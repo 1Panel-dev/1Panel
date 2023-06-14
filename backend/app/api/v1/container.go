@@ -307,6 +307,15 @@ func (b *BaseApi) Inspect(c *gin.Context) {
 	helper.SuccessWithData(c, result)
 }
 
+// @Tags Container
+// @Summary Container logs
+// @Description 容器日志
+// @Param container query string false "容器名称"
+// @Param since query string false "时间筛选"
+// @Param follow query string false "是否追踪"
+// @Param tail query string false "显示行号"
+// @Security ApiKeyAuth
+// @Router /containers/search/log [post]
 func (b *BaseApi) ContainerLogs(c *gin.Context) {
 	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {

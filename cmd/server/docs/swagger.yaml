@@ -290,16 +290,6 @@ definitions:
           $ref: '#/definitions/dto.VolumeHelper'
         type: array
     type: object
-  dto.ContainerLog:
-    properties:
-      containerID:
-        type: string
-      mode:
-        type: string
-    required:
-    - containerID
-    - mode
-    type: object
   dto.ContainerOperation:
     properties:
       name:
@@ -415,8 +405,8 @@ definitions:
       website:
         type: string
       week:
-        maximum: 7
-        minimum: 1
+        maximum: 6
+        minimum: 0
         type: integer
     required:
     - name
@@ -469,8 +459,8 @@ definitions:
       website:
         type: string
       week:
-        maximum: 7
-        minimum: 1
+        maximum: 6
+        minimum: 0
         type: integer
     required:
     - id
@@ -1437,9 +1427,9 @@ definitions:
     type: object
   dto.SSHHistory:
     properties:
-      Area:
-        type: string
       address:
+        type: string
+      area:
         type: string
       authMode:
         type: string
@@ -3670,8 +3660,8 @@ paths:
         bodyKeys:
         - installId
         - operate
-        formatEN: '[appKey] App [appName] [operate]'
-        formatZH: '[appKey] 应用 [appName] [operate]'
+        formatEN: '[operate] App [appKey][appName]'
+        formatZH: '[operate] 应用 [appKey][appName]'
         paramKeys: []
   /apps/installed/params/:appInstallId:
     get:
@@ -4836,21 +4826,25 @@ paths:
       - Container
   /containers/search/log:
     post:
-      consumes:
-      - application/json
       description: 容器日志
       parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.ContainerLog'
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
+      - description: 容器名称
+        in: query
+        name: container
+        type: string
+      - description: 时间筛选
+        in: query
+        name: since
+        type: string
+      - description: 是否追踪
+        in: query
+        name: follow
+        type: string
+      - description: 显示行号
+        in: query
+        name: tail
+        type: string
+      responses: {}
       security:
       - ApiKeyAuth: []
       summary: Container logs

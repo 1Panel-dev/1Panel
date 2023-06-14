@@ -2,8 +2,19 @@
     <div>
         <div>
             <el-select @change="searchLogs" style="width: 10%; float: left" v-model="logSearch.mode">
+                <template #prefix>{{ $t('container.fetch') }}</template>
                 <el-option v-for="item in timeOptions" :key="item.label" :value="item.value" :label="item.label" />
             </el-select>
+            <el-input
+                @change="searchLogs"
+                class="margin-button"
+                style="width: 10%; float: left"
+                v-model.number="logSearch.tail"
+            >
+                <template #prefix>
+                    <div style="margin-left: 2px">{{ $t('container.lines') }}</div>
+                </template>
+            </el-input>
             <div class="margin-button" style="float: left">
                 <el-checkbox border v-model="logSearch.isWatch">{{ $t('commons.button.watch') }}</el-checkbox>
             </div>
@@ -34,14 +45,14 @@
 </template>
 
 <script lang="ts" setup>
-import { cleanContainerLog, logContainer } from '@/api/modules/container';
+import { cleanContainerLog } from '@/api/modules/container';
 import i18n from '@/lang';
 import { dateFormatForName } from '@/utils/util';
-import { nextTick, onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
+import { onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 
 const extensions = [javascript(), oneDark];
 
@@ -50,14 +61,15 @@ const view = shallowRef();
 const handleReady = (payload) => {
     view.value = payload.view;
 };
+const terminalSocket = ref<WebSocket>();
 
 const logSearch = reactive({
     isWatch: false,
     container: '',
     containerID: '',
     mode: 'all',
+    tail: 100,
 });
-let timer: NodeJS.Timer | null = null;
 
 const timeOptions = ref([
     { label: i18n.global.t('container.all'), value: 'all' },
@@ -80,15 +92,26 @@ const timeOptions = ref([
 ]);
 
 const searchLogs = async () => {
-    const res = await logContainer(logSearch);
-    logInfo.value = res.data || '';
-    nextTick(() => {
+    if (!Number(logSearch.tail) || Number(logSearch.tail) <= 0) {
+        MsgError(i18n.global.t('container.linesHelper'));
+        return;
+    }
+    terminalSocket.value?.close();
+    logInfo.value = '';
+    const href = window.location.href;
+    const protocol = href.split('//')[0] === 'http:' ? 'ws' : 'wss';
+    const host = href.split('//')[1].split('/')[0];
+    terminalSocket.value = new WebSocket(
+        `${protocol}://${host}/api/v1/containers/search/log?container=${logSearch.containerID}&since=${logSearch.mode}&tail=${logSearch.tail}&follow=${logSearch.isWatch}`,
+    );
+    terminalSocket.value.onmessage = (event) => {
+        logInfo.value += event.data;
         const state = view.value.state;
         view.value.dispatch({
             selection: { anchor: state.doc.length, head: state.doc.length },
             scrollIntoView: true,
         });
-    });
+    };
 };
 
 const onDownload = async () => {
@@ -108,15 +131,11 @@ interface DialogProps {
 
 const acceptParams = (props: DialogProps): void => {
     logSearch.containerID = props.containerID;
+    logSearch.tail = 100;
     logSearch.mode = 'all';
     logSearch.isWatch = false;
     logSearch.container = props.container;
     searchLogs();
-    timer = setInterval(() => {
-        if (logSearch.isWatch) {
-            searchLogs();
-        }
-    }, 1000 * 5);
 };
 
 const onClean = async () => {
@@ -132,8 +151,7 @@ const onClean = async () => {
 };
 
 onBeforeUnmount(() => {
-    clearInterval(Number(timer));
-    timer = null;
+    terminalSocket.value?.close();
 });
 
 defineExpose({

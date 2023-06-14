@@ -1,7 +1,6 @@
 package service
 
 import (
-	"bufio"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -354,9 +353,9 @@ func (u *ContainerService) ContainerLogs(wsConn *websocket.Conn, container, sinc
 		return err
 	}
 
-	reader := bufio.NewReader(stdout)
+	buffer := make([]byte, 1024)
 	for {
-		bytes, err := reader.ReadBytes('\n')
+		n, err := stdout.Read(buffer)
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -364,7 +363,7 @@ func (u *ContainerService) ContainerLogs(wsConn *websocket.Conn, container, sinc
 			global.LOG.Errorf("read bytes from container log failed, err: %v", err)
 			continue
 		}
-		if err = wsConn.WriteMessage(websocket.TextMessage, bytes); err != nil {
+		if err = wsConn.WriteMessage(websocket.TextMessage, buffer[:n]); err != nil {
 			global.LOG.Errorf("send message with container log to ws failed, err: %v", err)
 			break
 		}

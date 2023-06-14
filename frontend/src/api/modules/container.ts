@@ -8,9 +8,6 @@ export const searchContainer = (params: Container.ContainerSearch) => {
 export const createContainer = (params: Container.ContainerCreate) => {
     return http.post(`/containers`, params, 3000000);
 };
-export const logContainer = (params: Container.ContainerLogSearch) => {
-    return http.post<string>(`/containers/search/log`, params, 400000);
-};
 export const cleanContainerLog = (containerName: string) => {
     return http.post(`/containers/clean/log`, { name: containerName });
 };

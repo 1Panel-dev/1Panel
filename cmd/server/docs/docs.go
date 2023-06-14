@@ -490,8 +490,8 @@ var doc = `{
                         "installId",
                         "operate"
                     ],
-                    "formatEN": "[appKey] App [appName] [operate]",
-                    "formatZH": "[appKey] 应用 [appName] [operate]",
+                    "formatEN": "[operate] App [appKey][appName]",
+                    "formatZH": "[operate] 应用 [appKey][appName]",
                     "paramKeys": []
                 }
             }
@@ -2327,32 +2327,37 @@ var doc = `{
                     }
                 ],
                 "description": "容器日志",
-                "consumes": [
-                    "application/json"
-                ],
                 "tags": [
                     "Container"
                 ],
                 "summary": "Container logs",
                 "parameters": [
                     {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.ContainerLog"
-                        }
+                        "type": "string",
+                        "description": "容器名称",
+                        "name": "container",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "时间筛选",
+                        "name": "since",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "是否追踪",
+                        "name": "follow",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "显示行号",
+                        "name": "tail",
+                        "in": "query"
                     }
                 ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
+                "responses": {}
             }
         },
         "/containers/stats/:id": {
@@ -10635,21 +10640,6 @@ var doc = `{
                 }
             }
         },
-        "dto.ContainerLog": {
-            "type": "object",
-            "required": [
-                "containerID",
-                "mode"
-            ],
-            "properties": {
-                "containerID": {
-                    "type": "string"
-                },
-                "mode": {
-                    "type": "string"
-                }
-            }
-        },
         "dto.ContainerOperation": {
             "type": "object",
             "required": [
@@ -10825,8 +10815,8 @@ var doc = `{
                 },
                 "week": {
                     "type": "integer",
-                    "maximum": 7,
-                    "minimum": 1
+                    "maximum": 6,
+                    "minimum": 0
                 }
             }
         },
@@ -10904,8 +10894,8 @@ var doc = `{
                 },
                 "week": {
                     "type": "integer",
-                    "maximum": 7,
-                    "minimum": 1
+                    "maximum": 6,
+                    "minimum": 0
                 }
             }
         },
@@ -12347,10 +12337,10 @@ var doc = `{
         "dto.SSHHistory": {
             "type": "object",
             "properties": {
-                "Area": {
+                "address": {
                     "type": "string"
                 },
-                "address": {
+                "area": {
                     "type": "string"
                 },
                 "authMode": {
