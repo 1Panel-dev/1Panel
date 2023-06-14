@@ -36,6 +36,7 @@ type ContainerCreate struct {
 	PublishAllPorts bool           `json:"publishAllPorts"`
 	ExposedPorts    []PortHelper   `json:"exposedPorts"`
 	Cmd             []string       `json:"cmd"`
+	CPUShares       int64          `josn:"cpuShares"`
 	NanoCPUs        int64          `json:"nanoCPUs"`
 	Memory          int64          `json:"memory"`
 	AutoRemove      bool           `json:"autoRemove"`

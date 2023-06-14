@@ -490,6 +490,8 @@ const message = {
         cleanLog: '清空日志',
         newName: '新名称',
         source: '资源使用率',
+        cpuShare: 'CPU 权重',
+        cpuShareHelper: '容器默认份额为 1024 个 CPU，增大可使当前容器获得更多的 CPU 时间',
 
         user: '用户',
         command: '命令',
