@@ -2,12 +2,13 @@ package db
 
 import (
 	"fmt"
-	"gorm.io/gorm/logger"
 	"log"
 	"os"
 	"time"
 
-	"gorm.io/driver/sqlite"
+	"gorm.io/gorm/logger"
+
+	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 
 	"github.com/1Panel-dev/1Panel/backend/global"

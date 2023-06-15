@@ -17,6 +17,7 @@ require (
 	github.com/gin-contrib/gzip v0.0.6
 	github.com/gin-contrib/i18n v0.0.1
 	github.com/gin-gonic/gin v1.9.1
+	github.com/glebarez/sqlite v1.8.0
 	github.com/go-acme/lego/v4 v4.9.0
 	github.com/go-gormigrate/gormigrate/v2 v2.0.2
 	github.com/go-playground/validator/v10 v10.14.0
@@ -56,7 +57,7 @@ require (
 	gopkg.in/square/go-jose.v2 v2.6.0
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/sqlite v1.4.4
-	gorm.io/gorm v1.24.5
+	gorm.io/gorm v1.24.6
 )
 
 require (
@@ -112,6 +113,7 @@ require (
 	github.com/fvbommel/sortorder v1.0.2 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
+	github.com/glebarez/go-sqlite v1.21.1 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
@@ -200,6 +202,7 @@ require (
 	github.com/prometheus/client_model v0.3.0 // indirect
 	github.com/prometheus/common v0.37.0 // indirect
 	github.com/prometheus/procfs v0.8.0 // indirect
+	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/rs/xid v1.4.0 // indirect
 	github.com/serialx/hashring v0.0.0-20190422032157-8b2912629002 // indirect
@@ -258,6 +261,10 @@ require (
 	k8s.io/client-go v0.24.1 // indirect
 	k8s.io/klog/v2 v2.80.1 // indirect
 	k8s.io/utils v0.0.0-20221107191617-1a15be271d1d // indirect
+	modernc.org/libc v1.22.3 // indirect
+	modernc.org/mathutil v1.5.0 // indirect
+	modernc.org/memory v1.5.0 // indirect
+	modernc.org/sqlite v1.21.1 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )

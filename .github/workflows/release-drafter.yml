@@ -10,9 +10,7 @@ jobs:
   create-release:
     runs-on: ubuntu-latest
     steps:
-      - name: Install cross-compilers
-        run: sudo apt-get update && sudo apt-get -y install gcc-x86-64-linux-gnu gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi gcc-powerpc64le-linux-gnu gcc-s390x-linux-gnu
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v2
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -20,7 +18,7 @@ jobs:
           node-version: '18.14'
       - name: Build Web
         run: |
-          cd frontend && npm install && npm run build:dev
+          cd frontend && npm install && npm run build:pro
         env:
           NODE_OPTIONS: --max-old-space-size=8192
       - name: Setup Go
@@ -30,17 +28,33 @@ jobs:
       - name: Build Release
         uses: goreleaser/goreleaser-action@v4
         with:
+          distribution: goreleaser
+          version: latest
           args: release --skip-publish --clean
       - name: Upload Assets
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
           draft: true
+          body: |
+            # 一、安装和升级
+
+            ## 1.1 一键安装
+            ```sh
+            curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_start.sh && sudo bash quick_start.sh
+            ```
+
+            ## 1.2 在线升级
+
+            登录 1Panel Web 控制台，在页面右下角点击 **【检查更新】** 进行在线升级。
+
+            >更多信息请查阅在线文档：https://1panel.cn/docs/
+
+            # 二、更新日志
+
           files: |
             dist/*.tar.gz
             dist/checksums.txt
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Setup OSSUTIL
         uses: yizhoumo/setup-ossutil@v1
         with:
@@ -49,4 +63,4 @@ jobs:
           access-key-secret: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
           ossutil-version: '1.7.14'
       - name: Upload Assets to OSS
-        run: ossutil cp -r dist/ oss://resource-fit2cloud-com/1panel/package/stable/${{  github.ref_name }}/release/ --include "*.tar.gz" --include "checksums.txt" --only-current-dir
+        run: ossutil cp -r dist/ oss://resource-fit2cloud-com/1panel/package/stable/${{  github.ref_name }}/release/ --include "*.tar.gz" --include "checksums.txt" --only-current-dir --force

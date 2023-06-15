@@ -19,15 +19,6 @@ builds:
       - --extldflags "-static -fpic"
     tags:
       - osusergo
-    env:
-      - CGO_ENABLED=1
-      - >-
-        {{- if eq .Arch "amd64"}}CC=x86_64-linux-gnu-gcc{{- end }}
-        {{- if eq .Arch "arm64"}}CC=aarch64-linux-gnu-gcc{{- end }}
-        {{- if eq .Arch "arm"}}CC=arm-linux-gnueabi-gcc{{- end }}
-        {{- if eq .Arch "loong64"}}CC=loongarch64-linux-gnu-gcc{{- end }}
-        {{- if eq .Arch "ppc64le"}}CC=powerpc64le-linux-gnu-gcc{{- end }}
-        {{- if eq .Arch "s390x"}}CC=s390x-linux-gnu-gcc{{- end }}
     goos:
       - linux
     goarm:
