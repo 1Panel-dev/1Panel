@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ContainerOperator } from '@/api/modules/container';
+import { containerOperator } from '@/api/modules/container';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -54,7 +54,7 @@ const onSubmitName = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         loading.value = true;
-        await ContainerOperator(renameForm)
+        await containerOperator(renameForm)
             .then(() => {
                 loading.value = false;
                 emit('search');

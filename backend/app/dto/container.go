@@ -30,6 +30,11 @@ type ContainerInfo struct {
 	IsFromCompose bool `json:"isFromCompose"`
 }
 
+type ResourceLimit struct {
+	CPU    int `json:"cpu"`
+	Memory int `json:"memory"`
+}
+
 type ContainerOperate struct {
 	Name            string         `json:"name"`
 	Image           string         `json:"image"`

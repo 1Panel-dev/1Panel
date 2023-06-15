@@ -62,7 +62,7 @@
 
 <script lang="ts" setup>
 import { onBeforeUnmount, ref } from 'vue';
-import { ContainerStats } from '@/api/modules/container';
+import { containerStats } from '@/api/modules/container';
 import { dateFormatForSecond } from '@/utils/util';
 import VCharts from '@/components/v-charts/index.vue';
 import i18n from '@/lang';
@@ -125,7 +125,7 @@ const changeTimer = () => {
 };
 
 const loadData = async () => {
-    const res = await ContainerStats(dialogData.value.containerID);
+    const res = await containerStats(dialogData.value.containerID);
     cpuDatas.value.push(res.data.cpuPercent.toFixed(2));
     if (cpuDatas.value.length > 20) {
         cpuDatas.value.splice(0, 1);

@@ -507,7 +507,7 @@ const message = {
         autoRemove: 'Auto remove',
         cpuQuota: 'NacosCPU',
         memoryLimit: 'Memory',
-        limitHelper: 'If the limit is 0, the limit is turned off',
+        limitHelper: 'If you limit it to 0, then the limitation is turned off, and the maximum available is {0}.',
         mount: 'Mount',
         serverPath: 'Server path',
         containerDir: 'Container path',

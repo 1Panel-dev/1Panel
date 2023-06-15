@@ -104,7 +104,6 @@
                 <CodemirrorDialog ref="mydetail" />
 
                 <ContainerLogDialog ref="dialogContainerLogRef" />
-                <CreateDialog @search="search" ref="dialogCreateRef" />
                 <MonitorDialog ref="dialogMonitorRef" />
                 <TerminalDialog ref="dialogTerminalRef" />
             </template>
@@ -115,14 +114,13 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import Tooltip from '@/components/tooltip/index.vue';
-import CreateDialog from '@/views/container/container/create/index.vue';
 import MonitorDialog from '@/views/container/container/monitor/index.vue';
 import ContainerLogDialog from '@/views/container/container/log/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
 import Status from '@/components/status/index.vue';
 import { dateFormat } from '@/utils/util';
-import { composeOperator, ContainerOperator, inspect, searchContainer } from '@/api/modules/container';
+import { composeOperator, containerOperator, inspect, searchContainer } from '@/api/modules/container';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import { Container } from '@/api/interface/container';
@@ -240,7 +238,7 @@ const onOperate = async (operation: string) => {
                 operation: operation,
                 newName: '',
             };
-            ps.push(ContainerOperator(param));
+            ps.push(containerOperator(param));
         }
         Promise.all(ps)
             .then(() => {

@@ -1853,6 +1853,25 @@ var doc = `{
                 }
             }
         },
+        "/containers/limit": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取容器限制",
+                "summary": "Load container limis",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ResourceLimit"
+                        }
+                    }
+                }
+            }
+        },
         "/containers/network": {
             "post": {
                 "security": [
@@ -12405,6 +12424,17 @@ var doc = `{
                 },
                 "used_memory_rss": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.ResourceLimit": {
+            "type": "object",
+            "properties": {
+                "cpu": {
+                    "type": "integer"
+                },
+                "memory": {
+                    "type": "integer"
                 }
             }
         },
