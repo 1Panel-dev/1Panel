@@ -253,7 +253,7 @@ definitions:
     - name
     - path
     type: object
-  dto.ContainerCreate:
+  dto.ContainerOperate:
     properties:
       autoRemove:
         type: boolean
@@ -261,6 +261,8 @@ definitions:
         items:
           type: string
         type: array
+      cpushares:
+        type: integer
       env:
         items:
           type: string
@@ -3926,7 +3928,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.ContainerCreate'
+          $ref: '#/definitions/dto.ContainerOperate'
       responses:
         "200":
           description: ""
@@ -4483,6 +4485,28 @@ paths:
         formatEN: tag image [reponame][targetName]
         formatZH: tag 镜像 [reponame][targetName]
         paramKeys: []
+  /containers/info:
+    post:
+      consumes:
+      - application/json
+      description: 获取容器表单信息
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OperationWithName'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ContainerOperate'
+      security:
+      - ApiKeyAuth: []
+      summary: Load container info
+      tags:
+      - Container
   /containers/inspect:
     post:
       consumes:
@@ -4999,6 +5023,34 @@ paths:
         - id
         formatEN: update compose template information [name]
         formatZH: 更新 compose 模版 [name]
+        paramKeys: []
+  /containers/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新容器
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ContainerOperate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update container
+      tags:
+      - Container
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        - image
+        formatEN: update container [name][image]
+        formatZH: 更新容器 [name][image]
         paramKeys: []
   /containers/volume:
     post:

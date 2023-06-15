@@ -39,7 +39,9 @@ type IContainerService interface {
 	PageCompose(req dto.SearchWithPage) (int64, interface{}, error)
 	CreateCompose(req dto.ComposeCreate) (string, error)
 	ComposeOperation(req dto.ComposeOperation) error
-	ContainerCreate(req dto.ContainerCreate) error
+	ContainerCreate(req dto.ContainerOperate) error
+	ContainerUpdate(req dto.ContainerOperate) error
+	ContainerInfo(req dto.OperationWithName) (*dto.ContainerOperate, error)
 	ContainerLogClean(req dto.OperationWithName) error
 	ContainerOperation(req dto.ContainerOperation) error
 	ContainerLogs(wsConn *websocket.Conn, container, since, tail string, follow bool) error
@@ -213,55 +215,16 @@ func (u *ContainerService) Prune(req dto.ContainerPrune) (dto.ContainerPruneRepo
 	return report, nil
 }
 
-func (u *ContainerService) ContainerCreate(req dto.ContainerCreate) error {
-	portMap, err := checkPortStats(req.ExposedPorts)
-	if err != nil {
-		return err
-	}
+func (u *ContainerService) ContainerCreate(req dto.ContainerOperate) error {
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		return err
 	}
 
-	exposeds := make(nat.PortSet)
-	for port := range portMap {
-		exposeds[port] = struct{}{}
-	}
-	config := &container.Config{
-		Image:        req.Image,
-		Cmd:          req.Cmd,
-		Env:          req.Env,
-		Labels:       stringsToMap(req.Labels),
-		Tty:          true,
-		OpenStdin:    true,
-		ExposedPorts: exposeds,
-	}
-	hostConf := &container.HostConfig{
-		AutoRemove:      req.AutoRemove,
-		PublishAllPorts: req.PublishAllPorts,
-		RestartPolicy:   container.RestartPolicy{Name: req.RestartPolicy},
-	}
-	if req.RestartPolicy == "on-failure" {
-		hostConf.RestartPolicy.MaximumRetryCount = 5
-	}
-	if req.NanoCPUs != 0 {
-		hostConf.NanoCPUs = req.NanoCPUs * 1000000000
-	}
-	if req.CPUShares != 0 {
-		hostConf.CPUShares = req.CPUShares
-	}
-	if req.Memory != 0 {
-		hostConf.Memory = req.Memory
-	}
-	if len(req.ExposedPorts) != 0 {
-		hostConf.PortBindings = portMap
-	}
-	if len(req.Volumes) != 0 {
-		config.Volumes = make(map[string]struct{})
-		for _, volume := range req.Volumes {
-			config.Volumes[volume.ContainerDir] = struct{}{}
-			hostConf.Binds = append(hostConf.Binds, fmt.Sprintf("%s:%s:%s", volume.SourceDir, volume.ContainerDir, volume.Mode))
-		}
+	var config *container.Config
+	var hostConf *container.HostConfig
+	if err := loadConfigInfo(req, config, hostConf); err != nil {
+		return err
 	}
 
 	global.LOG.Infof("new container info %s has been made, now start to create", req.Name)
@@ -282,6 +245,95 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerCreate) error {
 		_ = client.ContainerRemove(ctx, req.Name, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
 		return fmt.Errorf("create successful but start failed, err: %v", err)
 	}
+	return nil
+}
+
+func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.ContainerOperate, error) {
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return nil, err
+	}
+	ctx := context.Background()
+	oldContainer, err := client.ContainerInspect(ctx, req.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	var data dto.ContainerOperate
+	data.Name = strings.ReplaceAll(oldContainer.Name, "/", "")
+	data.Image = oldContainer.Config.Image
+	data.Cmd = oldContainer.Config.Cmd
+	data.Env = oldContainer.Config.Env
+	for key, val := range oldContainer.Config.Labels {
+		data.Labels = append(data.Labels, fmt.Sprintf("%s=%s", key, val))
+	}
+	for key, val := range oldContainer.HostConfig.PortBindings {
+		var itemPort dto.PortHelper
+		if !strings.Contains(string(key), "/") {
+			continue
+		}
+		itemPort.ContainerPort = strings.Split(string(key), "/")[0]
+		itemPort.Protocol = strings.Split(string(key), "/")[1]
+		for _, binds := range val {
+			itemPort.HostIP = binds.HostIP
+			itemPort.HostPort = binds.HostPort
+			data.ExposedPorts = append(data.ExposedPorts, itemPort)
+		}
+	}
+	data.AutoRemove = oldContainer.HostConfig.AutoRemove
+	data.PublishAllPorts = oldContainer.HostConfig.PublishAllPorts
+	data.RestartPolicy = oldContainer.HostConfig.RestartPolicy.Name
+	if oldContainer.HostConfig.NanoCPUs != 0 {
+		data.NanoCPUs = oldContainer.HostConfig.NanoCPUs / 1000000000
+	}
+	if oldContainer.HostConfig.Memory != 0 {
+		data.Memory = oldContainer.HostConfig.Memory
+	}
+	for _, bind := range oldContainer.HostConfig.Binds {
+		parts := strings.Split(bind, ":")
+		if len(parts) != 3 {
+			continue
+		}
+		data.Volumes = append(data.Volumes, dto.VolumeHelper{SourceDir: parts[0], ContainerDir: parts[1], Mode: parts[2]})
+	}
+
+	return &data, nil
+}
+
+func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return err
+	}
+	ctx := context.Background()
+	oldContainer, err := client.ContainerInspect(ctx, req.Name)
+	if err != nil {
+		return err
+	}
+	if !checkImageExist(client, req.Image) {
+		if err := pullImages(ctx, client, req.Image); err != nil {
+			return err
+		}
+	}
+	config := oldContainer.Config
+	hostConf := oldContainer.HostConfig
+	if err := loadConfigInfo(req, config, hostConf); err != nil {
+		return err
+	}
+	if err := client.ContainerRemove(ctx, req.Name, types.ContainerRemoveOptions{Force: true}); err != nil {
+		return err
+	}
+
+	global.LOG.Infof("new container info %s has been update, now start to recreate", req.Name)
+	container, err := client.ContainerCreate(ctx, config, hostConf, &network.NetworkingConfig{}, &v1.Platform{}, req.Name)
+	if err != nil {
+		return fmt.Errorf("recreate contianer failed, err: %v", err)
+	}
+	global.LOG.Infof("update container %s successful! now check if the container is started.", req.Name)
+	if err := client.ContainerStart(ctx, container.ID, types.ContainerStartOptions{}); err != nil {
+		return fmt.Errorf("update successful but start failed, err: %v", err)
+	}
+
 	return nil
 }
 
@@ -558,4 +610,45 @@ func checkPortStats(ports []dto.PortHelper) (nat.PortMap, error) {
 		}
 	}
 	return portMap, nil
+}
+
+func loadConfigInfo(req dto.ContainerOperate, config *container.Config, hostConf *container.HostConfig) error {
+	portMap, err := checkPortStats(req.ExposedPorts)
+	if err != nil {
+		return err
+	}
+	exposeds := make(nat.PortSet)
+	for port := range portMap {
+		exposeds[port] = struct{}{}
+	}
+	config.Image = req.Image
+	config.Cmd = req.Cmd
+	config.Env = req.Env
+	config.Labels = stringsToMap(req.Labels)
+	config.ExposedPorts = exposeds
+
+	hostConf.AutoRemove = req.AutoRemove
+	hostConf.PublishAllPorts = req.PublishAllPorts
+	hostConf.RestartPolicy = container.RestartPolicy{Name: req.RestartPolicy}
+	if req.RestartPolicy == "on-failure" {
+		hostConf.RestartPolicy.MaximumRetryCount = 5
+	}
+	if req.NanoCPUs != 0 {
+		hostConf.NanoCPUs = req.NanoCPUs * 1000000000
+	}
+	if req.Memory != 0 {
+		hostConf.Memory = req.Memory
+	}
+	if len(req.ExposedPorts) != 0 {
+		hostConf.PortBindings = portMap
+	}
+	hostConf.Binds = []string{}
+	if len(req.Volumes) != 0 {
+		config.Volumes = make(map[string]struct{})
+		for _, volume := range req.Volumes {
+			config.Volumes[volume.ContainerDir] = struct{}{}
+			hostConf.Binds = append(hostConf.Binds, fmt.Sprintf("%s:%s:%s", volume.SourceDir, volume.ContainerDir, volume.Mode))
+		}
+	}
+	return nil
 }

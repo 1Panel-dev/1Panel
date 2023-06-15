@@ -444,6 +444,8 @@ const message = {
     },
     container: {
         createContainer: 'Create container',
+        updateContaienrHelper:
+            'Container editing requires rebuilding the container. Any data that has not been persisted will be lost. Do you want to continue?',
         containerList: 'Container list',
         operatorHelper: '{0} will be performed on the selected container. Do you want to continue?',
         operatorAppHelper:
@@ -489,6 +491,7 @@ const message = {
 
         user: 'User',
         command: 'Command',
+        commandHelper: 'Please enter the correct command, separated by spaces if there are multiple commands.',
         custom: 'Custom',
         emptyUser: 'When empty, you will log in as  default',
         containerTerminal: 'Terminal',
@@ -514,9 +517,10 @@ const message = {
         mode: 'Mode',
         env: 'Environment',
         restartPolicy: 'Restart policy',
+        always: 'always',
         unlessStopped: 'unless-stopped',
         onFailure: 'on-failure（five times by default）',
-        no: 'no',
+        no: 'never',
 
         image: 'Image',
         imagePull: 'Image pull',

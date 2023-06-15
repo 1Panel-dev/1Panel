@@ -916,7 +916,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.ContainerCreate"
+                            "$ref": "#/definitions/dto.ContainerOperate"
                         }
                     }
                 ],
@@ -1781,6 +1781,42 @@ var doc = `{
                 }
             }
         },
+        "/containers/info": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取容器表单信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Container"
+                ],
+                "summary": "Load container info",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperationWithName"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ContainerOperate"
+                        }
+                    }
+                }
+            }
+        },
         "/containers/inspect": {
             "post": {
                 "security": [
@@ -2593,6 +2629,49 @@ var doc = `{
                     ],
                     "formatEN": "update compose template information [name]",
                     "formatZH": "更新 compose 模版 [name]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/containers/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新容器",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Container"
+                ],
+                "summary": "Update container",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ContainerOperate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "name",
+                        "image"
+                    ],
+                    "formatEN": "update container [name][image]",
+                    "formatZH": "更新容器 [name][image]",
                     "paramKeys": []
                 }
             }
@@ -10584,7 +10663,7 @@ var doc = `{
                 }
             }
         },
-        "dto.ContainerCreate": {
+        "dto.ContainerOperate": {
             "type": "object",
             "properties": {
                 "autoRemove": {
@@ -10595,6 +10674,9 @@ var doc = `{
                     "items": {
                         "type": "string"
                     }
+                },
+                "cpushares": {
+                    "type": "integer"
                 },
                 "env": {
                     "type": "array",
