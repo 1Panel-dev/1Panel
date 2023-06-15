@@ -30,5 +30,6 @@ dist/
 1pctl
 1panel.service
 install.sh
+quick_start.sh
 cmd/server/web/.DS_Store
 cmd/server/.DS_Store
