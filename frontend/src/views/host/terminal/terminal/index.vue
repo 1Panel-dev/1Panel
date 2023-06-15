@@ -123,14 +123,14 @@
                 ></el-empty>
             </div>
         </el-tabs>
-        <el-button @click="toggleFullscreen" class="fullScreen" icon="FullScreen"></el-button>
+        <el-button @click="toggleFullscreen" v-if="!mobile" class="fullScreen" icon="FullScreen"></el-button>
 
         <HostDialog ref="dialogRef" @on-conn-terminal="onConnTerminal" @load-host-tree="loadHostTree" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, getCurrentInstance, watch, nextTick } from 'vue';
+import { ref, getCurrentInstance, watch, nextTick, computed } from 'vue';
 import Terminal from '@/components/terminal/index.vue';
 import HostDialog from '@/views/host/terminal/terminal/host-create.vue';
 import type Node from 'element-plus/es/components/tree/src/model/node';
@@ -145,15 +145,15 @@ import { GlobalStore } from '@/store';
 const dialogRef = ref();
 const ctx = getCurrentInstance() as any;
 const globalStore = GlobalStore();
+const mobile = computed(() => {
+    return globalStore.isMobile();
+});
 
 function toggleFullscreen() {
     if (screenfull.isEnabled) {
         screenfull.toggle();
     }
 }
-screenfull.on('change', () => {
-    globalStore.isFullScreen = screenfull.isFullscreen;
-});
 
 const localHostID = ref();
 
@@ -208,6 +208,12 @@ const acceptParams = async () => {
                 return;
             }
         }
+    }
+
+    if (!mobile.value) {
+        screenfull.on('change', () => {
+            globalStore.isFullScreen = screenfull.isFullscreen;
+        });
     }
 };
 const cleanTimer = () => {

@@ -8,7 +8,7 @@
         >
             <template #header>
                 <DrawerHeader :header="$t('commons.button.log')" :resource="logSearch.container" :back="handleClose">
-                    <template #extra>
+                    <template #extra v-if="!mobile">
                         <el-button @click="toggleFullscreen" class="fullScreen" icon="FullScreen" plain></el-button>
                     </template>
                 </DrawerHeader>
@@ -56,7 +56,7 @@
 import { cleanContainerLog, logContainer } from '@/api/modules/container';
 import i18n from '@/lang';
 import { dateFormatForName } from '@/utils/util';
-import { nextTick, onBeforeUnmount, reactive, ref, shallowRef, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, reactive, ref, shallowRef, watch } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
@@ -67,8 +67,10 @@ import screenfull from 'screenfull';
 import { GlobalStore } from '@/store';
 
 const extensions = [javascript(), oneDark];
-
 const logVisiable = ref(false);
+const mobile = computed(() => {
+    return globalStore.isMobile();
+});
 
 const logInfo = ref();
 const view = shallowRef();
@@ -110,16 +112,13 @@ function toggleFullscreen() {
         screenfull.toggle();
     }
 }
-screenfull.on('change', () => {
-    globalStore.isFullScreen = screenfull.isFullscreen;
-});
 const handleClose = async () => {
     logVisiable.value = false;
     clearInterval(Number(timer));
     timer = null;
 };
 watch(logVisiable, (val) => {
-    if (screenfull.isEnabled && !val) screenfull.exit();
+    if (screenfull.isEnabled && !val && !mobile.value) screenfull.exit();
 });
 const searchLogs = async () => {
     const res = await logContainer(logSearch);
@@ -172,6 +171,12 @@ const acceptParams = (props: DialogProps): void => {
             searchLogs();
         }
     }, 1000 * 5);
+
+    if (!mobile.value) {
+        screenfull.on('change', () => {
+            globalStore.isFullScreen = screenfull.isFullscreen;
+        });
+    }
 };
 
 onBeforeUnmount(() => {
