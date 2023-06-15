@@ -16,9 +16,6 @@ builds:
       - -trimpath
     ldflags:
       - -w -s
-      - --extldflags "-static -fpic"
-    tags:
-      - osusergo
     goos:
       - linux
     goarm:
