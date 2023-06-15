@@ -27,6 +27,8 @@ import (
 	"github.com/docker/go-connections/nat"
 	"github.com/gorilla/websocket"
 	v1 "github.com/opencontainers/image-spec/specs-go/v1"
+	"github.com/shirou/gopsutil/v3/cpu"
+	"github.com/shirou/gopsutil/v3/mem"
 )
 
 type ContainerService struct{}
@@ -42,6 +44,7 @@ type IContainerService interface {
 	ContainerCreate(req dto.ContainerOperate) error
 	ContainerUpdate(req dto.ContainerOperate) error
 	ContainerInfo(req dto.OperationWithName) (*dto.ContainerOperate, error)
+	LoadResouceLimit() (*dto.ResourceLimit, error)
 	ContainerLogClean(req dto.OperationWithName) error
 	ContainerOperation(req dto.ContainerOperation) error
 	ContainerLogs(wsConn *websocket.Conn, container, since, tail string, follow bool) error
@@ -213,6 +216,23 @@ func (u *ContainerService) Prune(req dto.ContainerPrune) (dto.ContainerPruneRepo
 		report.SpaceReclaimed = int(rep.SpaceReclaimed)
 	}
 	return report, nil
+}
+
+func (u *ContainerService) LoadResouceLimit() (*dto.ResourceLimit, error) {
+	cpuCounts, err := cpu.Counts(false)
+	if err != nil {
+		return nil, fmt.Errorf("load cpu limit failed, err: %v", err)
+	}
+	memoryInfo, err := mem.VirtualMemory()
+	if err != nil {
+		return nil, fmt.Errorf("load memory limit failed, err: %v", err)
+	}
+
+	data := dto.ResourceLimit{
+		CPU:    cpuCounts,
+		Memory: int(memoryInfo.Total),
+	}
+	return &data, nil
 }
 
 func (u *ContainerService) ContainerCreate(req dto.ContainerOperate) error {

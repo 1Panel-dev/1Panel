@@ -512,7 +512,7 @@ const message = {
         autoRemove: '容器退出后自动删除容器',
         cpuQuota: 'CPU 限制',
         memoryLimit: '内存限制',
-        limitHelper: '限制为 0 则关闭限制',
+        limitHelper: '限制为 0 则关闭限制，最大可用为 {0}',
         mount: '挂载卷',
         serverPath: '服务器目录',
         containerDir: '容器目录',

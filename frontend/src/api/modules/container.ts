@@ -5,6 +5,9 @@ import { Container } from '../interface/container';
 export const searchContainer = (params: Container.ContainerSearch) => {
     return http.post<ResPage<Container.ContainerInfo>>(`/containers/search`, params, 400000);
 };
+export const loadResourceLimit = () => {
+    return http.get<Container.ResourceLimit>(`/containers/limit`);
+};
 export const createContainer = (params: Container.ContainerHelper) => {
     return http.post(`/containers`, params, 3000000);
 };
@@ -17,10 +20,10 @@ export const loadContainerInfo = (name: string) => {
 export const cleanContainerLog = (containerName: string) => {
     return http.post(`/containers/clean/log`, { name: containerName });
 };
-export const ContainerStats = (id: string) => {
+export const containerStats = (id: string) => {
     return http.get<Container.ContainerStats>(`/containers/stats/${id}`);
 };
-export const ContainerOperator = (params: Container.ContainerOperate) => {
+export const containerOperator = (params: Container.ContainerOperate) => {
     return http.post(`/containers/operate`, params);
 };
 export const containerPrune = (params: Container.ContainerPrune) => {

@@ -141,7 +141,7 @@ import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
 import Status from '@/components/status/index.vue';
 import { reactive, onMounted, ref } from 'vue';
 import {
-    ContainerOperator,
+    containerOperator,
     containerPrune,
     inspect,
     loadContainerInfo,
@@ -352,7 +352,7 @@ const onOperate = async (operation: string) => {
                 operation: operation,
                 newName: '',
             };
-            ps.push(ContainerOperator(param));
+            ps.push(containerOperator(param));
         }
         loading.value = true;
         Promise.all(ps)

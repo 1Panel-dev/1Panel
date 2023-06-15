@@ -94,31 +94,29 @@
                         <el-input style="width: 40%" v-model.number="dialogData.rowData!.cpuShares" />
                         <span class="input-help">{{ $t('container.cpuShareHelper') }}</span>
                     </el-form-item>
-                    <el-form-item :label="$t('container.cpuQuota')" prop="nanoCPUs">
-                        <el-input type="number" style="width: 40%" v-model.number="dialogData.rowData!.nanoCPUs">
+                    <el-form-item
+                        :label="$t('container.cpuQuota')"
+                        prop="nanoCPUs"
+                        :rules="checkNumberRange(0, limits.cpu)"
+                    >
+                        <el-input style="width: 40%" v-model.number="dialogData.rowData!.nanoCPUs">
                             <template #append>
-                                <el-select v-model="dialogData.rowData!.cpuUnit" disabled style="width: 85px">
-                                    <el-option label="Core" value="Core" />
-                                </el-select>
+                                <div style="width: 35px">{{ $t('home.coreUnit') }}</div>
                             </template>
                         </el-input>
-                        <span class="input-help">{{ $t('container.limitHelper') }}</span>
+                        <span class="input-help">
+                            {{ $t('container.limitHelper', [limits.cpu]) }}{{ $t('home.coreUnit') }}
+                        </span>
                     </el-form-item>
-                    <el-form-item :label="$t('container.memoryLimit')" prop="memoryItem">
+                    <el-form-item
+                        :label="$t('container.memoryLimit')"
+                        prop="memoryItem"
+                        :rules="checkNumberRange(0, limits.memory)"
+                    >
                         <el-input style="width: 40%" v-model.number="dialogData.rowData!.memoryItem">
-                            <template #append>
-                                <el-select
-                                    v-model="dialogData.rowData!.memoryUnit"
-                                    placeholder="Select"
-                                    style="width: 85px"
-                                >
-                                    <el-option label="KB" value="KB" />
-                                    <el-option label="MB" value="MB" />
-                                    <el-option label="GB" value="GB" />
-                                </el-select>
-                            </template>
+                            <template #append><div style="width: 35px">MB</div></template>
                         </el-input>
-                        <span class="input-help">{{ $t('container.limitHelper') }}</span>
+                        <span class="input-help">{{ $t('container.limitHelper', [limits.memory]) }}MB</span>
                     </el-form-item>
                     <el-form-item :label="$t('container.mount')">
                         <el-card style="width: 100%">
@@ -224,10 +222,10 @@ import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { listImage, listVolume, createContainer, updateContainer } from '@/api/modules/container';
+import { listImage, listVolume, createContainer, updateContainer, loadResourceLimit } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { checkIp, checkPort, computeSize } from '@/utils/util';
+import { checkIp, checkPort } from '@/utils/util';
 
 const loading = ref(false);
 interface DialogProps {
@@ -246,10 +244,7 @@ const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
     if (params.title === 'edit') {
-        dialogData.value.rowData.cpuUnit = 'Core';
-        let itemMem = computeSize(Number(dialogData.value.rowData.memory));
-        dialogData.value.rowData.memoryItem = itemMem.indexOf(' ') !== -1 ? Number(itemMem.split(' ')[0]) : 0;
-        dialogData.value.rowData.memoryUnit = itemMem.indexOf(' ') !== -1 ? itemMem.split(' ')[1] : 'MB';
+        dialogData.value.rowData.memoryItem = Number((dialogData.value.rowData.memory / 1024 / 1024).toFixed(2));
         let itemCmd = '';
         for (const item of dialogData.value.rowData.cmd) {
             itemCmd += `'${item}' `;
@@ -261,6 +256,7 @@ const acceptParams = (params: DialogProps): void => {
             item.host = item.hostPort;
         }
     }
+    loadLimit();
     loadImageOptions();
     loadVolumeOptions();
     drawerVisiable.value = true;
@@ -269,6 +265,10 @@ const emit = defineEmits<{ (e: 'search'): void }>();
 
 const images = ref();
 const volumes = ref();
+const limits = ref<Container.ResourceLimit>({
+    cpu: null as number,
+    memory: null as number,
+});
 
 const handleClose = () => {
     drawerVisiable.value = false;
@@ -311,6 +311,12 @@ const handleVolumesDelete = (index: number) => {
     dialogData.value.rowData!.volumes.splice(index, 1);
 };
 
+const loadLimit = async () => {
+    const res = await loadResourceLimit();
+    limits.value = res.data;
+    limits.value.memory = Number((limits.value.memory / 1024 / 1024).toFixed(2));
+};
+
 const loadImageOptions = async () => {
     const res = await listImage();
     images.value = res.data;
@@ -351,17 +357,8 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         if (!checkPortValid()) {
             return;
         }
-        switch (dialogData.value.rowData!.memoryUnit) {
-            case 'KB':
-                dialogData.value.rowData!.memory = dialogData.value.rowData!.memoryItem * 1024;
-                break;
-            case 'MB':
-                dialogData.value.rowData!.memory = dialogData.value.rowData!.memoryItem * 1024 * 1024;
-                break;
-            case 'GB':
-                dialogData.value.rowData!.memory = dialogData.value.rowData!.memoryItem * 1024 * 1024 * 1024;
-                break;
-        }
+        dialogData.value.rowData!.memory = dialogData.value.rowData!.memoryItem * 1024 * 1024;
+
         loading.value = true;
         if (dialogData.value.title === 'create') {
             await createContainer(dialogData.value.rowData!)

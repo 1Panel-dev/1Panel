@@ -1422,6 +1422,13 @@ definitions:
       used_memory_rss:
         type: string
     type: object
+  dto.ResourceLimit:
+    properties:
+      cpu:
+        type: integer
+      memory:
+        type: integer
+    type: object
   dto.SSHConf:
     properties:
       file:
@@ -4529,6 +4536,17 @@ paths:
       summary: Container inspect
       tags:
       - Container
+  /containers/limit:
+    get:
+      description: 获取容器限制
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ResourceLimit'
+      security:
+      - ApiKeyAuth: []
+      summary: Load container limis
   /containers/network:
     post:
       consumes:
