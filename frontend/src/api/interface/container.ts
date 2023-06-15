@@ -10,13 +10,18 @@ export namespace Container {
         name: string;
         filters: string;
     }
-    export interface ContainerCreate {
+    export interface ContainerHelper {
         name: string;
         image: string;
+        cmdStr: string;
+        memoryUnit: string;
+        memoryItem: number;
         cmd: Array<string>;
         publishAllPorts: boolean;
         exposedPorts: Array<Port>;
         nanoCPUs: number;
+        cpuShares: number;
+        cpuUnit: string;
         memory: number;
         volumes: Array<Volume>;
         autoRemove: boolean;

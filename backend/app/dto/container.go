@@ -30,7 +30,7 @@ type ContainerInfo struct {
 	IsFromCompose bool `json:"isFromCompose"`
 }
 
-type ContainerCreate struct {
+type ContainerOperate struct {
 	Name            string         `json:"name"`
 	Image           string         `json:"image"`
 	PublishAllPorts bool           `json:"publishAllPorts"`

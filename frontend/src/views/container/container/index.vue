@@ -9,7 +9,7 @@
             <template #toolbar>
                 <el-row>
                     <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
-                        <el-button type="primary" @click="onCreate()">
+                        <el-button type="primary" @click="onOpenDialog('create')">
                             {{ $t('container.createContainer') }}
                         </el-button>
                         <el-button type="primary" plain @click="onClean()">
@@ -123,7 +123,7 @@
 
         <ReNameDialog @search="search" ref="dialogReNameRef" />
         <ContainerLogDialog ref="dialogContainerLogRef" />
-        <CreateDialog @search="search" ref="dialogCreateRef" />
+        <CreateDialog @search="search" ref="dialogOperateRef" />
         <MonitorDialog ref="dialogMonitorRef" />
         <TerminalDialog ref="dialogTerminalRef" />
     </div>
@@ -133,14 +133,21 @@
 import Tooltip from '@/components/tooltip/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import ReNameDialog from '@/views/container/container/rename/index.vue';
-import CreateDialog from '@/views/container/container/create/index.vue';
+import CreateDialog from '@/views/container/container/operate/index.vue';
 import MonitorDialog from '@/views/container/container/monitor/index.vue';
 import ContainerLogDialog from '@/views/container/container/log/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
 import Status from '@/components/status/index.vue';
 import { reactive, onMounted, ref } from 'vue';
-import { ContainerOperator, containerPrune, inspect, loadDockerStatus, searchContainer } from '@/api/modules/container';
+import {
+    ContainerOperator,
+    containerPrune,
+    inspect,
+    loadContainerInfo,
+    loadDockerStatus,
+    searchContainer,
+} from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
@@ -211,9 +218,35 @@ const search = async () => {
         });
 };
 
-const dialogCreateRef = ref();
-const onCreate = () => {
-    dialogCreateRef.value!.acceptParams();
+const dialogOperateRef = ref();
+const onEdit = async (container: string) => {
+    const res = await loadContainerInfo(container);
+    if (res.data) {
+        onOpenDialog('edit', res.data);
+    }
+};
+const onOpenDialog = async (
+    title: string,
+    rowData: Partial<Container.ContainerHelper> = {
+        cmd: [],
+        cmdStr: '',
+        exposedPorts: [],
+        nanoCPUs: 0,
+        memory: 0,
+        memoryItem: 0,
+        memoryUnit: 'MB',
+        cpuUnit: 'Core',
+        volumes: [],
+        labels: [],
+        env: [],
+        restartPolicy: 'no',
+    },
+) => {
+    let params = {
+        title,
+        rowData: { ...rowData },
+    };
+    dialogOperateRef.value!.acceptParams(params);
 };
 
 const dialogMonitorRef = ref();
@@ -336,6 +369,12 @@ const onOperate = async (operation: string) => {
 };
 
 const buttons = [
+    {
+        label: i18n.global.t('commons.button.edit'),
+        click: (row: Container.ContainerInfo) => {
+            onEdit(row.containerID);
+        },
+    },
     {
         label: i18n.global.t('file.terminal'),
         disabled: (row: Container.ContainerInfo) => {

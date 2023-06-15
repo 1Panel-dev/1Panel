@@ -5,8 +5,14 @@ import { Container } from '../interface/container';
 export const searchContainer = (params: Container.ContainerSearch) => {
     return http.post<ResPage<Container.ContainerInfo>>(`/containers/search`, params, 400000);
 };
-export const createContainer = (params: Container.ContainerCreate) => {
+export const createContainer = (params: Container.ContainerHelper) => {
     return http.post(`/containers`, params, 3000000);
+};
+export const updateContainer = (params: Container.ContainerHelper) => {
+    return http.post(`/containers/update`, params, 3000000);
+};
+export const loadContainerInfo = (name: string) => {
+    return http.post<Container.ContainerHelper>(`/containers/info`, { name: name });
 };
 export const cleanContainerLog = (containerName: string) => {
     return http.post(`/containers/clean/log`, { name: containerName });

@@ -3,14 +3,21 @@
         <template #header>
             <DrawerHeader :header="$t('container.createContainer')" :back="handleClose" />
         </template>
-        <el-form ref="formRef" label-position="top" v-loading="loading" :model="form" :rules="rules" label-width="80px">
+        <el-form
+            ref="formRef"
+            label-position="top"
+            v-loading="loading"
+            :model="dialogData.rowData!"
+            :rules="rules"
+            label-width="80px"
+        >
             <el-row type="flex" justify="center">
                 <el-col :span="22">
                     <el-form-item :label="$t('container.name')" prop="name">
-                        <el-input clearable v-model.trim="form.name" />
+                        <el-input clearable v-model.trim="dialogData.rowData!.name" />
                     </el-form-item>
                     <el-form-item :label="$t('container.image')" prop="image">
-                        <el-select class="widthClass" allow-create filterable v-model="form.image">
+                        <el-select class="widthClass" allow-create filterable v-model="dialogData.rowData!.image">
                             <el-option
                                 v-for="(item, index) of images"
                                 :key="index"
@@ -20,15 +27,15 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item :label="$t('container.port')">
-                        <el-radio-group v-model="form.publishAllPorts" class="ml-4">
+                        <el-radio-group v-model="dialogData.rowData!.publishAllPorts" class="ml-4">
                             <el-radio :label="false">{{ $t('container.exposePort') }}</el-radio>
                             <el-radio :label="true">{{ $t('container.exposeAll') }}</el-radio>
                         </el-radio-group>
                     </el-form-item>
-                    <el-form-item v-if="!form.publishAllPorts">
+                    <el-form-item v-if="!dialogData.rowData!.publishAllPorts">
                         <el-card class="widthClass">
                             <table style="width: 100%" class="tab-table">
-                                <tr v-if="form.exposedPorts.length !== 0">
+                                <tr v-if="dialogData.rowData!.exposedPorts.length !== 0">
                                     <th scope="col" width="45%" align="left">
                                         <label>{{ $t('container.server') }}</label>
                                     </th>
@@ -40,7 +47,7 @@
                                     </th>
                                     <th align="left"></th>
                                 </tr>
-                                <tr v-for="(row, index) in form.exposedPorts" :key="index">
+                                <tr v-for="(row, index) in dialogData.rowData!.exposedPorts" :key="index">
                                     <td width="45%">
                                         <el-input
                                             :placeholder="$t('container.serverExample')"
@@ -76,19 +83,21 @@
                         </el-card>
                     </el-form-item>
                     <el-form-item :label="$t('container.cmd')" prop="cmdStr">
-                        <el-input :placeholder="$t('container.cmdHelper')" v-model="form.cmdStr" />
+                        <el-input :placeholder="$t('container.cmdHelper')" v-model="dialogData.rowData!.cmdStr" />
                     </el-form-item>
                     <el-form-item prop="autoRemove">
-                        <el-checkbox v-model="form.autoRemove">{{ $t('container.autoRemove') }}</el-checkbox>
+                        <el-checkbox v-model="dialogData.rowData!.autoRemove">
+                            {{ $t('container.autoRemove') }}
+                        </el-checkbox>
                     </el-form-item>
                     <el-form-item :label="$t('container.cpuShare')" prop="cpuShares">
-                        <el-input style="width: 40%" v-model.number="form.cpuShares" />
+                        <el-input style="width: 40%" v-model.number="dialogData.rowData!.cpuShares" />
                         <span class="input-help">{{ $t('container.cpuShareHelper') }}</span>
                     </el-form-item>
                     <el-form-item :label="$t('container.cpuQuota')" prop="nanoCPUs">
-                        <el-input type="number" style="width: 40%" v-model.number="form.nanoCPUs">
+                        <el-input type="number" style="width: 40%" v-model.number="dialogData.rowData!.nanoCPUs">
                             <template #append>
-                                <el-select v-model="form.cpuUnit" disabled style="width: 85px">
+                                <el-select v-model="dialogData.rowData!.cpuUnit" disabled style="width: 85px">
                                     <el-option label="Core" value="Core" />
                                 </el-select>
                             </template>
@@ -96,9 +105,13 @@
                         <span class="input-help">{{ $t('container.limitHelper') }}</span>
                     </el-form-item>
                     <el-form-item :label="$t('container.memoryLimit')" prop="memoryItem">
-                        <el-input style="width: 40%" v-model.number="form.memoryItem">
+                        <el-input style="width: 40%" v-model.number="dialogData.rowData!.memoryItem">
                             <template #append>
-                                <el-select v-model="form.memoryUnit" placeholder="Select" style="width: 85px">
+                                <el-select
+                                    v-model="dialogData.rowData!.memoryUnit"
+                                    placeholder="Select"
+                                    style="width: 85px"
+                                >
                                     <el-option label="KB" value="KB" />
                                     <el-option label="MB" value="MB" />
                                     <el-option label="GB" value="GB" />
@@ -110,7 +123,7 @@
                     <el-form-item :label="$t('container.mount')">
                         <el-card style="width: 100%">
                             <table style="width: 100%" class="tab-table">
-                                <tr v-if="form.volumes.length !== 0">
+                                <tr v-if="dialogData.rowData!.volumes.length !== 0">
                                     <th scope="col" width="39%" align="left">
                                         <label>{{ $t('container.serverPath') }}</label>
                                     </th>
@@ -122,7 +135,7 @@
                                     </th>
                                     <th align="left"></th>
                                 </tr>
-                                <tr v-for="(row, index) in form.volumes" :key="index">
+                                <tr v-for="(row, index) in dialogData.rowData!.volumes" :key="index">
                                     <td width="39%">
                                         <el-select
                                             class="widthClass"
@@ -169,23 +182,24 @@
                         <el-input
                             type="textarea"
                             :placeholder="$t('container.tagHelper')"
-                            :autosize="{ minRows: 2, maxRows: 4 }"
-                            v-model="form.labelsStr"
+                            :autosize="{ minRows: 2, maxRows: 10 }"
+                            v-model="dialogData.rowData!.labelsStr"
                         />
                     </el-form-item>
                     <el-form-item :label="$t('container.env')" prop="envStr">
                         <el-input
                             type="textarea"
                             :placeholder="$t('container.tagHelper')"
-                            :autosize="{ minRows: 2, maxRows: 4 }"
-                            v-model="form.envStr"
+                            :autosize="{ minRows: 2, maxRows: 10 }"
+                            v-model="dialogData.rowData!.envStr"
                         />
                     </el-form-item>
                     <el-form-item :label="$t('container.restartPolicy')" prop="restartPolicy">
-                        <el-radio-group v-model="form.restartPolicy">
-                            <el-radio label="unless-stopped">{{ $t('container.unlessStopped') }}</el-radio>
-                            <el-radio label="on-failure">{{ $t('container.onFailure') }}</el-radio>
+                        <el-radio-group v-model="dialogData.rowData!.restartPolicy">
                             <el-radio label="no">{{ $t('container.no') }}</el-radio>
+                            <el-radio label="always">{{ $t('container.always') }}</el-radio>
+                            <el-radio label="on-failure">{{ $t('container.onFailure') }}</el-radio>
+                            <el-radio label="unless-stopped">{{ $t('container.unlessStopped') }}</el-radio>
                         </el-radio-group>
                     </el-form-item>
                 </el-col>
@@ -210,72 +224,55 @@ import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { listImage, listVolume, createContainer } from '@/api/modules/container';
+import { listImage, listVolume, createContainer, updateContainer } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { checkIp, checkPort } from '@/utils/util';
+import { checkIp, checkPort, computeSize } from '@/utils/util';
 
 const loading = ref(false);
+interface DialogProps {
+    title: string;
+    rowData?: Container.ContainerHelper;
+    getTableList?: () => Promise<any>;
+}
 
+const title = ref<string>('');
 const drawerVisiable = ref(false);
-const form = reactive({
-    name: '',
-    image: '',
-    cmdStr: '',
-    cmd: [] as Array<string>,
-    publishAllPorts: false,
-    exposedPorts: [] as Array<Container.Port>,
-    cpuShares: 1024,
-    nanoCPUs: 0,
-    memory: 0,
-    memoryItem: 0,
-    memoryUnit: 'MB',
-    cpuUnit: 'Core',
-    volumes: [] as Array<Container.Volume>,
-    autoRemove: false,
-    labels: [] as Array<string>,
-    labelsStr: '',
-    env: [] as Array<string>,
-    envStr: '',
-    restartPolicy: '',
-});
-const images = ref();
-const volumes = ref();
 
-const acceptParams = (): void => {
-    handlReset();
-    drawerVisiable.value = true;
+const dialogData = ref<DialogProps>({
+    title: '',
+});
+const acceptParams = (params: DialogProps): void => {
+    dialogData.value = params;
+    title.value = i18n.global.t('commons.button.' + dialogData.value.title);
+    if (params.title === 'edit') {
+        dialogData.value.rowData.cpuUnit = 'Core';
+        let itemMem = computeSize(Number(dialogData.value.rowData.memory));
+        dialogData.value.rowData.memoryItem = itemMem.indexOf(' ') !== -1 ? Number(itemMem.split(' ')[0]) : 0;
+        dialogData.value.rowData.memoryUnit = itemMem.indexOf(' ') !== -1 ? itemMem.split(' ')[1] : 'MB';
+        let itemCmd = '';
+        for (const item of dialogData.value.rowData.cmd) {
+            itemCmd += `'${item}' `;
+        }
+        dialogData.value.rowData.cmdStr = itemCmd ? itemCmd.substring(0, itemCmd.length - 1) : '';
+        dialogData.value.rowData.labelsStr = dialogData.value.rowData.labels.join('\n');
+        dialogData.value.rowData.envStr = dialogData.value.rowData.env.join('\n');
+        for (const item of dialogData.value.rowData.exposedPorts) {
+            item.host = item.hostPort;
+        }
+    }
     loadImageOptions();
     loadVolumeOptions();
+    drawerVisiable.value = true;
 };
+const emit = defineEmits<{ (e: 'search'): void }>();
 
-const handlReset = () => {
-    form.name = '';
-    form.image = '';
-    form.cmdStr = '';
-    form.cmd = [];
-    form.publishAllPorts = false;
-    form.exposedPorts = [];
-    form.cpuShares = 1024;
-    form.nanoCPUs = 0;
-    form.memory = 0;
-    form.memoryItem = 0;
-    form.memoryUnit = 'MB';
-    form.cpuUnit = 'Core';
-    form.volumes = [];
-    form.autoRemove = false;
-    form.labels = [];
-    form.labelsStr = '';
-    form.env = [];
-    form.envStr = '';
-    form.restartPolicy = 'no';
-};
+const images = ref();
+const volumes = ref();
 
 const handleClose = () => {
     drawerVisiable.value = false;
 };
-
-const emit = defineEmits<{ (e: 'search'): void }>();
 
 const rules = reactive({
     cpuShares: [Rules.number, checkNumberRange(2, 262144)],
@@ -296,10 +293,10 @@ const handlePortsAdd = () => {
         hostPort: '',
         protocol: 'tcp',
     };
-    form.exposedPorts.push(item);
+    dialogData.value.rowData!.exposedPorts.push(item);
 };
 const handlePortsDelete = (index: number) => {
-    form.exposedPorts.splice(index, 1);
+    dialogData.value.rowData!.exposedPorts.splice(index, 1);
 };
 
 const handleVolumesAdd = () => {
@@ -308,10 +305,10 @@ const handleVolumesAdd = () => {
         containerDir: '',
         mode: 'rw',
     };
-    form.volumes.push(item);
+    dialogData.value.rowData!.volumes.push(item);
 };
 const handleVolumesDelete = (index: number) => {
-    form.volumes.splice(index, 1);
+    dialogData.value.rowData!.volumes.splice(index, 1);
 };
 
 const loadImageOptions = async () => {
@@ -323,8 +320,8 @@ const loadVolumeOptions = async () => {
     volumes.value = res.data;
 };
 const onSubmit = async (formEl: FormInstance | undefined) => {
-    if (form.volumes.length !== 0) {
-        for (const item of form.volumes) {
+    if (dialogData.value.rowData!.volumes.length !== 0) {
+        for (const item of dialogData.value.rowData!.volumes) {
             if (!item.containerDir || !item.sourceDir) {
                 MsgError(i18n.global.t('container.volumeHelper'));
                 return;
@@ -334,48 +331,78 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        if (form.envStr.length !== 0) {
-            form.env = form.envStr.split('\n');
+        if (dialogData.value.rowData!.envStr.length !== 0) {
+            dialogData.value.rowData!.env = dialogData.value.rowData!.envStr.split('\n');
         }
-        if (form.labelsStr.length !== 0) {
-            form.labels = form.labelsStr.split('\n');
+        if (dialogData.value.rowData!.labelsStr.length !== 0) {
+            dialogData.value.rowData!.labels = dialogData.value.rowData!.labelsStr.split('\n');
         }
-        if (form.cmdStr.length !== 0) {
-            form.cmd = form.cmdStr.split(' ');
+        if (dialogData.value.rowData!.cmdStr.length !== 0) {
+            let itemCmd = dialogData.value.rowData!.cmdStr.split(' ');
+            for (const cmd of itemCmd) {
+                if (cmd.startsWith(`'`) && cmd.endsWith(`'`) && cmd.length >= 3) {
+                    dialogData.value.rowData!.cmd.push(cmd.substring(1, cmd.length - 2));
+                } else {
+                    MsgError(i18n.global.t('container.commandHelper'));
+                    return;
+                }
+            }
         }
         if (!checkPortValid()) {
             return;
         }
-        switch (form.memoryUnit) {
+        switch (dialogData.value.rowData!.memoryUnit) {
             case 'KB':
-                form.memory = form.memoryItem * 1024;
+                dialogData.value.rowData!.memory = dialogData.value.rowData!.memoryItem * 1024;
                 break;
             case 'MB':
-                form.memory = form.memoryItem * 1024 * 1024;
+                dialogData.value.rowData!.memory = dialogData.value.rowData!.memoryItem * 1024 * 1024;
                 break;
             case 'GB':
-                form.memory = form.memoryItem * 1024 * 1024 * 1024;
+                dialogData.value.rowData!.memory = dialogData.value.rowData!.memoryItem * 1024 * 1024 * 1024;
                 break;
         }
         loading.value = true;
-        await createContainer(form)
-            .then(() => {
-                loading.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                emit('search');
-                drawerVisiable.value = false;
-            })
-            .catch(() => {
-                loading.value = false;
+        if (dialogData.value.title === 'create') {
+            await createContainer(dialogData.value.rowData!)
+                .then(() => {
+                    loading.value = false;
+                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                    emit('search');
+                    drawerVisiable.value = false;
+                })
+                .catch(() => {
+                    loading.value = false;
+                });
+        } else {
+            ElMessageBox.confirm(
+                i18n.global.t('container.updateContaienrHelper'),
+                i18n.global.t('commons.button.edit'),
+                {
+                    confirmButtonText: i18n.global.t('commons.button.confirm'),
+                    cancelButtonText: i18n.global.t('commons.button.cancel'),
+                },
+            ).then(async () => {
+                await updateContainer(dialogData.value.rowData!)
+                    .then(() => {
+                        loading.value = false;
+                        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                        emit('search');
+                        drawerVisiable.value = false;
+                    })
+                    .catch(() => {
+                        loading.value = false;
+                    });
             });
+        }
     });
 };
 
 const checkPortValid = () => {
-    if (form.exposedPorts.length === 0) {
+    if (dialogData.value.rowData!.exposedPorts.length === 0) {
         return true;
     }
-    for (const port of form.exposedPorts) {
+    for (const port of dialogData.value.rowData!.exposedPorts) {
         if (port.host.indexOf(':') !== -1) {
             port.hostIP = port.host.split(':')[0];
             if (checkIp(port.hostIP)) {

@@ -154,16 +154,68 @@ func (b *BaseApi) OperatorCompose(c *gin.Context) {
 }
 
 // @Tags Container
+// @Summary Update container
+// @Description 更新容器
+// @Accept json
+// @Param request body dto.ContainerOperate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /containers/update [post]
+// @x-panel-log {"bodyKeys":["name","image"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新容器 [name][image]","formatEN":"update container [name][image]"}
+func (b *BaseApi) ContainerUpdate(c *gin.Context) {
+	var req dto.ContainerOperate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := containerService.ContainerUpdate(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Container
+// @Summary Load container info
+// @Description 获取容器表单信息
+// @Accept json
+// @Param request body dto.OperationWithName true "request"
+// @Success 200 {object} dto.ContainerOperate
+// @Security ApiKeyAuth
+// @Router /containers/info [post]
+func (b *BaseApi) ContainerInfo(c *gin.Context) {
+	var req dto.OperationWithName
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	data, err := containerService.ContainerInfo(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags Container
 // @Summary Create container
 // @Description 创建容器
 // @Accept json
-// @Param request body dto.ContainerCreate true "request"
+// @Param request body dto.ContainerOperate true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers [post]
 // @x-panel-log {"bodyKeys":["name","image"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建容器 [name][image]","formatEN":"create container [name][image]"}
 func (b *BaseApi) ContainerCreate(c *gin.Context) {
-	var req dto.ContainerCreate
+	var req dto.ContainerOperate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return

@@ -453,6 +453,7 @@ const message = {
     },
     container: {
         createContainer: '创建容器',
+        updateContaienrHelper: '容器编辑需要重建容器，任何未持久化的数据将会丢失，是否继续？',
         containerList: '容器列表',
         operatorHelper: '将对选中容器进行 {0} 操作，是否继续？',
         operatorAppHelper: '存在来源于应用商店的容器，{0} 操作可能会影响到该服务的正常使用，是否确认？',
@@ -495,6 +496,7 @@ const message = {
 
         user: '用户',
         command: '命令',
+        commandHelper: '请输入正确的命令，多个命令空格分割',
         custom: '自定义',
         containerTerminal: '终端',
         emptyUser: '为空时，将使用容器默认的用户登录',
@@ -520,6 +522,7 @@ const message = {
         mode: '权限',
         env: '环境变量',
         restartPolicy: '重启规则',
+        always: '一直重启',
         unlessStopped: '关闭后重启',
         onFailure: '失败后重启（默认重启 5 次）',
         no: '不重启',
