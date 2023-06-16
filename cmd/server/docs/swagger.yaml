@@ -261,7 +261,7 @@ definitions:
         items:
           type: string
         type: array
-      cpushares:
+      cpuShares:
         type: integer
       env:
         items:
@@ -333,6 +333,16 @@ definitions:
         type: integer
       spaceReclaimed:
         type: integer
+    type: object
+  dto.ContainerUpgrade:
+    properties:
+      image:
+        type: string
+      name:
+        type: string
+    required:
+    - image
+    - name
     type: object
   dto.ContainterStats:
     properties:
@@ -5069,6 +5079,34 @@ paths:
         - image
         formatEN: update container [name][image]
         formatZH: 更新容器 [name][image]
+        paramKeys: []
+  /containers/upgrade:
+    post:
+      consumes:
+      - application/json
+      description: 更新容器镜像
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ContainerUpgrade'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Upgrade container
+      tags:
+      - Container
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        - image
+        formatEN: upgrade container image [name][image]
+        formatZH: 更新容器镜像 [name][image]
         paramKeys: []
   /containers/volume:
     post:

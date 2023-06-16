@@ -496,10 +496,17 @@ const message = {
 
         user: '用户',
         command: '命令',
-        commandHelper: '请输入正确的命令，多个命令空格分割',
         custom: '自定义',
         containerTerminal: '终端',
         emptyUser: '为空时，将使用容器默认的用户登录',
+
+        upgrade: '升级',
+        upgradeHelper: '该操作仅支持容器版本升级',
+        upgradeWarning: '当前目标版本低于原镜像版本，请重新输入！',
+        upgradeWarning2: '升级操作需要重建容器，任何未持久化的数据将会丢失，是否继续？',
+        oldImage: '当前镜像',
+        targetImage: '目标镜像',
+        appHelper: '该容器来源于应用商店，升级可能导致该服务不可用，是否继续？',
 
         port: '端口',
         server: '服务器',

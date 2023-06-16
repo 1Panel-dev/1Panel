@@ -16,25 +16,25 @@
                             {{ $t('container.containerPrune') }}
                         </el-button>
                         <el-button-group style="margin-left: 10px">
-                            <el-button :disabled="checkStatus('start')" @click="onOperate('start')">
+                            <el-button :disabled="checkStatus('start', null)" @click="onOperate('start', null)">
                                 {{ $t('container.start') }}
                             </el-button>
-                            <el-button :disabled="checkStatus('stop')" @click="onOperate('stop')">
+                            <el-button :disabled="checkStatus('stop', null)" @click="onOperate('stop', null)">
                                 {{ $t('container.stop') }}
                             </el-button>
-                            <el-button :disabled="checkStatus('restart')" @click="onOperate('restart')">
+                            <el-button :disabled="checkStatus('restart', null)" @click="onOperate('restart', null)">
                                 {{ $t('container.restart') }}
                             </el-button>
-                            <el-button :disabled="checkStatus('kill')" @click="onOperate('kill')">
+                            <el-button :disabled="checkStatus('kill', null)" @click="onOperate('kill', null)">
                                 {{ $t('container.kill') }}
                             </el-button>
-                            <el-button :disabled="checkStatus('pause')" @click="onOperate('pause')">
+                            <el-button :disabled="checkStatus('pause', null)" @click="onOperate('pause', null)">
                                 {{ $t('container.pause') }}
                             </el-button>
-                            <el-button :disabled="checkStatus('unpause')" @click="onOperate('unpause')">
+                            <el-button :disabled="checkStatus('unpause', null)" @click="onOperate('unpause', null)">
                                 {{ $t('container.unpause') }}
                             </el-button>
-                            <el-button :disabled="checkStatus('remove')" @click="onOperate('remove')">
+                            <el-button :disabled="checkStatus('remove', null)" @click="onOperate('remove', null)">
                                 {{ $t('container.remove') }}
                             </el-button>
                         </el-button-group>
@@ -110,7 +110,7 @@
                     />
                     <fu-table-operations
                         width="300px"
-                        :ellipsis="10"
+                        :ellipsis="3"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         fix
@@ -123,7 +123,8 @@
 
         <ReNameDialog @search="search" ref="dialogReNameRef" />
         <ContainerLogDialog ref="dialogContainerLogRef" />
-        <CreateDialog @search="search" ref="dialogOperateRef" />
+        <OperateDialog @search="search" ref="dialogOperateRef" />
+        <UpgraeDialog @search="search" ref="dialogUpgradeRef" />
         <MonitorDialog ref="dialogMonitorRef" />
         <TerminalDialog ref="dialogTerminalRef" />
     </div>
@@ -133,7 +134,8 @@
 import Tooltip from '@/components/tooltip/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import ReNameDialog from '@/views/container/container/rename/index.vue';
-import CreateDialog from '@/views/container/container/operate/index.vue';
+import OperateDialog from '@/views/container/container/operate/index.vue';
+import UpgraeDialog from '@/views/container/container/upgrade/index.vue';
 import MonitorDialog from '@/views/container/container/monitor/index.vue';
 import ContainerLogDialog from '@/views/container/container/log/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
@@ -164,6 +166,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchName = ref();
+const dialogUpgradeRef = ref();
 
 const dockerStatus = ref('Running');
 const loadStatus = async () => {
@@ -231,11 +234,10 @@ const onOpenDialog = async (
         cmd: [],
         cmdStr: '',
         exposedPorts: [],
+        cpuShares: 1024,
         nanoCPUs: 0,
         memory: 0,
         memoryItem: 0,
-        memoryUnit: 'MB',
-        cpuUnit: 'Core',
         volumes: [],
         labels: [],
         env: [],
@@ -297,34 +299,35 @@ const onClean = () => {
     });
 };
 
-const checkStatus = (operation: string) => {
-    if (selects.value.length < 1) {
+const checkStatus = (operation: string, row: Container.ContainerInfo | null) => {
+    let opList = row ? [row] : selects.value;
+    if (opList.length < 1) {
         return true;
     }
     switch (operation) {
         case 'start':
-            for (const item of selects.value) {
+            for (const item of opList) {
                 if (item.state === 'running') {
                     return true;
                 }
             }
             return false;
         case 'stop':
-            for (const item of selects.value) {
+            for (const item of opList) {
                 if (item.state === 'stopped' || item.state === 'exited') {
                     return true;
                 }
             }
             return false;
         case 'pause':
-            for (const item of selects.value) {
+            for (const item of opList) {
                 if (item.state === 'paused' || item.state === 'exited') {
                     return true;
                 }
             }
             return false;
         case 'unpause':
-            for (const item of selects.value) {
+            for (const item of opList) {
                 if (item.state !== 'paused') {
                     return true;
                 }
@@ -332,9 +335,10 @@ const checkStatus = (operation: string) => {
             return false;
     }
 };
-const onOperate = async (operation: string) => {
+const onOperate = async (operation: string, row: Container.ContainerInfo | null) => {
+    let opList = row ? [row] : selects.value;
     let msg = i18n.global.t('container.operatorHelper', [i18n.global.t('container.' + operation)]);
-    for (const item of selects.value) {
+    for (const item of opList) {
         if (item.isFromApp) {
             msg = i18n.global.t('container.operatorAppHelper', [i18n.global.t('container.' + operation)]);
             break;
@@ -346,7 +350,7 @@ const onOperate = async (operation: string) => {
         type: 'info',
     }).then(() => {
         let ps = [];
-        for (const item of selects.value) {
+        for (const item of opList) {
             const param = {
                 name: item.name,
                 operation: operation,
@@ -385,12 +389,24 @@ const buttons = [
         },
     },
     {
+        label: i18n.global.t('commons.button.log'),
+        click: (row: Container.ContainerInfo) => {
+            dialogContainerLogRef.value!.acceptParams({ containerID: row.containerID, container: row.name });
+        },
+    },
+    {
         label: i18n.global.t('container.monitor'),
         disabled: (row: Container.ContainerInfo) => {
             return row.state !== 'running';
         },
         click: (row: Container.ContainerInfo) => {
             onMonitor(row);
+        },
+    },
+    {
+        label: i18n.global.t('container.upgrade'),
+        click: (row: Container.ContainerInfo) => {
+            dialogUpgradeRef.value!.acceptParams({ container: row.name, image: row.imageName, fromApp: row.isFromApp });
         },
     },
     {
@@ -403,9 +419,66 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('commons.button.log'),
+        label: i18n.global.t('container.start'),
         click: (row: Container.ContainerInfo) => {
-            dialogContainerLogRef.value!.acceptParams({ containerID: row.containerID, container: row.name });
+            onOperate('start', row);
+        },
+        disabled: (row: any) => {
+            return checkStatus('start', row);
+        },
+    },
+    {
+        label: i18n.global.t('container.stop'),
+        click: (row: Container.ContainerInfo) => {
+            onOperate('stop', row);
+        },
+        disabled: (row: any) => {
+            return checkStatus('stop', row);
+        },
+    },
+    {
+        label: i18n.global.t('container.restart'),
+        click: (row: Container.ContainerInfo) => {
+            onOperate('restart', row);
+        },
+        disabled: (row: any) => {
+            return checkStatus('restart', row);
+        },
+    },
+    {
+        label: i18n.global.t('container.kill'),
+        click: (row: Container.ContainerInfo) => {
+            onOperate('kill', row);
+        },
+        disabled: (row: any) => {
+            return checkStatus('kill', row);
+        },
+    },
+    {
+        label: i18n.global.t('container.pause'),
+        click: (row: Container.ContainerInfo) => {
+            onOperate('pause', row);
+        },
+        disabled: (row: any) => {
+            return checkStatus('pause', row);
+        },
+    },
+    {
+        label: i18n.global.t('container.unpause'),
+        click: (row: Container.ContainerInfo) => {
+            onOperate('unpause', row);
+        },
+        disabled: (row: any) => {
+            return checkStatus('unpause', row);
+        },
+    },
+    {
+        label: i18n.global.t('container.remove'),
+        click: (row: Container.ContainerInfo) => {
+            onOperate('remove', row);
+        },
+        disabled: (row: any) => {
+            return checkStatus('remove', row);
         },
     },
 ];

@@ -2695,6 +2695,49 @@ var doc = `{
                 }
             }
         },
+        "/containers/upgrade": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新容器镜像",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Container"
+                ],
+                "summary": "Upgrade container",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ContainerUpgrade"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "name",
+                        "image"
+                    ],
+                    "formatEN": "upgrade container image [name][image]",
+                    "formatZH": "更新容器镜像 [name][image]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/containers/volume": {
             "post": {
                 "security": [
@@ -10694,7 +10737,7 @@ var doc = `{
                         "type": "string"
                     }
                 },
-                "cpushares": {
+                "cpuShares": {
                     "type": "integer"
                 },
                 "env": {
@@ -10797,6 +10840,21 @@ var doc = `{
                 },
                 "spaceReclaimed": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.ContainerUpgrade": {
+            "type": "object",
+            "required": [
+                "image",
+                "name"
+            ],
+            "properties": {
+                "image": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },

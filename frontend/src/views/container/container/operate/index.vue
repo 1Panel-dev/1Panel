@@ -121,7 +121,7 @@
                     <el-form-item :label="$t('container.mount')">
                         <el-card style="width: 100%">
                             <table style="width: 100%" class="tab-table">
-                                <tr v-if="dialogData.rowData!.volumes.length !== 0">
+                                <tr v-if="dialogData.rowData!.volumes!.length !== 0">
                                     <th scope="col" width="39%" align="left">
                                         <label>{{ $t('container.serverPath') }}</label>
                                     </th>
@@ -252,9 +252,12 @@ const acceptParams = (params: DialogProps): void => {
         dialogData.value.rowData.cmdStr = itemCmd ? itemCmd.substring(0, itemCmd.length - 1) : '';
         dialogData.value.rowData.labelsStr = dialogData.value.rowData.labels.join('\n');
         dialogData.value.rowData.envStr = dialogData.value.rowData.env.join('\n');
+        dialogData.value.rowData.exposedPorts = dialogData.value.rowData.exposedPorts || [];
         for (const item of dialogData.value.rowData.exposedPorts) {
             item.host = item.hostPort;
         }
+        dialogData.value.rowData.volumes = dialogData.value.rowData.volumes || [];
+        console.log(dialogData.value.rowData.cpuShares);
     }
     loadLimit();
     loadImageOptions();
@@ -337,20 +340,18 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        if (dialogData.value.rowData!.envStr.length !== 0) {
-            dialogData.value.rowData!.env = dialogData.value.rowData!.envStr.split('\n');
+        if (dialogData.value.rowData?.envStr) {
+            dialogData.value.rowData.env = dialogData.value.rowData!.envStr.split('\n');
         }
-        if (dialogData.value.rowData!.labelsStr.length !== 0) {
+        if (dialogData.value.rowData?.labelsStr) {
             dialogData.value.rowData!.labels = dialogData.value.rowData!.labelsStr.split('\n');
         }
-        if (dialogData.value.rowData!.cmdStr.length !== 0) {
-            let itemCmd = dialogData.value.rowData!.cmdStr.split(' ');
+        dialogData.value.rowData!.cmd = [];
+        if (dialogData.value.rowData?.cmdStr) {
+            let itemCmd = dialogData.value.rowData!.cmdStr.split(`'`);
             for (const cmd of itemCmd) {
-                if (cmd.startsWith(`'`) && cmd.endsWith(`'`) && cmd.length >= 3) {
-                    dialogData.value.rowData!.cmd.push(cmd.substring(1, cmd.length - 2));
-                } else {
-                    MsgError(i18n.global.t('container.commandHelper'));
-                    return;
+                if (cmd && cmd !== ' ') {
+                    dialogData.value.rowData!.cmd.push(cmd);
                 }
             }
         }

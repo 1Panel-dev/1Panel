@@ -10,35 +10,35 @@ type ImageInfo struct {
 }
 
 type ImageLoad struct {
-	Path string `josn:"path" validate:"required"`
+	Path string `json:"path" validate:"required"`
 }
 
 type ImageBuild struct {
-	From       string   `josn:"from" validate:"required"`
+	From       string   `json:"from" validate:"required"`
 	Name       string   `json:"name" validate:"required"`
-	Dockerfile string   `josn:"dockerfile" validate:"required"`
-	Tags       []string `josn:"tags"`
+	Dockerfile string   `json:"dockerfile" validate:"required"`
+	Tags       []string `json:"tags"`
 }
 
 type ImagePull struct {
-	RepoID    uint   `josn:"repoID"`
-	ImageName string `josn:"imageName" validate:"required"`
+	RepoID    uint   `json:"repoID"`
+	ImageName string `json:"imageName" validate:"required"`
 }
 
 type ImageTag struct {
-	RepoID     uint   `josn:"repoID"`
+	RepoID     uint   `json:"repoID"`
 	SourceID   string `json:"sourceID" validate:"required"`
-	TargetName string `josn:"targetName" validate:"required"`
+	TargetName string `json:"targetName" validate:"required"`
 }
 
 type ImagePush struct {
-	RepoID  uint   `josn:"repoID" validate:"required"`
+	RepoID  uint   `json:"repoID" validate:"required"`
 	TagName string `json:"tagName" validate:"required"`
 	Name    string `json:"name" validate:"required"`
 }
 
 type ImageSave struct {
 	TagName string `json:"tagName" validate:"required"`
-	Path    string `josn:"path" validate:"required"`
+	Path    string `json:"path" validate:"required"`
 	Name    string `json:"name" validate:"required"`
 }

@@ -491,10 +491,19 @@ const message = {
 
         user: 'User',
         command: 'Command',
-        commandHelper: 'Please enter the correct command, separated by spaces if there are multiple commands.',
         custom: 'Custom',
         emptyUser: 'When empty, you will log in as  default',
         containerTerminal: 'Terminal',
+
+        upgrade: 'Upgrade',
+        upgradeHelper: 'This operation only supports upgrading container versions.',
+        upgradeWarning: 'The target version is lower than the original image version. Please try again!',
+        upgradeWarning2:
+            'The upgrade operation requires rebuilding the container, and any non-persistent data will be lost. Do you want to continue?',
+        oldImage: 'Current image',
+        targetImage: 'Target image',
+        appHelper:
+            'This container is sourced from the application store. Upgrading it may cause the service to be unavailable. Do you want to continue?',
 
         port: 'Port',
         server: 'Host',

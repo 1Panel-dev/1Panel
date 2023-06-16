@@ -43,6 +43,7 @@ type IContainerService interface {
 	ComposeOperation(req dto.ComposeOperation) error
 	ContainerCreate(req dto.ContainerOperate) error
 	ContainerUpdate(req dto.ContainerOperate) error
+	ContainerUpgrade(req dto.ContainerUpgrade) error
 	ContainerInfo(req dto.OperationWithName) (*dto.ContainerOperate, error)
 	LoadResouceLimit() (*dto.ResourceLimit, error)
 	ContainerLogClean(req dto.OperationWithName) error
@@ -241,9 +242,9 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate) error {
 		return err
 	}
 
-	var config *container.Config
-	var hostConf *container.HostConfig
-	if err := loadConfigInfo(req, config, hostConf); err != nil {
+	var config container.Config
+	var hostConf container.HostConfig
+	if err := loadConfigInfo(req, &config, &hostConf); err != nil {
 		return err
 	}
 
@@ -255,7 +256,7 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate) error {
 			return err
 		}
 	}
-	container, err := client.ContainerCreate(ctx, config, hostConf, &network.NetworkingConfig{}, &v1.Platform{}, req.Name)
+	container, err := client.ContainerCreate(ctx, &config, &hostConf, &network.NetworkingConfig{}, &v1.Platform{}, req.Name)
 	if err != nil {
 		_ = client.ContainerRemove(ctx, req.Name, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
 		return err
@@ -284,6 +285,7 @@ func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.Contai
 	data.Image = oldContainer.Config.Image
 	data.Cmd = oldContainer.Config.Cmd
 	data.Env = oldContainer.Config.Env
+	data.CPUShares = oldContainer.HostConfig.CPUShares
 	for key, val := range oldContainer.Config.Labels {
 		data.Labels = append(data.Labels, fmt.Sprintf("%s=%s", key, val))
 	}
@@ -340,6 +342,41 @@ func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
 	if err := loadConfigInfo(req, config, hostConf); err != nil {
 		return err
 	}
+	if err := client.ContainerRemove(ctx, req.Name, types.ContainerRemoveOptions{Force: true}); err != nil {
+		return err
+	}
+
+	global.LOG.Infof("new container info %s has been update, now start to recreate", req.Name)
+	container, err := client.ContainerCreate(ctx, config, hostConf, &network.NetworkingConfig{}, &v1.Platform{}, req.Name)
+	if err != nil {
+		return fmt.Errorf("recreate contianer failed, err: %v", err)
+	}
+	global.LOG.Infof("update container %s successful! now check if the container is started.", req.Name)
+	if err := client.ContainerStart(ctx, container.ID, types.ContainerStartOptions{}); err != nil {
+		return fmt.Errorf("update successful but start failed, err: %v", err)
+	}
+
+	return nil
+}
+
+func (u *ContainerService) ContainerUpgrade(req dto.ContainerUpgrade) error {
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return err
+	}
+	ctx := context.Background()
+	oldContainer, err := client.ContainerInspect(ctx, req.Name)
+	if err != nil {
+		return err
+	}
+	if !checkImageExist(client, req.Image) {
+		if err := pullImages(ctx, client, req.Image); err != nil {
+			return err
+		}
+	}
+	config := oldContainer.Config
+	config.Image = req.Image
+	hostConf := oldContainer.HostConfig
 	if err := client.ContainerRemove(ctx, req.Name, types.ContainerRemoveOptions{Force: true}); err != nil {
 		return err
 	}
@@ -648,6 +685,7 @@ func loadConfigInfo(req dto.ContainerOperate, config *container.Config, hostConf
 	config.ExposedPorts = exposeds
 
 	hostConf.AutoRemove = req.AutoRemove
+	hostConf.CPUShares = req.CPUShares
 	hostConf.PublishAllPorts = req.PublishAllPorts
 	hostConf.RestartPolicy = container.RestartPolicy{Name: req.RestartPolicy}
 	if req.RestartPolicy == "on-failure" {

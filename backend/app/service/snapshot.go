@@ -535,7 +535,7 @@ func (u *SnapshotService) handleDaemonJson(fileOp files.FileOp, operation string
 	if operation == "snapshot" || operation == "recover" {
 		_, err := os.Stat(daemonJsonPath)
 		if os.IsNotExist(err) {
-			global.LOG.Info("no daemon.josn in snapshot and system now, nothing happened")
+			global.LOG.Info("no daemon.json in snapshot and system now, nothing happened")
 		}
 		if err == nil {
 			if err := fileOp.CopyFile(daemonJsonPath, target); err != nil {
