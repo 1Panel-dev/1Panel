@@ -41,7 +41,7 @@ type ContainerOperate struct {
 	PublishAllPorts bool           `json:"publishAllPorts"`
 	ExposedPorts    []PortHelper   `json:"exposedPorts"`
 	Cmd             []string       `json:"cmd"`
-	CPUShares       int64          `josn:"cpuShares"`
+	CPUShares       int64          `json:"cpuShares"`
 	NanoCPUs        int64          `json:"nanoCPUs"`
 	Memory          int64          `json:"memory"`
 	AutoRemove      bool           `json:"autoRemove"`
@@ -49,6 +49,11 @@ type ContainerOperate struct {
 	Labels          []string       `json:"labels"`
 	Env             []string       `json:"env"`
 	RestartPolicy   string         `json:"restartPolicy"`
+}
+
+type ContainerUpgrade struct {
+	Name  string `json:"name" validate:"required"`
+	Image string `json:"image" validate:"required"`
 }
 
 type ContainterStats struct {
@@ -83,7 +88,7 @@ type ContainerOperation struct {
 
 type ContainerPrune struct {
 	PruneType  string `json:"pruneType" validate:"required,oneof=container image volume network"`
-	WithTagAll bool   `josn:"withTagAll"`
+	WithTagAll bool   `json:"withTagAll"`
 }
 
 type ContainerPruneReport struct {

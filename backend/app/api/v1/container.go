@@ -246,6 +246,32 @@ func (b *BaseApi) ContainerCreate(c *gin.Context) {
 }
 
 // @Tags Container
+// @Summary Upgrade container
+// @Description 更新容器镜像
+// @Accept json
+// @Param request body dto.ContainerUpgrade true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /containers/upgrade [post]
+// @x-panel-log {"bodyKeys":["name","image"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新容器镜像 [name][image]","formatEN":"upgrade container image [name][image]"}
+func (b *BaseApi) ContainerUpgrade(c *gin.Context) {
+	var req dto.ContainerUpgrade
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := containerService.ContainerUpgrade(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Container
 // @Summary Clean container
 // @Description 容器清理
 // @Accept json
