@@ -141,7 +141,7 @@ const search = async () => {
     await loadSSHLogs(params)
         .then((res) => {
             loading.value = false;
-            data.value = res.data.logs || [];
+            data.value = res.data?.logs || [];
             faliedCount.value = res.data.failedCount;
             successfulCount.value = res.data.successfulCount;
             if (searchStatus.value === 'Success') {
