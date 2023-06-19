@@ -83,6 +83,7 @@
         "stylelint-config-recommended-vue": "^1.4.0",
         "stylelint-config-standard": "^25.0.0",
         "stylelint-config-standard-scss": "^3.0.0",
+        "tailwindcss": "^3.3.2",
         "typescript": "^4.5.4",
         "unplugin-auto-import": "^0.16.4",
         "unplugin-vue-components": "^0.25.0",
