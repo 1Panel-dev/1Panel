@@ -4,6 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"strings"
@@ -62,6 +65,7 @@ func (u *BackupService) List() ([]dto.BackupInfo, error) {
 	dtobas = append(dtobas, u.loadByType("MINIO", ops))
 	dtobas = append(dtobas, u.loadByType("COS", ops))
 	dtobas = append(dtobas, u.loadByType("KODO", ops))
+	dtobas = append(dtobas, u.loadByType("OneDrive", ops))
 	return dtobas, err
 }
 
@@ -133,6 +137,12 @@ func (u *BackupService) Create(backupDto dto.BackupOperate) error {
 	}
 	if err := copier.Copy(&backup, &backupDto); err != nil {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
+	}
+
+	if backupDto.Type == constant.OneDrive {
+		if err := u.loadAccessToken(&backup); err != nil {
+			return err
+		}
 	}
 	if err := backupRepo.Create(&backup); err != nil {
 		return err
@@ -284,6 +294,53 @@ func (u *BackupService) loadByType(accountType string, accounts []model.BackupAc
 		}
 	}
 	return dto.BackupInfo{Type: accountType}
+}
+
+func (u *BackupService) loadAccessToken(backup *model.BackupAccount) error {
+	varMap := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
+		return fmt.Errorf("unmarshal backup vars failed, err: %v", err)
+	}
+
+	data := url.Values{}
+	data.Set("client_id", constant.OneDriveClientID)
+	data.Set("client_secret", constant.OneDriveClientSecret)
+	data.Set("grant_type", "authorization_code")
+	data.Set("code", varMap["code"].(string))
+	data.Set("redirect_uri", constant.OneDriveRedirectURI)
+	client := &http.Client{}
+	req, err := http.NewRequest("POST", "https://login.microsoftonline.com/common/oauth2/v2.0/token", strings.NewReader(data.Encode()))
+	if err != nil {
+		return fmt.Errorf("new http post client for access token failed, err: %v", err)
+	}
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("request for access token failed, err: %v", err)
+	}
+	delete(varMap, "code")
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("read data from response body failed, err: %v", err)
+	}
+	defer resp.Body.Close()
+
+	token := map[string]interface{}{}
+	if err := json.Unmarshal(respBody, &token); err != nil {
+		return fmt.Errorf("unmarshal data from response body failed, err: %v", err)
+	}
+	accessToken, ok := token["access_token"].(string)
+	if !ok {
+		return errors.New("no such access token in response")
+	}
+
+	itemVars, err := json.Marshal(varMap)
+	if err != nil {
+		return fmt.Errorf("json marshal var map failed, err: %v", err)
+	}
+	backup.Credential = accessToken
+	backup.Vars = string(itemVars)
+	return nil
 }
 
 func loadLocalDir() (string, error) {

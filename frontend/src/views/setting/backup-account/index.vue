@@ -261,6 +261,45 @@
                             </el-button>
                         </el-alert>
                     </el-col>
+                    <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
+                        <div>
+                            <svg-icon style="font-size: 7px" iconName="p-SFTP"></svg-icon>
+                            <span style="font-size: 14px; font-weight: 500">&nbsp;OneDrive</span>
+                            <div style="float: right">
+                                <el-button
+                                    round
+                                    plain
+                                    :disabled="oneDriveData.id === 0"
+                                    @click="onOpenDialog('edit', 'SFTP', oneDriveData)"
+                                >
+                                    {{ $t('commons.button.edit') }}
+                                </el-button>
+                                <el-button round :disabled="oneDriveData.id === 0" @click="onDelete(oneDriveData)">
+                                    {{ $t('commons.button.delete') }}
+                                </el-button>
+                            </div>
+                        </div>
+                        <el-divider class="devider" />
+                        <div v-if="oneDriveData.id !== 0" style="margin-left: 20px">
+                            <el-form-item :label="$t('setting.backupDir')">
+                                {{ oneDriveData.varsJson['path'] }}
+                            </el-form-item>
+                            <el-form-item :label="$t('commons.table.createdAt')">
+                                {{ dateFormat(0, 0, oneDriveData.createdAt) }}
+                            </el-form-item>
+                        </div>
+                        <el-alert v-else center class="alert" style="height: 167px" :closable="false">
+                            <el-button
+                                size="large"
+                                round
+                                plain
+                                type="primary"
+                                @click="onOpenDialog('create', 'OneDrive')"
+                            >
+                                {{ $t('setting.createBackupAccount', [$t('setting.OneDrive')]) }}
+                            </el-button>
+                        </el-alert>
+                    </el-col>
                 </el-row>
             </template>
         </LayoutContent>
@@ -326,6 +365,18 @@ const sftpData = ref<Backup.BackupInfo>({
     varsJson: {
         address: '',
         port: 22,
+    },
+    createdAt: new Date(),
+});
+const oneDriveData = ref<Backup.BackupInfo>({
+    id: 0,
+    type: 'OneDrive',
+    accessKey: '',
+    bucket: '',
+    credential: '',
+    vars: '',
+    varsJson: {
+        redirectURI: '',
     },
     createdAt: new Date(),
 });
@@ -395,6 +446,9 @@ const search = async () => {
                 break;
             case 'KODO':
                 kodoData.value = bac;
+                break;
+            case 'OneDrive':
+                oneDriveData.value = bac;
                 break;
         }
     }
