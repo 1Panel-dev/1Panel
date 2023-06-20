@@ -225,6 +225,12 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 	upMap["bucket"] = req.Bucket
 	upMap["credential"] = req.Credential
 	upMap["vars"] = req.Vars
+
+	if req.Type == constant.OneDrive {
+		if err := u.loadAccessToken(&backup); err != nil {
+			return err
+		}
+	}
 	if err := backupRepo.Update(req.ID, upMap); err != nil {
 		return err
 	}

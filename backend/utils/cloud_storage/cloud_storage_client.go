@@ -33,5 +33,8 @@ func NewCloudStorageClient(vars map[string]interface{}) (CloudStorageClient, err
 	if vars["type"] == constant.Kodo {
 		return client.NewKodoClient(vars)
 	}
+	if vars["type"] == constant.OneDrive {
+		return client.NewOneDriveClient(vars)
+	}
 	return nil, constant.ErrNotSupportType
 }
