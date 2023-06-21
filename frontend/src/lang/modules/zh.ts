@@ -967,7 +967,7 @@ const message = {
         S3: '亚马逊 S3 云存储',
         MINIO: 'MINIO',
         SFTP: 'SFTP',
-        OneDrive: 'OneDrive',
+        OneDrive: '微软 OneDrive',
         backupDir: '备份路径',
         isCN: '国内版',
         code: '授权码',

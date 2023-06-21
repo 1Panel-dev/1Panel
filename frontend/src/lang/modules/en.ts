@@ -989,7 +989,7 @@ const message = {
         S3: 'Amazon S3',
         MINIO: 'MINIO',
         SFTP: 'SFTP',
-        OneDrive: 'OneDrive',
+        OneDrive: 'Microsoft OneDrive',
         backupDir: 'Backup dir',
         isCN: 'Domestic version',
         code: 'Auth code',

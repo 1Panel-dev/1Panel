@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "13015332",
+      "name": "onedrive",
+      "font_class": "onedrive",
+      "unicode": "e601",
+      "unicode_decimal": 58881
+    },
+    {
       "icon_id": "7708032",
       "name": "菜单",
       "font_class": "caidan",
