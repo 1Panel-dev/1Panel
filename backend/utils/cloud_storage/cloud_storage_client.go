@@ -14,27 +14,23 @@ type CloudStorageClient interface {
 	Download(src, target string) (bool, error)
 }
 
-func NewCloudStorageClient(vars map[string]interface{}) (CloudStorageClient, error) {
-	if vars["type"] == constant.S3 {
+func NewCloudStorageClient(backupType string, vars map[string]interface{}) (CloudStorageClient, error) {
+	switch backupType {
+	case constant.S3:
 		return client.NewS3Client(vars)
-	}
-	if vars["type"] == constant.OSS {
+	case constant.OSS:
 		return client.NewOssClient(vars)
-	}
-	if vars["type"] == constant.Sftp {
+	case constant.Sftp:
 		return client.NewSftpClient(vars)
-	}
-	if vars["type"] == constant.MinIo {
+	case constant.MinIo:
 		return client.NewMinIoClient(vars)
-	}
-	if vars["type"] == constant.Cos {
+	case constant.Cos:
 		return client.NewCosClient(vars)
-	}
-	if vars["type"] == constant.Kodo {
+	case constant.Kodo:
 		return client.NewKodoClient(vars)
-	}
-	if vars["type"] == constant.OneDrive {
+	case constant.OneDrive:
 		return client.NewOneDriveClient(vars)
+	default:
+		return nil, constant.ErrNotSupportType
 	}
-	return nil, constant.ErrNotSupportType
 }

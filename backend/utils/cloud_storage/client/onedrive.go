@@ -4,15 +4,20 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
+	"path"
 	"strconv"
+	"strings"
 
+	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	odsdk "github.com/goh-chunlin/go-onedrive/onedrive"
 	"golang.org/x/oauth2"
 )
@@ -30,8 +35,15 @@ func NewOneDriveClient(vars map[string]interface{}) (*oneDriveClient, error) {
 		return nil, constant.ErrInvalidParams
 	}
 	ctx := context.Background()
+
+	newToken, err := refreshToken(token)
+	if err != nil {
+		return nil, err
+	}
+	_ = global.DB.Model(&model.Group{}).Where("type = ?", "OneDrive").Updates(map[string]interface{}{"credential": newToken}).Error
+
 	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
+		&oauth2.Token{AccessToken: newToken},
 	)
 	tc := oauth2.NewClient(ctx, ts)
 
@@ -44,6 +56,7 @@ func (onedrive oneDriveClient) ListBuckets() ([]interface{}, error) {
 }
 
 func (onedrive oneDriveClient) Exist(path string) (bool, error) {
+	path = "/" + strings.TrimPrefix(path, "/")
 	fileID, err := onedrive.loadIDByPath(path)
 	if err != nil {
 		return false, err
@@ -53,6 +66,7 @@ func (onedrive oneDriveClient) Exist(path string) (bool, error) {
 }
 
 func (onedrive oneDriveClient) Delete(path string) (bool, error) {
+	path = "/" + strings.TrimPrefix(path, "/")
 	fileID, err := onedrive.loadIDByPath(path)
 	if err != nil {
 		return false, err
@@ -65,6 +79,16 @@ func (onedrive oneDriveClient) Delete(path string) (bool, error) {
 }
 
 func (onedrive oneDriveClient) Upload(src, target string) (bool, error) {
+	target = "/" + strings.TrimPrefix(target, "/")
+	if _, err := onedrive.loadIDByPath(path.Dir(target)); err != nil {
+		if !strings.Contains(err.Error(), "itemNotFound") {
+			return false, err
+		}
+		if err := onedrive.createFolder(path.Dir(target)); err != nil {
+			return false, fmt.Errorf("create dir before upload failed, err: %v", err)
+		}
+	}
+
 	ctx := context.Background()
 	file, err := os.Open(src)
 	if err != nil {
@@ -81,7 +105,7 @@ func (onedrive oneDriveClient) Upload(src, target string) (bool, error) {
 	fileName := fileInfo.Name()
 	fileSize := fileInfo.Size()
 
-	folderID, err := onedrive.loadIDByPath(target)
+	folderID, err := onedrive.loadIDByPath(path.Dir(target))
 	if err != nil {
 		return false, err
 	}
@@ -141,6 +165,7 @@ func (onedrive oneDriveClient) Upload(src, target string) (bool, error) {
 }
 
 func (onedrive oneDriveClient) Download(src, target string) (bool, error) {
+	src = "/" + strings.TrimPrefix(src, "/")
 	req, err := onedrive.client.NewRequest("GET", fmt.Sprintf("me/drive/root:%s", src), nil)
 	if err != nil {
 		return false, fmt.Errorf("new request for file id failed, err: %v", err)
@@ -172,6 +197,7 @@ func (onedrive oneDriveClient) Download(src, target string) (bool, error) {
 }
 
 func (onedrive *oneDriveClient) ListObjects(prefix string) ([]interface{}, error) {
+	prefix = "/" + strings.TrimPrefix(prefix, "/")
 	folderID, err := onedrive.loadIDByPath(prefix)
 	if err != nil {
 		return nil, err
@@ -206,6 +232,57 @@ func (onedrive *oneDriveClient) loadIDByPath(path string) (string, error) {
 		return "", fmt.Errorf("do request for file id failed, err: %v", err)
 	}
 	return driveItem.Id, nil
+}
+
+func refreshToken(oldToken string) (string, error) {
+	data := url.Values{}
+	data.Set("client_id", constant.OneDriveClientID)
+	data.Set("client_secret", constant.OneDriveClientSecret)
+	data.Set("grant_type", "refresh_token")
+	data.Set("refresh_token", oldToken)
+	data.Set("redirect_uri", constant.OneDriveRedirectURI)
+	client := &http.Client{}
+	req, err := http.NewRequest("POST", "https://login.microsoftonline.com/common/oauth2/v2.0/token", strings.NewReader(data.Encode()))
+	if err != nil {
+		return "", fmt.Errorf("new http post client for access token failed, err: %v", err)
+	}
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("request for access token failed, err: %v", err)
+	}
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("read data from response body failed, err: %v", err)
+	}
+	defer resp.Body.Close()
+
+	tokenMap := map[string]interface{}{}
+	if err := json.Unmarshal(respBody, &tokenMap); err != nil {
+		return "", fmt.Errorf("unmarshal data from response body failed, err: %v", err)
+	}
+	accessToken, ok := tokenMap["access_token"].(string)
+	if !ok {
+		return "", errors.New("no such access token in response")
+	}
+	return accessToken, nil
+}
+
+func (onedrive *oneDriveClient) createFolder(parent string) error {
+	if _, err := onedrive.loadIDByPath(path.Dir(parent)); err != nil {
+		if !strings.Contains(err.Error(), "itemNotFound") {
+			return err
+		}
+		_ = onedrive.createFolder(path.Dir(parent))
+	}
+	item2, err := onedrive.loadIDByPath(path.Dir(parent))
+	if err != nil {
+		return err
+	}
+	if _, err := onedrive.client.DriveItems.CreateNewFolder(context.Background(), "", item2, path.Base(parent)); err != nil {
+		return err
+	}
+	return nil
 }
 
 type NewUploadSessionCreationRequest struct {
