@@ -61,14 +61,6 @@
                             </el-input>
                         </el-form-item>
                         <el-form-item
-                            v-if="dialogData.rowData!.type === 'OneDrive'"
-                            :label="$t('setting.backupDir')"
-                            prop="varsJson.path"
-                            :rules="Rules.requiredInput"
-                        >
-                            <el-input clearable v-model.trim="dialogData.rowData!.varsJson['path']" />
-                        </el-form-item>
-                        <el-form-item
                             v-if="dialogData.rowData!.type === 'S3' || dialogData.rowData!.type === 'COS'"
                             label="Region"
                             prop="varsJson.region"
@@ -159,6 +151,13 @@
                                 <el-input v-model="dialogData.rowData!.bucket" />
                             </el-form-item>
                         </div>
+                        <el-form-item
+                            v-if="dialogData.rowData!.type !== 'LOCAL'"
+                            :label="$t('setting.backupDir')"
+                            prop="backupPath"
+                        >
+                            <el-input clearable v-model.trim="dialogData.rowData!.backupPath" />
+                        </el-form-item>
                     </el-col>
                 </el-row>
             </el-form>

@@ -31,6 +31,7 @@ func Init() {
 		migrations.AddBindAndAllowIPs,
 		migrations.UpdateCronjobWithSecond,
 		migrations.UpdateWebsite,
+		migrations.AddBackupAccountDir,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

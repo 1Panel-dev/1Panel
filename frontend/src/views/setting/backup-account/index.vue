@@ -66,6 +66,9 @@
                             <el-form-item label="Bucket">
                                 {{ s3Data.bucket }}
                             </el-form-item>
+                            <el-form-item :label="$t('setting.backupDir')">
+                                {{ s3Data.backupPath }}
+                            </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
                                 {{ dateFormat(0, 0, s3Data.createdAt) }}
                             </el-form-item>
@@ -101,6 +104,9 @@
                             </el-form-item>
                             <el-form-item label="Bucket">
                                 {{ ossData.bucket }}
+                            </el-form-item>
+                            <el-form-item :label="$t('setting.backupDir')">
+                                {{ ossData.backupPath }}
                             </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
                                 {{ dateFormat(0, 0, ossData.createdAt) }}
@@ -139,6 +145,9 @@
                             <el-form-item label="Bucket">
                                 {{ cosData.bucket }}
                             </el-form-item>
+                            <el-form-item :label="$t('setting.backupDir')">
+                                {{ cosData.backupPath }}
+                            </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
                                 {{ dateFormat(0, 0, cosData.createdAt) }}
                             </el-form-item>
@@ -174,6 +183,9 @@
                             </el-form-item>
                             <el-form-item label="Bucket">
                                 {{ kodoData.bucket }}
+                            </el-form-item>
+                            <el-form-item :label="$t('setting.backupDir')">
+                                {{ kodoData.backupPath }}
                             </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
                                 {{ dateFormat(0, 0, kodoData.createdAt) }}
@@ -211,6 +223,9 @@
                             </el-form-item>
                             <el-form-item label="Bucket">
                                 {{ minioData.bucket }}
+                            </el-form-item>
+                            <el-form-item :label="$t('setting.backupDir')">
+                                {{ minioData.backupPath }}
                             </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
                                 {{ dateFormat(0, 0, minioData.createdAt) }}
@@ -251,6 +266,9 @@
                             <el-form-item :label="$t('setting.path')">
                                 {{ sftpData.bucket }}
                             </el-form-item>
+                            <el-form-item :label="$t('setting.backupDir')">
+                                {{ sftpData.backupPath }}
+                            </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
                                 {{ dateFormat(0, 0, sftpData.createdAt) }}
                             </el-form-item>
@@ -282,7 +300,7 @@
                         <el-divider class="devider" />
                         <div v-if="oneDriveData.id !== 0" style="margin-left: 20px">
                             <el-form-item :label="$t('setting.backupDir')">
-                                {{ oneDriveData.varsJson['path'] }}
+                                {{ oneDriveData.backupPath }}
                             </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
                                 {{ dateFormat(0, 0, oneDriveData.createdAt) }}
@@ -323,6 +341,7 @@ const localData = ref<Backup.BackupInfo>({
     accessKey: '',
     bucket: '',
     credential: '',
+    backupPath: '',
     vars: '',
     varsJson: {
         dir: '',
@@ -335,6 +354,7 @@ const ossData = ref<Backup.BackupInfo>({
     accessKey: '',
     bucket: '',
     credential: '',
+    backupPath: '',
     vars: '',
     varsJson: {
         region: '',
@@ -348,6 +368,7 @@ const minioData = ref<Backup.BackupInfo>({
     accessKey: '',
     bucket: '',
     credential: '',
+    backupPath: '',
     vars: '',
     varsJson: {
         region: '',
@@ -361,6 +382,7 @@ const sftpData = ref<Backup.BackupInfo>({
     accessKey: '',
     bucket: '',
     credential: '',
+    backupPath: '',
     vars: '',
     varsJson: {
         address: '',
@@ -374,6 +396,7 @@ const oneDriveData = ref<Backup.BackupInfo>({
     accessKey: '',
     bucket: '',
     credential: '',
+    backupPath: '',
     vars: '',
     varsJson: {
         redirectURI: '',
@@ -386,6 +409,7 @@ const s3Data = ref<Backup.BackupInfo>({
     accessKey: '',
     bucket: '',
     credential: '',
+    backupPath: '',
     vars: '',
     varsJson: {
         region: '',
@@ -399,6 +423,7 @@ const cosData = ref<Backup.BackupInfo>({
     accessKey: '',
     bucket: '',
     credential: '',
+    backupPath: '',
     vars: '',
     varsJson: {
         region: '',
@@ -411,6 +436,7 @@ const kodoData = ref<Backup.BackupInfo>({
     accessKey: '',
     bucket: '',
     credential: '',
+    backupPath: '',
     vars: '',
     varsJson: {
         domain: '',

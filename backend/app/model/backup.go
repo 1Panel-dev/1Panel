@@ -6,6 +6,7 @@ type BackupAccount struct {
 	Bucket     string `gorm:"type:varchar(256)" json:"bucket"`
 	AccessKey  string `gorm:"type:varchar(256)" json:"accessKey"`
 	Credential string `gorm:"type:varchar(256)" json:"credential"`
+	BackupPath string `gorm:"type:varchar(256)" json:"backupPath"`
 	Vars       string `gorm:"type:longText" json:"vars"`
 }
 

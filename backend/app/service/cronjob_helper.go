@@ -33,16 +33,16 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 				return
 			}
 			message, err = u.handleShell(cronjob.Type, cronjob.Name, cronjob.Script)
-			u.HandleRmExpired("LOCAL", "", cronjob, nil)
+			u.HandleRmExpired("LOCAL", "", "", cronjob, nil)
 		case "curl":
 			if len(cronjob.URL) == 0 {
 				return
 			}
 			message, err = u.handleShell(cronjob.Type, cronjob.Name, fmt.Sprintf("curl '%s'", cronjob.URL))
-			u.HandleRmExpired("LOCAL", "", cronjob, nil)
+			u.HandleRmExpired("LOCAL", "", "", cronjob, nil)
 		case "ntp":
 			err = u.handleNtpSync()
-			u.HandleRmExpired("LOCAL", "", cronjob, nil)
+			u.HandleRmExpired("LOCAL", "", "", cronjob, nil)
 		case "website":
 			record.File, err = u.handleBackup(cronjob, record.StartTime)
 		case "database":
@@ -142,19 +142,25 @@ func (u *CronjobService) handleBackup(cronjob *model.Cronjob, startTime time.Tim
 			if err != nil {
 				return "", err
 			}
+			if len(backup.BackupPath) != 0 {
+				itemPath := strings.TrimPrefix(backup.BackupPath, "/")
+				itemPath = strings.TrimSuffix(itemPath, "/") + "/"
+				itemFileDir = itemPath + itemFileDir
+			}
 			if _, err = client.Upload(backupDir+"/"+fileName, itemFileDir+"/"+fileName); err != nil {
 				return "", err
 			}
 		}
-		u.HandleRmExpired(backup.Type, localDir, cronjob, client)
+		u.HandleRmExpired(backup.Type, backup.BackupPath, localDir, cronjob, client)
 		if backup.Type == "LOCAL" || cronjob.KeepLocal {
-			return fmt.Sprintf("%s/%s/%s/%s", localDir, cronjob.Type, cronjob.Name, fileName), nil
+			return fmt.Sprintf("%s/%s", backupDir, fileName), nil
+		} else {
+			return fmt.Sprintf("%s/%s", itemFileDir, fileName), nil
 		}
-		return fmt.Sprintf("%s/%s/%s", cronjob.Type, cronjob.Name, fileName), nil
 	}
 }
 
-func (u *CronjobService) HandleRmExpired(backType, localDir string, cronjob *model.Cronjob, backClient cloud_storage.CloudStorageClient) {
+func (u *CronjobService) HandleRmExpired(backType, backupPath, localDir string, cronjob *model.Cronjob, backClient cloud_storage.CloudStorageClient) {
 	global.LOG.Infof("start to handle remove expired, retain copies: %d", cronjob.RetainCopies)
 	records, _ := cronjobRepo.ListRecord(cronjobRepo.WithByJobID(int(cronjob.ID)), commonRepo.WithOrderBy("created_at desc"))
 	if len(records) > int(cronjob.RetainCopies) {
@@ -163,7 +169,7 @@ func (u *CronjobService) HandleRmExpired(backType, localDir string, cronjob *mod
 				files := strings.Split(records[i].File, ",")
 				for _, file := range files {
 					if backType != "LOCAL" {
-						_, _ = backClient.Delete(strings.ReplaceAll(file, localDir+"/", ""))
+						_, _ = backClient.Delete(backupPath + "/" + strings.TrimPrefix(file, localDir+"/"))
 						_ = os.Remove(file)
 					} else {
 						_ = os.Remove(file)
@@ -270,12 +276,11 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, app *repo.RootInf
 		}
 		record.DetailName = dbName
 		record.FileDir = backupDir
-		itemFileDir := strings.ReplaceAll(backupDir, localDir+"/", "")
+		itemFileDir := strings.TrimPrefix(backupDir, localDir+"/")
 		if !cronjob.KeepLocal && backup.Type != "LOCAL" {
 			record.Source = backup.Type
 			record.FileDir = itemFileDir
 		}
-		paths = append(paths, fmt.Sprintf("%s/%s", record.FileDir, record.FileName))
 
 		if err := backupRepo.CreateRecord(&record); err != nil {
 			global.LOG.Errorf("save backup record failed, err: %v", err)
@@ -287,12 +292,22 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, app *repo.RootInf
 					_ = os.RemoveAll(fmt.Sprintf("%s/%s", backupDir, record.FileName))
 				}()
 			}
+			if len(backup.BackupPath) != 0 {
+				itemPath := strings.TrimPrefix(backup.BackupPath, "/")
+				itemPath = strings.TrimSuffix(itemPath, "/") + "/"
+				itemFileDir = itemPath + itemFileDir
+			}
 			if _, err = client.Upload(backupDir+"/"+record.FileName, itemFileDir+"/"+record.FileName); err != nil {
 				return paths, err
 			}
 		}
+		if backup.Type == "LOCAL" || cronjob.KeepLocal {
+			paths = append(paths, fmt.Sprintf("%s/%s", record.FileDir, record.FileName))
+		} else {
+			paths = append(paths, fmt.Sprintf("%s/%s", itemFileDir, record.FileName))
+		}
 	}
-	u.HandleRmExpired(backup.Type, localDir, &cronjob, client)
+	u.HandleRmExpired(backup.Type, backup.BackupPath, localDir, &cronjob, client)
 	return paths, nil
 }
 
@@ -358,7 +373,7 @@ func (u *CronjobService) handleCutWebsiteLog(cronjob *model.Cronjob, startTime t
 		}()
 	}
 	wg.Wait()
-	u.HandleRmExpired("LOCAL", "", cronjob, nil)
+	u.HandleRmExpired("LOCAL", "", "", cronjob, nil)
 	return strings.Join(filePaths, ","), nil
 }
 
@@ -399,10 +414,10 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, backup model.Backu
 		}
 		backupDir := fmt.Sprintf("%s/website/%s", localDir, website.PrimaryDomain)
 		record.FileDir = backupDir
-		itemFileDir := strings.ReplaceAll(backupDir, localDir+"/", "")
+		itemFileDir := strings.TrimPrefix(backupDir, localDir+"/")
 		if !cronjob.KeepLocal && backup.Type != "LOCAL" {
 			record.Source = backup.Type
-			record.FileDir = strings.ReplaceAll(backupDir, localDir+"/", "")
+			record.FileDir = strings.TrimPrefix(backupDir, localDir+"/")
 		}
 		record.FileName = fmt.Sprintf("website_%s_%s.tar.gz", website.PrimaryDomain, startTime.Format("20060102150405"))
 		paths = append(paths, fmt.Sprintf("%s/%s", record.FileDir, record.FileName))
@@ -420,11 +435,21 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, backup model.Backu
 					_ = os.RemoveAll(fmt.Sprintf("%s/%s", backupDir, record.FileName))
 				}()
 			}
+			if len(backup.BackupPath) != 0 {
+				itemPath := strings.TrimPrefix(backup.BackupPath, "/")
+				itemPath = strings.TrimSuffix(itemPath, "/") + "/"
+				itemFileDir = itemPath + itemFileDir
+			}
 			if _, err = client.Upload(backupDir+"/"+record.FileName, itemFileDir+"/"+record.FileName); err != nil {
 				return paths, err
 			}
 		}
+		if backup.Type == "LOCAL" || cronjob.KeepLocal {
+			paths = append(paths, fmt.Sprintf("%s/%s", record.FileDir, record.FileName))
+		} else {
+			paths = append(paths, fmt.Sprintf("%s/%s", itemFileDir, record.FileName))
+		}
 	}
-	u.HandleRmExpired(backup.Type, localDir, &cronjob, client)
+	u.HandleRmExpired(backup.Type, backup.BackupPath, localDir, &cronjob, client)
 	return paths, nil
 }
