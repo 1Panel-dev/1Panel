@@ -7,6 +7,7 @@ export namespace Backup {
         accessKey: string;
         bucket: string;
         credential: string;
+        backupPath: string;
         vars: string;
         varsJson: object;
         createdAt: Date;
@@ -17,6 +18,7 @@ export namespace Backup {
         accessKey: string;
         bucket: string;
         credential: string;
+        backupPath: string;
         vars: string;
     }
     export interface RecordDownload {

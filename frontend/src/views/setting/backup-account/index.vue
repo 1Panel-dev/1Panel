@@ -66,6 +66,9 @@
                             <el-form-item label="Bucket">
                                 {{ s3Data.bucket }}
                             </el-form-item>
+                            <el-form-item :label="$t('setting.backupDir')">
+                                {{ s3Data.backupPath }}
+                            </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
                                 {{ dateFormat(0, 0, s3Data.createdAt) }}
                             </el-form-item>
@@ -101,6 +104,9 @@
                             </el-form-item>
                             <el-form-item label="Bucket">
                                 {{ ossData.bucket }}
+                            </el-form-item>
+                            <el-form-item :label="$t('setting.backupDir')">
+                                {{ ossData.backupPath }}
                             </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
                                 {{ dateFormat(0, 0, ossData.createdAt) }}
@@ -139,6 +145,9 @@
                             <el-form-item label="Bucket">
                                 {{ cosData.bucket }}
                             </el-form-item>
+                            <el-form-item :label="$t('setting.backupDir')">
+                                {{ cosData.backupPath }}
+                            </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
                                 {{ dateFormat(0, 0, cosData.createdAt) }}
                             </el-form-item>
@@ -149,6 +158,47 @@
                             </el-button>
                         </el-alert>
                     </el-col>
+                    <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
+                        <div>
+                            <svg-icon style="font-size: 7px" iconName="p-onedrive"></svg-icon>
+                            <span style="font-size: 14px; font-weight: 500">&nbsp;{{ $t('setting.OneDrive') }}</span>
+                            <div style="float: right">
+                                <el-button
+                                    round
+                                    plain
+                                    :disabled="oneDriveData.id === 0"
+                                    @click="onOpenDialog('edit', 'SFTP', oneDriveData)"
+                                >
+                                    {{ $t('commons.button.edit') }}
+                                </el-button>
+                                <el-button round :disabled="oneDriveData.id === 0" @click="onDelete(oneDriveData)">
+                                    {{ $t('commons.button.delete') }}
+                                </el-button>
+                            </div>
+                        </div>
+                        <el-divider class="devider" />
+                        <div v-if="oneDriveData.id !== 0" style="margin-left: 20px">
+                            <el-form-item :label="$t('setting.backupDir')">
+                                {{ oneDriveData.backupPath }}
+                            </el-form-item>
+                            <el-form-item :label="$t('commons.table.createdAt')">
+                                {{ dateFormat(0, 0, oneDriveData.createdAt) }}
+                            </el-form-item>
+                        </div>
+                        <el-alert v-else center class="alert" style="height: 167px" :closable="false">
+                            <el-button
+                                size="large"
+                                round
+                                plain
+                                type="primary"
+                                @click="onOpenDialog('create', 'OneDrive')"
+                            >
+                                {{ $t('setting.createBackupAccount', [$t('setting.OneDrive')]) }}
+                            </el-button>
+                        </el-alert>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20" style="margin-top: 20px">
                     <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
                         <div>
                             <svg-icon style="font-size: 7px" iconName="p-qiniuyun"></svg-icon>
@@ -175,6 +225,9 @@
                             <el-form-item label="Bucket">
                                 {{ kodoData.bucket }}
                             </el-form-item>
+                            <el-form-item :label="$t('setting.backupDir')">
+                                {{ kodoData.backupPath }}
+                            </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
                                 {{ dateFormat(0, 0, kodoData.createdAt) }}
                             </el-form-item>
@@ -185,8 +238,6 @@
                             </el-button>
                         </el-alert>
                     </el-col>
-                </el-row>
-                <el-row :gutter="20" style="margin-top: 20px">
                     <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
                         <div>
                             <svg-icon style="font-size: 7px" iconName="p-minio"></svg-icon>
@@ -212,6 +263,9 @@
                             <el-form-item label="Bucket">
                                 {{ minioData.bucket }}
                             </el-form-item>
+                            <el-form-item :label="$t('setting.backupDir')">
+                                {{ minioData.backupPath }}
+                            </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
                                 {{ dateFormat(0, 0, minioData.createdAt) }}
                             </el-form-item>
@@ -222,6 +276,8 @@
                             </el-button>
                         </el-alert>
                     </el-col>
+                </el-row>
+                <el-row :gutter="20" style="margin-top: 20px">
                     <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
                         <div>
                             <svg-icon style="font-size: 7px" iconName="p-SFTP"></svg-icon>
@@ -250,6 +306,9 @@
                             </el-form-item>
                             <el-form-item :label="$t('setting.path')">
                                 {{ sftpData.bucket }}
+                            </el-form-item>
+                            <el-form-item :label="$t('setting.backupDir')">
+                                {{ sftpData.backupPath }}
                             </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
                                 {{ dateFormat(0, 0, sftpData.createdAt) }}
@@ -284,6 +343,7 @@ const localData = ref<Backup.BackupInfo>({
     accessKey: '',
     bucket: '',
     credential: '',
+    backupPath: '',
     vars: '',
     varsJson: {
         dir: '',
@@ -296,6 +356,7 @@ const ossData = ref<Backup.BackupInfo>({
     accessKey: '',
     bucket: '',
     credential: '',
+    backupPath: '',
     vars: '',
     varsJson: {
         region: '',
@@ -309,6 +370,7 @@ const minioData = ref<Backup.BackupInfo>({
     accessKey: '',
     bucket: '',
     credential: '',
+    backupPath: '',
     vars: '',
     varsJson: {
         region: '',
@@ -322,10 +384,24 @@ const sftpData = ref<Backup.BackupInfo>({
     accessKey: '',
     bucket: '',
     credential: '',
+    backupPath: '',
     vars: '',
     varsJson: {
         address: '',
         port: 22,
+    },
+    createdAt: new Date(),
+});
+const oneDriveData = ref<Backup.BackupInfo>({
+    id: 0,
+    type: 'OneDrive',
+    accessKey: '',
+    bucket: '',
+    credential: '',
+    backupPath: '',
+    vars: '',
+    varsJson: {
+        redirectURI: '',
     },
     createdAt: new Date(),
 });
@@ -335,6 +411,7 @@ const s3Data = ref<Backup.BackupInfo>({
     accessKey: '',
     bucket: '',
     credential: '',
+    backupPath: '',
     vars: '',
     varsJson: {
         region: '',
@@ -348,6 +425,7 @@ const cosData = ref<Backup.BackupInfo>({
     accessKey: '',
     bucket: '',
     credential: '',
+    backupPath: '',
     vars: '',
     varsJson: {
         region: '',
@@ -360,6 +438,7 @@ const kodoData = ref<Backup.BackupInfo>({
     accessKey: '',
     bucket: '',
     credential: '',
+    backupPath: '',
     vars: '',
     varsJson: {
         domain: '',
@@ -395,6 +474,9 @@ const search = async () => {
                 break;
             case 'KODO':
                 kodoData.value = bac;
+                break;
+            case 'OneDrive':
+                oneDriveData.value = bac;
                 break;
         }
     }

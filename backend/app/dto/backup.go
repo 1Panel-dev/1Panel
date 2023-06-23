@@ -8,15 +8,17 @@ type BackupOperate struct {
 	Bucket     string `json:"bucket"`
 	AccessKey  string `json:"accessKey"`
 	Credential string `json:"credential"`
+	BackupPath string `json:"backupPath"`
 	Vars       string `json:"vars" validate:"required"`
 }
 
 type BackupInfo struct {
-	ID        uint      `json:"id"`
-	CreatedAt time.Time `json:"createdAt"`
-	Type      string    `json:"type"`
-	Bucket    string    `json:"bucket"`
-	Vars      string    `json:"vars"`
+	ID         uint      `json:"id"`
+	CreatedAt  time.Time `json:"createdAt"`
+	Type       string    `json:"type"`
+	Bucket     string    `json:"bucket"`
+	BackupPath string    `json:"backupPath"`
+	Vars       string    `json:"vars"`
 }
 
 type BackupSearch struct {

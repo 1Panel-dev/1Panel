@@ -45,6 +45,21 @@
                         >
                             <el-input show-password clearable v-model.trim="dialogData.rowData!.credential" />
                         </el-form-item>
+                        <el-form-item v-if="dialogData.rowData!.type === 'OneDrive'">
+                            <el-checkbox v-model="dialogData.rowData!.varsJson['isCN']" :label="$t('setting.isCN')" />
+                        </el-form-item>
+                        <el-form-item
+                            v-if="dialogData.rowData!.type === 'OneDrive'"
+                            :label="$t('setting.code')"
+                            prop="varsJson.code"
+                            :rules="Rules.requiredInput"
+                        >
+                            <el-input clearable v-model.trim="dialogData.rowData!.varsJson['code']">
+                                <template #append>
+                                    <el-button @click="jumpAzure">{{ $t('setting.loadCode') }}</el-button>
+                                </template>
+                            </el-input>
+                        </el-form-item>
                         <el-form-item
                             v-if="dialogData.rowData!.type === 'S3' || dialogData.rowData!.type === 'COS'"
                             label="Region"
@@ -136,6 +151,13 @@
                                 <el-input v-model="dialogData.rowData!.bucket" />
                             </el-form-item>
                         </div>
+                        <el-form-item
+                            v-if="dialogData.rowData!.type !== 'LOCAL'"
+                            :label="$t('setting.backupDir')"
+                            prop="backupPath"
+                        >
+                            <el-input clearable v-model.trim="dialogData.rowData!.backupPath" />
+                        </el-form-item>
                     </el-col>
                 </el-row>
             </el-form>
@@ -204,6 +226,16 @@ const acceptParams = (params: DialogProps): void => {
 
 const handleClose = () => {
     drawerVisiable.value = false;
+};
+
+const jumpAzure = () => {
+    let commonUrl =
+        'response_type=code&client_id=5446cfe3-4c79-47a0-ae25-fc645478e2d9&redirect_uri=http://localhost/login/authorized&scope=offline_access+Files.ReadWrite.All+User.Read';
+    if (!dialogData.value.rowData!.varsJson['isCN']) {
+        window.open('https://login.microsoftonline.com/common/oauth2/v2.0/authorize?' + commonUrl, '_blank');
+    } else {
+        window.open('https://login.chinacloudapi.cn/common/oauth2/v2.0/authorize?' + commonUrl, '_blank');
+    }
 };
 
 const loadDir = async (path: string) => {

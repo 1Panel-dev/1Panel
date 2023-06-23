@@ -100,9 +100,9 @@ func (u *CronjobService) CleanRecord(req dto.CronjobClean) error {
 			if err != nil {
 				return err
 			}
-			u.HandleRmExpired(backup.Type, localDir, &cronjob, client)
+			u.HandleRmExpired(backup.Type, backup.BackupPath, localDir, &cronjob, client)
 		} else {
-			u.HandleRmExpired(backup.Type, "", &cronjob, nil)
+			u.HandleRmExpired(backup.Type, backup.BackupPath, "", &cronjob, nil)
 		}
 	}
 	delRecords, err := cronjobRepo.ListRecord(cronjobRepo.WithByJobID(int(req.CronjobID)))

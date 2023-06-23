@@ -390,3 +390,13 @@ var UpdateWebsite = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddBackupAccountDir = &gormigrate.Migration{
+	ID: "20200620-add-backup-dir",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.BackupAccount{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}

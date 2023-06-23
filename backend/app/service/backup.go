@@ -4,6 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"strings"
@@ -62,6 +65,7 @@ func (u *BackupService) List() ([]dto.BackupInfo, error) {
 	dtobas = append(dtobas, u.loadByType("MINIO", ops))
 	dtobas = append(dtobas, u.loadByType("COS", ops))
 	dtobas = append(dtobas, u.loadByType("KODO", ops))
+	dtobas = append(dtobas, u.loadByType("OneDrive", ops))
 	return dtobas, err
 }
 
@@ -96,7 +100,6 @@ func (u *BackupService) DownloadRecord(info dto.DownloadRecord) (string, error) 
 	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
 		return "", err
 	}
-	varMap["type"] = backup.Type
 	varMap["bucket"] = backup.Bucket
 	switch backup.Type {
 	case constant.Sftp:
@@ -105,8 +108,10 @@ func (u *BackupService) DownloadRecord(info dto.DownloadRecord) (string, error) 
 	case constant.OSS, constant.S3, constant.MinIo, constant.Cos, constant.Kodo:
 		varMap["accessKey"] = backup.AccessKey
 		varMap["secretKey"] = backup.Credential
+	case constant.OneDrive:
+		varMap["accessToken"] = backup.Credential
 	}
-	backClient, err := cloud_storage.NewCloudStorageClient(varMap)
+	backClient, err := cloud_storage.NewCloudStorageClient(backup.Type, varMap)
 	if err != nil {
 		return "", fmt.Errorf("new cloud storage client failed, err: %v", err)
 	}
@@ -134,6 +139,12 @@ func (u *BackupService) Create(backupDto dto.BackupOperate) error {
 	if err := copier.Copy(&backup, &backupDto); err != nil {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
+
+	if backupDto.Type == constant.OneDrive {
+		if err := u.loadAccessToken(&backup); err != nil {
+			return err
+		}
+	}
 	if err := backupRepo.Create(&backup); err != nil {
 		return err
 	}
@@ -145,7 +156,6 @@ func (u *BackupService) GetBuckets(backupDto dto.ForBuckets) ([]interface{}, err
 	if err := json.Unmarshal([]byte(backupDto.Vars), &varMap); err != nil {
 		return nil, err
 	}
-	varMap["type"] = backupDto.Type
 	switch backupDto.Type {
 	case constant.Sftp:
 		varMap["username"] = backupDto.AccessKey
@@ -154,7 +164,7 @@ func (u *BackupService) GetBuckets(backupDto dto.ForBuckets) ([]interface{}, err
 		varMap["accessKey"] = backupDto.AccessKey
 		varMap["secretKey"] = backupDto.Credential
 	}
-	client, err := cloud_storage.NewCloudStorageClient(varMap)
+	client, err := cloud_storage.NewCloudStorageClient(backupDto.Type, varMap)
 	if err != nil {
 		return nil, err
 	}
@@ -215,6 +225,15 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 	upMap["bucket"] = req.Bucket
 	upMap["credential"] = req.Credential
 	upMap["vars"] = req.Vars
+	backup.Vars = req.Vars
+
+	if req.Type == constant.OneDrive {
+		if err := u.loadAccessToken(&backup); err != nil {
+			return err
+		}
+		upMap["credential"] = backup.Credential
+		upMap["vars"] = backup.Vars
+	}
 	if err := backupRepo.Update(req.ID, upMap); err != nil {
 		return err
 	}
@@ -251,7 +270,6 @@ func (u *BackupService) NewClient(backup *model.BackupAccount) (cloud_storage.Cl
 	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
 		return nil, err
 	}
-	varMap["type"] = backup.Type
 	if backup.Type == "LOCAL" {
 		return nil, errors.New("not support")
 	}
@@ -263,9 +281,11 @@ func (u *BackupService) NewClient(backup *model.BackupAccount) (cloud_storage.Cl
 	case constant.OSS, constant.S3, constant.MinIo, constant.Cos, constant.Kodo:
 		varMap["accessKey"] = backup.AccessKey
 		varMap["secretKey"] = backup.Credential
+	case constant.OneDrive:
+		varMap["accessToken"] = backup.Credential
 	}
 
-	backClient, err := cloud_storage.NewCloudStorageClient(varMap)
+	backClient, err := cloud_storage.NewCloudStorageClient(backup.Type, varMap)
 	if err != nil {
 		return nil, err
 	}
@@ -284,6 +304,53 @@ func (u *BackupService) loadByType(accountType string, accounts []model.BackupAc
 		}
 	}
 	return dto.BackupInfo{Type: accountType}
+}
+
+func (u *BackupService) loadAccessToken(backup *model.BackupAccount) error {
+	varMap := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
+		return fmt.Errorf("unmarshal backup vars failed, err: %v", err)
+	}
+
+	data := url.Values{}
+	data.Set("client_id", constant.OneDriveClientID)
+	data.Set("client_secret", constant.OneDriveClientSecret)
+	data.Set("grant_type", "authorization_code")
+	data.Set("code", varMap["code"].(string))
+	data.Set("redirect_uri", constant.OneDriveRedirectURI)
+	client := &http.Client{}
+	req, err := http.NewRequest("POST", "https://login.microsoftonline.com/common/oauth2/v2.0/token", strings.NewReader(data.Encode()))
+	if err != nil {
+		return fmt.Errorf("new http post client for access token failed, err: %v", err)
+	}
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("request for access token failed, err: %v", err)
+	}
+	delete(varMap, "code")
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("read data from response body failed, err: %v", err)
+	}
+	defer resp.Body.Close()
+
+	token := map[string]interface{}{}
+	if err := json.Unmarshal(respBody, &token); err != nil {
+		return fmt.Errorf("unmarshal data from response body failed, err: %v", err)
+	}
+	accessToken, ok := token["refresh_token"].(string)
+	if !ok {
+		return errors.New("no such access token in response")
+	}
+
+	itemVars, err := json.Marshal(varMap)
+	if err != nil {
+		return fmt.Errorf("json marshal var map failed, err: %v", err)
+	}
+	backup.Credential = accessToken
+	backup.Vars = string(itemVars)
+	return nil
 }
 
 func loadLocalDir() (string, error) {
