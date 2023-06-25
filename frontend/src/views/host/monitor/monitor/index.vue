@@ -144,7 +144,7 @@ import { ref, reactive, onMounted, onBeforeUnmount, computed } from 'vue';
 import * as echarts from 'echarts';
 import { loadMonitor, getNetworkOptions } from '@/api/modules/monitor';
 import { Monitor } from '@/api/interface/monitor';
-import { dateFormatWithoutYear } from '@/utils/util';
+import { computeSizeFromKBs, dateFormatWithoutYear } from '@/utils/util';
 import i18n from '@/lang';
 import MonitorRouter from '@/views/host/monitor/index.vue';
 import { GlobalStore } from '@/store';
@@ -380,8 +380,14 @@ function initCharts(chartName: string, xDatas: any, yDatas: any, yTitle: string,
             trigger: 'axis',
             formatter: function (datas: any) {
                 let res = datas[0].name + '<br/>';
-                for (const item of datas) {
-                    res += item.marker + ' ' + item.seriesName + '：' + item.data + formatStr + '<br/>';
+                if (chartName !== 'loadNetworkChart') {
+                    for (const item of datas) {
+                        res += item.marker + ' ' + item.seriesName + '：' + item.data + formatStr + '<br/>';
+                    }
+                } else {
+                    for (const item of datas) {
+                        res += item.marker + ' ' + item.seriesName + '：' + computeSizeFromKBs(item.data) + '<br/>';
+                    }
                 }
                 return res;
             },
@@ -574,7 +580,7 @@ function initIOCharts(item: Monitor.MonitorData) {
                         item.seriesName === i18n.global.t('monitor.read') ||
                         item.seriesName === i18n.global.t('monitor.write')
                     ) {
-                        res += item.marker + ' ' + item.seriesName + '：' + item.data + ' KB/s' + '<br/>';
+                        res += item.marker + ' ' + item.seriesName + '：' + computeSizeFromKBs(item.data) + '<br/>';
                     }
                     if (item.seriesName === i18n.global.t('monitor.readWriteCount')) {
                         res +=

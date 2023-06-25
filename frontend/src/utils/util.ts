@@ -129,6 +129,21 @@ export function computeSize(size: number): string {
     return (size / Math.pow(num, 4)).toFixed(2) + ' TB';
 }
 
+export function computeSizeFromMB(size: number): string {
+    const num = 1024.0;
+    if (size < num) return size + ' MB';
+    if (size < Math.pow(num, 2)) return (size / num).toFixed(2) + ' GB';
+    return (size / Math.pow(num, 3)).toFixed(2) + ' TB';
+}
+
+export function computeSizeFromKBs(size: number): string {
+    const num = 1024.0;
+    if (size < num) return size + ' KB/s';
+    if (size < Math.pow(num, 2)) return (size / num).toFixed(2) + ' MB/s';
+    if (size < Math.pow(num, 3)) return (size / Math.pow(num, 2)).toFixed(2) + ' GB/s';
+    return (size / Math.pow(num, 3)).toFixed(2) + ' TB/s';
+}
+
 let icons = new Map([
     ['.zip', 'p-file-zip'],
     ['.gz', 'p-file-zip'],
