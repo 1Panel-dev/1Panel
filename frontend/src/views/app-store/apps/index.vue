@@ -99,6 +99,15 @@
                     </div>
                 </el-col>
             </el-row>
+            <div class="page-button">
+                <fu-table-pagination
+                    v-model:current-page="paginationConfig.currentPage"
+                    v-model:page-size="paginationConfig.pageSize"
+                    v-bind="paginationConfig"
+                    @change="search(req)"
+                    :layout="'total, sizes, prev, pager, next, jumper'"
+                />
+            </div>
         </template>
     </LayoutContent>
     <Detail v-if="showDetail" :id="appId"></Detail>
@@ -115,6 +124,12 @@ import { MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
 
 const language = useI18n().locale.value;
+
+const paginationConfig = reactive({
+    currentPage: 1,
+    pageSize: 50,
+    total: 0,
+});
 
 const req = reactive({
     name: '',
@@ -138,9 +153,12 @@ const getColor = (index: number) => {
 
 const search = async (req: App.AppReq) => {
     loading.value = true;
+    req.pageSize = paginationConfig.pageSize;
+    req.page = paginationConfig.currentPage;
     await SearchApp(req)
         .then((res) => {
             apps.value = res.data.items;
+            paginationConfig.total = res.data.total;
         })
         .finally(() => {
             loading.value = false;
@@ -259,5 +277,11 @@ onMounted(() => {
         background: none;
         border: none;
     }
+}
+
+.page-button {
+    float: right;
+    margin-bottom: 10px;
+    margin-top: 10px;
 }
 </style>
