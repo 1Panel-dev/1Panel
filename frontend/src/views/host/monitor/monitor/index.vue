@@ -389,9 +389,13 @@ function initCharts(chartName: string, xDatas: any, yDatas: any, yTitle: string,
         legend: {
             data: chartName === 'loadNetworkChart' && [i18n.global.t('monitor.up'), i18n.global.t('monitor.down')],
         },
-        grid: { left: '7%', right: '7%', bottom: '20%' },
+        grid: {
+            left: getSideWidth(chartName == 'loadNetworkChart'),
+            right: getSideWidth(chartName == 'loadNetworkChart'),
+            bottom: '20%',
+        },
         xAxis: { data: xDatas },
-        yAxis: { name: '( ' + formatStr + ' )' },
+        yAxis: { name: '( ' + formatStr + ' )', axisLabel: { fontSize: chartName == 'loadNetworkChart' ? 10 : 12 } },
         dataZoom: [{ startValue: zoomStart.value }],
         series: yDatas,
     };
@@ -599,13 +603,20 @@ function initIOCharts(item: Monitor.MonitorData) {
                 i18n.global.t('monitor.readWriteTime'),
             ],
         },
-        grid: { left: '7%', right: '7%', bottom: '20%' },
+        grid: { left: getSideWidth(true), right: getSideWidth(true), bottom: '20%' },
         xAxis: {
             data: ioDate,
         },
         yAxis: [
-            { type: 'value', name: '( KB/s )' },
-            { type: 'value', position: 'right', alignTicks: true },
+            { type: 'value', name: '( KB/s )', axisLabel: { fontSize: 10 } },
+            {
+                type: 'value',
+                position: 'right',
+                alignTicks: true,
+                axisLabel: {
+                    fontSize: 10,
+                },
+            },
         ],
         dataZoom: [{ startValue: zoomStart.value }],
         series: [
@@ -698,6 +709,10 @@ function loadEmptyDate(timeRange: any) {
 }
 function loadEmptyData() {
     return [0, 0];
+}
+
+function getSideWidth(b: boolean) {
+    return !b || document.body.clientWidth > 1600 ? '7%' : '10%';
 }
 
 function changeChartSize() {
