@@ -163,11 +163,11 @@ func (b *BaseApi) ContainerWsSsh(c *gin.Context) {
 	}
 	defer wsConn.Close()
 
-	cmds := fmt.Sprintf("docker exec %s %s", containerID, command)
+	cmds := []string{"exec", containerID, command}
 	if len(user) != 0 {
-		cmds = fmt.Sprintf("docker exec -u %s %s %s", user, containerID, command)
+		cmds = []string{"exec", "-u", user, containerID, command}
 	}
-	stdout, err := cmd.Exec(cmds)
+	stdout, err := cmd.ExecWithCheck("docker", cmds...)
 	if wshandleError(wsConn, errors.WithMessage(err, stdout)) {
 		return
 	}

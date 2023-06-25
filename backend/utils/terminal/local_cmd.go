@@ -8,6 +8,7 @@ import (
 	"unsafe"
 
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/creack/pty"
 	"github.com/pkg/errors"
 )
@@ -26,6 +27,9 @@ type LocalCommand struct {
 }
 
 func NewCommand(commands string) (*LocalCommand, error) {
+	if cmd.CheckIllegal(commands) {
+		return nil, errors.New("There are invalid characters in the command you're executing.")
+	}
 	cmd := exec.Command("sh", "-c", commands)
 
 	pty, err := pty.Start(cmd)
