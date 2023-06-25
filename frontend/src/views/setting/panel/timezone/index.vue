@@ -4,16 +4,16 @@
             <template #header>
                 <DrawerHeader :header="$t('setting.timeZone')" :back="handleClose" />
             </template>
-            <el-alert v-if="canChangeZone()" style="margin-bottom: 20px" :closable="false" type="warning">
-                <template #default>
-                    <span>
-                        <span>{{ $t('setting.timeZoneHelper') }}</span>
-                    </span>
-                </template>
-            </el-alert>
-            <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
-                <el-row type="flex" justify="center">
-                    <el-col :span="22">
+            <el-row type="flex" justify="center">
+                <el-col :span="22">
+                    <el-alert
+                        v-if="canChangeZone()"
+                        :title="$t('setting.timeZoneHelper')"
+                        style="margin-bottom: 20px"
+                        :closable="false"
+                        type="warning"
+                    />
+                    <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
                         <el-form-item :label="$t('setting.timeZone')" prop="timeZone" :rules="Rules.requiredInput">
                             <el-select filterable :disabled="canChangeZone()" v-model="form.timeZone">
                                 <el-option v-for="item in zones" :key="item" :label="item" :value="item" />
@@ -46,9 +46,9 @@
                                 {{ $t('setting.timeZoneNY') }}
                             </el-button>
                         </el-form-item>
-                    </el-col>
-                </el-row>
-            </el-form>
+                    </el-form>
+                </el-col>
+            </el-row>
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>

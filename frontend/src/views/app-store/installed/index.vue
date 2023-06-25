@@ -64,11 +64,7 @@
                     </span>
                 </template>
             </el-alert>
-            <el-alert type="info" :closable="false" v-if="mode === 'upgrade'">
-                <template #default>
-                    <span>{{ $t('app.upgradeHelper') }}</span>
-                </template>
-            </el-alert>
+            <el-alert type="info" :title="$t('app.upgradeHelper')" :closable="false" v-if="mode === 'upgrade'" />
             <div class="update-prompt" v-if="data == null">
                 <span>{{ mode === 'upgrade' ? $t('app.updatePrompt') : $t('app.installPrompt') }}</span>
                 <div>

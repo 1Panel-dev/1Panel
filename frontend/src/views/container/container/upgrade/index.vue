@@ -3,16 +3,17 @@
         <template #header>
             <DrawerHeader :header="$t('container.upgrade')" :resource="form.name" :back="handleClose" />
         </template>
-        <el-alert v-if="form.fromApp" style="margin-bottom: 20px" :closable="false" type="error">
-            <template #default>
-                <span>
-                    <span>{{ $t('container.appHelper') }}</span>
-                </span>
-            </template>
-        </el-alert>
-        <el-form @submit.prevent ref="formRef" v-loading="loading" :model="form" label-position="top">
-            <el-row type="flex" justify="center">
-                <el-col :span="22">
+
+        <el-row v-loading="loading">
+            <el-col :span="22" :offset="1">
+                <el-alert
+                    v-if="form.fromApp"
+                    :title="$t('container.appHelper')"
+                    style="margin-bottom: 20px"
+                    :closable="false"
+                    type="error"
+                />
+                <el-form @submit.prevent ref="formRef" v-loading="loading" :model="form" label-position="top">
                     <el-form-item :label="$t('container.oldImage')" prop="oldImage">
                         <el-tag>{{ form.imageName }}:{{ form.oldTag }}</el-tag>
                     </el-form-item>
@@ -22,9 +23,9 @@
                         </el-input>
                         <span class="input-help">{{ $t('container.upgradeHelper') }}</span>
                     </el-form-item>
-                </el-col>
-            </el-row>
-        </el-form>
+                </el-form>
+            </el-col>
+        </el-row>
         <template #footer>
             <span class="dialog-footer">
                 <el-button :disabled="loading" @click="drawerVisiable = false">
