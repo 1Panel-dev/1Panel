@@ -27,6 +27,7 @@ export namespace Setting {
         complexityVerification: string;
         mfaStatus: string;
         mfaSecret: string;
+        mfaInterval: string;
 
         monitorStatus: string;
         monitorInterval: number;
@@ -71,6 +72,7 @@ export namespace Setting {
     export interface MFABind {
         secret: string;
         code: string;
+        interval: string;
     }
     export interface SnapshotCreate {
         from: string;

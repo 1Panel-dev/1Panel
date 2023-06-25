@@ -12,8 +12,9 @@ type UserLoginInfo struct {
 }
 
 type MfaCredential struct {
-	Secret string `json:"secret"`
-	Code   string `json:"code"`
+	Secret   string `json:"secret"`
+	Code     string `json:"code"`
+	Interval string `json:"interval"`
 }
 
 type Login struct {

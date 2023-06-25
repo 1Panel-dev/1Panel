@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/skip2/go-qrcode"
 	"github.com/xlzd/gotp"
 )
@@ -17,10 +18,10 @@ type Otp struct {
 	QrImage string `json:"qrImage"`
 }
 
-func GetOtp(username string) (otp Otp, err error) {
+func GetOtp(username string, interval int) (otp Otp, err error) {
 	secret := gotp.RandomSecret(secretLength)
 	otp.Secret = secret
-	totp := gotp.NewDefaultTOTP(secret)
+	totp := gotp.NewTOTP(secret, 6, interval, nil)
 	uri := totp.ProvisioningUri(username, "1Panel")
 	subImg, err := qrcode.Encode(uri, qrcode.Medium, 256)
 	dist := make([]byte, 3000)
@@ -31,8 +32,13 @@ func GetOtp(username string) (otp Otp, err error) {
 	return
 }
 
-func ValidCode(code string, secret string) bool {
-	totp := gotp.NewDefaultTOTP(secret)
+func ValidCode(code, intervalStr, secret string) bool {
+	interval, err := strconv.Atoi(intervalStr)
+	if err != nil {
+		global.LOG.Errorf("type conversion failed, err: %v", err)
+		return false
+	}
+	totp := gotp.NewTOTP(secret, 6, interval, nil)
 	now := time.Now().Unix()
 	strInt64 := strconv.FormatInt(now, 10)
 	id16, _ := strconv.Atoi(strInt64)

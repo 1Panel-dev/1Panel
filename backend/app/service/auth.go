@@ -76,7 +76,11 @@ func (u *AuthService) MFALogin(c *gin.Context, info dto.MFALogin) (*dto.UserLogi
 	if err != nil {
 		return nil, err
 	}
-	success := mfa.ValidCode(info.Code, mfaSecret.Value)
+	mfaInterval, err := settingRepo.Get(settingRepo.WithByKey("MFAInterval"))
+	if err != nil {
+		return nil, err
+	}
+	success := mfa.ValidCode(info.Code, mfaInterval.Value, mfaSecret.Value)
 	if !success {
 		return nil, constant.ErrAuth
 	}

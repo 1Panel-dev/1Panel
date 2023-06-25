@@ -17,7 +17,14 @@
                     </span>
                 </template>
             </el-alert>
-            <el-form :model="form" ref="formRef" @submit.prevent v-loading="loading" label-position="top">
+            <el-form
+                :model="form"
+                ref="formRef"
+                @submit.prevent
+                v-loading="loading"
+                label-position="top"
+                :rules="rules"
+            >
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
                         <el-form-item :label="$t('setting.mfaHelper1')">
@@ -45,7 +52,15 @@
                                 </div>
                             </span>
                         </el-form-item>
-                        <el-form-item :label="$t('setting.mfaCode')" prop="code" :rules="Rules.requiredInput">
+                        <el-form-item :label="$t('setting.mfaInterval')" prop="interval">
+                            <el-input v-model.number="form.interval">
+                                <template #append>
+                                    <el-button @click="loadMfaCode">{{ $t('commons.button.save') }}</el-button>
+                                </template>
+                            </el-input>
+                            <span class="input-help">{{ $t('setting.mfaIntervalHelper') }}</span>
+                        </el-form-item>
+                        <el-form-item :label="$t('setting.mfaCode')" prop="code">
                             <el-input v-model="form.code"></el-input>
                         </el-form-item>
                     </el-col>
@@ -65,7 +80,7 @@
 <script lang="ts" setup>
 import { bindMFA, getMFA } from '@/api/modules/setting';
 import { reactive, ref } from 'vue';
-import { Rules } from '@/global/form-rules';
+import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
@@ -81,10 +96,20 @@ const formRef = ref();
 const form = reactive({
     code: '',
     secret: '',
+    interval: 30,
 });
 
+const rules = reactive({
+    code: [Rules.requiredInput],
+    mfaInterval: [Rules.number, checkNumberRange(15, 300)],
+});
+
+interface DialogProps {
+    interval: number;
+}
 const emit = defineEmits<{ (e: 'search'): void }>();
-const acceptParams = (): void => {
+const acceptParams = (params: DialogProps): void => {
+    form.interval = params.interval;
     loadMfaCode();
     drawerVisiable.value = true;
 };
@@ -99,7 +124,7 @@ const onCopy = async () => {
 };
 
 const loadMfaCode = async () => {
-    const res = await getMFA();
+    const res = await getMFA(form.interval);
     form.secret = res.data.secret;
     qrImage.value = res.data.qrImage;
 };
@@ -108,8 +133,13 @@ const onBind = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
+        let param = {
+            code: form.code,
+            secret: form.secret,
+            interval: form.interval + '',
+        };
         loading.value = true;
-        await bindMFA(form)
+        await bindMFA(param)
             .then(() => {
                 loading.value = false;
                 drawerVisiable.value = false;
