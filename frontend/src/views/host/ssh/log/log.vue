@@ -19,10 +19,10 @@
                             <el-option :label="$t('commons.status.success')" value="Success"></el-option>
                             <el-option :label="$t('commons.status.failed')" value="Failed"></el-option>
                         </el-select>
-                        <el-tag type="success" size="large" style="margin-left: 15px">
+                        <el-tag v-if="searchStatus === 'All'" type="success" size="large" style="margin-left: 15px">
                             {{ $t('commons.status.success') }}： {{ successfulCount }}
                         </el-tag>
-                        <el-tag type="danger" size="large" style="margin-left: 5px">
+                        <el-tag v-if="searchStatus === 'All'" type="danger" size="large" style="margin-left: 5px">
                             {{ $t('commons.status.failed') }}： {{ faliedCount }}
                         </el-tag>
                     </el-col>
