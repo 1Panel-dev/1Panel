@@ -1050,6 +1050,8 @@ const message = {
         allowIPEgs:
             'If multiple ip authorizations exist, newlines need to be displayed. For example, \n172.16.10.111 \n172.16.10.112',
         mfa: 'MFA',
+        mfaInterval: 'Refresh interval (s)',
+        mfaIntervalHelper: 'Please rescan or manually add key information after modifying the refresh time.',
         mfaAlert:
             'MFA password is generated based on the current time. Please ensure that the server time is synchronized.',
         mfaHelper: 'After this function is enabled, the mobile application verification code will be verified',

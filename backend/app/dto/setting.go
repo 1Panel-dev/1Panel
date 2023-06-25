@@ -28,6 +28,7 @@ type SettingInfo struct {
 	ComplexityVerification string `json:"complexityVerification"`
 	MFAStatus              string `json:"mfaStatus"`
 	MFASecret              string `json:"mfaSecret"`
+	MFAInterval            string `json:"mfaInterval"`
 
 	MonitorStatus    string `json:"monitorStatus"`
 	MonitorInterval  string `json:"monitorInterval"`

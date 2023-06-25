@@ -32,6 +32,7 @@ func Init() {
 		migrations.UpdateCronjobWithSecond,
 		migrations.UpdateWebsite,
 		migrations.AddBackupAccountDir,
+		migrations.AddMfaInterval,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

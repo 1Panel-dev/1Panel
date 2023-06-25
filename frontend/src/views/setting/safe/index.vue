@@ -194,6 +194,7 @@ const form = reactive({
     expirationTime: '',
     complexityVerification: 'disable',
     mfaStatus: 'disable',
+    mfaInterval: 30,
     allowIPs: '',
     bindDomain: '',
 });
@@ -213,6 +214,7 @@ const search = async () => {
     form.expirationTime = res.data.expirationTime;
     form.complexityVerification = res.data.complexityVerification;
     form.mfaStatus = res.data.mfaStatus;
+    form.mfaInterval = Number(res.data.mfaInterval);
     form.allowIPs = res.data.allowIPs.replaceAll(',', '\n');
     form.bindDomain = res.data.bindDomain;
 };
@@ -236,7 +238,7 @@ const onSaveComplexity = async () => {
 
 const handleMFA = async () => {
     if (form.mfaStatus === 'enable') {
-        mfaRef.value.acceptParams();
+        mfaRef.value.acceptParams({ interval: form.mfaInterval });
         return;
     }
     loading.value = true;

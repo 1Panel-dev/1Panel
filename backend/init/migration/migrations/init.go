@@ -400,3 +400,13 @@ var AddBackupAccountDir = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddMfaInterval = &gormigrate.Migration{
+	ID: "20230625-add-mfa-interval",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "MFAInterval", Value: "30"}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
