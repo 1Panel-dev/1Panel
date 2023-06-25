@@ -18,13 +18,13 @@
                             :stroke-width="12"
                             :percentage="uploadPrecent"
                         ></el-progress>
-                        <div v-if="type === 'mysql'" class="el-upload__tip">
+                        <div v-if="type === 'mysql'" style="width: 80%" class="el-upload__tip">
                             <span class="input-help">{{ $t('database.supportUpType') }}</span>
                             <span class="input-help">
                                 {{ $t('database.zipFormat') }}
                             </span>
                         </div>
-                        <div v-else class="el-upload__tip">
+                        <div v-else style="width: 80%" class="el-upload__tip">
                             <span class="input-help">{{ $t('website.supportUpType') }}</span>
                             <span class="input-help">
                                 {{ $t('website.zipFormat', [type + '.json']) }}
