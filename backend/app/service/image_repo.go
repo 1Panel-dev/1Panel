@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path"
 	"strings"
@@ -149,7 +150,7 @@ func (u *ImageRepoService) Update(req dto.ImageRepoUpdate) error {
 	if repo.DownloadUrl != req.DownloadUrl || (!repo.Auth && req.Auth) {
 		_ = u.handleRegistries(req.DownloadUrl, repo.DownloadUrl, "update")
 		if repo.Auth {
-			_, _ = cmd.Execf("docker logout %s", repo.DownloadUrl)
+			_, _ = cmd.ExecWithCheck("docker", "logout", repo.DownloadUrl)
 		}
 		stdout, err := cmd.Exec("systemctl restart docker")
 		if err != nil {
@@ -176,9 +177,9 @@ func (u *ImageRepoService) Update(req dto.ImageRepoUpdate) error {
 }
 
 func (u *ImageRepoService) CheckConn(host, user, password string) error {
-	stdout, err := cmd.Execf("docker login -u %s -p %s %s", user, password, host)
+	stdout, err := cmd.ExecWithCheck("docker", "login", "-u", user, "-p", password, host)
 	if err != nil {
-		return errors.New(string(stdout))
+		return fmt.Errorf("stdout: %s, stderr: %v", stdout, err)
 	}
 	if strings.Contains(string(stdout), "Login Succeeded") {
 		return nil
