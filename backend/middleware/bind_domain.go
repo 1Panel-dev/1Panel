@@ -15,7 +15,7 @@ func BindDomain() gin.HandlerFunc {
 		settingRepo := repo.NewISettingRepo()
 		status, err := settingRepo.Get(settingRepo.WithByKey("BindDomain"))
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrDomain, constant.ErrTypeInternalServer, err)
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 			return
 		}
 		if len(status.Value) == 0 {
