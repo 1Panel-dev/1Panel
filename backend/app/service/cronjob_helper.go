@@ -356,7 +356,7 @@ func (u *CronjobService) handleCutWebsiteLog(cronjob *model.Cronjob, startTime t
 			dstName := fmt.Sprintf("%s_log_%s.gz", website.PrimaryDomain, startTime.Format("20060102150405"))
 			filePaths = append(filePaths, path.Join(dstLogDir, dstName))
 			if err = fileOp.Compress([]string{srcAccessLogPath, srcErrorLogPath}, dstLogDir, dstName, files.Gz); err != nil {
-				global.LOG.Errorf("There was an error in compressing the website[%s] access.log", website.PrimaryDomain)
+				global.LOG.Errorf("There was an error in compressing the website[%s] access.log, err: %v", website.PrimaryDomain, err)
 			} else {
 				_ = fileOp.WriteFile(srcAccessLogPath, strings.NewReader(""), 0755)
 				_ = fileOp.WriteFile(srcErrorLogPath, strings.NewReader(""), 0755)
