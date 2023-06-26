@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
@@ -77,6 +78,9 @@ func (u *ImageRepoService) List() ([]dto.ImageRepoOption, error) {
 }
 
 func (u *ImageRepoService) Create(req dto.ImageRepoCreate) error {
+	if cmd.CheckIllegal(req.Username, req.Password, req.DownloadUrl) {
+		return buserr.New(constant.ErrRepoConn)
+	}
 	imageRepo, _ := imageRepoRepo.Get(commonRepo.WithByName(req.Name))
 	if imageRepo.ID != 0 {
 		return constant.ErrRecordExist
@@ -142,6 +146,9 @@ func (u *ImageRepoService) BatchDelete(req dto.ImageRepoDelete) error {
 func (u *ImageRepoService) Update(req dto.ImageRepoUpdate) error {
 	if req.ID == 1 {
 		return errors.New("The default value cannot be deleted !")
+	}
+	if cmd.CheckIllegal(req.Username, req.Password, req.DownloadUrl) {
+		return buserr.New(constant.ErrRepoConn)
 	}
 	repo, err := imageRepoRepo.Get(commonRepo.WithByID(req.ID))
 	if err != nil {

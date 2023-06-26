@@ -78,6 +78,7 @@ ErrTypeOfRedis: "The recovery file type does not match the current persistence m
 #container 
 ErrInUsed: "{{ .detail }} is in use and cannot be deleted"
 ErrObjectInUsed: "This object is in use and cannot be deleted"
+ErrRepoConn: "The repository information contains illegal characters"
 
 #runtime
 ErrDirNotFound: "The build folder does not exist! Please check file integrity！"

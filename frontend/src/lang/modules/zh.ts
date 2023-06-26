@@ -138,6 +138,7 @@ const message = {
             rePassword: '密码不一致，请检查后重新输入',
             requiredInput: '请填写必填项',
             requiredSelect: '请选择必选项',
+            illegalInput: '输入框中存在不合法字符',
             commonName: '支持英文、中文、数字、.-和_,长度1-30',
             userName: '支持英文、中文、数字和_,长度3-30',
             simpleName: '支持英文、数字、_,长度1-30',

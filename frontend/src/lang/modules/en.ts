@@ -135,6 +135,7 @@ const message = {
             rePassword: 'The passwords are inconsistent. Please check and re-enter the password',
             requiredInput: 'Please enter the required fields',
             requiredSelect: 'Please select the required fields',
+            illegalInput: 'There are illegal characters in the input box.',
             commonName: 'Support English, Chinese, numbers, .-, and _ length 1-30',
             userName: 'Support English, Chinese, numbers and _ length 3-30',
             simpleName: 'Support English, numbers and _ length 1-30',
