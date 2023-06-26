@@ -3,7 +3,6 @@ package cmd
 import (
 	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -120,9 +119,6 @@ func Execf(cmdStr string, a ...interface{}) (string, error) {
 }
 
 func ExecWithCheck(name string, a ...string) (string, error) {
-	if CheckIllegal(a...) {
-		return "error exec !", errors.New("There are invalid characters in the command you're executing.")
-	}
 	cmd := exec.Command(name, a...)
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout

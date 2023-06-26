@@ -111,10 +111,10 @@ const handleClose = () => {
 };
 const rules = reactive({
     name: [Rules.requiredInput, Rules.name],
-    downloadUrl: [Rules.requiredInput],
+    downloadUrl: [Rules.illegal],
     protocol: [Rules.requiredSelect],
-    username: [Rules.requiredInput],
-    password: [Rules.requiredInput],
+    username: [Rules.illegal],
+    password: [Rules.illegal],
     auth: [Rules.requiredSelect],
 });
 

@@ -105,6 +105,7 @@ var (
 	ErrInUsed       = "ErrInUsed"
 	ErrObjectInUsed = "ErrObjectInUsed"
 	ErrPortRules    = "ErrPortRules"
+	ErrRepoConn     = "ErrRepoConn"
 )
 
 // runtime

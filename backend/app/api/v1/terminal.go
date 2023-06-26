@@ -167,6 +167,11 @@ func (b *BaseApi) ContainerWsSsh(c *gin.Context) {
 	if len(user) != 0 {
 		cmds = []string{"exec", "-u", user, containerID, command}
 	}
+	if cmd.CheckIllegal(user, containerID, command) {
+		if wshandleError(wsConn, errors.New("  The command contains illegal characters.")) {
+			return
+		}
+	}
 	stdout, err := cmd.ExecWithCheck("docker", cmds...)
 	if wshandleError(wsConn, errors.WithMessage(err, stdout)) {
 		return
