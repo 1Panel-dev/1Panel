@@ -303,7 +303,7 @@ const onNewSsh = () => {
     dialogRef.value!.acceptParams({ isLocal: false });
 };
 const onNewLocal = () => {
-    onConnTerminal(i18n.global.t('terminal.localhost'), localHostID.value, true);
+    onConnTerminal(i18n.global.t('terminal.localhost'), localHostID.value, false);
 };
 
 const onClickConn = (node: Node, data: Tree) => {
