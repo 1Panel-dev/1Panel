@@ -30,6 +30,27 @@ const checkHost = (rule: any, value: any, callback: any) => {
     }
 };
 
+const checkIllegal = (rule: any, value: any, callback: any) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback(new Error(i18n.global.t('commons.rule.requiredInput')));
+        return;
+    }
+    if (
+        value.indexOf('&') !== -1 ||
+        value.indexOf('|') !== -1 ||
+        value.indexOf(';') !== -1 ||
+        value.indexOf('$') !== -1 ||
+        value.indexOf("'") !== -1 ||
+        value.indexOf('`') !== -1 ||
+        value.indexOf('(') !== -1 ||
+        value.indexOf(')') !== -1
+    ) {
+        callback(new Error(i18n.global.t('commons.rule.illegalInput')));
+    } else {
+        callback();
+    }
+};
+
 const complexityPassword = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.complexityPassword')));
@@ -333,6 +354,7 @@ interface CommonRule {
     integerNumber: FormItemRule;
     ip: FormItemRule;
     host: FormItemRule;
+    illegal: FormItemRule;
     port: FormItemRule;
     domain: FormItemRule;
     databaseName: FormItemRule;
@@ -437,6 +459,11 @@ export const Rules: CommonRule = {
     },
     host: {
         validator: checkHost,
+        required: true,
+        trigger: 'blur',
+    },
+    illegal: {
+        validator: checkIllegal,
         required: true,
         trigger: 'blur',
     },
