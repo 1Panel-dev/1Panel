@@ -45,7 +45,7 @@ const acceptParams = (props: InstallRrops) => {
 };
 
 const toApp = () => {
-    router.push({ name: 'App' });
+    router.push({ name: 'AppInstalled' });
 };
 
 defineExpose({

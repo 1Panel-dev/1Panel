@@ -2,13 +2,7 @@
     <div>
         <LayoutContent v-loading="loading" :title="$t('ssh.loginLogs')">
             <template #prompt>
-                <el-alert type="info" :closable="false">
-                    <template #default>
-                        <span>
-                            {{ $t('ssh.sshAlert') }}
-                        </span>
-                    </template>
-                </el-alert>
+                <el-alert type="info" :title="$t('ssh.sshAlert')" :closable="false" />
             </template>
             <template #toolbar>
                 <el-row>
