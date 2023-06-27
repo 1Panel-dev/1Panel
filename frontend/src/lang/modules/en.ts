@@ -726,6 +726,10 @@ const message = {
     },
     monitor: {
         monitor: 'Monitor',
+        globalFilter: 'Global Filter',
+        enableMonitor: 'Enable',
+        storeDays: 'Expiration days',
+        cleanMonitor: 'Clearing monitoring records',
         setting: 'Setting',
         avgLoad: 'Average load',
         loadDetail: 'Load detail',
@@ -1124,11 +1128,6 @@ const message = {
         upgradeNow: 'Upgrade now',
         source: 'Download source',
         hasNewVersion: 'New version Available',
-
-        monitor: 'Monitor',
-        enableMonitor: 'Enable',
-        storeDays: 'Expiration days',
-        cleanMonitor: 'Clearing monitoring records',
 
         message: 'Message',
         messageType: 'Message type',

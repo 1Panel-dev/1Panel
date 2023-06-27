@@ -8,7 +8,7 @@
                     <el-row>
                         <el-col :span="1"><br /></el-col>
                         <el-col :span="12">
-                            <el-form-item :label="$t('setting.enableMonitor')" prop="monitorStatus">
+                            <el-form-item :label="$t('monitor.enableMonitor')" prop="monitorStatus">
                                 <el-switch
                                     @change="onSaveStatus"
                                     v-model="form.monitorStatus"
@@ -16,7 +16,7 @@
                                     inactive-value="disable"
                                 />
                             </el-form-item>
-                            <el-form-item :label="$t('setting.storeDays')" prop="monitorStoreDays">
+                            <el-form-item :label="$t('monitor.storeDays')" prop="monitorStoreDays">
                                 <el-input disabled v-model="form.monitorStoreDays">
                                     <template #append>
                                         <el-button @click="onChangeStoreDays" icon="Setting">
@@ -35,7 +35,7 @@
                                 </el-input>
                             </el-form-item>
                             <el-form-item>
-                                <el-button @click="onClean()" icon="Delete">{{ $t('setting.cleanMonitor') }}</el-button>
+                                <el-button @click="onClean()" icon="Delete">{{ $t('monitor.cleanMonitor') }}</el-button>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -100,7 +100,7 @@ const onChangeInterval = () => {
 };
 
 const onClean = async () => {
-    ElMessageBox.confirm(i18n.global.t('commons.msg.clean'), i18n.global.t('setting.cleanMonitor'), {
+    ElMessageBox.confirm(i18n.global.t('commons.msg.clean'), i18n.global.t('monitor.cleanMonitor'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',

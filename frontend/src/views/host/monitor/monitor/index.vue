@@ -2,6 +2,22 @@
     <div>
         <MonitorRouter />
 
+        <div class="content-container__search">
+            <el-card>
+                <span style="font-size: 14px">{{ $t('monitor.globalFilter') }}</span>
+                <el-date-picker
+                    @change="searchGlobal()"
+                    v-model="timeRangeGlobal"
+                    type="datetimerange"
+                    :range-separator="$t('commons.search.timeRange')"
+                    :start-placeholder="$t('commons.search.timeStart')"
+                    :end-placeholder="$t('commons.search.timeEnd')"
+                    :shortcuts="shortcuts"
+                    style="max-width: 360px; width: 100%; margin-left: 10px"
+                    :size="mobile ? 'small' : 'default'"
+                ></el-date-picker>
+            </el-card>
+        </div>
         <el-row :gutter="20" style="margin-top: 20px">
             <el-col :span="24">
                 <el-card style="overflow: inherit">
@@ -157,6 +173,7 @@ const mobile = computed(() => {
 
 const zoomStart = ref();
 const monitorBase = ref();
+const timeRangeGlobal = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
 const timeRangeLoad = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
 const timeRangeCpu = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
 const timeRangeMemory = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
@@ -214,6 +231,19 @@ const searchInfo = reactive<Monitor.MonitorSearch>({
     startTime: new Date(new Date().setHours(0, 0, 0, 0)),
     endTime: new Date(),
 });
+
+const searchGlobal = () => {
+    timeRangeLoad.value = timeRangeGlobal.value;
+    timeRangeCpu.value = timeRangeGlobal.value;
+    timeRangeMemory.value = timeRangeGlobal.value;
+    timeRangeIO.value = timeRangeGlobal.value;
+    timeRangeNetwork.value = timeRangeGlobal.value;
+    search('load');
+    search('cpu');
+    search('memory');
+    search('io');
+    search('network');
+};
 
 const search = async (param: string) => {
     searchInfo.param = param;
@@ -740,6 +770,12 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
+.content-container__search {
+    margin-top: 20px;
+    .el-card {
+        --el-card-padding: 12px;
+    }
+}
 .networkOption {
     font-size: 16px;
     font-weight: 500;

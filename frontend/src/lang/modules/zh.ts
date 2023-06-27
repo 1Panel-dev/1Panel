@@ -714,6 +714,10 @@ const message = {
     },
     monitor: {
         monitor: '监控',
+        globalFilter: '全局过滤',
+        enableMonitor: '监控状态',
+        storeDays: '保存天数',
+        cleanMonitor: '清空监控记录',
         setting: '设置',
         avgLoad: '平均负载',
         loadDetail: '负载详情',
@@ -1086,11 +1090,6 @@ const message = {
         rootCrtDownload: '根证书下载',
         primaryKey: '密钥',
         certificate: '证书',
-
-        monitor: '监控',
-        enableMonitor: '监控状态',
-        storeDays: '保存天数',
-        cleanMonitor: '清空监控记录',
 
         message: '通知',
         messageType: '通知方式',
