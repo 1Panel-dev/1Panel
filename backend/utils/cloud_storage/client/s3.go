@@ -13,14 +13,16 @@ import (
 )
 
 type s3Client struct {
-	Vars map[string]interface{}
-	Sess session.Session
+	scType string
+	Vars   map[string]interface{}
+	Sess   session.Session
 }
 
 func NewS3Client(vars map[string]interface{}) (*s3Client, error) {
 	var accessKey string
 	var secretKey string
 	var endpoint string
+	var scType string
 	var region string
 	if _, ok := vars["accessKey"]; ok {
 		accessKey = vars["accessKey"].(string)
@@ -31,6 +33,11 @@ func NewS3Client(vars map[string]interface{}) (*s3Client, error) {
 		secretKey = vars["secretKey"].(string)
 	} else {
 		return nil, constant.ErrInvalidParams
+	}
+	if _, ok := vars["scType"]; ok {
+		scType = vars["scType"].(string)
+	} else {
+		scType = "Standard"
 	}
 	if _, ok := vars["endpoint"]; ok {
 		endpoint = vars["endpoint"].(string)
@@ -53,8 +60,9 @@ func NewS3Client(vars map[string]interface{}) (*s3Client, error) {
 		return nil, err
 	}
 	return &s3Client{
-		Vars: vars,
-		Sess: *sess,
+		scType: scType,
+		Vars:   vars,
+		Sess:   *sess,
 	}, nil
 }
 
@@ -126,9 +134,10 @@ func (s3C s3Client) Upload(src, target string) (bool, error) {
 
 	uploader := s3manager.NewUploader(&s3C.Sess)
 	_, err = uploader.Upload(&s3manager.UploadInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(target),
-		Body:   file,
+		Bucket:       aws.String(bucket),
+		Key:          aws.String(target),
+		Body:         file,
+		StorageClass: &s3C.scType,
 	})
 	if err != nil {
 		return false, err

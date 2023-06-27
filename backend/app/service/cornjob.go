@@ -133,7 +133,7 @@ func (u *CronjobService) Download(down dto.CronjobDownload) (string, error) {
 	}
 	if backup.Type == "LOCAL" || record.FromLocal {
 		if _, err := os.Stat(record.File); err != nil && os.IsNotExist(err) {
-			return "", constant.ErrRecordNotFound
+			return "", err
 		}
 		return record.File, nil
 	}
@@ -145,7 +145,7 @@ func (u *CronjobService) Download(down dto.CronjobDownload) (string, error) {
 	_ = os.MkdirAll(path.Dir(tempPath), os.ModePerm)
 	isOK, err := client.Download(record.File, tempPath)
 	if !isOK || err != nil {
-		return "", constant.ErrRecordNotFound
+		return "", err
 	}
 	return tempPath, nil
 }

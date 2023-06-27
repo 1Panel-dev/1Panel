@@ -66,6 +66,20 @@
                             <el-form-item label="Bucket">
                                 {{ s3Data.bucket }}
                             </el-form-item>
+                            <el-form-item :label="$t('setting.scType')">
+                                <span v-if="!s3Data.varsJson['scType'] || s3Data.varsJson['scType'] === 'STANDARD'">
+                                    {{ $t('setting.typeStandard') }}
+                                </span>
+                                <span v-if="s3Data.varsJson['scType'] === 'STANDARD_IA'">
+                                    {{ $t('setting.typeStandard_IA') }}
+                                </span>
+                                <span v-if="s3Data.varsJson['scType'] === 'GLACIER'">
+                                    {{ $t('setting.typeArchive') }}
+                                </span>
+                                <span v-if="s3Data.varsJson['scType'] === 'DEEP_ARCHIVE'">
+                                    {{ $t('setting.typeDeep_Archive') }}
+                                </span>
+                            </el-form-item>
                             <el-form-item :label="$t('setting.backupDir')">
                                 {{ s3Data.backupPath }}
                             </el-form-item>
@@ -73,7 +87,7 @@
                                 {{ dateFormat(0, 0, s3Data.createdAt) }}
                             </el-form-item>
                         </div>
-                        <el-alert v-else center class="alert" style="height: 167px" :closable="false">
+                        <el-alert v-else center class="alert" style="height: 257px" :closable="false">
                             <el-button size="large" round plain type="primary" @click="onOpenDialog('create', 'S3')">
                                 {{ $t('setting.createBackupAccount', [$t('setting.S3')]) }}
                             </el-button>
@@ -105,6 +119,20 @@
                             <el-form-item label="Bucket">
                                 {{ ossData.bucket }}
                             </el-form-item>
+                            <el-form-item :label="$t('setting.scType')">
+                                <span v-if="!ossData.varsJson['scType'] || ossData.varsJson['scType'] === 'Standard'">
+                                    {{ $t('setting.typeStandard') }}
+                                </span>
+                                <span v-if="ossData.varsJson['scType'] === 'IA'">
+                                    {{ $t('setting.typeStandard_IA') }}
+                                </span>
+                                <span v-if="ossData.varsJson['scType'] === 'Archive'">
+                                    {{ $t('setting.typeArchive') }}
+                                </span>
+                                <span v-if="ossData.varsJson['scType'] === 'ColdArchive'">
+                                    {{ $t('setting.typeDeep_Archive') }}
+                                </span>
+                            </el-form-item>
                             <el-form-item :label="$t('setting.backupDir')">
                                 {{ ossData.backupPath }}
                             </el-form-item>
@@ -112,7 +140,7 @@
                                 {{ dateFormat(0, 0, ossData.createdAt) }}
                             </el-form-item>
                         </div>
-                        <el-alert v-else center class="alert" style="height: 167px" :closable="false">
+                        <el-alert v-else center class="alert" style="height: 257px" :closable="false">
                             <el-button size="large" round plain type="primary" @click="onOpenDialog('create', 'OSS')">
                                 {{ $t('setting.createBackupAccount', [$t('setting.OSS')]) }}
                             </el-button>
@@ -145,6 +173,20 @@
                             <el-form-item label="Bucket">
                                 {{ cosData.bucket }}
                             </el-form-item>
+                            <el-form-item :label="$t('setting.scType')">
+                                <span v-if="!cosData.varsJson['scType'] || cosData.varsJson['scType'] === 'Standard'">
+                                    {{ $t('setting.typeStandard') }}
+                                </span>
+                                <span v-if="cosData.varsJson['scType'] === 'Standard_IA'">
+                                    {{ $t('setting.typeStandard_IA') }}
+                                </span>
+                                <span v-if="cosData.varsJson['scType'] === 'Archive'">
+                                    {{ $t('setting.typeArchive') }}
+                                </span>
+                                <span v-if="cosData.varsJson['scType'] === 'Deep_Archive'">
+                                    {{ $t('setting.typeDeep_Archive') }}
+                                </span>
+                            </el-form-item>
                             <el-form-item :label="$t('setting.backupDir')">
                                 {{ cosData.backupPath }}
                             </el-form-item>
@@ -152,7 +194,7 @@
                                 {{ dateFormat(0, 0, cosData.createdAt) }}
                             </el-form-item>
                         </div>
-                        <el-alert v-else center class="alert" style="height: 167px" :closable="false">
+                        <el-alert v-else center class="alert" style="height: 257px" :closable="false">
                             <el-button size="large" round plain type="primary" @click="onOpenDialog('create', 'COS')">
                                 {{ $t('setting.createBackupAccount', [$t('setting.COS')]) }}
                             </el-button>
@@ -185,7 +227,7 @@
                                 {{ dateFormat(0, 0, oneDriveData.createdAt) }}
                             </el-form-item>
                         </div>
-                        <el-alert v-else center class="alert" style="height: 167px" :closable="false">
+                        <el-alert v-else center class="alert" style="height: 257px" :closable="false">
                             <el-button
                                 size="large"
                                 round
@@ -232,7 +274,7 @@
                                 {{ dateFormat(0, 0, kodoData.createdAt) }}
                             </el-form-item>
                         </div>
-                        <el-alert v-else center class="alert" style="height: 167px" :closable="false">
+                        <el-alert v-else center class="alert" style="height: 257px" :closable="false">
                             <el-button size="large" round plain type="primary" @click="onOpenDialog('create', 'KODO')">
                                 {{ $t('setting.createBackupAccount', [$t('setting.KODO')]) }}
                             </el-button>
@@ -270,7 +312,7 @@
                                 {{ dateFormat(0, 0, minioData.createdAt) }}
                             </el-form-item>
                         </div>
-                        <el-alert v-else center class="alert" style="height: 167px" :closable="false">
+                        <el-alert v-else center class="alert" style="height: 257px" :closable="false">
                             <el-button size="large" round plain type="primary" @click="onOpenDialog('create', 'MINIO')">
                                 {{ $t('setting.createBackupAccount', [$t('setting.MINIO')]) }}
                             </el-button>
@@ -314,7 +356,7 @@
                                 {{ dateFormat(0, 0, sftpData.createdAt) }}
                             </el-form-item>
                         </div>
-                        <el-alert v-else center class="alert" style="height: 167px" :closable="false">
+                        <el-alert v-else center class="alert" style="height: 257px" :closable="false">
                             <el-button size="large" round plain type="primary" @click="onOpenDialog('create', 'SFTP')">
                                 {{ $t('setting.createBackupAccount', [$t('setting.SFTP')]) }}
                             </el-button>
@@ -361,6 +403,7 @@ const ossData = ref<Backup.BackupInfo>({
     varsJson: {
         region: '',
         endpoint: '',
+        scType: 'Standard',
     },
     createdAt: new Date(),
 });
@@ -415,6 +458,7 @@ const s3Data = ref<Backup.BackupInfo>({
     vars: '',
     varsJson: {
         region: '',
+        scType: 'Standard',
         endpoint: '',
     },
     createdAt: new Date(),
@@ -429,6 +473,7 @@ const cosData = ref<Backup.BackupInfo>({
     vars: '',
     varsJson: {
         region: '',
+        scType: 'Standard',
     },
     createdAt: new Date(),
 });
