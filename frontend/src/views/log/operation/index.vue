@@ -215,7 +215,7 @@ const loadDetail = (log: string) => {
         return log.replace('[MFAStatus]', '[' + i18n.global.t('setting.mfa') + ']');
     }
     if (log.indexOf('[MonitorStatus]') !== -1) {
-        return log.replace('[MonitorStatus]', '[' + i18n.global.t('setting.enableMonitor') + ']');
+        return log.replace('[MonitorStatus]', '[' + i18n.global.t('monitor.enableMonitor') + ']');
     }
     if (log.indexOf('[MonitorStoreDays]') !== -1) {
         return log.replace('[MonitorStoreDays]', '[' + i18n.global.t('setting.monitor') + ']');

@@ -8,13 +8,13 @@
             size="30%"
         >
             <template #header>
-                <DrawerHeader :header="$t('setting.storeDays')" :back="handleClose" />
+                <DrawerHeader :header="$t('monitor.storeDays')" :back="handleClose" />
             </template>
             <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
                         <el-form-item
-                            :label="$t('setting.storeDays')"
+                            :label="$t('monitor.storeDays')"
                             :rules="[Rules.integerNumber, checkNumberRange(1, 30)]"
                             prop="monitorStoreDays"
                         >
