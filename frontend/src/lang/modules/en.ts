@@ -997,6 +997,19 @@ const message = {
         loadCode: 'Acquire',
         COS: 'Tencent COS',
         KODO: 'Qiniu Kodo',
+        scType: ' Storage type',
+        typeStandard: 'Standard',
+        typeStandard_IA: 'Standard_IA',
+        typeArchive: 'Archive',
+        typeDeep_Archive: 'Deep_Archive',
+        scStandard:
+            'Standard Storage is suitable for business scenarios with a large number of hot files that require real-time access, frequent data interaction, and so on.',
+        scStandard_IA:
+            'Low-frequency storage is suitable for business scenarios with relatively low access frequency, and stores data for at least 30 days.',
+        scArchive: 'Archival storage is suitable for business scenarios with extremely low access frequency.',
+        scDeep_Archive: 'Durable cold storage is suitable for business scenarios with extremely low access frequency.',
+        archiveHelper:
+            'Archival storage files cannot be downloaded directly and must first be restored through the corresponding cloud service provider`s website. Please use with caution!',
         domainHelper: 'The accelerated domain name must contain http:// or https://',
         backupAlert:
             "In theory, as long as the cloud provider is compatible with the S3 protocol, existing Amazon S3 cloud storage can be used for backup. For specific configurations, please refer to the <a target=“_blank” href='https://1panel.cn/docs/user_manual/settings/#3'>official documentation.</a> ",

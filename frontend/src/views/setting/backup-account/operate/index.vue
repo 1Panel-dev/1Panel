@@ -117,6 +117,66 @@
                             </el-button>
                             <span v-if="errBuckets" class="input-error">{{ $t('commons.rule.requiredSelect') }}</span>
                         </el-form-item>
+                        <el-form-item
+                            v-if="dialogData.rowData!.type === 'COS'"
+                            :label="$t('setting.scType')"
+                            prop="varsJson.scType"
+                            :rules="[Rules.requiredSelect]"
+                        >
+                            <el-select v-model="dialogData.rowData!.varsJson['scType']">
+                                <el-option value="Standard" :label="$t('setting.scStandard')" />
+                                <el-option value="Standard_IA" :label="$t('setting.scStandard_IA')" />
+                                <el-option value="Archive" :label="$t('setting.scArchive')" />
+                                <el-option value="Deep_Archive" :label="$t('setting.scDeep_Archive')" />
+                            </el-select>
+                            <el-alert
+                                v-if="dialogData.rowData!.varsJson['scType'] === 'Archive' || dialogData.rowData!.varsJson['scType'] === 'Deep_Archive'"
+                                style="margin-top: 10px"
+                                :closable="false"
+                                type="warning"
+                                :title="$t('setting.archiveHelper')"
+                            />
+                        </el-form-item>
+                        <el-form-item
+                            v-if="dialogData.rowData!.type === 'OSS'"
+                            :label="$t('setting.scType')"
+                            prop="varsJson.scType"
+                            :rules="[Rules.requiredSelect]"
+                        >
+                            <el-select v-model="dialogData.rowData!.varsJson['scType']">
+                                <el-option value="Standard" :label="$t('setting.scStandard')" />
+                                <el-option value="IA" :label="$t('setting.scStandard_IA')" />
+                                <el-option value="Archive" :label="$t('setting.scArchive')" />
+                                <el-option value="ColdArchive" :label="$t('setting.scDeep_Archive')" />
+                            </el-select>
+                            <el-alert
+                                v-if="dialogData.rowData!.varsJson['scType'] === 'Archive' || dialogData.rowData!.varsJson['scType'] === 'ColdArchive'"
+                                style="margin-top: 10px"
+                                :closable="false"
+                                type="warning"
+                                :title="$t('setting.archiveHelper')"
+                            />
+                        </el-form-item>
+                        <el-form-item
+                            v-if="dialogData.rowData!.type === 'S3'"
+                            :label="$t('setting.scType')"
+                            prop="varsJson.scType"
+                            :rules="[Rules.requiredSelect]"
+                        >
+                            <el-select v-model="dialogData.rowData!.varsJson['scType']">
+                                <el-option value="STANDARD" :label="$t('setting.scStandard')" />
+                                <el-option value="STANDARD_IA" :label="$t('setting.scStandard_IA')" />
+                                <el-option value="GLACIER" :label="$t('setting.scArchive')" />
+                                <el-option value="DEEP_ARCHIVE" :label="$t('setting.scDeep_Archive')" />
+                            </el-select>
+                            <el-alert
+                                v-if="dialogData.rowData!.varsJson['scType'] === 'Archive' || dialogData.rowData!.varsJson['scType'] === 'ColdArchive'"
+                                style="margin-top: 10px"
+                                :closable="false"
+                                type="warning"
+                                :title="$t('setting.archiveHelper')"
+                            />
+                        </el-form-item>
                         <div v-if="dialogData.rowData!.type === 'SFTP'">
                             <el-form-item :label="$t('setting.address')" prop="varsJson.address" :rules="Rules.host">
                                 <el-input v-model.trim="dialogData.rowData!.varsJson['address']" />
@@ -156,14 +216,14 @@
                             :label="$t('setting.backupDir')"
                             prop="backupPath"
                         >
-                            <el-input clearable v-model.trim="dialogData.rowData!.backupPath" />
+                            <el-input clearable v-model.trim="dialogData.rowData!.backupPath" placeholder="/1panel" />
                         </el-form-item>
                     </el-col>
                 </el-row>
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button :disabled="loading" @click="drawerVisiable = false">
+                    <el-button :disabled="loading" @click="handleClose">
                         {{ $t('commons.button.cancel') }}
                     </el-button>
                     <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
@@ -220,11 +280,22 @@ const acceptParams = (params: DialogProps): void => {
     if (dialogData.value.title === 'create' && dialogData.value.rowData!.type === 'SFTP') {
         dialogData.value.rowData.varsJson['port'] = 22;
     }
+    if (dialogData.value.rowData!.type === 'COS' || dialogData.value.rowData!.type === 'OSS') {
+        if (params.title === 'create' || (params.title === 'edit' && !dialogData.value.rowData.varsJson['scType'])) {
+            dialogData.value.rowData.varsJson['scType'] = 'Standard';
+        }
+    }
+    if (dialogData.value.rowData!.type === 'S3') {
+        if (params.title === 'create' || (params.title === 'edit' && !dialogData.value.rowData.varsJson['scType'])) {
+            dialogData.value.rowData.varsJson['scType'] = 'STANDARD';
+        }
+    }
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
     drawerVisiable.value = true;
 };
 
 const handleClose = () => {
+    emit('search');
     drawerVisiable.value = false;
 };
 

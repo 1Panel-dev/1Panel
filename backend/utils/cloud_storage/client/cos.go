@@ -14,6 +14,7 @@ type cosClient struct {
 	region    string
 	accessKey string
 	secretKey string
+	scType    string
 	Vars      map[string]interface{}
 	client    *cosSDK.Client
 }
@@ -21,6 +22,7 @@ type cosClient struct {
 func NewCosClient(vars map[string]interface{}) (*cosClient, error) {
 	var accessKey string
 	var secretKey string
+	var scType string
 	var region string
 	if _, ok := vars["region"]; ok {
 		region = vars["region"].(string)
@@ -31,6 +33,11 @@ func NewCosClient(vars map[string]interface{}) (*cosClient, error) {
 		accessKey = vars["accessKey"].(string)
 	} else {
 		return nil, constant.ErrInvalidParams
+	}
+	if _, ok := vars["scType"]; ok {
+		scType = vars["scType"].(string)
+	} else {
+		scType = "Standard"
 	}
 	if _, ok := vars["secretKey"]; ok {
 		secretKey = vars["secretKey"].(string)
@@ -47,7 +54,7 @@ func NewCosClient(vars map[string]interface{}) (*cosClient, error) {
 		},
 	})
 
-	return &cosClient{Vars: vars, client: client, accessKey: accessKey, secretKey: secretKey, region: region}, nil
+	return &cosClient{Vars: vars, client: client, accessKey: accessKey, secretKey: secretKey, scType: scType, region: region}, nil
 }
 
 func (cos cosClient) ListBuckets() ([]interface{}, error) {
@@ -90,7 +97,12 @@ func (cos cosClient) Upload(src, target string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	if _, err := client.Object.PutFromFile(context.Background(), target, src, &cosSDK.ObjectPutOptions{}); err != nil {
+	if _, err := client.Object.PutFromFile(context.Background(), target, src, &cosSDK.ObjectPutOptions{
+		ACLHeaderOptions: nil,
+		ObjectPutHeaderOptions: &cosSDK.ObjectPutHeaderOptions{
+			XCosStorageClass: cos.scType,
+		},
+	}); err != nil {
 		return false, err
 	}
 	return true, nil
