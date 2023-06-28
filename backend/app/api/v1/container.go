@@ -40,6 +40,23 @@ func (b *BaseApi) SearchContainer(c *gin.Context) {
 	})
 }
 
+// @Tags Container
+// @Summary List containers
+// @Description 获取容器名称
+// @Accept json
+// @Produce json
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /containers/list [post]
+func (b *BaseApi) ListContainer(c *gin.Context) {
+	list, err := containerService.List()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, list)
+}
+
 // @Tags Container Compose
 // @Summary Page composes
 // @Description 获取编排列表分页

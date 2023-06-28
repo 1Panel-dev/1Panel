@@ -21,7 +21,7 @@
                             <el-option value="ntp" :label="$t('cronjob.ntp')" />
                             <el-option value="cutWebsiteLog" :label="$t('cronjob.cutWebsiteLog')" />
                         </el-select>
-                        <el-tag v-else>{{ dialogData.rowData!.type }}</el-tag>
+                        <el-tag v-else>{{ $t('cronjob.' + dialogData.rowData!.type) }}</el-tag>
                     </el-form-item>
 
                     <el-form-item :label="$t('cronjob.taskName')" prop="name">
@@ -73,6 +73,21 @@
                         >
                             <template #append>{{ $t('cronjob.second') }}</template>
                         </el-input>
+                    </el-form-item>
+
+                    <el-form-item v-if="hasScript()">
+                        <el-checkbox v-model="dialogData.rowData!.inContainer">
+                            {{ $t('cronjob.containerCheckBox') }}
+                        </el-checkbox>
+                    </el-form-item>
+                    <el-form-item
+                        v-if="hasScript() && dialogData.rowData!.inContainer"
+                        :label="$t('cronjob.containerName')"
+                        prop="containerName"
+                    >
+                        <el-select class="selectClass" v-model="dialogData.rowData!.containerName">
+                            <el-option v-for="item in containerOptions" :key="item" :value="item" :label="item" />
+                        </el-select>
                     </el-form-item>
 
                     <el-form-item v-if="hasScript()" :label="$t('cronjob.shellContent')" prop="script">
@@ -205,6 +220,7 @@ import { GetWebsiteOptions } from '@/api/modules/website';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { useRouter } from 'vue-router';
+import { listContainer } from '@/api/modules/container';
 const router = useRouter();
 
 interface DialogProps {
@@ -226,10 +242,14 @@ const acceptParams = (params: DialogProps): void => {
     if (dialogData.value?.rowData?.exclusionRules) {
         dialogData.value.rowData.exclusionRules = dialogData.value.rowData.exclusionRules.replaceAll(',', '\n');
     }
+    if (dialogData.value?.rowData?.containerName) {
+        dialogData.value.rowData.inContainer = true;
+    }
     drawerVisiable.value = true;
     checkMysqlInstalled();
     loadBackups();
     loadWebsites();
+    loadContainers();
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -243,6 +263,7 @@ const handleClose = () => {
 
 const localDirID = ref();
 
+const containerOptions = ref();
 const websiteOptions = ref();
 const backupOptions = ref();
 
@@ -424,7 +445,12 @@ const loadBackups = async () => {
 
 const loadWebsites = async () => {
     const res = await GetWebsiteOptions();
-    websiteOptions.value = res.data;
+    websiteOptions.value = res.data || [];
+};
+
+const loadContainers = async () => {
+    const res = await listContainer();
+    containerOptions.value = res.data || [];
 };
 
 const checkMysqlInstalled = async () => {
@@ -487,6 +513,9 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
+        if (!dialogData.value.rowData.inContainer) {
+            dialogData.value.rowData.containerName = '';
+        }
         if (dialogData.value?.rowData?.exclusionRules) {
             dialogData.value.rowData.exclusionRules = dialogData.value.rowData.exclusionRules.replaceAll('\n', ',');
         }

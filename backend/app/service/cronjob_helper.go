@@ -32,7 +32,11 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 			if len(cronjob.Script) == 0 {
 				return
 			}
-			message, err = u.handleShell(cronjob.Type, cronjob.Name, cronjob.Script)
+			if len(cronjob.ContainerName) != 0 {
+				message, err = u.handleShell(cronjob.Type, cronjob.Name, fmt.Sprintf("docker exec %s %s", cronjob.ContainerName, cronjob.Script))
+			} else {
+				message, err = u.handleShell(cronjob.Type, cronjob.Name, cronjob.Script)
+			}
 			u.HandleRmExpired("LOCAL", "", "", cronjob, nil)
 		case "curl":
 			if len(cronjob.URL) == 0 {

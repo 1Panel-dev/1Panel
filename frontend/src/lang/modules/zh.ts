@@ -655,6 +655,8 @@ const message = {
         taskType: '任务类型',
         record: '报告',
         shell: 'Shell 脚本',
+        containerCheckBox: '在容器中执行（无需再输入进入容器命令）',
+        containerName: '容器名称',
         ntp: '时间同步',
         website: '备份网站',
         rulesHelper: '当存在多个压缩排除规则时，需要换行显示，例：\n*.log \n*.sql',

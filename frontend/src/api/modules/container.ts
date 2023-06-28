@@ -5,6 +5,9 @@ import { Container } from '../interface/container';
 export const searchContainer = (params: Container.ContainerSearch) => {
     return http.post<ResPage<Container.ContainerInfo>>(`/containers/search`, params, 400000);
 };
+export const listContainer = () => {
+    return http.post<Array<string>>(`/containers/list`, {});
+};
 export const loadResourceLimit = () => {
     return http.get<Container.ResourceLimit>(`/containers/limit`);
 };
