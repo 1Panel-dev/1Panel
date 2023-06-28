@@ -86,6 +86,7 @@ func Routers() *gin.Engine {
 		systemRouter.InitWebsiteAcmeAccountRouter(PrivateGroup)
 		systemRouter.InitNginxRouter(PrivateGroup)
 		systemRouter.InitRuntimeRouter(PrivateGroup)
+		systemRouter.InitProcessRouter(PrivateGroup)
 	}
 
 	return Router

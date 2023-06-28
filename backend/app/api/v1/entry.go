@@ -49,4 +49,5 @@ var (
 	upgradeService  = service.NewIUpgradeService()
 
 	runtimeService = service.NewRuntimeService()
+	processService = service.NewIProcessService()
 )
