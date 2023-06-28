@@ -70,6 +70,17 @@ const hostRouter = {
             },
         },
         {
+            path: '/hosts/process/process',
+            name: 'Process',
+            component: () => import('@/views/host/process/process/index.vue'),
+            meta: {
+                title: 'menu.processManage',
+                activeMenu: '/hosts/process/process',
+                keepAlive: true,
+                requiresAuth: false,
+            },
+        },
+        {
             path: '/hosts/ssh/ssh',
             name: 'SSH',
             component: () => import('@/views/host/ssh/ssh/index.vue'),

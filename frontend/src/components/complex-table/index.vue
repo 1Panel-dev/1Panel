@@ -75,11 +75,16 @@ function handleSelectionChange(row: any) {
     emit('update:selects', row);
 }
 
+function sort(prop: string, order: string) {
+    tableRef.value.refElTable.sort(prop, order);
+}
+
 function clearSelects() {
     tableRef.value.refElTable.clearSelection();
 }
 defineExpose({
     clearSelects,
+    sort,
 });
 </script>
 

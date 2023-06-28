@@ -734,19 +734,12 @@ var wsUpgrade = websocket.Upgrader{
 	},
 }
 
-var WsManager = websocket2.Manager{
-	Group:       make(map[string]*websocket2.Client),
-	Register:    make(chan *websocket2.Client, 128),
-	UnRegister:  make(chan *websocket2.Client, 128),
-	ClientCount: 0,
-}
-
 func (b *BaseApi) Ws(c *gin.Context) {
 	ws, err := wsUpgrade.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		return
 	}
-	wsClient := websocket2.NewWsClient("wsClient", ws)
+	wsClient := websocket2.NewWsClient("fileClient", ws)
 	go wsClient.Read()
 	go wsClient.Write()
 }
