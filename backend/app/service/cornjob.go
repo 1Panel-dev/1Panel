@@ -238,6 +238,7 @@ func (u *CronjobService) Update(id uint, req dto.CronjobUpdate) error {
 	upMap["name"] = req.Name
 	upMap["spec"] = cronjob.Spec
 	upMap["script"] = req.Script
+	upMap["container_name"] = req.ContainerName
 	upMap["spec_type"] = req.SpecType
 	upMap["week"] = req.Week
 	upMap["day"] = req.Day

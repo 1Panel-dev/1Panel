@@ -13,6 +13,8 @@ export namespace Cronjob {
         second: number;
 
         script: string;
+        inContainer: boolean;
+        containerName: string;
         website: string;
         exclusionRules: string;
         dbName: string;

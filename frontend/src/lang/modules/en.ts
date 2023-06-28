@@ -661,6 +661,8 @@ const message = {
         taskType: 'Task type',
         record: 'Records',
         shell: 'Shell script',
+        containerCheckBox: 'In container (no need to enter the container command)',
+        containerName: 'Container name',
         ntp: 'Time synchronization',
         website: 'Backup website',
         rulesHelper:

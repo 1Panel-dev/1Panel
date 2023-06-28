@@ -35,6 +35,7 @@ type ContainerService struct{}
 
 type IContainerService interface {
 	Page(req dto.PageContainer) (int64, interface{}, error)
+	List() ([]string, error)
 	PageNetwork(req dto.SearchWithPage) (int64, interface{}, error)
 	PageVolume(req dto.SearchWithPage) (int64, interface{}, error)
 	ListVolume() ([]dto.Options, error)
@@ -148,6 +149,27 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 	wg.Wait()
 
 	return int64(total), backDatas, nil
+}
+
+func (u *ContainerService) List() ([]string, error) {
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return nil, err
+	}
+	containers, err := client.ContainerList(context.Background(), types.ContainerListOptions{All: true})
+	if err != nil {
+		return nil, err
+	}
+	var datas []string
+	for _, container := range containers {
+		for _, name := range container.Names {
+			if len(name) != 0 {
+				datas = append(datas, strings.TrimLeft(name, "/"))
+			}
+		}
+	}
+
+	return datas, nil
 }
 
 func (u *ContainerService) Inspect(req dto.InspectReq) (string, error) {
