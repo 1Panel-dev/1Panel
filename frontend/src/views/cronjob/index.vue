@@ -45,16 +45,17 @@
                 <ComplexTable
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
+                    @sort-change="search"
                     @search="search"
                     :data="data"
                 >
                     <el-table-column type="selection" fix />
-                    <el-table-column :label="$t('cronjob.taskName')" :min-width="120" prop="name">
+                    <el-table-column :label="$t('cronjob.taskName')" :min-width="120" prop="name" sortable>
                         <template #default="{ row }">
                             <Tooltip @click="loadDetail(row)" :text="row.name" />
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.status')" :min-width="80" prop="status">
+                    <el-table-column :label="$t('commons.table.status')" :min-width="80" prop="status" sortable>
                         <template #default="{ row }">
                             <el-button
                                 v-if="row.status === 'Enable'"
@@ -155,7 +156,7 @@
         </el-dialog>
 
         <OperatrDialog @search="search" ref="dialogRef" />
-        <Records @search="search()" ref="dialogRecordRef" />
+        <Records @search="search" ref="dialogRecordRef" />
     </div>
 </template>
 
@@ -199,11 +200,13 @@ const weekOptions = [
     { label: i18n.global.t('cronjob.sunday'), value: 7 },
 ];
 
-const search = async () => {
+const search = async (column?: any) => {
     let params = {
         info: searchName.value,
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
+        orderBy: column?.order ? column.prop : 'created_at',
+        order: column?.order ? column.order : 'null',
     };
     loading.value = true;
     await getCronjobPage(params)

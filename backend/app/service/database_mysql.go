@@ -48,7 +48,7 @@ func NewIMysqlService() IMysqlService {
 }
 
 func (u *MysqlService) SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error) {
-	total, mysqls, err := mysqlRepo.Page(search.Page, search.PageSize, commonRepo.WithLikeName(search.Info))
+	total, mysqls, err := mysqlRepo.Page(search.Page, search.PageSize, commonRepo.WithLikeName(search.Info), commonRepo.WithOrderRuleBy(search.OrderBy, search.Order))
 	var dtoMysqls []dto.MysqlDBInfo
 	for _, mysql := range mysqls {
 		var item dto.MysqlDBInfo

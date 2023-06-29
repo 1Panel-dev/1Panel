@@ -36,7 +36,7 @@ func NewICronjobService() ICronjobService {
 }
 
 func (u *CronjobService) SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error) {
-	total, cronjobs, err := cronjobRepo.Page(search.Page, search.PageSize, commonRepo.WithLikeName(search.Info))
+	total, cronjobs, err := cronjobRepo.Page(search.Page, search.PageSize, commonRepo.WithLikeName(search.Info), commonRepo.WithOrderRuleBy(search.OrderBy, search.Order))
 	var dtoCronjobs []dto.CronjobInfo
 	for _, cronjob := range cronjobs {
 		var item dto.CronjobInfo

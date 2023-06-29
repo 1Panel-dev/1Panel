@@ -43,11 +43,12 @@
             <template #main v-if="mysqlIsExist && !isOnSetting">
                 <ComplexTable
                     :pagination-config="paginationConfig"
+                    @sort-change="search"
                     @search="search"
                     :data="data"
                     :class="{ mask: mysqlStatus != 'Running' }"
                 >
-                    <el-table-column :label="$t('commons.table.name')" prop="name" />
+                    <el-table-column :label="$t('commons.table.name')" prop="name" sortable />
                     <el-table-column :label="$t('commons.login.username')" prop="username" />
                     <el-table-column :label="$t('commons.login.password')" prop="password">
                         <template #default="{ row }">
@@ -239,11 +240,13 @@ const onSetting = async () => {
     settingRef.value!.acceptParams(params);
 };
 
-const search = async () => {
+const search = async (column?: any) => {
     let params = {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
         info: searchName.value,
+        orderBy: column?.order ? column.prop : 'created_at',
+        order: column?.order ? column.order : 'null',
     };
     const res = await searchMysqlDBs(params);
     data.value = res.data.items || [];

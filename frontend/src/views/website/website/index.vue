@@ -64,19 +64,28 @@
                 <ComplexTable
                     :pagination-config="paginationConfig"
                     :data="data"
+                    @sort-change="search"
                     @search="search()"
                     :class="{ mask: nginxStatus != 'Running' }"
                 >
-                    <el-table-column :label="$t('commons.table.name')" fix prop="primaryDomain" min-width="120px">
+                    <el-table-column
+                        :label="$t('commons.table.name')"
+                        fix
+                        prop="primaryDomain"
+                        min-width="120px"
+                        sortable
+                    >
                         <template #default="{ row }">
                             <Tooltip @click="openConfig(row.id)" :text="row.primaryDomain" />
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.type')" fix show-overflow-tooltip prop="type">
+                    <el-table-column :label="$t('commons.table.type')" fix show-overflow-tooltip prop="type" sortable>
                         <template #default="{ row }">
-                            {{ $t('website.' + row.type) }}
-                            <span v-if="row.type === 'deployment'">[{{ row.appName }}]</span>
-                            <span v-if="row.type === 'runtime'">[{{ row.runtimeName }}]</span>
+                            <div v-if="row.type">
+                                {{ $t('website.' + row.type) }}
+                                <span v-if="row.type === 'deployment'">[{{ row.appName }}]</span>
+                                <span v-if="row.type === 'runtime'">[{{ row.runtimeName }}]</span>
+                            </div>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('website.sitePath')" prop="sitePath">
@@ -233,14 +242,19 @@ let req = reactive({
     name: '',
     page: 1,
     pageSize: 10,
+    orderBy: 'created_at',
+    order: 'null',
     websiteGroupId: 0,
 });
 const mobile = computed(() => {
     return globalStore.isMobile();
 });
-const search = async () => {
+const search = async (column?: any) => {
     req.page = paginationConfig.currentPage;
     req.pageSize = paginationConfig.pageSize;
+    req.orderBy = column?.order ? column.prop : 'created_at';
+    req.orderBy = req.orderBy === 'primaryDomain' ? 'primary_domain' : req.orderBy;
+    req.order = column?.order ? column.order : 'null';
     loading.value = true;
     await SearchWebsites(req)
         .then((res) => {

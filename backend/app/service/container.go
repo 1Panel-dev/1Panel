@@ -67,9 +67,8 @@ func NewIContainerService() IContainerService {
 
 func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, error) {
 	var (
-		records   []types.Container
-		list      []types.Container
-		backDatas []dto.ContainerInfo
+		records []types.Container
+		list    []types.Container
 	)
 	client, err := docker.NewDockerClient()
 	if err != nil {
@@ -95,9 +94,30 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 			}
 		}
 	}
-	sort.Slice(list, func(i, j int) bool {
-		return list[i].Created > list[j].Created
-	})
+	switch req.OrderBy {
+	case "name":
+		sort.Slice(list, func(i, j int) bool {
+			if req.Order == constant.OrderAsc {
+				return list[i].Names[0][1:] < list[j].Names[0][1:]
+			}
+			return list[i].Names[0][1:] > list[j].Names[0][1:]
+		})
+	case "state":
+		sort.Slice(list, func(i, j int) bool {
+			if req.Order == constant.OrderAsc {
+				return list[i].State < list[j].State
+			}
+			return list[i].State > list[j].State
+		})
+	default:
+		sort.Slice(list, func(i, j int) bool {
+			if req.Order == constant.OrderAsc {
+				return list[i].Created < list[j].Created
+			}
+			return list[i].Created > list[j].Created
+		})
+	}
+
 	total, start, end := len(list), (req.Page-1)*req.PageSize, req.Page*req.PageSize
 	if start > total {
 		records = make([]types.Container, 0)
@@ -108,10 +128,11 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 		records = list[start:end]
 	}
 
+	backDatas := make([]dto.ContainerInfo, len(records))
 	var wg sync.WaitGroup
 	wg.Add(len(records))
-	for _, container := range records {
-		go func(item types.Container) {
+	for i := 0; i < len(records); i++ {
+		go func(item types.Container, i int) {
 			IsFromCompose := false
 			if _, ok := item.Labels[composeProjectLabel]; ok {
 				IsFromCompose = true
@@ -129,7 +150,7 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 				ports = append(ports, fmt.Sprintf("%v:%v/%s", port.PublicPort, port.PrivatePort, port.Type))
 			}
 			cpu, mem := loadCpuAndMem(client, item.ID)
-			backDatas = append(backDatas, dto.ContainerInfo{
+			backDatas[i] = dto.ContainerInfo{
 				ContainerID:   item.ID,
 				CreateTime:    time.Unix(item.Created, 0).Format("2006-01-02 15:04:05"),
 				Name:          item.Names[0][1:],
@@ -142,9 +163,9 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 				Ports:         ports,
 				IsFromApp:     IsFromApp,
 				IsFromCompose: IsFromCompose,
-			})
+			}
 			wg.Done()
-		}(container)
+		}(records[i], i)
 	}
 	wg.Wait()
 
