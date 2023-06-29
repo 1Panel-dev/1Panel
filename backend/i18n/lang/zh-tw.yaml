@@ -37,13 +37,13 @@ ErrFileNotFound: '{{.name}} 文件不存在'
 ErrFileParseApp: '{{.name}} 文件解析失敗 {{.err}}'
 ErrAppDirNull: '版本資料夾不存在'
 LocalAppErr: "應用 {{.name}} 同步失敗！{{.err}}"
-ErrContainerName: "容器名称已存在"
-ErrAppSystemRestart: "1Panel 重启导致任务终止"
-ErrCreateHttpClient: "创建HTTP请求失败 {{.err}}"
-ErrHttpReqTimeOut: "请求超时 {{.err}}"
-ErrHttpReqFailed: "请求失败 {{.err}}"
+ErrContainerName: "容器名稱已存在"
+ErrAppSystemRestart: "1Panel 重啟導致任務中斷"
+ErrCreateHttpClient: "創建HTTP請求失敗 {{.err}}"
+ErrHttpReqTimeOut: "請求超時 {{.err}}"
+ErrHttpReqFailed: "請求失敗 {{.err}}"
 ErrHttpReqNotFound: "文件不存在"
-ErrNoSuchHost: "网络连接失败"
+ErrNoSuchHost: "網路連接失敗"
 
 #file
 ErrFileCanNotRead: "此文件不支持預覽"
