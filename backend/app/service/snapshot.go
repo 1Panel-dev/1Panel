@@ -208,7 +208,9 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
 		global.LOG.Infof("start to upload snapshot to %s, please wait", backup.Type)
 		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusUploading})
 		localPath := fmt.Sprintf("%s/system/1panel_%s_%s.tar.gz", localDir, versionItem.Value, timeNow)
-		if ok, err := backupAccount.Upload(localPath, fmt.Sprintf("system_snapshot/1panel_%s_%s.tar.gz", versionItem.Value, timeNow)); err != nil || !ok {
+		itemBackupPath := strings.TrimLeft(backup.BackupPath, "/")
+		itemBackupPath = strings.TrimRight(itemBackupPath, "/")
+		if ok, err := backupAccount.Upload(localPath, fmt.Sprintf("%s/system_snapshot/1panel_%s_%s.tar.gz", itemBackupPath, versionItem.Value, timeNow)); err != nil || !ok {
 			_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
 			global.LOG.Errorf("upload snapshot to %s failed, err: %v", backup.Type, err)
 			return
@@ -259,7 +261,9 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 			operation = "re-recover"
 		}
 		if !isReTry || snap.InterruptStep == "Download" || (isReTry && req.ReDownload) {
-			ok, err := client.Download(fmt.Sprintf("system_snapshot/%s.tar.gz", snap.Name), fmt.Sprintf("%s/%s.tar.gz", baseDir, snap.Name))
+			itemBackupPath := strings.TrimLeft(backup.BackupPath, "/")
+			itemBackupPath = strings.TrimRight(itemBackupPath, "/")
+			ok, err := client.Download(fmt.Sprintf("%s/system_snapshot/%s.tar.gz", itemBackupPath, snap.Name), fmt.Sprintf("%s/%s.tar.gz", baseDir, snap.Name))
 			if err != nil || !ok {
 				if req.ReDownload {
 					updateRecoverStatus(snap.ID, snap.InterruptStep, constant.StatusFailed, fmt.Sprintf("download file %s from %s failed, err: %v", snap.Name, backup.Type, err))
@@ -664,7 +668,7 @@ func (u *SnapshotService) handleBackupDatas(fileOp files.FileOp, operation strin
 func (u *SnapshotService) handlePanelDatas(snapID uint, fileOp files.FileOp, operation string, source, target, backupDir, dockerDir string) error {
 	switch operation {
 	case "snapshot":
-		exclusionRules := "./tmp;./cache;"
+		exclusionRules := "./tmp;./cache;./db/1Panel.db-*;"
 		if strings.Contains(backupDir, source) {
 			exclusionRules += ("." + strings.ReplaceAll(backupDir, source, "") + ";")
 		}
