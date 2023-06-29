@@ -164,6 +164,7 @@ import { GetAppPort } from '@/api/modules/app';
 import router from '@/routers';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import useClipboard from 'vue-clipboard3';
+import { getSettingInfo } from '@/api/modules/setting';
 const { toClipboard } = useClipboard();
 
 const loading = ref(false);
@@ -261,9 +262,12 @@ const goDashboard = async () => {
         phpVisiable.value = true;
         return;
     }
-    let href = window.location.href;
-    let ipLocal = href.split('//')[1].split(':')[0];
-    window.open(`http://${ipLocal}:${phpadminPort.value}`, '_blank');
+    const res = await getSettingInfo();
+    if (!res.data.systemIP) {
+        MsgError(i18n.global.t('setting.systemIPWarning'));
+        return;
+    }
+    window.open(`http://${res.data.systemIP}:${phpadminPort.value}`, '_blank');
 };
 const getAppDetail = (key: string) => {
     router.push({ name: 'AppDetail', params: { appKey: key } });

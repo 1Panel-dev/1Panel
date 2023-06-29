@@ -257,7 +257,6 @@ const acceptParams = (params: DialogProps): void => {
             item.host = item.hostPort;
         }
         dialogData.value.rowData.volumes = dialogData.value.rowData.volumes || [];
-        console.log(dialogData.value.rowData.cpuShares);
     }
     loadLimit();
     loadImageOptions();
