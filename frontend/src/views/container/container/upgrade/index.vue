@@ -1,7 +1,7 @@
 <template>
     <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
         <template #header>
-            <DrawerHeader :header="$t('container.upgrade')" :resource="form.name" :back="handleClose" />
+            <DrawerHeader :header="$t('commons.button.upgrade')" :resource="form.name" :back="handleClose" />
         </template>
 
         <el-row v-loading="loading">
@@ -86,7 +86,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             MsgWarning(i18n.global.t('container.upgradeWarning'));
             return;
         }
-        ElMessageBox.confirm(i18n.global.t('container.upgradeWarning2'), i18n.global.t('container.upgrade'), {
+        ElMessageBox.confirm(i18n.global.t('container.upgradeWarning2'), i18n.global.t('commons.button.upgrade'), {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),
         }).then(async () => {

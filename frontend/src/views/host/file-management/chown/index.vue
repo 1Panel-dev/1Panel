@@ -14,7 +14,7 @@
                     :rules="rules"
                     v-loading="loading"
                 >
-                    <el-form-item :label="$t('file.user')" prop="user">
+                    <el-form-item :label="$t('commons.table.user')" prop="user">
                         <el-input v-model.trim="addForm.user" />
                     </el-form-item>
                     <el-form-item :label="$t('file.group')" prop="group">

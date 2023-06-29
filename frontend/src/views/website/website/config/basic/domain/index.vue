@@ -9,7 +9,7 @@
             </template>
         </el-table-column>
         <el-table-column :label="$t('website.domain')" prop="domain"></el-table-column>
-        <el-table-column :label="$t('website.port')" prop="port"></el-table-column>
+        <el-table-column :label="$t('commons.table.port')" prop="port"></el-table-column>
         <fu-table-operations
             :ellipsis="1"
             :buttons="buttons"
@@ -51,7 +51,7 @@ const website = ref<Website.WebsiteDTO>();
 
 const buttons = [
     {
-        label: i18n.global.t('app.delete'),
+        label: i18n.global.t('commons.button.delete'),
         click: function (row: Website.Domain) {
             deleteDoamin(row.id);
         },

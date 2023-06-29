@@ -21,7 +21,7 @@
                                 <span v-if="isLocal">{{ hostInfo.addr }}</span>
                             </div>
                         </el-form-item>
-                        <el-form-item :label="$t('terminal.user')" prop="user">
+                        <el-form-item :label="$t('commons.login.username')" prop="user">
                             <el-input clearable v-model="hostInfo.user" />
                         </el-form-item>
                         <el-form-item :label="$t('terminal.authMode')" prop="authMode">
@@ -31,7 +31,7 @@
                             </el-radio-group>
                         </el-form-item>
                         <el-form-item
-                            :label="$t('terminal.password')"
+                            :label="$t('commons.login.password')"
                             v-if="hostInfo.authMode === 'password'"
                             prop="password"
                         >
@@ -50,7 +50,7 @@
                         <el-checkbox clearable v-model.number="hostInfo.rememberPassword">
                             {{ $t('terminal.rememberPassword') }}
                         </el-checkbox>
-                        <el-form-item style="margin-top: 10px" :label="$t('terminal.port')" prop="port">
+                        <el-form-item style="margin-top: 10px" :label="$t('commons.table.port')" prop="port">
                             <el-input clearable v-model.number="hostInfo.port" />
                         </el-form-item>
                         <el-form-item :label="$t('commons.table.title')" prop="name">

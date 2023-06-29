@@ -13,7 +13,7 @@
                     :rules="rules"
                     label-width="80px"
                 >
-                    <el-form-item :label="$t('container.volumeName')" prop="name">
+                    <el-form-item :label="$t('commons.table.name')" prop="name">
                         <el-input clearable v-model.trim="form.name" />
                     </el-form-item>
                     <el-form-item :label="$t('container.driver')" prop="driver">

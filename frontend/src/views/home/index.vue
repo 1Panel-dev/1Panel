@@ -119,7 +119,7 @@
                                 <el-tag>{{ $t('monitor.write') }}: {{ currentChartInfo.ioWriteBytes }} MB</el-tag>
                                 <el-tag>
                                     {{ $t('home.rwPerSecond') }}: {{ currentChartInfo.ioCount }}
-                                    {{ $t('home.time') }}
+                                    {{ $t('commons.units.time') }}
                                 </el-tag>
                                 <el-tag>{{ $t('home.ioDelay') }}: {{ currentChartInfo.ioTime }} ms</el-tag>
                             </div>
@@ -435,34 +435,34 @@ function loadUpTime(uptime: number) {
     if (days !== 0) {
         return (
             days +
-            i18n.global.t('home.Day') +
+            i18n.global.t('commons.units.day') +
             ' ' +
             hours +
-            i18n.global.t('home.Hour') +
+            i18n.global.t('commons.units.hour') +
             ' ' +
             minutes +
-            i18n.global.t('home.Minute') +
+            i18n.global.t('commons.units.minute') +
             ' ' +
             seconds +
-            i18n.global.t('home.Second')
+            i18n.global.t('commons.units.second')
         );
     }
     if (hours !== 0) {
         return (
             hours +
-            i18n.global.t('home.Hour') +
+            i18n.global.t('commons.units.hour') +
             ' ' +
             minutes +
-            i18n.global.t('home.Minute') +
+            i18n.global.t('commons.units.minute') +
             ' ' +
             seconds +
-            i18n.global.t('home.Second')
+            i18n.global.t('commons.units.second')
         );
     }
     if (minutes !== 0) {
-        return minutes + i18n.global.t('home.Minute') + ' ' + seconds + i18n.global.t('home.Second');
+        return minutes + i18n.global.t('home.Minute') + ' ' + seconds + i18n.global.t('commons.units.second');
     }
-    return seconds + i18n.global.t('home.Second');
+    return seconds + i18n.global.t('commons.units.second');
 }
 
 const loadData = async () => {

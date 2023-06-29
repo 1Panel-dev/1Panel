@@ -34,7 +34,7 @@
                 <el-form-item v-if="configDir" :label="$t('website.userGroup')">
                     <el-space wrap>
                         <el-input v-model="updatePermission.user" class="user-num-input">
-                            <template #prepend>{{ $t('website.user') }}</template>
+                            <template #prepend>{{ $t('commons.table.user') }}</template>
                         </el-input>
                         <el-input v-model="updatePermission.group" class="user-num-input">
                             <template #prepend>{{ $t('website.uGroup') }}</template>

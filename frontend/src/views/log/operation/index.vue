@@ -188,7 +188,7 @@ const loadDetail = (log: string) => {
         log = log.replace('[get]', '[' + i18n.global.t('commons.button.get') + ']');
     }
     if (log.indexOf('[UserName]') !== -1) {
-        return log.replace('[UserName]', '[' + i18n.global.t('setting.user') + ']');
+        return log.replace('[UserName]', '[' + i18n.global.t('commons.login.username') + ']');
     }
     if (log.indexOf('[PanelName]') !== -1) {
         return log.replace('[PanelName]', '[' + i18n.global.t('setting.title') + ']');

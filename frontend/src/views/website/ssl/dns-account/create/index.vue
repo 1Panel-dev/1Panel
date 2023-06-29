@@ -13,7 +13,7 @@
                     <el-form-item :label="$t('commons.table.name')" prop="name">
                         <el-input v-model.trim="account.name"></el-input>
                     </el-form-item>
-                    <el-form-item :label="$t('website.type')" prop="type">
+                    <el-form-item :label="$t('commons.table.type')" prop="type">
                         <el-select v-model="account.type" :disabled="accountData.mode === 'edit'">
                             <el-option
                                 v-for="(type, index) in types"

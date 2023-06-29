@@ -6,7 +6,7 @@
         <el-form @submit.prevent v-loading="loading" ref="formRef" :model="form" label-position="top">
             <el-row type="flex" justify="center">
                 <el-col :span="22">
-                    <el-form-item :label="$t('database.requirepass')" :rules="Rules.requiredInput" prop="password">
+                    <el-form-item :label="$t('commons.login.password')" :rules="Rules.requiredInput" prop="password">
                         <el-input type="password" show-password clearable v-model="form.password">
                             <template #append>
                                 <el-button @click="onCopy(form.password)" icon="DocumentCopy"></el-button>

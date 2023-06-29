@@ -93,15 +93,19 @@
                                 &#32;{{ loadZero(row.hour) }} : {{ loadZero(row.minute) }}
                             </span>
                             <span v-if="row.specType === 'perNDay'">
-                                {{ row.day }} {{ $t('cronjob.day1') }}, {{ loadZero(row.hour) }} :
+                                {{ row.day }} {{ $t('commons.units.day') }}, {{ loadZero(row.hour) }} :
                                 {{ loadZero(row.minute) }}
                             </span>
                             <span v-if="row.specType === 'perNHour'">
-                                {{ row.hour }}{{ $t('cronjob.hour') }}, {{ loadZero(row.minute) }}
+                                {{ row.hour }}{{ $t('commons.units.hour') }}, {{ loadZero(row.minute) }}
                             </span>
                             <span v-if="row.specType === 'perHour'">{{ loadZero(row.minute) }}</span>
-                            <span v-if="row.specType === 'perNMinute'">{{ row.minute }}{{ $t('cronjob.minute') }}</span>
-                            <span v-if="row.specType === 'perNSecond'">{{ row.second }}{{ $t('cronjob.second') }}</span>
+                            <span v-if="row.specType === 'perNMinute'">
+                                {{ row.minute }}{{ $t('commons.units.minute') }}
+                            </span>
+                            <span v-if="row.specType === 'perNSecond'">
+                                {{ row.second }}{{ $t('commons.units.second') }}
+                            </span>
                             {{ $t('cronjob.handle') }}
                         </template>
                     </el-table-column>

@@ -34,7 +34,7 @@
     </div>
     <el-drawer :close-on-click-modal="false" :key="refresh" v-model="drawerVisiable" size="50%" append-to-body>
         <template #header>
-            <DrawerHeader :header="$t('setting.upgrade')" :back="handleClose" />
+            <DrawerHeader :header="$t('commons.button.upgrade')" :back="handleClose" />
         </template>
         <div class="panel-MdEditor">
             <el-alert :closable="false">
@@ -133,7 +133,7 @@ const changeOption = async () => {
 };
 
 const onUpgrade = async () => {
-    ElMessageBox.confirm(i18n.global.t('setting.upgradeHelper', i18n.global.t('setting.upgrade')), {
+    ElMessageBox.confirm(i18n.global.t('setting.upgradeHelper', i18n.global.t('commons.button.upgrade')), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',

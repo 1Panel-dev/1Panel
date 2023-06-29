@@ -47,8 +47,8 @@
                 >
                     <el-table-column type="selection" :selectable="selectable" fix />
                     <el-table-column :label="$t('terminal.ip')" prop="addr" fix />
-                    <el-table-column :label="$t('terminal.user')" show-overflow-tooltip prop="user" />
-                    <el-table-column :label="$t('terminal.port')" prop="port" />
+                    <el-table-column :label="$t('commons.login.username')" show-overflow-tooltip prop="user" />
+                    <el-table-column :label="$t('commons.table.port')" prop="port" />
                     <el-table-column :label="$t('commons.table.group')" show-overflow-tooltip prop="groupBelong">
                         <template #default="{ row }">
                             <span v-if="row.groupBelong === 'default'">{{ $t('website.default') }}</span>

@@ -139,7 +139,7 @@
                                     </el-col>
                                 </el-row>
                             </el-form-item>
-                            <el-form-item :label="$t('app.name')" prop="appinstall.name">
+                            <el-form-item :label="$t('commons.table.name')" prop="appinstall.name">
                                 <el-input v-model.trim="website.appinstall.name"></el-input>
                             </el-form-item>
                             <Params
@@ -181,7 +181,11 @@
                                     <el-option :label="$t('website.unix')" :value="'unix'"></el-option>
                                 </el-select>
                             </el-form-item>
-                            <el-form-item v-if="website.proxyType === 'tcp'" :label="$t('website.port')" prop="port">
+                            <el-form-item
+                                v-if="website.proxyType === 'tcp'"
+                                :label="$t('commons.table.port')"
+                                prop="port"
+                            >
                                 <el-input v-model.number="website.port"></el-input>
                             </el-form-item>
                         </div>

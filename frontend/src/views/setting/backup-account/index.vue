@@ -1,6 +1,6 @@
 <template>
     <div>
-        <LayoutContent :title="$t('setting.backup')">
+        <LayoutContent :title="$t('commons.button.backup')">
             <template #main>
                 <el-form label-position="left" label-width="130px" :v-key="reflash">
                     <el-row :gutter="20">
@@ -343,7 +343,7 @@
                             <el-form-item :label="$t('setting.address')">
                                 {{ sftpData.varsJson['address'] }}
                             </el-form-item>
-                            <el-form-item :label="$t('setting.port')">
+                            <el-form-item :label="$t('commons.table.port')">
                                 {{ sftpData.varsJson['port'] }}
                             </el-form-item>
                             <el-form-item :label="$t('setting.path')">

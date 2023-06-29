@@ -85,7 +85,7 @@
                             {{ row.memoryPercent.toFixed(2) }}%
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.port')" min-width="80" prop="ports" fix>
+                    <el-table-column :label="$t('commons.table.port')" min-width="80" prop="ports" fix>
                         <template #default="{ row }">
                             <div v-if="row.ports">
                                 <div v-for="(item, index) in row.ports" :key="index">
@@ -428,7 +428,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('container.upgrade'),
+        label: i18n.global.t('commons.button.upgrade'),
         click: (row: Container.ContainerInfo) => {
             dialogUpgradeRef.value!.acceptParams({ container: row.name, image: row.imageName, fromApp: row.isFromApp });
         },

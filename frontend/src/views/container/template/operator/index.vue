@@ -17,7 +17,7 @@
         >
             <el-row type="flex" justify="center">
                 <el-col :span="22">
-                    <el-form-item :label="$t('container.name')" prop="name">
+                    <el-form-item :label="$t('commons.table.name')" prop="name">
                         <el-input
                             :disabled="dialogData.title === 'edit'"
                             v-model.trim="dialogData.rowData!.name"

@@ -47,22 +47,22 @@
                             {{ loadZero(dialogData.rowData?.minute) }}
                         </span>
                         <span v-if="dialogData.rowData?.specType === 'perNDay'">
-                            {{ dialogData.rowData?.day }}{{ $t('cronjob.day1') }},&nbsp;
+                            {{ dialogData.rowData?.day }}{{ $t('commons.units.day') }},&nbsp;
                             {{ loadZero(dialogData.rowData?.hour) }} :
                             {{ loadZero(dialogData.rowData?.minute) }}
                         </span>
                         <span v-if="dialogData.rowData?.specType === 'perNHour'">
-                            {{ dialogData.rowData?.hour }}{{ $t('cronjob.hour') }},&nbsp;
+                            {{ dialogData.rowData?.hour }}{{ $t('commons.units.hour') }},&nbsp;
                             {{ loadZero(dialogData.rowData?.minute) }}
                         </span>
                         <span v-if="dialogData.rowData?.specType === 'perHour'">
                             &nbsp;{{ loadZero(dialogData.rowData?.minute) }}
                         </span>
                         <span v-if="dialogData.rowData?.specType === 'perNMinute'">
-                            &nbsp;{{ dialogData.rowData?.minute }}{{ $t('cronjob.minute') }}
+                            &nbsp;{{ dialogData.rowData?.minute }}{{ $t('commons.units.minute') }}
                         </span>
                         <span v-if="dialogData.rowData?.specType === 'perNSecond'">
-                            &nbsp;{{ dialogData.rowData?.second }}{{ $t('cronjob.second') }}
+                            &nbsp;{{ dialogData.rowData?.second }}{{ $t('commons.units.second') }}
                         </span>
                         &nbsp;{{ $t('cronjob.handle') }}
                     </el-tag>

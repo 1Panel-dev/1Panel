@@ -13,7 +13,7 @@
                     :rules="rules"
                     :validate-on-rule-change="false"
                 >
-                    <el-form-item :label="$t('runtime.name')" prop="name">
+                    <el-form-item :label="$t('commons.table.name')" prop="name">
                         <el-input :disabled="mode === 'edit'" v-model="runtime.name"></el-input>
                     </el-form-item>
                     <el-form-item :label="$t('runtime.resource')" prop="resource">

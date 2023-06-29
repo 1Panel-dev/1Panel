@@ -26,7 +26,7 @@
                     :rules="rules"
                     :validate-on-rule-change="false"
                 >
-                    <el-form-item :label="$t('app.name')" prop="name">
+                    <el-form-item :label="$t('commons.table.name')" prop="name">
                         <el-input v-model.trim="req.name"></el-input>
                     </el-form-item>
                     <Params

@@ -7,12 +7,12 @@
                 </el-form-item>
                 <el-form-item prop="cycle" :label="$t('website.cycle')">
                     <el-input v-model.number="form.cycle" maxlength="15">
-                        <template #append>{{ $t('website.seconds') }}</template>
+                        <template #append>{{ $t('commons.units.second') }}</template>
                     </el-input>
                 </el-form-item>
                 <el-form-item prop="frequency" :label="$t('website.frequency')">
                     <el-input v-model.number="form.frequency" maxlength="15">
-                        <template #append>{{ $t('website.count') }}</template>
+                        <template #append>{{ $t('commons.units.time') }}</template>
                     </el-input>
                 </el-form-item>
                 <el-alert

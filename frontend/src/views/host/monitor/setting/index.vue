@@ -2,7 +2,7 @@
     <div>
         <MonitorRouter />
 
-        <LayoutContent v-loading="loading" :title="$t('monitor.setting')" :divider="true">
+        <LayoutContent v-loading="loading" :title="$t('commons.button.set')" :divider="true">
             <template #main>
                 <el-form :model="form" @submit.prevent ref="panelFormRef" label-position="left" label-width="160px">
                     <el-row>

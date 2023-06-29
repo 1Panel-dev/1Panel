@@ -24,7 +24,7 @@
                             <el-option v-for="item in options" :key="item" :label="item" :value="item" />
                         </el-select>
                     </el-form-item>
-                    <el-form-item :label="$t('file.name')" prop="name">
+                    <el-form-item :label="$t('commons.table.name')" prop="name">
                         <el-input v-model="form.name">
                             <template #append>{{ extension }}</template>
                         </el-input>

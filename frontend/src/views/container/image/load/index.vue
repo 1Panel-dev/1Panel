@@ -22,7 +22,7 @@
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button :disabeld="loading" type="primary" @click="onSubmit(formRef)">
-                    {{ $t('container.import') }}
+                    {{ $t('commons.button.import') }}
                 </el-button>
             </span>
         </template>

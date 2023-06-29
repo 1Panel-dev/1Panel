@@ -44,7 +44,7 @@
                                                 suffix-icon="Search"
                                                 @keyup.enter="search()"
                                                 @change="search()"
-                                                :placeholder="$t('process.username')"
+                                                :placeholder="$t('commons.table.user')"
                                             ></el-input>
                                         </div>
                                     </el-col>
@@ -69,7 +69,7 @@
                     ></el-table-column>
                     <el-table-column :label="$t('process.ppid')" fix prop="PPID" sortable></el-table-column>
                     <el-table-column :label="$t('process.numThreads')" fix prop="numThreads"></el-table-column>
-                    <el-table-column :label="$t('process.username')" fix prop="username"></el-table-column>
+                    <el-table-column :label="$t('commons.table.user')" fix prop="username"></el-table-column>
                     <el-table-column
                         :label="'CPU'"
                         fix

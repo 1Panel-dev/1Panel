@@ -17,7 +17,7 @@
                             <el-radio-group v-model="form.sslType">
                                 <el-radio label="self">{{ $t('setting.selfSigned') }}</el-radio>
                                 <el-radio label="select">{{ $t('setting.select') }}</el-radio>
-                                <el-radio label="import">{{ $t('setting.import') }}</el-radio>
+                                <el-radio label="import">{{ $t('commons.button.import') }}</el-radio>
                             </el-radio-group>
                             <span class="input-help" v-if="form.sslType === 'self'">
                                 {{ $t('setting.selfSignedHelper') }}

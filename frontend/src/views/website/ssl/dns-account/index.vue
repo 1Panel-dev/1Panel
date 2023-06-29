@@ -55,7 +55,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('app.delete'),
+        label: i18n.global.t('commons.button.delete'),
         click: function (row: Website.DnsAccount) {
             deleteAccount(row.id);
         },
