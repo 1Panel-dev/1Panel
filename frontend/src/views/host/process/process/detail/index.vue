@@ -119,7 +119,9 @@ const acceptParams = async (params: InfoProps): Promise<void> => {
     activeName.value = 'basic';
     data.value = params.info;
     resourceName.value = data.value.name;
-    envStr.value = data.value.envs.join('\n');
+    if (data.value.envs) {
+        envStr.value = data.value.envs.join('\n');
+    }
     open.value = true;
 };
 
