@@ -28,7 +28,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('runtime.version')" prop="version"></el-table-column>
                     <el-table-column :label="$t('runtime.image')" prop="image" show-overflow-tooltip></el-table-column>
-                    <el-table-column :label="$t('runtime.status')" prop="status">
+                    <el-table-column :label="$t('commons.table.status')" prop="status">
                         <template #default="{ row }">
                             <el-popover
                                 v-if="row.status === 'error'"

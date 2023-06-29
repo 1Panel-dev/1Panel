@@ -6,7 +6,7 @@
                     <el-row>
                         <el-col :span="1"><br /></el-col>
                         <el-col :xs="24" :sm="20" :md="15" :lg="12" :xl="12">
-                            <el-form-item :label="$t('setting.user')" prop="userName">
+                            <el-form-item :label="$t('commons.login.username')" prop="userName">
                                 <el-input disabled v-model="form.userName">
                                     <template #append>
                                         <el-button @click="onChangeUserName()" icon="Setting">

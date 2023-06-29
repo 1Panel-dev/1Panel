@@ -50,13 +50,13 @@
                     <el-table-column type="selection" :selectable="selectable" fix />
                     <el-table-column min-width="80" :label="$t('logs.loginIP')" prop="address" />
                     <el-table-column min-width="60" :label="$t('ssh.belong')" prop="area" />
-                    <el-table-column min-width="60" :label="$t('firewall.port')" prop="port" />
+                    <el-table-column min-width="60" :label="$t('commons.table.port')" prop="port" />
                     <el-table-column min-width="60" :label="$t('ssh.loginMode')" prop="authMode">
                         <template #default="{ row }">
                             <span v-if="row.authMode">{{ $t('ssh.' + row.authMode) }}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column min-width="60" :label="$t('ssh.loginUser')" prop="user" />
+                    <el-table-column min-width="60" :label="$t('commons.table.user')" prop="user" />
                     <el-table-column min-width="60" :label="$t('logs.loginStatus')" prop="status">
                         <template #default="{ row }">
                             <div v-if="row.status === 'Success'">

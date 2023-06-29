@@ -26,7 +26,7 @@
                             <el-descriptions-item :label="$t('process.diskWrite')">
                                 {{ data.diskWrite }}
                             </el-descriptions-item>
-                            <el-descriptions-item :label="$t('process.username')">
+                            <el-descriptions-item :label="$t('commons.table.user')">
                                 {{ data.username }}
                             </el-descriptions-item>
                             <el-descriptions-item :label="$t('process.startTime')">

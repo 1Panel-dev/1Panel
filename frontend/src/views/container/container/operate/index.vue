@@ -13,7 +13,7 @@
         >
             <el-row type="flex" justify="center">
                 <el-col :span="22">
-                    <el-form-item :label="$t('container.name')" prop="name">
+                    <el-form-item :label="$t('commons.table.name')" prop="name">
                         <el-input clearable v-model.trim="dialogData.rowData!.name" />
                     </el-form-item>
                     <el-form-item :label="$t('container.image')" prop="image">
@@ -26,7 +26,7 @@
                             />
                         </el-select>
                     </el-form-item>
-                    <el-form-item :label="$t('container.port')">
+                    <el-form-item :label="$t('commons.table.port')">
                         <el-radio-group v-model="dialogData.rowData!.publishAllPorts" class="ml-4">
                             <el-radio :label="false">{{ $t('container.exposePort') }}</el-radio>
                             <el-radio :label="true">{{ $t('container.exposeAll') }}</el-radio>
@@ -43,7 +43,7 @@
                                         <label>{{ $t('container.container') }}</label>
                                     </th>
                                     <th scope="col" width="20%" align="left">
-                                        <label>{{ $t('container.protocol') }}</label>
+                                        <label>{{ $t('commons.table.protocol') }}</label>
                                     </th>
                                     <th align="left"></th>
                                 </tr>
@@ -101,11 +101,11 @@
                     >
                         <el-input style="width: 40%" v-model.number="dialogData.rowData!.nanoCPUs">
                             <template #append>
-                                <div style="width: 35px">{{ $t('home.coreUnit') }}</div>
+                                <div style="width: 35px">{{ $t('commons.units.core') }}</div>
                             </template>
                         </el-input>
                         <span class="input-help">
-                            {{ $t('container.limitHelper', [limits.cpu]) }}{{ $t('home.coreUnit') }}
+                            {{ $t('container.limitHelper', [limits.cpu]) }}{{ $t('commons.units.core') }}
                         </span>
                     </el-form-item>
                     <el-form-item

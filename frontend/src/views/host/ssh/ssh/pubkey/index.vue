@@ -21,7 +21,7 @@
                                 <el-option label="DSA" value="dsa" />
                             </el-select>
                         </el-form-item>
-                        <el-form-item :label="$t('terminal.password')" prop="password">
+                        <el-form-item :label="$t('commons.login.password')" prop="password">
                             <el-input v-model="form.password" type="password" show-password>
                                 <template #append>
                                     <el-button @click="onCopy(form.password)" icon="DocumentCopy"></el-button>

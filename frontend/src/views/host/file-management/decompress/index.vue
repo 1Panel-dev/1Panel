@@ -19,7 +19,7 @@
                     :rules="rules"
                     v-loading="loading"
                 >
-                    <el-form-item :label="$t('file.name')">
+                    <el-form-item :label="$t('commons.table.name')">
                         <el-input v-model="name" disabled></el-input>
                     </el-form-item>
                     <el-form-item :label="$t('file.deCompressDst')" prop="dst">

@@ -156,7 +156,7 @@
                                                 @click="openBackups(installed.app.key, installed.name)"
                                                 v-if="mode === 'installed'"
                                             >
-                                                {{ $t('app.backup') }}
+                                                {{ $t('commons.button.backup') }}
                                             </el-button>
                                             <el-button
                                                 class="h-button"
@@ -172,7 +172,7 @@
                                                 @click="openOperate(installed, 'upgrade')"
                                                 v-if="mode === 'upgrade'"
                                             >
-                                                {{ $t('app.upgrade') }}
+                                                {{ $t('commons.button.upgrade') }}
                                             </el-button>
                                         </div>
                                         <div class="d-description">
@@ -420,7 +420,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('app.delete'),
+        label: i18n.global.t('commons.button.delete'),
         click: (row: any) => {
             openOperate(row, 'delete');
         },

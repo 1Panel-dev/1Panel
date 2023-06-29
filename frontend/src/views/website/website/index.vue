@@ -118,7 +118,11 @@
                             <MsgInfo :info="row.remark" />
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('website.protocol')" prop="protocol" width="90px"></el-table-column>
+                    <el-table-column
+                        :label="$t('commons.table.protocol')"
+                        prop="protocol"
+                        width="90px"
+                    ></el-table-column>
                     <el-table-column :label="$t('website.expireDate')">
                         <template #default="{ row, $index }">
                             <div v-show="row.showdate">
@@ -383,7 +387,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('app.delete'),
+        label: i18n.global.t('commons.button.delete'),
         click: function (row: Website.Website) {
             openDelete(row);
         },

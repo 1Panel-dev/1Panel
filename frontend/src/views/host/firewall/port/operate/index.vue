@@ -7,7 +7,7 @@
             <el-form ref="formRef" label-position="top" :model="dialogData.rowData" :rules="rules">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
-                        <el-form-item :label="$t('firewall.protocol')" prop="protocol">
+                        <el-form-item :label="$t('commons.table.protocol')" prop="protocol">
                             <el-select style="width: 100%" v-model="dialogData.rowData!.protocol">
                                 <el-option value="tcp" label="tcp" />
                                 <el-option value="udp" label="udp" />
@@ -15,7 +15,7 @@
                             </el-select>
                         </el-form-item>
 
-                        <el-form-item :label="$t('firewall.port')" prop="port">
+                        <el-form-item :label="$t('commons.table.port')" prop="port">
                             <el-input
                                 :disabled="dialogData.title === 'edit'"
                                 clearable

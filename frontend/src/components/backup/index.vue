@@ -4,11 +4,11 @@
             <template #header>
                 <DrawerHeader
                     v-if="detailName"
-                    :header="$t('database.backup')"
+                    :header="$t('commons.button.backup')"
                     :resource="name + '(' + detailName + ')'"
                     :back="handleClose"
                 />
-                <DrawerHeader v-else :header="$t('database.backup')" :resource="name" :back="handleClose" />
+                <DrawerHeader v-else :header="$t('commons.button.backup')" :resource="name" :back="handleClose" />
             </template>
             <ComplexTable
                 v-loading="loading"
@@ -19,7 +19,7 @@
             >
                 <template #toolbar>
                     <el-button type="primary" @click="onBackup()">
-                        {{ $t('database.backup') }}
+                        {{ $t('commons.button.backup') }}
                     </el-button>
                     <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
                         {{ $t('commons.button.delete') }}

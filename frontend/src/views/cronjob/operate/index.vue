@@ -57,21 +57,21 @@
                             <template #append>{{ $t('cronjob.day') }}</template>
                         </el-input>
                         <el-input v-if="hasHour()" class="specClass" v-model.number="dialogData.rowData!.hour">
-                            <template #append>{{ $t('cronjob.hour') }}</template>
+                            <template #append>{{ $t('commons.units.hour') }}</template>
                         </el-input>
                         <el-input
                             v-if="dialogData.rowData!.specType !== 'perNSecond'"
                             class="specClass"
                             v-model.number="dialogData.rowData!.minute"
                         >
-                            <template #append>{{ $t('cronjob.minute') }}</template>
+                            <template #append>{{ $t('commons.units.minute') }}</template>
                         </el-input>
                         <el-input
                             v-if="dialogData.rowData!.specType === 'perNSecond'"
                             class="specClass"
                             v-model.number="dialogData.rowData!.second"
                         >
-                            <template #append>{{ $t('cronjob.second') }}</template>
+                            <template #append>{{ $t('commons.units.second') }}</template>
                         </el-input>
                     </el-form-item>
 

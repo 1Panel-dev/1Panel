@@ -476,9 +476,9 @@ function initLoadCharts(item: Monitor.MonitorData) {
         },
         legend: {
             data: [
-                '1 ' + i18n.global.t('monitor.min'),
-                '5 ' + i18n.global.t('monitor.min'),
-                '15 ' + i18n.global.t('monitor.min'),
+                '1 ' + i18n.global.t('commons.units.minute'),
+                '5 ' + i18n.global.t('commons.units.minute'),
+                '15 ' + i18n.global.t('commons.units.minute'),
                 i18n.global.t('monitor.resourceUsage'),
             ],
         },
@@ -498,7 +498,7 @@ function initLoadCharts(item: Monitor.MonitorData) {
         dataZoom: [{ startValue: zoomStart.value }],
         series: [
             {
-                name: '1 ' + i18n.global.t('monitor.min'),
+                name: '1 ' + i18n.global.t('commons.units.minute'),
                 type: 'line',
                 areaStyle: {
                     color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
@@ -516,7 +516,7 @@ function initLoadCharts(item: Monitor.MonitorData) {
                 data: load1Data,
             },
             {
-                name: '5 ' + i18n.global.t('monitor.min'),
+                name: '5 ' + i18n.global.t('commons.units.minute'),
                 type: 'line',
                 areaStyle: {
                     color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
@@ -534,7 +534,7 @@ function initLoadCharts(item: Monitor.MonitorData) {
                 data: load5Data,
             },
             {
-                name: '15 ' + i18n.global.t('monitor.min'),
+                name: '15 ' + i18n.global.t('commons.units.minute'),
                 type: 'line',
                 areaStyle: {
                     color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
@@ -620,7 +620,7 @@ function initIOCharts(item: Monitor.MonitorData) {
                             '：' +
                             item.data +
                             ' ' +
-                            i18n.global.t('monitor.count') +
+                            i18n.global.t('commons.units.time') +
                             '/s' +
                             '<br/>';
                     }

@@ -181,7 +181,7 @@
                             <el-form-item :label="$t('setting.address')" prop="varsJson.address" :rules="Rules.host">
                                 <el-input v-model.trim="dialogData.rowData!.varsJson['address']" />
                             </el-form-item>
-                            <el-form-item :label="$t('setting.port')" prop="varsJson.port" :rules="[Rules.port]">
+                            <el-form-item :label="$t('commons.table.port')" prop="varsJson.port" :rules="[Rules.port]">
                                 <el-input-number
                                     :min="0"
                                     :max="65535"
@@ -196,7 +196,7 @@
                                 <el-input v-model="dialogData.rowData!.accessKey" />
                             </el-form-item>
                             <el-form-item
-                                :label="$t('setting.password')"
+                                :label="$t('commons.login.password')"
                                 prop="credential"
                                 :rules="[Rules.requiredInput]"
                             >
