@@ -129,8 +129,23 @@ func (s *Server) RemoveDirective(key string, params []string) {
 		if dir.GetName() == key {
 			if len(params) > 0 {
 				oldParams := dir.GetParameters()
-				if oldParams[0] == params[0] {
-					continue
+				if key == "location" {
+					if len(params) == len(oldParams) {
+						exist := true
+						for i := range params {
+							if params[i] != oldParams[i] {
+								exist = false
+								break
+							}
+						}
+						if exist {
+							continue
+						}
+					}
+				} else {
+					if oldParams[0] == params[0] {
+						continue
+					}
 				}
 			} else {
 				continue
