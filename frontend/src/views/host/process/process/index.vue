@@ -55,7 +55,13 @@
                 </el-row>
             </template>
             <template #main>
-                <ComplexTable :data="data" @sort-change="changeSort" @filter-change="changeFilter" ref="tableRef">
+                <ComplexTable
+                    :data="data"
+                    @sort-change="changeSort"
+                    @filter-change="changeFilter"
+                    ref="tableRef"
+                    v-loading="data.length === 0"
+                >
                     <el-table-column :label="'PID'" fix prop="PID" max-width="60px" sortable>
                         <template #default="{ row }">
                             <el-link @click="openDetail(row)">{{ row.PID }}</el-link>

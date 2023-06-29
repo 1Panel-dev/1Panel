@@ -24,6 +24,9 @@
         <div class="complex-table__body">
             <fu-table v-bind="$attrs" ref="tableRef" @selection-change="handleSelectionChange">
                 <slot></slot>
+                <template #empty>
+                    <slot name="empty"></slot>
+                </template>
             </fu-table>
         </div>
 
