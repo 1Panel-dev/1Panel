@@ -82,6 +82,22 @@
                                     </template>
                                 </el-input>
                             </el-form-item>
+                            <el-form-item :label="$t('setting.systemIP')" prop="systemIP">
+                                <el-input disabled v-if="form.systemIP" v-model="form.systemIP">
+                                    <template #append>
+                                        <el-button @click="onChangeSystemIP" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                                <el-input disabled v-if="!form.systemIP" v-model="unset">
+                                    <template #append>
+                                        <el-button @click="onChangeSystemIP" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
                             <el-form-item :label="$t('setting.syncTime')">
                                 <el-input disabled v-model="form.localTime">
                                     <template #append>
@@ -100,6 +116,7 @@
         <Password ref="passwordRef" />
         <UserName ref="userNameRef" />
         <PanelName ref="panelNameRef" @search="search()" />
+        <SystemIP ref="systemIPRef" @search="search()" />
         <Timeout ref="timeoutRef" @search="search()" />
         <TimeZone ref="timezoneRef" @search="search()" />
         <Ntp ref="ntpRef" @search="search()" />
@@ -118,6 +135,7 @@ import Password from '@/views/setting/panel/password/index.vue';
 import UserName from '@/views/setting/panel/username/index.vue';
 import Timeout from '@/views/setting/panel/timeout/index.vue';
 import PanelName from '@/views/setting/panel/name/index.vue';
+import SystemIP from '@/views/setting/panel/systemip/index.vue';
 import TimeZone from '@/views/setting/panel/timezone/index.vue';
 import Ntp from '@/views/setting/panel/ntp/index.vue';
 
@@ -136,6 +154,7 @@ const form = reactive({
     timeZone: '',
     ntpSite: '',
     panelName: '',
+    systemIP: '',
     theme: '',
     language: '',
     complexityVerification: '',
@@ -146,9 +165,11 @@ const show = ref();
 const userNameRef = ref();
 const passwordRef = ref();
 const panelNameRef = ref();
+const systemIPRef = ref();
 const timeoutRef = ref();
 const ntpRef = ref();
 const timezoneRef = ref();
+const unset = ref(i18n.t('setting.unSetting'));
 
 const search = async () => {
     const res = await getSettingInfo();
@@ -159,6 +180,7 @@ const search = async () => {
     form.timeZone = res.data.timeZone;
     form.ntpSite = res.data.ntpSite;
     form.panelName = res.data.panelName;
+    form.systemIP = res.data.systemIP;
     form.theme = res.data.theme;
     form.language = res.data.language;
     form.complexityVerification = res.data.complexityVerification;
@@ -175,6 +197,9 @@ const onChangeTitle = () => {
 };
 const onChangeTimeout = () => {
     timeoutRef.value.acceptParams({ sessionTimeout: form.sessionTimeout });
+};
+const onChangeSystemIP = () => {
+    systemIPRef.value.acceptParams({ systemIP: form.systemIP });
 };
 const onChangeTimeZone = () => {
     timezoneRef.value.acceptParams({ timeZone: form.timeZone });

@@ -969,6 +969,8 @@ const message = {
         sessionTimeoutError: 'The minimum timeout is 300 seconds',
         sessionTimeoutHelper:
             'If you do not operate the panel for more than {0} seconds, the panel automatically logs out',
+        systemIP: 'System IP',
+        systemIPWarning: 'Please set the system IP in the panel settings first.',
         syncTime: 'Server time',
         timeZone: 'Time Zone',
         timeZoneChangeHelper: 'Changing the time zone requires restarting the service. Do you want to continue?',

@@ -949,6 +949,8 @@ const message = {
         sessionTimeout: '超时时间',
         sessionTimeoutError: '最小超时时间为 300 秒',
         sessionTimeoutHelper: '如果用户超过 {0} 秒未操作面板，面板将自动退出登录',
+        systemIP: '服务器 IP',
+        systemIPWarning: '请先在面板设置中设置服务器 IP',
         syncTime: '服务器时间',
         timeZone: '系统时区',
         timeZoneChangeHelper: '系统时区修改需要重启服务，是否继续？',

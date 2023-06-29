@@ -90,7 +90,16 @@
                             <div v-if="row.ports">
                                 <div v-for="(item, index) in row.ports" :key="index">
                                     <div v-if="row.expand || (!row.expand && index < 3)">
-                                        <el-tag class="tagMargin">{{ item }}</el-tag>
+                                        <el-button
+                                            @click="goDashboard(item)"
+                                            class="tagMargin"
+                                            icon="Position"
+                                            type="primary"
+                                            plain
+                                            size="small"
+                                        >
+                                            {{ item }}
+                                        </el-button>
                                     </div>
                                 </div>
                                 <div v-if="!row.expand && row.ports.length > 3">
@@ -154,8 +163,9 @@ import { Container } from '@/api/interface/container';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import router from '@/routers';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { computeSize } from '@/utils/util';
+import { getSettingInfo } from '@/api/modules/setting';
 
 const loading = ref();
 const data = ref();
@@ -184,6 +194,20 @@ const loadStatus = async () => {
             loading.value = false;
         });
 };
+
+const goDashboard = async (port: any) => {
+    if (!port || port.indexOf(':') === -1) {
+        return;
+    }
+    let portEx = port.split(':')[0];
+    const res = await getSettingInfo();
+    if (!res.data.systemIP) {
+        MsgError(i18n.global.t('setting.systemIPWarning'));
+        return;
+    }
+    window.open(`http://${res.data.systemIP}:${portEx}`, '_blank');
+};
+
 const goSetting = async () => {
     router.push({ name: 'ContainerSetting' });
 };

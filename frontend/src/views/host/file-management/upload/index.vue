@@ -82,7 +82,6 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
 };
 
 const hadleSuccess: UploadProps['onSuccess'] = (res, file) => {
-    console.log(file.name);
     file.status = 'success';
 };
 

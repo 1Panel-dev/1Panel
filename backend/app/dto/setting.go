@@ -5,6 +5,7 @@ import "time"
 type SettingInfo struct {
 	UserName      string `json:"userName"`
 	Email         string `json:"email"`
+	SystemIP      string `json:"systemIP"`
 	SystemVersion string `json:"systemVersion"`
 
 	SessionTimeout string `json:"sessionTimeout"`
