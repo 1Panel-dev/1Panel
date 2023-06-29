@@ -9,6 +9,8 @@ export namespace Container {
     export interface ContainerSearch extends ReqPage {
         name: string;
         filters: string;
+        orderBy: string;
+        order: string;
     }
     export interface ResourceLimit {
         cpu: number;

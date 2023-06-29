@@ -60,10 +60,11 @@
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
                     :data="data"
+                    @sort-change="search"
                     @search="search"
                 >
                     <el-table-column type="selection" fix />
-                    <el-table-column :label="$t('commons.table.name')" min-width="80" prop="name" fix>
+                    <el-table-column :label="$t('commons.table.name')" min-width="80" prop="name" sortable fix>
                         <template #default="{ row }">
                             <Tooltip @click="onInspect(row.containerID)" :text="row.name" />
                         </template>
@@ -74,7 +75,7 @@
                         min-width="80"
                         prop="imageName"
                     />
-                    <el-table-column :label="$t('commons.table.status')" min-width="60" prop="state" fix>
+                    <el-table-column :label="$t('commons.table.status')" min-width="60" prop="state" sortable fix>
                         <template #default="{ row }">
                             <Status :key="row.state" :status="row.state"></Status>
                         </template>
@@ -225,13 +226,15 @@ const mydetail = ref();
 const dialogContainerLogRef = ref();
 const dialogReNameRef = ref();
 
-const search = async () => {
+const search = async (column?: any) => {
     let filterItem = props.filters ? props.filters : '';
     let params = {
         name: searchName.value,
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
         filters: filterItem,
+        orderBy: column?.order ? column.prop : 'created_at',
+        order: column?.order ? column.order : 'null',
     };
     loading.value = true;
     await searchContainer(params)

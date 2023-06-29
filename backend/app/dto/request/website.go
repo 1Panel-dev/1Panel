@@ -7,6 +7,8 @@ import (
 type WebsiteSearch struct {
 	dto.PageInfo
 	Name           string `json:"name"`
+	OrderBy        string `json:"orderBy"`
+	Order          string `json:"order"`
 	WebsiteGroupID uint   `json:"websiteGroupId"`
 }
 

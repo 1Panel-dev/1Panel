@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -16,6 +17,7 @@ type ICommonRepo interface {
 	WithByName(name string) DBOption
 	WithByType(tp string) DBOption
 	WithOrderBy(orderStr string) DBOption
+	WithOrderRuleBy(orderBy, order string) DBOption
 	WithByGroupID(groupID uint) DBOption
 	WithLikeName(name string) DBOption
 	WithIdsIn(ids []uint) DBOption
@@ -90,6 +92,21 @@ func (c *CommonRepo) WithLikeName(name string) DBOption {
 func (c *CommonRepo) WithOrderBy(orderStr string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Order(orderStr)
+	}
+}
+
+func (c *CommonRepo) WithOrderRuleBy(orderBy, order string) DBOption {
+	switch order {
+	case constant.OrderDesc:
+		order = "desc"
+	case constant.OrderAsc:
+		order = "asc"
+	default:
+		orderBy = "created_at"
+		order = "desc"
+	}
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Order(fmt.Sprintf("%s %s", orderBy, order))
 	}
 }
 

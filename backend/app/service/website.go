@@ -8,6 +8,14 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"os"
+	"path"
+	"reflect"
+	"regexp"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
@@ -18,13 +26,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/ini.v1"
 	"gorm.io/gorm"
-	"os"
-	"path"
-	"reflect"
-	"regexp"
-	"strconv"
-	"strings"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
@@ -96,7 +97,7 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 		}
 		return 0, nil, err
 	}
-	opts = append(opts, commonRepo.WithOrderBy("created_at desc"))
+	opts = append(opts, commonRepo.WithOrderRuleBy(req.OrderBy, req.Order))
 	if req.Name != "" {
 		opts = append(opts, websiteRepo.WithDomainLike(req.Name))
 	}
