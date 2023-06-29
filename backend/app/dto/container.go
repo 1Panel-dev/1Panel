@@ -5,8 +5,8 @@ import "time"
 type PageContainer struct {
 	PageInfo
 	Name    string `json:"name"`
-	OrderBy string `json:"orderBy" validate:"oneof=name state created_at"`
-	Order   string `json:"order" validate:"oneof=ascending descending null"`
+	OrderBy string `json:"orderBy"`
+	Order   string `json:"order"`
 	Filters string `json:"filters"`
 }
 
