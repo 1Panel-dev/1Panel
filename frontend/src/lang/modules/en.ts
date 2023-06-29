@@ -1242,6 +1242,8 @@ const message = {
         allReadyInstalled: 'Installed',
         installHelper: 'Configuring image acceleration can solve the problem of image pull failure',
         upgradeHelper: 'The abnormal application needs to be synchronized to the normal state first',
+        installWarn:
+            ' Port external access is not enabled, and cannot be accessed through the external network IP:port. Do you want to continue?',
     },
     website: {
         website: 'Website',

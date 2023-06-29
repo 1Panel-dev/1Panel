@@ -149,7 +149,7 @@ const initData = () => ({
     appDetailId: 0,
     params: form.value,
     name: '',
-    advanced: false,
+    advanced: true,
     cpuQuota: 0,
     memoryLimit: 0,
     memoryUnit: 'MB',
@@ -198,15 +198,20 @@ const submit = async (formEl: FormInstance | undefined) => {
         if (req.memoryLimit < 0) {
             req.memoryLimit = 0;
         }
-        loading.value = true;
-        InstallApp(req)
-            .then(() => {
-                handleClose();
-                router.push({ path: '/apps/installed' });
-            })
-            .finally(() => {
-                loading.value = false;
-            });
+        ElMessageBox.confirm(i18n.global.t('app.installWarn'), i18n.global.t('app.checkTitle'), {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+        }).then(async () => {
+            loading.value = true;
+            InstallApp(req)
+                .then(() => {
+                    handleClose();
+                    router.push({ path: '/apps/installed' });
+                })
+                .finally(() => {
+                    loading.value = false;
+                });
+        });
     });
 };
 
