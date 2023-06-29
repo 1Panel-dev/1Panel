@@ -163,7 +163,7 @@ func (a AppService) GetAppDetail(appId uint, version, appType string) (response.
 		}
 		fileOp := files.NewFileOp()
 		versionPath := path.Join(constant.AppResourceDir, app.Resource, app.Key, detail.Version)
-		if !fileOp.Stat(versionPath) {
+		if !fileOp.Stat(versionPath) || detail.Update {
 			if err = downloadApp(app, detail, nil); err != nil {
 				return appDetailDTO, err
 			}
@@ -730,10 +730,8 @@ func (a AppService) SyncAppListFromRemote() error {
 			detail.Params = string(paramByte)
 			detail.DownloadUrl = v.DownloadUrl
 			detail.DownloadCallBackUrl = v.DownloadCallBackUrl
-			if v.LastModified > detail.LastModified {
-				detail.Update = true
-				detail.LastModified = v.LastModified
-			}
+			detail.Update = true
+			detail.LastModified = v.LastModified
 			detailsMap[version] = detail
 		}
 		var newDetails []model.AppDetail
