@@ -62,18 +62,20 @@
                     ref="tableRef"
                     v-loading="data.length === 0"
                 >
-                    <el-table-column :label="'PID'" fix prop="PID" max-width="60px" sortable>
-                        <template #default="{ row }">
-                            <el-link @click="openDetail(row)">{{ row.PID }}</el-link>
-                        </template>
-                    </el-table-column>
+                    <el-table-column :label="'PID'" fix prop="PID" max-width="60px" sortable></el-table-column>
                     <el-table-column
                         :label="$t('commons.table.name')"
                         fix
                         prop="name"
                         min-width="120px"
                     ></el-table-column>
-                    <el-table-column :label="$t('process.ppid')" fix prop="PPID" sortable></el-table-column>
+                    <el-table-column
+                        :label="$t('process.ppid')"
+                        min-width="120px"
+                        fix
+                        prop="PPID"
+                        sortable
+                    ></el-table-column>
                     <el-table-column :label="$t('process.numThreads')" fix prop="numThreads"></el-table-column>
                     <el-table-column :label="$t('commons.table.user')" fix prop="username"></el-table-column>
                     <el-table-column
@@ -116,7 +118,7 @@
                         :label="$t('process.startTime')"
                         fix
                         prop="startTime"
-                        min-width="120px"
+                        min-width="140px"
                     ></el-table-column>
                     <fu-table-operations :ellipsis="10" :buttons="buttons" :label="$t('commons.table.operate')" fix />
                 </ComplexTable>

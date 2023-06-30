@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
+	"github.com/shirou/gopsutil/v3/host"
 	"github.com/shirou/gopsutil/v3/net"
 	"github.com/shirou/gopsutil/v3/process"
 	"strings"
@@ -15,6 +16,7 @@ type WsInput struct {
 	Type string `json:"type"`
 	DownloadProgress
 	PsProcessConfig
+	SSHSessionConfig
 }
 
 type DownloadProgress struct {
@@ -25,6 +27,11 @@ type PsProcessConfig struct {
 	Pid      int32  `json:"pid"`
 	Name     string `json:"name"`
 	Username string `json:"username"`
+}
+
+type SSHSessionConfig struct {
+	LoginUser string `json:"loginUser"`
+	LoginIP   string `json:"loginIP"`
 }
 
 type PsProcessData struct {
@@ -64,6 +71,15 @@ type processConnect struct {
 	Status string   `json:"status"`
 	Laddr  net.Addr `json:"localaddr"`
 	Raddr  net.Addr `json:"remoteaddr"`
+	PID    string   `json:"PID"`
+}
+
+type sshSession struct {
+	Username  string `json:"username"`
+	PID       int32  `json:"PID"`
+	Terminal  string `json:"terminal"`
+	Host      string `json:"host"`
+	LoginTime string `json:"loginTime"`
 }
 
 func ProcessData(c *Client, inputMsg []byte) {
@@ -82,6 +98,12 @@ func ProcessData(c *Client, inputMsg []byte) {
 		c.Msg <- res
 	case "ps":
 		res, err := getProcessData(wsInput.PsProcessConfig)
+		if err != nil {
+			return
+		}
+		c.Msg <- res
+	case "ssh":
+		res, err := getSSHSessions(wsInput.SSHSessionConfig)
 		if err != nil {
 			return
 		}
@@ -216,6 +238,55 @@ func getProcessData(processConfig PsProcessConfig) (res []byte, err error) {
 		procData.Envs, _ = proc.Environ()
 
 		result = append(result, procData)
+	}
+	res, err = json.Marshal(result)
+	return
+}
+
+func getSSHSessions(config SSHSessionConfig) (res []byte, err error) {
+	var (
+		result    []sshSession
+		users     []host.UserStat
+		processes []*process.Process
+	)
+	processes, err = process.Processes()
+	if err != nil {
+		return
+	}
+	users, err = host.Users()
+	if err != nil {
+		return
+	}
+	for _, proc := range processes {
+		name, _ := proc.Name()
+		if name != "sshd" || proc.Pid == 0 {
+			continue
+		}
+		connections, _ := proc.Connections()
+		for _, conn := range connections {
+			for _, user := range users {
+				if user.Host == "" {
+					continue
+				}
+				if conn.Raddr.IP == user.Host {
+					if config.LoginUser != "" && !strings.Contains(user.User, config.LoginUser) {
+						continue
+					}
+					if config.LoginIP != "" && !strings.Contains(user.Host, config.LoginIP) {
+						continue
+					}
+					session := sshSession{
+						Username: user.User,
+						Host:     user.Host,
+						Terminal: user.Terminal,
+						PID:      proc.Pid,
+					}
+					t := time.Unix(int64(user.Started), 0)
+					session.LoginTime = t.Format("2006-1-2 15:04:05")
+					result = append(result, session)
+				}
+			}
+		}
 	}
 	res, err = json.Marshal(result)
 	return

@@ -101,6 +101,16 @@ const hostRouter = {
                 requiresAuth: false,
             },
         },
+        {
+            path: '/hosts/ssh/session',
+            name: 'SSHSession',
+            component: () => import('@/views/host/ssh/session/index.vue'),
+            hidden: true,
+            meta: {
+                activeMenu: '/hosts/ssh/ssh',
+                requiresAuth: false,
+            },
+        },
     ],
 };
 

@@ -912,7 +912,12 @@ const message = {
         publickey: 'Key',
         belong: 'Belong',
         local: 'Local',
-        remote: 'Remote',
+        config: 'Configuration',
+        session: 'Session',
+        loginTime: 'Login Time',
+        loginIP: 'Login IP',
+        disconnect: 'Disconnect',
+        stopSSHWarn: 'Whether to disconnect this SSH connection',
     },
     setting: {
         all: 'All',

@@ -13,12 +13,16 @@ import RouterButton from '@/components/router-button/index.vue';
 
 const buttons = [
     {
-        label: i18n.global.t('menu.ssh'),
+        label: i18n.global.t('menu.config'),
         path: '/hosts/ssh/ssh',
     },
     {
         label: i18n.global.t('ssh.loginLogs'),
         path: '/hosts/ssh/log',
+    },
+    {
+        label: i18n.global.t('ssh.session'),
+        path: '/hosts/ssh/session',
     },
 ];
 </script>
