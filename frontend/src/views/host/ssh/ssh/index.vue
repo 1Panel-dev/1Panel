@@ -44,7 +44,7 @@
             </el-card>
         </div>
 
-        <LayoutContent style="margin-top: 20px" :title="$t('menu.ssh')" :divider="true">
+        <LayoutContent style="margin-top: 20px" :title="$t('menu.config')" :divider="true">
             <template #main>
                 <el-radio-group v-model="confShowType" @change="changeMode">
                     <el-radio-button label="base">{{ $t('database.baseConf') }}</el-radio-button>

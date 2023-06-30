@@ -2,6 +2,7 @@ package ps
 
 import (
 	"fmt"
+	"github.com/shirou/gopsutil/v3/host"
 	"github.com/shirou/gopsutil/v3/process"
 	"strconv"
 	"testing"
@@ -61,8 +62,17 @@ func TestPs(t *testing.T) {
 		if err == nil {
 			fmt.Println(cmdLine)
 		}
+		ss, err := pro.Terminal()
+		if err == nil {
+			fmt.Println(ss)
+		}
 
 		fmt.Println(fmt.Sprintf("Name: %s PId: %v ParentID: %v Username: %v status:%s startTime: %s numThreads: %v numConnections:%v cpuPercent:%v rss:%s MB IORead: %s IOWrite: %s",
 			name, pro.Pid, parentID, userName, status, startTime, numThreads, numConnections, cpuPercent, rss, ioRead, ioWrite))
 	}
+	users, err := host.Users()
+	if err == nil {
+		fmt.Println(users)
+	}
+
 }
