@@ -1059,49 +1059,40 @@ func (w WebsiteService) UpdatePHPConfig(req request.WebsitePHPConfigUpdate) (err
 		return err
 	}
 
-	if req.Scope == "params" {
-		content := string(contentBytes)
-		lines := strings.Split(content, "\n")
-		for i, line := range lines {
-			if strings.HasPrefix(line, ";") {
-				continue
-			}
+	content := string(contentBytes)
+	lines := strings.Split(content, "\n")
+	for i, line := range lines {
+		if strings.HasPrefix(line, ";") {
+			continue
+		}
+		switch req.Scope {
+		case "params":
 			for key, value := range req.Params {
 				pattern := "^" + regexp.QuoteMeta(key) + "\\s*=\\s*.*$"
 				if matched, _ := regexp.MatchString(pattern, line); matched {
 					lines[i] = key + " = " + value
 				}
 			}
-		}
-		updatedContent := strings.Join(lines, "\n")
-		if err := fileOp.WriteFile(phpConfigPath, strings.NewReader(updatedContent), 0755); err != nil {
-			return err
+		case "disable_functions":
+			pattern := "^" + regexp.QuoteMeta("disable_functions") + "\\s*=\\s*.*$"
+			if matched, _ := regexp.MatchString(pattern, line); matched {
+				lines[i] = "disable_functions" + " = " + strings.Join(req.DisableFunctions, ",")
+				break
+			}
+		case "upload_max_filesize":
+			pattern := "^" + regexp.QuoteMeta("post_max_size") + "\\s*=\\s*.*$"
+			if matched, _ := regexp.MatchString(pattern, line); matched {
+				lines[i] = "post_max_size" + " = " + req.UploadMaxSize
+			}
+			patternUpload := "^" + regexp.QuoteMeta("upload_max_filesize") + "\\s*=\\s*.*$"
+			if matched, _ := regexp.MatchString(patternUpload, line); matched {
+				lines[i] = "upload_max_filesize" + " = " + req.UploadMaxSize
+			}
 		}
 	}
-
-	cfg, err := ini.Load(phpConfigPath)
-	if err != nil {
+	updatedContent := strings.Join(lines, "\n")
+	if err := fileOp.WriteFile(phpConfigPath, strings.NewReader(updatedContent), 0755); err != nil {
 		return err
-	}
-	phpConfig, err := cfg.GetSection("PHP")
-	if err != nil {
-		return err
-	}
-	if req.Scope == "disable_functions" {
-		disable := phpConfig.Key("disable_functions")
-		disable.SetValue(strings.Join(req.DisableFunctions, ","))
-		if err = cfg.SaveTo(phpConfigPath); err != nil {
-			return err
-		}
-	}
-	if req.Scope == "upload_max_filesize" {
-		postMaxSize := phpConfig.Key("post_max_size")
-		postMaxSize.SetValue(req.UploadMaxSize)
-		uploadMaxFileSize := phpConfig.Key("upload_max_filesize")
-		uploadMaxFileSize.SetValue(req.UploadMaxSize)
-		if err = cfg.SaveTo(phpConfigPath); err != nil {
-			return err
-		}
 	}
 
 	appInstallReq := request.AppInstalledOperate{

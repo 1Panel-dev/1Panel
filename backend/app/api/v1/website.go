@@ -541,7 +541,7 @@ func (b *BaseApi) UpdateWebsitePHPConfig(c *gin.Context) {
 
 // @Tags Website PHP
 // @Summary Update php conf
-// @Description 更新 php 配置
+// @Description 更新 php 配置文件
 // @Accept json
 // @Param request body request.WebsitePHPFileUpdate true "request"
 // @Success 200
