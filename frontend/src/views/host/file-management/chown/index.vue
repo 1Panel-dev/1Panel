@@ -5,7 +5,7 @@
         </template>
         <el-row>
             <el-col :span="22" :offset="1">
-                <el-alert :title="$t('file.ownerHelper')" type="info" :closable="false" style="margin-bottom: 20px" />
+                <el-alert :title="$t('file.ownerHelper')" type="info" :closable="false" class="common-prompt" />
                 <el-form
                     ref="fileForm"
                     label-position="top"

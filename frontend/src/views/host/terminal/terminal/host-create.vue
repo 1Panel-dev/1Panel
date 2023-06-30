@@ -9,7 +9,7 @@
                     <el-col :span="22">
                         <el-alert
                             v-if="isLocal"
-                            style="margin-bottom: 20px"
+                            class="common-prompt"
                             center
                             :title="$t('terminal.connLocalErr')"
                             :closable="false"

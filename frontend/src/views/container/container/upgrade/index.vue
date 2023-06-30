@@ -9,7 +9,7 @@
                 <el-alert
                     v-if="form.fromApp"
                     :title="$t('container.appHelper')"
-                    style="margin-bottom: 20px"
+                    class="common-prompt"
                     :closable="false"
                     type="error"
                 />
