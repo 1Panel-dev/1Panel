@@ -10,7 +10,7 @@
             <template #header>
                 <DrawerHeader :header="$t('setting.mfa')" :back="handleClose" />
             </template>
-            <el-alert style="margin-bottom: 20px" :closable="false" type="warning">
+            <el-alert class="common-prompt" :closable="false" type="warning">
                 <template #default>
                     <span>
                         <span>{{ $t('setting.mfaAlert') }}</span>

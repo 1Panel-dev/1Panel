@@ -83,13 +83,12 @@
                                 v-model:rules="rules"
                             ></EditParams>
                             <el-form-item v-if="runtime.type === 'php'">
-                                <el-alert :title="$t('runtime.extendHelper')" type="info" :closable="false" />
-                                <el-alert
-                                    v-if="mode == 'edit'"
-                                    :title="$t('runtime.rebuildHelper')"
-                                    type="info"
-                                    :closable="false"
-                                />
+                                <el-alert type="info" :closable="false">
+                                    <span>{{ $t('runtime.extendHelper') }}</span>
+                                    <span v-html="$t('runtime.phpPluginHelper')"></span>
+                                    <br />
+                                    <span v-if="mode == 'edit'">{{ $t('runtime.rebuildHelper') }}</span>
+                                </el-alert>
                             </el-form-item>
                         </div>
                     </div>

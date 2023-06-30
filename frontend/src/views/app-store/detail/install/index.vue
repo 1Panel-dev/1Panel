@@ -11,12 +11,7 @@
         </template>
         <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
-                <el-alert
-                    :title="$t('app.appInstallWarn')"
-                    style="margin-bottom: 20px"
-                    :closable="false"
-                    type="error"
-                />
+                <el-alert :title="$t('app.appInstallWarn')" class="common-prompt" :closable="false" type="error" />
                 <el-form
                     @submit.prevent
                     ref="paramForm"

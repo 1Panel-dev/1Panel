@@ -9,7 +9,7 @@
                     <el-alert
                         v-if="canChangeZone()"
                         :title="$t('setting.timeZoneHelper')"
-                        style="margin-bottom: 20px"
+                        class="common-prompt"
                         :closable="false"
                         type="warning"
                     />

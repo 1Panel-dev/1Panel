@@ -10,7 +10,7 @@
             <template #header>
                 <DrawerHeader :header="$t('container.cutLog')" :back="handleClose" />
             </template>
-            <el-alert style="margin-bottom: 20px" :closable="false" type="warning">
+            <el-alert class="common-prompt" :closable="false" type="warning">
                 <template #default>
                     <ul style="margin-left: -20px">
                         <li>{{ $t('container.cutLogHelper1') }}</li>
