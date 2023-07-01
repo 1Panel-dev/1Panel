@@ -20,7 +20,7 @@
                             :type="activeTag === item.key ? 'primary' : ''"
                             :plain="activeTag !== item.key"
                         >
-                            {{ language == 'zh' ? item.name : item.key }}
+                            {{ language == 'zh' || language == 'tw' ? item.name : item.key }}
                         </el-button>
                     </div>
                 </el-col>
@@ -79,13 +79,17 @@
                                         </div>
                                         <div class="app-desc">
                                             <span class="desc">
-                                                {{ language == 'zh' ? app.shortDescZh : app.shortDescEn }}
+                                                {{
+                                                    language == 'zh' || language == 'tw'
+                                                        ? app.shortDescZh
+                                                        : app.shortDescEn
+                                                }}
                                             </span>
                                         </div>
                                         <div class="app-tag">
                                             <el-tag v-for="(tag, ind) in app.tags" :key="ind" style="margin-right: 5px">
                                                 <span :style="{ color: getColor(ind) }">
-                                                    {{ language == 'zh' ? tag.name : tag.key }}
+                                                    {{ language == 'zh' || language == 'tw' ? tag.name : tag.key }}
                                                 </span>
                                             </el-tag>
                                             <el-tag v-if="app.status === 'TakeDown'" style="margin-right: 5px">

@@ -60,7 +60,7 @@ func GinI18nLocalize() gin.HandlerFunc {
 	return ginI18n.Localize(
 		ginI18n.WithBundle(&ginI18n.BundleCfg{
 			RootPath:         "./lang",
-			AcceptLanguage:   []language.Tag{language.Chinese, language.English},
+			AcceptLanguage:   []language.Tag{language.Chinese, language.English, language.TraditionalChinese},
 			DefaultLanguage:  language.Chinese,
 			FormatBundleFile: "yaml",
 			UnmarshalFunc:    yaml.Unmarshal,

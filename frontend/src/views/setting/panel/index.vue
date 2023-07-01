@@ -55,7 +55,8 @@
                                     @change="onSave('Language', form.language)"
                                     v-model="form.language"
                                 >
-                                    <el-radio label="zh">中文</el-radio>
+                                    <el-radio label="zh">中文(简体)</el-radio>
+                                    <el-radio label="tw">中文(繁體)</el-radio>
                                     <el-radio label="en">English</el-radio>
                                 </el-radio-group>
                             </el-form-item>

@@ -135,6 +135,7 @@ const message = {
             licenseHelper:
                 'Agree &laquo; <a href="https://www.fit2cloud.com/legal/licenses.html" target="_blank">Community License Agreement</a> &raquo;',
             errorAgree: 'Please click to agree to the Community Software License Agreement',
+            logout: 'Logout',
         },
         rule: {
             username: 'Please enter a username',
@@ -181,18 +182,6 @@ const message = {
             serverError: 'Service exception',
             notFound: 'The resource does not exist',
             commonError: 'The request failed',
-        },
-        header: {
-            language: 'Internationalization',
-            zh: '简体中文',
-            en: 'English',
-            theme: 'Layout Settings',
-            globalTheme: 'Global',
-            themeColor: 'Theme Color',
-            darkTheme: 'Dark Theme',
-            personalData: 'Personal Data',
-            changePassword: 'Change Password',
-            logout: 'Logout',
         },
         service: {
             serviceNotStarted: 'The {0} service is not currently started',
