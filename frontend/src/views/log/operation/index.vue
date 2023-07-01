@@ -65,7 +65,9 @@
                     </el-table-column>
                     <el-table-column :label="$t('logs.operate')" min-width="150px" prop="detailZH">
                         <template #default="{ row }">
-                            <span v-if="globalStore.language === 'zh'">{{ row.detailZH }}</span>
+                            <span v-if="globalStore.language === 'zh' || globalStore.language === 'tw'">
+                                {{ row.detailZH }}
+                            </span>
                             <span v-if="globalStore.language === 'en'">{{ row.detailEN }}</span>
                         </template>
                     </el-table-column>
@@ -143,7 +145,7 @@ const search = async () => {
         .then((res) => {
             loading.value = false;
             data.value = res.data.items || [];
-            if (globalStore.language === 'zh') {
+            if (globalStore.language === 'zh' || globalStore.language === 'tw') {
                 for (const item of data.value) {
                     item.detailZH = loadDetail(item.detailZH);
                 }

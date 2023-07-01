@@ -18,11 +18,13 @@ class RequestHttp {
     service: AxiosInstance;
     public constructor(config: AxiosRequestConfig) {
         this.service = axios.create(config);
+        let language = globalStore.language === 'tw' ? 'zh-Hant' : globalStore.language;
         this.service.interceptors.request.use(
             (config: AxiosRequestConfig) => {
                 if (config.method != 'get') {
                     config.headers = {
                         'X-CSRF-TOKEN': globalStore.csrfToken,
+                        'Accept-Language': language,
                         ...config.headers,
                     };
                 }

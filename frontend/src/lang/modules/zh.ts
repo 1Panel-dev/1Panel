@@ -136,6 +136,7 @@ const message = {
             licenseHelper:
                 '同意 &laquo; <a href="https://www.fit2cloud.com/legal/licenses.html" target="_blank"> 飞致云社区软件许可协议</a> &raquo;',
             errorAgree: '请点击同意社区软件许可协议',
+            logout: '退出登录',
         },
         rule: {
             username: '请输入用户名',
@@ -180,18 +181,6 @@ const message = {
             serverError: '服务异常',
             notFound: '资源不存在',
             commonError: '请求失败',
-        },
-        header: {
-            language: '国际化',
-            zh: '简体中文',
-            en: 'English',
-            theme: '布局设置',
-            globalTheme: '全局主题',
-            themeColor: '主题颜色',
-            darkTheme: '暗黑主题',
-            personalData: '个人资料',
-            changePassword: '修改密码',
-            logout: '退出登录',
         },
         service: {
             serviceNotStarted: '当前未启动 {0} 服务',

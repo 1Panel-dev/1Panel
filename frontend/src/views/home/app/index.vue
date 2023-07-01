@@ -15,7 +15,7 @@
                             </div>
                             <div class="h-app-desc">
                                 <span>
-                                    {{ language == 'zh' ? app.shortDescZh : app.shortDescEn }}
+                                    {{ language == 'zh' || language == 'tw' ? app.shortDescZh : app.shortDescEn }}
                                 </span>
                             </div>
                         </div>

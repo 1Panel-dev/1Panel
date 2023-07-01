@@ -1,5 +1,6 @@
 import { createI18n } from 'vue-i18n';
 import zh from './modules/zh';
+import tw from './modules/tw';
 import en from './modules/en';
 
 const i18n = createI18n({
@@ -8,6 +9,7 @@ const i18n = createI18n({
     globalInjection: true,
     messages: {
         zh,
+        tw,
         en,
     },
     warnHtmlMessage: false,

@@ -237,7 +237,7 @@ const changeService = (value: string, services: App.AppService[]) => {
 
 const getLabel = (row: ParamObj): string => {
     const language = useI18n().locale.value;
-    if (language == 'zh') {
+    if (language == 'zh' || language == 'tw') {
         return row.labelZh;
     } else {
         return row.labelEn;
