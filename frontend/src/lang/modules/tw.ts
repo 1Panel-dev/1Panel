@@ -1121,6 +1121,8 @@ const message = {
         allReadyInstalled: '已安裝',
         installHelper: '配置鏡像加速可以解決鏡像拉取失敗的問題',
         upgradeHelper: '異常應用需要先同步到正常狀態',
+        installWarn: '未開啟端口外部訪問，無法通過外網IP:端口訪問，是否繼續？ ',
+        restoreWarn: '恢復操作將刪除該應用當前數據並重啟。此操作不可回滾，是否繼續?',
     },
     website: {
         website: '網站',
