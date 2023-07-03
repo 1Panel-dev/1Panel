@@ -40,6 +40,7 @@ ErrHttpReqTimeOut: "Request timed out {{.err}}"
 ErrHttpReqFailed: "Request failed {{.err}}"
 ErrHttpReqNotFound: "The file does not exist"
 ErrNoSuchHost: "Network connection failed"
+ErrImagePullTimeOut: 'Image pull timeout'
 
 #file
 ErrFileCanNotRead: "File can not read"

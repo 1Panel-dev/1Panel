@@ -208,6 +208,7 @@ const message = {
             downloaderr: '下載失敗',
             upgrading: '升級中',
             upgradeerr: '升級失敗',
+            pullerr: '鏡像拉取失敗',
         },
         units: {
             second: '秒',

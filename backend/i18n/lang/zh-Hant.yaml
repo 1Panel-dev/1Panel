@@ -40,6 +40,7 @@ ErrHttpReqTimeOut: "請求超時 {{.err}}"
 ErrHttpReqFailed: "請求失敗 {{.err}}"
 ErrHttpReqNotFound: "文件不存在"
 ErrNoSuchHost: "網路連接失敗"
+ErrImagePullTimeOut: "鏡像拉取超時"
 
 #file
 ErrFileCanNotRead: "此文件不支持預覽"

@@ -175,7 +175,7 @@ const handleParams = () => {
                 if (p.type === 'service' || p.type === 'apps') {
                     rules[p.envKey] = [Rules.requiredSelect];
                     if (p.child) {
-                        p.childProp = p.child.envKey;
+                        p.childProp = propStart.value + p.child.envKey;
                         if (p.child.type === 'service') {
                             rules[p.child.envKey] = [Rules.requiredSelect];
                         }
