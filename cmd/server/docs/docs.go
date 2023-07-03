@@ -387,6 +387,48 @@ const docTemplate = `{
                 }
             }
         },
+        "/apps/installed/ignore": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "忽略应用升级版本",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "App"
+                ],
+                "summary": "ignore App Update",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.AppInstalledIgnoreUpgrade"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "installId"
+                    ],
+                    "formatEN": "Application param update [installId]",
+                    "formatZH": "忽略应用 [installId] 版本升级",
+                    "paramKeys": []
+                }
+            }
+        },
         "/apps/installed/loadport/:key": {
             "get": {
                 "security": [
@@ -1861,6 +1903,31 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/dto.ResourceLimit"
                         }
+                    }
+                }
+            }
+        },
+        "/containers/list": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取容器名称",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Container"
+                ],
+                "summary": "List containers",
+                "responses": {
+                    "200": {
+                        "description": "OK"
                     }
                 }
             }
@@ -9632,7 +9699,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "更新 php 配置",
+                "description": "更新 php 配置文件",
                 "consumes": [
                     "application/json"
                 ],
@@ -10967,6 +11034,9 @@ const docTemplate = `{
                 "type"
             ],
             "properties": {
+                "containerName": {
+                    "type": "string"
+                },
                 "day": {
                     "type": "integer"
                 },
@@ -11046,6 +11116,9 @@ const docTemplate = `{
                 "specType"
             ],
             "properties": {
+                "containerName": {
+                    "type": "string"
+                },
                 "day": {
                     "type": "integer"
                 },
@@ -12265,6 +12338,12 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "order": {
+                    "type": "string"
+                },
+                "orderBy": {
+                    "type": "string"
+                },
                 "page": {
                     "type": "integer"
                 },
@@ -12819,6 +12898,12 @@ const docTemplate = `{
                 "info": {
                     "type": "string"
                 },
+                "order": {
+                    "type": "string"
+                },
+                "orderBy": {
+                    "type": "string"
+                },
                 "page": {
                     "type": "integer"
                 },
@@ -12909,6 +12994,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "sslType": {
+                    "type": "string"
+                },
+                "systemIP": {
                     "type": "string"
                 },
                 "systemVersion": {
@@ -13559,6 +13647,21 @@ const docTemplate = `{
                     "additionalProperties": {
                         "type": "string"
                     }
+                }
+            }
+        },
+        "request.AppInstalledIgnoreUpgrade": {
+            "type": "object",
+            "required": [
+                "detailId",
+                "installId"
+            ],
+            "properties": {
+                "detailId": {
+                    "type": "integer"
+                },
+                "installId": {
+                    "type": "integer"
                 }
             }
         },
@@ -14863,6 +14966,12 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "order": {
+                    "type": "string"
+                },
+                "orderBy": {
+                    "type": "string"
+                },
                 "page": {
                     "type": "integer"
                 },
@@ -15077,6 +15186,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "ignoreUpgrade": {
+                    "type": "boolean"
                 },
                 "image": {
                     "type": "string"

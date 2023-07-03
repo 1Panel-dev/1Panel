@@ -89,3 +89,7 @@ export const GetAppInstallParams = (id: number) => {
 export const UpdateAppInstallParams = (req: any) => {
     return http.post<any>(`apps/installed/params/update`, req);
 };
+
+export const IgnoreUpgrade = (req: any) => {
+    return http.post<any>(`apps/installed/ignore`, req);
+};

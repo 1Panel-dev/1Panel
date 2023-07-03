@@ -751,7 +751,7 @@ func handleErr(install model.AppInstall, err error, out string) error {
 func handleInstalled(appInstallList []model.AppInstall, updated bool) ([]response.AppInstalledDTO, error) {
 	var res []response.AppInstalledDTO
 	for _, installed := range appInstallList {
-		if updated && installed.App.Type == "php" {
+		if updated && installed.App.Type == "php" || installed.Status == constant.Installing {
 			continue
 		}
 		installDTO := response.AppInstalledDTO{
@@ -768,6 +768,9 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool) ([]respons
 		}
 		var versions []string
 		for _, detail := range details {
+			if detail.IgnoreUpgrade {
+				continue
+			}
 			if common.IsCrossVersion(installed.Version, detail.Version) && !app.CrossVersionUpdate {
 				continue
 			}

@@ -305,3 +305,25 @@ func (b *BaseApi) UpdateInstalled(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, nil)
 }
+
+// @Tags App
+// @Summary ignore App Update
+// @Description 忽略应用升级版本
+// @Accept json
+// @Param request body request.AppInstalledIgnoreUpgrade true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /apps/installed/ignore [post]
+// @x-panel-log {"bodyKeys":["installId"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"忽略应用 [installId] 版本升级","formatEN":"Application param update [installId]"}
+func (b *BaseApi) IgnoreUpgrade(c *gin.Context) {
+	var req request.AppInstalledIgnoreUpgrade
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := appInstallService.IgnoreUpgrade(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}

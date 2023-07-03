@@ -164,6 +164,17 @@
                                                 plain
                                                 round
                                                 size="small"
+                                                @click="openOperate(installed, 'ignoreUpgrade')"
+                                                v-if="mode === 'upgrade'"
+                                            >
+                                                {{ $t('commons.button.ignoreUpgrade') }}
+                                            </el-button>
+                                            <el-button
+                                                class="h-button"
+                                                type="primary"
+                                                plain
+                                                round
+                                                size="small"
                                                 :disabled="
                                                     (installed.status !== 'Running' &&
                                                         installed.status !== 'UpgradeErr') ||
@@ -322,8 +333,8 @@ const search = () => {
 const openOperate = (row: any, op: string) => {
     operateReq.installId = row.id;
     operateReq.operate = op;
-    if (op == 'upgrade') {
-        upgradeRef.value.acceptParams(row.id, row.name);
+    if (op == 'upgrade' || op == 'ignoreUpgrade') {
+        upgradeRef.value.acceptParams(row.id, row.name, op);
     } else if (op == 'delete') {
         AppInstalledDeleteCheck(row.id).then(async (res) => {
             const items = res.data;

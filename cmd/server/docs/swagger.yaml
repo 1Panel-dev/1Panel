@@ -385,6 +385,8 @@ definitions:
     type: object
   dto.CronjobCreate:
     properties:
+      containerName:
+        type: string
       day:
         type: integer
       dbName:
@@ -439,6 +441,8 @@ definitions:
     type: object
   dto.CronjobUpdate:
     properties:
+      containerName:
+        type: string
       day:
         type: integer
       dbName:
@@ -1258,6 +1262,10 @@ definitions:
         type: string
       name:
         type: string
+      order:
+        type: string
+      orderBy:
+        type: string
       page:
         type: integer
       pageSize:
@@ -1627,6 +1635,10 @@ definitions:
     properties:
       info:
         type: string
+      order:
+        type: string
+      orderBy:
+        type: string
       page:
         type: integer
       pageSize:
@@ -1690,6 +1702,8 @@ definitions:
       ssl:
         type: string
       sslType:
+        type: string
+      systemIP:
         type: string
       systemVersion:
         type: string
@@ -2120,6 +2134,16 @@ definitions:
     required:
     - appDetailId
     - name
+    type: object
+  request.AppInstalledIgnoreUpgrade:
+    properties:
+      detailId:
+        type: integer
+      installId:
+        type: integer
+    required:
+    - detailId
+    - installId
     type: object
   request.AppInstalledOperate:
     properties:
@@ -2993,6 +3017,10 @@ definitions:
     properties:
       name:
         type: string
+      order:
+        type: string
+      orderBy:
+        type: string
       page:
         type: integer
       pageSize:
@@ -3140,6 +3168,8 @@ definitions:
         type: boolean
       id:
         type: integer
+      ignoreUpgrade:
+        type: boolean
       image:
         type: string
       lastModified:
@@ -3644,6 +3674,33 @@ paths:
       summary: Check before delete
       tags:
       - App
+  /apps/installed/ignore:
+    post:
+      consumes:
+      - application/json
+      description: 忽略应用升级版本
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.AppInstalledIgnoreUpgrade'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: ignore App Update
+      tags:
+      - App
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - installId
+        formatEN: Application param update [installId]
+        formatZH: 忽略应用 [installId] 版本升级
+        paramKeys: []
   /apps/installed/loadport/:key:
     get:
       consumes:
@@ -4586,6 +4643,21 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Load container limis
+  /containers/list:
+    post:
+      consumes:
+      - application/json
+      description: 获取容器名称
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: List containers
+      tags:
+      - Container
   /containers/network:
     post:
       consumes:
@@ -9521,7 +9593,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: 更新 php 配置
+      description: 更新 php 配置文件
       parameters:
       - description: request
         in: body

@@ -44,6 +44,7 @@ const message = {
             refresh: '刷新',
             get: '获取',
             upgrade: '升级',
+            ignoreUpgrade: '忽略升级',
         },
         search: {
             timeStart: '开始时间',

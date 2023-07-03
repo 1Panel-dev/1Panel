@@ -45,6 +45,7 @@ type IAppInstallService interface {
 	SearchForWebsite(req request.AppInstalledSearch) ([]response.AppInstalledDTO, error)
 	Operate(req request.AppInstalledOperate) error
 	Update(req request.AppInstalledUpdate) error
+	IgnoreUpgrade(req request.AppInstalledIgnoreUpgrade) error
 	SyncAll(systemInit bool) error
 	GetServices(key string) ([]response.AppService, error)
 	GetUpdateVersions(installId uint) ([]dto.AppVersion, error)
@@ -352,6 +353,15 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 	return nil
 }
 
+func (a *AppInstallService) IgnoreUpgrade(req request.AppInstalledIgnoreUpgrade) error {
+	appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(req.DetailId))
+	if err != nil {
+		return err
+	}
+	appDetail.IgnoreUpgrade = true
+	return appDetailRepo.Update(context.Background(), appDetail)
+}
+
 func (a *AppInstallService) SyncAll(systemInit bool) error {
 	allList, err := appInstallRepo.ListBy()
 	if err != nil {
@@ -412,6 +422,9 @@ func (a *AppInstallService) GetUpdateVersions(installId uint) ([]dto.AppVersion,
 		return versions, err
 	}
 	for _, detail := range details {
+		if detail.IgnoreUpgrade {
+			continue
+		}
 		if common.IsCrossVersion(install.Version, detail.Version) && !app.CrossVersionUpdate {
 			continue
 		}

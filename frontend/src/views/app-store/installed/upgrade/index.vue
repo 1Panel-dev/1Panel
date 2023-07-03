@@ -1,7 +1,11 @@
 <template>
     <el-drawer :close-on-click-modal="false" v-model="open" size="30%">
         <template #header>
-            <Header :header="$t('commons.button.upgrade')" :resource="resourceName" :back="handleClose"></Header>
+            <Header
+                :header="$t('commons.button.' + operateReq.operate)"
+                :resource="resourceName"
+                :back="handleClose"
+            ></Header>
         </template>
         <el-row>
             <el-col :span="22" :offset="1">
@@ -38,7 +42,7 @@
 </template>
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
-import { GetAppUpdateVersions, InstalledOp } from '@/api/modules/app';
+import { GetAppUpdateVersions, IgnoreUpgrade, InstalledOp } from '@/api/modules/app';
 import i18n from '@/lang';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { reactive, ref, onBeforeUnmount } from 'vue';
@@ -48,16 +52,16 @@ import { Rules } from '@/global/form-rules';
 import bus from '../../bus';
 
 const updateRef = ref<FormInstance>();
-let open = ref(false);
-let loading = ref(false);
-let versions = ref<App.VersionDetail[]>();
-let operateReq = reactive({
+const open = ref(false);
+const loading = ref(false);
+const versions = ref<App.VersionDetail[]>();
+const operateReq = reactive({
     detailId: 0,
     operate: 'upgrade',
     installId: 0,
 });
 const resourceName = ref('');
-let rules = ref<any>({
+const rules = ref<any>({
     detailId: [Rules.requiredSelect],
 });
 
@@ -67,8 +71,9 @@ const handleClose = () => {
     em('close', open);
 };
 
-const acceptParams = (id: number, name: string) => {
+const acceptParams = (id: number, name: string, op: string) => {
     operateReq.installId = id;
+    operateReq.operate = op;
     resourceName.value = name;
     GetAppUpdateVersions(id).then((res) => {
         versions.value = res.data;
@@ -81,20 +86,32 @@ const acceptParams = (id: number, name: string) => {
 
 const operate = async () => {
     loading.value = true;
-    await InstalledOp(operateReq)
-        .then(() => {
-            MsgSuccess(i18n.global.t('app.upgradeStart'));
-            bus.emit('upgrade', true);
-            handleClose();
-        })
-        .finally(() => {
-            loading.value = false;
-        });
+    if (operateReq.operate === 'upgrade') {
+        await InstalledOp(operateReq)
+            .then(() => {
+                MsgSuccess(i18n.global.t('app.upgradeStart'));
+                bus.emit('upgrade', true);
+                handleClose();
+            })
+            .finally(() => {
+                loading.value = false;
+            });
+    } else {
+        await IgnoreUpgrade(operateReq)
+            .then(() => {
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                bus.emit('upgrade', true);
+                handleClose();
+            })
+            .finally(() => {
+                loading.value = false;
+            });
+    }
 };
 
 const onOperate = async () => {
     ElMessageBox.confirm(
-        i18n.global.t('app.operatorHelper', [i18n.global.t('commons.button.upgrade')]),
+        i18n.global.t('app.operatorHelper', [i18n.global.t('commons.button.' + operateReq.operate)]),
         i18n.global.t('commons.button.upgrade'),
         {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
