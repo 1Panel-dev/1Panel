@@ -413,3 +413,16 @@ var AddMfaInterval = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var UpdateAppDetail = &gormigrate.Migration{
+	ID: "20230704-update-app-detail",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.AppDetail{}); err != nil {
+			return err
+		}
+		if err := tx.Model(&model.AppDetail{}).Where("1 = 1").Update("ignore_upgrade", "0").Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

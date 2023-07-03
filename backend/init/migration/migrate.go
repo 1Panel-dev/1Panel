@@ -33,6 +33,7 @@ func Init() {
 		migrations.UpdateWebsite,
 		migrations.AddBackupAccountDir,
 		migrations.AddMfaInterval,
+		migrations.UpdateAppDetail,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

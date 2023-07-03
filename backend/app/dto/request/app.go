@@ -66,6 +66,11 @@ type AppInstalledUpdate struct {
 	AppContainerConfig
 }
 
+type AppInstalledIgnoreUpgrade struct {
+	InstallId uint `json:"installId" validate:"required"`
+	DetailId  uint `json:"detailId"  validate:"required"`
+}
+
 type PortUpdate struct {
 	Key  string `json:"key"`
 	Name string `json:"name"`

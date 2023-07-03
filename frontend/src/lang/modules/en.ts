@@ -44,6 +44,7 @@ const message = {
             refresh: 'Refresh',
             get: 'Get',
             upgrade: 'Upgrade',
+            ignoreUpgrade: 'Ignore upgrade',
         },
         search: {
             timeStart: 'Time start',
