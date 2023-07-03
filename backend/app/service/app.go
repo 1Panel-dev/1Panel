@@ -470,8 +470,12 @@ func (a AppService) SyncAppListFromLocal() {
 				oldDetail, exist := appDetails[version]
 				if exist {
 					newDetail.ID = oldDetail.ID
+					delete(appDetails, version)
 				}
 				app.Details[i] = newDetail
+			}
+			for _, v := range appDetails {
+				app.Details = append(app.Details, v)
 			}
 		}
 		app.TagsKey = append(app.TagsKey, constant.AppResourceLocal)
