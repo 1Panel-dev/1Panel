@@ -59,6 +59,17 @@
                                     <el-button @click="jumpAzure">{{ $t('setting.loadCode') }}</el-button>
                                 </template>
                             </el-input>
+                            <span class="input-help">
+                                {{ $t('setting.codeHelper') }}
+                                <el-link
+                                    style="font-size: 12px; margin-left: 5px"
+                                    icon="Position"
+                                    @click="toDoc()"
+                                    type="primary"
+                                >
+                                    {{ $t('firewall.quickJump') }}
+                                </el-link>
+                            </span>
                         </el-form-item>
                         <el-form-item
                             v-if="dialogData.rowData!.type === 'S3' || dialogData.rowData!.type === 'COS'"
@@ -319,6 +330,10 @@ function hasBucket(val: string) {
 function hasEndpoint(val: string) {
     return val === 'OSS' || val === 'S3';
 }
+
+const toDoc = () => {
+    window.open('https://1panel.cn/docs/user_manual/settings/', '_blank');
+};
 
 const getBuckets = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
