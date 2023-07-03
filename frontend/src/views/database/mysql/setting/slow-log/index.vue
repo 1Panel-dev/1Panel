@@ -31,7 +31,7 @@
             :placeholder="$t('database.noData')"
             :indent-with-tab="true"
             :tabSize="4"
-            style="height: calc(100vh - 428px); width: 100%"
+            :style="{ height: getDynamicHeight(), width: '100%' }"
             :lineWrapping="true"
             :matchBrackets="true"
             theme="cobalt"
@@ -42,7 +42,6 @@
             :disabled="true"
         />
 
-        <br />
         <ConfirmDialog @cancel="onCancel" ref="confirmDialogRef" @confirm="onSave"></ConfirmDialog>
     </div>
 </template>
@@ -100,6 +99,8 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
                 loadMysqlSlowlogs(path);
             }
         }, 1000 * 5);
+    } else {
+        detailShow.value = false;
     }
 };
 const emit = defineEmits(['loading']);
@@ -115,6 +116,10 @@ const handleSlowLogs = async () => {
         submitInputInfo: i18n.global.t('database.restartNow'),
     };
     confirmDialogRef.value!.acceptParams(params);
+};
+
+const getDynamicHeight = () => {
+    return variables.slow_query_log === 'ON' ? `calc(100vh - 437px)` : `calc(100vh - 383px)`;
 };
 
 const changeSlowLogs = () => {
