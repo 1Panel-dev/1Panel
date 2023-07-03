@@ -209,6 +209,7 @@ const message = {
             downloaderr: 'Download Error',
             upgrading: 'Upgrading',
             upgradeerr: 'Upgrade Error',
+            pullerr: 'Pull Image Error',
         },
         units: {
             second: 'Second',

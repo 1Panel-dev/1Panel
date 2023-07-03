@@ -89,6 +89,10 @@ func (s *ComposeService) ComposeBuild() error {
 	return s.Build(context.Background(), s.project, api.BuildOptions{})
 }
 
+func (s *ComposeService) ComposePull() error {
+	return s.Pull(context.Background(), s.project, api.PullOptions{})
+}
+
 func GetComposeProject(projectName, workDir string, yml []byte, env []byte, skipNormalization bool) (*types.Project, error) {
 	var configFiles []types.ConfigFile
 	configFiles = append(configFiles, types.ConfigFile{

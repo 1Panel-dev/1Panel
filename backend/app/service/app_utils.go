@@ -576,8 +576,14 @@ func upApp(appInstall *model.AppInstall) {
 			if err != nil {
 				return err
 			}
+			err = composeService.ComposePull()
+			if err != nil {
+				appInstall.Status = constant.PullErr
+				return err
+			}
 			err = composeService.ComposeUp()
 			if err != nil {
+				appInstall.Status = constant.Error
 				return err
 			}
 			return
@@ -586,8 +592,14 @@ func upApp(appInstall *model.AppInstall) {
 		}
 	}
 	if err := upProject(appInstall); err != nil {
-		appInstall.Status = constant.Error
-		appInstall.Message = err.Error()
+		otherMsg := ""
+		if strings.Contains(err.Error(), "no such host") {
+			otherMsg = i18n.GetMsgByKey("ErrNoSuchHost") + ":"
+		}
+		if strings.Contains(err.Error(), "timeout") {
+			otherMsg = i18n.GetMsgByKey("ErrImagePullTimeOut") + ":"
+		}
+		appInstall.Message = otherMsg + err.Error()
 	} else {
 		appInstall.Status = constant.Running
 	}
@@ -751,7 +763,7 @@ func handleErr(install model.AppInstall, err error, out string) error {
 func handleInstalled(appInstallList []model.AppInstall, updated bool) ([]response.AppInstalledDTO, error) {
 	var res []response.AppInstalledDTO
 	for _, installed := range appInstallList {
-		if updated && installed.App.Type == "php" || installed.Status == constant.Installing {
+		if updated && (installed.App.Type == "php" || installed.Status == constant.Installing) {
 			continue
 		}
 		installDTO := response.AppInstalledDTO{

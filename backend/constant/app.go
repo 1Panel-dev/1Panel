@@ -11,6 +11,7 @@ const (
 	DirNotFound = "DirNotFound"
 	Upgrading   = "Upgrading"
 	UpgradeErr  = "UpgradeErr"
+	PullErr     = "PullErr"
 
 	ContainerPrefix = "1Panel-"
 
