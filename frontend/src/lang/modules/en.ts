@@ -1184,6 +1184,8 @@ const message = {
         upgradeHelper: 'The abnormal application needs to be synchronized to the normal state first',
         installWarn:
             ' Port external access is not enabled, and cannot be accessed through the external network IP:port. Do you want to continue?',
+        restoreWarn:
+            'The restore operation will delete the current data of the application and restart it. This operation cannot be rolled back, continue?',
     },
     website: {
         website: 'Website',
