@@ -349,9 +349,6 @@
                             <el-form-item :label="$t('setting.path')">
                                 {{ sftpData.bucket }}
                             </el-form-item>
-                            <el-form-item :label="$t('setting.backupDir')">
-                                {{ sftpData.backupPath }}
-                            </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
                                 {{ dateFormat(0, 0, sftpData.createdAt) }}
                             </el-form-item>

@@ -223,7 +223,11 @@ func (onedrive *oneDriveClient) ListObjects(prefix string) ([]interface{}, error
 }
 
 func (onedrive *oneDriveClient) loadIDByPath(path string) (string, error) {
-	req, err := onedrive.client.NewRequest("GET", fmt.Sprintf("me/drive/root:%s", path), nil)
+	pathItem := "root:" + path
+	if path == "/" {
+		pathItem = "root"
+	}
+	req, err := onedrive.client.NewRequest("GET", fmt.Sprintf("me/drive/%s", pathItem), nil)
 	if err != nil {
 		return "", fmt.Errorf("new request for file id failed, err: %v", err)
 	}

@@ -189,11 +189,11 @@
                                 />
                             </el-form-item>
                             <el-form-item
-                                :label="$t('setting.username')"
+                                :label="$t('commons.login.username')"
                                 prop="accessKey"
                                 :rules="[Rules.requiredInput]"
                             >
-                                <el-input v-model="dialogData.rowData!.accessKey" />
+                                <el-input v-model.trim="dialogData.rowData!.accessKey" />
                             </el-form-item>
                             <el-form-item
                                 :label="$t('commons.login.password')"
@@ -204,15 +204,15 @@
                                     type="password"
                                     clearable
                                     show-password
-                                    v-model="dialogData.rowData!.credential"
+                                    v-model.trim="dialogData.rowData!.credential"
                                 />
                             </el-form-item>
                             <el-form-item :label="$t('setting.path')" prop="bucket" :rules="[Rules.requiredInput]">
-                                <el-input v-model="dialogData.rowData!.bucket" />
+                                <el-input v-model.trim="dialogData.rowData!.bucket" />
                             </el-form-item>
                         </div>
                         <el-form-item
-                            v-if="dialogData.rowData!.type !== 'LOCAL'"
+                            v-if="dialogData.rowData!.type !== 'LOCAL' && dialogData.rowData!.type !== 'SFTP'"
                             :label="$t('setting.backupDir')"
                             prop="backupPath"
                         >
