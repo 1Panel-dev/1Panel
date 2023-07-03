@@ -24,7 +24,6 @@ func (s *HostRouter) InitHostRouter(Router *gin.RouterGroup) {
 		hostRouter.POST("/tree", baseApi.HostTree)
 		hostRouter.POST("/test/byinfo", baseApi.TestByInfo)
 		hostRouter.POST("/test/byid/:id", baseApi.TestByID)
-		hostRouter.GET(":id", baseApi.GetHostInfo)
 
 		hostRouter.GET("/firewall/base", baseApi.LoadFirewallBaseInfo)
 		hostRouter.POST("/firewall/search", baseApi.SearchFirewallRule)

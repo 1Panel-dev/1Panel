@@ -11,9 +11,6 @@ export const searchHosts = (params: Host.SearchWithPage) => {
 export const getHostTree = (params: Host.ReqSearch) => {
     return http.post<Array<Host.HostTree>>(`/hosts/tree`, params);
 };
-export const getHostInfo = (id: number) => {
-    return http.get<Host.Host>(`/hosts/` + id);
-};
 export const addHost = (params: Host.HostOperate) => {
     let reqest = deepCopy(params) as Host.HostOperate;
     if (reqest.password) {

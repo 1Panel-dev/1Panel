@@ -426,3 +426,35 @@ var UpdateAppDetail = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var EncryptHostPassword = &gormigrate.Migration{
+	ID: "20230703-encrypt-host-password",
+	Migrate: func(tx *gorm.DB) error {
+		var hosts []model.Host
+		if err := tx.Find(&hosts).Error; err != nil {
+			return err
+		}
+
+		for _, host := range hosts {
+			if len(host.Password) != 0 {
+				pass, err := encrypt.StringEncrypt(host.Password)
+				if err != nil {
+					return err
+				}
+				if err := tx.Model(&model.Host{}).Where("id = ?", host.ID).Update("password", pass).Error; err != nil {
+					return err
+				}
+			}
+			if len(host.PrivateKey) != 0 {
+				key, err := encrypt.StringEncrypt(host.PrivateKey)
+				if err != nil {
+					return err
+				}
+				if err := tx.Model(&model.Host{}).Update("private_key", key).Error; err != nil {
+					return err
+				}
+			}
+		}
+		return nil
+	},
+}
