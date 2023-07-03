@@ -7,6 +7,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/backend/utils/ssh"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
@@ -89,7 +90,20 @@ func (u *HostService) TestLocalConn(id uint) bool {
 	if err := copier.Copy(&connInfo, &host); err != nil {
 		return false
 	}
-	connInfo.PrivateKey = []byte(host.PrivateKey)
+	if len(host.Password) != 0 {
+		host.Password, err = encrypt.StringDecrypt(host.Password)
+		if err != nil {
+			return false
+		}
+		connInfo.Password = host.Password
+	}
+	if len(host.PrivateKey) != 0 {
+		host.PrivateKey, err = encrypt.StringDecrypt(host.PrivateKey)
+		if err != nil {
+			return false
+		}
+		connInfo.PrivateKey = []byte(host.PrivateKey)
+	}
 	if len(host.PassPhrase) != 0 {
 		connInfo.PassPhrase = []byte(host.PassPhrase)
 	}
@@ -106,6 +120,18 @@ func (u *HostService) GetHostInfo(id uint) (*model.Host, error) {
 	host, err := hostRepo.Get(commonRepo.WithByID(id))
 	if err != nil {
 		return nil, constant.ErrRecordNotFound
+	}
+	if len(host.Password) != 0 {
+		host.Password, err = encrypt.StringDecrypt(host.Password)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if len(host.PrivateKey) != 0 {
+		host.PrivateKey, err = encrypt.StringDecrypt(host.PrivateKey)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return &host, err
 }

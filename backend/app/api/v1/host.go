@@ -7,7 +7,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
-	"github.com/1Panel-dev/1Panel/backend/utils/copier"
+	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -36,7 +36,12 @@ func (b *BaseApi) CreateHost(c *gin.Context) {
 			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 			return
 		}
-		req.Password = string(password)
+		passwordItem, err := encrypt.StringEncrypt(string(password))
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			return
+		}
+		req.Password = passwordItem
 	}
 	if req.AuthMode == "key" && len(req.PrivateKey) != 0 {
 		privateKey, err := base64.StdEncoding.DecodeString(req.PrivateKey)
@@ -44,7 +49,12 @@ func (b *BaseApi) CreateHost(c *gin.Context) {
 			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 			return
 		}
-		req.PrivateKey = string(privateKey)
+		keyItem, err := encrypt.StringEncrypt(string(privateKey))
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			return
+		}
+		req.Password = keyItem
 	}
 
 	host, err := hostService.Create(req)
@@ -149,33 +159,6 @@ func (b *BaseApi) SearchHost(c *gin.Context) {
 }
 
 // @Tags Host
-// @Summary Load host info
-// @Description 加载主机信息
-// @Accept json
-// @Param id path integer true "request"
-// @Success 200 {object} dto.HostInfo
-// @Security ApiKeyAuth
-// @Router /hosts/:id [get]
-func (b *BaseApi) GetHostInfo(c *gin.Context) {
-	id, err := helper.GetParamID(c)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	host, err := hostService.GetHostInfo(id)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	var hostDto dto.HostInfo
-	if err := copier.Copy(&hostDto, host); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	helper.SuccessWithData(c, hostDto)
-}
-
-// @Tags Host
 // @Summary Delete host
 // @Description 删除主机
 // @Accept json
@@ -227,7 +210,12 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 			return
 		}
-		req.Password = string(password)
+		passwordItem, err := encrypt.StringEncrypt(string(password))
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			return
+		}
+		req.Password = passwordItem
 	}
 	if req.AuthMode == "key" && len(req.PrivateKey) != 0 {
 		privateKey, err := base64.StdEncoding.DecodeString(req.PrivateKey)
@@ -235,7 +223,12 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 			return
 		}
-		req.PrivateKey = string(privateKey)
+		keyItem, err := encrypt.StringEncrypt(string(privateKey))
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			return
+		}
+		req.PrivateKey = keyItem
 	}
 
 	upMap := make(map[string]interface{})

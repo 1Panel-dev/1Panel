@@ -8,6 +8,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
 
@@ -15,6 +16,9 @@ import (
 )
 
 func StringEncrypt(text string) (string, error) {
+	if len(text) == 0 {
+		return "", errors.New("it is not possible to encrypt an empty string.")
+	}
 	key := global.CONF.System.EncryptKey
 	pass := []byte(text)
 	xpass, err := aesEncryptWithSalt([]byte(key), pass)
@@ -26,6 +30,9 @@ func StringEncrypt(text string) (string, error) {
 }
 
 func StringDecrypt(text string) (string, error) {
+	if len(text) == 0 {
+		return "", errors.New("it is not possible to decrypt an empty string.")
+	}
 	key := global.CONF.System.EncryptKey
 	bytesPass, err := base64.StdEncoding.DecodeString(text)
 	if err != nil {
