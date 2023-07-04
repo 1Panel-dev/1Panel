@@ -15,12 +15,27 @@
                 />
                 <el-form @submit.prevent ref="formRef" v-loading="loading" :model="form" label-position="top">
                     <el-form-item :label="$t('container.oldImage')" prop="oldImage">
-                        <el-tag>{{ form.imageName }}:{{ form.oldTag }}</el-tag>
+                        <el-tooltip placement="top-start" :content="form.imageName" v-if="form.imageName.length > 50">
+                            <el-tag>{{ form.imageName.substring(0, 50) }}...:{{ form.oldTag }}</el-tag>
+                        </el-tooltip>
+                        <el-tag v-else>{{ form.imageName }}:{{ form.oldTag }}</el-tag>
                     </el-form-item>
-                    <el-form-item :label="$t('container.targetImage')" prop="newTag" :rules="Rules.requiredInput">
-                        <el-input v-model="form.newTag">
-                            <template #prefix>{{ form.imageName }}:</template>
-                        </el-input>
+                    <el-form-item prop="newTag" :rules="Rules.requiredInput">
+                        <template #label>
+                            <el-tooltip
+                                placement="top-start"
+                                :content="form.imageName"
+                                v-if="form.imageName.length > 40"
+                            >
+                                <span>
+                                    {{ $t('container.targetImage') + ' (' + form.imageName.substring(0, 40) + '...)' }}
+                                </span>
+                            </el-tooltip>
+                            <span v-else>
+                                {{ $t('container.targetImage') + ' (' + form.imageName + ')' }}
+                            </span>
+                        </template>
+                        <el-input v-model="form.newTag" :placeholder="$t('container.targetImageHelper')" />
                         <span class="input-help">{{ $t('container.upgradeHelper') }}</span>
                     </el-form-item>
                 </el-form>
@@ -72,7 +87,7 @@ const acceptParams = (props: DialogProps): void => {
     form.name = props.container;
     form.imageName = props.image.indexOf(':') !== -1 ? props.image.split(':')[0] : props.image;
     form.oldTag = props.image.indexOf(':') !== -1 ? props.image.split(':')[1] : 'latest';
-    form.newTag = '';
+    form.newTag = form.oldTag;
     form.fromApp = props.fromApp;
     drawerVisiable.value = true;
 };

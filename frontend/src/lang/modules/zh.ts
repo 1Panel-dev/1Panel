@@ -484,6 +484,7 @@ const message = {
         upgradeWarning2: '升级操作需要重建容器，任何未持久化的数据将会丢失，是否继续？',
         oldImage: '当前镜像',
         targetImage: '目标镜像',
+        targetImageHelper: '请输入目标镜像版本',
         appHelper: '该容器来源于应用商店，升级可能导致该服务不可用，是否继续？',
 
         server: '服务器',

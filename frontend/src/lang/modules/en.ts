@@ -495,6 +495,7 @@ const message = {
             'The upgrade operation requires rebuilding the container, and any non-persistent data will be lost. Do you want to continue?',
         oldImage: 'Current image',
         targetImage: 'Target image',
+        targetImageHelper: 'Please enter the target image version',
         appHelper:
             'This container is sourced from the application store. Upgrading it may cause the service to be unavailable. Do you want to continue?',
 
