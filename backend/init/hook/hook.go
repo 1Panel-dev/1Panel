@@ -1,6 +1,8 @@
 package hook
 
 import (
+	"encoding/base64"
+
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
@@ -25,6 +27,19 @@ func Init() {
 		global.LOG.Errorf("load service ssl from setting failed, err: %v", err)
 	}
 	global.CONF.System.SSL = sslSetting.Value
+
+	OneDriveID, err := settingRepo.Get(settingRepo.WithByKey("OneDriveID"))
+	if err != nil {
+		global.LOG.Errorf("load onedrive info from setting failed, err: %v", err)
+	}
+	idItem, _ := base64.StdEncoding.DecodeString(OneDriveID.Value)
+	global.CONF.System.OneDriveID = string(idItem)
+	OneDriveSc, err := settingRepo.Get(settingRepo.WithByKey("OneDriveSc"))
+	if err != nil {
+		global.LOG.Errorf("load onedrive info from setting failed, err: %v", err)
+	}
+	scItem, _ := base64.StdEncoding.DecodeString(OneDriveSc.Value)
+	global.CONF.System.OneDriveSc = string(scItem)
 
 	if _, err := settingRepo.Get(settingRepo.WithByKey("SystemStatus")); err != nil {
 		_ = settingRepo.Create("SystemStatus", "Free")

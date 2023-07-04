@@ -254,7 +254,7 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { Backup } from '@/api/interface/backup';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { addBackup, editBackup, listBucket } from '@/api/modules/setting';
+import { addBackup, editBackup, getOneDriveInfo, listBucket } from '@/api/modules/setting';
 import { deepCopy } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';
 
@@ -309,10 +309,9 @@ const handleClose = () => {
     emit('search');
     drawerVisiable.value = false;
 };
-
-const jumpAzure = () => {
-    let commonUrl =
-        'response_type=code&client_id=5446cfe3-4c79-47a0-ae25-fc645478e2d9&redirect_uri=http://localhost/login/authorized&scope=offline_access+Files.ReadWrite.All+User.Read';
+const jumpAzure = async () => {
+    const res = await getOneDriveInfo();
+    let commonUrl = `response_type=code&client_id=${res.data}&redirect_uri=http://localhost/login/authorized&scope=offline_access+Files.ReadWrite.All+User.Read`;
     if (!dialogData.value.rowData!.varsJson['isCN']) {
         window.open('https://login.microsoftonline.com/common/oauth2/v2.0/authorize?' + commonUrl, '_blank');
     } else {
