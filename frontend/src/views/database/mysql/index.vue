@@ -155,7 +155,7 @@ import Setting from '@/views/database/mysql/setting/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
 import Backups from '@/components/backup/index.vue';
 import UploadDialog from '@/components/upload/index.vue';
-import { dateFormat } from '@/utils/util';
+import { JumpDashboard, dateFormat } from '@/utils/util';
 import { reactive, ref } from 'vue';
 import { deleteCheckMysqlDB, loadRemoteAccess, searchMysqlDBs, updateMysqlDescription } from '@/api/modules/database';
 import i18n from '@/lang';
@@ -165,7 +165,6 @@ import { GetAppPort } from '@/api/modules/app';
 import router from '@/routers';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import useClipboard from 'vue-clipboard3';
-import { getSettingInfo } from '@/api/modules/setting';
 const { toClipboard } = useClipboard();
 
 const loading = ref(false);
@@ -265,13 +264,9 @@ const goDashboard = async () => {
         phpVisiable.value = true;
         return;
     }
-    const res = await getSettingInfo();
-    if (!res.data.systemIP) {
-        MsgError(i18n.global.t('setting.systemIPWarning'));
-        return;
-    }
-    window.open(`http://${res.data.systemIP}:${phpadminPort.value}`, '_blank');
+    JumpDashboard(phpadminPort.value);
 };
+
 const getAppDetail = (key: string) => {
     router.push({ name: 'AppDetail', params: { appKey: key } });
 };

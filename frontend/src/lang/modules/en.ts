@@ -114,6 +114,7 @@ const message = {
             fileNameErr:
                 'You can upload only files whose name contains 1 to 256 characters, including English, Chinese, digits, or periods (.-_)',
             confirmNoNull: 'Make sure the value {0} is not empty',
+            errPort: 'Incorrect port information, please confirm!',
         },
         login: {
             username: 'UserName',
