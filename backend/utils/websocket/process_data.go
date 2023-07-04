@@ -275,15 +275,19 @@ func getSSHSessions(config SSHSessionConfig) (res []byte, err error) {
 					if config.LoginIP != "" && !strings.Contains(user.Host, config.LoginIP) {
 						continue
 					}
-					session := sshSession{
-						Username: user.User,
-						Host:     user.Host,
-						Terminal: user.Terminal,
-						PID:      proc.Pid,
+					if terminal, err := proc.Cmdline(); err == nil {
+						if strings.Contains(terminal, user.Terminal) {
+							session := sshSession{
+								Username: user.User,
+								Host:     user.Host,
+								Terminal: user.Terminal,
+								PID:      proc.Pid,
+							}
+							t := time.Unix(int64(user.Started), 0)
+							session.LoginTime = t.Format("2006-1-2 15:04:05")
+							result = append(result, session)
+						}
 					}
-					t := time.Unix(int64(user.Started), 0)
-					session.LoginTime = t.Format("2006-1-2 15:04:05")
-					result = append(result, session)
 				}
 			}
 		}

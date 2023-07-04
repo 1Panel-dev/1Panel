@@ -789,6 +789,9 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool) ([]respons
 			versions = append(versions, detail.Version)
 		}
 		versions = common.GetSortedVersions(versions)
+		if len(versions) == 0 {
+			continue
+		}
 		lastVersion := versions[0]
 		if common.IsCrossVersion(installed.Version, lastVersion) {
 			installDTO.CanUpdate = app.CrossVersionUpdate
