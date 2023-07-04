@@ -91,7 +91,7 @@
                         </el-checkbox>
                     </el-form-item>
                     <el-form-item :label="$t('container.cpuShare')" prop="cpuShares">
-                        <el-input style="width: 40%" v-model.number="dialogData.rowData!.cpuShares" />
+                        <el-input class="mini-form-item" v-model.number="dialogData.rowData!.cpuShares" />
                         <span class="input-help">{{ $t('container.cpuShareHelper') }}</span>
                     </el-form-item>
                     <el-form-item
@@ -99,7 +99,7 @@
                         prop="nanoCPUs"
                         :rules="checkNumberRange(0, limits.cpu)"
                     >
-                        <el-input style="width: 40%" v-model.number="dialogData.rowData!.nanoCPUs">
+                        <el-input class="mini-form-item" v-model.number="dialogData.rowData!.nanoCPUs">
                             <template #append>
                                 <div style="width: 35px">{{ $t('commons.units.core') }}</div>
                             </template>
@@ -113,7 +113,7 @@
                         prop="memoryItem"
                         :rules="checkNumberRange(0, limits.memory)"
                     >
-                        <el-input style="width: 40%" v-model.number="dialogData.rowData!.memoryItem">
+                        <el-input class="mini-form-item" v-model.number="dialogData.rowData!.memoryItem">
                             <template #append><div style="width: 35px">MB</div></template>
                         </el-input>
                         <span class="input-help">{{ $t('container.limitHelper', [limits.memory]) }}MB</span>
