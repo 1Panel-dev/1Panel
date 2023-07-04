@@ -7881,6 +7881,21 @@ paths:
         formatEN: delete backup account [types]
         formatZH: 删除备份账号 [types]
         paramKeys: []
+  /settings/backup/onedrive:
+    get:
+      consumes:
+      - application/json
+      description: 获取 OneDrive 信息
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Load OneDrive info
+      tags:
+      - Backup Account
   /settings/backup/record/del:
     post:
       consumes:

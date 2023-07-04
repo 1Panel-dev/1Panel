@@ -21,4 +21,6 @@ type System struct {
 	IsDemo         bool   `mapstructure:"is_demo"`
 	AppRepo        string `mapstructure:"app_repo"`
 	ChangeUserInfo bool   `mapstructure:"change_user_info"`
+	OneDriveID     string `mapstructure:"one_drive_id"`
+	OneDriveSc     string `mapstructure:"one_drive_sc"`
 }

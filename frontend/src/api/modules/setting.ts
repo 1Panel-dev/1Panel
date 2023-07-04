@@ -85,6 +85,9 @@ export const searchBackupRecords = (params: Backup.SearchBackupRecord) => {
 export const getBackupList = () => {
     return http.get<Array<Backup.BackupInfo>>(`/settings/backup/search`);
 };
+export const getOneDriveInfo = () => {
+    return http.get<string>(`/settings/backup/onedrive`);
+};
 export const getFilesFromBackup = (type: string) => {
     return http.post<Array<any>>(`/settings/backup/search/files`, { type: type });
 };

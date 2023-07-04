@@ -7085,6 +7085,31 @@ var doc = `{
                 }
             }
         },
+        "/settings/backup/onedrive": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取 OneDrive 信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Backup Account"
+                ],
+                "summary": "Load OneDrive info",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/settings/backup/record/del": {
             "post": {
                 "security": [

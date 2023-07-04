@@ -240,8 +240,8 @@ func (onedrive *oneDriveClient) loadIDByPath(path string) (string, error) {
 
 func refreshToken(oldToken string) (string, error) {
 	data := url.Values{}
-	data.Set("client_id", constant.OneDriveClientID)
-	data.Set("client_secret", constant.OneDriveClientSecret)
+	data.Set("client_id", global.CONF.System.OneDriveID)
+	data.Set("client_secret", global.CONF.System.OneDriveSc)
 	data.Set("grant_type", "refresh_token")
 	data.Set("refresh_token", oldToken)
 	data.Set("redirect_uri", constant.OneDriveRedirectURI)

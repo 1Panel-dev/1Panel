@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -27,6 +28,7 @@ type BackupService struct{}
 type IBackupService interface {
 	List() ([]dto.BackupInfo, error)
 	SearchRecordsWithPage(search dto.RecordSearch) (int64, []dto.BackupRecords, error)
+	LoadOneDriveInfo() (string, error)
 	DownloadRecord(info dto.DownloadRecord) (string, error)
 	Create(backupDto dto.BackupOperate) error
 	GetBuckets(backupDto dto.ForBuckets) ([]interface{}, error)
@@ -86,6 +88,18 @@ func (u *BackupService) SearchRecordsWithPage(search dto.RecordSearch) (int64, [
 		dtobas = append(dtobas, item)
 	}
 	return total, dtobas, err
+}
+
+func (u *BackupService) LoadOneDriveInfo() (string, error) {
+	OneDriveID, err := settingRepo.Get(settingRepo.WithByKey("OneDriveID"))
+	if err != nil {
+		return "", err
+	}
+	idItem, err := base64.StdEncoding.DecodeString(OneDriveID.Value)
+	if err != nil {
+		return "", err
+	}
+	return string(idItem), err
 }
 
 func (u *BackupService) DownloadRecord(info dto.DownloadRecord) (string, error) {
@@ -313,8 +327,8 @@ func (u *BackupService) loadAccessToken(backup *model.BackupAccount) error {
 	}
 
 	data := url.Values{}
-	data.Set("client_id", constant.OneDriveClientID)
-	data.Set("client_secret", constant.OneDriveClientSecret)
+	data.Set("client_id", global.CONF.System.OneDriveID)
+	data.Set("client_secret", global.CONF.System.OneDriveSc)
 	data.Set("grant_type", "authorization_code")
 	data.Set("code", varMap["code"].(string))
 	data.Set("redirect_uri", constant.OneDriveRedirectURI)
