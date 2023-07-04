@@ -33,7 +33,7 @@
                     </el-form-item>
 
                     <el-form-item :label="$t('cronjob.cronSpec')" prop="spec">
-                        <el-select style="width: 20%" v-model="dialogData.rowData!.specType">
+                        <el-select class="specTypeClass" v-model="dialogData.rowData!.specType">
                             <el-option
                                 v-for="item in specOptions"
                                 :key="item.label"
@@ -539,8 +539,23 @@ defineExpose({
 </script>
 <style scoped lang="scss">
 .specClass {
-    width: 20%;
+    width: 20% !important;
     margin-left: 20px;
+}
+@media only screen and (max-width: 1000px) {
+    .specClass {
+        width: 100% !important;
+        margin-top: 20px;
+        margin-left: 0;
+    }
+}
+.specTypeClass {
+    width: 20% !important;
+}
+@media only screen and (max-width: 1000px) {
+    .specTypeClass {
+        width: 100% !important;
+    }
 }
 .selectClass {
     width: 100%;
