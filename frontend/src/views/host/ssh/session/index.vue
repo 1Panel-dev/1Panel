@@ -26,7 +26,7 @@
             <template #main>
                 <ComplexTable :data="data" ref="tableRef" v-loading="loading">
                     <el-table-column :label="$t('commons.table.user')" fix prop="username"></el-table-column>
-                    <el-table-column :label="'PTS'" fix prop="terminal"></el-table-column>
+                    <el-table-column :label="'TTY'" fix prop="terminal"></el-table-column>
                     <el-table-column :label="$t('ssh.loginIP')" fix prop="host"></el-table-column>
                     <el-table-column
                         :label="$t('ssh.loginTime')"
