@@ -187,8 +187,15 @@
                                             </el-button>
                                         </div>
                                         <div class="d-description">
-                                            <el-tag>{{ $t('app.version') }}：{{ installed.version }}</el-tag>
-                                            <el-tag v-if="installed.httpPort > 0">
+                                            <el-tag class="middle-center">
+                                                {{ $t('app.version') }}：{{ installed.version }}
+                                            </el-tag>
+                                            <el-tag
+                                                class="middle-center"
+                                                v-if="installed.httpPort > 0"
+                                                @click="JumpDashboard(installed.httpPort)"
+                                            >
+                                                <el-icon class="middle-center"><Position /></el-icon>
                                                 {{ $t('app.busPort') }}：{{ installed.httpPort }}
                                             </el-tag>
                                             <div class="description">
@@ -257,6 +264,7 @@ import { getAge } from '@/utils/util';
 import { useRouter } from 'vue-router';
 import { MsgSuccess } from '@/utils/message';
 import { toFolder } from '@/global/business';
+import { JumpDashboard } from '@/utils/util';
 
 const data = ref<any>();
 const loading = ref(false);

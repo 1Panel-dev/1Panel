@@ -115,6 +115,7 @@ const message = {
             fileExist: '当前文件夹已存在该文件，不支持重复上传！',
             fileNameErr: '仅支持上传名称包含英文、中文、数字或者 .-_ ,长度 1-256 位的文件',
             confirmNoNull: '请确认 {0} 值不为空',
+            errPort: '错误的端口信息，请确认！',
         },
         login: {
             username: '用户名',

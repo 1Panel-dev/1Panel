@@ -1,4 +1,6 @@
+import { getSettingInfo } from '@/api/modules/setting';
 import i18n from '@/lang';
+import { MsgError } from './message';
 
 export function deepCopy<T>(obj: any): T {
     let newObj: any;
@@ -255,4 +257,17 @@ export function toLowerCase(str: string) {
 export function downloadFile(filePath: string) {
     let url = `${import.meta.env.VITE_API_URL as string}/files/download?`;
     window.open(url + 'path=' + filePath, '_blank');
+}
+
+export async function JumpDashboard(port: any) {
+    if (Number(port) === 0) {
+        MsgError(i18n.global.t('setting.errPort'));
+        return;
+    }
+    const res = await getSettingInfo();
+    if (!res.data.systemIP) {
+        MsgError(i18n.global.t('setting.systemIPWarning'));
+        return;
+    }
+    window.open(`http://${res.data.systemIP}:${port}`, '_blank');
 }

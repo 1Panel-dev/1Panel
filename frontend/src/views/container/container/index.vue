@@ -164,9 +164,8 @@ import { Container } from '@/api/interface/container';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import router from '@/routers';
-import { MsgError, MsgSuccess } from '@/utils/message';
-import { computeSize } from '@/utils/util';
-import { getSettingInfo } from '@/api/modules/setting';
+import { MsgSuccess } from '@/utils/message';
+import { JumpDashboard, computeSize } from '@/utils/util';
 
 const loading = ref();
 const data = ref();
@@ -201,12 +200,7 @@ const goDashboard = async (port: any) => {
         return;
     }
     let portEx = port.split(':')[0];
-    const res = await getSettingInfo();
-    if (!res.data.systemIP) {
-        MsgError(i18n.global.t('setting.systemIPWarning'));
-        return;
-    }
-    window.open(`http://${res.data.systemIP}:${portEx}`, '_blank');
+    JumpDashboard(portEx);
 };
 
 const goSetting = async () => {
