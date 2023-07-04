@@ -160,6 +160,7 @@ export namespace Website {
         provider: string;
         websites?: Website.Website[];
         autoRenew: boolean;
+        acmeAccountId?: number;
     }
 
     export interface SSLCreate {
@@ -207,6 +208,7 @@ export namespace Website {
 
     export interface SSLReq {
         name?: string;
+        acmeAccountID?: number;
     }
 
     export interface HTTPSReq {

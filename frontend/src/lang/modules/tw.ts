@@ -1339,6 +1339,8 @@ const message = {
         disableLeech: '禁用防盜鏈',
         ipv6: '監聽 IPV6 端口',
         leechReturnError: '請填寫 HTTP 狀態碼',
+        selectAcme: '選擇 Acme 賬號',
+        localSSL: '已導入',
     },
     php: {
         short_open_tag: '短標簽支持',

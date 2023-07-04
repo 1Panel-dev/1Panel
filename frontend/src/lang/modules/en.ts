@@ -1412,6 +1412,8 @@ const message = {
         disableLeech: 'Disable anti-leech',
         ipv6: 'Listen IPV6',
         leechReturnError: 'Please fill in the HTTP status code',
+        selectAcme: 'Select Acme account',
+        localSSL: 'Imported',
     },
     php: {
         short_open_tag: 'Short tag support',

@@ -1345,6 +1345,8 @@ const message = {
         disableLeech: '禁用防盗链',
         ipv6: '监听 IPV6 端口',
         leechReturnError: '请填写 HTTP 状态码',
+        selectAcme: '选择 acme 账号',
+        localSSL: '已导入',
     },
     php: {
         short_open_tag: '短标签支持',

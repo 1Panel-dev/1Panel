@@ -35,7 +35,7 @@ func (b *BaseApi) PageWebsiteSSL(c *gin.Context) {
 			Items: accounts,
 		})
 	} else {
-		list, err := websiteSSLService.Search()
+		list, err := websiteSSLService.Search(req)
 		if err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 			return
