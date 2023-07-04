@@ -193,7 +193,7 @@
                                             <el-tag
                                                 class="middle-center"
                                                 v-if="installed.httpPort > 0"
-                                                @click="JumpDashboard(installed.httpPort)"
+                                                @click="goDashboard(installed.httpPort)"
                                             >
                                                 <el-icon class="middle-center"><Position /></el-icon>
                                                 {{ $t('app.busPort') }}：{{ installed.httpPort }}
@@ -239,6 +239,8 @@
     <AppDelete ref="deleteRef" @close="search" />
     <AppParams ref="appParamRef" />
     <AppUpgrade ref="upgradeRef" @close="search" />
+
+    <PortJumpDialog ref="dialogPortJumpRef" />
 </template>
 
 <script lang="ts" setup>
@@ -254,6 +256,7 @@ import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
 import Backups from '@/components/backup/index.vue';
 import Uploads from '@/components/upload/index.vue';
+import PortJumpDialog from '@/components/port-jump/index.vue';
 import AppResources from './check/index.vue';
 import AppDelete from './delete/index.vue';
 import AppParams from './detail/index.vue';
@@ -264,7 +267,6 @@ import { getAge } from '@/utils/util';
 import { useRouter } from 'vue-router';
 import { MsgSuccess } from '@/utils/message';
 import { toFolder } from '@/global/business';
-import { JumpDashboard } from '@/utils/util';
 
 const data = ref<any>();
 const loading = ref(false);
@@ -287,6 +289,7 @@ const checkRef = ref();
 const deleteRef = ref();
 const appParamRef = ref();
 const upgradeRef = ref();
+const dialogPortJumpRef = ref();
 const tags = ref<App.Tag[]>([]);
 const activeTag = ref('all');
 const searchReq = reactive({
@@ -336,6 +339,10 @@ const search = () => {
     GetAppTags().then((res) => {
         tags.value = res.data;
     });
+};
+
+const goDashboard = async (port: any) => {
+    dialogPortJumpRef.value.acceptParams({ port: port });
 };
 
 const openOperate = (row: any, op: string) => {

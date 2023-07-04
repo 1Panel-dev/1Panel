@@ -1,7 +1,7 @@
 <template>
     <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
-            <DrawerHeader :header="$t('container.createContainer')" :back="handleClose" />
+            <DrawerHeader :header="title" :back="handleClose" />
         </template>
         <el-form
             ref="formRef"
@@ -242,7 +242,7 @@ const dialogData = ref<DialogProps>({
 });
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
-    title.value = i18n.global.t('commons.button.' + dialogData.value.title);
+    title.value = i18n.global.t('container.' + dialogData.value.title);
     if (params.title === 'edit') {
         dialogData.value.rowData.memoryItem = Number((dialogData.value.rowData.memory / 1024 / 1024).toFixed(2));
         let itemCmd = '';
@@ -277,7 +277,7 @@ const handleClose = () => {
 };
 
 const rules = reactive({
-    cpuShares: [Rules.number, checkNumberRange(2, 262144)],
+    cpuShares: [Rules.number, checkNumberRange(0, 262144)],
     name: [Rules.requiredInput, Rules.name],
     image: [Rules.requiredSelect],
     nanoCPUs: [Rules.number],

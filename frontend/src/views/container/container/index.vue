@@ -10,7 +10,7 @@
                 <el-row>
                     <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
                         <el-button type="primary" @click="onOpenDialog('create')">
-                            {{ $t('container.createContainer') }}
+                            {{ $t('container.create') }}
                         </el-button>
                         <el-button type="primary" plain @click="onClean()">
                             {{ $t('container.containerPrune') }}
@@ -80,18 +80,19 @@
                             <Status :key="row.state" :status="row.state"></Status>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.source')" show-overflow-tooltip min-width="125" fix>
+                    <el-table-column :label="$t('container.source')" show-overflow-tooltip min-width="75" fix>
                         <template #default="{ row }">
-                            CPU: {{ row.cpuPercent.toFixed(2) }}% {{ $t('monitor.memory') }}:
-                            {{ row.memoryPercent.toFixed(2) }}%
+                            <div>CPU: {{ row.cpuPercent.toFixed(2) }}%</div>
+                            <div>{{ $t('monitor.memory') }}: {{ row.memoryPercent.toFixed(2) }}%</div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.port')" min-width="80" prop="ports" fix>
+                    <el-table-column :label="$t('commons.table.port')" min-width="120" prop="ports" fix>
                         <template #default="{ row }">
                             <div v-if="row.ports">
                                 <div v-for="(item, index) in row.ports" :key="index">
                                     <div v-if="row.expand || (!row.expand && index < 3)">
                                         <el-button
+                                            v-if="item.indexOf('->') !== -1"
                                             @click="goDashboard(item)"
                                             class="tagMargin"
                                             icon="Position"
@@ -99,6 +100,9 @@
                                             plain
                                             size="small"
                                         >
+                                            {{ item }}
+                                        </el-button>
+                                        <el-button v-else class="tagMargin" type="primary" plain size="small">
                                             {{ item }}
                                         </el-button>
                                     </div>
@@ -137,6 +141,8 @@
         <UpgraeDialog @search="search" ref="dialogUpgradeRef" />
         <MonitorDialog ref="dialogMonitorRef" />
         <TerminalDialog ref="dialogTerminalRef" />
+
+        <PortJumpDialog ref="dialogPortJumpRef" />
     </div>
 </template>
 
@@ -150,6 +156,7 @@ import MonitorDialog from '@/views/container/container/monitor/index.vue';
 import ContainerLogDialog from '@/views/container/container/log/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
+import PortJumpDialog from '@/components/port-jump/index.vue';
 import Status from '@/components/status/index.vue';
 import { reactive, onMounted, ref } from 'vue';
 import {
@@ -164,8 +171,8 @@ import { Container } from '@/api/interface/container';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import router from '@/routers';
-import { MsgSuccess } from '@/utils/message';
-import { JumpDashboard, computeSize } from '@/utils/util';
+import { MsgSuccess, MsgWarning } from '@/utils/message';
+import { computeSize } from '@/utils/util';
 
 const loading = ref();
 const data = ref();
@@ -177,6 +184,7 @@ const paginationConfig = reactive({
 });
 const searchName = ref();
 const dialogUpgradeRef = ref();
+const dialogPortJumpRef = ref();
 
 const dockerStatus = ref('Running');
 const loadStatus = async () => {
@@ -196,11 +204,16 @@ const loadStatus = async () => {
 };
 
 const goDashboard = async (port: any) => {
-    if (!port || port.indexOf(':') === -1) {
+    if (port.indexOf('127.0.0.1') !== -1) {
+        MsgWarning(i18n.global.t('container.unExposedPort'));
         return;
     }
-    let portEx = port.split(':')[0];
-    JumpDashboard(portEx);
+    if (!port || port.indexOf(':') === -1 || port.indexOf('->') === -1) {
+        MsgWarning(i18n.global.t('commons.msg.errPort'));
+        return;
+    }
+    let portEx = port.match(/:(\d+)/)[1];
+    dialogPortJumpRef.value.acceptParams({ port: portEx });
 };
 
 const goSetting = async () => {

@@ -141,6 +141,8 @@
 
         <AppResources ref="checkRef"></AppResources>
         <DeleteDialog ref="deleteRef" @search="search" />
+
+        <PortJumpDialog ref="dialogPortJumpRef" />
     </div>
 </template>
 
@@ -155,7 +157,8 @@ import Setting from '@/views/database/mysql/setting/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
 import Backups from '@/components/backup/index.vue';
 import UploadDialog from '@/components/upload/index.vue';
-import { JumpDashboard, dateFormat } from '@/utils/util';
+import PortJumpDialog from '@/components/port-jump/index.vue';
+import { dateFormat } from '@/utils/util';
 import { reactive, ref } from 'vue';
 import { deleteCheckMysqlDB, loadRemoteAccess, searchMysqlDBs, updateMysqlDescription } from '@/api/modules/database';
 import i18n from '@/lang';
@@ -178,6 +181,8 @@ const deleteRef = ref();
 
 const phpadminPort = ref();
 const phpVisiable = ref(false);
+
+const dialogPortJumpRef = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -264,7 +269,7 @@ const goDashboard = async () => {
         phpVisiable.value = true;
         return;
     }
-    JumpDashboard(phpadminPort.value);
+    dialogPortJumpRef.value.acceptParams({ port: phpadminPort.value });
 };
 
 const getAppDetail = (key: string) => {

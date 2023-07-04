@@ -1,7 +1,7 @@
 <template>
     <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
-            <DrawerHeader :header="$t('firewall.portRule')" :back="handleClose" />
+            <DrawerHeader :header="title" :back="handleClose" />
         </template>
         <div v-loading="loading">
             <el-form ref="formRef" label-position="top" :model="dialogData.rowData" :rules="rules">
@@ -98,7 +98,7 @@ const acceptParams = (params: DialogProps): void => {
         }
         oldRule.value = deepCopy(params.rowData);
     }
-    title.value = i18n.global.t('commons.button.' + dialogData.value.title);
+    title.value = i18n.global.t('firewall.' + dialogData.value.title);
     drawerVisiable.value = true;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();

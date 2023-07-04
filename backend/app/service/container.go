@@ -144,10 +144,11 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 
 			var ports []string
 			for _, port := range item.Ports {
-				if port.IP == "::" || port.PublicPort == 0 {
-					continue
+				itemPortStr := fmt.Sprintf("%v/%s", port.PrivatePort, port.Type)
+				if port.PublicPort != 0 {
+					itemPortStr = fmt.Sprintf("%s:%v->%v/%s", port.IP, port.PublicPort, port.PrivatePort, port.Type)
 				}
-				ports = append(ports, fmt.Sprintf("%v:%v/%s", port.PublicPort, port.PrivatePort, port.Type))
+				ports = append(ports, itemPortStr)
 			}
 			cpu, mem := loadCpuAndMem(client, item.ID)
 			backDatas[i] = dto.ContainerInfo{
