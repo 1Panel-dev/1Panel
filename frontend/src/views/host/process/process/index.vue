@@ -55,13 +55,7 @@
                 </el-row>
             </template>
             <template #main>
-                <ComplexTable
-                    :data="data"
-                    @sort-change="changeSort"
-                    @filter-change="changeFilter"
-                    ref="tableRef"
-                    v-loading="data.length === 0"
-                >
+                <ComplexTable :data="data" @sort-change="changeSort" @filter-change="changeFilter" ref="tableRef">
                     <el-table-column :label="'PID'" fix prop="PID" max-width="60px" sortable></el-table-column>
                     <el-table-column
                         :label="$t('commons.table.name')"
@@ -225,6 +219,7 @@ const onMessage = (message: any) => {
     oldData.value = result;
     data.value = filterByStatus();
     sortTable();
+    loading.value = false;
 };
 
 const filterByStatus = () => {
@@ -258,6 +253,8 @@ const initProcess = () => {
     processSocket.onmessage = onMessage;
     processSocket.onerror = onerror;
     processSocket.onclose = onClose;
+    loading.value = true;
+    search();
     sendMsg();
 };
 

@@ -532,7 +532,7 @@ func (b *BaseApi) DownloadChunkFiles(c *gin.Context) {
 		}
 		defer file.Close()
 
-		file.Seek(startPos, 0)
+		_, _ = file.Seek(startPos, 0)
 		reader := io.LimitReader(file, endPos-startPos+1)
 		_, err = io.CopyBuffer(c.Writer, reader, buffer)
 		if err != nil {
