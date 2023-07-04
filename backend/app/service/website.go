@@ -1496,14 +1496,6 @@ func (w WebsiteService) UpdateAuthBasic(req request.NginxAuthUpdate) (err error)
 	if !fileOp.Stat(absoluteAuthPath) {
 		_ = fileOp.CreateFile(absoluteAuthPath)
 	}
-	defer func() {
-		if err != nil {
-			switch req.Operate {
-			case "create":
-
-			}
-		}
-	}()
 
 	params = append(params, dto.NginxParam{Name: "auth_basic", Params: []string{`"Authentication"`}})
 	params = append(params, dto.NginxParam{Name: "auth_basic_user_file", Params: []string{authPath}})
@@ -1511,7 +1503,9 @@ func (w WebsiteService) UpdateAuthBasic(req request.NginxAuthUpdate) (err error)
 	if err != nil {
 		return
 	}
-	authArray = strings.Split(string(authContent), "\n")
+	if len(authContent) > 0 {
+		authArray = strings.Split(string(authContent), "\n")
+	}
 	switch req.Operate {
 	case "disable":
 		return deleteNginxConfig(constant.NginxScopeServer, params, &website)
@@ -1582,6 +1576,9 @@ func (w WebsiteService) UpdateAuthBasic(req request.NginxAuthUpdate) (err error)
 	defer passFile.Close()
 	writer := bufio.NewWriter(passFile)
 	for _, line := range authArray {
+		if line == "" {
+			continue
+		}
 		_, err = writer.WriteString(line + "\n")
 		if err != nil {
 			return
@@ -1590,6 +1587,15 @@ func (w WebsiteService) UpdateAuthBasic(req request.NginxAuthUpdate) (err error)
 	err = writer.Flush()
 	if err != nil {
 		return
+	}
+	authContent, err = fileOp.GetContent(absoluteAuthPath)
+	if err != nil {
+		return
+	}
+	if len(authContent) == 0 {
+		if err = deleteNginxConfig(constant.NginxScopeServer, params, &website); err != nil {
+			return
+		}
 	}
 	return
 }
