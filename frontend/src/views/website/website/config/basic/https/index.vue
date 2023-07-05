@@ -34,7 +34,7 @@
                                 :placeholder="$t('website.selectAcme')"
                                 @change="listSSL"
                             >
-                                <el-option :key="0" :label="$t('website.localSSL')" :value="0"></el-option>
+                                <el-option :key="0" :label="$t('website.imported')" :value="0"></el-option>
                                 <el-option
                                     v-for="(acme, index) in acmeAccounts"
                                     :key="index"
@@ -59,12 +59,36 @@
                         </el-form-item>
                     </div>
                     <div v-if="form.type === 'manual'">
-                        <el-form-item :label="$t('website.privateKey')" prop="privateKey">
-                            <el-input v-model="form.privateKey" :rows="6" type="textarea" />
+                        <el-form-item :label="$t('website.importType')" prop="type">
+                            <el-select v-model="form.importType">
+                                <el-option :label="$t('website.pasteSSL')" :value="'paste'"></el-option>
+                                <el-option :label="$t('website.localSSL')" :value="'local'"></el-option>
+                            </el-select>
                         </el-form-item>
-                        <el-form-item :label="$t('website.certificate')" prop="certificate">
-                            <el-input v-model="form.certificate" :rows="6" type="textarea" />
-                        </el-form-item>
+                        <div v-if="form.importType === 'paste'">
+                            <el-form-item :label="$t('website.privateKey')" prop="privateKey">
+                                <el-input v-model="form.privateKey" :rows="6" type="textarea" />
+                            </el-form-item>
+                            <el-form-item :label="$t('website.certificate')" prop="certificate">
+                                <el-input v-model="form.certificate" :rows="6" type="textarea" />
+                            </el-form-item>
+                        </div>
+                        <div v-if="form.importType === 'local'">
+                            <el-form-item :label="$t('website.privateKeyPath')" prop="privateKeyPath">
+                                <el-input v-model="form.privateKeyPath">
+                                    <template #prepend>
+                                        <FileList @choose="getPrivateKeyPath" :dir="false"></FileList>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
+                            <el-form-item :label="$t('website.certificatePath')" prop="certificatePath">
+                                <el-input v-model="form.certificatePath">
+                                    <template #prepend>
+                                        <FileList @choose="getCertificatePath" :dir="false"></FileList>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
+                        </div>
                     </div>
                     <el-form-item :label="' '" v-if="websiteSSL && websiteSSL.id > 0">
                         <el-descriptions :column="5" border direction="vertical">
@@ -137,6 +161,7 @@ import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
 import { dateFormatSimple, getProvider } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';
+import FileList from '@/components/file-list/index.vue';
 
 const props = defineProps({
     id: {
@@ -154,8 +179,11 @@ const form = reactive({
     websiteId: id.value,
     websiteSSLId: undefined,
     type: 'existed',
+    importType: 'paste',
     privateKey: '',
     certificate: '',
+    privateKeyPath: '',
+    certificatePath: '',
     httpConfig: 'HTTPToHTTPS',
     algorithm:
         'EECDH+CHACHA20:EECDH+CHACHA20-draft:EECDH+AES128:RSA+AES128:EECDH+AES256:RSA+AES256:EECDH+3DES:RSA+3DES:!MD5',
@@ -169,6 +197,8 @@ const rules = ref({
     type: [Rules.requiredSelect],
     privateKey: [Rules.requiredInput],
     certificate: [Rules.requiredInput],
+    privateKeyPath: [Rules.requiredInput],
+    certificatePath: [Rules.requiredInput],
     websiteSSLId: [Rules.requiredSelect],
     httpConfig: [Rules.requiredSelect],
     SSLProtocol: [Rules.requiredSelect],
@@ -180,6 +210,13 @@ const sslReq = reactive({
     acmeAccountID: 0,
 });
 
+const getPrivateKeyPath = (path: string) => {
+    form.privateKeyPath = path;
+};
+
+const getCertificatePath = (path: string) => {
+    form.certificatePath = path;
+};
 const listSSL = () => {
     sslReq.acmeAccountID = form.acmeAccountID;
     ListSSL(sslReq).then((res) => {
@@ -217,6 +254,7 @@ const changeType = (type: string) => {
 const get = () => {
     GetHTTPSConfig(id.value).then((res) => {
         if (res.data) {
+            form.type = 'existed';
             resData.value = res.data;
             form.enable = res.data.enable;
             if (res.data.httpConfig != '') {
@@ -263,7 +301,7 @@ const changeEnable = (enable: boolean) => {
         listSSL();
     }
     if (resData.value.enable && !enable) {
-        ElMessageBox.confirm(i18n.global.t('website.disbaleHTTPSHelper'), i18n.global.t('website.disbaleHTTPS'), {
+        ElMessageBox.confirm(i18n.global.t('website.disableHTTPSHelper'), i18n.global.t('website.disableHTTPS'), {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),
             type: 'error',

@@ -58,7 +58,7 @@ type IWebsiteService interface {
 	UpdateNginxConfigByScope(req request.NginxConfigUpdate) error
 	GetWebsiteNginxConfig(websiteId uint, configType string) (response.FileInfo, error)
 	GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, error)
-	OpWebsiteHTTPS(ctx context.Context, req request.WebsiteHTTPSOp) (response.WebsiteHTTPS, error)
+	OpWebsiteHTTPS(ctx context.Context, req request.WebsiteHTTPSOp) (*response.WebsiteHTTPS, error)
 	PreInstallCheck(req request.WebsiteInstallCheckReq) ([]response.WebsitePreInstallCheck, error)
 	GetWafConfig(req request.WebsiteWafReq) (response.WebsiteWafConfig, error)
 	UpdateWafConfig(req request.WebsiteWafUpdate) error
@@ -619,10 +619,10 @@ func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, 
 	return res, nil
 }
 
-func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteHTTPSOp) (response.WebsiteHTTPS, error) {
+func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteHTTPSOp) (*response.WebsiteHTTPS, error) {
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
 	if err != nil {
-		return response.WebsiteHTTPS{}, err
+		return nil, err
 	}
 	var (
 		res        response.WebsiteHTTPS
@@ -635,7 +635,7 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 		website.Protocol = constant.ProtocolHTTP
 		website.WebsiteSSLID = 0
 		if err := deleteListenAndServerName(website, []string{"443", "[::]:443"}, []string{}); err != nil {
-			return response.WebsiteHTTPS{}, err
+			return nil, err
 		}
 		nginxParams := getNginxParamsFromStaticFile(dto.SSL, nil)
 		nginxParams = append(nginxParams,
@@ -656,28 +656,64 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 				Name: "ssl_ciphers",
 			},
 		)
-		if err := deleteNginxConfig(constant.NginxScopeServer, nginxParams, &website); err != nil {
-			return response.WebsiteHTTPS{}, err
+		if err = deleteNginxConfig(constant.NginxScopeServer, nginxParams, &website); err != nil {
+			return nil, err
 		}
-		if err := websiteRepo.Save(ctx, &website); err != nil {
-			return response.WebsiteHTTPS{}, err
+		if err = websiteRepo.Save(ctx, &website); err != nil {
+			return nil, err
 		}
-		return res, nil
+		return nil, nil
 	}
 
 	if req.Type == constant.SSLExisted {
 		websiteSSL, err = websiteSSLRepo.GetFirst(commonRepo.WithByID(req.WebsiteSSLID))
 		if err != nil {
-			return response.WebsiteHTTPS{}, err
+			return nil, err
 		}
 		website.WebsiteSSLID = websiteSSL.ID
 		res.SSL = websiteSSL
 	}
 	if req.Type == constant.SSLManual {
-		certBlock, _ := pem.Decode([]byte(req.Certificate))
+		var (
+			certificate string
+			privateKey  string
+		)
+		switch req.ImportType {
+		case "paste":
+			certificate = req.Certificate
+			privateKey = req.PrivateKey
+		case "local":
+			fileOp := files.NewFileOp()
+			if !fileOp.Stat(req.PrivateKeyPath) {
+				return nil, buserr.New("ErrSSLKeyNotFound")
+			}
+			if !fileOp.Stat(req.CertificatePath) {
+				return nil, buserr.New("ErrSSLCertificateNotFound")
+			}
+			if content, err := fileOp.GetContent(req.PrivateKeyPath); err != nil {
+				return nil, err
+			} else {
+				privateKey = string(content)
+			}
+			if content, err := fileOp.GetContent(req.CertificatePath); err != nil {
+				return nil, err
+			} else {
+				certificate = string(content)
+			}
+		}
+
+		privateKeyCertBlock, _ := pem.Decode([]byte(privateKey))
+		if privateKeyCertBlock == nil {
+			return nil, buserr.New("ErrSSLCertificateFormat")
+		}
+
+		certBlock, _ := pem.Decode([]byte(certificate))
+		if certBlock == nil {
+			return nil, buserr.New("ErrSSLCertificateFormat")
+		}
 		cert, err := x509.ParseCertificate(certBlock.Bytes)
 		if err != nil {
-			return response.WebsiteHTTPS{}, err
+			return nil, err
 		}
 		websiteSSL.ExpireDate = cert.NotAfter
 		websiteSSL.StartDate = cert.NotBefore
@@ -691,28 +727,28 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 			websiteSSL.PrimaryDomain = cert.DNSNames[0]
 			websiteSSL.Domains = strings.Join(cert.DNSNames, ",")
 		}
-
 		websiteSSL.Provider = constant.Manual
-		websiteSSL.PrivateKey = req.PrivateKey
-		websiteSSL.Pem = req.Certificate
+		websiteSSL.PrivateKey = privateKey
+		websiteSSL.Pem = certificate
+
 		res.SSL = websiteSSL
 	}
 	website.Protocol = constant.ProtocolHTTPS
 	if err := applySSL(website, websiteSSL, req); err != nil {
-		return response.WebsiteHTTPS{}, err
+		return nil, err
 	}
 	website.HttpConfig = req.HttpConfig
 
 	if websiteSSL.ID == 0 {
 		if err := websiteSSLRepo.Create(ctx, &websiteSSL); err != nil {
-			return response.WebsiteHTTPS{}, err
+			return nil, err
 		}
 		website.WebsiteSSLID = websiteSSL.ID
 	}
 	if err := websiteRepo.Save(ctx, &website); err != nil {
-		return response.WebsiteHTTPS{}, err
+		return nil, err
 	}
-	return res, nil
+	return &res, nil
 }
 
 func (w WebsiteService) PreInstallCheck(req request.WebsiteInstallCheckReq) ([]response.WebsitePreInstallCheck, error) {

@@ -63,6 +63,10 @@ ErrSSLCannotDelete: "The certificate is being used by the website and cannot be 
 ErrAccountCannotDelete: "The certificate associated with the account cannot be deleted"
 ErrSSLApply: "The certificate continues to be signed successfully, but openresty reload fails, please check the configuration！"
 ErrEmailIsExist: 'Email is already exist'
+ErrSSLKeyNotFound: 'The private key file does not exist'
+ErrSSLCertificateNotFound: 'The certificate file does not exist'
+ErrSSLKeyFormat: 'Private key file format error, please use pem format'
+ErrSSLCertificateFormat: 'Certificate file format error, please use pem format'
 
 #mysql
 ErrUserIsExist: "The current user already exists. Please enter a new user"
