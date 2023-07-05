@@ -38,6 +38,7 @@ type ResourceLimit struct {
 }
 
 type ContainerOperate struct {
+	ContainerID     string         `json:"containerID"`
 	Name            string         `json:"name"`
 	Image           string         `json:"image"`
 	PublishAllPorts bool           `json:"publishAllPorts"`

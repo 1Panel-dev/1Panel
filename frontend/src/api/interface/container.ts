@@ -17,6 +17,7 @@ export namespace Container {
         memory: number;
     }
     export interface ContainerHelper {
+        containerID: string;
         name: string;
         image: string;
         cmdStr: string;
