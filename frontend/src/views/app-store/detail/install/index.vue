@@ -165,7 +165,7 @@ const initData = () => ({
     advanced: true,
     cpuQuota: 0,
     memoryLimit: 0,
-    memoryUnit: 'MB',
+    memoryUnit: 'M',
     containerName: '',
     allowPort: false,
     editCompose: false,
@@ -187,7 +187,7 @@ const changeUnit = () => {
     if (req.memoryUnit == 'M') {
         limits.value.memory = oldMemory.value;
     } else {
-        limits.value.memory = oldMemory.value / 1024;
+        limits.value.memory = Number((oldMemory.value / 1024).toFixed(2));
     }
 };
 
