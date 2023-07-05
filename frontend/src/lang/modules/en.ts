@@ -1177,8 +1177,7 @@ const message = {
         containerName: 'Container Name',
         containerNameHelper: 'can be empty, it will be automatically generated',
         allowPort: 'Port external access',
-        allowPortHelper:
-            'Allowing external port access will release the firewall port, please do not release the php operating environment',
+        allowPortHelper: 'Allowing external port access will release the firewall port',
         appInstallWarn:
             'The application does not release the external access port by default, you can choose to release it in the advanced settings',
         upgradeStart: 'Start upgrading! Please refresh the page later',
@@ -1191,7 +1190,7 @@ const message = {
         installHelper: 'Configuring image acceleration can solve the problem of image pull failure',
         upgradeHelper: 'The abnormal application needs to be synchronized to the normal state first',
         installWarn:
-            ' Port external access is not enabled, and cannot be accessed through the external network IP:port. Do you want to continue?',
+            'Currently, if the port external access is not checked, it will not be able to access through the external network IP: port. Do you want to continue?',
         restoreWarn:
             'The restore operation will delete the current data of the application and restart it. This operation cannot be rolled back, continue?',
     },

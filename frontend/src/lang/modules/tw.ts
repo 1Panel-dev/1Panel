@@ -1121,7 +1121,7 @@ const message = {
         containerName: '容器名稱',
         containerNameHelper: '可以為空，為空自動生成',
         allowPort: '端口外部訪問',
-        allowPortHelper: '允許端口外部訪問會放開防火墻端口，php運行環境請勿放開',
+        allowPortHelper: '允許端口外部訪問會放開防火墻端口',
         appInstallWarn: '應用端口默認不允許外部訪問，可以在下方高級設置中選擇放開',
         upgradeStart: '開始升級！請稍後刷新頁面',
         toFolder: '進入安裝目錄',
@@ -1132,7 +1132,7 @@ const message = {
         allReadyInstalled: '已安裝',
         installHelper: '配置鏡像加速可以解決鏡像拉取失敗的問題',
         upgradeHelper: '異常應用需要先同步到正常狀態',
-        installWarn: '未開啟端口外部訪問，無法通過外網IP:端口訪問，是否繼續？ ',
+        installWarn: '當前未勾選端口外部訪問，將無法通過外網IP:端口訪問，是否繼續？ ',
         restoreWarn: '恢復操作將刪除該應用當前數據並重啟。此操作不可回滾，是否繼續?',
     },
     website: {

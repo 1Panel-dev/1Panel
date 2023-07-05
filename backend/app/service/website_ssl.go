@@ -66,10 +66,7 @@ func (w WebsiteSSLService) Search(search request.WebsiteSSLSearch) ([]response.W
 		opts   []repo.DBOption
 		result []response.WebsiteSSLDTO
 	)
-	opts = append(opts, commonRepo.WithOrderBy("created_at desc"))
-	if search.AcmeAccountID >= 0 {
-		opts = append(opts, websiteSSLRepo.WithByAcmeAccountId(search.AcmeAccountID))
-	}
+	opts = append(opts, commonRepo.WithOrderBy("created_at desc"), websiteSSLRepo.WithByAcmeAccountId(search.AcmeAccountID))
 	sslList, err := websiteSSLRepo.List(opts...)
 	if err != nil {
 		return nil, err
