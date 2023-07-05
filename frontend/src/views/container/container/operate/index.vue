@@ -1,7 +1,7 @@
 <template>
     <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
-            <DrawerHeader :header="title" :back="handleClose" />
+            <DrawerHeader :header="title" :resource="dialogData.rowData?.name" :back="handleClose" />
         </template>
         <el-form
             ref="formRef"
@@ -379,18 +379,22 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                     confirmButtonText: i18n.global.t('commons.button.confirm'),
                     cancelButtonText: i18n.global.t('commons.button.cancel'),
                 },
-            ).then(async () => {
-                await updateContainer(dialogData.value.rowData!)
-                    .then(() => {
-                        loading.value = false;
-                        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                        emit('search');
-                        drawerVisiable.value = false;
-                    })
-                    .catch(() => {
-                        loading.value = false;
-                    });
-            });
+            )
+                .then(async () => {
+                    await updateContainer(dialogData.value.rowData!)
+                        .then(() => {
+                            loading.value = false;
+                            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                            emit('search');
+                            drawerVisiable.value = false;
+                        })
+                        .catch(() => {
+                            loading.value = false;
+                        });
+                })
+                .catch(() => {
+                    loading.value = false;
+                });
         }
     });
 };

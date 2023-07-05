@@ -285,6 +285,11 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate) error {
 	if err != nil {
 		return err
 	}
+	ctx := context.Background()
+	newContainer, _ := client.ContainerInspect(ctx, req.Name)
+	if len(newContainer.ID) != 0 {
+		return buserr.New(constant.ErrContainerName)
+	}
 
 	var config container.Config
 	var hostConf container.HostConfig
@@ -294,7 +299,6 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate) error {
 
 	global.LOG.Infof("new container info %s has been made, now start to create", req.Name)
 
-	ctx := context.Background()
 	if !checkImageExist(client, req.Image) {
 		if err := pullImages(ctx, client, req.Image); err != nil {
 			return err
@@ -325,6 +329,7 @@ func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.Contai
 	}
 
 	var data dto.ContainerOperate
+	data.ContainerID = oldContainer.ID
 	data.Name = strings.ReplaceAll(oldContainer.Name, "/", "")
 	data.Image = oldContainer.Config.Image
 	data.Cmd = oldContainer.Config.Cmd
@@ -372,7 +377,12 @@ func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
 		return err
 	}
 	ctx := context.Background()
-	oldContainer, err := client.ContainerInspect(ctx, req.Name)
+	newContainer, _ := client.ContainerInspect(ctx, req.Name)
+	if len(newContainer.ID) != 0 && newContainer.ID != req.ContainerID {
+		return buserr.New(constant.ErrContainerName)
+	}
+
+	oldContainer, err := client.ContainerInspect(ctx, req.ContainerID)
 	if err != nil {
 		return err
 	}
@@ -386,7 +396,7 @@ func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
 	if err := loadConfigInfo(req, config, hostConf); err != nil {
 		return err
 	}
-	if err := client.ContainerRemove(ctx, req.Name, types.ContainerRemoveOptions{Force: true}); err != nil {
+	if err := client.ContainerRemove(ctx, req.ContainerID, types.ContainerRemoveOptions{Force: true}); err != nil {
 		return err
 	}
 
@@ -460,6 +470,10 @@ func (u *ContainerService) ContainerOperation(req dto.ContainerOperation) error 
 	case constant.ContainerOpUnpause:
 		err = client.ContainerUnpause(ctx, req.Name)
 	case constant.ContainerOpRename:
+		newContainer, _ := client.ContainerInspect(ctx, req.NewName)
+		if len(newContainer.ID) != 0 {
+			return buserr.New(constant.ErrContainerName)
+		}
 		err = client.ContainerRename(ctx, req.Name, req.NewName)
 	case constant.ContainerOpRemove:
 		err = client.ContainerRemove(ctx, req.Name, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
