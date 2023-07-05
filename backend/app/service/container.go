@@ -264,7 +264,7 @@ func (u *ContainerService) Prune(req dto.ContainerPrune) (dto.ContainerPruneRepo
 }
 
 func (u *ContainerService) LoadResouceLimit() (*dto.ResourceLimit, error) {
-	cpuCounts, err := cpu.Counts(false)
+	cpuCounts, err := cpu.Counts(true)
 	if err != nil {
 		return nil, fmt.Errorf("load cpu limit failed, err: %v", err)
 	}
