@@ -441,6 +441,12 @@ var EncryptHostPassword = &gormigrate.Migration{
 			return err
 		}
 
+		var encryptSetting model.Setting
+		if err := tx.Where("key = ?", "EncryptKey").Find(&encryptSetting).Error; err != nil {
+			return err
+		}
+		global.CONF.System.EncryptKey = encryptSetting.Value
+
 		for _, host := range hosts {
 			if len(host.Password) != 0 {
 				pass, err := encrypt.StringEncrypt(host.Password)

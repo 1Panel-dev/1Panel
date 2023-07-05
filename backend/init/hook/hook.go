@@ -17,11 +17,11 @@ func Init() {
 		global.LOG.Errorf("load service port from setting failed, err: %v", err)
 	}
 	global.CONF.System.Port = portSetting.Value
-	enptrySetting, err := settingRepo.Get(settingRepo.WithByKey("EncryptKey"))
+	encryptSetting, err := settingRepo.Get(settingRepo.WithByKey("EncryptKey"))
 	if err != nil {
 		global.LOG.Errorf("load service encrypt key from setting failed, err: %v", err)
 	}
-	global.CONF.System.EncryptKey = enptrySetting.Value
+	global.CONF.System.EncryptKey = encryptSetting.Value
 	sslSetting, err := settingRepo.Get(settingRepo.WithByKey("SSL"))
 	if err != nil {
 		global.LOG.Errorf("load service ssl from setting failed, err: %v", err)
