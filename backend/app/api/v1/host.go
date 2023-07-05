@@ -42,6 +42,8 @@ func (b *BaseApi) CreateHost(c *gin.Context) {
 			return
 		}
 		req.Password = passwordItem
+		req.PrivateKey = ""
+		req.PassPhrase = ""
 	}
 	if req.AuthMode == "key" && len(req.PrivateKey) != 0 {
 		privateKey, err := base64.StdEncoding.DecodeString(req.PrivateKey)
@@ -55,6 +57,16 @@ func (b *BaseApi) CreateHost(c *gin.Context) {
 			return
 		}
 		req.Password = keyItem
+
+		if len(req.PassPhrase) != 0 {
+			pass, err := encrypt.StringEncrypt(req.PassPhrase)
+			if err != nil {
+				helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+				return
+			}
+			req.PassPhrase = pass
+		}
+		req.Password = ""
 	}
 
 	host, err := hostService.Create(req)
@@ -229,6 +241,15 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 			return
 		}
 		req.PrivateKey = keyItem
+
+		if len(req.PassPhrase) != 0 {
+			pass, err := encrypt.StringEncrypt(req.PassPhrase)
+			if err != nil {
+				helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+				return
+			}
+			req.PassPhrase = pass
+		}
 	}
 
 	upMap := make(map[string]interface{})
@@ -239,10 +260,12 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 	upMap["user"] = req.User
 	upMap["auth_mode"] = req.AuthMode
 	upMap["remember_password"] = req.RememberPassword
-	if len(req.Password) != 0 {
+	if req.AuthMode == "password" {
 		upMap["password"] = req.Password
-	}
-	if len(req.PrivateKey) != 0 {
+		upMap["private_key"] = ""
+		upMap["pass_phrase"] = ""
+	} else {
+		upMap["password"] = ""
 		upMap["private_key"] = req.PrivateKey
 		upMap["pass_phrase"] = req.PassPhrase
 	}

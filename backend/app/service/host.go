@@ -105,6 +105,10 @@ func (u *HostService) TestLocalConn(id uint) bool {
 		connInfo.PrivateKey = []byte(host.PrivateKey)
 	}
 	if len(host.PassPhrase) != 0 {
+		host.PassPhrase, err = encrypt.StringDecrypt(host.PassPhrase)
+		if err != nil {
+			return false
+		}
 		connInfo.PassPhrase = []byte(host.PassPhrase)
 	}
 	client, err := connInfo.NewClient()
@@ -133,6 +137,13 @@ func (u *HostService) GetHostInfo(id uint) (*model.Host, error) {
 			return nil, err
 		}
 	}
+
+	if len(host.PassPhrase) != 0 {
+		host.PassPhrase, err = encrypt.StringDecrypt(host.PassPhrase)
+		if err != nil {
+			return nil, err
+		}
+	}
 	return &host, err
 }
 
@@ -153,6 +164,25 @@ func (u *HostService) SearchWithPage(search dto.SearchHostWithPage) (int64, inte
 			item.Password = ""
 			item.PrivateKey = ""
 			item.PassPhrase = ""
+		} else {
+			if len(host.Password) != 0 {
+				item.Password, err = encrypt.StringDecrypt(host.Password)
+				if err != nil {
+					return 0, nil, err
+				}
+			}
+			if len(host.PrivateKey) != 0 {
+				item.PrivateKey, err = encrypt.StringDecrypt(host.PrivateKey)
+				if err != nil {
+					return 0, nil, err
+				}
+			}
+			if len(host.PassPhrase) != 0 {
+				item.PassPhrase, err = encrypt.StringDecrypt(host.PassPhrase)
+				if err != nil {
+					return 0, nil, err
+				}
+			}
 		}
 		dtoHosts = append(dtoHosts, item)
 	}
