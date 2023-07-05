@@ -249,6 +249,7 @@ const message = {
         runtime: 'Runtime',
         processManage: 'Process',
         process: 'Process',
+        network: 'Network',
     },
     home: {
         overview: 'Overview',
@@ -1417,7 +1418,7 @@ const message = {
         ipv6: 'Listen IPV6',
         leechReturnError: 'Please fill in the HTTP status code',
         selectAcme: 'Select Acme account',
-        imported: 'Imported',
+        imported: 'Manually Created',
         importType: 'Import Type',
         pasteSSL: 'Paste code',
         localSSL: 'Select local file',

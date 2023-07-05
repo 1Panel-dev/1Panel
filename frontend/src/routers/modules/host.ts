@@ -81,6 +81,16 @@ const hostRouter = {
             },
         },
         {
+            path: '/hosts/process/network',
+            name: 'ProcessNetwork',
+            hidden: true,
+            component: () => import('@/views/host/process/network/index.vue'),
+            meta: {
+                activeMenu: '/hosts/process/process',
+                requiresAuth: false,
+            },
+        },
+        {
             path: '/hosts/ssh/ssh',
             name: 'SSH',
             component: () => import('@/views/host/ssh/ssh/index.vue'),

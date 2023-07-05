@@ -16,5 +16,9 @@ const buttons = [
         label: i18n.global.t('menu.process'),
         path: '/hosts/process/process',
     },
+    {
+        label: i18n.global.t('menu.network'),
+        path: '/hosts/process/network',
+    },
 ];
 </script>

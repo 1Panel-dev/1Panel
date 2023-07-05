@@ -17,6 +17,7 @@ type WsInput struct {
 	DownloadProgress
 	PsProcessConfig
 	SSHSessionConfig
+	NetConfig
 }
 
 type DownloadProgress struct {
@@ -32,6 +33,12 @@ type PsProcessConfig struct {
 type SSHSessionConfig struct {
 	LoginUser string `json:"loginUser"`
 	LoginIP   string `json:"loginIP"`
+}
+
+type NetConfig struct {
+	Port        uint32 `json:"port"`
+	ProcessName string `json:"processName"`
+	ProcessID   int32  `json:"processID"`
 }
 
 type PsProcessData struct {
@@ -71,7 +78,8 @@ type processConnect struct {
 	Status string   `json:"status"`
 	Laddr  net.Addr `json:"localaddr"`
 	Raddr  net.Addr `json:"remoteaddr"`
-	PID    string   `json:"PID"`
+	PID    int32    `json:"PID"`
+	Name   string   `json:"name"`
 }
 
 type sshSession struct {
@@ -104,6 +112,12 @@ func ProcessData(c *Client, inputMsg []byte) {
 		c.Msg <- res
 	case "ssh":
 		res, err := getSSHSessions(wsInput.SSHSessionConfig)
+		if err != nil {
+			return
+		}
+		c.Msg <- res
+	case "net":
+		res, err := getNetConnections(wsInput.NetConfig)
 		if err != nil {
 			return
 		}
@@ -289,6 +303,46 @@ func getSSHSessions(config SSHSessionConfig) (res []byte, err error) {
 						}
 					}
 				}
+			}
+		}
+	}
+	res, err = json.Marshal(result)
+	return
+}
+
+var netTypes = [...]string{"tcp", "udp"}
+
+func getNetConnections(config NetConfig) (res []byte, err error) {
+	var (
+		result []processConnect
+		proc   *process.Process
+	)
+	for _, netType := range netTypes {
+		connections, _ := net.Connections(netType)
+		if err == nil {
+			for _, conn := range connections {
+				if config.ProcessID > 0 && config.ProcessID != conn.Pid {
+					continue
+				}
+				proc, err = process.NewProcess(conn.Pid)
+				if err == nil {
+					name, _ := proc.Name()
+					if name != "" && config.ProcessName != "" && !strings.Contains(name, config.ProcessName) {
+						continue
+					}
+					if config.Port > 0 && config.Port != conn.Laddr.Port && config.Port != conn.Raddr.Port {
+						continue
+					}
+					result = append(result, processConnect{
+						Type:   netType,
+						Status: conn.Status,
+						Laddr:  conn.Laddr,
+						Raddr:  conn.Raddr,
+						PID:    conn.Pid,
+						Name:   name,
+					})
+				}
+
 			}
 		}
 	}
