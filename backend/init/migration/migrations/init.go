@@ -460,6 +460,15 @@ var EncryptHostPassword = &gormigrate.Migration{
 					return err
 				}
 			}
+			if len(host.PassPhrase) != 0 {
+				pass, err := encrypt.StringEncrypt(host.PassPhrase)
+				if err != nil {
+					return err
+				}
+				if err := tx.Model(&model.Host{}).Update("pass_phrase", pass).Error; err != nil {
+					return err
+				}
+			}
 		}
 		return nil
 	},
