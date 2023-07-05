@@ -247,6 +247,7 @@ const message = {
         runtime: '運行環境',
         processManage: '進程管理',
         process: '進程',
+        network: '網絡',
     },
     home: {
         overview: '概覽',
@@ -1348,7 +1349,7 @@ const message = {
         ipv6: '監聽 IPV6 端口',
         leechReturnError: '請填寫 HTTP 狀態碼',
         selectAcme: '選擇 Acme 賬號',
-        imported: '已導入',
+        imported: '手動創建',
         importType: '導入方式',
         pasteSSL: '粘貼代碼',
         localSSL: '選擇本地文件',

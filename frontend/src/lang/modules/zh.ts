@@ -247,6 +247,7 @@ const message = {
         runtime: '运行环境',
         processManage: '进程管理',
         process: '进程',
+        network: '网络',
     },
     home: {
         overview: '概览',
@@ -1354,7 +1355,7 @@ const message = {
         ipv6: '监听 IPV6 端口',
         leechReturnError: '请填写 HTTP 状态码',
         selectAcme: '选择 acme 账号',
-        imported: '已导入',
+        imported: '手动创建',
         importType: '导入方式',
         pasteSSL: '粘贴代码',
         localSSL: '选择本地文件',
@@ -1527,6 +1528,7 @@ const message = {
         raddr: '目标地址/端口',
         stopProcess: '结束',
         stopProcessWarn: '是否确定结束此进程 (PID:{0})？此操作不可回滚',
+        processName: '进程名称',
     },
 };
 export default {
