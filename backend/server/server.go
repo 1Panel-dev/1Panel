@@ -34,7 +34,6 @@ func Start() {
 	log.Init()
 	app.Init()
 	db.Init()
-	hook.Init()
 	migration.Init()
 	validator.Init()
 	gob.Register(psession.SessionUser{})
@@ -43,6 +42,7 @@ func Start() {
 	gin.SetMode("debug")
 	cron.Run()
 	business.Init()
+	hook.Init()
 
 	rootRouter := router.Routers()
 	address := fmt.Sprintf(":%s", global.CONF.System.Port)
