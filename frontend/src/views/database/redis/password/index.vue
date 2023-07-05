@@ -9,8 +9,11 @@
                     <el-form-item :label="$t('commons.login.password')" :rules="Rules.requiredInput" prop="password">
                         <el-input type="password" show-password clearable v-model="form.password">
                             <template #append>
-                                <el-button @click="onCopy(form.password)" icon="DocumentCopy"></el-button>
-                                <el-button style="margin-left: 1px" @click="random" icon="RefreshRight"></el-button>
+                                <el-button @click="onCopy(form.password)">{{ $t('commons.button.copy') }}</el-button>
+                                <el-divider direction="vertical" />
+                                <el-button style="margin-left: 1px" @click="random">
+                                    {{ $t('commons.button.random') }}
+                                </el-button>
                             </template>
                         </el-input>
                     </el-form-item>
