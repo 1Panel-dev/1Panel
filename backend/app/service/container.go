@@ -287,7 +287,7 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate) error {
 	}
 	ctx := context.Background()
 	newContainer, _ := client.ContainerInspect(ctx, req.Name)
-	if len(newContainer.ID) != 0 {
+	if newContainer.ContainerJSONBase != nil {
 		return buserr.New(constant.ErrContainerName)
 	}
 
@@ -378,7 +378,7 @@ func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
 	}
 	ctx := context.Background()
 	newContainer, _ := client.ContainerInspect(ctx, req.Name)
-	if len(newContainer.ID) != 0 && newContainer.ID != req.ContainerID {
+	if newContainer.ContainerJSONBase != nil && newContainer.ID != req.ContainerID {
 		return buserr.New(constant.ErrContainerName)
 	}
 
@@ -471,7 +471,7 @@ func (u *ContainerService) ContainerOperation(req dto.ContainerOperation) error 
 		err = client.ContainerUnpause(ctx, req.Name)
 	case constant.ContainerOpRename:
 		newContainer, _ := client.ContainerInspect(ctx, req.NewName)
-		if len(newContainer.ID) != 0 {
+		if newContainer.ContainerJSONBase != nil {
 			return buserr.New(constant.ErrContainerName)
 		}
 		err = client.ContainerRename(ctx, req.Name, req.NewName)
