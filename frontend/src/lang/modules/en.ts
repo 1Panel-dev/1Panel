@@ -867,6 +867,7 @@ const message = {
         searchHelper: 'Support wildcards such as *',
         uploadFailed: '[{0}] File Upload file',
         fileUploadStart: 'Uploading [{0}]....',
+        currentSelect: 'Current Select: ',
     },
     ssh: {
         sshAlert:

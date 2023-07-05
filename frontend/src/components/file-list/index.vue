@@ -11,7 +11,7 @@
             <el-button :icon="Folder" @click="popoverVisible = true"></el-button>
         </template>
         <div>
-            <el-button class="close" link @click="popoverVisible = false">
+            <el-button class="close" link @click="closePage">
                 <el-icon><Close /></el-icon>
             </el-button>
             <BreadCrumbs>
@@ -67,6 +67,22 @@
                 </el-table-column>
             </el-table>
         </div>
+        <div class="file-list-bottom">
+            <div v-if="selectRow?.path">
+                {{ $t('file.currentSelect') }}
+                <el-tooltip :content="selectRow.path" placement="top">
+                    <el-tag type="success">
+                        <div class="path">
+                            <span>{{ selectRow.path }}</span>
+                        </div>
+                    </el-tag>
+                </el-tooltip>
+            </div>
+            <div class="button">
+                <el-button @click="closePage">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button type="primary" @click="selectFile">{{ $t('commons.button.confirm') }}</el-button>
+            </div>
+        </div>
     </el-popover>
 </template>
 
@@ -78,11 +94,12 @@ import BreadCrumbs from '@/components/bread-crumbs/index.vue';
 import BreadCrumbItem from '@/components/bread-crumbs/bread-crumbs-item.vue';
 import { onMounted, onUpdated, reactive, ref } from 'vue';
 
-let rowName = ref('');
-let data = ref();
-let loading = ref(false);
-let paths = ref<string[]>([]);
-let req = reactive({ path: '/', expand: true, page: 1, pageSize: 300 });
+const rowName = ref('');
+const data = ref();
+const loading = ref(false);
+const paths = ref<string[]>([]);
+const req = reactive({ path: '/', expand: true, page: 1, pageSize: 300 });
+const selectRow = ref();
 
 const popoverVisible = ref(false);
 
@@ -100,9 +117,20 @@ const props = defineProps({
 const em = defineEmits(['choose']);
 
 const checkFile = (row: any) => {
-    rowName.value = row.name;
-    em('choose', row.path);
+    selectRow.value = row;
+    rowName.value = selectRow.value.name;
+};
+
+const selectFile = () => {
+    if (selectRow.value) {
+        em('choose', selectRow.value.path);
+    }
+    closePage();
+};
+
+const closePage = () => {
     popoverVisible.value = false;
+    selectRow.value = {};
 };
 
 const open = async (row: File.File) => {
@@ -116,6 +144,7 @@ const open = async (row: File.File) => {
         }
         search(req);
     }
+    rowName.value = '';
 };
 
 const jump = async (index: number) => {
@@ -170,6 +199,19 @@ onUpdated(() => {
         position: absolute;
         right: 10px;
         top: 10px;
+    }
+}
+.file-list-bottom {
+    margin-top: 10px;
+    .path {
+        width: 250px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .button {
+        margin-top: 10px;
+        float: right;
     }
 }
 </style>

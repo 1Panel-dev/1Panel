@@ -45,7 +45,16 @@
         </template>
         <template #main>
             <el-row :gutter="5">
-                <el-col v-for="(app, index) in apps" :key="index" :xs="24" :sm="12" :md="8" :lg="8" :xl="8">
+                <el-col
+                    class="app-col-12"
+                    v-for="(app, index) in apps"
+                    :key="index"
+                    :xs="24"
+                    :sm="12"
+                    :md="8"
+                    :lg="8"
+                    :xl="8"
+                >
                     <div class="app-card">
                         <el-card class="e-card">
                             <el-row :gutter="20">
@@ -177,20 +186,15 @@ const getAppDetail = (key: string) => {
 };
 
 const sync = () => {
-    loading.value = true;
-    SyncApp()
-        .then((res) => {
-            if (res.message != '') {
-                MsgSuccess(res.message);
-            } else {
-                MsgSuccess(i18n.global.t('app.syncStart'));
-            }
-            canUpdate.value = false;
-            search(req);
-        })
-        .finally(() => {
-            loading.value = false;
-        });
+    SyncApp().then((res) => {
+        if (res.message != '') {
+            MsgSuccess(res.message);
+        } else {
+            MsgSuccess(i18n.global.t('app.syncStart'));
+        }
+        canUpdate.value = false;
+        search(req);
+    });
 };
 
 const changeTag = (key: string) => {
@@ -287,5 +291,12 @@ onMounted(() => {
     float: right;
     margin-bottom: 10px;
     margin-top: 10px;
+}
+
+@media only screen and (min-width: 768px) and (max-width: 1200px) {
+    .app-col-12 {
+        max-width: 50%;
+        flex: 0 0 50%;
+    }
 }
 </style>

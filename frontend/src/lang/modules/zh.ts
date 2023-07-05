@@ -837,6 +837,7 @@ const message = {
         searchHelper: '支持 * 等通配符',
         uploadFailed: '[{0}] 文件上传失败',
         fileUploadStart: '正在上传[{0}]....',
+        currentSelect: '当前选中: ',
     },
     ssh: {
         sshAlert: '列表数据根据登录时间排序，但请注意，切换时区或其他操作可能导致登录日志的时间出现偏差。',
