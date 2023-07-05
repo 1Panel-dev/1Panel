@@ -24,7 +24,7 @@
                         <el-input type="password" clearable show-password v-model.trim="authBasic.password">
                             <template #append>
                                 <el-button @click="random">
-                                    {{ $t('website.createPassword') }}
+                                    {{ $t('commons.button.random') }}
                                 </el-button>
                             </template>
                         </el-input>

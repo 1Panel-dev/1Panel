@@ -45,6 +45,8 @@ const message = {
             get: 'Get',
             upgrade: 'Upgrade',
             ignoreUpgrade: 'Ignore upgrade',
+            copy: 'Copy',
+            random: 'Random',
         },
         search: {
             timeStart: 'Time start',
@@ -1006,6 +1008,7 @@ const message = {
         entranceError:
             'Please enter a secure login entry point of 6-10 characters, only numbers or letters are supported.',
         entranceInputHelper: 'When the security entry is set to blank, the security entry is cancelled.',
+        randomGenerate: 'Random',
         expirationTime: 'Expiration Time',
         unSetting: 'Not Set',
         noneSetting:
@@ -1401,7 +1404,6 @@ const message = {
         basicAuth: 'Password Access',
         editBasicAuthHelper:
             'The password is asymmetrically encrypted and cannot be echoed. Editing needs to reset the password',
-        createPassword: 'Generate password',
         antiLeech: 'Anti-leech',
         extends: 'Extension',
         browserCache: 'browser cache',

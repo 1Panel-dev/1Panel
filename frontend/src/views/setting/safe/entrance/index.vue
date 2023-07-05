@@ -17,7 +17,7 @@
                         <el-form-item :label="$t('setting.entrance')" prop="securityEntrance">
                             <el-input clearable v-model="form.securityEntrance">
                                 <template #append>
-                                    <el-button @click="random" icon="RefreshRight"></el-button>
+                                    <el-button @click="random">{{ $t('setting.randomGenerate') }}</el-button>
                                 </template>
                             </el-input>
                             <span class="input-help">
