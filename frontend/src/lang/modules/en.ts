@@ -1325,8 +1325,8 @@ const message = {
         HTTPToHTTPS: 'Access HTTP automatically jumps to HTTPS',
         HTTPAlso: 'HTTP can be accessed directly',
         sslConfig: 'SSL options',
-        disbaleHTTPS: 'Disable HTTPS',
-        disbaleHTTPSHelper:
+        disableHTTPS: 'Disable HTTPS',
+        disableHTTPSHelper:
             'Disabling HTTPS will delete the certificate related configuration, Do you want to continue?',
         SSLHelper:
             'Note: Do not use SSL certificates for illegal websites \n If HTTPS access cannot be used after opening, please check whether the security group has correctly released port 443',
@@ -1417,7 +1417,12 @@ const message = {
         ipv6: 'Listen IPV6',
         leechReturnError: 'Please fill in the HTTP status code',
         selectAcme: 'Select Acme account',
-        localSSL: 'Imported',
+        imported: 'Imported',
+        importType: 'Import Type',
+        pasteSSL: 'Paste code',
+        localSSL: 'Select local file',
+        privateKeyPath: 'Private key file',
+        certificatePath: 'Certificate file',
     },
     php: {
         short_open_tag: 'Short tag support',

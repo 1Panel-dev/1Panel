@@ -55,7 +55,12 @@
             <el-table :data="data" highlight-current-row height="40vh">
                 <el-table-column width="40" fix>
                     <template #default="{ row }">
-                        <el-checkbox v-model="rowName" :true-label="row.name" @click="checkFile(row)" />
+                        <el-checkbox
+                            v-model="rowName"
+                            :true-label="row.name"
+                            :disabled="disabledDir(row)"
+                            @change="checkFile(row)"
+                        />
                     </template>
                 </el-table-column>
                 <el-table-column show-overflow-tooltip fix>
@@ -100,7 +105,6 @@ const loading = ref(false);
 const paths = ref<string[]>([]);
 const req = reactive({ path: '/', expand: true, page: 1, pageSize: 300 });
 const selectRow = ref();
-
 const popoverVisible = ref(false);
 
 const props = defineProps({
@@ -131,6 +135,13 @@ const selectFile = () => {
 const closePage = () => {
     popoverVisible.value = false;
     selectRow.value = {};
+};
+
+const disabledDir = (row: File.File) => {
+    if (!props.dir) {
+        return row.isDir;
+    }
+    return false;
 };
 
 const open = async (row: File.File) => {
