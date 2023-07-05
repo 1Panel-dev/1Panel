@@ -468,6 +468,7 @@ const message = {
         cleanSuccessWithSpace:
             'The operation is successful. The number of disks cleared this time is {0}. The disk space freed is {1}!',
         container: 'Container',
+        unExposedPort: 'The current port mapping address is 127.0.0.1, which cannot enable external access.',
         upTime: 'UpTime',
         all: 'All',
         fetch: 'Fetch',
@@ -937,7 +938,7 @@ const message = {
         sessionTimeoutHelper:
             'If you do not operate the panel for more than {0} seconds, the panel automatically logs out',
         systemIP: 'System IP',
-        systemIPWarning: 'Please set the system IP in the panel settings first.',
+        systemIPWarning: 'The server IP is not currently set. Please set it in the control panel first!',
         syncTime: 'Server time',
         timeZone: 'Time Zone',
         timeZoneChangeHelper: 'Changing the time zone requires restarting the service. Do you want to continue?',

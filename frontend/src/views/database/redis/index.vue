@@ -53,6 +53,8 @@
                 </span>
             </template>
         </el-dialog>
+
+        <PortJumpDialog ref="dialogPortJumpRef" />
     </div>
 </template>
 
@@ -61,13 +63,11 @@ import Setting from '@/views/database/redis/setting/index.vue';
 import Password from '@/views/database/redis/password/index.vue';
 import Terminal from '@/components/terminal/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
+import PortJumpDialog from '@/components/port-jump/index.vue';
 import { nextTick, onBeforeUnmount, ref } from 'vue';
 import { App } from '@/api/interface/app';
 import { GetAppPort } from '@/api/modules/app';
 import router from '@/routers';
-import { MsgError } from '@/utils/message';
-import { getSettingInfo } from '@/api/modules/setting';
-import i18n from '@/lang';
 
 const loading = ref(false);
 const maskShow = ref(true);
@@ -83,6 +83,8 @@ const terminalShow = ref(false);
 const redisCommandPort = ref();
 const commandVisiable = ref(false);
 
+const dialogPortJumpRef = ref();
+
 const isRefresh = ref();
 
 const onSetting = async () => {
@@ -97,12 +99,7 @@ const goDashboard = async () => {
         commandVisiable.value = true;
         return;
     }
-    const res = await getSettingInfo();
-    if (!res.data.systemIP) {
-        MsgError(i18n.global.t('setting.systemIPWarning'));
-        return;
-    }
-    window.open(`http://${res.data.systemIP}:${redisCommandPort.value}`, '_blank');
+    dialogPortJumpRef.value.acceptParams({ port: redisCommandPort.value });
 };
 const getAppDetail = (key: string) => {
     router.push({ name: 'AppDetail', params: { appKey: key } });

@@ -1,7 +1,7 @@
 <template>
     <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
-            <DrawerHeader :header="$t('cronjob.cronTask')" :resource="dialogData.rowData?.name" :back="handleClose" />
+            <DrawerHeader :header="title" :resource="dialogData.rowData?.name" :back="handleClose" />
         </template>
         <el-form ref="formRef" label-position="top" :model="dialogData.rowData" :rules="rules">
             <el-row type="flex" justify="center">
@@ -238,7 +238,7 @@ const acceptParams = (params: DialogProps): void => {
     if (dialogData.value.title === 'create') {
         changeType();
     }
-    title.value = i18n.global.t('commons.button.' + dialogData.value.title);
+    title.value = i18n.global.t('cronjob.' + dialogData.value.title);
     if (dialogData.value?.rowData?.exclusionRules) {
         dialogData.value.rowData.exclusionRules = dialogData.value.rowData.exclusionRules.replaceAll(',', '\n');
     }
