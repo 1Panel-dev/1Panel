@@ -187,4 +187,11 @@ export namespace App {
         allowPort: boolean;
         dockerCompose: string;
     }
+
+    export interface IgnoredApp {
+        name: string;
+        detailID: number;
+        version: string;
+        icon: string;
+    }
 }

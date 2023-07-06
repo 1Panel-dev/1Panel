@@ -46,6 +46,9 @@
             <el-button @click="sync" type="primary" link v-if="mode === 'installed' && data != null">
                 {{ $t('app.sync') }}
             </el-button>
+            <el-button @click="openIngore" type="primary" link v-if="mode === 'upgrade'">
+                {{ $t('app.showIgnore') }}
+            </el-button>
         </template>
 
         <template #main>
@@ -164,10 +167,10 @@
                                                 plain
                                                 round
                                                 size="small"
-                                                @click="openOperate(installed, 'ignoreUpgrade')"
+                                                @click="openOperate(installed, 'ignore')"
                                                 v-if="mode === 'upgrade'"
                                             >
-                                                {{ $t('commons.button.ignoreUpgrade') }}
+                                                {{ $t('commons.button.ignore') }}
                                             </el-button>
                                             <el-button
                                                 class="h-button"
@@ -239,8 +242,8 @@
     <AppDelete ref="deleteRef" @close="search" />
     <AppParams ref="appParamRef" />
     <AppUpgrade ref="upgradeRef" @close="search" />
-
     <PortJumpDialog ref="dialogPortJumpRef" />
+    <AppIgnore ref="ignoreRef" @close="search" />
 </template>
 
 <script lang="ts" setup>
@@ -261,6 +264,7 @@ import AppResources from './check/index.vue';
 import AppDelete from './delete/index.vue';
 import AppParams from './detail/index.vue';
 import AppUpgrade from './upgrade/index.vue';
+import AppIgnore from './ignore/index.vue';
 import { App } from '@/api/interface/app';
 import Status from '@/components/status/index.vue';
 import { getAge } from '@/utils/util';
@@ -289,6 +293,7 @@ const checkRef = ref();
 const deleteRef = ref();
 const appParamRef = ref();
 const upgradeRef = ref();
+const ignoreRef = ref();
 const dialogPortJumpRef = ref();
 const tags = ref<App.Tag[]>([]);
 const activeTag = ref('all');
@@ -348,7 +353,7 @@ const goDashboard = async (port: any) => {
 const openOperate = (row: any, op: string) => {
     operateReq.installId = row.id;
     operateReq.operate = op;
-    if (op == 'upgrade' || op == 'ignoreUpgrade') {
+    if (op == 'upgrade' || op == 'ignore') {
         upgradeRef.value.acceptParams(row.id, row.name, op);
     } else if (op == 'delete') {
         AppInstalledDeleteCheck(row.id).then(async (res) => {
@@ -362,6 +367,10 @@ const openOperate = (row: any, op: string) => {
     } else {
         onOperate(op);
     }
+};
+
+const openIngore = () => {
+    ignoreRef.value.acceptParams();
 };
 
 const operate = async () => {

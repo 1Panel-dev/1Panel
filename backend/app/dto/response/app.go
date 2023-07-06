@@ -48,6 +48,13 @@ type AppDetailDTO struct {
 	Image  string      `json:"image"`
 }
 
+type IgnoredApp struct {
+	Icon     string `json:"icon"`
+	Name     string `json:"name"`
+	Version  string `json:"version"`
+	DetailID uint   `json:"detailID"`
+}
+
 type AppInstalledDTO struct {
 	model.AppInstall
 	Total     int    `json:"total"`

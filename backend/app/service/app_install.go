@@ -359,7 +359,7 @@ func (a *AppInstallService) IgnoreUpgrade(req request.AppInstalledIgnoreUpgrade)
 	if err != nil {
 		return err
 	}
-	appDetail.IgnoreUpgrade = true
+	appDetail.IgnoreUpgrade = req.Operate == "ignore"
 	return appDetailRepo.Update(context.Background(), appDetail)
 }
 

@@ -67,8 +67,8 @@ type AppInstalledUpdate struct {
 }
 
 type AppInstalledIgnoreUpgrade struct {
-	InstallId uint `json:"installId" validate:"required"`
-	DetailId  uint `json:"detailId"  validate:"required"`
+	DetailID uint   `json:"detailID"  validate:"required"`
+	Operate  string `json:"operate"   validate:"required,oneof=cancel ignore"`
 }
 
 type PortUpdate struct {
