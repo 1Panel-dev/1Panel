@@ -238,6 +238,7 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 	upMap := make(map[string]interface{})
 	upMap["bucket"] = req.Bucket
 	upMap["credential"] = req.Credential
+	upMap["backup_path"] = req.BackupPath
 	upMap["vars"] = req.Vars
 	backup.Vars = req.Vars
 
