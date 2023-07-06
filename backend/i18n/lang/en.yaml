@@ -41,6 +41,8 @@ ErrHttpReqFailed: "Request failed {{.err}}"
 ErrHttpReqNotFound: "The file does not exist"
 ErrNoSuchHost: "Network connection failed"
 ErrImagePullTimeOut: 'Image pull timeout'
+ErrContainerNotFound: '{{ .name }} container does not exist'
+ErrContainerMsg: '{{ .name }} container is abnormal, please check the log on the container page for details'
 
 #file
 ErrFileCanNotRead: "File can not read"

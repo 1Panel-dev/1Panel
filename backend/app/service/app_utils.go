@@ -359,7 +359,6 @@ func getContainerNames(install model.AppInstall) ([]string, error) {
 		return nil, err
 	}
 	containerMap := make(map[string]struct{})
-	containerMap[install.ContainerName] = struct{}{}
 	for _, service := range project.AllServices() {
 		if service.ContainerName == "${CONTAINER_NAME}" || service.ContainerName == "" {
 			continue
@@ -571,19 +570,28 @@ func checkContainerNameIsExist(containerName, appDir string) (bool, error) {
 func upApp(appInstall *model.AppInstall) {
 	upProject := func(appInstall *model.AppInstall) (err error) {
 		if err == nil {
-			var composeService *composeV2.ComposeService
-			composeService, err = getServiceFromInstall(appInstall)
+			var (
+				out    string
+				errMsg string
+			)
+			out, err = compose.Pull(appInstall.GetComposePath())
 			if err != nil {
+				if out != "" {
+					if strings.Contains(out, "no such host") {
+						errMsg = i18n.GetMsgByKey("ErrNoSuchHost") + ":"
+					}
+					if strings.Contains(out, "timeout") {
+						errMsg = i18n.GetMsgByKey("ErrImagePullTimeOut") + ":"
+					}
+					appInstall.Message = errMsg + out
+				}
 				return err
 			}
-			err = composeService.ComposePull()
+			out, err = compose.Up(appInstall.GetComposePath())
 			if err != nil {
-				appInstall.Status = constant.PullErr
-				return err
-			}
-			err = composeService.ComposeUp()
-			if err != nil {
-				appInstall.Status = constant.Error
+				if out != "" {
+					appInstall.Message = errMsg + out
+				}
 				return err
 			}
 			return
@@ -592,14 +600,7 @@ func upApp(appInstall *model.AppInstall) {
 		}
 	}
 	if err := upProject(appInstall); err != nil {
-		otherMsg := ""
-		if strings.Contains(err.Error(), "no such host") {
-			otherMsg = i18n.GetMsgByKey("ErrNoSuchHost") + ":"
-		}
-		if strings.Contains(err.Error(), "timeout") {
-			otherMsg = i18n.GetMsgByKey("ErrImagePullTimeOut") + ":"
-		}
-		appInstall.Message = otherMsg + err.Error()
+		appInstall.Status = constant.Error
 	} else {
 		appInstall.Status = constant.Running
 	}
