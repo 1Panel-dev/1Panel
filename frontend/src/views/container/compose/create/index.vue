@@ -158,7 +158,7 @@ const form = reactive({
 });
 const rules = reactive({
     name: [Rules.requiredInput, Rules.imageName],
-    path: [Rules.requiredSelect],
+    path: [Rules.requiredInput],
     template: [Rules.requiredSelect],
 });
 

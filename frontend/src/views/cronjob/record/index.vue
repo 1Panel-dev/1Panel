@@ -123,8 +123,8 @@
                 </el-row>
             </template>
             <template #main>
-                <div style="overflow: auto">
-                    <el-row :gutter="20" v-show="hasRecords" style="min-width: 900px">
+                <div class="mainClass">
+                    <el-row :gutter="20" v-show="hasRecords" class="mainRowClass">
                         <el-col :span="8">
                             <div>
                                 <ul class="infinite-list" style="overflow: auto">
@@ -715,5 +715,14 @@ defineExpose({
 }
 .description {
     width: 30%;
+}
+
+@media only screen and (max-width: 1000px) {
+    .mainClass {
+        overflow: auto;
+    }
+    .mainRowClass {
+        min-width: 900px;
+    }
 }
 </style>
