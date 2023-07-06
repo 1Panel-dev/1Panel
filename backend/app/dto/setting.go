@@ -76,7 +76,7 @@ type PortUpdate struct {
 }
 
 type SnapshotCreate struct {
-	From        string `json:"from" validate:"required,oneof=OSS S3 SFTP MINIO COS KODO"`
+	From        string `json:"from" validate:"required,oneof=OSS S3 SFTP MINIO COS KODO OneDrive"`
 	Description string `json:"description" validate:"max=256"`
 }
 type SnapshotRecover struct {

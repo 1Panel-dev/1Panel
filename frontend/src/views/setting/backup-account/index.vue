@@ -81,7 +81,8 @@
                                 </span>
                             </el-form-item>
                             <el-form-item :label="$t('setting.backupDir')">
-                                {{ s3Data.backupPath }}
+                                <span v-if="s3Data.backupPath">{{ s3Data.backupPath }}</span>
+                                <span v-else>{{ $t('setting.unSetting') }}</span>
                             </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
                                 {{ dateFormat(0, 0, s3Data.createdAt) }}
@@ -134,7 +135,8 @@
                                 </span>
                             </el-form-item>
                             <el-form-item :label="$t('setting.backupDir')">
-                                {{ ossData.backupPath }}
+                                <span v-if="ossData.backupPath">{{ ossData.backupPath }}</span>
+                                <span v-else>{{ $t('setting.unSetting') }}</span>
                             </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
                                 {{ dateFormat(0, 0, ossData.createdAt) }}
@@ -188,7 +190,8 @@
                                 </span>
                             </el-form-item>
                             <el-form-item :label="$t('setting.backupDir')">
-                                {{ cosData.backupPath }}
+                                <span v-if="cosData.backupPath">{{ cosData.backupPath }}</span>
+                                <span v-else>{{ $t('setting.unSetting') }}</span>
                             </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
                                 {{ dateFormat(0, 0, cosData.createdAt) }}
@@ -221,7 +224,8 @@
                         <el-divider class="devider" />
                         <div v-if="oneDriveData.id !== 0" style="margin-left: 20px">
                             <el-form-item :label="$t('setting.backupDir')">
-                                {{ oneDriveData.backupPath }}
+                                <span v-if="oneDriveData.backupPath">{{ oneDriveData.backupPath }}</span>
+                                <span v-else>{{ $t('setting.unSetting') }}</span>
                             </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
                                 {{ dateFormat(0, 0, oneDriveData.createdAt) }}
@@ -268,7 +272,8 @@
                                 {{ kodoData.bucket }}
                             </el-form-item>
                             <el-form-item :label="$t('setting.backupDir')">
-                                {{ kodoData.backupPath }}
+                                <span v-if="kodoData.backupPath">{{ kodoData.backupPath }}</span>
+                                <span v-else>{{ $t('setting.unSetting') }}</span>
                             </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
                                 {{ dateFormat(0, 0, kodoData.createdAt) }}
@@ -306,7 +311,8 @@
                                 {{ minioData.bucket }}
                             </el-form-item>
                             <el-form-item :label="$t('setting.backupDir')">
-                                {{ minioData.backupPath }}
+                                <span v-if="minioData.backupPath">{{ minioData.backupPath }}</span>
+                                <span v-else>{{ $t('setting.unSetting') }}</span>
                             </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
                                 {{ dateFormat(0, 0, minioData.createdAt) }}
