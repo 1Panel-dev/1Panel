@@ -15,6 +15,7 @@ type IComposeTemplateRepo interface {
 	Update(id uint, vars map[string]interface{}) error
 	Delete(opts ...DBOption) error
 
+	GetRecord(opts ...DBOption) (model.Compose, error)
 	CreateRecord(compose *model.Compose) error
 	DeleteRecord(opts ...DBOption) error
 	ListRecord() ([]model.Compose, error)
@@ -70,6 +71,16 @@ func (u *ComposeTemplateRepo) Delete(opts ...DBOption) error {
 		db = opt(db)
 	}
 	return db.Delete(&model.ComposeTemplate{}).Error
+}
+
+func (u *ComposeTemplateRepo) GetRecord(opts ...DBOption) (model.Compose, error) {
+	var compose model.Compose
+	db := global.DB
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	err := db.First(&compose).Error
+	return compose, err
 }
 
 func (u *ComposeTemplateRepo) ListRecord() ([]model.Compose, error) {

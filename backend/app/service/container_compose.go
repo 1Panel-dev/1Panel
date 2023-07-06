@@ -92,7 +92,7 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 		}
 	}
 	for _, item := range composeCreatedByLocal {
-		if err := composeRepo.DeleteRecord(commonRepo.WithByName(item.Name)); err != nil {
+		if err := composeRepo.DeleteRecord(commonRepo.WithByID(item.ID)); err != nil {
 			global.LOG.Error(err)
 		}
 	}
@@ -127,6 +127,10 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 }
 
 func (u *ContainerService) TestCompose(req dto.ComposeCreate) (bool, error) {
+	composeItem, _ := composeRepo.GetRecord(commonRepo.WithByName(req.Name))
+	if composeItem.ID != 0 {
+		return false, constant.ErrRecordExist
+	}
 	if err := u.loadPath(&req); err != nil {
 		return false, err
 	}

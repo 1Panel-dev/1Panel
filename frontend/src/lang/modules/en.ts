@@ -609,6 +609,7 @@ const message = {
         createComposeTemplate: 'Create compose template',
         description: 'Description',
         content: 'Content',
+        contentEmpty: 'Compose content cannot be empty, please enter and try again!',
         containerNumber: 'Container number',
         down: 'Down',
         up: 'Up',
