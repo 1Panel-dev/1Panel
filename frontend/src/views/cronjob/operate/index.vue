@@ -370,7 +370,7 @@ const rules = reactive({
     website: [Rules.requiredSelect],
     dbName: [Rules.requiredSelect],
     url: [Rules.requiredInput],
-    sourceDir: [Rules.requiredSelect],
+    sourceDir: [Rules.requiredInput],
     targetDirID: [Rules.requiredSelect, Rules.number],
     retainCopies: [Rules.number],
 });

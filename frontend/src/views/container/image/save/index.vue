@@ -17,7 +17,7 @@
                             />
                         </el-select>
                     </el-form-item>
-                    <el-form-item :label="$t('container.path')" :rules="Rules.requiredSelect" prop="path">
+                    <el-form-item :label="$t('container.path')" :rules="Rules.requiredInput" prop="path">
                         <el-input v-model="form.path">
                             <template #prepend>
                                 <FileList @choose="loadSaveDir" :dir="true"></FileList>
