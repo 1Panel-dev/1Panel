@@ -44,7 +44,7 @@ const message = {
             refresh: 'Refresh',
             get: 'Get',
             upgrade: 'Upgrade',
-            ignoreUpgrade: 'Ignore upgrade',
+            ignore: 'Ignore upgrade',
             copy: 'Copy',
             random: 'Random',
         },
@@ -1198,6 +1198,9 @@ const message = {
             'Currently, if the port external access is not checked, it will not be able to access through the external network IP: port. Do you want to continue?',
         restoreWarn:
             'The restore operation will delete the current data of the application and restart it. This operation cannot be rolled back, continue?',
+        showIgnore: 'View ignore application',
+        cancelIgnore: 'Cancel ignore',
+        ignoreList: 'ignore list',
     },
     website: {
         website: 'Website',

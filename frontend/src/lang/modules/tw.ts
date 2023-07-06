@@ -44,7 +44,7 @@ const message = {
             refresh: '刷新',
             get: '獲取',
             upgrade: '升級',
-            ignoreUpgrade: '忽略升級',
+            ignore: '忽略升級',
             copy: '復製',
             random: '隨機密碼',
         },
@@ -1139,6 +1139,9 @@ const message = {
         upgradeHelper: '異常應用需要先同步到正常狀態',
         installWarn: '當前未勾選端口外部訪問，將無法通過外網IP:端口訪問，是否繼續？ ',
         restoreWarn: '恢復操作將刪除該應用當前數據並重啟。此操作不可回滾，是否繼續?',
+        showIgnore: '查看忽略應用',
+        cancelIgnore: '取消忽略',
+        ignoreList: '忽略列表',
     },
     website: {
         website: '網站',

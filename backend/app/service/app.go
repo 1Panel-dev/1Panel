@@ -39,6 +39,7 @@ type IAppService interface {
 	GetAppUpdate() (*response.AppUpdateRes, error)
 	GetAppDetailByID(id uint) (*response.AppDetailDTO, error)
 	SyncAppListFromLocal()
+	GetIgnoredApp() ([]response.IgnoredApp, error)
 }
 
 func NewIAppService() IAppService {
@@ -229,6 +230,27 @@ func (a AppService) GetAppDetailByID(id uint) (*response.AppDetailDTO, error) {
 		return nil, err
 	}
 	res.Params = paramMap
+	return res, nil
+}
+
+func (a AppService) GetIgnoredApp() ([]response.IgnoredApp, error) {
+	var res []response.IgnoredApp
+	details, _ := appDetailRepo.GetBy(appDetailRepo.WithIgnored())
+	if len(details) == 0 {
+		return res, nil
+	}
+	for _, detail := range details {
+		app, err := appRepo.GetFirst(commonRepo.WithByID(detail.AppId))
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, response.IgnoredApp{
+			Name:     app.Name,
+			Version:  detail.Version,
+			DetailID: detail.ID,
+			Icon:     app.Icon,
+		})
+	}
 	return res, nil
 }
 

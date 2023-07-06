@@ -131,6 +131,22 @@ func (b *BaseApi) GetAppDetailByID(c *gin.Context) {
 }
 
 // @Tags App
+// @Summary Get Ignore App
+// @Description 获取忽略的应用版本
+// @Accept json
+// @Success 200 {object} response.IgnoredApp
+// @Security ApiKeyAuth
+// @Router /apps/ingored [get]
+func (b *BaseApi) GetIgnoredApp(c *gin.Context) {
+	res, err := appService.GetIgnoredApp()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags App
 // @Summary Install app
 // @Description 安装应用
 // @Accept json

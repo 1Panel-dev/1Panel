@@ -44,7 +44,7 @@ const message = {
             refresh: '刷新',
             get: '获取',
             upgrade: '升级',
-            ignoreUpgrade: '忽略升级',
+            ignore: '忽略升级',
             copy: '复制',
             random: '随机密码',
         },
@@ -1145,6 +1145,9 @@ const message = {
         upgradeHelper: '异常应用需要先同步到正常状态',
         installWarn: '当前未勾选端口外部访问，将无法通过外网IP:端口访问，是否继续？',
         restoreWarn: '恢复操作将删除该应用当前数据并重启。此操作不可回滚，是否继续?',
+        showIgnore: '查看忽略应用',
+        cancelIgnore: '取消忽略',
+        ignoreList: '忽略列表',
     },
     website: {
         website: '网站',
