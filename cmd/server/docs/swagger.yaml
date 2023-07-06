@@ -26,6 +26,35 @@ definitions:
       oldRule:
         $ref: '#/definitions/dto.AddrRuleOperate'
     type: object
+  dto.AppResource:
+    properties:
+      name:
+        type: string
+      type:
+        type: string
+    type: object
+  dto.AppVersion:
+    properties:
+      detailId:
+        type: integer
+      version:
+        type: string
+    type: object
+  dto.BackupInfo:
+    properties:
+      backupPath:
+        type: string
+      bucket:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: integer
+      type:
+        type: string
+      vars:
+        type: string
+    type: object
   dto.BackupOperate:
     properties:
       accessKey:
@@ -233,6 +262,19 @@ definitions:
     required:
     - name
     type: object
+  dto.ComposeTemplateInfo:
+    properties:
+      content:
+        type: string
+      createdAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
   dto.ComposeTemplateUpdate:
     properties:
       content:
@@ -255,6 +297,15 @@ definitions:
     - name
     - path
     type: object
+  dto.ContainerListStats:
+    properties:
+      containerID:
+        type: string
+      cpuPercent:
+        type: number
+      memoryPercent:
+        type: number
+    type: object
   dto.ContainerOperate:
     properties:
       autoRemove:
@@ -263,6 +314,8 @@ definitions:
         items:
           type: string
         type: array
+      containerID:
+        type: string
       cpuShares:
         type: integer
       env:
@@ -336,17 +389,7 @@ definitions:
       spaceReclaimed:
         type: integer
     type: object
-  dto.ContainerUpgrade:
-    properties:
-      image:
-        type: string
-      name:
-        type: string
-    required:
-    - image
-    - name
-    type: object
-  dto.ContainterStats:
+  dto.ContainerStats:
     properties:
       cache:
         type: number
@@ -364,6 +407,16 @@ definitions:
         type: number
       shotTime:
         type: string
+    type: object
+  dto.ContainerUpgrade:
+    properties:
+      image:
+        type: string
+      name:
+        type: string
+    required:
+    - image
+    - name
     type: object
   dto.CronjobBatchDelete:
     properties:
@@ -859,6 +912,17 @@ definitions:
     - port
     - user
     type: object
+  dto.HostTree:
+    properties:
+      children:
+        items:
+          $ref: '#/definitions/dto.TreeChild'
+        type: array
+      id:
+        type: integer
+      label:
+        type: string
+    type: object
   dto.ImageBuild:
     properties:
       dockerfile:
@@ -913,6 +977,15 @@ definitions:
         type: array
     required:
     - ids
+    type: object
+  dto.ImageRepoOption:
+    properties:
+      downloadUrl:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
     type: object
   dto.ImageRepoUpdate:
     properties:
@@ -1208,6 +1281,11 @@ definitions:
         type: string
     required:
     - name
+    type: object
+  dto.Options:
+    properties:
+      option:
+        type: string
     type: object
   dto.PageContainer:
     properties:
@@ -1721,6 +1799,13 @@ definitions:
   dto.SyncTime:
     properties:
       ntpSite:
+        type: string
+    type: object
+  dto.TreeChild:
+    properties:
+      id:
+        type: integer
+      label:
         type: string
     type: object
   dto.UpdateDescription:
@@ -2754,12 +2839,6 @@ definitions:
     type: object
   request.WebsiteHTTPSOp:
     properties:
-      HttpConfig:
-        enum:
-        - HTTPSOnly
-        - HTTPAlso
-        - HTTPToHTTPS
-        type: string
       SSLProtocol:
         items:
           type: string
@@ -2768,9 +2847,21 @@ definitions:
         type: string
       certificate:
         type: string
+      certificatePath:
+        type: string
       enable:
         type: boolean
+      httpConfig:
+        enum:
+        - HTTPSOnly
+        - HTTPAlso
+        - HTTPToHTTPS
+        type: string
+      importType:
+        type: string
       privateKey:
+        type: string
+      privateKeyPath:
         type: string
       type:
         enum:
@@ -2948,6 +3039,8 @@ definitions:
     type: object
   request.WebsiteSSLSearch:
     properties:
+      acmeAccountId:
+        type: integer
       page:
         type: integer
       pageSize:
@@ -3185,6 +3278,14 @@ definitions:
       value: {}
       values: {}
     type: object
+  response.AppService:
+    properties:
+      config: {}
+      label:
+        type: string
+      value:
+        type: string
+    type: object
   response.FileInfo:
     properties:
       content:
@@ -3224,6 +3325,19 @@ definitions:
       updateTime:
         type: string
       user:
+        type: string
+    type: object
+  response.FileTree:
+    properties:
+      children:
+        items:
+          $ref: '#/definitions/response.FileTree'
+        type: array
+      id:
+        type: string
+      name:
+        type: string
+      path:
         type: string
     type: object
   response.NginxParam:
@@ -3276,6 +3390,17 @@ definitions:
       updatedAt:
         type: string
       url:
+        type: string
+    type: object
+  response.WebsiteDNSRes:
+    properties:
+      domain:
+        type: string
+      err:
+        type: string
+      resolve:
+        type: string
+      value:
         type: string
     type: object
   response.WebsiteDTO:
@@ -3377,6 +3502,17 @@ definitions:
         items:
           $ref: '#/definitions/response.NginxParam'
         type: array
+    type: object
+  response.WebsitePreInstallCheck:
+    properties:
+      appName:
+        type: string
+      name:
+        type: string
+      status:
+        type: string
+      version:
+        type: string
     type: object
   response.WebsiteWafConfig:
     properties:
@@ -3537,7 +3673,9 @@ paths:
         "200":
           description: OK
           schema:
-            type: anrry
+            items:
+              $ref: '#/definitions/dto.AppVersion'
+            type: array
       security:
       - ApiKeyAuth: []
       summary: Search app update version by install id
@@ -3621,7 +3759,9 @@ paths:
         "200":
           description: OK
           schema:
-            type: anrry
+            items:
+              $ref: '#/definitions/dto.AppResource'
+            type: array
       security:
       - ApiKeyAuth: []
       summary: Check before delete
@@ -3870,7 +4010,9 @@ paths:
         "200":
           description: OK
           schema:
-            type: anrry
+            items:
+              $ref: '#/definitions/response.AppService'
+            type: array
       security:
       - ApiKeyAuth: []
       summary: Search app service by key
@@ -4292,7 +4434,9 @@ paths:
         "200":
           description: OK
           schema:
-            type: anrry
+            items:
+              $ref: '#/definitions/dto.Options'
+            type: array
       security:
       - ApiKeyAuth: []
       summary: List images
@@ -4611,6 +4755,19 @@ paths:
       summary: List containers
       tags:
       - Container
+  /containers/list/stats:
+    get:
+      description: 获取容器列表资源占用
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.ContainerListStats'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Load container stats
   /containers/network:
     post:
       consumes:
@@ -4756,7 +4913,9 @@ paths:
         "200":
           description: OK
           schema:
-            type: anrry
+            items:
+              $ref: '#/definitions/dto.ImageRepoOption'
+            type: array
       security:
       - ApiKeyAuth: []
       summary: List image repos
@@ -4969,7 +5128,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.ContainterStats'
+            $ref: '#/definitions/dto.ContainerStats'
       security:
       - ApiKeyAuth: []
       summary: Container stats
@@ -4984,7 +5143,9 @@ paths:
         "200":
           description: OK
           schema:
-            type: anrry
+            items:
+              $ref: '#/definitions/dto.ComposeTemplateInfo'
+            type: array
       security:
       - ApiKeyAuth: []
       summary: List compose templates
@@ -5767,7 +5928,9 @@ paths:
         "200":
           description: OK
           schema:
-            type: anrry
+            items:
+              type: string
+            type: array
       security:
       - ApiKeyAuth: []
       summary: Check before delete mysql database
@@ -5823,7 +5986,9 @@ paths:
         "200":
           description: OK
           schema:
-            type: anrry
+            items:
+              type: string
+            type: array
       security:
       - ApiKeyAuth: []
       summary: List mysql database names
@@ -6597,7 +6762,9 @@ paths:
         "200":
           description: OK
           schema:
-            type: anrry
+            items:
+              $ref: '#/definitions/response.FileTree'
+            type: array
       security:
       - ApiKeyAuth: []
       summary: Load files tree
@@ -6643,7 +6810,9 @@ paths:
         "200":
           description: OK
           schema:
-            type: anrry
+            items:
+              $ref: '#/definitions/response.FileInfo'
+            type: array
       security:
       - ApiKeyAuth: []
       summary: Page file
@@ -7336,7 +7505,9 @@ paths:
         "200":
           description: OK
           schema:
-            type: anrry
+            items:
+              $ref: '#/definitions/dto.HostTree'
+            type: array
       security:
       - ApiKeyAuth: []
       summary: Page host
@@ -7399,7 +7570,9 @@ paths:
         "200":
           description: OK
           schema:
-            type: anrry
+            items:
+              $ref: '#/definitions/dto.HostTree'
+            type: array
       security:
       - ApiKeyAuth: []
       summary: Load host tree
@@ -7595,7 +7768,9 @@ paths:
         "200":
           description: OK
           schema:
-            type: anrry
+            items:
+              $ref: '#/definitions/response.NginxParam'
+            type: array
       security:
       - ApiKeyAuth: []
       summary: Load partial OpenResty conf
@@ -8044,7 +8219,9 @@ paths:
         "200":
           description: OK
           schema:
-            type: anrry
+            items:
+              $ref: '#/definitions/dto.BackupInfo'
+            type: array
       security:
       - ApiKeyAuth: []
       summary: List backup accounts
@@ -8065,7 +8242,9 @@ paths:
         "200":
           description: OK
           schema:
-            type: anrry
+            items:
+              type: string
+            type: array
       security:
       - ApiKeyAuth: []
       summary: List buckets
@@ -8087,7 +8266,9 @@ paths:
         "200":
           description: OK
           schema:
-            type: anrry
+            items:
+              type: string
+            type: array
       security:
       - ApiKeyAuth: []
       summary: List files from backup accounts
@@ -8927,7 +9108,9 @@ paths:
         "200":
           description: OK
           schema:
-            type: anrry
+            items:
+              $ref: '#/definitions/response.WebsitePreInstallCheck'
+            type: array
       security:
       - ApiKeyAuth: []
       summary: Check before create website
@@ -9274,7 +9457,9 @@ paths:
         "200":
           description: OK
           schema:
-            type: anrry
+            items:
+              $ref: '#/definitions/model.WebsiteDomain'
+            type: array
       security:
       - ApiKeyAuth: []
       summary: Search website domains by websiteId
@@ -9360,7 +9545,9 @@ paths:
         "200":
           description: OK
           schema:
-            type: anrry
+            items:
+              $ref: '#/definitions/response.WebsiteDTO'
+            type: array
       security:
       - ApiKeyAuth: []
       summary: List websites
@@ -9476,7 +9663,9 @@ paths:
         "200":
           description: OK
           schema:
-            type: anrry
+            items:
+              type: string
+            type: array
       security:
       - ApiKeyAuth: []
       summary: List website names
@@ -9860,7 +10049,9 @@ paths:
         "200":
           description: OK
           schema:
-            type: anrry
+            items:
+              $ref: '#/definitions/response.WebsiteDNSRes'
+            type: array
       security:
       - ApiKeyAuth: []
       summary: Resolve website ssl

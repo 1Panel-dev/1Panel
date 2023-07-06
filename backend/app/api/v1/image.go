@@ -44,7 +44,7 @@ func (b *BaseApi) SearchImage(c *gin.Context) {
 // @Summary List images
 // @Description 获取镜像列表
 // @Produce json
-// @Success 200 {anrry} dto.Options
+// @Success 200 {array} dto.Options
 // @Security ApiKeyAuth
 // @Router /containers/image [get]
 func (b *BaseApi) ListImage(c *gin.Context) {

@@ -27,7 +27,7 @@ func (b *BaseApi) GetNginx(c *gin.Context) {
 // @Description 获取部分 OpenResty 配置信息
 // @Accept json
 // @Param request body request.NginxScopeReq true "request"
-// @Success 200 {anrry} response.NginxParam
+// @Success 200 {array} response.NginxParam
 // @Security ApiKeyAuth
 // @Router /openResty/scope [post]
 func (b *BaseApi) GetNginxConfigByScope(c *gin.Context) {

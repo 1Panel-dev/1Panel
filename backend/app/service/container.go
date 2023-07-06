@@ -46,11 +46,12 @@ type IContainerService interface {
 	ContainerUpdate(req dto.ContainerOperate) error
 	ContainerUpgrade(req dto.ContainerUpgrade) error
 	ContainerInfo(req dto.OperationWithName) (*dto.ContainerOperate, error)
+	ContainerListStats() ([]dto.ContainerListStats, error)
 	LoadResouceLimit() (*dto.ResourceLimit, error)
 	ContainerLogClean(req dto.OperationWithName) error
 	ContainerOperation(req dto.ContainerOperation) error
 	ContainerLogs(wsConn *websocket.Conn, container, since, tail string, follow bool) error
-	ContainerStats(id string) (*dto.ContainterStats, error)
+	ContainerStats(id string) (*dto.ContainerStats, error)
 	Inspect(req dto.InspectReq) (string, error)
 	DeleteNetwork(req dto.BatchDelete) error
 	CreateNetwork(req dto.NetworkCreate) error
@@ -129,46 +130,38 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 	}
 
 	backDatas := make([]dto.ContainerInfo, len(records))
-	var wg sync.WaitGroup
-	wg.Add(len(records))
 	for i := 0; i < len(records); i++ {
-		go func(item types.Container, i int) {
-			IsFromCompose := false
-			if _, ok := item.Labels[composeProjectLabel]; ok {
-				IsFromCompose = true
-			}
-			IsFromApp := false
-			if created, ok := item.Labels[composeCreatedBy]; ok && created == "Apps" {
-				IsFromApp = true
-			}
+		item := records[i]
+		IsFromCompose := false
+		if _, ok := item.Labels[composeProjectLabel]; ok {
+			IsFromCompose = true
+		}
+		IsFromApp := false
+		if created, ok := item.Labels[composeCreatedBy]; ok && created == "Apps" {
+			IsFromApp = true
+		}
 
-			var ports []string
-			for _, port := range item.Ports {
-				itemPortStr := fmt.Sprintf("%v/%s", port.PrivatePort, port.Type)
-				if port.PublicPort != 0 {
-					itemPortStr = fmt.Sprintf("%s:%v->%v/%s", port.IP, port.PublicPort, port.PrivatePort, port.Type)
-				}
-				ports = append(ports, itemPortStr)
+		var ports []string
+		for _, port := range item.Ports {
+			itemPortStr := fmt.Sprintf("%v/%s", port.PrivatePort, port.Type)
+			if port.PublicPort != 0 {
+				itemPortStr = fmt.Sprintf("%s:%v->%v/%s", port.IP, port.PublicPort, port.PrivatePort, port.Type)
 			}
-			cpu, mem := loadCpuAndMem(client, item.ID)
-			backDatas[i] = dto.ContainerInfo{
-				ContainerID:   item.ID,
-				CreateTime:    time.Unix(item.Created, 0).Format("2006-01-02 15:04:05"),
-				Name:          item.Names[0][1:],
-				ImageId:       strings.Split(item.ImageID, ":")[1],
-				ImageName:     item.Image,
-				State:         item.State,
-				RunTime:       item.Status,
-				CPUPercent:    cpu,
-				MemoryPercent: mem,
-				Ports:         ports,
-				IsFromApp:     IsFromApp,
-				IsFromCompose: IsFromCompose,
-			}
-			wg.Done()
-		}(records[i], i)
+			ports = append(ports, itemPortStr)
+		}
+		backDatas[i] = dto.ContainerInfo{
+			ContainerID:   item.ID,
+			CreateTime:    time.Unix(item.Created, 0).Format("2006-01-02 15:04:05"),
+			Name:          item.Names[0][1:],
+			ImageId:       strings.Split(item.ImageID, ":")[1],
+			ImageName:     item.Image,
+			State:         item.State,
+			RunTime:       item.Status,
+			Ports:         ports,
+			IsFromApp:     IsFromApp,
+			IsFromCompose: IsFromCompose,
+		}
 	}
-	wg.Wait()
 
 	return int64(total), backDatas, nil
 }
@@ -191,6 +184,29 @@ func (u *ContainerService) List() ([]string, error) {
 		}
 	}
 
+	return datas, nil
+}
+
+func (u *ContainerService) ContainerListStats() ([]dto.ContainerListStats, error) {
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return nil, err
+	}
+	list, err := client.ContainerList(context.Background(), types.ContainerListOptions{All: true})
+	if err != nil {
+		return nil, err
+	}
+	var datas []dto.ContainerListStats
+	var wg sync.WaitGroup
+	wg.Add(len(list))
+	for i := 0; i < len(list); i++ {
+		go func(item types.Container) {
+			cpu, mem := loadCpuAndMem(client, item.ID)
+			datas = append(datas, dto.ContainerListStats{CPUPercent: cpu, MemoryPercent: mem, ContainerID: item.ID})
+			wg.Done()
+		}(list[i])
+	}
+	wg.Wait()
 	return datas, nil
 }
 
@@ -541,7 +557,7 @@ func (u *ContainerService) ContainerLogs(wsConn *websocket.Conn, container, sinc
 	return nil
 }
 
-func (u *ContainerService) ContainerStats(id string) (*dto.ContainterStats, error) {
+func (u *ContainerService) ContainerStats(id string) (*dto.ContainerStats, error) {
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		return nil, err
@@ -562,7 +578,7 @@ func (u *ContainerService) ContainerStats(id string) (*dto.ContainterStats, erro
 	if err := json.Unmarshal(body, &stats); err != nil {
 		return nil, err
 	}
-	var data dto.ContainterStats
+	var data dto.ContainerStats
 	data.CPUPercent = calculateCPUPercentUnix(stats)
 	data.IORead, data.IOWrite = calculateBlockIO(stats.BlkioStats)
 	data.Memory = float64(stats.MemoryStats.Usage) / 1024 / 1024

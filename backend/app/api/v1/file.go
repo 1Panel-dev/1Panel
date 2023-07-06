@@ -52,7 +52,7 @@ func (b *BaseApi) ListFiles(c *gin.Context) {
 // @Description 分页获取上传文件
 // @Accept json
 // @Param request body request.SearchUploadWithPage true "request"
-// @Success 200 {anrry} response.FileInfo
+// @Success 200 {array} response.FileInfo
 // @Security ApiKeyAuth
 // @Router /files/upload/search [post]
 func (b *BaseApi) SearchUploadWithPage(c *gin.Context) {
@@ -81,7 +81,7 @@ func (b *BaseApi) SearchUploadWithPage(c *gin.Context) {
 // @Description 加载文件树
 // @Accept json
 // @Param request body request.FileOption true "request"
-// @Success 200 {anrry} response.FileTree
+// @Success 200 {array} response.FileTree
 // @Security ApiKeyAuth
 // @Router /files/tree [post]
 func (b *BaseApi) GetFileTree(c *gin.Context) {

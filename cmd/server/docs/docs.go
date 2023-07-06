@@ -252,7 +252,10 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.AppVersion"
+                            }
                         }
                     }
                 }
@@ -388,7 +391,10 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.AppResource"
+                            }
                         }
                     }
                 }
@@ -778,7 +784,10 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.AppService"
+                            }
                         }
                     }
                 }
@@ -1442,7 +1451,10 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.Options"
+                            }
                         }
                     }
                 }
@@ -1939,6 +1951,28 @@ var doc = `{
                 }
             }
         },
+        "/containers/list/stats": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取容器列表资源占用",
+                "summary": "Load container stats",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.ContainerListStats"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/containers/network": {
             "post": {
                 "security": [
@@ -2170,7 +2204,10 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.ImageRepoOption"
+                            }
                         }
                     }
                 }
@@ -2507,7 +2544,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.ContainterStats"
+                            "$ref": "#/definitions/dto.ContainerStats"
                         }
                     }
                 }
@@ -2532,7 +2569,10 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.ComposeTemplateInfo"
+                            }
                         }
                     }
                 }
@@ -3756,7 +3796,10 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -3844,7 +3887,10 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -5064,7 +5110,10 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.FileTree"
+                            }
                         }
                     }
                 }
@@ -5137,7 +5186,10 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.FileInfo"
+                            }
                         }
                     }
                 }
@@ -6227,7 +6279,10 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.HostTree"
+                            }
                         }
                     }
                 }
@@ -6330,7 +6385,10 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.HostTree"
+                            }
                         }
                     }
                 }
@@ -6640,7 +6698,10 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.NginxParam"
+                            }
                         }
                     }
                 }
@@ -7343,7 +7404,10 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.BackupInfo"
+                            }
                         }
                     }
                 }
@@ -7377,7 +7441,10 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -7413,7 +7480,10 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -8738,7 +8808,10 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.WebsitePreInstallCheck"
+                            }
                         }
                     }
                 }
@@ -9280,7 +9353,10 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.WebsiteDomain"
+                            }
                         }
                     }
                 }
@@ -9419,7 +9495,10 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.WebsiteDTO"
+                            }
                         }
                     }
                 }
@@ -9599,7 +9678,10 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -10204,7 +10286,10 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.WebsiteDNSRes"
+                            }
                         }
                     }
                 }
@@ -10491,6 +10576,51 @@ var doc = `{
                 },
                 "oldRule": {
                     "$ref": "#/definitions/dto.AddrRuleOperate"
+                }
+            }
+        },
+        "dto.AppResource": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.AppVersion": {
+            "type": "object",
+            "properties": {
+                "detailId": {
+                    "type": "integer"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.BackupInfo": {
+            "type": "object",
+            "properties": {
+                "backupPath": {
+                    "type": "string"
+                },
+                "bucket": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "vars": {
+                    "type": "string"
                 }
             }
         },
@@ -10801,6 +10931,26 @@ var doc = `{
                 }
             }
         },
+        "dto.ComposeTemplateInfo": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.ComposeTemplateUpdate": {
             "type": "object",
             "properties": {
@@ -10834,6 +10984,20 @@ var doc = `{
                 }
             }
         },
+        "dto.ContainerListStats": {
+            "type": "object",
+            "properties": {
+                "containerID": {
+                    "type": "string"
+                },
+                "cpuPercent": {
+                    "type": "number"
+                },
+                "memoryPercent": {
+                    "type": "number"
+                }
+            }
+        },
         "dto.ContainerOperate": {
             "type": "object",
             "properties": {
@@ -10845,6 +11009,9 @@ var doc = `{
                     "items": {
                         "type": "string"
                     }
+                },
+                "containerID": {
+                    "type": "string"
                 },
                 "cpuShares": {
                     "type": "integer"
@@ -10952,22 +11119,7 @@ var doc = `{
                 }
             }
         },
-        "dto.ContainerUpgrade": {
-            "type": "object",
-            "required": [
-                "image",
-                "name"
-            ],
-            "properties": {
-                "image": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.ContainterStats": {
+        "dto.ContainerStats": {
             "type": "object",
             "properties": {
                 "cache": {
@@ -10992,6 +11144,21 @@ var doc = `{
                     "type": "number"
                 },
                 "shotTime": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ContainerUpgrade": {
+            "type": "object",
+            "required": [
+                "image",
+                "name"
+            ],
+            "properties": {
+                "image": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 }
             }
@@ -11728,6 +11895,23 @@ var doc = `{
                 }
             }
         },
+        "dto.HostTree": {
+            "type": "object",
+            "properties": {
+                "children": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.TreeChild"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "label": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.ImageBuild": {
             "type": "object",
             "required": [
@@ -11808,6 +11992,20 @@ var doc = `{
                     "items": {
                         "type": "integer"
                     }
+                }
+            }
+        },
+        "dto.ImageRepoOption": {
+            "type": "object",
+            "properties": {
+                "downloadUrl": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
@@ -12253,6 +12451,14 @@ var doc = `{
             ],
             "properties": {
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.Options": {
+            "type": "object",
+            "properties": {
+                "option": {
                     "type": "string"
                 }
             }
@@ -13024,6 +13230,17 @@ var doc = `{
             "type": "object",
             "properties": {
                 "ntpSite": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.TreeChild": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "label": {
                     "type": "string"
                 }
             }
@@ -14580,14 +14797,6 @@ var doc = `{
                 "websiteId"
             ],
             "properties": {
-                "HttpConfig": {
-                    "type": "string",
-                    "enum": [
-                        "HTTPSOnly",
-                        "HTTPAlso",
-                        "HTTPToHTTPS"
-                    ]
-                },
                 "SSLProtocol": {
                     "type": "array",
                     "items": {
@@ -14600,10 +14809,27 @@ var doc = `{
                 "certificate": {
                     "type": "string"
                 },
+                "certificatePath": {
+                    "type": "string"
+                },
                 "enable": {
                     "type": "boolean"
                 },
+                "httpConfig": {
+                    "type": "string",
+                    "enum": [
+                        "HTTPSOnly",
+                        "HTTPAlso",
+                        "HTTPToHTTPS"
+                    ]
+                },
+                "importType": {
+                    "type": "string"
+                },
                 "privateKey": {
+                    "type": "string"
+                },
+                "privateKeyPath": {
                     "type": "string"
                 },
                 "type": {
@@ -14865,6 +15091,9 @@ var doc = `{
                 "pageSize"
             ],
             "properties": {
+                "acmeAccountId": {
+                    "type": "integer"
+                },
                 "page": {
                     "type": "integer"
                 },
@@ -15215,6 +15444,18 @@ var doc = `{
                 "values": {}
             }
         },
+        "response.AppService": {
+            "type": "object",
+            "properties": {
+                "config": {},
+                "label": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
         "response.FileInfo": {
             "type": "object",
             "properties": {
@@ -15273,6 +15514,26 @@ var doc = `{
                     "type": "string"
                 },
                 "user": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.FileTree": {
+            "type": "object",
+            "properties": {
+                "children": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.FileTree"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "path": {
                     "type": "string"
                 }
             }
@@ -15353,6 +15614,23 @@ var doc = `{
                     "type": "string"
                 },
                 "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.WebsiteDNSRes": {
+            "type": "object",
+            "properties": {
+                "domain": {
+                    "type": "string"
+                },
+                "err": {
+                    "type": "string"
+                },
+                "resolve": {
+                    "type": "string"
+                },
+                "value": {
                     "type": "string"
                 }
             }
@@ -15506,6 +15784,23 @@ var doc = `{
                     "items": {
                         "$ref": "#/definitions/response.NginxParam"
                     }
+                }
+            }
+        },
+        "response.WebsitePreInstallCheck": {
+            "type": "object",
+            "properties": {
+                "appName": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
                 }
             }
         },
