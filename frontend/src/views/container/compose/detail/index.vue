@@ -163,11 +163,19 @@ const search = async () => {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
         filters: filterItem,
+        orderBy: 'created_at',
+        order: 'null',
     };
-    await searchContainer(params).then((res) => {
-        data.value = res.data.items || [];
-        paginationConfig.total = res.data.total;
-    });
+    loading.value = true;
+    await searchContainer(params)
+        .then((res) => {
+            loading.value = false;
+            data.value = res.data.items || [];
+            paginationConfig.total = res.data.total;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const detailInfo = ref();

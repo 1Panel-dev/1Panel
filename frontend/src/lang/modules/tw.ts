@@ -595,6 +595,7 @@ const message = {
         createComposeTemplate: '創建編排模版',
         description: '描述',
         content: '內容',
+        contentEmpty: '編排內容不能為空，請輸入後重試！',
         containerNumber: '容器數量',
         down: '刪除',
         up: '啟動',

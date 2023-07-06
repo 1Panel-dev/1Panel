@@ -126,6 +126,7 @@ import { listComposeTemplate, testCompose, upCompose } from '@/api/modules/conta
 import { loadBaseDir } from '@/api/modules/setting';
 import { LoadFile } from '@/api/modules/files';
 import { formatImageStdout } from '@/utils/docker';
+import { MsgError } from '@/utils/message';
 
 const loading = ref();
 
@@ -238,6 +239,10 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
+        if ((form.from === 'edit' || form.from === 'template') && form.file.length === 0) {
+            MsgError(i18n.global.t('container.contentEmpty'));
+            return;
+        }
         loading.value = true;
         logInfo.value = '';
         await testCompose(form)
@@ -246,9 +251,15 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                 if (res.data) {
                     onCreating.value = true;
                     mode.value = 'log';
-                    const res = await upCompose(form);
-                    logInfo.value = '';
-                    loadLogs(res.data);
+                    await upCompose(form)
+                        .then((res) => {
+                            logInfo.value = '';
+                            loadLogs(res.data);
+                        })
+                        .catch(() => {
+                            loading.value = false;
+                            onCreating.value = false;
+                        });
                 }
             })
             .catch(() => {
