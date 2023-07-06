@@ -119,7 +119,7 @@
                                 <el-tag>{{ $t('monitor.write') }}: {{ currentChartInfo.ioWriteBytes }} MB</el-tag>
                                 <el-tag>
                                     {{ $t('home.rwPerSecond') }}: {{ currentChartInfo.ioCount }}
-                                    {{ $t('commons.units.time') }}
+                                    {{ $t('commons.units.time') }}/s
                                 </el-tag>
                                 <el-tag>{{ $t('home.ioDelay') }}: {{ currentChartInfo.ioTime }} ms</el-tag>
                             </div>

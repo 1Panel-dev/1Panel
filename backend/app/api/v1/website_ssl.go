@@ -94,7 +94,7 @@ func (b *BaseApi) RenewWebsiteSSL(c *gin.Context) {
 // @Description 解析网站 ssl
 // @Accept json
 // @Param request body request.WebsiteDNSReq true "request"
-// @Success 200 {anrry} response.WebsiteDNSRes
+// @Success 200 {array} response.WebsiteDNSRes
 // @Security ApiKeyAuth
 // @Router /websites/ssl/resolve [post]
 func (b *BaseApi) GetDNSResolve(c *gin.Context) {

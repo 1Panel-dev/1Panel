@@ -82,8 +82,13 @@
                     </el-table-column>
                     <el-table-column :label="$t('container.source')" show-overflow-tooltip min-width="75" fix>
                         <template #default="{ row }">
-                            <div>CPU: {{ row.cpuPercent.toFixed(2) }}%</div>
-                            <div>{{ $t('monitor.memory') }}: {{ row.memoryPercent.toFixed(2) }}%</div>
+                            <div v-if="row.hasLoad">
+                                <div>CPU: {{ row.cpuPercent.toFixed(2) }}%</div>
+                                <div>{{ $t('monitor.memory') }}: {{ row.memoryPercent.toFixed(2) }}%</div>
+                            </div>
+                            <div v-if="!row.hasLoad">
+                                <el-button link loading></el-button>
+                            </div>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.port')" min-width="120" prop="ports" fix>
@@ -160,6 +165,7 @@ import PortJumpDialog from '@/components/port-jump/index.vue';
 import Status from '@/components/status/index.vue';
 import { reactive, onMounted, ref } from 'vue';
 import {
+    containerListStats,
     containerOperator,
     containerPrune,
     inspect,
@@ -244,6 +250,7 @@ const search = async (column?: any) => {
         order: column?.order ? column.order : 'null',
     };
     loading.value = true;
+    loadStats();
     await searchContainer(params)
         .then((res) => {
             loading.value = false;
@@ -253,6 +260,24 @@ const search = async (column?: any) => {
         .catch(() => {
             loading.value = false;
         });
+};
+
+const loadStats = async () => {
+    const res = await containerListStats();
+    let stats = res.data || [];
+    if (stats.length === 0) {
+        return;
+    }
+    for (const container of data.value) {
+        for (const item of stats) {
+            if (container.containerID === item.containerID) {
+                container.hasLoad = true;
+                container.cpuPercent = item.cpuPercent;
+                container.memoryPercent = item.memoryPercent;
+                break;
+            }
+        }
+    }
 };
 
 const dialogOperateRef = ref();

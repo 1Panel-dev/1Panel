@@ -124,7 +124,7 @@ func (b *BaseApi) TestByID(c *gin.Context) {
 // @Description 加载主机树
 // @Accept json
 // @Param request body dto.SearchForTree true "request"
-// @Success 200 {anrry} dto.HostTree
+// @Success 200 {array} dto.HostTree
 // @Security ApiKeyAuth
 // @Router /hosts/tree [post]
 func (b *BaseApi) HostTree(c *gin.Context) {
@@ -148,7 +148,7 @@ func (b *BaseApi) HostTree(c *gin.Context) {
 // @Description 获取主机列表分页
 // @Accept json
 // @Param request body dto.SearchHostWithPage true "request"
-// @Success 200 {anrry} dto.HostTree
+// @Success 200 {array} dto.HostTree
 // @Security ApiKeyAuth
 // @Router /hosts/search [post]
 func (b *BaseApi) SearchHost(c *gin.Context) {

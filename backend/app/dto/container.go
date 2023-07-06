@@ -24,9 +24,7 @@ type ContainerInfo struct {
 	State       string `json:"state"`
 	RunTime     string `json:"runTime"`
 
-	CPUPercent    float64  `json:"cpuPercent"`
-	MemoryPercent float64  `json:"memoryPercent"`
-	Ports         []string `json:"ports"`
+	Ports []string `json:"ports"`
 
 	IsFromApp     bool `json:"isFromApp"`
 	IsFromCompose bool `json:"isFromCompose"`
@@ -59,7 +57,13 @@ type ContainerUpgrade struct {
 	Image string `json:"image" validate:"required"`
 }
 
-type ContainterStats struct {
+type ContainerListStats struct {
+	ContainerID   string  `json:"containerID"`
+	CPUPercent    float64 `json:"cpuPercent"`
+	MemoryPercent float64 `json:"memoryPercent"`
+}
+
+type ContainerStats struct {
 	CPUPercent float64 `json:"cpuPercent"`
 	Memory     float64 `json:"memory"`
 	Cache      float64 `json:"cache"`

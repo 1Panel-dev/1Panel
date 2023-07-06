@@ -60,7 +60,7 @@ func (b *BaseApi) CreateBackup(c *gin.Context) {
 // @Description 获取 bucket 列表
 // @Accept json
 // @Param request body dto.ForBuckets true "request"
-// @Success 200 {anrry} string
+// @Success 200 {array} string
 // @Security ApiKeyAuth
 // @Router /settings/backup/search [post]
 func (b *BaseApi) ListBuckets(c *gin.Context) {
@@ -269,7 +269,7 @@ func (b *BaseApi) UpdateBackup(c *gin.Context) {
 // @Tags Backup Account
 // @Summary List backup accounts
 // @Description 获取备份账号列表
-// @Success 200 {anrry} dto.BackupInfo
+// @Success 200 {array} dto.BackupInfo
 // @Security ApiKeyAuth
 // @Router /settings/backup/search [get]
 func (b *BaseApi) ListBackup(c *gin.Context) {
@@ -287,7 +287,7 @@ func (b *BaseApi) ListBackup(c *gin.Context) {
 // @Description 获取备份账号内文件列表
 // @Accept json
 // @Param request body dto.BackupSearchFile true "request"
-// @Success 200 {anrry} string
+// @Success 200 {array} string
 // @Security ApiKeyAuth
 // @Router /settings/backup/search/files [post]
 func (b *BaseApi) LoadFilesFromBackup(c *gin.Context) {

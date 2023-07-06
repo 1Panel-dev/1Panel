@@ -66,7 +66,7 @@ func (b *BaseApi) SearchComposeTemplate(c *gin.Context) {
 // @Summary List compose templates
 // @Description 获取容器编排模版列表
 // @Produce json
-// @Success 200 {anrry} dto.ComposeTemplateInfo
+// @Success 200 {array} dto.ComposeTemplateInfo
 // @Security ApiKeyAuth
 // @Router /containers/template [get]
 func (b *BaseApi) ListComposeTemplate(c *gin.Context) {

@@ -236,6 +236,20 @@ func (b *BaseApi) LoadResouceLimit(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
+// @Summary Load container stats
+// @Description 获取容器列表资源占用
+// @Success 200 {array} dto.ContainerListStats
+// @Security ApiKeyAuth
+// @Router /containers/list/stats [get]
+func (b *BaseApi) ContainerListStats(c *gin.Context) {
+	datas, err := containerService.ContainerListStats()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, datas)
+}
+
 // @Tags Container
 // @Summary Create container
 // @Description 创建容器
@@ -371,7 +385,7 @@ func (b *BaseApi) ContainerOperation(c *gin.Context) {
 // @Summary Container stats
 // @Description 容器监控信息
 // @Param id path integer true "容器id"
-// @Success 200 {object} dto.ContainterStats
+// @Success 200 {object} dto.ContainerStats
 // @Security ApiKeyAuth
 // @Router /containers/stats/:id [get]
 func (b *BaseApi) ContainerStats(c *gin.Context) {
