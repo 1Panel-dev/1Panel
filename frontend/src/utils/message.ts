@@ -4,7 +4,7 @@ export const MsgSuccess = (message) => {
     ElMessage.success({
         message: message,
         type: 'success',
-        showClose: false,
+        showClose: true,
         duration: 3000,
     });
 };
@@ -13,7 +13,7 @@ export const MsgInfo = (message) => {
     ElMessage.info({
         message: message,
         type: 'info',
-        showClose: false,
+        showClose: true,
         duration: 3000,
     });
 };
