@@ -98,7 +98,7 @@ export const createVolume = (params: Container.VolumeCreate) => {
 
 // repo
 export const checkRepoStatus = (id: number) => {
-    return http.post(`/containers/repo/status`, { id: id });
+    return http.post(`/containers/repo/status`, { id: id }, 40000);
 };
 export const searchImageRepo = (params: SearchWithPage) => {
     return http.post<ResPage<Container.RepoInfo>>(`/containers/repo/search`, params);
@@ -107,13 +107,13 @@ export const listImageRepo = () => {
     return http.get<Container.RepoOptions>(`/containers/repo`);
 };
 export const createImageRepo = (params: Container.RepoCreate) => {
-    return http.post(`/containers/repo`, params);
+    return http.post(`/containers/repo`, params, 40000);
 };
 export const updateImageRepo = (params: Container.RepoUpdate) => {
-    return http.post(`/containers/repo/update`, params);
+    return http.post(`/containers/repo/update`, params, 40000);
 };
 export const deleteImageRepo = (params: Container.RepoDelete) => {
-    return http.post(`/containers/repo/del`, params);
+    return http.post(`/containers/repo/del`, params, 40000);
 };
 
 // composeTemplate
