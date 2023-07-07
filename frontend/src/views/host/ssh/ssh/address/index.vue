@@ -13,7 +13,7 @@
             <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
-                        <el-form-item :label="$t('ssh.listenAddress')" prop="listenAddress" :rules="Rules.ip">
+                        <el-form-item :label="$t('ssh.listenAddress')" prop="listenAddress" :rules="Rules.ipV4V6">
                             <el-input clearable v-model="form.listenAddress" />
                         </el-form-item>
                     </el-col>

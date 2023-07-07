@@ -225,7 +225,7 @@ import DrawerHeader from '@/components/drawer-header/index.vue';
 import { listImage, listVolume, createContainer, updateContainer, loadResourceLimit } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { checkIp, checkPort } from '@/utils/util';
+import { checkIpV4V6, checkPort } from '@/utils/util';
 
 const loading = ref(false);
 interface DialogProps {
@@ -406,7 +406,7 @@ const checkPortValid = () => {
     for (const port of dialogData.value.rowData!.exposedPorts) {
         if (port.host.indexOf(':') !== -1) {
             port.hostIP = port.host.split(':')[0];
-            if (checkIp(port.hostIP)) {
+            if (checkIpV4V6(port.hostIP)) {
                 MsgError(i18n.global.t('firewall.addressFormatError'));
                 return false;
             }

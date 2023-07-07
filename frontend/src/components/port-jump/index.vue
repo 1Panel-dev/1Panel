@@ -26,6 +26,7 @@ import { getSettingInfo } from '@/api/modules/setting';
 import i18n from '@/lang';
 import { MsgError } from '@/utils/message';
 import { useRouter } from 'vue-router';
+import { checkIp } from '@/utils/util';
 const router = useRouter();
 
 const dialogVisiable = ref();
@@ -44,7 +45,10 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
         dialogVisiable.value = true;
         return;
     }
-    window.open(`http://${res.data.systemIP}:${params.port}`, '_blank');
+    if (!checkIp(res.data.systemIP)) {
+        window.open(`http://${res.data.systemIP}:${params.port}`, '_blank');
+    }
+    window.open(`http://[${res.data.systemIP}]:${params.port}`, '_blank');
 };
 
 const goRouter = async (path: string) => {
