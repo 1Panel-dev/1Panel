@@ -37,6 +37,7 @@ type IContainerService interface {
 	Page(req dto.PageContainer) (int64, interface{}, error)
 	List() ([]string, error)
 	PageNetwork(req dto.SearchWithPage) (int64, interface{}, error)
+	ListNetwork() ([]dto.Options, error)
 	PageVolume(req dto.SearchWithPage) (int64, interface{}, error)
 	ListVolume() ([]dto.Options, error)
 	PageCompose(req dto.SearchWithPage) (int64, interface{}, error)
@@ -309,7 +310,8 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate) error {
 
 	var config container.Config
 	var hostConf container.HostConfig
-	if err := loadConfigInfo(req, &config, &hostConf); err != nil {
+	var networkConf network.NetworkingConfig
+	if err := loadConfigInfo(req, &config, &hostConf, &networkConf); err != nil {
 		return err
 	}
 
@@ -320,7 +322,7 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate) error {
 			return err
 		}
 	}
-	container, err := client.ContainerCreate(ctx, &config, &hostConf, &network.NetworkingConfig{}, &v1.Platform{}, req.Name)
+	container, err := client.ContainerCreate(ctx, &config, &hostConf, &networkConf, &v1.Platform{}, req.Name)
 	if err != nil {
 		_ = client.ContainerRemove(ctx, req.Name, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
 		return err
@@ -348,6 +350,12 @@ func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.Contai
 	data.ContainerID = oldContainer.ID
 	data.Name = strings.ReplaceAll(oldContainer.Name, "/", "")
 	data.Image = oldContainer.Config.Image
+	if oldContainer.NetworkSettings != nil {
+		for network := range oldContainer.NetworkSettings.Networks {
+			data.Network = network
+			break
+		}
+	}
 	data.Cmd = oldContainer.Config.Cmd
 	data.Env = oldContainer.Config.Env
 	data.CPUShares = oldContainer.HostConfig.CPUShares
@@ -409,7 +417,8 @@ func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
 	}
 	config := oldContainer.Config
 	hostConf := oldContainer.HostConfig
-	if err := loadConfigInfo(req, config, hostConf); err != nil {
+	var networkConf network.NetworkingConfig
+	if err := loadConfigInfo(req, config, hostConf, &networkConf); err != nil {
 		return err
 	}
 	if err := client.ContainerRemove(ctx, req.ContainerID, types.ContainerRemoveOptions{Force: true}); err != nil {
@@ -417,7 +426,7 @@ func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
 	}
 
 	global.LOG.Infof("new container info %s has been update, now start to recreate", req.Name)
-	container, err := client.ContainerCreate(ctx, config, hostConf, &network.NetworkingConfig{}, &v1.Platform{}, req.Name)
+	container, err := client.ContainerCreate(ctx, config, hostConf, &networkConf, &v1.Platform{}, req.Name)
 	if err != nil {
 		return fmt.Errorf("recreate contianer failed, err: %v", err)
 	}
@@ -447,6 +456,13 @@ func (u *ContainerService) ContainerUpgrade(req dto.ContainerUpgrade) error {
 	config := oldContainer.Config
 	config.Image = req.Image
 	hostConf := oldContainer.HostConfig
+	var networkConf network.NetworkingConfig
+	if oldContainer.NetworkSettings != nil {
+		for networkKey := range oldContainer.NetworkSettings.Networks {
+			networkConf.EndpointsConfig = map[string]*network.EndpointSettings{networkKey: {}}
+			break
+		}
+	}
 	if err := client.ContainerRemove(ctx, req.Name, types.ContainerRemoveOptions{Force: true}); err != nil {
 		return err
 	}
@@ -743,7 +759,7 @@ func checkPortStats(ports []dto.PortHelper) (nat.PortMap, error) {
 	return portMap, nil
 }
 
-func loadConfigInfo(req dto.ContainerOperate, config *container.Config, hostConf *container.HostConfig) error {
+func loadConfigInfo(req dto.ContainerOperate, config *container.Config, hostConf *container.HostConfig, networkConf *network.NetworkingConfig) error {
 	portMap, err := checkPortStats(req.ExposedPorts)
 	if err != nil {
 		return err
@@ -757,6 +773,8 @@ func loadConfigInfo(req dto.ContainerOperate, config *container.Config, hostConf
 	config.Env = req.Env
 	config.Labels = stringsToMap(req.Labels)
 	config.ExposedPorts = exposeds
+
+	networkConf.EndpointsConfig = map[string]*network.EndpointSettings{req.Network: {}}
 
 	hostConf.AutoRemove = req.AutoRemove
 	hostConf.CPUShares = req.CPUShares

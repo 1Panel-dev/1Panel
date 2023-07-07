@@ -339,6 +339,8 @@ definitions:
         type: string
       nanoCPUs:
         type: integer
+      network:
+        type: string
       publishAllPorts:
         type: boolean
       restartPolicy:
@@ -4817,6 +4819,24 @@ paths:
       - ApiKeyAuth: []
       summary: Load container stats
   /containers/network:
+    get:
+      consumes:
+      - application/json
+      description: 获取容器网络列表
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.Options'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: List networks
+      tags:
+      - Container Network
     post:
       consumes:
       - application/json
@@ -5372,6 +5392,24 @@ paths:
         formatZH: 更新容器镜像 [name][image]
         paramKeys: []
   /containers/volume:
+    get:
+      consumes:
+      - application/json
+      description: 获取容器存储卷列表
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.Options'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: List volumes
+      tags:
+      - Container Volume
     post:
       consumes:
       - application/json
@@ -5426,29 +5464,6 @@ paths:
         formatZH: 删除容器存储卷 [names]
         paramKeys: []
   /containers/volume/search:
-    get:
-      consumes:
-      - application/json
-      description: 获取容器存储卷列表
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.PageInfo'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.PageResult'
-      security:
-      - ApiKeyAuth: []
-      summary: List volumes
-      tags:
-      - Container Volume
     post:
       consumes:
       - application/json

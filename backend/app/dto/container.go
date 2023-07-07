@@ -39,6 +39,7 @@ type ContainerOperate struct {
 	ContainerID     string         `json:"containerID"`
 	Name            string         `json:"name"`
 	Image           string         `json:"image"`
+	Network         string         `json:"network"`
 	PublishAllPorts bool           `json:"publishAllPorts"`
 	ExposedPorts    []PortHelper   `json:"exposedPorts"`
 	Cmd             []string       `json:"cmd"`
