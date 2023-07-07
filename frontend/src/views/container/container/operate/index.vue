@@ -82,6 +82,16 @@
                             </table>
                         </el-card>
                     </el-form-item>
+                    <el-form-item :label="$t('container.network')" prop="network">
+                        <el-select v-model="dialogData.rowData!.network">
+                            <el-option
+                                v-for="(item, indexV) of networks"
+                                :key="indexV"
+                                :value="item.option"
+                                :label="item.option"
+                            />
+                        </el-select>
+                    </el-form-item>
                     <el-form-item :label="$t('container.cmd')" prop="cmdStr">
                         <el-input :placeholder="$t('container.cmdHelper')" v-model="dialogData.rowData!.cmdStr" />
                     </el-form-item>
@@ -222,7 +232,14 @@ import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { listImage, listVolume, createContainer, updateContainer, loadResourceLimit } from '@/api/modules/container';
+import {
+    listImage,
+    listVolume,
+    createContainer,
+    updateContainer,
+    loadResourceLimit,
+    listNetwork,
+} from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { checkIpV4V6, checkPort } from '@/utils/util';
@@ -263,12 +280,14 @@ const acceptParams = (params: DialogProps): void => {
     loadLimit();
     loadImageOptions();
     loadVolumeOptions();
+    loadNetworkOptions();
     drawerVisiable.value = true;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const images = ref();
 const volumes = ref();
+const networks = ref();
 const limits = ref<Container.ResourceLimit>({
     cpu: null as number,
     memory: null as number,
@@ -279,6 +298,7 @@ const handleClose = () => {
 };
 
 const rules = reactive({
+    network: [Rules.requiredSelect],
     cpuShares: [Rules.number, checkNumberRange(0, 262144)],
     name: [Rules.requiredInput, Rules.name],
     image: [Rules.requiredSelect],
@@ -328,6 +348,10 @@ const loadImageOptions = async () => {
 const loadVolumeOptions = async () => {
     const res = await listVolume();
     volumes.value = res.data;
+};
+const loadNetworkOptions = async () => {
+    const res = await listNetwork();
+    networks.value = res.data;
 };
 const onSubmit = async (formEl: FormInstance | undefined) => {
     if (dialogData.value.rowData!.volumes.length !== 0) {

@@ -490,6 +490,23 @@ func (b *BaseApi) SearchNetwork(c *gin.Context) {
 }
 
 // @Tags Container Network
+// @Summary List networks
+// @Description 获取容器网络列表
+// @Accept json
+// @Produce json
+// @Success 200 {array} dto.Options
+// @Security ApiKeyAuth
+// @Router /containers/network [get]
+func (b *BaseApi) ListNetwork(c *gin.Context) {
+	list, err := containerService.ListNetwork()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, list)
+}
+
+// @Tags Container Network
 // @Summary Delete network
 // @Description 删除容器网络
 // @Accept json
@@ -578,11 +595,10 @@ func (b *BaseApi) SearchVolume(c *gin.Context) {
 // @Summary List volumes
 // @Description 获取容器存储卷列表
 // @Accept json
-// @Param request body dto.PageInfo true "request"
 // @Produce json
-// @Success 200 {object} dto.PageResult
+// @Success 200 {array} dto.Options
 // @Security ApiKeyAuth
-// @Router /containers/volume/search [get]
+// @Router /containers/volume [get]
 func (b *BaseApi) ListVolume(c *gin.Context) {
 	list, err := containerService.ListVolume()
 	if err != nil {

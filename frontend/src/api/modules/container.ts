@@ -75,6 +75,9 @@ export const imageRemove = (params: Container.BatchDelete) => {
 export const searchNetwork = (params: SearchWithPage) => {
     return http.post<ResPage<Container.NetworkInfo>>(`/containers/network/search`, params);
 };
+export const listNetwork = () => {
+    return http.get<Array<Container.Options>>(`/containers/network`);
+};
 export const deleteNetwork = (params: Container.BatchDelete) => {
     return http.post(`/containers/network/del`, params);
 };

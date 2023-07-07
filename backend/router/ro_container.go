@@ -61,10 +61,11 @@ func (s *ContainerRouter) InitContainerRouter(Router *gin.RouterGroup) {
 		baRouter.POST("/image/tag", baseApi.ImageTag)
 		baRouter.POST("/image/build", baseApi.ImageBuild)
 
-		baRouter.GET("/volume", baseApi.ListVolume)
+		baRouter.GET("/network", baseApi.ListNetwork)
 		baRouter.POST("/network/del", baseApi.DeleteNetwork)
 		baRouter.POST("/network/search", baseApi.SearchNetwork)
 		baRouter.POST("/network", baseApi.CreateNetwork)
+		baRouter.GET("/volume", baseApi.ListVolume)
 		baRouter.POST("/volume/del", baseApi.DeleteVolume)
 		baRouter.POST("/volume/search", baseApi.SearchVolume)
 		baRouter.POST("/volume", baseApi.CreateVolume)

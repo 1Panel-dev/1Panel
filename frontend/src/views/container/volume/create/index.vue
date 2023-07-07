@@ -12,6 +12,7 @@
                     :model="form"
                     :rules="rules"
                     label-width="80px"
+                    @submit.prevent
                 >
                     <el-form-item :label="$t('commons.table.name')" prop="name">
                         <el-input clearable v-model.trim="form.name" />
