@@ -8,7 +8,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/i18n"
-	"github.com/compose-spec/compose-go/types"
 	"github.com/subosito/gotenv"
 	"gopkg.in/yaml.v3"
 	"math"
@@ -521,27 +520,6 @@ func upAppPre(app model.App, appInstall *model.AppInstall) error {
 	return nil
 }
 
-func getServiceFromInstall(appInstall *model.AppInstall) (service *composeV2.ComposeService, err error) {
-	var (
-		project *types.Project
-		envStr  string
-	)
-	envStr, err = coverEnvJsonToStr(appInstall.Env)
-	if err != nil {
-		return
-	}
-	project, err = composeV2.GetComposeProject(appInstall.Name, appInstall.GetPath(), []byte(appInstall.DockerCompose), []byte(envStr), true)
-	if err != nil {
-		return
-	}
-	service, err = composeV2.NewComposeService()
-	if err != nil {
-		return
-	}
-	service.SetProject(project)
-	return
-}
-
 func checkContainerNameIsExist(containerName, appDir string) (bool, error) {
 	client, err := composeV2.NewDockerClient()
 	if err != nil {
@@ -574,18 +552,20 @@ func upApp(appInstall *model.AppInstall) {
 				out    string
 				errMsg string
 			)
-			out, err = compose.Pull(appInstall.GetComposePath())
-			if err != nil {
-				if out != "" {
-					if strings.Contains(out, "no such host") {
-						errMsg = i18n.GetMsgByKey("ErrNoSuchHost") + ":"
+			if appInstall.App.Type != "php" {
+				out, err = compose.Pull(appInstall.GetComposePath())
+				if err != nil {
+					if out != "" {
+						if strings.Contains(out, "no such host") {
+							errMsg = i18n.GetMsgByKey("ErrNoSuchHost") + ":"
+						}
+						if strings.Contains(out, "timeout") {
+							errMsg = i18n.GetMsgByKey("ErrImagePullTimeOut") + ":"
+						}
+						appInstall.Message = errMsg + out
 					}
-					if strings.Contains(out, "timeout") {
-						errMsg = i18n.GetMsgByKey("ErrImagePullTimeOut") + ":"
-					}
-					appInstall.Message = errMsg + out
+					return err
 				}
-				return err
 			}
 			out, err = compose.Up(appInstall.GetComposePath())
 			if err != nil {

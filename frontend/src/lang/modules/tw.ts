@@ -1142,6 +1142,7 @@ const message = {
         showIgnore: '查看忽略應用',
         cancelIgnore: '取消忽略',
         ignoreList: '忽略列表',
+        appHelper: '部分應用的安裝使用說明請在應用詳情頁查看',
     },
     website: {
         website: '網站',

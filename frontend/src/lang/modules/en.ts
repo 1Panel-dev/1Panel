@@ -1201,6 +1201,7 @@ const message = {
         showIgnore: 'View ignore application',
         cancelIgnore: 'Cancel ignore',
         ignoreList: 'ignore list',
+        appHelper: 'Please view the installation instructions of some applications on the application details page',
     },
     website: {
         website: 'Website',

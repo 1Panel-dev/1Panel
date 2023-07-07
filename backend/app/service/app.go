@@ -24,6 +24,7 @@ import (
 	"os"
 	"path"
 	"strconv"
+	"strings"
 )
 
 type AppService struct {
@@ -269,14 +270,23 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		appDetail model.AppDetail
 		app       model.App
 	)
-	httpPort, err = checkPort("PANEL_APP_PORT_HTTP", req.Params)
-	if err != nil {
-		return
+	for key := range req.Params {
+		if !strings.Contains(key, "PORT") {
+			continue
+		}
+		var port int
+		if port, err = checkPort(key, req.Params); err == nil {
+			if key == "PANEL_APP_PORT_HTTP" {
+				httpPort = port
+			}
+			if key == "PANEL_APP_PORT_HTTPS" {
+				httpsPort = port
+			}
+		} else {
+			return
+		}
 	}
-	httpsPort, err = checkPort("PANEL_APP_PORT_HTTPS", req.Params)
-	if err != nil {
-		return
-	}
+
 	appDetail, err = appDetailRepo.GetFirst(commonRepo.WithByID(req.AppDetailId))
 	if err != nil {
 		return
