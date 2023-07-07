@@ -48,7 +48,7 @@ import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { Host } from '@/api/interface/host';
 import { operateIPRule, updateAddrRule } from '@/api/modules/host';
-import { checkIp, deepCopy } from '@/utils/util';
+import { checkIpV4V6, deepCopy } from '@/utils/util';
 
 const loading = ref();
 const oldRule = ref<Host.RuleIP>();
@@ -99,7 +99,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             ips.push(dialogData.value.rowData.address);
         }
         for (const ip of ips) {
-            if (checkIp(ip)) {
+            if (checkIpV4V6(ip)) {
                 MsgError(i18n.global.t('firewall.addressFormatError'));
                 return;
             }

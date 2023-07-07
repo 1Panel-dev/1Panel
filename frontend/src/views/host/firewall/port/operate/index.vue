@@ -73,7 +73,7 @@ import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { Host } from '@/api/interface/host';
 import { operatePortRule, updatePortRule } from '@/api/modules/host';
-import { checkIp, checkPort, deepCopy } from '@/utils/util';
+import { checkIpV4V6, checkPort, deepCopy } from '@/utils/util';
 
 const loading = ref();
 const oldRule = ref<Host.RulePort>();
@@ -126,12 +126,12 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             dialogData.value.rowData.address = '';
         } else {
             if (dialogData.value.rowData.address.indexOf('/') !== -1) {
-                if (checkIp(dialogData.value.rowData.address.split('/')[0])) {
+                if (checkIpV4V6(dialogData.value.rowData.address.split('/')[0])) {
                     MsgError(i18n.global.t('firewall.addressFormatError'));
                     return;
                 }
             } else {
-                if (checkIp(dialogData.value.rowData.address)) {
+                if (checkIpV4V6(dialogData.value.rowData.address)) {
                     MsgError(i18n.global.t('firewall.addressFormatError'));
                     return;
                 }

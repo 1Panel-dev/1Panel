@@ -36,7 +36,7 @@ import { GetWafConfig, UpdateWafEnable } from '@/api/modules/website';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { SaveFileContent } from '@/api/modules/files';
 import i18n from '@/lang';
-import { checkIp } from '@/utils/util';
+import { checkIpV4V6 } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';
 import { MsgError } from '@/utils/message';
 
@@ -127,7 +127,7 @@ const openCreate = () => {
     }
     if (req.value.rule.indexOf('ip') > -1) {
         for (const id in newIpArray) {
-            if (checkIp(newIpArray[id])) {
+            if (checkIpV4V6(newIpArray[id])) {
                 MsgError(i18n.global.t('commons.rule.ipErr', [ipArray[id]]));
                 return;
             }
