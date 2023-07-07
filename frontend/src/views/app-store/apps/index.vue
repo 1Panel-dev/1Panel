@@ -44,6 +44,7 @@
             </el-badge>
         </template>
         <template #main>
+            <el-alert type="info" :title="$t('app.appHelper')" :closable="false" />
             <el-row :gutter="5">
                 <el-col
                     class="app-col-12"
