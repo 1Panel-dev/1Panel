@@ -124,6 +124,7 @@ const onTermWheel = (event: WheelEvent) => {
         } else {
             term.value.options.fontSize = term.value.options.fontSize + 1;
         }
+        changeTerminalSize();
     }
 };
 
