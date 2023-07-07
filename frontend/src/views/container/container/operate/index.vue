@@ -250,6 +250,8 @@ const acceptParams = (params: DialogProps): void => {
             itemCmd += `'${item}' `;
         }
         dialogData.value.rowData.cmdStr = itemCmd ? itemCmd.substring(0, itemCmd.length - 1) : '';
+        dialogData.value.rowData.labels = dialogData.value.rowData.labels || [];
+        dialogData.value.rowData.env = dialogData.value.rowData.env || [];
         dialogData.value.rowData.labelsStr = dialogData.value.rowData.labels.join('\n');
         dialogData.value.rowData.envStr = dialogData.value.rowData.env.join('\n');
         dialogData.value.rowData.exposedPorts = dialogData.value.rowData.exposedPorts || [];
