@@ -355,7 +355,7 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 }
 
 func (a *AppInstallService) IgnoreUpgrade(req request.AppInstalledIgnoreUpgrade) error {
-	appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(req.DetailId))
+	appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(req.DetailID))
 	if err != nil {
 		return err
 	}
