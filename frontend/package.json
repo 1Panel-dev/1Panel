@@ -76,7 +76,7 @@
         "rollup-plugin-visualizer": "^5.5.4",
         "sass": "^1.49.7",
         "standard-version": "^9.5.0",
-        "stylelint": "^14.8.5",
+        "stylelint": "^15.10.1",
         "stylelint-config-html": "^1.0.0",
         "stylelint-config-prettier": "^9.0.3",
         "stylelint-config-recess-order": "^3.0.0",
