@@ -161,7 +161,7 @@ const checkVolumeName = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.volumeName')));
     } else {
-        const reg = /^[a-zA-Z0-9]{1}[a-z:A-Z0-9_.-]{1,30}$/;
+        const reg = /^[a-zA-Z0-9]{1}[a-zA-Z0-9_.-]{1,30}$/;
         if (!reg.test(value) && value !== '') {
             callback(new Error(i18n.global.t('commons.rule.volumeName')));
         } else {
@@ -230,6 +230,19 @@ const checkIntegerNumber = (rule: any, value: any, callback: any) => {
         const reg = /^[1-9]\d*$/;
         if (!reg.test(value) && value !== '') {
             callback(new Error(i18n.global.t('commons.rule.integer')));
+        } else {
+            callback();
+        }
+    }
+};
+
+const checkFloatNumber = (rule: any, value: any, callback: any) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback(new Error(i18n.global.t('commons.rule.integer')));
+    } else {
+        const reg = /^\d+(\.\d+)?$/;
+        if (!reg.test(value) && value !== '') {
+            callback(new Error(i18n.global.t('commons.rule.number')));
         } else {
             callback();
         }
@@ -313,6 +326,26 @@ export function checkNumberRange(min: number, max: number): FormItemRule {
     };
 }
 
+export function checkFloatNumberRange(min: number, max: number): FormItemRule {
+    let validatorFunc = function (rule: any, value: any, callback: any) {
+        if (value === '' || typeof value === 'undefined' || value == null) {
+            callback(new Error(i18n.global.t('commons.rule.disableFunction')));
+        } else {
+            if ((Number(value) < min || Number(value) > max) && value !== '') {
+                callback(new Error(i18n.global.t('commons.rule.disableFunction')));
+            } else {
+                callback();
+            }
+        }
+    };
+    return {
+        required: false,
+        trigger: 'blur',
+        validator: validatorFunc,
+        message: i18n.global.t('commons.rule.numberRange', [min, max]),
+    };
+}
+
 const checkContainerName = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback();
@@ -380,6 +413,7 @@ interface CommonRule {
     email: FormItemRule;
     number: FormItemRule;
     integerNumber: FormItemRule;
+    floatNumber: FormItemRule;
     ip: FormItemRule;
     ipV4V6: FormItemRule;
     host: FormItemRule;
@@ -480,6 +514,13 @@ export const Rules: CommonRule = {
         required: true,
         validator: checkIntegerNumber,
         trigger: 'blur',
+    },
+    floatNumber: {
+        required: true,
+        validator: checkFloatNumber,
+        trigger: 'blur',
+        min: 0,
+        message: i18n.global.t('commons.rule.number'),
     },
     ip: {
         validator: checkIp,

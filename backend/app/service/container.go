@@ -379,10 +379,10 @@ func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.Contai
 	data.PublishAllPorts = oldContainer.HostConfig.PublishAllPorts
 	data.RestartPolicy = oldContainer.HostConfig.RestartPolicy.Name
 	if oldContainer.HostConfig.NanoCPUs != 0 {
-		data.NanoCPUs = oldContainer.HostConfig.NanoCPUs / 1000000000
+		data.NanoCPUs = float64(oldContainer.HostConfig.NanoCPUs) / 1000000000
 	}
 	if oldContainer.HostConfig.Memory != 0 {
-		data.Memory = oldContainer.HostConfig.Memory
+		data.Memory = float64(oldContainer.HostConfig.Memory) / 1024 / 1024
 	}
 	for _, bind := range oldContainer.HostConfig.Binds {
 		parts := strings.Split(bind, ":")
@@ -783,22 +783,14 @@ func loadConfigInfo(req dto.ContainerOperate, config *container.Config, hostConf
 	if req.RestartPolicy == "on-failure" {
 		hostConf.RestartPolicy.MaximumRetryCount = 5
 	}
-	if req.NanoCPUs != 0 {
-		hostConf.NanoCPUs = req.NanoCPUs * 1000000000
-	}
-	if req.Memory != 0 {
-		hostConf.Memory = req.Memory
-	}
-	if len(req.ExposedPorts) != 0 {
-		hostConf.PortBindings = portMap
-	}
+	hostConf.NanoCPUs = int64(req.NanoCPUs * 1000000000)
+	hostConf.Memory = int64(req.Memory * 1024 * 1024)
+	hostConf.PortBindings = portMap
 	hostConf.Binds = []string{}
-	if len(req.Volumes) != 0 {
-		config.Volumes = make(map[string]struct{})
-		for _, volume := range req.Volumes {
-			config.Volumes[volume.ContainerDir] = struct{}{}
-			hostConf.Binds = append(hostConf.Binds, fmt.Sprintf("%s:%s:%s", volume.SourceDir, volume.ContainerDir, volume.Mode))
-		}
+	config.Volumes = make(map[string]struct{})
+	for _, volume := range req.Volumes {
+		config.Volumes[volume.ContainerDir] = struct{}{}
+		hostConf.Binds = append(hostConf.Binds, fmt.Sprintf("%s:%s:%s", volume.SourceDir, volume.ContainerDir, volume.Mode))
 	}
 	return nil
 }
