@@ -44,8 +44,8 @@ type ContainerOperate struct {
 	ExposedPorts    []PortHelper   `json:"exposedPorts"`
 	Cmd             []string       `json:"cmd"`
 	CPUShares       int64          `json:"cpuShares"`
-	NanoCPUs        int64          `json:"nanoCPUs"`
-	Memory          int64          `json:"memory"`
+	NanoCPUs        float64        `json:"nanoCPUs"`
+	Memory          float64        `json:"memory"`
 	AutoRemove      bool           `json:"autoRemove"`
 	Volumes         []VolumeHelper `json:"volumes"`
 	Labels          []string       `json:"labels"`

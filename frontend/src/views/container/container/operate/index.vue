@@ -107,9 +107,9 @@
                     <el-form-item
                         :label="$t('container.cpuQuota')"
                         prop="nanoCPUs"
-                        :rules="checkNumberRange(0, limits.cpu)"
+                        :rules="checkFloatNumberRange(0, Number(limits.cpu))"
                     >
-                        <el-input class="mini-form-item" v-model.number="dialogData.rowData!.nanoCPUs">
+                        <el-input class="mini-form-item" v-model="dialogData.rowData!.nanoCPUs">
                             <template #append>
                                 <div style="width: 35px">{{ $t('commons.units.core') }}</div>
                             </template>
@@ -118,12 +118,8 @@
                             {{ $t('container.limitHelper', [limits.cpu]) }}{{ $t('commons.units.core') }}
                         </span>
                     </el-form-item>
-                    <el-form-item
-                        :label="$t('container.memoryLimit')"
-                        prop="memoryItem"
-                        :rules="checkNumberRange(0, limits.memory)"
-                    >
-                        <el-input class="mini-form-item" v-model.number="dialogData.rowData!.memoryItem">
+                    <el-form-item :label="$t('container.memoryLimit')" prop="memory">
+                        <el-input class="mini-form-item" v-model="dialogData.rowData!.memory">
                             <template #append><div style="width: 35px">MB</div></template>
                         </el-input>
                         <span class="input-help">{{ $t('container.limitHelper', [limits.memory]) }}MB</span>
@@ -228,7 +224,7 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { Rules, checkNumberRange } from '@/global/form-rules';
+import { Rules, checkFloatNumberRange, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
@@ -261,7 +257,7 @@ const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
     title.value = i18n.global.t('container.' + dialogData.value.title);
     if (params.title === 'edit') {
-        dialogData.value.rowData.memoryItem = Number((dialogData.value.rowData.memory / 1024 / 1024).toFixed(2));
+        dialogData.value.rowData.memory = Number(dialogData.value.rowData.memory.toFixed(2));
         let itemCmd = '';
         for (const item of dialogData.value.rowData.cmd) {
             itemCmd += `'${item}' `;
@@ -298,12 +294,12 @@ const handleClose = () => {
 };
 
 const rules = reactive({
-    network: [Rules.requiredSelect],
-    cpuShares: [Rules.number, checkNumberRange(0, 262144)],
-    name: [Rules.requiredInput, Rules.name],
+    name: [Rules.requiredInput, Rules.volumeName],
     image: [Rules.requiredSelect],
-    nanoCPUs: [Rules.number],
-    memoryItem: [Rules.number],
+    network: [Rules.requiredSelect],
+    cpuShares: [Rules.floatNumber, checkNumberRange(0, 262144)],
+    nanoCPUs: [Rules.floatNumber],
+    memory: [Rules.floatNumber],
 });
 
 type FormInstance = InstanceType<typeof ElForm>;
@@ -383,7 +379,9 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         if (!checkPortValid()) {
             return;
         }
-        dialogData.value.rowData!.memory = dialogData.value.rowData!.memoryItem * 1024 * 1024;
+        dialogData.value.rowData!.memory = Number(dialogData.value.rowData!.memory);
+        dialogData.value.rowData!.cpuShares = Number(dialogData.value.rowData!.cpuShares);
+        dialogData.value.rowData!.nanoCPUs = Number(dialogData.value.rowData!.nanoCPUs);
 
         loading.value = true;
         if (dialogData.value.title === 'create') {
