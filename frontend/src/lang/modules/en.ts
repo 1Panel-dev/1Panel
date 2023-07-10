@@ -504,6 +504,7 @@ const message = {
         appHelper:
             'This container is sourced from the application store. Upgrading it may cause the service to be unavailable. Do you want to continue?',
 
+        forcePull: 'Pull the latest image',
         server: 'Host',
         serverExample: 'e.g. 80, 80-88, ip:80 or ip:80-88',
         containerExample: 'e.g. 80 or 80-88',

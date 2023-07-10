@@ -26,6 +26,11 @@
                             />
                         </el-select>
                     </el-form-item>
+                    <el-form-item prop="forcePull">
+                        <el-checkbox v-model="dialogData.rowData!.forcePull">
+                            {{ $t('container.forcePull') }}
+                        </el-checkbox>
+                    </el-form-item>
                     <el-form-item :label="$t('commons.table.port')">
                         <el-radio-group v-model="dialogData.rowData!.publishAllPorts" class="ml-4">
                             <el-radio :label="false">{{ $t('container.exposePort') }}</el-radio>

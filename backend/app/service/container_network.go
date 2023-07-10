@@ -89,6 +89,9 @@ func (u *ContainerService) ListNetwork() ([]dto.Options, error) {
 	for _, item := range list {
 		datas = append(datas, dto.Options{Option: item.Name})
 	}
+	sort.Slice(datas, func(i, j int) bool {
+		return datas[i].Option < datas[j].Option
+	})
 	return datas, nil
 }
 

@@ -17,8 +17,8 @@ export const createContainer = (params: Container.ContainerHelper) => {
 export const updateContainer = (params: Container.ContainerHelper) => {
     return http.post(`/containers/update`, params, 3000000);
 };
-export const upgradeContainer = (name: string, image: string) => {
-    return http.post(`/containers/upgrade`, { name: name, image: image }, 3000000);
+export const upgradeContainer = (name: string, image: string, forcePull: boolean) => {
+    return http.post(`/containers/upgrade`, { name: name, image: image, forcePull: forcePull }, 3000000);
 };
 export const loadContainerInfo = (name: string) => {
     return http.post<Container.ContainerHelper>(`/containers/info`, { name: name });

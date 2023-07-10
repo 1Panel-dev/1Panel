@@ -38,6 +38,11 @@
                         <el-input v-model="form.newTag" :placeholder="$t('container.targetImageHelper')" />
                         <span class="input-help">{{ $t('container.upgradeHelper') }}</span>
                     </el-form-item>
+                    <el-form-item prop="forcePull">
+                        <el-checkbox v-model="form.forcePull">
+                            {{ $t('container.forcePull') }}
+                        </el-checkbox>
+                    </el-form-item>
                 </el-form>
             </el-col>
         </el-row>
@@ -71,6 +76,7 @@ const form = reactive({
     oldTag: '',
     newTag: '',
     fromApp: false,
+    forcePull: false,
 });
 
 const formRef = ref<FormInstance>();
@@ -106,7 +112,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             cancelButtonText: i18n.global.t('commons.button.cancel'),
         }).then(async () => {
             loading.value = true;
-            await upgradeContainer(form.name, form.imageName + ':' + form.newTag)
+            await upgradeContainer(form.name, form.imageName + ':' + form.newTag, form.forcePull)
                 .then(() => {
                     loading.value = false;
                     emit('search');
