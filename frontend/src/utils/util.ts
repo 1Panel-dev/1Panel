@@ -283,3 +283,13 @@ export function downloadFile(filePath: string) {
     let url = `${import.meta.env.VITE_API_URL as string}/files/download?`;
     window.open(url + 'path=' + filePath, '_blank');
 }
+
+export function downloadWithContent(content: string, fileName: string) {
+    const downloadUrl = window.URL.createObjectURL(new Blob([content]));
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = downloadUrl;
+    a.download = fileName;
+    const event = new MouseEvent('click');
+    a.dispatchEvent(event);
+}

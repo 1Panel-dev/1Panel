@@ -47,7 +47,7 @@
 <script lang="ts" setup>
 import { cleanContainerLog } from '@/api/modules/container';
 import i18n from '@/lang';
-import { dateFormatForName } from '@/utils/util';
+import { dateFormatForName, downloadWithContent } from '@/utils/util';
 import { onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
@@ -115,13 +115,7 @@ const searchLogs = async () => {
 };
 
 const onDownload = async () => {
-    const downloadUrl = window.URL.createObjectURL(new Blob([logInfo.value]));
-    const a = document.createElement('a');
-    a.style.display = 'none';
-    a.href = downloadUrl;
-    a.download = logSearch.container + '-' + dateFormatForName(new Date()) + '.log';
-    const event = new MouseEvent('click');
-    a.dispatchEvent(event);
+    downloadWithContent(logInfo.value, logSearch.container + '-' + dateFormatForName(new Date()) + '.log');
 };
 
 interface DialogProps {
