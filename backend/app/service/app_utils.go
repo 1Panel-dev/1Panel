@@ -48,7 +48,20 @@ var (
 func checkPort(key string, params map[string]interface{}) (int, error) {
 	port, ok := params[key]
 	if ok {
-		portN := int(math.Ceil(port.(float64)))
+		portN := 0
+		var err error
+		switch p := port.(type) {
+		case string:
+			portN, err = strconv.Atoi(p)
+			if err != nil {
+				return portN, nil
+			}
+		case float64:
+			portN = int(math.Ceil(p))
+		case int:
+			portN = p
+		}
+
 		oldInstalled, _ := appInstallRepo.ListBy(appInstallRepo.WithPort(portN))
 		if len(oldInstalled) > 0 {
 			var apps []string

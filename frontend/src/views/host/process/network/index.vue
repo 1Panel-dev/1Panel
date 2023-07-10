@@ -166,7 +166,6 @@ const onMessage = (message: any) => {
 };
 
 const filterByStatus = () => {
-    console.log(sortConfig.filters);
     if (sortConfig.filters.length > 0) {
         const newData = oldData.value.filter((re: any) => {
             return (sortConfig.filters as string[]).indexOf(re.status) > -1;
