@@ -24,24 +24,34 @@
                 </el-row>
             </template>
             <template #search>
-                <el-select v-model="logReq.id" @change="search()">
-                    <template #prefix>{{ $t('website.website') }}</template>
-                    <el-option
-                        v-for="(website, index) in websites"
-                        :key="index"
-                        :label="website.primaryDomain"
-                        :value="website.id"
-                    ></el-option>
-                </el-select>
-                <el-button
-                    type="primary"
-                    plain
-                    @click="onClean()"
-                    style="margin-left: 10px"
-                    :disabled="data.content.length === 0"
-                >
-                    {{ $t('logs.deleteLogs') }}
-                </el-button>
+                <div>
+                    <el-select v-model="logReq.id" @change="search()">
+                        <template #prefix>{{ $t('website.website') }}</template>
+                        <el-option
+                            v-for="(website, index) in websites"
+                            :key="index"
+                            :label="website.primaryDomain"
+                            :value="website.id"
+                        ></el-option>
+                    </el-select>
+                    <el-button class="left-button">
+                        <el-checkbox v-model="tailLog" @change="changeTail">
+                            {{ $t('commons.button.watch') }}
+                        </el-checkbox>
+                    </el-button>
+                    <el-button class="left-button" @click="onDownload" icon="Download" :disabled="data.content === ''">
+                        {{ $t('file.download') }}
+                    </el-button>
+                    <el-button
+                        type="primary"
+                        plain
+                        @click="onClean()"
+                        class="left-button"
+                        :disabled="data.content.length === 0"
+                    >
+                        {{ $t('logs.deleteLogs') }}
+                    </el-button>
+                </div>
             </template>
             <template #main>
                 <Codemirror
@@ -74,6 +84,7 @@ import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
+import { dateFormatForName, downloadWithContent } from '@/utils/util';
 
 const extensions = [javascript(), oneDark];
 
@@ -89,6 +100,8 @@ const data = ref({
     content: '',
 });
 const confirmDialogRef = ref();
+const tailLog = ref(false);
+let timer: NodeJS.Timer | null = null;
 
 const getWebsites = async () => {
     loading.value = true;
@@ -142,6 +155,26 @@ const onClean = async () => {
         submitInputInfo: i18n.global.t('logs.deleteLogs'),
     };
     confirmDialogRef.value!.acceptParams(params);
+};
+
+const onDownload = async () => {
+    downloadWithContent(data.value.content, logReq.logType + '-' + dateFormatForName(new Date()) + '.log');
+};
+
+const changeTail = () => {
+    if (tailLog.value) {
+        timer = setInterval(() => {
+            search();
+        }, 1000 * 5);
+    } else {
+        onCloseLog();
+    }
+};
+
+const onCloseLog = async () => {
+    tailLog.value = false;
+    clearInterval(Number(timer));
+    timer = null;
 };
 
 const onSubmitClean = async () => {

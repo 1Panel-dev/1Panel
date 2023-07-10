@@ -54,7 +54,7 @@ import { Database } from '@/api/interface/database';
 import { LoadFile } from '@/api/modules/files';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { updateMysqlVariables } from '@/api/modules/database';
-import { dateFormatForName } from '@/utils/util';
+import { dateFormatForName, downloadWithContent } from '@/utils/util';
 import i18n from '@/lang';
 import { loadBaseDir } from '@/api/modules/setting';
 import { MsgError, MsgInfo, MsgSuccess } from '@/utils/message';
@@ -165,13 +165,7 @@ const onDownload = async () => {
         MsgInfo(i18n.global.t('database.noData'));
         return;
     }
-    const downloadUrl = window.URL.createObjectURL(new Blob([slowLogs.value]));
-    const a = document.createElement('a');
-    a.style.display = 'none';
-    a.href = downloadUrl;
-    a.download = mysqlName.value + '-slowlogs-' + dateFormatForName(new Date()) + '.log';
-    const event = new MouseEvent('click');
-    a.dispatchEvent(event);
+    downloadWithContent(slowLogs.value, mysqlName.value + '-slowlogs-' + dateFormatForName(new Date()) + '.log');
 };
 
 const loadMysqlSlowlogs = async (path: string) => {
