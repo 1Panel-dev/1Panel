@@ -90,6 +90,7 @@ const message = {
             Rollbacking: '快照回滚中，请稍候...',
         },
         msg: {
+            noneData: '暂无数据',
             delete: '删除 操作不可回滚，是否继续？',
             clean: '清空 操作不可回滚，是否继续？',
             deleteTitle: '删除',
@@ -867,6 +868,7 @@ const message = {
         pwdAuthHelper: '是否启用密码认证，默认启用。',
         pubkeyAuthentication: '密钥认证',
         key: '密钥',
+        password: '密码',
         pubkey: '密钥信息',
         encryptionMode: '加密方式',
         passwordHelper: '支持大小写英文、数字,长度6-10',

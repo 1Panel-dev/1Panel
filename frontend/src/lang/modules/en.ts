@@ -90,6 +90,7 @@ const message = {
             Rollbacking: 'Rollbacking from snapshot, please wait...',
         },
         msg: {
+            noneData: 'No data available',
             delete: 'This operation delete cannot be rolled back. Do you want to continue?',
             clean: 'This operation clean cannot be rolled back. Do you want to continue?',
             deleteTitle: 'Delete',
@@ -896,6 +897,7 @@ const message = {
         pwdAuthHelper: 'Whether to enable password authentication. This parameter is enabled by default.',
         pubkeyAuthentication: 'Key auth',
         key: 'Key',
+        password: 'Password',
         pubkey: 'Key info',
         encryptionMode: 'Encryption mode',
         passwordHelper: 'Can contain 6 to 10 digits and English cases',

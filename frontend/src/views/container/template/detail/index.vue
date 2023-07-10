@@ -7,7 +7,7 @@
         </template>
         <codemirror
             :autofocus="true"
-            placeholder="None data"
+            :placeholder="$t('commons.msg.noneData')"
             :indent-with-tab="true"
             :tabSize="4"
             style="width: 100%; height: calc(100vh - 160px)"
