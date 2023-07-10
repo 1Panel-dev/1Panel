@@ -84,12 +84,16 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 		return nil, err
 	}
 	var appDTOs []*response.AppDTO
-	for _, a := range apps {
+	for _, ap := range apps {
+		ap.ReadMe = ""
+		ap.Website = ""
+		ap.Document = ""
+		ap.Github = ""
 		appDTO := &response.AppDTO{
-			App: a,
+			App: ap,
 		}
 		appDTOs = append(appDTOs, appDTO)
-		appTags, err := appTagRepo.GetByAppId(a.ID)
+		appTags, err := appTagRepo.GetByAppId(ap.ID)
 		if err != nil {
 			continue
 		}
@@ -102,7 +106,7 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 			continue
 		}
 		appDTO.Tags = tags
-		installs, _ := appInstallRepo.ListBy(appInstallRepo.WithAppId(a.ID))
+		installs, _ := appInstallRepo.ListBy(appInstallRepo.WithAppId(ap.ID))
 		appDTO.Installed = len(installs) > 0
 	}
 	res.Items = appDTOs
