@@ -317,9 +317,12 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate) error {
 
 	global.LOG.Infof("new container info %s has been made, now start to create", req.Name)
 
-	if !checkImageExist(client, req.Image) {
+	if !checkImageExist(client, req.Image) || req.ForcePull {
 		if err := pullImages(ctx, client, req.Image); err != nil {
-			return err
+			if !req.ForcePull {
+				return err
+			}
+			global.LOG.Errorf("force pull image %s failed, err: %v", req.Image, err)
 		}
 	}
 	container, err := client.ContainerCreate(ctx, &config, &hostConf, &networkConf, &v1.Platform{}, req.Name)
@@ -410,9 +413,12 @@ func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
 	if err != nil {
 		return err
 	}
-	if !checkImageExist(client, req.Image) {
+	if !checkImageExist(client, req.Image) || req.ForcePull {
 		if err := pullImages(ctx, client, req.Image); err != nil {
-			return err
+			if !req.ForcePull {
+				return err
+			}
+			global.LOG.Errorf("force pull image %s failed, err: %v", req.Image, err)
 		}
 	}
 	config := oldContainer.Config
@@ -448,9 +454,12 @@ func (u *ContainerService) ContainerUpgrade(req dto.ContainerUpgrade) error {
 	if err != nil {
 		return err
 	}
-	if !checkImageExist(client, req.Image) {
+	if !checkImageExist(client, req.Image) || req.ForcePull {
 		if err := pullImages(ctx, client, req.Image); err != nil {
-			return err
+			if !req.ForcePull {
+				return err
+			}
+			global.LOG.Errorf("force pull image %s failed, err: %v", req.Image, err)
 		}
 	}
 	config := oldContainer.Config

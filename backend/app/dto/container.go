@@ -37,6 +37,7 @@ type ResourceLimit struct {
 
 type ContainerOperate struct {
 	ContainerID     string         `json:"containerID"`
+	ForcePull       bool           `json:"forcePull"`
 	Name            string         `json:"name"`
 	Image           string         `json:"image"`
 	Network         string         `json:"network"`
@@ -54,8 +55,9 @@ type ContainerOperate struct {
 }
 
 type ContainerUpgrade struct {
-	Name  string `json:"name" validate:"required"`
-	Image string `json:"image" validate:"required"`
+	Name      string `json:"name" validate:"required"`
+	Image     string `json:"image" validate:"required"`
+	ForcePull bool   `json:"forcePull"`
 }
 
 type ContainerListStats struct {

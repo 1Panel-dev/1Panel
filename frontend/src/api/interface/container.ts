@@ -20,6 +20,7 @@ export namespace Container {
         containerID: string;
         name: string;
         image: string;
+        forcePull: boolean;
         network: string;
         cmdStr: string;
         memoryItem: number;

@@ -80,13 +80,16 @@ func (u *ContainerService) ListVolume() ([]dto.Options, error) {
 	if err != nil {
 		return nil, err
 	}
-	var data []dto.Options
+	var datas []dto.Options
 	for _, item := range list.Volumes {
-		data = append(data, dto.Options{
+		datas = append(datas, dto.Options{
 			Option: item.Name,
 		})
 	}
-	return data, nil
+	sort.Slice(datas, func(i, j int) bool {
+		return datas[i].Option < datas[j].Option
+	})
+	return datas, nil
 }
 func (u *ContainerService) DeleteVolume(req dto.BatchDelete) error {
 	client, err := docker.NewDockerClient()

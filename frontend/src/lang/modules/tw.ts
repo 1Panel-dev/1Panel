@@ -493,6 +493,7 @@ const message = {
         targetImageHelper: '請輸入目標鏡像版本',
         appHelper: '該容器來源於應用商店，升級可能導致該服務不可用，是否繼續？',
 
+        forcePull: '拉取最新鏡像',
         server: '服務器',
         serverExample: '例： 80, 80-88, ip:80 或者 ip:80-88',
         containerExample: '例： 80 或者 80-88',
