@@ -271,7 +271,7 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		app       model.App
 	)
 	for key := range req.Params {
-		if !strings.Contains(key, "PORT") {
+		if !strings.Contains(key, "PANEL_APP_PORT") {
 			continue
 		}
 		var port int
