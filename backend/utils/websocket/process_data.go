@@ -8,7 +8,9 @@ import (
 	"github.com/shirou/gopsutil/v3/host"
 	"github.com/shirou/gopsutil/v3/net"
 	"github.com/shirou/gopsutil/v3/process"
+	"sort"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -80,6 +82,20 @@ type processConnect struct {
 	Raddr  net.Addr `json:"remoteaddr"`
 	PID    int32    `json:"PID"`
 	Name   string   `json:"name"`
+}
+
+type ProcessConnects []processConnect
+
+func (p ProcessConnects) Len() int {
+	return len(p)
+}
+
+func (p ProcessConnects) Less(i, j int) bool {
+	return p[i].PID < p[j].PID
+}
+
+func (p ProcessConnects) Swap(i, j int) {
+	p[i], p[j] = p[j], p[i]
 }
 
 type sshSession struct {
@@ -163,20 +179,25 @@ func formatBytes(bytes uint64) string {
 }
 
 func getProcessData(processConfig PsProcessConfig) (res []byte, err error) {
-	var (
-		result    []PsProcessData
-		processes []*process.Process
-	)
+	var processes []*process.Process
 	processes, err = process.Processes()
 	if err != nil {
 		return
 	}
-	for _, proc := range processes {
+
+	var (
+		result      []PsProcessData
+		resultMutex sync.Mutex
+		wg          sync.WaitGroup
+		numWorkers  = 4
+	)
+
+	handleData := func(proc *process.Process) {
 		procData := PsProcessData{
 			PID: proc.Pid,
 		}
 		if processConfig.Pid > 0 && processConfig.Pid != proc.Pid {
-			continue
+			return
 		}
 		if procName, err := proc.Name(); err == nil {
 			procData.Name = procName
@@ -184,13 +205,13 @@ func getProcessData(processConfig PsProcessConfig) (res []byte, err error) {
 			procData.Name = "<UNKNOWN>"
 		}
 		if processConfig.Name != "" && !strings.Contains(procData.Name, processConfig.Name) {
-			continue
+			return
 		}
 		if username, err := proc.Username(); err == nil {
 			procData.Username = username
 		}
 		if processConfig.Username != "" && !strings.Contains(procData.Username, processConfig.Username) {
-			continue
+			return
 		}
 		procData.PPID, _ = proc.Ppid()
 		statusArray, _ := proc.Status()
@@ -251,8 +272,33 @@ func getProcessData(processConfig PsProcessConfig) (res []byte, err error) {
 		procData.OpenFiles, _ = proc.OpenFiles()
 		procData.Envs, _ = proc.Environ()
 
+		resultMutex.Lock()
 		result = append(result, procData)
+		resultMutex.Unlock()
 	}
+
+	chunkSize := (len(processes) + numWorkers - 1) / numWorkers
+	for i := 0; i < numWorkers; i++ {
+		wg.Add(1)
+		start := i * chunkSize
+		end := (i + 1) * chunkSize
+		if end > len(processes) {
+			end = len(processes)
+		}
+
+		go func(start, end int) {
+			defer wg.Done()
+			for j := start; j < end; j++ {
+				handleData(processes[j])
+			}
+		}(start, end)
+	}
+
+	wg.Wait()
+
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].PID < result[j].PID
+	})
 	res, err = json.Marshal(result)
 	return
 }

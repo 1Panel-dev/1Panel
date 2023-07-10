@@ -169,6 +169,7 @@ const loading = ref(false);
 const tableRef = ref();
 const oldData = ref([]);
 const detailRef = ref();
+const isGetData = ref(true);
 
 const openDetail = (row: any) => {
     detailRef.value.acceptParams({ info: row });
@@ -213,10 +214,14 @@ const closeSocket = () => {
     }
 };
 
-const onOpenProcess = () => {};
+const onOpenProcess = () => {
+    loading.value = true;
+    isGetData.value = true;
+    processSocket.send(JSON.stringify(processSearch));
+};
 const onMessage = (message: any) => {
-    let result: any[] = JSON.parse(message.data);
-    oldData.value = result;
+    isGetData.value = false;
+    oldData.value = JSON.parse(message.data);
     data.value = filterByStatus();
     sortTable();
     loading.value = false;
@@ -253,8 +258,6 @@ const initProcess = () => {
     processSocket.onmessage = onMessage;
     processSocket.onerror = onerror;
     processSocket.onclose = onClose;
-    loading.value = true;
-    search();
     sendMsg();
 };
 
@@ -265,7 +268,8 @@ const sendMsg = () => {
 };
 
 const search = () => {
-    if (isWsOpen()) {
+    if (isWsOpen() && !isGetData.value) {
+        isGetData.value = true;
         if (typeof processSearch.pid === 'string') {
             processSearch.pid = undefined;
         }
