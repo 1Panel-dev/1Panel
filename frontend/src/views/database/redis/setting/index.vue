@@ -37,7 +37,7 @@
                 <div v-if="activeName === 'conf'">
                     <codemirror
                         :autofocus="true"
-                        placeholder="None data"
+                        :placeholder="$t('commons.msg.noneData')"
                         :indent-with-tab="true"
                         :tabSize="4"
                         style="margin-top: 10px; height: calc(100vh - 380px)"

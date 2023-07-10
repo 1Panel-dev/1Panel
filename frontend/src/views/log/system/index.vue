@@ -19,7 +19,7 @@
             <template #main>
                 <codemirror
                     :autofocus="true"
-                    placeholder="None data"
+                    :placeholder="$t('commons.msg.noneData')"
                     :indent-with-tab="true"
                     :tabSize="4"
                     style="height: calc(100vh - 290px)"

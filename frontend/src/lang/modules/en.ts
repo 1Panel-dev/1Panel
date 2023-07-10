@@ -90,6 +90,7 @@ const message = {
             Rollbacking: 'Rollbacking from snapshot, please wait...',
         },
         msg: {
+            noneData: 'No data available',
             delete: 'This operation delete cannot be rolled back. Do you want to continue?',
             clean: 'This operation clean cannot be rolled back. Do you want to continue?',
             deleteTitle: 'Delete',

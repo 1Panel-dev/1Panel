@@ -2,7 +2,7 @@
     <div v-loading="loading">
         <codemirror
             :autofocus="true"
-            placeholder="None data"
+            :placeholder="$t('commons.msg.noneData')"
             :indent-with-tab="true"
             :tabSize="4"
             style="margin-top: 10px; max-height: 700px"

@@ -90,6 +90,7 @@ const message = {
             Rollbacking: '快照回滚中，请稍候...',
         },
         msg: {
+            noneData: '暂无数据',
             delete: '删除 操作不可回滚，是否继续？',
             clean: '清空 操作不可回滚，是否继续？',
             deleteTitle: '删除',
