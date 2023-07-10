@@ -868,6 +868,7 @@ const message = {
         pwdAuthHelper: '是否啟用密碼認證，默認啟用。',
         pubkeyAuthentication: '密鑰認證',
         key: '密鑰',
+        password: '密碼',
         pubkey: '密鑰信息',
         encryptionMode: '加密方式',
         passwordHelper: '支持大小寫英文、數字,長度6-10',

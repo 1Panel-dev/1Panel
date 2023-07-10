@@ -897,6 +897,7 @@ const message = {
         pwdAuthHelper: 'Whether to enable password authentication. This parameter is enabled by default.',
         pubkeyAuthentication: 'Key auth',
         key: 'Key',
+        password: 'Password',
         pubkey: 'Key info',
         encryptionMode: 'Encryption mode',
         passwordHelper: 'Can contain 6 to 10 digits and English cases',
