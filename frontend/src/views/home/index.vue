@@ -513,13 +513,16 @@ const loadSafeStatus = async () => {
     isSafety.value = res.data.securityEntrance;
 };
 
+const onFocus = () => {
+    isActive.value = true;
+};
+const onBlur = () => {
+    isActive.value = false;
+};
+
 onMounted(() => {
-    window.addEventListener('focus', () => {
-        isActive.value = true;
-    });
-    window.addEventListener('blur', () => {
-        isActive.value = false;
-    });
+    window.addEventListener('focus', onFocus);
+    window.addEventListener('blur', onBlur);
     loadSafeStatus();
     loadUpgradeStatus();
     onLoadNetworkOptions();
@@ -528,6 +531,8 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+    window.removeEventListener('focus', onFocus);
+    window.removeEventListener('blur', onBlur);
     clearInterval(Number(timer));
     timer = null;
 });

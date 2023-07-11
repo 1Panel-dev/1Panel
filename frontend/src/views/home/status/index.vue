@@ -356,11 +356,21 @@ function changeChartSize() {
     }
 }
 
+function disposeChart() {
+    echarts.getInstanceByDom(document.getElementById('cpu') as HTMLElement)?.dispose();
+    echarts.getInstanceByDom(document.getElementById('memory') as HTMLElement)?.dispose();
+    echarts.getInstanceByDom(document.getElementById('load') as HTMLElement)?.dispose();
+    for (let i = 0; i < currentInfo.value.diskData.length; i++) {
+        echarts.getInstanceByDom(document.getElementById('disk' + i) as HTMLElement)?.dispose();
+    }
+}
+
 onMounted(() => {
     window.addEventListener('resize', changeChartSize);
 });
 
 onBeforeUnmount(() => {
+    disposeChart();
     window.removeEventListener('resize', changeChartSize);
 });
 
