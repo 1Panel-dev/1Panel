@@ -427,7 +427,6 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, backup model.Backu
 			record.FileDir = strings.TrimPrefix(backupDir, localDir+"/")
 		}
 		record.FileName = fmt.Sprintf("website_%s_%s.tar.gz", website.PrimaryDomain, startTime.Format("20060102150405"))
-		paths = append(paths, fmt.Sprintf("%s/%s", record.FileDir, record.FileName))
 		if err := handleWebsiteBackup(&website, backupDir, record.FileName); err != nil {
 			return paths, err
 		}
