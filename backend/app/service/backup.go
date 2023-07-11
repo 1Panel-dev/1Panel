@@ -136,6 +136,11 @@ func (u *BackupService) DownloadRecord(info dto.DownloadRecord) (string, error) 
 		}
 	}
 	srcPath := fmt.Sprintf("%s/%s", info.FileDir, info.FileName)
+	if len(backup.BackupPath) != 0 {
+		itemPath := strings.TrimPrefix(backup.BackupPath, "/")
+		itemPath = strings.TrimSuffix(itemPath, "/") + "/"
+		srcPath = itemPath + srcPath
+	}
 	if exist, _ := backClient.Exist(srcPath); exist {
 		isOK, err := backClient.Download(srcPath, targetPath)
 		if !isOK {
