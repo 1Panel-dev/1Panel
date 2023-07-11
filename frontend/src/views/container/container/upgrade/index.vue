@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
+    <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
             <DrawerHeader :header="$t('commons.button.upgrade')" :resource="form.name" :back="handleClose" />
         </template>
@@ -42,6 +42,7 @@
                         <el-checkbox v-model="form.forcePull">
                             {{ $t('container.forcePull') }}
                         </el-checkbox>
+                        <span class="input-help">{{ $t('container.forcePullHelper') }}</span>
                     </el-form-item>
                 </el-form>
             </el-col>

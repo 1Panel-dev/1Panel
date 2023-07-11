@@ -30,6 +30,7 @@
                         <el-checkbox v-model="dialogData.rowData!.forcePull">
                             {{ $t('container.forcePull') }}
                         </el-checkbox>
+                        <span class="input-help">{{ $t('container.forcePullHelper') }}</span>
                     </el-form-item>
                     <el-form-item :label="$t('commons.table.port')">
                         <el-radio-group v-model="dialogData.rowData!.publishAllPorts" class="ml-4">
@@ -302,7 +303,7 @@ const rules = reactive({
     name: [Rules.requiredInput, Rules.volumeName],
     image: [Rules.requiredSelect],
     network: [Rules.requiredSelect],
-    cpuShares: [Rules.floatNumber, checkNumberRange(0, 262144)],
+    cpuShares: [Rules.integerNumberWith0, checkNumberRange(0, 262144)],
     nanoCPUs: [Rules.floatNumber],
     memory: [Rules.floatNumber],
 });
@@ -385,7 +386,6 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             return;
         }
         dialogData.value.rowData!.memory = Number(dialogData.value.rowData!.memory);
-        dialogData.value.rowData!.cpuShares = Number(dialogData.value.rowData!.cpuShares);
         dialogData.value.rowData!.nanoCPUs = Number(dialogData.value.rowData!.nanoCPUs);
 
         loading.value = true;
