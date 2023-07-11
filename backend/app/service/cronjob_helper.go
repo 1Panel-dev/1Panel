@@ -167,24 +167,32 @@ func (u *CronjobService) handleBackup(cronjob *model.Cronjob, startTime time.Tim
 func (u *CronjobService) HandleRmExpired(backType, backupPath, localDir string, cronjob *model.Cronjob, backClient cloud_storage.CloudStorageClient) {
 	global.LOG.Infof("start to handle remove expired, retain copies: %d", cronjob.RetainCopies)
 	records, _ := cronjobRepo.ListRecord(cronjobRepo.WithByJobID(int(cronjob.ID)), commonRepo.WithOrderBy("created_at desc"))
-	if len(records) > int(cronjob.RetainCopies) {
-		for i := int(cronjob.RetainCopies); i < len(records); i++ {
-			if len(records[i].File) != 0 {
-				files := strings.Split(records[i].File, ",")
-				for _, file := range files {
-					if backType != "LOCAL" {
-						_, _ = backClient.Delete(backupPath + "/" + strings.TrimPrefix(file, localDir+"/"))
-						_ = os.Remove(file)
-					} else {
-						_ = os.Remove(file)
-					}
-					_ = backupRepo.DeleteRecord(context.TODO(), backupRepo.WithByFileName(path.Base(file)))
+	if len(records) <= int(cronjob.RetainCopies) {
+		return
+	}
+	for i := int(cronjob.RetainCopies); i < len(records); i++ {
+		if len(records[i].File) != 0 {
+			files := strings.Split(records[i].File, ",")
+			for _, file := range files {
+				_ = os.Remove(file)
+				_ = backupRepo.DeleteRecord(context.TODO(), backupRepo.WithByFileName(path.Base(file)))
+				if backType == "LOCAL" {
+					continue
 				}
-			}
 
-			_ = cronjobRepo.DeleteRecord(commonRepo.WithByID(uint(records[i].ID)))
-			_ = os.Remove(records[i].Records)
+				fileItem := file
+				if cronjob.KeepLocal {
+					if len(backupPath) != 0 {
+						itemPath := strings.TrimPrefix(backupPath, "/")
+						itemPath = strings.TrimSuffix(itemPath, "/") + "/"
+						fileItem = itemPath + strings.TrimPrefix(file, localDir+"/")
+					}
+				}
+				_, _ = backClient.Delete(fileItem)
+			}
 		}
+		_ = cronjobRepo.DeleteRecord(commonRepo.WithByID(uint(records[i].ID)))
+		_ = os.Remove(records[i].Records)
 	}
 }
 
