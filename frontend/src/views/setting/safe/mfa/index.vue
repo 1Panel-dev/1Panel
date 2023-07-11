@@ -101,7 +101,7 @@ const form = reactive({
 
 const rules = reactive({
     code: [Rules.requiredInput],
-    mfaInterval: [Rules.number, checkNumberRange(15, 300)],
+    mfaInterval: [Rules.number, checkNumberRange(15, 60)],
 });
 
 interface DialogProps {
