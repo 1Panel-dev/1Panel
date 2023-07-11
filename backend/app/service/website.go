@@ -704,7 +704,7 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 
 		privateKeyCertBlock, _ := pem.Decode([]byte(privateKey))
 		if privateKeyCertBlock == nil {
-			return nil, buserr.New("ErrSSLCertificateFormat")
+			return nil, buserr.New("ErrSSLKeyFormat")
 		}
 
 		certBlock, _ := pem.Decode([]byte(certificate))

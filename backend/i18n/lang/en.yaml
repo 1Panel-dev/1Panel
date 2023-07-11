@@ -67,7 +67,7 @@ ErrSSLApply: "The certificate continues to be signed successfully, but openresty
 ErrEmailIsExist: 'Email is already exist'
 ErrSSLKeyNotFound: 'The private key file does not exist'
 ErrSSLCertificateNotFound: 'The certificate file does not exist'
-ErrSSLKeyFormat: 'Private key file format error, please use pem format'
+ErrSSLKeyFormat: 'Private key file verification error'
 ErrSSLCertificateFormat: 'Certificate file format error, please use pem format'
 
 #mysql
