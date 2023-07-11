@@ -148,8 +148,14 @@ func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error 
 		return err
 	}
 
-	if err := excSQL(app.ContainerName, app.Password, fmt.Sprintf("drop user if exists '%s'@'%s'", db.Username, db.Permission)); err != nil && !req.ForceDelete {
-		return err
+	if strings.HasPrefix(app.Version, "5.6") {
+		if err := excSQL(app.ContainerName, app.Password, fmt.Sprintf("drop user '%s'@'%s'", db.Username, db.Permission)); err != nil && !req.ForceDelete {
+			return err
+		}
+	} else {
+		if err := excSQL(app.ContainerName, app.Password, fmt.Sprintf("drop user if exists '%s'@'%s'", db.Username, db.Permission)); err != nil && !req.ForceDelete {
+			return err
+		}
 	}
 	if err := excSQL(app.ContainerName, app.Password, fmt.Sprintf("drop database if exists `%s`", db.Name)); err != nil && !req.ForceDelete {
 		return err
