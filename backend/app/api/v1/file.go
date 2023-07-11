@@ -683,7 +683,12 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 	}
 	filename := c.PostForm("filename")
 	fileDir := filepath.Join(tmpDir, filename)
-	_ = os.MkdirAll(fileDir, 0755)
+	if chunkIndex == 0 {
+		if fileOp.Stat(fileDir) {
+			_ = fileOp.DeleteDir(fileDir)
+		}
+		_ = os.MkdirAll(fileDir, 0755)
+	}
 	filePath := filepath.Join(fileDir, filename)
 
 	defer func() {

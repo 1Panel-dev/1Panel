@@ -846,8 +846,8 @@ const message = {
         containSub: '同時修改子文件屬性',
         ownerHelper: 'PHP 運行環境默認用戶:用戶組為 1000:1000, 容器內外用戶顯示不一致為正常現象',
         searchHelper: '支持 * 等通配符',
-        uploadFailed: '[{0}] 文件上傳失敗',
-        fileUploadStart: '正在上傳[{0}]....',
+        uploadFailed: '【{0}】 文件上傳失敗',
+        fileUploadStart: '正在上傳【{0}】....',
         currentSelect: '當前選中: ',
     },
     ssh: {

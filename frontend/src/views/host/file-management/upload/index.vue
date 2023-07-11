@@ -124,6 +124,7 @@ const submit = async () => {
                         );
                         uploadPrecent.value = progress;
                     },
+                    timeout: 40000,
                 });
                 uploadedChunkCount++;
             } catch (error) {
