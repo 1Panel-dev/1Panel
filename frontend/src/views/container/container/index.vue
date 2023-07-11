@@ -454,18 +454,18 @@ const buttons = [
         },
     },
     {
+        label: i18n.global.t('commons.button.upgrade'),
+        click: (row: Container.ContainerInfo) => {
+            dialogUpgradeRef.value!.acceptParams({ container: row.name, image: row.imageName, fromApp: row.isFromApp });
+        },
+    },
+    {
         label: i18n.global.t('container.monitor'),
         disabled: (row: Container.ContainerInfo) => {
             return row.state !== 'running';
         },
         click: (row: Container.ContainerInfo) => {
             onMonitor(row);
-        },
-    },
-    {
-        label: i18n.global.t('commons.button.upgrade'),
-        click: (row: Container.ContainerInfo) => {
-            dialogUpgradeRef.value!.acceptParams({ container: row.name, image: row.imageName, fromApp: row.isFromApp });
         },
     },
     {

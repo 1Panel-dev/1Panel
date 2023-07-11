@@ -236,6 +236,19 @@ const checkIntegerNumber = (rule: any, value: any, callback: any) => {
     }
 };
 
+const checkIntegerNumberWith0 = (rule: any, value: any, callback: any) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback(new Error(i18n.global.t('commons.rule.integer')));
+    } else {
+        const reg = /^[0-9]*$/;
+        if (!reg.test(value) && value !== '') {
+            callback(new Error(i18n.global.t('commons.rule.integer')));
+        } else {
+            callback();
+        }
+    }
+};
+
 const checkFloatNumber = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.integer')));
@@ -413,6 +426,7 @@ interface CommonRule {
     email: FormItemRule;
     number: FormItemRule;
     integerNumber: FormItemRule;
+    integerNumberWith0: FormItemRule;
     floatNumber: FormItemRule;
     ip: FormItemRule;
     ipV4V6: FormItemRule;
@@ -513,6 +527,11 @@ export const Rules: CommonRule = {
     integerNumber: {
         required: true,
         validator: checkIntegerNumber,
+        trigger: 'blur',
+    },
+    integerNumberWith0: {
+        required: true,
+        validator: checkIntegerNumberWith0,
         trigger: 'blur',
     },
     floatNumber: {
