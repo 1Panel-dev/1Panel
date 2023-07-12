@@ -528,11 +528,16 @@ const search = async () => {
     if (!currentRecord.value) {
         currentRecord.value = records.value[0];
     } else {
+        let beDelete = true;
         for (const item of records.value) {
             if (item.id === currentRecord.value.id) {
+                beDelete = false;
                 currentRecord.value = item;
                 break;
             }
+        }
+        if (beDelete) {
+            currentRecord.value = records.value[0];
         }
     }
     if (currentRecord.value?.records) {
