@@ -117,6 +117,11 @@
                                         {{ $t('commons.button.expand') }}...
                                     </el-button>
                                 </div>
+                                <div v-if="row.expand && row.ports.length > 3">
+                                    <el-button type="primary" link @click="row.expand = false">
+                                        {{ $t('commons.button.shrink') }}
+                                    </el-button>
+                                </div>
                             </div>
                         </template>
                     </el-table-column>

@@ -29,6 +29,7 @@ const message = {
             watch: '追蹤',
             handle: '執行',
             expand: '展開',
+            collapse: '收起',
             log: '日誌',
             back: '返回',
             backup: '備份',
