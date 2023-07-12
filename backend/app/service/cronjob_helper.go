@@ -227,7 +227,7 @@ func handleTar(sourceDir, targetDir, name, exclusionRules string) error {
 
 	commands := fmt.Sprintf("tar zcvf %s %s %s", targetDir+"/"+name, excludeRules, path)
 	global.LOG.Debug(commands)
-	stdout, err := cmd.ExecWithTimeOut(commands, 5*time.Minute)
+	stdout, err := cmd.ExecWithTimeOut(commands, 24*time.Hour)
 	if err != nil {
 		global.LOG.Errorf("do handle tar failed, stdout: %s, err: %v", stdout, err)
 		return errors.New(stdout)
@@ -244,7 +244,7 @@ func handleUnTar(sourceFile, targetDir string) error {
 
 	commands := fmt.Sprintf("tar zxvfC %s %s", sourceFile, targetDir)
 	global.LOG.Debug(commands)
-	stdout, err := cmd.ExecWithTimeOut(commands, 5*time.Minute)
+	stdout, err := cmd.ExecWithTimeOut(commands, 24*time.Hour)
 	if err != nil {
 		global.LOG.Errorf("do handle untar failed, stdout: %s, err: %v", stdout, err)
 		return errors.New(stdout)
