@@ -757,7 +757,7 @@ func handleErr(install model.AppInstall, err error, out string) error {
 func handleInstalled(appInstallList []model.AppInstall, updated bool) ([]response.AppInstalledDTO, error) {
 	var res []response.AppInstalledDTO
 	for _, installed := range appInstallList {
-		if updated && (installed.App.Type == "php" || installed.Status == constant.Installing) {
+		if updated && (installed.App.Type == "php" || installed.Status == constant.Installing || (installed.App.Key == constant.AppMysql && installed.Version == "5.6.51")) {
 			continue
 		}
 		installDTO := response.AppInstalledDTO{

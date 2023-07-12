@@ -4,6 +4,14 @@
             <el-form-item prop="enable" :label="$t('website.enable')">
                 <el-switch v-model="enableUpdate.enable" @change="updateEnable"></el-switch>
             </el-form-item>
+            <el-form-item>
+                <el-alert
+                    type="info"
+                    v-if="rule === 'ip_white'"
+                    :title="$t('website.ipWhiteListHelper')"
+                    :closable="false"
+                />
+            </el-form-item>
             <el-form-item :label="$t('website.ipValue')">
                 <el-input
                     type="textarea"

@@ -1364,6 +1364,7 @@ const message = {
         localSSL: '選擇本地文件',
         privateKeyPath: '私鑰文件',
         certificatePath: '證書文件',
+        ipWhiteListHelper: 'IP白名單的作用：所有規則對IP白名單無效',
     },
     php: {
         short_open_tag: '短標簽支持',

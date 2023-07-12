@@ -1370,6 +1370,7 @@ const message = {
         localSSL: '选择本地文件',
         privateKeyPath: '私钥文件',
         certificatePath: '证书文件',
+        ipWhiteListHelper: 'IP 白名单的作用：所有规则对IP白名单无效',
     },
     php: {
         short_open_tag: '短标签支持',
