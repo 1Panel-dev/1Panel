@@ -92,7 +92,7 @@ const timeOptions = ref([
 ]);
 
 const searchLogs = async () => {
-    if (!Number(logSearch.tail) || Number(logSearch.tail) <= 0) {
+    if (!Number(logSearch.tail) || Number(logSearch.tail) < 0) {
         MsgError(i18n.global.t('container.linesHelper'));
         return;
     }

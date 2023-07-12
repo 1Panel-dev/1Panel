@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -421,13 +422,15 @@ func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
 			global.LOG.Errorf("force pull image %s failed, err: %v", req.Image, err)
 		}
 	}
+
+	if err := client.ContainerRemove(ctx, req.ContainerID, types.ContainerRemoveOptions{Force: true}); err != nil {
+		return err
+	}
+
 	config := oldContainer.Config
 	hostConf := oldContainer.HostConfig
 	var networkConf network.NetworkingConfig
 	if err := loadConfigInfo(req, config, hostConf, &networkConf); err != nil {
-		return err
-	}
-	if err := client.ContainerRemove(ctx, req.ContainerID, types.ContainerRemoveOptions{Force: true}); err != nil {
 		return err
 	}
 
@@ -540,6 +543,11 @@ func (u *ContainerService) ContainerLogClean(req dto.OperationWithName) error {
 		return err
 	}
 	_, _ = file.Seek(0, 0)
+
+	files, _ := filepath.Glob(fmt.Sprintf("%s.*", container.LogPath))
+	for _, file := range files {
+		_ = os.Remove(file)
+	}
 	return nil
 }
 

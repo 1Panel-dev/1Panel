@@ -148,9 +148,15 @@ func loadNetIO() {
 				if net2.BytesSent != 0 && net1.BytesSent != 0 {
 					itemNet.Up = float64(net2.BytesSent-net1.BytesSent) / 1024 / 60
 				}
+				if itemNet.Up > 100000000 {
+					global.LOG.Errorf("net2: %v, net1: %v, BytesSent: %v \n", net2.BytesSent, net1.BytesSent, float64(net2.BytesSent-net1.BytesSent)/1024/60)
+				}
 
 				if net2.BytesRecv != 0 && net1.BytesRecv != 0 {
 					itemNet.Down = float64(net2.BytesRecv-net1.BytesRecv) / 1024 / 60
+				}
+				if itemNet.Down > 100000000 {
+					global.LOG.Errorf("net2: %v, net1: %v, BytesRecv: %v \n", net2.BytesRecv, net1.BytesRecv, float64(net2.BytesRecv-net1.BytesRecv)/1024/60)
 				}
 				netList = append(netList, itemNet)
 				break
