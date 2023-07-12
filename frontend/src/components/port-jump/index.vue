@@ -47,6 +47,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     }
     if (!checkIp(res.data.systemIP)) {
         window.open(`http://${res.data.systemIP}:${params.port}`, '_blank');
+        return;
     }
     window.open(`http://[${res.data.systemIP}]:${params.port}`, '_blank');
 };

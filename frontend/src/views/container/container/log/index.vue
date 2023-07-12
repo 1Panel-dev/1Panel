@@ -134,7 +134,7 @@ watch(logVisiable, (val) => {
     if (screenfull.isEnabled && !val && !mobile.value) screenfull.exit();
 });
 const searchLogs = async () => {
-    if (!Number(logSearch.tail) || Number(logSearch.tail) <= 0) {
+    if (!Number(logSearch.tail) || Number(logSearch.tail) < 0) {
         MsgError(i18n.global.t('container.linesHelper'));
         return;
     }
