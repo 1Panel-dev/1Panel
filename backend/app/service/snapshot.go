@@ -57,7 +57,7 @@ func (u *SnapshotService) SnapshotImport(req dto.SnapshotImport) error {
 		return fmt.Errorf("incorrect snapshot request body: %v", req.Names)
 	}
 	for _, snapName := range req.Names {
-		snap, _ := snapshotRepo.Get(commonRepo.WithByName(snapName))
+		snap, _ := snapshotRepo.Get(commonRepo.WithByName(strings.ReplaceAll(snapName, ".tar.gz", "")))
 		if snap.ID != 0 {
 			return constant.ErrRecordExist
 		}
