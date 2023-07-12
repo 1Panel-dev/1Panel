@@ -222,7 +222,16 @@ const listSSL = () => {
     ListSSL(sslReq).then((res) => {
         ssls.value = res.data || [];
         if (ssls.value.length > 0) {
-            form.websiteSSLId = ssls.value[0].id;
+            let exist = false;
+            for (const ssl of ssls.value) {
+                if (ssl.id === form.websiteSSLId) {
+                    exist = true;
+                    break;
+                }
+            }
+            if (!exist) {
+                form.websiteSSLId = ssls.value[0].id;
+            }
             changeSSl(form.websiteSSLId);
         } else {
             websiteSSL.value = {};
