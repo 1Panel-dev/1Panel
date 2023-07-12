@@ -186,6 +186,8 @@ func (u *CronjobService) HandleRmExpired(backType, backupPath, localDir string, 
 						itemPath := strings.TrimPrefix(backupPath, "/")
 						itemPath = strings.TrimSuffix(itemPath, "/") + "/"
 						fileItem = itemPath + strings.TrimPrefix(file, localDir+"/")
+					} else {
+						fileItem = strings.TrimPrefix(file, localDir+"/")
 					}
 				}
 				_, _ = backClient.Delete(fileItem)
