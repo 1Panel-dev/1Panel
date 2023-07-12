@@ -29,6 +29,7 @@ const message = {
             watch: 'Watch',
             handle: 'Handle',
             expand: 'Expand',
+            collapse: 'Collapse',
             log: 'Log',
             back: 'Back',
             backup: 'Backup',

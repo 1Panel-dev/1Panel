@@ -275,7 +275,11 @@ const acceptParams = (params: DialogProps): void => {
         dialogData.value.rowData.envStr = dialogData.value.rowData.env.join('\n');
         dialogData.value.rowData.exposedPorts = dialogData.value.rowData.exposedPorts || [];
         for (const item of dialogData.value.rowData.exposedPorts) {
-            item.host = item.hostPort;
+            if (item.hostIP) {
+                item.host = item.hostIP + ':' + item.hostPort;
+            } else {
+                item.host = item.hostPort;
+            }
         }
         dialogData.value.rowData.volumes = dialogData.value.rowData.volumes || [];
     }
