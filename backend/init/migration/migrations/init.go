@@ -437,7 +437,7 @@ var EncryptHostPassword = &gormigrate.Migration{
 	ID: "20230703-encrypt-host-password",
 	Migrate: func(tx *gorm.DB) error {
 		var hosts []model.Host
-		if err := tx.Find(&hosts).Error; err != nil {
+		if err := tx.Where("1 = 1").Find(&hosts).Error; err != nil {
 			return err
 		}
 
@@ -462,7 +462,7 @@ var EncryptHostPassword = &gormigrate.Migration{
 				if err != nil {
 					return err
 				}
-				if err := tx.Model(&model.Host{}).Update("private_key", key).Error; err != nil {
+				if err := tx.Model(&model.Host{}).Where("id = ?", host.ID).Update("private_key", key).Error; err != nil {
 					return err
 				}
 			}
@@ -471,7 +471,7 @@ var EncryptHostPassword = &gormigrate.Migration{
 				if err != nil {
 					return err
 				}
-				if err := tx.Model(&model.Host{}).Update("pass_phrase", pass).Error; err != nil {
+				if err := tx.Model(&model.Host{}).Where("id = ?", host.ID).Update("pass_phrase", pass).Error; err != nil {
 					return err
 				}
 			}
