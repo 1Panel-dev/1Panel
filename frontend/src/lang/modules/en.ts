@@ -1433,6 +1433,7 @@ const message = {
         localSSL: 'Select local file',
         privateKeyPath: 'Private key file',
         certificatePath: 'Certificate file',
+        ipWhiteListHelper: 'The role of IP whitelist: all rules are invalid for IP whitelist',
     },
     php: {
         short_open_tag: 'Short tag support',
