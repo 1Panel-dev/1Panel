@@ -224,7 +224,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         if (req.memoryLimit < 0) {
             req.memoryLimit = 0;
         }
-        if (req.advanced && !req.allowPort) {
+        if (installData.value.app.key != 'openresty' && req.advanced && !req.allowPort) {
             ElMessageBox.confirm(i18n.global.t('app.installWarn'), i18n.global.t('app.checkTitle'), {
                 confirmButtonText: i18n.global.t('commons.button.confirm'),
                 cancelButtonText: i18n.global.t('commons.button.cancel'),
