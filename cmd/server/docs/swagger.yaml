@@ -327,6 +327,8 @@ definitions:
         items:
           $ref: '#/definitions/dto.PortHelper'
         type: array
+      forcePull:
+        type: boolean
       image:
         type: string
       labels:
@@ -334,11 +336,11 @@ definitions:
           type: string
         type: array
       memory:
-        type: integer
+        type: number
       name:
         type: string
       nanoCPUs:
-        type: integer
+        type: number
       network:
         type: string
       publishAllPorts:
@@ -413,6 +415,8 @@ definitions:
     type: object
   dto.ContainerUpgrade:
     properties:
+      forcePull:
+        type: boolean
       image:
         type: string
       name:
@@ -3063,8 +3067,8 @@ definitions:
     type: object
   request.WebsiteSSLSearch:
     properties:
-      acmeAccountId:
-        type: integer
+      acmeAccountID:
+        type: string
       page:
         type: integer
       pageSize:

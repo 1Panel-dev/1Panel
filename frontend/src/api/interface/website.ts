@@ -208,7 +208,7 @@ export namespace Website {
 
     export interface SSLReq {
         name?: string;
-        acmeAccountID?: number;
+        acmeAccountID?: string;
     }
 
     export interface HTTPSReq {
