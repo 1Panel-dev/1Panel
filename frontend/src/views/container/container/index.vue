@@ -119,7 +119,7 @@
                                 </div>
                                 <div v-if="row.expand && row.ports.length > 3">
                                     <el-button type="primary" link @click="row.expand = false">
-                                        {{ $t('commons.button.shrink') }}
+                                        {{ $t('commons.button.collapse') }}
                                     </el-button>
                                 </div>
                             </div>

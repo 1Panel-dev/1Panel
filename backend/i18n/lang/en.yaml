@@ -82,6 +82,7 @@ ErrTypeOfRedis: "The recovery file type does not match the current persistence m
 ErrInUsed: "{{ .detail }} is in use and cannot be deleted"
 ErrObjectInUsed: "This object is in use and cannot be deleted"
 ErrRepoConn: "The repository information contains illegal characters"
+ErrPortRules: "The number of ports does not match, please re-enter!"
 
 #runtime
 ErrDirNotFound: "The build folder does not exist! Please check file integrity！"
