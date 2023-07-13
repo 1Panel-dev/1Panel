@@ -239,6 +239,7 @@ const isSafety = ref();
 const chartOption = ref('network');
 let timer: NodeJS.Timer | null = null;
 let isInit = ref<boolean>(true);
+let isStatusInit = ref<boolean>(true);
 let isActive = ref(true);
 
 const ioReadBytes = ref<Array<number>>([]);
@@ -355,7 +356,8 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
     baseInfo.value = res.data;
     currentInfo.value = baseInfo.value.currentInfo;
     await onLoadCurrentInfo();
-    statuRef.value.acceptParams(currentInfo.value, baseInfo.value);
+    isStatusInit.value = false;
+    statuRef.value.acceptParams(currentInfo.value, baseInfo.value, isStatusInit.value);
     appRef.value.acceptParams();
     if (isInit) {
         timer = setInterval(async () => {
@@ -421,7 +423,7 @@ const onLoadCurrentInfo = async () => {
     }
     loadData();
     currentInfo.value = res.data;
-    statuRef.value.acceptParams(currentInfo.value, baseInfo.value);
+    statuRef.value.acceptParams(currentInfo.value, baseInfo.value, isStatusInit.value);
 };
 
 function loadUpTime(uptime: number) {
