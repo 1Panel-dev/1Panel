@@ -11061,6 +11061,9 @@
                         "$ref": "#/definitions/dto.PortHelper"
                     }
                 },
+                "forcePull": {
+                    "type": "boolean"
+                },
                 "image": {
                     "type": "string"
                 },
@@ -11071,13 +11074,13 @@
                     }
                 },
                 "memory": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "name": {
                     "type": "string"
                 },
                 "nanoCPUs": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "network": {
                     "type": "string"
@@ -11191,6 +11194,9 @@
                 "name"
             ],
             "properties": {
+                "forcePull": {
+                    "type": "boolean"
+                },
                 "image": {
                     "type": "string"
                 },
@@ -15152,8 +15158,8 @@
                 "pageSize"
             ],
             "properties": {
-                "acmeAccountId": {
-                    "type": "integer"
+                "acmeAccountID": {
+                    "type": "string"
                 },
                 "page": {
                     "type": "integer"

@@ -4,7 +4,7 @@ import "github.com/1Panel-dev/1Panel/backend/app/dto"
 
 type WebsiteSSLSearch struct {
 	dto.PageInfo
-	AcmeAccountID uint `json:"acmeAccountId"`
+	AcmeAccountID string `json:"acmeAccountID"`
 }
 
 type WebsiteSSLCreate struct {

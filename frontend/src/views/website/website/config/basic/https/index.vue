@@ -207,7 +207,7 @@ const rules = ref({
 });
 const resData = ref();
 const sslReq = reactive({
-    acmeAccountID: 0,
+    acmeAccountID: '',
 });
 
 const getPrivateKeyPath = (path: string) => {
@@ -218,7 +218,7 @@ const getCertificatePath = (path: string) => {
     form.certificatePath = path;
 };
 const listSSL = () => {
-    sslReq.acmeAccountID = form.acmeAccountID;
+    sslReq.acmeAccountID = String(form.acmeAccountID);
     ListSSL(sslReq).then((res) => {
         ssls.value = res.data || [];
         if (ssls.value.length > 0) {
@@ -278,7 +278,6 @@ const get = () => {
             if (res.data.SSL && res.data.SSL.id > 0) {
                 form.websiteSSLId = res.data.SSL.id;
                 websiteSSL.value = res.data.SSL;
-                sslReq.acmeAccountID = res.data.SSL.acmeAccountId;
                 form.acmeAccountID = res.data.SSL.acmeAccountId;
             }
         }

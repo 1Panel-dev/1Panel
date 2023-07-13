@@ -13,6 +13,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/ssl"
 	"path"
+	"strconv"
 	"strings"
 )
 
@@ -66,7 +67,14 @@ func (w WebsiteSSLService) Search(search request.WebsiteSSLSearch) ([]response.W
 		opts   []repo.DBOption
 		result []response.WebsiteSSLDTO
 	)
-	opts = append(opts, commonRepo.WithOrderBy("created_at desc"), websiteSSLRepo.WithByAcmeAccountId(search.AcmeAccountID))
+	opts = append(opts, commonRepo.WithOrderBy("created_at desc"))
+	if search.AcmeAccountID != "" {
+		acmeAccountID, err := strconv.ParseUint(search.AcmeAccountID, 10, 64)
+		if err != nil {
+			return nil, err
+		}
+		opts = append(opts, websiteSSLRepo.WithByAcmeAccountId(uint(acmeAccountID)))
+	}
 	sslList, err := websiteSSLRepo.List(opts...)
 	if err != nil {
 		return nil, err
