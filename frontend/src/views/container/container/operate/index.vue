@@ -264,6 +264,7 @@ const acceptParams = (params: DialogProps): void => {
     title.value = i18n.global.t('container.' + dialogData.value.title);
     if (params.title === 'edit') {
         dialogData.value.rowData.memory = Number(dialogData.value.rowData.memory.toFixed(2));
+        dialogData.value.rowData.cmd = dialogData.value.rowData.cmd || [];
         let itemCmd = '';
         for (const item of dialogData.value.rowData.cmd) {
             itemCmd += `'${item}' `;
