@@ -46,6 +46,9 @@
             <el-button @click="sync" type="primary" link v-if="mode === 'installed' && data != null">
                 {{ $t('app.sync') }}
             </el-button>
+            <el-button @click="openIngore" type="primary" link v-if="mode === 'upgrade'">
+                {{ $t('app.showIgnore') }}
+            </el-button>
         </template>
 
         <template #main>
@@ -64,11 +67,7 @@
                     </span>
                 </template>
             </el-alert>
-            <el-alert type="info" :closable="false" v-if="mode === 'upgrade'">
-                <template #default>
-                    <span>{{ $t('app.upgradeHelper') }}</span>
-                </template>
-            </el-alert>
+            <el-alert type="info" :title="$t('app.upgradeHelper')" :closable="false" v-if="mode === 'upgrade'" />
             <div class="update-prompt" v-if="data == null">
                 <span>{{ mode === 'upgrade' ? $t('app.updatePrompt') : $t('app.installPrompt') }}</span>
                 <div>
@@ -160,7 +159,18 @@
                                                 @click="openBackups(installed.app.key, installed.name)"
                                                 v-if="mode === 'installed'"
                                             >
-                                                {{ $t('app.backup') }}
+                                                {{ $t('commons.button.backup') }}
+                                            </el-button>
+                                            <el-button
+                                                class="h-button"
+                                                type="primary"
+                                                plain
+                                                round
+                                                size="small"
+                                                @click="openOperate(installed, 'ignore')"
+                                                v-if="mode === 'upgrade'"
+                                            >
+                                                {{ $t('commons.button.ignore') }}
                                             </el-button>
                                             <el-button
                                                 class="h-button"
@@ -176,12 +186,19 @@
                                                 @click="openOperate(installed, 'upgrade')"
                                                 v-if="mode === 'upgrade'"
                                             >
-                                                {{ $t('app.upgrade') }}
+                                                {{ $t('commons.button.upgrade') }}
                                             </el-button>
                                         </div>
                                         <div class="d-description">
-                                            <el-tag>{{ $t('app.version') }}：{{ installed.version }}</el-tag>
-                                            <el-tag v-if="installed.httpPort > 0">
+                                            <el-tag class="middle-center">
+                                                {{ $t('app.version') }}：{{ installed.version }}
+                                            </el-tag>
+                                            <el-tag
+                                                class="middle-center"
+                                                v-if="installed.httpPort > 0"
+                                                @click="goDashboard(installed.httpPort)"
+                                            >
+                                                <el-icon class="middle-center"><Position /></el-icon>
                                                 {{ $t('app.busPort') }}：{{ installed.httpPort }}
                                             </el-tag>
                                             <div class="description">
@@ -225,6 +242,8 @@
     <AppDelete ref="deleteRef" @close="search" />
     <AppParams ref="appParamRef" />
     <AppUpgrade ref="upgradeRef" @close="search" />
+    <PortJumpDialog ref="dialogPortJumpRef" />
+    <AppIgnore ref="ignoreRef" @close="search" />
 </template>
 
 <script lang="ts" setup>
@@ -240,10 +259,12 @@ import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
 import Backups from '@/components/backup/index.vue';
 import Uploads from '@/components/upload/index.vue';
+import PortJumpDialog from '@/components/port-jump/index.vue';
 import AppResources from './check/index.vue';
 import AppDelete from './delete/index.vue';
 import AppParams from './detail/index.vue';
 import AppUpgrade from './upgrade/index.vue';
+import AppIgnore from './ignore/index.vue';
 import { App } from '@/api/interface/app';
 import Status from '@/components/status/index.vue';
 import { getAge } from '@/utils/util';
@@ -272,6 +293,8 @@ const checkRef = ref();
 const deleteRef = ref();
 const appParamRef = ref();
 const upgradeRef = ref();
+const ignoreRef = ref();
+const dialogPortJumpRef = ref();
 const tags = ref<App.Tag[]>([]);
 const activeTag = ref('all');
 const searchReq = reactive({
@@ -323,11 +346,15 @@ const search = () => {
     });
 };
 
+const goDashboard = async (port: any) => {
+    dialogPortJumpRef.value.acceptParams({ port: port });
+};
+
 const openOperate = (row: any, op: string) => {
     operateReq.installId = row.id;
     operateReq.operate = op;
-    if (op == 'upgrade') {
-        upgradeRef.value.acceptParams(row.id, row.name);
+    if (op == 'upgrade' || op == 'ignore') {
+        upgradeRef.value.acceptParams(row.id, row.name, op);
     } else if (op == 'delete') {
         AppInstalledDeleteCheck(row.id).then(async (res) => {
             const items = res.data;
@@ -340,6 +367,10 @@ const openOperate = (row: any, op: string) => {
     } else {
         onOperate(op);
     }
+};
+
+const openIngore = () => {
+    ignoreRef.value.acceptParams();
 };
 
 const operate = async () => {
@@ -424,7 +455,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('app.delete'),
+        label: i18n.global.t('commons.button.delete'),
         click: (row: any) => {
             openOperate(row, 'delete');
         },

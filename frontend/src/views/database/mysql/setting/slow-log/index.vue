@@ -31,7 +31,7 @@
             :placeholder="$t('database.noData')"
             :indent-with-tab="true"
             :tabSize="4"
-            style="height: calc(100vh - 428px); width: 100%"
+            :style="{ height: getDynamicHeight(), width: '100%' }"
             :lineWrapping="true"
             :matchBrackets="true"
             theme="cobalt"
@@ -42,7 +42,6 @@
             :disabled="true"
         />
 
-        <br />
         <ConfirmDialog @cancel="onCancel" ref="confirmDialogRef" @confirm="onSave"></ConfirmDialog>
     </div>
 </template>
@@ -55,7 +54,7 @@ import { Database } from '@/api/interface/database';
 import { LoadFile } from '@/api/modules/files';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { updateMysqlVariables } from '@/api/modules/database';
-import { dateFormatForName } from '@/utils/util';
+import { dateFormatForName, downloadWithContent } from '@/utils/util';
 import i18n from '@/lang';
 import { loadBaseDir } from '@/api/modules/setting';
 import { MsgError, MsgInfo, MsgSuccess } from '@/utils/message';
@@ -100,6 +99,8 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
                 loadMysqlSlowlogs(path);
             }
         }, 1000 * 5);
+    } else {
+        detailShow.value = false;
     }
 };
 const emit = defineEmits(['loading']);
@@ -115,6 +116,10 @@ const handleSlowLogs = async () => {
         submitInputInfo: i18n.global.t('database.restartNow'),
     };
     confirmDialogRef.value!.acceptParams(params);
+};
+
+const getDynamicHeight = () => {
+    return variables.slow_query_log === 'ON' ? `calc(100vh - 437px)` : `calc(100vh - 383px)`;
 };
 
 const changeSlowLogs = () => {
@@ -160,13 +165,7 @@ const onDownload = async () => {
         MsgInfo(i18n.global.t('database.noData'));
         return;
     }
-    const downloadUrl = window.URL.createObjectURL(new Blob([slowLogs.value]));
-    const a = document.createElement('a');
-    a.style.display = 'none';
-    a.href = downloadUrl;
-    a.download = mysqlName.value + '-slowlogs-' + dateFormatForName(new Date()) + '.log';
-    const event = new MouseEvent('click');
-    a.dispatchEvent(event);
+    downloadWithContent(slowLogs.value, mysqlName.value + '-slowlogs-' + dateFormatForName(new Date()) + '.log');
 };
 
 const loadMysqlSlowlogs = async (path: string) => {

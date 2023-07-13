@@ -16,7 +16,7 @@
                     <el-form-item :label="$t('website.domain')" prop="domain">
                         <el-input v-model="domain.domain"></el-input>
                     </el-form-item>
-                    <el-form-item :label="$t('website.port')" prop="port">
+                    <el-form-item :label="$t('commons.table.port')" prop="port">
                         <el-input v-model.number="domain.port"></el-input>
                     </el-form-item>
                 </el-form>

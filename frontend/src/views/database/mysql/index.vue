@@ -43,11 +43,12 @@
             <template #main v-if="mysqlIsExist && !isOnSetting">
                 <ComplexTable
                     :pagination-config="paginationConfig"
+                    @sort-change="search"
                     @search="search"
                     :data="data"
                     :class="{ mask: mysqlStatus != 'Running' }"
                 >
-                    <el-table-column :label="$t('commons.table.name')" prop="name" />
+                    <el-table-column :label="$t('commons.table.name')" prop="name" sortable />
                     <el-table-column :label="$t('commons.login.username')" prop="username" />
                     <el-table-column :label="$t('commons.login.password')" prop="password">
                         <template #default="{ row }">
@@ -140,6 +141,8 @@
 
         <AppResources ref="checkRef"></AppResources>
         <DeleteDialog ref="deleteRef" @search="search" />
+
+        <PortJumpDialog ref="dialogPortJumpRef" />
     </div>
 </template>
 
@@ -154,6 +157,7 @@ import Setting from '@/views/database/mysql/setting/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
 import Backups from '@/components/backup/index.vue';
 import UploadDialog from '@/components/upload/index.vue';
+import PortJumpDialog from '@/components/port-jump/index.vue';
 import { dateFormat } from '@/utils/util';
 import { reactive, ref } from 'vue';
 import { deleteCheckMysqlDB, loadRemoteAccess, searchMysqlDBs, updateMysqlDescription } from '@/api/modules/database';
@@ -177,6 +181,8 @@ const deleteRef = ref();
 
 const phpadminPort = ref();
 const phpVisiable = ref(false);
+
+const dialogPortJumpRef = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -238,11 +244,13 @@ const onSetting = async () => {
     settingRef.value!.acceptParams(params);
 };
 
-const search = async () => {
+const search = async (column?: any) => {
     let params = {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
         info: searchName.value,
+        orderBy: column?.order ? column.prop : 'created_at',
+        order: column?.order ? column.order : 'null',
     };
     const res = await searchMysqlDBs(params);
     data.value = res.data.items || [];
@@ -261,10 +269,9 @@ const goDashboard = async () => {
         phpVisiable.value = true;
         return;
     }
-    let href = window.location.href;
-    let ipLocal = href.split('//')[1].split(':')[0];
-    window.open(`http://${ipLocal}:${phpadminPort.value}`, '_blank');
+    dialogPortJumpRef.value.acceptParams({ port: phpadminPort.value });
 };
+
 const getAppDetail = (key: string) => {
     router.push({ name: 'AppDetail', params: { appKey: key } });
 };

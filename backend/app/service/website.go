@@ -8,6 +8,14 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"os"
+	"path"
+	"reflect"
+	"regexp"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
@@ -18,13 +26,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/ini.v1"
 	"gorm.io/gorm"
-	"os"
-	"path"
-	"reflect"
-	"regexp"
-	"strconv"
-	"strings"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
@@ -57,7 +58,7 @@ type IWebsiteService interface {
 	UpdateNginxConfigByScope(req request.NginxConfigUpdate) error
 	GetWebsiteNginxConfig(websiteId uint, configType string) (response.FileInfo, error)
 	GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, error)
-	OpWebsiteHTTPS(ctx context.Context, req request.WebsiteHTTPSOp) (response.WebsiteHTTPS, error)
+	OpWebsiteHTTPS(ctx context.Context, req request.WebsiteHTTPSOp) (*response.WebsiteHTTPS, error)
 	PreInstallCheck(req request.WebsiteInstallCheckReq) ([]response.WebsitePreInstallCheck, error)
 	GetWafConfig(req request.WebsiteWafReq) (response.WebsiteWafConfig, error)
 	UpdateWafConfig(req request.WebsiteWafUpdate) error
@@ -96,7 +97,7 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 		}
 		return 0, nil, err
 	}
-	opts = append(opts, commonRepo.WithOrderBy("created_at desc"))
+	opts = append(opts, commonRepo.WithOrderRuleBy(req.OrderBy, req.Order))
 	if req.Name != "" {
 		opts = append(opts, websiteRepo.WithDomainLike(req.Name))
 	}
@@ -618,10 +619,10 @@ func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, 
 	return res, nil
 }
 
-func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteHTTPSOp) (response.WebsiteHTTPS, error) {
+func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteHTTPSOp) (*response.WebsiteHTTPS, error) {
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
 	if err != nil {
-		return response.WebsiteHTTPS{}, err
+		return nil, err
 	}
 	var (
 		res        response.WebsiteHTTPS
@@ -634,7 +635,7 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 		website.Protocol = constant.ProtocolHTTP
 		website.WebsiteSSLID = 0
 		if err := deleteListenAndServerName(website, []string{"443", "[::]:443"}, []string{}); err != nil {
-			return response.WebsiteHTTPS{}, err
+			return nil, err
 		}
 		nginxParams := getNginxParamsFromStaticFile(dto.SSL, nil)
 		nginxParams = append(nginxParams,
@@ -655,28 +656,64 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 				Name: "ssl_ciphers",
 			},
 		)
-		if err := deleteNginxConfig(constant.NginxScopeServer, nginxParams, &website); err != nil {
-			return response.WebsiteHTTPS{}, err
+		if err = deleteNginxConfig(constant.NginxScopeServer, nginxParams, &website); err != nil {
+			return nil, err
 		}
-		if err := websiteRepo.Save(ctx, &website); err != nil {
-			return response.WebsiteHTTPS{}, err
+		if err = websiteRepo.Save(ctx, &website); err != nil {
+			return nil, err
 		}
-		return res, nil
+		return nil, nil
 	}
 
 	if req.Type == constant.SSLExisted {
 		websiteSSL, err = websiteSSLRepo.GetFirst(commonRepo.WithByID(req.WebsiteSSLID))
 		if err != nil {
-			return response.WebsiteHTTPS{}, err
+			return nil, err
 		}
 		website.WebsiteSSLID = websiteSSL.ID
 		res.SSL = websiteSSL
 	}
 	if req.Type == constant.SSLManual {
-		certBlock, _ := pem.Decode([]byte(req.Certificate))
+		var (
+			certificate string
+			privateKey  string
+		)
+		switch req.ImportType {
+		case "paste":
+			certificate = req.Certificate
+			privateKey = req.PrivateKey
+		case "local":
+			fileOp := files.NewFileOp()
+			if !fileOp.Stat(req.PrivateKeyPath) {
+				return nil, buserr.New("ErrSSLKeyNotFound")
+			}
+			if !fileOp.Stat(req.CertificatePath) {
+				return nil, buserr.New("ErrSSLCertificateNotFound")
+			}
+			if content, err := fileOp.GetContent(req.PrivateKeyPath); err != nil {
+				return nil, err
+			} else {
+				privateKey = string(content)
+			}
+			if content, err := fileOp.GetContent(req.CertificatePath); err != nil {
+				return nil, err
+			} else {
+				certificate = string(content)
+			}
+		}
+
+		privateKeyCertBlock, _ := pem.Decode([]byte(privateKey))
+		if privateKeyCertBlock == nil {
+			return nil, buserr.New("ErrSSLKeyFormat")
+		}
+
+		certBlock, _ := pem.Decode([]byte(certificate))
+		if certBlock == nil {
+			return nil, buserr.New("ErrSSLCertificateFormat")
+		}
 		cert, err := x509.ParseCertificate(certBlock.Bytes)
 		if err != nil {
-			return response.WebsiteHTTPS{}, err
+			return nil, err
 		}
 		websiteSSL.ExpireDate = cert.NotAfter
 		websiteSSL.StartDate = cert.NotBefore
@@ -690,28 +727,28 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 			websiteSSL.PrimaryDomain = cert.DNSNames[0]
 			websiteSSL.Domains = strings.Join(cert.DNSNames, ",")
 		}
-
 		websiteSSL.Provider = constant.Manual
-		websiteSSL.PrivateKey = req.PrivateKey
-		websiteSSL.Pem = req.Certificate
+		websiteSSL.PrivateKey = privateKey
+		websiteSSL.Pem = certificate
+
 		res.SSL = websiteSSL
 	}
 	website.Protocol = constant.ProtocolHTTPS
 	if err := applySSL(website, websiteSSL, req); err != nil {
-		return response.WebsiteHTTPS{}, err
+		return nil, err
 	}
 	website.HttpConfig = req.HttpConfig
 
 	if websiteSSL.ID == 0 {
 		if err := websiteSSLRepo.Create(ctx, &websiteSSL); err != nil {
-			return response.WebsiteHTTPS{}, err
+			return nil, err
 		}
 		website.WebsiteSSLID = websiteSSL.ID
 	}
 	if err := websiteRepo.Save(ctx, &website); err != nil {
-		return response.WebsiteHTTPS{}, err
+		return nil, err
 	}
-	return res, nil
+	return &res, nil
 }
 
 func (w WebsiteService) PreInstallCheck(req request.WebsiteInstallCheckReq) ([]response.WebsitePreInstallCheck, error) {
@@ -1058,49 +1095,40 @@ func (w WebsiteService) UpdatePHPConfig(req request.WebsitePHPConfigUpdate) (err
 		return err
 	}
 
-	if req.Scope == "params" {
-		content := string(contentBytes)
-		lines := strings.Split(content, "\n")
-		for i, line := range lines {
-			if strings.HasPrefix(line, ";") {
-				continue
-			}
+	content := string(contentBytes)
+	lines := strings.Split(content, "\n")
+	for i, line := range lines {
+		if strings.HasPrefix(line, ";") {
+			continue
+		}
+		switch req.Scope {
+		case "params":
 			for key, value := range req.Params {
 				pattern := "^" + regexp.QuoteMeta(key) + "\\s*=\\s*.*$"
 				if matched, _ := regexp.MatchString(pattern, line); matched {
 					lines[i] = key + " = " + value
 				}
 			}
-		}
-		updatedContent := strings.Join(lines, "\n")
-		if err := fileOp.WriteFile(phpConfigPath, strings.NewReader(updatedContent), 0755); err != nil {
-			return err
+		case "disable_functions":
+			pattern := "^" + regexp.QuoteMeta("disable_functions") + "\\s*=\\s*.*$"
+			if matched, _ := regexp.MatchString(pattern, line); matched {
+				lines[i] = "disable_functions" + " = " + strings.Join(req.DisableFunctions, ",")
+				break
+			}
+		case "upload_max_filesize":
+			pattern := "^" + regexp.QuoteMeta("post_max_size") + "\\s*=\\s*.*$"
+			if matched, _ := regexp.MatchString(pattern, line); matched {
+				lines[i] = "post_max_size" + " = " + req.UploadMaxSize
+			}
+			patternUpload := "^" + regexp.QuoteMeta("upload_max_filesize") + "\\s*=\\s*.*$"
+			if matched, _ := regexp.MatchString(patternUpload, line); matched {
+				lines[i] = "upload_max_filesize" + " = " + req.UploadMaxSize
+			}
 		}
 	}
-
-	cfg, err := ini.Load(phpConfigPath)
-	if err != nil {
+	updatedContent := strings.Join(lines, "\n")
+	if err := fileOp.WriteFile(phpConfigPath, strings.NewReader(updatedContent), 0755); err != nil {
 		return err
-	}
-	phpConfig, err := cfg.GetSection("PHP")
-	if err != nil {
-		return err
-	}
-	if req.Scope == "disable_functions" {
-		disable := phpConfig.Key("disable_functions")
-		disable.SetValue(strings.Join(req.DisableFunctions, ","))
-		if err = cfg.SaveTo(phpConfigPath); err != nil {
-			return err
-		}
-	}
-	if req.Scope == "upload_max_filesize" {
-		postMaxSize := phpConfig.Key("post_max_size")
-		postMaxSize.SetValue(req.UploadMaxSize)
-		uploadMaxFileSize := phpConfig.Key("upload_max_filesize")
-		uploadMaxFileSize.SetValue(req.UploadMaxSize)
-		if err = cfg.SaveTo(phpConfigPath); err != nil {
-			return err
-		}
 	}
 
 	appInstallReq := request.AppInstalledOperate{
@@ -1504,14 +1532,6 @@ func (w WebsiteService) UpdateAuthBasic(req request.NginxAuthUpdate) (err error)
 	if !fileOp.Stat(absoluteAuthPath) {
 		_ = fileOp.CreateFile(absoluteAuthPath)
 	}
-	defer func() {
-		if err != nil {
-			switch req.Operate {
-			case "create":
-
-			}
-		}
-	}()
 
 	params = append(params, dto.NginxParam{Name: "auth_basic", Params: []string{`"Authentication"`}})
 	params = append(params, dto.NginxParam{Name: "auth_basic_user_file", Params: []string{authPath}})
@@ -1519,7 +1539,9 @@ func (w WebsiteService) UpdateAuthBasic(req request.NginxAuthUpdate) (err error)
 	if err != nil {
 		return
 	}
-	authArray = strings.Split(string(authContent), "\n")
+	if len(authContent) > 0 {
+		authArray = strings.Split(string(authContent), "\n")
+	}
 	switch req.Operate {
 	case "disable":
 		return deleteNginxConfig(constant.NginxScopeServer, params, &website)
@@ -1590,6 +1612,9 @@ func (w WebsiteService) UpdateAuthBasic(req request.NginxAuthUpdate) (err error)
 	defer passFile.Close()
 	writer := bufio.NewWriter(passFile)
 	for _, line := range authArray {
+		if line == "" {
+			continue
+		}
 		_, err = writer.WriteString(line + "\n")
 		if err != nil {
 			return
@@ -1598,6 +1623,15 @@ func (w WebsiteService) UpdateAuthBasic(req request.NginxAuthUpdate) (err error)
 	err = writer.Flush()
 	if err != nil {
 		return
+	}
+	authContent, err = fileOp.GetContent(absoluteAuthPath)
+	if err != nil {
+		return
+	}
+	if len(authContent) == 0 {
+		if err = deleteNginxConfig(constant.NginxScopeServer, params, &website); err != nil {
+			return
+		}
 	}
 	return
 }

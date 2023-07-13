@@ -62,11 +62,7 @@
             </el-tab-pane>
             <el-tab-pane :closable="false" name="newTabs">
                 <template #label>
-                    <el-button
-                        v-popover="popoverRef"
-                        style="background-color: #ededed; border: 0"
-                        icon="Plus"
-                    ></el-button>
+                    <el-button v-popover="popoverRef" class="tagButton" icon="Plus"></el-button>
                     <el-popover ref="popoverRef" width="250px" trigger="hover" virtual-triggering persistent>
                         <div style="margin-left: 10px">
                             <el-button link type="primary" @click="onNewSsh">{{ $t('terminal.createConn') }}</el-button>
@@ -303,7 +299,7 @@ const onNewSsh = () => {
     dialogRef.value!.acceptParams({ isLocal: false });
 };
 const onNewLocal = () => {
-    onConnTerminal(i18n.global.t('terminal.localhost'), localHostID.value, true);
+    onConnTerminal(i18n.global.t('terminal.localhost'), localHostID.value, false);
 };
 
 const onClickConn = (node: Node, data: Tree) => {
@@ -399,6 +395,11 @@ defineExpose({
         color: #ebeef5;
         background-color: #575758;
     }
+}
+
+.tagButton {
+    border: 0;
+    background-color: var(--el-tabs__item);
 }
 
 .vertical-tabs > .el-tabs__content {

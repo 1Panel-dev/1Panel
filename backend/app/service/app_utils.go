@@ -8,7 +8,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/i18n"
-	"github.com/compose-spec/compose-go/types"
 	"github.com/subosito/gotenv"
 	"gopkg.in/yaml.v3"
 	"math"
@@ -49,7 +48,20 @@ var (
 func checkPort(key string, params map[string]interface{}) (int, error) {
 	port, ok := params[key]
 	if ok {
-		portN := int(math.Ceil(port.(float64)))
+		portN := 0
+		var err error
+		switch p := port.(type) {
+		case string:
+			portN, err = strconv.Atoi(p)
+			if err != nil {
+				return portN, nil
+			}
+		case float64:
+			portN = int(math.Ceil(p))
+		case int:
+			portN = p
+		}
+
 		oldInstalled, _ := appInstallRepo.ListBy(appInstallRepo.WithPort(portN))
 		if len(oldInstalled) > 0 {
 			var apps []string
@@ -359,7 +371,6 @@ func getContainerNames(install model.AppInstall) ([]string, error) {
 		return nil, err
 	}
 	containerMap := make(map[string]struct{})
-	containerMap[install.ContainerName] = struct{}{}
 	for _, service := range project.AllServices() {
 		if service.ContainerName == "${CONTAINER_NAME}" || service.ContainerName == "" {
 			continue
@@ -369,6 +380,9 @@ func getContainerNames(install model.AppInstall) ([]string, error) {
 	var containerNames []string
 	for k := range containerMap {
 		containerNames = append(containerNames, k)
+	}
+	if len(containerNames) == 0 {
+		containerNames = append(containerNames, install.ContainerName)
 	}
 	return containerNames, nil
 }
@@ -522,27 +536,6 @@ func upAppPre(app model.App, appInstall *model.AppInstall) error {
 	return nil
 }
 
-func getServiceFromInstall(appInstall *model.AppInstall) (service *composeV2.ComposeService, err error) {
-	var (
-		project *types.Project
-		envStr  string
-	)
-	envStr, err = coverEnvJsonToStr(appInstall.Env)
-	if err != nil {
-		return
-	}
-	project, err = composeV2.GetComposeProject(appInstall.Name, appInstall.GetPath(), []byte(appInstall.DockerCompose), []byte(envStr), true)
-	if err != nil {
-		return
-	}
-	service, err = composeV2.NewComposeService()
-	if err != nil {
-		return
-	}
-	service.SetProject(project)
-	return
-}
-
 func checkContainerNameIsExist(containerName, appDir string) (bool, error) {
 	client, err := composeV2.NewDockerClient()
 	if err != nil {
@@ -571,13 +564,30 @@ func checkContainerNameIsExist(containerName, appDir string) (bool, error) {
 func upApp(appInstall *model.AppInstall) {
 	upProject := func(appInstall *model.AppInstall) (err error) {
 		if err == nil {
-			var composeService *composeV2.ComposeService
-			composeService, err = getServiceFromInstall(appInstall)
-			if err != nil {
-				return err
+			var (
+				out    string
+				errMsg string
+			)
+			if appInstall.App.Type != "php" {
+				out, err = compose.Pull(appInstall.GetComposePath())
+				if err != nil {
+					if out != "" {
+						if strings.Contains(out, "no such host") {
+							errMsg = i18n.GetMsgByKey("ErrNoSuchHost") + ":"
+						}
+						if strings.Contains(out, "timeout") {
+							errMsg = i18n.GetMsgByKey("ErrImagePullTimeOut") + ":"
+						}
+						appInstall.Message = errMsg + out
+					}
+					return err
+				}
 			}
-			err = composeService.ComposeUp()
+			out, err = compose.Up(appInstall.GetComposePath())
 			if err != nil {
+				if out != "" {
+					appInstall.Message = errMsg + out
+				}
 				return err
 			}
 			return
@@ -587,7 +597,6 @@ func upApp(appInstall *model.AppInstall) {
 	}
 	if err := upProject(appInstall); err != nil {
 		appInstall.Status = constant.Error
-		appInstall.Message = err.Error()
 	} else {
 		appInstall.Status = constant.Running
 	}
@@ -751,7 +760,7 @@ func handleErr(install model.AppInstall, err error, out string) error {
 func handleInstalled(appInstallList []model.AppInstall, updated bool) ([]response.AppInstalledDTO, error) {
 	var res []response.AppInstalledDTO
 	for _, installed := range appInstallList {
-		if updated && installed.App.Type == "php" {
+		if updated && (installed.App.Type == "php" || installed.Status == constant.Installing || (installed.App.Key == constant.AppMysql && installed.Version == "5.6.51")) {
 			continue
 		}
 		installDTO := response.AppInstalledDTO{
@@ -768,12 +777,18 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool) ([]respons
 		}
 		var versions []string
 		for _, detail := range details {
+			if detail.IgnoreUpgrade {
+				continue
+			}
 			if common.IsCrossVersion(installed.Version, detail.Version) && !app.CrossVersionUpdate {
 				continue
 			}
 			versions = append(versions, detail.Version)
 		}
 		versions = common.GetSortedVersions(versions)
+		if len(versions) == 0 {
+			continue
+		}
 		lastVersion := versions[0]
 		if common.IsCrossVersion(installed.Version, lastVersion) {
 			installDTO.CanUpdate = app.CrossVersionUpdate

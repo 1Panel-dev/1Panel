@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -27,6 +28,7 @@ type BackupService struct{}
 type IBackupService interface {
 	List() ([]dto.BackupInfo, error)
 	SearchRecordsWithPage(search dto.RecordSearch) (int64, []dto.BackupRecords, error)
+	LoadOneDriveInfo() (string, error)
 	DownloadRecord(info dto.DownloadRecord) (string, error)
 	Create(backupDto dto.BackupOperate) error
 	GetBuckets(backupDto dto.ForBuckets) ([]interface{}, error)
@@ -88,6 +90,18 @@ func (u *BackupService) SearchRecordsWithPage(search dto.RecordSearch) (int64, [
 	return total, dtobas, err
 }
 
+func (u *BackupService) LoadOneDriveInfo() (string, error) {
+	OneDriveID, err := settingRepo.Get(settingRepo.WithByKey("OneDriveID"))
+	if err != nil {
+		return "", err
+	}
+	idItem, err := base64.StdEncoding.DecodeString(OneDriveID.Value)
+	if err != nil {
+		return "", err
+	}
+	return string(idItem), err
+}
+
 func (u *BackupService) DownloadRecord(info dto.DownloadRecord) (string, error) {
 	if info.Source == "LOCAL" {
 		return info.FileDir + "/" + info.FileName, nil
@@ -122,6 +136,11 @@ func (u *BackupService) DownloadRecord(info dto.DownloadRecord) (string, error) 
 		}
 	}
 	srcPath := fmt.Sprintf("%s/%s", info.FileDir, info.FileName)
+	if len(backup.BackupPath) != 0 {
+		itemPath := strings.TrimPrefix(backup.BackupPath, "/")
+		itemPath = strings.TrimSuffix(itemPath, "/") + "/"
+		srcPath = itemPath + srcPath
+	}
 	if exist, _ := backClient.Exist(srcPath); exist {
 		isOK, err := backClient.Download(srcPath, targetPath)
 		if !isOK {
@@ -224,6 +243,7 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 	upMap := make(map[string]interface{})
 	upMap["bucket"] = req.Bucket
 	upMap["credential"] = req.Credential
+	upMap["backup_path"] = req.BackupPath
 	upMap["vars"] = req.Vars
 	backup.Vars = req.Vars
 
@@ -313,8 +333,8 @@ func (u *BackupService) loadAccessToken(backup *model.BackupAccount) error {
 	}
 
 	data := url.Values{}
-	data.Set("client_id", constant.OneDriveClientID)
-	data.Set("client_secret", constant.OneDriveClientSecret)
+	data.Set("client_id", global.CONF.System.OneDriveID)
+	data.Set("client_secret", global.CONF.System.OneDriveSc)
 	data.Set("grant_type", "authorization_code")
 	data.Set("code", varMap["code"].(string))
 	data.Set("redirect_uri", constant.OneDriveRedirectURI)

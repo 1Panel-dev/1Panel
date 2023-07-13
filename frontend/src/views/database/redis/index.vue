@@ -53,6 +53,8 @@
                 </span>
             </template>
         </el-dialog>
+
+        <PortJumpDialog ref="dialogPortJumpRef" />
     </div>
 </template>
 
@@ -61,6 +63,7 @@ import Setting from '@/views/database/redis/setting/index.vue';
 import Password from '@/views/database/redis/password/index.vue';
 import Terminal from '@/components/terminal/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
+import PortJumpDialog from '@/components/port-jump/index.vue';
 import { nextTick, onBeforeUnmount, ref } from 'vue';
 import { App } from '@/api/interface/app';
 import { GetAppPort } from '@/api/modules/app';
@@ -80,6 +83,8 @@ const terminalShow = ref(false);
 const redisCommandPort = ref();
 const commandVisiable = ref(false);
 
+const dialogPortJumpRef = ref();
+
 const isRefresh = ref();
 
 const onSetting = async () => {
@@ -94,9 +99,7 @@ const goDashboard = async () => {
         commandVisiable.value = true;
         return;
     }
-    let href = window.location.href;
-    let ipLocal = href.split('//')[1].split(':')[0];
-    window.open(`http://${ipLocal}:${redisCommandPort.value}`, '_blank');
+    dialogPortJumpRef.value.acceptParams({ port: redisCommandPort.value });
 };
 const getAppDetail = (key: string) => {
     router.push({ name: 'AppDetail', params: { appKey: key } });

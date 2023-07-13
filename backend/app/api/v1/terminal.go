@@ -9,8 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
-	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/copier"
@@ -22,24 +20,27 @@ import (
 )
 
 func (b *BaseApi) WsSsh(c *gin.Context) {
-	id, err := strconv.Atoi(c.Query("id"))
+	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		global.LOG.Errorf("gin context http handler failed, err: %v", err)
+		return
+	}
+	defer wsConn.Close()
+
+	id, err := strconv.Atoi(c.Query("id"))
+	if wshandleError(wsConn, errors.WithMessage(err, "invalid param id in request")) {
 		return
 	}
 	cols, err := strconv.Atoi(c.DefaultQuery("cols", "80"))
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if wshandleError(wsConn, errors.WithMessage(err, "invalid param cols in request")) {
 		return
 	}
 	rows, err := strconv.Atoi(c.DefaultQuery("rows", "40"))
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if wshandleError(wsConn, errors.WithMessage(err, "invalid param rows in request")) {
 		return
 	}
 	host, err := hostService.GetHostInfo(uint(id))
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if wshandleError(wsConn, errors.WithMessage(err, "load host info by id failed")) {
 		return
 	}
 	var connInfo ssh.ConnInfo
@@ -48,13 +49,6 @@ func (b *BaseApi) WsSsh(c *gin.Context) {
 	if len(host.PassPhrase) != 0 {
 		connInfo.PassPhrase = []byte(host.PassPhrase)
 	}
-
-	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
-	if err != nil {
-		global.LOG.Errorf("gin context http handler failed, err: %v", err)
-		return
-	}
-	defer wsConn.Close()
 
 	client, err := connInfo.NewClient()
 	if wshandleError(wsConn, errors.WithMessage(err, "failed to set up the connection. Please check the host information")) {
@@ -85,28 +79,25 @@ func (b *BaseApi) WsSsh(c *gin.Context) {
 }
 
 func (b *BaseApi) RedisWsSsh(c *gin.Context) {
-	cols, err := strconv.Atoi(c.DefaultQuery("cols", "80"))
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	rows, err := strconv.Atoi(c.DefaultQuery("rows", "40"))
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	redisConf, err := redisService.LoadConf()
-	if err != nil {
-		global.LOG.Errorf("load redis container failed, err: %v", err)
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-
 	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		global.LOG.Errorf("gin context http handler failed, err: %v", err)
 		return
 	}
+
+	cols, err := strconv.Atoi(c.DefaultQuery("cols", "80"))
+	if wshandleError(wsConn, errors.WithMessage(err, "invalid param cols in request")) {
+		return
+	}
+	rows, err := strconv.Atoi(c.DefaultQuery("rows", "40"))
+	if wshandleError(wsConn, errors.WithMessage(err, "invalid param rows in request")) {
+		return
+	}
+	redisConf, err := redisService.LoadConf()
+	if wshandleError(wsConn, errors.WithMessage(err, "load redis container failed")) {
+		return
+	}
+
 	defer wsConn.Close()
 	commands := "redis-cli"
 	if len(redisConf.Requirepass) != 0 {
@@ -138,30 +129,29 @@ func (b *BaseApi) RedisWsSsh(c *gin.Context) {
 }
 
 func (b *BaseApi) ContainerWsSsh(c *gin.Context) {
-	containerID := c.Query("containerid")
-	command := c.Query("command")
-	user := c.Query("user")
-	if len(command) == 0 || len(containerID) == 0 {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error param of command or containerID"))
-		return
-	}
-	cols, err := strconv.Atoi(c.DefaultQuery("cols", "80"))
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	rows, err := strconv.Atoi(c.DefaultQuery("rows", "40"))
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-
 	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		global.LOG.Errorf("gin context http handler failed, err: %v", err)
 		return
 	}
 	defer wsConn.Close()
+
+	containerID := c.Query("containerid")
+	command := c.Query("command")
+	user := c.Query("user")
+	if len(command) == 0 || len(containerID) == 0 {
+		if wshandleError(wsConn, errors.New("error param of command or containerID")) {
+			return
+		}
+	}
+	cols, err := strconv.Atoi(c.DefaultQuery("cols", "80"))
+	if wshandleError(wsConn, errors.WithMessage(err, "invalid param cols in request")) {
+		return
+	}
+	rows, err := strconv.Atoi(c.DefaultQuery("rows", "40"))
+	if wshandleError(wsConn, errors.WithMessage(err, "invalid param rows in request")) {
+		return
+	}
 
 	cmds := []string{"exec", containerID, command}
 	if len(user) != 0 {

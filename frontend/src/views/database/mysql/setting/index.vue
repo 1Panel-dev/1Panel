@@ -1,6 +1,6 @@
 <template>
     <div v-show="onSetting" v-loading="loading">
-        <LayoutContent :title="'MySQL ' + $t('database.setting')" :reload="true">
+        <LayoutContent :title="'MySQL ' + $t('commons.button.set')" :reload="true">
             <template #buttons>
                 <el-button type="primary" :plain="activeName !== 'conf'" @click="jumpToConf">
                     {{ $t('database.confChange') }}
@@ -22,7 +22,7 @@
                     {{ $t('database.performanceTuning') }}
                 </el-button>
                 <el-button type="primary" :plain="activeName !== 'port'" @click="activeName = 'port'">
-                    {{ $t('database.portSetting') }}
+                    {{ $t('commons.table.port') }}
                 </el-button>
                 <el-button
                     type="primary"
@@ -45,7 +45,7 @@
                 <div v-if="activeName === 'conf'">
                     <codemirror
                         :autofocus="true"
-                        placeholder="None data"
+                        :placeholder="$t('commons.msg.noneData')"
                         :indent-with-tab="true"
                         :tabSize="4"
                         style="margin-top: 10px; height: calc(100vh - 375px)"
@@ -81,7 +81,7 @@
                         <el-row>
                             <el-col :span="1"><br /></el-col>
                             <el-col :span="10">
-                                <el-form-item :label="$t('setting.port')" prop="port" :rules="Rules.port">
+                                <el-form-item :label="$t('commons.table.port')" prop="port" :rules="Rules.port">
                                     <el-input clearable type="number" v-model.number="baseInfo.port" />
                                 </el-form-item>
                                 <el-form-item>

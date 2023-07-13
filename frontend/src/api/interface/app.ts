@@ -41,7 +41,6 @@ export namespace App {
         readme: string;
         params: AppParams;
         dockerCompose: string;
-        enbale: boolean;
         image: string;
     }
 
@@ -187,5 +186,12 @@ export namespace App {
         containerName: string;
         allowPort: boolean;
         dockerCompose: string;
+    }
+
+    export interface IgnoredApp {
+        name: string;
+        detailID: number;
+        version: string;
+        icon: string;
     }
 }

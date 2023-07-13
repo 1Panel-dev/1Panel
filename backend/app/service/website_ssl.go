@@ -7,11 +7,13 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/ssl"
 	"path"
+	"strconv"
 	"strings"
 )
 
@@ -21,7 +23,7 @@ type WebsiteSSLService struct {
 type IWebsiteSSLService interface {
 	Page(search request.WebsiteSSLSearch) (int64, []response.WebsiteSSLDTO, error)
 	GetSSL(id uint) (*response.WebsiteSSLDTO, error)
-	Search() ([]response.WebsiteSSLDTO, error)
+	Search(req request.WebsiteSSLSearch) ([]response.WebsiteSSLDTO, error)
 	Create(create request.WebsiteSSLCreate) (request.WebsiteSSLCreate, error)
 	Renew(sslId uint) error
 	GetDNSResolve(req request.WebsiteDNSReq) ([]response.WebsiteDNSRes, error)
@@ -35,17 +37,19 @@ func NewIWebsiteSSLService() IWebsiteSSLService {
 }
 
 func (w WebsiteSSLService) Page(search request.WebsiteSSLSearch) (int64, []response.WebsiteSSLDTO, error) {
+	var (
+		result []response.WebsiteSSLDTO
+	)
 	total, sslList, err := websiteSSLRepo.Page(search.Page, search.PageSize, commonRepo.WithOrderBy("created_at desc"))
 	if err != nil {
 		return 0, nil, err
 	}
-	var sslDTOs []response.WebsiteSSLDTO
-	for _, ssl := range sslList {
-		sslDTOs = append(sslDTOs, response.WebsiteSSLDTO{
-			WebsiteSSL: ssl,
+	for _, sslModel := range sslList {
+		result = append(result, response.WebsiteSSLDTO{
+			WebsiteSSL: sslModel,
 		})
 	}
-	return total, sslDTOs, err
+	return total, result, err
 }
 
 func (w WebsiteSSLService) GetSSL(id uint) (*response.WebsiteSSLDTO, error) {
@@ -58,18 +62,29 @@ func (w WebsiteSSLService) GetSSL(id uint) (*response.WebsiteSSLDTO, error) {
 	return &res, nil
 }
 
-func (w WebsiteSSLService) Search() ([]response.WebsiteSSLDTO, error) {
-	sslList, err := websiteSSLRepo.List()
+func (w WebsiteSSLService) Search(search request.WebsiteSSLSearch) ([]response.WebsiteSSLDTO, error) {
+	var (
+		opts   []repo.DBOption
+		result []response.WebsiteSSLDTO
+	)
+	opts = append(opts, commonRepo.WithOrderBy("created_at desc"))
+	if search.AcmeAccountID != "" {
+		acmeAccountID, err := strconv.ParseUint(search.AcmeAccountID, 10, 64)
+		if err != nil {
+			return nil, err
+		}
+		opts = append(opts, websiteSSLRepo.WithByAcmeAccountId(uint(acmeAccountID)))
+	}
+	sslList, err := websiteSSLRepo.List(opts...)
 	if err != nil {
 		return nil, err
 	}
-	var sslDTOs []response.WebsiteSSLDTO
-	for _, ssl := range sslList {
-		sslDTOs = append(sslDTOs, response.WebsiteSSLDTO{
-			WebsiteSSL: ssl,
+	for _, sslModel := range sslList {
+		result = append(result, response.WebsiteSSLDTO{
+			WebsiteSSL: sslModel,
 		})
 	}
-	return sslDTOs, err
+	return result, err
 }
 
 func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.WebsiteSSLCreate, error) {

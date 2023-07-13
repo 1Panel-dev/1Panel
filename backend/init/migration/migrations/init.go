@@ -394,7 +394,7 @@ var UpdateWebsite = &gormigrate.Migration{
 var AddBackupAccountDir = &gormigrate.Migration{
 	ID: "20200620-add-backup-dir",
 	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.BackupAccount{}); err != nil {
+		if err := tx.AutoMigrate(&model.BackupAccount{}, &model.Cronjob{}); err != nil {
 			return err
 		}
 		return nil
@@ -406,6 +406,75 @@ var AddMfaInterval = &gormigrate.Migration{
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.Create(&model.Setting{Key: "MFAInterval", Value: "30"}).Error; err != nil {
 			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "SystemIP", Value: ""}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "OneDriveID", Value: "MDEwOTM1YTktMWFhOS00ODU0LWExZGMtNmU0NWZlNjI4YzZi"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "OneDriveSc", Value: "akpuOFF+YkNXOU1OLWRzS1ZSRDdOcG1LT2ZRM0RLNmdvS1RkVWNGRA=="}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var UpdateAppDetail = &gormigrate.Migration{
+	ID: "20230704-update-app-detail",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.AppDetail{}); err != nil {
+			return err
+		}
+		if err := tx.Model(&model.AppDetail{}).Where("1 = 1").Update("ignore_upgrade", "0").Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var EncryptHostPassword = &gormigrate.Migration{
+	ID: "20230703-encrypt-host-password",
+	Migrate: func(tx *gorm.DB) error {
+		var hosts []model.Host
+		if err := tx.Where("1 = 1").Find(&hosts).Error; err != nil {
+			return err
+		}
+
+		var encryptSetting model.Setting
+		if err := tx.Where("key = ?", "EncryptKey").Find(&encryptSetting).Error; err != nil {
+			return err
+		}
+		global.CONF.System.EncryptKey = encryptSetting.Value
+
+		for _, host := range hosts {
+			if len(host.Password) != 0 {
+				pass, err := encrypt.StringEncrypt(host.Password)
+				if err != nil {
+					return err
+				}
+				if err := tx.Model(&model.Host{}).Where("id = ?", host.ID).Update("password", pass).Error; err != nil {
+					return err
+				}
+			}
+			if len(host.PrivateKey) != 0 {
+				key, err := encrypt.StringEncrypt(host.PrivateKey)
+				if err != nil {
+					return err
+				}
+				if err := tx.Model(&model.Host{}).Where("id = ?", host.ID).Update("private_key", key).Error; err != nil {
+					return err
+				}
+			}
+			if len(host.PassPhrase) != 0 {
+				pass, err := encrypt.StringEncrypt(host.PassPhrase)
+				if err != nil {
+					return err
+				}
+				if err := tx.Model(&model.Host{}).Where("id = ?", host.ID).Update("pass_phrase", pass).Error; err != nil {
+					return err
+				}
+			}
 		}
 		return nil
 	},

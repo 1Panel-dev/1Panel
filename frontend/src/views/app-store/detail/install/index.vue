@@ -11,9 +11,7 @@
         </template>
         <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
-                <el-alert type="error" :closable="false">
-                    <p>{{ $t('app.appInstallWarn') }}</p>
-                </el-alert>
+                <el-alert :title="$t('app.appInstallWarn')" class="common-prompt" :closable="false" type="error" />
                 <el-form
                     @submit.prevent
                     ref="paramForm"
@@ -23,7 +21,7 @@
                     :rules="rules"
                     :validate-on-rule-change="false"
                 >
-                    <el-form-item :label="$t('app.name')" prop="name">
+                    <el-form-item :label="$t('commons.table.name')" prop="name">
                         <el-input v-model.trim="req.name"></el-input>
                     </el-form-item>
                     <Params
@@ -43,23 +41,39 @@
                                 :placeholder="$t('app.containerNameHelper')"
                             ></el-input>
                         </el-form-item>
-                        <el-form-item :label="$t('container.cpuQuota')" prop="cpuQuota">
+                        <el-form-item
+                            :label="$t('container.cpuQuota')"
+                            prop="cpuQuota"
+                            :rules="checkNumberRange(0, limits.cpu)"
+                        >
                             <el-input type="number" style="width: 40%" v-model.number="req.cpuQuota" maxlength="5">
                                 <template #append>{{ $t('app.cpuCore') }}</template>
                             </el-input>
-                            <span class="input-help">{{ $t('container.limitHelper') }}</span>
+                            <span class="input-help">
+                                {{ $t('container.limitHelper', [limits.cpu]) }}{{ $t('commons.units.core') }}
+                            </span>
                         </el-form-item>
-                        <el-form-item :label="$t('container.memoryLimit')" prop="memoryLimit">
+                        <el-form-item
+                            :label="$t('container.memoryLimit')"
+                            prop="memoryLimit"
+                            :rules="checkNumberRange(0, limits.memory)"
+                        >
                             <el-input style="width: 40%" v-model.number="req.memoryLimit" maxlength="10">
                                 <template #append>
-                                    <el-select v-model="req.memoryUnit" placeholder="Select" style="width: 85px">
-                                        <el-option label="KB" value="K" />
+                                    <el-select
+                                        v-model="req.memoryUnit"
+                                        placeholder="Select"
+                                        style="width: 85px"
+                                        @change="changeUnit"
+                                    >
                                         <el-option label="MB" value="M" />
                                         <el-option label="GB" value="G" />
                                     </el-select>
                                 </template>
                             </el-input>
-                            <span class="input-help">{{ $t('container.limitHelper') }}</span>
+                            <span class="input-help">
+                                {{ $t('container.limitHelper', [limits.memory]) }}{{ req.memoryUnit }}B
+                            </span>
                         </el-form-item>
                         <el-form-item prop="allowPort" v-if="canEditPort(installData.app)">
                             <el-checkbox v-model="req.allowPort" :label="$t('app.allowPort')" size="large" />
@@ -106,7 +120,7 @@ import { InstallApp } from '@/api/modules/app';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { canEditPort } from '@/global/business';
 import { FormInstance, FormRules } from 'element-plus';
-import { reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import Params from '../params/index.vue';
 import Header from '@/components/drawer-header/index.vue';
@@ -115,6 +129,8 @@ import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import i18n from '@/lang';
 import { MsgError } from '@/utils/message';
+import { Container } from '@/api/interface/container';
+import { loadResourceLimit } from '@/api/modules/container';
 
 const extensions = [javascript(), oneDark];
 const router = useRouter();
@@ -146,20 +162,33 @@ const initData = () => ({
     appDetailId: 0,
     params: form.value,
     name: '',
-    advanced: false,
+    advanced: true,
     cpuQuota: 0,
     memoryLimit: 0,
-    memoryUnit: 'MB',
+    memoryUnit: 'M',
     containerName: '',
     allowPort: false,
     editCompose: false,
     dockerCompose: '',
 });
 const req = reactive(initData());
+const limits = ref<Container.ResourceLimit>({
+    cpu: null as number,
+    memory: null as number,
+});
+const oldMemory = ref<number>(0);
 
 const handleClose = () => {
     open.value = false;
     resetForm();
+};
+
+const changeUnit = () => {
+    if (req.memoryUnit == 'M') {
+        limits.value.memory = oldMemory.value;
+    } else {
+        limits.value.memory = Number((oldMemory.value / 1024).toFixed(2));
+    }
 };
 
 const resetForm = () => {
@@ -195,19 +224,43 @@ const submit = async (formEl: FormInstance | undefined) => {
         if (req.memoryLimit < 0) {
             req.memoryLimit = 0;
         }
-        loading.value = true;
-        InstallApp(req)
-            .then(() => {
-                handleClose();
-                router.push({ path: '/apps/installed' });
-            })
-            .finally(() => {
-                loading.value = false;
+        if (installData.value.app.key != 'openresty' && req.advanced && !req.allowPort) {
+            ElMessageBox.confirm(i18n.global.t('app.installWarn'), i18n.global.t('app.checkTitle'), {
+                confirmButtonText: i18n.global.t('commons.button.confirm'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+            }).then(async () => {
+                install();
             });
+        } else {
+            install();
+        }
     });
+};
+
+const install = () => {
+    loading.value = true;
+    InstallApp(req)
+        .then(() => {
+            handleClose();
+            router.push({ path: '/apps/installed' });
+        })
+        .finally(() => {
+            loading.value = false;
+        });
+};
+
+const loadLimit = async () => {
+    const res = await loadResourceLimit();
+    limits.value = res.data;
+    limits.value.memory = Number((limits.value.memory / 1024 / 1024).toFixed(2));
+    oldMemory.value = limits.value.memory;
 };
 
 defineExpose({
     acceptParams,
+});
+
+onMounted(() => {
+    loadLimit();
 });
 </script>

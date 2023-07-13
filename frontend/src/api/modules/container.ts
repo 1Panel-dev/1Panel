@@ -5,6 +5,9 @@ import { Container } from '../interface/container';
 export const searchContainer = (params: Container.ContainerSearch) => {
     return http.post<ResPage<Container.ContainerInfo>>(`/containers/search`, params, 400000);
 };
+export const listContainer = () => {
+    return http.post<Array<string>>(`/containers/list`, {});
+};
 export const loadResourceLimit = () => {
     return http.get<Container.ResourceLimit>(`/containers/limit`);
 };
@@ -14,14 +17,17 @@ export const createContainer = (params: Container.ContainerHelper) => {
 export const updateContainer = (params: Container.ContainerHelper) => {
     return http.post(`/containers/update`, params, 3000000);
 };
-export const upgradeContainer = (name: string, image: string) => {
-    return http.post(`/containers/upgrade`, { name: name, image: image }, 3000000);
+export const upgradeContainer = (name: string, image: string, forcePull: boolean) => {
+    return http.post(`/containers/upgrade`, { name: name, image: image, forcePull: forcePull }, 3000000);
 };
 export const loadContainerInfo = (name: string) => {
     return http.post<Container.ContainerHelper>(`/containers/info`, { name: name });
 };
 export const cleanContainerLog = (containerName: string) => {
     return http.post(`/containers/clean/log`, { name: containerName });
+};
+export const containerListStats = () => {
+    return http.get<Array<Container.ContainerListStats>>(`/containers/list/stats`);
 };
 export const containerStats = (id: string) => {
     return http.get<Container.ContainerStats>(`/containers/stats/${id}`);
@@ -69,6 +75,9 @@ export const imageRemove = (params: Container.BatchDelete) => {
 export const searchNetwork = (params: SearchWithPage) => {
     return http.post<ResPage<Container.NetworkInfo>>(`/containers/network/search`, params);
 };
+export const listNetwork = () => {
+    return http.get<Array<Container.Options>>(`/containers/network`);
+};
 export const deleteNetwork = (params: Container.BatchDelete) => {
     return http.post(`/containers/network/del`, params);
 };
@@ -92,7 +101,7 @@ export const createVolume = (params: Container.VolumeCreate) => {
 
 // repo
 export const checkRepoStatus = (id: number) => {
-    return http.post(`/containers/repo/status`, { id: id });
+    return http.post(`/containers/repo/status`, { id: id }, 40000);
 };
 export const searchImageRepo = (params: SearchWithPage) => {
     return http.post<ResPage<Container.RepoInfo>>(`/containers/repo/search`, params);
@@ -101,13 +110,13 @@ export const listImageRepo = () => {
     return http.get<Container.RepoOptions>(`/containers/repo`);
 };
 export const createImageRepo = (params: Container.RepoCreate) => {
-    return http.post(`/containers/repo`, params);
+    return http.post(`/containers/repo`, params, 40000);
 };
 export const updateImageRepo = (params: Container.RepoUpdate) => {
-    return http.post(`/containers/repo/update`, params);
+    return http.post(`/containers/repo/update`, params, 40000);
 };
 export const deleteImageRepo = (params: Container.RepoDelete) => {
-    return http.post(`/containers/repo/del`, params);
+    return http.post(`/containers/repo/del`, params, 40000);
 };
 
 // composeTemplate

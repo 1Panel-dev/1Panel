@@ -68,8 +68,8 @@
                         :data="data"
                     >
                         <el-table-column type="selection" :selectable="selectable" fix />
-                        <el-table-column :label="$t('firewall.protocol')" :min-width="90" prop="protocol" />
-                        <el-table-column :label="$t('firewall.port')" :min-width="120" prop="port" />
+                        <el-table-column :label="$t('commons.table.protocol')" :min-width="90" prop="protocol" />
+                        <el-table-column :label="$t('commons.table.port')" :min-width="120" prop="port" />
                         <el-table-column :label="$t('commons.table.status')" :min-width="120">
                             <template #default="{ row }">
                                 <el-tag type="info" v-if="row.isUsed">
@@ -225,7 +225,7 @@ const onChangeStatus = async (row: Host.RuleInfo, status: string) => {
         status === 'accept'
             ? i18n.global.t('firewall.changeStrategyPortHelper2')
             : i18n.global.t('firewall.changeStrategyPortHelper1');
-    ElMessageBox.confirm(operation, i18n.global.t('firewall.changeStrategy', [i18n.global.t('firewall.port')]), {
+    ElMessageBox.confirm(operation, i18n.global.t('firewall.changeStrategy', [i18n.global.t('commons.table.port')]), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
     }).then(async () => {

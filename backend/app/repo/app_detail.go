@@ -13,6 +13,7 @@ type AppDetailRepo struct {
 type IAppDetailRepo interface {
 	WithVersion(version string) DBOption
 	WithAppId(id uint) DBOption
+	WithIgnored() DBOption
 	GetFirst(opts ...DBOption) (model.AppDetail, error)
 	Update(ctx context.Context, detail model.AppDetail) error
 	BatchCreate(ctx context.Context, details []model.AppDetail) error
@@ -31,9 +32,16 @@ func (a AppDetailRepo) WithVersion(version string) DBOption {
 		return g.Where("version = ?", version)
 	}
 }
+
 func (a AppDetailRepo) WithAppId(id uint) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("app_id = ?", id)
+	}
+}
+
+func (a AppDetailRepo) WithIgnored() DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("ignore_upgrade = 1")
 	}
 }
 

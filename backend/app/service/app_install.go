@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"math"
 	"os"
 	"path"
@@ -45,6 +46,7 @@ type IAppInstallService interface {
 	SearchForWebsite(req request.AppInstalledSearch) ([]response.AppInstalledDTO, error)
 	Operate(req request.AppInstalledOperate) error
 	Update(req request.AppInstalledUpdate) error
+	IgnoreUpgrade(req request.AppInstalledIgnoreUpgrade) error
 	SyncAll(systemInit bool) error
 	GetServices(key string) ([]response.AppService, error)
 	GetUpdateVersions(installId uint) ([]dto.AppVersion, error)
@@ -352,6 +354,15 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 	return nil
 }
 
+func (a *AppInstallService) IgnoreUpgrade(req request.AppInstalledIgnoreUpgrade) error {
+	appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(req.DetailID))
+	if err != nil {
+		return err
+	}
+	appDetail.IgnoreUpgrade = req.Operate == "ignore"
+	return appDetailRepo.Update(context.Background(), appDetail)
+}
+
 func (a *AppInstallService) SyncAll(systemInit bool) error {
 	allList, err := appInstallRepo.ListBy()
 	if err != nil {
@@ -366,8 +377,10 @@ func (a *AppInstallService) SyncAll(systemInit bool) error {
 			}
 			continue
 		}
-		if err := syncById(i.ID); err != nil {
-			global.LOG.Errorf("sync install app[%s] error,mgs: %s", i.Name, err.Error())
+		if !systemInit {
+			if err := syncById(i.ID); err != nil {
+				global.LOG.Errorf("sync install app[%s] error,mgs: %s", i.Name, err.Error())
+			}
 		}
 	}
 	return nil
@@ -412,6 +425,9 @@ func (a *AppInstallService) GetUpdateVersions(installId uint) ([]dto.AppVersion,
 		return versions, err
 	}
 	for _, detail := range details {
+		if detail.IgnoreUpgrade {
+			continue
+		}
 		if common.IsCrossVersion(install.Version, detail.Version) && !app.CrossVersionUpdate {
 			continue
 		}
@@ -577,6 +593,9 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 	config := getAppCommonConfig(envs)
 	config.DockerCompose = install.DockerCompose
 	res.Params = params
+	if config.ContainerName == "" {
+		config.ContainerName = install.ContainerName
+	}
 	res.AppContainerConfig = config
 	return &res, nil
 }
@@ -589,12 +608,10 @@ func syncById(installId uint) error {
 	if appInstall.Status == constant.Installing {
 		return nil
 	}
-
 	containerNames, err := getContainerNames(appInstall)
 	if err != nil {
 		return err
 	}
-
 	cli, err := docker.NewClient()
 	if err != nil {
 		return err
@@ -620,16 +637,16 @@ func syncById(installId uint) error {
 			errorContainers = append(errorContainers, n.Names[0])
 		}
 	}
-	for _, old := range containerNames {
+	for _, name := range containerNames {
 		exist := false
-		for _, new := range containers {
-			if common.ExistWithStrArray(old, new.Names) {
+		for _, container := range containers {
+			if common.ExistWithStrArray(name, container.Names) {
 				exist = true
 				break
 			}
 		}
 		if !exist {
-			notFoundContainers = append(notFoundContainers, old)
+			notFoundContainers = append(notFoundContainers, name)
 		}
 	}
 
@@ -642,10 +659,10 @@ func syncById(installId uint) error {
 
 	if containerCount == 0 {
 		appInstall.Status = constant.Error
-		appInstall.Message = "container is not found"
+		appInstall.Message = i18n.GetMsgWithMap("ErrContainerNotFound", map[string]interface{}{"name": strings.Join(containerNames, ",")})
 		return appInstallRepo.Save(context.Background(), &appInstall)
 	}
-	if errCount == 0 && existedCount == 0 {
+	if errCount == 0 && existedCount == 0 && notFoundCount == 0 {
 		appInstall.Status = constant.Running
 		return appInstallRepo.Save(context.Background(), &appInstall)
 	}
@@ -660,22 +677,14 @@ func syncById(installId uint) error {
 		appInstall.Status = constant.UnHealthy
 	}
 
-	var errMsg strings.Builder
+	var errMsg string
 	if errCount > 0 {
-		errMsg.Write([]byte(string(rune(errCount)) + " error containers:"))
-		for _, e := range errorContainers {
-			errMsg.Write([]byte(e))
-		}
-		errMsg.Write([]byte("\n"))
+		errMsg += i18n.GetMsgWithMap("ErrContainerMsg", map[string]interface{}{"name": strings.Join(errorContainers, ",")})
 	}
 	if notFoundCount > 0 {
-		errMsg.Write([]byte(string(rune(notFoundCount)) + " not found containers:"))
-		for _, e := range notFoundContainers {
-			errMsg.Write([]byte(e))
-		}
-		errMsg.Write([]byte("\n"))
+		errMsg += i18n.GetMsgWithMap("ErrContainerNotFound", map[string]interface{}{"name": strings.Join(notFoundContainers, ",")})
 	}
-	appInstall.Message = errMsg.String()
+	appInstall.Message = errMsg
 	return appInstallRepo.Save(context.Background(), &appInstall)
 }
 

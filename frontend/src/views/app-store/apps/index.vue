@@ -20,7 +20,7 @@
                             :type="activeTag === item.key ? 'primary' : ''"
                             :plain="activeTag !== item.key"
                         >
-                            {{ language == 'zh' ? item.name : item.key }}
+                            {{ language == 'zh' || language == 'tw' ? item.name : item.key }}
                         </el-button>
                     </div>
                 </el-col>
@@ -44,8 +44,18 @@
             </el-badge>
         </template>
         <template #main>
+            <el-alert type="info" :title="$t('app.appHelper')" :closable="false" />
             <el-row :gutter="5">
-                <el-col v-for="(app, index) in apps" :key="index" :xs="24" :sm="12" :md="8" :lg="8" :xl="8">
+                <el-col
+                    class="app-col-12"
+                    v-for="(app, index) in apps"
+                    :key="index"
+                    :xs="24"
+                    :sm="12"
+                    :md="8"
+                    :lg="8"
+                    :xl="8"
+                >
                     <div class="app-card">
                         <el-card class="e-card">
                             <el-row :gutter="20">
@@ -79,13 +89,17 @@
                                         </div>
                                         <div class="app-desc">
                                             <span class="desc">
-                                                {{ language == 'zh' ? app.shortDescZh : app.shortDescEn }}
+                                                {{
+                                                    language == 'zh' || language == 'tw'
+                                                        ? app.shortDescZh
+                                                        : app.shortDescEn
+                                                }}
                                             </span>
                                         </div>
                                         <div class="app-tag">
                                             <el-tag v-for="(tag, ind) in app.tags" :key="ind" style="margin-right: 5px">
                                                 <span :style="{ color: getColor(ind) }">
-                                                    {{ language == 'zh' ? tag.name : tag.key }}
+                                                    {{ language == 'zh' || language == 'tw' ? tag.name : tag.key }}
                                                 </span>
                                             </el-tag>
                                             <el-tag v-if="app.status === 'TakeDown'" style="margin-right: 5px">
@@ -173,20 +187,15 @@ const getAppDetail = (key: string) => {
 };
 
 const sync = () => {
-    loading.value = true;
-    SyncApp()
-        .then((res) => {
-            if (res.message != '') {
-                MsgSuccess(res.message);
-            } else {
-                MsgSuccess(i18n.global.t('app.syncStart'));
-            }
-            canUpdate.value = false;
-            search(req);
-        })
-        .finally(() => {
-            loading.value = false;
-        });
+    SyncApp().then((res) => {
+        if (res.message != '') {
+            MsgSuccess(res.message);
+        } else {
+            MsgSuccess(i18n.global.t('app.syncStart'));
+        }
+        canUpdate.value = false;
+        search(req);
+    });
 };
 
 const changeTag = (key: string) => {
@@ -283,5 +292,12 @@ onMounted(() => {
     float: right;
     margin-bottom: 10px;
     margin-top: 10px;
+}
+
+@media only screen and (min-width: 768px) and (max-width: 1200px) {
+    .app-col-12 {
+        max-width: 50%;
+        flex: 0 0 50%;
+    }
 }
 </style>

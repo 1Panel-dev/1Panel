@@ -1,5 +1,5 @@
 <template>
-    <div class="collapse">
+    <div class="menu-collapse">
         <el-icon class="collapse-icon" :size="25" @click="menuStore.setCollapse()">
             <component :is="isCollapse ? 'expand' : 'fold'"></component>
         </el-icon>
@@ -14,7 +14,7 @@ const isCollapse = computed((): boolean => menuStore.isCollapse);
 </script>
 
 <style scoped lang="scss">
-.collapse {
+.menu-collapse {
     height: 48px;
     border-top: 1px solid #e4e7ed;
     box-sizing: border-box;

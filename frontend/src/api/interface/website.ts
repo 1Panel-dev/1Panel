@@ -39,6 +39,8 @@ export namespace Website {
 
     export interface WebSiteSearch extends ReqPage {
         name: string;
+        orderBy: string;
+        order: string;
         websiteGroupId: number;
     }
 
@@ -158,6 +160,7 @@ export namespace Website {
         provider: string;
         websites?: Website.Website[];
         autoRenew: boolean;
+        acmeAccountId?: number;
     }
 
     export interface SSLCreate {
@@ -205,6 +208,7 @@ export namespace Website {
 
     export interface SSLReq {
         name?: string;
+        acmeAccountID?: string;
     }
 
     export interface HTTPSReq {

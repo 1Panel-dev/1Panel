@@ -12,7 +12,7 @@
         <el-row type="flex" justify="center">
             <el-col :span="22">
                 <el-form ref="formRef" label-position="top" :model="form" label-width="80px" :rules="rules">
-                    <el-form-item :label="$t('container.name')" prop="name">
+                    <el-form-item :label="$t('commons.table.name')" prop="name">
                         <el-input :placeholder="$t('container.imageNameHelper')" v-model.trim="form.name" clearable />
                     </el-form-item>
                     <el-form-item label="Dockerfile" prop="from">

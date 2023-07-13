@@ -24,6 +24,9 @@
         <div class="complex-table__body">
             <fu-table v-bind="$attrs" ref="tableRef" @selection-change="handleSelectionChange">
                 <slot></slot>
+                <template #empty>
+                    <slot name="empty"></slot>
+                </template>
             </fu-table>
         </div>
 
@@ -75,11 +78,16 @@ function handleSelectionChange(row: any) {
     emit('update:selects', row);
 }
 
+function sort(prop: string, order: string) {
+    tableRef.value.refElTable.sort(prop, order);
+}
+
 function clearSelects() {
     tableRef.value.refElTable.clearSelection();
 }
 defineExpose({
     clearSelects,
+    sort,
 });
 </script>
 

@@ -22,7 +22,7 @@
                         <SvgIcon :iconName="'p-logout'" :className="'svg-icon'"></SvgIcon>
                     </el-icon>
                     <template #title>
-                        <span @click="logout">{{ $t('commons.header.logout') }}</span>
+                        <span @click="logout">{{ $t('commons.login.logout') }}</span>
                     </template>
                 </el-menu-item>
             </el-menu>

@@ -36,7 +36,7 @@ import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { updateSetting } from '@/api/modules/setting';
 import { ElMessageBox } from 'element-plus';
-import { checkIp } from '@/utils/util';
+import { checkIpV4V6 } from '@/utils/util';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
@@ -58,7 +58,7 @@ const onSave = async () => {
         let ips = allowIPs.value.split('\n');
         for (const ip of ips) {
             if (ip) {
-                if (checkIp(ip) || ip === '0.0.0.0') {
+                if (checkIpV4V6(ip) || ip === '0.0.0.0') {
                     MsgError(i18n.global.t('firewall.addressFormatError'));
                     return false;
                 }

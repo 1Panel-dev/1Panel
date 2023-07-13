@@ -62,7 +62,7 @@ func handleParams(image, runtimeType, runtimeDir string, params map[string]inter
 			if extendsArray, ok := extends.([]interface{}); ok {
 				strArray := make([]string, len(extendsArray))
 				for i, v := range extendsArray {
-					strArray[i] = fmt.Sprintf("%v", v)
+					strArray[i] = strings.ToLower(fmt.Sprintf("%v", v))
 				}
 				params["PHP_EXTENSIONS"] = strings.Join(strArray, ",")
 			}

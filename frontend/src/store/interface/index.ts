@@ -13,7 +13,7 @@ export interface GlobalState {
     isLogin: boolean;
     entrance: string;
     csrfToken: string;
-    language: string; // zh | en
+    language: string; // zh | en | tw
     // assemblySize: string; // small | default | large
     themeConfig: ThemeConfigProp;
     isFullScreen: boolean;

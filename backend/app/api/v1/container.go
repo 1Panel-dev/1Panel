@@ -40,6 +40,23 @@ func (b *BaseApi) SearchContainer(c *gin.Context) {
 	})
 }
 
+// @Tags Container
+// @Summary List containers
+// @Description 获取容器名称
+// @Accept json
+// @Produce json
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /containers/list [post]
+func (b *BaseApi) ListContainer(c *gin.Context) {
+	list, err := containerService.List()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, list)
+}
+
 // @Tags Container Compose
 // @Summary Page composes
 // @Description 获取编排列表分页
@@ -219,6 +236,20 @@ func (b *BaseApi) LoadResouceLimit(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
+// @Summary Load container stats
+// @Description 获取容器列表资源占用
+// @Success 200 {array} dto.ContainerListStats
+// @Security ApiKeyAuth
+// @Router /containers/list/stats [get]
+func (b *BaseApi) ContainerListStats(c *gin.Context) {
+	datas, err := containerService.ContainerListStats()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, datas)
+}
+
 // @Tags Container
 // @Summary Create container
 // @Description 创建容器
@@ -354,7 +385,7 @@ func (b *BaseApi) ContainerOperation(c *gin.Context) {
 // @Summary Container stats
 // @Description 容器监控信息
 // @Param id path integer true "容器id"
-// @Success 200 {object} dto.ContainterStats
+// @Success 200 {object} dto.ContainerStats
 // @Security ApiKeyAuth
 // @Router /containers/stats/:id [get]
 func (b *BaseApi) ContainerStats(c *gin.Context) {
@@ -459,6 +490,23 @@ func (b *BaseApi) SearchNetwork(c *gin.Context) {
 }
 
 // @Tags Container Network
+// @Summary List networks
+// @Description 获取容器网络列表
+// @Accept json
+// @Produce json
+// @Success 200 {array} dto.Options
+// @Security ApiKeyAuth
+// @Router /containers/network [get]
+func (b *BaseApi) ListNetwork(c *gin.Context) {
+	list, err := containerService.ListNetwork()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, list)
+}
+
+// @Tags Container Network
 // @Summary Delete network
 // @Description 删除容器网络
 // @Accept json
@@ -547,11 +595,10 @@ func (b *BaseApi) SearchVolume(c *gin.Context) {
 // @Summary List volumes
 // @Description 获取容器存储卷列表
 // @Accept json
-// @Param request body dto.PageInfo true "request"
 // @Produce json
-// @Success 200 {object} dto.PageResult
+// @Success 200 {array} dto.Options
 // @Security ApiKeyAuth
-// @Router /containers/volume/search [get]
+// @Router /containers/volume [get]
 func (b *BaseApi) ListVolume(c *gin.Context) {
 	list, err := containerService.ListVolume()
 	if err != nil {

@@ -25,11 +25,11 @@ var userinfoCmd = &cobra.Command{
 		port := getSettingByKey(db, "ServerPort")
 		ssl := getSettingByKey(db, "SSL")
 		entrance := getSettingByKey(db, "SecurityEntrance")
-		enptrySetting := getSettingByKey(db, "EncryptKey")
+		encryptSetting := getSettingByKey(db, "EncryptKey")
 
 		p := ""
-		if len(enptrySetting) == 16 {
-			global.CONF.System.EncryptKey = enptrySetting
+		if len(encryptSetting) == 16 {
+			global.CONF.System.EncryptKey = encryptSetting
 			p, _ = encrypt.StringDecrypt(password)
 		} else {
 			p = password

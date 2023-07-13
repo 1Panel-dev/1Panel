@@ -5,6 +5,7 @@ import '@/styles/index.scss';
 import '@/styles/common.scss';
 import '@/assets/iconfont/iconfont.css';
 import '@/assets/iconfont/iconfont.js';
+import '@/styles/style.css';
 
 import directives from '@/directives/index';
 import router from '@/routers/index';

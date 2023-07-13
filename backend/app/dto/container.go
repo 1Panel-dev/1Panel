@@ -5,6 +5,8 @@ import "time"
 type PageContainer struct {
 	PageInfo
 	Name    string `json:"name"`
+	OrderBy string `json:"orderBy"`
+	Order   string `json:"order"`
 	Filters string `json:"filters"`
 }
 
@@ -22,9 +24,7 @@ type ContainerInfo struct {
 	State       string `json:"state"`
 	RunTime     string `json:"runTime"`
 
-	CPUPercent    float64  `json:"cpuPercent"`
-	MemoryPercent float64  `json:"memoryPercent"`
-	Ports         []string `json:"ports"`
+	Ports []string `json:"ports"`
 
 	IsFromApp     bool `json:"isFromApp"`
 	IsFromCompose bool `json:"isFromCompose"`
@@ -36,14 +36,17 @@ type ResourceLimit struct {
 }
 
 type ContainerOperate struct {
+	ContainerID     string         `json:"containerID"`
+	ForcePull       bool           `json:"forcePull"`
 	Name            string         `json:"name"`
 	Image           string         `json:"image"`
+	Network         string         `json:"network"`
 	PublishAllPorts bool           `json:"publishAllPorts"`
 	ExposedPorts    []PortHelper   `json:"exposedPorts"`
 	Cmd             []string       `json:"cmd"`
 	CPUShares       int64          `json:"cpuShares"`
-	NanoCPUs        int64          `json:"nanoCPUs"`
-	Memory          int64          `json:"memory"`
+	NanoCPUs        float64        `json:"nanoCPUs"`
+	Memory          float64        `json:"memory"`
 	AutoRemove      bool           `json:"autoRemove"`
 	Volumes         []VolumeHelper `json:"volumes"`
 	Labels          []string       `json:"labels"`
@@ -52,11 +55,18 @@ type ContainerOperate struct {
 }
 
 type ContainerUpgrade struct {
-	Name  string `json:"name" validate:"required"`
-	Image string `json:"image" validate:"required"`
+	Name      string `json:"name" validate:"required"`
+	Image     string `json:"image" validate:"required"`
+	ForcePull bool   `json:"forcePull"`
 }
 
-type ContainterStats struct {
+type ContainerListStats struct {
+	ContainerID   string  `json:"containerID"`
+	CPUPercent    float64 `json:"cpuPercent"`
+	MemoryPercent float64 `json:"memoryPercent"`
+}
+
+type ContainerStats struct {
 	CPUPercent float64 `json:"cpuPercent"`
 	Memory     float64 `json:"memory"`
 	Cache      float64 `json:"cache"`

@@ -47,22 +47,22 @@
                             {{ loadZero(dialogData.rowData?.minute) }}
                         </span>
                         <span v-if="dialogData.rowData?.specType === 'perNDay'">
-                            {{ dialogData.rowData?.day }}{{ $t('cronjob.day1') }},&nbsp;
+                            {{ dialogData.rowData?.day }}{{ $t('commons.units.day') }},&nbsp;
                             {{ loadZero(dialogData.rowData?.hour) }} :
                             {{ loadZero(dialogData.rowData?.minute) }}
                         </span>
                         <span v-if="dialogData.rowData?.specType === 'perNHour'">
-                            {{ dialogData.rowData?.hour }}{{ $t('cronjob.hour') }},&nbsp;
+                            {{ dialogData.rowData?.hour }}{{ $t('commons.units.hour') }},&nbsp;
                             {{ loadZero(dialogData.rowData?.minute) }}
                         </span>
                         <span v-if="dialogData.rowData?.specType === 'perHour'">
                             &nbsp;{{ loadZero(dialogData.rowData?.minute) }}
                         </span>
                         <span v-if="dialogData.rowData?.specType === 'perNMinute'">
-                            &nbsp;{{ dialogData.rowData?.minute }}{{ $t('cronjob.minute') }}
+                            &nbsp;{{ dialogData.rowData?.minute }}{{ $t('commons.units.minute') }}
                         </span>
                         <span v-if="dialogData.rowData?.specType === 'perNSecond'">
-                            &nbsp;{{ dialogData.rowData?.second }}{{ $t('cronjob.second') }}
+                            &nbsp;{{ dialogData.rowData?.second }}{{ $t('commons.units.second') }}
                         </span>
                         &nbsp;{{ $t('cronjob.handle') }}
                     </el-tag>
@@ -123,8 +123,8 @@
                 </el-row>
             </template>
             <template #main>
-                <div style="overflow: auto">
-                    <el-row :gutter="20" v-show="hasRecords" style="min-width: 900px">
+                <div class="mainClass">
+                    <el-row :gutter="20" v-show="hasRecords" class="mainRowClass">
                         <el-col :span="8">
                             <div>
                                 <ul class="infinite-list" style="overflow: auto">
@@ -461,7 +461,7 @@ const weekOptions = [
     { label: i18n.global.t('cronjob.thursday'), value: 4 },
     { label: i18n.global.t('cronjob.friday'), value: 5 },
     { label: i18n.global.t('cronjob.saturday'), value: 6 },
-    { label: i18n.global.t('cronjob.sunday'), value: 7 },
+    { label: i18n.global.t('cronjob.sunday'), value: 0 },
 ];
 const timeRangeLoad = ref<[Date, Date]>([
     new Date(new Date(new Date().getTime() - 3600 * 1000 * 24 * 7).setHours(0, 0, 0, 0)),
@@ -528,11 +528,16 @@ const search = async () => {
     if (!currentRecord.value) {
         currentRecord.value = records.value[0];
     } else {
+        let beDelete = true;
         for (const item of records.value) {
             if (item.id === currentRecord.value.id) {
+                beDelete = false;
                 currentRecord.value = item;
                 break;
             }
+        }
+        if (beDelete) {
+            currentRecord.value = records.value[0];
         }
     }
     if (currentRecord.value?.records) {
@@ -715,5 +720,14 @@ defineExpose({
 }
 .description {
     width: 30%;
+}
+
+@media only screen and (max-width: 1000px) {
+    .mainClass {
+        overflow: auto;
+    }
+    .mainRowClass {
+        min-width: 900px;
+    }
 }
 </style>

@@ -4,6 +4,14 @@
             <el-form-item prop="enable" :label="$t('website.enable')">
                 <el-switch v-model="enableUpdate.enable" @change="updateEnable"></el-switch>
             </el-form-item>
+            <el-form-item>
+                <el-alert
+                    type="info"
+                    v-if="rule === 'ip_white'"
+                    :title="$t('website.ipWhiteListHelper')"
+                    :closable="false"
+                />
+            </el-form-item>
             <el-form-item :label="$t('website.ipValue')">
                 <el-input
                     type="textarea"
@@ -36,7 +44,7 @@ import { GetWafConfig, UpdateWafEnable } from '@/api/modules/website';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { SaveFileContent } from '@/api/modules/files';
 import i18n from '@/lang';
-import { checkIp } from '@/utils/util';
+import { checkIpV4V6 } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';
 import { MsgError } from '@/utils/message';
 
@@ -127,7 +135,7 @@ const openCreate = () => {
     }
     if (req.value.rule.indexOf('ip') > -1) {
         for (const id in newIpArray) {
-            if (checkIp(newIpArray[id])) {
+            if (checkIpV4V6(newIpArray[id])) {
                 MsgError(i18n.global.t('commons.rule.ipErr', [ipArray[id]]));
                 return;
             }

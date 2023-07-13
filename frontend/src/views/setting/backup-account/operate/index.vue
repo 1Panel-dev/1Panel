@@ -59,6 +59,17 @@
                                     <el-button @click="jumpAzure">{{ $t('setting.loadCode') }}</el-button>
                                 </template>
                             </el-input>
+                            <span class="input-help">
+                                {{ $t('setting.codeHelper') }}
+                                <el-link
+                                    style="font-size: 12px; margin-left: 5px"
+                                    icon="Position"
+                                    @click="toDoc()"
+                                    type="primary"
+                                >
+                                    {{ $t('firewall.quickJump') }}
+                                </el-link>
+                            </span>
                         </el-form-item>
                         <el-form-item
                             v-if="dialogData.rowData!.type === 'S3' || dialogData.rowData!.type === 'COS'"
@@ -117,11 +128,71 @@
                             </el-button>
                             <span v-if="errBuckets" class="input-error">{{ $t('commons.rule.requiredSelect') }}</span>
                         </el-form-item>
+                        <el-form-item
+                            v-if="dialogData.rowData!.type === 'COS'"
+                            :label="$t('setting.scType')"
+                            prop="varsJson.scType"
+                            :rules="[Rules.requiredSelect]"
+                        >
+                            <el-select v-model="dialogData.rowData!.varsJson['scType']">
+                                <el-option value="Standard" :label="$t('setting.scStandard')" />
+                                <el-option value="Standard_IA" :label="$t('setting.scStandard_IA')" />
+                                <el-option value="Archive" :label="$t('setting.scArchive')" />
+                                <el-option value="Deep_Archive" :label="$t('setting.scDeep_Archive')" />
+                            </el-select>
+                            <el-alert
+                                v-if="dialogData.rowData!.varsJson['scType'] === 'Archive' || dialogData.rowData!.varsJson['scType'] === 'Deep_Archive'"
+                                style="margin-top: 10px"
+                                :closable="false"
+                                type="warning"
+                                :title="$t('setting.archiveHelper')"
+                            />
+                        </el-form-item>
+                        <el-form-item
+                            v-if="dialogData.rowData!.type === 'OSS'"
+                            :label="$t('setting.scType')"
+                            prop="varsJson.scType"
+                            :rules="[Rules.requiredSelect]"
+                        >
+                            <el-select v-model="dialogData.rowData!.varsJson['scType']">
+                                <el-option value="Standard" :label="$t('setting.scStandard')" />
+                                <el-option value="IA" :label="$t('setting.scStandard_IA')" />
+                                <el-option value="Archive" :label="$t('setting.scArchive')" />
+                                <el-option value="ColdArchive" :label="$t('setting.scDeep_Archive')" />
+                            </el-select>
+                            <el-alert
+                                v-if="dialogData.rowData!.varsJson['scType'] === 'Archive' || dialogData.rowData!.varsJson['scType'] === 'ColdArchive'"
+                                style="margin-top: 10px"
+                                :closable="false"
+                                type="warning"
+                                :title="$t('setting.archiveHelper')"
+                            />
+                        </el-form-item>
+                        <el-form-item
+                            v-if="dialogData.rowData!.type === 'S3'"
+                            :label="$t('setting.scType')"
+                            prop="varsJson.scType"
+                            :rules="[Rules.requiredSelect]"
+                        >
+                            <el-select v-model="dialogData.rowData!.varsJson['scType']">
+                                <el-option value="STANDARD" :label="$t('setting.scStandard')" />
+                                <el-option value="STANDARD_IA" :label="$t('setting.scStandard_IA')" />
+                                <el-option value="GLACIER" :label="$t('setting.scArchive')" />
+                                <el-option value="DEEP_ARCHIVE" :label="$t('setting.scDeep_Archive')" />
+                            </el-select>
+                            <el-alert
+                                v-if="dialogData.rowData!.varsJson['scType'] === 'Archive' || dialogData.rowData!.varsJson['scType'] === 'ColdArchive'"
+                                style="margin-top: 10px"
+                                :closable="false"
+                                type="warning"
+                                :title="$t('setting.archiveHelper')"
+                            />
+                        </el-form-item>
                         <div v-if="dialogData.rowData!.type === 'SFTP'">
                             <el-form-item :label="$t('setting.address')" prop="varsJson.address" :rules="Rules.host">
                                 <el-input v-model.trim="dialogData.rowData!.varsJson['address']" />
                             </el-form-item>
-                            <el-form-item :label="$t('setting.port')" prop="varsJson.port" :rules="[Rules.port]">
+                            <el-form-item :label="$t('commons.table.port')" prop="varsJson.port" :rules="[Rules.port]">
                                 <el-input-number
                                     :min="0"
                                     :max="65535"
@@ -129,14 +200,14 @@
                                 />
                             </el-form-item>
                             <el-form-item
-                                :label="$t('setting.username')"
+                                :label="$t('commons.login.username')"
                                 prop="accessKey"
                                 :rules="[Rules.requiredInput]"
                             >
-                                <el-input v-model="dialogData.rowData!.accessKey" />
+                                <el-input v-model.trim="dialogData.rowData!.accessKey" />
                             </el-form-item>
                             <el-form-item
-                                :label="$t('setting.password')"
+                                :label="$t('commons.login.password')"
                                 prop="credential"
                                 :rules="[Rules.requiredInput]"
                             >
@@ -144,26 +215,26 @@
                                     type="password"
                                     clearable
                                     show-password
-                                    v-model="dialogData.rowData!.credential"
+                                    v-model.trim="dialogData.rowData!.credential"
                                 />
                             </el-form-item>
                             <el-form-item :label="$t('setting.path')" prop="bucket" :rules="[Rules.requiredInput]">
-                                <el-input v-model="dialogData.rowData!.bucket" />
+                                <el-input v-model.trim="dialogData.rowData!.bucket" />
                             </el-form-item>
                         </div>
                         <el-form-item
-                            v-if="dialogData.rowData!.type !== 'LOCAL'"
+                            v-if="dialogData.rowData!.type !== 'LOCAL' && dialogData.rowData!.type !== 'SFTP'"
                             :label="$t('setting.backupDir')"
                             prop="backupPath"
                         >
-                            <el-input clearable v-model.trim="dialogData.rowData!.backupPath" />
+                            <el-input clearable v-model.trim="dialogData.rowData!.backupPath" placeholder="/1panel" />
                         </el-form-item>
                     </el-col>
                 </el-row>
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button :disabled="loading" @click="drawerVisiable = false">
+                    <el-button :disabled="loading" @click="handleClose">
                         {{ $t('commons.button.cancel') }}
                     </el-button>
                     <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
@@ -183,7 +254,7 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { Backup } from '@/api/interface/backup';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { addBackup, editBackup, listBucket } from '@/api/modules/setting';
+import { addBackup, editBackup, getOneDriveInfo, listBucket } from '@/api/modules/setting';
 import { deepCopy } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';
 
@@ -220,17 +291,27 @@ const acceptParams = (params: DialogProps): void => {
     if (dialogData.value.title === 'create' && dialogData.value.rowData!.type === 'SFTP') {
         dialogData.value.rowData.varsJson['port'] = 22;
     }
+    if (dialogData.value.rowData!.type === 'COS' || dialogData.value.rowData!.type === 'OSS') {
+        if (params.title === 'create' || (params.title === 'edit' && !dialogData.value.rowData.varsJson['scType'])) {
+            dialogData.value.rowData.varsJson['scType'] = 'Standard';
+        }
+    }
+    if (dialogData.value.rowData!.type === 'S3') {
+        if (params.title === 'create' || (params.title === 'edit' && !dialogData.value.rowData.varsJson['scType'])) {
+            dialogData.value.rowData.varsJson['scType'] = 'STANDARD';
+        }
+    }
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
     drawerVisiable.value = true;
 };
 
 const handleClose = () => {
+    emit('search');
     drawerVisiable.value = false;
 };
-
-const jumpAzure = () => {
-    let commonUrl =
-        'response_type=code&client_id=5446cfe3-4c79-47a0-ae25-fc645478e2d9&redirect_uri=http://localhost/login/authorized&scope=offline_access+Files.ReadWrite.All+User.Read';
+const jumpAzure = async () => {
+    const res = await getOneDriveInfo();
+    let commonUrl = `response_type=code&client_id=${res.data}&redirect_uri=http://localhost/login/authorized&scope=offline_access+Files.ReadWrite.All+User.Read`;
     if (!dialogData.value.rowData!.varsJson['isCN']) {
         window.open('https://login.microsoftonline.com/common/oauth2/v2.0/authorize?' + commonUrl, '_blank');
     } else {
@@ -248,6 +329,10 @@ function hasBucket(val: string) {
 function hasEndpoint(val: string) {
     return val === 'OSS' || val === 'S3';
 }
+
+const toDoc = () => {
+    window.open('https://1panel.cn/docs/user_manual/settings/', '_blank');
+};
 
 const getBuckets = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;

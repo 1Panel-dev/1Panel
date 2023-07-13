@@ -1,17 +1,13 @@
 ErrInvalidParams: "请求参数错误: {{ .detail }}"
-ErrToken: "Token 信息错误: {{ .detail }}"
 ErrTokenParse: "Token 生成错误: {{ .detail }}"
-ErrTokenTimeOut: "登陆信息已过期: {{ .detail }}"
 ErrInitialPassword: "原密码错误"
 ErrInternalServer: "服务内部错误: {{ .detail }}"
 ErrRecordExist: "记录已存在"
 ErrRecordNotFound: "记录未能找到"
 ErrStructTransform: "类型转换失败: {{ .detail }}"
 ErrNotLogin: "用户未登录: {{ .detail }}"
-ErrNotSafety: "当前用户登录状态不安全: {{ .detail }}"
 ErrPasswordExpired: "当前密码已过期: {{ .detail }}"
 ErrNotSupportType: "系统暂不支持当前类型: {{ .detail }}"
-ErrRepoNotValid: "远程仓库校验失败！"
 
 #common
 ErrNameIsExist: "名称已存在"
@@ -44,6 +40,9 @@ ErrHttpReqTimeOut: "请求超时 {{.err}}"
 ErrHttpReqFailed: "请求失败 {{.err}}"
 ErrHttpReqNotFound: "文件不存在"
 ErrNoSuchHost: "网络连接失败"
+ErrImagePullTimeOut: '镜像拉取超时'
+ErrContainerNotFound: '{{ .name }} 容器不存在'
+ErrContainerMsg: '{{ .name }} 容器异常，具体请在容器页面查看日志'
 
 #file
 ErrFileCanNotRead: "此文件不支持预览"
@@ -60,12 +59,18 @@ ErrDomainIsExist: "域名已存在"
 ErrAliasIsExist: "代号已存在"
 ErrAppDelete: '其他网站使用此应用,无法删除'
 ErrGroupIsUsed: '分组正在使用中，无法删除'
+ErrBackupMatch: '该备份文件与当前网站部分数据不匹配 {{ .detail}}"'
+ErrBackupExist: '该备份文件对应部分源数据不存在 {{ .detail}}"'
 
 #ssl
 ErrSSLCannotDelete: "证书正在被网站使用，无法删除"
 ErrAccountCannotDelete: "账号关联证书，无法删除"
 ErrSSLApply: "证书续签成功，openresty reload失败，请检查配置！"
 ErrEmailIsExist: '邮箱已存在'
+ErrSSLKeyNotFound: '私钥文件不存在'
+ErrSSLCertificateNotFound: '证书文件不存在'
+ErrSSLKeyFormat: '私钥文件校验失败'
+ErrSSLCertificateFormat: '证书文件格式错误，请使用 pem 格式'
 
 #mysql
 ErrUserIsExist: "当前用户已存在，请重新输入"
@@ -79,6 +84,7 @@ ErrTypeOfRedis: "恢复文件类型与当前持久化方式不符，请修改后
 ErrInUsed: "{{ .detail }} 正被使用，无法删除"
 ErrObjectInUsed: "该对象正被使用，无法删除"
 ErrRepoConn: "仓库信息中存在不合法的字符"
+ErrPortRules: "端口数目不匹配，请重新输入！"
 
 #runtime
 ErrDirNotFound: "build 文件夹不存在！请检查文件完整性！"

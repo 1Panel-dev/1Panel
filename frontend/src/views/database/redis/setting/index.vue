@@ -1,6 +1,6 @@
 <template>
     <div v-show="settingShow" v-loading="loading">
-        <LayoutContent :title="'Redis ' + $t('database.setting')" :reload="true">
+        <LayoutContent :title="'Redis ' + $t('commons.button.set')" :reload="true">
             <template #buttons>
                 <el-button type="primary" :plain="activeName !== 'conf'" @click="changeTab('conf')">
                     {{ $t('database.confChange') }}
@@ -11,7 +11,7 @@
                     :plain="activeName !== 'status'"
                     @click="changeTab('status')"
                 >
-                    {{ $t('database.status') }}
+                    {{ $t('database.currentStatus') }}
                 </el-button>
                 <el-button
                     type="primary"
@@ -22,7 +22,7 @@
                     {{ $t('database.performanceTuning') }}
                 </el-button>
                 <el-button type="primary" :plain="activeName !== 'port'" @click="changeTab('port')">
-                    {{ $t('database.portSetting') }}
+                    {{ $t('commons.table.port') }}
                 </el-button>
                 <el-button
                     type="primary"
@@ -37,7 +37,7 @@
                 <div v-if="activeName === 'conf'">
                     <codemirror
                         :autofocus="true"
-                        placeholder="None data"
+                        :placeholder="$t('commons.msg.noneData')"
                         :indent-with-tab="true"
                         :tabSize="4"
                         style="margin-top: 10px; height: calc(100vh - 380px)"
@@ -75,7 +75,7 @@
                             <el-col :span="10">
                                 <el-form-item :label="$t('database.timeout')" prop="timeout">
                                     <el-input clearable type="number" v-model.number="form.timeout">
-                                        <template #append>{{ $t('home.Second') }}</template>
+                                        <template #append>{{ $t('commons.units.second') }}</template>
                                     </el-input>
                                     <span class="input-help">{{ $t('database.timeoutHelper') }}</span>
                                 </el-form-item>
@@ -103,7 +103,7 @@
                         <el-row>
                             <el-col :span="1"><br /></el-col>
                             <el-col :span="10">
-                                <el-form-item :label="$t('setting.port')" prop="port" :rules="Rules.port">
+                                <el-form-item :label="$t('commons.table.port')" prop="port" :rules="Rules.port">
                                     <el-input clearable type="number" v-model.number="form.port" />
                                 </el-form-item>
                                 <el-form-item>

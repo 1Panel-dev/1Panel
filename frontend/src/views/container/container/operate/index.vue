@@ -1,7 +1,7 @@
 <template>
     <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
-            <DrawerHeader :header="$t('container.createContainer')" :back="handleClose" />
+            <DrawerHeader :header="title" :resource="dialogData.rowData?.name" :back="handleClose" />
         </template>
         <el-form
             ref="formRef"
@@ -13,7 +13,7 @@
         >
             <el-row type="flex" justify="center">
                 <el-col :span="22">
-                    <el-form-item :label="$t('container.name')" prop="name">
+                    <el-form-item :label="$t('commons.table.name')" prop="name">
                         <el-input clearable v-model.trim="dialogData.rowData!.name" />
                     </el-form-item>
                     <el-form-item :label="$t('container.image')" prop="image">
@@ -26,7 +26,13 @@
                             />
                         </el-select>
                     </el-form-item>
-                    <el-form-item :label="$t('container.port')">
+                    <el-form-item prop="forcePull">
+                        <el-checkbox v-model="dialogData.rowData!.forcePull">
+                            {{ $t('container.forcePull') }}
+                        </el-checkbox>
+                        <span class="input-help">{{ $t('container.forcePullHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item :label="$t('commons.table.port')">
                         <el-radio-group v-model="dialogData.rowData!.publishAllPorts" class="ml-4">
                             <el-radio :label="false">{{ $t('container.exposePort') }}</el-radio>
                             <el-radio :label="true">{{ $t('container.exposeAll') }}</el-radio>
@@ -43,7 +49,7 @@
                                         <label>{{ $t('container.container') }}</label>
                                     </th>
                                     <th scope="col" width="20%" align="left">
-                                        <label>{{ $t('container.protocol') }}</label>
+                                        <label>{{ $t('commons.table.protocol') }}</label>
                                     </th>
                                     <th align="left"></th>
                                 </tr>
@@ -82,6 +88,16 @@
                             </table>
                         </el-card>
                     </el-form-item>
+                    <el-form-item :label="$t('container.network')" prop="network">
+                        <el-select v-model="dialogData.rowData!.network">
+                            <el-option
+                                v-for="(item, indexV) of networks"
+                                :key="indexV"
+                                :value="item.option"
+                                :label="item.option"
+                            />
+                        </el-select>
+                    </el-form-item>
                     <el-form-item :label="$t('container.cmd')" prop="cmdStr">
                         <el-input :placeholder="$t('container.cmdHelper')" v-model="dialogData.rowData!.cmdStr" />
                     </el-form-item>
@@ -91,29 +107,25 @@
                         </el-checkbox>
                     </el-form-item>
                     <el-form-item :label="$t('container.cpuShare')" prop="cpuShares">
-                        <el-input style="width: 40%" v-model.number="dialogData.rowData!.cpuShares" />
+                        <el-input class="mini-form-item" v-model.number="dialogData.rowData!.cpuShares" />
                         <span class="input-help">{{ $t('container.cpuShareHelper') }}</span>
                     </el-form-item>
                     <el-form-item
                         :label="$t('container.cpuQuota')"
                         prop="nanoCPUs"
-                        :rules="checkNumberRange(0, limits.cpu)"
+                        :rules="checkFloatNumberRange(0, Number(limits.cpu))"
                     >
-                        <el-input style="width: 40%" v-model.number="dialogData.rowData!.nanoCPUs">
+                        <el-input class="mini-form-item" v-model="dialogData.rowData!.nanoCPUs">
                             <template #append>
-                                <div style="width: 35px">{{ $t('home.coreUnit') }}</div>
+                                <div style="width: 35px">{{ $t('commons.units.core') }}</div>
                             </template>
                         </el-input>
                         <span class="input-help">
-                            {{ $t('container.limitHelper', [limits.cpu]) }}{{ $t('home.coreUnit') }}
+                            {{ $t('container.limitHelper', [limits.cpu]) }}{{ $t('commons.units.core') }}
                         </span>
                     </el-form-item>
-                    <el-form-item
-                        :label="$t('container.memoryLimit')"
-                        prop="memoryItem"
-                        :rules="checkNumberRange(0, limits.memory)"
-                    >
-                        <el-input style="width: 40%" v-model.number="dialogData.rowData!.memoryItem">
+                    <el-form-item :label="$t('container.memoryLimit')" prop="memory">
+                        <el-input class="mini-form-item" v-model="dialogData.rowData!.memory">
                             <template #append><div style="width: 35px">MB</div></template>
                         </el-input>
                         <span class="input-help">{{ $t('container.limitHelper', [limits.memory]) }}MB</span>
@@ -218,14 +230,21 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { Rules, checkNumberRange } from '@/global/form-rules';
+import { Rules, checkFloatNumberRange, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { listImage, listVolume, createContainer, updateContainer, loadResourceLimit } from '@/api/modules/container';
+import {
+    listImage,
+    listVolume,
+    createContainer,
+    updateContainer,
+    loadResourceLimit,
+    listNetwork,
+} from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { checkIp, checkPort } from '@/utils/util';
+import { checkIpV4V6, checkPort } from '@/utils/util';
 
 const loading = ref(false);
 interface DialogProps {
@@ -242,32 +261,40 @@ const dialogData = ref<DialogProps>({
 });
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
-    title.value = i18n.global.t('commons.button.' + dialogData.value.title);
+    title.value = i18n.global.t('container.' + dialogData.value.title);
     if (params.title === 'edit') {
-        dialogData.value.rowData.memoryItem = Number((dialogData.value.rowData.memory / 1024 / 1024).toFixed(2));
+        dialogData.value.rowData.memory = Number(dialogData.value.rowData.memory.toFixed(2));
+        dialogData.value.rowData.cmd = dialogData.value.rowData.cmd || [];
         let itemCmd = '';
         for (const item of dialogData.value.rowData.cmd) {
             itemCmd += `'${item}' `;
         }
         dialogData.value.rowData.cmdStr = itemCmd ? itemCmd.substring(0, itemCmd.length - 1) : '';
+        dialogData.value.rowData.labels = dialogData.value.rowData.labels || [];
+        dialogData.value.rowData.env = dialogData.value.rowData.env || [];
         dialogData.value.rowData.labelsStr = dialogData.value.rowData.labels.join('\n');
         dialogData.value.rowData.envStr = dialogData.value.rowData.env.join('\n');
         dialogData.value.rowData.exposedPorts = dialogData.value.rowData.exposedPorts || [];
         for (const item of dialogData.value.rowData.exposedPorts) {
-            item.host = item.hostPort;
+            if (item.hostIP) {
+                item.host = item.hostIP + ':' + item.hostPort;
+            } else {
+                item.host = item.hostPort;
+            }
         }
         dialogData.value.rowData.volumes = dialogData.value.rowData.volumes || [];
-        console.log(dialogData.value.rowData.cpuShares);
     }
     loadLimit();
     loadImageOptions();
     loadVolumeOptions();
+    loadNetworkOptions();
     drawerVisiable.value = true;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const images = ref();
 const volumes = ref();
+const networks = ref();
 const limits = ref<Container.ResourceLimit>({
     cpu: null as number,
     memory: null as number,
@@ -278,11 +305,12 @@ const handleClose = () => {
 };
 
 const rules = reactive({
-    cpuShares: [Rules.number, checkNumberRange(2, 262144)],
-    name: [Rules.requiredInput, Rules.name],
+    name: [Rules.requiredInput, Rules.volumeName],
     image: [Rules.requiredSelect],
-    nanoCPUs: [Rules.number],
-    memoryItem: [Rules.number],
+    network: [Rules.requiredSelect],
+    cpuShares: [Rules.integerNumberWith0, checkNumberRange(0, 262144)],
+    nanoCPUs: [Rules.floatNumber],
+    memory: [Rules.floatNumber],
 });
 
 type FormInstance = InstanceType<typeof ElForm>;
@@ -328,6 +356,10 @@ const loadVolumeOptions = async () => {
     const res = await listVolume();
     volumes.value = res.data;
 };
+const loadNetworkOptions = async () => {
+    const res = await listNetwork();
+    networks.value = res.data;
+};
 const onSubmit = async (formEl: FormInstance | undefined) => {
     if (dialogData.value.rowData!.volumes.length !== 0) {
         for (const item of dialogData.value.rowData!.volumes) {
@@ -358,7 +390,8 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         if (!checkPortValid()) {
             return;
         }
-        dialogData.value.rowData!.memory = dialogData.value.rowData!.memoryItem * 1024 * 1024;
+        dialogData.value.rowData!.memory = Number(dialogData.value.rowData!.memory);
+        dialogData.value.rowData!.nanoCPUs = Number(dialogData.value.rowData!.nanoCPUs);
 
         loading.value = true;
         if (dialogData.value.title === 'create') {
@@ -380,18 +413,22 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                     confirmButtonText: i18n.global.t('commons.button.confirm'),
                     cancelButtonText: i18n.global.t('commons.button.cancel'),
                 },
-            ).then(async () => {
-                await updateContainer(dialogData.value.rowData!)
-                    .then(() => {
-                        loading.value = false;
-                        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                        emit('search');
-                        drawerVisiable.value = false;
-                    })
-                    .catch(() => {
-                        loading.value = false;
-                    });
-            });
+            )
+                .then(async () => {
+                    await updateContainer(dialogData.value.rowData!)
+                        .then(() => {
+                            loading.value = false;
+                            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                            emit('search');
+                            drawerVisiable.value = false;
+                        })
+                        .catch(() => {
+                            loading.value = false;
+                        });
+                })
+                .catch(() => {
+                    loading.value = false;
+                });
         }
     });
 };
@@ -403,7 +440,7 @@ const checkPortValid = () => {
     for (const port of dialogData.value.rowData!.exposedPorts) {
         if (port.host.indexOf(':') !== -1) {
             port.hostIP = port.host.split(':')[0];
-            if (checkIp(port.hostIP)) {
+            if (checkIpV4V6(port.hostIP)) {
                 MsgError(i18n.global.t('firewall.addressFormatError'));
                 return false;
             }

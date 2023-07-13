@@ -45,7 +45,7 @@
                         min-width="100"
                         fix
                     />
-                    <el-table-column :label="$t('container.protocol')" prop="protocol" min-width="60" fix />
+                    <el-table-column :label="$t('commons.table.protocol')" prop="protocol" min-width="60" fix />
                     <el-table-column :label="$t('commons.table.status')" prop="status" min-width="60" fix>
                         <template #default="{ row }">
                             <el-tag v-if="row.status === 'Success'" type="success">

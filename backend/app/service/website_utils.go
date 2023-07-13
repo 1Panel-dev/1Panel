@@ -378,9 +378,9 @@ func applySSL(website model.Website, websiteSSL model.WebsiteSSL, req request.We
 	}
 	config := nginxFull.SiteConfig.Config
 	server := config.FindServers()[0]
-	server.UpdateListen("443", website.DefaultServer, "ssl")
+	server.UpdateListen("443", website.DefaultServer, "ssl", "http2")
 	if website.IPV6 {
-		server.UpdateListen("[::]:443", website.DefaultServer, "ssl")
+		server.UpdateListen("[::]:443", website.DefaultServer, "ssl", "http2")
 	}
 
 	switch req.HttpConfig {

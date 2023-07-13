@@ -21,7 +21,7 @@
                             <template #prepend><FileList :path="addForm.path" @choose="getPath"></FileList></template>
                         </el-input>
                     </el-form-item>
-                    <el-form-item :label="$t('file.name')" prop="name">
+                    <el-form-item :label="$t('commons.table.name')" prop="name">
                         <el-input v-model="addForm.name"></el-input>
                     </el-form-item>
                 </el-form>

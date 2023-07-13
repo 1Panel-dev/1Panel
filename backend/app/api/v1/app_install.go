@@ -118,7 +118,7 @@ func (b *BaseApi) LoadConnInfo(c *gin.Context) {
 // @Description 删除前检查
 // @Accept json
 // @Param appInstallId path integer true "App install id"
-// @Success 200 {anrry} dto.AppResource
+// @Success 200 {array} dto.AppResource
 // @Security ApiKeyAuth
 // @Router /apps/installed/delete/check/:appInstallId [get]
 func (b *BaseApi) DeleteCheck(c *gin.Context) {
@@ -178,7 +178,7 @@ func (b *BaseApi) OperateInstalled(c *gin.Context) {
 // @Description 通过 key 获取应用 service
 // @Accept json
 // @Param key path string true "request"
-// @Success 200 {anrry} response.AppService
+// @Success 200 {array} response.AppService
 // @Security ApiKeyAuth
 // @Router /apps/services/:key [get]
 func (b *BaseApi) GetServices(c *gin.Context) {
@@ -196,7 +196,7 @@ func (b *BaseApi) GetServices(c *gin.Context) {
 // @Description 通过 install id 获取应用更新版本
 // @Accept json
 // @Param appInstallId path integer true "request"
-// @Success 200 {anrry} dto.AppVersion
+// @Success 200 {array} dto.AppVersion
 // @Security ApiKeyAuth
 // @Router /apps/installed/:appInstallId/versions [get]
 func (b *BaseApi) GetUpdateVersions(c *gin.Context) {
@@ -304,4 +304,26 @@ func (b *BaseApi) UpdateInstalled(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, nil)
+}
+
+// @Tags App
+// @Summary ignore App Update
+// @Description 忽略应用升级版本
+// @Accept json
+// @Param request body request.AppInstalledIgnoreUpgrade true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /apps/installed/ignore [post]
+// @x-panel-log {"bodyKeys":["installId"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"忽略应用 [installId] 版本升级","formatEN":"Application param update [installId]"}
+func (b *BaseApi) IgnoreUpgrade(c *gin.Context) {
+	var req request.AppInstalledIgnoreUpgrade
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := appInstallService.IgnoreUpgrade(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
 }

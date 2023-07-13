@@ -124,6 +124,7 @@ const onTermWheel = (event: WheelEvent) => {
         } else {
             term.value.options.fontSize = term.value.options.fontSize + 1;
         }
+        changeTerminalSize();
     }
 };
 
@@ -184,6 +185,7 @@ const closeRealTerminal = (ev: CloseEvent) => {
     if (heartbeatTimer.value) {
         clearInterval(heartbeatTimer.value);
     }
+    term.value.write('The connection has been disconnected.');
     term.value.write(ev.reason);
 };
 

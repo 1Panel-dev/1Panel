@@ -216,7 +216,7 @@ func (b *BaseApi) SearchMysql(c *gin.Context) {
 // @Description 获取 mysql 数据库列表
 // @Accept json
 // @Param request body dto.PageInfo true "request"
-// @Success 200 {anrry} string
+// @Success 200 {array} string
 // @Security ApiKeyAuth
 // @Router /databases/options [get]
 func (b *BaseApi) ListDBName(c *gin.Context) {
@@ -234,7 +234,7 @@ func (b *BaseApi) ListDBName(c *gin.Context) {
 // @Description Mysql 数据库删除前检查
 // @Accept json
 // @Param request body dto.OperateByID true "request"
-// @Success 200 {anrry} string
+// @Success 200 {array} string
 // @Security ApiKeyAuth
 // @Router /databases/del/check [post]
 func (b *BaseApi) DeleteCheckMysql(c *gin.Context) {

@@ -175,7 +175,7 @@ const handleParams = () => {
                 if (p.type === 'service' || p.type === 'apps') {
                     rules[p.envKey] = [Rules.requiredSelect];
                     if (p.child) {
-                        p.childProp = p.child.envKey;
+                        p.childProp = propStart.value + p.child.envKey;
                         if (p.child.type === 'service') {
                             rules[p.child.envKey] = [Rules.requiredSelect];
                         }
@@ -237,7 +237,7 @@ const changeService = (value: string, services: App.AppService[]) => {
 
 const getLabel = (row: ParamObj): string => {
     const language = useI18n().locale.value;
-    if (language == 'zh') {
+    if (language == 'zh' || language == 'tw') {
         return row.labelZh;
     } else {
         return row.labelEn;

@@ -1,17 +1,13 @@
 ErrInvalidParams: "Request parameter error: {{ .detail }}"
-ErrToken: "Token information is incorrect.: {{ .detail }}"
 ErrTokenParse: "Token generation error: {{ .detail }}"
-ErrTokenTimeOut: "Login information is out of date: {{ .detail }}"
 ErrInitialPassword: "Initial password error"
 ErrInternalServer: "Service internal error: {{ .detail }}"
 ErrRecordExist: "Record already exists"
 ErrRecordNotFound: "Records not found"
 ErrStructTransform: "Type conversion failure: {{ .detail }}"
 ErrNotLogin: "User is not Login: {{ .detail }}"
-ErrNotSafety: "The login status of the current user is unsafe: {{ .detail }}"
 ErrPasswordExpired: "The current password has expired: {{ .detail }}"
 ErrNotSupportType: "The system does not support the current type: {{ .detail }}"
-ErrRepoNotValid: "Remote repository verification failed！"
 
 #common
 ErrNameIsExist: "Name is already exist"
@@ -44,6 +40,9 @@ ErrHttpReqTimeOut: "Request timed out {{.err}}"
 ErrHttpReqFailed: "Request failed {{.err}}"
 ErrHttpReqNotFound: "The file does not exist"
 ErrNoSuchHost: "Network connection failed"
+ErrImagePullTimeOut: 'Image pull timeout'
+ErrContainerNotFound: '{{ .name }} container does not exist'
+ErrContainerMsg: '{{ .name }} container is abnormal, please check the log on the container page for details'
 
 #file
 ErrFileCanNotRead: "File can not read"
@@ -60,12 +59,18 @@ ErrDomainIsExist: "Domain is already exist"
 ErrAliasIsExist: "Alias is already exist"
 ErrAppDelete: 'Other Website use this App'
 ErrGroupIsUsed: 'The group is in use and cannot be deleted'
+ErrBackupMatch: 'the backup file does not match the current partial data of the website: {{ .detail}}"'
+ErrBackupExist: 'the backup file corresponds to a portion of the original data that does not exist: {{ .detail}}"'
 
 #ssl
 ErrSSLCannotDelete: "The certificate is being used by the website and cannot be removed"
 ErrAccountCannotDelete: "The certificate associated with the account cannot be deleted"
 ErrSSLApply: "The certificate continues to be signed successfully, but openresty reload fails, please check the configuration！"
 ErrEmailIsExist: 'Email is already exist'
+ErrSSLKeyNotFound: 'The private key file does not exist'
+ErrSSLCertificateNotFound: 'The certificate file does not exist'
+ErrSSLKeyFormat: 'Private key file verification error'
+ErrSSLCertificateFormat: 'Certificate file format error, please use pem format'
 
 #mysql
 ErrUserIsExist: "The current user already exists. Please enter a new user"
@@ -79,6 +84,7 @@ ErrTypeOfRedis: "The recovery file type does not match the current persistence m
 ErrInUsed: "{{ .detail }} is in use and cannot be deleted"
 ErrObjectInUsed: "This object is in use and cannot be deleted"
 ErrRepoConn: "The repository information contains illegal characters"
+ErrPortRules: "The number of ports does not match, please re-enter!"
 
 #runtime
 ErrDirNotFound: "The build folder does not exist! Please check file integrity！"

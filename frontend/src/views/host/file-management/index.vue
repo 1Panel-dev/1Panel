@@ -122,7 +122,7 @@
                             <el-link :underline="false" @click="openMode(row)" type="primary">{{ row.mode }}</el-link>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('file.user')" prop="user" show-overflow-tooltip>
+                    <el-table-column :label="$t('commons.table.user')" prop="user" show-overflow-tooltip>
                         <template #default="{ row }">
                             <el-link :underline="false" @click="openChown(row)" type="primary">{{ row.user }}</el-link>
                         </template>

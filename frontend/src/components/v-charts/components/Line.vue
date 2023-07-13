@@ -2,7 +2,7 @@
     <div :id="id" class="v-charts" ref="chartRef" :style="{ height: height, width: width }" />
 </template>
 <script lang="ts" setup>
-import { onMounted, onUnmounted, nextTick, watch } from 'vue';
+import { onMounted, nextTick, watch, onBeforeUnmount } from 'vue';
 import * as echarts from 'echarts';
 import { GlobalStore } from '@/store';
 import { computeSizeFromKBs, computeSizeFromMB } from '@/utils/util';
@@ -176,8 +176,8 @@ onMounted(() => {
     });
 });
 
-onUnmounted(() => {
-    echarts.dispose;
+onBeforeUnmount(() => {
+    echarts.getInstanceByDom(document.getElementById(props.id) as HTMLElement).dispose();
 });
 </script>
 <style lang="scss" scoped></style>

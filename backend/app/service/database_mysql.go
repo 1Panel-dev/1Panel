@@ -48,7 +48,7 @@ func NewIMysqlService() IMysqlService {
 }
 
 func (u *MysqlService) SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error) {
-	total, mysqls, err := mysqlRepo.Page(search.Page, search.PageSize, commonRepo.WithLikeName(search.Info))
+	total, mysqls, err := mysqlRepo.Page(search.Page, search.PageSize, commonRepo.WithLikeName(search.Info), commonRepo.WithOrderRuleBy(search.OrderBy, search.Order))
 	var dtoMysqls []dto.MysqlDBInfo
 	for _, mysql := range mysqls {
 		var item dto.MysqlDBInfo
@@ -148,8 +148,14 @@ func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error 
 		return err
 	}
 
-	if err := excSQL(app.ContainerName, app.Password, fmt.Sprintf("drop user if exists '%s'@'%s'", db.Username, db.Permission)); err != nil && !req.ForceDelete {
-		return err
+	if strings.HasPrefix(app.Version, "5.6") {
+		if err := excSQL(app.ContainerName, app.Password, fmt.Sprintf("drop user '%s'@'%s'", db.Username, db.Permission)); err != nil && !req.ForceDelete {
+			return err
+		}
+	} else {
+		if err := excSQL(app.ContainerName, app.Password, fmt.Sprintf("drop user if exists '%s'@'%s'", db.Username, db.Permission)); err != nil && !req.ForceDelete {
+			return err
+		}
 	}
 	if err := excSQL(app.ContainerName, app.Password, fmt.Sprintf("drop database if exists `%s`", db.Name)); err != nil && !req.ForceDelete {
 		return err
@@ -194,7 +200,7 @@ func (u *MysqlService) ChangePassword(info dto.ChangeDBInfo) error {
 	}
 
 	passwordChangeCMD := fmt.Sprintf("set password for '%s'@'%s' = password('%s')", mysql.Username, mysql.Permission, info.Value)
-	if !strings.HasPrefix(app.Version, "5.7") {
+	if !strings.HasPrefix(app.Version, "5.7") && !strings.HasPrefix(app.Version, "5.6") {
 		passwordChangeCMD = fmt.Sprintf("ALTER USER '%s'@'%s' IDENTIFIED WITH mysql_native_password BY '%s';", mysql.Username, mysql.Permission, info.Value)
 	}
 	if info.ID != 0 {
@@ -229,7 +235,7 @@ func (u *MysqlService) ChangePassword(info dto.ChangeDBInfo) error {
 	for _, host := range hosts {
 		if host == "%" || host == "localhost" {
 			passwordRootChangeCMD := fmt.Sprintf("set password for 'root'@'%s' = password('%s')", host, info.Value)
-			if !strings.HasPrefix(app.Version, "5.7") {
+			if !strings.HasPrefix(app.Version, "5.7") && !strings.HasPrefix(app.Version, "5.6") {
 				passwordRootChangeCMD = fmt.Sprintf("alter user 'root'@'%s' identified with mysql_native_password BY '%s';", host, info.Value)
 			}
 			if err := excuteSql(app.ContainerName, app.Password, passwordRootChangeCMD); err != nil {
@@ -280,8 +286,14 @@ func (u *MysqlService) ChangeAccess(info dto.ChangeDBInfo) error {
 		}
 		for _, user := range userlist {
 			if len(user) != 0 {
-				if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("drop user if exists '%s'@'%s'", mysql.Username, user)); err != nil {
-					return err
+				if strings.HasPrefix(app.Version, "5.6") {
+					if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("drop user '%s'@'%s'", mysql.Username, user)); err != nil {
+						return err
+					}
+				} else {
+					if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("drop user if exists '%s'@'%s'", mysql.Username, user)); err != nil {
+						return err
+					}
 				}
 			}
 		}
@@ -346,7 +358,7 @@ func (u *MysqlService) UpdateVariables(updates []dto.MysqlVariablesUpdate) error
 
 	group := "[mysqld]"
 	for _, info := range updates {
-		if !strings.HasPrefix(app.Version, "5.7") {
+		if !strings.HasPrefix(app.Version, "5.7") && !strings.HasPrefix(app.Version, "5.6") {
 			if info.Param == "query_cache_size" {
 				continue
 			}
@@ -495,7 +507,7 @@ func (u *MysqlService) createUser(container, password, version string, req dto.M
 		if req.Name == "*" {
 			grantStr = fmt.Sprintf("grant all privileges on *.* to %s", user)
 		}
-		if strings.HasPrefix(version, "5.7") {
+		if strings.HasPrefix(version, "5.7") || strings.HasPrefix(version, "5.6") {
 			grantStr = fmt.Sprintf("%s identified by '%s' with grant option;", grantStr, req.Password)
 		}
 		if err := excSQL(container, password, grantStr); err != nil {

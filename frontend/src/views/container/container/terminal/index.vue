@@ -10,7 +10,7 @@
             <DrawerHeader :header="$t('container.containerTerminal')" :resource="title" :back="handleClose" />
         </template>
         <el-form ref="formRef" :model="form" label-position="top">
-            <el-form-item :label="$t('container.user')" prop="user">
+            <el-form-item :label="$t('commons.table.user')" prop="user">
                 <el-input placeholder="root" clearable v-model="form.user" />
             </el-form-item>
             <el-form-item

@@ -36,7 +36,7 @@ func (b *BaseApi) PageWebsite(c *gin.Context) {
 // @Tags Website
 // @Summary List websites
 // @Description 获取网站列表
-// @Success 200 {anrry} response.WebsiteDTO
+// @Success 200 {array} response.WebsiteDTO
 // @Security ApiKeyAuth
 // @Router /websites/list [get]
 func (b *BaseApi) GetWebsites(c *gin.Context) {
@@ -51,7 +51,7 @@ func (b *BaseApi) GetWebsites(c *gin.Context) {
 // @Tags Website
 // @Summary List website names
 // @Description 获取网站列表
-// @Success 200 {anrry} string
+// @Success 200 {array} string
 // @Security ApiKeyAuth
 // @Router /websites/options [get]
 func (b *BaseApi) GetWebsiteOptions(c *gin.Context) {
@@ -207,7 +207,7 @@ func (b *BaseApi) GetWebsiteNginx(c *gin.Context) {
 // @Description 通过网站 id 查询域名
 // @Accept json
 // @Param websiteId path integer true "request"
-// @Success 200 {anrry} model.WebsiteDomain
+// @Success 200 {array} model.WebsiteDomain
 // @Security ApiKeyAuth
 // @Router /websites/domains/:websiteId [get]
 func (b *BaseApi) GetWebDomains(c *gin.Context) {
@@ -367,7 +367,7 @@ func (b *BaseApi) UpdateHTTPSConfig(c *gin.Context) {
 // @Description 网站创建前检查
 // @Accept json
 // @Param request body request.WebsiteInstallCheckReq true "request"
-// @Success 200 {anrry} request.WebsitePreInstallCheck
+// @Success 200 {array} response.WebsitePreInstallCheck
 // @Security ApiKeyAuth
 // @Router /websites/check [post]
 func (b *BaseApi) CreateWebsiteCheck(c *gin.Context) {
@@ -541,7 +541,7 @@ func (b *BaseApi) UpdateWebsitePHPConfig(c *gin.Context) {
 
 // @Tags Website PHP
 // @Summary Update php conf
-// @Description 更新 php 配置
+// @Description 更新 php 配置文件
 // @Accept json
 // @Param request body request.WebsitePHPFileUpdate true "request"
 // @Success 200

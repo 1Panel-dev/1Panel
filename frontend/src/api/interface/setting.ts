@@ -5,6 +5,7 @@ export namespace Setting {
         userName: string;
         password: string;
         email: string;
+        systemIP: string;
         systemVersion: string;
 
         sessionTimeout: number;

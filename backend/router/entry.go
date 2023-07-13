@@ -20,6 +20,7 @@ type RouterGroup struct {
 	DatabaseRouter
 	NginxRouter
 	RuntimeRouter
+	ProcessRouter
 }
 
 var RouterGroupApp = new(RouterGroup)

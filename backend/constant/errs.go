@@ -68,6 +68,8 @@ var (
 	ErrGroupIsUsed        = "ErrGroupIsUsed"
 	ErrUsernameIsExist    = "ErrUsernameIsExist"
 	ErrUsernameIsNotExist = "ErrUsernameIsNotExist"
+	ErrBackupMatch        = "ErrBackupMatch"
+	ErrBackupExist        = "ErrBackupExist"
 )
 
 // ssl

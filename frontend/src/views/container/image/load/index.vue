@@ -6,7 +6,7 @@
         <el-form @submit.prevent v-loading="loading" ref="formRef" :model="form" label-position="top">
             <el-row type="flex" justify="center">
                 <el-col :span="22">
-                    <el-form-item :label="$t('container.path')" :rules="Rules.requiredSelect" prop="path">
+                    <el-form-item :label="$t('container.path')" :rules="Rules.requiredInput" prop="path">
                         <el-input v-model="form.path">
                             <template #prepend>
                                 <FileList @choose="loadLoadDir" :dir="false"></FileList>
@@ -22,7 +22,7 @@
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button :disabeld="loading" type="primary" @click="onSubmit(formRef)">
-                    {{ $t('container.import') }}
+                    {{ $t('commons.button.import') }}
                 </el-button>
             </span>
         </template>

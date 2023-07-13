@@ -53,7 +53,7 @@
                             <el-table-column prop="domain" :label="$t('website.domain')" />
                             <el-table-column prop="resolve" :label="$t('ssl.resolveDomain')" />
                             <el-table-column prop="value" :label="$t('ssl.value')" />
-                            <el-table-column :label="$t('ssl.type')">TXT</el-table-column>
+                            <el-table-column :label="$t('commons.table.type')">TXT</el-table-column>
                         </el-table>
                     </el-form-item>
                     <el-form-item :label="''" prop="autoRenew" v-if="ssl.provider !== 'dnsManual'">

@@ -7,7 +7,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
-	"github.com/1Panel-dev/1Panel/backend/utils/copier"
+	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -36,7 +36,14 @@ func (b *BaseApi) CreateHost(c *gin.Context) {
 			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 			return
 		}
-		req.Password = string(password)
+		passwordItem, err := encrypt.StringEncrypt(string(password))
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			return
+		}
+		req.Password = passwordItem
+		req.PrivateKey = ""
+		req.PassPhrase = ""
 	}
 	if req.AuthMode == "key" && len(req.PrivateKey) != 0 {
 		privateKey, err := base64.StdEncoding.DecodeString(req.PrivateKey)
@@ -44,7 +51,22 @@ func (b *BaseApi) CreateHost(c *gin.Context) {
 			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 			return
 		}
-		req.PrivateKey = string(privateKey)
+		keyItem, err := encrypt.StringEncrypt(string(privateKey))
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			return
+		}
+		req.Password = keyItem
+
+		if len(req.PassPhrase) != 0 {
+			pass, err := encrypt.StringEncrypt(req.PassPhrase)
+			if err != nil {
+				helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+				return
+			}
+			req.PassPhrase = pass
+		}
+		req.Password = ""
 	}
 
 	host, err := hostService.Create(req)
@@ -102,7 +124,7 @@ func (b *BaseApi) TestByID(c *gin.Context) {
 // @Description 加载主机树
 // @Accept json
 // @Param request body dto.SearchForTree true "request"
-// @Success 200 {anrry} dto.HostTree
+// @Success 200 {array} dto.HostTree
 // @Security ApiKeyAuth
 // @Router /hosts/tree [post]
 func (b *BaseApi) HostTree(c *gin.Context) {
@@ -126,7 +148,7 @@ func (b *BaseApi) HostTree(c *gin.Context) {
 // @Description 获取主机列表分页
 // @Accept json
 // @Param request body dto.SearchHostWithPage true "request"
-// @Success 200 {anrry} dto.HostTree
+// @Success 200 {array} dto.HostTree
 // @Security ApiKeyAuth
 // @Router /hosts/search [post]
 func (b *BaseApi) SearchHost(c *gin.Context) {
@@ -146,33 +168,6 @@ func (b *BaseApi) SearchHost(c *gin.Context) {
 		Items: list,
 		Total: total,
 	})
-}
-
-// @Tags Host
-// @Summary Load host info
-// @Description 加载主机信息
-// @Accept json
-// @Param id path integer true "request"
-// @Success 200 {object} dto.HostInfo
-// @Security ApiKeyAuth
-// @Router /hosts/:id [get]
-func (b *BaseApi) GetHostInfo(c *gin.Context) {
-	id, err := helper.GetParamID(c)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	host, err := hostService.GetHostInfo(id)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	var hostDto dto.HostInfo
-	if err := copier.Copy(&hostDto, host); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	helper.SuccessWithData(c, hostDto)
 }
 
 // @Tags Host
@@ -227,7 +222,12 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 			return
 		}
-		req.Password = string(password)
+		passwordItem, err := encrypt.StringEncrypt(string(password))
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			return
+		}
+		req.Password = passwordItem
 	}
 	if req.AuthMode == "key" && len(req.PrivateKey) != 0 {
 		privateKey, err := base64.StdEncoding.DecodeString(req.PrivateKey)
@@ -235,7 +235,21 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 			return
 		}
-		req.PrivateKey = string(privateKey)
+		keyItem, err := encrypt.StringEncrypt(string(privateKey))
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			return
+		}
+		req.PrivateKey = keyItem
+
+		if len(req.PassPhrase) != 0 {
+			pass, err := encrypt.StringEncrypt(req.PassPhrase)
+			if err != nil {
+				helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+				return
+			}
+			req.PassPhrase = pass
+		}
 	}
 
 	upMap := make(map[string]interface{})
@@ -246,10 +260,12 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 	upMap["user"] = req.User
 	upMap["auth_mode"] = req.AuthMode
 	upMap["remember_password"] = req.RememberPassword
-	if len(req.Password) != 0 {
+	if req.AuthMode == "password" {
 		upMap["password"] = req.Password
-	}
-	if len(req.PrivateKey) != 0 {
+		upMap["private_key"] = ""
+		upMap["pass_phrase"] = ""
+	} else {
+		upMap["password"] = ""
 		upMap["private_key"] = req.PrivateKey
 		upMap["pass_phrase"] = req.PassPhrase
 	}

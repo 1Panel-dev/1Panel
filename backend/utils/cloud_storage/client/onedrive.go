@@ -67,14 +67,14 @@ func (onedrive oneDriveClient) Exist(path string) (bool, error) {
 
 func (onedrive oneDriveClient) Delete(path string) (bool, error) {
 	path = "/" + strings.TrimPrefix(path, "/")
-	fileID, err := onedrive.loadIDByPath(path)
+	req, err := onedrive.client.NewRequest("DELETE", fmt.Sprintf("me/drive/root:%s", path), nil)
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("new request for delete file failed, err: %v \n", err)
+	}
+	if err := onedrive.client.Do(context.Background(), req, false, nil); err != nil {
+		return false, fmt.Errorf("do request for delete file failed, err: %v \n", err)
 	}
 
-	if err := onedrive.client.DriveItems.Delete(context.Background(), "", fileID); err != nil {
-		return false, err
-	}
 	return true, nil
 }
 
@@ -205,11 +205,11 @@ func (onedrive *oneDriveClient) ListObjects(prefix string) ([]interface{}, error
 
 	req, err := onedrive.client.NewRequest("GET", fmt.Sprintf("me/drive/items/%s/children", folderID), nil)
 	if err != nil {
-		return nil, fmt.Errorf("new request for delete failed, err: %v", err)
+		return nil, fmt.Errorf("new request for list failed, err: %v", err)
 	}
 	var driveItems *odsdk.OneDriveDriveItemsResponse
 	if err := onedrive.client.Do(context.Background(), req, false, &driveItems); err != nil {
-		return nil, fmt.Errorf("do request for delete failed, err: %v", err)
+		return nil, fmt.Errorf("do request for list failed, err: %v", err)
 	}
 	for _, item := range driveItems.DriveItems {
 		return nil, fmt.Errorf("id: %v, name: %s \n", item.Id, item.Name)
@@ -223,7 +223,11 @@ func (onedrive *oneDriveClient) ListObjects(prefix string) ([]interface{}, error
 }
 
 func (onedrive *oneDriveClient) loadIDByPath(path string) (string, error) {
-	req, err := onedrive.client.NewRequest("GET", fmt.Sprintf("me/drive/root:%s", path), nil)
+	pathItem := "root:" + path
+	if path == "/" {
+		pathItem = "root"
+	}
+	req, err := onedrive.client.NewRequest("GET", fmt.Sprintf("me/drive/%s", pathItem), nil)
 	if err != nil {
 		return "", fmt.Errorf("new request for file id failed, err: %v", err)
 	}
@@ -236,8 +240,8 @@ func (onedrive *oneDriveClient) loadIDByPath(path string) (string, error) {
 
 func refreshToken(oldToken string) (string, error) {
 	data := url.Values{}
-	data.Set("client_id", constant.OneDriveClientID)
-	data.Set("client_secret", constant.OneDriveClientSecret)
+	data.Set("client_id", global.CONF.System.OneDriveID)
+	data.Set("client_secret", global.CONF.System.OneDriveSc)
 	data.Set("grant_type", "refresh_token")
 	data.Set("refresh_token", oldToken)
 	data.Set("redirect_uri", constant.OneDriveRedirectURI)

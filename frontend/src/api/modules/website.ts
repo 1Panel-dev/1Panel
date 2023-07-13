@@ -100,7 +100,7 @@ export const ListSSL = (req: Website.SSLReq) => {
 };
 
 export const CreateSSL = (req: Website.SSLCreate) => {
-    return http.post<Website.SSLCreate>(`/websites/ssl`, req, 60000);
+    return http.post<Website.SSLCreate>(`/websites/ssl`, req, 100000);
 };
 
 export const DeleteSSL = (req: Website.DelReq) => {

@@ -82,7 +82,6 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
 };
 
 const hadleSuccess: UploadProps['onSuccess'] = (res, file) => {
-    console.log(file.name);
     file.status = 'success';
 };
 
@@ -125,6 +124,7 @@ const submit = async () => {
                         );
                         uploadPrecent.value = progress;
                     },
+                    timeout: 40000,
                 });
                 uploadedChunkCount++;
             } catch (error) {

@@ -7,6 +7,8 @@ import (
 type WebsiteSearch struct {
 	dto.PageInfo
 	Name           string `json:"name"`
+	OrderBy        string `json:"orderBy"`
+	Order          string `json:"order"`
 	WebsiteGroupID uint   `json:"websiteGroupId"`
 }
 
@@ -113,15 +115,18 @@ type WebsiteDomainDelete struct {
 }
 
 type WebsiteHTTPSOp struct {
-	WebsiteID    uint     `json:"websiteId" validate:"required"`
-	Enable       bool     `json:"enable" validate:"required"`
-	WebsiteSSLID uint     `json:"websiteSSLId"`
-	Type         string   `json:"type"  validate:"oneof=existed auto manual"`
-	PrivateKey   string   `json:"privateKey"`
-	Certificate  string   `json:"certificate"`
-	HttpConfig   string   `json:"HttpConfig"  validate:"oneof=HTTPSOnly HTTPAlso HTTPToHTTPS"`
-	SSLProtocol  []string `json:"SSLProtocol"`
-	Algorithm    string   `json:"algorithm"`
+	WebsiteID       uint     `json:"websiteId" validate:"required"`
+	Enable          bool     `json:"enable" validate:"required"`
+	WebsiteSSLID    uint     `json:"websiteSSLId"`
+	Type            string   `json:"type"  validate:"oneof=existed auto manual"`
+	PrivateKey      string   `json:"privateKey"`
+	Certificate     string   `json:"certificate"`
+	PrivateKeyPath  string   `json:"privateKeyPath"`
+	CertificatePath string   `json:"certificatePath"`
+	ImportType      string   `json:"importType"`
+	HttpConfig      string   `json:"httpConfig"  validate:"oneof=HTTPSOnly HTTPAlso HTTPToHTTPS"`
+	SSLProtocol     []string `json:"SSLProtocol"`
+	Algorithm       string   `json:"algorithm"`
 }
 
 type WebsiteNginxUpdate struct {

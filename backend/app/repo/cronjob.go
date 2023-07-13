@@ -83,7 +83,7 @@ func (u *CronjobRepo) Page(page, size int, opts ...DBOption) (int64, []model.Cro
 	}
 	count := int64(0)
 	db = db.Count(&count)
-	err := db.Order("created_at desc").Limit(size).Offset(size * (page - 1)).Find(&cronjobs).Error
+	err := db.Limit(size).Offset(size * (page - 1)).Find(&cronjobs).Error
 	return count, cronjobs, err
 }
 

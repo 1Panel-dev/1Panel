@@ -118,8 +118,8 @@ func OperationLog() gin.HandlerFunc {
 				}
 			}
 		}
-		record.DetailEN = operationDic.FormatEN
-		record.DetailZH = operationDic.FormatZH
+		record.DetailEN = strings.ReplaceAll(operationDic.FormatEN, "[]", "")
+		record.DetailZH = strings.ReplaceAll(operationDic.FormatZH, "[]", "")
 
 		writer := responseBodyWriter{
 			ResponseWriter: c.Writer,

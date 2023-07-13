@@ -5,6 +5,7 @@ import "time"
 type SettingInfo struct {
 	UserName      string `json:"userName"`
 	Email         string `json:"email"`
+	SystemIP      string `json:"systemIP"`
 	SystemVersion string `json:"systemVersion"`
 
 	SessionTimeout string `json:"sessionTimeout"`
@@ -75,7 +76,7 @@ type PortUpdate struct {
 }
 
 type SnapshotCreate struct {
-	From        string `json:"from" validate:"required,oneof=OSS S3 SFTP MINIO COS KODO"`
+	From        string `json:"from" validate:"required,oneof=OSS S3 SFTP MINIO COS KODO OneDrive"`
 	Description string `json:"description" validate:"max=256"`
 }
 type SnapshotRecover struct {

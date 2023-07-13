@@ -36,7 +36,7 @@ func NewICronjobService() ICronjobService {
 }
 
 func (u *CronjobService) SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error) {
-	total, cronjobs, err := cronjobRepo.Page(search.Page, search.PageSize, commonRepo.WithLikeName(search.Info))
+	total, cronjobs, err := cronjobRepo.Page(search.Page, search.PageSize, commonRepo.WithLikeName(search.Info), commonRepo.WithOrderRuleBy(search.OrderBy, search.Order))
 	var dtoCronjobs []dto.CronjobInfo
 	for _, cronjob := range cronjobs {
 		var item dto.CronjobInfo
@@ -133,7 +133,7 @@ func (u *CronjobService) Download(down dto.CronjobDownload) (string, error) {
 	}
 	if backup.Type == "LOCAL" || record.FromLocal {
 		if _, err := os.Stat(record.File); err != nil && os.IsNotExist(err) {
-			return "", constant.ErrRecordNotFound
+			return "", err
 		}
 		return record.File, nil
 	}
@@ -145,7 +145,7 @@ func (u *CronjobService) Download(down dto.CronjobDownload) (string, error) {
 	_ = os.MkdirAll(path.Dir(tempPath), os.ModePerm)
 	isOK, err := client.Download(record.File, tempPath)
 	if !isOK || err != nil {
-		return "", constant.ErrRecordNotFound
+		return "", err
 	}
 	return tempPath, nil
 }
@@ -238,6 +238,7 @@ func (u *CronjobService) Update(id uint, req dto.CronjobUpdate) error {
 	upMap["name"] = req.Name
 	upMap["spec"] = cronjob.Spec
 	upMap["script"] = req.Script
+	upMap["container_name"] = req.ContainerName
 	upMap["spec_type"] = req.SpecType
 	upMap["week"] = req.Week
 	upMap["day"] = req.Day

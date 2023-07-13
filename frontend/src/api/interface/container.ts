@@ -9,14 +9,19 @@ export namespace Container {
     export interface ContainerSearch extends ReqPage {
         name: string;
         filters: string;
+        orderBy: string;
+        order: string;
     }
     export interface ResourceLimit {
         cpu: number;
         memory: number;
     }
     export interface ContainerHelper {
+        containerID: string;
         name: string;
         image: string;
+        forcePull: boolean;
+        network: string;
         cmdStr: string;
         memoryItem: number;
         cmd: Array<string>;
@@ -52,11 +57,18 @@ export namespace Container {
         createTime: string;
         state: string;
         runTime: string;
-        cpuPercent: number;
-        memoryPercent: number;
         ports: Array<string>;
         isFromApp: boolean;
         isFromCompose: boolean;
+
+        hasLoad: boolean;
+        cpuPercent: number;
+        memoryPercent: number;
+    }
+    export interface ContainerListStats {
+        containerID: string;
+        cpuPercent: number;
+        memoryPercent: number;
     }
     export interface ContainerStats {
         cpuPercent: number;

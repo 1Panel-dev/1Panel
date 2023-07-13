@@ -10,7 +10,7 @@
                 <el-row>
                     <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
                         <el-button type="primary" @click="onOpenDialog('create')">
-                            {{ $t('container.createContainer') }}
+                            {{ $t('container.create') }}
                         </el-button>
                         <el-button type="primary" plain @click="onClean()">
                             {{ $t('container.containerPrune') }}
@@ -60,10 +60,11 @@
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
                     :data="data"
+                    @sort-change="search"
                     @search="search"
                 >
                     <el-table-column type="selection" fix />
-                    <el-table-column :label="$t('commons.table.name')" min-width="80" prop="name" fix>
+                    <el-table-column :label="$t('commons.table.name')" min-width="80" prop="name" sortable fix>
                         <template #default="{ row }">
                             <Tooltip @click="onInspect(row.containerID)" :text="row.name" />
                         </template>
@@ -74,28 +75,51 @@
                         min-width="80"
                         prop="imageName"
                     />
-                    <el-table-column :label="$t('commons.table.status')" min-width="60" prop="state" fix>
+                    <el-table-column :label="$t('commons.table.status')" min-width="60" prop="state" sortable fix>
                         <template #default="{ row }">
                             <Status :key="row.state" :status="row.state"></Status>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.source')" show-overflow-tooltip min-width="125" fix>
+                    <el-table-column :label="$t('container.source')" show-overflow-tooltip min-width="75" fix>
                         <template #default="{ row }">
-                            CPU: {{ row.cpuPercent.toFixed(2) }}% {{ $t('monitor.memory') }}:
-                            {{ row.memoryPercent.toFixed(2) }}%
+                            <div v-if="row.hasLoad">
+                                <div>CPU: {{ row.cpuPercent.toFixed(2) }}%</div>
+                                <div>{{ $t('monitor.memory') }}: {{ row.memoryPercent.toFixed(2) }}%</div>
+                            </div>
+                            <div v-if="!row.hasLoad">
+                                <el-button link loading></el-button>
+                            </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.port')" min-width="80" prop="ports" fix>
+                    <el-table-column :label="$t('commons.table.port')" min-width="120" prop="ports" fix>
                         <template #default="{ row }">
                             <div v-if="row.ports">
                                 <div v-for="(item, index) in row.ports" :key="index">
                                     <div v-if="row.expand || (!row.expand && index < 3)">
-                                        <el-tag class="tagMargin">{{ item }}</el-tag>
+                                        <el-button
+                                            v-if="item.indexOf('->') !== -1"
+                                            @click="goDashboard(item)"
+                                            class="tagMargin"
+                                            icon="Position"
+                                            type="primary"
+                                            plain
+                                            size="small"
+                                        >
+                                            {{ item }}
+                                        </el-button>
+                                        <el-button v-else class="tagMargin" type="primary" plain size="small">
+                                            {{ item }}
+                                        </el-button>
                                     </div>
                                 </div>
                                 <div v-if="!row.expand && row.ports.length > 3">
                                     <el-button type="primary" link @click="row.expand = true">
                                         {{ $t('commons.button.expand') }}...
+                                    </el-button>
+                                </div>
+                                <div v-if="row.expand && row.ports.length > 3">
+                                    <el-button type="primary" link @click="row.expand = false">
+                                        {{ $t('commons.button.collapse') }}
                                     </el-button>
                                 </div>
                             </div>
@@ -110,7 +134,7 @@
                     />
                     <fu-table-operations
                         width="300px"
-                        :ellipsis="3"
+                        :ellipsis="4"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         fix
@@ -127,6 +151,8 @@
         <UpgraeDialog @search="search" ref="dialogUpgradeRef" />
         <MonitorDialog ref="dialogMonitorRef" />
         <TerminalDialog ref="dialogTerminalRef" />
+
+        <PortJumpDialog ref="dialogPortJumpRef" />
     </div>
 </template>
 
@@ -140,9 +166,11 @@ import MonitorDialog from '@/views/container/container/monitor/index.vue';
 import ContainerLogDialog from '@/views/container/container/log/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
+import PortJumpDialog from '@/components/port-jump/index.vue';
 import Status from '@/components/status/index.vue';
 import { reactive, onMounted, ref } from 'vue';
 import {
+    containerListStats,
     containerOperator,
     containerPrune,
     inspect,
@@ -154,7 +182,7 @@ import { Container } from '@/api/interface/container';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import router from '@/routers';
-import { MsgSuccess } from '@/utils/message';
+import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { computeSize } from '@/utils/util';
 
 const loading = ref();
@@ -167,6 +195,7 @@ const paginationConfig = reactive({
 });
 const searchName = ref();
 const dialogUpgradeRef = ref();
+const dialogPortJumpRef = ref();
 
 const dockerStatus = ref('Running');
 const loadStatus = async () => {
@@ -184,6 +213,20 @@ const loadStatus = async () => {
             loading.value = false;
         });
 };
+
+const goDashboard = async (port: any) => {
+    if (port.indexOf('127.0.0.1') !== -1) {
+        MsgWarning(i18n.global.t('container.unExposedPort'));
+        return;
+    }
+    if (!port || port.indexOf(':') === -1 || port.indexOf('->') === -1) {
+        MsgWarning(i18n.global.t('commons.msg.errPort'));
+        return;
+    }
+    let portEx = port.match(/:(\d+)/)[1];
+    dialogPortJumpRef.value.acceptParams({ port: portEx });
+};
+
 const goSetting = async () => {
     router.push({ name: 'ContainerSetting' });
 };
@@ -201,15 +244,18 @@ const mydetail = ref();
 const dialogContainerLogRef = ref();
 const dialogReNameRef = ref();
 
-const search = async () => {
+const search = async (column?: any) => {
     let filterItem = props.filters ? props.filters : '';
     let params = {
         name: searchName.value,
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
         filters: filterItem,
+        orderBy: column?.order ? column.prop : 'created_at',
+        order: column?.order ? column.order : 'null',
     };
     loading.value = true;
+    loadStats();
     await searchContainer(params)
         .then((res) => {
             loading.value = false;
@@ -219,6 +265,24 @@ const search = async () => {
         .catch(() => {
             loading.value = false;
         });
+};
+
+const loadStats = async () => {
+    const res = await containerListStats();
+    let stats = res.data || [];
+    if (stats.length === 0) {
+        return;
+    }
+    for (const container of data.value) {
+        for (const item of stats) {
+            if (container.containerID === item.containerID) {
+                container.hasLoad = true;
+                container.cpuPercent = item.cpuPercent;
+                container.memoryPercent = item.memoryPercent;
+                break;
+            }
+        }
+    }
 };
 
 const dialogOperateRef = ref();
@@ -395,18 +459,18 @@ const buttons = [
         },
     },
     {
+        label: i18n.global.t('commons.button.upgrade'),
+        click: (row: Container.ContainerInfo) => {
+            dialogUpgradeRef.value!.acceptParams({ container: row.name, image: row.imageName, fromApp: row.isFromApp });
+        },
+    },
+    {
         label: i18n.global.t('container.monitor'),
         disabled: (row: Container.ContainerInfo) => {
             return row.state !== 'running';
         },
         click: (row: Container.ContainerInfo) => {
             onMonitor(row);
-        },
-    },
-    {
-        label: i18n.global.t('container.upgrade'),
-        click: (row: Container.ContainerInfo) => {
-            dialogUpgradeRef.value!.acceptParams({ container: row.name, image: row.imageName, fromApp: row.isFromApp });
         },
     },
     {

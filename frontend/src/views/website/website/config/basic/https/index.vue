@@ -27,32 +27,68 @@
                             <el-option :label="$t('website.manualSSL')" :value="'manual'"></el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item
-                        :label="$t('website.ssl')"
-                        prop="websiteSSLId"
-                        v-if="form.type === 'existed'"
-                        :hide-required-asterisk="true"
-                    >
-                        <el-select
-                            v-model="form.websiteSSLId"
-                            :placeholder="$t('website.selectSSL')"
-                            @change="changeSSl(form.websiteSSLId)"
-                        >
-                            <el-option
-                                v-for="(ssl, index) in ssls"
-                                :key="index"
-                                :label="ssl.primaryDomain"
-                                :value="ssl.id"
-                            ></el-option>
-                        </el-select>
-                    </el-form-item>
+                    <div v-if="form.type === 'existed'">
+                        <el-form-item :label="$t('website.acmeAccountManage')" prop="acmeAccountID">
+                            <el-select
+                                v-model="form.acmeAccountID"
+                                :placeholder="$t('website.selectAcme')"
+                                @change="listSSL"
+                            >
+                                <el-option :key="0" :label="$t('website.imported')" :value="0"></el-option>
+                                <el-option
+                                    v-for="(acme, index) in acmeAccounts"
+                                    :key="index"
+                                    :label="acme.email"
+                                    :value="acme.id"
+                                ></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item :label="$t('website.ssl')" prop="websiteSSLId" :hide-required-asterisk="true">
+                            <el-select
+                                v-model="form.websiteSSLId"
+                                :placeholder="$t('website.selectSSL')"
+                                @change="changeSSl(form.websiteSSLId)"
+                            >
+                                <el-option
+                                    v-for="(ssl, index) in ssls"
+                                    :key="index"
+                                    :label="ssl.primaryDomain"
+                                    :value="ssl.id"
+                                ></el-option>
+                            </el-select>
+                        </el-form-item>
+                    </div>
                     <div v-if="form.type === 'manual'">
-                        <el-form-item :label="$t('website.privateKey')" prop="privateKey">
-                            <el-input v-model="form.privateKey" :rows="6" type="textarea" />
+                        <el-form-item :label="$t('website.importType')" prop="type">
+                            <el-select v-model="form.importType">
+                                <el-option :label="$t('website.pasteSSL')" :value="'paste'"></el-option>
+                                <el-option :label="$t('website.localSSL')" :value="'local'"></el-option>
+                            </el-select>
                         </el-form-item>
-                        <el-form-item :label="$t('website.certificate')" prop="certificate">
-                            <el-input v-model="form.certificate" :rows="6" type="textarea" />
-                        </el-form-item>
+                        <div v-if="form.importType === 'paste'">
+                            <el-form-item :label="$t('website.privateKey')" prop="privateKey">
+                                <el-input v-model="form.privateKey" :rows="6" type="textarea" />
+                            </el-form-item>
+                            <el-form-item :label="$t('website.certificate')" prop="certificate">
+                                <el-input v-model="form.certificate" :rows="6" type="textarea" />
+                            </el-form-item>
+                        </div>
+                        <div v-if="form.importType === 'local'">
+                            <el-form-item :label="$t('website.privateKeyPath')" prop="privateKeyPath">
+                                <el-input v-model="form.privateKeyPath">
+                                    <template #prepend>
+                                        <FileList @choose="getPrivateKeyPath" :dir="false"></FileList>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
+                            <el-form-item :label="$t('website.certificatePath')" prop="certificatePath">
+                                <el-input v-model="form.certificatePath">
+                                    <template #prepend>
+                                        <FileList @choose="getCertificatePath" :dir="false"></FileList>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
+                        </div>
                     </div>
                     <el-form-item :label="' '" v-if="websiteSSL && websiteSSL.id > 0">
                         <el-descriptions :column="5" border direction="vertical">
@@ -118,13 +154,14 @@
 </template>
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
-import { GetHTTPSConfig, ListSSL, UpdateHTTPSConfig } from '@/api/modules/website';
+import { GetHTTPSConfig, ListSSL, SearchAcmeAccount, UpdateHTTPSConfig } from '@/api/modules/website';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { computed, onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
 import { dateFormatSimple, getProvider } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';
+import FileList from '@/components/file-list/index.vue';
 
 const props = defineProps({
     id: {
@@ -137,12 +174,16 @@ const id = computed(() => {
 });
 const httpsForm = ref<FormInstance>();
 const form = reactive({
+    acmeAccountID: 0,
     enable: false,
     websiteId: id.value,
     websiteSSLId: undefined,
     type: 'existed',
+    importType: 'paste',
     privateKey: '',
     certificate: '',
+    privateKeyPath: '',
+    certificatePath: '',
     httpConfig: 'HTTPToHTTPS',
     algorithm:
         'EECDH+CHACHA20:EECDH+CHACHA20-draft:EECDH+AES128:RSA+AES128:EECDH+AES256:RSA+AES256:EECDH+3DES:RSA+3DES:!MD5',
@@ -150,22 +191,58 @@ const form = reactive({
 });
 const loading = ref(false);
 const ssls = ref();
+const acmeAccounts = ref();
 const websiteSSL = ref();
 const rules = ref({
     type: [Rules.requiredSelect],
     privateKey: [Rules.requiredInput],
     certificate: [Rules.requiredInput],
+    privateKeyPath: [Rules.requiredInput],
+    certificatePath: [Rules.requiredInput],
     websiteSSLId: [Rules.requiredSelect],
     httpConfig: [Rules.requiredSelect],
     SSLProtocol: [Rules.requiredSelect],
     algorithm: [Rules.requiredInput],
+    acmeAccountID: [Rules.requiredInput],
 });
 const resData = ref();
+const sslReq = reactive({
+    acmeAccountID: '',
+});
 
+const getPrivateKeyPath = (path: string) => {
+    form.privateKeyPath = path;
+};
+
+const getCertificatePath = (path: string) => {
+    form.certificatePath = path;
+};
 const listSSL = () => {
-    ListSSL({}).then((res) => {
-        ssls.value = res.data;
-        changeSSl(form.websiteSSLId);
+    sslReq.acmeAccountID = String(form.acmeAccountID);
+    ListSSL(sslReq).then((res) => {
+        ssls.value = res.data || [];
+        if (ssls.value.length > 0) {
+            let exist = false;
+            for (const ssl of ssls.value) {
+                if (ssl.id === form.websiteSSLId) {
+                    exist = true;
+                    break;
+                }
+            }
+            if (!exist) {
+                form.websiteSSLId = ssls.value[0].id;
+            }
+            changeSSl(form.websiteSSLId);
+        } else {
+            websiteSSL.value = {};
+            form.websiteSSLId = undefined;
+        }
+    });
+};
+
+const listAcmeAccount = () => {
+    SearchAcmeAccount({ page: 1, pageSize: 100 }).then((res) => {
+        acmeAccounts.value = res.data.items || [];
     });
 };
 
@@ -186,6 +263,7 @@ const changeType = (type: string) => {
 const get = () => {
     GetHTTPSConfig(id.value).then((res) => {
         if (res.data) {
+            form.type = 'existed';
             resData.value = res.data;
             form.enable = res.data.enable;
             if (res.data.httpConfig != '') {
@@ -200,9 +278,11 @@ const get = () => {
             if (res.data.SSL && res.data.SSL.id > 0) {
                 form.websiteSSLId = res.data.SSL.id;
                 websiteSSL.value = res.data.SSL;
+                form.acmeAccountID = res.data.SSL.acmeAccountId;
             }
         }
         listSSL();
+        listAcmeAccount();
     });
 };
 const submit = async (formEl: FormInstance | undefined) => {
@@ -229,7 +309,7 @@ const changeEnable = (enable: boolean) => {
         listSSL();
     }
     if (resData.value.enable && !enable) {
-        ElMessageBox.confirm(i18n.global.t('website.disbaleHTTPSHelper'), i18n.global.t('website.disbaleHTTPS'), {
+        ElMessageBox.confirm(i18n.global.t('website.disableHTTPSHelper'), i18n.global.t('website.disableHTTPS'), {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),
             type: 'error',

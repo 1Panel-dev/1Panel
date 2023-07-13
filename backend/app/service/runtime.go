@@ -65,7 +65,7 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (err error) {
 	}
 	fileOp := files.NewFileOp()
 	appVersionDir := path.Join(constant.AppResourceDir, app.Resource, app.Key, appDetail.Version)
-	if !fileOp.Stat(appVersionDir) {
+	if !fileOp.Stat(appVersionDir) || appDetail.Update {
 		if err := downloadApp(app, appDetail, nil); err != nil {
 			return err
 		}

@@ -25,7 +25,7 @@
                         <el-form-item :label="$t('commons.login.password')" prop="password">
                             <el-input type="password" clearable show-password v-model.trim="form.password">
                                 <template #append>
-                                    <el-button @click="random" icon="RefreshRight"></el-button>
+                                    <el-button @click="random">{{ $t('commons.button.random') }}</el-button>
                                 </template>
                             </el-input>
                         </el-form-item>

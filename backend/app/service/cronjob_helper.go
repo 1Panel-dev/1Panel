@@ -32,7 +32,11 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 			if len(cronjob.Script) == 0 {
 				return
 			}
-			message, err = u.handleShell(cronjob.Type, cronjob.Name, cronjob.Script)
+			if len(cronjob.ContainerName) != 0 {
+				message, err = u.handleShell(cronjob.Type, cronjob.Name, fmt.Sprintf("docker exec %s %s", cronjob.ContainerName, cronjob.Script))
+			} else {
+				message, err = u.handleShell(cronjob.Type, cronjob.Name, cronjob.Script)
+			}
 			u.HandleRmExpired("LOCAL", "", "", cronjob, nil)
 		case "curl":
 			if len(cronjob.URL) == 0 {
@@ -163,24 +167,34 @@ func (u *CronjobService) handleBackup(cronjob *model.Cronjob, startTime time.Tim
 func (u *CronjobService) HandleRmExpired(backType, backupPath, localDir string, cronjob *model.Cronjob, backClient cloud_storage.CloudStorageClient) {
 	global.LOG.Infof("start to handle remove expired, retain copies: %d", cronjob.RetainCopies)
 	records, _ := cronjobRepo.ListRecord(cronjobRepo.WithByJobID(int(cronjob.ID)), commonRepo.WithOrderBy("created_at desc"))
-	if len(records) > int(cronjob.RetainCopies) {
-		for i := int(cronjob.RetainCopies); i < len(records); i++ {
-			if len(records[i].File) != 0 {
-				files := strings.Split(records[i].File, ",")
-				for _, file := range files {
-					if backType != "LOCAL" {
-						_, _ = backClient.Delete(backupPath + "/" + strings.TrimPrefix(file, localDir+"/"))
-						_ = os.Remove(file)
-					} else {
-						_ = os.Remove(file)
-					}
-					_ = backupRepo.DeleteRecord(context.TODO(), backupRepo.WithByFileName(path.Base(file)))
+	if len(records) <= int(cronjob.RetainCopies) {
+		return
+	}
+	for i := int(cronjob.RetainCopies); i < len(records); i++ {
+		if len(records[i].File) != 0 {
+			files := strings.Split(records[i].File, ",")
+			for _, file := range files {
+				_ = os.Remove(file)
+				_ = backupRepo.DeleteRecord(context.TODO(), backupRepo.WithByFileName(path.Base(file)))
+				if backType == "LOCAL" {
+					continue
 				}
-			}
 
-			_ = cronjobRepo.DeleteRecord(commonRepo.WithByID(uint(records[i].ID)))
-			_ = os.Remove(records[i].Records)
+				fileItem := file
+				if cronjob.KeepLocal {
+					if len(backupPath) != 0 {
+						itemPath := strings.TrimPrefix(backupPath, "/")
+						itemPath = strings.TrimSuffix(itemPath, "/") + "/"
+						fileItem = itemPath + strings.TrimPrefix(file, localDir+"/")
+					} else {
+						fileItem = strings.TrimPrefix(file, localDir+"/")
+					}
+				}
+				_, _ = backClient.Delete(fileItem)
+			}
 		}
+		_ = cronjobRepo.DeleteRecord(commonRepo.WithByID(uint(records[i].ID)))
+		_ = os.Remove(records[i].Records)
 	}
 }
 
@@ -213,7 +227,7 @@ func handleTar(sourceDir, targetDir, name, exclusionRules string) error {
 
 	commands := fmt.Sprintf("tar zcvf %s %s %s", targetDir+"/"+name, excludeRules, path)
 	global.LOG.Debug(commands)
-	stdout, err := cmd.ExecWithTimeOut(commands, 5*time.Minute)
+	stdout, err := cmd.ExecWithTimeOut(commands, 24*time.Hour)
 	if err != nil {
 		global.LOG.Errorf("do handle tar failed, stdout: %s, err: %v", stdout, err)
 		return errors.New(stdout)
@@ -230,7 +244,7 @@ func handleUnTar(sourceFile, targetDir string) error {
 
 	commands := fmt.Sprintf("tar zxvfC %s %s", sourceFile, targetDir)
 	global.LOG.Debug(commands)
-	stdout, err := cmd.ExecWithTimeOut(commands, 5*time.Minute)
+	stdout, err := cmd.ExecWithTimeOut(commands, 24*time.Hour)
 	if err != nil {
 		global.LOG.Errorf("do handle untar failed, stdout: %s, err: %v", stdout, err)
 		return errors.New(stdout)
@@ -423,7 +437,6 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, backup model.Backu
 			record.FileDir = strings.TrimPrefix(backupDir, localDir+"/")
 		}
 		record.FileName = fmt.Sprintf("website_%s_%s.tar.gz", website.PrimaryDomain, startTime.Format("20060102150405"))
-		paths = append(paths, fmt.Sprintf("%s/%s", record.FileDir, record.FileName))
 		if err := handleWebsiteBackup(&website, backupDir, record.FileName); err != nil {
 			return paths, err
 		}

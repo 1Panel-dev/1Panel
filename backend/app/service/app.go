@@ -24,6 +24,7 @@ import (
 	"os"
 	"path"
 	"strconv"
+	"strings"
 )
 
 type AppService struct {
@@ -39,6 +40,7 @@ type IAppService interface {
 	GetAppUpdate() (*response.AppUpdateRes, error)
 	GetAppDetailByID(id uint) (*response.AppDetailDTO, error)
 	SyncAppListFromLocal()
+	GetIgnoredApp() ([]response.IgnoredApp, error)
 }
 
 func NewIAppService() IAppService {
@@ -82,12 +84,16 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 		return nil, err
 	}
 	var appDTOs []*response.AppDTO
-	for _, a := range apps {
+	for _, ap := range apps {
+		ap.ReadMe = ""
+		ap.Website = ""
+		ap.Document = ""
+		ap.Github = ""
 		appDTO := &response.AppDTO{
-			App: a,
+			App: ap,
 		}
 		appDTOs = append(appDTOs, appDTO)
-		appTags, err := appTagRepo.GetByAppId(a.ID)
+		appTags, err := appTagRepo.GetByAppId(ap.ID)
 		if err != nil {
 			continue
 		}
@@ -100,7 +106,7 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 			continue
 		}
 		appDTO.Tags = tags
-		installs, _ := appInstallRepo.ListBy(appInstallRepo.WithAppId(a.ID))
+		installs, _ := appInstallRepo.ListBy(appInstallRepo.WithAppId(ap.ID))
 		appDTO.Installed = len(installs) > 0
 	}
 	res.Items = appDTOs
@@ -163,7 +169,7 @@ func (a AppService) GetAppDetail(appId uint, version, appType string) (response.
 		}
 		fileOp := files.NewFileOp()
 		versionPath := path.Join(constant.AppResourceDir, app.Resource, app.Key, detail.Version)
-		if !fileOp.Stat(versionPath) {
+		if !fileOp.Stat(versionPath) || detail.Update {
 			if err = downloadApp(app, detail, nil); err != nil {
 				return appDetailDTO, err
 			}
@@ -232,6 +238,27 @@ func (a AppService) GetAppDetailByID(id uint) (*response.AppDetailDTO, error) {
 	return res, nil
 }
 
+func (a AppService) GetIgnoredApp() ([]response.IgnoredApp, error) {
+	var res []response.IgnoredApp
+	details, _ := appDetailRepo.GetBy(appDetailRepo.WithIgnored())
+	if len(details) == 0 {
+		return res, nil
+	}
+	for _, detail := range details {
+		app, err := appRepo.GetFirst(commonRepo.WithByID(detail.AppId))
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, response.IgnoredApp{
+			Name:     app.Name,
+			Version:  detail.Version,
+			DetailID: detail.ID,
+			Icon:     app.Icon,
+		})
+	}
+	return res, nil
+}
+
 func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (appInstall *model.AppInstall, err error) {
 	if err = docker.CreateDefaultDockerNetwork(); err != nil {
 		err = buserr.WithDetail(constant.Err1PanelNetworkFailed, err.Error(), nil)
@@ -247,14 +274,23 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		appDetail model.AppDetail
 		app       model.App
 	)
-	httpPort, err = checkPort("PANEL_APP_PORT_HTTP", req.Params)
-	if err != nil {
-		return
+	for key := range req.Params {
+		if !strings.Contains(key, "PANEL_APP_PORT") {
+			continue
+		}
+		var port int
+		if port, err = checkPort(key, req.Params); err == nil {
+			if key == "PANEL_APP_PORT_HTTP" {
+				httpPort = port
+			}
+			if key == "PANEL_APP_PORT_HTTPS" {
+				httpsPort = port
+			}
+		} else {
+			return
+		}
 	}
-	httpsPort, err = checkPort("PANEL_APP_PORT_HTTPS", req.Params)
-	if err != nil {
-		return
-	}
+
 	appDetail, err = appDetailRepo.GetFirst(commonRepo.WithByID(req.AppDetailId))
 	if err != nil {
 		return
@@ -470,8 +506,12 @@ func (a AppService) SyncAppListFromLocal() {
 				oldDetail, exist := appDetails[version]
 				if exist {
 					newDetail.ID = oldDetail.ID
+					delete(appDetails, version)
 				}
 				app.Details[i] = newDetail
+			}
+			for _, v := range appDetails {
+				app.Details = append(app.Details, v)
 			}
 		}
 		app.TagsKey = append(app.TagsKey, constant.AppResourceLocal)
@@ -730,10 +770,8 @@ func (a AppService) SyncAppListFromRemote() error {
 			detail.Params = string(paramByte)
 			detail.DownloadUrl = v.DownloadUrl
 			detail.DownloadCallBackUrl = v.DownloadCallBackUrl
-			if v.LastModified > detail.LastModified {
-				detail.Update = true
-				detail.LastModified = v.LastModified
-			}
+			detail.Update = true
+			detail.LastModified = v.LastModified
 			detailsMap[version] = detail
 		}
 		var newDetails []model.AppDetail

@@ -4,6 +4,11 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 )
 
+func Pull(filePath string) (string, error) {
+	stdout, err := cmd.Execf("docker-compose -f %s pull", filePath)
+	return stdout, err
+}
+
 func Up(filePath string) (string, error) {
 	stdout, err := cmd.Execf("docker-compose -f %s up -d", filePath)
 	return stdout, err

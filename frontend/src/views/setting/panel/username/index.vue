@@ -2,12 +2,12 @@
     <div>
         <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
             <template #header>
-                <DrawerHeader :header="$t('setting.user')" :back="handleClose" />
+                <DrawerHeader :header="$t('commons.login.username')" :back="handleClose" />
             </template>
             <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
-                        <el-form-item :label="$t('setting.user')" prop="userName" :rules="Rules.userName">
+                        <el-form-item :label="$t('commons.login.username')" prop="userName" :rules="Rules.userName">
                             <el-input clearable v-model="form.userName" />
                         </el-form-item>
                     </el-col>

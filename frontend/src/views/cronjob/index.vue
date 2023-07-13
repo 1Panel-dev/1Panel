@@ -45,16 +45,17 @@
                 <ComplexTable
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
+                    @sort-change="search"
                     @search="search"
                     :data="data"
                 >
                     <el-table-column type="selection" fix />
-                    <el-table-column :label="$t('cronjob.taskName')" :min-width="120" prop="name">
+                    <el-table-column :label="$t('cronjob.taskName')" :min-width="120" prop="name" sortable>
                         <template #default="{ row }">
                             <Tooltip @click="loadDetail(row)" :text="row.name" />
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.status')" :min-width="80" prop="status">
+                    <el-table-column :label="$t('commons.table.status')" :min-width="80" prop="status" sortable>
                         <template #default="{ row }">
                             <el-button
                                 v-if="row.status === 'Enable'"
@@ -93,15 +94,19 @@
                                 &#32;{{ loadZero(row.hour) }} : {{ loadZero(row.minute) }}
                             </span>
                             <span v-if="row.specType === 'perNDay'">
-                                {{ row.day }} {{ $t('cronjob.day1') }}, {{ loadZero(row.hour) }} :
+                                {{ row.day }} {{ $t('commons.units.day') }}, {{ loadZero(row.hour) }} :
                                 {{ loadZero(row.minute) }}
                             </span>
                             <span v-if="row.specType === 'perNHour'">
-                                {{ row.hour }}{{ $t('cronjob.hour') }}, {{ loadZero(row.minute) }}
+                                {{ row.hour }}{{ $t('commons.units.hour') }}, {{ loadZero(row.minute) }}
                             </span>
                             <span v-if="row.specType === 'perHour'">{{ loadZero(row.minute) }}</span>
-                            <span v-if="row.specType === 'perNMinute'">{{ row.minute }}{{ $t('cronjob.minute') }}</span>
-                            <span v-if="row.specType === 'perNSecond'">{{ row.second }}{{ $t('cronjob.second') }}</span>
+                            <span v-if="row.specType === 'perNMinute'">
+                                {{ row.minute }}{{ $t('commons.units.minute') }}
+                            </span>
+                            <span v-if="row.specType === 'perNSecond'">
+                                {{ row.second }}{{ $t('commons.units.second') }}
+                            </span>
                             {{ $t('cronjob.handle') }}
                         </template>
                     </el-table-column>
@@ -155,7 +160,7 @@
         </el-dialog>
 
         <OperatrDialog @search="search" ref="dialogRef" />
-        <Records @search="search()" ref="dialogRecordRef" />
+        <Records @search="search" ref="dialogRecordRef" />
     </div>
 </template>
 
@@ -196,14 +201,16 @@ const weekOptions = [
     { label: i18n.global.t('cronjob.thursday'), value: 4 },
     { label: i18n.global.t('cronjob.friday'), value: 5 },
     { label: i18n.global.t('cronjob.saturday'), value: 6 },
-    { label: i18n.global.t('cronjob.sunday'), value: 7 },
+    { label: i18n.global.t('cronjob.sunday'), value: 0 },
 ];
 
-const search = async () => {
+const search = async (column?: any) => {
     let params = {
         info: searchName.value,
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
+        orderBy: column?.order ? column.prop : 'created_at',
+        order: column?.order ? column.order : 'null',
     };
     loading.value = true;
     await getCronjobPage(params)

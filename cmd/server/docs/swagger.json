@@ -62,7 +62,7 @@
                 "summary": "Get app list update",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -144,6 +144,31 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/response.AppDetailDTO"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/ingored": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取忽略的应用版本",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "App"
+                ],
+                "summary": "Get Ignore App",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.IgnoredApp"
                         }
                     }
                 }
@@ -238,7 +263,10 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.AppVersion"
+                            }
                         }
                     }
                 }
@@ -374,9 +402,54 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.AppResource"
+                            }
                         }
                     }
+                }
+            }
+        },
+        "/apps/installed/ignore": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "忽略应用升级版本",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "App"
+                ],
+                "summary": "ignore App Update",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.AppInstalledIgnoreUpgrade"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "installId"
+                    ],
+                    "formatEN": "Application param update [installId]",
+                    "formatZH": "忽略应用 [installId] 版本升级",
+                    "paramKeys": []
                 }
             }
         },
@@ -442,7 +515,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -544,7 +617,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -586,7 +659,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -630,7 +703,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -649,7 +722,7 @@
                 "summary": "Sync app installed",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -689,7 +762,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -722,7 +795,10 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.AppService"
+                            }
                         }
                     }
                 }
@@ -742,7 +818,7 @@
                 "summary": "Sync app list",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -780,7 +856,7 @@
                 "summary": "Check System isDemo",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -794,7 +870,7 @@
                 "summary": "Load safety status",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -844,7 +920,7 @@
                 "summary": "User logout",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -908,7 +984,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -951,7 +1027,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -993,7 +1069,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -1035,7 +1111,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -1114,7 +1190,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -1156,7 +1232,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -1248,7 +1324,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -1288,7 +1364,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -1328,7 +1404,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -1386,7 +1462,10 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.Options"
+                            }
                         }
                     }
                 }
@@ -1465,7 +1544,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -1618,7 +1697,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -1660,7 +1739,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -1743,7 +1822,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -1858,7 +1937,83 @@
                 }
             }
         },
+        "/containers/list": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取容器名称",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Container"
+                ],
+                "summary": "List containers",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/containers/list/stats": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取容器列表资源占用",
+                "summary": "Load container stats",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.ContainerListStats"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/containers/network": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取容器网络列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Container Network"
+                ],
+                "summary": "List networks",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.Options"
+                            }
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -1886,7 +2041,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -1928,7 +2083,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -2009,7 +2164,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -2089,7 +2244,10 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.ImageRepoOption"
+                            }
                         }
                     }
                 }
@@ -2124,7 +2282,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -2169,7 +2327,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -2262,7 +2420,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -2298,7 +2456,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -2426,7 +2584,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.ContainterStats"
+                            "$ref": "#/definitions/dto.ContainerStats"
                         }
                     }
                 }
@@ -2451,7 +2609,10 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.ComposeTemplateInfo"
+                            }
                         }
                     }
                 }
@@ -2483,7 +2644,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -2525,7 +2686,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -2615,7 +2776,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -2666,7 +2827,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -2709,7 +2870,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -2725,6 +2886,35 @@
             }
         },
         "/containers/volume": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取容器存储卷列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Container Volume"
+                ],
+                "summary": "List volumes",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.Options"
+                            }
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -2752,7 +2942,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -2794,7 +2984,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -2809,43 +2999,6 @@
             }
         },
         "/containers/volume/search": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "获取容器存储卷列表",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Container Volume"
-                ],
-                "summary": "List volumes",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.PageInfo"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.PageResult"
-                        }
-                    }
-                }
-            },
             "post": {
                 "security": [
                     {
@@ -2912,7 +3065,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -2955,7 +3108,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -3006,7 +3159,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -3057,7 +3210,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -3108,7 +3261,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -3231,7 +3384,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -3283,7 +3436,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -3416,7 +3569,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -3480,7 +3633,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -3531,7 +3684,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -3582,7 +3735,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -3622,7 +3775,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -3675,7 +3828,10 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -3709,7 +3865,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -3763,7 +3919,10 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -3855,7 +4014,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -3895,7 +4054,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -3935,7 +4094,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -3997,7 +4156,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -4161,7 +4320,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -4201,7 +4360,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -4243,7 +4402,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -4285,7 +4444,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -4327,7 +4486,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -4364,7 +4523,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -4397,7 +4556,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -4484,7 +4643,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -4526,7 +4685,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -4568,7 +4727,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -4610,7 +4769,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -4688,7 +4847,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -4731,7 +4890,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -4774,7 +4933,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -4818,7 +4977,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -4861,7 +5020,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -4939,7 +5098,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -4983,7 +5142,10 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.FileTree"
+                            }
                         }
                     }
                 }
@@ -5012,7 +5174,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -5056,7 +5218,10 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.FileInfo"
+                            }
                         }
                     }
                 }
@@ -5090,7 +5255,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -5134,7 +5299,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -5177,7 +5342,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -5275,7 +5440,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -5318,7 +5483,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -5358,7 +5523,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -5494,7 +5659,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -5527,7 +5692,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -5570,7 +5735,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -5582,40 +5747,6 @@
                     "formatEN": "create host [name][addr]",
                     "formatZH": "创建主机 [name][addr]",
                     "paramKeys": []
-                }
-            }
-        },
-        "/hosts/:id": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "加载主机信息",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Host"
-                ],
-                "summary": "Load host info",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "request",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.HostInfo"
-                        }
-                    }
                 }
             }
         },
@@ -5667,7 +5798,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -5710,7 +5841,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -5797,7 +5928,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -5839,7 +5970,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -5912,7 +6043,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -5945,7 +6076,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -6033,7 +6164,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -6112,7 +6243,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -6145,7 +6276,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -6180,7 +6311,10 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.HostTree"
+                            }
                         }
                     }
                 }
@@ -6248,7 +6382,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -6283,7 +6417,10 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.HostTree"
+                            }
                         }
                     }
                 }
@@ -6317,7 +6454,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -6360,7 +6497,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -6551,7 +6688,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -6593,7 +6730,10 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.NginxParam"
+                            }
                         }
                     }
                 }
@@ -6649,7 +6789,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -6668,6 +6808,45 @@
                     ],
                     "formatEN": "Update nginx conf [domain]",
                     "formatZH": "更新 nginx 配置 [domain]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/process/stop": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "停止进程",
+                "tags": [
+                    "Process"
+                ],
+                "summary": "Stop Process",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.ProcessReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "PID"
+                    ],
+                    "formatEN": "结束进程 [PID]",
+                    "formatZH": "结束进程 [PID]",
                     "paramKeys": []
                 }
             }
@@ -6700,7 +6879,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -6740,7 +6919,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -6773,7 +6952,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -6815,7 +6994,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -6848,7 +7027,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -6890,7 +7069,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -6932,7 +7111,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -6976,7 +7155,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -6996,6 +7175,31 @@
                     "formatEN": "delete backup account [types]",
                     "formatZH": "删除备份账号 [types]",
                     "paramKeys": []
+                }
+            }
+        },
+        "/settings/backup/onedrive": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取 OneDrive 信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Backup Account"
+                ],
+                "summary": "Load OneDrive info",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
                 }
             }
         },
@@ -7027,7 +7231,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -7078,7 +7282,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -7121,7 +7325,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -7154,7 +7358,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -7199,7 +7403,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -7232,7 +7436,10 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.BackupInfo"
+                            }
                         }
                     }
                 }
@@ -7266,7 +7473,10 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -7302,7 +7512,10 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -7336,7 +7549,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -7400,7 +7613,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -7412,7 +7625,7 @@
                 }
             }
         },
-        "/settings/mfa": {
+        "/settings/mfa/:interval": {
             "get": {
                 "security": [
                     {
@@ -7424,6 +7637,15 @@
                     "System Setting"
                 ],
                 "summary": "Load mfa info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "request",
+                        "name": "interval",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -7462,7 +7684,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -7488,7 +7710,7 @@
                 "summary": "Clean monitor datas",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -7528,7 +7750,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -7568,7 +7790,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -7618,7 +7840,7 @@
                 "summary": "Load system available status",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -7651,7 +7873,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -7694,7 +7916,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -7745,7 +7967,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -7797,7 +8019,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -7840,7 +8062,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -7891,7 +8113,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -8000,7 +8222,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -8028,7 +8250,7 @@
                 "summary": "Load time zone options",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -8106,7 +8328,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -8149,7 +8371,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             },
@@ -8180,7 +8402,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -8222,7 +8444,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -8463,7 +8685,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -8550,7 +8772,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -8583,7 +8805,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -8618,7 +8840,10 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.WebsitePreInstallCheck"
+                            }
                         }
                     }
                 }
@@ -8688,7 +8913,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -8739,7 +8964,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -8791,7 +9016,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -8842,7 +9067,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -8893,7 +9118,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -8944,7 +9169,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -8986,7 +9211,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -9073,7 +9298,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -9160,7 +9385,10 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.WebsiteDomain"
+                            }
                         }
                     }
                 }
@@ -9194,7 +9422,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -9245,7 +9473,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -9278,7 +9506,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -9299,7 +9527,10 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.WebsiteDTO"
+                            }
                         }
                     }
                 }
@@ -9388,7 +9619,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -9439,7 +9670,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -9479,7 +9710,10 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -9513,7 +9747,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -9577,7 +9811,7 @@
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "更新 php 配置",
+                "description": "更新 php 配置文件",
                 "consumes": [
                     "application/json"
                 ],
@@ -9598,7 +9832,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -9649,7 +9883,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -9682,7 +9916,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -9733,7 +9967,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -9784,7 +10018,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -9817,7 +10051,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -9947,7 +10181,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -9980,7 +10214,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -10031,7 +10265,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -10084,7 +10318,10 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.WebsiteDNSRes"
+                            }
                         }
                     }
                 }
@@ -10118,7 +10355,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -10151,7 +10388,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -10200,7 +10437,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             }
@@ -10233,7 +10470,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -10311,7 +10548,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -10374,6 +10611,51 @@
                 }
             }
         },
+        "dto.AppResource": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.AppVersion": {
+            "type": "object",
+            "properties": {
+                "detailId": {
+                    "type": "integer"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.BackupInfo": {
+            "type": "object",
+            "properties": {
+                "backupPath": {
+                    "type": "string"
+                },
+                "bucket": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "vars": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.BackupOperate": {
             "type": "object",
             "required": [
@@ -10382,6 +10664,9 @@
             ],
             "properties": {
                 "accessKey": {
+                    "type": "string"
+                },
+                "backupPath": {
                     "type": "string"
                 },
                 "bucket": {
@@ -10592,7 +10877,8 @@
                         "MINIO",
                         "LOCAL",
                         "COS",
-                        "KODO"
+                        "KODO",
+                        "OneDrive"
                     ]
                 },
                 "type": {
@@ -10678,6 +10964,26 @@
                 }
             }
         },
+        "dto.ComposeTemplateInfo": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.ComposeTemplateUpdate": {
             "type": "object",
             "properties": {
@@ -10711,6 +11017,20 @@
                 }
             }
         },
+        "dto.ContainerListStats": {
+            "type": "object",
+            "properties": {
+                "containerID": {
+                    "type": "string"
+                },
+                "cpuPercent": {
+                    "type": "number"
+                },
+                "memoryPercent": {
+                    "type": "number"
+                }
+            }
+        },
         "dto.ContainerOperate": {
             "type": "object",
             "properties": {
@@ -10722,6 +11042,9 @@
                     "items": {
                         "type": "string"
                     }
+                },
+                "containerID": {
+                    "type": "string"
                 },
                 "cpuShares": {
                     "type": "integer"
@@ -10738,6 +11061,9 @@
                         "$ref": "#/definitions/dto.PortHelper"
                     }
                 },
+                "forcePull": {
+                    "type": "boolean"
+                },
                 "image": {
                     "type": "string"
                 },
@@ -10748,13 +11074,16 @@
                     }
                 },
                 "memory": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "name": {
                     "type": "string"
                 },
                 "nanoCPUs": {
-                    "type": "integer"
+                    "type": "number"
+                },
+                "network": {
+                    "type": "string"
                 },
                 "publishAllPorts": {
                     "type": "boolean"
@@ -10829,22 +11158,7 @@
                 }
             }
         },
-        "dto.ContainerUpgrade": {
-            "type": "object",
-            "required": [
-                "image",
-                "name"
-            ],
-            "properties": {
-                "image": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.ContainterStats": {
+        "dto.ContainerStats": {
             "type": "object",
             "properties": {
                 "cache": {
@@ -10869,6 +11183,24 @@
                     "type": "number"
                 },
                 "shotTime": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ContainerUpgrade": {
+            "type": "object",
+            "required": [
+                "image",
+                "name"
+            ],
+            "properties": {
+                "forcePull": {
+                    "type": "boolean"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 }
             }
@@ -10909,6 +11241,9 @@
                 "type"
             ],
             "properties": {
+                "containerName": {
+                    "type": "string"
+                },
                 "day": {
                     "type": "integer"
                 },
@@ -10988,6 +11323,9 @@
                 "specType"
             ],
             "properties": {
+                "containerName": {
+                    "type": "string"
+                },
                 "day": {
                     "type": "integer"
                 },
@@ -11335,7 +11673,8 @@
                         "MINIO",
                         "LOCAL",
                         "COS",
-                        "KODO"
+                        "KODO",
+                        "OneDrive"
                     ]
                 }
             }
@@ -11547,53 +11886,6 @@
                 }
             }
         },
-        "dto.HostInfo": {
-            "type": "object",
-            "properties": {
-                "addr": {
-                    "type": "string"
-                },
-                "authMode": {
-                    "type": "string"
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "groupBelong": {
-                    "type": "string"
-                },
-                "groupID": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "passPhrase": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "port": {
-                    "type": "integer"
-                },
-                "privateKey": {
-                    "type": "string"
-                },
-                "rememberPassword": {
-                    "type": "boolean"
-                },
-                "user": {
-                    "type": "string"
-                }
-            }
-        },
         "dto.HostOperate": {
             "type": "object",
             "required": [
@@ -11642,6 +11934,23 @@
                     "type": "boolean"
                 },
                 "user": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.HostTree": {
+            "type": "object",
+            "properties": {
+                "children": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.TreeChild"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "label": {
                     "type": "string"
                 }
             }
@@ -11726,6 +12035,20 @@
                     "items": {
                         "type": "integer"
                     }
+                }
+            }
+        },
+        "dto.ImageRepoOption": {
+            "type": "object",
+            "properties": {
+                "downloadUrl": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
@@ -11855,6 +12178,9 @@
             "type": "object",
             "properties": {
                 "code": {
+                    "type": "string"
+                },
+                "interval": {
                     "type": "string"
                 },
                 "secret": {
@@ -12139,6 +12465,25 @@
                 }
             }
         },
+        "dto.NginxKey": {
+            "type": "string",
+            "enum": [
+                "index",
+                "limit-conn",
+                "ssl",
+                "cache",
+                "http-per",
+                "proxy-cache"
+            ],
+            "x-enum-varnames": [
+                "Index",
+                "LimitConn",
+                "SSL",
+                "CACHE",
+                "HttpPer",
+                "ProxyCache"
+            ]
+        },
         "dto.Operate": {
             "type": "object",
             "required": [
@@ -12172,6 +12517,14 @@
                 }
             }
         },
+        "dto.Options": {
+            "type": "object",
+            "properties": {
+                "option": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.PageContainer": {
             "type": "object",
             "required": [
@@ -12183,6 +12536,12 @@
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "order": {
+                    "type": "string"
+                },
+                "orderBy": {
                     "type": "string"
                 },
                 "page": {
@@ -12739,6 +13098,12 @@
                 "info": {
                     "type": "string"
                 },
+                "order": {
+                    "type": "string"
+                },
+                "orderBy": {
+                    "type": "string"
+                },
                 "page": {
                     "type": "integer"
                 },
@@ -12789,6 +13154,9 @@
                 "messageType": {
                     "type": "string"
                 },
+                "mfaInterval": {
+                    "type": "string"
+                },
                 "mfaSecret": {
                     "type": "string"
                 },
@@ -12826,6 +13194,9 @@
                     "type": "string"
                 },
                 "sslType": {
+                    "type": "string"
+                },
+                "systemIP": {
                     "type": "string"
                 },
                 "systemVersion": {
@@ -12877,7 +13248,8 @@
                         "SFTP",
                         "MINIO",
                         "COS",
-                        "KODO"
+                        "KODO",
+                        "OneDrive"
                     ]
                 }
             }
@@ -12921,6 +13293,17 @@
             "type": "object",
             "properties": {
                 "ntpSite": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.TreeChild": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "label": {
                     "type": "string"
                 }
             }
@@ -13476,6 +13859,25 @@
                     "additionalProperties": {
                         "type": "string"
                     }
+                }
+            }
+        },
+        "request.AppInstalledIgnoreUpgrade": {
+            "type": "object",
+            "required": [
+                "detailID",
+                "operate"
+            ],
+            "properties": {
+                "detailID": {
+                    "type": "integer"
+                },
+                "operate": {
+                    "type": "string",
+                    "enum": [
+                        "cancel",
+                        "ignore"
+                    ]
                 }
             }
         },
@@ -14059,7 +14461,7 @@
                 },
                 "params": {},
                 "scope": {
-                    "type": "string"
+                    "$ref": "#/definitions/dto.NginxKey"
                 },
                 "websiteId": {
                     "type": "integer"
@@ -14126,7 +14528,7 @@
             ],
             "properties": {
                 "scope": {
-                    "type": "string"
+                    "$ref": "#/definitions/dto.NginxKey"
                 },
                 "websiteId": {
                     "type": "integer"
@@ -14143,6 +14545,17 @@
                     "type": "string"
                 },
                 "port": {
+                    "type": "integer"
+                }
+            }
+        },
+        "request.ProcessReq": {
+            "type": "object",
+            "required": [
+                "PID"
+            ],
+            "properties": {
+                "PID": {
                     "type": "integer"
                 }
             }
@@ -14451,14 +14864,6 @@
                 "websiteId"
             ],
             "properties": {
-                "HttpConfig": {
-                    "type": "string",
-                    "enum": [
-                        "HTTPSOnly",
-                        "HTTPAlso",
-                        "HTTPToHTTPS"
-                    ]
-                },
                 "SSLProtocol": {
                     "type": "array",
                     "items": {
@@ -14471,10 +14876,27 @@
                 "certificate": {
                     "type": "string"
                 },
+                "certificatePath": {
+                    "type": "string"
+                },
                 "enable": {
                     "type": "boolean"
                 },
+                "httpConfig": {
+                    "type": "string",
+                    "enum": [
+                        "HTTPSOnly",
+                        "HTTPAlso",
+                        "HTTPToHTTPS"
+                    ]
+                },
+                "importType": {
+                    "type": "string"
+                },
                 "privateKey": {
+                    "type": "string"
+                },
+                "privateKeyPath": {
                     "type": "string"
                 },
                 "type": {
@@ -14736,6 +15158,9 @@
                 "pageSize"
             ],
             "properties": {
+                "acmeAccountID": {
+                    "type": "string"
+                },
                 "page": {
                     "type": "integer"
                 },
@@ -14767,6 +15192,12 @@
             ],
             "properties": {
                 "name": {
+                    "type": "string"
+                },
+                "order": {
+                    "type": "string"
+                },
+                "orderBy": {
                     "type": "string"
                 },
                 "page": {
@@ -14984,6 +15415,9 @@
                 "id": {
                     "type": "integer"
                 },
+                "ignoreUpgrade": {
+                    "type": "boolean"
+                },
                 "image": {
                     "type": "string"
                 },
@@ -15077,6 +15511,18 @@
                 "values": {}
             }
         },
+        "response.AppService": {
+            "type": "object",
+            "properties": {
+                "config": {},
+                "label": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
         "response.FileInfo": {
             "type": "object",
             "properties": {
@@ -15135,6 +15581,43 @@
                     "type": "string"
                 },
                 "user": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.FileTree": {
+            "type": "object",
+            "properties": {
+                "children": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.FileTree"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.IgnoredApp": {
+            "type": "object",
+            "properties": {
+                "detailID": {
+                    "type": "integer"
+                },
+                "icon": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "version": {
                     "type": "string"
                 }
             }
@@ -15215,6 +15698,23 @@
                     "type": "string"
                 },
                 "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.WebsiteDNSRes": {
+            "type": "object",
+            "properties": {
+                "domain": {
+                    "type": "string"
+                },
+                "err": {
+                    "type": "string"
+                },
+                "resolve": {
+                    "type": "string"
+                },
+                "value": {
                     "type": "string"
                 }
             }
@@ -15368,6 +15868,23 @@
                     "items": {
                         "$ref": "#/definitions/response.NginxParam"
                     }
+                }
+            }
+        },
+        "response.WebsitePreInstallCheck": {
+            "type": "object",
+            "properties": {
+                "appName": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
                 }
             }
         },

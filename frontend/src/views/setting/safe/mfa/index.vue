@@ -10,7 +10,7 @@
             <template #header>
                 <DrawerHeader :header="$t('setting.mfa')" :back="handleClose" />
             </template>
-            <el-alert style="margin-bottom: 20px" :closable="false" type="warning">
+            <el-alert class="common-prompt" :closable="false" type="warning">
                 <template #default>
                     <span>
                         <span>{{ $t('setting.mfaAlert') }}</span>
@@ -55,7 +55,9 @@
                         <el-form-item :label="$t('setting.mfaInterval')" prop="interval">
                             <el-input v-model.number="form.interval">
                                 <template #append>
-                                    <el-button @click="loadMfaCode">{{ $t('commons.button.save') }}</el-button>
+                                    <el-button @click="loadMfaCodeBefore(formRef)">
+                                        {{ $t('commons.button.save') }}
+                                    </el-button>
                                 </template>
                             </el-input>
                             <span class="input-help">{{ $t('setting.mfaIntervalHelper') }}</span>
@@ -101,7 +103,7 @@ const form = reactive({
 
 const rules = reactive({
     code: [Rules.requiredInput],
-    mfaInterval: [Rules.number, checkNumberRange(15, 300)],
+    interval: [Rules.number, checkNumberRange(15, 60)],
 });
 
 interface DialogProps {
@@ -123,11 +125,27 @@ const onCopy = async () => {
     }
 };
 
+const loadMfaCodeBefore = async (formEl: FormInstance | undefined) => {
+    if (!formEl) return;
+    const result = await formEl.validateField('interval', callback);
+    if (!result) {
+        return;
+    }
+    loadMfaCode();
+};
 const loadMfaCode = async () => {
     const res = await getMFA(form.interval);
     form.secret = res.data.secret;
     qrImage.value = res.data.qrImage;
 };
+
+function callback(error: any) {
+    if (error) {
+        return error.message;
+    } else {
+        return;
+    }
+}
 
 const onBind = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;

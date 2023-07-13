@@ -16,7 +16,7 @@
                     <el-form-item :label="$t('file.path')" prop="path">
                         <el-input v-model="addForm.path" disabled />
                     </el-form-item>
-                    <el-form-item :label="$t('file.name')" prop="newName">
+                    <el-form-item :label="$t('commons.table.name')" prop="newName">
                         <el-input v-model.trim="addForm.newName" />
                     </el-form-item>
                 </el-form>

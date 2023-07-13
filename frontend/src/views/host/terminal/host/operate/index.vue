@@ -13,7 +13,7 @@
                             </span>
                             <el-input v-else clearable v-model.trim="dialogData.rowData!.addr" />
                         </el-form-item>
-                        <el-form-item :label="$t('terminal.user')" prop="user">
+                        <el-form-item :label="$t('commons.login.username')" prop="user">
                             <el-input clearable v-model="dialogData.rowData!.user" />
                         </el-form-item>
                         <el-form-item :label="$t('terminal.authMode')" prop="authMode">
@@ -23,7 +23,7 @@
                             </el-radio-group>
                         </el-form-item>
                         <el-form-item
-                            :label="$t('terminal.password')"
+                            :label="$t('commons.login.password')"
                             v-if="dialogData.rowData!.authMode === 'password'"
                             prop="password"
                         >
@@ -51,7 +51,7 @@
                         <el-checkbox clearable v-model.number="dialogData.rowData!.rememberPassword">
                             {{ $t('terminal.rememberPassword') }}
                         </el-checkbox>
-                        <el-form-item style="margin-top: 10px" :label="$t('terminal.port')" prop="port">
+                        <el-form-item style="margin-top: 10px" :label="$t('commons.table.port')" prop="port">
                             <el-input clearable v-model.number="dialogData.rowData!.port" />
                         </el-form-item>
                         <el-form-item :label="$t('commons.table.group')" prop="groupID">

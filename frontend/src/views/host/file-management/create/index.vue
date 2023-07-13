@@ -21,7 +21,7 @@
                     v-loading="loading"
                     @submit.enter.prevent
                 >
-                    <el-form-item :label="$t('file.name')" prop="name">
+                    <el-form-item :label="$t('commons.table.name')" prop="name">
                         <el-input v-model.trim="addForm.name" />
                     </el-form-item>
                     <el-form-item v-if="!addForm.isDir">

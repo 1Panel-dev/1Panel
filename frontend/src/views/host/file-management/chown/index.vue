@@ -5,6 +5,7 @@
         </template>
         <el-row>
             <el-col :span="22" :offset="1">
+                <el-alert :title="$t('file.ownerHelper')" type="info" :closable="false" class="common-prompt" />
                 <el-form
                     ref="fileForm"
                     label-position="top"
@@ -13,7 +14,7 @@
                     :rules="rules"
                     v-loading="loading"
                 >
-                    <el-form-item :label="$t('file.user')" prop="user">
+                    <el-form-item :label="$t('commons.table.user')" prop="user">
                         <el-input v-model.trim="addForm.user" />
                     </el-form-item>
                     <el-form-item :label="$t('file.group')" prop="group">
@@ -21,9 +22,6 @@
                     </el-form-item>
                     <el-form-item v-if="isDir">
                         <el-checkbox v-model="addForm.sub">{{ $t('file.containSub') }}</el-checkbox>
-                    </el-form-item>
-                    <el-form-item>
-                        <el-alert :title="$t('file.ownerHelper')" type="info" :closable="false" />
                     </el-form-item>
                 </el-form>
             </el-col>

@@ -33,7 +33,7 @@
                 </template>
             </el-popover>
             <span class="input-help">
-                ( {{ formatNumber(currentInfo.cpuUsed) }} / {{ currentInfo.cpuTotal }} ) {{ $t('home.coreUnit') }}
+                ( {{ formatNumber(currentInfo.cpuUsed) }} / {{ currentInfo.cpuTotal }} ) {{ $t('commons.units.core') }}
             </span>
         </el-col>
         <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
@@ -201,7 +201,7 @@ const currentInfo = ref<Dashboard.CurrentInfo>({
     shotTime: new Date(),
 });
 
-const acceptParams = (current: Dashboard.CurrentInfo, base: Dashboard.BaseInfo): void => {
+const acceptParams = (current: Dashboard.CurrentInfo, base: Dashboard.BaseInfo, isInit: boolean): void => {
     currentInfo.value = current;
     baseInfo.value = base;
     freshChart('cpu', 'CPU', formatNumber(currentInfo.value.cpuUsedPercent));
@@ -215,7 +215,7 @@ const acceptParams = (current: Dashboard.CurrentInfo, base: Dashboard.BaseInfo):
             freshChart('disk' + i, itemPath, formatNumber(currentInfo.value.diskData[i].usedPercent));
         }
         if (currentInfo.value.diskData.length > 5) {
-            showMore.value = false;
+            showMore.value = isInit ? false : showMore.value || false;
         }
     });
 };
@@ -356,11 +356,21 @@ function changeChartSize() {
     }
 }
 
+function disposeChart() {
+    echarts.getInstanceByDom(document.getElementById('cpu') as HTMLElement)?.dispose();
+    echarts.getInstanceByDom(document.getElementById('memory') as HTMLElement)?.dispose();
+    echarts.getInstanceByDom(document.getElementById('load') as HTMLElement)?.dispose();
+    for (let i = 0; i < currentInfo.value.diskData.length; i++) {
+        echarts.getInstanceByDom(document.getElementById('disk' + i) as HTMLElement)?.dispose();
+    }
+}
+
 onMounted(() => {
     window.addEventListener('resize', changeChartSize);
 });
 
 onBeforeUnmount(() => {
+    disposeChart();
     window.removeEventListener('resize', changeChartSize);
 });
 

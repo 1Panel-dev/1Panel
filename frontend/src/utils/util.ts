@@ -185,6 +185,33 @@ export function checkIp(value: string): boolean {
     }
 }
 
+export function checkIpV4V6(value: string): boolean {
+    if (value === '') {
+        return true;
+    }
+    const IPv4SegmentFormat = '(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])';
+    const IPv4AddressFormat = `(${IPv4SegmentFormat}[.]){3}${IPv4SegmentFormat}`;
+    const IPv4AddressRegExp = new RegExp(`^${IPv4AddressFormat}$`);
+    const IPv6SegmentFormat = '(?:[0-9a-fA-F]{1,4})';
+    const IPv6AddressRegExp = new RegExp(
+        '^(' +
+            `(?:${IPv6SegmentFormat}:){7}(?:${IPv6SegmentFormat}|:)|` +
+            `(?:${IPv6SegmentFormat}:){6}(?:${IPv4AddressFormat}|:${IPv6SegmentFormat}|:)|` +
+            `(?:${IPv6SegmentFormat}:){5}(?::${IPv4AddressFormat}|(:${IPv6SegmentFormat}){1,2}|:)|` +
+            `(?:${IPv6SegmentFormat}:){4}(?:(:${IPv6SegmentFormat}){0,1}:${IPv4AddressFormat}|(:${IPv6SegmentFormat}){1,3}|:)|` +
+            `(?:${IPv6SegmentFormat}:){3}(?:(:${IPv6SegmentFormat}){0,2}:${IPv4AddressFormat}|(:${IPv6SegmentFormat}){1,4}|:)|` +
+            `(?:${IPv6SegmentFormat}:){2}(?:(:${IPv6SegmentFormat}){0,3}:${IPv4AddressFormat}|(:${IPv6SegmentFormat}){1,5}|:)|` +
+            `(?:${IPv6SegmentFormat}:){1}(?:(:${IPv6SegmentFormat}){0,4}:${IPv4AddressFormat}|(:${IPv6SegmentFormat}){1,6}|:)|` +
+            `(?::((?::${IPv6SegmentFormat}){0,5}:${IPv4AddressFormat}|(?::${IPv6SegmentFormat}){1,7}|:))` +
+            ')(%[0-9a-zA-Z-.:]{1,})?$',
+    );
+    if (!IPv4AddressRegExp.test(value) && !IPv6AddressRegExp.test(value) && value !== '') {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 export function checkPort(value: string): boolean {
     if (Number(value) <= 0) {
         return true;
@@ -222,17 +249,17 @@ export function getAge(d1: string): string {
 
     let res = '';
     if (dayDiff > 0) {
-        res += String(dayDiff) + i18n.global.t('app.day');
+        res += String(dayDiff) + i18n.global.t('commons.units.day');
         if (hours <= 0) {
             return res;
         }
     }
     if (hours > 0) {
-        res += String(hours) + i18n.global.t('app.hour');
+        res += String(hours) + i18n.global.t('commons.units.hour');
         return res;
     }
     if (minutes > 0) {
-        res += String(minutes) + i18n.global.t('app.minute');
+        res += String(minutes) + i18n.global.t('commons.units.minute');
         return res;
     }
     return i18n.global.t('app.less1Minute');
@@ -255,4 +282,14 @@ export function toLowerCase(str: string) {
 export function downloadFile(filePath: string) {
     let url = `${import.meta.env.VITE_API_URL as string}/files/download?`;
     window.open(url + 'path=' + filePath, '_blank');
+}
+
+export function downloadWithContent(content: string, fileName: string) {
+    const downloadUrl = window.URL.createObjectURL(new Blob([content]));
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = downloadUrl;
+    a.download = fileName;
+    const event = new MouseEvent('click');
+    a.dispatchEvent(event);
 }
