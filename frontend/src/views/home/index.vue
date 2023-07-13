@@ -460,7 +460,7 @@ function loadUpTime(uptime: number) {
         );
     }
     if (minutes !== 0) {
-        return minutes + i18n.global.t('home.Minute') + ' ' + seconds + i18n.global.t('commons.units.second');
+        return minutes + i18n.global.t('commons.units.minute') + ' ' + seconds + i18n.global.t('commons.units.second');
     }
     return seconds + i18n.global.t('commons.units.second');
 }
