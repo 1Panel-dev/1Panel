@@ -201,7 +201,7 @@ const currentInfo = ref<Dashboard.CurrentInfo>({
     shotTime: new Date(),
 });
 
-const acceptParams = (current: Dashboard.CurrentInfo, base: Dashboard.BaseInfo): void => {
+const acceptParams = (current: Dashboard.CurrentInfo, base: Dashboard.BaseInfo, isInit: boolean): void => {
     currentInfo.value = current;
     baseInfo.value = base;
     freshChart('cpu', 'CPU', formatNumber(currentInfo.value.cpuUsedPercent));
@@ -215,7 +215,7 @@ const acceptParams = (current: Dashboard.CurrentInfo, base: Dashboard.BaseInfo):
             freshChart('disk' + i, itemPath, formatNumber(currentInfo.value.diskData[i].usedPercent));
         }
         if (currentInfo.value.diskData.length > 5) {
-            showMore.value = false;
+            showMore.value = isInit ? false : showMore.value || false;
         }
     });
 };
