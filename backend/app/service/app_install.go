@@ -593,6 +593,9 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 	config := getAppCommonConfig(envs)
 	config.DockerCompose = install.DockerCompose
 	res.Params = params
+	if config.ContainerName == "" {
+		config.ContainerName = install.ContainerName
+	}
 	res.AppContainerConfig = config
 	return &res, nil
 }

@@ -381,6 +381,9 @@ func getContainerNames(install model.AppInstall) ([]string, error) {
 	for k := range containerMap {
 		containerNames = append(containerNames, k)
 	}
+	if len(containerNames) == 0 {
+		containerNames = append(containerNames, install.ContainerName)
+	}
 	return containerNames, nil
 }
 
