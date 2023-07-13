@@ -11,6 +11,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
@@ -80,11 +81,11 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 
 	temPathWithName := tmpPath + "/" + website.Alias
 	if !fileOp.Stat(tmpPath+"/website.json") || !fileOp.Stat(temPathWithName+".conf") || !fileOp.Stat(temPathWithName+".web.tar.gz") {
-		return errors.New("the wrong recovery package does not have .conf or .web.tar.gz files")
+		return buserr.WithDetail(constant.ErrBackupExist, ".conf or .web.tar.gz", nil)
 	}
 	if website.Type == constant.Deployment {
 		if !fileOp.Stat(temPathWithName + ".app.tar.gz") {
-			return errors.New("the wrong recovery package does not have .app.tar.gz files")
+			return buserr.WithDetail(constant.ErrBackupExist, ".app.tar.gz", nil)
 		}
 	}
 	var oldWebsite model.Website
@@ -95,8 +96,9 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 	if err := json.Unmarshal(websiteJson, &oldWebsite); err != nil {
 		return fmt.Errorf("unmarshal app.json failed, err: %v", err)
 	}
-	if oldWebsite.Alias != website.Alias || oldWebsite.Type != website.Type || oldWebsite.ID != website.ID {
-		return errors.New("the current backup file does not match the application")
+
+	if err := checkValidOfWebsite(&oldWebsite, website); err != nil {
+		return err
 	}
 
 	isOk := false
@@ -155,6 +157,7 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 		return errors.New(string(stdout))
 	}
 
+	oldWebsite.ID = website.ID
 	if err := websiteRepo.SaveWithoutCtx(&oldWebsite); err != nil {
 		global.LOG.Errorf("handle save website data failed, err: %v", err)
 		return err
@@ -210,5 +213,31 @@ func handleWebsiteBackup(website *model.Website, backupDir, fileName string) err
 		return err
 	}
 
+	return nil
+}
+
+func checkValidOfWebsite(oldWebsite, website *model.Website) error {
+	if oldWebsite.Alias != website.Alias || oldWebsite.Type != website.Type {
+		return buserr.WithDetail(constant.ErrBackupMatch, fmt.Sprintf("oldName: %s, oldType: %v", oldWebsite.Alias, oldWebsite.Type), nil)
+	}
+	if oldWebsite.AppInstallID != 0 {
+		app, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
+		if err != nil {
+			return buserr.WithDetail(constant.ErrBackupMatch, "app", nil)
+		}
+		if app.App.Type != "website" {
+			return buserr.WithDetail(constant.ErrBackupMatch, fmt.Sprintf("appType: %s", app.App.Type), nil)
+		}
+	}
+	if oldWebsite.RuntimeID != 0 {
+		if _, err := runtimeRepo.GetFirst(commonRepo.WithByID(website.RuntimeID)); err != nil {
+			return buserr.WithDetail(constant.ErrBackupMatch, "runtime", nil)
+		}
+	}
+	if oldWebsite.WebsiteSSLID != 0 {
+		if _, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(website.WebsiteSSLID)); err != nil {
+			return buserr.WithDetail(constant.ErrBackupMatch, "ssl", nil)
+		}
+	}
 	return nil
 }

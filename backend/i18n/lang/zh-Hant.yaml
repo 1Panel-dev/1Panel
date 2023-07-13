@@ -59,6 +59,8 @@ ErrDomainIsExist: "域名已存在"
 ErrAliasIsExist: "代號已存在"
 ErrAppDelete: '其他網站使用此應用,無法刪除'
 ErrGroupIsUsed: '分組正在使用中，無法刪除'
+ErrBackupMatch: '該備份文件與當前網站部分數據不匹配: {{ .detail}}"'
+ErrBackupExist: '該備份文件對應部分原數據不存在: {{ .detail}}"'
 
 #ssl
 ErrSSLCannotDelete: "證書正在被網站使用，無法刪除"

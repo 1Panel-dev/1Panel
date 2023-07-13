@@ -59,6 +59,8 @@ ErrDomainIsExist: "Domain is already exist"
 ErrAliasIsExist: "Alias is already exist"
 ErrAppDelete: 'Other Website use this App'
 ErrGroupIsUsed: 'The group is in use and cannot be deleted'
+ErrBackupMatch: 'the backup file does not match the current partial data of the website: {{ .detail}}"'
+ErrBackupExist: 'the backup file corresponds to a portion of the original data that does not exist: {{ .detail}}"'
 
 #ssl
 ErrSSLCannotDelete: "The certificate is being used by the website and cannot be removed"
