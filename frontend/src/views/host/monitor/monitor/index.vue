@@ -759,12 +759,21 @@ function changeChartSize() {
     echarts.getInstanceByDom(document.getElementById('loadNetworkChart') as HTMLElement)?.resize();
 }
 
+function disposeChart() {
+    echarts.getInstanceByDom(document.getElementById('loadLoadChart') as HTMLElement)?.dispose();
+    echarts.getInstanceByDom(document.getElementById('loadCPUChart') as HTMLElement)?.dispose();
+    echarts.getInstanceByDom(document.getElementById('loadMemoryChart') as HTMLElement)?.dispose();
+    echarts.getInstanceByDom(document.getElementById('loadIOChart') as HTMLElement)?.dispose();
+    echarts.getInstanceByDom(document.getElementById('loadNetworkChart') as HTMLElement)?.dispose();
+}
+
 onMounted(() => {
     zoomStart.value = dateFormatWithoutYear(new Date(new Date().setHours(0, 0, 0, 0)));
     loadNetworkOptions();
     window.addEventListener('resize', changeChartSize);
 });
 onBeforeUnmount(() => {
+    disposeChart();
     window.removeEventListener('resize', changeChartSize);
 });
 </script>
