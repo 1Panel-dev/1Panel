@@ -66,7 +66,7 @@
                         fix
                         :formatter="dateFormat"
                     />
-                    <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" />
+                    <fu-table-operations width="200px" :buttons="buttons" :label="$t('commons.table.operate')" />
                 </ComplexTable>
             </template>
         </LayoutContent>

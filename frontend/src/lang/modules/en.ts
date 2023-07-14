@@ -356,7 +356,7 @@ const message = {
         threadCacheHitHelper: 'If it is too low, increase thread_cache_size',
         indexHit: 'Index hit',
         indexHitHelper: 'If it is too low, increase key_buffer_size',
-        innodbIndexHit: 'Innodb 索引命中率',
+        innodbIndexHit: 'Innodb index hit rate',
         innodbIndexHitHelper: 'If it is too low, increase innodb_buffer_pool_size',
         cacheHit: 'Querying the Cache Hit',
         cacheHitHelper: 'If it is too low, increase query_cache_size',
@@ -444,7 +444,8 @@ const message = {
         localIP: 'Local IP',
     },
     container: {
-        createContainer: 'Create container',
+        create: 'Create container',
+        edit: 'Edit container',
         updateContaienrHelper:
             'Container editing requires rebuilding the container. Any data that has not been persisted will be lost. Do you want to continue?',
         containerList: 'Container list',
@@ -650,13 +651,13 @@ const message = {
         startIn: ' to start',
     },
     cronjob: {
-        cronTask: 'Task',
+        cronTask: 'Cronjob',
         changeStatus: 'Change status',
         disableMsg:
             'Stopping the scheduled task will result in the task no longer automatically executing. Do you want to continue?',
         enableMsg:
             'Enabling the scheduled task will allow the task to automatically execute on a regular basis. Do you want to continue?',
-        taskType: 'Task type',
+        taskType: 'Cronjob type',
         record: 'Records',
         shell: 'Shell script',
         containerCheckBox: 'In container (no need to enter the container command)',
@@ -674,7 +675,7 @@ const message = {
         syncDate: 'Synchronization time ',
         releaseMemory: 'Free memory',
         curl: 'Access URL',
-        taskName: 'Task name',
+        taskName: 'Cronjob name',
         cronSpec: 'Lifecycle',
         cronSpecHelper: 'Enter the correct execution period',
         cleanHelper:
@@ -711,7 +712,7 @@ const message = {
         sunday: 'Sunday',
         shellContent: 'Script content',
         errRecord: 'Incorrect logging',
-        errHandle: 'Task execution failure',
+        errHandle: 'Cronjob execution failure',
         noRecord: 'The execution did not generate any logs',
         cleanData: 'Clean data',
         cleanDataHelper: 'Delete the backup file generated during this task.',
@@ -1018,7 +1019,7 @@ const message = {
         entranceInputHelper: 'When the security entry is set to blank, the security entry is cancelled.',
         randomGenerate: 'Random',
         expirationTime: 'Expiration Time',
-        unSetting: 'Not Set',
+        unSetting: 'Unset',
         noneSetting:
             'Set the expiration time for the panel password. After the expiration, you need to reset the password',
         expirationHelper: 'If the password expiration time is [0] days, the password expiration function is disabled',
@@ -1500,6 +1501,8 @@ const message = {
         acmeHelper: 'Acme account is used to apply for free certificates',
     },
     firewall: {
+        create: 'Create rule',
+        edit: 'Edit rule',
         notSupport:
             'No system firewall detected (firewalld or ufw). Please refer to the official documentation for installation.',
         ccDeny: 'CC Protection',

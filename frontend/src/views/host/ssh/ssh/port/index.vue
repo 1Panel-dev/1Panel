@@ -8,12 +8,12 @@
             size="30%"
         >
             <template #header>
-                <DrawerHeader :header="$t('ssh.port')" :back="handleClose" />
+                <DrawerHeader :header="$t('commons.table.port')" :back="handleClose" />
             </template>
             <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
-                        <el-form-item :label="$t('ssh.port')" prop="port" :rules="Rules.port">
+                        <el-form-item :label="$t('commons.table.port')" prop="port" :rules="Rules.port">
                             <el-input clearable v-model.number="form.port" />
                         </el-form-item>
                     </el-col>
@@ -63,7 +63,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         ElMessageBox.confirm(
-            i18n.global.t('ssh.sshChangeHelper', [i18n.global.t('ssh.port'), form.port]),
+            i18n.global.t('ssh.sshChangeHelper', [i18n.global.t('commons.table.port'), form.port]),
             i18n.global.t('ssh.sshChange'),
             {
                 confirmButtonText: i18n.global.t('commons.button.confirm'),

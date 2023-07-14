@@ -54,7 +54,7 @@
                     <el-col :span="1"><br /></el-col>
                     <el-col :xs="24" :sm="20" :md="20" :lg="10" :xl="10">
                         <el-form :model="form" label-position="left" ref="formRef" label-width="120px">
-                            <el-form-item :label="$t('ssh.port')" prop="port">
+                            <el-form-item :label="$t('commons.table.port')" prop="port">
                                 <el-input disabled v-model.number="form.port">
                                     <template #append>
                                         <el-button @click="onChangePort" icon="Setting">
