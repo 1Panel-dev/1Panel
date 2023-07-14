@@ -424,6 +424,10 @@ function initCharts(chartName: string, xDatas: any, yDatas: any, yTitle: string,
         },
         legend: {
             data: chartName === 'loadNetworkChart' && [i18n.global.t('monitor.up'), i18n.global.t('monitor.down')],
+            textStyle: {
+                color: '#646A73',
+            },
+            icon: 'circle',
         },
         grid: {
             left: getSideWidth(chartName == 'loadNetworkChart'),
@@ -481,6 +485,10 @@ function initLoadCharts(item: Monitor.MonitorData) {
                 '15 ' + i18n.global.t('commons.units.minute'),
                 i18n.global.t('monitor.resourceUsage'),
             ],
+            textStyle: {
+                color: '#646A73',
+            },
+            icon: 'circle',
         },
         grid: { left: '7%', right: '7%', bottom: '20%' },
         xAxis: {
@@ -638,6 +646,10 @@ function initIOCharts(item: Monitor.MonitorData) {
                 i18n.global.t('monitor.readWriteCount'),
                 i18n.global.t('monitor.readWriteTime'),
             ],
+            textStyle: {
+                color: '#646A73',
+            },
+            icon: 'circle',
         },
         grid: { left: getSideWidth(true), right: getSideWidth(true), bottom: '20%' },
         xAxis: {
