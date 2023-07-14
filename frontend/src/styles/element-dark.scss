@@ -171,7 +171,7 @@ html.dark {
         .mobile-header {
             background-color: var(--panel-main-bg-color) !important;
             border-bottom: var(--panel-border);
-						color: #ffffff;
+            color: #ffffff;
         }
     }
     .system-label {
@@ -306,7 +306,10 @@ html.dark {
         background-color: rgb(56, 59, 59);
         color: var(--el-color-warning);
     }
-		.el-dropdown-menu__item.is-disabled {
-			color: var(--panel-button-disabled);
-	  }
+    .el-dropdown-menu__item.is-disabled {
+        color: var(--panel-button-disabled);
+    }
+    .el-date-editor .el-range-separator {
+        color: var(--panel-button-disabled);
+    }
 }
