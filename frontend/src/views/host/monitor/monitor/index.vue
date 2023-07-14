@@ -37,12 +37,21 @@
                             ></el-date-picker>
                         </div>
                     </template>
-                    <div id="loadLoadChart" class="chart"></div>
+                    <div class="chart">
+                        <v-charts
+                            height="400px"
+                            id="loadLoadChart"
+                            type="line"
+                            :option="chartsOption['loadLoadChart']"
+                            v-if="chartsOption['loadLoadChart']"
+                            :dataZoom="true"
+                        />
+                    </div>
                 </el-card>
             </el-col>
         </el-row>
         <el-row :gutter="20" style="margin-top: 20px">
-            <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
+            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                 <el-card style="overflow: inherit">
                     <template #header>
                         <div :class="mobile ? 'flx-wrap' : 'flx-justify-between'">
@@ -60,10 +69,19 @@
                             ></el-date-picker>
                         </div>
                     </template>
-                    <div id="loadCPUChart" class="chart"></div>
+                    <div class="chart">
+                        <v-charts
+                            height="400px"
+                            id="loadCPUChart"
+                            type="line"
+                            :option="chartsOption['loadCPUChart']"
+                            v-if="chartsOption['loadCPUChart']"
+                            :dataZoom="true"
+                        />
+                    </div>
                 </el-card>
             </el-col>
-            <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
+            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                 <el-card style="overflow: inherit">
                     <template #header>
                         <div :class="mobile ? 'flx-wrap' : 'flx-justify-between'">
@@ -81,12 +99,21 @@
                             ></el-date-picker>
                         </div>
                     </template>
-                    <div id="loadMemoryChart" class="chart"></div>
+                    <div class="chart">
+                        <v-charts
+                            height="400px"
+                            id="loadMemoryChart"
+                            type="line"
+                            :option="chartsOption['loadMemoryChart']"
+                            v-if="chartsOption['loadMemoryChart']"
+                            :dataZoom="true"
+                        />
+                    </div>
                 </el-card>
             </el-col>
         </el-row>
         <el-row :gutter="20" style="margin-top: 20px">
-            <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
+            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                 <el-card style="overflow: inherit">
                     <template #header>
                         <div :class="mobile ? 'flx-wrap' : 'flx-justify-between'">
@@ -104,10 +131,19 @@
                             ></el-date-picker>
                         </div>
                     </template>
-                    <div id="loadIOChart" class="chart"></div>
+                    <div class="chart">
+                        <v-charts
+                            height="400px"
+                            id="loadIOChart"
+                            type="line"
+                            :option="chartsOption['loadIOChart']"
+                            v-if="chartsOption['loadIOChart']"
+                            :dataZoom="true"
+                        />
+                    </div>
                 </el-card>
             </el-col>
-            <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
+            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                 <el-card style="overflow: inherit">
                     <template #header>
                         <div :class="mobile ? 'flx-wrap' : 'flx-justify-between'">
@@ -148,7 +184,16 @@
                             ></el-date-picker>
                         </div>
                     </template>
-                    <div id="loadNetworkChart" class="chart"></div>
+                    <div class="chart">
+                        <v-charts
+                            height="400px"
+                            id="loadNetworkChart"
+                            type="line"
+                            :option="chartsOption['loadNetworkChart']"
+                            v-if="chartsOption['loadNetworkChart']"
+                            :dataZoom="true"
+                        />
+                    </div>
                 </el-card>
             </el-col>
         </el-row>
@@ -156,8 +201,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, onBeforeUnmount, computed } from 'vue';
-import * as echarts from 'echarts';
+import { ref, reactive, onMounted, computed } from 'vue';
 import { loadMonitor, getNetworkOptions } from '@/api/modules/monitor';
 import { Monitor } from '@/api/interface/monitor';
 import { computeSizeFromKBs, dateFormatWithoutYear } from '@/utils/util';
@@ -181,6 +225,8 @@ const timeRangeIO = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0))
 const timeRangeNetwork = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
 const networkChoose = ref();
 const netOptions = ref();
+const chartsOption = ref({ loadLoadChart: null, loadCPUChart: null, loadMemoryChart: null, loadNetworkChart: null });
+
 const shortcuts = [
     {
         text: i18n.global.t('monitor.today'),
@@ -287,50 +333,34 @@ const search = async (param: string) => {
                         return item.cpu.toFixed(2);
                     });
                     cpuData = cpuData.length === 0 ? loadEmptyData() : cpuData;
-                    let yDatasOfCpu = {
-                        name: 'CPU',
-                        type: 'line',
-                        areaStyle: {
-                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                                {
-                                    offset: 0,
-                                    color: 'rgba(0, 94, 235, .5)',
-                                },
-                                {
-                                    offset: 1,
-                                    color: 'rgba(0, 94, 235, 0)',
-                                },
-                            ]),
-                        },
-                        data: cpuData,
-                        showSymbol: false,
+                    chartsOption.value['loadCPUChart'] = {
+                        xDatas: baseDate,
+                        yDatas: [
+                            {
+                                name: 'CPU',
+                                data: cpuData,
+                            },
+                        ],
+
+                        formatStr: '%',
                     };
-                    initCharts('loadCPUChart', baseDate, yDatasOfCpu, 'CPU', '%');
                 }
                 if (param === 'memory' || param === 'all') {
                     let memoryData = item.value.map(function (item: any) {
                         return item.memory.toFixed(2);
                     });
                     memoryData = memoryData.length === 0 ? loadEmptyData() : memoryData;
-                    let yDatasOfMem = {
-                        name: i18n.global.t('monitor.memory'),
-                        type: 'line',
-                        areaStyle: {
-                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                                {
-                                    offset: 0,
-                                    color: 'rgba(0, 94, 235, .5)',
-                                },
-                                {
-                                    offset: 1,
-                                    color: 'rgba(0, 94, 235, 0)',
-                                },
-                            ]),
-                        },
-                        data: memoryData,
-                        showSymbol: false,
+                    chartsOption.value['loadMemoryChart'] = {
+                        xDatas: baseDate,
+                        yDatas: [
+                            {
+                                name: i18n.global.t('monitor.memory'),
+                                data: memoryData,
+                            },
+                        ],
+
+                        formatStr: '%',
                     };
-                    initCharts('loadMemoryChart', baseDate, yDatasOfMem, i18n.global.t('monitor.memory'), '%');
                 }
                 if (param === 'load' || param === 'all') {
                     initLoadCharts(item);
@@ -348,47 +378,30 @@ const search = async (param: string) => {
                     return item.up.toFixed(2);
                 });
                 networkUp = networkUp.length === 0 ? loadEmptyData() : networkUp;
-                let yDatasOfUp = {
-                    name: i18n.global.t('monitor.up'),
-                    type: 'line',
-                    areaStyle: {
-                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                            {
-                                offset: 0,
-                                color: 'rgba(0, 94, 235, .5)',
-                            },
-                            {
-                                offset: 1,
-                                color: 'rgba(0, 94, 235, 0)',
-                            },
-                        ]),
-                    },
-                    data: networkUp,
-                    showSymbol: false,
-                };
                 let networkOut = item.value.map(function (item: any) {
                     return item.down.toFixed(2);
                 });
                 networkOut = networkOut.length === 0 ? loadEmptyData() : networkOut;
-                let yDatasOfDown = {
-                    name: i18n.global.t('monitor.down'),
-                    type: 'line',
-                    areaStyle: {
-                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                            {
-                                offset: 0,
-                                color: 'rgba(27, 143, 60, .5)',
-                            },
-                            {
-                                offset: 1,
-                                color: 'rgba(27, 143, 60, 0)',
-                            },
-                        ]),
+
+                chartsOption.value['loadNetworkChart'] = {
+                    xDatas: networkDate,
+                    yDatas: [
+                        {
+                            name: i18n.global.t('monitor.up'),
+                            data: networkUp,
+                        },
+                        {
+                            name: i18n.global.t('monitor.down'),
+                            data: networkOut,
+                        },
+                    ],
+                    grid: {
+                        left: getSideWidth(true),
+                        right: getSideWidth(true),
+                        bottom: '20%',
                     },
-                    data: networkOut,
-                    showSymbol: false,
+                    formatStr: 'KB/s',
                 };
-                initCharts('loadNetworkChart', networkDate, [yDatasOfUp, yDatasOfDown], 'KB/s', 'KB/s');
         }
     }
 };
@@ -400,47 +413,6 @@ const loadNetworkOptions = async () => {
     networkChoose.value = searchInfo.info;
     search('all');
 };
-
-function initCharts(chartName: string, xDatas: any, yDatas: any, yTitle: string, formatStr: string) {
-    const lineChart = echarts.init(document.getElementById(chartName) as HTMLElement);
-    const option = {
-        zlevel: 1,
-        z: 1,
-        tooltip: {
-            trigger: 'axis',
-            formatter: function (datas: any) {
-                let res = datas[0].name + '<br/>';
-                if (chartName !== 'loadNetworkChart') {
-                    for (const item of datas) {
-                        res += item.marker + ' ' + item.seriesName + '：' + item.data + formatStr + '<br/>';
-                    }
-                } else {
-                    for (const item of datas) {
-                        res += item.marker + ' ' + item.seriesName + '：' + computeSizeFromKBs(item.data) + '<br/>';
-                    }
-                }
-                return res;
-            },
-        },
-        legend: {
-            data: chartName === 'loadNetworkChart' && [i18n.global.t('monitor.up'), i18n.global.t('monitor.down')],
-            textStyle: {
-                color: '#646A73',
-            },
-            icon: 'circle',
-        },
-        grid: {
-            left: getSideWidth(chartName == 'loadNetworkChart'),
-            right: getSideWidth(chartName == 'loadNetworkChart'),
-            bottom: '20%',
-        },
-        xAxis: { data: xDatas },
-        yAxis: { name: '( ' + formatStr + ' )', axisLabel: { fontSize: chartName == 'loadNetworkChart' ? 10 : 12 } },
-        dataZoom: [{ startValue: zoomStart.value }],
-        series: yDatas,
-    };
-    lineChart.setOption(option, true);
-}
 
 function initLoadCharts(item: Monitor.MonitorData) {
     let itemLoadDate = item.date.length === 0 ? loadEmptyDate(timeRangeLoad.value) : item.date;
@@ -463,37 +435,27 @@ function initLoadCharts(item: Monitor.MonitorData) {
         return item.loadUsage.toFixed(2);
     });
     loadUsage = loadUsage.length === 0 ? loadEmptyData() : loadUsage;
-
-    const lineChart = echarts.init(document.getElementById('loadLoadChart') as HTMLElement);
-    const option = {
-        zlevel: 1,
-        z: 1,
-        tooltip: {
-            trigger: 'axis',
-            formatter: function (datas: any) {
-                let res = datas[0].name + '<br/>';
-                for (const item of datas) {
-                    res += item.marker + ' ' + item.seriesName + '：' + item.data + '%' + '<br/>';
-                }
-                return res;
+    chartsOption.value['loadLoadChart'] = {
+        xDatas: loadDate,
+        yDatas: [
+            {
+                name: '1 ' + i18n.global.t('commons.units.minute'),
+                data: load1Data,
             },
-        },
-        legend: {
-            data: [
-                '1 ' + i18n.global.t('commons.units.minute'),
-                '5 ' + i18n.global.t('commons.units.minute'),
-                '15 ' + i18n.global.t('commons.units.minute'),
-                i18n.global.t('monitor.resourceUsage'),
-            ],
-            textStyle: {
-                color: '#646A73',
+            {
+                name: '5 ' + i18n.global.t('commons.units.minute'),
+                data: load5Data,
             },
-            icon: 'circle',
-        },
-        grid: { left: '7%', right: '7%', bottom: '20%' },
-        xAxis: {
-            data: loadDate,
-        },
+            {
+                name: '15 ' + i18n.global.t('commons.units.minute'),
+                data: load15Data,
+            },
+            {
+                name: i18n.global.t('monitor.resourceUsage'),
+                data: loadUsage,
+                yAxisIndex: 1,
+            },
+        ],
         yAxis: [
             { type: 'value', name: i18n.global.t('monitor.loadDetail') + ' ( % )' },
             {
@@ -503,84 +465,8 @@ function initLoadCharts(item: Monitor.MonitorData) {
                 alignTicks: true,
             },
         ],
-        dataZoom: [{ startValue: zoomStart.value }],
-        series: [
-            {
-                name: '1 ' + i18n.global.t('commons.units.minute'),
-                type: 'line',
-                areaStyle: {
-                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                        {
-                            offset: 0,
-                            color: 'rgba(0, 94, 235, .5)',
-                        },
-                        {
-                            offset: 1,
-                            color: 'rgba(0, 94, 235, 0)',
-                        },
-                    ]),
-                },
-                showSymbol: false,
-                data: load1Data,
-            },
-            {
-                name: '5 ' + i18n.global.t('commons.units.minute'),
-                type: 'line',
-                areaStyle: {
-                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                        {
-                            offset: 0,
-                            color: 'rgba(27, 143, 60, .5)',
-                        },
-                        {
-                            offset: 1,
-                            color: 'rgba(27, 143, 60, 0)',
-                        },
-                    ]),
-                },
-                showSymbol: false,
-                data: load5Data,
-            },
-            {
-                name: '15 ' + i18n.global.t('commons.units.minute'),
-                type: 'line',
-                areaStyle: {
-                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                        {
-                            offset: 0,
-                            color: 'rgba(249, 199, 79, .5)',
-                        },
-                        {
-                            offset: 1,
-                            color: 'rgba(249, 199, 79, 0)',
-                        },
-                    ]),
-                },
-                showSymbol: false,
-                data: load15Data,
-            },
-            {
-                name: i18n.global.t('monitor.resourceUsage'),
-                type: 'line',
-                areaStyle: {
-                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                        {
-                            offset: 0,
-                            color: 'rgba(255, 173, 177, 0.5)',
-                        },
-                        {
-                            offset: 1,
-                            color: 'rgba(255, 173, 177, 0)',
-                        },
-                    ]),
-                },
-                showSymbol: false,
-                data: loadUsage,
-                yAxisIndex: 1,
-            },
-        ],
+        formatStr: '%',
     };
-    lineChart.setOption(option, true);
 }
 
 function initIOCharts(item: Monitor.MonitorData) {
@@ -604,11 +490,28 @@ function initIOCharts(item: Monitor.MonitorData) {
         return item.time;
     });
     ioTime = ioTime.length === 0 ? loadEmptyData() : ioTime;
-
-    const lineChart = echarts.init(document.getElementById('loadIOChart') as HTMLElement);
-    const option = {
-        zlevel: 1,
-        z: 1,
+    chartsOption.value['loadIOChart'] = {
+        xDatas: ioDate,
+        yDatas: [
+            {
+                name: i18n.global.t('monitor.read'),
+                data: ioRead,
+            },
+            {
+                name: i18n.global.t('monitor.write'),
+                data: ioWrite,
+            },
+            {
+                name: i18n.global.t('monitor.readWriteCount'),
+                data: ioCount,
+                yAxisIndex: 1,
+            },
+            {
+                name: i18n.global.t('monitor.readWriteTime'),
+                data: ioTime,
+                yAxisIndex: 1,
+            },
+        ],
         tooltip: {
             trigger: 'axis',
             formatter: function (datas: any) {
@@ -639,22 +542,7 @@ function initIOCharts(item: Monitor.MonitorData) {
                 return res;
             },
         },
-        legend: {
-            data: [
-                i18n.global.t('monitor.read'),
-                i18n.global.t('monitor.write'),
-                i18n.global.t('monitor.readWriteCount'),
-                i18n.global.t('monitor.readWriteTime'),
-            ],
-            textStyle: {
-                color: '#646A73',
-            },
-            icon: 'circle',
-        },
         grid: { left: getSideWidth(true), right: getSideWidth(true), bottom: '20%' },
-        xAxis: {
-            data: ioDate,
-        },
         yAxis: [
             { type: 'value', name: '( KB/s )', axisLabel: { fontSize: 10 } },
             {
@@ -666,85 +554,7 @@ function initIOCharts(item: Monitor.MonitorData) {
                 },
             },
         ],
-        dataZoom: [{ startValue: zoomStart.value }],
-        series: [
-            {
-                name: i18n.global.t('monitor.read'),
-                type: 'line',
-                areaStyle: {
-                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                        {
-                            offset: 0,
-                            color: 'rgba(0, 94, 235, .5)',
-                        },
-                        {
-                            offset: 1,
-                            color: 'rgba(0, 94, 235, 0)',
-                        },
-                    ]),
-                },
-                showSymbol: false,
-                data: ioRead,
-            },
-            {
-                name: i18n.global.t('monitor.write'),
-                type: 'line',
-                areaStyle: {
-                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                        {
-                            offset: 0,
-                            color: 'rgba(27, 143, 60, .5)',
-                        },
-                        {
-                            offset: 1,
-                            color: 'rgba(27, 143, 60, 0)',
-                        },
-                    ]),
-                },
-                showSymbol: false,
-                data: ioWrite,
-            },
-            {
-                name: i18n.global.t('monitor.readWriteCount'),
-                type: 'line',
-                areaStyle: {
-                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                        {
-                            offset: 0,
-                            color: 'rgba(249, 199, 79, .5)',
-                        },
-                        {
-                            offset: 1,
-                            color: 'rgba(249, 199, 79, 0)',
-                        },
-                    ]),
-                },
-                showSymbol: false,
-                data: ioCount,
-                yAxisIndex: 1,
-            },
-            {
-                name: i18n.global.t('monitor.readWriteTime'),
-                type: 'line',
-                areaStyle: {
-                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                        {
-                            offset: 0,
-                            color: 'rgba(255, 173, 177, 0.5)',
-                        },
-                        {
-                            offset: 1,
-                            color: 'rgba(255, 173, 177, 0)',
-                        },
-                    ]),
-                },
-                showSymbol: false,
-                data: ioTime,
-                yAxisIndex: 1,
-            },
-        ],
     };
-    lineChart.setOption(option, true);
 }
 
 function loadEmptyDate(timeRange: any) {
@@ -763,30 +573,9 @@ function getSideWidth(b: boolean) {
     return !b || document.body.clientWidth > 1600 ? '7%' : '10%';
 }
 
-function changeChartSize() {
-    echarts.getInstanceByDom(document.getElementById('loadLoadChart') as HTMLElement)?.resize();
-    echarts.getInstanceByDom(document.getElementById('loadCPUChart') as HTMLElement)?.resize();
-    echarts.getInstanceByDom(document.getElementById('loadMemoryChart') as HTMLElement)?.resize();
-    echarts.getInstanceByDom(document.getElementById('loadIOChart') as HTMLElement)?.resize();
-    echarts.getInstanceByDom(document.getElementById('loadNetworkChart') as HTMLElement)?.resize();
-}
-
-function disposeChart() {
-    echarts.getInstanceByDom(document.getElementById('loadLoadChart') as HTMLElement)?.dispose();
-    echarts.getInstanceByDom(document.getElementById('loadCPUChart') as HTMLElement)?.dispose();
-    echarts.getInstanceByDom(document.getElementById('loadMemoryChart') as HTMLElement)?.dispose();
-    echarts.getInstanceByDom(document.getElementById('loadIOChart') as HTMLElement)?.dispose();
-    echarts.getInstanceByDom(document.getElementById('loadNetworkChart') as HTMLElement)?.dispose();
-}
-
 onMounted(() => {
     zoomStart.value = dateFormatWithoutYear(new Date(new Date().setHours(0, 0, 0, 0)));
     loadNetworkOptions();
-    window.addEventListener('resize', changeChartSize);
-});
-onBeforeUnmount(() => {
-    disposeChart();
-    window.removeEventListener('resize', changeChartSize);
 });
 </script>
 
