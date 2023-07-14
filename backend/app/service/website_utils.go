@@ -536,6 +536,10 @@ func opWebsite(website *model.Website, operate string) error {
 		if files.NewFileOp().Stat(absoluteRewritePath) {
 			server.UpdateDirective("include", []string{rewriteInclude})
 		}
+		rootIndex := path.Join("/www/sites", website.Alias, "index")
+		if website.SiteDir != "/" {
+			rootIndex = path.Join(rootIndex, website.SiteDir)
+		}
 		switch website.Type {
 		case constant.Deployment:
 			server.RemoveDirective("root", nil)
@@ -546,12 +550,11 @@ func opWebsite(website *model.Website, operate string) error {
 			proxy := fmt.Sprintf("http://127.0.0.1:%d", appInstall.HttpPort)
 			server.UpdateRootProxy([]string{proxy})
 		case constant.Static:
-			server.UpdateRoot(path.Join("/www/sites", website.Alias, "index"))
+			server.UpdateRoot(rootIndex)
 			server.UpdateRootLocation()
 		case constant.Proxy:
 			server.RemoveDirective("root", nil)
 		case constant.Runtime:
-			rootIndex := path.Join("/www/sites", website.Alias, "index")
 			server.UpdateRoot(rootIndex)
 			localPath := ""
 			if website.ProxyType == constant.RuntimeProxyUnix {
