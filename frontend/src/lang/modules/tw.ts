@@ -159,7 +159,7 @@ const message = {
             volumeName: '支持英文、數字、.-和_,長度2-30',
             complexityPassword: '請輸入長度大於 8 位且包含字母、數字、特殊字符至少兩項的密碼組合',
             commonPassword: '請輸入 6 位以上長度密碼',
-            linuxName: '長度1-30，名稱不能含有{0}等符號',
+            linuxName: '長度1-128，名稱不能含有{0}等符號',
             email: '請輸入正確的郵箱',
             number: '請輸入正確的數字',
             integer: '請輸入正確的正整數',
@@ -179,7 +179,7 @@ const message = {
             containerName: '支持字母、數字、下劃線、連字符和點,不能以連字符-或點.結尾,長度1-127',
             disableFunction: '僅支持字母和,',
             leechExts: '僅支持字母數字和,',
-            paramSimple: '支持小寫字母和數字,長度1-64',
+            paramSimple: '支持小寫字母和數字,長度 1-128',
         },
         res: {
             paramError: '請求失敗,請稍後重試!',
@@ -1530,7 +1530,7 @@ const message = {
         laddr: '源地址/端口',
         raddr: '目標地址/端口',
         stopProcess: '結束',
-        stopProcessWarn: '是否確定結束此進程 (PID:{0})？此操作不可回滾',
+        stopProcessWarn: '是否確定結束此進程 (PID:{0})？',
     },
 };
 export default {

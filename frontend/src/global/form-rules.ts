@@ -174,7 +174,7 @@ const checkLinuxName = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.linuxName', ['/\\:*?\'"<>|'])));
     } else {
-        const reg = /^[^/\\\"'|<>?*]{1,30}$/;
+        const reg = /^[^/\\\"'|<>?*]{1,128}$/;
         if (!reg.test(value) && value !== '') {
             callback(new Error(i18n.global.t('commons.rule.linuxName', ['/\\:*?\'"<>|'])));
         } else {
@@ -402,7 +402,7 @@ const checkParamSimple = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback();
     } else {
-        const reg = /^[a-z0-9][a-z0-9]{1,64}$/;
+        const reg = /^[a-z0-9][a-z0-9]{1,128}$/;
         if (!reg.test(value) && value !== '') {
             callback(new Error(i18n.global.t('commons.rule.paramSimple')));
         } else {

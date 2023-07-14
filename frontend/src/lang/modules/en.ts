@@ -159,6 +159,7 @@ const message = {
             complexityPassword:
                 'Longer than eight characters and contains at least two combinations of letters, digits, and special characters',
             commonPassword: 'Please enter a password with more than 6 characters',
+            linuxName: 'Length 1-128, the name cannot contain symbols such as {0}',
             email: 'Email format error',
             number: 'Please enter the correct number',
             integer: 'Please enter the correct positive integer',
@@ -180,7 +181,7 @@ const message = {
                 'Supports letters, numbers, underscores, hyphens and dots, cannot end with hyphen- or dot.1-127',
             disableFunction: 'Only support letters and,',
             leechExts: 'Only support letters, numbers and,',
-            paramSimple: 'Support lowercase letters and numbers, length 1-64',
+            paramSimple: 'Support lowercase letters and numbers, length 1-128',
         },
         res: {
             paramError: 'The request failed, please try again later!',
@@ -1614,7 +1615,7 @@ const message = {
         laddr: 'Source address/port',
         raddr: 'Destination address/port',
         stopProcess: 'End',
-        stopProcessWarn: 'Are you sure you want to end this process (PID:{0})? This operation cannot be rolled back',
+        stopProcessWarn: 'Are you sure you want to end this process (PID:{0})? ',
     },
 };
 
