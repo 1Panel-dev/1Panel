@@ -359,10 +359,10 @@ func (u *CronjobService) handleCutWebsiteLog(cronjob *model.Cronjob, startTime t
 				wg.Done()
 				return
 			}
-			websiteLogDir := path.Join(baseDir, website.SiteDir, "log")
+			websiteLogDir := path.Join(baseDir, website.Alias, "log")
 			srcAccessLogPath := path.Join(websiteLogDir, "access.log")
 			srcErrorLogPath := path.Join(websiteLogDir, "error.log")
-			dstLogDir := path.Join(global.CONF.System.Backup, "log", "website", website.PrimaryDomain)
+			dstLogDir := path.Join(global.CONF.System.Backup, "log", "website", website.Alias)
 			if !fileOp.Stat(dstLogDir) {
 				_ = os.MkdirAll(dstLogDir, 0755)
 			}
