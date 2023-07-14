@@ -7,7 +7,7 @@
                     :rules="rules"
                     ref="leechRef"
                     label-position="right"
-                    label-width="120px"
+                    label-width="180px"
                     class="moblie-form"
                 >
                     <el-form-item :label="$t('website.enableOrNot')">
