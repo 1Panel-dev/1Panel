@@ -306,4 +306,7 @@ html.dark {
         background-color: rgb(56, 59, 59);
         color: var(--el-color-warning);
     }
+		.el-dropdown-menu__item.is-disabled {
+			color: var(--panel-button-disabled);
+	  }
 }
