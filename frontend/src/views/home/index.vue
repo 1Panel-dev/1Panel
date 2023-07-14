@@ -126,7 +126,7 @@
 
                             <div v-if="chartOption === 'io'" style="margin-top: 40px" class="mobile-monitor-chart">
                                 <v-charts
-                                    height="305px"
+                                    height="360px"
                                     id="ioChart"
                                     type="line"
                                     :option="chartsOption['ioChart']"
@@ -136,7 +136,7 @@
                             </div>
                             <div v-if="chartOption === 'network'" style="margin-top: 40px" class="mobile-monitor-chart">
                                 <v-charts
-                                    height="305px"
+                                    height="360px"
                                     id="networkChart"
                                     type="line"
                                     :option="chartsOption['networkChart']"
