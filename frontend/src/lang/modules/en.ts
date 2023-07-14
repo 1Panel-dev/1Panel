@@ -1318,7 +1318,7 @@ const message = {
         startHelper:
             'After enabling the site, users can access the content of the site normally, do you want to continue? ',
         sitePath: 'Website Directory',
-        siteAlias: 'Site Path Name',
+        siteAlias: 'Site  Alias',
         primaryPath: 'Main directory',
         folderTitle: 'The main directory of the website mainly contains four folders',
         wafFolder: 'Firewall Rules',
@@ -1418,11 +1418,11 @@ const message = {
             'The password is asymmetrically encrypted and cannot be echoed. Editing needs to reset the password',
         antiLeech: 'Anti-leech',
         extends: 'Extension',
-        browserCache: 'browser cache',
+        browserCache: 'Cache',
         leechLog: 'Record anti-leech log',
-        accessDomain: 'Allowed domain names',
+        accessDomain: 'Allowed domains',
         leechReturn: 'Response resource',
-        noneRef: 'Allow the source to be empty',
+        noneRef: 'Allow empty source',
         disable: 'not enabled',
         disableLeechHelper: 'Whether to disable the anti-leech',
         disableLeech: 'Disable anti-leech',
@@ -1616,6 +1616,7 @@ const message = {
         raddr: 'Destination address/port',
         stopProcess: 'End',
         stopProcessWarn: 'Are you sure you want to end this process (PID:{0})? ',
+        processName: 'ProcessName',
     },
 };
 

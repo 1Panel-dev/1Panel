@@ -1531,6 +1531,7 @@ const message = {
         raddr: '目標地址/端口',
         stopProcess: '結束',
         stopProcessWarn: '是否確定結束此進程 (PID:{0})？',
+        processName: '進程名稱',
     },
 };
 export default {

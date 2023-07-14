@@ -21,7 +21,7 @@
                                 :type="activeTag === item.key ? 'primary' : ''"
                                 :plain="activeTag !== item.key"
                             >
-                                {{ item.name }}
+                                {{ language == 'zh' || language == 'tw' ? item.name : item.key }}
                             </el-button>
                         </div>
                     </div>
@@ -271,6 +271,7 @@ import { getAge } from '@/utils/util';
 import { useRouter } from 'vue-router';
 import { MsgSuccess } from '@/utils/message';
 import { toFolder } from '@/global/business';
+import { useI18n } from 'vue-i18n';
 
 const data = ref<any>();
 const loading = ref(false);
@@ -307,6 +308,8 @@ const searchReq = reactive({
 const router = useRouter();
 const activeName = ref(i18n.global.t('app.installed'));
 const mode = ref('installed');
+
+const language = useI18n().locale.value;
 
 const sync = () => {
     syncLoading.value = true;
