@@ -80,7 +80,7 @@
                     <el-table-column :label="$t('cronjob.cronSpec')" :min-width="120">
                         <template #default="{ row }">
                             <span v-if="row.specType.indexOf('N') === -1 || row.specType === 'perWeek'">
-                                {{ $t('cronjob.' + row.specType) }}
+                                {{ $t('cronjob.' + row.specType) }}&nbsp;
                             </span>
                             <span v-else>{{ $t('cronjob.per') }}</span>
                             <span v-if="row.specType === 'perMonth'">
@@ -123,7 +123,7 @@
                         </template>
                     </el-table-column>
                     <fu-table-operations
-                        width="200px"
+                        width="300px"
                         :buttons="buttons"
                         :ellipsis="10"
                         :label="$t('commons.table.operate')"
