@@ -156,7 +156,7 @@
                         :ellipsis="3"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
-                        min-width="200"
+                        min-width="300"
                         fixed="right"
                         fix
                     />
