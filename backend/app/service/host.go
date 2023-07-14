@@ -24,6 +24,8 @@ type IHostService interface {
 	Create(hostDto dto.HostOperate) (*dto.HostInfo, error)
 	Update(id uint, upMap map[string]interface{}) error
 	Delete(id []uint) error
+
+	EncryptHost(itemVal string) (string, error)
 }
 
 func NewIHostService() IHostService {
@@ -220,6 +222,28 @@ func (u *HostService) SearchForTree(search dto.SearchForTree) ([]dto.HostTree, e
 }
 
 func (u *HostService) Create(req dto.HostOperate) (*dto.HostInfo, error) {
+	var err error
+	if len(req.Password) != 0 && req.AuthMode == "password" {
+		req.Password, err = u.EncryptHost(req.Password)
+		if err != nil {
+			return nil, err
+		}
+		req.PrivateKey = ""
+		req.PassPhrase = ""
+	}
+	if len(req.PrivateKey) != 0 && req.AuthMode == "key" {
+		req.PrivateKey, err = u.EncryptHost(req.PrivateKey)
+		if err != nil {
+			return nil, err
+		}
+		if len(req.PassPhrase) != 0 {
+			req.PassPhrase, err = encrypt.StringEncrypt(req.PassPhrase)
+			if err != nil {
+				return nil, err
+			}
+		}
+		req.Password = ""
+	}
 	var host model.Host
 	if err := copier.Copy(&host, &req); err != nil {
 		return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
@@ -289,4 +313,13 @@ func (u *HostService) Delete(ids []uint) error {
 
 func (u *HostService) Update(id uint, upMap map[string]interface{}) error {
 	return hostRepo.Update(id, upMap)
+}
+
+func (u *HostService) EncryptHost(itemVal string) (string, error) {
+	privateKey, err := base64.StdEncoding.DecodeString(itemVal)
+	if err != nil {
+		return "", err
+	}
+	keyItem, err := encrypt.StringEncrypt(string(privateKey))
+	return keyItem, err
 }

@@ -1,8 +1,6 @@
 package v1
 
 import (
-	"encoding/base64"
-
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -29,44 +27,6 @@ func (b *BaseApi) CreateHost(c *gin.Context) {
 	if err := global.VALID.Struct(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
-	}
-	if req.AuthMode == "password" && len(req.Password) != 0 {
-		password, err := base64.StdEncoding.DecodeString(req.Password)
-		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-			return
-		}
-		passwordItem, err := encrypt.StringEncrypt(string(password))
-		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-			return
-		}
-		req.Password = passwordItem
-		req.PrivateKey = ""
-		req.PassPhrase = ""
-	}
-	if req.AuthMode == "key" && len(req.PrivateKey) != 0 {
-		privateKey, err := base64.StdEncoding.DecodeString(req.PrivateKey)
-		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-			return
-		}
-		keyItem, err := encrypt.StringEncrypt(string(privateKey))
-		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-			return
-		}
-		req.Password = keyItem
-
-		if len(req.PassPhrase) != 0 {
-			pass, err := encrypt.StringEncrypt(req.PassPhrase)
-			if err != nil {
-				helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-				return
-			}
-			req.PassPhrase = pass
-		}
-		req.Password = ""
 	}
 
 	host, err := hostService.Create(req)
@@ -216,40 +176,30 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	if req.AuthMode == "password" && len(req.Password) != 0 {
-		password, err := base64.StdEncoding.DecodeString(req.Password)
+	var err error
+	if len(req.Password) != 0 && req.AuthMode == "password" {
+		req.Password, err = hostService.EncryptHost(req.Password)
 		if err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 			return
 		}
-		passwordItem, err := encrypt.StringEncrypt(string(password))
-		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-			return
-		}
-		req.Password = passwordItem
+		req.PrivateKey = ""
+		req.PassPhrase = ""
 	}
-	if req.AuthMode == "key" && len(req.PrivateKey) != 0 {
-		privateKey, err := base64.StdEncoding.DecodeString(req.PrivateKey)
+	if len(req.PrivateKey) != 0 && req.AuthMode == "key" {
+		req.PrivateKey, err = hostService.EncryptHost(req.PrivateKey)
 		if err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 			return
 		}
-		keyItem, err := encrypt.StringEncrypt(string(privateKey))
-		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-			return
-		}
-		req.PrivateKey = keyItem
-
 		if len(req.PassPhrase) != 0 {
-			pass, err := encrypt.StringEncrypt(req.PassPhrase)
+			req.PassPhrase, err = encrypt.StringEncrypt(req.PassPhrase)
 			if err != nil {
 				helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 				return
 			}
-			req.PassPhrase = pass
 		}
+		req.Password = ""
 	}
 
 	upMap := make(map[string]interface{})
