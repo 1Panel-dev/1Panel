@@ -159,7 +159,7 @@ const message = {
             volumeName: '支持英文、数字、.-和_,长度2-30',
             complexityPassword: '请输入长度大于 8 位且包含字母、数字、特殊字符至少两项的密码组合',
             commonPassword: '请输入 6 位以上长度密码',
-            linuxName: '长度1-30，名称不能含有{0}等符号',
+            linuxName: '长度1-128，名称不能含有{0}等符号',
             email: '请输入正确的邮箱',
             number: '请输入正确的数字',
             integer: '请输入正确的正整数',
@@ -179,7 +179,7 @@ const message = {
             containerName: '支持字母、数字、下划线、连字符和点,不能以连字符-或点.结尾,长度1-127',
             disableFunction: '仅支持字母和,',
             leechExts: '仅支持字母数字和,',
-            paramSimple: '支持小写字母和数字,长度1-64',
+            paramSimple: '支持小写字母和数字,长度1-128',
         },
         res: {
             paramError: '请求失败,请稍后重试!',
@@ -1538,7 +1538,7 @@ const message = {
         laddr: '源地址/端口',
         raddr: '目标地址/端口',
         stopProcess: '结束',
-        stopProcessWarn: '是否确定结束此进程 (PID:{0})？此操作不可回滚',
+        stopProcessWarn: '是否确定结束此进程 (PID:{0})？',
         processName: '进程名称',
     },
 };
