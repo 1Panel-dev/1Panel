@@ -76,29 +76,29 @@ func loadDiskIO() {
 			if io2.Name == io1.Name {
 				var itemIO model.MonitorIO
 				itemIO.Name = io1.Name
-				if io2.ReadBytes != 0 && io1.ReadBytes != 0 {
+				if io2.ReadBytes != 0 && io1.ReadBytes != 0 && io2.ReadBytes > io1.ReadBytes {
 					itemIO.Read = uint64(float64(io2.ReadBytes-io1.ReadBytes) / 60)
 				}
-				if io2.WriteBytes != 0 && io1.WriteBytes != 0 {
+				if io2.WriteBytes != 0 && io1.WriteBytes != 0 && io2.WriteBytes > io1.WriteBytes {
 					itemIO.Write = uint64(float64(io2.WriteBytes-io1.WriteBytes) / 60)
 				}
 
-				if io2.ReadCount != 0 && io1.ReadCount != 0 {
+				if io2.ReadCount != 0 && io1.ReadCount != 0 && io2.ReadCount > io1.ReadCount {
 					itemIO.Count = uint64(float64(io2.ReadCount-io1.ReadCount) / 60)
 				}
 				writeCount := uint64(0)
-				if io2.WriteCount != 0 && io1.WriteCount != 0 {
+				if io2.WriteCount != 0 && io1.WriteCount != 0 && io2.WriteCount > io1.WriteCount {
 					writeCount = uint64(float64(io2.WriteCount-io1.WriteCount) / 60)
 				}
 				if writeCount > itemIO.Count {
 					itemIO.Count = writeCount
 				}
 
-				if io2.ReadTime != 0 && io1.ReadTime != 0 {
+				if io2.ReadTime != 0 && io1.ReadTime != 0 && io2.ReadTime > io1.ReadTime {
 					itemIO.Time = uint64(float64(io2.ReadTime-io1.ReadTime) / 60)
 				}
 				writeTime := uint64(0)
-				if io2.WriteTime != 0 && io1.WriteTime != 0 {
+				if io2.WriteTime != 0 && io1.WriteTime != 0 && io2.WriteTime > io1.WriteTime {
 					writeTime = uint64(float64(io2.WriteTime-io1.WriteTime) / 60)
 				}
 				if writeTime > itemIO.Time {
@@ -128,10 +128,10 @@ func loadNetIO() {
 				var itemNet model.MonitorNetwork
 				itemNet.Name = net1.Name
 
-				if net2.BytesSent != 0 && net1.BytesSent != 0 {
+				if net2.BytesSent != 0 && net1.BytesSent != 0 && net2.BytesSent > net1.BytesSent {
 					itemNet.Up = float64(net2.BytesSent-net1.BytesSent) / 1024 / 60
 				}
-				if net2.BytesRecv != 0 && net1.BytesRecv != 0 {
+				if net2.BytesRecv != 0 && net1.BytesRecv != 0 && net2.BytesRecv > net1.BytesRecv {
 					itemNet.Down = float64(net2.BytesRecv-net1.BytesRecv) / 1024 / 60
 				}
 				netList = append(netList, itemNet)
@@ -145,20 +145,12 @@ func loadNetIO() {
 			if net2.Name == net1.Name {
 				var itemNet model.MonitorNetwork
 				itemNet.Name = net1.Name
-				if net2.BytesSent != 0 && net1.BytesSent != 0 {
+				if net2.BytesSent != 0 && net1.BytesSent != 0 && net2.BytesSent > net1.BytesSent {
 					itemNet.Up = float64(net2.BytesSent-net1.BytesSent) / 1024 / 60
 				}
-				if itemNet.Up > 10485760 {
-					itemNet.Up = 0
-					global.LOG.Errorf("net2: %v, net1: %v, BytesSent: %v \n", net2.BytesSent, net1.BytesSent, float64(net2.BytesSent-net1.BytesSent)/1024/60)
-				}
 
-				if net2.BytesRecv != 0 && net1.BytesRecv != 0 {
+				if net2.BytesRecv != 0 && net1.BytesRecv != 0 && net2.BytesRecv > net1.BytesRecv {
 					itemNet.Down = float64(net2.BytesRecv-net1.BytesRecv) / 1024 / 60
-				}
-				if itemNet.Down > 10485760 {
-					itemNet.Down = 0
-					global.LOG.Errorf("net2: %v, net1: %v, BytesRecv: %v \n", net2.BytesRecv, net1.BytesRecv, float64(net2.BytesRecv-net1.BytesRecv)/1024/60)
 				}
 				netList = append(netList, itemNet)
 				break
