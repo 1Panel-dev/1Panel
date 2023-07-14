@@ -31,7 +31,7 @@ const props = defineProps({
     option: {
         type: Object,
         required: true,
-    }, // option: { title , xDatas, yDatas, formatStr, yAxis:如果是数组, grid,tooltip}
+    }, // option: { title , xDatas, yDatas, formatStr, yAxis, grid, tooltip}
 });
 
 const seriesStyle = [

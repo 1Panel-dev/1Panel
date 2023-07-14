@@ -1,3 +1,6 @@
+html {
+    font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, 微软雅黑, Arial, sans-serif;
+}
 .flx-center {
     display: flex;
     align-items: center;
@@ -122,8 +125,6 @@
     font-size: 12px;
     word-break: break-all;
     color: #8f959e;
-    transform: scale(0.9);
-    transform-origin: left;
     width: 110%;
     display: inline-block;
 }
