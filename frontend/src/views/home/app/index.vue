@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-scrollbar max-height="500px">
+        <el-scrollbar max-height="500px" class="moz-height">
             <div class="h-app-card" v-for="(app, index) in apps" :key="index">
                 <el-row :gutter="10">
                     <el-col :span="5">
@@ -117,5 +117,11 @@ defineExpose({
     margin-top: 13px;
     border: 0;
     border-top: var(--panel-border);
+}
+/* FOR MOZILLA */
+@-moz-document url-prefix() {
+    .moz-height {
+        height: 499px;
+    }
 }
 </style>
