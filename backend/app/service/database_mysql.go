@@ -17,6 +17,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	_ "github.com/go-sql-driver/mysql"
@@ -77,6 +78,10 @@ var formatMap = map[string]string{
 }
 
 func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*model.DatabaseMysql, error) {
+	if cmd.CheckIllegal(req.Name, req.Username, req.Password, req.Format, req.Permission) {
+		return nil, buserr.New(constant.ErrCmdIllegal)
+	}
+
 	if req.Username == "root" {
 		return nil, errors.New("Cannot set root as user name")
 	}
@@ -184,6 +189,10 @@ func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error 
 }
 
 func (u *MysqlService) ChangePassword(info dto.ChangeDBInfo) error {
+	if cmd.CheckIllegal(info.Value) {
+		return buserr.New(constant.ErrCmdIllegal)
+	}
+
 	var (
 		mysql model.DatabaseMysql
 		err   error
@@ -253,6 +262,9 @@ func (u *MysqlService) ChangePassword(info dto.ChangeDBInfo) error {
 }
 
 func (u *MysqlService) ChangeAccess(info dto.ChangeDBInfo) error {
+	if cmd.CheckIllegal(info.Value) {
+		return buserr.New(constant.ErrCmdIllegal)
+	}
 	var (
 		mysql model.DatabaseMysql
 		err   error

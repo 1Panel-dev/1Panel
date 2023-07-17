@@ -304,7 +304,6 @@ func OperateFirewallPort(oldPorts, newPorts []int) error {
 		return err
 	}
 	for _, port := range newPorts {
-
 		if err := client.Port(fireClient.FireInfo{Port: strconv.Itoa(port), Protocol: "tcp", Strategy: "accept"}, "add"); err != nil {
 			return err
 		}

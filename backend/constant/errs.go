@@ -42,6 +42,7 @@ var (
 	ErrTypePasswordExpired = "ErrPasswordExpired"
 	ErrNameIsExist         = "ErrNameIsExist"
 	ErrDemoEnvironment     = "ErrDemoEnvironment"
+	ErrCmdIllegal          = "ErrCmdIllegal"
 )
 
 // app
@@ -107,7 +108,6 @@ var (
 	ErrInUsed       = "ErrInUsed"
 	ErrObjectInUsed = "ErrObjectInUsed"
 	ErrPortRules    = "ErrPortRules"
-	ErrRepoConn     = "ErrRepoConn"
 )
 
 // runtime

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/1Panel-dev/1Panel/backend/buserr"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 )
 
@@ -114,6 +116,10 @@ func (f *Firewall) ListAddress() ([]FireInfo, error) {
 }
 
 func (f *Firewall) Port(port FireInfo, operation string) error {
+	if cmd.CheckIllegal(operation, port.Protocol, port.Port) {
+		return buserr.New(constant.ErrCmdIllegal)
+	}
+
 	stdout, err := cmd.Execf("firewall-cmd --zone=public --%s-port=%s/%s --permanent", operation, port.Port, port.Protocol)
 	if err != nil {
 		return fmt.Errorf("%s port failed, err: %s", operation, stdout)
@@ -122,6 +128,9 @@ func (f *Firewall) Port(port FireInfo, operation string) error {
 }
 
 func (f *Firewall) RichRules(rule FireInfo, operation string) error {
+	if cmd.CheckIllegal(operation, rule.Address, rule.Protocol, rule.Port, rule.Strategy) {
+		return buserr.New(constant.ErrCmdIllegal)
+	}
 	ruleStr := ""
 	if strings.Contains(rule.Address, "-") {
 		std, err := cmd.Execf("firewall-cmd --permanent --new-ipset=%s --type=hash:ip", rule.Address)

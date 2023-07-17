@@ -13,6 +13,7 @@ ErrNotSupportType: "系統暫不支持當前類型: {{ .detail }}"
 ErrNameIsExist: "名稱已存在"
 ErrDemoEnvironment: "演示伺服器，禁止此操作!"
 ErrCmdTimeout: "指令執行超時！"
+ErrCmdIllegal: "執行命令中存在不合法字符，請修改後重試！"
 
 #app
 ErrPortInUsed: "{{ .detail }} 端口已被佔用！"
@@ -83,7 +84,6 @@ ErrTypeOfRedis: "恢復文件類型與當前持久化方式不符，請修改後
 #container
 ErrInUsed: "{{ .detail }} 正被使用，無法刪除"
 ErrObjectInUsed: "該對象正被使用，無法刪除"
-ErrRepoConn: "倉庫資訊中存在不合法的字符"
 ErrPortRules: "端口數目不匹配，請重新輸入！"
 
 #runtime

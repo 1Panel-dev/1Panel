@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/1Panel-dev/1Panel/backend/buserr"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 )
 
@@ -131,6 +133,9 @@ func (f *Ufw) Port(port FireInfo, operation string) error {
 	default:
 		return fmt.Errorf("unsupport strategy %s", port.Strategy)
 	}
+	if cmd.CheckIllegal(port.Protocol, port.Port) {
+		return buserr.New(constant.ErrCmdIllegal)
+	}
 
 	command := fmt.Sprintf("%s %s %s", f.CmdStr, port.Strategy, port.Port)
 	if operation == "remove" {
@@ -154,6 +159,10 @@ func (f *Ufw) RichRules(rule FireInfo, operation string) error {
 		rule.Strategy = "deny"
 	default:
 		return fmt.Errorf("unsupport strategy %s", rule.Strategy)
+	}
+
+	if cmd.CheckIllegal(operation, rule.Protocol, rule.Address, rule.Port) {
+		return buserr.New(constant.ErrCmdIllegal)
 	}
 
 	ruleStr := fmt.Sprintf("%s %s ", f.CmdStr, rule.Strategy)

@@ -18,6 +18,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/docker/docker/api/types"
@@ -552,6 +553,9 @@ func (u *ContainerService) ContainerLogClean(req dto.OperationWithName) error {
 }
 
 func (u *ContainerService) ContainerLogs(wsConn *websocket.Conn, container, since, tail string, follow bool) error {
+	if cmd.CheckIllegal(container, since, tail) {
+		return buserr.New(constant.ErrCmdIllegal)
+	}
 	command := fmt.Sprintf("docker logs %s", container)
 	if tail != "0" {
 		command += " -n " + tail
