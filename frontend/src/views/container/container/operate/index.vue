@@ -439,12 +439,12 @@ const checkPortValid = () => {
     }
     for (const port of dialogData.value.rowData!.exposedPorts) {
         if (port.host.indexOf(':') !== -1) {
-            port.hostIP = port.host.split(':')[0];
+            port.hostIP = port.host.substring(0, port.host.lastIndexOf(':'));
             if (checkIpV4V6(port.hostIP)) {
                 MsgError(i18n.global.t('firewall.addressFormatError'));
                 return false;
             }
-            port.hostPort = port.host.split(':')[1];
+            port.hostPort = port.host.substring(port.host.lastIndexOf(':') + 1);
         } else {
             port.hostPort = port.host;
         }
