@@ -14,8 +14,10 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/docker/docker/api/types"
@@ -127,6 +129,9 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 }
 
 func (u *ContainerService) TestCompose(req dto.ComposeCreate) (bool, error) {
+	if cmd.CheckIllegal(req.Path) {
+		return false, buserr.New(constant.ErrCmdIllegal)
+	}
 	composeItem, _ := composeRepo.GetRecord(commonRepo.WithByName(req.Name))
 	if composeItem.ID != 0 {
 		return false, constant.ErrRecordExist
@@ -143,6 +148,9 @@ func (u *ContainerService) TestCompose(req dto.ComposeCreate) (bool, error) {
 }
 
 func (u *ContainerService) CreateCompose(req dto.ComposeCreate) (string, error) {
+	if cmd.CheckIllegal(req.Name, req.Path) {
+		return "", buserr.New(constant.ErrCmdIllegal)
+	}
 	if err := u.loadPath(&req); err != nil {
 		return "", err
 	}
@@ -177,6 +185,9 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) (string, error) 
 }
 
 func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
+	if cmd.CheckIllegal(req.Path, req.Operation) {
+		return buserr.New(constant.ErrCmdIllegal)
+	}
 	if _, err := os.Stat(req.Path); err != nil {
 		return fmt.Errorf("load file with path %s failed, %v", req.Path, err)
 	}
@@ -195,6 +206,9 @@ func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
 }
 
 func (u *ContainerService) ComposeUpdate(req dto.ComposeUpdate) error {
+	if cmd.CheckIllegal(req.Name, req.Path) {
+		return buserr.New(constant.ErrCmdIllegal)
+	}
 	if _, err := os.Stat(req.Path); err != nil {
 		return fmt.Errorf("load file with path %s failed, %v", req.Path, err)
 	}

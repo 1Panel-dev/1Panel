@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
@@ -146,6 +147,9 @@ func (u *SSHService) UpdateByFile(value string) error {
 }
 
 func (u *SSHService) GenerateSSH(req dto.GenerateSSH) error {
+	if cmd.CheckIllegal(req.EncryptionMode, req.Password) {
+		return buserr.New(constant.ErrCmdIllegal)
+	}
 	currentUser, err := user.Current()
 	if err != nil {
 		return fmt.Errorf("load current user failed, err: %v", err)

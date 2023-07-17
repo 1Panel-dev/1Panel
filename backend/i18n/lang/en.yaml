@@ -13,6 +13,7 @@ ErrNotSupportType: "The system does not support the current type: {{ .detail }}"
 ErrNameIsExist: "Name is already exist"
 ErrDemoEnvironment: "Demo server, prohibit this operation!"
 ErrCmdTimeout: "Command execution timed out！"
+ErrCmdIllegal: "The command contains illegal characters. Please modify and try again!"
 
 #app
 ErrPortInUsed: "{{ .detail }} port already in use"
@@ -83,7 +84,6 @@ ErrTypeOfRedis: "The recovery file type does not match the current persistence m
 #container 
 ErrInUsed: "{{ .detail }} is in use and cannot be deleted"
 ErrObjectInUsed: "This object is in use and cannot be deleted"
-ErrRepoConn: "The repository information contains illegal characters"
 ErrPortRules: "The number of ports does not match, please re-enter!"
 
 #runtime

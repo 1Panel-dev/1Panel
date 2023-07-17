@@ -79,7 +79,7 @@ func (u *ImageRepoService) List() ([]dto.ImageRepoOption, error) {
 
 func (u *ImageRepoService) Create(req dto.ImageRepoCreate) error {
 	if cmd.CheckIllegal(req.Username, req.Password, req.DownloadUrl) {
-		return buserr.New(constant.ErrRepoConn)
+		return buserr.New(constant.ErrCmdIllegal)
 	}
 	imageRepo, _ := imageRepoRepo.Get(commonRepo.WithByName(req.Name))
 	if imageRepo.ID != 0 {
@@ -148,7 +148,7 @@ func (u *ImageRepoService) Update(req dto.ImageRepoUpdate) error {
 		return errors.New("The default value cannot be deleted !")
 	}
 	if cmd.CheckIllegal(req.Username, req.Password, req.DownloadUrl) {
-		return buserr.New(constant.ErrRepoConn)
+		return buserr.New(constant.ErrCmdIllegal)
 	}
 	repo, err := imageRepoRepo.Get(commonRepo.WithByID(req.ID))
 	if err != nil {
