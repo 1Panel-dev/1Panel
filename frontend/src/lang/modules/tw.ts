@@ -887,6 +887,12 @@ const message = {
         belong: '歸屬地',
         local: '內網',
         remote: '外網',
+        config: '配置',
+        session: '會話',
+        loginTime: '登錄時間',
+        loginIP: '登錄IP',
+        disconnect: '斷開',
+        stopSSHWarn: '是否斷開此SSH連接',
     },
     setting: {
         all: '全部',

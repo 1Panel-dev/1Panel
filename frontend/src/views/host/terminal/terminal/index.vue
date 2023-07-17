@@ -332,9 +332,9 @@ const onConnTerminal = async (title: string, wsID: number, isLocal?: boolean) =>
         for (const tab of terminalTabs.value) {
             if (tab.title.indexOf('@127.0.0.1:') !== -1 || tab.title === i18n.global.t('terminal.localhost')) {
                 onReconnect(tab);
-                return;
             }
         }
+        return;
     }
     terminalTabs.value.push({
         index: tabIndex,
