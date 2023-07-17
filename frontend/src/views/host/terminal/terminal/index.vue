@@ -344,7 +344,7 @@ const onConnTerminal = async (title: string, wsID: number, isLocal?: boolean) =>
         latency: 0,
     });
     terminalValue.value = tabIndex;
-    if (!res.data && isLocal) {
+    if (!res.data && title === i18n.global.t('terminal.localhost')) {
         dialogRef.value!.acceptParams({ isLocal: true });
     }
     nextTick(() => {
