@@ -234,6 +234,15 @@
                     </div>
                 </el-col>
             </el-row>
+            <div class="page-button" v-if="mode === 'installed'">
+                <fu-table-pagination
+                    v-model:current-page="paginationConfig.currentPage"
+                    v-model:page-size="paginationConfig.pageSize"
+                    v-bind="paginationConfig"
+                    @change="search"
+                    :layout="'total, sizes, prev, pager, next, jumper'"
+                />
+            </div>
         </template>
     </LayoutContent>
     <Backups ref="backupRef" @close="search" />
@@ -300,7 +309,7 @@ const tags = ref<App.Tag[]>([]);
 const activeTag = ref('all');
 const searchReq = reactive({
     page: 1,
-    pageSize: 15,
+    pageSize: 20,
     name: '',
     tags: [],
     update: false,

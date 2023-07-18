@@ -61,7 +61,12 @@ func NewIAppInstalledService() IAppInstallService {
 }
 
 func (a *AppInstallService) Page(req request.AppInstalledSearch) (int64, []response.AppInstalledDTO, error) {
-	var opts []repo.DBOption
+	var (
+		opts     []repo.DBOption
+		total    int64
+		installs []model.AppInstall
+		err      error
+	)
 
 	if req.Name != "" {
 		opts = append(opts, commonRepo.WithLikeName(req.Name))
@@ -87,14 +92,24 @@ func (a *AppInstallService) Page(req request.AppInstalledSearch) (int64, []respo
 		opts = append(opts, appInstallRepo.WithAppIdsIn(appIds))
 	}
 
-	total, installs, err := appInstallRepo.Page(req.Page, req.PageSize, opts...)
-	if err != nil {
-		return 0, nil, err
+	if req.Update {
+		installs, err = appInstallRepo.ListBy(opts...)
+		if err != nil {
+			return 0, nil, err
+		}
+	} else {
+		total, installs, err = appInstallRepo.Page(req.Page, req.PageSize, opts...)
+		if err != nil {
+			return 0, nil, err
+		}
 	}
 
 	installDTOs, err := handleInstalled(installs, req.Update)
 	if err != nil {
 		return 0, nil, err
+	}
+	if req.Update {
+		total = int64(len(installDTOs))
 	}
 
 	return total, installDTOs, nil
