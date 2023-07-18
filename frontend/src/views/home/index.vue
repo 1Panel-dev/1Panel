@@ -563,6 +563,12 @@ onBeforeUnmount(() => {
 
 .h-systemInfo {
     margin-left: 18px;
+    height: 216px;
+}
+@-moz-document url-prefix() {
+    .h-systemInfo {
+        height: auto;
+    }
 }
 
 .system-label {
