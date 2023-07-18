@@ -177,7 +177,7 @@ const message = {
             nginxDoc: '僅支持英文大小寫，數字，和.',
             appName: '支持英文、數字、-和_,長度2-30,並且不能以-_開頭和結尾',
             containerName: '支持字母、數字、下劃線、連字符和點,不能以連字符-或點.結尾,長度1-127',
-            disableFunction: '僅支持字母和,',
+            disableFunction: '僅支持字母、下劃線和,',
             leechExts: '僅支持字母數字和,',
             paramSimple: '支持小寫字母和數字,長度 1-128',
         },

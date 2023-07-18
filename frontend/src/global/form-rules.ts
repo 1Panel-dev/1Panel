@@ -376,7 +376,7 @@ const checkDisableFunctions = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.disableFunction')));
     } else {
-        const reg = /^[a-zA-Z,]+$/;
+        const reg = /^[a-zA-Z_,]+$/;
         if (!reg.test(value) && value !== '') {
             callback(new Error(i18n.global.t('commons.rule.disableFunction')));
         } else {
