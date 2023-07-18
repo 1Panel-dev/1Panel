@@ -293,4 +293,10 @@ onMounted(() => {
         flex: 0 0 50%;
     }
 }
+
+.page-button {
+    float: right;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
 </style>
