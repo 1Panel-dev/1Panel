@@ -287,13 +287,6 @@ onMounted(() => {
         border: none;
     }
 }
-
-.page-button {
-    float: right;
-    margin-bottom: 10px;
-    margin-top: 10px;
-}
-
 @media only screen and (min-width: 768px) and (max-width: 1200px) {
     .app-col-12 {
         max-width: 50%;
