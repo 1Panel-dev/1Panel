@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-scrollbar height="500px" class="moz-height">
+        <el-scrollbar height="525px" class="moz-height">
             <div class="h-app-card" v-for="(app, index) in apps" :key="index">
                 <el-row :gutter="10">
                     <el-col :span="5">
@@ -88,6 +88,7 @@ defineExpose({
     cursor: pointer;
     padding: 10px 15px;
     margin-right: 10px;
+    line-height: 18px;
 
     .h-app-content {
         padding-left: 15px;
@@ -122,7 +123,7 @@ defineExpose({
 /* FOR MOZILLA */
 @-moz-document url-prefix() {
     .moz-height {
-        height: 499px;
+        height: 524px;
     }
 }
 </style>
