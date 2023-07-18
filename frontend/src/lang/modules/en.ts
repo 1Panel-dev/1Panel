@@ -179,7 +179,7 @@ const message = {
             appName: 'Support English, numbers, - and _, length 2-30, and cannot start and end with -_',
             containerName:
                 'Supports letters, numbers, underscores, hyphens and dots, cannot end with hyphen- or dot.1-127',
-            disableFunction: 'Only support letters and,',
+            disableFunction: 'Only support letters ,underscores,and,',
             leechExts: 'Only support letters, numbers and,',
             paramSimple: 'Support lowercase letters and numbers, length 1-128',
         },
