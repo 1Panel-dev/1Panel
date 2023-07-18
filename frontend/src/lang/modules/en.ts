@@ -763,6 +763,7 @@ const message = {
         fold: 'All contract',
         batchInput: 'Batch input',
         quickCommand: 'Quick command',
+        quickCommandHelper: 'Frequently used command list for quick selection at the bottom of the terminal interface',
         groupDeleteHelper:
             'After the group is removed, all connections in the group will be migrated to the default group. Confirm the information',
         command: 'Command',

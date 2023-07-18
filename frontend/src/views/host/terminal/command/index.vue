@@ -1,6 +1,9 @@
 <template>
     <div>
         <LayoutContent v-loading="loading" :title="$t('terminal.quickCommand')">
+            <template #prompt>
+                <el-alert type="info" :title="$t('terminal.quickCommandHelper')" :closable="false" />
+            </template>
             <template #toolbar>
                 <el-button type="primary" @click="onCreate()">
                     {{ $t('commons.button.create') }}{{ $t('terminal.quickCommand') }}

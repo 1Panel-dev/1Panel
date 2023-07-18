@@ -737,6 +737,7 @@ const message = {
         fold: '全部收缩',
         batchInput: '批量输入',
         quickCommand: '快速命令',
+        quickCommandHelper: '常用命令列表，用于在终端界面底部快速选择',
         groupDeleteHelper: '移除组后，组内所有连接将迁移到 default 组内，是否确认',
         command: '命令',
         addHost: '添加主机',
