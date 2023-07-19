@@ -160,4 +160,17 @@ export namespace Database {
         fileName: string;
         fileDir: string;
     }
+
+    // remote
+    export interface RemoteDBInfo {
+        id: number;
+        createdAt: Date;
+        name: string;
+        type: string;
+        address: string;
+        port: number;
+        username: string;
+        password: string;
+        description: string;
+    }
 }
