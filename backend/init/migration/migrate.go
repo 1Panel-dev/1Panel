@@ -35,6 +35,7 @@ func Init() {
 		migrations.AddMfaInterval,
 		migrations.UpdateAppDetail,
 		migrations.EncryptHostPassword,
+		migrations.AddRemoteDB,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

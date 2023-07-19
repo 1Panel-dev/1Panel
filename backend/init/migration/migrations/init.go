@@ -479,3 +479,13 @@ var EncryptHostPassword = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddRemoteDB = &gormigrate.Migration{
+	ID: "20230718-add-remote-db",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Database{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}
