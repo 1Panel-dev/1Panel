@@ -1,8 +1,9 @@
 <template>
-    <component :is="typeComponentMap[type]" :height="height" :option="option" :dataZoom="dataZoom" />
+    <component :is="typeComponentMap[type]" :height="height" :option="option" :dataZoom="dataZoom" class="v-charts" />
 </template>
 <script lang="ts" setup>
 import line from './components/Line.vue';
+import pie from './components/Pie.vue';
 defineOptions({ name: 'VCharts' });
 defineProps({
     type: {
@@ -20,5 +21,5 @@ defineProps({
     }, // { title , xDatas, yDatas, formatStr  }
 });
 
-const typeComponentMap = { line };
+const typeComponentMap = { line, pie };
 </script>
