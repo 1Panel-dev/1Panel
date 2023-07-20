@@ -1,12 +1,11 @@
 package client
 
 type DBInfo struct {
-	Type     string `json:"type"` // local remote
+	From     string `json:"from"` // local remote
 	Address  string `json:"address"`
 	Port     uint   `json:"port"`
-	UserName string `json:"userName"`
+	Username string `json:"userName"`
 	Password string `json:"password"`
-	Format   string `json:"format"`
 
 	Timeout uint `json:"timeout"` // second
 }
@@ -15,7 +14,7 @@ type CreateInfo struct {
 	Name       string `json:"name"`
 	Format     string `json:"format"`
 	Version    string `json:"version"`
-	UserName   string `json:"userName"`
+	Username   string `json:"userName"`
 	Password   string `json:"password"`
 	Permission string `json:"permission"`
 
@@ -25,7 +24,7 @@ type CreateInfo struct {
 type DeleteInfo struct {
 	Name       string `json:"name"`
 	Version    string `json:"version"`
-	UserName   string `json:"userName"`
+	Username   string `json:"userName"`
 	Permission string `json:"permission"`
 
 	ForceDelete bool `json:"forceDelete"`
@@ -35,7 +34,7 @@ type DeleteInfo struct {
 type PasswordChangeInfo struct {
 	Name       string `json:"name"`
 	Version    string `json:"version"`
-	UserName   string `json:"userName"`
+	Username   string `json:"userName"`
 	Password   string `json:"password"`
 	Permission string `json:"permission"`
 
@@ -45,7 +44,7 @@ type PasswordChangeInfo struct {
 type AccessChangeInfo struct {
 	Name          string `json:"name"`
 	Version       string `json:"version"`
-	UserName      string `json:"userName"`
+	Username      string `json:"userName"`
 	OldPermission string `json:"oldPermission"`
 	Permission    string `json:"permission"`
 

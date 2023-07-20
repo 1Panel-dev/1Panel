@@ -16,6 +16,7 @@ type MysqlDBInfo struct {
 
 type MysqlDBCreate struct {
 	Name        string `json:"name" validate:"required"`
+	From        string `json:"from" validate:"required"`
 	Format      string `json:"format" validate:"required,oneof=utf8mb4 utf8 gbk big5"`
 	Username    string `json:"username" validate:"required"`
 	Password    string `json:"password" validate:"required"`
@@ -100,6 +101,7 @@ type MysqlConfUpdateByFile struct {
 
 type ChangeDBInfo struct {
 	ID    uint   `json:"id"`
+	From  string `json:"from" validate:"required"`
 	Value string `json:"value" validate:"required"`
 }
 

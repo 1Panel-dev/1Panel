@@ -31,7 +31,7 @@ func (r *Local) Create(info CreateInfo) error {
 		return err
 	}
 
-	if err := r.CreateUser(CreateInfo{Name: info.Name, Version: info.Version, UserName: info.UserName, Permission: info.Permission, Timeout: info.Timeout}); err != nil {
+	if err := r.CreateUser(CreateInfo{Name: info.Name, Version: info.Version, Username: info.Username, Permission: info.Permission, Timeout: info.Timeout}); err != nil {
 		return err
 	}
 
@@ -44,11 +44,11 @@ func (r *Local) CreateUser(info CreateInfo) error {
 		ips := strings.Split(info.Permission, ",")
 		for _, ip := range ips {
 			if len(ip) != 0 {
-				userlist = append(userlist, fmt.Sprintf("'%s'@'%s'", info.UserName, ip))
+				userlist = append(userlist, fmt.Sprintf("'%s'@'%s'", info.Username, ip))
 			}
 		}
 	} else {
-		userlist = append(userlist, fmt.Sprintf("'%s'@'%s'", info.UserName, info.Permission))
+		userlist = append(userlist, fmt.Sprintf("'%s'@'%s'", info.Username, info.Permission))
 	}
 
 	for _, user := range userlist {
@@ -56,7 +56,7 @@ func (r *Local) CreateUser(info CreateInfo) error {
 			_ = r.Delete(DeleteInfo{
 				Name:        info.Name,
 				Version:     info.Version,
-				UserName:    info.UserName,
+				Username:    info.Username,
 				Permission:  info.Permission,
 				ForceDelete: true,
 				Timeout:     300})
@@ -76,7 +76,7 @@ func (r *Local) CreateUser(info CreateInfo) error {
 			_ = r.Delete(DeleteInfo{
 				Name:        info.Name,
 				Version:     info.Version,
-				UserName:    info.UserName,
+				Username:    info.Username,
 				Permission:  info.Permission,
 				ForceDelete: true,
 				Timeout:     300})
@@ -92,11 +92,11 @@ func (r *Local) Delete(info DeleteInfo) error {
 		ips := strings.Split(info.Permission, ",")
 		for _, ip := range ips {
 			if len(ip) != 0 {
-				userlist = append(userlist, fmt.Sprintf("'%s'@'%s'", info.UserName, ip))
+				userlist = append(userlist, fmt.Sprintf("'%s'@'%s'", info.Username, ip))
 			}
 		}
 	} else {
-		userlist = append(userlist, fmt.Sprintf("'%s'@'%s'", info.UserName, info.Permission))
+		userlist = append(userlist, fmt.Sprintf("'%s'@'%s'", info.Username, info.Permission))
 	}
 
 	for _, user := range userlist {
@@ -123,17 +123,17 @@ func (r *Local) Delete(info DeleteInfo) error {
 }
 
 func (r *Local) ChangePassword(info PasswordChangeInfo) error {
-	if info.UserName != "root" {
+	if info.Username != "root" {
 		var userlist []string
 		if strings.Contains(info.Permission, ",") {
 			ips := strings.Split(info.Permission, ",")
 			for _, ip := range ips {
 				if len(ip) != 0 {
-					userlist = append(userlist, fmt.Sprintf("'%s'@'%s'", info.UserName, ip))
+					userlist = append(userlist, fmt.Sprintf("'%s'@'%s'", info.Username, ip))
 				}
 			}
 		} else {
-			userlist = append(userlist, fmt.Sprintf("'%s'@'%s'", info.UserName, info.Permission))
+			userlist = append(userlist, fmt.Sprintf("'%s'@'%s'", info.Username, info.Permission))
 		}
 
 		for _, user := range userlist {
@@ -168,24 +168,27 @@ func (r *Local) ChangePassword(info PasswordChangeInfo) error {
 }
 
 func (r *Local) ChangeAccess(info AccessChangeInfo) error {
-	if info.UserName == "root" {
+	if info.Username == "root" {
 		info.OldPermission = "%"
 		info.Name = "*"
 	}
 	if info.Permission != info.OldPermission {
 		if err := r.Delete(DeleteInfo{
 			Version:     info.Version,
-			UserName:    info.UserName,
+			Username:    info.Username,
 			Permission:  info.OldPermission,
 			ForceDelete: true,
 			Timeout:     300}); err != nil {
 			return err
 		}
-		if info.UserName == "root" {
+		if info.Username == "root" {
 			return nil
 		}
 	}
-	if err := r.CreateUser(CreateInfo{Name: info.Name, Version: info.Version, UserName: info.UserName, Permission: info.Permission, Timeout: info.Timeout}); err != nil {
+	if err := r.CreateUser(CreateInfo{Name: info.Name, Version: info.Version, Username: info.Username, Permission: info.Permission, Timeout: info.Timeout}); err != nil {
+		return err
+	}
+	if err := r.ExecSQL("flush privileges", 300); err != nil {
 		return err
 	}
 	return nil

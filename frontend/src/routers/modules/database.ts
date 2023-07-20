@@ -28,6 +28,16 @@ const databaseRouter = {
                     },
                 },
                 {
+                    path: 'mysql/remote',
+                    name: 'MySQL-Remote',
+                    component: () => import('@/views/database/mysql/remote/index.vue'),
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/databases',
+                        requiresAuth: false,
+                    },
+                },
+                {
                     path: 'redis',
                     name: 'Redis',
                     component: () => import('@/views/database/redis/index.vue'),
