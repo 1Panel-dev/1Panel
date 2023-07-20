@@ -19,14 +19,6 @@ const props = defineProps({
         type: String,
         default: '200px',
     },
-    type: {
-        type: String,
-        default: 'line',
-    },
-    dataZoom: {
-        type: Boolean,
-        default: false,
-    },
     option: {
         type: Object,
         required: true,
