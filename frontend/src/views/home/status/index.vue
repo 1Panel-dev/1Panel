@@ -1,7 +1,7 @@
 <template>
     <el-row :gutter="10">
         <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
-            <el-popover placement="bottom" :width="300" trigger="hover">
+            <el-popover placement="bottom" :width="300" trigger="hover" v-if="chartsOption['cpu']">
                 <div>
                     <el-tooltip
                         effect="dark"
@@ -29,7 +29,13 @@
                     </el-col>
                 </el-row>
                 <template #reference>
-                    <div id="cpu" class="chartClass"></div>
+                    <v-charts
+                        height="160px"
+                        id="cpu"
+                        type="pie"
+                        :option="chartsOption['cpu']"
+                        v-if="chartsOption['cpu']"
+                    />
                 </template>
             </el-popover>
             <span class="input-help">
@@ -37,14 +43,20 @@
             </span>
         </el-col>
         <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
-            <div id="memory" class="chartClass"></div>
+            <v-charts
+                height="160px"
+                id="memory"
+                type="pie"
+                :option="chartsOption['memory']"
+                v-if="chartsOption['memory']"
+            />
             <span class="input-help">
                 ( {{ formatNumber(currentInfo.memoryUsed / 1024 / 1024) }} /
                 {{ formatNumber(currentInfo.memoryTotal / 1024 / 1024) }} ) MB
             </span>
         </el-col>
         <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
-            <el-popover placement="bottom" :width="200" trigger="hover">
+            <el-popover placement="bottom" :width="200" trigger="hover" v-if="chartsOption['load']">
                 <el-tag class="tagClass">
                     {{ $t('home.loadAverage', [1]) }}: {{ formatNumber(currentInfo.load1) }}
                 </el-tag>
@@ -55,7 +67,13 @@
                     {{ $t('home.loadAverage', [15]) }}: {{ formatNumber(currentInfo.load15) }}
                 </el-tag>
                 <template #reference>
-                    <div id="load" class="chartClass"></div>
+                    <v-charts
+                        height="160px"
+                        id="load"
+                        type="pie"
+                        :option="chartsOption['load']"
+                        v-if="chartsOption['load']"
+                    />
                 </template>
             </el-popover>
             <span class="input-help">{{ loadStatus(currentInfo.loadUsagePercent) }}</span>
@@ -71,7 +89,7 @@
             :key="index"
             v-show="showMore || index < 4"
         >
-            <el-popover placement="bottom" :width="300" trigger="hover">
+            <el-popover placement="bottom" :width="300" trigger="hover" v-if="chartsOption[`disk${index}`]">
                 <el-row :gutter="5">
                     <el-tag style="font-weight: 500">{{ $t('home.baseInfo') }}:</el-tag>
                 </el-row>
@@ -108,7 +126,13 @@
                     </el-col>
                 </el-row>
                 <template #reference>
-                    <div :id="`disk${index}`" class="chartClass"></div>
+                    <v-charts
+                        height="160px"
+                        :id="`disk${index}`"
+                        type="pie"
+                        :option="chartsOption[`disk${index}`]"
+                        v-if="chartsOption[`disk${index}`]"
+                    />
                 </template>
             </el-popover>
             <span class="input-help">{{ computeSize(item.used) }} / {{ computeSize(item.total) }}</span>
@@ -141,11 +165,7 @@
 import { Dashboard } from '@/api/interface/dashboard';
 import { computeSize } from '@/utils/util';
 import i18n from '@/lang';
-import * as echarts from 'echarts';
-import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
-
+import { nextTick, ref } from 'vue';
 const showMore = ref(true);
 
 const baseInfo = ref<Dashboard.BaseInfo>({
@@ -201,132 +221,36 @@ const currentInfo = ref<Dashboard.CurrentInfo>({
     shotTime: new Date(),
 });
 
+const chartsOption = ref({ cpu: null, memory: null, load: null });
+
 const acceptParams = (current: Dashboard.CurrentInfo, base: Dashboard.BaseInfo, isInit: boolean): void => {
     currentInfo.value = current;
     baseInfo.value = base;
-    freshChart('cpu', 'CPU', formatNumber(currentInfo.value.cpuUsedPercent));
-    freshChart('memory', i18n.global.t('monitor.memory'), formatNumber(currentInfo.value.MemoryUsedPercent));
-    freshChart('load', i18n.global.t('home.load'), formatNumber(currentInfo.value.loadUsagePercent));
+    chartsOption.value['cpu'] = {
+        title: 'CPU',
+        data: formatNumber(currentInfo.value.cpuUsedPercent),
+    };
+    chartsOption.value['memory'] = {
+        title: i18n.global.t('monitor.memory'),
+        data: formatNumber(currentInfo.value.MemoryUsedPercent),
+    };
+    chartsOption.value['load'] = {
+        title: i18n.global.t('home.load'),
+        data: formatNumber(currentInfo.value.loadUsagePercent),
+    };
     currentInfo.value.diskData = currentInfo.value.diskData || [];
     nextTick(() => {
         for (let i = 0; i < currentInfo.value.diskData.length; i++) {
             let itemPath = currentInfo.value.diskData[i].path;
             itemPath = itemPath.length > 12 ? itemPath.substring(0, 9) + '...' : itemPath;
-            freshChart('disk' + i, itemPath, formatNumber(currentInfo.value.diskData[i].usedPercent));
+            chartsOption.value['disk' + i] = {
+                title: itemPath,
+                data: formatNumber(currentInfo.value.diskData[i].usedPercent),
+            };
         }
         if (currentInfo.value.diskData.length > 5) {
             showMore.value = isInit ? false : showMore.value || false;
         }
-    });
-};
-
-const freshChart = (chartName: string, Title: string, Data: number) => {
-    let myChart = echarts.getInstanceByDom(document.getElementById(chartName) as HTMLElement);
-    if (myChart === null || myChart === undefined) {
-        myChart = echarts.init(document.getElementById(chartName) as HTMLElement);
-    }
-    const theme = globalStore.$state.themeConfig.theme || 'light';
-    let percentText = String(Data).split('.');
-    const option = {
-        title: [
-            {
-                text: `{a|${percentText[0]}.}{b|${percentText[1] || 0} %}`,
-                textStyle: {
-                    rich: {
-                        a: {
-                            fontSize: '22',
-                        },
-                        b: {
-                            fontSize: '14',
-                            padding: [5, 0, 0, 0],
-                        },
-                    },
-
-                    color: theme === 'dark' ? '#ffffff' : '#0f0f0f',
-                    lineHeight: 25,
-                    // fontSize: 20,
-                    fontWeight: 500,
-                },
-                left: '49%',
-                top: '32%',
-                subtext: Title,
-                subtextStyle: {
-                    color: theme === 'dark' ? '#BBBFC4' : '#646A73',
-                    fontSize: 13,
-                },
-                textAlign: 'center',
-            },
-        ],
-        polar: {
-            radius: ['71%', '80%'],
-            center: ['50%', '50%'],
-        },
-        angleAxis: {
-            max: 100,
-            show: false,
-        },
-        radiusAxis: {
-            type: 'category',
-            show: true,
-            axisLabel: {
-                show: false,
-            },
-            axisLine: {
-                show: false,
-            },
-            axisTick: {
-                show: false,
-            },
-        },
-        series: [
-            {
-                type: 'bar',
-                roundCap: true,
-                barWidth: 30,
-                showBackground: true,
-                coordinateSystem: 'polar',
-                backgroundStyle: {
-                    color: theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 94, 235, 0.05)',
-                },
-                color: [
-                    new echarts.graphic.LinearGradient(0, 1, 0, 0, [
-                        {
-                            offset: 0,
-                            color: 'rgba(81, 192, 255, .1)',
-                        },
-                        {
-                            offset: 1,
-                            color: '#4261F6',
-                        },
-                    ]),
-                ],
-                label: {
-                    show: false,
-                },
-                data: [Data],
-            },
-            {
-                type: 'pie',
-                radius: ['0%', '60%'],
-                center: ['50%', '50%'],
-                label: {
-                    show: false,
-                },
-                color: theme === 'dark' ? '#16191D' : '#fff',
-                data: [
-                    {
-                        value: 0,
-                        itemStyle: {
-                            shadowColor: theme === 'dark' ? '#16191D' : 'rgba(0, 94, 235, 0.1)',
-                            shadowBlur: 5,
-                        },
-                    },
-                ],
-            },
-        ],
-    };
-    nextTick(function () {
-        myChart.setOption(option, true);
     });
 };
 
@@ -347,33 +271,6 @@ function formatNumber(val: number) {
     return Number(val.toFixed(2));
 }
 
-function changeChartSize() {
-    echarts.getInstanceByDom(document.getElementById('cpu') as HTMLElement)?.resize();
-    echarts.getInstanceByDom(document.getElementById('memory') as HTMLElement)?.resize();
-    echarts.getInstanceByDom(document.getElementById('load') as HTMLElement)?.resize();
-    for (let i = 0; i < currentInfo.value.diskData.length; i++) {
-        echarts.getInstanceByDom(document.getElementById('disk' + i) as HTMLElement)?.resize();
-    }
-}
-
-function disposeChart() {
-    echarts.getInstanceByDom(document.getElementById('cpu') as HTMLElement)?.dispose();
-    echarts.getInstanceByDom(document.getElementById('memory') as HTMLElement)?.dispose();
-    echarts.getInstanceByDom(document.getElementById('load') as HTMLElement)?.dispose();
-    for (let i = 0; i < currentInfo.value.diskData.length; i++) {
-        echarts.getInstanceByDom(document.getElementById('disk' + i) as HTMLElement)?.dispose();
-    }
-}
-
-onMounted(() => {
-    window.addEventListener('resize', changeChartSize);
-});
-
-onBeforeUnmount(() => {
-    disposeChart();
-    window.removeEventListener('resize', changeChartSize);
-});
-
 defineExpose({
     acceptParams,
 });
@@ -383,10 +280,7 @@ defineExpose({
 .tagClass {
     margin-top: 3px;
 }
-.chartClass {
-    width: 100%;
-    height: 160px;
-}
+
 .buttonClass {
     margin-top: 28%;
     font-size: 14px;

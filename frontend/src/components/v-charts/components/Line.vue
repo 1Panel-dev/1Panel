@@ -1,5 +1,5 @@
 <template>
-    <div :id="id" class="v-charts" ref="chartRef" :style="{ height: height, width: width }" />
+    <div :id="id" ref="LineChartRef" :style="{ height: height, width: width }" />
 </template>
 <script lang="ts" setup>
 import { onMounted, nextTick, watch, onBeforeUnmount } from 'vue';
@@ -10,7 +10,7 @@ const globalStore = GlobalStore();
 const props = defineProps({
     id: {
         type: String,
-        default: 'VChartsId',
+        default: 'lineChartId',
     },
     width: {
         type: String,
@@ -19,10 +19,6 @@ const props = defineProps({
     height: {
         type: String,
         default: '200px',
-    },
-    type: {
-        type: String,
-        default: 'line',
     },
     dataZoom: {
         type: Boolean,
