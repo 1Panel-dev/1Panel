@@ -167,6 +167,40 @@ export namespace Database {
         createdAt: Date;
         name: string;
         type: string;
+        version: string;
+        from: string;
+        address: string;
+        port: number;
+        username: string;
+        password: string;
+        description: string;
+    }
+    export interface SearchRemoteDBPage {
+        info: string;
+        type: string;
+        page: number;
+        pageSize: number;
+        orderBy?: string;
+        order?: string;
+    }
+    export interface RemoteDBOption {
+        id: number;
+        name: string;
+        address: string;
+    }
+    export interface RemoteDBCreate {
+        name: string;
+        version: string;
+        from: string;
+        address: string;
+        port: number;
+        username: string;
+        password: string;
+        description: string;
+    }
+    export interface RemoteDBUpdate {
+        id: number;
+        version: string;
         address: string;
         port: number;
         username: string;

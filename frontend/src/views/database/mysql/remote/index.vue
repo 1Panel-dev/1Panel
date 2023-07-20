@@ -1,98 +1,181 @@
 <template>
-    <el-drawer v-model="dialogVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
-        <template #header>
-            <DrawerHeader :header="$t('database.remoteAccess')" :back="handleClose" />
-        </template>
-        <el-form @submit.prevent v-loading="loading" ref="formRef" :model="form" label-position="top">
-            <el-row type="flex" justify="center">
-                <el-col :span="22">
-                    <el-form-item :label="$t('database.remoteAccess')" :rules="Rules.requiredInput" prop="privilege">
-                        <el-switch v-model="form.privilege" />
-                        <span class="input-help">{{ $t('database.remoteConnHelper') }}</span>
-                    </el-form-item>
-                </el-col>
-            </el-row>
-        </el-form>
+    <div v-loading="loading">
+        <LayoutContent>
+            <template #title>
+                <back-button name="MySQL" :header="'MySQL ' + $t('database.remoteDB')" />
+            </template>
+            <template #toolbar>
+                <el-row>
+                    <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
+                        <el-button type="primary" @click="onOpenDialog('create')">
+                            {{ $t('database.createRemoteDB') }}
+                        </el-button>
+                    </el-col>
+                    <el-col :xs="24" :sm="4" :md="4" :lg="4" :xl="4">
+                        <div class="search-button">
+                            <el-input
+                                v-model="searchName"
+                                clearable
+                                @clear="search()"
+                                suffix-icon="Search"
+                                @keyup.enter="search()"
+                                @change="search()"
+                                :placeholder="$t('commons.button.search')"
+                            ></el-input>
+                        </div>
+                    </el-col>
+                </el-row>
+            </template>
+            <template #main>
+                <ComplexTable :pagination-config="paginationConfig" @sort-change="search" @search="search" :data="data">
+                    <el-table-column :label="$t('commons.table.name')" prop="name" sortable />
+                    <el-table-column :label="$t('database.address')" prop="address" />
+                    <el-table-column :label="$t('commons.login.username')" prop="username" />
+                    <el-table-column :label="$t('commons.login.password')" prop="password">
+                        <template #default="{ row }">
+                            <div>
+                                <span style="float: left; line-height: 25px" v-if="!row.showPassword">***********</span>
+                                <div style="cursor: pointer; float: left" v-if="!row.showPassword">
+                                    <el-icon
+                                        style="margin-left: 5px; margin-top: 3px"
+                                        @click="row.showPassword = true"
+                                        :size="16"
+                                    >
+                                        <View />
+                                    </el-icon>
+                                </div>
+                                <span style="float: left" v-if="row.showPassword">{{ row.password }}</span>
+                                <div style="cursor: pointer; float: left" v-if="row.showPassword">
+                                    <el-icon
+                                        style="margin-left: 5px; margin-top: 3px"
+                                        @click="row.showPassword = false"
+                                        :size="16"
+                                    >
+                                        <Hide />
+                                    </el-icon>
+                                </div>
+                                <div style="cursor: pointer; float: left">
+                                    <el-icon style="margin-left: 5px; margin-top: 3px" :size="16" @click="onCopy(row)">
+                                        <DocumentCopy />
+                                    </el-icon>
+                                </div>
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        prop="description"
+                        :label="$t('commons.table.description')"
+                        show-overflow-tooltip
+                    />
+                    <el-table-column
+                        prop="createdAt"
+                        :label="$t('commons.table.date')"
+                        :formatter="dateFormat"
+                        show-overflow-tooltip
+                    />
+                    <fu-table-operations
+                        width="370px"
+                        :buttons="buttons"
+                        :ellipsis="10"
+                        :label="$t('commons.table.operate')"
+                        fix
+                    />
+                </ComplexTable>
+            </template>
+        </LayoutContent>
 
-        <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmit"></ConfirmDialog>
-
-        <template #footer>
-            <span class="dialog-footer">
-                <el-button @click="dialogVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="onSave(formRef)">
-                    {{ $t('commons.button.confirm') }}
-                </el-button>
-            </span>
-        </template>
-    </el-drawer>
+        <OperateDialog ref="dialogRef" @search="search" />
+    </div>
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
-import { Rules } from '@/global/form-rules';
+import { dateFormat } from '@/utils/util';
+import { onMounted, reactive, ref } from 'vue';
+import { deleteRemoteDB, searchRemoteDBs } from '@/api/modules/database';
+import OperateDialog from '@/views/database/mysql/remote/operate/index.vue';
 import i18n from '@/lang';
-import { ElForm } from 'element-plus';
-import { updateMysqlAccess } from '@/api/modules/database';
-import ConfirmDialog from '@/components/confirm-dialog/index.vue';
-import DrawerHeader from '@/components/drawer-header/index.vue';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
+import useClipboard from 'vue-clipboard3';
+import { Database } from '@/api/interface/database';
+import { useDeleteData } from '@/hooks/use-delete-data';
+const { toClipboard } = useClipboard();
 
 const loading = ref(false);
 
-const dialogVisiable = ref(false);
-const form = reactive({
-    privilege: false,
+const dialogRef = ref();
+
+const data = ref();
+const paginationConfig = reactive({
+    currentPage: 1,
+    pageSize: 10,
+    total: 0,
 });
+const searchName = ref();
 
-const confirmDialogRef = ref();
-
-type FormInstance = InstanceType<typeof ElForm>;
-const formRef = ref<FormInstance>();
-
-interface DialogProps {
-    privilege: boolean;
-}
-
-const acceptParams = (prop: DialogProps): void => {
-    form.privilege = prop.privilege;
-    dialogVisiable.value = true;
-};
-
-const handleClose = () => {
-    dialogVisiable.value = false;
-};
-
-const onSubmit = async () => {
-    let param = {
-        id: 0,
-        value: form.privilege ? '%' : 'localhost',
+const search = async (column?: any) => {
+    let params = {
+        page: paginationConfig.currentPage,
+        pageSize: paginationConfig.pageSize,
+        info: searchName.value,
+        type: 'mysql',
+        orderBy: column?.order ? column.prop : 'created_at',
+        order: column?.order ? column.order : 'null',
     };
-    loading.value = true;
-    await updateMysqlAccess(param)
-        .then(() => {
-            loading.value = false;
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            dialogVisiable.value = false;
-        })
-        .catch(() => {
-            loading.value = false;
-        });
+    const res = await searchRemoteDBs(params);
+    data.value = res.data.items || [];
+    paginationConfig.total = res.data.total;
 };
 
-const onSave = async (formEl: FormInstance | undefined) => {
-    if (!formEl) return;
-    formEl.validate(async (valid) => {
-        if (!valid) return;
-        let params = {
-            header: i18n.global.t('database.confChange'),
-            operationInfo: i18n.global.t('database.restartNowHelper'),
-            submitInputInfo: i18n.global.t('database.restartNow'),
-        };
-        confirmDialogRef.value!.acceptParams(params);
-    });
+const onOpenDialog = async (
+    title: string,
+    rowData: Partial<Database.RemoteDBInfo> = {
+        name: '',
+        type: 'mysql',
+        version: '5.6.x',
+        address: '',
+        port: 3306,
+        username: '',
+        password: '',
+        description: '',
+    },
+) => {
+    let params = {
+        title,
+        rowData: { ...rowData },
+    };
+    dialogRef.value!.acceptParams(params);
 };
 
-defineExpose({
-    acceptParams,
+const onCopy = async (row: any) => {
+    try {
+        await toClipboard(row.password);
+        MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
+    } catch (e) {
+        MsgError(i18n.global.t('commons.msg.copyfailed'));
+    }
+};
+
+const onDelete = async (row: Database.RemoteDBInfo) => {
+    await useDeleteData(deleteRemoteDB, row.id, 'commons.msg.delete');
+    search();
+};
+
+const buttons = [
+    {
+        label: i18n.global.t('commons.button.edit'),
+        click: (row: Database.RemoteDBInfo) => {
+            onOpenDialog('edit', row);
+        },
+    },
+    {
+        label: i18n.global.t('commons.button.delete'),
+        click: (row: Database.RemoteDBInfo) => {
+            onDelete(row);
+        },
+    },
+];
+
+onMounted(() => {
+    search();
 });
 </script>

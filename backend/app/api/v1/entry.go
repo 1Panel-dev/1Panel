@@ -21,8 +21,9 @@ var (
 	imageService           = service.NewIImageService()
 	dockerService          = service.NewIDockerService()
 
-	mysqlService = service.NewIMysqlService()
-	redisService = service.NewIRedisService()
+	mysqlService    = service.NewIMysqlService()
+	remoteDBService = service.NewIRemoteDBService()
+	redisService    = service.NewIRedisService()
 
 	cronjobService = service.NewICronjobService()
 

@@ -6,22 +6,6 @@
         <el-form @submit.prevent v-loading="loading" ref="formRef" :model="form" label-position="top">
             <el-row type="flex" justify="center">
                 <el-col :span="22">
-                    <el-form-item :label="$t('database.rootPassword')" :rules="Rules.requiredInput" prop="password">
-                        <el-input type="password" show-password clearable v-model="form.password">
-                            <template #append>
-                                <el-button @click="onCopy(form.password)">{{ $t('commons.button.copy') }}</el-button>
-                                <el-divider direction="vertical" />
-                                <el-button @click="random">
-                                    {{ $t('commons.button.random') }}
-                                </el-button>
-                            </template>
-                        </el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('database.serviceName')" prop="serviceName">
-                        <el-tag>{{ form.serviceName }}</el-tag>
-                        <el-button @click="onCopy(form.serviceName)" icon="DocumentCopy" link></el-button>
-                        <span class="input-help">{{ $t('database.serviceNameHelper') }}</span>
-                    </el-form-item>
                     <el-form-item :label="$t('database.containerConn')">
                         <el-tag>
                             {{ form.serviceName + ':3306' }}
@@ -35,11 +19,30 @@
                         <el-tag>{{ $t('database.localIP') + ':' + form.port }}</el-tag>
                         <span class="input-help">{{ $t('database.remoteConnHelper2') }}</span>
                     </el-form-item>
+
+                    <el-divider border-style="dashed" />
+
+                    <el-form-item :label="$t('database.remoteAccess')" prop="privilege">
+                        <el-switch v-model="form.privilege" @change="onSaveAccess" />
+                        <span class="input-help">{{ $t('database.remoteConnHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item :label="$t('database.rootPassword')" :rules="Rules.requiredInput" prop="password">
+                        <el-input type="password" show-password clearable v-model="form.password">
+                            <template #append>
+                                <el-button @click="onCopy(form.password)">{{ $t('commons.button.copy') }}</el-button>
+                                <el-divider direction="vertical" />
+                                <el-button @click="random">
+                                    {{ $t('commons.button.random') }}
+                                </el-button>
+                            </template>
+                        </el-input>
+                    </el-form-item>
                 </el-col>
             </el-row>
         </el-form>
 
-        <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmit"></ConfirmDialog>
+        <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmit" @cancel="loadPassword"></ConfirmDialog>
+        <ConfirmDialog ref="confirmAccessDialogRef" @confirm="onSubmitAccess" @cancel="loadAccess"></ConfirmDialog>
 
         <template #footer>
             <span class="dialog-footer">
@@ -59,7 +62,7 @@ import { ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
-import { updateMysqlPassword } from '@/api/modules/database';
+import { loadRemoteAccess, updateMysqlAccess, updateMysqlPassword } from '@/api/modules/database';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { GetAppConnInfo } from '@/api/modules/app';
 import DrawerHeader from '@/components/drawer-header/index.vue';
@@ -75,10 +78,12 @@ const dialogVisiable = ref(false);
 const form = ref<App.DatabaseConnInfo>({
     password: '',
     serviceName: '',
+    privilege: false,
     port: 0,
 });
 
 const confirmDialogRef = ref();
+const confirmAccessDialogRef = ref();
 
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
@@ -86,6 +91,7 @@ const formRef = ref<FormInstance>();
 const acceptParams = (): void => {
     form.value.password = '';
     loadPassword();
+    loadAccess();
     dialogVisiable.value = true;
 };
 
@@ -104,6 +110,11 @@ const onCopy = async (value: string) => {
 
 const handleClose = () => {
     dialogVisiable.value = false;
+};
+
+const loadAccess = async () => {
+    const res = await loadRemoteAccess();
+    form.value.privilege = res.data;
 };
 
 const loadPassword = async () => {
@@ -139,6 +150,32 @@ const onSave = async (formEl: FormInstance | undefined) => {
         };
         confirmDialogRef.value!.acceptParams(params);
     });
+};
+
+const onSubmitAccess = async () => {
+    let param = {
+        id: 0,
+        value: form.value.privilege ? '%' : 'localhost',
+    };
+    loading.value = true;
+    await updateMysqlAccess(param)
+        .then(() => {
+            loading.value = false;
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            dialogVisiable.value = false;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
+};
+
+const onSaveAccess = () => {
+    let params = {
+        header: i18n.global.t('database.confChange'),
+        operationInfo: i18n.global.t('database.restartNowHelper'),
+        submitInputInfo: i18n.global.t('database.restartNow'),
+    };
+    confirmAccessDialogRef.value!.acceptParams(params);
 };
 
 defineExpose({

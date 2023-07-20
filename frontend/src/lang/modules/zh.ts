@@ -330,6 +330,13 @@ const message = {
 
         confChange: '配置修改',
 
+        remoteDB: '远程数据库',
+        createRemoteDB: '创建远程数据库',
+        editRemoteDB: '编辑远程数据库',
+        localDB: '本地数据库',
+        address: '数据库地址',
+        version: '数据库版本',
+
         selectFile: '选择文件',
         dropHelper: '将上传文件拖拽到此处，或者',
         clickHelper: '点击上传',

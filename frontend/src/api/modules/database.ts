@@ -85,13 +85,16 @@ export const updateRedisConfByFile = (params: Database.RedisConfUpdateByFile) =>
 };
 
 // remote
-export const searchRemoteDBs = (params: SearchWithPage) => {
+export const searchRemoteDBs = (params: Database.SearchRemoteDBPage) => {
     return http.post<ResPage<Database.RemoteDBInfo>>(`/databases/remote/search`, params);
 };
-export const addRemoteDB = (params: Database.RemoteDBInfo) => {
+export const listRemoteDBs = (type: string) => {
+    return http.get<Array<Database.RemoteDBOption>>(`/databases/remote/list/${type}`);
+};
+export const addRemoteDB = (params: Database.RemoteDBCreate) => {
     return http.post(`/databases/remote`, params);
 };
-export const editRemoteDB = (params: Database.RemoteDBInfo) => {
+export const editRemoteDB = (params: Database.RemoteDBUpdate) => {
     return http.post(`/databases/remote/update`, params);
 };
 export const deleteRemoteDB = (id: number) => {

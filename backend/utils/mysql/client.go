@@ -22,19 +22,22 @@ type MysqlClient interface {
 }
 
 func NewMysqlClient(conn client.DBInfo) (MysqlClient, error) {
-	if conn.Type == "remote" {
-		connArgs := fmt.Sprintf("%s:%s@tcp(%s:%d)/?charset=utf8", conn.UserName, conn.Password, conn.Address, conn.Port)
+	if conn.From == "remote" {
+		connArgs := fmt.Sprintf("%s:%s@tcp(%s:%d)/?charset=utf8", conn.Username, conn.Password, conn.Address, conn.Port)
 		db, err := sql.Open("mysql", connArgs)
 		if err != nil {
 			return nil, err
 		}
+		if err := db.Ping(); err != nil {
+			return nil, err
+		}
 		return client.NewRemote(db), nil
 	}
-	if conn.Type == "local" {
-		if cmd.CheckIllegal(conn.Address, conn.UserName, conn.Password) {
+	if conn.From == "local" {
+		if cmd.CheckIllegal(conn.Address, conn.Username, conn.Password) {
 			return nil, buserr.New(constant.ErrCmdIllegal)
 		}
-		connArgs := []string{"exec", conn.Address, "mysql", "-u" + conn.UserName, "-p" + conn.Password + "-e"}
+		connArgs := []string{"exec", conn.Address, "mysql", "-u" + conn.Username, "-p" + conn.Password + "-e"}
 		return client.NewLocal(connArgs, conn.Address), nil
 	}
 	return nil, errors.New("no such type")

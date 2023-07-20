@@ -20,8 +20,8 @@
                         <el-button @click="onChangeRootPassword" type="primary" plain>
                             {{ $t('database.databaseConnInfo') }}
                         </el-button>
-                        <el-button @click="onChangeAccess" type="primary" plain>
-                            {{ $t('database.remoteAccess') }}
+                        <el-button @click="goRemoteDB" type="primary" plain>
+                            {{ $t('database.remoteDB') }}
                         </el-button>
                         <el-button @click="goDashboard" icon="Position" type="primary" plain>phpMyAdmin</el-button>
                     </el-col>
@@ -134,7 +134,6 @@
 
         <PasswordDialog ref="passwordRef" @search="search" />
         <RootPasswordDialog ref="rootPasswordRef" />
-        <RemoteAccessDialog ref="remoteAccessRef" />
         <UploadDialog ref="uploadRef" />
         <OperateDialog @search="search" ref="dialogRef" />
         <Backups ref="dialogBackupRef" />
@@ -151,7 +150,6 @@ import OperateDialog from '@/views/database/mysql/create/index.vue';
 import DeleteDialog from '@/views/database/mysql/delete/index.vue';
 import PasswordDialog from '@/views/database/mysql/password/index.vue';
 import RootPasswordDialog from '@/views/database/mysql/root-password/index.vue';
-import RemoteAccessDialog from '@/views/database/mysql/remote/index.vue';
 import AppResources from '@/views/database/mysql/check/index.vue';
 import Setting from '@/views/database/mysql/setting/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
@@ -160,7 +158,7 @@ import UploadDialog from '@/components/upload/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import { dateFormat } from '@/utils/util';
 import { reactive, ref } from 'vue';
-import { deleteCheckMysqlDB, loadRemoteAccess, searchMysqlDBs, updateMysqlDescription } from '@/api/modules/database';
+import { deleteCheckMysqlDB, searchMysqlDBs, updateMysqlDescription } from '@/api/modules/database';
 import i18n from '@/lang';
 import { Database } from '@/api/interface/database';
 import { App } from '@/api/interface/app';
@@ -222,13 +220,8 @@ const onChangeRootPassword = async () => {
     rootPasswordRef.value!.acceptParams();
 };
 
-const remoteAccessRef = ref();
-const onChangeAccess = async () => {
-    const res = await loadRemoteAccess();
-    let param = {
-        privilege: res.data,
-    };
-    remoteAccessRef.value!.acceptParams(param);
+const goRemoteDB = async () => {
+    router.push({ name: 'MySQL-Remote' });
 };
 
 const passwordRef = ref();
