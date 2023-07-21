@@ -2618,6 +2618,55 @@ definitions:
     - name
     - websiteID
     type: object
+  request.NginxRedirectReq:
+    properties:
+      domains:
+        items:
+          type: string
+        type: array
+      enable:
+        type: boolean
+      keepPath:
+        type: boolean
+      name:
+        type: string
+      operate:
+        type: string
+      path:
+        type: string
+      redirect:
+        type: string
+      redirectRoot:
+        type: boolean
+      target:
+        type: string
+      type:
+        type: string
+      websiteID:
+        type: integer
+    required:
+    - enable
+    - keepPath
+    - name
+    - operate
+    - redirect
+    - target
+    - type
+    - websiteID
+    type: object
+  request.NginxRedirectUpdate:
+    properties:
+      content:
+        type: string
+      name:
+        type: string
+      websiteID:
+        type: integer
+    required:
+    - content
+    - name
+    - websiteID
+    type: object
   request.NginxRewriteReq:
     properties:
       name:
@@ -9910,6 +9959,92 @@ paths:
         - websiteID
         formatEN: Nginx conf proxy file update [domain]
         formatZH: 更新反向代理文件 [domain]
+        paramKeys: []
+  /websites/redirect:
+    post:
+      consumes:
+      - application/json
+      description: 获取重定向配置
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteProxyReq'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Get proxy conf
+      tags:
+      - Website
+  /websites/redirect/file:
+    post:
+      consumes:
+      - application/json
+      description: 更新重定向文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.NginxRedirectUpdate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update redirect file
+      tags:
+      - Website
+      x-panel-log:
+        BeforeFuntions:
+        - db: websites
+          input_column: id
+          input_value: websiteID
+          isList: false
+          output_column: primary_domain
+          output_value: domain
+        bodyKeys:
+        - websiteID
+        formatEN: Nginx conf redirect file update [domain]
+        formatZH: 更新重定向文件 [domain]
+        paramKeys: []
+  /websites/redirect/update:
+    post:
+      consumes:
+      - application/json
+      description: 修改重定向配置
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.NginxRedirectReq'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update redirect conf
+      tags:
+      - Website
+      x-panel-log:
+        BeforeFuntions:
+        - db: websites
+          input_column: id
+          input_value: websiteID
+          isList: false
+          output_column: primary_domain
+          output_value: domain
+        bodyKeys:
+        - websiteID
+        formatEN: Update domain [domain] redirect config
+        formatZH: '修改网站 [domain] 重定向理配置 '
         paramKeys: []
   /websites/rewrite:
     post:

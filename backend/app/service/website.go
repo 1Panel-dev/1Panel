@@ -79,6 +79,9 @@ type IWebsiteService interface {
 	UpdateAuthBasic(req request.NginxAuthUpdate) (err error)
 	GetAntiLeech(id uint) (*response.NginxAntiLeechRes, error)
 	UpdateAntiLeech(req request.NginxAntiLeechUpdate) (err error)
+	OperateRedirect(req request.NginxRedirectReq) (err error)
+	GetRedirect(id uint) (res []response.NginxRedirectConfig, err error)
+	UpdateRedirectFile(req request.NginxRedirectUpdate) (err error)
 }
 
 func NewIWebsiteService() IWebsiteService {
@@ -1690,7 +1693,7 @@ func (w WebsiteService) UpdateAntiLeech(req request.NginxAntiLeechUpdate) (err e
 		return
 	}
 	fileOp := files.NewFileOp()
-	backpContent, err := fileOp.GetContent(nginxFull.SiteConfig.Config.FilePath)
+	backupContent, err := fileOp.GetContent(nginxFull.SiteConfig.Config.FilePath)
 	if err != nil {
 		return
 	}
@@ -1761,7 +1764,7 @@ func (w WebsiteService) UpdateAntiLeech(req request.NginxAntiLeechUpdate) (err e
 		return
 	}
 	if err = updateNginxConfig(constant.NginxScopeServer, nil, &website); err != nil {
-		_ = fileOp.WriteFile(nginxFull.SiteConfig.Config.FilePath, bytes.NewReader(backpContent), 0755)
+		_ = fileOp.WriteFile(nginxFull.SiteConfig.Config.FilePath, bytes.NewReader(backupContent), 0755)
 		return
 	}
 	return
@@ -1843,4 +1846,321 @@ func (w WebsiteService) GetAntiLeech(id uint) (*response.NginxAntiLeechRes, erro
 		}
 	}
 	return res, nil
+}
+
+func (w WebsiteService) OperateRedirect(req request.NginxRedirectReq) (err error) {
+	var (
+		website      model.Website
+		nginxInstall model.AppInstall
+		oldContent   []byte
+	)
+
+	website, err = websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	if err != nil {
+		return err
+	}
+	nginxInstall, err = getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return
+	}
+	includeDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "redirect")
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(includeDir) {
+		_ = fileOp.CreateDir(includeDir, 0755)
+	}
+	fileName := fmt.Sprintf("%s.conf", req.Name)
+	includePath := path.Join(includeDir, fileName)
+	backName := fmt.Sprintf("%s.bak", req.Name)
+	backPath := path.Join(includeDir, backName)
+
+	if req.Operate == "create" && (fileOp.Stat(includePath) || fileOp.Stat(backPath)) {
+		err = buserr.New(constant.ErrNameIsExist)
+		return
+	}
+
+	defer func() {
+		if err != nil {
+			switch req.Operate {
+			case "create":
+				_ = fileOp.DeleteFile(includePath)
+			case "edit":
+				_ = fileOp.WriteFile(includePath, bytes.NewReader(oldContent), 0755)
+			}
+		}
+	}()
+
+	var (
+		config *components.Config
+		oldPar *parser.Parser
+	)
+
+	switch req.Operate {
+	case "create":
+		config = &components.Config{}
+	case "edit":
+		oldPar, err = parser.NewParser(includePath)
+		if err != nil {
+			return
+		}
+		config = oldPar.Parse()
+		oldContent, err = fileOp.GetContent(includePath)
+		if err != nil {
+			return
+		}
+	case "delete":
+		_ = fileOp.DeleteFile(includePath)
+		_ = fileOp.DeleteFile(backPath)
+		return updateNginxConfig(constant.NginxScopeServer, nil, &website)
+	case "disable":
+		_ = fileOp.Rename(includePath, backPath)
+		return updateNginxConfig(constant.NginxScopeServer, nil, &website)
+	case "enable":
+		_ = fileOp.Rename(backPath, includePath)
+		return updateNginxConfig(constant.NginxScopeServer, nil, &website)
+	}
+
+	target := req.Target
+	block := &components.Block{}
+
+	switch req.Type {
+	case "path":
+		if req.KeepPath {
+			target = req.Target + "$1"
+		}
+		redirectKey := "permanent"
+		if req.Redirect == "302" {
+			redirectKey = "redirect"
+		}
+		block = &components.Block{
+			Directives: []components.IDirective{
+				&components.Directive{
+					Name:       "rewrite",
+					Parameters: []string{fmt.Sprintf("^%s(.*)", req.Path), target, redirectKey},
+				},
+			},
+		}
+	case "domain":
+		if req.KeepPath {
+			target = req.Target + "$request_uri"
+		}
+		returnBlock := &components.Block{
+			Directives: []components.IDirective{
+				&components.Directive{
+					Name:       "return",
+					Parameters: []string{req.Redirect, target},
+				},
+			},
+		}
+		for _, domain := range req.Domains {
+			block.Directives = append(block.Directives, &components.Directive{
+				Name:       "if",
+				Parameters: []string{"($host", "~", fmt.Sprintf("'^%s')", domain)},
+				Block:      returnBlock,
+			})
+		}
+	case "404":
+		if req.KeepPath && !req.RedirectRoot {
+			target = req.Target + "$request_uri"
+		}
+		if req.RedirectRoot {
+			target = "/"
+		} else {
+			if req.KeepPath {
+				target = req.Target + "$request_uri"
+			}
+		}
+		block = &components.Block{
+			Directives: []components.IDirective{
+				&components.Directive{
+					Name:       "error_page",
+					Parameters: []string{"404", "=", "@notfound"},
+				},
+				&components.Directive{
+					Name:       "location",
+					Parameters: []string{"@notfound"},
+					Block: &components.Block{
+						Directives: []components.IDirective{
+							&components.Directive{
+								Name:       "return",
+								Parameters: []string{"301", target},
+							},
+						},
+					},
+				},
+			},
+		}
+	}
+	config.FilePath = includePath
+	config.Block = block
+
+	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+		return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
+	}
+
+	nginxInclude := fmt.Sprintf("/www/sites/%s/redirect/*.conf", website.Alias)
+	if err = updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: "include", Params: []string{nginxInclude}}}, &website); err != nil {
+		return
+	}
+	return
+}
+
+func (w WebsiteService) GetRedirect(id uint) (res []response.NginxRedirectConfig, err error) {
+	var (
+		website      model.Website
+		nginxInstall model.AppInstall
+		fileList     response.FileInfo
+	)
+	website, err = websiteRepo.GetFirst(commonRepo.WithByID(id))
+	if err != nil {
+		return
+	}
+	nginxInstall, err = getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return
+	}
+	includeDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "redirect")
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(includeDir) {
+		return
+	}
+	fileList, err = NewIFileService().GetFileList(request.FileOption{FileOption: files.FileOption{Path: includeDir, Expand: true, Page: 1, PageSize: 100}})
+	if len(fileList.Items) == 0 {
+		return
+	}
+	var (
+		content []byte
+		config  *components.Config
+	)
+	for _, configFile := range fileList.Items {
+		redirectConfig := response.NginxRedirectConfig{
+			WebsiteID: website.ID,
+		}
+		parts := strings.Split(configFile.Name, ".")
+		redirectConfig.Name = parts[0]
+		if parts[1] == "conf" {
+			redirectConfig.Enable = true
+		} else {
+			redirectConfig.Enable = false
+		}
+		redirectConfig.FilePath = configFile.Path
+		content, err = fileOp.GetContent(configFile.Path)
+		if err != nil {
+			return
+		}
+		redirectConfig.Content = string(content)
+		config = parser.NewStringParser(string(content)).Parse()
+
+		dirs := config.GetDirectives()
+		if len(dirs) > 0 {
+			firstName := dirs[0].GetName()
+			switch firstName {
+			case "if":
+				for _, ifDir := range dirs {
+					params := ifDir.GetParameters()
+					if len(params) > 2 && params[0] == "($host" {
+						domain := strings.Trim(strings.Trim(params[2], "'"), "^")
+						redirectConfig.Domains = append(redirectConfig.Domains, domain)
+						if len(redirectConfig.Domains) > 1 {
+							continue
+						}
+						redirectConfig.Type = "domain"
+					}
+					childDirs := ifDir.GetBlock().GetDirectives()
+					for _, dir := range childDirs {
+						if dir.GetName() == "return" {
+							dirParams := dir.GetParameters()
+							if len(dirParams) > 1 {
+								redirectConfig.Redirect = dirParams[0]
+								if strings.HasSuffix(dirParams[1], "$request_uri") {
+									redirectConfig.KeepPath = true
+									redirectConfig.Target = strings.TrimSuffix(dirParams[1], "$request_uri")
+								} else {
+									redirectConfig.KeepPath = false
+									redirectConfig.Target = dirParams[1]
+								}
+							}
+						}
+					}
+				}
+			case "rewrite":
+				redirectConfig.Type = "path"
+				for _, pathDir := range dirs {
+					if pathDir.GetName() == "rewrite" {
+						params := pathDir.GetParameters()
+						if len(params) > 2 {
+							redirectConfig.Path = strings.Trim(strings.Trim(params[0], "^"), "(.*)")
+							if strings.HasSuffix(params[1], "$1") {
+								redirectConfig.KeepPath = true
+								redirectConfig.Target = strings.TrimSuffix(params[1], "$1")
+							} else {
+								redirectConfig.KeepPath = false
+								redirectConfig.Target = params[1]
+							}
+							if params[2] == "permanent" {
+								redirectConfig.Redirect = "301"
+							} else {
+								redirectConfig.Redirect = "302"
+							}
+						}
+					}
+				}
+			case "error_page":
+				redirectConfig.Type = "404"
+				for _, errDir := range dirs {
+					if errDir.GetName() == "location" {
+						childDirs := errDir.GetBlock().GetDirectives()
+						for _, dir := range childDirs {
+							if dir.GetName() == "return" {
+								dirParams := dir.GetParameters()
+								if len(dirParams) > 1 {
+									redirectConfig.Redirect = dirParams[0]
+									if strings.HasSuffix(dirParams[1], "$request_uri") {
+										redirectConfig.KeepPath = true
+										redirectConfig.Target = strings.TrimSuffix(dirParams[1], "$request_uri")
+									} else {
+										redirectConfig.KeepPath = false
+										redirectConfig.Target = dirParams[1]
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		res = append(res, redirectConfig)
+	}
+	return
+}
+
+func (w WebsiteService) UpdateRedirectFile(req request.NginxRedirectUpdate) (err error) {
+	var (
+		website           model.Website
+		nginxFull         dto.NginxFull
+		oldRewriteContent []byte
+	)
+	website, err = websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	if err != nil {
+		return err
+	}
+	nginxFull, err = getNginxFull(&website)
+	if err != nil {
+		return err
+	}
+	includePath := fmt.Sprintf("/www/sites/%s/redirect/%s.conf", website.Alias, req.Name)
+	absolutePath := path.Join(nginxFull.Install.GetPath(), includePath)
+	fileOp := files.NewFileOp()
+	oldRewriteContent, err = fileOp.GetContent(absolutePath)
+	if err != nil {
+		return err
+	}
+	if err = fileOp.WriteFile(absolutePath, strings.NewReader(req.Content), 0755); err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			_ = fileOp.WriteFile(absolutePath, bytes.NewReader(oldRewriteContent), 0755)
+		}
+	}()
+	return updateNginxConfig(constant.NginxScopeServer, nil, &website)
 }

@@ -9990,6 +9990,141 @@
                 }
             }
         },
+        "/websites/redirect": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取重定向配置",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Website"
+                ],
+                "summary": "Get proxy conf",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.WebsiteProxyReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/websites/redirect/file": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新重定向文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Website"
+                ],
+                "summary": "Update redirect file",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.NginxRedirectUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [
+                        {
+                            "db": "websites",
+                            "input_column": "id",
+                            "input_value": "websiteID",
+                            "isList": false,
+                            "output_column": "primary_domain",
+                            "output_value": "domain"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "websiteID"
+                    ],
+                    "formatEN": "Nginx conf redirect file update [domain]",
+                    "formatZH": "更新重定向文件 [domain]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/websites/redirect/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "修改重定向配置",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Website"
+                ],
+                "summary": "Update redirect conf",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.NginxRedirectReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [
+                        {
+                            "db": "websites",
+                            "input_column": "id",
+                            "input_value": "websiteID",
+                            "isList": false,
+                            "output_column": "primary_domain",
+                            "output_value": "domain"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "websiteID"
+                    ],
+                    "formatEN": "Update domain [domain] redirect config",
+                    "formatZH": "修改网站 [domain] 重定向理配置 ",
+                    "paramKeys": []
+                }
+            }
+        },
         "/websites/rewrite": {
             "post": {
                 "security": [
@@ -14469,6 +14604,76 @@
             }
         },
         "request.NginxProxyUpdate": {
+            "type": "object",
+            "required": [
+                "content",
+                "name",
+                "websiteID"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "websiteID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "request.NginxRedirectReq": {
+            "type": "object",
+            "required": [
+                "enable",
+                "keepPath",
+                "name",
+                "operate",
+                "redirect",
+                "target",
+                "type",
+                "websiteID"
+            ],
+            "properties": {
+                "domains": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "enable": {
+                    "type": "boolean"
+                },
+                "keepPath": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "operate": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "redirect": {
+                    "type": "string"
+                },
+                "redirectRoot": {
+                    "type": "boolean"
+                },
+                "target": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "websiteID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "request.NginxRedirectUpdate": {
             "type": "object",
             "required": [
                 "content",

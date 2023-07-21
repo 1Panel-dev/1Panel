@@ -214,3 +214,15 @@ export const GetAntiLeech = (req: Website.LeechReq) => {
 export const UpdateAntiLeech = (req: Website.LeechConfig) => {
     return http.post<any>(`/websites/leech/update`, req);
 };
+
+export const GetRedirectConfig = (req: Website.WebsiteReq) => {
+    return http.post<Website.RedirectConfig[]>(`/websites/redirect`, req);
+};
+
+export const OperateRedirectConfig = (req: Website.WebsiteReq) => {
+    return http.post<any>(`/websites/redirect/update`, req);
+};
+
+export const UpdateRedirectConfigFile = (req: Website.RedirectFileUpdate) => {
+    return http.post<any>(`/websites/redirect/file`, req);
+};

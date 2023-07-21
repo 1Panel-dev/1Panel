@@ -34,3 +34,17 @@ type NginxAntiLeechRes struct {
 	LogEnable   bool     `json:"logEnable"`
 	Blocked     bool     `json:"blocked"`
 }
+
+type NginxRedirectConfig struct {
+	WebsiteID uint     `json:"websiteID"`
+	Name      string   `json:"name"`
+	Domains   []string `json:"domains"`
+	KeepPath  bool     `json:"keepPath"`
+	Enable    bool     `json:"enable"`
+	Type      string   `json:"type"`
+	Redirect  string   `json:"redirect"`
+	Path      string   `json:"path"`
+	Target    string   `json:"target"`
+	FilePath  string   `json:"filePath"`
+	Content   string   `json:"content"`
+}
