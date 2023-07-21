@@ -68,7 +68,11 @@ func (b *BaseApi) SearchRemoteDB(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Router /databases/remote/list/:type [get]
 func (b *BaseApi) ListRemoteDB(c *gin.Context) {
-	dbType := c.Query("type")
+	dbType, err := helper.GetStrParamByKey(c, "type")
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
 	list, err := remoteDBService.List(dbType)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)

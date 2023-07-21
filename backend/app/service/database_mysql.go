@@ -122,10 +122,15 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 	if err != nil {
 		return nil, err
 	}
+	defer cli.Close()
 	if err := cli.Create(client.CreateInfo{
-		Name:    req.Name,
-		Format:  req.Format,
-		Version: version,
+		Name:       req.Name,
+		Format:     req.Format,
+		Username:   req.Username,
+		Password:   req.Password,
+		Permission: req.Permission,
+		Version:    version,
+		Timeout:    300,
 	}); err != nil {
 		return nil, err
 	}
@@ -168,6 +173,7 @@ func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error 
 	if err != nil {
 		return err
 	}
+	defer cli.Close()
 	db, err := mysqlRepo.Get(commonRepo.WithByID(req.ID))
 	if err != nil && !req.ForceDelete {
 		return err
@@ -216,6 +222,7 @@ func (u *MysqlService) ChangePassword(info dto.ChangeDBInfo) error {
 	if err != nil {
 		return err
 	}
+	defer cli.Close()
 	var (
 		mysqlData    model.DatabaseMysql
 		passwordInfo client.PasswordChangeInfo
@@ -278,6 +285,7 @@ func (u *MysqlService) ChangeAccess(info dto.ChangeDBInfo) error {
 	if err != nil {
 		return err
 	}
+	defer cli.Close()
 	var (
 		mysqlData  model.DatabaseMysql
 		accessInfo client.AccessChangeInfo
@@ -293,6 +301,7 @@ func (u *MysqlService) ChangeAccess(info dto.ChangeDBInfo) error {
 		}
 		accessInfo.Name = mysqlData.Name
 		accessInfo.Username = mysqlData.Username
+		accessInfo.Password = mysqlData.Password
 		accessInfo.OldPermission = mysqlData.Permission
 	} else {
 		accessInfo.Username = "root"
@@ -544,14 +553,17 @@ func loadClientByID(id uint) (mysql.MysqlClient, string, error) {
 		version   string
 		err       error
 	)
+
+	dbInfo.From = "local"
 	if id != 0 {
 		mysqlData, err = mysqlRepo.Get(commonRepo.WithByID(id))
 		if err != nil {
 			return nil, "", err
 		}
+		dbInfo.From = mysqlData.From
 	}
 
-	if mysqlData.From != "local" {
+	if dbInfo.From != "local" {
 		databaseItem, err := remoteDBRepo.Get(commonRepo.WithByName(mysqlData.From))
 		if err != nil {
 			return nil, "", err

@@ -31,7 +31,7 @@ func (r *Local) Create(info CreateInfo) error {
 		return err
 	}
 
-	if err := r.CreateUser(CreateInfo{Name: info.Name, Version: info.Version, Username: info.Username, Permission: info.Permission, Timeout: info.Timeout}); err != nil {
+	if err := r.CreateUser(info); err != nil {
 		return err
 	}
 
@@ -185,7 +185,14 @@ func (r *Local) ChangeAccess(info AccessChangeInfo) error {
 			return nil
 		}
 	}
-	if err := r.CreateUser(CreateInfo{Name: info.Name, Version: info.Version, Username: info.Username, Permission: info.Permission, Timeout: info.Timeout}); err != nil {
+	if err := r.CreateUser(CreateInfo{
+		Name:       info.Name,
+		Version:    info.Version,
+		Username:   info.Username,
+		Password:   info.Password,
+		Permission: info.Permission,
+		Timeout:    info.Timeout,
+	}); err != nil {
 		return err
 	}
 	if err := r.ExecSQL("flush privileges", 300); err != nil {

@@ -81,6 +81,7 @@ const changeFormRef = ref<FormInstance>();
 const title = ref();
 const changeForm = reactive({
     id: 0,
+    from: '',
     mysqlName: '',
     userName: '',
     password: '',
@@ -93,6 +94,7 @@ const confirmDialogRef = ref();
 
 interface DialogProps {
     id: number;
+    from: string;
     mysqlName: string;
     username: string;
     password: string;
@@ -107,6 +109,7 @@ const acceptParams = (params: DialogProps): void => {
             ? i18n.global.t('database.changePassword')
             : i18n.global.t('database.permission');
     changeForm.id = params.id;
+    changeForm.from = params.from === 'local' ? 'local' : 'remote';
     changeForm.mysqlName = params.mysqlName;
     changeForm.userName = params.username;
     changeForm.password = params.password;
@@ -128,6 +131,7 @@ const submitChangeInfo = async (formEl: FormInstance | undefined) => {
         if (!valid) return;
         let param = {
             id: changeForm.id,
+            from: changeForm.from,
             value: '',
         };
         if (changeForm.operation === 'password') {
@@ -177,6 +181,7 @@ const submitChangeInfo = async (formEl: FormInstance | undefined) => {
 const onSubmit = async () => {
     let param = {
         id: changeForm.id,
+        from: changeForm.from,
         value: changeForm.password,
     };
     loading.value = true;

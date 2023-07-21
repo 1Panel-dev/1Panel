@@ -42,7 +42,7 @@ func (s *DatabaseRouter) InitDatabaseRouter(Router *gin.RouterGroup) {
 		cmdRouter.POST("/redis/persistence/update", baseApi.UpdateRedisPersistenceConf)
 
 		cmdRouter.POST("/remote", baseApi.CreateRemoteDB)
-		cmdRouter.POST("/remote/list/:type", baseApi.ListRemoteDB)
+		cmdRouter.GET("/remote/list/:type", baseApi.ListRemoteDB)
 		cmdRouter.POST("/remote/update", baseApi.UpdateRemoteDB)
 		cmdRouter.POST("/remote/search", baseApi.SearchRemoteDB)
 		cmdRouter.POST("/remote/del", baseApi.DeleteRemoteDB)

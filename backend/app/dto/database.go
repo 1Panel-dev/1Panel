@@ -6,6 +6,7 @@ type MysqlDBInfo struct {
 	ID          uint      `json:"id"`
 	CreatedAt   time.Time `json:"createdAt"`
 	Name        string    `json:"name"`
+	From        string    `json:"from"`
 	Format      string    `json:"format"`
 	Username    string    `json:"username"`
 	Password    string    `json:"password"`
