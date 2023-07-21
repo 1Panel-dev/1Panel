@@ -437,7 +437,7 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 			}
 		}
 		if snap.InterruptStep == "UpdateLiveRestore" {
-			_, _ = cmd.Exec("systemctl restart dockere")
+			_, _ = cmd.Exec("systemctl restart docker")
 			return
 		}
 

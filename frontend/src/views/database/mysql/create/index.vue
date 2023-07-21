@@ -45,6 +45,18 @@
                             />
                             <span class="input-help">{{ $t('database.remoteHelper') }}</span>
                         </el-form-item>
+
+                        <el-form-item :label="$t('commons.table.name')" prop="name">
+                            <el-select v-model="form.from">
+                                <el-option
+                                    v-for="(item, index) in dbOptions"
+                                    :key="index"
+                                    :value="item.name"
+                                    :label="loadLabel(item)"
+                                ></el-option>
+                            </el-select>
+                        </el-form-item>
+
                         <el-form-item :label="$t('commons.table.description')" prop="description">
                             <el-input type="textarea" clearable v-model="form.description" />
                         </el-form-item>
@@ -71,15 +83,17 @@ import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
-import { addMysqlDB } from '@/api/modules/database';
+import { addMysqlDB, listRemoteDBs } from '@/api/modules/database';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { getRandomStr } from '@/utils/util';
 
 const loading = ref();
+const dbOptions = ref();
 const createVisiable = ref(false);
 const form = reactive({
     name: '',
+    from: 'local',
     mysqlName: '',
     format: '',
     username: '',
@@ -110,11 +124,21 @@ const acceptParams = (params: DialogProps): void => {
     form.permissionIPs = '';
     form.description = '';
     random();
+    loadDBOptions();
     createVisiable.value = true;
 };
 const handleClose = () => {
     createVisiable.value = false;
 };
+
+const loadDBOptions = async () => {
+    const res = await listRemoteDBs('mysql');
+    dbOptions.value = res.data;
+};
+
+function loadLabel(item: any) {
+    return (item.name === 'local' ? i18n.global.t('database.localDB') : item.name) + '(' + item.address + ')';
+}
 
 const random = async () => {
     form.password = getRandomStr(16);

@@ -41,7 +41,7 @@ func (u *RemoteDBService) SearchWithPage(search dto.RemoteDBSearch) (int64, inte
 }
 
 func (u *RemoteDBService) List(dbType string) ([]dto.RemoteDBOption, error) {
-	dbs, err := remoteDBRepo.GetList(commonRepo.WithByType(dbType), remoteDBRepo.WithoutByFrom("local"))
+	dbs, err := remoteDBRepo.GetList(commonRepo.WithByType(dbType))
 	var datas []dto.RemoteDBOption
 	for _, db := range dbs {
 		var item dto.RemoteDBOption

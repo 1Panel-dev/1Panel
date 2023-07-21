@@ -49,6 +49,11 @@
                     :class="{ mask: mysqlStatus != 'Running' }"
                 >
                     <el-table-column :label="$t('commons.table.name')" prop="name" sortable />
+                    <el-table-column :label="$t('commons.login.username')" prop="from">
+                        <template #default="{ row }">
+                            <span>{{ row.from === 'local' ? $t('database.localDB') : row.from }}</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('commons.login.username')" prop="username" />
                     <el-table-column :label="$t('commons.login.password')" prop="password">
                         <template #default="{ row }">
@@ -310,6 +315,7 @@ const buttons = [
         click: (row: Database.MysqlDBInfo) => {
             let param = {
                 id: row.id,
+                from: row.from,
                 mysqlName: row.name,
                 operation: 'password',
                 username: row.username,
@@ -323,6 +329,7 @@ const buttons = [
         click: (row: Database.MysqlDBInfo) => {
             let param = {
                 id: row.id,
+                from: row.from,
                 mysqlName: row.name,
                 operation: 'privilege',
                 privilege: '',

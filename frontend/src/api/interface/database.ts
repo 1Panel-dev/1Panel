@@ -9,6 +9,7 @@ export namespace Database {
         id: number;
         createdAt: Date;
         name: string;
+        from: string;
         format: string;
         username: string;
         password: string;

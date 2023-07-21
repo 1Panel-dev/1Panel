@@ -1,7 +1,7 @@
 package client
 
 type DBInfo struct {
-	From     string `json:"from"` // local remote
+	From     string `json:"from"`
 	Address  string `json:"address"`
 	Port     uint   `json:"port"`
 	Username string `json:"userName"`
@@ -45,6 +45,7 @@ type AccessChangeInfo struct {
 	Name          string `json:"name"`
 	Version       string `json:"version"`
 	Username      string `json:"userName"`
+	Password      string `json:"password"`
 	OldPermission string `json:"oldPermission"`
 	Permission    string `json:"permission"`
 
