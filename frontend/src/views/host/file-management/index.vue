@@ -153,11 +153,11 @@
                         show-overflow-tooltip
                     ></el-table-column>
                     <fu-table-operations
-                        :ellipsis="3"
+                        :ellipsis="mobile ? 0 : 3"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
-                        min-width="300"
-                        fixed="right"
+                        :min-width="mobile ? 'auto' : 300"
+                        :fixed="mobile ? false : 'right'"
                         fix
                     />
                 </ComplexTable>
@@ -181,7 +181,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted, reactive, ref } from '@vue/runtime-core';
+import { nextTick, onMounted, reactive, ref, computed } from '@vue/runtime-core';
 import { GetFilesList, DeleteFile, GetFileContent, ComputeDirSize } from '@/api/modules/files';
 import { computeSize, dateFormat, downloadFile, getIcon, getRandomStr } from '@/utils/util';
 import { File } from '@/api/interface/file';
@@ -207,6 +207,8 @@ import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
 import { useSearchable } from './hooks/searchable';
 import { ResultData } from '@/api/interface';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 interface FilePaths {
     url: string;
@@ -267,6 +269,10 @@ const paginationConfig = reactive({
     currentPage: 1,
     pageSize: 100,
     total: 0,
+});
+
+const mobile = computed(() => {
+    return globalStore.isMobile();
 });
 
 const search = async () => {
