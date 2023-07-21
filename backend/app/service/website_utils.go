@@ -576,6 +576,44 @@ func opWebsite(website *model.Website, operate string) error {
 	return nginxCheckAndReload(nginxInstall.SiteConfig.OldContent, config.FilePath, nginxInstall.Install.ContainerName)
 }
 
+func changeIPV6(website model.Website, enable bool) error {
+	nginxFull, err := getNginxFull(&website)
+	if err != nil {
+		return nil
+	}
+	config := nginxFull.SiteConfig.Config
+	server := config.FindServers()[0]
+	listens := server.Listens
+	if enable {
+		for _, listen := range listens {
+			if strings.HasPrefix(listen.Bind, "[::]:") {
+				continue
+			}
+			exist := false
+			ipv6Bind := fmt.Sprintf("[::]:%s", listen.Bind)
+			for _, li := range listens {
+				if li.Bind == ipv6Bind {
+					exist = true
+					break
+				}
+			}
+			if !exist {
+				server.UpdateListen(ipv6Bind, false, listen.GetParameters()[1:]...)
+			}
+		}
+	} else {
+		for _, listen := range listens {
+			if strings.HasPrefix(listen.Bind, "[::]:") {
+				server.RemoveListenByBind(listen.Bind)
+			}
+		}
+	}
+	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+		return err
+	}
+	return nginxCheckAndReload(nginxFull.SiteConfig.OldContent, config.FilePath, nginxFull.Install.ContainerName)
+}
+
 func checkIsLinkApp(website model.Website) bool {
 	if website.Type == constant.Deployment {
 		return true
