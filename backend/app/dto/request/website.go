@@ -189,3 +189,7 @@ type WebsiteProxyConfig struct {
 type WebsiteProxyReq struct {
 	ID uint `json:"id" validate:"required"`
 }
+
+type WebsiteRedirectReq struct {
+	WebsiteID uint `json:"websiteId" validate:"required"`
+}

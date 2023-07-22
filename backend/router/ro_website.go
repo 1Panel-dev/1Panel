@@ -61,5 +61,9 @@ func (a *WebsiteRouter) InitWebsiteRouter(Router *gin.RouterGroup) {
 
 		groupRouter.POST("/leech", baseApi.GetAntiLeech)
 		groupRouter.POST("/leech/update", baseApi.UpdateAntiLeech)
+
+		groupRouter.POST("/redirect/update", baseApi.UpdateRedirectConfig)
+		groupRouter.POST("/redirect", baseApi.GetRedirectConfig)
+		groupRouter.POST("/redirect/file", baseApi.UpdateRedirectConfigFile)
 	}
 }

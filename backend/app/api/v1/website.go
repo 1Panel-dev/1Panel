@@ -801,3 +801,70 @@ func (b *BaseApi) UpdateAntiLeech(c *gin.Context) {
 	}
 	helper.SuccessWithOutData(c)
 }
+
+// @Tags Website
+// @Summary Update redirect conf
+// @Description 修改重定向配置
+// @Accept json
+// @Param request body request.NginxRedirectReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/redirect/update [post]
+// @x-panel-log {"bodyKeys":["websiteID"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"websiteID","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"修改网站 [domain] 重定向理配置 ","formatEN":"Update domain [domain] redirect config"}
+func (b *BaseApi) UpdateRedirectConfig(c *gin.Context) {
+	var req request.NginxRedirectReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	err := websiteService.OperateRedirect(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}
+
+// @Tags Website
+// @Summary Get redirect conf
+// @Description 获取重定向配置
+// @Accept json
+// @Param request body request.WebsiteProxyReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/redirect [post]
+func (b *BaseApi) GetRedirectConfig(c *gin.Context) {
+	var req request.WebsiteRedirectReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	res, err := websiteService.GetRedirect(req.WebsiteID)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags Website
+// @Summary Update redirect file
+// @Description 更新重定向文件
+// @Accept json
+// @Param request body request.NginxRedirectUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/redirect/file [post]
+// @x-panel-log {"bodyKeys":["websiteID"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"websiteID","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"更新重定向文件 [domain]","formatEN":"Nginx conf redirect file update [domain]"}
+func (b *BaseApi) UpdateRedirectConfigFile(c *gin.Context) {
+	var req request.NginxRedirectUpdate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := websiteService.UpdateRedirectFile(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}

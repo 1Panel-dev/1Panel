@@ -66,3 +66,23 @@ type NginxAntiLeechUpdate struct {
 	LogEnable   bool     `json:"logEnable"`
 	Blocked     bool     `json:"blocked"`
 }
+
+type NginxRedirectReq struct {
+	Name         string   `json:"name" validate:"required"`
+	WebsiteID    uint     `json:"websiteID" validate:"required"`
+	Domains      []string `json:"domains"`
+	KeepPath     bool     `json:"keepPath" validate:"required"`
+	Enable       bool     `json:"enable" validate:"required"`
+	Type         string   `json:"type" validate:"required"`
+	Redirect     string   `json:"redirect" validate:"required"`
+	Path         string   `json:"path"`
+	Target       string   `json:"target" validate:"required"`
+	Operate      string   `json:"operate" validate:"required"`
+	RedirectRoot bool     `json:"redirectRoot"`
+}
+
+type NginxRedirectUpdate struct {
+	WebsiteID uint   `json:"websiteID" validate:"required"`
+	Content   string `json:"content" validate:"required"`
+	Name      string `json:"name" validate:"required"`
+}

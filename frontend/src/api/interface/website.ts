@@ -389,4 +389,30 @@ export namespace Website {
     export interface LeechReq {
         websiteID: number;
     }
+
+    export interface WebsiteReq {
+        websiteID: number;
+    }
+
+    export interface RedirectConfig {
+        operate: string;
+        websiteID: number;
+        domains?: string[];
+        enable: boolean;
+        name: string;
+        keepPath: boolean;
+        type: string;
+        redirect: string;
+        path?: string;
+        target: string;
+        redirectRoot?: boolean;
+        filePath?: string;
+        content?: string;
+    }
+
+    export interface RedirectFileUpdate {
+        websiteID: number;
+        name: string;
+        content: string;
+    }
 }
