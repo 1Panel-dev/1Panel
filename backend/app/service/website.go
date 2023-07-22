@@ -342,6 +342,11 @@ func (w WebsiteService) UpdateWebsite(req request.WebsiteUpdate) error {
 	if err != nil {
 		return err
 	}
+	if website.IPV6 != req.IPV6 {
+		if err := changeIPV6(website, req.IPV6); err != nil {
+			return err
+		}
+	}
 	website.PrimaryDomain = req.PrimaryDomain
 	website.WebsiteGroupID = req.WebsiteGroupID
 	website.Remark = req.Remark

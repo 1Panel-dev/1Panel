@@ -315,7 +315,7 @@ func (s *Server) UpdateDirectiveBySecondKey(name string, key string, directive D
 func (s *Server) RemoveListenByBind(bind string) {
 	var listens []*ServerListen
 	for _, listen := range s.Listens {
-		if listen.Bind != bind || len(listen.Parameters) > 0 {
+		if listen.Bind != bind {
 			listens = append(listens, listen)
 		}
 	}
