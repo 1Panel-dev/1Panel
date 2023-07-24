@@ -1,6 +1,8 @@
 package migrations
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -481,9 +483,41 @@ var EncryptHostPassword = &gormigrate.Migration{
 }
 
 var AddRemoteDB = &gormigrate.Migration{
-	ID: "20230720-add-remote-db",
+	ID: "20230724-add-remote-db",
 	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.RemoteDB{}); err != nil {
+		if err := tx.AutoMigrate(&model.RemoteDB{}, &model.DatabaseMysql{}); err != nil {
+			return err
+		}
+		var (
+			app        model.App
+			appInstall model.AppInstall
+		)
+		if err := global.DB.Where("key = ?", "mysql").First(&app).Error; err != nil {
+			return err
+		}
+		if err := global.DB.Where("app_id = ?", app.ID).First(&appInstall).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return nil
+			}
+			return err
+		}
+		envMap := make(map[string]interface{})
+		if err := json.Unmarshal([]byte(appInstall.Env), &envMap); err != nil {
+			return err
+		}
+		password, ok := envMap["PANEL_DB_ROOT_PASSWORD"].(string)
+		if !ok {
+			return errors.New("error password in app env")
+		}
+		if err := tx.Create(&model.RemoteDB{
+			Name:     "local",
+			Type:     "mysql",
+			Version:  appInstall.Version,
+			From:     "local",
+			Address:  "127.0.0.1",
+			Username: "root",
+			Password: password,
+		}).Error; err != nil {
 			return err
 		}
 		return nil

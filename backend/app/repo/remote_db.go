@@ -15,6 +15,7 @@ type IRemoteDBRepo interface {
 	Update(id uint, vars map[string]interface{}) error
 	Delete(opts ...DBOption) error
 	Get(opts ...DBOption) (model.RemoteDB, error)
+	WithByFrom(from string) DBOption
 	WithoutByFrom(from string) DBOption
 }
 
@@ -52,6 +53,12 @@ func (u *RemoteDBRepo) GetList(opts ...DBOption) ([]model.RemoteDB, error) {
 	}
 	err := db.Find(&databases).Error
 	return databases, err
+}
+
+func (c *RemoteDBRepo) WithByFrom(from string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("`from` != ?", from)
+	}
 }
 
 func (c *RemoteDBRepo) WithoutByFrom(from string) DBOption {
