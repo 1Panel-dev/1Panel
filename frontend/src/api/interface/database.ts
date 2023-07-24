@@ -1,6 +1,14 @@
 import { ReqPage } from '.';
 
 export namespace Database {
+    export interface SearchDBWithPage {
+        info: string;
+        from: string;
+        page: number;
+        pageSize: number;
+        orderBy?: string;
+        order?: string;
+    }
     export interface SearchBackupRecord extends ReqPage {
         mysqlName: string;
         dbName: string;

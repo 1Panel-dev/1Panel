@@ -133,7 +133,7 @@ const handleClose = () => {
 
 const loadDBOptions = async () => {
     const res = await listRemoteDBs('mysql');
-    dbOptions.value = res.data;
+    dbOptions.value = res.data || [];
 };
 
 function loadLabel(item: any) {

@@ -12,7 +12,7 @@ import (
 // @Summary Create remote database
 // @Description 创建远程数据库
 // @Accept json
-// @Param request body dto.DatabaseCreate true "request"
+// @Param request body dto.RemoteDBCreate true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /databases/remote [post]
@@ -38,7 +38,7 @@ func (b *BaseApi) CreateRemoteDB(c *gin.Context) {
 // @Summary Page remote databases
 // @Description 获取远程数据库列表分页
 // @Accept json
-// @Param request body dto.SearchWithPage true "request"
+// @Param request body dto.RemoteDBSearch true "request"
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Router /databases/remote/search [post]
@@ -113,7 +113,7 @@ func (b *BaseApi) DeleteRemoteDB(c *gin.Context) {
 // @Summary Update remote database
 // @Description 更新远程数据库
 // @Accept json
-// @Param request body dto.DatabaseUpdate true "request"
+// @Param request body dto.RemoteDBUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /databases/remote/update [post]

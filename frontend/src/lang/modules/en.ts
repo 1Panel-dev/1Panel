@@ -335,6 +335,14 @@ const message = {
         portHelper:
             'This port is the exposed port of the container. You need to save the modification separately and restart the container!',
 
+        remote: 'Remote',
+        remoteDB: 'Remote DB',
+        createRemoteDB: 'Create Remote DB',
+        editRemoteDB: 'Edit Remote DB',
+        localDB: 'Local DB',
+        address: 'DB address',
+        version: 'DB version',
+
         selectFile: 'Select file',
         dropHelper: 'You can drag and drop the uploaded file here or',
         clickHelper: 'click to upload',

@@ -120,11 +120,14 @@ definitions:
     type: object
   dto.ChangeDBInfo:
     properties:
+      from:
+        type: string
       id:
         type: integer
       value:
         type: string
     required:
+    - from
     - value
     type: object
   dto.ChangeHostGroup:
@@ -1104,6 +1107,8 @@ definitions:
         - gbk
         - big5
         type: string
+      from:
+        type: string
       name:
         type: string
       password:
@@ -1114,6 +1119,7 @@ definitions:
         type: string
     required:
     - format
+    - from
     - name
     - password
     - permission
@@ -1129,6 +1135,24 @@ definitions:
         type: integer
     required:
     - id
+    type: object
+  dto.MysqlDBSearch:
+    properties:
+      from:
+        type: string
+      info:
+        type: string
+      order:
+        type: string
+      orderBy:
+        type: string
+      page:
+        type: integer
+      pageSize:
+        type: integer
+    required:
+    - page
+    - pageSize
     type: object
   dto.MysqlStatus:
     properties:
@@ -1514,6 +1538,87 @@ definitions:
         type: string
       used_memory_rss:
         type: string
+    type: object
+  dto.RemoteDBCreate:
+    properties:
+      address:
+        type: string
+      description:
+        type: string
+      from:
+        enum:
+        - local
+        - remote
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      port:
+        type: integer
+      type:
+        enum:
+        - mysql
+        type: string
+      username:
+        type: string
+      version:
+        type: string
+    required:
+    - from
+    - name
+    - password
+    - type
+    - username
+    - version
+    type: object
+  dto.RemoteDBOption:
+    properties:
+      address:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  dto.RemoteDBSearch:
+    properties:
+      info:
+        type: string
+      order:
+        type: string
+      orderBy:
+        type: string
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      type:
+        type: string
+    required:
+    - page
+    - pageSize
+    type: object
+  dto.RemoteDBUpdate:
+    properties:
+      address:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      password:
+        type: string
+      port:
+        type: integer
+      username:
+        type: string
+      version:
+        type: string
+    required:
+    - password
+    - username
+    - version
     type: object
   dto.ResourceLimit:
     properties:
@@ -6288,6 +6393,130 @@ paths:
       summary: Load mysql remote access
       tags:
       - Database Mysql
+    post:
+      consumes:
+      - application/json
+      description: 创建远程数据库
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RemoteDBCreate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Create remote database
+      tags:
+      - Database
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        - type
+        formatEN: create remote database [name][type]
+        formatZH: 创建远程数据库 [name][type]
+        paramKeys: []
+  /databases/remote/del:
+    post:
+      consumes:
+      - application/json
+      description: 删除远程数据库
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OperateByID'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Delete remote database
+      tags:
+      - Database
+      x-panel-log:
+        BeforeFuntions:
+        - db: databases
+          input_column: id
+          input_value: ids
+          isList: true
+          output_column: name
+          output_value: names
+        bodyKeys:
+        - ids
+        formatEN: delete remote database [names]
+        formatZH: 删除远程数据库 [names]
+        paramKeys: []
+  /databases/remote/list/:type:
+    get:
+      description: 获取快速命令列表
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.RemoteDBOption'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: List remote databases
+      tags:
+      - Database
+  /databases/remote/search:
+    post:
+      consumes:
+      - application/json
+      description: 获取远程数据库列表分页
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RemoteDBSearch'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Page remote databases
+      tags:
+      - Database
+  /databases/remote/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新远程数据库
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RemoteDBUpdate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update remote database
+      tags:
+      - Database
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        formatEN: update remote database [name]
+        formatZH: 更新远程数据库 [name]
+        paramKeys: []
   /databases/search:
     post:
       consumes:
@@ -6299,7 +6528,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.SearchWithPage'
+          $ref: '#/definitions/dto.MysqlDBSearch'
       responses:
         "200":
           description: OK
