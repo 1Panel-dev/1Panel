@@ -109,7 +109,7 @@ const acceptParams = (params: DialogProps): void => {
             ? i18n.global.t('database.changePassword')
             : i18n.global.t('database.permission');
     changeForm.id = params.id;
-    changeForm.from = params.from === 'local' ? 'local' : 'remote';
+    changeForm.from = params.from;
     changeForm.mysqlName = params.mysqlName;
     changeForm.userName = params.username;
     changeForm.password = params.password;

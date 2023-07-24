@@ -82,45 +82,30 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 		return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
 
-	if req.Username == "root" {
+	if req.From == "local" && req.Username == "root" {
 		return nil, errors.New("Cannot set root as user name")
 	}
-
-	dbInfo := client.DBInfo{
-		From:    req.From,
-		Timeout: 300,
+	if req.From == "127.0.0.1" {
+		return nil, errors.New("Cannot set 127.0.0.1 as address")
 	}
-	version := ""
+
+	cli, version, err := loadClientByFrom(req.From)
+	if err != nil {
+		return nil, err
+	}
+
 	if req.From == "local" {
 		app, err := appInstallRepo.LoadBaseInfo("mysql", "")
 		if err != nil {
 			return nil, err
 		}
-		mysqlData, _ := mysqlRepo.Get(commonRepo.WithByName(req.Name))
-		if mysqlData.ID != 0 {
-			return nil, constant.ErrRecordExist
-		}
-		dbInfo.Address = app.ContainerName
-		dbInfo.Username = "root"
-		dbInfo.Password = app.Password
-		version = app.Version
 		createItem.MysqlName = app.Name
 	} else {
-		mysqlData, err := remoteDBRepo.Get(commonRepo.WithByName(req.From))
+		mysqlData, err := remoteDBRepo.Get(remoteDBRepo.WithByFrom(req.From))
 		if err != nil {
 			return nil, err
 		}
-		dbInfo.Address = mysqlData.Address
-		dbInfo.Port = mysqlData.Port
-		dbInfo.Username = mysqlData.Username
-		dbInfo.Password = mysqlData.Password
-		version = mysqlData.Version
 		createItem.MysqlName = mysqlData.Name
-	}
-
-	cli, err := mysql.NewMysqlClient(dbInfo)
-	if err != nil {
-		return nil, err
 	}
 	defer cli.Close()
 	if err := cli.Create(client.CreateInfo{
@@ -169,15 +154,15 @@ func (u *MysqlService) DeleteCheck(id uint) ([]string, error) {
 }
 
 func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error {
-	cli, version, err := loadClientByID(req.ID)
-	if err != nil {
-		return err
-	}
-	defer cli.Close()
 	db, err := mysqlRepo.Get(commonRepo.WithByID(req.ID))
 	if err != nil && !req.ForceDelete {
 		return err
 	}
+	cli, version, err := loadClientByFrom(db.From)
+	if err != nil {
+		return err
+	}
+	defer cli.Close()
 	if err := cli.Delete(client.DeleteInfo{
 		Name:       db.Name,
 		Version:    version,
@@ -218,7 +203,7 @@ func (u *MysqlService) ChangePassword(info dto.ChangeDBInfo) error {
 	if cmd.CheckIllegal(info.Value) {
 		return buserr.New(constant.ErrCmdIllegal)
 	}
-	cli, version, err := loadClientByID(info.ID)
+	cli, version, err := loadClientByFrom(info.From)
 	if err != nil {
 		return err
 	}
@@ -281,7 +266,7 @@ func (u *MysqlService) ChangeAccess(info dto.ChangeDBInfo) error {
 	if cmd.CheckIllegal(info.Value) {
 		return buserr.New(constant.ErrCmdIllegal)
 	}
-	cli, version, err := loadClientByID(info.ID)
+	cli, version, err := loadClientByFrom(info.From)
 	if err != nil {
 		return err
 	}
@@ -546,25 +531,15 @@ func updateMyCnf(oldFiles []string, group string, param string, value interface{
 	return newFiles
 }
 
-func loadClientByID(id uint) (mysql.MysqlClient, string, error) {
+func loadClientByFrom(from string) (mysql.MysqlClient, string, error) {
 	var (
-		mysqlData model.DatabaseMysql
-		dbInfo    client.DBInfo
-		version   string
-		err       error
+		dbInfo  client.DBInfo
+		version string
+		err     error
 	)
 
-	dbInfo.From = "local"
-	if id != 0 {
-		mysqlData, err = mysqlRepo.Get(commonRepo.WithByID(id))
-		if err != nil {
-			return nil, "", err
-		}
-		dbInfo.From = mysqlData.From
-	}
-
-	if dbInfo.From != "local" {
-		databaseItem, err := remoteDBRepo.Get(commonRepo.WithByName(mysqlData.From))
+	if from != "local" {
+		databaseItem, err := remoteDBRepo.Get(remoteDBRepo.WithByFrom(from))
 		if err != nil {
 			return nil, "", err
 		}
