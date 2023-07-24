@@ -188,12 +188,12 @@ func (b *BaseApi) UpdateMysqlConfByFile(c *gin.Context) {
 // @Summary Page mysql databases
 // @Description 获取 mysql 数据库列表分页
 // @Accept json
-// @Param request body dto.SearchWithPage true "request"
+// @Param request body dto.MysqlDBSearch true "request"
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Router /databases/search [post]
 func (b *BaseApi) SearchMysql(c *gin.Context) {
-	var req dto.SearchWithPage
+	var req dto.MysqlDBSearch
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return

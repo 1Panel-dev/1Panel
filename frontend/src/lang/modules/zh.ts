@@ -330,6 +330,7 @@ const message = {
 
         confChange: '配置修改',
 
+        remote: '远程',
         remoteDB: '远程数据库',
         createRemoteDB: '创建远程数据库',
         editRemoteDB: '编辑远程数据库',

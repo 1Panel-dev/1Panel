@@ -2,6 +2,14 @@ package dto
 
 import "time"
 
+type MysqlDBSearch struct {
+	PageInfo
+	Info    string `json:"info"`
+	From    string `json:"from"`
+	OrderBy string `json:"orderBy"`
+	Order   string `json:"order"`
+}
+
 type MysqlDBInfo struct {
 	ID          uint      `json:"id"`
 	CreatedAt   time.Time `json:"createdAt"`

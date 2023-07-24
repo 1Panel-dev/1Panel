@@ -330,6 +330,14 @@ const message = {
 
         confChange: '配置修改',
 
+        remote: '遠程',
+        remoteDB: '遠程數據庫',
+        createRemoteDB: '創建遠程數據庫',
+        editRemoteDB: '編輯遠程數據庫',
+        localDB: '本地數據庫',
+        address: '數據庫地址',
+        version: '數據庫版本',
+
         selectFile: '選擇文件',
         dropHelper: '將上傳文件拖拽到此處，或者',
         clickHelper: '點擊上傳',

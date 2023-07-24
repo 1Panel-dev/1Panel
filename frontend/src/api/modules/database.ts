@@ -1,10 +1,10 @@
 import http from '@/api';
 import { deepCopy } from '@/utils/util';
 import { Base64 } from 'js-base64';
-import { SearchWithPage, ResPage, DescriptionUpdate } from '../interface';
+import { ResPage, DescriptionUpdate } from '../interface';
 import { Database } from '../interface/database';
 
-export const searchMysqlDBs = (params: SearchWithPage) => {
+export const searchMysqlDBs = (params: Database.SearchDBWithPage) => {
     return http.post<ResPage<Database.MysqlDBInfo>>(`/databases/search`, params);
 };
 
