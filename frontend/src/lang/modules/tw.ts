@@ -337,6 +337,9 @@ const message = {
         localDB: '本地數據庫',
         address: '數據庫地址',
         version: '數據庫版本',
+        versionHelper: '當前僅支持 5.6 5.7 8.0 三個版本',
+        addressHelper: '非 127.0.0.1 的遠程數據庫地址',
+        userHelper: 'root 用戶或者擁有 root 權限的數據庫用戶',
 
         selectFile: '選擇文件',
         dropHelper: '將上傳文件拖拽到此處，或者',

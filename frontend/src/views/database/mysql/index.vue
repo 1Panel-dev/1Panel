@@ -13,7 +13,7 @@
 
             <template v-if="!isOnSetting" #search>
                 <el-select v-model="paginationConfig.from" @change="search()">
-                    <template #prefix>{{ $t('website.group') }}</template>
+                    <template #prefix>{{ $t('commons.table.type') }}</template>
                     <el-option-group>
                         <el-option :label="$t('database.localDB')" value="local" />
                     </el-option-group>
@@ -28,19 +28,34 @@
                 </el-select>
             </template>
 
-            <template #toolbar v-if="(mysqlIsExist && !isOnSetting) || !isLocal()">
-                <el-row :class="{ mask: mysqlStatus != 'Running' && isLocal() }">
+            <template #toolbar v-if="!isOnSetting">
+                <el-row>
                     <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
-                        <el-button type="primary" @click="onOpenDialog()">
+                        <el-button
+                            v-if="(mysqlIsExist && mysqlStatus === 'Running') || !isLocal()"
+                            type="primary"
+                            @click="onOpenDialog()"
+                        >
                             {{ $t('database.create') }}
                         </el-button>
-                        <el-button v-if="isLocal()" @click="onChangeRootPassword" type="primary" plain>
+                        <el-button
+                            v-if="mysqlIsExist && mysqlStatus === 'Running' && isLocal()"
+                            @click="onChangeRootPassword"
+                            type="primary"
+                            plain
+                        >
                             {{ $t('database.databaseConnInfo') }}
                         </el-button>
                         <el-button @click="goRemoteDB" type="primary" plain>
                             {{ $t('database.remoteDB') }}
                         </el-button>
-                        <el-button v-if="isLocal()" @click="goDashboard" icon="Position" type="primary" plain>
+                        <el-button
+                            v-if="mysqlIsExist && mysqlStatus === 'Running' && isLocal()"
+                            @click="goDashboard"
+                            icon="Position"
+                            type="primary"
+                            plain
+                        >
                             phpMyAdmin
                         </el-button>
                     </el-col>

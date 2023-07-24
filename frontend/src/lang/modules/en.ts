@@ -342,6 +342,9 @@ const message = {
         localDB: 'Local DB',
         address: 'DB address',
         version: 'DB version',
+        versionHelper: 'Currently, only versions 5.6, 5.7, and 8.0 are supported',
+        addressHelper: 'The remote database address except 127.0.0.1.',
+        userHelper: 'The root user or a database user with root privileges can access the remote database.',
 
         selectFile: 'Select file',
         dropHelper: 'You can drag and drop the uploaded file here or',

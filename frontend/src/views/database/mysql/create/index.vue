@@ -46,7 +46,7 @@
                             <span class="input-help">{{ $t('database.remoteHelper') }}</span>
                         </el-form-item>
 
-                        <el-form-item :label="$t('commons.table.name')" prop="name">
+                        <el-form-item :label="$t('commons.table.type')" prop="from">
                             <el-select v-model="form.from">
                                 <el-option
                                     v-for="(item, index) in dbOptions"
@@ -108,6 +108,7 @@ const rules = reactive({
     password: [Rules.requiredInput],
     permission: [Rules.requiredSelect],
     permissionIPs: [Rules.requiredInput],
+    from: [Rules.requiredSelect],
 });
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
