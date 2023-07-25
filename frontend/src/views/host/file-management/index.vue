@@ -363,6 +363,8 @@ const jump = async (url: string) => {
     req.containSub = false;
     req.search = '';
     let searchResult = await searchFile();
+
+    globalStore.setLastFilePath(req.path);
     // check search result,the file is exists?
     if (!searchResult.data.path) {
         req.path = oldUrl;
@@ -636,6 +638,12 @@ onMounted(() => {
     if (router.currentRoute.value.query.path) {
         req.path = String(router.currentRoute.value.query.path);
         getPaths(req.path);
+        globalStore.setLastFilePath(req.path);
+    } else {
+        if (globalStore.lastFilePath && globalStore.lastFilePath != '') {
+            req.path = globalStore.lastFilePath;
+            getPaths(req.path);
+        }
     }
     pathWidth.value = pathRef.value.offsetWidth * 0.7;
     search();

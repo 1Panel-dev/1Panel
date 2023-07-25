@@ -26,6 +26,7 @@ export const GlobalStore = defineStore({
         hasNewVersion: false,
         ignoreCaptcha: true,
         device: DeviceType.Desktop,
+        lastFilePath: '',
     }),
     getters: {},
     actions: {
@@ -59,6 +60,9 @@ export const GlobalStore = defineStore({
         },
         isMobile() {
             return this.device === DeviceType.Mobile;
+        },
+        setLastFilePath(path: string) {
+            this.lastFilePath = path;
         },
     },
     persist: piniaPersistConfig('GlobalState'),
