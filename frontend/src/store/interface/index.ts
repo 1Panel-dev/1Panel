@@ -21,6 +21,7 @@ export interface GlobalState {
     hasNewVersion: boolean;
     ignoreCaptcha: boolean;
     device: DeviceType;
+    lastFilePath: string;
 }
 
 export interface MenuState {
