@@ -158,6 +158,12 @@ type WebsitePHPFileUpdate struct {
 	Content string `json:"content" validate:"required"`
 }
 
+type WebsitePHPVersionReq struct {
+	WebsiteID    uint `json:"websiteID" validate:"required"`
+	RuntimeID    uint `json:"runtimeID" validate:"required"`
+	RetainConfig bool `json:"retainConfig" validate:"required"`
+}
+
 type WebsiteUpdateDir struct {
 	ID      uint   `json:"id" validate:"required"`
 	SiteDir string `json:"siteDir" validate:"required"`

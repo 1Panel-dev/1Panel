@@ -9,6 +9,9 @@
         <el-tab-pane :label="$t('php.uploadMaxSize')" name="2">
             <Upload :id="id" v-if="index == '2'"></Upload>
         </el-tab-pane>
+        <el-tab-pane :label="$t('runtime.version')" name="3">
+            <Version :id="id" :runtimeID="runtimeID" v-if="index == '3'"></Version>
+        </el-tab-pane>
     </el-tabs>
 </template>
 
@@ -19,6 +22,7 @@ import { computed, onMounted, ref } from 'vue';
 import Config from './config/index.vue';
 import Function from './function/index.vue';
 import Upload from './upload/index.vue';
+import Version from './version/index.vue';
 
 const props = defineProps({
     id: {
@@ -34,10 +38,12 @@ const id = computed(() => {
 const index = ref('0');
 const configPHP = ref(false);
 const installId = ref(0);
+const runtimeID = ref(0);
 
 const getWebsiteDetail = async () => {
     const res = await GetWebsite(props.id);
     if (res.data.type === 'runtime') {
+        runtimeID.value = res.data.runtimeID;
         installId.value = res.data.appInstallId;
         const runRes = await GetRuntime(res.data.runtimeID);
         if (runRes.data.resource === 'appstore') {

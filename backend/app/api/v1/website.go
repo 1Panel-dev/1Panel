@@ -561,6 +561,28 @@ func (b *BaseApi) UpdatePHPFile(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+// @Tags Website PHP
+// @Summary Update php version
+// @Description 变更 php 版本
+// @Accept json
+// @Param request body request.WebsitePHPVersionReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/php/version [post]
+// @x-panel-log {"bodyKeys":["websiteId"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"websiteId","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"php 版本变更 [domain]","formatEN":"php version update [domain]"}
+func (b *BaseApi) ChangePHPVersion(c *gin.Context) {
+	var req request.WebsitePHPVersionReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := websiteService.ChangePHPVersion(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}
+
 // @Tags Website
 // @Summary Get rewrite conf
 // @Description 获取伪静态配置

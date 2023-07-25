@@ -1395,6 +1395,9 @@ const message = {
         notKeep: '不保留',
         redirectRoot: '重定向到首頁',
         redirectHelper: '301永久重定向，302臨時重定向',
+        changePHPVersionWarn: '切換 PHP 版本會刪除原有的 PHP 容器（不會丟失已經掛載的網站代碼），是否繼續？ ',
+        changeVersion: '切換版本',
+        retainConfig: '是否保留 php-fpm.conf 和 php.ini 文件',
     },
     php: {
         short_open_tag: '短標簽支持',

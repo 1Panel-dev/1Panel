@@ -415,4 +415,10 @@ export namespace Website {
         name: string;
         content: string;
     }
+
+    export interface PHPVersionChange {
+        websiteID: number;
+        runtimeID: number;
+        retainConfig: boolean;
+    }
 }
