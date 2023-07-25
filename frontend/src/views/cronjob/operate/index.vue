@@ -215,7 +215,6 @@ import { ElForm } from 'element-plus';
 import { Cronjob } from '@/api/interface/cronjob';
 import { addCronjob, editCronjob } from '@/api/modules/cronjob';
 import { loadDBNames } from '@/api/modules/database';
-import { CheckAppInstalled } from '@/api/modules/app';
 import { GetWebsiteOptions } from '@/api/modules/website';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
@@ -454,14 +453,8 @@ const loadContainers = async () => {
 };
 
 const checkMysqlInstalled = async () => {
-    const res = await CheckAppInstalled('mysql');
-    mysqlInfo.isExist = res.data.isExist;
-    mysqlInfo.name = res.data.name;
-    mysqlInfo.version = res.data.version;
-    if (mysqlInfo.isExist) {
-        const data = await loadDBNames();
-        mysqlInfo.dbNames = data.data;
-    }
+    const data = await loadDBNames();
+    mysqlInfo.dbNames = data.data;
 };
 
 function isBackup() {

@@ -56,6 +56,7 @@ type BackupInfo struct {
 	Name      string `json:"name"`
 	Format    string `json:"format"`
 	TargetDir string `json:"targetDir"`
+	FileName  string `json:"fileName"`
 
 	Timeout uint `json:"timeout"` // second
 }

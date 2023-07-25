@@ -21,7 +21,7 @@
                         <el-option
                             v-for="(item, index) in dbOptions"
                             :key="index"
-                            :value="item.address"
+                            :value="item.name"
                             :label="item.name"
                         ></el-option>
                     </el-option-group>
@@ -265,14 +265,6 @@ const onOpenDialog = async () => {
 };
 
 const dialogBackupRef = ref();
-const onOpenBackupDialog = async (dbName: string) => {
-    let params = {
-        type: 'mysql',
-        name: mysqlName.value,
-        detailName: dbName,
-    };
-    dialogBackupRef.value!.acceptParams(params);
-};
 
 const uploadRef = ref();
 
@@ -422,22 +414,21 @@ const buttons = [
     },
     {
         label: i18n.global.t('database.backupList'),
-        disabled: (row: Database.MysqlDBInfo) => {
-            return row.from !== 'local';
-        },
         click: (row: Database.MysqlDBInfo) => {
-            onOpenBackupDialog(row.name);
+            let params = {
+                type: 'mysql',
+                name: row.mysqlName,
+                detailName: row.name,
+            };
+            dialogBackupRef.value!.acceptParams(params);
         },
     },
     {
         label: i18n.global.t('database.loadBackup'),
-        disabled: (row: Database.MysqlDBInfo) => {
-            return row.from !== 'local';
-        },
         click: (row: Database.MysqlDBInfo) => {
             let params = {
                 type: 'mysql',
-                name: mysqlName.value,
+                name: mysqlName.value || row.name,
                 detailName: row.name,
             };
             uploadRef.value!.acceptParams(params);

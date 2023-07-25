@@ -17,7 +17,7 @@ type MysqlClient interface {
 	ChangePassword(info client.PasswordChangeInfo) error
 	ChangeAccess(info client.AccessChangeInfo) error
 
-	Backup(info client.BackupInfo) (string, error)
+	Backup(info client.BackupInfo) error
 	Recover(info client.RecoverInfo) error
 
 	Close()

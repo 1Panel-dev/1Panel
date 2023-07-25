@@ -57,7 +57,7 @@ func (u *RemoteDBRepo) GetList(opts ...DBOption) ([]model.RemoteDB, error) {
 
 func (c *RemoteDBRepo) WithByFrom(from string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("`from` != ?", from)
+		return g.Where("`from` == ?", from)
 	}
 }
 
