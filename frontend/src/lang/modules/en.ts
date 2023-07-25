@@ -1221,6 +1221,8 @@ const message = {
         cancelIgnore: 'Cancel ignore',
         ignoreList: 'ignore list',
         appHelper: 'Please view the installation instructions of some applications on the application details page',
+        backupApp: 'Backup application before upgrade',
+        backupAppHelper: 'If the upgrade fails, you can use the application backup to roll back',
     },
     website: {
         website: 'Website',

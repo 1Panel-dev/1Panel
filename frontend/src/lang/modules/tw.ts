@@ -1166,6 +1166,8 @@ const message = {
         cancelIgnore: '取消忽略',
         ignoreList: '忽略列表',
         appHelper: '部分應用的安裝使用說明請在應用詳情頁查看',
+        backupApp: '升級前備份應用',
+        backupAppHelper: '升級失敗可以使用應用備份回滾',
     },
     website: {
         website: '網站',

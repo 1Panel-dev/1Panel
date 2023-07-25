@@ -236,7 +236,7 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 	case constant.Sync:
 		return syncById(install.ID)
 	case constant.Upgrade:
-		return upgradeInstall(install.ID, req.DetailId)
+		return upgradeInstall(install.ID, req.DetailId, req.Backup)
 	default:
 		return errors.New("operate not support")
 	}

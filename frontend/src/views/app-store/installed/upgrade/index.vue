@@ -27,6 +27,10 @@
                             ></el-option>
                         </el-select>
                     </el-form-item>
+                    <el-form-item prop="backup" v-if="operateReq.operate === 'upgrade'">
+                        <el-checkbox v-model="operateReq.backup" :label="$t('app.backupApp')" />
+                        <span class="input-help">{{ $t('app.backupAppHelper') }}</span>
+                    </el-form-item>
                 </el-form>
             </el-col>
         </el-row>
@@ -59,6 +63,7 @@ const operateReq = reactive({
     detailId: 0,
     operate: 'upgrade',
     installId: 0,
+    backup: true,
 });
 const resourceName = ref('');
 const rules = ref<any>({

@@ -1166,6 +1166,8 @@ const message = {
         cancelIgnore: '取消忽略',
         ignoreList: '忽略列表',
         appHelper: '部分应用的安装使用说明请在应用详情页查看',
+        backupApp: '升级前备份应用',
+        backupAppHelper: '升级失败可以使用应用备份回滚',
     },
     website: {
         website: '网站',
