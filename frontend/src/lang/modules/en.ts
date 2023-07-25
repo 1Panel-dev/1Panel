@@ -1457,6 +1457,10 @@ const message = {
         notKeep: 'Do not keep',
         redirectRoot: 'Redirect to the homepage',
         redirectHelper: '301 permanent redirection, 302 temporary redirection',
+        changePHPVersionWarn:
+            'Switching the PHP version will delete the original PHP container (the website code that has been mounted will not be lost), continue? ',
+        changeVersion: 'Switch version',
+        retainConfig: 'Whether to keep php-fpm.conf and php.ini files',
     },
     php: {
         short_open_tag: 'Short tag support',

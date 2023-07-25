@@ -5,9 +5,12 @@ import (
 	"bytes"
 	"context"
 	"crypto/x509"
+	"encoding/json"
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/utils/compose"
+	"github.com/1Panel-dev/1Panel/backend/utils/env"
 	"os"
 	"path"
 	"reflect"
@@ -54,20 +57,25 @@ type IWebsiteService interface {
 	CreateWebsiteDomain(create request.WebsiteDomainCreate) (model.WebsiteDomain, error)
 	GetWebsiteDomain(websiteId uint) ([]model.WebsiteDomain, error)
 	DeleteWebsiteDomain(domainId uint) error
+
 	GetNginxConfigByScope(req request.NginxScopeReq) (*response.WebsiteNginxConfig, error)
 	UpdateNginxConfigByScope(req request.NginxConfigUpdate) error
 	GetWebsiteNginxConfig(websiteId uint, configType string) (response.FileInfo, error)
+	UpdateNginxConfigFile(req request.WebsiteNginxUpdate) error
 	GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, error)
 	OpWebsiteHTTPS(ctx context.Context, req request.WebsiteHTTPSOp) (*response.WebsiteHTTPS, error)
-	PreInstallCheck(req request.WebsiteInstallCheckReq) ([]response.WebsitePreInstallCheck, error)
-	GetWafConfig(req request.WebsiteWafReq) (response.WebsiteWafConfig, error)
-	UpdateWafConfig(req request.WebsiteWafUpdate) error
-	UpdateNginxConfigFile(req request.WebsiteNginxUpdate) error
 	OpWebsiteLog(req request.WebsiteLogReq) (*response.WebsiteLog, error)
 	ChangeDefaultServer(id uint) error
+	PreInstallCheck(req request.WebsiteInstallCheckReq) ([]response.WebsitePreInstallCheck, error)
+
+	GetWafConfig(req request.WebsiteWafReq) (response.WebsiteWafConfig, error)
+	UpdateWafConfig(req request.WebsiteWafUpdate) error
+
 	GetPHPConfig(id uint) (*response.PHPConfig, error)
 	UpdatePHPConfig(req request.WebsitePHPConfigUpdate) error
 	UpdatePHPConfigFile(req request.WebsitePHPFileUpdate) error
+	ChangePHPVersion(req request.WebsitePHPVersionReq) error
+
 	GetRewriteConfig(req request.NginxRewriteReq) (*response.NginxRewriteRes, error)
 	UpdateRewriteConfig(req request.NginxRewriteUpdate) error
 	UpdateSiteDir(req request.WebsiteUpdateDir) error
@@ -1036,7 +1044,7 @@ func (w WebsiteService) GetPHPConfig(id uint) (*response.PHPConfig, error) {
 	phpConfigPath := path.Join(appInstall.GetPath(), "conf", "php.ini")
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(phpConfigPath) {
-		return nil, buserr.WithDetail(constant.ErrFileCanNotRead, "php.ini", nil)
+		return nil, buserr.WithMap("ErrFileNotFound", map[string]interface{}{"name": "php.ini"}, nil)
 	}
 	params := make(map[string]string)
 	configFile, err := fileOp.OpenFile(phpConfigPath)
@@ -1090,7 +1098,7 @@ func (w WebsiteService) UpdatePHPConfig(req request.WebsitePHPConfigUpdate) (err
 	phpConfigPath := path.Join(appInstall.GetPath(), "conf", "php.ini")
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(phpConfigPath) {
-		return buserr.WithDetail(constant.ErrFileCanNotRead, "php.ini", nil)
+		return buserr.WithMap("ErrFileNotFound", map[string]interface{}{"name": "php.ini"}, nil)
 	}
 	configFile, err := fileOp.OpenFile(phpConfigPath)
 	if err != nil {
@@ -1180,6 +1188,108 @@ func (w WebsiteService) UpdatePHPConfigFile(req request.WebsitePHPFileUpdate) er
 		return err
 	}
 	return nil
+}
+
+func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) error {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	if err != nil {
+		return err
+	}
+	runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(req.RuntimeID))
+	if err != nil {
+		return err
+	}
+	oldRuntime, err := runtimeRepo.GetFirst(commonRepo.WithByID(req.RuntimeID))
+	if err != nil {
+		return err
+	}
+	if runtime.Resource == constant.ResourceLocal || oldRuntime.Resource == constant.ResourceLocal {
+		return buserr.New("ErrPHPResource")
+	}
+	appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
+	if err != nil {
+		return err
+	}
+	appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(runtime.AppDetailID))
+	if err != nil {
+		return err
+	}
+
+	envs := make(map[string]interface{})
+	if err = json.Unmarshal([]byte(appInstall.Env), &envs); err != nil {
+		return err
+	}
+	if out, err := compose.Down(appInstall.GetComposePath()); err != nil {
+		if out != "" {
+			return errors.New(out)
+		}
+		return err
+	}
+
+	var (
+		busErr          error
+		fileOp          = files.NewFileOp()
+		envPath         = appInstall.GetEnvPath()
+		composePath     = appInstall.GetComposePath()
+		confDir         = path.Join(appInstall.GetPath(), "conf")
+		backupConfDir   = path.Join(appInstall.GetPath(), "conf_bak")
+		fpmConfDir      = path.Join(confDir, "php-fpm.conf")
+		phpDir          = path.Join(constant.RuntimeDir, runtime.Type, runtime.Name, "php")
+		oldFmContent, _ = fileOp.GetContent(fpmConfDir)
+	)
+	envParams := make(map[string]string, len(envs))
+	handleMap(envs, envParams)
+	envParams["IMAGE_NAME"] = runtime.Image
+	defer func() {
+		if busErr != nil {
+			envParams["IMAGE_NAME"] = oldRuntime.Image
+			_ = env.Write(envParams, envPath)
+			_ = fileOp.WriteFile(composePath, strings.NewReader(appInstall.DockerCompose), 0775)
+			if fileOp.Stat(backupConfDir) {
+				_ = fileOp.DeleteDir(confDir)
+				_ = fileOp.Rename(backupConfDir, confDir)
+			}
+		}
+	}()
+
+	if busErr = env.Write(envParams, envPath); busErr != nil {
+		return busErr
+	}
+	if busErr = fileOp.WriteFile(composePath, strings.NewReader(appDetail.DockerCompose), 0775); busErr != nil {
+		return busErr
+	}
+	if !req.RetainConfig {
+		if busErr = fileOp.Rename(confDir, backupConfDir); busErr != nil {
+			return busErr
+		}
+		_ = fileOp.CreateDir(confDir, 0755)
+		if busErr = fileOp.CopyFile(path.Join(phpDir, "php-fpm.conf"), confDir); busErr != nil {
+			return busErr
+		}
+		if busErr = fileOp.CopyFile(path.Join(phpDir, "php.ini"), confDir); busErr != nil {
+			_ = fileOp.WriteFile(fpmConfDir, bytes.NewReader(oldFmContent), 0775)
+			return busErr
+		}
+	}
+	if out, err := compose.Up(appInstall.GetComposePath()); err != nil {
+		if out != "" {
+			busErr = errors.New(out)
+			return busErr
+		}
+		busErr = err
+		return busErr
+	}
+
+	_ = fileOp.DeleteDir(backupConfDir)
+
+	appInstall.AppDetailId = runtime.AppDetailID
+	appInstall.AppId = appDetail.AppId
+	appInstall.Version = appDetail.Version
+	appInstall.DockerCompose = appDetail.DockerCompose
+
+	_ = appInstallRepo.Save(context.Background(), &appInstall)
+	website.RuntimeID = req.RuntimeID
+	return websiteRepo.Save(context.Background(), &website)
 }
 
 func (w WebsiteService) UpdateRewriteConfig(req request.NginxRewriteUpdate) error {

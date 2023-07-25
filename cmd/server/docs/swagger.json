@@ -10050,6 +10050,57 @@
                 }
             }
         },
+        "/websites/php/version": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "变更 php 版本",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Website PHP"
+                ],
+                "summary": "Update php version",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.WebsitePHPVersionReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [
+                        {
+                            "db": "websites",
+                            "input_column": "id",
+                            "input_value": "websiteId",
+                            "isList": false,
+                            "output_column": "primary_domain",
+                            "output_value": "domain"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "websiteId"
+                    ],
+                    "formatEN": "php version update [domain]",
+                    "formatZH": "php 版本变更 [domain]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/websites/proxies": {
             "post": {
                 "security": [
@@ -10199,7 +10250,7 @@
                 "tags": [
                     "Website"
                 ],
-                "summary": "Get proxy conf",
+                "summary": "Get redirect conf",
                 "parameters": [
                     {
                         "description": "request",
@@ -15577,6 +15628,25 @@
                 },
                 "type": {
                     "type": "string"
+                }
+            }
+        },
+        "request.WebsitePHPVersionReq": {
+            "type": "object",
+            "required": [
+                "retainConfig",
+                "runtimeID",
+                "websiteID"
+            ],
+            "properties": {
+                "retainConfig": {
+                    "type": "boolean"
+                },
+                "runtimeID": {
+                    "type": "integer"
+                },
+                "websiteID": {
+                    "type": "integer"
                 }
             }
         },

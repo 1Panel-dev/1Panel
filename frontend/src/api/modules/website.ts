@@ -226,3 +226,7 @@ export const OperateRedirectConfig = (req: Website.WebsiteReq) => {
 export const UpdateRedirectConfigFile = (req: Website.RedirectFileUpdate) => {
     return http.post<any>(`/websites/redirect/file`, req);
 };
+
+export const ChangePHPVersion = (req: Website.PHPVersionChange) => {
+    return http.post<any>(`/websites/php/version`, req);
+};
