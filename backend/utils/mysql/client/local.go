@@ -1,9 +1,11 @@
 package client
 
 import (
+	"compress/gzip"
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 	"time"
@@ -11,15 +13,17 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
 )
 
 type Local struct {
 	PrefixCommand []string
+	Password      string
 	ContainerName string
 }
 
-func NewLocal(command []string, containerName string) *Local {
-	return &Local{PrefixCommand: command, ContainerName: containerName}
+func NewLocal(command []string, containerName, password string) *Local {
+	return &Local{PrefixCommand: command, ContainerName: containerName, Password: password}
 }
 
 func (r *Local) Create(info CreateInfo) error {
@@ -198,6 +202,54 @@ func (r *Local) ChangeAccess(info AccessChangeInfo) error {
 	if err := r.ExecSQL("flush privileges", 300); err != nil {
 		return err
 	}
+	return nil
+}
+
+func (r *Local) Backup(info BackupInfo) (string, error) {
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(info.TargetDir) {
+		if err := os.MkdirAll(info.TargetDir, os.ModePerm); err != nil {
+			return "", fmt.Errorf("mkdir %s failed, err: %v", info.TargetDir, err)
+		}
+	}
+	fileName := fmt.Sprintf("%s/%s_%s.sql.gz", info.TargetDir, info.Name, time.Now().Format("20060102150405"))
+	outfile, _ := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, 0755)
+	global.LOG.Infof("start to mysqldump | gzip > %s.gzip", info.TargetDir+"/"+fileName)
+	cmd := exec.Command("docker", "exec", r.ContainerName, "mysqldump", "-uroot", "-p"+r.Password, info.Name)
+	gzipCmd := exec.Command("gzip", "-cf")
+	gzipCmd.Stdin, _ = cmd.StdoutPipe()
+	gzipCmd.Stdout = outfile
+	_ = gzipCmd.Start()
+	_ = cmd.Run()
+	_ = gzipCmd.Wait()
+	return fileName, nil
+}
+
+func (r *Local) Recover(info RecoverInfo) error {
+	fi, _ := os.Open(info.SourceFile)
+	defer fi.Close()
+	cmd := exec.Command("docker", "exec", "-i", r.ContainerName, "mysql", "-uroot", "-p"+r.Password, info.Name)
+	if strings.HasSuffix(info.SourceFile, ".gz") {
+		gzipFile, err := os.Open(info.SourceFile)
+		if err != nil {
+			return err
+		}
+		defer gzipFile.Close()
+		gzipReader, err := gzip.NewReader(gzipFile)
+		if err != nil {
+			return err
+		}
+		defer gzipReader.Close()
+		cmd.Stdin = gzipReader
+	} else {
+		cmd.Stdin = fi
+	}
+	stdout, err := cmd.CombinedOutput()
+	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
+	if err != nil || strings.HasPrefix(string(stdStr), "ERROR ") {
+		return errors.New(stdStr)
+	}
+
 	return nil
 }
 

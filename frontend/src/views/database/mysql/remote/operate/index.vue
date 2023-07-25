@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+    <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
         <template #header>
             <DrawerHeader :header="title" :resource="dialogData.rowData?.name" :back="handleClose" />
         </template>
@@ -11,26 +11,25 @@
                     </el-form-item>
                     <el-form-item :label="$t('database.version')" prop="version">
                         <el-select v-model="dialogData.rowData!.version">
-                            <el-option value="5.6.x" label="5.6.x" />
-                            <el-option value="5.7.x" label="5.7.x" />
-                            <el-option value="8.0.x" label="8.0.x" />
+                            <el-option value="5.6" label="5.6" />
+                            <el-option value="5.7" label="5.7" />
+                            <el-option value="8.0" label="8.0" />
                         </el-select>
+                        <span class="input-help">{{ $t('database.versionHelper') }}</span>
                     </el-form-item>
                     <el-form-item :label="$t('database.address')" prop="address">
                         <el-input clearable v-model.trim="dialogData.rowData!.address" />
+                        <span class="input-help">{{ $t('database.addressHelper') }}</span>
                     </el-form-item>
                     <el-form-item :label="$t('commons.table.port')" prop="port">
                         <el-input clearable v-model.trim="dialogData.rowData!.port" />
                     </el-form-item>
                     <el-form-item :label="$t('commons.login.username')" prop="username">
                         <el-input clearable v-model.trim="dialogData.rowData!.username" />
+                        <span class="input-help">{{ $t('database.userHelper') }}</span>
                     </el-form-item>
                     <el-form-item :label="$t('commons.login.password')" prop="password">
-                        <el-input type="password" clearable show-password v-model.trim="dialogData.rowData!.password">
-                            <template #append>
-                                <el-button @click="random">{{ $t('commons.button.random') }}</el-button>
-                            </template>
-                        </el-input>
+                        <el-input type="password" clearable show-password v-model.trim="dialogData.rowData!.password" />
                     </el-form-item>
                     <el-form-item :label="$t('commons.table.description')" prop="description">
                         <el-input clearable v-model.trim="dialogData.rowData!.description" />
@@ -57,7 +56,6 @@ import { Database } from '@/api/interface/database';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
-import { getRandomStr } from '@/utils/util';
 import { addRemoteDB, editRemoteDB } from '@/api/modules/database';
 
 interface DialogProps {
@@ -92,10 +90,6 @@ const rules = reactive({
 
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
-
-const random = async () => {
-    dialogData.value.rowData!.password = getRandomStr(16);
-};
 
 const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;

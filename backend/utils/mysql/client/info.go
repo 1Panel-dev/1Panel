@@ -52,6 +52,22 @@ type AccessChangeInfo struct {
 	Timeout uint `json:"timeout"` // second
 }
 
+type BackupInfo struct {
+	Name      string `json:"name"`
+	Format    string `json:"format"`
+	TargetDir string `json:"targetDir"`
+
+	Timeout uint `json:"timeout"` // second
+}
+
+type RecoverInfo struct {
+	Name       string `json:"name"`
+	Format     string `json:"format"`
+	SourceFile string `json:"sourceFile"`
+
+	Timeout uint `json:"timeout"` // second
+}
+
 var formatMap = map[string]string{
 	"utf8":    "utf8_general_ci",
 	"utf8mb4": "utf8mb4_general_ci",

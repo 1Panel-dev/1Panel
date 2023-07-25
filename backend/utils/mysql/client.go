@@ -17,6 +17,9 @@ type MysqlClient interface {
 	ChangePassword(info client.PasswordChangeInfo) error
 	ChangeAccess(info client.AccessChangeInfo) error
 
+	Backup(info client.BackupInfo) (string, error)
+	Recover(info client.RecoverInfo) error
+
 	Close()
 }
 
@@ -26,7 +29,7 @@ func NewMysqlClient(conn client.DBInfo) (MysqlClient, error) {
 			return nil, buserr.New(constant.ErrCmdIllegal)
 		}
 		connArgs := []string{"exec", conn.Address, "mysql", "-u" + conn.Username, "-p" + conn.Password, "-e"}
-		return client.NewLocal(connArgs, conn.Address), nil
+		return client.NewLocal(connArgs, conn.Address, conn.Password), nil
 	}
 
 	connArgs := fmt.Sprintf("%s:%s@tcp(%s:%d)/?charset=utf8", conn.Username, conn.Password, conn.Address, conn.Port)
@@ -37,5 +40,11 @@ func NewMysqlClient(conn client.DBInfo) (MysqlClient, error) {
 	if err := db.Ping(); err != nil {
 		return nil, err
 	}
-	return client.NewRemote(db), nil
+	return client.NewRemote(client.Remote{
+		Client:   db,
+		User:     conn.Username,
+		Password: conn.Password,
+		Address:  conn.Address,
+		Port:     conn.Port,
+	}), nil
 }

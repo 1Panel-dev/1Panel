@@ -4,20 +4,29 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"os"
+	"path"
 	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
+
+	"github.com/jarvanstack/mysqldump"
 )
 
 type Remote struct {
-	Client *sql.DB
+	Client   *sql.DB
+	User     string
+	Password string
+	Address  string
+	Port     uint
 }
 
-func NewRemote(client *sql.DB) *Remote {
-	return &Remote{Client: client}
+func NewRemote(db Remote) *Remote {
+	return &db
 }
 
 func (r *Remote) Create(info CreateInfo) error {
@@ -194,6 +203,55 @@ func (r *Remote) ChangeAccess(info AccessChangeInfo) error {
 		return err
 	}
 	if err := r.ExecSQL("flush privileges", 300); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *Remote) Backup(info BackupInfo) (string, error) {
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(info.TargetDir) {
+		if err := os.MkdirAll(info.TargetDir, os.ModePerm); err != nil {
+			return "", fmt.Errorf("mkdir %s failed, err: %v", info.TargetDir, err)
+		}
+	}
+	fileName := fmt.Sprintf("%s/%s_%s.sql", info.TargetDir, info.Name, time.Now().Format("20060102150405"))
+	dns := fmt.Sprintf("%s:%s@tcp(%s:%v)/%s?charset=%s&parseTime=true&loc=Asia%sShanghai", r.User, r.Password, r.Address, r.Port, info.Name, info.Format, "%2F")
+
+	f, _ := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, 0755)
+	defer f.Close()
+	if err := mysqldump.Dump(dns, mysqldump.WithData(), mysqldump.WithWriter(f)); err != nil {
+		return "", err
+	}
+
+	if err := fileOp.Compress([]string{fileName}, info.TargetDir, path.Base(fileName)+".gz", files.Gz); err != nil {
+		return "", err
+	}
+	return fileName, nil
+}
+
+func (r *Remote) Recover(info RecoverInfo) error {
+	fileOp := files.NewFileOp()
+	fileName := info.SourceFile
+	if strings.HasSuffix(info.SourceFile, ".sql.gz") {
+		fileName = strings.TrimSuffix(info.SourceFile, ".gz")
+		if err := fileOp.Decompress(info.SourceFile, fileName, files.Gz); err != nil {
+			return err
+		}
+	}
+	if strings.HasSuffix(info.SourceFile, ".tar.gz") {
+		fileName = strings.TrimSuffix(info.SourceFile, ".tar.gz")
+		if err := fileOp.Decompress(info.SourceFile, fileName, files.TarGz); err != nil {
+			return err
+		}
+	}
+	dns := fmt.Sprintf("%s:%s@tcp(%s:%v)/%s?charset=%s&parseTime=true&loc=Asia%sShanghai", r.User, r.Password, r.Address, r.Port, info.Name, info.Format, "%2F")
+	f, err := os.Open(fileName)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	if err := mysqldump.Source(dns, f); err != nil {
 		return err
 	}
 	return nil
