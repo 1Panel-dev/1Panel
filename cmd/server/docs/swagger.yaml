@@ -1062,6 +1062,8 @@ definitions:
         type: string
       ignoreCaptcha:
         type: boolean
+      language:
+        type: string
       name:
         type: string
       password:
@@ -4270,6 +4272,15 @@ paths:
         "200":
           description: OK
       summary: Load safety status
+      tags:
+      - Auth
+  /auth/language:
+    get:
+      description: 获取系统语言设置
+      responses:
+        "200":
+          description: OK
+      summary: Load System Language
       tags:
       - Auth
   /auth/login:
@@ -10206,7 +10217,7 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Get proxy conf
+      summary: Get redirect conf
       tags:
       - Website
   /websites/redirect/file:

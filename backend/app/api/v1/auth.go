@@ -120,6 +120,20 @@ func (b *BaseApi) CheckIsDemo(c *gin.Context) {
 	helper.SuccessWithData(c, global.CONF.System.IsDemo)
 }
 
+// @Tags Auth
+// @Summary Load System Language
+// @Description 获取系统语言设置
+// @Success 200
+// @Router /auth/language [get]
+func (b *BaseApi) GetLanguage(c *gin.Context) {
+	settingInfo, err := settingService.GetSettingInfo()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, settingInfo.Language)
+}
+
 func saveLoginLogs(c *gin.Context, err error) {
 	var logs model.LoginLog
 	if err != nil {

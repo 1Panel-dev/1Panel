@@ -24,3 +24,7 @@ export const checkIsSafety = (code: string) => {
 export const checkIsDemo = () => {
     return http.get<boolean>('/auth/demo');
 };
+
+export const getLanguage = () => {
+    return http.get<string>(`/auth/language`);
+};

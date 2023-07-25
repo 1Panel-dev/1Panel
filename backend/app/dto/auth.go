@@ -24,6 +24,7 @@ type Login struct {
 	Captcha       string `json:"captcha"`
 	CaptchaID     string `json:"captchaID"`
 	AuthMethod    string `json:"authMethod"`
+	Language      string `json:"language"`
 }
 
 type MFALogin struct {

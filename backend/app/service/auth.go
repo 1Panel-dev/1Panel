@@ -48,10 +48,12 @@ func (u *AuthService) Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo,
 	if err != nil {
 		return nil, err
 	}
+	if err = settingRepo.Update("Language", info.Language); err != nil {
+		return nil, err
+	}
 	if mfa.Value == "enable" {
 		return &dto.UserLoginInfo{Name: nameSetting.Value, MfaStatus: mfa.Value}, nil
 	}
-
 	return u.generateSession(c, info.Name, info.AuthMethod)
 }
 

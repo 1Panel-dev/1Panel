@@ -875,6 +875,20 @@
                 }
             }
         },
+        "/auth/language": {
+            "get": {
+                "description": "获取系统语言设置",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Load System Language",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/auth/login": {
             "post": {
                 "description": "用户登录",
@@ -10199,7 +10213,7 @@
                 "tags": [
                     "Website"
                 ],
-                "summary": "Get proxy conf",
+                "summary": "Get redirect conf",
                 "parameters": [
                     {
                         "description": "request",
@@ -12482,6 +12496,9 @@
                 },
                 "ignoreCaptcha": {
                     "type": "boolean"
+                },
+                "language": {
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"
