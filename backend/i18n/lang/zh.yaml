@@ -44,6 +44,7 @@ ErrNoSuchHost: "网络连接失败"
 ErrImagePullTimeOut: '镜像拉取超时'
 ErrContainerNotFound: '{{ .name }} 容器不存在'
 ErrContainerMsg: '{{ .name }} 容器异常，具体请在容器页面查看日志'
+ErrAppBackup: '{{ .name }} 应用备份失败 err {{.err}}'
 
 #file
 ErrFileCanNotRead: "此文件不支持预览"

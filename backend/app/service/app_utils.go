@@ -227,7 +227,7 @@ func deleteLink(ctx context.Context, install *model.AppInstall, deleteDB bool, f
 	return appInstallResourceRepo.DeleteBy(ctx, appInstallResourceRepo.WithAppInstallId(install.ID))
 }
 
-func upgradeInstall(installId uint, detailId uint) error {
+func upgradeInstall(installId uint, detailId uint, backup bool) error {
 	install, err := appInstallRepo.GetFirst(commonRepo.WithByID(installId))
 	if err != nil {
 		return err
@@ -239,13 +239,14 @@ func upgradeInstall(installId uint, detailId uint) error {
 	if install.Version == detail.Version {
 		return errors.New("two version is same")
 	}
-	if err := NewIBackupService().AppBackup(dto.CommonBackup{Name: install.App.Key, DetailName: install.Name}); err != nil {
-		return err
-	}
-
 	install.Status = constant.Upgrading
 
 	go func() {
+		if backup {
+			if err = NewIBackupService().AppBackup(dto.CommonBackup{Name: install.App.Key, DetailName: install.Name}); err != nil {
+				global.LOG.Errorf(i18n.GetMsgWithMap("ErrAppBackup", map[string]interface{}{"name": install.Name, "err": err.Error()}))
+			}
+		}
 		var upErr error
 		defer func() {
 			if upErr != nil {

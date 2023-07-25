@@ -58,6 +58,7 @@ type AppInstalledOperate struct {
 	ForceDelete  bool                `json:"forceDelete"`
 	DeleteBackup bool                `json:"deleteBackup"`
 	DeleteDB     bool                `json:"deleteDB"`
+	Backup       bool                `json:"backup"`
 }
 
 type AppInstalledUpdate struct {
