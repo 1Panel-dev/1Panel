@@ -882,6 +882,20 @@ const docTemplate = `{
                 }
             }
         },
+        "/auth/language": {
+            "get": {
+                "description": "获取系统语言设置",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Load System Language",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/auth/login": {
             "post": {
                 "description": "用户登录",
@@ -12540,6 +12554,9 @@ const docTemplate = `{
                 },
                 "ignoreCaptcha": {
                     "type": "boolean"
+                },
+                "language": {
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"
