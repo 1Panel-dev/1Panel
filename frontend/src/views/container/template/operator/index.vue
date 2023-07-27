@@ -3,6 +3,7 @@
         <template #header>
             <DrawerHeader
                 :header="title + $t('container.composeTemplate')"
+                :hideResource="dialogData.title === 'create'"
                 :resource="dialogData.rowData?.name"
                 :back="handleClose"
             />
