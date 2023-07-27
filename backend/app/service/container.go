@@ -432,13 +432,15 @@ func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
 	hostConf := oldContainer.HostConfig
 	var networkConf network.NetworkingConfig
 	if err := loadConfigInfo(req, config, hostConf, &networkConf); err != nil {
+		reCreateAfterUpdate(req.Name, client, oldContainer.Config, oldContainer.HostConfig, oldContainer.NetworkSettings)
 		return err
 	}
 
 	global.LOG.Infof("new container info %s has been update, now start to recreate", req.Name)
 	container, err := client.ContainerCreate(ctx, config, hostConf, &networkConf, &v1.Platform{}, req.Name)
 	if err != nil {
-		return fmt.Errorf("recreate contianer failed, err: %v", err)
+		reCreateAfterUpdate(req.Name, client, oldContainer.Config, oldContainer.HostConfig, oldContainer.NetworkSettings)
+		return fmt.Errorf("update contianer failed, err: %v", err)
 	}
 	global.LOG.Infof("update container %s successful! now check if the container is started.", req.Name)
 	if err := client.ContainerStart(ctx, container.ID, types.ContainerStartOptions{}); err != nil {
@@ -481,13 +483,14 @@ func (u *ContainerService) ContainerUpgrade(req dto.ContainerUpgrade) error {
 	}
 
 	global.LOG.Infof("new container info %s has been update, now start to recreate", req.Name)
-	container, err := client.ContainerCreate(ctx, config, hostConf, &network.NetworkingConfig{}, &v1.Platform{}, req.Name)
+	container, err := client.ContainerCreate(ctx, config, hostConf, &networkConf, &v1.Platform{}, req.Name)
 	if err != nil {
-		return fmt.Errorf("recreate contianer failed, err: %v", err)
+		reCreateAfterUpdate(req.Name, client, oldContainer.Config, oldContainer.HostConfig, oldContainer.NetworkSettings)
+		return fmt.Errorf("upgrade contianer failed, err: %v", err)
 	}
-	global.LOG.Infof("update container %s successful! now check if the container is started.", req.Name)
+	global.LOG.Infof("upgrade container %s successful! now check if the container is started.", req.Name)
 	if err := client.ContainerStart(ctx, container.ID, types.ContainerStartOptions{}); err != nil {
-		return fmt.Errorf("update successful but start failed, err: %v", err)
+		return fmt.Errorf("upgrade successful but start failed, err: %v", err)
 	}
 
 	return nil
@@ -795,7 +798,11 @@ func loadConfigInfo(req dto.ContainerOperate, config *container.Config, hostConf
 	config.Labels = stringsToMap(req.Labels)
 	config.ExposedPorts = exposeds
 
-	networkConf.EndpointsConfig = map[string]*network.EndpointSettings{req.Network: {}}
+	if len(req.Network) != 0 {
+		networkConf.EndpointsConfig = map[string]*network.EndpointSettings{req.Network: {}}
+	} else {
+		networkConf = &network.NetworkingConfig{}
+	}
 
 	hostConf.AutoRemove = req.AutoRemove
 	hostConf.CPUShares = req.CPUShares
@@ -814,4 +821,25 @@ func loadConfigInfo(req dto.ContainerOperate, config *container.Config, hostConf
 		hostConf.Binds = append(hostConf.Binds, fmt.Sprintf("%s:%s:%s", volume.SourceDir, volume.ContainerDir, volume.Mode))
 	}
 	return nil
+}
+
+func reCreateAfterUpdate(name string, client *client.Client, config *container.Config, hostConf *container.HostConfig, networkConf *types.NetworkSettings) {
+	ctx := context.Background()
+
+	var oldNetworkConf network.NetworkingConfig
+	if networkConf != nil {
+		for networkKey := range networkConf.Networks {
+			oldNetworkConf.EndpointsConfig = map[string]*network.EndpointSettings{networkKey: {}}
+			break
+		}
+	}
+
+	oldContainer, err := client.ContainerCreate(ctx, config, hostConf, &oldNetworkConf, &v1.Platform{}, name)
+	if err != nil {
+		global.LOG.Errorf("recreate after container update failed, err: %v", err)
+		return
+	}
+	if err := client.ContainerStart(ctx, oldContainer.ID, types.ContainerStartOptions{}); err != nil {
+		global.LOG.Errorf("restart after container update failed, err: %v", err)
+	}
 }

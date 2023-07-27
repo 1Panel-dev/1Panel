@@ -17,7 +17,13 @@
                         <el-input clearable v-model.trim="dialogData.rowData!.name" />
                     </el-form-item>
                     <el-form-item :label="$t('container.image')" prop="image">
-                        <el-select class="widthClass" allow-create filterable v-model="dialogData.rowData!.image">
+                        <el-select
+                            class="widthClass"
+                            :placeholder="$t('commons.msg.inputOrSelect')"
+                            allow-create
+                            filterable
+                            v-model="dialogData.rowData!.image"
+                        >
                             <el-option
                                 v-for="(item, index) of images"
                                 :key="index"
@@ -159,7 +165,7 @@
                                                 v-for="(item, indexV) of volumes"
                                                 :key="indexV"
                                                 :value="item.option"
-                                                :label="item.option"
+                                                :label="item.option.substring(0, 12)"
                                             />
                                         </el-select>
                                     </td>
@@ -301,13 +307,13 @@ const limits = ref<Container.ResourceLimit>({
 });
 
 const handleClose = () => {
+    emit('search');
     drawerVisiable.value = false;
 };
 
 const rules = reactive({
     name: [Rules.requiredInput, Rules.volumeName],
     image: [Rules.requiredSelect],
-    network: [Rules.requiredSelect],
     cpuShares: [Rules.integerNumberWith0, checkNumberRange(0, 262144)],
     nanoCPUs: [Rules.floatNumber],
     memory: [Rules.floatNumber],
