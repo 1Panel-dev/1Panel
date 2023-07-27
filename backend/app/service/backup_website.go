@@ -31,7 +31,7 @@ func (u *BackupService) WebsiteBackup(req dto.CommonBackup) error {
 	}
 
 	timeNow := time.Now().Format("20060102150405")
-	backupDir := fmt.Sprintf("%s/website/%s", localDir, req.Name)
+	backupDir := path.Join(localDir, fmt.Sprintf("website/%s", req.Name))
 	fileName := fmt.Sprintf("%s_%s.tar.gz", website.PrimaryDomain, timeNow)
 	if err := handleWebsiteBackup(&website, backupDir, fileName); err != nil {
 		return err
@@ -103,7 +103,7 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 
 	isOk := false
 	if !isRollback {
-		rollbackFile := fmt.Sprintf("%s/original/website/%s_%s.tar.gz", global.CONF.System.BaseDir, website.Alias, time.Now().Format("20060102150405"))
+		rollbackFile := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("original/website/%s_%s.tar.gz", website.Alias, time.Now().Format("20060102150405")))
 		if err := handleWebsiteBackup(website, path.Dir(rollbackFile), path.Base(rollbackFile)); err != nil {
 			return fmt.Errorf("backup website %s for rollback before recover failed, err: %v", website.Alias, err)
 		}

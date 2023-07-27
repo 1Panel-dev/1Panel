@@ -47,9 +47,6 @@ func Init() {
 		password = loadParams("ORIGINAL_PASSWORD")
 		entrance = loadParams("ORIGINAL_ENTRANCE")
 
-		if strings.HasSuffix(baseDir, "/") {
-			baseDir = baseDir[:strings.LastIndex(baseDir, "/")]
-		}
 		reader := bytes.NewReader(conf.AppYaml)
 		if err := v.ReadConfig(reader); err != nil {
 			panic(fmt.Errorf("Fatal error config file: %s \n", err))
@@ -88,12 +85,12 @@ func Init() {
 	global.CONF = serverConfig
 	global.CONF.System.BaseDir = baseDir
 	global.CONF.System.IsDemo = v.GetBool("system.is_demo")
-	global.CONF.System.DataDir = global.CONF.System.BaseDir + "/1panel"
-	global.CONF.System.Cache = global.CONF.System.DataDir + "/cache"
-	global.CONF.System.Backup = global.CONF.System.DataDir + "/backup"
-	global.CONF.System.DbPath = global.CONF.System.DataDir + "/db"
-	global.CONF.System.LogPath = global.CONF.System.DataDir + "/log"
-	global.CONF.System.TmpDir = global.CONF.System.DataDir + "/tmp"
+	global.CONF.System.DataDir = path.Join(global.CONF.System.BaseDir, "1panel")
+	global.CONF.System.Cache = path.Join(global.CONF.System.DataDir, "cache")
+	global.CONF.System.Backup = path.Join(global.CONF.System.DataDir, "backup")
+	global.CONF.System.DbPath = path.Join(global.CONF.System.DataDir, "db")
+	global.CONF.System.LogPath = path.Join(global.CONF.System.DataDir, "log")
+	global.CONF.System.TmpDir = path.Join(global.CONF.System.DataDir, "tmp")
 	global.CONF.System.Port = port
 	global.CONF.System.Version = version
 	global.CONF.System.Username = username

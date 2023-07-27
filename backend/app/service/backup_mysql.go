@@ -23,7 +23,7 @@ func (u *BackupService) MysqlBackup(req dto.CommonBackup) error {
 	}
 
 	timeNow := time.Now().Format("20060102150405")
-	targetDir := fmt.Sprintf("%s/database/mysql/%s/%s", localDir, req.Name, req.DetailName)
+	targetDir := path.Join(localDir, fmt.Sprintf("database/mysql/%s/%s", req.Name, req.DetailName))
 	fileName := fmt.Sprintf("%s_%s.sql.gz", req.DetailName, timeNow)
 
 	if err := handleMysqlBackup(req.DetailName, targetDir, fileName); err != nil {
@@ -137,7 +137,7 @@ func handleMysqlRecover(req dto.CommonRecover, isRollback bool) error {
 	}
 
 	if isRollback {
-		rollbackFile := fmt.Sprintf("%s/original/database/%s_%s.sql.gz", global.CONF.System.BaseDir, req.DetailName, time.Now().Format("20060102150405"))
+		rollbackFile := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("original/database/%s_%s.sql.gz", req.DetailName, time.Now().Format("20060102150405")))
 		if err := cli.Backup(client.BackupInfo{
 			Name:      req.DetailName,
 			Format:    dbInfo.Format,

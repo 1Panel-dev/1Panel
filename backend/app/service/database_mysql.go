@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path"
 	"regexp"
 	"strconv"
 	"strings"
@@ -178,7 +179,7 @@ func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error 
 		return err
 	}
 
-	uploadDir := fmt.Sprintf("%s/1panel/uploads/database/mysql/%s/%s", global.CONF.System.BaseDir, app.Name, db.Name)
+	uploadDir := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/uploads/database/mysql/%s/%s", app.Name, db.Name))
 	if _, err := os.Stat(uploadDir); err == nil {
 		_ = os.RemoveAll(uploadDir)
 	}
@@ -187,7 +188,7 @@ func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error 
 		if err != nil && !req.ForceDelete {
 			return err
 		}
-		backupDir := fmt.Sprintf("%s/database/mysql/%s/%s", localDir, db.MysqlName, db.Name)
+		backupDir := path.Join(localDir, fmt.Sprintf("database/mysql/%s/%s", db.MysqlName, db.Name))
 		if _, err := os.Stat(backupDir); err == nil {
 			_ = os.RemoveAll(backupDir)
 		}

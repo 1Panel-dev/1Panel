@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path"
 	"strings"
 	"time"
 
@@ -126,7 +127,7 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
 
 	timeNow := time.Now().Format("20060102150405")
 	versionItem, _ := settingRepo.Get(settingRepo.WithByKey("SystemVersion"))
-	rootDir := fmt.Sprintf("%s/system/1panel_%s_%s", localDir, versionItem.Value, timeNow)
+	rootDir := path.Join(localDir, fmt.Sprintf("system/1panel_%s_%s", versionItem.Value, timeNow))
 	backupPanelDir := fmt.Sprintf("%s/1panel", rootDir)
 	_ = os.MkdirAll(backupPanelDir, os.ModePerm)
 	backupDockerDir := fmt.Sprintf("%s/docker", rootDir)
@@ -180,7 +181,8 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
 			return
 		}
 
-		if err := u.handlePanelDatas(snap.ID, fileOp, "snapshot", global.CONF.System.BaseDir+"/1panel", backupPanelDir, localDir, dockerDataDir); err != nil {
+		dataDir := path.Join(global.CONF.System.BaseDir, "1panel")
+		if err := u.handlePanelDatas(snap.ID, fileOp, "snapshot", dataDir, backupPanelDir, localDir, dockerDataDir); err != nil {
 			updateSnapshotStatus(snap.ID, constant.StatusFailed, err.Error())
 			return
 		}
@@ -190,7 +192,7 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
 			BaseDir:            global.CONF.System.BaseDir,
 			DockerDataDir:      dockerDataDir,
 			BackupDataDir:      localDir,
-			PanelDataDir:       global.CONF.System.BaseDir + "/1panel",
+			PanelDataDir:       dataDir,
 			LiveRestoreEnabled: liveRestoreStatus,
 		}
 		if err := u.saveJson(snapJson, rootDir); err != nil {
@@ -198,7 +200,7 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
 			return
 		}
 
-		if err := handleTar(rootDir, fmt.Sprintf("%s/system", localDir), fmt.Sprintf("1panel_%s_%s.tar.gz", versionItem.Value, timeNow), ""); err != nil {
+		if err := handleTar(rootDir, path.Join(localDir, "system"), fmt.Sprintf("1panel_%s_%s.tar.gz", versionItem.Value, timeNow), ""); err != nil {
 			updateSnapshotStatus(snap.ID, constant.StatusFailed, err.Error())
 			return
 		}
@@ -207,7 +209,7 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
 
 		global.LOG.Infof("start to upload snapshot to %s, please wait", backup.Type)
 		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusUploading})
-		localPath := fmt.Sprintf("%s/system/1panel_%s_%s.tar.gz", localDir, versionItem.Value, timeNow)
+		localPath := path.Join(localDir, fmt.Sprintf("system/1panel_%s_%s.tar.gz", versionItem.Value, timeNow))
 		itemBackupPath := strings.TrimLeft(backup.BackupPath, "/")
 		itemBackupPath = strings.TrimRight(itemBackupPath, "/")
 		if ok, err := backupAccount.Upload(localPath, fmt.Sprintf("%s/system_snapshot/1panel_%s_%s.tar.gz", itemBackupPath, versionItem.Value, timeNow)); err != nil || !ok {
@@ -216,7 +218,7 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
 			return
 		}
 		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusSuccess})
-		_ = os.RemoveAll(fmt.Sprintf("%s/system/1panel_%s_%s.tar.gz", localDir, versionItem.Value, timeNow))
+		_ = os.RemoveAll(path.Join(localDir, fmt.Sprintf("system/1panel_%s_%s.tar.gz", versionItem.Value, timeNow)))
 
 		global.LOG.Infof("upload snapshot to %s success", backup.Type)
 	}()
@@ -248,7 +250,7 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 	if err != nil {
 		return err
 	}
-	baseDir := fmt.Sprintf("%s/system/%s", localDir, snap.Name)
+	baseDir := path.Join(localDir, fmt.Sprintf("system/%s", snap.Name))
 	if _, err := os.Stat(baseDir); err != nil && os.IsNotExist(err) {
 		_ = os.MkdirAll(baseDir, os.ModePerm)
 	}
@@ -300,7 +302,7 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 		_ = os.MkdirAll(u.OriginalPath, os.ModePerm)
 
 		snapJson.OldBaseDir = global.CONF.System.BaseDir
-		snapJson.OldPanelDataDir = global.CONF.System.BaseDir + "/1panel"
+		snapJson.OldPanelDataDir = path.Join(global.CONF.System.BaseDir, "1panel")
 		snapJson.OldBackupDataDir = localDir
 		recoverPanelDir := fmt.Sprintf("%s/%s/1panel", baseDir, snap.Name)
 		liveRestore := false
@@ -397,7 +399,7 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 	}
 	fileOp := files.NewFileOp()
 
-	rootDir := fmt.Sprintf("%s/system/%s/%s", localDir, snap.Name, snap.Name)
+	rootDir := path.Join(localDir, fmt.Sprintf("system/%s/%s", snap.Name, snap.Name))
 
 	_ = settingRepo.Update("SystemStatus", "Rollbacking")
 	_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"rollback_status": constant.StatusWaiting})
@@ -728,8 +730,9 @@ func (u *SnapshotService) Delete(req dto.BatchDeleteReq) error {
 		return err
 	}
 	for _, snap := range backups {
-		if _, err := os.Stat(fmt.Sprintf("%s/system/%s/%s.tar.gz", localDir, snap.Name, snap.Name)); err == nil {
-			_ = os.Remove(fmt.Sprintf("%s/system/%s/%s.tar.gz", localDir, snap.Name, snap.Name))
+		itemFile := path.Join(localDir, fmt.Sprintf("system/%s/%s.tar.gz", snap.Name, snap.Name))
+		if _, err := os.Stat(itemFile); err == nil {
+			_ = os.Remove(itemFile)
 		}
 	}
 	if err := snapshotRepo.Delete(commonRepo.WithIdsIn(req.Ids)); err != nil {
