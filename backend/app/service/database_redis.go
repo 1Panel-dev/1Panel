@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -163,7 +164,7 @@ func (u *RedisService) SearchBackupListWithPage(req dto.PageInfo) (int64, interf
 	if err != nil {
 		return 0, nil, err
 	}
-	backupDir := fmt.Sprintf("%s/database/redis/%s", localDir, redisInfo.Name)
+	backupDir := path.Join(localDir, fmt.Sprintf("database/redis/%s", redisInfo.Name))
 	_ = filepath.Walk(backupDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return nil

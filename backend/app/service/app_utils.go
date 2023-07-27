@@ -5,11 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
-	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
-	"github.com/1Panel-dev/1Panel/backend/i18n"
-	"github.com/subosito/gotenv"
-	"gopkg.in/yaml.v3"
 	"math"
 	"net/http"
 	"os"
@@ -19,6 +14,12 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
+	"github.com/1Panel-dev/1Panel/backend/i18n"
+	"github.com/subosito/gotenv"
+	"gopkg.in/yaml.v3"
 
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/utils/env"
@@ -187,13 +188,13 @@ func deleteAppInstall(install model.AppInstall, deleteBackup bool, forceDelete b
 	if install.App.Key == constant.AppMysql {
 		_ = mysqlRepo.DeleteAll(ctx)
 	}
-	uploadDir := fmt.Sprintf("%s/1panel/uploads/app/%s/%s", global.CONF.System.BaseDir, install.App.Key, install.Name)
+	uploadDir := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/uploads/app/%s/%s", install.App.Key, install.Name))
 	if _, err := os.Stat(uploadDir); err == nil {
 		_ = os.RemoveAll(uploadDir)
 	}
 	if deleteBackup {
 		localDir, _ := loadLocalDir()
-		backupDir := fmt.Sprintf("%s/app/%s/%s", localDir, install.App.Key, install.Name)
+		backupDir := path.Join(localDir, fmt.Sprintf("app/%s/%s", install.App.Key, install.Name))
 		if _, err := os.Stat(backupDir); err == nil {
 			_ = os.RemoveAll(backupDir)
 		}

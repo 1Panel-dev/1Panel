@@ -9,6 +9,7 @@ import (
 	"math/big"
 	"net"
 	"os"
+	"path"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/global"
@@ -90,7 +91,7 @@ func GenerateSSL(domain string) error {
 	pemBytes = append(pemBytes, pem.EncodeToMemory(clientCertBlock)...)
 	pemBytes = append(pemBytes, pem.EncodeToMemory(interCertBlock)...)
 	pemBytes = append(pemBytes, pem.EncodeToMemory(rootCertBlock)...)
-	certOut, err := os.OpenFile(global.CONF.System.BaseDir+"/1panel/secret/server.crt.tmp", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	certOut, err := os.OpenFile(path.Join(global.CONF.System.BaseDir, "1panel/secret/server.crt.tmp"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return err
 	}
@@ -99,7 +100,7 @@ func GenerateSSL(domain string) error {
 		return err
 	}
 
-	keyOut, err := os.OpenFile(global.CONF.System.BaseDir+"/1panel/secret/server.key.tmp", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	keyOut, err := os.OpenFile(path.Join(global.CONF.System.BaseDir, "1panel/secret/server.key.tmp"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return err
 	}

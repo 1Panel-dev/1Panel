@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/init/app"
@@ -58,11 +59,11 @@ func Start() {
 			panic(err)
 		}
 	} else {
-		certificate, err := os.ReadFile(global.CONF.System.BaseDir + "/1panel/secret/server.crt")
+		certificate, err := os.ReadFile(path.Join(global.CONF.System.BaseDir, "1panel/secret/server.crt"))
 		if err != nil {
 			panic(err)
 		}
-		key, err := os.ReadFile(global.CONF.System.BaseDir + "/1panel/secret/server.key")
+		key, err := os.ReadFile(path.Join(global.CONF.System.BaseDir, "1panel/secret/server.key"))
 		if err != nil {
 			panic(err)
 		}

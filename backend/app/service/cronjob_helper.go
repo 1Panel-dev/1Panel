@@ -124,7 +124,7 @@ func (u *CronjobService) handleBackup(cronjob *model.Cronjob, startTime time.Tim
 		return strings.Join(paths, ","), err
 	default:
 		fileName := fmt.Sprintf("directory%s_%s.tar.gz", strings.ReplaceAll(cronjob.SourceDir, "/", "_"), startTime.Format("20060102150405"))
-		backupDir := fmt.Sprintf("%s/%s/%s", localDir, cronjob.Type, cronjob.Name)
+		backupDir := path.Join(localDir, fmt.Sprintf("%s/%s", cronjob.Type, cronjob.Name))
 		itemFileDir := fmt.Sprintf("%s/%s", cronjob.Type, cronjob.Name)
 		global.LOG.Infof("handle tar %s to %s", backupDir, fileName)
 		if err := handleTar(cronjob.SourceDir, backupDir, fileName, cronjob.ExclusionRules); err != nil {
@@ -285,7 +285,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, backup model.Back
 			return paths, err
 		}
 		record.Name = dbInfo.MysqlName
-		backupDir := fmt.Sprintf("%s/database/mysql/%s/%s", localDir, record.Name, dbName)
+		backupDir := path.Join(localDir, fmt.Sprintf("database/mysql/%s/%s", record.Name, dbName))
 		record.FileName = fmt.Sprintf("db_%s_%s.sql.gz", dbName, startTime.Format("20060102150405"))
 		if err = handleMysqlBackup(dbName, backupDir, record.FileName); err != nil {
 			return paths, err
@@ -429,7 +429,7 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, backup model.Backu
 		if err != nil {
 			return paths, err
 		}
-		backupDir := fmt.Sprintf("%s/website/%s", localDir, website.PrimaryDomain)
+		backupDir := path.Join(localDir, fmt.Sprintf("website/%s", website.PrimaryDomain))
 		record.FileDir = backupDir
 		itemFileDir := strings.TrimPrefix(backupDir, localDir+"/")
 		if !cronjob.KeepLocal && backup.Type != "LOCAL" {

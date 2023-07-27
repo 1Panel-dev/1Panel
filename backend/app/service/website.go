@@ -9,8 +9,6 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/utils/compose"
-	"github.com/1Panel-dev/1Panel/backend/utils/env"
 	"os"
 	"path"
 	"reflect"
@@ -18,6 +16,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/utils/compose"
+	"github.com/1Panel-dev/1Panel/backend/utils/env"
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
@@ -424,13 +425,13 @@ func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 
 	if req.DeleteBackup {
 		localDir, _ := loadLocalDir()
-		backupDir := fmt.Sprintf("%s/website/%s", localDir, website.Alias)
+		backupDir := path.Join(localDir, fmt.Sprintf("website/%s", website.Alias))
 		if _, err := os.Stat(backupDir); err == nil {
 			_ = os.RemoveAll(backupDir)
 		}
 		global.LOG.Infof("delete website %s backups successful", website.Alias)
 	}
-	uploadDir := fmt.Sprintf("%s/1panel/uploads/website/%s", global.CONF.System.BaseDir, website.Alias)
+	uploadDir := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/uploads/website/%s", website.Alias))
 	if _, err := os.Stat(uploadDir); err == nil {
 		_ = os.RemoveAll(uploadDir)
 	}

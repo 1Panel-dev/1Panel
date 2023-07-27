@@ -43,7 +43,7 @@ func (u *BackupService) RedisBackup() error {
 			fileName = fmt.Sprintf("%s.tar.gz", timeNow)
 		}
 	}
-	backupDir := fmt.Sprintf("%s/database/redis/%s", localDir, redisInfo.Name)
+	backupDir := path.Join(localDir, fmt.Sprintf("database/redis/%s", redisInfo.Name))
 	if err := handleRedisBackup(redisInfo, backupDir, fileName); err != nil {
 		return err
 	}
@@ -143,7 +143,7 @@ func handleRedisRecover(redisInfo *repo.RootInfo, recoverFile string, isRollback
 				suffix = "tar.gz"
 			}
 		}
-		rollbackFile := fmt.Sprintf("%s/original/database/redis/%s_%s.%s", global.CONF.System.BaseDir, redisInfo.Name, time.Now().Format("20060102150405"), suffix)
+		rollbackFile := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("original/database/redis/%s_%s.%s", redisInfo.Name, time.Now().Format("20060102150405"), suffix))
 		if err := handleRedisBackup(redisInfo, path.Dir(rollbackFile), path.Base(rollbackFile)); err != nil {
 			return fmt.Errorf("backup database %s for rollback before recover failed, err: %v", redisInfo.Name, err)
 		}
