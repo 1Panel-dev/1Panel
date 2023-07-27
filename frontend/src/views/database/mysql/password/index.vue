@@ -29,6 +29,11 @@
                                 <el-form-item :label="$t('database.permission')" prop="privilege">
                                     <el-select style="width: 100%" v-model="changeForm.privilege">
                                         <el-option value="%" :label="$t('database.permissionAll')" />
+                                        <el-option
+                                            v-if="changeForm.from !== 'local'"
+                                            value="localhost"
+                                            :label="$t('terminal.localhost')"
+                                        />
                                         <el-option value="ip" :label="$t('database.permissionForIP')" />
                                     </el-select>
                                 </el-form-item>
@@ -110,6 +115,7 @@ const acceptParams = (params: DialogProps): void => {
             : i18n.global.t('database.permission');
     changeForm.id = params.id;
     changeForm.from = params.from;
+    console.log(changeForm.from);
     changeForm.mysqlName = params.mysqlName;
     changeForm.userName = params.username;
     changeForm.password = params.password;

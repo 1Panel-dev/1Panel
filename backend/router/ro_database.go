@@ -17,6 +17,7 @@ func (s *DatabaseRouter) InitDatabaseRouter(Router *gin.RouterGroup) {
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		cmdRouter.POST("", baseApi.CreateMysql)
+		cmdRouter.GET("load/:from", baseApi.LoadDBFromRemote)
 		cmdRouter.POST("/change/access", baseApi.ChangeMysqlAccess)
 		cmdRouter.POST("/change/password", baseApi.ChangeMysqlPassword)
 		cmdRouter.POST("/del/check", baseApi.DeleteCheckMysql)
@@ -42,6 +43,7 @@ func (s *DatabaseRouter) InitDatabaseRouter(Router *gin.RouterGroup) {
 		cmdRouter.POST("/redis/persistence/update", baseApi.UpdateRedisPersistenceConf)
 
 		cmdRouter.POST("/remote", baseApi.CreateRemoteDB)
+		cmdRouter.GET("/remote/:name", baseApi.GetRemoteDB)
 		cmdRouter.GET("/remote/list/:type", baseApi.ListRemoteDB)
 		cmdRouter.POST("/remote/update", baseApi.UpdateRemoteDB)
 		cmdRouter.POST("/remote/search", baseApi.SearchRemoteDB)

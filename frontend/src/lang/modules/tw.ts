@@ -330,15 +330,16 @@ const message = {
 
         confChange: '配置修改',
 
+        loadFromRemote: '從服務器獲取',
+        passwordHelper: '無法獲取密碼，請修改',
         remote: '遠程',
-        remoteDB: '遠程數據庫',
-        createRemoteDB: '創建遠程數據庫',
-        editRemoteDB: '編輯遠程數據庫',
+        remoteDB: '遠程服務器',
+        createRemoteDB: '添加遠程服務器',
+        editRemoteDB: '編輯遠程服務器',
         localDB: '本地數據庫',
         address: '數據庫地址',
         version: '數據庫版本',
         versionHelper: '當前僅支持 5.6 5.7 8.0 三個版本',
-        addressHelper: '非 127.0.0.1 的遠程數據庫地址',
         userHelper: 'root 用戶或者擁有 root 權限的數據庫用戶',
 
         selectFile: '選擇文件',

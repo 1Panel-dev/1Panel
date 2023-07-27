@@ -63,7 +63,7 @@ func (b *BaseApi) SearchRemoteDB(c *gin.Context) {
 
 // @Tags Database
 // @Summary List remote databases
-// @Description 获取快速命令列表
+// @Description 获取远程数据库列表
 // @Success 200 {array} dto.RemoteDBOption
 // @Security ApiKeyAuth
 // @Router /databases/remote/list/:type [get]
@@ -80,6 +80,27 @@ func (b *BaseApi) ListRemoteDB(c *gin.Context) {
 	}
 
 	helper.SuccessWithData(c, list)
+}
+
+// @Tags Database
+// @Summary Get remote databases
+// @Description 获取远程数据库
+// @Success 200 dto.RemoteDBOption
+// @Security ApiKeyAuth
+// @Router /databases/remote/:name [get]
+func (b *BaseApi) GetRemoteDB(c *gin.Context) {
+	name, err := helper.GetStrParamByKey(c, "name")
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	data, err := remoteDBService.Get(name)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, data)
 }
 
 // @Tags Database

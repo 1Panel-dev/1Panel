@@ -230,6 +230,25 @@ func (b *BaseApi) ListDBName(c *gin.Context) {
 }
 
 // @Tags Database Mysql
+// @Summary Load mysql database from remote
+// @Description 从服务器获取
+// @Security ApiKeyAuth
+// @Router /databases/load/:from [get]
+func (b *BaseApi) LoadDBFromRemote(c *gin.Context) {
+	from, err := helper.GetStrParamByKey(c, "from")
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := mysqlService.LoadFromRemote(from); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Database Mysql
 // @Summary Check before delete mysql database
 // @Description Mysql 数据库删除前检查
 // @Accept json

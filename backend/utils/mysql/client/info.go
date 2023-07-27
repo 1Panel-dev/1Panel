@@ -69,6 +69,16 @@ type RecoverInfo struct {
 	Timeout uint `json:"timeout"` // second
 }
 
+type SyncDBInfo struct {
+	Name       string `json:"name"`
+	From       string `json:"from"`
+	MysqlName  string `json:"mysqlName"`
+	Format     string `json:"format"`
+	Username   string `json:"username"`
+	Password   string `json:"password"`
+	Permission string `json:"permission"`
+}
+
 var formatMap = map[string]string{
 	"utf8":    "utf8_general_ci",
 	"utf8mb4": "utf8mb4_general_ci",
