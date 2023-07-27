@@ -1,6 +1,8 @@
 package service
 
 import (
+	"context"
+
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/mysql"
@@ -12,6 +14,7 @@ import (
 type RemoteDBService struct{}
 
 type IRemoteDBService interface {
+	Get(name string) (dto.RemoteDBInfo, error)
 	SearchWithPage(search dto.RemoteDBSearch) (int64, interface{}, error)
 	Create(req dto.RemoteDBCreate) error
 	Update(req dto.RemoteDBUpdate) error
@@ -38,6 +41,18 @@ func (u *RemoteDBService) SearchWithPage(search dto.RemoteDBSearch) (int64, inte
 		datas = append(datas, item)
 	}
 	return total, datas, err
+}
+
+func (u *RemoteDBService) Get(name string) (dto.RemoteDBInfo, error) {
+	var data dto.RemoteDBInfo
+	remote, err := remoteDBRepo.Get(commonRepo.WithByName(name))
+	if err != nil {
+		return data, err
+	}
+	if err := copier.Copy(&data, &remote); err != nil {
+		return data, errors.WithMessage(constant.ErrStructTransform, err.Error())
+	}
+	return data, nil
 }
 
 func (u *RemoteDBService) List(dbType string) ([]dto.RemoteDBOption, error) {
@@ -82,7 +97,15 @@ func (u *RemoteDBService) Delete(id uint) error {
 	if db.ID == 0 {
 		return constant.ErrRecordNotFound
 	}
-	return remoteDBRepo.Delete(commonRepo.WithByID(id))
+	if err := remoteDBRepo.Delete(commonRepo.WithByID(id)); err != nil {
+		return err
+	}
+	if db.From != "local" {
+		if err := mysqlRepo.Delete(context.Background(), remoteDBRepo.WithByFrom(db.Name)); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (u *RemoteDBService) Update(req dto.RemoteDBUpdate) error {

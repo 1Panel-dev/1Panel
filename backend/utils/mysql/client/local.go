@@ -13,17 +13,19 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 )
 
 type Local struct {
 	PrefixCommand []string
+	From          string
 	Password      string
 	ContainerName string
 }
 
-func NewLocal(command []string, containerName, password string) *Local {
-	return &Local{PrefixCommand: command, ContainerName: containerName, Password: password}
+func NewLocal(command []string, containerName, password, from string) *Local {
+	return &Local{PrefixCommand: command, ContainerName: containerName, Password: password, From: from}
 }
 
 func (r *Local) Create(info CreateInfo) error {
@@ -250,6 +252,81 @@ func (r *Local) Recover(info RecoverInfo) error {
 	}
 
 	return nil
+}
+
+func (r *Local) SyncDB(version string) ([]SyncDBInfo, error) {
+	var datas []SyncDBInfo
+	lines, err := r.ExecSQLForRows("SELECT SCHEMA_NAME, DEFAULT_CHARACTER_SET_NAME FROM information_schema.SCHEMATA", 300)
+	if err != nil {
+		return datas, err
+	}
+	for _, line := range lines {
+		parts := strings.Fields(line)
+		if len(parts) != 2 {
+			continue
+		}
+		if parts[0] == "SCHEMA_NAME" || parts[0] == "information_schema" || parts[0] == "mysql" || parts[0] == "performance_schema" || parts[0] == "sys" {
+			continue
+		}
+		dataItem := SyncDBInfo{
+			Name:      parts[0],
+			From:      r.From,
+			MysqlName: r.From,
+			Format:    parts[1],
+		}
+		userLines, err := r.ExecSQLForRows(fmt.Sprintf("SELECT USER,HOST FROM mysql.DB WHERE DB = '%s'", parts[0]), 300)
+		if err != nil {
+			return datas, err
+		}
+
+		var permissionItem []string
+		isLocal := true
+		i := 0
+		for _, userline := range userLines {
+			userparts := strings.Fields(userline)
+			if len(userparts) != 2 {
+				continue
+			}
+			if userparts[0] == "root" {
+				continue
+			}
+			if i == 0 {
+				dataItem.Username = userparts[0]
+			}
+			dataItem.Username = userparts[0]
+			if dataItem.Username == userparts[0] && userparts[1] == "%" {
+				isLocal = false
+				dataItem.Permission = "%"
+			} else if dataItem.Username == userparts[0] && userparts[1] != "localhost" {
+				isLocal = false
+				permissionItem = append(permissionItem, userparts[1])
+			}
+		}
+		if len(dataItem.Username) == 0 {
+			if err := r.CreateUser(CreateInfo{
+				Name:       parts[0],
+				Format:     parts[1],
+				Version:    version,
+				Username:   parts[0],
+				Password:   common.RandStr(16),
+				Permission: "%",
+				Timeout:    300,
+			}); err != nil {
+				global.LOG.Errorf("sync from remote server failed, err: create user failed %v", err)
+			}
+			dataItem.Username = parts[0]
+			dataItem.Permission = "%"
+		} else {
+			if isLocal {
+				dataItem.Permission = "localhost"
+			}
+			if len(dataItem.Permission) == 0 {
+				dataItem.Permission = strings.Join(permissionItem, ",")
+			}
+		}
+		datas = append(datas, dataItem)
+	}
+	return datas, nil
 }
 
 func (r *Local) Close() {}

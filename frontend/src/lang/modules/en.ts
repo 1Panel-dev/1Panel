@@ -335,15 +335,16 @@ const message = {
         portHelper:
             'This port is the exposed port of the container. You need to save the modification separately and restart the container!',
 
+        loadFromRemote: 'load from Server',
+        passwordHelper: 'Unable to retrieve, please modify',
         remote: 'Remote',
         remoteDB: 'Remote DB',
-        createRemoteDB: 'Create Remote DB',
-        editRemoteDB: 'Edit Remote DB',
+        createRemoteDB: 'Create Remote Server',
+        editRemoteDB: 'Edit Remote Server',
         localDB: 'Local DB',
         address: 'DB address',
         version: 'DB version',
         versionHelper: 'Currently, only versions 5.6, 5.7, and 8.0 are supported',
-        addressHelper: 'The remote database address except 127.0.0.1.',
         userHelper: 'The root user or a database user with root privileges can access the remote database.',
 
         selectFile: 'Select file',

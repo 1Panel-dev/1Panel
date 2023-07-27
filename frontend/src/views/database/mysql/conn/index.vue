@@ -4,7 +4,7 @@
             <DrawerHeader :header="$t('database.databaseConnInfo')" :back="handleClose" />
         </template>
         <el-form @submit.prevent v-loading="loading" ref="formRef" :model="form" label-position="top">
-            <el-row type="flex" justify="center">
+            <el-row type="flex" justify="center" v-if="form.from === 'local'">
                 <el-col :span="22">
                     <el-form-item :label="$t('database.containerConn')">
                         <el-tag>
@@ -39,6 +39,19 @@
                     </el-form-item>
                 </el-col>
             </el-row>
+            <el-row type="flex" justify="center" v-if="form.from !== 'local'">
+                <el-col :span="22">
+                    <el-form-item :label="$t('database.remoteConn')">
+                        <el-tag>{{ form.remoteIP + ':' + form.port }}</el-tag>
+                    </el-form-item>
+                    <el-form-item :label="$t('commons.login.username')">
+                        <el-tag>{{ form.username }}</el-tag>
+                    </el-form-item>
+                    <el-form-item :label="$t('commons.login.password')">
+                        <el-tag>{{ form.password }}</el-tag>
+                    </el-form-item>
+                </el-col>
+            </el-row>
         </el-form>
 
         <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmit" @cancel="loadPassword"></ConfirmDialog>
@@ -58,28 +71,31 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
-import { loadRemoteAccess, updateMysqlAccess, updateMysqlPassword } from '@/api/modules/database';
+import { getRemoteDB, loadRemoteAccess, updateMysqlAccess, updateMysqlPassword } from '@/api/modules/database';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { GetAppConnInfo } from '@/api/modules/app';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { getRandomStr } from '@/utils/util';
-import { App } from '@/api/interface/app';
 import useClipboard from 'vue-clipboard3';
 const { toClipboard } = useClipboard();
 
 const loading = ref(false);
 
 const dialogVisiable = ref(false);
-const form = ref<App.DatabaseConnInfo>({
+const form = reactive({
     password: '',
     serviceName: '',
     privilege: false,
     port: 0,
+
+    from: '',
+    username: '',
+    remoteIP: '',
 });
 
 const confirmDialogRef = ref();
@@ -88,15 +104,24 @@ const confirmAccessDialogRef = ref();
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 
-const acceptParams = (): void => {
-    form.value.password = '';
+interface DialogProps {
+    from: string;
+    remoteIP: string;
+}
+
+const acceptParams = (param: DialogProps): void => {
+    form.password = '';
+    form.from = param.from;
+    if (form.from !== 'local') {
+        loadRemoteInfo();
+    }
     loadPassword();
     loadAccess();
     dialogVisiable.value = true;
 };
 
 const random = async () => {
-    form.value.password = getRandomStr(16);
+    form.password = getRandomStr(16);
 };
 
 const onCopy = async (value: string) => {
@@ -114,18 +139,27 @@ const handleClose = () => {
 
 const loadAccess = async () => {
     const res = await loadRemoteAccess();
-    form.value.privilege = res.data;
+    form.privilege = res.data;
+};
+
+const loadRemoteInfo = async () => {
+    const res = await getRemoteDB(form.from);
+    form.remoteIP = res.data.address;
+    form.username = res.data.username;
+    form.password = res.data.password;
 };
 
 const loadPassword = async () => {
     const res = await GetAppConnInfo('mysql');
-    form.value = res.data;
+    form.password = res.data.password || '';
+    form.port = res.data.port || 3306;
+    form.serviceName = res.data.serviceName || '';
 };
 
 const onSubmit = async () => {
     let param = {
         id: 0,
-        value: form.value.password,
+        value: form.password,
     };
     loading.value = true;
     await updateMysqlPassword(param)
@@ -155,7 +189,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
 const onSubmitAccess = async () => {
     let param = {
         id: 0,
-        value: form.value.privilege ? '%' : 'localhost',
+        value: form.privilege ? '%' : 'localhost',
     };
     loading.value = true;
     await updateMysqlAccess(param)

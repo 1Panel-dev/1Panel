@@ -12,6 +12,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 
 	"github.com/jarvanstack/mysqldump"
@@ -19,6 +20,7 @@ import (
 
 type Remote struct {
 	Client   *sql.DB
+	From     string
 	User     string
 	Password string
 	Address  string
@@ -249,6 +251,86 @@ func (r *Remote) Recover(info RecoverInfo) error {
 		return err
 	}
 	return nil
+}
+
+func (r *Remote) SyncDB(version string) ([]SyncDBInfo, error) {
+	var datas []SyncDBInfo
+	rows, err := r.Client.Query("SELECT SCHEMA_NAME, DEFAULT_CHARACTER_SET_NAME FROM information_schema.SCHEMATA")
+	if err != nil {
+		return datas, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var dbName, charsetName string
+		if err = rows.Scan(&dbName, &charsetName); err != nil {
+			return datas, err
+		}
+		if dbName == "information_schema" || dbName == "mysql" || dbName == "performance_schema" || dbName == "sys" {
+			continue
+		}
+		dataItem := SyncDBInfo{
+			Name:      dbName,
+			From:      r.From,
+			MysqlName: r.From,
+			Format:    charsetName,
+		}
+		userRows, err := r.Client.Query("SELECT USER,HOST FROM mysql.DB WHERE DB = ?", dbName)
+		if err != nil {
+			return datas, err
+		}
+
+		var permissionItem []string
+		isLocal := true
+		i := 0
+		for userRows.Next() {
+			var user, host string
+			if err = userRows.Scan(&user, &host); err != nil {
+				return datas, err
+			}
+			if user == "root" {
+				continue
+			}
+			if i == 0 {
+				dataItem.Username = user
+			}
+			if dataItem.Username == user && host == "%" {
+				isLocal = false
+				dataItem.Permission = "%"
+			} else if dataItem.Username == user && host != "localhost" {
+				isLocal = false
+				permissionItem = append(permissionItem, host)
+			}
+			i++
+		}
+		if len(dataItem.Username) == 0 {
+			if err := r.CreateUser(CreateInfo{
+				Name:       dbName,
+				Format:     charsetName,
+				Version:    version,
+				Username:   dbName,
+				Password:   common.RandStr(16),
+				Permission: "%",
+				Timeout:    300,
+			}); err != nil {
+				global.LOG.Errorf("sync from remote server failed, err: create user failed %v", err)
+			}
+			dataItem.Username = dbName
+			dataItem.Permission = "%"
+		} else {
+			if isLocal {
+				dataItem.Permission = "localhost"
+			}
+			if len(dataItem.Permission) == 0 {
+				dataItem.Permission = strings.Join(permissionItem, ",")
+			}
+		}
+		datas = append(datas, dataItem)
+	}
+	if err = rows.Err(); err != nil {
+		return datas, err
+	}
+	return datas, nil
 }
 
 func (r *Remote) Close() {

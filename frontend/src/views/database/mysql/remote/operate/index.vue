@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
+    <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
             <DrawerHeader :header="title" :resource="dialogData.rowData?.name" :back="handleClose" />
         </template>
@@ -7,7 +7,12 @@
             <el-row type="flex" justify="center">
                 <el-col :span="22">
                     <el-form-item :label="$t('commons.table.name')" prop="name">
-                        <el-input clearable v-model.trim="dialogData.rowData!.name" />
+                        <el-input
+                            v-if="dialogData.title === 'create'"
+                            clearable
+                            v-model.trim="dialogData.rowData!.name"
+                        />
+                        <el-tag v-else>{{ dialogData.rowData!.name }}</el-tag>
                     </el-form-item>
                     <el-form-item :label="$t('database.version')" prop="version">
                         <el-select v-model="dialogData.rowData!.version">
@@ -19,7 +24,6 @@
                     </el-form-item>
                     <el-form-item :label="$t('database.address')" prop="address">
                         <el-input clearable v-model.trim="dialogData.rowData!.address" />
-                        <span class="input-help">{{ $t('database.addressHelper') }}</span>
                     </el-form-item>
                     <el-form-item :label="$t('commons.table.port')" prop="port">
                         <el-input clearable v-model.trim="dialogData.rowData!.port" />

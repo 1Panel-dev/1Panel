@@ -15,6 +15,9 @@ export const addMysqlDB = (params: Database.MysqlDBCreate) => {
     }
     return http.post(`/databases`, reqest);
 };
+export const loadDBFromRemote = (from: string) => {
+    return http.get(`/databases/load/${from}`);
+};
 export const updateMysqlAccess = (params: Database.ChangeInfo) => {
     return http.post(`/databases/change/access`, params);
 };
@@ -85,6 +88,9 @@ export const updateRedisConfByFile = (params: Database.RedisConfUpdateByFile) =>
 };
 
 // remote
+export const getRemoteDB = (name: string) => {
+    return http.get<Database.RemoteDBInfo>(`/databases/remote/${name}`);
+};
 export const searchRemoteDBs = (params: Database.SearchRemoteDBPage) => {
     return http.post<ResPage<Database.RemoteDBInfo>>(`/databases/remote/search`, params);
 };

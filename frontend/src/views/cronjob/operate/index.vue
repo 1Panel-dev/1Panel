@@ -454,7 +454,7 @@ const loadContainers = async () => {
 
 const checkMysqlInstalled = async () => {
     const data = await loadDBNames();
-    mysqlInfo.dbNames = data.data;
+    mysqlInfo.dbNames = data.data || [];
 };
 
 function isBackup() {

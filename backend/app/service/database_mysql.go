@@ -33,6 +33,7 @@ type IMysqlService interface {
 	SearchWithPage(search dto.MysqlDBSearch) (int64, interface{}, error)
 	ListDBName() ([]string, error)
 	Create(ctx context.Context, req dto.MysqlDBCreate) (*model.DatabaseMysql, error)
+	LoadFromRemote(from string) error
 	ChangeAccess(info dto.ChangeDBInfo) error
 	ChangePassword(info dto.ChangeDBInfo) error
 	UpdateVariables(updates []dto.MysqlVariablesUpdate) error
@@ -89,9 +90,6 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 	if req.From == "local" && req.Username == "root" {
 		return nil, errors.New("Cannot set root as user name")
 	}
-	if req.From == "127.0.0.1" {
-		return nil, errors.New("Cannot set 127.0.0.1 as address")
-	}
 
 	cli, version, err := LoadMysqlClientByFrom(req.From)
 	if err != nil {
@@ -127,29 +125,74 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 	return &createItem, nil
 }
 
+func (u *MysqlService) LoadFromRemote(from string) error {
+	client, version, err := LoadMysqlClientByFrom(from)
+	if err != nil {
+		return err
+	}
+
+	databases, err := mysqlRepo.List(remoteDBRepo.WithByFrom(from))
+	if err != nil {
+		return err
+	}
+	datas, err := client.SyncDB(version)
+	if err != nil {
+		return err
+	}
+	for _, data := range datas {
+		hasOld := false
+		for _, oldData := range databases {
+			if oldData.Name == data.Name {
+				hasOld = true
+				break
+			}
+		}
+		if !hasOld {
+			var createItem model.DatabaseMysql
+			if err := copier.Copy(&createItem, &data); err != nil {
+				return errors.WithMessage(constant.ErrStructTransform, err.Error())
+			}
+			if err := mysqlRepo.Create(context.Background(), &createItem); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 func (u *MysqlService) UpdateDescription(req dto.UpdateDescription) error {
 	return mysqlRepo.Update(req.ID, map[string]interface{}{"description": req.Description})
 }
 
 func (u *MysqlService) DeleteCheck(id uint) ([]string, error) {
 	var appInUsed []string
-	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
-	if err != nil {
-		return appInUsed, err
-	}
-
 	db, err := mysqlRepo.Get(commonRepo.WithByID(id))
 	if err != nil {
 		return appInUsed, err
 	}
 
-	apps, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithLinkId(app.ID), appInstallResourceRepo.WithResourceId(db.ID))
-	for _, app := range apps {
-		appInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(app.AppInstallId))
-		if appInstall.ID != 0 {
-			appInUsed = append(appInUsed, appInstall.Name)
+	if db.From == "local" {
+		app, err := appInstallRepo.LoadBaseInfo("mysql", "")
+		if err != nil {
+			return appInUsed, err
+		}
+		apps, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithLinkId(app.ID), appInstallResourceRepo.WithResourceId(db.ID))
+		for _, app := range apps {
+			appInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(app.AppInstallId))
+			if appInstall.ID != 0 {
+				appInUsed = append(appInUsed, appInstall.Name)
+			}
+		}
+	} else {
+		apps, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithResourceId(db.ID))
+		for _, app := range apps {
+			appInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(app.AppInstallId))
+			if appInstall.ID != 0 {
+				appInUsed = append(appInUsed, appInstall.Name)
+			}
 		}
 	}
+
 	return appInUsed, nil
 }
 

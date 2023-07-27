@@ -38,13 +38,16 @@
                         >
                             {{ $t('database.create') }}
                         </el-button>
+                        <el-button @click="onChangeConn" type="primary" plain>
+                            {{ $t('database.databaseConnInfo') }}
+                        </el-button>
                         <el-button
-                            v-if="mysqlIsExist && mysqlStatus === 'Running' && isLocal()"
-                            @click="onChangeRootPassword"
+                            v-if="(mysqlIsExist && mysqlStatus === 'Running') || !isLocal()"
+                            @click="loadDB"
                             type="primary"
                             plain
                         >
-                            {{ $t('database.databaseConnInfo') }}
+                            {{ $t('database.loadFromRemote') }}
                         </el-button>
                         <el-button @click="goRemoteDB" type="primary" plain>
                             {{ $t('database.remoteDB') }}
@@ -83,15 +86,10 @@
                     :class="{ mask: mysqlStatus != 'Running' && isLocal() }"
                 >
                     <el-table-column :label="$t('commons.table.name')" prop="name" sortable />
-                    <el-table-column :label="$t('commons.login.username')" prop="from">
-                        <template #default="{ row }">
-                            <span>{{ row.from === 'local' ? $t('database.localDB') : row.from }}</span>
-                        </template>
-                    </el-table-column>
                     <el-table-column :label="$t('commons.login.username')" prop="username" />
                     <el-table-column :label="$t('commons.login.password')" prop="password">
                         <template #default="{ row }">
-                            <div>
+                            <div v-if="row.password">
                                 <span style="float: left; line-height: 25px" v-if="!row.showPassword">***********</span>
                                 <div style="cursor: pointer; float: left" v-if="!row.showPassword">
                                     <el-icon
@@ -104,19 +102,20 @@
                                 </div>
                                 <span style="float: left" v-if="row.showPassword">{{ row.password }}</span>
                                 <div style="cursor: pointer; float: left" v-if="row.showPassword">
-                                    <el-icon
-                                        style="margin-left: 5px; margin-top: 3px"
-                                        @click="row.showPassword = false"
-                                        :size="16"
-                                    >
+                                    <el-icon class="iconInTable" @click="row.showPassword = false" :size="16">
                                         <Hide />
                                     </el-icon>
                                 </div>
                                 <div style="cursor: pointer; float: left">
-                                    <el-icon style="margin-left: 5px; margin-top: 3px" :size="16" @click="onCopy(row)">
+                                    <el-icon class="iconInTable" :size="16" @click="onCopy(row)">
                                         <DocumentCopy />
                                     </el-icon>
                                 </div>
+                            </div>
+                            <div v-else>
+                                <el-link @click="onChangePassword(row)">
+                                    <span style="font-size: 12px">{{ $t('database.passwordHelper') }}</span>
+                                </el-link>
                             </div>
                         </template>
                     </el-table-column>
@@ -191,7 +190,7 @@
         </el-dialog>
 
         <PasswordDialog ref="passwordRef" @search="search" />
-        <RootPasswordDialog ref="rootPasswordRef" />
+        <RootPasswordDialog ref="connRef" />
         <UploadDialog ref="uploadRef" />
         <OperateDialog @search="search" ref="dialogRef" />
         <Backups ref="dialogBackupRef" />
@@ -207,7 +206,7 @@
 import OperateDialog from '@/views/database/mysql/create/index.vue';
 import DeleteDialog from '@/views/database/mysql/delete/index.vue';
 import PasswordDialog from '@/views/database/mysql/password/index.vue';
-import RootPasswordDialog from '@/views/database/mysql/root-password/index.vue';
+import RootPasswordDialog from '@/views/database/mysql/conn/index.vue';
 import AppResources from '@/views/database/mysql/check/index.vue';
 import Setting from '@/views/database/mysql/setting/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
@@ -216,7 +215,13 @@ import UploadDialog from '@/components/upload/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import { dateFormat } from '@/utils/util';
 import { onMounted, reactive, ref } from 'vue';
-import { deleteCheckMysqlDB, listRemoteDBs, searchMysqlDBs, updateMysqlDescription } from '@/api/modules/database';
+import {
+    deleteCheckMysqlDB,
+    listRemoteDBs,
+    loadDBFromRemote,
+    searchMysqlDBs,
+    updateMysqlDescription,
+} from '@/api/modules/database';
 import i18n from '@/lang';
 import { Database } from '@/api/interface/database';
 import { App } from '@/api/interface/app';
@@ -268,9 +273,9 @@ const dialogBackupRef = ref();
 
 const uploadRef = ref();
 
-const rootPasswordRef = ref();
-const onChangeRootPassword = async () => {
-    rootPasswordRef.value!.acceptParams();
+const connRef = ref();
+const onChangeConn = async () => {
+    connRef.value!.acceptParams({ from: paginationConfig.from });
 };
 
 const goRemoteDB = async () => {
@@ -306,6 +311,18 @@ const search = async (column?: any) => {
     const res = await searchMysqlDBs(params);
     data.value = res.data.items || [];
     paginationConfig.total = res.data.total;
+};
+
+const loadDB = async () => {
+    loading.value = true;
+    await loadDBFromRemote(paginationConfig.from)
+        .then(() => {
+            loading.value = false;
+            search();
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const goRouter = async () => {
@@ -376,23 +393,30 @@ const onDelete = async (row: Database.MysqlDBInfo) => {
     }
 };
 
+const onChangePassword = async (row: Database.MysqlDBInfo) => {
+    let param = {
+        id: row.id,
+        from: row.from,
+        mysqlName: row.name,
+        operation: 'password',
+        username: row.username,
+        password: row.password,
+    };
+    passwordRef.value.acceptParams(param);
+};
+
 const buttons = [
     {
         label: i18n.global.t('database.changePassword'),
         click: (row: Database.MysqlDBInfo) => {
-            let param = {
-                id: row.id,
-                from: row.from,
-                mysqlName: row.name,
-                operation: 'password',
-                username: row.username,
-                password: row.password,
-            };
-            passwordRef.value.acceptParams(param);
+            onChangePassword(row);
         },
     },
     {
         label: i18n.global.t('database.permission'),
+        disabled: (row: Database.MysqlDBInfo) => {
+            return !row.password;
+        },
         click: (row: Database.MysqlDBInfo) => {
             let param = {
                 id: row.id,
@@ -403,7 +427,7 @@ const buttons = [
                 privilegeIPs: '',
                 password: '',
             };
-            if (row.permission === '%') {
+            if (row.permission === '%' || row.permission === 'localhost') {
                 param.privilege = row.permission;
             } else {
                 param.privilegeIPs = row.permission;
@@ -446,3 +470,10 @@ onMounted(() => {
     loadDBOptions();
 });
 </script>
+
+<style lang="scss" scoped>
+.iconInTable {
+    margin-left: 5px;
+    margin-top: 3px;
+}
+</style>
