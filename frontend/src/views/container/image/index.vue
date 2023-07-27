@@ -41,9 +41,9 @@
             </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
-                    <el-table-column label="ID" prop="id" min-width="60">
+                    <el-table-column label="ID" prop="id" min-width="50">
                         <template #default="{ row }">
-                            <Tooltip :islink="false" :text="row.id" />
+                            <span>{{ row.id.replaceAll('sha256:', '').substring(0, 12) }}</span>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('container.tag')" prop="tags" min-width="160" fix>
@@ -82,7 +82,6 @@
 </template>
 
 <script lang="ts" setup>
-import Tooltip from '@/components/tooltip/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import { reactive, onMounted, ref } from 'vue';
 import { dateFormat } from '@/utils/util';

@@ -297,6 +297,7 @@ const onOpenDialog = async (
     rowData: Partial<Container.ContainerHelper> = {
         cmd: [],
         cmdStr: '',
+        publishAllPorts: false,
         exposedPorts: [],
         cpuShares: 1024,
         nanoCPUs: 0,
