@@ -93,7 +93,7 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 		return nil, errors.New("Cannot set 127.0.0.1 as address")
 	}
 
-	cli, version, err := loadClientByFrom(req.From)
+	cli, version, err := LoadMysqlClientByFrom(req.From)
 	if err != nil {
 		return nil, err
 	}
@@ -105,11 +105,7 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 		}
 		createItem.MysqlName = app.Name
 	} else {
-		mysqlData, err := remoteDBRepo.Get(remoteDBRepo.WithByFrom(req.From))
-		if err != nil {
-			return nil, err
-		}
-		createItem.MysqlName = mysqlData.Name
+		createItem.MysqlName = req.From
 	}
 	defer cli.Close()
 	if err := cli.Create(client.CreateInfo{
@@ -162,7 +158,7 @@ func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error 
 	if err != nil && !req.ForceDelete {
 		return err
 	}
-	cli, version, err := loadClientByFrom(db.From)
+	cli, version, err := LoadMysqlClientByFrom(db.From)
 	if err != nil {
 		return err
 	}
@@ -207,7 +203,7 @@ func (u *MysqlService) ChangePassword(info dto.ChangeDBInfo) error {
 	if cmd.CheckIllegal(info.Value) {
 		return buserr.New(constant.ErrCmdIllegal)
 	}
-	cli, version, err := loadClientByFrom(info.From)
+	cli, version, err := LoadMysqlClientByFrom(info.From)
 	if err != nil {
 		return err
 	}
@@ -236,22 +232,31 @@ func (u *MysqlService) ChangePassword(info dto.ChangeDBInfo) error {
 	}
 
 	if info.ID != 0 {
-		// appRess, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithLinkId(app.ID), appInstallResourceRepo.WithResourceId(mysqlData.ID))
-		// for _, appRes := range appRess {
-		// 	appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(appRes.AppInstallId))
-		// 	if err != nil {
-		// 		return err
-		// 	}
-		// 	appModel, err := appRepo.GetFirst(commonRepo.WithByID(appInstall.AppId))
-		// 	if err != nil {
-		// 		return err
-		// 	}
+		var appRess []model.AppInstallResource
+		if info.From == "local" {
+			app, err := appInstallRepo.LoadBaseInfo("mysql", "")
+			if err != nil {
+				return err
+			}
+			appRess, _ = appInstallResourceRepo.GetBy(appInstallResourceRepo.WithLinkId(app.ID), appInstallResourceRepo.WithResourceId(mysqlData.ID))
+		} else {
+			appRess, _ = appInstallResourceRepo.GetBy(appInstallResourceRepo.WithResourceId(mysqlData.ID))
+		}
+		for _, appRes := range appRess {
+			appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(appRes.AppInstallId))
+			if err != nil {
+				return err
+			}
+			appModel, err := appRepo.GetFirst(commonRepo.WithByID(appInstall.AppId))
+			if err != nil {
+				return err
+			}
 
-		// 	global.LOG.Infof("start to update mysql password used by app %s-%s", appModel.Key, appInstall.Name)
-		// 	if err := updateInstallInfoInDB(appModel.Key, appInstall.Name, "user-password", true, info.Value); err != nil {
-		// 		return err
-		// 	}
-		// }
+			global.LOG.Infof("start to update mysql password used by app %s-%s", appModel.Key, appInstall.Name)
+			if err := updateInstallInfoInDB(appModel.Key, appInstall.Name, "user-password", true, info.Value); err != nil {
+				return err
+			}
+		}
 		global.LOG.Info("excute password change sql successful")
 		_ = mysqlRepo.Update(mysqlData.ID, map[string]interface{}{"password": info.Value})
 		return nil
@@ -270,7 +275,7 @@ func (u *MysqlService) ChangeAccess(info dto.ChangeDBInfo) error {
 	if cmd.CheckIllegal(info.Value) {
 		return buserr.New(constant.ErrCmdIllegal)
 	}
-	cli, version, err := loadClientByFrom(info.From)
+	cli, version, err := LoadMysqlClientByFrom(info.From)
 	if err != nil {
 		return err
 	}
@@ -535,15 +540,17 @@ func updateMyCnf(oldFiles []string, group string, param string, value interface{
 	return newFiles
 }
 
-func loadClientByFrom(from string) (mysql.MysqlClient, string, error) {
+func LoadMysqlClientByFrom(from string) (mysql.MysqlClient, string, error) {
 	var (
 		dbInfo  client.DBInfo
 		version string
 		err     error
 	)
 
+	dbInfo.From = from
+	dbInfo.Timeout = 300
 	if from != "local" {
-		databaseItem, err := remoteDBRepo.Get(remoteDBRepo.WithByFrom(from))
+		databaseItem, err := remoteDBRepo.Get(commonRepo.WithByName(from))
 		if err != nil {
 			return nil, "", err
 		}

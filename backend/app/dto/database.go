@@ -15,6 +15,7 @@ type MysqlDBInfo struct {
 	CreatedAt   time.Time `json:"createdAt"`
 	Name        string    `json:"name"`
 	From        string    `json:"from"`
+	MysqlName   string    `json:"mysqlName"`
 	Format      string    `json:"format"`
 	Username    string    `json:"username"`
 	Password    string    `json:"password"`

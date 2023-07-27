@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
-	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cloud_storage"
@@ -118,11 +117,7 @@ func (u *CronjobService) handleBackup(cronjob *model.Cronjob, startTime time.Tim
 
 	switch cronjob.Type {
 	case "database":
-		app, err := appInstallRepo.LoadBaseInfo("mysql", "")
-		if err != nil {
-			return "", err
-		}
-		paths, err := u.handleDatabase(*cronjob, app, backup, startTime)
+		paths, err := u.handleDatabase(*cronjob, backup, startTime)
 		return strings.Join(paths, ","), err
 	case "website":
 		paths, err := u.handleWebsite(*cronjob, backup, startTime)
@@ -252,7 +247,7 @@ func handleUnTar(sourceFile, targetDir string) error {
 	return nil
 }
 
-func (u *CronjobService) handleDatabase(cronjob model.Cronjob, app *repo.RootInfo, backup model.BackupAccount, startTime time.Time) ([]string, error) {
+func (u *CronjobService) handleDatabase(cronjob model.Cronjob, backup model.BackupAccount, startTime time.Time) ([]string, error) {
 	var paths []string
 	localDir, err := loadLocalDir()
 	if err != nil {
@@ -282,15 +277,20 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, app *repo.RootInf
 		var record model.BackupRecord
 
 		record.Type = "mysql"
-		record.Name = app.Name
 		record.Source = "LOCAL"
 		record.BackupType = backup.Type
 
-		backupDir := fmt.Sprintf("%s/database/mysql/%s/%s", localDir, app.Name, dbName)
-		record.FileName = fmt.Sprintf("db_%s_%s.sql.gz", dbName, startTime.Format("20060102150405"))
-		if err = handleMysqlBackup(app, backupDir, dbName, record.FileName); err != nil {
+		dbInfo, err := mysqlRepo.Get(commonRepo.WithByName(dbName))
+		if err != nil {
 			return paths, err
 		}
+		record.Name = dbInfo.MysqlName
+		backupDir := fmt.Sprintf("%s/database/mysql/%s/%s", localDir, record.Name, dbName)
+		record.FileName = fmt.Sprintf("db_%s_%s.sql.gz", dbName, startTime.Format("20060102150405"))
+		if err = handleMysqlBackup(dbName, backupDir, record.FileName); err != nil {
+			return paths, err
+		}
+
 		record.DetailName = dbName
 		record.FileDir = backupDir
 		itemFileDir := strings.TrimPrefix(backupDir, localDir+"/")

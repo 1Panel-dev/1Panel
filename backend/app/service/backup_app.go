@@ -106,15 +106,11 @@ func handleAppBackup(install *model.AppInstall, backupDir, fileName string) erro
 
 	resource, _ := appInstallResourceRepo.GetFirst(appInstallResourceRepo.WithAppInstallId(install.ID))
 	if resource.ID != 0 && resource.ResourceId != 0 {
-		mysqlInfo, err := appInstallRepo.LoadBaseInfo(constant.AppMysql, "")
-		if err != nil {
-			return err
-		}
 		db, err := mysqlRepo.Get(commonRepo.WithByID(resource.ResourceId))
 		if err != nil {
 			return err
 		}
-		if err := handleMysqlBackup(mysqlInfo, tmpDir, db.Name, fmt.Sprintf("%s.sql.gz", install.Name)); err != nil {
+		if err := handleMysqlBackup(db.Name, tmpDir, fmt.Sprintf("%s.sql.gz", install.Name)); err != nil {
 			return err
 		}
 	}
@@ -198,7 +194,11 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 		}
 		_ = appInstallResourceRepo.BatchUpdateBy(map[string]interface{}{"resource_id": newDB.ID}, commonRepo.WithByID(resource.ID))
 
-		if err := handleMysqlRecover(mysqlInfo, tmpPath, newDB.Name, fmt.Sprintf("%s.sql.gz", install.Name), true); err != nil {
+		if err := handleMysqlRecover(dto.CommonRecover{
+			Name:       newDB.MysqlName,
+			DetailName: newDB.Name,
+			File:       tmpPath + "/" + fmt.Sprintf("%s/%s.sql.gz", tmpPath, install.Name),
+		}, true); err != nil {
 			global.LOG.Errorf("handle recover from sql.gz failed, err: %v", err)
 			return err
 		}

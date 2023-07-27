@@ -17,6 +17,7 @@ export namespace Database {
         id: number;
         createdAt: Date;
         name: string;
+        mysqlName: string;
         from: string;
         format: string;
         username: string;

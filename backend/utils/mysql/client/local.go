@@ -205,16 +205,15 @@ func (r *Local) ChangeAccess(info AccessChangeInfo) error {
 	return nil
 }
 
-func (r *Local) Backup(info BackupInfo) (string, error) {
+func (r *Local) Backup(info BackupInfo) error {
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(info.TargetDir) {
 		if err := os.MkdirAll(info.TargetDir, os.ModePerm); err != nil {
-			return "", fmt.Errorf("mkdir %s failed, err: %v", info.TargetDir, err)
+			return fmt.Errorf("mkdir %s failed, err: %v", info.TargetDir, err)
 		}
 	}
-	fileName := fmt.Sprintf("%s/%s_%s.sql.gz", info.TargetDir, info.Name, time.Now().Format("20060102150405"))
-	outfile, _ := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, 0755)
-	global.LOG.Infof("start to mysqldump | gzip > %s.gzip", info.TargetDir+"/"+fileName)
+	outfile, _ := os.OpenFile(info.FileName, os.O_RDWR|os.O_CREATE, 0755)
+	global.LOG.Infof("start to mysqldump | gzip > %s.gzip", info.TargetDir+"/"+info.FileName)
 	cmd := exec.Command("docker", "exec", r.ContainerName, "mysqldump", "-uroot", "-p"+r.Password, info.Name)
 	gzipCmd := exec.Command("gzip", "-cf")
 	gzipCmd.Stdin, _ = cmd.StdoutPipe()
@@ -222,7 +221,7 @@ func (r *Local) Backup(info BackupInfo) (string, error) {
 	_ = gzipCmd.Start()
 	_ = cmd.Run()
 	_ = gzipCmd.Wait()
-	return fileName, nil
+	return nil
 }
 
 func (r *Local) Recover(info RecoverInfo) error {
