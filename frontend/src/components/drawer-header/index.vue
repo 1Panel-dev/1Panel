@@ -2,7 +2,7 @@
     <el-page-header @back="props.back">
         <template #content>
             <span>{{ header }}</span>
-            <span v-if="resource">
+            <span v-if="resource && !hideResource">
                 -
                 <el-tag effect="dark" type="success">{{ resource }}</el-tag>
             </span>
@@ -25,5 +25,6 @@ const props = defineProps({
     header: String,
     back: Function,
     resource: String,
+    hideResource: Boolean,
 });
 </script>

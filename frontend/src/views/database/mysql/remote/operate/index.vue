@@ -1,7 +1,12 @@
 <template>
     <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
-            <DrawerHeader :header="title" :resource="dialogData.rowData?.name" :back="handleClose" />
+            <DrawerHeader
+                :hideResource="dialogData.title === 'create'"
+                :header="title"
+                :resource="dialogData.rowData?.name"
+                :back="handleClose"
+            />
         </template>
         <el-form ref="formRef" label-position="top" :model="dialogData.rowData" :rules="rules">
             <el-row type="flex" justify="center">
