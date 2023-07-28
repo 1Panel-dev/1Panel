@@ -389,13 +389,7 @@ func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.Contai
 	if oldContainer.HostConfig.Memory != 0 {
 		data.Memory = float64(oldContainer.HostConfig.Memory) / 1024 / 1024
 	}
-	for _, bind := range oldContainer.HostConfig.Binds {
-		parts := strings.Split(bind, ":")
-		if len(parts) != 3 {
-			continue
-		}
-		data.Volumes = append(data.Volumes, dto.VolumeHelper{SourceDir: parts[0], ContainerDir: parts[1], Mode: parts[2]})
-	}
+	data.Volumes = loadVolumeBinds(oldContainer.HostConfig.Binds)
 
 	return &data, nil
 }
@@ -842,4 +836,43 @@ func reCreateAfterUpdate(name string, client *client.Client, config *container.C
 	if err := client.ContainerStart(ctx, oldContainer.ID, types.ContainerStartOptions{}); err != nil {
 		global.LOG.Errorf("restart after container update failed, err: %v", err)
 	}
+}
+
+func loadVolumeBinds(binds []string) []dto.VolumeHelper {
+	var datas []dto.VolumeHelper
+	for _, bind := range binds {
+		parts := strings.Split(bind, ":")
+		var volumeItem dto.VolumeHelper
+		if len(parts) > 3 {
+			continue
+		}
+		volumeItem.SourceDir = parts[0]
+		if len(parts) == 1 {
+			volumeItem.ContainerDir = parts[0]
+			volumeItem.Mode = "rw"
+		}
+		if len(parts) == 2 {
+			switch parts[1] {
+			case "r", "ro":
+				volumeItem.ContainerDir = parts[0]
+				volumeItem.Mode = "ro"
+			case "rw":
+				volumeItem.ContainerDir = parts[0]
+				volumeItem.Mode = "rw"
+			default:
+				volumeItem.ContainerDir = parts[1]
+				volumeItem.Mode = "rw"
+			}
+		}
+		if len(parts) == 3 {
+			volumeItem.ContainerDir = parts[1]
+			if parts[2] == "r" {
+				volumeItem.Mode = "ro"
+			} else {
+				volumeItem.Mode = parts[2]
+			}
+		}
+		datas = append(datas, volumeItem)
+	}
+	return datas
 }
