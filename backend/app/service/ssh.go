@@ -206,8 +206,13 @@ func (u *SSHService) LoadSSHSecret(mode string) (string, error) {
 	return string(file), err
 }
 
+type sshFileItem struct {
+	Name string
+	Year int
+}
+
 func (u *SSHService) LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error) {
-	var fileList []string
+	var fileList []sshFileItem
 	var data dto.SSHLog
 	baseDir := "/var/log"
 	if err := filepath.Walk(baseDir, func(pathItem string, info os.FileInfo, err error) error {
@@ -215,12 +220,15 @@ func (u *SSHService) LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error) {
 			return err
 		}
 		if !info.IsDir() && strings.HasPrefix(info.Name(), "secure") || strings.HasPrefix(info.Name(), "auth") {
-			if strings.HasSuffix(info.Name(), ".gz") {
+			if !strings.HasSuffix(info.Name(), ".gz") {
+				fileList = append(fileList, sshFileItem{Name: pathItem, Year: info.ModTime().Year()})
+				return nil
+			}
+			itemFileName := strings.TrimSuffix(pathItem, ".gz")
+			if _, err := os.Stat(itemFileName); err != nil && os.IsNotExist(err) {
 				if err := handleGunzip(pathItem); err == nil {
-					fileList = append(fileList, strings.ReplaceAll(pathItem, ".gz", ""))
+					fileList = append(fileList, sshFileItem{Name: itemFileName, Year: info.ModTime().Year()})
 				}
-			} else {
-				fileList = append(fileList, pathItem)
 			}
 		}
 		return nil
@@ -234,80 +242,62 @@ func (u *SSHService) LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error) {
 		command = fmt.Sprintf(" | grep '%s'", req.Info)
 	}
 
-	for i := 0; i < len(fileList); i++ {
-		withAppend := len(data.Logs) < req.Page*req.PageSize
-		if req.Status != constant.StatusSuccess {
-			if strings.HasPrefix(path.Base(fileList[i]), "secure") {
-				commandItem := fmt.Sprintf("cat %s | grep -a 'Failed password for' | grep -v 'invalid' %s", fileList[i], command)
-				dataItem, itemTotal := loadFailedSecureDatas(commandItem, withAppend)
-				data.FailedCount += itemTotal
-				data.TotalCount += itemTotal
-				data.Logs = append(data.Logs, dataItem...)
-			}
-			if strings.HasPrefix(path.Base(fileList[i]), "auth.log") {
-				commandItem := fmt.Sprintf("cat %s | grep -a 'Connection closed by authenticating user' | grep -a 'preauth' %s", fileList[i], command)
-				dataItem, itemTotal := loadFailedAuthDatas(commandItem, withAppend)
-				data.FailedCount += itemTotal
-				data.TotalCount += itemTotal
-				data.Logs = append(data.Logs, dataItem...)
-			}
-		}
-		if req.Status != constant.StatusFailed {
-			commandItem := fmt.Sprintf("cat %s | grep -a Accepted %s", fileList[i], command)
-			dataItem, itemTotal := loadSuccessDatas(commandItem, withAppend)
-			data.TotalCount += itemTotal
-			data.Logs = append(data.Logs, dataItem...)
-		}
-	}
-	data.SuccessfulCount = data.TotalCount - data.FailedCount
-	if len(data.Logs) < 1 {
-		return nil, nil
-	}
-
-	var itemDatas []dto.SSHHistory
-	total, start, end := len(data.Logs), (req.Page-1)*req.PageSize, req.Page*req.PageSize
-	if start > total {
-		itemDatas = make([]dto.SSHHistory, 0)
-	} else {
-		if end >= total {
-			end = total
-		}
-		itemDatas = data.Logs[start:end]
-	}
-	data.Logs = itemDatas
-
-	timeNow := time.Now()
+	showCountFrom := (req.Page - 1) * req.PageSize
+	showCountTo := req.Page * req.PageSize
 	nyc, _ := time.LoadLocation(common.LoadTimeZone())
 	qqWry, err := qqwry.NewQQwry()
 	if err != nil {
 		global.LOG.Errorf("load qqwry datas failed: %s", err)
 	}
-	var itemLogs []dto.SSHHistory
-	for i := 0; i < len(data.Logs); i++ {
-		data.Logs[i].Area = qqWry.Find(data.Logs[i].Address).Area
-		data.Logs[i].Date, _ = time.ParseInLocation("2006 Jan 2 15:04:05", fmt.Sprintf("%d %s", timeNow.Year(), data.Logs[i].DateStr), nyc)
-		itemLogs = append(itemLogs, data.Logs[i])
+	for _, file := range fileList {
+		commandItem := ""
+		if strings.HasPrefix(path.Base(file.Name), "secure") {
+			switch req.Status {
+			case constant.StatusSuccess:
+				commandItem = fmt.Sprintf("cat %s | grep -a Accepted %s", file.Name, command)
+			case constant.StatusFailed:
+				commandItem = fmt.Sprintf("cat %s | grep -a 'Failed password for' | grep -v 'invalid' %s", file.Name, command)
+			default:
+				commandItem = fmt.Sprintf("cat %s | grep -aE '(Failed password for|Accepted)' | grep -v 'invalid' %s", file.Name, command)
+			}
+		}
+		if strings.HasPrefix(path.Base(file.Name), "auth.log") {
+			switch req.Status {
+			case constant.StatusSuccess:
+				commandItem = fmt.Sprintf("cat %s | grep -a Accepted %s", file.Name, command)
+			case constant.StatusFailed:
+				commandItem = fmt.Sprintf("cat %s | grep -a 'Connection closed by authenticating user' | grep -a 'preauth' %s", file.Name, command)
+			default:
+				commandItem = fmt.Sprintf("cat %s | grep -aE \"(Connection closed by authenticating user|Accepted)\" | grep -v 'invalid' %s", file.Name, command)
+			}
+		}
+		dataItem, successCount, failedCount := loadSSHData(commandItem, showCountFrom, showCountTo, file.Year, qqWry, nyc)
+		data.FailedCount += failedCount
+		data.TotalCount += successCount + failedCount
+		showCountFrom = showCountFrom - data.TotalCount
+		showCountTo = showCountTo - data.TotalCount
+		data.Logs = append(data.Logs, dataItem...)
 	}
-	data.Logs = itemLogs
 
+	data.SuccessfulCount = data.TotalCount - data.FailedCount
 	return &data, nil
 }
 
-func sortFileList(fileNames []string) []string {
+func sortFileList(fileNames []sshFileItem) []sshFileItem {
 	if len(fileNames) < 2 {
 		return fileNames
 	}
-	if strings.HasPrefix(path.Base(fileNames[0]), "secure") {
-		var itemFile []string
+	if strings.HasPrefix(path.Base(fileNames[0].Name), "secure") {
+		var itemFile []sshFileItem
 		sort.Slice(fileNames, func(i, j int) bool {
-			return fileNames[i] > fileNames[j]
+			return fileNames[i].Name > fileNames[j].Name
 		})
 		itemFile = append(itemFile, fileNames[len(fileNames)-1])
 		itemFile = append(itemFile, fileNames[:len(fileNames)-2]...)
 		return itemFile
 	}
 	sort.Slice(fileNames, func(i, j int) bool {
-		return fileNames[i] < fileNames[j]
+		return fileNames[i].Name < fileNames[j].Name
 	})
 	return fileNames
 }
@@ -342,109 +332,111 @@ func updateSSHConf(oldFiles []string, param string, value interface{}) []string 
 	return newFiles
 }
 
-func loadSuccessDatas(command string, withAppend bool) ([]dto.SSHHistory, int) {
+func loadSSHData(command string, showCountFrom, showCountTo, currentYear int, qqWry *qqwry.QQwry, nyc *time.Location) ([]dto.SSHHistory, int, int) {
 	var (
-		datas    []dto.SSHHistory
-		totalNum int
+		datas        []dto.SSHHistory
+		successCount int
+		failedCount  int
 	)
 	stdout2, err := cmd.Exec(command)
-	if err == nil {
-		lines := strings.Split(string(stdout2), "\n")
-		if len(lines) == 0 {
-			return datas, 0
-		}
-		for i := len(lines) - 1; i >= 0; i-- {
-			parts := strings.Fields(lines[i])
-			if len(parts) < 14 {
-				continue
-			}
-			totalNum++
-			if withAppend {
-				historyItem := dto.SSHHistory{
-					DateStr:  fmt.Sprintf("%s %s %s", parts[0], parts[1], parts[2]),
-					AuthMode: parts[6],
-					User:     parts[8],
-					Address:  parts[10],
-					Port:     parts[12],
-					Status:   constant.StatusSuccess,
+	if err != nil {
+		return datas, 0, 0
+	}
+	lines := strings.Split(string(stdout2), "\n")
+	for i := len(lines) - 1; i >= 0; i-- {
+		var itemData dto.SSHHistory
+		switch {
+		case strings.Contains(lines[i], "Failed password for"):
+			itemData = loadFailedSecureDatas(lines[i])
+			if len(itemData.Address) != 0 {
+				if successCount+failedCount >= showCountFrom && successCount+failedCount < showCountTo {
+					itemData.Area = qqWry.Find(itemData.Address).Area
+					itemData.Date, _ = time.ParseInLocation("2006 Jan 2 15:04:05", fmt.Sprintf("%d %s", currentYear, itemData.DateStr), nyc)
+					datas = append(datas, itemData)
 				}
-				datas = append(datas, historyItem)
+				failedCount++
+			}
+		case strings.Contains(lines[i], "Connection closed by authenticating user"):
+			itemData = loadFailedAuthDatas(lines[i])
+			if len(itemData.Address) != 0 {
+				if successCount+failedCount >= showCountFrom && successCount+failedCount < showCountTo {
+					itemData.Area = qqWry.Find(itemData.Address).Area
+					itemData.Date, _ = time.ParseInLocation("2006 Jan 2 15:04:05", fmt.Sprintf("%d %s", currentYear, itemData.DateStr), nyc)
+					datas = append(datas, itemData)
+				}
+				failedCount++
+			}
+		case strings.Contains(lines[i], "Accepted "):
+			itemData = loadSuccessDatas(lines[i])
+			if len(itemData.Address) != 0 {
+				if successCount+failedCount >= showCountFrom && successCount+failedCount < showCountTo {
+					itemData.Area = qqWry.Find(itemData.Address).Area
+					itemData.Date, _ = time.ParseInLocation("2006 Jan 2 15:04:05", fmt.Sprintf("%d %s", currentYear, itemData.DateStr), nyc)
+					datas = append(datas, itemData)
+				}
+				successCount++
 			}
 		}
 	}
-	return datas, totalNum
+	return datas, successCount, failedCount
 }
 
-func loadFailedAuthDatas(command string, withAppend bool) ([]dto.SSHHistory, int) {
-	var (
-		datas    []dto.SSHHistory
-		totalNum int
-	)
-	stdout2, err := cmd.Exec(command)
-	if err == nil {
-		lines := strings.Split(string(stdout2), "\n")
-		if len(lines) == 0 {
-			return datas, 0
-		}
-		for i := len(lines) - 1; i >= 0; i-- {
-			parts := strings.Fields(lines[i])
-			if len(parts) < 14 {
-				continue
-			}
-			totalNum++
-			if withAppend {
-				historyItem := dto.SSHHistory{
-					DateStr:  fmt.Sprintf("%s %s %s", parts[0], parts[1], parts[2]),
-					AuthMode: parts[8],
-					User:     parts[10],
-					Address:  parts[11],
-					Port:     parts[13],
-					Status:   constant.StatusFailed,
-				}
-				if strings.Contains(lines[i], ": ") {
-					historyItem.Message = strings.Split(lines[i], ": ")[1]
-				}
-				datas = append(datas, historyItem)
-			}
-		}
+func loadSuccessDatas(line string) dto.SSHHistory {
+	var data dto.SSHHistory
+	parts := strings.Fields(line)
+	if len(parts) < 14 {
+		return data
 	}
-	return datas, totalNum
+	data = dto.SSHHistory{
+		DateStr:  fmt.Sprintf("%s %s %s", parts[0], parts[1], parts[2]),
+		AuthMode: parts[6],
+		User:     parts[8],
+		Address:  parts[10],
+		Port:     parts[12],
+		Status:   constant.StatusSuccess,
+	}
+	return data
 }
 
-func loadFailedSecureDatas(command string, withAppend bool) ([]dto.SSHHistory, int) {
-	var (
-		datas    []dto.SSHHistory
-		totalNum int
-	)
-	stdout2, err := cmd.Exec(command)
-	if err == nil {
-		lines := strings.Split(string(stdout2), "\n")
-		if len(lines) == 0 {
-			return datas, 0
-		}
-		for i := len(lines) - 1; i >= 0; i-- {
-			parts := strings.Fields(lines[i])
-			if len(parts) < 14 {
-				continue
-			}
-			totalNum++
-			if withAppend {
-				historyItem := dto.SSHHistory{
-					DateStr:  fmt.Sprintf("%s %s %s", parts[0], parts[1], parts[2]),
-					AuthMode: parts[6],
-					User:     parts[8],
-					Address:  parts[10],
-					Port:     parts[12],
-					Status:   constant.StatusFailed,
-				}
-				if strings.Contains(lines[i], ": ") {
-					historyItem.Message = strings.Split(lines[i], ": ")[1]
-				}
-				datas = append(datas, historyItem)
-			}
-		}
+func loadFailedAuthDatas(line string) dto.SSHHistory {
+	var data dto.SSHHistory
+	parts := strings.Fields(line)
+	if len(parts) < 14 {
+		return data
 	}
-	return datas, totalNum
+	data = dto.SSHHistory{
+		DateStr:  fmt.Sprintf("%s %s %s", parts[0], parts[1], parts[2]),
+		AuthMode: parts[8],
+		User:     parts[10],
+		Address:  parts[11],
+		Port:     parts[13],
+		Status:   constant.StatusFailed,
+	}
+	if strings.Contains(line, ": ") {
+		data.Message = strings.Split(line, ": ")[1]
+	}
+	return data
+}
+
+func loadFailedSecureDatas(line string) dto.SSHHistory {
+	var data dto.SSHHistory
+	parts := strings.Fields(line)
+	if len(parts) < 14 {
+		return data
+	}
+	data = dto.SSHHistory{
+		DateStr:  fmt.Sprintf("%s %s %s", parts[0], parts[1], parts[2]),
+		AuthMode: parts[6],
+		User:     parts[8],
+		Address:  parts[10],
+		Port:     parts[12],
+		Status:   constant.StatusFailed,
+	}
+	if strings.Contains(line, ": ") {
+		data.Message = strings.Split(line, ": ")[1]
+	}
+
+	return data
 }
 
 func handleGunzip(path string) error {
