@@ -55,12 +55,7 @@ func (b *BaseApi) WsSsh(c *gin.Context) {
 		return
 	}
 	defer client.Close()
-	ssConn, err := connInfo.NewSshConn(cols, rows)
-	if wshandleError(wsConn, err) {
-		return
-	}
-	defer ssConn.Close()
-
+	
 	sws, err := terminal.NewLogicSshWsSession(cols, rows, true, connInfo.Client, wsConn)
 	if wshandleError(wsConn, err) {
 		return
