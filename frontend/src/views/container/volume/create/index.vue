@@ -28,7 +28,7 @@
                             <el-input
                                 clearable
                                 v-model.trim="form.nfsAddress"
-                                :placeholder="$t('container.nfsAddressHelper')"
+                                :placeholder="$t('commons.rule.hostHelper')"
                             />
                         </el-form-item>
                         <el-form-item :label="$t('container.version')" prop="nfsVersion">

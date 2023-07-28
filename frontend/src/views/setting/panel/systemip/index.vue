@@ -7,8 +7,9 @@
             <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
-                        <el-form-item :label="$t('setting.systemIP')" prop="systemIP" :rules="Rules.ipV4V6">
+                        <el-form-item :label="$t('setting.systemIP')" prop="systemIP" :rules="Rules.ipV4V6OrDomain">
                             <el-input clearable v-model="form.systemIP" />
+                            <span class="input-help">{{ $t('commons.rule.hostHelper') }}</span>
                         </el-form-item>
                     </el-col>
                 </el-row>

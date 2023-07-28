@@ -15,7 +15,7 @@ const checkIp = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkIpV4V6 = (rule: any, value: any, callback: any) => {
+const checkIpV4V6OrDomain = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.requiredInput')));
     } else {
@@ -35,7 +35,8 @@ const checkIpV4V6 = (rule: any, value: any, callback: any) => {
                 `(?::((?::${IPv6SegmentFormat}){0,5}:${IPv4AddressFormat}|(?::${IPv6SegmentFormat}){1,7}|:))` +
                 ')(%[0-9a-zA-Z-.:]{1,})?$',
         );
-        if (!IPv4AddressRegExp.test(value) && !IPv6AddressRegExp.test(value) && value !== '') {
+        const regHost = /^(?=^.{3,255}$)[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$/;
+        if (!regHost.test(value) && !IPv4AddressRegExp.test(value) && !IPv6AddressRegExp.test(value) && value !== '') {
             callback(new Error(i18n.global.t('commons.rule.ip')));
         } else {
             callback();
@@ -429,7 +430,7 @@ interface CommonRule {
     integerNumberWith0: FormItemRule;
     floatNumber: FormItemRule;
     ip: FormItemRule;
-    ipV4V6: FormItemRule;
+    ipV4V6OrDomain: FormItemRule;
     host: FormItemRule;
     illegal: FormItemRule;
     port: FormItemRule;
@@ -546,8 +547,8 @@ export const Rules: CommonRule = {
         required: true,
         trigger: 'blur',
     },
-    ipV4V6: {
-        validator: checkIpV4V6,
+    ipV4V6OrDomain: {
+        validator: checkIpV4V6OrDomain,
         required: true,
         trigger: 'blur',
     },

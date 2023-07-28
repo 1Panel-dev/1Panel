@@ -185,6 +185,18 @@ export function checkIp(value: string): boolean {
     }
 }
 
+export function checkDomain(value: string): boolean {
+    if (value === '') {
+        return true;
+    }
+    const reg = /^(?=^.{3,255}$)[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$/;
+    if (!reg.test(value) && value !== '') {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 export function checkIpV4V6(value: string): boolean {
     if (value === '') {
         return true;
