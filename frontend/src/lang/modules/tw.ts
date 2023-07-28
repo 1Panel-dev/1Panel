@@ -250,6 +250,7 @@ const message = {
         processManage: '進程管理',
         process: '進程',
         network: '網絡',
+        supervisor: '進程守護',
     },
     home: {
         overview: '概覽',
@@ -1567,6 +1568,22 @@ const message = {
         stopProcess: '結束',
         stopProcessWarn: '是否確定結束此進程 (PID:{0})？',
         processName: '進程名稱',
+    },
+    tool: {
+        supervisor: {
+            notSupport: '未檢測到 Supervisor，請參考官方文檔進行安裝',
+            list: '守護進程',
+            config: 'Supervisor 配置',
+            primaryConfig: '主配置文件位置',
+            notSupportCrl: '未檢測到 supervisorctl，請參考官方文檔進行安裝',
+            user: '啟動用戶',
+            command: '啟動命令',
+            dir: '運行目錄',
+            numprocs: '進程數量',
+            initWarn:
+                '由於無法兼容原有配置，初始化 Supervisor 會修改配置文件的 files 參數，導致已有的進程全部停止，請提前確認風險。修改後的進程配置文件夾在 <1Panel安裝目錄>/1panel/tools/supervisord/supervisor.d 中',
+            operatorHelper: '將對 Supervisor 進行 {0} 操作，是否繼續？ ',
+        },
     },
 };
 export default {

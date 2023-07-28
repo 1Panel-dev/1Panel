@@ -250,6 +250,7 @@ const message = {
         processManage: '进程管理',
         process: '进程',
         network: '网络',
+        supervisor: '进程守护',
     },
     home: {
         overview: '概览',
@@ -1569,6 +1570,22 @@ const message = {
         stopProcess: '结束',
         stopProcessWarn: '是否确定结束此进程 (PID:{0})？',
         processName: '进程名称',
+    },
+    tool: {
+        supervisor: {
+            notSupport: '未检测到 Supervisor，请参考官方文档进行安装',
+            list: '守护进程',
+            config: 'Supervisor 配置',
+            primaryConfig: '主配置文件位置',
+            notSupportCrl: '未检测到 supervisorctl，请参考官方文档进行安装',
+            user: '启动用户',
+            command: '启动命令',
+            dir: '运行目录',
+            numprocs: '进程数量',
+            initWarn:
+                '由于无法兼容原有配置，初始化 Supervisor 会修改配置文件的 files 参数，导致已有的进程全部停止，请提前确认风险。修改后的进程配置文件夹在 <1Panel安装目录>/1panel/tools/supervisord/supervisor.d 中',
+            operatorHelper: '将对 Supervisor 进行 {0} 操作，是否继续？',
+        },
     },
 };
 export default {
