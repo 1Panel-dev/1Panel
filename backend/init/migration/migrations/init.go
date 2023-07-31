@@ -127,7 +127,7 @@ var AddTableSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "MonitorStatus", Value: "enable"}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "MonitorStoreDays", Value: "30"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "MonitorStoreDays", Value: "7"}).Error; err != nil {
 			return err
 		}
 
@@ -354,7 +354,7 @@ var AddBindAndAllowIPs = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "NtpSite", Value: "pool.ntp.org"}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "MonitorInterval", Value: "1"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "MonitorInterval", Value: "5"}).Error; err != nil {
 			return err
 		}
 		return nil
