@@ -167,10 +167,12 @@ func StartMonitor(removeBefore bool, interval string) error {
 	if removeBefore {
 		global.Cron.Remove(cron.EntryID(global.MonitorCronID))
 	}
-	monitorID, err := global.Cron.AddJob(fmt.Sprintf("@every %sm", interval), NewIMonitorService())
+	imservice := NewIMonitorService()
+	monitorID, err := global.Cron.AddJob(fmt.Sprintf("@every %sm", interval), imservice)
 	if err != nil {
 		return err
 	}
+	imservice.Run()
 	global.MonitorCronID = int(monitorID)
 	return nil
 }
