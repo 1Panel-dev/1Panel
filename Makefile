@@ -29,10 +29,6 @@ build_backend_on_darwin:
 	cd $(SERVER_PATH) \
     && GOOS=linux GOARCH=amd64 $(GOBUILD) -trimpath -ldflags '-s -w'  -o $(BUILD_PATH)/$(APP_NAME) $(MAIN)
 
-build_backend_on_archlinux:
-	cd $(SERVER_PATH) \
-    && GOOS=$(GOOS) GOARCH=$(GOARCH) $(GOBUILD) -trimpath -ldflags '-s -w' -o $(BUILD_PATH)/$(APP_NAME) $(MAIN)
-
 build_all: build_frontend build_backend_on_linux
 
 build_on_local: clean_assets build_frontend build_backend_on_darwin upx_bin

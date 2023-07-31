@@ -3910,6 +3910,21 @@ const docTemplate = `{
                 }
             }
         },
+        "/databases/load/:from": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "从服务器获取",
+                "tags": [
+                    "Database Mysql"
+                ],
+                "summary": "Load mysql database from remote",
+                "responses": {}
+            }
+        },
         "/databases/options": {
             "get": {
                 "security": [
@@ -4274,6 +4289,28 @@ const docTemplate = `{
                 }
             }
         },
+        "/databases/remote/:name": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取远程数据库",
+                "tags": [
+                    "Database"
+                ],
+                "summary": "Get remote databases",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.RemoteDBInfo"
+                        }
+                    }
+                }
+            }
+        },
         "/databases/remote/del": {
             "post": {
                 "security": [
@@ -4332,7 +4369,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "获取快速命令列表",
+                "description": "获取远程数据库列表",
                 "tags": [
                     "Database"
                 ],
@@ -5919,6 +5956,241 @@ const docTemplate = `{
                     ],
                     "formatEN": "update SSH setting [key] =\u003e [value]",
                     "formatZH": "修改 SSH 配置 [key] =\u003e [value]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/host/tool": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取主机工具状态",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Host tool"
+                ],
+                "summary": "Get tool",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.HostToolReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/host/tool/config": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "操作主机工具配置文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Host tool"
+                ],
+                "summary": "Get tool config",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.HostToolConfig"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "operate"
+                    ],
+                    "formatEN": "[operate] tool config",
+                    "formatZH": "[operate] 主机工具配置文件 ",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/host/tool/create": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "创建主机工具配置",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Host tool"
+                ],
+                "summary": "Create Host tool Config",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.HostToolCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "type"
+                    ],
+                    "formatEN": "create [type] config",
+                    "formatZH": "创建 [type] 配置",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/host/tool/log": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取主机工具日志",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Host tool"
+                ],
+                "summary": "Get tool",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.HostToolLogReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/host/tool/operate": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "操作主机工具",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Host tool"
+                ],
+                "summary": "Operate tool",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.HostToolReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "operate",
+                        "type"
+                    ],
+                    "formatEN": "[operate] [type]",
+                    "formatZH": "[operate] [type] ",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/host/tool/supervisor/process": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "操作守护进程",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Host tool"
+                ],
+                "summary": "Create Supervisor process",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.SupervisorProcessConfig"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "operate"
+                    ],
+                    "formatEN": "[operate] process",
+                    "formatZH": "[operate] 守护进程 ",
                     "paramKeys": []
                 }
             }
@@ -13317,6 +13589,41 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.RemoteDBInfo": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "from": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.RemoteDBOption": {
             "type": "object",
             "properties": {
@@ -14447,6 +14754,9 @@ const docTemplate = `{
                 "operate"
             ],
             "properties": {
+                "backup": {
+                    "type": "boolean"
+                },
                 "backupId": {
                     "type": "integer"
                 },
@@ -14853,6 +15163,81 @@ const docTemplate = `{
                 },
                 "url": {
                     "type": "string"
+                }
+            }
+        },
+        "request.HostToolConfig": {
+            "type": "object",
+            "required": [
+                "type"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "operate": {
+                    "type": "string",
+                    "enum": [
+                        "get",
+                        "set"
+                    ]
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "supervisord"
+                    ]
+                }
+            }
+        },
+        "request.HostToolCreate": {
+            "type": "object",
+            "required": [
+                "type"
+            ],
+            "properties": {
+                "configPath": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.HostToolLogReq": {
+            "type": "object",
+            "required": [
+                "type"
+            ],
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "supervisord"
+                    ]
+                }
+            }
+        },
+        "request.HostToolReq": {
+            "type": "object",
+            "required": [
+                "type"
+            ],
+            "properties": {
+                "operate": {
+                    "type": "string",
+                    "enum": [
+                        "status",
+                        "restart",
+                        "start",
+                        "stop"
+                    ]
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "supervisord"
+                    ]
                 }
             }
         },
@@ -15284,6 +15669,29 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "path": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.SupervisorProcessConfig": {
+            "type": "object",
+            "properties": {
+                "command": {
+                    "type": "string"
+                },
+                "dir": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "numprocs": {
+                    "type": "string"
+                },
+                "operate": {
+                    "type": "string"
+                },
+                "user": {
                     "type": "string"
                 }
             }

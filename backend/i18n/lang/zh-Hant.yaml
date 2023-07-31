@@ -97,5 +97,7 @@ ErrDelWithWebsite: "運行環境已經關聯網站，無法刪除"
 
 #setting
 ErrBackupInUsed: "該備份帳號已在計劃任務中使用，無法刪除"
-
 ErrOSSConn: "無法成功請求最新版本，請檢查伺服器是否能夠連接到外部網絡環境。"
+
+#tool
+ErrConfigNotFound: "配置文件不存在"

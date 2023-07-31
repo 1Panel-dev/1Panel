@@ -254,6 +254,7 @@ const message = {
         processManage: 'Process',
         process: 'Process',
         network: 'Network',
+        supervisor: 'Supervisor',
     },
     home: {
         overview: 'Overview',
@@ -1650,6 +1651,22 @@ const message = {
         stopProcess: 'End',
         stopProcessWarn: 'Are you sure you want to end this process (PID:{0})? ',
         processName: 'ProcessName',
+    },
+    tool: {
+        supervisor: {
+            notSupport: 'Supervisor is not detected, please refer to the official document for installation',
+            list: 'Daemon process',
+            config: 'Supervisor configuration',
+            primaryConfig: 'Main configuration file location',
+            notSupportCrl: 'The supervisorctl is not detected, please refer to the official document for installation',
+            user: 'start user',
+            command: 'start command',
+            dir: 'run directory',
+            numprocs: 'Number of processes',
+            initWarn:
+                'Because it is not compatible with the original configuration, initializing Supervisor will modify the files parameter of the configuration file, causing all existing processes to stop, please confirm the risk in advance. The modified process configuration folder is in <1Panel installation directory>/1panel/tools/supervisord/supervisor.d',
+            operatorHelper: 'Operation {0} will be performed on Supervisor, continue? ',
+        },
     },
 };
 

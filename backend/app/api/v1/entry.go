@@ -51,4 +51,6 @@ var (
 
 	runtimeService = service.NewRuntimeService()
 	processService = service.NewIProcessService()
+
+	hostToolService = service.NewIHostToolService()
 )

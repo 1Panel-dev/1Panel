@@ -91,6 +91,17 @@ const hostRouter = {
             },
         },
         {
+            path: '/hosts/tool/supersivor',
+            name: 'Supervisor',
+            component: () => import('@/views/host/tool/supervisor/index.vue'),
+            meta: {
+                title: 'menu.supervisor',
+                activeMenu: '/hosts/tool/supersivor',
+                keepAlive: true,
+                requiresAuth: false,
+            },
+        },
+        {
             path: '/hosts/ssh/ssh',
             name: 'SSH',
             component: () => import('@/views/host/ssh/ssh/index.vue'),
