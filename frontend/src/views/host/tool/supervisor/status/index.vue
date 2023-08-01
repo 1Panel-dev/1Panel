@@ -74,7 +74,7 @@ const data = ref({
     ctlExist: false,
 });
 
-const em = defineEmits(['setting', 'isExist', 'before', 'update:loading', 'update:maskShow']);
+const em = defineEmits(['setting', 'isExist', 'isRunning', 'update:loading', 'update:maskShow']);
 
 const setting = () => {
     em('setting', false);
@@ -85,9 +85,10 @@ const toDoc = async () => {
 };
 
 const onOperate = async (operation: string) => {
+    em('update:maskShow', false);
     operateReq.operate = operation;
     ElMessageBox.confirm(
-        i18n.global.t('tool.supervisor.operatorHelper', [i18n.global.t('app.' + operation)]),
+        i18n.global.t('tool.supervisor.operatorHelper', ['Supervisor', i18n.global.t('app.' + operation)]),
         i18n.global.t('app.' + operation),
         {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
@@ -97,9 +98,9 @@ const onOperate = async (operation: string) => {
     )
         .then(() => {
             em('update:loading', true);
-            em('before');
             OperateSupervisor(operation)
                 .then(() => {
+                    em('update:maskShow', true);
                     getStatus();
                     em('update:loading', false);
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -108,7 +109,9 @@ const onOperate = async (operation: string) => {
                     em('update:loading', false);
                 });
         })
-        .catch(() => {});
+        .catch(() => {
+            em('update:maskShow', true);
+        });
 };
 
 const getStatus = async () => {
@@ -116,6 +119,7 @@ const getStatus = async () => {
         em('update:loading', true);
         const res = await GetSupervisorStatus();
         data.value = res.data.config as HostTool.Supersivor;
+        em('isRunning', data.value.status === 'running');
         if (!data.value.isExist || !data.value.ctlExist) {
             em('isExist', false);
         } else {

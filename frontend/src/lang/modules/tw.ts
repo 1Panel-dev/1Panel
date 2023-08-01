@@ -1170,6 +1170,7 @@ const message = {
         appHelper: '部分應用的安裝使用說明請在應用詳情頁查看',
         backupApp: '升級前備份應用',
         backupAppHelper: '升級失敗可以使用應用備份回滾',
+        delete: '刪除',
     },
     website: {
         website: '網站',
@@ -1582,7 +1583,8 @@ const message = {
             numprocs: '進程數量',
             initWarn:
                 '由於無法兼容原有配置，初始化 Supervisor 會修改配置文件的 files 參數，導致已有的進程全部停止，請提前確認風險。修改後的進程配置文件夾在 <1Panel安裝目錄>/1panel/tools/supervisord/supervisor.d 中',
-            operatorHelper: '將對 Supervisor 進行 {0} 操作，是否繼續？ ',
+            operatorHelper: '將對 {0} 進行 {1} 操作，是否繼續？ ',
+            uptime: '運行時長',
         },
     },
 };

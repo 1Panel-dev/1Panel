@@ -39,5 +39,25 @@ export namespace HostTool {
         user: string;
         dir: string;
         numprocs: string;
+        status?: ProcessStatus[];
+    }
+
+    export interface ProcessStatus {
+        PID: string;
+        status: string;
+        uptime: string;
+        name: string;
+    }
+
+    export interface ProcessReq {
+        operate: string;
+        name: string;
+    }
+
+    export interface ProcessFileReq {
+        operate: string;
+        name: string;
+        content?: string;
+        file: string;
     }
 }

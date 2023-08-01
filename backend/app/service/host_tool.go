@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
@@ -14,7 +15,9 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/ini.v1"
 	"os/exec"
+	"os/user"
 	"path"
+	"strconv"
 	"strings"
 )
 
@@ -27,6 +30,8 @@ type IHostToolService interface {
 	OperateToolConfig(req request.HostToolConfig) (*response.HostToolConfig, error)
 	GetToolLog(req request.HostToolLogReq) (string, error)
 	OperateSupervisorProcess(req request.SupervisorProcessConfig) error
+	GetSupervisorProcessConfig() ([]response.SupervisorProcessConfig, error)
+	OperateSupervisorProcessFile(req request.SupervisorProcessFileReq) (string, error)
 }
 
 func NewIHostToolService() IHostToolService {
@@ -99,7 +104,7 @@ func (h *HostToolService) GetToolStatus(req request.HostToolReq) (*response.Host
 			configPath := "/etc/supervisord.conf"
 			if !fileOp.Stat(configPath) {
 				configPath = "/etc/supervisor/supervisord.conf"
-				if !fileOp.Stat("configPath") {
+				if !fileOp.Stat(configPath) {
 					return nil, errors.New("ErrConfigNotFound")
 				}
 			}
@@ -180,7 +185,6 @@ func (h *HostToolService) OperateToolConfig(req request.HostToolConfig) (*respon
 			configPath = pathSet.Value
 		}
 	}
-	configPath = "/etc/supervisord.conf"
 	switch req.Operate {
 	case "get":
 		content, err := fileOp.GetContent(configPath)
@@ -233,27 +237,277 @@ func (h *HostToolService) GetToolLog(req request.HostToolLogReq) (string, error)
 }
 
 func (h *HostToolService) OperateSupervisorProcess(req request.SupervisorProcessConfig) error {
-	configFile := ini.Empty()
-	supervisordDir := path.Join(global.CONF.System.BaseDir, "1panel", "tools", "supervisord")
-	logDir := path.Join(supervisordDir, "log")
-	includeDir := path.Join(supervisordDir, "supervisor.d")
+	var (
+		supervisordDir = path.Join(global.CONF.System.BaseDir, "1panel", "tools", "supervisord")
+		logDir         = path.Join(supervisordDir, "log")
+		includeDir     = path.Join(supervisordDir, "supervisor.d")
+		outLog         = path.Join(logDir, fmt.Sprintf("%s.out.log", req.Name))
+		errLog         = path.Join(logDir, fmt.Sprintf("%s.err.log", req.Name))
+		iniPath        = path.Join(includeDir, fmt.Sprintf("%s.ini", req.Name))
+		fileOp         = files.NewFileOp()
+	)
+	if req.Operate == "edit" || req.Operate == "create" {
+		if !fileOp.Stat(req.Dir) {
+			return buserr.New("ErrConfigDirNotFound")
+		}
+		_, err := user.Lookup(req.User)
+		if err != nil {
+			return buserr.WithMap("ErrUserFindErr", map[string]interface{}{"name": req.User, "err": err.Error()}, err)
+		}
+	}
 
-	section, err := configFile.NewSection(fmt.Sprintf("program:%s", req.Name))
+	switch req.Operate {
+	case "create":
+		if fileOp.Stat(iniPath) {
+			return buserr.New("ErrConfigAlreadyExist")
+		}
+		configFile := ini.Empty()
+		section, err := configFile.NewSection(fmt.Sprintf("program:%s", req.Name))
+		if err != nil {
+			return err
+		}
+		_, _ = section.NewKey("command", req.Command)
+		_, _ = section.NewKey("directory", req.Dir)
+		_, _ = section.NewKey("autorestart", "true")
+		_, _ = section.NewKey("startsecs", "3")
+		_, _ = section.NewKey("stdout_logfile", outLog)
+		_, _ = section.NewKey("stderr_logfile", errLog)
+		_, _ = section.NewKey("stdout_logfile_maxbytes", "2MB")
+		_, _ = section.NewKey("stderr_logfile_maxbytes", "2MB")
+		_, _ = section.NewKey("user", req.User)
+		_, _ = section.NewKey("priority", "999")
+		_, _ = section.NewKey("numprocs", req.Numprocs)
+		_, _ = section.NewKey("process_name", "%(program_name)s_%(process_num)02d")
+
+		if err = configFile.SaveTo(iniPath); err != nil {
+			return err
+		}
+		return operateSupervisorCtl("reload", "", "")
+	case "edit":
+		configFile, err := ini.Load(iniPath)
+		if err != nil {
+			return err
+		}
+		section, err := configFile.GetSection(fmt.Sprintf("program:%s", req.Name))
+		if err != nil {
+			return err
+		}
+
+		commandKey := section.Key("command")
+		commandKey.SetValue(req.Command)
+		directoryKey := section.Key("directory")
+		directoryKey.SetValue(req.Dir)
+		userKey := section.Key("user")
+		userKey.SetValue(req.User)
+		numprocsKey := section.Key("numprocs")
+		numprocsKey.SetValue(req.Numprocs)
+
+		if err = configFile.SaveTo(iniPath); err != nil {
+			return err
+		}
+		return operateSupervisorCtl("reload", "", "")
+	case "restart":
+		return operateSupervisorCtl("restart", req.Name, "")
+	case "start":
+		return operateSupervisorCtl("start", req.Name, "")
+	case "stop":
+		return operateSupervisorCtl("stop", req.Name, "")
+	case "delete":
+		_ = operateSupervisorCtl("remove", "", req.Name)
+		_ = files.NewFileOp().DeleteFile(iniPath)
+		_ = files.NewFileOp().DeleteFile(outLog)
+		_ = files.NewFileOp().DeleteFile(errLog)
+		_ = operateSupervisorCtl("reload", "", "")
+	}
+
+	return nil
+}
+
+func (h *HostToolService) GetSupervisorProcessConfig() ([]response.SupervisorProcessConfig, error) {
+	var (
+		result []response.SupervisorProcessConfig
+	)
+	configDir := path.Join(global.CONF.System.BaseDir, "1panel", "tools", "supervisord", "supervisor.d")
+	fileList, _ := NewIFileService().GetFileList(request.FileOption{FileOption: files.FileOption{Path: configDir, Expand: true, Page: 1, PageSize: 100}})
+	if len(fileList.Items) == 0 {
+		return result, nil
+	}
+	for _, configFile := range fileList.Items {
+		f, err := ini.Load(configFile.Path)
+		if err != nil {
+			global.LOG.Errorf("get %s file err %s", configFile.Name, err.Error())
+			continue
+		}
+		if strings.HasSuffix(configFile.Name, ".ini") {
+			config := response.SupervisorProcessConfig{}
+			name := strings.TrimSuffix(configFile.Name, ".ini")
+			config.Name = name
+			section, err := f.GetSection(fmt.Sprintf("program:%s", name))
+			if err != nil {
+				global.LOG.Errorf("get %s file section err %s", configFile.Name, err.Error())
+				continue
+			}
+			if command, _ := section.GetKey("command"); command != nil {
+				config.Command = command.Value()
+			}
+			if directory, _ := section.GetKey("directory"); directory != nil {
+				config.Dir = directory.Value()
+			}
+			if user, _ := section.GetKey("user"); user != nil {
+				config.User = user.Value()
+			}
+			if numprocs, _ := section.GetKey("numprocs"); numprocs != nil {
+				config.Numprocs = numprocs.Value()
+			}
+			_ = getProcessStatus(&config)
+			result = append(result, config)
+		}
+	}
+	return result, nil
+}
+
+func (h *HostToolService) OperateSupervisorProcessFile(req request.SupervisorProcessFileReq) (string, error) {
+	var (
+		fileOp     = files.NewFileOp()
+		group      = fmt.Sprintf("program:%s", req.Name)
+		configPath = path.Join(global.CONF.System.BaseDir, "1panel", "tools", "supervisord", "supervisor.d", fmt.Sprintf("%s.ini", req.Name))
+	)
+	switch req.File {
+	case "err.log":
+		logPath, err := ini_conf.GetIniValue(configPath, group, "stderr_logfile")
+		if err != nil {
+			return "", err
+		}
+		switch req.Operate {
+		case "get":
+			content, err := fileOp.GetContent(logPath)
+			if err != nil {
+				return "", err
+			}
+			return string(content), nil
+		case "clear":
+			if err = fileOp.WriteFile(logPath, strings.NewReader(""), 0755); err != nil {
+				return "", err
+			}
+		}
+
+	case "out.log":
+		logPath, err := ini_conf.GetIniValue(configPath, group, "stdout_logfile")
+		if err != nil {
+			return "", err
+		}
+		switch req.Operate {
+		case "get":
+			content, err := fileOp.GetContent(logPath)
+			if err != nil {
+				return "", err
+			}
+			return string(content), nil
+		case "clear":
+			if err = fileOp.WriteFile(logPath, strings.NewReader(""), 0755); err != nil {
+				return "", err
+			}
+		}
+
+	case "config":
+		switch req.Operate {
+		case "get":
+			content, err := fileOp.GetContent(configPath)
+			if err != nil {
+				return "", err
+			}
+			return string(content), nil
+		case "update":
+			if req.Content == "" {
+				return "", buserr.New("ErrConfigIsNull")
+			}
+			if err := fileOp.WriteFile(configPath, strings.NewReader(req.Content), 0755); err != nil {
+				return "", err
+			}
+			return "", operateSupervisorCtl("update", "", req.Name)
+		}
+
+	}
+	return "", nil
+}
+
+func operateSupervisorCtl(operate, name, group string) error {
+	processNames := []string{operate}
+	if name != "" {
+		includeDir := path.Join(global.CONF.System.BaseDir, "1panel", "tools", "supervisord", "supervisor.d")
+		f, err := ini.Load(path.Join(includeDir, fmt.Sprintf("%s.ini", name)))
+		if err != nil {
+			return err
+		}
+		section, err := f.GetSection(fmt.Sprintf("program:%s", name))
+		if err != nil {
+			return err
+		}
+		numprocsNum := ""
+		if numprocs, _ := section.GetKey("numprocs"); numprocs != nil {
+			numprocsNum = numprocs.Value()
+		}
+		if numprocsNum == "" {
+			return buserr.New("ErrConfigParse")
+		}
+		processNames = append(processNames, getProcessName(name, numprocsNum)...)
+	}
+	if group != "" {
+		processNames = append(processNames, group)
+	}
+
+	output, err := exec.Command("supervisorctl", processNames...).Output()
 	if err != nil {
+		if output != nil {
+			return errors.New(string(output))
+		}
 		return err
 	}
-	_, _ = section.NewKey("command", req.Command)
-	_, _ = section.NewKey("directory", req.Dir)
-	_, _ = section.NewKey("autorestart", "true")
-	_, _ = section.NewKey("startsecs", "3")
-	_, _ = section.NewKey("stdout_logfile", path.Join(logDir, fmt.Sprintf("%s.out.log", req.Name)))
-	_, _ = section.NewKey("stderr_logfile", path.Join(logDir, fmt.Sprintf("%s.err.log", req.Name)))
-	_, _ = section.NewKey("stdout_logfile_maxbytes", "2MB")
-	_, _ = section.NewKey("stderr_logfile_maxbytes", "2MB")
-	_, _ = section.NewKey("user", req.User)
-	_, _ = section.NewKey("priority", "999")
-	_, _ = section.NewKey("numprocs", req.Numprocs)
-	_, _ = section.NewKey("process_name", "%(program_name)s_%(process_num)02d")
+	return nil
+}
 
-	return configFile.SaveTo(path.Join(includeDir, fmt.Sprintf("%s.ini", req.Name)))
+func getProcessName(name, numprocs string) []string {
+	var (
+		processNames []string
+	)
+	num, err := strconv.Atoi(numprocs)
+	if err != nil {
+		return processNames
+	}
+	if num == 1 {
+		processNames = append(processNames, fmt.Sprintf("%s:%s_00", name, name))
+	} else {
+		for i := 0; i < num; i++ {
+			processName := fmt.Sprintf("%s:%s_0%s", name, name, strconv.Itoa(i))
+			if i >= 10 {
+				processName = fmt.Sprintf("%s:%s_%s", name, name, strconv.Itoa(i))
+			}
+			processNames = append(processNames, processName)
+		}
+	}
+	return processNames
+}
+
+func getProcessStatus(config *response.SupervisorProcessConfig) error {
+	var (
+		processNames = []string{"status"}
+	)
+	processNames = append(processNames, getProcessName(config.Name, config.Numprocs)...)
+	output, _ := exec.Command("supervisorctl", processNames...).Output()
+	lines := strings.Split(string(output), "\n")
+	for _, line := range lines {
+		fields := strings.Fields(line)
+		if len(fields) >= 5 {
+			status := response.ProcessStatus{
+				Name:   fields[0],
+				Status: fields[1],
+			}
+			if fields[1] == "RUNNING" {
+				status.PID = strings.TrimSuffix(fields[3], ",")
+				status.Uptime = fields[5]
+			}
+			config.Status = append(config.Status, status)
+		}
+	}
+	return nil
 }

@@ -101,3 +101,8 @@ ErrOSSConn: "Unable to successfully request the latest version. Please check if 
 
 #tool
 ErrConfigNotFound: "Configuration file does not exist"
+ErrConfigParse: "Configuration file format error"
+ErrConfigIsNull: "The configuration file is not allowed to be empty"
+ErrConfigDirNotFound: "The running directory does not exist"
+ErrConfigAlreadyExist: "A configuration file with the same name already exists"
+ErrUserFindErr: "Failed to find user {{ .name }} {{ .err }}"

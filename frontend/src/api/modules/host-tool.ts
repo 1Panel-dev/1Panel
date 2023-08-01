@@ -21,6 +21,18 @@ export const InitSupervisor = (req: HostTool.SupersivorInit) => {
     return http.post<any>(`/hosts/tool/init`, req);
 };
 
-export const OperateSupervisorProcess = (req: HostTool.SupersivorProcess) => {
+export const CreateSupervisorProcess = (req: HostTool.SupersivorProcess) => {
     return http.post<any>(`/hosts/tool/supervisor/process`, req);
+};
+
+export const OperateSupervisorProcess = (req: HostTool.ProcessReq) => {
+    return http.post<any>(`/hosts/tool/supervisor/process`, req, 100000);
+};
+
+export const GetSupervisorProcess = () => {
+    return http.get<HostTool.SupersivorProcess>(`/hosts/tool/supervisor/process`);
+};
+
+export const OperateSupervisorProcessFile = (req: HostTool.ProcessFileReq) => {
+    return http.post<any>(`/hosts/tool/supervisor/process/file`, req, 100000);
 };

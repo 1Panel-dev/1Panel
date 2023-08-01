@@ -2978,6 +2978,28 @@ definitions:
       user:
         type: string
     type: object
+  request.SupervisorProcessFileReq:
+    properties:
+      content:
+        type: string
+      file:
+        enum:
+        - out.log
+        - err.log
+        type: string
+      name:
+        type: string
+      operate:
+        enum:
+        - get
+        - clear
+        - update
+        type: string
+    required:
+    - file
+    - name
+    - operate
+    type: object
   request.WebsiteAcmeAccountCreate:
     properties:
       email:
@@ -7730,6 +7752,18 @@ paths:
         formatZH: '[operate] [type] '
         paramKeys: []
   /host/tool/supervisor/process:
+    get:
+      consumes:
+      - application/json
+      description: 获取 Supervisor 进程配置
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Get Supervisor process config
+      tags:
+      - Host tool
     post:
       consumes:
       - application/json
@@ -7755,6 +7789,33 @@ paths:
         - operate
         formatEN: '[operate] process'
         formatZH: '[operate] 守护进程 '
+        paramKeys: []
+  /host/tool/supervisor/process/file:
+    post:
+      consumes:
+      - application/json
+      description: 操作 Supervisor 进程文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.SupervisorProcessFileReq'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Get Supervisor process config
+      tags:
+      - Host tool
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - operate
+        formatEN: '[operate] [operate] Supervisor 进程文件'
+        formatZH: '[operate] Supervisor 进程文件 '
         paramKeys: []
   /hosts:
     post:
