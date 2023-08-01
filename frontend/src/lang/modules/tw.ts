@@ -531,7 +531,7 @@ const message = {
         env: '環境變量',
         restartPolicy: '重啟規則',
         always: '一直重啟',
-        unlessStopped: '關閉後重啟',
+        unlessStopped: '未手動停止則重啟',
         onFailure: '失敗後重啟（默認重啟 5 次）',
         no: '不重啟',
 
