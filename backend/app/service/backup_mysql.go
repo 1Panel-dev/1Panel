@@ -136,8 +136,8 @@ func handleMysqlRecover(req dto.CommonRecover, isRollback bool) error {
 		return err
 	}
 
-	if isRollback {
-		rollbackFile := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("original/database/%s_%s.sql.gz", req.DetailName, time.Now().Format("20060102150405")))
+	if !isRollback {
+		rollbackFile := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("database/mysql/%s_%s.sql.gz", req.DetailName, time.Now().Format("20060102150405")))
 		if err := cli.Backup(client.BackupInfo{
 			Name:      req.DetailName,
 			Format:    dbInfo.Format,

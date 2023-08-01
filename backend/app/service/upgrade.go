@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path"
 	"runtime"
 	"strings"
 	"time"
@@ -86,8 +87,8 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 	global.LOG.Info("start to upgrade now...")
 	fileOp := files.NewFileOp()
 	timeStr := time.Now().Format("20060102150405")
-	rootDir := fmt.Sprintf("%s/upgrade_%s/downloads", global.CONF.System.TmpDir, timeStr)
-	originalDir := fmt.Sprintf("%s/upgrade_%s/original", global.CONF.System.TmpDir, timeStr)
+	rootDir := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("upgrade/upgrade_%s/downloads", timeStr))
+	originalDir := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("upgrade/upgrade_%s/original", timeStr))
 	if err := os.MkdirAll(rootDir, os.ModePerm); err != nil {
 		return err
 	}
