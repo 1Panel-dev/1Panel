@@ -2233,9 +2233,11 @@ func (w WebsiteService) GetRedirect(id uint) (res []response.NginxRedirectConfig
 									if strings.HasSuffix(dirParams[1], "$request_uri") {
 										redirectConfig.KeepPath = true
 										redirectConfig.Target = strings.TrimSuffix(dirParams[1], "$request_uri")
+										redirectConfig.RedirectRoot = false
 									} else {
 										redirectConfig.KeepPath = false
 										redirectConfig.Target = dirParams[1]
+										redirectConfig.RedirectRoot = redirectConfig.Target == "/"
 									}
 								}
 							}
