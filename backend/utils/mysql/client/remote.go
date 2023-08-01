@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
-	"path"
+	"os/exec"
 	"strings"
 	"time"
 
@@ -14,8 +14,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
-
-	"github.com/jarvanstack/mysqldump"
+	"github.com/1Panel-dev/1Panel/backend/utils/mysql/helper"
 )
 
 type Remote struct {
@@ -222,23 +221,26 @@ func (r *Remote) Backup(info BackupInfo) error {
 
 	f, _ := os.OpenFile(fileNameItem, os.O_RDWR|os.O_CREATE, 0755)
 	defer f.Close()
-	if err := mysqldump.Dump(dns, mysqldump.WithData(), mysqldump.WithDropTable(), mysqldump.WithWriter(f)); err != nil {
+	if err := helper.Dump(dns, helper.WithData(), helper.WithDropTable(), helper.WithWriter(f)); err != nil {
 		return err
 	}
 
-	if err := fileOp.Compress([]string{fileNameItem}, info.TargetDir, info.FileName, files.Gz); err != nil {
-		return err
+	gzipCmd := exec.Command("gzip", fileNameItem)
+	stdout, err := gzipCmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("gzip file %s failed, stdout: %v, err: %v", strings.TrimSuffix(info.FileName, ".gz"), string(stdout), err)
 	}
 	return nil
 }
 
 func (r *Remote) Recover(info RecoverInfo) error {
-	fileOp := files.NewFileOp()
 	fileName := info.SourceFile
 	if strings.HasSuffix(info.SourceFile, ".sql.gz") {
 		fileName = strings.TrimSuffix(info.SourceFile, ".gz")
-		if err := fileOp.Decompress(info.SourceFile, path.Dir(fileName), files.Gz); err != nil {
-			return err
+		gzipCmd := exec.Command("gunzip", info.SourceFile)
+		stdout, err := gzipCmd.CombinedOutput()
+		if err != nil {
+			return fmt.Errorf("gunzip file %s failed, stdout: %v, err: %v", info.SourceFile, string(stdout), err)
 		}
 	}
 	dns := fmt.Sprintf("%s:%s@tcp(%s:%v)/%s?charset=%s&parseTime=true&loc=Asia%sShanghai", r.User, r.Password, r.Address, r.Port, info.Name, info.Format, "%2F")
@@ -247,7 +249,7 @@ func (r *Remote) Recover(info RecoverInfo) error {
 		return err
 	}
 	defer f.Close()
-	if err := mysqldump.Source(dns, f, mysqldump.WithMergeInsert(1000)); err != nil {
+	if err := helper.Source(dns, f, helper.WithMergeInsert(1000)); err != nil {
 		return err
 	}
 	return nil

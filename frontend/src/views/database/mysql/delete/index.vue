@@ -5,7 +5,7 @@
         width="30%"
         :close-on-click-modal="false"
     >
-        <el-form ref="deleteForm" v-loading="loading">
+        <el-form ref="deleteForm" v-loading="loading" @submit.prevent>
             <el-form-item>
                 <el-checkbox v-model="deleteReq.forceDelete" :label="$t('app.forceDelete')" />
                 <span class="input-help">

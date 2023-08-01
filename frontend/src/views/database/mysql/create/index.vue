@@ -47,14 +47,7 @@
                         </el-form-item>
 
                         <el-form-item :label="$t('commons.table.type')" prop="from">
-                            <el-select v-model="form.from">
-                                <el-option
-                                    v-for="(item, index) in dbOptions"
-                                    :key="index"
-                                    :value="item.name"
-                                    :label="loadLabel(item)"
-                                ></el-option>
-                            </el-select>
+                            <el-tag>{{ loadLabel(form.from) }}</el-tag>
                         </el-form-item>
 
                         <el-form-item :label="$t('commons.table.description')" prop="description">
@@ -83,13 +76,12 @@ import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
-import { addMysqlDB, listRemoteDBs } from '@/api/modules/database';
+import { addMysqlDB } from '@/api/modules/database';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { getRandomStr } from '@/utils/util';
 
 const loading = ref();
-const dbOptions = ref();
 const createVisiable = ref(false);
 const form = reactive({
     name: '',
@@ -108,16 +100,17 @@ const rules = reactive({
     password: [Rules.requiredInput],
     permission: [Rules.requiredSelect],
     permissionIPs: [Rules.requiredInput],
-    from: [Rules.requiredSelect],
 });
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 
 interface DialogProps {
+    from: string;
     mysqlName: string;
 }
 const acceptParams = (params: DialogProps): void => {
     form.name = '';
+    form.from = params.from;
     form.mysqlName = params.mysqlName;
     form.format = 'utf8mb4';
     form.username = '';
@@ -125,20 +118,14 @@ const acceptParams = (params: DialogProps): void => {
     form.permissionIPs = '';
     form.description = '';
     random();
-    loadDBOptions();
     createVisiable.value = true;
 };
 const handleClose = () => {
     createVisiable.value = false;
 };
 
-const loadDBOptions = async () => {
-    const res = await listRemoteDBs('mysql');
-    dbOptions.value = res.data || [];
-};
-
-function loadLabel(item: any) {
-    return (item.name === 'local' ? i18n.global.t('database.localDB') : item.name) + '(' + item.address + ')';
+function loadLabel(from: any) {
+    return from === 'local' ? i18n.global.t('database.localDB') : from;
 }
 
 const random = async () => {
