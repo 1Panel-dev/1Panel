@@ -1225,6 +1225,7 @@ const message = {
         appHelper: 'Please view the installation instructions of some applications on the application details page',
         backupApp: 'Backup application before upgrade',
         backupAppHelper: 'If the upgrade fails, you can use the application backup to roll back',
+        delete: 'Delete',
     },
     website: {
         website: 'Website',
@@ -1665,7 +1666,8 @@ const message = {
             numprocs: 'Number of processes',
             initWarn:
                 'Because it is not compatible with the original configuration, initializing Supervisor will modify the files parameter of the configuration file, causing all existing processes to stop, please confirm the risk in advance. The modified process configuration folder is in <1Panel installation directory>/1panel/tools/supervisord/supervisor.d',
-            operatorHelper: 'Operation {0} will be performed on Supervisor, continue? ',
+            operatorHelper: 'Operation {1} will be performed on {0}, continue? ',
+            uptime: 'running time',
         },
     },
 };

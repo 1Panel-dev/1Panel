@@ -85,7 +85,7 @@ func (b *BaseApi) ListRemoteDB(c *gin.Context) {
 // @Tags Database
 // @Summary Get remote databases
 // @Description 获取远程数据库
-// @Success 200 dto.RemoteDBOption
+// @Success 200 {object} dto.RemoteDBInfo
 // @Security ApiKeyAuth
 // @Router /databases/remote/:name [get]
 func (b *BaseApi) GetRemoteDB(c *gin.Context) {

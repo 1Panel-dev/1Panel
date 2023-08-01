@@ -101,3 +101,8 @@ ErrOSSConn: "無法成功請求最新版本，請檢查伺服器是否能夠連�
 
 #tool
 ErrConfigNotFound: "配置文件不存在"
+ErrConfigParse: "配置文件格式有誤"
+ErrConfigIsNull: "配置文件不允許為空"
+ErrConfigDirNotFound: "運行目錄不存在"
+ErrConfigAlreadyExist: "已存在同名配置文件"
+ErrUserFindErr: "用戶 {{ .name }} 查找失敗 {{ .err }}"

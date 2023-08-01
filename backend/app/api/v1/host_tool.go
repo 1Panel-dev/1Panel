@@ -172,3 +172,42 @@ func (b *BaseApi) OperateProcess(c *gin.Context) {
 	}
 	helper.SuccessWithOutData(c)
 }
+
+// @Tags Host tool
+// @Summary Get Supervisor process config
+// @Description 获取 Supervisor 进程配置
+// @Accept json
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /host/tool/supervisor/process [get]
+func (b *BaseApi) GetProcess(c *gin.Context) {
+	configs, err := hostToolService.GetSupervisorProcessConfig()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, configs)
+}
+
+// @Tags Host tool
+// @Summary Get Supervisor process config
+// @Description 操作 Supervisor 进程文件
+// @Accept json
+// @Param request body request.SupervisorProcessFileReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /host/tool/supervisor/process/file [post]
+// @x-panel-log {"bodyKeys":["operate"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"[operate] Supervisor 进程文件 ","formatEN":"[operate] Supervisor Process Config file"}
+func (b *BaseApi) GetProcessFile(c *gin.Context) {
+	var req request.SupervisorProcessFileReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	content, err := hostToolService.OperateSupervisorProcessFile(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, content)
+}

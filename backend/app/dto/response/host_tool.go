@@ -20,3 +20,20 @@ type Supervisor struct {
 type HostToolConfig struct {
 	Content string `json:"content"`
 }
+
+type SupervisorProcessConfig struct {
+	Name     string          `json:"name"`
+	Command  string          `json:"command"`
+	User     string          `json:"user"`
+	Dir      string          `json:"dir"`
+	Numprocs string          `json:"numprocs"`
+	Msg      string          `json:"msg"`
+	Status   []ProcessStatus `json:"status"`
+}
+
+type ProcessStatus struct {
+	Name   string `json:"name"`
+	Status string `json:"status"`
+	PID    string `json:"PID"`
+	Uptime string `json:"uptime"`
+}

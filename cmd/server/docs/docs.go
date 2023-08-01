@@ -6154,6 +6154,26 @@ const docTemplate = `{
             }
         },
         "/host/tool/supervisor/process": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取 Supervisor 进程配置",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Host tool"
+                ],
+                "summary": "Get Supervisor process config",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -6191,6 +6211,48 @@ const docTemplate = `{
                     ],
                     "formatEN": "[operate] process",
                     "formatZH": "[operate] 守护进程 ",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/host/tool/supervisor/process/file": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "操作 Supervisor 进程文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Host tool"
+                ],
+                "summary": "Get Supervisor process config",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.SupervisorProcessFileReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "operate"
+                    ],
+                    "formatEN": "[operate] [operate] Supervisor 进程文件",
+                    "formatZH": "[operate] Supervisor 进程文件 ",
                     "paramKeys": []
                 }
             }
@@ -15693,6 +15755,37 @@ const docTemplate = `{
                 },
                 "user": {
                     "type": "string"
+                }
+            }
+        },
+        "request.SupervisorProcessFileReq": {
+            "type": "object",
+            "required": [
+                "file",
+                "name",
+                "operate"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "file": {
+                    "type": "string",
+                    "enum": [
+                        "out.log",
+                        "err.log"
+                    ]
+                },
+                "name": {
+                    "type": "string"
+                },
+                "operate": {
+                    "type": "string",
+                    "enum": [
+                        "get",
+                        "clear",
+                        "update"
+                    ]
                 }
             }
         },
