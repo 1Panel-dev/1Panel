@@ -264,6 +264,7 @@ const mysqlVersion = ref();
 const dialogRef = ref();
 const onOpenDialog = async () => {
     let params = {
+        from: paginationConfig.from,
         mysqlName: mysqlName.value,
     };
     dialogRef.value!.acceptParams(params);

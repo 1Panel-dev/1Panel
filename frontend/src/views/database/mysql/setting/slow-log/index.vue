@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-form label-position="left" label-width="80px">
+        <el-form label-position="left" label-width="80px" @submit.prevent>
             <el-form-item :label="$t('database.isOn')">
                 <el-switch
                     v-model="variables.slow_query_log"

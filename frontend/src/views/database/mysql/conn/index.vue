@@ -159,6 +159,7 @@ const loadPassword = async () => {
 const onSubmit = async () => {
     let param = {
         id: 0,
+        from: form.from,
         value: form.password,
     };
     loading.value = true;
