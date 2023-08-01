@@ -130,6 +130,7 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 				createMysql.Format = "utf8mb4"
 				createMysql.Permission = "%"
 				createMysql.Password = dbConfig.Password
+				createMysql.From = "local"
 				mysqldb, err := NewIMysqlService().Create(ctx, createMysql)
 				if err != nil {
 					return err
