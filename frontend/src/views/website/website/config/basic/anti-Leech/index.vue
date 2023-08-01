@@ -1,7 +1,7 @@
 <template>
     <div v-loading="loading">
         <el-row :gutter="20" v-loading="loading">
-            <el-col :xs="24" :sm="18" :md="8" :lg="8" :xl="8">
+            <el-col :xs="24" :sm="18" :md="16" :lg="16" :xl="16">
                 <el-form
                     :model="form"
                     :rules="rules"
