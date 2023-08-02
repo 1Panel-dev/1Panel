@@ -141,12 +141,8 @@ func (u *CronjobService) Download(down dto.CronjobDownload) (string, error) {
 	if record.ID == 0 {
 		return "", constant.ErrRecordNotFound
 	}
-	cronjob, _ := cronjobRepo.Get(commonRepo.WithByID(record.CronjobID))
-	if cronjob.ID == 0 {
-		return "", constant.ErrRecordNotFound
-	}
 	backup, _ := backupRepo.Get(commonRepo.WithByID(down.BackupAccountID))
-	if cronjob.ID == 0 {
+	if backup.ID == 0 {
 		return "", constant.ErrRecordNotFound
 	}
 	if backup.Type == "LOCAL" || record.FromLocal {
@@ -155,15 +151,17 @@ func (u *CronjobService) Download(down dto.CronjobDownload) (string, error) {
 		}
 		return record.File, nil
 	}
-	client, err := NewIBackupService().NewClient(&backup)
-	if err != nil {
-		return "", err
-	}
 	tempPath := fmt.Sprintf("%s/download/%s", constant.DataDir, record.File)
-	_ = os.MkdirAll(path.Dir(tempPath), os.ModePerm)
-	isOK, err := client.Download(record.File, tempPath)
-	if !isOK || err != nil {
-		return "", err
+	if _, err := os.Stat(tempPath); err != nil && os.IsNotExist(err) {
+		client, err := NewIBackupService().NewClient(&backup)
+		if err != nil {
+			return "", err
+		}
+		_ = os.MkdirAll(path.Dir(tempPath), os.ModePerm)
+		isOK, err := client.Download(record.File, tempPath)
+		if !isOK || err != nil {
+			return "", err
+		}
 	}
 	return tempPath, nil
 }

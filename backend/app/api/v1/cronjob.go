@@ -246,7 +246,8 @@ func (b *BaseApi) TargetDownload(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	helper.SuccessWithData(c, filePath)
+
+	c.File(filePath)
 }
 
 // @Tags Cronjob

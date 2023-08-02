@@ -5093,48 +5093,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/files/download/bypath": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "下载指定文件",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "File"
-                ],
-                "summary": "Download file with path",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.FilePath"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [],
-                    "bodyKeys": [
-                        "path"
-                    ],
-                    "formatEN": "Download file [path]",
-                    "formatZH": "下载文件 [path]",
-                    "paramKeys": []
-                }
-            }
-        },
         "/files/mode": {
             "post": {
                 "security": [
@@ -8819,6 +8777,25 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/dto.PageResult"
                         }
+                    }
+                }
+            }
+        },
+        "/settings/ssl/download": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "下载证书",
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "Download system cert",
+                "responses": {
+                    "200": {
+                        "description": "OK"
                     }
                 }
             }
@@ -12517,17 +12494,6 @@ const docTemplate = `{
                         "KODO",
                         "OneDrive"
                     ]
-                }
-            }
-        },
-        "dto.FilePath": {
-            "type": "object",
-            "required": [
-                "path"
-            ],
-            "properties": {
-                "path": {
-                    "type": "string"
                 }
             }
         },

@@ -370,7 +370,7 @@ func loadInfoFromCert() (*dto.SSLInfo, error) {
 	return &dto.SSLInfo{
 		Domain:   strings.Join(domains, ","),
 		Timeout:  certObj.NotAfter.Format("2006-01-02 15:04:05"),
-		RootPath: global.CONF.System.BaseDir + "/1panel/secret/server.crt",
+		RootPath: path.Join(global.CONF.System.BaseDir, "1panel/secret/server.crt"),
 	}, nil
 }
 

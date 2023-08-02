@@ -79,10 +79,6 @@ export const DownloadFile = (params: File.FileDownload) => {
     return http.download<BlobPart>('files/download', params, { responseType: 'blob', timeout: 20000 });
 };
 
-export const DownloadByPath = (path: string) => {
-    return http.download<BlobPart>('files/download/bypath', { path: path }, { responseType: 'blob', timeout: 40000 });
-};
-
 export const ComputeDirSize = (params: File.DirSizeReq) => {
     return http.post<File.DirSizeRes>('files/size', params);
 };
