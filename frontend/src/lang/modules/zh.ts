@@ -1587,6 +1587,8 @@ const message = {
                 '由于无法兼容原有配置，初始化 Supervisor 会修改配置文件的 files 参数，导致已有的进程全部停止，请提前确认风险。修改后的进程配置文件夹在 <1Panel安装目录>/1panel/tools/supervisord/supervisor.d 中',
             operatorHelper: '将对 {0} 进行 {1} 操作，是否继续？',
             uptime: '运行时长',
+            notStartWarn: '当前未开启 Supervisor ，请先启动',
+            serviceName: '服务名称',
         },
     },
 };

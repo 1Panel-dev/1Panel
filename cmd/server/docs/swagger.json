@@ -6244,7 +6244,7 @@
                     "bodyKeys": [
                         "operate"
                     ],
-                    "formatEN": "[operate] [operate] Supervisor 进程文件",
+                    "formatEN": "[operate] Supervisor Process Config file",
                     "formatZH": "[operate] Supervisor 进程文件 ",
                     "paramKeys": []
                 }
@@ -15254,6 +15254,9 @@
                 "configPath": {
                     "type": "string"
                 },
+                "serviceName": {
+                    "type": "string"
+                },
                 "type": {
                     "type": "string"
                 }
@@ -15766,7 +15769,8 @@
                     "type": "string",
                     "enum": [
                         "out.log",
-                        "err.log"
+                        "err.log",
+                        "config"
                     ]
                 },
                 "name": {

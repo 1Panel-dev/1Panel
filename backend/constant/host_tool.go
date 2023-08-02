@@ -1,6 +1,8 @@
 package constant
 
 const (
-	Supervisord          = "supervisord"
-	SupervisorConfigPath = "SupervisorConfigPath"
+	Supervisord           = "supervisord"
+	Supervisor            = "supervisor"
+	SupervisorConfigPath  = "SupervisorConfigPath"
+	SupervisorServiceName = "SupervisorServiceName"
 )

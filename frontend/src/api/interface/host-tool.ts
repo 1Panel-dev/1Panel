@@ -14,6 +14,7 @@ export namespace HostTool {
         version: string;
         status: string;
         ctlExist: boolean;
+        serviceName: string;
     }
 
     export interface SupersivorConfig {
@@ -30,6 +31,7 @@ export namespace HostTool {
     export interface SupersivorInit {
         type: string;
         configPath: string;
+        serviceName: string;
     }
 
     export interface SupersivorProcess {

@@ -6251,7 +6251,7 @@ const docTemplate = `{
                     "bodyKeys": [
                         "operate"
                     ],
-                    "formatEN": "[operate] [operate] Supervisor 进程文件",
+                    "formatEN": "[operate] Supervisor Process Config file",
                     "formatZH": "[operate] Supervisor 进程文件 ",
                     "paramKeys": []
                 }
@@ -15261,6 +15261,9 @@ const docTemplate = `{
                 "configPath": {
                     "type": "string"
                 },
+                "serviceName": {
+                    "type": "string"
+                },
                 "type": {
                     "type": "string"
                 }
@@ -15773,7 +15776,8 @@ const docTemplate = `{
                     "type": "string",
                     "enum": [
                         "out.log",
-                        "err.log"
+                        "err.log",
+                        "config"
                     ]
                 },
                 "name": {

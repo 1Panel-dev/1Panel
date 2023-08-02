@@ -9,6 +9,9 @@
                     <el-form-item :label="$t('tool.supervisor.primaryConfig')" prop="primaryConfig">
                         <el-input v-model.trim="initModel.primaryConfig"></el-input>
                     </el-form-item>
+                    <el-form-item :label="$t('tool.supervisor.serviceName')" prop="serviceName">
+                        <el-input v-model.trim="initModel.serviceName"></el-input>
+                    </el-form-item>
                     <el-alert
                         :title="$t('tool.supervisor.initWarn')"
                         class="common-prompt"
@@ -41,15 +44,18 @@ const loading = ref(false);
 const initForm = ref<FormInstance>();
 const rules = ref({
     primaryConfig: [Rules.requiredInput],
+    serviceName: [Rules.requiredInput],
 });
 const initModel = ref({
     primaryConfig: '',
+    serviceName: '',
 });
 
 const em = defineEmits(['close']);
 
-const acceptParams = (primaryConfig: string) => {
+const acceptParams = (primaryConfig: string, serviceName: string) => {
     initModel.value.primaryConfig = primaryConfig;
+    initModel.value.serviceName = serviceName;
     open.value = true;
 };
 
@@ -60,7 +66,11 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         loading.value = true;
-        InitSupervisor({ type: 'supervisord', configPath: initModel.value.primaryConfig })
+        InitSupervisor({
+            type: 'supervisord',
+            configPath: initModel.value.primaryConfig,
+            serviceName: initModel.value.serviceName,
+        })
             .then(() => {
                 open.value = false;
                 em('close', true);

@@ -2642,6 +2642,8 @@ definitions:
     properties:
       configPath:
         type: string
+      serviceName:
+        type: string
       type:
         type: string
     required:
@@ -2986,6 +2988,7 @@ definitions:
         enum:
         - out.log
         - err.log
+        - config
         type: string
       name:
         type: string
@@ -7814,7 +7817,7 @@ paths:
         BeforeFuntions: []
         bodyKeys:
         - operate
-        formatEN: '[operate] [operate] Supervisor 进程文件'
+        formatEN: '[operate] Supervisor Process Config file'
         formatZH: '[operate] Supervisor 进程文件 '
         paramKeys: []
   /hosts:
