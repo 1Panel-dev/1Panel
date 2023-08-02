@@ -278,11 +278,11 @@ const checkParamCommon = (rule: any, value: any, callback: any) => {
 
 const checkParamComplexity = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
-        callback(new Error(i18n.global.t('commons.rule.paramComplexity', ['.%@$!&~_-'])));
+        callback(new Error(i18n.global.t('commons.rule.paramComplexity', ['.%@!~_-'])));
     } else {
-        const reg = /^[a-zA-Z0-9]{1}[a-zA-Z0-9.%@$!&~_-]{5,127}$/;
+        const reg = /^[a-zA-Z0-9]{1}[a-zA-Z0-9.%@!~_-]{4,126}[a-zA-Z0-9]{1}$/;
         if (!reg.test(value) && value !== '') {
-            callback(new Error(i18n.global.t('commons.rule.paramComplexity', ['.%@$!&~_-'])));
+            callback(new Error(i18n.global.t('commons.rule.paramComplexity', ['.%@!~_-'])));
         } else {
             callback();
         }
