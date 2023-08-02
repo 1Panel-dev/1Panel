@@ -122,9 +122,8 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, ElMessageBox } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { listComposeTemplate, testCompose, upCompose } from '@/api/modules/container';
+import { listComposeTemplate, loadContainerLog, testCompose, upCompose } from '@/api/modules/container';
 import { loadBaseDir } from '@/api/modules/setting';
-import { LoadFile } from '@/api/modules/files';
 import { formatImageStdout } from '@/utils/docker';
 import { MsgError } from '@/utils/message';
 
@@ -268,9 +267,9 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     });
 };
 
-const loadLogs = async (path: string) => {
+const loadLogs = async (name: string) => {
     timer = setInterval(async () => {
-        const res = await LoadFile({ path: path });
+        const res = await loadContainerLog('compose-create', name);
         logInfo.value = formatImageStdout(res.data);
         nextTick(() => {
             const state = view.value.state;

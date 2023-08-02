@@ -132,15 +132,13 @@ import { nextTick, reactive, ref, shallowRef } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { LoadFile } from '@/api/modules/files';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import Status from '@/views/database/redis/setting/status/index.vue';
 import Persistence from '@/views/database/redis/setting/persistence/index.vue';
-import { loadRedisConf, updateRedisConf, updateRedisConfByFile } from '@/api/modules/database';
+import { loadDatabaseFile, loadRedisConf, updateRedisConf, updateRedisConfByFile } from '@/api/modules/database';
 import i18n from '@/lang';
 import { checkNumberRange, Rules } from '@/global/form-rules';
 import { ChangePort, GetAppDefaultConfig } from '@/api/modules/app';
-import { loadBaseDir } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
 
 const extensions = [javascript(), oneDark];
@@ -335,11 +333,9 @@ const loadform = async () => {
 };
 
 const loadConfFile = async () => {
-    const pathRes = await loadBaseDir();
-    let path = `${pathRes.data}/apps/redis/${redisName.value}/conf/redis.conf`;
     useOld.value = false;
     loading.value = true;
-    await LoadFile({ path: path })
+    await loadDatabaseFile('redis-conf', redisName.value)
         .then((res) => {
             loading.value = false;
             redisConf.value = res.data;

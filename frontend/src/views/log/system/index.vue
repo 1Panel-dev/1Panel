@@ -42,9 +42,8 @@ import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { nextTick, onMounted, ref, shallowRef } from 'vue';
-import { LoadFile } from '@/api/modules/files';
-import { loadBaseDir } from '@/api/modules/setting';
 import { useRouter } from 'vue-router';
+import { getSystemLogs } from '@/api/modules/log';
 const router = useRouter();
 
 const loading = ref();
@@ -56,9 +55,7 @@ const handleReady = (payload) => {
 };
 
 const loadSystemlogs = async () => {
-    const pathRes = await loadBaseDir();
-    let logPath = pathRes.data + '/log';
-    await LoadFile({ path: `${logPath}/1Panel.log` })
+    await getSystemLogs()
         .then((res) => {
             loading.value = false;
             logs.value = res.data;

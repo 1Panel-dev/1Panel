@@ -356,6 +356,28 @@ func (b *BaseApi) CleanContainerLog(c *gin.Context) {
 }
 
 // @Tags Container
+// @Summary Load container log
+// @Description 获取容器操作日志
+// @Accept json
+// @Param request body dto.OperationWithNameAndType true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /containers/load/log [post]
+func (b *BaseApi) LoadContainerLog(c *gin.Context) {
+	var req dto.OperationWithNameAndType
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	content, err := containerService.LoadContainerLogs(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, content)
+}
+
+// @Tags Container
 // @Summary Operate Container
 // @Description 容器操作
 // @Accept json

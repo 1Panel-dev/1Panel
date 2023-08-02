@@ -493,7 +493,7 @@ var AddRemoteDB = &gormigrate.Migration{
 			appInstall model.AppInstall
 		)
 		if err := global.DB.Where("key = ?", "mysql").First(&app).Error; err != nil {
-			return err
+			return nil
 		}
 		if err := global.DB.Where("app_id = ?", app.ID).First(&appInstall).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {

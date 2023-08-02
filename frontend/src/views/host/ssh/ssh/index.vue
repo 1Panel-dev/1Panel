@@ -158,8 +158,7 @@ import Port from '@/views/host/ssh/ssh/port/index.vue';
 import Address from '@/views/host/ssh/ssh/address/index.vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { getSSHInfo, operateSSH, updateSSH, updateSSHByfile } from '@/api/modules/host';
-import { LoadFile } from '@/api/modules/files';
+import { getSSHConf, getSSHInfo, operateSSH, updateSSH, updateSSHByfile } from '@/api/modules/host';
 import { ElMessageBox, FormInstance } from 'element-plus';
 
 const loading = ref(false);
@@ -289,7 +288,7 @@ const changei18n = (value: string) => {
 };
 
 const loadSSHConf = async () => {
-    const res = await LoadFile({ path: '/etc/ssh/sshd_config' });
+    const res = await getSSHConf();
     sshConf.value = res.data || '';
 };
 

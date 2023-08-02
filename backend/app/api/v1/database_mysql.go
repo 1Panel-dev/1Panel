@@ -321,6 +321,28 @@ func (b *BaseApi) LoadBaseinfo(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
+// @Tags Database
+// @Summary Load Database file
+// @Description 获取数据库文件
+// @Accept json
+// @Param request body dto.OperationWithNameAndType true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /databases/load/file [post]
+func (b *BaseApi) LoadDatabaseFile(c *gin.Context) {
+	var req dto.OperationWithNameAndType
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	content, err := mysqlService.LoadDatabaseFile(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, content)
+}
+
 // @Tags Database Mysql
 // @Summary Load mysql remote access
 // @Description 获取 mysql 远程访问权限

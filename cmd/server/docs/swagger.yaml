@@ -1332,6 +1332,16 @@ definitions:
     required:
     - name
     type: object
+  dto.OperationWithNameAndType:
+    properties:
+      name:
+        type: string
+      type:
+        type: string
+    required:
+    - name
+    - type
+    type: object
   dto.Options:
     properties:
       option:
@@ -2986,6 +2996,7 @@ definitions:
         enum:
         - out.log
         - err.log
+        - config
         type: string
       name:
         type: string
@@ -5112,6 +5123,26 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Load container stats
+  /containers/load/log:
+    post:
+      consumes:
+      - application/json
+      description: 获取容器操作日志
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OperationWithNameAndType'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Load container log
+      tags:
+      - Container
   /containers/network:
     get:
       consumes:
@@ -5781,6 +5812,26 @@ paths:
       summary: Page volumes
       tags:
       - Container Volume
+  /cronjob/record/log:
+    post:
+      consumes:
+      - application/json
+      description: 获取计划任务记录日志
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OperateByID'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Load Cronjob record log
+      tags:
+      - Cronjob
   /cronjobs:
     post:
       consumes:
@@ -6336,6 +6387,26 @@ paths:
       summary: Load mysql database from remote
       tags:
       - Database Mysql
+  /databases/load/file:
+    post:
+      consumes:
+      - application/json
+      description: 获取数据库文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OperationWithNameAndType'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Load Database file
+      tags:
+      - Database
   /databases/options:
     get:
       consumes:
@@ -7038,28 +7109,6 @@ paths:
         formatEN: Download file [path]
         formatZH: 下载文件 [path]
         paramKeys: []
-  /files/loadfile:
-    post:
-      consumes:
-      - application/json
-      description: 读取文件
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.FilePath'
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      security:
-      - ApiKeyAuth: []
-      summary: Read file
-      tags:
-      - File
   /files/mode:
     post:
       consumes:
@@ -7495,6 +7544,17 @@ paths:
         formatEN: update SSH conf
         formatZH: 修改 SSH 配置文件
         paramKeys: []
+  /host/ssh/conf:
+    get:
+      description: 获取 ssh 配置文件
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Load host ssh conf
+      tags:
+      - SSH
   /host/ssh/generate:
     post:
       consumes:
@@ -7814,7 +7874,7 @@ paths:
         BeforeFuntions: []
         bodyKeys:
         - operate
-        formatEN: '[operate] [operate] Supervisor 进程文件'
+        formatEN: '[operate] Supervisor Process Config file'
         formatZH: '[operate] Supervisor 进程文件 '
         paramKeys: []
   /hosts:
@@ -8402,6 +8462,17 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Page operation logs
+      tags:
+      - Logs
+  /logs/system:
+    get:
+      description: 获取系统日志
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Load system logs
       tags:
       - Logs
   /openResty:

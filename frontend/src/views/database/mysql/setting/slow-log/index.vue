@@ -51,12 +51,10 @@ import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { nextTick, onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
 import { Database } from '@/api/interface/database';
-import { LoadFile } from '@/api/modules/files';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
-import { updateMysqlVariables } from '@/api/modules/database';
+import { loadDatabaseFile, updateMysqlVariables } from '@/api/modules/database';
 import { dateFormatForName, downloadWithContent } from '@/utils/util';
 import i18n from '@/lang';
-import { loadBaseDir } from '@/api/modules/setting';
 import { MsgError, MsgInfo, MsgSuccess } from '@/utils/message';
 
 const extensions = [javascript(), oneDark];
@@ -91,12 +89,10 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     if (variables.slow_query_log === 'ON') {
         currentStatus.value = true;
         detailShow.value = true;
-        const pathRes = await loadBaseDir();
-        let path = `${pathRes.data}/apps/mysql/${mysqlName.value}/data/1Panel-slow.log`;
-        loadMysqlSlowlogs(path);
+        loadMysqlSlowlogs();
         timer = setInterval(() => {
             if (variables.slow_query_log === 'ON' && isWatch.value) {
-                loadMysqlSlowlogs(path);
+                loadMysqlSlowlogs();
             }
         }, 1000 * 5);
     } else {
@@ -168,8 +164,8 @@ const onDownload = async () => {
     downloadWithContent(slowLogs.value, mysqlName.value + '-slowlogs-' + dateFormatForName(new Date()) + '.log');
 };
 
-const loadMysqlSlowlogs = async (path: string) => {
-    const res = await LoadFile({ path: path });
+const loadMysqlSlowlogs = async () => {
+    const res = await loadDatabaseFile('slow-logs', mysqlName.value);
     slowLogs.value = res.data || '';
     nextTick(() => {
         const state = view.value.state;

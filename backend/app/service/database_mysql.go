@@ -46,6 +46,8 @@ type IMysqlService interface {
 	LoadVariables() (*dto.MysqlVariables, error)
 	LoadBaseInfo() (*dto.DBBaseInfo, error)
 	LoadRemoteAccess() (bool, error)
+
+	LoadDatabaseFile(req dto.OperationWithNameAndType) (string, error)
 }
 
 func NewIMysqlService() IMysqlService {
@@ -512,6 +514,26 @@ func (u *MysqlService) LoadStatus() (*dto.MysqlStatus, error) {
 	}
 
 	return &info, nil
+}
+
+func (u *MysqlService) LoadDatabaseFile(req dto.OperationWithNameAndType) (string, error) {
+	filePath := ""
+	switch req.Type {
+	case "mysql-conf":
+		filePath = path.Join(global.CONF.System.DataDir, fmt.Sprintf("apps/mysql/%s/conf/my.cnf", req.Name))
+	case "redis-conf":
+		filePath = path.Join(global.CONF.System.DataDir, fmt.Sprintf("apps/redis/%s/conf/redis.conf", req.Name))
+	case "slow-logs":
+		filePath = path.Join(global.CONF.System.DataDir, fmt.Sprintf("apps/mysql/%s/data/1Panel-slow.log", req.Name))
+	}
+	if _, err := os.Stat(filePath); err != nil {
+		return "", buserr.New("ErrHttpReqNotFound")
+	}
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		return "", err
+	}
+	return string(content), nil
 }
 
 func excuteSqlForMaps(containerName, password, command string) (map[string]string, error) {

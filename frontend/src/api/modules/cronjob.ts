@@ -6,6 +6,10 @@ export const getCronjobPage = (params: SearchWithPage) => {
     return http.post<ResPage<Cronjob.CronjobInfo>>(`/cronjobs/search`, params);
 };
 
+export const getRecordLog = (id: number) => {
+    return http.post<string>(`/cronjobs/records/log`, { id: id });
+};
+
 export const addCronjob = (params: Cronjob.CronjobCreate) => {
     return http.post<Cronjob.CronjobCreate>(`/cronjobs`, params);
 };

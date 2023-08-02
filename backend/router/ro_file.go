@@ -38,7 +38,5 @@ func (f *FileRouter) InitFileRouter(Router *gin.RouterGroup) {
 		fileRouter.POST("/size", baseApi.Size)
 		fileRouter.GET("/ws", baseApi.Ws)
 		fileRouter.GET("/keys", baseApi.Keys)
-		fileRouter.POST("/loadfile", baseApi.LoadFromFile)
 	}
-
 }

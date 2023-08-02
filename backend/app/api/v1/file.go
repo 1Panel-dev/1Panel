@@ -589,33 +589,6 @@ func (b *BaseApi) Size(c *gin.Context) {
 	helper.SuccessWithData(c, res)
 }
 
-// @Tags File
-// @Summary Read file
-// @Description 读取文件
-// @Accept json
-// @Param request body dto.FilePath true "request"
-// @Success 200 {string} content
-// @Security ApiKeyAuth
-// @Router /files/loadfile [post]
-func (b *BaseApi) LoadFromFile(c *gin.Context) {
-	var req dto.FilePath
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-
-	content, err := os.ReadFile(req.Path)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	helper.SuccessWithData(c, string(content))
-}
-
 func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int) error {
 	if _, err := os.Stat(path.Dir(dstDir)); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(path.Dir(dstDir), os.ModePerm); err != nil {

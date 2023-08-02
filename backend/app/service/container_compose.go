@@ -157,7 +157,7 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) (string, error) 
 	global.LOG.Infof("docker-compose.yml %s create successful, start to docker-compose up", req.Name)
 
 	if req.From == "path" {
-		req.Name = path.Base(strings.ReplaceAll(req.Path, "/"+path.Base(req.Path), ""))
+		req.Name = path.Base(path.Dir(req.Path))
 	}
 	logName := path.Dir(req.Path) + "/compose.log"
 	file, err := os.OpenFile(logName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
@@ -181,7 +181,7 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) (string, error) 
 		_, _ = file.WriteString("docker-compose up successful!")
 	}()
 
-	return logName, nil
+	return req.Name, nil
 }
 
 func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {

@@ -10,6 +10,10 @@ export const getLoginLogs = (info: Log.SearchLgLog) => {
     return http.post<ResPage<Log.OperationLog>>(`/logs/login`, info);
 };
 
+export const getSystemLogs = () => {
+    return http.get<string>(`/logs/system`);
+};
+
 export const cleanLogs = (param: Log.CleanLog) => {
     return http.post(`/logs/clean`, param);
 };
