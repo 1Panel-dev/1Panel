@@ -26,9 +26,8 @@ type WebsiteNginxConfig struct {
 }
 
 type WebsiteWafConfig struct {
-	Enable   bool   `json:"enable"`
-	FilePath string `json:"filePath"`
-	Content  string `json:"content"`
+	Enable  bool   `json:"enable"`
+	Content string `json:"content"`
 }
 
 type WebsiteHTTPS struct {

@@ -250,7 +250,6 @@ export namespace Website {
 
     export interface WafRes {
         enable: boolean;
-        filePath: string;
         content: string;
     }
 
@@ -258,6 +257,12 @@ export namespace Website {
         enable: boolean;
         websiteId: number;
         key: string;
+    }
+
+    export interface WafFileUpdate {
+        websiteId: number;
+        type: string;
+        content: string;
     }
 
     export interface DelReq {

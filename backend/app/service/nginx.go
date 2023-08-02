@@ -20,7 +20,7 @@ type NginxService struct {
 }
 
 type INginxService interface {
-	GetNginxConfig() (response.FileInfo, error)
+	GetNginxConfig() (*response.NginxFile, error)
 	GetConfigByScope(req request.NginxScopeReq) ([]response.NginxParam, error)
 	UpdateConfigByScope(req request.NginxConfigUpdate) error
 	GetStatus() (response.NginxStatus, error)
@@ -31,20 +31,17 @@ func NewINginxService() INginxService {
 	return &NginxService{}
 }
 
-func (n NginxService) GetNginxConfig() (response.FileInfo, error) {
+func (n NginxService) GetNginxConfig() (*response.NginxFile, error) {
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
-		return response.FileInfo{}, err
+		return nil, err
 	}
 	configPath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "conf", "nginx.conf")
-	info, err := files.NewFileInfo(files.FileOption{
-		Path:   configPath,
-		Expand: true,
-	})
+	byteContent, err := files.NewFileOp().GetContent(configPath)
 	if err != nil {
-		return response.FileInfo{}, err
+		return nil, err
 	}
-	return response.FileInfo{FileInfo: *info}, nil
+	return &response.NginxFile{Content: string(byteContent)}, nil
 }
 
 func (n NginxService) GetConfigByScope(req request.NginxScopeReq) ([]response.NginxParam, error) {
@@ -86,31 +83,32 @@ func (n NginxService) GetStatus() (response.NginxStatus, error) {
 
 func (n NginxService) UpdateConfigFile(req request.NginxConfigFileUpdate) error {
 	fileOp := files.NewFileOp()
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	filePath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "conf", "nginx.conf")
+	if err != nil {
+		return err
+	}
 	if req.Backup {
-		backupPath := path.Join(path.Dir(req.FilePath), "bak")
+		backupPath := path.Join(path.Dir(filePath), "bak")
 		if !fileOp.Stat(backupPath) {
 			if err := fileOp.CreateDir(backupPath, 0755); err != nil {
 				return err
 			}
 		}
 		newFile := path.Join(backupPath, "nginx.bak"+"-"+time.Now().Format("2006-01-02-15-04-05"))
-		if err := fileOp.Copy(req.FilePath, backupPath); err != nil {
+		if err := fileOp.Copy(filePath, backupPath); err != nil {
 			return err
 		}
 		if err := fileOp.Rename(path.Join(backupPath, "nginx.conf"), newFile); err != nil {
 			return err
 		}
 	}
-	oldContent, err := os.ReadFile(req.FilePath)
+	oldContent, err := os.ReadFile(filePath)
 	if err != nil {
 		return err
 	}
-	if err := fileOp.WriteFile(req.FilePath, strings.NewReader(req.Content), 0644); err != nil {
+	if err = fileOp.WriteFile(filePath, strings.NewReader(req.Content), 0644); err != nil {
 		return err
 	}
-	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		return err
-	}
-	return nginxCheckAndReload(string(oldContent), req.FilePath, nginxInstall.ContainerName)
+	return nginxCheckAndReload(string(oldContent), filePath, nginxInstall.ContainerName)
 }

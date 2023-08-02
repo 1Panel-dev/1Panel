@@ -41,6 +41,7 @@ func (a *WebsiteRouter) InitWebsiteRouter(Router *gin.RouterGroup) {
 
 		groupRouter.POST("/waf/config", baseApi.GetWebsiteWafConfig)
 		groupRouter.POST("/waf/update", baseApi.UpdateWebsiteWafConfig)
+		groupRouter.POST("/waf/file/update", baseApi.UpdateWebsiteWafFile)
 
 		groupRouter.GET("/php/config/:id", baseApi.GetWebsitePHPConfig)
 		groupRouter.POST("/php/config", baseApi.UpdateWebsitePHPConfig)

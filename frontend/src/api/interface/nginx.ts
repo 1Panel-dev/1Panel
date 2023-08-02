@@ -26,7 +26,6 @@ export namespace Nginx {
 
     export interface NginxFileUpdate {
         content: string;
-        filePath: string;
         backup: boolean;
     }
 }

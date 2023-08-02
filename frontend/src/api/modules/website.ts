@@ -151,6 +151,10 @@ export const UpdateWafEnable = (req: Website.WafUpdate) => {
     return http.post<any>(`/websites/waf/update`, req);
 };
 
+export const UpdateWafFile = (req: Website.WafFileUpdate) => {
+    return http.post<any>(`/websites/waf/file/update`, req);
+};
+
 export const UpdateNginxFile = (req: Website.NginxUpdate) => {
     return http.post<any>(`/websites/nginx/update`, req);
 };
