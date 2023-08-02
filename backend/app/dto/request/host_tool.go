@@ -11,7 +11,8 @@ type HostToolCreate struct {
 }
 
 type SupervisorConfig struct {
-	ConfigPath string `json:"configPath"`
+	ConfigPath  string `json:"configPath"`
+	ServiceName string `json:"serviceName"`
 }
 
 type HostToolLogReq struct {

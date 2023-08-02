@@ -2,7 +2,7 @@
     <div>
         <ToolRouter />
         <el-card v-if="!isRunningSuperVisor && maskShow" class="mask-prompt">
-            <span>{{ $t('firewall.firewallNotStart') }}</span>
+            <span>{{ $t('tool.supervisor.notStartWarn') }}</span>
         </el-card>
         <LayoutContent :title="$t('tool.supervisor.list')" v-loading="loading">
             <template #app>

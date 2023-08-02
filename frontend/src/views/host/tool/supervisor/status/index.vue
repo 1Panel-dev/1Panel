@@ -72,6 +72,7 @@ const data = ref({
     init: false,
     configPath: '',
     ctlExist: false,
+    serviceName: '',
 });
 
 const em = defineEmits(['setting', 'isExist', 'isRunning', 'update:loading', 'update:maskShow']);
@@ -126,7 +127,7 @@ const getStatus = async () => {
             em('isExist', true);
         }
         if (data.value.init) {
-            initRef.value.acceptParams(data.value.configPath);
+            initRef.value.acceptParams(data.value.configPath, data.value.serviceName);
         }
     } catch (error) {}
     em('update:loading', false);

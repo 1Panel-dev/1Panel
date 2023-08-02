@@ -6,15 +6,16 @@ type HostToolRes struct {
 }
 
 type Supervisor struct {
-	ConfigPath string `json:"configPath"`
-	IncludeDir string `json:"includeDir"`
-	LogPath    string `json:"logPath"`
-	IsExist    bool   `json:"isExist"`
-	Init       bool   `json:"init"`
-	Msg        string `json:"msg"`
-	Version    string `json:"version"`
-	Status     string `json:"status"`
-	CtlExist   bool   `json:"ctlExist"`
+	ConfigPath  string `json:"configPath"`
+	IncludeDir  string `json:"includeDir"`
+	LogPath     string `json:"logPath"`
+	IsExist     bool   `json:"isExist"`
+	Init        bool   `json:"init"`
+	Msg         string `json:"msg"`
+	Version     string `json:"version"`
+	Status      string `json:"status"`
+	CtlExist    bool   `json:"ctlExist"`
+	ServiceName string `json:"serviceName"`
 }
 
 type HostToolConfig struct {

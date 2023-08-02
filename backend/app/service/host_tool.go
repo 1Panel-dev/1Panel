@@ -43,29 +43,33 @@ func (h *HostToolService) GetToolStatus(req request.HostToolReq) (*response.Host
 	res.Type = req.Type
 	switch req.Type {
 	case constant.Supervisord:
-		exist, err := systemctl.IsExist(constant.Supervisord)
-		if err != nil {
-			return nil, err
-		}
+		exist, _ := systemctl.IsExist(constant.Supervisord)
 		supervisorConfig := &response.Supervisor{}
 		if !exist {
-			supervisorConfig.IsExist = false
-			return res, nil
+			exist, _ = systemctl.IsExist(constant.Supervisor)
+			if !exist {
+				supervisorConfig.IsExist = false
+				res.Config = supervisorConfig
+				return res, nil
+			} else {
+				supervisorConfig.ServiceName = constant.Supervisor
+			}
+		} else {
+			supervisorConfig.ServiceName = constant.Supervisord
 		}
 		supervisorConfig.IsExist = true
+
+		serviceNameSet, _ := settingRepo.Get(settingRepo.WithByKey(constant.SupervisorServiceName))
+		if serviceNameSet.ID != 0 || serviceNameSet.Value != "" {
+			supervisorConfig.ServiceName = serviceNameSet.Value
+		}
 
 		versionRes, _ := cmd.Exec("supervisord -v")
 		supervisorConfig.Version = strings.TrimSuffix(versionRes, "\n")
 		_, ctlRrr := exec.LookPath("supervisorctl")
 		supervisorConfig.CtlExist = ctlRrr == nil
 
-		active, err := systemctl.IsActive(constant.Supervisord)
-		if err != nil {
-			supervisorConfig.Status = "unhealthy"
-			supervisorConfig.Msg = err.Error()
-			res.Config = supervisorConfig
-			return res, nil
-		}
+		active, _ := systemctl.IsActive(supervisorConfig.ServiceName)
 		if active {
 			supervisorConfig.Status = "running"
 		} else {
@@ -77,13 +81,14 @@ func (h *HostToolService) GetToolStatus(req request.HostToolReq) (*response.Host
 			supervisorConfig.ConfigPath = pathSet.Value
 			res.Config = supervisorConfig
 			return res, nil
+		} else {
+			supervisorConfig.Init = true
 		}
-		supervisorConfig.Init = true
 
-		servicePath := "/usr/lib/systemd/system/supervisord.service"
+		servicePath := "/usr/lib/systemd/system/supervisor.service"
 		fileOp := files.NewFileOp()
 		if !fileOp.Stat(servicePath) {
-			servicePath = "/lib/systemd/system/supervisord.service"
+			servicePath = "/usr/lib/systemd/system/supervisord.service"
 		}
 		if fileOp.Stat(servicePath) {
 			startCmd, _ := ini_conf.GetIniValue(servicePath, "Service", "ExecStart")
@@ -161,9 +166,12 @@ func (h *HostToolService) CreateToolConfig(req request.HostToolCreate) error {
 		if err = settingRepo.Create(constant.SupervisorConfigPath, req.ConfigPath); err != nil {
 			return err
 		}
+		if err = settingRepo.Create(constant.SupervisorServiceName, req.ServiceName); err != nil {
+			return err
+		}
 		go func() {
-			if err = systemctl.Restart(constant.Supervisord); err != nil {
-				global.LOG.Errorf("[init] restart supervisord failed err %s", err.Error())
+			if err = systemctl.Restart(req.ServiceName); err != nil {
+				global.LOG.Errorf("[init] restart %s failed err %s", req.ServiceName, err.Error())
 			}
 		}()
 	}
@@ -171,18 +179,30 @@ func (h *HostToolService) CreateToolConfig(req request.HostToolCreate) error {
 }
 
 func (h *HostToolService) OperateTool(req request.HostToolReq) error {
-	return systemctl.Operate(req.Operate, req.Type)
+	serviceName := req.Type
+	if req.Type == constant.Supervisord {
+		serviceNameSet, _ := settingRepo.Get(settingRepo.WithByKey(constant.SupervisorServiceName))
+		if serviceNameSet.ID != 0 || serviceNameSet.Value != "" {
+			serviceName = serviceNameSet.Value
+		}
+	}
+	return systemctl.Operate(req.Operate, serviceName)
 }
 
 func (h *HostToolService) OperateToolConfig(req request.HostToolConfig) (*response.HostToolConfig, error) {
 	fileOp := files.NewFileOp()
 	res := &response.HostToolConfig{}
 	configPath := ""
+	serviceName := "supervisord"
 	switch req.Type {
 	case constant.Supervisord:
 		pathSet, _ := settingRepo.Get(settingRepo.WithByKey(constant.SupervisorConfigPath))
 		if pathSet.ID != 0 || pathSet.Value != "" {
 			configPath = pathSet.Value
+		}
+		serviceNameSet, _ := settingRepo.Get(settingRepo.WithByKey(constant.SupervisorServiceName))
+		if serviceNameSet.ID != 0 || serviceNameSet.Value != "" {
+			serviceName = serviceNameSet.Value
 		}
 	}
 	switch req.Operate {
@@ -208,7 +228,7 @@ func (h *HostToolService) OperateToolConfig(req request.HostToolConfig) (*respon
 		if err = fileOp.WriteFile(configPath, strings.NewReader(req.Content), fileInfo.Mode()); err != nil {
 			return nil, err
 		}
-		if err = systemctl.Restart(req.Type); err != nil {
+		if err = systemctl.Restart(serviceName); err != nil {
 			_ = fileOp.WriteFile(configPath, bytes.NewReader(oldContent), fileInfo.Mode())
 			return nil, err
 		}

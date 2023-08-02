@@ -15377,6 +15377,9 @@ const docTemplate = `{
                 "configPath": {
                     "type": "string"
                 },
+                "serviceName": {
+                    "type": "string"
+                },
                 "type": {
                     "type": "string"
                 }
