@@ -57,7 +57,6 @@ import DrawerHeader from '@/components/drawer-header/index.vue';
 import { deleteBackupRecord, downloadBackupRecord, searchBackupRecords } from '@/api/modules/setting';
 import { Backup } from '@/api/interface/backup';
 import { MsgSuccess } from '@/utils/message';
-// import { DownloadByPath } from '@/api/modules/files';
 
 const selects = ref<any>([]);
 const loading = ref();

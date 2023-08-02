@@ -136,14 +136,14 @@ func (u *DockerService) UpdateConf(req dto.SettingUpdate) error {
 
 	switch req.Key {
 	case "Registries":
-		req.Value = strings.TrimRight(req.Value, ",")
+		req.Value = strings.TrimSuffix(req.Value, ",")
 		if len(req.Value) == 0 {
 			delete(daemonMap, "insecure-registries")
 		} else {
 			daemonMap["insecure-registries"] = strings.Split(req.Value, ",")
 		}
 	case "Mirrors":
-		req.Value = strings.TrimRight(req.Value, ",")
+		req.Value = strings.TrimSuffix(req.Value, ",")
 		if len(req.Value) == 0 {
 			delete(daemonMap, "registry-mirrors")
 		} else {

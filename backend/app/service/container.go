@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -63,6 +64,8 @@ type IContainerService interface {
 	TestCompose(req dto.ComposeCreate) (bool, error)
 	ComposeUpdate(req dto.ComposeUpdate) error
 	Prune(req dto.ContainerPrune) (dto.ContainerPruneReport, error)
+
+	LoadContainerLogs(req dto.OperationWithNameAndType) (string, error)
 }
 
 func NewIContainerService() IContainerService {
@@ -182,7 +185,7 @@ func (u *ContainerService) List() ([]string, error) {
 	for _, container := range containers {
 		for _, name := range container.Names {
 			if len(name) != 0 {
-				datas = append(datas, strings.TrimLeft(name, "/"))
+				datas = append(datas, strings.TrimPrefix(name, "/"))
 			}
 		}
 	}
@@ -623,6 +626,48 @@ func (u *ContainerService) ContainerStats(id string) (*dto.ContainerStats, error
 	data.NetworkRX, data.NetworkTX = calculateNetwork(stats.Networks)
 	data.ShotTime = stats.Read
 	return &data, nil
+}
+
+func (u *ContainerService) LoadContainerLogs(req dto.OperationWithNameAndType) (string, error) {
+	filePath := ""
+	switch req.Type {
+	case "image-pull", "image-push", "image-build":
+		filePath = path.Join(global.CONF.System.TmpDir, fmt.Sprintf("docker_logs/%s", req.Name))
+	case "compose-detail", "compose-create":
+		client, err := docker.NewDockerClient()
+		if err != nil {
+			return "", err
+		}
+		options := types.ContainerListOptions{All: true}
+		options.Filters = filters.NewArgs()
+		options.Filters.Add("label", fmt.Sprintf("%s=%s", composeProjectLabel, req.Name))
+		containers, err := client.ContainerList(context.Background(), options)
+		if err != nil {
+			return "", err
+		}
+		for _, container := range containers {
+			config := container.Labels[composeConfigLabel]
+			workdir := container.Labels[composeWorkdirLabel]
+			if len(config) != 0 && len(workdir) != 0 && strings.Contains(config, workdir) {
+				filePath = config
+				break
+			} else {
+				filePath = workdir
+				break
+			}
+		}
+		if req.Type == "compose-create" {
+			filePath = path.Join(path.Dir(filePath), "/compose.log")
+		}
+	}
+	if _, err := os.Stat(filePath); err != nil {
+		return "", buserr.New("ErrHttpReqNotFound")
+	}
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		return "", err
+	}
+	return string(content), nil
 }
 
 func stringsToMap(list []string) map[string]string {

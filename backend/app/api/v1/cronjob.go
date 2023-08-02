@@ -95,6 +95,28 @@ func (b *BaseApi) SearchJobRecords(c *gin.Context) {
 }
 
 // @Tags Cronjob
+// @Summary Load Cronjob record log
+// @Description 获取计划任务记录日志
+// @Accept json
+// @Param request body dto.OperateByID true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /cronjob/record/log [post]
+func (b *BaseApi) LoadRecordLog(c *gin.Context) {
+	var req dto.OperateByID
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	content, err := cronjobService.LoadRecordLog(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, content)
+}
+
+// @Tags Cronjob
 // @Summary Clean job records
 // @Description 清空计划任务记录
 // @Accept json

@@ -183,3 +183,18 @@ func (b *BaseApi) LoadSSHLogs(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, data)
 }
+
+// @Tags SSH
+// @Summary Load host ssh conf
+// @Description 获取 ssh 配置文件
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /host/ssh/conf [get]
+func (b *BaseApi) LoadSSHConf(c *gin.Context) {
+	data, err := sshService.LoadSSHConf()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}

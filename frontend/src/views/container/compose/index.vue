@@ -98,10 +98,9 @@ import EditDialog from '@/views/container/compose/edit/index.vue';
 import CreateDialog from '@/views/container/compose/create/index.vue';
 import DeleteDialog from '@/views/container/compose/delete/index.vue';
 import ComposeDetial from '@/views/container/compose/detail/index.vue';
-import { loadDockerStatus, searchCompose } from '@/api/modules/container';
+import { loadContainerLog, loadDockerStatus, searchCompose } from '@/api/modules/container';
 import i18n from '@/lang';
 import { Container } from '@/api/interface/container';
-import { LoadFile } from '@/api/modules/files';
 import { loadBaseDir } from '@/api/modules/setting';
 import router from '@/routers';
 
@@ -198,7 +197,7 @@ const onDelete = async (row: Container.ComposeInfo) => {
 
 const dialogEditRef = ref();
 const onEdit = async (row: Container.ComposeInfo) => {
-    const res = await LoadFile({ path: row.path });
+    const res = await loadContainerLog('compose-detail', row.name);
     let params = {
         name: row.name,
         path: row.path,

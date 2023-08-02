@@ -205,8 +205,8 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
 		global.LOG.Infof("start to upload snapshot to %s, please wait", backup.Type)
 		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusUploading})
 		localPath := path.Join(localDir, fmt.Sprintf("system/1panel_%s_%s.tar.gz", versionItem.Value, timeNow))
-		itemBackupPath := strings.TrimLeft(backup.BackupPath, "/")
-		itemBackupPath = strings.TrimRight(itemBackupPath, "/")
+		itemBackupPath := strings.TrimPrefix(backup.BackupPath, "/")
+		itemBackupPath = strings.TrimSuffix(itemBackupPath, "/")
 		if ok, err := backupAccount.Upload(localPath, fmt.Sprintf("%s/system_snapshot/1panel_%s_%s.tar.gz", itemBackupPath, versionItem.Value, timeNow)); err != nil || !ok {
 			_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
 			global.LOG.Errorf("upload snapshot to %s failed, err: %v", backup.Type, err)
@@ -259,8 +259,8 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 			operation = "re-recover"
 		}
 		if !isReTry || snap.InterruptStep == "Download" || (isReTry && req.ReDownload) {
-			itemBackupPath := strings.TrimLeft(backup.BackupPath, "/")
-			itemBackupPath = strings.TrimRight(itemBackupPath, "/")
+			itemBackupPath := strings.TrimPrefix(backup.BackupPath, "/")
+			itemBackupPath = strings.TrimSuffix(itemBackupPath, "/")
 			ok, err := client.Download(fmt.Sprintf("%s/system_snapshot/%s.tar.gz", itemBackupPath, snap.Name), fmt.Sprintf("%s/%s.tar.gz", baseDir, snap.Name))
 			if err != nil || !ok {
 				if req.ReDownload {
@@ -947,7 +947,10 @@ func (u *SnapshotService) handleTar(sourceDir, targetDir, name, exclusionRules s
 	global.LOG.Debug(commands)
 	stdout, err := cmd.ExecWithTimeOut(commands, 30*time.Minute)
 	if err != nil {
-		global.LOG.Errorf("do handle tar failed, stdout: %s, err: %v", stdout, err)
+		if len(stdout) != 0 {
+			global.LOG.Errorf("do handle tar failed, stdout: %s, err: %v", stdout, err)
+			return fmt.Errorf("do handle tar failed, stdout: %s, err: %v", stdout, err)
+		}
 	}
 	return nil
 }
@@ -963,7 +966,10 @@ func (u *SnapshotService) handleUnTar(sourceDir, targetDir string) error {
 	global.LOG.Debug(commands)
 	stdout, err := cmd.ExecWithTimeOut(commands, 30*time.Minute)
 	if err != nil {
-		global.LOG.Errorf("do handle untar failed, stdout: %s, err: %v", stdout, err)
+		if len(stdout) != 0 {
+			global.LOG.Errorf("do handle untar failed, stdout: %s, err: %v", stdout, err)
+			return fmt.Errorf("do handle untar failed, stdout: %s, err: %v", stdout, err)
+		}
 	}
 	return nil
 }

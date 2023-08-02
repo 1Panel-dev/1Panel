@@ -31,10 +31,6 @@ export const ChangeFileMode = (form: File.FileCreate) => {
     return http.post<File.File>('files/mode', form);
 };
 
-export const LoadFile = (form: File.FilePath) => {
-    return http.post<string>('files/loadfile', form);
-};
-
 export const CompressFile = (form: File.FileCompress) => {
     return http.post<File.File>('files/compress', form);
 };

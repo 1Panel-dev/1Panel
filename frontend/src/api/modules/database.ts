@@ -7,6 +7,9 @@ import { Database } from '../interface/database';
 export const searchMysqlDBs = (params: Database.SearchDBWithPage) => {
     return http.post<ResPage<Database.MysqlDBInfo>>(`/databases/search`, params);
 };
+export const loadDatabaseFile = (type: string, name: string) => {
+    return http.post<string>(`/databases/load/file`, { type: type, name: name });
+};
 
 export const addMysqlDB = (params: Database.MysqlDBCreate) => {
     let reqest = deepCopy(params) as Database.MysqlDBCreate;

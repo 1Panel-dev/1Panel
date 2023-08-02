@@ -1998,6 +1998,39 @@
                 }
             }
         },
+        "/containers/load/log": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取容器操作日志",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Container"
+                ],
+                "summary": "Load container log",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperationWithNameAndType"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/containers/network": {
             "get": {
                 "security": [
@@ -3051,6 +3084,39 @@
                 }
             }
         },
+        "/cronjob/record/log": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取计划任务记录日志",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cronjob"
+                ],
+                "summary": "Load Cronjob record log",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperateByID"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/cronjobs": {
             "post": {
                 "security": [
@@ -3916,6 +3982,39 @@
                 ],
                 "summary": "Load mysql database from remote",
                 "responses": {}
+            }
+        },
+        "/databases/load/file": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取数据库文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Database"
+                ],
+                "summary": "Load Database file",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperationWithNameAndType"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
             }
         },
         "/databases/options": {
@@ -5029,42 +5128,6 @@
                 }
             }
         },
-        "/files/loadfile": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "读取文件",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "File"
-                ],
-                "summary": "Read file",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.FilePath"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "/files/mode": {
             "post": {
                 "security": [
@@ -5741,6 +5804,25 @@
                 }
             }
         },
+        "/host/ssh/conf": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取 ssh 配置文件",
+                "tags": [
+                    "SSH"
+                ],
+                "summary": "Load host ssh conf",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/host/ssh/generate": {
             "post": {
                 "security": [
@@ -6244,7 +6326,7 @@
                     "bodyKeys": [
                         "operate"
                     ],
-                    "formatEN": "[operate] [operate] Supervisor 进程文件",
+                    "formatEN": "[operate] Supervisor Process Config file",
                     "formatZH": "[operate] Supervisor 进程文件 ",
                     "paramKeys": []
                 }
@@ -7177,6 +7259,25 @@
                         "schema": {
                             "$ref": "#/definitions/dto.PageResult"
                         }
+                    }
+                }
+            }
+        },
+        "/logs/system": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取系统日志",
+                "tags": [
+                    "Logs"
+                ],
+                "summary": "Load system logs",
+                "responses": {
+                    "200": {
+                        "description": "OK"
                     }
                 }
             }
@@ -13284,6 +13385,21 @@
                 }
             }
         },
+        "dto.OperationWithNameAndType": {
+            "type": "object",
+            "required": [
+                "name",
+                "type"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.Options": {
             "type": "object",
             "properties": {
@@ -15766,7 +15882,8 @@
                     "type": "string",
                     "enum": [
                         "out.log",
-                        "err.log"
+                        "err.log",
+                        "config"
                     ]
                 },
                 "name": {

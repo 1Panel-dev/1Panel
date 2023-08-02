@@ -119,17 +119,14 @@ import { reactive, ref } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { LoadFile } from '@/api/modules/files';
-import { loadMysqlBaseInfo, loadMysqlVariables, updateMysqlConfByFile } from '@/api/modules/database';
+import { loadDatabaseFile, loadMysqlBaseInfo, loadMysqlVariables, updateMysqlConfByFile } from '@/api/modules/database';
 import { ChangePort, GetAppDefaultConfig } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { loadBaseDir } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
 
-const baseDir = ref();
 const extensions = [javascript(), oneDark];
 const activeName = ref('conf');
 
@@ -179,8 +176,7 @@ const onClose = (): void => {
 
 const jumpToConf = async () => {
     activeName.value = 'conf';
-    const pathRes = await loadBaseDir();
-    loadMysqlConf(`${pathRes.data}/apps/mysql/${mysqlName.value}/conf/my.cnf`);
+    loadMysqlConf();
 };
 
 const jumpToSlowlog = async () => {
@@ -271,9 +267,7 @@ const loadBaseInfo = async () => {
     mysqlName.value = res.data?.name;
     baseInfo.port = res.data?.port;
     baseInfo.containerID = res.data?.containerName;
-    const pathRes = await loadBaseDir();
-    baseDir.value = pathRes.data;
-    loadMysqlConf(`${pathRes.data}/apps/mysql/${mysqlName.value}/conf/my.cnf`);
+    loadMysqlConf();
     loadContainerLog(baseInfo.containerID);
 };
 
@@ -302,9 +296,9 @@ const loadSlowLogs = async () => {
     slowLogRef.value!.acceptParams(param);
 };
 
-const loadMysqlConf = async (path: string) => {
+const loadMysqlConf = async () => {
     useOld.value = false;
-    const res = await LoadFile({ path: path });
+    const res = await loadDatabaseFile('mysql-conf', mysqlName.value);
     loading.value = false;
     mysqlConf.value = res.data;
 };

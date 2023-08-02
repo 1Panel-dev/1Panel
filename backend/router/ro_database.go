@@ -26,6 +26,7 @@ func (s *DatabaseRouter) InitDatabaseRouter(Router *gin.RouterGroup) {
 		cmdRouter.POST("/variables/update", baseApi.UpdateMysqlVariables)
 		cmdRouter.POST("/conffile/update", baseApi.UpdateMysqlConfByFile)
 		cmdRouter.POST("/search", baseApi.SearchMysql)
+		cmdRouter.POST("/load/file", baseApi.LoadDatabaseFile)
 		cmdRouter.GET("/variables", baseApi.LoadVariables)
 		cmdRouter.GET("/status", baseApi.LoadStatus)
 		cmdRouter.GET("/baseinfo", baseApi.LoadBaseinfo)

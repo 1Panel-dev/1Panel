@@ -32,6 +32,8 @@ type ISSHService interface {
 	GenerateSSH(req dto.GenerateSSH) error
 	LoadSSHSecret(mode string) (string, error)
 	LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error)
+
+	LoadSSHConf() (string, error)
 }
 
 func NewISSHService() ISSHService {
@@ -281,6 +283,17 @@ func (u *SSHService) LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error) {
 
 	data.SuccessfulCount = data.TotalCount - data.FailedCount
 	return &data, nil
+}
+
+func (u *SSHService) LoadSSHConf() (string, error) {
+	if _, err := os.Stat("/etc/ssh/sshd_config"); err != nil {
+		return "", buserr.New("ErrHttpReqNotFound")
+	}
+	content, err := os.ReadFile("/etc/ssh/sshd_config")
+	if err != nil {
+		return "", err
+	}
+	return string(content), nil
 }
 
 func sortFileList(fileNames []sshFileItem) []sshFileItem {

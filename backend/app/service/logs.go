@@ -1,9 +1,14 @@
 package service
 
 import (
+	"os"
+	"path"
+
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
@@ -19,6 +24,8 @@ type ILogService interface {
 
 	CreateOperationLog(operation model.OperationLog) error
 	PageOperationLog(search dto.SearchOpLogWithPage) (int64, interface{}, error)
+
+	LoadSystemLog() (string, error)
 
 	CleanLogs(logtype string) error
 }
@@ -72,6 +79,18 @@ func (u *LogService) PageOperationLog(req dto.SearchOpLogWithPage) (int64, inter
 		dtoOps = append(dtoOps, item)
 	}
 	return total, dtoOps, err
+}
+
+func (u *LogService) LoadSystemLog() (string, error) {
+	filePath := path.Join(global.CONF.System.DataDir, "log/1Panel.log")
+	if _, err := os.Stat(filePath); err != nil {
+		return "", buserr.New("ErrHttpReqNotFound")
+	}
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		return "", err
+	}
+	return string(content), nil
 }
 
 func (u *LogService) CleanLogs(logtype string) error {

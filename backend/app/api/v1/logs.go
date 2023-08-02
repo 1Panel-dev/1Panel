@@ -89,3 +89,19 @@ func (b *BaseApi) CleanLogs(c *gin.Context) {
 
 	helper.SuccessWithData(c, nil)
 }
+
+// @Tags Logs
+// @Summary Load system logs
+// @Description 获取系统日志
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /logs/system [get]
+func (b *BaseApi) GetSystemLogs(c *gin.Context) {
+	data, err := logService.LoadSystemLog()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, data)
+}

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path"
 	"strings"
 	"time"
 
@@ -214,7 +215,7 @@ func (r *Local) Backup(info BackupInfo) error {
 			return fmt.Errorf("mkdir %s failed, err: %v", info.TargetDir, err)
 		}
 	}
-	outfile, _ := os.OpenFile(info.FileName, os.O_RDWR|os.O_CREATE, 0755)
+	outfile, _ := os.OpenFile(path.Join(info.TargetDir, info.FileName), os.O_RDWR|os.O_CREATE, 0755)
 	global.LOG.Infof("start to mysqldump | gzip > %s.gzip", info.TargetDir+"/"+info.FileName)
 	cmd := exec.Command("docker", "exec", r.ContainerName, "mysqldump", "-uroot", "-p"+r.Password, info.Name)
 	gzipCmd := exec.Command("gzip", "-cf")

@@ -93,8 +93,7 @@ import { nextTick, onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
-import { imageBuild } from '@/api/modules/container';
-import { LoadFile } from '@/api/modules/files';
+import { imageBuild, loadContainerLog } from '@/api/modules/container';
 import { formatImageStdout } from '@/utils/docker';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 
@@ -163,7 +162,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
 const loadLogs = async (path: string) => {
     timer = setInterval(async () => {
         if (logVisiable.value) {
-            const res = await LoadFile({ path: path });
+            const res = await loadContainerLog('image-build', path);
             logInfo.value = formatImageStdout(res.data);
             nextTick(() => {
                 const state = view.value.state;
