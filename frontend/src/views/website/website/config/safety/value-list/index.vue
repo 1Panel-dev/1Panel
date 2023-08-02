@@ -47,9 +47,8 @@
 </template>
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
-import { GetWafConfig, UpdateWafEnable } from '@/api/modules/website';
+import { GetWafConfig, UpdateWafEnable, UpdateWafFile } from '@/api/modules/website';
 import { computed, onMounted, reactive, ref } from 'vue';
-import { SaveFileContent } from '@/api/modules/files';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 
@@ -77,18 +76,19 @@ const key = computed(() => {
     return props.paramKey;
 });
 
-let loading = ref(false);
-let data = ref([]);
-let req = ref<Website.WafReq>({
+const loading = ref(false);
+const data = ref([]);
+const req = ref<Website.WafReq>({
     websiteId: 0,
     key: '',
     rule: 'url',
 });
-let fileUpdate = reactive({
-    path: '',
+const fileUpdate = reactive({
     content: '',
+    websiteId: 0,
+    type: 'url',
 });
-let enableUpdate = ref<Website.WafUpdate>({
+const enableUpdate = ref<Website.WafUpdate>({
     websiteId: 0,
     key: '$UrlDeny',
     enable: false,
@@ -118,7 +118,6 @@ const get = async () => {
             }
         });
     }
-    fileUpdate.path = res.data.filePath;
 };
 
 const remove = (index: number) => {
@@ -157,7 +156,7 @@ const submit = async (addArray: string[]) => {
 
     fileUpdate.content = JSON.stringify(contentArray.value);
     loading.value = true;
-    SaveFileContent(fileUpdate)
+    UpdateWafFile(fileUpdate)
         .then(() => {
             add.value = {
                 value: '',
@@ -178,6 +177,8 @@ onMounted(() => {
     req.value.key = key.value;
     enableUpdate.value.key = key.value;
     enableUpdate.value.websiteId = id.value;
+    fileUpdate.websiteId = id.value;
+    fileUpdate.type = rule.value;
     get();
 });
 </script>

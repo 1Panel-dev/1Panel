@@ -33,8 +33,7 @@
 
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
-import { SaveFileContent } from '@/api/modules/files';
-import { GetWafConfig, UpdateWafEnable } from '@/api/modules/website';
+import { GetWafConfig, UpdateWafEnable, UpdateWafFile } from '@/api/modules/website';
 import { checkNumberRange, Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -51,28 +50,29 @@ const id = computed(() => {
     return props.id;
 });
 
-let data = ref<Website.WafRes>();
-let loading = ref(false);
-let form = reactive({
+const data = ref<Website.WafRes>();
+const loading = ref(false);
+const form = reactive({
     enable: false,
     cycle: 60,
     frequency: 120,
 });
-let req = ref<Website.WafReq>({
+const req = ref<Website.WafReq>({
     websiteId: 0,
     key: '$CCDeny',
     rule: 'cc',
 });
-let enableUpdate = ref<Website.WafUpdate>({
+const enableUpdate = ref<Website.WafUpdate>({
     websiteId: 0,
     key: '$CCDeny',
     enable: false,
 });
-let fileUpdate = reactive({
-    path: '',
+const fileUpdate = reactive({
     content: '',
+    websiteId: 0,
+    type: 'cc',
 });
-let rules = ref({
+const rules = ref({
     cycle: [Rules.requiredInput, checkNumberRange(1, 9999999)],
     frequency: [Rules.requiredInput, checkNumberRange(1, 9999999)],
 });
@@ -89,7 +89,6 @@ const get = async () => {
         form.frequency = Number(params[0]);
         form.cycle = Number(params[1]);
     }
-    fileUpdate.path = data.value.filePath;
 };
 
 const updateEnable = async (enable: boolean) => {
@@ -111,7 +110,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         }
         fileUpdate.content = String(form.frequency) + '/' + String(form.cycle);
         loading.value = true;
-        SaveFileContent(fileUpdate)
+        UpdateWafFile(fileUpdate)
             .then(() => {
                 MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             })
@@ -124,6 +123,7 @@ const submit = async (formEl: FormInstance | undefined) => {
 onMounted(() => {
     req.value.websiteId = id.value;
     enableUpdate.value.websiteId = id.value;
+    fileUpdate.websiteId = id.value;
     get();
 });
 </script>

@@ -3,9 +3,8 @@ package request
 import "github.com/1Panel-dev/1Panel/backend/app/dto"
 
 type NginxConfigFileUpdate struct {
-	Content  string `json:"content" validate:"required"`
-	FilePath string `json:"filePath" validate:"required"`
-	Backup   bool   `json:"backup" validate:"required"`
+	Content string `json:"content" validate:"required"`
+	Backup  bool   `json:"backup" validate:"required"`
 }
 
 type NginxScopeReq struct {

@@ -48,7 +48,6 @@ import { MsgSuccess } from '@/utils/message';
 
 const extensions = [StreamLanguage.define(nginx), oneDark];
 
-let data = ref();
 let content = ref('');
 let loading = ref(false);
 let useOld = ref(false);
@@ -56,7 +55,6 @@ let useOld = ref(false);
 const submit = () => {
     loading.value = true;
     UpdateNginxConfigFile({
-        filePath: data.value.path,
         content: content.value,
         backup: useOld.value,
     })
@@ -70,17 +68,20 @@ const submit = () => {
 };
 
 const getNginx = async () => {
-    const res = await GetNginx();
-    data.value = res.data;
-    content.value = data.value.content;
-    useOld.value = false;
+    try {
+        const res = await GetNginx();
+        content.value = res.data.content;
+        useOld.value = false;
+    } catch (error) {}
 };
 
 const getDefaultConfig = async () => {
     loading.value = true;
-    const res = await GetAppDefaultConfig('openresty');
-    content.value = res.data;
-    useOld.value = true;
+    try {
+        const res = await GetAppDefaultConfig('openresty');
+        content.value = res.data;
+        useOld.value = true;
+    } catch (error) {}
     loading.value = false;
 };
 

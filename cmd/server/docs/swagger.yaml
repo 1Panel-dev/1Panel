@@ -2773,12 +2773,9 @@ definitions:
         type: boolean
       content:
         type: string
-      filePath:
-        type: string
     required:
     - backup
     - content
-    - filePath
     type: object
   request.NginxConfigUpdate:
     properties:
@@ -3846,8 +3843,6 @@ definitions:
         type: string
       enable:
         type: boolean
-      filePath:
-        type: string
     type: object
 host: localhost
 info:
@@ -11038,6 +11033,39 @@ paths:
       summary: Load websit waf conf
       tags:
       - Website WAF
+  /websites/waf/file/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新 网站 waf 配置文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteWafUpdate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update website waf  file
+      tags:
+      - Website WAF
+      x-panel-log:
+        BeforeFuntions:
+        - db: websites
+          input_column: id
+          input_value: websiteId
+          isList: false
+          output_column: primary_domain
+          output_value: domain
+        bodyKeys:
+        - websiteId
+        formatEN: WAF conf file update [domain]
+        formatZH: WAF 配置文件修改 [domain]
+        paramKeys: []
   /websites/waf/update:
     post:
       consumes:

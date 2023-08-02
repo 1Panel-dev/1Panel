@@ -11327,6 +11327,57 @@
                 }
             }
         },
+        "/websites/waf/file/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新 网站 waf 配置文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Website WAF"
+                ],
+                "summary": "Update website waf  file",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.WebsiteWafUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [
+                        {
+                            "db": "websites",
+                            "input_column": "id",
+                            "input_value": "websiteId",
+                            "isList": false,
+                            "output_column": "primary_domain",
+                            "output_value": "domain"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "websiteId"
+                    ],
+                    "formatEN": "WAF conf file update [domain]",
+                    "formatZH": "WAF 配置文件修改 [domain]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/websites/waf/update": {
             "post": {
                 "security": [
@@ -15519,17 +15570,13 @@
             "type": "object",
             "required": [
                 "backup",
-                "content",
-                "filePath"
+                "content"
             ],
             "properties": {
                 "backup": {
                     "type": "boolean"
                 },
                 "content": {
-                    "type": "string"
-                },
-                "filePath": {
                     "type": "string"
                 }
             }
@@ -17124,9 +17171,6 @@
                 },
                 "enable": {
                     "type": "boolean"
-                },
-                "filePath": {
-                    "type": "string"
                 }
             }
         }

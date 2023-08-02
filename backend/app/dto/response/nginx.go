@@ -49,3 +49,7 @@ type NginxRedirectConfig struct {
 	Content      string   `json:"content"`
 	RedirectRoot bool     `json:"redirectRoot"`
 }
+
+type NginxFile struct {
+	Content string `json:"content"`
+}

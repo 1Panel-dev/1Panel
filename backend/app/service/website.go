@@ -71,6 +71,7 @@ type IWebsiteService interface {
 
 	GetWafConfig(req request.WebsiteWafReq) (response.WebsiteWafConfig, error)
 	UpdateWafConfig(req request.WebsiteWafUpdate) error
+	UpdateWafFile(req request.WebsiteWafFileUpdate) (err error)
 
 	GetPHPConfig(id uint) (*response.PHPConfig, error)
 	UpdatePHPConfig(req request.WebsitePHPConfigUpdate) error
@@ -848,7 +849,6 @@ func (w WebsiteService) GetWafConfig(req request.WebsiteWafReq) (response.Websit
 	if err != nil {
 		return res, nil
 	}
-	res.FilePath = filePath
 	res.Content = string(content)
 
 	return res, nil
@@ -2281,4 +2281,21 @@ func (w WebsiteService) UpdateRedirectFile(req request.NginxRedirectUpdate) (err
 		}
 	}()
 	return updateNginxConfig(constant.NginxScopeServer, nil, &website)
+}
+
+func (w WebsiteService) UpdateWafFile(req request.WebsiteWafFileUpdate) (err error) {
+	var (
+		website      model.Website
+		nginxInstall model.AppInstall
+	)
+	website, err = websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	if err != nil {
+		return err
+	}
+	nginxInstall, err = getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return
+	}
+	rulePath := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "waf", "rules", fmt.Sprintf("%s.json", req.Type))
+	return files.NewFileOp().WriteFile(rulePath, strings.NewReader(req.Content), 0755)
 }

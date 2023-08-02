@@ -75,6 +75,12 @@ type WebsiteWafReq struct {
 	Rule      string `json:"rule" validate:"required"`
 }
 
+type WebsiteRedirectUpdate struct {
+	WebsiteID uint   `json:"websiteId" validate:"required"`
+	Key       string `json:"key" validate:"required"`
+	Enable    bool   `json:"enable" validate:"required"`
+}
+
 type WebsiteWafUpdate struct {
 	WebsiteID uint   `json:"websiteId" validate:"required"`
 	Key       string `json:"key" validate:"required"`
@@ -198,4 +204,10 @@ type WebsiteProxyReq struct {
 
 type WebsiteRedirectReq struct {
 	WebsiteID uint `json:"websiteId" validate:"required"`
+}
+
+type WebsiteWafFileUpdate struct {
+	WebsiteID uint   `json:"websiteID" validate:"required"`
+	Content   string `json:"content" validate:"required"`
+	Type      string `json:"type" validate:"required,oneof=cc ip_white ip_block url_white url_block cookie_block args_check post_check ua_check file_ext_block"`
 }
