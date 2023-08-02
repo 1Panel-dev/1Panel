@@ -747,13 +747,6 @@ definitions:
     - fileName
     - source
     type: object
-  dto.FilePath:
-    properties:
-      path:
-        type: string
-    required:
-    - path
-    type: object
   dto.FirewallBaseInfo:
     properties:
       name:
@@ -7082,33 +7075,6 @@ paths:
         formatEN: Download file [name]
         formatZH: 下载文件 [name]
         paramKeys: []
-  /files/download/bypath:
-    post:
-      consumes:
-      - application/json
-      description: 下载指定文件
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.FilePath'
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      summary: Download file with path
-      tags:
-      - File
-      x-panel-log:
-        BeforeFuntions: []
-        bodyKeys:
-        - path
-        formatEN: Download file [path]
-        formatZH: 下载文件 [path]
-        paramKeys: []
   /files/mode:
     post:
       consumes:
@@ -9450,6 +9416,17 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Page system snapshot
+      tags:
+      - System Setting
+  /settings/ssl/download:
+    post:
+      description: 下载证书
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Download system cert
       tags:
       - System Setting
   /settings/ssl/info:

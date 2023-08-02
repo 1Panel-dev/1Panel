@@ -30,6 +30,9 @@ export const updateSSL = (param: Setting.SSLUpdate) => {
 export const loadSSLInfo = () => {
     return http.get<Setting.SSLInfo>(`/settings/ssl/info`);
 };
+export const downloadSSL = () => {
+    return http.download<any>(`settings/ssl/download`);
+};
 
 export const handleExpired = (param: Setting.PasswordUpdate) => {
     return http.post(`/settings/expired/handle`, param);

@@ -38,8 +38,11 @@ export const updateStatus = (params: Cronjob.UpdateStatus) => {
     return http.post(`cronjobs/status`, params);
 };
 
-export const download = (params: Cronjob.Download) => {
-    return http.post<string>(`cronjobs/download`, params);
+export const downloadRecordCheck = (params: Cronjob.Download) => {
+    return http.post<string>(`cronjobs/download`, params, 40000);
+};
+export const downloadRecord = (params: Cronjob.Download) => {
+    return http.download<BlobPart>(`cronjobs/download`, params, { responseType: 'blob', timeout: 40000 });
 };
 
 export const handleOnce = (id: number) => {

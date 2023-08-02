@@ -107,8 +107,7 @@ import { ListSSL } from '@/api/modules/website';
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { updateSSL } from '@/api/modules/setting';
-import { DownloadByPath } from '@/api/modules/files';
+import { downloadSSL, updateSSL } from '@/api/modules/setting';
 import { Rules } from '@/global/form-rules';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { Setting } from '@/api/interface/setting';
@@ -178,14 +177,15 @@ const changeSSl = (sslid: number) => {
 };
 
 const onDownload = async () => {
-    const file = await DownloadByPath(form.rootPath);
-    const downloadUrl = window.URL.createObjectURL(new Blob([file]));
-    const a = document.createElement('a');
-    a.style.display = 'none';
-    a.href = downloadUrl;
-    a.download = 'server.crt';
-    const event = new MouseEvent('click');
-    a.dispatchEvent(event);
+    await downloadSSL().then(async (file) => {
+        const downloadUrl = window.URL.createObjectURL(new Blob([file]));
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = downloadUrl;
+        a.download = 'server.crt';
+        const event = new MouseEvent('click');
+        a.dispatchEvent(event);
+    });
 };
 
 const onSaveSSL = async (formEl: FormInstance | undefined) => {

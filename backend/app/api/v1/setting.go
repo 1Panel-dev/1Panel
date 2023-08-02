@@ -3,6 +3,8 @@ package v1
 import (
 	"errors"
 	"fmt"
+	"os"
+	"path"
 	"strconv"
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
@@ -132,6 +134,22 @@ func (b *BaseApi) LoadFromCert(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, info)
+}
+
+// @Tags System Setting
+// @Summary Download system cert
+// @Description 下载证书
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/ssl/download [post]
+func (b *BaseApi) DownloadSSL(c *gin.Context) {
+	pathItem := path.Join(global.CONF.System.BaseDir, "1panel/secret/server.crt")
+	if _, err := os.Stat(pathItem); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	c.File(pathItem)
 }
 
 // @Tags System Setting
