@@ -15,6 +15,10 @@ type AuthParam struct {
 	RootPassword string `json:"PANEL_DB_ROOT_PASSWORD"`
 }
 
+type RedisAuthParam struct {
+	RootPassword string `json:"PANEL_REDIS_ROOT_PASSWORD"`
+}
+
 type ContainerExec struct {
 	ContainerName string      `json:"containerName"`
 	DbParam       AppDatabase `json:"dbParam"`

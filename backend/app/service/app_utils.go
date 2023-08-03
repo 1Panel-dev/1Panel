@@ -83,20 +83,33 @@ func checkPort(key string, params map[string]interface{}) (int, error) {
 func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall, params map[string]interface{}) error {
 	var dbConfig dto.AppDatabase
 	if app.Type == "runtime" {
-		var authParam dto.AuthParam
-		paramByte, err := json.Marshal(params)
-		if err != nil {
-			return err
-		}
-		if err := json.Unmarshal(paramByte, &authParam); err != nil {
-			return err
-		}
-		if authParam.RootPassword != "" {
-			authByte, err := json.Marshal(authParam)
-			if err != nil {
-				return err
+		switch app.Key {
+		case "mysql", "mariadb", "postgresql":
+			if password, ok := params["PANEL_DB_ROOT_PASSWORD"]; ok {
+				if password != "" {
+					authParam := dto.AuthParam{
+						RootPassword: password.(string),
+					}
+					authByte, err := json.Marshal(authParam)
+					if err != nil {
+						return err
+					}
+					appInstall.Param = string(authByte)
+				}
 			}
-			appInstall.Param = string(authByte)
+		case "redis":
+			if password, ok := params["PANEL_REDIS_ROOT_PASSWORD"]; ok {
+				if password != "" {
+					authParam := dto.RedisAuthParam{
+						RootPassword: password.(string),
+					}
+					authByte, err := json.Marshal(authParam)
+					if err != nil {
+						return err
+					}
+					appInstall.Param = string(authByte)
+				}
+			}
 		}
 	}
 	if app.Type == "website" || app.Type == "tool" {
@@ -104,7 +117,7 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 		if err != nil {
 			return err
 		}
-		if err := json.Unmarshal(paramByte, &dbConfig); err != nil {
+		if err = json.Unmarshal(paramByte, &dbConfig); err != nil {
 			return err
 		}
 	}

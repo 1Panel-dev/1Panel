@@ -523,3 +523,27 @@ var AddRemoteDB = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var UpdateRedisParam = &gormigrate.Migration{
+	ID: "20230804-update-redis-param",
+	Migrate: func(tx *gorm.DB) error {
+		var (
+			app        model.App
+			appInstall model.AppInstall
+		)
+		if err := global.DB.Where("key = ?", "redis").First(&app).Error; err != nil {
+			return nil
+		}
+		if err := global.DB.Where("app_id = ?", app.ID).First(&appInstall).Error; err != nil {
+			return nil
+		}
+		appInstall.Param = strings.ReplaceAll(appInstall.Param, "PANEL_DB_ROOT_PASSWORD", "PANEL_REDIS_ROOT_PASSWORD")
+		appInstall.DockerCompose = strings.ReplaceAll(appInstall.DockerCompose, "PANEL_DB_ROOT_PASSWORD", "PANEL_REDIS_ROOT_PASSWORD")
+		appInstall.Env = strings.ReplaceAll(appInstall.Env, "PANEL_DB_ROOT_PASSWORD", "PANEL_REDIS_ROOT_PASSWORD")
+		if err := tx.Model(&model.AppInstall{}).Where("id = ?", appInstall.ID).Updates(appInstall).Error; err != nil {
+			return err
+		}
+		return nil
+
+	},
+}
