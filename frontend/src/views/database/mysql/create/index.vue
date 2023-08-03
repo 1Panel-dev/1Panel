@@ -33,6 +33,11 @@
                         <el-form-item :label="$t('database.permission')" prop="permission">
                             <el-select v-model="form.permission">
                                 <el-option value="%" :label="$t('database.permissionAll')" />
+                                <el-option
+                                    v-if="form.from !== 'local'"
+                                    value="localhost"
+                                    :label="$t('terminal.localhost')"
+                                />
                                 <el-option value="ip" :label="$t('database.permissionForIP')" />
                             </el-select>
                         </el-form-item>
