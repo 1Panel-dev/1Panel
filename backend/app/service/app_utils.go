@@ -530,11 +530,15 @@ func copyData(app model.App, appDetail model.AppDetail, appInstall *model.AppIns
 
 // 处理文件夹权限等问题
 func upAppPre(app model.App, appInstall *model.AppInstall) error {
-	if app.Key == "nexus" {
-		dataPath := path.Join(appInstall.GetPath(), "data")
-		if err := files.NewFileOp().Chown(dataPath, 200, 0); err != nil {
-			return err
-		}
+	dataPath := path.Join(appInstall.GetPath(), "data")
+	fileOp := files.NewFileOp()
+	switch app.Key {
+	case "nexus":
+		return fileOp.Chown(dataPath, 200, 0)
+	case "sftpgo":
+		return files.NewFileOp().Chown(dataPath, 1000, 1000)
+	case "pgadmin4":
+		return files.NewFileOp().Chown(dataPath, 5050, 5050)
 	}
 	return nil
 }
