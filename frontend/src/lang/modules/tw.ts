@@ -1587,6 +1587,7 @@ const message = {
             uptime: '運行時長',
             notStartWarn: 'Supervisor 未啟動，請先啟動',
             serviceName: '服務名稱',
+            initHelper: '尚未初始化 Supervisor ，請先初始化',
         },
     },
 };

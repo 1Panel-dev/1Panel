@@ -7,10 +7,14 @@
             <el-button type="primary" :plain="activeName !== '2'" @click="changeTab('2')">
                 {{ $t('website.log') }}
             </el-button>
+            <el-button type="primary" :plain="activeName !== '3'" @click="changeTab('3')">
+                {{ $t('website.basic') }}
+            </el-button>
         </template>
         <template #main>
             <Source v-if="activeName === '1'"></Source>
             <Log v-if="activeName === '2'"></Log>
+            <Basic v-if="activeName === '3'"></Basic>
         </template>
     </LayoutContent>
 </template>
@@ -19,6 +23,7 @@
 import { ref } from 'vue';
 import Source from './source/index.vue';
 import Log from './log/index.vue';
+import Basic from './basic/index.vue';
 
 const activeName = ref('1');
 

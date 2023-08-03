@@ -6,7 +6,7 @@
                     <el-tag effect="dark" type="success">{{ 'Supervisor' }}</el-tag>
                     <Status class="status-content" :key="data.status" :status="data.status"></Status>
                     <el-tag class="status-content">{{ $t('app.version') }}:{{ data.version }}</el-tag>
-                    <span class="buttons">
+                    <span class="buttons" v-if="!data.init">
                         <el-button type="primary" v-if="data.status != 'running'" link @click="onOperate('start')">
                             {{ $t('app.start') }}
                         </el-button>
@@ -18,25 +18,30 @@
                             {{ $t('app.restart') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button
-                            type="primary"
-                            link
-                            :disabled="data.status !== 'running' || !data.ctlExist"
-                            @click="setting"
-                        >
+                        <el-button type="primary" link @click="setting">
                             {{ $t('commons.button.set') }}
+                        </el-button>
+                    </span>
+                    <span class="buttons" v-else>
+                        <el-button type="primary" link @click="init">
+                            {{ $t('commons.button.init') }}
                         </el-button>
                     </span>
                 </div>
             </el-card>
         </div>
-        <LayoutContent :title="$t('tool.supervisor.list')" :divider="true" v-if="!data.isExist || !data.ctlExist">
+        <LayoutContent
+            :title="$t('tool.supervisor.list')"
+            :divider="true"
+            v-if="!data.isExist || !data.ctlExist || data.init"
+        >
             <template #main>
                 <div class="app-warn">
                     <div>
                         <span v-if="!data.isExist">{{ $t('tool.supervisor.notSupport') }}</span>
-                        <span v-if="!data.ctlExist">{{ $t('tool.supervisor.notSupportCrl') }}</span>
-                        <span @click="toDoc()">
+                        <span v-else-if="!data.ctlExist">{{ $t('tool.supervisor.notSupportCrl') }}</span>
+                        <span v-else-if="data.init">{{ $t('tool.supervisor.initHelper') }}</span>
+                        <span @click="toDoc()" v-if="!data.isExist || !data.ctlExist">
                             <el-icon><Position /></el-icon>
                             {{ $t('firewall.quickJump') }}
                         </span>
@@ -75,14 +80,18 @@ const data = ref({
     serviceName: '',
 });
 
-const em = defineEmits(['setting', 'isExist', 'isRunning', 'update:loading', 'update:maskShow']);
+const em = defineEmits(['setting', 'getStatus', 'update:loading', 'update:maskShow']);
 
 const setting = () => {
-    em('setting', false);
+    em('setting', true);
 };
 
 const toDoc = async () => {
-    window.open('https://1panel.cn/docs/user_manual/hosts/firewall/', '_blank');
+    window.open('https://1panel.cn/docs/user_manual/hosts/supervisor/', '_blank');
+};
+
+const init = async () => {
+    initRef.value.acceptParams(data.value.configPath, data.value.serviceName);
 };
 
 const onOperate = async (operation: string) => {
@@ -120,15 +129,13 @@ const getStatus = async () => {
         em('update:loading', true);
         const res = await GetSupervisorStatus();
         data.value = res.data.config as HostTool.Supersivor;
-        em('isRunning', data.value.status === 'running');
-        if (!data.value.isExist || !data.value.ctlExist) {
-            em('isExist', false);
-        } else {
-            em('isExist', true);
-        }
-        if (data.value.init) {
-            initRef.value.acceptParams(data.value.configPath, data.value.serviceName);
-        }
+
+        const status = {
+            isExist: data.value.isExist && data.value.ctlExist,
+            isRunning: data.value.status === 'running',
+            init: data.value.init,
+        };
+        em('getStatus', status);
     } catch (error) {}
     em('update:loading', false);
 };

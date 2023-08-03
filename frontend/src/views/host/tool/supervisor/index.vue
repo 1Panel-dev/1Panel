@@ -1,7 +1,7 @@
 <template>
     <div>
         <ToolRouter />
-        <el-card v-if="!isRunningSuperVisor && maskShow" class="mask-prompt">
+        <el-card v-if="showStopped" class="mask-prompt">
             <span>{{ $t('tool.supervisor.notStartWarn') }}</span>
         </el-card>
         <LayoutContent :title="$t('tool.supervisor.list')" v-loading="loading">
@@ -9,18 +9,17 @@
                 <SuperVisorStatus
                     @setting="setting"
                     v-model:loading="loading"
-                    @is-exist="isExist"
-                    @is-running="isRunning"
+                    @get-status="getStatus"
                     v-model:mask-show="maskShow"
                 />
             </template>
-            <template v-if="isExistSuperVisor && !setSuperVisor" #toolbar>
+            <template v-if="showTable" #toolbar>
                 <el-button type="primary" @click="openCreate">
                     {{ $t('commons.button.create') + $t('tool.supervisor.list') }}
                 </el-button>
             </template>
-            <template #main v-if="isExistSuperVisor && !setSuperVisor">
-                <ComplexTable :data="data" :class="{ mask: !isRunningSuperVisor }">
+            <template #main v-if="showTable">
+                <ComplexTable :data="data" :class="{ mask: !supervisorStatus.isRunning }">
                     <el-table-column :label="$t('commons.table.name')" fix prop="name"></el-table-column>
                     <el-table-column :label="$t('tool.supervisor.command')" prop="command"></el-table-column>
                     <el-table-column :label="$t('tool.supervisor.dir')" prop="dir"></el-table-column>
@@ -86,24 +85,44 @@ const globalStore = GlobalStore();
 
 const loading = ref(false);
 const setSuperVisor = ref(false);
-const isExistSuperVisor = ref(false);
-const isRunningSuperVisor = ref(true);
 const createRef = ref();
 const fileRef = ref();
 const data = ref();
 const maskShow = ref(true);
+const supervisorStatus = ref({
+    maskShow: true,
+    isExist: false,
+    isRunning: false,
+    init: true,
+});
 
 const setting = () => {
     setSuperVisor.value = true;
 };
 
-const isExist = (isExist: boolean) => {
-    isExistSuperVisor.value = isExist;
+const getStatus = (status: any) => {
+    supervisorStatus.value = status;
 };
 
-const isRunning = (running: boolean) => {
-    isRunningSuperVisor.value = running;
-};
+const showStopped = computed((): boolean => {
+    if (supervisorStatus.value.init || setSuperVisor.value) {
+        return false;
+    }
+    if (supervisorStatus.value.isExist && !supervisorStatus.value.isRunning && maskShow.value) {
+        return true;
+    }
+    return false;
+});
+
+const showTable = computed((): boolean => {
+    if (supervisorStatus.value.init || setSuperVisor.value || !supervisorStatus.value.isExist) {
+        return false;
+    }
+    if (supervisorStatus.value.isExist && !setSuperVisor.value) {
+        return true;
+    }
+    return true;
+});
 
 const openCreate = () => {
     createRef.value.acceptParams();
@@ -113,7 +132,6 @@ const search = async () => {
     loading.value = true;
     try {
         const res = await GetSupervisorProcess();
-        console.log(res);
         data.value = res.data;
     } catch (error) {}
     loading.value = false;

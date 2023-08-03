@@ -1670,6 +1670,8 @@ const message = {
             uptime: 'running time',
             notStartWarn: 'Supervisor is not started, please start it first',
             serviceName: 'Service name',
+            initHelper:
+                'The initialization process will modify the configuration file, causing all existing processes to stop, please confirm the risk in advance',
         },
     },
 };
