@@ -214,6 +214,7 @@ import Backups from '@/components/backup/index.vue';
 import UploadDialog from '@/components/upload/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import { dateFormat } from '@/utils/util';
+import { ElMessageBox } from 'element-plus';
 import { onMounted, reactive, ref } from 'vue';
 import {
     deleteCheckMysqlDB,
@@ -315,15 +316,21 @@ const search = async (column?: any) => {
 };
 
 const loadDB = async () => {
-    loading.value = true;
-    await loadDBFromRemote(paginationConfig.from)
-        .then(() => {
-            loading.value = false;
-            search();
-        })
-        .catch(() => {
-            loading.value = false;
-        });
+    ElMessageBox.confirm(i18n.global.t('database.loadFromRemoteHelper'), i18n.global.t('commons.msg.infoTitle'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(async () => {
+        loading.value = true;
+        await loadDBFromRemote(paginationConfig.from)
+            .then(() => {
+                loading.value = false;
+                search();
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
 };
 
 const goRouter = async () => {
