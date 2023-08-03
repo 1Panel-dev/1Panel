@@ -16,7 +16,9 @@
                 </template>
             </el-input>
             <div class="margin-button" style="float: left">
-                <el-checkbox border v-model="logSearch.isWatch">{{ $t('commons.button.watch') }}</el-checkbox>
+                <el-checkbox border @change="searchLogs" v-model="logSearch.isWatch">
+                    {{ $t('commons.button.watch') }}
+                </el-checkbox>
             </div>
             <el-button class="margin-button" @click="onDownload" icon="Download">
                 {{ $t('file.download') }}
