@@ -36,6 +36,7 @@ func Init() {
 		migrations.UpdateAppDetail,
 		migrations.EncryptHostPassword,
 		migrations.AddRemoteDB,
+		migrations.UpdateRedisParam,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)
