@@ -15,7 +15,7 @@
                                 <el-form-item
                                     :label="$t('commons.login.password')"
                                     prop="password"
-                                    :rules="Rules.requiredInput"
+                                    :rules="Rules.paramComplexity"
                                 >
                                     <el-input
                                         type="password"

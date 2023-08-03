@@ -26,7 +26,7 @@
                         <el-switch v-model="form.privilege" @change="onSaveAccess" />
                         <span class="input-help">{{ $t('database.remoteConnHelper') }}</span>
                     </el-form-item>
-                    <el-form-item :label="$t('database.rootPassword')" :rules="Rules.requiredInput" prop="password">
+                    <el-form-item :label="$t('database.rootPassword')" :rules="Rules.paramComplexity" prop="password">
                         <el-input type="password" show-password clearable v-model="form.password">
                             <template #append>
                                 <el-button @click="onCopy(form.password)">{{ $t('commons.button.copy') }}</el-button>

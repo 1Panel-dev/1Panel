@@ -97,7 +97,7 @@ const form = reactive({
 const rules = reactive({
     name: [Rules.requiredInput, Rules.dbName],
     username: [Rules.requiredInput, Rules.name],
-    password: [Rules.requiredInput],
+    password: [Rules.paramComplexity],
     permission: [Rules.requiredSelect],
     permissionIPs: [Rules.requiredInput],
 });
