@@ -663,6 +663,7 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 		return nil, err
 	}
 	appStoreLastModified, _ := strconv.Atoi(setting.AppStoreLastModified)
+	res.AppStoreLastModified = appStoreLastModified
 	if setting.AppStoreLastModified == "" || lastModified != appStoreLastModified {
 		res.CanUpdate = true
 		return res, err
@@ -687,13 +688,13 @@ func getAppFromRepo(downloadPath string) error {
 	return nil
 }
 
-func (a AppService) SyncAppListFromRemote() error {
+func (a AppService) SyncAppListFromRemote() (err error) {
 	updateRes, err := a.GetAppUpdate()
 	if err != nil {
 		return err
 	}
 	if !updateRes.CanUpdate {
-		return nil
+		return
 	}
 	if err = getAppFromRepo(fmt.Sprintf("%s/%s/1panel.json.zip", global.CONF.System.AppRepo, global.CONF.System.Mode)); err != nil {
 		return err
@@ -704,9 +705,18 @@ func (a AppService) SyncAppListFromRemote() error {
 		return err
 	}
 	list := &dto.AppList{}
-	if err := json.Unmarshal(content, list); err != nil {
+	if err = json.Unmarshal(content, list); err != nil {
+		return
+	}
+	if err = settingRepo().Update("AppStoreLastModified", strconv.Itoa(list.LastModified)); err != nil {
 		return err
 	}
+
+	defer func() {
+		if err != nil {
+			_ = settingRepo().Update("AppStoreLastModified", strconv.Itoa(updateRes.AppStoreLastModified))
+		}
+	}()
 
 	var (
 		tags      []*model.Tag
@@ -721,7 +731,7 @@ func (a AppService) SyncAppListFromRemote() error {
 	}
 	oldApps, err := appRepo.GetBy(appRepo.WithResource(constant.AppResourceRemote))
 	if err != nil {
-		return err
+		return
 	}
 	for _, old := range oldApps {
 		oldAppIds = append(oldAppIds, old.ID)
@@ -810,32 +820,32 @@ func (a AppService) SyncAppListFromRemote() error {
 	tx, ctx := getTxAndContext()
 	defer tx.Rollback()
 	if len(addAppArray) > 0 {
-		if err := appRepo.BatchCreate(ctx, addAppArray); err != nil {
-			return err
+		if err = appRepo.BatchCreate(ctx, addAppArray); err != nil {
+			return
 		}
 	}
 	if len(deleteAppArray) > 0 {
-		if err := appRepo.BatchDelete(ctx, deleteAppArray); err != nil {
-			return err
+		if err = appRepo.BatchDelete(ctx, deleteAppArray); err != nil {
+			return
 		}
-		if err := appDetailRepo.DeleteByAppIds(ctx, deleteIds); err != nil {
-			return err
+		if err = appDetailRepo.DeleteByAppIds(ctx, deleteIds); err != nil {
+			return
 		}
 	}
-	if err := tagRepo.DeleteAll(ctx); err != nil {
-		return err
+	if err = tagRepo.DeleteAll(ctx); err != nil {
+		return
 	}
 	if len(tags) > 0 {
-		if err := tagRepo.BatchCreate(ctx, tags); err != nil {
-			return err
+		if err = tagRepo.BatchCreate(ctx, tags); err != nil {
+			return
 		}
 		for _, t := range tags {
 			tagMap[t.Key] = t.ID
 		}
 	}
 	for _, update := range updateAppArray {
-		if err := appRepo.Save(ctx, &update); err != nil {
-			return err
+		if err = appRepo.Save(ctx, &update); err != nil {
+			return
 		}
 	}
 	apps := append(addAppArray, updateAppArray...)
@@ -879,35 +889,32 @@ func (a AppService) SyncAppListFromRemote() error {
 		}
 	}
 	if len(addDetails) > 0 {
-		if err := appDetailRepo.BatchCreate(ctx, addDetails); err != nil {
-			return err
+		if err = appDetailRepo.BatchCreate(ctx, addDetails); err != nil {
+			return
 		}
 	}
 	if len(deleteDetails) > 0 {
-		if err := appDetailRepo.BatchDelete(ctx, deleteDetails); err != nil {
-			return err
+		if err = appDetailRepo.BatchDelete(ctx, deleteDetails); err != nil {
+			return
 		}
 	}
 	for _, u := range updateDetails {
-		if err := appDetailRepo.Update(ctx, u); err != nil {
-			return err
+		if err = appDetailRepo.Update(ctx, u); err != nil {
+			return
 		}
 	}
 
 	if len(oldAppIds) > 0 {
-		if err := appTagRepo.DeleteByAppIds(ctx, oldAppIds); err != nil {
-			return err
+		if err = appTagRepo.DeleteByAppIds(ctx, oldAppIds); err != nil {
+			return
 		}
 	}
 
 	if len(appTags) > 0 {
-		if err := appTagRepo.BatchCreate(ctx, appTags); err != nil {
-			return err
+		if err = appTagRepo.BatchCreate(ctx, appTags); err != nil {
+			return
 		}
 	}
 	tx.Commit()
-	if err := NewISettingService().Update("AppStoreLastModified", strconv.Itoa(list.LastModified)); err != nil {
-		return err
-	}
-	return nil
+	return
 }
