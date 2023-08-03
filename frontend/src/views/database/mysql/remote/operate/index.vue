@@ -31,7 +31,7 @@
                         <el-input clearable v-model.trim="dialogData.rowData!.address" />
                     </el-form-item>
                     <el-form-item :label="$t('commons.table.port')" prop="port">
-                        <el-input clearable v-model.trim="dialogData.rowData!.port" />
+                        <el-input clearable v-model.number="dialogData.rowData!.port" />
                     </el-form-item>
                     <el-form-item :label="$t('commons.login.username')" prop="username">
                         <el-input clearable v-model.trim="dialogData.rowData!.username" />

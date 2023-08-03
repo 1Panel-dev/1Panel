@@ -202,7 +202,6 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 			global.LOG.Errorf("handle recover from sql.gz failed, err: %v", err)
 			return err
 		}
-		_ = NewIMysqlService().LoadFromRemote("local")
 	}
 
 	if err := handleUnTar(tmpPath+"/app.tar.gz", fmt.Sprintf("%s/%s", constant.AppInstallDir, install.App.Key)); err != nil {
@@ -224,6 +223,7 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 	oldInstall.Status = constant.StatusRunning
 	oldInstall.AppId = install.AppId
 	oldInstall.AppDetailId = install.AppDetailId
+	oldInstall.App.ID = install.AppId
 	if err := appInstallRepo.Save(context.Background(), &oldInstall); err != nil {
 		global.LOG.Errorf("save db app install failed, err: %v", err)
 		return err
