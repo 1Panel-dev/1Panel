@@ -1149,6 +1149,15 @@ definitions:
     - page
     - pageSize
     type: object
+  dto.MysqlOption:
+    properties:
+      from:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
   dto.MysqlStatus:
     properties:
       Aborted_clients:
@@ -6414,7 +6423,7 @@ paths:
           description: OK
           schema:
             items:
-              type: string
+              $ref: '#/definitions/dto.MysqlOption'
             type: array
       security:
       - ApiKeyAuth: []

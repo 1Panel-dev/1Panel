@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -254,15 +255,18 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, backup model.Back
 		return paths, err
 	}
 
-	var dblist []string
+	var dbs []model.DatabaseMysql
 	if cronjob.DBName == "all" {
-		mysqlService := NewIMysqlService()
-		dblist, err = mysqlService.ListDBName()
+		dbs, err = mysqlRepo.List()
 		if err != nil {
 			return paths, err
 		}
 	} else {
-		dblist = append(dblist, cronjob.DBName)
+		itemID, _ := (strconv.Atoi(cronjob.DBName))
+		dbs, err = mysqlRepo.List(commonRepo.WithByID(uint(itemID)))
+		if err != nil {
+			return paths, err
+		}
 	}
 
 	var client cloud_storage.CloudStorageClient
@@ -273,25 +277,21 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, backup model.Back
 		}
 	}
 
-	for _, dbName := range dblist {
+	for _, dbInfo := range dbs {
 		var record model.BackupRecord
 
 		record.Type = "mysql"
 		record.Source = "LOCAL"
 		record.BackupType = backup.Type
 
-		dbInfo, err := mysqlRepo.Get(commonRepo.WithByName(dbName))
-		if err != nil {
-			return paths, err
-		}
 		record.Name = dbInfo.MysqlName
-		backupDir := path.Join(localDir, fmt.Sprintf("database/mysql/%s/%s", record.Name, dbName))
-		record.FileName = fmt.Sprintf("db_%s_%s.sql.gz", dbName, startTime.Format("20060102150405"))
-		if err = handleMysqlBackup(dbName, backupDir, record.FileName); err != nil {
+		backupDir := path.Join(localDir, fmt.Sprintf("database/mysql/%s/%s", record.Name, dbInfo.Name))
+		record.FileName = fmt.Sprintf("db_%s_%s.sql.gz", dbInfo.Name, startTime.Format("20060102150405"))
+		if err = handleMysqlBackup(dbInfo.MysqlName, dbInfo.Name, backupDir, record.FileName); err != nil {
 			return paths, err
 		}
 
-		record.DetailName = dbName
+		record.DetailName = dbInfo.Name
 		record.FileDir = backupDir
 		itemFileDir := strings.TrimPrefix(backupDir, localDir+"/")
 		if !cronjob.KeepLocal && backup.Type != "LOCAL" {

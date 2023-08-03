@@ -59,8 +59,8 @@ export const loadMysqlStatus = () => {
 export const loadRemoteAccess = () => {
     return http.get<boolean>(`/databases/remote`);
 };
-export const loadDBNames = () => {
-    return http.get<Array<string>>(`/databases/options`);
+export const loadDBOptions = () => {
+    return http.get<Array<Database.MysqlOption>>(`/databases/options`);
 };
 
 // redis

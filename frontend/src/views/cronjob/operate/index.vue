@@ -122,7 +122,18 @@
                         <el-form-item :label="$t('cronjob.database')" prop="dbName">
                             <el-select class="selectClass" clearable v-model="dialogData.rowData!.dbName">
                                 <el-option :label="$t('commons.table.all')" value="all" />
-                                <el-option v-for="item in mysqlInfo.dbNames" :key="item" :label="item" :value="item" />
+                                <div v-for="item in mysqlInfo.dbs" :key="item.id">
+                                    <el-option
+                                        v-if="item.from === 'local'"
+                                        :label="$t('database.localDB') + ' [' + item.name + ']'"
+                                        :value="item.id + ''"
+                                    />
+                                    <el-option
+                                        v-else
+                                        :label="item.from + ' [' + item.name + ']'"
+                                        :value="item.id + ''"
+                                    />
+                                </div>
                             </el-select>
                         </el-form-item>
                     </div>
@@ -219,12 +230,13 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { Cronjob } from '@/api/interface/cronjob';
 import { addCronjob, editCronjob } from '@/api/modules/cronjob';
-import { loadDBNames } from '@/api/modules/database';
+import { loadDBOptions } from '@/api/modules/database';
 import { GetWebsiteOptions } from '@/api/modules/website';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { useRouter } from 'vue-router';
 import { listContainer } from '@/api/modules/container';
+import { Database } from '@/api/interface/database';
 const router = useRouter();
 
 interface DialogProps {
@@ -275,7 +287,7 @@ const mysqlInfo = reactive({
     isExist: false,
     name: '',
     version: '',
-    dbNames: [] as Array<string>,
+    dbs: [] as Array<Database.MysqlOption>,
 });
 
 const varifySpec = (rule: any, value: any, callback: any) => {
@@ -458,8 +470,8 @@ const loadContainers = async () => {
 };
 
 const checkMysqlInstalled = async () => {
-    const data = await loadDBNames();
-    mysqlInfo.dbNames = data.data || [];
+    const data = await loadDBOptions();
+    mysqlInfo.dbs = data.data || [];
 };
 
 function isBackup() {

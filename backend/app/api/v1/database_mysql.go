@@ -216,11 +216,11 @@ func (b *BaseApi) SearchMysql(c *gin.Context) {
 // @Description 获取 mysql 数据库列表
 // @Accept json
 // @Param request body dto.PageInfo true "request"
-// @Success 200 {array} string
+// @Success 200 {array} dto.MysqlOption
 // @Security ApiKeyAuth
 // @Router /databases/options [get]
 func (b *BaseApi) ListDBName(c *gin.Context) {
-	list, err := mysqlService.ListDBName()
+	list, err := mysqlService.ListDBOption()
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

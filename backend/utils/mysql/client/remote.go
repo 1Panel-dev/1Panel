@@ -242,6 +242,10 @@ func (r *Remote) Recover(info RecoverInfo) error {
 		if err != nil {
 			return fmt.Errorf("gunzip file %s failed, stdout: %v, err: %v", info.SourceFile, string(stdout), err)
 		}
+		defer func() {
+			gzipCmd := exec.Command("gzip", fileName)
+			_, _ = gzipCmd.CombinedOutput()
+		}()
 	}
 	dns := fmt.Sprintf("%s:%s@tcp(%s:%v)/%s?charset=%s&parseTime=true&loc=Asia%sShanghai", r.User, r.Password, r.Address, r.Port, info.Name, info.Format, "%2F")
 	f, err := os.Open(fileName)

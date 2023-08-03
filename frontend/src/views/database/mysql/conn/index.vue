@@ -190,6 +190,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
 const onSubmitAccess = async () => {
     let param = {
         id: 0,
+        from: form.from,
         value: form.privilege ? '%' : 'localhost',
     };
     loading.value = true;

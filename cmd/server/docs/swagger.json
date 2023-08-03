@@ -4049,7 +4049,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "string"
+                                "$ref": "#/definitions/dto.MysqlOption"
                             }
                         }
                     }
@@ -13137,6 +13137,20 @@
                 },
                 "pageSize": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.MysqlOption": {
+            "type": "object",
+            "properties": {
+                "from": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
