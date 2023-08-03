@@ -192,6 +192,8 @@ const paginationConfig = reactive({
     currentPage: 1,
     pageSize: 10,
     total: 0,
+    orderBy: 'created_at',
+    order: 'null',
 });
 const searchName = ref();
 const dialogUpgradeRef = ref();
@@ -246,13 +248,15 @@ const dialogReNameRef = ref();
 
 const search = async (column?: any) => {
     let filterItem = props.filters ? props.filters : '';
+    paginationConfig.orderBy = column?.order ? column.prop : paginationConfig.orderBy;
+    paginationConfig.order = column?.order ? column.order : paginationConfig.order;
     let params = {
         name: searchName.value,
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
         filters: filterItem,
-        orderBy: column?.order ? column.prop : 'created_at',
-        order: column?.order ? column.order : 'null',
+        orderBy: paginationConfig.orderBy,
+        order: paginationConfig.order,
     };
     loading.value = true;
     loadStats();
