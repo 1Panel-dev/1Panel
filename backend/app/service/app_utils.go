@@ -271,15 +271,10 @@ func upgradeInstall(installId uint, detailId uint, backup bool) error {
 			detailDir = path.Join(constant.ResourceDir, "apps", "local", strings.TrimPrefix(install.App.Key, "local"), detail.Version)
 		}
 
-		cmd := exec.Command("/bin/bash", "-c", fmt.Sprintf("cp -rf %s/* %s", detailDir, install.GetPath()))
-		stdout, err := cmd.CombinedOutput()
-		if err != nil {
-			if stdout != nil {
-				upErr = errors.New(string(stdout))
-				return
-			}
-			upErr = err
-			return
+		cmd := exec.Command("/bin/bash", "-c", fmt.Sprintf("cp -rn %s/* %s || true", detailDir, install.GetPath()))
+		stdout, _ := cmd.CombinedOutput()
+		if stdout != nil {
+			global.LOG.Errorf("upgrade app [%s] [%s] cp file log : %s ", install.App.Key, install.Name, string(stdout))
 		}
 
 		composeMap := make(map[string]interface{})
