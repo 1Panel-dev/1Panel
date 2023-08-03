@@ -6,7 +6,7 @@
         <el-form @submit.prevent v-loading="loading" ref="formRef" :model="form" label-position="top">
             <el-row type="flex" justify="center">
                 <el-col :span="22">
-                    <el-form-item :label="$t('commons.login.password')" :rules="Rules.requiredInput" prop="password">
+                    <el-form-item :label="$t('commons.login.password')" :rules="Rules.paramComplexity" prop="password">
                         <el-input type="password" show-password clearable v-model="form.password">
                             <template #append>
                                 <el-button @click="onCopy(form.password)">{{ $t('commons.button.copy') }}</el-button>
@@ -73,6 +73,7 @@ const loading = ref(false);
 
 const dialogVisiable = ref(false);
 const form = ref<App.DatabaseConnInfo>({
+    privilege: false,
     password: '',
     serviceName: '',
     port: 0,
