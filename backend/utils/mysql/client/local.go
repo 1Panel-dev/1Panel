@@ -60,6 +60,9 @@ func (r *Local) CreateUser(info CreateInfo) error {
 
 	for _, user := range userlist {
 		if err := r.ExecSQL(fmt.Sprintf("create user %s identified by '%s';", user, info.Password), info.Timeout); err != nil {
+			if strings.Contains(err.Error(), "ERROR 1396") {
+				return buserr.New(constant.ErrUserIsExist)
+			}
 			_ = r.Delete(DeleteInfo{
 				Name:        info.Name,
 				Version:     info.Version,
@@ -67,9 +70,6 @@ func (r *Local) CreateUser(info CreateInfo) error {
 				Permission:  info.Permission,
 				ForceDelete: true,
 				Timeout:     300})
-			if strings.Contains(err.Error(), "ERROR 1396") {
-				return buserr.New(constant.ErrUserIsExist)
-			}
 			return err
 		}
 		grantStr := fmt.Sprintf("grant all privileges on `%s`.* to %s", info.Name, user)

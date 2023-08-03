@@ -111,6 +111,11 @@ export namespace Database {
         File: string;
         Position: number;
     }
+    export interface MysqlOption {
+        id: number;
+        name: string;
+        from: string;
+    }
     export interface ChangeInfo {
         id: number;
         value: string;

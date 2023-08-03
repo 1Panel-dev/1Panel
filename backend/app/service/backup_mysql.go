@@ -26,7 +26,7 @@ func (u *BackupService) MysqlBackup(req dto.CommonBackup) error {
 	targetDir := path.Join(localDir, fmt.Sprintf("database/mysql/%s/%s", req.Name, req.DetailName))
 	fileName := fmt.Sprintf("%s_%s.sql.gz", req.DetailName, timeNow)
 
-	if err := handleMysqlBackup(req.DetailName, targetDir, fileName); err != nil {
+	if err := handleMysqlBackup(req.Name, req.DetailName, targetDir, fileName); err != nil {
 		return err
 	}
 
@@ -97,8 +97,8 @@ func (u *BackupService) MysqlRecoverByUpload(req dto.CommonRecover) error {
 	return nil
 }
 
-func handleMysqlBackup(dbName, targetDir, fileName string) error {
-	dbInfo, err := mysqlRepo.Get(commonRepo.WithByName(dbName))
+func handleMysqlBackup(name, dbName, targetDir, fileName string) error {
+	dbInfo, err := mysqlRepo.Get(commonRepo.WithByName(dbName), mysqlRepo.WithByMysqlName(name))
 	if err != nil {
 		return err
 	}
@@ -127,7 +127,7 @@ func handleMysqlRecover(req dto.CommonRecover, isRollback bool) error {
 	if !fileOp.Stat(req.File) {
 		return errors.New(fmt.Sprintf("%s file is not exist", req.File))
 	}
-	dbInfo, err := mysqlRepo.Get(commonRepo.WithByName(req.DetailName))
+	dbInfo, err := mysqlRepo.Get(commonRepo.WithByName(req.DetailName), mysqlRepo.WithByMysqlName(req.Name))
 	if err != nil {
 		return err
 	}

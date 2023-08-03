@@ -32,7 +32,7 @@ type MysqlService struct{}
 
 type IMysqlService interface {
 	SearchWithPage(search dto.MysqlDBSearch) (int64, interface{}, error)
-	ListDBName() ([]string, error)
+	ListDBOption() ([]dto.MysqlOption, error)
 	Create(ctx context.Context, req dto.MysqlDBCreate) (*model.DatabaseMysql, error)
 	LoadFromRemote(from string) error
 	ChangeAccess(info dto.ChangeDBInfo) error
@@ -71,18 +71,27 @@ func (u *MysqlService) SearchWithPage(search dto.MysqlDBSearch) (int64, interfac
 	return total, dtoMysqls, err
 }
 
-func (u *MysqlService) ListDBName() ([]string, error) {
+func (u *MysqlService) ListDBOption() ([]dto.MysqlOption, error) {
 	mysqls, err := mysqlRepo.List()
-	var dbNames []string
+	var dbs []dto.MysqlOption
 	for _, mysql := range mysqls {
-		dbNames = append(dbNames, mysql.Name)
+		var item dto.MysqlOption
+		if err := copier.Copy(&item, &mysql); err != nil {
+			return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+		}
+		dbs = append(dbs, item)
 	}
-	return dbNames, err
+	return dbs, err
 }
 
 func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*model.DatabaseMysql, error) {
 	if cmd.CheckIllegal(req.Name, req.Username, req.Password, req.Format, req.Permission) {
 		return nil, buserr.New(constant.ErrCmdIllegal)
+	}
+
+	mysql, _ := mysqlRepo.Get(commonRepo.WithByName(req.Name), remoteDBRepo.WithByFrom(req.From))
+	if mysql.ID != 0 {
+		return nil, constant.ErrRecordExist
 	}
 
 	var createItem model.DatabaseMysql

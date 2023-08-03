@@ -110,7 +110,7 @@ func handleAppBackup(install *model.AppInstall, backupDir, fileName string) erro
 		if err != nil {
 			return err
 		}
-		if err := handleMysqlBackup(db.Name, tmpDir, fmt.Sprintf("%s.sql.gz", install.Name)); err != nil {
+		if err := handleMysqlBackup(db.MysqlName, db.Name, tmpDir, fmt.Sprintf("%s.sql.gz", install.Name)); err != nil {
 			return err
 		}
 	}

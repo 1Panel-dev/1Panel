@@ -24,6 +24,12 @@ type MysqlDBInfo struct {
 	Description string    `json:"description"`
 }
 
+type MysqlOption struct {
+	ID   uint   `json:"id"`
+	Name string `json:"name"`
+	From string `json:"from"`
+}
+
 type MysqlDBCreate struct {
 	Name        string `json:"name" validate:"required"`
 	From        string `json:"from" validate:"required"`
