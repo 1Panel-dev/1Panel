@@ -708,13 +708,14 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 	if err = json.Unmarshal(content, list); err != nil {
 		return
 	}
-	if err = settingRepo().Update("AppStoreLastModified", strconv.Itoa(list.LastModified)); err != nil {
+
+	if err = NewISettingService().Update("AppStoreLastModified", strconv.Itoa(list.LastModified)); err != nil {
 		return err
 	}
 
 	defer func() {
 		if err != nil {
-			_ = settingRepo().Update("AppStoreLastModified", strconv.Itoa(updateRes.AppStoreLastModified))
+			_ = NewISettingService().Update("AppStoreLastModified", strconv.Itoa(updateRes.AppStoreLastModified))
 		}
 	}()
 
