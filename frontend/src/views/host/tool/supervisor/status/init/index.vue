@@ -1,7 +1,7 @@
 <template>
-    <el-drawer :close-on-click-modal="false" v-model="open" size="30%" :show-close="false">
+    <el-drawer :close-on-click-modal="false" v-model="open" size="30%">
         <template #header>
-            <span>{{ $t('commons.button.init') }}</span>
+            <DrawerHeader :header="$t('commons.button.init')" :back="handleClose" />
         </template>
         <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
@@ -23,6 +23,9 @@
         </el-row>
         <template #footer>
             <span class="dialog-footer">
+                <el-button @click="handleClose()" :disabled="loading">
+                    {{ $t('commons.button.cancel') }}
+                </el-button>
                 <el-button type="primary" @click="submit(initForm)" :disabled="loading">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
@@ -57,6 +60,11 @@ const acceptParams = (primaryConfig: string, serviceName: string) => {
     initModel.value.primaryConfig = primaryConfig;
     initModel.value.serviceName = serviceName;
     open.value = true;
+};
+
+const handleClose = () => {
+    open.value = false;
+    em('close', false);
 };
 
 const submit = async (formEl: FormInstance | undefined) => {

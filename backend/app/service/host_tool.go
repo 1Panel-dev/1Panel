@@ -163,12 +163,29 @@ func (h *HostToolService) CreateToolConfig(req request.HostToolCreate) error {
 		if err = cfg.SaveTo(req.ConfigPath); err != nil {
 			return err
 		}
-		if err = settingRepo.Create(constant.SupervisorConfigPath, req.ConfigPath); err != nil {
-			return err
+
+		serviceNameSet, _ := settingRepo.Get(settingRepo.WithByKey(constant.SupervisorServiceName))
+		if serviceNameSet.ID != 0 {
+			if err = settingRepo.Update(constant.SupervisorServiceName, req.ServiceName); err != nil {
+				return err
+			}
+		} else {
+			if err = settingRepo.Create(constant.SupervisorServiceName, req.ServiceName); err != nil {
+				return err
+			}
 		}
-		if err = settingRepo.Create(constant.SupervisorServiceName, req.ServiceName); err != nil {
-			return err
+
+		configPathSet, _ := settingRepo.Get(settingRepo.WithByKey(constant.SupervisorConfigPath))
+		if configPathSet.ID != 0 {
+			if err = settingRepo.Update(constant.SupervisorConfigPath, req.ConfigPath); err != nil {
+				return err
+			}
+		} else {
+			if err = settingRepo.Create(constant.SupervisorConfigPath, req.ConfigPath); err != nil {
+				return err
+			}
 		}
+
 		go func() {
 			if err = systemctl.Restart(req.ServiceName); err != nil {
 				global.LOG.Errorf("[init] restart %s failed err %s", req.ServiceName, err.Error())
