@@ -569,10 +569,10 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := json.Unmarshal([]byte(detail.Params), &appForm); err != nil {
+	if err = json.Unmarshal([]byte(detail.Params), &appForm); err != nil {
 		return nil, err
 	}
-	if err := json.Unmarshal([]byte(install.Env), &envs); err != nil {
+	if err = json.Unmarshal([]byte(install.Env), &envs); err != nil {
 		return nil, err
 	}
 	for _, form := range appForm.FormFields {
@@ -602,6 +602,17 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 				appParam.Values = form.Values
 			}
 			params = append(params, appParam)
+		} else {
+			params = append(params, response.AppParam{
+				Edit:    form.Edit,
+				Key:     form.EnvKey,
+				Rule:    form.Rule,
+				Type:    form.Type,
+				LabelZh: form.LabelZh,
+				LabelEn: form.LabelEn,
+				Value:   form.Default,
+				Values:  form.Values,
+			})
 		}
 	}
 
