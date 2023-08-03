@@ -253,6 +253,8 @@ const paginationConfig = reactive({
     pageSize: 10,
     total: 0,
     from: 'local',
+    orderBy: 'created_at',
+    order: 'null',
 });
 const searchName = ref();
 
@@ -301,13 +303,15 @@ const onSetting = async () => {
 };
 
 const search = async (column?: any) => {
+    paginationConfig.orderBy = column?.order ? column.prop : paginationConfig.orderBy;
+    paginationConfig.order = column?.order ? column.order : paginationConfig.order;
     let params = {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
         info: searchName.value,
         from: paginationConfig.from,
-        orderBy: column?.order ? column.prop : 'created_at',
-        order: column?.order ? column.order : 'null',
+        orderBy: paginationConfig.orderBy,
+        order: paginationConfig.order,
     };
     const res = await searchMysqlDBs(params);
     data.value = res.data.items || [];
