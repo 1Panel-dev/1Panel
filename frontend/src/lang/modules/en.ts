@@ -1671,13 +1671,16 @@ const message = {
             dir: 'run directory',
             numprocs: 'Number of processes',
             initWarn:
-                'Because it is not compatible with the original configuration, initializing Supervisor will modify the files parameter of the configuration file, causing all existing processes to stop, please confirm the risk in advance. The modified process configuration folder is in <1Panel installation directory>/1panel/tools/supervisord/supervisor.d',
+                'The initialization operation needs to modify the [include] files parameter of the configuration file, the directory where the modified service configuration file is located: 1panel installation directory/1panel/tools/supervisord/supervisor.d/',
             operatorHelper: 'Operation {1} will be performed on {0}, continue? ',
             uptime: 'running time',
             notStartWarn: 'Supervisor is not started, please start it first',
             serviceName: 'Service name',
             initHelper:
                 'The initialization process will modify the configuration file, causing all existing processes to stop, please confirm the risk in advance',
+            serviceNameHelper: 'Currently only supports the Supervisor service managed by systemctl',
+            restartHelper:
+                'Initialization will restart the service, causing all the original daemon processes to close',
         },
     },
 };

@@ -185,12 +185,10 @@ func (h *HostToolService) CreateToolConfig(req request.HostToolCreate) error {
 				return err
 			}
 		}
-
-		go func() {
-			if err = systemctl.Restart(req.ServiceName); err != nil {
-				global.LOG.Errorf("[init] restart %s failed err %s", req.ServiceName, err.Error())
-			}
-		}()
+		if err = systemctl.Restart(req.ServiceName); err != nil {
+			global.LOG.Errorf("[init] restart %s failed err %s", req.ServiceName, err.Error())
+			return err
+		}
 	}
 	return nil
 }
