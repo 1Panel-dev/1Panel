@@ -40,6 +40,7 @@ func (r *Remote) Create(info CreateInfo) error {
 	}
 
 	if err := r.CreateUser(info); err != nil {
+		_ = r.ExecSQL(fmt.Sprintf("drop database if exists `%s`", info.Name), info.Timeout)
 		return err
 	}
 
