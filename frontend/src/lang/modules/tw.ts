@@ -1257,7 +1257,7 @@ const message = {
         value: '值',
         enable: '開啟',
         proxyAddress: '代理地址',
-        proxyHelper: '例: http://127.0.0.1:8080',
+        proxyHelper: '例: 127.0.0.1:8080',
         forceDelete: '強製刪除',
         forceDeleteHelper: '強製刪除，會忽略刪除過程中產生的錯誤並最終刪除元數據',
         deleteAppHelper: '同時刪除關聯應用、數據庫以及應用備份',
@@ -1404,6 +1404,7 @@ const message = {
         changePHPVersionWarn: '切換 PHP 版本會刪除原有的 PHP 容器（不會丟失已經掛載的網站代碼），是否繼續？ ',
         changeVersion: '切換版本',
         retainConfig: '是否保留 php-fpm.conf 和 php.ini 文件',
+        runDirHelper2: '請確保二級運行目錄位於 index 目錄下',
     },
     php: {
         short_open_tag: '短標簽支持',
@@ -1422,6 +1423,7 @@ const message = {
         disableFunction: '禁用函數',
         disableFunctionHelper: '輸入要禁用的函數，例如exec，多個請用,分割',
         uploadMaxSize: '上傳限製',
+        indexHelper: '為保障PHP網站正常運行，請將代碼放置於 index 目錄，並避免重命名',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '服務器名字的hash表大小',

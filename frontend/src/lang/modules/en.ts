@@ -1314,7 +1314,7 @@ const message = {
         value: 'value',
         enable: 'Enable',
         proxyAddress: 'Proxy Address',
-        proxyHelper: 'Example: http://127.0.0.1:8080',
+        proxyHelper: 'Example: 127.0.0.1:8080',
         forceDelete: 'Force Delete',
         forceDeleteHelper:
             'Forced deletion will ignore errors generated during the deletion process and eventually delete metadata',
@@ -1471,6 +1471,7 @@ const message = {
             'Switching the PHP version will delete the original PHP container (the website code that has been mounted will not be lost), continue? ',
         changeVersion: 'Switch version',
         retainConfig: 'Whether to keep php-fpm.conf and php.ini files',
+        runDirHelper2: 'Please ensure that the secondary running directory is under the index directory',
     },
     php: {
         short_open_tag: 'Short tag support',
@@ -1489,6 +1490,8 @@ const message = {
         disableFunction: 'Disable function',
         disableFunctionHelper: 'Enter the function to be disabled, such as exec, please use multiple, split',
         uploadMaxSize: 'Upload limit',
+        indexHelper:
+            'In order to ensure the normal operation of the PHP website, please place the code in the index directory and avoid renaming',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: 'The hash table size of the server name',

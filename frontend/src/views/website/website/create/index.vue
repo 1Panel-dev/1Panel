@@ -223,7 +223,7 @@
                                     <el-select
                                         v-model="website.appinstall.memoryUnit"
                                         placeholder="Select"
-                                        style="width: 85px"
+                                        class="pre-select"
                                     >
                                         <el-option label="KB" value="K" />
                                         <el-option label="MB" value="M" />
@@ -268,8 +268,20 @@
                             </span>
                         </div>
                     </el-form-item>
-                    <el-form-item v-if="website.type === 'proxy'" :label="$t('website.proxyAddress')" prop="proxy">
-                        <el-input v-model="website.proxy" :placeholder="$t('website.proxyHelper')"></el-input>
+                    <el-form-item
+                        v-if="website.type === 'proxy'"
+                        :label="$t('website.proxyAddress')"
+                        prop="proxyAddress"
+                    >
+                        <el-input v-model="website.proxyAddress" :placeholder="$t('website.proxyHelper')">
+                            <template #prepend>
+                                <el-select v-model="website.proxyProtocol" class="pre-select">
+                                    <el-option label="http" value="http://" />
+                                    <el-option label="https" value="https://" />
+                                    <el-option :label="$t('website.other')" value="" />
+                                </el-select>
+                            </template>
+                        </el-input>
                     </el-form-item>
                     <el-form-item :label="$t('website.remark')" prop="remark">
                         <el-input v-model="website.remark"></el-input>
@@ -348,6 +360,8 @@ const website = ref({
     IPV6: false,
     proxyType: 'tcp',
     port: 9000,
+    proxyProtocol: 'http://',
+    proxyAddress: '',
 });
 const rules = ref<any>({
     primaryDomain: [Rules.domain],
@@ -356,7 +370,7 @@ const rules = ref<any>({
     webSiteGroupId: [Rules.requiredSelectBusiness],
     appInstallId: [Rules.requiredSelectBusiness],
     appType: [Rules.requiredInput],
-    proxy: [Rules.requiredInput],
+    proxyAddress: [Rules.requiredInput],
     runtimeID: [Rules.requiredSelectBusiness],
     appinstall: {
         name: [Rules.appName],
@@ -549,6 +563,10 @@ const submit = async (formEl: FormInstance | undefined) => {
                     loading.value = false;
                     preCheckRef.value.acceptParams({ items: res.data });
                 } else {
+                    if (website.value.type === 'proxy') {
+                        website.value.proxy = website.value.proxyProtocol + website.value.proxyAddress;
+                        console.log(website.value.proxy);
+                    }
                     CreateWebsite(website.value)
                         .then(() => {
                             MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
