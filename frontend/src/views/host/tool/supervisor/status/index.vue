@@ -34,6 +34,7 @@
             :title="$t('tool.supervisor.list')"
             :divider="true"
             v-if="!data.isExist || !data.ctlExist || data.init"
+            v-loading="loading"
         >
             <template #main>
                 <div class="app-warn">
@@ -79,6 +80,7 @@ const data = ref({
     ctlExist: false,
     serviceName: '',
 });
+const loading = ref(false);
 
 const em = defineEmits(['setting', 'getStatus', 'update:loading', 'update:maskShow']);
 
@@ -126,6 +128,7 @@ const onOperate = async (operation: string) => {
 
 const getStatus = async () => {
     try {
+        loading.value = true;
         em('update:loading', true);
         const res = await GetSupervisorStatus();
         data.value = res.data.config as HostTool.Supersivor;
@@ -138,6 +141,7 @@ const getStatus = async () => {
         em('getStatus', status);
     } catch (error) {}
     em('update:loading', false);
+    loading.value = false;
 };
 
 onMounted(() => {

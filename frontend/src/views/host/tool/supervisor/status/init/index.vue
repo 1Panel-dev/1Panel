@@ -11,12 +11,20 @@
                     </el-form-item>
                     <el-form-item :label="$t('tool.supervisor.serviceName')" prop="serviceName">
                         <el-input v-model.trim="initModel.serviceName"></el-input>
+                        <span class="input-help">{{ $t('tool.supervisor.serviceNameHelper') }}</span>
                     </el-form-item>
                     <el-alert
                         :title="$t('tool.supervisor.initWarn')"
                         class="common-prompt"
                         :closable="false"
                         type="error"
+                    />
+                    <el-alert
+                        :title="$t('tool.supervisor.restartHelper')"
+                        class="common-prompt"
+                        :closable="false"
+                        type="error"
+                        effect="dark"
                     />
                 </el-form>
             </el-col>
@@ -26,11 +34,12 @@
                 <el-button @click="handleClose()" :disabled="loading">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button type="primary" @click="submit(initForm)" :disabled="loading">
+                <el-button type="primary" @click="openSubmit(initForm)" :disabled="loading">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
         </template>
+        <ConfirmDialog ref="confirmDialogRef" @confirm="submit(initForm)"></ConfirmDialog>
     </el-drawer>
 </template>
 
@@ -53,7 +62,7 @@ const initModel = ref({
     primaryConfig: '',
     serviceName: '',
 });
-
+const confirmDialogRef = ref();
 const em = defineEmits(['close']);
 
 const acceptParams = (primaryConfig: string, serviceName: string) => {
@@ -65,6 +74,19 @@ const acceptParams = (primaryConfig: string, serviceName: string) => {
 const handleClose = () => {
     open.value = false;
     em('close', false);
+};
+
+const openSubmit = async (formEl: FormInstance | undefined) => {
+    if (!formEl) return;
+    formEl.validate(async (valid) => {
+        if (!valid) return;
+        let params = {
+            header: i18n.global.t('commons.button.init'),
+            operationInfo: i18n.global.t('tool.supervisor.restartHelper'),
+            submitInputInfo: i18n.global.t('database.restartNow'),
+        };
+        confirmDialogRef.value!.acceptParams(params);
+    });
 };
 
 const submit = async (formEl: FormInstance | undefined) => {

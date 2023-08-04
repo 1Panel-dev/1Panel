@@ -1583,12 +1583,14 @@ const message = {
             dir: '運行目錄',
             numprocs: '進程數量',
             initWarn:
-                '由於無法兼容原有配置，初始化 Supervisor 會修改配置文件的 files 參數，導致已有的進程全部停止，請提前確認風險。修改後的進程配置文件夾在 <1Panel安裝目錄>/1panel/tools/supervisord/supervisor.d 中',
+                '初始化操作需要修改配置文件的 [include] files 參數，修改後的服務配置文件所在目錄: 1panel安裝目錄/1panel/tools/supervisord/supervisor.d/',
             operatorHelper: '將對 {0} 進行 {1} 操作，是否繼續？ ',
             uptime: '運行時長',
             notStartWarn: 'Supervisor 未啟動，請先啟動',
             serviceName: '服務名稱',
             initHelper: '尚未初始化 Supervisor ，請先初始化',
+            serviceNameHelper: '當前僅支持 systemctl 管理的 Supervisor 服務',
+            restartHelper: '初始化會重啟服務，導致原有的守護進程全部關閉',
         },
     },
 };
