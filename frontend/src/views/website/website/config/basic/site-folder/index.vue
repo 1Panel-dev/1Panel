@@ -30,6 +30,9 @@
                             {{ $t('nginx.saveAndReload') }}
                         </el-button>
                     </el-space>
+                    <span class="input-help">
+                        {{ $t('website.runDirHelper2') }}
+                    </span>
                 </el-form-item>
                 <el-form-item v-if="configDir" :label="$t('website.userGroup')">
                     <el-space wrap>
@@ -49,6 +52,7 @@
                 <template #default>
                     <span class="warnHelper">{{ $t('website.runDirHelper') }}</span>
                     <span class="warnHelper">{{ $t('website.runUserHelper') }}</span>
+                    <span class="warnHelper">{{ $t('php.indexHelper') }}</span>
                 </template>
             </el-alert>
             <br />

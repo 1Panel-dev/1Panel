@@ -107,8 +107,10 @@ func (f *FileInfo) search(search string, count int) (files []FileSearchInfo, tot
 	if err = cmd.Start(); err != nil {
 		return
 	}
-	defer cmd.Wait()
-	defer cmd.Process.Kill()
+	defer func() {
+		_ = cmd.Wait()
+		_ = cmd.Process.Kill()
+	}()
 
 	scanner := bufio.NewScanner(output)
 	for scanner.Scan() {

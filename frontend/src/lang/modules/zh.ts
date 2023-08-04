@@ -1257,7 +1257,7 @@ const message = {
         value: '值',
         enable: '开启',
         proxyAddress: '代理地址',
-        proxyHelper: '例: http://127.0.0.1:8080',
+        proxyHelper: '例: 127.0.0.1:8080',
         forceDelete: '强制删除',
         forceDeleteHelper: '强制删除，会忽略删除过程中产生的错误并最终删除元数据',
         deleteAppHelper: '同时删除关联应用、数据库以及应用备份',
@@ -1281,7 +1281,7 @@ const message = {
         primaryPath: '主目录',
         folderTitle: '网站主目录主要包含四个文件夹',
         wafFolder: '防火墙规则',
-        indexFolder: '网站root目录',
+        indexFolder: '网站 root 目录（PHP 运行环境 静态网站代码存放目录）',
         logFolder: '网站日志',
         sslFolder: '网站证书',
         enableOrNot: '是否启用',
@@ -1404,6 +1404,7 @@ const message = {
         changePHPVersionWarn: '切换 PHP 版本会删除原有的 PHP 容器（不会丢失已经挂载的网站代码），是否继续？',
         changeVersion: '切换版本',
         retainConfig: '是否保留 php-fpm.conf 和 php.ini 文件',
+        runDirHelper2: '请确保二级运行目录位于 index 目录下',
     },
     php: {
         short_open_tag: '短标签支持',
@@ -1422,6 +1423,7 @@ const message = {
         disableFunction: '禁用函数',
         disableFunctionHelper: '输入要禁用的函数，例如exec，多个请用,分割',
         uploadMaxSize: '上传限制',
+        indexHelper: '为保障 PHP 网站正常运行，请将代码放置于 index 目录，并避免重命名',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '服务器名字的hash表大小',
