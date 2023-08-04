@@ -464,7 +464,7 @@ const buttons = [
         click: (row: Database.MysqlDBInfo) => {
             let params = {
                 type: 'mysql',
-                name: mysqlName.value || row.name,
+                name: row.mysqlName,
                 detailName: row.name,
             };
             uploadRef.value!.acceptParams(params);

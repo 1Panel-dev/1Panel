@@ -270,10 +270,9 @@ func (r *Local) SyncDB(version string) ([]SyncDBInfo, error) {
 			continue
 		}
 		dataItem := SyncDBInfo{
-			Name:      parts[0],
-			From:      r.From,
-			MysqlName: r.From,
-			Format:    parts[1],
+			Name:   parts[0],
+			From:   r.From,
+			Format: parts[1],
 		}
 		userLines, err := r.ExecSQLForRows(fmt.Sprintf("SELECT USER,HOST FROM mysql.DB WHERE DB = '%s'", parts[0]), 300)
 		if err != nil {
