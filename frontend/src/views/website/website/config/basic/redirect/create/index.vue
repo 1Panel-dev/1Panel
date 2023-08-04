@@ -129,7 +129,9 @@ const acceptParams = (redirectParam: Website.RedirectConfig) => {
 };
 
 const changeType = (type: string) => {
+    redirectForm.value?.clearValidate('name');
     if (type != '404') {
+        redirect.value.name = '';
         redirect.value.redirectRoot = false;
     } else {
         redirect.value.name = '404';
