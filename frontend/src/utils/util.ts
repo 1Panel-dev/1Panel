@@ -1,4 +1,6 @@
 import i18n from '@/lang';
+import { UploadFile, UploadFiles } from 'element-plus';
+import { MsgWarning } from './message';
 
 export function deepCopy<T>(obj: any): T {
     let newObj: any;
@@ -304,4 +306,16 @@ export function downloadWithContent(content: string, fileName: string) {
     a.download = fileName;
     const event = new MouseEvent('click');
     a.dispatchEvent(event);
+}
+
+export function checkFileType(_uploadFile: UploadFile, uploadFiles: UploadFiles): boolean {
+    if (_uploadFile.raw?.type == '') {
+        const index = uploadFiles.findIndex((file) => file.name === _uploadFile.name && file.raw?.type === '');
+        if (index !== -1) {
+            uploadFiles.splice(index, 1);
+        }
+        MsgWarning(i18n.global.t('file.unsupportType'));
+        return false;
+    }
+    return true;
 }
