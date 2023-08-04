@@ -895,6 +895,7 @@ const message = {
         uploadFailed: '[{0}] File Upload file',
         fileUploadStart: 'Uploading [{0}]....',
         currentSelect: 'Current Select: ',
+        unsupportType: 'Unsupported file type',
     },
     ssh: {
         sshAlert:
