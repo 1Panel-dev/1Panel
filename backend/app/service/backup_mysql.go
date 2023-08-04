@@ -176,5 +176,6 @@ func handleMysqlRecover(req dto.CommonRecover, isRollback bool) error {
 	}); err != nil {
 		return err
 	}
+	isOk = true
 	return nil
 }

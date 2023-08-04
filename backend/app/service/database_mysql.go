@@ -143,6 +143,15 @@ func (u *MysqlService) LoadFromRemote(from string) error {
 		return err
 	}
 
+	mysqlName := from
+	if from == "local" {
+		app, err := appInstallRepo.LoadBaseInfo("mysql", "")
+		if err != nil {
+			return err
+		}
+		mysqlName = app.Name
+	}
+
 	databases, err := mysqlRepo.List(remoteDBRepo.WithByFrom(from))
 	if err != nil {
 		return err
@@ -164,6 +173,7 @@ func (u *MysqlService) LoadFromRemote(from string) error {
 			if err := copier.Copy(&createItem, &data); err != nil {
 				return errors.WithMessage(constant.ErrStructTransform, err.Error())
 			}
+			createItem.MysqlName = mysqlName
 			if err := mysqlRepo.Create(context.Background(), &createItem); err != nil {
 				return err
 			}
