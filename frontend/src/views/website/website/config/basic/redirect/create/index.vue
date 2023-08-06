@@ -51,14 +51,12 @@
                     <el-form-item :label="$t('website.redirectRoot')" prop="redirectRoot" v-if="redirect.type == '404'">
                         <el-switch v-model="redirect.redirectRoot"></el-switch>
                     </el-form-item>
-                    <div v-if="!redirect.redirectRoot">
-                        <el-form-item :label="$t('website.targetURL')" prop="target">
-                            <el-input v-model.trim="redirect.target"></el-input>
-                        </el-form-item>
-                        <el-form-item :label="$t('website.keepPath')" prop="keepPath">
-                            <el-switch v-model="redirect.keepPath"></el-switch>
-                        </el-form-item>
-                    </div>
+                    <el-form-item :label="$t('website.targetURL')" prop="target" v-if="!redirect.redirectRoot">
+                        <el-input v-model.trim="redirect.target"></el-input>
+                    </el-form-item>
+                    <el-form-item :label="$t('website.keepPath')" prop="keepPath" v-if="redirect.type !== '404'">
+                        <el-switch v-model="redirect.keepPath"></el-switch>
+                    </el-form-item>
                 </el-form>
             </el-col>
         </el-row>
