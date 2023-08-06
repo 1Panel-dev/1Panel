@@ -2042,6 +2042,8 @@ func (w WebsiteService) OperateRedirect(req request.NginxRedirectReq) (err error
 	case "path":
 		if req.KeepPath {
 			target = req.Target + "$1"
+		} else {
+			target = req.Target + "?"
 		}
 		redirectKey := "permanent"
 		if req.Redirect == "302" {
@@ -2210,7 +2212,7 @@ func (w WebsiteService) GetRedirect(id uint) (res []response.NginxRedirectConfig
 								redirectConfig.Target = strings.TrimSuffix(params[1], "$1")
 							} else {
 								redirectConfig.KeepPath = false
-								redirectConfig.Target = params[1]
+								redirectConfig.Target = strings.TrimSuffix(params[1], "?")
 							}
 							if params[2] == "permanent" {
 								redirectConfig.Redirect = "301"

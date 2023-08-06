@@ -38,7 +38,7 @@
         </el-table-column>
         <fu-table-operations
             :ellipsis="10"
-            width="260px"
+            width="220px"
             :buttons="buttons"
             :label="$t('commons.table.operate')"
             :fixed="mobile ? false : 'right'"
