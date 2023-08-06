@@ -731,7 +731,11 @@ func updateInstallInfoInDB(appKey, appName, param string, isRestart bool, value 
 	envKey := ""
 	switch param {
 	case "password":
-		envKey = "PANEL_DB_ROOT_PASSWORD="
+		if appKey == "mysql" {
+			envKey = "PANEL_DB_ROOT_PASSWORD="
+		} else {
+			envKey = "PANEL_REDIS_ROOT_PASSWORD="
+		}
 	case "port":
 		envKey = "PANEL_APP_PORT_HTTP="
 	case "user-password":
@@ -760,6 +764,10 @@ func updateInstallInfoInDB(appKey, appName, param string, isRestart bool, value 
 	if param == "password" {
 		oldVal = fmt.Sprintf("\"PANEL_DB_ROOT_PASSWORD\":\"%v\"", appInstall.Password)
 		newVal = fmt.Sprintf("\"PANEL_DB_ROOT_PASSWORD\":\"%v\"", value)
+		if appKey == "redis" {
+			oldVal = fmt.Sprintf("\"PANEL_REDIS_ROOT_PASSWORD\":\"%v\"", appInstall.Password)
+			newVal = fmt.Sprintf("\"PANEL_REDIS_ROOT_PASSWORD\":\"%v\"", value)
+		}
 		_ = appInstallRepo.BatchUpdateBy(map[string]interface{}{
 			"param": strings.ReplaceAll(appInstall.Param, oldVal, newVal),
 			"env":   strings.ReplaceAll(appInstall.Env, oldVal, newVal),

@@ -192,10 +192,19 @@ func (a *AppInstallRepo) LoadBaseInfo(key string, name string) (*RootInfo, error
 	if err := json.Unmarshal([]byte(appInstall.Env), &envMap); err != nil {
 		return nil, err
 	}
-	password, ok := envMap["PANEL_DB_ROOT_PASSWORD"].(string)
-	if ok {
-		info.Password = password
+	switch app.Key {
+	case "mysql":
+		password, ok := envMap["PANEL_DB_ROOT_PASSWORD"].(string)
+		if ok {
+			info.Password = password
+		}
+	case "redis":
+		password, ok := envMap["PANEL_REDIS_ROOT_PASSWORD"].(string)
+		if ok {
+			info.Password = password
+		}
 	}
+
 	userPassword, ok := envMap["PANEL_DB_USER_PASSWORD"].(string)
 	if ok {
 		info.UserPassword = userPassword
