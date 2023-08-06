@@ -20,7 +20,7 @@ type IMysqlRepo interface {
 	Delete(ctx context.Context, opts ...DBOption) error
 	Update(id uint, vars map[string]interface{}) error
 	UpdateDatabaseInfo(id uint, vars map[string]interface{}) error
-	DeleteAll(ctx context.Context) error
+	DeleteLocal(ctx context.Context) error
 }
 
 func NewIMysqlRepo() IMysqlRepo {
@@ -67,8 +67,8 @@ func (u *MysqlRepo) Delete(ctx context.Context, opts ...DBOption) error {
 	return getTx(ctx, opts...).Delete(&model.DatabaseMysql{}).Error
 }
 
-func (u *MysqlRepo) DeleteAll(ctx context.Context) error {
-	return getTx(ctx).Where("1 = 1").Delete(&model.DatabaseMysql{}).Error
+func (u *MysqlRepo) DeleteLocal(ctx context.Context) error {
+	return getTx(ctx).Where("`from` = ?", "local").Delete(&model.DatabaseMysql{}).Error
 }
 
 func (u *MysqlRepo) Update(id uint, vars map[string]interface{}) error {

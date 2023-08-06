@@ -16,7 +16,7 @@
                         </span>
                     </el-form-item>
                     <el-form-item :label="$t('database.remoteConn')">
-                        <el-tag>{{ $t('database.localIP') + ':' + form.port }}</el-tag>
+                        <el-tag>{{ form.systemIP + ':' + form.port }}</el-tag>
                         <span class="input-help">{{ $t('database.remoteConnHelper2') }}</span>
                     </el-form-item>
 
@@ -81,6 +81,7 @@ import { GetAppConnInfo } from '@/api/modules/app';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { getRandomStr } from '@/utils/util';
+import { getSettingInfo } from '@/api/modules/setting';
 import useClipboard from 'vue-clipboard3';
 const { toClipboard } = useClipboard();
 
@@ -88,6 +89,7 @@ const loading = ref(false);
 
 const dialogVisiable = ref(false);
 const form = reactive({
+    systemIP: '',
     password: '',
     serviceName: '',
     privilege: false,
@@ -112,11 +114,10 @@ interface DialogProps {
 const acceptParams = (param: DialogProps): void => {
     form.password = '';
     form.from = param.from;
-    if (form.from !== 'local') {
-        loadRemoteInfo();
+    if (form.from === 'local') {
+        loadAccess();
     }
     loadPassword();
-    loadAccess();
     dialogVisiable.value = true;
 };
 
@@ -142,18 +143,26 @@ const loadAccess = async () => {
     form.privilege = res.data;
 };
 
-const loadRemoteInfo = async () => {
-    const res = await getRemoteDB(form.from);
-    form.remoteIP = res.data.address;
-    form.username = res.data.username;
-    form.password = res.data.password;
+const loadSystemIP = async () => {
+    const res = await getSettingInfo();
+    form.systemIP = res.data.systemIP || i18n.global.t('database.localIP');
 };
 
 const loadPassword = async () => {
-    const res = await GetAppConnInfo('mysql');
+    if (form.from === 'local') {
+        const res = await GetAppConnInfo('mysql');
+        form.password = res.data.password || '';
+        form.port = res.data.port || 3306;
+        form.serviceName = res.data.serviceName || '';
+        loadSystemIP();
+        return;
+    }
+    const res = await getRemoteDB(form.from);
     form.password = res.data.password || '';
     form.port = res.data.port || 3306;
-    form.serviceName = res.data.serviceName || '';
+    form.username = res.data.username;
+    form.password = res.data.password;
+    form.remoteIP = res.data.address;
 };
 
 const onSubmit = async () => {
