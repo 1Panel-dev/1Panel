@@ -200,7 +200,7 @@ func deleteAppInstall(install model.AppInstall, deleteBackup bool, forceDelete b
 	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("app"), commonRepo.WithByName(install.App.Key), backupRepo.WithByDetailName(install.Name))
 	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType(install.App.Key))
 	if install.App.Key == constant.AppMysql {
-		_ = mysqlRepo.DeleteAll(ctx)
+		_ = mysqlRepo.DeleteLocal(ctx)
 	}
 	uploadDir := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/uploads/app/%s/%s", install.App.Key, install.Name))
 	if _, err := os.Stat(uploadDir); err == nil {
