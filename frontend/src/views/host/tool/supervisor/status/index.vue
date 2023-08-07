@@ -131,7 +131,9 @@ const getStatus = async () => {
         loading.value = true;
         em('update:loading', true);
         const res = await GetSupervisorStatus();
-        data.value = res.data.config as HostTool.Supersivor;
+        if (res.data.config) {
+            data.value = res.data.config as HostTool.Supersivor;
+        }
 
         const status = {
             isExist: data.value.isExist && data.value.ctlExist,
