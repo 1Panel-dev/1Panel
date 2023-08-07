@@ -106,11 +106,17 @@ const goRouter = async (key: string) => {
 };
 
 const onCheck = async () => {
-    const res = await CheckAppInstalled(key.value);
-    data.value = res.data;
-    em('isExist', res.data);
-    operateReq.installId = res.data.appInstallId;
-    refresh.value++;
+    await CheckAppInstalled(key.value)
+        .then((res) => {
+            data.value = res.data;
+            em('isExist', res.data);
+            operateReq.installId = res.data.appInstallId;
+            refresh.value++;
+        })
+        .catch(() => {
+            em('isExist', false);
+            refresh.value++;
+        });
 };
 
 const onOperate = async (operation: string) => {
