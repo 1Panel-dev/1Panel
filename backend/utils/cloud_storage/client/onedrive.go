@@ -211,9 +211,6 @@ func (onedrive *oneDriveClient) ListObjects(prefix string) ([]interface{}, error
 	if err := onedrive.client.Do(context.Background(), req, false, &driveItems); err != nil {
 		return nil, fmt.Errorf("do request for list failed, err: %v", err)
 	}
-	for _, item := range driveItems.DriveItems {
-		return nil, fmt.Errorf("id: %v, name: %s \n", item.Id, item.Name)
-	}
 
 	var itemList []interface{}
 	for _, item := range driveItems.DriveItems {
