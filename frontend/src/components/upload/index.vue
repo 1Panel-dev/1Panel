@@ -80,7 +80,7 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { checkFileType, computeSize } from '@/utils/util';
+import { computeSize } from '@/utils/util';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { handleRecoverByUpload } from '@/api/modules/setting';
 import i18n from '@/lang';
@@ -184,9 +184,7 @@ const beforeAvatarUpload = (rawFile) => {
 };
 
 const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
-    if (checkFileType(_uploadFile, uploadFiles)) {
-        uploaderFiles.value = uploadFiles;
-    }
+    uploaderFiles.value = uploadFiles;
 };
 
 const handleClose = () => {

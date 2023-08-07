@@ -130,7 +130,7 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 		var resourceId uint
 		if dbConfig.DbName != "" && dbConfig.DbUser != "" && dbConfig.Password != "" {
 			iMysqlRepo := repo.NewIMysqlRepo()
-			oldMysqlDb, _ := iMysqlRepo.Get(commonRepo.WithByName(dbConfig.DbName))
+			oldMysqlDb, _ := iMysqlRepo.Get(commonRepo.WithByName(dbConfig.DbName), iMysqlRepo.WithByFrom(constant.ResourceLocal))
 			resourceId = oldMysqlDb.ID
 			if oldMysqlDb.ID > 0 {
 				if oldMysqlDb.Username != dbConfig.DbUser || oldMysqlDb.Password != dbConfig.Password {
