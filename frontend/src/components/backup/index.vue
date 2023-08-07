@@ -41,7 +41,7 @@
                     show-overflow-tooltip
                 />
 
-                <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fix />
+                <fu-table-operations width="230px" :buttons="buttons" :label="$t('commons.table.operate')" fix />
             </ComplexTable>
         </el-drawer>
     </div>

@@ -38,7 +38,7 @@
                         >
                             {{ $t('database.create') }}
                         </el-button>
-                        <el-button :disabled="!mysqlIsExist && isLocal()" @click="onChangeConn" type="primary" plain>
+                        <el-button v-if="mysqlIsExist || !isLocal()" @click="onChangeConn" type="primary" plain>
                             {{ $t('database.databaseConnInfo') }}
                         </el-button>
                         <el-button

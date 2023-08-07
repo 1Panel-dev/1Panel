@@ -180,6 +180,7 @@ func (r *Remote) ChangeAccess(info AccessChangeInfo) error {
 	if info.Username == "root" {
 		info.OldPermission = "%"
 		info.Name = "*"
+		info.Password = r.Password
 	}
 	if info.Permission != info.OldPermission {
 		if err := r.Delete(DeleteInfo{
