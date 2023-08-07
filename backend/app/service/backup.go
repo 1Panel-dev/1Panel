@@ -282,7 +282,11 @@ func (u *BackupService) ListFiles(req dto.BackupSearchFile) ([]interface{}, erro
 	if err != nil {
 		return nil, err
 	}
-	return client.ListObjects("system_snapshot/")
+	prefix := "system_snapshot"
+	if len(backup.BackupPath) != 0 {
+		prefix = path.Join("/"+strings.TrimPrefix(backup.BackupPath, "/"), prefix)
+	}
+	return client.ListObjects(prefix)
 }
 
 func (u *BackupService) NewClient(backup *model.BackupAccount) (cloud_storage.CloudStorageClient, error) {
