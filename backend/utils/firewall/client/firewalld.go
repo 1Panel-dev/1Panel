@@ -3,6 +3,7 @@ package client
 import (
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -60,39 +61,48 @@ func (f *Firewall) Reload() error {
 }
 
 func (f *Firewall) ListPort() ([]FireInfo, error) {
-	stdout, err := cmd.Exec("firewall-cmd --zone=public --list-ports")
-	if err != nil {
-		return nil, err
-	}
-	ports := strings.Split(strings.ReplaceAll(stdout, "\n", ""), " ")
+	var wg sync.WaitGroup
 	var datas []FireInfo
-	for _, port := range ports {
-		if len(port) == 0 {
-			continue
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		stdout, err := cmd.Exec("firewall-cmd --zone=public --list-ports")
+		if err != nil {
+			return
 		}
-		var itemPort FireInfo
-		if strings.Contains(port, "/") {
-			itemPort.Port = strings.Split(port, "/")[0]
-			itemPort.Protocol = strings.Split(port, "/")[1]
+		ports := strings.Split(strings.ReplaceAll(stdout, "\n", ""), " ")
+		for _, port := range ports {
+			if len(port) == 0 {
+				continue
+			}
+			var itemPort FireInfo
+			if strings.Contains(port, "/") {
+				itemPort.Port = strings.Split(port, "/")[0]
+				itemPort.Protocol = strings.Split(port, "/")[1]
+			}
+			itemPort.Strategy = "accept"
+			datas = append(datas, itemPort)
 		}
-		itemPort.Strategy = "accept"
-		datas = append(datas, itemPort)
-	}
+	}()
 
-	stdout1, err := cmd.Exec("firewall-cmd --zone=public --list-rich-rules")
-	if err != nil {
-		return nil, err
-	}
-	rules := strings.Split(stdout1, "\n")
-	for _, rule := range rules {
-		if len(rule) == 0 {
-			continue
+	go func() {
+		defer wg.Done()
+		stdout1, err := cmd.Exec("firewall-cmd --zone=public --list-rich-rules")
+		if err != nil {
+			return
 		}
-		itemRule := f.loadInfo(rule)
-		if len(itemRule.Port) != 0 && itemRule.Family == "ipv4" {
-			datas = append(datas, itemRule)
+		rules := strings.Split(stdout1, "\n")
+		for _, rule := range rules {
+			if len(rule) == 0 {
+				continue
+			}
+			itemRule := f.loadInfo(rule)
+			if len(itemRule.Port) != 0 && itemRule.Family == "ipv4" {
+				datas = append(datas, itemRule)
+			}
 		}
-	}
+	}()
+	wg.Wait()
 	return datas, nil
 }
 

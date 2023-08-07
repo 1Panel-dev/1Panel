@@ -1,111 +1,113 @@
 <template>
-    <div v-loading="loading" style="position: relative">
+    <div>
         <FireRouter />
-        <FireStatus
-            v-show="fireName !== '-'"
-            ref="fireStatuRef"
-            @search="search"
-            v-model:loading="loading"
-            v-model:name="fireName"
-            v-model:mask-show="maskShow"
-            v-model:status="fireStatus"
-        />
 
-        <div v-if="fireName !== '-'">
-            <el-card v-if="fireStatus != 'running' && maskShow" class="mask-prompt">
-                <span>{{ $t('firewall.firewallNotStart') }}</span>
-            </el-card>
+        <div v-loading="loading">
+            <FireStatus
+                v-show="fireName !== '-'"
+                ref="fireStatuRef"
+                @search="search"
+                v-model:loading="loading"
+                v-model:name="fireName"
+                v-model:mask-show="maskShow"
+                v-model:status="fireStatus"
+            />
 
-            <LayoutContent :title="$t('firewall.ipRule')" :class="{ mask: fireStatus != 'running' }">
-                <template #toolbar>
-                    <el-row>
-                        <el-col :span="16">
-                            <el-button type="primary" @click="onOpenDialog('create')">
-                                {{ $t('commons.button.create') }} {{ $t('firewall.ipRule') }}
-                            </el-button>
-                            <el-button @click="onDelete(null)" plain :disabled="selects.length === 0">
-                                {{ $t('commons.button.delete') }}
-                            </el-button>
-                        </el-col>
-                        <el-col :span="8">
-                            <TableSetting @search="search()" />
-                            <div class="search-button">
-                                <el-input
-                                    v-model="searchName"
-                                    clearable
-                                    @clear="search()"
-                                    suffix-icon="Search"
-                                    @keyup.enter="search()"
-                                    @change="search()"
-                                    :placeholder="$t('commons.button.search')"
-                                ></el-input>
-                            </div>
-                        </el-col>
-                    </el-row>
-                </template>
-                <template #main>
-                    <ComplexTable
-                        :pagination-config="paginationConfig"
-                        v-model:selects="selects"
-                        @search="search"
-                        :data="data"
-                    >
-                        <el-table-column type="selection" fix />
-                        <el-table-column :min-width="80" :label="$t('firewall.address')" prop="address">
-                            <template #default="{ row }">
-                                <span v-if="row.address && row.address !== 'Anywhere'">{{ row.address }}</span>
-                                <span v-else>{{ $t('firewall.allIP') }}</span>
-                            </template>
-                        </el-table-column>
-                        <el-table-column :min-width="80" :label="$t('firewall.strategy')" prop="strategy">
-                            <template #default="{ row }">
-                                <el-button
-                                    v-if="row.strategy === 'accept'"
-                                    @click="onChangeStatus(row, 'drop')"
-                                    link
-                                    type="success"
-                                >
-                                    {{ $t('firewall.allow') }}
+            <div v-if="fireName !== '-'">
+                <el-card v-if="fireStatus != 'running' && maskShow" class="mask-prompt">
+                    <span>{{ $t('firewall.firewallNotStart') }}</span>
+                </el-card>
+
+                <LayoutContent :title="$t('firewall.ipRule')" :class="{ mask: fireStatus != 'running' }">
+                    <template #toolbar>
+                        <el-row>
+                            <el-col :span="16">
+                                <el-button type="primary" @click="onOpenDialog('create')">
+                                    {{ $t('commons.button.create') }} {{ $t('firewall.ipRule') }}
                                 </el-button>
-                                <el-button v-else link type="danger" @click="onChangeStatus(row, 'accept')">
-                                    {{ $t('firewall.deny') }}
+                                <el-button @click="onDelete(null)" plain :disabled="selects.length === 0">
+                                    {{ $t('commons.button.delete') }}
                                 </el-button>
-                            </template>
-                        </el-table-column>
-                        <fu-table-operations
-                            width="200px"
-                            :buttons="buttons"
-                            :ellipsis="10"
-                            :label="$t('commons.table.operate')"
-                            fix
-                        />
-                    </ComplexTable>
-                </template>
-            </LayoutContent>
-        </div>
-        <div v-else>
-            <LayoutContent :title="$t('firewall.firewall')" :divider="true">
-                <template #main>
-                    <div class="app-warn">
-                        <div>
-                            <span>{{ $t('firewall.notSupport') }}</span>
-                            <el-link
-                                style="font-size: 12px; margin-left: 5px"
-                                @click="toDoc"
-                                icon="Position"
-                                type="primary"
-                            >
-                                {{ $t('firewall.quickJump') }}
-                            </el-link>
+                            </el-col>
+                            <el-col :span="8">
+                                <TableSetting @search="search()" />
+                                <div class="search-button">
+                                    <el-input
+                                        v-model="searchName"
+                                        clearable
+                                        @clear="search()"
+                                        suffix-icon="Search"
+                                        @keyup.enter="search()"
+                                        @change="search()"
+                                        :placeholder="$t('commons.button.search')"
+                                    ></el-input>
+                                </div>
+                            </el-col>
+                        </el-row>
+                    </template>
+                    <template #main>
+                        <ComplexTable
+                            :pagination-config="paginationConfig"
+                            v-model:selects="selects"
+                            @search="search"
+                            :data="data"
+                        >
+                            <el-table-column type="selection" fix />
+                            <el-table-column :min-width="80" :label="$t('firewall.address')" prop="address">
+                                <template #default="{ row }">
+                                    <span v-if="row.address && row.address !== 'Anywhere'">{{ row.address }}</span>
+                                    <span v-else>{{ $t('firewall.allIP') }}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column :min-width="80" :label="$t('firewall.strategy')" prop="strategy">
+                                <template #default="{ row }">
+                                    <el-button
+                                        v-if="row.strategy === 'accept'"
+                                        @click="onChangeStatus(row, 'drop')"
+                                        link
+                                        type="success"
+                                    >
+                                        {{ $t('firewall.allow') }}
+                                    </el-button>
+                                    <el-button v-else link type="danger" @click="onChangeStatus(row, 'accept')">
+                                        {{ $t('firewall.deny') }}
+                                    </el-button>
+                                </template>
+                            </el-table-column>
+                            <fu-table-operations
+                                width="200px"
+                                :buttons="buttons"
+                                :ellipsis="10"
+                                :label="$t('commons.table.operate')"
+                                fix
+                            />
+                        </ComplexTable>
+                    </template>
+                </LayoutContent>
+            </div>
+            <div v-else>
+                <LayoutContent :title="$t('firewall.firewall')" :divider="true">
+                    <template #main>
+                        <div class="app-warn">
                             <div>
-                                <img src="@/assets/images/no_app.svg" />
+                                <span>{{ $t('firewall.notSupport') }}</span>
+                                <el-link
+                                    style="font-size: 12px; margin-left: 5px"
+                                    @click="toDoc"
+                                    icon="Position"
+                                    type="primary"
+                                >
+                                    {{ $t('firewall.quickJump') }}
+                                </el-link>
+                                <div>
+                                    <img src="@/assets/images/no_app.svg" />
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </template>
-            </LayoutContent>
+                    </template>
+                </LayoutContent>
+            </div>
         </div>
-
         <OperatrDialog @search="search" ref="dialogRef" />
     </div>
 </template>
