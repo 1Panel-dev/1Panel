@@ -303,8 +303,8 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 		recoverPanelDir := fmt.Sprintf("%s/%s/1panel", baseDir, snap.Name)
 		liveRestore := false
 
-		if !isReTry && !isNewSnapshot {
-			if snap.InterruptStep == "LoadDockerJson" {
+		if !isNewSnapshot {
+			if !isReTry || snap.InterruptStep == "LoadDockerJson" {
 				snapJson.OldDockerDataDir, liveRestore, err = u.loadDockerDataDir()
 				if err != nil {
 					updateRecoverStatus(snap.ID, "LoadDockerJson", constant.StatusFailed, fmt.Sprintf("load docker data dir failed, err: %v", err))
@@ -322,7 +322,7 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 			_ = u.saveJson(snapJson, rootDir)
 
 			_, _ = cmd.Exec("systemctl stop docker")
-			if snap.InterruptStep == "DockerDir" {
+			if !isReTry || snap.InterruptStep == "DockerDir" {
 				if err := u.handleDockerDatas(fileOp, operation, rootDir, snapJson.DockerDataDir); err != nil {
 					updateRecoverStatus(snap.ID, "DockerDir", constant.StatusFailed, err.Error())
 					return
