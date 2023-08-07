@@ -565,7 +565,6 @@ const submit = async (formEl: FormInstance | undefined) => {
                 } else {
                     if (website.value.type === 'proxy') {
                         website.value.proxy = website.value.proxyProtocol + website.value.proxyAddress;
-                        console.log(website.value.proxy);
                     }
                     CreateWebsite(website.value)
                         .then(() => {

@@ -48,7 +48,6 @@ import { ChunkUploadFileData, UploadFileData } from '@/api/modules/files';
 import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
-import { checkFileType } from '@/utils/util';
 
 interface UploadFileProps {
     path: string;
@@ -71,9 +70,7 @@ const handleClose = () => {
 const uploaderFiles = ref<UploadFiles>([]);
 
 const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
-    if (checkFileType(_uploadFile, uploadFiles)) {
-        uploaderFiles.value = uploadFiles;
-    }
+    uploaderFiles.value = uploadFiles;
 };
 
 const handleExceed: UploadProps['onExceed'] = (files) => {
