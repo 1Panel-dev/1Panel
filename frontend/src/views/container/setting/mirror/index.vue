@@ -4,15 +4,22 @@
             <template #header>
                 <DrawerHeader :header="$t('container.mirrors')" :back="handleClose" />
             </template>
-            <el-form label-position="top" @submit.prevent v-loading="loading">
+            <el-form
+                ref="formRef"
+                label-position="top"
+                :model="form"
+                @submit.prevent
+                :rules="rules"
+                v-loading="loading"
+            >
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
-                        <el-form-item :label="$t('container.mirrors')">
+                        <el-form-item :label="$t('container.mirrors')" prop="mirrors">
                             <el-input
                                 type="textarea"
                                 :placeholder="$t('container.mirrorHelper')"
                                 :autosize="{ minRows: 8, maxRows: 10 }"
-                                v-model="mirrors"
+                                v-model="form.mirrors"
                             />
                         </el-form-item>
                     </el-col>
@@ -21,7 +28,7 @@
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button :disabled="loading" type="primary" @click="onSave">
+                    <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
                         {{ $t('commons.button.confirm') }}
                     </el-button>
                 </span>
@@ -32,41 +39,66 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { updateDaemonJson } from '@/api/modules/container';
 import DrawerHeader from '@/components/drawer-header/index.vue';
+import { FormInstance } from 'element-plus';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const confirmDialogRef = ref();
 
-const mirrors = ref();
 interface DialogProps {
     mirrors: string;
 }
 const drawerVisiable = ref();
 const loading = ref();
 
+const form = reactive({
+    mirrors: '',
+});
+const formRef = ref<FormInstance>();
+const rules = reactive({
+    mirrors: [{ validator: checkMirrors, trigger: 'blur' }],
+});
+
+function checkMirrors(rule: any, value: any, callback: any) {
+    if (form.mirrors !== '') {
+        const reg = /^https?:\/\/[a-zA-Z0-9.-]+$/;
+        let mirrors = form.mirrors.split('\n');
+        for (const item of mirrors) {
+            if (!reg.test(item)) {
+                return callback(new Error(i18n.global.t('commons.rule.mirror')));
+            }
+        }
+    }
+    callback();
+}
+
 const acceptParams = (params: DialogProps): void => {
-    mirrors.value = params.mirrors || params.mirrors.replaceAll(',', '\n');
+    form.mirrors = params.mirrors || params.mirrors.replaceAll(',', '\n');
     drawerVisiable.value = true;
 };
 
-const onSave = async () => {
-    let params = {
-        header: i18n.global.t('database.confChange'),
-        operationInfo: i18n.global.t('database.restartNowHelper'),
-        submitInputInfo: i18n.global.t('database.restartNow'),
-    };
-    confirmDialogRef.value!.acceptParams(params);
+const onSave = async (formEl: FormInstance | undefined) => {
+    if (!formEl) return;
+    formEl.validate(async (valid) => {
+        if (!valid) return;
+        let params = {
+            header: i18n.global.t('database.confChange'),
+            operationInfo: i18n.global.t('database.restartNowHelper'),
+            submitInputInfo: i18n.global.t('database.restartNow'),
+        };
+        confirmDialogRef.value!.acceptParams(params);
+    });
 };
 
 const onSubmit = async () => {
     loading.value = true;
-    await updateDaemonJson('Mirrors', mirrors.value.replaceAll('\n', ','))
+    await updateDaemonJson('Mirrors', form.mirrors.replaceAll('\n', ','))
         .then(() => {
             loading.value = false;
             emit('search');

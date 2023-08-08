@@ -4,15 +4,22 @@
             <template #header>
                 <DrawerHeader :header="$t('container.registries')" :back="handleClose" />
             </template>
-            <el-form label-position="top" @submit.prevent v-loading="loading">
+            <el-form
+                ref="formRef"
+                label-position="top"
+                :model="form"
+                :rules="rules"
+                @submit.prevent
+                v-loading="loading"
+            >
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
-                        <el-form-item :label="$t('container.registries')">
+                        <el-form-item :label="$t('container.registries')" prop="registries">
                             <el-input
                                 type="textarea"
                                 :placeholder="$t('container.registrieHelper')"
                                 :autosize="{ minRows: 8, maxRows: 10 }"
-                                v-model="registries"
+                                v-model="form.registries"
                             />
                         </el-form-item>
                     </el-col>
@@ -32,26 +39,47 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { updateDaemonJson } from '@/api/modules/container';
 import DrawerHeader from '@/components/drawer-header/index.vue';
+import { FormInstance } from 'element-plus';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const confirmDialogRef = ref();
 
-const registries = ref();
 interface DialogProps {
     registries: string;
 }
 const drawerVisiable = ref();
 const loading = ref();
 
+const form = reactive({
+    registries: '',
+});
+const formRef = ref<FormInstance>();
+const rules = reactive({
+    registries: [{ validator: checkRegistries, trigger: 'blur' }],
+});
+
+function checkRegistries(rule: any, value: any, callback: any) {
+    if (form.registries !== '') {
+        const reg = /^[a-zA-Z0-9]{1}[a-z:A-Z0-9_/.-]{0,150}$/;
+        let regis = form.registries.split('\n');
+        for (const item of regis) {
+            if (!reg.test(item)) {
+                return callback(new Error(i18n.global.t('commons.rule.imageName')));
+            }
+        }
+    }
+    callback();
+}
+
 const acceptParams = (params: DialogProps): void => {
-    registries.value = params.registries || params.registries.replaceAll(',', '\n');
+    form.registries = params.registries || params.registries.replaceAll(',', '\n');
     drawerVisiable.value = true;
 };
 
@@ -66,7 +94,7 @@ const onSave = async () => {
 
 const onSubmit = async () => {
     loading.value = true;
-    await updateDaemonJson('Registries', registries.value.replaceAll('\n', ','))
+    await updateDaemonJson('Registries', form.registries.replaceAll('\n', ','))
         .then(() => {
             loading.value = false;
             handleClose();

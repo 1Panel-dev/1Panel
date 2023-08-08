@@ -13,7 +13,7 @@ type RemoteDBSearch struct {
 type RemoteDBInfo struct {
 	ID          uint      `json:"id"`
 	CreatedAt   time.Time `json:"createdAt"`
-	Name        string    `json:"name"`
+	Name        string    `json:"name" validate:"max=256"`
 	From        string    `json:"from"`
 	Version     string    `json:"version"`
 	Address     string    `json:"address"`
