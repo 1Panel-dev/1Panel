@@ -37,4 +37,5 @@ type ProcessStatus struct {
 	Status string `json:"status"`
 	PID    string `json:"PID"`
 	Uptime string `json:"uptime"`
+	Msg    string `json:"msg"`
 }

@@ -21,8 +21,18 @@
             <template #main v-if="showTable">
                 <ComplexTable :data="data" :class="{ mask: !supervisorStatus.isRunning }">
                     <el-table-column :label="$t('commons.table.name')" fix prop="name" width="150px"></el-table-column>
-                    <el-table-column :label="$t('tool.supervisor.command')" prop="command"></el-table-column>
-                    <el-table-column :label="$t('tool.supervisor.dir')" prop="dir"></el-table-column>
+                    <el-table-column
+                        :label="$t('tool.supervisor.command')"
+                        prop="command"
+                        fix
+                        show-overflow-tooltip
+                    ></el-table-column>
+                    <el-table-column
+                        :label="$t('tool.supervisor.dir')"
+                        prop="dir"
+                        fix
+                        show-overflow-tooltip
+                    ></el-table-column>
                     <el-table-column :label="$t('tool.supervisor.user')" prop="user" width="100px"></el-table-column>
                     <el-table-column
                         :label="$t('tool.supervisor.numprocs')"
@@ -45,11 +55,26 @@
                                         <el-table-column
                                             property="name"
                                             :label="$t('commons.table.name')"
-                                            width="300"
+                                            fix
+                                            show-overflow-tooltip
                                         />
-                                        <el-table-column property="status" :label="$t('commons.table.status')" />
-                                        <el-table-column property="PID" label="PID" />
-                                        <el-table-column property="uptime" :label="$t('tool.supervisor.uptime')" />
+                                        <el-table-column
+                                            property="status"
+                                            :label="$t('commons.table.status')"
+                                            width="100px"
+                                        />
+                                        <el-table-column property="PID" label="PID" width="100px" />
+                                        <el-table-column
+                                            property="uptime"
+                                            :label="$t('tool.supervisor.uptime')"
+                                            width="100px"
+                                        />
+                                        <el-table-column
+                                            property="msg"
+                                            :label="$t('tool.supervisor.msg')"
+                                            fix
+                                            show-overflow-tooltip
+                                        />
                                     </el-table>
                                 </el-popover>
                             </div>
