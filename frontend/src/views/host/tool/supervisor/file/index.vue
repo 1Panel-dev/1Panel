@@ -52,6 +52,7 @@ import { useDeleteData } from '@/hooks/use-delete-data';
 import { OperateSupervisorProcessFile } from '@/api/modules/host-tool';
 import i18n from '@/lang';
 import { TabsPaneContext } from 'element-plus';
+import { MsgSuccess } from '@/utils/message';
 
 const extensions = [javascript(), oneDark];
 const loading = ref(false);
@@ -113,6 +114,7 @@ const submit = () => {
     loading.value = true;
     OperateSupervisorProcessFile(updateReq)
         .then(() => {
+            MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             getContent();
         })
         .finally(() => {

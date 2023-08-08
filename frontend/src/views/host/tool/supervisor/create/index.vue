@@ -21,7 +21,7 @@
                         </el-input>
                     </el-form-item>
                     <el-form-item :label="$t('tool.supervisor.command')" prop="command">
-                        <el-input v-model.trim="process.command"></el-input>
+                        <el-input v-model="process.command"></el-input>
                     </el-form-item>
                     <el-form-item :label="$t('tool.supervisor.numprocs')" prop="numprocsNum">
                         <el-input type="number" v-model.number="process.numprocsNum"></el-input>
@@ -54,7 +54,7 @@ const open = ref(false);
 const loading = ref(false);
 const processForm = ref<FormInstance>();
 const rules = ref({
-    name: [Rules.requiredInput],
+    name: [Rules.requiredInput, Rules.simpleName],
     dir: [Rules.requiredInput],
     command: [Rules.requiredInput],
     user: [Rules.requiredInput],
@@ -64,7 +64,7 @@ const initData = () => ({
     operate: 'create',
     name: '',
     command: '',
-    user: '',
+    user: 'root',
     dir: '',
     numprocsNum: 1,
     numprocs: '1',
@@ -89,9 +89,9 @@ const resetForm = () => {
 
 const acceptParams = (operate: string, config: HostTool.SupersivorProcess) => {
     process.value = initData();
-    if (operate == 'edit') {
+    if (operate == 'update') {
         process.value = {
-            operate: 'edit',
+            operate: 'update',
             name: config.name,
             command: config.command,
             user: config.user,

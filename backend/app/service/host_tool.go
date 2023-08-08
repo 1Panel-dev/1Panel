@@ -110,7 +110,7 @@ func (h *HostToolService) GetToolStatus(req request.HostToolReq) (*response.Host
 			if !fileOp.Stat(configPath) {
 				configPath = "/etc/supervisor/supervisord.conf"
 				if !fileOp.Stat(configPath) {
-					return nil, errors.New("ErrConfigNotFound")
+					return nil, buserr.New("ErrConfigNotFound")
 				}
 			}
 		}
@@ -125,7 +125,7 @@ func (h *HostToolService) CreateToolConfig(req request.HostToolCreate) error {
 	case constant.Supervisord:
 		fileOp := files.NewFileOp()
 		if !fileOp.Stat(req.ConfigPath) {
-			return errors.New("ErrConfigNotFound")
+			return buserr.New("ErrConfigNotFound")
 		}
 		cfg, err := ini.Load(req.ConfigPath)
 		if err != nil {
@@ -281,7 +281,7 @@ func (h *HostToolService) OperateSupervisorProcess(req request.SupervisorProcess
 		iniPath        = path.Join(includeDir, fmt.Sprintf("%s.ini", req.Name))
 		fileOp         = files.NewFileOp()
 	)
-	if req.Operate == "edit" || req.Operate == "create" {
+	if req.Operate == "update" || req.Operate == "create" {
 		if !fileOp.Stat(req.Dir) {
 			return buserr.New("ErrConfigDirNotFound")
 		}
@@ -318,7 +318,7 @@ func (h *HostToolService) OperateSupervisorProcess(req request.SupervisorProcess
 			return err
 		}
 		return operateSupervisorCtl("reload", "", "")
-	case "edit":
+	case "update":
 		configFile, err := ini.Load(iniPath)
 		if err != nil {
 			return err
