@@ -542,11 +542,11 @@ func upAppPre(app model.App, appInstall *model.AppInstall) error {
 	fileOp := files.NewFileOp()
 	switch app.Key {
 	case "nexus":
-		return fileOp.Chown(dataPath, 200, 0)
+		return fileOp.ChownR(dataPath, "200", "0", true)
 	case "sftpgo":
-		return files.NewFileOp().Chown(dataPath, 1000, 1000)
+		return fileOp.ChownR(dataPath, "1000", "1000", true)
 	case "pgadmin4":
-		return files.NewFileOp().Chown(dataPath, 5050, 5050)
+		return fileOp.ChownR(dataPath, "5050", "5050", true)
 	}
 	return nil
 }
