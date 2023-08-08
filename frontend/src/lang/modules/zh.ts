@@ -1340,7 +1340,6 @@ const message = {
         current: '当前',
         rewriteHelper: '若设置伪静态后，网站无法正常访问，请尝试设置回default',
         runDir: '运行目录',
-        runDirHelper: '部分程序需要指定二级目录作为运行目录，如ThinkPHP5，Laravel',
         runUserHelper:
             '通过 PHP 运行环境部署的网站，需要将 index 和子目录下的所有文件、文件夹所有者和用户组设置为 1000',
         userGroup: '运行用户/组',
@@ -1424,7 +1423,7 @@ const message = {
         disableFunction: '禁用函数',
         disableFunctionHelper: '输入要禁用的函数，例如exec，多个请用,分割',
         uploadMaxSize: '上传限制',
-        indexHelper: '为保障 PHP 网站正常运行，请将代码放置于 index 目录，并避免重命名',
+        indexHelper: '为保障 PHP 网站正常运行，请将代码放置于主目录下的 index 目录，并避免重命名',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '服务器名字的hash表大小',

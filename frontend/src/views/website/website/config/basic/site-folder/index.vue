@@ -14,6 +14,9 @@
                             </el-icon>
                         </el-button>
                     </el-space>
+                    <span class="input-help" v-if="configDir">
+                        {{ $t('php.indexHelper') }}
+                    </span>
                 </el-form-item>
                 <el-form-item v-if="configDir" :label="$t('website.runDir')">
                     <el-space wrap>
@@ -50,9 +53,7 @@
             </el-form>
             <el-alert :closable="false" v-if="configDir">
                 <template #default>
-                    <span class="warnHelper">{{ $t('website.runDirHelper') }}</span>
                     <span class="warnHelper">{{ $t('website.runUserHelper') }}</span>
-                    <span class="warnHelper">{{ $t('php.indexHelper') }}</span>
                 </template>
             </el-alert>
             <br />
