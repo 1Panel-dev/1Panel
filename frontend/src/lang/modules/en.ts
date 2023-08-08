@@ -48,6 +48,7 @@ const message = {
             ignore: 'Ignore upgrade',
             copy: 'Copy',
             random: 'Random',
+            uninstall: 'Uninstall',
         },
         search: {
             timeStart: 'Time start',

@@ -33,6 +33,7 @@ const dialogVisiable = ref();
 
 interface DialogProps {
     port: any;
+    protocol: string;
 }
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
@@ -40,16 +41,17 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
         MsgError(i18n.global.t('setting.errPort'));
         return;
     }
+    let protocol = params.protocol === 'https' ? 'https' : 'http';
     const res = await getSettingInfo();
     if (!res.data.systemIP) {
         dialogVisiable.value = true;
         return;
     }
     if (!checkIp(res.data.systemIP) || !checkDomain(res.data.systemIP)) {
-        window.open(`http://${res.data.systemIP}:${params.port}`, '_blank');
+        window.open(`${protocol}://${res.data.systemIP}:${params.port}`, '_blank');
         return;
     }
-    window.open(`http://[${res.data.systemIP}]:${params.port}`, '_blank');
+    window.open(`${protocol}://[${res.data.systemIP}]:${params.port}`, '_blank');
 };
 
 const goRouter = async (path: string) => {
