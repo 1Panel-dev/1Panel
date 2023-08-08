@@ -98,10 +98,6 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (err error) {
 	if err != nil {
 		return
 	}
-	composeService, err := getComposeService(create.Name, newNameDir, composeContent, envContent, false)
-	if err != nil {
-		return
-	}
 	runtime := &model.Runtime{
 		Name:          create.Name,
 		DockerCompose: string(composeContent),
@@ -117,7 +113,7 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (err error) {
 	if err = runtimeRepo.Create(context.Background(), runtime); err != nil {
 		return
 	}
-	go buildRuntime(runtime, composeService, "")
+	go buildRuntime(runtime, "")
 	return
 }
 
@@ -260,7 +256,6 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 	if err != nil {
 		return err
 	}
-	composeService, err := getComposeService(runtime.Name, runtimeDir, composeContent, envContent, false)
 	if err != nil {
 		return err
 	}
@@ -277,6 +272,6 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 	if err != nil {
 		return err
 	}
-	go buildRuntime(runtime, composeService, imageID)
+	go buildRuntime(runtime, imageID)
 	return nil
 }

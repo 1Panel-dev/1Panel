@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
@@ -8,20 +9,42 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
-	"github.com/docker/cli/cli/command"
 	"github.com/subosito/gotenv"
+	"io"
 	"os"
+	"os/exec"
 	"path"
 	"strings"
 )
 
-func buildRuntime(runtime *model.Runtime, service *docker.ComposeService, oldImageID string) {
-	err := service.ComposeBuild()
+func buildRuntime(runtime *model.Runtime, oldImageID string) {
+	runtimePath := path.Join(constant.RuntimeDir, runtime.Type, runtime.Name)
+	composePath := path.Join(runtimePath, "docker-compose.yml")
+	logPath := path.Join(runtimePath, "build.log")
+
+	logFile, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
+	if err != nil {
+		fmt.Println("Failed to open log file:", err)
+		return
+	}
+	defer func() {
+		_ = logFile.Close()
+	}()
+
+	cmd := exec.Command("docker-compose", "-f", composePath, "build")
+	multiWriterStdout := io.MultiWriter(os.Stdout, logFile)
+	cmd.Stdout = multiWriterStdout
+	var stderrBuf bytes.Buffer
+	multiWriterStderr := io.MultiWriter(&stderrBuf, logFile, os.Stderr)
+	cmd.Stderr = multiWriterStderr
+
+	err = cmd.Run()
 	if err != nil {
 		runtime.Status = constant.RuntimeError
-		runtime.Message = buserr.New(constant.ErrImageBuildErr).Error() + ":" + err.Error()
+		runtime.Message = buserr.New(constant.ErrImageBuildErr).Error() + ":" + stderrBuf.String()
 	} else {
 		runtime.Status = constant.RuntimeNormal
+		runtime.Message = ""
 		if oldImageID != "" {
 			client, err := docker.NewClient()
 			if err == nil {
@@ -82,26 +105,4 @@ func handleParams(image, runtimeType, runtimeDir string, params map[string]inter
 	}
 	envContent = []byte(envStr)
 	return
-}
-
-func getComposeService(name, runtimeDir string, composeFile, env []byte, skipNormalization bool) (*docker.ComposeService, error) {
-	project, err := docker.GetComposeProject(name, runtimeDir, composeFile, env, skipNormalization)
-	if err != nil {
-		return nil, err
-	}
-	logPath := path.Join(runtimeDir, "build.log")
-	fileOp := files.NewFileOp()
-	if fileOp.Stat(logPath) {
-		_ = fileOp.DeleteFile(logPath)
-	}
-	file, err := os.Create(logPath)
-	if err != nil {
-		return nil, err
-	}
-	composeService, err := docker.NewComposeService(command.WithOutputStream(file))
-	if err != nil {
-		return nil, err
-	}
-	composeService.SetProject(project)
-	return composeService, nil
 }
