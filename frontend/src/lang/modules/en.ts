@@ -1405,8 +1405,6 @@ const message = {
         rewriteHelper:
             'If the website cannot be accessed normally after setting pseudo-static, please try to set it back to default',
         runDir: 'Run Directory',
-        runDirHelper:
-            'Some programs need to specify a secondary directory as the running directory, e.g. ThinkPHP5, Laravel',
         runUserHelper:
             'For websites deployed through the PHP runtime environment, all files, folder owners, and user groups under the index and subdirectories need to be set to 1000, command: chown -R 1000:1000 index',
         userGroup: 'User/Group',

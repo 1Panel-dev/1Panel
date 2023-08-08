@@ -1341,7 +1341,6 @@ const message = {
         current: '當前',
         rewriteHelper: '若設置偽靜態後，網站無法正常訪問，請嘗試設置回default',
         runDir: '運行目錄',
-        runDirHelper: '部分程序需要指定二級目錄作為運行目錄，如ThinkPHP5，Laravel',
         runUserHelper:
             '通過 PHP 運行環境部署的網站，需要將 index 和子目錄下的所有文件、文件夾所有者和用戶組設置為 1000',
         userGroup: '運行用戶/組',
