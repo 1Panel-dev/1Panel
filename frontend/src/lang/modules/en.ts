@@ -667,6 +667,8 @@ const message = {
         startIn: ' to start',
     },
     cronjob: {
+        create: 'Create Cronjob',
+        edit: 'Edit Cronjob',
         cronTask: 'Cronjob',
         changeStatus: 'Change status',
         disableMsg:
