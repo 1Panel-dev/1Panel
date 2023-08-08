@@ -218,7 +218,7 @@ func (s sftpClient) getBucket() (string, error) {
 	}
 }
 
-func (s sftpClient) ListObjects(prefix string) ([]interface{}, error) {
+func (s sftpClient) ListObjects(prefix string) ([]string, error) {
 	bucket, err := s.getBucket()
 	if err != nil {
 		return nil, err
@@ -236,7 +236,7 @@ func (s sftpClient) ListObjects(prefix string) ([]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	var result []interface{}
+	var result []string
 	for _, file := range files {
 		result = append(result, file.Name())
 	}

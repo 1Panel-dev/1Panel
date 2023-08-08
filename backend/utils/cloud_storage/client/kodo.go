@@ -119,13 +119,13 @@ func (kodo *kodoClient) GetBucket() (string, error) {
 	}
 }
 
-func (kodo kodoClient) ListObjects(prefix string) ([]interface{}, error) {
+func (kodo kodoClient) ListObjects(prefix string) ([]string, error) {
 	bucket, err := kodo.GetBucket()
 	if err != nil {
 		return nil, constant.ErrInvalidParams
 	}
 
-	var result []interface{}
+	var result []string
 	marker := ""
 	for {
 		entries, _, nextMarker, hashNext, err := kodo.client.ListFiles(bucket, prefix, "", marker, 1000)

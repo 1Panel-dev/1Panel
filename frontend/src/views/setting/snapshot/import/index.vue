@@ -113,9 +113,6 @@ const loadBackups = async () => {
 const loadFiles = async () => {
     const res = await getFilesFromBackup(form.from);
     fileNames.value = res.data || [];
-    for (let i = 0; i < fileNames.value.length; i++) {
-        fileNames.value[i] = fileNames.value[i].replaceAll('system_snapshot/', '');
-    }
 };
 
 defineExpose({

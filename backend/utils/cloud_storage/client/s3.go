@@ -184,13 +184,13 @@ func (s3C *s3Client) getBucket() (string, error) {
 	}
 }
 
-func (s3C *s3Client) ListObjects(prefix string) ([]interface{}, error) {
+func (s3C *s3Client) ListObjects(prefix string) ([]string, error) {
 	bucket, err := s3C.getBucket()
 	if err != nil {
 		return nil, constant.ErrInvalidParams
 	}
 	svc := s3.New(&s3C.Sess)
-	var result []interface{}
+	var result []string
 	if err := svc.ListObjectsPages(&s3.ListObjectsInput{
 		Bucket: &bucket,
 		Prefix: &prefix,

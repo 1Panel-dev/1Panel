@@ -37,7 +37,7 @@ type IBackupService interface {
 	BatchDeleteRecord(ids []uint) error
 	NewClient(backup *model.BackupAccount) (cloud_storage.CloudStorageClient, error)
 
-	ListFiles(req dto.BackupSearchFile) ([]interface{}, error)
+	ListFiles(req dto.BackupSearchFile) ([]string, error)
 
 	MysqlBackup(db dto.CommonBackup) error
 	MysqlRecover(db dto.CommonRecover) error
@@ -273,7 +273,7 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 	return nil
 }
 
-func (u *BackupService) ListFiles(req dto.BackupSearchFile) ([]interface{}, error) {
+func (u *BackupService) ListFiles(req dto.BackupSearchFile) ([]string, error) {
 	backup, err := backupRepo.Get(backupRepo.WithByType(req.Type))
 	if err != nil {
 		return nil, err
@@ -284,9 +284,19 @@ func (u *BackupService) ListFiles(req dto.BackupSearchFile) ([]interface{}, erro
 	}
 	prefix := "system_snapshot"
 	if len(backup.BackupPath) != 0 {
-		prefix = path.Join("/"+strings.TrimPrefix(backup.BackupPath, "/"), prefix)
+		prefix = path.Join(strings.TrimPrefix(backup.BackupPath, "/"), prefix)
 	}
-	return client.ListObjects(prefix)
+	files, err := client.ListObjects(prefix)
+	if err != nil {
+		return nil, err
+	}
+	var datas []string
+	for _, file := range files {
+		if len(file) != 0 {
+			datas = append(datas, path.Base(file))
+		}
+	}
+	return datas, nil
 }
 
 func (u *BackupService) NewClient(backup *model.BackupAccount) (cloud_storage.CloudStorageClient, error) {

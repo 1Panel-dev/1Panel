@@ -127,7 +127,7 @@ func (cos *cosClient) GetBucket() (string, error) {
 	}
 }
 
-func (cos cosClient) ListObjects(prefix string) ([]interface{}, error) {
+func (cos cosClient) ListObjects(prefix string) ([]string, error) {
 	client, err := cos.newClientWithBucket()
 	if err != nil {
 		return nil, err
@@ -137,7 +137,7 @@ func (cos cosClient) ListObjects(prefix string) ([]interface{}, error) {
 		return nil, err
 	}
 
-	var result []interface{}
+	var result []string
 	for _, item := range datas.Contents {
 		result = append(result, item.Key)
 	}
