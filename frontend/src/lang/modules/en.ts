@@ -181,6 +181,7 @@ const message = {
             appName: 'Support English, numbers, - and _, length 2-30, and cannot start and end with -_',
             containerName:
                 'Supports letters, numbers, underscores, hyphens and dots, cannot end with hyphen- or dot.1-127',
+            mirror: 'Support image accelerator addresses that start with http(s)://, English uppercase and lowercase letters, numbers, periods, and hyphens, and there should be no empty lines.',
             disableFunction: 'Only support letters ,underscores,and,',
             leechExts: 'Only support letters, numbers and,',
             paramSimple: 'Support lowercase letters and numbers, length 1-128',

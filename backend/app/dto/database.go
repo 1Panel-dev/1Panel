@@ -117,7 +117,7 @@ type MysqlConfUpdateByFile struct {
 
 type ChangeDBInfo struct {
 	ID    uint   `json:"id"`
-	From  string `json:"from" validate:"required"`
+	From  string `json:"from"`
 	Value string `json:"value" validate:"required"`
 }
 

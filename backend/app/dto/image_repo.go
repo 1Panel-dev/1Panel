@@ -15,8 +15,8 @@ type ImageRepoUpdate struct {
 	ID          uint   `json:"id"`
 	DownloadUrl string `json:"downloadUrl"`
 	Protocol    string `json:"protocol"`
-	Username    string `json:"username"`
-	Password    string `json:"password"`
+	Username    string `json:"username" validate:"max=256"`
+	Password    string `json:"password" validate:"max=256"`
 	Auth        bool   `json:"auth"`
 }
 
