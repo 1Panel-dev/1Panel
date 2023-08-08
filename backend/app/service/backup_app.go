@@ -208,10 +208,18 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 		}
 	}
 
+	appDir := install.GetPath()
+	backPath := fmt.Sprintf("%s_bak", appDir)
+	_ = fileOp.Rename(appDir, backPath)
+	_ = fileOp.CreateDir(appDir, 0755)
+
 	if err := handleUnTar(tmpPath+"/app.tar.gz", fmt.Sprintf("%s/%s", constant.AppInstallDir, install.App.Key)); err != nil {
 		global.LOG.Errorf("handle recover from app.tar.gz failed, err: %v", err)
+		_ = fileOp.DeleteDir(appDir)
+		_ = fileOp.Rename(backPath, appDir)
 		return err
 	}
+	_ = fileOp.DeleteDir(backPath)
 
 	if len(newEnvFile) != 0 {
 		envPath := fmt.Sprintf("%s/%s/%s/.env", constant.AppInstallDir, install.App.Key, install.Name)
@@ -233,6 +241,7 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 		return err
 	}
 	isOk = true
+
 	return nil
 }
 
