@@ -83,11 +83,12 @@ func Dump(dns string, opts ...DumpOption) error {
 	buf := bufio.NewWriter(o.writer)
 	defer buf.Flush()
 
-	_, _ = buf.WriteString("-- ----------------------------\n")
-	_, _ = buf.WriteString("-- MySQL Database Dump\n")
-	_, _ = buf.WriteString("-- Start Time: " + start.Format("2006-01-02 15:04:05") + "\n")
-	_, _ = buf.WriteString("-- ----------------------------\n")
-	_, _ = buf.WriteString("\n\n")
+	itemFile, lineNumber := "", 0
+
+	itemFile += "-- ----------------------------\n"
+	itemFile += "-- MySQL Database Dump\n"
+	itemFile += "-- Start Time: " + start.Format("2006-01-02 15:04:05") + "\n"
+	itemFile += "-- ----------------------------\n\n\n"
 
 	db, err := sql.Open("mysql", dns)
 	if err != nil {
@@ -121,28 +122,76 @@ func Dump(dns string, opts ...DumpOption) error {
 
 	for _, table := range tables {
 		if o.isDropTable {
-			_, _ = buf.WriteString(fmt.Sprintf("DROP TABLE IF EXISTS `%s`;\n", table))
+			itemFile += fmt.Sprintf("DROP TABLE IF EXISTS `%s`;\n", table)
 		}
 
-		err = writeTableStruct(db, table, buf)
+		itemFile += "-- ----------------------------\n"
+		itemFile += fmt.Sprintf("-- Table structure for %s\n", table)
+		itemFile += "-- ----------------------------\n"
+
+		createTableSQL, err := getCreateTableSQL(db, table)
 		if err != nil {
-			global.LOG.Errorf("write table struct failed, err: %v", err)
+			global.LOG.Errorf("get create table sql failed, err: %v", err)
 			return err
 		}
+		itemFile += createTableSQL
+		itemFile += ";\n\n\n\n"
 
 		if o.isData {
-			err = writeTableData(db, table, buf)
+			itemFile += "-- ----------------------------\n"
+			itemFile += fmt.Sprintf("-- Records of %s\n", table)
+			itemFile += "-- ----------------------------\n"
+
+			lineRows, err := db.Query(fmt.Sprintf("SELECT * FROM `%s`", table))
 			if err != nil {
-				global.LOG.Errorf("write table data failed, err: %v", err)
+				global.LOG.Errorf("exec `select * from %s` failed, err: %v", table, err)
 				return err
 			}
+			defer lineRows.Close()
+
+			var columns []string
+			columns, err = lineRows.Columns()
+			if err != nil {
+				global.LOG.Errorf("get columes falied, err: %v", err)
+				return err
+			}
+			columnTypes, err := lineRows.ColumnTypes()
+			if err != nil {
+				global.LOG.Errorf("get colume types failed, err: %v", err)
+				return err
+			}
+			for lineRows.Next() {
+				row := make([]interface{}, len(columns))
+				rowPointers := make([]interface{}, len(columns))
+				for i := range columns {
+					rowPointers[i] = &row[i]
+				}
+				if err = lineRows.Scan(rowPointers...); err != nil {
+					global.LOG.Errorf("scan row data failed, err: %v", err)
+					return err
+				}
+				ssql := loadDataSql(row, columnTypes, table)
+				if len(ssql) != 0 {
+					itemFile += ssql
+					lineNumber++
+				}
+				if lineNumber > 500 {
+					_, _ = buf.WriteString(itemFile)
+					itemFile = ""
+					lineNumber = 0
+				}
+			}
+
+			itemFile += "\n\n"
 		}
 	}
 
-	_, _ = buf.WriteString("-- ----------------------------\n")
-	_, _ = buf.WriteString("-- Dumped by mysqldump\n")
-	_, _ = buf.WriteString("-- Cost Time: " + time.Since(start).String() + "\n")
-	_, _ = buf.WriteString("-- ----------------------------\n")
+	itemFile += "-- ----------------------------\n"
+	itemFile += "-- Dumped by mysqldump\n"
+	itemFile += "-- Cost Time: " + time.Since(start).String() + "\n"
+	itemFile += "-- ----------------------------\n"
+
+	_, _ = buf.WriteString(itemFile)
 	_ = buf.Flush()
 
 	return nil
@@ -177,151 +226,89 @@ func getAllTables(db *sql.DB) ([]string, error) {
 	return tables, nil
 }
 
-func writeTableStruct(db *sql.DB, table string, buf *bufio.Writer) error {
-	_, _ = buf.WriteString("-- ----------------------------\n")
-	_, _ = buf.WriteString(fmt.Sprintf("-- Table structure for %s\n", table))
-	_, _ = buf.WriteString("-- ----------------------------\n")
-
-	createTableSQL, err := getCreateTableSQL(db, table)
-	if err != nil {
-		global.LOG.Errorf("get create table sql failed, err: %v", err)
-		return err
-	}
-	_, _ = buf.WriteString(createTableSQL)
-	_, _ = buf.WriteString(";")
-
-	_, _ = buf.WriteString("\n\n")
-	_, _ = buf.WriteString("\n\n")
-	return nil
-}
-
-func writeTableData(db *sql.DB, table string, buf *bufio.Writer) error {
-	_, _ = buf.WriteString("-- ----------------------------\n")
-	_, _ = buf.WriteString(fmt.Sprintf("-- Records of %s\n", table))
-	_, _ = buf.WriteString("-- ----------------------------\n")
-
-	lineRows, err := db.Query(fmt.Sprintf("SELECT * FROM `%s`", table))
-	if err != nil {
-		global.LOG.Errorf("exec `select * from %s` failed, err: %v", table, err)
-		return err
-	}
-	defer lineRows.Close()
-
-	var columns []string
-	columns, err = lineRows.Columns()
-	if err != nil {
-		global.LOG.Errorf("get columes falied, err: %v", err)
-		return err
-	}
-	columnTypes, err := lineRows.ColumnTypes()
-	if err != nil {
-		global.LOG.Errorf("get colume types failed, err: %v", err)
-		return err
-	}
-
-	var values [][]interface{}
-	for lineRows.Next() {
-		row := make([]interface{}, len(columns))
-		rowPointers := make([]interface{}, len(columns))
-		for i := range columns {
-			rowPointers[i] = &row[i]
-		}
-		err = lineRows.Scan(rowPointers...)
-		if err != nil {
-			global.LOG.Errorf("scan row data failed, err: %v", err)
-			return err
-		}
-		values = append(values, row)
-	}
-
-	for _, row := range values {
-		ssql := "INSERT INTO `" + table + "` VALUES ("
-
-		for i, col := range row {
-			if col == nil {
-				ssql += "NULL"
-			} else {
-				Type := columnTypes[i].DatabaseTypeName()
-				Type = strings.Replace(Type, "UNSIGNED", "", -1)
-				Type = strings.Replace(Type, " ", "", -1)
-				switch Type {
-				case "TINYINT", "SMALLINT", "MEDIUMINT", "INT", "INTEGER", "BIGINT":
-					if bs, ok := col.([]byte); ok {
-						ssql += string(bs)
-					} else {
-						ssql += fmt.Sprintf("%d", col)
-					}
-				case "FLOAT", "DOUBLE":
-					if bs, ok := col.([]byte); ok {
-						ssql += string(bs)
-					} else {
-						ssql += fmt.Sprintf("%f", col)
-					}
-				case "DECIMAL", "DEC":
-					ssql += fmt.Sprintf("%s", col)
-
-				case "DATE":
-					t, ok := col.(time.Time)
-					if !ok {
-						global.LOG.Errorf("the DATE type conversion failed., err: %v", err)
-						return err
-					}
-					ssql += fmt.Sprintf("'%s'", t.Format("2006-01-02"))
-				case "DATETIME":
-					t, ok := col.(time.Time)
-					if !ok {
-						global.LOG.Errorf("the DATETIME type conversion failed., err: %v", err)
-						return err
-					}
-					ssql += fmt.Sprintf("'%s'", t.Format("2006-01-02 15:04:05"))
-				case "TIMESTAMP":
-					t, ok := col.(time.Time)
-					if !ok {
-						global.LOG.Errorf("the TIMESTAMP type conversion failed., err: %v", err)
-						return err
-					}
-					ssql += fmt.Sprintf("'%s'", t.Format("2006-01-02 15:04:05"))
-				case "TIME":
-					t, ok := col.([]byte)
-					if !ok {
-						global.LOG.Errorf("the TIME type conversion failed., err: %v", err)
-						return err
-					}
-					ssql += fmt.Sprintf("'%s'", string(t))
-				case "YEAR":
-					t, ok := col.([]byte)
-					if !ok {
-						global.LOG.Errorf("the YEAR type conversion failed., err: %v", err)
-						return err
-					}
-					ssql += string(t)
-				case "CHAR", "VARCHAR", "TINYTEXT", "TEXT", "MEDIUMTEXT", "LONGTEXT":
-					ssql += fmt.Sprintf("'%s'", strings.Replace(fmt.Sprintf("%s", col), "'", "''", -1))
-				case "BIT", "BINARY", "VARBINARY", "TINYBLOB", "BLOB", "MEDIUMBLOB", "LONGBLOB":
-					ssql += fmt.Sprintf("0x%X", col)
-				case "ENUM", "SET":
-					ssql += fmt.Sprintf("'%s'", col)
-				case "BOOL", "BOOLEAN":
-					if col.(bool) {
-						ssql += "true"
-					} else {
-						ssql += "false"
-					}
-				case "JSON":
-					ssql += fmt.Sprintf("'%s'", col)
-				default:
-					global.LOG.Errorf("unsupported colume type: %s", Type)
-					return fmt.Errorf("unsupported colume type: %s", Type)
+func loadDataSql(row []interface{}, columnTypes []*sql.ColumnType, table string) string {
+	ssql := "INSERT INTO `" + table + "` VALUES ("
+	for i, col := range row {
+		if col == nil {
+			ssql += "NULL"
+		} else {
+			Type := columnTypes[i].DatabaseTypeName()
+			Type = strings.Replace(Type, "UNSIGNED", "", -1)
+			Type = strings.Replace(Type, " ", "", -1)
+			switch Type {
+			case "TINYINT", "SMALLINT", "MEDIUMINT", "INT", "INTEGER", "BIGINT":
+				if bs, ok := col.([]byte); ok {
+					ssql += string(bs)
+				} else {
+					ssql += fmt.Sprintf("%d", col)
 				}
-			}
-			if i < len(row)-1 {
-				ssql += ","
+			case "FLOAT", "DOUBLE":
+				if bs, ok := col.([]byte); ok {
+					ssql += string(bs)
+				} else {
+					ssql += fmt.Sprintf("%f", col)
+				}
+			case "DECIMAL", "DEC":
+				ssql += fmt.Sprintf("%s", col)
+
+			case "DATE":
+				t, ok := col.(time.Time)
+				if !ok {
+					global.LOG.Errorf("the DATE type conversion failed, err value: %v", col)
+					return ""
+				}
+				ssql += fmt.Sprintf("'%s'", t.Format("2006-01-02"))
+			case "DATETIME":
+				t, ok := col.(time.Time)
+				if !ok {
+					global.LOG.Errorf("the DATETIME type conversion failed, err value: %v", col)
+					return ""
+				}
+				ssql += fmt.Sprintf("'%s'", t.Format("2006-01-02 15:04:05"))
+			case "TIMESTAMP":
+				t, ok := col.(time.Time)
+				if !ok {
+					global.LOG.Errorf("the TIMESTAMP type conversion failed, err value: %v", col)
+					return ""
+				}
+				ssql += fmt.Sprintf("'%s'", t.Format("2006-01-02 15:04:05"))
+			case "TIME":
+				t, ok := col.([]byte)
+				if !ok {
+					global.LOG.Errorf("the TIME type conversion failed, err value: %v", col)
+					return ""
+				}
+				ssql += fmt.Sprintf("'%s'", string(t))
+			case "YEAR":
+				t, ok := col.([]byte)
+				if !ok {
+					global.LOG.Errorf("the YEAR type conversion failed, err value: %v", col)
+					return ""
+				}
+				ssql += string(t)
+			case "CHAR", "VARCHAR", "TINYTEXT", "TEXT", "MEDIUMTEXT", "LONGTEXT":
+				ssql += fmt.Sprintf("'%s'", strings.Replace(fmt.Sprintf("%s", col), "'", "''", -1))
+			case "BIT", "BINARY", "VARBINARY", "TINYBLOB", "BLOB", "MEDIUMBLOB", "LONGBLOB":
+				ssql += fmt.Sprintf("0x%X", col)
+			case "ENUM", "SET":
+				ssql += fmt.Sprintf("'%s'", col)
+			case "BOOL", "BOOLEAN":
+				if col.(bool) {
+					ssql += "true"
+				} else {
+					ssql += "false"
+				}
+			case "JSON":
+				ssql += fmt.Sprintf("'%s'", col)
+			default:
+				global.LOG.Errorf("unsupported colume type: %s", Type)
+				return ""
 			}
 		}
-		ssql += ");\n"
-		_, _ = buf.WriteString(ssql)
+		if i < len(row)-1 {
+			ssql += ","
+		}
 	}
-
-	_, _ = buf.WriteString("\n\n")
-	return nil
+	ssql += ");\n"
+	return ssql
 }
