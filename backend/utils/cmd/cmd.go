@@ -168,3 +168,8 @@ func SudoHandleCmd() string {
 	}
 	return ""
 }
+
+func Which(name string) bool {
+	_, err := exec.LookPath(name)
+	return err == nil
+}

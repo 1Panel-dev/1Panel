@@ -8,7 +8,7 @@
                 {{ $t('website.log') }}
             </el-button>
             <el-button type="primary" :plain="activeName !== '3'" @click="changeTab('3')">
-                {{ $t('website.basic') }}
+                {{ $t('commons.button.init') }}
             </el-button>
         </template>
         <template #main>

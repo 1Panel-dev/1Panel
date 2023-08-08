@@ -43,11 +43,17 @@ func (h *HostToolService) GetToolStatus(req request.HostToolReq) (*response.Host
 	res.Type = req.Type
 	switch req.Type {
 	case constant.Supervisord:
-		exist, _ := systemctl.IsExist(constant.Supervisord)
 		supervisorConfig := &response.Supervisor{}
-		if !exist {
-			exist, _ = systemctl.IsExist(constant.Supervisor)
-			if !exist {
+		if !cmd.Which(constant.Supervisord) {
+			supervisorConfig.IsExist = false
+			res.Config = supervisorConfig
+			return res, nil
+		}
+		supervisorConfig.IsExist = true
+		serviceExist, _ := systemctl.IsExist(constant.Supervisord)
+		if !serviceExist {
+			serviceExist, _ = systemctl.IsExist(constant.Supervisor)
+			if !serviceExist {
 				supervisorConfig.IsExist = false
 				res.Config = supervisorConfig
 				return res, nil
@@ -57,7 +63,6 @@ func (h *HostToolService) GetToolStatus(req request.HostToolReq) (*response.Host
 		} else {
 			supervisorConfig.ServiceName = constant.Supervisord
 		}
-		supervisorConfig.IsExist = true
 
 		serviceNameSet, _ := settingRepo.Get(settingRepo.WithByKey(constant.SupervisorServiceName))
 		if serviceNameSet.ID != 0 || serviceNameSet.Value != "" {
