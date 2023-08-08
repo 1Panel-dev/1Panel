@@ -196,10 +196,18 @@
                                             <el-tag
                                                 class="middle-center"
                                                 v-if="installed.httpPort > 0"
-                                                @click="goDashboard(installed.httpPort)"
+                                                @click="goDashboard(installed.httpPort, 'http')"
                                             >
                                                 <el-icon class="middle-center"><Position /></el-icon>
                                                 {{ $t('app.busPort') }}：{{ installed.httpPort }}
+                                            </el-tag>
+                                            <el-tag
+                                                class="middle-center"
+                                                v-if="installed.httpsPort > 0"
+                                                @click="goDashboard(installed.httpsPort, 'https')"
+                                            >
+                                                <el-icon class="middle-center"><Position /></el-icon>
+                                                {{ $t('app.busPort') }}：{{ installed.httpsPort }}
                                             </el-tag>
                                             <div class="description">
                                                 <span>
@@ -358,8 +366,8 @@ const search = () => {
     });
 };
 
-const goDashboard = async (port: any) => {
-    dialogPortJumpRef.value.acceptParams({ port: port });
+const goDashboard = async (port: any, protocol: string) => {
+    dialogPortJumpRef.value.acceptParams({ port: port, protocol: protocol });
 };
 
 const openOperate = (row: any, op: string) => {
@@ -467,7 +475,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('commons.button.delete'),
+        label: i18n.global.t('commons.button.uninstall'),
         click: (row: any) => {
             openOperate(row, 'delete');
         },

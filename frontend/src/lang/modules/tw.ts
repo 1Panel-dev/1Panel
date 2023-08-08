@@ -48,6 +48,7 @@ const message = {
             ignore: '忽略升級',
             copy: '復製',
             random: '隨機密碼',
+            uninstall: '卸載',
         },
         search: {
             timeStart: '開始時間',
