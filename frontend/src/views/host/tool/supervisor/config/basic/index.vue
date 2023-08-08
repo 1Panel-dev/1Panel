@@ -65,7 +65,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             serviceName: data.value.serviceName,
         })
             .then(() => {
-                MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             })
             .finally(() => {
                 loading.value = false;

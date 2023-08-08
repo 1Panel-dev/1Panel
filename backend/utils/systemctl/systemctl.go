@@ -46,15 +46,6 @@ func Restart(serviceName string) error {
 	out, err := RunSystemCtl("restart", serviceName)
 	return handlerErr(out, err)
 }
-func Start(serviceName string) error {
-	out, err := RunSystemCtl("start", serviceName)
-	return handlerErr(out, err)
-}
-
-func Stop(serviceName string) error {
-	out, err := RunSystemCtl("stop", serviceName)
-	return handlerErr(out, err)
-}
 
 func Operate(operate, serviceName string) error {
 	out, err := RunSystemCtl(operate, serviceName)
