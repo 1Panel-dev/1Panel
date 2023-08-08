@@ -1594,6 +1594,7 @@ const message = {
             initHelper: '尚未初始化 Supervisor ，請先初始化',
             serviceNameHelper: '當前僅支持 systemctl 管理的 Supervisor 服務',
             restartHelper: '初始化會重啟服務，導致原有的守護進程全部關閉',
+            msg: '信息',
         },
     },
 };

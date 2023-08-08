@@ -1682,6 +1682,7 @@ const message = {
             serviceNameHelper: 'Currently only supports the Supervisor service managed by systemctl',
             restartHelper:
                 'Initialization will restart the service, causing all the original daemon processes to close',
+            msg: 'Message',
         },
     },
 };

@@ -540,6 +540,8 @@ func getProcessStatus(config *response.SupervisorProcessConfig) error {
 			if fields[1] == "RUNNING" {
 				status.PID = strings.TrimSuffix(fields[3], ",")
 				status.Uptime = fields[5]
+			} else {
+				status.Msg = strings.Join(fields[2:], " ")
 			}
 			config.Status = append(config.Status, status)
 		}
