@@ -20,15 +20,19 @@
             </template>
             <template #main v-if="showTable">
                 <ComplexTable :data="data" :class="{ mask: !supervisorStatus.isRunning }">
-                    <el-table-column :label="$t('commons.table.name')" fix prop="name"></el-table-column>
+                    <el-table-column :label="$t('commons.table.name')" fix prop="name" width="150px"></el-table-column>
                     <el-table-column :label="$t('tool.supervisor.command')" prop="command"></el-table-column>
                     <el-table-column :label="$t('tool.supervisor.dir')" prop="dir"></el-table-column>
-                    <el-table-column :label="$t('tool.supervisor.user')" prop="user"></el-table-column>
-                    <el-table-column :label="$t('tool.supervisor.numprocs')" prop="numprocs"></el-table-column>
-                    <el-table-column :label="$t('commons.table.status')">
+                    <el-table-column :label="$t('tool.supervisor.user')" prop="user" width="100px"></el-table-column>
+                    <el-table-column
+                        :label="$t('tool.supervisor.numprocs')"
+                        prop="numprocs"
+                        width="100px"
+                    ></el-table-column>
+                    <el-table-column :label="$t('commons.table.status')" width="100px">
                         <template #default="{ row }">
                             <div v-if="row.status">
-                                <el-popover placement="left" :width="600" trigger="hover">
+                                <el-popover placement="bottom" :width="600" trigger="hover">
                                     <template #reference>
                                         <el-button type="primary" link v-if="row.status.length > 1">
                                             {{ $t('website.check') }}
@@ -173,7 +177,7 @@ const getFile = (name: string, file: string) => {
 };
 
 const edit = (row: HostTool.SupersivorProcess) => {
-    createRef.value.acceptParams('edit', row);
+    createRef.value.acceptParams('update', row);
 };
 
 const buttons = [
