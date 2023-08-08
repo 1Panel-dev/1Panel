@@ -65,7 +65,7 @@ type IContainerService interface {
 	ComposeUpdate(req dto.ComposeUpdate) error
 	Prune(req dto.ContainerPrune) (dto.ContainerPruneReport, error)
 
-	LoadContainerLogs(req dto.OperationWithNameAndType) (string, error)
+	LoadContainerLogs(req dto.OperationWithNameAndType) string
 }
 
 func NewIContainerService() IContainerService {
@@ -628,7 +628,7 @@ func (u *ContainerService) ContainerStats(id string) (*dto.ContainerStats, error
 	return &data, nil
 }
 
-func (u *ContainerService) LoadContainerLogs(req dto.OperationWithNameAndType) (string, error) {
+func (u *ContainerService) LoadContainerLogs(req dto.OperationWithNameAndType) string {
 	filePath := ""
 	switch req.Type {
 	case "image-pull", "image-push", "image-build":
@@ -636,14 +636,14 @@ func (u *ContainerService) LoadContainerLogs(req dto.OperationWithNameAndType) (
 	case "compose-detail", "compose-create":
 		client, err := docker.NewDockerClient()
 		if err != nil {
-			return "", err
+			return ""
 		}
 		options := types.ContainerListOptions{All: true}
 		options.Filters = filters.NewArgs()
 		options.Filters.Add("label", fmt.Sprintf("%s=%s", composeProjectLabel, req.Name))
 		containers, err := client.ContainerList(context.Background(), options)
 		if err != nil {
-			return "", err
+			return ""
 		}
 		for _, container := range containers {
 			config := container.Labels[composeConfigLabel]
@@ -657,17 +657,17 @@ func (u *ContainerService) LoadContainerLogs(req dto.OperationWithNameAndType) (
 			}
 		}
 		if req.Type == "compose-create" {
-			filePath = path.Join(path.Dir(filePath), "/compose.log")
+			filePath = path.Join(path.Dir(filePath), "compose.log")
 		}
 	}
 	if _, err := os.Stat(filePath); err != nil {
-		return "", buserr.New("ErrHttpReqNotFound")
+		return ""
 	}
 	content, err := os.ReadFile(filePath)
 	if err != nil {
-		return "", err
+		return ""
 	}
-	return string(content), nil
+	return string(content)
 }
 
 func stringsToMap(list []string) map[string]string {

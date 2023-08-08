@@ -123,7 +123,7 @@ func (u *ImageService) ImageBuild(req dto.ImageBuild) (string, error) {
 		return "", err
 	}
 	fileName := "Dockerfile"
-	dockerLogDir := path.Join(global.CONF.System.TmpDir, "/docker_logs")
+	dockerLogDir := path.Join(global.CONF.System.TmpDir, "docker_logs")
 	if req.From == "edit" {
 		dir := fmt.Sprintf("%s/docker/build/%s", constant.DataDir, strings.ReplaceAll(req.Name, ":", "_"))
 		if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
@@ -200,7 +200,7 @@ func (u *ImageService) ImagePull(req dto.ImagePull) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	dockerLogDir := path.Join(global.CONF.System.TmpDir, "/docker_logs")
+	dockerLogDir := path.Join(global.CONF.System.TmpDir, "docker_logs")
 	if _, err := os.Stat(dockerLogDir); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(dockerLogDir, os.ModePerm); err != nil {
 			return "", err

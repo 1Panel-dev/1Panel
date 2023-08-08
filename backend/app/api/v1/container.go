@@ -369,11 +369,7 @@ func (b *BaseApi) LoadContainerLog(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	content, err := containerService.LoadContainerLogs(req)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
+	content := containerService.LoadContainerLogs(req)
 	helper.SuccessWithData(c, content)
 }
 
