@@ -196,7 +196,7 @@ func (onedrive oneDriveClient) Download(src, target string) (bool, error) {
 	return true, nil
 }
 
-func (onedrive *oneDriveClient) ListObjects(prefix string) ([]interface{}, error) {
+func (onedrive *oneDriveClient) ListObjects(prefix string) ([]string, error) {
 	prefix = "/" + strings.TrimPrefix(prefix, "/")
 	folderID, err := onedrive.loadIDByPath(prefix)
 	if err != nil {
@@ -212,7 +212,7 @@ func (onedrive *oneDriveClient) ListObjects(prefix string) ([]interface{}, error
 		return nil, fmt.Errorf("do request for list failed, err: %v", err)
 	}
 
-	var itemList []interface{}
+	var itemList []string
 	for _, item := range driveItems.DriveItems {
 		itemList = append(itemList, item.Name)
 	}

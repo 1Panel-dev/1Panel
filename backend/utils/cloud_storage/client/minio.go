@@ -164,7 +164,7 @@ func (minIo *minIoClient) GetBucket() (string, error) {
 	}
 }
 
-func (minIo minIoClient) ListObjects(prefix string) ([]interface{}, error) {
+func (minIo minIoClient) ListObjects(prefix string) ([]string, error) {
 	bucket, err := minIo.GetBucket()
 	if err != nil {
 		return nil, constant.ErrInvalidParams
@@ -174,7 +174,7 @@ func (minIo minIoClient) ListObjects(prefix string) ([]interface{}, error) {
 		Prefix:    prefix,
 	}
 
-	var result []interface{}
+	var result []string
 	for object := range minIo.client.ListObjects(context.Background(), bucket, opts) {
 		if object.Err != nil {
 			continue

@@ -116,7 +116,7 @@ func (oss *ossClient) GetBucket() (*osssdk.Bucket, error) {
 	}
 }
 
-func (oss *ossClient) ListObjects(prefix string) ([]interface{}, error) {
+func (oss *ossClient) ListObjects(prefix string) ([]string, error) {
 	bucket, err := oss.GetBucket()
 	if err != nil {
 		return nil, constant.ErrInvalidParams
@@ -125,7 +125,7 @@ func (oss *ossClient) ListObjects(prefix string) ([]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	var result []interface{}
+	var result []string
 	for _, obj := range lor.Objects {
 		result = append(result, obj.Key)
 	}
