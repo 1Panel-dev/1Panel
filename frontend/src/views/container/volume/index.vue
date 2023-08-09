@@ -44,12 +44,18 @@
                     @search="search"
                 >
                     <el-table-column type="selection" fix />
-                    <el-table-column :label="$t('commons.table.name')" min-width="80" prop="name" fix>
+                    <el-table-column
+                        :label="$t('commons.table.name')"
+                        min-width="100"
+                        :width="mobile ? 220 : 'auto'"
+                        prop="name"
+                        fix
+                    >
                         <template #default="{ row }">
                             <Tooltip @click="onInspect(row.name)" :text="row.name" />
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.volumeDir')" min-width="50">
+                    <el-table-column :label="$t('container.volumeDir')" min-width="100">
                         <template #default="{ row }">
                             <el-button type="primary" link @click="toFolder(row.mountpoint)">
                                 <el-icon>
@@ -91,7 +97,7 @@ import Tooltip from '@/components/tooltip/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import CreateDialog from '@/views/container/volume/create/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
-import { reactive, onMounted, ref } from 'vue';
+import { reactive, onMounted, ref, computed } from 'vue';
 import { computeSize, dateFormat } from '@/utils/util';
 import { deleteVolume, searchVolume, inspect, loadDockerStatus, containerPrune } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
@@ -100,6 +106,12 @@ import { useDeleteData } from '@/hooks/use-delete-data';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
+
+const mobile = computed(() => {
+    return globalStore.isMobile();
+});
 
 const loading = ref();
 const detailInfo = ref();

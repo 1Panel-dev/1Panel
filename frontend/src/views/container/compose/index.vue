@@ -54,7 +54,7 @@
                     :data="data"
                     @search="search"
                 >
-                    <el-table-column :label="$t('commons.table.name')" min-width="100" prop="name" fix>
+                    <el-table-column :label="$t('commons.table.name')" width="170" prop="name" fix>
                         <template #default="{ row }">
                             <Tooltip @click="loadDetail(row)" :text="row.name" />
                         </template>

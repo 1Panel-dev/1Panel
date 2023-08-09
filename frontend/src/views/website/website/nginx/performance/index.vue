@@ -1,9 +1,8 @@
 <template>
     <div>
         <el-form :model="form" :rules="variablesRules" ref="nginxFormRef" label-position="top">
-            <el-row v-loading="loading">
-                <el-col :span="1"><br /></el-col>
-                <el-col :span="9">
+            <el-row v-loading="loading" :gutter="20">
+                <el-col :xs="24" :sm="24" :md="9" :lg="9" :xl="9">
                     <el-form-item label="server_names_hash_bucket_size" prop="server_names_hash_bucket_size">
                         <el-input
                             clearable
@@ -28,14 +27,8 @@
                         <el-input clearable type="number" v-model.number="form.keepalive_timeout"></el-input>
                         <span class="input-help">{{ $t('nginx.keepaliveTimeoutHelper') }}</span>
                     </el-form-item>
-                    <el-form-item>
-                        <el-button type="primary" @click="submit(nginxFormRef)">
-                            {{ $t('commons.button.save') }}
-                        </el-button>
-                    </el-form-item>
                 </el-col>
-                <el-col :span="1"><br /></el-col>
-                <el-col :span="9">
+                <el-col :xs="24" :sm="24" :md="9" :lg="9" :xl="9">
                     <el-form-item label="gzip" prop="gzip">
                         <el-select v-model="form.gzip">
                             <el-option :label="'on'" :value="'on'"></el-option>
@@ -55,6 +48,11 @@
                     </el-form-item>
                 </el-col>
             </el-row>
+            <el-form-item>
+                <el-button type="primary" @click="submit(nginxFormRef)">
+                    {{ $t('commons.button.save') }}
+                </el-button>
+            </el-form-item>
         </el-form>
     </div>
 </template>

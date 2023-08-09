@@ -465,6 +465,7 @@ function initLoadCharts(item: Monitor.MonitorData) {
                 alignTicks: true,
             },
         ],
+        grid: mobile.value ? { left: '15%', right: '15%', bottom: '20%' } : null,
         formatStr: '%',
     };
 }

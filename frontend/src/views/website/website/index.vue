@@ -73,13 +73,21 @@
                         fix
                         prop="primaryDomain"
                         min-width="120px"
+                        :width="mobile ? 220 : 'auto'"
                         sortable
                     >
                         <template #default="{ row }">
                             <Tooltip @click="openConfig(row.id)" :text="row.primaryDomain" />
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.type')" fix show-overflow-tooltip prop="type" sortable>
+                    <el-table-column
+                        min-width="120px"
+                        :label="$t('commons.table.type')"
+                        fix
+                        show-overflow-tooltip
+                        prop="type"
+                        sortable
+                    >
                         <template #default="{ row }">
                             <div v-if="row.type">
                                 {{ $t('website.' + row.type) }}
@@ -97,7 +105,7 @@
                             </el-button>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.status')" prop="status" width="100px">
+                    <el-table-column :label="$t('commons.table.status')" prop="status" width="120px">
                         <template #default="{ row }">
                             <el-button
                                 v-if="row.status === 'Running'"
@@ -113,7 +121,7 @@
                             </el-button>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('website.remark')" prop="remark">
+                    <el-table-column :label="$t('website.remark')" prop="remark" min-width="120px">
                         <template #default="{ row }">
                             <MsgInfo :info="row.remark" />
                         </template>

@@ -65,7 +65,7 @@
             }
         }
     }
-    
+
     .mini-form-item {
         width: 100% !important;
     }
@@ -83,5 +83,8 @@
         .el-col-xs-24 {
             margin-bottom: 10px;
         }
+    }
+    .el-dialog {
+        --el-dialog-width: 80% !important;
     }
 }

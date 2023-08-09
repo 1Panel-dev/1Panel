@@ -64,7 +64,14 @@
                     @search="search"
                 >
                     <el-table-column type="selection" fix />
-                    <el-table-column :label="$t('commons.table.name')" min-width="80" prop="name" sortable fix>
+                    <el-table-column
+                        :label="$t('commons.table.name')"
+                        :width="mobile ? 300 : 'auto'"
+                        min-width="80"
+                        prop="name"
+                        sortable
+                        fix
+                    >
                         <template #default="{ row }">
                             <Tooltip @click="onInspect(row.containerID)" :text="row.name" />
                         </template>
@@ -75,12 +82,12 @@
                         min-width="80"
                         prop="imageName"
                     />
-                    <el-table-column :label="$t('commons.table.status')" min-width="60" prop="state" sortable fix>
+                    <el-table-column :label="$t('commons.table.status')" min-width="80" prop="state" sortable fix>
                         <template #default="{ row }">
                             <Status :key="row.state" :status="row.state"></Status>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.source')" show-overflow-tooltip min-width="75" fix>
+                    <el-table-column :label="$t('container.source')" show-overflow-tooltip min-width="100" fix>
                         <template #default="{ row }">
                             <div v-if="row.hasLoad">
                                 <div>CPU: {{ row.cpuPercent.toFixed(2) }}%</div>
@@ -91,7 +98,13 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.port')" min-width="120" prop="ports" fix>
+                    <el-table-column
+                        :label="$t('commons.table.port')"
+                        :width="mobile ? 260 : 'auto'"
+                        min-width="120"
+                        prop="ports"
+                        fix
+                    >
                         <template #default="{ row }">
                             <div v-if="row.ports">
                                 <div v-for="(item, index) in row.ports" :key="index">
@@ -127,7 +140,7 @@
                     </el-table-column>
                     <el-table-column
                         :label="$t('container.upTime')"
-                        min-width="70"
+                        min-width="80"
                         show-overflow-tooltip
                         prop="runTime"
                         fix
@@ -168,7 +181,7 @@ import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import Status from '@/components/status/index.vue';
-import { reactive, onMounted, ref } from 'vue';
+import { reactive, onMounted, ref, computed } from 'vue';
 import {
     containerListStats,
     containerOperator,
@@ -184,6 +197,12 @@ import i18n from '@/lang';
 import router from '@/routers';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { computeSize } from '@/utils/util';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
+
+const mobile = computed(() => {
+    return globalStore.isMobile();
+});
 
 const loading = ref();
 const data = ref();
