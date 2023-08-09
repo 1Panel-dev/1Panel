@@ -44,12 +44,12 @@
                     @search="search"
                 >
                     <el-table-column type="selection" :selectable="selectable" fix />
-                    <el-table-column :label="$t('commons.table.name')" min-width="80" prop="name" fix>
+                    <el-table-column :label="$t('commons.table.name')" width="130" prop="name" fix>
                         <template #default="{ row }">
                             <Tooltip @click="onInspect(row.id)" :text="row.name" />
                         </template>
                     </el-table-column>
-                    <el-table-column min-width="50">
+                    <el-table-column width="90">
                         <template #default="{ row }">
                             <el-tag effect="dark" round v-if="row.isSystem">system</el-tag>
                         </template>
@@ -57,7 +57,7 @@
                     <el-table-column
                         :label="$t('container.driver')"
                         show-overflow-tooltip
-                        min-width="40"
+                        min-width="60"
                         prop="driver"
                     />
                     <el-table-column :label="$t('container.subnet')" min-width="80" prop="subnet" fix />

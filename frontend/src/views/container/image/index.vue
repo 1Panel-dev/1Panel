@@ -41,14 +41,25 @@
             </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
-                    <el-table-column label="ID" prop="id" min-width="50">
+                    <el-table-column label="ID" prop="id" width="120">
                         <template #default="{ row }">
                             <span>{{ row.id.replaceAll('sha256:', '').substring(0, 12) }}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.tag')" prop="tags" min-width="160" fix>
+                    <el-table-column
+                        :label="$t('container.tag')"
+                        prop="tags"
+                        min-width="160"
+                        :width="mobile ? 400 : 'auto'"
+                        fix
+                    >
                         <template #default="{ row }">
-                            <el-tag style="margin-left: 5px" v-for="(item, index) of row.tags" :key="index">
+                            <el-tag
+                                style="margin-left: 5px"
+                                v-for="(item, index) of row.tags"
+                                :key="index"
+                                :title="item"
+                            >
                                 {{ item }}
                             </el-tag>
                         </template>
@@ -83,7 +94,7 @@
 
 <script lang="ts" setup>
 import TableSetting from '@/components/table-setting/index.vue';
-import { reactive, onMounted, ref } from 'vue';
+import { reactive, onMounted, ref, computed } from 'vue';
 import { dateFormat } from '@/utils/util';
 import { Container } from '@/api/interface/container';
 import Pull from '@/views/container/image/pull/index.vue';
@@ -98,6 +109,12 @@ import { searchImage, listImageRepo, loadDockerStatus, imageRemove } from '@/api
 import i18n from '@/lang';
 import router from '@/routers';
 import { useDeleteData } from '@/hooks/use-delete-data';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
+
+const mobile = computed(() => {
+    return globalStore.isMobile();
+});
 
 const loading = ref(false);
 

@@ -1,21 +1,16 @@
 <template>
     <div>
-        <div>
-            <el-select @change="searchLogs" style="width: 10%; float: left" v-model="logSearch.mode">
+        <div style="display: flex; flex-wrap: wrap">
+            <el-select @change="searchLogs" v-model="logSearch.mode" style="width: 100px">
                 <template #prefix>{{ $t('container.fetch') }}</template>
                 <el-option v-for="item in timeOptions" :key="item.label" :value="item.value" :label="item.label" />
             </el-select>
-            <el-input
-                @change="searchLogs"
-                class="margin-button"
-                style="width: 10%; float: left"
-                v-model.number="logSearch.tail"
-            >
+            <el-input @change="searchLogs" class="margin-button" style="width: 100px" v-model.number="logSearch.tail">
                 <template #prefix>
                     <div style="margin-left: 2px">{{ $t('container.lines') }}</div>
                 </template>
             </el-input>
-            <div class="margin-button" style="float: left">
+            <div class="margin-button">
                 <el-checkbox border @change="searchLogs" v-model="logSearch.isWatch">
                     {{ $t('commons.button.watch') }}
                 </el-checkbox>
