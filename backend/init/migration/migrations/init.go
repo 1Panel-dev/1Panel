@@ -547,3 +547,26 @@ var UpdateRedisParam = &gormigrate.Migration{
 
 	},
 }
+
+var UpdateCronjobWithDb = &gormigrate.Migration{
+	ID: "20230809-update-cronjob-with-db",
+	Migrate: func(tx *gorm.DB) error {
+		var cronjobs []model.Cronjob
+		if err := global.DB.Where("type = ? AND db_name != ?", "database", "all").Find(&cronjobs).Error; err != nil {
+			return nil
+		}
+
+		for _, job := range cronjobs {
+			var db model.DatabaseMysql
+			if err := global.DB.Where("name = ?", job.DBName).First(&db).Error; err != nil {
+				continue
+			}
+			if err := tx.Model(&model.Cronjob{}).
+				Where("id = ?", job.ID).
+				Updates(map[string]interface{}{"db_name": db.ID}).Error; err != nil {
+				continue
+			}
+		}
+		return nil
+	},
+}
