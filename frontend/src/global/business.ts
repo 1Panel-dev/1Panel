@@ -1,13 +1,8 @@
 import router from '@/routers';
 
-export function canEditPort(app: any): boolean {
-    if (app.key == 'openresty') {
-        return false;
-    }
-    if (app.type == 'php') {
-        return false;
-    }
-    return true;
+export function canEditPort(appKey: string): boolean {
+    const apps = ['openresty', 'php', 'frpc', 'frps', 'ddns-go', 'home-assistant'];
+    return !apps.includes(appKey);
 }
 
 export function toFolder(folder: string) {

@@ -75,7 +75,7 @@
                                 {{ $t('container.limitHelper', [limits.memory]) }}{{ req.memoryUnit }}B
                             </span>
                         </el-form-item>
-                        <el-form-item prop="allowPort" v-if="canEditPort(installData.app)">
+                        <el-form-item prop="allowPort" v-if="canEditPort(installData.app.key)">
                             <el-checkbox v-model="req.allowPort" :label="$t('app.allowPort')" size="large" />
                             <span class="input-help">{{ $t('app.allowPortHelper') }}</span>
                         </el-form-item>
@@ -224,7 +224,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         if (req.memoryLimit < 0) {
             req.memoryLimit = 0;
         }
-        if (installData.value.app.key != 'openresty' && req.advanced && !req.allowPort) {
+        if (canEditPort(installData.value.app.key) && !req.allowPort) {
             ElMessageBox.confirm(i18n.global.t('app.installWarn'), i18n.global.t('app.checkTitle'), {
                 confirmButtonText: i18n.global.t('commons.button.confirm'),
                 cancelButtonText: i18n.global.t('commons.button.cancel'),
