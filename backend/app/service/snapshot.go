@@ -145,7 +145,9 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
 	}
 	_ = snapshotRepo.Create(&snap)
 	go func() {
+		_ = global.Cron.Stop()
 		defer func() {
+			global.Cron.Start()
 			_ = os.RemoveAll(rootDir)
 		}()
 		fileOp := files.NewFileOp()
@@ -254,6 +256,10 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 	_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"recover_status": constant.StatusWaiting})
 	_ = settingRepo.Update("SystemStatus", "Recovering")
 	go func() {
+		_ = global.Cron.Stop()
+		defer func() {
+			global.Cron.Start()
+		}()
 		operation := "recover"
 		if isReTry {
 			operation = "re-recover"
@@ -418,6 +424,10 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 	_ = settingRepo.Update("SystemStatus", "Rollbacking")
 	_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"rollback_status": constant.StatusWaiting})
 	go func() {
+		_ = global.Cron.Stop()
+		defer func() {
+			global.Cron.Start()
+		}()
 		snapJson, err := u.readFromJson(fmt.Sprintf("%s/snapshot.json", rootDir))
 		if err != nil {
 			updateRollbackStatus(snap.ID, constant.StatusFailed, fmt.Sprintf("decompress file failed, err: %v", err))
