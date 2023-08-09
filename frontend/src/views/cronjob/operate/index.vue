@@ -549,7 +549,7 @@ defineExpose({
 </script>
 <style scoped lang="scss">
 .specClass {
-    width: 20% !important;
+    width: 22% !important;
     margin-left: 20px;
 }
 @media only screen and (max-width: 1000px) {
@@ -560,7 +560,7 @@ defineExpose({
     }
 }
 .specTypeClass {
-    width: 20% !important;
+    width: 22% !important;
 }
 @media only screen and (max-width: 1000px) {
     .specTypeClass {

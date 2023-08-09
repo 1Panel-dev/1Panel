@@ -721,7 +721,7 @@ const message = {
         perNSecond: 'Every N seconds',
         per: 'Every ',
         handle: 'Handle',
-        day1: 'Day',
+        day: 'Day',
         monday: 'Monday',
         tuesday: 'Tuesday',
         wednesday: 'Wednesday',
