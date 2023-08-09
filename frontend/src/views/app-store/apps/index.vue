@@ -119,7 +119,7 @@
                     v-model:page-size="paginationConfig.pageSize"
                     v-bind="paginationConfig"
                     @change="search(req)"
-                    :layout="'total, sizes, prev, pager, next, jumper'"
+                    :layout="mobile ? 'total, prev, pager, next' : 'total, sizes, prev, pager, next, jumper'"
                 />
             </div>
         </template>
@@ -129,13 +129,20 @@
 
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref, computed } from 'vue';
 import { GetAppTags, SearchApp, SyncApp } from '@/api/modules/app';
 import i18n from '@/lang';
 import Detail from '../detail/index.vue';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
+import { GlobalStore } from '@/store';
+
+const globalStore = GlobalStore();
+
+const mobile = computed(() => {
+    return globalStore.isMobile();
+});
 
 const language = useI18n().locale.value;
 
