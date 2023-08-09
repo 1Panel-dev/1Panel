@@ -6,8 +6,8 @@
                     <el-row :gutter="20">
                         <el-col :span="24">
                             <div>
-                                <svg-icon style="font-size: 7px" iconName="p-file-folder"></svg-icon>
-                                <span style="font-size: 14px; font-weight: 500">&nbsp;{{ $t('setting.LOCAL') }}</span>
+                                <svg-icon class="card-logo" iconName="p-file-folder"></svg-icon>
+                                <span class="card-title">&nbsp;{{ $t('setting.LOCAL') }}</span>
                                 <div style="float: right">
                                     <el-button round @click="onOpenDialog('edit', 'local', localData)">
                                         {{ $t('commons.button.edit') }}
@@ -28,7 +28,7 @@
                 </el-form>
 
                 <div class="common-div">
-                    <span style="font-size: 14px; font-weight: 500">{{ $t('setting.thirdParty') }}</span>
+                    <span class="card-title">{{ $t('setting.thirdParty') }}</span>
                 </div>
 
                 <el-alert type="info" :closable="false" class="common-div">
@@ -40,8 +40,8 @@
                 <el-row :gutter="20" class="common-div">
                     <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
                         <div>
-                            <svg-icon style="font-size: 7px" iconName="p-aws"></svg-icon>
-                            <span style="font-size: 14px; font-weight: 500">&nbsp;{{ $t('setting.S3') }}</span>
+                            <svg-icon class="card-logo" iconName="p-aws"></svg-icon>
+                            <span class="card-title">&nbsp;{{ $t('setting.S3') }}</span>
                             <div style="float: right">
                                 <el-button
                                     round
@@ -96,8 +96,8 @@
                     </el-col>
                     <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
                         <div>
-                            <svg-icon style="font-size: 7px" iconName="p-oss"></svg-icon>
-                            <span style="font-size: 14px; font-weight: 500">&nbsp;{{ $t('setting.OSS') }}</span>
+                            <svg-icon class="card-logo" iconName="p-oss"></svg-icon>
+                            <span class="card-title">&nbsp;{{ $t('setting.OSS') }}</span>
                             <div style="float: right">
                                 <el-button
                                     round
@@ -152,8 +152,8 @@
                 <el-row :gutter="20" class="common-div">
                     <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
                         <div>
-                            <svg-icon style="font-size: 7px" iconName="p-tengxunyun1"></svg-icon>
-                            <span style="font-size: 14px; font-weight: 500">&nbsp;{{ $t('setting.COS') }}</span>
+                            <svg-icon class="card-logo" iconName="p-tengxunyun1"></svg-icon>
+                            <span class="card-title">&nbsp;{{ $t('setting.COS') }}</span>
                             <div style="float: right">
                                 <el-button
                                     round
@@ -205,8 +205,8 @@
                     </el-col>
                     <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
                         <div>
-                            <svg-icon style="font-size: 7px" iconName="p-onedrive"></svg-icon>
-                            <span style="font-size: 14px; font-weight: 500">&nbsp;{{ $t('setting.OneDrive') }}</span>
+                            <svg-icon class="card-logo" iconName="p-onedrive"></svg-icon>
+                            <span class="card-title">&nbsp;{{ $t('setting.OneDrive') }}</span>
                             <div style="float: right">
                                 <el-button
                                     round
@@ -247,8 +247,8 @@
                 <el-row :gutter="20" style="margin-top: 20px">
                     <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
                         <div>
-                            <svg-icon style="font-size: 7px" iconName="p-qiniuyun"></svg-icon>
-                            <span style="font-size: 14px; font-weight: 500">&nbsp;{{ $t('setting.KODO') }}</span>
+                            <svg-icon class="card-logo" iconName="p-qiniuyun"></svg-icon>
+                            <span class="card-title">&nbsp;{{ $t('setting.KODO') }}</span>
                             <div style="float: right">
                                 <el-button
                                     round
@@ -287,8 +287,8 @@
                     </el-col>
                     <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
                         <div>
-                            <svg-icon style="font-size: 7px" iconName="p-minio"></svg-icon>
-                            <span style="font-size: 14px; font-weight: 500">&nbsp;MINIO</span>
+                            <svg-icon class="card-logo" iconName="p-minio"></svg-icon>
+                            <span class="card-title">&nbsp;MINIO</span>
                             <div style="float: right">
                                 <el-button
                                     round
@@ -328,8 +328,8 @@
                 <el-row :gutter="20" style="margin-top: 20px">
                     <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
                         <div>
-                            <svg-icon style="font-size: 7px" iconName="p-SFTP"></svg-icon>
-                            <span style="font-size: 14px; font-weight: 500">&nbsp;SFTP</span>
+                            <svg-icon class="card-logo" iconName="p-SFTP"></svg-icon>
+                            <span class="card-title">&nbsp;SFTP</span>
                             <div style="float: right">
                                 <el-button
                                     round
@@ -571,5 +571,14 @@ onMounted(() => {
 
 .common-div {
     margin-top: 20px;
+}
+
+.card-title {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 25px;
+}
+.card-logo {
+    font-size: 7px;
 }
 </style>
