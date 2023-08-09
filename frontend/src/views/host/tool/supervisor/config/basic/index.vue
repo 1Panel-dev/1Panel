@@ -7,6 +7,7 @@
                 </el-form-item>
                 <el-form-item :label="$t('tool.supervisor.serviceName')" prop="serviceName">
                     <el-input v-model.trim="data.serviceName"></el-input>
+                    <span class="input-help">{{ $t('tool.supervisor.serviceNameHelper') }}</span>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="submit(initForm)" :disabled="loading">

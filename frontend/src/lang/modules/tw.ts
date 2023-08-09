@@ -1593,7 +1593,7 @@ const message = {
             notStartWarn: 'Supervisor 未啟動，請先啟動',
             serviceName: '服務名稱',
             initHelper: '尚未初始化 Supervisor ，請先初始化',
-            serviceNameHelper: '當前僅支持 systemctl 管理的 Supervisor 服務',
+            serviceNameHelper: 'systemctl 管理的 Supervisor 服務名稱，一般為 supervisor 或 supervisord',
             restartHelper: '初始化會重啟服務，導致原有的守護進程全部關閉',
             msg: '信息',
         },
