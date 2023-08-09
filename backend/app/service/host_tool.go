@@ -110,12 +110,13 @@ func (h *HostToolService) GetToolStatus(req request.HostToolReq) (*response.Host
 					supervisorConfig.ConfigPath = args[cIndex+1]
 				}
 			}
-		} else {
+		}
+		if supervisorConfig.ConfigPath == "" {
 			configPath := "/etc/supervisord.conf"
 			if !fileOp.Stat(configPath) {
 				configPath = "/etc/supervisor/supervisord.conf"
-				if !fileOp.Stat(configPath) {
-					return nil, buserr.New("ErrConfigNotFound")
+				if fileOp.Stat(configPath) {
+					supervisorConfig.ConfigPath = configPath
 				}
 			}
 		}

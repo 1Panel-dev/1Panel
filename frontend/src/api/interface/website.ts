@@ -343,6 +343,8 @@ export namespace Website {
         filePath?: string;
         replaces?: ProxReplace;
         content?: string;
+        proxyAddress?: string;
+        proxyProtocol?: string;
     }
 
     export interface ProxReplace {

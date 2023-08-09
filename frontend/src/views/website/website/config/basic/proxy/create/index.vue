@@ -38,7 +38,15 @@
                     <el-row :gutter="10">
                         <el-col :span="12">
                             <el-form-item :label="$t('website.proxyPass')" prop="proxyPass">
-                                <el-input v-model.trim="proxy.proxyPass"></el-input>
+                                <el-input v-model.trim="proxy.proxyAddress" :placeholder="$t('website.proxyHelper')">
+                                    <template #prepend>
+                                        <el-select v-model="proxy.proxyProtocol" class="pre-select">
+                                            <el-option label="http" value="http://" />
+                                            <el-option label="https" value="https://" />
+                                            <el-option :label="$t('website.other')" value="" />
+                                        </el-select>
+                                    </template>
+                                </el-input>
                                 <div>
                                     <span class="input-help">{{ $t('website.proxyPassHelper') }}</span>
                                 </div>
@@ -131,10 +139,12 @@ const initData = (): Website.ProxyConfig => ({
     name: '',
     modifier: '^~',
     match: '/',
-    proxyPass: 'http://',
+    proxyPass: 'http://127.0.0.1:8080',
     proxyHost: '$host',
     filePath: '',
     replaces: {},
+    proxyAddress: '',
+    proxyProtocol: 'http://',
 });
 let proxy = ref(initData());
 const replaces = ref<any>([]);
@@ -148,6 +158,15 @@ const handleClose = () => {
 const acceptParams = (proxyParam: Website.ProxyConfig) => {
     replaces.value = [];
     proxy.value = proxyParam;
+
+    const res = getProtocolAndHost(proxyParam.proxyPass);
+    if (res != null) {
+        proxy.value.proxyProtocol = res.protocol;
+        proxy.value.proxyAddress = res.host;
+    } else {
+        proxy.value.proxyProtocol = 'http://';
+    }
+
     open.value = true;
     if (proxy.value.replaces) {
         for (const key in proxy.value.replaces) {
@@ -198,6 +217,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             }
         }
         loading.value = true;
+        proxy.value.proxyPass = proxy.value.proxyProtocol + proxy.value.proxyAddress;
         OperateProxyConfig(proxy.value)
             .then(() => {
                 if (proxy.value.operate == 'create') {
@@ -211,6 +231,19 @@ const submit = async (formEl: FormInstance | undefined) => {
                 loading.value = false;
             });
     });
+};
+
+const getProtocolAndHost = (url: string): { protocol: string; host: string } | null => {
+    const regex = /^(https?:\/\/)([^\/]+)/;
+    const match = url.match(regex);
+    if (match) {
+        return {
+            protocol: match[1],
+            host: match[2],
+        };
+    }
+    console.log('err');
+    return null;
 };
 
 defineExpose({
