@@ -1595,7 +1595,7 @@ const message = {
             notStartWarn: '当前未开启 Supervisor ，请先启动',
             serviceName: '服务名称',
             initHelper: '尚未初始化 Supervisor ，请先初始化',
-            serviceNameHelper: '当前仅支持 systemctl 管理的 Supervisor 服务',
+            serviceNameHelper: 'systemctl 管理的 Supervisor 服务名称，一般为 supervisor、supervisord',
             restartHelper: '初始化会重启服务，导致原有的守护进程全部关闭',
             msg: '信息',
         },

@@ -1680,7 +1680,7 @@ const message = {
             serviceName: 'Service name',
             initHelper:
                 'The initialization process will modify the configuration file, causing all existing processes to stop, please confirm the risk in advance',
-            serviceNameHelper: 'Currently only supports the Supervisor service managed by systemctl',
+            serviceNameHelper: 'Supervisor service name managed by systemctl, usually supervisor or supervisord',
             restartHelper:
                 'Initialization will restart the service, causing all the original daemon processes to close',
             msg: 'Message',
