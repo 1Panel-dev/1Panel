@@ -784,14 +784,17 @@ func (u *SnapshotService) handlePanelDatas(snapID uint, fileOp files.FileOp, ope
 		}
 		_ = snapshotRepo.Update(snapID, map[string]interface{}{"recover_status": constant.StatusWaiting})
 
+		_ = fileOp.Fs.RemoveAll(path.Join(target, "apps"))
 		if err := u.handleUnTar(source+"/1panel/1panel_data.tar.gz", target); err != nil {
 			return fmt.Errorf("recover panel data failed, err: %v", err)
 		}
 	case "re-recover":
+		_ = fileOp.Fs.RemoveAll(path.Join(target, "apps"))
 		if err := u.handleUnTar(source+"/1panel/1panel_data.tar.gz", target); err != nil {
 			return fmt.Errorf("retry recover panel data failed, err: %v", err)
 		}
 	case "rollback":
+		_ = fileOp.Fs.RemoveAll(path.Join(target, "apps"))
 		if err := u.handleUnTar(source+"/1panel_data.tar.gz", target); err != nil {
 			return fmt.Errorf("rollback panel data failed, err: %v", err)
 		}
