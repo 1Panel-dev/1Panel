@@ -97,6 +97,9 @@ const buttons = [
         click: function (row: Runtime.Runtime) {
             openDetail(row);
         },
+        disabled: function (row: Runtime.Runtime) {
+            return row.status === 'building';
+        },
     },
     {
         label: i18n.global.t('commons.button.delete'),

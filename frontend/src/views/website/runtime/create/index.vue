@@ -87,7 +87,6 @@
                                     <span>{{ $t('runtime.extendHelper') }}</span>
                                     <span v-html="$t('runtime.phpPluginHelper')"></span>
                                     <br />
-                                    <span v-if="mode == 'edit'">{{ $t('runtime.rebuildHelper') }}</span>
                                 </el-alert>
                             </el-form-item>
                         </div>
@@ -246,8 +245,8 @@ const submit = async (formEl: FormInstance | undefined) => {
         if (!valid) {
             return;
         }
-        loading.value = true;
         if (mode.value == 'create') {
+            loading.value = true;
             CreateRuntime(runtime.value)
                 .then(() => {
                     MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
@@ -257,14 +256,20 @@ const submit = async (formEl: FormInstance | undefined) => {
                     loading.value = false;
                 });
         } else {
-            UpdateRuntime(runtime.value)
-                .then(() => {
-                    MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
-                    handleClose();
-                })
-                .finally(() => {
-                    loading.value = false;
-                });
+            ElMessageBox.confirm(i18n.global.t('runtime.rebuildHelper'), i18n.global.t('commons.msg.infoTitle'), {
+                confirmButtonText: i18n.global.t('commons.button.confirm'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+            }).then(async () => {
+                loading.value = true;
+                UpdateRuntime(runtime.value)
+                    .then(() => {
+                        MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+                        handleClose();
+                    })
+                    .finally(() => {
+                        loading.value = false;
+                    });
+            });
         }
     });
 };

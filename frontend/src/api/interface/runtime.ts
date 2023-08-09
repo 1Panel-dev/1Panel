@@ -12,6 +12,7 @@ export namespace Runtime {
         type: string;
         resource: string;
         version: string;
+        status: string;
     }
 
     export interface RuntimeReq extends ReqPage {
