@@ -119,6 +119,7 @@
                     v-model:page-size="paginationConfig.pageSize"
                     v-bind="paginationConfig"
                     @change="search(req)"
+                    :page-sizes="[30, 60, 90]"
                     :layout="mobile ? 'total, prev, pager, next' : 'total, sizes, prev, pager, next, jumper'"
                 />
             </div>
@@ -148,7 +149,7 @@ const language = useI18n().locale.value;
 
 const paginationConfig = reactive({
     currentPage: 1,
-    pageSize: 50,
+    pageSize: 60,
     total: 0,
 });
 
@@ -156,7 +157,7 @@ const req = reactive({
     name: '',
     tags: [],
     page: 1,
-    pageSize: 50,
+    pageSize: 60,
 });
 
 const apps = ref<App.AppDTO[]>([]);
