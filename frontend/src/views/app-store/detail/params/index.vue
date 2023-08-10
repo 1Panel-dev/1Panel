@@ -102,6 +102,7 @@ import { Rules } from '@/global/form-rules';
 import { App } from '@/api/interface/app';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import { getDBName } from '@/utils/util';
 const router = useRouter();
 
 interface ParamObj extends App.FromField {
@@ -167,7 +168,11 @@ const handleParams = () => {
             pObj.disabled = p.disabled;
             paramObjs.value.push(pObj);
             if (p.random) {
-                form[p.envKey] = p.default + '_' + getRandomStr(6);
+                if (p.envKey === 'PANEL_DB_NAME') {
+                    form[p.envKey] = p.default + '_' + getDBName(6);
+                } else {
+                    form[p.envKey] = p.default + '_' + getRandomStr(6);
+                }
             } else {
                 form[p.envKey] = p.default;
             }

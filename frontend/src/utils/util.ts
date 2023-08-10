@@ -116,6 +116,17 @@ export function getRandomStr(e: number): string {
     return n;
 }
 
+export function getDBName(e: number): string {
+    const t = 'abcdefhijkmnprstwxyz2345678';
+    const a = t.length;
+    let n = '';
+
+    for (let i = 0; i < e; i++) {
+        n += t.charAt(Math.floor(Math.random() * a));
+    }
+    return n;
+}
+
 export function loadZero(i: number) {
     return i < 10 ? '0' + i : '' + i;
 }
