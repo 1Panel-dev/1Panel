@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"strconv"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -54,14 +53,6 @@ func (u *CronjobService) SearchWithPage(search dto.SearchWithPage) (int64, inter
 			}
 		} else {
 			item.TargetDir = "-"
-		}
-		if item.Type == "database" && item.DBName != "all" {
-			itemID, _ := strconv.Atoi(item.DBName)
-			dbItem, err := mysqlRepo.Get(commonRepo.WithByID(uint(itemID)))
-			if err != nil {
-				return 0, nil, err
-			}
-			item.DBName = dbItem.Name
 		}
 		record, _ := cronjobRepo.RecordFirst(cronjob.ID)
 		if record.ID != 0 {
