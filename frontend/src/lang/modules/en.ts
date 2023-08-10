@@ -154,7 +154,7 @@ const message = {
             commonName: 'Support English, Chinese, numbers, .-, and _ length 1-30',
             userName: 'Support English, Chinese, numbers and _ length 3-30',
             simpleName: 'Support English, numbers and _ length 1-30',
-            dbName: 'Support English, Chinese, numbers, .-, and _ length 1-64',
+            dbName: 'Support lowercase letters, Chinese, numbers, .-, and _ length 1-64',
             imageName: 'Support English, numbers, :/.-_, length 1-150',
             volumeName: 'Support English, numbers, .-_, length 2-30',
             complexityPassword:
