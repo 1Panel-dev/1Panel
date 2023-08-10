@@ -3,23 +3,6 @@
         <div class="complex-table__header" v-if="$slots.header || header">
             <slot name="header">{{ header }}</slot>
         </div>
-        <div v-if="$slots.toolbar && !searchConfig" style="margin-bottom: 10px">
-            <slot name="toolbar"></slot>
-        </div>
-
-        <template v-if="searchConfig">
-            <fu-filter-bar v-bind="searchConfig" @exec="search">
-                <template #tl>
-                    <slot name="toolbar"></slot>
-                </template>
-                <template #default>
-                    <slot name="complex"></slot>
-                </template>
-                <template #buttons>
-                    <slot name="buttons"></slot>
-                </template>
-            </fu-filter-bar>
-        </template>
 
         <div class="complex-table__body">
             <fu-table v-bind="$attrs" ref="tableRef" @selection-change="handleSelectionChange">
@@ -30,13 +13,14 @@
             </fu-table>
         </div>
 
-        <div class="complex-table__pagination" v-if="$slots.pagination || paginationConfig">
+        <div class="complex-table__pagination" v-if="props.paginationConfig">
             <slot name="pagination">
                 <fu-table-pagination
                     v-model:current-page="paginationConfig.currentPage"
                     v-model:page-size="paginationConfig.pageSize"
-                    v-bind="paginationConfig"
-                    @change="search"
+                    :total="paginationConfig.total"
+                    @size-change="sizeChange"
+                    @current-change="currentChange"
                     :small="mobile"
                     :layout="mobile ? 'total, prev, pager, next' : 'total, sizes, prev, pager, next, jumper'"
                 />
@@ -49,15 +33,15 @@ import { ref, computed } from 'vue';
 import { GlobalStore } from '@/store';
 
 defineOptions({ name: 'ComplexTable' });
-defineProps({
+const props = defineProps({
     header: String,
-    searchConfig: Object,
     paginationConfig: {
         type: Object,
+        required: false,
         default: () => {},
     },
 });
-const emit = defineEmits(['search', 'update:selects']);
+const emit = defineEmits(['search', 'update:selects', 'update:paginationConfig']);
 
 const globalStore = GlobalStore();
 
@@ -65,13 +49,15 @@ const mobile = computed(() => {
     return globalStore.isMobile();
 });
 
-const condition = ref({});
 const tableRef = ref();
-function search(conditions: any, e: any) {
-    if (conditions) {
-        condition.value = conditions;
-    }
-    emit('search', condition.value, e);
+
+function currentChange() {
+    emit('search');
+}
+
+function sizeChange() {
+    props.paginationConfig.currentPage = 1;
+    emit('search');
 }
 
 function handleSelectionChange(row: any) {
