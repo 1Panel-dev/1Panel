@@ -276,8 +276,8 @@ func (u *SSHService) LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error) {
 		dataItem, successCount, failedCount := loadSSHData(commandItem, showCountFrom, showCountTo, file.Year, qqWry, nyc)
 		data.FailedCount += failedCount
 		data.TotalCount += successCount + failedCount
-		showCountFrom = showCountFrom - data.TotalCount
-		showCountTo = showCountTo - data.TotalCount
+		showCountFrom = showCountFrom - (successCount + failedCount)
+		showCountTo = showCountTo - (successCount + failedCount)
 		data.Logs = append(data.Logs, dataItem...)
 	}
 
