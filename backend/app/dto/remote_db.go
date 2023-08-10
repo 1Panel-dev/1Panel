@@ -30,7 +30,7 @@ type RemoteDBOption struct {
 }
 
 type RemoteDBCreate struct {
-	Name        string `json:"name" validate:"required"`
+	Name        string `json:"name" validate:"required,max=256"`
 	Type        string `json:"type" validate:"required,oneof=mysql"`
 	From        string `json:"from" validate:"required,oneof=local remote"`
 	Version     string `json:"version" validate:"required"`
