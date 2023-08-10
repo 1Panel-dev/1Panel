@@ -221,12 +221,9 @@ func checkValidOfWebsite(oldWebsite, website *model.Website) error {
 		return buserr.WithDetail(constant.ErrBackupMatch, fmt.Sprintf("oldName: %s, oldType: %v", oldWebsite.Alias, oldWebsite.Type), nil)
 	}
 	if oldWebsite.AppInstallID != 0 {
-		app, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
+		_, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
 		if err != nil {
 			return buserr.WithDetail(constant.ErrBackupMatch, "app", nil)
-		}
-		if app.App.Type != "website" {
-			return buserr.WithDetail(constant.ErrBackupMatch, fmt.Sprintf("appType: %s", app.App.Type), nil)
 		}
 	}
 	if oldWebsite.RuntimeID != 0 {
