@@ -173,7 +173,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.sync'),
         disabled: (row: Container.RepoInfo) => {
-            return row.downloadUrl === 'docker.io';
+            return row.id === 1;
         },
         click: (row: Container.RepoInfo) => {
             onCheckConn(row);
@@ -182,7 +182,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
         disabled: (row: Container.RepoInfo) => {
-            return row.downloadUrl === 'docker.io';
+            return row.id === 1;
         },
         click: (row: Container.RepoInfo) => {
             onOpenDialog('edit', row);
@@ -191,7 +191,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
         disabled: (row: Container.RepoInfo) => {
-            return row.downloadUrl === 'docker.io';
+            return row.id === 1;
         },
         click: (row: Container.RepoInfo) => {
             onDelete(row);

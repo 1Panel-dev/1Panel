@@ -137,7 +137,7 @@ const checkDBName = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.dbName')));
     } else {
-        const reg = /^[a-z0-9\u4e00-\u9fa5]{1}[a-z0-9_.\u4e00-\u9fa5-]{0,64}$/;
+        const reg = /^[a-zA-Z0-9\u4e00-\u9fa5]{1}[a-zA-Z0-9_.\u4e00-\u9fa5-]{0,64}$/;
         if (!reg.test(value) && value !== '') {
             callback(new Error(i18n.global.t('commons.rule.dbName')));
         } else {

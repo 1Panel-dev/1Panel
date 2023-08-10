@@ -163,7 +163,7 @@ func (u *MysqlService) LoadFromRemote(from string) error {
 	for _, data := range datas {
 		hasOld := false
 		for _, oldData := range databases {
-			if oldData.Name == data.Name {
+			if strings.EqualFold(oldData.Name, data.Name) {
 				hasOld = true
 				break
 			}
