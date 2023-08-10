@@ -91,7 +91,7 @@ const handleClose = () => {
 const rules = reactive({
     name: [Rules.requiredInput],
     version: [Rules.requiredSelect],
-    address: [Rules.ip],
+    address: [Rules.host],
     port: [Rules.port],
     username: [Rules.requiredInput],
     password: [Rules.requiredInput],
