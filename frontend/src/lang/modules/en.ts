@@ -533,7 +533,7 @@ const message = {
         exposePort: 'Expose port',
         exposeAll: 'Expose all',
         cmd: 'Command',
-        cmdHelper: 'Example: echo "hello"',
+        cmdHelper: "Separate multiple commands with ' ' as delimiter, such as 'nginx' '-g' 'daemon off;'",
         autoRemove: 'Auto remove',
         cpuQuota: 'NacosCPU',
         memoryLimit: 'Memory',
