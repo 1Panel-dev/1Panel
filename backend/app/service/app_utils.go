@@ -341,6 +341,24 @@ func upgradeInstall(installId uint, detailId uint, backup bool) error {
 		install.Version = detail.Version
 		install.AppDetailId = detailId
 
+		images, err := getImages(install)
+		if err != nil {
+			upErr = err
+			return
+		}
+		dockerCli, err := composeV2.NewClient()
+		if err != nil {
+			upErr = err
+			return
+		}
+
+		for _, image := range images {
+			if err = dockerCli.PullImage(image, true); err != nil {
+				upErr = buserr.WithNameAndErr("ErrDockerPullImage", "", err)
+				return
+			}
+		}
+
 		if out, err := compose.Down(install.GetComposePath()); err != nil {
 			if out != "" {
 				upErr = errors.New(out)
@@ -396,6 +414,26 @@ func getContainerNames(install model.AppInstall) ([]string, error) {
 		containerNames = append(containerNames, install.ContainerName)
 	}
 	return containerNames, nil
+}
+
+func getImages(install model.AppInstall) ([]string, error) {
+	envStr, err := coverEnvJsonToStr(install.Env)
+	if err != nil {
+		return nil, err
+	}
+	project, err := composeV2.GetComposeProject(install.Name, install.GetPath(), []byte(install.DockerCompose), []byte(envStr), true)
+	if err != nil {
+		return nil, err
+	}
+	imagesMap := make(map[string]struct{})
+	for _, service := range project.AllServices() {
+		imagesMap[service.Image] = struct{}{}
+	}
+	var images []string
+	for k := range imagesMap {
+		images = append(images, k)
+	}
+	return images, nil
 }
 
 func coverEnvJsonToStr(envJson string) (string, error) {

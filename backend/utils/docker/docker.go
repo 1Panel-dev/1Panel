@@ -72,6 +72,22 @@ func (c Client) DeleteImage(imageID string) error {
 	return nil
 }
 
+func (c Client) PullImage(imageName string, force bool) error {
+	if !force {
+		exist, err := c.CheckImageExist(imageName)
+		if err != nil {
+			return err
+		}
+		if exist {
+			return nil
+		}
+	}
+	if _, err := c.cli.ImagePull(context.Background(), imageName, types.ImagePullOptions{}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c Client) GetImageIDByName(imageName string) (string, error) {
 	filter := filters.NewArgs()
 	filter.Add("reference", imageName)
@@ -85,6 +101,18 @@ func (c Client) GetImageIDByName(imageName string) (string, error) {
 		return list[0].ID, nil
 	}
 	return "", nil
+}
+
+func (c Client) CheckImageExist(imageName string) (bool, error) {
+	filter := filters.NewArgs()
+	filter.Add("reference", imageName)
+	list, err := c.cli.ImageList(context.Background(), types.ImageListOptions{
+		Filters: filter,
+	})
+	if err != nil {
+		return false, err
+	}
+	return len(list) > 0, nil
 }
 
 func (c Client) NetworkExist(name string) bool {
