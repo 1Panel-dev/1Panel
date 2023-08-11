@@ -519,7 +519,7 @@ const message = {
         exposePort: '暴露端口',
         exposeAll: '暴露所有',
         cmd: '啟動命令',
-        cmdHelper: '例：echo "hello"',
+        cmdHelper: "多個命令間請用 ' ' 分隔開，如 'nginx' '-g' 'daemon off;'",
         autoRemove: '容器退出後自動刪除容器',
         cpuQuota: 'CPU 限製',
         memoryLimit: '內存限製',

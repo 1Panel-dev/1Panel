@@ -110,7 +110,8 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item :label="$t('container.cmd')" prop="cmdStr">
-                        <el-input :placeholder="$t('container.cmdHelper')" v-model="dialogData.rowData!.cmdStr" />
+                        <el-input v-model="dialogData.rowData!.cmdStr" />
+                        <span class="input-help">{{ $t('container.cmdHelper') }}</span>
                     </el-form-item>
                     <el-form-item prop="autoRemove">
                         <el-checkbox v-model="dialogData.rowData!.autoRemove">
