@@ -13,20 +13,7 @@ const terminalElement = ref<HTMLDivElement | null>(null);
 const fitAddon = new FitAddon();
 const termReady = ref(false);
 const webSocketReady = ref(false);
-const term = ref(
-    new Terminal({
-        lineHeight: 1.2,
-        fontSize: 12,
-        fontFamily: "Monaco, Menlo, Consolas, 'Courier New', monospace",
-        theme: {
-            background: '#000000',
-        },
-        cursorBlink: true,
-        cursorStyle: 'underline',
-        scrollback: 100,
-        tabStopWidth: 4,
-    }),
-);
+const term = ref();
 const terminalSocket = ref<WebSocket>();
 const heartbeatTimer = ref<number>();
 const latency = ref(0);
@@ -56,6 +43,21 @@ const acceptParams = (props: WsProps) => {
     });
 };
 
+const newTerm = () => {
+    term.value = new Terminal({
+        lineHeight: 1.2,
+        fontSize: 12,
+        fontFamily: "Monaco, Menlo, Consolas, 'Courier New', monospace",
+        theme: {
+            background: '#000000',
+        },
+        cursorBlink: true,
+        cursorStyle: 'underline',
+        scrollback: 100,
+        tabStopWidth: 4,
+    });
+};
+
 const init = (endpoint: string, args: string) => {
     if (initTerminal(true)) {
         initWebSocket(endpoint, args);
@@ -78,11 +80,13 @@ function onClose(isKeepShow: boolean = false) {
             term.value.dispose();
         } catch {}
     }
+    terminalElement.value.innerHTML = '';
 }
 
 // terminal 相关代码 start
 
 const initTerminal = (online: boolean = false): boolean => {
+    newTerm();
     if (terminalElement.value) {
         term.value.open(terminalElement.value);
         term.value.loadAddon(fitAddon);
