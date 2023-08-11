@@ -100,11 +100,14 @@ export const searchRemoteDBs = (params: Database.SearchRemoteDBPage) => {
 export const listRemoteDBs = (type: string) => {
     return http.get<Array<Database.RemoteDBOption>>(`/databases/remote/list/${type}`);
 };
+export const checkRemoteDB = (params: Database.RemoteDBCreate) => {
+    return http.post<boolean>(`/databases/remote/check`, params, 40000);
+};
 export const addRemoteDB = (params: Database.RemoteDBCreate) => {
-    return http.post(`/databases/remote`, params);
+    return http.post(`/databases/remote`, params, 40000);
 };
 export const editRemoteDB = (params: Database.RemoteDBUpdate) => {
-    return http.post(`/databases/remote/update`, params);
+    return http.post(`/databases/remote/update`, params, 40000);
 };
 export const deleteRemoteDB = (id: number) => {
     return http.post(`/databases/remote/del`, { id: id });

@@ -1,8 +1,10 @@
 package mysql
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -38,9 +40,16 @@ func NewMysqlClient(conn client.DBInfo) (MysqlClient, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := db.Ping(); err != nil {
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(conn.Timeout)*time.Second)
+	defer cancel()
+	if err := db.PingContext(ctx); err != nil {
 		return nil, err
 	}
+	if ctx.Err() == context.DeadlineExceeded {
+		return nil, buserr.New(constant.ErrExecTimeOut)
+	}
+
 	return client.NewRemote(client.Remote{
 		Client:   db,
 		From:     conn.From,

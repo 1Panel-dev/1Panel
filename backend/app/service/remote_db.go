@@ -16,6 +16,7 @@ type RemoteDBService struct{}
 type IRemoteDBService interface {
 	Get(name string) (dto.RemoteDBInfo, error)
 	SearchWithPage(search dto.RemoteDBSearch) (int64, interface{}, error)
+	CheckeRemoteDB(req dto.RemoteDBCreate) bool
 	Create(req dto.RemoteDBCreate) error
 	Update(req dto.RemoteDBUpdate) error
 	Delete(id uint) error
@@ -68,6 +69,20 @@ func (u *RemoteDBService) List(dbType string) ([]dto.RemoteDBOption, error) {
 	return datas, err
 }
 
+func (u *RemoteDBService) CheckeRemoteDB(req dto.RemoteDBCreate) bool {
+	if _, err := mysql.NewMysqlClient(client.DBInfo{
+		From:     "remote",
+		Address:  req.Address,
+		Port:     req.Port,
+		Username: req.Username,
+		Password: req.Password,
+		Timeout:  6,
+	}); err != nil {
+		return false
+	}
+	return true
+}
+
 func (u *RemoteDBService) Create(req dto.RemoteDBCreate) error {
 	db, _ := remoteDBRepo.Get(commonRepo.WithByName(req.Name))
 	if db.ID != 0 {
@@ -79,7 +94,7 @@ func (u *RemoteDBService) Create(req dto.RemoteDBCreate) error {
 		Port:     req.Port,
 		Username: req.Username,
 		Password: req.Password,
-		Timeout:  300,
+		Timeout:  6,
 	}); err != nil {
 		return err
 	}
