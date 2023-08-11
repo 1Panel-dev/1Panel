@@ -1684,6 +1684,14 @@ const message = {
             restartHelper:
                 'Initialization will restart the service, causing all the original daemon processes to close',
             msg: 'Message',
+            RUNNING: 'Running',
+            STOPPED: 'Stopped',
+            STOPPING: 'Stopping',
+            STARTING: 'Starting',
+            FATAL: 'Failed to start',
+            BACKOFF: 'Start exception',
+            statusCode: 'Status code',
+            manage: 'Management',
         },
     },
 };
