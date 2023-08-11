@@ -39,6 +39,39 @@
                         prop="numprocs"
                         width="100px"
                     ></el-table-column>
+                    <el-table-column :label="$t('tool.supervisor.manage')" width="100px">
+                        <template #default="{ row }">
+                            <div v-if="row.status && row.status.length > 0">
+                                <el-button
+                                    v-if="checkStatus(row.status) === 'RUNNING'"
+                                    link
+                                    type="success"
+                                    :icon="VideoPlay"
+                                    @click="operate('stop', row.name)"
+                                >
+                                    {{ $t('commons.status.running') }}
+                                </el-button>
+                                <el-button
+                                    v-else-if="checkStatus(row.status) === 'WARNING'"
+                                    link
+                                    type="warning"
+                                    :icon="RefreshRight"
+                                    @click="operate('restart', row.name)"
+                                >
+                                    {{ $t('commons.status.unhealthy') }}
+                                </el-button>
+                                <el-button
+                                    v-else
+                                    link
+                                    type="danger"
+                                    :icon="VideoPause"
+                                    @click="operate('start', row.name)"
+                                >
+                                    {{ $t('commons.status.stopped') }}
+                                </el-button>
+                            </div>
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" width="100px">
                         <template #default="{ row }">
                             <div v-if="row.status">
@@ -48,7 +81,7 @@
                                             {{ $t('website.check') }}
                                         </el-button>
                                         <el-button type="primary" link v-else>
-                                            <span>{{ row.status[0].status }}</span>
+                                            <span>{{ $t('tool.supervisor.' + row.status[0].status) }}</span>
                                         </el-button>
                                     </template>
                                     <el-table :data="row.status">
@@ -60,7 +93,7 @@
                                         />
                                         <el-table-column
                                             property="status"
-                                            :label="$t('commons.table.status')"
+                                            :label="$t('tool.supervisor.statusCode')"
                                             width="100px"
                                         />
                                         <el-table-column property="PID" label="PID" width="100px" />
@@ -85,7 +118,7 @@
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         :fixed="mobile ? false : 'right'"
-                        width="350px"
+                        width="250px"
                         fix
                     />
                 </ComplexTable>
@@ -110,6 +143,7 @@ import { GlobalStore } from '@/store';
 import i18n from '@/lang';
 import { HostTool } from '@/api/interface/host-tool';
 import { MsgSuccess } from '@/utils/message';
+import { VideoPlay, VideoPause, RefreshRight } from '@element-plus/icons-vue';
 const globalStore = GlobalStore();
 
 const loading = ref(false);
@@ -170,6 +204,20 @@ const mobile = computed(() => {
     return globalStore.isMobile();
 });
 
+const checkStatus = (status: HostTool.ProcessStatus[]): string => {
+    if (!status || status.length === 0) return 'STOPPED';
+
+    const statusCounts = status.reduce((acc, curr) => {
+        acc[curr.status] = (acc[curr.status] || 0) + 1;
+        return acc;
+    }, {} as Record<string, number>);
+
+    if (statusCounts['STARTING']) return 'STARTING';
+    if (statusCounts['RUNNING'] === status.length) return 'RUNNING';
+    if (statusCounts['RUNNING'] > 0) return 'WARNING';
+    return 'STOPPED';
+};
+
 const operate = async (operation: string, name: string) => {
     try {
         ElMessageBox.confirm(
@@ -225,40 +273,9 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('app.start'),
-        click: function (row: HostTool.SupersivorProcess) {
-            operate('start', row.name);
-        },
-        disabled: (row: any) => {
-            if (row.status == undefined) {
-                return true;
-            } else {
-                return row.status && row.status[0].status == 'RUNNING';
-            }
-        },
-    },
-    {
-        label: i18n.global.t('app.stop'),
-        click: function (row: HostTool.SupersivorProcess) {
-            operate('stop', row.name);
-        },
-        disabled: (row: any) => {
-            if (row.status == undefined) {
-                return true;
-            }
-            return row.status && row.status[0].status != 'RUNNING';
-        },
-    },
-    {
         label: i18n.global.t('commons.button.restart'),
         click: function (row: HostTool.SupersivorProcess) {
             operate('restart', row.name);
-        },
-        disabled: (row: any): boolean => {
-            if (row.status == undefined) {
-                return true;
-            }
-            return row.status && row.status[0].status != 'RUNNING';
         },
     },
     {
