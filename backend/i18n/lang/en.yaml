@@ -45,6 +45,7 @@ ErrImagePullTimeOut: 'Image pull timeout'
 ErrContainerNotFound: '{{ .name }} container does not exist'
 ErrContainerMsg: '{{ .name }} container is abnormal, please check the log on the container page for details'
 ErrAppBackup: '{{ .name }} application backup failed err {{.err}}'
+ErrImagePull: '{{ .name }} image pull failed err {{.err}}'
 
 #file
 ErrFileCanNotRead: "File can not read"

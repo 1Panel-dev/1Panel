@@ -4,11 +4,7 @@ import (
 	"context"
 	"github.com/compose-spec/compose-go/loader"
 	"github.com/compose-spec/compose-go/types"
-	"github.com/docker/cli/cli/command"
-	"github.com/docker/cli/cli/flags"
 	"github.com/docker/compose/v2/pkg/api"
-	"github.com/docker/compose/v2/pkg/compose"
-	"github.com/docker/docker/client"
 	"github.com/joho/godotenv"
 	"path"
 	"regexp"
@@ -19,24 +15,6 @@ import (
 type ComposeService struct {
 	api.Service
 	project *types.Project
-}
-
-func NewComposeService(ops ...command.DockerCliOption) (*ComposeService, error) {
-	apiClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-	if err != nil {
-		return nil, err
-	}
-	ops = append(ops, command.WithAPIClient(apiClient), command.WithDefaultContextStoreConfig())
-	cli, err := command.NewDockerCli(ops...)
-	if err != nil {
-		return nil, err
-	}
-	cliOp := flags.NewClientOptions()
-	if err := cli.Initialize(cliOp); err != nil {
-		return nil, err
-	}
-	service := compose.NewComposeService(cli)
-	return &ComposeService{service, nil}, nil
 }
 
 func (s *ComposeService) SetProject(project *types.Project) {

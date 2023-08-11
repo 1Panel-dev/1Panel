@@ -45,6 +45,7 @@ ErrImagePullTimeOut: "鏡像拉取超時"
 ErrContainerNotFound: '{{ .name }} 容器不存在'
 ErrContainerMsg: '{{ .name }} 容器異常，具體請在容器頁面查看日誌'
 ErrAppBackup: '{{ .name }} 應用備份失敗 err {{.err}}'
+ErrImagePull: '{{ .name }} 鏡像拉取失敗 err {{.err}}'
 
 #file
 ErrFileCanNotRead: "此文件不支持預覽"
