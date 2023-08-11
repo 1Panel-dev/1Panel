@@ -479,7 +479,10 @@ const message = {
         rename: 'Rename',
         remove: 'Remove',
         containerPrune: 'Container prune',
-        containerPruneHelper: 'Remove all stopped containers. Do you want to continue?',
+        containerPruneHelper1: 'Cleaning containers will delete all containers that are in a stopped state.',
+        containerPruneHelper2:
+            'If the containers are from the app store, after performing the cleanup, you need to go to the [Installed] list in the [App Store] and click the [Rebuild] button to reinstall them.',
+        containerPruneHelper3: 'This operation cannot be rolled back. Do you want to continue?',
         imagePrune: 'Image prune',
         imagePruneSome: 'Clean unlabeled',
         imagePruneSomeHelper: 'Remove all unused and unlabeled container images。',
