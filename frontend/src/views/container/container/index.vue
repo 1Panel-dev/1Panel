@@ -157,6 +157,7 @@
         </LayoutContent>
 
         <CodemirrorDialog ref="mydetail" />
+        <PruneDialog @search="search" ref="dialogPruneRef" />
 
         <ReNameDialog @search="search" ref="dialogReNameRef" />
         <ContainerLogDialog ref="dialogContainerLogRef" />
@@ -172,6 +173,7 @@
 <script lang="ts" setup>
 import Tooltip from '@/components/tooltip/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
+import PruneDialog from '@/views/container/container/prune/index.vue';
 import ReNameDialog from '@/views/container/container/rename/index.vue';
 import OperateDialog from '@/views/container/container/operate/index.vue';
 import UpgraeDialog from '@/views/container/container/upgrade/index.vue';
@@ -185,7 +187,6 @@ import { reactive, onMounted, ref, computed } from 'vue';
 import {
     containerListStats,
     containerOperator,
-    containerPrune,
     inspect,
     loadContainerInfo,
     loadDockerStatus,
@@ -196,7 +197,6 @@ import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import router from '@/routers';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
-import { computeSize } from '@/utils/util';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 
@@ -264,6 +264,7 @@ const mydetail = ref();
 
 const dialogContainerLogRef = ref();
 const dialogReNameRef = ref();
+const dialogPruneRef = ref();
 
 const search = async (column?: any) => {
     let filterItem = props.filters ? props.filters : '';
@@ -360,31 +361,7 @@ const onInspect = async (id: string) => {
 };
 
 const onClean = () => {
-    ElMessageBox.confirm(i18n.global.t('container.containerPruneHelper'), i18n.global.t('container.containerPrune'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-        type: 'info',
-    }).then(async () => {
-        loading.value = true;
-        let params = {
-            pruneType: 'container',
-            withTagAll: false,
-        };
-        await containerPrune(params)
-            .then((res) => {
-                loading.value = false;
-                MsgSuccess(
-                    i18n.global.t('container.cleanSuccessWithSpace', [
-                        res.data.deletedNumber,
-                        computeSize(res.data.spaceReclaimed),
-                    ]),
-                );
-                search();
-            })
-            .catch(() => {
-                loading.value = false;
-            });
-    });
+    dialogPruneRef.value!.acceptParams();
 };
 
 const checkStatus = (operation: string, row: Container.ContainerInfo | null) => {

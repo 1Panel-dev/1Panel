@@ -469,7 +469,10 @@ const message = {
         rename: '重命名',
         remove: '刪除',
         containerPrune: '清理容器',
-        containerPruneHelper: '清理容器 將刪除所有處於停止狀態的容器，該操作無法回滾，是否繼續？',
+        containerPruneHelper1: '清理容器 將刪除所有處於停止狀態的容器。',
+        containerPruneHelper2:
+            '若容器來自於應用商店，在執行清理操作後，您需要前往 [應用商店] 的 [已安裝] 列表，點擊 [重建] 按鈕進行重新安裝。',
+        containerPruneHelper3: '該操作無法回滾，是否繼續？',
         imagePrune: '清理鏡像',
         imagePruneSome: '未標簽鏡像',
         imagePruneSomeHelper: '清理標簽為 none 且未被任何容器使用的鏡像。',
