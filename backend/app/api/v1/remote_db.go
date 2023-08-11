@@ -35,6 +35,28 @@ func (b *BaseApi) CreateRemoteDB(c *gin.Context) {
 }
 
 // @Tags Database
+// @Summary Check remote database
+// @Description 检测远程数据库连接性
+// @Accept json
+// @Param request body dto.RemoteDBCreate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /databases/remote/check [post]
+// @x-panel-log {"bodyKeys":["name", "type"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"检测远程数据库 [name][type] 连接性","formatEN":"check if remote database [name][type] is connectable"}
+func (b *BaseApi) CheckeRemoteDB(c *gin.Context) {
+	var req dto.RemoteDBCreate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	helper.SuccessWithData(c, remoteDBService.CheckeRemoteDB(req))
+}
+
+// @Tags Database
 // @Summary Page remote databases
 // @Description 获取远程数据库列表分页
 // @Accept json

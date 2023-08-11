@@ -127,7 +127,6 @@ definitions:
       value:
         type: string
     required:
-    - from
     - value
     type: object
   dto.ChangeHostGroup:
@@ -1000,10 +999,12 @@ definitions:
       id:
         type: integer
       password:
+        maxLength: 256
         type: string
       protocol:
         type: string
       username:
+        maxLength: 256
         type: string
     type: object
   dto.ImageSave:
@@ -1565,6 +1566,7 @@ definitions:
         - remote
         type: string
       name:
+        maxLength: 256
         type: string
       password:
         type: string
@@ -1599,6 +1601,7 @@ definitions:
       id:
         type: integer
       name:
+        maxLength: 256
         type: string
       password:
         type: string
@@ -6648,6 +6651,34 @@ paths:
       summary: Get remote databases
       tags:
       - Database
+  /databases/remote/check:
+    post:
+      consumes:
+      - application/json
+      description: 检测远程数据库连接性
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RemoteDBCreate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Check remote database
+      tags:
+      - Database
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        - type
+        formatEN: check if remote database [name][type] is connectable
+        formatZH: 检测远程数据库 [name][type] 连接性
+        paramKeys: []
   /databases/remote/del:
     post:
       consumes:

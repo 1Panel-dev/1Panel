@@ -4410,6 +4410,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/databases/remote/check": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "检测远程数据库连接性",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Database"
+                ],
+                "summary": "Check remote database",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.RemoteDBCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "name",
+                        "type"
+                    ],
+                    "formatEN": "check if remote database [name][type] is connectable",
+                    "formatZH": "检测远程数据库 [name][type] 连接性",
+                    "paramKeys": []
+                }
+            }
+        },
         "/databases/remote/del": {
             "post": {
                 "security": [
@@ -11621,7 +11664,6 @@ const docTemplate = `{
         "dto.ChangeDBInfo": {
             "type": "object",
             "required": [
-                "from",
                 "value"
             ],
             "properties": {
@@ -12923,13 +12965,15 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 256
                 },
                 "protocol": {
                     "type": "string"
                 },
                 "username": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 256
                 }
             }
         },
@@ -13776,7 +13820,8 @@ const docTemplate = `{
                     ]
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 256
                 },
                 "password": {
                     "type": "string"
@@ -13817,7 +13862,8 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 256
                 },
                 "password": {
                     "type": "string"
