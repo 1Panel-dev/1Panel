@@ -28,8 +28,8 @@
             </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" @sort-change="search" @search="search" :data="data">
-                    <el-table-column :label="$t('commons.table.name')" prop="name" sortable />
-                    <el-table-column :label="$t('database.address')" prop="address" />
+                    <el-table-column show-overflow-tooltip :label="$t('commons.table.name')" prop="name" sortable />
+                    <el-table-column show-overflow-tooltip :label="$t('database.address')" prop="address" />
                     <el-table-column :label="$t('commons.login.username')" prop="username" />
                     <el-table-column :label="$t('commons.login.password')" prop="password">
                         <template #default="{ row }">
@@ -74,7 +74,7 @@
                         show-overflow-tooltip
                     />
                     <fu-table-operations
-                        width="370px"
+                        width="170px"
                         :buttons="buttons"
                         :ellipsis="10"
                         :label="$t('commons.table.operate')"
@@ -138,7 +138,7 @@ const onOpenDialog = async (
         version: '5.6',
         address: '',
         port: 3306,
-        username: '',
+        username: 'root',
         password: '',
         description: '',
     },
