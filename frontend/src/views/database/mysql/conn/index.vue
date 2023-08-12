@@ -16,7 +16,15 @@
                         </span>
                     </el-form-item>
                     <el-form-item :label="$t('database.remoteConn')">
-                        <el-tag>{{ form.systemIP + ':' + form.port }}</el-tag>
+                        <el-tooltip v-if="loadConnInfo(true).length > 48" :content="loadConnInfo(true)" placement="top">
+                            <el-tag>{{ loadConnInfo(true).substring(0, 48) }}...</el-tag>
+                        </el-tooltip>
+                        <el-tag v-else>{{ loadConnInfo(true) }}</el-tag>
+                        <el-button
+                            @click="onCopy(form.systemIP + ':' + form.port)"
+                            icon="DocumentCopy"
+                            link
+                        ></el-button>
                         <span class="input-help">{{ $t('database.remoteConnHelper2') }}</span>
                     </el-form-item>
 
@@ -42,13 +50,27 @@
             <el-row type="flex" justify="center" v-if="form.from !== 'local'">
                 <el-col :span="22">
                     <el-form-item :label="$t('database.remoteConn')">
-                        <el-tag>{{ form.remoteIP + ':' + form.port }}</el-tag>
+                        <el-tooltip
+                            v-if="loadConnInfo(false).length > 48"
+                            :content="loadConnInfo(false)"
+                            placement="top"
+                        >
+                            <el-tag>{{ loadConnInfo(false).substring(0, 48) }}...</el-tag>
+                        </el-tooltip>
+                        <el-tag v-else>{{ loadConnInfo(false) }}</el-tag>
+                        <el-button
+                            @click="onCopy(form.remoteIP + ':' + form.port)"
+                            icon="DocumentCopy"
+                            link
+                        ></el-button>
                     </el-form-item>
                     <el-form-item :label="$t('commons.login.username')">
                         <el-tag>{{ form.username }}</el-tag>
+                        <el-button @click="onCopy(form.username)" icon="DocumentCopy" link></el-button>
                     </el-form-item>
                     <el-form-item :label="$t('commons.login.password')">
                         <el-tag>{{ form.password }}</el-tag>
+                        <el-button @click="onCopy(form.password)" icon="DocumentCopy" link></el-button>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -120,6 +142,12 @@ const acceptParams = (param: DialogProps): void => {
     loadPassword();
     dialogVisiable.value = true;
 };
+
+function loadConnInfo(isLocal: boolean) {
+    let ip = isLocal ? form.systemIP : form.remoteIP;
+    let info = ip + ':' + form.port;
+    return info;
+}
 
 const random = async () => {
     form.password = getRandomStr(16);
