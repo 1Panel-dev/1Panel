@@ -221,12 +221,14 @@ func handleTar(sourceDir, targetDir, name, exclusionRules string) error {
 		path = sourceDir
 	}
 
-	commands := fmt.Sprintf("tar --warning=no-file-changed zcvf %s %s %s", targetDir+"/"+name, excludeRules, path)
+	commands := fmt.Sprintf("tar --warning=no-file-changed -zcf %s %s %s", targetDir+"/"+name, excludeRules, path)
 	global.LOG.Debug(commands)
 	stdout, err := cmd.ExecWithTimeOut(commands, 24*time.Hour)
 	if err != nil {
-		global.LOG.Errorf("do handle tar failed, stdout: %s, err: %v", stdout, err)
-		return errors.New(stdout)
+		if len(stdout) != 0 {
+			global.LOG.Errorf("do handle tar failed, stdout: %s, err: %v", stdout, err)
+			return fmt.Errorf("do handle tar failed, stdout: %s, err: %v", stdout, err)
+		}
 	}
 	return nil
 }
