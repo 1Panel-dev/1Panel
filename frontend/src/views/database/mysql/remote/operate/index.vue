@@ -150,7 +150,7 @@ const onSubmit = async (formEl: FormInstance | undefined, operation: string) => 
         if (operation === 'create') {
             await addRemoteDB(param)
                 .then(() => {
-                    loading.value = true;
+                    loading.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                     emit('search');
                     drawerVisiable.value = false;
