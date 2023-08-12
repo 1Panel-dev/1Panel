@@ -3,6 +3,9 @@
         <div class="complex-table__header" v-if="$slots.header || header">
             <slot name="header">{{ header }}</slot>
         </div>
+        <div v-if="$slots.toolbar" style="margin-bottom: 10px">
+            <slot name="toolbar"></slot>
+        </div>
 
         <div class="complex-table__body">
             <fu-table v-bind="$attrs" ref="tableRef" @selection-change="handleSelectionChange">
