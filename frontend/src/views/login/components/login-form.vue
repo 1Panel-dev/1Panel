@@ -148,7 +148,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import type { ElForm } from 'element-plus';
 import { loginApi, getCaptcha, mfaLoginApi, checkIsDemo, getLanguage } from '@/api/modules/auth';
@@ -182,9 +182,10 @@ const loginForm = reactive({
     agreeLicense: false,
     language: 'zh',
 });
+
 const loginRules = reactive({
-    name: [{ required: true, message: i18n.global.t('commons.rule.username'), trigger: 'blur' }],
-    password: [{ required: true, message: i18n.global.t('commons.rule.password'), trigger: 'blur' }],
+    name: computed(() => [{ required: true, message: i18n.global.t('commons.rule.username'), trigger: 'blur' }]),
+    password: computed(() => [{ required: true, message: i18n.global.t('commons.rule.password'), trigger: 'blur' }]),
 });
 
 const mfaButtonFocused = ref();
