@@ -229,7 +229,7 @@ const loadStatus = async () => {
     for (const process of data.value) {
         process.status = [];
         for (const item of stats) {
-            if (process.name === item.name) {
+            if (process.name === item.name.split(':')[0]) {
                 process.status.push(item);
             }
         }
