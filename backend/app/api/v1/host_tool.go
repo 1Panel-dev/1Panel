@@ -190,6 +190,16 @@ func (b *BaseApi) GetProcess(c *gin.Context) {
 }
 
 // @Tags Host tool
+// @Summary Load Supervisor process status
+// @Description 获取 Supervisor 进程状态
+// @Success 200 {array} response.ProcessStatus
+// @Security ApiKeyAuth
+// @Router /host/tool/supervisor/process/load [post]
+func (b *BaseApi) LoadProcessStatus(c *gin.Context) {
+	helper.SuccessWithData(c, hostToolService.LoadProcessStatus())
+}
+
+// @Tags Host tool
 // @Summary Get Supervisor process config
 // @Description 操作 Supervisor 进程文件
 // @Accept json

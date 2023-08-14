@@ -3,6 +3,14 @@ package service
 import (
 	"bytes"
 	"fmt"
+	"os/exec"
+	"os/user"
+	"path"
+	"strconv"
+	"strings"
+	"sync"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
@@ -14,11 +22,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/systemctl"
 	"github.com/pkg/errors"
 	"gopkg.in/ini.v1"
-	"os/exec"
-	"os/user"
-	"path"
-	"strconv"
-	"strings"
 )
 
 type HostToolService struct{}
@@ -31,6 +34,7 @@ type IHostToolService interface {
 	GetToolLog(req request.HostToolLogReq) (string, error)
 	OperateSupervisorProcess(req request.SupervisorProcessConfig) error
 	GetSupervisorProcessConfig() ([]response.SupervisorProcessConfig, error)
+	LoadProcessStatus() []response.ProcessStatus
 	OperateSupervisorProcessFile(req request.SupervisorProcessFileReq) (string, error)
 }
 
@@ -364,6 +368,57 @@ func (h *HostToolService) OperateSupervisorProcess(req request.SupervisorProcess
 	return nil
 }
 
+func (h *HostToolService) LoadProcessStatus() []response.ProcessStatus {
+	var datas []response.ProcessStatus
+	statuLines, err := cmd.Exec("supervisorctl status")
+	if err != nil {
+		return datas
+	}
+	lines := strings.Split(string(statuLines), "\n")
+	for _, line := range lines {
+		fields := strings.Fields(line)
+		if len(fields) > 1 {
+			datas = append(datas, response.ProcessStatus{Name: fields[0]})
+		}
+	}
+
+	var wg sync.WaitGroup
+	wg.Add(len(datas))
+	for i := 0; i < len(datas); i++ {
+		go func(index int) {
+			for t := 0; t < 3; t++ {
+				status, err := cmd.ExecWithTimeOut(fmt.Sprintf("supervisorctl status %s", datas[index].Name), 3*time.Second)
+				if err != nil {
+					time.Sleep(2 * time.Second)
+					continue
+				}
+				fields := strings.Fields(status)
+				if len(fields) < 5 {
+					time.Sleep(2 * time.Second)
+					continue
+				}
+				datas[index].Name = fields[0]
+				datas[index].Status = fields[1]
+				if fields[1] != "RUNNING" {
+					datas[index].Msg = strings.Join(fields[2:], " ")
+					time.Sleep(1 * time.Second)
+					continue
+				}
+				datas[index].PID = strings.TrimSuffix(fields[3], ",")
+				datas[index].Uptime = fields[5]
+				break
+			}
+			if len(datas[index].Status) == 0 {
+				datas[index].Status = "FATAL"
+				datas[index].Msg = "Timeout for getting process status"
+			}
+			wg.Done()
+		}(i)
+	}
+	wg.Wait()
+	return datas
+}
+
 func (h *HostToolService) GetSupervisorProcessConfig() ([]response.SupervisorProcessConfig, error) {
 	var (
 		result []response.SupervisorProcessConfig
@@ -400,7 +455,6 @@ func (h *HostToolService) GetSupervisorProcessConfig() ([]response.SupervisorPro
 			if numprocs, _ := section.GetKey("numprocs"); numprocs != nil {
 				config.Numprocs = numprocs.Value()
 			}
-			_ = getProcessStatus(&config)
 			result = append(result, config)
 		}
 	}
@@ -527,30 +581,4 @@ func getProcessName(name, numprocs string) []string {
 		}
 	}
 	return processNames
-}
-
-func getProcessStatus(config *response.SupervisorProcessConfig) error {
-	var (
-		processNames = []string{"status"}
-	)
-	processNames = append(processNames, getProcessName(config.Name, config.Numprocs)...)
-	output, _ := exec.Command("supervisorctl", processNames...).Output()
-	lines := strings.Split(string(output), "\n")
-	for _, line := range lines {
-		fields := strings.Fields(line)
-		if len(fields) >= 5 {
-			status := response.ProcessStatus{
-				Name:   fields[0],
-				Status: fields[1],
-			}
-			if fields[1] == "RUNNING" {
-				status.PID = strings.TrimSuffix(fields[3], ",")
-				status.Uptime = fields[5]
-			} else {
-				status.Msg = strings.Join(fields[2:], " ")
-			}
-			config.Status = append(config.Status, status)
-		}
-	}
-	return nil
 }

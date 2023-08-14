@@ -73,6 +73,8 @@ const handleReady = (payload) => {
 };
 let timer: NodeJS.Timer | null = null;
 
+const em = defineEmits(['search']);
+
 const getContent = () => {
     loading.value = true;
     OperateSupervisorProcessFile(req)
@@ -114,8 +116,9 @@ const submit = () => {
     loading.value = true;
     OperateSupervisorProcessFile(updateReq)
         .then(() => {
+            em('search');
+            open.value = false;
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
-            getContent();
         })
         .finally(() => {
             loading.value = false;

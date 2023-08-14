@@ -6340,6 +6340,31 @@ const docTemplate = `{
                 }
             }
         },
+        "/host/tool/supervisor/process/load": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取 Supervisor 进程状态",
+                "tags": [
+                    "Host tool"
+                ],
+                "summary": "Load Supervisor process status",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.ProcessStatus"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/hosts": {
             "post": {
                 "security": [
@@ -17020,6 +17045,26 @@ const docTemplate = `{
                     }
                 },
                 "uploadMaxSize": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.ProcessStatus": {
+            "type": "object",
+            "properties": {
+                "PID": {
+                    "type": "string"
+                },
+                "msg": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "uptime": {
                     "type": "string"
                 }
             }

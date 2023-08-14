@@ -20,28 +20,41 @@
             </template>
             <template #main v-if="showTable">
                 <ComplexTable :data="data" :class="{ mask: !supervisorStatus.isRunning }">
-                    <el-table-column :label="$t('commons.table.name')" fix prop="name" width="150px"></el-table-column>
+                    <el-table-column
+                        :label="$t('commons.table.name')"
+                        fix
+                        prop="name"
+                        min-width="80px"
+                        show-overflow-tooltip
+                    ></el-table-column>
                     <el-table-column
                         :label="$t('tool.supervisor.command')"
                         prop="command"
+                        min-width="100px"
                         fix
                         show-overflow-tooltip
                     ></el-table-column>
                     <el-table-column
                         :label="$t('tool.supervisor.dir')"
                         prop="dir"
+                        min-width="100px"
                         fix
                         show-overflow-tooltip
                     ></el-table-column>
-                    <el-table-column :label="$t('tool.supervisor.user')" prop="user" width="100px"></el-table-column>
+                    <el-table-column
+                        :label="$t('tool.supervisor.user')"
+                        prop="user"
+                        show-overflow-tooltip
+                        min-width="50px"
+                    ></el-table-column>
                     <el-table-column
                         :label="$t('tool.supervisor.numprocs')"
                         prop="numprocs"
-                        width="100px"
+                        min-width="60px"
                     ></el-table-column>
-                    <el-table-column :label="$t('tool.supervisor.manage')" width="100px">
+                    <el-table-column :label="$t('tool.supervisor.manage')" min-width="80px">
                         <template #default="{ row }">
-                            <div v-if="row.status && row.status.length > 0">
+                            <div v-if="row.status && row.status.length > 0 && row.hasLoad">
                                 <el-button
                                     v-if="checkStatus(row.status) === 'RUNNING'"
                                     link
@@ -70,11 +83,14 @@
                                     {{ $t('commons.status.stopped') }}
                                 </el-button>
                             </div>
+                            <div v-if="!row.hasLoad">
+                                <el-button link loading></el-button>
+                            </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.status')" width="100px">
+                    <el-table-column :label="$t('commons.table.status')" min-width="60px">
                         <template #default="{ row }">
-                            <div v-if="row.status">
+                            <div v-if="row.hasLoad">
                                 <el-popover placement="bottom" :width="600" trigger="hover">
                                     <template #reference>
                                         <el-button type="primary" link v-if="row.status.length > 1">
@@ -111,6 +127,9 @@
                                     </el-table>
                                 </el-popover>
                             </div>
+                            <div v-if="!row.hasLoad">
+                                <el-button link loading></el-button>
+                            </div>
                         </template>
                     </el-table-column>
                     <fu-table-operations
@@ -118,7 +137,7 @@
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         :fixed="mobile ? false : 'right'"
-                        width="250px"
+                        width="280px"
                         fix
                     />
                 </ComplexTable>
@@ -126,7 +145,7 @@
             <ConfigSuperVisor v-if="setSuperVisor" />
         </LayoutContent>
         <Create ref="createRef" @close="search"></Create>
-        <File ref="fileRef"></File>
+        <File ref="fileRef" @search="search"></File>
     </div>
 </template>
 
@@ -138,7 +157,7 @@ import ConfigSuperVisor from './config/index.vue';
 import { computed, onMounted } from 'vue';
 import Create from './create/index.vue';
 import File from './file/index.vue';
-import { GetSupervisorProcess, OperateSupervisorProcess } from '@/api/modules/host-tool';
+import { GetSupervisorProcess, LoadProcessStatus, OperateSupervisorProcess } from '@/api/modules/host-tool';
 import { GlobalStore } from '@/store';
 import i18n from '@/lang';
 import { HostTool } from '@/api/interface/host-tool';
@@ -193,11 +212,31 @@ const openCreate = () => {
 
 const search = async () => {
     loading.value = true;
+    loadStatus();
     try {
         const res = await GetSupervisorProcess();
         data.value = res.data;
     } catch (error) {}
     loading.value = false;
+};
+
+const loadStatus = async () => {
+    const res = await LoadProcessStatus();
+    let stats = res.data || [];
+    if (stats.length === 0) {
+        return;
+    }
+    for (const process of data.value) {
+        process.status = [];
+        for (const item of stats) {
+            if (process.name === item.name) {
+                process.status.push(item);
+            }
+        }
+        if (process.status.length !== 0) {
+            process.hasLoad = true;
+        }
+    }
 };
 
 const mobile = computed(() => {
