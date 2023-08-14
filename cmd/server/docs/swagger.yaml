@@ -3714,6 +3714,19 @@ definitions:
       uploadMaxSize:
         type: string
     type: object
+  response.ProcessStatus:
+    properties:
+      PID:
+        type: string
+      msg:
+        type: string
+      name:
+        type: string
+      status:
+        type: string
+      uptime:
+        type: string
+    type: object
   response.WebsiteAcmeAccountDTO:
     properties:
       createdAt:
@@ -7880,6 +7893,21 @@ paths:
         formatEN: '[operate] Supervisor Process Config file'
         formatZH: '[operate] Supervisor 进程文件 '
         paramKeys: []
+  /host/tool/supervisor/process/load:
+    post:
+      description: 获取 Supervisor 进程状态
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/response.ProcessStatus'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Load Supervisor process status
+      tags:
+      - Host tool
   /hosts:
     post:
       consumes:
