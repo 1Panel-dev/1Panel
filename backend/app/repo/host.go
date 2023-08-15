@@ -19,6 +19,12 @@ type IHostRepo interface {
 	Create(host *model.Host) error
 	Update(id uint, vars map[string]interface{}) error
 	Delete(opts ...DBOption) error
+
+	GetFirewallRecord(opts ...DBOption) (model.Firewall, error)
+	ListFirewallRecord() ([]model.Firewall, error)
+	SaveFirewallRecord(firewall *model.Firewall) error
+	DeleteFirewallRecordByID(id uint) error
+	DeleteFirewallRecord(port, protocol, address, strategy string) error
 }
 
 func NewIHostRepo() IHostRepo {
@@ -105,4 +111,42 @@ func (h *HostRepo) Delete(opts ...DBOption) error {
 		db = opt(db)
 	}
 	return db.Delete(&model.Host{}).Error
+}
+
+func (h *HostRepo) GetFirewallRecord(opts ...DBOption) (model.Firewall, error) {
+	var firewall model.Firewall
+	db := global.DB
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	err := db.First(&firewall).Error
+	return firewall, err
+}
+
+func (h *HostRepo) ListFirewallRecord() ([]model.Firewall, error) {
+	var datas []model.Firewall
+	if err := global.DB.Find(&datas).Error; err != nil {
+		return datas, nil
+	}
+	return datas, nil
+}
+
+func (h *HostRepo) SaveFirewallRecord(firewall *model.Firewall) error {
+	if firewall.ID != 0 {
+		return global.DB.Save(firewall).Error
+	}
+	var data model.Firewall
+	_ = global.DB.Where("port = ? AND protocol = ? AND address = ? AND strategy = ?", firewall.Port, firewall.Protocol, firewall.Address, firewall.Strategy).First(&data)
+	if data.ID != 0 {
+		firewall.ID = data.ID
+	}
+	return global.DB.Save(firewall).Error
+}
+
+func (h *HostRepo) DeleteFirewallRecordByID(id uint) error {
+	return global.DB.Where("id = ?", id).Delete(&model.Firewall{}).Error
+}
+
+func (h *HostRepo) DeleteFirewallRecord(port, protocol, address, strategy string) error {
+	return global.DB.Where("port = ? AND protocol = ? AND address = ? AND strategy = ?", port, protocol, address, strategy).Delete(&model.Firewall{}).Error
 }

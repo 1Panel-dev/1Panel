@@ -105,6 +105,21 @@
                                     <span v-else>{{ $t('firewall.allIP') }}</span>
                                 </template>
                             </el-table-column>
+                            <el-table-column
+                                :min-width="150"
+                                :label="$t('commons.table.description')"
+                                prop="description"
+                            >
+                                <template #default="{ row }">
+                                    <fu-read-write-switch
+                                        :data="row.description"
+                                        v-model="row.edit"
+                                        @change="onChange(row)"
+                                    >
+                                        <el-input v-model="row.description" @blur="row.edit = false" />
+                                    </fu-read-write-switch>
+                                </template>
+                            </el-table-column>
                             <fu-table-operations
                                 width="200px"
                                 :buttons="buttons"
@@ -150,7 +165,7 @@ import TableSetting from '@/components/table-setting/index.vue';
 import OperatrDialog from '@/views/host/firewall/port/operate/index.vue';
 import FireStatus from '@/views/host/firewall/status/index.vue';
 import { onMounted, reactive, ref } from 'vue';
-import { batchOperateRule, searchFireRule, updatePortRule } from '@/api/modules/host';
+import { batchOperateRule, searchFireRule, updateFirewallDescription, updatePortRule } from '@/api/modules/host';
 import { Host } from '@/api/interface/host';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -239,6 +254,7 @@ const onChangeStatus = async (row: Host.RuleInfo, status: string) => {
                 source: '',
                 protocol: row.protocol,
                 strategy: row.strategy,
+                description: row.description,
             },
             newRule: {
                 operation: 'add',
@@ -247,6 +263,7 @@ const onChangeStatus = async (row: Host.RuleInfo, status: string) => {
                 source: '',
                 protocol: row.protocol,
                 strategy: status,
+                description: row.description,
             },
         };
         loading.value = true;
@@ -260,6 +277,13 @@ const onChangeStatus = async (row: Host.RuleInfo, status: string) => {
                 loading.value = false;
             });
     });
+};
+
+const onChange = async (info: any) => {
+    if (!info.edit) {
+        await updateFirewallDescription(info);
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    }
 };
 
 const onDelete = async (row: Host.RuleInfo | null) => {

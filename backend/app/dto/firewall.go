@@ -23,12 +23,25 @@ type PortRuleOperate struct {
 	Port      string `json:"port" validate:"required"`
 	Protocol  string `json:"protocol" validate:"required,oneof=tcp udp tcp/udp"`
 	Strategy  string `json:"strategy" validate:"required,oneof=accept drop"`
+
+	Description string `json:"description"`
+}
+
+type UpdateFirewallDescription struct {
+	Address  string `json:"address"`
+	Port     string `json:"port"`
+	Protocol string `json:"protocol"`
+	Strategy string `json:"strategy" validate:"required,oneof=accept drop"`
+
+	Description string `json:"description"`
 }
 
 type AddrRuleOperate struct {
 	Operation string `json:"operation" validate:"required,oneof=add remove"`
 	Address   string `json:"address"  validate:"required"`
 	Strategy  string `json:"strategy" validate:"required,oneof=accept drop"`
+
+	Description string `json:"description"`
 }
 
 type PortRuleUpdate struct {

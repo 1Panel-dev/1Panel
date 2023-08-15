@@ -24,6 +24,9 @@
                                 <el-radio label="drop">{{ $t('firewall.deny') }}</el-radio>
                             </el-radio-group>
                         </el-form-item>
+                        <el-form-item :label="$t('commons.table.description')" prop="description">
+                            <el-input clearable v-model.trim="dialogData.rowData!.description" />
+                        </el-form-item>
                     </el-col>
                 </el-row>
             </el-form>

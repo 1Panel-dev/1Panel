@@ -570,3 +570,13 @@ var UpdateCronjobWithDb = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddTableFirewall = &gormigrate.Migration{
+	ID: "20230814-add-table-firewall",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Firewall{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}

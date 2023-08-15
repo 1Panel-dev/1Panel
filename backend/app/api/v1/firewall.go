@@ -157,6 +157,31 @@ func (b *BaseApi) BatchOperateRule(c *gin.Context) {
 }
 
 // @Tags Firewall
+// @Summary Update rule description
+// @Description 更新防火墙描述
+// @Accept json
+// @Param request body dto.UpdateFirewallDescription true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /hosts/firewall/update/description [post]
+func (b *BaseApi) UpdateFirewallDescription(c *gin.Context) {
+	var req dto.UpdateFirewallDescription
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := firewallService.UpdateDescription(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Firewall
 // @Summary Create group
 // @Description 更新端口防火墙规则
 // @Accept json
