@@ -77,6 +77,14 @@ export namespace Host {
         strategy: string;
         appName: string;
         isUsed: boolean;
+        description: string;
+    }
+    export interface UpdateDescription {
+        address: string;
+        port: string;
+        protocol: string;
+        strategy: string;
+        description: string;
     }
     export interface RulePort {
         operation: string;
@@ -85,11 +93,13 @@ export namespace Host {
         source: string;
         protocol: string;
         strategy: string;
+        description: string;
     }
     export interface RuleIP {
         operation: string;
         address: string;
         strategy: string;
+        description: string;
     }
     export interface UpdatePortRule {
         oldRule: RulePort;

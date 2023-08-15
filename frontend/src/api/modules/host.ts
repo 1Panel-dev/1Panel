@@ -90,6 +90,9 @@ export const updatePortRule = (params: Host.UpdatePortRule) => {
 export const updateAddrRule = (params: Host.UpdateAddrRule) => {
     return http.post(`/hosts/firewall/update/addr`, params);
 };
+export const updateFirewallDescription = (params: Host.UpdateDescription) => {
+    return http.post(`/hosts/firewall/update/description`, params);
+};
 export const batchOperateRule = (params: Host.BatchRule) => {
     return http.post(`/hosts/firewall/batch`, params);
 };

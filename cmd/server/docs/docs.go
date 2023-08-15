@@ -6906,6 +6906,39 @@ const docTemplate = `{
                 }
             }
         },
+        "/hosts/firewall/update/description": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新防火墙描述",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Firewall"
+                ],
+                "summary": "Update rule description",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateFirewallDescription"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/hosts/firewall/update/port": {
             "post": {
                 "security": [
@@ -11517,6 +11550,9 @@ const docTemplate = `{
                 "address": {
                     "type": "string"
                 },
+                "description": {
+                    "type": "string"
+                },
                 "operation": {
                     "type": "string",
                     "enum": [
@@ -13610,6 +13646,9 @@ const docTemplate = `{
                 "address": {
                     "type": "string"
                 },
+                "description": {
+                    "type": "string"
+                },
                 "operation": {
                     "type": "string",
                     "enum": [
@@ -14466,6 +14505,33 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.UpdateFirewallDescription": {
+            "type": "object",
+            "required": [
+                "strategy"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "string"
+                },
+                "protocol": {
+                    "type": "string"
+                },
+                "strategy": {
+                    "type": "string",
+                    "enum": [
+                        "accept",
+                        "drop"
+                    ]
                 }
             }
         },

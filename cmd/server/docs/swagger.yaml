@@ -4,6 +4,8 @@ definitions:
     properties:
       address:
         type: string
+      description:
+        type: string
       operation:
         enum:
         - add
@@ -1409,6 +1411,8 @@ definitions:
     properties:
       address:
         type: string
+      description:
+        type: string
       operation:
         enum:
         - add
@@ -1987,6 +1991,24 @@ definitions:
         type: integer
     required:
     - id
+    type: object
+  dto.UpdateFirewallDescription:
+    properties:
+      address:
+        type: string
+      description:
+        type: string
+      port:
+        type: string
+      protocol:
+        type: string
+      strategy:
+        enum:
+        - accept
+        - drop
+        type: string
+    required:
+    - strategy
     type: object
   dto.Upgrade:
     properties:
@@ -8249,6 +8271,26 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Create group
+      tags:
+      - Firewall
+  /hosts/firewall/update/description:
+    post:
+      consumes:
+      - application/json
+      description: 更新防火墙描述
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateFirewallDescription'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update rule description
       tags:
       - Firewall
   /hosts/firewall/update/port:
