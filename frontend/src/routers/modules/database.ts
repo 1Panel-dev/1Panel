@@ -28,6 +28,16 @@ const databaseRouter = {
                     },
                 },
                 {
+                    path: 'mysql/setting',
+                    name: 'MySQL-Setting',
+                    component: () => import('@/views/database/mysql/setting/index.vue'),
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/databases',
+                        requiresAuth: false,
+                    },
+                },
+                {
                     path: 'mysql/remote',
                     name: 'MySQL-Remote',
                     component: () => import('@/views/database/mysql/remote/index.vue'),

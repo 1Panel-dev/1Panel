@@ -1,7 +1,11 @@
 <template>
-    <div v-show="onSetting" v-loading="loading">
-        <LayoutContent :title="'MySQL ' + $t('commons.button.set')" :reload="true">
-            <template #buttons>
+    <div v-loading="loading">
+        <LayoutContent>
+            <template #title>
+                <back-button name="MySQL" :header="'MySQL ' + $t('commons.button.set')" />
+            </template>
+
+            <template #toolbar>
                 <el-button type="primary" :plain="activeName !== 'conf'" @click="jumpToConf">
                     {{ $t('database.confChange') }}
                 </el-button>
@@ -115,12 +119,12 @@ import Status from '@/views/database/mysql/setting/status/index.vue';
 import Variables from '@/views/database/mysql/setting/variables/index.vue';
 import SlowLog from '@/views/database/mysql/setting/slow-log/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
-import { reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { loadDatabaseFile, loadMysqlBaseInfo, loadMysqlVariables, updateMysqlConfByFile } from '@/api/modules/database';
-import { ChangePort, GetAppDefaultConfig } from '@/api/modules/app';
+import { ChangePort, CheckAppInstalled, GetAppDefaultConfig } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -146,34 +150,12 @@ const statusRef = ref();
 const variablesRef = ref();
 const slowLogRef = ref();
 
-const onSetting = ref<boolean>(false);
 const mysqlName = ref();
 const mysqlStatus = ref();
 const mysqlVersion = ref();
 const variables = ref();
 
-interface DialogProps {
-    mysqlName: string;
-    mysqlVersion: string;
-    status: string;
-}
-
 const dialogContainerLogRef = ref();
-const acceptParams = (props: DialogProps): void => {
-    onSetting.value = true;
-    mysqlStatus.value = props.status;
-    mysqlVersion.value = props.mysqlVersion;
-    loadBaseInfo();
-    if (mysqlStatus.value === 'Running') {
-        loadVariables();
-        loadSlowLogs();
-        statusRef.value!.acceptParams({ mysqlName: props.mysqlName });
-    }
-};
-const onClose = (): void => {
-    onSetting.value = false;
-};
-
 const jumpToConf = async () => {
     activeName.value = 'conf';
     loadMysqlConf();
@@ -303,8 +285,21 @@ const loadMysqlConf = async () => {
     mysqlConf.value = res.data;
 };
 
-defineExpose({
-    acceptParams,
-    onClose,
+const onLoadInfo = async () => {
+    await CheckAppInstalled('mysql').then((res) => {
+        mysqlName.value = res.data.name;
+        mysqlStatus.value = res.data.status;
+        mysqlVersion.value = res.data.version;
+        loadBaseInfo();
+        if (mysqlStatus.value === 'Running') {
+            loadVariables();
+            loadSlowLogs();
+            statusRef.value!.acceptParams({ mysqlName: mysqlName.value });
+        }
+    });
+};
+
+onMounted(() => {
+    onLoadInfo();
 });
 </script>
