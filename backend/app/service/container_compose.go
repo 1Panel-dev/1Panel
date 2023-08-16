@@ -159,8 +159,10 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) (string, error) 
 	if req.From == "path" {
 		req.Name = path.Base(path.Dir(req.Path))
 	}
-	logName := path.Dir(req.Path) + "/compose.log"
-	file, err := os.OpenFile(logName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+
+	dockerLogDir := path.Join(global.CONF.System.TmpDir, "docker_logs")
+	logItem := fmt.Sprintf("%s/compose_create_%s_%s.log", dockerLogDir, req.Name, time.Now().Format("20060102150405"))
+	file, err := os.OpenFile(logItem, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {
 		return "", err
 	}
@@ -181,7 +183,7 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) (string, error) 
 		_, _ = file.WriteString("docker-compose up successful!")
 	}()
 
-	return req.Name, nil
+	return path.Base(logItem), nil
 }
 
 func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
