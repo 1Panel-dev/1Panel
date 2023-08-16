@@ -119,7 +119,6 @@
                     v-model:page-size="paginationConfig.pageSize"
                     v-bind="paginationConfig"
                     @change="search(req)"
-                    :page-sizes="[30, 60, 90]"
                     :layout="mobile ? 'total, prev, pager, next' : 'total, sizes, prev, pager, next, jumper'"
                 />
             </div>
@@ -259,14 +258,14 @@ onMounted(() => {
         }
 
         .app-desc {
-            margin-top: 5px;
+            margin-top: 8px;
             overflow: hidden;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
 
             text-overflow: ellipsis;
-            height: 45px;
+            height: 43px;
 
             .desc {
                 font-size: 14px;
