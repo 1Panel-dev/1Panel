@@ -327,7 +327,10 @@ func (h *HostToolService) OperateSupervisorProcess(req request.SupervisorProcess
 		if err = configFile.SaveTo(iniPath); err != nil {
 			return err
 		}
-		return operateSupervisorCtl("reload", "", "")
+		if err := operateSupervisorCtl("reread", "", ""); err != nil {
+			return err
+		}
+		return operateSupervisorCtl("update", "", "")
 	case "update":
 		configFile, err := ini.Load(iniPath)
 		if err != nil {
@@ -350,7 +353,10 @@ func (h *HostToolService) OperateSupervisorProcess(req request.SupervisorProcess
 		if err = configFile.SaveTo(iniPath); err != nil {
 			return err
 		}
-		return operateSupervisorCtl("reload", "", "")
+		if err := operateSupervisorCtl("reread", "", ""); err != nil {
+			return err
+		}
+		return operateSupervisorCtl("update", "", "")
 	case "restart":
 		return operateSupervisorCtl("restart", req.Name, "")
 	case "start":
@@ -362,7 +368,10 @@ func (h *HostToolService) OperateSupervisorProcess(req request.SupervisorProcess
 		_ = files.NewFileOp().DeleteFile(iniPath)
 		_ = files.NewFileOp().DeleteFile(outLog)
 		_ = files.NewFileOp().DeleteFile(errLog)
-		_ = operateSupervisorCtl("reload", "", "")
+		if err := operateSupervisorCtl("reread", "", ""); err != nil {
+			return err
+		}
+		return operateSupervisorCtl("update", "", "")
 	}
 
 	return nil
@@ -387,22 +396,21 @@ func (h *HostToolService) LoadProcessStatus() []response.ProcessStatus {
 	for i := 0; i < len(datas); i++ {
 		go func(index int) {
 			for t := 0; t < 3; t++ {
-				status, err := cmd.ExecWithTimeOut(fmt.Sprintf("supervisorctl status %s", datas[index].Name), 3*time.Second)
+				status, err := cmd.ExecWithTimeOut(fmt.Sprintf("supervisorctl status %s", datas[index].Name), 2*time.Second)
 				if err != nil {
-					time.Sleep(2 * time.Second)
+					time.Sleep(1 * time.Second)
 					continue
 				}
 				fields := strings.Fields(status)
 				if len(fields) < 5 {
-					time.Sleep(2 * time.Second)
+					time.Sleep(1 * time.Second)
 					continue
 				}
 				datas[index].Name = fields[0]
 				datas[index].Status = fields[1]
 				if fields[1] != "RUNNING" {
 					datas[index].Msg = strings.Join(fields[2:], " ")
-					time.Sleep(1 * time.Second)
-					continue
+					break
 				}
 				datas[index].PID = strings.TrimSuffix(fields[3], ",")
 				datas[index].Uptime = fields[5]
