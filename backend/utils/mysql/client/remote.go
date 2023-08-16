@@ -263,7 +263,7 @@ func (r *Remote) Recover(info RecoverInfo) error {
 
 func (r *Remote) SyncDB(version string) ([]SyncDBInfo, error) {
 	var datas []SyncDBInfo
-	rows, err := r.Client.Query("SELECT SCHEMA_NAME, DEFAULT_CHARACTER_SET_NAME FROM information_schema.SCHEMATA")
+	rows, err := r.Client.Query("select schema_name, default_character_set_name from information_schema.SCHEMATA")
 	if err != nil {
 		return datas, err
 	}
@@ -283,7 +283,7 @@ func (r *Remote) SyncDB(version string) ([]SyncDBInfo, error) {
 			MysqlName: r.From,
 			Format:    charsetName,
 		}
-		userRows, err := r.Client.Query("SELECT USER,HOST FROM mysql.DB WHERE DB = ?", dbName)
+		userRows, err := r.Client.Query("select user,host from mysql.db where db = ?", dbName)
 		if err != nil {
 			return datas, err
 		}

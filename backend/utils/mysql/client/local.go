@@ -147,7 +147,7 @@ func (r *Local) ChangePassword(info PasswordChangeInfo) error {
 		for _, user := range userlist {
 			passwordChangeSql := fmt.Sprintf("set password for %s = password('%s')", user, info.Password)
 			if !strings.HasPrefix(info.Version, "5.7") && !strings.HasPrefix(info.Version, "5.6") {
-				passwordChangeSql = fmt.Sprintf("ALTER USER %s IDENTIFIED WITH mysql_native_password BY '%s';", user, info.Password)
+				passwordChangeSql = fmt.Sprintf("alter user %s identified by '%s';", user, info.Password)
 			}
 			if err := r.ExecSQL(passwordChangeSql, info.Timeout); err != nil {
 				return err
@@ -276,7 +276,7 @@ func (r *Local) SyncDB(version string) ([]SyncDBInfo, error) {
 			From:   r.From,
 			Format: parts[1],
 		}
-		userLines, err := r.ExecSQLForRows(fmt.Sprintf("SELECT USER,HOST FROM mysql.DB WHERE DB = '%s'", parts[0]), 300)
+		userLines, err := r.ExecSQLForRows(fmt.Sprintf("select user,host from mysql.db where db = '%s'", parts[0]), 300)
 		if err != nil {
 			return datas, err
 		}

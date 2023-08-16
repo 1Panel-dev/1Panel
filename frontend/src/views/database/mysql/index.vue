@@ -11,7 +11,7 @@
                 ></AppStatus>
             </template>
 
-            <template v-if="!isOnSetting" #search>
+            <template #search>
                 <el-select v-model="paginationConfig.from" @change="search()">
                     <template #prefix>{{ $t('commons.table.type') }}</template>
                     <el-option-group>
@@ -28,7 +28,7 @@
                 </el-select>
             </template>
 
-            <template #toolbar v-if="!isOnSetting">
+            <template #toolbar>
                 <el-row>
                     <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
                         <el-button
@@ -77,7 +77,7 @@
                     </el-col>
                 </el-row>
             </template>
-            <template #main v-if="(mysqlIsExist && !isOnSetting) || !isLocal()">
+            <template #main v-if="mysqlIsExist || !isLocal()">
                 <ComplexTable
                     :pagination-config="paginationConfig"
                     @sort-change="search"
@@ -162,14 +162,10 @@
             </LayoutContent>
         </div>
 
-        <el-card
-            v-if="mysqlStatus != 'Running' && !isOnSetting && mysqlIsExist && !loading && maskShow && isLocal"
-            class="mask-prompt"
-        >
+        <el-card v-if="mysqlStatus != 'Running' && mysqlIsExist && !loading && maskShow && isLocal" class="mask-prompt">
             <span>{{ $t('commons.service.serviceNotStarted', ['MySQL']) }}</span>
         </el-card>
 
-        <Setting ref="settingRef" style="margin-top: 20px" />
         <el-dialog
             v-model="phpVisiable"
             :title="$t('app.checkTitle')"
@@ -208,7 +204,6 @@ import DeleteDialog from '@/views/database/mysql/delete/index.vue';
 import PasswordDialog from '@/views/database/mysql/password/index.vue';
 import RootPasswordDialog from '@/views/database/mysql/conn/index.vue';
 import AppResources from '@/views/database/mysql/check/index.vue';
-import Setting from '@/views/database/mysql/setting/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
 import Backups from '@/components/backup/index.vue';
 import UploadDialog from '@/components/upload/index.vue';
@@ -238,7 +233,6 @@ const maskShow = ref(true);
 const dbOptions = ref<Array<Database.RemoteDBOption>>([]);
 
 const mysqlName = ref();
-const isOnSetting = ref<boolean>();
 
 const checkRef = ref();
 const deleteRef = ref();
@@ -292,15 +286,8 @@ function isLocal() {
 
 const passwordRef = ref();
 
-const settingRef = ref();
 const onSetting = async () => {
-    isOnSetting.value = true;
-    let params = {
-        status: mysqlStatus.value,
-        mysqlName: mysqlName.value,
-        mysqlVersion: mysqlVersion.value,
-    };
-    settingRef.value!.acceptParams(params);
+    router.push({ name: 'MySQL-Setting' });
 };
 
 const search = async (column?: any) => {
