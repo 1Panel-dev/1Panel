@@ -5,28 +5,28 @@
                 {{ $t('commons.button.create') + $t('website.redirect') }}
             </el-button>
         </template>
-        <el-table-column :label="$t('commons.table.name')" prop="name"></el-table-column>
-        <el-table-column :label="$t('website.sourceDomain')" prop="domain" min-width="150px">
+        <el-table-column :label="$t('commons.table.name')" prop="name" min-width="60px" show-overflow-tooltip />
+        <el-table-column :label="$t('website.sourceDomain')" prop="domain" min-width="80px" show-overflow-tooltip>
             <template #default="{ row }">
                 <span v-if="row.type === 'domain'">{{ row.domains.join(',') }}</span>
                 <span v-else>{{ row.path }}</span>
             </template>
         </el-table-column>
-        <el-table-column :label="$t('commons.table.type')" prop="type" width="80px">
+        <el-table-column :label="$t('commons.table.type')" prop="type" min-width="60px">
             <template #default="{ row }">
                 <span v-if="row.type != 404">{{ $t('website.' + row.type) }}</span>
                 <span v-else>{{ 404 }}</span>
             </template>
         </el-table-column>
-        <el-table-column :label="$t('website.redirectWay')" prop="redirect" width="80px"></el-table-column>
-        <el-table-column :label="$t('website.targetURL')" prop="target"></el-table-column>
-        <el-table-column :label="$t('website.keepPath')" prop="keepPath">
+        <el-table-column :label="$t('website.redirectWay')" prop="redirect" min-width="50px"></el-table-column>
+        <el-table-column :label="$t('website.targetURL')" prop="target" min-width="100px" show-overflow-tooltip />
+        <el-table-column :label="$t('website.keepPath')" prop="keepPath" min-width="80px" show-overflow-tooltip>
             <template #default="{ row }">
                 <span v-if="row.type != '404'">{{ row.keepPath ? $t('website.keep') : $t('website.notKeep') }}</span>
                 <span v-else></span>
             </template>
         </el-table-column>
-        <el-table-column :label="$t('commons.table.status')" prop="enable">
+        <el-table-column :label="$t('commons.table.status')" prop="enable" min-width="50px">
             <template #default="{ row }">
                 <el-button v-if="row.enable" link type="success" :icon="VideoPlay" @click="opProxy(row)">
                     {{ $t('commons.status.running') }}
@@ -38,7 +38,7 @@
         </el-table-column>
         <fu-table-operations
             :ellipsis="10"
-            width="220px"
+            width="180px"
             :buttons="buttons"
             :label="$t('commons.table.operate')"
             :fixed="mobile ? false : 'right'"
