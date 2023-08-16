@@ -631,9 +631,9 @@ func (u *ContainerService) ContainerStats(id string) (*dto.ContainerStats, error
 func (u *ContainerService) LoadContainerLogs(req dto.OperationWithNameAndType) string {
 	filePath := ""
 	switch req.Type {
-	case "image-pull", "image-push", "image-build":
+	case "image-pull", "image-push", "image-build", "compose-create":
 		filePath = path.Join(global.CONF.System.TmpDir, fmt.Sprintf("docker_logs/%s", req.Name))
-	case "compose-detail", "compose-create":
+	case "compose-detail":
 		client, err := docker.NewDockerClient()
 		if err != nil {
 			return ""
