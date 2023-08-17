@@ -379,7 +379,7 @@ func (h *HostToolService) OperateSupervisorProcess(req request.SupervisorProcess
 
 func (h *HostToolService) LoadProcessStatus() ([]response.ProcessStatus, error) {
 	var datas []response.ProcessStatus
-	statuLines, err := cmd.Exec("supervisorct status")
+	statuLines, err := cmd.Exec("supervisorctl status")
 	if err != nil {
 		return datas, fmt.Errorf("exec `supervisorctl status` failed, err: %v", statuLines)
 	}
@@ -398,12 +398,12 @@ func (h *HostToolService) LoadProcessStatus() ([]response.ProcessStatus, error) 
 			for t := 0; t < 3; t++ {
 				status, err := cmd.ExecWithTimeOut(fmt.Sprintf("supervisorctl status %s", datas[index].Name), 2*time.Second)
 				if err != nil {
-					time.Sleep(1 * time.Second)
+					time.Sleep(2 * time.Second)
 					continue
 				}
 				fields := strings.Fields(status)
 				if len(fields) < 5 {
-					time.Sleep(1 * time.Second)
+					time.Sleep(2 * time.Second)
 					continue
 				}
 				datas[index].Name = fields[0]

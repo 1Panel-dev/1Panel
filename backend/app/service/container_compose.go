@@ -161,6 +161,11 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) (string, error) 
 	}
 
 	dockerLogDir := path.Join(global.CONF.System.TmpDir, "docker_logs")
+	if _, err := os.Stat(dockerLogDir); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(dockerLogDir, os.ModePerm); err != nil {
+			return "", err
+		}
+	}
 	logItem := fmt.Sprintf("%s/compose_create_%s_%s.log", dockerLogDir, req.Name, time.Now().Format("20060102150405"))
 	file, err := os.OpenFile(logItem, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {
