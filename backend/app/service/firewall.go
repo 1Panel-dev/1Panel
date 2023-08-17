@@ -207,6 +207,7 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 		return nil
 	}
 
+	itemPorts := req.Port
 	for _, proto := range protos {
 		if strings.Contains(req.Port, "-") {
 			req.Protocol = proto
@@ -215,7 +216,7 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 			}
 			_ = u.addPortRecord(req)
 		} else {
-			ports := strings.Split(req.Port, ",")
+			ports := strings.Split(itemPorts, ",")
 			for _, port := range ports {
 				if len(port) == 0 {
 					continue
