@@ -221,22 +221,27 @@ const search = async () => {
 };
 
 const loadStatus = async () => {
-    const res = await LoadProcessStatus();
-    let stats = res.data || [];
-    if (stats.length === 0) {
-        return;
-    }
-    for (const process of data.value) {
-        process.status = [];
-        for (const item of stats) {
-            if (process.name === item.name.split(':')[0]) {
-                process.status.push(item);
+    await LoadProcessStatus()
+        .then((res) => {
+            let stats = res.data || [];
+            for (const process of data.value) {
+                process.status = [];
+                for (const item of stats) {
+                    if (process.name === item.name.split(':')[0]) {
+                        process.status.push(item);
+                    }
+                }
+                if (process.status.length !== 0) {
+                    process.hasLoad = true;
+                }
             }
-        }
-        if (process.status.length !== 0) {
-            process.hasLoad = true;
-        }
-    }
+        })
+        .catch(() => {
+            for (const process of data.value) {
+                process.status = [{ name: '-', status: 'FATAL', msg: i18n.global.t('tool.supervisor.loadStatusErr') }];
+                process.hasLoad = true;
+            }
+        });
 };
 
 const mobile = computed(() => {

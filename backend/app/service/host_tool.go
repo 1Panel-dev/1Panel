@@ -34,7 +34,7 @@ type IHostToolService interface {
 	GetToolLog(req request.HostToolLogReq) (string, error)
 	OperateSupervisorProcess(req request.SupervisorProcessConfig) error
 	GetSupervisorProcessConfig() ([]response.SupervisorProcessConfig, error)
-	LoadProcessStatus() []response.ProcessStatus
+	LoadProcessStatus() ([]response.ProcessStatus, error)
 	OperateSupervisorProcessFile(req request.SupervisorProcessFileReq) (string, error)
 }
 
@@ -377,11 +377,11 @@ func (h *HostToolService) OperateSupervisorProcess(req request.SupervisorProcess
 	return nil
 }
 
-func (h *HostToolService) LoadProcessStatus() []response.ProcessStatus {
+func (h *HostToolService) LoadProcessStatus() ([]response.ProcessStatus, error) {
 	var datas []response.ProcessStatus
-	statuLines, err := cmd.Exec("supervisorctl status")
+	statuLines, err := cmd.Exec("supervisorct status")
 	if err != nil {
-		return datas
+		return datas, fmt.Errorf("exec `supervisorctl status` failed, err: %v", statuLines)
 	}
 	lines := strings.Split(string(statuLines), "\n")
 	for _, line := range lines {
@@ -424,7 +424,7 @@ func (h *HostToolService) LoadProcessStatus() []response.ProcessStatus {
 		}(i)
 	}
 	wg.Wait()
-	return datas
+	return datas, nil
 }
 
 func (h *HostToolService) GetSupervisorProcessConfig() ([]response.SupervisorProcessConfig, error) {

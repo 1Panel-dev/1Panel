@@ -196,7 +196,12 @@ func (b *BaseApi) GetProcess(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Router /host/tool/supervisor/process/load [post]
 func (b *BaseApi) LoadProcessStatus(c *gin.Context) {
-	helper.SuccessWithData(c, hostToolService.LoadProcessStatus())
+	datas, err := hostToolService.LoadProcessStatus()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, datas)
 }
 
 // @Tags Host tool
