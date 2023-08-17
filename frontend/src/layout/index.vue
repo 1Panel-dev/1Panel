@@ -148,7 +148,6 @@ onMounted(() => {
     top: 0;
     bottom: 0;
     left: 0;
-    z-index: 9999;
     overflow: hidden;
 }
 
@@ -178,6 +177,7 @@ onMounted(() => {
         transition: transform 0.28s;
         width: var(--panel-menu-width) !important;
         background: #ffffff;
+        z-index: 9999;
     }
     .app-footer {
         display: block;
