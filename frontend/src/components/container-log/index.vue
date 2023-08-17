@@ -1,7 +1,7 @@
 <template>
     <div>
         <div style="display: flex; flex-wrap: wrap">
-            <el-select @change="searchLogs" v-model="logSearch.mode" style="width: 100px">
+            <el-select @change="searchLogs" v-model="logSearch.mode" style="width: 150px">
                 <template #prefix>{{ $t('container.fetch') }}</template>
                 <el-option v-for="item in timeOptions" :key="item.label" :value="item.value" :label="item.label" />
             </el-select>
