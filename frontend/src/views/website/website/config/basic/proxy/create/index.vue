@@ -235,10 +235,10 @@ const submit = async (formEl: FormInstance | undefined) => {
 
 const getProtocolAndHost = (url: string): { protocol: string; host: string } | null => {
     if (url.startsWith('https://')) {
-        return { protocol: 'https', host: url.replaceAll('https://', '') };
+        return { protocol: 'https://', host: url.replaceAll('https://', '') };
     }
     if (url.startsWith('http://')) {
-        return { protocol: 'http', host: url.replaceAll('http://', '') };
+        return { protocol: 'http://', host: url.replaceAll('http://', '') };
     }
     return { protocol: '', host: url };
 };
