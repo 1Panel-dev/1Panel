@@ -234,16 +234,13 @@ const submit = async (formEl: FormInstance | undefined) => {
 };
 
 const getProtocolAndHost = (url: string): { protocol: string; host: string } | null => {
-    const regex = /^(https?:\/\/)([^\/]+)/;
-    const match = url.match(regex);
-    if (match) {
-        return {
-            protocol: match[1],
-            host: match[2],
-        };
+    if (url.startsWith('https://')) {
+        return { protocol: 'https', host: url.replaceAll('https://', '') };
     }
-    console.log('err');
-    return null;
+    if (url.startsWith('http://')) {
+        return { protocol: 'http', host: url.replaceAll('http://', '') };
+    }
+    return { protocol: '', host: url };
 };
 
 defineExpose({
