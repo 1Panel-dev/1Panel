@@ -1666,6 +1666,7 @@ const message = {
     },
     tool: {
         supervisor: {
+            loadStatusErr: 'Failed to retrieve process status, please check the status of the supervisor service.',
             notSupport: 'Supervisor is not detected, please refer to the official document for installation',
             list: 'Daemon process',
             config: 'Supervisor configuration',
