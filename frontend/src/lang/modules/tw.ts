@@ -1580,6 +1580,7 @@ const message = {
     },
     tool: {
         supervisor: {
+            loadStatusErr: '獲取進程狀態失敗，請檢查 supervisor 服務狀態',
             notSupport: '未檢測到 Supervisor，請參考官方文檔進行安裝',
             list: '守護進程',
             config: 'Supervisor 配置',

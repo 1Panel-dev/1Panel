@@ -1582,6 +1582,7 @@ const message = {
     },
     tool: {
         supervisor: {
+            loadStatusErr: '获取进程状态失败，请检查 supervisor 服务状态',
             notSupport: '未检测到 Supervisor，请参考官方文档进行安装',
             list: '守护进程',
             config: 'Supervisor 配置',
