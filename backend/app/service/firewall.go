@@ -166,59 +166,51 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 	if err != nil {
 		return err
 	}
+	protos := strings.Split(req.Protocol, "/")
 	if client.Name() == "ufw" {
-		req.Port = strings.ReplaceAll(req.Port, "-", ":")
-		if req.Operation == "remove" && req.Protocol == "tcp/udp" {
-			req.Protocol = ""
-			return u.operatePort(client, req)
+		if len(req.Address) == 0 {
+			req.Address = "Anywhere"
 		}
+		if strings.Contains(req.Port, ",") || strings.Contains(req.Port, "-") {
+			for _, proto := range protos {
+				req.Port = strings.ReplaceAll(req.Port, "-", ":")
+				req.Protocol = proto
+				if err := u.operatePort(client, req); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+		if req.Protocol == "tcp/udp" {
+			req.Protocol = ""
+		}
+		if err := u.operatePort(client, req); err != nil {
+			return err
+		}
+		return nil
 	}
-	if req.Protocol == "tcp/udp" {
-		if client.Name() == "firewalld" && strings.Contains(req.Port, ",") {
+
+	for _, proto := range protos {
+		if strings.Contains(req.Port, "-") {
+			req.Protocol = proto
+			if err := u.operatePort(client, req); err != nil {
+				return err
+			}
+		} else {
 			ports := strings.Split(req.Port, ",")
 			for _, port := range ports {
 				if len(port) == 0 {
 					continue
 				}
 				req.Port = port
-				req.Protocol = "tcp"
+				req.Protocol = proto
 				if err := u.operatePort(client, req); err != nil {
 					return err
 				}
-				req.Protocol = "udp"
-				if err := u.operatePort(client, req); err != nil {
-					return err
-				}
-			}
-		} else {
-			req.Protocol = "tcp"
-			if err := u.operatePort(client, req); err != nil {
-				return err
-			}
-			req.Protocol = "udp"
-			if err := u.operatePort(client, req); err != nil {
-				return err
-			}
-		}
-	} else {
-		if strings.Contains(req.Port, ",") {
-			ports := strings.Split(req.Port, ",")
-			for _, port := range ports {
-				req.Port = port
-				if err := u.operatePort(client, req); err != nil {
-					return err
-				}
-			}
-		} else {
-			if err := u.operatePort(client, req); err != nil {
-				return err
 			}
 		}
 	}
-	if reload {
-		return client.Reload()
-	}
-	return nil
+	return client.Reload()
 }
 
 func (u *FirewallService) OperateAddressRule(req dto.AddrRuleOperate, reload bool) error {
