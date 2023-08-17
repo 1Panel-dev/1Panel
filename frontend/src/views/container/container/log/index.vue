@@ -147,7 +147,7 @@ const searchLogs = async () => {
         `${protocol}://${host}/api/v1/containers/search/log?container=${logSearch.containerID}&since=${logSearch.mode}&tail=${logSearch.tail}&follow=${logSearch.isWatch}`,
     );
     terminalSocket.value.onmessage = (event) => {
-        logInfo.value += event.data;
+        logInfo.value += event.data.replace(/\x1B\[[0-9;]*[mG]/g, '');
         const state = view.value.state;
         view.value.dispatch({
             selection: { anchor: state.doc.length, head: state.doc.length },
