@@ -1,7 +1,21 @@
 import { ElMessage } from 'element-plus';
 
+let messageDom: any = null;
+const messageTypes: Array<string> = ['success', 'error', 'warning', 'info'];
+const Message: any = (options) => {
+    if (messageDom) messageDom.close();
+    messageDom = ElMessage(options);
+};
+messageTypes.forEach((type) => {
+    Message[type] = (options) => {
+        if (typeof options === 'string') options = { message: options };
+        options.type = type;
+        return Message(options);
+    };
+});
+
 export const MsgSuccess = (message) => {
-    ElMessage.success({
+    Message.success({
         message: message,
         type: 'success',
         showClose: true,
@@ -10,7 +24,7 @@ export const MsgSuccess = (message) => {
 };
 
 export const MsgInfo = (message) => {
-    ElMessage.info({
+    Message.info({
         message: message,
         type: 'info',
         showClose: true,
@@ -19,7 +33,7 @@ export const MsgInfo = (message) => {
 };
 
 export const MsgWarning = (message) => {
-    ElMessage.warning({
+    Message.warning({
         message: message,
         type: 'warning',
         showClose: true,
@@ -28,7 +42,7 @@ export const MsgWarning = (message) => {
 };
 
 export const MsgError = (message) => {
-    ElMessage.error({
+    Message.error({
         message: message,
         type: 'error',
         showClose: true,
