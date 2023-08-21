@@ -130,7 +130,7 @@ const acceptParams = (props: DialogProps): void => {
 };
 
 const onClean = async () => {
-    ElMessageBox.confirm(i18n.global.t('commons.msg.clean'), i18n.global.t('container.cleanLog'), {
+    ElMessageBox.confirm(i18n.global.t('container.cleanLogHelper'), i18n.global.t('container.cleanLog'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
