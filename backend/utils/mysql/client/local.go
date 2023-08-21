@@ -38,7 +38,7 @@ func (r *Local) Create(info CreateInfo) error {
 		return err
 	}
 
-	if err := r.CreateUser(info); err != nil {
+	if err := r.CreateUser(info, true); err != nil {
 		_ = r.ExecSQL(fmt.Sprintf("drop database if exists `%s`", info.Name), info.Timeout)
 		return err
 	}
@@ -46,7 +46,7 @@ func (r *Local) Create(info CreateInfo) error {
 	return nil
 }
 
-func (r *Local) CreateUser(info CreateInfo) error {
+func (r *Local) CreateUser(info CreateInfo, withDeleteDB bool) error {
 	var userlist []string
 	if strings.Contains(info.Permission, ",") {
 		ips := strings.Split(info.Permission, ",")
@@ -201,7 +201,7 @@ func (r *Local) ChangeAccess(info AccessChangeInfo) error {
 		Password:   info.Password,
 		Permission: info.Permission,
 		Timeout:    info.Timeout,
-	}); err != nil {
+	}, false); err != nil {
 		return err
 	}
 	if err := r.ExecSQL("flush privileges", 300); err != nil {
@@ -305,15 +305,16 @@ func (r *Local) SyncDB(version string) ([]SyncDBInfo, error) {
 			}
 		}
 		if len(dataItem.Username) == 0 {
+			username := loadNameByDB(parts[0], version)
 			if err := r.CreateUser(CreateInfo{
 				Name:       parts[0],
 				Format:     parts[1],
 				Version:    version,
-				Username:   parts[0],
+				Username:   username,
 				Password:   common.RandStr(16),
 				Permission: "%",
 				Timeout:    300,
-			}); err != nil {
+			}, false); err != nil {
 				global.LOG.Errorf("sync from remote server failed, err: create user failed %v", err)
 			}
 			dataItem.Username = parts[0]
