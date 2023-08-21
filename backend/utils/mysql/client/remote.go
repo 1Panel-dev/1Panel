@@ -39,7 +39,7 @@ func (r *Remote) Create(info CreateInfo) error {
 		return err
 	}
 
-	if err := r.CreateUser(info); err != nil {
+	if err := r.CreateUser(info, true); err != nil {
 		_ = r.ExecSQL(fmt.Sprintf("drop database if exists `%s`", info.Name), info.Timeout)
 		return err
 	}
@@ -47,7 +47,7 @@ func (r *Remote) Create(info CreateInfo) error {
 	return nil
 }
 
-func (r *Remote) CreateUser(info CreateInfo) error {
+func (r *Remote) CreateUser(info CreateInfo, withDeleteDB bool) error {
 	var userlist []string
 	if strings.Contains(info.Permission, ",") {
 		ips := strings.Split(info.Permission, ",")
@@ -62,15 +62,17 @@ func (r *Remote) CreateUser(info CreateInfo) error {
 
 	for _, user := range userlist {
 		if err := r.ExecSQL(fmt.Sprintf("create user %s identified by '%s';", user, info.Password), info.Timeout); err != nil {
-			_ = r.Delete(DeleteInfo{
-				Name:        info.Name,
-				Version:     info.Version,
-				Username:    info.Username,
-				Permission:  info.Permission,
-				ForceDelete: true,
-				Timeout:     300})
-			if strings.Contains(err.Error(), "ERROR 1396") {
-				return buserr.New(constant.ErrUserIsExist)
+			if withDeleteDB {
+				_ = r.Delete(DeleteInfo{
+					Name:        info.Name,
+					Version:     info.Version,
+					Username:    info.Username,
+					Permission:  info.Permission,
+					ForceDelete: true,
+					Timeout:     300})
+				if strings.Contains(err.Error(), "ERROR 1396") {
+					return buserr.New(constant.ErrUserIsExist)
+				}
 			}
 			return err
 		}
@@ -82,13 +84,15 @@ func (r *Remote) CreateUser(info CreateInfo) error {
 			grantStr = fmt.Sprintf("%s identified by '%s' with grant option;", grantStr, info.Password)
 		}
 		if err := r.ExecSQL(grantStr, info.Timeout); err != nil {
-			_ = r.Delete(DeleteInfo{
-				Name:        info.Name,
-				Version:     info.Version,
-				Username:    info.Username,
-				Permission:  info.Permission,
-				ForceDelete: true,
-				Timeout:     300})
+			if withDeleteDB {
+				_ = r.Delete(DeleteInfo{
+					Name:        info.Name,
+					Version:     info.Version,
+					Username:    info.Username,
+					Permission:  info.Permission,
+					ForceDelete: true,
+					Timeout:     300})
+			}
 			return err
 		}
 	}
@@ -202,7 +206,7 @@ func (r *Remote) ChangeAccess(info AccessChangeInfo) error {
 		Password:   info.Password,
 		Permission: info.Permission,
 		Timeout:    info.Timeout,
-	}); err != nil {
+	}, false); err != nil {
 		return err
 	}
 	if err := r.ExecSQL("flush privileges", 300); err != nil {
@@ -312,16 +316,17 @@ func (r *Remote) SyncDB(version string) ([]SyncDBInfo, error) {
 			i++
 		}
 		if len(dataItem.Username) == 0 {
+			userName := loadNameByDB(dbName, version)
 			if err := r.CreateUser(CreateInfo{
 				Name:       dbName,
 				Format:     charsetName,
 				Version:    version,
-				Username:   dbName,
+				Username:   userName,
 				Password:   common.RandStr(16),
 				Permission: "%",
 				Timeout:    300,
-			}); err != nil {
-				global.LOG.Errorf("sync from remote server failed, err: create user failed %v", err)
+			}, false); err != nil {
+				return datas, fmt.Errorf("sync db from remote server failed, err: create user failed %v", err)
 			}
 			dataItem.Username = dbName
 			dataItem.Permission = "%"
