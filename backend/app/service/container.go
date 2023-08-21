@@ -531,11 +531,15 @@ func (u *ContainerService) ContainerLogClean(req dto.OperationWithName) error {
 	if err != nil {
 		return err
 	}
-	container, err := client.ContainerInspect(context.Background(), req.Name)
+	ctx := context.Background()
+	containerItem, err := client.ContainerInspect(ctx, req.Name)
 	if err != nil {
 		return err
 	}
-	file, err := os.OpenFile(container.LogPath, os.O_RDWR|os.O_CREATE, 0666)
+	if err := client.ContainerStop(ctx, containerItem.ID, container.StopOptions{}); err != nil {
+		return err
+	}
+	file, err := os.OpenFile(containerItem.LogPath, os.O_RDWR|os.O_CREATE, 0666)
 	if err != nil {
 		return err
 	}
@@ -545,9 +549,13 @@ func (u *ContainerService) ContainerLogClean(req dto.OperationWithName) error {
 	}
 	_, _ = file.Seek(0, 0)
 
-	files, _ := filepath.Glob(fmt.Sprintf("%s.*", container.LogPath))
+	files, _ := filepath.Glob(fmt.Sprintf("%s.*", containerItem.LogPath))
 	for _, file := range files {
 		_ = os.Remove(file)
+	}
+
+	if err := client.ContainerStart(ctx, containerItem.ID, types.ContainerStartOptions{}); err != nil {
+		return err
 	}
 	return nil
 }
