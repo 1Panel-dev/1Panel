@@ -840,6 +840,10 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool) ([]respons
 		}
 		versions = common.GetSortedVersions(versions)
 		if len(versions) == 0 {
+			if !updated {
+				installDTO.CanUpdate = false
+				res = append(res, installDTO)
+			}
 			continue
 		}
 		lastVersion := versions[0]
