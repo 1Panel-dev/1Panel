@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -33,6 +34,8 @@ type ISnapshotService interface {
 	SnapshotRollback(req dto.SnapshotRecover) error
 	SnapshotImport(req dto.SnapshotImport) error
 	Delete(req dto.BatchDeleteReq) error
+
+	LoadSnapShotStatus(id uint) (*dto.SnapshotStatus, error)
 
 	UpdateDescription(req dto.UpdateDescription) error
 	readFromJson(path string) (SnapshotJson, error)
@@ -99,6 +102,18 @@ func (u *SnapshotService) UpdateDescription(req dto.UpdateDescription) error {
 	return snapshotRepo.Update(req.ID, map[string]interface{}{"description": req.Description})
 }
 
+func (u *SnapshotService) LoadSnapShotStatus(id uint) (*dto.SnapshotStatus, error) {
+	var data dto.SnapshotStatus
+	status, err := snapshotRepo.GetStatus(id)
+	if err != nil {
+		return nil, err
+	}
+	if err := copier.Copy(&data, &status); err != nil {
+		return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+	}
+	return &data, nil
+}
+
 type SnapshotJson struct {
 	OldBaseDir       string `json:"oldBaseDir"`
 	OldDockerDataDir string `json:"oldDockerDataDir"`
@@ -113,112 +128,103 @@ type SnapshotJson struct {
 }
 
 func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
-	global.LOG.Info("start to create snapshot now")
 	localDir, err := loadLocalDir()
 	if err != nil {
 		return err
 	}
-	backup, err := backupRepo.Get(commonRepo.WithByType(req.From))
-	if err != nil {
-		return err
-	}
-	backupAccount, err := NewIBackupService().NewClient(&backup)
-	if err != nil {
-		return err
+
+	var (
+		snap       model.Snapshot
+		snapStatus model.SnapshotStatus
+		rootDir    string
+	)
+
+	if req.ID == 0 {
+		timeNow := time.Now().Format("20060102150405")
+		versionItem, _ := settingRepo.Get(settingRepo.WithByKey("SystemVersion"))
+		rootDir = path.Join(localDir, fmt.Sprintf("system/1panel_%s_%s", versionItem.Value, timeNow))
+
+		snap = model.Snapshot{
+			Name:        fmt.Sprintf("1panel_%s_%s", versionItem.Value, timeNow),
+			Description: req.Description,
+			From:        req.From,
+			Version:     versionItem.Value,
+			Status:      constant.StatusWaiting,
+		}
+		_ = snapshotRepo.Create(&snap)
+		snapStatus.SnapID = snap.ID
+		_ = snapshotRepo.CreateStatus(&snapStatus)
+	} else {
+		snap, err = snapshotRepo.Get(commonRepo.WithByID(req.ID))
+		if err != nil {
+			return err
+		}
+		snapStatus, _ = snapshotRepo.GetStatus(snap.ID)
+		if snapStatus.ID == 0 {
+			snapStatus.SnapID = snap.ID
+			_ = snapshotRepo.CreateStatus(&snapStatus)
+		}
+		rootDir = path.Join(localDir, fmt.Sprintf("system/%s", snap.Name))
 	}
 
-	timeNow := time.Now().Format("20060102150405")
-	versionItem, _ := settingRepo.Get(settingRepo.WithByKey("SystemVersion"))
-	rootDir := path.Join(localDir, fmt.Sprintf("system/1panel_%s_%s", versionItem.Value, timeNow))
-	backupPanelDir := fmt.Sprintf("%s/1panel", rootDir)
+	var wg sync.WaitGroup
+	itemHelper := snapHelper{SnapID: snap.ID, Wg: &wg, FileOp: files.NewFileOp(), Ctx: context.Background()}
+	backupPanelDir := path.Join(rootDir, "1panel")
 	_ = os.MkdirAll(backupPanelDir, os.ModePerm)
-	backupDockerDir := fmt.Sprintf("%s/docker", rootDir)
+	backupDockerDir := path.Join(rootDir, "docker")
 	_ = os.MkdirAll(backupDockerDir, os.ModePerm)
 
-	_ = settingRepo.Update("SystemStatus", "Snapshoting")
-	snap := model.Snapshot{
-		Name:        fmt.Sprintf("1panel_%s_%s", versionItem.Value, timeNow),
-		Description: req.Description,
-		From:        req.From,
-		Version:     versionItem.Value,
-		Status:      constant.StatusSuccess,
+	jsonItem := SnapshotJson{
+		BaseDir:       global.CONF.System.BaseDir,
+		BackupDataDir: localDir,
+		PanelDataDir:  path.Join(global.CONF.System.BaseDir, "1panel"),
 	}
-	_ = snapshotRepo.Create(&snap)
+
+	if snapStatus.PanelInfo != constant.StatusDone {
+		wg.Add(1)
+		go snapJson(itemHelper, snapStatus.ID, jsonItem, rootDir)
+	}
+	if snapStatus.Panel != constant.StatusDone {
+		wg.Add(1)
+		go snapPanel(itemHelper, snapStatus.ID, backupPanelDir)
+	}
+	if snapStatus.PanelCtl != constant.StatusDone {
+		wg.Add(1)
+		go snapPanelCtl(itemHelper, snapStatus.ID, backupPanelDir)
+	}
+	if snapStatus.PanelService != constant.StatusDone {
+		wg.Add(1)
+		go snapPanelService(itemHelper, snapStatus.ID, backupPanelDir)
+	}
+	if snapStatus.DaemonJson != constant.StatusDone {
+		wg.Add(1)
+		go snapDaemonJson(itemHelper, snapStatus.ID, backupDockerDir)
+	}
+	if snapStatus.AppData != constant.StatusDone {
+		wg.Add(1)
+		go snapAppData(itemHelper, snapStatus.ID, backupDockerDir)
+	}
+	if snapStatus.BackupData != constant.StatusDone {
+		wg.Add(1)
+		go snapBackup(itemHelper, snapStatus.ID, localDir, backupPanelDir)
+	}
+	if snapStatus.PanelData != constant.StatusDone {
+		wg.Add(1)
+		go snapPanelData(itemHelper, snapStatus.ID, localDir, backupPanelDir)
+	}
+
 	go func() {
-		_ = global.Cron.Stop()
-		defer func() {
-			global.Cron.Start()
-			_ = os.RemoveAll(rootDir)
-		}()
-		fileOp := files.NewFileOp()
+		wg.Wait()
+		if checkIsAllDone(snap.ID) {
+			snapCompress(itemHelper, snapStatus.ID, rootDir)
 
-		snapJson := SnapshotJson{
-			BaseDir:       global.CONF.System.BaseDir,
-			BackupDataDir: localDir,
+			snapUpload(req.From, snapStatus.ID, fmt.Sprintf("%s.tar.gz", rootDir))
+			_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusSuccess})
+		} else {
+			_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
 		}
-
-		if err := u.handleDockerDatasWithSave(fileOp, "snapshot", "", backupDockerDir); err != nil {
-			updateSnapshotStatus(snap.ID, constant.StatusFailed, err.Error())
-			return
-		}
-		if err := u.handleDaemonJson(fileOp, "snapshot", "", backupDockerDir); err != nil {
-			updateSnapshotStatus(snap.ID, constant.StatusFailed, err.Error())
-			return
-		}
-
-		if err := u.handlePanelBinary(fileOp, "snapshot", "", backupPanelDir+"/1panel"); err != nil {
-			updateSnapshotStatus(snap.ID, constant.StatusFailed, err.Error())
-			return
-		}
-		if err := u.handlePanelctlBinary(fileOp, "snapshot", "", backupPanelDir+"/1pctl"); err != nil {
-			updateSnapshotStatus(snap.ID, constant.StatusFailed, err.Error())
-			return
-		}
-		if err := u.handlePanelService(fileOp, "snapshot", "", backupPanelDir+"/1panel.service"); err != nil {
-			updateSnapshotStatus(snap.ID, constant.StatusFailed, err.Error())
-			return
-		}
-
-		if err := u.handleBackupDatas(fileOp, "snapshot", localDir, backupPanelDir); err != nil {
-			updateSnapshotStatus(snap.ID, constant.StatusFailed, err.Error())
-			return
-		}
-
-		dataDir := path.Join(global.CONF.System.BaseDir, "1panel")
-		if err := u.handlePanelDatas(snap.ID, fileOp, "snapshot", dataDir, backupPanelDir, localDir, snapJson.DockerDataDir); err != nil {
-			updateSnapshotStatus(snap.ID, constant.StatusFailed, err.Error())
-			return
-		}
-		_, _ = cmd.Exec("systemctl restart docker")
-		snapJson.PanelDataDir = dataDir
-
-		if err := u.saveJson(snapJson, rootDir); err != nil {
-			updateSnapshotStatus(snap.ID, constant.StatusFailed, fmt.Sprintf("save snapshot json failed, err: %v", err))
-			return
-		}
-
-		if err := handleTar(rootDir, path.Join(localDir, "system"), fmt.Sprintf("1panel_%s_%s.tar.gz", versionItem.Value, timeNow), ""); err != nil {
-			updateSnapshotStatus(snap.ID, constant.StatusFailed, err.Error())
-			return
-		}
-
-		_ = settingRepo.Update("SystemStatus", "Free")
-
-		global.LOG.Infof("start to upload snapshot to %s, please wait", backup.Type)
-		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusUploading})
-		localPath := path.Join(localDir, fmt.Sprintf("system/1panel_%s_%s.tar.gz", versionItem.Value, timeNow))
-		itemBackupPath := strings.TrimPrefix(backup.BackupPath, "/")
-		itemBackupPath = strings.TrimSuffix(itemBackupPath, "/")
-		if ok, err := backupAccount.Upload(localPath, fmt.Sprintf("%s/system_snapshot/1panel_%s_%s.tar.gz", itemBackupPath, versionItem.Value, timeNow)); err != nil || !ok {
-			_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
-			global.LOG.Errorf("upload snapshot to %s failed, err: %v", backup.Type, err)
-			return
-		}
-		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusSuccess})
-		_ = os.RemoveAll(path.Join(localDir, fmt.Sprintf("system/1panel_%s_%s.tar.gz", versionItem.Value, timeNow)))
-
-		global.LOG.Infof("upload snapshot to %s success", backup.Type)
 	}()
+
 	return nil
 }
 
@@ -556,11 +562,11 @@ func (u *SnapshotService) readFromJson(path string) (SnapshotJson, error) {
 func (u *SnapshotService) handleDockerDatas(fileOp files.FileOp, operation string, source, target string) error {
 	switch operation {
 	case "snapshot":
-		if err := u.handleTar(source, target, "docker_data.tar.gz", ""); err != nil {
+		if err := handleSnapTar(source, target, "docker_data.tar.gz", ""); err != nil {
 			return fmt.Errorf("backup docker data failed, err: %v", err)
 		}
 	case "recover":
-		if err := u.handleTar(target, u.OriginalPath, "docker_data.tar.gz", ""); err != nil {
+		if err := handleSnapTar(target, u.OriginalPath, "docker_data.tar.gz", ""); err != nil {
 			return fmt.Errorf("backup docker data failed, err: %v", err)
 		}
 		if err := u.handleUnTar(source+"/docker/docker_data.tar.gz", target); err != nil {
@@ -581,31 +587,6 @@ func (u *SnapshotService) handleDockerDatas(fileOp files.FileOp, operation strin
 
 func (u *SnapshotService) handleDockerDatasWithSave(fileOp files.FileOp, operation, source, target string) error {
 	switch operation {
-	case "snapshot":
-		appInstalls, err := appInstallRepo.ListBy()
-		if err != nil {
-			return err
-		}
-		imageRegex := regexp.MustCompile(`image:\s*(.*)`)
-		var imageSaveList []string
-		existStr, _ := cmd.Exec("docker images | awk '{print $1\":\"$2}' | grep -v REPOSITORY:TAG")
-		existImages := strings.Split(existStr, "\n")
-		duplicateMap := make(map[string]bool)
-		for _, app := range appInstalls {
-			matches := imageRegex.FindAllStringSubmatch(app.DockerCompose, -1)
-			for _, match := range matches {
-				for _, existImage := range existImages {
-					if match[1] == existImage && !duplicateMap[match[1]] {
-						imageSaveList = append(imageSaveList, match[1])
-						duplicateMap[match[1]] = true
-					}
-				}
-			}
-		}
-		std, err := cmd.Execf("docker save %s | gzip -c > %s", strings.Join(imageSaveList, " "), path.Join(target, "docker_image.tar"))
-		if err != nil {
-			return errors.New(std)
-		}
 	case "recover":
 		if err := u.handleDockerDatasWithSave(fileOp, "snapshot", "", u.OriginalPath); err != nil {
 			return fmt.Errorf("backup docker data failed, err: %v", err)
@@ -731,12 +712,8 @@ func (u *SnapshotService) handlePanelService(fileOp files.FileOp, operation stri
 
 func (u *SnapshotService) handleBackupDatas(fileOp files.FileOp, operation string, source, target string) error {
 	switch operation {
-	case "snapshot":
-		if err := u.handleTar(source, target, "1panel_backup.tar.gz", "./system;"); err != nil {
-			return fmt.Errorf("backup panel local backup dir data failed, err: %v", err)
-		}
 	case "recover":
-		if err := u.handleTar(target, u.OriginalPath, "1panel_backup.tar.gz", "./system;"); err != nil {
+		if err := handleSnapTar(target, u.OriginalPath, "1panel_backup.tar.gz", "./system;"); err != nil {
 			return fmt.Errorf("restore original local backup dir data failed, err: %v", err)
 		}
 		if err := u.handleUnTar(source+"/1panel/1panel_backup.tar.gz", target); err != nil {
@@ -766,7 +743,7 @@ func (u *SnapshotService) handlePanelDatas(snapID uint, fileOp files.FileOp, ope
 			exclusionRules += ("." + strings.ReplaceAll(dockerDir, source, "") + ";")
 		}
 
-		if err := u.handleTar(source, target, "1panel_data.tar.gz", exclusionRules); err != nil {
+		if err := handleSnapTar(source, target, "1panel_data.tar.gz", exclusionRules); err != nil {
 			return fmt.Errorf("backup panel data failed, err: %v", err)
 		}
 	case "recover":
@@ -779,7 +756,7 @@ func (u *SnapshotService) handlePanelDatas(snapID uint, fileOp files.FileOp, ope
 		}
 
 		_ = snapshotRepo.Update(snapID, map[string]interface{}{"recover_status": ""})
-		if err := u.handleTar(target, u.OriginalPath, "1panel_data.tar.gz", exclusionRules); err != nil {
+		if err := handleSnapTar(target, u.OriginalPath, "1panel_data.tar.gz", exclusionRules); err != nil {
 			return fmt.Errorf("restore original panel data failed, err: %v", err)
 		}
 		_ = snapshotRepo.Update(snapID, map[string]interface{}{"recover_status": constant.StatusWaiting})
@@ -825,6 +802,7 @@ func (u *SnapshotService) Delete(req dto.BatchDeleteReq) error {
 		if _, err := os.Stat(itemFile); err == nil {
 			_ = os.Remove(itemFile)
 		}
+		_ = snapshotRepo.DeleteStatus(snap.ID)
 	}
 	if err := snapshotRepo.Delete(commonRepo.WithIdsIn(req.Ids)); err != nil {
 		return err
@@ -833,18 +811,6 @@ func (u *SnapshotService) Delete(req dto.BatchDeleteReq) error {
 	return nil
 }
 
-func updateSnapshotStatus(id uint, status string, message string) {
-	if status != constant.StatusSuccess {
-		global.LOG.Errorf("snapshot failed, err: %s", message)
-	}
-	if err := snapshotRepo.Update(id, map[string]interface{}{
-		"status":  status,
-		"message": message,
-	}); err != nil {
-		global.LOG.Errorf("update snap snapshot status failed, err: %v", err)
-	}
-	_ = settingRepo.Update("SystemStatus", "Free")
-}
 func updateRecoverStatus(id uint, interruptStep, status string, message string) {
 	if status != constant.StatusSuccess {
 		global.LOG.Errorf("recover failed, err: %s", message)
@@ -939,35 +905,6 @@ func (u *SnapshotService) updateLiveRestore(enabled bool) error {
 	return nil
 }
 
-func (u *SnapshotService) handleTar(sourceDir, targetDir, name, exclusionRules string) error {
-	if _, err := os.Stat(targetDir); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(targetDir, os.ModePerm); err != nil {
-			return err
-		}
-	}
-
-	exStr := ""
-	excludes := strings.Split(exclusionRules, ";")
-	for _, exclude := range excludes {
-		if len(exclude) == 0 {
-			continue
-		}
-		exStr += " --exclude "
-		exStr += exclude
-	}
-
-	commands := fmt.Sprintf("tar --warning=no-file-changed -zcf %s %s -C %s .", targetDir+"/"+name, exStr, sourceDir)
-	global.LOG.Debug(commands)
-	stdout, err := cmd.ExecWithTimeOut(commands, 30*time.Minute)
-	if err != nil {
-		if len(stdout) != 0 {
-			global.LOG.Errorf("do handle tar failed, stdout: %s, err: %v", stdout, err)
-			return fmt.Errorf("do handle tar failed, stdout: %s, err: %v", stdout, err)
-		}
-	}
-	return nil
-}
-
 func (u *SnapshotService) handleUnTar(sourceDir, targetDir string) error {
 	if _, err := os.Stat(targetDir); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(targetDir, os.ModePerm); err != nil {
@@ -1034,4 +971,36 @@ func min(a, b int) int {
 		return a
 	}
 	return b
+}
+
+func checkIsAllDone(snapID uint) bool {
+	status, err := snapshotRepo.GetStatus(snapID)
+	if err != nil {
+		return false
+	}
+	if status.Panel != constant.StatusDone {
+		return false
+	}
+	if status.PanelCtl != constant.StatusDone {
+		return false
+	}
+	if status.PanelService != constant.StatusDone {
+		return false
+	}
+	if status.PanelInfo != constant.StatusDone {
+		return false
+	}
+	if status.DaemonJson != constant.StatusDone {
+		return false
+	}
+	if status.AppData != constant.StatusDone {
+		return false
+	}
+	if status.PanelData != constant.StatusDone {
+		return false
+	}
+	if status.BackupData != constant.StatusDone {
+		return false
+	}
+	return true
 }

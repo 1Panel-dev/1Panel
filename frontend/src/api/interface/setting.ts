@@ -76,6 +76,7 @@ export namespace Setting {
         interval: string;
     }
     export interface SnapshotCreate {
+        id: number;
         from: string;
         description: string;
     }
@@ -105,6 +106,19 @@ export namespace Setting {
         rollbackStatus: string;
         rollbackMessage: string;
         lastRollbackedAt: string;
+    }
+    export interface SnapshotStatus {
+        panel: string;
+        panelCtl: string;
+        panelService: string;
+        panelInfo: string;
+        daemonJson: string;
+        appData: string;
+        panelData: string;
+        backupData: string;
+
+        compress: string;
+        upload: string;
     }
     export interface UpgradeInfo {
         newVersion: string;

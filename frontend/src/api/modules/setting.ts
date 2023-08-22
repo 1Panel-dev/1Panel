@@ -132,6 +132,9 @@ export const listBucket = (params: Backup.ForBucket) => {
 export const snapshotCreate = (param: Setting.SnapshotCreate) => {
     return http.post(`/settings/snapshot`, param);
 };
+export const loadSnapStatus = (id: number) => {
+    return http.post<Setting.SnapshotStatus>(`/settings/snapshot/status`, { id: id });
+};
 export const snapshotImport = (param: Setting.SnapshotImport) => {
     return http.post(`/settings/snapshot/import`, param);
 };

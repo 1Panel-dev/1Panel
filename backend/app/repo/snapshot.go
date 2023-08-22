@@ -12,6 +12,12 @@ type ISnapshotRepo interface {
 	Update(id uint, vars map[string]interface{}) error
 	Page(limit, offset int, opts ...DBOption) (int64, []model.Snapshot, error)
 	Delete(opts ...DBOption) error
+
+	GetStatus(snapID uint) (model.SnapshotStatus, error)
+	GetStatusList(opts ...DBOption) ([]model.SnapshotStatus, error)
+	CreateStatus(snap *model.SnapshotStatus) error
+	DeleteStatus(snapID uint) error
+	UpdateStatus(id uint, vars map[string]interface{}) error
 }
 
 func NewISnapshotRepo() ISnapshotRepo {
@@ -66,4 +72,34 @@ func (u *SnapshotRepo) Delete(opts ...DBOption) error {
 		db = opt(db)
 	}
 	return db.Delete(&model.Snapshot{}).Error
+}
+
+func (u *SnapshotRepo) GetStatus(snapID uint) (model.SnapshotStatus, error) {
+	var data model.SnapshotStatus
+	if err := global.DB.Where("snap_id = ?", snapID).First(&data).Error; err != nil {
+		return data, err
+	}
+	return data, nil
+}
+
+func (u *SnapshotRepo) GetStatusList(opts ...DBOption) ([]model.SnapshotStatus, error) {
+	var status []model.SnapshotStatus
+	db := global.DB.Model(&model.SnapshotStatus{})
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	err := db.Find(&status).Error
+	return status, err
+}
+
+func (u *SnapshotRepo) CreateStatus(snap *model.SnapshotStatus) error {
+	return global.DB.Create(snap).Error
+}
+
+func (u *SnapshotRepo) DeleteStatus(snapID uint) error {
+	return global.DB.Where("snap_id = ?", snapID).Delete(&model.SnapshotStatus{}).Error
+}
+
+func (u *SnapshotRepo) UpdateStatus(id uint, vars map[string]interface{}) error {
+	return global.DB.Model(&model.SnapshotStatus{}).Where("id = ?", id).Updates(vars).Error
 }
