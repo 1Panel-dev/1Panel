@@ -42,6 +42,10 @@ export const SearchAppInstalled = (search: App.AppInstallSearch) => {
     return http.post<ResPage<App.AppInstalled>>('apps/installed/search', search);
 };
 
+export const ListAppInstalled = () => {
+    return http.get<Array<App.AppInstalledInfo>>('apps/installed/list');
+};
+
 export const GetAppPort = (key: string) => {
     return http.get<number>(`apps/installed/loadport/${key}`);
 };

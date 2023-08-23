@@ -15,6 +15,7 @@ export namespace Cronjob {
         script: string;
         inContainer: boolean;
         containerName: string;
+        appID: string;
         website: string;
         exclusionRules: string;
         dbName: string;

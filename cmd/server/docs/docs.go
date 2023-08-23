@@ -460,6 +460,34 @@ const docTemplate = `{
                 }
             }
         },
+        "/apps/installed/list": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取已安装应用列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "App"
+                ],
+                "summary": "List app installed",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.AppInstallInfo"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/apps/installed/loadport/:key": {
             "get": {
                 "security": [
@@ -689,14 +717,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "获取已安装应用列表",
+                "description": "分页获取已安装应用列表",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "App"
                 ],
-                "summary": "List app installed",
+                "summary": "Page app installed",
                 "parameters": [
                     {
                         "description": "request",
@@ -11580,6 +11608,20 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.AppInstallInfo": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.AppResource": {
             "type": "object",
             "properties": {
@@ -12213,6 +12255,9 @@ const docTemplate = `{
                 "type"
             ],
             "properties": {
+                "appID": {
+                    "type": "string"
+                },
                 "containerName": {
                     "type": "string"
                 },
@@ -12295,6 +12340,9 @@ const docTemplate = `{
                 "specType"
             ],
             "properties": {
+                "appID": {
+                    "type": "string"
+                },
                 "containerName": {
                     "type": "string"
                 },

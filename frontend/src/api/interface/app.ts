@@ -116,6 +116,12 @@ export namespace App {
         app: App;
     }
 
+    export interface AppInstalledInfo {
+        id: number;
+        key: string;
+        name: string;
+    }
+
     export interface CheckInstalled {
         name: string;
         version: string;

@@ -177,6 +177,17 @@
                                             {{ $t('file.download') }}
                                         </el-button>
                                     </el-form-item>
+                                    <el-form-item class="description" v-if="dialogData.rowData!.type === 'app'">
+                                        <template #label>
+                                            <span class="status-label">{{ $t('cronjob.app') }}</span>
+                                        </template>
+                                        <span v-if="dialogData.rowData!.appID !== 'all'" class="status-count">
+                                            {{ dialogData.rowData!.appID }}
+                                        </span>
+                                        <span v-else class="status-count">
+                                            {{ $t('commons.table.all') }}
+                                        </span>
+                                    </el-form-item>
                                     <el-form-item class="description" v-if="dialogData.rowData!.type === 'website'">
                                         <template #label>
                                             <span class="status-label">{{ $t('cronjob.website') }}</span>
@@ -228,10 +239,7 @@
                                         <span class="status-count">{{ dialogData.rowData!.retainCopies }}</span>
                                     </el-form-item>
                                 </el-row>
-                                <el-form-item
-                                    class="description"
-                                    v-if="dialogData.rowData!.type === 'website' || dialogData.rowData!.type === 'directory'"
-                                >
+                                <el-form-item class="description" v-if=" dialogData.rowData!.type === 'directory'">
                                     <template #label>
                                         <span class="status-label">{{ $t('cronjob.exclusionRules') }}</span>
                                     </template>
@@ -375,6 +383,7 @@ import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { MsgError, MsgInfo, MsgSuccess } from '@/utils/message';
 import { loadDBOptions } from '@/api/modules/database';
+import { ListAppInstalled } from '@/api/modules/app';
 
 const loading = ref();
 const refresh = ref(false);
@@ -411,6 +420,16 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
                 } else {
                     dialogData.value.rowData.dbName = item.from + ' [' + item.name + ']';
                 }
+                break;
+            }
+        }
+    }
+    if (dialogData.value.rowData.type === 'app') {
+        const res = await ListAppInstalled();
+        let itemApps = res.data || [];
+        for (const item of itemApps) {
+            if (item.id == dialogData.value.rowData.appID) {
+                dialogData.value.rowData.appID = item.key + ' [' + item.name + ']';
                 break;
             }
         }
@@ -572,6 +591,10 @@ const onDownload = async (record: any, backupID: number) => {
         MsgInfo(i18n.global.t('cronjob.allOptionHelper', [i18n.global.t('database.database')]));
         return;
     }
+    if (dialogData.value.rowData.app === 'all') {
+        MsgInfo(i18n.global.t('cronjob.allOptionHelper', [i18n.global.t('app.app')]));
+        return;
+    }
     if (dialogData.value.rowData.website === 'all') {
         MsgInfo(i18n.global.t('cronjob.allOptionHelper', [i18n.global.t('website.website')]));
         return;
@@ -652,6 +675,7 @@ const cleanRecord = async () => {
 
 function isBackup() {
     return (
+        dialogData.value.rowData!.type === 'app' ||
         dialogData.value.rowData!.type === 'website' ||
         dialogData.value.rowData!.type === 'database' ||
         dialogData.value.rowData!.type === 'directory'

@@ -665,6 +665,7 @@ const message = {
         containerCheckBox: '在容器中執行（無需再輸入進入容器命令）',
         containerName: '容器名稱',
         ntp: '時間同步',
+        app: '備份應用',
         website: '備份網站',
         rulesHelper: '當存在多個壓縮排除規則時，需要換行顯示，例：\n*.log \n*.sql',
         lastRecordTime: '上次執行時間',

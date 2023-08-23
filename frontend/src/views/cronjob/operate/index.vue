@@ -19,6 +19,7 @@
                             v-model="dialogData.rowData!.type"
                         >
                             <el-option value="shell" :label="$t('cronjob.shell')" />
+                            <el-option value="app" :label="$t('cronjob.app')" />
                             <el-option value="website" :label="$t('cronjob.website')" />
                             <el-option value="database" :label="$t('cronjob.database')" />
                             <el-option value="directory" :label="$t('cronjob.directory')" />
@@ -117,6 +118,17 @@
                             {{ $t('cronjob.cutWebsiteLogHelper') }}
                         </span>
                     </el-form-item>
+
+                    <div v-if="dialogData.rowData!.type === 'app'">
+                        <el-form-item :label="$t('cronjob.app')" prop="appID">
+                            <el-select class="selectClass" clearable v-model="dialogData.rowData!.appID">
+                                <el-option :label="$t('commons.table.all')" value="all" />
+                                <div v-for="item in appOptions" :key="item.id">
+                                    <el-option :label="item.key + ' [' + item.name + ']'" :value="item.id + ''" />
+                                </div>
+                            </el-select>
+                        </el-form-item>
+                    </div>
 
                     <div v-if="dialogData.rowData!.type === 'database'">
                         <el-form-item :label="$t('cronjob.database')" prop="dbName">
@@ -237,6 +249,7 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 import { useRouter } from 'vue-router';
 import { listContainer } from '@/api/modules/container';
 import { Database } from '@/api/interface/database';
+import { ListAppInstalled } from '@/api/modules/app';
 const router = useRouter();
 
 interface DialogProps {
@@ -264,6 +277,7 @@ const acceptParams = (params: DialogProps): void => {
     drawerVisiable.value = true;
     checkMysqlInstalled();
     loadBackups();
+    loadAppInstalls();
     loadWebsites();
     loadContainers();
 };
@@ -282,6 +296,7 @@ const localDirID = ref();
 const containerOptions = ref();
 const websiteOptions = ref();
 const backupOptions = ref();
+const appOptions = ref();
 
 const mysqlInfo = reactive({
     isExist: false,
@@ -417,6 +432,11 @@ const changeType = () => {
             dialogData.value.rowData.hour = 1;
             dialogData.value.rowData.minute = 30;
             break;
+        case 'app':
+            dialogData.value.rowData.specType = 'perDay';
+            dialogData.value.rowData.hour = 2;
+            dialogData.value.rowData.minute = 30;
+            break;
         case 'database':
             dialogData.value.rowData.specType = 'perDay';
             dialogData.value.rowData.hour = 2;
@@ -459,6 +479,11 @@ const loadBackups = async () => {
     }
 };
 
+const loadAppInstalls = async () => {
+    const res = await ListAppInstalled();
+    appOptions.value = res.data || [];
+};
+
 const loadWebsites = async () => {
     const res = await GetWebsiteOptions();
     websiteOptions.value = res.data || [];
@@ -476,6 +501,7 @@ const checkMysqlInstalled = async () => {
 
 function isBackup() {
     return (
+        dialogData.value.rowData!.type === 'app' ||
         dialogData.value.rowData!.type === 'website' ||
         dialogData.value.rowData!.type === 'database' ||
         dialogData.value.rowData!.type === 'directory'

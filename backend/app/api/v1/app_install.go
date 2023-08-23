@@ -14,8 +14,8 @@ import (
 )
 
 // @Tags App
-// @Summary List app installed
-// @Description 获取已安装应用列表
+// @Summary Page app installed
+// @Description 分页获取已安装应用列表
 // @Accept json
 // @Param request body request.AppInstalledSearch true "request"
 // @Success 200
@@ -45,6 +45,22 @@ func (b *BaseApi) SearchAppInstalled(c *gin.Context) {
 		}
 		helper.SuccessWithData(c, list)
 	}
+}
+
+// @Tags App
+// @Summary List app installed
+// @Description 获取已安装应用列表
+// @Accept json
+// @Success 200 array dto.AppInstallInfo
+// @Security ApiKeyAuth
+// @Router /apps/installed/list [get]
+func (b *BaseApi) ListAppInstalled(c *gin.Context) {
+	list, err := appInstallService.GetInstallList()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, list)
 }
 
 // @Tags App
