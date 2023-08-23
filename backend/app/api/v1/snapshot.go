@@ -61,6 +61,32 @@ func (b *BaseApi) ImportSnapshot(c *gin.Context) {
 }
 
 // @Tags System Setting
+// @Summary Load Snapshot status
+// @Description 获取快照状态
+// @Accept json
+// @Param request body dto.OperateByID true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/snapshot/status [post]
+func (b *BaseApi) LoadSnapShotStatus(c *gin.Context) {
+	var req dto.OperateByID
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	data, err := snapshotService.LoadSnapShotStatus(req.ID)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags System Setting
 // @Summary Update snapshot description
 // @Description 更新快照描述信息
 // @Accept json

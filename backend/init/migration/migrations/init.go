@@ -572,9 +572,9 @@ var UpdateCronjobWithDb = &gormigrate.Migration{
 }
 
 var AddTableFirewall = &gormigrate.Migration{
-	ID: "20230814-add-table-firewall",
+	ID: "20230821-add-table-firewall",
 	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.Firewall{}); err != nil {
+		if err := tx.AutoMigrate(&model.Firewall{}, model.SnapshotStatus{}); err != nil {
 			return err
 		}
 		return nil

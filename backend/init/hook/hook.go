@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
@@ -62,5 +63,58 @@ func Init() {
 
 		sudo := cmd.SudoHandleCmd()
 		_, _ = cmd.Execf("%s sed -i '/CHANGE_USER_INFO=true/d' /usr/local/bin/1pctl", sudo)
+	}
+
+	handleSnapStatus()
+}
+
+func handleSnapStatus() {
+	snapRepo := repo.NewISnapshotRepo()
+	snaps, _ := snapRepo.GetList()
+	for _, snap := range snaps {
+		if snap.Status == "OnSaveData" {
+			_ = snapRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusSuccess})
+		}
+		if snap.Status == constant.StatusWaiting {
+			_ = snapRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed, "message": "the task was interrupted due to the restart of the 1panel service"})
+		}
+	}
+
+	status, _ := snapRepo.GetStatusList()
+	for _, statu := range status {
+		updatas := make(map[string]interface{})
+		if statu.Panel == constant.StatusRunning {
+			updatas["panel"] = constant.StatusFailed
+		}
+		if statu.PanelCtl == constant.StatusRunning {
+			updatas["panel_ctl"] = constant.StatusFailed
+		}
+		if statu.PanelService == constant.StatusRunning {
+			updatas["panel_service"] = constant.StatusFailed
+		}
+		if statu.PanelInfo == constant.StatusRunning {
+			updatas["panel_info"] = constant.StatusFailed
+		}
+		if statu.DaemonJson == constant.StatusRunning {
+			updatas["daemon_json"] = constant.StatusFailed
+		}
+		if statu.AppData == constant.StatusRunning {
+			updatas["app_data"] = constant.StatusFailed
+		}
+		if statu.PanelData == constant.StatusRunning {
+			updatas["panel_data"] = constant.StatusFailed
+		}
+		if statu.BackupData == constant.StatusRunning {
+			updatas["backup_data"] = constant.StatusFailed
+		}
+		if statu.Compress == constant.StatusRunning {
+			updatas["compress"] = constant.StatusFailed
+		}
+		if statu.Upload == constant.StatusUploading {
+			updatas["upload"] = constant.StatusFailed
+		}
+		if len(updatas) != 0 {
+			_ = snapRepo.UpdateStatus(statu.ID, updatas)
+		}
 	}
 }

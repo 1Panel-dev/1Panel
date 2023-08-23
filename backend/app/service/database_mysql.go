@@ -234,7 +234,7 @@ func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error 
 		Username:   db.Username,
 		Permission: db.Permission,
 		Timeout:    300,
-	}); err != nil {
+	}); err != nil && !req.ForceDelete {
 		return err
 	}
 
