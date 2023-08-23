@@ -1238,6 +1238,8 @@ const message = {
         backupApp: 'Backup application before upgrade',
         backupAppHelper: 'If the upgrade fails, you can use the application backup to roll back',
         delete: 'Delete',
+        openrestyDeleteHelper:
+            'Forcibly deleting OpenResty will delete all websites, please confirm the risk before operation',
     },
     website: {
         website: 'Website',
