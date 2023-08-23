@@ -30,6 +30,10 @@ type FileDelete struct {
 	IsDir bool   `json:"isDir"`
 }
 
+type FileTrue struct {
+	Path string `json:"path" validate:"required"`
+}
+
 type FileBatchDelete struct {
 	Paths []string `json:"paths" validate:"required"`
 	IsDir bool     `json:"isDir"`

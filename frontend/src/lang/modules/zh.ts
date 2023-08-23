@@ -496,7 +496,6 @@ const message = {
         lastHour: '最近 1 小时',
         last10Min: '最近 10 分钟',
         cleanLog: '清空日志',
-        cleanLogHelper: '清空日志需要重启容器，该操作无法回滚，是否继续？',
         newName: '新名称',
         source: '资源使用率',
         cpuShare: 'CPU 权重',

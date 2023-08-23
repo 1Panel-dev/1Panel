@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"io"
 	"os"
 	"os/exec"
@@ -531,31 +532,17 @@ func (u *ContainerService) ContainerLogClean(req dto.OperationWithName) error {
 	if err != nil {
 		return err
 	}
-	ctx := context.Background()
-	containerItem, err := client.ContainerInspect(ctx, req.Name)
+	container, err := client.ContainerInspect(context.Background(), req.Name)
 	if err != nil {
 		return err
 	}
-	if err := client.ContainerStop(ctx, containerItem.ID, container.StopOptions{}); err != nil {
+	fo := files.NewFileOp()
+	if err = fo.TrueFile(container.LogPath); err != nil {
 		return err
 	}
-	file, err := os.OpenFile(containerItem.LogPath, os.O_RDWR|os.O_CREATE, 0666)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	if err = file.Truncate(0); err != nil {
-		return err
-	}
-	_, _ = file.Seek(0, 0)
-
-	files, _ := filepath.Glob(fmt.Sprintf("%s.*", containerItem.LogPath))
+	files, _ := filepath.Glob(fmt.Sprintf("%s.*", container.LogPath))
 	for _, file := range files {
 		_ = os.Remove(file)
-	}
-
-	if err := client.ContainerStart(ctx, containerItem.ID, types.ContainerStartOptions{}); err != nil {
-		return err
 	}
 	return nil
 }

@@ -507,8 +507,6 @@ const message = {
         lastHour: 'Last Hour',
         last10Min: 'Last 10 Minutes',
         cleanLog: 'Clean log',
-        cleanLogHelper:
-            'Clearing logs requires restarting the container, and this operation cannot be rolled back. Do you want to continue?',
         newName: 'New name',
         source: 'Resource rate',
         cpuShare: 'CPU Share',

@@ -15,6 +15,7 @@ import (
 	"io/fs"
 	"net/http"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"strconv"
@@ -82,6 +83,10 @@ func (f FileOp) Stat(dst string) bool {
 
 func (f FileOp) DeleteFile(dst string) error {
 	return f.Fs.Remove(dst)
+}
+
+func (f FileOp) TrueFile(dst string) error {
+	return exec.Command("true", "->", dst).Run()
 }
 
 func (f FileOp) WriteFile(dst string, in io.Reader, mode fs.FileMode) error {
