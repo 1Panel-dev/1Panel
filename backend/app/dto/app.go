@@ -132,3 +132,9 @@ var AppToolMap = map[string]string{
 	"mysql": "phpmyadmin",
 	"redis": "redis-commander",
 }
+
+type AppInstallInfo struct {
+	ID   uint   `json:"id"`
+	Key  string `json:"key"`
+	Name string `json:"name"`
+}

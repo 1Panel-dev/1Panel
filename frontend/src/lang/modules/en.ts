@@ -689,6 +689,7 @@ const message = {
         containerCheckBox: 'In container (no need to enter the container command)',
         containerName: 'Container name',
         ntp: 'Time synchronization',
+        app: 'Backup app',
         website: 'Backup website',
         rulesHelper:
             'When there are multiple compression exclusion rules, they need to be displayed with line breaks. For example: \n*.log \n*.sql',

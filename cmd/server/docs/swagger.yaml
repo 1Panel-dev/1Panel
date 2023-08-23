@@ -28,6 +28,15 @@ definitions:
       oldRule:
         $ref: '#/definitions/dto.AddrRuleOperate'
     type: object
+  dto.AppInstallInfo:
+    properties:
+      id:
+        type: integer
+      key:
+        type: string
+      name:
+        type: string
+    type: object
   dto.AppResource:
     properties:
       name:
@@ -449,6 +458,8 @@ definitions:
     type: object
   dto.CronjobCreate:
     properties:
+      appID:
+        type: string
       containerName:
         type: string
       day:
@@ -505,6 +516,8 @@ definitions:
     type: object
   dto.CronjobUpdate:
     properties:
+      appID:
+        type: string
       containerName:
         type: string
       day:
@@ -4177,6 +4190,23 @@ paths:
         formatEN: Application param update [installId]
         formatZH: 忽略应用 [installId] 版本升级
         paramKeys: []
+  /apps/installed/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取已安装应用列表
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.AppInstallInfo'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: List app installed
+      tags:
+      - App
   /apps/installed/loadport/:key:
     get:
       consumes:
@@ -4325,7 +4355,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: 获取已安装应用列表
+      description: 分页获取已安装应用列表
       parameters:
       - description: request
         in: body
@@ -4338,7 +4368,7 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: List app installed
+      summary: Page app installed
       tags:
       - App
   /apps/installed/sync:

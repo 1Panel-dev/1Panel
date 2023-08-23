@@ -4,13 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"math"
 	"os"
 	"path"
 	"reflect"
 	"strconv"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/backend/i18n"
 
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"gopkg.in/yaml.v3"
@@ -54,10 +55,24 @@ type IAppInstallService interface {
 	ChangeAppPort(req request.PortUpdate) error
 	GetDefaultConfigByKey(key string) (string, error)
 	DeleteCheck(installId uint) ([]dto.AppResource, error)
+
+	GetInstallList() ([]dto.AppInstallInfo, error)
 }
 
 func NewIAppInstalledService() IAppInstallService {
 	return &AppInstallService{}
+}
+
+func (a *AppInstallService) GetInstallList() ([]dto.AppInstallInfo, error) {
+	var datas []dto.AppInstallInfo
+	appInstalls, err := appInstallRepo.ListBy()
+	if err != nil {
+		return nil, err
+	}
+	for _, install := range appInstalls {
+		datas = append(datas, dto.AppInstallInfo{ID: install.ID, Key: install.App.Key, Name: install.Name})
+	}
+	return datas, nil
 }
 
 func (a *AppInstallService) Page(req request.AppInstalledSearch) (int64, []response.AppInstalledDTO, error) {
