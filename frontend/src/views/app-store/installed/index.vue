@@ -255,7 +255,7 @@
     </LayoutContent>
     <Backups ref="backupRef" @close="search" />
     <Uploads ref="uploadRef" />
-    <AppResources ref="checkRef" />
+    <AppResources ref="checkRef" @close="search" />
     <AppDelete ref="deleteRef" @close="search" />
     <AppParams ref="appParamRef" />
     <AppUpgrade ref="upgradeRef" @close="search" />
@@ -379,7 +379,7 @@ const openOperate = (row: any, op: string) => {
         AppInstalledDeleteCheck(row.id).then(async (res) => {
             const items = res.data;
             if (res.data && res.data.length > 0) {
-                checkRef.value.acceptParams({ items: items });
+                checkRef.value.acceptParams({ items: items, key: row.app.key, installID: row.id });
             } else {
                 deleteRef.value.acceptParams(row);
             }

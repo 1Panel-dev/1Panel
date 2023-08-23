@@ -1179,6 +1179,7 @@ const message = {
         backupApp: '升级前备份应用',
         backupAppHelper: '升级失败可以使用应用备份回滚',
         delete: '删除',
+        openrestyDeleteHelper: '强制删除 OpenResty 会删除所有的网站，请确认风险之后操作',
     },
     website: {
         website: '网站',

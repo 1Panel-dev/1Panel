@@ -197,6 +197,10 @@ func deleteAppInstall(install model.AppInstall, deleteBackup bool, forceDelete b
 	if err := deleteLink(ctx, &install, deleteDB, forceDelete); err != nil && !forceDelete {
 		return err
 	}
+	if install.App.Key == constant.AppOpenresty {
+		_ = websiteRepo.DeleteAll(ctx)
+		_ = websiteDomainRepo.DeleteAll(ctx)
+	}
 	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("app"), commonRepo.WithByName(install.App.Key), backupRepo.WithByDetailName(install.Name))
 	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType(install.App.Key))
 	if install.App.Key == constant.AppMysql {
