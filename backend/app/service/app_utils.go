@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"math"
 	"net/http"
 	"os"
@@ -188,6 +189,10 @@ func deleteAppInstall(install model.AppInstall, deleteBackup bool, forceDelete b
 		if err != nil && !forceDelete {
 			return handleErr(install, err, out)
 		}
+		if err = runScript(&install, "uninstall"); err != nil {
+			_, _ = compose.Up(install.GetComposePath())
+			return err
+		}
 	}
 	tx, ctx := helper.GetTxAndContext()
 	defer tx.Rollback()
@@ -288,10 +293,19 @@ func upgradeInstall(installId uint, detailId uint, backup bool) error {
 			detailDir = path.Join(constant.ResourceDir, "apps", "local", strings.TrimPrefix(install.App.Key, "local"), detail.Version)
 		}
 
-		cmd := exec.Command("/bin/bash", "-c", fmt.Sprintf("cp -rn %s/* %s || true", detailDir, install.GetPath()))
-		stdout, _ := cmd.CombinedOutput()
+		command := exec.Command("/bin/bash", "-c", fmt.Sprintf("cp -rn %s/* %s || true", detailDir, install.GetPath()))
+		stdout, _ := command.CombinedOutput()
 		if stdout != nil {
-			global.LOG.Errorf("upgrade app [%s] [%s] cp file log : %s ", install.App.Key, install.Name, string(stdout))
+			global.LOG.Infof("upgrade app [%s] [%s] cp file log : %s ", install.App.Key, install.Name, string(stdout))
+		}
+		fileOp := files.NewFileOp()
+		sourceScripts := path.Join(detailDir, "scripts")
+		if fileOp.Stat(sourceScripts) {
+			dstScripts := path.Join(install.GetPath(), "scripts")
+			_ = fileOp.DeleteDir(dstScripts)
+			_ = fileOp.CreateDir(dstScripts, 0755)
+			scriptCmd := exec.Command("cp", "-rf", sourceScripts+"/.", dstScripts+"/")
+			_, _ = scriptCmd.CombinedOutput()
 		}
 
 		composeMap := make(map[string]interface{})
@@ -370,12 +384,16 @@ func upgradeInstall(installId uint, detailId uint, backup bool) error {
 			}
 			return
 		}
-		fileOp := files.NewFileOp()
 		envParams := make(map[string]string, len(envs))
 		handleMap(envs, envParams)
 		if err = env.Write(envParams, install.GetEnvPath()); err != nil {
 			return
 		}
+
+		if err = runScript(&install, "upgrade"); err != nil {
+			return
+		}
+
 		if upErr = fileOp.WriteFile(install.GetComposePath(), strings.NewReader(install.DockerCompose), 0775); upErr != nil {
 			return
 		}
@@ -578,17 +596,27 @@ func copyData(app model.App, appDetail model.AppDetail, appInstall *model.AppIns
 	return
 }
 
-// 处理文件夹权限等问题
-func upAppPre(app model.App, appInstall *model.AppInstall) error {
-	dataPath := path.Join(appInstall.GetPath(), "data")
-	fileOp := files.NewFileOp()
-	switch app.Key {
-	case "nexus":
-		return fileOp.ChownR(dataPath, "200", "0", true)
-	case "sftpgo":
-		return fileOp.ChownR(dataPath, "1000", "1000", true)
-	case "pgadmin4":
-		return fileOp.ChownR(dataPath, "5050", "5050", true)
+func runScript(appInstall *model.AppInstall, operate string) error {
+	workDir := appInstall.GetPath()
+	scriptPath := ""
+	switch operate {
+	case "init":
+		scriptPath = path.Join(workDir, "scripts", "init.sh")
+	case "upgrade":
+		scriptPath = path.Join(workDir, "scripts", "upgrade.sh")
+	case "uninstall":
+		scriptPath = path.Join(workDir, "scripts", "uninstall.sh")
+	}
+	if !files.NewFileOp().Stat(scriptPath) {
+		return nil
+	}
+	out, err := cmd.ExecScript(scriptPath, workDir)
+	if err != nil {
+		if out != "" {
+			global.LOG.Errorf("run script %s error %s", scriptPath, out)
+			return errors.New(out)
+		}
+		return err
 	}
 	return nil
 }

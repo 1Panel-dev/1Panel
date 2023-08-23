@@ -402,7 +402,7 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 			_ = appInstallRepo.Save(context.Background(), appInstall)
 			return
 		}
-		if err = upAppPre(app, appInstall); err != nil {
+		if err = runScript(appInstall, "init"); err != nil {
 			return
 		}
 		upApp(appInstall)

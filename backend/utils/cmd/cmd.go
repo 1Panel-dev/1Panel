@@ -141,6 +141,35 @@ func ExecWithCheck(name string, a ...string) (string, error) {
 	return stdout.String(), nil
 }
 
+func ExecScript(scriptPath, workDir string) (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
+	defer cancel()
+	cmd := exec.Command("/bin/sh", scriptPath)
+	cmd.Dir = workDir
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	err := cmd.Run()
+	if ctx.Err() == context.DeadlineExceeded {
+		return "", buserr.New(constant.ErrCmdTimeout)
+	}
+	if err != nil {
+		errMsg := ""
+		if len(stderr.String()) != 0 {
+			errMsg = fmt.Sprintf("stderr: %s", stderr.String())
+		}
+		if len(stdout.String()) != 0 {
+			if len(errMsg) != 0 {
+				errMsg = fmt.Sprintf("%s; stdout: %s", errMsg, stdout.String())
+			} else {
+				errMsg = fmt.Sprintf("stdout: %s", stdout.String())
+			}
+		}
+		return errMsg, err
+	}
+	return stdout.String(), nil
+}
+
 func CheckIllegal(args ...string) bool {
 	if args == nil {
 		return false
