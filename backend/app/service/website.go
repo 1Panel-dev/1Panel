@@ -22,7 +22,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
-	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx"
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx/components"
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx/parser"
@@ -175,6 +174,11 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 	if exist, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithDomain(create.PrimaryDomain)); len(exist) > 0 {
 		return buserr.New(constant.ErrDomainIsExist)
 	}
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return err
+	}
+	defaultHttpPort := nginxInstall.HttpPort
 
 	defaultDate, _ := time.Parse(constant.DateLayout, constant.DefaultDate)
 	website := &model.Website{
@@ -291,13 +295,13 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 	}
 
 	var domains []model.WebsiteDomain
-	domains = append(domains, model.WebsiteDomain{Domain: website.PrimaryDomain, Port: 80})
+	domains = append(domains, model.WebsiteDomain{Domain: website.PrimaryDomain, Port: defaultHttpPort})
 	otherDomainArray := strings.Split(create.OtherDomains, "\n")
 	for _, domain := range otherDomainArray {
 		if domain == "" {
 			continue
 		}
-		domainModel, err := getDomain(domain)
+		domainModel, err := getDomain(domain, defaultHttpPort)
 		if err != nil {
 			return err
 		}
@@ -445,11 +449,11 @@ func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) 
 		ports       []int
 		domains     []string
 	)
-	if create.Port != 80 {
-		if common.ScanPort(create.Port) {
-			return domainModel, buserr.WithDetail(constant.ErrPortInUsed, create.Port, nil)
-		}
+	httpPort, _, err := getAppInstallPort(constant.AppOpenresty)
+	if err != nil {
+		return domainModel, err
 	}
+
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(create.WebsiteID))
 	if err != nil {
 		return domainModel, err
@@ -466,7 +470,7 @@ func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) 
 		Port:      create.Port,
 		WebsiteID: create.WebsiteID,
 	}
-	if create.Port != 80 {
+	if create.Port != httpPort {
 		go func() {
 			_ = OperateFirewallPort(nil, []int{create.Port})
 		}()
@@ -652,7 +656,12 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 	if !req.Enable {
 		website.Protocol = constant.ProtocolHTTP
 		website.WebsiteSSLID = 0
-		if err := deleteListenAndServerName(website, []string{"443", "[::]:443"}, []string{}); err != nil {
+		_, httpsPort, err := getAppInstallPort(constant.AppOpenresty)
+		if err != nil {
+			return nil, err
+		}
+		httpsPortStr := strconv.Itoa(httpsPort)
+		if err := deleteListenAndServerName(website, []string{httpsPortStr, "[::]:" + httpsPortStr}, []string{}); err != nil {
 			return nil, err
 		}
 		nginxParams := getNginxParamsFromStaticFile(dto.SSL, nil)
@@ -1007,12 +1016,17 @@ func (w WebsiteService) ChangeDefaultServer(id uint) error {
 		if err != nil {
 			return err
 		}
+		httpPort, httpsPort, err := getAppInstallPort(constant.AppOpenresty)
+		if err != nil {
+			return err
+		}
+
 		var changeParams []dto.NginxParam
 		for _, param := range params {
 			paramLen := len(param.Params)
 			bind := param.Params[0]
 			var newParam []string
-			if bind == "80" || bind == "443" || bind == "[::]:80" || bind == "[::]:443" {
+			if bind == strconv.Itoa(httpPort) || bind == strconv.Itoa(httpsPort) || bind == "[::]:"+strconv.Itoa(httpPort) || bind == "[::]:"+strconv.Itoa(httpsPort) {
 				if param.Params[paramLen-1] == components.DefaultServer {
 					newParam = param.Params
 				} else {

@@ -1496,6 +1496,7 @@ const message = {
         changeVersion: 'Switch version',
         retainConfig: 'Whether to keep php-fpm.conf and php.ini files',
         runDirHelper2: 'Please ensure that the secondary running directory is under the index directory',
+        openrestryHelper: 'The default port of OpenResty is {0}, which affects website domain name access',
     },
     php: {
         short_open_tag: 'Short tag support',

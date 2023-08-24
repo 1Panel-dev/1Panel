@@ -133,6 +133,8 @@ export namespace App {
         appInstallId: number;
         containerName: string;
         installPath: string;
+        httpPort: number;
+        httpsPort: number;
     }
 
     export interface DatabaseConnInfo {

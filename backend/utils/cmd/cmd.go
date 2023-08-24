@@ -144,7 +144,7 @@ func ExecWithCheck(name string, a ...string) (string, error) {
 func ExecScript(scriptPath, workDir string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
 	defer cancel()
-	cmd := exec.Command("/bin/sh", scriptPath)
+	cmd := exec.Command("bash", scriptPath)
 	cmd.Dir = workDir
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout

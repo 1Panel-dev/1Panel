@@ -23,12 +23,12 @@ import (
 	"gorm.io/gorm"
 )
 
-func getDomain(domainStr string) (model.WebsiteDomain, error) {
+func getDomain(domainStr string, defaultPort int) (model.WebsiteDomain, error) {
 	domain := model.WebsiteDomain{}
 	domainArray := strings.Split(domainStr, ":")
 	if len(domainArray) == 1 {
 		domain.Domain = domainArray[0]
-		domain.Port = 80
+		domain.Port = defaultPort
 		return domain, nil
 	}
 	if len(domainArray) > 1 {
@@ -186,6 +186,7 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 		return errors.New("nginx config is not valid")
 	}
 	server := servers[0]
+	server.DeleteListen("80")
 	var serverNames []string
 	for _, domain := range domains {
 		serverNames = append(serverNames, domain.Domain)
@@ -378,27 +379,33 @@ func applySSL(website model.Website, websiteSSL model.WebsiteSSL, req request.We
 	}
 	config := nginxFull.SiteConfig.Config
 	server := config.FindServers()[0]
-	server.UpdateListen("443", website.DefaultServer, "ssl", "http2")
+
+	httpPort := strconv.Itoa(nginxFull.Install.HttpPort)
+	httpsPort := strconv.Itoa(nginxFull.Install.HttpsPort)
+	httpPortIPV6 := "[::]:" + httpPort
+	httpsPortIPV6 := "[::]:" + httpsPort
+
+	server.UpdateListen(httpsPort, website.DefaultServer, "ssl", "http2")
 	if website.IPV6 {
-		server.UpdateListen("[::]:443", website.DefaultServer, "ssl", "http2")
+		server.UpdateListen(httpsPortIPV6, website.DefaultServer, "ssl", "http2")
 	}
 
 	switch req.HttpConfig {
 	case constant.HTTPSOnly:
-		server.RemoveListenByBind("80")
-		server.RemoveListenByBind("[::]:80")
+		server.RemoveListenByBind(httpPort)
+		server.RemoveListenByBind(httpPortIPV6)
 		server.RemoveDirective("if", []string{"($scheme"})
 	case constant.HTTPToHTTPS:
-		server.UpdateListen("80", website.DefaultServer)
+		server.UpdateListen(httpPort, website.DefaultServer)
 		if website.IPV6 {
-			server.UpdateListen("[::]:80", website.DefaultServer)
+			server.UpdateListen(httpPortIPV6, website.DefaultServer)
 		}
 		server.AddHTTP2HTTPS()
 	case constant.HTTPAlso:
-		server.UpdateListen("80", website.DefaultServer)
+		server.UpdateListen(httpPort, website.DefaultServer)
 		server.RemoveDirective("if", []string{"($scheme"})
 		if website.IPV6 {
-			server.UpdateListen("[::]:80", website.DefaultServer)
+			server.UpdateListen(httpPortIPV6, website.DefaultServer)
 		}
 	}
 

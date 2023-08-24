@@ -41,6 +41,12 @@
                             {{ $t('commons.button.set') }}
                         </el-button>
                     </span>
+
+                    <span class="warn" v-if="key === 'openresty' && httpPort != 80">
+                        <el-alert class="helper" type="error" :closable="false">
+                            {{ $t('website.openrestryHelper', [httpPort]) }}
+                        </el-alert>
+                    </span>
                 </div>
             </el-card>
         </div>
@@ -95,6 +101,7 @@ let operateReq = reactive({
     operate: '',
 });
 let refresh = ref(1);
+const httpPort = ref(0);
 
 const em = defineEmits(['setting', 'isExist', 'before', 'update:loading', 'update:maskShow']);
 const setting = () => {
@@ -111,6 +118,7 @@ const onCheck = async () => {
             data.value = res.data;
             em('isExist', res.data);
             operateReq.installId = res.data.appInstallId;
+            httpPort.value = res.data.httpPort;
             refresh.value++;
         })
         .catch(() => {
@@ -166,3 +174,12 @@ onMounted(() => {
     onCheck();
 });
 </script>
+
+<style lang="scss">
+.warn {
+    margin-left: 20px;
+    .helper {
+        display: inline;
+    }
+}
+</style>

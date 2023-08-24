@@ -115,7 +115,10 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 		if err != nil {
 			return request.WebsiteSSLCreate{}, err
 		}
-		if err := client.UseHTTP(path.Join(constant.AppInstallDir, constant.AppOpenresty, appInstall.Name, "root")); err != nil {
+		if appInstall.HttpPort != 80 {
+			return request.WebsiteSSLCreate{}, buserr.WithDetail("ErrOpenrestyPort", appInstall.HttpPort, nil)
+		}
+		if err := client.UseHTTP(path.Join(appInstall.GetPath(), "root")); err != nil {
 			return res, err
 		}
 		websiteSSL.AutoRenew = create.AutoRenew

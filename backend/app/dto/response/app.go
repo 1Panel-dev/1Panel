@@ -39,6 +39,8 @@ type AppInstalledCheck struct {
 	AppInstallID  uint      `json:"appInstallId"`
 	ContainerName string    `json:"containerName"`
 	InstallPath   string    `json:"installPath"`
+	HttpPort      int       `json:"httpPort"`
+	HttpsPort     int       `json:"httpsPort"`
 }
 
 type AppDetailDTO struct {

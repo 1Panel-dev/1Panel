@@ -156,6 +156,8 @@ func (a *AppInstallService) CheckExist(key string) (*response.AppInstalledCheck,
 	res.AppInstallID = appInstall.ID
 	res.IsExist = true
 	res.InstallPath = path.Join(constant.AppInstallDir, app.Key, appInstall.Name)
+	res.HttpPort = appInstall.HttpPort
+	res.HttpsPort = appInstall.HttpsPort
 
 	return res, nil
 }

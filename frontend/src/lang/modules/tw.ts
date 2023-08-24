@@ -1426,6 +1426,7 @@ const message = {
         changeVersion: '切換版本',
         retainConfig: '是否保留 php-fpm.conf 和 php.ini 文件',
         runDirHelper2: '請確保二級運行目錄位於 index 目錄下',
+        openrestryHelper: 'OpenResty默認端口為 {0}，影響網站域名訪問',
     },
     php: {
         short_open_tag: '短標簽支持',

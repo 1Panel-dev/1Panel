@@ -394,12 +394,14 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		return
 	}
 	go func() {
-		if err = copyData(app, appDetail, appInstall, req); err != nil {
-			if appInstall.Status == constant.Installing {
+		defer func() {
+			if err != nil {
 				appInstall.Status = constant.Error
 				appInstall.Message = err.Error()
+				_ = appInstallRepo.Save(context.Background(), appInstall)
 			}
-			_ = appInstallRepo.Save(context.Background(), appInstall)
+		}()
+		if err = copyData(app, appDetail, appInstall, req); err != nil {
 			return
 		}
 		if err = runScript(appInstall, "init"); err != nil {

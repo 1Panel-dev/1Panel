@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -61,7 +62,15 @@ func (n NginxService) UpdateConfigByScope(req request.NginxConfigUpdate) error {
 }
 
 func (n NginxService) GetStatus() (response.NginxStatus, error) {
-	res, err := http.Get("http://127.0.0.1/nginx_status")
+	httpPort, _, err := getAppInstallPort(constant.AppOpenresty)
+	if err != nil {
+		return response.NginxStatus{}, err
+	}
+	url := "http://127.0.0.1/nginx_status"
+	if httpPort != 80 {
+		url = fmt.Sprintf("http://127.0.0.1:%v/nginx_status", httpPort)
+	}
+	res, err := http.Get(url)
 	if err != nil {
 		return response.NginxStatus{}, err
 	}
