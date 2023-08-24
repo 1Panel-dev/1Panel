@@ -109,8 +109,6 @@ export namespace Setting {
     }
     export interface SnapshotStatus {
         panel: string;
-        panelCtl: string;
-        panelService: string;
         panelInfo: string;
         daemonJson: string;
         appData: string;

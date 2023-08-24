@@ -46,7 +46,7 @@ func (u *CronjobService) SearchWithPage(search dto.SearchWithPage) (int64, inter
 		if err := copier.Copy(&item, &cronjob); err != nil {
 			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 		}
-		if item.Type == "app" || item.Type == "website" || item.Type == "database" || item.Type == "directory" {
+		if item.Type == "app" || item.Type == "website" || item.Type == "database" || item.Type == "directory" || item.Type == "snapshot" {
 			backup, _ := backupRepo.Get(commonRepo.WithByID(uint(item.TargetDirID)))
 			if len(backup.Type) != 0 {
 				item.TargetDir = backup.Type
@@ -103,7 +103,7 @@ func (u *CronjobService) CleanRecord(req dto.CronjobClean) error {
 	if err != nil {
 		return err
 	}
-	if req.CleanData && (cronjob.Type == "app" || cronjob.Type == "database" || cronjob.Type == "website" || cronjob.Type == "directory") {
+	if req.CleanData && (cronjob.Type == "app" || cronjob.Type == "database" || cronjob.Type == "website" || cronjob.Type == "directory" || cronjob.Type == "snapshot") {
 		cronjob.RetainCopies = 0
 		backup, err := backupRepo.Get(commonRepo.WithByID(uint(cronjob.TargetDirID)))
 		if err != nil {

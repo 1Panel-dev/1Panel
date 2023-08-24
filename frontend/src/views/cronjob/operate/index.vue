@@ -23,6 +23,7 @@
                             <el-option value="website" :label="$t('cronjob.website')" />
                             <el-option value="database" :label="$t('cronjob.database')" />
                             <el-option value="directory" :label="$t('cronjob.directory')" />
+                            <el-option value="snapshot" :label="$t('cronjob.snapshot')" />
                             <el-option value="curl" :label="$t('cronjob.curl')" />
                             <el-option value="ntp" :label="$t('cronjob.ntp')" />
                             <el-option value="cutWebsiteLog" :label="$t('cronjob.cutWebsiteLog')" />
@@ -165,12 +166,13 @@
                     <div v-if="isBackup()">
                         <el-form-item :label="$t('cronjob.target')" prop="targetDirID">
                             <el-select class="selectClass" v-model="dialogData.rowData!.targetDirID">
-                                <el-option
-                                    v-for="item in backupOptions"
-                                    :key="item.label"
-                                    :value="item.value"
-                                    :label="item.label"
-                                />
+                                <div v-for="item in backupOptions" :key="item.label">
+                                    <el-option
+                                        v-if="item.label !== $t('setting.LOCAL') || dialogData.rowData!.type !== 'snapshot'"
+                                        :value="item.value"
+                                        :label="item.label"
+                                    />
+                                </div>
                             </el-select>
                             <span class="input-help">
                                 {{ $t('cronjob.targetHelper') }}
@@ -184,7 +186,9 @@
                                 </el-link>
                             </span>
                         </el-form-item>
-                        <el-form-item v-if="dialogData.rowData!.targetDirID !== localDirID">
+                        <el-form-item
+                            v-if="dialogData.rowData!.targetDirID !== localDirID && dialogData.rowData!.type !== 'snapshot'"
+                        >
                             <el-checkbox v-model="dialogData.rowData!.keepLocal">
                                 {{ $t('cronjob.saveLocal') }}
                             </el-checkbox>
@@ -448,6 +452,20 @@ const changeType = () => {
             dialogData.value.rowData.hour = 1;
             dialogData.value.rowData.minute = 30;
             break;
+        case 'snapshot':
+            dialogData.value.rowData.specType = 'perWeek';
+            dialogData.value.rowData.week = 1;
+            dialogData.value.rowData.hour = 1;
+            dialogData.value.rowData.minute = 30;
+            dialogData.value.rowData.keepLocal = false;
+            dialogData.value.rowData.targetDirID = null;
+            for (const item of backupOptions.value) {
+                if (item.label !== i18n.global.t('setting.LOCAL')) {
+                    dialogData.value.rowData.targetDirID = item.value;
+                    break;
+                }
+            }
+            break;
         case 'directory':
             dialogData.value.rowData.specType = 'perDay';
             dialogData.value.rowData.hour = 1;
@@ -504,7 +522,8 @@ function isBackup() {
         dialogData.value.rowData!.type === 'app' ||
         dialogData.value.rowData!.type === 'website' ||
         dialogData.value.rowData!.type === 'database' ||
-        dialogData.value.rowData!.type === 'directory'
+        dialogData.value.rowData!.type === 'directory' ||
+        dialogData.value.rowData!.type === 'snapshot'
     );
 }
 

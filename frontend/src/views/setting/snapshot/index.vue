@@ -57,7 +57,7 @@
                     <el-table-column :label="$t('commons.table.status')" min-width="80" prop="status">
                         <template #default="{ row }">
                             <el-button
-                                v-if="row.status === 'Waiting' || row.status === 'onSaveData'"
+                                v-if="row.status === 'Waiting' || row.status === 'OnSaveData'"
                                 type="primary"
                                 @click="onLoadStatus(row)"
                                 link

@@ -12,35 +12,19 @@
             </div>
         </template>
         <div v-loading="loading">
-            <el-alert :type="loadStatus(status.panel)" :closable="false">
-                <template #title>
-                    <el-button :icon="loadIcon(status.panel)" link>{{ $t('setting.panelBin') }}</el-button>
-                    <div v-if="showErrorMsg(status.panel)" class="top-margin">
-                        <span class="err-message">{{ status.panel }}</span>
-                    </div>
-                </template>
-            </el-alert>
-            <el-alert :type="loadStatus(status.panelCtl)" :closable="false">
-                <template #title>
-                    <el-button :icon="loadIcon(status.panelCtl)" link>{{ $t('setting.panelCtl') }}</el-button>
-                    <div v-if="showErrorMsg(status.panelCtl)" class="top-margin">
-                        <span class="err-message">{{ status.panelCtl }}</span>
-                    </div>
-                </template>
-            </el-alert>
-            <el-alert :type="loadStatus(status.panelService)" :closable="false">
-                <template #title>
-                    <el-button :icon="loadIcon(status.panelService)" link>{{ $t('setting.panelService') }}</el-button>
-                    <div v-if="showErrorMsg(status.panelService)" class="top-margin">
-                        <span class="err-message">{{ status.panelService }}</span>
-                    </div>
-                </template>
-            </el-alert>
             <el-alert :type="loadStatus(status.panelInfo)" :closable="false">
                 <template #title>
                     <el-button :icon="loadIcon(status.panelInfo)" link>{{ $t('setting.panelInfo') }}</el-button>
                     <div v-if="showErrorMsg(status.panelInfo)" class="top-margin">
                         <span class="err-message">{{ status.panelInfo }}</span>
+                    </div>
+                </template>
+            </el-alert>
+            <el-alert :type="loadStatus(status.panel)" :closable="false">
+                <template #title>
+                    <el-button :icon="loadIcon(status.panel)" link>{{ $t('setting.panelBin') }}</el-button>
+                    <div v-if="showErrorMsg(status.panel)" class="top-margin">
+                        <span class="err-message">{{ status.panel }}</span>
                     </div>
                 </template>
             </el-alert>
@@ -113,8 +97,6 @@ import { nextTick, onBeforeUnmount, reactive, ref } from 'vue';
 
 const status = reactive<Setting.SnapshotStatus>({
     panel: '',
-    panelCtl: '',
-    panelService: '',
     panelInfo: '',
     daemonJson: '',
     appData: '',
@@ -158,8 +140,6 @@ const loadCurrentStatus = async () => {
         .then((res) => {
             loading.value = false;
             status.panel = res.data.panel;
-            status.panelCtl = res.data.panelCtl;
-            status.panelService = res.data.panelService;
             status.panelInfo = res.data.panelInfo;
             status.daemonJson = res.data.daemonJson;
             status.appData = res.data.appData;
@@ -196,8 +176,6 @@ const onWatch = () => {
         if (keepLoadStatus()) {
             const res = await loadSnapStatus(snapID.value);
             status.panel = res.data.panel;
-            status.panelCtl = res.data.panelCtl;
-            status.panelService = res.data.panelService;
             status.panelInfo = res.data.panelInfo;
             status.daemonJson = res.data.daemonJson;
             status.appData = res.data.appData;
@@ -212,12 +190,6 @@ const onWatch = () => {
 
 const keepLoadStatus = () => {
     if (status.panel === 'Running') {
-        return true;
-    }
-    if (status.panelCtl === 'Running') {
-        return true;
-    }
-    if (status.panelService === 'Running') {
         return true;
     }
     if (status.panelInfo === 'Running') {
@@ -253,12 +225,6 @@ const showRetry = () => {
         return false;
     }
     if (status.panel !== 'Running' && status.panel !== 'Done') {
-        return true;
-    }
-    if (status.panelCtl !== 'Running' && status.panelCtl !== 'Done') {
-        return true;
-    }
-    if (status.panelService !== 'Running' && status.panelService !== 'Done') {
         return true;
     }
     if (status.panelInfo !== 'Running' && status.panelInfo !== 'Done') {

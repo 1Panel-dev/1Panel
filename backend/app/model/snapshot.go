@@ -20,15 +20,13 @@ type Snapshot struct {
 
 type SnapshotStatus struct {
 	BaseModel
-	SnapID       uint   `gorm:"type:decimal" json:"snapID"`
-	Panel        string `json:"panel" gorm:"type:varchar(64);default:Running"`
-	PanelCtl     string `json:"panelCtl" gorm:"type:varchar(64);default:Running"`
-	PanelService string `json:"panelService" gorm:"type:varchar(64);default:Running"`
-	PanelInfo    string `json:"panelInfo" gorm:"type:varchar(64);default:Running"`
-	DaemonJson   string `json:"daemonJson" gorm:"type:varchar(64);default:Running"`
-	AppData      string `json:"appData" gorm:"type:varchar(64);default:Running"`
-	PanelData    string `json:"panelData" gorm:"type:varchar(64);default:Running"`
-	BackupData   string `json:"backupData" gorm:"type:varchar(64);default:Running"`
+	SnapID     uint   `gorm:"type:decimal" json:"snapID"`
+	Panel      string `json:"panel" gorm:"type:varchar(64);default:Running"`
+	PanelInfo  string `json:"panelInfo" gorm:"type:varchar(64);default:Running"`
+	DaemonJson string `json:"daemonJson" gorm:"type:varchar(64);default:Running"`
+	AppData    string `json:"appData" gorm:"type:varchar(64);default:Running"`
+	PanelData  string `json:"panelData" gorm:"type:varchar(64);default:Running"`
+	BackupData string `json:"backupData" gorm:"type:varchar(64);default:Running"`
 
 	Compress string `json:"compress" gorm:"type:varchar(64);default:Waiting"`
 	Upload   string `json:"upload" gorm:"type:varchar(64);default:Waiting"`
