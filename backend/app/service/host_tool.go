@@ -378,25 +378,25 @@ func (h *HostToolService) OperateSupervisorProcess(req request.SupervisorProcess
 }
 
 func (h *HostToolService) LoadProcessStatus() ([]response.ProcessStatus, error) {
-	var datas []response.ProcessStatus
-	statuLines, err := cmd.Exec("supervisorctl status")
-	if err != nil {
-		return datas, fmt.Errorf("exec `supervisorctl status` failed, err: %v", statuLines)
+	var res []response.ProcessStatus
+	statusLines, _ := cmd.Exec("supervisorctl status")
+	if len(statusLines) == 0 {
+		return res, nil
 	}
-	lines := strings.Split(string(statuLines), "\n")
+	lines := strings.Split(statusLines, "\n")
 	for _, line := range lines {
 		fields := strings.Fields(line)
 		if len(fields) > 1 {
-			datas = append(datas, response.ProcessStatus{Name: fields[0]})
+			res = append(res, response.ProcessStatus{Name: fields[0]})
 		}
 	}
 
 	var wg sync.WaitGroup
-	wg.Add(len(datas))
-	for i := 0; i < len(datas); i++ {
+	wg.Add(len(res))
+	for i := 0; i < len(res); i++ {
 		go func(index int) {
 			for t := 0; t < 3; t++ {
-				status, err := cmd.ExecWithTimeOut(fmt.Sprintf("supervisorctl status %s", datas[index].Name), 2*time.Second)
+				status, err := cmd.ExecWithTimeOut(fmt.Sprintf("supervisorctl status %s", res[index].Name), 2*time.Second)
 				if err != nil {
 					time.Sleep(2 * time.Second)
 					continue
@@ -406,25 +406,25 @@ func (h *HostToolService) LoadProcessStatus() ([]response.ProcessStatus, error) 
 					time.Sleep(2 * time.Second)
 					continue
 				}
-				datas[index].Name = fields[0]
-				datas[index].Status = fields[1]
+				res[index].Name = fields[0]
+				res[index].Status = fields[1]
 				if fields[1] != "RUNNING" {
-					datas[index].Msg = strings.Join(fields[2:], " ")
+					res[index].Msg = strings.Join(fields[2:], " ")
 					break
 				}
-				datas[index].PID = strings.TrimSuffix(fields[3], ",")
-				datas[index].Uptime = fields[5]
+				res[index].PID = strings.TrimSuffix(fields[3], ",")
+				res[index].Uptime = fields[5]
 				break
 			}
-			if len(datas[index].Status) == 0 {
-				datas[index].Status = "FATAL"
-				datas[index].Msg = "Timeout for getting process status"
+			if len(res[index].Status) == 0 {
+				res[index].Status = "FATAL"
+				res[index].Msg = "Timeout for getting process status"
 			}
 			wg.Done()
 		}(i)
 	}
 	wg.Wait()
-	return datas, nil
+	return res, nil
 }
 
 func (h *HostToolService) GetSupervisorProcessConfig() ([]response.SupervisorProcessConfig, error) {
