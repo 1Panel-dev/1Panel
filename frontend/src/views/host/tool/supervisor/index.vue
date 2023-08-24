@@ -184,6 +184,7 @@ const setting = () => {
 
 const getStatus = (status: any) => {
     supervisorStatus.value = status;
+    search();
 };
 
 const showStopped = computed((): boolean => {
@@ -211,6 +212,9 @@ const openCreate = () => {
 };
 
 const search = async () => {
+    if (!supervisorStatus.value.isExist) {
+        return;
+    }
     loading.value = true;
     loadStatus();
     try {
@@ -231,9 +235,7 @@ const loadStatus = async () => {
                         process.status.push(item);
                     }
                 }
-                if (process.status.length !== 0) {
-                    process.hasLoad = true;
-                }
+                process.hasLoad = true;
             }
         })
         .catch(() => {
