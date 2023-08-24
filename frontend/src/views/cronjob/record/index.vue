@@ -167,7 +167,7 @@
                                         </template>
                                         <span class="status-count">{{ dialogData.rowData!.targetDir }}</span>
                                         <el-button
-                                            v-if="currentRecord?.status === 'Success'"
+                                            v-if="currentRecord?.status === 'Success' && dialogData.rowData!.type !== 'snapshot'"
                                             type="primary"
                                             style="margin-left: 10px"
                                             link
@@ -238,6 +238,10 @@
                                         </template>
                                         <span class="status-count">{{ dialogData.rowData!.retainCopies }}</span>
                                     </el-form-item>
+                                    <el-form-item
+                                        class="description"
+                                        v-if="dialogData.rowData!.type === 'snapshot'"
+                                    ></el-form-item>
                                 </el-row>
                                 <el-form-item class="description" v-if=" dialogData.rowData!.type === 'directory'">
                                     <template #label>
@@ -678,7 +682,8 @@ function isBackup() {
         dialogData.value.rowData!.type === 'app' ||
         dialogData.value.rowData!.type === 'website' ||
         dialogData.value.rowData!.type === 'database' ||
-        dialogData.value.rowData!.type === 'directory'
+        dialogData.value.rowData!.type === 'directory' ||
+        dialogData.value.rowData!.type === 'snapshot'
     );
 }
 function loadWeek(i: number) {

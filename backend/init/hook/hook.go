@@ -86,12 +86,6 @@ func handleSnapStatus() {
 		if statu.Panel == constant.StatusRunning {
 			updatas["panel"] = constant.StatusFailed
 		}
-		if statu.PanelCtl == constant.StatusRunning {
-			updatas["panel_ctl"] = constant.StatusFailed
-		}
-		if statu.PanelService == constant.StatusRunning {
-			updatas["panel_service"] = constant.StatusFailed
-		}
 		if statu.PanelInfo == constant.StatusRunning {
 			updatas["panel_info"] = constant.StatusFailed
 		}

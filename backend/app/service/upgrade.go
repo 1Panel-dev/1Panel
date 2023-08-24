@@ -127,13 +127,13 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 		}
 		global.LOG.Info("backup original data successful, now start to upgrade!")
 
-		if err := cpBinary(tmpDir+"/1panel", "/usr/local/bin/1panel"); err != nil {
+		if err := cpBinary([]string{tmpDir + "/1panel"}, "/usr/local/bin/1panel"); err != nil {
 			u.handleRollback(fileOp, originalDir, 1)
 			global.LOG.Errorf("upgrade 1panel failed, err: %v", err)
 			return
 		}
 
-		if err := cpBinary(tmpDir+"/1pctl", "/usr/local/bin/1pctl"); err != nil {
+		if err := cpBinary([]string{tmpDir + "/1pctl"}, "/usr/local/bin/1pctl"); err != nil {
 			u.handleRollback(fileOp, originalDir, 2)
 			global.LOG.Errorf("upgrade 1pctl failed, err: %v", err)
 			return
@@ -144,7 +144,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 			return
 		}
 
-		if err := cpBinary(tmpDir+"/1panel.service", "/etc/systemd/system/1panel.service"); err != nil {
+		if err := cpBinary([]string{tmpDir + "/1panel.service"}, "/etc/systemd/system/1panel.service"); err != nil {
 			u.handleRollback(fileOp, originalDir, 3)
 			global.LOG.Errorf("upgrade 1panel.service failed, err: %v", err)
 			return
@@ -179,22 +179,22 @@ func (u *UpgradeService) handleBackup(fileOp files.FileOp, originalDir string) e
 func (u *UpgradeService) handleRollback(fileOp files.FileOp, originalDir string, errStep int) {
 	dbPath := global.CONF.System.DbPath + "/1Panel.db"
 	_ = settingRepo.Update("SystemStatus", "Free")
-	if err := cpBinary(originalDir+"/1Panel.db", dbPath); err != nil {
+	if err := cpBinary([]string{originalDir + "/1Panel.db"}, dbPath); err != nil {
 		global.LOG.Errorf("rollback 1panel failed, err: %v", err)
 	}
-	if err := cpBinary(originalDir+"/1panel", "/usr/local/bin/1panel"); err != nil {
+	if err := cpBinary([]string{originalDir + "/1panel"}, "/usr/local/bin/1panel"); err != nil {
 		global.LOG.Errorf("rollback 1pctl failed, err: %v", err)
 	}
 	if errStep == 1 {
 		return
 	}
-	if err := cpBinary(originalDir+"/1pctl", "/usr/local/bin/1pctl"); err != nil {
+	if err := cpBinary([]string{originalDir + "/1pctl"}, "/usr/local/bin/1pctl"); err != nil {
 		global.LOG.Errorf("rollback 1panel failed, err: %v", err)
 	}
 	if errStep == 2 {
 		return
 	}
-	if err := cpBinary(originalDir+"/1panel.service", "/etc/systemd/system/1panel.service"); err != nil {
+	if err := cpBinary([]string{originalDir + "/1panel.service"}, "/etc/systemd/system/1panel.service"); err != nil {
 		global.LOG.Errorf("rollback 1panel failed, err: %v", err)
 	}
 }

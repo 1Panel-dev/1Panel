@@ -11,6 +11,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
@@ -19,76 +20,64 @@ import (
 
 type snapHelper struct {
 	SnapID uint
+	Status *model.SnapshotStatus
 	Ctx    context.Context
 	FileOp files.FileOp
 	Wg     *sync.WaitGroup
 }
 
-func snapJson(snap snapHelper, statusID uint, snapJson SnapshotJson, targetDir string) {
+func snapJson(snap snapHelper, snapJson SnapshotJson, targetDir string) {
 	defer snap.Wg.Done()
-	_ = snapshotRepo.UpdateStatus(statusID, map[string]interface{}{"panel_info": constant.Running})
+	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"panel_info": constant.Running})
 	status := constant.StatusDone
 	remarkInfo, _ := json.MarshalIndent(snapJson, "", "\t")
 	if err := os.WriteFile(fmt.Sprintf("%s/snapshot.json", targetDir), remarkInfo, 0640); err != nil {
 		status = err.Error()
 	}
-	_ = snapshotRepo.UpdateStatus(statusID, map[string]interface{}{"panel_info": status})
+	snap.Status.PanelInfo = status
+	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"panel_info": status})
 }
 
-func snapPanel(snap snapHelper, statusID uint, targetDir string) {
+func snapPanel(snap snapHelper, targetDir string) {
 	defer snap.Wg.Done()
-	_ = snapshotRepo.UpdateStatus(statusID, map[string]interface{}{"panel": constant.Running})
+	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"panel": constant.Running})
 	status := constant.StatusDone
-	if err := cpBinary("/usr/local/bin/1panel", path.Join(targetDir, "1panel")); err != nil {
+	if err := cpBinary([]string{"/usr/local/bin/1panel", "/usr/local/bin/1pctl", "/etc/systemd/system/1panel.service"}, targetDir); err != nil {
 		status = err.Error()
 	}
-	_ = snapshotRepo.UpdateStatus(statusID, map[string]interface{}{"panel": status})
+	snap.Status.Panel = status
+	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"panel": status})
 }
 
-func snapPanelCtl(snap snapHelper, statusID uint, targetDir string) {
+func snapDaemonJson(snap snapHelper, targetDir string) {
 	defer snap.Wg.Done()
-	_ = snapshotRepo.UpdateStatus(statusID, map[string]interface{}{"panel_ctl": constant.Running})
 	status := constant.StatusDone
-	if err := cpBinary("/usr/local/bin/1pctl", path.Join(targetDir, "1pctl")); err != nil {
-		status = err.Error()
-	}
-	_ = snapshotRepo.UpdateStatus(statusID, map[string]interface{}{"panel_ctl": status})
-}
-
-func snapPanelService(snap snapHelper, statusID uint, targetDir string) {
-	defer snap.Wg.Done()
-	_ = snapshotRepo.UpdateStatus(statusID, map[string]interface{}{"panel_service": constant.Running})
-	status := constant.StatusDone
-	if err := cpBinary("/etc/systemd/system/1panel.service", path.Join(targetDir, "1panel.service")); err != nil {
-		status = err.Error()
-	}
-	_ = snapshotRepo.UpdateStatus(statusID, map[string]interface{}{"panel_service": status})
-}
-
-func snapDaemonJson(snap snapHelper, statusID uint, targetDir string) {
-	defer snap.Wg.Done()
 	if !snap.FileOp.Stat("/etc/docker/daemon.json") {
+		snap.Status.DaemonJson = status
+		_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"daemon_json": status})
 		return
 	}
-	_ = snapshotRepo.UpdateStatus(statusID, map[string]interface{}{"daemon_json": constant.Running})
-	status := constant.StatusDone
-	if err := cpBinary("/etc/docker/daemon.json", path.Join(targetDir, "daemon.json")); err != nil {
+	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"daemon_json": constant.Running})
+	if err := cpBinary([]string{"/etc/docker/daemon.json"}, path.Join(targetDir, "daemon.json")); err != nil {
 		status = err.Error()
 	}
-	_ = snapshotRepo.UpdateStatus(statusID, map[string]interface{}{"daemon_json": status})
+	snap.Status.DaemonJson = status
+	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"daemon_json": status})
 }
 
-func snapAppData(snap snapHelper, statusID uint, targetDir string) {
+func snapAppData(snap snapHelper, targetDir string) {
 	defer snap.Wg.Done()
-	_ = snapshotRepo.UpdateStatus(statusID, map[string]interface{}{"app_data": constant.Running})
+	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"app_data": constant.Running})
 	appInstalls, err := appInstallRepo.ListBy()
 	if err != nil {
-		_ = snapshotRepo.UpdateStatus(statusID, map[string]interface{}{"app_data": err.Error()})
+		snap.Status.AppData = err.Error()
+		_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"app_data": err.Error()})
 		return
 	}
 	runtimes, err := runtimeRepo.List()
 	if err != nil {
-		_ = snapshotRepo.UpdateStatus(statusID, map[string]interface{}{"app_data": err.Error()})
+		snap.Status.AppData = err.Error()
+		_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"app_data": err.Error()})
 		return
 	}
 	imageRegex := regexp.MustCompile(`image:\s*(.*)`)
@@ -119,28 +108,31 @@ func snapAppData(snap snapHelper, statusID uint, targetDir string) {
 	global.LOG.Debugf("docker save %s | gzip -c > %s", strings.Join(imageSaveList, " "), path.Join(targetDir, "docker_image.tar"))
 	std, err := cmd.Execf("docker save %s | gzip -c > %s", strings.Join(imageSaveList, " "), path.Join(targetDir, "docker_image.tar"))
 	if err != nil {
-		_ = snapshotRepo.UpdateStatus(statusID, map[string]interface{}{"app_data": std})
+		snap.Status.AppData = err.Error()
+		_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"app_data": std})
 		return
 	}
-	_ = snapshotRepo.UpdateStatus(statusID, map[string]interface{}{"app_data": constant.StatusDone})
+	snap.Status.AppData = constant.StatusDone
+	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"app_data": constant.StatusDone})
 }
 
-func snapBackup(snap snapHelper, statusID uint, localDir, targetDir string) {
+func snapBackup(snap snapHelper, localDir, targetDir string) {
 	defer snap.Wg.Done()
-	_ = snapshotRepo.UpdateStatus(statusID, map[string]interface{}{"backup_data": constant.Running})
+	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"backup_data": constant.Running})
 	status := constant.StatusDone
 	if err := handleSnapTar(localDir, targetDir, "1panel_backup.tar.gz", "./system;"); err != nil {
 		status = err.Error()
 	}
-	_ = snapshotRepo.UpdateStatus(statusID, map[string]interface{}{"backup_data": status})
+	snap.Status.BackupData = status
+	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"backup_data": status})
 }
 
-func snapPanelData(snap snapHelper, statusID uint, localDir, targetDir string) {
+func snapPanelData(snap snapHelper, localDir, targetDir string) {
 	defer snap.Wg.Done()
-	_ = snapshotRepo.UpdateStatus(statusID, map[string]interface{}{"panel_data": constant.Running})
+	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"panel_data": constant.Running})
 	status := constant.StatusDone
 	dataDir := path.Join(global.CONF.System.BaseDir, "1panel")
-	exclusionRules := "./tmp;./log;./cache;./db/1Panel.db-*;"
+	exclusionRules := "./tmp;./log;./cache;"
 	if strings.Contains(localDir, dataDir) {
 		exclusionRules += ("." + strings.ReplaceAll(localDir, dataDir, "") + ";")
 	}
@@ -150,48 +142,57 @@ func snapPanelData(snap snapHelper, statusID uint, localDir, targetDir string) {
 		status = err.Error()
 	}
 	_ = snapshotRepo.Update(snap.SnapID, map[string]interface{}{"status": constant.StatusWaiting})
-	_ = snapshotRepo.UpdateStatus(statusID, map[string]interface{}{"panel_data": status})
+
+	snap.Status.PanelData = status
+	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"panel_data": status})
 }
 
-func snapCompress(snap snapHelper, statusID uint, rootDir string) {
+func snapCompress(snap snapHelper, rootDir string) {
 	defer func() {
 		global.LOG.Debugf("remove snapshot file %s", rootDir)
 		_ = os.RemoveAll(rootDir)
 	}()
-	_ = snapshotRepo.UpdateStatus(statusID, map[string]interface{}{"compress": constant.StatusRunning})
+	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"compress": constant.StatusRunning})
 	tmpDir := path.Join(global.CONF.System.TmpDir, "system")
 	fileName := fmt.Sprintf("%s.tar.gz", path.Base(rootDir))
 	if err := snap.FileOp.Compress([]string{rootDir}, tmpDir, fileName, files.TarGz); err != nil {
-		_ = snapshotRepo.UpdateStatus(statusID, map[string]interface{}{"compress": err.Error()})
+		snap.Status.Compress = err.Error()
+		_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"compress": err.Error()})
 		return
 	}
-	_ = snapshotRepo.UpdateStatus(statusID, map[string]interface{}{"compress": constant.StatusDone})
+
+	snap.Status.Compress = constant.StatusDone
+	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"compress": constant.StatusDone})
 }
 
-func snapUpload(account string, statusID uint, file string) {
+func snapUpload(snap snapHelper, account string, file string) {
 	source := path.Join(global.CONF.System.TmpDir, "system", path.Base(file))
 	defer func() {
 		global.LOG.Debugf("remove snapshot file %s", source)
 		_ = os.Remove(source)
 	}()
 
-	_ = snapshotRepo.UpdateStatus(statusID, map[string]interface{}{"upload": constant.StatusUploading})
+	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"upload": constant.StatusUploading})
 	backup, err := backupRepo.Get(commonRepo.WithByType(account))
 	if err != nil {
-		_ = snapshotRepo.UpdateStatus(statusID, map[string]interface{}{"upload": err.Error()})
+		snap.Status.Upload = err.Error()
+		_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"upload": err.Error()})
 		return
 	}
 	client, err := NewIBackupService().NewClient(&backup)
 	if err != nil {
-		_ = snapshotRepo.UpdateStatus(statusID, map[string]interface{}{"upload": err.Error()})
+		snap.Status.Upload = err.Error()
+		_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"upload": err.Error()})
 		return
 	}
 	target := path.Join(backup.BackupPath, "system_snapshot", path.Base(file))
 	if _, err := client.Upload(source, target); err != nil {
-		_ = snapshotRepo.UpdateStatus(statusID, map[string]interface{}{"upload": err.Error()})
+		snap.Status.Upload = err.Error()
+		_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"upload": err.Error()})
 		return
 	}
-	_ = snapshotRepo.UpdateStatus(statusID, map[string]interface{}{"upload": constant.StatusDone})
+	snap.Status.Upload = constant.StatusDone
+	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"upload": constant.StatusDone})
 }
 
 func handleSnapTar(sourceDir, targetDir, name, exclusionRules string) error {
@@ -211,7 +212,7 @@ func handleSnapTar(sourceDir, targetDir, name, exclusionRules string) error {
 		exStr += exclude
 	}
 
-	commands := fmt.Sprintf("tar --warning=no-file-changed -zcf %s %s -C %s .", targetDir+"/"+name, exStr, sourceDir)
+	commands := fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read -zcf %s %s -C %s .", targetDir+"/"+name, exStr, sourceDir)
 	global.LOG.Debug(commands)
 	stdout, err := cmd.ExecWithTimeOut(commands, 30*time.Minute)
 	if err != nil {

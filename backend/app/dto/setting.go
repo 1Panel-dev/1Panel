@@ -76,14 +76,12 @@ type PortUpdate struct {
 }
 
 type SnapshotStatus struct {
-	Panel        string `json:"panel"`
-	PanelCtl     string `json:"panelCtl"`
-	PanelService string `json:"panelService"`
-	PanelInfo    string `json:"panelInfo"`
-	DaemonJson   string `json:"daemonJson"`
-	AppData      string `json:"appData"`
-	PanelData    string `json:"panelData"`
-	BackupData   string `json:"backupData"`
+	Panel      string `json:"panel"`
+	PanelInfo  string `json:"panelInfo"`
+	DaemonJson string `json:"daemonJson"`
+	AppData    string `json:"appData"`
+	PanelData  string `json:"panelData"`
+	BackupData string `json:"backupData"`
 
 	Compress string `json:"compress"`
 	Upload   string `json:"upload"`
