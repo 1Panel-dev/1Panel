@@ -51,7 +51,9 @@
                     </el-table-column>
                     <el-table-column width="90">
                         <template #default="{ row }">
-                            <el-tag effect="dark" round v-if="row.isSystem">system</el-tag>
+                            <el-tag effect="dark" round v-if="row.isSystem || row.name === '1panel-network'">
+                                system
+                            </el-tag>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -78,11 +80,12 @@
                     </el-table-column>
                     <el-table-column
                         prop="createdAt"
+                        show-overflow-tooltip
                         min-width="90"
                         :label="$t('commons.table.date')"
                         :formatter="dateFormat"
                     />
-                    <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fix />
+                    <fu-table-operations width="100" :buttons="buttons" :label="$t('commons.table.operate')" fix />
                 </ComplexTable>
             </template>
         </LayoutContent>
@@ -222,7 +225,7 @@ const onInspect = async (id: string) => {
 };
 
 function isSystem(val: string) {
-    return val === 'bridge' || val === '1panel-network' || val === 'none' || val === 'host';
+    return val === 'bridge' || val === 'none' || val === 'host';
 }
 
 const buttons = [
