@@ -613,8 +613,9 @@ func runScript(appInstall *model.AppInstall, operate string) error {
 	out, err := cmd.ExecScript(scriptPath, workDir)
 	if err != nil {
 		if out != "" {
-			global.LOG.Errorf("run script %s error %s", scriptPath, out)
-			return errors.New(out)
+			errMsg := fmt.Sprintf("run script %s error %s", scriptPath, out)
+			global.LOG.Error(errMsg)
+			return errors.New(errMsg)
 		}
 		return err
 	}
@@ -905,6 +906,16 @@ func getAppInstallByKey(key string) (model.AppInstall, error) {
 		return model.AppInstall{}, err
 	}
 	return appInstall, nil
+}
+
+func getAppInstallPort(key string) (httpPort, httpsPort int, err error) {
+	install, err := getAppInstallByKey(key)
+	if err != nil {
+		return
+	}
+	httpPort = install.HttpPort
+	httpsPort = install.HttpsPort
+	return
 }
 
 func updateToolApp(installed *model.AppInstall) {
