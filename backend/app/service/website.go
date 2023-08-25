@@ -9,6 +9,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"os"
 	"path"
 	"reflect"
@@ -452,6 +453,15 @@ func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) 
 	httpPort, _, err := getAppInstallPort(constant.AppOpenresty)
 	if err != nil {
 		return domainModel, err
+	}
+
+	if existDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithPort(create.Port)); len(existDomains) == 0 {
+		if existAppInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithPort(create.Port)); !reflect.DeepEqual(existAppInstall, model.AppInstall{}) {
+			return domainModel, buserr.WithMap(constant.ErrPortInOtherApp, map[string]interface{}{"port": create.Port, "apps": existAppInstall.App.Name}, nil)
+		}
+		if common.ScanPort(create.Port) {
+			return domainModel, buserr.WithDetail(constant.ErrPortInUsed, create.Port, nil)
+		}
 	}
 
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(create.WebsiteID))

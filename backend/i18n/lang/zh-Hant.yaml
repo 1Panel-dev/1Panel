@@ -20,7 +20,7 @@ ErrPortInUsed: "{{ .detail }} 端口已被佔用！"
 ErrAppLimit: "應用超出安裝數量限制"
 ErrAppRequired: "請先安裝 {{ .detail }} 應用"
 ErrNotInstall: "應用未安裝"
-ErrPortInOtherApp: "{{ .port }} 端口已被 {{ .apps }}佔用！"
+ErrPortInOtherApp: "{{ .port }} 端口已被應用 {{ .apps }} 佔用！"
 ErrDbUserNotValid: "儲存資料庫，用戶名密碼不匹配！"
 ErrDockerComposeNotValid: "docker-compose 文件格式錯誤"
 ErrUpdateBuWebsite: '應用更新成功，但是網站配置文件修改失敗，請檢查配置！'
