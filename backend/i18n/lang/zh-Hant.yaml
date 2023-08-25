@@ -46,6 +46,7 @@ ErrContainerNotFound: '{{ .name }} 容器不存在'
 ErrContainerMsg: '{{ .name }} 容器異常，具體請在容器頁面查看日誌'
 ErrAppBackup: '{{ .name }} 應用備份失敗 err {{.err}}'
 ErrImagePull: '{{ .name }} 鏡像拉取失敗 err {{.err}}'
+ErrVersionTooLow: '當前 1Panel 版本過低，無法更新應用商店，請升級版本之後操作'
 
 #file
 ErrFileCanNotRead: "此文件不支持預覽"

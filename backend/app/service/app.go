@@ -668,6 +668,21 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 		res.CanUpdate = true
 		return res, err
 	}
+	if err = getAppFromRepo(fmt.Sprintf("%s/%s/1panel.json.zip", global.CONF.System.AppRepo, global.CONF.System.Mode)); err != nil {
+		return nil, err
+	}
+	listFile := path.Join(constant.ResourceDir, "1panel.json")
+	content, err := os.ReadFile(listFile)
+	if err != nil {
+		return nil, err
+	}
+	list := &dto.AppList{}
+	if err = json.Unmarshal(content, list); err != nil {
+		return nil, err
+	}
+	if list.Extra.Version != "" && !common.CompareVersion(setting.SystemVersion, list.Extra.Version) {
+		return nil, buserr.New("ErrVersionTooLow")
+	}
 	return res, nil
 }
 
