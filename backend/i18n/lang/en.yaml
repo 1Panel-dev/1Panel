@@ -20,7 +20,7 @@ ErrPortInUsed: "{{ .detail }} port already in use"
 ErrAppLimit: "App exceeds install limit"
 ErrAppRequired: "{{ .detail }} app is required"
 ErrNotInstall: "App not installed"
-ErrPortInOtherApp: "{{ .port }} port  already in use by  {{ .apps }}"
+ErrPortInOtherApp: "{{ .port }} port  already in use by app  {{ .apps }}"
 ErrDbUserNotValid: "Stock database, username and password do not match！"
 ErrDockerComposeNotValid: "docker-compose file format error!"
 ErrUpdateBuWebsite: 'The application was updated successfully, but the modification of the website configuration file failed, please check the configuration!'
