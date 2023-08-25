@@ -921,19 +921,12 @@ func (w WebsiteService) OpWebsiteLog(req request.WebsiteLogReq) (*response.Websi
 			}
 		}
 		filePath := path.Join(sitePath, "log", req.LogType)
-		fileInfo, err := os.Stat(filePath)
+		lines, end, err := files.ReadFileByLine(filePath, req.Page, req.PageSize)
 		if err != nil {
 			return nil, err
 		}
-		if fileInfo.Size() > 20<<20 {
-			return nil, buserr.New(constant.ErrFileToLarge)
-		}
-		fileInfo.Size()
-		content, err := os.ReadFile(filePath)
-		if err != nil {
-			return nil, err
-		}
-		res.Content = string(content)
+		res.End = end
+		res.Content = strings.Join(lines, "\n")
 		return res, nil
 	case constant.DisableLog:
 		key := "access_log"
