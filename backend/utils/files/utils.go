@@ -1,6 +1,7 @@
 package files
 
 import (
+	"bufio"
 	"github.com/spf13/afero"
 	"net/http"
 	"os"
@@ -74,4 +75,37 @@ const dotCharacter = 46
 
 func IsHidden(path string) bool {
 	return path[0] == dotCharacter
+}
+
+func ReadFileByLine(filename string, page, pageSize int) ([]string, bool, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, false, err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+
+	var lines []string
+	currentLine := 0
+	startLine := (page - 1) * pageSize
+	endLine := startLine + pageSize
+
+	for scanner.Scan() {
+		if currentLine >= startLine && currentLine < endLine {
+			lines = append(lines, scanner.Text())
+		}
+		currentLine++
+		if currentLine >= endLine {
+			break
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, false, err
+	}
+
+	isEndOfFile := currentLine < endLine
+
+	return lines, isEndOfFile, nil
 }

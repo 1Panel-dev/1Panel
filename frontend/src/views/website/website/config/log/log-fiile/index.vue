@@ -23,6 +23,7 @@
         </div>
         <br />
         <codemirror
+            re="logContainer"
             style="height: calc(100vh - 430px); width: 100%"
             :autofocus="true"
             :placeholder="$t('website.noLog')"
@@ -33,7 +34,7 @@
             theme="cobalt"
             :styleActiveLine="true"
             :extensions="extensions"
-            v-model="data.content"
+            v-model="content"
             :disabled="true"
             @ready="handleReady"
         />
@@ -43,7 +44,7 @@
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { computed, nextTick, onMounted, onUnmounted, ref, shallowRef } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref, shallowRef } from 'vue';
 import { OpWebsiteLog } from '@/api/modules/website';
 import { dateFormatForName, downloadWithContent } from '@/utils/util';
 import { useDeleteData } from '@/hooks/use-delete-data';
@@ -74,31 +75,52 @@ const tailLog = ref(false);
 let timer: NodeJS.Timer | null = null;
 
 const view = shallowRef();
+const editorContainer = ref<HTMLDivElement | null>(null);
 const handleReady = (payload) => {
     view.value = payload.view;
+    editorContainer.value = payload.container;
 };
+const content = ref('');
+const end = ref(false);
+const lastContent = ref('');
+
+const readReq = reactive({
+    id: id.value,
+    operate: 'get',
+    logType: logType.value,
+    page: 0,
+    pageSize: 500,
+});
 
 const getContent = () => {
-    const req = {
-        id: id.value,
-        operate: 'get',
-        logType: logType.value,
-    };
-    loading.value = true;
-    OpWebsiteLog(req)
-        .then((res) => {
-            data.value = res.data;
-            nextTick(() => {
-                const state = view.value.state;
-                view.value.dispatch({
-                    selection: { anchor: state.doc.length, head: state.doc.length },
-                    scrollIntoView: true,
-                });
+    if (!end.value) {
+        readReq.page += 1;
+    }
+    OpWebsiteLog(readReq).then((res) => {
+        if (!end.value && res.data.end) {
+            lastContent.value = content.value;
+        }
+        data.value = res.data;
+        if (res.data.content != '') {
+            if (end.value) {
+                content.value = lastContent.value + '\n' + res.data.content;
+            } else {
+                if (content.value == '') {
+                    content.value = res.data.content;
+                } else {
+                    content.value = content.value + '\n' + res.data.content;
+                }
+            }
+        }
+        end.value = res.data.end;
+        nextTick(() => {
+            const state = view.value.state;
+            view.value.dispatch({
+                selection: { anchor: state.doc.length, head: state.doc.length },
             });
-        })
-        .finally(() => {
-            loading.value = false;
+            view.value.focus();
         });
+    });
 };
 
 const changeTail = () => {
@@ -152,8 +174,23 @@ const onCloseLog = async () => {
     timer = null;
 };
 
+function isScrolledToBottom(element: HTMLElement): boolean {
+    return element.scrollTop + element.clientHeight === element.scrollHeight;
+}
+
 onMounted(() => {
     getContent();
+    nextTick(() => {
+        let editorElement = editorContainer.value.querySelector('.cm-editor');
+        let scrollerElement = editorElement.querySelector('.cm-scroller') as HTMLElement;
+        if (scrollerElement) {
+            scrollerElement.addEventListener('scroll', function () {
+                if (isScrolledToBottom(scrollerElement)) {
+                    getContent();
+                }
+            });
+        }
+    });
 });
 
 onUnmounted(() => {

@@ -82,11 +82,14 @@ export namespace Website {
         id: number;
         operate: string;
         logType: string;
+        page?: number;
+        pageSize?: number;
     }
 
     export interface WebSiteLog {
         enable: boolean;
         content: string;
+        end: boolean;
     }
 
     export interface Domain {

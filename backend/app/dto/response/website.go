@@ -41,6 +41,7 @@ type WebsiteHTTPS struct {
 type WebsiteLog struct {
 	Enable  bool   `json:"enable"`
 	Content string `json:"content"`
+	End     bool   `json:"end"`
 }
 
 type PHPConfig struct {
