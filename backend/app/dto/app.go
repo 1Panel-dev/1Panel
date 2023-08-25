@@ -67,7 +67,8 @@ type LocalAppInstallDefine struct {
 }
 
 type ExtraProperties struct {
-	Tags []Tag `json:"tags"`
+	Tags    []Tag  `json:"tags"`
+	Version string `json:"version"`
 }
 
 type AppProperty struct {
