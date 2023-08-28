@@ -694,16 +694,24 @@ func upApp(appInstall *model.AppInstall) {
 }
 
 func rebuildApp(appInstall model.AppInstall) error {
-	dockerComposePath := appInstall.GetComposePath()
-	out, err := compose.Down(dockerComposePath)
-	if err != nil {
-		return handleErr(appInstall, err, out)
-	}
-	out, err = compose.Up(dockerComposePath)
-	if err != nil {
-		return handleErr(appInstall, err, out)
-	}
-	return syncById(appInstall.ID)
+	appInstall.Status = constant.Rebuilding
+	_ = appInstallRepo.Save(context.Background(), &appInstall)
+	go func() {
+		dockerComposePath := appInstall.GetComposePath()
+		out, err := compose.Down(dockerComposePath)
+		if err != nil {
+			_ = handleErr(appInstall, err, out)
+			return
+		}
+		out, err = compose.Up(dockerComposePath)
+		if err != nil {
+			_ = handleErr(appInstall, err, out)
+			return
+		}
+		appInstall.Status = constant.Running
+		_ = appInstallRepo.Save(context.Background(), &appInstall)
+	}()
+	return nil
 }
 
 func getAppDetails(details []model.AppDetail, versions []dto.AppConfigVersion) map[string]model.AppDetail {
