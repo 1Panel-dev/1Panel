@@ -113,7 +113,7 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (err error) {
 	if err = runtimeRepo.Create(context.Background(), runtime); err != nil {
 		return
 	}
-	go buildRuntime(runtime, "")
+	go buildRuntime(runtime, "", false)
 	return
 }
 
@@ -272,6 +272,6 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 	if err != nil {
 		return err
 	}
-	go buildRuntime(runtime, imageID)
+	go buildRuntime(runtime, imageID, req.Rebuild)
 	return nil
 }

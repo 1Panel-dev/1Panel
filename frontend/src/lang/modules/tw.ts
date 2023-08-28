@@ -1559,7 +1559,10 @@ const message = {
         toupgrade: '去升級',
         edit: '編輯運行環境',
         extendHelper: '列表中不存在的擴展，可以手動輸入之後選擇，例:輸入 sockets ，然後在下拉列表中選擇第一個',
-        rebuildHelper: '編輯擴展後需要去【應用商店-已安裝】頁面【重建】PHP 應用之後才能生效',
+        rebuildHelper: '編輯擴展後需要【重建】PHP 應用之後才能生效',
+        phpPluginHelper:
+            "<a target=“_blank” href='https://1panel.cn/docs/user_manual/websites/php/#php_1'>查看 PHP 擴展列表</a> ",
+        rebuild: '重建 PHP 應用',
     },
     process: {
         pid: '進程ID',

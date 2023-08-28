@@ -35,6 +35,7 @@ export namespace Runtime {
         resource: string;
         appId?: number;
         version?: string;
+        rebuild?: boolean;
     }
 
     export interface RuntimeUpdate {
@@ -46,6 +47,7 @@ export namespace Runtime {
         resource: string;
         appId?: number;
         version?: string;
+        rebuild?: boolean;
     }
 
     export interface RuntimeDelete {
