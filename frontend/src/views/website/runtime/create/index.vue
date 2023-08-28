@@ -89,6 +89,19 @@
                                     <br />
                                 </el-alert>
                             </el-form-item>
+                            <div v-if="runtime.type === 'php' && mode == 'edit'">
+                                <el-form-item>
+                                    <el-checkbox v-model="runtime.rebuild">
+                                        {{ $t('runtime.rebuild') }}
+                                    </el-checkbox>
+                                </el-form-item>
+                                <el-form-item>
+                                    <el-alert type="info" :closable="false">
+                                        <span>{{ $t('runtime.rebuildHelper') }}</span>
+                                        <br />
+                                    </el-alert>
+                                </el-form-item>
+                            </div>
                         </div>
                     </div>
                     <div v-else>
@@ -154,6 +167,7 @@ const runtime = ref<Runtime.RuntimeCreate>({
     params: {},
     type: 'php',
     resource: 'appstore',
+    rebuild: false,
 });
 const rules = ref<any>({
     name: [Rules.appName],
@@ -256,20 +270,15 @@ const submit = async (formEl: FormInstance | undefined) => {
                     loading.value = false;
                 });
         } else {
-            ElMessageBox.confirm(i18n.global.t('runtime.rebuildHelper'), i18n.global.t('commons.msg.infoTitle'), {
-                confirmButtonText: i18n.global.t('commons.button.confirm'),
-                cancelButtonText: i18n.global.t('commons.button.cancel'),
-            }).then(async () => {
-                loading.value = true;
-                UpdateRuntime(runtime.value)
-                    .then(() => {
-                        MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
-                        handleClose();
-                    })
-                    .finally(() => {
-                        loading.value = false;
-                    });
-            });
+            loading.value = true;
+            UpdateRuntime(runtime.value)
+                .then(() => {
+                    MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+                    handleClose();
+                })
+                .finally(() => {
+                    loading.value = false;
+                });
         }
     });
 };
@@ -288,6 +297,7 @@ const getRuntime = async (id: number) => {
             resource: data.resource,
             appId: data.appId,
             version: data.version,
+            rebuild: true,
         };
         editParams.value = data.appParams;
         if (mode.value == 'create') {

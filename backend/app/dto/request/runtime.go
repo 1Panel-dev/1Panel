@@ -29,4 +29,5 @@ type RuntimeUpdate struct {
 	Params  map[string]interface{} `json:"params"`
 	Image   string                 `json:"image"`
 	Version string                 `json:"version"`
+	Rebuild bool                   `json:"rebuild"`
 }

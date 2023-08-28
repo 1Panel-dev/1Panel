@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -17,7 +18,7 @@ import (
 	"strings"
 )
 
-func buildRuntime(runtime *model.Runtime, oldImageID string) {
+func buildRuntime(runtime *model.Runtime, oldImageID string, rebuild bool) {
 	runtimePath := path.Join(constant.RuntimeDir, runtime.Type, runtime.Name)
 	composePath := path.Join(runtimePath, "docker-compose.yml")
 	logPath := path.Join(runtimePath, "build.log")
@@ -59,6 +60,29 @@ func buildRuntime(runtime *model.Runtime, oldImageID string) {
 				}
 			} else {
 				global.LOG.Errorf("delete imageID [%s] error %v", oldImageID, err)
+			}
+		}
+		if rebuild && runtime.ID > 0 {
+			websites, _ := websiteRepo.GetBy(websiteRepo.WithRuntimeID(runtime.ID))
+			if len(websites) > 0 {
+				installService := NewIAppInstalledService()
+				installMap := make(map[uint]string)
+				for _, website := range websites {
+					if website.AppInstallID > 0 {
+						installMap[website.AppInstallID] = website.PrimaryDomain
+					}
+				}
+				for installID, domain := range installMap {
+					go func(installID uint, domain string) {
+						global.LOG.Infof("rebuild php runtime [%s] domain [%s]", runtime.Name, domain)
+						if err := installService.Operate(request.AppInstalledOperate{
+							InstallId: installID,
+							Operate:   constant.Rebuild,
+						}); err != nil {
+							global.LOG.Errorf("rebuild php runtime [%s] domain [%s] error %v", runtime.Name, domain, err)
+						}
+					}(installID, domain)
+				}
 			}
 		}
 	}
