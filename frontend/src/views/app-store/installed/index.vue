@@ -430,7 +430,7 @@ const buttons = [
             openOperate(row, 'sync');
         },
         disabled: (row: any) => {
-            return row.status === 'DownloadErr' || row.status === 'Upgrading';
+            return row.status === 'DownloadErr' || row.status === 'Upgrading' || row.status === 'Rebuilding';
         },
     },
     {
@@ -439,7 +439,7 @@ const buttons = [
             openOperate(row, 'rebuild');
         },
         disabled: (row: any) => {
-            return row.status === 'DownloadErr' || row.status === 'Upgrading';
+            return row.status === 'DownloadErr' || row.status === 'Upgrading' || row.status === 'Rebuilding';
         },
     },
     {
@@ -448,7 +448,7 @@ const buttons = [
             openOperate(row, 'restart');
         },
         disabled: (row: any) => {
-            return row.status === 'DownloadErr' || row.status === 'Upgrading';
+            return row.status === 'DownloadErr' || row.status === 'Upgrading' || row.status === 'Rebuilding';
         },
     },
     {
@@ -461,7 +461,8 @@ const buttons = [
                 row.status === 'Running' ||
                 row.status === 'Error' ||
                 row.status === 'DownloadErr' ||
-                row.status === 'Upgrading'
+                row.status === 'Upgrading' ||
+                row.status === 'Rebuilding'
             );
         },
     },
@@ -471,7 +472,12 @@ const buttons = [
             openOperate(row, 'stop');
         },
         disabled: (row: any) => {
-            return row.status !== 'Running' || row.status === 'DownloadErr' || row.status === 'Upgrading';
+            return (
+                row.status !== 'Running' ||
+                row.status === 'DownloadErr' ||
+                row.status === 'Upgrading' ||
+                row.status === 'Rebuilding'
+            );
         },
     },
     {
@@ -486,7 +492,7 @@ const buttons = [
             openParam(row);
         },
         disabled: (row: any) => {
-            return row.status === 'DownloadErr' || row.status === 'Upgrading';
+            return row.status === 'DownloadErr' || row.status === 'Upgrading' || row.status === 'Rebuilding';
         },
     },
 ];

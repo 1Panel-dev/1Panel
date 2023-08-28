@@ -221,6 +221,7 @@ const message = {
             upgrading: 'Upgrading',
             upgradeerr: 'Upgrade Error',
             pullerr: 'Pull Image Error',
+            rebuilding: '重建中',
         },
         units: {
             second: 'Second',

@@ -12,6 +12,7 @@ const (
 	Upgrading   = "Upgrading"
 	UpgradeErr  = "UpgradeErr"
 	PullErr     = "PullErr"
+	Rebuilding  = "Rebuilding"
 
 	ContainerPrefix = "1Panel-"
 

@@ -219,6 +219,7 @@ const message = {
             upgrading: '升級中',
             upgradeerr: '升級失敗',
             pullerr: '鏡像拉取失敗',
+            rebuilding: '重建中',
         },
         units: {
             second: '秒',
