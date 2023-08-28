@@ -318,20 +318,21 @@ func upgradeInstall(installId uint, detailId uint, backup bool) error {
 			return
 		}
 		servicesMap := value.(map[string]interface{})
-		index := 0
-		oldServiceName := ""
-		for k := range servicesMap {
-			oldServiceName = k
-			index++
-			if index > 0 {
-				break
+		if len(servicesMap) == 1 {
+			index := 0
+			oldServiceName := ""
+			for k := range servicesMap {
+				oldServiceName = k
+				index++
+				if index > 0 {
+					break
+				}
+			}
+			servicesMap[install.ServiceName] = servicesMap[oldServiceName]
+			if install.ServiceName != oldServiceName {
+				delete(servicesMap, oldServiceName)
 			}
 		}
-		servicesMap[install.ServiceName] = servicesMap[oldServiceName]
-		if install.ServiceName != oldServiceName {
-			delete(servicesMap, oldServiceName)
-		}
-
 		envs := make(map[string]interface{})
 		if upErr = json.Unmarshal([]byte(install.Env), &envs); upErr != nil {
 			return
@@ -518,7 +519,7 @@ func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.App
 		_ = fileOp.CreateDir(appVersionDir, 0755)
 	}
 	global.LOG.Infof("download app[%s] from %s", app.Name, appDetail.DownloadUrl)
-	filePath := path.Join(appVersionDir, appDetail.Version+".tar.gz")
+	filePath := path.Join(appVersionDir, app.Key+"-"+appDetail.Version+".tar.gz")
 
 	defer func() {
 		if err != nil {
@@ -533,7 +534,7 @@ func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.App
 		global.LOG.Errorf("download app[%s] error %v", app.Name, err)
 		return
 	}
-	if err = fileOp.Decompress(filePath, appVersionDir, files.TarGz); err != nil {
+	if err = fileOp.Decompress(filePath, appResourceDir, files.TarGz); err != nil {
 		global.LOG.Errorf("decompress app[%s] error %v", app.Name, err)
 		return
 	}

@@ -782,8 +782,8 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 		for _, v := range versions {
 			version := v.Name
 			detail := detailsMap[version]
-
-			dockerComposeUrl := fmt.Sprintf("%s/%s/%s/%s", baseRemoteUrl, app.Key, version, "docker-compose.yml")
+			versionUrl := fmt.Sprintf("%s/%s/%s", baseRemoteUrl, app.Key, version)
+			dockerComposeUrl := fmt.Sprintf("%s/%s", versionUrl, "docker-compose.yml")
 			composeRes, err := http.Get(dockerComposeUrl)
 			if err != nil {
 				return err
@@ -796,7 +796,7 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 
 			paramByte, _ := json.Marshal(v.AppForm)
 			detail.Params = string(paramByte)
-			detail.DownloadUrl = v.DownloadUrl
+			detail.DownloadUrl = fmt.Sprintf("%s/%s", versionUrl, app.Key+"-"+version+".tar.gz")
 			detail.DownloadCallBackUrl = v.DownloadCallBackUrl
 			detail.Update = true
 			detail.LastModified = v.LastModified
