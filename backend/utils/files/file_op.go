@@ -518,6 +518,13 @@ func (f FileOp) Decompress(srcFile string, dst string, cType CompressType) error
 				return err
 			}
 			return nil
+		} else {
+			parentDir := path.Dir(filePath)
+			if !f.Stat(parentDir) {
+				if err := f.Fs.MkdirAll(parentDir, info.Mode()); err != nil {
+					return err
+				}
+			}
 		}
 		fr, err := archFile.Open()
 		if err != nil {
