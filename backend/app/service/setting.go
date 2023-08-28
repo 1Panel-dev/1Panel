@@ -103,6 +103,12 @@ func (u *SettingService) Update(key, value string) error {
 		if err := ntp.UpdateSystemTimeZone(value); err != nil {
 			return err
 		}
+	case "AppStoreLastModified":
+		exist, _ := settingRepo.Get(settingRepo.WithByKey("AppStoreLastModified"))
+		if exist.ID == 0 {
+			_ = settingRepo.Create("AppStoreLastModified", value)
+			return nil
+		}
 	}
 
 	if err := settingRepo.Update(key, value); err != nil {
@@ -128,6 +134,7 @@ func (u *SettingService) Update(key, value string) error {
 		}
 	case "UserName", "Password":
 		_ = global.SESSION.Clean()
+
 	}
 
 	return nil
