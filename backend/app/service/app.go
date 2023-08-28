@@ -680,7 +680,7 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 	if err = json.Unmarshal(content, list); err != nil {
 		return nil, err
 	}
-	if list.Extra.Version != "" && !common.CompareVersion(setting.SystemVersion, list.Extra.Version) {
+	if list.Extra.Version != "" && setting.SystemVersion != list.Extra.Version && !common.CompareVersion(setting.SystemVersion, list.Extra.Version) {
 		return nil, buserr.New("ErrVersionTooLow")
 	}
 	return res, nil
