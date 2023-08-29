@@ -143,17 +143,16 @@ func (a *AppInstallService) CheckExist(req request.AppInstalledInfo) (*response.
 
 	var appInstall model.AppInstall
 	if len(req.Name) == 0 {
-		appInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithAppId(app.ID))
-		if reflect.DeepEqual(appInstall, model.AppInstall{}) {
-			return res, nil
-		}
-		if err := syncById(appInstall.ID); err != nil {
-			return nil, err
-		}
-		appInstall, _ = appInstallRepo.GetFirst(commonRepo.WithByID(appInstall.ID))
+		appInstall, _ = appInstallRepo.GetFirst(appInstallRepo.WithAppId(app.ID))
 	} else {
 		appInstall, _ = appInstallRepo.GetFirst(commonRepo.WithByName(req.Name))
+	}
 
+	if reflect.DeepEqual(appInstall, model.AppInstall{}) {
+		return res, nil
+	}
+	if err = syncById(appInstall.ID); err != nil {
+		return nil, err
 	}
 
 	res.ContainerName = appInstall.ContainerName
