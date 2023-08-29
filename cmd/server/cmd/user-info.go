@@ -16,6 +16,10 @@ var userinfoCmd = &cobra.Command{
 	Use:   "user-info",
 	Short: "获取用户信息",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		if !isRoot() {
+			fmt.Println("请使用 sudo 1pctl user-info 或者切换到 root 用户")
+			return nil
+		}
 		db, err := loadDBConn()
 		if err != nil {
 			return fmt.Errorf("init my db conn failed, err: %v \n", err)
