@@ -109,7 +109,7 @@ func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
 	if err := copier.Copy(&db, &req); err != nil {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
-	if err := databaseRepo.Create(&db); err != nil {
+	if err := databaseRepo.Create(context.Background(), &db); err != nil {
 		return err
 	}
 	return nil
@@ -120,7 +120,7 @@ func (u *DatabaseService) Delete(id uint) error {
 	if db.ID == 0 {
 		return constant.ErrRecordNotFound
 	}
-	if err := databaseRepo.Delete(commonRepo.WithByID(id)); err != nil {
+	if err := databaseRepo.Delete(context.Background(), commonRepo.WithByID(id)); err != nil {
 		return err
 	}
 	if db.From != "local" {
