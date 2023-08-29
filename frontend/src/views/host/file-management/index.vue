@@ -176,16 +176,16 @@
             <Process :open="processPage.open" @close="closeProcess" />
             <Owner ref="chownRef" @close="search"></Owner>
             <Detail ref="detailRef" />
+            <Delete ref="deleteRef" @close="search" />
         </LayoutContent>
     </div>
 </template>
 
 <script setup lang="ts">
 import { nextTick, onMounted, reactive, ref, computed } from '@vue/runtime-core';
-import { GetFilesList, DeleteFile, GetFileContent, ComputeDirSize } from '@/api/modules/files';
+import { GetFilesList, GetFileContent, ComputeDirSize } from '@/api/modules/files';
 import { computeSize, dateFormat, downloadFile, getIcon, getRandomStr } from '@/utils/util';
 import { File } from '@/api/interface/file';
-import { useDeleteData } from '@/hooks/use-delete-data';
 import i18n from '@/lang';
 import CreateFile from './create/index.vue';
 import ChangeRole from './change-role/index.vue';
@@ -198,13 +198,14 @@ import Wget from './wget/index.vue';
 import Move from './move/index.vue';
 import Download from './download/index.vue';
 import Owner from './chown/index.vue';
+import Delete from './delete/index.vue';
 import { Mimetypes, Languages } from '@/global/mimetype';
 import Process from './process/index.vue';
 import Detail from './detail/index.vue';
 import { useRouter } from 'vue-router';
 import { Back, Refresh } from '@element-plus/icons-vue';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
-import { ElMessageBox } from 'element-plus';
+// import { ElMessageBox } from 'element-plus';
 import { useSearchable } from './hooks/searchable';
 import { ResultData } from '@/api/interface';
 import { GlobalStore } from '@/store';
@@ -261,6 +262,7 @@ const pathRef = ref();
 const breadCrumbRef = ref();
 const chownRef = ref();
 const moveOpen = ref(false);
+const deleteRef = ref();
 
 // editablePath
 const { searchableStatus, searchablePath, searchableInputRef, searchableInputBlur } = useSearchable(paths);
@@ -407,30 +409,11 @@ const handleCreate = (commnad: string) => {
 };
 
 const delFile = async (row: File.File | null) => {
-    await useDeleteData(DeleteFile, row as File.FileDelete, 'commons.msg.delete');
-    search();
+    deleteRef.value.acceptParams([row]);
 };
 
 const batchDelFiles = () => {
-    ElMessageBox.confirm(i18n.global.t('commons.msg.delete'), i18n.global.t('commons.msg.deleteTitle'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-        type: 'info',
-    }).then(() => {
-        const pros = [];
-        for (const s of selects.value) {
-            pros.push(DeleteFile({ path: s['path'], isDir: s['isDir'] }));
-        }
-        loading.value = true;
-        Promise.all(pros)
-            .then(() => {
-                MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
-                search();
-            })
-            .finally(() => {
-                loading.value = false;
-            });
-    });
+    deleteRef.value.acceptParams(selects.value);
 };
 
 const getFileSize = (size: number) => {
