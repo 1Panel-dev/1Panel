@@ -8,7 +8,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
-	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/mysql/client"
 )
 
@@ -28,9 +27,6 @@ type MysqlClient interface {
 
 func NewMysqlClient(conn client.DBInfo) (MysqlClient, error) {
 	if conn.From == "local" {
-		if cmd.CheckIllegal(conn.Address, conn.Username, conn.Password) {
-			return nil, buserr.New(constant.ErrCmdIllegal)
-		}
 		connArgs := []string{"exec", conn.Address, "mysql", "-u" + conn.Username, "-p" + conn.Password, "-e"}
 		return client.NewLocal(connArgs, conn.Address, conn.Password, conn.From), nil
 	}
