@@ -96,7 +96,24 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 						return err
 					}
 					appInstall.Param = string(authByte)
+					if app.Key == "mysql" || app.Key == "mariadb" {
+						database := &model.Database{
+							AppInstallID: appInstall.ID,
+							Name:         appInstall.Name,
+							Type:         app.Key,
+							Version:      appInstall.Version,
+							From:         "local",
+							Address:      appInstall.ServiceName,
+							Username:     "root",
+							Password:     password.(string),
+							Port:         3306,
+						}
+						if err := databaseRepo.Create(ctx, database); err != nil {
+							return err
+						}
+					}
 				}
+
 			}
 		case "redis":
 			if password, ok := params["PANEL_REDIS_ROOT_PASSWORD"]; ok {
@@ -141,6 +158,7 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 				var createMysql dto.MysqlDBCreate
 				createMysql.Name = dbConfig.DbName
 				createMysql.Username = dbConfig.DbUser
+				createMysql.Database = dbInstall.Name
 				createMysql.Format = "utf8mb4"
 				createMysql.Permission = "%"
 				createMysql.Password = dbConfig.Password
@@ -229,13 +247,16 @@ func deleteAppInstall(install model.AppInstall, deleteBackup bool, forceDelete b
 }
 
 func deleteLink(ctx context.Context, install *model.AppInstall, deleteDB bool, forceDelete bool) error {
+	if install.App.Key == "mysql" || install.App.Key == "mariadb" {
+		_ = databaseRepo.Delete(ctx, databaseRepo.WithAppInstallID(install.ID))
+	}
 	resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(install.ID))
 	if len(resources) == 0 {
 		return nil
 	}
 	for _, re := range resources {
 		mysqlService := NewIMysqlService()
-		if re.Key == "mysql" && deleteDB {
+		if re.Key == "mysql" || re.Key == "mariadb" && deleteDB {
 			database, _ := mysqlRepo.Get(commonRepo.WithByID(re.ResourceId))
 			if reflect.DeepEqual(database, model.DatabaseMysql{}) {
 				continue

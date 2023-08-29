@@ -352,13 +352,20 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 	appInstall.ContainerName = containerName
 
 	index := 0
+	serviceName := ""
 	for k := range servicesMap {
-		appInstall.ServiceName = k
+		serviceName = k
 		if index > 0 {
 			continue
 		}
 		index++
 	}
+	if app.Limit == 0 {
+		servicesMap[appInstall.Name] = servicesMap[serviceName]
+		delete(servicesMap, serviceName)
+		serviceName = appInstall.Name
+	}
+	appInstall.ServiceName = serviceName
 
 	if err = addDockerComposeCommonParam(composeMap, appInstall.ServiceName, req.AppContainerConfig, req.Params); err != nil {
 		return
