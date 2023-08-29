@@ -26,6 +26,7 @@ var userinfoCmd = &cobra.Command{
 		ssl := getSettingByKey(db, "SSL")
 		entrance := getSettingByKey(db, "SecurityEntrance")
 		encryptSetting := getSettingByKey(db, "EncryptKey")
+		address := getSettingByKey(db, "SystemIP")
 
 		p := ""
 		if len(encryptSetting) == 16 {
@@ -35,11 +36,17 @@ var userinfoCmd = &cobra.Command{
 			p = password
 		}
 
-		fmt.Printf("username: %s\n", user)
-		fmt.Printf("password: %s\n", p)
-		fmt.Printf("port: %s\n", port)
-		fmt.Printf("ssl: %s\n", ssl)
-		fmt.Printf("entrance: %s\n", entrance)
+		protocol := "http"
+		if ssl == "enable" {
+			protocol = "https"
+		}
+		if address == "" {
+			address = "$LOCAL_IP"
+		}
+
+		fmt.Printf("面板地址: %s://%s:%s/%s \n", protocol, address, port, entrance)
+		fmt.Printf("用户名称: %s\n", user)
+		fmt.Printf("用户密码: %s\n", p)
 		return nil
 	},
 }
