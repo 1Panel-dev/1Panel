@@ -485,7 +485,7 @@ var EncryptHostPassword = &gormigrate.Migration{
 var AddRemoteDB = &gormigrate.Migration{
 	ID: "20230724-add-remote-db",
 	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.RemoteDB{}, &model.DatabaseMysql{}); err != nil {
+		if err := tx.AutoMigrate(&model.DatabaseMysql{}); err != nil {
 			return err
 		}
 		var (
@@ -509,7 +509,7 @@ var AddRemoteDB = &gormigrate.Migration{
 		if !ok {
 			return errors.New("error password in app env")
 		}
-		if err := tx.Create(&model.RemoteDB{
+		if err := tx.Create(&model.Database{
 			Name:     "local",
 			Type:     "mysql",
 			Version:  appInstall.Version,
@@ -572,9 +572,88 @@ var UpdateCronjobWithDb = &gormigrate.Migration{
 }
 
 var AddTableFirewall = &gormigrate.Migration{
-	ID: "20230823-add-table-firewall",
+	ID: "20230825-add-table-firewall",
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.AutoMigrate(&model.Firewall{}, model.SnapshotStatus{}, &model.Cronjob{}); err != nil {
+			return err
+		}
+		if err := tx.Exec("alter table remote_dbs rename to databases;").Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var UpdateDatabase = &gormigrate.Migration{
+	ID: "20230828-update-database",
+	Migrate: func(tx *gorm.DB) error {
+		var (
+			app        model.App
+			appInstall model.AppInstall
+		)
+		if err := tx.AutoMigrate(&model.Database{}); err != nil {
+			return err
+		}
+		if err := global.DB.Where("key = ?", "mariadb").First(&app).Error; err != nil {
+			return nil
+		}
+		if err := global.DB.Where("app_id = ?", app.ID).First(&appInstall).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return nil
+			}
+			return err
+		}
+		envMap := make(map[string]interface{})
+		if err := json.Unmarshal([]byte(appInstall.Env), &envMap); err != nil {
+			return err
+		}
+		password, ok := envMap["PANEL_DB_ROOT_PASSWORD"].(string)
+		if !ok {
+			return errors.New("error password in app env")
+		}
+		if err := tx.Create(&model.Database{
+			AppInstallID: appInstall.ID,
+			Name:         appInstall.Name,
+			Type:         "mariadb",
+			Version:      appInstall.Version,
+			From:         "local",
+			Address:      appInstall.ServiceName,
+			Port:         uint(appInstall.HttpPort),
+			Username:     "root",
+			Password:     password,
+		}).Error; err != nil {
+			return err
+		}
+
+		if err := global.DB.Model(&model.DatabaseMysql{}).Where("`from` != ?", "local").Updates(map[string]interface{}{
+			"from": "remote",
+		}).Error; err != nil {
+			return err
+		}
+
+		var (
+			appMysql        model.App
+			appInstallMysql model.AppInstall
+			localDatabase   model.Database
+		)
+		_ = global.DB.Where("name = ? AND address = ?", "local", "127.0.0.1").First(&localDatabase).Error
+		if localDatabase.ID == 0 {
+			return nil
+		}
+		if err := global.DB.Where("key = ?", "mysql").First(&appMysql).Error; err != nil {
+			return nil
+		}
+		if err := global.DB.Where("app_id = ?", appMysql.ID).First(&appInstallMysql).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return nil
+			}
+			return err
+		}
+		if err := global.DB.Model(&model.Database{}).Where("id = ?", localDatabase.ID).Updates(map[string]interface{}{
+			"app_install_id": appInstallMysql.ID,
+			"name":           appInstallMysql.Name,
+			"address":        appInstallMysql.ServiceName,
+		}).Error; err != nil {
 			return err
 		}
 		return nil

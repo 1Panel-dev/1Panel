@@ -91,7 +91,7 @@
 <script lang="ts" setup>
 import { dateFormat } from '@/utils/util';
 import { onMounted, reactive, ref } from 'vue';
-import { deleteRemoteDB, searchRemoteDBs } from '@/api/modules/database';
+import { deleteDatabase, searchDatabases } from '@/api/modules/database';
 import OperateDialog from '@/views/database/mysql/remote/operate/index.vue';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
@@ -125,14 +125,14 @@ const search = async (column?: any) => {
         orderBy: paginationConfig.orderBy,
         order: paginationConfig.order,
     };
-    const res = await searchRemoteDBs(params);
+    const res = await searchDatabases(params);
     data.value = res.data.items || [];
     paginationConfig.total = res.data.total;
 };
 
 const onOpenDialog = async (
     title: string,
-    rowData: Partial<Database.RemoteDBInfo> = {
+    rowData: Partial<Database.DatabaseInfo> = {
         name: '',
         type: 'mysql',
         version: '5.6',
@@ -159,21 +159,21 @@ const onCopy = async (row: any) => {
     }
 };
 
-const onDelete = async (row: Database.RemoteDBInfo) => {
-    await useDeleteData(deleteRemoteDB, row.id, 'commons.msg.delete');
+const onDelete = async (row: Database.DatabaseInfo) => {
+    await useDeleteData(deleteDatabase, row.id, 'commons.msg.delete');
     search();
 };
 
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
-        click: (row: Database.RemoteDBInfo) => {
+        click: (row: Database.DatabaseInfo) => {
             onOpenDialog('edit', row);
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
-        click: (row: Database.RemoteDBInfo) => {
+        click: (row: Database.DatabaseInfo) => {
             onDelete(row);
         },
     },

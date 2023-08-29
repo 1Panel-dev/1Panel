@@ -82,33 +82,33 @@ func handleSnapStatus() {
 
 	status, _ := snapRepo.GetStatusList()
 	for _, statu := range status {
-		updatas := make(map[string]interface{})
+		updates := make(map[string]interface{})
 		if statu.Panel == constant.StatusRunning {
-			updatas["panel"] = constant.StatusFailed
+			updates["panel"] = constant.StatusFailed
 		}
 		if statu.PanelInfo == constant.StatusRunning {
-			updatas["panel_info"] = constant.StatusFailed
+			updates["panel_info"] = constant.StatusFailed
 		}
 		if statu.DaemonJson == constant.StatusRunning {
-			updatas["daemon_json"] = constant.StatusFailed
+			updates["daemon_json"] = constant.StatusFailed
 		}
 		if statu.AppData == constant.StatusRunning {
-			updatas["app_data"] = constant.StatusFailed
+			updates["app_data"] = constant.StatusFailed
 		}
 		if statu.PanelData == constant.StatusRunning {
-			updatas["panel_data"] = constant.StatusFailed
+			updates["panel_data"] = constant.StatusFailed
 		}
 		if statu.BackupData == constant.StatusRunning {
-			updatas["backup_data"] = constant.StatusFailed
+			updates["backup_data"] = constant.StatusFailed
 		}
 		if statu.Compress == constant.StatusRunning {
-			updatas["compress"] = constant.StatusFailed
+			updates["compress"] = constant.StatusFailed
 		}
 		if statu.Upload == constant.StatusUploading {
-			updatas["upload"] = constant.StatusFailed
+			updates["upload"] = constant.StatusFailed
 		}
-		if len(updatas) != 0 {
-			_ = snapRepo.UpdateStatus(statu.ID, updatas)
+		if len(updates) != 0 {
+			_ = snapRepo.UpdateStatus(statu.ID, updates)
 		}
 	}
 }

@@ -106,7 +106,7 @@ const getAppDetail = (key: string) => {
 };
 
 const loadDashboardPort = async () => {
-    const res = await GetAppPort('redis-commander');
+    const res = await GetAppPort('redis-commander', '');
     redisCommandPort.value = res.data;
 };
 

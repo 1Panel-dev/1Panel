@@ -106,7 +106,7 @@ func handleAppBackup(install *model.AppInstall, backupDir, fileName string) erro
 
 	resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(install.ID))
 	for _, resource := range resources {
-		if resource.Key == "mysql" {
+		if resource.Key == "mysql" || resource.Key == "mariadb" {
 			db, err := mysqlRepo.Get(commonRepo.WithByID(resource.ResourceId))
 			if err != nil {
 				return err
@@ -173,7 +173,7 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 	newEnvFile := ""
 	resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(install.ID))
 	for _, resource := range resources {
-		if resource.Key == "mysql" {
+		if resource.Key == "mysql" || resource.Key == "maraidb" {
 			mysqlInfo, err := appInstallRepo.LoadBaseInfo(resource.Key, "")
 			if err != nil {
 				return err

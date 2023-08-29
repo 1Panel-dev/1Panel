@@ -346,6 +346,7 @@ const message = {
         loadFromRemoteHelper:
             'This action will synchronize the database info on the server to 1Panel, do you want to continue?',
         passwordHelper: 'Unable to retrieve, please modify',
+        local: 'Local',
         remote: 'Remote',
         remoteDB: 'Remote DB',
         createRemoteDB: 'Create Remote Server',

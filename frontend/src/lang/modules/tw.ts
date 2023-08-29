@@ -340,6 +340,7 @@ const message = {
         loadFromRemote: '從服務器獲取',
         loadFromRemoteHelper: '此操作將同步服務器上數據庫信息到 1Panel，是否繼續？',
         passwordHelper: '無法獲取密碼，請修改',
+        local: '本地',
         remote: '遠程',
         remoteDB: '遠程服務器',
         createRemoteDB: '添加遠程服務器',

@@ -22,7 +22,7 @@ var (
 	dockerService          = service.NewIDockerService()
 
 	mysqlService    = service.NewIMysqlService()
-	remoteDBService = service.NewIRemoteDBService()
+	databaseService = service.NewIDatabaseService()
 	redisService    = service.NewIRedisService()
 
 	cronjobService = service.NewICronjobService()

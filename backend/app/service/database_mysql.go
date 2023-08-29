@@ -34,18 +34,19 @@ type IMysqlService interface {
 	SearchWithPage(search dto.MysqlDBSearch) (int64, interface{}, error)
 	ListDBOption() ([]dto.MysqlOption, error)
 	Create(ctx context.Context, req dto.MysqlDBCreate) (*model.DatabaseMysql, error)
-	LoadFromRemote(from string) error
+	LoadFromRemote(req dto.MysqlLodaDB) error
 	ChangeAccess(info dto.ChangeDBInfo) error
 	ChangePassword(info dto.ChangeDBInfo) error
-	UpdateVariables(updates []dto.MysqlVariablesUpdate) error
+	UpdateVariables(req dto.MysqlVariablesUpdate) error
 	UpdateConfByFile(info dto.MysqlConfUpdateByFile) error
 	UpdateDescription(req dto.UpdateDescription) error
-	DeleteCheck(id uint) ([]string, error)
+	DeleteCheck(req dto.MysqlDBDeleteCheck) ([]string, error)
 	Delete(ctx context.Context, req dto.MysqlDBDelete) error
-	LoadStatus() (*dto.MysqlStatus, error)
-	LoadVariables() (*dto.MysqlVariables, error)
-	LoadBaseInfo() (*dto.DBBaseInfo, error)
-	LoadRemoteAccess() (bool, error)
+
+	LoadStatus(req dto.OperationWithNameAndType) (*dto.MysqlStatus, error)
+	LoadVariables(req dto.OperationWithNameAndType) (*dto.MysqlVariables, error)
+	LoadBaseInfo(req dto.OperationWithNameAndType) (*dto.DBBaseInfo, error)
+	LoadRemoteAccess(req dto.OperationWithNameAndType) (bool, error)
 
 	LoadDatabaseFile(req dto.OperationWithNameAndType) (string, error)
 }
@@ -56,7 +57,7 @@ func NewIMysqlService() IMysqlService {
 
 func (u *MysqlService) SearchWithPage(search dto.MysqlDBSearch) (int64, interface{}, error) {
 	total, mysqls, err := mysqlRepo.Page(search.Page, search.PageSize,
-		mysqlRepo.WithByFrom(search.From),
+		mysqlRepo.WithByMysqlName(search.Database),
 		commonRepo.WithLikeName(search.Info),
 		commonRepo.WithOrderRuleBy(search.OrderBy, search.Order),
 	)
@@ -89,7 +90,7 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 		return nil, buserr.New(constant.ErrCmdIllegal)
 	}
 
-	mysql, _ := mysqlRepo.Get(commonRepo.WithByName(req.Name), remoteDBRepo.WithByFrom(req.From))
+	mysql, _ := mysqlRepo.Get(commonRepo.WithByName(req.Name), databaseRepo.WithByFrom(req.From))
 	if mysql.ID != 0 {
 		return nil, constant.ErrRecordExist
 	}
@@ -103,20 +104,11 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 		return nil, errors.New("Cannot set root as user name")
 	}
 
-	cli, version, err := LoadMysqlClientByFrom(req.From)
+	cli, version, err := LoadMysqlClientByFrom(req.Database)
 	if err != nil {
 		return nil, err
 	}
-
-	if req.From == "local" {
-		app, err := appInstallRepo.LoadBaseInfo("mysql", "")
-		if err != nil {
-			return nil, err
-		}
-		createItem.MysqlName = app.Name
-	} else {
-		createItem.MysqlName = req.From
-	}
+	createItem.MysqlName = req.Database
 	defer cli.Close()
 	if err := cli.Create(client.CreateInfo{
 		Name:       req.Name,
@@ -137,22 +129,22 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 	return &createItem, nil
 }
 
-func (u *MysqlService) LoadFromRemote(from string) error {
-	client, version, err := LoadMysqlClientByFrom(from)
+func (u *MysqlService) LoadFromRemote(req dto.MysqlLodaDB) error {
+	client, version, err := LoadMysqlClientByFrom(req.Database)
 	if err != nil {
 		return err
 	}
 
-	mysqlName := from
-	if from == "local" {
-		app, err := appInstallRepo.LoadBaseInfo("mysql", "")
+	mysqlName := req.From
+	if req.From == "local" {
+		app, err := appInstallRepo.LoadBaseInfo(req.Type, req.Database)
 		if err != nil {
 			return err
 		}
 		mysqlName = app.Name
 	}
 
-	databases, err := mysqlRepo.List(remoteDBRepo.WithByFrom(from))
+	databases, err := mysqlRepo.List(databaseRepo.WithByFrom(req.From))
 	if err != nil {
 		return err
 	}
@@ -186,15 +178,15 @@ func (u *MysqlService) UpdateDescription(req dto.UpdateDescription) error {
 	return mysqlRepo.Update(req.ID, map[string]interface{}{"description": req.Description})
 }
 
-func (u *MysqlService) DeleteCheck(id uint) ([]string, error) {
+func (u *MysqlService) DeleteCheck(req dto.MysqlDBDeleteCheck) ([]string, error) {
 	var appInUsed []string
-	db, err := mysqlRepo.Get(commonRepo.WithByID(id))
+	db, err := mysqlRepo.Get(commonRepo.WithByID(req.ID))
 	if err != nil {
 		return appInUsed, err
 	}
 
 	if db.From == "local" {
-		app, err := appInstallRepo.LoadBaseInfo("mysql", "")
+		app, err := appInstallRepo.LoadBaseInfo(req.Type, req.Database)
 		if err != nil {
 			return appInUsed, err
 		}
@@ -223,7 +215,7 @@ func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error 
 	if err != nil && !req.ForceDelete {
 		return err
 	}
-	cli, version, err := LoadMysqlClientByFrom(db.From)
+	cli, version, err := LoadMysqlClientByFrom(req.Database)
 	if err != nil {
 		return err
 	}
@@ -238,12 +230,7 @@ func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error 
 		return err
 	}
 
-	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
-	if err != nil && !req.ForceDelete {
-		return err
-	}
-
-	uploadDir := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/uploads/database/mysql/%s/%s", app.Name, db.Name))
+	uploadDir := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/uploads/database/%s/%s/%s", req.Type, req.Database, db.Name))
 	if _, err := os.Stat(uploadDir); err == nil {
 		_ = os.RemoveAll(uploadDir)
 	}
@@ -252,23 +239,23 @@ func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error 
 		if err != nil && !req.ForceDelete {
 			return err
 		}
-		backupDir := path.Join(localDir, fmt.Sprintf("database/mysql/%s/%s", db.MysqlName, db.Name))
+		backupDir := path.Join(localDir, fmt.Sprintf("database/%s/%s/%s", req.Type, db.MysqlName, db.Name))
 		if _, err := os.Stat(backupDir); err == nil {
 			_ = os.RemoveAll(backupDir)
 		}
-		global.LOG.Infof("delete database %s-%s backups successful", app.Name, db.Name)
+		global.LOG.Infof("delete database %s-%s backups successful", req.Database, db.Name)
 	}
-	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("mysql"), commonRepo.WithByName(app.Name), backupRepo.WithByDetailName(db.Name))
+	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType(req.Type), commonRepo.WithByName(req.Database), backupRepo.WithByDetailName(db.Name))
 
 	_ = mysqlRepo.Delete(ctx, commonRepo.WithByID(db.ID))
 	return nil
 }
 
-func (u *MysqlService) ChangePassword(info dto.ChangeDBInfo) error {
-	if cmd.CheckIllegal(info.Value) {
+func (u *MysqlService) ChangePassword(req dto.ChangeDBInfo) error {
+	if cmd.CheckIllegal(req.Value) {
 		return buserr.New(constant.ErrCmdIllegal)
 	}
-	cli, version, err := LoadMysqlClientByFrom(info.From)
+	cli, version, err := LoadMysqlClientByFrom(req.Database)
 	if err != nil {
 		return err
 	}
@@ -277,12 +264,12 @@ func (u *MysqlService) ChangePassword(info dto.ChangeDBInfo) error {
 		mysqlData    model.DatabaseMysql
 		passwordInfo client.PasswordChangeInfo
 	)
-	passwordInfo.Password = info.Value
+	passwordInfo.Password = req.Value
 	passwordInfo.Timeout = 300
 	passwordInfo.Version = version
 
-	if info.ID != 0 {
-		mysqlData, err = mysqlRepo.Get(commonRepo.WithByID(info.ID))
+	if req.ID != 0 {
+		mysqlData, err = mysqlRepo.Get(commonRepo.WithByID(req.ID))
 		if err != nil {
 			return err
 		}
@@ -296,10 +283,10 @@ func (u *MysqlService) ChangePassword(info dto.ChangeDBInfo) error {
 		return err
 	}
 
-	if info.ID != 0 {
+	if req.ID != 0 {
 		var appRess []model.AppInstallResource
-		if info.From == "local" {
-			app, err := appInstallRepo.LoadBaseInfo("mysql", "")
+		if req.From == "local" {
+			app, err := appInstallRepo.LoadBaseInfo(req.Type, req.Database)
 			if err != nil {
 				return err
 			}
@@ -318,29 +305,26 @@ func (u *MysqlService) ChangePassword(info dto.ChangeDBInfo) error {
 			}
 
 			global.LOG.Infof("start to update mysql password used by app %s-%s", appModel.Key, appInstall.Name)
-			if err := updateInstallInfoInDB(appModel.Key, appInstall.Name, "user-password", true, info.Value); err != nil {
+			if err := updateInstallInfoInDB(appModel.Key, appInstall.Name, "user-password", true, req.Value); err != nil {
 				return err
 			}
 		}
 		global.LOG.Info("excute password change sql successful")
-		_ = mysqlRepo.Update(mysqlData.ID, map[string]interface{}{"password": info.Value})
+		_ = mysqlRepo.Update(mysqlData.ID, map[string]interface{}{"password": req.Value})
 		return nil
 	}
 
-	if err := updateInstallInfoInDB("mysql", "", "password", false, info.Value); err != nil {
-		return err
-	}
-	if err := updateInstallInfoInDB("phpmyadmin", "", "password", true, info.Value); err != nil {
+	if err := updateInstallInfoInDB(req.Type, req.Database, "password", false, req.Value); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (u *MysqlService) ChangeAccess(info dto.ChangeDBInfo) error {
-	if cmd.CheckIllegal(info.Value) {
+func (u *MysqlService) ChangeAccess(req dto.ChangeDBInfo) error {
+	if cmd.CheckIllegal(req.Value) {
 		return buserr.New(constant.ErrCmdIllegal)
 	}
-	cli, version, err := LoadMysqlClientByFrom(info.From)
+	cli, version, err := LoadMysqlClientByFrom(req.Database)
 	if err != nil {
 		return err
 	}
@@ -349,12 +333,12 @@ func (u *MysqlService) ChangeAccess(info dto.ChangeDBInfo) error {
 		mysqlData  model.DatabaseMysql
 		accessInfo client.AccessChangeInfo
 	)
-	accessInfo.Permission = info.Value
+	accessInfo.Permission = req.Value
 	accessInfo.Timeout = 300
 	accessInfo.Version = version
 
-	if info.ID != 0 {
-		mysqlData, err = mysqlRepo.Get(commonRepo.WithByID(info.ID))
+	if req.ID != 0 {
+		mysqlData, err = mysqlRepo.Get(commonRepo.WithByID(req.ID))
 		if err != nil {
 			return err
 		}
@@ -370,40 +354,40 @@ func (u *MysqlService) ChangeAccess(info dto.ChangeDBInfo) error {
 	}
 
 	if mysqlData.ID != 0 {
-		_ = mysqlRepo.Update(mysqlData.ID, map[string]interface{}{"permission": info.Value})
+		_ = mysqlRepo.Update(mysqlData.ID, map[string]interface{}{"permission": req.Value})
 	}
 
 	return nil
 }
 
-func (u *MysqlService) UpdateConfByFile(info dto.MysqlConfUpdateByFile) error {
-	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
+func (u *MysqlService) UpdateConfByFile(req dto.MysqlConfUpdateByFile) error {
+	app, err := appInstallRepo.LoadBaseInfo(req.Type, req.Database)
 	if err != nil {
 		return err
 	}
-	path := fmt.Sprintf("%s/mysql/%s/conf/my.cnf", constant.AppInstallDir, app.Name)
+	path := fmt.Sprintf("%s/%s/%s/conf/my.cnf", constant.AppInstallDir, req.Type, app.Name)
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_TRUNC, 0640)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 	write := bufio.NewWriter(file)
-	_, _ = write.WriteString(info.File)
+	_, _ = write.WriteString(req.File)
 	write.Flush()
-	if _, err := compose.Restart(fmt.Sprintf("%s/mysql/%s/docker-compose.yml", constant.AppInstallDir, app.Name)); err != nil {
+	if _, err := compose.Restart(fmt.Sprintf("%s/%s/%s/docker-compose.yml", constant.AppInstallDir, req.Type, app.Name)); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (u *MysqlService) UpdateVariables(updates []dto.MysqlVariablesUpdate) error {
-	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
+func (u *MysqlService) UpdateVariables(req dto.MysqlVariablesUpdate) error {
+	app, err := appInstallRepo.LoadBaseInfo(req.Type, req.Database)
 	if err != nil {
 		return err
 	}
 	var files []string
 
-	path := fmt.Sprintf("%s/mysql/%s/conf/my.cnf", constant.AppInstallDir, app.Name)
+	path := fmt.Sprintf("%s/%s/%s/conf/my.cnf", constant.AppInstallDir, req.Type, app.Name)
 	lineBytes, err := os.ReadFile(path)
 	if err != nil {
 		return err
@@ -411,7 +395,7 @@ func (u *MysqlService) UpdateVariables(updates []dto.MysqlVariablesUpdate) error
 	files = strings.Split(string(lineBytes), "\n")
 
 	group := "[mysqld]"
-	for _, info := range updates {
+	for _, info := range req.Variables {
 		if !strings.HasPrefix(app.Version, "5.7") && !strings.HasPrefix(app.Version, "5.6") {
 			if info.Param == "query_cache_size" {
 				continue
@@ -434,16 +418,16 @@ func (u *MysqlService) UpdateVariables(updates []dto.MysqlVariablesUpdate) error
 		return err
 	}
 
-	if _, err := compose.Restart(fmt.Sprintf("%s/mysql/%s/docker-compose.yml", constant.AppInstallDir, app.Name)); err != nil {
+	if _, err := compose.Restart(fmt.Sprintf("%s/%s/%s/docker-compose.yml", constant.AppInstallDir, req.Type, app.Name)); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (u *MysqlService) LoadBaseInfo() (*dto.DBBaseInfo, error) {
+func (u *MysqlService) LoadBaseInfo(req dto.OperationWithNameAndType) (*dto.DBBaseInfo, error) {
 	var data dto.DBBaseInfo
-	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
+	app, err := appInstallRepo.LoadBaseInfo(req.Type, req.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -454,8 +438,8 @@ func (u *MysqlService) LoadBaseInfo() (*dto.DBBaseInfo, error) {
 	return &data, nil
 }
 
-func (u *MysqlService) LoadRemoteAccess() (bool, error) {
-	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
+func (u *MysqlService) LoadRemoteAccess(req dto.OperationWithNameAndType) (bool, error) {
+	app, err := appInstallRepo.LoadBaseInfo(req.Type, req.Name)
 	if err != nil {
 		return false, err
 	}
@@ -472,8 +456,8 @@ func (u *MysqlService) LoadRemoteAccess() (bool, error) {
 	return false, nil
 }
 
-func (u *MysqlService) LoadVariables() (*dto.MysqlVariables, error) {
-	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
+func (u *MysqlService) LoadVariables(req dto.OperationWithNameAndType) (*dto.MysqlVariables, error) {
+	app, err := appInstallRepo.LoadBaseInfo(req.Type, req.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -490,8 +474,8 @@ func (u *MysqlService) LoadVariables() (*dto.MysqlVariables, error) {
 	return &info, nil
 }
 
-func (u *MysqlService) LoadStatus() (*dto.MysqlStatus, error) {
-	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
+func (u *MysqlService) LoadStatus(req dto.OperationWithNameAndType) (*dto.MysqlStatus, error) {
+	app, err := appInstallRepo.LoadBaseInfo(req.Type, req.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -540,10 +524,14 @@ func (u *MysqlService) LoadDatabaseFile(req dto.OperationWithNameAndType) (strin
 	switch req.Type {
 	case "mysql-conf":
 		filePath = path.Join(global.CONF.System.DataDir, fmt.Sprintf("apps/mysql/%s/conf/my.cnf", req.Name))
+	case "mariadb-conf":
+		filePath = path.Join(global.CONF.System.DataDir, fmt.Sprintf("apps/mariadb/%s/conf/my.cnf", req.Name))
 	case "redis-conf":
 		filePath = path.Join(global.CONF.System.DataDir, fmt.Sprintf("apps/redis/%s/conf/redis.conf", req.Name))
-	case "slow-logs":
+	case "mysql-slow-logs":
 		filePath = path.Join(global.CONF.System.DataDir, fmt.Sprintf("apps/mysql/%s/data/1Panel-slow.log", req.Name))
+	case "mariadb-slow-logs":
+		filePath = path.Join(global.CONF.System.DataDir, fmt.Sprintf("apps/mariadb/%s/db/data/1Panel-slow.log", req.Name))
 	}
 	if _, err := os.Stat(filePath); err != nil {
 		return "", buserr.New("ErrHttpReqNotFound")
@@ -625,20 +613,20 @@ func updateMyCnf(oldFiles []string, group string, param string, value interface{
 	return newFiles
 }
 
-func LoadMysqlClientByFrom(from string) (mysql.MysqlClient, string, error) {
+func LoadMysqlClientByFrom(database string) (mysql.MysqlClient, string, error) {
 	var (
 		dbInfo  client.DBInfo
 		version string
 		err     error
 	)
 
-	dbInfo.From = from
 	dbInfo.Timeout = 300
-	if from != "local" {
-		databaseItem, err := remoteDBRepo.Get(commonRepo.WithByName(from))
-		if err != nil {
-			return nil, "", err
-		}
+	databaseItem, err := databaseRepo.Get(commonRepo.WithByName(database))
+	if err != nil {
+		return nil, "", err
+	}
+	dbInfo.From = databaseItem.From
+	if dbInfo.From != "local" {
 		dbInfo.Address = databaseItem.Address
 		dbInfo.Port = databaseItem.Port
 		dbInfo.Username = databaseItem.Username
@@ -646,7 +634,7 @@ func LoadMysqlClientByFrom(from string) (mysql.MysqlClient, string, error) {
 		version = databaseItem.Version
 
 	} else {
-		app, err := appInstallRepo.LoadBaseInfo("mysql", "")
+		app, err := appInstallRepo.LoadBaseInfo(databaseItem.Type, database)
 		if err != nil {
 			return nil, "", err
 		}

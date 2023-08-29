@@ -74,11 +74,11 @@ import { Database } from '@/api/interface/database';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
-import { addRemoteDB, checkRemoteDB, editRemoteDB } from '@/api/modules/database';
+import { addDatabase, checkDatabase, editDatabase } from '@/api/modules/database';
 
 interface DialogProps {
     title: string;
-    rowData?: Database.RemoteDBInfo;
+    rowData?: Database.DatabaseInfo;
     getTableList?: () => Promise<any>;
 }
 const title = ref<string>('');
@@ -131,7 +131,7 @@ const onSubmit = async (formEl: FormInstance | undefined, operation: string) => 
         loading.value = true;
 
         if (operation === 'check') {
-            await checkRemoteDB(param)
+            await checkDatabase(param)
                 .then((res) => {
                     loading.value = false;
                     if (res.data) {
@@ -148,7 +148,7 @@ const onSubmit = async (formEl: FormInstance | undefined, operation: string) => 
         }
 
         if (operation === 'create') {
-            await addRemoteDB(param)
+            await addDatabase(param)
                 .then(() => {
                     loading.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -160,7 +160,7 @@ const onSubmit = async (formEl: FormInstance | undefined, operation: string) => 
                 });
         }
         if (operation === 'edit') {
-            await editRemoteDB(param)
+            await editDatabase(param)
                 .then(() => {
                     loading.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

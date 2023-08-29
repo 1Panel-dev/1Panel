@@ -109,13 +109,16 @@ const onCopy = async (value: string) => {
 };
 
 const loadPassword = async () => {
-    const res = await GetAppConnInfo('redis');
+    const res = await GetAppConnInfo('redis', '');
     form.value = res.data;
 };
 
 const onSubmit = async () => {
     let param = {
         id: 0,
+        from: 'local',
+        type: 'redis',
+        database: '',
         value: form.value.password,
     };
     loading.value = true;

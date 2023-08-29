@@ -91,7 +91,7 @@ const createVisiable = ref(false);
 const form = reactive({
     name: '',
     from: 'local',
-    mysqlName: '',
+    database: '',
     format: '',
     username: '',
     password: '',
@@ -111,12 +111,12 @@ const formRef = ref<FormInstance>();
 
 interface DialogProps {
     from: string;
-    mysqlName: string;
+    database: string;
 }
 const acceptParams = (params: DialogProps): void => {
     form.name = '';
     form.from = params.from;
-    form.mysqlName = params.mysqlName;
+    form.database = params.database;
     form.format = 'utf8mb4';
     form.username = '';
     form.permission = '%';

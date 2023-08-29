@@ -3,7 +3,7 @@ import { ReqPage } from '.';
 export namespace Database {
     export interface SearchDBWithPage {
         info: string;
-        from: string;
+        database: string;
         page: number;
         pageSize: number;
         orderBy?: string;
@@ -34,19 +34,34 @@ export namespace Database {
         containerName: string;
     }
     export interface MysqlConfUpdateByFile {
-        mysqlName: string;
+        type: string;
+        database: string;
         file: string;
     }
     export interface MysqlDBCreate {
         name: string;
+        from: string;
+        database: string;
         format: string;
         username: string;
         password: string;
         permission: string;
         description: string;
     }
+    export interface MysqlLodaDB {
+        from: string;
+        type: string;
+        database: string;
+    }
+    export interface MysqlDBDeleteCheck {
+        id: number;
+        type: string;
+        database: string;
+    }
     export interface MysqlDBDelete {
         id: number;
+        type: string;
+        database: string;
         forceDelete: boolean;
         deleteBackup: boolean;
     }
@@ -71,6 +86,11 @@ export namespace Database {
         long_query_time: number;
     }
     export interface VariablesUpdate {
+        type: string;
+        database: string;
+        variables: Array<VariablesUpdateHelper>;
+    }
+    export interface VariablesUpdateHelper {
         param: string;
         value: any;
     }
@@ -118,6 +138,9 @@ export namespace Database {
     }
     export interface ChangeInfo {
         id: number;
+        from: string;
+        type: string;
+        database: string;
         value: string;
     }
 
@@ -177,7 +200,7 @@ export namespace Database {
     }
 
     // remote
-    export interface RemoteDBInfo {
+    export interface DatabaseInfo {
         id: number;
         createdAt: Date;
         name: string;
@@ -190,7 +213,7 @@ export namespace Database {
         password: string;
         description: string;
     }
-    export interface SearchRemoteDBPage {
+    export interface SearchDatabasePage {
         info: string;
         type: string;
         page: number;
@@ -198,12 +221,15 @@ export namespace Database {
         orderBy?: string;
         order?: string;
     }
-    export interface RemoteDBOption {
+    export interface DatabaseOption {
         id: number;
-        name: string;
+        from: string;
+        type: string;
+        database: string;
+        version: string;
         address: string;
     }
-    export interface RemoteDBCreate {
+    export interface DatabaseCreate {
         name: string;
         version: string;
         from: string;
@@ -213,7 +239,7 @@ export namespace Database {
         password: string;
         description: string;
     }
-    export interface RemoteDBUpdate {
+    export interface DatabaseUpdate {
         id: number;
         version: string;
         address: string;

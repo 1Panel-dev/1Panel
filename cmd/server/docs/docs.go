@@ -279,8 +279,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/apps/installed/check/:key": {
-            "get": {
+        "/apps/installed/check": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -296,11 +296,13 @@ const docTemplate = `{
                 "summary": "Check app installed",
                 "parameters": [
                     {
-                        "type": "string",
                         "description": "request",
-                        "name": "key",
-                        "in": "path",
-                        "required": true
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.AppInstalledInfo"
+                        }
                     }
                 ],
                 "responses": {
@@ -364,11 +366,13 @@ const docTemplate = `{
                 "summary": "Search app password by key",
                 "parameters": [
                     {
-                        "type": "string",
                         "description": "request",
-                        "name": "key",
-                        "in": "path",
-                        "required": true
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperationWithNameAndType"
+                        }
                     }
                 ],
                 "responses": {
@@ -488,8 +492,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/apps/installed/loadport/:key": {
-            "get": {
+        "/apps/installed/loadport": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -505,11 +509,13 @@ const docTemplate = `{
                 "summary": "Search app port by key",
                 "parameters": [
                     {
-                        "type": "string",
                         "description": "request",
-                        "name": "key",
-                        "in": "path",
-                        "required": true
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperationWithNameAndType"
+                        }
                     }
                 ],
                 "responses": {
@@ -3699,17 +3705,31 @@ const docTemplate = `{
             }
         },
         "/databases/baseinfo": {
-            "get": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
                 "description": "获取 mysql 基础信息",
+                "consumes": [
+                    "application/json"
+                ],
                 "tags": [
                     "Database Mysql"
                 ],
                 "summary": "Load mysql base info",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperationWithNameAndType"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -3935,7 +3955,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.OperateByID"
+                            "$ref": "#/definitions/dto.MysqlDBDeleteCheck"
                         }
                     }
                 ],
@@ -4004,18 +4024,32 @@ const docTemplate = `{
                 }
             }
         },
-        "/databases/load/:from": {
-            "get": {
+        "/databases/load": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
                 "description": "从服务器获取",
+                "consumes": [
+                    "application/json"
+                ],
                 "tags": [
                     "Database Mysql"
                 ],
                 "summary": "Load mysql database from remote",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.MysqlLodaDB"
+                        }
+                    }
+                ],
                 "responses": {}
             }
         },
@@ -4354,40 +4388,20 @@ const docTemplate = `{
             }
         },
         "/databases/remote": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "获取 mysql 远程访问权限",
-                "tags": [
-                    "Database Mysql"
-                ],
-                "summary": "Load mysql remote access",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "boolean"
-                        }
-                    }
-                }
-            },
             "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "创建远程数据库",
+                "description": "获取 mysql 远程访问权限",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
-                    "Database"
+                    "Database Mysql"
                 ],
-                "summary": "Create remote database",
+                "summary": "Load mysql remote access",
                 "parameters": [
                     {
                         "description": "request",
@@ -4395,24 +4409,17 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.RemoteDBCreate"
+                            "$ref": "#/definitions/dto.OperationWithNameAndType"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
                     }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [],
-                    "bodyKeys": [
-                        "name",
-                        "type"
-                    ],
-                    "formatEN": "create remote database [name][type]",
-                    "formatZH": "创建远程数据库 [name][type]",
-                    "paramKeys": []
                 }
             }
         },
@@ -4432,7 +4439,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.RemoteDBInfo"
+                            "$ref": "#/definitions/dto.DatabaseInfo"
                         }
                     }
                 }
@@ -4460,7 +4467,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.RemoteDBCreate"
+                            "$ref": "#/definitions/dto.DatabaseCreate"
                         }
                     }
                 ],
@@ -4550,7 +4557,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/dto.RemoteDBOption"
+                                "$ref": "#/definitions/dto.DatabaseOption"
                             }
                         }
                     }
@@ -4579,7 +4586,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.RemoteDBSearch"
+                            "$ref": "#/definitions/dto.DatabaseSearch"
                         }
                     }
                 ],
@@ -4615,7 +4622,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.RemoteDBUpdate"
+                            "$ref": "#/definitions/dto.DatabaseUpdate"
                         }
                     }
                 ],
@@ -4672,17 +4679,31 @@ const docTemplate = `{
             }
         },
         "/databases/status": {
-            "get": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
                 "description": "获取 mysql 状态信息",
+                "consumes": [
+                    "application/json"
+                ],
                 "tags": [
                     "Database Mysql"
                 ],
                 "summary": "Load mysql status info",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperationWithNameAndType"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -4694,17 +4715,31 @@ const docTemplate = `{
             }
         },
         "/databases/variables": {
-            "get": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
                 "description": "获取 mysql 性能参数信息",
+                "consumes": [
+                    "application/json"
+                ],
                 "tags": [
                     "Database Mysql"
                 ],
                 "summary": "Load mysql variables info",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperationWithNameAndType"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -8910,6 +8945,39 @@ const docTemplate = `{
                 }
             }
         },
+        "/settings/snapshot/status": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取快照状态",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "Load Snapshot status",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperateByID"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/settings/ssl/download": {
             "post": {
                 "security": [
@@ -11767,14 +11835,31 @@ const docTemplate = `{
         "dto.ChangeDBInfo": {
             "type": "object",
             "required": [
+                "database",
+                "from",
+                "type",
                 "value"
             ],
             "properties": {
-                "from": {
+                "database": {
                     "type": "string"
+                },
+                "from": {
+                    "type": "string",
+                    "enum": [
+                        "local",
+                        "remote"
+                    ]
                 },
                 "id": {
                     "type": "integer"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "mysql",
+                        "mariadb"
+                    ]
                 },
                 "value": {
                     "type": "string"
@@ -11860,6 +11945,7 @@ const docTemplate = `{
                     "enum": [
                         "app",
                         "mysql",
+                        "mariadb",
                         "redis",
                         "website"
                     ]
@@ -11900,6 +11986,7 @@ const docTemplate = `{
                     "enum": [
                         "app",
                         "mysql",
+                        "mariadb",
                         "redis",
                         "website"
                     ]
@@ -12616,6 +12703,171 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.DatabaseCreate": {
+            "type": "object",
+            "required": [
+                "from",
+                "name",
+                "password",
+                "type",
+                "username",
+                "version"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "from": {
+                    "type": "string",
+                    "enum": [
+                        "local",
+                        "remote"
+                    ]
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 256
+                },
+                "password": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "mysql"
+                    ]
+                },
+                "username": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.DatabaseInfo": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "from": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 256
+                },
+                "password": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.DatabaseOption": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "database": {
+                    "type": "string"
+                },
+                "from": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.DatabaseSearch": {
+            "type": "object",
+            "required": [
+                "page",
+                "pageSize"
+            ],
+            "properties": {
+                "info": {
+                    "type": "string"
+                },
+                "order": {
+                    "type": "string"
+                },
+                "orderBy": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.DatabaseUpdate": {
+            "type": "object",
+            "required": [
+                "password",
+                "username",
+                "version"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.DiskInfo": {
             "type": "object",
             "properties": {
@@ -13205,20 +13457,29 @@ const docTemplate = `{
         "dto.MysqlConfUpdateByFile": {
             "type": "object",
             "required": [
-                "mysqlName"
+                "database",
+                "type"
             ],
             "properties": {
+                "database": {
+                    "type": "string"
+                },
                 "file": {
                     "type": "string"
                 },
-                "mysqlName": {
-                    "type": "string"
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "mysql",
+                        "mariadb"
+                    ]
                 }
             }
         },
         "dto.MysqlDBCreate": {
             "type": "object",
             "required": [
+                "database",
                 "format",
                 "from",
                 "name",
@@ -13227,6 +13488,9 @@ const docTemplate = `{
                 "username"
             ],
             "properties": {
+                "database": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -13240,7 +13504,11 @@ const docTemplate = `{
                     ]
                 },
                 "from": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "local",
+                        "remote"
+                    ]
                 },
                 "name": {
                     "type": "string"
@@ -13259,9 +13527,14 @@ const docTemplate = `{
         "dto.MysqlDBDelete": {
             "type": "object",
             "required": [
-                "id"
+                "database",
+                "id",
+                "type"
             ],
             "properties": {
+                "database": {
+                    "type": "string"
+                },
                 "deleteBackup": {
                     "type": "boolean"
                 },
@@ -13270,17 +13543,48 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "mysql",
+                        "mariadb"
+                    ]
+                }
+            }
+        },
+        "dto.MysqlDBDeleteCheck": {
+            "type": "object",
+            "required": [
+                "database",
+                "id",
+                "type"
+            ],
+            "properties": {
+                "database": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "mysql",
+                        "mariadb"
+                    ]
                 }
             }
         },
         "dto.MysqlDBSearch": {
             "type": "object",
             "required": [
+                "database",
                 "page",
                 "pageSize"
             ],
             "properties": {
-                "from": {
+                "database": {
                     "type": "string"
                 },
                 "info": {
@@ -13300,17 +13604,44 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.MysqlLodaDB": {
+            "type": "object",
+            "required": [
+                "database",
+                "from",
+                "type"
+            ],
+            "properties": {
+                "database": {
+                    "type": "string"
+                },
+                "from": {
+                    "type": "string",
+                    "enum": [
+                        "local",
+                        "remote"
+                    ]
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "mysql",
+                        "mariadb"
+                    ]
+                }
+            }
+        },
         "dto.MysqlOption": {
             "type": "object",
             "properties": {
+                "database": {
+                    "type": "string"
+                },
                 "from": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
-                },
-                "name": {
-                    "type": "string"
                 }
             }
         },
@@ -13484,6 +13815,31 @@ const docTemplate = `{
             }
         },
         "dto.MysqlVariablesUpdate": {
+            "type": "object",
+            "required": [
+                "database",
+                "type"
+            ],
+            "properties": {
+                "database": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "mysql",
+                        "mariadb"
+                    ]
+                },
+                "variables": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.MysqlVariablesUpdateHelper"
+                    }
+                }
+            }
+        },
+        "dto.MysqlVariablesUpdateHelper": {
             "type": "object",
             "properties": {
                 "param": {
@@ -13903,162 +14259,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "used_memory_rss": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.RemoteDBCreate": {
-            "type": "object",
-            "required": [
-                "from",
-                "name",
-                "password",
-                "type",
-                "username",
-                "version"
-            ],
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "from": {
-                    "type": "string",
-                    "enum": [
-                        "local",
-                        "remote"
-                    ]
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 256
-                },
-                "password": {
-                    "type": "string"
-                },
-                "port": {
-                    "type": "integer"
-                },
-                "type": {
-                    "type": "string",
-                    "enum": [
-                        "mysql"
-                    ]
-                },
-                "username": {
-                    "type": "string"
-                },
-                "version": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.RemoteDBInfo": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "from": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 256
-                },
-                "password": {
-                    "type": "string"
-                },
-                "port": {
-                    "type": "integer"
-                },
-                "username": {
-                    "type": "string"
-                },
-                "version": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.RemoteDBOption": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.RemoteDBSearch": {
-            "type": "object",
-            "required": [
-                "page",
-                "pageSize"
-            ],
-            "properties": {
-                "info": {
-                    "type": "string"
-                },
-                "order": {
-                    "type": "string"
-                },
-                "orderBy": {
-                    "type": "string"
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "pageSize": {
-                    "type": "integer"
-                },
-                "type": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.RemoteDBUpdate": {
-            "type": "object",
-            "required": [
-                "password",
-                "username",
-                "version"
-            ],
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "port": {
-                    "type": "integer"
-                },
-                "username": {
-                    "type": "string"
-                },
-                "version": {
                     "type": "string"
                 }
             }
@@ -14484,6 +14684,9 @@ const docTemplate = `{
                         "KODO",
                         "OneDrive"
                     ]
+                },
+                "id": {
+                    "type": "integer"
                 }
             }
         },
@@ -15138,6 +15341,20 @@ const docTemplate = `{
                         "cancel",
                         "ignore"
                     ]
+                }
+            }
+        },
+        "request.AppInstalledInfo": {
+            "type": "object",
+            "required": [
+                "key"
+            ],
+            "properties": {
+                "key": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
@@ -16937,6 +17154,12 @@ const docTemplate = `{
                 },
                 "createdAt": {
                     "type": "string"
+                },
+                "httpPort": {
+                    "type": "integer"
+                },
+                "httpsPort": {
+                    "type": "integer"
                 },
                 "installPath": {
                     "type": "string"

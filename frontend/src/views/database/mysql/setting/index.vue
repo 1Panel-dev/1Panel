@@ -155,6 +155,15 @@ const mysqlStatus = ref();
 const mysqlVersion = ref();
 const variables = ref();
 
+interface DBProps {
+    type: string;
+    database: string;
+}
+const props = withDefaults(defineProps<DBProps>(), {
+    type: '',
+    database: '',
+});
+
 const dialogContainerLogRef = ref();
 const jumpToConf = async () => {
     activeName.value = 'conf';
@@ -215,7 +224,8 @@ const getDefaultConfig = async () => {
 
 const onSubmitChangeConf = async () => {
     let param = {
-        mysqlName: mysqlName.value,
+        type: props.type,
+        database: props.database,
         file: mysqlConf.value,
     };
     loading.value = true;
@@ -245,7 +255,7 @@ const loadContainerLog = async (containerID: string) => {
 };
 
 const loadBaseInfo = async () => {
-    const res = await loadMysqlBaseInfo();
+    const res = await loadMysqlBaseInfo(props.type, props.database);
     mysqlName.value = res.data?.name;
     baseInfo.port = res.data?.port;
     baseInfo.containerID = res.data?.containerName;
@@ -258,21 +268,23 @@ const changeLoading = (status: boolean) => {
 };
 
 const loadVariables = async () => {
-    const res = await loadMysqlVariables();
+    const res = await loadMysqlVariables(props.type, props.database);
     variables.value = res.data;
     variablesRef.value!.acceptParams({
-        mysqlName: mysqlName.value,
+        type: props.type,
+        database: props.database,
         mysqlVersion: mysqlVersion.value,
         variables: res.data,
     });
 };
 
 const loadSlowLogs = async () => {
-    const res = await loadMysqlVariables();
+    const res = await loadMysqlVariables(props.type, props.database);
     variables.value = res.data;
 
     let param = {
-        mysqlName: mysqlName.value,
+        type: props.type,
+        database: props.database,
         variables: variables.value,
     };
     slowLogRef.value!.acceptParams(param);
@@ -280,13 +292,13 @@ const loadSlowLogs = async () => {
 
 const loadMysqlConf = async () => {
     useOld.value = false;
-    const res = await loadDatabaseFile('mysql-conf', mysqlName.value);
+    const res = await loadDatabaseFile(props.type + '-conf', props.database);
     loading.value = false;
     mysqlConf.value = res.data;
 };
 
 const onLoadInfo = async () => {
-    await CheckAppInstalled('mysql').then((res) => {
+    await CheckAppInstalled(props.type, props.database).then((res) => {
         mysqlName.value = res.data.name;
         mysqlStatus.value = res.data.status;
         mysqlVersion.value = res.data.version;
@@ -294,7 +306,7 @@ const onLoadInfo = async () => {
         if (mysqlStatus.value === 'Running') {
             loadVariables();
             loadSlowLogs();
-            statusRef.value!.acceptParams({ mysqlName: mysqlName.value });
+            statusRef.value!.acceptParams({ type: props.type, database: props.database });
         }
     });
 };

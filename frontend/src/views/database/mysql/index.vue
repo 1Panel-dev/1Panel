@@ -1,9 +1,21 @@
 <template>
     <div v-loading="loading">
+        <div class="app-status" style="margin-top: 20px" v-if="!isLocal()">
+            <el-card>
+                <div>
+                    <el-tag style="float: left" effect="dark" type="success">
+                        {{ currentDB?.type === 'mysql' ? 'Mysql' : 'MariaDB' }}
+                    </el-tag>
+                    <el-tag class="status-content">{{ $t('app.version') }}: {{ currentDB?.version }}</el-tag>
+                </div>
+            </el-card>
+        </div>
+
         <LayoutContent :title="'MySQL ' + $t('menu.database')">
-            <template #app v-if="mysqlIsExist">
+            <template #app v-if="mysqlIsExist && isLocal()">
                 <AppStatus
-                    :app-key="'mysql'"
+                    :app-key="appKey"
+                    :app-name="appName"
                     v-model:loading="loading"
                     v-model:mask-show="maskShow"
                     @setting="onSetting"
@@ -12,18 +24,25 @@
             </template>
 
             <template #search>
-                <el-select v-model="paginationConfig.from" @change="search()">
+                <el-select v-model="currentDBName" @change="changeDatabase()">
                     <template #prefix>{{ $t('commons.table.type') }}</template>
-                    <el-option-group>
-                        <el-option :label="$t('database.localDB')" value="local" />
+                    <el-option-group :label="$t('database.local')" v-if="dbOptionsLocal.length !== 0">
+                        <div v-for="(item, index) in dbOptionsLocal" :key="index">
+                            <el-option
+                                v-if="item.from === 'local'"
+                                :value="item.database"
+                                :label="item.database"
+                            ></el-option>
+                        </div>
                     </el-option-group>
-                    <el-option-group :label="$t('database.remote')" v-if="dbOptions.length !== 0">
-                        <el-option
-                            v-for="(item, index) in dbOptions"
-                            :key="index"
-                            :value="item.name"
-                            :label="item.name"
-                        ></el-option>
+                    <el-option-group :label="$t('database.remote')" v-if="dbOptionsRemote.length !== 0">
+                        <div v-for="(item, index) in dbOptionsRemote" :key="index">
+                            <el-option
+                                v-if="item.from === 'remote'"
+                                :value="item.database"
+                                :label="item.database"
+                            ></el-option>
+                        </div>
                     </el-option-group>
                 </el-select>
             </template>
@@ -213,7 +232,7 @@ import { ElMessageBox } from 'element-plus';
 import { onMounted, reactive, ref } from 'vue';
 import {
     deleteCheckMysqlDB,
-    listRemoteDBs,
+    listDatabases,
     loadDBFromRemote,
     searchMysqlDBs,
     updateMysqlDescription,
@@ -230,9 +249,13 @@ const { toClipboard } = useClipboard();
 const loading = ref(false);
 const maskShow = ref(true);
 
-const dbOptions = ref<Array<Database.RemoteDBOption>>([]);
+const appKey = ref('mysql');
+const appName = ref();
 
-const mysqlName = ref();
+const dbOptionsLocal = ref<Array<Database.DatabaseOption>>([]);
+const dbOptionsRemote = ref<Array<Database.DatabaseOption>>([]);
+const currentDB = ref<Database.DatabaseOption>();
+const currentDBName = ref();
 
 const checkRef = ref();
 const deleteRef = ref();
@@ -247,7 +270,6 @@ const paginationConfig = reactive({
     currentPage: 1,
     pageSize: 10,
     total: 0,
-    from: 'local',
     orderBy: 'created_at',
     order: 'null',
 });
@@ -261,8 +283,8 @@ const mysqlVersion = ref();
 const dialogRef = ref();
 const onOpenDialog = async () => {
     let params = {
-        from: paginationConfig.from,
-        mysqlName: mysqlName.value,
+        from: currentDB.value.from,
+        database: currentDBName.value,
     };
     dialogRef.value!.acceptParams(params);
 };
@@ -273,7 +295,11 @@ const uploadRef = ref();
 
 const connRef = ref();
 const onChangeConn = async () => {
-    connRef.value!.acceptParams({ from: paginationConfig.from });
+    connRef.value!.acceptParams({
+        from: currentDB.value.from,
+        type: currentDB.value.type,
+        database: currentDBName.value,
+    });
 };
 
 const goRemoteDB = async () => {
@@ -281,13 +307,35 @@ const goRemoteDB = async () => {
 };
 
 function isLocal() {
-    return paginationConfig.from === 'local';
+    if (!currentDB.value) {
+        return false;
+    }
+    return currentDB.value.from === 'local';
 }
 
 const passwordRef = ref();
 
 const onSetting = async () => {
-    router.push({ name: 'MySQL-Setting' });
+    router.push({ name: 'MySQL-Setting', params: { type: currentDB.value.type, database: currentDB.value.database } });
+};
+
+const changeDatabase = async () => {
+    for (const item of dbOptionsLocal.value) {
+        if (item.database == currentDBName.value) {
+            currentDB.value = item;
+            appKey.value = item.type;
+            appName.value = item.database;
+            search();
+            return;
+        }
+    }
+    for (const item of dbOptionsRemote.value) {
+        if (item.database == currentDBName.value) {
+            currentDB.value = item;
+            break;
+        }
+    }
+    search();
 };
 
 const search = async (column?: any) => {
@@ -297,7 +345,7 @@ const search = async (column?: any) => {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
         info: searchName.value,
-        from: paginationConfig.from,
+        database: currentDB.value.database,
         orderBy: paginationConfig.orderBy,
         order: paginationConfig.order,
     };
@@ -313,7 +361,12 @@ const loadDB = async () => {
         type: 'info',
     }).then(async () => {
         loading.value = true;
-        await loadDBFromRemote(paginationConfig.from)
+        let params = {
+            from: currentDB.value.from,
+            type: currentDB.value.type,
+            database: currentDBName.value,
+        };
+        await loadDBFromRemote(params)
             .then(() => {
                 loading.value = false;
                 search();
@@ -348,13 +401,12 @@ const getAppDetail = (key: string) => {
 };
 
 const loadDashboardPort = async () => {
-    const res = await GetAppPort('phpmyadmin');
+    const res = await GetAppPort('phpmyadmin', '');
     phpadminPort.value = res.data;
 };
 
 const checkExist = (data: App.CheckInstalled) => {
     mysqlIsExist.value = data.isExist;
-    mysqlName.value = data.name;
     mysqlStatus.value = data.status;
     mysqlVersion.value = data.version;
     mysqlContainer.value = data.containerName;
@@ -365,12 +417,22 @@ const checkExist = (data: App.CheckInstalled) => {
 };
 
 const loadDBOptions = async () => {
-    const res = await listRemoteDBs('mysql');
-    dbOptions.value = res.data || [];
-    for (let i = 0; i < dbOptions.value.length; i++) {
-        if (dbOptions.value[i].name === 'local') {
-            dbOptions.value.splice(i, 1);
+    const res = await listDatabases('mysql');
+    let datas = res.data || [];
+    dbOptionsLocal.value = [];
+    dbOptionsRemote.value = [];
+    for (const item of datas) {
+        if (item.from === 'local') {
+            dbOptionsLocal.value.push(item);
+        } else {
+            dbOptionsRemote.value.push(item);
         }
+    }
+    if (dbOptionsLocal.value.length !== 0) {
+        currentDB.value = dbOptionsLocal.value[0];
+        currentDBName.value = dbOptionsLocal.value[0].database;
+        appKey.value = dbOptionsLocal.value[0].type;
+        appName.value = dbOptionsLocal.value[0].database;
     }
 };
 
@@ -384,11 +446,21 @@ const onCopy = async (row: any) => {
 };
 
 const onDelete = async (row: Database.MysqlDBInfo) => {
-    const res = await deleteCheckMysqlDB(row.id);
+    let param = {
+        id: row.id,
+        type: currentDB.value.type,
+        database: currentDBName.value,
+    };
+    const res = await deleteCheckMysqlDB(param);
     if (res.data && res.data.length > 0) {
         checkRef.value.acceptParams({ items: res.data });
     } else {
-        deleteRef.value.acceptParams({ id: row.id, name: row.name });
+        deleteRef.value.acceptParams({
+            id: row.id,
+            type: currentDB.value.type,
+            database: currentDBName.value,
+            name: row.name,
+        });
     }
 };
 
@@ -396,6 +468,8 @@ const onChangePassword = async (row: Database.MysqlDBInfo) => {
     let param = {
         id: row.id,
         from: row.from,
+        type: currentDB.value.type,
+        database: currentDBName.value,
         mysqlName: row.name,
         operation: 'password',
         username: row.username,
@@ -420,6 +494,8 @@ const buttons = [
             let param = {
                 id: row.id,
                 from: row.from,
+                type: currentDB.value.type,
+                database: currentDBName.value,
                 mysqlName: row.name,
                 operation: 'privilege',
                 privilege: '',
@@ -439,8 +515,8 @@ const buttons = [
         label: i18n.global.t('database.backupList'),
         click: (row: Database.MysqlDBInfo) => {
             let params = {
-                type: 'mysql',
-                name: row.mysqlName,
+                type: currentDB.value.type,
+                name: currentDBName.value,
                 detailName: row.name,
             };
             dialogBackupRef.value!.acceptParams(params);
@@ -450,8 +526,8 @@ const buttons = [
         label: i18n.global.t('database.loadBackup'),
         click: (row: Database.MysqlDBInfo) => {
             let params = {
-                type: 'mysql',
-                name: row.mysqlName,
+                type: currentDB.value.type,
+                name: currentDBName.value,
                 detailName: row.name,
             };
             uploadRef.value!.acceptParams(params);

@@ -7,8 +7,8 @@ import { Database } from '../interface/database';
 export const searchMysqlDBs = (params: Database.SearchDBWithPage) => {
     return http.post<ResPage<Database.MysqlDBInfo>>(`/databases/search`, params);
 };
-export const loadDatabaseFile = (type: string, name: string) => {
-    return http.post<string>(`/databases/load/file`, { type: type, name: name });
+export const loadDatabaseFile = (type: string, database: string) => {
+    return http.post<string>(`/databases/load/file`, { type: type, name: database });
 };
 
 export const addMysqlDB = (params: Database.MysqlDBCreate) => {
@@ -18,8 +18,8 @@ export const addMysqlDB = (params: Database.MysqlDBCreate) => {
     }
     return http.post(`/databases`, reqest);
 };
-export const loadDBFromRemote = (from: string) => {
-    return http.get(`/databases/load/${from}`);
+export const loadDBFromRemote = (params: Database.MysqlLodaDB) => {
+    return http.post(`/databases/load`, params);
 };
 export const updateMysqlAccess = (params: Database.ChangeInfo) => {
     return http.post(`/databases/change/access`, params);
@@ -34,30 +34,30 @@ export const updateMysqlPassword = (params: Database.ChangeInfo) => {
 export const updateMysqlDescription = (params: DescriptionUpdate) => {
     return http.post(`/databases/description/update`, params);
 };
-export const updateMysqlVariables = (params: Array<Database.VariablesUpdate>) => {
+export const updateMysqlVariables = (params: Database.VariablesUpdate) => {
     return http.post(`/databases/variables/update`, params);
 };
 export const updateMysqlConfByFile = (params: Database.MysqlConfUpdateByFile) => {
     return http.post(`/databases/conffile/update`, params);
 };
-export const deleteCheckMysqlDB = (id: number) => {
-    return http.post<Array<string>>(`/databases/del/check`, { id: id });
+export const deleteCheckMysqlDB = (params: Database.MysqlDBDeleteCheck) => {
+    return http.post<Array<string>>(`/databases/del/check`, params);
 };
 export const deleteMysqlDB = (params: Database.MysqlDBDelete) => {
     return http.post(`/databases/del`, params);
 };
 
-export const loadMysqlBaseInfo = () => {
-    return http.get<Database.BaseInfo>(`/databases/baseinfo`);
+export const loadMysqlBaseInfo = (type: string, database: string) => {
+    return http.post<Database.BaseInfo>(`/databases/baseinfo`, { type: type, name: database });
 };
-export const loadMysqlVariables = () => {
-    return http.get<Database.MysqlVariables>(`/databases/variables`);
+export const loadMysqlVariables = (type: string, database: string) => {
+    return http.post<Database.MysqlVariables>(`/databases/variables`, { type: type, name: database });
 };
-export const loadMysqlStatus = () => {
-    return http.get<Database.MysqlStatus>(`/databases/status`);
+export const loadMysqlStatus = (type: string, database: string) => {
+    return http.post<Database.MysqlStatus>(`/databases/status`, { type: type, name: database });
 };
-export const loadRemoteAccess = () => {
-    return http.get<boolean>(`/databases/remote`);
+export const loadRemoteAccess = (type: string, database: string) => {
+    return http.post<boolean>(`/databases/remote`, { type: type, name: database });
 };
 export const loadDBOptions = () => {
     return http.get<Array<Database.MysqlOption>>(`/databases/options`);
@@ -90,25 +90,25 @@ export const updateRedisConfByFile = (params: Database.RedisConfUpdateByFile) =>
     return http.post(`/databases/redis/conffile/update`, params);
 };
 
-// remote
-export const getRemoteDB = (name: string) => {
-    return http.get<Database.RemoteDBInfo>(`/databases/remote/${name}`);
+// databasae
+export const getDatabase = (name: string) => {
+    return http.get<Database.DatabaseInfo>(`/databases/db/${name}`);
 };
-export const searchRemoteDBs = (params: Database.SearchRemoteDBPage) => {
-    return http.post<ResPage<Database.RemoteDBInfo>>(`/databases/remote/search`, params);
+export const searchDatabases = (params: Database.SearchDatabasePage) => {
+    return http.post<ResPage<Database.DatabaseInfo>>(`/databases/db/search`, params);
 };
-export const listRemoteDBs = (type: string) => {
-    return http.get<Array<Database.RemoteDBOption>>(`/databases/remote/list/${type}`);
+export const listDatabases = (type: string) => {
+    return http.get<Array<Database.DatabaseOption>>(`/databases/db/list/${type}`);
 };
-export const checkRemoteDB = (params: Database.RemoteDBCreate) => {
-    return http.post<boolean>(`/databases/remote/check`, params, 40000);
+export const checkDatabase = (params: Database.DatabaseCreate) => {
+    return http.post<boolean>(`/databases/db/check`, params, 40000);
 };
-export const addRemoteDB = (params: Database.RemoteDBCreate) => {
-    return http.post(`/databases/remote`, params, 40000);
+export const addDatabase = (params: Database.DatabaseCreate) => {
+    return http.post(`/databases/db`, params, 40000);
 };
-export const editRemoteDB = (params: Database.RemoteDBUpdate) => {
-    return http.post(`/databases/remote/update`, params, 40000);
+export const editDatabase = (params: Database.DatabaseUpdate) => {
+    return http.post(`/databases/db/update`, params, 40000);
 };
-export const deleteRemoteDB = (id: number) => {
-    return http.post(`/databases/remote/del`, { id: id });
+export const deleteDatabase = (id: number) => {
+    return http.post(`/databases/db/del`, { id: id });
 };

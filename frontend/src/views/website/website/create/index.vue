@@ -433,7 +433,7 @@ const changeType = (type: string) => {
 
 const checkNginxVersion = async () => {
     try {
-        const res = await CheckAppInstalled('openresty');
+        const res = await CheckAppInstalled('openresty', '');
         if (res.data && res.data.version) {
             if (!compareVersions(res.data.version, '1.21.4')) {
                 versionExist.value = false;

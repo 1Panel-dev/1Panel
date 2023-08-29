@@ -169,7 +169,7 @@ func (r *Remote) ChangePassword(info PasswordChangeInfo) error {
 		if host == "%" || host == "localhost" {
 			passwordRootChangeCMD := fmt.Sprintf("set password for 'root'@'%s' = password('%s')", host, info.Password)
 			if !strings.HasPrefix(info.Version, "5.7") && !strings.HasPrefix(info.Version, "5.6") {
-				passwordRootChangeCMD = fmt.Sprintf("alter user 'root'@'%s' identified with mysql_native_password BY '%s';", host, info.Password)
+				passwordRootChangeCMD = fmt.Sprintf("alter user 'root'@'%s' identified by '%s';", host, info.Password)
 			}
 			if err := r.ExecSQL(passwordRootChangeCMD, info.Timeout); err != nil {
 				return err

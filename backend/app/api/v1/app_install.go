@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"errors"
 	"reflect"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
@@ -67,17 +66,21 @@ func (b *BaseApi) ListAppInstalled(c *gin.Context) {
 // @Summary Check app installed
 // @Description 检查应用安装情况
 // @Accept json
-// @Param key path string true "request"
+// @Param request body request.AppInstalledInfo true "request"
 // @Success 200 {object} response.AppInstalledCheck
 // @Security ApiKeyAuth
-// @Router /apps/installed/check/:key [get]
+// @Router /apps/installed/check [post]
 func (b *BaseApi) CheckAppInstalled(c *gin.Context) {
-	key, ok := c.Params.Get("key")
-	if !ok {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error key in path"))
+	var req request.AppInstalledInfo
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	checkData, err := appInstallService.CheckExist(key)
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	checkData, err := appInstallService.CheckExist(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -89,17 +92,17 @@ func (b *BaseApi) CheckAppInstalled(c *gin.Context) {
 // @Summary Search app port by key
 // @Description 获取应用端口
 // @Accept json
-// @Param key path string true "request"
+// @Param request body dto.OperationWithNameAndType true "request"
 // @Success 200 {integer} port
 // @Security ApiKeyAuth
-// @Router /apps/installed/loadport/:key [get]
+// @Router /apps/installed/loadport [post]
 func (b *BaseApi) LoadPort(c *gin.Context) {
-	key, ok := c.Params.Get("key")
-	if !ok {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error key in path"))
+	var req dto.OperationWithNameAndType
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	port, err := appInstallService.LoadPort(key)
+	port, err := appInstallService.LoadPort(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -111,17 +114,17 @@ func (b *BaseApi) LoadPort(c *gin.Context) {
 // @Summary Search app password by key
 // @Description 获取应用连接信息
 // @Accept json
-// @Param key path string true "request"
+// @Param request body dto.OperationWithNameAndType true "request"
 // @Success 200 {string} response.DatabaseConn
 // @Security ApiKeyAuth
 // @Router /apps/installed/conninfo/:key [get]
 func (b *BaseApi) LoadConnInfo(c *gin.Context) {
-	key, ok := c.Params.Get("key")
-	if !ok {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error key in path"))
+	var req dto.OperationWithNameAndType
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	conn, err := appInstallService.LoadConnInfo(key)
+	conn, err := appInstallService.LoadConnInfo(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

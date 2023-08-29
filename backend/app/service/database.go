@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/mysql"
 	"github.com/1Panel-dev/1Panel/backend/utils/mysql/client"
@@ -11,31 +12,31 @@ import (
 	"github.com/pkg/errors"
 )
 
-type RemoteDBService struct{}
+type DatabaseService struct{}
 
-type IRemoteDBService interface {
-	Get(name string) (dto.RemoteDBInfo, error)
-	SearchWithPage(search dto.RemoteDBSearch) (int64, interface{}, error)
-	CheckeRemoteDB(req dto.RemoteDBCreate) bool
-	Create(req dto.RemoteDBCreate) error
-	Update(req dto.RemoteDBUpdate) error
+type IDatabaseService interface {
+	Get(name string) (dto.DatabaseInfo, error)
+	SearchWithPage(search dto.DatabaseSearch) (int64, interface{}, error)
+	CheckDatabase(req dto.DatabaseCreate) bool
+	Create(req dto.DatabaseCreate) error
+	Update(req dto.DatabaseUpdate) error
 	Delete(id uint) error
-	List(dbType string) ([]dto.RemoteDBOption, error)
+	List(dbType string) ([]dto.DatabaseOption, error)
 }
 
-func NewIRemoteDBService() IRemoteDBService {
-	return &RemoteDBService{}
+func NewIDatabaseService() IDatabaseService {
+	return &DatabaseService{}
 }
 
-func (u *RemoteDBService) SearchWithPage(search dto.RemoteDBSearch) (int64, interface{}, error) {
-	total, dbs, err := remoteDBRepo.Page(search.Page, search.PageSize,
+func (u *DatabaseService) SearchWithPage(search dto.DatabaseSearch) (int64, interface{}, error) {
+	total, dbs, err := databaseRepo.Page(search.Page, search.PageSize,
 		commonRepo.WithByType(search.Type),
 		commonRepo.WithLikeName(search.Info),
-		remoteDBRepo.WithoutByFrom("local"),
+		databaseRepo.WithoutByFrom("local"),
 	)
-	var datas []dto.RemoteDBInfo
+	var datas []dto.DatabaseInfo
 	for _, db := range dbs {
-		var item dto.RemoteDBInfo
+		var item dto.DatabaseInfo
 		if err := copier.Copy(&item, &db); err != nil {
 			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 		}
@@ -44,9 +45,9 @@ func (u *RemoteDBService) SearchWithPage(search dto.RemoteDBSearch) (int64, inte
 	return total, datas, err
 }
 
-func (u *RemoteDBService) Get(name string) (dto.RemoteDBInfo, error) {
-	var data dto.RemoteDBInfo
-	remote, err := remoteDBRepo.Get(commonRepo.WithByName(name))
+func (u *DatabaseService) Get(name string) (dto.DatabaseInfo, error) {
+	var data dto.DatabaseInfo
+	remote, err := databaseRepo.Get(commonRepo.WithByName(name))
 	if err != nil {
 		return data, err
 	}
@@ -56,20 +57,27 @@ func (u *RemoteDBService) Get(name string) (dto.RemoteDBInfo, error) {
 	return data, nil
 }
 
-func (u *RemoteDBService) List(dbType string) ([]dto.RemoteDBOption, error) {
-	dbs, err := remoteDBRepo.GetList(commonRepo.WithByType(dbType))
-	var datas []dto.RemoteDBOption
+func (u *DatabaseService) List(dbType string) ([]dto.DatabaseOption, error) {
+	var opts []repo.DBOption
+	if dbType == "mysql" {
+		opts = append(opts, databaseRepo.WithByMysqlList())
+	} else {
+		opts = append(opts, commonRepo.WithByType(dbType))
+	}
+	dbs, err := databaseRepo.GetList(opts...)
+	var datas []dto.DatabaseOption
 	for _, db := range dbs {
-		var item dto.RemoteDBOption
+		var item dto.DatabaseOption
 		if err := copier.Copy(&item, &db); err != nil {
 			return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 		}
+		item.Database = db.Name
 		datas = append(datas, item)
 	}
 	return datas, err
 }
 
-func (u *RemoteDBService) CheckeRemoteDB(req dto.RemoteDBCreate) bool {
+func (u *DatabaseService) CheckDatabase(req dto.DatabaseCreate) bool {
 	if _, err := mysql.NewMysqlClient(client.DBInfo{
 		From:     "remote",
 		Address:  req.Address,
@@ -83,8 +91,8 @@ func (u *RemoteDBService) CheckeRemoteDB(req dto.RemoteDBCreate) bool {
 	return true
 }
 
-func (u *RemoteDBService) Create(req dto.RemoteDBCreate) error {
-	db, _ := remoteDBRepo.Get(commonRepo.WithByName(req.Name))
+func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
+	db, _ := databaseRepo.Get(commonRepo.WithByName(req.Name))
 	if db.ID != 0 {
 		return constant.ErrRecordExist
 	}
@@ -101,29 +109,29 @@ func (u *RemoteDBService) Create(req dto.RemoteDBCreate) error {
 	if err := copier.Copy(&db, &req); err != nil {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
-	if err := remoteDBRepo.Create(&db); err != nil {
+	if err := databaseRepo.Create(&db); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (u *RemoteDBService) Delete(id uint) error {
-	db, _ := remoteDBRepo.Get(commonRepo.WithByID(id))
+func (u *DatabaseService) Delete(id uint) error {
+	db, _ := databaseRepo.Get(commonRepo.WithByID(id))
 	if db.ID == 0 {
 		return constant.ErrRecordNotFound
 	}
-	if err := remoteDBRepo.Delete(commonRepo.WithByID(id)); err != nil {
+	if err := databaseRepo.Delete(commonRepo.WithByID(id)); err != nil {
 		return err
 	}
 	if db.From != "local" {
-		if err := mysqlRepo.Delete(context.Background(), remoteDBRepo.WithByFrom(db.Name)); err != nil {
+		if err := mysqlRepo.Delete(context.Background(), databaseRepo.WithByFrom(db.Name)); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (u *RemoteDBService) Update(req dto.RemoteDBUpdate) error {
+func (u *DatabaseService) Update(req dto.DatabaseUpdate) error {
 	if _, err := mysql.NewMysqlClient(client.DBInfo{
 		From:     "remote",
 		Address:  req.Address,
@@ -142,5 +150,5 @@ func (u *RemoteDBService) Update(req dto.RemoteDBUpdate) error {
 	upMap["username"] = req.Username
 	upMap["password"] = req.Password
 	upMap["description"] = req.Description
-	return remoteDBRepo.Update(req.ID, upMap)
+	return databaseRepo.Update(req.ID, upMap)
 }

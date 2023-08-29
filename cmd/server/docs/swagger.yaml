@@ -131,13 +131,26 @@ definitions:
     type: object
   dto.ChangeDBInfo:
     properties:
+      database:
+        type: string
       from:
+        enum:
+        - local
+        - remote
         type: string
       id:
         type: integer
+      type:
+        enum:
+        - mysql
+        - mariadb
+        type: string
       value:
         type: string
     required:
+    - database
+    - from
+    - type
     - value
     type: object
   dto.ChangeHostGroup:
@@ -191,6 +204,7 @@ definitions:
         enum:
         - app
         - mysql
+        - mariadb
         - redis
         - website
         type: string
@@ -220,6 +234,7 @@ definitions:
         enum:
         - app
         - mysql
+        - mariadb
         - redis
         - website
         type: string
@@ -703,6 +718,118 @@ definitions:
       uptime:
         type: integer
     type: object
+  dto.DatabaseCreate:
+    properties:
+      address:
+        type: string
+      description:
+        type: string
+      from:
+        enum:
+        - local
+        - remote
+        type: string
+      name:
+        maxLength: 256
+        type: string
+      password:
+        type: string
+      port:
+        type: integer
+      type:
+        enum:
+        - mysql
+        type: string
+      username:
+        type: string
+      version:
+        type: string
+    required:
+    - from
+    - name
+    - password
+    - type
+    - username
+    - version
+    type: object
+  dto.DatabaseInfo:
+    properties:
+      address:
+        type: string
+      createdAt:
+        type: string
+      description:
+        type: string
+      from:
+        type: string
+      id:
+        type: integer
+      name:
+        maxLength: 256
+        type: string
+      password:
+        type: string
+      port:
+        type: integer
+      username:
+        type: string
+      version:
+        type: string
+    type: object
+  dto.DatabaseOption:
+    properties:
+      address:
+        type: string
+      database:
+        type: string
+      from:
+        type: string
+      id:
+        type: integer
+      type:
+        type: string
+      version:
+        type: string
+    type: object
+  dto.DatabaseSearch:
+    properties:
+      info:
+        type: string
+      order:
+        type: string
+      orderBy:
+        type: string
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      type:
+        type: string
+    required:
+    - page
+    - pageSize
+    type: object
+  dto.DatabaseUpdate:
+    properties:
+      address:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      password:
+        type: string
+      port:
+        type: integer
+      username:
+        type: string
+      version:
+        type: string
+    required:
+    - password
+    - username
+    - version
+    type: object
   dto.DiskInfo:
     properties:
       device:
@@ -1100,15 +1227,23 @@ definitions:
     type: object
   dto.MysqlConfUpdateByFile:
     properties:
+      database:
+        type: string
       file:
         type: string
-      mysqlName:
+      type:
+        enum:
+        - mysql
+        - mariadb
         type: string
     required:
-    - mysqlName
+    - database
+    - type
     type: object
   dto.MysqlDBCreate:
     properties:
+      database:
+        type: string
       description:
         type: string
       format:
@@ -1119,6 +1254,9 @@ definitions:
         - big5
         type: string
       from:
+        enum:
+        - local
+        - remote
         type: string
       name:
         type: string
@@ -1129,6 +1267,7 @@ definitions:
       username:
         type: string
     required:
+    - database
     - format
     - from
     - name
@@ -1138,18 +1277,43 @@ definitions:
     type: object
   dto.MysqlDBDelete:
     properties:
+      database:
+        type: string
       deleteBackup:
         type: boolean
       forceDelete:
         type: boolean
       id:
         type: integer
+      type:
+        enum:
+        - mysql
+        - mariadb
+        type: string
     required:
+    - database
     - id
+    - type
+    type: object
+  dto.MysqlDBDeleteCheck:
+    properties:
+      database:
+        type: string
+      id:
+        type: integer
+      type:
+        enum:
+        - mysql
+        - mariadb
+        type: string
+    required:
+    - database
+    - id
+    - type
     type: object
   dto.MysqlDBSearch:
     properties:
-      from:
+      database:
         type: string
       info:
         type: string
@@ -1162,17 +1326,37 @@ definitions:
       pageSize:
         type: integer
     required:
+    - database
     - page
     - pageSize
     type: object
+  dto.MysqlLodaDB:
+    properties:
+      database:
+        type: string
+      from:
+        enum:
+        - local
+        - remote
+        type: string
+      type:
+        enum:
+        - mysql
+        - mariadb
+        type: string
+    required:
+    - database
+    - from
+    - type
+    type: object
   dto.MysqlOption:
     properties:
+      database:
+        type: string
       from:
         type: string
       id:
         type: integer
-      name:
-        type: string
     type: object
   dto.MysqlStatus:
     properties:
@@ -1287,6 +1471,23 @@ definitions:
         type: string
     type: object
   dto.MysqlVariablesUpdate:
+    properties:
+      database:
+        type: string
+      type:
+        enum:
+        - mysql
+        - mariadb
+        type: string
+      variables:
+        items:
+          $ref: '#/definitions/dto.MysqlVariablesUpdateHelper'
+        type: array
+    required:
+    - database
+    - type
+    type: object
+  dto.MysqlVariablesUpdateHelper:
     properties:
       param:
         type: string
@@ -1571,112 +1772,6 @@ definitions:
       used_memory_rss:
         type: string
     type: object
-  dto.RemoteDBCreate:
-    properties:
-      address:
-        type: string
-      description:
-        type: string
-      from:
-        enum:
-        - local
-        - remote
-        type: string
-      name:
-        maxLength: 256
-        type: string
-      password:
-        type: string
-      port:
-        type: integer
-      type:
-        enum:
-        - mysql
-        type: string
-      username:
-        type: string
-      version:
-        type: string
-    required:
-    - from
-    - name
-    - password
-    - type
-    - username
-    - version
-    type: object
-  dto.RemoteDBInfo:
-    properties:
-      address:
-        type: string
-      createdAt:
-        type: string
-      description:
-        type: string
-      from:
-        type: string
-      id:
-        type: integer
-      name:
-        maxLength: 256
-        type: string
-      password:
-        type: string
-      port:
-        type: integer
-      username:
-        type: string
-      version:
-        type: string
-    type: object
-  dto.RemoteDBOption:
-    properties:
-      address:
-        type: string
-      id:
-        type: integer
-      name:
-        type: string
-    type: object
-  dto.RemoteDBSearch:
-    properties:
-      info:
-        type: string
-      order:
-        type: string
-      orderBy:
-        type: string
-      page:
-        type: integer
-      pageSize:
-        type: integer
-      type:
-        type: string
-    required:
-    - page
-    - pageSize
-    type: object
-  dto.RemoteDBUpdate:
-    properties:
-      address:
-        type: string
-      description:
-        type: string
-      id:
-        type: integer
-      password:
-        type: string
-      port:
-        type: integer
-      username:
-        type: string
-      version:
-        type: string
-    required:
-    - password
-    - username
-    - version
-    type: object
   dto.ResourceLimit:
     properties:
       cpu:
@@ -1957,6 +2052,8 @@ definitions:
         - KODO
         - OneDrive
         type: string
+      id:
+        type: integer
     required:
     - from
     type: object
@@ -2390,6 +2487,15 @@ definitions:
     required:
     - detailID
     - operate
+    type: object
+  request.AppInstalledInfo:
+    properties:
+      key:
+        type: string
+      name:
+        type: string
+    required:
+    - key
     type: object
   request.AppInstalledOperate:
     properties:
@@ -3601,6 +3707,10 @@ definitions:
         type: string
       createdAt:
         type: string
+      httpPort:
+        type: integer
+      httpsPort:
+        type: integer
       installPath:
         type: string
       isExist:
@@ -4077,17 +4187,18 @@ paths:
       summary: Search app update version by install id
       tags:
       - App
-  /apps/installed/check/:key:
-    get:
+  /apps/installed/check:
+    post:
       consumes:
       - application/json
       description: 检查应用安装情况
       parameters:
       - description: request
-        in: path
-        name: key
+        in: body
+        name: request
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/request.AppInstalledInfo'
       responses:
         "200":
           description: OK
@@ -4126,10 +4237,11 @@ paths:
       description: 获取应用连接信息
       parameters:
       - description: request
-        in: path
-        name: key
+        in: body
+        name: request
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/dto.OperationWithNameAndType'
       responses:
         "200":
           description: OK
@@ -4207,17 +4319,18 @@ paths:
       summary: List app installed
       tags:
       - App
-  /apps/installed/loadport/:key:
-    get:
+  /apps/installed/loadport:
+    post:
       consumes:
       - application/json
       description: 获取应用端口
       parameters:
       - description: request
-        in: path
-        name: key
+        in: body
+        name: request
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/dto.OperationWithNameAndType'
       responses:
         "200":
           description: OK
@@ -6250,8 +6363,17 @@ paths:
         formatZH: 创建 mysql 数据库 [name]
         paramKeys: []
   /databases/baseinfo:
-    get:
+    post:
+      consumes:
+      - application/json
       description: 获取 mysql 基础信息
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OperationWithNameAndType'
       responses:
         "200":
           description: OK
@@ -6398,7 +6520,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.OperateByID'
+          $ref: '#/definitions/dto.MysqlDBDeleteCheck'
       responses:
         "200":
           description: OK
@@ -6445,9 +6567,18 @@ paths:
         formatEN: The description of the mysql database [name] is modified => [description]
         formatZH: mysql 数据库 [name] 描述信息修改 [description]
         paramKeys: []
-  /databases/load/:from:
-    get:
+  /databases/load:
+    post:
+      consumes:
+      - application/json
       description: 从服务器获取
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.MysqlLodaDB'
       responses: {}
       security:
       - ApiKeyAuth: []
@@ -6664,8 +6795,17 @@ paths:
       tags:
       - Database Redis
   /databases/remote:
-    get:
+    post:
+      consumes:
+      - application/json
       description: 获取 mysql 远程访问权限
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OperationWithNameAndType'
       responses:
         "200":
           description: OK
@@ -6676,33 +6816,6 @@ paths:
       summary: Load mysql remote access
       tags:
       - Database Mysql
-    post:
-      consumes:
-      - application/json
-      description: 创建远程数据库
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.RemoteDBCreate'
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      summary: Create remote database
-      tags:
-      - Database
-      x-panel-log:
-        BeforeFuntions: []
-        bodyKeys:
-        - name
-        - type
-        formatEN: create remote database [name][type]
-        formatZH: 创建远程数据库 [name][type]
-        paramKeys: []
   /databases/remote/:name:
     get:
       description: 获取远程数据库
@@ -6710,7 +6823,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.RemoteDBInfo'
+            $ref: '#/definitions/dto.DatabaseInfo'
       security:
       - ApiKeyAuth: []
       summary: Get remote databases
@@ -6727,7 +6840,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.RemoteDBCreate'
+          $ref: '#/definitions/dto.DatabaseCreate'
       responses:
         "200":
           description: OK
@@ -6785,7 +6898,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/dto.RemoteDBOption'
+              $ref: '#/definitions/dto.DatabaseOption'
             type: array
       security:
       - ApiKeyAuth: []
@@ -6803,7 +6916,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.RemoteDBSearch'
+          $ref: '#/definitions/dto.DatabaseSearch'
       responses:
         "200":
           description: OK
@@ -6825,7 +6938,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.RemoteDBUpdate'
+          $ref: '#/definitions/dto.DatabaseUpdate'
       responses:
         "200":
           description: OK
@@ -6864,8 +6977,17 @@ paths:
       tags:
       - Database Mysql
   /databases/status:
-    get:
+    post:
+      consumes:
+      - application/json
       description: 获取 mysql 状态信息
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OperationWithNameAndType'
       responses:
         "200":
           description: OK
@@ -6877,8 +6999,17 @@ paths:
       tags:
       - Database Mysql
   /databases/variables:
-    get:
+    post:
+      consumes:
+      - application/json
       description: 获取 mysql 性能参数信息
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OperationWithNameAndType'
       responses:
         "200":
           description: OK
@@ -9553,6 +9684,26 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Page system snapshot
+      tags:
+      - System Setting
+  /settings/snapshot/status:
+    post:
+      consumes:
+      - application/json
+      description: 获取快照状态
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OperateByID'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Load Snapshot status
       tags:
       - System Setting
   /settings/ssl/download:

@@ -46,16 +46,16 @@ export const ListAppInstalled = () => {
     return http.get<Array<App.AppInstalledInfo>>('apps/installed/list');
 };
 
-export const GetAppPort = (key: string) => {
-    return http.get<number>(`apps/installed/loadport/${key}`);
+export const GetAppPort = (type: string, name: string) => {
+    return http.post<number>(`apps/installed/loadport`, { type: type, name: name });
 };
 
-export const GetAppConnInfo = (key: string) => {
-    return http.get<App.DatabaseConnInfo>(`apps/installed/conninfo/${key}`);
+export const GetAppConnInfo = (type: string, name: string) => {
+    return http.post<App.DatabaseConnInfo>(`apps/installed/conninfo`, { type: type, name: name });
 };
 
-export const CheckAppInstalled = (key: string) => {
-    return http.get<App.CheckInstalled>(`apps/installed/check/${key}`);
+export const CheckAppInstalled = (key: string, name: string) => {
+    return http.post<App.CheckInstalled>(`apps/installed/check`, { key: key, name: name });
 };
 
 export const AppInstalledDeleteCheck = (appInstallId: number) => {
