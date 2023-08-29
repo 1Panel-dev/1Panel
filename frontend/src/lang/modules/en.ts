@@ -911,6 +911,7 @@ const message = {
         fileUploadStart: 'Uploading [{0}]....',
         currentSelect: 'Current Select: ',
         unsupportType: 'Unsupported file type',
+        deleteHelper: 'The following resources will be deleted, this operation cannot be rolled back, continue? ',
     },
     ssh: {
         sshAlert:
