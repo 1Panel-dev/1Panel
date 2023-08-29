@@ -584,8 +584,8 @@ var AddTableFirewall = &gormigrate.Migration{
 	},
 }
 
-var UpdateDatabase = &gormigrate.Migration{
-	ID: "20230828-update-database",
+var AddMariaDB = &gormigrate.Migration{
+	ID: "20230828-add-mariadb",
 	Migrate: func(tx *gorm.DB) error {
 		var (
 			app        model.App
@@ -624,7 +624,13 @@ var UpdateDatabase = &gormigrate.Migration{
 		}).Error; err != nil {
 			return err
 		}
+		return nil
+	},
+}
 
+var UpdateDatabase = &gormigrate.Migration{
+	ID: "20230829-update-database",
+	Migrate: func(tx *gorm.DB) error {
 		if err := global.DB.Model(&model.DatabaseMysql{}).Where("`from` != ?", "local").Updates(map[string]interface{}{
 			"from": "remote",
 		}).Error; err != nil {
