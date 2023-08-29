@@ -41,9 +41,9 @@ type AppInstallService struct {
 
 type IAppInstallService interface {
 	Page(req request.AppInstalledSearch) (int64, []response.AppInstalledDTO, error)
-	CheckExist(key string) (*response.AppInstalledCheck, error)
-	LoadPort(key string) (int64, error)
-	LoadConnInfo(key string) (response.DatabaseConn, error)
+	CheckExist(req request.AppInstalledInfo) (*response.AppInstalledCheck, error)
+	LoadPort(req dto.OperationWithNameAndType) (int64, error)
+	LoadConnInfo(req dto.OperationWithNameAndType) (response.DatabaseConn, error)
 	SearchForWebsite(req request.AppInstalledSearch) ([]response.AppInstalledDTO, error)
 	Operate(req request.AppInstalledOperate) error
 	Update(req request.AppInstalledUpdate) error
@@ -130,23 +130,31 @@ func (a *AppInstallService) Page(req request.AppInstalledSearch) (int64, []respo
 	return total, installDTOs, nil
 }
 
-func (a *AppInstallService) CheckExist(key string) (*response.AppInstalledCheck, error) {
+func (a *AppInstallService) CheckExist(req request.AppInstalledInfo) (*response.AppInstalledCheck, error) {
 	res := &response.AppInstalledCheck{
 		IsExist: false,
 	}
-	app, err := appRepo.GetFirst(appRepo.WithKey(key))
+
+	app, err := appRepo.GetFirst(appRepo.WithKey(req.Key))
 	if err != nil {
 		return res, nil
 	}
 	res.App = app.Name
-	appInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithAppId(app.ID))
-	if reflect.DeepEqual(appInstall, model.AppInstall{}) {
-		return res, nil
+
+	var appInstall model.AppInstall
+	if len(req.Name) == 0 {
+		appInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithAppId(app.ID))
+		if reflect.DeepEqual(appInstall, model.AppInstall{}) {
+			return res, nil
+		}
+		if err := syncById(appInstall.ID); err != nil {
+			return nil, err
+		}
+		appInstall, _ = appInstallRepo.GetFirst(commonRepo.WithByID(appInstall.ID))
+	} else {
+		appInstall, _ = appInstallRepo.GetFirst(commonRepo.WithByName(req.Name))
+
 	}
-	if err := syncById(appInstall.ID); err != nil {
-		return nil, err
-	}
-	appInstall, _ = appInstallRepo.GetFirst(commonRepo.WithByID(appInstall.ID))
 
 	res.ContainerName = appInstall.ContainerName
 	res.Name = appInstall.Name
@@ -155,24 +163,24 @@ func (a *AppInstallService) CheckExist(key string) (*response.AppInstalledCheck,
 	res.Status = appInstall.Status
 	res.AppInstallID = appInstall.ID
 	res.IsExist = true
-	res.InstallPath = path.Join(constant.AppInstallDir, app.Key, appInstall.Name)
+	res.InstallPath = path.Join(constant.AppInstallDir, appInstall.App.Key, appInstall.Name)
 	res.HttpPort = appInstall.HttpPort
 	res.HttpsPort = appInstall.HttpsPort
 
 	return res, nil
 }
 
-func (a *AppInstallService) LoadPort(key string) (int64, error) {
-	app, err := appInstallRepo.LoadBaseInfo(key, "")
+func (a *AppInstallService) LoadPort(req dto.OperationWithNameAndType) (int64, error) {
+	app, err := appInstallRepo.LoadBaseInfo(req.Type, req.Name)
 	if err != nil {
 		return int64(0), nil
 	}
 	return app.Port, nil
 }
 
-func (a *AppInstallService) LoadConnInfo(key string) (response.DatabaseConn, error) {
+func (a *AppInstallService) LoadConnInfo(req dto.OperationWithNameAndType) (response.DatabaseConn, error) {
 	var data response.DatabaseConn
-	app, err := appInstallRepo.LoadBaseInfo(key, "")
+	app, err := appInstallRepo.LoadBaseInfo(req.Type, req.Name)
 	if err != nil {
 		return data, nil
 	}
@@ -748,7 +756,7 @@ func updateInstallInfoInDB(appKey, appName, param string, isRestart bool, value 
 	envKey := ""
 	switch param {
 	case "password":
-		if appKey == "mysql" {
+		if appKey == "mysql" || appKey == "mariadb" {
 			envKey = "PANEL_DB_ROOT_PASSWORD="
 		} else {
 			envKey = "PANEL_REDIS_ROOT_PASSWORD="

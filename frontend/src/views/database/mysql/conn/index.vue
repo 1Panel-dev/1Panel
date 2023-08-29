@@ -97,7 +97,7 @@ import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
-import { getRemoteDB, loadRemoteAccess, updateMysqlAccess, updateMysqlPassword } from '@/api/modules/database';
+import { getDatabase, loadRemoteAccess, updateMysqlAccess, updateMysqlPassword } from '@/api/modules/database';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { GetAppConnInfo } from '@/api/modules/app';
 import DrawerHeader from '@/components/drawer-header/index.vue';
@@ -118,6 +118,8 @@ const form = reactive({
     port: 0,
 
     from: '',
+    type: '',
+    database: '',
     username: '',
     remoteIP: '',
 });
@@ -130,15 +132,16 @@ const formRef = ref<FormInstance>();
 
 interface DialogProps {
     from: string;
-    remoteIP: string;
+    type: string;
+    database: string;
 }
 
 const acceptParams = (param: DialogProps): void => {
     form.password = '';
     form.from = param.from;
-    if (form.from === 'local') {
-        loadAccess();
-    }
+    form.type = param.type;
+    form.database = param.database;
+    loadAccess();
     loadPassword();
     dialogVisiable.value = true;
 };
@@ -167,8 +170,10 @@ const handleClose = () => {
 };
 
 const loadAccess = async () => {
-    const res = await loadRemoteAccess();
-    form.privilege = res.data;
+    if (form.from === 'local') {
+        const res = await loadRemoteAccess(form.type, form.database);
+        form.privilege = res.data;
+    }
 };
 
 const loadSystemIP = async () => {
@@ -178,14 +183,14 @@ const loadSystemIP = async () => {
 
 const loadPassword = async () => {
     if (form.from === 'local') {
-        const res = await GetAppConnInfo('mysql');
+        const res = await GetAppConnInfo(form.type, form.database);
         form.password = res.data.password || '';
         form.port = res.data.port || 3306;
         form.serviceName = res.data.serviceName || '';
         loadSystemIP();
         return;
     }
-    const res = await getRemoteDB(form.from);
+    const res = await getDatabase(form.database);
     form.password = res.data.password || '';
     form.port = res.data.port || 3306;
     form.username = res.data.username;
@@ -197,6 +202,8 @@ const onSubmit = async () => {
     let param = {
         id: 0,
         from: form.from,
+        type: form.type,
+        database: form.database,
         value: form.password,
     };
     loading.value = true;
@@ -228,6 +235,8 @@ const onSubmitAccess = async () => {
     let param = {
         id: 0,
         from: form.from,
+        type: form.type,
+        database: form.database,
         value: form.privilege ? '%' : 'localhost',
     };
     loading.value = true;

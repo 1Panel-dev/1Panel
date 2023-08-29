@@ -39,6 +39,7 @@ func Init() {
 		migrations.UpdateRedisParam,
 		migrations.UpdateCronjobWithDb,
 		migrations.AddTableFirewall,
+		migrations.UpdateDatabase,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

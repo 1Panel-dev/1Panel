@@ -78,6 +78,8 @@ const title = ref();
 const changeForm = reactive({
     id: 0,
     from: '',
+    type: '',
+    database: '',
     mysqlName: '',
     userName: '',
     password: '',
@@ -106,6 +108,8 @@ function checkIPs(rule: any, value: any, callback: any) {
 interface DialogProps {
     id: number;
     from: string;
+    type: string;
+    database: string;
     mysqlName: string;
     username: string;
     password: string;
@@ -121,6 +125,8 @@ const acceptParams = (params: DialogProps): void => {
             : i18n.global.t('database.permission');
     changeForm.id = params.id;
     changeForm.from = params.from;
+    changeForm.type = params.type;
+    changeForm.database = params.database;
     changeForm.mysqlName = params.mysqlName;
     changeForm.userName = params.username;
     changeForm.password = params.password;
@@ -143,10 +149,12 @@ const submitChangeInfo = async (formEl: FormInstance | undefined) => {
         let param = {
             id: changeForm.id,
             from: changeForm.from,
+            type: changeForm.type,
+            database: changeForm.database,
             value: '',
         };
         if (changeForm.operation === 'password') {
-            const res = await deleteCheckMysqlDB(changeForm.id);
+            const res = await deleteCheckMysqlDB(param);
             if (res.data && res.data.length > 0) {
                 let params = {
                     header: i18n.global.t('database.changePassword'),
@@ -193,6 +201,8 @@ const onSubmit = async () => {
     let param = {
         id: changeForm.id,
         from: changeForm.from,
+        type: changeForm.type,
+        database: changeForm.database,
         value: changeForm.password,
     };
     loading.value = true;

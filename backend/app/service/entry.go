@@ -13,7 +13,7 @@ var (
 	appInstallResourceRepo = repo.NewIAppInstallResourceRpo()
 
 	mysqlRepo    = repo.NewIMysqlRepo()
-	remoteDBRepo = repo.NewIRemoteDBRepo()
+	databaseRepo = repo.NewIDatabaseRepo()
 
 	imageRepoRepo = repo.NewIImageRepoRepo()
 	composeRepo   = repo.NewIComposeTemplateRepo()

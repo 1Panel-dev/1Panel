@@ -340,6 +340,7 @@ const message = {
         loadFromRemote: '从服务器获取',
         loadFromRemoteHelper: '此操作将同步服务器上数据库信息到 1Panel，是否继续？',
         passwordHelper: '无法获取密码，请修改',
+        local: '本地',
         remote: '远程',
         remoteDB: '远程服务器',
         createRemoteDB: '添加远程服务器',

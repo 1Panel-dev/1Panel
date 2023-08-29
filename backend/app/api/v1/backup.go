@@ -335,7 +335,7 @@ func (b *BaseApi) Backup(c *gin.Context) {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 			return
 		}
-	case "mysql":
+	case "mysql", "mariadb":
 		if err := backupService.MysqlBackup(req); err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 			return
@@ -383,7 +383,7 @@ func (b *BaseApi) Recover(c *gin.Context) {
 		req.File = downloadPath
 	}
 	switch req.Type {
-	case "mysql":
+	case "mysql", "mariadb":
 		if err := backupService.MysqlRecover(req); err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 			return
@@ -428,7 +428,7 @@ func (b *BaseApi) RecoverByUpload(c *gin.Context) {
 	}
 
 	switch req.Type {
-	case "mysql":
+	case "mysql", "mariadb":
 		if err := backupService.MysqlRecoverByUpload(req); err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 			return

@@ -3,6 +3,7 @@ package repo
 import (
 	"context"
 	"encoding/json"
+
 	"gorm.io/gorm/clause"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -193,7 +194,7 @@ func (a *AppInstallRepo) LoadBaseInfo(key string, name string) (*RootInfo, error
 		return nil, err
 	}
 	switch app.Key {
-	case "mysql":
+	case "mysql", "mariadb":
 		password, ok := envMap["PANEL_DB_ROOT_PASSWORD"].(string)
 		if ok {
 			info.Password = password

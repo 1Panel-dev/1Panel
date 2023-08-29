@@ -126,10 +126,11 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     if (type.value === 'website' || type.value === 'app') {
         title.value = name.value;
     }
+    let dir = type.value === 'mysql' || type.value === 'mariadb' ? 'database/' + type.value : type.value;
     if (detailName.value) {
-        baseDir.value = `${pathRes.data}/uploads/${type.value}/${name.value}/${detailName.value}/`;
+        baseDir.value = `${pathRes.data}/uploads/${dir}/${name.value}/${detailName.value}/`;
     } else {
-        baseDir.value = `${pathRes.data}/uploads/${type.value}/${name.value}/`;
+        baseDir.value = `${pathRes.data}/uploads/${dir}/${name.value}/`;
     }
     upVisiable.value = true;
     search();

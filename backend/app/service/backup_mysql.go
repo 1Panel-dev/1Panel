@@ -23,7 +23,7 @@ func (u *BackupService) MysqlBackup(req dto.CommonBackup) error {
 	}
 
 	timeNow := time.Now().Format("20060102150405")
-	targetDir := path.Join(localDir, fmt.Sprintf("database/mysql/%s/%s", req.Name, req.DetailName))
+	targetDir := path.Join(localDir, fmt.Sprintf("database/%s/%s/%s", req.Type, req.Name, req.DetailName))
 	fileName := fmt.Sprintf("%s_%s.sql.gz", req.DetailName, timeNow)
 
 	if err := handleMysqlBackup(req.Name, req.DetailName, targetDir, fileName); err != nil {
@@ -31,7 +31,7 @@ func (u *BackupService) MysqlBackup(req dto.CommonBackup) error {
 	}
 
 	record := &model.BackupRecord{
-		Type:       "mysql",
+		Type:       req.Type,
 		Name:       req.Name,
 		DetailName: req.DetailName,
 		Source:     "LOCAL",
@@ -97,12 +97,12 @@ func (u *BackupService) MysqlRecoverByUpload(req dto.CommonRecover) error {
 	return nil
 }
 
-func handleMysqlBackup(name, dbName, targetDir, fileName string) error {
-	dbInfo, err := mysqlRepo.Get(commonRepo.WithByName(dbName), mysqlRepo.WithByMysqlName(name))
+func handleMysqlBackup(database, dbName, targetDir, fileName string) error {
+	dbInfo, err := mysqlRepo.Get(commonRepo.WithByName(dbName), mysqlRepo.WithByMysqlName(database))
 	if err != nil {
 		return err
 	}
-	cli, _, err := LoadMysqlClientByFrom(dbInfo.From)
+	cli, _, err := LoadMysqlClientByFrom(database)
 	if err != nil {
 		return err
 	}
@@ -131,13 +131,13 @@ func handleMysqlRecover(req dto.CommonRecover, isRollback bool) error {
 	if err != nil {
 		return err
 	}
-	cli, _, err := LoadMysqlClientByFrom(dbInfo.From)
+	cli, _, err := LoadMysqlClientByFrom(req.Name)
 	if err != nil {
 		return err
 	}
 
 	if !isRollback {
-		rollbackFile := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("database/mysql/%s_%s.sql.gz", req.DetailName, time.Now().Format("20060102150405")))
+		rollbackFile := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("database/%s/%s_%s.sql.gz", req.Type, req.DetailName, time.Now().Format("20060102150405")))
 		if err := cli.Backup(client.BackupInfo{
 			Name:      req.DetailName,
 			Format:    dbInfo.Format,

@@ -41,6 +41,11 @@ type AppInstalledSearch struct {
 	Unused bool     `json:"unused"`
 }
 
+type AppInstalledInfo struct {
+	Key  string `json:"key" validate:"required"`
+	Name string `json:"name"`
+}
+
 type AppBackupSearch struct {
 	dto.PageInfo
 	AppInstallID uint `json:"appInstallID"`

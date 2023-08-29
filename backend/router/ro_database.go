@@ -17,7 +17,7 @@ func (s *DatabaseRouter) InitDatabaseRouter(Router *gin.RouterGroup) {
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		cmdRouter.POST("", baseApi.CreateMysql)
-		cmdRouter.GET("load/:from", baseApi.LoadDBFromRemote)
+		cmdRouter.POST("load", baseApi.LoadDBFromRemote)
 		cmdRouter.POST("/change/access", baseApi.ChangeMysqlAccess)
 		cmdRouter.POST("/change/password", baseApi.ChangeMysqlPassword)
 		cmdRouter.POST("/del/check", baseApi.DeleteCheckMysql)
@@ -27,10 +27,10 @@ func (s *DatabaseRouter) InitDatabaseRouter(Router *gin.RouterGroup) {
 		cmdRouter.POST("/conffile/update", baseApi.UpdateMysqlConfByFile)
 		cmdRouter.POST("/search", baseApi.SearchMysql)
 		cmdRouter.POST("/load/file", baseApi.LoadDatabaseFile)
-		cmdRouter.GET("/variables", baseApi.LoadVariables)
-		cmdRouter.GET("/status", baseApi.LoadStatus)
-		cmdRouter.GET("/baseinfo", baseApi.LoadBaseinfo)
-		cmdRouter.GET("/remote", baseApi.LoadRemoteAccess)
+		cmdRouter.POST("/variables", baseApi.LoadVariables)
+		cmdRouter.POST("/status", baseApi.LoadStatus)
+		cmdRouter.POST("/baseinfo", baseApi.LoadBaseinfo)
+		cmdRouter.POST("/remote", baseApi.LoadRemoteAccess)
 		cmdRouter.GET("/options", baseApi.ListDBName)
 
 		cmdRouter.GET("/redis/persistence/conf", baseApi.LoadPersistenceConf)
@@ -43,12 +43,12 @@ func (s *DatabaseRouter) InitDatabaseRouter(Router *gin.RouterGroup) {
 		cmdRouter.POST("/redis/conffile/update", baseApi.UpdateRedisConfByFile)
 		cmdRouter.POST("/redis/persistence/update", baseApi.UpdateRedisPersistenceConf)
 
-		cmdRouter.POST("/remote/check", baseApi.CheckeRemoteDB)
-		cmdRouter.POST("/remote", baseApi.CreateRemoteDB)
-		cmdRouter.GET("/remote/:name", baseApi.GetRemoteDB)
-		cmdRouter.GET("/remote/list/:type", baseApi.ListRemoteDB)
-		cmdRouter.POST("/remote/update", baseApi.UpdateRemoteDB)
-		cmdRouter.POST("/remote/search", baseApi.SearchRemoteDB)
-		cmdRouter.POST("/remote/del", baseApi.DeleteRemoteDB)
+		cmdRouter.POST("/db/check", baseApi.CheckDatabase)
+		cmdRouter.POST("/db", baseApi.CreateDatabase)
+		cmdRouter.GET("/db/:name", baseApi.GetDatabase)
+		cmdRouter.GET("/db/list/:type", baseApi.ListDatabase)
+		cmdRouter.POST("/db/update", baseApi.UpdateDatabase)
+		cmdRouter.POST("/db/search", baseApi.SearchDatabase)
+		cmdRouter.POST("/db/del", baseApi.DeleteDatabase)
 	}
 }

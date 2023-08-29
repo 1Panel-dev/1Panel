@@ -71,18 +71,23 @@ const confirmDialogRef = ref();
 const isWatch = ref();
 let timer: NodeJS.Timer | null = null;
 
-const mysqlName = ref();
 const variables = reactive({
     slow_query_log: 'OFF',
     long_query_time: 10,
 });
 
+const currentDB = reactive({
+    type: '',
+    database: '',
+});
 interface DialogProps {
-    mysqlName: string;
+    type: string;
+    database: string;
     variables: Database.MysqlVariables;
 }
 const acceptParams = async (params: DialogProps): Promise<void> => {
-    mysqlName.value = params.mysqlName;
+    currentDB.type = params.type;
+    currentDB.database = params.database;
     variables.slow_query_log = params.variables.slow_query_log;
     variables.long_query_time = Number(params.variables.long_query_time);
 
@@ -137,14 +142,19 @@ const onCancel = async () => {
 };
 
 const onSave = async () => {
-    let param = [] as Array<Database.VariablesUpdate>;
+    let param = [] as Array<Database.VariablesUpdateHelper>;
     param.push({ param: 'slow_query_log', value: variables.slow_query_log });
     if (variables.slow_query_log === 'ON') {
         param.push({ param: 'long_query_time', value: variables.long_query_time + '' });
         param.push({ param: 'slow_query_log_file', value: '/var/lib/mysql/1Panel-slow.log' });
     }
+    let params = {
+        type: currentDB.type,
+        database: currentDB.database,
+        variables: param,
+    };
     emit('loading', true);
-    await updateMysqlVariables(param)
+    await updateMysqlVariables(params)
         .then(() => {
             emit('loading', false);
             currentStatus.value = variables.slow_query_log === 'ON';
@@ -161,11 +171,11 @@ const onDownload = async () => {
         MsgInfo(i18n.global.t('database.noData'));
         return;
     }
-    downloadWithContent(slowLogs.value, mysqlName.value + '-slowlogs-' + dateFormatForName(new Date()) + '.log');
+    downloadWithContent(slowLogs.value, currentDB.database + '-slowlogs-' + dateFormatForName(new Date()) + '.log');
 };
 
 const loadMysqlSlowlogs = async () => {
-    const res = await loadDatabaseFile('slow-logs', mysqlName.value);
+    const res = await loadDatabaseFile(currentDB.type + '-slow-logs', currentDB.database);
     slowLogs.value = res.data || '';
     nextTick(() => {
         const state = view.value.state;
