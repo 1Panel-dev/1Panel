@@ -18,6 +18,10 @@ var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "获取系统版本信息",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		if !isRoot() {
+			fmt.Println("请使用 sudo 1pctl version 或者切换到 root 用户")
+			return nil
+		}
 		db, err := loadDBConn()
 		if err != nil {
 			return err
