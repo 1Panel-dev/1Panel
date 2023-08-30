@@ -44,14 +44,13 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { MsgError, MsgSuccess } from '@/utils/message';
+import { MsgSuccess } from '@/utils/message';
 import { Host } from '@/api/interface/host';
 import { operateIPRule, updateAddrRule } from '@/api/modules/host';
-import { checkIpV4V6, deepCopy } from '@/utils/util';
+import { checkCidr, checkIpV4V6, deepCopy } from '@/utils/util';
 
 const loading = ref();
 const oldRule = ref<Host.RuleIP>();
@@ -81,8 +80,26 @@ const handleClose = () => {
 };
 
 const rules = reactive({
-    address: [Rules.requiredInput],
+    address: [{ validator: checkAddress, trigger: 'blur' }],
 });
+function checkAddress(rule: any, value: any, callback: any) {
+    if (!dialogData.value.rowData.address) {
+        return callback(new Error(i18n.global.t('firewall.addressFormatError')));
+    }
+    let addrs = dialogData.value.rowData.address.split(',');
+    for (const item of addrs) {
+        if (item.indexOf('/') !== -1) {
+            if (checkCidr(item)) {
+                return callback(new Error(i18n.global.t('firewall.addressFormatError')));
+            }
+        } else {
+            if (checkIpV4V6(item)) {
+                return callback(new Error(i18n.global.t('firewall.addressFormatError')));
+            }
+        }
+    }
+    callback();
+}
 
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
@@ -93,20 +110,6 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         if (!valid) return;
         dialogData.value.rowData.operation = 'add';
         if (!dialogData.value.rowData) return;
-        let ips = [];
-        if (dialogData.value.rowData.address.indexOf(',') !== -1) {
-            ips = dialogData.value.rowData.address.split(',');
-        } else if (dialogData.value.rowData.address.indexOf('/') !== -1) {
-            ips.push(dialogData.value.rowData.address.split('/')[0]);
-        } else {
-            ips.push(dialogData.value.rowData.address);
-        }
-        for (const ip of ips) {
-            if (checkIpV4V6(ip)) {
-                MsgError(i18n.global.t('firewall.addressFormatError'));
-                return;
-            }
-        }
         loading.value = true;
         if (dialogData.value.title === 'create') {
             await operateIPRule(dialogData.value.rowData)

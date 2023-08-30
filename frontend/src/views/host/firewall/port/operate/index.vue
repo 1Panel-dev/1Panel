@@ -37,10 +37,9 @@
                             v-if="dialogData.rowData!.source === 'address'"
                             prop="address"
                         >
-                            <el-input
-                                :placeholder="$t('firewall.addressHelper')"
-                                v-model="dialogData.rowData!.address"
-                            />
+                            <el-input v-model.trim="dialogData.rowData!.address" />
+                            <span class="input-help">{{ $t('firewall.addressHelper1') }}</span>
+                            <span class="input-help">{{ $t('firewall.addressHelper2') }}</span>
                         </el-form-item>
 
                         <el-form-item :label="$t('firewall.strategy')" prop="strategy">
@@ -76,7 +75,7 @@ import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { Host } from '@/api/interface/host';
 import { operatePortRule, updatePortRule } from '@/api/modules/host';
-import { checkIpV4V6, checkPort, deepCopy } from '@/utils/util';
+import { checkCidr, checkIpV4V6, checkPort, deepCopy } from '@/utils/util';
 
 const loading = ref();
 const oldRule = ref<Host.RulePort>();
@@ -113,8 +112,27 @@ const handleClose = () => {
 const rules = reactive({
     protocol: [Rules.requiredSelect],
     port: [Rules.requiredInput],
-    address: [Rules.requiredInput],
+    address: [{ validator: checkAddress, trigger: 'blur' }],
 });
+
+function checkAddress(rule: any, value: any, callback: any) {
+    if (!dialogData.value.rowData.address) {
+        return callback(new Error(i18n.global.t('firewall.addressFormatError')));
+    }
+    let addrs = dialogData.value.rowData.address.split(',');
+    for (const item of addrs) {
+        if (item.indexOf('/') !== -1) {
+            if (checkCidr(item)) {
+                return callback(new Error(i18n.global.t('firewall.addressFormatError')));
+            }
+        } else {
+            if (checkIpV4V6(item)) {
+                return callback(new Error(i18n.global.t('firewall.addressFormatError')));
+            }
+        }
+    }
+    callback();
+}
 
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
@@ -127,18 +145,6 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         if (!dialogData.value.rowData) return;
         if (dialogData.value.rowData.source === 'anyWhere') {
             dialogData.value.rowData.address = '';
-        } else {
-            if (dialogData.value.rowData.address.indexOf('/') !== -1) {
-                if (checkIpV4V6(dialogData.value.rowData.address.split('/')[0])) {
-                    MsgError(i18n.global.t('firewall.addressFormatError'));
-                    return;
-                }
-            } else {
-                if (checkIpV4V6(dialogData.value.rowData.address)) {
-                    MsgError(i18n.global.t('firewall.addressFormatError'));
-                    return;
-                }
-            }
         }
         let ports = [];
         if (dialogData.value.rowData.port.indexOf('-') !== -1 && !dialogData.value.rowData.port.startsWith('-')) {
