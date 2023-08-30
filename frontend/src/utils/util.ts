@@ -235,6 +235,19 @@ export function checkIpV4V6(value: string): boolean {
     }
 }
 
+export function checkCidr(value: string): boolean {
+    if (value === '') {
+        return true;
+    }
+    const reg =
+        /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?:\/([0-9]|[1-2][0-9]|3[0-2]))?$/;
+    if (!reg.test(value) && value !== '') {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 export function checkPort(value: string): boolean {
     if (Number(value) <= 0) {
         return true;

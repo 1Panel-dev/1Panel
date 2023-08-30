@@ -277,7 +277,7 @@ const onDelete = async (row: Host.RuleIP | null) => {
             }
         }
         loading.value = true;
-        await batchOperateRule({ type: 'port', rules: rules })
+        await batchOperateRule({ type: 'address', rules: rules })
             .then(() => {
                 loading.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

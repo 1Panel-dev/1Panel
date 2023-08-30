@@ -219,51 +219,67 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 		return err
 	}
 	protos := strings.Split(req.Protocol, "/")
+	itemAddress := strings.Split(strings.TrimSuffix(req.Address, ","), ",")
 	if client.Name() == "ufw" {
-		if len(req.Address) == 0 {
-			req.Address = "Anywhere"
-		}
 		if strings.Contains(req.Port, ",") || strings.Contains(req.Port, "-") {
 			for _, proto := range protos {
-				req.Port = strings.ReplaceAll(req.Port, "-", ":")
-				req.Protocol = proto
-				if err := u.operatePort(client, req); err != nil {
-					return err
+				for _, addr := range itemAddress {
+					if len(addr) == 0 {
+						addr = "Anywhere"
+					}
+					req.Address = addr
+					req.Port = strings.ReplaceAll(req.Port, "-", ":")
+					req.Protocol = proto
+					if err := u.operatePort(client, req); err != nil {
+						return err
+					}
+					_ = u.addPortRecord(req)
 				}
-				_ = u.addPortRecord(req)
 			}
 			return nil
 		}
 		if req.Protocol == "tcp/udp" {
 			req.Protocol = ""
 		}
-		if err := u.operatePort(client, req); err != nil {
-			return err
+		for _, addr := range itemAddress {
+			if len(addr) == 0 {
+				addr = "Anywhere"
+			}
+			req.Address = addr
+			if err := u.operatePort(client, req); err != nil {
+				return err
+			}
+			_ = u.addPortRecord(req)
 		}
-		_ = u.addPortRecord(req)
 		return nil
 	}
 
 	itemPorts := req.Port
 	for _, proto := range protos {
 		if strings.Contains(req.Port, "-") {
-			req.Protocol = proto
-			if err := u.operatePort(client, req); err != nil {
-				return err
+			for _, addr := range itemAddress {
+				req.Protocol = proto
+				req.Address = addr
+				if err := u.operatePort(client, req); err != nil {
+					return err
+				}
+				_ = u.addPortRecord(req)
 			}
-			_ = u.addPortRecord(req)
 		} else {
 			ports := strings.Split(itemPorts, ",")
 			for _, port := range ports {
 				if len(port) == 0 {
 					continue
 				}
-				req.Port = port
-				req.Protocol = proto
-				if err := u.operatePort(client, req); err != nil {
-					return err
+				for _, addr := range itemAddress {
+					req.Address = addr
+					req.Port = port
+					req.Protocol = proto
+					if err := u.operatePort(client, req); err != nil {
+						return err
+					}
+					_ = u.addPortRecord(req)
 				}
-				_ = u.addPortRecord(req)
 			}
 		}
 	}
@@ -290,6 +306,7 @@ func (u *FirewallService) OperateAddressRule(req dto.AddrRuleOperate, reload boo
 		if err := client.RichRules(fireInfo, req.Operation); err != nil {
 			return err
 		}
+		req.Address = addr
 		_ = u.addAddressRecord(req)
 	}
 	if reload {
