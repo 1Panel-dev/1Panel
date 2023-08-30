@@ -68,7 +68,7 @@
                             @search="search"
                             :data="data"
                         >
-                            <el-table-column type="selection" :selectable="selectable" fix />
+                            <el-table-column type="selection" fix />
                             <el-table-column :label="$t('commons.table.protocol')" :min-width="90" prop="protocol" />
                             <el-table-column :label="$t('commons.table.port')" :min-width="120" prop="port" />
                             <el-table-column :label="$t('commons.table.status')" :min-width="120">
@@ -87,7 +87,6 @@
                                 <template #default="{ row }">
                                     <el-button
                                         v-if="row.strategy === 'accept'"
-                                        :disabled="row.appName === '1panel'"
                                         @click="onChangeStatus(row, 'drop')"
                                         link
                                         type="success"
@@ -303,27 +302,17 @@ const onDelete = async (row: Host.RuleInfo | null) => {
     });
 };
 
-function selectable(row) {
-    return row.appName !== '1panel';
-}
-
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
         click: (row: Host.RulePort) => {
             onOpenDialog('edit', row);
         },
-        disabled: (row: any) => {
-            return row.appName === '1panel';
-        },
     },
     {
         label: i18n.global.t('commons.button.delete'),
         click: (row: Host.RuleInfo) => {
             onDelete(row);
-        },
-        disabled: (row: any) => {
-            return row.appName === '1panel';
         },
     },
 ];
