@@ -1102,3 +1102,10 @@ func getAppCommonConfig(envs map[string]interface{}) request.AppContainerConfig 
 
 	return config
 }
+
+func checkAppInstalled(appId uint) bool {
+	if _, err := appInstallRepo.GetFirst(appInstallRepo.WithAppId(appId)); err != nil {
+		return false
+	}
+	return true
+}

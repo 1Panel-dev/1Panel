@@ -85,6 +85,9 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 	}
 	var appDTOs []*response.AppDTO
 	for _, ap := range apps {
+		if checkAppInstalled(ap.ID) && ap.Limit == 1 {
+			continue
+		}
 		ap.ReadMe = ""
 		ap.Website = ""
 		ap.Document = ""
