@@ -35,6 +35,22 @@
                             </template>
                         </el-alert>
                     </template>
+                    <template #search>
+                        <div class="flx-align-center">
+                            <el-select v-model="searchStatus" @change="search()" clearable>
+                                <template #prefix>{{ $t('commons.table.status') }}</template>
+                                <el-option :label="$t('commons.table.all')" value=""></el-option>
+                                <el-option :label="$t('firewall.unUsed')" value="free"></el-option>
+                                <el-option :label="$t('firewall.used')" value="used"></el-option>
+                            </el-select>
+                            <el-select v-model="searchStrategy" style="margin-left: 10px" @change="search()" clearable>
+                                <template #prefix>{{ $t('firewall.strategy') }}</template>
+                                <el-option :label="$t('commons.table.all')" value=""></el-option>
+                                <el-option :label="$t('firewall.accept')" value="accept"></el-option>
+                                <el-option :label="$t('firewall.drop')" value="drop"></el-option>
+                            </el-select>
+                        </div>
+                    </template>
                     <template #toolbar>
                         <el-row>
                             <el-col :span="16">
@@ -110,13 +126,7 @@
                                 prop="description"
                             >
                                 <template #default="{ row }">
-                                    <fu-read-write-switch
-                                        :data="row.description"
-                                        v-model="row.edit"
-                                        @change="onChange(row)"
-                                    >
-                                        <el-input v-model="row.description" @blur="row.edit = false" />
-                                    </fu-read-write-switch>
+                                    <fu-input-rw-switch v-model="row.description" @blur="onChange(row)" />
                                 </template>
                             </el-table-column>
                             <fu-table-operations
@@ -175,6 +185,8 @@ const loading = ref();
 const activeTag = ref('port');
 const selects = ref<any>([]);
 const searchName = ref();
+const searchStatus = ref('');
+const searchStrategy = ref('');
 
 const maskShow = ref(true);
 const fireStatus = ref('running');
@@ -197,6 +209,8 @@ const search = async () => {
     }
     let params = {
         type: activeTag.value,
+        status: searchStatus.value,
+        strategy: searchStrategy.value,
         info: searchName.value,
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
@@ -279,10 +293,9 @@ const onChangeStatus = async (row: Host.RuleInfo, status: string) => {
 };
 
 const onChange = async (info: any) => {
-    if (!info.edit) {
-        await updateFirewallDescription(info);
-        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-    }
+    info.type = 'port';
+    await updateFirewallDescription(info);
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
 };
 
 const onDelete = async (row: Host.RuleInfo | null) => {

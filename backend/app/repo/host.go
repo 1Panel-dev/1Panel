@@ -24,7 +24,7 @@ type IHostRepo interface {
 	ListFirewallRecord() ([]model.Firewall, error)
 	SaveFirewallRecord(firewall *model.Firewall) error
 	DeleteFirewallRecordByID(id uint) error
-	DeleteFirewallRecord(port, protocol, address, strategy string) error
+	DeleteFirewallRecord(fType, port, protocol, address, strategy string) error
 }
 
 func NewIHostRepo() IHostRepo {
@@ -136,9 +136,16 @@ func (h *HostRepo) SaveFirewallRecord(firewall *model.Firewall) error {
 		return global.DB.Save(firewall).Error
 	}
 	var data model.Firewall
-	_ = global.DB.Where("port = ? AND protocol = ? AND address = ? AND strategy = ?", firewall.Port, firewall.Protocol, firewall.Address, firewall.Strategy).First(&data)
-	if data.ID != 0 {
-		firewall.ID = data.ID
+	if firewall.Type == "port" {
+		_ = global.DB.Where("type = ? AND port = ? AND protocol = ? AND address = ? AND strategy = ?", "port", firewall.Port, firewall.Protocol, firewall.Address, firewall.Strategy).First(&data)
+		if data.ID != 0 {
+			firewall.ID = data.ID
+		}
+	} else {
+		_ = global.DB.Where("type = ? AND address = ? AND strategy = ?", "address", firewall.Address, firewall.Strategy).First(&data)
+		if data.ID != 0 {
+			firewall.ID = data.ID
+		}
 	}
 	return global.DB.Save(firewall).Error
 }
@@ -147,6 +154,6 @@ func (h *HostRepo) DeleteFirewallRecordByID(id uint) error {
 	return global.DB.Where("id = ?", id).Delete(&model.Firewall{}).Error
 }
 
-func (h *HostRepo) DeleteFirewallRecord(port, protocol, address, strategy string) error {
-	return global.DB.Where("port = ? AND protocol = ? AND address = ? AND strategy = ?", port, protocol, address, strategy).Delete(&model.Firewall{}).Error
+func (h *HostRepo) DeleteFirewallRecord(fType, port, protocol, address, strategy string) error {
+	return global.DB.Where("type = ? AND port = ? AND protocol = ? AND address = ? AND strategy = ?", fType, port, protocol, address, strategy).Delete(&model.Firewall{}).Error
 }

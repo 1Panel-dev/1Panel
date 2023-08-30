@@ -104,20 +104,57 @@ func (u *FirewallService) SearchWithPage(req dto.RuleSearch) (int64, interface{}
 			datas = addrs
 		}
 	}
-	total, start, end := len(datas), (req.Page-1)*req.PageSize, req.Page*req.PageSize
+
+	var datasFilterStatus []fireClient.FireInfo
+	if len(req.Status) != 0 {
+		for _, data := range datas {
+			portItem, _ := strconv.Atoi(data.Port)
+			if req.Status == "free" && !common.ScanPort(portItem) {
+				datasFilterStatus = append(datasFilterStatus, data)
+			}
+			if req.Status == "used" && common.ScanPort(portItem) {
+				datasFilterStatus = append(datasFilterStatus, data)
+			}
+		}
+	} else {
+		datasFilterStatus = datas
+	}
+	var datasFilterStrategy []fireClient.FireInfo
+	if len(req.Strategy) != 0 {
+		for _, data := range datasFilterStatus {
+			if req.Strategy == data.Strategy {
+				datasFilterStrategy = append(datasFilterStrategy, data)
+			}
+		}
+	} else {
+		datasFilterStrategy = datasFilterStatus
+	}
+
+	total, start, end := len(datasFilterStrategy), (req.Page-1)*req.PageSize, req.Page*req.PageSize
 	if start > total {
 		backDatas = make([]fireClient.FireInfo, 0)
 	} else {
 		if end >= total {
 			end = total
 		}
-		backDatas = datas[start:end]
+		backDatas = datasFilterStrategy[start:end]
 	}
 
 	datasFromDB, _ := hostRepo.ListFirewallRecord()
 	for i := 0; i < len(backDatas); i++ {
 		for _, des := range datasFromDB {
-			if backDatas[i].Port == des.Port && backDatas[i].Protocol == des.Protocol && backDatas[i].Strategy == des.Strategy && backDatas[i].Address == des.Address {
+			if req.Type != des.Type {
+				continue
+			}
+			if backDatas[i].Port == des.Port &&
+				req.Type == "port" &&
+				backDatas[i].Protocol == des.Protocol &&
+				backDatas[i].Strategy == des.Strategy &&
+				backDatas[i].Address == des.Address {
+				backDatas[i].Description = des.Description
+				break
+			}
+			if req.Type == "address" && backDatas[i].Strategy == des.Strategy && backDatas[i].Address == des.Address {
 				backDatas[i].Description = des.Description
 				break
 			}
@@ -488,10 +525,11 @@ func (u *FirewallService) addPortsBeforeStart(client firewall.FirewallClient) er
 
 func (u *FirewallService) addPortRecord(req dto.PortRuleOperate) error {
 	if req.Operation == "remove" {
-		return hostRepo.DeleteFirewallRecord(req.Port, req.Protocol, req.Address, req.Strategy)
+		return hostRepo.DeleteFirewallRecord("port", req.Port, req.Protocol, req.Address, req.Strategy)
 	}
 
 	return hostRepo.SaveFirewallRecord(&model.Firewall{
+		Type:        "port",
 		Port:        req.Port,
 		Protocol:    req.Protocol,
 		Address:     req.Address,
@@ -502,9 +540,10 @@ func (u *FirewallService) addPortRecord(req dto.PortRuleOperate) error {
 
 func (u *FirewallService) addAddressRecord(req dto.AddrRuleOperate) error {
 	if req.Operation == "remove" {
-		return hostRepo.DeleteFirewallRecord("", "", req.Address, req.Strategy)
+		return hostRepo.DeleteFirewallRecord("address", "", "", req.Address, req.Strategy)
 	}
 	return hostRepo.SaveFirewallRecord(&model.Firewall{
+		Type:        "address",
 		Address:     req.Address,
 		Strategy:    req.Strategy,
 		Description: req.Description,

@@ -74,9 +74,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.description')" prop="description">
                         <template #default="{ row }">
-                            <fu-read-write-switch :data="row.description" v-model="row.edit" @change="onChange(row)">
-                                <el-input v-model="row.description" @blur="row.edit = false" />
-                            </fu-read-write-switch>
+                            <fu-input-rw-switch v-model="row.description" @blur="onChange(row)" />
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -205,10 +203,8 @@ const handleClose = () => {
 };
 
 const onChange = async (info: any) => {
-    if (!info.edit) {
-        await updateSnapshotDescription({ id: info.id, description: info.description });
-        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-    }
+    await updateSnapshotDescription({ id: info.id, description: info.description });
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
 };
 
 const submitAddSnapshot = (formEl: FormInstance | undefined) => {

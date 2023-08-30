@@ -9,8 +9,10 @@ type FirewallBaseInfo struct {
 
 type RuleSearch struct {
 	PageInfo
-	Info string `json:"info"`
-	Type string `json:"type" validate:"required"`
+	Info     string `json:"info"`
+	Status   string `json:"status"`
+	Strategy string `json:"strategy"`
+	Type     string `json:"type" validate:"required"`
 }
 
 type FirewallOperation struct {
@@ -28,6 +30,7 @@ type PortRuleOperate struct {
 }
 
 type UpdateFirewallDescription struct {
+	Type     string `json:"type"`
 	Address  string `json:"address"`
 	Port     string `json:"port"`
 	Protocol string `json:"protocol"`

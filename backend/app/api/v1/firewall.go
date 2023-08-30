@@ -38,6 +38,10 @@ func (b *BaseApi) SearchFirewallRule(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
 
 	total, list, err := firewallService.SearchWithPage(req)
 	if err != nil {

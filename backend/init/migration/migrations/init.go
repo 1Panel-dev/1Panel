@@ -572,14 +572,12 @@ var UpdateCronjobWithDb = &gormigrate.Migration{
 }
 
 var AddTableFirewall = &gormigrate.Migration{
-	ID: "20230825-add-table-firewall",
+	ID: "20230828-add-table-firewall",
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.AutoMigrate(&model.Firewall{}, model.SnapshotStatus{}, &model.Cronjob{}); err != nil {
 			return err
 		}
-		if err := tx.Exec("alter table remote_dbs rename to databases;").Error; err != nil {
-			return err
-		}
+		_ = tx.Exec("alter table remote_dbs rename to databases;").Error
 		return nil
 	},
 }
