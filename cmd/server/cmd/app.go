@@ -3,11 +3,12 @@ package cmd
 import (
 	"bytes"
 	"fmt"
+	"io"
+
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/1Panel-dev/1Panel/cmd/server/app"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"io"
 )
 
 var (
@@ -31,6 +32,10 @@ var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "初始化应用",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		if !isRoot() {
+			fmt.Println("请使用 sudo 1pctl app init 或者切换到 root 用户")
+			return nil
+		}
 		if len(args) > 0 {
 			appKey = args[0]
 			if len(args) > 1 {
