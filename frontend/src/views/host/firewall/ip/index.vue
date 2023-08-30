@@ -45,6 +45,16 @@
                             </el-col>
                         </el-row>
                     </template>
+                    <template #search>
+                        <div class="flx-align-center">
+                            <el-select v-model="searchStrategy" @change="search()" clearable>
+                                <template #prefix>{{ $t('firewall.strategy') }}</template>
+                                <el-option :label="$t('commons.table.all')" value=""></el-option>
+                                <el-option :label="$t('firewall.allow')" value="accept"></el-option>
+                                <el-option :label="$t('firewall.deny')" value="drop"></el-option>
+                            </el-select>
+                        </div>
+                    </template>
                     <template #main>
                         <ComplexTable
                             :pagination-config="paginationConfig"
@@ -80,13 +90,7 @@
                                 prop="description"
                             >
                                 <template #default="{ row }">
-                                    <fu-read-write-switch
-                                        :data="row.description"
-                                        v-model="row.edit"
-                                        @change="onChange(row)"
-                                    >
-                                        <el-input v-model="row.description" @blur="row.edit = false" />
-                                    </fu-read-write-switch>
+                                    <fu-input-rw-switch v-model="row.description" @blur="onChange(row)" />
                                 </template>
                             </el-table-column>
                             <fu-table-operations
@@ -143,6 +147,7 @@ const loading = ref();
 const activeTag = ref('address');
 const selects = ref<any>([]);
 const searchName = ref();
+const searchStrategy = ref('');
 const fireName = ref();
 
 const maskShow = ref(true);
@@ -165,6 +170,8 @@ const search = async () => {
     }
     let params = {
         type: activeTag.value,
+        status: '',
+        strategy: searchStrategy.value,
         info: searchName.value,
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
@@ -200,10 +207,9 @@ const toDoc = () => {
 };
 
 const onChange = async (info: any) => {
-    if (!info.edit) {
-        await updateFirewallDescription(info);
-        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-    }
+    info.type = 'address';
+    await updateFirewallDescription(info);
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
 };
 
 const onChangeStatus = async (row: Host.RuleInfo, status: string) => {
