@@ -133,8 +133,9 @@ export namespace Database {
     }
     export interface MysqlOption {
         id: number;
-        name: string;
         from: string;
+        database: string;
+        name: string;
     }
     export interface ChangeInfo {
         id: number;

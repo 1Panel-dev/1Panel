@@ -1357,6 +1357,8 @@ definitions:
         type: string
       id:
         type: integer
+      name:
+        type: string
     type: object
   dto.MysqlStatus:
     properties:
@@ -2116,6 +2118,8 @@ definitions:
         enum:
         - accept
         - drop
+        type: string
+      type:
         type: string
     required:
     - strategy
@@ -3102,6 +3106,8 @@ definitions:
       params:
         additionalProperties: true
         type: object
+      rebuild:
+        type: boolean
       version:
         type: string
     type: object
@@ -3346,6 +3352,10 @@ definitions:
         type: string
       operate:
         type: string
+      page:
+        type: integer
+      pageSize:
+        type: integer
     required:
     - id
     - logType
@@ -3985,6 +3995,8 @@ definitions:
       content:
         type: string
       enable:
+        type: boolean
+      end:
         type: boolean
     type: object
   response.WebsiteNginxConfig:
@@ -6476,6 +6488,172 @@ paths:
         formatEN: update the mysql database configuration information
         formatZH: 更新 mysql 数据库配置信息
         paramKeys: []
+  /databases/db:
+    post:
+      consumes:
+      - application/json
+      description: 创建远程数据库
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DatabaseCreate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Create database
+      tags:
+      - Database
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        - type
+        formatEN: create database [name][type]
+        formatZH: 创建远程数据库 [name][type]
+        paramKeys: []
+  /databases/db/:name:
+    get:
+      description: 获取远程数据库
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.DatabaseInfo'
+      security:
+      - ApiKeyAuth: []
+      summary: Get databases
+      tags:
+      - Database
+  /databases/db/check:
+    post:
+      consumes:
+      - application/json
+      description: 检测远程数据库连接性
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DatabaseCreate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Check database
+      tags:
+      - Database
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        - type
+        formatEN: check if database [name][type] is connectable
+        formatZH: 检测远程数据库 [name][type] 连接性
+        paramKeys: []
+  /databases/db/del:
+    post:
+      consumes:
+      - application/json
+      description: 删除远程数据库
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OperateByID'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Delete database
+      tags:
+      - Database
+      x-panel-log:
+        BeforeFuntions:
+        - db: databases
+          input_column: id
+          input_value: ids
+          isList: true
+          output_column: name
+          output_value: names
+        bodyKeys:
+        - ids
+        formatEN: delete database [names]
+        formatZH: 删除远程数据库 [names]
+        paramKeys: []
+  /databases/db/list/:type:
+    get:
+      description: 获取远程数据库列表
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.DatabaseOption'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: List databases
+      tags:
+      - Database
+  /databases/db/search:
+    post:
+      consumes:
+      - application/json
+      description: 获取远程数据库列表分页
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DatabaseSearch'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Page databases
+      tags:
+      - Database
+  /databases/db/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新远程数据库
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DatabaseUpdate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update database
+      tags:
+      - Database
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        formatEN: update database [name]
+        formatZH: 更新远程数据库 [name]
+        paramKeys: []
   /databases/del:
     post:
       consumes:
@@ -6816,144 +6994,6 @@ paths:
       summary: Load mysql remote access
       tags:
       - Database Mysql
-  /databases/remote/:name:
-    get:
-      description: 获取远程数据库
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.DatabaseInfo'
-      security:
-      - ApiKeyAuth: []
-      summary: Get remote databases
-      tags:
-      - Database
-  /databases/remote/check:
-    post:
-      consumes:
-      - application/json
-      description: 检测远程数据库连接性
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.DatabaseCreate'
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      summary: Check remote database
-      tags:
-      - Database
-      x-panel-log:
-        BeforeFuntions: []
-        bodyKeys:
-        - name
-        - type
-        formatEN: check if remote database [name][type] is connectable
-        formatZH: 检测远程数据库 [name][type] 连接性
-        paramKeys: []
-  /databases/remote/del:
-    post:
-      consumes:
-      - application/json
-      description: 删除远程数据库
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.OperateByID'
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      summary: Delete remote database
-      tags:
-      - Database
-      x-panel-log:
-        BeforeFuntions:
-        - db: databases
-          input_column: id
-          input_value: ids
-          isList: true
-          output_column: name
-          output_value: names
-        bodyKeys:
-        - ids
-        formatEN: delete remote database [names]
-        formatZH: 删除远程数据库 [names]
-        paramKeys: []
-  /databases/remote/list/:type:
-    get:
-      description: 获取远程数据库列表
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/dto.DatabaseOption'
-            type: array
-      security:
-      - ApiKeyAuth: []
-      summary: List remote databases
-      tags:
-      - Database
-  /databases/remote/search:
-    post:
-      consumes:
-      - application/json
-      description: 获取远程数据库列表分页
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.DatabaseSearch'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.PageResult'
-      security:
-      - ApiKeyAuth: []
-      summary: Page remote databases
-      tags:
-      - Database
-  /databases/remote/update:
-    post:
-      consumes:
-      - application/json
-      description: 更新远程数据库
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.DatabaseUpdate'
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      summary: Update remote database
-      tags:
-      - Database
-      x-panel-log:
-        BeforeFuntions: []
-        bodyKeys:
-        - name
-        formatEN: update remote database [name]
-        formatZH: 更新远程数据库 [name]
-        paramKeys: []
   /databases/search:
     post:
       consumes:

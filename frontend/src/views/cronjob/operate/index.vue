@@ -135,18 +135,12 @@
                         <el-form-item :label="$t('cronjob.database')" prop="dbName">
                             <el-select class="selectClass" clearable v-model="dialogData.rowData!.dbName">
                                 <el-option :label="$t('commons.table.all')" value="all" />
-                                <div v-for="item in mysqlInfo.dbs" :key="item.id">
-                                    <el-option
-                                        v-if="item.from === 'local'"
-                                        :label="$t('database.localDB') + ' [' + item.name + ']'"
-                                        :value="item.id + ''"
-                                    />
-                                    <el-option
-                                        v-else
-                                        :label="item.from + ' [' + item.name + ']'"
-                                        :value="item.id + ''"
-                                    />
-                                </div>
+                                <el-option
+                                    v-for="item in mysqlInfo.dbs"
+                                    :key="item.id"
+                                    :label="item.database + ' [' + item.name + ']'"
+                                    :value="item.id + ''"
+                                />
                             </el-select>
                         </el-form-item>
                     </div>
