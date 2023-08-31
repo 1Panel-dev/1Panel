@@ -419,11 +419,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
         let itemDBs = data.data || [];
         for (const item of itemDBs) {
             if (item.id == dialogData.value.rowData.dbName) {
-                if (item.from === 'local') {
-                    dialogData.value.rowData.dbName = i18n.global.t('database.localDB') + ' [' + item.name + ']';
-                } else {
-                    dialogData.value.rowData.dbName = item.from + ' [' + item.name + ']';
-                }
+                dialogData.value.rowData.dbName = item.database + ' [' + item.name + ']';
                 break;
             }
         }

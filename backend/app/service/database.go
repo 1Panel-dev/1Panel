@@ -124,7 +124,7 @@ func (u *DatabaseService) Delete(id uint) error {
 		return err
 	}
 	if db.From != "local" {
-		if err := mysqlRepo.Delete(context.Background(), databaseRepo.WithByFrom(db.Name)); err != nil {
+		if err := mysqlRepo.Delete(context.Background(), mysqlRepo.WithByMysqlName(db.Name)); err != nil {
 			return err
 		}
 	}

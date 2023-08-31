@@ -28,6 +28,7 @@ type MysqlOption struct {
 	ID       uint   `json:"id"`
 	From     string `json:"from"`
 	Database string `json:"database"`
+	Name     string `json:"name"`
 }
 
 type MysqlDBCreate struct {
