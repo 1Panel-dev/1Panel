@@ -41,6 +41,7 @@ func Init() {
 		migrations.AddTableFirewall,
 		migrations.AddMariaDB,
 		migrations.UpdateDatabase,
+		migrations.UpdateAppInstallResource,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

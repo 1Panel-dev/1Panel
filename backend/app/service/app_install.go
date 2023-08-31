@@ -426,25 +426,50 @@ func (a *AppInstallService) SyncAll(systemInit bool) error {
 }
 
 func (a *AppInstallService) GetServices(key string) ([]response.AppService, error) {
-	app, err := appRepo.GetFirst(appRepo.WithKey(key))
-	if err != nil {
-		return nil, err
-	}
-	installs, err := appInstallRepo.ListBy(appInstallRepo.WithAppId(app.ID), appInstallRepo.WithStatus(constant.Running))
-	if err != nil {
-		return nil, err
-	}
 	var res []response.AppService
-	for _, install := range installs {
-		paramMap := make(map[string]string)
-		if install.Param != "" {
-			_ = json.Unmarshal([]byte(install.Param), &paramMap)
+	if DatabaseKeys[key] {
+		dbs, _ := databaseRepo.GetList(databaseRepo.WithByFrom("local"), databaseRepo.WithType(key))
+		if len(dbs) == 0 {
+			return res, nil
 		}
-		res = append(res, response.AppService{
-			Label:  install.Name,
-			Value:  install.ServiceName,
-			Config: paramMap,
-		})
+		for _, db := range dbs {
+			service := response.AppService{
+				Label: db.Name,
+				Value: db.Name,
+			}
+			if db.AppInstallID > 0 {
+				install, err := appInstallRepo.GetFirst(commonRepo.WithByID(db.AppInstallID))
+				if err != nil {
+					return nil, err
+				}
+				paramMap := make(map[string]string)
+				if install.Param != "" {
+					_ = json.Unmarshal([]byte(install.Param), &paramMap)
+				}
+				service.Config = paramMap
+			}
+			res = append(res, service)
+		}
+	} else {
+		app, err := appRepo.GetFirst(appRepo.WithKey(key))
+		if err != nil {
+			return nil, err
+		}
+		installs, err := appInstallRepo.ListBy(appInstallRepo.WithAppId(app.ID), appInstallRepo.WithStatus(constant.Running))
+		if err != nil {
+			return nil, err
+		}
+		for _, install := range installs {
+			paramMap := make(map[string]string)
+			if install.Param != "" {
+				_ = json.Unmarshal([]byte(install.Param), &paramMap)
+			}
+			res = append(res, response.AppService{
+				Label:  install.Name,
+				Value:  install.ServiceName,
+				Config: paramMap,
+			})
+		}
 	}
 	return res, nil
 }

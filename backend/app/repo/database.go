@@ -20,6 +20,7 @@ type IDatabaseRepo interface {
 	WithoutByFrom(from string) DBOption
 	WithByMysqlList() DBOption
 	WithAppInstallID(appInstallID uint) DBOption
+	WithType(dbType string) DBOption
 }
 
 func NewIDatabaseRepo() IDatabaseRepo {
@@ -75,6 +76,13 @@ func (d *DatabaseRepo) WithoutByFrom(from string) DBOption {
 		return g.Where("`from` != ?", from)
 	}
 }
+
+func (d *DatabaseRepo) WithType(dbType string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("`type` = ?", dbType)
+	}
+}
+
 func (d *DatabaseRepo) WithAppInstallID(appInstallID uint) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("app_install_id = ?", appInstallID)

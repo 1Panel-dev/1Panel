@@ -23,6 +23,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"reflect"
 	"strconv"
 	"strings"
 )
@@ -389,6 +390,14 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 			}
 		}
 	}()
+	if hostName, ok := req.Params["PANEL_DB_HOST"]; ok {
+		database, _ := databaseRepo.Get(commonRepo.WithByName(hostName.(string)))
+		if !reflect.DeepEqual(database, model.Database{}) {
+			req.Params["PANEL_DB_HOST"] = database.Address
+			req.Params["PANEL_DB_PORT"] = database.Port
+			req.Params["PANEL_DB_HOST_NAME"] = hostName
+		}
+	}
 	paramByte, err = json.Marshal(req.Params)
 	if err != nil {
 		return
