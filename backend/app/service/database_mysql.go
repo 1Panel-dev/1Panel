@@ -80,6 +80,7 @@ func (u *MysqlService) ListDBOption() ([]dto.MysqlOption, error) {
 		if err := copier.Copy(&item, &mysql); err != nil {
 			return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 		}
+		item.Database = mysql.MysqlName
 		dbs = append(dbs, item)
 	}
 	return dbs, err
@@ -146,7 +147,7 @@ func (u *MysqlService) LoadFromRemote(req dto.MysqlLodaDB) error {
 	for _, data := range datas {
 		hasOld := false
 		for _, oldData := range databases {
-			if strings.EqualFold(oldData.Name, data.Name) {
+			if strings.EqualFold(oldData.Name, data.Name) && strings.EqualFold(oldData.MysqlName, data.MysqlName) {
 				hasOld = true
 				break
 			}

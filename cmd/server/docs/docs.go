@@ -3882,6 +3882,268 @@ const docTemplate = `{
                 }
             }
         },
+        "/databases/db": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "创建远程数据库",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Database"
+                ],
+                "summary": "Create database",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.DatabaseCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "name",
+                        "type"
+                    ],
+                    "formatEN": "create database [name][type]",
+                    "formatZH": "创建远程数据库 [name][type]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/databases/db/:name": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取远程数据库",
+                "tags": [
+                    "Database"
+                ],
+                "summary": "Get databases",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.DatabaseInfo"
+                        }
+                    }
+                }
+            }
+        },
+        "/databases/db/check": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "检测远程数据库连接性",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Database"
+                ],
+                "summary": "Check database",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.DatabaseCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "name",
+                        "type"
+                    ],
+                    "formatEN": "check if database [name][type] is connectable",
+                    "formatZH": "检测远程数据库 [name][type] 连接性",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/databases/db/del": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "删除远程数据库",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Database"
+                ],
+                "summary": "Delete database",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperateByID"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [
+                        {
+                            "db": "databases",
+                            "input_column": "id",
+                            "input_value": "ids",
+                            "isList": true,
+                            "output_column": "name",
+                            "output_value": "names"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "ids"
+                    ],
+                    "formatEN": "delete database [names]",
+                    "formatZH": "删除远程数据库 [names]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/databases/db/list/:type": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取远程数据库列表",
+                "tags": [
+                    "Database"
+                ],
+                "summary": "List databases",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.DatabaseOption"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/databases/db/search": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取远程数据库列表分页",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Database"
+                ],
+                "summary": "Page databases",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.DatabaseSearch"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.PageResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/databases/db/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新远程数据库",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Database"
+                ],
+                "summary": "Update database",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.DatabaseUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "name"
+                    ],
+                    "formatEN": "update database [name]",
+                    "formatZH": "更新远程数据库 [name]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/databases/del": {
             "post": {
                 "security": [
@@ -4420,225 +4682,6 @@ const docTemplate = `{
                             "type": "boolean"
                         }
                     }
-                }
-            }
-        },
-        "/databases/remote/:name": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "获取远程数据库",
-                "tags": [
-                    "Database"
-                ],
-                "summary": "Get remote databases",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.DatabaseInfo"
-                        }
-                    }
-                }
-            }
-        },
-        "/databases/remote/check": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "检测远程数据库连接性",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Database"
-                ],
-                "summary": "Check remote database",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.DatabaseCreate"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [],
-                    "bodyKeys": [
-                        "name",
-                        "type"
-                    ],
-                    "formatEN": "check if remote database [name][type] is connectable",
-                    "formatZH": "检测远程数据库 [name][type] 连接性",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/databases/remote/del": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "删除远程数据库",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Database"
-                ],
-                "summary": "Delete remote database",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.OperateByID"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [
-                        {
-                            "db": "databases",
-                            "input_column": "id",
-                            "input_value": "ids",
-                            "isList": true,
-                            "output_column": "name",
-                            "output_value": "names"
-                        }
-                    ],
-                    "bodyKeys": [
-                        "ids"
-                    ],
-                    "formatEN": "delete remote database [names]",
-                    "formatZH": "删除远程数据库 [names]",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/databases/remote/list/:type": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "获取远程数据库列表",
-                "tags": [
-                    "Database"
-                ],
-                "summary": "List remote databases",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/dto.DatabaseOption"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/databases/remote/search": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "获取远程数据库列表分页",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Database"
-                ],
-                "summary": "Page remote databases",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.DatabaseSearch"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.PageResult"
-                        }
-                    }
-                }
-            }
-        },
-        "/databases/remote/update": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "更新远程数据库",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Database"
-                ],
-                "summary": "Update remote database",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.DatabaseUpdate"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [],
-                    "bodyKeys": [
-                        "name"
-                    ],
-                    "formatEN": "update remote database [name]",
-                    "formatZH": "更新远程数据库 [name]",
-                    "paramKeys": []
                 }
             }
         },
@@ -13642,6 +13685,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
@@ -14783,6 +14829,9 @@ const docTemplate = `{
                         "accept",
                         "drop"
                     ]
+                },
+                "type": {
+                    "type": "string"
                 }
             }
         },
@@ -16259,6 +16308,9 @@ const docTemplate = `{
                     "type": "object",
                     "additionalProperties": true
                 },
+                "rebuild": {
+                    "type": "boolean"
+                },
                 "version": {
                     "type": "string"
                 }
@@ -16624,6 +16676,12 @@ const docTemplate = `{
                 },
                 "operate": {
                     "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
                 }
             }
         },
@@ -17577,6 +17635,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "enable": {
+                    "type": "boolean"
+                },
+                "end": {
                     "type": "boolean"
                 }
             }

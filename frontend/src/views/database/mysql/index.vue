@@ -1,6 +1,6 @@
 <template>
     <div v-loading="loading">
-        <div class="app-status" style="margin-top: 20px" v-if="!isLocal()">
+        <div class="app-status" style="margin-top: 20px" v-if="currentDB?.from === 'remote'">
             <el-card>
                 <div>
                     <el-tag style="float: left" effect="dark" type="success">
@@ -10,9 +10,8 @@
                 </div>
             </el-card>
         </div>
-
         <LayoutContent :title="'MySQL ' + $t('menu.database')">
-            <template #app v-if="mysqlIsExist && isLocal()">
+            <template #app v-if="currentDB?.from === 'local'">
                 <AppStatus
                     :app-key="appKey"
                     :app-name="appName"
@@ -23,7 +22,7 @@
                 ></AppStatus>
             </template>
 
-            <template #search>
+            <template #search v-if="currentDB">
                 <el-select v-model="currentDBName" @change="changeDatabase()">
                     <template #prefix>{{ $t('commons.table.type') }}</template>
                     <el-option-group :label="$t('database.local')" v-if="dbOptionsLocal.length !== 0">
@@ -31,7 +30,7 @@
                             <el-option
                                 v-if="item.from === 'local'"
                                 :value="item.database"
-                                :label="item.database"
+                                :label="item.type + ' [' + item.database + ']'"
                             ></el-option>
                         </div>
                     </el-option-group>
@@ -40,7 +39,7 @@
                             <el-option
                                 v-if="item.from === 'remote'"
                                 :value="item.database"
-                                :label="item.database"
+                                :label="item.type + ' [' + item.database + ']'"
                             ></el-option>
                         </div>
                     </el-option-group>
@@ -51,17 +50,22 @@
                 <el-row>
                     <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
                         <el-button
-                            v-if="(mysqlIsExist && mysqlStatus === 'Running') || !isLocal()"
+                            v-if="currentDB && (currentDB.from !== 'local' || mysqlStatus === 'Running')"
                             type="primary"
                             @click="onOpenDialog()"
                         >
                             {{ $t('database.create') }}
                         </el-button>
-                        <el-button v-if="mysqlIsExist || !isLocal()" @click="onChangeConn" type="primary" plain>
+                        <el-button
+                            v-if="currentDB && (currentDB.from !== 'local' || mysqlStatus === 'Running')"
+                            @click="onChangeConn"
+                            type="primary"
+                            plain
+                        >
                             {{ $t('database.databaseConnInfo') }}
                         </el-button>
                         <el-button
-                            v-if="(mysqlIsExist && mysqlStatus === 'Running') || !isLocal()"
+                            v-if="currentDB && (currentDB.from !== 'local' || mysqlStatus === 'Running')"
                             @click="loadDB"
                             type="primary"
                             plain
@@ -71,15 +75,7 @@
                         <el-button @click="goRemoteDB" type="primary" plain>
                             {{ $t('database.remoteDB') }}
                         </el-button>
-                        <el-button
-                            v-if="mysqlIsExist && mysqlStatus === 'Running' && isLocal()"
-                            @click="goDashboard"
-                            icon="Position"
-                            type="primary"
-                            plain
-                        >
-                            phpMyAdmin
-                        </el-button>
+                        <el-button @click="goDashboard" icon="Position" type="primary" plain>phpMyAdmin</el-button>
                     </el-col>
                     <el-col :xs="24" :sm="4" :md="4" :lg="4" :xl="4">
                         <div class="search-button">
@@ -96,14 +92,8 @@
                     </el-col>
                 </el-row>
             </template>
-            <template #main v-if="mysqlIsExist || !isLocal()">
-                <ComplexTable
-                    :pagination-config="paginationConfig"
-                    @sort-change="search"
-                    @search="search"
-                    :data="data"
-                    :class="{ mask: mysqlStatus != 'Running' && isLocal() }"
-                >
+            <template #main v-if="currentDB">
+                <ComplexTable :pagination-config="paginationConfig" @sort-change="search" @search="search" :data="data">
                     <el-table-column :label="$t('commons.table.name')" prop="name" sortable />
                     <el-table-column :label="$t('commons.login.username')" prop="username" />
                     <el-table-column :label="$t('commons.login.password')" prop="password">
@@ -160,12 +150,12 @@
             </template>
         </LayoutContent>
 
-        <div v-if="!mysqlIsExist && isLocal()">
+        <div v-if="!currentDB">
             <LayoutContent :title="'MySQL ' + $t('menu.database')" :divider="true">
                 <template #main>
                     <div class="app-warn">
                         <div>
-                            <span>{{ $t('app.checkInstalledWarn', ['Mysql']) }}</span>
+                            <span>{{ $t('app.checkInstalledWarn', [$t('database.noMysql')]) }}</span>
                             <span @click="goRouter">
                                 <el-icon><Position /></el-icon>
                                 {{ $t('database.goInstall') }}
@@ -178,10 +168,6 @@
                 </template>
             </LayoutContent>
         </div>
-
-        <el-card v-if="mysqlStatus != 'Running' && mysqlIsExist && !loading && maskShow && isLocal" class="mask-prompt">
-            <span>{{ $t('commons.service.serviceNotStarted', ['MySQL']) }}</span>
-        </el-card>
 
         <el-dialog
             v-model="phpVisiable"
@@ -273,7 +259,6 @@ const paginationConfig = reactive({
 });
 const searchName = ref();
 
-const mysqlIsExist = ref(true);
 const mysqlContainer = ref();
 const mysqlStatus = ref();
 const mysqlVersion = ref();
@@ -303,13 +288,6 @@ const onChangeConn = async () => {
 const goRemoteDB = async () => {
     router.push({ name: 'MySQL-Remote' });
 };
-
-function isLocal() {
-    if (!currentDB.value) {
-        return false;
-    }
-    return currentDB.value.from === 'local';
-}
 
 const passwordRef = ref();
 
@@ -402,14 +380,9 @@ const loadDashboardPort = async () => {
 };
 
 const checkExist = (data: App.CheckInstalled) => {
-    mysqlIsExist.value = data.isExist;
     mysqlStatus.value = data.status;
     mysqlVersion.value = data.version;
     mysqlContainer.value = data.containerName;
-    if (mysqlIsExist.value) {
-        search();
-        loadDashboardPort();
-    }
 };
 
 const loadDBOptions = async () => {
@@ -429,6 +402,13 @@ const loadDBOptions = async () => {
         currentDBName.value = dbOptionsLocal.value[0].database;
         appKey.value = dbOptionsLocal.value[0].type;
         appName.value = dbOptionsLocal.value[0].database;
+    }
+    if (!currentDB.value && dbOptionsRemote.value.length !== 0) {
+        currentDB.value = dbOptionsRemote.value[0];
+        currentDBName.value = dbOptionsRemote.value[0].database;
+    }
+    if (currentDB.value) {
+        search();
     }
 };
 
@@ -539,6 +519,7 @@ const buttons = [
 
 onMounted(() => {
     loadDBOptions();
+    loadDashboardPort();
 });
 </script>
 

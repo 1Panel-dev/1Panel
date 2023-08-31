@@ -9,14 +9,14 @@ import (
 )
 
 // @Tags Database
-// @Summary Create remote database
+// @Summary Create database
 // @Description 创建远程数据库
 // @Accept json
 // @Param request body dto.DatabaseCreate true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /databases/remote [post]
-// @x-panel-log {"bodyKeys":["name", "type"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建远程数据库 [name][type]","formatEN":"create remote database [name][type]"}
+// @Router /databases/db [post]
+// @x-panel-log {"bodyKeys":["name", "type"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建远程数据库 [name][type]","formatEN":"create database [name][type]"}
 func (b *BaseApi) CreateDatabase(c *gin.Context) {
 	var req dto.DatabaseCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -35,14 +35,14 @@ func (b *BaseApi) CreateDatabase(c *gin.Context) {
 }
 
 // @Tags Database
-// @Summary Check remote database
+// @Summary Check database
 // @Description 检测远程数据库连接性
 // @Accept json
 // @Param request body dto.DatabaseCreate true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /databases/remote/check [post]
-// @x-panel-log {"bodyKeys":["name", "type"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"检测远程数据库 [name][type] 连接性","formatEN":"check if remote database [name][type] is connectable"}
+// @Router /databases/db/check [post]
+// @x-panel-log {"bodyKeys":["name", "type"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"检测远程数据库 [name][type] 连接性","formatEN":"check if database [name][type] is connectable"}
 func (b *BaseApi) CheckDatabase(c *gin.Context) {
 	var req dto.DatabaseCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -57,13 +57,13 @@ func (b *BaseApi) CheckDatabase(c *gin.Context) {
 }
 
 // @Tags Database
-// @Summary Page remote databases
+// @Summary Page databases
 // @Description 获取远程数据库列表分页
 // @Accept json
 // @Param request body dto.DatabaseSearch true "request"
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
-// @Router /databases/remote/search [post]
+// @Router /databases/db/search [post]
 func (b *BaseApi) SearchDatabase(c *gin.Context) {
 	var req dto.DatabaseSearch
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -84,11 +84,11 @@ func (b *BaseApi) SearchDatabase(c *gin.Context) {
 }
 
 // @Tags Database
-// @Summary List remote databases
+// @Summary List databases
 // @Description 获取远程数据库列表
 // @Success 200 {array} dto.DatabaseOption
 // @Security ApiKeyAuth
-// @Router /databases/remote/list/:type [get]
+// @Router /databases/db/list/:type [get]
 func (b *BaseApi) ListDatabase(c *gin.Context) {
 	dbType, err := helper.GetStrParamByKey(c, "type")
 	if err != nil {
@@ -105,11 +105,11 @@ func (b *BaseApi) ListDatabase(c *gin.Context) {
 }
 
 // @Tags Database
-// @Summary Get remote databases
+// @Summary Get databases
 // @Description 获取远程数据库
 // @Success 200 {object} dto.DatabaseInfo
 // @Security ApiKeyAuth
-// @Router /databases/remote/:name [get]
+// @Router /databases/db/:name [get]
 func (b *BaseApi) GetDatabase(c *gin.Context) {
 	name, err := helper.GetStrParamByKey(c, "name")
 	if err != nil {
@@ -126,14 +126,14 @@ func (b *BaseApi) GetDatabase(c *gin.Context) {
 }
 
 // @Tags Database
-// @Summary Delete remote database
+// @Summary Delete database
 // @Description 删除远程数据库
 // @Accept json
 // @Param request body dto.OperateByID true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /databases/remote/del [post]
-// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"ids","isList":true,"db":"databases","output_column":"name","output_value":"names"}],"formatZH":"删除远程数据库 [names]","formatEN":"delete remote database [names]"}
+// @Router /databases/db/del [post]
+// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"ids","isList":true,"db":"databases","output_column":"name","output_value":"names"}],"formatZH":"删除远程数据库 [names]","formatEN":"delete database [names]"}
 func (b *BaseApi) DeleteDatabase(c *gin.Context) {
 	var req dto.OperateByID
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -153,14 +153,14 @@ func (b *BaseApi) DeleteDatabase(c *gin.Context) {
 }
 
 // @Tags Database
-// @Summary Update remote database
+// @Summary Update database
 // @Description 更新远程数据库
 // @Accept json
 // @Param request body dto.DatabaseUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /databases/remote/update [post]
-// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新远程数据库 [name]","formatEN":"update remote database [name]"}
+// @Router /databases/db/update [post]
+// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新远程数据库 [name]","formatEN":"update database [name]"}
 func (b *BaseApi) UpdateDatabase(c *gin.Context) {
 	var req dto.DatabaseUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {

@@ -317,7 +317,7 @@ const message = {
         delete: 'Delete operation cannot be rolled back, please input "',
         deleteHelper: '" to delete this database',
         create: 'Create database',
-        noMysql: 'No {0} database is detected, please go to App Store and click Install!',
+        noMysql: 'Database service (MySQL or MariaDB)',
         goInstall: 'Go to install',
         source: 'Source',
         permission: 'Permission',
