@@ -22,7 +22,7 @@
             }
         }
         &.is-active {
-            background-color: var(--el-menu-item-bg-color-active);;
+            background-color: var(--el-menu-item-bg-color-active);
             border: 2px solid $primary-color;
 
             &::before {
@@ -80,4 +80,8 @@
         background-color: var(--el-menu-bg-color) !important;
         padding: 4px 8px;
     }
+}
+
+.el-sub-menu__title {
+    padding-right: 0;
 }
