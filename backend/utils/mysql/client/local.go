@@ -20,13 +20,13 @@ import (
 
 type Local struct {
 	PrefixCommand []string
-	From          string
+	Database      string
 	Password      string
 	ContainerName string
 }
 
-func NewLocal(command []string, containerName, password, from string) *Local {
-	return &Local{PrefixCommand: command, ContainerName: containerName, Password: password, From: from}
+func NewLocal(command []string, containerName, password, database string) *Local {
+	return &Local{PrefixCommand: command, ContainerName: containerName, Password: password, Database: database}
 }
 
 func (r *Local) Create(info CreateInfo) error {
@@ -272,9 +272,10 @@ func (r *Local) SyncDB(version string) ([]SyncDBInfo, error) {
 			continue
 		}
 		dataItem := SyncDBInfo{
-			Name:   parts[0],
-			From:   r.From,
-			Format: parts[1],
+			Name:      parts[0],
+			From:      "local",
+			MysqlName: r.Database,
+			Format:    parts[1],
 		}
 		userLines, err := r.ExecSQLForRows(fmt.Sprintf("select user,host from mysql.db where db = '%s'", parts[0]), 300)
 		if err != nil {

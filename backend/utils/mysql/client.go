@@ -28,7 +28,7 @@ type MysqlClient interface {
 func NewMysqlClient(conn client.DBInfo) (MysqlClient, error) {
 	if conn.From == "local" {
 		connArgs := []string{"exec", conn.Address, "mysql", "-u" + conn.Username, "-p" + conn.Password, "-e"}
-		return client.NewLocal(connArgs, conn.Address, conn.Password, conn.From), nil
+		return client.NewLocal(connArgs, conn.Address, conn.Password, conn.Database), nil
 	}
 
 	connArgs := fmt.Sprintf("%s:%s@tcp(%s:%d)/?charset=utf8", conn.Username, conn.Password, conn.Address, conn.Port)
@@ -48,7 +48,7 @@ func NewMysqlClient(conn client.DBInfo) (MysqlClient, error) {
 
 	return client.NewRemote(client.Remote{
 		Client:   db,
-		From:     conn.From,
+		Database: conn.Database,
 		User:     conn.Username,
 		Password: conn.Password,
 		Address:  conn.Address,

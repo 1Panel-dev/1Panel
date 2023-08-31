@@ -8,6 +8,7 @@ import (
 
 type DBInfo struct {
 	From     string `json:"from"`
+	Database string `json:"database"`
 	Address  string `json:"address"`
 	Port     uint   `json:"port"`
 	Username string `json:"userName"`

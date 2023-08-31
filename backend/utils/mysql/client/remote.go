@@ -19,7 +19,7 @@ import (
 
 type Remote struct {
 	Client   *sql.DB
-	From     string
+	Database string
 	User     string
 	Password string
 	Address  string
@@ -283,8 +283,8 @@ func (r *Remote) SyncDB(version string) ([]SyncDBInfo, error) {
 		}
 		dataItem := SyncDBInfo{
 			Name:      dbName,
-			From:      r.From,
-			MysqlName: r.From,
+			From:      "remote",
+			MysqlName: r.Database,
 			Format:    charsetName,
 		}
 		userRows, err := r.Client.Query("select user,host from mysql.db where db = ?", dbName)
