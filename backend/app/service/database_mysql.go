@@ -135,15 +135,6 @@ func (u *MysqlService) LoadFromRemote(req dto.MysqlLodaDB) error {
 		return err
 	}
 
-	mysqlName := req.From
-	if req.From == "local" {
-		app, err := appInstallRepo.LoadBaseInfo(req.Type, req.Database)
-		if err != nil {
-			return err
-		}
-		mysqlName = app.Name
-	}
-
 	databases, err := mysqlRepo.List(databaseRepo.WithByFrom(req.From))
 	if err != nil {
 		return err
@@ -165,7 +156,6 @@ func (u *MysqlService) LoadFromRemote(req dto.MysqlLodaDB) error {
 			if err := copier.Copy(&createItem, &data); err != nil {
 				return errors.WithMessage(constant.ErrStructTransform, err.Error())
 			}
-			createItem.MysqlName = mysqlName
 			if err := mysqlRepo.Create(context.Background(), &createItem); err != nil {
 				return err
 			}
@@ -626,6 +616,7 @@ func LoadMysqlClientByFrom(database string) (mysql.MysqlClient, string, error) {
 		return nil, "", err
 	}
 	dbInfo.From = databaseItem.From
+	dbInfo.Database = database
 	if dbInfo.From != "local" {
 		dbInfo.Address = databaseItem.Address
 		dbInfo.Port = databaseItem.Port
