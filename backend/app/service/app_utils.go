@@ -81,11 +81,47 @@ func checkPort(key string, params map[string]interface{}) (int, error) {
 	return 0, nil
 }
 
+var DatabaseKeys = map[string]bool{
+	"mysql":      true,
+	"mariadb":    true,
+	"postgresql": true,
+	"mongodb":    true,
+	"redis":      true,
+	"memcached":  true,
+}
+
 func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall, params map[string]interface{}) error {
 	var dbConfig dto.AppDatabase
-	if app.Type == "runtime" {
+	if app.Type == "runtime" && DatabaseKeys[app.Key] {
+		database := &model.Database{
+			AppInstallID: appInstall.ID,
+			Name:         appInstall.Name,
+			Type:         app.Key,
+			Version:      appInstall.Version,
+			From:         "local",
+			Address:      appInstall.ServiceName,
+		}
+		detail, err := appDetailRepo.GetFirst(commonRepo.WithByID(appInstall.AppDetailId))
+		if err != nil {
+			return err
+		}
+
+		formFields := &dto.AppForm{}
+		if err := json.Unmarshal([]byte(detail.Params), formFields); err != nil {
+			return err
+		}
+		for _, form := range formFields.FormFields {
+			if form.EnvKey == "PANEL_APP_PORT_HTTP" {
+				portFloat, ok := form.Default.(float64)
+				if ok {
+					database.Port = uint(int(portFloat))
+				}
+				break
+			}
+		}
+
 		switch app.Key {
-		case "mysql", "mariadb", "postgresql":
+		case "mysql", "mariadb", "postgresql", "mongodb":
 			if password, ok := params["PANEL_DB_ROOT_PASSWORD"]; ok {
 				if password != "" {
 					authParam := dto.AuthParam{
@@ -96,24 +132,14 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 						return err
 					}
 					appInstall.Param = string(authByte)
+					database.Password = password.(string)
 					if app.Key == "mysql" || app.Key == "mariadb" {
-						database := &model.Database{
-							AppInstallID: appInstall.ID,
-							Name:         appInstall.Name,
-							Type:         app.Key,
-							Version:      appInstall.Version,
-							From:         "local",
-							Address:      appInstall.ServiceName,
-							Username:     "root",
-							Password:     password.(string),
-							Port:         3306,
-						}
-						if err := databaseRepo.Create(ctx, database); err != nil {
-							return err
-						}
+						database.Username = "root"
+					}
+					if rootUser, ok := params["PANEL_DB_ROOT_USER"]; ok {
+						database.Username = rootUser.(string)
 					}
 				}
-
 			}
 		case "redis":
 			if password, ok := params["PANEL_REDIS_ROOT_PASSWORD"]; ok {
@@ -127,7 +153,11 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 					}
 					appInstall.Param = string(authByte)
 				}
+				database.Password = password.(string)
 			}
+		}
+		if err := databaseRepo.Create(ctx, database); err != nil {
+			return err
 		}
 	}
 	if app.Type == "website" || app.Type == "tool" {
@@ -264,6 +294,7 @@ func deleteLink(ctx context.Context, install *model.AppInstall, deleteDB bool, f
 			if err := mysqlService.Delete(ctx, dto.MysqlDBDelete{
 				ID:          database.ID,
 				ForceDelete: forceDelete,
+				Database:    database.MysqlName,
 			}); err != nil && !forceDelete {
 				return err
 			}
@@ -519,6 +550,8 @@ func handleMap(params map[string]interface{}, envParams map[string]string) {
 			envParams[k] = t
 		case float64:
 			envParams[k] = strconv.FormatFloat(t, 'f', -1, 32)
+		case uint:
+			envParams[k] = strconv.Itoa(int(t))
 		default:
 			envParams[k] = t.(string)
 		}

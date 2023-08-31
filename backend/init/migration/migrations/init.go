@@ -663,3 +663,18 @@ var UpdateDatabase = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var UpdateAppInstallResource = &gormigrate.Migration{
+	ID: "20230831-update-app_install_resource",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.AppInstallResource{}); err != nil {
+			return err
+		}
+		if err := global.DB.Model(&model.AppInstallResource{}).Where("1 = 1").Updates(map[string]interface{}{
+			"from": "local",
+		}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
