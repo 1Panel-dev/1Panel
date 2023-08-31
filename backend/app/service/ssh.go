@@ -18,6 +18,8 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/1Panel-dev/1Panel/backend/utils/qqwry"
+	"github.com/1Panel-dev/1Panel/backend/utils/systemctl"
+	"github.com/pkg/errors"
 )
 
 const sshPath = "/etc/ssh/sshd_config"
@@ -51,19 +53,20 @@ func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 		PermitRootLogin:        "yes",
 		UseDNS:                 "yes",
 	}
-	sudo := cmd.SudoHandleCmd()
-	stdout, err := cmd.Execf("%s systemctl status sshd", sudo)
+	serviceName, err := loadServiceName()
 	if err != nil {
-		data.Message = stdout
 		data.Status = constant.StatusDisable
-	}
-	stdLines := strings.Split(stdout, "\n")
-	for _, stdline := range stdLines {
-		if strings.Contains(stdline, "active (running)") {
+		data.Message = err.Error()
+	} else {
+		active, err := systemctl.IsActive(serviceName)
+		if !active {
+			data.Status = constant.StatusDisable
+			data.Message = err.Error()
+		} else {
 			data.Status = constant.StatusEnable
-			break
 		}
 	}
+
 	sshConf, err := os.ReadFile(sshPath)
 	if err != nil {
 		data.Message = err.Error()
@@ -95,10 +98,14 @@ func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 
 func (u *SSHService) OperateSSH(operation string) error {
 	if operation == "start" || operation == "stop" || operation == "restart" {
-		sudo := cmd.SudoHandleCmd()
-		stdout, err := cmd.Execf("%s systemctl %s sshd", sudo, operation)
+		serviceName, err := loadServiceName()
 		if err != nil {
-			return fmt.Errorf("%s sshd failed, stdout: %s, err: %v", operation, stdout, err)
+			return err
+		}
+		sudo := cmd.SudoHandleCmd()
+		stdout, err := cmd.Execf("%s systemctl %s %s", sudo, operation, serviceName)
+		if err != nil {
+			return fmt.Errorf("%s %s failed, stdout: %s, err: %v", operation, serviceName, stdout, err)
 		}
 		return nil
 	}
@@ -106,6 +113,11 @@ func (u *SSHService) OperateSSH(operation string) error {
 }
 
 func (u *SSHService) Update(key, value string) error {
+	serviceName, err := loadServiceName()
+	if err != nil {
+		return err
+	}
+
 	sshConf, err := os.ReadFile(sshPath)
 	if err != nil {
 		return err
@@ -130,11 +142,17 @@ func (u *SSHService) Update(key, value string) error {
 			_, _ = cmd.Execf("%s semanage port -a -t ssh_port_t -p tcp %s", sudo, value)
 		}
 	}
-	_, _ = cmd.Execf("%s systemctl restart sshd", sudo)
+
+	_, _ = cmd.Execf("%s systemctl restart %s", sudo, serviceName)
 	return nil
 }
 
 func (u *SSHService) UpdateByFile(value string) error {
+	serviceName, err := loadServiceName()
+	if err != nil {
+		return err
+	}
+
 	file, err := os.OpenFile(sshPath, os.O_WRONLY|os.O_TRUNC, 0666)
 	if err != nil {
 		return err
@@ -144,7 +162,7 @@ func (u *SSHService) UpdateByFile(value string) error {
 		return err
 	}
 	sudo := cmd.SudoHandleCmd()
-	_, _ = cmd.Execf("%s systemctl restart sshd", sudo)
+	_, _ = cmd.Execf("%s systemctl restart %s", sudo, serviceName)
 	return nil
 }
 
@@ -457,4 +475,13 @@ func handleGunzip(path string) error {
 		return err
 	}
 	return nil
+}
+
+func loadServiceName() (string, error) {
+	if exist, _ := systemctl.IsExist("sshd"); exist {
+		return "sshd", nil
+	} else if exist, _ := systemctl.IsExist("ssh"); exist {
+		return "ssh", nil
+	}
+	return "", errors.New("The ssh or sshd service is unavailable")
 }
