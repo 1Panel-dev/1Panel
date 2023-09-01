@@ -374,9 +374,10 @@ const onLoadCurrentInfo = async () => {
     const res = await loadCurrentInfo(searchInfo.ioOption, searchInfo.netOption);
     currentInfo.value.timeSinceUptime = res.data.timeSinceUptime;
 
+    let timeInterval = Number(res.data.uptime - currentInfo.value.uptime) || 3;
     currentChartInfo.netBytesSent =
         res.data.netBytesSent - currentInfo.value.netBytesSent > 0
-            ? Number(((res.data.netBytesSent - currentInfo.value.netBytesSent) / 1024 / 3).toFixed(2))
+            ? Number(((res.data.netBytesSent - currentInfo.value.netBytesSent) / 1024 / timeInterval).toFixed(2))
             : 0;
     netBytesSents.value.push(currentChartInfo.netBytesSent);
     if (netBytesSents.value.length > 20) {
@@ -385,7 +386,7 @@ const onLoadCurrentInfo = async () => {
 
     currentChartInfo.netBytesRecv =
         res.data.netBytesRecv - currentInfo.value.netBytesRecv > 0
-            ? Number(((res.data.netBytesRecv - currentInfo.value.netBytesRecv) / 1024 / 3).toFixed(2))
+            ? Number(((res.data.netBytesRecv - currentInfo.value.netBytesRecv) / 1024 / timeInterval).toFixed(2))
             : 0;
     netBytesRecvs.value.push(currentChartInfo.netBytesRecv);
     if (netBytesRecvs.value.length > 20) {
@@ -394,7 +395,7 @@ const onLoadCurrentInfo = async () => {
 
     currentChartInfo.ioReadBytes =
         res.data.ioReadBytes - currentInfo.value.ioReadBytes > 0
-            ? Number(((res.data.ioReadBytes - currentInfo.value.ioReadBytes) / 1024 / 1024 / 3).toFixed(2))
+            ? Number(((res.data.ioReadBytes - currentInfo.value.ioReadBytes) / 1024 / 1024 / timeInterval).toFixed(2))
             : 0;
     ioReadBytes.value.push(currentChartInfo.ioReadBytes);
     if (ioReadBytes.value.length > 20) {
@@ -403,17 +404,17 @@ const onLoadCurrentInfo = async () => {
 
     currentChartInfo.ioWriteBytes =
         res.data.ioWriteBytes - currentInfo.value.ioWriteBytes > 0
-            ? Number(((res.data.ioWriteBytes - currentInfo.value.ioWriteBytes) / 1024 / 1024 / 3).toFixed(2))
+            ? Number(((res.data.ioWriteBytes - currentInfo.value.ioWriteBytes) / 1024 / 1024 / timeInterval).toFixed(2))
             : 0;
     ioWriteBytes.value.push(currentChartInfo.ioWriteBytes);
     if (ioWriteBytes.value.length > 20) {
         ioWriteBytes.value.splice(0, 1);
     }
-    currentChartInfo.ioCount = Math.round(Number((res.data.ioCount - currentInfo.value.ioCount) / 3));
+    currentChartInfo.ioCount = Math.round(Number((res.data.ioCount - currentInfo.value.ioCount) / timeInterval));
     let ioReadTime = res.data.ioReadTime - currentInfo.value.ioReadTime;
     let ioWriteTime = res.data.ioWriteTime - currentInfo.value.ioWriteTime;
     let ioChoose = ioReadTime > ioWriteTime ? ioReadTime : ioWriteTime;
-    currentChartInfo.ioTime = Math.round(Number(ioChoose / 3));
+    currentChartInfo.ioTime = Math.round(Number(ioChoose / timeInterval));
 
     timeIODatas.value.push(dateFormatForSecond(res.data.shotTime));
     if (timeIODatas.value.length > 20) {
