@@ -354,7 +354,6 @@ const message = {
         localDB: 'Local DB',
         address: 'DB address',
         version: 'DB version',
-        versionHelper: 'Currently, only versions {0} are supported',
         userHelper: 'The root user or a database user with root privileges can access the remote database.',
 
         selectFile: 'Select file',
@@ -963,10 +962,11 @@ const message = {
         panel: 'Panel',
         userChange: 'Change username',
         userChangeHelper: 'Change the user name to log out. Do you want to continue?',
+        user: 'User Name',
         passwd: 'Password',
         emailHelper: 'For password retrieval',
-        title: 'Panel alias',
-        panelPort: 'Panel port',
+        title: 'Panel Alias',
+        panelPort: 'Panel Port',
         portHelper:
             'The recommended port range is 8888 to 65535. Note: If the server has a security group, permit the new port from the security group in advance',
         portChange: 'Port change',
@@ -983,7 +983,7 @@ const message = {
             'If you do not operate the panel for more than {0} seconds, the panel automatically logs out',
         systemIP: 'System Address',
         systemIPWarning: 'The server address is not currently set. Please set it in the control panel first!',
-        syncTime: 'Server time',
+        syncTime: 'Server Time',
         timeZone: 'Time Zone',
         timeZoneChangeHelper: 'Changing the time zone requires restarting the service. Do you want to continue?',
         timeZoneHelper:
@@ -1060,11 +1060,11 @@ const message = {
         expiredHelper: 'The current password has expired. Please change the password again.',
         timeoutHelper:
             '[ {0} days ] The panel password is about to expire. After the expiration, you need to reset the password',
-        complexity: 'Complexity verification',
+        complexity: 'Complexity Verification',
         complexityHelper:
             'The password must contain at least eight characters and contain at least three uppercase letters, lowercase letters, digits, and special characters',
 
-        bindDomain: 'Bind domain',
+        bindDomain: 'Bind Domain',
         unBindDomain: 'Unbind domain',
         unBindDomainHelper:
             'The action of unbinding a domain name may cause system insecurity. Do you want to continue?',

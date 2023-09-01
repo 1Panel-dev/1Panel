@@ -51,8 +51,8 @@
                             <span class="input-help">{{ $t('database.remoteHelper') }}</span>
                         </el-form-item>
 
-                        <el-form-item :label="$t('commons.table.type')" prop="from">
-                            <el-tag>{{ loadLabel(form.from) }}</el-tag>
+                        <el-form-item :label="$t('commons.table.type')" prop="database">
+                            <el-tag>{{ form.database + ' [' + form.type + ']' }}</el-tag>
                         </el-form-item>
 
                         <el-form-item :label="$t('commons.table.description')" prop="description">
@@ -91,6 +91,7 @@ const createVisiable = ref(false);
 const form = reactive({
     name: '',
     from: 'local',
+    type: '',
     database: '',
     format: '',
     username: '',
@@ -111,11 +112,13 @@ const formRef = ref<FormInstance>();
 
 interface DialogProps {
     from: string;
+    type: string;
     database: string;
 }
 const acceptParams = (params: DialogProps): void => {
     form.name = '';
     form.from = params.from;
+    form.type = params.type;
     form.database = params.database;
     form.format = 'utf8mb4';
     form.username = '';
@@ -128,10 +131,6 @@ const acceptParams = (params: DialogProps): void => {
 const handleClose = () => {
     createVisiable.value = false;
 };
-
-function loadLabel(from: any) {
-    return from === 'local' ? i18n.global.t('database.localDB') : from;
-}
 
 const random = async () => {
     form.password = getRandomStr(16);
