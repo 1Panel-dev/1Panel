@@ -121,7 +121,7 @@
                                 </span>
                             </el-form-item>
 
-                            <el-form-item label="https" prop="ssl">
+                            <el-form-item label="HTTPS" prop="ssl">
                                 <el-switch
                                     @change="handleSSL"
                                     v-model="form.ssl"

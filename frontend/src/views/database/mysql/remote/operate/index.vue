@@ -20,28 +20,20 @@
                         <el-tag v-else>{{ dialogData.rowData!.name }}</el-tag>
                     </el-form-item>
                     <el-form-item :label="$t('commons.table.type')" prop="type">
-                        <el-select v-model="dialogData.rowData!.type" @change="changeType">
-                            <div>
-                                <el-option value="mysql" label="MySQL" />
-                                <el-option value="mariadb" label="Mariadb" />
-                            </div>
-                        </el-select>
+                        <el-radio-group v-model="dialogData.rowData!.type" @change="changeType">
+                            <el-radio-button label="mysql">MySQL</el-radio-button>
+                            <el-radio-button label="mariadb">MariaDB</el-radio-button>
+                        </el-radio-group>
                     </el-form-item>
                     <el-form-item :label="$t('database.version')" prop="version">
-                        <el-select @change="isOK = false" v-model="dialogData.rowData!.version">
+                        <el-radio-group v-model="dialogData.rowData!.version" @change="isOK = false">
                             <div v-if="dialogData.rowData!.type === 'mysql'">
-                                <el-option value="5.6" label="5.6" />
-                                <el-option value="5.7" label="5.7" />
-                                <el-option value="8.x" label="8.x" />
+                                <el-radio label="8.x" />
+                                <el-radio label="5.7" />
+                                <el-radio label="5.6" />
                             </div>
-                            <el-option v-else value="10.x" label="10.x" />
-                        </el-select>
-                        <span v-if="dialogData.rowData!.type === 'mysql'" class="input-help">
-                            {{ $t('database.versionHelper', ['5.6 5.7 8.x']) }}
-                        </span>
-                        <span v-else class="input-help">
-                            {{ $t('database.versionHelper', ['10.x']) }}
-                        </span>
+                            <el-radio v-else label="10.x" />
+                        </el-radio-group>
                     </el-form-item>
                     <el-form-item :label="$t('database.address')" prop="address">
                         <el-input @change="isOK = false" clearable v-model.trim="dialogData.rowData!.address" />
@@ -118,6 +110,7 @@ const handleClose = () => {
 
 const rules = reactive({
     name: [Rules.requiredInput],
+    type: [Rules.requiredSelect],
     version: [Rules.requiredSelect],
     address: [Rules.host],
     port: [Rules.port],

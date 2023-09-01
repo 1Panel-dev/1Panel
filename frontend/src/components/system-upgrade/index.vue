@@ -38,11 +38,11 @@
         </template>
         <div class="panel-MdEditor">
             <el-alert :closable="false">
-                {{ $t('setting.versionHelper') }}
-                <li>{{ $t('setting.versionHelper1') }}</li>
-                <li>{{ $t('setting.versionHelper2') }}</li>
+                <span class="line-heigth">{{ $t('setting.versionHelper') }}</span>
+                <li class="line-heigth">{{ $t('setting.versionHelper1') }}</li>
+                <li class="line-heigth">{{ $t('setting.versionHelper2') }}</li>
             </el-alert>
-            <div class="default-theme">
+            <div class="default-theme" style="margin-left: 20px">
                 <h2 class="inline-block">{{ $t('app.version') }}</h2>
             </div>
             <el-radio-group class="inline-block tag" v-model="upgradeVersion" @change="changeOption">
@@ -158,18 +158,21 @@ onMounted(() => {
     text-decoration: none;
     letter-spacing: 0.5px;
 }
+.line-heigth {
+    line-height: 25px;
+}
 .panel-MdEditor {
     height: calc(100vh - 330px);
-    margin-left: 70px;
     .tag {
         margin-top: -6px;
+        margin-left: 20px;
         vertical-align: middle;
     }
     :deep(.md-editor-preview) {
         font-size: 14px;
     }
     :deep(.default-theme h2) {
-        margin: 13px 0;
+        margin: 13px, 0;
         padding: 0;
         font-size: 16px;
     }

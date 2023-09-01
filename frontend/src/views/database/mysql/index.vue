@@ -30,7 +30,7 @@
                             <el-option
                                 v-if="item.from === 'local'"
                                 :value="item.database"
-                                :label="item.type + ' [' + item.database + ']'"
+                                :label="item.database + ' [' + item.type + ']'"
                             ></el-option>
                         </div>
                     </el-option-group>
@@ -39,7 +39,7 @@
                             <el-option
                                 v-if="item.from === 'remote'"
                                 :value="item.database"
-                                :label="item.type + ' [' + item.database + ']'"
+                                :label="item.database + ' [' + item.type + ']'"
                             ></el-option>
                         </div>
                     </el-option-group>
@@ -267,6 +267,7 @@ const dialogRef = ref();
 const onOpenDialog = async () => {
     let params = {
         from: currentDB.value.from,
+        type: currentDB.value.type,
         database: currentDBName.value,
     };
     dialogRef.value!.acceptParams(params);

@@ -135,7 +135,7 @@ const onOpenDialog = async (
     rowData: Partial<Database.DatabaseInfo> = {
         name: '',
         type: 'mysql',
-        version: '5.6',
+        version: '8.x',
         address: '',
         port: 3306,
         username: 'root',
