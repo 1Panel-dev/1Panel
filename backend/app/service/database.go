@@ -2,9 +2,11 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/backend/utils/mysql"
 	"github.com/1Panel-dev/1Panel/backend/utils/mysql/client"
 	"github.com/jinzhu/copier"
@@ -136,12 +138,17 @@ func (u *DatabaseService) Update(req dto.DatabaseUpdate) error {
 		return err
 	}
 
+	pass, err := encrypt.StringEncrypt(req.Password)
+	if err != nil {
+		return fmt.Errorf("decrypt database password failed, err: %v", err)
+	}
+
 	upMap := make(map[string]interface{})
 	upMap["version"] = req.Version
 	upMap["address"] = req.Address
 	upMap["port"] = req.Port
 	upMap["username"] = req.Username
-	upMap["password"] = req.Password
+	upMap["password"] = pass
 	upMap["description"] = req.Description
 	return databaseRepo.Update(req.ID, upMap)
 }

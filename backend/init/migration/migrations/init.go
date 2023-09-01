@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
@@ -582,52 +583,97 @@ var AddTableFirewall = &gormigrate.Migration{
 	},
 }
 
-var AddMariaDB = &gormigrate.Migration{
-	ID: "20230828-add-mariadb",
+var AddDatabases = &gormigrate.Migration{
+	ID: "20230831-add-databases",
 	Migrate: func(tx *gorm.DB) error {
-		var (
-			app        model.App
-			appInstall model.AppInstall
-		)
-		if err := tx.AutoMigrate(&model.Database{}); err != nil {
-			return err
-		}
-		if err := global.DB.Where("key = ?", "mariadb").First(&app).Error; err != nil {
-			return nil
-		}
-		if err := global.DB.Where("app_id = ?", app.ID).First(&appInstall).Error; err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return nil
+		installRepo := repo.NewIAppInstallRepo()
+		mariadbInfo, err := installRepo.LoadBaseInfo("mariadb", "")
+		if err == nil {
+			if err := tx.Create(&model.Database{
+				AppInstallID: mariadbInfo.ID,
+				Name:         mariadbInfo.Name,
+				Type:         "mariadb",
+				Version:      mariadbInfo.Version,
+				From:         "local",
+				Address:      mariadbInfo.ServiceName,
+				Port:         uint(mariadbInfo.Port),
+				Username:     "root",
+				Password:     mariadbInfo.Password,
+			}).Error; err != nil {
+				return err
 			}
-			return err
 		}
-		envMap := make(map[string]interface{})
-		if err := json.Unmarshal([]byte(appInstall.Env), &envMap); err != nil {
-			return err
+		redisInfo, err := installRepo.LoadBaseInfo("redis", "")
+		if err == nil {
+			if err := tx.Create(&model.Database{
+				AppInstallID: redisInfo.ID,
+				Name:         redisInfo.Name,
+				Type:         "mariadb",
+				Version:      redisInfo.Version,
+				From:         "local",
+				Address:      redisInfo.ServiceName,
+				Port:         uint(redisInfo.Port),
+				Username:     "root",
+				Password:     redisInfo.Password,
+			}).Error; err != nil {
+				return err
+			}
 		}
-		password, ok := envMap["PANEL_DB_ROOT_PASSWORD"].(string)
-		if !ok {
-			return errors.New("error password in app env")
+		pgInfo, err := installRepo.LoadBaseInfo("postgresql", "")
+		if err == nil {
+			if err := tx.Create(&model.Database{
+				AppInstallID: pgInfo.ID,
+				Name:         pgInfo.Name,
+				Type:         "mariadb",
+				Version:      pgInfo.Version,
+				From:         "local",
+				Address:      pgInfo.ServiceName,
+				Port:         uint(pgInfo.Port),
+				Username:     "root",
+				Password:     pgInfo.Password,
+			}).Error; err != nil {
+				return err
+			}
 		}
-		if err := tx.Create(&model.Database{
-			AppInstallID: appInstall.ID,
-			Name:         appInstall.Name,
-			Type:         "mariadb",
-			Version:      appInstall.Version,
-			From:         "local",
-			Address:      appInstall.ServiceName,
-			Port:         uint(appInstall.HttpPort),
-			Username:     "root",
-			Password:     password,
-		}).Error; err != nil {
-			return err
+		mongodbInfo, err := installRepo.LoadBaseInfo("mongodb", "")
+		if err == nil {
+			if err := tx.Create(&model.Database{
+				AppInstallID: mongodbInfo.ID,
+				Name:         mongodbInfo.Name,
+				Type:         "mariadb",
+				Version:      mongodbInfo.Version,
+				From:         "local",
+				Address:      mongodbInfo.ServiceName,
+				Port:         uint(mongodbInfo.Port),
+				Username:     "root",
+				Password:     mongodbInfo.Password,
+			}).Error; err != nil {
+				return err
+			}
 		}
+		memcachedInfo, err := installRepo.LoadBaseInfo("memcached", "")
+		if err == nil {
+			if err := tx.Create(&model.Database{
+				AppInstallID: memcachedInfo.ID,
+				Name:         memcachedInfo.Name,
+				Type:         "mariadb",
+				Version:      memcachedInfo.Version,
+				From:         "local",
+				Address:      memcachedInfo.ServiceName,
+				Port:         uint(memcachedInfo.Port),
+				Username:     "root",
+				Password:     memcachedInfo.Password,
+			}).Error; err != nil {
+				return err
+			}
+		}
+
 		return nil
 	},
 }
 
 var UpdateDatabase = &gormigrate.Migration{
-	ID: "20230829-update-database",
+	ID: "20230831-update-database",
 	Migrate: func(tx *gorm.DB) error {
 		if err := global.DB.Model(&model.DatabaseMysql{}).Where("`from` != ?", "local").Updates(map[string]interface{}{
 			"from": "remote",
@@ -635,30 +681,59 @@ var UpdateDatabase = &gormigrate.Migration{
 			return err
 		}
 
-		var (
-			appMysql        model.App
-			appInstallMysql model.AppInstall
-			localDatabase   model.Database
-		)
-		_ = global.DB.Where("name = ? AND address = ?", "local", "127.0.0.1").First(&localDatabase).Error
-		if localDatabase.ID == 0 {
+		var datas []model.Database
+		if err := global.DB.Find(&datas).Error; err != nil {
 			return nil
 		}
-		if err := global.DB.Where("key = ?", "mysql").First(&appMysql).Error; err != nil {
-			return nil
-		}
-		if err := global.DB.Where("app_id = ?", appMysql.ID).First(&appInstallMysql).Error; err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return nil
+		for _, data := range datas {
+			if data.Name == "local" && data.Address == "127.0.0.1" && data.Type == "mysql" {
+				installRepo := repo.NewIAppInstallRepo()
+				mysqlInfo, err := installRepo.LoadBaseInfo("mysql", "")
+				if err != nil {
+					continue
+				}
+				pass, err := encrypt.StringEncrypt(data.Password)
+				if err != nil {
+					global.LOG.Errorf("encrypt database %s password failed, err: %v", data.Name, err)
+					continue
+				}
+				if err := global.DB.Model(&model.Database{}).Where("id = ?", data.ID).Updates(map[string]interface{}{
+					"app_install_id": mysqlInfo.ID,
+					"name":           mysqlInfo.Name,
+					"password":       pass,
+					"address":        mysqlInfo.ServiceName,
+				}).Error; err != nil {
+					global.LOG.Errorf("updata database %s info failed, err: %v", data.Name, err)
+				}
+			} else {
+				pass, err := encrypt.StringEncrypt(data.Password)
+				if err != nil {
+					global.LOG.Errorf("encrypt database %s password failed, err: %v", data.Name, err)
+					continue
+				}
+				if err := global.DB.Model(&model.Database{}).Where("id = ?", data.ID).Updates(map[string]interface{}{
+					"password": pass,
+				}).Error; err != nil {
+					global.LOG.Errorf("updata database %s info failed, err: %v", data.Name, err)
+				}
 			}
-			return err
 		}
-		if err := global.DB.Model(&model.Database{}).Where("id = ?", localDatabase.ID).Updates(map[string]interface{}{
-			"app_install_id": appInstallMysql.ID,
-			"name":           appInstallMysql.Name,
-			"address":        appInstallMysql.ServiceName,
-		}).Error; err != nil {
-			return err
+
+		var mysqls []model.DatabaseMysql
+		if err := global.DB.Find(&mysqls).Error; err != nil {
+			return nil
+		}
+		for _, data := range mysqls {
+			pass, err := encrypt.StringEncrypt(data.Password)
+			if err != nil {
+				global.LOG.Errorf("encrypt database db %s password failed, err: %v", data.Name, err)
+				continue
+			}
+			if err := global.DB.Model(&model.DatabaseMysql{}).Where("id = ?", data.ID).Updates(map[string]interface{}{
+				"password": pass,
+			}).Error; err != nil {
+				global.LOG.Errorf("updata database db %s info failed, err: %v", data.Name, err)
+			}
 		}
 		return nil
 	},
