@@ -21,6 +21,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
+	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/backend/utils/mysql"
 	"github.com/1Panel-dev/1Panel/backend/utils/mysql/client"
 	_ "github.com/go-sql-driver/mysql"
@@ -301,7 +302,11 @@ func (u *MysqlService) ChangePassword(req dto.ChangeDBInfo) error {
 			}
 		}
 		global.LOG.Info("excute password change sql successful")
-		_ = mysqlRepo.Update(mysqlData.ID, map[string]interface{}{"password": req.Value})
+		pass, err := encrypt.StringEncrypt(req.Value)
+		if err != nil {
+			return fmt.Errorf("decrypt database db password failed, err: %v", err)
+		}
+		_ = mysqlRepo.Update(mysqlData.ID, map[string]interface{}{"password": pass})
 		return nil
 	}
 

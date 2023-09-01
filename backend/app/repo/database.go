@@ -2,10 +2,12 @@ package repo
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
 	"gorm.io/gorm"
 )
 
@@ -34,20 +36,36 @@ func (d *DatabaseRepo) Get(opts ...DBOption) (model.Database, error) {
 	for _, opt := range opts {
 		db = opt(db)
 	}
-	err := db.First(&database).Error
-	return database, err
+	if err := db.First(&database).Error; err != nil {
+		return database, err
+	}
+	pass, err := encrypt.StringDecrypt(database.Password)
+	if err != nil {
+		global.LOG.Errorf("decrypt database %s password failed, err: %v", database.Name, err)
+	}
+	database.Password = pass
+	return database, nil
 }
 
 func (d *DatabaseRepo) Page(page, size int, opts ...DBOption) (int64, []model.Database, error) {
-	var users []model.Database
+	var databases []model.Database
 	db := global.DB.Model(&model.Database{})
 	for _, opt := range opts {
 		db = opt(db)
 	}
 	count := int64(0)
 	db = db.Count(&count)
-	err := db.Limit(size).Offset(size * (page - 1)).Find(&users).Error
-	return count, users, err
+	if err := db.Limit(size).Offset(size * (page - 1)).Find(&databases).Error; err != nil {
+		return count, databases, err
+	}
+	for i := 0; i < len(databases); i++ {
+		pass, err := encrypt.StringDecrypt(databases[i].Password)
+		if err != nil {
+			global.LOG.Errorf("decrypt database db %s password failed, err: %v", databases[i].Name, err)
+		}
+		databases[i].Password = pass
+	}
+	return count, databases, nil
 }
 
 func (d *DatabaseRepo) GetList(opts ...DBOption) ([]model.Database, error) {
@@ -56,8 +74,17 @@ func (d *DatabaseRepo) GetList(opts ...DBOption) ([]model.Database, error) {
 	for _, opt := range opts {
 		db = opt(db)
 	}
-	err := db.Find(&databases).Error
-	return databases, err
+	if err := db.Find(&databases).Error; err != nil {
+		return databases, err
+	}
+	for i := 0; i < len(databases); i++ {
+		pass, err := encrypt.StringDecrypt(databases[i].Password)
+		if err != nil {
+			global.LOG.Errorf("decrypt database db %s password failed, err: %v", databases[i].Name, err)
+		}
+		databases[i].Password = pass
+	}
+	return databases, nil
 }
 
 func (d *DatabaseRepo) WithByFrom(from string) DBOption {
@@ -94,6 +121,11 @@ func (d *DatabaseRepo) WithAppInstallID(appInstallID uint) DBOption {
 }
 
 func (d *DatabaseRepo) Create(ctx context.Context, database *model.Database) error {
+	pass, err := encrypt.StringEncrypt(database.Password)
+	if err != nil {
+		return fmt.Errorf("decrypt database db %s password failed, err: %v", database.Name, err)
+	}
+	database.Password = pass
 	return getTx(ctx).Create(database).Error
 }
 

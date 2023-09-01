@@ -39,7 +39,7 @@ func Init() {
 		migrations.UpdateRedisParam,
 		migrations.UpdateCronjobWithDb,
 		migrations.AddTableFirewall,
-		migrations.AddMariaDB,
+		migrations.AddDatabases,
 		migrations.UpdateDatabase,
 		migrations.UpdateAppInstallResource,
 	})
