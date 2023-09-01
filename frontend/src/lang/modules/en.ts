@@ -354,7 +354,7 @@ const message = {
         localDB: 'Local DB',
         address: 'DB address',
         version: 'DB version',
-        versionHelper: 'Currently, only versions 5.6, 5.7, and 8.0 are supported',
+        versionHelper: 'Currently, only versions {0} are supported',
         userHelper: 'The root user or a database user with root privileges can access the remote database.',
 
         selectFile: 'Select file',

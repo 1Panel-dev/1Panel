@@ -428,7 +428,7 @@ func (a *AppInstallService) SyncAll(systemInit bool) error {
 func (a *AppInstallService) GetServices(key string) ([]response.AppService, error) {
 	var res []response.AppService
 	if DatabaseKeys[key] {
-		dbs, _ := databaseRepo.GetList(databaseRepo.WithByFrom("local"), databaseRepo.WithType(key))
+		dbs, _ := databaseRepo.GetList(databaseRepo.WithByFrom("local"), commonRepo.WithByType(key))
 		if len(dbs) == 0 {
 			return res, nil
 		}
