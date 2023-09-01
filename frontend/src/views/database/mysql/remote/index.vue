@@ -121,7 +121,7 @@ const search = async (column?: any) => {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
         info: searchName.value,
-        type: 'mysql',
+        type: 'mysql,mariadb',
         orderBy: paginationConfig.orderBy,
         order: paginationConfig.order,
     };

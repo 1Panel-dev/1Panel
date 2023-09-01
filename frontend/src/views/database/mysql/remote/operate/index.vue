@@ -19,13 +19,29 @@
                         />
                         <el-tag v-else>{{ dialogData.rowData!.name }}</el-tag>
                     </el-form-item>
+                    <el-form-item :label="$t('commons.table.type')" prop="type">
+                        <el-select v-model="dialogData.rowData!.type" @change="changeType">
+                            <div>
+                                <el-option value="mysql" label="MySQL" />
+                                <el-option value="mariadb" label="Mariadb" />
+                            </div>
+                        </el-select>
+                    </el-form-item>
                     <el-form-item :label="$t('database.version')" prop="version">
                         <el-select @change="isOK = false" v-model="dialogData.rowData!.version">
-                            <el-option value="5.6" label="5.6" />
-                            <el-option value="5.7" label="5.7" />
-                            <el-option value="8.0" label="8.0" />
+                            <div v-if="dialogData.rowData!.type === 'mysql'">
+                                <el-option value="5.6" label="5.6" />
+                                <el-option value="5.7" label="5.7" />
+                                <el-option value="8.x" label="8.x" />
+                            </div>
+                            <el-option v-else value="10.x" label="10.x" />
                         </el-select>
-                        <span class="input-help">{{ $t('database.versionHelper') }}</span>
+                        <span v-if="dialogData.rowData!.type === 'mysql'" class="input-help">
+                            {{ $t('database.versionHelper', ['5.6 5.7 8.x']) }}
+                        </span>
+                        <span v-else class="input-help">
+                            {{ $t('database.versionHelper', ['10.x']) }}
+                        </span>
                     </el-form-item>
                     <el-form-item :label="$t('database.address')" prop="address">
                         <el-input @change="isOK = false" clearable v-model.trim="dialogData.rowData!.address" />
@@ -112,26 +128,19 @@ const rules = reactive({
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 
+const changeType = () => {
+    dialogData.value.rowData.version = dialogData.value.rowData.type === 'mysql' ? '5.6' : '10.x';
+    isOK.value = false;
+};
+
 const onSubmit = async (formEl: FormInstance | undefined, operation: string) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        let param = {
-            id: dialogData.value.rowData.id,
-            name: dialogData.value.rowData.name,
-            type: 'mysql',
-            version: dialogData.value.rowData.version,
-            from: 'remote',
-            address: dialogData.value.rowData.address,
-            port: dialogData.value.rowData.port,
-            username: dialogData.value.rowData.username,
-            password: dialogData.value.rowData.password,
-            description: dialogData.value.rowData.description,
-        };
+        dialogData.value.rowData.from = 'remote';
         loading.value = true;
-
         if (operation === 'check') {
-            await checkDatabase(param)
+            await checkDatabase(dialogData.value.rowData)
                 .then((res) => {
                     loading.value = false;
                     if (res.data) {
@@ -148,7 +157,7 @@ const onSubmit = async (formEl: FormInstance | undefined, operation: string) => 
         }
 
         if (operation === 'create') {
-            await addDatabase(param)
+            await addDatabase(dialogData.value.rowData)
                 .then(() => {
                     loading.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -160,7 +169,7 @@ const onSubmit = async (formEl: FormInstance | undefined, operation: string) => 
                 });
         }
         if (operation === 'edit') {
-            await editDatabase(param)
+            await editDatabase(dialogData.value.rowData)
                 .then(() => {
                     loading.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

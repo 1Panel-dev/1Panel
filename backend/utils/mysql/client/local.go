@@ -147,7 +147,7 @@ func (r *Local) ChangePassword(info PasswordChangeInfo) error {
 		for _, user := range userlist {
 			passwordChangeSql := fmt.Sprintf("set password for %s = password('%s')", user, info.Password)
 			if !strings.HasPrefix(info.Version, "5.7") && !strings.HasPrefix(info.Version, "5.6") {
-				passwordChangeSql = fmt.Sprintf("alter user %s identified by '%s';", user, info.Password)
+				passwordChangeSql = fmt.Sprintf("ALTER USER %s IDENTIFIED BY '%s';", user, info.Password)
 			}
 			if err := r.ExecSQL(passwordChangeSql, info.Timeout); err != nil {
 				return err

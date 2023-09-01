@@ -346,7 +346,7 @@ const message = {
         localDB: '本地数据库',
         address: '数据库地址',
         version: '数据库版本',
-        versionHelper: '当前仅支持 5.6 5.7 8.0 三个版本',
+        versionHelper: '当前仅支持 {0} 版本',
         userHelper: 'root 用户或者拥有 root 权限的数据库用户',
 
         selectFile: '选择文件',

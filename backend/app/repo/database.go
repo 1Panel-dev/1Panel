@@ -2,6 +2,8 @@ package repo
 
 import (
 	"context"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"gorm.io/gorm"
@@ -18,9 +20,8 @@ type IDatabaseRepo interface {
 	Get(opts ...DBOption) (model.Database, error)
 	WithByFrom(from string) DBOption
 	WithoutByFrom(from string) DBOption
-	WithByMysqlList() DBOption
 	WithAppInstallID(appInstallID uint) DBOption
-	WithType(dbType string) DBOption
+	WithTypeList(dbType string) DBOption
 }
 
 func NewIDatabaseRepo() IDatabaseRepo {
@@ -59,12 +60,6 @@ func (d *DatabaseRepo) GetList(opts ...DBOption) ([]model.Database, error) {
 	return databases, err
 }
 
-func (d *DatabaseRepo) WithByMysqlList() DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("type = ? OR type = ?", "mysql", "mariadb")
-	}
-}
-
 func (d *DatabaseRepo) WithByFrom(from string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("`from` = ?", from)
@@ -77,9 +72,18 @@ func (d *DatabaseRepo) WithoutByFrom(from string) DBOption {
 	}
 }
 
-func (d *DatabaseRepo) WithType(dbType string) DBOption {
+func (d *DatabaseRepo) WithTypeList(dbType string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("`type` = ?", dbType)
+		types := strings.Split(dbType, ",")
+		if len(types) == 1 {
+			return g.Where("`type` = ?", dbType)
+		}
+		for _, ty := range types {
+			if len(ty) != 0 {
+				g.Or("`type` = ?", ty)
+			}
+		}
+		return g
 	}
 }
 

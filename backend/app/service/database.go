@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
-	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/mysql"
 	"github.com/1Panel-dev/1Panel/backend/utils/mysql/client"
@@ -30,7 +29,7 @@ func NewIDatabaseService() IDatabaseService {
 
 func (u *DatabaseService) SearchWithPage(search dto.DatabaseSearch) (int64, interface{}, error) {
 	total, dbs, err := databaseRepo.Page(search.Page, search.PageSize,
-		commonRepo.WithByType(search.Type),
+		databaseRepo.WithTypeList(search.Type),
 		commonRepo.WithLikeName(search.Info),
 		databaseRepo.WithoutByFrom("local"),
 	)
@@ -58,13 +57,7 @@ func (u *DatabaseService) Get(name string) (dto.DatabaseInfo, error) {
 }
 
 func (u *DatabaseService) List(dbType string) ([]dto.DatabaseOption, error) {
-	var opts []repo.DBOption
-	if dbType == "mysql" {
-		opts = append(opts, databaseRepo.WithByMysqlList())
-	} else {
-		opts = append(opts, commonRepo.WithByType(dbType))
-	}
-	dbs, err := databaseRepo.GetList(opts...)
+	dbs, err := databaseRepo.GetList(databaseRepo.WithTypeList(dbType))
 	var datas []dto.DatabaseOption
 	for _, db := range dbs {
 		var item dto.DatabaseOption

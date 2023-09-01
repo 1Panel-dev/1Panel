@@ -346,7 +346,7 @@ const message = {
         localDB: '本地數據庫',
         address: '數據庫地址',
         version: '數據庫版本',
-        versionHelper: '當前僅支持 5.6 5.7 8.0 三個版本',
+        versionHelper: '當前僅支持 {0} 三個版本',
         userHelper: 'root 用戶或者擁有 root 權限的數據庫用戶',
 
         selectFile: '選擇文件',

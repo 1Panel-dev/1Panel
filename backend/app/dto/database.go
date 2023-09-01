@@ -244,6 +244,7 @@ type DatabaseInfo struct {
 	CreatedAt   time.Time `json:"createdAt"`
 	Name        string    `json:"name" validate:"max=256"`
 	From        string    `json:"from"`
+	Type        string    `json:"type"`
 	Version     string    `json:"version"`
 	Address     string    `json:"address"`
 	Port        uint      `json:"port"`
@@ -263,7 +264,7 @@ type DatabaseOption struct {
 
 type DatabaseCreate struct {
 	Name        string `json:"name" validate:"required,max=256"`
-	Type        string `json:"type" validate:"required,oneof=mysql"`
+	Type        string `json:"type" validate:"required"`
 	From        string `json:"from" validate:"required,oneof=local remote"`
 	Version     string `json:"version" validate:"required"`
 	Address     string `json:"address"`
