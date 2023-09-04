@@ -167,6 +167,14 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 			IsFromApp:     IsFromApp,
 			IsFromCompose: IsFromCompose,
 		}
+		if item.NetworkSettings != nil && len(item.NetworkSettings.Networks) > 0 {
+			networks := make([]string, 0, len(item.NetworkSettings.Networks))
+			for key := range item.NetworkSettings.Networks {
+				networks = append(networks, key+":"+item.NetworkSettings.Networks[key].IPAddress)
+			}
+			sort.Strings(networks)
+			backDatas[i].Network = networks
+		}
 	}
 
 	return int64(total), backDatas, nil

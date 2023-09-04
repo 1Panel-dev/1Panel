@@ -78,6 +78,7 @@ const message = {
             interval: '耗时',
             user: '用户',
             title: '标题',
+					  network: '网络',
             port: '端口',
             protocol: '协议',
             tableSetting: '列表设置',
