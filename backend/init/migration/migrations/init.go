@@ -486,7 +486,7 @@ var EncryptHostPassword = &gormigrate.Migration{
 var AddRemoteDB = &gormigrate.Migration{
 	ID: "20230724-add-remote-db",
 	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.DatabaseMysql{}); err != nil {
+		if err := tx.AutoMigrate(&model.Database{}, &model.DatabaseMysql{}); err != nil {
 			return err
 		}
 		var (
