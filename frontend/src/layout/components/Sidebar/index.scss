@@ -1,16 +1,15 @@
 .el-menu {
-    background: none !important;
+    user-select: none;
+    background: none;
     width: 100%;
     padding: 0 7px;
     .el-menu-item {
-        border-radius: 4px !important;
+        border-radius: 4px;
         background-color: var(--el-menu-item-bg-color);
         margin: 6px 0;
-        height: 46px !important;
+        height: 46px;
         box-shadow: 0px 0px 4px rgba(0, 94, 235, 0.1);
         box-sizing: border-box;
-        min-width: auto;
-        padding-left: 22px;
 
         &:hover {
             .el-icon {
@@ -28,8 +27,6 @@
             &::before {
                 position: absolute;
                 border-radius: 4px;
-                top: 14px;
-                bottom: 15px;
                 left: 12px;
                 width: 4px;
                 height: 14px;
@@ -53,8 +50,8 @@
         .el-sub-menu__title {
             background-color: var(--el-menu-item-bg-color);
             box-shadow: 0px 0px 4px rgba(0, 94, 235, 0.1);
-            height: 44px;
-            border-radius: 4px !important;
+            height: 46px;
+            border-radius: 4px;
             &:hover {
                 .el-icon {
                     color: $primary-color;
@@ -69,7 +66,7 @@
             padding: 0;
             .el-menu-item {
                 box-shadow: none;
-                padding-left: 35px !important;
+                padding-left: 35px;
             }
         }
     }
@@ -77,7 +74,7 @@
 
 .sidebar-container-popper {
     .el-menu {
-        background-color: var(--el-menu-bg-color) !important;
+        background-color: var(--el-menu-bg-color);
         padding: 4px 8px;
     }
 }

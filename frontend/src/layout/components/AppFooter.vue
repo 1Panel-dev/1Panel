@@ -1,11 +1,7 @@
 <template>
-    <div class="footer flx-justify-between">
-        <div class="footer-left">
-            <a href="https://fit2cloud.com/" target="_blank">Copyright © 2014-2023 FIT2CLOUD 飞致云</a>
-        </div>
-        <div class="footer-right">
-            <SystemUpgrade :footer="true" />
-        </div>
+    <div class="footer">
+        <a href="https://fit2cloud.com/" target="_blank">Copyright © 2014-2023 FIT2CLOUD 飞致云</a>
+        <SystemUpgrade :footer="true" />
     </div>
 </template>
 
@@ -15,6 +11,10 @@ import SystemUpgrade from '@/components/system-upgrade/index.vue';
 
 <style scoped lang="scss">
 .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 48px;
     background: #ffffff;
     border-top: 1px solid #e4e7ed;
     box-sizing: border-box;
