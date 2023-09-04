@@ -2,7 +2,7 @@
     <div v-loading="loading">
         <FireRouter />
 
-        <div class="a-card" style="margin-top: 20px">
+        <div class="app-status" style="margin-top: 20px">
             <el-card>
                 <div>
                     <el-tag style="float: left" effect="dark" type="success">SSH</el-tag>
@@ -329,19 +329,3 @@ onMounted(() => {
     search();
 });
 </script>
-
-<style lang="scss" scoped>
-.a-card {
-    font-size: 17px;
-    .el-card {
-        --el-card-padding: 12px;
-        .buttons {
-            margin-left: 100px;
-        }
-    }
-}
-.status-content {
-    float: left;
-    margin-left: 50px;
-}
-</style>

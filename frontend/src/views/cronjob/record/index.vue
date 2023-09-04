@@ -1,6 +1,6 @@
 <template>
     <div v-if="recordShow" v-loading="loading">
-        <div class="a-card" style="margin-top: 20px">
+        <div class="app-status" style="margin-top: 20px">
             <el-card>
                 <div>
                     <el-popover
@@ -725,41 +725,6 @@ defineExpose({
         margin: 10px;
         font-weight: 500;
         color: red;
-    }
-}
-.a-card {
-    font-size: 17px;
-    .el-card {
-        --el-card-padding: 12px;
-        .buttons {
-            margin-left: 100px;
-        }
-    }
-}
-.status-content {
-    float: left;
-    margin-left: 50px;
-}
-
-.app-warn {
-    text-align: center;
-    margin-top: 100px;
-    span:first-child {
-        color: #bbbfc4;
-    }
-
-    span:nth-child(2) {
-        color: $primary-color;
-        cursor: pointer;
-    }
-
-    span:nth-child(2):hover {
-        color: #74a4f3;
-    }
-
-    img {
-        width: 300px;
-        height: 300px;
     }
 }
 .descriptionWide {
