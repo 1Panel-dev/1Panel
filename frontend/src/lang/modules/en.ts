@@ -78,7 +78,7 @@ const message = {
             interval: 'Interval',
             user: 'User',
             title: 'Title',
-					  network: 'Network',
+            network: 'Network',
             port: 'Port',
             protocol: 'Protocol',
             tableSetting: 'Table setting',

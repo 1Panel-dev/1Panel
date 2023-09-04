@@ -57,6 +57,7 @@ export namespace Container {
         createTime: string;
         state: string;
         runTime: string;
+        network: Array<string>;
         ports: Array<string>;
         isFromApp: boolean;
         isFromCompose: boolean;

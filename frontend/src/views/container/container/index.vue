@@ -90,7 +90,10 @@
                     <el-table-column :label="$t('container.source')" show-overflow-tooltip min-width="100" fix>
                         <template #default="{ row }">
                             <div v-if="row.hasLoad">
-                                <div>CPU: {{ row.cpuPercent.toFixed(2) }}% {{ $t('monitor.memory') }}: {{ row.memoryPercent.toFixed(2) }}%</div>
+                                <div>
+                                    CPU: {{ row.cpuPercent.toFixed(2) }}% {{ $t('monitor.memory') }}:
+                                    {{ row.memoryPercent.toFixed(2) }}%
+                                </div>
                             </div>
                             <div v-if="!row.hasLoad">
                                 <el-button link loading></el-button>
@@ -98,16 +101,18 @@
                         </template>
                     </el-table-column>
                     <el-table-column
-                    		:label="$t('commons.table.network')"
-												:width="mobile ? 80 : 'auto'"
-												min-width="80"
-												fix
-										>
-												<div v-if="row.network">
-														<div v-for="(item, index) in row.network" :key="index">
-																<div>{{ item }}</div>
-														</div>
-												</div>
+                        :label="$t('commons.table.network')"
+                        :width="mobile ? 80 : 'auto'"
+                        min-width="80"
+                        fix
+                    >
+                        <template #default="{ row }">
+                            <div v-if="row.network">
+                                <div v-for="(item, index) in row.network" :key="index">
+                                    <div>{{ item }}</div>
+                                </div>
+                            </div>
+                        </template>
                     </el-table-column>
                     <el-table-column
                         :label="$t('commons.table.port')"
