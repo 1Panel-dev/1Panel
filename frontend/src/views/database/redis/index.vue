@@ -102,7 +102,7 @@ const goDashboard = async () => {
     dialogPortJumpRef.value.acceptParams({ port: redisCommandPort.value });
 };
 const getAppDetail = (key: string) => {
-    router.push({ name: 'AppDetail', params: { appKey: key } });
+    router.push({ name: 'AppAll', query: { install: key } });
 };
 
 const loadDashboardPort = async () => {

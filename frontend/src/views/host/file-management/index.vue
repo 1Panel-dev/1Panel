@@ -635,6 +635,8 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .path {
+    display: flex;
+    align-items: center;
     border: 1px solid #ebeef5;
     background-color: var(--panel-path-bg);
     height: 30px;

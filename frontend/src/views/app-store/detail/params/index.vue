@@ -249,8 +249,8 @@ const getLabel = (row: ParamObj): string => {
     }
 };
 
-const toPage = (appKey: string) => {
-    router.push({ name: 'AppDetail', params: { appKey: appKey } });
+const toPage = (key: string) => {
+    router.push({ name: 'AppAll', query: { install: key } });
 };
 
 onMounted(() => {

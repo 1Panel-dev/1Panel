@@ -64,7 +64,7 @@ const acceptParams = (): void => {
 };
 
 const goInstall = (key: string) => {
-    router.push({ name: 'AppDetail', params: { appKey: key } });
+    router.push({ name: 'AppAll', query: { install: key } });
 };
 
 const search = async (req: App.AppReq) => {

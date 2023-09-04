@@ -130,7 +130,7 @@ const setting = () => {
 };
 
 const goRouter = async (key: string) => {
-    router.push({ name: 'AppDetail', params: { appKey: key } });
+    router.push({ name: 'AppAll', query: { install: key } });
 };
 
 const onCheck = async () => {

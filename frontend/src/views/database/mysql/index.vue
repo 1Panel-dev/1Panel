@@ -355,7 +355,7 @@ const loadDB = async () => {
 };
 
 const goRouter = async () => {
-    router.push({ name: 'AppDetail', params: { appKey: 'mysql' } });
+    router.push({ name: 'AppAll', query: { install: 'mysql' } });
 };
 
 const onChange = async (info: any) => {
@@ -372,7 +372,7 @@ const goDashboard = async () => {
 };
 
 const getAppDetail = (key: string) => {
-    router.push({ name: 'AppDetail', params: { appKey: key } });
+    router.push({ name: 'AppAll', query: { install: key } });
 };
 
 const loadDashboardPort = async () => {

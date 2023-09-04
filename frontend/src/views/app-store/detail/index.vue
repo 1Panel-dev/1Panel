@@ -4,41 +4,35 @@
             <DrawerHeader :header="$t('app.detail')" :back="handleClose" />
         </template>
         <div class="brief" v-loading="loadingApp">
-            <el-row :gutter="20">
-                <div>
-                    <el-col :span="3">
-                        <el-avatar shape="square" :size="180" :src="app.icon" />
-                    </el-col>
+            <div class="detail flex">
+                <div class="w-12 h-12 bg-gray-100 rounded p-1 shadow-md icon">
+                    <img :src="app.icon" alt="App Icon" class="w-full h-full rounded" />
                 </div>
-                <el-col :span="18">
-                    <div class="detail">
-                        <div class="name">
-                            <span>{{ app.name }}</span>
-                        </div>
-                        <div class="description">
-                            <span>
-                                {{ language == 'zh' || language == 'tw' ? app.shortDescZh : app.shortDescEn }}
-                            </span>
-                        </div>
-                        <br />
-                        <div v-if="!loadingDetail">
-                            <el-alert
-                                style="width: 300px"
-                                v-if="!appDetail.enable"
-                                :title="$t('app.limitHelper')"
-                                type="warning"
-                                show-icon
-                                :closable="false"
-                            />
-                        </div>
-                        <div>
-                            <el-button round v-if="appDetail.enable" @click="openInstall" type="primary">
-                                {{ $t('app.install') }}
-                            </el-button>
-                        </div>
+                <div class="ml-4">
+                    <div class="name mb-2">
+                        <span>{{ app.name }}</span>
                     </div>
-                </el-col>
-            </el-row>
+                    <div class="description mb-4">
+                        <span>
+                            {{ language == 'zh' || language == 'tw' ? app.shortDescZh : app.shortDescEn }}
+                        </span>
+                    </div>
+                    <br />
+                    <div v-if="!loadingDetail" class="mb-2">
+                        <el-alert
+                            style="width: 300px"
+                            v-if="!appDetail.enable"
+                            :title="$t('app.limitHelper')"
+                            type="warning"
+                            show-icon
+                            :closable="false"
+                        />
+                    </div>
+                    <el-button round v-if="appDetail.enable" @click="openInstall" type="primary">
+                        {{ $t('app.install') }}
+                    </el-button>
+                </div>
+            </div>
             <div class="divider"></div>
             <div>
                 <el-row>
@@ -170,7 +164,9 @@ defineExpose({
         }
     }
 
-    .detail {
+    .icon {
+        width: 180px;
+        height: 180px;
     }
 
     .version {

@@ -176,6 +176,7 @@ const canUpdate = ref(false);
 const syncing = ref(false);
 const detailRef = ref();
 const installRef = ref();
+const installKey = ref('');
 
 const getColor = (index: number) => {
     return colorArr[index];
@@ -245,6 +246,15 @@ const searchByName = (name: string) => {
 };
 
 onMounted(() => {
+    if (router.currentRoute.value.query.install) {
+        installKey.value = String(router.currentRoute.value.query.install);
+        const params = {
+            app: {
+                key: installKey.value,
+            },
+        };
+        installRef.value.acceptParams(params);
+    }
     search(req);
 });
 </script>
