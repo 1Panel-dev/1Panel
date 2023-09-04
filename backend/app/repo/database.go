@@ -101,16 +101,22 @@ func (d *DatabaseRepo) WithoutByFrom(from string) DBOption {
 
 func (d *DatabaseRepo) WithTypeList(dbType string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
-		types := strings.Split(dbType, ",")
-		if len(types) == 1 {
+		if !strings.Contains(dbType, ",") {
 			return g.Where("`type` = ?", dbType)
 		}
+		types := strings.Split(dbType, ",")
+		var (
+			rules  []string
+			values []interface{}
+		)
 		for _, ty := range types {
 			if len(ty) != 0 {
-				g.Or("`type` = ?", ty)
+				rules = append(rules, "`type` = ?")
+				values = append(values, ty)
 			}
 		}
-		return g
+		fmt.Println(strings.Join(rules, " OR "))
+		return g.Where(strings.Join(rules, " OR "), values...)
 	}
 }
 
