@@ -62,6 +62,7 @@
                     :data="data"
                     @sort-change="search"
                     @search="search"
+                    :row-style="{ height: '65px' }"
                 >
                     <el-table-column type="selection" fix />
                     <el-table-column
@@ -90,9 +91,9 @@
                     <el-table-column :label="$t('container.source')" show-overflow-tooltip min-width="100" fix>
                         <template #default="{ row }">
                             <div v-if="row.hasLoad">
-                                <div>
-                                    CPU: {{ row.cpuPercent.toFixed(2) }}% {{ $t('monitor.memory') }}:
-                                    {{ row.memoryPercent.toFixed(2) }}%
+                                <div class="source-font">CPU: {{ row.cpuPercent.toFixed(2) }}%</div>
+                                <div class="source-font">
+                                    {{ $t('monitor.memory') }}: {{ row.memoryPercent.toFixed(2) }}%
                                 </div>
                             </div>
                             <div v-if="!row.hasLoad">
@@ -103,14 +104,12 @@
                     <el-table-column
                         :label="$t('commons.table.network')"
                         :width="mobile ? 80 : 'auto'"
-                        min-width="80"
+                        min-width="70"
                         fix
                     >
                         <template #default="{ row }">
                             <div v-if="row.network">
-                                <div v-for="(item, index) in row.network" :key="index">
-                                    <div>{{ item }}</div>
-                                </div>
+                                <div v-for="(item, index) in row.network" :key="index">{{ item }}</div>
                             </div>
                         </template>
                     </el-table-column>
@@ -572,5 +571,8 @@ onMounted(() => {
 <style scoped lang="scss">
 .tagMargin {
     margin-top: 2px;
+}
+.source-font {
+    font-size: 12px;
 }
 </style>
