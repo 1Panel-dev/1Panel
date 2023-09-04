@@ -113,6 +113,13 @@ func ScanUDPPort(port int) bool {
 	return false
 }
 
+func ScanPortWithProto(port int, proto string) bool {
+	if proto == "udp" {
+		return ScanUDPPort(port)
+	}
+	return ScanPort(port)
+}
+
 func ExistWithStrArray(str string, arr []string) bool {
 	for _, a := range arr {
 		if strings.Contains(a, str) {

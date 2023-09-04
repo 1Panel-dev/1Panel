@@ -109,10 +109,10 @@ func (u *FirewallService) SearchWithPage(req dto.RuleSearch) (int64, interface{}
 	if len(req.Status) != 0 {
 		for _, data := range datas {
 			portItem, _ := strconv.Atoi(data.Port)
-			if req.Status == "free" && !common.ScanPort(portItem) {
+			if req.Status == "free" && !common.ScanPortWithProto(portItem, data.Protocol) {
 				datasFilterStatus = append(datasFilterStatus, data)
 			}
-			if req.Status == "used" && common.ScanPort(portItem) {
+			if req.Status == "used" && common.ScanPortWithProto(portItem, data.Protocol) {
 				datasFilterStatus = append(datasFilterStatus, data)
 			}
 		}

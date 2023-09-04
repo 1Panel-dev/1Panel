@@ -88,6 +88,7 @@
                                 :min-width="150"
                                 :label="$t('commons.table.description')"
                                 prop="description"
+                                show-overflow-tooltip
                             >
                                 <template #default="{ row }">
                                     <fu-input-rw-switch v-model="row.description" @blur="onChange(row)" />
