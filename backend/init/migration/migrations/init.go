@@ -579,6 +579,9 @@ var AddTableFirewall = &gormigrate.Migration{
 			return err
 		}
 		_ = tx.Exec("alter table remote_dbs rename to databases;").Error
+		if err := tx.AutoMigrate(&model.Database{}); err != nil {
+			return err
+		}
 		return nil
 	},
 }
