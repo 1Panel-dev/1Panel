@@ -1,6 +1,6 @@
 <template>
     <div v-loading="loading">
-        <div class="a-card" style="margin-top: 20px">
+        <div class="app-status" style="margin-top: 20px">
             <el-card>
                 <div>
                     <el-tag style="float: left" effect="dark" type="success">Docker</el-tag>
@@ -54,7 +54,7 @@
                                         v-model="form.mirrors"
                                         style="width: calc(100% - 80px)"
                                     />
-                                    <el-button class="append-button" @click="onChangeMirrors" icon="Setting">
+                                    <el-button @click="onChangeMirrors" icon="Setting">
                                         {{ $t('commons.button.set') }}
                                     </el-button>
                                 </div>
@@ -87,7 +87,7 @@
                                         v-model="form.registries"
                                         style="width: calc(100% - 80px)"
                                     />
-                                    <el-button class="append-button" @click="onChangeRegistries" icon="Setting">
+                                    <el-button @click="onChangeRegistries" icon="Setting">
                                         {{ $t('commons.button.set') }}
                                     </el-button>
                                 </div>
@@ -451,28 +451,3 @@ onMounted(() => {
     search();
 });
 </script>
-
-<style lang="scss" scoped>
-.a-card {
-    font-size: 17px;
-    .el-card {
-        --el-card-padding: 12px;
-        .buttons {
-            margin-left: 100px;
-        }
-    }
-}
-.status-content {
-    float: left;
-    margin-left: 50px;
-}
-body {
-    margin: 0;
-}
-
-.append-button {
-    width: 80px;
-    background-color: var(--el-fill-color-light);
-    color: var(--el-color-info);
-}
-</style>
