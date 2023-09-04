@@ -30,11 +30,11 @@
                                 <el-radio-group @change="onSave('Theme', form.theme)" v-model="form.theme">
                                     <el-radio-button label="light">
                                         <el-icon><Sunny /></el-icon>
-                                        {{ $t('setting.light') }}
+                                        <span>{{ $t('setting.light') }}</span>
                                     </el-radio-button>
                                     <el-radio-button label="dark">
                                         <el-icon><Moon /></el-icon>
-                                        {{ $t('setting.dark') }}
+                                        <span>{{ $t('setting.dark') }}</span>
                                     </el-radio-button>
                                 </el-radio-group>
                             </el-form-item>
