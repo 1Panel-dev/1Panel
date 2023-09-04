@@ -8,9 +8,13 @@
                 <el-col :span="22">
                     <el-form-item :label="$t('database.containerConn')">
                         <el-tag>
-                            {{ form.serviceName + ':3306' }}
+                            {{ form.serviceName + ':' + form.port }}
                         </el-tag>
-                        <el-button @click="onCopy(form.serviceName + ':3306')" icon="DocumentCopy" link></el-button>
+                        <el-button
+                            @click="onCopy(form.serviceName + ':' + form.port)"
+                            icon="DocumentCopy"
+                            link
+                        ></el-button>
                         <span class="input-help">
                             {{ $t('database.containerConnHelper') }}
                         </span>
