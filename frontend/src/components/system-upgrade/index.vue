@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="flx-center">
         <span v-if="props.footer">
             <el-button type="primary" link @click="toForum">
                 <span>{{ $t('setting.forum') }}</span>
@@ -11,24 +11,18 @@
             <el-divider direction="vertical" />
         </span>
         <span class="version">{{ $t('setting.currentVersion') + version }}</span>
-        <el-badge
-            is-dot
-            class="item"
-            v-if="version !== 'Waiting' && globalStore.hasNewVersion"
-            style="margin-top: -6px"
-        >
+        <el-badge is-dot class="item" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
             <el-button type="primary" link @click="onLoadUpgradeInfo">
-                <span style="font-size: 14px">（{{ $t('setting.hasNewVersion') }}）</span>
+                <span>（{{ $t('setting.hasNewVersion') }}）</span>
             </el-button>
         </el-badge>
         <el-button
             v-if="version !== 'Waiting' && !globalStore.hasNewVersion"
-            style="margin-top: -2px"
             type="primary"
             link
             @click="onLoadUpgradeInfo"
         >
-            （{{ $t('setting.upgradeCheck') }}）
+            <span>（{{ $t('setting.upgradeCheck') }}）</span>
         </el-button>
         <el-tag v-if="version === 'Waiting'" round style="margin-left: 10px">{{ $t('setting.upgrading') }}</el-tag>
     </div>

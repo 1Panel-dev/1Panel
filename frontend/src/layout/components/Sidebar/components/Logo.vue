@@ -1,6 +1,6 @@
 <template>
-    <div class="logo flx-center">
-        <img :src="getLogoUrl(isCollapse)" alt="" />
+    <div class="logo">
+        <img :src="getLogoUrl(isCollapse)" alt="logo" />
     </div>
 </template>
 
@@ -22,10 +22,10 @@ const getLogoUrl = (isCollapse: boolean) => {
 
 <style scoped lang="scss">
 .logo {
-    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     height: 55px;
-    margin: 5px 0;
-    padding: 0 15px;
     img {
         object-fit: contain;
         height: 40px;

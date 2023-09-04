@@ -16,7 +16,7 @@ const props = defineProps({
     },
     color: {
         type: String,
-        default: '#409eff',
+        default: '#005eeb',
     },
 });
 // 图标在 iconfont 中的名字

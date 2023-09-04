@@ -6,7 +6,7 @@
         element-loading-svg-view-box="-10, -10, 50, 50"
         element-loading-background="rgba(122, 122, 122, 0.01)"
     >
-        <Logo :isCollapse="isCollapse"></Logo>
+        <Logo :isCollapse="isCollapse" />
         <el-scrollbar>
             <el-menu
                 :default-active="activeMenu"
@@ -14,12 +14,11 @@
                 :collapse="isCollapse"
                 :collapse-transition="false"
                 :unique-opened="true"
-                popper-class="sidebar-container-popper"
             >
-                <SubItem :menuList="routerMenus"></SubItem>
+                <SubItem :menuList="routerMenus" />
                 <el-menu-item :index="''">
                     <el-icon @click="logout">
-                        <SvgIcon :iconName="'p-logout'" :className="'svg-icon'"></SvgIcon>
+                        <SvgIcon :iconName="'p-logout'" />
                     </el-icon>
                     <template #title>
                         <span @click="logout">{{ $t('commons.login.logout') }}</span>
@@ -45,27 +44,25 @@ import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
 import { GlobalStore } from '@/store';
 import { MsgSuccess } from '@/utils/message';
+import { isString } from '@vueuse/core';
 const route = useRoute();
 const menuStore = MenuStore();
 const globalStore = GlobalStore();
-const activeMenu = computed((): string => {
+const activeMenu = computed(() => {
     const { meta, path } = route;
-    if (typeof meta.activeMenu === 'string') {
-        return meta.activeMenu;
-    }
-    return path;
+    return isString(meta.activeMenu) ? meta.activeMenu : path;
 });
 const isCollapse = computed((): boolean => menuStore.isCollapse);
 
 const routerMenus = computed((): RouteRecordRaw[] => menuStore.menuList);
 
-const screenWidth = ref<number>(0);
+const screenWidth = ref(0);
 const listeningWindow = () => {
     window.onresize = () => {
         return (() => {
             screenWidth.value = document.body.clientWidth;
-            if (isCollapse.value === false && screenWidth.value < 1200) menuStore.setCollapse();
-            if (isCollapse.value === true && screenWidth.value > 1200) menuStore.setCollapse();
+            if (!isCollapse.value && screenWidth.value < 1200) menuStore.setCollapse();
+            if (isCollapse.value && screenWidth.value > 1200) menuStore.setCollapse();
         })();
     };
 };
@@ -89,34 +86,28 @@ const logout = () => {
 const systemLogOut = async () => {
     await logOutApi();
 };
-onMounted(async () => {
+onMounted(() => {
     menuStore.setMenuList(menuList);
 });
 </script>
 
 <style lang="scss">
 @import './index.scss';
+
 .sidebar-container {
     position: relative;
     display: flex;
     flex-direction: column;
     height: 100%;
     background: url(@/assets/images/menu-bg.png) var(--el-menu-bg-color) no-repeat top;
-    transition: all 0.3s ease;
 
     .el-scrollbar {
-        height: calc(100% - 55px);
+        flex: 1;
         .el-menu {
-            flex: 1;
             overflow: auto;
             overflow-x: hidden;
             border-right: none;
         }
-    }
-    .sidebar-container-footer {
-        height: 30px;
-        background-color: #c0c0c0;
-        text-align: center;
     }
 }
 </style>
