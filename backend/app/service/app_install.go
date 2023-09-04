@@ -145,7 +145,7 @@ func (a *AppInstallService) CheckExist(req request.AppInstalledInfo) (*response.
 	if len(req.Name) == 0 {
 		appInstall, _ = appInstallRepo.GetFirst(appInstallRepo.WithAppId(app.ID))
 	} else {
-		appInstall, _ = appInstallRepo.GetFirst(commonRepo.WithByName(req.Name))
+		appInstall, _ = appInstallRepo.GetFirst(appInstallRepo.WithAppId(app.ID), commonRepo.WithByName(req.Name))
 	}
 
 	if reflect.DeepEqual(appInstall, model.AppInstall{}) {
