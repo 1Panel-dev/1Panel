@@ -11,7 +11,13 @@
         </template>
         <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
-                <el-alert :title="$t('app.appInstallWarn')" class="common-prompt" :closable="false" type="error" />
+                <el-alert
+                    :title="$t('app.appInstallWarn')"
+                    class="common-prompt"
+                    :closable="false"
+                    type="error"
+                    v-if="canEditPort(installData.app.key)"
+                />
                 <el-form
                     @submit.prevent
                     ref="paramForm"
@@ -191,6 +197,9 @@ const appVersions = ref<string[]>([]);
 const handleClose = () => {
     open.value = false;
     resetForm();
+    if (router.currentRoute.value.query.install) {
+        router.push({ name: 'AppAll' });
+    }
 };
 const paramKey = ref(1);
 
