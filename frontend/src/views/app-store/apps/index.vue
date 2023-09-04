@@ -40,7 +40,9 @@
         </template>
         <template #rightButton>
             <el-badge is-dot class="item" :hidden="!canUpdate">
-                <el-button @click="sync" type="primary" link :plain="true">{{ $t('app.syncAppList') }}</el-button>
+                <el-button @click="sync" type="primary" link :plain="true" :disabled="syncing">
+                    {{ $t('app.syncAppList') }}
+                </el-button>
             </el-badge>
         </template>
         <template #main>
@@ -60,12 +62,14 @@
                         <el-card class="e-card">
                             <el-row :gutter="20">
                                 <el-col :xs="8" :sm="6" :md="6" :lg="6" :xl="5">
-                                    <div class="app-icon">
-                                        <el-avatar
-                                            shape="square"
-                                            :size="60"
-                                            :src="'data:image/png;base64,' + app.icon"
-                                        />
+                                    <div class="app-icon-container">
+                                        <div class="app-icon" @click="openDetail(app.key)">
+                                            <el-avatar
+                                                shape="square"
+                                                :size="60"
+                                                :src="'data:image/png;base64,' + app.icon"
+                                            />
+                                        </div>
                                     </div>
                                 </el-col>
                                 <el-col :xs="16" :sm="18" :md="18" :lg="18" :xl="19">
@@ -81,7 +85,7 @@
                                                 plain
                                                 round
                                                 size="small"
-                                                @click="getAppDetail(app.key)"
+                                                @click="openInstall(app)"
                                                 :disabled="app.status === 'TakeDown'"
                                             >
                                                 {{ $t('app.install') }}
@@ -124,7 +128,8 @@
             </div>
         </template>
     </LayoutContent>
-    <Detail v-if="showDetail" :id="appId"></Detail>
+    <Detail :id="appId" ref="detailRef"></Detail>
+    <Install ref="installRef" />
 </template>
 
 <script lang="ts" setup>
@@ -133,6 +138,7 @@ import { onMounted, reactive, ref, computed } from 'vue';
 import { GetAppTags, SearchApp, SyncApp } from '@/api/modules/app';
 import i18n from '@/lang';
 import Detail from '../detail/index.vue';
+import Install from '../detail/install/index.vue';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
@@ -167,6 +173,9 @@ const activeTag = ref('all');
 const showDetail = ref(false);
 const appId = ref(0);
 const canUpdate = ref(false);
+const syncing = ref(false);
+const detailRef = ref();
+const installRef = ref();
 
 const getColor = (index: number) => {
     return colorArr[index];
@@ -189,20 +198,36 @@ const search = async (req: App.AppReq) => {
     });
 };
 
-const getAppDetail = (key: string) => {
-    router.push({ name: 'AppDetail', params: { appKey: key } });
+const openInstall = (app: App.App) => {
+    if (app.type === 'php') {
+        router.push({ path: '/websites/runtime/php' });
+    } else {
+        const params = {
+            app: app,
+        };
+        installRef.value.acceptParams(params);
+    }
+};
+
+const openDetail = (key: string) => {
+    detailRef.value.acceptParams(key);
 };
 
 const sync = () => {
-    SyncApp().then((res) => {
-        if (res.message != '') {
-            MsgSuccess(res.message);
-        } else {
-            MsgSuccess(i18n.global.t('app.syncStart'));
-        }
-        canUpdate.value = false;
-        search(req);
-    });
+    syncing.value = true;
+    SyncApp()
+        .then((res) => {
+            if (res.message != '') {
+                MsgSuccess(res.message);
+            } else {
+                MsgSuccess(i18n.global.t('app.syncStart'));
+            }
+            canUpdate.value = false;
+            search(req);
+        })
+        .finally(() => {
+            syncing.value = false;
+        });
 };
 
 const changeTag = (key: string) => {
@@ -234,9 +259,18 @@ onMounted(() => {
     cursor: pointer;
     padding: 5px;
 
-    .app-icon {
+    .app-icon-container {
         margin-top: 10px;
-        margin-left: 10px;
+        margin-left: 15px;
+    }
+
+    .app-icon {
+        transition: transform 0.1s;
+        transform-origin: center center;
+    }
+
+    .app-icon:hover {
+        transform: scale(1.2);
     }
 
     .app-content {

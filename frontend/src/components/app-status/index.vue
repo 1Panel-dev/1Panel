@@ -136,9 +136,6 @@ const goRouter = async (key: string) => {
 const onCheck = async () => {
     await CheckAppInstalled(key.value, name.value)
         .then((res) => {
-            if (res.data.appInstallId === 0) {
-                return;
-            }
             data.value = res.data;
             em('isExist', res.data);
             operateReq.installId = res.data.appInstallId;
