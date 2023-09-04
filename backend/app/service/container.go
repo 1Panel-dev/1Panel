@@ -151,7 +151,7 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 		for _, port := range item.Ports {
 			itemPortStr := fmt.Sprintf("%v/%s", port.PrivatePort, port.Type)
 			if port.PublicPort != 0 {
-				itemPortStr = fmt.Sprintf("%s:%v->%v/%s", port.IP, port.PublicPort, port.PrivatePort, port.Type)
+				itemPortStr = fmt.Sprintf("%v->%v/%s", port.PublicPort, port.PrivatePort, port.Type)
 			}
 			ports = append(ports, itemPortStr)
 		}
@@ -170,7 +170,7 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 		if item.NetworkSettings != nil && len(item.NetworkSettings.Networks) > 0 {
 			networks := make([]string, 0, len(item.NetworkSettings.Networks))
 			for key := range item.NetworkSettings.Networks {
-				networks = append(networks, key+":"+item.NetworkSettings.Networks[key].IPAddress)
+				networks = append(networks, item.NetworkSettings.Networks[key].IPAddress)
 			}
 			sort.Strings(networks)
 			backDatas[i].Network = networks
