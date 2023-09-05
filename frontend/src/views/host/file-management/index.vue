@@ -128,12 +128,16 @@
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.user')" prop="user" show-overflow-tooltip>
                         <template #default="{ row }">
-                            <el-link :underline="false" @click="openChown(row)" type="primary">{{ row.user }}</el-link>
+                            <el-link :underline="false" @click="openChown(row)" type="primary">
+                                {{ row.user ? row.user : '-' }} ({{ row.uid }})
+                            </el-link>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('file.group')" prop="group">
                         <template #default="{ row }">
-                            <el-link :underline="false" @click="openChown(row)" type="primary">{{ row.group }}</el-link>
+                            <el-link :underline="false" @click="openChown(row)" type="primary">
+                                {{ row.group ? row.group : '-' }} ({{ row.gid }})
+                            </el-link>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('file.size')" prop="size" max-width="50">

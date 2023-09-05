@@ -5,6 +5,8 @@ export namespace File {
         name: string;
         user: string;
         group: string;
+        uid: number;
+        gid: number;
         content: string;
         size: number;
         isDir: boolean;
