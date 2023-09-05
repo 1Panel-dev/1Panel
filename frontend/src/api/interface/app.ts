@@ -12,6 +12,7 @@ export namespace App {
         source: string;
         type: string;
         status: string;
+        limit: number;
     }
 
     export interface AppDTO extends App {

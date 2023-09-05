@@ -59,11 +59,11 @@
                     :xl="8"
                 >
                     <div class="app-card">
-                        <el-card class="e-card">
+                        <el-card class="e-card" @click.stop="openDetail(app.key)">
                             <el-row :gutter="20">
                                 <el-col :xs="8" :sm="6" :md="6" :lg="6" :xl="5">
                                     <div class="app-icon-container">
-                                        <div class="app-icon" @click="openDetail(app.key)">
+                                        <div class="app-icon">
                                             <el-avatar
                                                 shape="square"
                                                 :size="60"
@@ -85,8 +85,10 @@
                                                 plain
                                                 round
                                                 size="small"
-                                                @click="openInstall(app)"
-                                                :disabled="app.status === 'TakeDown'"
+                                                :disabled="
+                                                    (app.installed && app.limit == 1) || app.status === 'TakeDown'
+                                                "
+                                                @click.stop="openInstall(app)"
                                             >
                                                 {{ $t('app.install') }}
                                             </el-button>
@@ -274,13 +276,13 @@ onMounted(() => {
         margin-left: 15px;
     }
 
+    &:hover .app-icon {
+        transform: scale(1.2);
+    }
+
     .app-icon {
         transition: transform 0.1s;
         transform-origin: center center;
-    }
-
-    .app-icon:hover {
-        transform: scale(1.2);
     }
 
     .app-content {
