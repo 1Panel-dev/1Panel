@@ -10,7 +10,7 @@
                 </div>
             </el-card>
         </div>
-        <LayoutContent :title="(currentDB?.type === 'mysql' ? 'MySQL' : 'MariaDB') + $t('menu.database')">
+        <LayoutContent :title="(currentDB?.type === 'mysql' ? 'MySQL ' : 'MariaDB ') + $t('menu.database')">
             <template #app v-if="currentDB?.from === 'local'">
                 <AppStatus
                     :app-key="appKey"

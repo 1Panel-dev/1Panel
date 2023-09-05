@@ -78,7 +78,6 @@ const message = {
             interval: '耗时',
             user: '用户',
             title: '标题',
-            network: '网络',
             port: '端口',
             protocol: '协议',
             tableSetting: '列表设置',
@@ -501,6 +500,7 @@ const message = {
         cleanLogHelper: '清空日志需要重启容器，该操作无法回滚，是否继续？',
         newName: '新名称',
         source: '资源使用率',
+        ip: 'IP 地址',
         cpuShare: 'CPU 权重',
         cpuShareHelper: '容器默认份额为 1024 个 CPU，增大可使当前容器获得更多的 CPU 时间',
 
@@ -515,7 +515,7 @@ const message = {
         oldImage: '当前镜像',
         targetImage: '目标镜像',
         targetImageHelper: '请输入目标镜像版本',
-        appHelper: '该容器来源于应用商店，升级可能导致该服务不可用，是否继续？',
+        appHelper: '该容器来源于应用商店，升级可能导致该服务不可用',
 
         forcePull: '强制拉取镜像',
         forcePullHelper: '忽略服务器已存在的镜像，重新拉取一次',

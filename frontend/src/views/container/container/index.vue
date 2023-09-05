@@ -83,12 +83,12 @@
                         min-width="80"
                         prop="imageName"
                     />
-                    <el-table-column :label="$t('commons.table.status')" min-width="80" prop="state" sortable fix>
+                    <el-table-column :label="$t('commons.table.status')" min-width="70" prop="state" sortable fix>
                         <template #default="{ row }">
                             <Status :key="row.state" :status="row.state"></Status>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.source')" show-overflow-tooltip min-width="100" fix>
+                    <el-table-column :label="$t('container.source')" show-overflow-tooltip min-width="80" fix>
                         <template #default="{ row }">
                             <div v-if="row.hasLoad">
                                 <div class="source-font">CPU: {{ row.cpuPercent.toFixed(2) }}%</div>
@@ -101,12 +101,7 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column
-                        :label="$t('commons.table.network')"
-                        :width="mobile ? 80 : 'auto'"
-                        min-width="70"
-                        fix
-                    >
+                    <el-table-column :label="$t('container.ip')" :width="mobile ? 80 : 'auto'" min-width="70" fix>
                         <template #default="{ row }">
                             <div v-if="row.network">
                                 <div v-for="(item, index) in row.network" :key="index">{{ item }}</div>
@@ -116,7 +111,7 @@
                     <el-table-column
                         :label="$t('commons.table.port')"
                         :width="mobile ? 260 : 'auto'"
-                        min-width="120"
+                        min-width="130"
                         prop="ports"
                         fix
                     >
@@ -124,20 +119,22 @@
                             <div v-if="row.ports">
                                 <div v-for="(item, index) in row.ports" :key="index">
                                     <div v-if="row.expand || (!row.expand && index < 3)">
-                                        <el-button
-                                            v-if="item.indexOf('->') !== -1"
-                                            @click="goDashboard(item)"
-                                            class="tagMargin"
-                                            icon="Position"
-                                            type="primary"
-                                            plain
-                                            size="small"
-                                        >
-                                            {{ item }}
-                                        </el-button>
-                                        <el-button v-else class="tagMargin" type="primary" plain size="small">
-                                            {{ item }}
-                                        </el-button>
+                                        <el-tooltip :hide-after="20" :content="item" placement="top">
+                                            <el-button
+                                                v-if="item.indexOf('->') !== -1"
+                                                @click="goDashboard(item)"
+                                                class="tagMargin"
+                                                icon="Position"
+                                                type="primary"
+                                                plain
+                                                size="small"
+                                            >
+                                                {{ item.length > 25 ? item.substring(0, 25) + '...' : item }}
+                                            </el-button>
+                                            <el-button v-else class="tagMargin" type="primary" plain size="small">
+                                                {{ item }}
+                                            </el-button>
+                                        </el-tooltip>
                                     </div>
                                 </div>
                                 <div v-if="!row.expand && row.ports.length > 3">
@@ -161,8 +158,8 @@
                         fix
                     />
                     <fu-table-operations
-                        width="300px"
-                        :ellipsis="4"
+                        width="180px"
+                        :ellipsis="2"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         fix
@@ -454,12 +451,6 @@ const onOperate = async (operation: string, row: Container.ContainerInfo | null)
 
 const buttons = [
     {
-        label: i18n.global.t('commons.button.edit'),
-        click: (row: Container.ContainerInfo) => {
-            onEdit(row.containerID);
-        },
-    },
-    {
         label: i18n.global.t('file.terminal'),
         disabled: (row: Container.ContainerInfo) => {
             return row.state !== 'running';
@@ -472,6 +463,12 @@ const buttons = [
         label: i18n.global.t('commons.button.log'),
         click: (row: Container.ContainerInfo) => {
             dialogContainerLogRef.value!.acceptParams({ containerID: row.containerID, container: row.name });
+        },
+    },
+    {
+        label: i18n.global.t('commons.button.edit'),
+        click: (row: Container.ContainerInfo) => {
+            onEdit(row.containerID);
         },
     },
     {
