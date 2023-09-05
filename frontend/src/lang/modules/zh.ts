@@ -497,6 +497,8 @@ const message = {
         lastHour: '最近 1 小时',
         last10Min: '最近 10 分钟',
         cleanLog: '清空日志',
+        downLogHelper1: '即将下载 {0} 容器所有日志，是否继续？',
+        downLogHelper2: '即将下载 {0} 容器最近 {1} 条日志，是否继续？',
         cleanLogHelper: '清空日志需要重启容器，该操作无法回滚，是否继续？',
         newName: '新名称',
         source: '资源使用率',
