@@ -157,7 +157,7 @@ import ConfigSuperVisor from './config/index.vue';
 import { computed, onMounted } from 'vue';
 import Create from './create/index.vue';
 import File from './file/index.vue';
-import { GetSupervisorProcess, LoadProcessStatus, OperateSupervisorProcess } from '@/api/modules/host-tool';
+import { GetSupervisorProcess, OperateSupervisorProcess } from '@/api/modules/host-tool';
 import { GlobalStore } from '@/store';
 import i18n from '@/lang';
 import { HostTool } from '@/api/interface/host-tool';
@@ -216,34 +216,46 @@ const search = async () => {
         return;
     }
     loading.value = true;
-    loadStatus();
+    let needLoadStatus = false;
     try {
         const res = await GetSupervisorProcess();
         data.value = res.data;
+        for (const process of data.value) {
+            if (process.status && process.status.length > 0) {
+                process.hasLoad = true;
+            } else {
+                process.hasLoad = false;
+                needLoadStatus = true;
+            }
+        }
+        if (needLoadStatus) {
+            setTimeout(loadStatus, 1000);
+        }
     } catch (error) {}
     loading.value = false;
 };
 
 const loadStatus = async () => {
-    await LoadProcessStatus()
-        .then((res) => {
-            let stats = res.data || [];
-            for (const process of data.value) {
-                process.status = [];
-                for (const item of stats) {
-                    if (process.name === item.name.split(':')[0]) {
-                        process.status.push(item);
+    let needLoadStatus = false;
+    try {
+        const res = await GetSupervisorProcess();
+        const stats = res.data || [];
+        for (const process of data.value) {
+            for (const item of stats) {
+                if (process.name === item.name) {
+                    if (item.status && item.status.length > 0) {
+                        process.status = item.status;
+                        process.hasLoad = true;
+                    } else {
+                        needLoadStatus = true;
                     }
                 }
-                process.hasLoad = true;
             }
-        })
-        .catch(() => {
-            for (const process of data.value) {
-                process.status = [{ name: '-', status: 'FATAL', msg: i18n.global.t('tool.supervisor.loadStatusErr') }];
-                process.hasLoad = true;
-            }
-        });
+        }
+        if (needLoadStatus) {
+            setTimeout(loadStatus, 2000);
+        }
+    } catch (error) {}
 };
 
 const mobile = computed(() => {
