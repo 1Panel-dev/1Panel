@@ -2,7 +2,7 @@
     <div v-loading="loading">
         <LayoutContent>
             <template #title>
-                <back-button name="MySQL" :header="'MySQL ' + $t('database.remoteDB')" />
+                <back-button name="MySQL" :header="$t('database.remoteDB')" />
             </template>
             <template #toolbar>
                 <el-row>

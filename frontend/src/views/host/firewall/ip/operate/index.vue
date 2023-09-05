@@ -4,7 +4,7 @@
             <DrawerHeader :header="title" :back="handleClose" />
         </template>
         <div v-loading="loading">
-            <el-form ref="formRef" label-position="top" :model="dialogData.rowData" :rules="rules">
+            <el-form ref="formRef" label-position="top" @submit.prevent :model="dialogData.rowData" :rules="rules">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
                         <el-form-item :label="$t('firewall.address')" prop="address">

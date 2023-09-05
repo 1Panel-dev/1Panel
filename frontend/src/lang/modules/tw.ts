@@ -78,7 +78,6 @@ const message = {
             interval: '耗時',
             user: '用戶',
             title: '標題',
-            network: '網絡',
             port: '端口',
             protocol: '協議',
             tableSetting: '列表設置',
@@ -501,6 +500,7 @@ const message = {
         cleanLogHelper: '清空日誌需要重啟容器，該操作無法回滾，是否繼續？',
         newName: '新名稱',
         source: '資源使用率',
+        ip: 'IP 地址',
         cpuShare: 'CPU 權重',
         cpuShareHelper: '容器默認份額為 1024 個 CPU，增大可使當前容器獲得更多的 CPU 時間',
 
@@ -515,7 +515,7 @@ const message = {
         oldImage: '當前鏡像',
         targetImage: '目標鏡像',
         targetImageHelper: '請輸入目標鏡像版本',
-        appHelper: '該容器來源於應用商店，升級可能導致該服務不可用，是否繼續？',
+        appHelper: '該容器來源於應用商店，升級可能導致該服務不可用',
 
         forcePull: '強製拉取鏡像',
         forcePullHelper: '忽略服務器已存在的鏡像，重新拉取一次',

@@ -147,14 +147,7 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 			IsFromApp = true
 		}
 
-		var ports []string
-		for _, port := range item.Ports {
-			itemPortStr := fmt.Sprintf("%v/%s", port.PrivatePort, port.Type)
-			if port.PublicPort != 0 {
-				itemPortStr = fmt.Sprintf("%v->%v/%s", port.PublicPort, port.PrivatePort, port.Type)
-			}
-			ports = append(ports, itemPortStr)
-		}
+		ports := simplifyPort(item.Ports)
 		backDatas[i] = dto.ContainerInfo{
 			ContainerID:   item.ID,
 			CreateTime:    time.Unix(item.Created, 0).Format("2006-01-02 15:04:05"),
@@ -934,6 +927,60 @@ func loadVolumeBinds(binds []string) []dto.VolumeHelper {
 			}
 		}
 		datas = append(datas, volumeItem)
+	}
+	return datas
+}
+
+func simplifyPort(ports []types.Port) []string {
+	var datas []string
+	if len(ports) == 0 {
+		return datas
+	}
+	if len(ports) == 1 {
+		itemPortStr := fmt.Sprintf("%v/%s", ports[0].PrivatePort, ports[0].Type)
+		if ports[0].PublicPort != 0 {
+			itemPortStr = fmt.Sprintf("%v->%v/%s", ports[0].PublicPort, ports[0].PrivatePort, ports[0].Type)
+		}
+		datas = append(datas, itemPortStr)
+		return datas
+	}
+
+	sort.Slice(ports, func(i, j int) bool {
+		return ports[i].PrivatePort < ports[j].PrivatePort
+	})
+	start := ports[0]
+
+	for i := 1; i < len(ports); i++ {
+		if ports[i].PrivatePort != ports[i-1].PrivatePort+1 || ports[i].IP != ports[i-1].IP || ports[i].PublicPort != ports[i-1].PublicPort+1 || ports[i].Type != ports[i-1].Type {
+			if ports[i-1].PrivatePort == start.PrivatePort {
+				itemPortStr := fmt.Sprintf("%s:%v/%s", start.IP, start.PrivatePort, start.Type)
+				if start.PublicPort != 0 {
+					itemPortStr = fmt.Sprintf("%s:%v->%v/%s", start.IP, start.PublicPort, start.PrivatePort, start.Type)
+				}
+				datas = append(datas, itemPortStr)
+			} else {
+				itemPortStr := fmt.Sprintf("%s:%v-%v/%s", start.IP, start.PrivatePort, ports[i-1].PrivatePort, start.Type)
+				if start.PublicPort != 0 {
+					itemPortStr = fmt.Sprintf("%s:%v-%v->%v-%v/%s", start.IP, start.PublicPort, ports[i-1].PublicPort, start.PrivatePort, ports[i-1].PrivatePort, start.Type)
+				}
+				datas = append(datas, itemPortStr)
+			}
+			start = ports[i]
+		} else if i == len(ports)-1 {
+			if ports[i].PrivatePort == start.PrivatePort {
+				itemPortStr := fmt.Sprintf("%s:%v/%s", start.IP, start.PrivatePort, start.Type)
+				if start.PublicPort != 0 {
+					itemPortStr = fmt.Sprintf("%s:%v->%v/%s", start.IP, start.PublicPort, start.PrivatePort, start.Type)
+				}
+				datas = append(datas, itemPortStr)
+			} else {
+				itemPortStr := fmt.Sprintf("%s:%v-%v/%s", start.IP, start.PrivatePort, ports[i].PrivatePort, start.Type)
+				if start.PublicPort != 0 {
+					itemPortStr = fmt.Sprintf("%s:%v-%v->%v-%v/%s", start.IP, start.PublicPort, ports[i].PublicPort, start.PrivatePort, ports[i].PrivatePort, start.Type)
+				}
+				datas = append(datas, itemPortStr)
+			}
+		}
 	}
 	return datas
 }

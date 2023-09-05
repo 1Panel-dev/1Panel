@@ -78,7 +78,6 @@ const message = {
             interval: 'Interval',
             user: 'User',
             title: 'Title',
-            network: 'Network',
             port: 'Port',
             protocol: 'Protocol',
             tableSetting: 'Table setting',
@@ -515,6 +514,7 @@ const message = {
             'Clearing logs requires restarting the container, and this operation cannot be rolled back. Do you want to continue?',
         newName: 'New name',
         source: 'Resource rate',
+        ip: 'IP address',
         cpuShare: 'CPU Share',
         cpuShareHelper:
             'The default CPU share for a container is 1024, which can be increased to give the container more CPU time.',
@@ -532,7 +532,7 @@ const message = {
         targetImage: 'Target image',
         targetImageHelper: 'Please enter the target image version',
         appHelper:
-            'This container is sourced from the application store. Upgrading it may cause the service to be unavailable. Do you want to continue?',
+            'This container is sourced from the application store. Upgrading it may cause the service to be unavailable.',
 
         forcePull: 'forced image pull ',
         forcePullHelper: 'Ignore existing images on the server and pull again.',
