@@ -25,7 +25,7 @@
             <template #search v-if="currentDB">
                 <el-select v-model="currentDBName" @change="changeDatabase()">
                     <template #prefix>{{ $t('commons.table.type') }}</template>
-                    <el-option-group :label="$t('database.local')" v-if="dbOptionsLocal.length !== 0">
+                    <el-option-group :label="$t('database.local')">
                         <div v-for="(item, index) in dbOptionsLocal" :key="index">
                             <el-option
                                 v-if="item.from === 'local'"
@@ -33,8 +33,11 @@
                                 :label="item.database + ' [' + item.type + ']'"
                             ></el-option>
                         </div>
+                        <el-button link type="primary" class="jumpAdd" @click="goRouter('app')" icon="Position">
+                            {{ $t('database.goInstall') }}
+                        </el-button>
                     </el-option-group>
-                    <el-option-group :label="$t('database.remote')" v-if="dbOptionsRemote.length !== 0">
+                    <el-option-group :label="$t('database.remote')">
                         <div v-for="(item, index) in dbOptionsRemote" :key="index">
                             <el-option
                                 v-if="item.from === 'remote'"
@@ -42,6 +45,9 @@
                                 :label="item.database + ' [' + item.type + ']'"
                             ></el-option>
                         </div>
+                        <el-button link type="primary" class="jumpAdd" @click="goRouter('remote')" icon="Position">
+                            {{ $t('database.createRemoteDB') }}
+                        </el-button>
                     </el-option-group>
                 </el-select>
             </template>
@@ -156,7 +162,7 @@
                     <div class="app-warn">
                         <div>
                             <span>{{ $t('app.checkInstalledWarn', [$t('database.noMysql')]) }}</span>
-                            <span @click="goRouter">
+                            <span @click="goRouter('app')">
                                 <el-icon><Position /></el-icon>
                                 {{ $t('database.goInstall') }}
                             </span>
@@ -354,8 +360,12 @@ const loadDB = async () => {
     });
 };
 
-const goRouter = async () => {
-    router.push({ name: 'AppAll', query: { install: 'mysql' } });
+const goRouter = async (target: string) => {
+    if (target === 'app') {
+        router.push({ name: 'AppAll', query: { install: 'mysql' } });
+        return;
+    }
+    router.push({ name: 'MySQL-Remote' });
 };
 
 const onChange = async (info: any) => {
@@ -528,5 +538,10 @@ onMounted(() => {
 .iconInTable {
     margin-left: 5px;
     margin-top: 3px;
+}
+.jumpAdd {
+    margin-top: 10px;
+    margin-left: 15px;
+    font-size: 12px;
 }
 </style>
