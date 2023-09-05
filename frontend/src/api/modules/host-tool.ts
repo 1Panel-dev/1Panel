@@ -34,7 +34,7 @@ export const LoadProcessStatus = () => {
 };
 
 export const GetSupervisorProcess = () => {
-    return http.get<HostTool.SupersivorProcess>(`/hosts/tool/supervisor/process`);
+    return http.get<HostTool.SupersivorProcess[]>(`/hosts/tool/supervisor/process`);
 };
 
 export const OperateSupervisorProcessFile = (req: HostTool.ProcessFileReq) => {
