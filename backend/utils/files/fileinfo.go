@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -23,6 +24,8 @@ type FileInfo struct {
 	Name       string      `json:"name"`
 	User       string      `json:"user"`
 	Group      string      `json:"group"`
+	Uid        string      `json:"uid"`
+	Gid        string      `json:"gid"`
 	Extension  string      `json:"extension"`
 	Content    string      `json:"content"`
 	Size       int64       `json:"size"`
@@ -77,6 +80,8 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 		IsHidden:  IsHidden(op.Path),
 		Mode:      fmt.Sprintf("%04o", info.Mode().Perm()),
 		User:      GetUsername(info.Sys().(*syscall.Stat_t).Uid),
+		Uid:       strconv.FormatUint(uint64(info.Sys().(*syscall.Stat_t).Uid), 10),
+		Gid:       strconv.FormatUint(uint64(info.Sys().(*syscall.Stat_t).Gid), 10),
 		Group:     GetGroup(info.Sys().(*syscall.Stat_t).Gid),
 		MimeType:  GetMimeType(op.Path),
 	}
@@ -208,6 +213,8 @@ func (f *FileInfo) listChildren(dir, showHidden, containSub bool, search string,
 			Mode:      fmt.Sprintf("%04o", df.Mode().Perm()),
 			User:      GetUsername(df.Sys().(*syscall.Stat_t).Uid),
 			Group:     GetGroup(df.Sys().(*syscall.Stat_t).Gid),
+			Uid:       strconv.FormatUint(uint64(df.Sys().(*syscall.Stat_t).Uid), 10),
+			Gid:       strconv.FormatUint(uint64(df.Sys().(*syscall.Stat_t).Gid), 10),
 		}
 
 		if isSymlink {
