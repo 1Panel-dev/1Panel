@@ -21,7 +21,6 @@
                 <el-form-item v-if="configDir" :label="$t('website.runDir')">
                     <el-space wrap>
                         <el-select v-model="update.siteDir">
-                            <el-option :label="'/'" :value="'/'"></el-option>
                             <el-option
                                 v-for="(item, index) in dirs"
                                 :label="item"
@@ -56,6 +55,11 @@
                     <span class="warnHelper">{{ $t('website.runUserHelper') }}</span>
                 </template>
             </el-alert>
+            <el-alert :closable="false" type="error" v-if="dirConfig.msg != ''">
+                <template #default>
+                    <span class="warnHelper">{{ dirConfig.msg }}</span>
+                </template>
+            </el-alert>
             <br />
             <el-descriptions :title="$t('website.folderTitle')" :column="1" border>
                 <el-descriptions-item label="waf">{{ $t('website.wafFolder') }}</el-descriptions-item>
@@ -67,8 +71,8 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { GetFilesList } from '@/api/modules/files';
-import { GetWebsite, UpdateWebsiteDir, UpdateWebsiteDirPermission } from '@/api/modules/website';
+import { Website } from '@/api/interface/website';
+import { GetDirConfig, GetWebsite, UpdateWebsiteDir, UpdateWebsiteDirPermission } from '@/api/modules/website';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
@@ -98,17 +102,13 @@ const updatePermission = reactive({
     group: '1000',
 });
 const siteForm = ref<FormInstance>();
-const dirReq = reactive({
-    path: '/',
-    expand: true,
-    showHidden: false,
-    page: 1,
-    pageSize: 100,
-    search: '',
-    containSub: false,
-    dir: true,
-});
 const dirs = ref([]);
+const dirConfig = ref<Website.DirConfig>({
+    dirs: [''],
+    user: '',
+    userGroup: '',
+    msg: '',
+});
 
 const search = () => {
     loading.value = true;
@@ -116,14 +116,15 @@ const search = () => {
         .then((res) => {
             website.value = res.data;
             update.id = website.value.id;
-            update.siteDir = website.value.siteDir;
+            update.siteDir = website.value.siteDir.startsWith('/')
+                ? website.value.siteDir
+                : '/' + website.value.siteDir;
             updatePermission.id = website.value.id;
             updatePermission.group = website.value.group === '' ? '1000' : website.value.group;
             updatePermission.user = website.value.user === '' ? '1000' : website.value.user;
             if (website.value.type === 'static' || website.value.runtimeID > 0) {
                 configDir.value = true;
-                dirReq.path = website.value.sitePath + '/index';
-                getDirs();
+                getDirConfig();
             }
         })
         .finally(() => {
@@ -164,23 +165,17 @@ const submitPermission = async () => {
         });
 };
 
-const getDirs = async () => {
-    loading.value = true;
-    await GetFilesList(dirReq)
-        .then((res) => {
-            dirs.value = [];
-            const items = res.data.items || [];
-            for (const item of items) {
-                dirs.value.push(item.name);
-            }
-        })
-        .finally(() => {
-            loading.value = false;
-        });
-};
-
 const initData = () => {
     dirs.value = [];
+};
+
+const getDirConfig = async () => {
+    try {
+        const res = await GetDirConfig({ id: props.id });
+        dirs.value = res.data.dirs;
+        dirConfig.value = res.data;
+        console.log(res);
+    } catch (error) {}
 };
 
 const toFolder = (folder: string) => {

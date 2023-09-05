@@ -213,3 +213,7 @@ type WebsiteWafFileUpdate struct {
 	Content   string `json:"content" validate:"required"`
 	Type      string `json:"type" validate:"required,oneof=cc ip_white ip_block url_white url_block cookie_block args_check post_check ua_check file_ext_block"`
 }
+
+type WebsiteCommonReq struct {
+	ID uint `json:"id" validate:"required"`
+}

@@ -431,4 +431,11 @@ export namespace Website {
         runtimeID: number;
         retainConfig: boolean;
     }
+
+    export interface DirConfig {
+        dirs: string[];
+        user: string;
+        userGroup: string;
+        msg: string;
+    }
 }

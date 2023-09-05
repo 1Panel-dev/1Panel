@@ -737,8 +737,6 @@ definitions:
       port:
         type: integer
       type:
-        enum:
-        - mysql
         type: string
       username:
         type: string
@@ -771,6 +769,8 @@ definitions:
         type: string
       port:
         type: integer
+      type:
+        type: string
       username:
         type: string
       version:
@@ -3169,6 +3169,13 @@ definitions:
     required:
     - email
     type: object
+  request.WebsiteCommonReq:
+    properties:
+      id:
+        type: integer
+    required:
+    - id
+    type: object
   request.WebsiteCreate:
     properties:
       IPV6:
@@ -3867,19 +3874,6 @@ definitions:
           type: string
         type: object
       uploadMaxSize:
-        type: string
-    type: object
-  response.ProcessStatus:
-    properties:
-      PID:
-        type: string
-      msg:
-        type: string
-      name:
-        type: string
-      status:
-        type: string
-      uptime:
         type: string
     type: object
   response.WebsiteAcmeAccountDTO:
@@ -8116,21 +8110,6 @@ paths:
         formatEN: '[operate] Supervisor Process Config file'
         formatZH: '[operate] Supervisor 进程文件 '
         paramKeys: []
-  /host/tool/supervisor/process/load:
-    post:
-      description: 获取 Supervisor 进程状态
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/response.ProcessStatus'
-            type: array
-      security:
-      - ApiKeyAuth: []
-      summary: Load Supervisor process status
-      tags:
-      - Host tool
   /hosts:
     post:
       consumes:
@@ -10305,6 +10284,26 @@ paths:
         formatEN: Delete website [domain]
         formatZH: 删除网站 [domain]
         paramKeys: []
+  /websites/dir:
+    post:
+      consumes:
+      - application/json
+      description: 获取网站目录配置
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteCommonReq'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Get website dir
+      tags:
+      - Website
   /websites/dir/permission:
     post:
       consumes:

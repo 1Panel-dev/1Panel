@@ -912,3 +912,25 @@ func (b *BaseApi) UpdateRedirectConfigFile(c *gin.Context) {
 	}
 	helper.SuccessWithOutData(c)
 }
+
+// @Tags Website
+// @Summary Get website dir
+// @Description 获取网站目录配置
+// @Accept json
+// @Param request body request.WebsiteCommonReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/dir [post]
+func (b *BaseApi) GetDirConfig(c *gin.Context) {
+	var req request.WebsiteCommonReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	res, err := websiteService.LoadWebsiteDirConfig(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
