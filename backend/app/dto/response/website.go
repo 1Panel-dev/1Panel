@@ -53,3 +53,10 @@ type PHPConfig struct {
 type NginxRewriteRes struct {
 	Content string `json:"content"`
 }
+
+type WebsiteDirConfig struct {
+	Dirs      []string `json:"dirs"`
+	User      string   `json:"user"`
+	UserGroup string   `json:"userGroup"`
+	Msg       string   `json:"msg"`
+}

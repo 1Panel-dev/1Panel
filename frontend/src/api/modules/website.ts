@@ -234,3 +234,7 @@ export const UpdateRedirectConfigFile = (req: Website.RedirectFileUpdate) => {
 export const ChangePHPVersion = (req: Website.PHPVersionChange) => {
     return http.post<any>(`/websites/php/version`, req);
 };
+
+export const GetDirConfig = (req: Website.ProxyReq) => {
+    return http.post<Website.DirConfig>(`/websites/dir`, req);
+};
