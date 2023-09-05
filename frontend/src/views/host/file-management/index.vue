@@ -1,40 +1,44 @@
 <template>
     <div>
-        <el-row>
-            <el-col :span="2">
-                <div>
-                    <el-button :icon="Back" @click="back" circle :disabled="paths.length == 0" />
-                    <el-button :icon="Refresh" circle @click="search" />
-                </div>
-            </el-col>
-            <el-col :span="22">
-                <div v-show="!searchableStatus" tabindex="0" @click="searchableStatus = true">
-                    <div class="path" ref="pathRef">
-                        <span ref="breadCrumbRef">
-                            <span class="root">
-                                <el-link @click.stop="jump('/')">
-                                    <el-icon :size="20"><HomeFilled /></el-icon>
-                                </el-link>
-                            </span>
-                            <span v-for="item in paths" :key="item.url" class="other">
-                                <span class="split">></span>
-                                <el-link @click.stop="jump(item.url)">{{ item.name }}</el-link>
-                            </span>
+        <div class="flex items-center">
+            <div class="flex-shrink-0 flex items-center mr-4">
+                <el-button :icon="Back" @click="back" circle :disabled="paths.length == 0" />
+                <el-button :icon="Refresh" circle @click="search" />
+            </div>
+            <div
+                v-show="!searchableStatus"
+                tabindex="0"
+                @click="searchableStatus = true"
+                class="address-bar bg-white shadow-md rounded-md px-4 py-2 flex items-center flex-grow"
+            >
+                <div ref="pathRef" class="w-full">
+                    <span ref="breadCrumbRef" class="w-full flex items-center">
+                        <span class="root mr-2">
+                            <el-link @click.stop="jump('/')">
+                                <el-icon :size="20"><HomeFilled /></el-icon>
+                            </el-link>
                         </span>
-                    </div>
+                        <span v-for="path in paths" :key="path.url" class="inline-flex items-center">
+                            <span class="mr-2">></span>
+                            <el-link class="path-segment cursor-pointer mr-2 pathname" @click.stop="jump(path.url)">
+                                {{ path.name }}
+                            </el-link>
+                        </span>
+                    </span>
                 </div>
-                <el-input
-                    ref="searchableInputRef"
-                    v-show="searchableStatus"
-                    v-model="searchablePath"
-                    @blur="searchableInputBlur"
-                    @keyup.enter="
-                        jump(searchablePath);
-                        searchableStatus = false;
-                    "
-                />
-            </el-col>
-        </el-row>
+            </div>
+            <el-input
+                ref="searchableInputRef"
+                v-show="searchableStatus"
+                v-model="searchablePath"
+                @blur="searchableInputBlur"
+                class="px-4 py-2 bg-white border rounded-md shadow-md"
+                @keyup.enter="
+                    jump(searchablePath);
+                    searchableStatus = false;
+                "
+            />
+        </div>
         <LayoutContent :title="$t('file.file')" v-loading="loading">
             <template #toolbar>
                 <el-dropdown @command="handleCreate">
@@ -338,7 +342,14 @@ const copyDir = (row: File.File) => {
 };
 
 const handlePath = () => {
-    if (breadCrumbRef.value.offsetWidth > pathWidth.value) {
+    const breadcrumbElement = breadCrumbRef.value as any;
+    const pathNodes = breadcrumbElement.querySelectorAll('.pathname');
+
+    let totalpathWidth = 0;
+    pathNodes.forEach((node) => {
+        totalpathWidth += node.offsetWidth;
+    });
+    if (totalpathWidth > pathWidth.value) {
         paths.value.splice(0, 1);
         paths.value[0].name = '..';
         nextTick(function () {
@@ -628,8 +639,12 @@ onMounted(() => {
             getPaths(req.path);
         }
     }
-    pathWidth.value = pathRef.value.offsetWidth * 0.7;
+    pathWidth.value = pathRef.value.offsetWidth;
     search();
+
+    nextTick(function () {
+        handlePath();
+    });
 });
 </script>
 
