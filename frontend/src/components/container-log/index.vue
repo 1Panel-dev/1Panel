@@ -1,15 +1,18 @@
 <template>
     <div>
         <div style="display: flex; flex-wrap: wrap">
-            <el-select @change="searchLogs" v-model="logSearch.mode" style="width: 150px">
+            <el-select @change="searchLogs" v-model="logSearch.mode" class="selectWidth">
                 <template #prefix>{{ $t('container.fetch') }}</template>
                 <el-option v-for="item in timeOptions" :key="item.label" :value="item.value" :label="item.label" />
             </el-select>
-            <el-input @change="searchLogs" class="margin-button" style="width: 100px" v-model.number="logSearch.tail">
-                <template #prefix>
-                    <div style="margin-left: 2px">{{ $t('container.lines') }}</div>
-                </template>
-            </el-input>
+            <el-select @change="searchLogs" class="margin-button selectWidth" v-model.number="logSearch.tail">
+                <template #prefix>{{ $t('container.lines') }}</template>
+                <el-option :value="0" :label="$t('commons.table.all')" />
+                <el-option :value="100" :label="100" />
+                <el-option :value="200" :label="200" />
+                <el-option :value="500" :label="500" />
+                <el-option :value="1000" :label="1000" />
+            </el-select>
             <div class="margin-button">
                 <el-checkbox border @change="searchLogs" v-model="logSearch.isWatch">
                     {{ $t('commons.button.watch') }}
@@ -89,7 +92,7 @@ const timeOptions = ref([
 ]);
 
 const searchLogs = async () => {
-    if (!Number(logSearch.tail) || Number(logSearch.tail) < 0) {
+    if (Number(logSearch.tail) < 0) {
         MsgError(i18n.global.t('container.linesHelper'));
         return;
     }
@@ -112,7 +115,17 @@ const searchLogs = async () => {
 };
 
 const onDownload = async () => {
-    downloadWithContent(logInfo.value, logSearch.container + '-' + dateFormatForName(new Date()) + '.log');
+    let msg =
+        logSearch.tail === 0
+            ? i18n.global.t('container.downLogHelper1', [logSearch.container])
+            : i18n.global.t('container.downLogHelper2', [logSearch.container, logSearch.tail]);
+    ElMessageBox.confirm(msg, i18n.global.t('file.download'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(async () => {
+        downloadWithContent(logInfo.value, logSearch.container + '-' + dateFormatForName(new Date()) + '.log');
+    });
 };
 
 interface DialogProps {
@@ -153,5 +166,8 @@ defineExpose({
 <style scoped lang="scss">
 .margin-button {
     margin-left: 20px;
+}
+.selectWidth {
+    width: 150px;
 }
 </style>
