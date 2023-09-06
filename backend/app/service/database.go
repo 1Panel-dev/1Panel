@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/backend/utils/mysql"
@@ -89,6 +90,9 @@ func (u *DatabaseService) CheckDatabase(req dto.DatabaseCreate) bool {
 func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
 	db, _ := databaseRepo.Get(commonRepo.WithByName(req.Name))
 	if db.ID != 0 {
+		if db.From == "local" {
+			return buserr.New(constant.ErrLocalExist)
+		}
 		return constant.ErrRecordExist
 	}
 	if _, err := mysql.NewMysqlClient(client.DBInfo{

@@ -83,6 +83,8 @@ ErrOpenrestyPort: 'openresty 默认端口为 {{ .detail }}，无法使用 HTTP �
 ErrUserIsExist: "当前用户已存在，请重新输入"
 ErrDatabaseIsExist: "当前数据库已存在，请重新输入"
 ErrExecTimeOut: "SQL 执行超时，请检查数据库"
+ErrRemoteExist: "远程数据库已存在该名称，请修改后重试"
+ErrLocalExist: "本地数据库已存在该名称，请修改后重试"
 
 #redis
 ErrTypeOfRedis: "恢复文件类型与当前持久化方式不符，请修改后重试"
