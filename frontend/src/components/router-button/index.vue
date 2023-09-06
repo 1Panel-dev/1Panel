@@ -8,7 +8,7 @@
                 size="large"
                 :key="index"
             >
-                <el-badge :value="button.count" class="item" v-if="button.count > 0" is-dot>
+                <el-badge :value="button.count" v-if="button.count" is-dot>
                     <span>{{ button.label }}</span>
                 </el-badge>
             </el-radio-button>
@@ -24,13 +24,12 @@ defineOptions({ name: 'RouterButton' });
 
 const props = defineProps({
     buttons: {
-        type: Array,
+        type: Array<RouterButton>,
         required: true,
-        count: Number,
     },
 });
 
-const buttonArray: any = computed(() => {
+const buttonArray = computed(() => {
     return props.buttons;
 });
 
@@ -44,30 +43,21 @@ const routerToName = (name: string) => {
 };
 
 const handleChange = (label: string) => {
-    buttonArray.value.forEach((btn: RouterButton) => {
-        if (btn.label == label) {
-            if (btn.path) {
-                routerToPath(btn.path);
-            } else if (btn.name) {
-                routerToName(btn.name);
-            }
-            activeName.value = btn.label;
-            return;
-        }
-    });
+    const btn = buttonArray.value.find((btn) => btn.label === label);
+    if (!btn) return;
+    if (btn.path) routerToPath(btn.path);
+    else if (btn.name) routerToName(btn.name);
+    activeName.value = btn.label;
 };
 
 onMounted(() => {
-    const nowPath = router.currentRoute.value.path;
-    if (buttonArray.value.length > 0) {
+    if (buttonArray.value.length) {
         let isPathExist = false;
-        buttonArray.value.forEach((btn: RouterButton) => {
-            if (btn.path == nowPath) {
-                isPathExist = true;
-                activeName.value = btn.label;
-                return;
-            }
-        });
+        const btn = buttonArray.value.find((btn) => btn.path === router.currentRoute.value.path);
+        if (btn) {
+            isPathExist = true;
+            activeName.value = btn.label;
+        }
         if (!isPathExist) {
             activeName.value = buttonArray.value[0].label;
         }
@@ -77,32 +67,22 @@ onMounted(() => {
 
 <style lang="scss">
 .router_card {
-    --el-card-border-radius: 8px;
     --el-card-padding: 0;
-    padding: 0px;
-    padding-bottom: 2px;
-    padding-top: 2px;
 }
+
 .router_card_button {
-    margin-left: 2px;
     .el-radio-button__inner {
         min-width: 100px;
         height: 100%;
-        border: 0 !important;
+        background-color: var(--panel-button-active) !important;
+        box-shadow: none !important;
+        border: 2px solid transparent !important;
     }
 
     .el-radio-button__original-radio:checked + .el-radio-button__inner {
-        border-radius: 3px;
         color: $primary-color;
-        background-color: var(--panel-button-active);
-        box-shadow: 0 0 0 2px $primary-color !important;
-    }
-
-    .el-radio-button:first-child .el-radio-button__inner {
-        border-radius: 3px;
-        color: $primary-color;
-        background-color: var(--panel-button-active);
-        box-shadow: 0 0 0 2px $primary-color !important;
+        border-color: $primary-color !important;
+        border-radius: 4px;
     }
 }
 </style>
