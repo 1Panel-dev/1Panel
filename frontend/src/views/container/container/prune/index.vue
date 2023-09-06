@@ -2,7 +2,7 @@
     <el-dialog v-model="dialogVisiable" :title="$t('container.containerPrune')" :destroy-on-close="true" width="30%">
         <div>
             <ul class="help-ul">
-                <li lineClass style="color: red">{{ $t('container.containerPruneHelper1') }}</li>
+                <li class="lineClass" style="color: red">{{ $t('container.containerPruneHelper1') }}</li>
                 <li class="lineClass">{{ $t('container.containerPruneHelper2') }}</li>
                 <li class="lineClass">{{ $t('container.containerPruneHelper3') }}</li>
             </ul>

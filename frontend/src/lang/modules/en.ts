@@ -470,9 +470,9 @@ const message = {
         updateContaienrHelper:
             'Container editing requires rebuilding the container. Any data that has not been persisted will be lost. Do you want to continue?',
         containerList: 'Container list',
-        operatorHelper: '{0} will be performed on the selected container. Do you want to continue?',
+        operatorHelper: '{0} will be performed on the following container, Do you want to continue?',
         operatorAppHelper:
-            'There is a container from the App store. The {0} operation may affect the normal use of this service. Are you sure?',
+            'The {0} operation will be performed on the following containers, some of which are from the App Store. This operation may affect the normal use of the service, Do you want to continue?',
         start: 'Start',
         stop: 'Stop',
         restart: 'Restart',

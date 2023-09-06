@@ -459,8 +459,9 @@ const message = {
         edit: '編輯容器',
         updateContaienrHelper: '容器編輯需要重建容器，任何未持久化的數據將會丟失，是否繼續？',
         containerList: '容器列表',
-        operatorHelper: '將對選中容器進行 {0} 操作，是否繼續？',
-        operatorAppHelper: '存在來源於應用商店的容器，{0} 操作可能會影響到該服務的正常使用，是否確認？',
+        operatorHelper: '將對以下容器進行 {0} 操作，是否繼續？',
+        operatorAppHelper:
+            '將對以下容器進行 {0} 操作，其中部分來源於應用商店，該操作可能會影響到該服務的正常使用，是否確認？',
         start: '啟動',
         stop: '停止',
         restart: '重啟',

@@ -611,7 +611,7 @@ var AddDatabases = &gormigrate.Migration{
 			if err := tx.Create(&model.Database{
 				AppInstallID: redisInfo.ID,
 				Name:         redisInfo.Name,
-				Type:         "mariadb",
+				Type:         "redis",
 				Version:      redisInfo.Version,
 				From:         "local",
 				Address:      redisInfo.ServiceName,
@@ -627,7 +627,7 @@ var AddDatabases = &gormigrate.Migration{
 			if err := tx.Create(&model.Database{
 				AppInstallID: pgInfo.ID,
 				Name:         pgInfo.Name,
-				Type:         "mariadb",
+				Type:         "postgresql",
 				Version:      pgInfo.Version,
 				From:         "local",
 				Address:      pgInfo.ServiceName,
@@ -643,7 +643,7 @@ var AddDatabases = &gormigrate.Migration{
 			if err := tx.Create(&model.Database{
 				AppInstallID: mongodbInfo.ID,
 				Name:         mongodbInfo.Name,
-				Type:         "mariadb",
+				Type:         "mongodb",
 				Version:      mongodbInfo.Version,
 				From:         "local",
 				Address:      mongodbInfo.ServiceName,
@@ -659,7 +659,7 @@ var AddDatabases = &gormigrate.Migration{
 			if err := tx.Create(&model.Database{
 				AppInstallID: memcachedInfo.ID,
 				Name:         memcachedInfo.Name,
-				Type:         "mariadb",
+				Type:         "memcached",
 				Version:      memcachedInfo.Version,
 				From:         "local",
 				Address:      memcachedInfo.ServiceName,
