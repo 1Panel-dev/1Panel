@@ -83,6 +83,8 @@ ErrOpenrestyPort: 'The default port of openresty is {{ .detail }}, HTTP mode can
 ErrUserIsExist: "The current user already exists. Please enter a new user"
 ErrDatabaseIsExist: "The current database already exists. Please enter a new database"
 ErrExecTimeOut: "SQL execution timed out, please check the database"
+ErrRemoteExist: "The remote database already exists with that name, please modify it and try again"
+ErrLocalExist: "The local database already exists with that name, please modify it and try again"
 
 #redis
 ErrTypeOfRedis: "The recovery file type does not match the current persistence mode. Modify the file type and try again"

@@ -83,6 +83,8 @@ ErrOpenrestyPort: 'openresty 默認端口為 {{ .detail }}，無法使用 HTTP �
 ErrUserIsExist: "當前用戶已存在，請重新輸入"
 ErrDatabaseIsExist: "當前資料庫已存在，請重新輸入"
 ErrExecTimeOut: "SQL 執行超時，請檢查數據庫"
+ErrRemoteExist: "遠程數據庫已存在該名稱，請修改後重試"
+ErrLocalExist: "本地數據庫已存在該名稱，請修改後重試"
 
 #redis
 ErrTypeOfRedis: "恢復文件類型與當前持久化方式不符，請修改後重試"
