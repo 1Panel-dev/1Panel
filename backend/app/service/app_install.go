@@ -53,7 +53,7 @@ type IAppInstallService interface {
 	GetUpdateVersions(installId uint) ([]dto.AppVersion, error)
 	GetParams(id uint) (*response.AppConfig, error)
 	ChangeAppPort(req request.PortUpdate) error
-	GetDefaultConfigByKey(key string) (string, error)
+	GetDefaultConfigByKey(key, name string) (string, error)
 	DeleteCheck(installId uint) ([]dto.AppResource, error)
 
 	GetInstallList() ([]dto.AppInstallInfo, error)
@@ -572,22 +572,22 @@ func (a *AppInstallService) DeleteCheck(installId uint) ([]dto.AppResource, erro
 	return res, nil
 }
 
-func (a *AppInstallService) GetDefaultConfigByKey(key string) (string, error) {
-	appInstall, err := getAppInstallByKey(key)
+func (a *AppInstallService) GetDefaultConfigByKey(key, name string) (string, error) {
+	baseInfo, err := appInstallRepo.LoadBaseInfo(key, name)
 	if err != nil {
 		return "", err
 	}
 
 	fileOp := files.NewFileOp()
-	filePath := path.Join(constant.AppResourceDir, "remote", appInstall.App.Key, appInstall.Version, "conf")
+	filePath := path.Join(constant.AppResourceDir, "remote", baseInfo.Key, baseInfo.Version, "conf")
 	if !fileOp.Stat(filePath) {
-		filePath = path.Join(constant.AppResourceDir, appInstall.App.Key, "versions", appInstall.Version, "conf")
+		filePath = path.Join(constant.AppResourceDir, baseInfo.Key, "versions", baseInfo.Version, "conf")
 	}
 	if !fileOp.Stat(filePath) {
 		return "", buserr.New(constant.ErrPathNotFound)
 	}
 
-	if key == constant.AppMysql {
+	if key == constant.AppMysql || key == constant.AppMariaDB {
 		filePath = path.Join(filePath, "my.cnf")
 	}
 	if key == constant.AppRedis {

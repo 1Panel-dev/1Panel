@@ -308,8 +308,8 @@
                 }
             }
         },
-        "/apps/installed/conf/:key": {
-            "get": {
+        "/apps/installed/conf": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -325,11 +325,13 @@
                 "summary": "Search default config by key",
                 "parameters": [
                     {
-                        "type": "string",
                         "description": "request",
-                        "name": "key",
-                        "in": "path",
-                        "required": true
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperationWithNameAndType"
+                        }
                     }
                 ],
                 "responses": {
@@ -12897,6 +12899,7 @@
             "type": "object",
             "required": [
                 "password",
+                "type",
                 "username",
                 "version"
             ],
@@ -12915,6 +12918,9 @@
                 },
                 "port": {
                     "type": "integer"
+                },
+                "type": {
+                    "type": "string"
                 },
                 "username": {
                     "type": "string"

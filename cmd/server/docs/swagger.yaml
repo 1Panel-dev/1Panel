@@ -821,12 +821,15 @@ definitions:
         type: string
       port:
         type: integer
+      type:
+        type: string
       username:
         type: string
       version:
         type: string
     required:
     - password
+    - type
     - username
     - version
     type: object
@@ -4223,17 +4226,18 @@ paths:
       summary: Check app installed
       tags:
       - App
-  /apps/installed/conf/:key:
-    get:
+  /apps/installed/conf:
+    post:
       consumes:
       - application/json
       description: 通过 key 获取应用默认配置
       parameters:
       - description: request
-        in: path
-        name: key
+        in: body
+        name: request
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/dto.OperationWithNameAndType'
       responses:
         "200":
           description: OK

@@ -292,10 +292,15 @@ const submtiForm = async () => {
 
 const getDefaultConfig = async () => {
     loading.value = true;
-    const res = await GetAppDefaultConfig('redis');
-    redisConf.value = res.data;
-    useOld.value = true;
-    loading.value = false;
+    await GetAppDefaultConfig('redis', '')
+        .then((res) => {
+            redisConf.value = res.data;
+            useOld.value = true;
+            loading.value = false;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const onSaveFile = async () => {
@@ -319,7 +324,7 @@ const submtiFile = async () => {
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
-            loading.value = true;
+            loading.value = false;
         });
 };
 
