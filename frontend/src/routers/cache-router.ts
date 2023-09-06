@@ -7,11 +7,11 @@ import { routerArray } from '@/routers/router';
  * @param {Array} _cache 缓存的路由表
  * @return void
  * */
-let cacheRouter: any[] = [];
+let cacheRouter: RouteRecordName[] = [];
 const filterKeepAlive = (_route: RouteRecordRaw[], _cache: RouteRecordName[]): void => {
     _route.forEach((item) => {
         item.meta?.keepAlive && item.name && _cache.push(item.name);
-        item.children && item.children.length !== 0 && filterKeepAlive(item.children, _cache);
+        item?.children?.length && filterKeepAlive(item.children, _cache);
     });
 };
 

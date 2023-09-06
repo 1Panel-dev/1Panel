@@ -26,4 +26,5 @@ declare interface RouterButton {
     label: string;
     path?: string;
     name?: string;
+    count?: number;
 }
