@@ -567,7 +567,7 @@ func (u *ContainerService) ContainerLogs(wsConn *websocket.Conn, container, sinc
 	}
 	command := fmt.Sprintf("docker logs %s", container)
 	if tail != "0" {
-		command += " -n " + tail
+		command += " --tail " + tail
 	}
 	if since != "all" {
 		command += " --since " + since

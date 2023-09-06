@@ -639,3 +639,7 @@ func chownRootDir(path string) error {
 	}
 	return nil
 }
+
+func checkWebsiteDirPermission(path string) error {
+	return nil
+}

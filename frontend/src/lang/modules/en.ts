@@ -510,6 +510,8 @@ const message = {
         lastHour: 'Last Hour',
         last10Min: 'Last 10 Minutes',
         cleanLog: 'Clean log',
+        downLogHelper1: 'Are you sure you want to download all logs for container {0}?',
+        downLogHelper2: 'Are you sure you want to download the recent {1} logs for container {0}?',
         cleanLogHelper:
             'Clearing logs requires restarting the container, and this operation cannot be rolled back. Do you want to continue?',
         newName: 'New name',

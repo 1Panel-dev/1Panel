@@ -9,13 +9,16 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
+	"github.com/spf13/afero"
 	"os"
 	"path"
 	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
@@ -80,6 +83,7 @@ type IWebsiteService interface {
 
 	GetRewriteConfig(req request.NginxRewriteReq) (*response.NginxRewriteRes, error)
 	UpdateRewriteConfig(req request.NginxRewriteUpdate) error
+	LoadWebsiteDirConfig(req request.WebsiteCommonReq) (*response.WebsiteDirConfig, error)
 	UpdateSiteDir(req request.WebsiteUpdateDir) error
 	UpdateSitePermission(req request.WebsiteUpdateDirPermission) error
 	OperateProxy(req request.WebsiteProxyConfig) (err error)
@@ -1389,7 +1393,7 @@ func (w WebsiteService) UpdateSiteDir(req request.WebsiteUpdateDir) error {
 	runDir := req.SiteDir
 	siteDir := path.Join("/www/sites", website.Alias, "index")
 	if req.SiteDir != "/" {
-		siteDir = fmt.Sprintf("%s/%s", siteDir, req.SiteDir)
+		siteDir = fmt.Sprintf("%s%s", siteDir, req.SiteDir)
 	}
 	if err := updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: "root", Params: []string{siteDir}}}, &website); err != nil {
 		return err
@@ -1408,9 +1412,6 @@ func (w WebsiteService) UpdateSitePermission(req request.WebsiteUpdateDirPermiss
 		return err
 	}
 	absoluteIndexPath := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "index")
-	if website.SiteDir != "/" {
-		absoluteIndexPath = path.Join(absoluteIndexPath, website.SiteDir)
-	}
 	chownCmd := fmt.Sprintf("chown -R %s:%s %s", req.User, req.Group, absoluteIndexPath)
 	if cmd.HasNoPasswordSudo() {
 		chownCmd = fmt.Sprintf("sudo %s", chownCmd)
@@ -2317,4 +2318,53 @@ func (w WebsiteService) UpdateWafFile(req request.WebsiteWafFileUpdate) (err err
 	}
 	rulePath := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "waf", "rules", fmt.Sprintf("%s.json", req.Type))
 	return files.NewFileOp().WriteFile(rulePath, strings.NewReader(req.Content), 0755)
+}
+
+func (w WebsiteService) LoadWebsiteDirConfig(req request.WebsiteCommonReq) (*response.WebsiteDirConfig, error) {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return nil, err
+	}
+	res := &response.WebsiteDirConfig{}
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return nil, err
+	}
+	absoluteIndexPath := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "index")
+	var appFs = afero.NewOsFs()
+	info, err := appFs.Stat(absoluteIndexPath)
+	if err != nil {
+		return nil, err
+	}
+	res.User = strconv.FormatUint(uint64(info.Sys().(*syscall.Stat_t).Uid), 10)
+	res.UserGroup = strconv.FormatUint(uint64(info.Sys().(*syscall.Stat_t).Gid), 10)
+
+	indexFiles, err := os.ReadDir(absoluteIndexPath)
+	if err != nil {
+		return nil, err
+	}
+	res.Dirs = []string{"/"}
+	for _, file := range indexFiles {
+		if !file.IsDir() {
+			continue
+		}
+		res.Dirs = append(res.Dirs, fmt.Sprintf("/%s", file.Name()))
+		fileInfo, _ := file.Info()
+		if fileInfo.Sys().(*syscall.Stat_t).Uid != 1000 || fileInfo.Sys().(*syscall.Stat_t).Gid != 1000 {
+			res.Msg = i18n.GetMsgByKey("ErrPathPermission")
+		}
+		childFiles, _ := os.ReadDir(absoluteIndexPath + "/" + file.Name())
+		for _, childFile := range childFiles {
+			if !childFile.IsDir() {
+				continue
+			}
+			childInfo, _ := childFile.Info()
+			if childInfo.Sys().(*syscall.Stat_t).Uid != 1000 || childInfo.Sys().(*syscall.Stat_t).Gid != 1000 {
+				res.Msg = i18n.GetMsgByKey("ErrPathPermission")
+			}
+			res.Dirs = append(res.Dirs, fmt.Sprintf("/%s/%s", file.Name(), childFile.Name()))
+		}
+	}
+
+	return res, nil
 }

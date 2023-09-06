@@ -6439,31 +6439,6 @@
                 }
             }
         },
-        "/host/tool/supervisor/process/load": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "获取 Supervisor 进程状态",
-                "tags": [
-                    "Host tool"
-                ],
-                "summary": "Load Supervisor process status",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/response.ProcessStatus"
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/hosts": {
             "post": {
                 "security": [
@@ -9900,6 +9875,39 @@
                 }
             }
         },
+        "/websites/dir": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取网站目录配置",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Website"
+                ],
+                "summary": "Get website dir",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.WebsiteCommonReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/websites/dir/permission": {
             "post": {
                 "security": [
@@ -12774,10 +12782,7 @@
                     "type": "integer"
                 },
                 "type": {
-                    "type": "string",
-                    "enum": [
-                        "mysql"
-                    ]
+                    "type": "string"
                 },
                 "username": {
                     "type": "string"
@@ -12814,6 +12819,9 @@
                 },
                 "port": {
                     "type": "integer"
+                },
+                "type": {
+                    "type": "string"
                 },
                 "username": {
                     "type": "string"
@@ -16394,6 +16402,17 @@
                 }
             }
         },
+        "request.WebsiteCommonReq": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
         "request.WebsiteCreate": {
             "type": "object",
             "required": [
@@ -17433,26 +17452,6 @@
                     }
                 },
                 "uploadMaxSize": {
-                    "type": "string"
-                }
-            }
-        },
-        "response.ProcessStatus": {
-            "type": "object",
-            "properties": {
-                "PID": {
-                    "type": "string"
-                },
-                "msg": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "uptime": {
                     "type": "string"
                 }
             }
