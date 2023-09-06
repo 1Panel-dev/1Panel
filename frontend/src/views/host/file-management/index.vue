@@ -99,7 +99,7 @@
                             </el-checkbox>
                         </template>
                         <template #append>
-                            <el-button icon="Search" @click="search" />
+                            <el-button icon="Search" @click="search" round />
                         </template>
                     </el-input>
                 </div>
@@ -680,7 +680,7 @@ onMounted(() => {
 
 .search {
     display: inline;
-    width: 300px;
+    width: 400px;
     float: right;
 }
 

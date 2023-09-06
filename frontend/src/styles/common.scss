@@ -252,6 +252,10 @@ html {
         border-top-left-radius: 50px;
         border-bottom-left-radius: 50px;
     }
+    .el-input-group__append {
+        border-top-right-radius: 50px;
+        border-bottom-right-radius: 50px;
+    }
 }
 
 // drawer头部增加按钮
@@ -351,7 +355,6 @@ html {
 .pre-select {
     width: 85px !important;
 }
-
 
 .el-input-group__append {
     border-left: 0;

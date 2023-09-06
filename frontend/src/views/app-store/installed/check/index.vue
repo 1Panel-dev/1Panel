@@ -3,7 +3,7 @@
         <el-row>
             <el-col :span="20" :offset="2" v-if="open">
                 <el-alert
-                    type="warning"
+                    type="error"
                     :description="$t('app.deleteHelper', [$t('app.app')])"
                     center
                     show-icon
@@ -20,16 +20,9 @@
                         </span>
                     </el-descriptions-item>
                 </el-descriptions>
-                <div class="center" v-if="installData.key === 'openresty'">
+                <div v-if="installData.key === 'openresty'" class="mt-5">
                     <el-checkbox v-model="forceDelete" label="true">{{ $t('app.forceDelete') }}</el-checkbox>
-                    <el-alert
-                        v-if="forceDelete"
-                        type="error"
-                        effect="dark"
-                        :description="$t('app.openrestyDeleteHelper')"
-                        center
-                        :closable="false"
-                    />
+                    <ErrPrompt :title="$t('app.openrestyDeleteHelper')" />
                 </div>
             </el-col>
         </el-row>

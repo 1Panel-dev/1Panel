@@ -68,8 +68,8 @@
             v-model="app.readMe"
             :theme="globalStore.$state.themeConfig.theme === 'dark' ? 'dark' : 'light'"
         />
-        <Install ref="installRef"></Install>
     </el-drawer>
+    <Install ref="installRef"></Install>
 </template>
 
 <script lang="ts" setup>
@@ -138,6 +138,7 @@ const openInstall = () => {
             app: app.value,
         };
         installRef.value.acceptParams(params);
+        open.value = false;
     }
 };
 

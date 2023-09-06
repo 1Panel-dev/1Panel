@@ -24,7 +24,6 @@
                         class="common-prompt"
                         :closable="false"
                         type="error"
-                        effect="dark"
                     />
                 </el-form>
             </el-col>
