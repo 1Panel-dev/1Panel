@@ -179,6 +179,7 @@
         <TerminalDialog ref="dialogTerminalRef" />
 
         <PortJumpDialog ref="dialogPortJumpRef" />
+        <HandleDialog @search="search" ref="handleRef" />
     </div>
 </template>
 
@@ -192,23 +193,22 @@ import UpgraeDialog from '@/views/container/container/upgrade/index.vue';
 import MonitorDialog from '@/views/container/container/monitor/index.vue';
 import ContainerLogDialog from '@/views/container/container/log/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
+import HandleDialog from '@/views/container/container/handle/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import Status from '@/components/status/index.vue';
 import { reactive, onMounted, ref, computed } from 'vue';
 import {
     containerListStats,
-    containerOperator,
     inspect,
     loadContainerInfo,
     loadDockerStatus,
     searchContainer,
 } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
-import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import router from '@/routers';
-import { MsgSuccess, MsgWarning } from '@/utils/message';
+import { MsgWarning } from '@/utils/message';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 
@@ -229,6 +229,7 @@ const paginationConfig = reactive({
 const searchName = ref();
 const dialogUpgradeRef = ref();
 const dialogPortJumpRef = ref();
+const handleRef = ref();
 
 const dockerStatus = ref('Running');
 const loadStatus = async () => {
@@ -415,38 +416,14 @@ const checkStatus = (operation: string, row: Container.ContainerInfo | null) => 
 const onOperate = async (operation: string, row: Container.ContainerInfo | null) => {
     let opList = row ? [row] : selects.value;
     let msg = i18n.global.t('container.operatorHelper', [i18n.global.t('container.' + operation)]);
+    let containers = [];
     for (const item of opList) {
+        containers.push(item.name);
         if (item.isFromApp) {
             msg = i18n.global.t('container.operatorAppHelper', [i18n.global.t('container.' + operation)]);
-            break;
         }
     }
-    ElMessageBox.confirm(msg, i18n.global.t('container.' + operation), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-        type: 'info',
-    }).then(() => {
-        let ps = [];
-        for (const item of opList) {
-            const param = {
-                name: item.name,
-                operation: operation,
-                newName: '',
-            };
-            ps.push(containerOperator(param));
-        }
-        loading.value = true;
-        Promise.all(ps)
-            .then(() => {
-                loading.value = false;
-                search();
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            })
-            .catch(() => {
-                loading.value = false;
-                search();
-            });
-    });
+    handleRef.value.acceptParams({ containers: containers, operation: operation, msg: msg });
 };
 
 const buttons = [

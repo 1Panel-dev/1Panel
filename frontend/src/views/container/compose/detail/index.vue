@@ -106,6 +106,7 @@
                 <ContainerLogDialog ref="dialogContainerLogRef" />
                 <MonitorDialog ref="dialogMonitorRef" />
                 <TerminalDialog ref="dialogTerminalRef" />
+                <HandleDialog @search="search" ref="handleRef" />
             </template>
         </LayoutContent>
     </div>
@@ -117,10 +118,11 @@ import Tooltip from '@/components/tooltip/index.vue';
 import MonitorDialog from '@/views/container/container/monitor/index.vue';
 import ContainerLogDialog from '@/views/container/container/log/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
+import HandleDialog from '@/views/container/container/handle/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
 import Status from '@/components/status/index.vue';
 import { dateFormat } from '@/utils/util';
-import { composeOperator, containerOperator, inspect, searchContainer } from '@/api/modules/container';
+import { composeOperator, inspect, searchContainer } from '@/api/modules/container';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import { Container } from '@/api/interface/container';
@@ -130,6 +132,9 @@ const composeName = ref();
 const composePath = ref();
 const filters = ref();
 const createdBy = ref();
+
+const dialogContainerLogRef = ref();
+const handleRef = ref();
 
 const emit = defineEmits<{ (e: 'back'): void }>();
 interface DialogProps {
@@ -228,35 +233,14 @@ const checkStatus = (operation: string) => {
 
 const onOperate = async (operation: string) => {
     let msg = i18n.global.t('container.operatorHelper', [i18n.global.t('container.' + operation)]);
+    let containers = [];
     for (const item of selects.value) {
+        containers.push(item.name);
         if (item.isFromApp) {
             msg = i18n.global.t('container.operatorAppHelper', [i18n.global.t('container.' + operation)]);
-            break;
         }
     }
-    ElMessageBox.confirm(msg, i18n.global.t('container.' + operation), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-        type: 'info',
-    }).then(() => {
-        let ps = [];
-        for (const item of selects.value) {
-            const param = {
-                name: item.name,
-                operation: operation,
-                newName: '',
-            };
-            ps.push(containerOperator(param));
-        }
-        Promise.all(ps)
-            .then(() => {
-                search();
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            })
-            .catch(() => {
-                search();
-            });
-    });
+    handleRef.value.acceptParams({ containers: containers, operation: operation, msg: msg });
 };
 
 const onComposeOperate = async (operation: string) => {
@@ -301,8 +285,6 @@ const dialogTerminalRef = ref();
 const onTerminal = (row: any) => {
     dialogTerminalRef.value!.acceptParams({ containerID: row.containerID, container: row.name });
 };
-
-const dialogContainerLogRef = ref();
 
 const buttons = [
     {
