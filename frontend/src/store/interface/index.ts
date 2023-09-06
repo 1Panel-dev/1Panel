@@ -22,6 +22,7 @@ export interface GlobalState {
     ignoreCaptcha: boolean;
     device: DeviceType;
     lastFilePath: string;
+    currentDB: string;
 }
 
 export interface MenuState {

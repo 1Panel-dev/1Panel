@@ -30,7 +30,7 @@
                             <el-option
                                 v-if="item.from === 'local'"
                                 :value="item.database"
-                                :label="item.database + ' [' + item.type + ']'"
+                                :label="item.database + ' [' + (item.type === 'mysql' ? 'MySQL' : 'MariaDB') + ']'"
                             ></el-option>
                         </div>
                         <el-button link type="primary" class="jumpAdd" @click="goRouter('app')" icon="Position">
@@ -42,7 +42,7 @@
                             <el-option
                                 v-if="item.from === 'remote'"
                                 :value="item.database"
-                                :label="item.database + ' [' + item.type + ']'"
+                                :label="item.database + ' [' + (item.type === 'mysql' ? 'MySQL' : 'MariaDB') + ']'"
                             ></el-option>
                         </div>
                         <el-button link type="primary" class="jumpAdd" @click="goRouter('remote')" icon="Position">
@@ -235,6 +235,8 @@ import router from '@/routers';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import useClipboard from 'vue-clipboard3';
 const { toClipboard } = useClipboard();
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const loading = ref(false);
 const maskShow = ref(true);
@@ -293,12 +295,14 @@ const onChangeConn = async () => {
 };
 
 const goRemoteDB = async () => {
+    globalStore.setCurrentDB(currentDB.value.database);
     router.push({ name: 'MySQL-Remote' });
 };
 
 const passwordRef = ref();
 
 const onSetting = async () => {
+    globalStore.setCurrentDB(currentDB.value.database);
     router.push({ name: 'MySQL-Setting', params: { type: currentDB.value.type, database: currentDB.value.database } });
 };
 
@@ -401,12 +405,25 @@ const loadDBOptions = async () => {
     let datas = res.data || [];
     dbOptionsLocal.value = [];
     dbOptionsRemote.value = [];
+    currentDBName.value = globalStore.currentDB;
     for (const item of datas) {
+        if (currentDBName.value && item.database === currentDBName.value) {
+            currentDB.value = item;
+            if (item.from === 'local') {
+                appKey.value = item.type;
+                appName.value = item.database;
+            }
+        }
         if (item.from === 'local') {
             dbOptionsLocal.value.push(item);
         } else {
             dbOptionsRemote.value.push(item);
         }
+    }
+    if (currentDB.value) {
+        globalStore.setCurrentDB('');
+        search();
+        return;
     }
     if (dbOptionsLocal.value.length !== 0) {
         currentDB.value = dbOptionsLocal.value[0];
