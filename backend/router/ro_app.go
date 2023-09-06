@@ -34,7 +34,7 @@ func (a *AppRouter) InitAppRouter(Router *gin.RouterGroup) {
 		appRouter.POST("/installed/sync", baseApi.SyncInstalled)
 		appRouter.POST("/installed/port/change", baseApi.ChangeAppPort)
 		appRouter.GET("/services/:key", baseApi.GetServices)
-		appRouter.GET("/installed/conf/:key", baseApi.GetDefaultConfig)
+		appRouter.POST("/installed/conf", baseApi.GetDefaultConfig)
 		appRouter.GET("/installed/params/:appInstallId", baseApi.GetParams)
 		appRouter.POST("/installed/params/update", baseApi.UpdateInstalled)
 		appRouter.POST("/installed/ignore", baseApi.IgnoreUpgrade)

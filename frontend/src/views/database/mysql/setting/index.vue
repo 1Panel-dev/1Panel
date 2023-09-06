@@ -2,7 +2,7 @@
     <div v-loading="loading">
         <LayoutContent>
             <template #title>
-                <back-button name="MySQL" :header="'MySQL ' + $t('commons.button.set')" />
+                <back-button name="MySQL" :header="$t('commons.button.set')" />
             </template>
 
             <template #toolbar>
@@ -177,8 +177,8 @@ const jumpToSlowlog = async () => {
 
 const onSubmitChangePort = async () => {
     let params = {
-        key: 'mysql',
-        name: mysqlName.value,
+        key: props.type,
+        name: props.database,
         port: baseInfo.port,
     };
     loading.value = true;
@@ -216,10 +216,15 @@ function callback(error: any) {
 
 const getDefaultConfig = async () => {
     loading.value = true;
-    const res = await GetAppDefaultConfig('mysql');
-    mysqlConf.value = res.data;
-    useOld.value = true;
-    loading.value = false;
+    await GetAppDefaultConfig(props.type, props.database)
+        .then((res) => {
+            mysqlConf.value = res.data;
+            useOld.value = true;
+            loading.value = false;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const onSubmitChangeConf = async () => {

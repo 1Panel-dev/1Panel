@@ -262,17 +262,17 @@ func (b *BaseApi) ChangeAppPort(c *gin.Context) {
 // @Summary Search default config by key
 // @Description 通过 key 获取应用默认配置
 // @Accept json
-// @Param key path string true "request"
+// @Param request body dto.OperationWithNameAndType true "request"
 // @Success 200 {string} content
 // @Security ApiKeyAuth
-// @Router /apps/installed/conf/:key [get]
+// @Router /apps/installed/conf [post]
 func (b *BaseApi) GetDefaultConfig(c *gin.Context) {
-	key := c.Param("key")
-	if key == "" {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+	var req dto.OperationWithNameAndType
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	content, err := appInstallService.GetDefaultConfigByKey(key)
+	content, err := appInstallService.GetDefaultConfigByKey(req.Type, req.Name)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

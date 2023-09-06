@@ -219,5 +219,6 @@ func (a *AppInstallRepo) LoadBaseInfo(key string, name string) (*RootInfo, error
 	info.Env = appInstall.Env
 	info.Param = appInstall.Param
 	info.Version = appInstall.Version
+	info.Key = app.Key
 	return &info, nil
 }

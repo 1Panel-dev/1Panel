@@ -82,8 +82,8 @@ export const GetAppUpdateVersions = (id: number) => {
     return http.get<any>(`apps/installed/${id}/versions`);
 };
 
-export const GetAppDefaultConfig = (key: string) => {
-    return http.get<string>(`apps/installed/conf/${key}`);
+export const GetAppDefaultConfig = (key: string, name: string) => {
+    return http.post<string>(`apps/installed/conf`, { type: key, name: name });
 };
 
 export const GetAppInstallParams = (id: number) => {

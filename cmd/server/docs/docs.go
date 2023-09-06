@@ -315,8 +315,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/apps/installed/conf/:key": {
-            "get": {
+        "/apps/installed/conf": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -332,11 +332,13 @@ const docTemplate = `{
                 "summary": "Search default config by key",
                 "parameters": [
                     {
-                        "type": "string",
                         "description": "request",
-                        "name": "key",
-                        "in": "path",
-                        "required": true
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperationWithNameAndType"
+                        }
                     }
                 ],
                 "responses": {
@@ -12904,6 +12906,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "password",
+                "type",
                 "username",
                 "version"
             ],
@@ -12922,6 +12925,9 @@ const docTemplate = `{
                 },
                 "port": {
                     "type": "integer"
+                },
+                "type": {
+                    "type": "string"
                 },
                 "username": {
                     "type": "string"
