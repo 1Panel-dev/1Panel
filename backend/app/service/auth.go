@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
@@ -19,16 +20,16 @@ type AuthService struct{}
 type IAuthService interface {
 	CheckIsSafety(code string) (string, error)
 	VerifyCode(code string) (bool, error)
-	Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo, error)
+	Login(c *gin.Context, info dto.Login, entrance string) (*dto.UserLoginInfo, error)
 	LogOut(c *gin.Context) error
-	MFALogin(c *gin.Context, info dto.MFALogin) (*dto.UserLoginInfo, error)
+	MFALogin(c *gin.Context, info dto.MFALogin, entrance string) (*dto.UserLoginInfo, error)
 }
 
 func NewIAuthService() IAuthService {
 	return &AuthService{}
 }
 
-func (u *AuthService) Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo, error) {
+func (u *AuthService) Login(c *gin.Context, info dto.Login, entrance string) (*dto.UserLoginInfo, error) {
 	nameSetting, err := settingRepo.Get(settingRepo.WithByKey("UserName"))
 	if err != nil {
 		return nil, errors.WithMessage(constant.ErrRecordNotFound, err.Error())
@@ -43,6 +44,13 @@ func (u *AuthService) Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo,
 	}
 	if info.Password != pass || nameSetting.Value != info.Name {
 		return nil, constant.ErrAuth
+	}
+	entranceSetting, err := settingRepo.Get(settingRepo.WithByKey("SecurityEntrance"))
+	if err != nil {
+		return nil, err
+	}
+	if len(entranceSetting.Value) != 0 && entranceSetting.Value != entrance {
+		return nil, buserr.New(constant.ErrEntrance)
 	}
 	mfa, err := settingRepo.Get(settingRepo.WithByKey("MFAStatus"))
 	if err != nil {
@@ -57,7 +65,7 @@ func (u *AuthService) Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo,
 	return u.generateSession(c, info.Name, info.AuthMethod)
 }
 
-func (u *AuthService) MFALogin(c *gin.Context, info dto.MFALogin) (*dto.UserLoginInfo, error) {
+func (u *AuthService) MFALogin(c *gin.Context, info dto.MFALogin, entrance string) (*dto.UserLoginInfo, error) {
 	nameSetting, err := settingRepo.Get(settingRepo.WithByKey("UserName"))
 	if err != nil {
 		return nil, errors.WithMessage(constant.ErrRecordNotFound, err.Error())
@@ -73,7 +81,13 @@ func (u *AuthService) MFALogin(c *gin.Context, info dto.MFALogin) (*dto.UserLogi
 	if info.Password != pass || nameSetting.Value != info.Name {
 		return nil, constant.ErrAuth
 	}
-
+	entranceSetting, err := settingRepo.Get(settingRepo.WithByKey("SecurityEntrance"))
+	if err != nil {
+		return nil, err
+	}
+	if len(entranceSetting.Value) != 0 && entranceSetting.Value != entrance {
+		return nil, buserr.New(constant.ErrEntrance)
+	}
 	mfaSecret, err := settingRepo.Get(settingRepo.WithByKey("MFASecret"))
 	if err != nil {
 		return nil, err

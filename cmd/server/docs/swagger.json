@@ -949,6 +949,12 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dto.UserLoginInfo"
+                        },
+                        "headers": {
+                            "EntranceCode": {
+                                "type": "string",
+                                "description": "安全入口"
+                            }
                         }
                     }
                 }
@@ -999,6 +1005,12 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dto.UserLoginInfo"
+                        },
+                        "headers": {
+                            "EntranceCode": {
+                                "type": "string",
+                                "description": "安全入口"
+                            }
                         }
                     }
                 }
@@ -14918,6 +14930,9 @@
                 "extension": {
                     "type": "string"
                 },
+                "gid": {
+                    "type": "string"
+                },
                 "group": {
                     "type": "string"
                 },
@@ -14961,6 +14976,9 @@
                     "type": "integer"
                 },
                 "type": {
+                    "type": "string"
+                },
+                "uid": {
                     "type": "string"
                 },
                 "updateTime": {
@@ -17306,6 +17324,9 @@
                 "extension": {
                     "type": "string"
                 },
+                "gid": {
+                    "type": "string"
+                },
                 "group": {
                     "type": "string"
                 },
@@ -17349,6 +17370,9 @@
                     "type": "integer"
                 },
                 "type": {
+                    "type": "string"
+                },
+                "uid": {
                     "type": "string"
                 },
                 "updateTime": {
