@@ -2,7 +2,7 @@
     <el-dialog
         v-model="open"
         :close-on-click-modal="false"
-        :title="$t('website.delete')"
+        :title="$t('website.delete') + ' - ' + websiteName"
         width="30%"
         :before-close="handleClose"
     >
@@ -58,21 +58,21 @@ import { ref } from 'vue';
 import { Website } from '@/api/interface/website';
 import { MsgSuccess } from '@/utils/message';
 
-let key = 1;
-let open = ref(false);
-let loading = ref(false);
-let deleteReq = ref({
+const key = 1;
+const open = ref(false);
+const loading = ref(false);
+const deleteReq = ref({
     id: 0,
     deleteApp: false,
     deleteBackup: false,
     forceDelete: false,
 });
-let type = ref('');
+const type = ref('');
 const em = defineEmits(['close']);
 const deleteForm = ref<FormInstance>();
-let deleteInfo = ref('');
-let websiteName = ref('');
-let deleteHelper = ref('');
+const deleteInfo = ref('');
+const websiteName = ref('');
+const deleteHelper = ref('');
 const runtimeApp = ref(false);
 
 const handleClose = () => {

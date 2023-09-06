@@ -2,7 +2,7 @@
     <el-dialog v-model="open" :title="$t('app.delete')" width="30%" :close-on-click-modal="false">
         <el-row>
             <el-col :span="20" :offset="2">
-                <el-alert :title="$t('file.deleteHelper')" type="error" effect="dark" :closable="false"></el-alert>
+                <el-alert :title="$t('file.deleteHelper')" show-icon type="error" :closable="false"></el-alert>
                 <div class="resource">
                     <table>
                         <tr v-for="(row, index) in files" :key="index">
