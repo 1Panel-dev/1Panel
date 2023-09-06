@@ -122,4 +122,5 @@ var (
 var (
 	ErrBackupInUsed = "ErrBackupInUsed"
 	ErrOSSConn      = "ErrOSSConn"
+	ErrEntrance     = "ErrEntrance"
 )

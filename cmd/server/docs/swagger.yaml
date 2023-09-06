@@ -2177,6 +2177,8 @@ definitions:
         type: string
       extension:
         type: string
+      gid:
+        type: string
       group:
         type: string
       isDir:
@@ -2206,6 +2208,8 @@ definitions:
       size:
         type: integer
       type:
+        type: string
+      uid:
         type: string
       updateTime:
         type: string
@@ -3778,6 +3782,8 @@ definitions:
         type: string
       extension:
         type: string
+      gid:
+        type: string
       group:
         type: string
       isDir:
@@ -3807,6 +3813,8 @@ definitions:
       size:
         type: integer
       type:
+        type: string
+      uid:
         type: string
       updateTime:
         type: string
@@ -4620,6 +4628,10 @@ paths:
       responses:
         "200":
           description: OK
+          headers:
+            EntranceCode:
+              description: 安全入口
+              type: string
           schema:
             $ref: '#/definitions/dto.UserLoginInfo'
       summary: User login
@@ -4651,6 +4663,10 @@ paths:
       responses:
         "200":
           description: OK
+          headers:
+            EntranceCode:
+              description: 安全入口
+              type: string
           schema:
             $ref: '#/definitions/dto.UserLoginInfo'
       summary: User login with mfa

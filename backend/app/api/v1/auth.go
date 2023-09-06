@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"encoding/base64"
+
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -20,6 +22,7 @@ type BaseApi struct{}
 // @Param request body dto.Login true "request"
 // @Success 200 {object} dto.UserLoginInfo
 // @Router /auth/login [post]
+// @Header 200 {string} EntranceCode "安全入口"
 func (b *BaseApi) Login(c *gin.Context) {
 	var req dto.Login
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -32,8 +35,13 @@ func (b *BaseApi) Login(c *gin.Context) {
 			return
 		}
 	}
+	entranceItem := c.Request.Header.Get("EntranceCode")
+	var entrance []byte
+	if len(entranceItem) != 0 {
+		entrance, _ = base64.StdEncoding.DecodeString(entranceItem)
+	}
 
-	user, err := authService.Login(c, req)
+	user, err := authService.Login(c, req, string(entrance))
 	go saveLoginLogs(c, err)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
@@ -49,6 +57,7 @@ func (b *BaseApi) Login(c *gin.Context) {
 // @Param request body dto.MFALogin true "request"
 // @Success 200 {object} dto.UserLoginInfo
 // @Router /auth/mfalogin [post]
+// @Header 200 {string} EntranceCode "安全入口"
 func (b *BaseApi) MFALogin(c *gin.Context) {
 	var req dto.MFALogin
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -59,8 +68,13 @@ func (b *BaseApi) MFALogin(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
+	entranceItem := c.Request.Header.Get("EntranceCode")
+	var entrance []byte
+	if len(entranceItem) != 0 {
+		entrance, _ = base64.StdEncoding.DecodeString(entranceItem)
+	}
 
-	user, err := authService.MFALogin(c, req)
+	user, err := authService.MFALogin(c, req, string(entrance))
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

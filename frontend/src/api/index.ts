@@ -5,6 +5,7 @@ import { checkStatus } from './helper/check-status';
 import router from '@/routers';
 import { GlobalStore } from '@/store';
 import { MsgError } from '@/utils/message';
+import { Base64 } from 'js-base64';
 
 const globalStore = GlobalStore();
 
@@ -25,6 +26,10 @@ class RequestHttp {
                     'Accept-Language': language,
                     ...config.headers,
                 };
+                if (config.url === '/auth/login' || config.url === '/auth/mfalogin') {
+                    let entrace = Base64.encode(globalStore.entrance);
+                    config.headers.EntranceCode = entrace;
+                }
                 return {
                     ...config,
                 };
