@@ -99,6 +99,18 @@ const loading = ref();
 
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
+    if (dialogData.value.rowData.version.startsWith('5.6')) {
+        dialogData.value.rowData.version = '5.6';
+    }
+    if (dialogData.value.rowData.version.startsWith('5.7')) {
+        dialogData.value.rowData.version = '5.7';
+    }
+    if (dialogData.value.rowData.version.startsWith('8.')) {
+        dialogData.value.rowData.version = '8.x';
+    }
+    if (dialogData.value.rowData.version.startsWith('10.')) {
+        dialogData.value.rowData.version = '10.x';
+    }
     title.value = i18n.global.t('database.' + dialogData.value.title + 'RemoteDB');
     drawerVisiable.value = true;
 };

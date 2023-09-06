@@ -276,6 +276,7 @@ type DatabaseCreate struct {
 
 type DatabaseUpdate struct {
 	ID          uint   `json:"id"`
+	Type        string `json:"type" validate:"required"`
 	Version     string `json:"version" validate:"required"`
 	Address     string `json:"address"`
 	Port        uint   `json:"port"`

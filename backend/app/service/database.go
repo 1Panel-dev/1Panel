@@ -148,6 +148,7 @@ func (u *DatabaseService) Update(req dto.DatabaseUpdate) error {
 	}
 
 	upMap := make(map[string]interface{})
+	upMap["type"] = req.Type
 	upMap["version"] = req.Version
 	upMap["address"] = req.Address
 	upMap["port"] = req.Port
