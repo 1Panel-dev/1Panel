@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	"github.com/mozillazg/go-pinyin"
 )
 
 func CompareVersion(version1 string, version2 string) bool {
@@ -179,4 +180,18 @@ func LoadTimeZoneByCmd() string {
 		return loc
 	}
 	return fields[2]
+}
+
+func ConvertToPinyin(text string) string {
+	args := pinyin.NewArgs()
+	args.Fallback = func(r rune, a pinyin.Args) []string {
+		return []string{string(r)}
+	}
+	p := pinyin.Pinyin(text, args)
+	var strArr []string
+	for i := 0; i < len(p); i++ {
+		strArr = append(strArr, strings.Join(p[i], ""))
+	}
+
+	return strings.Join(strArr, "")
 }

@@ -31,6 +31,7 @@ require (
 	github.com/mholt/archiver/v4 v4.0.0-alpha.8
 	github.com/minio/minio-go/v7 v7.0.36
 	github.com/mojocn/base64Captcha v1.3.5
+	github.com/mozillazg/go-pinyin v0.20.0
 	github.com/nicksnyder/go-i18n/v2 v2.1.2
 	github.com/opencontainers/image-spec v1.1.0-rc2
 	github.com/pkg/errors v0.9.1
