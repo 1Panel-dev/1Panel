@@ -277,8 +277,9 @@ func deleteAppInstall(install model.AppInstall, deleteBackup bool, forceDelete b
 }
 
 func deleteLink(ctx context.Context, install *model.AppInstall, deleteDB bool, forceDelete bool) error {
-	if install.App.Key == "mysql" || install.App.Key == "mariadb" {
+	if DatabaseKeys[install.App.Key] {
 		_ = databaseRepo.Delete(ctx, databaseRepo.WithAppInstallID(install.ID))
+		_ = mysqlRepo.Delete(ctx, mysqlRepo.WithByMysqlName(install.Name))
 	}
 	resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(install.ID))
 	if len(resources) == 0 {
@@ -286,7 +287,7 @@ func deleteLink(ctx context.Context, install *model.AppInstall, deleteDB bool, f
 	}
 	for _, re := range resources {
 		mysqlService := NewIMysqlService()
-		if re.Key == "mysql" || re.Key == "mariadb" && deleteDB {
+		if (re.Key == "mysql" || re.Key == "mariadb") && deleteDB {
 			database, _ := mysqlRepo.Get(commonRepo.WithByID(re.ResourceId))
 			if reflect.DeepEqual(database, model.DatabaseMysql{}) {
 				continue
