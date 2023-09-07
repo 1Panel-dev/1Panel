@@ -275,6 +275,20 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		appDetail model.AppDetail
 		app       model.App
 	)
+	appDetail, err = appDetailRepo.GetFirst(commonRepo.WithByID(req.AppDetailId))
+	if err != nil {
+		return
+	}
+	app, err = appRepo.GetFirst(commonRepo.WithByID(appDetail.AppId))
+	if err != nil {
+		return
+	}
+	if DatabaseKeys[app.Key] {
+		if existDatabases, _ := databaseRepo.GetList(commonRepo.WithByName(req.Name)); len(existDatabases) > 0 {
+			err = buserr.New(constant.ErrRemoteExist)
+			return
+		}
+	}
 	for key := range req.Params {
 		if !strings.Contains(key, "PANEL_APP_PORT") {
 			continue
@@ -292,14 +306,6 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		}
 	}
 
-	appDetail, err = appDetailRepo.GetFirst(commonRepo.WithByID(req.AppDetailId))
-	if err != nil {
-		return
-	}
-	app, err = appRepo.GetFirst(commonRepo.WithByID(appDetail.AppId))
-	if err != nil {
-		return
-	}
 	if err = checkRequiredAndLimit(app); err != nil {
 		return
 	}
