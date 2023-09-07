@@ -1,11 +1,19 @@
 <template>
     <el-dialog v-model="open" :title="$t('app.delete')" width="30%" :close-on-click-modal="false">
-        <div>
-            <span class="lineClass" style="color: red">{{ msg }}</span>
-            <ul>
-                <li class="lineClass" v-for="(row, index) in containers" :key="index">{{ row }}</li>
-            </ul>
-        </div>
+        <el-row>
+            <el-col :span="20" :offset="2">
+                <el-alert :title="msg" show-icon type="error" :closable="false"></el-alert>
+                <div class="resource">
+                    <table>
+                        <tr v-for="(row, index) in containers" :key="index">
+                            <td>
+                                <span>{{ row }}</span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </el-col>
+        </el-row>
 
         <template #footer>
             <span class="dialog-footer">
@@ -71,7 +79,9 @@ defineExpose({
 </script>
 
 <style scoped>
-.lineClass {
-    line-height: 25px;
+.resource {
+    margin-top: 10px;
+    max-height: 400px;
+    overflow: auto;
 }
 </style>
