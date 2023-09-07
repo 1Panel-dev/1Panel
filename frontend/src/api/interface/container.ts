@@ -23,8 +23,10 @@ export namespace Container {
         forcePull: boolean;
         network: string;
         cmdStr: string;
+        entrypointStr: string;
         memoryItem: number;
         cmd: Array<string>;
+        entrypoint: Array<string>;
         publishAllPorts: boolean;
         exposedPorts: Array<Port>;
         nanoCPUs: number;
