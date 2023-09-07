@@ -12,7 +12,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
-	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/1Panel-dev/1Panel/backend/utils/mysql/helper"
 )
@@ -317,7 +316,7 @@ func (r *Remote) SyncDB(version string) ([]SyncDBInfo, error) {
 		}
 		if len(dataItem.Username) == 0 {
 			dataItem.Username = loadNameByDB(dbName, version)
-			dataItem.Password = common.RandStr(16)
+			dataItem.Password = randomPassword(dataItem.Username)
 			if err := r.CreateUser(CreateInfo{
 				Name:       dbName,
 				Format:     charsetName,
@@ -329,7 +328,6 @@ func (r *Remote) SyncDB(version string) ([]SyncDBInfo, error) {
 			}, false); err != nil {
 				return datas, fmt.Errorf("sync db from remote server failed, err: create user failed %v", err)
 			}
-
 			dataItem.Permission = "%"
 		} else {
 			if isLocal {

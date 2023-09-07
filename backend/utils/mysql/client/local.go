@@ -14,7 +14,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
-	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 )
 
@@ -307,12 +306,13 @@ func (r *Local) SyncDB(version string) ([]SyncDBInfo, error) {
 		}
 		if len(dataItem.Username) == 0 {
 			dataItem.Username = loadNameByDB(parts[0], version)
+			dataItem.Password = randomPassword(dataItem.Username)
 			if err := r.CreateUser(CreateInfo{
 				Name:       parts[0],
 				Format:     parts[1],
 				Version:    version,
 				Username:   dataItem.Username,
-				Password:   common.RandStr(16),
+				Password:   dataItem.Password,
 				Permission: "%",
 				Timeout:    300,
 			}, false); err != nil {
