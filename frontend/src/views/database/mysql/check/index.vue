@@ -7,14 +7,14 @@
         :destroy-on-close="true"
     >
         <el-row>
-            <el-alert
-                type="warning"
-                :description="$t('app.deleteHelper', [$t('app.database')])"
-                center
-                show-icon
-                :closable="false"
-            />
-            <el-col :span="12" :offset="6">
+            <el-col :span="20" :offset="2" v-if="open">
+                <el-alert
+                    type="error"
+                    :description="$t('app.deleteHelper', [$t('app.database')])"
+                    center
+                    show-icon
+                    :closable="false"
+                />
                 <br />
                 <el-descriptions border :column="1">
                     <el-descriptions-item>

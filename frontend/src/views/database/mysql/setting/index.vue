@@ -2,7 +2,16 @@
     <div v-loading="loading">
         <LayoutContent>
             <template #title>
-                <back-button name="MySQL" :header="$t('commons.button.set')" />
+                <back-button
+                    name="MySQL"
+                    :header="
+                        props.database +
+                        ' [' +
+                        (props.type === 'mysql' ? 'MySQL' : 'MariaDB') +
+                        '] - ' +
+                        $t('commons.button.set')
+                    "
+                />
             </template>
 
             <template #toolbar>
