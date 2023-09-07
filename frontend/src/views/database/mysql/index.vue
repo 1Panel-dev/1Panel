@@ -295,14 +295,18 @@ const onChangeConn = async () => {
 };
 
 const goRemoteDB = async () => {
-    globalStore.setCurrentDB(currentDB.value.database);
+    if (currentDB.value) {
+        globalStore.setCurrentDB(currentDB.value.database);
+    }
     router.push({ name: 'MySQL-Remote' });
 };
 
 const passwordRef = ref();
 
 const onSetting = async () => {
-    globalStore.setCurrentDB(currentDB.value.database);
+    if (currentDB.value) {
+        globalStore.setCurrentDB(currentDB.value.database);
+    }
     router.push({ name: 'MySQL-Setting', params: { type: currentDB.value.type, database: currentDB.value.database } });
 };
 
