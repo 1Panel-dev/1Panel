@@ -109,39 +109,6 @@
                             />
                         </el-select>
                     </el-form-item>
-                    <el-form-item :label="$t('container.cmd')" prop="cmdStr">
-                        <el-input v-model="dialogData.rowData!.cmdStr" />
-                        <span class="input-help">{{ $t('container.cmdHelper') }}</span>
-                    </el-form-item>
-                    <el-form-item prop="autoRemove">
-                        <el-checkbox v-model="dialogData.rowData!.autoRemove">
-                            {{ $t('container.autoRemove') }}
-                        </el-checkbox>
-                    </el-form-item>
-                    <el-form-item :label="$t('container.cpuShare')" prop="cpuShares">
-                        <el-input class="mini-form-item" v-model.number="dialogData.rowData!.cpuShares" />
-                        <span class="input-help">{{ $t('container.cpuShareHelper') }}</span>
-                    </el-form-item>
-                    <el-form-item
-                        :label="$t('container.cpuQuota')"
-                        prop="nanoCPUs"
-                        :rules="checkFloatNumberRange(0, Number(limits.cpu))"
-                    >
-                        <el-input class="mini-form-item" v-model="dialogData.rowData!.nanoCPUs">
-                            <template #append>
-                                <div style="width: 35px">{{ $t('commons.units.core') }}</div>
-                            </template>
-                        </el-input>
-                        <span class="input-help">
-                            {{ $t('container.limitHelper', [limits.cpu]) }}{{ $t('commons.units.core') }}
-                        </span>
-                    </el-form-item>
-                    <el-form-item :label="$t('container.memoryLimit')" prop="memory">
-                        <el-input class="mini-form-item" v-model="dialogData.rowData!.memory">
-                            <template #append><div style="width: 35px">MB</div></template>
-                        </el-input>
-                        <span class="input-help">{{ $t('container.limitHelper', [limits.memory]) }}MB</span>
-                    </el-form-item>
                     <el-form-item :label="$t('container.mount')">
                         <el-card style="width: 100%">
                             <table style="width: 100%" class="tab-table">
@@ -167,12 +134,14 @@
                                             filterable
                                             v-model="row.sourceDir"
                                         >
-                                            <el-option
-                                                v-for="(item, indexV) of volumes"
-                                                :key="indexV"
-                                                :value="item.option"
-                                                :label="item.option.substring(0, 12)"
-                                            />
+                                            <div v-for="(item, indexV) of volumes" :key="indexV">
+                                                <el-tooltip :hide-after="20" :content="item.option" placement="top">
+                                                    <el-option
+                                                        :value="item.option"
+                                                        :label="item.option.substring(0, 12)"
+                                                    />
+                                                </el-tooltip>
+                                            </div>
                                         </el-select>
                                     </td>
                                     <td width="18%">
@@ -200,6 +169,52 @@
                             </table>
                         </el-card>
                     </el-form-item>
+                    <el-form-item label="Command" prop="cmdStr">
+                        <el-input v-model="dialogData.rowData!.cmdStr" :placeholder="$t('container.cmdHelper')" />
+                    </el-form-item>
+                    <el-form-item label="Entrypoint" prop="entrypoint">
+                        <el-input
+                            v-model="dialogData.rowData!.entrypointStr"
+                            :placeholder="$t('container.entrypointHelper')"
+                        />
+                    </el-form-item>
+                    <el-form-item prop="autoRemove">
+                        <el-checkbox v-model="dialogData.rowData!.autoRemove">
+                            {{ $t('container.autoRemove') }}
+                        </el-checkbox>
+                    </el-form-item>
+                    <el-form-item :label="$t('container.restartPolicy')" prop="restartPolicy">
+                        <el-radio-group v-model="dialogData.rowData!.restartPolicy">
+                            <el-radio label="no">{{ $t('container.no') }}</el-radio>
+                            <el-radio label="always">{{ $t('container.always') }}</el-radio>
+                            <el-radio label="on-failure">{{ $t('container.onFailure') }}</el-radio>
+                            <el-radio label="unless-stopped">{{ $t('container.unlessStopped') }}</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+                    <el-form-item :label="$t('container.cpuShare')" prop="cpuShares">
+                        <el-input class="mini-form-item" v-model.number="dialogData.rowData!.cpuShares" />
+                        <span class="input-help">{{ $t('container.cpuShareHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item
+                        :label="$t('container.cpuQuota')"
+                        prop="nanoCPUs"
+                        :rules="checkFloatNumberRange(0, Number(limits.cpu))"
+                    >
+                        <el-input class="mini-form-item" v-model="dialogData.rowData!.nanoCPUs">
+                            <template #append>
+                                <div style="width: 35px">{{ $t('commons.units.core') }}</div>
+                            </template>
+                        </el-input>
+                        <span class="input-help">
+                            {{ $t('container.limitHelper', [limits.cpu]) }}{{ $t('commons.units.core') }}
+                        </span>
+                    </el-form-item>
+                    <el-form-item :label="$t('container.memoryLimit')" prop="memory">
+                        <el-input class="mini-form-item" v-model="dialogData.rowData!.memory">
+                            <template #append><div style="width: 35px">MB</div></template>
+                        </el-input>
+                        <span class="input-help">{{ $t('container.limitHelper', [limits.memory]) }}MB</span>
+                    </el-form-item>
                     <el-form-item :label="$t('container.tag')" prop="labelsStr">
                         <el-input
                             type="textarea"
@@ -215,14 +230,6 @@
                             :autosize="{ minRows: 2, maxRows: 10 }"
                             v-model="dialogData.rowData!.envStr"
                         />
-                    </el-form-item>
-                    <el-form-item :label="$t('container.restartPolicy')" prop="restartPolicy">
-                        <el-radio-group v-model="dialogData.rowData!.restartPolicy">
-                            <el-radio label="no">{{ $t('container.no') }}</el-radio>
-                            <el-radio label="always">{{ $t('container.always') }}</el-radio>
-                            <el-radio label="on-failure">{{ $t('container.onFailure') }}</el-radio>
-                            <el-radio label="unless-stopped">{{ $t('container.unlessStopped') }}</el-radio>
-                        </el-radio-group>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -282,6 +289,9 @@ const acceptParams = (params: DialogProps): void => {
             itemCmd += `'${item}' `;
         }
         dialogData.value.rowData.cmdStr = itemCmd ? itemCmd.substring(0, itemCmd.length - 1) : '';
+        if (dialogData.value.rowData.entrypoint) {
+            dialogData.value.rowData.entrypointStr = dialogData.value.rowData.entrypoint.join(' ');
+        }
         dialogData.value.rowData.labels = dialogData.value.rowData.labels || [];
         dialogData.value.rowData.env = dialogData.value.rowData.env || [];
         dialogData.value.rowData.labelsStr = dialogData.value.rowData.labels.join('\n');
@@ -391,13 +401,21 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             dialogData.value.rowData!.labels = dialogData.value.rowData!.labelsStr.split('\n');
         }
         dialogData.value.rowData!.cmd = [];
-        if (dialogData.value.rowData?.cmdStr) {
+        if (dialogData.value.rowData?.cmdStr.indexOf(`'`) !== -1) {
             let itemCmd = dialogData.value.rowData!.cmdStr.split(`'`);
             for (const cmd of itemCmd) {
                 if (cmd && cmd !== ' ') {
                     dialogData.value.rowData!.cmd.push(cmd);
                 }
             }
+        } else {
+            let itemCmd = dialogData.value.rowData!.cmdStr.split(` `);
+            for (const cmd of itemCmd) {
+                dialogData.value.rowData!.cmd.push(cmd);
+            }
+        }
+        if (dialogData.value.rowData!.entrypointStr) {
+            dialogData.value.rowData!.entrypoint = dialogData.value.rowData!.entrypointStr.split(' ');
         }
         if (!checkPortValid()) {
             return;

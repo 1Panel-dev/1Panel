@@ -45,6 +45,7 @@ type ContainerOperate struct {
 	PublishAllPorts bool           `json:"publishAllPorts"`
 	ExposedPorts    []PortHelper   `json:"exposedPorts"`
 	Cmd             []string       `json:"cmd"`
+	Entrypoint      []string       `json:"entrypoint"`
 	CPUShares       int64          `json:"cpuShares"`
 	NanoCPUs        float64        `json:"nanoCPUs"`
 	Memory          float64        `json:"memory"`

@@ -366,6 +366,7 @@ func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.Contai
 		}
 	}
 	data.Cmd = oldContainer.Config.Cmd
+	data.Entrypoint = oldContainer.Config.Entrypoint
 	data.Env = oldContainer.Config.Env
 	data.CPUShares = oldContainer.HostConfig.CPUShares
 	for key, val := range oldContainer.Config.Labels {
@@ -842,6 +843,7 @@ func loadConfigInfo(req dto.ContainerOperate, config *container.Config, hostConf
 	}
 	config.Image = req.Image
 	config.Cmd = req.Cmd
+	config.Entrypoint = req.Entrypoint
 	config.Env = req.Env
 	config.Labels = stringsToMap(req.Labels)
 	config.ExposedPorts = exposeds
