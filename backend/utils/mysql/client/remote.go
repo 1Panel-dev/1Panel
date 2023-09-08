@@ -32,7 +32,7 @@ func NewRemote(db Remote) *Remote {
 func (r *Remote) Create(info CreateInfo) error {
 	createSql := fmt.Sprintf("create database `%s` default character set %s collate %s", info.Name, info.Format, formatMap[info.Format])
 	if err := r.ExecSQL(createSql, info.Timeout); err != nil {
-		if strings.Contains(strings.ToLower(err.Error()), "ERROR 1007") {
+		if strings.Contains(strings.ToLower(err.Error()), "error 1007") {
 			return buserr.New(constant.ErrDatabaseIsExist)
 		}
 		return err

@@ -136,7 +136,7 @@ import { loadDatabaseFile, loadMysqlBaseInfo, loadMysqlVariables, updateMysqlCon
 import { ChangePort, CheckAppInstalled, GetAppDefaultConfig } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
 
@@ -306,9 +306,15 @@ const loadSlowLogs = async () => {
 
 const loadMysqlConf = async () => {
     useOld.value = false;
-    const res = await loadDatabaseFile(props.type + '-conf', props.database);
-    loading.value = false;
-    mysqlConf.value = res.data;
+    await loadDatabaseFile(props.type + '-conf', props.database)
+        .then((res) => {
+            loading.value = false;
+            mysqlConf.value = res.data;
+        })
+        .catch(() => {
+            MsgError(i18n.global.t('database.confNotFound'));
+            loading.value = false;
+        });
 };
 
 const onLoadInfo = async () => {

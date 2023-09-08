@@ -334,6 +334,7 @@ const message = {
         portHelper: '该端口为容器对外暴露端口，修改需要单独保存并且重启容器！',
 
         confChange: '配置修改',
+        confNotFound: '未能找到该应用配置文件，请在应用商店升级该应用至最新版本后重试！',
 
         loadFromRemote: '从服务器获取',
         loadFromRemoteHelper: '此操作将同步服务器上数据库信息到 1Panel，是否继续？',

@@ -67,13 +67,13 @@ export const loadBaseDir = () => {
 
 // backup
 export const handleBackup = (params: Backup.Backup) => {
-    return http.post(`/settings/backup/backup`, params, 600000);
+    return http.post(`/settings/backup/backup`, params, 3600000);
 };
 export const handleRecover = (params: Backup.Recover) => {
-    return http.post(`/settings/backup/recover`, params, 600000);
+    return http.post(`/settings/backup/recover`, params, 86400000);
 };
 export const handleRecoverByUpload = (params: Backup.Recover) => {
-    return http.post(`/settings/backup/recover/byupload`, params, 600000);
+    return http.post(`/settings/backup/recover/byupload`, params, 86400000);
 };
 export const downloadBackupRecord = (params: Backup.RecordDownload) => {
     return http.post<string>(`/settings/backup/record/download`, params, 600000);
