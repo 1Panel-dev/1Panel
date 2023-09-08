@@ -70,7 +70,9 @@
             </el-alert>
             <el-alert :type="loadStatus(status.upload)" :closable="false">
                 <template #title>
-                    <el-button :icon="loadIcon(status.upload)" link>{{ $t('setting.upload') }}</el-button>
+                    <el-button :icon="loadIcon(status.upload)" link>
+                        {{ $t('setting.upload') }} {{ status.size }}
+                    </el-button>
                     <div v-if="showErrorMsg(status.upload)" class="top-margin">
                         <span class="err-message">{{ status.upload }}</span>
                     </div>
@@ -104,6 +106,7 @@ const status = reactive<Setting.SnapshotStatus>({
     backupData: '',
 
     compress: '',
+    size: '',
     upload: '',
 });
 
@@ -147,6 +150,7 @@ const loadCurrentStatus = async () => {
             status.backupData = res.data.backupData;
 
             status.compress = res.data.compress;
+            status.size = res.data.size;
             status.upload = res.data.upload;
         })
         .catch(() => {

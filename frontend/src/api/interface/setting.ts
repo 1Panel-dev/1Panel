@@ -116,6 +116,7 @@ export namespace Setting {
         backupData: string;
 
         compress: string;
+        size: string;
         upload: string;
     }
     export interface UpgradeInfo {

@@ -15,6 +15,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 )
 
@@ -161,8 +162,16 @@ func snapCompress(snap snapHelper, rootDir string) {
 		return
 	}
 
+	stat, err := os.Stat(path.Join(tmpDir, fileName))
+	if err != nil {
+		snap.Status.Compress = err.Error()
+		_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"compress": err.Error()})
+		return
+	}
+	size := common.LoadSizeUnit(float64(stat.Size()))
+	global.LOG.Debugf("compress successful! size of file: %s", size)
 	snap.Status.Compress = constant.StatusDone
-	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"compress": constant.StatusDone})
+	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"compress": constant.StatusDone, "size": size})
 }
 
 func snapUpload(snap snapHelper, account string, file string) {
