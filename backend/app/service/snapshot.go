@@ -764,7 +764,7 @@ func (u *SnapshotService) handleBackupDatas(fileOp files.FileOp, operation strin
 func (u *SnapshotService) handlePanelDatas(snapID uint, fileOp files.FileOp, operation string, source, target, backupDir, dockerDir string) error {
 	switch operation {
 	case "snapshot":
-		exclusionRules := "./tmp;./log;./cache;./db/1Panel.db-*;"
+		exclusionRules := "./tmp;./log;./cache;"
 		if strings.Contains(backupDir, source) {
 			exclusionRules += ("." + strings.ReplaceAll(backupDir, source, "") + ";")
 		}
@@ -776,7 +776,7 @@ func (u *SnapshotService) handlePanelDatas(snapID uint, fileOp files.FileOp, ope
 			return fmt.Errorf("backup panel data failed, err: %v", err)
 		}
 	case "recover":
-		exclusionRules := "./tmp;./log;./cache;./db/1Panel.db-*;"
+		exclusionRules := "./tmp;./log;./cache;"
 		if strings.Contains(backupDir, target) {
 			exclusionRules += ("." + strings.ReplaceAll(backupDir, target, "") + ";")
 		}
@@ -1038,8 +1038,9 @@ func loadLogByStatus(status model.SnapshotStatus) string {
 	logs += fmt.Sprintf("Backup installed apps from 1Panel: %s \n", status.AppData)
 	logs += fmt.Sprintf("Backup 1Panel data directory: %s \n", status.PanelData)
 	logs += fmt.Sprintf("Backup local backup directory for 1Panel: %s \n", status.BackupData)
-	logs += fmt.Sprintf("Create snapshot file: %s \n", status.BackupData)
-	logs += fmt.Sprintf("Upload snapshot file: %s \n", status.BackupData)
+	logs += fmt.Sprintf("Create snapshot file: %s \n", status.Compress)
+	logs += fmt.Sprintf("Snapshot size: %s \n", status.Size)
+	logs += fmt.Sprintf("Upload snapshot file: %s \n", status.Upload)
 
 	return logs
 }

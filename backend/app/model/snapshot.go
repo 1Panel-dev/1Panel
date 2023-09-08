@@ -29,5 +29,6 @@ type SnapshotStatus struct {
 	BackupData string `json:"backupData" gorm:"type:varchar(64);default:Running"`
 
 	Compress string `json:"compress" gorm:"type:varchar(64);default:Waiting"`
+	Size     string `json:"size" gorm:"type:varchar(64)"`
 	Upload   string `json:"upload" gorm:"type:varchar(64);default:Waiting"`
 }

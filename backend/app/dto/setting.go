@@ -84,6 +84,7 @@ type SnapshotStatus struct {
 	BackupData string `json:"backupData"`
 
 	Compress string `json:"compress"`
+	Size     string `json:"size"`
 	Upload   string `json:"upload"`
 }
 
