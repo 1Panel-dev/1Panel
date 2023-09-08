@@ -1,8 +1,6 @@
 package migrations
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -489,37 +487,20 @@ var AddRemoteDB = &gormigrate.Migration{
 		if err := tx.AutoMigrate(&model.Database{}, &model.DatabaseMysql{}); err != nil {
 			return err
 		}
-		var (
-			app        model.App
-			appInstall model.AppInstall
-		)
-		if err := global.DB.Where("key = ?", "mysql").First(&app).Error; err != nil {
-			return nil
-		}
-		if err := global.DB.Where("app_id = ?", app.ID).First(&appInstall).Error; err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return nil
+		installRepo := repo.NewIAppInstallRepo()
+		mysqlInfo, err := installRepo.LoadBaseInfo("mysql", "")
+		if err == nil {
+			if err := tx.Create(&model.Database{
+				Name:     "local",
+				Type:     "mysql",
+				Version:  mysqlInfo.Version,
+				From:     "local",
+				Address:  "127.0.0.1",
+				Username: "root",
+				Password: mysqlInfo.Password,
+			}).Error; err != nil {
+				return err
 			}
-			return err
-		}
-		envMap := make(map[string]interface{})
-		if err := json.Unmarshal([]byte(appInstall.Env), &envMap); err != nil {
-			return err
-		}
-		password, ok := envMap["PANEL_DB_ROOT_PASSWORD"].(string)
-		if !ok {
-			return errors.New("error password in app env")
-		}
-		if err := tx.Create(&model.Database{
-			Name:     "local",
-			Type:     "mysql",
-			Version:  appInstall.Version,
-			From:     "local",
-			Address:  "127.0.0.1",
-			Username: "root",
-			Password: password,
-		}).Error; err != nil {
-			return err
 		}
 		return nil
 	},
@@ -532,10 +513,10 @@ var UpdateRedisParam = &gormigrate.Migration{
 			app        model.App
 			appInstall model.AppInstall
 		)
-		if err := global.DB.Where("key = ?", "redis").First(&app).Error; err != nil {
+		if err := tx.Where("key = ?", "redis").First(&app).Error; err != nil {
 			return nil
 		}
-		if err := global.DB.Where("app_id = ?", app.ID).First(&appInstall).Error; err != nil {
+		if err := tx.Where("app_id = ?", app.ID).First(&appInstall).Error; err != nil {
 			return nil
 		}
 		appInstall.Param = strings.ReplaceAll(appInstall.Param, "PANEL_DB_ROOT_PASSWORD", "PANEL_REDIS_ROOT_PASSWORD")
@@ -545,7 +526,6 @@ var UpdateRedisParam = &gormigrate.Migration{
 			return err
 		}
 		return nil
-
 	},
 }
 
@@ -553,13 +533,13 @@ var UpdateCronjobWithDb = &gormigrate.Migration{
 	ID: "20230809-update-cronjob-with-db",
 	Migrate: func(tx *gorm.DB) error {
 		var cronjobs []model.Cronjob
-		if err := global.DB.Where("type = ? AND db_name != ?", "database", "all").Find(&cronjobs).Error; err != nil {
+		if err := tx.Where("type = ? AND db_name != ?", "database", "all").Find(&cronjobs).Error; err != nil {
 			return nil
 		}
 
 		for _, job := range cronjobs {
 			var db model.DatabaseMysql
-			if err := global.DB.Where("name = ?", job.DBName).First(&db).Error; err != nil {
+			if err := tx.Where("name = ?", job.DBName).First(&db).Error; err != nil {
 				continue
 			}
 			if err := tx.Model(&model.Cronjob{}).
@@ -590,6 +570,24 @@ var AddDatabases = &gormigrate.Migration{
 	ID: "20230831-add-databases",
 	Migrate: func(tx *gorm.DB) error {
 		installRepo := repo.NewIAppInstallRepo()
+		mysqlInfo, err := installRepo.LoadBaseInfo("mysql", "")
+		if err == nil {
+			var mysqlDb model.Database
+			_ = tx.Where("name = ?", mysqlInfo.Name).First(&mysqlDb).Error
+			if mysqlDb.ID == 0 {
+				if err := tx.Create(&model.Database{
+					Name:     mysqlDb.Name,
+					Type:     "mysql",
+					Version:  mysqlInfo.Version,
+					From:     "local",
+					Address:  mysqlInfo.ServiceName,
+					Username: "root",
+					Password: mysqlInfo.Password,
+				}).Error; err != nil {
+					return err
+				}
+			}
+		}
 		mariadbInfo, err := installRepo.LoadBaseInfo("mariadb", "")
 		if err == nil {
 			if err := tx.Create(&model.Database{
@@ -632,7 +630,7 @@ var AddDatabases = &gormigrate.Migration{
 				From:         "local",
 				Address:      pgInfo.ServiceName,
 				Port:         uint(pgInfo.Port),
-				Username:     "root",
+				Username:     pgInfo.UserName,
 				Password:     pgInfo.Password,
 			}).Error; err != nil {
 				return err
@@ -648,7 +646,7 @@ var AddDatabases = &gormigrate.Migration{
 				From:         "local",
 				Address:      mongodbInfo.ServiceName,
 				Port:         uint(mongodbInfo.Port),
-				Username:     "root",
+				Username:     mongodbInfo.UserName,
 				Password:     mongodbInfo.Password,
 			}).Error; err != nil {
 				return err
@@ -678,14 +676,14 @@ var AddDatabases = &gormigrate.Migration{
 var UpdateDatabase = &gormigrate.Migration{
 	ID: "20230831-update-database",
 	Migrate: func(tx *gorm.DB) error {
-		if err := global.DB.Model(&model.DatabaseMysql{}).Where("`from` != ?", "local").Updates(map[string]interface{}{
+		if err := tx.Model(&model.DatabaseMysql{}).Where("`from` != ?", "local").Updates(map[string]interface{}{
 			"from": "remote",
 		}).Error; err != nil {
 			return err
 		}
 
 		var datas []model.Database
-		if err := global.DB.Find(&datas).Error; err != nil {
+		if err := tx.Find(&datas).Error; err != nil {
 			return nil
 		}
 		for _, data := range datas {
@@ -700,7 +698,7 @@ var UpdateDatabase = &gormigrate.Migration{
 					global.LOG.Errorf("encrypt database %s password failed, err: %v", data.Name, err)
 					continue
 				}
-				if err := global.DB.Model(&model.Database{}).Where("id = ?", data.ID).Updates(map[string]interface{}{
+				if err := tx.Model(&model.Database{}).Where("id = ?", data.ID).Updates(map[string]interface{}{
 					"app_install_id": mysqlInfo.ID,
 					"name":           mysqlInfo.Name,
 					"password":       pass,
@@ -714,7 +712,7 @@ var UpdateDatabase = &gormigrate.Migration{
 					global.LOG.Errorf("encrypt database %s password failed, err: %v", data.Name, err)
 					continue
 				}
-				if err := global.DB.Model(&model.Database{}).Where("id = ?", data.ID).Updates(map[string]interface{}{
+				if err := tx.Model(&model.Database{}).Where("id = ?", data.ID).Updates(map[string]interface{}{
 					"password": pass,
 				}).Error; err != nil {
 					global.LOG.Errorf("updata database %s info failed, err: %v", data.Name, err)
@@ -723,7 +721,7 @@ var UpdateDatabase = &gormigrate.Migration{
 		}
 
 		var mysqls []model.DatabaseMysql
-		if err := global.DB.Find(&mysqls).Error; err != nil {
+		if err := tx.Find(&mysqls).Error; err != nil {
 			return nil
 		}
 		for _, data := range mysqls {
@@ -732,7 +730,7 @@ var UpdateDatabase = &gormigrate.Migration{
 				global.LOG.Errorf("encrypt database db %s password failed, err: %v", data.Name, err)
 				continue
 			}
-			if err := global.DB.Model(&model.DatabaseMysql{}).Where("id = ?", data.ID).Updates(map[string]interface{}{
+			if err := tx.Model(&model.DatabaseMysql{}).Where("id = ?", data.ID).Updates(map[string]interface{}{
 				"password": pass,
 			}).Error; err != nil {
 				global.LOG.Errorf("updata database db %s info failed, err: %v", data.Name, err)
@@ -748,7 +746,7 @@ var UpdateAppInstallResource = &gormigrate.Migration{
 		if err := tx.AutoMigrate(&model.AppInstallResource{}); err != nil {
 			return err
 		}
-		if err := global.DB.Model(&model.AppInstallResource{}).Where("1 = 1").Updates(map[string]interface{}{
+		if err := tx.Model(&model.AppInstallResource{}).Where("1 = 1").Updates(map[string]interface{}{
 			"from": "local",
 		}).Error; err != nil {
 			return err
