@@ -115,7 +115,6 @@ func (d *DatabaseRepo) WithTypeList(dbType string) DBOption {
 				values = append(values, ty)
 			}
 		}
-		fmt.Println(strings.Join(rules, " OR "))
 		return g.Where(strings.Join(rules, " OR "), values...)
 	}
 }

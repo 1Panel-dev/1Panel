@@ -31,7 +31,7 @@ func NewLocal(command []string, containerName, password, database string) *Local
 func (r *Local) Create(info CreateInfo) error {
 	createSql := fmt.Sprintf("create database `%s` default character set %s collate %s", info.Name, info.Format, formatMap[info.Format])
 	if err := r.ExecSQL(createSql, info.Timeout); err != nil {
-		if strings.Contains(err.Error(), "ERROR 1007") {
+		if strings.Contains(strings.ToLower(err.Error()), "error 1007") {
 			return buserr.New(constant.ErrDatabaseIsExist)
 		}
 		return err
@@ -60,7 +60,7 @@ func (r *Local) CreateUser(info CreateInfo, withDeleteDB bool) error {
 
 	for _, user := range userlist {
 		if err := r.ExecSQL(fmt.Sprintf("create user %s identified by '%s';", user, info.Password), info.Timeout); err != nil {
-			if strings.Contains(err.Error(), "ERROR 1396") {
+			if strings.Contains(strings.ToLower(err.Error()), "error 1396") {
 				return buserr.New(constant.ErrUserIsExist)
 			}
 			_ = r.Delete(DeleteInfo{

@@ -338,6 +338,8 @@ const message = {
             'The database has been associated with an application. Changing the password will change the database password of the application at the same time. The change takes effect after the application restarts.',
 
         confChange: 'Configuration change',
+        confNotFound:
+            'The configuration file could not be found. Please upgrade the application to the latest version in the app store and try again!',
 
         portHelper:
             'This port is the exposed port of the container. You need to save the modification separately and restart the container!',
