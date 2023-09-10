@@ -27,11 +27,12 @@
                     <template #prefix>{{ $t('commons.table.type') }}</template>
                     <el-option-group :label="$t('database.local')">
                         <div v-for="(item, index) in dbOptionsLocal" :key="index">
-                            <el-option
-                                v-if="item.from === 'local'"
-                                :value="item.database"
-                                :label="item.database + ' [' + (item.type === 'mysql' ? 'MySQL' : 'MariaDB') + ']'"
-                            ></el-option>
+                            <el-option v-if="item.from === 'local'" :value="item.database">
+                                <span>{{ item.database }}</span>
+                                <el-tag class="tagClass">
+                                    {{ item.type === 'mysql' ? 'MySQL' : 'MariaDB' }}
+                                </el-tag>
+                            </el-option>
                         </div>
                         <el-button link type="primary" class="jumpAdd" @click="goRouter('app')" icon="Position">
                             {{ $t('database.goInstall') }}
@@ -39,11 +40,12 @@
                     </el-option-group>
                     <el-option-group :label="$t('database.remote')">
                         <div v-for="(item, index) in dbOptionsRemote" :key="index">
-                            <el-option
-                                v-if="item.from === 'remote'"
-                                :value="item.database"
-                                :label="item.database + ' [' + (item.type === 'mysql' ? 'MySQL' : 'MariaDB') + ']'"
-                            ></el-option>
+                            <el-option v-if="item.from === 'remote'" :value="item.database">
+                                <span>{{ item.database }}</span>
+                                <el-tag class="tagClass">
+                                    {{ item.type === 'mysql' ? 'MySQL' : 'MariaDB' }}
+                                </el-tag>
+                            </el-option>
                         </div>
                         <el-button link type="primary" class="jumpAdd" @click="goRouter('remote')" icon="Position">
                             {{ $t('database.createRemoteDB') }}
@@ -563,6 +565,12 @@ onMounted(() => {
 .jumpAdd {
     margin-top: 10px;
     margin-left: 15px;
+    margin-bottom: 5px;
     font-size: 12px;
+}
+.tagClass {
+    float: right;
+    font-size: 12px;
+    margin-top: 5px;
 }
 </style>

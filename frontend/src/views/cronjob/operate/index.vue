@@ -125,7 +125,12 @@
                             <el-select class="selectClass" clearable v-model="dialogData.rowData!.appID">
                                 <el-option :label="$t('commons.table.all')" value="all" />
                                 <div v-for="item in appOptions" :key="item.id">
-                                    <el-option :label="item.key + ' [' + item.name + ']'" :value="item.id + ''" />
+                                    <el-option :value="item.id + ''">
+                                        <span>{{ item.name }}</span>
+                                        <el-tag class="tagClass">
+                                            {{ item.key }}
+                                        </el-tag>
+                                    </el-option>
                                 </div>
                             </el-select>
                         </el-form-item>
@@ -135,12 +140,15 @@
                         <el-form-item :label="$t('cronjob.database')" prop="dbName">
                             <el-select class="selectClass" clearable v-model="dialogData.rowData!.dbName">
                                 <el-option :label="$t('commons.table.all')" value="all" />
-                                <el-option
-                                    v-for="item in mysqlInfo.dbs"
-                                    :key="item.id"
-                                    :label="item.database + ' [' + item.name + ']'"
-                                    :value="item.id + ''"
-                                />
+                                <el-option v-for="item in mysqlInfo.dbs" :key="item.id" :value="item.id + ''">
+                                    <span>{{ item.name }}</span>
+                                    <el-tag class="tagClass">
+                                        {{ item.from === 'local' ? $t('database.local') : $t('database.remote') }}
+                                    </el-tag>
+                                    <el-tag class="tagClass">
+                                        {{ item.database }}
+                                    </el-tag>
+                                </el-option>
                             </el-select>
                         </el-form-item>
                     </div>
@@ -608,5 +616,11 @@ defineExpose({
 }
 .selectClass {
     width: 100%;
+}
+.tagClass {
+    float: right;
+    margin-right: 10px;
+    font-size: 12px;
+    margin-top: 5px;
 }
 </style>
