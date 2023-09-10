@@ -161,6 +161,7 @@ type RootInfo struct {
 	Name          string `json:"name"`
 	Port          int64  `json:"port"`
 	HttpsPort     int64  `json:"httpsPort"`
+	UserName      string `json:"userName"`
 	Password      string `json:"password"`
 	UserPassword  string `json:"userPassword"`
 	ContainerName string `json:"containerName"`
@@ -201,6 +202,15 @@ func (a *AppInstallRepo) LoadBaseInfo(key string, name string) (*RootInfo, error
 		}
 	case "redis":
 		password, ok := envMap["PANEL_REDIS_ROOT_PASSWORD"].(string)
+		if ok {
+			info.Password = password
+		}
+	case "mongodb", "postgresql":
+		user, ok := envMap["PANEL_DB_ROOT_USER"].(string)
+		if ok {
+			info.UserName = user
+		}
+		password, ok := envMap["PANEL_DB_ROOT_PASSWORD"].(string)
 		if ok {
 			info.Password = password
 		}
