@@ -134,6 +134,7 @@ export namespace Database {
     export interface MysqlOption {
         id: number;
         from: string;
+        type: string;
         database: string;
         name: string;
     }

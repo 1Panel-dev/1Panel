@@ -75,6 +75,14 @@ func (u *MysqlService) SearchWithPage(search dto.MysqlDBSearch) (int64, interfac
 
 func (u *MysqlService) ListDBOption() ([]dto.MysqlOption, error) {
 	mysqls, err := mysqlRepo.List()
+	if err != nil {
+		return nil, err
+	}
+
+	databases, err := databaseRepo.GetList(databaseRepo.WithTypeList("mysql,mariadb"))
+	if err != nil {
+		return nil, err
+	}
 	var dbs []dto.MysqlOption
 	for _, mysql := range mysqls {
 		var item dto.MysqlOption
@@ -82,6 +90,11 @@ func (u *MysqlService) ListDBOption() ([]dto.MysqlOption, error) {
 			return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 		}
 		item.Database = mysql.MysqlName
+		for _, database := range databases {
+			if database.Name == item.Database {
+				item.Type = database.Type
+			}
+		}
 		dbs = append(dbs, item)
 	}
 	return dbs, err

@@ -347,6 +347,10 @@ definitions:
         type: string
       cpuShares:
         type: integer
+      entrypoint:
+        items:
+          type: string
+        type: array
       env:
         items:
           type: string
@@ -1361,6 +1365,8 @@ definitions:
       id:
         type: integer
       name:
+        type: string
+      type:
         type: string
     type: object
   dto.MysqlStatus:

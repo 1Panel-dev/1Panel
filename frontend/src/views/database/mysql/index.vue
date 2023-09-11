@@ -27,8 +27,11 @@
                     <template #prefix>{{ $t('commons.table.type') }}</template>
                     <el-option-group :label="$t('database.local')">
                         <div v-for="(item, index) in dbOptionsLocal" :key="index">
-                            <el-option v-if="item.from === 'local'" :value="item.database">
-                                <span>{{ item.database }}</span>
+                            <el-option v-if="item.from === 'local'" :value="item.database" class="optionClass">
+                                <span v-if="item.database.length < 25">{{ item.database }}</span>
+                                <el-tooltip v-else :content="item.database" placement="top">
+                                    <span>{{ item.database.substring(0, 25) }}...</span>
+                                </el-tooltip>
                                 <el-tag class="tagClass">
                                     {{ item.type === 'mysql' ? 'MySQL' : 'MariaDB' }}
                                 </el-tag>
@@ -40,8 +43,11 @@
                     </el-option-group>
                     <el-option-group :label="$t('database.remote')">
                         <div v-for="(item, index) in dbOptionsRemote" :key="index">
-                            <el-option v-if="item.from === 'remote'" :value="item.database">
-                                <span>{{ item.database }}</span>
+                            <el-option v-if="item.from === 'remote'" :value="item.database" class="optionClass">
+                                <span v-if="item.database.length < 25">{{ item.database }}</span>
+                                <el-tooltip v-else :content="item.database" placement="top">
+                                    <span>{{ item.database.substring(0, 25) }}...</span>
+                                </el-tooltip>
                                 <el-tag class="tagClass">
                                     {{ item.type === 'mysql' ? 'MySQL' : 'MariaDB' }}
                                 </el-tag>
@@ -572,5 +578,8 @@ onMounted(() => {
     float: right;
     font-size: 12px;
     margin-top: 5px;
+}
+.optionClass {
+    min-width: 350px;
 }
 </style>

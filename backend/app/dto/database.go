@@ -27,6 +27,7 @@ type MysqlDBInfo struct {
 type MysqlOption struct {
 	ID       uint   `json:"id"`
 	From     string `json:"from"`
+	Type     string `json:"type"`
 	Database string `json:"database"`
 	Name     string `json:"name"`
 }

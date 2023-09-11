@@ -12215,6 +12215,12 @@ const docTemplate = `{
                 "cpuShares": {
                     "type": "integer"
                 },
+                "entrypoint": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "env": {
                     "type": "array",
                     "items": {
@@ -13713,6 +13719,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 }
             }
