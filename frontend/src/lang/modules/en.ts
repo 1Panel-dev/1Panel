@@ -1051,6 +1051,7 @@ const message = {
 
         safe: 'Security',
         entrance: 'Entrance',
+        showEntrance: 'Enable Home Page Notification Not Enabled',
         entranceHelper: 'Enabling secure entry will only allow logging in to the panel through specified secure entry.',
         entranceError:
             'Please enter a secure login entry point of 6-10 characters, only numbers or letters are supported.',

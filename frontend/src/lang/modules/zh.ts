@@ -1051,6 +1051,7 @@ const message = {
 
         safe: '安全',
         entrance: '安全入口',
+        showEntrance: '启用概览页未开启提醒',
         entranceHelper: '开启安全入口后只能通过指定安全入口登录面板',
         entranceError: '请输入 6-10 位安全登录入口，仅支持输入数字或字母',
         entranceInputHelper: '安全入口设置为空时，则取消安全入口',
