@@ -92,7 +92,7 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 		return nil, buserr.New(constant.ErrCmdIllegal)
 	}
 
-	mysql, _ := mysqlRepo.Get(commonRepo.WithByName(req.Name), databaseRepo.WithByFrom(req.From))
+	mysql, _ := mysqlRepo.Get(commonRepo.WithByName(req.Name), mysqlRepo.WithByMysqlName(req.Database), databaseRepo.WithByFrom(req.From))
 	if mysql.ID != 0 {
 		return nil, constant.ErrRecordExist
 	}
