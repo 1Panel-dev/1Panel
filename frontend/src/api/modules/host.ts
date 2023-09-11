@@ -76,7 +76,7 @@ export const searchFireRule = (params: Host.RuleSearch) => {
     return http.post<ResPage<Host.RuleInfo>>(`/hosts/firewall/search`, params);
 };
 export const operateFire = (operation: string) => {
-    return http.post(`/hosts/firewall/operate`, { operation: operation });
+    return http.post(`/hosts/firewall/operate`, { operation: operation }, 40000);
 };
 export const operatePortRule = (params: Host.RulePort) => {
     return http.post<Host.RulePort>(`/hosts/firewall/port`, params);
