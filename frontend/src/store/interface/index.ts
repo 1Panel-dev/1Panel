@@ -23,6 +23,7 @@ export interface GlobalState {
     device: DeviceType;
     lastFilePath: string;
     currentDB: string;
+    showEntranceWarn: boolean;
 }
 
 export interface MenuState {

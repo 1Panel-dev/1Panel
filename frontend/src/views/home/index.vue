@@ -8,7 +8,12 @@
                 },
             ]"
         />
-        <el-alert v-if="!isSafety" :closable="false" style="margin-top: 20px" type="warning">
+        <el-alert
+            v-if="!isSafety && globalStore.showEntranceWarn"
+            style="margin-top: 20px"
+            type="warning"
+            @close="hideEntrance"
+        >
             <template #default>
                 <span>
                     <span>{{ $t('home.entranceHelper') }}</span>
@@ -502,6 +507,10 @@ const loadData = async () => {
             formatStr: 'KB/s',
         };
     }
+};
+
+const hideEntrance = () => {
+    globalStore.setShowEntranceWarn(false);
 };
 
 const loadUpgradeStatus = async () => {

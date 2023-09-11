@@ -28,6 +28,7 @@ export const GlobalStore = defineStore({
         device: DeviceType.Desktop,
         lastFilePath: '',
         currentDB: '',
+        showEntranceWarn: true,
     }),
     getters: {},
     actions: {
@@ -67,6 +68,9 @@ export const GlobalStore = defineStore({
         },
         setCurrentDB(name: string) {
             this.currentDB = name;
+        },
+        setShowEntranceWarn(show: boolean) {
+            this.showEntranceWarn = show;
         },
     },
     persist: piniaPersistConfig('GlobalState'),

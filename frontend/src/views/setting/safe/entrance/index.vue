@@ -24,6 +24,9 @@
                                 {{ $t('setting.entranceInputHelper') }}
                             </span>
                         </el-form-item>
+                        <el-form-item>
+                            <el-checkbox v-model="show" :label="$t('setting.showEntrance')" />
+                        </el-form-item>
                     </el-col>
                 </el-row>
             </el-form>
@@ -56,6 +59,7 @@ interface DialogProps {
 }
 const drawerVisiable = ref();
 const loading = ref();
+const show = ref();
 
 const form = reactive({
     securityEntrance: '',
@@ -78,6 +82,7 @@ function checkSecurityEntrance(rule: any, value: any, callback: any) {
 
 const acceptParams = (params: DialogProps): void => {
     form.securityEntrance = params.securityEntrance;
+    show.value = globalStore.showEntranceWarn;
     drawerVisiable.value = true;
 };
 
@@ -96,6 +101,7 @@ const submitEntrance = async (formEl: FormInstance | undefined) => {
         loading.value = true;
         await updateSetting(param)
             .then(() => {
+                globalStore.setShowEntranceWarn(show.value);
                 globalStore.entrance = form.securityEntrance;
                 loading.value = false;
                 drawerVisiable.value = false;
