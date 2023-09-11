@@ -67,9 +67,7 @@
                                     <el-input
                                         v-model="searchName"
                                         clearable
-                                        @clear="search()"
                                         suffix-icon="Search"
-                                        @keyup.enter="search()"
                                         @change="search()"
                                         :placeholder="$t('commons.button.search')"
                                     ></el-input>
