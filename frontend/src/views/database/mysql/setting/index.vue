@@ -116,6 +116,25 @@
             </template>
         </LayoutContent>
 
+        <el-dialog
+            v-model="upgradeVisiable"
+            :title="$t('app.checkTitle')"
+            width="30%"
+            :close-on-click-modal="false"
+            :destroy-on-close="true"
+        >
+            <el-alert :closable="false" :title="$t('database.confNotFound')" type="info">
+                <el-link icon="Position" @click="goUpgrade()" type="primary">
+                    {{ $t('database.goUpgrade') }}
+                </el-link>
+            </el-alert>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="upgradeVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                </span>
+            </template>
+        </el-dialog>
+
         <ConfirmDialog ref="confirmPortRef" @confirm="onSubmitChangePort"></ConfirmDialog>
         <ConfirmDialog ref="confirmConfRef" @confirm="onSubmitChangeConf"></ConfirmDialog>
     </div>
@@ -136,7 +155,8 @@ import { loadDatabaseFile, loadMysqlBaseInfo, loadMysqlVariables, updateMysqlCon
 import { ChangePort, CheckAppInstalled, GetAppDefaultConfig } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { MsgError, MsgSuccess } from '@/utils/message';
+import { MsgSuccess } from '@/utils/message';
+import router from '@/routers';
 
 const loading = ref(false);
 
@@ -152,6 +172,7 @@ const baseInfo = reactive({
 });
 const panelFormRef = ref<FormInstance>();
 const mysqlConf = ref();
+const upgradeVisiable = ref();
 
 const useOld = ref(false);
 
@@ -312,9 +333,13 @@ const loadMysqlConf = async () => {
             mysqlConf.value = res.data;
         })
         .catch(() => {
-            MsgError(i18n.global.t('database.confNotFound'));
+            upgradeVisiable.value = true;
             loading.value = false;
         });
+};
+
+const goUpgrade = () => {
+    router.push({ name: 'AppUpgrade' });
 };
 
 const onLoadInfo = async () => {

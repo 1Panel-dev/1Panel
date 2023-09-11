@@ -62,7 +62,9 @@
             </el-alert>
             <el-alert :type="loadStatus(status.compress)" :closable="false">
                 <template #title>
-                    <el-button :icon="loadIcon(status.compress)" link>{{ $t('setting.compress') }}</el-button>
+                    <el-button :icon="loadIcon(status.compress)" link>
+                        {{ $t('setting.compress') }} {{ status.size }}
+                    </el-button>
                     <div v-if="showErrorMsg(status.compress)" class="top-margin">
                         <span class="err-message">{{ status.compress }}</span>
                     </div>
@@ -71,7 +73,7 @@
             <el-alert :type="loadStatus(status.upload)" :closable="false">
                 <template #title>
                     <el-button :icon="loadIcon(status.upload)" link>
-                        {{ $t('setting.upload') }} {{ status.size }}
+                        {{ $t('setting.upload') }}
                     </el-button>
                     <div v-if="showErrorMsg(status.upload)" class="top-margin">
                         <span class="err-message">{{ status.upload }}</span>
@@ -187,6 +189,7 @@ const onWatch = () => {
             status.backupData = res.data.backupData;
 
             status.compress = res.data.compress;
+            status.size = res.data.size;
             status.upload = res.data.upload;
         }
     }, 1000 * 3);

@@ -138,7 +138,7 @@
                                                 <el-tooltip :hide-after="20" :content="item.option" placement="top">
                                                     <el-option
                                                         :value="item.option"
-                                                        :label="item.option.substring(0, 12)"
+                                                        :label="item.option.substring(0, 30)"
                                                     />
                                                 </el-tooltip>
                                             </div>

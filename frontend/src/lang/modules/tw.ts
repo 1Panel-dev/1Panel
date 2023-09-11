@@ -314,6 +314,7 @@ const message = {
         deleteHelper: '" 刪除此數據庫',
         create: '創建數據庫',
         noMysql: '數據庫服務 (MySQL 或 MariaDB)',
+        goUpgrade: '去應用商店升級',
         goInstall: '去應用商店安裝',
         source: '來源',
         permission: '權限',

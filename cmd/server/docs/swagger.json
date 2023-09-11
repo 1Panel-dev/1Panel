@@ -12208,6 +12208,12 @@
                 "cpuShares": {
                     "type": "integer"
                 },
+                "entrypoint": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "env": {
                     "type": "array",
                     "items": {
@@ -13706,6 +13712,9 @@
                     "type": "integer"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 }
             }
