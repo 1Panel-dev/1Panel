@@ -1,7 +1,7 @@
 [中文 README.md](README.md)
-[日本語 README.md](README_JA.md)
+[English README.md](README_EN.md)
 <p align="center"><a href="https://1panel.cn"><img src="http://1panel.oss-cn-hangzhou.aliyuncs.com/img/1panel-logo.png" alt="1Panel" width="300" /></a></p>
-<p align="center"><b>Modern and Open-Source Linux Server Operation and Management Panel</b></p>
+<p align="center"><b>モダンでオープンソースの Linux サーバー運用管理パネル</b></p>
 <p align="center">
   <a href="https://www.gnu.org/licenses/gpl-3.0.html"><img src="https://shields.io/github/license/1Panel-dev/1Panel" alt="License: GPL v3"></a>
   <a href="https://app.codacy.com/gh/1Panel-dev/1Panel?utm_source=github.com&utm_medium=referral&utm_content=1Panel-dev/1Panel&utm_campaign=Badge_Grade_Dashboard"><img src="https://app.codacy.com/project/badge/Grade/da67574fd82b473992781d1386b937ef" alt="Codacy"></a>
@@ -11,52 +11,52 @@
 
 ------------------------------
 
-1Panel is a modern and Open-Source linux server operation and management panel, the functions and advantages of 1Panel include:
+1Panel はモダンでオープンソースの Linux サーバー操作と管理パネルです:
 
-- **Quick website building**: Deeply integrated with Wordpress and [Halo](https://github.com/halo-dev/halo/), with one-click solutions for domain name binding, SSL certificate configuration, and more;
-- **Efficient management**: Easily manage Linux servers through the web interface, including application management, host monitoring, file management, database management, container management, and more;
-- **Secure and reliable**: Minimal vulnerability exposure, with firewall and security audit functions provided;
-- **One-click backup**: Support for one-click backup and restore, with backup data stored in the cloud and never lost.
+- **素早いウェブサイト構築**: Wordpress および [Halo](https://github.com/halo-dev/halo/) と深く統合されており、ドメイン名のバインディング、SSL 証明書の設定など、ワンクリックで解決できます;
+- **効率的なマネジメント**: アプリケーション管理、ホスト監視、ファイル管理、データベース管理、コンテナ管理など、web インターフェイスを通じて Linux サーバーを簡単に管理できます;
+- **安全性と信頼性**: ファイアウォールとセキュリティ監査機能により、脆弱性の露出を最小限に抑えます;
+- **ワンクリックバックアップ**: ワンクリックでのバックアップと復元をサポートし、バックアップデータはクラウドに保存され、失われることはありません。
 
-## UI Display
+## UI ディスプレイ
 
 ![UI Display](https://resource.fit2cloud.com/1panel/img/overview_en.png)
 
-## Quick Start
+## クイックスタート
 
-**Online Demo**
+**オンラインでも**
 
-- Address: <https://demo.1panel.cn/>
-- Username: demo
-- Password: 1panel
+- アドレス: <https://demo.1panel.cn/>
+- ユーザネーム: demo
+- パスワード: 1panel
 
-**One-Click Installation**
+**ワンクリックインストール**
 
-Execute the following command to install 1Panel with one click:
+ワンクリックで 1Panel をインストールするには、次のコマンドを実行します:
 
 ```sh
 curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_start.sh && sudo bash quick_start.sh
 ```
 
-**Learning Materials**
+**学習教材**
 
-- [Online Documentation](https://1panel.cn/docs/)
-- [Teaching Videos](https://space.bilibili.com/510493147/channel/collectiondetail?sid=1199760)
+- [オンラインドキュメント](https://1panel.cn/docs/)
+- [ビデオ教材](https://space.bilibili.com/510493147/channel/collectiondetail?sid=1199760)
 
-## Community
+## コミュニティ
 
-If you have any questions or suggestions, please submit a GitHub Issue or join our WeChat group for communication.
+ご質問やご提案がございましたら、GitHub Issue にご投稿いただくか、WeChat グループにご参加ください。
 
-**WeChat Group**
+**WeChat グループ**
 
 <img src="https://1panel.cn/img/wechat-group.jpg" width="156" height="156"/>
 
-## Security Information
+## セキュリティ情報
 
-If you discover any security issues, please contact us through:
+セキュリティ上の問題を発見された場合は、下記までご連絡ください:
 
-- Email: support@fit2cloud.com
-- Phone: 400-052-0755
+- メール: support@fit2cloud.com
+- 電話番号: 400-052-0755
 
 ## Star History
 
