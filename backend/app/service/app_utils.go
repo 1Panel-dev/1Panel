@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"math"
 	"net/http"
 	"os"
@@ -15,6 +14,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
@@ -294,9 +295,11 @@ func deleteLink(ctx context.Context, install *model.AppInstall, deleteDB bool, f
 				continue
 			}
 			if err := mysqlService.Delete(ctx, dto.MysqlDBDelete{
-				ID:          database.ID,
-				ForceDelete: forceDelete,
-				Database:    database.MysqlName,
+				ID:           database.ID,
+				ForceDelete:  forceDelete,
+				DeleteBackup: true,
+				Type:         re.Key,
+				Database:     database.MysqlName,
 			}); err != nil && !forceDelete {
 				return err
 			}

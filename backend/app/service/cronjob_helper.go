@@ -232,7 +232,7 @@ func handleTar(sourceDir, targetDir, name, exclusionRules string) error {
 		path = sourceDir
 	}
 
-	commands := fmt.Sprintf("tar -zcf --warning=no-file-changed --ignore-failed-read %s %s %s", targetDir+"/"+name, excludeRules, path)
+	commands := fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read -zcf %s %s %s", targetDir+"/"+name, excludeRules, path)
 	global.LOG.Debug(commands)
 	stdout, err := cmd.ExecWithTimeOut(commands, 24*time.Hour)
 	if err != nil {
