@@ -173,8 +173,15 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 	newEnvFile := ""
 	resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(install.ID))
 	for _, resource := range resources {
+		if resource.From != "local" {
+			continue
+		}
+		resourceApp, err := appInstallRepo.GetFirst(commonRepo.WithByID(resource.LinkId))
+		if err != nil {
+			return err
+		}
 		if resource.Key == "mysql" || resource.Key == "maraidb" {
-			mysqlInfo, err := appInstallRepo.LoadBaseInfo(resource.Key, "")
+			mysqlInfo, err := appInstallRepo.LoadBaseInfo(resource.Key, resourceApp.Name)
 			if err != nil {
 				return err
 			}
@@ -183,7 +190,7 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 				return err
 			}
 
-			newDB, envMap, err := reCreateDB(db.ID, oldInstall.Env)
+			newDB, envMap, err := reCreateDB(db.ID, resourceApp, oldInstall.Env)
 			if err != nil {
 				return err
 			}
@@ -245,10 +252,10 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 	return nil
 }
 
-func reCreateDB(dbID uint, oldEnv string) (*model.DatabaseMysql, map[string]interface{}, error) {
+func reCreateDB(dbID uint, app model.AppInstall, oldEnv string) (*model.DatabaseMysql, map[string]interface{}, error) {
 	mysqlService := NewIMysqlService()
 	ctx := context.Background()
-	_ = mysqlService.Delete(ctx, dto.MysqlDBDelete{ID: dbID, DeleteBackup: true, ForceDelete: true})
+	_ = mysqlService.Delete(ctx, dto.MysqlDBDelete{ID: dbID, Database: app.Name, Type: app.App.Key, DeleteBackup: true, ForceDelete: true})
 
 	envMap := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(oldEnv), &envMap); err != nil {
@@ -260,6 +267,7 @@ func reCreateDB(dbID uint, oldEnv string) (*model.DatabaseMysql, map[string]inte
 	createDB, err := mysqlService.Create(context.Background(), dto.MysqlDBCreate{
 		Name:       oldName,
 		From:       "local",
+		Database:   app.Name,
 		Format:     "utf8mb4",
 		Username:   oldUser,
 		Password:   oldPassword,
