@@ -1,6 +1,7 @@
 import http from '@/api';
 import { ResPage } from '../interface';
 import { App } from '../interface/app';
+import { TimeoutEnum } from '@/enums/http-enum';
 
 export const SyncApp = () => {
     return http.post<any>('apps/sync', {});
@@ -67,7 +68,7 @@ export const GetAppInstalled = (search: App.AppInstalledSearch) => {
 };
 
 export const InstalledOp = (op: App.AppInstalledOp) => {
-    return http.post<any>('apps/installed/op', op, 40000);
+    return http.post<any>('apps/installed/op', op, TimeoutEnum.T_40S);
 };
 
 export const SyncInstalledApp = () => {

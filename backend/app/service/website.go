@@ -9,9 +9,6 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/i18n"
-	"github.com/1Panel-dev/1Panel/backend/utils/common"
-	"github.com/spf13/afero"
 	"os"
 	"path"
 	"reflect"
@@ -20,6 +17,10 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/i18n"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
+	"github.com/spf13/afero"
 
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	"github.com/1Panel-dev/1Panel/backend/utils/env"
@@ -816,7 +817,7 @@ func (w WebsiteService) PreInstallCheck(req request.WebsiteInstallCheckReq) ([]r
 		checkIds = append(req.InstallIds, appInstall.ID)
 	}
 	for _, id := range checkIds {
-		if err := syncById(id); err != nil {
+		if err := syncByID(id); err != nil {
 			return nil, err
 		}
 	}

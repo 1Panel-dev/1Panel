@@ -13,6 +13,14 @@ export enum ResultEnum {
     TYPE = 'success',
 }
 
+export enum TimeoutEnum {
+    T_40S = 40000,
+    T_60S = 60000,
+    T_5M = 300000,
+    T_10M = 600000,
+    T_1H = 3600000,
+    T_1D = 86400000,
+}
 /**
  * @description：请求方法
  */

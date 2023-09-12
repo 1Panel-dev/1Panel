@@ -3,6 +3,7 @@ import { deepCopy } from '@/utils/util';
 import { Base64 } from 'js-base64';
 import { ResPage, DescriptionUpdate } from '../interface';
 import { Database } from '../interface/database';
+import { TimeoutEnum } from '@/enums/http-enum';
 
 export const searchMysqlDBs = (params: Database.SearchDBWithPage) => {
     return http.post<ResPage<Database.MysqlDBInfo>>(`/databases/search`, params);
@@ -101,13 +102,13 @@ export const listDatabases = (type: string) => {
     return http.get<Array<Database.DatabaseOption>>(`/databases/db/list/${type}`);
 };
 export const checkDatabase = (params: Database.DatabaseCreate) => {
-    return http.post<boolean>(`/databases/db/check`, params, 40000);
+    return http.post<boolean>(`/databases/db/check`, params, TimeoutEnum.T_40S);
 };
 export const addDatabase = (params: Database.DatabaseCreate) => {
-    return http.post(`/databases/db`, params, 40000);
+    return http.post(`/databases/db`, params, TimeoutEnum.T_40S);
 };
 export const editDatabase = (params: Database.DatabaseUpdate) => {
-    return http.post(`/databases/db/update`, params, 40000);
+    return http.post(`/databases/db/update`, params, TimeoutEnum.T_40S);
 };
 export const deleteDatabase = (id: number) => {
     return http.post(`/databases/db/del`, { id: id });

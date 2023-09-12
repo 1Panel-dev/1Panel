@@ -2,6 +2,7 @@ import http from '@/api';
 import { ReqPage, ResPage } from '../interface';
 import { Website } from '../interface/website';
 import { File } from '../interface/file';
+import { TimeoutEnum } from '@/enums/http-enum';
 
 export const SearchWebsites = (req: Website.WebSiteSearch) => {
     return http.post<ResPage<Website.WebsiteDTO>>(`/websites/search`, req);
@@ -100,7 +101,7 @@ export const ListSSL = (req: Website.SSLReq) => {
 };
 
 export const CreateSSL = (req: Website.SSLCreate) => {
-    return http.post<Website.SSLCreate>(`/websites/ssl`, req, 100000);
+    return http.post<Website.SSLCreate>(`/websites/ssl`, req, TimeoutEnum.T_60S);
 };
 
 export const DeleteSSL = (req: Website.DelReq) => {
@@ -128,7 +129,7 @@ export const UpdateSSL = (req: Website.SSLUpdate) => {
 };
 
 export const GetDnsResolve = (req: Website.DNSResolveReq) => {
-    return http.post<Website.DNSResolve[]>(`/websites/ssl/resolve`, req, 60000);
+    return http.post<Website.DNSResolve[]>(`/websites/ssl/resolve`, req, TimeoutEnum.T_60S);
 };
 
 export const GetHTTPSConfig = (id: number) => {
