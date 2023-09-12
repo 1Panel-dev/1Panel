@@ -81,18 +81,18 @@ func checkPort(key string, params map[string]interface{}) (int, error) {
 	return 0, nil
 }
 
-var DatabaseKeys = map[string]bool{
-	"mysql":      true,
-	"mariadb":    true,
-	"postgresql": true,
-	"mongodb":    true,
-	"redis":      true,
-	"memcached":  true,
+var DatabaseKeys = map[string]uint{
+	"mysql":      3306,
+	"mariadb":    3306,
+	"postgresql": 5432,
+	"mongodb":    27017,
+	"redis":      6379,
+	"memcached":  11211,
 }
 
 func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall, params map[string]interface{}) error {
 	var dbConfig dto.AppDatabase
-	if app.Type == "runtime" && DatabaseKeys[app.Key] {
+	if app.Type == "runtime" && DatabaseKeys[app.Key] > 0 {
 		database := &model.Database{
 			AppInstallID: appInstall.ID,
 			Name:         appInstall.Name,
@@ -100,6 +100,7 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 			Version:      appInstall.Version,
 			From:         "local",
 			Address:      appInstall.ServiceName,
+			Port:         DatabaseKeys[app.Key],
 		}
 		detail, err := appDetailRepo.GetFirst(commonRepo.WithByID(appInstall.AppDetailId))
 		if err != nil {
@@ -277,7 +278,7 @@ func deleteAppInstall(install model.AppInstall, deleteBackup bool, forceDelete b
 }
 
 func deleteLink(ctx context.Context, install *model.AppInstall, deleteDB bool, forceDelete bool) error {
-	if DatabaseKeys[install.App.Key] {
+	if DatabaseKeys[install.App.Key] > 0 {
 		_ = databaseRepo.Delete(ctx, databaseRepo.WithAppInstallID(install.ID))
 		_ = mysqlRepo.Delete(ctx, mysqlRepo.WithByMysqlName(install.Name))
 	}

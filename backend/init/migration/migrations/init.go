@@ -2,6 +2,7 @@ package migrations
 
 import (
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/app/service"
 	"strings"
 	"time"
 
@@ -582,7 +583,7 @@ var AddDatabases = &gormigrate.Migration{
 					Version:      mysqlInfo.Version,
 					From:         "local",
 					Address:      mysqlInfo.ServiceName,
-					Port:         uint(mysqlInfo.Port),
+					Port:         service.DatabaseKeys["mysql"],
 					Username:     "root",
 					Password:     mysqlInfo.Password,
 				}).Error; err != nil {
@@ -599,7 +600,7 @@ var AddDatabases = &gormigrate.Migration{
 				Version:      mariadbInfo.Version,
 				From:         "local",
 				Address:      mariadbInfo.ServiceName,
-				Port:         uint(mariadbInfo.Port),
+				Port:         service.DatabaseKeys["mariadb"],
 				Username:     "root",
 				Password:     mariadbInfo.Password,
 			}).Error; err != nil {
@@ -615,7 +616,7 @@ var AddDatabases = &gormigrate.Migration{
 				Version:      redisInfo.Version,
 				From:         "local",
 				Address:      redisInfo.ServiceName,
-				Port:         uint(redisInfo.Port),
+				Port:         service.DatabaseKeys["redis"],
 				Username:     "root",
 				Password:     redisInfo.Password,
 			}).Error; err != nil {
@@ -631,7 +632,7 @@ var AddDatabases = &gormigrate.Migration{
 				Version:      pgInfo.Version,
 				From:         "local",
 				Address:      pgInfo.ServiceName,
-				Port:         uint(pgInfo.Port),
+				Port:         service.DatabaseKeys["postgresql"],
 				Username:     pgInfo.UserName,
 				Password:     pgInfo.Password,
 			}).Error; err != nil {
@@ -647,7 +648,7 @@ var AddDatabases = &gormigrate.Migration{
 				Version:      mongodbInfo.Version,
 				From:         "local",
 				Address:      mongodbInfo.ServiceName,
-				Port:         uint(mongodbInfo.Port),
+				Port:         service.DatabaseKeys["mongodb"],
 				Username:     mongodbInfo.UserName,
 				Password:     mongodbInfo.Password,
 			}).Error; err != nil {
@@ -663,7 +664,7 @@ var AddDatabases = &gormigrate.Migration{
 				Version:      memcachedInfo.Version,
 				From:         "local",
 				Address:      memcachedInfo.ServiceName,
-				Port:         uint(memcachedInfo.Port),
+				Port:         service.DatabaseKeys["memcached"],
 				Username:     "root",
 				Password:     memcachedInfo.Password,
 			}).Error; err != nil {
