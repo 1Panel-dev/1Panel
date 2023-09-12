@@ -151,7 +151,7 @@ func (a *AppInstallService) CheckExist(req request.AppInstalledInfo) (*response.
 	if reflect.DeepEqual(appInstall, model.AppInstall{}) {
 		return res, nil
 	}
-	if err = syncById(appInstall.ID); err != nil {
+	if err = syncByID(appInstall.ID); err != nil {
 		return nil, err
 	}
 
@@ -239,26 +239,26 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 		if err != nil {
 			return handleErr(install, err, out)
 		}
-		return syncById(install.ID)
+		return syncByID(install.ID)
 	case constant.Stop:
 		out, err := compose.Stop(dockerComposePath)
 		if err != nil {
 			return handleErr(install, err, out)
 		}
-		return syncById(install.ID)
+		return syncByID(install.ID)
 	case constant.Restart:
 		out, err := compose.Restart(dockerComposePath)
 		if err != nil {
 			return handleErr(install, err, out)
 		}
-		return syncById(install.ID)
+		return syncByID(install.ID)
 	case constant.Delete:
 		if err := deleteAppInstall(install, req.DeleteBackup, req.ForceDelete, req.DeleteDB); err != nil && !req.ForceDelete {
 			return err
 		}
 		return nil
 	case constant.Sync:
-		return syncById(install.ID)
+		return syncByID(install.ID)
 	case constant.Upgrade:
 		return upgradeInstall(install.ID, req.DetailId, req.Backup)
 	default:
@@ -417,7 +417,7 @@ func (a *AppInstallService) SyncAll(systemInit bool) error {
 			continue
 		}
 		if !systemInit {
-			if err := syncById(i.ID); err != nil {
+			if err := syncByID(i.ID); err != nil {
 				global.LOG.Errorf("sync install app[%s] error,mgs: %s", i.Name, err.Error())
 			}
 		}
@@ -675,8 +675,8 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 	return &res, nil
 }
 
-func syncById(installId uint) error {
-	appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(installId))
+func syncByID(installID uint) error {
+	appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(installID))
 	if err != nil {
 		return err
 	}
