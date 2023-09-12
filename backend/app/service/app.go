@@ -283,7 +283,7 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 	if err != nil {
 		return
 	}
-	if DatabaseKeys[app.Key] {
+	if DatabaseKeys[app.Key] > 0 {
 		if existDatabases, _ := databaseRepo.GetList(commonRepo.WithByName(req.Name)); len(existDatabases) > 0 {
 			err = buserr.New(constant.ErrRemoteExist)
 			return
