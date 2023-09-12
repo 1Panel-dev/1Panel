@@ -1,6 +1,7 @@
 import http from '@/api';
 import { ResPage, SearchWithPage } from '../interface';
 import { Cronjob } from '../interface/cronjob';
+import { TimeoutEnum } from '@/enums/http-enum';
 
 export const getCronjobPage = (params: SearchWithPage) => {
     return http.post<ResPage<Cronjob.CronjobInfo>>(`/cronjobs/search`, params);
@@ -39,10 +40,13 @@ export const updateStatus = (params: Cronjob.UpdateStatus) => {
 };
 
 export const downloadRecordCheck = (params: Cronjob.Download) => {
-    return http.post<string>(`cronjobs/download`, params, 40000);
+    return http.post<string>(`cronjobs/download`, params, TimeoutEnum.T_40S);
 };
 export const downloadRecord = (params: Cronjob.Download) => {
-    return http.download<BlobPart>(`cronjobs/download`, params, { responseType: 'blob', timeout: 40000 });
+    return http.download<BlobPart>(`cronjobs/download`, params, {
+        responseType: 'blob',
+        timeout: TimeoutEnum.T_40S,
+    });
 };
 
 export const handleOnce = (id: number) => {

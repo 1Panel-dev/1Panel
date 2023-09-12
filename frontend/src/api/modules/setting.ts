@@ -4,6 +4,7 @@ import { Base64 } from 'js-base64';
 import { ResPage, SearchWithPage, DescriptionUpdate } from '../interface';
 import { Backup } from '../interface/backup';
 import { Setting } from '../interface/setting';
+import { TimeoutEnum } from '@/enums/http-enum';
 
 export const getSettingInfo = () => {
     return http.post<Setting.SettingInfo>(`/settings/search`);
@@ -67,16 +68,16 @@ export const loadBaseDir = () => {
 
 // backup
 export const handleBackup = (params: Backup.Backup) => {
-    return http.post(`/settings/backup/backup`, params, 3600000);
+    return http.post(`/settings/backup/backup`, params, TimeoutEnum.T_1H);
 };
 export const handleRecover = (params: Backup.Recover) => {
-    return http.post(`/settings/backup/recover`, params, 86400000);
+    return http.post(`/settings/backup/recover`, params, TimeoutEnum.T_1D);
 };
 export const handleRecoverByUpload = (params: Backup.Recover) => {
-    return http.post(`/settings/backup/recover/byupload`, params, 86400000);
+    return http.post(`/settings/backup/recover/byupload`, params, TimeoutEnum.T_1D);
 };
 export const downloadBackupRecord = (params: Backup.RecordDownload) => {
-    return http.post<string>(`/settings/backup/record/download`, params, 600000);
+    return http.post<string>(`/settings/backup/record/download`, params, TimeoutEnum.T_10M);
 };
 export const deleteBackupRecord = (params: { ids: number[] }) => {
     return http.post(`/settings/backup/record/del`, params);
