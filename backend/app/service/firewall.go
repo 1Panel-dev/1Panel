@@ -5,10 +5,12 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/firewall"
@@ -39,7 +41,6 @@ func NewIFirewallService() IFirewallService {
 
 func (u *FirewallService) LoadBaseInfo() (dto.FirewallBaseInfo, error) {
 	var baseInfo dto.FirewallBaseInfo
-	baseInfo.PingStatus = u.pingStatus()
 	baseInfo.Status = "not running"
 	baseInfo.Version = "-"
 	baseInfo.Name = "-"
@@ -51,17 +52,22 @@ func (u *FirewallService) LoadBaseInfo() (dto.FirewallBaseInfo, error) {
 		return baseInfo, err
 	}
 	baseInfo.Name = client.Name()
-	baseInfo.Status, err = client.Status()
-	if err != nil {
-		return baseInfo, err
-	}
-	if baseInfo.Status == "not running" {
-		return baseInfo, err
-	}
-	baseInfo.Version, err = client.Version()
-	if err != nil {
-		return baseInfo, err
-	}
+
+	var wg sync.WaitGroup
+	wg.Add(3)
+	go func() {
+		defer wg.Done()
+		baseInfo.PingStatus = u.pingStatus()
+	}()
+	go func() {
+		defer wg.Done()
+		baseInfo.Status, _ = client.Status()
+	}()
+	go func() {
+		defer wg.Done()
+		baseInfo.Version, _ = client.Version()
+	}()
+	wg.Wait()
 	return baseInfo, nil
 }
 
@@ -220,6 +226,8 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 	}
 	protos := strings.Split(req.Protocol, "/")
 	itemAddress := strings.Split(strings.TrimSuffix(req.Address, ","), ",")
+
+	var wg sync.WaitGroup
 	if client.Name() == "ufw" {
 		if strings.Contains(req.Port, ",") || strings.Contains(req.Port, "-") {
 			for _, proto := range protos {
@@ -230,10 +238,14 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 					req.Address = addr
 					req.Port = strings.ReplaceAll(req.Port, "-", ":")
 					req.Protocol = proto
-					if err := u.operatePort(client, req); err != nil {
-						return err
-					}
-					_ = u.addPortRecord(req)
+					wg.Add(1)
+					go func(req dto.PortRuleOperate) {
+						defer wg.Done()
+						if err := u.operatePort(client, req); err != nil {
+							global.LOG.Errorf("%s port %s/%s failed (strategy: %s, address: %s), err: %v", req.Operation, req.Port, req.Protocol, req.Strategy, req.Address, err)
+						}
+						_ = u.addPortRecord(req)
+					}(req)
 				}
 			}
 			return nil
@@ -246,10 +258,14 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 				addr = "Anywhere"
 			}
 			req.Address = addr
-			if err := u.operatePort(client, req); err != nil {
-				return err
-			}
-			_ = u.addPortRecord(req)
+			wg.Add(1)
+			go func(req dto.PortRuleOperate) {
+				defer wg.Done()
+				if err := u.operatePort(client, req); err != nil {
+					global.LOG.Errorf("%s port %s/%s failed (strategy: %s, address: %s), err: %v", req.Operation, req.Port, req.Protocol, req.Strategy, req.Address, err)
+				}
+				_ = u.addPortRecord(req)
+			}(req)
 		}
 		return nil
 	}
@@ -260,10 +276,14 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 			for _, addr := range itemAddress {
 				req.Protocol = proto
 				req.Address = addr
-				if err := u.operatePort(client, req); err != nil {
-					return err
-				}
-				_ = u.addPortRecord(req)
+				wg.Add(1)
+				go func(req dto.PortRuleOperate) {
+					defer wg.Done()
+					if err := u.operatePort(client, req); err != nil {
+						global.LOG.Errorf("%s port %s/%s failed (strategy: %s, address: %s), err: %v", req.Operation, req.Port, req.Protocol, req.Strategy, req.Address, err)
+					}
+					_ = u.addPortRecord(req)
+				}(req)
 			}
 		} else {
 			ports := strings.Split(itemPorts, ",")
@@ -275,15 +295,24 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 					req.Address = addr
 					req.Port = port
 					req.Protocol = proto
-					if err := u.operatePort(client, req); err != nil {
-						return err
-					}
-					_ = u.addPortRecord(req)
+					wg.Add(1)
+					go func(req dto.PortRuleOperate) {
+						defer wg.Done()
+						if err := u.operatePort(client, req); err != nil {
+							global.LOG.Errorf("%s port %s/%s failed (strategy: %s, address: %s), err: %v", req.Operation, req.Port, req.Protocol, req.Strategy, req.Address, err)
+						}
+						_ = u.addPortRecord(req)
+					}(req)
 				}
 			}
 		}
 	}
-	return client.Reload()
+
+	wg.Wait()
+	if reload {
+		return client.Reload()
+	}
+	return nil
 }
 
 func (u *FirewallService) OperateAddressRule(req dto.AddrRuleOperate, reload bool) error {
@@ -297,17 +326,22 @@ func (u *FirewallService) OperateAddressRule(req dto.AddrRuleOperate, reload boo
 		return err
 	}
 
+	var wg sync.WaitGroup
 	addressList := strings.Split(req.Address, ",")
 	for _, addr := range addressList {
 		if len(addr) == 0 {
 			continue
 		}
 		fireInfo.Address = addr
-		if err := client.RichRules(fireInfo, req.Operation); err != nil {
-			return err
-		}
-		req.Address = addr
-		_ = u.addAddressRecord(req)
+		wg.Add(1)
+		go func(req dto.AddrRuleOperate) {
+			defer wg.Done()
+			if err := client.RichRules(fireInfo, req.Operation); err != nil {
+				global.LOG.Errorf("%s address %s failed (strategy: %s), err: %v", req.Operation, req.Address, req.Strategy, err)
+			}
+			req.Address = fireInfo.Address
+			_ = u.addAddressRecord(req)
+		}(req)
 	}
 	if reload {
 		return client.Reload()
@@ -356,19 +390,25 @@ func (u *FirewallService) BatchOperateRule(req dto.BatchRuleOperate) error {
 	if err != nil {
 		return err
 	}
+	var wgBatch sync.WaitGroup
 	if req.Type == "port" {
 		for _, rule := range req.Rules {
-			if err := u.OperatePortRule(rule, false); err != nil {
-				return err
-			}
+			wgBatch.Add(1)
+			go func(item dto.PortRuleOperate) {
+				defer wgBatch.Done()
+				_ = u.OperatePortRule(item, false)
+			}(rule)
 		}
+		wgBatch.Wait()
 		return client.Reload()
 	}
 	for _, rule := range req.Rules {
 		itemRule := dto.AddrRuleOperate{Operation: rule.Operation, Address: rule.Address, Strategy: rule.Strategy}
-		if err := u.OperateAddressRule(itemRule, false); err != nil {
-			return err
-		}
+		wgBatch.Add(1)
+		go func(item dto.AddrRuleOperate) {
+			defer wgBatch.Done()
+			_ = u.OperateAddressRule(item, false)
+		}(itemRule)
 	}
 	return client.Reload()
 }
