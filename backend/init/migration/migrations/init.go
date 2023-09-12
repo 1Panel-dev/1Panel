@@ -576,13 +576,15 @@ var AddDatabases = &gormigrate.Migration{
 			_ = tx.Where("name = ?", mysqlInfo.Name).First(&mysqlDb).Error
 			if mysqlDb.ID == 0 {
 				if err := tx.Create(&model.Database{
-					Name:     mysqlDb.Name,
-					Type:     "mysql",
-					Version:  mysqlInfo.Version,
-					From:     "local",
-					Address:  mysqlInfo.ServiceName,
-					Username: "root",
-					Password: mysqlInfo.Password,
+					AppInstallID: mysqlInfo.ID,
+					Name:         mysqlInfo.Name,
+					Type:         "mysql",
+					Version:      mysqlInfo.Version,
+					From:         "local",
+					Address:      mysqlInfo.ServiceName,
+					Port:         uint(mysqlInfo.Port),
+					Username:     "root",
+					Password:     mysqlInfo.Password,
 				}).Error; err != nil {
 					return err
 				}

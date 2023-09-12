@@ -164,7 +164,7 @@
             </template>
         </LayoutContent>
 
-        <div v-if="!currentDB">
+        <div v-if="!currentDB?.id">
             <LayoutContent :title="'MySQL ' + $t('menu.database')" :divider="true">
                 <template #main>
                     <div class="app-warn">
