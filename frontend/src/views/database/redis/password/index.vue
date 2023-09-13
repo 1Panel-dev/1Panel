@@ -114,16 +114,9 @@ const loadPassword = async () => {
 };
 
 const onSubmit = async () => {
-    let param = {
-        id: 0,
-        from: 'local',
-        type: 'redis',
-        database: '',
-        value: form.value.password,
-    };
     loading.value = true;
     emit('closeTerminal');
-    await changeRedisPassword(param)
+    await changeRedisPassword(form.value.password)
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

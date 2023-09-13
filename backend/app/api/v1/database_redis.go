@@ -92,13 +92,13 @@ func (b *BaseApi) UpdateRedisConf(c *gin.Context) {
 // @Summary Change redis password
 // @Description 更新 redis 密码
 // @Accept json
-// @Param request body dto.ChangeDBInfo true "request"
+// @Param request body dto.ChangeRedisPass true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /databases/redis/password [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"修改 redis 数据库密码","formatEN":"change the password of the redis database"}
 func (b *BaseApi) ChangeRedisPassword(c *gin.Context) {
-	var req dto.ChangeDBInfo
+	var req dto.ChangeRedisPass
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return

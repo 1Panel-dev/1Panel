@@ -163,6 +163,13 @@ definitions:
     - groupID
     - id
     type: object
+  dto.ChangeRedisPass:
+    properties:
+      value:
+        type: string
+    required:
+    - value
+    type: object
   dto.CleanLog:
     properties:
       logType:
@@ -6925,7 +6932,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.ChangeDBInfo'
+          $ref: '#/definitions/dto.ChangeRedisPass'
       responses:
         "200":
           description: OK

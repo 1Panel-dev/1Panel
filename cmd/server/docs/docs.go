@@ -4561,7 +4561,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.ChangeDBInfo"
+                            "$ref": "#/definitions/dto.ChangeRedisPass"
                         }
                     }
                 ],
@@ -11943,6 +11943,17 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.ChangeRedisPass": {
+            "type": "object",
+            "required": [
+                "value"
+            ],
+            "properties": {
+                "value": {
+                    "type": "string"
                 }
             }
         },
