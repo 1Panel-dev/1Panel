@@ -233,11 +233,11 @@ func (b *BaseApi) ListDBName(c *gin.Context) {
 // @Summary Load mysql database from remote
 // @Description 从服务器获取
 // @Accept json
-// @Param request body dto.MysqlLodaDB true "request"
+// @Param request body dto.MysqlLoadDB true "request"
 // @Security ApiKeyAuth
 // @Router /databases/load [post]
 func (b *BaseApi) LoadDBFromRemote(c *gin.Context) {
-	var req dto.MysqlLodaDB
+	var req dto.MysqlLoadDB
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return

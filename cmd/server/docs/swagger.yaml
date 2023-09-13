@@ -1344,7 +1344,7 @@ definitions:
     - page
     - pageSize
     type: object
-  dto.MysqlLodaDB:
+  dto.MysqlLoadDB:
     properties:
       database:
         type: string
@@ -6783,7 +6783,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.MysqlLodaDB'
+          $ref: '#/definitions/dto.MysqlLoadDB'
       responses: {}
       security:
       - ApiKeyAuth: []

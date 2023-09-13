@@ -261,6 +261,7 @@ func (u *CronjobService) Update(id uint, req dto.CronjobUpdate) error {
 	upMap["hour"] = req.Hour
 	upMap["minute"] = req.Minute
 	upMap["second"] = req.Second
+	upMap["app_id"] = req.AppID
 	upMap["website"] = req.Website
 	upMap["exclusion_rules"] = req.ExclusionRules
 	upMap["db_name"] = req.DBName

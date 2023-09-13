@@ -35,7 +35,7 @@ type IMysqlService interface {
 	SearchWithPage(search dto.MysqlDBSearch) (int64, interface{}, error)
 	ListDBOption() ([]dto.MysqlOption, error)
 	Create(ctx context.Context, req dto.MysqlDBCreate) (*model.DatabaseMysql, error)
-	LoadFromRemote(req dto.MysqlLodaDB) error
+	LoadFromRemote(req dto.MysqlLoadDB) error
 	ChangeAccess(info dto.ChangeDBInfo) error
 	ChangePassword(info dto.ChangeDBInfo) error
 	UpdateVariables(req dto.MysqlVariablesUpdate) error
@@ -144,7 +144,7 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 	return &createItem, nil
 }
 
-func (u *MysqlService) LoadFromRemote(req dto.MysqlLodaDB) error {
+func (u *MysqlService) LoadFromRemote(req dto.MysqlLoadDB) error {
 	client, version, err := LoadMysqlClientByFrom(req.Database)
 	if err != nil {
 		return err
@@ -314,7 +314,7 @@ func (u *MysqlService) ChangePassword(req dto.ChangeDBInfo) error {
 				return err
 			}
 		}
-		global.LOG.Info("excute password change sql successful")
+		global.LOG.Info("execute password change sql successful")
 		pass, err := encrypt.StringEncrypt(req.Value)
 		if err != nil {
 			return fmt.Errorf("decrypt database db password failed, err: %v", err)
