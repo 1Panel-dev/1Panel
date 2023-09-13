@@ -224,7 +224,7 @@ func handleAppInstallErr(ctx context.Context, install *model.AppInstall) error {
 			return err
 		}
 	}
-	if err := deleteLink(ctx, install, true, true); err != nil {
+	if err := deleteLink(ctx, install, true, true, true); err != nil {
 		return err
 	}
 	return nil
@@ -249,7 +249,7 @@ func deleteAppInstall(install model.AppInstall, deleteBackup bool, forceDelete b
 	if err := appInstallRepo.Delete(ctx, install); err != nil {
 		return err
 	}
-	if err := deleteLink(ctx, &install, deleteDB, forceDelete); err != nil && !forceDelete {
+	if err := deleteLink(ctx, &install, deleteDB, forceDelete, deleteBackup); err != nil && !forceDelete {
 		return err
 	}
 	if install.App.Key == constant.AppOpenresty {
@@ -257,9 +257,8 @@ func deleteAppInstall(install model.AppInstall, deleteBackup bool, forceDelete b
 		_ = websiteDomainRepo.DeleteAll(ctx)
 	}
 	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("app"), commonRepo.WithByName(install.App.Key), backupRepo.WithByDetailName(install.Name))
-	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType(install.App.Key))
-	if install.App.Key == constant.AppMysql {
-		_ = mysqlRepo.DeleteLocal(ctx)
+	if install.App.Key == constant.AppMysql || install.App.Key == constant.AppMariaDB {
+		_ = mysqlRepo.Delete(ctx, mysqlRepo.WithByMysqlName(install.Name))
 	}
 	uploadDir := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/uploads/app/%s/%s", install.App.Key, install.Name))
 	if _, err := os.Stat(uploadDir); err == nil {
@@ -278,7 +277,7 @@ func deleteAppInstall(install model.AppInstall, deleteBackup bool, forceDelete b
 	return nil
 }
 
-func deleteLink(ctx context.Context, install *model.AppInstall, deleteDB bool, forceDelete bool) error {
+func deleteLink(ctx context.Context, install *model.AppInstall, deleteDB bool, forceDelete bool, deleteBackup bool) error {
 	if DatabaseKeys[install.App.Key] > 0 {
 		_ = databaseRepo.Delete(ctx, databaseRepo.WithAppInstallID(install.ID))
 		_ = mysqlRepo.Delete(ctx, mysqlRepo.WithByMysqlName(install.Name))
@@ -289,7 +288,7 @@ func deleteLink(ctx context.Context, install *model.AppInstall, deleteDB bool, f
 	}
 	for _, re := range resources {
 		mysqlService := NewIMysqlService()
-		if (re.Key == "mysql" || re.Key == "mariadb") && deleteDB {
+		if (re.Key == constant.AppMysql || re.Key == constant.AppMariaDB) && deleteDB {
 			database, _ := mysqlRepo.Get(commonRepo.WithByID(re.ResourceId))
 			if reflect.DeepEqual(database, model.DatabaseMysql{}) {
 				continue
@@ -297,7 +296,7 @@ func deleteLink(ctx context.Context, install *model.AppInstall, deleteDB bool, f
 			if err := mysqlService.Delete(ctx, dto.MysqlDBDelete{
 				ID:           database.ID,
 				ForceDelete:  forceDelete,
-				DeleteBackup: true,
+				DeleteBackup: deleteBackup,
 				Type:         re.Key,
 				Database:     database.MysqlName,
 			}); err != nil && !forceDelete {
