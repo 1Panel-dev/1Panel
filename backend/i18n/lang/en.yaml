@@ -77,7 +77,6 @@ ErrSSLKeyNotFound: 'The private key file does not exist'
 ErrSSLCertificateNotFound: 'The certificate file does not exist'
 ErrSSLKeyFormat: 'Private key file verification error'
 ErrSSLCertificateFormat: 'Certificate file format error, please use pem format'
-ErrOpenrestyPort: 'The default port of openresty is {{ .detail }}, HTTP mode cannot be used!'
 
 #mysql
 ErrUserIsExist: "The current user already exists. Please enter a new user"

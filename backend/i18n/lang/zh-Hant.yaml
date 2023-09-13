@@ -77,7 +77,6 @@ ErrSSLKeyNotFound: '私鑰文件不存在'
 ErrSSLCertificateNotFound: '證書文件不存在'
 ErrSSLKeyFormat: '私鑰文件校驗錯誤'
 ErrSSLCertificateFormat: '證書文件格式錯誤，請使用 pem 格式'
-ErrOpenrestyPort: 'openresty 默認端口為 {{ .detail }}，無法使用 HTTP 模式！'
 
 #mysql
 ErrUserIsExist: "當前用戶已存在，請重新輸入"
