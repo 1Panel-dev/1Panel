@@ -417,8 +417,12 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         if (dialogData.value.rowData!.entrypointStr) {
             dialogData.value.rowData!.entrypoint = dialogData.value.rowData!.entrypointStr.split(' ');
         }
-        if (!checkPortValid()) {
-            return;
+        if (dialogData.value.rowData!.publishAllPorts) {
+            dialogData.value.rowData!.exposedPorts = [];
+        } else {
+            if (!checkPortValid()) {
+                return;
+            }
         }
         dialogData.value.rowData!.memory = Number(dialogData.value.rowData!.memory);
         dialogData.value.rowData!.nanoCPUs = Number(dialogData.value.rowData!.nanoCPUs);

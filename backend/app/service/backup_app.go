@@ -180,7 +180,7 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 		if err != nil {
 			return err
 		}
-		if resource.Key == "mysql" || resource.Key == "maraidb" {
+		if resource.Key == "mysql" || resource.Key == "mariadb" {
 			mysqlInfo, err := appInstallRepo.LoadBaseInfo(resource.Key, resourceApp.Name)
 			if err != nil {
 				return err
