@@ -74,12 +74,11 @@ export const loadRedisConf = () => {
 export const redisPersistenceConf = () => {
     return http.get<Database.RedisPersistenceConf>(`/databases/redis/persistence/conf`);
 };
-export const changeRedisPassword = (params: Database.ChangeInfo) => {
-    let reqest = deepCopy(params) as Database.ChangeInfo;
-    if (reqest.value) {
-        reqest.value = Base64.encode(reqest.value);
+export const changeRedisPassword = (value: string) => {
+    if (value) {
+        value = Base64.encode(value);
     }
-    return http.post(`/databases/redis/password`, reqest);
+    return http.post(`/databases/redis/password`, { value: value });
 };
 export const updateRedisPersistenceConf = (params: Database.RedisConfPersistenceUpdate) => {
     return http.post(`/databases/redis/persistence/update`, params);

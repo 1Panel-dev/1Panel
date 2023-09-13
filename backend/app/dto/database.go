@@ -172,6 +172,10 @@ type UploadRecover struct {
 }
 
 // redis
+type ChangeRedisPass struct {
+	Value string `json:"value" validate:"required"`
+}
+
 type RedisConfUpdate struct {
 	Timeout    string `json:"timeout"`
 	Maxclients string `json:"maxclients"`
