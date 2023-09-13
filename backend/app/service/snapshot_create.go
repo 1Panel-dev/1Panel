@@ -194,7 +194,8 @@ func snapUpload(snap snapHelper, account string, file string) {
 		_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"upload": err.Error()})
 		return
 	}
-	target := path.Join(backup.BackupPath, "system_snapshot", path.Base(file))
+	target := path.Join(strings.TrimPrefix(backup.BackupPath, "/"), "system_snapshot", path.Base(file))
+	global.LOG.Debugf("start upload snapshot to %s, dir: %s", backup.Type, target)
 	if _, err := client.Upload(source, target); err != nil {
 		snap.Status.Upload = err.Error()
 		_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"upload": err.Error()})
