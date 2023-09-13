@@ -13,24 +13,24 @@ export const loadDatabaseFile = (type: string, database: string) => {
 };
 
 export const addMysqlDB = (params: Database.MysqlDBCreate) => {
-    let reqest = deepCopy(params) as Database.MysqlDBCreate;
-    if (reqest.password) {
-        reqest.password = Base64.encode(reqest.password);
+    let request = deepCopy(params) as Database.MysqlDBCreate;
+    if (request.password) {
+        request.password = Base64.encode(request.password);
     }
-    return http.post(`/databases`, reqest);
+    return http.post(`/databases`, request);
 };
-export const loadDBFromRemote = (params: Database.MysqlLodaDB) => {
+export const loadDBFromRemote = (params: Database.MysqlLoadDB) => {
     return http.post(`/databases/load`, params);
 };
 export const updateMysqlAccess = (params: Database.ChangeInfo) => {
     return http.post(`/databases/change/access`, params);
 };
 export const updateMysqlPassword = (params: Database.ChangeInfo) => {
-    let reqest = deepCopy(params) as Database.ChangeInfo;
-    if (reqest.value) {
-        reqest.value = Base64.encode(reqest.value);
+    let request = deepCopy(params) as Database.ChangeInfo;
+    if (request.value) {
+        request.value = Base64.encode(request.value);
     }
-    return http.post(`/databases/change/password`, reqest);
+    return http.post(`/databases/change/password`, request);
 };
 export const updateMysqlDescription = (params: DescriptionUpdate) => {
     return http.post(`/databases/description/update`, params);
@@ -90,7 +90,7 @@ export const updateRedisConfByFile = (params: Database.RedisConfUpdateByFile) =>
     return http.post(`/databases/redis/conffile/update`, params);
 };
 
-// databasae
+// database
 export const getDatabase = (name: string) => {
     return http.get<Database.DatabaseInfo>(`/databases/db/${name}`);
 };

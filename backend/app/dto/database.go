@@ -43,7 +43,7 @@ type MysqlDBCreate struct {
 	Description string `json:"description"`
 }
 
-type MysqlLodaDB struct {
+type MysqlLoadDB struct {
 	From     string `json:"from" validate:"required,oneof=local remote"`
 	Type     string `json:"type" validate:"required,oneof=mysql mariadb"`
 	Database string `json:"database" validate:"required"`

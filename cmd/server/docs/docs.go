@@ -4322,7 +4322,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.MysqlLodaDB"
+                            "$ref": "#/definitions/dto.MysqlLoadDB"
                         }
                     }
                 ],
@@ -13690,7 +13690,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.MysqlLodaDB": {
+        "dto.MysqlLoadDB": {
             "type": "object",
             "required": [
                 "database",

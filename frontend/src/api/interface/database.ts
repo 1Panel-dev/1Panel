@@ -48,7 +48,7 @@ export namespace Database {
         permission: string;
         description: string;
     }
-    export interface MysqlLodaDB {
+    export interface MysqlLoadDB {
         from: string;
         type: string;
         database: string;

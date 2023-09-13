@@ -456,7 +456,6 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, backup model.BackupAcc
 		if err := handleAppBackup(&app, backupDir, record.FileName); err != nil {
 			return paths, err
 		}
-		record.Name = app.Name
 		if err := backupRepo.CreateRecord(&record); err != nil {
 			global.LOG.Errorf("save backup record failed, err: %v", err)
 			return paths, err

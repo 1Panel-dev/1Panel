@@ -587,16 +587,20 @@ const search = async () => {
 };
 
 const onDownload = async (record: any, backupID: number) => {
-    if (dialogData.value.rowData.dbName === 'all') {
-        MsgInfo(i18n.global.t('cronjob.allOptionHelper', [i18n.global.t('database.database')]));
-        return;
+    let type = '';
+    switch (dialogData.value.rowData.type) {
+        case 'database':
+            type = i18n.global.t('database.database');
+            break;
+        case 'app':
+            type = i18n.global.t('app.app');
+            break;
+        case 'website':
+            type = i18n.global.t('website.website');
+            break;
     }
-    if (dialogData.value.rowData.app === 'all') {
-        MsgInfo(i18n.global.t('cronjob.allOptionHelper', [i18n.global.t('app.app')]));
-        return;
-    }
-    if (dialogData.value.rowData.website === 'all') {
-        MsgInfo(i18n.global.t('cronjob.allOptionHelper', [i18n.global.t('website.website')]));
+    if (currentRecord.value.file.indexOf(',') !== 0) {
+        MsgInfo(i18n.global.t('cronjob.allOptionHelper', [type]));
         return;
     }
     if (!record.file || record.file.indexOf('/') === -1) {

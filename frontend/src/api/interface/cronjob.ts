@@ -82,6 +82,7 @@ export namespace Cronjob {
     }
     export interface Record {
         id: number;
+        file: string;
         startTime: Date;
         endTime: Date;
         records: string;
