@@ -2,9 +2,10 @@ package migrations
 
 import (
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/app/service"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/app/service"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
@@ -705,6 +706,7 @@ var UpdateDatabase = &gormigrate.Migration{
 					"app_install_id": mysqlInfo.ID,
 					"name":           mysqlInfo.Name,
 					"password":       pass,
+					"port":           service.DatabaseKeys["mysql"],
 					"address":        mysqlInfo.ServiceName,
 				}).Error; err != nil {
 					global.LOG.Errorf("updata database %s info failed, err: %v", data.Name, err)

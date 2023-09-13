@@ -104,6 +104,10 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 	fileName := fmt.Sprintf("1panel-%s-%s-%s.tar.gz", req.Version, "linux", itemArch)
 	_ = settingRepo.Update("SystemStatus", "Upgrading")
 	go func() {
+		_ = global.Cron.Stop()
+		defer func() {
+			global.Cron.Start()
+		}()
 		if err := fileOp.DownloadFile(downloadPath+"/"+fileName, rootDir+"/"+fileName); err != nil {
 			global.LOG.Errorf("download service file failed, err: %v", err)
 			_ = settingRepo.Update("SystemStatus", "Free")
