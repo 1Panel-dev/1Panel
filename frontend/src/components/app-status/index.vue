@@ -42,9 +42,9 @@
                         </el-button>
                     </span>
 
-                    <span class="warn" v-if="key === 'openresty' && httpPort != 80">
+                    <span class="warn" v-if="key === 'openresty' && (httpPort != 80 || httpsPort != 443)">
                         <el-alert class="helper" type="error" :closable="false">
-                            {{ $t('website.openrestryHelper', [httpPort]) }}
+                            {{ $t('website.openrestryHelper', [httpPort, httpsPort]) }}
                         </el-alert>
                     </span>
                 </div>
@@ -123,6 +123,7 @@ let operateReq = reactive({
 });
 let refresh = ref(1);
 const httpPort = ref(0);
+const httpsPort = ref(0);
 
 const em = defineEmits(['setting', 'isExist', 'before', 'update:loading', 'update:maskShow']);
 const setting = () => {
@@ -140,6 +141,7 @@ const onCheck = async () => {
             em('isExist', res.data);
             operateReq.installId = res.data.appInstallId;
             httpPort.value = res.data.httpPort;
+            httpsPort.value = res.data.httpsPort;
             refresh.value++;
         })
         .catch(() => {
