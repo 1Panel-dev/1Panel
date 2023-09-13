@@ -1,10 +1,10 @@
 <template>
-    <div v-loading="loading">
+    <div>
         <el-drawer v-model="drawerVisiable" size="30%">
             <template #header>
                 <DrawerHeader :header="$t('setting.importSnapshot')" :back="handleClose" />
             </template>
-            <el-form ref="formRef" label-position="top" :model="form" :rules="rules">
+            <el-form ref="formRef" label-position="top" :model="form" :rules="rules" v-loading="loading">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
                         <el-form-item :label="$t('setting.backupAccount')" prop="from">
@@ -101,13 +101,20 @@ const submitImport = async (formEl: FormInstance | undefined) => {
 };
 
 const loadBackups = async () => {
-    const res = await getBackupList();
-    backupOptions.value = [];
-    for (const item of res.data) {
-        if (item.type !== 'LOCAL' && item.id !== 0) {
-            backupOptions.value.push({ label: i18n.global.t('setting.' + item.type), value: item.type });
-        }
-    }
+    loading.value = true;
+    await getBackupList()
+        .then((res) => {
+            loading.value = false;
+            backupOptions.value = [];
+            for (const item of res.data) {
+                if (item.type !== 'LOCAL' && item.id !== 0) {
+                    backupOptions.value.push({ label: i18n.global.t('setting.' + item.type), value: item.type });
+                }
+            }
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const loadFiles = async () => {
