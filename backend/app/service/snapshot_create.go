@@ -171,6 +171,7 @@ func snapCompress(snap snapHelper, rootDir string) {
 	size := common.LoadSizeUnit(float64(stat.Size()))
 	global.LOG.Debugf("compress successful! size of file: %s", size)
 	snap.Status.Compress = constant.StatusDone
+	snap.Status.Size = size
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"compress": constant.StatusDone, "size": size})
 }
 
