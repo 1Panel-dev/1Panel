@@ -17,6 +17,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/jinzhu/copier"
@@ -957,14 +958,35 @@ func (u *SnapshotService) handleUnTar(sourceDir, targetDir string) error {
 }
 
 func rebuildAllAppInstall() error {
+	global.LOG.Debug("start to rebuild all app")
 	appInstalls, err := appInstallRepo.ListBy()
 	if err != nil {
 		global.LOG.Errorf("get all app installed for rebuild failed, err: %v", err)
 		return err
 	}
-	for _, install := range appInstalls {
-		_ = rebuildApp(install)
+	var wg sync.WaitGroup
+	for i := 0; i < len(appInstalls); i++ {
+		wg.Add(1)
+		appInstalls[i].Status = constant.Rebuilding
+		_ = appInstallRepo.Save(context.Background(), &appInstalls[i])
+		go func(app model.AppInstall) {
+			defer wg.Done()
+			dockerComposePath := app.GetComposePath()
+			out, err := compose.Down(dockerComposePath)
+			if err != nil {
+				_ = handleErr(app, err, out)
+				return
+			}
+			out, err = compose.Up(dockerComposePath)
+			if err != nil {
+				_ = handleErr(app, err, out)
+				return
+			}
+			app.Status = constant.Running
+			_ = appInstallRepo.Save(context.Background(), &app)
+		}(appInstalls[i])
 	}
+	wg.Wait()
 	return nil
 }
 
