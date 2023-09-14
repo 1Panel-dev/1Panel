@@ -72,12 +72,14 @@ func (r *Local) CreateUser(info CreateInfo, withDeleteDB bool) error {
 				Timeout:     300})
 			return err
 		}
-		grantStr := fmt.Sprintf("grant all privileges on `%s`.* to %s with grant option;", info.Name, user)
+		grantStr := fmt.Sprintf("grant all privileges on `%s`.* to %s", info.Name, user)
 		if info.Name == "*" {
-			grantStr = fmt.Sprintf("grant all privileges on *.* to %s with grant option;", user)
+			grantStr = fmt.Sprintf("grant all privileges on *.* to %s", user)
 		}
 		if strings.HasPrefix(info.Version, "5.7") || strings.HasPrefix(info.Version, "5.6") {
 			grantStr = fmt.Sprintf("%s identified by '%s' with grant option;", grantStr, info.Password)
+		} else {
+			grantStr = grantStr + " with grant option;"
 		}
 		if err := r.ExecSQL(grantStr, info.Timeout); err != nil {
 			_ = r.Delete(DeleteInfo{
