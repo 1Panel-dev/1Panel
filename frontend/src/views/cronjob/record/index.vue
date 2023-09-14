@@ -599,7 +599,7 @@ const onDownload = async (record: any, backupID: number) => {
             type = i18n.global.t('website.website');
             break;
     }
-    if (currentRecord.value.file.indexOf(',') !== 0) {
+    if (currentRecord.value.file.indexOf(',') !== -1) {
         MsgInfo(i18n.global.t('cronjob.allOptionHelper', [type]));
         return;
     }
