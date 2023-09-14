@@ -27,6 +27,7 @@
                             plain
                             round
                             size="small"
+                            :disabled="app.limit == 1 && app.installed"
                             @click="goInstall(app.key)"
                         >
                             {{ $t('app.install') }}
@@ -57,7 +58,7 @@ let req = reactive({
 });
 
 let loading = ref(false);
-let apps = ref<App.App[]>([]);
+let apps = ref<App.AppDTO[]>([]);
 
 const acceptParams = (): void => {
     search(req);
