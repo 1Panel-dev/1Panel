@@ -759,3 +759,11 @@ var UpdateAppInstallResource = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var DropDatabaseLocal = &gormigrate.Migration{
+	ID: "20230914-drop-database-local",
+	Migrate: func(tx *gorm.DB) error {
+		_ = tx.Where("name = ? AND address = ?", "local", "127.0.0.1").Delete(&model.Database{}).Error
+		return nil
+	},
+}
