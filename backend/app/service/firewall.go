@@ -267,6 +267,7 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 				_ = u.addPortRecord(req)
 			}(req)
 		}
+		wg.Wait()
 		return nil
 	}
 
@@ -343,6 +344,7 @@ func (u *FirewallService) OperateAddressRule(req dto.AddrRuleOperate, reload boo
 			_ = u.addAddressRecord(req)
 		}(req)
 	}
+	wg.Wait()
 	if reload {
 		return client.Reload()
 	}
