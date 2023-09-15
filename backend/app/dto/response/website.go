@@ -42,6 +42,7 @@ type WebsiteLog struct {
 	Enable  bool   `json:"enable"`
 	Content string `json:"content"`
 	End     bool   `json:"end"`
+	Path    string `json:"path"`
 }
 
 type PHPConfig struct {

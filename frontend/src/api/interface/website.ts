@@ -90,6 +90,7 @@ export namespace Website {
         enable: boolean;
         content: string;
         end: boolean;
+        path: string;
     }
 
     export interface Domain {

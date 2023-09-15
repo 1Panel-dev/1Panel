@@ -941,6 +941,7 @@ func (w WebsiteService) OpWebsiteLog(req request.WebsiteLogReq) (*response.Websi
 			return nil, err
 		}
 		res.End = end
+		res.Path = filePath
 		res.Content = strings.Join(lines, "\n")
 		return res, nil
 	case constant.DisableLog:
