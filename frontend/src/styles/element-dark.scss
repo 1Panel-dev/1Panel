@@ -180,11 +180,13 @@ html.dark {
 
     .router_card_button {
         .el-radio-button__inner {
-            background: none;
+            background: none !important;
         }
         .el-radio-button__original-radio:checked + .el-radio-button__inner {
             color: #ffffff;
+            background-color: var(--panel-button-active) !important;
             box-shadow: none !important;
+            border: none !important;
         }
     }
     // content-box
