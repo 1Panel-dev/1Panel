@@ -170,19 +170,16 @@ const variablesRules = reactive({
 });
 
 const currentDB = reactive({
-    type: '',
-    database: '',
+    databaseID: 0,
     version: '',
 });
 interface DialogProps {
-    type: string;
-    database: string;
+    databaseID: number;
     version: string;
     variables: Database.MysqlVariables;
 }
 const acceptParams = (params: DialogProps): void => {
-    currentDB.type = params.type;
-    currentDB.database = params.database;
+    currentDB.databaseID = params.databaseID;
     currentDB.version = params.version;
     mysqlVariables.key_buffer_size = Number(params.variables.key_buffer_size) / 1024 / 1024;
     mysqlVariables.query_cache_size = Number(params.variables.query_cache_size) / 1024 / 1024;
@@ -288,8 +285,7 @@ const onSaveVariables = async () => {
     }
     emit('loading', true);
     let params = {
-        type: currentDB.type,
-        database: currentDB.database,
+        databaseID: currentDB.databaseID,
         variables: param,
     };
     await updateMysqlVariables(params)

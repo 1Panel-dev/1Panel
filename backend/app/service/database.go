@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
-	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/backend/utils/mysql"
@@ -88,15 +87,12 @@ func (u *DatabaseService) CheckDatabase(req dto.DatabaseCreate) bool {
 }
 
 func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
-	db, _ := databaseRepo.Get(commonRepo.WithByName(req.Name))
+	db, _ := databaseRepo.Get(commonRepo.WithByName(req.Name), commonRepo.WithByType(req.Type), databaseRepo.WithByFrom(req.From))
 	if db.ID != 0 {
-		if db.From == "local" {
-			return buserr.New(constant.ErrLocalExist)
-		}
 		return constant.ErrRecordExist
 	}
 	if _, err := mysql.NewMysqlClient(client.DBInfo{
-		From:     "remote",
+		From:     req.From,
 		Address:  req.Address,
 		Port:     req.Port,
 		Username: req.Username,
@@ -123,7 +119,7 @@ func (u *DatabaseService) Delete(id uint) error {
 		return err
 	}
 	if db.From != "local" {
-		if err := mysqlRepo.Delete(context.Background(), mysqlRepo.WithByMysqlName(db.Name)); err != nil {
+		if err := mysqlRepo.Delete(context.Background(), mysqlRepo.WithByDatabase(db.ID)); err != nil {
 			return err
 		}
 	}

@@ -28,7 +28,7 @@ const databaseRouter = {
                     },
                 },
                 {
-                    path: 'mysql/setting/:type/:database',
+                    path: 'mysql/setting/:type/:database/:databaseID',
                     name: 'MySQL-Setting',
                     component: () => import('@/views/database/mysql/setting/index.vue'),
                     props: true,

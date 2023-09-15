@@ -4,10 +4,10 @@ import "time"
 
 type MysqlDBSearch struct {
 	PageInfo
-	Info     string `json:"info"`
-	Database string `json:"database" validate:"required"`
-	OrderBy  string `json:"orderBy"`
-	Order    string `json:"order"`
+	Info       string `json:"info"`
+	DatabaseID uint   `json:"databaseID" validate:"required"`
+	OrderBy    string `json:"orderBy"`
+	Order      string `json:"order"`
 }
 
 type MysqlDBInfo struct {
@@ -15,7 +15,7 @@ type MysqlDBInfo struct {
 	CreatedAt   time.Time `json:"createdAt"`
 	Name        string    `json:"name"`
 	From        string    `json:"from"`
-	MysqlName   string    `json:"mysqlName"`
+	DatabaseID  uint      `json:"databaseID"`
 	Format      string    `json:"format"`
 	Username    string    `json:"username"`
 	Password    string    `json:"password"`
@@ -25,17 +25,18 @@ type MysqlDBInfo struct {
 }
 
 type MysqlOption struct {
-	ID       uint   `json:"id"`
-	From     string `json:"from"`
-	Type     string `json:"type"`
-	Database string `json:"database"`
-	Name     string `json:"name"`
+	ID         uint   `json:"id"`
+	From       string `json:"from"`
+	Type       string `json:"type"`
+	DatabaseID uint   `json:"databaseID"`
+	Database   string `json:"database"`
+	Name       string `json:"name"`
 }
 
 type MysqlDBCreate struct {
 	Name        string `json:"name" validate:"required"`
 	From        string `json:"from" validate:"required,oneof=local remote"`
-	Database    string `json:"database" validate:"required"`
+	DatabaseID  uint   `json:"databaseID" validate:"required"`
 	Format      string `json:"format" validate:"required,oneof=utf8mb4 utf8 gbk big5"`
 	Username    string `json:"username" validate:"required"`
 	Password    string `json:"password" validate:"required"`
@@ -43,22 +44,15 @@ type MysqlDBCreate struct {
 	Description string `json:"description"`
 }
 
-type MysqlLoadDB struct {
-	From     string `json:"from" validate:"required,oneof=local remote"`
-	Type     string `json:"type" validate:"required,oneof=mysql mariadb"`
-	Database string `json:"database" validate:"required"`
-}
-
 type MysqlDBDeleteCheck struct {
-	ID       uint   `json:"id" validate:"required"`
-	Type     string `json:"type" validate:"required,oneof=mysql mariadb"`
-	Database string `json:"database" validate:"required"`
+	ID         uint `json:"id" validate:"required"`
+	DatabaseID uint `json:"databaseID" validate:"required"`
 }
 
 type MysqlDBDelete struct {
 	ID           uint   `json:"id" validate:"required"`
 	Type         string `json:"type" validate:"required,oneof=mysql mariadb"`
-	Database     string `json:"database" validate:"required"`
+	DatabaseID   uint   `json:"databaseID" validate:"required"`
 	ForceDelete  bool   `json:"forceDelete"`
 	DeleteBackup bool   `json:"deleteBackup"`
 }
@@ -124,9 +118,8 @@ type MysqlVariables struct {
 }
 
 type MysqlVariablesUpdate struct {
-	Type      string                       `json:"type" validate:"required,oneof=mysql mariadb"`
-	Database  string                       `json:"database" validate:"required"`
-	Variables []MysqlVariablesUpdateHelper `json:"variables"`
+	DatabaseID uint                         `json:"databaseID" validate:"required"`
+	Variables  []MysqlVariablesUpdateHelper `json:"variables"`
 }
 
 type MysqlVariablesUpdateHelper struct {
@@ -134,41 +127,22 @@ type MysqlVariablesUpdateHelper struct {
 	Value interface{} `json:"value"`
 }
 type MysqlConfUpdateByFile struct {
-	Type     string `json:"type" validate:"required,oneof=mysql mariadb"`
-	Database string `json:"database" validate:"required"`
-	File     string `json:"file"`
+	DatabaseID uint   `json:"databaseID" validate:"required"`
+	File       string `json:"file"`
 }
 
 type ChangeDBInfo struct {
-	ID       uint   `json:"id"`
-	From     string `json:"from" validate:"required,oneof=local remote"`
-	Type     string `json:"type" validate:"required,oneof=mysql mariadb"`
-	Database string `json:"database" validate:"required"`
-	Value    string `json:"value" validate:"required"`
+	ID         uint   `json:"id"`
+	From       string `json:"from" validate:"required,oneof=local remote"`
+	Type       string `json:"type" validate:"required,oneof=mysql mariadb"`
+	DatabaseID uint   `json:"databaseID" validate:"required"`
+	Value      string `json:"value" validate:"required"`
 }
 
 type DBBaseInfo struct {
 	Name          string `json:"name"`
 	ContainerName string `json:"containerName"`
 	Port          int64  `json:"port"`
-}
-
-type BackupDB struct {
-	MysqlName string `json:"mysqlName" validate:"required"`
-	DBName    string `json:"dbName" validate:"required"`
-}
-
-type RecoverDB struct {
-	MysqlName  string `json:"mysqlName" validate:"required"`
-	DBName     string `json:"dbName" validate:"required"`
-	BackupName string `json:"backupName" validate:"required"`
-}
-
-type UploadRecover struct {
-	MysqlName string `json:"mysqlName" validate:"required"`
-	DBName    string `json:"dbName" validate:"required"`
-	FileName  string `json:"fileName"`
-	FileDir   string `json:"fileDir"`
 }
 
 // redis

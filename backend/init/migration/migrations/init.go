@@ -572,103 +572,39 @@ var AddDatabases = &gormigrate.Migration{
 	ID: "20230831-add-databases",
 	Migrate: func(tx *gorm.DB) error {
 		installRepo := repo.NewIAppInstallRepo()
-		mysqlInfo, err := installRepo.LoadBaseInfo("mysql", "")
-		if err == nil {
-			var mysqlDb model.Database
-			_ = tx.Where("name = ?", mysqlInfo.Name).First(&mysqlDb).Error
-			if mysqlDb.ID == 0 {
-				if err := tx.Create(&model.Database{
-					AppInstallID: mysqlInfo.ID,
-					Name:         mysqlInfo.Name,
-					Type:         "mysql",
-					Version:      mysqlInfo.Version,
-					From:         "local",
-					Address:      mysqlInfo.ServiceName,
-					Port:         service.DatabaseKeys["mysql"],
-					Username:     "root",
-					Password:     mysqlInfo.Password,
-				}).Error; err != nil {
-					return err
-				}
-			}
-		}
-		mariadbInfo, err := installRepo.LoadBaseInfo("mariadb", "")
-		if err == nil {
-			if err := tx.Create(&model.Database{
-				AppInstallID: mariadbInfo.ID,
-				Name:         mariadbInfo.Name,
-				Type:         "mariadb",
-				Version:      mariadbInfo.Version,
-				From:         "local",
-				Address:      mariadbInfo.ServiceName,
-				Port:         service.DatabaseKeys["mariadb"],
-				Username:     "root",
-				Password:     mariadbInfo.Password,
-			}).Error; err != nil {
+		mysql := addDatabaseData("mysql", installRepo)
+		if mysql.AppInstallID != 0 {
+			if err := tx.Create(mysql).Error; err != nil {
 				return err
 			}
 		}
-		redisInfo, err := installRepo.LoadBaseInfo("redis", "")
-		if err == nil {
-			if err := tx.Create(&model.Database{
-				AppInstallID: redisInfo.ID,
-				Name:         redisInfo.Name,
-				Type:         "redis",
-				Version:      redisInfo.Version,
-				From:         "local",
-				Address:      redisInfo.ServiceName,
-				Port:         service.DatabaseKeys["redis"],
-				Username:     "root",
-				Password:     redisInfo.Password,
-			}).Error; err != nil {
+		mariadb := addDatabaseData("mariadb", installRepo)
+		if mariadb.AppInstallID != 0 {
+			if err := tx.Create(mariadb).Error; err != nil {
 				return err
 			}
 		}
-		pgInfo, err := installRepo.LoadBaseInfo("postgresql", "")
-		if err == nil {
-			if err := tx.Create(&model.Database{
-				AppInstallID: pgInfo.ID,
-				Name:         pgInfo.Name,
-				Type:         "postgresql",
-				Version:      pgInfo.Version,
-				From:         "local",
-				Address:      pgInfo.ServiceName,
-				Port:         service.DatabaseKeys["postgresql"],
-				Username:     pgInfo.UserName,
-				Password:     pgInfo.Password,
-			}).Error; err != nil {
+		redis := addDatabaseData("redis", installRepo)
+		if redis.AppInstallID != 0 {
+			if err := tx.Create(redis).Error; err != nil {
 				return err
 			}
 		}
-		mongodbInfo, err := installRepo.LoadBaseInfo("mongodb", "")
-		if err == nil {
-			if err := tx.Create(&model.Database{
-				AppInstallID: mongodbInfo.ID,
-				Name:         mongodbInfo.Name,
-				Type:         "mongodb",
-				Version:      mongodbInfo.Version,
-				From:         "local",
-				Address:      mongodbInfo.ServiceName,
-				Port:         service.DatabaseKeys["mongodb"],
-				Username:     mongodbInfo.UserName,
-				Password:     mongodbInfo.Password,
-			}).Error; err != nil {
+		postgresql := addDatabaseData("postgresql", installRepo)
+		if postgresql.AppInstallID != 0 {
+			if err := tx.Create(postgresql).Error; err != nil {
 				return err
 			}
 		}
-		memcachedInfo, err := installRepo.LoadBaseInfo("memcached", "")
-		if err == nil {
-			if err := tx.Create(&model.Database{
-				AppInstallID: memcachedInfo.ID,
-				Name:         memcachedInfo.Name,
-				Type:         "memcached",
-				Version:      memcachedInfo.Version,
-				From:         "local",
-				Address:      memcachedInfo.ServiceName,
-				Port:         service.DatabaseKeys["memcached"],
-				Username:     "root",
-				Password:     memcachedInfo.Password,
-			}).Error; err != nil {
+		mongodb := addDatabaseData("mongodb", installRepo)
+		if mongodb.AppInstallID != 0 {
+			if err := tx.Create(mongodb).Error; err != nil {
+				return err
+			}
+		}
+		memcached := addDatabaseData("memcached", installRepo)
+		if memcached.AppInstallID != 0 {
+			if err := tx.Create(memcached).Error; err != nil {
 				return err
 			}
 		}
@@ -766,4 +702,56 @@ var DropDatabaseLocal = &gormigrate.Migration{
 		_ = tx.Where("name = ? AND address = ?", "local", "127.0.0.1").Delete(&model.Database{}).Error
 		return nil
 	},
+}
+
+var AddDatabaseID = &gormigrate.Migration{
+	ID: "20230914-add-database-id",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.DatabaseMysql{}); err != nil {
+			return err
+		}
+		var (
+			mysqls    []model.DatabaseMysql
+			databases []model.Database
+		)
+		_ = tx.Find(&mysqls).Error
+		if len(mysqls) == 0 {
+			return nil
+		}
+		_ = tx.Find(&databases).Error
+		for _, mysql := range mysqls {
+			for _, database := range databases {
+				if mysql.MysqlName == database.Name && mysql.From == database.From {
+					if err := tx.Model(&model.DatabaseMysql{}).Where("id = ?", mysql.ID).Updates(map[string]interface{}{
+						"database_id": database.ID,
+					}).Error; err != nil {
+						return err
+					}
+					break
+				}
+			}
+		}
+		return nil
+	},
+}
+
+func addDatabaseData(appType string, installRepo repo.IAppInstallRepo) *model.Database {
+	dbInfo, err := installRepo.LoadBaseInfo(appType, "")
+	if err == nil {
+		if appType == "mysql" || appType == "redis" || appType == "mariadb" || appType == "memcached" {
+			dbInfo.UserName = "root"
+		}
+		return &model.Database{
+			AppInstallID: dbInfo.ID,
+			Name:         dbInfo.Name,
+			Type:         appType,
+			Version:      dbInfo.Version,
+			From:         "local",
+			Address:      dbInfo.ServiceName,
+			Port:         service.DatabaseKeys[appType],
+			Username:     dbInfo.UserName,
+			Password:     dbInfo.Password,
+		}
+	}
+	return &model.Database{}
 }

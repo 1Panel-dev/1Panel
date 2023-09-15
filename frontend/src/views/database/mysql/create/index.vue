@@ -93,6 +93,7 @@ const form = reactive({
     from: 'local',
     type: '',
     database: '',
+    databaseID: 0,
     format: '',
     username: '',
     password: '',
@@ -124,12 +125,14 @@ interface DialogProps {
     from: string;
     type: string;
     database: string;
+    databaseID: number;
 }
 const acceptParams = (params: DialogProps): void => {
     form.name = '';
     form.from = params.from;
     form.type = params.type;
     form.database = params.database;
+    form.databaseID = params.databaseID;
     form.format = 'utf8mb4';
     form.username = '';
     form.permission = '%';

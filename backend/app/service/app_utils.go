@@ -190,7 +190,7 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 				var createMysql dto.MysqlDBCreate
 				createMysql.Name = dbConfig.DbName
 				createMysql.Username = dbConfig.DbUser
-				createMysql.Database = dbInstall.Name
+				// createMysql.Database = dbInstall.Name
 				createMysql.Format = "utf8mb4"
 				createMysql.Permission = "%"
 				createMysql.Password = dbConfig.Password
@@ -253,16 +253,16 @@ func deleteAppInstall(install model.AppInstall, deleteBackup bool, forceDelete b
 		return err
 	}
 
-	if DatabaseKeys[install.App.Key] > 0 {
-		_ = databaseRepo.Delete(ctx, databaseRepo.WithAppInstallID(install.ID))
-	}
+	// if DatabaseKeys[install.App.Key] > 0 {
+	// _ = databaseRepo.Delete(ctx, databaseRepo.WithAppInstallID(install.ID))
+	// }
 
 	switch install.App.Key {
 	case constant.AppOpenresty:
 		_ = websiteRepo.DeleteAll(ctx)
 		_ = websiteDomainRepo.DeleteAll(ctx)
 	case constant.AppMysql, constant.AppMariaDB:
-		_ = mysqlRepo.Delete(ctx, mysqlRepo.WithByMysqlName(install.Name))
+		// _ = mysqlRepo.Delete(ctx, mysqlRepo.WithByMysqlName(install.Name))
 	}
 
 	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("app"), commonRepo.WithByName(install.App.Key), backupRepo.WithByDetailName(install.Name))
@@ -301,7 +301,7 @@ func deleteLink(ctx context.Context, install *model.AppInstall, deleteDB bool, f
 				ForceDelete:  forceDelete,
 				DeleteBackup: deleteBackup,
 				Type:         re.Key,
-				Database:     database.MysqlName,
+				// Database:     database.MysqlName,
 			}); err != nil && !forceDelete {
 				return err
 			}
