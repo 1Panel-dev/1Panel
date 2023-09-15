@@ -735,6 +735,16 @@ var AddDatabaseID = &gormigrate.Migration{
 	},
 }
 
+var RemoveDatabaseUnique = &gormigrate.Migration{
+	ID: "20230914-update-database",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Database{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
 func addDatabaseData(appType string, installRepo repo.IAppInstallRepo) *model.Database {
 	dbInfo, err := installRepo.LoadBaseInfo(appType, "")
 	if err == nil {

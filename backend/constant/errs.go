@@ -96,8 +96,6 @@ var (
 	ErrUserIsExist     = "ErrUserIsExist"
 	ErrDatabaseIsExist = "ErrDatabaseIsExist"
 	ErrExecTimeOut     = "ErrExecTimeOut"
-	ErrRemoteExist     = "ErrRemoteExist"
-	ErrLocalExist      = "ErrLocalExist"
 )
 
 // redis

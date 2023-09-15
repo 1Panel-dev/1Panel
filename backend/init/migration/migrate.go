@@ -44,6 +44,7 @@ func Init() {
 		migrations.UpdateAppInstallResource,
 		migrations.DropDatabaseLocal,
 		migrations.AddDatabaseID,
+		migrations.RemoveDatabaseUnique,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)
