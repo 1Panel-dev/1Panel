@@ -13605,14 +13605,9 @@ const docTemplate = `{
         "dto.MysqlDBDelete": {
             "type": "object",
             "required": [
-                "databaseID",
-                "id",
-                "type"
+                "id"
             ],
             "properties": {
-                "databaseID": {
-                    "type": "integer"
-                },
                 "deleteBackup": {
                     "type": "boolean"
                 },
@@ -13621,13 +13616,6 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
-                },
-                "type": {
-                    "type": "string",
-                    "enum": [
-                        "mysql",
-                        "mariadb"
-                    ]
                 }
             }
         },

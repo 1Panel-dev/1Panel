@@ -258,12 +258,7 @@ func deleteAppInstall(install model.AppInstall, deleteBackup bool, forceDelete b
 	if err := deleteLink(ctx, &install, deleteDB, forceDelete, deleteBackup); err != nil && !forceDelete {
 		return err
 	}
-	var databaseIDs []uint
 	if DatabaseKeys[install.App.Key] > 0 {
-		databases, _ := databaseRepo.GetList(databaseRepo.WithAppInstallID(install.ID))
-		for _, database := range databases {
-			databaseIDs = append(databaseIDs, database.ID)
-		}
 		_ = databaseRepo.Delete(ctx, databaseRepo.WithAppInstallID(install.ID))
 	}
 
@@ -272,8 +267,9 @@ func deleteAppInstall(install model.AppInstall, deleteBackup bool, forceDelete b
 		_ = websiteRepo.DeleteAll(ctx)
 		_ = websiteDomainRepo.DeleteAll(ctx)
 	case constant.AppMysql, constant.AppMariaDB:
-		if len(databaseIDs) > 0 {
-			_ = mysqlRepo.Delete(ctx, mysqlRepo.WithDatabaseIDIn(databaseIDs))
+		database, _ := databaseRepo.Get(databaseRepo.WithAppInstallID(install.ID))
+		if database.ID > 0 {
+			_ = mysqlRepo.Delete(ctx, mysqlRepo.WithByDatabase(database.ID))
 		}
 	}
 
@@ -311,7 +307,6 @@ func deleteLink(ctx context.Context, install *model.AppInstall, deleteDB bool, f
 				ID:           mysqlDatabase.ID,
 				ForceDelete:  forceDelete,
 				DeleteBackup: deleteBackup,
-				Type:         re.Key,
 			}); err != nil && !forceDelete {
 				return err
 			}

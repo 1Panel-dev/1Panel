@@ -47,8 +47,6 @@ export namespace Database {
     }
     export interface MysqlDBDelete {
         id: number;
-        type: string;
-        databaseID: number;
         forceDelete: boolean;
         deleteBackup: boolean;
     }

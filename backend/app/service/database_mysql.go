@@ -224,7 +224,11 @@ func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error 
 	if err != nil && !req.ForceDelete {
 		return err
 	}
-	cli, version, database, err := LoadMysqlClientByFrom(req.DatabaseID)
+	database, err := databaseRepo.Get(commonRepo.WithByID(db.DatabaseID))
+	if err != nil && !req.ForceDelete {
+		return err
+	}
+	cli, version, _, err := LoadMysqlClientByFrom(db.DatabaseID)
 	if err != nil {
 		return err
 	}
@@ -239,26 +243,24 @@ func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error 
 		return err
 	}
 
-	uploadDir := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/uploads/database/%s/%s/%s", req.Type, database, db.Name))
-	if _, err := os.Stat(uploadDir); err == nil {
-		_ = os.RemoveAll(uploadDir)
+	uploadDir2 := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/uploads/database/%s/%s-%s/%s", database.Type, database.From, database.Name, db.Name))
+	if _, err := os.Stat(uploadDir2); err == nil {
+		_ = os.RemoveAll(uploadDir2)
 	}
 	if req.DeleteBackup {
 		localDir, err := loadLocalDir()
 		if err != nil && !req.ForceDelete {
 			return err
 		}
-		backupDir := path.Join(localDir, fmt.Sprintf("database/%s/%s-%s/%s", req.Type, db.From, database, db.Name))
+		backupDir := path.Join(localDir, fmt.Sprintf("database/%s/%s-%s/%s", database.Type, db.From, database.Name, db.Name))
 		if _, err := os.Stat(backupDir); err == nil {
 			_ = os.RemoveAll(backupDir)
 		}
-		backupDir2 := path.Join(localDir, fmt.Sprintf("database/%s/%s/%s", req.Type, database, db.Name))
-		if _, err := os.Stat(backupDir2); err == nil {
-			_ = os.RemoveAll(backupDir2)
-		}
-		global.LOG.Infof("delete database %s-%s backups successful", database, db.Name)
+		global.LOG.Infof("delete database %s-%s backups successful", database.Name, db.Name)
 	}
-	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType(req.Type), commonRepo.WithByName(database), backupRepo.WithByDetailName(db.Name))
+	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType(database.Type),
+		commonRepo.WithByName(fmt.Sprintf("%v", database.ID)),
+		backupRepo.WithByDetailName(db.Name))
 
 	_ = mysqlRepo.Delete(ctx, commonRepo.WithByID(db.ID))
 	return nil
