@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -23,16 +24,25 @@ func (u *BackupService) MysqlBackup(req dto.CommonBackup) error {
 	}
 
 	timeNow := time.Now().Format("20060102150405")
-	targetDir := path.Join(localDir, fmt.Sprintf("database/%s/%s/%s", req.Type, req.Name, req.DetailName))
+	databaseID, err := strconv.Atoi(req.Name)
+	if err != nil {
+		return err
+	}
+	database, err := databaseRepo.Get(commonRepo.WithByID(uint(databaseID)))
+	if err != nil {
+		return err
+	}
+	dirName := fmt.Sprintf("%s-%s", database.From, database.Name)
+	targetDir := path.Join(localDir, fmt.Sprintf("database/%s/%s/%s", req.Type, dirName, req.DetailName))
 	fileName := fmt.Sprintf("%s_%s.sql.gz", req.DetailName, timeNow)
 
-	if err := handleMysqlBackup(req.Name, req.DetailName, targetDir, fileName); err != nil {
+	if err := handleMysqlBackup(uint(databaseID), req.DetailName, targetDir, fileName); err != nil {
 		return err
 	}
 
 	record := &model.BackupRecord{
 		Type:       req.Type,
-		Name:       req.Name,
+		Name:       dirName,
 		DetailName: req.DetailName,
 		Source:     "LOCAL",
 		BackupType: "LOCAL",
@@ -97,12 +107,12 @@ func (u *BackupService) MysqlRecoverByUpload(req dto.CommonRecover) error {
 	return nil
 }
 
-func handleMysqlBackup(database, dbName, targetDir, fileName string) error {
-	dbInfo, err := mysqlRepo.Get(commonRepo.WithByName(dbName), mysqlRepo.WithByMysqlName(database))
+func handleMysqlBackup(databaseID uint, dbName, targetDir, fileName string) error {
+	cli, _, _, err := LoadMysqlClientByFrom(databaseID)
 	if err != nil {
 		return err
 	}
-	cli, _, err := LoadMysqlClientByFrom(database)
+	dbInfo, err := mysqlRepo.Get(commonRepo.WithByName(dbName), mysqlRepo.WithByDatabase(databaseID))
 	if err != nil {
 		return err
 	}
@@ -127,11 +137,15 @@ func handleMysqlRecover(req dto.CommonRecover, isRollback bool) error {
 	if !fileOp.Stat(req.File) {
 		return errors.New(fmt.Sprintf("%s file is not exist", req.File))
 	}
-	dbInfo, err := mysqlRepo.Get(commonRepo.WithByName(req.DetailName), mysqlRepo.WithByMysqlName(req.Name))
+	databaseID, err := strconv.Atoi(req.Name)
 	if err != nil {
 		return err
 	}
-	cli, _, err := LoadMysqlClientByFrom(req.Name)
+	cli, _, _, err := LoadMysqlClientByFrom(uint(databaseID))
+	if err != nil {
+		return err
+	}
+	dbInfo, err := mysqlRepo.Get(commonRepo.WithByName(req.DetailName), mysqlRepo.WithByDatabase(uint(databaseID)))
 	if err != nil {
 		return err
 	}

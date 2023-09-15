@@ -120,6 +120,7 @@ const form = reactive({
     from: '',
     type: '',
     database: '',
+    databaseID: 0,
     username: '',
     remoteIP: '',
 });
@@ -134,6 +135,7 @@ interface DialogProps {
     from: string;
     type: string;
     database: string;
+    databaseID: number;
 }
 
 const acceptParams = (param: DialogProps): void => {
@@ -141,6 +143,7 @@ const acceptParams = (param: DialogProps): void => {
     form.from = param.from;
     form.type = param.type;
     form.database = param.database;
+    form.databaseID = param.databaseID;
     loadAccess();
     loadPassword();
     dialogVisiable.value = true;
@@ -171,7 +174,7 @@ const handleClose = () => {
 
 const loadAccess = async () => {
     if (form.from === 'local') {
-        const res = await loadRemoteAccess(form.type, form.database);
+        const res = await loadRemoteAccess(form.databaseID);
         form.privilege = res.data;
     }
 };
@@ -203,7 +206,7 @@ const onSubmit = async () => {
         id: 0,
         from: form.from,
         type: form.type,
-        database: form.database,
+        databaseID: form.databaseID,
         value: form.password,
     };
     loading.value = true;
@@ -236,7 +239,7 @@ const onSubmitAccess = async () => {
         id: 0,
         from: form.from,
         type: form.type,
-        database: form.database,
+        databaseID: form.databaseID,
         value: form.privilege ? '%' : 'localhost',
     };
     loading.value = true;

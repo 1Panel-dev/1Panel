@@ -19,9 +19,6 @@ export const addMysqlDB = (params: Database.MysqlDBCreate) => {
     }
     return http.post(`/databases`, request);
 };
-export const loadDBFromRemote = (params: Database.MysqlLoadDB) => {
-    return http.post(`/databases/load`, params);
-};
 export const updateMysqlAccess = (params: Database.ChangeInfo) => {
     return http.post(`/databases/change/access`, params);
 };
@@ -48,17 +45,20 @@ export const deleteMysqlDB = (params: Database.MysqlDBDelete) => {
     return http.post(`/databases/del`, params);
 };
 
-export const loadMysqlBaseInfo = (type: string, database: string) => {
-    return http.post<Database.BaseInfo>(`/databases/baseinfo`, { type: type, name: database });
+export const loadDBFromRemote = (id: number) => {
+    return http.post(`/databases/load`, { id: id });
 };
-export const loadMysqlVariables = (type: string, database: string) => {
-    return http.post<Database.MysqlVariables>(`/databases/variables`, { type: type, name: database });
+export const loadMysqlBaseInfo = (id: number) => {
+    return http.post<Database.BaseInfo>(`/databases/baseinfo`, { id: id });
 };
-export const loadMysqlStatus = (type: string, database: string) => {
-    return http.post<Database.MysqlStatus>(`/databases/status`, { type: type, name: database });
+export const loadMysqlVariables = (id: number) => {
+    return http.post<Database.MysqlVariables>(`/databases/variables`, { id: id });
 };
-export const loadRemoteAccess = (type: string, database: string) => {
-    return http.post<boolean>(`/databases/remote`, { type: type, name: database });
+export const loadMysqlStatus = (id: number) => {
+    return http.post<Database.MysqlStatus>(`/databases/status`, { id: id });
+};
+export const loadRemoteAccess = (id: number) => {
+    return http.post<boolean>(`/databases/remote`, { id: id });
 };
 export const loadDBOptions = () => {
     return http.get<Array<Database.MysqlOption>>(`/databases/options`);

@@ -109,14 +109,17 @@ const upVisiable = ref(false);
 const type = ref();
 const name = ref();
 const detailName = ref();
+const databaseID = ref();
 interface DialogProps {
     type: string;
     name: string;
+    databaseID: string;
     detailName: string;
 }
 const acceptParams = async (params: DialogProps): Promise<void> => {
     type.value = params.type;
     name.value = params.name;
+    databaseID.value = params.databaseID;
     detailName.value = params.detailName;
 
     const pathRes = await loadBaseDir();
@@ -148,10 +151,11 @@ const search = async () => {
 };
 
 const onRecover = async (row: File.File) => {
+    let nameItem = type.value === 'mysql' || type.value === 'mariadb' ? databaseID.value : name.value;
     let params = {
         source: 'LOCAL',
         type: type.value,
-        name: name.value,
+        name: nameItem,
         detailName: detailName.value,
         file: baseDir.value + row.name,
     };

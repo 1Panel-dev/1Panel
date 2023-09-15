@@ -209,23 +209,20 @@ let mysqlStatus = reactive({
 });
 
 const currentDB = reactive({
-    type: '',
-    database: '',
+    databaseID: 0,
 });
 
 interface DialogProps {
-    type: string;
-    database: string;
+    databaseID: number;
 }
 
 const acceptParams = (params: DialogProps): void => {
-    currentDB.type = params.type;
-    currentDB.database = params.database;
+    currentDB.databaseID = params.databaseID;
     loadStatus();
 };
 
 const loadStatus = async () => {
-    const res = await loadMysqlStatus(currentDB.type, currentDB.database);
+    const res = await loadMysqlStatus(currentDB.databaseID);
     let queryPerSecond = res.data.Questions / res.data.Uptime;
     let txPerSecond = (res.data!.Com_commit + res.data.Com_rollback) / res.data.Uptime;
 

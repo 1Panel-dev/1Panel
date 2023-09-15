@@ -285,6 +285,7 @@ const onOpenDialog = async () => {
         from: currentDB.value.from,
         type: currentDB.value.type,
         database: currentDBName.value,
+        databaseID: currentDB.value.id,
     };
     dialogRef.value!.acceptParams(params);
 };
@@ -298,7 +299,8 @@ const onChangeConn = async () => {
     connRef.value!.acceptParams({
         from: currentDB.value.from,
         type: currentDB.value.type,
-        database: currentDBName.value,
+        databaseID: currentDB.value.id,
+        database: currentDB.value.database,
     });
 };
 
@@ -315,7 +317,10 @@ const onSetting = async () => {
     if (currentDB.value) {
         globalStore.setCurrentDB(currentDB.value.database);
     }
-    router.push({ name: 'MySQL-Setting', params: { type: currentDB.value.type, database: currentDB.value.database } });
+    router.push({
+        name: 'MySQL-Setting',
+        params: { type: currentDB.value.type, database: currentDB.value.database, databaseID: currentDB.value.id },
+    });
 };
 
 const changeDatabase = async () => {
@@ -344,7 +349,7 @@ const search = async (column?: any) => {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
         info: searchName.value,
-        database: currentDB.value.database,
+        databaseID: currentDB.value.id,
         orderBy: paginationConfig.orderBy,
         order: paginationConfig.order,
     };
@@ -360,12 +365,7 @@ const loadDB = async () => {
         type: 'info',
     }).then(async () => {
         loading.value = true;
-        let params = {
-            from: currentDB.value.from,
-            type: currentDB.value.type,
-            database: currentDBName.value,
-        };
-        await loadDBFromRemote(params)
+        await loadDBFromRemote(currentDB.value.id)
             .then(() => {
                 loading.value = false;
                 search();
@@ -464,8 +464,7 @@ const onCopy = async (row: any) => {
 const onDelete = async (row: Database.MysqlDBInfo) => {
     let param = {
         id: row.id,
-        type: currentDB.value.type,
-        database: currentDBName.value,
+        databaseID: currentDB.value.id,
     };
     const res = await deleteCheckMysqlDB(param);
     if (res.data && res.data.length > 0) {
@@ -474,8 +473,8 @@ const onDelete = async (row: Database.MysqlDBInfo) => {
         deleteRef.value.acceptParams({
             id: row.id,
             type: currentDB.value.type,
-            database: currentDBName.value,
             name: row.name,
+            databaseID: currentDB.value.id,
         });
     }
 };
@@ -485,8 +484,7 @@ const onChangePassword = async (row: Database.MysqlDBInfo) => {
         id: row.id,
         from: row.from,
         type: currentDB.value.type,
-        database: currentDBName.value,
-        mysqlName: row.name,
+        databaseID: currentDB.value.id,
         operation: 'password',
         username: row.username,
         password: row.password,
@@ -511,8 +509,7 @@ const buttons = [
                 id: row.id,
                 from: row.from,
                 type: currentDB.value.type,
-                database: currentDBName.value,
-                mysqlName: row.name,
+                databaseID: currentDB.value.id,
                 operation: 'privilege',
                 privilege: '',
                 privilegeIPs: '',
@@ -532,7 +529,8 @@ const buttons = [
         click: (row: Database.MysqlDBInfo) => {
             let params = {
                 type: currentDB.value.type,
-                name: currentDBName.value,
+                name: currentDB.value.from + '-' + currentDB.value.database,
+                databaseID: currentDB.value.id + '',
                 detailName: row.name,
             };
             dialogBackupRef.value!.acceptParams(params);
@@ -543,7 +541,8 @@ const buttons = [
         click: (row: Database.MysqlDBInfo) => {
             let params = {
                 type: currentDB.value.type,
-                name: currentDBName.value,
+                name: currentDB.value.from + '-' + currentDB.value.database,
+                databaseID: currentDB.value.id + '',
                 detailName: row.name,
             };
             uploadRef.value!.acceptParams(params);

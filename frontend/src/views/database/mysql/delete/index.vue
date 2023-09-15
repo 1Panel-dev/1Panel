@@ -49,7 +49,7 @@ import { MsgSuccess } from '@/utils/message';
 let deleteReq = ref({
     id: 0,
     type: '',
-    database: '',
+    databaseID: 0,
     deleteBackup: false,
     forceDelete: false,
 });
@@ -64,7 +64,7 @@ interface DialogProps {
     id: number;
     type: string;
     name: string;
-    database: string;
+    databaseID: number;
 }
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -72,7 +72,7 @@ const acceptParams = async (prop: DialogProps) => {
     deleteReq.value = {
         id: prop.id,
         type: prop.type,
-        database: prop.database,
+        databaseID: prop.databaseID,
         deleteBackup: false,
         forceDelete: false,
     };

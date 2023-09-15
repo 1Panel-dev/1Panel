@@ -14,7 +14,7 @@ type MysqlRepo struct{}
 
 type IMysqlRepo interface {
 	Get(opts ...DBOption) (model.DatabaseMysql, error)
-	WithByMysqlName(mysqlName string) DBOption
+	WithByDatabase(databaseID uint) DBOption
 	WithByFrom(from string) DBOption
 	List(opts ...DBOption) ([]model.DatabaseMysql, error)
 	Page(limit, offset int, opts ...DBOption) (int64, []model.DatabaseMysql, error)
@@ -107,9 +107,9 @@ func (u *MysqlRepo) Update(id uint, vars map[string]interface{}) error {
 	return global.DB.Model(&model.DatabaseMysql{}).Where("id = ?", id).Updates(vars).Error
 }
 
-func (u *MysqlRepo) WithByMysqlName(mysqlName string) DBOption {
+func (u *MysqlRepo) WithByDatabase(databaseID uint) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("mysql_name = ?", mysqlName)
+		return g.Where("database_id = ?", databaseID)
 	}
 }
 
