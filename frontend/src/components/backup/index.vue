@@ -3,7 +3,13 @@
         <el-drawer v-model="backupVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
             <template #header>
                 <DrawerHeader
-                    v-if="detailName"
+                    v-if="type === 'mysql' || type == 'mariadb'"
+                    :header="$t('commons.button.backup')"
+                    :resource="detailName"
+                    :back="handleClose"
+                />
+                <DrawerHeader
+                    v-else-if="detailName"
                     :header="$t('commons.button.backup')"
                     :resource="name + '(' + detailName + ')'"
                     :back="handleClose"
@@ -72,18 +78,15 @@ const backupVisiable = ref(false);
 const type = ref();
 const name = ref();
 const detailName = ref();
-const databaseID = ref();
 
 interface DialogProps {
     type: string;
     name: string;
-    databaseID: string;
     detailName: string;
 }
 const acceptParams = (params: DialogProps): void => {
     type.value = params.type;
     name.value = params.name;
-    databaseID.value = params.databaseID;
     detailName.value = params.detailName;
     backupVisiable.value = true;
     search();
@@ -106,10 +109,9 @@ const search = async () => {
 };
 
 const onBackup = async () => {
-    let nameItem = type.value === 'mysql' || type.value === 'mariadb' ? databaseID.value : name.value;
     let params = {
         type: type.value,
-        name: nameItem,
+        name: name.value,
         detailName: detailName.value,
     };
     loading.value = true;
@@ -125,11 +127,10 @@ const onBackup = async () => {
 };
 
 const onRecover = async (row: Backup.RecordInfo) => {
-    let nameItem = type.value === 'mysql' || type.value === 'mariadb' ? databaseID.value : name.value;
     let params = {
         source: row.source,
         type: type.value,
-        name: nameItem,
+        name: name.value,
         detailName: detailName.value,
         file: row.fileDir + '/' + row.fileName,
     };
