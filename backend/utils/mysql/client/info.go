@@ -1,7 +1,6 @@
 package client
 
 import (
-	mathRand "math/rand"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
@@ -112,26 +111,5 @@ func randomPassword(user string) string {
 	if len(user) > 6 {
 		passwdItem = user[:6]
 	}
-	num := []rune("1234567890")
-	uppercase := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
-	lowercase := []rune("abcdefghijklmnopqrstuvwxyz")
-	special := []rune(".%@!~_-")
-
-	b := make([]rune, 10)
-	for i := 0; i < 2; i++ {
-		b[i] = lowercase[mathRand.Intn(len(lowercase))]
-	}
-	for i := 2; i < 4; i++ {
-		b[i] = uppercase[mathRand.Intn(len(uppercase))]
-	}
-	b[4] = special[mathRand.Intn(len(special))]
-	for i := 5; i < 9; i++ {
-		b[i] = num[mathRand.Intn(len(num))]
-	}
-
-	for i := len(b) - 1; i > 0; i-- {
-		j := mathRand.Intn(i + 1)
-		b[i], b[j] = b[j], b[i]
-	}
-	return passwdItem + "-" + (string(b))
+	return passwdItem + "@" + common.RandStrAndNum(8)
 }

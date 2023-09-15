@@ -42,7 +42,7 @@ func (u *BackupService) MysqlBackup(req dto.CommonBackup) error {
 
 	record := &model.BackupRecord{
 		Type:       req.Type,
-		Name:       dirName,
+		Name:       fmt.Sprintf("%v", database.ID),
 		DetailName: req.DetailName,
 		Source:     "LOCAL",
 		BackupType: "LOCAL",

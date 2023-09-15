@@ -2,6 +2,7 @@ package migrations
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -571,6 +572,23 @@ var AddTableFirewall = &gormigrate.Migration{
 var AddDatabases = &gormigrate.Migration{
 	ID: "20230831-add-databases",
 	Migrate: func(tx *gorm.DB) error {
+		var (
+			backups   []model.BackupRecord
+			databases []model.Database
+		)
+		_ = tx.Where("type = ? OR type = ?", "mysql", "mariadb").Find(&backups).Error
+		_ = tx.Where("from = ?", "remote").Find(&databases).Error
+		_ = tx.Where("name = ? AND address = ? AND type = ?", "local", "127.0.0.1", "mysql").Delete(&model.Database{}).Error
+		for _, backup := range backups {
+			for _, database := range databases {
+				if backup.Name == database.Name && backup.Type == database.Type {
+					_ = tx.Model(&model.BackupRecord{}).Where("id = ?", backup.ID).Updates(map[string]interface{}{
+						"name": fmt.Sprintf("%v", database.ID),
+					}).Error
+					break
+				}
+			}
+		}
 		installRepo := repo.NewIAppInstallRepo()
 		mysql := addDatabaseData("mysql", installRepo)
 		if mysql.AppInstallID != 0 {
@@ -609,6 +627,21 @@ var AddDatabases = &gormigrate.Migration{
 			}
 		}
 
+		_ = tx.Where("type = ? OR type = ?", "mysql", "mariadb").Find(&backups).Error
+		_ = tx.Where("from = ?", "local").Find(&databases).Error
+		for _, backup := range backups {
+			if _, err := strconv.Atoi(backup.Name); err == nil {
+				continue
+			}
+			for _, database := range databases {
+				if backup.Name == database.Name && backup.Type == database.Type {
+					_ = tx.Model(&model.BackupRecord{}).Where("id = ?", backup.ID).Updates(map[string]interface{}{
+						"name": fmt.Sprintf("%v", database.ID),
+					}).Error
+					break
+				}
+			}
+		}
 		return nil
 	},
 }
@@ -627,37 +660,15 @@ var UpdateDatabase = &gormigrate.Migration{
 			return nil
 		}
 		for _, data := range datas {
-			if data.Name == "local" && data.Address == "127.0.0.1" && data.Type == "mysql" {
-				installRepo := repo.NewIAppInstallRepo()
-				mysqlInfo, err := installRepo.LoadBaseInfo("mysql", "")
-				if err != nil {
-					continue
-				}
-				pass, err := encrypt.StringEncrypt(data.Password)
-				if err != nil {
-					global.LOG.Errorf("encrypt database %s password failed, err: %v", data.Name, err)
-					continue
-				}
-				if err := tx.Model(&model.Database{}).Where("id = ?", data.ID).Updates(map[string]interface{}{
-					"app_install_id": mysqlInfo.ID,
-					"name":           mysqlInfo.Name,
-					"password":       pass,
-					"port":           service.DatabaseKeys["mysql"],
-					"address":        mysqlInfo.ServiceName,
-				}).Error; err != nil {
-					global.LOG.Errorf("updata database %s info failed, err: %v", data.Name, err)
-				}
-			} else {
-				pass, err := encrypt.StringEncrypt(data.Password)
-				if err != nil {
-					global.LOG.Errorf("encrypt database %s password failed, err: %v", data.Name, err)
-					continue
-				}
-				if err := tx.Model(&model.Database{}).Where("id = ?", data.ID).Updates(map[string]interface{}{
-					"password": pass,
-				}).Error; err != nil {
-					global.LOG.Errorf("updata database %s info failed, err: %v", data.Name, err)
-				}
+			pass, err := encrypt.StringEncrypt(data.Password)
+			if err != nil {
+				global.LOG.Errorf("encrypt database %s password failed, err: %v", data.Name, err)
+				continue
+			}
+			if err := tx.Model(&model.Database{}).Where("id = ?", data.ID).Updates(map[string]interface{}{
+				"password": pass,
+			}).Error; err != nil {
+				global.LOG.Errorf("updata database %s info failed, err: %v", data.Name, err)
 			}
 		}
 
@@ -707,7 +718,7 @@ var DropDatabaseLocal = &gormigrate.Migration{
 var AddDatabaseID = &gormigrate.Migration{
 	ID: "20230914-add-database-id",
 	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.DatabaseMysql{}); err != nil {
+		if err := tx.AutoMigrate(&model.DatabaseMysql{}, &model.Database{}); err != nil {
 			return err
 		}
 		var (
@@ -735,11 +746,27 @@ var AddDatabaseID = &gormigrate.Migration{
 	},
 }
 
-var RemoveDatabaseUnique = &gormigrate.Migration{
-	ID: "20230914-update-database",
+var UpdataBackupRecord = &gormigrate.Migration{
+	ID: "20230915-update-backup-record",
 	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.Database{}); err != nil {
-			return err
+		var (
+			backups   []model.BackupRecord
+			databases []model.Database
+		)
+		_ = tx.Where("type = ? OR type = ?", "mysql", "mariadb").Find(&backups).Error
+		_ = tx.Find(&databases).Error
+		for _, backup := range backups {
+			if _, err := strconv.Atoi(backup.Name); err == nil {
+				continue
+			}
+			for _, database := range databases {
+				if backup.Name == database.Name && backup.Type == database.Type {
+					_ = tx.Model(&model.BackupRecord{}).Where("id = ?", backup.ID).Updates(map[string]interface{}{
+						"name": fmt.Sprintf("%v", database.ID),
+					}).Error
+					break
+				}
+			}
 		}
 		return nil
 	},

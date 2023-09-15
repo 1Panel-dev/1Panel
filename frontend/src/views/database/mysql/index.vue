@@ -529,8 +529,7 @@ const buttons = [
         click: (row: Database.MysqlDBInfo) => {
             let params = {
                 type: currentDB.value.type,
-                name: currentDB.value.from + '-' + currentDB.value.database,
-                databaseID: currentDB.value.id + '',
+                name: currentDB.value.id + '',
                 detailName: row.name,
             };
             dialogBackupRef.value!.acceptParams(params);

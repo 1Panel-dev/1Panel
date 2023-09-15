@@ -298,7 +298,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, backup model.Back
 		record.BackupType = backup.Type
 
 		dirName := fmt.Sprintf("%s-%s", database.From, database.Name)
-		record.Name = dirName
+		record.Name = fmt.Sprintf("%v", database.ID)
 		backupDir := path.Join(localDir, fmt.Sprintf("database/%s/%s/%s", database.Type, dirName, dbInfo.Name))
 		record.FileName = fmt.Sprintf("db_%s_%s.sql.gz", dbInfo.Name, startTime.Format("20060102150405"))
 		if err = handleMysqlBackup(dbInfo.DatabaseID, dbInfo.Name, backupDir, record.FileName); err != nil {

@@ -18,7 +18,7 @@
                             :stroke-width="12"
                             :percentage="uploadPrecent"
                         ></el-progress>
-                        <div v-if="type === 'mysql'" style="width: 80%" class="el-upload__tip">
+                        <div v-if="type === 'mysql' || type === 'mariadb'" style="width: 80%" class="el-upload__tip">
                             <span class="input-help">{{ $t('database.supportUpType') }}</span>
                             <span class="input-help">
                                 {{ $t('database.zipFormat') }}
@@ -123,7 +123,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     detailName.value = params.detailName;
 
     const pathRes = await loadBaseDir();
-    if (type.value === 'mysql') {
+    if (type.value === 'mysql' || type.value === 'mariadb') {
         title.value = name.value + ' [ ' + detailName.value + ' ]';
     }
     if (type.value === 'website' || type.value === 'app') {
