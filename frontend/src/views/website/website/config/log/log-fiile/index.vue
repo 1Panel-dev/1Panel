@@ -4,19 +4,14 @@
             <el-form-item :label="$t('website.enable')">
                 <el-switch v-model="data.enable" @change="updateEnable"></el-switch>
             </el-form-item>
-            <div style="margin-top: 10px">
-                <el-checkbox border v-model="tailLog" style="float: left" @change="changeTail">
+            <div class="mt-2.5">
+                <el-checkbox border v-model="tailLog" class="float-left" @change="changeTail">
                     {{ $t('commons.button.watch') }}
                 </el-checkbox>
-                <el-button
-                    style="margin-left: 20px"
-                    @click="onDownload"
-                    icon="Download"
-                    :disabled="data.content === ''"
-                >
+                <el-button class="ml-5" @click="onDownload" icon="Download" :disabled="data.content === ''">
                     {{ $t('file.download') }}
                 </el-button>
-                <el-button style="margin-left: 20px" @click="cleanLog" icon="Delete" :disabled="data.content === ''">
+                <el-button class="ml-5" @click="cleanLog" icon="Delete" :disabled="data.content === ''">
                     {{ $t('commons.button.clean') }}
                 </el-button>
             </div>
@@ -46,8 +41,8 @@ import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { computed, nextTick, onMounted, onUnmounted, reactive, ref, shallowRef } from 'vue';
 import { OpWebsiteLog } from '@/api/modules/website';
-import { dateFormatForName, downloadWithContent } from '@/utils/util';
 import { useDeleteData } from '@/hooks/use-delete-data';
+import { downloadFile } from '@/utils/util';
 
 const extensions = [javascript(), oneDark];
 const props = defineProps({
@@ -70,6 +65,7 @@ const loading = ref(false);
 const data = ref({
     enable: false,
     content: '',
+    path: '',
 });
 const tailLog = ref(false);
 let timer: NodeJS.Timer | null = null;
@@ -165,7 +161,7 @@ const cleanLog = async () => {
 };
 
 const onDownload = async () => {
-    downloadWithContent(data.value.content, logType.value + '-' + dateFormatForName(new Date()) + '.log');
+    downloadFile(data.value.path);
 };
 
 const onCloseLog = async () => {
