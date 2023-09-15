@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="open" :title="$t('app.delete')" width="30%" :close-on-click-modal="false">
+    <el-dialog v-model="open" :title="$t('container.' + operation)" width="30%" :close-on-click-modal="false">
         <el-row>
             <el-col :span="20" :offset="2">
                 <el-alert :title="msg" show-icon type="error" :closable="false"></el-alert>
