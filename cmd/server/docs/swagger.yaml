@@ -1285,23 +1285,14 @@ definitions:
     type: object
   dto.MysqlDBDelete:
     properties:
-      databaseID:
-        type: integer
       deleteBackup:
         type: boolean
       forceDelete:
         type: boolean
       id:
         type: integer
-      type:
-        enum:
-        - mysql
-        - mariadb
-        type: string
     required:
-    - databaseID
     - id
-    - type
     type: object
   dto.MysqlDBDeleteCheck:
     properties:

@@ -50,11 +50,9 @@ type MysqlDBDeleteCheck struct {
 }
 
 type MysqlDBDelete struct {
-	ID           uint   `json:"id" validate:"required"`
-	Type         string `json:"type" validate:"required,oneof=mysql mariadb"`
-	DatabaseID   uint   `json:"databaseID" validate:"required"`
-	ForceDelete  bool   `json:"forceDelete"`
-	DeleteBackup bool   `json:"deleteBackup"`
+	ID           uint `json:"id" validate:"required"`
+	ForceDelete  bool `json:"forceDelete"`
+	DeleteBackup bool `json:"deleteBackup"`
 }
 
 type MysqlStatus struct {

@@ -16,7 +16,6 @@ type IMysqlRepo interface {
 	Get(opts ...DBOption) (model.DatabaseMysql, error)
 	WithByDatabase(databaseID uint) DBOption
 	WithByFrom(from string) DBOption
-	WithDatabaseIDIn(databaseIDs []uint) DBOption
 	List(opts ...DBOption) ([]model.DatabaseMysql, error)
 	Page(limit, offset int, opts ...DBOption) (int64, []model.DatabaseMysql, error)
 	Create(ctx context.Context, mysql *model.DatabaseMysql) error
@@ -118,15 +117,6 @@ func (u *MysqlRepo) WithByFrom(from string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		if len(from) != 0 {
 			return g.Where("`from` = ?", from)
-		}
-		return g
-	}
-}
-
-func (u *MysqlRepo) WithDatabaseIDIn(databaseIDs []uint) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		if len(databaseIDs) != 0 {
-			return g.Where("database_id in (?)", databaseIDs)
 		}
 		return g
 	}

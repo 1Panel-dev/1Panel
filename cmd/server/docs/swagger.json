@@ -13598,14 +13598,9 @@
         "dto.MysqlDBDelete": {
             "type": "object",
             "required": [
-                "databaseID",
-                "id",
-                "type"
+                "id"
             ],
             "properties": {
-                "databaseID": {
-                    "type": "integer"
-                },
                 "deleteBackup": {
                     "type": "boolean"
                 },
@@ -13614,13 +13609,6 @@
                 },
                 "id": {
                     "type": "integer"
-                },
-                "type": {
-                    "type": "string",
-                    "enum": [
-                        "mysql",
-                        "mariadb"
-                    ]
                 }
             }
         },

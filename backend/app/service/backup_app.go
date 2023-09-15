@@ -255,7 +255,7 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 func reCreateDB(db model.DatabaseMysql, app model.AppInstall, oldEnv string) (*model.DatabaseMysql, map[string]interface{}, error) {
 	mysqlService := NewIMysqlService()
 	ctx := context.Background()
-	_ = mysqlService.Delete(ctx, dto.MysqlDBDelete{ID: db.ID, DatabaseID: db.DatabaseID, Type: app.App.Key, DeleteBackup: true, ForceDelete: true})
+	_ = mysqlService.Delete(ctx, dto.MysqlDBDelete{ID: db.ID, DeleteBackup: true, ForceDelete: true})
 
 	envMap := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(oldEnv), &envMap); err != nil {
