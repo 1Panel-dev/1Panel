@@ -24,6 +24,17 @@ func CompareVersion(version1 string, version2 string) bool {
 	version1s := strings.Split(version1, ".")
 	version2s := strings.Split(version2, ".")
 
+	if len(version2s) > len(version1s) {
+		for i := 0; i < len(version2s)-len(version1s); i++ {
+			version1s = append(version1s, "0")
+		}
+	}
+	if len(version1s) > len(version2s) {
+		for i := 0; i < len(version1s)-len(version2s); i++ {
+			version2s = append(version2s, "0")
+		}
+	}
+
 	n := min(len(version1s), len(version2s))
 	re := regexp.MustCompile("[0-9]+")
 	for i := 0; i < n; i++ {

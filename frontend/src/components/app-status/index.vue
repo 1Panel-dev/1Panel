@@ -50,7 +50,7 @@
                 </div>
             </el-card>
         </div>
-        <div v-if="!data.isExist && !isDB">
+        <div v-if="!data.isExist && !isDB()">
             <LayoutContent :title="getTitle(key)" :divider="true">
                 <template #main>
                     <div class="app-warn">
@@ -135,7 +135,7 @@ const goRouter = async (key: string) => {
 };
 
 const isDB = () => {
-    return key.value === 'mysql' || key.value === 'mysql';
+    return key.value === 'mysql' || key.value === 'mariadb';
 };
 
 const onCheck = async () => {
