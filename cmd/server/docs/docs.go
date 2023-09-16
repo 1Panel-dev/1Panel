@@ -3740,7 +3740,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.OperateByID"
+                            "$ref": "#/definitions/dto.OperationWithNameAndType"
                         }
                     }
                 ],
@@ -4322,7 +4322,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.OperateByID"
+                            "$ref": "#/definitions/dto.MysqlLoadDB"
                         }
                     }
                 ],
@@ -4685,7 +4685,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.OperateByID"
+                            "$ref": "#/definitions/dto.OperationWithNameAndType"
                         }
                     }
                 ],
@@ -4757,7 +4757,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.OperateByID"
+                            "$ref": "#/definitions/dto.OperationWithNameAndType"
                         }
                     }
                 ],
@@ -4793,7 +4793,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.OperateByID"
+                            "$ref": "#/definitions/dto.OperationWithNameAndType"
                         }
                     }
                 ],
@@ -11900,14 +11900,14 @@ const docTemplate = `{
         "dto.ChangeDBInfo": {
             "type": "object",
             "required": [
-                "databaseID",
+                "database",
                 "from",
                 "type",
                 "value"
             ],
             "properties": {
-                "databaseID": {
-                    "type": "integer"
+                "database": {
+                    "type": "string"
                 },
                 "from": {
                     "type": "string",
@@ -13543,21 +13543,29 @@ const docTemplate = `{
         "dto.MysqlConfUpdateByFile": {
             "type": "object",
             "required": [
-                "databaseID"
+                "database",
+                "type"
             ],
             "properties": {
-                "databaseID": {
-                    "type": "integer"
+                "database": {
+                    "type": "string"
                 },
                 "file": {
                     "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "mysql",
+                        "mariadb"
+                    ]
                 }
             }
         },
         "dto.MysqlDBCreate": {
             "type": "object",
             "required": [
-                "databaseID",
+                "database",
                 "format",
                 "from",
                 "name",
@@ -13566,8 +13574,8 @@ const docTemplate = `{
                 "username"
             ],
             "properties": {
-                "databaseID": {
-                    "type": "integer"
+                "database": {
+                    "type": "string"
                 },
                 "description": {
                     "type": "string"
@@ -13605,9 +13613,14 @@ const docTemplate = `{
         "dto.MysqlDBDelete": {
             "type": "object",
             "required": [
-                "id"
+                "database",
+                "id",
+                "type"
             ],
             "properties": {
+                "database": {
+                    "type": "string"
+                },
                 "deleteBackup": {
                     "type": "boolean"
                 },
@@ -13616,34 +13629,49 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "mysql",
+                        "mariadb"
+                    ]
                 }
             }
         },
         "dto.MysqlDBDeleteCheck": {
             "type": "object",
             "required": [
-                "databaseID",
-                "id"
+                "database",
+                "id",
+                "type"
             ],
             "properties": {
-                "databaseID": {
-                    "type": "integer"
+                "database": {
+                    "type": "string"
                 },
                 "id": {
                     "type": "integer"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "mysql",
+                        "mariadb"
+                    ]
                 }
             }
         },
         "dto.MysqlDBSearch": {
             "type": "object",
             "required": [
-                "databaseID",
+                "database",
                 "page",
                 "pageSize"
             ],
             "properties": {
-                "databaseID": {
-                    "type": "integer"
+                "database": {
+                    "type": "string"
                 },
                 "info": {
                     "type": "string"
@@ -13662,14 +13690,38 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.MysqlLoadDB": {
+            "type": "object",
+            "required": [
+                "database",
+                "from",
+                "type"
+            ],
+            "properties": {
+                "database": {
+                    "type": "string"
+                },
+                "from": {
+                    "type": "string",
+                    "enum": [
+                        "local",
+                        "remote"
+                    ]
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "mysql",
+                        "mariadb"
+                    ]
+                }
+            }
+        },
         "dto.MysqlOption": {
             "type": "object",
             "properties": {
                 "database": {
                     "type": "string"
-                },
-                "databaseID": {
-                    "type": "integer"
                 },
                 "from": {
                     "type": "string"
@@ -13857,11 +13909,19 @@ const docTemplate = `{
         "dto.MysqlVariablesUpdate": {
             "type": "object",
             "required": [
-                "databaseID"
+                "database",
+                "type"
             ],
             "properties": {
-                "databaseID": {
-                    "type": "integer"
+                "database": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "mysql",
+                        "mariadb"
+                    ]
                 },
                 "variables": {
                     "type": "array",
@@ -17628,6 +17688,9 @@ const docTemplate = `{
                 },
                 "end": {
                     "type": "boolean"
+                },
+                "path": {
+                    "type": "string"
                 }
             }
         },

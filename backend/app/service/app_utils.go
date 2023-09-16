@@ -187,25 +187,19 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 					return buserr.New(constant.ErrDbUserNotValid)
 				}
 			} else {
-				if databaseID, ok := params["PANEL_DB_HOST_ID"]; ok {
-					database, err := databaseRepo.Get(commonRepo.WithByID(databaseID.(uint)))
-					if err != nil {
-						return err
-					}
-					var createMysql dto.MysqlDBCreate
-					createMysql.Name = dbConfig.DbName
-					createMysql.Username = dbConfig.DbUser
-					createMysql.DatabaseID = database.ID
-					createMysql.Format = "utf8mb4"
-					createMysql.Permission = "%"
-					createMysql.Password = dbConfig.Password
-					createMysql.From = "local"
-					mysqldb, err := NewIMysqlService().Create(ctx, createMysql)
-					if err != nil {
-						return err
-					}
-					resourceId = mysqldb.ID
+				var createMysql dto.MysqlDBCreate
+				createMysql.Name = dbConfig.DbName
+				createMysql.Username = dbConfig.DbUser
+				createMysql.Database = dbInstall.Name
+				createMysql.Format = "utf8mb4"
+				createMysql.Permission = "%"
+				createMysql.Password = dbConfig.Password
+				createMysql.From = "local"
+				mysqldb, err := NewIMysqlService().Create(ctx, createMysql)
+				if err != nil {
+					return err
 				}
+				resourceId = mysqldb.ID
 			}
 		}
 		var installResource model.AppInstallResource
@@ -258,6 +252,7 @@ func deleteAppInstall(install model.AppInstall, deleteBackup bool, forceDelete b
 	if err := deleteLink(ctx, &install, deleteDB, forceDelete, deleteBackup); err != nil && !forceDelete {
 		return err
 	}
+
 	if DatabaseKeys[install.App.Key] > 0 {
 		_ = databaseRepo.Delete(ctx, databaseRepo.WithAppInstallID(install.ID))
 	}
@@ -267,10 +262,7 @@ func deleteAppInstall(install model.AppInstall, deleteBackup bool, forceDelete b
 		_ = websiteRepo.DeleteAll(ctx)
 		_ = websiteDomainRepo.DeleteAll(ctx)
 	case constant.AppMysql, constant.AppMariaDB:
-		database, _ := databaseRepo.Get(databaseRepo.WithAppInstallID(install.ID))
-		if database.ID > 0 {
-			_ = mysqlRepo.Delete(ctx, mysqlRepo.WithByDatabase(database.ID))
-		}
+		_ = mysqlRepo.Delete(ctx, mysqlRepo.WithByMysqlName(install.Name))
 	}
 
 	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("app"), commonRepo.WithByName(install.App.Key), backupRepo.WithByDetailName(install.Name))
@@ -292,6 +284,7 @@ func deleteAppInstall(install model.AppInstall, deleteBackup bool, forceDelete b
 }
 
 func deleteLink(ctx context.Context, install *model.AppInstall, deleteDB bool, forceDelete bool, deleteBackup bool) error {
+
 	resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(install.ID))
 	if len(resources) == 0 {
 		return nil
@@ -299,14 +292,16 @@ func deleteLink(ctx context.Context, install *model.AppInstall, deleteDB bool, f
 	for _, re := range resources {
 		mysqlService := NewIMysqlService()
 		if (re.Key == constant.AppMysql || re.Key == constant.AppMariaDB) && deleteDB {
-			mysqlDatabase, _ := mysqlRepo.Get(commonRepo.WithByID(re.ResourceId))
-			if mysqlDatabase.ID == 0 {
+			database, _ := mysqlRepo.Get(commonRepo.WithByID(re.ResourceId))
+			if reflect.DeepEqual(database, model.DatabaseMysql{}) {
 				continue
 			}
 			if err := mysqlService.Delete(ctx, dto.MysqlDBDelete{
-				ID:           mysqlDatabase.ID,
+				ID:           database.ID,
 				ForceDelete:  forceDelete,
 				DeleteBackup: deleteBackup,
+				Type:         re.Key,
+				Database:     database.MysqlName,
 			}); err != nil && !forceDelete {
 				return err
 			}

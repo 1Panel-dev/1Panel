@@ -3,7 +3,7 @@ package model
 type Database struct {
 	BaseModel
 	AppInstallID uint   `json:"appInstallID" gorm:"type:decimal"`
-	Name         string `json:"name" gorm:"type:varchar(64);not null"`
+	Name         string `json:"name" gorm:"type:varchar(64);not null;unique"`
 	Type         string `json:"type" gorm:"type:varchar(64);not null"`
 	Version      string `json:"version" gorm:"type:varchar(64);not null"`
 	From         string `json:"from" gorm:"type:varchar(64);not null"`

@@ -233,11 +233,11 @@ func (b *BaseApi) ListDBName(c *gin.Context) {
 // @Summary Load mysql database from remote
 // @Description 从服务器获取
 // @Accept json
-// @Param request body dto.OperateByID true "request"
+// @Param request body dto.MysqlLoadDB true "request"
 // @Security ApiKeyAuth
 // @Router /databases/load [post]
 func (b *BaseApi) LoadDBFromRemote(c *gin.Context) {
-	var req dto.OperateByID
+	var req dto.MysqlLoadDB
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -315,12 +315,12 @@ func (b *BaseApi) DeleteMysql(c *gin.Context) {
 // @Summary Load mysql base info
 // @Description 获取 mysql 基础信息
 // @Accept json
-// @Param request body dto.OperateByID true "request"
+// @Param request body dto.OperationWithNameAndType true "request"
 // @Success 200 {object} dto.DBBaseInfo
 // @Security ApiKeyAuth
 // @Router /databases/baseinfo [post]
 func (b *BaseApi) LoadBaseinfo(c *gin.Context) {
-	var req dto.OperateByID
+	var req dto.OperationWithNameAndType
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -360,12 +360,12 @@ func (b *BaseApi) LoadDatabaseFile(c *gin.Context) {
 // @Summary Load mysql remote access
 // @Description 获取 mysql 远程访问权限
 // @Accept json
-// @Param request body dto.OperateByID true "request"
+// @Param request body dto.OperationWithNameAndType true "request"
 // @Success 200 {boolean} isRemote
 // @Security ApiKeyAuth
 // @Router /databases/remote [post]
 func (b *BaseApi) LoadRemoteAccess(c *gin.Context) {
-	var req dto.OperateByID
+	var req dto.OperationWithNameAndType
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -383,12 +383,12 @@ func (b *BaseApi) LoadRemoteAccess(c *gin.Context) {
 // @Summary Load mysql status info
 // @Description 获取 mysql 状态信息
 // @Accept json
-// @Param request body dto.OperateByID true "request"
+// @Param request body dto.OperationWithNameAndType true "request"
 // @Success 200 {object} dto.MysqlStatus
 // @Security ApiKeyAuth
 // @Router /databases/status [post]
 func (b *BaseApi) LoadStatus(c *gin.Context) {
-	var req dto.OperateByID
+	var req dto.OperationWithNameAndType
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -406,12 +406,12 @@ func (b *BaseApi) LoadStatus(c *gin.Context) {
 // @Summary Load mysql variables info
 // @Description 获取 mysql 性能参数信息
 // @Accept json
-// @Param request body dto.OperateByID true "request"
+// @Param request body dto.OperationWithNameAndType true "request"
 // @Success 200 {object} dto.MysqlVariables
 // @Security ApiKeyAuth
 // @Router /databases/variables [post]
 func (b *BaseApi) LoadVariables(c *gin.Context) {
-	var req dto.OperateByID
+	var req dto.OperationWithNameAndType
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return

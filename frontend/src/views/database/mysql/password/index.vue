@@ -79,7 +79,7 @@ const changeForm = reactive({
     id: 0,
     from: '',
     type: '',
-    databaseID: 0,
+    database: '',
     mysqlName: '',
     userName: '',
     password: '',
@@ -109,7 +109,7 @@ interface DialogProps {
     id: number;
     from: string;
     type: string;
-    databaseID: number;
+    database: string;
     mysqlName: string;
     username: string;
     password: string;
@@ -126,7 +126,7 @@ const acceptParams = (params: DialogProps): void => {
     changeForm.id = params.id;
     changeForm.from = params.from;
     changeForm.type = params.type;
-    changeForm.databaseID = params.databaseID;
+    changeForm.database = params.database;
     changeForm.mysqlName = params.mysqlName;
     changeForm.userName = params.username;
     changeForm.password = params.password;
@@ -150,7 +150,7 @@ const submitChangeInfo = async (formEl: FormInstance | undefined) => {
             id: changeForm.id,
             from: changeForm.from,
             type: changeForm.type,
-            databaseID: changeForm.databaseID,
+            database: changeForm.database,
             value: '',
         };
         if (changeForm.operation === 'password') {
@@ -202,7 +202,7 @@ const onSubmit = async () => {
         id: changeForm.id,
         from: changeForm.from,
         type: changeForm.type,
-        databaseID: changeForm.databaseID,
+        database: changeForm.database,
         value: changeForm.password,
     };
     loading.value = true;

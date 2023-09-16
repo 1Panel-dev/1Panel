@@ -79,18 +79,15 @@ const variables = reactive({
 const currentDB = reactive({
     type: '',
     database: '',
-    databaseID: 0,
 });
 interface DialogProps {
     type: string;
     database: string;
-    databaseID: number;
     variables: Database.MysqlVariables;
 }
 const acceptParams = async (params: DialogProps): Promise<void> => {
     currentDB.type = params.type;
     currentDB.database = params.database;
-    currentDB.databaseID = params.databaseID;
     variables.slow_query_log = params.variables.slow_query_log;
     variables.long_query_time = Number(params.variables.long_query_time);
 
@@ -152,7 +149,8 @@ const onSave = async () => {
         param.push({ param: 'slow_query_log_file', value: '/var/lib/mysql/1Panel-slow.log' });
     }
     let params = {
-        databaseID: currentDB.databaseID,
+        type: currentDB.type,
+        database: currentDB.database,
         variables: param,
     };
     emit('loading', true);

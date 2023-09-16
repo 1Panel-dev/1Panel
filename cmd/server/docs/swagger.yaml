@@ -131,8 +131,8 @@ definitions:
     type: object
   dto.ChangeDBInfo:
     properties:
-      databaseID:
-        type: integer
+      database:
+        type: string
       from:
         enum:
         - local
@@ -148,7 +148,7 @@ definitions:
       value:
         type: string
     required:
-    - databaseID
+    - database
     - from
     - type
     - value
@@ -1241,17 +1241,23 @@ definitions:
     type: object
   dto.MysqlConfUpdateByFile:
     properties:
-      databaseID:
-        type: integer
+      database:
+        type: string
       file:
         type: string
+      type:
+        enum:
+        - mysql
+        - mariadb
+        type: string
     required:
-    - databaseID
+    - database
+    - type
     type: object
   dto.MysqlDBCreate:
     properties:
-      databaseID:
-        type: integer
+      database:
+        type: string
       description:
         type: string
       format:
@@ -1275,7 +1281,7 @@ definitions:
       username:
         type: string
     required:
-    - databaseID
+    - database
     - format
     - from
     - name
@@ -1285,29 +1291,44 @@ definitions:
     type: object
   dto.MysqlDBDelete:
     properties:
+      database:
+        type: string
       deleteBackup:
         type: boolean
       forceDelete:
         type: boolean
       id:
         type: integer
+      type:
+        enum:
+        - mysql
+        - mariadb
+        type: string
     required:
+    - database
     - id
+    - type
     type: object
   dto.MysqlDBDeleteCheck:
     properties:
-      databaseID:
-        type: integer
+      database:
+        type: string
       id:
         type: integer
+      type:
+        enum:
+        - mysql
+        - mariadb
+        type: string
     required:
-    - databaseID
+    - database
     - id
+    - type
     type: object
   dto.MysqlDBSearch:
     properties:
-      databaseID:
-        type: integer
+      database:
+        type: string
       info:
         type: string
       order:
@@ -1319,16 +1340,33 @@ definitions:
       pageSize:
         type: integer
     required:
-    - databaseID
+    - database
     - page
     - pageSize
+    type: object
+  dto.MysqlLoadDB:
+    properties:
+      database:
+        type: string
+      from:
+        enum:
+        - local
+        - remote
+        type: string
+      type:
+        enum:
+        - mysql
+        - mariadb
+        type: string
+    required:
+    - database
+    - from
+    - type
     type: object
   dto.MysqlOption:
     properties:
       database:
         type: string
-      databaseID:
-        type: integer
       from:
         type: string
       id:
@@ -1452,14 +1490,20 @@ definitions:
     type: object
   dto.MysqlVariablesUpdate:
     properties:
-      databaseID:
-        type: integer
+      database:
+        type: string
+      type:
+        enum:
+        - mysql
+        - mariadb
+        type: string
       variables:
         items:
           $ref: '#/definitions/dto.MysqlVariablesUpdateHelper'
         type: array
     required:
-    - databaseID
+    - database
+    - type
     type: object
   dto.MysqlVariablesUpdateHelper:
     properties:
@@ -3972,6 +4016,8 @@ definitions:
         type: boolean
       end:
         type: boolean
+      path:
+        type: string
     type: object
   response.WebsiteNginxConfig:
     properties:
@@ -6368,7 +6414,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.OperateByID'
+          $ref: '#/definitions/dto.OperationWithNameAndType'
       responses:
         "200":
           description: OK
@@ -6739,7 +6785,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.OperateByID'
+          $ref: '#/definitions/dto.MysqlLoadDB'
       responses: {}
       security:
       - ApiKeyAuth: []
@@ -6966,7 +7012,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.OperateByID'
+          $ref: '#/definitions/dto.OperationWithNameAndType'
       responses:
         "200":
           description: OK
@@ -7010,7 +7056,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.OperateByID'
+          $ref: '#/definitions/dto.OperationWithNameAndType'
       responses:
         "200":
           description: OK
@@ -7032,7 +7078,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.OperateByID'
+          $ref: '#/definitions/dto.OperationWithNameAndType'
       responses:
         "200":
           description: OK

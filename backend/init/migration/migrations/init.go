@@ -2,7 +2,6 @@ package migrations
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
@@ -572,76 +571,45 @@ var AddTableFirewall = &gormigrate.Migration{
 var AddDatabases = &gormigrate.Migration{
 	ID: "20230831-add-databases",
 	Migrate: func(tx *gorm.DB) error {
-		var (
-			backups   []model.BackupRecord
-			databases []model.Database
-		)
-		_ = tx.Where("type = ? OR type = ?", "mysql", "mariadb").Find(&backups).Error
-		_ = tx.Where("from = ?", "remote").Find(&databases).Error
-		_ = tx.Where("name = ? AND address = ? AND type = ?", "local", "127.0.0.1", "mysql").Delete(&model.Database{}).Error
-		for _, backup := range backups {
-			for _, database := range databases {
-				if backup.Name == database.Name && backup.Type == database.Type {
-					_ = tx.Model(&model.BackupRecord{}).Where("id = ?", backup.ID).Updates(map[string]interface{}{
-						"name": fmt.Sprintf("%v", database.ID),
-					}).Error
-					break
-				}
-			}
-		}
 		installRepo := repo.NewIAppInstallRepo()
-		mysql := addDatabaseData("mysql", installRepo)
+		_ = tx.Where("name = ? AND address = ?", "local", "127.0.0.1").Delete(&model.Database{}).Error
+		mysql := addDatabaseData(tx, installRepo, "mysql")
 		if mysql.AppInstallID != 0 {
 			if err := tx.Create(mysql).Error; err != nil {
 				return err
 			}
 		}
-		mariadb := addDatabaseData("mariadb", installRepo)
+		mariadb := addDatabaseData(tx, installRepo, "mariadb")
 		if mariadb.AppInstallID != 0 {
 			if err := tx.Create(mariadb).Error; err != nil {
 				return err
 			}
 		}
-		redis := addDatabaseData("redis", installRepo)
+		redis := addDatabaseData(tx, installRepo, "redis")
 		if redis.AppInstallID != 0 {
 			if err := tx.Create(redis).Error; err != nil {
 				return err
 			}
 		}
-		postgresql := addDatabaseData("postgresql", installRepo)
+		postgresql := addDatabaseData(tx, installRepo, "postgresql")
 		if postgresql.AppInstallID != 0 {
 			if err := tx.Create(postgresql).Error; err != nil {
 				return err
 			}
 		}
-		mongodb := addDatabaseData("mongodb", installRepo)
+		mongodb := addDatabaseData(tx, installRepo, "mongodb")
 		if mongodb.AppInstallID != 0 {
 			if err := tx.Create(mongodb).Error; err != nil {
 				return err
 			}
 		}
-		memcached := addDatabaseData("memcached", installRepo)
+		memcached := addDatabaseData(tx, installRepo, "memcached")
 		if memcached.AppInstallID != 0 {
 			if err := tx.Create(memcached).Error; err != nil {
 				return err
 			}
 		}
 
-		_ = tx.Where("type = ? OR type = ?", "mysql", "mariadb").Find(&backups).Error
-		_ = tx.Where("from = ?", "local").Find(&databases).Error
-		for _, backup := range backups {
-			if _, err := strconv.Atoi(backup.Name); err == nil {
-				continue
-			}
-			for _, database := range databases {
-				if backup.Name == database.Name && backup.Type == database.Type {
-					_ = tx.Model(&model.BackupRecord{}).Where("id = ?", backup.ID).Updates(map[string]interface{}{
-						"name": fmt.Sprintf("%v", database.ID),
-					}).Error
-					break
-				}
-			}
-		}
 		return nil
 	},
 }
@@ -715,80 +683,61 @@ var DropDatabaseLocal = &gormigrate.Migration{
 	},
 }
 
-var AddDatabaseID = &gormigrate.Migration{
-	ID: "20230914-add-database-id",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.DatabaseMysql{}, &model.Database{}); err != nil {
-			return err
-		}
-		var (
-			mysqls    []model.DatabaseMysql
-			databases []model.Database
-		)
-		_ = tx.Find(&mysqls).Error
-		if len(mysqls) == 0 {
-			return nil
-		}
-		_ = tx.Find(&databases).Error
-		for _, mysql := range mysqls {
-			for _, database := range databases {
-				if mysql.MysqlName == database.Name && mysql.From == database.From {
-					if err := tx.Model(&model.DatabaseMysql{}).Where("id = ?", mysql.ID).Updates(map[string]interface{}{
-						"database_id": database.ID,
-					}).Error; err != nil {
-						return err
-					}
-					break
-				}
-			}
-		}
-		return nil
-	},
-}
-
-var UpdataBackupRecord = &gormigrate.Migration{
-	ID: "20230915-update-backup-record",
-	Migrate: func(tx *gorm.DB) error {
-		var (
-			backups   []model.BackupRecord
-			databases []model.Database
-		)
-		_ = tx.Where("type = ? OR type = ?", "mysql", "mariadb").Find(&backups).Error
-		_ = tx.Find(&databases).Error
-		for _, backup := range backups {
-			if _, err := strconv.Atoi(backup.Name); err == nil {
-				continue
-			}
-			for _, database := range databases {
-				if backup.Name == database.Name && backup.Type == database.Type {
-					_ = tx.Model(&model.BackupRecord{}).Where("id = ?", backup.ID).Updates(map[string]interface{}{
-						"name": fmt.Sprintf("%v", database.ID),
-					}).Error
-					break
-				}
-			}
-		}
-		return nil
-	},
-}
-
-func addDatabaseData(appType string, installRepo repo.IAppInstallRepo) *model.Database {
+func addDatabaseData(tx *gorm.DB, installRepo repo.IAppInstallRepo, appType string) *model.Database {
 	dbInfo, err := installRepo.LoadBaseInfo(appType, "")
-	if err == nil {
-		if appType == "mysql" || appType == "redis" || appType == "mariadb" || appType == "memcached" {
-			dbInfo.UserName = "root"
+	if err != nil {
+		return &model.Database{}
+	}
+
+	if appType == "mysql" || appType == "redis" || appType == "mariadb" || appType == "memcached" {
+		dbInfo.UserName = "root"
+	}
+	database := &model.Database{
+		AppInstallID: dbInfo.ID,
+		Name:         dbInfo.Name,
+		Type:         appType,
+		Version:      dbInfo.Version,
+		From:         "local",
+		Address:      dbInfo.ServiceName,
+		Port:         service.DatabaseKeys[appType],
+		Username:     dbInfo.UserName,
+		Password:     dbInfo.Password,
+	}
+	var dbItem model.Database
+	_ = global.DB.Where("name = ?", dbInfo.Name).First(&dbItem).Error
+	if dbItem.ID != 0 {
+		if appType == "mysql" {
+			var (
+				backups []model.BackupRecord
+				mysqls  []model.DatabaseMysql
+			)
+			_ = tx.Where("name = ? AND type = ?", dbItem.Name, "mysql").Find(&backups)
+			_ = tx.Where("`from` = ?", "local").Find(&mysqls)
+			for _, item := range backups {
+				isLocal := false
+				for _, mysql := range mysqls {
+					if item.Name == mysql.MysqlName && item.DetailName == mysql.Name {
+						isLocal = true
+						break
+					}
+				}
+				if !isLocal {
+					_ = tx.Model(&model.BackupRecord{}).Where("id = ?", item.ID).Updates(map[string]interface{}{
+						"name": "remote-" + dbItem.Name,
+					}).Error
+				}
+			}
 		}
-		return &model.Database{
-			AppInstallID: dbInfo.ID,
-			Name:         dbInfo.Name,
-			Type:         appType,
-			Version:      dbInfo.Version,
-			From:         "local",
-			Address:      dbInfo.ServiceName,
-			Port:         service.DatabaseKeys[appType],
-			Username:     dbInfo.UserName,
-			Password:     dbInfo.Password,
+		if err := tx.Debug().Model(&model.DatabaseMysql{}).Where("mysql_name = ? AND `from` != ?", dbItem.Name, "local").Updates(map[string]interface{}{
+			"mysql_name": "remote-" + dbItem.Name,
+		}).Error; err != nil {
+			fmt.Println(err)
+		}
+		if err := tx.Debug().Model(&model.Database{}).Where("name = ?", dbItem.Name).Updates(map[string]interface{}{
+			"name": "remote-" + dbItem.Name,
+		}).Error; err != nil {
+			fmt.Println(err)
 		}
 	}
-	return &model.Database{}
+	return database
 }

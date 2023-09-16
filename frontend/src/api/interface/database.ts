@@ -1,17 +1,23 @@
+import { ReqPage } from '.';
+
 export namespace Database {
     export interface SearchDBWithPage {
         info: string;
-        databaseID: number;
+        database: string;
         page: number;
         pageSize: number;
         orderBy?: string;
         order?: string;
     }
+    export interface SearchBackupRecord extends ReqPage {
+        mysqlName: string;
+        dbName: string;
+    }
     export interface MysqlDBInfo {
         id: number;
         createdAt: Date;
         name: string;
-        databaseID: number;
+        mysqlName: string;
         from: string;
         format: string;
         username: string;
@@ -28,25 +34,34 @@ export namespace Database {
         containerName: string;
     }
     export interface MysqlConfUpdateByFile {
-        databaseID: number;
+        type: string;
+        database: string;
         file: string;
     }
     export interface MysqlDBCreate {
         name: string;
         from: string;
-        databaseID: number;
+        database: string;
         format: string;
         username: string;
         password: string;
         permission: string;
         description: string;
     }
+    export interface MysqlLoadDB {
+        from: string;
+        type: string;
+        database: string;
+    }
     export interface MysqlDBDeleteCheck {
         id: number;
-        databaseID: number;
+        type: string;
+        database: string;
     }
     export interface MysqlDBDelete {
         id: number;
+        type: string;
+        database: string;
         forceDelete: boolean;
         deleteBackup: boolean;
     }
@@ -71,7 +86,8 @@ export namespace Database {
         long_query_time: number;
     }
     export interface VariablesUpdate {
-        databaseID: number;
+        type: string;
+        database: string;
         variables: Array<VariablesUpdateHelper>;
     }
     export interface VariablesUpdateHelper {
@@ -119,7 +135,6 @@ export namespace Database {
         id: number;
         from: string;
         type: string;
-        databaseID: number;
         database: string;
         name: string;
     }
@@ -127,7 +142,7 @@ export namespace Database {
         id: number;
         from: string;
         type: string;
-        databaseID: number;
+        database: string;
         value: string;
     }
 

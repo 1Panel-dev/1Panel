@@ -111,7 +111,7 @@ func handleAppBackup(install *model.AppInstall, backupDir, fileName string) erro
 			if err != nil {
 				return err
 			}
-			if err := handleMysqlBackup(db.DatabaseID, db.Name, tmpDir, fmt.Sprintf("%s.sql.gz", install.Name)); err != nil {
+			if err := handleMysqlBackup(db.MysqlName, db.Name, tmpDir, fmt.Sprintf("%s.sql.gz", install.Name)); err != nil {
 				return err
 			}
 		}
@@ -190,7 +190,7 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 				return err
 			}
 
-			newDB, envMap, err := reCreateDB(db, resourceApp, oldInstall.Env)
+			newDB, envMap, err := reCreateDB(db.ID, resourceApp, oldInstall.Env)
 			if err != nil {
 				return err
 			}
@@ -205,7 +205,7 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 			_ = appInstallResourceRepo.BatchUpdateBy(map[string]interface{}{"resource_id": newDB.ID}, commonRepo.WithByID(resource.ID))
 
 			if err := handleMysqlRecover(dto.CommonRecover{
-				Name:       fmt.Sprintf("%d", newDB.DatabaseID),
+				Name:       newDB.MysqlName,
 				DetailName: newDB.Name,
 				File:       fmt.Sprintf("%s/%s.sql.gz", tmpPath, install.Name),
 			}, true); err != nil {
@@ -252,10 +252,10 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 	return nil
 }
 
-func reCreateDB(db model.DatabaseMysql, app model.AppInstall, oldEnv string) (*model.DatabaseMysql, map[string]interface{}, error) {
+func reCreateDB(dbID uint, app model.AppInstall, oldEnv string) (*model.DatabaseMysql, map[string]interface{}, error) {
 	mysqlService := NewIMysqlService()
 	ctx := context.Background()
-	_ = mysqlService.Delete(ctx, dto.MysqlDBDelete{ID: db.ID, DeleteBackup: true, ForceDelete: true})
+	_ = mysqlService.Delete(ctx, dto.MysqlDBDelete{ID: dbID, Database: app.Name, Type: app.App.Key, DeleteBackup: true, ForceDelete: true})
 
 	envMap := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(oldEnv), &envMap); err != nil {
@@ -267,7 +267,7 @@ func reCreateDB(db model.DatabaseMysql, app model.AppInstall, oldEnv string) (*m
 	createDB, err := mysqlService.Create(context.Background(), dto.MysqlDBCreate{
 		Name:       oldName,
 		From:       "local",
-		DatabaseID: db.DatabaseID,
+		Database:   app.Name,
 		Format:     "utf8mb4",
 		Username:   oldUser,
 		Password:   oldPassword,
