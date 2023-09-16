@@ -283,9 +283,10 @@ func (r *Remote) SyncDB(version string) ([]SyncDBInfo, error) {
 			continue
 		}
 		dataItem := SyncDBInfo{
-			Name:   dbName,
-			From:   "remote",
-			Format: charsetName,
+			Name:      dbName,
+			From:      "remote",
+			MysqlName: r.Database,
+			Format:    charsetName,
 		}
 		userRows, err := r.Client.Query("select user,host from mysql.db where db = ?", dbName)
 		if err != nil {

@@ -18,7 +18,7 @@
                             :stroke-width="12"
                             :percentage="uploadPrecent"
                         ></el-progress>
-                        <div v-if="type === 'mysql' || type === 'mariadb'" style="width: 80%" class="el-upload__tip">
+                        <div v-if="type === 'mysql'" style="width: 80%" class="el-upload__tip">
                             <span class="input-help">{{ $t('database.supportUpType') }}</span>
                             <span class="input-help">
                                 {{ $t('database.zipFormat') }}
@@ -109,21 +109,18 @@ const upVisiable = ref(false);
 const type = ref();
 const name = ref();
 const detailName = ref();
-const databaseID = ref();
 interface DialogProps {
     type: string;
     name: string;
-    databaseID: string;
     detailName: string;
 }
 const acceptParams = async (params: DialogProps): Promise<void> => {
     type.value = params.type;
     name.value = params.name;
-    databaseID.value = params.databaseID;
     detailName.value = params.detailName;
 
     const pathRes = await loadBaseDir();
-    if (type.value === 'mysql' || type.value === 'mariadb') {
+    if (type.value === 'mysql') {
         title.value = name.value + ' [ ' + detailName.value + ' ]';
     }
     if (type.value === 'website' || type.value === 'app') {
@@ -151,11 +148,10 @@ const search = async () => {
 };
 
 const onRecover = async (row: File.File) => {
-    let nameItem = type.value === 'mysql' || type.value === 'mariadb' ? databaseID.value : name.value;
     let params = {
         source: 'LOCAL',
         type: type.value,
-        name: nameItem,
+        name: name.value,
         detailName: detailName.value,
         file: baseDir.value + row.name,
     };

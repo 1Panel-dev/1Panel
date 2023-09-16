@@ -79,6 +79,7 @@ type RecoverInfo struct {
 type SyncDBInfo struct {
 	Name       string `json:"name"`
 	From       string `json:"from"`
+	MysqlName  string `json:"mysqlName"`
 	Format     string `json:"format"`
 	Username   string `json:"username"`
 	Password   string `json:"password"`

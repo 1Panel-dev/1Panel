@@ -292,16 +292,16 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, backup model.Back
 
 	for _, dbInfo := range dbs {
 		var record model.BackupRecord
-		database, _ := databaseRepo.Get(commonRepo.WithByID(dbInfo.DatabaseID))
+
+		database, _ := databaseRepo.Get(commonRepo.WithByName(dbInfo.MysqlName))
 		record.Type = database.Type
 		record.Source = "LOCAL"
 		record.BackupType = backup.Type
 
-		dirName := fmt.Sprintf("%s-%s", database.From, database.Name)
-		record.Name = fmt.Sprintf("%v", database.ID)
-		backupDir := path.Join(localDir, fmt.Sprintf("database/%s/%s/%s", database.Type, dirName, dbInfo.Name))
+		record.Name = dbInfo.MysqlName
+		backupDir := path.Join(localDir, fmt.Sprintf("database/%s/%s/%s", database.Type, record.Name, dbInfo.Name))
 		record.FileName = fmt.Sprintf("db_%s_%s.sql.gz", dbInfo.Name, startTime.Format("20060102150405"))
-		if err = handleMysqlBackup(dbInfo.DatabaseID, dbInfo.Name, backupDir, record.FileName); err != nil {
+		if err = handleMysqlBackup(dbInfo.MysqlName, dbInfo.Name, backupDir, record.FileName); err != nil {
 			return paths, err
 		}
 

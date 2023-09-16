@@ -188,12 +188,10 @@ const variables = ref();
 interface DBProps {
     type: string;
     database: string;
-    databaseID: string;
 }
 const props = withDefaults(defineProps<DBProps>(), {
     type: '',
     database: '',
-    databaseID: '',
 });
 
 const dialogContainerLogRef = ref();
@@ -261,7 +259,8 @@ const getDefaultConfig = async () => {
 
 const onSubmitChangeConf = async () => {
     let param = {
-        databaseID: Number(props.databaseID),
+        type: props.type,
+        database: props.database,
         file: mysqlConf.value,
     };
     loading.value = true;
@@ -291,7 +290,7 @@ const loadContainerLog = async (containerID: string) => {
 };
 
 const loadBaseInfo = async () => {
-    const res = await loadMysqlBaseInfo(Number(props.databaseID));
+    const res = await loadMysqlBaseInfo(props.type, props.database);
     mysqlName.value = res.data?.name;
     baseInfo.port = res.data?.port;
     baseInfo.containerID = res.data?.containerName;
@@ -304,22 +303,23 @@ const changeLoading = (status: boolean) => {
 };
 
 const loadVariables = async () => {
-    const res = await loadMysqlVariables(Number(props.databaseID));
+    const res = await loadMysqlVariables(props.type, props.database);
     variables.value = res.data;
     variablesRef.value!.acceptParams({
-        databaseID: Number(props.databaseID),
+        type: props.type,
+        database: props.database,
         mysqlVersion: mysqlVersion.value,
         variables: res.data,
     });
 };
 
 const loadSlowLogs = async () => {
-    const res = await loadMysqlVariables(Number(props.databaseID));
+    const res = await loadMysqlVariables(props.type, props.database);
     variables.value = res.data;
+
     let param = {
         type: props.type,
         database: props.database,
-        databaseID: Number(props.databaseID),
         variables: variables.value,
     };
     slowLogRef.value!.acceptParams(param);
@@ -351,7 +351,7 @@ const onLoadInfo = async () => {
         if (mysqlStatus.value === 'Running') {
             loadVariables();
             loadSlowLogs();
-            statusRef.value!.acceptParams({ databaseID: Number(props.databaseID) });
+            statusRef.value!.acceptParams({ type: props.type, database: props.database });
         }
     });
 };

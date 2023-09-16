@@ -164,7 +164,7 @@
             </template>
         </LayoutContent>
 
-        <div v-if="!currentDB?.id">
+        <div v-if="dbOptionsLocal.length === 0 && dbOptionsRemote.length === 0">
             <LayoutContent :title="'MySQL ' + $t('menu.database')" :divider="true">
                 <template #main>
                     <div class="app-warn">
@@ -285,7 +285,6 @@ const onOpenDialog = async () => {
         from: currentDB.value.from,
         type: currentDB.value.type,
         database: currentDBName.value,
-        databaseID: currentDB.value.id,
     };
     dialogRef.value!.acceptParams(params);
 };
@@ -299,8 +298,7 @@ const onChangeConn = async () => {
     connRef.value!.acceptParams({
         from: currentDB.value.from,
         type: currentDB.value.type,
-        databaseID: currentDB.value.id,
-        database: currentDB.value.database,
+        database: currentDBName.value,
     });
 };
 
@@ -317,10 +315,7 @@ const onSetting = async () => {
     if (currentDB.value) {
         globalStore.setCurrentDB(currentDB.value.database);
     }
-    router.push({
-        name: 'MySQL-Setting',
-        params: { type: currentDB.value.type, database: currentDB.value.database, databaseID: currentDB.value.id },
-    });
+    router.push({ name: 'MySQL-Setting', params: { type: currentDB.value.type, database: currentDB.value.database } });
 };
 
 const changeDatabase = async () => {
@@ -349,7 +344,7 @@ const search = async (column?: any) => {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
         info: searchName.value,
-        databaseID: currentDB.value.id,
+        database: currentDB.value.database,
         orderBy: paginationConfig.orderBy,
         order: paginationConfig.order,
     };
@@ -365,7 +360,12 @@ const loadDB = async () => {
         type: 'info',
     }).then(async () => {
         loading.value = true;
-        await loadDBFromRemote(currentDB.value.id)
+        let params = {
+            from: currentDB.value.from,
+            type: currentDB.value.type,
+            database: currentDBName.value,
+        };
+        await loadDBFromRemote(params)
             .then(() => {
                 loading.value = false;
                 search();
@@ -464,7 +464,8 @@ const onCopy = async (row: any) => {
 const onDelete = async (row: Database.MysqlDBInfo) => {
     let param = {
         id: row.id,
-        databaseID: currentDB.value.id,
+        type: currentDB.value.type,
+        database: currentDBName.value,
     };
     const res = await deleteCheckMysqlDB(param);
     if (res.data && res.data.length > 0) {
@@ -473,8 +474,8 @@ const onDelete = async (row: Database.MysqlDBInfo) => {
         deleteRef.value.acceptParams({
             id: row.id,
             type: currentDB.value.type,
+            database: currentDBName.value,
             name: row.name,
-            databaseID: currentDB.value.id,
         });
     }
 };
@@ -484,7 +485,8 @@ const onChangePassword = async (row: Database.MysqlDBInfo) => {
         id: row.id,
         from: row.from,
         type: currentDB.value.type,
-        databaseID: currentDB.value.id,
+        database: currentDBName.value,
+        mysqlName: row.name,
         operation: 'password',
         username: row.username,
         password: row.password,
@@ -509,7 +511,8 @@ const buttons = [
                 id: row.id,
                 from: row.from,
                 type: currentDB.value.type,
-                databaseID: currentDB.value.id,
+                database: currentDBName.value,
+                mysqlName: row.name,
                 operation: 'privilege',
                 privilege: '',
                 privilegeIPs: '',
@@ -529,7 +532,7 @@ const buttons = [
         click: (row: Database.MysqlDBInfo) => {
             let params = {
                 type: currentDB.value.type,
-                name: currentDB.value.id + '',
+                name: currentDBName.value,
                 detailName: row.name,
             };
             dialogBackupRef.value!.acceptParams(params);
@@ -540,8 +543,7 @@ const buttons = [
         click: (row: Database.MysqlDBInfo) => {
             let params = {
                 type: currentDB.value.type,
-                name: currentDB.value.from + '-' + currentDB.value.database,
-                databaseID: currentDB.value.id + '',
+                name: currentDBName.value,
                 detailName: row.name,
             };
             uploadRef.value!.acceptParams(params);

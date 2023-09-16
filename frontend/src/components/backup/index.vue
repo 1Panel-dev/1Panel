@@ -3,13 +3,7 @@
         <el-drawer v-model="backupVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
             <template #header>
                 <DrawerHeader
-                    v-if="type === 'mysql' || type == 'mariadb'"
-                    :header="$t('commons.button.backup')"
-                    :resource="detailName"
-                    :back="handleClose"
-                />
-                <DrawerHeader
-                    v-else-if="detailName"
+                    v-if="detailName"
                     :header="$t('commons.button.backup')"
                     :resource="name + '(' + detailName + ')'"
                     :back="handleClose"

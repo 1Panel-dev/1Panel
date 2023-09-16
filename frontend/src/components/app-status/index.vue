@@ -50,7 +50,7 @@
                 </div>
             </el-card>
         </div>
-        <div v-else>
+        <div v-if="!data.isExist && !isDB">
             <LayoutContent :title="getTitle(key)" :divider="true">
                 <template #main>
                     <div class="app-warn">
@@ -132,6 +132,10 @@ const setting = () => {
 
 const goRouter = async (key: string) => {
     router.push({ name: 'AppAll', query: { install: key } });
+};
+
+const isDB = () => {
+    return key.value === 'mysql' || key.value === 'mysql';
 };
 
 const onCheck = async () => {
