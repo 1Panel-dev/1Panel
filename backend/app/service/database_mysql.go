@@ -235,11 +235,11 @@ func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error 
 		return err
 	}
 
-	uploadDir := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/uploads/database/%s/%s/%s", req.Type, req.Database, db.Name))
-	if _, err := os.Stat(uploadDir); err == nil {
-		_ = os.RemoveAll(uploadDir)
-	}
 	if req.DeleteBackup {
+		uploadDir := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/uploads/database/%s/%s/%s", req.Type, req.Database, db.Name))
+		if _, err := os.Stat(uploadDir); err == nil {
+			_ = os.RemoveAll(uploadDir)
+		}
 		localDir, err := loadLocalDir()
 		if err != nil && !req.ForceDelete {
 			return err
@@ -248,9 +248,9 @@ func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error 
 		if _, err := os.Stat(backupDir); err == nil {
 			_ = os.RemoveAll(backupDir)
 		}
+		_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType(req.Type), commonRepo.WithByName(req.Database), backupRepo.WithByDetailName(db.Name))
 		global.LOG.Infof("delete database %s-%s backups successful", req.Database, db.Name)
 	}
-	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType(req.Type), commonRepo.WithByName(req.Database), backupRepo.WithByDetailName(db.Name))
 
 	_ = mysqlRepo.Delete(ctx, commonRepo.WithByID(db.ID))
 	return nil
