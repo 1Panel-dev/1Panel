@@ -435,7 +435,7 @@ func (a *AppInstallService) GetServices(key string) ([]response.AppService, erro
 		for _, db := range dbs {
 			service := response.AppService{
 				Label: db.Name,
-				Value: strconv.Itoa(int(db.ID)),
+				Value: db.Name,
 			}
 			if db.AppInstallID > 0 {
 				install, err := appInstallRepo.GetFirst(commonRepo.WithByID(db.AppInstallID))
