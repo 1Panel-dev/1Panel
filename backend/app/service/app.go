@@ -5,6 +5,14 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"path"
+	"reflect"
+	"strconv"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
@@ -19,12 +27,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	http2 "github.com/1Panel-dev/1Panel/backend/utils/http"
 	"gopkg.in/yaml.v3"
-	"io"
-	"net/http"
-	"os"
-	"path"
-	"strconv"
-	"strings"
 )
 
 type AppService struct {
@@ -282,6 +284,12 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 	if err != nil {
 		return
 	}
+	if DatabaseKeys[app.Key] > 0 {
+		if existDatabases, _ := databaseRepo.GetList(commonRepo.WithByName(req.Name)); len(existDatabases) > 0 {
+			err = buserr.New(constant.ErrRemoteExist)
+			return
+		}
+	}
 	for key := range req.Params {
 		if !strings.Contains(key, "PANEL_APP_PORT") {
 			continue
@@ -389,22 +397,13 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 			}
 		}
 	}()
-	if dbHost, ok := req.Params["PANEL_DB_HOST"]; ok {
-		var (
-			databaseID int
-			database   model.Database
-		)
-		databaseID, err = strconv.Atoi(dbHost.(string))
-		if err != nil {
-			return
+	if hostName, ok := req.Params["PANEL_DB_HOST"]; ok {
+		database, _ := databaseRepo.Get(commonRepo.WithByName(hostName.(string)))
+		if !reflect.DeepEqual(database, model.Database{}) {
+			req.Params["PANEL_DB_HOST"] = database.Address
+			req.Params["PANEL_DB_PORT"] = database.Port
+			req.Params["PANEL_DB_HOST_NAME"] = hostName
 		}
-		database, err = databaseRepo.Get(commonRepo.WithByID(uint(databaseID)))
-		if err != nil {
-			return
-		}
-		req.Params["PANEL_DB_HOST"] = database.Address
-		req.Params["PANEL_DB_PORT"] = database.Port
-		req.Params["PANEL_DB_HOST_ID"] = uint(databaseID)
 	}
 	paramByte, err = json.Marshal(req.Params)
 	if err != nil {

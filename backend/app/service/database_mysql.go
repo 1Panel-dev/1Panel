@@ -150,7 +150,7 @@ func (u *MysqlService) LoadFromRemote(req dto.MysqlLoadDB) error {
 		return err
 	}
 
-	databases, err := mysqlRepo.List(databaseRepo.WithByFrom(req.From))
+	databases, err := mysqlRepo.List(mysqlRepo.WithByMysqlName(req.Database))
 	if err != nil {
 		return err
 	}
