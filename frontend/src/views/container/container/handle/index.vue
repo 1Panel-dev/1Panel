@@ -64,7 +64,7 @@ const onConfirm = () => {
             open.value = false;
             loading.value = false;
             em('search');
-            MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .finally(() => {
             open.value = false;
