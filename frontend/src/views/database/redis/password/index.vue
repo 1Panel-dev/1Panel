@@ -92,7 +92,6 @@ const formRef = ref<FormInstance>();
 const acceptParams = (): void => {
     form.value.password = '';
     loadPassword();
-    loadSystemIP();
     dialogVisible.value = true;
 };
 const handleClose = () => {
@@ -114,13 +113,9 @@ const onCopy = async (value: string) => {
 
 const loadPassword = async () => {
     const res = await GetAppConnInfo('redis', '');
+    const settingInfoRes = await getSettingInfo();
     form.value = res.data;
-};
-
-const loadSystemIP = async () => {
-    const res = await getSettingInfo();
-    console.log(res);
-    form.value.systemIP = res.data.systemIP || i18n.global.t('database.localIP');
+    form.value.systemIP = settingInfoRes.data.systemIP || i18n.global.t('database.localIP');
 };
 
 const onSubmit = async () => {
