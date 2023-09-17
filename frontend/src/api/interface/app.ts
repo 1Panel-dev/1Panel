@@ -142,6 +142,7 @@ export namespace App {
         password: string;
         privilege: boolean;
         serviceName: string;
+        systemIP: string;
         port: number;
     }
     export interface AppInstallResource {
