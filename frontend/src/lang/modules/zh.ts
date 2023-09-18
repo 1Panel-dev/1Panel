@@ -1469,7 +1469,7 @@ const message = {
         writing: '响应数(Writing)',
         waiting: '驻留进程(Waiting)',
         status: '当前状态',
-        nginxConfig: 'OpenResty 设置',
+        nginxConfig: '设置',
         configResource: '配置修改',
         saveAndReload: '保存并重载',
     },

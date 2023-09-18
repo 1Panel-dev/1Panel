@@ -6,22 +6,6 @@
         <el-form @submit.prevent v-loading="loading" ref="formRef" :model="form" label-position="top">
             <el-row type="flex" justify="center">
                 <el-col :span="22">
-                    <el-form-item :label="$t('commons.login.password')" :rules="Rules.paramComplexity" prop="password">
-                        <el-input type="password" show-password clearable v-model="form.password">
-                            <template #append>
-                                <el-button @click="onCopy(form.password)">{{ $t('commons.button.copy') }}</el-button>
-                                <el-divider direction="vertical" />
-                                <el-button style="margin-left: 1px" @click="random">
-                                    {{ $t('commons.button.random') }}
-                                </el-button>
-                            </template>
-                        </el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('database.serviceName')" prop="serviceName">
-                        <el-tag>{{ form.serviceName }}</el-tag>
-                        <el-button @click="onCopy(form.serviceName)" icon="DocumentCopy" link></el-button>
-                        <span class="input-help">{{ $t('database.serviceNameHelper') }}</span>
-                    </el-form-item>
                     <el-form-item :label="$t('database.containerConn')">
                         <el-tag>
                             {{ form.serviceName + ':6379' }}
@@ -32,9 +16,23 @@
                         </span>
                     </el-form-item>
                     <el-form-item :label="$t('database.remoteConn')">
-                        <el-tag>{{ form.systemIP + ':' + form.port }}</el-tag>
+                        <el-tooltip v-if="loadConnInfo().length > 48" :content="loadConnInfo()" placement="top">
+                            <el-tag>{{ loadConnInfo().substring(0, 48) }}...</el-tag>
+                        </el-tooltip>
+                        <el-tag v-else>{{ loadConnInfo() }}</el-tag>
                         <el-button @click="onCopy(form.systemIP + ':6379')" icon="DocumentCopy" link></el-button>
                         <span class="input-help">{{ $t('database.remoteConnHelper2') }}</span>
+                    </el-form-item>
+                    <el-form-item :label="$t('commons.login.password')" :rules="Rules.paramComplexity" prop="password">
+                        <el-input type="password" show-password clearable v-model="form.password">
+                            <template #append>
+                                <el-button @click="onCopy(form.password)">{{ $t('commons.button.copy') }}</el-button>
+                                <el-divider direction="vertical" />
+                                <el-button style="margin-left: 1px" @click="random">
+                                    {{ $t('commons.button.random') }}
+                                </el-button>
+                            </template>
+                        </el-input>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -132,6 +130,10 @@ const onSubmit = async () => {
             loading.value = false;
         });
 };
+
+function loadConnInfo() {
+    return form.value.systemIP + ':' + form.value.port;
+}
 
 const onSave = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;

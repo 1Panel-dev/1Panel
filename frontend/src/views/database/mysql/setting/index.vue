@@ -2,58 +2,54 @@
     <div v-loading="loading">
         <LayoutContent>
             <template #title>
-                <back-button
-                    name="MySQL"
-                    :header="
-                        props.database +
-                        ' [' +
-                        (props.type === 'mysql' ? 'MySQL' : 'MariaDB') +
-                        '] - ' +
-                        $t('commons.button.set')
-                    "
-                />
+                <back-button name="MySQL" :header="props.database + ' ' + $t('commons.button.set')">
+                    <template #buttons>
+                        <el-button type="primary" :plain="activeName !== 'conf'" @click="jumpToConf">
+                            {{ $t('database.confChange') }}
+                        </el-button>
+                        <el-button
+                            type="primary"
+                            :disabled="mysqlStatus !== 'Running'"
+                            :plain="activeName !== 'status'"
+                            @click="activeName = 'status'"
+                        >
+                            {{ $t('database.currentStatus') }}
+                        </el-button>
+                        <el-button
+                            type="primary"
+                            :disabled="mysqlStatus !== 'Running'"
+                            :plain="activeName !== 'tuning'"
+                            @click="activeName = 'tuning'"
+                        >
+                            {{ $t('database.performanceTuning') }}
+                        </el-button>
+                        <el-button type="primary" :plain="activeName !== 'port'" @click="activeName = 'port'">
+                            {{ $t('commons.table.port') }}
+                        </el-button>
+                        <el-button
+                            type="primary"
+                            :disabled="mysqlStatus !== 'Running'"
+                            :plain="activeName !== 'log'"
+                            @click="activeName = 'log'"
+                        >
+                            {{ $t('database.log') }}
+                        </el-button>
+                        <el-button
+                            type="primary"
+                            :disabled="mysqlStatus !== 'Running'"
+                            @click="jumpToSlowlog"
+                            :plain="activeName !== 'slowLog'"
+                        >
+                            {{ $t('database.slowLog') }}
+                        </el-button>
+                    </template>
+                </back-button>
             </template>
 
-            <template #toolbar>
-                <el-button type="primary" :plain="activeName !== 'conf'" @click="jumpToConf">
-                    {{ $t('database.confChange') }}
-                </el-button>
-                <el-button
-                    type="primary"
-                    :disabled="mysqlStatus !== 'Running'"
-                    :plain="activeName !== 'status'"
-                    @click="activeName = 'status'"
-                >
-                    {{ $t('database.currentStatus') }}
-                </el-button>
-                <el-button
-                    type="primary"
-                    :disabled="mysqlStatus !== 'Running'"
-                    :plain="activeName !== 'tuning'"
-                    @click="activeName = 'tuning'"
-                >
-                    {{ $t('database.performanceTuning') }}
-                </el-button>
-                <el-button type="primary" :plain="activeName !== 'port'" @click="activeName = 'port'">
-                    {{ $t('commons.table.port') }}
-                </el-button>
-                <el-button
-                    type="primary"
-                    :disabled="mysqlStatus !== 'Running'"
-                    :plain="activeName !== 'log'"
-                    @click="activeName = 'log'"
-                >
-                    {{ $t('database.log') }}
-                </el-button>
-                <el-button
-                    type="primary"
-                    :disabled="mysqlStatus !== 'Running'"
-                    @click="jumpToSlowlog"
-                    :plain="activeName !== 'slowLog'"
-                >
-                    {{ $t('database.slowLog') }}
-                </el-button>
+            <template #app>
+                <AppStatus :app-key="props.type" :app-name="props.database" v-model:loading="loading" />
             </template>
+
             <template #main>
                 <div v-if="activeName === 'conf'">
                     <codemirror

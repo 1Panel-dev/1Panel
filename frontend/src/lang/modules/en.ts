@@ -1544,7 +1544,7 @@ const message = {
         writing: 'Number of Responses (Writing)',
         waiting: 'resident process (Waiting)',
         status: 'Current Status',
-        nginxConfig: 'OpenResty Settings',
+        nginxConfig: 'Settings',
         configResource: 'Configuration',
         saveAndReload: 'Save and Reload',
     },
