@@ -5,7 +5,7 @@
             :placeholder="$t('commons.msg.noneData')"
             :indent-with-tab="true"
             :tabSize="4"
-            style="margin-top: 10px; max-height: 700px"
+            style="max-height: 700px"
             :lineWrapping="true"
             :matchBrackets="true"
             theme="cobalt"
@@ -13,11 +13,9 @@
             :extensions="extensions"
             v-model="content"
         />
-        <div style="margin-top: 10px">
-            <el-button type="primary" @click="submit()">
-                {{ $t('nginx.saveAndReload') }}
-            </el-button>
-        </div>
+        <el-button type="primary" @click="submit()" class="mt-2.5">
+            {{ $t('nginx.saveAndReload') }}
+        </el-button>
     </div>
 </template>
 <script lang="ts" setup>
