@@ -63,44 +63,60 @@
                                 </el-col>
                             </el-row>
                         </el-form-item>
-                        <el-form-item :label="$t('runtime.image')" prop="image">
-                            <el-input v-model="runtime.image"></el-input>
-                        </el-form-item>
                         <div v-if="initParam">
-                            <el-form-item v-if="runtime.type === 'php'">
-                                <el-alert :title="$t('runtime.buildHelper')" type="warning" :closable="false" />
-                            </el-form-item>
-                            <Params
-                                v-if="mode === 'create'"
-                                v-model:form="runtime.params"
-                                v-model:params="appParams"
-                                v-model:rules="rules"
-                            ></Params>
-                            <EditParams
-                                v-if="mode === 'edit'"
-                                v-model:form="runtime.params"
-                                v-model:params="editParams"
-                                v-model:rules="rules"
-                            ></EditParams>
-                            <el-form-item v-if="runtime.type === 'php'">
-                                <el-alert type="info" :closable="false">
-                                    <span>{{ $t('runtime.extendHelper') }}</span>
-                                    <span v-html="$t('runtime.phpPluginHelper')"></span>
-                                    <br />
-                                </el-alert>
-                            </el-form-item>
-                            <div v-if="runtime.type === 'php' && mode == 'edit'">
+                            <div v-if="runtime.type === 'php'">
+                                <el-form-item :label="$t('runtime.image')" prop="image">
+                                    <el-input v-model="runtime.image"></el-input>
+                                </el-form-item>
+                                <el-form-item :label="$t('runtime.source')" prop="source">
+                                    <el-select v-model="runtime.source" filterable allow-create default-first-option>
+                                        <el-option
+                                            v-for="(source, index) in phpSources"
+                                            :key="index"
+                                            :label="source.label + ' [' + source.value + ']'"
+                                            :value="source.value"
+                                        ></el-option>
+                                    </el-select>
+                                    <span class="input-help">
+                                        {{ $t('runtime.phpsourceHelper') }}
+                                    </span>
+                                </el-form-item>
+
+                                <Params
+                                    v-if="mode === 'create'"
+                                    v-model:form="runtime.params"
+                                    v-model:params="appParams"
+                                    v-model:rules="rules"
+                                ></Params>
+                                <EditParams
+                                    v-if="mode === 'edit'"
+                                    v-model:form="runtime.params"
+                                    v-model:params="editParams"
+                                    v-model:rules="rules"
+                                ></EditParams>
                                 <el-form-item>
-                                    <el-checkbox v-model="runtime.rebuild">
-                                        {{ $t('runtime.rebuild') }}
-                                    </el-checkbox>
+                                    <el-alert :title="$t('runtime.buildHelper')" type="warning" :closable="false" />
                                 </el-form-item>
                                 <el-form-item>
                                     <el-alert type="info" :closable="false">
-                                        <span>{{ $t('runtime.rebuildHelper') }}</span>
+                                        <span>{{ $t('runtime.extendHelper') }}</span>
+                                        <span v-html="$t('runtime.phpPluginHelper')"></span>
                                         <br />
                                     </el-alert>
                                 </el-form-item>
+                                <div v-if="mode == 'edit'">
+                                    <el-form-item>
+                                        <el-checkbox v-model="runtime.rebuild">
+                                            {{ $t('runtime.rebuild') }}
+                                        </el-checkbox>
+                                    </el-form-item>
+                                    <el-form-item>
+                                        <el-alert type="info" :closable="false">
+                                            <span>{{ $t('runtime.rebuildHelper') }}</span>
+                                            <br />
+                                        </el-alert>
+                                    </el-form-item>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -160,22 +176,58 @@ const appReq = reactive({
     page: 1,
     pageSize: 20,
 });
-const runtime = ref<Runtime.RuntimeCreate>({
+const initData = (type: string) => ({
     name: '',
     appDetailId: undefined,
     image: '',
     params: {},
-    type: 'php',
+    type: type,
     resource: 'appstore',
     rebuild: false,
+    source: 'mirrors.ustc.edu.cn',
 });
+
+let runtime = reactive<Runtime.RuntimeCreate>(initData('php'));
+
 const rules = ref<any>({
     name: [Rules.appName],
     resource: [Rules.requiredInput],
     appId: [Rules.requiredSelect],
     version: [Rules.requiredInput, Rules.paramCommon],
     image: [Rules.requiredInput, Rules.imageName],
+    source: [Rules.requiredSelect],
 });
+
+const phpSources = [
+    {
+        label: i18n.global.t('runtime.ustc'),
+        value: 'mirrors.ustc.edu.cn',
+    },
+    {
+        label: i18n.global.t('runtime.netease'),
+        value: 'mirrors.163.com',
+    },
+    {
+        label: i18n.global.t('runtime.aliyun'),
+        value: 'mirrors.aliyun.com',
+    },
+    {
+        label: i18n.global.t('runtime.tsinghua'),
+        value: 'mirrors.tuna.tsinghua.edu.cn',
+    },
+    {
+        label: i18n.global.t('runtime.xtomhk'),
+        value: 'mirrors.xtom.com.hk',
+    },
+    {
+        label: i18n.global.t('runtime.xtom'),
+        value: 'mirrors.xtom.com',
+    },
+    {
+        label: i18n.global.t('runtime.default'),
+        value: 'dl-cdn.alpinelinux.org',
+    },
+];
 
 const em = defineEmits(['close']);
 
@@ -186,12 +238,12 @@ const handleClose = () => {
 
 const changeResource = (resource: string) => {
     if (resource === 'local') {
-        runtime.value.appDetailId = undefined;
-        runtime.value.version = '';
-        runtime.value.params = {};
-        runtime.value.image = '';
+        runtime.appDetailId = undefined;
+        runtime.version = '';
+        runtime.params = {};
+        runtime.image = '';
     } else {
-        runtime.value.version = '';
+        runtime.version = '';
         searchApp(null);
     }
 };
@@ -201,7 +253,7 @@ const searchApp = (appId: number) => {
         apps.value = res.data.items || [];
         if (res.data && res.data.items && res.data.items.length > 0) {
             if (appId == null) {
-                runtime.value.appId = res.data.items[0].id;
+                runtime.appId = res.data.items[0].id;
                 getApp(res.data.items[0].key, mode.value);
             } else {
                 res.data.items.forEach((item) => {
@@ -227,10 +279,10 @@ const changeApp = (appId: number) => {
 const changeVersion = () => {
     loading.value = true;
     initParam.value = false;
-    GetAppDetail(runtime.value.appId, runtime.value.version, 'runtime')
+    GetAppDetail(runtime.appId, runtime.version, 'runtime')
         .then((res) => {
-            runtime.value.appDetailId = res.data.id;
-            runtime.value.image = res.data.image + ':' + runtime.value.version;
+            runtime.appDetailId = res.data.id;
+            runtime.image = res.data.image + ':' + runtime.version;
             appParams.value = res.data.params;
             initParam.value = true;
         })
@@ -243,7 +295,7 @@ const getApp = (appkey: string, mode: string) => {
     GetApp(appkey).then((res) => {
         appVersions.value = res.data.versions || [];
         if (res.data.versions.length > 0) {
-            runtime.value.version = res.data.versions[0];
+            runtime.version = res.data.versions[0];
             if (mode === 'create') {
                 changeVersion();
             } else {
@@ -261,7 +313,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         }
         if (mode.value == 'create') {
             loading.value = true;
-            CreateRuntime(runtime.value)
+            CreateRuntime(runtime)
                 .then(() => {
                     MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
                     handleClose();
@@ -271,7 +323,7 @@ const submit = async (formEl: FormInstance | undefined) => {
                 });
         } else {
             loading.value = true;
-            UpdateRuntime(runtime.value)
+            UpdateRuntime(runtime)
                 .then(() => {
                     MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
                     handleClose();
@@ -287,7 +339,7 @@ const getRuntime = async (id: number) => {
     try {
         const res = await GetRuntime(id);
         const data = res.data;
-        runtime.value = {
+        Object.assign(runtime, {
             id: data.id,
             name: data.name,
             appDetailId: data.appDetailId,
@@ -298,7 +350,8 @@ const getRuntime = async (id: number) => {
             appId: data.appId,
             version: data.version,
             rebuild: true,
-        };
+            source: data.source,
+        });
         editParams.value = data.appParams;
         if (mode.value == 'create') {
             searchApp(data.appId);
@@ -312,16 +365,10 @@ const acceptParams = async (props: OperateRrops) => {
     mode.value = props.mode;
     initParam.value = false;
     if (props.mode === 'create') {
-        runtime.value = {
-            name: '',
-            appDetailId: undefined,
-            image: '',
-            params: {},
-            type: props.type,
-            resource: 'appstore',
-        };
+        Object.assign(runtime, initData(props.type));
         searchApp(null);
     } else {
+        searchApp(null);
         getRuntime(props.id);
     }
     open.value = true;

@@ -94,7 +94,7 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (err error) {
 			return
 		}
 	}
-	composeContent, envContent, forms, err := handleParams(create.Image, create.Type, newNameDir, create.Params)
+	composeContent, envContent, forms, err := handleParams(create.Image, create.Type, newNameDir, create.Source, create.Params)
 	if err != nil {
 		return
 	}
@@ -197,6 +197,9 @@ func (r *RuntimeService) Get(id uint) (*response.RuntimeRes, error) {
 	if err != nil {
 		return nil, err
 	}
+	if v, ok := envs["CONTAINER_PACKAGE_URL"]; ok {
+		res.Source = v
+	}
 	for _, form := range appForm.FormFields {
 		if v, ok := envs[form.EnvKey]; ok {
 			appParam := response.AppParam{
@@ -252,7 +255,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 		return buserr.New(constant.ErrImageExist)
 	}
 	runtimeDir := path.Join(constant.RuntimeDir, runtime.Type, runtime.Name)
-	composeContent, envContent, _, err := handleParams(req.Image, runtime.Type, runtimeDir, req.Params)
+	composeContent, envContent, _, err := handleParams(req.Image, runtime.Type, runtimeDir, req.Source, req.Params)
 	if err != nil {
 		return err
 	}
