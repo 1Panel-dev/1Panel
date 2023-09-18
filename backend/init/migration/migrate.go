@@ -43,6 +43,8 @@ func Init() {
 		migrations.UpdateDatabase,
 		migrations.UpdateAppInstallResource,
 		migrations.DropDatabaseLocal,
+
+		migrations.AddDefaultNetwork,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

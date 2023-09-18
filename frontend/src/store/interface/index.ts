@@ -24,6 +24,7 @@ export interface GlobalState {
     lastFilePath: string;
     currentDB: string;
     showEntranceWarn: boolean;
+    defaultNetwork: string;
 }
 
 export interface MenuState {

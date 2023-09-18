@@ -340,7 +340,7 @@ const goRouter = async (path: string) => {
 const onLoadNetworkOptions = async () => {
     const res = await getNetworkOptions();
     netOptions.value = res.data;
-    searchInfo.netOption = netOptions.value && netOptions.value[0];
+    searchInfo.netOption = globalStore.defaultNetwork || (netOptions.value && netOptions.value[0]);
 };
 
 const onLoadIOOptions = async () => {
