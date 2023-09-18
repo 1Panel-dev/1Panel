@@ -5,7 +5,7 @@
             :placeholder="$t('commons.msg.noneData')"
             :indent-with-tab="true"
             :tabSize="4"
-            style="margin-top: 10px; max-height: 700px"
+            style="max-height: 700px"
             :lineWrapping="true"
             :matchBrackets="true"
             theme="cobalt"
@@ -13,11 +13,10 @@
             :extensions="extensions"
             v-model="content"
         />
-        <div style="margin-top: 10px">
-            <el-button type="primary" @click="submit()">
-                {{ $t('nginx.saveAndReload') }}
-            </el-button>
-        </div>
+        <el-button type="primary" @click="openUpdate()" class="mt-2.5">
+            {{ $t('nginx.saveAndReload') }}
+        </el-button>
+        <ConfirmDialog ref="confirmDialogRef" @confirm="submit()"></ConfirmDialog>
     </div>
 </template>
 <script lang="ts" setup>
@@ -52,9 +51,10 @@ const id = computed(() => {
     return props.id;
 });
 
-let data = ref<File.File>();
-let loading = ref(false);
-let content = ref('');
+const data = ref<File.File>();
+const loading = ref(false);
+const content = ref('');
+const confirmDialogRef = ref();
 
 const get = () => {
     loading.value = true;
@@ -66,6 +66,14 @@ const get = () => {
         .finally(() => {
             loading.value = false;
         });
+};
+
+const openUpdate = async () => {
+    confirmDialogRef.value!.acceptParams({
+        header: i18n.global.t('database.confChange'),
+        operationInfo: i18n.global.t('database.restartNowHelper'),
+        submitInputInfo: i18n.global.t('database.restartNow'),
+    });
 };
 
 const submit = async () => {

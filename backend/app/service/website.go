@@ -1211,6 +1211,9 @@ func (w WebsiteService) UpdatePHPConfigFile(req request.WebsitePHPFileUpdate) er
 	if err := files.NewFileOp().WriteFile(configPath, strings.NewReader(req.Content), 0755); err != nil {
 		return err
 	}
+	if _, err := compose.Restart(runtimeInstall.GetComposePath()); err != nil {
+		return err
+	}
 	return nil
 }
 
