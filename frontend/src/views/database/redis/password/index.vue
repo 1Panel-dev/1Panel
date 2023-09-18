@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="dialogVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
+    <el-drawer v-model="dialogVisible" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
         <template #header>
             <DrawerHeader :header="$t('database.databaseConnInfo')" :back="handleClose" />
         </template>
@@ -32,7 +32,8 @@
                         </span>
                     </el-form-item>
                     <el-form-item :label="$t('database.remoteConn')">
-                        <el-tag>{{ $t('database.localIP') + ':' + form.port }}</el-tag>
+                        <el-tag>{{ form.systemIP + ':' + form.port }}</el-tag>
+                        <el-button @click="onCopy(form.systemIP + ':6379')" icon="DocumentCopy" link></el-button>
                         <span class="input-help">{{ $t('database.remoteConnHelper2') }}</span>
                     </el-form-item>
                 </el-col>
@@ -43,7 +44,7 @@
 
         <template #footer>
             <span class="dialog-footer">
-                <el-button :disabled="loading" @click="dialogVisiable = false">
+                <el-button :disabled="loading" @click="dialogVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
@@ -67,15 +68,17 @@ import DrawerHeader from '@/components/drawer-header/index.vue';
 import { App } from '@/api/interface/app';
 import { getRandomStr } from '@/utils/util';
 import useClipboard from 'vue-clipboard3';
+import { getSettingInfo } from '@/api/modules/setting';
 const { toClipboard } = useClipboard();
 
 const loading = ref(false);
 
-const dialogVisiable = ref(false);
+const dialogVisible = ref(false);
 const form = ref<App.DatabaseConnInfo>({
     privilege: false,
     password: '',
     serviceName: '',
+    systemIP: '',
     port: 0,
 });
 
@@ -89,10 +92,10 @@ const formRef = ref<FormInstance>();
 const acceptParams = (): void => {
     form.value.password = '';
     loadPassword();
-    dialogVisiable.value = true;
+    dialogVisible.value = true;
 };
 const handleClose = () => {
-    dialogVisiable.value = false;
+    dialogVisible.value = false;
 };
 
 const random = async () => {
@@ -110,7 +113,9 @@ const onCopy = async (value: string) => {
 
 const loadPassword = async () => {
     const res = await GetAppConnInfo('redis', '');
+    const settingInfoRes = await getSettingInfo();
     form.value = res.data;
+    form.value.systemIP = settingInfoRes.data.systemIP || i18n.global.t('database.localIP');
 };
 
 const onSubmit = async () => {
@@ -120,7 +125,7 @@ const onSubmit = async () => {
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            dialogVisiable.value = false;
+            dialogVisible.value = false;
             emit('checkExist');
         })
         .catch(() => {
