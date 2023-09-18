@@ -295,6 +295,7 @@ const loading = ref(false);
 const syncLoading = ref(false);
 let timer: NodeJS.Timer | null = null;
 const paginationConfig = reactive({
+    cacheSizeKey: 'app-installed-page-size',
     currentPage: 1,
     pageSize: 20,
     total: 0,

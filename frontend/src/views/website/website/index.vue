@@ -246,6 +246,7 @@ let dateRefs: Map<number, any> = new Map();
 let groups = ref<Group.GroupInfo[]>([]);
 
 const paginationConfig = reactive({
+    cacheSizeKey: 'website-page-size',
     currentPage: 1,
     pageSize: 10,
     total: 0,

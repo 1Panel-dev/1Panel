@@ -38,6 +38,7 @@ import i18n from '@/lang';
 import { useDeleteData } from '@/hooks/use-delete-data';
 
 const paginationConfig = reactive({
+    cacheSizeKey: 'dns-account-page-size',
     currentPage: 1,
     pageSize: 20,
     total: 0,

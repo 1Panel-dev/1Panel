@@ -100,6 +100,7 @@ import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 
 const paginationConfig = reactive({
+    cacheSizeKey: 'ssl-page-size',
     currentPage: 1,
     pageSize: 10,
     total: 0,

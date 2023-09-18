@@ -412,6 +412,11 @@ const delLoading = ref();
 const cleanData = ref();
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
+    let itemSize = Number(localStorage.getItem(searchInfo.cacheSizeKey));
+    if (itemSize) {
+        searchInfo.pageSize = itemSize;
+    }
+
     recordShow.value = true;
     dialogData.value = params;
     if (dialogData.value.rowData.type === 'database') {
@@ -442,6 +447,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
 
 const handleSizeChange = (val: number) => {
     searchInfo.pageSize = val;
+    localStorage.setItem(searchInfo.cacheSizeKey, val + '');
     search();
 };
 const handleCurrentChange = (val: number) => {
@@ -509,6 +515,7 @@ const timeRangeLoad = ref<[Date, Date]>([
     new Date(new Date().setHours(23, 59, 59, 999)),
 ]);
 const searchInfo = reactive({
+    cacheSizeKey: 'cronjob-record-page-size',
     page: 1,
     pageSize: 8,
     recordTotal: 0,

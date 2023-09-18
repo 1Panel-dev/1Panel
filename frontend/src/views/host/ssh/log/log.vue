@@ -93,6 +93,7 @@ import i18n from '@/lang';
 const loading = ref();
 const data = ref();
 const paginationConfig = reactive({
+    cacheSizeKey: 'ssh-log-page-size',
     currentPage: 1,
     pageSize: 10,
     total: 0,
@@ -118,7 +119,7 @@ function select2address(): string {
 const onDeny = async () => {
     let address = select2address();
     if (!address) return;
-    await operateIPRule({ operation: 'add', address: address, strategy: 'drop' }).then(() => {
+    await operateIPRule({ operation: 'add', address: address, strategy: 'drop', description: '' }).then(() => {
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         search();
     });

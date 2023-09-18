@@ -112,6 +112,7 @@ const isOnDetail = ref(false);
 const baseDir = ref();
 
 const paginationConfig = reactive({
+    cacheSizeKey: 'container-compose-page-size',
     currentPage: 1,
     pageSize: 10,
     total: 0,

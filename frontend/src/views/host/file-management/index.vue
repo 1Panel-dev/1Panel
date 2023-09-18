@@ -276,6 +276,7 @@ const deleteRef = ref();
 const { searchableStatus, searchablePath, searchableInputRef, searchableInputBlur } = useSearchable(paths);
 
 const paginationConfig = reactive({
+    cacheSizeKey: 'file-page-size',
     currentPage: 1,
     pageSize: 100,
     total: 0,

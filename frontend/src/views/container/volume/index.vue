@@ -120,6 +120,7 @@ const codemirror = ref();
 const data = ref();
 const selects = ref<any>([]);
 const paginationConfig = reactive({
+    cacheSizeKey: 'container-volume-page-size',
     currentPage: 1,
     pageSize: 10,
     total: 0,
