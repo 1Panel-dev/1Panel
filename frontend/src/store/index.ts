@@ -29,6 +29,7 @@ export const GlobalStore = defineStore({
         lastFilePath: '',
         currentDB: '',
         showEntranceWarn: true,
+        defaultNetwork: 'all',
     }),
     getters: {},
     actions: {
@@ -71,6 +72,9 @@ export const GlobalStore = defineStore({
         },
         setShowEntranceWarn(show: boolean) {
             this.showEntranceWarn = show;
+        },
+        setDefaultNetwork(net: string) {
+            this.defaultNetwork = net;
         },
     },
     persist: piniaPersistConfig('GlobalState'),

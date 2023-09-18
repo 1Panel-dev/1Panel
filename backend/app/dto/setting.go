@@ -13,10 +13,11 @@ type SettingInfo struct {
 	TimeZone       string `json:"timeZone"`
 	NtpSite        string `json:"ntpSite"`
 
-	Port      string `json:"port"`
-	PanelName string `json:"panelName"`
-	Theme     string `json:"theme"`
-	Language  string `json:"language"`
+	Port           string `json:"port"`
+	PanelName      string `json:"panelName"`
+	Theme          string `json:"theme"`
+	Language       string `json:"language"`
+	DefaultNetwork string `json:"defaultNetwork"`
 
 	ServerPort             string `json:"serverPort"`
 	SSL                    string `json:"ssl"`

@@ -950,6 +950,7 @@ const message = {
         sessionTimeoutHelper: '如果用戶超過 {0} 秒未操作面板，面板將自動退出登錄',
         systemIP: '服務器地址',
         systemIPWarning: '當前未設置服務器地址，請先在面板設置中設置！',
+        defaultNetwork: '默認網卡',
         syncTime: '服務器時間',
         timeZone: '系統時區',
         timeZoneChangeHelper: '系統時區修改需要重啟服務，是否繼續？',

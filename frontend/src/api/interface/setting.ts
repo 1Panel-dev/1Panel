@@ -16,6 +16,7 @@ export namespace Setting {
         panelName: string;
         theme: string;
         language: string;
+        defaultNetwork: string;
 
         serverPort: number;
         ssl: string;

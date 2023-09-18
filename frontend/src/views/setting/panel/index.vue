@@ -108,6 +108,15 @@
                                     </template>
                                 </el-input>
                             </el-form-item>
+                            <el-form-item :label="$t('setting.defaultNetwork')">
+                                <el-input disabled v-model="form.defaultNetworkVal">
+                                    <template #append>
+                                        <el-button v-show="!show" @click="onChangeNetwork" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
                         </el-col>
                     </el-row>
                 </el-form>
@@ -121,6 +130,7 @@
         <Timeout ref="timeoutRef" @search="search()" />
         <TimeZone ref="timezoneRef" @search="search()" />
         <Ntp ref="ntpRef" @search="search()" />
+        <Netwrok ref="netwrokRef" @search="search()" />
     </div>
 </template>
 
@@ -138,6 +148,7 @@ import Timeout from '@/views/setting/panel/timeout/index.vue';
 import PanelName from '@/views/setting/panel/name/index.vue';
 import SystemIP from '@/views/setting/panel/systemip/index.vue';
 import TimeZone from '@/views/setting/panel/timezone/index.vue';
+import Netwrok from '@/views/setting/panel/default-network/index.vue';
 import Ntp from '@/views/setting/panel/ntp/index.vue';
 
 const loading = ref(false);
@@ -159,6 +170,8 @@ const form = reactive({
     theme: '',
     language: '',
     complexityVerification: '',
+    defaultNetwork: '',
+    defaultNetworkVal: '',
 });
 
 const show = ref();
@@ -170,6 +183,7 @@ const systemIPRef = ref();
 const timeoutRef = ref();
 const ntpRef = ref();
 const timezoneRef = ref();
+const netwrokRef = ref();
 const unset = ref(i18n.t('setting.unSetting'));
 
 const search = async () => {
@@ -185,6 +199,8 @@ const search = async () => {
     form.theme = res.data.theme;
     form.language = res.data.language;
     form.complexityVerification = res.data.complexityVerification;
+    form.defaultNetwork = res.data.defaultNetwork;
+    form.defaultNetworkVal = res.data.defaultNetwork === 'all' ? i18n.t('commons.table.all') : res.data.defaultNetwork;
 };
 
 const onChangePassword = () => {
@@ -207,6 +223,9 @@ const onChangeTimeZone = () => {
 };
 const onChangeNtp = () => {
     ntpRef.value.acceptParams({ localTime: form.localTime, ntpSite: form.ntpSite });
+};
+const onChangeNetwork = () => {
+    netwrokRef.value.acceptParams({ defaultNetwork: form.defaultNetwork });
 };
 
 const onSave = async (key: string, val: any) => {

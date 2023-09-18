@@ -409,7 +409,7 @@ const search = async (param: string) => {
 const loadNetworkOptions = async () => {
     const res = await getNetworkOptions();
     netOptions.value = res.data;
-    searchInfo.info = netOptions.value && netOptions.value[0];
+    searchInfo.info = globalStore.defaultNetwork || (netOptions.value && netOptions.value[0]);
     networkChoose.value = searchInfo.info;
     search('all');
 };
