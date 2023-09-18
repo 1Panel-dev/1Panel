@@ -1658,6 +1658,15 @@ const message = {
         phpPluginHelper:
             '<a target="_blank" href="https://1panel.cn/docs/user_manual/websites/php/#php_1">View PHP extension list</a> ',
         rebuild: 'Rebuild PHP App',
+        source: 'PHP extension source',
+        ustc: 'University of Science and Technology of China',
+        netease: 'Netease',
+        aliyun: 'Alibaba Cloud',
+        default: 'default',
+        tsinghua: 'Tsinghua University',
+        xtomhk: 'XTOM Mirror Station (Hong Kong)',
+        xtom: 'XTOM Mirror Station (Global)',
+        phpsourceHelper: 'Choose the appropriate source according to your network environment',
     },
     process: {
         pid: 'Process ID',

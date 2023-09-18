@@ -23,6 +23,7 @@ export namespace Runtime {
     export interface RuntimeDTO extends Runtime {
         appParams: App.InstallParams[];
         appId: number;
+        source?: string;
     }
 
     export interface RuntimeCreate {
@@ -36,6 +37,7 @@ export namespace Runtime {
         appId?: number;
         version?: string;
         rebuild?: boolean;
+        source?: string;
     }
 
     export interface RuntimeUpdate {
