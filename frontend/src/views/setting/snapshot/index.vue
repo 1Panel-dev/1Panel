@@ -164,6 +164,7 @@ const loading = ref(false);
 const data = ref();
 const selects = ref<any>([]);
 const paginationConfig = reactive({
+    cacheSizeKey: 'snapshot-page-size',
     currentPage: 1,
     pageSize: 10,
     total: 0,

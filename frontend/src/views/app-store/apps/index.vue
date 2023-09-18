@@ -155,6 +155,7 @@ const mobile = computed(() => {
 const language = useI18n().locale.value;
 
 const paginationConfig = reactive({
+    cacheSizeKey: 'app-page-size',
     currentPage: 1,
     pageSize: 60,
     total: 0,

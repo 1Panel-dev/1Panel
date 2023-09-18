@@ -267,6 +267,7 @@ const dialogPortJumpRef = ref();
 
 const data = ref();
 const paginationConfig = reactive({
+    cacheSizeKey: 'mysql-page-size',
     currentPage: 1,
     pageSize: 10,
     total: 0,

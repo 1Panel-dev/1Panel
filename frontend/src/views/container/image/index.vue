@@ -121,6 +121,7 @@ const loading = ref(false);
 const data = ref();
 const repos = ref();
 const paginationConfig = reactive({
+    cacheSizeKey: 'container-image-page-size',
     currentPage: 1,
     pageSize: 10,
     total: 0,

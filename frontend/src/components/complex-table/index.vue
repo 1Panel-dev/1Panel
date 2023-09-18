@@ -32,7 +32,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { GlobalStore } from '@/store';
 
 defineOptions({ name: 'ComplexTable' });
@@ -60,6 +60,7 @@ function currentChange() {
 
 function sizeChange() {
     props.paginationConfig.currentPage = 1;
+    localStorage.setItem(props.paginationConfig.cacheSizeKey, props.paginationConfig.pageSize);
     emit('search');
 }
 
@@ -77,6 +78,13 @@ function clearSelects() {
 defineExpose({
     clearSelects,
     sort,
+});
+
+onMounted(() => {
+    let itemSize = Number(localStorage.getItem(props.paginationConfig.cacheSizeKey));
+    if (itemSize) {
+        props.paginationConfig.pageSize = itemSize;
+    }
 });
 </script>
 

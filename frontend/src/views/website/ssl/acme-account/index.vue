@@ -35,6 +35,7 @@ let loading = ref(false);
 let data = ref();
 let createRef = ref();
 const paginationConfig = reactive({
+    cacheSizeKey: 'acme-account-page-size',
     currentPage: 1,
     pageSize: 20,
     total: 0,

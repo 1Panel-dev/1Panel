@@ -90,6 +90,7 @@ const loading = ref();
 const data = ref();
 const selects = ref<any>([]);
 const paginationConfig = reactive({
+    cacheSizeKey: 'terminal-command-page-size',
     currentPage: 1,
     pageSize: 10,
     total: 0,
