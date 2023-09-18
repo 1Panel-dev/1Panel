@@ -944,6 +944,13 @@ const docTemplate = `{
                 "summary": "User login",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "安全入口 base64 加密串",
+                        "name": "EntranceCode",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "request",
                         "name": "request",
                         "in": "body",
@@ -958,12 +965,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dto.UserLoginInfo"
-                        },
-                        "headers": {
-                            "EntranceCode": {
-                                "type": "string",
-                                "description": "安全入口"
-                            }
                         }
                     }
                 }

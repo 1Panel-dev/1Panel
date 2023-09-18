@@ -4638,6 +4638,11 @@ paths:
       - application/json
       description: 用户登录
       parameters:
+      - description: 安全入口 base64 加密串
+        in: header
+        name: EntranceCode
+        required: true
+        type: string
       - description: request
         in: body
         name: request
@@ -4647,10 +4652,6 @@ paths:
       responses:
         "200":
           description: OK
-          headers:
-            EntranceCode:
-              description: 安全入口
-              type: string
           schema:
             $ref: '#/definitions/dto.UserLoginInfo'
       summary: User login
