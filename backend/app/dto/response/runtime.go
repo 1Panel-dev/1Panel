@@ -6,4 +6,5 @@ type RuntimeRes struct {
 	model.Runtime
 	AppParams []AppParam `json:"appParams"`
 	AppID     uint       `json:"appId"`
+	Source    string     `json:"source"`
 }

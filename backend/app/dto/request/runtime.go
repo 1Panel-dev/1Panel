@@ -17,6 +17,7 @@ type RuntimeCreate struct {
 	Image       string                 `json:"image"`
 	Type        string                 `json:"type"`
 	Version     string                 `json:"version"`
+	Source      string                 `json:"source"`
 }
 
 type RuntimeDelete struct {
@@ -30,4 +31,5 @@ type RuntimeUpdate struct {
 	Image   string                 `json:"image"`
 	Version string                 `json:"version"`
 	Rebuild bool                   `json:"rebuild"`
+	Source  string                 `json:"source"`
 }

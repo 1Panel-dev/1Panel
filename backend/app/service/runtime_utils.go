@@ -89,7 +89,7 @@ func buildRuntime(runtime *model.Runtime, oldImageID string, rebuild bool) {
 	_ = runtimeRepo.Save(runtime)
 }
 
-func handleParams(image, runtimeType, runtimeDir string, params map[string]interface{}) (composeContent []byte, envContent []byte, forms []byte, err error) {
+func handleParams(image, runtimeType, runtimeDir, source string, params map[string]interface{}) (composeContent []byte, envContent []byte, forms []byte, err error) {
 	fileOp := files.NewFileOp()
 	composeContent, err = fileOp.GetContent(path.Join(runtimeDir, "docker-compose.yml"))
 	if err != nil {
@@ -114,6 +114,7 @@ func handleParams(image, runtimeType, runtimeDir string, params map[string]inter
 				params["PHP_EXTENSIONS"] = strings.Join(strArray, ",")
 			}
 		}
+		params["CONTAINER_PACKAGE_URL"] = source
 	}
 	newMap := make(map[string]string)
 	handleMap(params, newMap)

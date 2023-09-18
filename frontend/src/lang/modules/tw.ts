@@ -1569,6 +1569,15 @@ const message = {
         phpPluginHelper:
             "<a target=“_blank” href='https://1panel.cn/docs/user_manual/websites/php/#php_1'>查看 PHP 擴展列表</a> ",
         rebuild: '重建 PHP 應用',
+        source: 'PHP 擴展源',
+        ustc: '中國科學技術大學',
+        netease: '網易',
+        aliyun: '阿里雲',
+        default: '默認',
+        tsinghua: '清華大學',
+        xtomhk: 'XTOM 鏡像站（香港）',
+        xtom: 'XTOM 鏡像站（全球）',
+        phpsourceHelper: '根據你的網絡環境選擇合適的源',
     },
     process: {
         pid: '進程ID',
