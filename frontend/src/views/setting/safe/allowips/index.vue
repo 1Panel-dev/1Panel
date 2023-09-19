@@ -4,15 +4,22 @@
             <template #header>
                 <DrawerHeader :header="$t('setting.allowIPs')" :back="handleClose" />
             </template>
-            <el-form label-position="top" @submit.prevent v-loading="loading">
+            <el-form
+                ref="formRef"
+                label-position="top"
+                @submit.prevent
+                :model="form"
+                :rules="rules"
+                v-loading="loading"
+            >
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
-                        <el-form-item :label="$t('setting.allowIPs')">
+                        <el-form-item :label="$t('setting.allowIPs')" prop="allowIPs">
                             <el-input
                                 type="textarea"
                                 :placeholder="$t('setting.allowIPEgs')"
                                 :autosize="{ minRows: 8, maxRows: 10 }"
-                                v-model="allowIPs"
+                                v-model="form.allowIPs"
                             />
                             <span class="input-help">{{ $t('setting.allowIPsHelper1') }}</span>
                         </el-form-item>
@@ -22,7 +29,7 @@
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button :disabled="loading" type="primary" @click="onSave()">
+                    <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
                         {{ $t('commons.button.confirm') }}
                     </el-button>
                 </span>
@@ -31,59 +38,82 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 import i18n from '@/lang';
-import { MsgError, MsgSuccess } from '@/utils/message';
+import { MsgSuccess } from '@/utils/message';
 import { updateSetting } from '@/api/modules/setting';
-import { ElMessageBox } from 'element-plus';
-import { checkIpV4V6 } from '@/utils/util';
+import { ElMessageBox, FormInstance } from 'element-plus';
+import { checkCidr, checkIpV4V6 } from '@/utils/util';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
-const allowIPs = ref();
+const form = reactive({
+    allowIPs: '',
+});
+const rules = reactive({
+    allowIPs: [{ validator: checkAddress, trigger: 'blur' }],
+});
+function checkAddress(rule: any, value: any, callback: any) {
+    if (form.allowIPs !== '') {
+        let addrs = form.allowIPs.split('\n');
+        for (const item of addrs) {
+            if (item === '0.0.0.0') {
+                return callback(new Error(i18n.global.t('firewall.addressFormatError')));
+            }
+            if (item.indexOf('/') !== -1) {
+                if (checkCidr(item)) {
+                    return callback(new Error(i18n.global.t('firewall.addressFormatError')));
+                }
+            } else {
+                if (checkIpV4V6(item)) {
+                    return callback(new Error(i18n.global.t('firewall.addressFormatError')));
+                }
+            }
+        }
+        callback();
+    }
+}
+const formRef = ref<FormInstance>();
+
 interface DialogProps {
     allowIPs: string;
 }
+
 const drawerVisiable = ref();
 const loading = ref();
 
 const acceptParams = (params: DialogProps): void => {
-    allowIPs.value = params.allowIPs;
+    form.allowIPs = params.allowIPs;
     drawerVisiable.value = true;
 };
 
-const onSave = async () => {
-    if (allowIPs.value) {
-        let ips = allowIPs.value.split('\n');
-        for (const ip of ips) {
-            if (ip) {
-                if (checkIpV4V6(ip) || ip === '0.0.0.0') {
-                    MsgError(i18n.global.t('firewall.addressFormatError'));
-                    return false;
-                }
-            }
-        }
-    }
-    let title = allowIPs.value ? i18n.global.t('setting.allowIPs') : i18n.global.t('setting.unAllowIPs');
-    let allow = allowIPs.value ? i18n.global.t('setting.allowIPsWarning') : i18n.global.t('setting.unAllowIPsWarning');
-    ElMessageBox.confirm(allow, title, {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-        type: 'info',
-    }).then(async () => {
-        loading.value = true;
+const onSave = async (formEl: FormInstance | undefined) => {
+    if (!formEl) return;
+    formEl.validate(async (valid) => {
+        if (!valid) return;
+        let title = form.allowIPs ? i18n.global.t('setting.allowIPs') : i18n.global.t('setting.unAllowIPs');
+        let allow = form.allowIPs
+            ? i18n.global.t('setting.allowIPsWarning')
+            : i18n.global.t('setting.unAllowIPsWarning');
+        ElMessageBox.confirm(allow, title, {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            type: 'info',
+        }).then(async () => {
+            loading.value = true;
 
-        await updateSetting({ key: 'AllowIPs', value: allowIPs.value.replaceAll('\n', ',') })
-            .then(() => {
-                loading.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                emit('search');
-                handleClose();
-            })
-            .catch(() => {
-                loading.value = false;
-            });
+            await updateSetting({ key: 'AllowIPs', value: form.allowIPs.replaceAll('\n', ',') })
+                .then(() => {
+                    loading.value = false;
+                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                    emit('search');
+                    handleClose();
+                })
+                .catch(() => {
+                    loading.value = false;
+                });
+        });
     });
 };
 

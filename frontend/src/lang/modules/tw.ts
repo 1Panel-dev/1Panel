@@ -1079,7 +1079,7 @@ const message = {
         allowIPsHelper: '設置授權 IP 後，僅有設置中的 IP 可以訪問 1Panel 服務',
         allowIPsWarning: '設置授權 IP 後，僅有設置中的 IP 可以訪問 1Panel 服務，是否繼續？',
         allowIPsHelper1: '授權 IP 為空時，則取消授權 IP',
-        allowIPEgs: '當存在多個授權 IP 時，需要換行顯示，例： \n172.16.10.111 \n172.16.10.112',
+        allowIPEgs: '當存在多個授權 IP 時，需要換行顯示，例： \n172.16.10.111 \n172.16.10.0/24',
         mfa: '兩步驗證',
         secret: '密鑰',
         mfaAlert: '兩步驗證密碼是基於當前時間生成，請確保服務器時間已同步',

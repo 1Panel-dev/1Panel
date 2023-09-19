@@ -1091,7 +1091,7 @@ const message = {
             'After setting the authorized IP address, only the IP address in the setting can access the 1Panel service. Do you want to continue?',
         allowIPsHelper1: 'If the authorized IP address is empty, the authorized IP address is canceled',
         allowIPEgs:
-            'If multiple ip authorizations exist, newlines need to be displayed. For example, \n172.16.10.111 \n172.16.10.112',
+            'If multiple ip authorizations exist, newlines need to be displayed. For example, \n172.16.10.111 \n172.16.10.0/24',
         mfa: 'MFA',
         secret: 'Secret',
         mfaInterval: 'Refresh interval (s)',

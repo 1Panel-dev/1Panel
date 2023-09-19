@@ -2,11 +2,13 @@ package middleware
 
 import (
 	"errors"
+	"net"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,11 +27,37 @@ func WhiteAllow() gin.HandlerFunc {
 		}
 		clientIP := c.ClientIP()
 		for _, ip := range strings.Split(status.Value, ",") {
-			if len(ip) != 0 && ip == clientIP {
+			if len(ip) == 0 {
+				continue
+			}
+			if ip == clientIP || (strings.Contains(ip, "/") && checkIpInCidr(ip, clientIP)) {
 				c.Next()
 				return
 			}
 		}
 		helper.ErrorWithDetail(c, constant.CodeErrIP, constant.ErrTypeInternalServer, errors.New("IP address not allowed"))
+	}
+}
+
+func checkIpInCidr(cidr, checkIP string) bool {
+	ip, ipNet, err := net.ParseCIDR(cidr)
+	if err != nil {
+		global.LOG.Errorf("parse CIDR %s failed, err: %v", cidr, err)
+		return false
+	}
+	for ip := ip.Mask(ipNet.Mask); ipNet.Contains(ip); incIP(ip) {
+		if ip.String() == checkIP {
+			return true
+		}
+	}
+	return false
+}
+
+func incIP(ip net.IP) {
+	for j := len(ip) - 1; j >= 0; j-- {
+		ip[j]++
+		if ip[j] > 0 {
+			break
+		}
 	}
 }
