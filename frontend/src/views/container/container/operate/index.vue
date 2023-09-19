@@ -401,17 +401,19 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             dialogData.value.rowData!.labels = dialogData.value.rowData!.labelsStr.split('\n');
         }
         dialogData.value.rowData!.cmd = [];
-        if (dialogData.value.rowData?.cmdStr.indexOf(`'`) !== -1) {
-            let itemCmd = dialogData.value.rowData!.cmdStr.split(`'`);
-            for (const cmd of itemCmd) {
-                if (cmd && cmd !== ' ') {
+        if (dialogData.value.rowData?.cmdStr) {
+            if (dialogData.value.rowData?.cmdStr.indexOf(`'`) !== -1) {
+                let itemCmd = dialogData.value.rowData!.cmdStr.split(`'`);
+                for (const cmd of itemCmd) {
+                    if (cmd && cmd !== ' ') {
+                        dialogData.value.rowData!.cmd.push(cmd);
+                    }
+                }
+            } else {
+                let itemCmd = dialogData.value.rowData!.cmdStr.split(` `);
+                for (const cmd of itemCmd) {
                     dialogData.value.rowData!.cmd.push(cmd);
                 }
-            }
-        } else {
-            let itemCmd = dialogData.value.rowData!.cmdStr.split(` `);
-            for (const cmd of itemCmd) {
-                dialogData.value.rowData!.cmd.push(cmd);
             }
         }
         if (dialogData.value.rowData!.entrypointStr) {
