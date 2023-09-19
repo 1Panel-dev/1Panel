@@ -228,7 +228,7 @@ const search = async () => {
                 needLoadStatus = true;
             }
         }
-        if (needLoadStatus) {
+        if (supervisorStatus.value.isRunning && needLoadStatus) {
             setTimeout(loadStatus, 1000);
         }
     } catch (error) {}
@@ -252,7 +252,7 @@ const loadStatus = async () => {
                 }
             }
         }
-        if (needLoadStatus) {
+        if (supervisorStatus.value.isRunning && needLoadStatus) {
             setTimeout(loadStatus, 2000);
         }
     } catch (error) {}
