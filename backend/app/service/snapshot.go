@@ -884,9 +884,10 @@ func updateRollbackStatus(id uint, status string, message string) {
 }
 
 func cpBinary(src []string, dst string) error {
-	stderr, err := cmd.Exec(fmt.Sprintf("\\cp -f %s %s", strings.Join(src, " "), dst))
+	global.LOG.Debugf(fmt.Sprintf("\\cp -f %s %s", strings.Join(src, " "), dst))
+	stdout, err := cmd.Exec(fmt.Sprintf("\\cp -f %s %s", strings.Join(src, " "), dst))
 	if err != nil {
-		return errors.New(stderr)
+		return fmt.Errorf("cp file failed, stdout: %v, err: %v", stdout, err)
 	}
 	return nil
 }
