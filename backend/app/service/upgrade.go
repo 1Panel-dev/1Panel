@@ -132,25 +132,25 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 		global.LOG.Info("backup original data successful, now start to upgrade!")
 
 		if err := cpBinary([]string{tmpDir + "/1panel"}, "/usr/local/bin/1panel"); err != nil {
-			u.handleRollback(fileOp, originalDir, 1)
 			global.LOG.Errorf("upgrade 1panel failed, err: %v", err)
+			u.handleRollback(fileOp, originalDir, 1)
 			return
 		}
 
 		if err := cpBinary([]string{tmpDir + "/1pctl"}, "/usr/local/bin/1pctl"); err != nil {
-			u.handleRollback(fileOp, originalDir, 2)
 			global.LOG.Errorf("upgrade 1pctl failed, err: %v", err)
+			u.handleRollback(fileOp, originalDir, 2)
 			return
 		}
 		if _, err := cmd.Execf("sed -i -e 's#BASE_DIR=.*#BASE_DIR=%s#g' /usr/local/bin/1pctl", global.CONF.System.BaseDir); err != nil {
-			u.handleRollback(fileOp, originalDir, 2)
 			global.LOG.Errorf("upgrade basedir in 1pctl failed, err: %v", err)
+			u.handleRollback(fileOp, originalDir, 2)
 			return
 		}
 
 		if err := cpBinary([]string{tmpDir + "/1panel.service"}, "/etc/systemd/system/1panel.service"); err != nil {
-			u.handleRollback(fileOp, originalDir, 3)
 			global.LOG.Errorf("upgrade 1panel.service failed, err: %v", err)
+			u.handleRollback(fileOp, originalDir, 3)
 			return
 		}
 
