@@ -4,13 +4,13 @@
             <template #toolbar>
                 <el-row>
                     <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
-                        <el-button type="primary" @click="onChangeRoute('OperationLog')">
+                        <el-button type="primary" class="tag-button" @click="onChangeRoute('OperationLog')">
                             {{ $t('logs.operation') }}
                         </el-button>
-                        <el-button class="no-active-button" @click="onChangeRoute('LoginLog')">
+                        <el-button class="tag-button no-active" @click="onChangeRoute('LoginLog')">
                             {{ $t('logs.login') }}
                         </el-button>
-                        <el-button class="no-active-button" @click="onChangeRoute('SystemLog')">
+                        <el-button class="tag-button no-active" @click="onChangeRoute('SystemLog')">
                             {{ $t('logs.system') }}
                         </el-button>
                     </el-col>

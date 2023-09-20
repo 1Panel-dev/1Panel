@@ -7465,7 +7465,7 @@ const docTemplate = `{
             }
         },
         "/logs/system": {
-            "get": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -7476,6 +7476,25 @@ const docTemplate = `{
                     "Logs"
                 ],
                 "summary": "Load system logs",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/logs/system/files": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取系统日志文件列表",
+                "tags": [
+                    "Logs"
+                ],
+                "summary": "Load system log files",
                 "responses": {
                     "200": {
                         "description": "OK"

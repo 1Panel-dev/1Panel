@@ -8807,7 +8807,7 @@ paths:
       tags:
       - Logs
   /logs/system:
-    get:
+    post:
       description: 获取系统日志
       responses:
         "200":
@@ -8815,6 +8815,17 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Load system logs
+      tags:
+      - Logs
+  /logs/system/files:
+    get:
+      description: 获取系统日志文件列表
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Load system log files
       tags:
       - Logs
   /openResty:

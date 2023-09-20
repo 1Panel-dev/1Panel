@@ -336,11 +336,6 @@ html {
     }
 }
 
-.no-active-button {
-    background: none;
-    border: none;
-}
-
 .common-prompt {
     margin-bottom: 20px !important;
 }
@@ -368,4 +363,12 @@ html {
     border-bottom-left-radius: 0;
     box-shadow: 0 1px 0 0 var(--el-input-border-color) inset, 0 -1px 0 0 var(--el-input-border-color) inset,
         -1px 0 0 0 var(--el-input-border-color) inset;
+}
+
+.tag-button {
+    margin-right: 10px;
+    &.no-active {
+        background: none;
+        border: none;
+    }
 }

@@ -91,13 +91,34 @@ func (b *BaseApi) CleanLogs(c *gin.Context) {
 }
 
 // @Tags Logs
+// @Summary Load system log files
+// @Description 获取系统日志文件列表
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /logs/system/files [get]
+func (b *BaseApi) GetSystemFiles(c *gin.Context) {
+	data, err := logService.ListSystemLogFile()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags Logs
 // @Summary Load system logs
 // @Description 获取系统日志
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /logs/system [get]
+// @Router /logs/system [post]
 func (b *BaseApi) GetSystemLogs(c *gin.Context) {
-	data, err := logService.LoadSystemLog()
+	var req dto.OperationWithName
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	data, err := logService.LoadSystemLog(req.Name)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
