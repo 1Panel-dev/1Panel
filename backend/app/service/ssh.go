@@ -240,7 +240,7 @@ func (u *SSHService) LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error) {
 		if err != nil {
 			return err
 		}
-		if !info.IsDir() && strings.HasPrefix(info.Name(), "secure") || strings.HasPrefix(info.Name(), "auth") {
+		if !info.IsDir() && (strings.HasPrefix(info.Name(), "secure") || strings.HasPrefix(info.Name(), "auth")) {
 			if !strings.HasSuffix(info.Name(), ".gz") {
 				fileList = append(fileList, sshFileItem{Name: pathItem, Year: info.ModTime().Year()})
 				return nil
@@ -311,7 +311,7 @@ func (u *SSHService) AnalysisLog(req dto.SearchForAnalysis) ([]dto.SSHLogAnalysi
 		if err != nil {
 			return err
 		}
-		if !info.IsDir() && strings.HasPrefix(info.Name(), "secure") || strings.HasPrefix(info.Name(), "auth") {
+		if !info.IsDir() && (strings.HasPrefix(info.Name(), "secure") || strings.HasPrefix(info.Name(), "auth")) {
 			if !strings.HasSuffix(info.Name(), ".gz") {
 				fileList = append(fileList, pathItem)
 				return nil

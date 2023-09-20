@@ -17,7 +17,7 @@ func (s *LogRouter) InitLogRouter(Router *gin.RouterGroup) {
 		operationRouter.POST("/login", baseApi.GetLoginLogs)
 		operationRouter.POST("/operation", baseApi.GetOperationLogs)
 		operationRouter.POST("/clean", baseApi.CleanLogs)
-		operationRouter.GET("/system", baseApi.GetSystemLogs)
-
+		operationRouter.GET("/system/files", baseApi.GetSystemFiles)
+		operationRouter.POST("/system", baseApi.GetSystemLogs)
 	}
 }
