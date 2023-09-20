@@ -49,6 +49,8 @@ const message = {
             copy: 'Copy',
             random: 'Random',
             uninstall: 'Uninstall',
+            fullscreen: 'Fullscreen',
+            quitFullscreen: 'Quit Fullscreen',
         },
         search: {
             timeStart: 'Time start',

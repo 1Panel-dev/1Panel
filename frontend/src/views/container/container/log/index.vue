@@ -9,7 +9,9 @@
             <template #header>
                 <DrawerHeader :header="$t('commons.button.log')" :resource="logSearch.container" :back="handleClose">
                     <template #extra v-if="!mobile">
-                        <el-button @click="toggleFullscreen" class="fullScreen" icon="FullScreen" plain></el-button>
+                        <el-tooltip :content="loadTooltip()" placement="top">
+                            <el-button @click="toggleFullscreen" class="fullScreen" icon="FullScreen" plain></el-button>
+                        </el-tooltip>
                     </template>
                 </DrawerHeader>
             </template>
@@ -124,6 +126,10 @@ function toggleFullscreen() {
         screenfull.toggle();
     }
 }
+
+const loadTooltip = () => {
+    return i18n.global.t('commons.button.' + (screenfull.isFullscreen ? 'quitFullscreen' : 'fullscreen'));
+};
 const handleClose = async () => {
     logVisiable.value = false;
     terminalSocket.value.close();

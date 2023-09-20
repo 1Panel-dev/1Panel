@@ -119,7 +119,9 @@
                 ></el-empty>
             </div>
         </el-tabs>
-        <el-button @click="toggleFullscreen" v-if="!mobile" class="fullScreen" icon="FullScreen"></el-button>
+        <el-tooltip :content="loadTooltip()" placement="top">
+            <el-button @click="toggleFullscreen" v-if="!mobile" class="fullScreen" icon="FullScreen"></el-button>
+        </el-tooltip>
 
         <HostDialog ref="dialogRef" @on-conn-terminal="onConnTerminal" @load-host-tree="loadHostTree" />
     </div>
@@ -149,7 +151,11 @@ function toggleFullscreen() {
     if (screenfull.isEnabled) {
         screenfull.toggle();
     }
+    globalStore.isFullScreen = !screenfull.isFullscreen;
 }
+const loadTooltip = () => {
+    return i18n.global.t('commons.button.' + (globalStore.isFullScreen ? 'quitFullscreen' : 'fullscreen'));
+};
 
 const localHostID = ref();
 
@@ -409,6 +415,8 @@ defineExpose({
     font-weight: 600;
 }
 .fullScreen {
+    background-color: #efefef;
+    border: none;
     position: absolute;
     right: 50px;
     top: 90px;
