@@ -53,6 +53,7 @@ func (u *ImageService) Page(req dto.SearchWithPage) (int64, interface{}, error) 
 	if err != nil {
 		return 0, nil, err
 	}
+	containers, _ := client.ContainerList(context.Background(), types.ContainerListOptions{All: true})
 	if len(req.Info) != 0 {
 		length, count := len(list), 0
 		for count < length {
@@ -77,6 +78,7 @@ func (u *ImageService) Page(req dto.SearchWithPage) (int64, interface{}, error) 
 		records = append(records, dto.ImageInfo{
 			ID:        image.ID,
 			Tags:      image.RepoTags,
+			IsUsed:    checkUsed(image.ID, containers),
 			CreatedAt: time.Unix(image.Created, 0),
 			Size:      size,
 		})
@@ -414,4 +416,13 @@ func formatFileSize(fileSize int64) (size string) {
 	} else {
 		return fmt.Sprintf("%.2fEB", float64(fileSize)/float64(1024*1024*1024*1024*1024))
 	}
+}
+
+func checkUsed(imageID string, containers []types.Container) bool {
+	for _, container := range containers {
+		if container.ImageID == imageID {
+			return true
+		}
+	}
+	return false
 }
