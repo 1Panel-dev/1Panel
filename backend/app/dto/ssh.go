@@ -36,6 +36,19 @@ type SSHLog struct {
 	SuccessfulCount int          `json:"successfulCount"`
 	FailedCount     int          `json:"failedCount"`
 }
+
+type SearchForAnalysis struct {
+	OrderBy string `json:"orderBy" validate:"required,oneof=Success Failed"`
+}
+
+type SSHLogAnalysis struct {
+	Address         string `json:"address"`
+	Area            string `json:"area"`
+	SuccessfulCount int    `json:"successfulCount"`
+	FailedCount     int    `json:"failedCount"`
+	Status          string `json:"status"`
+}
+
 type SSHHistory struct {
 	Date     time.Time `json:"date"`
 	DateStr  string    `json:"dateStr"`

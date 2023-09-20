@@ -126,3 +126,7 @@ var (
 	ErrOSSConn      = "ErrOSSConn"
 	ErrEntrance     = "ErrEntrance"
 )
+
+var (
+	ErrFirewall = "ErrFirewall"
+)

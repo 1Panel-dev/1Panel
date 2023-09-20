@@ -112,3 +112,6 @@ ErrConfigIsNull: "配置文件不允許為空"
 ErrConfigDirNotFound: "運行目錄不存在"
 ErrConfigAlreadyExist: "已存在同名配置文件"
 ErrUserFindErr: "用戶 {{ .name }} 查找失敗 {{ .err }}"
+
+#ssh
+ErrFirewall: "當前未檢測到系統 firewalld 或 ufw 服務，請檢查後重試！"

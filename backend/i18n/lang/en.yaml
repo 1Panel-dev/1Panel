@@ -112,3 +112,6 @@ ErrConfigIsNull: "The configuration file is not allowed to be empty"
 ErrConfigDirNotFound: "The running directory does not exist"
 ErrConfigAlreadyExist: "A configuration file with the same name already exists"
 ErrUserFindErr: "Failed to find user {{ .name }} {{ .err }}"
+
+#ssh
+ErrFirewall: "No firewalld or ufw service is detected. Please check and try again!"

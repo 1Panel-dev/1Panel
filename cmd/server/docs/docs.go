@@ -5907,7 +5907,7 @@ const docTemplate = `{
                 "tags": [
                     "SSH"
                 ],
-                "summary": "Update host ssh setting by file",
+                "summary": "Update host SSH setting by file",
                 "parameters": [
                     {
                         "description": "request",
@@ -5940,11 +5940,11 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "获取 ssh 配置文件",
+                "description": "获取 SSH 配置文件",
                 "tags": [
                     "SSH"
                 ],
-                "summary": "Load host ssh conf",
+                "summary": "Load host SSH conf",
                 "responses": {
                     "200": {
                         "description": "OK"
@@ -5959,14 +5959,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "生成 ssh 密钥",
+                "description": "生成 SSH 密钥",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "SSH"
                 ],
-                "summary": "Generate host ssh secret",
+                "summary": "Generate host SSH secret",
                 "parameters": [
                     {
                         "description": "request",
@@ -5992,21 +5992,21 @@ const docTemplate = `{
                 }
             }
         },
-        "/host/ssh/logs": {
+        "/host/ssh/log": {
             "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "获取 ssh 登录日志",
+                "description": "获取 SSH 登录日志",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "SSH"
                 ],
-                "summary": "Load host ssh logs",
+                "summary": "Load host SSH logs",
                 "parameters": [
                     {
                         "description": "request",
@@ -6028,6 +6028,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/host/ssh/log/analysis": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "分析 SSH 登录日志",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SSH"
+                ],
+                "summary": "Analysis host SSH logs",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SearchForAnalysis"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.SSHLogAnalysis"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/host/ssh/operate": {
             "post": {
                 "security": [
@@ -6042,7 +6081,7 @@ const docTemplate = `{
                 "tags": [
                     "SSH"
                 ],
-                "summary": "Operate ssh",
+                "summary": "Operate SSH",
                 "parameters": [
                     {
                         "description": "request",
@@ -6077,7 +6116,7 @@ const docTemplate = `{
                 "tags": [
                     "SSH"
                 ],
-                "summary": "Load host ssh setting info",
+                "summary": "Load host SSH setting info",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -6095,14 +6134,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "获取 ssh 密钥",
+                "description": "获取 SSH 密钥",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "SSH"
                 ],
-                "summary": "Load host ssh secret",
+                "summary": "Load host SSH secret",
                 "parameters": [
                     {
                         "description": "request",
@@ -6135,7 +6174,7 @@ const docTemplate = `{
                 "tags": [
                     "SSH"
                 ],
-                "summary": "Update host ssh setting",
+                "summary": "Update host SSH setting",
                 "parameters": [
                     {
                         "description": "request",
@@ -14456,6 +14495,26 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.SSHLogAnalysis": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "area": {
+                    "type": "string"
+                },
+                "failedCount": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "successfulCount": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.SSLUpdate": {
             "type": "object",
             "required": [
@@ -14483,6 +14542,21 @@ const docTemplate = `{
                 },
                 "sslType": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.SearchForAnalysis": {
+            "type": "object",
+            "required": [
+                "orderBy"
+            ],
+            "properties": {
+                "orderBy": {
+                    "type": "string",
+                    "enum": [
+                        "Success",
+                        "Failed"
+                    ]
                 }
             }
         },
@@ -14654,6 +14728,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "complexityVerification": {
+                    "type": "string"
+                },
+                "defaultNetwork": {
                     "type": "string"
                 },
                 "dingVars": {
@@ -16305,6 +16382,9 @@ const docTemplate = `{
                 "resource": {
                     "type": "string"
                 },
+                "source": {
+                    "type": "string"
+                },
                 "type": {
                     "type": "string"
                 },
@@ -16363,6 +16443,9 @@ const docTemplate = `{
                 },
                 "rebuild": {
                     "type": "boolean"
+                },
+                "source": {
+                    "type": "string"
                 },
                 "version": {
                     "type": "string"
