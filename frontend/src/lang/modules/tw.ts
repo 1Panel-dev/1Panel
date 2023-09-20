@@ -49,6 +49,8 @@ const message = {
             copy: '復製',
             random: '隨機密碼',
             uninstall: '卸載',
+            fullscreen: '全屏',
+            quitFullscreen: '退出全屏',
         },
         search: {
             timeStart: '開始時間',
