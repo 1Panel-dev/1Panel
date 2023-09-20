@@ -608,3 +608,21 @@ func (u *FirewallService) addAddressRecord(req dto.AddrRuleOperate) error {
 		Description: req.Description,
 	})
 }
+
+func listIpRules(strategy string) ([]string, error) {
+	client, err := firewall.NewFirewallClient()
+	if err != nil {
+		return nil, err
+	}
+	addrs, err := client.ListAddress()
+	if err != nil {
+		return nil, err
+	}
+	var rules []string
+	for _, addr := range addrs {
+		if addr.Strategy == strategy {
+			rules = append(rules, addr.Address)
+		}
+	}
+	return rules, nil
+}

@@ -221,7 +221,9 @@ const message = {
             upgrading: 'Upgrading',
             upgradeerr: 'Upgrade Error',
             pullerr: 'Pull Image Error',
-            rebuilding: '重建中',
+            rebuilding: 'ReBuilding',
+            deny: 'Denied',
+            accept: 'Accepted',
         },
         units: {
             second: 'Second',
@@ -950,6 +952,14 @@ const message = {
         useDNS: 'useDNS',
         dnsHelper:
             'Controls whether the DNS resolution function is enabled on the SSH server to verify the identity of the connection.',
+        analysis: 'Statistical information',
+        denyHelper:
+            "Performing a 'deny' operation on the following addresses. After setting, the IP will be prohibited from accessing the server. Do you want to continue?",
+        acceptHelper:
+            "Performing an 'accept' operation on the following addresses. After setting, the IP will regain normal access. Do you want to continue?",
+        noAddrWarning: 'No [{0}] addresses are currently selected. Please check and try again!',
+        successful: 'Success',
+        failed: 'Failed',
         loginLogs: 'SSH login log',
         loginMode: 'Login mode',
         authenticating: 'Key',

@@ -1855,6 +1855,19 @@ definitions:
       totalCount:
         type: integer
     type: object
+  dto.SSHLogAnalysis:
+    properties:
+      address:
+        type: string
+      area:
+        type: string
+      failedCount:
+        type: integer
+      status:
+        type: string
+      successfulCount:
+        type: integer
+    type: object
   dto.SSLUpdate:
     properties:
       cert:
@@ -1874,6 +1887,16 @@ definitions:
         type: string
     required:
     - ssl
+    type: object
+  dto.SearchForAnalysis:
+    properties:
+      orderBy:
+        enum:
+        - Success
+        - Failed
+        type: string
+    required:
+    - orderBy
     type: object
   dto.SearchForTree:
     properties:
@@ -1988,6 +2011,8 @@ definitions:
       bindDomain:
         type: string
       complexityVerification:
+        type: string
+      defaultNetwork:
         type: string
       dingVars:
         type: string
@@ -3089,6 +3114,8 @@ definitions:
         type: object
       resource:
         type: string
+      source:
+        type: string
       type:
         type: string
       version:
@@ -3128,6 +3155,8 @@ definitions:
         type: object
       rebuild:
         type: boolean
+      source:
+        type: string
       version:
         type: string
     type: object
@@ -7804,7 +7833,7 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Update host ssh setting by file
+      summary: Update host SSH setting by file
       tags:
       - SSH
       x-panel-log:
@@ -7815,20 +7844,20 @@ paths:
         paramKeys: []
   /host/ssh/conf:
     get:
-      description: 获取 ssh 配置文件
+      description: 获取 SSH 配置文件
       responses:
         "200":
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Load host ssh conf
+      summary: Load host SSH conf
       tags:
       - SSH
   /host/ssh/generate:
     post:
       consumes:
       - application/json
-      description: 生成 ssh 密钥
+      description: 生成 SSH 密钥
       parameters:
       - description: request
         in: body
@@ -7841,7 +7870,7 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Generate host ssh secret
+      summary: Generate host SSH secret
       tags:
       - SSH
       x-panel-log:
@@ -7850,11 +7879,11 @@ paths:
         formatEN: generate SSH secret
         formatZH: '生成 SSH 密钥 '
         paramKeys: []
-  /host/ssh/logs:
+  /host/ssh/log:
     post:
       consumes:
       - application/json
-      description: 获取 ssh 登录日志
+      description: 获取 SSH 登录日志
       parameters:
       - description: request
         in: body
@@ -7869,7 +7898,31 @@ paths:
             $ref: '#/definitions/dto.SSHLog'
       security:
       - ApiKeyAuth: []
-      summary: Load host ssh logs
+      summary: Load host SSH logs
+      tags:
+      - SSH
+  /host/ssh/log/analysis:
+    post:
+      consumes:
+      - application/json
+      description: 分析 SSH 登录日志
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SearchForAnalysis'
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.SSHLogAnalysis'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Analysis host SSH logs
       tags:
       - SSH
   /host/ssh/operate:
@@ -7887,7 +7940,7 @@ paths:
       responses: {}
       security:
       - ApiKeyAuth: []
-      summary: Operate ssh
+      summary: Operate SSH
       tags:
       - SSH
       x-panel-log:
@@ -7907,14 +7960,14 @@ paths:
             $ref: '#/definitions/dto.SSHInfo'
       security:
       - ApiKeyAuth: []
-      summary: Load host ssh setting info
+      summary: Load host SSH setting info
       tags:
       - SSH
   /host/ssh/secret:
     post:
       consumes:
       - application/json
-      description: 获取 ssh 密钥
+      description: 获取 SSH 密钥
       parameters:
       - description: request
         in: body
@@ -7927,7 +7980,7 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Load host ssh secret
+      summary: Load host SSH secret
       tags:
       - SSH
   /host/ssh/update:
@@ -7947,7 +8000,7 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Update host ssh setting
+      summary: Update host SSH setting
       tags:
       - SSH
       x-panel-log:

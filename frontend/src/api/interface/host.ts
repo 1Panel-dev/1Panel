@@ -141,6 +141,13 @@ export namespace Host {
         successfulCount: number;
         failedCount: number;
     }
+    export interface logAnalysis {
+        address: string;
+        area: string;
+        successfulCount: number;
+        failedCount: number;
+        status: string;
+    }
     export interface sshHistory {
         date: Date;
         area: string;

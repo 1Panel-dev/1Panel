@@ -64,7 +64,6 @@ const formRef = ref<FormInstance>();
 
 const acceptParams = (params: DialogProps): void => {
     form.defaultNetwork = params.defaultNetwork;
-    console.log(form.defaultNetwork);
     loadNetworkOptions();
     drawerVisiable.value = true;
 };
