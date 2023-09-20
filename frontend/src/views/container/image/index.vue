@@ -46,6 +46,16 @@
                             <span>{{ row.id.replaceAll('sha256:', '').substring(0, 12) }}</span>
                         </template>
                     </el-table-column>
+                    <el-table-column :label="$t('commons.table.status')" prop="isUsed" width="100">
+                        <template #default="{ row }">
+                            <el-tag icon="Select" v-if="row.isUsed" type="success">
+                                {{ $t('commons.status.used') }}
+                            </el-tag>
+                            <el-tag v-else type="info">
+                                {{ $t('commons.status.unUsed') }}
+                            </el-tag>
+                        </template>
+                    </el-table-column>
                     <el-table-column
                         :label="$t('container.tag')"
                         prop="tags"
@@ -186,7 +196,7 @@ const onOpenBuild = () => {
 };
 
 const onOpenPrune = () => {
-    dialogPruneRef.value!.acceptParams();
+    dialogPruneRef.value!.acceptParams({ list: data.value });
 };
 
 const onOpenload = () => {

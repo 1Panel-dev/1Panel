@@ -11,10 +11,22 @@
                     <el-radio :label="false">{{ $t('container.imagePruneSome') }}</el-radio>
                     <el-radio :label="true">{{ $t('container.imagePruneAll') }}</el-radio>
                 </el-radio-group>
-                <span class="input-help">
-                    {{ withTagAll ? $t('container.imagePruneAllHelper') : $t('container.imagePruneSomeHelper') }}
-                </span>
             </el-form-item>
+            <span>
+                {{ withTagAll ? $t('container.imagePruneAllHelper') : $t('container.imagePruneSomeHelper') }}
+            </span>
+            <div v-if="!withTagAll">
+                <ul v-for="(item, index) in imageList" :key="index">
+                    <li v-if="item.tags.length === 1 && item.tags[0].indexOf(':<none>') !== -1">
+                        {{ item.tags[0] }}
+                    </li>
+                </ul>
+            </div>
+            <div v-else>
+                <ul v-for="(item, index) in imageList" :key="index">
+                    <li v-if="!item.isUsed">{{ item.tags.join(', ') }}</li>
+                </ul>
+            </div>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -30,6 +42,7 @@
 </template>
 
 <script lang="ts" setup>
+import { Container } from '@/api/interface/container';
 import { containerPrune } from '@/api/modules/container';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -39,8 +52,13 @@ import { ref } from 'vue';
 const dialogVisiable = ref(false);
 const withTagAll = ref(false);
 const loading = ref();
+const imageList = ref();
 
-const acceptParams = (): void => {
+interface DialogProps {
+    list: Array<Container.ImageInfo>;
+}
+const acceptParams = (params: DialogProps): void => {
+    imageList.value = params.list;
     dialogVisiable.value = true;
     withTagAll.value = false;
 };
