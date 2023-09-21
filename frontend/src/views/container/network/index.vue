@@ -111,8 +111,6 @@ import { ElMessageBox } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 
 const loading = ref();
-
-const detailInfo = ref();
 const codemirror = ref();
 
 const data = ref();
@@ -217,10 +215,10 @@ const batchDelete = async (row: Container.NetworkInfo | null) => {
 
 const onInspect = async (id: string) => {
     const res = await inspect({ id: id, type: 'network' });
-    detailInfo.value = JSON.stringify(JSON.parse(res.data), null, 2);
+    let detailInfo = JSON.stringify(JSON.parse(res.data), null, 2);
     let param = {
         header: i18n.global.t('commons.button.view'),
-        detailInfo: detailInfo.value,
+        detailInfo: detailInfo,
     };
     codemirror.value!.acceptParams(param);
 };

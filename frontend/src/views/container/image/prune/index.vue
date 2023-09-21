@@ -17,7 +17,7 @@
             </span>
             <div v-if="!withTagAll">
                 <ul v-for="(item, index) in imageList" :key="index">
-                    <li v-if="item.tags.length === 1 && item.tags[0].indexOf(':<none>') !== -1">
+                    <li v-if="item.tags.length === 1 && item.tags[0].indexOf('<none>') !== -1">
                         {{ item.tags[0] }}
                     </li>
                 </ul>

@@ -114,7 +114,6 @@ const mobile = computed(() => {
 });
 
 const loading = ref();
-const detailInfo = ref();
 const codemirror = ref();
 
 const data = ref();
@@ -178,10 +177,10 @@ const search = async () => {
 
 const onInspect = async (id: string) => {
     const res = await inspect({ id: id, type: 'volume' });
-    detailInfo.value = JSON.stringify(JSON.parse(res.data), null, 2);
+    let detailInfo = JSON.stringify(JSON.parse(res.data), null, 2);
     let param = {
         header: i18n.global.t('commons.button.view'),
-        detailInfo: detailInfo.value,
+        detailInfo: detailInfo,
     };
     codemirror.value!.acceptParams(param);
 };
