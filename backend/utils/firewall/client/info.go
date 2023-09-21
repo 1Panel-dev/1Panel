@@ -8,7 +8,7 @@ type FireInfo struct {
 	Strategy string `json:"strategy"` // accept drop
 
 	APPName     string `json:"appName"`
-	IsUsed      bool   `json:"isUsed"`
+	UsedStatus  string `json:"usedStatus"`
 	Description string `json:"description"`
 }
 

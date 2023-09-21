@@ -46,9 +46,6 @@ func (u *FirewallService) LoadBaseInfo() (dto.FirewallBaseInfo, error) {
 	baseInfo.Name = "-"
 	client, err := firewall.NewFirewallClient()
 	if err != nil {
-		if err.Error() == "no such type" {
-			return baseInfo, nil
-		}
 		return baseInfo, err
 	}
 	baseInfo.Name = client.Name()
@@ -111,14 +108,19 @@ func (u *FirewallService) SearchWithPage(req dto.RuleSearch) (int64, interface{}
 		}
 	}
 
+	if req.Type == "port" {
+		apps := u.loadPortByApp()
+		for i := 0; i < len(datas); i++ {
+			datas[i].UsedStatus = checkPortUsed(datas[i].Port, datas[i].Protocol, apps)
+		}
+	}
 	var datasFilterStatus []fireClient.FireInfo
 	if len(req.Status) != 0 {
 		for _, data := range datas {
-			portItem, _ := strconv.Atoi(data.Port)
-			if req.Status == "free" && !common.ScanPortWithProto(portItem, data.Protocol) {
+			if req.Status == "free" && len(data.UsedStatus) == 0 {
 				datasFilterStatus = append(datasFilterStatus, data)
 			}
-			if req.Status == "used" && common.ScanPortWithProto(portItem, data.Protocol) {
+			if req.Status == "used" && len(data.UsedStatus) != 0 {
 				datasFilterStatus = append(datasFilterStatus, data)
 			}
 		}
@@ -167,23 +169,6 @@ func (u *FirewallService) SearchWithPage(req dto.RuleSearch) (int64, interface{}
 		}
 	}
 
-	if req.Type == "port" {
-		apps := u.loadPortByApp()
-		for i := 0; i < len(backDatas); i++ {
-			port, _ := strconv.Atoi(backDatas[i].Port)
-			backDatas[i].IsUsed = common.ScanPort(port)
-			if backDatas[i].Protocol == "udp" {
-				backDatas[i].IsUsed = common.ScanUDPPort(port)
-				continue
-			}
-			for _, app := range apps {
-				if app.HttpPort == backDatas[i].Port || app.HttpsPort == backDatas[i].Port {
-					backDatas[i].APPName = app.AppName
-					break
-				}
-			}
-		}
-	}
 	go u.cleanUnUsedData(client)
 
 	return int64(total), backDatas, nil
@@ -625,4 +610,51 @@ func listIpRules(strategy string) ([]string, error) {
 		}
 	}
 	return rules, nil
+}
+
+func checkPortUsed(ports, proto string, apps []portOfApp) string {
+	if strings.Contains(ports, "-") {
+		port1, err := strconv.Atoi(strings.Split(ports, "-")[0])
+		if err != nil {
+			global.LOG.Errorf(" convert string %s to int failed, err: %v", strings.Split(ports, "-")[0], err)
+			return ""
+		}
+		port2, err := strconv.Atoi(strings.Split(ports, "-")[1])
+		if err != nil {
+			global.LOG.Errorf(" convert string %s to int failed, err: %v", strings.Split(ports, "-")[1], err)
+			return ""
+		}
+
+		var usedPorts []string
+		for i := port1; i <= port2; i++ {
+			portItem := fmt.Sprintf("%v", i)
+			isUsedByApp := false
+			for _, app := range apps {
+				if app.HttpPort == portItem || app.HttpsPort == portItem {
+					isUsedByApp = true
+					usedPorts = append(usedPorts, fmt.Sprintf("%s (%s)", portItem, app.AppName))
+					break
+				}
+			}
+			if !isUsedByApp && common.ScanPortWithProto(i, proto) {
+				usedPorts = append(usedPorts, fmt.Sprintf("%v", i))
+			}
+		}
+		return strings.Join(usedPorts, ",")
+	}
+
+	for _, app := range apps {
+		if app.HttpPort == ports || app.HttpsPort == ports {
+			return fmt.Sprintf("%s (%s)", ports, app.AppName)
+		}
+	}
+	port, err := strconv.Atoi(ports)
+	if err != nil {
+		global.LOG.Errorf(" convert string %v to int failed, err: %v", port, err)
+		return ""
+	}
+	if common.ScanPortWithProto(port, proto) {
+		return ports
+	}
+	return ""
 }
