@@ -273,7 +273,6 @@ const props = withDefaults(defineProps<Filters>(), {
     filters: '',
 });
 
-const detailInfo = ref();
 const mydetail = ref();
 
 const dialogContainerLogRef = ref();
@@ -366,10 +365,10 @@ const onTerminal = (row: any) => {
 
 const onInspect = async (id: string) => {
     const res = await inspect({ id: id, type: 'container' });
-    detailInfo.value = JSON.stringify(JSON.parse(res.data), null, 2);
+    let detailInfo = JSON.stringify(JSON.parse(res.data), null, 2);
     let param = {
         header: i18n.global.t('commons.button.view'),
-        detailInfo: detailInfo.value,
+        detailInfo: detailInfo,
     };
     mydetail.value!.acceptParams(param);
 };

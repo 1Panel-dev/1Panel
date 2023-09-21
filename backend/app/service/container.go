@@ -226,6 +226,8 @@ func (u *ContainerService) Inspect(req dto.InspectReq) (string, error) {
 	switch req.Type {
 	case "container":
 		inspectInfo, err = client.ContainerInspect(context.Background(), req.ID)
+	case "image":
+		inspectInfo, _, err = client.ImageInspectWithRaw(context.Background(), req.ID)
 	case "network":
 		inspectInfo, err = client.NetworkInspect(context.TODO(), req.ID, types.NetworkInspectOptions{})
 	case "volume":
