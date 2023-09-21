@@ -372,3 +372,8 @@ html {
         border: none;
     }
 }
+
+.limit-height-popover {
+    max-height: 300px;
+    overflow: auto;
+}

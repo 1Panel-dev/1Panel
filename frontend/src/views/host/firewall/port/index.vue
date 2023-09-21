@@ -83,18 +83,31 @@
                             :data="data"
                         >
                             <el-table-column type="selection" fix />
-                            <el-table-column :label="$t('commons.table.protocol')" :min-width="90" prop="protocol" />
-                            <el-table-column :label="$t('commons.table.port')" :min-width="120" prop="port" />
+                            <el-table-column :label="$t('commons.table.protocol')" :min-width="70" prop="protocol" />
+                            <el-table-column :label="$t('commons.table.port')" :min-width="70" prop="port" />
                             <el-table-column :label="$t('commons.table.status')" :min-width="120">
                                 <template #default="{ row }">
-                                    <el-tag type="info" v-if="row.isUsed">
-                                        {{
-                                            row.appName
-                                                ? $t('firewall.used') + ' ( ' + row.appName + ' )'
-                                                : $t('firewall.used')
-                                        }}
-                                    </el-tag>
-                                    <el-tag type="success" v-else>{{ $t('firewall.unUsed') }}</el-tag>
+                                    <div v-if="row.port.indexOf('-') !== -1 && row.usedStatus">
+                                        <el-tag type="info" class="mt-1">
+                                            {{ $t('firewall.used') + ' * ' + row.usedPorts.length }}
+                                        </el-tag>
+                                        <el-popover placement="right" popper-class="limit-height-popover" :width="250">
+                                            <template #default>
+                                                <ul v-for="(item, index) in row.usedPorts" :key="index">
+                                                    <li>{{ item }}</li>
+                                                </ul>
+                                            </template>
+                                            <template #reference>
+                                                <svg-icon iconName="p-xiangqing" class="svg-icon"></svg-icon>
+                                            </template>
+                                        </el-popover>
+                                    </div>
+                                    <div v-else>
+                                        <el-tag type="info" v-if="row.usedStatus">
+                                            {{ $t('firewall.used') }}
+                                        </el-tag>
+                                        <el-tag type="success" v-else>{{ $t('firewall.unUsed') }}</el-tag>
+                                    </div>
                                 </template>
                             </el-table-column>
                             <el-table-column :min-width="80" :label="$t('firewall.strategy')" prop="strategy">
@@ -220,6 +233,9 @@ const search = async () => {
         .then((res) => {
             loading.value = false;
             data.value = res.data.items || [];
+            for (const item of data.value) {
+                item.usedPorts = item.usedStatus ? item.usedStatus.split(',') : [];
+            }
             paginationConfig.total = res.data.total;
         })
         .catch(() => {
@@ -361,3 +377,11 @@ onMounted(() => {
     }
 });
 </script>
+
+<style lang="scss" scoped>
+.svg-icon {
+    font-size: 8px;
+    margin-bottom: -4px;
+    cursor: pointer;
+}
+</style>
