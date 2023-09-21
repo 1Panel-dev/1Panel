@@ -525,6 +525,12 @@ const message = {
             'Clearing logs requires restarting the container, and this operation cannot be rolled back. Do you want to continue?',
         newName: 'New name',
         source: 'Resource rate',
+        cpuUsage: 'CPU Usage',
+        cpuTotal: 'CPU Total',
+        core: 'Core',
+        memUsage: 'Memory Usage',
+        memTotal: 'Memory Limit',
+        memCache: 'Memory Cache',
         ip: 'IP address',
         cpuShare: 'CPU Share',
         cpuShareHelper:

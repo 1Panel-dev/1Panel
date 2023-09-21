@@ -208,8 +208,7 @@ func (u *ContainerService) ContainerListStats() ([]dto.ContainerListStats, error
 	wg.Add(len(list))
 	for i := 0; i < len(list); i++ {
 		go func(item types.Container) {
-			cpu, mem := loadCpuAndMem(client, item.ID)
-			datas = append(datas, dto.ContainerListStats{CPUPercent: cpu, MemoryPercent: mem, ContainerID: item.ID})
+			datas = append(datas, loadCpuAndMem(client, item.ID))
 			wg.Done()
 		}(list[i])
 	}
@@ -766,26 +765,36 @@ func pullImages(ctx context.Context, client *client.Client, image string) error 
 	return nil
 }
 
-func loadCpuAndMem(client *client.Client, container string) (float64, float64) {
+func loadCpuAndMem(client *client.Client, container string) dto.ContainerListStats {
+	data := dto.ContainerListStats{
+		ContainerID: container,
+	}
 	res, err := client.ContainerStats(context.Background(), container, false)
 	if err != nil {
-		return 0, 0
+		return data
 	}
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		res.Body.Close()
-		return 0, 0
+		return data
 	}
 	res.Body.Close()
 	var stats *types.StatsJSON
 	if err := json.Unmarshal(body, &stats); err != nil {
-		return 0, 0
+		return data
 	}
 
-	CPUPercent := calculateCPUPercentUnix(stats)
-	MemPercent := calculateMemPercentUnix(stats.MemoryStats)
-	return CPUPercent, MemPercent
+	data.CPUTotalUsage = stats.CPUStats.CPUUsage.TotalUsage - stats.PreCPUStats.CPUUsage.TotalUsage
+	data.SystemUsage = stats.CPUStats.SystemUsage - stats.PreCPUStats.SystemUsage
+	data.CPUPercent = calculateCPUPercentUnix(stats)
+	data.PercpuUsage = len(stats.CPUStats.CPUUsage.PercpuUsage)
+
+	data.MemroyCache = stats.MemoryStats.Stats["cache"]
+	data.MemoryUsage = stats.MemoryStats.Usage
+	data.MemoryLimit = stats.MemoryStats.Limit
+	data.MemoryPercent = calculateMemPercentUnix(stats.MemoryStats)
+	return data
 }
 
 func checkPortStats(ports []dto.PortHelper) (nat.PortMap, error) {
