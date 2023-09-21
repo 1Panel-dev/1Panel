@@ -70,7 +70,13 @@ export namespace Container {
     }
     export interface ContainerListStats {
         containerID: string;
+        cpuTotalUsage: number;
+        systemUsage: number;
         cpuPercent: number;
+        percpuUsage: number;
+        memoryCache: number;
+        memoryUsage: number;
+        memoryLimit: number;
         memoryPercent: number;
     }
     export interface ContainerStats {

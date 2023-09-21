@@ -92,9 +92,69 @@
                         <template #default="{ row }">
                             <div v-if="row.hasLoad">
                                 <div class="source-font">CPU: {{ row.cpuPercent.toFixed(2) }}%</div>
-                                <div class="source-font">
+                                <div class="float-left source-font">
                                     {{ $t('monitor.memory') }}: {{ row.memoryPercent.toFixed(2) }}%
                                 </div>
+                                <el-popover placement="right" width="500px" class="float-right">
+                                    <template #reference>
+                                        <svg-icon iconName="p-xiangqing" class="svg-icon"></svg-icon>
+                                    </template>
+                                    <template #default>
+                                        <el-row>
+                                            <el-col :span="8">
+                                                <el-statistic
+                                                    :title="$t('container.cpuUsage')"
+                                                    :value="loadCPUValue(row.cpuTotalUsage)"
+                                                    :precision="2"
+                                                >
+                                                    <template #suffix>{{ loadCPUUnit(row.cpuTotalUsage) }}</template>
+                                                </el-statistic>
+                                            </el-col>
+                                            <el-col :span="8">
+                                                <el-statistic
+                                                    :title="$t('container.cpuTotal')"
+                                                    :value="loadCPUValue(row.systemUsage)"
+                                                    :precision="2"
+                                                >
+                                                    <template #suffix>{{ loadCPUUnit(row.systemUsage) }}</template>
+                                                </el-statistic>
+                                            </el-col>
+                                            <el-col :span="8">
+                                                <el-statistic :title="$t('container.core')" :value="row.percpuUsage" />
+                                            </el-col>
+                                        </el-row>
+
+                                        <el-row class="mt-4">
+                                            <el-col :span="8">
+                                                <el-statistic
+                                                    :title="$t('container.memUsage')"
+                                                    :value="loadMemValue(row.memoryUsage)"
+                                                    :precision="2"
+                                                >
+                                                    <template #suffix>{{ loadMemUnit(row.memoryUsage) }}</template>
+                                                </el-statistic>
+                                            </el-col>
+                                            <el-col :span="8">
+                                                <el-statistic
+                                                    :title="$t('container.memCache')"
+                                                    :value="loadMemValue(row.memoryCache)"
+                                                    :precision="2"
+                                                >
+                                                    <template #suffix>{{ loadMemUnit(row.memoryCache) }}</template>
+                                                </el-statistic>
+                                            </el-col>
+                                            <el-col :span="8">
+                                                <el-statistic
+                                                    :title="$t('container.memTotal')"
+                                                    :value="loadMemValue(row.memoryLimit)"
+                                                    :precision="2"
+                                                >
+                                                    <template #suffix>{{ loadMemUnit(row.memoryLimit) }}</template>
+                                                </el-statistic>
+                                            </el-col>
+                                        </el-row>
+                                    </template>
+                                </el-popover>
                             </div>
                             <div v-if="!row.hasLoad">
                                 <el-button link loading></el-button>
@@ -314,13 +374,51 @@ const loadStats = async () => {
         for (const item of stats) {
             if (container.containerID === item.containerID) {
                 container.hasLoad = true;
+                container.cpuTotalUsage = item.cpuTotalUsage;
+                container.systemUsage = item.systemUsage;
                 container.cpuPercent = item.cpuPercent;
+                container.percpuUsage = item.percpuUsage;
+                container.memoryCache = item.memoryCache;
+                container.memoryUsage = item.memoryUsage;
+                container.memoryLimit = item.memoryLimit;
                 container.memoryPercent = item.memoryPercent;
                 break;
             }
         }
     }
 };
+
+const loadCPUUnit = (t: number) => {
+    const num = 1000;
+    if (t < num) return ' ns';
+    if (t < Math.pow(num, 2)) return ' μs';
+    if (t < Math.pow(num, 3)) return ' ms';
+    return ' s';
+};
+function loadCPUValue(t: number) {
+    const num = 1000;
+    if (t < num) return t;
+    if (t < Math.pow(num, 2)) return Number((t / num).toFixed(2));
+    if (t < Math.pow(num, 3)) return Number((t / Math.pow(num, 2)).toFixed(2));
+    return Number((t / Math.pow(num, 3)).toFixed(2));
+}
+const loadMemUnit = (t: number) => {
+    if (t == 0) {
+        return '';
+    }
+    const num = 1024;
+    if (t < num) return ' B';
+    if (t < Math.pow(num, 2)) return ' KiB';
+    if (t < Math.pow(num, 3)) return ' MiB';
+    return ' GiB';
+};
+function loadMemValue(t: number) {
+    const num = 1024;
+    if (t < num) return t;
+    if (t < Math.pow(num, 2)) return Number((t / num).toFixed(2));
+    if (t < Math.pow(num, 3)) return Number((t / Math.pow(num, 2)).toFixed(2));
+    return Number((t / Math.pow(num, 3)).toFixed(2));
+}
 
 const dialogOperateRef = ref();
 const onEdit = async (container: string) => {
@@ -548,5 +646,10 @@ onMounted(() => {
 }
 .source-font {
     font-size: 12px;
+}
+.svg-icon {
+    margin-top: -3px;
+    font-size: 6px;
+    cursor: pointer;
 }
 </style>

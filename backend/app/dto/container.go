@@ -63,8 +63,16 @@ type ContainerUpgrade struct {
 }
 
 type ContainerListStats struct {
-	ContainerID   string  `json:"containerID"`
+	ContainerID string `json:"containerID"`
+
+	CPUTotalUsage uint64  `json:"cpuTotalUsage"`
+	SystemUsage   uint64  `json:"systemUsage"`
 	CPUPercent    float64 `json:"cpuPercent"`
+	PercpuUsage   int     `json:"percpuUsage"`
+
+	MemroyCache   uint64  `json:"memoryCache"`
+	MemoryUsage   uint64  `json:"memoryUsage"`
+	MemoryLimit   uint64  `json:"memoryLimit"`
 	MemoryPercent float64 `json:"memoryPercent"`
 }
 
