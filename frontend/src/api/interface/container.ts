@@ -20,6 +20,7 @@ export namespace Container {
         containerID: string;
         name: string;
         image: string;
+        imageInput: boolean;
         forcePull: boolean;
         network: string;
         cmdStr: string;
@@ -51,6 +52,7 @@ export namespace Container {
         sourceDir: string;
         containerDir: string;
         mode: string;
+        isVolume: boolean;
     }
     export interface ContainerInfo {
         containerID: string;

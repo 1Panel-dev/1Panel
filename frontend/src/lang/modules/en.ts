@@ -476,7 +476,7 @@ const message = {
     container: {
         create: 'Create container',
         edit: 'Edit container',
-        updateContaienrHelper:
+        updateContainerHelper:
             'Container editing requires rebuilding the container. Any data that has not been persisted will be lost. Do you want to continue?',
         containerList: 'Container list',
         operatorHelper: '{0} will be performed on the following container, Do you want to continue?',
@@ -551,6 +551,7 @@ const message = {
         appHelper:
             'This container is sourced from the application store. Upgrading it may cause the service to be unavailable.',
 
+        input: 'Input',
         forcePull: 'forced image pull ',
         forcePullHelper: 'Ignore existing images on the server and pull again.',
         server: 'Host',
@@ -565,6 +566,8 @@ const message = {
         memoryLimit: 'Memory',
         limitHelper: 'If you limit it to 0, then the limitation is turned off, and the maximum available is {0}.',
         mount: 'Mount',
+        volumeOption: 'Volume',
+        hostOption: 'Host',
         serverPath: 'Server path',
         containerDir: 'Container path',
         volumeHelper: 'Ensure that the content of the storage volume is correct',

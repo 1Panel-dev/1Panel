@@ -465,7 +465,7 @@ const message = {
     container: {
         create: '创建容器',
         edit: '编辑容器',
-        updateContaienrHelper: '容器编辑需要重建容器，任何未持久化的数据将会丢失，是否继续？',
+        updateContainerHelper: '容器编辑需要重建容器，任何未持久化的数据将会丢失，是否继续？',
         containerList: '容器列表',
         operatorHelper: '将对以下容器进行 {0} 操作，是否继续？',
         operatorAppHelper:
@@ -534,6 +534,7 @@ const message = {
         targetImageHelper: '请输入目标镜像版本',
         appHelper: '该容器来源于应用商店，升级可能导致该服务不可用',
 
+        input: '手动输入',
         forcePull: '强制拉取镜像',
         forcePullHelper: '忽略服务器已存在的镜像，重新拉取一次',
         server: '服务器',
@@ -547,7 +548,9 @@ const message = {
         cpuQuota: 'CPU 限制',
         memoryLimit: '内存限制',
         limitHelper: '限制为 0 则关闭限制，最大可用为 {0}',
-        mount: '挂载卷',
+        mount: '挂载',
+        volumeOption: '挂载卷',
+        hostOption: '本机目录',
         serverPath: '服务器目录',
         containerDir: '容器目录',
         volumeHelper: '请确认存储卷内容输入正确',
