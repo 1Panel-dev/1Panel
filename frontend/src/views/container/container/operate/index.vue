@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+    <el-drawer v-model="drawerVisible" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
             <DrawerHeader
                 :header="title"
@@ -22,10 +22,9 @@
                         <el-input clearable v-model.trim="dialogData.rowData!.name" />
                     </el-form-item>
                     <el-form-item :label="$t('container.image')" prop="image">
+                        <el-checkbox v-model="dialogData.rowData!.imageInput" :label="$t('container.input')" />
                         <el-select
-                            class="widthClass"
-                            :placeholder="$t('commons.msg.inputOrSelect')"
-                            allow-create
+                            v-if="!dialogData.rowData!.imageInput"
                             filterable
                             v-model="dialogData.rowData!.image"
                         >
@@ -36,6 +35,7 @@
                                 :label="item.option"
                             />
                         </el-select>
+                        <el-input v-else v-model="dialogData.rowData!.image" />
                     </el-form-item>
                     <el-form-item prop="forcePull">
                         <el-checkbox v-model="dialogData.rowData!.forcePull">
@@ -110,64 +110,57 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item :label="$t('container.mount')">
-                        <el-card style="width: 100%">
-                            <table style="width: 100%" class="tab-table">
-                                <tr v-if="dialogData.rowData!.volumes!.length !== 0">
-                                    <th scope="col" width="39%" align="left">
-                                        <label>{{ $t('container.serverPath') }}</label>
-                                    </th>
-                                    <th scope="col" width="18%" align="left">
-                                        <label>{{ $t('container.mode') }}</label>
-                                    </th>
-                                    <th scope="col" width="39%" align="left">
-                                        <label>{{ $t('container.containerDir') }}</label>
-                                    </th>
-                                    <th align="left"></th>
-                                </tr>
-                                <tr v-for="(row, index) in dialogData.rowData!.volumes" :key="index">
-                                    <td width="39%">
-                                        <el-select
-                                            class="widthClass"
-                                            allow-create
-                                            clearable
-                                            :placeholder="$t('commons.msg.inputOrSelect')"
-                                            filterable
-                                            v-model="row.sourceDir"
-                                        >
-                                            <div v-for="(item, indexV) of volumes" :key="indexV">
-                                                <el-tooltip :hide-after="20" :content="item.option" placement="top">
-                                                    <el-option
-                                                        :value="item.option"
-                                                        :label="item.option.substring(0, 30)"
-                                                    />
-                                                </el-tooltip>
-                                            </div>
-                                        </el-select>
-                                    </td>
-                                    <td width="18%">
-                                        <el-select class="widthClass" filterable v-model="row.mode">
-                                            <el-option value="rw" :label="$t('container.modeRW')" />
-                                            <el-option value="ro" :label="$t('container.modeR')" />
-                                        </el-select>
-                                    </td>
-                                    <td width="39%">
-                                        <el-input v-model="row.containerDir" />
-                                    </td>
-                                    <td>
-                                        <el-button link style="font-size: 10px" @click="handleVolumesDelete(index)">
-                                            {{ $t('commons.button.delete') }}
-                                        </el-button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td align="left">
-                                        <el-button @click="handleVolumesAdd()">
-                                            {{ $t('commons.button.add') }}
-                                        </el-button>
-                                    </td>
-                                </tr>
-                            </table>
-                        </el-card>
+                        <div v-for="(row, index) in dialogData.rowData!.volumes" :key="index" style="width: 100%">
+                            <el-card class="mt-1">
+                                <el-radio-group v-model="row.isVolume">
+                                    <el-radio-button :label="true">{{ $t('container.volumeOption') }}</el-radio-button>
+                                    <el-radio-button :label="false">{{ $t('container.hostOption') }}</el-radio-button>
+                                </el-radio-group>
+                                <el-button
+                                    class="float-right mt-3"
+                                    link
+                                    type="primary"
+                                    @click="handleVolumesDelete(index)"
+                                >
+                                    {{ $t('commons.button.delete') }}
+                                </el-button>
+                                <el-row class="mt-4" :gutter="5">
+                                    <el-col :span="10">
+                                        <el-form-item v-if="row.isVolume" :label="$t('container.volumeOption')">
+                                            <el-select filterable v-model="row.sourceDir">
+                                                <div v-for="(item, indexV) of volumes" :key="indexV">
+                                                    <el-tooltip :hide-after="20" :content="item.option" placement="top">
+                                                        <el-option
+                                                            :value="item.option"
+                                                            :label="item.option.substring(0, 30)"
+                                                        />
+                                                    </el-tooltip>
+                                                </div>
+                                            </el-select>
+                                        </el-form-item>
+                                        <el-form-item v-else :label="$t('container.hostOption')">
+                                            <el-input v-model="row.sourceDir" />
+                                        </el-form-item>
+                                    </el-col>
+                                    <el-col :span="5">
+                                        <el-form-item :label="$t('container.mode')">
+                                            <el-select class="widthClass" filterable v-model="row.mode">
+                                                <el-option value="rw" :label="$t('container.modeRW')" />
+                                                <el-option value="ro" :label="$t('container.modeR')" />
+                                            </el-select>
+                                        </el-form-item>
+                                    </el-col>
+                                    <el-col :span="9">
+                                        <el-form-item :label="$t('container.containerDir')">
+                                            <el-input v-model="row.containerDir" />
+                                        </el-form-item>
+                                    </el-col>
+                                </el-row>
+                            </el-card>
+                        </div>
+                        <el-button @click="handleVolumesAdd()">
+                            {{ $t('commons.button.add') }}
+                        </el-button>
                     </el-form-item>
                     <el-form-item label="Command" prop="cmdStr">
                         <el-input v-model="dialogData.rowData!.cmdStr" :placeholder="$t('container.cmdHelper')" />
@@ -236,7 +229,7 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button :disabled="loading" @click="drawerVisiable = false">
+                <el-button :disabled="loading" @click="drawerVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
@@ -251,7 +244,7 @@
 import { reactive, ref } from 'vue';
 import { Rules, checkFloatNumberRange, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
-import { ElForm } from 'element-plus';
+import { ElForm, ElMessageBox } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import {
     listImage,
@@ -273,7 +266,7 @@ interface DialogProps {
 }
 
 const title = ref<string>('');
-const drawerVisiable = ref(false);
+const drawerVisible = ref(false);
 
 const dialogData = ref<DialogProps>({
     title: '',
@@ -310,7 +303,7 @@ const acceptParams = (params: DialogProps): void => {
     loadImageOptions();
     loadVolumeOptions();
     loadNetworkOptions();
-    drawerVisiable.value = true;
+    drawerVisible.value = true;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -324,12 +317,12 @@ const limits = ref<Container.ResourceLimit>({
 
 const handleClose = () => {
     emit('search');
-    drawerVisiable.value = false;
+    drawerVisible.value = false;
 };
 
 const rules = reactive({
     name: [Rules.requiredInput, Rules.volumeName],
-    image: [Rules.requiredSelect],
+    image: [Rules.requiredInput],
     cpuShares: [Rules.integerNumberWith0, checkNumberRange(0, 262144)],
     nanoCPUs: [Rules.floatNumber],
     memory: [Rules.floatNumber],
@@ -357,6 +350,7 @@ const handleVolumesAdd = () => {
         sourceDir: '',
         containerDir: '',
         mode: 'rw',
+        isVolume: true,
     };
     dialogData.value.rowData!.volumes.push(item);
 };
@@ -377,6 +371,18 @@ const loadImageOptions = async () => {
 const loadVolumeOptions = async () => {
     const res = await listVolume();
     volumes.value = res.data;
+    for (const item of dialogData.value.rowData.volumes) {
+        let isVolume = false;
+        for (const v of volumes.value) {
+            if (item.sourceDir == v.option) {
+                item.isVolume = true;
+                break;
+            }
+            if (!isVolume) {
+                item.isVolume = false;
+            }
+        }
+    }
 };
 const loadNetworkOptions = async () => {
     const res = await listNetwork();
@@ -436,14 +442,14 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                     loading.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                     emit('search');
-                    drawerVisiable.value = false;
+                    drawerVisible.value = false;
                 })
                 .catch(() => {
                     loading.value = false;
                 });
         } else {
             ElMessageBox.confirm(
-                i18n.global.t('container.updateContaienrHelper'),
+                i18n.global.t('container.updateContainerHelper'),
                 i18n.global.t('commons.button.edit'),
                 {
                     confirmButtonText: i18n.global.t('commons.button.confirm'),
@@ -456,7 +462,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                             loading.value = false;
                             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                             emit('search');
-                            drawerVisiable.value = false;
+                            drawerVisible.value = false;
                         })
                         .catch(() => {
                             loading.value = false;
