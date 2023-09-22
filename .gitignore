@@ -4,9 +4,30 @@
 *.dll
 *.so
 *.dylib
-.idea
-
 build/1panel
+
+# Mac
+.DS_Store
+*/.DS_Store
+
+# VS Code
+.vscode
+*.project
+*.factorypath
+
+# IntelliJ IDEA
+.idea
+*.iws
+*.iml
+*.ipr
+
+# NetBeans
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
 
 # Test binary, built with `go test -c`
 *.test
@@ -14,8 +35,7 @@ build/1panel
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
-# Dependency directories (remove the comment below to include it)
-# vendor/
+# Dependency directories
 /pkg/
 backend/__debug_bin
 cmd/server/__debug_bin
@@ -31,7 +51,5 @@ dist/
 1panel.service
 install.sh
 quick_start.sh
-cmd/server/web/.DS_Store
-cmd/server/.DS_Store
 cmd/server/fileList.txt
 .fileList.txt
