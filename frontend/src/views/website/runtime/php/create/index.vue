@@ -35,9 +35,9 @@
                             <el-row :gutter="20">
                                 <el-col :span="12">
                                     <el-select
-                                        v-model="runtime.appId"
+                                        v-model="runtime.appID"
                                         :disabled="mode === 'edit'"
-                                        @change="changeApp(runtime.appId)"
+                                        @change="changeApp(runtime.appID)"
                                     >
                                         <el-option
                                             v-for="(app, index) in apps"
@@ -178,7 +178,7 @@ const appReq = reactive({
 });
 const initData = (type: string) => ({
     name: '',
-    appDetailId: undefined,
+    appDetailID: undefined,
     image: '',
     params: {},
     type: type,
@@ -192,7 +192,7 @@ let runtime = reactive<Runtime.RuntimeCreate>(initData('php'));
 const rules = ref<any>({
     name: [Rules.appName],
     resource: [Rules.requiredInput],
-    appId: [Rules.requiredSelect],
+    appID: [Rules.requiredSelect],
     version: [Rules.requiredInput, Rules.paramCommon],
     image: [Rules.requiredInput, Rules.imageName],
     source: [Rules.requiredSelect],
@@ -238,7 +238,7 @@ const handleClose = () => {
 
 const changeResource = (resource: string) => {
     if (resource === 'local') {
-        runtime.appDetailId = undefined;
+        runtime.appDetailID = undefined;
         runtime.version = '';
         runtime.params = {};
         runtime.image = '';
@@ -253,7 +253,7 @@ const searchApp = (appId: number) => {
         apps.value = res.data.items || [];
         if (res.data && res.data.items && res.data.items.length > 0) {
             if (appId == null) {
-                runtime.appId = res.data.items[0].id;
+                runtime.appID = res.data.items[0].id;
                 getApp(res.data.items[0].key, mode.value);
             } else {
                 res.data.items.forEach((item) => {
@@ -279,9 +279,9 @@ const changeApp = (appId: number) => {
 const changeVersion = () => {
     loading.value = true;
     initParam.value = false;
-    GetAppDetail(runtime.appId, runtime.version, 'runtime')
+    GetAppDetail(runtime.appID, runtime.version, 'runtime')
         .then((res) => {
-            runtime.appDetailId = res.data.id;
+            runtime.appDetailID = res.data.id;
             runtime.image = res.data.image + ':' + runtime.version;
             appParams.value = res.data.params;
             initParam.value = true;
@@ -342,19 +342,19 @@ const getRuntime = async (id: number) => {
         Object.assign(runtime, {
             id: data.id,
             name: data.name,
-            appDetailId: data.appDetailId,
+            appDetailID: data.appDetailID,
             image: data.image,
             params: {},
             type: data.type,
             resource: data.resource,
-            appId: data.appId,
+            appID: data.appID,
             version: data.version,
             rebuild: true,
             source: data.source,
         });
         editParams.value = data.appParams;
         if (mode.value == 'create') {
-            searchApp(data.appId);
+            searchApp(data.appID);
         } else {
             initParam.value = true;
         }

@@ -339,8 +339,20 @@ definitions:
         type: string
       cpuPercent:
         type: number
+      cpuTotalUsage:
+        type: integer
+      memoryCache:
+        type: integer
+      memoryLimit:
+        type: integer
       memoryPercent:
         type: number
+      memoryUsage:
+        type: integer
+      percpuUsage:
+        type: integer
+      systemUsage:
+        type: integer
     type: object
   dto.ContainerOperate:
     properties:
@@ -3085,6 +3097,11 @@ definitions:
     required:
     - scope
     type: object
+  request.NodePackageReq:
+    properties:
+      codeDir:
+        type: string
+    type: object
   request.PortUpdate:
     properties:
       key:
@@ -3105,8 +3122,14 @@ definitions:
     properties:
       appDetailId:
         type: integer
+      clean:
+        type: boolean
+      codeDir:
+        type: string
       image:
         type: string
+      install:
+        type: boolean
       name:
         type: string
       params:
@@ -3123,6 +3146,8 @@ definitions:
     type: object
   request.RuntimeDelete:
     properties:
+      forceDelete:
+        type: boolean
       id:
         type: integer
     type: object
@@ -3144,10 +3169,16 @@ definitions:
     type: object
   request.RuntimeUpdate:
     properties:
+      clean:
+        type: boolean
+      codeDir:
+        type: string
       id:
         type: integer
       image:
         type: string
+      install:
+        type: boolean
       name:
         type: string
       params:
@@ -9035,6 +9066,26 @@ paths:
         formatEN: Delete website [name]
         formatZH: 删除网站 [name]
         paramKeys: []
+  /runtimes/node/package:
+    post:
+      consumes:
+      - application/json
+      description: 获取 Node 项目的 scripts
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.NodePackageReq'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Get Node package scripts
+      tags:
+      - Runtime
   /runtimes/search:
     post:
       consumes:

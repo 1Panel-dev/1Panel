@@ -4,11 +4,15 @@ const (
 	ResourceLocal    = "local"
 	ResourceAppstore = "appstore"
 
-	RuntimeNormal   = "normal"
-	RuntimeError    = "error"
-	RuntimeBuildIng = "building"
+	RuntimeNormal     = "normal"
+	RuntimeError      = "error"
+	RuntimeBuildIng   = "building"
+	RuntimeStarting   = "starting"
+	RuntimeRunning    = "running"
+	RuntimeReCreating = "recreating"
 
-	RuntimePHP = "php"
+	RuntimePHP  = "php"
+	RuntimeNode = "node"
 
 	RuntimeProxyUnix = "unix"
 	RuntimeProxyTcp  = "tcp"

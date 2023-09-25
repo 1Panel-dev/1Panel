@@ -8,7 +8,7 @@
         popper-class="file-list"
     >
         <template #reference>
-            <el-button :icon="Folder" @click="popoverVisible = true"></el-button>
+            <el-button :icon="Folder" :disabled="disabled" @click="popoverVisible = true"></el-button>
         </template>
         <div>
             <el-button class="close" link @click="closePage">
@@ -113,6 +113,10 @@ const props = defineProps({
         default: '/',
     },
     dir: {
+        type: Boolean,
+        default: false,
+    },
+    disabled: {
         type: Boolean,
         default: false,
     },

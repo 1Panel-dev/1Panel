@@ -203,13 +203,18 @@ const search = async (req: App.AppReq) => {
 };
 
 const openInstall = (app: App.App) => {
-    if (app.type === 'php') {
-        router.push({ path: '/websites/runtime/php' });
-    } else {
-        const params = {
-            app: app,
-        };
-        installRef.value.acceptParams(params);
+    switch (app.type) {
+        case 'php':
+            router.push({ path: '/websites/runtimes/php' });
+            break;
+        case 'node':
+            router.push({ path: '/websites/runtimes/node' });
+            break;
+        default:
+            const params = {
+                app: app,
+            };
+            installRef.value.acceptParams(params);
     }
 };
 

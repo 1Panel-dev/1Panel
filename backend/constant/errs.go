@@ -114,11 +114,14 @@ var (
 
 // runtime
 var (
-	ErrDirNotFound    = "ErrDirNotFound"
-	ErrFileNotExist   = "ErrFileNotExist"
-	ErrImageBuildErr  = "ErrImageBuildErr"
-	ErrImageExist     = "ErrImageExist"
-	ErrDelWithWebsite = "ErrDelWithWebsite"
+	ErrDirNotFound         = "ErrDirNotFound"
+	ErrFileNotExist        = "ErrFileNotExist"
+	ErrImageBuildErr       = "ErrImageBuildErr"
+	ErrImageExist          = "ErrImageExist"
+	ErrDelWithWebsite      = "ErrDelWithWebsite"
+	ErrRuntimeStart        = "ErrRuntimeStart"
+	ErrPackageJsonNotFound = "ErrPackageJsonNotFound"
+	ErrScriptsNotFound     = "ErrScriptsNotFound"
 )
 
 var (
