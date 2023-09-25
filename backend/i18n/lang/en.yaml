@@ -99,6 +99,9 @@ ErrFileNotExist: "{{ .detail }} file does not exist! Please check source file in
 ErrImageBuildErr: "Image build failed"
 ErrImageExist: "Image is already exist！"
 ErrDelWithWebsite: "The operating environment has been associated with a website and cannot be deleted"
+ErrRuntimeStart: "Failed to start"
+ErrPackageJsonNotFound: "package.json file does not exist"
+ErrScriptsNotFound: "No scripts configuration item was found in package.json"
 
 #setting
 ErrBackupInUsed: "The backup account is already being used in a cronjob and cannot be deleted."

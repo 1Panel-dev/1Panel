@@ -21,3 +21,7 @@ export const GetRuntime = (id: number) => {
 export const UpdateRuntime = (req: Runtime.RuntimeUpdate) => {
     return http.post<any>(`/runtimes/update`, req);
 };
+
+export const GetNodeScripts = (req: Runtime.NodeReq) => {
+    return http.post<Runtime.NodeScripts[]>(`/runtimes/node/package`, req);
+};

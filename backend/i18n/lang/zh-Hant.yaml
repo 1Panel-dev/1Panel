@@ -99,6 +99,9 @@ ErrFileNotExist: "{{ .detail }} 文件不存在！請檢查源文件完整性！
 ErrImageBuildErr: "鏡像 build 失敗"
 ErrImageExist: "鏡像已存在！"
 ErrDelWithWebsite: "運行環境已經關聯網站，無法刪除"
+ErrRuntimeStart: "啟動失敗"
+ErrPackageJsonNotFound: "package.json 文件不存在"
+ErrScriptsNotFound: "沒有在 package.json 中找到 scripts 配置項"
 
 #setting
 ErrBackupInUsed: "該備份帳號已在計劃任務中使用，無法刪除"

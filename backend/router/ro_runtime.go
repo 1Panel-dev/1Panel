@@ -20,5 +20,6 @@ func (r *RuntimeRouter) InitRuntimeRouter(Router *gin.RouterGroup) {
 		groupRouter.POST("/del", baseApi.DeleteRuntime)
 		groupRouter.POST("/update", baseApi.UpdateRuntime)
 		groupRouter.GET("/:id", baseApi.GetRuntime)
+		groupRouter.POST("/node/package", baseApi.GetNodePackageRunScript)
 	}
 }

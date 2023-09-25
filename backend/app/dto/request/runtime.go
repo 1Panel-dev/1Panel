@@ -18,10 +18,18 @@ type RuntimeCreate struct {
 	Type        string                 `json:"type"`
 	Version     string                 `json:"version"`
 	Source      string                 `json:"source"`
+	CodeDir     string                 `json:"codeDir"`
+	NodeConfig
+}
+
+type NodeConfig struct {
+	Install bool `json:"install"`
+	Clean   bool `json:"clean"`
 }
 
 type RuntimeDelete struct {
-	ID uint `json:"id"`
+	ID          uint `json:"id"`
+	ForceDelete bool `json:"forceDelete"`
 }
 
 type RuntimeUpdate struct {
@@ -32,4 +40,10 @@ type RuntimeUpdate struct {
 	Version string                 `json:"version"`
 	Rebuild bool                   `json:"rebuild"`
 	Source  string                 `json:"source"`
+	CodeDir string                 `json:"codeDir"`
+	NodeConfig
+}
+
+type NodePackageReq struct {
+	CodeDir string `json:"codeDir"`
 }

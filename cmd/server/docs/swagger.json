@@ -7823,6 +7823,39 @@
                 }
             }
         },
+        "/runtimes/node/package": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取 Node 项目的 scripts",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Runtime"
+                ],
+                "summary": "Get Node package scripts",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.NodePackageReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/runtimes/search": {
             "post": {
                 "security": [
@@ -12255,8 +12288,26 @@
                 "cpuPercent": {
                     "type": "number"
                 },
+                "cpuTotalUsage": {
+                    "type": "integer"
+                },
+                "memoryCache": {
+                    "type": "integer"
+                },
+                "memoryLimit": {
+                    "type": "integer"
+                },
                 "memoryPercent": {
                     "type": "number"
+                },
+                "memoryUsage": {
+                    "type": "integer"
+                },
+                "percpuUsage": {
+                    "type": "integer"
+                },
+                "systemUsage": {
+                    "type": "integer"
                 }
             }
         },
@@ -16350,6 +16401,14 @@
                 }
             }
         },
+        "request.NodePackageReq": {
+            "type": "object",
+            "properties": {
+                "codeDir": {
+                    "type": "string"
+                }
+            }
+        },
         "request.PortUpdate": {
             "type": "object",
             "properties": {
@@ -16381,8 +16440,17 @@
                 "appDetailId": {
                     "type": "integer"
                 },
+                "clean": {
+                    "type": "boolean"
+                },
+                "codeDir": {
+                    "type": "string"
+                },
                 "image": {
                     "type": "string"
+                },
+                "install": {
+                    "type": "boolean"
                 },
                 "name": {
                     "type": "string"
@@ -16408,6 +16476,9 @@
         "request.RuntimeDelete": {
             "type": "object",
             "properties": {
+                "forceDelete": {
+                    "type": "boolean"
+                },
                 "id": {
                     "type": "integer"
                 }
@@ -16440,11 +16511,20 @@
         "request.RuntimeUpdate": {
             "type": "object",
             "properties": {
+                "clean": {
+                    "type": "boolean"
+                },
+                "codeDir": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
                 "image": {
                     "type": "string"
+                },
+                "install": {
+                    "type": "boolean"
                 },
                 "name": {
                     "type": "string"

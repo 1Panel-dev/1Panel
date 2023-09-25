@@ -40,11 +40,21 @@ const webSiteRouter = {
             },
         },
         {
-            path: '/websites/runtime/php',
-            name: 'Runtime',
-            component: () => import('@/views/website/runtime/index.vue'),
+            path: '/websites/runtimes/php',
+            name: 'PHP',
+            component: () => import('@/views/website/runtime/php/index.vue'),
             meta: {
                 title: 'menu.runtime',
+                requiresAuth: false,
+            },
+        },
+        {
+            path: '/websites/runtimes/node',
+            name: 'Node',
+            hidden: true,
+            component: () => import('@/views/website/runtime/node/index.vue'),
+            meta: {
+                activeMenu: '/websites/runtimes/php',
                 requiresAuth: false,
             },
         },

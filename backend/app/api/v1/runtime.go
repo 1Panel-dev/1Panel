@@ -70,7 +70,7 @@ func (b *BaseApi) DeleteRuntime(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	err := runtimeService.Delete(req.ID)
+	err := runtimeService.Delete(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -115,6 +115,28 @@ func (b *BaseApi) GetRuntime(c *gin.Context) {
 		return
 	}
 	res, err := runtimeService.Get(id)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags Runtime
+// @Summary Get Node package scripts
+// @Description 获取 Node 项目的 scripts
+// @Accept json
+// @Param request body request.NodePackageReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /runtimes/node/package [post]
+func (b *BaseApi) GetNodePackageRunScript(c *gin.Context) {
+	var req request.NodePackageReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	res, err := runtimeService.GetNodePackageRunScript(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

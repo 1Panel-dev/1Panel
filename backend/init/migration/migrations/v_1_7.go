@@ -15,3 +15,13 @@ var AddDefaultNetwork = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var UpdateRuntime = &gormigrate.Migration{
+	ID: "20230920-update-runtime",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Runtime{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}
