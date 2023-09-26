@@ -93,14 +93,14 @@ func (b *BaseApi) GetApp(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Router /apps/detail/:appId/:version/:type [get]
 func (b *BaseApi) GetAppDetail(c *gin.Context) {
-	appId, err := helper.GetIntParamByKey(c, "appId")
+	appID, err := helper.GetIntParamByKey(c, "appId")
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
 		return
 	}
 	version := c.Param("version")
 	appType := c.Param("type")
-	appDetailDTO, err := appService.GetAppDetail(appId, version, appType)
+	appDetailDTO, err := appService.GetAppDetail(appID, version, appType)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

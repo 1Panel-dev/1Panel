@@ -2,6 +2,13 @@
     <div>
         <RouterMenu />
         <LayoutContent :title="'Node.js'" v-loading="loading">
+            <template #prompt>
+                <el-alert type="info" :closable="false">
+                    <template #default>
+                        <span><span v-html="$t('runtime.statusHelper')"></span></span>
+                    </template>
+                </el-alert>
+            </template>
             <template #toolbar>
                 <el-button type="primary" @click="openCreate">
                     {{ $t('runtime.create') }}
@@ -56,7 +63,7 @@
                     />
                     <fu-table-operations
                         :ellipsis="10"
-                        width="120px"
+                        width="250px"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         fixed="right"
@@ -73,7 +80,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import { Runtime } from '@/api/interface/runtime';
-import { SearchRuntimes } from '@/api/modules/runtime';
+import { OperateRuntime, SearchRuntimes } from '@/api/modules/runtime';
 import { dateFormat } from '@/utils/util';
 import OperateNode from '@/views/website/runtime/node/operate/index.vue';
 import Status from '@/components/status/index.vue';
@@ -98,12 +105,39 @@ let timer: NodeJS.Timer | null = null;
 
 const buttons = [
     {
+        label: i18n.global.t('container.stop'),
+        click: function (row: Runtime.Runtime) {
+            operateRuntime('down', row.id);
+        },
+        disabled: function (row: Runtime.Runtime) {
+            return disabledRuntime(row) || row.status === 'stopped';
+        },
+    },
+    {
+        label: i18n.global.t('container.start'),
+        click: function (row: Runtime.Runtime) {
+            operateRuntime('up', row.id);
+        },
+        disabled: function (row: Runtime.Runtime) {
+            return disabledRuntime(row) || row.status === 'running';
+        },
+    },
+    {
+        label: i18n.global.t('container.restart'),
+        click: function (row: Runtime.Runtime) {
+            operateRuntime('restart', row.id);
+        },
+        disabled: function (row: Runtime.Runtime) {
+            return disabledRuntime(row);
+        },
+    },
+    {
         label: i18n.global.t('commons.button.edit'),
         click: function (row: Runtime.Runtime) {
             openDetail(row);
         },
         disabled: function (row: Runtime.Runtime) {
-            return row.status === 'starting' || row.status === 'recreating';
+            return disabledRuntime(row);
         },
     },
     {
@@ -117,6 +151,10 @@ const loading = ref(false);
 const items = ref<Runtime.RuntimeDTO[]>([]);
 const operateRef = ref();
 const deleteRef = ref();
+
+const disabledRuntime = (row: Runtime.Runtime) => {
+    return row.status === 'starting' || row.status === 'recreating';
+};
 
 const search = async () => {
     req.page = paginationConfig.currentPage;
@@ -142,6 +180,28 @@ const openDetail = (row: Runtime.Runtime) => {
 
 const openDelete = async (row: Runtime.Runtime) => {
     deleteRef.value.acceptParams(row.id, row.name);
+};
+
+const operateRuntime = async (operate: string, ID: number) => {
+    try {
+        const action = await ElMessageBox.confirm(
+            i18n.global.t('runtime.operatorHelper', [i18n.global.t('commons.operate.' + operate)]),
+            i18n.global.t('commons.operate.' + operate),
+            {
+                confirmButtonText: i18n.global.t('commons.button.confirm'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+                type: 'info',
+            },
+        );
+        if (action === 'confirm') {
+            loading.value = true;
+            await OperateRuntime({ operate: operate, ID: ID });
+            search();
+        }
+    } catch (error) {
+    } finally {
+        loading.value = false;
+    }
 };
 
 const toFolder = (folder: string) => {

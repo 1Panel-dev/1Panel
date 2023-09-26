@@ -143,3 +143,26 @@ func (b *BaseApi) GetNodePackageRunScript(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, res)
 }
+
+// @Tags Runtime
+// @Summary Operate runtime
+// @Description 操作运行环境
+// @Accept json
+// @Param request body request.RuntimeOperate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /runtimes/operate [post]
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"操作运行环境 [name]","formatEN":"Operate runtime [name]"}
+func (b *BaseApi) OperateRuntime(c *gin.Context) {
+	var req request.RuntimeOperate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	err := runtimeService.OperateRuntime(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}

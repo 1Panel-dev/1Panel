@@ -156,6 +156,7 @@ const appReq = reactive({
     type: 'node',
     page: 1,
     pageSize: 20,
+    resource: 'remote',
 });
 const initData = (type: string) => ({
     name: '',

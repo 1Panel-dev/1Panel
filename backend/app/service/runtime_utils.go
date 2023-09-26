@@ -42,7 +42,7 @@ func handleNode(create request.RuntimeCreate, runtime *model.Runtime, fileOp fil
 	}
 	runtime.DockerCompose = string(composeContent)
 	runtime.Env = string(envContent)
-	runtime.Status = constant.RuntimeStarting
+	runtime.Status = constant.RuntimeCreating
 	runtime.CodeDir = create.CodeDir
 
 	go startRuntime(runtime)
@@ -88,29 +88,39 @@ func handlePHP(create request.RuntimeCreate, runtime *model.Runtime, fileOp file
 }
 
 func startRuntime(runtime *model.Runtime) {
-	cmd := exec.Command("docker-compose", "-f", runtime.GetComposePath(), "up", "-d")
-	logPath := runtime.GetLogPath()
-	logFile, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
-	if err != nil {
-		global.LOG.Errorf("Failed to open log file: %v", err)
+	if err := runComposeCmdWithLog("up", runtime.GetComposePath(), runtime.GetLogPath()); err != nil {
+		runtime.Status = constant.RuntimeError
+		runtime.Message = err.Error()
+		_ = runtimeRepo.Save(runtime)
 		return
 	}
-	multiWriterStdout := io.MultiWriter(os.Stdout, logFile)
-	cmd.Stdout = multiWriterStdout
-	var stderrBuf bytes.Buffer
-	multiWriterStderr := io.MultiWriter(&stderrBuf, logFile, os.Stderr)
-	cmd.Stderr = multiWriterStderr
 
-	err = cmd.Run()
-	if err != nil {
+	if err := SyncRuntimeContainerStatus(runtime); err != nil {
 		runtime.Status = constant.RuntimeError
-		runtime.Message = buserr.New(constant.ErrRuntimeStart).Error() + ":" + stderrBuf.String()
-	} else {
-		runtime.Status = constant.RuntimeRunning
-		runtime.Message = ""
+		runtime.Message = err.Error()
+		_ = runtimeRepo.Save(runtime)
+		return
 	}
+}
 
-	_ = runtimeRepo.Save(runtime)
+func reCreateRuntime(runtime *model.Runtime) {
+	var err error
+	defer func() {
+		if err != nil {
+			runtime.Status = constant.RuntimeError
+			runtime.Message = err.Error()
+			_ = runtimeRepo.Save(runtime)
+		}
+	}()
+	if err = runComposeCmdWithLog("down", runtime.GetComposePath(), runtime.GetLogPath()); err != nil {
+		return
+	}
+	if err = runComposeCmdWithLog("up", runtime.GetComposePath(), runtime.GetLogPath()); err != nil {
+		return
+	}
+	if err := SyncRuntimeContainerStatus(runtime); err != nil {
+		return
+	}
 }
 
 func runComposeCmdWithLog(operate string, composePath string, logPath string) error {
@@ -136,23 +146,57 @@ func runComposeCmdWithLog(operate string, composePath string, logPath string) er
 	return nil
 }
 
-func reCreateRuntime(runtime *model.Runtime) {
-	var err error
-	defer func() {
+func SyncRuntimeContainerStatus(runtime *model.Runtime) error {
+	env, err := gotenv.Unmarshal(runtime.Env)
+	if err != nil {
+		return err
+	}
+	var containerNames []string
+	if containerName, ok := env["CONTAINER_NAME"]; !ok {
+		return buserr.New("ErrContainerNameNotFound")
+	} else {
+		containerNames = append(containerNames, containerName)
+	}
+	cli, err := docker.NewClient()
+	if err != nil {
+		return err
+	}
+	containers, err := cli.ListContainersByName(containerNames)
+	if err != nil {
+		return err
+	}
+	if len(containers) == 0 {
+		return buserr.WithNameAndErr("ErrContainerNotFound", containerNames[0], nil)
+	}
+	container := containers[0]
+
+	interval := 10 * time.Second
+	retries := 60
+	for i := 0; i < retries; i++ {
+		resp, err := cli.InspectContainer(container.ID)
 		if err != nil {
-			runtime.Status = constant.RuntimeError
-			runtime.Message = err.Error()
-			_ = runtimeRepo.Save(runtime)
+			time.Sleep(interval)
+			continue
 		}
-	}()
-	if err = runComposeCmdWithLog("down", runtime.GetComposePath(), runtime.GetLogPath()); err != nil {
-		return
+		if resp.State.Health != nil {
+			status := strings.ToLower(resp.State.Health.Status)
+			switch status {
+			case "starting":
+				runtime.Status = constant.RuntimeStarting
+				_ = runtimeRepo.Save(runtime)
+			case "healthy":
+				runtime.Status = constant.RuntimeRunning
+				_ = runtimeRepo.Save(runtime)
+				return nil
+			case "unhealthy":
+				runtime.Status = constant.RuntimeUnhealthy
+				_ = runtimeRepo.Save(runtime)
+				return nil
+			}
+		}
+		time.Sleep(interval)
 	}
-	if err = runComposeCmdWithLog("up", runtime.GetComposePath(), runtime.GetLogPath()); err != nil {
-		return
-	}
-	runtime.Status = constant.RuntimeRunning
-	_ = runtimeRepo.Save(runtime)
+	return nil
 }
 
 func buildRuntime(runtime *model.Runtime, oldImageID string, rebuild bool) {

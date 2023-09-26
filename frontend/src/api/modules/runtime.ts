@@ -25,3 +25,7 @@ export const UpdateRuntime = (req: Runtime.RuntimeUpdate) => {
 export const GetNodeScripts = (req: Runtime.NodeReq) => {
     return http.post<Runtime.NodeScripts[]>(`/runtimes/node/package`, req);
 };
+
+export const OperateRuntime = (req: Runtime.RuntimeOperate) => {
+    return http.post<any>(`/runtimes/operate`, req);
+};

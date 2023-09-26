@@ -228,6 +228,7 @@ const message = {
             unUsed: '未使用',
             starting: '启动中',
             recreating: '重建中',
+            creating: '创建中',
         },
         units: {
             second: '秒',
@@ -239,6 +240,11 @@ const message = {
             year: '年',
             time: '次',
             core: '核',
+        },
+        operate: {
+            down: '停止',
+            up: '启动',
+            restart: '重启',
         },
     },
     menu: {
@@ -1612,6 +1618,8 @@ const message = {
         runScriptHelper: '启动命令列表是从源码目录下的 package.json 文件中解析而来',
         open: '放开',
         close: '关闭',
+        operatorHelper: '将对选中的运行环境进行 {0} 操作，是否继续？',
+        statusHelper: '状态说明：启动中-容器已启动，但应用正在启动；异常-容器已启动，但应用状态异常',
     },
     process: {
         pid: '进程ID',

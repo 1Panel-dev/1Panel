@@ -80,6 +80,10 @@ func (c Client) DeleteImage(imageID string) error {
 	return nil
 }
 
+func (c Client) InspectContainer(containerID string) (types.ContainerJSON, error) {
+	return c.cli.ContainerInspect(context.Background(), containerID)
+}
+
 func (c Client) PullImage(imageName string, force bool) error {
 	if !force {
 		exist, err := c.CheckImageExist(imageName)
