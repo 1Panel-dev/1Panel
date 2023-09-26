@@ -230,6 +230,7 @@ const message = {
             unUsed: 'Unused',
             starting: 'Starting',
             recreating: 'Recreating',
+            creating: 'Creating',
         },
         units: {
             second: 'Second',
@@ -241,6 +242,11 @@ const message = {
             year: 'Year',
             time: 'Time',
             core: 'Core',
+        },
+        operate: {
+            down: 'Stop',
+            up: 'Start',
+            restart: 'Restart',
         },
     },
     menu: {
@@ -1703,6 +1709,10 @@ const message = {
         runScriptHelper: 'The startup command list is parsed from the package.json file in the source directory',
         open: 'Open',
         close: 'Close',
+        operatorHelper:
+            'The {0} operation will be performed on the selected operating environment. Do you want to continue? ',
+        statusHelper:
+            'Status description: Starting - the container has been started, but the application is starting; abnormal - the container has been started, but the application status is abnormal',
     },
     process: {
         pid: 'Process ID',

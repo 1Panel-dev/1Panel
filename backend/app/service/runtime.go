@@ -31,6 +31,7 @@ type IRuntimeService interface {
 	Update(req request.RuntimeUpdate) error
 	Get(id uint) (res *response.RuntimeDTO, err error)
 	GetNodePackageRunScript(req request.NodePackageReq) ([]response.PackageScripts, error)
+	OperateRuntime(req request.RuntimeOperate) error
 }
 
 func NewRuntimeService() IRuntimeService {
@@ -356,4 +357,43 @@ func (r *RuntimeService) GetNodePackageRunScript(req request.NodePackageReq) ([]
 		})
 	}
 	return packageScripts, nil
+}
+
+func (r *RuntimeService) OperateRuntime(req request.RuntimeOperate) error {
+	runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			runtime.Status = constant.RuntimeError
+			runtime.Message = err.Error()
+			_ = runtimeRepo.Save(runtime)
+		}
+	}()
+	switch req.Operate {
+	case constant.RuntimeUp:
+		if err = runComposeCmdWithLog(req.Operate, runtime.GetComposePath(), runtime.GetLogPath()); err != nil {
+			return err
+		}
+		if err = SyncRuntimeContainerStatus(runtime); err != nil {
+			return err
+		}
+	case constant.RuntimeDown:
+		if err = runComposeCmdWithLog(req.Operate, runtime.GetComposePath(), runtime.GetLogPath()); err != nil {
+			return err
+		}
+		runtime.Status = constant.RuntimeStopped
+	case constant.RuntimeRestart:
+		if err = runComposeCmdWithLog(constant.RuntimeDown, runtime.GetComposePath(), runtime.GetLogPath()); err != nil {
+			return err
+		}
+		if err = runComposeCmdWithLog(constant.RuntimeUp, runtime.GetComposePath(), runtime.GetLogPath()); err != nil {
+			return err
+		}
+		if err = SyncRuntimeContainerStatus(runtime); err != nil {
+			return err
+		}
+	}
+	return runtimeRepo.Save(runtime)
 }

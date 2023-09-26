@@ -34,7 +34,16 @@ const getType = (status: string) => {
     }
 };
 
-const loadingStatus = ['installing', 'building', 'restarting', 'upgrading', 'rebuilding', 'recreating', 'creating'];
+const loadingStatus = [
+    'installing',
+    'building',
+    'restarting',
+    'upgrading',
+    'rebuilding',
+    'recreating',
+    'creating',
+    'starting',
+];
 
 const loadingIcon = (status: string): boolean => {
     return loadingStatus.indexOf(status) > -1;

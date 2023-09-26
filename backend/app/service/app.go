@@ -61,6 +61,9 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 	if req.Recommend {
 		opts = append(opts, appRepo.GetRecommend())
 	}
+	if req.Resource != "" {
+		opts = append(opts, appRepo.WithResource(req.Resource))
+	}
 	if len(req.Tags) != 0 {
 		tags, err := tagRepo.GetByKeys(req.Tags)
 		if err != nil {
@@ -151,12 +154,12 @@ func (a AppService) GetApp(key string) (*response.AppDTO, error) {
 	return &appDTO, nil
 }
 
-func (a AppService) GetAppDetail(appId uint, version, appType string) (response.AppDetailDTO, error) {
+func (a AppService) GetAppDetail(appID uint, version, appType string) (response.AppDetailDTO, error) {
 	var (
 		appDetailDTO response.AppDetailDTO
 		opts         []repo.DBOption
 	)
-	opts = append(opts, appDetailRepo.WithAppId(appId), appDetailRepo.WithVersion(version))
+	opts = append(opts, appDetailRepo.WithAppId(appID), appDetailRepo.WithVersion(version))
 	detail, err := appDetailRepo.GetFirst(opts...)
 	if err != nil {
 		return appDetailDTO, err
@@ -165,7 +168,7 @@ func (a AppService) GetAppDetail(appId uint, version, appType string) (response.
 	appDetailDTO.Enable = true
 
 	if appType == "runtime" {
-		app, err := appRepo.GetFirst(commonRepo.WithByID(appId))
+		app, err := appRepo.GetFirst(commonRepo.WithByID(appID))
 		if err != nil {
 			return appDetailDTO, err
 		}

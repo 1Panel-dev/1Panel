@@ -11,6 +11,7 @@ type AppSearch struct {
 	Tags      []string `json:"tags"`
 	Type      string   `json:"type"`
 	Recommend bool     `json:"recommend"`
+	Resource  string   `json:"resource"`
 }
 
 type AppInstallCreate struct {

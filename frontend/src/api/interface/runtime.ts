@@ -68,4 +68,9 @@ export namespace Runtime {
         id: number;
         forceDelete: boolean;
     }
+
+    export interface RuntimeOperate {
+        ID: number;
+        operate: string;
+    }
 }

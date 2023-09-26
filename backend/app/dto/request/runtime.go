@@ -47,3 +47,8 @@ type RuntimeUpdate struct {
 type NodePackageReq struct {
 	CodeDir string `json:"codeDir"`
 }
+
+type RuntimeOperate struct {
+	Operate string `json:"operate"`
+	ID      uint   `json:"ID"`
+}

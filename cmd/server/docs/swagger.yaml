@@ -2639,6 +2639,8 @@ definitions:
         type: integer
       recommend:
         type: boolean
+      resource:
+        type: string
       tags:
         items:
           type: string
@@ -3150,6 +3152,13 @@ definitions:
         type: boolean
       id:
         type: integer
+    type: object
+  request.RuntimeOperate:
+    properties:
+      ID:
+        type: integer
+      operate:
+        type: string
     type: object
   request.RuntimeSearch:
     properties:
@@ -9086,6 +9095,33 @@ paths:
       summary: Get Node package scripts
       tags:
       - Runtime
+  /runtimes/operate:
+    post:
+      consumes:
+      - application/json
+      description: 操作运行环境
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.RuntimeOperate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Operate runtime
+      tags:
+      - Runtime
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - id
+        formatEN: Operate runtime [name]
+        formatZH: 操作运行环境 [name]
+        paramKeys: []
   /runtimes/search:
     post:
       consumes:

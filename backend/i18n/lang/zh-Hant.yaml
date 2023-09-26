@@ -102,6 +102,7 @@ ErrDelWithWebsite: "運行環境已經關聯網站，無法刪除"
 ErrRuntimeStart: "啟動失敗"
 ErrPackageJsonNotFound: "package.json 文件不存在"
 ErrScriptsNotFound: "沒有在 package.json 中找到 scripts 配置項"
+ErrContainerNameNotFound: "無法取得容器名稱，請檢查 .env 文件"
 
 #setting
 ErrBackupInUsed: "該備份帳號已在計劃任務中使用，無法刪除"

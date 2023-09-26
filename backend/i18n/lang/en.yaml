@@ -102,6 +102,7 @@ ErrDelWithWebsite: "The operating environment has been associated with a website
 ErrRuntimeStart: "Failed to start"
 ErrPackageJsonNotFound: "package.json file does not exist"
 ErrScriptsNotFound: "No scripts configuration item was found in package.json"
+ErrContainerNameNotFound: "Unable to get container name, please check .env file"
 
 #setting
 ErrBackupInUsed: "The backup account is already being used in a cronjob and cannot be deleted."

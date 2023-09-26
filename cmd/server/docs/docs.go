@@ -7863,6 +7863,48 @@ const docTemplate = `{
                 }
             }
         },
+        "/runtimes/operate": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "操作运行环境",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Runtime"
+                ],
+                "summary": "Operate runtime",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.RuntimeOperate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "id"
+                    ],
+                    "formatEN": "Operate runtime [name]",
+                    "formatZH": "操作运行环境 [name]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/runtimes/search": {
             "post": {
                 "security": [
@@ -15732,6 +15774,9 @@ const docTemplate = `{
                 "recommend": {
                     "type": "boolean"
                 },
+                "resource": {
+                    "type": "string"
+                },
                 "tags": {
                     "type": "array",
                     "items": {
@@ -16488,6 +16533,17 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                }
+            }
+        },
+        "request.RuntimeOperate": {
+            "type": "object",
+            "properties": {
+                "ID": {
+                    "type": "integer"
+                },
+                "operate": {
+                    "type": "string"
                 }
             }
         },

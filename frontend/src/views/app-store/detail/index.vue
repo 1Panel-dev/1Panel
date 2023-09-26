@@ -131,14 +131,19 @@ const toLink = (link: string) => {
 };
 
 const openInstall = () => {
-    if (app.value.type === 'php') {
-        router.push({ path: '/websites/runtime/php' });
-    } else {
-        const params = {
-            app: app.value,
-        };
-        installRef.value.acceptParams(params);
-        open.value = false;
+    switch (app.value.type) {
+        case 'php':
+            router.push({ path: '/websites/runtimes/php' });
+            break;
+        case 'node':
+            router.push({ path: '/websites/runtimes/node' });
+            break;
+        default:
+            const params = {
+                app: app.value,
+            };
+            installRef.value.acceptParams(params);
+            open.value = false;
     }
 };
 

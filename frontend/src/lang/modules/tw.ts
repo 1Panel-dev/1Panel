@@ -228,6 +228,7 @@ const message = {
             unUsed: '未使用',
             starting: '啟動中',
             recreating: '重建中',
+            creating: '創建中',
         },
         units: {
             second: '秒',
@@ -239,6 +240,11 @@ const message = {
             year: '年',
             time: '次',
             core: '核',
+        },
+        operate: {
+            down: '停止',
+            up: '启动',
+            restart: '重启',
         },
     },
     menu: {
@@ -1612,6 +1618,8 @@ const message = {
         runScriptHelper: '啟動命令是指容器啟動後運行的命令',
         open: '開啟',
         close: '關閉',
+        operatorHelper: '將對選取的執行環境進行 {0} 操作，是否繼續？ ',
+        statusHelper: '狀態說明：啟動中-容器已啟動，但應用正在啟動；異常-容器已啟動，但應用狀態異常',
     },
     process: {
         pid: '進程ID',

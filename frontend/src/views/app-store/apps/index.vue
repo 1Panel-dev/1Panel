@@ -130,7 +130,7 @@
             </div>
         </template>
     </LayoutContent>
-    <Detail :id="appId" ref="detailRef"></Detail>
+    <Detail ref="detailRef"></Detail>
     <Install ref="installRef" />
 </template>
 
@@ -174,7 +174,6 @@ const colorArr = ['#005eeb', '#008B45', '#BEBEBE', '#FFF68F', '#FFFF00', '#8B000
 const loading = ref(false);
 const activeTag = ref('all');
 const showDetail = ref(false);
-const appId = ref(0);
 const canUpdate = ref(false);
 const syncing = ref(false);
 const detailRef = ref();
