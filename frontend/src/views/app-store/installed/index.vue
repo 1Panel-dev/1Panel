@@ -261,6 +261,7 @@
     <AppUpgrade ref="upgradeRef" @close="search" />
     <PortJumpDialog ref="dialogPortJumpRef" />
     <AppIgnore ref="ignoreRef" @close="search" />
+    <ComposeLogs ref="composeLogRef" />
 </template>
 
 <script lang="ts" setup>
@@ -282,6 +283,7 @@ import AppDelete from './delete/index.vue';
 import AppParams from './detail/index.vue';
 import AppUpgrade from './upgrade/index.vue';
 import AppIgnore from './ignore/index.vue';
+import ComposeLogs from '@/components/compose-log/index.vue';
 import { App } from '@/api/interface/app';
 import Status from '@/components/status/index.vue';
 import { getAge } from '@/utils/util';
@@ -314,6 +316,7 @@ const appParamRef = ref();
 const upgradeRef = ref();
 const ignoreRef = ref();
 const dialogPortJumpRef = ref();
+const composeLogRef = ref();
 const tags = ref<App.Tag[]>([]);
 const activeTag = ref('all');
 const searchReq = reactive({
@@ -496,6 +499,15 @@ const buttons = [
             return row.status === 'DownloadErr' || row.status === 'Upgrading' || row.status === 'Rebuilding';
         },
     },
+    {
+        label: i18n.global.t('commons.button.log'),
+        click: (row: any) => {
+            openLog(row);
+        },
+        disabled: (row: any) => {
+            return row.status === 'DownloadErr';
+        },
+    },
 ];
 
 const openBackups = (key: string, name: string) => {
@@ -526,6 +538,10 @@ const isAppErr = (row: any) => {
 
 const quickJump = () => {
     router.push({ name: 'ContainerSetting' });
+};
+
+const openLog = (row: any) => {
+    composeLogRef.value.acceptParams({ compose: row.path + '/docker-compose.yml', resource: row.name });
 };
 
 onMounted(() => {

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"github.com/gorilla/websocket"
 	"io"
 	"os"
 	"os/exec"
@@ -258,6 +259,48 @@ func (u *ContainerService) loadPath(req *dto.ComposeCreate) error {
 		_, _ = write.WriteString(string(req.File))
 		write.Flush()
 		req.Path = path
+	}
+	return nil
+}
+
+func (u *ContainerService) ComposeLogs(wsConn *websocket.Conn, composePath, since, tail string, follow bool) error {
+	if cmd.CheckIllegal(composePath, since, tail) {
+		return buserr.New(constant.ErrCmdIllegal)
+	}
+	command := fmt.Sprintf("docker-compose -f %s logs", composePath)
+	if tail != "0" {
+		command += " --tail " + tail
+	}
+	if since != "all" {
+		command += " --since " + since
+	}
+	if follow {
+		command += " -f"
+	}
+	command += " 2>&1"
+	cmd := exec.Command("bash", "-c", command)
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return err
+	}
+	if err := cmd.Start(); err != nil {
+		return err
+	}
+
+	buffer := make([]byte, 1024)
+	for {
+		n, err := stdout.Read(buffer)
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			global.LOG.Errorf("read bytes from compose log failed, err: %v", err)
+			continue
+		}
+		if err = wsConn.WriteMessage(websocket.TextMessage, buffer[:n]); err != nil {
+			global.LOG.Errorf("send message with compose log to ws failed, err: %v", err)
+			break
+		}
 	}
 	return nil
 }

@@ -73,7 +73,7 @@
             </template>
         </LayoutContent>
         <OperateNode ref="operateRef" @close="search" />
-        <Delete ref="deleteRef" @close="search()" />
+        <Delete ref="deleteRef" @close="search" />
     </div>
 </template>
 
