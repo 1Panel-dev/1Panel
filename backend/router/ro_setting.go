@@ -32,6 +32,8 @@ func (s *SettingRouter) InitSettingRouter(Router *gin.RouterGroup) {
 		settingRouter.POST("/monitor/clean", baseApi.CleanMonitor)
 		settingRouter.GET("/mfa/:interval", baseApi.GetMFA)
 		settingRouter.POST("/mfa/bind", baseApi.MFABind)
+		settingRouter.POST("/scan", baseApi.ScanSystem)
+		settingRouter.POST("/clean", baseApi.SystemClean)
 
 		settingRouter.POST("/snapshot", baseApi.CreateSnapshot)
 		settingRouter.POST("/snapshot/status", baseApi.LoadSnapShotStatus)

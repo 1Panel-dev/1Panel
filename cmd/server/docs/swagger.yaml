@@ -170,6 +170,15 @@ definitions:
     required:
     - value
     type: object
+  dto.Clean:
+    properties:
+      name:
+        type: string
+      size:
+        type: integer
+      treeType:
+        type: string
+    type: object
   dto.CleanLog:
     properties:
       logType:
@@ -2037,6 +2046,12 @@ definitions:
       expirationTime:
         type: string
       language:
+        type: string
+      lastCleanData:
+        type: string
+      lastCleanSize:
+        type: string
+      lastCleanTime:
         type: string
       localTime:
         type: string
@@ -9542,6 +9557,34 @@ paths:
       summary: Load local backup dir
       tags:
       - System Setting
+  /settings/clean:
+    post:
+      consumes:
+      - application/json
+      description: 清理系统垃圾文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/dto.Clean'
+          type: array
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: System clean
+      tags:
+      - System Setting
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys: []
+        formatEN: Clean system junk files
+        formatZH: 清理系统垃圾文件
+        paramKeys: []
   /settings/expired/handle:
     post:
       consumes:
@@ -9682,6 +9725,23 @@ paths:
         - serverPort
         formatEN: update system port => [serverPort]
         formatZH: 修改系统端口 => [serverPort]
+        paramKeys: []
+  /settings/scan:
+    post:
+      description: 扫描系统垃圾文件
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Scan system
+      tags:
+      - System Setting
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys: []
+        formatEN: scan System Junk Files
+        formatZH: 扫描系统垃圾文件
         paramKeys: []
   /settings/search:
     post:

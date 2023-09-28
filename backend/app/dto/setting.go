@@ -18,6 +18,9 @@ type SettingInfo struct {
 	Theme          string `json:"theme"`
 	Language       string `json:"language"`
 	DefaultNetwork string `json:"defaultNetwork"`
+	LastCleanTime  string `json:"lastCleanTime"`
+	LastCleanSize  string `json:"lastCleanSize"`
+	LastCleanData  string `json:"lastCleanData"`
 
 	ServerPort             string `json:"serverPort"`
 	SSL                    string `json:"ssl"`
@@ -135,4 +138,30 @@ type SyncTime struct {
 
 type Upgrade struct {
 	Version string `json:"version"`
+}
+
+type CleanData struct {
+	SystemClean    []CleanTree `json:"systemClean"`
+	UploadClean    []CleanTree `json:"uploadClean"`
+	DownloadClean  []CleanTree `json:"downloadClean"`
+	SystemLogClean []CleanTree `json:"systemLogClean"`
+}
+
+type CleanTree struct {
+	ID       string      `json:"id"`
+	Label    string      `json:"label"`
+	Children []CleanTree `json:"children"`
+
+	Type string `json:"type"`
+	Name string `json:"name"`
+
+	Size        uint64 `json:"size"`
+	IsCheck     bool   `json:"isCheck"`
+	IsRecommend bool   `json:"isRecommend"`
+}
+
+type Clean struct {
+	TreeType string `json:"treeType"`
+	Name     string `json:"name"`
+	Size     uint64 `json:"size"`
 }

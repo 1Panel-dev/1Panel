@@ -38,6 +38,9 @@ type ISettingService interface {
 	LoadFromCert() (*dto.SSLInfo, error)
 	HandlePasswordExpired(c *gin.Context, old, new string) error
 	SyncTime(req dto.SyncTime) error
+
+	SystemScan() dto.CleanData
+	SystemClean(req []dto.Clean)
 }
 
 func NewISettingService() ISettingService {

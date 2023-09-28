@@ -89,7 +89,6 @@ const message = {
         loadingText: {
             Upgrading: 'System upgrade, please wait...',
             Restarting: 'System restart, please wait...',
-            Snapshoting: 'Making snapshots, please wait...',
             Recovering: 'Recovering from snapshot, please wait...',
             Rollbacking: 'Rollbacking from snapshot, please wait...',
         },
@@ -1202,6 +1201,58 @@ const message = {
         forum: 'Forum',
         doc2: 'Document',
         currentVersion: 'Version',
+    },
+    clean: {
+        scan: 'Start Scanning',
+        clean: 'Clean Now',
+        reScan: 'Rescan',
+        cleanHelper:
+            'After checking the files and directories for cleaning, it cannot be undone (system cache cleaning requires a service restart). Do you want to continue?',
+        statusSuggest: '( Recommended Cleaning )',
+        statusClean: '( Very Clean )',
+        statusEmpty: 'Very clean, no cleaning needed!',
+        statusWarning: '( Proceed with Caution )',
+        lastCleanTime: 'Last Cleaned: {0}',
+        lastCleanHelper: 'Files and directories cleaned: {0}, Total cleaned: {1}',
+        cleanSuccessful: 'Cleaning Successful!',
+        currentCleanHelper: 'Files and directories cleaned in this session: {0}, Total cleaned: {1}',
+        suggest: '(Recommended)',
+        totalScan: 'Total junk files to be cleaned: ',
+        selectScan: 'Total selected junk files: ',
+
+        system: 'System Junk',
+        systemHelper:
+            'Scan system junk (specifically includes temporary files generated during snapshots, upgrades, and obsolete file contents during version iterations)',
+        panelOriginal: 'System snapshot recovery backup files',
+        upgrade: 'System upgrade backup files',
+        cache: 'System cache files',
+        snapshot: 'System snapshot temporary files',
+        snapshotTmp: 'System snapshot upload temporary files',
+        snapshotLocal: 'System snapshot creation temporary files',
+        unused: 'Unused system directories',
+        oldUpgrade: 'Unused pre-upgrade backup directories',
+        oldOriginal: 'Unused pre-snapshot recovery backup directories',
+        oldAppsBak: 'Unused application backup directories',
+
+        upload: 'Temporary upload files',
+        uploadHelper:
+            'Scan temporary upload directory (specifically includes temporary files uploaded from the system backup list)',
+        download: 'Temporary Download Files',
+        downloadHelper:
+            'Scan temporary download directory (specifically includes temporary files downloaded from third-party backup accounts by the system)',
+        website: 'Website',
+        app: 'Application',
+        database: 'Database',
+        directory: 'Directory',
+
+        systemLog: 'System Log Files',
+        systemLogHelper:
+            'Scan system junk (specifically includes system log information, container build or image pull log information, and log files generated in scheduled tasks)',
+        dockerLog: 'Container operation log files',
+        taskLog: 'Scheduled task execution log files',
+        shell: 'Shell script scheduled tasks',
+        containerShell: 'Container internal Shell script scheduled tasks',
+        curl: 'CURL scheduled tasks',
     },
     app: {
         app: 'Application',
