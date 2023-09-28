@@ -995,7 +995,7 @@ const message = {
         newPassword: '新密码',
         retryPassword: '确认密码',
         duplicatePassword: '新密码不能与原始密码一致，请重新输入！',
-        diskClean: '磁盘清理',
+        diskClean: '缓存清理',
 
         thirdParty: '第三方账号',
         createBackupAccount: '添加 {0}',
@@ -1162,7 +1162,7 @@ const message = {
         selectScan: '已选中垃圾文件共计： ',
 
         system: '系统垃圾',
-        systemHelper: '扫描系统垃圾（具体包括：快照、升级等过程中产生的临时文件以及版本迭代过程中废弃的文件内容）',
+        systemHelper: '快照、升级等过程中产生的临时文件以及版本迭代过程中废弃的文件内容',
         panelOriginal: '系统快照恢复前备份文件',
         upgrade: '系统升级备份文件',
         cache: '系统缓存文件',
@@ -1175,17 +1175,16 @@ const message = {
         oldAppsBak: '废弃应用备份目录',
 
         upload: '临时上传文件',
-        uploadHelper: '扫描临时上传目录（具体包括：系统上传备份列表中上传的临时文件）',
+        uploadHelper: '系统上传备份列表中上传的临时文件',
         download: '临时下载文件',
-        downloadHelper: '扫描临时下载目录（具体包括：系统从第三方备份账号下载的临时文件）',
+        downloadHelper: '系统从第三方备份账号下载的临时文件',
         website: '网站',
         app: '应用',
         database: '数据库',
         directory: '应用',
 
         systemLog: '系统日志文件',
-        systemLogHelper:
-            '扫描系统垃圾（具体包括：系统日志信息、容器构建或镜像拉取等日志信息以及计划任务中产生的日志文件）',
+        systemLogHelper: '系统日志信息、容器构建或镜像拉取等日志信息以及计划任务中产生的日志文件',
         dockerLog: '容器操作日志文件',
         taskLog: '计划任务执行日志文件',
         shell: 'Shell 脚本计划任务',

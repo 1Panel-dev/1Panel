@@ -5,223 +5,225 @@
                 <DrawerHeader :header="$t('setting.diskClean')" :back="handleClose" />
             </template>
             <div v-loading="loading">
-                <div v-if="scanStatus !== 'scanned'">
-                    <div v-if="scanStatus === 'beforeScan'">
-                        <el-text class="clean_title" type="success">
-                            {{ $t('clean.lastCleanTime', [form.lastCleanTime || '-']) }}
-                        </el-text>
-                        <div class="mt-4">
-                            <el-text type="success">
-                                {{
-                                    $t('clean.lastCleanHelper', [
-                                        form.lastCleanData || '-',
-                                        form.lastCleanSize ? computeSize(Number(form.lastCleanSize)) : '-',
-                                    ])
-                                }}
-                            </el-text>
+                <el-row type="flex" justify="center">
+                    <el-col :span="22">
+                        <div v-if="scanStatus !== 'scanned'">
+                            <div v-if="scanStatus === 'beforeScan'">
+                                <el-text class="clean_title" type="success">
+                                    {{ $t('clean.lastCleanTime', [form.lastCleanTime || '-']) }}
+                                </el-text>
+                                <div class="mt-4">
+                                    <el-text type="success">
+                                        {{
+                                            $t('clean.lastCleanHelper', [
+                                                form.lastCleanData || '-',
+                                                form.lastCleanSize ? computeSize(Number(form.lastCleanSize)) : '-',
+                                            ])
+                                        }}
+                                    </el-text>
+                                </div>
+                                <div class="large_button">
+                                    <el-button type="primary" size="large" @click="scanData">
+                                        {{ $t('clean.scan') }}
+                                    </el-button>
+                                </div>
+                            </div>
+                            <div v-if="scanStatus === 'afterScan'">
+                                <el-text class="clean_title" type="success">{{ $t('clean.cleanSuccessful') }}</el-text>
+                                <div class="mt-4">
+                                    <el-text type="success">
+                                        {{
+                                            $t('clean.currentCleanHelper', [
+                                                form.lastCleanData,
+                                                computeSize(Number(form.lastCleanSize)),
+                                            ])
+                                        }}
+                                    </el-text>
+                                </div>
+                                <div class="large_button">
+                                    <el-button type="success" size="large" @click="scanData">
+                                        {{ $t('clean.reScan') }}
+                                    </el-button>
+                                </div>
+                            </div>
+                            <div class="app-card">
+                                <el-card class="e-card">
+                                    <el-row>
+                                        <el-col :span="4">
+                                            <el-button icon="Setting" link class="card_icon" />
+                                        </el-col>
+                                        <el-col :span="20">
+                                            <div>
+                                                <el-text class="mx-1 card_title" type="primary">
+                                                    {{ $t('clean.system') }}
+                                                </el-text>
+                                            </div>
+                                            <span class="input-help">{{ $t('clean.systemHelper') }}</span>
+                                        </el-col>
+                                    </el-row>
+                                </el-card>
+                                <el-card class="e-card">
+                                    <el-row>
+                                        <el-col :span="4">
+                                            <el-button icon="Upload" link class="card_icon" />
+                                        </el-col>
+                                        <el-col :span="20">
+                                            <div>
+                                                <el-text class="mx-1 card_title" type="primary">
+                                                    {{ $t('clean.upload') }}
+                                                </el-text>
+                                            </div>
+                                            <span class="input-help">{{ $t('clean.uploadHelper') }}</span>
+                                        </el-col>
+                                    </el-row>
+                                </el-card>
+                                <el-card class="e-card">
+                                    <el-row>
+                                        <el-col :span="4">
+                                            <el-button icon="Download" link class="card_icon" />
+                                        </el-col>
+                                        <el-col :span="20">
+                                            <div>
+                                                <el-text class="mx-1 card_title" type="primary">
+                                                    {{ $t('clean.download') }}
+                                                </el-text>
+                                            </div>
+                                            <span class="input-help">{{ $t('clean.downloadHelper') }}</span>
+                                        </el-col>
+                                    </el-row>
+                                </el-card>
+                                <el-card class="e-card">
+                                    <el-row>
+                                        <el-col :span="4">
+                                            <el-button icon="Document" link class="card_icon" />
+                                        </el-col>
+                                        <el-col :span="20">
+                                            <div>
+                                                <el-text class="mx-1 card_title" type="primary">
+                                                    {{ $t('clean.systemLog') }}
+                                                </el-text>
+                                            </div>
+                                            <span class="input-help">
+                                                {{ $t('clean.systemLogHelper') }}
+                                            </span>
+                                        </el-col>
+                                    </el-row>
+                                </el-card>
+                            </div>
                         </div>
-                        <div class="large_button">
-                            <el-button type="primary" size="large" @click="scanData">{{ $t('clean.scan') }}</el-button>
+                        <div v-if="scanStatus === 'scanned'">
+                            <div>
+                                <el-text class="clean_title" type="primary">
+                                    {{ $t('clean.totalScan') }} {{ computeSize(totalSize) }}
+                                </el-text>
+                                <div class="mt-4">
+                                    <el-text type="info">
+                                        {{ $t('clean.selectScan') }} {{ computeSize(selectSize) }}
+                                    </el-text>
+                                </div>
+                                <div class="large_button">
+                                    <el-button type="primary" size="large" @click="onSubmitClean">
+                                        {{ $t('clean.clean') }}
+                                    </el-button>
+                                </div>
+                            </div>
+                            <el-collapse class="mt-12" v-model="activeNames">
+                                <el-collapse-item :title="$t('clean.system')" name="system">
+                                    <el-tree
+                                        ref="systemRef"
+                                        :data="cleanData.systemClean"
+                                        node-key="id"
+                                        :default-checked-keys="systemDefaultCheck"
+                                        show-checkbox
+                                        :props="defaultProps"
+                                        @check-change="onChange"
+                                    >
+                                        <template #default="{ node, data }">
+                                            <div class="float-left">
+                                                <span>{{ load18n(data.label) }}</span>
+                                            </div>
+                                            <div class="ml-4 float-left">
+                                                <span v-if="data.size">{{ computeSize(data.size) }}</span>
+                                            </div>
+                                            <div class="ml-4 float-left">
+                                                <span>{{ loadTag(node, data) }}</span>
+                                            </div>
+                                        </template>
+                                    </el-tree>
+                                </el-collapse-item>
+                                <el-collapse-item :title="$t('clean.upload')" name="upload">
+                                    <el-tree
+                                        ref="uploadRef"
+                                        :data="cleanData.uploadClean"
+                                        node-key="id"
+                                        :default-checked-keys="uploadDefaultCheck"
+                                        show-checkbox
+                                        :props="defaultProps"
+                                        @check-change="onChange"
+                                    >
+                                        <template #default="{ node, data }">
+                                            <div class="float-left">
+                                                <span>{{ load18n(data.label) }}</span>
+                                            </div>
+                                            <div class="ml-4 float-left">
+                                                <span v-if="data.size">{{ computeSize(data.size) }}</span>
+                                            </div>
+                                            <div class="ml-4 float-left">
+                                                <span>{{ loadTag(node, data) }}</span>
+                                            </div>
+                                        </template>
+                                    </el-tree>
+                                </el-collapse-item>
+                                <el-collapse-item :title="$t('clean.download')" name="download">
+                                    <el-tree
+                                        ref="downloadRef"
+                                        :data="cleanData.downloadClean"
+                                        node-key="id"
+                                        :default-checked-keys="downloadDefaultCheck"
+                                        show-checkbox
+                                        :props="defaultProps"
+                                        @check-change="onChange"
+                                    >
+                                        <template #default="{ node, data }">
+                                            <div class="float-left">
+                                                <span>{{ load18n(data.label) }}</span>
+                                            </div>
+                                            <div class="ml-4 float-left">
+                                                <span v-if="data.size">{{ computeSize(data.size) }}</span>
+                                            </div>
+                                            <div class="ml-4 float-left">
+                                                <span>{{ loadTag(node, data) }}</span>
+                                            </div>
+                                        </template>
+                                    </el-tree>
+                                </el-collapse-item>
+                                <el-collapse-item :title="$t('clean.systemLog')" name="system_log">
+                                    <el-tree
+                                        ref="systemLogRef"
+                                        :data="cleanData.systemLogClean"
+                                        node-key="id"
+                                        :default-checked-keys="systemLogDefaultCheck"
+                                        show-checkbox
+                                        :props="defaultProps"
+                                        @check-change="onChange"
+                                    >
+                                        <template #default="{ node, data }">
+                                            <div class="float-left">
+                                                <span>{{ load18n(data.label) }}</span>
+                                            </div>
+                                            <div class="ml-4 float-left">
+                                                <span v-if="data.size">{{ computeSize(data.size) }}</span>
+                                            </div>
+                                            <div class="ml-4 float-left">
+                                                <span>{{ loadTag(node, data) }}</span>
+                                            </div>
+                                        </template>
+                                    </el-tree>
+                                </el-collapse-item>
+                            </el-collapse>
                         </div>
-                    </div>
-                    <div v-if="scanStatus === 'afterScan'">
-                        <el-text class="clean_title" type="success">{{ $t('clean.cleanSuccessful') }}</el-text>
-                        <div class="mt-4">
-                            <el-text type="success">
-                                {{
-                                    $t('clean.currentCleanHelper', [
-                                        form.lastCleanData,
-                                        computeSize(Number(form.lastCleanSize)),
-                                    ])
-                                }}
-                            </el-text>
-                        </div>
-                        <div class="large_button">
-                            <el-button type="primary" size="large" @click="scanData">
-                                {{ $t('clean.reScan') }}
-                            </el-button>
-                        </div>
-                    </div>
-                    <div class="app-card">
-                        <el-card class="e-card">
-                            <el-row>
-                                <el-col :span="3">
-                                    <el-button icon="Setting" link class="card_icon" />
-                                </el-col>
-                                <el-col :span="21">
-                                    <div>
-                                        <el-text class="mx-1 card_title" type="primary">
-                                            {{ $t('clean.system') }}
-                                        </el-text>
-                                    </div>
-                                    <span>{{ $t('clean.systemHelper') }}</span>
-                                </el-col>
-                            </el-row>
-                        </el-card>
-                        <el-card class="e-card">
-                            <el-row>
-                                <el-col :span="3">
-                                    <el-button icon="Upload" link class="card_icon" />
-                                </el-col>
-                                <el-col :span="21">
-                                    <div>
-                                        <el-text class="mx-1 card_title" type="primary">
-                                            {{ $t('clean.upload') }}
-                                        </el-text>
-                                    </div>
-                                    <span>{{ $t('clean.uploadHelper') }}</span>
-                                </el-col>
-                            </el-row>
-                        </el-card>
-                        <el-card class="e-card">
-                            <el-row>
-                                <el-col :span="3">
-                                    <el-button icon="Download" link class="card_icon" />
-                                </el-col>
-                                <el-col :span="21">
-                                    <div>
-                                        <el-text class="mx-1 card_title" type="primary">
-                                            {{ $t('clean.download') }}
-                                        </el-text>
-                                    </div>
-                                    <span>{{ $t('clean.downloadHelper') }}</span>
-                                </el-col>
-                            </el-row>
-                        </el-card>
-                        <el-card class="e-card">
-                            <el-row>
-                                <el-col :span="3">
-                                    <el-button icon="Document" link class="card_icon" />
-                                </el-col>
-                                <el-col :span="21">
-                                    <div>
-                                        <el-text class="mx-1 card_title" type="primary">
-                                            {{ $t('clean.systemLog') }}
-                                        </el-text>
-                                    </div>
-                                    <span>
-                                        {{ $t('clean.systemLogHelper') }}
-                                    </span>
-                                </el-col>
-                            </el-row>
-                        </el-card>
-                    </div>
-                </div>
-                <div v-if="scanStatus === 'scanned'">
-                    <div>
-                        <el-text class="clean_title" type="primary">
-                            {{ $t('clean.totalScan') }} {{ computeSize(totalSize) }}
-                        </el-text>
-                        <div class="mt-4">
-                            <el-text type="info">{{ $t('clean.selectScan') }} {{ computeSize(selectSize) }}</el-text>
-                        </div>
-                        <div class="large_button">
-                            <el-button type="primary" size="large" @click="onSubmitClean">
-                                {{ $t('clean.clean') }}
-                            </el-button>
-                        </div>
-                    </div>
-                    <el-collapse class="mt-4" v-model="activeNames">
-                        <el-collapse-item :title="$t('clean.system')" name="system">
-                            <el-tree
-                                ref="systemRef"
-                                :data="cleanData.systemClean"
-                                node-key="id"
-                                :default-checked-keys="systemDefaultCheck"
-                                show-checkbox
-                                :props="defaultProps"
-                                @check-change="onChange"
-                            >
-                                <template #default="{ node, data }">
-                                    <div class="float-left">
-                                        <span>{{ load18n(data.label) }}</span>
-                                    </div>
-                                    <div class="ml-4 float-left">
-                                        <span v-if="data.size">{{ computeSize(data.size) }}</span>
-                                    </div>
-                                    <div class="ml-4 float-left">
-                                        <span>{{ loadTag(node, data) }}</span>
-                                    </div>
-                                </template>
-                            </el-tree>
-                        </el-collapse-item>
-                        <el-collapse-item :title="$t('clean.upload')" name="upload">
-                            <el-tree
-                                ref="uploadRef"
-                                :data="cleanData.uploadClean"
-                                node-key="id"
-                                :default-checked-keys="uploadDefaultCheck"
-                                show-checkbox
-                                :props="defaultProps"
-                                @check-change="onChange"
-                            >
-                                <template #empty>
-                                    <el-empty :image-size="60" :description="$t('clean.statusEmpty')" />
-                                </template>
-                                <template #default="{ node, data }">
-                                    <div class="float-left">
-                                        <span>{{ load18n(data.label) }}</span>
-                                    </div>
-                                    <div class="ml-4 float-left">
-                                        <span v-if="data.size">{{ computeSize(data.size) }}</span>
-                                    </div>
-                                    <div class="ml-4 float-left">
-                                        <span>{{ loadTag(node, data) }}</span>
-                                    </div>
-                                </template>
-                            </el-tree>
-                        </el-collapse-item>
-                        <el-collapse-item :title="$t('clean.download')" name="download">
-                            <el-tree
-                                ref="downloadRef"
-                                :data="cleanData.downloadClean"
-                                node-key="id"
-                                :default-checked-keys="downloadDefaultCheck"
-                                show-checkbox
-                                :props="defaultProps"
-                                @check-change="onChange"
-                            >
-                                <template #empty>
-                                    <el-empty :image-size="60" :description="$t('clean.statusEmpty')" />
-                                </template>
-                                <template #default="{ node, data }">
-                                    <div class="float-left">
-                                        <span>{{ load18n(data.label) }}</span>
-                                    </div>
-                                    <div class="ml-4 float-left">
-                                        <span v-if="data.size">{{ computeSize(data.size) }}</span>
-                                    </div>
-                                    <div class="ml-4 float-left">
-                                        <span>{{ loadTag(node, data) }}</span>
-                                    </div>
-                                </template>
-                            </el-tree>
-                        </el-collapse-item>
-                        <el-collapse-item :title="$t('clean.systemLog')" name="system_log">
-                            <el-tree
-                                ref="systemLogRef"
-                                :data="cleanData.systemLogClean"
-                                node-key="id"
-                                :default-checked-keys="systemLogDefaultCheck"
-                                show-checkbox
-                                :props="defaultProps"
-                                @check-change="onChange"
-                            >
-                                <template #default="{ node, data }">
-                                    <div class="float-left">
-                                        <span>{{ load18n(data.label) }}</span>
-                                    </div>
-                                    <div class="ml-4 float-left">
-                                        <span v-if="data.size">{{ computeSize(data.size) }}</span>
-                                    </div>
-                                    <div class="ml-4 float-left">
-                                        <span>{{ loadTag(node, data) }}</span>
-                                    </div>
-                                </template>
-                            </el-tree>
-                        </el-collapse-item>
-                    </el-collapse>
-                </div>
+                    </el-col>
+                </el-row>
             </div>
             <template #footer>
                 <span class="dialog-footer">
@@ -464,13 +466,17 @@ function load18n(label: string) {
             return i18n.global.t('clean.upload');
         case 'download':
             return i18n.global.t('clean.download');
-        case 'website':
+        case 'upload_website':
+        case 'download_website':
             return i18n.global.t('clean.website');
-        case 'app':
+        case 'upload_app':
+        case 'download_app':
             return i18n.global.t('clean.app');
-        case 'database':
+        case 'upload_database':
+        case 'download_database':
             return i18n.global.t('clean.database');
-        case 'directory':
+        case 'upload_directory':
+        case 'download_directory':
             return i18n.global.t('clean.directory');
         case 'system_log':
             return i18n.global.t('clean.systemLog');

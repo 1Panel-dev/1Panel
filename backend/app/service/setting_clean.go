@@ -88,12 +88,10 @@ func (u *SettingService) SystemScan() dto.CleanData {
 	})
 	SystemClean.SystemClean = treeData
 
-	uploadPath := path.Join(global.CONF.System.BaseDir, "1panel/uploads")
-	uploadTreeData := loadTreeWithAllFile(true, uploadPath, "upload", uploadPath, fileOp)
+	uploadTreeData := loadUploadTree(fileOp)
 	SystemClean.UploadClean = append(SystemClean.UploadClean, uploadTreeData...)
 
-	downloadPath := path.Join(global.CONF.System.BaseDir, "1panel/download")
-	downloadTreeData := loadTreeWithAllFile(true, downloadPath, "download", downloadPath, fileOp)
+	downloadTreeData := loadDownloadTree(fileOp)
 	SystemClean.DownloadClean = append(SystemClean.DownloadClean, downloadTreeData...)
 
 	logTree := loadLogTree(fileOp)
@@ -153,8 +151,24 @@ func (u *SettingService) SystemClean(req []dto.Clean) {
 
 		case "upload":
 			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/uploads", item.Name))
+		case "upload_app":
+			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/uploads/app", item.Name))
+		case "upload_database":
+			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/uploads/database", item.Name))
+		case "upload_website":
+			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/uploads/website", item.Name))
+		case "upload_directory":
+			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/uploads/directory", item.Name))
 		case "download":
-			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/download", item.Name))
+			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/downloads", item.Name))
+		case "download_app":
+			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/downloads/app", item.Name))
+		case "download_database":
+			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/downloads/database", item.Name))
+		case "download_website":
+			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/downloads/website", item.Name))
+		case "download_directory":
+			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/downloads/directory", item.Name))
 
 		case "system_log":
 			if len(item.Name) == 0 {
@@ -248,6 +262,64 @@ func loadUnusedFile(fileOp fileUtils.FileOp) []dto.CleanTree {
 	return treeData
 }
 
+func loadUploadTree(fileOp fileUtils.FileOp) []dto.CleanTree {
+	var treeData []dto.CleanTree
+	path1 := path.Join(global.CONF.System.BaseDir, "1panel/upload/app")
+	list1 := loadTreeWithAllFile(true, path1, "upload_app", path1, fileOp)
+	size1, _ := fileOp.GetDirSize(path1)
+	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "upload_app", Size: uint64(size1), Children: list1, Type: "upload_app", IsRecommend: true})
+
+	path2 := path.Join(global.CONF.System.BaseDir, "1panel/upload/website")
+	list2 := loadTreeWithAllFile(true, path2, "upload_website", path2, fileOp)
+	size2, _ := fileOp.GetDirSize(path2)
+	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "upload_website", Size: uint64(size2), Children: list2, Type: "upload_website", IsRecommend: true})
+
+	path3 := path.Join(global.CONF.System.BaseDir, "1panel/upload/database")
+	list3 := loadTreeWithAllFile(true, path3, "upload_app", path3, fileOp)
+	size3, _ := fileOp.GetDirSize(path3)
+	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "upload_database", Size: uint64(size3), Children: list3, Type: "upload_database", IsRecommend: true})
+
+	path4 := path.Join(global.CONF.System.BaseDir, "1panel/upload/directory")
+	list4 := loadTreeWithAllFile(true, path4, "upload_app", path4, fileOp)
+	size4, _ := fileOp.GetDirSize(path4)
+	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "upload_directory", Size: uint64(size4), Children: list4, Type: "upload_directory", IsRecommend: true})
+
+	path5 := path.Join(global.CONF.System.BaseDir, "1panel/uploads")
+	uploadTreeData := loadTreeWithAllFile(true, path5, "upload", path5, fileOp)
+	treeData = append(treeData, uploadTreeData...)
+
+	return treeData
+}
+
+func loadDownloadTree(fileOp fileUtils.FileOp) []dto.CleanTree {
+	var treeData []dto.CleanTree
+	path1 := path.Join(global.CONF.System.BaseDir, "1panel/download/app")
+	list1 := loadTreeWithAllFile(true, path1, "download_app", path1, fileOp)
+	size1, _ := fileOp.GetDirSize(path1)
+	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "download_app", Size: uint64(size1), Children: list1, Type: "download_app", IsRecommend: true})
+
+	path2 := path.Join(global.CONF.System.BaseDir, "1panel/download/website")
+	list2 := loadTreeWithAllFile(true, path2, "download_website", path2, fileOp)
+	size2, _ := fileOp.GetDirSize(path2)
+	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "download_website", Size: uint64(size2), Children: list2, Type: "download_website", IsRecommend: true})
+
+	path3 := path.Join(global.CONF.System.BaseDir, "1panel/download/database")
+	list3 := loadTreeWithAllFile(true, path3, "download_app", path3, fileOp)
+	size3, _ := fileOp.GetDirSize(path3)
+	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "download_database", Size: uint64(size3), Children: list3, Type: "download_database", IsRecommend: true})
+
+	path4 := path.Join(global.CONF.System.BaseDir, "1panel/download/directory")
+	list4 := loadTreeWithAllFile(true, path4, "download_app", path4, fileOp)
+	size4, _ := fileOp.GetDirSize(path4)
+	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "download_directory", Size: uint64(size4), Children: list4, Type: "download_directory", IsRecommend: true})
+
+	path5 := path.Join(global.CONF.System.BaseDir, "1panel/download")
+	uploadTreeData := loadTreeWithAllFile(true, path5, "download", path5, fileOp)
+	treeData = append(treeData, uploadTreeData...)
+
+	return treeData
+}
+
 func loadLogTree(fileOp fileUtils.FileOp) []dto.CleanTree {
 	var treeData []dto.CleanTree
 	path1 := path.Join(global.CONF.System.BaseDir, "1panel/log")
@@ -316,6 +388,9 @@ func loadTreeWithAllFile(isCheck bool, originalPath, treeType, pathItem string, 
 	}
 	for _, file := range files {
 		if treeType == "system_log" && file.Name() == "1Panel.log" {
+			continue
+		}
+		if (treeType == "upload" || treeType == "download") && file.IsDir() && (file.Name() == "app" || file.Name() == "database" || file.Name() == "website" || file.Name() == "directory") {
 			continue
 		}
 		size := uint64(0)

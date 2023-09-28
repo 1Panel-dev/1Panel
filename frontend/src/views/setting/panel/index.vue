@@ -74,6 +74,25 @@
                                 </span>
                             </el-form-item>
 
+                            <el-form-item :label="$t('setting.defaultNetwork')">
+                                <el-input disabled v-model="form.defaultNetworkVal">
+                                    <template #append>
+                                        <el-button v-show="!show" @click="onChangeNetwork" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
+                            <el-form-item :label="$t('setting.diskClean')">
+                                <el-input disabled v-model="form.lastCleanTime">
+                                    <template #append>
+                                        <el-button v-show="!show" @click="onClean" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
+
                             <el-form-item :label="$t('setting.timeZone')" prop="timeZone">
                                 <el-input disabled v-model.number="form.timeZone">
                                     <template #append>
@@ -103,24 +122,6 @@
                                 <el-input disabled v-model="form.localTime">
                                     <template #append>
                                         <el-button v-show="!show" @click="onChangeNtp" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-                            <el-form-item :label="$t('setting.defaultNetwork')">
-                                <el-input disabled v-model="form.defaultNetworkVal">
-                                    <template #append>
-                                        <el-button v-show="!show" @click="onChangeNetwork" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-                            <el-form-item :label="$t('setting.diskClean')">
-                                <el-input disabled v-model="form.lastCleanTime">
-                                    <template #append>
-                                        <el-button v-show="!show" @click="onClean" icon="Setting">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
