@@ -1295,6 +1295,9 @@ const message = {
         delete: 'Delete',
         openrestyDeleteHelper:
             'Forcibly deleting OpenResty will delete all websites, please confirm the risk before operation',
+        downloadLogHelper1: 'All logs of {0} application are about to be downloaded. Do you want to continue? ',
+        downloadLogHelper2:
+            'The latest {1} logs of {0} application are about to be downloaded. Do you want to continue? ',
     },
     website: {
         website: 'Website',

@@ -706,3 +706,31 @@ func (b *BaseApi) ComposeUpdate(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, nil)
 }
+
+// @Tags Container Compose
+// @Summary Container Compose logs
+// @Description docker-compose 日志
+// @Param compose query string false "compose 文件地址"
+// @Param since query string false "时间筛选"
+// @Param follow query string false "是否追踪"
+// @Param tail query string false "显示行号"
+// @Security ApiKeyAuth
+// @Router /containers/compose/search/log [post]
+func (b *BaseApi) ComposeLogs(c *gin.Context) {
+	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		global.LOG.Errorf("gin context http handler failed, err: %v", err)
+		return
+	}
+	defer wsConn.Close()
+
+	compose := c.Query("compose")
+	since := c.Query("since")
+	follow := c.Query("follow") == "true"
+	tail := c.Query("tail")
+
+	if err := containerService.ComposeLogs(wsConn, compose, since, tail, follow); err != nil {
+		_ = wsConn.WriteMessage(1, []byte(err.Error()))
+		return
+	}
+}

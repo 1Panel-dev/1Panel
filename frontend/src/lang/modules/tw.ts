@@ -1230,6 +1230,8 @@ const message = {
         backupAppHelper: '升級失敗可以使用應用備份回滾',
         delete: '刪除',
         openrestyDeleteHelper: '強制刪除 OpenResty 會刪除所有的網站，請確認風險後操作',
+        downloadLogHelper1: '即將下載 {0} 套用所有日誌，是否繼續？ ',
+        downloadLogHelper2: '即將下載 {0} 應用最近 {1} 條日誌，是否繼續？ ',
     },
     website: {
         website: '網站',

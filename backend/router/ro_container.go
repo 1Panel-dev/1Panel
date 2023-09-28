@@ -45,6 +45,7 @@ func (s *ContainerRouter) InitContainerRouter(Router *gin.RouterGroup) {
 		baRouter.POST("/compose/test", baseApi.TestCompose)
 		baRouter.POST("/compose/operate", baseApi.OperatorCompose)
 		baRouter.POST("/compose/update", baseApi.ComposeUpdate)
+		baRouter.GET("/compose/search/log", baseApi.ComposeLogs)
 
 		baRouter.GET("/template", baseApi.ListComposeTemplate)
 		baRouter.POST("/template/search", baseApi.SearchComposeTemplate)

@@ -4893,6 +4893,32 @@ paths:
       summary: Page composes
       tags:
       - Container Compose
+  /containers/compose/search/log:
+    post:
+      description: docker-compose 日志
+      parameters:
+      - description: compose 文件地址
+        in: query
+        name: compose
+        type: string
+      - description: 时间筛选
+        in: query
+        name: since
+        type: string
+      - description: 是否追踪
+        in: query
+        name: follow
+        type: string
+      - description: 显示行号
+        in: query
+        name: tail
+        type: string
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Container Compose logs
+      tags:
+      - Container Compose
   /containers/compose/test:
     post:
       consumes:

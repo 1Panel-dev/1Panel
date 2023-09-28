@@ -276,7 +276,11 @@ func handleParams(create request.RuntimeCreate, projectDir string) (composeConte
 	if err != nil {
 		return
 	}
-	env, err := gotenv.Read(path.Join(projectDir, ".env"))
+	envPath := path.Join(projectDir, ".env")
+	if !fileOp.Stat(envPath) {
+		_ = fileOp.CreateFile(envPath)
+	}
+	env, err := gotenv.Read(envPath)
 	if err != nil {
 		return
 	}
@@ -316,7 +320,7 @@ func handleParams(create request.RuntimeCreate, projectDir string) (composeConte
 	if err != nil {
 		return
 	}
-	if err = gotenv.Write(env, path.Join(projectDir, ".env")); err != nil {
+	if err = gotenv.Write(env, envPath); err != nil {
 		return
 	}
 	envContent = []byte(envStr)

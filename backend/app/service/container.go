@@ -66,6 +66,7 @@ type IContainerService interface {
 	Prune(req dto.ContainerPrune) (dto.ContainerPruneReport, error)
 
 	LoadContainerLogs(req dto.OperationWithNameAndType) string
+	ComposeLogs(wsConn *websocket.Conn, composePath, since, tail string, follow bool) error
 }
 
 func NewIContainerService() IContainerService {

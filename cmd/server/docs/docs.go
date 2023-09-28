@@ -1232,6 +1232,47 @@ const docTemplate = `{
                 }
             }
         },
+        "/containers/compose/search/log": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "docker-compose 日志",
+                "tags": [
+                    "Container Compose"
+                ],
+                "summary": "Container Compose logs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "compose 文件地址",
+                        "name": "compose",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "时间筛选",
+                        "name": "since",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "是否追踪",
+                        "name": "follow",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "显示行号",
+                        "name": "tail",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/containers/compose/test": {
             "post": {
                 "security": [
