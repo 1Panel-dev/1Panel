@@ -11,6 +11,11 @@ type UserLoginInfo struct {
 	MfaStatus string `json:"mfaStatus"`
 }
 
+type MfaRequest struct {
+	Title    string `json:"title"`
+	Interval int    `json:"interval"`
+}
+
 type MfaCredential struct {
 	Secret   string `json:"secret"`
 	Code     string `json:"code"`

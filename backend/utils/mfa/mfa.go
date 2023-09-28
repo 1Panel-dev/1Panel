@@ -18,11 +18,11 @@ type Otp struct {
 	QrImage string `json:"qrImage"`
 }
 
-func GetOtp(username string, interval int) (otp Otp, err error) {
+func GetOtp(username, title string, interval int) (otp Otp, err error) {
 	secret := gotp.RandomSecret(secretLength)
 	otp.Secret = secret
 	totp := gotp.NewTOTP(secret, 6, interval, nil)
-	uri := totp.ProvisioningUri(username, "1Panel")
+	uri := totp.ProvisioningUri(username, title)
 	subImg, err := qrcode.Encode(uri, qrcode.Medium, 256)
 	dist := make([]byte, 3000)
 	base64.StdEncoding.Encode(dist, subImg)

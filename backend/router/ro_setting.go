@@ -30,7 +30,7 @@ func (s *SettingRouter) InitSettingRouter(Router *gin.RouterGroup) {
 		settingRouter.GET("/time/option", baseApi.LoadTimeZone)
 		settingRouter.POST("/time/sync", baseApi.SyncTime)
 		settingRouter.POST("/monitor/clean", baseApi.CleanMonitor)
-		settingRouter.GET("/mfa/:interval", baseApi.GetMFA)
+		settingRouter.POST("/mfa", baseApi.LoadMFA)
 		settingRouter.POST("/mfa/bind", baseApi.MFABind)
 
 		settingRouter.POST("/snapshot", baseApi.CreateSnapshot)
