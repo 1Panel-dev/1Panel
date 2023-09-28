@@ -1542,6 +1542,7 @@ const message = {
         runDirHelper2: 'Please ensure that the secondary running directory is under the index directory',
         openrestryHelper:
             'OpenResty default HTTP port: {0} HTTPS port: {1}, which may affect website domain name access and HTTPS forced redirect',
+        primaryDomainHelper: 'Support domain name: port',
     },
     php: {
         short_open_tag: 'Short tag support',
