@@ -1038,6 +1038,7 @@ const message = {
         newPassword: 'New password',
         retryPassword: 'Confirm password',
         duplicatePassword: 'The new password cannot be the same as the original password, please re-enter!',
+        diskClean: 'Cache Clean',
 
         thirdParty: 'Third-party account',
         createBackupAccount: 'Add {0}',
@@ -1224,7 +1225,7 @@ const message = {
 
         system: 'System Junk',
         systemHelper:
-            'Scan system junk (specifically includes temporary files generated during snapshots, upgrades, and obsolete file contents during version iterations)',
+            'Temporary files generated during snapshots, upgrades, and obsolete file contents during version iterations',
         panelOriginal: 'System snapshot recovery backup files',
         upgrade: 'System upgrade backup files',
         cache: 'System cache files',
@@ -1237,11 +1238,9 @@ const message = {
         oldAppsBak: 'Unused application backup directories',
 
         upload: 'Temporary upload files',
-        uploadHelper:
-            'Scan temporary upload directory (specifically includes temporary files uploaded from the system backup list)',
+        uploadHelper: 'Temporary files uploaded from the system backup list',
         download: 'Temporary Download Files',
-        downloadHelper:
-            'Scan temporary download directory (specifically includes temporary files downloaded from third-party backup accounts by the system)',
+        downloadHelper: 'Temporary files downloaded from third-party backup accounts by the system',
         website: 'Website',
         app: 'Application',
         database: 'Database',
@@ -1249,7 +1248,7 @@ const message = {
 
         systemLog: 'System Log Files',
         systemLogHelper:
-            'Scan system junk (specifically includes system log information, container build or image pull log information, and log files generated in scheduled tasks)',
+            'System log information, container build or image pull log information, and log files generated in scheduled tasks',
         dockerLog: 'Container operation log files',
         taskLog: 'Scheduled task execution log files',
         shell: 'Shell script scheduled tasks',

@@ -995,6 +995,7 @@ const message = {
         newPassword: '新密碼',
         retryPassword: '確認密碼',
         duplicatePassword: '新密碼不能與原始密碼一致，請重新輸入！',
+        diskClean: '缓存清理',
 
         thirdParty: '第三方賬號',
         createBackupAccount: '添加 {0}',
@@ -1162,7 +1163,7 @@ const message = {
         selectScan: '已選中垃圾文件共計： ',
 
         system: '系統垃圾',
-        systemHelper: '掃描系統垃圾（具體包括：快照、升級等過程中產生的臨時文件以及版本叠代過程中廢棄的文件內容）',
+        systemHelper: '快照、升級等過程中產生的臨時文件以及版本叠代過程中廢棄的文件內容',
         panelOriginal: '系統快照恢復前備份文件',
         upgrade: '系統升級備份文件',
         cache: '系統緩存文件',
@@ -1175,17 +1176,16 @@ const message = {
         oldAppsBak: '廢棄應用備份目錄',
 
         upload: '臨時上傳文件',
-        uploadHelper: '掃描臨時上傳目錄（具體包括：系統上傳備份列表中上傳的臨時文件）',
+        uploadHelper: '系統上傳備份列表中上傳的臨時文件',
         download: '臨時下載文件',
-        downloadHelper: '掃描臨時下載目錄（具體包括：系統從第三方備份賬號下載的臨時文件）',
+        downloadHelper: '系統從第三方備份賬號下載的臨時文件',
         website: '網站',
         app: '應用',
         database: '數據庫',
         directory: '應用',
 
         systemLog: '系統日誌文件',
-        systemLogHelper:
-            '掃描系統垃圾（具體包括：系統日誌信息、容器構建或鏡像拉取等日誌信息以及計劃任務中產生的日誌文件）',
+        systemLogHelper: '系統日誌信息、容器構建或鏡像拉取等日誌信息以及計劃任務中產生的日誌文件',
         dockerLog: '容器操作日誌文件',
         taskLog: '計劃任務執行日誌文件',
         shell: 'Shell 腳本計劃任務',
