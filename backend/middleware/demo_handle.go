@@ -1,12 +1,13 @@
 package middleware
 
 import (
+	"net/http"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"strings"
 )
 
 var whiteUrlList = map[string]struct{}{
@@ -18,6 +19,14 @@ var whiteUrlList = map[string]struct{}{
 	"/api/v1/logs/operation":      {},
 	"/api/v1/logs/login":          {},
 	"/api/v1/auth/logout":         {},
+
+	"/api/v1/apps/installed/loadport": {},
+	"/api/v1/apps/installed/check":    {},
+	"/api/v1/apps/installed/conninfo": {},
+	"/api/v1/databases/load/file":     {},
+	"/api/v1/databases/variables":     {},
+	"/api/v1/databases/status":        {},
+	"/api/v1/databases/baseinfo":      {},
 }
 
 func DemoHandle() gin.HandlerFunc {
