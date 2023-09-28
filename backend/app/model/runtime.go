@@ -18,6 +18,7 @@ type Runtime struct {
 	Type          string `gorm:"type:varchar;not null" json:"type"`
 	Status        string `gorm:"type:varchar;not null" json:"status"`
 	Resource      string `gorm:"type:varchar;not null" json:"resource"`
+	Port          int    `gorm:"type:integer;" json:"port"`
 	Message       string `gorm:"type:longtext;" json:"message"`
 	CodeDir       string `gorm:"type:varchar;" json:"codeDir"`
 }

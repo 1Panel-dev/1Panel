@@ -304,6 +304,7 @@ func handleParams(create request.RuntimeCreate, projectDir string) (composeConte
 	case constant.RuntimeNode:
 		create.Params["CODE_DIR"] = create.CodeDir
 		create.Params["NODE_VERSION"] = create.Version
+		create.Params["PANEL_APP_PORT_HTTP"] = create.Port
 		if create.NodeConfig.Install {
 			create.Params["RUN_INSTALL"] = "1"
 		} else {

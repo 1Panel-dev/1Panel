@@ -14,6 +14,10 @@ ErrNameIsExist: "Name is already exist"
 ErrDemoEnvironment: "Demo server, prohibit this operation!"
 ErrCmdTimeout: "Command execution timed out！"
 ErrCmdIllegal: "The command contains illegal characters. Please modify and try again!"
+ErrPortExist: '{{ .port }} port is already occupied by {{ .type }} [{{ .name }}]'
+TYPE_APP: "Application"
+TYPE_RUNTIME: "Runtime environment"
+TYPE_DOMAIN: "Domain name"
 
 #app
 ErrPortInUsed: "{{ .detail }} port already in use"

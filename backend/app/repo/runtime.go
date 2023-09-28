@@ -17,6 +17,7 @@ type IRuntimeRepo interface {
 	WithNotId(id uint) DBOption
 	WithStatus(status string) DBOption
 	WithDetailId(id uint) DBOption
+	WithPort(port int) DBOption
 	Page(page, size int, opts ...DBOption) (int64, []model.Runtime, error)
 	Create(ctx context.Context, runtime *model.Runtime) error
 	Save(runtime *model.Runtime) error
@@ -56,6 +57,12 @@ func (r *RuntimeRepo) WithDetailId(id uint) DBOption {
 func (r *RuntimeRepo) WithNotId(id uint) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("id != ?", id)
+	}
+}
+
+func (r *RuntimeRepo) WithPort(port int) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("port = ?", port)
 	}
 }
 

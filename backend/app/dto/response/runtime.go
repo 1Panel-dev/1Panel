@@ -21,6 +21,8 @@ type RuntimeDTO struct {
 	CreatedAt   time.Time              `json:"createdAt"`
 	CodeDir     string                 `json:"codeDir"`
 	AppParams   []AppParam             `json:"appParams"`
+	Port        int                    `json:"port"`
+	Path        string                 `json:"path"`
 }
 
 type PackageScripts struct {
@@ -41,5 +43,7 @@ func NewRuntimeDTO(runtime model.Runtime) RuntimeDTO {
 		CreatedAt:   runtime.CreatedAt,
 		CodeDir:     runtime.CodeDir,
 		Version:     runtime.Version,
+		Port:        runtime.Port,
+		Path:        runtime.GetPath(),
 	}
 }

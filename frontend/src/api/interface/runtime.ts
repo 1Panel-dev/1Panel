@@ -14,6 +14,7 @@ export namespace Runtime {
         version: string;
         status: string;
         codeDir: string;
+        port: number;
     }
 
     export interface RuntimeReq extends ReqPage {
@@ -35,6 +36,7 @@ export namespace Runtime {
         appParams: App.InstallParams[];
         appID: number;
         source?: string;
+        path?: string;
     }
 
     export interface RuntimeCreate {
@@ -50,6 +52,7 @@ export namespace Runtime {
         rebuild?: boolean;
         source?: string;
         codeDir?: string;
+        port?: number;
     }
 
     export interface RuntimeUpdate {

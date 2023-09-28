@@ -14,6 +14,10 @@ ErrNameIsExist: "名称已存在"
 ErrDemoEnvironment: "演示服务器，禁止此操作!"
 ErrCmdTimeout: "命令执行超时！"
 ErrCmdIllegal: "执行命令中存在不合法字符，请修改后重试！"
+ErrPortExist: '{{ .port }} 端口已被 {{ .type }} [{{ .name }}] 占用'
+TYPE_APP: "应用"
+TYPE_RUNTIME: "运行环境"
+TYPE_DOMAIN: "域名"
 
 #app
 ErrPortInUsed: "{{ .detail }} 端口已被占用！"

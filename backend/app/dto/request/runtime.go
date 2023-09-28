@@ -25,6 +25,7 @@ type RuntimeCreate struct {
 type NodeConfig struct {
 	Install bool `json:"install"`
 	Clean   bool `json:"clean"`
+	Port    int  `json:"port"`
 }
 
 type RuntimeDelete struct {

@@ -39,7 +39,16 @@ func NewRuntimeService() IRuntimeService {
 }
 
 func (r *RuntimeService) Create(create request.RuntimeCreate) (err error) {
-	exist, _ := runtimeRepo.GetFirst(runtimeRepo.WithName(create.Name), commonRepo.WithByType(create.Type))
+	var (
+		opts []repo.DBOption
+	)
+	if create.Name != "" {
+		opts = append(opts, commonRepo.WithLikeName(create.Name))
+	}
+	if create.Type != "" {
+		opts = append(opts, commonRepo.WithByType(create.Type))
+	}
+	exist, _ := runtimeRepo.GetFirst(opts...)
 	if exist != nil {
 		return buserr.New(constant.ErrNameIsExist)
 	}
@@ -66,6 +75,9 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (err error) {
 			return buserr.New(constant.ErrPathNotFound)
 		}
 		create.Install = true
+		if err = checkPortExist(create.Port); err != nil {
+			return err
+		}
 	}
 
 	appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(create.AppDetailID))
@@ -98,6 +110,7 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (err error) {
 			return
 		}
 	case constant.RuntimeNode:
+		runtime.Port = create.Port
 		if err = handleNode(create, runtime, fileOp, appVersionDir); err != nil {
 			return
 		}
@@ -286,6 +299,13 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 		if exist != nil {
 			return buserr.New(constant.ErrImageExist)
 		}
+	case constant.RuntimeNode:
+		if runtime.Port != req.Port {
+			if err = checkPortExist(req.Port); err != nil {
+				return err
+			}
+			runtime.Port = req.Port
+		}
 	}
 
 	projectDir := path.Join(constant.RuntimeDir, runtime.Type, runtime.Name)
@@ -296,6 +316,9 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 		Params:  req.Params,
 		CodeDir: req.CodeDir,
 		Version: req.Version,
+		NodeConfig: request.NodeConfig{
+			Port: req.Port,
+		},
 	}
 	composeContent, envContent, _, err := handleParams(create, projectDir)
 	if err != nil {
@@ -321,6 +344,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 	case constant.RuntimeNode:
 		runtime.Version = req.Version
 		runtime.CodeDir = req.CodeDir
+		runtime.Port = req.Port
 		runtime.Status = constant.RuntimeReCreating
 		_ = runtimeRepo.Save(runtime)
 		go reCreateRuntime(runtime)

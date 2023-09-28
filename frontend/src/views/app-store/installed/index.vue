@@ -13,7 +13,7 @@
                         >
                             {{ $t('app.all') }}
                         </el-button>
-                        <div v-for="item in tags" :key="item.key" style="display: inline">
+                        <div v-for="item in tags" :key="item.key" class="inline">
                             <el-button
                                 class="tag-button"
                                 :class="activeTag === item.key ? '' : 'no-active'"
@@ -56,12 +56,7 @@
                 <template #default>
                     <span>
                         <span>{{ $t('app.installHelper') }}</span>
-                        <el-link
-                            style="font-size: 12px; margin-left: 5px"
-                            icon="Position"
-                            @click="quickJump()"
-                            type="primary"
-                        >
+                        <el-link class="text-xs scroll-ml-1" icon="Position" @click="quickJump()" type="primary">
                             {{ $t('firewall.quickJump') }}
                         </el-link>
                     </span>

@@ -715,7 +715,7 @@ func (b *BaseApi) ComposeUpdate(c *gin.Context) {
 // @Param follow query string false "是否追踪"
 // @Param tail query string false "显示行号"
 // @Security ApiKeyAuth
-// @Router /containers/compose/search/log [post]
+// @Router /containers/compose/search/log [get]
 func (b *BaseApi) ComposeLogs(c *gin.Context) {
 	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {

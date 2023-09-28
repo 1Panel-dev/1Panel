@@ -89,8 +89,8 @@
                             </el-form-item>
                         </el-col>
                         <el-col :span="10">
-                            <el-form-item :label="$t('runtime.externalPort')" prop="params.PANEL_APP_PORT_HTTP">
-                                <el-input v-model.number="runtime.params['PANEL_APP_PORT_HTTP']" />
+                            <el-form-item :label="$t('runtime.externalPort')" prop="port">
+                                <el-input v-model.number="runtime.port" />
                                 <span class="input-help">{{ $t('runtime.externalPortHelper') }}</span>
                             </el-form-item>
                         </el-col>
@@ -170,15 +170,16 @@ const initData = (type: string) => ({
     resource: 'appstore',
     rebuild: false,
     codeDir: '/',
+    port: 3000,
 });
 let runtime = reactive<Runtime.RuntimeCreate>(initData('node'));
 const rules = ref<any>({
     name: [Rules.appName],
     appID: [Rules.requiredSelect],
     codeDir: [Rules.requiredInput],
+    port: [Rules.requiredInput, Rules.port],
     params: {
         NODE_APP_PORT: [Rules.requiredInput, Rules.port],
-        PANEL_APP_PORT_HTTP: [Rules.requiredInput, Rules.port],
         PACKAGE_MANAGER: [Rules.requiredSelect],
         HOST_IP: [Rules.requiredSelect],
         EXEC_SCRIPT: [Rules.requiredSelect],
@@ -192,7 +193,7 @@ watch(
     () => runtime.params['NODE_APP_PORT'],
     (newVal) => {
         if (newVal && mode.value == 'create') {
-            runtime.params['PANEL_APP_PORT_HTTP'] = newVal;
+            runtime.port = newVal;
         }
     },
     { deep: true },
@@ -325,6 +326,7 @@ const getRuntime = async (id: number) => {
             source: data.source,
             params: data.params,
             codeDir: data.codeDir,
+            port: data.port,
         });
         editParams.value = data.appParams;
         if (mode.value == 'edit') {
