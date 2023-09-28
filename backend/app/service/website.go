@@ -185,10 +185,12 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		return err
 	}
 	defaultHttpPort := nginxInstall.HttpPort
+	primaryDomainArray := strings.Split(create.PrimaryDomain, ":")
+	primaryDomain := primaryDomainArray[0]
 
 	defaultDate, _ := time.Parse(constant.DateLayout, constant.DefaultDate)
 	website := &model.Website{
-		PrimaryDomain:  create.PrimaryDomain,
+		PrimaryDomain:  primaryDomain,
 		Type:           create.Type,
 		Alias:          create.Alias,
 		Remark:         create.Remark,
@@ -263,9 +265,8 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		website.RuntimeID = runtime.ID
 		if runtime.Resource == constant.ResourceAppstore {
 			var (
-				req          request.AppInstallCreate
-				nginxInstall model.AppInstall
-				install      *model.AppInstall
+				req     request.AppInstallCreate
+				install *model.AppInstall
 			)
 			reg, _ := regexp.Compile(`[^a-z0-9_-]+`)
 			req.Name = reg.ReplaceAllString(strings.ToLower(create.PrimaryDomain), "")
@@ -273,10 +274,6 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			req.Params = create.AppInstall.Params
 			req.Params["IMAGE_NAME"] = runtime.Image
 			req.AppContainerConfig = create.AppInstall.AppContainerConfig
-			nginxInstall, err = getAppInstallByKey(constant.AppOpenresty)
-			if err != nil {
-				return err
-			}
 			req.Params["PANEL_WEBSITE_DIR"] = path.Join(nginxInstall.GetPath(), "/www")
 			tx, installCtx := getTxAndContext()
 			install, err = NewIAppService().Install(installCtx, req)
@@ -301,9 +298,9 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 	}
 
 	var domains []model.WebsiteDomain
-	domains = append(domains, model.WebsiteDomain{Domain: website.PrimaryDomain, Port: defaultHttpPort})
-	otherDomainArray := strings.Split(create.OtherDomains, "\n")
-	for _, domain := range otherDomainArray {
+	domainArray := strings.Split(create.OtherDomains, "\n")
+	domainArray = append(domainArray, create.PrimaryDomain)
+	for _, domain := range domainArray {
 		if domain == "" {
 			continue
 		}

@@ -246,6 +246,7 @@
                         <el-input
                             v-model.trim="website.primaryDomain"
                             @input="changeAlias(website.primaryDomain)"
+                            :placeholder="$t('website.primaryDomainHelper')"
                         ></el-input>
                     </el-form-item>
                     <el-form-item :label="$t('website.otherDomains')" prop="otherDomains">
@@ -364,7 +365,7 @@ const website = ref({
     proxyAddress: '',
 });
 const rules = ref<any>({
-    primaryDomain: [Rules.domain],
+    primaryDomain: [Rules.domainWithPort],
     alias: [Rules.linuxName],
     type: [Rules.requiredInput],
     webSiteGroupId: [Rules.requiredSelectBusiness],
@@ -504,7 +505,7 @@ const changeRuntime = (runID: number) => {
         if (item.id === runID) {
             runtimeResource.value = item.resource;
             if (item.resource === 'appstore') {
-                getAppDetailByID(item.appDetailId);
+                getAppDetailByID(item.appDetailID);
             }
         }
     });
@@ -519,7 +520,7 @@ const getRuntimes = async () => {
             website.value.runtimeID = first.id;
             runtimeResource.value = first.resource;
             if (first.resource === 'appstore') {
-                getAppDetailByID(first.appDetailId);
+                getAppDetailByID(first.appDetailID);
             }
         }
     } catch (error) {}
@@ -583,7 +584,8 @@ const submit = async (formEl: FormInstance | undefined) => {
 };
 
 const changeAlias = (value: string) => {
-    website.value.alias = value;
+    const domain = value.split(':')[0];
+    website.value.alias = domain;
 };
 
 function compareVersions(version1: string, version2: string): boolean {

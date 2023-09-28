@@ -225,6 +225,20 @@ const checkDomain = (rule: any, value: any, callback: any) => {
     }
 };
 
+const checkDomainWithPort = (rule: any, value: any, callback: any) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback(new Error(i18n.global.t('commons.rule.domain')));
+    } else {
+        const reg =
+            /^([\w\u4e00-\u9fa5\-\*]{1,100}\.){1,10}([\w\u4e00-\u9fa5\-]{1,24}|[\w\u4e00-\u9fa5\-]{1,24}\.[\w\u4e00-\u9fa5\-]{1,24})(:\d{1,5})?$/;
+        if (!reg.test(value) && value !== '') {
+            callback(new Error(i18n.global.t('commons.rule.domain')));
+        } else {
+            callback();
+        }
+    }
+};
+
 const checkIntegerNumber = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.integer')));
@@ -442,6 +456,7 @@ interface CommonRule {
     containerName: FormItemRule;
     disabledFunctions: FormItemRule;
     leechExts: FormItemRule;
+    domainWithPort: FormItemRule;
 
     paramCommon: FormItemRule;
     paramComplexity: FormItemRule;
@@ -625,5 +640,10 @@ export const Rules: CommonRule = {
         required: true,
         trigger: 'blur',
         validator: checkParamSimple,
+    },
+    domainWithPort: {
+        required: true,
+        validator: checkDomainWithPort,
+        trigger: 'blur',
     },
 };
