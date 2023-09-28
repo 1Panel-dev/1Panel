@@ -17,7 +17,7 @@ var AddDefaultNetwork = &gormigrate.Migration{
 }
 
 var UpdateRuntime = &gormigrate.Migration{
-	ID: "20230920-update-runtime",
+	ID: "20230927-update-runtime",
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.AutoMigrate(&model.Runtime{}); err != nil {
 			return err

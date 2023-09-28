@@ -82,6 +82,33 @@ func checkPort(key string, params map[string]interface{}) (int, error) {
 	return 0, nil
 }
 
+func checkPortExist(port int) error {
+	errMap := make(map[string]interface{})
+	errMap["port"] = port
+	appInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithPort(port))
+	if appInstall.ID > 0 {
+		errMap["type"] = i18n.GetMsgByKey("TYPE_APP")
+		errMap["name"] = appInstall.Name
+		return buserr.WithMap("ErrPortExist", errMap, nil)
+	}
+	runtime, _ := runtimeRepo.GetFirst(runtimeRepo.WithPort(port))
+	if runtime != nil {
+		errMap["type"] = i18n.GetMsgByKey("TYPE_RUNTIME")
+		errMap["name"] = runtime.Name
+		return buserr.WithMap("ErrPortExist", errMap, nil)
+	}
+	domain, _ := websiteDomainRepo.GetFirst(websiteDomainRepo.WithPort(port))
+	if domain.ID > 0 {
+		errMap["type"] = i18n.GetMsgByKey("TYPE_DOMAIN")
+		errMap["name"] = domain.Domain
+		return buserr.WithMap("ErrPortExist", errMap, nil)
+	}
+	if common.ScanPort(port) {
+		return buserr.WithDetail(constant.ErrPortInUsed, port, nil)
+	}
+	return nil
+}
+
 var DatabaseKeys = map[string]uint{
 	"mysql":      3306,
 	"mariadb":    3306,
@@ -559,6 +586,8 @@ func handleMap(params map[string]interface{}, envParams map[string]string) {
 			envParams[k] = strconv.FormatFloat(t, 'f', -1, 32)
 		case uint:
 			envParams[k] = strconv.Itoa(int(t))
+		case int:
+			envParams[k] = strconv.Itoa(t)
 		default:
 			envParams[k] = t.(string)
 		}

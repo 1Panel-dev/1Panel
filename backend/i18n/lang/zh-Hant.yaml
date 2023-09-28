@@ -14,6 +14,10 @@ ErrNameIsExist: "名稱已存在"
 ErrDemoEnvironment: "演示伺服器，禁止此操作!"
 ErrCmdTimeout: "指令執行超時！"
 ErrCmdIllegal: "執行命令中存在不合法字符，請修改後重試！"
+ErrPortExist: '{{ .port }} 埠已被 {{ .type }} [{{ .name }}] 佔用'
+TYPE_APP: "應用"
+TYPE_RUNTIME: "運作環境"
+TYPE_DOMAIN: "網域名稱"
 
 #app
 ErrPortInUsed: "{{ .detail }} 端口已被佔用！"

@@ -31,10 +31,12 @@
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('runtime.version')" prop="version"></el-table-column>
-                    <el-table-column
-                        :label="$t('runtime.externalPort')"
-                        prop="params.PANEL_APP_PORT_HTTP"
-                    ></el-table-column>
+                    <el-table-column :label="$t('runtime.externalPort')" prop="port">
+                        <template #default="{ row }">
+                            {{ row.port }}
+                            <el-button link :icon="Promotion" @click="goDashboard(row.port, 'http')"></el-button>
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" prop="status">
                         <template #default="{ row }">
                             <el-popover
@@ -51,6 +53,11 @@
                             <div v-else>
                                 <Status :key="row.status" :status="row.status"></Status>
                             </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('commons.button.log')" prop="path">
+                        <template #default="{ row }">
+                            <el-button @click="openLog(row)" link type="primary">{{ $t('website.check') }}</el-button>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -74,6 +81,8 @@
         </LayoutContent>
         <OperateNode ref="operateRef" @close="search" />
         <Delete ref="deleteRef" @close="search" />
+        <ComposeLogs ref="composeLogRef" />
+        <PortJumpDialog ref="dialogPortJumpRef" />
     </div>
 </template>
 
@@ -88,6 +97,17 @@ import Delete from '@/views/website/runtime/delete/index.vue';
 import i18n from '@/lang';
 import RouterMenu from '../index.vue';
 import router from '@/routers/router';
+import ComposeLogs from '@/components/compose-log/index.vue';
+import { Promotion } from '@element-plus/icons-vue';
+import PortJumpDialog from '@/components/port-jump/index.vue';
+
+let timer: NodeJS.Timer | null = null;
+const loading = ref(false);
+const items = ref<Runtime.RuntimeDTO[]>([]);
+const operateRef = ref();
+const deleteRef = ref();
+const dialogPortJumpRef = ref();
+const composeLogRef = ref();
 
 const paginationConfig = reactive({
     cacheSizeKey: 'runtime-page-size',
@@ -101,8 +121,6 @@ const req = reactive<Runtime.RuntimeReq>({
     pageSize: 40,
     type: 'node',
 });
-let timer: NodeJS.Timer | null = null;
-
 const buttons = [
     {
         label: i18n.global.t('container.stop'),
@@ -147,10 +165,6 @@ const buttons = [
         },
     },
 ];
-const loading = ref(false);
-const items = ref<Runtime.RuntimeDTO[]>([]);
-const operateRef = ref();
-const deleteRef = ref();
 
 const disabledRuntime = (row: Runtime.Runtime) => {
     return row.status === 'starting' || row.status === 'recreating';
@@ -180,6 +194,14 @@ const openDetail = (row: Runtime.Runtime) => {
 
 const openDelete = async (row: Runtime.Runtime) => {
     deleteRef.value.acceptParams(row.id, row.name);
+};
+
+const openLog = (row: any) => {
+    composeLogRef.value.acceptParams({ compose: row.path + '/docker-compose.yml', resource: row.name });
+};
+
+const goDashboard = async (port: any, protocol: string) => {
+    dialogPortJumpRef.value.acceptParams({ port: port, protocol: protocol });
 };
 
 const operateRuntime = async (operate: string, ID: number) => {
