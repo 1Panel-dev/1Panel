@@ -1125,6 +1125,8 @@ const message = {
         mfa: 'MFA',
         secret: 'Secret',
         mfaInterval: 'Refresh interval (s)',
+        mfaTitleHelper:
+            'Used to differentiate between different 1Panel hosts. After modification, please rescan or manually add the key information!',
         mfaIntervalHelper: 'Please rescan or manually add key information after modifying the refresh time.',
         mfaAlert:
             'MFA password is generated based on the current time. Please ensure that the server time is synchronized.',

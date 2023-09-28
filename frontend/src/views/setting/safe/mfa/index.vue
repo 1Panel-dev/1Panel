@@ -52,6 +52,16 @@
                                 </div>
                             </span>
                         </el-form-item>
+                        <el-form-item :label="$t('commons.table.title')" prop="title">
+                            <el-input v-model="form.title">
+                                <template #append>
+                                    <el-button @click="loadMfaCodeBefore(formRef)">
+                                        {{ $t('commons.button.save') }}
+                                    </el-button>
+                                </template>
+                            </el-input>
+                            <span class="input-help">{{ $t('setting.mfaTitleHelper') }}</span>
+                        </el-form-item>
                         <el-form-item :label="$t('setting.mfaInterval')" prop="interval">
                             <el-input v-model.number="form.interval">
                                 <template #append>
@@ -80,7 +90,7 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { bindMFA, getMFA } from '@/api/modules/setting';
+import { bindMFA, loadMFA } from '@/api/modules/setting';
 import { reactive, ref } from 'vue';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
@@ -96,6 +106,7 @@ const drawerVisiable = ref();
 const formRef = ref();
 
 const form = reactive({
+    title: '1Panel',
     code: '',
     secret: '',
     interval: 30,
@@ -134,7 +145,11 @@ const loadMfaCodeBefore = async (formEl: FormInstance | undefined) => {
     loadMfaCode();
 };
 const loadMfaCode = async () => {
-    const res = await getMFA(form.interval);
+    let param = {
+        title: form.title,
+        interval: form.interval,
+    };
+    const res = await loadMFA(param);
     form.secret = res.data.secret;
     qrImage.value = res.data.qrImage;
 };

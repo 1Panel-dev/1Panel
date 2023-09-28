@@ -8648,25 +8648,30 @@ const docTemplate = `{
                 }
             }
         },
-        "/settings/mfa/:interval": {
-            "get": {
+        "/settings/mfa": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
                 "description": "获取 mfa 信息",
+                "consumes": [
+                    "application/json"
+                ],
                 "tags": [
                     "System Setting"
                 ],
                 "summary": "Load mfa info",
                 "parameters": [
                     {
-                        "type": "string",
                         "description": "request",
-                        "name": "interval",
-                        "in": "path",
-                        "required": true
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.MfaCredential"
+                        }
                     }
                 ],
                 "responses": {

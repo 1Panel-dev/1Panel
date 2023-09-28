@@ -1118,6 +1118,7 @@ const message = {
         mfaHelper3: '输入手机应用上的 6 位数字',
         mfaCode: '验证码',
         mfaInterval: '刷新时间（秒）',
+        mfaTitleHelper: '用于区分不同 1Panel 主机，修改后请重新扫描或手动添加密钥信息！',
         mfaIntervalHelper: '修改刷新时间后，请重新扫描或手动添加密钥信息！',
         sslChangeHelper: 'https 设置修改需要重启服务，是否继续？',
         sslDisable: '禁用',

@@ -2,10 +2,8 @@ package v1
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"path"
-	"strconv"
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -311,23 +309,19 @@ func (b *BaseApi) SystemClean(c *gin.Context) {
 // @Tags System Setting
 // @Summary Load mfa info
 // @Description 获取 mfa 信息
-// @Param interval path string true "request"
+// @Accept json
+// @Param request body dto.MfaCredential true "request"
 // @Success 200 {object} mfa.Otp
 // @Security ApiKeyAuth
-// @Router /settings/mfa/:interval [get]
-func (b *BaseApi) GetMFA(c *gin.Context) {
-	intervalStr, ok := c.Params.Get("interval")
-	if !ok {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error interval in path"))
-		return
-	}
-	interval, err := strconv.Atoi(intervalStr)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, fmt.Errorf("type conversion failed, err: %v", err))
+// @Router /settings/mfa [post]
+func (b *BaseApi) LoadMFA(c *gin.Context) {
+	var req dto.MfaRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
 
-	otp, err := mfa.GetOtp("admin", interval)
+	otp, err := mfa.GetOtp("admin", req.Title, req.Interval)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

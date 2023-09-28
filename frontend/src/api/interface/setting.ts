@@ -70,6 +70,10 @@ export namespace Setting {
     export interface PortUpdate {
         serverPort: number;
     }
+    export interface MFARequest {
+        title: string;
+        interval: number;
+    }
     export interface MFAInfo {
         secret: string;
         qrImage: string;

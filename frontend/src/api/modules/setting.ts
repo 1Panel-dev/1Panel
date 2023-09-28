@@ -57,8 +57,8 @@ export const cleanMonitors = () => {
     return http.post(`/settings/monitor/clean`, {});
 };
 
-export const getMFA = (interval: number) => {
-    return http.get<Setting.MFAInfo>(`/settings/mfa/${interval}`, {});
+export const loadMFA = (param: Setting.MFARequest) => {
+    return http.post<Setting.MFAInfo>(`/settings/mfa`, param);
 };
 
 export const loadDaemonJsonPath = () => {

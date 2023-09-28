@@ -9611,15 +9611,18 @@ paths:
         formatEN: reset an expired Password
         formatZH: 重置过期密码
         paramKeys: []
-  /settings/mfa/:interval:
-    get:
+  /settings/mfa:
+    post:
+      consumes:
+      - application/json
       description: 获取 mfa 信息
       parameters:
       - description: request
-        in: path
-        name: interval
+        in: body
+        name: request
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/dto.MfaCredential'
       responses:
         "200":
           description: OK

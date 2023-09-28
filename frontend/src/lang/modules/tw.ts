@@ -1117,6 +1117,7 @@ const message = {
         mfaHelper3: '輸入手機應用上的 6 位數字',
         mfaCode: '驗證碼',
         mfaInterval: '刷新時間（秒）',
+        mfaTitleHelper: '用於區分不同 1Panel 主機，修改後請重新掃描或手動添加密鑰信息！',
         mfaIntervalHelper: '修改刷新時間後，請重新掃描或手動添加密鑰信息！',
         sslChangeHelper: 'https 設置修改需要重啟服務，是否繼續？',
         sslDisable: '禁用',
