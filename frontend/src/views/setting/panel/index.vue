@@ -117,6 +117,15 @@
                                     </template>
                                 </el-input>
                             </el-form-item>
+                            <el-form-item :label="$t('setting.diskClean')">
+                                <el-input disabled v-model="form.lastCleanTime">
+                                    <template #append>
+                                        <el-button v-show="!show" @click="onClean" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
                         </el-col>
                     </el-row>
                 </el-form>
@@ -130,7 +139,8 @@
         <Timeout ref="timeoutRef" @search="search()" />
         <TimeZone ref="timezoneRef" @search="search()" />
         <Ntp ref="ntpRef" @search="search()" />
-        <Netwrok ref="netwrokRef" @search="search()" />
+        <Network ref="networkRef" @search="search()" />
+        <Clean ref="cleanRef" @search="search()" />
     </div>
 </template>
 
@@ -148,7 +158,8 @@ import Timeout from '@/views/setting/panel/timeout/index.vue';
 import PanelName from '@/views/setting/panel/name/index.vue';
 import SystemIP from '@/views/setting/panel/systemip/index.vue';
 import TimeZone from '@/views/setting/panel/timezone/index.vue';
-import Netwrok from '@/views/setting/panel/default-network/index.vue';
+import Network from '@/views/setting/panel/default-network/index.vue';
+import Clean from '@/views/setting/panel/clean/index.vue';
 import Ntp from '@/views/setting/panel/ntp/index.vue';
 
 const loading = ref(false);
@@ -172,6 +183,10 @@ const form = reactive({
     complexityVerification: '',
     defaultNetwork: '',
     defaultNetworkVal: '',
+
+    lastCleanTime: '',
+    lastCleanSize: '',
+    lastCleanData: '',
 });
 
 const show = ref();
@@ -183,7 +198,8 @@ const systemIPRef = ref();
 const timeoutRef = ref();
 const ntpRef = ref();
 const timezoneRef = ref();
-const netwrokRef = ref();
+const networkRef = ref();
+const cleanRef = ref();
 const unset = ref(i18n.t('setting.unSetting'));
 
 const search = async () => {
@@ -201,6 +217,10 @@ const search = async () => {
     form.complexityVerification = res.data.complexityVerification;
     form.defaultNetwork = res.data.defaultNetwork;
     form.defaultNetworkVal = res.data.defaultNetwork === 'all' ? i18n.t('commons.table.all') : res.data.defaultNetwork;
+
+    form.lastCleanTime = res.data.lastCleanTime;
+    form.lastCleanSize = res.data.lastCleanSize;
+    form.lastCleanData = res.data.lastCleanData;
 };
 
 const onChangePassword = () => {
@@ -225,7 +245,14 @@ const onChangeNtp = () => {
     ntpRef.value.acceptParams({ localTime: form.localTime, ntpSite: form.ntpSite });
 };
 const onChangeNetwork = () => {
-    netwrokRef.value.acceptParams({ defaultNetwork: form.defaultNetwork });
+    networkRef.value.acceptParams({ defaultNetwork: form.defaultNetwork });
+};
+const onClean = () => {
+    cleanRef.value.acceptParams({
+        lastCleanTime: form.lastCleanTime,
+        lastCleanSize: form.lastCleanSize,
+        lastCleanData: form.lastCleanData,
+    });
 };
 
 const onSave = async (key: string, val: any) => {

@@ -8558,6 +8558,49 @@
                 }
             }
         },
+        "/settings/clean": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "清理系统垃圾文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "System clean",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.Clean"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [],
+                    "formatEN": "Clean system junk files",
+                    "formatZH": "清理系统垃圾文件",
+                    "paramKeys": []
+                }
+            }
+        },
         "/settings/expired/handle": {
             "post": {
                 "security": [
@@ -8773,6 +8816,32 @@
                     ],
                     "formatEN": "update system port =\u003e [serverPort]",
                     "formatZH": "修改系统端口 =\u003e [serverPort]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/settings/scan": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "扫描系统垃圾文件",
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "Scan system",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [],
+                    "formatEN": "scan System Junk Files",
+                    "formatZH": "扫描系统垃圾文件",
                     "paramKeys": []
                 }
             }
@@ -12125,6 +12194,20 @@
                 }
             }
         },
+        "dto.Clean": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "treeType": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.CleanLog": {
             "type": "object",
             "required": [
@@ -14895,6 +14978,15 @@
                     "type": "string"
                 },
                 "language": {
+                    "type": "string"
+                },
+                "lastCleanData": {
+                    "type": "string"
+                },
+                "lastCleanSize": {
+                    "type": "string"
+                },
+                "lastCleanTime": {
                     "type": "string"
                 },
                 "localTime": {

@@ -7,9 +7,18 @@ import (
 )
 
 var AddDefaultNetwork = &gormigrate.Migration{
-	ID: "20230918-add-default-network",
+	ID: "20230928-add-default-network",
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.Create(&model.Setting{Key: "DefaultNetwork", Value: ""}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "LastCleanTime", Value: ""}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "LastCleanSize", Value: ""}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "LastCleanData", Value: ""}).Error; err != nil {
 			return err
 		}
 		return nil

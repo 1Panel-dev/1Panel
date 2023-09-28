@@ -278,6 +278,37 @@ func (b *BaseApi) CleanMonitor(c *gin.Context) {
 }
 
 // @Tags System Setting
+// @Summary Scan system
+// @Description 扫描系统垃圾文件
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/scan [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"扫描系统垃圾文件","formatEN":"scan System Junk Files"}
+func (b *BaseApi) ScanSystem(c *gin.Context) {
+	helper.SuccessWithData(c, settingService.SystemScan())
+}
+
+// @Tags System Setting
+// @Summary System clean
+// @Description 清理系统垃圾文件
+// @Accept json
+// @Param request body []dto.Clean true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/clean [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"清理系统垃圾文件","formatEN":"Clean system junk files"}
+func (b *BaseApi) SystemClean(c *gin.Context) {
+	var req []dto.Clean
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	settingService.SystemClean(req)
+
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags System Setting
 // @Summary Load mfa info
 // @Description 获取 mfa 信息
 // @Param interval path string true "request"

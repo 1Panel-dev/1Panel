@@ -17,6 +17,9 @@ export namespace Setting {
         theme: string;
         language: string;
         defaultNetwork: string;
+        lastCleanTime: string;
+        lastCleanSize: string;
+        lastCleanData: string;
 
         serverPort: number;
         ssl: string;
@@ -76,6 +79,24 @@ export namespace Setting {
         code: string;
         interval: string;
     }
+
+    export interface CleanData {
+        systemClean: Array<CleanTree>;
+        uploadClean: Array<CleanTree>;
+        downloadClean: Array<CleanTree>;
+        systemLogClean: Array<CleanTree>;
+    }
+    export interface CleanTree {
+        id: string;
+        label: string;
+        children: Array<CleanTree>;
+        type: string;
+        name: string;
+        size: number;
+        isCheck: boolean;
+        isRecommend: boolean;
+    }
+
     export interface SnapshotCreate {
         id: number;
         from: string;
