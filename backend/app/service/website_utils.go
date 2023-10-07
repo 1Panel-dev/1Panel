@@ -216,20 +216,22 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 		nginxInclude := fmt.Sprintf("/www/sites/%s/proxy/*.conf", website.Alias)
 		server.UpdateDirective("include", []string{nginxInclude})
 	case constant.Runtime:
-		if runtime.Resource == constant.ResourceLocal {
-			switch runtime.Type {
-			case constant.RuntimePHP:
-				server.UpdateRoot(rootIndex)
-				localPath := path.Join(nginxInstall.GetPath(), rootIndex, "index.php")
-				server.UpdatePHPProxy([]string{website.Proxy}, localPath)
-			}
-		}
-		if runtime.Resource == constant.ResourceAppstore {
-			switch runtime.Type {
-			case constant.RuntimePHP:
+		switch runtime.Type {
+		case constant.RuntimePHP:
+			if runtime.Resource == constant.ResourceLocal {
+				switch runtime.Type {
+				case constant.RuntimePHP:
+					server.UpdateRoot(rootIndex)
+					localPath := path.Join(nginxInstall.GetPath(), rootIndex, "index.php")
+					server.UpdatePHPProxy([]string{website.Proxy}, localPath)
+				}
+			} else {
 				server.UpdateRoot(rootIndex)
 				server.UpdatePHPProxy([]string{website.Proxy}, "")
 			}
+		case constant.RuntimeNode:
+			proxy := fmt.Sprintf("http://127.0.0.1:%d", runtime.Port)
+			server.UpdateRootProxy([]string{proxy})
 		}
 	}
 
