@@ -59,7 +59,7 @@ const router = useRouter();
 
 const loading = ref();
 const isWatch = ref();
-const currentFile = ref('1Panel.log');
+const currentFile = ref();
 const fileList = ref();
 
 const extensions = [javascript(), oneDark];
@@ -87,6 +87,10 @@ const changeWatch = async () => {
 const loadFiles = async () => {
     const res = await getSystemFiles();
     fileList.value = res.data || [];
+    if (fileList.value) {
+        currentFile.value = fileList.value[0];
+        search();
+    }
 };
 
 const search = async () => {
@@ -118,7 +122,6 @@ onBeforeUnmount(() => {
 
 onMounted(() => {
     loadFiles();
-    search();
 });
 </script>
 

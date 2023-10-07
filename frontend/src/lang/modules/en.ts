@@ -857,6 +857,8 @@ const message = {
             websites: 'Website',
             containers: 'Container',
             files: 'File Manage',
+            runtimes: 'Runtime',
+            process: 'Process',
             logs: 'Panel Logs',
             settings: 'Panel Setting',
             cronjobs: 'Cronjob',

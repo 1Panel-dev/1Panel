@@ -389,7 +389,7 @@ func sortFileList(fileNames []sshFileItem) []sshFileItem {
 			return fileNames[i].Name > fileNames[j].Name
 		})
 		itemFile = append(itemFile, fileNames[len(fileNames)-1])
-		itemFile = append(itemFile, fileNames[:len(fileNames)-2]...)
+		itemFile = append(itemFile, fileNames[:len(fileNames)-1]...)
 		return itemFile
 	}
 	sort.Slice(fileNames, func(i, j int) bool {

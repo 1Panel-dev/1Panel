@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -50,8 +51,15 @@ func (u *LogService) ListSystemLogFile() ([]string, error) {
 		if err != nil {
 			return err
 		}
-		if !info.IsDir() && (strings.HasSuffix(info.Name(), ".log") || strings.HasSuffix(info.Name(), ".log.gz")) {
-			files = append(files, strings.TrimSuffix(info.Name(), ".gz"))
+		if !info.IsDir() {
+			if info.Name() == "1Panel.log" {
+				files = append(files, time.Now().Format("2006-01-02"))
+				return nil
+			}
+			itemFileName := strings.TrimPrefix(info.Name(), "1Panel-")
+			itemFileName = strings.TrimSuffix(itemFileName, ".gz")
+			itemFileName = strings.TrimSuffix(itemFileName, ".log")
+			files = append(files, itemFileName)
 			return nil
 		}
 		return nil
@@ -113,6 +121,11 @@ func (u *LogService) PageOperationLog(req dto.SearchOpLogWithPage) (int64, inter
 }
 
 func (u *LogService) LoadSystemLog(name string) (string, error) {
+	if name == time.Now().Format("2006-01-02") {
+		name = "1Panel.log"
+	} else {
+		name = "1Panel-" + name + ".log"
+	}
 	filePath := path.Join(global.CONF.System.DataDir, "log", name)
 	if _, err := os.Stat(filePath); err != nil {
 		fileGzPath := path.Join(global.CONF.System.DataDir, "log", name+".gz")
@@ -120,7 +133,7 @@ func (u *LogService) LoadSystemLog(name string) (string, error) {
 			return "", buserr.New("ErrHttpReqNotFound")
 		}
 		if err := handleGunzip(fileGzPath); err != nil {
-			return "", fmt.Errorf("handle ungzip file %s falied, err: %v", fileGzPath, err)
+			return "", fmt.Errorf("handle ungzip file %s failed, err: %v", fileGzPath, err)
 		}
 	}
 	content, err := os.ReadFile(filePath)
