@@ -84,6 +84,7 @@ export namespace App {
     export interface ServiceParam {
         label: '';
         value: '';
+        from?: '';
     }
 
     export interface AppInstall {
@@ -168,6 +169,7 @@ export namespace App {
         label: string;
         value: string;
         config?: Object;
+        from?: string;
     }
 
     export interface VersionDetail {

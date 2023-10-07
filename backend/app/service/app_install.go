@@ -428,7 +428,7 @@ func (a *AppInstallService) SyncAll(systemInit bool) error {
 func (a *AppInstallService) GetServices(key string) ([]response.AppService, error) {
 	var res []response.AppService
 	if DatabaseKeys[key] > 0 {
-		dbs, _ := databaseRepo.GetList(databaseRepo.WithByFrom("local"), commonRepo.WithByType(key))
+		dbs, _ := databaseRepo.GetList(commonRepo.WithByType(key))
 		if len(dbs) == 0 {
 			return res, nil
 		}
@@ -447,6 +447,9 @@ func (a *AppInstallService) GetServices(key string) ([]response.AppService, erro
 					_ = json.Unmarshal([]byte(install.Param), &paramMap)
 				}
 				service.Config = paramMap
+				service.From = constant.AppResourceLocal
+			} else {
+				service.From = constant.AppResourceRemote
 			}
 			res = append(res, service)
 		}

@@ -200,9 +200,13 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 	}
 
 	if !reflect.DeepEqual(dbConfig, dto.AppDatabase{}) && dbConfig.ServiceName != "" {
-		dbInstall, err := appInstallRepo.GetFirst(appInstallRepo.WithServiceName(dbConfig.ServiceName))
-		if err != nil {
-			return err
+		hostName := params["PANEL_DB_HOST_NAME"]
+		if hostName == nil || hostName.(string) == "" {
+			return nil
+		}
+		database, _ := databaseRepo.Get(commonRepo.WithByName(hostName.(string)))
+		if database.ID == 0 {
+			return nil
 		}
 		var resourceId uint
 		if dbConfig.DbName != "" && dbConfig.DbUser != "" && dbConfig.Password != "" {
@@ -217,11 +221,11 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 				var createMysql dto.MysqlDBCreate
 				createMysql.Name = dbConfig.DbName
 				createMysql.Username = dbConfig.DbUser
-				createMysql.Database = dbInstall.Name
+				createMysql.Database = database.Name
 				createMysql.Format = "utf8mb4"
 				createMysql.Permission = "%"
 				createMysql.Password = dbConfig.Password
-				createMysql.From = "local"
+				createMysql.From = database.From
 				mysqldb, err := NewIMysqlService().Create(ctx, createMysql)
 				if err != nil {
 					return err
@@ -232,8 +236,13 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 		var installResource model.AppInstallResource
 		installResource.ResourceId = resourceId
 		installResource.AppInstallId = appInstall.ID
-		installResource.LinkId = dbInstall.ID
-		installResource.Key = dbInstall.App.Key
+		if database.AppInstallID > 0 {
+			installResource.LinkId = database.AppInstallID
+		} else {
+			installResource.LinkId = database.ID
+		}
+		installResource.Key = database.Type
+		installResource.From = database.From
 		if err := appInstallResourceRepo.Create(ctx, &installResource); err != nil {
 			return err
 		}
