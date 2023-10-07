@@ -310,6 +310,7 @@ func handleParams(create request.RuntimeCreate, projectDir string) (composeConte
 		} else {
 			create.Params["RUN_INSTALL"] = "0"
 		}
+		create.Params["CONTAINER_PACKAGE_URL"] = create.Source
 	}
 
 	newMap := make(map[string]string)

@@ -278,6 +278,9 @@ func (r *RuntimeService) Get(id uint) (*response.RuntimeDTO, error) {
 				res.Params[k] = v
 			}
 		}
+		if v, ok := envs["CONTAINER_PACKAGE_URL"]; ok {
+			res.Source = v
+		}
 	}
 
 	return &res, nil

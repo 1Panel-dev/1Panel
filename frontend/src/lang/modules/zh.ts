@@ -1673,6 +1673,9 @@ const message = {
         close: '关闭',
         operatorHelper: '将对选中的运行环境进行 {0} 操作，是否继续？',
         statusHelper: '状态说明：启动中-容器已启动，但应用正在启动；异常-容器已启动，但应用状态异常',
+        taobao: '淘宝',
+        tencent: '腾讯',
+        imageSource: '镜像源',
     },
     process: {
         pid: '进程ID',

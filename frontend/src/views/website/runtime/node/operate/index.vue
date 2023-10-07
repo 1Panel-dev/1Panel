@@ -82,20 +82,20 @@
                         <span class="input-help">{{ $t('runtime.runScriptHelper') }}</span>
                     </el-form-item>
                     <el-row :gutter="20">
-                        <el-col :span="10">
+                        <el-col :span="9">
                             <el-form-item :label="$t('runtime.appPort')" prop="params.NODE_APP_PORT">
                                 <el-input v-model.number="runtime.params['NODE_APP_PORT']" />
                                 <span class="input-help">{{ $t('runtime.appPortHelper') }}</span>
                             </el-form-item>
                         </el-col>
-                        <el-col :span="10">
+                        <el-col :span="9">
                             <el-form-item :label="$t('runtime.externalPort')" prop="port">
                                 <el-input v-model.number="runtime.port" />
                                 <span class="input-help">{{ $t('runtime.externalPortHelper') }}</span>
                             </el-form-item>
                         </el-col>
 
-                        <el-col :span="4">
+                        <el-col :span="6">
                             <el-form-item :label="$t('app.allowPort')" prop="params.HOST_IP">
                                 <el-select v-model="runtime.params['HOST_IP']">
                                     <el-option :label="$t('runtime.open')" value="0.0.0.0"></el-option>
@@ -109,6 +109,19 @@
                             <el-option label="npm" value="npm"></el-option>
                             <el-option label="yarn" value="yarn"></el-option>
                         </el-select>
+                    </el-form-item>
+                    <el-form-item :label="$t('runtime.imageSource')" prop="source">
+                        <el-select v-model="runtime.source" filterable allow-create default-first-option>
+                            <el-option
+                                v-for="(source, index) in imageSources"
+                                :key="index"
+                                :label="source.label + ' [' + source.value + ']'"
+                                :value="source.value"
+                            ></el-option>
+                        </el-select>
+                        <span class="input-help">
+                            {{ $t('runtime.phpsourceHelper') }}
+                        </span>
                     </el-form-item>
                     <el-form-item :label="$t('app.containerName')" prop="params.CONTAINER_NAME">
                         <el-input v-model.trim="runtime.params['CONTAINER_NAME']"></el-input>
@@ -171,23 +184,40 @@ const initData = (type: string) => ({
     rebuild: false,
     codeDir: '/',
     port: 3000,
+    source: 'https://registry.npmjs.org/',
 });
 let runtime = reactive<Runtime.RuntimeCreate>(initData('node'));
 const rules = ref<any>({
-    name: [Rules.appName],
+    name: [Rules.requiredInput, Rules.appName],
     appID: [Rules.requiredSelect],
     codeDir: [Rules.requiredInput],
     port: [Rules.requiredInput, Rules.port],
+    source: [Rules.requiredSelect],
     params: {
         NODE_APP_PORT: [Rules.requiredInput, Rules.port],
         PACKAGE_MANAGER: [Rules.requiredSelect],
         HOST_IP: [Rules.requiredSelect],
         EXEC_SCRIPT: [Rules.requiredSelect],
-        CONTAINER_NAME: [Rules.requiredInput],
+        CONTAINER_NAME: [Rules.requiredInput, Rules.containerName],
     },
 });
 const scripts = ref<Runtime.NodeScripts[]>([]);
 const em = defineEmits(['close']);
+
+const imageSources = [
+    {
+        label: i18n.global.t('runtime.default'),
+        value: 'https://registry.npmjs.org/',
+    },
+    {
+        label: i18n.global.t('runtime.taobao'),
+        value: 'https://registry.npmmirror.com',
+    },
+    {
+        label: i18n.global.t('runtime.tencent'),
+        value: 'https://mirrors.cloud.tencent.com/npm/',
+    },
+];
 
 watch(
     () => runtime.params['NODE_APP_PORT'],

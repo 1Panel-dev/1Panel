@@ -1674,6 +1674,9 @@ const message = {
         close: '關閉',
         operatorHelper: '將對選取的執行環境進行 {0} 操作，是否繼續？ ',
         statusHelper: '狀態說明：啟動中-容器已啟動，但應用正在啟動；異常-容器已啟動，但應用狀態異常',
+        taobao: 'Taobao',
+        tencent: 'Tencent',
+        imageSource: 'Image source',
     },
     process: {
         pid: '進程ID',
