@@ -641,7 +641,7 @@ const message = {
         composePathHelper: '配置文件保存路徑: {0}',
         composeHelper: '通過 1Panel 編輯或者模版創建的編排，將保存在 {0}/docker/compose 路徑下',
         deleteFile: '刪除文件',
-        deleteComposeHelper: '刪除編排文件所在目錄下所有文件，包括該文件下的持久化文件等，請謹慎操作！',
+        deleteComposeHelper: '刪除 {0} 目录下所有文件，包括該文件下的持久化文件等，請謹慎操作！',
         deleteCompose: '" 刪除此編排',
         apps: '應用商店',
         local: '本地',
