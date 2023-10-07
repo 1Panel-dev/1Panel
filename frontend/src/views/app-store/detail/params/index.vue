@@ -79,7 +79,13 @@
                                 :key="service.label"
                                 :value="service.value"
                                 :label="service.label"
-                            ></el-option>
+                            >
+                                <span>{{ service.label }}</span>
+                                <span class="float-right" v-if="service.from != ''">
+                                    <el-tag v-if="service.from === 'local'">{{ $t('database.local') }}</el-tag>
+                                    <el-tag v-else type="success">{{ $t('database.remote') }}</el-tag>
+                                </span>
+                            </el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>

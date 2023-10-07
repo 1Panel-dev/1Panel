@@ -77,6 +77,7 @@ type AppService struct {
 	Label  string      `json:"label"`
 	Value  string      `json:"value"`
 	Config interface{} `json:"config"`
+	From   string      `json:"from"`
 }
 
 type AppParam struct {
