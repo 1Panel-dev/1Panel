@@ -111,20 +111,37 @@
                                                     :content="installed.message"
                                                 >
                                                     <template #reference>
-                                                        <el-button link type="primary">
-                                                            {{ $t('app.detail') }}
+                                                        <el-button link type="danger">
+                                                            <el-icon><Warning /></el-icon>
                                                         </el-button>
                                                     </template>
                                                 </el-popover>
                                             </span>
-
-                                            <el-tooltip effect="dark" :content="$t('app.toFolder')" placement="top">
-                                                <el-button type="primary" link @click="toFolder(installed.path)">
-                                                    <el-icon>
-                                                        <FolderOpened />
-                                                    </el-icon>
-                                                </el-button>
-                                            </el-tooltip>
+                                            <span class="ml-1">
+                                                <el-tooltip effect="dark" :content="$t('app.toFolder')" placement="top">
+                                                    <el-button type="primary" link @click="toFolder(installed.path)">
+                                                        <el-icon>
+                                                            <FolderOpened />
+                                                        </el-icon>
+                                                    </el-button>
+                                                </el-tooltip>
+                                            </span>
+                                            <span class="ml-1">
+                                                <el-tooltip
+                                                    effect="dark"
+                                                    :content="$t('commons.button.log')"
+                                                    placement="top"
+                                                >
+                                                    <el-button
+                                                        link
+                                                        type="primary"
+                                                        @click="openLog(installed)"
+                                                        :disabled="installed.status === 'DownloadErr'"
+                                                    >
+                                                        <el-icon><Tickets /></el-icon>
+                                                    </el-button>
+                                                </el-tooltip>
+                                            </span>
 
                                             <el-button
                                                 class="h-button"
@@ -492,15 +509,6 @@ const buttons = [
         },
         disabled: (row: any) => {
             return row.status === 'DownloadErr' || row.status === 'Upgrading' || row.status === 'Rebuilding';
-        },
-    },
-    {
-        label: i18n.global.t('commons.button.log'),
-        click: (row: any) => {
-            openLog(row);
-        },
-        disabled: (row: any) => {
-            return row.status === 'DownloadErr';
         },
     },
 ];
