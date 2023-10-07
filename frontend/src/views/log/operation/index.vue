@@ -36,11 +36,13 @@
                     <el-option :label="$t('commons.table.all')" value=""></el-option>
                     <el-option :label="$t('logs.detail.apps')" value="apps"></el-option>
                     <el-option :label="$t('logs.detail.websites')" value="websites"></el-option>
+                    <el-option :label="$t('logs.detail.runtimes')" value="runtimes"></el-option>
                     <el-option :label="$t('logs.detail.databases')" value="databases"></el-option>
                     <el-option :label="$t('logs.detail.containers')" value="containers"></el-option>
                     <el-option :label="$t('logs.detail.cronjobs')" value="cronjobs"></el-option>
                     <el-option :label="$t('logs.detail.files')" value="files"></el-option>
                     <el-option :label="$t('logs.detail.hosts')" value="hosts"></el-option>
+                    <el-option :label="$t('logs.detail.process')" value="process"></el-option>
                     <el-option :label="$t('logs.detail.logs')" value="logs"></el-option>
                     <el-option :label="$t('logs.detail.settings')" value="settings"></el-option>
                 </el-select>

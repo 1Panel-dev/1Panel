@@ -823,6 +823,8 @@ const message = {
             websites: '網站',
             containers: '容器',
             files: '文件管理',
+            runtimes: '運行環境',
+            process: '進程管理',
             logs: '日誌審計',
             settings: '面板設置',
             cronjobs: '計劃任務',

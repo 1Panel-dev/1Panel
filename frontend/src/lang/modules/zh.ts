@@ -823,6 +823,8 @@ const message = {
             websites: '网站',
             containers: '容器',
             files: '文件管理',
+            runtimes: '运行环境',
+            process: '进程管理',
             logs: '日志审计',
             settings: '面板设置',
             cronjobs: '计划任务',
