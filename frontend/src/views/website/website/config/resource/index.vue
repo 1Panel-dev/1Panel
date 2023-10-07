@@ -39,7 +39,7 @@ const getWebsiteDetail = async () => {
     if (res.data.type === 'runtime') {
         installId.value = res.data.appInstallId;
         const runRes = await GetRuntime(res.data.runtimeID);
-        if (runRes.data.resource === 'appstore') {
+        if (runRes.data.type == 'php' && runRes.data.resource === 'appstore') {
             configPHP.value = true;
         }
     }

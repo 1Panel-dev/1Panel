@@ -132,7 +132,8 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 		return err
 	}
 
-	if website.Type == constant.Deployment {
+	switch website.Type {
+	case constant.Deployment:
 		app, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
 		if err != nil {
 			return err
@@ -145,7 +146,19 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 			global.LOG.Errorf("docker-compose restart failed, err: %v", err)
 			return err
 		}
+	case constant.Runtime:
+		runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(website.RuntimeID))
+		if err != nil {
+			return err
+		}
+		if runtime.Type == constant.RuntimeNode {
+			if err := handleRuntimeRecover(runtime, fmt.Sprintf("%s/%s.runtime.tar.gz", tmpPath, website.Alias), true); err != nil {
+				return err
+			}
+			global.LOG.Info("put runtime.tar.gz into tmp dir successful")
+		}
 	}
+
 	siteDir := fmt.Sprintf("%s/openresty/%s/www/sites", constant.AppInstallDir, nginxInfo.Name)
 	if err := handleUnTar(fmt.Sprintf("%s/%s.web.tar.gz", tmpPath, website.Alias), siteDir); err != nil {
 		global.LOG.Errorf("handle recover from web.tar.gz failed, err: %v", err)
@@ -194,7 +207,8 @@ func handleWebsiteBackup(website *model.Website, backupDir, fileName string) err
 	}
 	global.LOG.Info("put openresty conf into tmp dir successful")
 
-	if website.Type == constant.Deployment {
+	switch website.Type {
+	case constant.Deployment:
 		app, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
 		if err != nil {
 			return err
@@ -203,7 +217,19 @@ func handleWebsiteBackup(website *model.Website, backupDir, fileName string) err
 			return err
 		}
 		global.LOG.Info("put app.tar.gz into tmp dir successful")
+	case constant.Runtime:
+		runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(website.RuntimeID))
+		if err != nil {
+			return err
+		}
+		if runtime.Type == constant.RuntimeNode {
+			if err := handleRuntimeBackup(runtime, tmpDir, fmt.Sprintf("%s.runtime.tar.gz", website.Alias)); err != nil {
+				return err
+			}
+			global.LOG.Info("put runtime.tar.gz into tmp dir successful")
+		}
 	}
+
 	websiteDir := fmt.Sprintf("%s/openresty/%s/www/sites/%s", constant.AppInstallDir, nginxInfo.Name, website.Alias)
 	if err := handleTar(websiteDir, tmpDir, fmt.Sprintf("%s.web.tar.gz", website.Alias), ""); err != nil {
 		return err

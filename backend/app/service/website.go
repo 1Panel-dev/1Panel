@@ -263,38 +263,44 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			return err
 		}
 		website.RuntimeID = runtime.ID
-		if runtime.Resource == constant.ResourceAppstore {
-			var (
-				req     request.AppInstallCreate
-				install *model.AppInstall
-			)
-			reg, _ := regexp.Compile(`[^a-z0-9_-]+`)
-			req.Name = reg.ReplaceAllString(strings.ToLower(create.PrimaryDomain), "")
-			req.AppDetailId = create.AppInstall.AppDetailId
-			req.Params = create.AppInstall.Params
-			req.Params["IMAGE_NAME"] = runtime.Image
-			req.AppContainerConfig = create.AppInstall.AppContainerConfig
-			req.Params["PANEL_WEBSITE_DIR"] = path.Join(nginxInstall.GetPath(), "/www")
-			tx, installCtx := getTxAndContext()
-			install, err = NewIAppService().Install(installCtx, req)
-			if err != nil {
-				tx.Rollback()
-				return err
+		switch runtime.Type {
+		case constant.RuntimePHP:
+			if runtime.Resource == constant.ResourceAppstore {
+				var (
+					req     request.AppInstallCreate
+					install *model.AppInstall
+				)
+				reg, _ := regexp.Compile(`[^a-z0-9_-]+`)
+				req.Name = reg.ReplaceAllString(strings.ToLower(create.PrimaryDomain), "")
+				req.AppDetailId = create.AppInstall.AppDetailId
+				req.Params = create.AppInstall.Params
+				req.Params["IMAGE_NAME"] = runtime.Image
+				req.AppContainerConfig = create.AppInstall.AppContainerConfig
+				req.Params["PANEL_WEBSITE_DIR"] = path.Join(nginxInstall.GetPath(), "/www")
+				tx, installCtx := getTxAndContext()
+				install, err = NewIAppService().Install(installCtx, req)
+				if err != nil {
+					tx.Rollback()
+					return err
+				}
+				tx.Commit()
+				website.AppInstallID = install.ID
+				appInstall = install
+				website.Proxy = fmt.Sprintf("127.0.0.1:%d", appInstall.HttpPort)
+			} else {
+				website.ProxyType = create.ProxyType
+				if website.ProxyType == constant.RuntimeProxyUnix {
+					proxy = fmt.Sprintf("unix:%s", path.Join("/www/sites", website.Alias, "php-pool", "php-fpm.sock"))
+				}
+				if website.ProxyType == constant.RuntimeProxyTcp {
+					proxy = fmt.Sprintf("127.0.0.1:%d", create.Port)
+				}
+				website.Proxy = proxy
 			}
-			tx.Commit()
-			website.AppInstallID = install.ID
-			appInstall = install
-			website.Proxy = fmt.Sprintf("127.0.0.1:%d", appInstall.HttpPort)
-		} else {
-			website.ProxyType = create.ProxyType
-			if website.ProxyType == constant.RuntimeProxyUnix {
-				proxy = fmt.Sprintf("unix:%s", path.Join("/www/sites", website.Alias, "php-pool", "php-fpm.sock"))
-			}
-			if website.ProxyType == constant.RuntimeProxyTcp {
-				proxy = fmt.Sprintf("127.0.0.1:%d", create.Port)
-			}
-			website.Proxy = proxy
+		case constant.RuntimeNode:
+			website.Proxy = fmt.Sprintf("127.0.0.1:%d", runtime.Port)
 		}
+
 	}
 
 	var domains []model.WebsiteDomain

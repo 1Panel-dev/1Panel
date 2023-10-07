@@ -93,7 +93,7 @@ onMounted(() => {
             website.value = res.data;
             if (res.data.type === 'runtime') {
                 const runRes = await GetRuntime(res.data.runtimeID);
-                if (runRes.data.resource === 'appstore') {
+                if (runRes.data.type == 'php' && runRes.data.resource === 'appstore') {
                     configPHP.value = true;
                 }
             }
