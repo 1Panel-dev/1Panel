@@ -233,6 +233,7 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 					}(req)
 				}
 			}
+			wg.Wait()
 			return nil
 		}
 		if req.Protocol == "tcp/udp" {
@@ -314,20 +315,20 @@ func (u *FirewallService) OperateAddressRule(req dto.AddrRuleOperate, reload boo
 
 	var wg sync.WaitGroup
 	addressList := strings.Split(req.Address, ",")
-	for _, addr := range addressList {
-		if len(addr) == 0 {
+	for i := 0; i < len(addressList); i++ {
+		if len(addressList[i]) == 0 {
 			continue
 		}
-		fireInfo.Address = addr
 		wg.Add(1)
-		go func(req dto.AddrRuleOperate) {
+		go func(addr string) {
 			defer wg.Done()
+			fireInfo.Address = addr
 			if err := client.RichRules(fireInfo, req.Operation); err != nil {
-				global.LOG.Errorf("%s address %s failed (strategy: %s), err: %v", req.Operation, req.Address, req.Strategy, err)
+				global.LOG.Errorf("%s address %s failed (strategy: %s), err: %v", req.Operation, addr, req.Strategy, err)
 			}
-			req.Address = fireInfo.Address
+			req.Address = addr
 			_ = u.addAddressRecord(req)
-		}(req)
+		}(addressList[i])
 	}
 	wg.Wait()
 	if reload {
@@ -397,6 +398,7 @@ func (u *FirewallService) BatchOperateRule(req dto.BatchRuleOperate) error {
 			_ = u.OperateAddressRule(item, false)
 		}(itemRule)
 	}
+	wgBatch.Wait()
 	return client.Reload()
 }
 
