@@ -544,6 +544,9 @@ const message = {
             'The default CPU share for a container is 1024, which can be increased to give the container more CPU time.',
 
         command: 'Command',
+        console: 'Console Interaction',
+        tty: 'TTY (-t)',
+        openStdin: 'OpenStdin (-i)',
         custom: 'Custom',
         emptyUser: 'When empty, you will log in as  default',
         containerTerminal: 'Terminal',

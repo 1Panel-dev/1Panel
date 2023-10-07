@@ -403,10 +403,14 @@ definitions:
         type: number
       network:
         type: string
+      openStdin:
+        type: boolean
       publishAllPorts:
         type: boolean
       restartPolicy:
         type: string
+      tty:
+        type: boolean
       volumes:
         items:
           $ref: '#/definitions/dto.VolumeHelper'
@@ -3152,6 +3156,8 @@ definitions:
       params:
         additionalProperties: true
         type: object
+      port:
+        type: integer
       resource:
         type: string
       source:
@@ -3208,6 +3214,8 @@ definitions:
       params:
         additionalProperties: true
         type: object
+      port:
+        type: integer
       rebuild:
         type: boolean
       source:
@@ -4909,7 +4917,7 @@ paths:
       tags:
       - Container Compose
   /containers/compose/search/log:
-    post:
+    get:
       description: docker-compose 日志
       parameters:
       - description: compose 文件地址
@@ -5426,7 +5434,7 @@ paths:
             $ref: '#/definitions/dto.ResourceLimit'
       security:
       - ApiKeyAuth: []
-      summary: Load container limis
+      summary: Load container limits
   /containers/list:
     post:
       consumes:

@@ -1226,7 +1226,7 @@
             }
         },
         "/containers/compose/search/log": {
-            "post": {
+            "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -2030,7 +2030,7 @@
                     }
                 ],
                 "description": "获取容器限制",
-                "summary": "Load container limis",
+                "summary": "Load container limits",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -12542,11 +12542,17 @@
                 "network": {
                     "type": "string"
                 },
+                "openStdin": {
+                    "type": "boolean"
+                },
                 "publishAllPorts": {
                     "type": "boolean"
                 },
                 "restartPolicy": {
                     "type": "string"
+                },
+                "tty": {
+                    "type": "boolean"
                 },
                 "volumes": {
                     "type": "array",
@@ -16642,6 +16648,9 @@
                     "type": "object",
                     "additionalProperties": true
                 },
+                "port": {
+                    "type": "integer"
+                },
                 "resource": {
                     "type": "string"
                 },
@@ -16726,6 +16735,9 @@
                 "params": {
                     "type": "object",
                     "additionalProperties": true
+                },
+                "port": {
+                    "type": "integer"
                 },
                 "rebuild": {
                     "type": "boolean"

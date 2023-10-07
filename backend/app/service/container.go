@@ -51,7 +51,7 @@ type IContainerService interface {
 	ContainerUpgrade(req dto.ContainerUpgrade) error
 	ContainerInfo(req dto.OperationWithName) (*dto.ContainerOperate, error)
 	ContainerListStats() ([]dto.ContainerListStats, error)
-	LoadResouceLimit() (*dto.ResourceLimit, error)
+	LoadResourceLimit() (*dto.ResourceLimit, error)
 	ContainerLogClean(req dto.OperationWithName) error
 	ContainerOperation(req dto.ContainerOperation) error
 	ContainerLogs(wsConn *websocket.Conn, container, since, tail string, follow bool) error
@@ -288,7 +288,7 @@ func (u *ContainerService) Prune(req dto.ContainerPrune) (dto.ContainerPruneRepo
 	return report, nil
 }
 
-func (u *ContainerService) LoadResouceLimit() (*dto.ResourceLimit, error) {
+func (u *ContainerService) LoadResourceLimit() (*dto.ResourceLimit, error) {
 	cpuCounts, err := cpu.Counts(true)
 	if err != nil {
 		return nil, fmt.Errorf("load cpu limit failed, err: %v", err)
@@ -368,6 +368,8 @@ func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.Contai
 		}
 	}
 	data.Cmd = oldContainer.Config.Cmd
+	data.OpenStdin = oldContainer.Config.OpenStdin
+	data.Tty = oldContainer.Config.Tty
 	data.Entrypoint = oldContainer.Config.Entrypoint
 	data.Env = oldContainer.Config.Env
 	data.CPUShares = oldContainer.HostConfig.CPUShares
@@ -441,7 +443,7 @@ func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
 	container, err := client.ContainerCreate(ctx, config, hostConf, &networkConf, &v1.Platform{}, req.Name)
 	if err != nil {
 		reCreateAfterUpdate(req.Name, client, oldContainer.Config, oldContainer.HostConfig, oldContainer.NetworkSettings)
-		return fmt.Errorf("update contianer failed, err: %v", err)
+		return fmt.Errorf("update container failed, err: %v", err)
 	}
 	global.LOG.Infof("update container %s successful! now check if the container is started.", req.Name)
 	if err := client.ContainerStart(ctx, container.ID, types.ContainerStartOptions{}); err != nil {
@@ -487,7 +489,7 @@ func (u *ContainerService) ContainerUpgrade(req dto.ContainerUpgrade) error {
 	container, err := client.ContainerCreate(ctx, config, hostConf, &networkConf, &v1.Platform{}, req.Name)
 	if err != nil {
 		reCreateAfterUpdate(req.Name, client, oldContainer.Config, oldContainer.HostConfig, oldContainer.NetworkSettings)
-		return fmt.Errorf("upgrade contianer failed, err: %v", err)
+		return fmt.Errorf("upgrade container failed, err: %v", err)
 	}
 	global.LOG.Infof("upgrade container %s successful! now check if the container is started.", req.Name)
 	if err := client.ContainerStart(ctx, container.ID, types.ContainerStartOptions{}); err != nil {
@@ -683,14 +685,14 @@ func (u *ContainerService) LoadContainerLogs(req dto.OperationWithNameAndType) s
 }
 
 func stringsToMap(list []string) map[string]string {
-	var lableMap = make(map[string]string)
+	var labelMap = make(map[string]string)
 	for _, label := range list {
 		if strings.Contains(label, "=") {
 			sps := strings.SplitN(label, "=", 2)
-			lableMap[sps[0]] = sps[1]
+			labelMap[sps[0]] = sps[1]
 		}
 	}
-	return lableMap
+	return labelMap
 }
 
 func calculateCPUPercentUnix(stats *types.StatsJSON) float64 {
@@ -791,7 +793,7 @@ func loadCpuAndMem(client *client.Client, container string) dto.ContainerListSta
 	data.CPUPercent = calculateCPUPercentUnix(stats)
 	data.PercpuUsage = len(stats.CPUStats.CPUUsage.PercpuUsage)
 
-	data.MemroyCache = stats.MemoryStats.Stats["cache"]
+	data.MemoryCache = stats.MemoryStats.Stats["cache"]
 	data.MemoryUsage = stats.MemoryStats.Usage
 	data.MemoryLimit = stats.MemoryStats.Limit
 	data.MemoryPercent = calculateMemPercentUnix(stats.MemoryStats)
@@ -849,16 +851,18 @@ func loadConfigInfo(req dto.ContainerOperate, config *container.Config, hostConf
 	if err != nil {
 		return err
 	}
-	exposeds := make(nat.PortSet)
+	exposed := make(nat.PortSet)
 	for port := range portMap {
-		exposeds[port] = struct{}{}
+		exposed[port] = struct{}{}
 	}
 	config.Image = req.Image
 	config.Cmd = req.Cmd
 	config.Entrypoint = req.Entrypoint
 	config.Env = req.Env
 	config.Labels = stringsToMap(req.Labels)
-	config.ExposedPorts = exposeds
+	config.ExposedPorts = exposed
+	config.OpenStdin = req.OpenStdin
+	config.Tty = req.Tty
 
 	if len(req.Network) != 0 {
 		networkConf.EndpointsConfig = map[string]*network.EndpointSettings{req.Network: {}}
