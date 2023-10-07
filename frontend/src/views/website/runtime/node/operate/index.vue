@@ -145,7 +145,7 @@ import { App } from '@/api/interface/app';
 import { Runtime } from '@/api/interface/runtime';
 import { GetApp, GetAppDetail, SearchApp } from '@/api/modules/app';
 import { CreateRuntime, GetNodeScripts, GetRuntime, UpdateRuntime } from '@/api/modules/runtime';
-import { Rules } from '@/global/form-rules';
+import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
@@ -191,10 +191,10 @@ const rules = ref<any>({
     name: [Rules.requiredInput, Rules.appName],
     appID: [Rules.requiredSelect],
     codeDir: [Rules.requiredInput],
-    port: [Rules.requiredInput, Rules.port],
+    port: [Rules.requiredInput, Rules.paramPort, checkNumberRange(1, 65535)],
     source: [Rules.requiredSelect],
     params: {
-        NODE_APP_PORT: [Rules.requiredInput, Rules.port],
+        NODE_APP_PORT: [Rules.requiredInput, Rules.paramPort, checkNumberRange(1, 65535)],
         PACKAGE_MANAGER: [Rules.requiredSelect],
         HOST_IP: [Rules.requiredSelect],
         EXEC_SCRIPT: [Rules.requiredSelect],
