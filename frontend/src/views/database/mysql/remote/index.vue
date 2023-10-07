@@ -156,7 +156,7 @@ const onCopy = async (row: any) => {
         await toClipboard(row.password);
         MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
     } catch (e) {
-        MsgError(i18n.global.t('commons.msg.copyfailed'));
+        MsgError(i18n.global.t('commons.msg.copyFailed'));
     }
 };
 

@@ -36,7 +36,7 @@
         <Setting ref="settingRef" style="margin-top: 30px" />
         <Password ref="passwordRef" @check-exist="initTerminal" @close-terminal="closeTerminal(true)" />
         <el-dialog
-            v-model="commandVisiable"
+            v-model="commandVisible"
             :title="$t('app.checkTitle')"
             width="30%"
             :close-on-click-modal="false"
@@ -49,7 +49,7 @@
             </el-alert>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="commandVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button @click="commandVisible = false">{{ $t('commons.button.cancel') }}</el-button>
                 </span>
             </template>
         </el-dialog>
@@ -81,7 +81,7 @@ const redisName = ref();
 const terminalShow = ref(false);
 
 const redisCommandPort = ref();
-const commandVisiable = ref(false);
+const commandVisible = ref(false);
 
 const dialogPortJumpRef = ref();
 
@@ -96,7 +96,7 @@ const onSetting = async () => {
 
 const goDashboard = async () => {
     if (redisCommandPort.value === 0) {
-        commandVisiable.value = true;
+        commandVisible.value = true;
         return;
     }
     dialogPortJumpRef.value.acceptParams({ port: redisCommandPort.value });

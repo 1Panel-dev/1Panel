@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
+    <el-drawer v-model="drawerVisible" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
         <template #header>
             <DrawerHeader :header="$t('container.createVolume')" :back="handleClose" />
         </template>
@@ -69,7 +69,7 @@
         </el-row>
         <template #footer>
             <span class="dialog-footer">
-                <el-button :disabled="loading" @click="drawerVisiable = false">
+                <el-button :disabled="loading" @click="drawerVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
@@ -91,7 +91,7 @@ import { MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
 
-const drawerVisiable = ref(false);
+const drawerVisible = ref(false);
 const form = reactive({
     name: '',
     driver: 'local',
@@ -117,12 +117,12 @@ const acceptParams = (): void => {
     form.nfsVersion = 'v4';
     form.nfsMount = '';
     form.nfsOption = 'rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14';
-    drawerVisiable.value = true;
+    drawerVisible.value = true;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const handleClose = () => {
-    drawerVisiable.value = false;
+    drawerVisible.value = false;
 };
 
 const rules = reactive({
@@ -159,7 +159,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                 loading.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 emit('search');
-                drawerVisiable.value = false;
+                drawerVisible.value = false;
             })
             .catch(() => {
                 loading.value = false;

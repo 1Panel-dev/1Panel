@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-drawer
-            v-model="logVisiable"
+            v-model="logVisible"
             :destroy-on-close="true"
             :close-on-click-modal="false"
             :size="globalStore.isFullScreen ? '100%' : '50%'"
@@ -58,7 +58,7 @@
             />
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="logVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button @click="logVisible = false">{{ $t('commons.button.cancel') }}</el-button>
                 </span>
             </template>
         </el-drawer>
@@ -80,7 +80,7 @@ import screenfull from 'screenfull';
 import { GlobalStore } from '@/store';
 
 const extensions = [javascript(), oneDark];
-const logVisiable = ref(false);
+const logVisible = ref(false);
 const mobile = computed(() => {
     return globalStore.isMobile();
 });
@@ -131,10 +131,10 @@ const loadTooltip = () => {
     return i18n.global.t('commons.button.' + (screenfull.isFullscreen ? 'quitFullscreen' : 'fullscreen'));
 };
 const handleClose = async () => {
-    logVisiable.value = false;
+    logVisible.value = false;
     terminalSocket.value.close();
 };
-watch(logVisiable, (val) => {
+watch(logVisible, (val) => {
     if (screenfull.isEnabled && !val && !mobile.value) screenfull.exit();
 });
 const searchLogs = async () => {
@@ -192,7 +192,7 @@ interface DialogProps {
 }
 
 const acceptParams = (props: DialogProps): void => {
-    logVisiable.value = true;
+    logVisible.value = true;
     logSearch.containerID = props.containerID;
     logSearch.tail = 100;
     logSearch.mode = 'all';

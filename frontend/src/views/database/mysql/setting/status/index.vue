@@ -2,7 +2,7 @@
     <div>
         <el-form label-position="top">
             <span class="title">{{ $t('database.baseParam') }}</span>
-            <el-divider class="devider" />
+            <el-divider class="divider" />
             <el-row type="flex" justify="center" style="margin-left: 50px" :gutter="20">
                 <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
                     <el-form-item>
@@ -71,7 +71,7 @@
             </el-row>
 
             <span class="title">{{ $t('database.performanceParam') }}</span>
-            <el-divider class="devider" />
+            <el-divider class="divider" />
             <el-row type="flex" style="margin-left: 50px" justify="center" :gutter="20">
                 <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
                     <el-form-item>
@@ -264,7 +264,7 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
-.devider {
+.divider {
     display: block;
     height: 1px;
     width: 100%;

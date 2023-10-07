@@ -70,7 +70,7 @@ func (b *BaseApi) GetOperationLogs(c *gin.Context) {
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Router /logs/clean [post]
-// @x-panel-log {"bodyKeys":["logType"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"清空 [logType] 日志信息","formatEN":"Clean the [logType] log information"}
+// @x-panel-log {"bodyKeys":["logType"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"清空 [logType] 日志信息","formatEN":"Clean the [logType] log information"}
 func (b *BaseApi) CleanLogs(c *gin.Context) {
 	var req dto.CleanLog
 	if err := c.ShouldBindJSON(&req); err != nil {

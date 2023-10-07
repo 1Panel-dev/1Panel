@@ -27,7 +27,7 @@ const onCopy = async () => {
         await toClipboard('1pctl user-info');
         MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
     } catch (e) {
-        MsgError(i18n.global.t('commons.msg.copyfailed'));
+        MsgError(i18n.global.t('commons.msg.copyFailed'));
     }
 };
 </script>

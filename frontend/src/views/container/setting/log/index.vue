@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-drawer
-            v-model="drawerVisiable"
+            v-model="drawerVisible"
             :destroy-on-close="true"
             :close-on-click-modal="false"
             @close="handleClose"
@@ -63,7 +63,7 @@ import { updateLogOption } from '@/api/modules/container';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const loading = ref();
-const drawerVisiable = ref();
+const drawerVisible = ref();
 const confirmDialogRef = ref();
 const formRef = ref();
 
@@ -92,7 +92,7 @@ const acceptParams = (params: DialogProps): void => {
         form.logMaxSize = 10;
         form.sizeUnit = 'm';
     }
-    drawerVisiable.value = true;
+    drawerVisible.value = true;
 };
 
 const onSave = async (formEl: FormInstance | undefined) => {
@@ -113,7 +113,7 @@ const onSubmitSave = async () => {
     await updateLogOption(form.logMaxSize + form.sizeUnit, form.logMaxFile + '')
         .then(() => {
             loading.value = false;
-            drawerVisiable.value = false;
+            drawerVisible.value = false;
             emit('search');
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
@@ -143,7 +143,7 @@ const loadSize = (value: string) => {
 
 const handleClose = () => {
     emit('search');
-    drawerVisiable.value = false;
+    drawerVisible.value = false;
 };
 
 defineExpose({

@@ -25,7 +25,7 @@ func (b *BaseApi) ProcessWs(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /process/stop [post]
-// @x-panel-log {"bodyKeys":["PID"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"结束进程 [PID]","formatEN":"结束进程 [PID]"}
+// @x-panel-log {"bodyKeys":["PID"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"结束进程 [PID]","formatEN":"结束进程 [PID]"}
 func (b *BaseApi) StopProcess(c *gin.Context) {
 	var req request.ProcessReq
 	if err := c.ShouldBindJSON(&req); err != nil {

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-drawer v-model="backupVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+        <el-drawer v-model="backupVisible" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
             <template #header>
                 <DrawerHeader
                     v-if="detailName"
@@ -69,7 +69,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 
-const backupVisiable = ref(false);
+const backupVisible = ref(false);
 const type = ref();
 const name = ref();
 const detailName = ref();
@@ -83,11 +83,11 @@ const acceptParams = (params: DialogProps): void => {
     type.value = params.type;
     name.value = params.name;
     detailName.value = params.detailName;
-    backupVisiable.value = true;
+    backupVisible.value = true;
     search();
 };
 const handleClose = () => {
-    backupVisiable.value = false;
+    backupVisible.value = false;
 };
 
 const search = async () => {

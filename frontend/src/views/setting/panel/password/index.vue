@@ -1,6 +1,6 @@
 <template>
     <div v-loading="loading">
-        <el-drawer v-model="passwordVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
+        <el-drawer v-model="passwordVisible" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
             <template #header>
                 <DrawerHeader :header="$t('setting.changePassword')" :back="handleClose" />
             </template>
@@ -37,7 +37,7 @@
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button :disabled="loading" @click="passwordVisiable = false">
+                    <el-button :disabled="loading" @click="passwordVisible = false">
                         {{ $t('commons.button.cancel') }}
                     </el-button>
                     <el-button :disabled="loading" type="primary" @click="submitChangePassword(passFormRef)">
@@ -73,7 +73,7 @@ const passRules = reactive({
     retryPassword: [Rules.requiredInput, { validator: checkPassword, trigger: 'blur' }],
 });
 const loading = ref(false);
-const passwordVisiable = ref<boolean>(false);
+const passwordVisible = ref<boolean>(false);
 const passForm = reactive({
     oldPassword: '',
     newPassword: '',
@@ -91,7 +91,7 @@ const acceptParams = (params: DialogProps): void => {
     passForm.newPassword = '';
     passForm.newPasswordComplexity = '';
     passForm.retryPassword = '';
-    passwordVisiable.value = true;
+    passwordVisible.value = true;
 };
 
 function checkPassword(rule: any, value: any, callback: any) {
@@ -116,7 +116,7 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
         await updatePassword({ oldPassword: passForm.oldPassword, newPassword: password })
             .then(async () => {
                 loading.value = false;
-                passwordVisiable.value = false;
+                passwordVisible.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 await logOutApi();
                 router.push({ name: 'entrance', params: { code: globalStore.entrance } });
@@ -128,7 +128,7 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
     });
 };
 const handleClose = () => {
-    passwordVisiable.value = false;
+    passwordVisible.value = false;
 };
 
 defineExpose({

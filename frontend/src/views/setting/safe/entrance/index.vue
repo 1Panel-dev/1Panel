@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
+        <el-drawer v-model="drawerVisible" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
             <template #header>
                 <DrawerHeader :header="$t('setting.entrance')" :back="handleClose" />
             </template>
@@ -32,7 +32,7 @@
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
                     <el-button :disabled="loading" type="primary" @click="submitEntrance(formRef)">
                         {{ $t('commons.button.confirm') }}
                     </el-button>
@@ -57,7 +57,7 @@ const emit = defineEmits<{ (e: 'search'): void }>();
 interface DialogProps {
     securityEntrance: string;
 }
-const drawerVisiable = ref();
+const drawerVisible = ref();
 const loading = ref();
 const show = ref();
 
@@ -83,7 +83,7 @@ function checkSecurityEntrance(rule: any, value: any, callback: any) {
 const acceptParams = (params: DialogProps): void => {
     form.securityEntrance = params.securityEntrance;
     show.value = globalStore.showEntranceWarn;
-    drawerVisiable.value = true;
+    drawerVisible.value = true;
 };
 
 const random = async () => {
@@ -104,7 +104,7 @@ const submitEntrance = async (formEl: FormInstance | undefined) => {
                 globalStore.setShowEntranceWarn(show.value);
                 globalStore.entrance = form.securityEntrance;
                 loading.value = false;
-                drawerVisiable.value = false;
+                drawerVisible.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 emit('search');
             })
@@ -115,7 +115,7 @@ const submitEntrance = async (formEl: FormInstance | undefined) => {
 };
 
 const handleClose = () => {
-    drawerVisiable.value = false;
+    drawerVisible.value = false;
 };
 
 defineExpose({

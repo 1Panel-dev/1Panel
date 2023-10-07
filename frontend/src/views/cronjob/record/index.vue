@@ -339,7 +339,7 @@
         </LayoutContent>
 
         <el-dialog
-            v-model="deleteVisiable"
+            v-model="deleteVisible"
             :title="$t('commons.button.clean')"
             width="30%"
             :close-on-click-modal="false"
@@ -354,7 +354,7 @@
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="deleteVisiable = false" :disabled="delLoading">
+                    <el-button @click="deleteVisible = false" :disabled="delLoading">
                         {{ $t('commons.button.cancel') }}
                     </el-button>
                     <el-button type="primary" @click="cleanRecord">
@@ -407,7 +407,7 @@ const records = ref<Array<Cronjob.Record>>([]);
 const currentRecord = ref<Cronjob.Record>();
 const currentRecordDetail = ref<string>('');
 
-const deleteVisiable = ref();
+const deleteVisible = ref();
 const delLoading = ref();
 const cleanData = ref();
 
@@ -666,7 +666,7 @@ const onClean = async () => {
                 });
         });
     } else {
-        deleteVisiable.value = true;
+        deleteVisible.value = true;
     }
 };
 
@@ -675,7 +675,7 @@ const cleanRecord = async () => {
     await cleanRecords(dialogData.value.rowData.id, cleanData.value)
         .then(() => {
             delLoading.value = false;
-            deleteVisiable.value = false;
+            deleteVisible.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             search();
         })

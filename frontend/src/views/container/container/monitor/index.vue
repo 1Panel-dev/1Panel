@@ -1,6 +1,6 @@
 <template>
     <el-drawer
-        v-model="monitorVisiable"
+        v-model="monitorVisible"
         :destroy-on-close="true"
         @close="handleClose"
         :close-on-click-modal="false"
@@ -69,7 +69,7 @@ import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const title = ref();
-const monitorVisiable = ref(false);
+const monitorVisible = ref(false);
 const timeInterval = ref();
 let timer: NodeJS.Timer | null = null;
 let isInit = ref<boolean>(true);
@@ -83,7 +83,7 @@ const dialogData = ref<DialogProps>({
 });
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
-    monitorVisiable.value = true;
+    monitorVisible.value = true;
     dialogData.value.containerID = params.containerID;
     title.value = params.container;
     cpuDatas.value = [];
@@ -98,7 +98,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     isInit.value = true;
     loadData();
     timer = setInterval(async () => {
-        if (monitorVisiable.value) {
+        if (monitorVisible.value) {
             isInit.value = false;
             loadData();
         }
@@ -118,7 +118,7 @@ const chartsOption = ref({ cpuChart: null, memoryChart: null, ioChart: null, net
 const changeTimer = () => {
     clearInterval(Number(timer));
     timer = setInterval(async () => {
-        if (monitorVisiable.value) {
+        if (monitorVisible.value) {
             loadData();
         }
     }, 1000 * timeInterval.value);
@@ -220,7 +220,7 @@ const loadData = async () => {
     };
 };
 const handleClose = async () => {
-    monitorVisiable.value = false;
+    monitorVisible.value = false;
     clearInterval(Number(timer));
     timer = null;
     chartsOption.value = { cpuChart: null, memoryChart: null, ioChart: null, networkChart: null };

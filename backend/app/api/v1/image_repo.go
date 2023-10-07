@@ -92,7 +92,7 @@ func (b *BaseApi) CheckRepoStatus(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers/repo [post]
-// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建镜像仓库 [name]","formatEN":"create image repo [name]"}
+// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建镜像仓库 [name]","formatEN":"create image repo [name]"}
 func (b *BaseApi) CreateRepo(c *gin.Context) {
 	var req dto.ImageRepoCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -119,7 +119,7 @@ func (b *BaseApi) CreateRepo(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers/repo/del [post]
-// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"ids","isList":true,"db":"image_repos","output_column":"name","output_value":"names"}],"formatZH":"删除镜像仓库 [names]","formatEN":"delete image repo [names]"}
+// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"ids","isList":true,"db":"image_repos","output_column":"name","output_value":"names"}],"formatZH":"删除镜像仓库 [names]","formatEN":"delete image repo [names]"}
 func (b *BaseApi) DeleteRepo(c *gin.Context) {
 	var req dto.ImageRepoDelete
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -147,7 +147,7 @@ func (b *BaseApi) DeleteRepo(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers/repo/update [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"image_repos","output_column":"name","output_value":"name"}],"formatZH":"更新镜像仓库 [name]","formatEN":"update image repo information [name]"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"image_repos","output_column":"name","output_value":"name"}],"formatZH":"更新镜像仓库 [name]","formatEN":"update image repo information [name]"}
 func (b *BaseApi) UpdateRepo(c *gin.Context) {
 	var req dto.ImageRepoUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {

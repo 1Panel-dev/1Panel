@@ -1,6 +1,6 @@
 <template>
     <div v-loading="loading">
-        <el-drawer v-model="drawerVisiable">
+        <el-drawer v-model="drawerVisible">
             <template #header>
                 <DrawerHeader :header="$t('setting.recoverDetail')" :back="handleClose" />
             </template>
@@ -67,7 +67,7 @@
                                 </span>
                             </el-form-item>
                             <el-form-item>
-                                <el-button @click="dialogVisiable = true" type="primary">
+                                <el-button @click="dialogVisible = true" type="primary">
                                     {{ $t('commons.button.retry') }}
                                 </el-button>
                             </el-form-item>
@@ -149,7 +149,7 @@
                 </el-card>
             </el-form>
         </el-drawer>
-        <el-dialog v-model="dialogVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
+        <el-dialog v-model="dialogVisible" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
             <template #header>
                 <div class="card-header">
                     <span>{{ $t('commons.button.retry') }}</span>
@@ -164,7 +164,7 @@
             </div>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button :disabled="loading" @click="dialogVisiable = false">
+                    <el-button :disabled="loading" @click="dialogVisible = false">
                         {{ $t('commons.button.cancel') }}
                     </el-button>
                     <el-button :disabled="loading" type="primary" @click="doRecover(false)">
@@ -185,11 +185,11 @@ import DrawerHeader from '@/components/drawer-header/index.vue';
 import { snapshotRecover, snapshotRollback } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
 
-const drawerVisiable = ref(false);
+const drawerVisible = ref(false);
 const snapInfo = ref();
 const loading = ref();
 
-const dialogVisiable = ref();
+const dialogVisible = ref();
 const reDownload = ref();
 
 interface DialogProps {
@@ -197,12 +197,12 @@ interface DialogProps {
 }
 const acceptParams = (params: DialogProps): void => {
     snapInfo.value = params.snapInfo;
-    drawerVisiable.value = true;
+    drawerVisible.value = true;
 };
 const emit = defineEmits(['search']);
 
 const handleClose = () => {
-    drawerVisiable.value = false;
+    drawerVisible.value = false;
 };
 
 const doRecover = async (isNew: boolean) => {
@@ -211,8 +211,8 @@ const doRecover = async (isNew: boolean) => {
         .then(() => {
             emit('search');
             loading.value = false;
-            dialogVisiable.value = false;
-            drawerVisiable.value = false;
+            dialogVisible.value = false;
+            drawerVisible.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
@@ -241,8 +241,8 @@ const rollbackSnapshot = async () => {
             .then(() => {
                 emit('search');
                 loading.value = false;
-                dialogVisiable.value = false;
-                drawerVisiable.value = false;
+                dialogVisible.value = false;
+                drawerVisible.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             })
             .catch(() => {

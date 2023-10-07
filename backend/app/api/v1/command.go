@@ -16,7 +16,7 @@ import (
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /hosts/command [post]
-// @x-panel-log {"bodyKeys":["name","command"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建快捷命令 [name][command]","formatEN":"create quick command [name][command]"}
+// @x-panel-log {"bodyKeys":["name","command"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建快捷命令 [name][command]","formatEN":"create quick command [name][command]"}
 func (b *BaseApi) CreateCommand(c *gin.Context) {
 	var req dto.CommandOperate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -85,7 +85,7 @@ func (b *BaseApi) ListCommand(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /hosts/command/del [post]
-// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"ids","isList":true,"db":"commands","output_column":"name","output_value":"names"}],"formatZH":"删除快捷命令 [names]","formatEN":"delete quick command [names]"}
+// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"ids","isList":true,"db":"commands","output_column":"name","output_value":"names"}],"formatZH":"删除快捷命令 [names]","formatEN":"delete quick command [names]"}
 func (b *BaseApi) DeleteCommand(c *gin.Context) {
 	var req dto.BatchDeleteReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -112,7 +112,7 @@ func (b *BaseApi) DeleteCommand(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /hosts/command/update [post]
-// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新快捷命令 [name]","formatEN":"update quick command [name]"}
+// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新快捷命令 [name]","formatEN":"update quick command [name]"}
 func (b *BaseApi) UpdateCommand(c *gin.Context) {
 	var req dto.CommandOperate
 	if err := c.ShouldBindJSON(&req); err != nil {

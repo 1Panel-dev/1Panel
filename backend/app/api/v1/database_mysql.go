@@ -19,7 +19,7 @@ import (
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /databases [post]
-// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建 mysql 数据库 [name]","formatEN":"create mysql database [name]"}
+// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建 mysql 数据库 [name]","formatEN":"create mysql database [name]"}
 func (b *BaseApi) CreateMysql(c *gin.Context) {
 	var req dto.MysqlDBCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -54,7 +54,7 @@ func (b *BaseApi) CreateMysql(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /databases/description/update [post]
-// @x-panel-log {"bodyKeys":["id","description"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"database_mysqls","output_column":"name","output_value":"name"}],"formatZH":"mysql 数据库 [name] 描述信息修改 [description]","formatEN":"The description of the mysql database [name] is modified => [description]"}
+// @x-panel-log {"bodyKeys":["id","description"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"database_mysqls","output_column":"name","output_value":"name"}],"formatZH":"mysql 数据库 [name] 描述信息修改 [description]","formatEN":"The description of the mysql database [name] is modified => [description]"}
 func (b *BaseApi) UpdateMysqlDescription(c *gin.Context) {
 	var req dto.UpdateDescription
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -80,7 +80,7 @@ func (b *BaseApi) UpdateMysqlDescription(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /databases/change/password [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"database_mysqls","output_column":"name","output_value":"name"}],"formatZH":"更新数据库 [name] 密码","formatEN":"Update database [name] password"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"database_mysqls","output_column":"name","output_value":"name"}],"formatZH":"更新数据库 [name] 密码","formatEN":"Update database [name] password"}
 func (b *BaseApi) ChangeMysqlPassword(c *gin.Context) {
 	var req dto.ChangeDBInfo
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -115,7 +115,7 @@ func (b *BaseApi) ChangeMysqlPassword(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /databases/change/access [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"database_mysqls","output_column":"name","output_value":"name"}],"formatZH":"更新数据库 [name] 访问权限","formatEN":"Update database [name] access"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"database_mysqls","output_column":"name","output_value":"name"}],"formatZH":"更新数据库 [name] 访问权限","formatEN":"Update database [name] access"}
 func (b *BaseApi) ChangeMysqlAccess(c *gin.Context) {
 	var req dto.ChangeDBInfo
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -141,7 +141,7 @@ func (b *BaseApi) ChangeMysqlAccess(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /databases/variables/update [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"调整 mysql 数据库性能参数","formatEN":"adjust mysql database performance parameters"}
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"调整 mysql 数据库性能参数","formatEN":"adjust mysql database performance parameters"}
 func (b *BaseApi) UpdateMysqlVariables(c *gin.Context) {
 	var req dto.MysqlVariablesUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -164,7 +164,7 @@ func (b *BaseApi) UpdateMysqlVariables(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /databases/conffile/update [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新 mysql 数据库配置信息","formatEN":"update the mysql database configuration information"}
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 mysql 数据库配置信息","formatEN":"update the mysql database configuration information"}
 func (b *BaseApi) UpdateMysqlConfByFile(c *gin.Context) {
 	var req dto.MysqlConfUpdateByFile
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -289,7 +289,7 @@ func (b *BaseApi) DeleteCheckMysql(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /databases/del [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"database_mysqls","output_column":"name","output_value":"name"}],"formatZH":"删除 mysql 数据库 [name]","formatEN":"delete mysql database [name]"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"database_mysqls","output_column":"name","output_value":"name"}],"formatZH":"删除 mysql 数据库 [name]","formatEN":"delete mysql database [name]"}
 func (b *BaseApi) DeleteMysql(c *gin.Context) {
 	var req dto.MysqlDBDelete
 	if err := c.ShouldBindJSON(&req); err != nil {

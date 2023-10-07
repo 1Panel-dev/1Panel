@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
+        <el-drawer v-model="drawerVisible" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
             <template #header>
                 <DrawerHeader :header="$t('setting.timeZone')" :back="handleClose" />
             </template>
@@ -51,7 +51,7 @@
             </el-row>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
                     <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
                         {{ $t('commons.button.confirm') }}
                     </el-button>
@@ -74,7 +74,7 @@ const globalStore = GlobalStore();
 interface DialogProps {
     timeZone: string;
 }
-const drawerVisiable = ref();
+const drawerVisible = ref();
 const loading = ref();
 
 const form = reactive({
@@ -87,7 +87,7 @@ const zones = ref<Array<string>>([]);
 const acceptParams = (params: DialogProps): void => {
     loadTimeZones();
     form.timeZone = params.timeZone;
-    drawerVisiable.value = true;
+    drawerVisible.value = true;
 };
 
 const loadTimeZones = async () => {
@@ -124,7 +124,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
 };
 
 const handleClose = () => {
-    drawerVisiable.value = false;
+    drawerVisible.value = false;
 };
 
 defineExpose({

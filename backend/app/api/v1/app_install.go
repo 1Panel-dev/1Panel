@@ -161,7 +161,7 @@ func (b *BaseApi) DeleteCheck(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /apps/installed/sync [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"同步已安装应用列表","formatEN":"Sync the list of installed apps"}
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"同步已安装应用列表","formatEN":"Sync the list of installed apps"}
 func (b *BaseApi) SyncInstalled(c *gin.Context) {
 	if err := appInstallService.SyncAll(false); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
@@ -178,7 +178,7 @@ func (b *BaseApi) SyncInstalled(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /apps/installed/op [post]
-// @x-panel-log {"bodyKeys":["installId","operate"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"installId","isList":false,"db":"app_installs","output_column":"app_id","output_value":"appId"},{"input_column":"id","input_value":"installId","isList":false,"db":"app_installs","output_column":"name","output_value":"appName"},{"input_column":"id","input_value":"appId","isList":false,"db":"apps","output_column":"key","output_value":"appKey"}],"formatZH":"[operate] 应用 [appKey][appName]","formatEN":"[operate] App [appKey][appName]"}
+// @x-panel-log {"bodyKeys":["installId","operate"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"installId","isList":false,"db":"app_installs","output_column":"app_id","output_value":"appId"},{"input_column":"id","input_value":"installId","isList":false,"db":"app_installs","output_column":"name","output_value":"appName"},{"input_column":"id","input_value":"appId","isList":false,"db":"apps","output_column":"key","output_value":"appKey"}],"formatZH":"[operate] 应用 [appKey][appName]","formatEN":"[operate] App [appKey][appName]"}
 func (b *BaseApi) OperateInstalled(c *gin.Context) {
 	var req request.AppInstalledOperate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -240,7 +240,7 @@ func (b *BaseApi) GetUpdateVersions(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /apps/installed/port/change [post]
-// @x-panel-log {"bodyKeys":["key","name","port"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"应用端口修改 [key]-[name] => [port]","formatEN":"Application port update [key]-[name] => [port]"}
+// @x-panel-log {"bodyKeys":["key","name","port"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"应用端口修改 [key]-[name] => [port]","formatEN":"Application port update [key]-[name] => [port]"}
 func (b *BaseApi) ChangeAppPort(c *gin.Context) {
 	var req request.PortUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -311,7 +311,7 @@ func (b *BaseApi) GetParams(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /apps/installed/params/update [post]
-// @x-panel-log {"bodyKeys":["installId"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"应用参数修改 [installId]","formatEN":"Application param update [installId]"}
+// @x-panel-log {"bodyKeys":["installId"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"应用参数修改 [installId]","formatEN":"Application param update [installId]"}
 func (b *BaseApi) UpdateInstalled(c *gin.Context) {
 	var req request.AppInstalledUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -333,7 +333,7 @@ func (b *BaseApi) UpdateInstalled(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /apps/installed/ignore [post]
-// @x-panel-log {"bodyKeys":["installId"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"忽略应用 [installId] 版本升级","formatEN":"Application param update [installId]"}
+// @x-panel-log {"bodyKeys":["installId"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"忽略应用 [installId] 版本升级","formatEN":"Application param update [installId]"}
 func (b *BaseApi) IgnoreUpgrade(c *gin.Context) {
 	var req request.AppInstalledIgnoreUpgrade
 	if err := c.ShouldBindJSON(&req); err != nil {

@@ -1,6 +1,6 @@
 <template>
     <div v-loading="loading">
-        <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
+        <el-drawer v-model="drawerVisible" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
             <template #header>
                 <DrawerHeader :header="$t('terminal.groupChange')" :back="handleClose" />
             </template>
@@ -19,7 +19,7 @@
             </el-row>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
                     <el-button type="primary" @click="onSubmit(hostInfoRef)">
                         {{ $t('commons.button.confirm') }}
                     </el-button>
@@ -44,7 +44,7 @@ interface DialogProps {
     id: number;
     group: string;
 }
-const drawerVisiable = ref(false);
+const drawerVisible = ref(false);
 const dialogData = ref({
     id: 0,
     groupID: 0,
@@ -54,12 +54,12 @@ const groupList = ref();
 const acceptParams = (params: DialogProps): void => {
     dialogData.value.id = params.id;
     loadGroups(params.group);
-    drawerVisiable.value = true;
+    drawerVisible.value = true;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const handleClose = () => {
-    drawerVisiable.value = false;
+    drawerVisible.value = false;
 };
 
 type FormInstance = InstanceType<typeof ElForm>;
@@ -88,7 +88,7 @@ const onSubmit = (formEl: FormInstance | undefined) => {
             .then(() => {
                 loading.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                drawerVisiable.value = false;
+                drawerVisible.value = false;
                 emit('search');
             })
             .catch(() => {

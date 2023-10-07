@@ -112,7 +112,7 @@ const message = {
             operate: '操作',
             operateConfirm: '如果确认操作，请手动输入',
             inputOrSelect: '请选择或输入',
-            copyfailed: '复制失败',
+            copyFailed: '复制失败',
             backupSuccess: '备份成功',
             restoreSuccess: '备份成功',
             notFound: '抱歉，您访问的页面不存在',

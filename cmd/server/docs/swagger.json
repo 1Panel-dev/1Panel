@@ -209,7 +209,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "app_installs",
                             "input_column": "name",
@@ -449,7 +449,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "installId"
                     ],
@@ -555,7 +555,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "app_installs",
                             "input_column": "id",
@@ -657,7 +657,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "installId"
                     ],
@@ -699,7 +699,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "key",
                         "name",
@@ -762,7 +762,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "Sync the list of installed apps",
                     "formatZH": "同步已安装应用列表",
@@ -858,7 +858,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "App store synchronization",
                     "formatZH": "应用商店同步",
@@ -1051,7 +1051,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name",
                         "image"
@@ -1094,7 +1094,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -1136,7 +1136,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -1178,7 +1178,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name",
                         "operation"
@@ -1298,7 +1298,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -1340,7 +1340,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -1432,7 +1432,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "Updated the docker daemon.json log option",
                     "formatZH": "更新 docker daemon.json 日志配置",
@@ -1472,7 +1472,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "Updated the docker daemon.json configuration",
                     "formatZH": "更新 docker daemon.json 配置",
@@ -1512,7 +1512,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "operation"
                     ],
@@ -1610,7 +1610,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -1652,7 +1652,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "path"
                     ],
@@ -1697,7 +1697,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "image_repos",
                             "input_column": "id",
@@ -1752,7 +1752,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "image_repos",
                             "input_column": "id",
@@ -1805,7 +1805,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "names"
                     ],
@@ -1847,7 +1847,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "tagName",
                         "path",
@@ -1930,7 +1930,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "image_repos",
                             "input_column": "id",
@@ -2182,7 +2182,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -2224,7 +2224,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "names"
                     ],
@@ -2305,7 +2305,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name",
                         "operation",
@@ -2352,7 +2352,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "pruneType"
                     ],
@@ -2423,7 +2423,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -2468,7 +2468,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "image_repos",
                             "input_column": "id",
@@ -2597,7 +2597,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "image_repos",
                             "input_column": "id",
@@ -2785,7 +2785,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -2827,7 +2827,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "compose_templates",
                             "input_column": "id",
@@ -2917,7 +2917,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "compose_templates",
                             "input_column": "id",
@@ -2968,7 +2968,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name",
                         "image"
@@ -3011,7 +3011,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name",
                         "image"
@@ -3083,7 +3083,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -3125,7 +3125,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "names"
                     ],
@@ -3239,7 +3239,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "type",
                         "name"
@@ -3282,7 +3282,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "cronjobs",
                             "input_column": "id",
@@ -3333,7 +3333,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "job_records",
                             "input_column": "id",
@@ -3384,7 +3384,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "cronjobs",
                             "input_column": "id",
@@ -3435,7 +3435,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "cronjobs",
                             "input_column": "id",
@@ -3558,7 +3558,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "cronjobs",
                             "input_column": "id",
@@ -3610,7 +3610,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "cronjobs",
                             "input_column": "id",
@@ -3743,7 +3743,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -3821,7 +3821,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "database_mysqls",
                             "input_column": "id",
@@ -3872,7 +3872,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "database_mysqls",
                             "input_column": "id",
@@ -3923,7 +3923,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "update the mysql database configuration information",
                     "formatZH": "更新 mysql 数据库配置信息",
@@ -3963,7 +3963,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name",
                         "type"
@@ -4028,7 +4028,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name",
                         "type"
@@ -4071,7 +4071,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "databases",
                             "input_column": "id",
@@ -4183,7 +4183,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -4225,7 +4225,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "database_mysqls",
                             "input_column": "id",
@@ -4315,7 +4315,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "database_mysqls",
                             "input_column": "id",
@@ -4526,7 +4526,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "update the redis database configuration information",
                     "formatZH": "更新 redis 数据库配置信息",
@@ -4566,7 +4566,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "update the redis database configuration information",
                     "formatZH": "更新 redis 数据库配置信息",
@@ -4606,7 +4606,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "change the password of the redis database",
                     "formatZH": "修改 redis 数据库密码",
@@ -4668,7 +4668,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "redis database persistence configuration update",
                     "formatZH": "redis 数据库持久化配置更新",
@@ -4874,7 +4874,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "adjust mysql database performance parameters",
                     "formatZH": "调整 mysql 数据库性能参数",
@@ -4914,7 +4914,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "path"
                     ],
@@ -4956,7 +4956,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "paths"
                     ],
@@ -4998,7 +4998,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "path"
                     ],
@@ -5040,7 +5040,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -5110,7 +5110,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -5155,7 +5155,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "path"
                     ],
@@ -5197,7 +5197,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "path"
                     ],
@@ -5239,7 +5239,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "path"
                     ],
@@ -5281,7 +5281,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -5323,7 +5323,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "path",
                         "mode"
@@ -5366,7 +5366,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "oldPaths",
                         "newPath"
@@ -5409,7 +5409,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "path",
                         "user",
@@ -5453,7 +5453,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "oldName",
                         "newName"
@@ -5496,7 +5496,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "path"
                     ],
@@ -5574,7 +5574,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "path"
                     ],
@@ -5650,7 +5650,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "path"
                     ],
@@ -5731,7 +5731,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "url",
                         "path",
@@ -5775,7 +5775,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name",
                         "type"
@@ -5818,7 +5818,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "groups",
                             "input_column": "id",
@@ -5916,7 +5916,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name",
                         "type"
@@ -5959,7 +5959,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "update SSH conf",
                     "formatZH": "修改 SSH 配置文件",
@@ -6018,7 +6018,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "generate SSH secret",
                     "formatZH": "生成 SSH 密钥 ",
@@ -6129,7 +6129,7 @@
                 ],
                 "responses": {},
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "operation"
                     ],
@@ -6226,7 +6226,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "key",
                         "value"
@@ -6302,7 +6302,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "operate"
                     ],
@@ -6344,7 +6344,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "type"
                     ],
@@ -6419,7 +6419,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "operate",
                         "type"
@@ -6482,7 +6482,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "operate"
                     ],
@@ -6524,7 +6524,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "operate"
                     ],
@@ -6566,7 +6566,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name",
                         "addr"
@@ -6629,7 +6629,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name",
                         "command"
@@ -6672,7 +6672,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "commands",
                             "input_column": "id",
@@ -6759,7 +6759,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -6801,7 +6801,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "hosts",
                             "input_column": "id",
@@ -6907,7 +6907,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "strategy",
                         "address"
@@ -6953,7 +6953,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "operation"
                     ],
@@ -6995,7 +6995,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "port",
                         "strategy"
@@ -7318,7 +7318,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name",
                         "addr"
@@ -7361,7 +7361,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "hosts",
                             "input_column": "id",
@@ -7416,7 +7416,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "logType"
                     ],
@@ -7590,7 +7590,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "Update nginx conf",
                     "formatZH": "更新 nginx 配置",
@@ -7691,7 +7691,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -7739,7 +7739,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "PID"
                     ],
@@ -7781,7 +7781,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -7854,7 +7854,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "id"
                     ],
@@ -7929,7 +7929,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "id"
                     ],
@@ -8004,7 +8004,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -8046,7 +8046,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "type"
                     ],
@@ -8088,7 +8088,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "type",
                         "name",
@@ -8132,7 +8132,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "backup_accounts",
                             "input_column": "id",
@@ -8208,7 +8208,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "backup_records",
                             "input_column": "id",
@@ -8259,7 +8259,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "source",
                         "fileName"
@@ -8335,7 +8335,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "type",
                         "name",
@@ -8380,7 +8380,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "type",
                         "name",
@@ -8526,7 +8526,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "type"
                     ],
@@ -8593,7 +8593,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "Clean system junk files",
                     "formatZH": "清理系统垃圾文件",
@@ -8633,7 +8633,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "reset an expired Password",
                     "formatZH": "重置过期密码",
@@ -8709,7 +8709,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "bind mfa",
                     "formatZH": "mfa 绑定",
@@ -8735,7 +8735,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "clean monitor datas",
                     "formatZH": "清空监控数据",
@@ -8775,7 +8775,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "update system password",
                     "formatZH": "修改系统密码",
@@ -8815,7 +8815,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "serverPort"
                     ],
@@ -8843,7 +8843,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "scan System Junk Files",
                     "formatZH": "扫描系统垃圾文件",
@@ -8924,7 +8924,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "from",
                         "description"
@@ -8967,7 +8967,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "snapshots",
                             "input_column": "id",
@@ -9018,7 +9018,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "snapshots",
                             "input_column": "id",
@@ -9070,7 +9070,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "from",
                         "names"
@@ -9113,7 +9113,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "snapshots",
                             "input_column": "id",
@@ -9164,7 +9164,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "snapshots",
                             "input_column": "id",
@@ -9325,7 +9325,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "ssl"
                     ],
@@ -9389,7 +9389,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "ntpSite"
                     ],
@@ -9431,7 +9431,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "key",
                         "value"
@@ -9505,7 +9505,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "version"
                     ],
@@ -9547,7 +9547,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "primaryDomain"
                     ],
@@ -9692,7 +9692,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -9746,7 +9746,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "email"
                     ],
@@ -9788,7 +9788,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "website_acme_accounts",
                             "input_column": "id",
@@ -10016,7 +10016,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -10067,7 +10067,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -10119,7 +10119,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -10203,7 +10203,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -10254,7 +10254,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -10305,7 +10305,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -10347,7 +10347,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "website_dns_accounts",
                             "input_column": "id",
@@ -10434,7 +10434,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -10479,7 +10479,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "domain"
                     ],
@@ -10558,7 +10558,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "website_domains",
                             "input_column": "id",
@@ -10703,7 +10703,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -10755,7 +10755,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -10806,7 +10806,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -10883,7 +10883,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -10968,7 +10968,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -11019,7 +11019,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -11103,7 +11103,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -11154,7 +11154,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -11238,7 +11238,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -11289,7 +11289,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -11373,7 +11373,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -11463,7 +11463,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "primaryDomain"
                     ],
@@ -11536,7 +11536,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "website_ssls",
                             "input_column": "id",
@@ -11587,7 +11587,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "website_ssls",
                             "input_column": "id",
@@ -11710,7 +11710,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "website_ssls",
                             "input_column": "id",
@@ -11792,7 +11792,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "primaryDomain"
                     ],
@@ -11870,7 +11870,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -11921,7 +11921,7 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -12932,7 +12932,7 @@
         "dto.DashboardBase": {
             "type": "object",
             "properties": {
-                "appInstalldNumber": {
+                "appInstalledNumber": {
                     "type": "integer"
                 },
                 "cpuCores": {

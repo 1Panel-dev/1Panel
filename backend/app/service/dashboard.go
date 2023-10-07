@@ -45,7 +45,7 @@ func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto
 	if err != nil {
 		return nil, err
 	}
-	baseInfo.AppInstalldNumber = len(appInstall)
+	baseInfo.AppInstalledNumber = len(appInstall)
 	dbs, err := mysqlRepo.List()
 	if err != nil {
 		return nil, err
@@ -56,11 +56,11 @@ func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto
 		return nil, err
 	}
 	baseInfo.WebsiteNumber = len(website)
-	cornjobs, err := cronjobRepo.List()
+	cronjobs, err := cronjobRepo.List()
 	if err != nil {
 		return nil, err
 	}
-	baseInfo.CronjobNumber = len(cornjobs)
+	baseInfo.CronjobNumber = len(cronjobs)
 
 	cpuInfo, err := cpu.Info()
 	if err == nil {

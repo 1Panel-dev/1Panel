@@ -72,7 +72,7 @@ const terminalSocket = ref<WebSocket>();
 const open = ref(false);
 const resource = ref('');
 const globalStore = GlobalStore();
-const logVisiable = ref(false);
+const logVisible = ref(false);
 
 const mobile = computed(() => {
     return globalStore.isMobile();
@@ -99,7 +99,7 @@ const loadTooltip = () => {
     return i18n.global.t('commons.button.' + (screenfull.isFullscreen ? 'quitFullscreen' : 'fullscreen'));
 };
 
-watch(logVisiable, (val) => {
+watch(logVisible, (val) => {
     if (screenfull.isEnabled && !val && !mobile.value) screenfull.exit();
 });
 

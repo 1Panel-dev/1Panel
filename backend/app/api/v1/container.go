@@ -95,7 +95,7 @@ func (b *BaseApi) SearchCompose(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers/compose/test [post]
-// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"检测 compose [name] 格式","formatEN":"check compose [name]"}
+// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"检测 compose [name] 格式","formatEN":"check compose [name]"}
 func (b *BaseApi) TestCompose(c *gin.Context) {
 	var req dto.ComposeCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -123,7 +123,7 @@ func (b *BaseApi) TestCompose(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers/compose [post]
-// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建 compose [name]","formatEN":"create compose [name]"}
+// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建 compose [name]","formatEN":"create compose [name]"}
 func (b *BaseApi) CreateCompose(c *gin.Context) {
 	var req dto.ComposeCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -151,7 +151,7 @@ func (b *BaseApi) CreateCompose(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers/compose/operate [post]
-// @x-panel-log {"bodyKeys":["name","operation"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"compose [operation] [name]","formatEN":"compose [operation] [name]"}
+// @x-panel-log {"bodyKeys":["name","operation"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"compose [operation] [name]","formatEN":"compose [operation] [name]"}
 func (b *BaseApi) OperatorCompose(c *gin.Context) {
 	var req dto.ComposeOperation
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -178,7 +178,7 @@ func (b *BaseApi) OperatorCompose(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers/update [post]
-// @x-panel-log {"bodyKeys":["name","image"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新容器 [name][image]","formatEN":"update container [name][image]"}
+// @x-panel-log {"bodyKeys":["name","image"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新容器 [name][image]","formatEN":"update container [name][image]"}
 func (b *BaseApi) ContainerUpdate(c *gin.Context) {
 	var req dto.ContainerOperate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -258,7 +258,7 @@ func (b *BaseApi) ContainerListStats(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers [post]
-// @x-panel-log {"bodyKeys":["name","image"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建容器 [name][image]","formatEN":"create container [name][image]"}
+// @x-panel-log {"bodyKeys":["name","image"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建容器 [name][image]","formatEN":"create container [name][image]"}
 func (b *BaseApi) ContainerCreate(c *gin.Context) {
 	var req dto.ContainerOperate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -284,7 +284,7 @@ func (b *BaseApi) ContainerCreate(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers/upgrade [post]
-// @x-panel-log {"bodyKeys":["name","image"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新容器镜像 [name][image]","formatEN":"upgrade container image [name][image]"}
+// @x-panel-log {"bodyKeys":["name","image"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新容器镜像 [name][image]","formatEN":"upgrade container image [name][image]"}
 func (b *BaseApi) ContainerUpgrade(c *gin.Context) {
 	var req dto.ContainerUpgrade
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -310,7 +310,7 @@ func (b *BaseApi) ContainerUpgrade(c *gin.Context) {
 // @Success 200 {object} dto.ContainerPruneReport
 // @Security ApiKeyAuth
 // @Router /containers/prune [post]
-// @x-panel-log {"bodyKeys":["pruneType"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"清理容器 [pruneType]","formatEN":"clean container [pruneType]"}
+// @x-panel-log {"bodyKeys":["pruneType"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"清理容器 [pruneType]","formatEN":"clean container [pruneType]"}
 func (b *BaseApi) ContainerPrune(c *gin.Context) {
 	var req dto.ContainerPrune
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -337,7 +337,7 @@ func (b *BaseApi) ContainerPrune(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers/clean/log [post]
-// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"清理容器 [name] 日志","formatEN":"clean container [name] logs"}
+// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"清理容器 [name] 日志","formatEN":"clean container [name] logs"}
 func (b *BaseApi) CleanContainerLog(c *gin.Context) {
 	var req dto.OperationWithName
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -381,7 +381,7 @@ func (b *BaseApi) LoadContainerLog(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers/operate [post]
-// @x-panel-log {"bodyKeys":["name","operation","newName"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"容器 [name] 执行 [operation] [newName]","formatEN":"container [operation] [name] [newName]"}
+// @x-panel-log {"bodyKeys":["name","operation","newName"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"容器 [name] 执行 [operation] [newName]","formatEN":"container [operation] [name] [newName]"}
 func (b *BaseApi) ContainerOperation(c *gin.Context) {
 	var req dto.ContainerOperation
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -532,7 +532,7 @@ func (b *BaseApi) ListNetwork(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers/network/del [post]
-// @x-panel-log {"bodyKeys":["names"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"删除容器网络 [names]","formatEN":"delete container network [names]"}
+// @x-panel-log {"bodyKeys":["names"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"删除容器网络 [names]","formatEN":"delete container network [names]"}
 func (b *BaseApi) DeleteNetwork(c *gin.Context) {
 	var req dto.BatchDelete
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -559,7 +559,7 @@ func (b *BaseApi) DeleteNetwork(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers/network [post]
-// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建容器网络 name","formatEN":"create container network [name]"}
+// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建容器网络 name","formatEN":"create container network [name]"}
 func (b *BaseApi) CreateNetwork(c *gin.Context) {
 	var req dto.NetworkCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -634,7 +634,7 @@ func (b *BaseApi) ListVolume(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers/volume/del [post]
-// @x-panel-log {"bodyKeys":["names"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"删除容器存储卷 [names]","formatEN":"delete container volume [names]"}
+// @x-panel-log {"bodyKeys":["names"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"删除容器存储卷 [names]","formatEN":"delete container volume [names]"}
 func (b *BaseApi) DeleteVolume(c *gin.Context) {
 	var req dto.BatchDelete
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -661,7 +661,7 @@ func (b *BaseApi) DeleteVolume(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers/volume [post]
-// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建容器存储卷 [name]","formatEN":"create container volume [name]"}
+// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建容器存储卷 [name]","formatEN":"create container volume [name]"}
 func (b *BaseApi) CreateVolume(c *gin.Context) {
 	var req dto.VolumeCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -688,7 +688,7 @@ func (b *BaseApi) CreateVolume(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers/compose/update [post]
-// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新 compose [name]","formatEN":"update compose information [name]"}
+// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 compose [name]","formatEN":"update compose information [name]"}
 func (b *BaseApi) ComposeUpdate(c *gin.Context) {
 	var req dto.ComposeUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {

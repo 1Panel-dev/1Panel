@@ -112,7 +112,7 @@ const message = {
             operate: 'Operate',
             operateConfirm: 'If you are sure about the operation, please input it manually',
             inputOrSelect: 'Please select or enter',
-            copyfailed: 'Copy failed',
+            copyFailed: 'Copy failed',
             notFound: 'Sorry, the page you requested does not exist.',
             unSupportType: 'Current file type is not supported!',
             unSupportSize: 'The uploaded file exceeds {0}M, please confirm!',

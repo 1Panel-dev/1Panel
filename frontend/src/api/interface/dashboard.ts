@@ -3,7 +3,7 @@ export namespace Dashboard {
         websiteNumber: number;
         databaseNumber: number;
         cronjobNumber: number;
-        appInstalldNumber: number;
+        appInstalledNumber: number;
 
         hostname: string;
         os: string;

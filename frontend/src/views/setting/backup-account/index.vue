@@ -14,7 +14,7 @@
                                     </el-button>
                                 </div>
                             </div>
-                            <el-divider class="devider" />
+                            <el-divider class="divider" />
                             <div style="margin-left: 20px">
                                 <el-form-item :label="$t('setting.currentPath')">
                                     {{ localData.varsJson['dir'] }}
@@ -54,7 +54,7 @@
                                     {{ $t('commons.button.delete') }}
                                 </el-button>
                             </div>
-                            <el-divider class="devider" />
+                            <el-divider class="divider" />
                         </div>
                         <div v-if="s3Data.id !== 0" style="margin-left: 20px">
                             <el-form-item label="Region">
@@ -112,7 +112,7 @@
                             </div>
                         </div>
 
-                        <el-divider class="devider" />
+                        <el-divider class="divider" />
                         <div v-if="ossData.id !== 0" style="margin-left: 20px">
                             <el-form-item label="Endpoint">
                                 {{ ossData.varsJson['endpoint'] }}
@@ -166,7 +166,7 @@
                                     {{ $t('commons.button.delete') }}
                                 </el-button>
                             </div>
-                            <el-divider class="devider" />
+                            <el-divider class="divider" />
                         </div>
                         <div v-if="cosData.id !== 0" style="margin-left: 20px">
                             <el-form-item label="Region">
@@ -221,7 +221,7 @@
                                 </el-button>
                             </div>
                         </div>
-                        <el-divider class="devider" />
+                        <el-divider class="divider" />
                         <div v-if="oneDriveData.id !== 0" style="margin-left: 20px">
                             <el-form-item :label="$t('setting.backupDir')">
                                 <span v-if="oneDriveData.backupPath">{{ oneDriveData.backupPath }}</span>
@@ -263,7 +263,7 @@
                             </div>
                         </div>
 
-                        <el-divider class="devider" />
+                        <el-divider class="divider" />
                         <div v-if="kodoData.id !== 0" style="margin-left: 20px">
                             <el-form-item :label="$t('setting.domain')">
                                 {{ kodoData.varsJson['domain'] }}
@@ -302,7 +302,7 @@
                                 </el-button>
                             </div>
                         </div>
-                        <el-divider class="devider" />
+                        <el-divider class="divider" />
                         <div v-if="minioData.id !== 0" style="margin-left: 20px">
                             <el-form-item label="Endpoint">
                                 {{ minioData.varsJson['endpoint'] }}
@@ -344,7 +344,7 @@
                                 </el-button>
                             </div>
                         </div>
-                        <el-divider class="devider" />
+                        <el-divider class="divider" />
                         <div v-if="sftpData.id !== 0" style="margin-left: 20px">
                             <el-form-item :label="$t('setting.address')">
                                 {{ sftpData.varsJson['address'] }}
@@ -558,7 +558,7 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-.devider {
+.divider {
     display: block;
     height: 1px;
     width: 100%;

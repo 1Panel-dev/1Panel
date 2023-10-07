@@ -1,6 +1,6 @@
 <template>
     <div v-loading="loading">
-        <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+        <el-drawer v-model="drawerVisible" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
             <template #header>
                 <DrawerHeader :header="$t('terminal.host')" :back="handleClose" />
             </template>
@@ -75,7 +75,7 @@
             </el-row>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
                     <el-button @click="submitAddHost(hostInfoRef, 'testconn')">
                         {{ $t('terminal.testConn') }}
                     </el-button>
@@ -106,7 +106,7 @@ interface DialogProps {
     getTableList?: () => Promise<any>;
 }
 const title = ref<string>('');
-const drawerVisiable = ref(false);
+const drawerVisible = ref(false);
 const dialogData = ref<DialogProps>({
     title: '',
 });
@@ -123,12 +123,12 @@ const groupList = ref();
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
-    drawerVisiable.value = true;
+    drawerVisible.value = true;
     loadGroups();
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 const handleClose = () => {
-    drawerVisiable.value = false;
+    drawerVisible.value = false;
 };
 
 type FormInstance = InstanceType<typeof ElForm>;
@@ -164,7 +164,7 @@ const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
                 .then(() => {
                     loading.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                    drawerVisiable.value = false;
+                    drawerVisible.value = false;
                     emit('search');
                 })
                 .catch(() => {
@@ -177,7 +177,7 @@ const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
                 .then(() => {
                     loading.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                    drawerVisiable.value = false;
+                    drawerVisible.value = false;
                     emit('search');
                 })
                 .catch(() => {

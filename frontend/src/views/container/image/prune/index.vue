@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="dialogVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
+    <el-dialog v-model="dialogVisible" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
         <template #header>
             <div class="card-header">
                 <span>{{ $t('container.imagePrune') }}</span>
@@ -30,7 +30,7 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="dialogVisiable = false">
+                <el-button @click="dialogVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button type="primary" @click="onClean" :disabled="loading">
@@ -49,7 +49,7 @@ import { MsgSuccess } from '@/utils/message';
 import { computeSize } from '@/utils/util';
 import { ref } from 'vue';
 
-const dialogVisiable = ref(false);
+const dialogVisible = ref(false);
 const withTagAll = ref(false);
 const loading = ref();
 const imageList = ref();
@@ -59,7 +59,7 @@ interface DialogProps {
 }
 const acceptParams = (params: DialogProps): void => {
     imageList.value = params.list;
-    dialogVisiable.value = true;
+    dialogVisible.value = true;
     withTagAll.value = false;
 };
 
@@ -74,7 +74,7 @@ const onClean = async () => {
     await containerPrune(params)
         .then((res) => {
             loading.value = false;
-            dialogVisiable.value = false;
+            dialogVisible.value = false;
             MsgSuccess(
                 i18n.global.t('container.cleanSuccessWithSpace', [
                     res.data.deletedNumber,

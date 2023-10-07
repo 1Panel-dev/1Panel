@@ -245,7 +245,7 @@ const onSave = async (formEl: FormInstance | undefined, key: string, value: stri
     }
 
     ElMessageBox.confirm(
-        i18n.global.t('ssh.sshChangeHelper', [i18n.global.t('ssh.' + itemKey), changei18n(value)]),
+        i18n.global.t('ssh.sshChangeHelper', [i18n.global.t('ssh.' + itemKey), changeI18n(value)]),
         i18n.global.t('ssh.sshChange'),
         {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
@@ -276,7 +276,7 @@ function callback(error: any) {
     }
 }
 
-const changei18n = (value: string) => {
+const changeI18n = (value: string) => {
     switch (value) {
         case 'yes':
             return i18n.global.t('commons.button.enable');

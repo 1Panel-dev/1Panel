@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="dialogVisiable" :title="$t('container.containerPrune')" :destroy-on-close="true" width="30%">
+    <el-dialog v-model="dialogVisible" :title="$t('container.containerPrune')" :destroy-on-close="true" width="30%">
         <div>
             <ul class="help-ul">
                 <li class="lineClass" style="color: red">{{ $t('container.containerPruneHelper1') }}</li>
@@ -9,7 +9,7 @@
         </div>
         <template #footer>
             <span class="dialog-footer">
-                <el-button :disabled="loading" @click="dialogVisiable = false">
+                <el-button :disabled="loading" @click="dialogVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button :disabled="loading" type="primary" @click="onClean()">
@@ -28,7 +28,7 @@ import { ref } from 'vue';
 import { computeSize } from '@/utils/util';
 
 const loading = ref(false);
-const dialogVisiable = ref<boolean>(false);
+const dialogVisible = ref<boolean>(false);
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -47,7 +47,7 @@ const onClean = async () => {
                     computeSize(res.data.spaceReclaimed),
                 ]),
             );
-            dialogVisiable.value = false;
+            dialogVisible.value = false;
             emit('search');
         })
         .catch(() => {
@@ -56,7 +56,7 @@ const onClean = async () => {
 };
 
 const acceptParams = (): void => {
-    dialogVisiable.value = true;
+    dialogVisible.value = true;
 };
 
 defineExpose({

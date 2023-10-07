@@ -134,7 +134,7 @@
         </LayoutContent>
 
         <el-dialog
-            v-model="deleteVisiable"
+            v-model="deleteVisible"
             :title="$t('commons.button.clean')"
             width="30%"
             :close-on-click-modal="false"
@@ -149,7 +149,7 @@
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="deleteVisiable = false" :disabled="delLoading">
+                    <el-button @click="deleteVisible = false" :disabled="delLoading">
                         {{ $t('commons.button.cancel') }}
                     </el-button>
                     <el-button type="primary" @click="onSubmitDelete">
@@ -192,7 +192,7 @@ const paginationConfig = reactive({
 });
 const searchName = ref();
 
-const deleteVisiable = ref();
+const deleteVisible = ref();
 const deleteCronjobID = ref();
 const delLoading = ref();
 const cleanData = ref();
@@ -265,12 +265,12 @@ const onDelete = async (row: Cronjob.CronjobInfo | null) => {
             deleteMessageBox();
             return;
         }
-        deleteVisiable.value = true;
+        deleteVisible.value = true;
     } else {
         deleteCronjobID.value = 0;
         for (const item of selects.value) {
             if (item.type === 'database' || item.type === 'website' || item.type === 'directory') {
-                deleteVisiable.value = true;
+                deleteVisible.value = true;
                 return;
             }
         }
@@ -317,7 +317,7 @@ const onSubmitDelete = async () => {
     await deleteCronjob(ids, cleanData.value)
         .then(() => {
             delLoading.value = false;
-            deleteVisiable.value = false;
+            deleteVisible.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             search();
         })

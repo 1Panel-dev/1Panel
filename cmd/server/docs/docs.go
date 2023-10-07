@@ -216,7 +216,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "app_installs",
                             "input_column": "name",
@@ -456,7 +456,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "installId"
                     ],
@@ -562,7 +562,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "app_installs",
                             "input_column": "id",
@@ -664,7 +664,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "installId"
                     ],
@@ -706,7 +706,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "key",
                         "name",
@@ -769,7 +769,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "Sync the list of installed apps",
                     "formatZH": "同步已安装应用列表",
@@ -865,7 +865,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "App store synchronization",
                     "formatZH": "应用商店同步",
@@ -1058,7 +1058,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name",
                         "image"
@@ -1101,7 +1101,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -1143,7 +1143,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -1185,7 +1185,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name",
                         "operation"
@@ -1305,7 +1305,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -1347,7 +1347,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -1439,7 +1439,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "Updated the docker daemon.json log option",
                     "formatZH": "更新 docker daemon.json 日志配置",
@@ -1479,7 +1479,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "Updated the docker daemon.json configuration",
                     "formatZH": "更新 docker daemon.json 配置",
@@ -1519,7 +1519,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "operation"
                     ],
@@ -1617,7 +1617,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -1659,7 +1659,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "path"
                     ],
@@ -1704,7 +1704,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "image_repos",
                             "input_column": "id",
@@ -1759,7 +1759,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "image_repos",
                             "input_column": "id",
@@ -1812,7 +1812,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "names"
                     ],
@@ -1854,7 +1854,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "tagName",
                         "path",
@@ -1937,7 +1937,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "image_repos",
                             "input_column": "id",
@@ -2189,7 +2189,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -2231,7 +2231,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "names"
                     ],
@@ -2312,7 +2312,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name",
                         "operation",
@@ -2359,7 +2359,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "pruneType"
                     ],
@@ -2430,7 +2430,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -2475,7 +2475,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "image_repos",
                             "input_column": "id",
@@ -2604,7 +2604,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "image_repos",
                             "input_column": "id",
@@ -2792,7 +2792,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -2834,7 +2834,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "compose_templates",
                             "input_column": "id",
@@ -2924,7 +2924,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "compose_templates",
                             "input_column": "id",
@@ -2975,7 +2975,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name",
                         "image"
@@ -3018,7 +3018,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name",
                         "image"
@@ -3090,7 +3090,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -3132,7 +3132,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "names"
                     ],
@@ -3246,7 +3246,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "type",
                         "name"
@@ -3289,7 +3289,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "cronjobs",
                             "input_column": "id",
@@ -3340,7 +3340,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "job_records",
                             "input_column": "id",
@@ -3391,7 +3391,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "cronjobs",
                             "input_column": "id",
@@ -3442,7 +3442,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "cronjobs",
                             "input_column": "id",
@@ -3565,7 +3565,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "cronjobs",
                             "input_column": "id",
@@ -3617,7 +3617,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "cronjobs",
                             "input_column": "id",
@@ -3750,7 +3750,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -3828,7 +3828,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "database_mysqls",
                             "input_column": "id",
@@ -3879,7 +3879,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "database_mysqls",
                             "input_column": "id",
@@ -3930,7 +3930,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "update the mysql database configuration information",
                     "formatZH": "更新 mysql 数据库配置信息",
@@ -3970,7 +3970,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name",
                         "type"
@@ -4035,7 +4035,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name",
                         "type"
@@ -4078,7 +4078,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "databases",
                             "input_column": "id",
@@ -4190,7 +4190,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -4232,7 +4232,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "database_mysqls",
                             "input_column": "id",
@@ -4322,7 +4322,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "database_mysqls",
                             "input_column": "id",
@@ -4533,7 +4533,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "update the redis database configuration information",
                     "formatZH": "更新 redis 数据库配置信息",
@@ -4573,7 +4573,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "update the redis database configuration information",
                     "formatZH": "更新 redis 数据库配置信息",
@@ -4613,7 +4613,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "change the password of the redis database",
                     "formatZH": "修改 redis 数据库密码",
@@ -4675,7 +4675,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "redis database persistence configuration update",
                     "formatZH": "redis 数据库持久化配置更新",
@@ -4881,7 +4881,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "adjust mysql database performance parameters",
                     "formatZH": "调整 mysql 数据库性能参数",
@@ -4921,7 +4921,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "path"
                     ],
@@ -4963,7 +4963,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "paths"
                     ],
@@ -5005,7 +5005,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "path"
                     ],
@@ -5047,7 +5047,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -5117,7 +5117,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -5162,7 +5162,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "path"
                     ],
@@ -5204,7 +5204,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "path"
                     ],
@@ -5246,7 +5246,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "path"
                     ],
@@ -5288,7 +5288,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -5330,7 +5330,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "path",
                         "mode"
@@ -5373,7 +5373,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "oldPaths",
                         "newPath"
@@ -5416,7 +5416,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "path",
                         "user",
@@ -5460,7 +5460,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "oldName",
                         "newName"
@@ -5503,7 +5503,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "path"
                     ],
@@ -5581,7 +5581,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "path"
                     ],
@@ -5657,7 +5657,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "path"
                     ],
@@ -5738,7 +5738,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "url",
                         "path",
@@ -5782,7 +5782,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name",
                         "type"
@@ -5825,7 +5825,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "groups",
                             "input_column": "id",
@@ -5923,7 +5923,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name",
                         "type"
@@ -5966,7 +5966,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "update SSH conf",
                     "formatZH": "修改 SSH 配置文件",
@@ -6025,7 +6025,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "generate SSH secret",
                     "formatZH": "生成 SSH 密钥 ",
@@ -6136,7 +6136,7 @@ const docTemplate = `{
                 ],
                 "responses": {},
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "operation"
                     ],
@@ -6233,7 +6233,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "key",
                         "value"
@@ -6309,7 +6309,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "operate"
                     ],
@@ -6351,7 +6351,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "type"
                     ],
@@ -6426,7 +6426,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "operate",
                         "type"
@@ -6489,7 +6489,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "operate"
                     ],
@@ -6531,7 +6531,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "operate"
                     ],
@@ -6573,7 +6573,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name",
                         "addr"
@@ -6636,7 +6636,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name",
                         "command"
@@ -6679,7 +6679,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "commands",
                             "input_column": "id",
@@ -6766,7 +6766,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -6808,7 +6808,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "hosts",
                             "input_column": "id",
@@ -6914,7 +6914,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "strategy",
                         "address"
@@ -6960,7 +6960,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "operation"
                     ],
@@ -7002,7 +7002,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "port",
                         "strategy"
@@ -7325,7 +7325,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name",
                         "addr"
@@ -7368,7 +7368,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "hosts",
                             "input_column": "id",
@@ -7423,7 +7423,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "logType"
                     ],
@@ -7597,7 +7597,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "Update nginx conf",
                     "formatZH": "更新 nginx 配置",
@@ -7698,7 +7698,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -7746,7 +7746,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "PID"
                     ],
@@ -7788,7 +7788,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -7861,7 +7861,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "id"
                     ],
@@ -7936,7 +7936,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "id"
                     ],
@@ -8011,7 +8011,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -8053,7 +8053,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "type"
                     ],
@@ -8095,7 +8095,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "type",
                         "name",
@@ -8139,7 +8139,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "backup_accounts",
                             "input_column": "id",
@@ -8215,7 +8215,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "backup_records",
                             "input_column": "id",
@@ -8266,7 +8266,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "source",
                         "fileName"
@@ -8342,7 +8342,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "type",
                         "name",
@@ -8387,7 +8387,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "type",
                         "name",
@@ -8533,7 +8533,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "type"
                     ],
@@ -8600,7 +8600,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "Clean system junk files",
                     "formatZH": "清理系统垃圾文件",
@@ -8640,7 +8640,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "reset an expired Password",
                     "formatZH": "重置过期密码",
@@ -8716,7 +8716,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "bind mfa",
                     "formatZH": "mfa 绑定",
@@ -8742,7 +8742,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "clean monitor datas",
                     "formatZH": "清空监控数据",
@@ -8782,7 +8782,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "update system password",
                     "formatZH": "修改系统密码",
@@ -8822,7 +8822,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "serverPort"
                     ],
@@ -8850,7 +8850,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [],
                     "formatEN": "scan System Junk Files",
                     "formatZH": "扫描系统垃圾文件",
@@ -8931,7 +8931,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "from",
                         "description"
@@ -8974,7 +8974,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "snapshots",
                             "input_column": "id",
@@ -9025,7 +9025,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "snapshots",
                             "input_column": "id",
@@ -9077,7 +9077,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "from",
                         "names"
@@ -9120,7 +9120,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "snapshots",
                             "input_column": "id",
@@ -9171,7 +9171,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "snapshots",
                             "input_column": "id",
@@ -9332,7 +9332,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "ssl"
                     ],
@@ -9396,7 +9396,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "ntpSite"
                     ],
@@ -9438,7 +9438,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "key",
                         "value"
@@ -9512,7 +9512,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "version"
                     ],
@@ -9554,7 +9554,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "primaryDomain"
                     ],
@@ -9699,7 +9699,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -9753,7 +9753,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "email"
                     ],
@@ -9795,7 +9795,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "website_acme_accounts",
                             "input_column": "id",
@@ -10023,7 +10023,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -10074,7 +10074,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -10126,7 +10126,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -10210,7 +10210,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -10261,7 +10261,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -10312,7 +10312,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -10354,7 +10354,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "website_dns_accounts",
                             "input_column": "id",
@@ -10441,7 +10441,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
@@ -10486,7 +10486,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "domain"
                     ],
@@ -10565,7 +10565,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "website_domains",
                             "input_column": "id",
@@ -10710,7 +10710,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -10762,7 +10762,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -10813,7 +10813,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -10890,7 +10890,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -10975,7 +10975,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -11026,7 +11026,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -11110,7 +11110,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -11161,7 +11161,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -11245,7 +11245,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -11296,7 +11296,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -11380,7 +11380,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -11470,7 +11470,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "primaryDomain"
                     ],
@@ -11543,7 +11543,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "website_ssls",
                             "input_column": "id",
@@ -11594,7 +11594,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "website_ssls",
                             "input_column": "id",
@@ -11717,7 +11717,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "website_ssls",
                             "input_column": "id",
@@ -11799,7 +11799,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "primaryDomain"
                     ],
@@ -11877,7 +11877,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -11928,7 +11928,7 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [
+                    "BeforeFunctions": [
                         {
                             "db": "websites",
                             "input_column": "id",
@@ -12939,7 +12939,7 @@ const docTemplate = `{
         "dto.DashboardBase": {
             "type": "object",
             "properties": {
-                "appInstalldNumber": {
+                "appInstalledNumber": {
                     "type": "integer"
                 },
                 "cpuCores": {

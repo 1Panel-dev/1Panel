@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-drawer v-model="changeVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
+        <el-drawer v-model="changeVisible" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
             <template #header>
                 <DrawerHeader :header="title" :resource="changeForm.mysqlName" :back="handleClose" />
             </template>
@@ -47,7 +47,7 @@
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button :disabled="loading" @click="changeVisiable = false">
+                    <el-button :disabled="loading" @click="changeVisible = false">
                         {{ $t('commons.button.cancel') }}
                     </el-button>
                     <el-button :disabled="loading" type="primary" @click="submitChangeInfo(changeFormRef)">
@@ -71,7 +71,7 @@ import { MsgSuccess } from '@/utils/message';
 import { checkIp } from '@/utils/util';
 
 const loading = ref();
-const changeVisiable = ref(false);
+const changeVisible = ref(false);
 type FormInstance = InstanceType<typeof ElForm>;
 const changeFormRef = ref<FormInstance>();
 const title = ref();
@@ -134,12 +134,12 @@ const acceptParams = (params: DialogProps): void => {
     changeForm.privilege = params.privilege;
     changeForm.privilegeIPs = params.privilegeIPs;
     changeForm.value = params.value;
-    changeVisiable.value = true;
+    changeVisible.value = true;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const handleClose = () => {
-    changeVisiable.value = false;
+    changeVisible.value = false;
 };
 
 const submitChangeInfo = async (formEl: FormInstance | undefined) => {
@@ -169,7 +169,7 @@ const submitChangeInfo = async (formEl: FormInstance | undefined) => {
                     .then(() => {
                         loading.value = false;
                         emit('search');
-                        changeVisiable.value = false;
+                        changeVisible.value = false;
                         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                     })
                     .catch(() => {
@@ -188,7 +188,7 @@ const submitChangeInfo = async (formEl: FormInstance | undefined) => {
             .then(() => {
                 loading.value = false;
                 emit('search');
-                changeVisiable.value = false;
+                changeVisible.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             })
             .catch(() => {
@@ -210,7 +210,7 @@ const onSubmit = async () => {
         .then(() => {
             loading.value = false;
             emit('search');
-            changeVisiable.value = false;
+            changeVisible.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
