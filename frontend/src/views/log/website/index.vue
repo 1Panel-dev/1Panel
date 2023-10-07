@@ -6,7 +6,7 @@
                     <el-col :span="16">
                         <el-button
                             class="tag-button"
-                            :label="'access.log'"
+                            :class="logReq.logType === 'access.log' ? '' : 'no-active'"
                             :type="logReq.logType === 'access.log' ? 'primary' : ''"
                             @click="changeType('access.log')"
                         >
@@ -14,7 +14,7 @@
                         </el-button>
                         <el-button
                             class="tag-button"
-                            :label="'error.log'"
+                            :class="logReq.logType === 'error.log' ? '' : 'no-active'"
                             :type="logReq.logType === 'error.log' ? 'primary' : ''"
                             @click="changeType('error.log')"
                         >
@@ -196,17 +196,8 @@ const onSubmitClean = async () => {
 };
 
 onMounted(() => {
+    logReq.logType = 'access.log';
     getWebsites();
+    console.log(logReq.logType);
 });
 </script>
-
-<style lang="scss" scoped>
-.tag-button {
-    &.el-button--primary:hover {
-        background-color: var(--el-color-primary) !important;
-    }
-    &.el-button--primary:focus {
-        background-color: var(--el-color-primary) !important;
-    }
-}
-</style>
