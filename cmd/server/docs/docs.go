@@ -1233,7 +1233,7 @@ const docTemplate = `{
             }
         },
         "/containers/compose/search/log": {
-            "post": {
+            "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -2037,7 +2037,7 @@ const docTemplate = `{
                     }
                 ],
                 "description": "获取容器限制",
-                "summary": "Load container limis",
+                "summary": "Load container limits",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -12549,11 +12549,17 @@ const docTemplate = `{
                 "network": {
                     "type": "string"
                 },
+                "openStdin": {
+                    "type": "boolean"
+                },
                 "publishAllPorts": {
                     "type": "boolean"
                 },
                 "restartPolicy": {
                     "type": "string"
+                },
+                "tty": {
+                    "type": "boolean"
                 },
                 "volumes": {
                     "type": "array",
@@ -16649,6 +16655,9 @@ const docTemplate = `{
                     "type": "object",
                     "additionalProperties": true
                 },
+                "port": {
+                    "type": "integer"
+                },
                 "resource": {
                     "type": "string"
                 },
@@ -16733,6 +16742,9 @@ const docTemplate = `{
                 "params": {
                     "type": "object",
                     "additionalProperties": true
+                },
+                "port": {
+                    "type": "integer"
                 },
                 "rebuild": {
                     "type": "boolean"

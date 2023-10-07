@@ -529,6 +529,9 @@ const message = {
         cpuShareHelper: '容器默認份額為 1024 個 CPU，增大可使當前容器獲得更多的 CPU 時間',
 
         command: '命令',
+        console: '控製臺交互',
+        tty: '偽終端 ( -t )',
+        openStdin: '標準輸入 ( -i )',
         custom: '自定義',
         containerTerminal: '終端',
         emptyUser: '為空時，將使用容器默認的用戶登錄',

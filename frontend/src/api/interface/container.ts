@@ -27,6 +27,8 @@ export namespace Container {
         entrypointStr: string;
         memoryItem: number;
         cmd: Array<string>;
+        openStdin: boolean;
+        tty: boolean;
         entrypoint: Array<string>;
         publishAllPorts: boolean;
         exposedPorts: Array<Port>;

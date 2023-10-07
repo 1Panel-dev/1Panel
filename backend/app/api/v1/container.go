@@ -222,13 +222,13 @@ func (b *BaseApi) ContainerInfo(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
-// @Summary Load container limis
+// @Summary Load container limits
 // @Description 获取容器限制
 // @Success 200 {object} dto.ResourceLimit
 // @Security ApiKeyAuth
 // @Router /containers/limit [get]
-func (b *BaseApi) LoadResouceLimit(c *gin.Context) {
-	data, err := containerService.LoadResouceLimit()
+func (b *BaseApi) LoadResourceLimit(c *gin.Context) {
+	data, err := containerService.LoadResourceLimit()
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

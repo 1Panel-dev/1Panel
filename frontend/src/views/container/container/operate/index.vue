@@ -176,6 +176,12 @@
                             {{ $t('container.autoRemove') }}
                         </el-checkbox>
                     </el-form-item>
+                    <el-form-item :label="$t('container.console')">
+                        <el-checkbox v-model="dialogData.rowData!.tty">{{ $t('container.tty') }}</el-checkbox>
+                        <el-checkbox v-model="dialogData.rowData!.openStdin">
+                            {{ $t('container.openStdin') }}
+                        </el-checkbox>
+                    </el-form-item>
                     <el-form-item :label="$t('container.restartPolicy')" prop="restartPolicy">
                         <el-radio-group v-model="dialogData.rowData!.restartPolicy">
                             <el-radio label="no">{{ $t('container.no') }}</el-radio>

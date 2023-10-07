@@ -44,6 +44,8 @@ type ContainerOperate struct {
 	Network         string         `json:"network"`
 	PublishAllPorts bool           `json:"publishAllPorts"`
 	ExposedPorts    []PortHelper   `json:"exposedPorts"`
+	Tty             bool           `json:"tty"`
+	OpenStdin       bool           `json:"openStdin"`
 	Cmd             []string       `json:"cmd"`
 	Entrypoint      []string       `json:"entrypoint"`
 	CPUShares       int64          `json:"cpuShares"`
@@ -70,7 +72,7 @@ type ContainerListStats struct {
 	CPUPercent    float64 `json:"cpuPercent"`
 	PercpuUsage   int     `json:"percpuUsage"`
 
-	MemroyCache   uint64  `json:"memoryCache"`
+	MemoryCache   uint64  `json:"memoryCache"`
 	MemoryUsage   uint64  `json:"memoryUsage"`
 	MemoryLimit   uint64  `json:"memoryLimit"`
 	MemoryPercent float64 `json:"memoryPercent"`
