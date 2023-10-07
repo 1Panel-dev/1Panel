@@ -19,7 +19,7 @@ import (
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /cronjobs [post]
-// @x-panel-log {"bodyKeys":["type","name"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建计划任务 [type][name]","formatEN":"create cronjob [type][name]"}
+// @x-panel-log {"bodyKeys":["type","name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建计划任务 [type][name]","formatEN":"create cronjob [type][name]"}
 func (b *BaseApi) CreateCronjob(c *gin.Context) {
 	var req dto.CronjobCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -124,7 +124,7 @@ func (b *BaseApi) LoadRecordLog(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /cronjobs/records/clean [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"cronjobs","output_column":"name","output_value":"name"}],"formatZH":"清空计划任务记录 [name]","formatEN":"clean cronjob [name] records"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"cronjobs","output_column":"name","output_value":"name"}],"formatZH":"清空计划任务记录 [name]","formatEN":"clean cronjob [name] records"}
 func (b *BaseApi) CleanRecord(c *gin.Context) {
 	var req dto.CronjobClean
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -148,7 +148,7 @@ func (b *BaseApi) CleanRecord(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /cronjobs/del [post]
-// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"ids","isList":true,"db":"cronjobs","output_column":"name","output_value":"names"}],"formatZH":"删除计划任务 [names]","formatEN":"delete cronjob [names]"}
+// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"ids","isList":true,"db":"cronjobs","output_column":"name","output_value":"names"}],"formatZH":"删除计划任务 [names]","formatEN":"delete cronjob [names]"}
 func (b *BaseApi) DeleteCronjob(c *gin.Context) {
 	var req dto.CronjobBatchDelete
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -175,7 +175,7 @@ func (b *BaseApi) DeleteCronjob(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /cronjobs/update [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"cronjobs","output_column":"name","output_value":"name"}],"formatZH":"更新计划任务 [name]","formatEN":"update cronjob [name]"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"cronjobs","output_column":"name","output_value":"name"}],"formatZH":"更新计划任务 [name]","formatEN":"update cronjob [name]"}
 func (b *BaseApi) UpdateCronjob(c *gin.Context) {
 	var req dto.CronjobUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -202,7 +202,7 @@ func (b *BaseApi) UpdateCronjob(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /cronjobs/status [post]
-// @x-panel-log {"bodyKeys":["id","status"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"cronjobs","output_column":"name","output_value":"name"}],"formatZH":"修改计划任务 [name] 状态为 [status]","formatEN":"change the status of cronjob [name] to [status]."}
+// @x-panel-log {"bodyKeys":["id","status"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"cronjobs","output_column":"name","output_value":"name"}],"formatZH":"修改计划任务 [name] 状态为 [status]","formatEN":"change the status of cronjob [name] to [status]."}
 func (b *BaseApi) UpdateCronjobStatus(c *gin.Context) {
 	var req dto.CronjobUpdateStatus
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -229,7 +229,7 @@ func (b *BaseApi) UpdateCronjobStatus(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /cronjobs/download [post]
-// @x-panel-log {"bodyKeys":["recordID"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"recordID","isList":false,"db":"job_records","output_column":"file","output_value":"file"}],"formatZH":"下载计划任务记录 [file]","formatEN":"download the cronjob record [file]"}
+// @x-panel-log {"bodyKeys":["recordID"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"recordID","isList":false,"db":"job_records","output_column":"file","output_value":"file"}],"formatZH":"下载计划任务记录 [file]","formatEN":"download the cronjob record [file]"}
 func (b *BaseApi) TargetDownload(c *gin.Context) {
 	var req dto.CronjobDownload
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -258,7 +258,7 @@ func (b *BaseApi) TargetDownload(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /cronjobs/handle [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"cronjobs","output_column":"name","output_value":"name"}],"formatZH":"手动执行计划任务 [name]","formatEN":"manually execute the cronjob [name]"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"cronjobs","output_column":"name","output_value":"name"}],"formatZH":"手动执行计划任务 [name]","formatEN":"manually execute the cronjob [name]"}
 func (b *BaseApi) HandleOnce(c *gin.Context) {
 	var req dto.OperateByID
 	if err := c.ShouldBindJSON(&req); err != nil {

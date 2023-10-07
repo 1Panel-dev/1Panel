@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="newNameVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
+    <el-drawer v-model="newNameVisible" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
         <template #header>
             <DrawerHeader :header="$t('container.rename')" :resource="renameForm.name" :back="handleClose" />
         </template>
@@ -14,7 +14,7 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button :disabled="loading" @click="newNameVisiable = false">
+                <el-button :disabled="loading" @click="newNameVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button :disabled="loading" type="primary" @click="onSubmitName(newNameRef)">
@@ -44,7 +44,7 @@ const renameForm = reactive({
 
 const newNameRef = ref<FormInstance>();
 
-const newNameVisiable = ref<boolean>(false);
+const newNameVisible = ref<boolean>(false);
 type FormInstance = InstanceType<typeof ElForm>;
 
 const emit = defineEmits<{ (e: 'search'): void }>();
@@ -58,7 +58,7 @@ const onSubmitName = async (formEl: FormInstance | undefined) => {
             .then(() => {
                 loading.value = false;
                 emit('search');
-                newNameVisiable.value = false;
+                newNameVisible.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             })
             .catch(() => {
@@ -74,11 +74,11 @@ interface DialogProps {
 const acceptParams = (props: DialogProps): void => {
     renameForm.name = props.container;
     renameForm.newName = '';
-    newNameVisiable.value = true;
+    newNameVisible.value = true;
 };
 
 const handleClose = async () => {
-    newNameVisiable.value = false;
+    newNameVisible.value = false;
     emit('search');
 };
 

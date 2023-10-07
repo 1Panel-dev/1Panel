@@ -30,7 +30,7 @@ func (b *BaseApi) GetSSHInfo(c *gin.Context) {
 // @Param request body dto.Operate true "request"
 // @Security ApiKeyAuth
 // @Router /host/ssh/operate [post]
-// @x-panel-log {"bodyKeys":["operation"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"[operation] SSH ","formatEN":"[operation] SSH"}
+// @x-panel-log {"bodyKeys":["operation"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"[operation] SSH ","formatEN":"[operation] SSH"}
 func (b *BaseApi) OperateSSH(c *gin.Context) {
 	var req dto.Operate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -57,7 +57,7 @@ func (b *BaseApi) OperateSSH(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /host/ssh/update [post]
-// @x-panel-log {"bodyKeys":["key","value"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"修改 SSH 配置 [key] => [value]","formatEN":"update SSH setting [key] => [value]"}
+// @x-panel-log {"bodyKeys":["key","value"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改 SSH 配置 [key] => [value]","formatEN":"update SSH setting [key] => [value]"}
 func (b *BaseApi) UpdateSSH(c *gin.Context) {
 	var req dto.SettingUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -84,7 +84,7 @@ func (b *BaseApi) UpdateSSH(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /host/conffile/update [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"修改 SSH 配置文件","formatEN":"update SSH conf"}
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改 SSH 配置文件","formatEN":"update SSH conf"}
 func (b *BaseApi) UpdateSSHByfile(c *gin.Context) {
 	var req dto.SSHConf
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -111,7 +111,7 @@ func (b *BaseApi) UpdateSSHByfile(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /host/ssh/generate [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"生成 SSH 密钥 ","formatEN":"generate SSH secret"}
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"生成 SSH 密钥 ","formatEN":"generate SSH secret"}
 func (b *BaseApi) GenerateSSH(c *gin.Context) {
 	var req dto.GenerateSSH
 	if err := c.ShouldBindJSON(&req); err != nil {

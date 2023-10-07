@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+        <el-drawer v-model="drawerVisible" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
             <template #header>
                 <DrawerHeader :header="$t('menu.home')" :back="handleClose" />
             </template>
@@ -80,7 +80,7 @@
             </div>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
                 </span>
             </template>
         </el-drawer>
@@ -127,7 +127,7 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { Host } from '@/api/interface/host';
 
-const drawerVisiable = ref();
+const drawerVisible = ref();
 const loading = ref();
 const data = ref();
 const successfulTotalCount = ref();
@@ -141,7 +141,7 @@ const operationList = ref();
 
 const acceptParams = (): void => {
     search('Failed');
-    drawerVisiable.value = true;
+    drawerVisible.value = true;
 };
 
 const search = async (status: string) => {
@@ -227,7 +227,7 @@ const submitOperation = async () => {
 };
 
 const handleClose = () => {
-    drawerVisiable.value = false;
+    drawerVisible.value = false;
 };
 
 defineExpose({

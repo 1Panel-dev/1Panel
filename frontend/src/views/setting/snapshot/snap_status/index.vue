@@ -1,6 +1,6 @@
 <template>
     <el-dialog
-        v-model="dialogVisiable"
+        v-model="dialogVisible"
         @close="onClose"
         :destroy-on-close="true"
         :close-on-click-modal="false"
@@ -112,7 +112,7 @@ const status = reactive<Setting.SnapshotStatus>({
     upload: '',
 });
 
-const dialogVisiable = ref(false);
+const dialogVisible = ref(false);
 
 const loading = ref();
 const snapID = ref();
@@ -128,7 +128,7 @@ interface DialogProps {
 }
 
 const acceptParams = (props: DialogProps): void => {
-    dialogVisiable.value = true;
+    dialogVisible.value = true;
     snapID.value = props.id;
     snapFrom.value = props.from;
     snapDescription.value = props.description;
@@ -162,7 +162,7 @@ const loadCurrentStatus = async () => {
 
 const onClose = async () => {
     emit('search');
-    dialogVisiable.value = false;
+    dialogVisible.value = false;
 };
 
 const onRetry = async () => {

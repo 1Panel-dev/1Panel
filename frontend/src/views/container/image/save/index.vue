@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
+    <el-drawer v-model="drawerVisible" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
         <template #header>
             <DrawerHeader :header="$t('container.exportImage')" :back="handleClose" />
         </template>
@@ -35,7 +35,7 @@
 
         <template #footer>
             <span class="dialog-footer">
-                <el-button :disabeld="loading" @click="drawerVisiable = false">
+                <el-button :disabeld="loading" @click="drawerVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button :disabeld="loading" type="primary" @click="onSubmit(formRef)">
@@ -59,7 +59,7 @@ import { MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
 
-const drawerVisiable = ref(false);
+const drawerVisible = ref(false);
 const form = reactive({
     tags: [] as Array<string>,
     tagName: '',
@@ -77,7 +77,7 @@ const dialogData = ref<DialogProps>({
 });
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
-    drawerVisiable.value = true;
+    drawerVisible.value = true;
     form.tags = params.tags;
     form.tagName = form.tags.length !== 0 ? form.tags[0] : '';
     form.path = '';
@@ -87,7 +87,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const handleClose = () => {
-    drawerVisiable.value = false;
+    drawerVisible.value = false;
 };
 
 type FormInstance = InstanceType<typeof ElForm>;
@@ -101,7 +101,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         await imageSave(form)
             .then(() => {
                 loading.value = false;
-                drawerVisiable.value = false;
+                drawerVisible.value = false;
                 emit('search');
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             })

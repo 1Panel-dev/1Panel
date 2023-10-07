@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
+        <el-drawer v-model="drawerVisible" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
             <template #header>
                 <DrawerHeader :header="$t('setting.syncTime')" :back="handleClose" />
             </template>
@@ -28,7 +28,7 @@
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
                     <el-button :disabled="loading" type="primary" @click="onSyncTime(formRef)">
                         {{ $t('commons.button.sync') }}
                     </el-button>
@@ -52,7 +52,7 @@ interface DialogProps {
     localTime: string;
     ntpSite: string;
 }
-const drawerVisiable = ref();
+const drawerVisible = ref();
 const loading = ref();
 
 const form = reactive({
@@ -65,7 +65,7 @@ const formRef = ref<FormInstance>();
 const acceptParams = (params: DialogProps): void => {
     form.localTime = params.localTime;
     form.ntpSite = params.ntpSite;
-    drawerVisiable.value = true;
+    drawerVisible.value = true;
 };
 
 const onSyncTime = async (formEl: FormInstance | undefined) => {
@@ -98,7 +98,7 @@ const onSyncTime = async (formEl: FormInstance | undefined) => {
 };
 
 const handleClose = () => {
-    drawerVisiable.value = false;
+    drawerVisible.value = false;
 };
 
 defineExpose({

@@ -26,7 +26,7 @@
         </el-button>
         <el-tag v-if="version === 'Waiting'" round style="margin-left: 10px">{{ $t('setting.upgrading') }}</el-tag>
     </div>
-    <el-drawer :close-on-click-modal="false" :key="refresh" v-model="drawerVisiable" size="50%" append-to-body>
+    <el-drawer :close-on-click-modal="false" :key="refresh" v-model="drawerVisible" size="50%" append-to-body>
         <template #header>
             <DrawerHeader :header="$t('commons.button.upgrade')" :back="handleClose" />
         </template>
@@ -55,7 +55,7 @@
         </div>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
                 <el-button type="primary" @click="onUpgrade">{{ $t('setting.upgradeNow') }}</el-button>
             </span>
         </template>
@@ -75,7 +75,7 @@ const globalStore = GlobalStore();
 
 const version = ref();
 const loading = ref(false);
-const drawerVisiable = ref(false);
+const drawerVisible = ref(false);
 const upgradeInfo = ref();
 const refresh = ref();
 const upgradeVersion = ref();
@@ -92,7 +92,7 @@ const search = async () => {
 };
 
 const handleClose = () => {
-    drawerVisiable.value = false;
+    drawerVisible.value = false;
 };
 
 const toDoc = () => {
@@ -114,7 +114,7 @@ const onLoadUpgradeInfo = async () => {
             }
             upgradeInfo.value = res.data;
             upgradeVersion.value = upgradeInfo.value.newVersion || upgradeInfo.value.latestVersion;
-            drawerVisiable.value = true;
+            drawerVisible.value = true;
         })
         .catch(() => {
             loading.value = false;
@@ -134,7 +134,7 @@ const onUpgrade = async () => {
     }).then(async () => {
         globalStore.isLoading = true;
         await upgrade(upgradeVersion.value);
-        drawerVisiable.value = false;
+        drawerVisible.value = false;
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         search();
     });

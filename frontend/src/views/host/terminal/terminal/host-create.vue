@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-drawer v-model="dialogVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+        <el-drawer v-model="dialogVisible" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
             <template #header>
                 <DrawerHeader :header="$t('terminal.addHost')" :back="handleClose" />
             </template>
@@ -64,7 +64,7 @@
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="dialogVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button @click="dialogVisible = false">{{ $t('commons.button.cancel') }}</el-button>
                     <el-button @click="submitAddHost(hostRef, 'testConn')">
                         {{ $t('terminal.testConn') }}
                     </el-button>
@@ -87,7 +87,7 @@ import i18n from '@/lang';
 import { reactive, ref, watch } from 'vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 
-const dialogVisiable = ref();
+const dialogVisible = ref();
 const isOK = ref(false);
 type FormInstance = InstanceType<typeof ElForm>;
 const hostRef = ref<FormInstance>();
@@ -144,11 +144,11 @@ const acceptParams = (props: DialogProps) => {
         hostInfo.addr = '127.0.0.1';
         hostInfo.user = 'root';
     }
-    dialogVisiable.value = true;
+    dialogVisible.value = true;
 };
 
 const handleClose = () => {
-    dialogVisiable.value = false;
+    dialogVisible.value = false;
 };
 
 const emit = defineEmits(['on-conn-terminal', 'load-host-tree']);
@@ -172,7 +172,7 @@ const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
                 break;
             case 'saveAndConn':
                 const res = await addHost(hostInfo);
-                dialogVisiable.value = false;
+                dialogVisible.value = false;
                 let title = res.data.user + '@' + res.data.addr + ':' + res.data.port;
                 if (res.data.name.length !== 0) {
                     title = res.data.name + '-' + title;

@@ -59,7 +59,7 @@
                                     <span>{{ $t('home.appInstalled') }}</span>
                                     <div class="count">
                                         <span @click="goRouter('/apps/installed')">
-                                            {{ baseInfo?.appInstalldNumber }}
+                                            {{ baseInfo?.appInstalledNumber }}
                                         </span>
                                     </div>
                                 </el-col>
@@ -69,7 +69,7 @@
                 </CardWithHeader>
                 <CardWithHeader :header="$t('commons.table.status')" style="margin-top: 20px">
                     <template #body>
-                        <Status ref="statuRef" style="margin-top: -7px" />
+                        <Status ref="statusRef" style="margin-top: -7px" />
                     </template>
                 </CardWithHeader>
                 <CardWithHeader :header="$t('menu.monitor')" style="margin-top: 20px; margin-bottom: 20px">
@@ -238,7 +238,7 @@ import { GlobalStore } from '@/store';
 const router = useRouter();
 const globalStore = GlobalStore();
 
-const statuRef = ref();
+const statusRef = ref();
 const appRef = ref();
 
 const isSafety = ref();
@@ -267,7 +267,7 @@ const baseInfo = ref<Dashboard.BaseInfo>({
     websiteNumber: 0,
     databaseNumber: 0,
     cronjobNumber: 0,
-    appInstalldNumber: 0,
+    appInstalledNumber: 0,
 
     hostname: '',
     os: '',
@@ -364,7 +364,7 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
     currentInfo.value = baseInfo.value.currentInfo;
     await onLoadCurrentInfo();
     isStatusInit.value = false;
-    statuRef.value.acceptParams(currentInfo.value, baseInfo.value, isStatusInit.value);
+    statusRef.value.acceptParams(currentInfo.value, baseInfo.value, isStatusInit.value);
     appRef.value.acceptParams();
     if (isInit) {
         timer = setInterval(async () => {
@@ -431,7 +431,7 @@ const onLoadCurrentInfo = async () => {
     }
     loadData();
     currentInfo.value = res.data;
-    statuRef.value.acceptParams(currentInfo.value, baseInfo.value, isStatusInit.value);
+    statusRef.value.acceptParams(currentInfo.value, baseInfo.value, isStatusInit.value);
 };
 
 function loadUpTime(uptime: number) {

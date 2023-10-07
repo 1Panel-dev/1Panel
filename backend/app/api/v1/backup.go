@@ -20,7 +20,7 @@ import (
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /settings/backup [post]
-// @x-panel-log {"bodyKeys":["type"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建备份账号 [type]","formatEN":"create backup account [type]"}
+// @x-panel-log {"bodyKeys":["type"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建备份账号 [type]","formatEN":"create backup account [type]"}
 func (b *BaseApi) CreateBackup(c *gin.Context) {
 	var req dto.BackupOperate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -122,7 +122,7 @@ func (b *BaseApi) LoadOneDriveInfo(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /settings/backup/del [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":true,"db":"backup_accounts","output_column":"type","output_value":"types"}],"formatZH":"删除备份账号 [types]","formatEN":"delete backup account [types]"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":true,"db":"backup_accounts","output_column":"type","output_value":"types"}],"formatZH":"删除备份账号 [types]","formatEN":"delete backup account [types]"}
 func (b *BaseApi) DeleteBackup(c *gin.Context) {
 	var req dto.OperateByID
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -176,7 +176,7 @@ func (b *BaseApi) SearchBackupRecords(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /settings/backup/record/download [post]
-// @x-panel-log {"bodyKeys":["source","fileName"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"下载备份记录 [source][fileName]","formatEN":"download backup records [source][fileName]"}
+// @x-panel-log {"bodyKeys":["source","fileName"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"下载备份记录 [source][fileName]","formatEN":"download backup records [source][fileName]"}
 func (b *BaseApi) DownloadRecord(c *gin.Context) {
 	var req dto.DownloadRecord
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -204,7 +204,7 @@ func (b *BaseApi) DownloadRecord(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /settings/backup/record/del [post]
-// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"ids","isList":true,"db":"backup_records","output_column":"file_name","output_value":"files"}],"formatZH":"删除备份记录 [files]","formatEN":"delete backup records [files]"}
+// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"ids","isList":true,"db":"backup_records","output_column":"file_name","output_value":"files"}],"formatZH":"删除备份记录 [files]","formatEN":"delete backup records [files]"}
 func (b *BaseApi) DeleteBackupRecord(c *gin.Context) {
 	var req dto.BatchDeleteReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -231,7 +231,7 @@ func (b *BaseApi) DeleteBackupRecord(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /settings/backup/update [post]
-// @x-panel-log {"bodyKeys":["type"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新备份账号 [types]","formatEN":"update backup account [types]"}
+// @x-panel-log {"bodyKeys":["type"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新备份账号 [types]","formatEN":"update backup account [types]"}
 func (b *BaseApi) UpdateBackup(c *gin.Context) {
 	var req dto.BackupOperate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -317,7 +317,7 @@ func (b *BaseApi) LoadFilesFromBackup(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /settings/backup/ [post]
-// @x-panel-log {"bodyKeys":["type","name","detailName"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"备份 [type] 数据 [name][detailName]","formatEN":"backup [type] data [name][detailName]"}
+// @x-panel-log {"bodyKeys":["type","name","detailName"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"备份 [type] 数据 [name][detailName]","formatEN":"backup [type] data [name][detailName]"}
 func (b *BaseApi) Backup(c *gin.Context) {
 	var req dto.CommonBackup
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -362,7 +362,7 @@ func (b *BaseApi) Backup(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /settings/backup/recover [post]
-// @x-panel-log {"bodyKeys":["type","name","detailName","file"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"从 [file] 恢复 [type] 数据 [name][detailName]","formatEN":"recover [type] data [name][detailName] from [file]"}
+// @x-panel-log {"bodyKeys":["type","name","detailName","file"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"从 [file] 恢复 [type] 数据 [name][detailName]","formatEN":"recover [type] data [name][detailName] from [file]"}
 func (b *BaseApi) Recover(c *gin.Context) {
 	var req dto.CommonRecover
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -415,7 +415,7 @@ func (b *BaseApi) Recover(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /settings/backup/recover/byupload [post]
-// @x-panel-log {"bodyKeys":["type","name","detailName","file"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"从 [file] 恢复 [type] 数据 [name][detailName]","formatEN":"recover [type] data [name][detailName] from [file]"}
+// @x-panel-log {"bodyKeys":["type","name","detailName","file"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"从 [file] 恢复 [type] 数据 [name][detailName]","formatEN":"recover [type] data [name][detailName] from [file]"}
 func (b *BaseApi) RecoverByUpload(c *gin.Context) {
 	var req dto.CommonRecover
 	if err := c.ShouldBindJSON(&req); err != nil {

@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+    <el-drawer v-model="drawerVisible" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
             <DrawerHeader :header="$t('commons.button.upgrade')" :resource="form.name" :back="handleClose" />
         </template>
@@ -49,7 +49,7 @@
         </el-row>
         <template #footer>
             <span class="dialog-footer">
-                <el-button :disabled="loading" @click="drawerVisiable = false">
+                <el-button :disabled="loading" @click="drawerVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
@@ -82,7 +82,7 @@ const form = reactive({
 
 const formRef = ref<FormInstance>();
 
-const drawerVisiable = ref<boolean>(false);
+const drawerVisible = ref<boolean>(false);
 type FormInstance = InstanceType<typeof ElForm>;
 
 interface DialogProps {
@@ -96,7 +96,7 @@ const acceptParams = (props: DialogProps): void => {
     form.oldTag = props.image.indexOf(':') !== -1 ? props.image.split(':')[1] : 'latest';
     form.newTag = form.oldTag;
     form.fromApp = props.fromApp;
-    drawerVisiable.value = true;
+    drawerVisible.value = true;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -117,7 +117,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                 .then(() => {
                     loading.value = false;
                     emit('search');
-                    drawerVisiable.value = false;
+                    drawerVisible.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 })
                 .catch(() => {
@@ -127,7 +127,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     });
 };
 const handleClose = async () => {
-    drawerVisiable.value = false;
+    drawerVisible.value = false;
     emit('search');
 };
 

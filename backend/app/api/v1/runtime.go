@@ -41,7 +41,7 @@ func (b *BaseApi) SearchRuntimes(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /runtimes [post]
-// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建运行环境 [name]","formatEN":"Create runtime [name]"}
+// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建运行环境 [name]","formatEN":"Create runtime [name]"}
 func (b *BaseApi) CreateRuntime(c *gin.Context) {
 	var req request.RuntimeCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -63,7 +63,7 @@ func (b *BaseApi) CreateRuntime(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /runtimes/del [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"删除网站 [name]","formatEN":"Delete website [name]"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"删除网站 [name]","formatEN":"Delete website [name]"}
 func (b *BaseApi) DeleteRuntime(c *gin.Context) {
 	var req request.RuntimeDelete
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -86,7 +86,7 @@ func (b *BaseApi) DeleteRuntime(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /runtimes/update [post]
-// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新运行环境 [name]","formatEN":"Update runtime [name]"}
+// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新运行环境 [name]","formatEN":"Update runtime [name]"}
 func (b *BaseApi) UpdateRuntime(c *gin.Context) {
 	var req request.RuntimeUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -152,7 +152,7 @@ func (b *BaseApi) GetNodePackageRunScript(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /runtimes/operate [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"操作运行环境 [name]","formatEN":"Operate runtime [name]"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"操作运行环境 [name]","formatEN":"Operate runtime [name]"}
 func (b *BaseApi) OperateRuntime(c *gin.Context) {
 	var req request.RuntimeOperate
 	if err := c.ShouldBindJSON(&req); err != nil {

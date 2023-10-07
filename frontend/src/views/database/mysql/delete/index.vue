@@ -1,6 +1,6 @@
 <template>
     <el-dialog
-        v-model="dialogVisiable"
+        v-model="dialogVisible"
         :title="$t('commons.button.delete') + ' - ' + dbName"
         width="30%"
         :close-on-click-modal="false"
@@ -29,7 +29,7 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="dialogVisiable = false" :disabled="loading">
+                <el-button @click="dialogVisible = false" :disabled="loading">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button type="primary" @click="submit" :disabled="deleteInfo != dbName || loading">
@@ -53,7 +53,7 @@ let deleteReq = ref({
     deleteBackup: false,
     forceDelete: false,
 });
-let dialogVisiable = ref(false);
+let dialogVisible = ref(false);
 let loading = ref(false);
 let deleteInfo = ref('');
 let dbName = ref('');
@@ -78,7 +78,7 @@ const acceptParams = async (prop: DialogProps) => {
     };
     dbName.value = prop.name;
     deleteInfo.value = '';
-    dialogVisiable.value = true;
+    dialogVisible.value = true;
 };
 
 const submit = async () => {
@@ -88,7 +88,7 @@ const submit = async () => {
             loading.value = false;
             emit('search');
             MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
-            dialogVisiable.value = false;
+            dialogVisible.value = false;
         })
         .catch(() => {
             loading.value = false;

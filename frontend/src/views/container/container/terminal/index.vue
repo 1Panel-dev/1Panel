@@ -1,6 +1,6 @@
 <template>
     <el-drawer
-        v-model="terminalVisiable"
+        v-model="terminalVisible"
         @close="handleClose"
         :destroy-on-close="true"
         :close-on-click-modal="false"
@@ -57,7 +57,7 @@ import Terminal from '@/components/terminal/index.vue';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const title = ref();
-const terminalVisiable = ref(false);
+const terminalVisible = ref(false);
 const terminalOpen = ref(false);
 const form = reactive({
     isCustom: false,
@@ -73,7 +73,7 @@ interface DialogProps {
     container: string;
 }
 const acceptParams = async (params: DialogProps): Promise<void> => {
-    terminalVisiable.value = true;
+    terminalVisible.value = true;
     form.containerID = params.containerID;
     title.value = params.container;
     form.isCustom = false;
@@ -106,7 +106,7 @@ const onClose = () => {
 
 function handleClose() {
     onClose();
-    terminalVisiable.value = false;
+    terminalVisible.value = false;
 }
 
 defineExpose({

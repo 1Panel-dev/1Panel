@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-drawer v-model="drawerVisiable" size="30%">
+        <el-drawer v-model="drawerVisible" size="30%">
             <template #header>
                 <DrawerHeader :header="$t('setting.importSnapshot')" :back="handleClose" />
             </template>
@@ -30,7 +30,7 @@
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button :disabled="loading" @click="drawerVisiable = false">
+                    <el-button :disabled="loading" @click="drawerVisible = false">
                         {{ $t('commons.button.cancel') }}
                     </el-button>
                     <el-button :disabled="loading" type="primary" @click="submitImport(formRef)">
@@ -52,7 +52,7 @@ import { getBackupList, getFilesFromBackup } from '@/api/modules/setting';
 import { Rules } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';
 
-const drawerVisiable = ref(false);
+const drawerVisible = ref(false);
 const loading = ref();
 
 const formRef = ref();
@@ -74,12 +74,12 @@ const acceptParams = (): void => {
     form.from = '';
     form.names = [] as Array<string>;
     loadBackups();
-    drawerVisiable.value = true;
+    drawerVisible.value = true;
 };
 const emit = defineEmits(['search']);
 
 const handleClose = () => {
-    drawerVisiable.value = false;
+    drawerVisible.value = false;
 };
 
 const submitImport = async (formEl: FormInstance | undefined) => {
@@ -91,7 +91,7 @@ const submitImport = async (formEl: FormInstance | undefined) => {
             .then(() => {
                 emit('search');
                 loading.value = false;
-                drawerVisiable.value = false;
+                drawerVisible.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             })
             .catch(() => {

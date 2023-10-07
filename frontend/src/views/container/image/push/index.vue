@@ -1,6 +1,6 @@
 <template>
     <el-drawer
-        v-model="drawerVisiable"
+        v-model="drawerVisible"
         :destroy-on-close="true"
         @close="onCloseLog"
         :close-on-click-modal="false"
@@ -35,7 +35,7 @@
                 </el-form>
 
                 <codemirror
-                    v-if="logVisiable"
+                    v-if="logVisible"
                     :autofocus="true"
                     placeholder="Waiting for push output..."
                     :indent-with-tab="true"
@@ -55,7 +55,7 @@
 
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="drawerVisiable = false">
+                <el-button @click="drawerVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button :disabled="buttonDisabled" type="primary" @click="onSubmit(formRef)">
@@ -80,7 +80,7 @@ import DrawerHeader from '@/components/drawer-header/index.vue';
 import { formatImageStdout } from '@/utils/docker';
 import { MsgSuccess } from '@/utils/message';
 
-const drawerVisiable = ref(false);
+const drawerVisible = ref(false);
 const form = reactive({
     tags: [] as Array<string>,
     tagName: '',
@@ -90,7 +90,7 @@ const form = reactive({
 
 const buttonDisabled = ref(false);
 
-const logVisiable = ref(false);
+const logVisible = ref(false);
 const logInfo = ref();
 const view = shallowRef();
 const handleReady = (payload) => {
@@ -109,8 +109,8 @@ const dialogData = ref<DialogProps>({
 });
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
-    logVisiable.value = false;
-    drawerVisiable.value = true;
+    logVisible.value = false;
+    drawerVisible.value = true;
     form.tags = params.tags;
     form.repoID = 1;
     form.tagName = form.tags.length !== 0 ? form.tags[0] : '';
@@ -127,7 +127,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         const res = await imagePush(form);
-        logVisiable.value = true;
+        logVisible.value = true;
         buttonDisabled.value = true;
         loadLogs(res.data);
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -136,7 +136,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
 
 const loadLogs = async (path: string) => {
     timer = setInterval(async () => {
-        if (logVisiable.value) {
+        if (logVisible.value) {
             const res = await loadContainerLog('image-push', path);
             logInfo.value = formatImageStdout(res.data);
             nextTick(() => {
@@ -158,7 +158,7 @@ const onCloseLog = async () => {
     emit('search');
     clearInterval(Number(timer));
     timer = null;
-    drawerVisiable.value = false;
+    drawerVisible.value = false;
 };
 
 function loadDetailInfo(id: number) {

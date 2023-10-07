@@ -184,7 +184,7 @@
         </div>
 
         <el-dialog
-            v-model="phpVisiable"
+            v-model="phpVisible"
             :title="$t('app.checkTitle')"
             width="30%"
             :close-on-click-modal="false"
@@ -197,7 +197,7 @@
             </el-alert>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="phpVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button @click="phpVisible = false">{{ $t('commons.button.cancel') }}</el-button>
                 </span>
             </template>
         </el-dialog>
@@ -261,7 +261,7 @@ const checkRef = ref();
 const deleteRef = ref();
 
 const phpadminPort = ref();
-const phpVisiable = ref(false);
+const phpVisible = ref(false);
 
 const dialogPortJumpRef = ref();
 
@@ -392,7 +392,7 @@ const onChange = async (info: any) => {
 
 const goDashboard = async () => {
     if (phpadminPort.value === 0) {
-        phpVisiable.value = true;
+        phpVisible.value = true;
         return;
     }
     dialogPortJumpRef.value.acceptParams({ port: phpadminPort.value });
@@ -458,7 +458,7 @@ const onCopy = async (row: any) => {
         await toClipboard(row.password);
         MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
     } catch (e) {
-        MsgError(i18n.global.t('commons.msg.copyfailed'));
+        MsgError(i18n.global.t('commons.msg.copyFailed'));
     }
 };
 

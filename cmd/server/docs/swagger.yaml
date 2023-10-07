@@ -666,7 +666,7 @@ definitions:
     type: object
   dto.DashboardBase:
     properties:
-      appInstalldNumber:
+      appInstalledNumber:
         type: integer
       cpuCores:
         type: integer
@@ -4271,7 +4271,7 @@ paths:
       tags:
       - App
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: app_installs
           input_column: name
           input_value: name
@@ -4421,7 +4421,7 @@ paths:
       tags:
       - App
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - installId
         formatEN: Application param update [installId]
@@ -4487,7 +4487,7 @@ paths:
       tags:
       - App
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: app_installs
           input_column: id
           input_value: installId
@@ -4554,7 +4554,7 @@ paths:
       tags:
       - App
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - installId
         formatEN: Application param update [installId]
@@ -4581,7 +4581,7 @@ paths:
       tags:
       - App
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - key
         - name
@@ -4621,7 +4621,7 @@ paths:
       tags:
       - App
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys: []
         formatEN: Sync the list of installed apps
         formatZH: 同步已安装应用列表
@@ -4681,7 +4681,7 @@ paths:
       tags:
       - App
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys: []
         formatEN: App store synchronization
         formatZH: 应用商店同步
@@ -4805,7 +4805,7 @@ paths:
       tags:
       - Container
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         - image
@@ -4833,7 +4833,7 @@ paths:
       tags:
       - Container
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         formatEN: clean container [name] logs
@@ -4860,7 +4860,7 @@ paths:
       tags:
       - Container Compose
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         formatEN: create compose [name]
@@ -4887,7 +4887,7 @@ paths:
       tags:
       - Container Compose
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         - operation
@@ -4963,7 +4963,7 @@ paths:
       tags:
       - Container Compose
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         formatEN: check compose [name]
@@ -4990,7 +4990,7 @@ paths:
       tags:
       - Container Compose
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         formatEN: update compose information [name]
@@ -5047,7 +5047,7 @@ paths:
       tags:
       - Container Docker
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys: []
         formatEN: Updated the docker daemon.json log option
         formatZH: 更新 docker daemon.json 日志配置
@@ -5073,7 +5073,7 @@ paths:
       tags:
       - Container Docker
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys: []
         formatEN: Updated the docker daemon.json configuration
         formatZH: 更新 docker daemon.json 配置
@@ -5099,7 +5099,7 @@ paths:
       tags:
       - Container Docker
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - operation
         formatEN: '[operation] docker service'
@@ -5160,7 +5160,7 @@ paths:
       tags:
       - Container Image
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         formatEN: build image [name]
@@ -5187,7 +5187,7 @@ paths:
       tags:
       - Container Image
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - path
         formatEN: load image from [path]
@@ -5216,7 +5216,7 @@ paths:
       tags:
       - Container Image
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: image_repos
           input_column: id
           input_value: repoID
@@ -5252,7 +5252,7 @@ paths:
       tags:
       - Container Image
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: image_repos
           input_column: id
           input_value: repoID
@@ -5287,7 +5287,7 @@ paths:
       tags:
       - Container Image
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - names
         formatEN: remove image [names]
@@ -5314,7 +5314,7 @@ paths:
       tags:
       - Container Image
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - tagName
         - path
@@ -5367,7 +5367,7 @@ paths:
       tags:
       - Container Image
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: image_repos
           input_column: id
           input_value: repoID
@@ -5522,7 +5522,7 @@ paths:
       tags:
       - Container Network
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         formatEN: create container network [name]
@@ -5549,7 +5549,7 @@ paths:
       tags:
       - Container Network
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - names
         formatEN: delete container network [names]
@@ -5600,7 +5600,7 @@ paths:
       tags:
       - Container
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         - operation
@@ -5631,7 +5631,7 @@ paths:
       tags:
       - Container
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - pruneType
         formatEN: clean container [pruneType]
@@ -5676,7 +5676,7 @@ paths:
       tags:
       - Container Image-repo
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         formatEN: create image repo [name]
@@ -5705,7 +5705,7 @@ paths:
       tags:
       - Container Image-repo
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: image_repos
           input_column: id
           input_value: ids
@@ -5786,7 +5786,7 @@ paths:
       tags:
       - Container Image-repo
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: image_repos
           input_column: id
           input_value: id
@@ -5904,7 +5904,7 @@ paths:
       tags:
       - Container Compose-template
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         formatEN: create compose template [name]
@@ -5931,7 +5931,7 @@ paths:
       tags:
       - Container Compose-template
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: compose_templates
           input_column: id
           input_value: ids
@@ -5988,7 +5988,7 @@ paths:
       tags:
       - Container Compose-template
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: compose_templates
           input_column: id
           input_value: id
@@ -6021,7 +6021,7 @@ paths:
       tags:
       - Container
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         - image
@@ -6049,7 +6049,7 @@ paths:
       tags:
       - Container
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         - image
@@ -6095,7 +6095,7 @@ paths:
       tags:
       - Container Volume
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         formatEN: create container volume [name]
@@ -6122,7 +6122,7 @@ paths:
       tags:
       - Container Volume
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - names
         formatEN: delete container volume [names]
@@ -6193,7 +6193,7 @@ paths:
       tags:
       - Cronjob
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - type
         - name
@@ -6221,7 +6221,7 @@ paths:
       tags:
       - Cronjob
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: cronjobs
           input_column: id
           input_value: ids
@@ -6254,7 +6254,7 @@ paths:
       tags:
       - Cronjob
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: job_records
           input_column: id
           input_value: recordID
@@ -6287,7 +6287,7 @@ paths:
       tags:
       - Cronjob
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: cronjobs
           input_column: id
           input_value: id
@@ -6320,7 +6320,7 @@ paths:
       tags:
       - Cronjob
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: cronjobs
           input_column: id
           input_value: id
@@ -6397,7 +6397,7 @@ paths:
       tags:
       - Cronjob
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: cronjobs
           input_column: id
           input_value: id
@@ -6431,7 +6431,7 @@ paths:
       tags:
       - Cronjob
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: cronjobs
           input_column: id
           input_value: id
@@ -6516,7 +6516,7 @@ paths:
       tags:
       - Database Mysql
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         formatEN: create mysql database [name]
@@ -6565,7 +6565,7 @@ paths:
       tags:
       - Database Mysql
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: database_mysqls
           input_column: id
           input_value: id
@@ -6598,7 +6598,7 @@ paths:
       tags:
       - Database Mysql
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: database_mysqls
           input_column: id
           input_value: id
@@ -6631,7 +6631,7 @@ paths:
       tags:
       - Database Mysql
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys: []
         formatEN: update the mysql database configuration information
         formatZH: 更新 mysql 数据库配置信息
@@ -6657,7 +6657,7 @@ paths:
       tags:
       - Database
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         - type
@@ -6698,7 +6698,7 @@ paths:
       tags:
       - Database
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         - type
@@ -6726,7 +6726,7 @@ paths:
       tags:
       - Database
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: databases
           input_column: id
           input_value: ids
@@ -6796,7 +6796,7 @@ paths:
       tags:
       - Database
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         formatEN: update database [name]
@@ -6823,7 +6823,7 @@ paths:
       tags:
       - Database Mysql
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: database_mysqls
           input_column: id
           input_value: id
@@ -6880,7 +6880,7 @@ paths:
       tags:
       - Database Mysql
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: database_mysqls
           input_column: id
           input_value: id
@@ -7011,7 +7011,7 @@ paths:
       tags:
       - Database Redis
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys: []
         formatEN: update the redis database configuration information
         formatZH: 更新 redis 数据库配置信息
@@ -7037,7 +7037,7 @@ paths:
       tags:
       - Database Redis
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys: []
         formatEN: update the redis database configuration information
         formatZH: 更新 redis 数据库配置信息
@@ -7063,7 +7063,7 @@ paths:
       tags:
       - Database Redis
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys: []
         formatEN: change the password of the redis database
         formatZH: 修改 redis 数据库密码
@@ -7102,7 +7102,7 @@ paths:
       tags:
       - Database Redis
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys: []
         formatEN: redis database persistence configuration update
         formatZH: redis 数据库持久化配置更新
@@ -7229,7 +7229,7 @@ paths:
       tags:
       - Database Mysql
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys: []
         formatEN: adjust mysql database performance parameters
         formatZH: 调整 mysql 数据库性能参数
@@ -7255,7 +7255,7 @@ paths:
       tags:
       - File
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - path
         formatEN: Create dir or file [path]
@@ -7282,7 +7282,7 @@ paths:
       tags:
       - File
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - paths
         formatEN: Batch delete dir or file [paths]
@@ -7309,7 +7309,7 @@ paths:
       tags:
       - File
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - path
         formatEN: Check whether file [path] exists
@@ -7336,7 +7336,7 @@ paths:
       tags:
       - File
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         formatEN: Download file [name]
@@ -7380,7 +7380,7 @@ paths:
       tags:
       - File
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         formatEN: Compress file [name]
@@ -7409,7 +7409,7 @@ paths:
       tags:
       - File
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - path
         formatEN: Load file content [path]
@@ -7436,7 +7436,7 @@ paths:
       tags:
       - File
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - path
         formatEN: Decompress file [path]
@@ -7463,7 +7463,7 @@ paths:
       tags:
       - File
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - path
         formatEN: Delete dir or file [path]
@@ -7490,7 +7490,7 @@ paths:
       tags:
       - File
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         formatEN: Download file [name]
@@ -7517,7 +7517,7 @@ paths:
       tags:
       - File
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - path
         - mode
@@ -7545,7 +7545,7 @@ paths:
       tags:
       - File
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - oldPaths
         - newPath
@@ -7573,7 +7573,7 @@ paths:
       tags:
       - File
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - path
         - user
@@ -7602,7 +7602,7 @@ paths:
       tags:
       - File
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - oldName
         - newName
@@ -7630,7 +7630,7 @@ paths:
       tags:
       - File
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - path
         formatEN: Update file content [path]
@@ -7679,7 +7679,7 @@ paths:
       tags:
       - File
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - path
         formatEN: Load file size [path]
@@ -7727,7 +7727,7 @@ paths:
       tags:
       - File
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - path
         formatEN: Upload file [path]
@@ -7778,7 +7778,7 @@ paths:
       tags:
       - File
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - url
         - path
@@ -7807,7 +7807,7 @@ paths:
       tags:
       - System Group
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         - type
@@ -7835,7 +7835,7 @@ paths:
       tags:
       - System Group
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: groups
           input_column: id
           input_value: id
@@ -7898,7 +7898,7 @@ paths:
       tags:
       - System Group
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         - type
@@ -7926,7 +7926,7 @@ paths:
       tags:
       - SSH
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys: []
         formatEN: update SSH conf
         formatZH: 修改 SSH 配置文件
@@ -7963,7 +7963,7 @@ paths:
       tags:
       - SSH
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys: []
         formatEN: generate SSH secret
         formatZH: '生成 SSH 密钥 '
@@ -8033,7 +8033,7 @@ paths:
       tags:
       - SSH
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - operation
         formatEN: '[operation] SSH'
@@ -8093,7 +8093,7 @@ paths:
       tags:
       - SSH
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - key
         - value
@@ -8141,7 +8141,7 @@ paths:
       tags:
       - Host tool
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - operate
         formatEN: '[operate] tool config'
@@ -8168,7 +8168,7 @@ paths:
       tags:
       - Host tool
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - type
         formatEN: create [type] config
@@ -8215,7 +8215,7 @@ paths:
       tags:
       - Host tool
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - operate
         - type
@@ -8255,7 +8255,7 @@ paths:
       tags:
       - Host tool
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - operate
         formatEN: '[operate] process'
@@ -8282,7 +8282,7 @@ paths:
       tags:
       - Host tool
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - operate
         formatEN: '[operate] Supervisor Process Config file'
@@ -8309,7 +8309,7 @@ paths:
       tags:
       - Host
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         - addr
@@ -8349,7 +8349,7 @@ paths:
       tags:
       - Command
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         - command
@@ -8377,7 +8377,7 @@ paths:
       tags:
       - Command
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: commands
           input_column: id
           input_value: ids
@@ -8432,7 +8432,7 @@ paths:
       tags:
       - Command
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         formatEN: update quick command [name]
@@ -8459,7 +8459,7 @@ paths:
       tags:
       - Host
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: hosts
           input_column: id
           input_value: ids
@@ -8525,7 +8525,7 @@ paths:
       tags:
       - Firewall
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - strategy
         - address
@@ -8555,7 +8555,7 @@ paths:
       tags:
       - Firewall
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - operation
         formatEN: '[operation] firewall'
@@ -8582,7 +8582,7 @@ paths:
       tags:
       - Firewall
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - port
         - strategy
@@ -8781,7 +8781,7 @@ paths:
       tags:
       - Host
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         - addr
@@ -8809,7 +8809,7 @@ paths:
       tags:
       - Host
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: hosts
           input_column: id
           input_value: id
@@ -8845,7 +8845,7 @@ paths:
       tags:
       - Logs
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - logType
         formatEN: Clean the [logType] log information
@@ -8951,7 +8951,7 @@ paths:
       tags:
       - OpenResty
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys: []
         formatEN: Update nginx conf
         formatZH: 更新 nginx 配置
@@ -9014,7 +9014,7 @@ paths:
       tags:
       - OpenResty
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: websites
           input_column: id
           input_value: websiteId
@@ -9045,7 +9045,7 @@ paths:
       tags:
       - Process
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - PID
         formatEN: 结束进程 [PID]
@@ -9072,7 +9072,7 @@ paths:
       tags:
       - Runtime
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         formatEN: Create runtime [name]
@@ -9118,7 +9118,7 @@ paths:
       tags:
       - Website
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - id
         formatEN: Delete website [name]
@@ -9165,7 +9165,7 @@ paths:
       tags:
       - Runtime
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - id
         formatEN: Operate runtime [name]
@@ -9212,7 +9212,7 @@ paths:
       tags:
       - Runtime
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         formatEN: Update runtime [name]
@@ -9239,7 +9239,7 @@ paths:
       tags:
       - Backup Account
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - type
         formatEN: create backup account [type]
@@ -9266,7 +9266,7 @@ paths:
       tags:
       - Backup Account
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - type
         - name
@@ -9295,7 +9295,7 @@ paths:
       tags:
       - Backup Account
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: backup_accounts
           input_column: id
           input_value: id
@@ -9343,7 +9343,7 @@ paths:
       tags:
       - Backup Account
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: backup_records
           input_column: id
           input_value: ids
@@ -9376,7 +9376,7 @@ paths:
       tags:
       - Backup Account
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - source
         - fileName
@@ -9424,7 +9424,7 @@ paths:
       tags:
       - Backup Account
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - type
         - name
@@ -9454,7 +9454,7 @@ paths:
       tags:
       - Backup Account
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - type
         - name
@@ -9546,7 +9546,7 @@ paths:
       tags:
       - Backup Account
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - type
         formatEN: update backup account [types]
@@ -9588,7 +9588,7 @@ paths:
       tags:
       - System Setting
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys: []
         formatEN: Clean system junk files
         formatZH: 清理系统垃圾文件
@@ -9614,7 +9614,7 @@ paths:
       tags:
       - System Setting
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys: []
         formatEN: reset an expired Password
         formatZH: 重置过期密码
@@ -9662,7 +9662,7 @@ paths:
       tags:
       - System Setting
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys: []
         formatEN: bind mfa
         formatZH: mfa 绑定
@@ -9679,7 +9679,7 @@ paths:
       tags:
       - System Setting
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys: []
         formatEN: clean monitor datas
         formatZH: 清空监控数据
@@ -9705,7 +9705,7 @@ paths:
       tags:
       - System Setting
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys: []
         formatEN: update system password
         formatZH: 修改系统密码
@@ -9731,7 +9731,7 @@ paths:
       tags:
       - System Setting
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - serverPort
         formatEN: update system port => [serverPort]
@@ -9749,7 +9749,7 @@ paths:
       tags:
       - System Setting
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys: []
         formatEN: scan System Junk Files
         formatZH: 扫描系统垃圾文件
@@ -9799,7 +9799,7 @@ paths:
       tags:
       - System Setting
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - from
         - description
@@ -9827,7 +9827,7 @@ paths:
       tags:
       - System Setting
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: snapshots
           input_column: id
           input_value: ids
@@ -9860,7 +9860,7 @@ paths:
       tags:
       - System Setting
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: snapshots
           input_column: id
           input_value: id
@@ -9894,7 +9894,7 @@ paths:
       tags:
       - System Setting
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - from
         - names
@@ -9922,7 +9922,7 @@ paths:
       tags:
       - System Setting
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: snapshots
           input_column: id
           input_value: id
@@ -9955,7 +9955,7 @@ paths:
       tags:
       - System Setting
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: snapshots
           input_column: id
           input_value: id
@@ -10054,7 +10054,7 @@ paths:
       tags:
       - System Setting
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - ssl
         formatEN: update system ssl => [ssl]
@@ -10094,7 +10094,7 @@ paths:
       tags:
       - System Setting
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - ntpSite
         formatEN: sync system time [ntpSite]
@@ -10121,7 +10121,7 @@ paths:
       tags:
       - System Setting
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - key
         - value
@@ -10168,7 +10168,7 @@ paths:
       tags:
       - System Setting
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - version
         formatEN: upgrade service => [version]
@@ -10195,7 +10195,7 @@ paths:
       tags:
       - Website
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - primaryDomain
         formatEN: Create website [primaryDomain]
@@ -10286,7 +10286,7 @@ paths:
       tags:
       - Website HTTPS
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: websites
           input_column: id
           input_value: websiteId
@@ -10321,7 +10321,7 @@ paths:
       tags:
       - Website Acme
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - email
         formatEN: Create website acme [email]
@@ -10348,7 +10348,7 @@ paths:
       tags:
       - Website Acme
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: website_acme_accounts
           input_column: id
           input_value: id
@@ -10489,7 +10489,7 @@ paths:
       tags:
       - Website Nginx
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: websites
           input_column: id
           input_value: websiteId
@@ -10522,7 +10522,7 @@ paths:
       tags:
       - Website
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: websites
           input_column: id
           input_value: id
@@ -10556,7 +10556,7 @@ paths:
       tags:
       - Website
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: websites
           input_column: id
           input_value: id
@@ -10609,7 +10609,7 @@ paths:
       tags:
       - Website
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: websites
           input_column: id
           input_value: id
@@ -10642,7 +10642,7 @@ paths:
       tags:
       - Website
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: websites
           input_column: id
           input_value: id
@@ -10675,7 +10675,7 @@ paths:
       tags:
       - Website DNS
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         formatEN: Create website dns [name]
@@ -10702,7 +10702,7 @@ paths:
       tags:
       - Website DNS
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: website_dns_accounts
           input_column: id
           input_value: id
@@ -10757,7 +10757,7 @@ paths:
       tags:
       - Website DNS
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - name
         formatEN: Update website dns [name]
@@ -10786,7 +10786,7 @@ paths:
       tags:
       - Website Domain
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - domain
         formatEN: Create domain [domain]
@@ -10836,7 +10836,7 @@ paths:
       tags:
       - Website Domain
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: website_domains
           input_column: id
           input_value: id
@@ -10926,7 +10926,7 @@ paths:
       tags:
       - Website
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: websites
           input_column: id
           input_value: id
@@ -10960,7 +10960,7 @@ paths:
       tags:
       - Website Nginx
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: websites
           input_column: id
           input_value: id
@@ -10993,7 +10993,7 @@ paths:
       tags:
       - Website
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: websites
           input_column: id
           input_value: id
@@ -11042,7 +11042,7 @@ paths:
       tags:
       - Website PHP
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: websites
           input_column: id
           input_value: id
@@ -11096,7 +11096,7 @@ paths:
       tags:
       - Website PHP
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: websites
           input_column: id
           input_value: websiteId
@@ -11129,7 +11129,7 @@ paths:
       tags:
       - Website PHP
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: websites
           input_column: id
           input_value: websiteId
@@ -11182,7 +11182,7 @@ paths:
       tags:
       - Website
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: websites
           input_column: id
           input_value: id
@@ -11215,7 +11215,7 @@ paths:
       tags:
       - Website
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: websites
           input_column: id
           input_value: websiteID
@@ -11268,7 +11268,7 @@ paths:
       tags:
       - Website
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: websites
           input_column: id
           input_value: websiteID
@@ -11301,7 +11301,7 @@ paths:
       tags:
       - Website
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: websites
           input_column: id
           input_value: websiteID
@@ -11354,7 +11354,7 @@ paths:
       tags:
       - Website
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: websites
           input_column: id
           input_value: websiteID
@@ -11411,7 +11411,7 @@ paths:
       tags:
       - Website SSL
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - primaryDomain
         formatEN: Create website ssl [primaryDomain]
@@ -11457,7 +11457,7 @@ paths:
       tags:
       - Website SSL
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: website_ssls
           input_column: id
           input_value: id
@@ -11490,7 +11490,7 @@ paths:
       tags:
       - Website SSL
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: website_ssls
           input_column: id
           input_value: SSLId
@@ -11567,7 +11567,7 @@ paths:
       tags:
       - Website SSL
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: website_ssls
           input_column: id
           input_value: id
@@ -11619,7 +11619,7 @@ paths:
       tags:
       - Website
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFunctions: []
         bodyKeys:
         - primaryDomain
         formatEN: Update website [primaryDomain]
@@ -11668,7 +11668,7 @@ paths:
       tags:
       - Website WAF
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: websites
           input_column: id
           input_value: websiteId
@@ -11701,7 +11701,7 @@ paths:
       tags:
       - Website WAF
       x-panel-log:
-        BeforeFuntions:
+        BeforeFunctions:
         - db: websites
           input_column: id
           input_value: websiteId

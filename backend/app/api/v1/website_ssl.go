@@ -52,7 +52,7 @@ func (b *BaseApi) PageWebsiteSSL(c *gin.Context) {
 // @Success 200 {object} request.WebsiteSSLCreate
 // @Security ApiKeyAuth
 // @Router /websites/ssl [post]
-// @x-panel-log {"bodyKeys":["primaryDomain"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建网站 ssl [primaryDomain]","formatEN":"Create website ssl [primaryDomain]"}
+// @x-panel-log {"bodyKeys":["primaryDomain"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建网站 ssl [primaryDomain]","formatEN":"Create website ssl [primaryDomain]"}
 func (b *BaseApi) CreateWebsiteSSL(c *gin.Context) {
 	var req request.WebsiteSSLCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -75,7 +75,7 @@ func (b *BaseApi) CreateWebsiteSSL(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /websites/ssl/renew [post]
-// @x-panel-log {"bodyKeys":["SSLId"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"SSLId","isList":false,"db":"website_ssls","output_column":"primary_domain","output_value":"domain"}],"formatZH":"重置 ssl [domain]","formatEN":"Renew ssl [domain]"}
+// @x-panel-log {"bodyKeys":["SSLId"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"SSLId","isList":false,"db":"website_ssls","output_column":"primary_domain","output_value":"domain"}],"formatZH":"重置 ssl [domain]","formatEN":"Renew ssl [domain]"}
 func (b *BaseApi) RenewWebsiteSSL(c *gin.Context) {
 	var req request.WebsiteSSLRenew
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -119,7 +119,7 @@ func (b *BaseApi) GetDNSResolve(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /websites/ssl/del [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"website_ssls","output_column":"primary_domain","output_value":"domain"}],"formatZH":"删除 ssl [domain]","formatEN":"Delete ssl [domain]"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"website_ssls","output_column":"primary_domain","output_value":"domain"}],"formatZH":"删除 ssl [domain]","formatEN":"Delete ssl [domain]"}
 func (b *BaseApi) DeleteWebsiteSSL(c *gin.Context) {
 	var req request.WebsiteResourceReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -185,7 +185,7 @@ func (b *BaseApi) GetWebsiteSSLById(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /websites/ssl/update [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"website_ssls","output_column":"primary_domain","output_value":"domain"}],"formatZH":"更新证书设置 [domain]","formatEN":"Update ssl config [domain]"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"website_ssls","output_column":"primary_domain","output_value":"domain"}],"formatZH":"更新证书设置 [domain]","formatEN":"Update ssl config [domain]"}
 func (b *BaseApi) UpdateWebsiteSSL(c *gin.Context) {
 	var req request.WebsiteSSLUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {

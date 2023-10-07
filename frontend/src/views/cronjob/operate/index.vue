@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+    <el-drawer v-model="drawerVisible" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
             <DrawerHeader
                 :header="title"
@@ -235,7 +235,7 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
                 <el-button type="primary" @click="onSubmit(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
@@ -269,7 +269,7 @@ interface DialogProps {
     getTableList?: () => Promise<any>;
 }
 const title = ref<string>('');
-const drawerVisiable = ref(false);
+const drawerVisible = ref(false);
 const dialogData = ref<DialogProps>({
     title: '',
 });
@@ -285,7 +285,7 @@ const acceptParams = (params: DialogProps): void => {
     if (dialogData.value?.rowData?.containerName) {
         dialogData.value.rowData.inContainer = true;
     }
-    drawerVisiable.value = true;
+    drawerVisible.value = true;
     checkMysqlInstalled();
     loadBackups();
     loadAppInstalls();
@@ -299,7 +299,7 @@ const goRouter = async (path: string) => {
 };
 
 const handleClose = () => {
-    drawerVisiable.value = false;
+    drawerVisible.value = false;
 };
 
 const localDirID = ref();
@@ -316,7 +316,7 @@ const mysqlInfo = reactive({
     dbs: [] as Array<Database.MysqlOption>,
 });
 
-const varifySpec = (rule: any, value: any, callback: any) => {
+const verifySpec = (rule: any, value: any, callback: any) => {
     switch (dialogData.value.rowData!.specType) {
         case 'perMonth':
         case 'perNDay':
@@ -400,8 +400,8 @@ const rules = reactive({
     type: [Rules.requiredSelect],
     specType: [Rules.requiredSelect],
     spec: [
-        { validator: varifySpec, trigger: 'blur', required: true },
-        { validator: varifySpec, trigger: 'change', required: true },
+        { validator: verifySpec, trigger: 'blur', required: true },
+        { validator: verifySpec, trigger: 'change', required: true },
     ],
     week: [Rules.requiredSelect, Rules.number],
     day: [Rules.number, checkNumberRange(1, 31)],
@@ -591,7 +591,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
 
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         emit('search');
-        drawerVisiable.value = false;
+        drawerVisible.value = false;
     });
 };
 

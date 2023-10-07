@@ -113,7 +113,7 @@
         </LayoutContent>
 
         <el-dialog
-            v-model="upgradeVisiable"
+            v-model="upgradeVisible"
             :title="$t('app.checkTitle')"
             width="30%"
             :close-on-click-modal="false"
@@ -126,7 +126,7 @@
             </el-alert>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="upgradeVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button @click="upgradeVisible = false">{{ $t('commons.button.cancel') }}</el-button>
                 </span>
             </template>
         </el-dialog>
@@ -168,7 +168,7 @@ const baseInfo = reactive({
 });
 const panelFormRef = ref<FormInstance>();
 const mysqlConf = ref();
-const upgradeVisiable = ref();
+const upgradeVisible = ref();
 
 const useOld = ref(false);
 
@@ -329,7 +329,7 @@ const loadMysqlConf = async () => {
             mysqlConf.value = res.data;
         })
         .catch(() => {
-            upgradeVisiable.value = true;
+            upgradeVisible.value = true;
             loading.value = false;
         });
 };

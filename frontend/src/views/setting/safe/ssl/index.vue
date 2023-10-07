@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-drawer
-            v-model="drawerVisiable"
+            v-model="drawerVisible"
             :destroy-on-close="true"
             @close="handleClose"
             :close-on-click-modal="false"
@@ -43,7 +43,7 @@
                             <el-form-item :label="$t('website.privateKey')" prop="key">
                                 <el-input v-model="form.key" :autosize="{ minRows: 5, maxRows: 10 }" type="textarea" />
                             </el-form-item>
-                            <el-form-item class="margintop" :label="$t('website.certificate')" prop="cert">
+                            <el-form-item class="marginTop" :label="$t('website.certificate')" prop="cert">
                                 <el-input v-model="form.cert" :autosize="{ minRows: 5, maxRows: 10 }" type="textarea" />
                             </el-form-item>
                         </div>
@@ -60,7 +60,7 @@
                                 </el-select>
                             </el-form-item>
                             <el-descriptions
-                                class="margintop"
+                                class="marginTop"
                                 :column="5"
                                 border
                                 direction="vertical"
@@ -91,7 +91,7 @@
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
                     <el-button :disabled="loading" type="primary" @click="onSaveSSL(formRef)">
                         {{ $t('commons.button.confirm') }}
                     </el-button>
@@ -116,7 +116,7 @@ import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 
 const loading = ref();
-const drawerVisiable = ref();
+const drawerVisible = ref();
 
 const form = reactive({
     ssl: 'enable',
@@ -160,7 +160,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     } else {
         loadSSLs();
     }
-    drawerVisiable.value = true;
+    drawerVisible.value = true;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -225,7 +225,7 @@ const onSaveSSL = async (formEl: FormInstance | undefined) => {
 
 const handleClose = () => {
     emit('search');
-    drawerVisiable.value = false;
+    drawerVisible.value = false;
 };
 
 defineExpose({
@@ -234,7 +234,7 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-.margintop {
+.marginTop {
     margin-top: 10px;
 }
 </style>

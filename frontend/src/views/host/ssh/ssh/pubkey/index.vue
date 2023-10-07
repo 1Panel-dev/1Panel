@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-drawer
-            v-model="drawerVisiable"
+            v-model="drawerVisible"
             :destroy-on-close="true"
             @close="handleClose"
             :close-on-click-modal="false"
@@ -42,10 +42,10 @@
                                 type="textarea"
                             />
                             <div v-if="form.primaryKey">
-                                <el-button icon="CopyDocument" class="margintop" @click="onCopy(form.primaryKey)">
+                                <el-button icon="CopyDocument" class="marginTop" @click="onCopy(form.primaryKey)">
                                     {{ $t('file.copy') }}
                                 </el-button>
-                                <el-button icon="Download" class="margintop" @click="onDownload">
+                                <el-button icon="Download" class="marginTop" @click="onDownload">
                                     {{ $t('commons.button.download') }}
                                 </el-button>
                             </div>
@@ -55,7 +55,7 @@
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
                     <el-button @click="onGenerate(formRef)" type="primary">
                         {{ $t('ssh.generate') }}
                     </el-button>
@@ -77,7 +77,7 @@ import { reactive, ref } from 'vue';
 const { toClipboard } = useClipboard();
 
 const loading = ref();
-const drawerVisiable = ref();
+const drawerVisible = ref();
 
 const formRef = ref();
 const form = reactive({
@@ -105,7 +105,7 @@ const acceptParams = async (): Promise<void> => {
     form.encryptionMode = 'rsa';
     form.primaryKey = '';
     onLoadSecret();
-    drawerVisiable.value = true;
+    drawerVisible.value = true;
 };
 
 const random = async () => {
@@ -122,7 +122,7 @@ const onCopy = async (str: string) => {
         await toClipboard(str);
         MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
     } catch (e) {
-        MsgError(i18n.global.t('commons.msg.copyfailed'));
+        MsgError(i18n.global.t('commons.msg.copyFailed'));
     }
 };
 
@@ -154,7 +154,7 @@ const onDownload = async () => {
 };
 
 const handleClose = () => {
-    drawerVisiable.value = false;
+    drawerVisible.value = false;
 };
 
 defineExpose({
@@ -163,7 +163,7 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-.margintop {
+.marginTop {
     margin-top: 10px;
 }
 </style>

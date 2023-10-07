@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="codeVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+    <el-drawer v-model="codeVisible" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
             <DrawerHeader :header="header" :back="handleClose" />
         </template>
@@ -20,7 +20,7 @@
         />
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="codeVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button @click="codeVisible = false">{{ $t('commons.button.cancel') }}</el-button>
             </span>
         </template>
     </el-drawer>
@@ -38,7 +38,7 @@ const mymirror = ref();
 const extensions = [javascript(), oneDark];
 const header = ref();
 const detailInfo = ref();
-const codeVisiable = ref(false);
+const codeVisible = ref(false);
 
 interface DialogProps {
     header: string;
@@ -48,11 +48,11 @@ interface DialogProps {
 const acceptParams = (props: DialogProps): void => {
     header.value = props.header;
     detailInfo.value = props.detailInfo;
-    codeVisiable.value = true;
+    codeVisible.value = true;
 };
 
 const handleClose = () => {
-    codeVisiable.value = false;
+    codeVisible.value = false;
 };
 
 defineExpose({

@@ -95,7 +95,7 @@
         </LayoutContent>
         <RecoverStatus ref="recoverStatusRef" @search="search()"></RecoverStatus>
         <SnapshotImport ref="importRef" @search="search()" />
-        <el-drawer v-model="drawerVisiable" size="50%">
+        <el-drawer v-model="drawerVisible" size="50%">
             <template #header>
                 <DrawerHeader :header="$t('setting.createSnapshot')" :back="handleClose" />
             </template>
@@ -130,7 +130,7 @@
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button :disabled="loading" @click="drawerVisiable = false">
+                    <el-button :disabled="loading" @click="drawerVisible = false">
                         {{ $t('commons.button.cancel') }}
                     </el-button>
                     <el-button :disabled="loading" type="primary" @click="submitAddSnapshot(snapRef)">
@@ -188,11 +188,11 @@ let snapInfo = reactive<Setting.SnapshotCreate>({
     description: '',
 });
 
-const drawerVisiable = ref<boolean>(false);
+const drawerVisible = ref<boolean>(false);
 
 const onCreate = async () => {
     restForm();
-    drawerVisiable.value = true;
+    drawerVisible.value = true;
 };
 
 const onImport = () => {
@@ -200,7 +200,7 @@ const onImport = () => {
 };
 
 const handleClose = () => {
-    drawerVisiable.value = false;
+    drawerVisible.value = false;
 };
 
 const onChange = async (info: any) => {
@@ -216,7 +216,7 @@ const submitAddSnapshot = (formEl: FormInstance | undefined) => {
         await snapshotCreate(snapInfo)
             .then(() => {
                 loading.value = false;
-                drawerVisiable.value = false;
+                drawerVisible.value = false;
                 search();
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             })

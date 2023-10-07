@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
+    <el-drawer v-model="drawerVisible" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
         <template #header>
             <DrawerHeader :header="$t('container.imageTag')" :resource="form.itemName" :back="handleClose" />
         </template>
@@ -30,7 +30,7 @@
 
         <template #footer>
             <span class="dialog-footer">
-                <el-button :disabeld="loading" @click="drawerVisiable = false">
+                <el-button :disabeld="loading" @click="drawerVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button :disabeld="loading" type="primary" @click="onSubmit(formRef)">
@@ -53,7 +53,7 @@ import { MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
 
-const drawerVisiable = ref(false);
+const drawerVisible = ref(false);
 const repos = ref();
 const form = reactive({
     itemName: '',
@@ -70,7 +70,7 @@ interface DialogProps {
 }
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
-    drawerVisiable.value = true;
+    drawerVisible.value = true;
     form.repoID = 1;
     form.itemName = params.itemName;
     form.sourceID = params.sourceID;
@@ -81,7 +81,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const handleClose = () => {
-    drawerVisiable.value = false;
+    drawerVisible.value = false;
 };
 
 type FormInstance = InstanceType<typeof ElForm>;
@@ -98,7 +98,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         await imageTag(form)
             .then(() => {
                 loading.value = false;
-                drawerVisiable.value = false;
+                drawerVisible.value = false;
                 emit('search');
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             })

@@ -62,7 +62,7 @@ func (b *BaseApi) LoadDaemonJson(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers/daemonjson/update [post]
-// @x-panel-log {"bodyKeys":["key", "value"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新 docker daemon.json 配置 [key]=>[value]","formatEN":"Updated the docker daemon.json configuration [key]=>[value]"}
+// @x-panel-log {"bodyKeys":["key", "value"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 docker daemon.json 配置 [key]=>[value]","formatEN":"Updated the docker daemon.json configuration [key]=>[value]"}
 func (b *BaseApi) UpdateDaemonJson(c *gin.Context) {
 	var req dto.SettingUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -86,7 +86,7 @@ func (b *BaseApi) UpdateDaemonJson(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers/daemonjson/update [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新 docker daemon.json 日志配置","formatEN":"Updated the docker daemon.json log option"}
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 docker daemon.json 日志配置","formatEN":"Updated the docker daemon.json log option"}
 func (b *BaseApi) UpdateLogOption(c *gin.Context) {
 	var req dto.LogOption
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -110,7 +110,7 @@ func (b *BaseApi) UpdateLogOption(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers/daemonjson/update/byfile [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新 docker daemon.json 配置","formatEN":"Updated the docker daemon.json configuration"}
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 docker daemon.json 配置","formatEN":"Updated the docker daemon.json configuration"}
 func (b *BaseApi) UpdateDaemonJsonByFile(c *gin.Context) {
 	var req dto.DaemonJsonUpdateByFile
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -138,7 +138,7 @@ func (b *BaseApi) UpdateDaemonJsonByFile(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers/docker/operate [post]
-// @x-panel-log {"bodyKeys":["operation"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"docker 服务 [operation]","formatEN":"[operation] docker service"}
+// @x-panel-log {"bodyKeys":["operation"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"docker 服务 [operation]","formatEN":"[operation] docker service"}
 func (b *BaseApi) OperateDocker(c *gin.Context) {
 	var req dto.DockerOperation
 	if err := c.ShouldBindJSON(&req); err != nil {

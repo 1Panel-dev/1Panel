@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="composeVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+    <el-drawer v-model="composeVisible" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
             <DrawerHeader :header="$t('commons.button.edit')" :resource="name" :back="handleClose" />
         </template>
@@ -20,7 +20,7 @@
         </div>
         <template #footer>
             <span class="dialog-footer">
-                <el-button :disabled="loading" @click="composeVisiable = false">
+                <el-button :disabled="loading" @click="composeVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button :disabled="loading" type="primary" @click="onSubmitEdit()">
@@ -41,7 +41,7 @@ import { MsgSuccess } from '@/utils/message';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const loading = ref(false);
-const composeVisiable = ref(false);
+const composeVisible = ref(false);
 const extensions = [javascript(), oneDark];
 const path = ref();
 const content = ref();
@@ -58,7 +58,7 @@ const onSubmitEdit = async () => {
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            composeVisiable.value = false;
+            composeVisible.value = false;
         })
         .catch(() => {
             loading.value = false;
@@ -72,13 +72,13 @@ interface DialogProps {
 }
 
 const acceptParams = (props: DialogProps): void => {
-    composeVisiable.value = true;
+    composeVisible.value = true;
     path.value = props.path;
     name.value = props.name;
     content.value = props.content;
 };
 const handleClose = () => {
-    composeVisiable.value = false;
+    composeVisible.value = false;
 };
 
 defineExpose({

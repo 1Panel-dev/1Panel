@@ -71,7 +71,7 @@ func (b *BaseApi) GetWebsiteOptions(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /websites [post]
-// @x-panel-log {"bodyKeys":["primaryDomain"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建网站 [primaryDomain]","formatEN":"Create website [primaryDomain]"}
+// @x-panel-log {"bodyKeys":["primaryDomain"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建网站 [primaryDomain]","formatEN":"Create website [primaryDomain]"}
 func (b *BaseApi) CreateWebsite(c *gin.Context) {
 	var req request.WebsiteCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -95,7 +95,7 @@ func (b *BaseApi) CreateWebsite(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /websites/operate [post]
-// @x-panel-log {"bodyKeys":["id", "operate"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"[operate] 网站 [domain]","formatEN":"[operate] website [domain]"}
+// @x-panel-log {"bodyKeys":["id", "operate"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"[operate] 网站 [domain]","formatEN":"[operate] website [domain]"}
 func (b *BaseApi) OpWebsite(c *gin.Context) {
 	var req request.WebsiteOp
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -118,7 +118,7 @@ func (b *BaseApi) OpWebsite(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /websites/del [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"删除网站 [domain]","formatEN":"Delete website [domain]"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"删除网站 [domain]","formatEN":"Delete website [domain]"}
 func (b *BaseApi) DeleteWebsite(c *gin.Context) {
 	var req request.WebsiteDelete
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -142,7 +142,7 @@ func (b *BaseApi) DeleteWebsite(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /websites/update [post]
-// @x-panel-log {"bodyKeys":["primaryDomain"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新网站 [primaryDomain]","formatEN":"Update website [primaryDomain]"}
+// @x-panel-log {"bodyKeys":["primaryDomain"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新网站 [primaryDomain]","formatEN":"Update website [primaryDomain]"}
 func (b *BaseApi) UpdateWebsite(c *gin.Context) {
 	var req request.WebsiteUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -232,7 +232,7 @@ func (b *BaseApi) GetWebDomains(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /websites/domains/del [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"website_domains","output_column":"domain","output_value":"domain"}],"formatZH":"删除域名 [domain]","formatEN":"Delete domain [domain]"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"website_domains","output_column":"domain","output_value":"domain"}],"formatZH":"删除域名 [domain]","formatEN":"Delete domain [domain]"}
 func (b *BaseApi) DeleteWebDomain(c *gin.Context) {
 	var req request.WebsiteDomainDelete
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -255,7 +255,7 @@ func (b *BaseApi) DeleteWebDomain(c *gin.Context) {
 // @Success 200 {object} model.WebsiteDomain
 // @Security ApiKeyAuth
 // @Router /websites/domains [post]
-// @x-panel-log {"bodyKeys":["domain"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建域名 [domain]","formatEN":"Create domain [domain]"}
+// @x-panel-log {"bodyKeys":["domain"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建域名 [domain]","formatEN":"Create domain [domain]"}
 func (b *BaseApi) CreateWebDomain(c *gin.Context) {
 	var req request.WebsiteDomainCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -300,7 +300,7 @@ func (b *BaseApi) GetNginxConfig(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /websites/config/update [post]
-// @x-panel-log {"bodyKeys":["websiteId"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"websiteId","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"nginx 配置修改 [domain]","formatEN":"Nginx conf update [domain]"}
+// @x-panel-log {"bodyKeys":["websiteId"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"websiteId","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"nginx 配置修改 [domain]","formatEN":"Nginx conf update [domain]"}
 func (b *BaseApi) UpdateNginxConfig(c *gin.Context) {
 	var req request.NginxConfigUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -344,7 +344,7 @@ func (b *BaseApi) GetHTTPSConfig(c *gin.Context) {
 // @Success 200 {object} response.WebsiteHTTPS
 // @Security ApiKeyAuth
 // @Router /websites/:id/https [post]
-// @x-panel-log {"bodyKeys":["websiteId"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"websiteId","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"更新网站 [domain] https 配置","formatEN":"Update website https [domain] conf"}
+// @x-panel-log {"bodyKeys":["websiteId"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"websiteId","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"更新网站 [domain] https 配置","formatEN":"Update website https [domain] conf"}
 func (b *BaseApi) UpdateHTTPSConfig(c *gin.Context) {
 	var req request.WebsiteHTTPSOp
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -414,7 +414,7 @@ func (b *BaseApi) GetWebsiteWafConfig(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /websites/waf/update [post]
-// @x-panel-log {"bodyKeys":["websiteId"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"websiteId","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"WAF 配置修改 [domain]","formatEN":"WAF conf update [domain]"}
+// @x-panel-log {"bodyKeys":["websiteId"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"websiteId","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"WAF 配置修改 [domain]","formatEN":"WAF conf update [domain]"}
 func (b *BaseApi) UpdateWebsiteWafConfig(c *gin.Context) {
 	var req request.WebsiteWafUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -436,7 +436,7 @@ func (b *BaseApi) UpdateWebsiteWafConfig(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /websites/waf/file/update [post]
-// @x-panel-log {"bodyKeys":["websiteId"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"websiteId","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"WAF 配置文件修改 [domain]","formatEN":"WAF conf file update [domain]"}
+// @x-panel-log {"bodyKeys":["websiteId"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"websiteId","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"WAF 配置文件修改 [domain]","formatEN":"WAF conf file update [domain]"}
 func (b *BaseApi) UpdateWebsiteWafFile(c *gin.Context) {
 	var req request.WebsiteWafFileUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -458,7 +458,7 @@ func (b *BaseApi) UpdateWebsiteWafFile(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /websites/nginx/update [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"[domain] Nginx 配置修改","formatEN":"[domain] Nginx conf update"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"[domain] Nginx 配置修改","formatEN":"[domain] Nginx conf update"}
 func (b *BaseApi) UpdateWebsiteNginxConfig(c *gin.Context) {
 	var req request.WebsiteNginxUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -480,7 +480,7 @@ func (b *BaseApi) UpdateWebsiteNginxConfig(c *gin.Context) {
 // @Success 200 {object} response.WebsiteLog
 // @Security ApiKeyAuth
 // @Router /websites/log [post]
-// @x-panel-log {"bodyKeys":["id", "operate"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"[domain][operate] 日志","formatEN":"[domain][operate] logs"}
+// @x-panel-log {"bodyKeys":["id", "operate"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"[domain][operate] 日志","formatEN":"[domain][operate] logs"}
 func (b *BaseApi) OpWebsiteLog(c *gin.Context) {
 	var req request.WebsiteLogReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -503,7 +503,7 @@ func (b *BaseApi) OpWebsiteLog(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /websites/default/server [post]
-// @x-panel-log {"bodyKeys":["id", "operate"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"修改默认 server => [domain]","formatEN":"Change default server => [domain]"}
+// @x-panel-log {"bodyKeys":["id", "operate"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"修改默认 server => [domain]","formatEN":"Change default server => [domain]"}
 func (b *BaseApi) ChangeDefaultServer(c *gin.Context) {
 	var req request.WebsiteDefaultUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -547,7 +547,7 @@ func (b *BaseApi) GetWebsitePHPConfig(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /websites/php/config [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"[domain] PHP 配置修改","formatEN":"[domain] PHP conf update"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"[domain] PHP 配置修改","formatEN":"[domain] PHP conf update"}
 func (b *BaseApi) UpdateWebsitePHPConfig(c *gin.Context) {
 	var req request.WebsitePHPConfigUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -569,7 +569,7 @@ func (b *BaseApi) UpdateWebsitePHPConfig(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /websites/php/update [post]
-// @x-panel-log {"bodyKeys":["websiteId"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"websiteId","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"php 配置修改 [domain]","formatEN":"Nginx conf update [domain]"}
+// @x-panel-log {"bodyKeys":["websiteId"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"websiteId","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"php 配置修改 [domain]","formatEN":"Nginx conf update [domain]"}
 func (b *BaseApi) UpdatePHPFile(c *gin.Context) {
 	var req request.WebsitePHPFileUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -591,7 +591,7 @@ func (b *BaseApi) UpdatePHPFile(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /websites/php/version [post]
-// @x-panel-log {"bodyKeys":["websiteId"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"websiteId","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"php 版本变更 [domain]","formatEN":"php version update [domain]"}
+// @x-panel-log {"bodyKeys":["websiteId"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"websiteId","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"php 版本变更 [domain]","formatEN":"php version update [domain]"}
 func (b *BaseApi) ChangePHPVersion(c *gin.Context) {
 	var req request.WebsitePHPVersionReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -635,7 +635,7 @@ func (b *BaseApi) GetRewriteConfig(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /websites/rewrite/update [post]
-// @x-panel-log {"bodyKeys":["websiteID"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"websiteID","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"伪静态配置修改 [domain]","formatEN":"Nginx conf rewrite update [domain]"}
+// @x-panel-log {"bodyKeys":["websiteID"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"websiteID","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"伪静态配置修改 [domain]","formatEN":"Nginx conf rewrite update [domain]"}
 func (b *BaseApi) UpdateRewriteConfig(c *gin.Context) {
 	var req request.NginxRewriteUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -657,7 +657,7 @@ func (b *BaseApi) UpdateRewriteConfig(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /websites/dir/update [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"更新网站 [domain] 目录","formatEN":"Update  domain [domain] dir"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"更新网站 [domain] 目录","formatEN":"Update  domain [domain] dir"}
 func (b *BaseApi) UpdateSiteDir(c *gin.Context) {
 	var req request.WebsiteUpdateDir
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -679,7 +679,7 @@ func (b *BaseApi) UpdateSiteDir(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /websites/dir/permission [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"更新网站 [domain] 目录权限","formatEN":"Update  domain [domain] dir permission"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"更新网站 [domain] 目录权限","formatEN":"Update  domain [domain] dir permission"}
 func (b *BaseApi) UpdateSiteDirPermission(c *gin.Context) {
 	var req request.WebsiteUpdateDirPermission
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -723,7 +723,7 @@ func (b *BaseApi) GetProxyConfig(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /websites/proxies/update [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"修改网站 [domain] 反向代理配置 ","formatEN":"Update domain [domain] proxy config"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"修改网站 [domain] 反向代理配置 ","formatEN":"Update domain [domain] proxy config"}
 func (b *BaseApi) UpdateProxyConfig(c *gin.Context) {
 	var req request.WebsiteProxyConfig
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -746,7 +746,7 @@ func (b *BaseApi) UpdateProxyConfig(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /websites/proxy/file [post]
-// @x-panel-log {"bodyKeys":["websiteID"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"websiteID","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"更新反向代理文件 [domain]","formatEN":"Nginx conf proxy file update [domain]"}
+// @x-panel-log {"bodyKeys":["websiteID"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"websiteID","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"更新反向代理文件 [domain]","formatEN":"Nginx conf proxy file update [domain]"}
 func (b *BaseApi) UpdateProxyConfigFile(c *gin.Context) {
 	var req request.NginxProxyUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -854,7 +854,7 @@ func (b *BaseApi) UpdateAntiLeech(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /websites/redirect/update [post]
-// @x-panel-log {"bodyKeys":["websiteID"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"websiteID","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"修改网站 [domain] 重定向理配置 ","formatEN":"Update domain [domain] redirect config"}
+// @x-panel-log {"bodyKeys":["websiteID"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"websiteID","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"修改网站 [domain] 重定向理配置 ","formatEN":"Update domain [domain] redirect config"}
 func (b *BaseApi) UpdateRedirectConfig(c *gin.Context) {
 	var req request.NginxRedirectReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -899,7 +899,7 @@ func (b *BaseApi) GetRedirectConfig(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /websites/redirect/file [post]
-// @x-panel-log {"bodyKeys":["websiteID"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"websiteID","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"更新重定向文件 [domain]","formatEN":"Nginx conf redirect file update [domain]"}
+// @x-panel-log {"bodyKeys":["websiteID"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"websiteID","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"更新重定向文件 [domain]","formatEN":"Nginx conf redirect file update [domain]"}
 func (b *BaseApi) UpdateRedirectConfigFile(c *gin.Context) {
 	var req request.NginxRedirectUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {

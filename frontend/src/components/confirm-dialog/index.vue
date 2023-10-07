@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="submitVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="20%">
+    <el-dialog v-model="submitVisible" :destroy-on-close="true" :close-on-click-modal="false" width="20%">
         <template #header>
             <div class="card-header">
                 <span>{{ header }}</span>
@@ -32,7 +32,7 @@ import { ref } from 'vue';
 const header = ref();
 const operationInfo = ref();
 const submitInputInfo = ref();
-const submitVisiable = ref(false);
+const submitVisible = ref(false);
 
 const submitInput = ref();
 
@@ -43,7 +43,7 @@ interface DialogProps {
 }
 
 const acceptParams = (props: DialogProps): void => {
-    submitVisiable.value = true;
+    submitVisible.value = true;
     header.value = props.header;
     operationInfo.value = props.operationInfo;
     submitInputInfo.value = props.submitInputInfo;
@@ -53,12 +53,12 @@ const emit = defineEmits(['confirm', 'cancel']);
 
 const onConfirm = async () => {
     emit('confirm');
-    submitVisiable.value = false;
+    submitVisible.value = false;
 };
 
 const onCancel = async () => {
     emit('cancel');
-    submitVisiable.value = false;
+    submitVisible.value = false;
 };
 
 defineExpose({

@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="createVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
+    <el-drawer v-model="createVisible" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
         <template #header>
             <DrawerHeader :header="$t('database.create')" :back="handleClose" />
         </template>
@@ -65,7 +65,7 @@
 
         <template #footer>
             <span class="dialog-footer">
-                <el-button :disabled="loading" @click="createVisiable = false">
+                <el-button :disabled="loading" @click="createVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
@@ -87,7 +87,7 @@ import { MsgSuccess } from '@/utils/message';
 import { checkIp, getRandomStr } from '@/utils/util';
 
 const loading = ref();
-const createVisiable = ref(false);
+const createVisible = ref(false);
 const form = reactive({
     name: '',
     from: 'local',
@@ -136,10 +136,10 @@ const acceptParams = (params: DialogProps): void => {
     form.permissionIPs = '';
     form.description = '';
     random();
-    createVisiable.value = true;
+    createVisible.value = true;
 };
 const handleClose = () => {
-    createVisiable.value = false;
+    createVisible.value = false;
 };
 
 const random = async () => {
@@ -160,7 +160,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                 loading.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 emit('search');
-                createVisiable.value = false;
+                createVisible.value = false;
             })
             .catch(() => {
                 if (form.permission != '%') {

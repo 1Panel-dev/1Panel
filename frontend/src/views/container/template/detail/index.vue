@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="detailVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+    <el-drawer v-model="detailVisible" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
             <div class="card-header">
                 <span>{{ $t('commons.button.view') }}</span>
@@ -21,7 +21,7 @@
         />
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="detailVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button @click="detailVisible = false">{{ $t('commons.button.cancel') }}</el-button>
             </span>
         </template>
     </el-drawer>
@@ -34,7 +34,7 @@ import { ref } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 const extensions = [javascript(), oneDark];
 
-const detailVisiable = ref(false);
+const detailVisible = ref(false);
 const detailInfo = ref();
 
 interface DialogProps {
@@ -42,7 +42,7 @@ interface DialogProps {
 }
 const acceptParams = (params: DialogProps): void => {
     detailInfo.value = params.content;
-    detailVisiable.value = true;
+    detailVisible.value = true;
 };
 
 defineExpose({

@@ -43,7 +43,7 @@ func (b *BaseApi) GetToolStatus(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /host/tool/create [post]
-// @x-panel-log {"bodyKeys":["type"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建 [type] 配置","formatEN":"create [type] config"}
+// @x-panel-log {"bodyKeys":["type"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建 [type] 配置","formatEN":"create [type] config"}
 func (b *BaseApi) InitToolConfig(c *gin.Context) {
 	var req request.HostToolCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -70,7 +70,7 @@ func (b *BaseApi) InitToolConfig(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /host/tool/operate [post]
-// @x-panel-log {"bodyKeys":["operate","type"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"[operate] [type] ","formatEN":"[operate] [type]"}
+// @x-panel-log {"bodyKeys":["operate","type"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"[operate] [type] ","formatEN":"[operate] [type]"}
 func (b *BaseApi) OperateTool(c *gin.Context) {
 	var req request.HostToolReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -98,7 +98,7 @@ func (b *BaseApi) OperateTool(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /host/tool/config [post]
-// @x-panel-log {"bodyKeys":["operate"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"[operate] 主机工具配置文件 ","formatEN":"[operate] tool config"}
+// @x-panel-log {"bodyKeys":["operate"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"[operate] 主机工具配置文件 ","formatEN":"[operate] tool config"}
 func (b *BaseApi) OperateToolConfig(c *gin.Context) {
 	var req request.HostToolConfig
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -153,7 +153,7 @@ func (b *BaseApi) GetToolLog(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /host/tool/supervisor/process [post]
-// @x-panel-log {"bodyKeys":["operate"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"[operate] 守护进程 ","formatEN":"[operate] process"}
+// @x-panel-log {"bodyKeys":["operate"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"[operate] 守护进程 ","formatEN":"[operate] process"}
 func (b *BaseApi) OperateProcess(c *gin.Context) {
 	var req request.SupervisorProcessConfig
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -197,7 +197,7 @@ func (b *BaseApi) GetProcess(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /host/tool/supervisor/process/file [post]
-// @x-panel-log {"bodyKeys":["operate"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"[operate] Supervisor 进程文件 ","formatEN":"[operate] Supervisor Process Config file"}
+// @x-panel-log {"bodyKeys":["operate"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"[operate] Supervisor 进程文件 ","formatEN":"[operate] Supervisor Process Config file"}
 func (b *BaseApi) GetProcessFile(c *gin.Context) {
 	var req request.SupervisorProcessFileReq
 	if err := c.ShouldBindJSON(&req); err != nil {

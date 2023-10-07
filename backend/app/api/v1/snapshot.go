@@ -16,7 +16,7 @@ import (
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /settings/snapshot [post]
-// @x-panel-log {"bodyKeys":["from", "description"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建系统快照 [description] 到 [from]","formatEN":"Create system backup [description] to [from]"}
+// @x-panel-log {"bodyKeys":["from", "description"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建系统快照 [description] 到 [from]","formatEN":"Create system backup [description] to [from]"}
 func (b *BaseApi) CreateSnapshot(c *gin.Context) {
 	var req dto.SnapshotCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -42,7 +42,7 @@ func (b *BaseApi) CreateSnapshot(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /settings/snapshot/import [post]
-// @x-panel-log {"bodyKeys":["from", "names"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"从 [from] 同步系统快照 [names]","formatEN":"Sync system snapshots [names] from [from]"}
+// @x-panel-log {"bodyKeys":["from", "names"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"从 [from] 同步系统快照 [names]","formatEN":"Sync system snapshots [names] from [from]"}
 func (b *BaseApi) ImportSnapshot(c *gin.Context) {
 	var req dto.SnapshotImport
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -94,7 +94,7 @@ func (b *BaseApi) LoadSnapShotStatus(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /settings/snapshot/description/update [post]
-// @x-panel-log {"bodyKeys":["id","description"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"snapshots","output_column":"name","output_value":"name"}],"formatZH":"快照 [name] 描述信息修改 [description]","formatEN":"The description of the snapshot [name] is modified => [description]"}
+// @x-panel-log {"bodyKeys":["id","description"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"snapshots","output_column":"name","output_value":"name"}],"formatZH":"快照 [name] 描述信息修改 [description]","formatEN":"The description of the snapshot [name] is modified => [description]"}
 func (b *BaseApi) UpdateSnapDescription(c *gin.Context) {
 	var req dto.UpdateDescription
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -145,7 +145,7 @@ func (b *BaseApi) SearchSnapshot(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /settings/snapshot/recover [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"snapshots","output_column":"name","output_value":"name"}],"formatZH":"从系统快照 [name] 恢复","formatEN":"Recover from system backup [name]"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"snapshots","output_column":"name","output_value":"name"}],"formatZH":"从系统快照 [name] 恢复","formatEN":"Recover from system backup [name]"}
 func (b *BaseApi) RecoverSnapshot(c *gin.Context) {
 	var req dto.SnapshotRecover
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -172,7 +172,7 @@ func (b *BaseApi) RecoverSnapshot(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /settings/snapshot/rollback [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"snapshots","output_column":"name","output_value":"name"}],"formatZH":"从系统快照 [name] 回滚","formatEN":"Rollback from system backup [name]"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"snapshots","output_column":"name","output_value":"name"}],"formatZH":"从系统快照 [name] 回滚","formatEN":"Rollback from system backup [name]"}
 func (b *BaseApi) RollbackSnapshot(c *gin.Context) {
 	var req dto.SnapshotRecover
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -199,7 +199,7 @@ func (b *BaseApi) RollbackSnapshot(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /settings/snapshot/del [post]
-// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"ids","isList":true,"db":"snapshots","output_column":"name","output_value":"name"}],"formatZH":"删除系统快照 [name]","formatEN":"Delete system backup [name]"}
+// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"ids","isList":true,"db":"snapshots","output_column":"name","output_value":"name"}],"formatZH":"删除系统快照 [name]","formatEN":"Delete system backup [name]"}
 func (b *BaseApi) DeleteSnapshot(c *gin.Context) {
 	var req dto.BatchDeleteReq
 	if err := c.ShouldBindJSON(&req); err != nil {

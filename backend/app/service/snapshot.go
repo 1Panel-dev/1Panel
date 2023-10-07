@@ -139,7 +139,7 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
 }
 
 func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
-	global.LOG.Info("start to recvover panel by snapshot now")
+	global.LOG.Info("start to recover panel by snapshot now")
 	snap, err := snapshotRepo.Get(commonRepo.WithByID(req.ID))
 	if err != nil {
 		return err

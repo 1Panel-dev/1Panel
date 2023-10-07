@@ -90,8 +90,8 @@ func OperationLog() gin.HandlerFunc {
 				}
 			}
 		}
-		if len(operationDic.BeforeFuntions) != 0 {
-			for _, funcs := range operationDic.BeforeFuntions {
+		if len(operationDic.BeforeFunctions) != 0 {
+			for _, funcs := range operationDic.BeforeFunctions {
 				for key, value := range formatMap {
 					if funcs.InputValue == key {
 						var names []string
@@ -109,9 +109,9 @@ func OperationLog() gin.HandlerFunc {
 		}
 		for key, value := range formatMap {
 			if strings.Contains(operationDic.FormatEN, "["+key+"]") {
-				if arrys, ok := value.([]string); ok {
-					operationDic.FormatZH = strings.ReplaceAll(operationDic.FormatZH, "["+key+"]", fmt.Sprintf("[%v]", strings.Join(arrys, ",")))
-					operationDic.FormatEN = strings.ReplaceAll(operationDic.FormatEN, "["+key+"]", fmt.Sprintf("[%v]", strings.Join(arrys, ",")))
+				if arrays, ok := value.([]string); ok {
+					operationDic.FormatZH = strings.ReplaceAll(operationDic.FormatZH, "["+key+"]", fmt.Sprintf("[%v]", strings.Join(arrays, ",")))
+					operationDic.FormatEN = strings.ReplaceAll(operationDic.FormatEN, "["+key+"]", fmt.Sprintf("[%v]", strings.Join(arrays, ",")))
 				} else {
 					operationDic.FormatZH = strings.ReplaceAll(operationDic.FormatZH, "["+key+"]", fmt.Sprintf("[%v]", value))
 					operationDic.FormatEN = strings.ReplaceAll(operationDic.FormatEN, "["+key+"]", fmt.Sprintf("[%v]", value))
@@ -171,13 +171,13 @@ type swaggerJson struct {
 }
 
 type operationJson struct {
-	API            string         `json:"api"`
-	Method         string         `json:"method"`
-	BodyKeys       []string       `json:"bodyKeys"`
-	ParamKeys      []string       `json:"paramKeys"`
-	BeforeFuntions []functionInfo `json:"beforeFuntions"`
-	FormatZH       string         `json:"formatZH"`
-	FormatEN       string         `json:"formatEN"`
+	API             string         `json:"api"`
+	Method          string         `json:"method"`
+	BodyKeys        []string       `json:"bodyKeys"`
+	ParamKeys       []string       `json:"paramKeys"`
+	BeforeFunctions []functionInfo `json:"beforeFunctions"`
+	FormatZH        string         `json:"formatZH"`
+	FormatEN        string         `json:"formatEN"`
 }
 type functionInfo struct {
 	InputColumn  string `json:"input_column"`
@@ -208,9 +208,9 @@ func loadLogInfo(path string) string {
 	if !strings.Contains(path, "/") {
 		return ""
 	}
-	pathArrys := strings.Split(path, "/")
-	if len(pathArrys) < 2 {
+	pathArrays := strings.Split(path, "/")
+	if len(pathArrays) < 2 {
 		return ""
 	}
-	return pathArrys[1]
+	return pathArrays[1]
 }

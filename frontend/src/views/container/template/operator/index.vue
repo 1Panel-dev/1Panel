@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+    <el-drawer v-model="drawerVisible" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
             <DrawerHeader
                 :header="title + $t('container.composeTemplate')"
@@ -47,7 +47,7 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button :disabled="loading" @click="drawerVisiable = false">
+                <el-button :disabled="loading" @click="drawerVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
@@ -80,19 +80,19 @@ interface DialogProps {
 }
 const extensions = [javascript(), oneDark];
 const title = ref<string>('');
-const drawerVisiable = ref(false);
+const drawerVisible = ref(false);
 const dialogData = ref<DialogProps>({
     title: '',
 });
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
-    drawerVisiable.value = true;
+    drawerVisible.value = true;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const handleClose = () => {
-    drawerVisiable.value = false;
+    drawerVisible.value = false;
 };
 
 const rules = reactive({
@@ -114,7 +114,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                     loading.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                     emit('search');
-                    drawerVisiable.value = false;
+                    drawerVisible.value = false;
                 })
                 .catch(() => {
                     loading.value = false;
@@ -126,7 +126,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                 loading.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 emit('search');
-                drawerVisiable.value = false;
+                drawerVisible.value = false;
             })
             .catch(() => {
                 loading.value = false;

@@ -70,7 +70,7 @@ func (b *BaseApi) LoadPersistenceConf(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /databases/redis/conf/update [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新 redis 数据库配置信息","formatEN":"update the redis database configuration information"}
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 redis 数据库配置信息","formatEN":"update the redis database configuration information"}
 func (b *BaseApi) UpdateRedisConf(c *gin.Context) {
 	var req dto.RedisConfUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -96,7 +96,7 @@ func (b *BaseApi) UpdateRedisConf(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /databases/redis/password [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"修改 redis 数据库密码","formatEN":"change the password of the redis database"}
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改 redis 数据库密码","formatEN":"change the password of the redis database"}
 func (b *BaseApi) ChangeRedisPassword(c *gin.Context) {
 	var req dto.ChangeRedisPass
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -131,7 +131,7 @@ func (b *BaseApi) ChangeRedisPassword(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /databases/redis/persistence/update [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"redis 数据库持久化配置更新","formatEN":"redis database persistence configuration update"}
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"redis 数据库持久化配置更新","formatEN":"redis database persistence configuration update"}
 func (b *BaseApi) UpdateRedisPersistenceConf(c *gin.Context) {
 	var req dto.RedisConfPersistenceUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -184,7 +184,7 @@ func (b *BaseApi) RedisBackupList(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /databases/redis/conffile/update [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新 redis 数据库配置信息","formatEN":"update the redis database configuration information"}
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 redis 数据库配置信息","formatEN":"update the redis database configuration information"}
 func (b *BaseApi) UpdateRedisConfByFile(c *gin.Context) {
 	var req dto.RedisConfUpdateByFile
 	if err := c.ShouldBindJSON(&req); err != nil {

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
+        <el-drawer v-model="drawerVisible" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
             <template #header>
                 <DrawerHeader :header="$t('container.registries')" :back="handleClose" />
             </template>
@@ -27,7 +27,7 @@
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
                     <el-button :disabled="loading" type="primary" @click="onSave">
                         {{ $t('commons.button.confirm') }}
                     </el-button>
@@ -54,7 +54,7 @@ const confirmDialogRef = ref();
 interface DialogProps {
     registries: string;
 }
-const drawerVisiable = ref();
+const drawerVisible = ref();
 const loading = ref();
 
 const form = reactive({
@@ -80,7 +80,7 @@ function checkRegistries(rule: any, value: any, callback: any) {
 
 const acceptParams = (params: DialogProps): void => {
     form.registries = params.registries || params.registries.replaceAll(',', '\n');
-    drawerVisiable.value = true;
+    drawerVisible.value = true;
 };
 
 const onSave = async () => {
@@ -107,7 +107,7 @@ const onSubmit = async () => {
 };
 
 const handleClose = () => {
-    drawerVisiable.value = false;
+    drawerVisible.value = false;
 };
 
 defineExpose({

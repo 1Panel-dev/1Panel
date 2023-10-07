@@ -1,6 +1,6 @@
 <template>
     <el-drawer
-        v-model="drawerVisiable"
+        v-model="drawerVisible"
         @close="handleClose"
         :destroy-on-close="true"
         :close-on-click-modal="false"
@@ -101,7 +101,7 @@
         </div>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="drawerVisiable = false">
+                <el-button @click="drawerVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button type="primary" :disabled="onCreating" @click="onSubmit(formRef)">
@@ -140,7 +140,7 @@ const handleReady = (payload) => {
 };
 const logInfo = ref();
 
-const drawerVisiable = ref(false);
+const drawerVisible = ref(false);
 const templateOptions = ref();
 
 const baseDir = ref();
@@ -168,7 +168,7 @@ const loadTemplates = async () => {
 
 const acceptParams = (): void => {
     mode.value = 'edit';
-    drawerVisiable.value = true;
+    drawerVisible.value = true;
     form.name = '';
     form.from = 'edit';
     form.path = '';
@@ -218,7 +218,7 @@ const handleClose = () => {
     emit('search');
     clearInterval(Number(timer));
     timer = null;
-    drawerVisiable.value = false;
+    drawerVisible.value = false;
 };
 
 const loadPath = async () => {

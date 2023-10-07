@@ -5,7 +5,7 @@
         <div v-loading="loading">
             <FireStatus
                 v-show="fireName !== '-'"
-                ref="fireStatuRef"
+                ref="fireStatusRef"
                 @search="search"
                 v-model:loading="loading"
                 v-model:mask-show="maskShow"
@@ -176,14 +176,14 @@
             </div>
         </div>
 
-        <OperatrDialog @search="search" ref="dialogRef" />
+        <OperateDialog @search="search" ref="dialogRef" />
     </div>
 </template>
 
 <script lang="ts" setup>
 import FireRouter from '@/views/host/firewall/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
-import OperatrDialog from '@/views/host/firewall/port/operate/index.vue';
+import OperateDialog from '@/views/host/firewall/port/operate/index.vue';
 import FireStatus from '@/views/host/firewall/status/index.vue';
 import { onMounted, reactive, ref } from 'vue';
 import { batchOperateRule, searchFireRule, updateFirewallDescription, updatePortRule } from '@/api/modules/host';
@@ -203,7 +203,7 @@ const searchStrategy = ref('');
 const maskShow = ref(true);
 const fireStatus = ref('running');
 const fireName = ref();
-const fireStatuRef = ref();
+const fireStatusRef = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -373,7 +373,7 @@ const buttons = [
 onMounted(() => {
     if (fireName.value !== '-') {
         loading.value = true;
-        fireStatuRef.value.acceptParams();
+        fireStatusRef.value.acceptParams();
     }
 });
 </script>

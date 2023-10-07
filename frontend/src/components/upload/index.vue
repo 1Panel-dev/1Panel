@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-drawer v-model="upVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+        <el-drawer v-model="upVisible" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
             <template #header>
                 <DrawerHeader :header="$t('commons.button.import')" :resource="title" :back="handleClose" />
             </template>
@@ -106,7 +106,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 
-const upVisiable = ref(false);
+const upVisible = ref(false);
 const type = ref();
 const name = ref();
 const detailName = ref();
@@ -133,7 +133,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     } else {
         baseDir.value = `${pathRes.data}/uploads/${dir}/${name.value}/`;
     }
-    upVisiable.value = true;
+    upVisible.value = true;
     search();
 };
 
@@ -192,7 +192,7 @@ const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
 const handleClose = () => {
     uploaderFiles.value = [];
     uploadRef.value!.clearFiles();
-    upVisiable.value = false;
+    upVisible.value = false;
 };
 
 const onSubmit = async () => {

@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="loadVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
+    <el-drawer v-model="loadVisible" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
         <template #header>
             <DrawerHeader :header="$t('container.importImage')" :back="handleClose" />
         </template>
@@ -18,7 +18,7 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button :disabeld="loading" @click="loadVisiable = false">
+                <el-button :disabeld="loading" @click="loadVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button :disabeld="loading" type="primary" @click="onSubmit(formRef)">
@@ -41,17 +41,17 @@ import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const loading = ref(false);
 
-const loadVisiable = ref(false);
+const loadVisible = ref(false);
 const form = reactive({
     path: '',
 });
 
 const acceptParams = () => {
-    loadVisiable.value = true;
+    loadVisible.value = true;
     form.path = '';
 };
 const handleClose = () => {
-    loadVisiable.value = false;
+    loadVisible.value = false;
 };
 
 const emit = defineEmits<{ (e: 'search'): void }>();
@@ -67,7 +67,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         await imageLoad(form)
             .then(() => {
                 loading.value = false;
-                loadVisiable.value = false;
+                loadVisible.value = false;
                 emit('search');
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             })

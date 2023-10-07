@@ -163,7 +163,7 @@
         </LayoutContent>
 
         <el-dialog
-            v-model="iptablesVisiable"
+            v-model="iptablesVisible"
             :title="$t('container.iptablesDisable')"
             width="30%"
             :destroy-on-close="true"
@@ -186,7 +186,7 @@
                 <span class="dialog-footer">
                     <el-button
                         @click="
-                            iptablesVisiable = false;
+                            iptablesVisible = false;
                             search();
                         "
                     >
@@ -275,7 +275,7 @@ const formRef = ref<FormInstance>();
 const dockerConf = ref();
 const confirmDialogRefFile = ref();
 
-const iptablesVisiable = ref();
+const iptablesVisible = ref();
 
 const onSaveFile = async () => {
     let params = {
@@ -318,12 +318,12 @@ const handleIptables = () => {
         confirmDialogRefIptable.value!.acceptParams(params);
         return;
     } else {
-        iptablesVisiable.value = true;
+        iptablesVisible.value = true;
     }
 };
 const onSubmitCloseIPtable = () => {
     save('IPtables', 'disable');
-    iptablesVisiable.value = false;
+    iptablesVisible.value = false;
 };
 const onSubmitOpenIPtable = () => {
     save('IPtables', 'enable');

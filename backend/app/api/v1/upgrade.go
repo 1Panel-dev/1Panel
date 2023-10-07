@@ -52,7 +52,7 @@ func (b *BaseApi) GetNotesByVersion(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /settings/upgrade [post]
-// @x-panel-log {"bodyKeys":["version"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新系统 => [version]","formatEN":"upgrade service => [version]"}
+// @x-panel-log {"bodyKeys":["version"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新系统 => [version]","formatEN":"upgrade service => [version]"}
 func (b *BaseApi) Upgrade(c *gin.Context) {
 	var req dto.Upgrade
 	if err := c.ShouldBindJSON(&req); err != nil {

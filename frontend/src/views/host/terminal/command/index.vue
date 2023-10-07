@@ -37,7 +37,7 @@
                 </ComplexTable>
             </template>
         </LayoutContent>
-        <el-drawer v-model="cmdVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
+        <el-drawer v-model="cmdVisible" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
             <template #header>
                 <DrawerHeader
                     :header="$t('commons.button.' + operate) + $t('terminal.quickCommand')"
@@ -65,7 +65,7 @@
             </el-row>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="cmdVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button @click="cmdVisible = false">{{ $t('commons.button.cancel') }}</el-button>
                     <el-button type="primary" @click="submitAddCommand(commandInfoRef)">
                         {{ $t('commons.button.confirm') }}
                     </el-button>
@@ -115,18 +115,18 @@ let commandInfo = reactive<Command.CommandOperate>({
     command: '',
 });
 
-const cmdVisiable = ref<boolean>(false);
+const cmdVisible = ref<boolean>(false);
 
 const onCreate = async () => {
     commandInfo.id = 0;
     commandInfo.name = '';
     commandInfo.command = '';
     operate.value = 'create';
-    cmdVisiable.value = true;
+    cmdVisible.value = true;
 };
 
 const handleClose = () => {
-    cmdVisiable.value = false;
+    cmdVisible.value = false;
 };
 
 const submitAddCommand = (formEl: FormInstance | undefined) => {
@@ -138,7 +138,7 @@ const submitAddCommand = (formEl: FormInstance | undefined) => {
         } else {
             await editCommand(commandInfo);
         }
-        cmdVisiable.value = false;
+        cmdVisible.value = false;
         search();
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     });
@@ -150,7 +150,7 @@ const onEdit = async (row: Command.CommandInfo | null) => {
         commandInfo.name = row.name;
         commandInfo.command = row.command;
         operate.value = 'edit';
-        cmdVisiable.value = true;
+        cmdVisible.value = true;
     }
 };
 

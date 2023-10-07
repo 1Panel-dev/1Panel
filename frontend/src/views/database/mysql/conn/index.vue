@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="dialogVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
+    <el-drawer v-model="dialogVisible" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
         <template #header>
             <DrawerHeader :header="$t('database.databaseConnInfo')" :back="handleClose" />
         </template>
@@ -81,7 +81,7 @@
 
         <template #footer>
             <span class="dialog-footer">
-                <el-button :disabled="loading" @click="dialogVisiable = false">
+                <el-button :disabled="loading" @click="dialogVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
@@ -109,7 +109,7 @@ const { toClipboard } = useClipboard();
 
 const loading = ref(false);
 
-const dialogVisiable = ref(false);
+const dialogVisible = ref(false);
 const form = reactive({
     systemIP: '',
     password: '',
@@ -143,7 +143,7 @@ const acceptParams = (param: DialogProps): void => {
     form.database = param.database;
     loadAccess();
     loadPassword();
-    dialogVisiable.value = true;
+    dialogVisible.value = true;
 };
 
 function loadConnInfo(isLocal: boolean) {
@@ -161,12 +161,12 @@ const onCopy = async (value: string) => {
         await toClipboard(value);
         MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
     } catch (e) {
-        MsgError(i18n.global.t('commons.msg.copyfailed'));
+        MsgError(i18n.global.t('commons.msg.copyFailed'));
     }
 };
 
 const handleClose = () => {
-    dialogVisiable.value = false;
+    dialogVisible.value = false;
 };
 
 const loadAccess = async () => {
@@ -211,7 +211,7 @@ const onSubmit = async () => {
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            dialogVisiable.value = false;
+            dialogVisible.value = false;
         })
         .catch(() => {
             loading.value = false;
@@ -244,7 +244,7 @@ const onSubmitAccess = async () => {
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            dialogVisiable.value = false;
+            dialogVisible.value = false;
         })
         .catch(() => {
             loading.value = false;

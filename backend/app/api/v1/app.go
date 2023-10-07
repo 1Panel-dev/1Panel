@@ -37,7 +37,7 @@ func (b *BaseApi) SearchApp(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /apps/sync [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"应用商店同步","formatEN":"App store synchronization"}
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"应用商店同步","formatEN":"App store synchronization"}
 func (b *BaseApi) SyncApp(c *gin.Context) {
 	go appService.SyncAppListFromLocal()
 	res, err := appService.GetAppUpdate()
@@ -154,7 +154,7 @@ func (b *BaseApi) GetIgnoredApp(c *gin.Context) {
 // @Success 200 {object} model.AppInstall
 // @Security ApiKeyAuth
 // @Router /apps/install [post]
-// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFuntions":[{"input_column":"name","input_value":"name","isList":false,"db":"app_installs","output_column":"app_id","output_value":"appId"},{"info":"appId","isList":false,"db":"apps","output_column":"key","output_value":"appKey"}],"formatZH":"安装应用 [appKey]-[name]","formatEN":"Install app [appKey]-[name]"}
+// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[{"input_column":"name","input_value":"name","isList":false,"db":"app_installs","output_column":"app_id","output_value":"appId"},{"info":"appId","isList":false,"db":"apps","output_column":"key","output_value":"appKey"}],"formatZH":"安装应用 [appKey]-[name]","formatEN":"Install app [appKey]-[name]"}
 func (b *BaseApi) InstallApp(c *gin.Context) {
 	var req request.AppInstallCreate
 	if err := c.ShouldBindJSON(&req); err != nil {

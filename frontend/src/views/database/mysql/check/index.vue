@@ -33,13 +33,13 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 const router = useRouter();
 
-interface InstallRrops {
+interface InstallProps {
     items: Array<string>;
 }
 const installData = ref();
 let open = ref(false);
 
-const acceptParams = (props: InstallRrops) => {
+const acceptParams = (props: InstallProps) => {
     installData.value = props.items;
     open.value = true;
 };

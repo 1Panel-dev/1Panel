@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-drawer
-            v-model="drawerVisiable"
+            v-model="drawerVisible"
             :destroy-on-close="true"
             :close-on-click-modal="false"
             @close="handleClose"
@@ -102,7 +102,7 @@ const { toClipboard } = useClipboard();
 
 const loading = ref();
 const qrImage = ref();
-const drawerVisiable = ref();
+const drawerVisible = ref();
 const formRef = ref();
 
 const form = reactive({
@@ -124,7 +124,7 @@ const emit = defineEmits<{ (e: 'search'): void }>();
 const acceptParams = (params: DialogProps): void => {
     form.interval = params.interval;
     loadMfaCode();
-    drawerVisiable.value = true;
+    drawerVisible.value = true;
 };
 
 const onCopy = async () => {
@@ -132,7 +132,7 @@ const onCopy = async () => {
         await toClipboard(form.secret);
         MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
     } catch (e) {
-        MsgError(i18n.global.t('commons.msg.copyfailed'));
+        MsgError(i18n.global.t('commons.msg.copyFailed'));
     }
 };
 
@@ -175,7 +175,7 @@ const onBind = async (formEl: FormInstance | undefined) => {
         await bindMFA(param)
             .then(() => {
                 loading.value = false;
-                drawerVisiable.value = false;
+                drawerVisible.value = false;
                 emit('search');
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             })
@@ -187,7 +187,7 @@ const onBind = async (formEl: FormInstance | undefined) => {
 
 const handleClose = () => {
     emit('search');
-    drawerVisiable.value = false;
+    drawerVisible.value = false;
 };
 
 defineExpose({

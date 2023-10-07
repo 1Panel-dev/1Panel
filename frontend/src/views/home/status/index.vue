@@ -172,7 +172,7 @@ const baseInfo = ref<Dashboard.BaseInfo>({
     websiteNumber: 0,
     databaseNumber: 0,
     cronjobNumber: 0,
-    appInstalldNumber: 0,
+    appInstalledNumber: 0,
 
     hostname: '',
     os: '',
