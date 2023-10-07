@@ -9,14 +9,14 @@
             <el-form-item>
                 <el-checkbox v-model="deleteFile" :label="$t('container.deleteFile')" />
                 <span class="input-help">
-                    {{ $t('container.deleteComposeHelper') }}
+                    {{ $t('container.deleteComposeHelper', [loadComposeDir()]) }}
                 </span>
             </el-form-item>
             <el-form-item>
-                <div>
-                    <span style="font-size: 12px">{{ $t('database.delete') }}</span>
-                    <span style="font-size: 12px; color: red; font-weight: 500">{{ composeName }}</span>
-                    <span style="font-size: 12px">{{ $t('container.deleteCompose') }}</span>
+                <div class="font">
+                    <span>{{ $t('database.delete') }}</span>
+                    <span class="warning">{{ composeName }}</span>
+                    <span>{{ $t('container.deleteCompose') }}</span>
                 </div>
                 <el-input v-model="deleteInfo" :placeholder="composeName"></el-input>
             </el-form-item>
@@ -64,6 +64,15 @@ const acceptParams = async (prop: DialogProps) => {
     dialogVisiable.value = true;
 };
 
+const loadComposeDir = () => {
+    const parts = composePath.value.split('/');
+    if (parts.length <= 2) {
+        return '/';
+    }
+    const parentDirectory = parts.slice(0, -1).join('/');
+    return parentDirectory;
+};
+
 const submit = async () => {
     loading.value = true;
     let params = {
@@ -88,3 +97,13 @@ defineExpose({
     acceptParams,
 });
 </script>
+
+<style lang="scss" scoped>
+.font {
+    font-size: 12px;
+    .warning {
+        color: red;
+        font-weight: 500;
+    }
+}
+</style>
