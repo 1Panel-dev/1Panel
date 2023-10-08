@@ -3,7 +3,7 @@
         <el-col :xs="24" :sm="18" :md="8" :lg="8" :xl="8">
             <el-form ref="websiteForm" label-position="right" label-width="150px" :model="form" :rules="rules">
                 <el-form-item :label="$t('website.primaryDomain')" prop="primaryDomain">
-                    <el-input v-model="form.primaryDomain" disabled></el-input>
+                    <el-input v-model="form.primaryDomain"></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('website.group')" prop="webSiteGroupID">
                     <el-select v-model="form.webSiteGroupId">
