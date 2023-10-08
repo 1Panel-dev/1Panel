@@ -84,25 +84,30 @@
             </template>
         </LayoutContent>
 
+        <AppResources ref="checkRef"></AppResources>
         <OperateDialog ref="dialogRef" @search="search" />
+        <DeleteDialog ref="deleteRef" @search="search" />
     </div>
 </template>
 
 <script lang="ts" setup>
 import { dateFormat } from '@/utils/util';
 import { onMounted, reactive, ref } from 'vue';
-import { deleteDatabase, searchDatabases } from '@/api/modules/database';
+import { deleteCheckDatabase, searchDatabases } from '@/api/modules/database';
+import AppResources from '@/views/database/mysql/check/index.vue';
 import OperateDialog from '@/views/database/mysql/remote/operate/index.vue';
+import DeleteDialog from '@/views/database/mysql/remote/delete/index.vue';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import useClipboard from 'vue-clipboard3';
 import { Database } from '@/api/interface/database';
-import { useDeleteData } from '@/hooks/use-delete-data';
+import useClipboard from 'vue-clipboard3';
 const { toClipboard } = useClipboard();
 
 const loading = ref(false);
 
 const dialogRef = ref();
+const checkRef = ref();
+const deleteRef = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -161,8 +166,15 @@ const onCopy = async (row: any) => {
 };
 
 const onDelete = async (row: Database.DatabaseInfo) => {
-    await useDeleteData(deleteDatabase, row.id, 'commons.msg.delete');
-    search();
+    const res = await deleteCheckDatabase(row.id);
+    if (res.data && res.data.length > 0) {
+        checkRef.value.acceptParams({ items: res.data });
+    } else {
+        deleteRef.value.acceptParams({
+            id: row.id,
+            database: row.name,
+        });
+    }
 };
 
 const buttons = [

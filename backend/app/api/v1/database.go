@@ -126,15 +126,14 @@ func (b *BaseApi) GetDatabase(c *gin.Context) {
 }
 
 // @Tags Database
-// @Summary Delete database
-// @Description 删除远程数据库
+// @Summary Check before delete remote database
+// @Description Mysql 远程数据库删除前检查
 // @Accept json
 // @Param request body dto.OperateByID true "request"
-// @Success 200
+// @Success 200 {array} string
 // @Security ApiKeyAuth
-// @Router /databases/db/del [post]
-// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"ids","isList":true,"db":"databases","output_column":"name","output_value":"names"}],"formatZH":"删除远程数据库 [names]","formatEN":"delete database [names]"}
-func (b *BaseApi) DeleteDatabase(c *gin.Context) {
+// @Router /db/remote/del/check [post]
+func (b *BaseApi) DeleteCheckDatabase(c *gin.Context) {
 	var req dto.OperateByID
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
@@ -145,7 +144,35 @@ func (b *BaseApi) DeleteDatabase(c *gin.Context) {
 		return
 	}
 
-	if err := databaseService.Delete(req.ID); err != nil {
+	apps, err := databaseService.DeleteCheck(req.ID)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, apps)
+}
+
+// @Tags Database
+// @Summary Delete database
+// @Description 删除远程数据库
+// @Accept json
+// @Param request body dto.DatabaseDelete true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /databases/db/del [post]
+// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"ids","isList":true,"db":"databases","output_column":"name","output_value":"names"}],"formatZH":"删除远程数据库 [names]","formatEN":"delete database [names]"}
+func (b *BaseApi) DeleteDatabase(c *gin.Context) {
+	var req dto.DatabaseDelete
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	if err := databaseService.Delete(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

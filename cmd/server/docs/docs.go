@@ -4068,7 +4068,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.OperateByID"
+                            "$ref": "#/definitions/dto.DatabaseDelete"
                         }
                     }
                 ],
@@ -4886,6 +4886,45 @@ const docTemplate = `{
                     "formatEN": "adjust mysql database performance parameters",
                     "formatZH": "调整 mysql 数据库性能参数",
                     "paramKeys": []
+                }
+            }
+        },
+        "/db/remote/del/check": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Mysql 远程数据库删除前检查",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Database"
+                ],
+                "summary": "Check before delete remote database",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperateByID"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -13117,6 +13156,23 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.DatabaseDelete": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "deleteBackup": {
+                    "type": "boolean"
+                },
+                "forceDelete": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.DatabaseInfo": {
             "type": "object",
             "properties": {
@@ -17729,6 +17785,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "config": {},
+                "from": {
+                    "type": "string"
+                },
                 "label": {
                     "type": "string"
                 },

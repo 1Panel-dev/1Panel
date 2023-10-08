@@ -3,10 +3,13 @@ package service
 import (
 	"context"
 	"fmt"
+	"os"
+	"path"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/backend/utils/mysql"
 	"github.com/1Panel-dev/1Panel/backend/utils/mysql/client"
@@ -22,7 +25,8 @@ type IDatabaseService interface {
 	CheckDatabase(req dto.DatabaseCreate) bool
 	Create(req dto.DatabaseCreate) error
 	Update(req dto.DatabaseUpdate) error
-	Delete(id uint) error
+	DeleteCheck(id uint) ([]string, error)
+	Delete(req dto.DatabaseDelete) error
 	List(dbType string) ([]dto.DatabaseOption, error)
 }
 
@@ -114,16 +118,47 @@ func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
 	return nil
 }
 
-func (u *DatabaseService) Delete(id uint) error {
-	db, _ := databaseRepo.Get(commonRepo.WithByID(id))
+func (u *DatabaseService) DeleteCheck(id uint) ([]string, error) {
+	var appInUsed []string
+	apps, _ := appInstallResourceRepo.GetBy(databaseRepo.WithByFrom("remote"), appInstallResourceRepo.WithLinkId(id))
+	for _, app := range apps {
+		appInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(app.AppInstallId))
+		if appInstall.ID != 0 {
+			appInUsed = append(appInUsed, appInstall.Name)
+		}
+	}
+
+	return appInUsed, nil
+}
+
+func (u *DatabaseService) Delete(req dto.DatabaseDelete) error {
+	db, _ := databaseRepo.Get(commonRepo.WithByID(req.ID))
 	if db.ID == 0 {
 		return constant.ErrRecordNotFound
 	}
-	if err := databaseRepo.Delete(context.Background(), commonRepo.WithByID(id)); err != nil {
+
+	if req.DeleteBackup {
+		uploadDir := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/uploads/database/%s/%s", db.Type, db.Name))
+		if _, err := os.Stat(uploadDir); err == nil {
+			_ = os.RemoveAll(uploadDir)
+		}
+		localDir, err := loadLocalDir()
+		if err != nil && !req.ForceDelete {
+			return err
+		}
+		backupDir := path.Join(localDir, fmt.Sprintf("database/%s/%s", db.Type, db.Name))
+		if _, err := os.Stat(backupDir); err == nil {
+			_ = os.RemoveAll(backupDir)
+		}
+		_ = backupRepo.DeleteRecord(context.Background(), commonRepo.WithByType(db.Type), commonRepo.WithByName(db.Name))
+		global.LOG.Infof("delete database %s-%s backups successful", db.Type, db.Name)
+	}
+
+	if err := databaseRepo.Delete(context.Background(), commonRepo.WithByID(req.ID)); err != nil && !req.ForceDelete {
 		return err
 	}
 	if db.From != "local" {
-		if err := mysqlRepo.Delete(context.Background(), mysqlRepo.WithByMysqlName(db.Name)); err != nil {
+		if err := mysqlRepo.Delete(context.Background(), mysqlRepo.WithByMysqlName(db.Name)); err != nil && !req.ForceDelete {
 			return err
 		}
 	}

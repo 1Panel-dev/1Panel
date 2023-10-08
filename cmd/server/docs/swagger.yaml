@@ -786,6 +786,17 @@ definitions:
     - username
     - version
     type: object
+  dto.DatabaseDelete:
+    properties:
+      deleteBackup:
+        type: boolean
+      forceDelete:
+        type: boolean
+      id:
+        type: integer
+    required:
+    - id
+    type: object
   dto.DatabaseInfo:
     properties:
       address:
@@ -3879,6 +3890,8 @@ definitions:
   response.AppService:
     properties:
       config: {}
+      from:
+        type: string
       label:
         type: string
       value:
@@ -6716,7 +6729,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.OperateByID'
+          $ref: '#/definitions/dto.DatabaseDelete'
       responses:
         "200":
           description: OK
@@ -7234,6 +7247,30 @@ paths:
         formatEN: adjust mysql database performance parameters
         formatZH: 调整 mysql 数据库性能参数
         paramKeys: []
+  /db/remote/del/check:
+    post:
+      consumes:
+      - application/json
+      description: Mysql 远程数据库删除前检查
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OperateByID'
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Check before delete remote database
+      tags:
+      - Database
   /files:
     post:
       consumes:

@@ -1,7 +1,7 @@
 <template>
     <el-dialog
         v-model="dialogVisible"
-        :title="$t('commons.button.delete') + ' - ' + dbName"
+        :title="$t('commons.button.delete') + ' - ' + deleteReq.database"
         width="30%"
         :close-on-click-modal="false"
     >
@@ -21,10 +21,10 @@
             <el-form-item>
                 <div>
                     <span style="font-size: 12px">{{ $t('database.delete') }}</span>
-                    <span style="font-size: 12px; color: red; font-weight: 500">{{ dbName }}</span>
+                    <span style="font-size: 12px; color: red; font-weight: 500">{{ deleteReq.database }}</span>
                     <span style="font-size: 12px">{{ $t('database.deleteHelper') }}</span>
                 </div>
-                <el-input v-model="deleteInfo" :placeholder="dbName"></el-input>
+                <el-input v-model="deleteInfo" :placeholder="deleteReq.database"></el-input>
             </el-form-item>
         </el-form>
         <template #footer>
@@ -32,7 +32,7 @@
                 <el-button @click="dialogVisible = false" :disabled="loading">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button type="primary" @click="submit" :disabled="deleteInfo != dbName || loading">
+                <el-button type="primary" @click="submit" :disabled="deleteInfo != deleteReq.database || loading">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -43,12 +43,11 @@
 import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
 import i18n from '@/lang';
-import { deleteMysqlDB } from '@/api/modules/database';
+import { deleteDatabase } from '@/api/modules/database';
 import { MsgSuccess } from '@/utils/message';
 
 let deleteReq = ref({
     id: 0,
-    type: '',
     database: '',
     deleteBackup: false,
     forceDelete: false,
@@ -56,13 +55,11 @@ let deleteReq = ref({
 let dialogVisible = ref(false);
 let loading = ref(false);
 let deleteInfo = ref('');
-let dbName = ref('');
 
 const deleteForm = ref<FormInstance>();
 
 interface DialogProps {
     id: number;
-    type: string;
     name: string;
     database: string;
 }
@@ -71,19 +68,16 @@ const emit = defineEmits<{ (e: 'search'): void }>();
 const acceptParams = async (prop: DialogProps) => {
     deleteReq.value = {
         id: prop.id,
-        type: prop.type,
         database: prop.database,
         deleteBackup: false,
         forceDelete: false,
     };
-    dbName.value = prop.name;
-    deleteInfo.value = '';
     dialogVisible.value = true;
 };
 
 const submit = async () => {
     loading.value = true;
-    deleteMysqlDB(deleteReq.value)
+    deleteDatabase(deleteReq.value)
         .then(() => {
             loading.value = false;
             emit('search');

@@ -323,6 +323,7 @@ const message = {
     },
     database: {
         database: '数据库',
+        deleteBackupHelper: '同时删除数据库备份',
         delete: '删除操作无法回滚，请输入 "',
         deleteHelper: '" 删除此数据库',
         create: '创建数据库',
