@@ -128,7 +128,7 @@ const buttons = [
             operateRuntime('down', row.id);
         },
         disabled: function (row: Runtime.Runtime) {
-            return disabledRuntime(row) || row.status === 'stopped';
+            return row.status === 'recreating' || row.status === 'stopped';
         },
     },
     {
@@ -137,7 +137,7 @@ const buttons = [
             operateRuntime('up', row.id);
         },
         disabled: function (row: Runtime.Runtime) {
-            return disabledRuntime(row) || row.status === 'running';
+            return row.status === 'starting' || row.status === 'recreating' || row.status === 'running';
         },
     },
     {
@@ -146,7 +146,7 @@ const buttons = [
             operateRuntime('restart', row.id);
         },
         disabled: function (row: Runtime.Runtime) {
-            return disabledRuntime(row);
+            return row.status === 'recreating';
         },
     },
     {
@@ -155,7 +155,7 @@ const buttons = [
             openDetail(row);
         },
         disabled: function (row: Runtime.Runtime) {
-            return disabledRuntime(row);
+            return row.status === 'recreating';
         },
     },
     {
@@ -165,10 +165,6 @@ const buttons = [
         },
     },
 ];
-
-const disabledRuntime = (row: Runtime.Runtime) => {
-    return row.status === 'starting' || row.status === 'recreating';
-};
 
 const search = async () => {
     req.page = paginationConfig.currentPage;
