@@ -332,14 +332,7 @@
 <script lang="ts" setup name="CreateWebSite">
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { App } from '@/api/interface/app';
-import {
-    GetApp,
-    GetAppDetail,
-    SearchApp,
-    GetAppInstalled,
-    GetAppDetailByID,
-    CheckAppInstalled,
-} from '@/api/modules/app';
+import { GetApp, GetAppDetail, SearchApp, GetAppInstalled, GetAppDetailByID } from '@/api/modules/app';
 import { CreateWebsite, PreCheck } from '@/api/modules/website';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
@@ -442,29 +435,22 @@ const handleClose = () => {
 };
 
 const changeType = (type: string) => {
-    if (type == 'deployemnt') {
-        if (appInstalles.value && appInstalles.value.length > 0) {
-            website.value.appInstallId = appInstalles.value[0].id;
-        }
-    } else if (type == 'runtime') {
-        checkNginxVersion();
-        getRuntimes();
-    } else {
-        website.value.appInstallId = undefined;
+    switch (type) {
+        case 'deployment':
+            website.value.appType = 'installed';
+            if (appInstalles.value && appInstalles.value.length > 0) {
+                website.value.appInstallId = appInstalles.value[0].id;
+            }
+            break;
+        case 'runtime':
+            getRuntimes();
+            break;
+        default:
+            website.value.appInstallId = undefined;
+            break;
     }
     website.value.type = type;
     versionExist.value = true;
-};
-
-const checkNginxVersion = async () => {
-    try {
-        const res = await CheckAppInstalled('openresty', '');
-        if (res.data && res.data.version) {
-            if (!compareVersions(res.data.version, '1.21.4')) {
-                versionExist.value = false;
-            }
-        }
-    } catch (error) {}
 };
 
 const searchAppInstalled = () => {
@@ -531,6 +517,7 @@ const changeRuntimeType = () => {
     } else {
         runtimeReq.value.status = 'running';
     }
+    website.value.runtimeID = undefined;
     getRuntimes();
 };
 
@@ -621,23 +608,6 @@ const changeAlias = (value: string) => {
     const domain = value.split(':')[0];
     website.value.alias = domain;
 };
-
-function compareVersions(version1: string, version2: string): boolean {
-    const v1 = version1.split('.');
-    const v2 = version2.split('.');
-    const len = Math.max(v1.length, v2.length);
-
-    for (let i = 0; i < len; i++) {
-        const num1 = parseInt(v1[i] || '0');
-        const num2 = parseInt(v2[i] || '0');
-
-        if (num1 !== num2) {
-            return num1 > num2 ? true : false;
-        }
-    }
-
-    return false;
-}
 
 defineExpose({
     acceptParams,

@@ -106,7 +106,7 @@ export namespace App {
 
     export interface AppInstalled extends CommonModel {
         name: string;
-        appId: string;
+        appId: number;
         appDetailId: string;
         env: string;
         status: string;
