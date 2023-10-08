@@ -98,6 +98,7 @@ type AppConfigVersion struct {
 type Tag struct {
 	Key  string `json:"key"`
 	Name string `json:"name"`
+	Sort int    `json:"sort"`
 }
 
 type AppForm struct {

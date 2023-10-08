@@ -13,7 +13,7 @@
                         >
                             {{ $t('app.all') }}
                         </el-button>
-                        <div v-for="item in tags" :key="item.key" class="inline">
+                        <div v-for="item in tags.slice(0, 6)" :key="item.key" class="inline">
                             <el-button
                                 class="tag-button"
                                 :class="activeTag === item.key ? '' : 'no-active'"
@@ -24,8 +24,34 @@
                                 {{ language == 'zh' || language == 'tw' ? item.name : item.key }}
                             </el-button>
                         </div>
+                        <div class="inline">
+                            <el-dropdown>
+                                <el-button
+                                    class="tag-button"
+                                    :type="moreTag !== '' ? 'primary' : ''"
+                                    :class="moreTag !== '' ? '' : 'no-active'"
+                                >
+                                    {{ moreTag == '' ? $t('tabs.more') : getTagValue(moreTag) }}
+                                    <el-icon class="el-icon--right">
+                                        <arrow-down />
+                                    </el-icon>
+                                </el-button>
+                                <template #dropdown>
+                                    <el-dropdown-menu>
+                                        <el-dropdown-item
+                                            v-for="item in tags.slice(6)"
+                                            @click="changeTag(item.key)"
+                                            :key="item.key"
+                                        >
+                                            {{ language == 'zh' || language == 'tw' ? item.name : item.key }}
+                                        </el-dropdown-item>
+                                    </el-dropdown-menu>
+                                </template>
+                            </el-dropdown>
+                        </div>
                     </div>
                 </el-col>
+
                 <el-col :xs="24" :sm="4" :md="4" :lg="4" :xl="4">
                     <div class="search-button">
                         <el-input
@@ -341,7 +367,7 @@ const searchReq = reactive({
 const router = useRouter();
 const activeName = ref(i18n.global.t('app.installed'));
 const mode = ref('installed');
-
+const moreTag = ref('');
 const language = useI18n().locale.value;
 
 const sync = () => {
@@ -362,7 +388,20 @@ const changeTag = (key: string) => {
     if (key !== 'all') {
         searchReq.tags = [key];
     }
+    const index = tags.value.findIndex((tag) => tag.key === key);
+    if (index > 5) {
+        moreTag.value = key;
+    } else {
+        moreTag.value = '';
+    }
     search();
+};
+
+const getTagValue = (key: string) => {
+    const tag = tags.value.find((tag) => tag.key === key);
+    if (tag) {
+        return language == 'zh' || language == 'tw' ? tag.name : tag.key;
+    }
 };
 
 const search = () => {

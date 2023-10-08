@@ -23,6 +23,7 @@ export namespace App {
     export interface Tag {
         key: string;
         name: string;
+        sort: number;
     }
 
     export interface AppResPage {
