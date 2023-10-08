@@ -104,7 +104,8 @@
                                     </div>
                                     <div v-else>
                                         <el-tag type="info" v-if="row.usedStatus">
-                                            {{ $t('firewall.used') }}
+                                            <span v-if="row.usedStatus === 'inUsed'">{{ $t('firewall.used') }}</span>
+                                            <span v-else>{{ $t('firewall.used') + ' ' + row.usedStatus }}</span>
                                         </el-tag>
                                         <el-tag type="success" v-else>{{ $t('firewall.unUsed') }}</el-tag>
                                     </div>
