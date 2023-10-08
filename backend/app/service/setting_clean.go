@@ -102,6 +102,7 @@ func (u *SettingService) SystemScan() dto.CleanData {
 
 func (u *SettingService) SystemClean(req []dto.Clean) {
 	size := uint64(0)
+	restart := false
 	for _, item := range req {
 		size += item.Size
 		switch item.TreeType {
@@ -121,9 +122,7 @@ func (u *SettingService) SystemClean(req []dto.Clean) {
 
 		case "cache":
 			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/cache", item.Name))
-			defer func() {
-				_, _ = cmd.Exec("systemctl restart 1panel.service")
-			}()
+			restart = true
 
 		case "unused":
 			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "original", item.Name))
@@ -207,6 +206,15 @@ func (u *SettingService) SystemClean(req []dto.Clean) {
 	_ = settingRepo.Update("LastCleanTime", time.Now().Format("2006-01-02 15:04:05"))
 	_ = settingRepo.Update("LastCleanSize", fmt.Sprintf("%v", size))
 	_ = settingRepo.Update("LastCleanData", fmt.Sprintf("%v", len(req)))
+
+	if restart {
+		go func() {
+			_, err := cmd.Exec("systemctl restart 1panel.service")
+			if err != nil {
+				global.LOG.Errorf("restart system port failed, err: %v", err)
+			}
+		}()
+	}
 }
 
 func loadSnapshotTree(fileOp fileUtils.FileOp) []dto.CleanTree {

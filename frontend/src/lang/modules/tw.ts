@@ -1171,7 +1171,9 @@ const message = {
         systemHelper: '快照、升級等過程中產生的臨時文件以及版本叠代過程中廢棄的文件內容',
         panelOriginal: '系統快照恢復前備份文件',
         upgrade: '系統升級備份文件',
+        upgradeHelper: '( 建議保留最新的升級備份用於系統回滾 )',
         cache: '系統緩存文件',
+        cacheHelper: '( 謹慎操作，清理需要重啟服務 )',
         snapshot: '系統快照臨時文件',
         snapshotTmp: '系統快照上傳臨時文件',
         snapshotLocal: '系統快照製作臨時文件',
@@ -1187,7 +1189,7 @@ const message = {
         website: '網站',
         app: '應用',
         database: '數據庫',
-        directory: '應用',
+        directory: '文件夾',
 
         systemLog: '系統日誌文件',
         systemLogHelper: '系統日誌信息、容器構建或鏡像拉取等日誌信息以及計劃任務中產生的日誌文件',

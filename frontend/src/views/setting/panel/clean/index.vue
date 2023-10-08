@@ -240,6 +240,8 @@ import DrawerHeader from '@/components/drawer-header/index.vue';
 import { cleanSystem, scanSystem } from '@/api/modules/setting';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 const drawerVisible = ref();
@@ -284,7 +286,6 @@ interface DialogProps {
 const acceptParams = (params: DialogProps): void => {
     scanStatus.value = 'beforeScan';
     form.lastCleanTime = params.lastCleanTime;
-    console.log(form.lastCleanTime);
     form.lastCleanSize = params.lastCleanSize;
     form.lastCleanData = params.lastCleanData;
     drawerVisible.value = true;
@@ -332,10 +333,17 @@ const onSubmitClean = async () => {
     }).then(async () => {
         loading.value = true;
         submitCleans.value = [];
+        let restart = false;
         loadSubmitCheck(cleanData.systemClean);
         loadSubmitCheck(cleanData.uploadClean);
         loadSubmitCheck(cleanData.downloadClean);
         loadSubmitCheck(cleanData.systemLogClean);
+        for (const item of submitCleans.value) {
+            if (item.treeType === 'cache') {
+                restart = true;
+                break;
+            }
+        }
         await cleanSystem(submitCleans.value)
             .then(() => {
                 form.lastCleanSize = selectSize.value + '';
@@ -343,6 +351,17 @@ const onSubmitClean = async () => {
                 scanStatus.value = 'afterScan';
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 loading.value = false;
+                if (restart) {
+                    let href = window.location.href;
+                    globalStore.isLogin = false;
+                    let address = href.split('://')[1];
+                    if (globalStore.entrance) {
+                        address = address.replaceAll('settings/panel', globalStore.entrance);
+                    } else {
+                        address = address.replaceAll('settings/panel', 'login');
+                    }
+                    window.open(`http://${address}`, '_self');
+                }
             })
             .catch(() => {
                 loading.value = false;
@@ -436,6 +455,12 @@ function loadTag(node: any, data: any) {
     }
     if (data.size === 0) {
         return i18n.global.t('clean.statusClean');
+    }
+    if (data.label === 'upgrade') {
+        return i18n.global.t('clean.upgradeHelper');
+    }
+    if (data.label === 'cache') {
+        return i18n.global.t('clean.cacheHelper');
     }
     return data.isRecommend ? i18n.global.t('clean.statusSuggest') : i18n.global.t('clean.statusWarning');
 }

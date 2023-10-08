@@ -77,8 +77,8 @@ export namespace Host {
         port: string;
         protocol: string;
         strategy: string;
-        appName: string;
-        isUsed: boolean;
+
+        usedStatus: string;
         description: string;
     }
     export interface UpdateDescription {
