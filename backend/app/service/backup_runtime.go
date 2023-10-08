@@ -7,7 +7,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
-	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"io/fs"
 	"os"
@@ -52,7 +51,7 @@ func handleRuntimeRecover(runtime *model.Runtime, recoverFile string, isRollback
 	}
 	tmpPath := strings.ReplaceAll(recoverFile, ".tar.gz", "")
 	defer func() {
-		_, _ = compose.Up(runtime.GetComposePath())
+		go startRuntime(runtime)
 		_ = os.RemoveAll(strings.ReplaceAll(recoverFile, ".tar.gz", ""))
 	}()
 
