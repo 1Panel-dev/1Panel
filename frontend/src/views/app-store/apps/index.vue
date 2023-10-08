@@ -12,7 +12,7 @@
                     >
                         {{ $t('app.all') }}
                     </el-button>
-                    <div v-for="item in tags" :key="item.key" style="display: inline">
+                    <div v-for="item in tags.slice(0, 6)" :key="item.key" class="inline">
                         <el-button
                             class="tag-button"
                             :class="activeTag === item.key ? '' : 'no-active'"
@@ -22,6 +22,31 @@
                         >
                             {{ language == 'zh' || language == 'tw' ? item.name : item.key }}
                         </el-button>
+                    </div>
+                    <div class="inline">
+                        <el-dropdown>
+                            <el-button
+                                class="tag-button"
+                                :type="moreTag !== '' ? 'primary' : ''"
+                                :class="moreTag !== '' ? '' : 'no-active'"
+                            >
+                                {{ moreTag == '' ? $t('tabs.more') : getTagValue(moreTag) }}
+                                <el-icon class="el-icon--right">
+                                    <arrow-down />
+                                </el-icon>
+                            </el-button>
+                            <template #dropdown>
+                                <el-dropdown-menu>
+                                    <el-dropdown-item
+                                        v-for="item in tags.slice(6)"
+                                        @click="changeTag(item.key)"
+                                        :key="item.key"
+                                    >
+                                        {{ language == 'zh' || language == 'tw' ? item.name : item.key }}
+                                    </el-dropdown-item>
+                                </el-dropdown-menu>
+                            </template>
+                        </el-dropdown>
                     </div>
                 </el-col>
                 <el-col :xs="24" :sm="4" :md="4" :lg="4" :xl="4">
@@ -103,12 +128,12 @@
                                             </span>
                                         </div>
                                         <div class="app-tag">
-                                            <el-tag v-for="(tag, ind) in app.tags" :key="ind" style="margin-right: 5px">
-                                                <span :style="{ color: getColor(ind) }">
+                                            <el-tag v-for="(tag, ind) in app.tags" :key="ind" class="p-mr-5">
+                                                <span>
                                                     {{ language == 'zh' || language == 'tw' ? tag.name : tag.key }}
                                                 </span>
                                             </el-tag>
-                                            <el-tag v-if="app.status === 'TakeDown'" style="margin-right: 5px">
+                                            <el-tag v-if="app.status === 'TakeDown'" class="p-mr-5">
                                                 <span style="color: red">{{ $t('app.takeDown') }}</span>
                                             </el-tag>
                                         </div>
@@ -170,7 +195,6 @@ const req = reactive({
 
 const apps = ref<App.AppDTO[]>([]);
 const tags = ref<App.Tag[]>([]);
-const colorArr = ['#005eeb', '#008B45', '#BEBEBE', '#FFF68F', '#FFFF00', '#8B0000'];
 const loading = ref(false);
 const activeTag = ref('all');
 const showDetail = ref(false);
@@ -179,10 +203,7 @@ const syncing = ref(false);
 const detailRef = ref();
 const installRef = ref();
 const installKey = ref('');
-
-const getColor = (index: number) => {
-    return colorArr[index];
-};
+const moreTag = ref('');
 
 const search = async (req: App.AppReq) => {
     loading.value = true;
@@ -244,7 +265,20 @@ const changeTag = (key: string) => {
     if (key !== 'all') {
         req.tags = [key];
     }
+    const index = tags.value.findIndex((tag) => tag.key === key);
+    if (index > 5) {
+        moreTag.value = key;
+    } else {
+        moreTag.value = '';
+    }
     search(req);
+};
+
+const getTagValue = (key: string) => {
+    const tag = tags.value.find((tag) => tag.key === key);
+    if (tag) {
+        return language == 'zh' || language == 'tw' ? tag.name : tag.key;
+    }
 };
 
 const searchByName = (name: string) => {
@@ -345,6 +379,7 @@ onMounted(() => {
         border: none;
     }
 }
+
 @media only screen and (min-width: 768px) and (max-width: 1200px) {
     .app-col-12 {
         max-width: 50%;

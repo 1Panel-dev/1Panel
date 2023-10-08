@@ -31,7 +31,7 @@ func (t TagRepo) DeleteAll(ctx context.Context) error {
 
 func (t TagRepo) All() ([]model.Tag, error) {
 	var tags []model.Tag
-	if err := getDb().Where("1 = 1 ").Find(&tags).Error; err != nil {
+	if err := getDb().Where("1 = 1 ").Order("sort asc").Find(&tags).Error; err != nil {
 		return nil, err
 	}
 	return tags, nil

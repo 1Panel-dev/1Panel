@@ -774,6 +774,7 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 		tags = append(tags, &model.Tag{
 			Key:  t.Key,
 			Name: t.Name,
+			Sort: t.Sort,
 		})
 	}
 	oldApps, err := appRepo.GetBy(appRepo.WithResource(constant.AppResourceRemote))

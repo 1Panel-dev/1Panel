@@ -34,3 +34,13 @@ var UpdateRuntime = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var UpdateTag = &gormigrate.Migration{
+	ID: "20231008-update-tag",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Tag{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}
