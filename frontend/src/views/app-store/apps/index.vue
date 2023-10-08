@@ -64,11 +64,20 @@
             </el-row>
         </template>
         <template #rightButton>
-            <el-badge is-dot class="item" :hidden="!canUpdate">
-                <el-button @click="sync" type="primary" link :plain="true" :disabled="syncing">
-                    {{ $t('app.syncAppList') }}
-                </el-button>
-            </el-badge>
+            <div class="flex justify-end">
+                <fu-table-pagination
+                    v-model:current-page="paginationConfig.currentPage"
+                    v-model:page-size="paginationConfig.pageSize"
+                    v-bind="paginationConfig"
+                    @change="search(req)"
+                    :layout="mobile ? ' prev, pager, next' : ' prev, pager, next'"
+                />
+                <el-badge is-dot :hidden="!canUpdate" class="ml-5">
+                    <el-button @click="sync" type="primary" plain :disabled="syncing">
+                        {{ $t('app.syncAppList') }}
+                    </el-button>
+                </el-badge>
+            </div>
         </template>
         <template #main>
             <el-alert type="info" :title="$t('app.appHelper')" :closable="false" />
