@@ -320,7 +320,8 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 		CodeDir: req.CodeDir,
 		Version: req.Version,
 		NodeConfig: request.NodeConfig{
-			Port: req.Port,
+			Port:    req.Port,
+			Install: true,
 		},
 	}
 	composeContent, envContent, _, err := handleParams(create, projectDir)

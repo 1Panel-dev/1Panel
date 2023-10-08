@@ -154,7 +154,7 @@ func createWebsiteFolder(nginxInstall model.AppInstall, website *model.Website, 
 				}
 			}
 		}
-		if website.Type == constant.Static || website.Type == constant.Runtime {
+		if website.Type == constant.Static || (website.Type == constant.Runtime && runtime.Type == constant.RuntimePHP) {
 			if err := createIndexFile(website, runtime); err != nil {
 				return err
 			}
