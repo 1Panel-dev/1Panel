@@ -42,7 +42,7 @@
                                 <el-divider direction="vertical" />
                                 <slot name="buttons"></slot>
                             </span>
-                            <span style="float: right">
+                            <span class="float-right">
                                 <slot v-if="slots.rightButton" name="rightButton"></slot>
                             </span>
                         </span>
