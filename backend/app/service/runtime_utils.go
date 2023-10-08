@@ -328,3 +328,18 @@ func handleParams(create request.RuntimeCreate, projectDir string) (composeConte
 	envContent = []byte(envStr)
 	return
 }
+
+func checkContainerName(name string) error {
+	dockerCli, err := docker.NewClient()
+	if err != nil {
+		return err
+	}
+	names, err := dockerCli.ListContainersByName([]string{name})
+	if err != nil {
+		return err
+	}
+	if len(names) > 0 {
+		return buserr.New(constant.ErrContainerName)
+	}
+	return nil
+}

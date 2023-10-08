@@ -78,6 +78,11 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (err error) {
 		if err = checkPortExist(create.Port); err != nil {
 			return err
 		}
+		if containerName, ok := create.Params["CONTAINER_NAME"]; ok {
+			if err := checkContainerName(containerName.(string)); err != nil {
+				return err
+			}
+		}
 	}
 
 	appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(create.AppDetailID))
@@ -308,6 +313,18 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 				return err
 			}
 			runtime.Port = req.Port
+		}
+		if containerName, ok := req.Params["CONTAINER_NAME"]; ok {
+			envs, err := gotenv.Unmarshal(runtime.Env)
+			if err != nil {
+				return err
+			}
+			oldContainerName := envs["CONTAINER_NAME"]
+			if containerName != oldContainerName {
+				if err := checkContainerName(containerName.(string)); err != nil {
+					return err
+				}
+			}
 		}
 	}
 
