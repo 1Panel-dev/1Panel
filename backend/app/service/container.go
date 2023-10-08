@@ -955,9 +955,13 @@ func simplifyPort(ports []types.Port) []string {
 		return datas
 	}
 	if len(ports) == 1 {
-		itemPortStr := fmt.Sprintf("%s:%v/%s", ports[0].IP, ports[0].PrivatePort, ports[0].Type)
+		ip := ""
+		if len(ports[0].IP) != 0 {
+			ip = ports[0].IP + ":"
+		}
+		itemPortStr := fmt.Sprintf("%s%v/%s", ip, ports[0].PrivatePort, ports[0].Type)
 		if ports[0].PublicPort != 0 {
-			itemPortStr = fmt.Sprintf("%s:%v->%v/%s", ports[0].IP, ports[0].PublicPort, ports[0].PrivatePort, ports[0].Type)
+			itemPortStr = fmt.Sprintf("%s%v->%v/%s", ip, ports[0].PublicPort, ports[0].PrivatePort, ports[0].Type)
 		}
 		datas = append(datas, itemPortStr)
 		return datas
