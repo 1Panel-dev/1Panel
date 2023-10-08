@@ -61,6 +61,21 @@ func (u *SettingService) SystemScan() dto.CleanData {
 		Children:    snapTree,
 	})
 
+	rollBackTree := loadRollBackTree(fileOp)
+	rollbackSize := uint64(0)
+	for _, rollback := range rollBackTree {
+		rollbackSize += uint64(rollback.Size)
+	}
+	treeData = append(treeData, dto.CleanTree{
+		ID:          uuid.NewString(),
+		Label:       "rollback",
+		Size:        rollbackSize,
+		IsCheck:     true,
+		IsRecommend: true,
+		Type:        "rollback",
+		Children:    rollBackTree,
+	})
+
 	cachePath := path.Join(global.CONF.System.BaseDir, "1panel/cache")
 	cacheSize, _ := fileOp.GetDirSize(cachePath)
 	treeData = append(treeData, dto.CleanTree{
@@ -120,15 +135,34 @@ func (u *SettingService) SystemClean(req []dto.Clean) {
 		case "snapshot_local":
 			dropFileOrDir(path.Join(global.CONF.System.Backup, "system", item.Name))
 
+		case "rollback":
+			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/tmp/app"))
+			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/tmp/database"))
+			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/tmp/website"))
+		case "rollback_app":
+			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/tmp/app", item.Name))
+		case "rollback_database":
+			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/tmp/database", item.Name))
+		case "rollback_website":
+			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/tmp/website", item.Name))
+
 		case "cache":
 			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/cache", item.Name))
 			restart = true
 
 		case "unused":
-			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "original", item.Name))
-			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/resource/apps_bak", item.Name))
-			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/tmp/download", item.Name))
-			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/tmp", item.Name))
+			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "original"))
+			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/resource/apps_bak"))
+			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/tmp/download"))
+			files, _ := os.ReadDir(path.Join(global.CONF.System.BaseDir, "1panel/tmp"))
+			if len(files) == 0 {
+				continue
+			}
+			for _, file := range files {
+				if strings.HasPrefix(file.Name(), "upgrade_") {
+					dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/tmp", file.Name()))
+				}
+			}
 		case "old_original":
 			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "original", item.Name))
 		case "old_apps_bak":
@@ -142,7 +176,9 @@ func (u *SettingService) SystemClean(req []dto.Clean) {
 					continue
 				}
 				for _, file := range files {
-					dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/tmp", file.Name()))
+					if strings.HasPrefix(file.Name(), "upgrade_") {
+						dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/tmp", file.Name()))
+					}
 				}
 			} else {
 				dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/tmp", item.Name))
@@ -150,6 +186,11 @@ func (u *SettingService) SystemClean(req []dto.Clean) {
 
 		case "upload":
 			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/uploads", item.Name))
+			if len(item.Name) == 0 {
+				dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/tmp/upload"))
+			}
+		case "upload_tmp":
+			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/tmp/upload", item.Name))
 		case "upload_app":
 			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/uploads/app", item.Name))
 		case "upload_database":
@@ -159,15 +200,15 @@ func (u *SettingService) SystemClean(req []dto.Clean) {
 		case "upload_directory":
 			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/uploads/directory", item.Name))
 		case "download":
-			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/downloads", item.Name))
+			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/download", item.Name))
 		case "download_app":
-			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/downloads/app", item.Name))
+			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/download/app", item.Name))
 		case "download_database":
-			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/downloads/database", item.Name))
+			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/download/database", item.Name))
 		case "download_website":
-			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/downloads/website", item.Name))
+			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/download/website", item.Name))
 		case "download_directory":
-			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/downloads/directory", item.Name))
+			dropFileOrDir(path.Join(global.CONF.System.BaseDir, "1panel/download/directory", item.Name))
 
 		case "system_log":
 			if len(item.Name) == 0 {
@@ -235,6 +276,26 @@ func loadSnapshotTree(fileOp fileUtils.FileOp) []dto.CleanTree {
 	return treeData
 }
 
+func loadRollBackTree(fileOp fileUtils.FileOp) []dto.CleanTree {
+	var treeData []dto.CleanTree
+	path1 := path.Join(global.CONF.System.BaseDir, "1panel/tmp/app")
+	list1 := loadTreeWithAllFile(true, path1, "rollback_app", path1, fileOp)
+	size1, _ := fileOp.GetDirSize(path1)
+	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "rollback_app", Size: uint64(size1), Children: list1, Type: "rollback_app", IsRecommend: true})
+
+	path2 := path.Join(global.CONF.System.BaseDir, "1panel/tmp/website")
+	list2 := loadTreeWithAllFile(true, path2, "rollback_website", path2, fileOp)
+	size2, _ := fileOp.GetDirSize(path2)
+	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "rollback_website", Size: uint64(size2), Children: list2, Type: "rollback_website", IsRecommend: true})
+
+	path3 := path.Join(global.CONF.System.BaseDir, "1panel/tmp/database")
+	list3 := loadTreeWithAllFile(true, path3, "rollback_database", path3, fileOp)
+	size3, _ := fileOp.GetDirSize(path3)
+	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "rollback_database", Size: uint64(size3), Children: list3, Type: "rollback_database", IsRecommend: true})
+
+	return treeData
+}
+
 func loadUnusedFile(fileOp fileUtils.FileOp) []dto.CleanTree {
 	var treeData []dto.CleanTree
 	path1 := path.Join(global.CONF.System.BaseDir, "original")
@@ -272,23 +333,29 @@ func loadUnusedFile(fileOp fileUtils.FileOp) []dto.CleanTree {
 
 func loadUploadTree(fileOp fileUtils.FileOp) []dto.CleanTree {
 	var treeData []dto.CleanTree
-	path1 := path.Join(global.CONF.System.BaseDir, "1panel/upload/app")
+
+	path0 := path.Join(global.CONF.System.BaseDir, "1panel/tmp/upload")
+	list0 := loadTreeWithAllFile(true, path0, "upload_tmp", path0, fileOp)
+	size0, _ := fileOp.GetDirSize(path0)
+	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "upload_tmp", Size: uint64(size0), Children: list0, Type: "upload_tmp", IsRecommend: true})
+
+	path1 := path.Join(global.CONF.System.BaseDir, "1panel/uploads/app")
 	list1 := loadTreeWithAllFile(true, path1, "upload_app", path1, fileOp)
 	size1, _ := fileOp.GetDirSize(path1)
 	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "upload_app", Size: uint64(size1), Children: list1, Type: "upload_app", IsRecommend: true})
 
-	path2 := path.Join(global.CONF.System.BaseDir, "1panel/upload/website")
+	path2 := path.Join(global.CONF.System.BaseDir, "1panel/uploads/website")
 	list2 := loadTreeWithAllFile(true, path2, "upload_website", path2, fileOp)
 	size2, _ := fileOp.GetDirSize(path2)
 	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "upload_website", Size: uint64(size2), Children: list2, Type: "upload_website", IsRecommend: true})
 
-	path3 := path.Join(global.CONF.System.BaseDir, "1panel/upload/database")
-	list3 := loadTreeWithAllFile(true, path3, "upload_app", path3, fileOp)
+	path3 := path.Join(global.CONF.System.BaseDir, "1panel/uploads/database")
+	list3 := loadTreeWithAllFile(true, path3, "upload_database", path3, fileOp)
 	size3, _ := fileOp.GetDirSize(path3)
 	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "upload_database", Size: uint64(size3), Children: list3, Type: "upload_database", IsRecommend: true})
 
-	path4 := path.Join(global.CONF.System.BaseDir, "1panel/upload/directory")
-	list4 := loadTreeWithAllFile(true, path4, "upload_app", path4, fileOp)
+	path4 := path.Join(global.CONF.System.BaseDir, "1panel/uploads/directory")
+	list4 := loadTreeWithAllFile(true, path4, "upload_directory", path4, fileOp)
 	size4, _ := fileOp.GetDirSize(path4)
 	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "upload_directory", Size: uint64(size4), Children: list4, Type: "upload_directory", IsRecommend: true})
 
@@ -312,12 +379,12 @@ func loadDownloadTree(fileOp fileUtils.FileOp) []dto.CleanTree {
 	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "download_website", Size: uint64(size2), Children: list2, Type: "download_website", IsRecommend: true})
 
 	path3 := path.Join(global.CONF.System.BaseDir, "1panel/download/database")
-	list3 := loadTreeWithAllFile(true, path3, "download_app", path3, fileOp)
+	list3 := loadTreeWithAllFile(true, path3, "download_database", path3, fileOp)
 	size3, _ := fileOp.GetDirSize(path3)
 	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "download_database", Size: uint64(size3), Children: list3, Type: "download_database", IsRecommend: true})
 
 	path4 := path.Join(global.CONF.System.BaseDir, "1panel/download/directory")
-	list4 := loadTreeWithAllFile(true, path4, "download_app", path4, fileOp)
+	list4 := loadTreeWithAllFile(true, path4, "download_directory", path4, fileOp)
 	size4, _ := fileOp.GetDirSize(path4)
 	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "download_directory", Size: uint64(size4), Children: list4, Type: "download_directory", IsRecommend: true})
 

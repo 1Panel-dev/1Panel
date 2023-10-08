@@ -1178,6 +1178,7 @@ const message = {
         snapshot: '系統快照臨時文件',
         snapshotTmp: '系統快照上傳臨時文件',
         snapshotLocal: '系統快照製作臨時文件',
+        rollback: '恢復前備份目錄',
         unused: '系統廢棄目錄',
         oldUpgrade: '廢棄升級前備份目錄',
         oldOriginal: '廢棄快照恢復前備份目錄',
