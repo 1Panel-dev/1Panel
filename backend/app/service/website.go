@@ -463,13 +463,15 @@ func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) 
 		return domainModel, err
 	}
 
-	if existDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithPort(create.Port)); len(existDomains) == 0 {
+	if existDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithDomain(create.Domain), websiteDomainRepo.WithPort(create.Port)); len(existDomains) == 0 {
 		if existAppInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithPort(create.Port)); !reflect.DeepEqual(existAppInstall, model.AppInstall{}) {
 			return domainModel, buserr.WithMap(constant.ErrPortInOtherApp, map[string]interface{}{"port": create.Port, "apps": existAppInstall.App.Name}, nil)
 		}
 		if common.ScanPort(create.Port) {
 			return domainModel, buserr.WithDetail(constant.ErrPortInUsed, create.Port, nil)
 		}
+	} else {
+		return domainModel, buserr.WithDetail(constant.ErrDomainIsExist, create.Domain, nil)
 	}
 
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(create.WebsiteID))
@@ -479,7 +481,11 @@ func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) 
 	if oldDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(create.WebsiteID), websiteDomainRepo.WithPort(create.Port)); len(oldDomains) == 0 {
 		ports = append(ports, create.Port)
 	}
-	domains = append(domains, create.Domain)
+
+	if oldDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(create.WebsiteID), websiteDomainRepo.WithDomain(create.Domain)); len(oldDomains) == 0 {
+		domains = append(domains, create.Domain)
+	}
+
 	if err := addListenAndServerName(website, ports, domains); err != nil {
 		return domainModel, err
 	}
