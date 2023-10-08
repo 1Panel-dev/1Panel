@@ -1240,6 +1240,7 @@ const message = {
         snapshot: 'System snapshot temporary files',
         snapshotTmp: 'System snapshot upload temporary files',
         snapshotLocal: 'System snapshot creation temporary files',
+        rollback: 'Backup files before recover',
         unused: 'Unused system directories',
         oldUpgrade: 'Unused pre-upgrade backup directories',
         oldOriginal: 'Unused pre-snapshot recovery backup directories',

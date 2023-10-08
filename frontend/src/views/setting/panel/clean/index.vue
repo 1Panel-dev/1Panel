@@ -479,6 +479,8 @@ function load18n(label: string) {
             return i18n.global.t('clean.snapshotTmp');
         case 'snapshot_local':
             return i18n.global.t('clean.snapshotLocal');
+        case 'rollback':
+            return i18n.global.t('clean.rollback');
         case 'unused':
             return i18n.global.t('clean.unused');
         case 'old_original':
@@ -488,16 +490,20 @@ function load18n(label: string) {
         case 'old_upgrade':
             return i18n.global.t('clean.oldUpgrade');
         case 'upload':
+        case 'upload_tmp':
             return i18n.global.t('clean.upload');
         case 'download':
             return i18n.global.t('clean.download');
         case 'upload_website':
+        case 'rollback_website':
         case 'download_website':
             return i18n.global.t('clean.website');
         case 'upload_app':
+        case 'rollback_app':
         case 'download_app':
             return i18n.global.t('clean.app');
         case 'upload_database':
+        case 'rollback_database':
         case 'download_database':
             return i18n.global.t('clean.database');
         case 'upload_directory':
