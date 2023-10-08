@@ -323,6 +323,7 @@ const message = {
     },
     database: {
         database: '數據庫',
+        deleteBackupHelper: '同時刪除數據庫備份',
         delete: '刪除操作無法回滾，請輸入 "',
         deleteHelper: '" 刪除此數據庫',
         create: '創建數據庫',

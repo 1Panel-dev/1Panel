@@ -109,6 +109,9 @@ export const addDatabase = (params: Database.DatabaseCreate) => {
 export const editDatabase = (params: Database.DatabaseUpdate) => {
     return http.post(`/databases/db/update`, params, TimeoutEnum.T_40S);
 };
-export const deleteDatabase = (id: number) => {
-    return http.post(`/databases/db/del`, { id: id });
+export const deleteCheckDatabase = (id: number) => {
+    return http.post<Array<string>>(`/databases/db/del/check`, { id: id });
+};
+export const deleteDatabase = (params: Database.DatabaseDelete) => {
+    return http.post(`/databases/db/del`, params);
 };

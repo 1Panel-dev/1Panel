@@ -327,6 +327,7 @@ const message = {
     },
     database: {
         database: 'database',
+        deleteBackupHelper: 'Delete database backups simultaneously',
         delete: 'Delete operation cannot be rolled back, please input "',
         deleteHelper: '" to delete this database',
         create: 'Create database',

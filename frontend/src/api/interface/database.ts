@@ -250,4 +250,9 @@ export namespace Database {
         password: string;
         description: string;
     }
+    export interface DatabaseDelete {
+        id: number;
+        forceDelete: boolean;
+        deleteBackup: boolean;
+    }
 }

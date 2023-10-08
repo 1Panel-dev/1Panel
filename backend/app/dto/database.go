@@ -271,3 +271,9 @@ type DatabaseUpdate struct {
 	Password    string `json:"password" validate:"required"`
 	Description string `json:"description"`
 }
+
+type DatabaseDelete struct {
+	ID           uint `json:"id" validate:"required"`
+	ForceDelete  bool `json:"forceDelete"`
+	DeleteBackup bool `json:"deleteBackup"`
+}
