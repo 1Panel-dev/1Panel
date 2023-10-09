@@ -456,11 +456,11 @@ func (a AppService) SyncAppListFromLocal() {
 
 	defer func() {
 		if err != nil {
-			global.LOG.Errorf("sync app failed %v", err)
+			global.LOG.Errorf("Sync local app failed %v", err)
 		}
 	}()
 
-	global.LOG.Infof("start sync local apps...")
+	global.LOG.Infof("Starting local application synchronization ...")
 	dirEntries, err = os.ReadDir(localAppDir)
 	if err != nil {
 		return
@@ -666,17 +666,14 @@ func (a AppService) SyncAppListFromLocal() {
 		}
 	}
 	tx.Commit()
-	global.LOG.Infof("sync local apps success")
+	global.LOG.Infof("Synchronization of local applications completed")
 }
 
 func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 	res := &response.AppUpdateRes{
 		CanUpdate: false,
 	}
-	setting, err := NewISettingService().GetSettingInfo()
-	if err != nil {
-		return nil, err
-	}
+
 	versionUrl := fmt.Sprintf("%s/%s/1panel.json.version.txt", global.CONF.System.AppRepo, global.CONF.System.Mode)
 	versionRes, err := http2.GetHttpRes(versionUrl)
 	if err != nil {
@@ -688,8 +685,11 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 		return nil, err
 	}
 	lastModifiedStr := string(body)
-
 	lastModified, err := strconv.Atoi(lastModifiedStr)
+	if err != nil {
+		return nil, err
+	}
+	setting, err := NewISettingService().GetSettingInfo()
 	if err != nil {
 		return nil, err
 	}
@@ -699,27 +699,22 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 		res.CanUpdate = true
 		return res, err
 	}
-	if err = getAppFromRepo(fmt.Sprintf("%s/%s/1panel.json.zip", global.CONF.System.AppRepo, global.CONF.System.Mode)); err != nil {
-		return nil, err
-	}
-	listFile := path.Join(constant.ResourceDir, "1panel.json")
-	content, err := os.ReadFile(listFile)
-	if err != nil {
-		return nil, err
-	}
 	list := &dto.AppList{}
-	if err = json.Unmarshal(content, list); err != nil {
-		return nil, err
+	list, err = getAppList()
+	if err != nil {
+		return res, err
 	}
 	if list.Extra.Version != "" && setting.SystemVersion != list.Extra.Version && !common.CompareVersion(setting.SystemVersion, list.Extra.Version) {
+		global.LOG.Errorf("The current version is too low to synchronize with the App Store. The minimum required version is %s", list.Extra.Version)
 		return nil, buserr.New("ErrVersionTooLow")
 	}
+	res.AppList = list
 	return res, nil
 }
 
 func getAppFromRepo(downloadPath string) error {
 	downloadUrl := downloadPath
-	global.LOG.Infof("download file from %s", downloadUrl)
+	global.LOG.Infof("[AppStore] download file from %s", downloadUrl)
 	fileOp := files.NewFileOp()
 	packagePath := path.Join(constant.ResourceDir, path.Base(downloadUrl))
 	if err := fileOp.DownloadFile(downloadUrl, packagePath); err != nil {
@@ -734,25 +729,40 @@ func getAppFromRepo(downloadPath string) error {
 	return nil
 }
 
+func getAppList() (*dto.AppList, error) {
+	list := &dto.AppList{}
+	if err := getAppFromRepo(fmt.Sprintf("%s/%s/1panel.json.zip", global.CONF.System.AppRepo, global.CONF.System.Mode)); err != nil {
+		return nil, err
+	}
+	listFile := path.Join(constant.ResourceDir, "1panel.json")
+	content, err := os.ReadFile(listFile)
+	if err != nil {
+		return nil, err
+	}
+	if err = json.Unmarshal(content, list); err != nil {
+		return nil, err
+	}
+	return list, nil
+}
+
 func (a AppService) SyncAppListFromRemote() (err error) {
+	global.LOG.Infof("Starting synchronization with App Store...")
 	updateRes, err := a.GetAppUpdate()
 	if err != nil {
 		return err
 	}
 	if !updateRes.CanUpdate {
+		global.LOG.Infof("The App Store is at the latest version")
 		return
-	}
-	if err = getAppFromRepo(fmt.Sprintf("%s/%s/1panel.json.zip", global.CONF.System.AppRepo, global.CONF.System.Mode)); err != nil {
-		return err
-	}
-	listFile := path.Join(constant.ResourceDir, "1panel.json")
-	content, err := os.ReadFile(listFile)
-	if err != nil {
-		return err
 	}
 	list := &dto.AppList{}
-	if err = json.Unmarshal(content, list); err != nil {
-		return
+	if updateRes.AppList == nil {
+		list, err = getAppList()
+		if err != nil {
+			return
+		}
+	} else {
+		list = updateRes.AppList
 	}
 
 	if err = NewISettingService().Update("AppStoreLastModified", strconv.Itoa(list.LastModified)); err != nil {
@@ -964,5 +974,6 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 		}
 	}
 	tx.Commit()
+	global.LOG.Infof("Synchronization with the App Store was successful!")
 	return
 }

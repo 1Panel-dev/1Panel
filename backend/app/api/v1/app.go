@@ -50,11 +50,8 @@ func (b *BaseApi) SyncApp(c *gin.Context) {
 		return
 	}
 	go func() {
-		global.LOG.Infof("sync app list start ...")
 		if err := appService.SyncAppListFromRemote(); err != nil {
-			global.LOG.Errorf("sync app list error [%s]", err.Error())
-		} else {
-			global.LOG.Infof("sync app list success!")
+			global.LOG.Errorf("Synchronization with the App Store failed [%s]", err.Error())
 		}
 	}()
 	helper.SuccessWithData(c, "")
