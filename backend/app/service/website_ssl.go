@@ -135,7 +135,9 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 		return res, err
 	}
 
-	websiteSSL.DnsAccountID = create.DnsAccountID
+	if create.Provider == constant.DNSAccount {
+		websiteSSL.DnsAccountID = create.DnsAccountID
+	}
 	websiteSSL.AcmeAccountID = acmeAccount.ID
 	websiteSSL.Provider = create.Provider
 	websiteSSL.Domains = strings.Join(otherDomainArray, ",")
