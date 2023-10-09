@@ -964,10 +964,11 @@ func (w WebsiteService) OpWebsiteLog(req request.WebsiteLogReq) (*response.Websi
 		}
 		var nginxParams []dto.NginxParam
 		nginxParams = append(nginxParams, dto.NginxParam{
-			Name: key,
+			Name:   key,
+			Params: []string{"off"},
 		})
 
-		if err := deleteNginxConfig(constant.NginxScopeServer, nginxParams, &website); err != nil {
+		if err := updateNginxConfig(constant.NginxScopeServer, nginxParams, &website); err != nil {
 			return nil, err
 		}
 		if err := websiteRepo.Save(context.Background(), &website); err != nil {
