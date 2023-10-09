@@ -12,7 +12,6 @@ import (
 	"unsafe"
 
 	"github.com/1Panel-dev/1Panel/backend/global"
-	"github.com/1Panel-dev/1Panel/backend/utils/files"
 )
 
 type Writer struct {
@@ -120,7 +119,7 @@ func NewWriterFromConfig(c *Config) (RollingWriter, error) {
 			}
 
 			fileName := c.FileName
-			if strings.Contains(fi.Name(), fileName) && strings.Contains(fi.Name(), c.LogSuffix+".gz") {
+			if strings.Contains(fi.Name(), fileName) && strings.Contains(fi.Name(), c.LogSuffix) {
 				start := strings.Index(fi.Name(), "-")
 				end := strings.Index(fi.Name(), c.LogSuffix)
 				name := fi.Name()
@@ -237,11 +236,6 @@ func (w *Writer) Reopen(file string) error {
 	w.file = newFile
 
 	go func() {
-		if err := w.CompressFile(file); err != nil {
-			log.Println("error in compress log file", err)
-			return
-		}
-
 		if w.cf.MaxRemain > 0 {
 		retry:
 			select {
@@ -252,19 +246,5 @@ func (w *Writer) Reopen(file string) error {
 			}
 		}
 	}()
-	return nil
-}
-
-func (w *Writer) CompressFile(logFile string) error {
-	op := files.NewFileOp()
-	comFileName := path.Base(logFile) + ".gz"
-	filePath := path.Dir(logFile)
-
-	if err := op.Compress([]string{logFile}, filePath, comFileName, files.Gz); err != nil {
-		return err
-	}
-	if errR := os.Remove(logFile); errR != nil {
-		return errR
-	}
 	return nil
 }
