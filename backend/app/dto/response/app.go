@@ -1,6 +1,7 @@
 package response
 
 import (
+	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"time"
 
@@ -13,8 +14,9 @@ type AppRes struct {
 }
 
 type AppUpdateRes struct {
-	CanUpdate            bool `json:"canUpdate"`
-	AppStoreLastModified int  `json:"appStoreLastModified"`
+	CanUpdate            bool         `json:"canUpdate"`
+	AppStoreLastModified int          `json:"appStoreLastModified"`
+	AppList              *dto.AppList `json:"appList"`
 }
 
 type AppDTO struct {
