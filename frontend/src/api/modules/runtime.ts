@@ -29,3 +29,7 @@ export const GetNodeScripts = (req: Runtime.NodeReq) => {
 export const OperateRuntime = (req: Runtime.RuntimeOperate) => {
     return http.post<any>(`/runtimes/operate`, req);
 };
+
+export const GetNodeModules = (req: Runtime.NodeModuleReq) => {
+    return http.post<Runtime.NodeModule[]>(`/runtimes/node/modules`, req);
+};

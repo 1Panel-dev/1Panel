@@ -22,6 +22,7 @@ func (r *RuntimeRouter) InitRuntimeRouter(Router *gin.RouterGroup) {
 		groupRouter.GET("/:id", baseApi.GetRuntime)
 		groupRouter.POST("/node/package", baseApi.GetNodePackageRunScript)
 		groupRouter.POST("/operate", baseApi.OperateRuntime)
+		groupRouter.POST("/node/modules", baseApi.GetNodeModules)
 	}
 
 }

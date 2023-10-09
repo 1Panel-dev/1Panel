@@ -107,6 +107,7 @@ ErrRuntimeStart: "啟動失敗"
 ErrPackageJsonNotFound: "package.json 文件不存在"
 ErrScriptsNotFound: "沒有在 package.json 中找到 scripts 配置項"
 ErrContainerNameNotFound: "無法取得容器名稱，請檢查 .env 文件"
+ErrNodeModulesNotFound: "node_modules 文件夾不存在！請編輯運行環境或者等待運行環境啟動成功"
 
 #setting
 ErrBackupInUsed: "該備份帳號已在計劃任務中使用，無法刪除"
