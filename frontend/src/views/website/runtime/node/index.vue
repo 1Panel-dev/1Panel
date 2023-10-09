@@ -70,7 +70,7 @@
                     />
                     <fu-table-operations
                         :ellipsis="10"
-                        width="250px"
+                        width="300px"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         fixed="right"
@@ -83,6 +83,7 @@
         <Delete ref="deleteRef" @close="search" />
         <ComposeLogs ref="composeLogRef" />
         <PortJumpDialog ref="dialogPortJumpRef" />
+        <Modules ref="moduleRef" />
     </div>
 </template>
 
@@ -96,6 +97,7 @@ import Status from '@/components/status/index.vue';
 import Delete from '@/views/website/runtime/delete/index.vue';
 import i18n from '@/lang';
 import RouterMenu from '../index.vue';
+import Modules from '@/views/website/runtime/node/module/index.vue';
 import router from '@/routers/router';
 import ComposeLogs from '@/components/compose-log/index.vue';
 import { Promotion } from '@element-plus/icons-vue';
@@ -108,6 +110,7 @@ const operateRef = ref();
 const deleteRef = ref();
 const dialogPortJumpRef = ref();
 const composeLogRef = ref();
+const moduleRef = ref();
 
 const paginationConfig = reactive({
     cacheSizeKey: 'runtime-page-size',
@@ -122,6 +125,15 @@ const req = reactive<Runtime.RuntimeReq>({
     type: 'node',
 });
 const buttons = [
+    {
+        label: i18n.global.t('runtime.module'),
+        click: function (row: Runtime.Runtime) {
+            openModules(row);
+        },
+        disabled: function (row: Runtime.Runtime) {
+            return row.status === 'recreating' || row.status === 'stopped';
+        },
+    },
     {
         label: i18n.global.t('container.stop'),
         click: function (row: Runtime.Runtime) {
@@ -178,6 +190,10 @@ const search = async () => {
     } finally {
         loading.value = false;
     }
+};
+
+const openModules = (row: Runtime.Runtime) => {
+    moduleRef.value.acceptParams({ id: row.id });
 };
 
 const openCreate = () => {

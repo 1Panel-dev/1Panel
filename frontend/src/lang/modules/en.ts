@@ -1781,6 +1781,8 @@ const message = {
         taobao: 'Taobao',
         tencent: 'Tencent',
         imageSource: 'Image source',
+        moduleManager: 'Module Management',
+        module: 'Module',
     },
     process: {
         pid: 'Process ID',

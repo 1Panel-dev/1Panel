@@ -16,6 +16,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/pkg/errors"
 	"github.com/subosito/gotenv"
+	"os"
 	"path"
 	"strconv"
 	"strings"
@@ -32,6 +33,7 @@ type IRuntimeService interface {
 	Get(id uint) (res *response.RuntimeDTO, err error)
 	GetNodePackageRunScript(req request.NodePackageReq) ([]response.PackageScripts, error)
 	OperateRuntime(req request.RuntimeOperate) error
+	GetNodeModules(req request.NodeModuleReq) ([]response.NodeModule, error)
 }
 
 func NewRuntimeService() IRuntimeService {
@@ -441,4 +443,37 @@ func (r *RuntimeService) OperateRuntime(req request.RuntimeOperate) error {
 		}
 	}
 	return runtimeRepo.Save(runtime)
+}
+
+func (r *RuntimeService) GetNodeModules(req request.NodeModuleReq) ([]response.NodeModule, error) {
+	runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return nil, err
+	}
+	var res []response.NodeModule
+	nodeModulesPath := path.Join(runtime.CodeDir, "node_modules")
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(nodeModulesPath) {
+		return nil, buserr.New("ErrNodeModulesNotFound")
+	}
+	moduleDirs, err := os.ReadDir(nodeModulesPath)
+	if err != nil {
+		return nil, err
+	}
+	for _, moduleDir := range moduleDirs {
+		packagePath := path.Join(nodeModulesPath, moduleDir.Name(), "package.json")
+		if !fileOp.Stat(packagePath) {
+			continue
+		}
+		content, err := fileOp.GetContent(packagePath)
+		if err != nil {
+			continue
+		}
+		module := response.NodeModule{}
+		if err := json.Unmarshal(content, &module); err != nil {
+			continue
+		}
+		res = append(res, module)
+	}
+	return res, nil
 }

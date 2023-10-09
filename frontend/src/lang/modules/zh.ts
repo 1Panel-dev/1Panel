@@ -1682,6 +1682,8 @@ const message = {
         taobao: '淘宝',
         tencent: '腾讯',
         imageSource: '镜像源',
+        moduleManager: '模块管理',
+        module: '模块',
     },
     process: {
         pid: '进程ID',

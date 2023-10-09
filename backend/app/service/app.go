@@ -699,8 +699,7 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 		res.CanUpdate = true
 		return res, err
 	}
-	list := &dto.AppList{}
-	list, err = getAppList()
+	list, err := getAppList()
 	if err != nil {
 		return res, err
 	}

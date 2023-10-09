@@ -7903,6 +7903,39 @@
                 }
             }
         },
+        "/runtimes/node/modules": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取 Node 项目的 modules",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Runtime"
+                ],
+                "summary": "Get Node modules",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.NodeModuleReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/runtimes/node/package": {
             "post": {
                 "security": [
@@ -15561,6 +15594,9 @@
                 "name": {
                     "type": "string"
                 },
+                "sort": {
+                    "type": "integer"
+                },
                 "updatedAt": {
                     "type": "string"
                 }
@@ -16643,6 +16679,20 @@
                 },
                 "websiteId": {
                     "type": "integer"
+                }
+            }
+        },
+        "request.NodeModuleReq": {
+            "type": "object",
+            "properties": {
+                "ID": {
+                    "type": "integer"
+                },
+                "module": {
+                    "type": "string"
+                },
+                "operate": {
+                    "type": "string"
                 }
             }
         },

@@ -53,3 +53,9 @@ type RuntimeOperate struct {
 	Operate string `json:"operate"`
 	ID      uint   `json:"ID"`
 }
+
+type NodeModuleReq struct {
+	Operate string `json:"operate"`
+	ID      uint   `json:"ID"`
+	Module  string `json:"module"`
+}

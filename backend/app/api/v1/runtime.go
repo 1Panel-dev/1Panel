@@ -166,3 +166,25 @@ func (b *BaseApi) OperateRuntime(c *gin.Context) {
 	}
 	helper.SuccessWithOutData(c)
 }
+
+// @Tags Runtime
+// @Summary Get Node modules
+// @Description 获取 Node 项目的 modules
+// @Accept json
+// @Param request body request.NodeModuleReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /runtimes/node/modules [post]
+func (b *BaseApi) GetNodeModules(c *gin.Context) {
+	var req request.NodeModuleReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	res, err := runtimeService.GetNodeModules(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}

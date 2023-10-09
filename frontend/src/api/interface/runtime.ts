@@ -76,4 +76,14 @@ export namespace Runtime {
         ID: number;
         operate: string;
     }
+
+    export interface NodeModule {
+        name: string;
+        version: string;
+        description: string;
+    }
+
+    export interface NodeModuleReq {
+        ID: number;
+    }
 }

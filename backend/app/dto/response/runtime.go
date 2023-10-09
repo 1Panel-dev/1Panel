@@ -47,3 +47,10 @@ func NewRuntimeDTO(runtime model.Runtime) RuntimeDTO {
 		Path:        runtime.GetPath(),
 	}
 }
+
+type NodeModule struct {
+	Name        string `json:"name"`
+	Version     string `json:"version"`
+	License     string `json:"license"`
+	Description string `json:"description"`
+}

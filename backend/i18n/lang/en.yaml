@@ -107,6 +107,7 @@ ErrRuntimeStart: "Failed to start"
 ErrPackageJsonNotFound: "package.json file does not exist"
 ErrScriptsNotFound: "No scripts configuration item was found in package.json"
 ErrContainerNameNotFound: "Unable to get container name, please check .env file"
+ErrNodeModulesNotFound: "The node_modules folder does not exist! Please edit the running environment or wait for the running environment to start successfully"
 
 #setting
 ErrBackupInUsed: "The backup account is already being used in a cronjob and cannot be deleted."

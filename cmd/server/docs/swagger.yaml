@@ -2402,6 +2402,8 @@ definitions:
         type: string
       name:
         type: string
+      sort:
+        type: integer
       updatedAt:
         type: string
     type: object
@@ -3128,6 +3130,15 @@ definitions:
         type: integer
     required:
     - scope
+    type: object
+  request.NodeModuleReq:
+    properties:
+      ID:
+        type: integer
+      module:
+        type: string
+      operate:
+        type: string
     type: object
   request.NodePackageReq:
     properties:
@@ -9161,6 +9172,26 @@ paths:
         formatEN: Delete website [name]
         formatZH: 删除网站 [name]
         paramKeys: []
+  /runtimes/node/modules:
+    post:
+      consumes:
+      - application/json
+      description: 获取 Node 项目的 modules
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.NodeModuleReq'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Get Node modules
+      tags:
+      - Runtime
   /runtimes/node/package:
     post:
       consumes:
