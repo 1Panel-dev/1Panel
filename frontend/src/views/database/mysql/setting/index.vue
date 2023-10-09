@@ -304,7 +304,7 @@ const loadVariables = async () => {
     variablesRef.value!.acceptParams({
         type: props.type,
         database: props.database,
-        mysqlVersion: mysqlVersion.value,
+        version: mysqlVersion.value,
         variables: res.data,
     });
 };
