@@ -71,8 +71,8 @@ function checkAddress(rule: any, value: any, callback: any) {
                 }
             }
         }
-        callback();
     }
+    callback();
 }
 const formRef = ref<FormInstance>();
 
