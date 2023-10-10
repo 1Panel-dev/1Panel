@@ -193,7 +193,7 @@ const search = async () => {
 };
 
 const openModules = (row: Runtime.Runtime) => {
-    moduleRef.value.acceptParams({ id: row.id });
+    moduleRef.value.acceptParams({ id: row.id, packageManager: row.params['PACKAGE_MANAGER'] });
 };
 
 const openCreate = () => {

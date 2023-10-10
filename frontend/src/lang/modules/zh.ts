@@ -244,6 +244,9 @@ const message = {
             down: '停止',
             up: '启动',
             restart: '重启',
+            install: '安装',
+            uninstall: '卸载',
+            update: '更新',
         },
     },
     menu: {
@@ -1684,6 +1687,7 @@ const message = {
         imageSource: '镜像源',
         moduleManager: '模块管理',
         module: '模块',
+        nodeOperatorHelper: '是否{0} {1} 模块？操作可能导致运行环境异常，请确认后操作',
     },
     process: {
         pid: '进程ID',

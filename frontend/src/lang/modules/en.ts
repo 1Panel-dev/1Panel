@@ -246,6 +246,9 @@ const message = {
             down: 'Stop',
             up: 'Start',
             restart: 'Restart',
+            install: 'Install',
+            uninstall: 'Uninstall',
+            update: 'Update',
         },
     },
     menu: {
@@ -1783,6 +1786,8 @@ const message = {
         imageSource: 'Image source',
         moduleManager: 'Module Management',
         module: 'Module',
+        nodeOperatorHelper:
+            'Is {0} {1} module? The operation may cause abnormality in the operating environment, please confirm before proceeding',
     },
     process: {
         pid: 'Process ID',

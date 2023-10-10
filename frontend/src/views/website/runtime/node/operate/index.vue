@@ -301,8 +301,8 @@ const getApp = (appkey: string, mode: string) => {
     GetApp(appkey).then((res) => {
         appVersions.value = res.data.versions || [];
         if (res.data.versions.length > 0) {
-            runtime.version = res.data.versions[0];
             if (mode === 'create') {
+                runtime.version = res.data.versions[0];
                 changeVersion();
             }
         }

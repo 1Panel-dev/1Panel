@@ -1,6 +1,7 @@
 import http from '@/api';
 import { ResPage } from '../interface';
 import { Runtime } from '../interface/runtime';
+import { TimeoutEnum } from '@/enums/http-enum';
 
 export const SearchRuntimes = (req: Runtime.RuntimeReq) => {
     return http.post<ResPage<Runtime.RuntimeDTO>>(`/runtimes/search`, req);
@@ -32,4 +33,8 @@ export const OperateRuntime = (req: Runtime.RuntimeOperate) => {
 
 export const GetNodeModules = (req: Runtime.NodeModuleReq) => {
     return http.post<Runtime.NodeModule[]>(`/runtimes/node/modules`, req);
+};
+
+export const OperateNodeModule = (req: Runtime.NodeModuleReq) => {
+    return http.post<any>(`/runtimes/node/modules/operate`, req, TimeoutEnum.T_10M);
 };

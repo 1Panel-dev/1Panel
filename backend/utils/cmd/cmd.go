@@ -68,6 +68,18 @@ func ExecWithTimeOut(cmdStr string, timeout time.Duration) (string, error) {
 	return stdout.String(), nil
 }
 
+func ExecContainerScript(containerName, cmdStr string, timeout time.Duration) error {
+	cmdStr = fmt.Sprintf("docker exec -i %s bash -c '%s'", containerName, cmdStr)
+	out, err := ExecWithTimeOut(cmdStr, timeout)
+	if err != nil {
+		if out != "" {
+			return fmt.Errorf("%s; err: %v", out, err)
+		}
+		return err
+	}
+	return nil
+}
+
 func ExecCronjobWithTimeOut(cmdStr string, workdir string, timeout time.Duration) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()

@@ -23,6 +23,7 @@ func (r *RuntimeRouter) InitRuntimeRouter(Router *gin.RouterGroup) {
 		groupRouter.POST("/node/package", baseApi.GetNodePackageRunScript)
 		groupRouter.POST("/operate", baseApi.OperateRuntime)
 		groupRouter.POST("/node/modules", baseApi.GetNodeModules)
+		groupRouter.POST("/node/modules/operate", baseApi.OperateNodeModules)
 	}
 
 }

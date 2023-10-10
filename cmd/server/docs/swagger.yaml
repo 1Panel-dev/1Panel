@@ -3138,7 +3138,18 @@ definitions:
       module:
         type: string
       operate:
+        enum:
+        - install
+        - uninstall
+        - update
         type: string
+      pkgManager:
+        enum:
+        - npm
+        - yarn
+        type: string
+    required:
+    - ID
     type: object
   request.NodePackageReq:
     properties:
@@ -9190,6 +9201,26 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Get Node modules
+      tags:
+      - Runtime
+  /runtimes/node/modules/operate:
+    post:
+      consumes:
+      - application/json
+      description: 操作 Node 项目的 modules
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.NodeModuleReq'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Operate Node modules
       tags:
       - Runtime
   /runtimes/node/package:

@@ -2,6 +2,7 @@ package env
 
 import (
 	"fmt"
+	"github.com/joho/godotenv"
 	"os"
 	"sort"
 	"strconv"
@@ -36,4 +37,16 @@ func Marshal(envMap map[string]string) (string, error) {
 	}
 	sort.Strings(lines)
 	return strings.Join(lines, "\n"), nil
+}
+
+func GetEnvValueByKey(envPath, key string) (string, error) {
+	envMap, err := godotenv.Read(envPath)
+	if err != nil {
+		return "", err
+	}
+	value, ok := envMap[key]
+	if !ok {
+		return "", fmt.Errorf("key %s not found in %s", key, envPath)
+	}
+	return value, nil
 }

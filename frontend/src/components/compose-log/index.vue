@@ -82,7 +82,7 @@ const logSearch = reactive({
     isWatch: true,
     compose: '',
     mode: 'all',
-    tail: 1000,
+    tail: 500,
 });
 
 const handleClose = () => {
@@ -167,7 +167,7 @@ interface DialogProps {
 
 const acceptParams = (props: DialogProps): void => {
     logSearch.compose = props.compose;
-    logSearch.tail = 1000;
+    logSearch.tail = 200;
     logSearch.mode = timeOptions.value[3].value;
     logSearch.isWatch = true;
     resource.value = props.resource;
