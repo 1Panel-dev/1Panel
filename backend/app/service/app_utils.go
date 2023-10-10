@@ -295,6 +295,22 @@ func deleteAppInstall(install model.AppInstall, deleteBackup bool, forceDelete b
 
 	switch install.App.Key {
 	case constant.AppOpenresty:
+		websites, _ := websiteRepo.List()
+		for _, website := range websites {
+			if website.AppInstallID > 0 {
+				websiteAppInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
+				if websiteAppInstall.AppId > 0 {
+					websiteApp, _ := appRepo.GetFirst(commonRepo.WithByID(websiteAppInstall.AppId))
+					if websiteApp.Type == constant.RuntimePHP {
+						go func() {
+							_, _ = compose.Down(install.GetComposePath())
+							_ = op.DeleteDir(install.GetPath())
+						}()
+						_ = appInstallRepo.Delete(ctx, websiteAppInstall)
+					}
+				}
+			}
+		}
 		_ = websiteRepo.DeleteAll(ctx)
 		_ = websiteDomainRepo.DeleteAll(ctx)
 	case constant.AppMysql, constant.AppMariaDB:

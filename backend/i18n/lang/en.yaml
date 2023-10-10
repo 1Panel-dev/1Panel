@@ -51,6 +51,7 @@ ErrContainerMsg: '{{ .name }} container is abnormal, please check the log on the
 ErrAppBackup: '{{ .name }} application backup failed err {{.err}}'
 ErrImagePull: '{{ .name }} image pull failed err {{.err}}'
 ErrVersionTooLow: 'The current 1Panel version is too low to update the app store, please upgrade the version'
+ErrAppNameExist: 'App name is already exist'
 
 #file
 ErrFileCanNotRead: "File can not read"
