@@ -17,25 +17,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-func GeneratePaginationFromReq(c *gin.Context) (*dto.PageInfo, bool) {
-	p, ok1 := c.GetQuery("page")
-	ps, ok2 := c.GetQuery("pageSize")
-	if !(ok1 && ok2) {
-		return nil, false
-	}
-
-	page, err := strconv.Atoi(p)
-	if err != nil {
-		return nil, false
-	}
-	pageSize, err := strconv.Atoi(ps)
-	if err != nil {
-		return nil, false
-	}
-
-	return &dto.PageInfo{Page: page, PageSize: pageSize}, true
-}
-
 func ErrorWithDetail(ctx *gin.Context, code int, msgKey string, err error) {
 	res := dto.Response{
 		Code:    code,
@@ -131,4 +112,16 @@ func GetTxAndContext() (tx *gorm.DB, ctx context.Context) {
 	tx = global.DB.Begin()
 	ctx = context.WithValue(context.Background(), constant.DB, tx)
 	return
+}
+
+func CheckBindAndValidate(req interface{}, c *gin.Context) error {
+	if err := c.ShouldBindJSON(&req); err != nil {
+		ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return err
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return err
+	}
+	return nil
 }

@@ -5,7 +5,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/constant"
-	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,8 +18,7 @@ import (
 // @Router /runtimes/search [post]
 func (b *BaseApi) SearchRuntimes(c *gin.Context) {
 	var req request.RuntimeSearch
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 	total, items, err := runtimeService.Page(req)
@@ -45,8 +43,7 @@ func (b *BaseApi) SearchRuntimes(c *gin.Context) {
 // @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建运行环境 [name]","formatEN":"Create runtime [name]"}
 func (b *BaseApi) CreateRuntime(c *gin.Context) {
 	var req request.RuntimeCreate
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 	if err := runtimeService.Create(req); err != nil {
@@ -67,8 +64,7 @@ func (b *BaseApi) CreateRuntime(c *gin.Context) {
 // @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"删除网站 [name]","formatEN":"Delete website [name]"}
 func (b *BaseApi) DeleteRuntime(c *gin.Context) {
 	var req request.RuntimeDelete
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 	err := runtimeService.Delete(req)
@@ -90,8 +86,7 @@ func (b *BaseApi) DeleteRuntime(c *gin.Context) {
 // @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新运行环境 [name]","formatEN":"Update runtime [name]"}
 func (b *BaseApi) UpdateRuntime(c *gin.Context) {
 	var req request.RuntimeUpdate
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 	if err := runtimeService.Update(req); err != nil {
@@ -133,8 +128,7 @@ func (b *BaseApi) GetRuntime(c *gin.Context) {
 // @Router /runtimes/node/package [post]
 func (b *BaseApi) GetNodePackageRunScript(c *gin.Context) {
 	var req request.NodePackageReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 	res, err := runtimeService.GetNodePackageRunScript(req)
@@ -156,8 +150,7 @@ func (b *BaseApi) GetNodePackageRunScript(c *gin.Context) {
 // @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"操作运行环境 [name]","formatEN":"Operate runtime [name]"}
 func (b *BaseApi) OperateRuntime(c *gin.Context) {
 	var req request.RuntimeOperate
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 	err := runtimeService.OperateRuntime(req)
@@ -178,8 +171,7 @@ func (b *BaseApi) OperateRuntime(c *gin.Context) {
 // @Router /runtimes/node/modules [post]
 func (b *BaseApi) GetNodeModules(c *gin.Context) {
 	var req request.NodeModuleReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 	res, err := runtimeService.GetNodeModules(req)
@@ -200,12 +192,7 @@ func (b *BaseApi) GetNodeModules(c *gin.Context) {
 // @Router /runtimes/node/modules/operate [post]
 func (b *BaseApi) OperateNodeModules(c *gin.Context) {
 	var req request.NodeModuleReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 	err := runtimeService.OperateNodeModules(req)
