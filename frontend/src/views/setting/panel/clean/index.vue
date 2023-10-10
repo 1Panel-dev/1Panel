@@ -127,100 +127,102 @@
                                     </el-button>
                                 </div>
                             </div>
-                            <el-collapse class="mt-12" v-model="activeNames">
-                                <el-collapse-item :title="$t('clean.system')" name="system">
-                                    <el-tree
-                                        ref="systemRef"
-                                        :data="cleanData.systemClean"
-                                        node-key="id"
-                                        :default-checked-keys="systemDefaultCheck"
-                                        show-checkbox
-                                        :props="defaultProps"
-                                        @check-change="onChange"
-                                    >
-                                        <template #default="{ node, data }">
-                                            <div class="float-left">
-                                                <span>{{ load18n(data.label) }}</span>
-                                            </div>
-                                            <div class="ml-4 float-left">
-                                                <span v-if="data.size">{{ computeSize(data.size) }}</span>
-                                            </div>
-                                            <div class="ml-4 float-left">
-                                                <span>{{ loadTag(node, data) }}</span>
-                                            </div>
-                                        </template>
-                                    </el-tree>
-                                </el-collapse-item>
-                                <el-collapse-item :title="$t('clean.upload')" name="upload">
-                                    <el-tree
-                                        ref="uploadRef"
-                                        :data="cleanData.uploadClean"
-                                        node-key="id"
-                                        :default-checked-keys="uploadDefaultCheck"
-                                        show-checkbox
-                                        :props="defaultProps"
-                                        @check-change="onChange"
-                                    >
-                                        <template #default="{ node, data }">
-                                            <div class="float-left">
-                                                <span>{{ load18n(data.label) }}</span>
-                                            </div>
-                                            <div class="ml-4 float-left">
-                                                <span v-if="data.size">{{ computeSize(data.size) }}</span>
-                                            </div>
-                                            <div class="ml-4 float-left">
-                                                <span>{{ loadTag(node, data) }}</span>
-                                            </div>
-                                        </template>
-                                    </el-tree>
-                                </el-collapse-item>
-                                <el-collapse-item :title="$t('clean.download')" name="download">
-                                    <el-tree
-                                        ref="downloadRef"
-                                        :data="cleanData.downloadClean"
-                                        node-key="id"
-                                        :default-checked-keys="downloadDefaultCheck"
-                                        show-checkbox
-                                        :props="defaultProps"
-                                        @check-change="onChange"
-                                    >
-                                        <template #default="{ node, data }">
-                                            <div class="float-left">
-                                                <span>{{ load18n(data.label) }}</span>
-                                            </div>
-                                            <div class="ml-4 float-left">
-                                                <span v-if="data.size">{{ computeSize(data.size) }}</span>
-                                            </div>
-                                            <div class="ml-4 float-left">
-                                                <span>{{ loadTag(node, data) }}</span>
-                                            </div>
-                                        </template>
-                                    </el-tree>
-                                </el-collapse-item>
-                                <el-collapse-item :title="$t('clean.systemLog')" name="system_log">
-                                    <el-tree
-                                        ref="systemLogRef"
-                                        :data="cleanData.systemLogClean"
-                                        node-key="id"
-                                        :default-checked-keys="systemLogDefaultCheck"
-                                        show-checkbox
-                                        :props="defaultProps"
-                                        @check-change="onChange"
-                                    >
-                                        <template #default="{ node, data }">
-                                            <div class="float-left">
-                                                <span>{{ load18n(data.label) }}</span>
-                                            </div>
-                                            <div class="ml-4 float-left">
-                                                <span v-if="data.size">{{ computeSize(data.size) }}</span>
-                                            </div>
-                                            <div class="ml-4 float-left">
-                                                <span>{{ loadTag(node, data) }}</span>
-                                            </div>
-                                        </template>
-                                    </el-tree>
-                                </el-collapse-item>
-                            </el-collapse>
+                            <el-scrollbar class="mt-4" max-height="calc(100vh - 235px)">
+                                <el-collapse v-model="activeNames">
+                                    <el-collapse-item :title="$t('clean.system')" name="system">
+                                        <el-tree
+                                            ref="systemRef"
+                                            :data="cleanData.systemClean"
+                                            node-key="id"
+                                            :default-checked-keys="systemDefaultCheck"
+                                            show-checkbox
+                                            :props="defaultProps"
+                                            @check-change="onChange"
+                                        >
+                                            <template #default="{ node, data }">
+                                                <div class="float-left">
+                                                    <span>{{ load18n(data.label) }}</span>
+                                                </div>
+                                                <div class="ml-4 float-left">
+                                                    <span v-if="data.size">{{ computeSize(data.size) }}</span>
+                                                </div>
+                                                <div class="ml-4 float-left">
+                                                    <span>{{ loadTag(node, data) }}</span>
+                                                </div>
+                                            </template>
+                                        </el-tree>
+                                    </el-collapse-item>
+                                    <el-collapse-item :title="$t('clean.upload')" name="upload">
+                                        <el-tree
+                                            ref="uploadRef"
+                                            :data="cleanData.uploadClean"
+                                            node-key="id"
+                                            :default-checked-keys="uploadDefaultCheck"
+                                            show-checkbox
+                                            :props="defaultProps"
+                                            @check-change="onChange"
+                                        >
+                                            <template #default="{ node, data }">
+                                                <div class="float-left">
+                                                    <span>{{ load18n(data.label) }}</span>
+                                                </div>
+                                                <div class="ml-4 float-left">
+                                                    <span v-if="data.size">{{ computeSize(data.size) }}</span>
+                                                </div>
+                                                <div class="ml-4 float-left">
+                                                    <span>{{ loadTag(node, data) }}</span>
+                                                </div>
+                                            </template>
+                                        </el-tree>
+                                    </el-collapse-item>
+                                    <el-collapse-item :title="$t('clean.download')" name="download">
+                                        <el-tree
+                                            ref="downloadRef"
+                                            :data="cleanData.downloadClean"
+                                            node-key="id"
+                                            :default-checked-keys="downloadDefaultCheck"
+                                            show-checkbox
+                                            :props="defaultProps"
+                                            @check-change="onChange"
+                                        >
+                                            <template #default="{ node, data }">
+                                                <div class="float-left">
+                                                    <span>{{ load18n(data.label) }}</span>
+                                                </div>
+                                                <div class="ml-4 float-left">
+                                                    <span v-if="data.size">{{ computeSize(data.size) }}</span>
+                                                </div>
+                                                <div class="ml-4 float-left">
+                                                    <span>{{ loadTag(node, data) }}</span>
+                                                </div>
+                                            </template>
+                                        </el-tree>
+                                    </el-collapse-item>
+                                    <el-collapse-item :title="$t('clean.systemLog')" name="system_log">
+                                        <el-tree
+                                            ref="systemLogRef"
+                                            :data="cleanData.systemLogClean"
+                                            node-key="id"
+                                            :default-checked-keys="systemLogDefaultCheck"
+                                            show-checkbox
+                                            :props="defaultProps"
+                                            @check-change="onChange"
+                                        >
+                                            <template #default="{ node, data }">
+                                                <div class="float-left">
+                                                    <span>{{ load18n(data.label) }}</span>
+                                                </div>
+                                                <div class="ml-4 float-left">
+                                                    <span v-if="data.size">{{ computeSize(data.size) }}</span>
+                                                </div>
+                                                <div class="ml-4 float-left">
+                                                    <span>{{ loadTag(node, data) }}</span>
+                                                </div>
+                                            </template>
+                                        </el-tree>
+                                    </el-collapse-item>
+                                </el-collapse>
+                            </el-scrollbar>
                         </div>
                     </el-col>
                 </el-row>
