@@ -49,7 +49,6 @@ var (
 var (
 	ErrPortInUsed          = "ErrPortInUsed"
 	ErrAppLimit            = "ErrAppLimit"
-	ErrFileToLarge         = "ErrFileToLarge"
 	ErrFileCanNotRead      = "ErrFileCanNotRead"
 	ErrNotInstall          = "ErrNotInstall"
 	ErrPortInOtherApp      = "ErrPortInOtherApp"
@@ -60,6 +59,7 @@ var (
 	ErrFileParse           = "ErrFileParse"
 	ErrInstallDirNotFound  = "ErrInstallDirNotFound"
 	ErrContainerName       = "ErrContainerName"
+	ErrAppNameExist        = "ErrAppNameExist"
 )
 
 // website

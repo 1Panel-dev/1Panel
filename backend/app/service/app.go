@@ -273,7 +273,7 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		return
 	}
 	if list, _ := appInstallRepo.ListBy(commonRepo.WithByName(req.Name)); len(list) > 0 {
-		err = buserr.New(constant.ErrNameIsExist)
+		err = buserr.New(constant.ErrAppNameExist)
 		return
 	}
 	var (
