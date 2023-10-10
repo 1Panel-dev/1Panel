@@ -89,6 +89,7 @@ func (u *SettingService) Update(key, value string) error {
 			}
 		}
 		if value == "disable" && global.MonitorCronID != 0 {
+			monitorCancel()
 			global.Cron.Remove(cron.EntryID(global.MonitorCronID))
 			global.MonitorCronID = 0
 		}
