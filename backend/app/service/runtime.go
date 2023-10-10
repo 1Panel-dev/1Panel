@@ -11,8 +11,10 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	cmd2 "github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
+	"github.com/1Panel-dev/1Panel/backend/utils/env"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/pkg/errors"
 	"github.com/subosito/gotenv"
@@ -20,6 +22,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type RuntimeService struct {
@@ -34,6 +37,7 @@ type IRuntimeService interface {
 	GetNodePackageRunScript(req request.NodePackageReq) ([]response.PackageScripts, error)
 	OperateRuntime(req request.RuntimeOperate) error
 	GetNodeModules(req request.NodeModuleReq) ([]response.NodeModule, error)
+	OperateNodeModules(req request.NodeModuleReq) error
 }
 
 func NewRuntimeService() IRuntimeService {
@@ -476,4 +480,34 @@ func (r *RuntimeService) GetNodeModules(req request.NodeModuleReq) ([]response.N
 		res = append(res, module)
 	}
 	return res, nil
+}
+
+func (r *RuntimeService) OperateNodeModules(req request.NodeModuleReq) error {
+	runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	containerName, err := env.GetEnvValueByKey(runtime.GetEnvPath(), "CONTAINER_NAME")
+	if err != nil {
+		return err
+	}
+	cmd := req.PkgManager
+	switch req.Operate {
+	case constant.RuntimeInstall:
+		if req.PkgManager == constant.RuntimeNpm {
+			cmd += " install"
+		} else {
+			cmd += " add"
+		}
+	case constant.RuntimeUninstall:
+		if req.PkgManager == constant.RuntimeNpm {
+			cmd += " uninstall"
+		} else {
+			cmd += " remove"
+		}
+	case constant.RuntimeUpdate:
+		cmd += " update"
+	}
+	cmd += " " + req.Module
+	return cmd2.ExecContainerScript(containerName, cmd, 5*time.Minute)
 }

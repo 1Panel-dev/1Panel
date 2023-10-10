@@ -242,8 +242,11 @@ const message = {
         },
         operate: {
             down: '停止',
-            up: '启动',
-            restart: '重启',
+            up: '啟動',
+            restart: '重啟',
+            install: '安裝',
+            uninstall: '卸載',
+            update: '更新',
         },
     },
     menu: {
@@ -1685,6 +1688,7 @@ const message = {
         imageSource: '鏡像源',
         moduleManager: '模塊管理',
         module: '模塊',
+        nodeOperatorHelper: '是否{0} {1} 模組？ 操作可能導致運轉環境異常，請確認後操作',
     },
     process: {
         pid: '進程ID',

@@ -23,4 +23,11 @@ const (
 	RuntimeUp      = "up"
 	RuntimeDown    = "down"
 	RuntimeRestart = "restart"
+
+	RuntimeInstall   = "install"
+	RuntimeUninstall = "uninstall"
+	RuntimeUpdate    = "update"
+
+	RuntimeNpm  = "npm"
+	RuntimeYarn = "yarn"
 )

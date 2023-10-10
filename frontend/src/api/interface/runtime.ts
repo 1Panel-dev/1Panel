@@ -44,7 +44,7 @@ export namespace Runtime {
         name: string;
         appDetailID: number;
         image: string;
-        params: object;
+        params: Object;
         type: string;
         resource: string;
         appID?: number;
@@ -85,5 +85,8 @@ export namespace Runtime {
 
     export interface NodeModuleReq {
         ID: number;
+        Operate?: string;
+        Module?: string;
+        PkgManager?: string;
     }
 }

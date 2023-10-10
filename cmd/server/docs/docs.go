@@ -7943,6 +7943,39 @@ const docTemplate = `{
                 }
             }
         },
+        "/runtimes/node/modules/operate": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "操作 Node 项目的 modules",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Runtime"
+                ],
+                "summary": "Operate Node modules",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.NodeModuleReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/runtimes/node/package": {
             "post": {
                 "security": [
@@ -16691,6 +16724,9 @@ const docTemplate = `{
         },
         "request.NodeModuleReq": {
             "type": "object",
+            "required": [
+                "ID"
+            ],
             "properties": {
                 "ID": {
                     "type": "integer"
@@ -16699,7 +16735,19 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "operate": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "install",
+                        "uninstall",
+                        "update"
+                    ]
+                },
+                "pkgManager": {
+                    "type": "string",
+                    "enum": [
+                        "npm",
+                        "yarn"
+                    ]
                 }
             }
         },

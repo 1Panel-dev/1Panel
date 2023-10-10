@@ -5,6 +5,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/gin-gonic/gin"
 )
 
@@ -187,4 +188,30 @@ func (b *BaseApi) GetNodeModules(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, res)
+}
+
+// @Tags Runtime
+// @Summary Operate Node modules
+// @Description 操作 Node 项目 modules
+// @Accept json
+// @Param request body request.NodeModuleReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /runtimes/node/modules/operate [post]
+func (b *BaseApi) OperateNodeModules(c *gin.Context) {
+	var req request.NodeModuleReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	err := runtimeService.OperateNodeModules(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
 }
