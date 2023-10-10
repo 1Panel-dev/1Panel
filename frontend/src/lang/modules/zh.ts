@@ -179,7 +179,7 @@ const message = {
             paramUrlAndPort: '格式为 http(s)://(域名/ip):(端口)',
             nginxDoc: '仅支持英文大小写，数字，和.',
             appName: '支持英文、数字、-和_,长度2-30,并且不能以-_开头和结尾',
-            containerName: '支持字母、数字、下划线、连字符和点,不能以连字符-或点.结尾,长度1-127',
+            containerName: '支持字母、数字、_-和.,不能以-_或.开头,长度1-127',
             mirror: '支持以 http(s):// 开头，英文大小写，数字，. 和 - 的镜像加速地址，且不能有空行',
             disableFunction: '仅支持字母、下划线和,',
             leechExts: '仅支持字母数字和,',
