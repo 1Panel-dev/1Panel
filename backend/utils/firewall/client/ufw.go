@@ -165,7 +165,7 @@ func (f *Ufw) RichRules(rule FireInfo, operation string) error {
 		return buserr.New(constant.ErrCmdIllegal)
 	}
 
-	ruleStr := fmt.Sprintf("%s %s ", f.CmdStr, rule.Strategy)
+	ruleStr := fmt.Sprintf("%s insert 1 %s ", f.CmdStr, rule.Strategy)
 	if operation == "remove" {
 		ruleStr = fmt.Sprintf("%s delete %s ", f.CmdStr, rule.Strategy)
 	}
