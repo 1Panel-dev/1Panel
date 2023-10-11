@@ -371,15 +371,22 @@ const moreTag = ref('');
 const language = useI18n().locale.value;
 
 const sync = () => {
-    syncLoading.value = true;
-    SyncInstalledApp()
-        .then(() => {
-            MsgSuccess(i18n.global.t('app.syncSuccess'));
-            search();
+    ElMessageBox.confirm(i18n.global.t('app.syncAllAppHelper'), i18n.global.t('app.sync'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    })
+        .then(async () => {
+            syncLoading.value = true;
+            try {
+                await SyncInstalledApp();
+                MsgSuccess(i18n.global.t('app.syncSuccess'));
+                search();
+            } finally {
+                syncLoading.value = false;
+            }
         })
-        .finally(() => {
-            syncLoading.value = false;
-        });
+        .catch(() => {});
 };
 
 const changeTag = (key: string) => {

@@ -1294,6 +1294,7 @@ const message = {
         openrestyDeleteHelper: '強制刪除 OpenResty 會刪除所有的網站，請確認風險後操作',
         downloadLogHelper1: '即將下載 {0} 套用所有日誌，是否繼續？ ',
         downloadLogHelper2: '即將下載 {0} 應用最近 {1} 條日誌，是否繼續？ ',
+        syncAllAppHelper: '即將同步所有應用，是否繼續？ ',
     },
     website: {
         website: '網站',
