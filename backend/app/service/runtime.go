@@ -506,7 +506,11 @@ func (r *RuntimeService) OperateNodeModules(req request.NodeModuleOperateReq) er
 			cmd += " remove"
 		}
 	case constant.RuntimeUpdate:
-		cmd += " update"
+		if req.PkgManager == constant.RuntimeNpm {
+			cmd += " update"
+		} else {
+			cmd += " upgrade"
+		}
 	}
 	cmd += " " + req.Module
 	return cmd2.ExecContainerScript(containerName, cmd, 5*time.Minute)
