@@ -153,7 +153,7 @@
                     </div>
                     <div v-if="website.type === 'runtime'">
                         <el-row :gutter="20">
-                            <el-col :span="12">
+                            <el-col :span="8">
                                 <el-form-item :label="$t('commons.table.type')" prop="runtimeType">
                                     <el-select v-model="website.runtimeType" @change="changeRuntimeType()">
                                         <el-option label="PHP" value="php"></el-option>
@@ -161,7 +161,7 @@
                                     </el-select>
                                 </el-form-item>
                             </el-col>
-                            <el-col :span="12">
+                            <el-col :span="16">
                                 <el-form-item :label="$t('runtime.runtime')" prop="runtimeID">
                                     <el-select
                                         v-model="website.runtimeID"
@@ -175,8 +175,12 @@
                                             :value="run.id"
                                         >
                                             <el-row>
-                                                <el-col :span="8">{{ run.name }}</el-col>
-                                                <el-col :span="12">
+                                                <el-col :span="14">
+                                                    <span class="runtimeName">
+                                                        {{ run.name }}
+                                                    </span>
+                                                </el-col>
+                                                <el-col :span="10">
                                                     {{ ' [' + $t('runtime.' + run.resource) + ']' }}
                                                 </el-col>
                                             </el-row>
@@ -613,3 +617,13 @@ defineExpose({
     acceptParams,
 });
 </script>
+
+<style lang="scss" scoped>
+.runtimeName {
+    width: 250px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+}
+</style>
