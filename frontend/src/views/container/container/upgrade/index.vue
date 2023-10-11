@@ -38,6 +38,12 @@
                         <el-input v-model="form.newTag" :placeholder="$t('container.targetImageHelper')" />
                         <span class="input-help">{{ $t('container.upgradeHelper') }}</span>
                     </el-form-item>
+                    <el-form-item prop="ignoreCompare">
+                        <el-checkbox v-model="form.ignoreCompare">
+                            {{ $t('container.ignoreCompare') }}
+                        </el-checkbox>
+                        <span class="input-help">{{ $t('container.ignoreCompareHelper') }}</span>
+                    </el-form-item>
                     <el-form-item prop="forcePull">
                         <el-checkbox v-model="form.forcePull">
                             {{ $t('container.forcePull') }}
@@ -78,6 +84,8 @@ const form = reactive({
     newTag: '',
     fromApp: false,
     forcePull: false,
+
+    ignoreCompare: false,
 });
 
 const formRef = ref<FormInstance>();
@@ -96,6 +104,7 @@ const acceptParams = (props: DialogProps): void => {
     form.oldTag = props.image.indexOf(':') !== -1 ? props.image.split(':')[1] : 'latest';
     form.newTag = form.oldTag;
     form.fromApp = props.fromApp;
+    form.ignoreCompare = false;
     drawerVisible.value = true;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
@@ -104,7 +113,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        if (!compareVersion(form.newTag, form.oldTag)) {
+        if (!form.ignoreCompare && !compareVersion(form.newTag, form.oldTag)) {
             MsgWarning(i18n.global.t('container.upgradeWarning'));
             return;
         }

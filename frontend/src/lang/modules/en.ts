@@ -555,6 +555,9 @@ const message = {
         containerTerminal: 'Terminal',
 
         upgradeHelper: 'This operation only supports upgrading container versions.',
+        ignoreCompare: 'Force Upgrade',
+        ignoreCompareHelper:
+            'Skip the comparison between old and new versions, upgrade directly. This operation may result in service unavailability.',
         upgradeWarning: 'The target version is lower than the original image version. Please try again!',
         upgradeWarning2:
             'The upgrade operation requires rebuilding the container, and any non-persistent data will be lost. Do you want to continue?',
