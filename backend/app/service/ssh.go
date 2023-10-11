@@ -32,7 +32,7 @@ type ISSHService interface {
 	UpdateByFile(value string) error
 	Update(key, value string) error
 	GenerateSSH(req dto.GenerateSSH) error
-	AnalysisLog(req dto.SearchForAnalysis) ([]dto.SSHLogAnalysis, error)
+	AnalysisLog(req dto.SearchForAnalysis) (*dto.AnalysisRes, error)
 	LoadSSHSecret(mode string) (string, error)
 	LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error)
 
@@ -304,7 +304,7 @@ func (u *SSHService) LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error) {
 	return &data, nil
 }
 
-func (u *SSHService) AnalysisLog(req dto.SearchForAnalysis) ([]dto.SSHLogAnalysis, error) {
+func (u *SSHService) AnalysisLog(req dto.SearchForAnalysis) (*dto.AnalysisRes, error) {
 	var fileList []string
 	baseDir := "/var/log"
 	if err := filepath.Walk(baseDir, func(pathItem string, info os.FileInfo, err error) error {
@@ -365,7 +365,26 @@ func (u *SSHService) AnalysisLog(req dto.SearchForAnalysis) ([]dto.SSHLogAnalysi
 		}
 	}
 
-	return sortSlice, nil
+	var backData dto.AnalysisRes
+	for _, item := range sortSlice {
+		backData.FailedCount += item.FailedCount
+		backData.SuccessfulCount += item.SuccessfulCount
+	}
+
+	var data []dto.SSHLogAnalysis
+	total, start, end := len(sortSlice), (req.Page-1)*req.PageSize, req.Page*req.PageSize
+	if start > total {
+		data = make([]dto.SSHLogAnalysis, 0)
+	} else {
+		if end >= total {
+			end = total
+		}
+		data = sortSlice[start:end]
+	}
+	backData.Items = data
+	backData.Total = int64(total)
+
+	return &backData, nil
 }
 
 func (u *SSHService) LoadSSHConf() (string, error) {

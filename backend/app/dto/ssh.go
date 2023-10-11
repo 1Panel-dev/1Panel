@@ -38,7 +38,15 @@ type SSHLog struct {
 }
 
 type SearchForAnalysis struct {
+	PageInfo
 	OrderBy string `json:"orderBy" validate:"required,oneof=Success Failed"`
+}
+
+type AnalysisRes struct {
+	Total           int64            `json:"total"`
+	Items           []SSHLogAnalysis `json:"items"`
+	SuccessfulCount int              `json:"successfulCount"`
+	FailedCount     int              `json:"failedCount"`
 }
 
 type SSHLogAnalysis struct {

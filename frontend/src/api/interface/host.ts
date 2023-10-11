@@ -136,6 +136,15 @@ export namespace Host {
         info: string;
         status: string;
     }
+    export interface analysisSSHLog extends ReqPage {
+        orderBy: string;
+    }
+    export interface logAnalysisRes {
+        total: number;
+        items: Array<logAnalysis>;
+        successfulCount: number;
+        failedCount: number;
+    }
     export interface sshLog {
         logs: Array<sshHistory>;
         successfulCount: number;

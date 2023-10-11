@@ -7943,7 +7943,7 @@
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "操作 Node 项目的 modules",
+                "description": "操作 Node 项目 modules",
                 "consumes": [
                     "application/json"
                 ],
@@ -14910,7 +14910,9 @@
         "dto.SearchForAnalysis": {
             "type": "object",
             "required": [
-                "orderBy"
+                "orderBy",
+                "page",
+                "pageSize"
             ],
             "properties": {
                 "orderBy": {
@@ -14919,6 +14921,12 @@
                         "Success",
                         "Failed"
                     ]
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
                 }
             }
         },
@@ -16723,24 +16731,6 @@
             "properties": {
                 "ID": {
                     "type": "integer"
-                },
-                "module": {
-                    "type": "string"
-                },
-                "operate": {
-                    "type": "string",
-                    "enum": [
-                        "install",
-                        "uninstall",
-                        "update"
-                    ]
-                },
-                "pkgManager": {
-                    "type": "string",
-                    "enum": [
-                        "npm",
-                        "yarn"
-                    ]
                 }
             }
         },
