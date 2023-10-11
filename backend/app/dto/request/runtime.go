@@ -54,9 +54,13 @@ type RuntimeOperate struct {
 	ID      uint   `json:"ID"`
 }
 
-type NodeModuleReq struct {
+type NodeModuleOperateReq struct {
 	Operate    string `json:"operate" validate:"oneof=install uninstall update"`
 	ID         uint   `json:"ID" validate:"required"`
 	Module     string `json:"module"`
 	PkgManager string `json:"pkgManager" validate:"oneof=npm yarn"`
+}
+
+type NodeModuleReq struct {
+	ID uint `json:"ID" validate:"required"`
 }
