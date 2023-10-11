@@ -233,12 +233,12 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 			}
 			return nil
 		}
-		if req.Protocol == "tcp/udp" {
-			req.Protocol = ""
-		}
 		for _, addr := range itemAddress {
 			if len(addr) == 0 {
 				addr = "Anywhere"
+			}
+			if req.Protocol == "tcp/udp" {
+				req.Protocol = ""
 			}
 			req.Address = addr
 			if err := u.operatePort(client, req); err != nil {
