@@ -32,14 +32,16 @@
                 <el-button type="primary" @click="onChangeStatus('drop', null)" :disabled="selects.length === 0">
                     {{ $t('firewall.deny') }}
                 </el-button>
-                <ComplexTable v-model:selects="selects" class="mt-5" :data="data" @header-click="changeSort">
+                <el-table v-model:selects="selects" class="mt-5" :data="data" @header-click="changeSort">
                     <el-table-column type="selection" fix :selectable="selectable" />
                     <el-table-column :label="$t('logs.loginIP')" prop="address" min-width="40" />
                     <el-table-column :label="$t('ssh.belong')" prop="area" min-width="40" />
                     <el-table-column prop="successfulCount" min-width="20">
                         <template #header>
                             {{ $t('ssh.successful') }}
-                            <el-icon style="cursor: pointer" @click="search('Success')"><CaretBottom /></el-icon>
+                            <el-icon style="cursor: pointer" @click="(orderBy = 'Success') && search()">
+                                <CaretBottom />
+                            </el-icon>
                         </template>
                         <template #default="{ row }">
                             <el-button type="primary" link>{{ row.successfulCount }}</el-button>
@@ -48,7 +50,9 @@
                     <el-table-column prop="failedCount" min-width="20">
                         <template #header>
                             {{ $t('ssh.failed') }}
-                            <el-icon style="cursor: pointer" @click="search('Failed')"><CaretBottom /></el-icon>
+                            <el-icon style="cursor: pointer" @click="(orderBy = 'Failed') && search()">
+                                <CaretBottom />
+                            </el-icon>
                         </template>
                         <template #default="{ row }">
                             <el-button type="danger" link>{{ row.failedCount }}</el-button>
@@ -76,7 +80,15 @@
                             </el-button>
                         </template>
                     </el-table-column>
-                </ComplexTable>
+                </el-table>
+                <fu-table-pagination
+                    class="float-right mt-4"
+                    v-model:current-page="paginationConfig.currentPage"
+                    v-model:page-size="paginationConfig.pageSize"
+                    v-bind="paginationConfig"
+                    @change="search()"
+                    :layout="'prev, pager, next'"
+                />
             </div>
             <template #footer>
                 <span class="dialog-footer">
@@ -120,7 +132,7 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { loadAnalysis, operateIPRule } from '@/api/modules/host';
 import { MsgError, MsgSuccess } from '@/utils/message';
@@ -133,29 +145,38 @@ const data = ref();
 const successfulTotalCount = ref();
 const failedTotalCount = ref();
 const selects = ref<any>([]);
+const orderBy = ref<string>('Failed');
 
 const dialogVisible = ref();
 const msg = ref();
 const operation = ref();
 const operationList = ref();
 
+const paginationConfig = reactive({
+    currentPage: 1,
+    pageSize: 10,
+    total: 0,
+});
+
 const acceptParams = (): void => {
-    search('Failed');
+    search();
     drawerVisible.value = true;
 };
 
-const search = async (status: string) => {
+const search = async () => {
+    let params = {
+        page: paginationConfig.currentPage,
+        pageSize: paginationConfig.pageSize,
+        orderBy: orderBy.value,
+    };
     loading.value = true;
-    loadAnalysis(status)
+    loadAnalysis(params)
         .then((res) => {
             loading.value = false;
-            data.value = res.data || [];
-            successfulTotalCount.value = 0;
-            failedTotalCount.value = 0;
-            for (const item of data.value) {
-                successfulTotalCount.value += item.successfulCount;
-                failedTotalCount.value += item.failedCount;
-            }
+            data.value = res.data.items || [];
+            successfulTotalCount.value = res.data.successfulCount;
+            failedTotalCount.value = res.data.failedCount;
+            paginationConfig.total = res.data.total;
         })
         .catch(() => {
             loading.value = false;
@@ -169,10 +190,12 @@ function selectable(row: any): boolean {
 const changeSort = (column: any) => {
     switch (column.property) {
         case 'successfulCount':
-            search('Success');
+            orderBy.value = 'Success';
+            search();
             return;
         case 'failedCount':
-            search('Failed');
+            orderBy.value = 'Failed';
+            search();
             return;
     }
 };
@@ -218,7 +241,7 @@ const submitOperation = async () => {
         .then(() => {
             loading.value = false;
             dialogVisible.value = false;
-            search('Failed');
+            search();
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .finally(() => {

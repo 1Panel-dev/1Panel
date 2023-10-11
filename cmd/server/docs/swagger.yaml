@@ -1931,8 +1931,14 @@ definitions:
         - Success
         - Failed
         type: string
+      page:
+        type: integer
+      pageSize:
+        type: integer
     required:
     - orderBy
+    - page
+    - pageSize
     type: object
   dto.SearchForTree:
     properties:
@@ -3135,19 +3141,6 @@ definitions:
     properties:
       ID:
         type: integer
-      module:
-        type: string
-      operate:
-        enum:
-        - install
-        - uninstall
-        - update
-        type: string
-      pkgManager:
-        enum:
-        - npm
-        - yarn
-        type: string
     required:
     - ID
     type: object
@@ -9207,7 +9200,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: 操作 Node 项目的 modules
+      description: 操作 Node 项目 modules
       parameters:
       - description: request
         in: body
