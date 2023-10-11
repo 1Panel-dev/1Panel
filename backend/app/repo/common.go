@@ -24,6 +24,7 @@ type ICommonRepo interface {
 	WithByDate(startTime, endTime time.Time) DBOption
 	WithByStartDate(startTime time.Time) DBOption
 	WithByStatus(status string) DBOption
+	WithByFrom(from string) DBOption
 }
 
 type CommonRepo struct{}
@@ -77,6 +78,12 @@ func (c *CommonRepo) WithByStatus(status string) DBOption {
 			return g
 		}
 		return g.Where("status = ?", status)
+	}
+}
+
+func (c *CommonRepo) WithByFrom(from string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("`from` = ?", from)
 	}
 }
 

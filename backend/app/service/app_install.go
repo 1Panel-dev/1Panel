@@ -536,9 +536,9 @@ func (a *AppInstallService) ChangeAppPort(req request.PortUpdate) error {
 	return nil
 }
 
-func (a *AppInstallService) DeleteCheck(installId uint) ([]dto.AppResource, error) {
+func (a *AppInstallService) DeleteCheck(installID uint) ([]dto.AppResource, error) {
 	var res []dto.AppResource
-	appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(installId))
+	appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(installID))
 	if err != nil {
 		return nil, err
 	}
@@ -562,8 +562,8 @@ func (a *AppInstallService) DeleteCheck(installId uint) ([]dto.AppResource, erro
 			})
 		}
 	}
-	if app.Type == "runtime" {
-		resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithLinkId(appInstall.ID))
+	if app.Type == constant.Runtime {
+		resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithLinkId(appInstall.ID), commonRepo.WithByFrom(constant.AppResourceLocal))
 		for _, resource := range resources {
 			linkInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(resource.AppInstallId))
 			res = append(res, dto.AppResource{
