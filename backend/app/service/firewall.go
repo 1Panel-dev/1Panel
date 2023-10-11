@@ -225,7 +225,10 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 					if err := u.operatePort(client, req); err != nil {
 						global.LOG.Errorf("%s port %s/%s failed (strategy: %s, address: %s), err: %v", req.Operation, req.Port, req.Protocol, req.Strategy, req.Address, err)
 					}
-					_ = u.addPortRecord(req)
+					req.Port = strings.ReplaceAll(req.Port, ":", "-")
+					if err := u.addPortRecord(req); err != nil {
+						global.LOG.Errorf("add record %s/%s failed (strategy: %s, address: %s), err: %v", req.Port, req.Protocol, req.Strategy, req.Address, err)
+					}
 				}
 			}
 			return nil
@@ -244,7 +247,9 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 			if len(req.Protocol) == 0 {
 				req.Protocol = "tcp/udp"
 			}
-			_ = u.addPortRecord(req)
+			if err := u.addPortRecord(req); err != nil {
+				global.LOG.Errorf("add record %s/%s failed (strategy: %s, address: %s), err: %v", req.Port, req.Protocol, req.Strategy, req.Address, err)
+			}
 		}
 		return nil
 	}
