@@ -541,6 +541,8 @@ const message = {
         emptyUser: '為空時，將使用容器默認的用戶登錄',
 
         upgradeHelper: '該操作僅支持容器版本升級',
+        ignoreCompare: '強製升級',
+        ignoreCompareHelper: '跳過新老版本比較，直接升級，該操作可能導致服務不可用',
         upgradeWarning: '當前目標版本低於原鏡像版本，請重新輸入！',
         upgradeWarning2: '升級操作需要重建容器，任何未持久化的數據將會丟失，是否繼續？',
         oldImage: '當前鏡像',
