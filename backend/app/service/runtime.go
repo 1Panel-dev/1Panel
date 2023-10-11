@@ -37,7 +37,7 @@ type IRuntimeService interface {
 	GetNodePackageRunScript(req request.NodePackageReq) ([]response.PackageScripts, error)
 	OperateRuntime(req request.RuntimeOperate) error
 	GetNodeModules(req request.NodeModuleReq) ([]response.NodeModule, error)
-	OperateNodeModules(req request.NodeModuleReq) error
+	OperateNodeModules(req request.NodeModuleOperateReq) error
 }
 
 func NewRuntimeService() IRuntimeService {
@@ -482,7 +482,7 @@ func (r *RuntimeService) GetNodeModules(req request.NodeModuleReq) ([]response.N
 	return res, nil
 }
 
-func (r *RuntimeService) OperateNodeModules(req request.NodeModuleReq) error {
+func (r *RuntimeService) OperateNodeModules(req request.NodeModuleOperateReq) error {
 	runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(req.ID))
 	if err != nil {
 		return err

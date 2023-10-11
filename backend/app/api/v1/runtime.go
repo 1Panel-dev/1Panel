@@ -191,7 +191,7 @@ func (b *BaseApi) GetNodeModules(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Router /runtimes/node/modules/operate [post]
 func (b *BaseApi) OperateNodeModules(c *gin.Context) {
-	var req request.NodeModuleReq
+	var req request.NodeModuleOperateReq
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
