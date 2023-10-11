@@ -328,7 +328,7 @@ const handleClose = () => {
 
 const rules = reactive({
     name: [Rules.requiredInput, Rules.containerName],
-    image: [Rules.requiredInput],
+    image: [Rules.imageName],
     cpuShares: [Rules.integerNumberWith0, checkNumberRange(0, 262144)],
     nanoCPUs: [Rules.floatNumber],
     memory: [Rules.floatNumber],

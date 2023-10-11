@@ -20,7 +20,7 @@
                         </el-tooltip>
                         <el-tag v-else>{{ form.imageName }}:{{ form.oldTag }}</el-tag>
                     </el-form-item>
-                    <el-form-item prop="newTag" :rules="Rules.requiredInput">
+                    <el-form-item prop="newTag" :rules="Rules.imageName">
                         <template #label>
                             <el-tooltip
                                 placement="top-start"

@@ -139,10 +139,15 @@ const onCopy = async () => {
 
 const loadMfaCodeBefore = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
-    formEl.validate(async (valid) => {
-        if (!valid) return;
-        loadMfaCode();
-    });
+    const result = await formEl.validateField('interval', callback);
+    if (!result) {
+        return;
+    }
+    const result2 = await formEl.validateField('title', callback);
+    if (!result2) {
+        return;
+    }
+    loadMfaCode();
 };
 const loadMfaCode = async () => {
     let param = {
@@ -153,6 +158,14 @@ const loadMfaCode = async () => {
     form.secret = res.data.secret;
     qrImage.value = res.data.qrImage;
 };
+
+function callback(error: any) {
+    if (error) {
+        return error.message;
+    } else {
+        return;
+    }
+}
 
 const onBind = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
