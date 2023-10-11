@@ -1291,6 +1291,7 @@ const message = {
         openrestyDeleteHelper: '强制删除 OpenResty 会删除所有的网站，请确认风险之后操作',
         downloadLogHelper1: '即将下载 {0} 应用所有日志，是否继续？',
         downloadLogHelper2: '即将下载 {0} 应用最近 {1} 条日志，是否继续？',
+        syncAllAppHelper: '即将同步所有应用，是否继续？',
     },
     website: {
         website: '网站',

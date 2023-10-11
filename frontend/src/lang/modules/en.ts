@@ -1361,6 +1361,7 @@ const message = {
         downloadLogHelper1: 'All logs of {0} application are about to be downloaded. Do you want to continue? ',
         downloadLogHelper2:
             'The latest {1} logs of {0} application are about to be downloaded. Do you want to continue? ',
+        syncAllAppHelper: 'All applications are about to be synchronized. Do you want to continue? ',
     },
     website: {
         website: 'Website',
