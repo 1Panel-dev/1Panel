@@ -32,7 +32,7 @@
                 <el-button type="primary" @click="onChangeStatus('drop', null)" :disabled="selects.length === 0">
                     {{ $t('firewall.deny') }}
                 </el-button>
-                <el-table v-model:selects="selects" class="mt-5" :data="data" @header-click="changeSort">
+                <ComplexTable v-model:selects="selects" class="mt-5" :data="data" @header-click="changeSort">
                     <el-table-column type="selection" fix :selectable="selectable" />
                     <el-table-column :label="$t('logs.loginIP')" prop="address" min-width="40" />
                     <el-table-column :label="$t('ssh.belong')" prop="area" min-width="40" />
@@ -80,7 +80,7 @@
                             </el-button>
                         </template>
                     </el-table-column>
-                </el-table>
+                </ComplexTable>
                 <fu-table-pagination
                     class="float-right mt-4"
                     v-model:current-page="paginationConfig.currentPage"
