@@ -28,7 +28,7 @@
                             round
                             size="small"
                             :disabled="app.limit == 1 && app.installed"
-                            @click="goInstall(app.key)"
+                            @click="goInstall(app.key, app.type)"
                         >
                             {{ $t('app.install') }}
                         </el-button>
@@ -64,8 +64,17 @@ const acceptParams = (): void => {
     search(req);
 };
 
-const goInstall = (key: string) => {
-    router.push({ name: 'AppAll', query: { install: key } });
+const goInstall = (key: string, type: string) => {
+    switch (type) {
+        case 'php':
+            router.push({ path: '/websites/runtimes/php' });
+            break;
+        case 'node':
+            router.push({ path: '/websites/runtimes/node' });
+            break;
+        default:
+            router.push({ name: 'AppAll', query: { install: key } });
+    }
 };
 
 const search = async (req: App.AppReq) => {
