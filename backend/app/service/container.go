@@ -316,15 +316,11 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate) error {
 		return buserr.New(constant.ErrContainerName)
 	}
 
-	var config container.Config
-	var hostConf container.HostConfig
-	var networkConf network.NetworkingConfig
-	if err := loadConfigInfo(req, &config, &hostConf, &networkConf); err != nil {
+	config, hostConf, networkConf, err := loadConfigInfo(true, req, nil)
+	if err != nil {
 		return err
 	}
-
 	global.LOG.Infof("new container info %s has been made, now start to create", req.Name)
-
 	if !checkImageExist(client, req.Image) || req.ForcePull {
 		if err := pullImages(ctx, client, req.Image); err != nil {
 			if !req.ForcePull {
@@ -333,7 +329,7 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate) error {
 			global.LOG.Errorf("force pull image %s failed, err: %v", req.Image, err)
 		}
 	}
-	container, err := client.ContainerCreate(ctx, &config, &hostConf, &networkConf, &v1.Platform{}, req.Name)
+	container, err := client.ContainerCreate(ctx, config, hostConf, networkConf, &v1.Platform{}, req.Name)
 	if err != nil {
 		_ = client.ContainerRemove(ctx, req.Name, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
 		return err
@@ -431,16 +427,14 @@ func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
 		return err
 	}
 
-	config := oldContainer.Config
-	hostConf := oldContainer.HostConfig
-	var networkConf network.NetworkingConfig
-	if err := loadConfigInfo(req, config, hostConf, &networkConf); err != nil {
+	config, hostConf, networkConf, err := loadConfigInfo(false, req, &oldContainer)
+	if err != nil {
 		reCreateAfterUpdate(req.Name, client, oldContainer.Config, oldContainer.HostConfig, oldContainer.NetworkSettings)
 		return err
 	}
 
 	global.LOG.Infof("new container info %s has been update, now start to recreate", req.Name)
-	container, err := client.ContainerCreate(ctx, config, hostConf, &networkConf, &v1.Platform{}, req.Name)
+	container, err := client.ContainerCreate(ctx, config, hostConf, networkConf, &v1.Platform{}, req.Name)
 	if err != nil {
 		reCreateAfterUpdate(req.Name, client, oldContainer.Config, oldContainer.HostConfig, oldContainer.NetworkSettings)
 		return fmt.Errorf("update container failed, err: %v", err)
@@ -846,10 +840,18 @@ func checkPortStats(ports []dto.PortHelper) (nat.PortMap, error) {
 	return portMap, nil
 }
 
-func loadConfigInfo(req dto.ContainerOperate, config *container.Config, hostConf *container.HostConfig, networkConf *network.NetworkingConfig) error {
+func loadConfigInfo(isCreate bool, req dto.ContainerOperate, oldContainer *types.ContainerJSON) (*container.Config, *container.HostConfig, *network.NetworkingConfig, error) {
+	var config container.Config
+	var hostConf container.HostConfig
+	if !isCreate {
+		config = *oldContainer.Config
+		hostConf = *oldContainer.HostConfig
+	}
+	var networkConf network.NetworkingConfig
+
 	portMap, err := checkPortStats(req.ExposedPorts)
 	if err != nil {
-		return err
+		return nil, nil, nil, err
 	}
 	exposed := make(nat.PortSet)
 	for port := range portMap {
@@ -867,7 +869,7 @@ func loadConfigInfo(req dto.ContainerOperate, config *container.Config, hostConf
 	if len(req.Network) != 0 {
 		networkConf.EndpointsConfig = map[string]*network.EndpointSettings{req.Network: {}}
 	} else {
-		networkConf = &network.NetworkingConfig{}
+		networkConf = network.NetworkingConfig{}
 	}
 
 	hostConf.AutoRemove = req.AutoRemove
@@ -886,7 +888,7 @@ func loadConfigInfo(req dto.ContainerOperate, config *container.Config, hostConf
 		config.Volumes[volume.ContainerDir] = struct{}{}
 		hostConf.Binds = append(hostConf.Binds, fmt.Sprintf("%s:%s:%s", volume.SourceDir, volume.ContainerDir, volume.Mode))
 	}
-	return nil
+	return &config, &hostConf, &networkConf, nil
 }
 
 func reCreateAfterUpdate(name string, client *client.Client, config *container.Config, hostConf *container.HostConfig, networkConf *types.NetworkSettings) {
@@ -908,6 +910,7 @@ func reCreateAfterUpdate(name string, client *client.Client, config *container.C
 	if err := client.ContainerStart(ctx, oldContainer.ID, types.ContainerStartOptions{}); err != nil {
 		global.LOG.Errorf("restart after container update failed, err: %v", err)
 	}
+	global.LOG.Errorf("recreate after container update successful")
 }
 
 func loadVolumeBinds(binds []string) []dto.VolumeHelper {
