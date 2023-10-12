@@ -159,6 +159,7 @@
                     v-model:page-size="paginationConfig.pageSize"
                     v-bind="paginationConfig"
                     @change="search(req)"
+                    :page-sizes="[30, 60, 90]"
                     :layout="mobile ? 'total, prev, pager, next' : 'total, sizes, prev, pager, next, jumper'"
                 />
             </div>
