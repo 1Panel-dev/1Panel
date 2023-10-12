@@ -13,6 +13,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/subosito/gotenv"
 	"io"
+	"net/http"
 	"os"
 	"os/exec"
 	"path"
@@ -45,7 +46,16 @@ func handleNode(create request.RuntimeCreate, runtime *model.Runtime, fileOp fil
 	runtime.Status = constant.RuntimeCreating
 	runtime.CodeDir = create.CodeDir
 
+	nodeDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(runtime.AppDetailID))
+	if err != nil {
+		return err
+	}
+
+	go func() {
+		_, _ = http.Get(nodeDetail.DownloadCallBackUrl)
+	}()
 	go startRuntime(runtime)
+
 	return
 }
 
