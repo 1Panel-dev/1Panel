@@ -24,6 +24,13 @@
         >
             <el-row type="flex" justify="center">
                 <el-col :span="22">
+                    <el-alert
+                        v-if="dialogData.title === 'edit'"
+                        :title="$t('container.containerFromAppHelper')"
+                        class="common-prompt"
+                        :closable="false"
+                        type="error"
+                    />
                     <el-form-item :label="$t('commons.table.name')" prop="name">
                         <el-input clearable v-model.trim="dialogData.rowData!.name" />
                     </el-form-item>
@@ -171,7 +178,7 @@
                     <el-form-item label="Command" prop="cmdStr">
                         <el-input v-model="dialogData.rowData!.cmdStr" :placeholder="$t('container.cmdHelper')" />
                     </el-form-item>
-                    <el-form-item label="Entrypoint" prop="entrypoint">
+                    <el-form-item label="Entrypoint" prop="entrypointStr">
                         <el-input
                             v-model="dialogData.rowData!.entrypointStr"
                             :placeholder="$t('container.entrypointHelper')"
@@ -295,9 +302,14 @@ const acceptParams = (params: DialogProps): void => {
             itemCmd += `'${item}' `;
         }
         dialogData.value.rowData.cmdStr = itemCmd ? itemCmd.substring(0, itemCmd.length - 1) : '';
-        if (dialogData.value.rowData.entrypoint) {
-            dialogData.value.rowData.entrypointStr = dialogData.value.rowData.entrypoint.join(' ');
+
+        let itemEntrypoint = '';
+        for (const item of dialogData.value.rowData.entrypoint) {
+            itemEntrypoint += `'${item}' `;
         }
+        dialogData.value.rowData.entrypointStr = itemEntrypoint
+            ? itemEntrypoint.substring(0, itemEntrypoint.length - 1)
+            : '';
         dialogData.value.rowData.labels = dialogData.value.rowData.labels || [];
         dialogData.value.rowData.env = dialogData.value.rowData.env || [];
         dialogData.value.rowData.labelsStr = dialogData.value.rowData.labels.join('\n');
@@ -435,8 +447,21 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                 }
             }
         }
-        if (dialogData.value.rowData!.entrypointStr) {
-            dialogData.value.rowData!.entrypoint = dialogData.value.rowData!.entrypointStr.split(' ');
+        dialogData.value.rowData!.entrypoint = [];
+        if (dialogData.value.rowData?.entrypointStr) {
+            if (dialogData.value.rowData?.entrypointStr.indexOf(`'`) !== -1) {
+                let itemEntrypoint = dialogData.value.rowData!.entrypointStr.split(`'`);
+                for (const entry of itemEntrypoint) {
+                    if (entry && entry !== ' ') {
+                        dialogData.value.rowData!.entrypoint.push(entry);
+                    }
+                }
+            } else {
+                let itemEntrypoint = dialogData.value.rowData!.entrypointStr.split(` `);
+                for (const entry of itemEntrypoint) {
+                    dialogData.value.rowData!.entrypoint.push(entry);
+                }
+            }
         }
         if (dialogData.value.rowData!.publishAllPorts) {
             dialogData.value.rowData!.exposedPorts = [];
