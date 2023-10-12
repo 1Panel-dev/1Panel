@@ -546,6 +546,8 @@ const message = {
         cpuShareHelper:
             'The default CPU share for a container is 1024, which can be increased to give the container more CPU time.',
 
+        containerFromAppHelper:
+            'Detected that this container originates from the app store. App operations may cause current edits to be invalidated.',
         command: 'Command',
         console: 'Console Interaction',
         tty: 'TTY (-t)',

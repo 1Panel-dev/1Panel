@@ -532,6 +532,7 @@ const message = {
         cpuShare: 'CPU 權重',
         cpuShareHelper: '容器默認份額為 1024 個 CPU，增大可使當前容器獲得更多的 CPU 時間',
 
+        containerFromAppHelper: '檢測到該容器來源於應用商店，應用操作可能會導致當前編輯失效',
         command: '命令',
         console: '控製臺交互',
         tty: '偽終端 ( -t )',
