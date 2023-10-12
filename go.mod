@@ -50,11 +50,11 @@ require (
 	github.com/swaggo/swag v1.16.1
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.41
 	github.com/xlzd/gotp v0.0.0-20220817083547-a63b9d03d72f
-	golang.org/x/crypto v0.9.0
-	golang.org/x/net v0.10.0
+	golang.org/x/crypto v0.14.0
+	golang.org/x/net v0.17.0
 	golang.org/x/oauth2 v0.4.0
-	golang.org/x/sys v0.8.0
-	golang.org/x/text v0.9.0
+	golang.org/x/sys v0.13.0
+	golang.org/x/text v0.13.0
 	gopkg.in/ini.v1 v1.67.0
 	gopkg.in/square/go-jose.v2 v2.6.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -218,7 +218,7 @@ require (
 	golang.org/x/image v0.5.0 // indirect
 	golang.org/x/mod v0.9.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/term v0.8.0 // indirect
+	golang.org/x/term v0.13.0 // indirect
 	golang.org/x/time v0.1.0 // indirect
 	golang.org/x/tools v0.7.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
@@ -242,7 +242,7 @@ require (
 
 replace (
 	github.com/cucumber/godog => github.com/cucumber/godog v0.12.6
-	golang.org/x/net => golang.org/x/net v0.7.0
+	golang.org/x/net => golang.org/x/net v0.17.0
 	k8s.io/api => k8s.io/api v0.22.4
 	k8s.io/apimachinery => k8s.io/apimachinery v0.22.4
 	k8s.io/apiserver => k8s.io/apiserver v0.22.4
