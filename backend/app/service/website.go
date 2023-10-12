@@ -188,6 +188,51 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 	primaryDomainArray := strings.Split(create.PrimaryDomain, ":")
 	primaryDomain := primaryDomainArray[0]
 
+	var (
+		domains []model.WebsiteDomain
+		ports   = make(map[int]struct{})
+	)
+	domainArray := strings.Split(create.OtherDomains, "\n")
+	domainArray = append(domainArray, create.PrimaryDomain)
+	for _, domain := range domainArray {
+		if domain == "" {
+			continue
+		}
+		domainModel, err := getDomain(domain, defaultHttpPort)
+		if err != nil {
+			return err
+		}
+		if reflect.DeepEqual(domainModel, model.WebsiteDomain{}) {
+			continue
+		}
+		domains = append(domains, domainModel)
+		if domainModel.Port != defaultHttpPort {
+			ports[domainModel.Port] = struct{}{}
+		}
+	}
+
+	for port := range ports {
+		if existPorts, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithPort(port)); len(existPorts) == 0 {
+			errMap := make(map[string]interface{})
+			errMap["port"] = port
+			appInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithPort(port))
+			if appInstall.ID > 0 {
+				errMap["type"] = i18n.GetMsgByKey("TYPE_APP")
+				errMap["name"] = appInstall.Name
+				return buserr.WithMap("ErrPortExist", errMap, nil)
+			}
+			runtime, _ := runtimeRepo.GetFirst(runtimeRepo.WithPort(port))
+			if runtime != nil {
+				errMap["type"] = i18n.GetMsgByKey("TYPE_RUNTIME")
+				errMap["name"] = runtime.Name
+				return buserr.WithMap("ErrPortExist", errMap, nil)
+			}
+			if common.ScanPort(create.Port) {
+				return buserr.WithDetail(constant.ErrPortInUsed, create.Port, nil)
+			}
+		}
+	}
+
 	defaultDate, _ := time.Parse(constant.DateLayout, constant.DefaultDate)
 	website := &model.Website{
 		PrimaryDomain:  primaryDomain,
@@ -303,22 +348,6 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 
 	}
 
-	var domains []model.WebsiteDomain
-	domainArray := strings.Split(create.OtherDomains, "\n")
-	domainArray = append(domainArray, create.PrimaryDomain)
-	for _, domain := range domainArray {
-		if domain == "" {
-			continue
-		}
-		domainModel, err := getDomain(domain, defaultHttpPort)
-		if err != nil {
-			return err
-		}
-		if reflect.DeepEqual(domainModel, model.WebsiteDomain{}) {
-			continue
-		}
-		domains = append(domains, domainModel)
-	}
 	if err = configDefaultNginx(website, domains, appInstall, runtime); err != nil {
 		return err
 	}
@@ -463,14 +492,18 @@ func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) 
 		return domainModel, err
 	}
 
-	if existDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithDomain(create.Domain), websiteDomainRepo.WithPort(create.Port)); len(existDomains) == 0 {
-		if existAppInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithPort(create.Port)); !reflect.DeepEqual(existAppInstall, model.AppInstall{}) {
-			return domainModel, buserr.WithMap(constant.ErrPortInOtherApp, map[string]interface{}{"port": create.Port, "apps": existAppInstall.App.Name}, nil)
+	if create.Port != httpPort {
+		if existPorts, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithPort(create.Port)); len(existPorts) == 0 {
+			if existAppInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithPort(create.Port)); existAppInstall.ID > 0 {
+				return domainModel, buserr.WithMap(constant.ErrPortInOtherApp, map[string]interface{}{"port": create.Port, "apps": existAppInstall.App.Name}, nil)
+			}
+			if common.ScanPort(create.Port) {
+				return domainModel, buserr.WithDetail(constant.ErrPortInUsed, create.Port, nil)
+			}
 		}
-		if common.ScanPort(create.Port) {
-			return domainModel, buserr.WithDetail(constant.ErrPortInUsed, create.Port, nil)
-		}
-	} else {
+	}
+
+	if existDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithDomain(create.Domain), websiteDomainRepo.WithPort(create.Port)); len(existDomains) > 0 {
 		return domainModel, buserr.WithDetail(constant.ErrDomainIsExist, create.Domain, nil)
 	}
 
