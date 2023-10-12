@@ -225,19 +225,13 @@ const onChangeStatus = async (status: string, row: Host.logAnalysis | null) => {
 };
 
 const submitOperation = async () => {
-    const pros = [];
-    for (const item of operationList.value) {
-        pros.push(
-            operateIPRule({
-                operation: operation.value === 'drop' ? 'add' : 'remove',
-                address: item,
-                strategy: 'drop',
-                description: '',
-            }),
-        );
-    }
     loading.value = true;
-    Promise.all(pros)
+    operateIPRule({
+        operation: operation.value === 'drop' ? 'add' : 'remove',
+        address: operationList.value.join(','),
+        strategy: 'drop',
+        description: '',
+    })
         .then(() => {
             loading.value = false;
             dialogVisible.value = false;
