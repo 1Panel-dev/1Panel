@@ -1,5 +1,11 @@
 <template>
-    <el-drawer v-model="drawerVisible" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+    <el-drawer
+        v-model="drawerVisible"
+        @close="handleClose"
+        :destroy-on-close="true"
+        :close-on-click-modal="false"
+        size="50%"
+    >
         <template #header>
             <DrawerHeader
                 :header="title"
@@ -259,6 +265,7 @@ import {
     updateContainer,
     loadResourceLimit,
     listNetwork,
+    searchContainer,
 } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import { MsgError, MsgSuccess } from '@/utils/message';
@@ -471,12 +478,30 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                             drawerVisible.value = false;
                         })
                         .catch(() => {
+                            updateContainerID();
                             loading.value = false;
                         });
                 })
                 .catch(() => {
                     loading.value = false;
                 });
+        }
+    });
+};
+
+const updateContainerID = async () => {
+    let params = {
+        page: 1,
+        pageSize: 1,
+        name: dialogData.value.rowData.name,
+        filters: '',
+        orderBy: 'created_at',
+        order: 'null',
+    };
+    await searchContainer(params).then((res) => {
+        if (res.data.items?.length === 1) {
+            dialogData.value.rowData.containerID = res.data.items[0].containerID;
+            return;
         }
     });
 };
