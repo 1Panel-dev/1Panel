@@ -174,7 +174,6 @@ const getDirConfig = async () => {
         const res = await GetDirConfig({ id: props.id });
         dirs.value = res.data.dirs;
         dirConfig.value = res.data;
-        console.log(res);
     } catch (error) {}
 };
 
