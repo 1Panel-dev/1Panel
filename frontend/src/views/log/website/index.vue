@@ -65,7 +65,7 @@
                     theme="cobalt"
                     :styleActiveLine="true"
                     :extensions="extensions"
-                    v-model="data.content"
+                    v-model="content"
                     :disabled="true"
                     @ready="handleReady"
                 />
@@ -90,11 +90,6 @@ const extensions = [javascript(), oneDark];
 
 const loading = ref(false);
 const websites = ref();
-const logReq = reactive({
-    id: undefined,
-    operate: 'get',
-    logType: 'access.log',
-});
 const data = ref({
     enable: false,
     content: '',
@@ -102,6 +97,19 @@ const data = ref({
 const confirmDialogRef = ref();
 const tailLog = ref(false);
 let timer: NodeJS.Timer | null = null;
+
+const content = ref('');
+const end = ref(false);
+const lastContent = ref('');
+const editorContainer = ref<HTMLDivElement | null>(null);
+
+const logReq = reactive({
+    id: undefined,
+    operate: 'get',
+    logType: 'access.log',
+    page: 0,
+    pageSize: 500,
+});
 
 const getWebsites = async () => {
     loading.value = true;
@@ -111,6 +119,17 @@ const getWebsites = async () => {
             if (websites.value.length > 0) {
                 logReq.id = websites.value[0].id;
                 search();
+                nextTick(() => {
+                    let editorElement = editorContainer.value.querySelector('.cm-editor');
+                    let scrollerElement = editorElement.querySelector('.cm-scroller') as HTMLElement;
+                    if (scrollerElement) {
+                        scrollerElement.addEventListener('scroll', function () {
+                            if (isScrolledToBottom(scrollerElement)) {
+                                search();
+                            }
+                        });
+                    }
+                });
             }
         })
         .finally(() => {
@@ -121,6 +140,7 @@ const getWebsites = async () => {
 const view = shallowRef();
 const handleReady = (payload) => {
     view.value = payload.view;
+    editorContainer.value = payload.container;
 };
 
 const changeType = (type: string) => {
@@ -131,21 +151,34 @@ const changeType = (type: string) => {
 };
 
 const search = () => {
-    loading.value = true;
-    OpWebsiteLog(logReq)
-        .then((res) => {
-            data.value = res.data;
-            nextTick(() => {
-                const state = view.value.state;
-                view.value.dispatch({
-                    selection: { anchor: state.doc.length, head: state.doc.length },
-                    scrollIntoView: true,
-                });
+    if (!end.value) {
+        logReq.page += 1;
+    }
+    OpWebsiteLog(logReq).then((res) => {
+        if (!end.value && res.data.end) {
+            lastContent.value = content.value;
+        }
+        data.value = res.data;
+        if (res.data.content != '') {
+            if (end.value) {
+                content.value = lastContent.value + '\n' + res.data.content;
+            } else {
+                if (content.value == '') {
+                    content.value = res.data.content;
+                } else {
+                    content.value = content.value + '\n' + res.data.content;
+                }
+            }
+        }
+        end.value = res.data.end;
+        nextTick(() => {
+            const state = view.value.state;
+            view.value.dispatch({
+                selection: { anchor: state.doc.length, head: state.doc.length },
             });
-        })
-        .finally(() => {
-            loading.value = false;
+            view.value.focus();
         });
+    });
 };
 
 const onClean = async () => {
@@ -195,9 +228,12 @@ const onSubmitClean = async () => {
         });
 };
 
+function isScrolledToBottom(element: HTMLElement): boolean {
+    return element.scrollTop + element.clientHeight === element.scrollHeight;
+}
+
 onMounted(() => {
     logReq.logType = 'access.log';
     getWebsites();
-    console.log(logReq.logType);
 });
 </script>
