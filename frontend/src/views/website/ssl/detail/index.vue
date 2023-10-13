@@ -17,7 +17,7 @@
                         {{ ssl.primaryDomain }}
                     </el-descriptions-item>
                     <el-descriptions-item :label="$t('website.otherDomains')">
-                        {{ ssl.otherDomains }}
+                        {{ ssl.domains }}
                     </el-descriptions-item>
                     <el-descriptions-item :label="$t('ssl.provider')">
                         {{ getProvider(ssl.provider) }}
@@ -71,10 +71,10 @@ import useClipboard from 'vue-clipboard3';
 import { MsgError, MsgSuccess } from '@/utils/message';
 const { toClipboard } = useClipboard();
 
-let open = ref(false);
-let id = ref(0);
-let curr = ref('detail');
-let ssl = ref<any>({});
+const open = ref(false);
+const id = ref(0);
+const curr = ref('detail');
+const ssl = ref<any>({});
 
 const handleClose = () => {
     open.value = false;
