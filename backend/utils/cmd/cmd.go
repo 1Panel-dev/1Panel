@@ -24,20 +24,24 @@ func Exec(cmdStr string) (string, error) {
 		return "", buserr.New(constant.ErrCmdTimeout)
 	}
 	if err != nil {
-		errMsg := ""
-		if len(stderr.String()) != 0 {
-			errMsg = fmt.Sprintf("stderr: %s", stderr.String())
-		}
-		if len(stdout.String()) != 0 {
-			if len(errMsg) != 0 {
-				errMsg = fmt.Sprintf("%s; stdout: %s", errMsg, stdout.String())
-			} else {
-				errMsg = fmt.Sprintf("stdout: %s", stdout.String())
-			}
-		}
-		return errMsg, err
+		return handleErr(stdout, stderr, err)
 	}
 	return stdout.String(), nil
+}
+
+func handleErr(stdout, stderr bytes.Buffer, err error) (string, error) {
+	errMsg := ""
+	if len(stderr.String()) != 0 {
+		errMsg = fmt.Sprintf("stderr: %s", stderr.String())
+	}
+	if len(stdout.String()) != 0 {
+		if len(errMsg) != 0 {
+			errMsg = fmt.Sprintf("%s; stdout: %s", errMsg, stdout.String())
+		} else {
+			errMsg = fmt.Sprintf("stdout: %s", stdout.String())
+		}
+	}
+	return errMsg, err
 }
 
 func ExecWithTimeOut(cmdStr string, timeout time.Duration) (string, error) {
@@ -52,18 +56,7 @@ func ExecWithTimeOut(cmdStr string, timeout time.Duration) (string, error) {
 		return "", buserr.New(constant.ErrCmdTimeout)
 	}
 	if err != nil {
-		errMsg := ""
-		if len(stderr.String()) != 0 {
-			errMsg = fmt.Sprintf("stderr: %s", stderr.String())
-		}
-		if len(stdout.String()) != 0 {
-			if len(errMsg) != 0 {
-				errMsg = fmt.Sprintf("%s; stdout: %s", errMsg, stdout.String())
-			} else {
-				errMsg = fmt.Sprintf("stdout: %s", stdout.String())
-			}
-		}
-		return errMsg, err
+		return handleErr(stdout, stderr, err)
 	}
 	return stdout.String(), nil
 }
@@ -114,18 +107,7 @@ func Execf(cmdStr string, a ...interface{}) (string, error) {
 	cmd.Stderr = &stderr
 	err := cmd.Run()
 	if err != nil {
-		errMsg := ""
-		if len(stderr.String()) != 0 {
-			errMsg = fmt.Sprintf("stderr: %s", stderr.String())
-		}
-		if len(stdout.String()) != 0 {
-			if len(errMsg) != 0 {
-				errMsg = fmt.Sprintf("%s; stdout: %s", errMsg, stdout.String())
-			} else {
-				errMsg = fmt.Sprintf("stdout: %s", stdout.String())
-			}
-		}
-		return errMsg, err
+		return handleErr(stdout, stderr, err)
 	}
 	return stdout.String(), nil
 }
@@ -137,18 +119,7 @@ func ExecWithCheck(name string, a ...string) (string, error) {
 	cmd.Stderr = &stderr
 	err := cmd.Run()
 	if err != nil {
-		errMsg := ""
-		if len(stderr.String()) != 0 {
-			errMsg = fmt.Sprintf("stderr: %s", stderr.String())
-		}
-		if len(stdout.String()) != 0 {
-			if len(errMsg) != 0 {
-				errMsg = fmt.Sprintf("%s; stdout: %s", errMsg, stdout.String())
-			} else {
-				errMsg = fmt.Sprintf("stdout: %s", stdout.String())
-			}
-		}
-		return errMsg, err
+		return handleErr(stdout, stderr, err)
 	}
 	return stdout.String(), nil
 }
@@ -166,20 +137,18 @@ func ExecScript(scriptPath, workDir string) (string, error) {
 		return "", buserr.New(constant.ErrCmdTimeout)
 	}
 	if err != nil {
-		errMsg := ""
-		if len(stderr.String()) != 0 {
-			errMsg = fmt.Sprintf("stderr: %s", stderr.String())
-		}
-		if len(stdout.String()) != 0 {
-			if len(errMsg) != 0 {
-				errMsg = fmt.Sprintf("%s; stdout: %s", errMsg, stdout.String())
-			} else {
-				errMsg = fmt.Sprintf("stdout: %s", stdout.String())
-			}
-		}
-		return errMsg, err
+		return handleErr(stdout, stderr, err)
 	}
 	return stdout.String(), nil
+}
+
+func ExecCmd(cmdStr string) error {
+	cmd := exec.Command("bash", "-c", cmdStr)
+	err := cmd.Run()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func CheckIllegal(args ...string) bool {

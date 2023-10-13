@@ -312,83 +312,14 @@ func (f FileOp) CopyDir(src, dst string) error {
 		return err
 	}
 	dstDir := filepath.Join(dst, srcInfo.Name())
-	if err := f.Fs.MkdirAll(dstDir, srcInfo.Mode()); err != nil {
+	if err = f.Fs.MkdirAll(dstDir, srcInfo.Mode()); err != nil {
 		return err
 	}
-
-	dir, _ := f.Fs.Open(src)
-	obs, err := dir.Readdir(-1)
-	if err != nil {
-		return err
-	}
-	var errs []error
-
-	for _, obj := range obs {
-		fSrc := filepath.Join(src, obj.Name())
-		if obj.IsDir() {
-			err = f.CopyDir(fSrc, dstDir)
-			if err != nil {
-				errs = append(errs, err)
-			}
-		} else {
-			err = f.CopyFile(fSrc, dstDir)
-			if err != nil {
-				errs = append(errs, err)
-			}
-		}
-	}
-
-	var errString string
-	for _, err := range errs {
-		errString += err.Error() + "\n"
-	}
-
-	if errString != "" {
-		return errors.New(errString)
-	}
-
-	return nil
+	return cmd.ExecCmd(fmt.Sprintf("cp -rf %s %s", src, dst+"/"))
 }
 
 func (f FileOp) CopyFile(src, dst string) error {
-	srcFile, err := f.Fs.Open(src)
-	if err != nil {
-		return err
-	}
-	defer srcFile.Close()
-
-	srcInfo, err := f.Fs.Stat(src)
-	if err != nil {
-		return err
-	}
-	dstPath := path.Join(dst, srcInfo.Name())
-	if src == dstPath {
-		return nil
-	}
-
-	err = f.Fs.MkdirAll(filepath.Dir(dst), 0666)
-	if err != nil {
-		return err
-	}
-
-	dstFile, err := f.Fs.OpenFile(dstPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0775)
-	if err != nil {
-		return err
-	}
-	defer dstFile.Close()
-
-	if _, err = io.Copy(dstFile, srcFile); err != nil {
-		return err
-	}
-	info, err := f.Fs.Stat(src)
-	if err != nil {
-		return err
-	}
-	if err = f.Fs.Chmod(dstFile.Name(), info.Mode()); err != nil {
-		return err
-	}
-
-	return nil
+	return cmd.ExecCmd(fmt.Sprintf("cp -f %s %s", src, dst+"/"))
 }
 
 func (f FileOp) GetDirSize(path string) (float64, error) {

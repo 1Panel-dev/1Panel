@@ -40,6 +40,13 @@
             />
         </div>
         <LayoutContent :title="$t('file.file')" v-loading="loading">
+            <template #prompt>
+                <el-alert type="info" :closable="false">
+                    <template #default>
+                        <span><span v-html="$t('file.fileHeper')"></span></span>
+                    </template>
+                </el-alert>
+            </template>
             <template #toolbar>
                 <el-dropdown @command="handleCreate">
                     <el-button type="primary">
@@ -111,9 +118,17 @@
                     ref="tableRef"
                     :data="data"
                     @search="search"
+                    @sort-change="changeSort"
                 >
                     <el-table-column type="selection" width="30" />
-                    <el-table-column :label="$t('commons.table.name')" min-width="250" fix show-overflow-tooltip>
+                    <el-table-column
+                        :label="$t('commons.table.name')"
+                        min-width="250"
+                        fix
+                        show-overflow-tooltip
+                        sortable
+                        prop="name"
+                    >
                         <template #default="{ row }">
                             <svg-icon v-if="row.isDir" className="table-icon" iconName="p-file-folder"></svg-icon>
                             <svg-icon v-else className="table-icon" :iconName="getIconName(row.extension)"></svg-icon>
@@ -140,7 +155,7 @@
                             </el-link>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('file.size')" prop="size" max-width="50">
+                    <el-table-column :label="$t('file.size')" prop="size" max-width="50" sortable>
                         <template #default="{ row }">
                             <span v-if="row.isDir">
                                 <el-button type="primary" link small @click="getDirSize(row)">
@@ -156,15 +171,16 @@
                     <el-table-column
                         :label="$t('file.updateTime')"
                         prop="modTime"
-                        min-width="150"
+                        width="180"
                         :formatter="dateFormat"
                         show-overflow-tooltip
+                        sortable
                     ></el-table-column>
                     <fu-table-operations
                         :ellipsis="mobile ? 0 : 3"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
-                        :min-width="mobile ? 'auto' : 300"
+                        :min-width="mobile ? 'auto' : 200"
                         :fixed="mobile ? false : 'right'"
                         fix
                     />
@@ -213,7 +229,6 @@ import Detail from './detail/index.vue';
 import { useRouter } from 'vue-router';
 import { Back, Refresh } from '@element-plus/icons-vue';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
-// import { ElMessageBox } from 'element-plus';
 import { useSearchable } from './hooks/searchable';
 import { ResultData } from '@/api/interface';
 import { GlobalStore } from '@/store';
@@ -238,6 +253,8 @@ const initData = () => ({
     pageSize: 100,
     search: '',
     containSub: false,
+    sortBy: 'name',
+    sortOrder: 'ascending',
 });
 let req = reactive(initData());
 let loading = ref(false);
@@ -288,6 +305,12 @@ const mobile = computed(() => {
 
 const search = async () => {
     loading.value = true;
+    if (req.search != '') {
+        req.sortBy = 'name';
+        req.sortOrder = 'ascending';
+        tableRef.value.clearSort();
+    }
+
     req.page = paginationConfig.currentPage;
     req.pageSize = paginationConfig.pageSize;
     await GetFilesList(req)
@@ -582,6 +605,16 @@ const openDownload = (file: File.File) => {
 
 const openDetail = (row: File.File) => {
     detailRef.value.acceptParams({ path: row.path });
+};
+
+const changeSort = ({ prop, order }) => {
+    req.sortBy = prop;
+    req.sortOrder = order;
+    req.search = '';
+    req.page = 1;
+    req.pageSize = paginationConfig.pageSize;
+    req.containSub = false;
+    search();
 };
 
 const buttons = [

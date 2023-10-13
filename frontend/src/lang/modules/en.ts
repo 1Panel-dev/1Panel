@@ -952,6 +952,7 @@ const message = {
         currentSelect: 'Current Select: ',
         unsupportType: 'Unsupported file type',
         deleteHelper: 'The following resources will be deleted, this operation cannot be rolled back, continue? ',
+        fileHeper: 'Note: 1. Sorting is not supported after searching 2. Folders are not supported by size sorting',
     },
     ssh: {
         sshAlert:

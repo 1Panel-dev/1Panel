@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"syscall"
@@ -52,6 +53,8 @@ type FileOption struct {
 	ShowHidden bool   `json:"showHidden"`
 	Page       int    `json:"page"`
 	PageSize   int    `json:"pageSize"`
+	SortBy     string `json:"sortBy" validate:"oneof=name size modTime"`
+	SortOrder  string `json:"sortOrder" validate:"oneof=ascending descending"`
 }
 
 type FileSearchInfo struct {
@@ -90,7 +93,7 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 	}
 	if op.Expand {
 		if file.IsDir {
-			if err := file.listChildren(op.Dir, op.ShowHidden, op.ContainSub, op.Search, op.Page, op.PageSize); err != nil {
+			if err := file.listChildren(op); err != nil {
 				return nil, err
 			}
 			return file, nil
@@ -139,7 +142,42 @@ func (f *FileInfo) search(search string, count int) (files []FileSearchInfo, tot
 	return
 }
 
-func (f *FileInfo) listChildren(dir, showHidden, containSub bool, search string, page, pageSize int) error {
+func sortFileList(list []FileSearchInfo, sortBy, sortOrder string) {
+	switch sortBy {
+	case "name":
+		if sortOrder == "ascending" {
+			sort.Slice(list, func(i, j int) bool {
+				return list[i].Name() < list[j].Name()
+			})
+		} else {
+			sort.Slice(list, func(i, j int) bool {
+				return list[i].Name() > list[j].Name()
+			})
+		}
+	case "size":
+		if sortOrder == "ascending" {
+			sort.Slice(list, func(i, j int) bool {
+				return list[i].Size() < list[j].Size()
+			})
+		} else {
+			sort.Slice(list, func(i, j int) bool {
+				return list[i].Size() > list[j].Size()
+			})
+		}
+	case "modTime":
+		if sortOrder == "ascending" {
+			sort.Slice(list, func(i, j int) bool {
+				return list[i].ModTime().Before(list[j].ModTime())
+			})
+		} else {
+			sort.Slice(list, func(i, j int) bool {
+				return list[i].ModTime().After(list[j].ModTime())
+			})
+		}
+	}
+}
+
+func (f *FileInfo) listChildren(option FileOption) error {
 	afs := &afero.Afero{Fs: f.Fs}
 	var (
 		files []FileSearchInfo
@@ -147,8 +185,8 @@ func (f *FileInfo) listChildren(dir, showHidden, containSub bool, search string,
 		total int
 	)
 
-	if search != "" && containSub {
-		files, total, err = f.search(search, page*pageSize)
+	if option.Search != "" && option.ContainSub {
+		files, total, err = f.search(option.Search, option.Page*option.PageSize)
 		if err != nil {
 			return err
 		}
@@ -157,34 +195,46 @@ func (f *FileInfo) listChildren(dir, showHidden, containSub bool, search string,
 		if err != nil {
 			return err
 		}
+		var (
+			dirs     []FileSearchInfo
+			fileList []FileSearchInfo
+		)
 		for _, file := range dirFiles {
-			files = append(files, FileSearchInfo{
+			info := FileSearchInfo{
 				Path:     f.Path,
 				FileInfo: file,
-			})
+			}
+			if file.IsDir() {
+				dirs = append(dirs, info)
+			} else {
+				fileList = append(fileList, info)
+			}
 		}
+		sortFileList(dirs, option.SortBy, option.SortOrder)
+		sortFileList(fileList, option.SortBy, option.SortOrder)
+		files = append(dirs, fileList...)
 	}
 
 	var items []*FileInfo
 	for _, df := range files {
-		if dir && !df.IsDir() {
+		if option.Dir && !df.IsDir() {
 			continue
 		}
 		name := df.Name()
 		fPath := path.Join(df.Path, df.Name())
-		if search != "" {
-			if containSub {
+		if option.Search != "" {
+			if option.ContainSub {
 				fPath = df.Path
 				name = strings.TrimPrefix(strings.TrimPrefix(fPath, f.Path), "/")
 			} else {
 				lowerName := strings.ToLower(name)
-				lowerSearch := strings.ToLower(search)
+				lowerSearch := strings.ToLower(option.Search)
 				if !strings.Contains(lowerName, lowerSearch) {
 					continue
 				}
 			}
 		}
-		if !showHidden && IsHidden(name) {
+		if !option.ShowHidden && IsHidden(name) {
 			continue
 		}
 		f.ItemTotal++
@@ -228,11 +278,11 @@ func (f *FileInfo) listChildren(dir, showHidden, containSub bool, search string,
 		}
 		items = append(items, file)
 	}
-	if containSub {
+	if option.ContainSub {
 		f.ItemTotal = total
 	}
-	start := (page - 1) * pageSize
-	end := pageSize + start
+	start := (option.Page - 1) * option.PageSize
+	end := option.PageSize + start
 	var result []*FileInfo
 	if start < 0 || start > f.ItemTotal || end < 0 || start > end {
 		result = items

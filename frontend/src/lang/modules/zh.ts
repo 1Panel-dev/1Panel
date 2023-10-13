@@ -916,6 +916,7 @@ const message = {
         currentSelect: '当前选中: ',
         unsupportType: '不支持的文件类型',
         deleteHelper: '以下资源将被删除，此操作不可回滚，是否继续？',
+        fileHeper: '注意：1.搜索之后不支持排序 2.按大小排序不支持文件夹',
     },
     ssh: {
         sshAlert: '列表数据根据登录时间排序，但请注意，切换时区或其他操作可能导致登录日志的时间出现偏差。',
