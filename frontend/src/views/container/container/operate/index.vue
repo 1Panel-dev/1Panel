@@ -25,7 +25,7 @@
             <el-row type="flex" justify="center">
                 <el-col :span="22">
                     <el-alert
-                        v-if="dialogData.title === 'edit'"
+                        v-if="dialogData.title === 'edit' && isFromApp(dialogData.rowData!)"
                         :title="$t('container.containerFromAppHelper')"
                         class="common-prompt"
                         :closable="false"
@@ -578,6 +578,13 @@ const checkPortValid = () => {
         }
     }
     return true;
+};
+
+const isFromApp = (rowData: Container.ContainerHelper) => {
+    if (rowData && rowData.labels) {
+        return rowData.labels.indexOf('createdBy=Apps') > -1;
+    }
+    return false;
 };
 defineExpose({
     acceptParams,
