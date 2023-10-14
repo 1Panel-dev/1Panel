@@ -304,9 +304,12 @@ const acceptParams = (params: DialogProps): void => {
         dialogData.value.rowData.cmdStr = itemCmd ? itemCmd.substring(0, itemCmd.length - 1) : '';
 
         let itemEntrypoint = '';
-        for (const item of dialogData.value.rowData.entrypoint) {
-            itemEntrypoint += `'${item}' `;
+        if (dialogData.value.rowData?.entrypoint) {
+            for (const item of dialogData.value.rowData.entrypoint) {
+                itemEntrypoint += `'${item}' `;
+            }
         }
+
         dialogData.value.rowData.entrypointStr = itemEntrypoint
             ? itemEntrypoint.substring(0, itemEntrypoint.length - 1)
             : '';
