@@ -15,7 +15,8 @@
 - **Quick website building**: Deeply integrated with Wordpress and [Halo](https://github.com/halo-dev/halo/), with one-click solutions for domain name binding, SSL certificate configuration, and more;
 - **Efficient management**: Easily manage Linux servers through the web interface, including application management, host monitoring, file management, database management, container management, and more;
 - **Secure and reliable**: Minimal vulnerability exposure, with firewall and security audit functions provided;
-- **One-click backup**: Support for one-click backup and restore, with backup data stored in the cloud and never lost.
+- **One-click backup**: Support for one-click backup and restore, with backup data stored in the cloud and never lost;
+- **App Store**: Curate a variety of high-quality open-source tools and application software, enabling you to easily install and upgrade them.
 
 ## UI Display
 
