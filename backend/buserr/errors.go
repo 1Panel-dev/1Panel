@@ -76,3 +76,14 @@ func WithNameAndErr(Key string, name string, err error) BusinessError {
 		Err: err,
 	}
 }
+
+func WithName(Key string, name string) BusinessError {
+	paramMap := map[string]interface{}{}
+	if name != "" {
+		paramMap["name"] = name
+	}
+	return BusinessError{
+		Msg: Key,
+		Map: paramMap,
+	}
+}

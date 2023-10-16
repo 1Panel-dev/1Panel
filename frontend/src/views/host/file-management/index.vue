@@ -502,6 +502,7 @@ const openCompress = (items: File.File[]) => {
 };
 
 const openDeCompress = (item: File.File) => {
+    console.log(item.mimeType);
     if (Mimetypes.get(item.mimeType) == undefined) {
         MsgWarning(i18n.global.t('file.canNotDeCompress'));
         return;

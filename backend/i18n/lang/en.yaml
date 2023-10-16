@@ -62,6 +62,7 @@ ErrLinkPathNotFound: "Target path does not exist!"
 ErrFileIsExit: "File already exists!"
 ErrFileUpload: "Failed to upload file {{.name}}  {{.detail}}"
 ErrFileDownloadDir: "Download folder not supported"
+ErrCmdNotFound: "{{ .name}} command does not exist, please install this command on the host first"
 
 #website
 ErrDomainIsExist: "Domain is already exist"
