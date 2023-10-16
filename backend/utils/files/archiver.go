@@ -7,17 +7,22 @@ import (
 )
 
 type ShellArchiver interface {
-	Compress() error
-	Extract(dstDir string) error
+	Extract(filePath, dstDir string) error
+	Compress(sourcePaths []string, dstFile string) error
 }
 
-func NewShellArchiver(compressType CompressType) (*TarArchiver, error) {
+func NewShellArchiver(compressType CompressType) (ShellArchiver, error) {
 	switch compressType {
 	case Tar:
 		if err := checkCmdAvailability("tar"); err != nil {
 			return nil, err
 		}
 		return NewTarArchiver(compressType), nil
+	case Zip:
+		if err := checkCmdAvailability("zip"); err != nil {
+			return nil, err
+		}
+		return NewZipArchiver(), nil
 	default:
 		return nil, buserr.New("unsupported compress type")
 	}
