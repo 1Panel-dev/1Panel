@@ -287,9 +287,9 @@ func (u *SSHService) LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error) {
 			case constant.StatusSuccess:
 				commandItem = fmt.Sprintf("cat %s | grep -a Accepted %s", file.Name, command)
 			case constant.StatusFailed:
-				commandItem = fmt.Sprintf("cat %s | grep -a 'Connection closed by authenticating user' | grep -a 'preauth' %s", file.Name, command)
+				commandItem = fmt.Sprintf("cat %s | grep -aE 'Failed password for|Connection closed by authenticating user' | grep -a 'preauth' %s", file.Name, command)
 			default:
-				commandItem = fmt.Sprintf("cat %s | grep -aE \"(Connection closed by authenticating user|Accepted)\" | grep -v 'invalid' %s", file.Name, command)
+				commandItem = fmt.Sprintf("cat %s | grep -aE \"(Failed password for|Connection closed by authenticating user|Accepted)\" | grep -v 'invalid' %s", file.Name, command)
 			}
 		}
 		dataItem, successCount, failedCount := loadSSHData(commandItem, showCountFrom, showCountTo, file.Year, qqWry, nyc)
@@ -466,7 +466,7 @@ func loadSSHData(command string, showCountFrom, showCountTo, currentYear int, qq
 			if len(itemData.Address) != 0 {
 				if successCount+failedCount >= showCountFrom && successCount+failedCount < showCountTo {
 					itemData.Area = qqWry.Find(itemData.Address).Area
-					itemData.Date, _ = time.ParseInLocation("2006 Jan 2 15:04:05", fmt.Sprintf("%d %s", currentYear, itemData.DateStr), nyc)
+					itemData.Date = loadDate(currentYear, itemData.DateStr, nyc)
 					datas = append(datas, itemData)
 				}
 				failedCount++
@@ -476,7 +476,7 @@ func loadSSHData(command string, showCountFrom, showCountTo, currentYear int, qq
 			if len(itemData.Address) != 0 {
 				if successCount+failedCount >= showCountFrom && successCount+failedCount < showCountTo {
 					itemData.Area = qqWry.Find(itemData.Address).Area
-					itemData.Date, _ = time.ParseInLocation("2006 Jan 2 15:04:05", fmt.Sprintf("%d %s", currentYear, itemData.DateStr), nyc)
+					itemData.Date = loadDate(currentYear, itemData.DateStr, nyc)
 					datas = append(datas, itemData)
 				}
 				failedCount++
@@ -486,7 +486,7 @@ func loadSSHData(command string, showCountFrom, showCountTo, currentYear int, qq
 			if len(itemData.Address) != 0 {
 				if successCount+failedCount >= showCountFrom && successCount+failedCount < showCountTo {
 					itemData.Area = qqWry.Find(itemData.Address).Area
-					itemData.Date, _ = time.ParseInLocation("2006 Jan 2 15:04:05", fmt.Sprintf("%d %s", currentYear, itemData.DateStr), nyc)
+					itemData.Date = loadDate(currentYear, itemData.DateStr, nyc)
 					datas = append(datas, itemData)
 				}
 				successCount++
@@ -540,16 +540,31 @@ func loadSSHDataForAnalysis(analysisMap map[string]dto.SSHLogAnalysis, commandIt
 func loadSuccessDatas(line string) dto.SSHHistory {
 	var data dto.SSHHistory
 	parts := strings.Fields(line)
-	if len(parts) < 14 {
-		return data
-	}
-	data = dto.SSHHistory{
-		DateStr:  fmt.Sprintf("%s %s %s", parts[0], parts[1], parts[2]),
-		AuthMode: parts[6],
-		User:     parts[8],
-		Address:  parts[10],
-		Port:     parts[12],
-		Status:   constant.StatusSuccess,
+	t, err := time.Parse("2006-01-02T15:04:05.999999-07:00", parts[0])
+	if err != nil {
+		if len(parts) < 14 {
+			return data
+		}
+		data = dto.SSHHistory{
+			DateStr:  fmt.Sprintf("%s %s %s", parts[0], parts[1], parts[2]),
+			AuthMode: parts[6],
+			User:     parts[8],
+			Address:  parts[10],
+			Port:     parts[12],
+			Status:   constant.StatusSuccess,
+		}
+	} else {
+		if len(parts) < 12 {
+			return data
+		}
+		data = dto.SSHHistory{
+			DateStr:  t.Format("2006 Jan 2 15:04:05"),
+			AuthMode: parts[4],
+			User:     parts[6],
+			Address:  parts[8],
+			Port:     parts[10],
+			Status:   constant.StatusSuccess,
+		}
 	}
 	return data
 }
@@ -557,16 +572,31 @@ func loadSuccessDatas(line string) dto.SSHHistory {
 func loadFailedAuthDatas(line string) dto.SSHHistory {
 	var data dto.SSHHistory
 	parts := strings.Fields(line)
-	if len(parts) < 14 {
-		return data
-	}
-	data = dto.SSHHistory{
-		DateStr:  fmt.Sprintf("%s %s %s", parts[0], parts[1], parts[2]),
-		AuthMode: parts[8],
-		User:     parts[10],
-		Address:  parts[11],
-		Port:     parts[13],
-		Status:   constant.StatusFailed,
+	t, err := time.Parse("2006-01-02T15:04:05.999999-07:00", parts[0])
+	if err != nil {
+		if len(parts) < 14 {
+			return data
+		}
+		data = dto.SSHHistory{
+			DateStr:  fmt.Sprintf("%s %s %s", parts[0], parts[1], parts[2]),
+			AuthMode: parts[8],
+			User:     parts[10],
+			Address:  parts[11],
+			Port:     parts[13],
+			Status:   constant.StatusFailed,
+		}
+	} else {
+		if len(parts) < 12 {
+			return data
+		}
+		data = dto.SSHHistory{
+			DateStr:  t.Format("2006 Jan 2 15:04:05"),
+			AuthMode: parts[6],
+			User:     parts[7],
+			Address:  parts[9],
+			Port:     parts[11],
+			Status:   constant.StatusFailed,
+		}
 	}
 	if strings.Contains(line, ": ") {
 		data.Message = strings.Split(line, ": ")[1]
@@ -577,21 +607,39 @@ func loadFailedAuthDatas(line string) dto.SSHHistory {
 func loadFailedSecureDatas(line string) dto.SSHHistory {
 	var data dto.SSHHistory
 	parts := strings.Fields(line)
-	if len(parts) < 14 {
-		return data
-	}
-	data = dto.SSHHistory{
-		DateStr:  fmt.Sprintf("%s %s %s", parts[0], parts[1], parts[2]),
-		AuthMode: parts[6],
-		User:     parts[8],
-		Address:  parts[10],
-		Port:     parts[12],
-		Status:   constant.StatusFailed,
+	t, err := time.Parse("2006-01-02T15:04:05.999999-07:00", parts[0])
+	if err != nil {
+		if len(parts) < 14 {
+			return data
+		}
+		data = dto.SSHHistory{
+			DateStr:  fmt.Sprintf("%s %s %s", parts[0], parts[1], parts[2]),
+			AuthMode: parts[6],
+			User:     parts[8],
+			Address:  parts[10],
+			Port:     parts[12],
+			Status:   constant.StatusFailed,
+		}
+	} else {
+		if len(parts) < 12 {
+			return data
+		}
+		index := 0
+		if strings.Contains("line", " invalid user") {
+			index = 2
+		}
+		data = dto.SSHHistory{
+			DateStr:  t.Format("2006 Jan 2 15:04:05"),
+			AuthMode: parts[4],
+			User:     parts[index+6],
+			Address:  parts[index+8],
+			Port:     parts[index+10],
+			Status:   constant.StatusFailed,
+		}
 	}
 	if strings.Contains(line, ": ") {
 		data.Message = strings.Split(line, ": ")[1]
 	}
-
 	return data
 }
 
@@ -609,4 +657,12 @@ func loadServiceName() (string, error) {
 		return "ssh", nil
 	}
 	return "", errors.New("The ssh or sshd service is unavailable")
+}
+
+func loadDate(currentYear int, DateStr string, nyc *time.Location) time.Time {
+	itemDate, err := time.ParseInLocation("2006 Jan 2 15:04:05", fmt.Sprintf("%d %s", currentYear, DateStr), nyc)
+	if err != nil {
+		itemDate, _ = time.ParseInLocation("2006 Jan 2 15:04:05", DateStr, nyc)
+	}
+	return itemDate
 }
