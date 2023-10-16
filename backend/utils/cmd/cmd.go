@@ -144,9 +144,19 @@ func ExecScript(scriptPath, workDir string) (string, error) {
 
 func ExecCmd(cmdStr string) error {
 	cmd := exec.Command("bash", "-c", cmdStr)
-	err := cmd.Run()
+	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return err
+		return fmt.Errorf("error : %v, output: %s", err, output)
+	}
+	return nil
+}
+
+func ExecCmdWithDir(cmdStr, workDir string) error {
+	cmd := exec.Command("bash", "-c", cmdStr)
+	cmd.Dir = workDir
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("error : %v, output: %s", err, output)
 	}
 	return nil
 }

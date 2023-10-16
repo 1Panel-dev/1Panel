@@ -386,10 +386,7 @@ func (f FileOp) Compress(srcRiles []string, dst string, name string, cType Compr
 
 	switch cType {
 	case Zip:
-		if err := ZipFile(files, out); err != nil {
-			_ = f.DeleteFile(dstFile)
-			return err
-		}
+		return NewZipArchiver().Compress(srcRiles, dstFile)
 	default:
 		err = format.Archive(context.Background(), out, files)
 		if err != nil {
@@ -415,13 +412,12 @@ func decodeGBK(input string) (string, error) {
 
 func (f FileOp) Decompress(srcFile string, dst string, cType CompressType) error {
 	switch cType {
-	case Tar:
+	case Tar, Zip:
 		shellArchiver, err := NewShellArchiver(cType)
 		if err != nil {
 			return err
 		}
-		shellArchiver.FilePath = srcFile
-		return shellArchiver.Extract(dst)
+		return shellArchiver.Extract(srcFile, dst)
 	default:
 		format := getFormat(cType)
 		handler := func(ctx context.Context, archFile archiver.File) error {
@@ -475,7 +471,6 @@ func (f FileOp) Decompress(srcFile string, dst string, cType CompressType) error
 		}
 		return format.Extract(context.Background(), input, nil, handler)
 	}
-	return nil
 }
 
 func (f FileOp) Backup(srcFile string) (string, error) {
@@ -510,47 +505,4 @@ func (f FileOp) CopyAndBackup(src string) (string, error) {
 		return backupPath, err
 	}
 	return backupPath, nil
-}
-
-func ZipFile(files []archiver.File, dst afero.File) error {
-	zw := zip.NewWriter(dst)
-	defer zw.Close()
-
-	for _, file := range files {
-		hdr, err := zip.FileInfoHeader(file)
-		if err != nil {
-			return err
-		}
-		hdr.Name = file.NameInArchive
-		if file.IsDir() {
-			if !strings.HasSuffix(hdr.Name, "/") {
-				hdr.Name += "/"
-			}
-			hdr.Method = zip.Store
-		}
-		w, err := zw.CreateHeader(hdr)
-		if err != nil {
-			return err
-		}
-		if file.IsDir() {
-			continue
-		}
-
-		if file.LinkTarget != "" {
-			_, err = w.Write([]byte(filepath.ToSlash(file.LinkTarget)))
-			if err != nil {
-				return err
-			}
-		} else {
-			fileReader, err := file.Open()
-			if err != nil {
-				return err
-			}
-			_, err = io.Copy(w, fileReader)
-			if err != nil {
-				return err
-			}
-		}
-	}
-	return nil
 }
