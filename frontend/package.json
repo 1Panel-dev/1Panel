@@ -1,7 +1,7 @@
 {
-    "name": "panel",
+    "name": "1Panel-Frontend",
     "private": true,
-    "version": "1.3",
+    "version": "1.7",
     "description": "1Panel 前端",
     "scripts": {
         "dev": "vite",

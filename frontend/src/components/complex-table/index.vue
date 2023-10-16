@@ -75,9 +75,15 @@ function sort(prop: string, order: string) {
 function clearSelects() {
     tableRef.value.refElTable.clearSelection();
 }
+
+function clearSort() {
+    tableRef.value.refElTable.clearSort();
+}
+
 defineExpose({
     clearSelects,
     sort,
+    clearSort,
 });
 
 onMounted(() => {
