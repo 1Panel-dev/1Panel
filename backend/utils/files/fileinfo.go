@@ -335,3 +335,14 @@ func min(x, y int) int {
 	}
 	return y
 }
+
+type CompressType string
+
+const (
+	Zip   CompressType = "zip"
+	Gz    CompressType = "gz"
+	Bz2   CompressType = "bz2"
+	Tar   CompressType = "tar"
+	TarGz CompressType = "tar.gz"
+	Xz    CompressType = "xz"
+)

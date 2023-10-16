@@ -15,6 +15,7 @@ export const Mimetypes = new Map([
     ['application/x-gzip-compressed', CompressType.TarGz],
     ['gzip/document', CompressType.TarGz],
     ['application/x-xz', CompressType.Xz],
+    ['application/octet-stream', CompressType.Tar],
 ]);
 
 export const Languages = [

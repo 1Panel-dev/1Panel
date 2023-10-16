@@ -339,19 +339,7 @@ func (f FileOp) GetDirSize(path string) (float64, error) {
 	return dirSize, nil
 }
 
-type CompressType string
-
-const (
-	Zip   CompressType = "zip"
-	Gz    CompressType = "gz"
-	Bz2   CompressType = "bz2"
-	Tar   CompressType = "tar"
-	TarGz CompressType = "tar.gz"
-	Xz    CompressType = "xz"
-)
-
 func getFormat(cType CompressType) archiver.CompressedArchive {
-
 	format := archiver.CompressedArchive{}
 	switch cType {
 	case Tar:
@@ -426,58 +414,68 @@ func decodeGBK(input string) (string, error) {
 }
 
 func (f FileOp) Decompress(srcFile string, dst string, cType CompressType) error {
-	format := getFormat(cType)
-
-	handler := func(ctx context.Context, archFile archiver.File) error {
-		info := archFile.FileInfo
-		if isIgnoreFile(archFile.Name()) {
-			return nil
+	switch cType {
+	case Tar:
+		shellArchiver, err := NewShellArchiver(cType)
+		if err != nil {
+			return err
 		}
-		fileName := archFile.NameInArchive
-		var err error
-		if header, ok := archFile.Header.(cZip.FileHeader); ok {
-			if header.NonUTF8 && header.Flags == 0 {
-				fileName, err = decodeGBK(fileName)
-				if err != nil {
-					return err
+		shellArchiver.FilePath = srcFile
+		return shellArchiver.Extract(dst)
+	default:
+		format := getFormat(cType)
+		handler := func(ctx context.Context, archFile archiver.File) error {
+			info := archFile.FileInfo
+			if isIgnoreFile(archFile.Name()) {
+				return nil
+			}
+			fileName := archFile.NameInArchive
+			var err error
+			if header, ok := archFile.Header.(cZip.FileHeader); ok {
+				if header.NonUTF8 && header.Flags == 0 {
+					fileName, err = decodeGBK(fileName)
+					if err != nil {
+						return err
+					}
 				}
 			}
-		}
-		filePath := filepath.Join(dst, fileName)
-		if archFile.FileInfo.IsDir() {
-			if err := f.Fs.MkdirAll(filePath, info.Mode()); err != nil {
+			filePath := filepath.Join(dst, fileName)
+			if archFile.FileInfo.IsDir() {
+				if err := f.Fs.MkdirAll(filePath, info.Mode()); err != nil {
+					return err
+				}
+				return nil
+			} else {
+				parentDir := path.Dir(filePath)
+				if !f.Stat(parentDir) {
+					if err := f.Fs.MkdirAll(parentDir, info.Mode()); err != nil {
+						return err
+					}
+				}
+			}
+			fr, err := archFile.Open()
+			if err != nil {
 				return err
 			}
-			return nil
-		} else {
-			parentDir := path.Dir(filePath)
-			if !f.Stat(parentDir) {
-				if err := f.Fs.MkdirAll(parentDir, info.Mode()); err != nil {
-					return err
-				}
+			defer fr.Close()
+			fw, err := f.Fs.OpenFile(filePath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, info.Mode())
+			if err != nil {
+				return err
 			}
-		}
-		fr, err := archFile.Open()
-		if err != nil {
-			return err
-		}
-		defer fr.Close()
-		fw, err := f.Fs.OpenFile(filePath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, info.Mode())
-		if err != nil {
-			return err
-		}
-		defer fw.Close()
-		if _, err := io.Copy(fw, fr); err != nil {
-			return err
-		}
+			defer fw.Close()
+			if _, err := io.Copy(fw, fr); err != nil {
+				return err
+			}
 
-		return nil
+			return nil
+		}
+		input, err := f.Fs.Open(srcFile)
+		if err != nil {
+			return err
+		}
+		return format.Extract(context.Background(), input, nil, handler)
 	}
-	input, err := f.Fs.Open(srcFile)
-	if err != nil {
-		return err
-	}
-	return format.Extract(context.Background(), input, nil, handler)
+	return nil
 }
 
 func (f FileOp) Backup(srcFile string) (string, error) {

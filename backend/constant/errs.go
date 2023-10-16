@@ -89,6 +89,7 @@ var (
 	ErrFileIsExit       = "ErrFileIsExit"
 	ErrFileUpload       = "ErrFileUpload"
 	ErrFileDownloadDir  = "ErrFileDownloadDir"
+	ErrCmdNotFound      = "ErrCmdNotFound"
 )
 
 // mysql
