@@ -275,6 +275,10 @@ const message = {
         supervisor: '进程守护',
     },
     home: {
+        restart_1panel: '重启面板',
+        restart_system: '重启服务器',
+        restartHelper: '是否对该机器进行 [{0}] 操作，该操作将导致服务暂时不可用，是否继续？',
+        operationSuccess: '操作成功！正在重启，请稍候...',
         overview: '概览',
         entranceHelper: '设置安全入口有利于提高系统的安全性，如有需要，前往 面板设置-安全 中，启用安全入口',
         appInstalled: '已安装应用',

@@ -56,6 +56,28 @@ func (b *BaseApi) LoadDashboardCurrentInfo(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error netOption in path"))
 		return
 	}
+
 	data := dashboardService.LoadCurrentInfo(ioOption, netOption)
 	helper.SuccessWithData(c, data)
+}
+
+// @Tags Dashboard
+// @Summary System restart
+// @Description 重启服务器/面板
+// @Accept json
+// @Param operation path string true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /dashboard/system/restart/:operation [post]
+func (b *BaseApi) SystemRestart(c *gin.Context) {
+	operation, ok := c.Params.Get("operation")
+	if !ok {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error operation in path"))
+		return
+	}
+	if err := dashboardService.Restart(operation); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
 }

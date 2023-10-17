@@ -8,3 +8,7 @@ export const loadBaseInfo = (ioOption: string, netOption: string) => {
 export const loadCurrentInfo = (ioOption: string, netOption: string) => {
     return http.get<Dashboard.CurrentInfo>(`/dashboard/current/${ioOption}/${netOption}`);
 };
+
+export const systemRestart = (operation: string) => {
+    return http.post(`/dashboard/system/restart/${operation}`);
+};

@@ -13,6 +13,7 @@
                 </el-badge>
             </el-radio-button>
         </el-radio-group>
+        <slot name="route-button"></slot>
     </el-card>
 </template>
 
