@@ -13,37 +13,37 @@ export const getHostTree = (params: Host.ReqSearch) => {
     return http.post<Array<Host.HostTree>>(`/hosts/tree`, params);
 };
 export const addHost = (params: Host.HostOperate) => {
-    let reqest = deepCopy(params) as Host.HostOperate;
-    if (reqest.password) {
-        reqest.password = Base64.encode(reqest.password);
+    let request = deepCopy(params) as Host.HostOperate;
+    if (request.password) {
+        request.password = Base64.encode(request.password);
     }
-    if (reqest.privateKey) {
-        reqest.privateKey = Base64.encode(reqest.privateKey);
+    if (request.privateKey) {
+        request.privateKey = Base64.encode(request.privateKey);
     }
-    return http.post<Host.HostOperate>(`/hosts`, reqest);
+    return http.post<Host.HostOperate>(`/hosts`, request);
 };
 export const testByInfo = (params: Host.HostConnTest) => {
-    let reqest = deepCopy(params) as Host.HostOperate;
-    if (reqest.password) {
-        reqest.password = Base64.encode(reqest.password);
+    let request = deepCopy(params) as Host.HostOperate;
+    if (request.password) {
+        request.password = Base64.encode(request.password);
     }
-    if (reqest.privateKey) {
-        reqest.privateKey = Base64.encode(reqest.privateKey);
+    if (request.privateKey) {
+        request.privateKey = Base64.encode(request.privateKey);
     }
-    return http.post<boolean>(`/hosts/test/byinfo`, reqest);
+    return http.post<boolean>(`/hosts/test/byinfo`, request);
 };
 export const testByID = (id: number) => {
     return http.post<boolean>(`/hosts/test/byid/${id}`);
 };
 export const editHost = (params: Host.HostOperate) => {
-    let reqest = deepCopy(params) as Host.HostOperate;
-    if (reqest.password) {
-        reqest.password = Base64.encode(reqest.password);
+    let request = deepCopy(params) as Host.HostOperate;
+    if (request.password) {
+        request.password = Base64.encode(request.password);
     }
-    if (reqest.privateKey) {
-        reqest.privateKey = Base64.encode(reqest.privateKey);
+    if (request.privateKey) {
+        request.privateKey = Base64.encode(request.privateKey);
     }
-    return http.post(`/hosts/update`, reqest);
+    return http.post(`/hosts/update`, request);
 };
 export const editHostGroup = (params: Host.GroupChange) => {
     return http.post(`/hosts/update/group`, params);

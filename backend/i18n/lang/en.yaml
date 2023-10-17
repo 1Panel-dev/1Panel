@@ -113,6 +113,7 @@ ErrNodeModulesNotFound: "The node_modules folder does not exist! Please edit the
 
 #setting
 ErrBackupInUsed: "The backup account is already being used in a cronjob and cannot be deleted."
+ErrBackupCheck: "Backup account test connection failed {{ .err}}"
 ErrOSSConn: "Unable to successfully request the latest version. Please check if the server can connect to the external network environment."
 ErrEntrance: "Security entrance information error. Please check and try again!"
 

@@ -113,6 +113,7 @@ ErrNodeModulesNotFound: "node_modules 文件夾不存在！請編輯運行環境
 
 #setting
 ErrBackupInUsed: "該備份帳號已在計劃任務中使用，無法刪除"
+ErrBackupCheck: "備份帳號測試連接失敗 {{ .err}}"
 ErrOSSConn: "無法成功請求最新版本，請檢查伺服器是否能夠連接到外部網絡環境。"
 ErrEntrance: "安全入口信息錯誤，請檢查後重試！"
 

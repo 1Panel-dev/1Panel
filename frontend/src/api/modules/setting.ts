@@ -103,37 +103,37 @@ export const getFilesFromBackup = (type: string) => {
     return http.post<Array<any>>(`/settings/backup/search/files`, { type: type });
 };
 export const addBackup = (params: Backup.BackupOperate) => {
-    let reqest = deepCopy(params) as Backup.BackupOperate;
-    if (reqest.accessKey) {
-        reqest.accessKey = Base64.encode(reqest.accessKey);
+    let request = deepCopy(params) as Backup.BackupOperate;
+    if (request.accessKey) {
+        request.accessKey = Base64.encode(request.accessKey);
     }
-    if (reqest.credential) {
-        reqest.credential = Base64.encode(reqest.credential);
+    if (request.credential) {
+        request.credential = Base64.encode(request.credential);
     }
-    return http.post<Backup.BackupOperate>(`/settings/backup`, reqest);
+    return http.post<Backup.BackupOperate>(`/settings/backup`, request);
 };
 export const editBackup = (params: Backup.BackupOperate) => {
-    let reqest = deepCopy(params) as Backup.BackupOperate;
-    if (reqest.accessKey) {
-        reqest.accessKey = Base64.encode(reqest.accessKey);
+    let request = deepCopy(params) as Backup.BackupOperate;
+    if (request.accessKey) {
+        request.accessKey = Base64.encode(request.accessKey);
     }
-    if (reqest.credential) {
-        reqest.credential = Base64.encode(reqest.credential);
+    if (request.credential) {
+        request.credential = Base64.encode(request.credential);
     }
-    return http.post(`/settings/backup/update`, reqest);
+    return http.post(`/settings/backup/update`, request);
 };
 export const deleteBackup = (params: { id: number }) => {
     return http.post(`/settings/backup/del`, params);
 };
 export const listBucket = (params: Backup.ForBucket) => {
-    let reqest = deepCopy(params) as Backup.BackupOperate;
-    if (reqest.accessKey) {
-        reqest.accessKey = Base64.encode(reqest.accessKey);
+    let request = deepCopy(params) as Backup.BackupOperate;
+    if (request.accessKey) {
+        request.accessKey = Base64.encode(request.accessKey);
     }
-    if (reqest.credential) {
-        reqest.credential = Base64.encode(reqest.credential);
+    if (request.credential) {
+        request.credential = Base64.encode(request.credential);
     }
-    return http.post(`/settings/backup/buckets`, reqest);
+    return http.post(`/settings/backup/buckets`, request);
 };
 
 // snapshot
