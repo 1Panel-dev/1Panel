@@ -867,6 +867,10 @@ func loadConfigInfo(isCreate bool, req dto.ContainerOperate, oldContainer *types
 	config.Tty = req.Tty
 
 	if len(req.Network) != 0 {
+		switch req.Network {
+		case "host", "none", "bridge":
+			hostConf.NetworkMode = container.NetworkMode(req.Network)
+		}
 		networkConf.EndpointsConfig = map[string]*network.EndpointSettings{req.Network: {}}
 	} else {
 		networkConf = network.NetworkingConfig{}
