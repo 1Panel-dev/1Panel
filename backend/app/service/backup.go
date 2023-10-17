@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bufio"
 	"context"
 	"encoding/base64"
 	"encoding/json"
@@ -150,18 +151,24 @@ func (u *BackupService) DownloadRecord(info dto.DownloadRecord) (string, error) 
 	return targetPath, nil
 }
 
-func (u *BackupService) Create(backupDto dto.BackupOperate) error {
-	backup, _ := backupRepo.Get(commonRepo.WithByType(backupDto.Type))
+func (u *BackupService) Create(req dto.BackupOperate) error {
+	backup, _ := backupRepo.Get(commonRepo.WithByType(req.Type))
 	if backup.ID != 0 {
 		return constant.ErrRecordExist
 	}
-	if err := copier.Copy(&backup, &backupDto); err != nil {
+	if err := copier.Copy(&backup, &req); err != nil {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
 
-	if backupDto.Type == constant.OneDrive {
+	if req.Type == constant.OneDrive {
 		if err := u.loadAccessToken(&backup); err != nil {
 			return err
+		}
+	}
+	if req.Type != "LOCAL" {
+		isOk, err := u.checkBackupConn(&backup)
+		if err != nil || !isOk {
+			return buserr.WithMap("ErrBackupCheck", map[string]interface{}{"err": err.Error()}, err)
 		}
 	}
 	if err := backupRepo.Create(&backup); err != nil {
@@ -242,10 +249,15 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 	}
 	upMap := make(map[string]interface{})
 	upMap["bucket"] = req.Bucket
+	upMap["access_key"] = req.AccessKey
 	upMap["credential"] = req.Credential
 	upMap["backup_path"] = req.BackupPath
 	upMap["vars"] = req.Vars
+	backup.Bucket = req.Bucket
 	backup.Vars = req.Vars
+	backup.Credential = req.Credential
+	backup.AccessKey = req.AccessKey
+	backup.BackupPath = req.BackupPath
 
 	if req.Type == constant.OneDrive {
 		if err := u.loadAccessToken(&backup); err != nil {
@@ -254,6 +266,13 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 		upMap["credential"] = backup.Credential
 		upMap["vars"] = backup.Vars
 	}
+	if backup.Type != "LOCAL" {
+		isOk, err := u.checkBackupConn(&backup)
+		if err != nil || !isOk {
+			return buserr.WithMap("ErrBackupCheck", map[string]interface{}{"err": err.Error()}, err)
+		}
+	}
+
 	if err := backupRepo.Update(req.ID, upMap); err != nil {
 		return err
 	}
@@ -440,4 +459,31 @@ func copyDir(src, dst string) error {
 	}
 
 	return nil
+}
+
+func (u *BackupService) checkBackupConn(backup *model.BackupAccount) (bool, error) {
+	client, err := u.NewClient(backup)
+	if err != nil {
+		return false, err
+	}
+	fileItem := path.Join(global.CONF.System.TmpDir, "test", "1panel")
+	if _, err := os.Stat(path.Dir(fileItem)); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(path.Dir(fileItem), os.ModePerm); err != nil {
+			return false, err
+		}
+	}
+	file, err := os.OpenFile(fileItem, os.O_WRONLY|os.O_CREATE, 0666)
+	if err != nil {
+		return false, err
+	}
+	defer file.Close()
+	write := bufio.NewWriter(file)
+	_, _ = write.WriteString(string("1Panel 备份账号测试文件。\n"))
+	_, _ = write.WriteString(string("1Panel 備份賬號測試文件。\n"))
+	_, _ = write.WriteString(string("1Panel Backs up account test files.\n"))
+	_, _ = write.WriteString(string("1Panelアカウントのテストファイルをバックアップします。\n"))
+	write.Flush()
+
+	targetPath := strings.TrimPrefix(path.Join(backup.BackupPath, "test/1panel"), "/")
+	return client.Upload(fileItem, targetPath)
 }
