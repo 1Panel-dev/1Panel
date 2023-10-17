@@ -22,23 +22,28 @@
                             </el-tag>
                         </template>
                     </el-popover>
-                    <span v-if="form.status === 'Enable'" class="buttons">
-                        <el-button type="primary" @click="onOperate('stop')" link>
+                    <span class="buttons">
+                        <el-button v-if="form.status === 'Enable'" type="primary" @click="onOperate('stop')" link>
                             {{ $t('commons.button.stop') }}
                         </el-button>
-                        <el-divider direction="vertical" />
-                        <el-button type="primary" @click="onOperate('restart')" link>
-                            {{ $t('container.restart') }}
-                        </el-button>
-                    </span>
-                    <span v-if="form.status === 'Disable'" class="buttons">
-                        <el-button type="primary" @click="onOperate('start')" link>
+                        <el-button v-if="form.status === 'Disable'" type="primary" @click="onOperate('start')" link>
                             {{ $t('commons.button.start') }}
                         </el-button>
                         <el-divider direction="vertical" />
                         <el-button type="primary" @click="onOperate('restart')" link>
                             {{ $t('container.restart') }}
                         </el-button>
+                        <el-divider direction="vertical" />
+                        <el-button type="primary" link>
+                            {{ $t('ssh.autoStart') }}
+                        </el-button>
+                        <el-switch
+                            style="margin-left: 10px"
+                            inactive-value="disable"
+                            active-value="enable"
+                            @change="onOperate(autoStart)"
+                            v-model="autoStart"
+                        />
                     </span>
                 </div>
             </el-card>
@@ -170,6 +175,8 @@ const portRef = ref();
 const addressRef = ref();
 const rootsRef = ref();
 
+const autoStart = ref('enable');
+
 const sshConf = ref();
 const form = reactive({
     status: 'enable',
@@ -218,22 +225,28 @@ const onChangeAddress = () => {
 };
 
 const onOperate = async (operation: string) => {
-    ElMessageBox.confirm(i18n.global.t('ssh.sshOperate', [i18n.global.t('commons.button.' + operation)]), 'SSH', {
+    let msg = operation === 'enable' || operation === 'disable' ? 'ssh.' : 'commons.button.';
+    ElMessageBox.confirm(i18n.global.t('ssh.sshOperate', [i18n.global.t(msg + operation)]), 'SSH', {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
-    }).then(async () => {
-        loading.value = true;
-        await operateSSH(operation)
-            .then(() => {
-                loading.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                search();
-            })
-            .catch(() => {
-                loading.value = false;
-            });
-    });
+    })
+        .then(async () => {
+            loading.value = true;
+            await operateSSH(operation)
+                .then(() => {
+                    loading.value = false;
+                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                    search();
+                })
+                .catch(() => {
+                    autoStart.value = operation === 'enable' ? 'disable' : 'enable';
+                    loading.value = false;
+                });
+        })
+        .catch(() => {
+            autoStart.value = operation === 'enable' ? 'disable' : 'enable';
+        });
 };
 
 const onSave = async (formEl: FormInstance | undefined, key: string, value: string) => {

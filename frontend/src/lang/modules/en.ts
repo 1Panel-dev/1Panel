@@ -955,6 +955,9 @@ const message = {
         fileHeper: 'Note: 1. Sorting is not supported after searching 2. Folders are not supported by size sorting',
     },
     ssh: {
+        autoStart: 'Auto Start',
+        enable: 'Enable Autostart',
+        disable: 'Disable Autostart',
         sshAlert:
             'The list data is sorted based on login time, but please note that changing time zones or other operations may cause deviations in the time of login logs.',
         sshOperate: 'Operation [{0}] on the SSH service is performed. Do you want to continue?',
