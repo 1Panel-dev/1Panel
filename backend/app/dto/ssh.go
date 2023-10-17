@@ -3,6 +3,7 @@ package dto
 import "time"
 
 type SSHInfo struct {
+	AutoStart              bool   `json:"authStart"`
 	Status                 string `json:"status"`
 	Message                string `json:"message"`
 	Port                   string `json:"port"`

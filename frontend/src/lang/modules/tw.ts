@@ -919,6 +919,9 @@ const message = {
         fileHeper: '注意：1.搜尋之後不支援排序 2.依大小排序不支援資料夾',
     },
     ssh: {
+        autoStart: '開機自啟',
+        enable: '設置開機自啟',
+        disable: '關閉開機自啟',
         sshAlert: '列表數據根據登錄時間排序，但請註意，切換時區或其他操作可能導致登錄日誌的時間出現偏差。',
         sshOperate: '對 SSH 服務進行 [{0}] 操作，是否繼續？',
         sshChange: 'SSH 配置修改',

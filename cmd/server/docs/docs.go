@@ -14818,6 +14818,9 @@ const docTemplate = `{
         "dto.SSHInfo": {
             "type": "object",
             "properties": {
+                "authStart": {
+                    "type": "boolean"
+                },
                 "listenAddress": {
                     "type": "string"
                 },
@@ -16277,6 +16280,21 @@ const docTemplate = `{
                 },
                 "showHidden": {
                     "type": "boolean"
+                },
+                "sortBy": {
+                    "type": "string",
+                    "enum": [
+                        "name",
+                        "size",
+                        "modTime"
+                    ]
+                },
+                "sortOrder": {
+                    "type": "string",
+                    "enum": [
+                        "ascending",
+                        "descending"
+                    ]
                 }
             }
         },

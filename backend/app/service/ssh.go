@@ -45,6 +45,7 @@ func NewISSHService() ISSHService {
 
 func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 	data := dto.SSHInfo{
+		AutoStart:              true,
 		Status:                 constant.StatusEnable,
 		Message:                "",
 		Port:                   "22",
@@ -67,7 +68,7 @@ func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 			data.Status = constant.StatusEnable
 		}
 	}
-
+	data.AutoStart, _ = systemctl.IsEnable(serviceName)
 	sshConf, err := os.ReadFile(sshPath)
 	if err != nil {
 		data.Message = err.Error()
@@ -98,19 +99,19 @@ func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 }
 
 func (u *SSHService) OperateSSH(operation string) error {
-	if operation == "start" || operation == "stop" || operation == "restart" {
-		serviceName, err := loadServiceName()
-		if err != nil {
-			return err
-		}
-		sudo := cmd.SudoHandleCmd()
-		stdout, err := cmd.Execf("%s systemctl %s %s", sudo, operation, serviceName)
-		if err != nil {
-			return fmt.Errorf("%s %s failed, stdout: %s, err: %v", operation, serviceName, stdout, err)
-		}
-		return nil
+	serviceName, err := loadServiceName()
+	if err != nil {
+		return err
 	}
-	return fmt.Errorf("not support such operation: %s", operation)
+	sudo := cmd.SudoHandleCmd()
+	if operation == "enable" || operation == "disable" {
+		serviceName += ".service"
+	}
+	stdout, err := cmd.Execf("%s systemctl %s %s", sudo, operation, serviceName)
+	if err != nil {
+		return fmt.Errorf("%s %s failed, stdout: %s, err: %v", operation, serviceName, stdout, err)
+	}
+	return nil
 }
 
 func (u *SSHService) Update(key, value string) error {

@@ -2,9 +2,10 @@ package systemctl
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 	"os/exec"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 func RunSystemCtl(args ...string) (string, error) {
@@ -22,6 +23,14 @@ func IsActive(serviceName string) (bool, error) {
 		return false, err
 	}
 	return out == "active\n", nil
+}
+
+func IsEnable(serviceName string) (bool, error) {
+	out, err := RunSystemCtl("is-enabled", serviceName)
+	if err != nil {
+		return false, err
+	}
+	return out == "enabled\n", nil
 }
 
 func IsExist(serviceName string) (bool, error) {

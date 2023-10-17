@@ -1861,6 +1861,8 @@ definitions:
     type: object
   dto.SSHInfo:
     properties:
+      authStart:
+        type: boolean
       listenAddress:
         type: string
       message:
@@ -2832,6 +2834,17 @@ definitions:
         type: string
       showHidden:
         type: boolean
+      sortBy:
+        enum:
+        - name
+        - size
+        - modTime
+        type: string
+      sortOrder:
+        enum:
+        - ascending
+        - descending
+        type: string
     type: object
   request.FilePathCheck:
     properties:
