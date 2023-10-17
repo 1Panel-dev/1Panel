@@ -275,6 +275,10 @@ const message = {
         supervisor: '進程守護',
     },
     home: {
+        restart_1panel: '重啟面板',
+        restart_system: '重啟伺服器',
+        restartHelper: '您是否要對這台機器執行 [{0}] 操作？此操作將導致服務暫時無法使用。您要繼續嗎？',
+        operationSuccess: '操作成功！正在重啟，請稍候...',
         overview: '概覽',
         entranceHelper: '設置安全入口有利於提高系統的安全性，如有需要，前往 面板設置-安全 中，啟用安全入口',
         appInstalled: '已安裝應用',

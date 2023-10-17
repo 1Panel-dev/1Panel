@@ -277,6 +277,11 @@ const message = {
         supervisor: 'Supervisor',
     },
     home: {
+        restart_1panel: 'Restart Panel',
+        restart_system: 'Restart Server',
+        restartHelper:
+            'Do you want to perform the operation [{0}] on this machine? This action will temporarily disable the service. Do you want to continue?',
+        operationSuccess: 'Operation successful! Restarting, please wait...',
         overview: 'Overview',
         entranceHelper:
             'Enabling a secure entrance can help improve system security. If necessary, go to the Control Panel settings, select Security, and enable the secure entrance.',

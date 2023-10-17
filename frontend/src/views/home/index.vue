@@ -7,7 +7,19 @@
                     path: '/',
                 },
             ]"
-        />
+        >
+            <template #route-button>
+                <div class="router-button">
+                    <el-button link type="primary" @click="restart('1panel')">
+                        {{ $t('home.restart_1panel') }}
+                    </el-button>
+                    <el-divider direction="vertical" />
+                    <el-button link type="primary" @click="restart('system')">
+                        {{ $t('home.restart_system') }}
+                    </el-button>
+                </div>
+            </template>
+        </RouterButton>
         <el-alert
             v-if="!isSafety && globalStore.showEntranceWarn"
             style="margin-top: 20px"
@@ -231,10 +243,11 @@ import i18n from '@/lang';
 import { Dashboard } from '@/api/interface/dashboard';
 import { dateFormatForSecond, computeSize } from '@/utils/util';
 import { useRouter } from 'vue-router';
-import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
+import { loadBaseInfo, loadCurrentInfo, systemRestart } from '@/api/modules/dashboard';
 import { getIOOptions, getNetworkOptions } from '@/api/modules/monitor';
 import { getSettingInfo, loadUpgradeInfo } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
+import { MsgSuccess } from '@/utils/message';
 const router = useRouter();
 const globalStore = GlobalStore();
 
@@ -525,6 +538,21 @@ const loadUpgradeStatus = async () => {
 const loadSafeStatus = async () => {
     const res = await getSettingInfo();
     isSafety.value = res.data.securityEntrance;
+};
+
+const restart = async (type: string) => {
+    ElMessageBox.confirm(
+        i18n.global.t('home.restartHelper', [i18n.global.t('home.restart_' + type)]),
+        i18n.global.t('commons.msg.operate'),
+        {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            type: 'info',
+        },
+    ).then(async () => {
+        MsgSuccess(i18n.global.t('home.operationSuccess'));
+        await systemRestart(type);
+    });
 };
 
 const onFocus = () => {

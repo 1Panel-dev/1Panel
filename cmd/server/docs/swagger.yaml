@@ -6523,6 +6523,25 @@ paths:
       summary: Load dashboard current info
       tags:
       - Dashboard
+  /dashboard/system/restart/:operation:
+    post:
+      consumes:
+      - application/json
+      description: 重启服务器/面板
+      parameters:
+      - description: request
+        in: path
+        name: operation
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: System restart
+      tags:
+      - Dashboard
   /databases:
     post:
       consumes:

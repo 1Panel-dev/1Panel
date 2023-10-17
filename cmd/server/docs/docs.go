@@ -3718,6 +3718,37 @@ const docTemplate = `{
                 }
             }
         },
+        "/dashboard/system/restart/:operation": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "重启服务器/面板",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "System restart",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "request",
+                        "name": "operation",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/databases": {
             "post": {
                 "security": [
