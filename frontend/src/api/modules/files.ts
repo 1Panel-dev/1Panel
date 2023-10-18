@@ -3,6 +3,7 @@ import http from '@/api';
 import { AxiosRequestConfig } from 'axios';
 import { ResPage } from '../interface';
 import { TimeoutEnum } from '@/enums/http-enum';
+import { ReqPage } from '@/api/interface';
 
 export const GetFilesList = (params: File.ReqFile) => {
     return http.post<File.File>('files/search', params, TimeoutEnum.T_5M);
@@ -86,4 +87,16 @@ export const ComputeDirSize = (params: File.DirSizeReq) => {
 
 export const FileKeys = () => {
     return http.get<File.FileKeys>('files/keys');
+};
+
+export const getRecycleList = (params: ReqPage) => {
+    return http.post<ResPage<File.RecycleBin>>('files/recycle/search', params);
+};
+
+export const reduceFile = (params: File.RecycleBinReduce) => {
+    return http.post<any>('files/recycle/reduce', params);
+};
+
+export const clearRecycle = () => {
+    return http.post<any>('files/recycle/clear');
 };

@@ -48,67 +48,78 @@
                 </el-alert>
             </template>
             <template #toolbar>
-                <el-dropdown @command="handleCreate">
-                    <el-button type="primary">
-                        {{ $t('commons.button.create') }}
-                        <el-icon><arrow-down /></el-icon>
-                    </el-button>
-                    <template #dropdown>
-                        <el-dropdown-menu>
-                            <el-dropdown-item command="dir">
-                                <svg-icon iconName="p-file-folder"></svg-icon>
-                                {{ $t('file.dir') }}
-                            </el-dropdown-item>
-                            <el-dropdown-item command="file">
-                                <svg-icon iconName="p-file-normal"></svg-icon>
-                                {{ $t('file.file') }}
-                            </el-dropdown-item>
-                        </el-dropdown-menu>
-                    </template>
-                </el-dropdown>
-                <el-button-group style="margin-left: 10px">
-                    <el-button plain @click="openUpload">{{ $t('file.upload') }}</el-button>
-                    <el-button plain @click="openWget">{{ $t('file.remoteFile') }}</el-button>
-                    <el-button plain @click="openMove('copy')" :disabled="selects.length === 0">
-                        {{ $t('file.copy') }}
-                    </el-button>
-                    <el-button plain @click="openMove('cut')" :disabled="selects.length === 0">
-                        {{ $t('file.move') }}
-                    </el-button>
-                    <el-button plain @click="openCompress(selects)" :disabled="selects.length === 0">
-                        {{ $t('file.compress') }}
-                    </el-button>
-                    <el-button plain @click="batchDelFiles" :disabled="selects.length === 0">
-                        {{ $t('commons.button.delete') }}
-                    </el-button>
-                </el-button-group>
-                <el-button-group class="copy-button" v-if="moveOpen">
-                    <el-tooltip class="box-item" effect="dark" :content="$t('file.paste')" placement="bottom">
-                        <el-button plain @click="openPaste">{{ $t('file.paste') }}</el-button>
-                    </el-tooltip>
-                    <el-tooltip class="box-item" effect="dark" :content="$t('file.cancel')" placement="bottom">
-                        <el-button plain class="close" @click="closeMove">
-                            <el-icon class="close-icon"><Close /></el-icon>
+                <div class="btn-container">
+                    <div class="left-section">
+                        <el-dropdown @command="handleCreate">
+                            <el-button type="primary">
+                                {{ $t('commons.button.create') }}
+                                <el-icon><arrow-down /></el-icon>
+                            </el-button>
+                            <template #dropdown>
+                                <el-dropdown-menu>
+                                    <el-dropdown-item command="dir">
+                                        <svg-icon iconName="p-file-folder"></svg-icon>
+                                        {{ $t('file.dir') }}
+                                    </el-dropdown-item>
+                                    <el-dropdown-item command="file">
+                                        <svg-icon iconName="p-file-normal"></svg-icon>
+                                        {{ $t('file.file') }}
+                                    </el-dropdown-item>
+                                </el-dropdown-menu>
+                            </template>
+                        </el-dropdown>
+                        <el-button-group>
+                            <el-button plain @click="openUpload">{{ $t('file.upload') }}</el-button>
+                            <el-button plain @click="openWget">{{ $t('file.remoteFile') }}</el-button>
+                            <el-button plain @click="openMove('copy')" :disabled="selects.length === 0">
+                                {{ $t('file.copy') }}
+                            </el-button>
+                            <el-button plain @click="openMove('cut')" :disabled="selects.length === 0">
+                                {{ $t('file.move') }}
+                            </el-button>
+                            <el-button plain @click="openCompress(selects)" :disabled="selects.length === 0">
+                                {{ $t('file.compress') }}
+                            </el-button>
+                            <el-button plain @click="batchDelFiles" :disabled="selects.length === 0">
+                                {{ $t('commons.button.delete') }}
+                            </el-button>
+                        </el-button-group>
+
+                        <el-button-group class="copy-button" v-if="moveOpen">
+                            <el-tooltip class="box-item" effect="dark" :content="$t('file.paste')" placement="bottom">
+                                <el-button plain @click="openPaste">{{ $t('file.paste') }}</el-button>
+                            </el-tooltip>
+                            <el-tooltip class="box-item" effect="dark" :content="$t('file.cancel')" placement="bottom">
+                                <el-button plain class="close" @click="closeMove">
+                                    <el-icon class="close-icon"><Close /></el-icon>
+                                </el-button>
+                            </el-tooltip>
+                        </el-button-group>
+                    </div>
+
+                    <div class="right-section">
+                        <el-button class="btn" @click="openRecycleBin" :icon="Delete">
+                            {{ $t('file.recycleBin') }}
                         </el-button>
-                    </el-tooltip>
-                </el-button-group>
-                <div class="search search-button">
-                    <el-input
-                        v-model="req.search"
-                        clearable
-                        @clear="search()"
-                        @keydown.enter="search()"
-                        :placeholder="$t('file.search')"
-                    >
-                        <template #prepend>
-                            <el-checkbox v-model="req.containSub">
-                                {{ $t('file.sub') }}
-                            </el-checkbox>
-                        </template>
-                        <template #append>
-                            <el-button icon="Search" @click="search" round />
-                        </template>
-                    </el-input>
+                        <div class="search-button">
+                            <el-input
+                                v-model="req.search"
+                                clearable
+                                @clear="search()"
+                                @keydown.enter="search()"
+                                :placeholder="$t('file.search')"
+                            >
+                                <template #prepend>
+                                    <el-checkbox v-model="req.containSub">
+                                        {{ $t('file.sub') }}
+                                    </el-checkbox>
+                                </template>
+                                <template #append>
+                                    <el-button icon="Search" @click="search" round />
+                                </template>
+                            </el-input>
+                        </div>
+                    </div>
                 </div>
             </template>
             <template #main>
@@ -200,7 +211,8 @@
             <Process :open="processPage.open" @close="closeProcess" />
             <Owner ref="chownRef" @close="search"></Owner>
             <Detail ref="detailRef" />
-            <Delete ref="deleteRef" @close="search" />
+            <DeleteFile ref="deleteRef" @close="search" />
+            <RecycleBin ref="recycleBinRef" @close="search" />
         </LayoutContent>
     </div>
 </template>
@@ -209,6 +221,7 @@
 import { nextTick, onMounted, reactive, ref, computed } from '@vue/runtime-core';
 import { GetFilesList, GetFileContent, ComputeDirSize } from '@/api/modules/files';
 import { computeSize, dateFormat, downloadFile, getIcon, getRandomStr } from '@/utils/util';
+import { Delete } from '@element-plus/icons-vue';
 import { File } from '@/api/interface/file';
 import i18n from '@/lang';
 import CreateFile from './create/index.vue';
@@ -222,10 +235,11 @@ import Wget from './wget/index.vue';
 import Move from './move/index.vue';
 import Download from './download/index.vue';
 import Owner from './chown/index.vue';
-import Delete from './delete/index.vue';
+import DeleteFile from './delete/index.vue';
 import { Mimetypes, Languages } from '@/global/mimetype';
 import Process from './process/index.vue';
 import Detail from './detail/index.vue';
+import RecycleBin from './recycle-bin/index.vue';
 import { useRouter } from 'vue-router';
 import { Back, Refresh } from '@element-plus/icons-vue';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
@@ -288,6 +302,7 @@ const breadCrumbRef = ref();
 const chownRef = ref();
 const moveOpen = ref(false);
 const deleteRef = ref();
+const recycleBinRef = ref();
 
 // editablePath
 const { searchableStatus, searchablePath, searchableInputRef, searchableInputBlur } = useSearchable(paths);
@@ -608,6 +623,10 @@ const openDetail = (row: File.File) => {
     detailRef.value.acceptParams({ path: row.path });
 };
 
+const openRecycleBin = () => {
+    recycleBinRef.value.acceptParams();
+};
+
 const changeSort = ({ prop, order }) => {
     req.sortBy = prop;
     req.sortOrder = order;
@@ -713,12 +732,6 @@ onMounted(() => {
     }
 }
 
-.search {
-    display: inline;
-    width: 400px;
-    float: right;
-}
-
 .copy-button {
     margin-left: 10px;
     .close {
@@ -727,5 +740,26 @@ onMounted(() => {
             color: red;
         }
     }
+}
+
+.btn-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.left-section,
+.right-section {
+    display: flex;
+    align-items: center;
+}
+
+.left-section > *:not(:first-child) {
+    margin-left: 10px;
+}
+
+.right-section > *:not(:last-child) {
+    margin-right: 10px;
 }
 </style>

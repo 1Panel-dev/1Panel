@@ -53,4 +53,6 @@ var (
 	processService = service.NewIProcessService()
 
 	hostToolService = service.NewIHostToolService()
+
+	recycleBinService = service.NewIRecycleBinService()
 )

@@ -7819,6 +7819,94 @@
                 }
             }
         },
+        "/recycle/clear": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "清空回收站文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "RecycleBin"
+                ],
+                "summary": "Clear RecycleBin files",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/recycle/reduce": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "还原回收站文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "RecycleBin"
+                ],
+                "summary": "Reduce RecycleBin files",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.RecycleBinReduce"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/recycle/search": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取回收站文件列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "RecycleBin"
+                ],
+                "summary": "List RecycleBin files",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.PageInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/runtimes": {
             "post": {
                 "security": [
@@ -16207,6 +16295,9 @@
                 "path"
             ],
             "properties": {
+                "forceDelete": {
+                    "type": "boolean"
+                },
                 "isDir": {
                     "type": "boolean"
                 },
@@ -16813,6 +16904,21 @@
             "properties": {
                 "PID": {
                     "type": "integer"
+                }
+            }
+        },
+        "request.RecycleBinReduce": {
+            "type": "object",
+            "required": [
+                "from",
+                "rName"
+            ],
+            "properties": {
+                "from": {
+                    "type": "string"
+                },
+                "rName": {
+                    "type": "string"
                 }
             }
         },
