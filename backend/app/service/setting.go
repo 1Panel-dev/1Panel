@@ -41,6 +41,7 @@ type ISettingService interface {
 
 	SystemScan() dto.CleanData
 	SystemClean(req []dto.Clean)
+	SystemCleanForCronjob() (string, error)
 }
 
 func NewISettingService() ISettingService {
