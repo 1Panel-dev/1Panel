@@ -102,6 +102,17 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 			}
 		}
 	}
+	if req.State != "all" {
+		length, count := len(list), 0
+		for count < length {
+			if list[count].State != req.State {
+				list = append(list[:count], list[(count+1):]...)
+				length--
+			} else {
+				count++
+			}
+		}
+	}
 	switch req.OrderBy {
 	case "name":
 		sort.Slice(list, func(i, j int) bool {

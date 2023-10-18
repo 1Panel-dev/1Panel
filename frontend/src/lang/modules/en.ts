@@ -212,6 +212,7 @@ const message = {
             removing: 'Removing',
             paused: 'Paused',
             exited: 'Exited',
+            dead: 'Dead',
             installing: 'Installing',
             enabled: 'Enabled',
             disabled: 'Disabled',

@@ -55,6 +55,19 @@
                     </el-col>
                 </el-row>
             </template>
+            <template #search>
+                <el-select v-model="searchState" @change="search()" clearable>
+                    <template #prefix>{{ $t('commons.table.status') }}</template>
+                    <el-option :label="$t('commons.table.all')" value="all"></el-option>
+                    <el-option :label="$t('commons.status.created')" value="created"></el-option>
+                    <el-option :label="$t('commons.status.running')" value="running"></el-option>
+                    <el-option :label="$t('commons.status.paused')" value="paused"></el-option>
+                    <el-option :label="$t('commons.status.restarting')" value="restarting"></el-option>
+                    <el-option :label="$t('commons.status.removing')" value="removing"></el-option>
+                    <el-option :label="$t('commons.status.exited')" value="exited"></el-option>
+                    <el-option :label="$t('commons.status.dead')" value="dead"></el-option>
+                </el-select>
+            </template>
             <template #main>
                 <ComplexTable
                     :pagination-config="paginationConfig"
@@ -234,7 +247,7 @@
         <ReNameDialog @search="search" ref="dialogReNameRef" />
         <ContainerLogDialog ref="dialogContainerLogRef" />
         <OperateDialog @search="search" ref="dialogOperateRef" />
-        <UpgraeDialog @search="search" ref="dialogUpgradeRef" />
+        <UpgradeDialog @search="search" ref="dialogUpgradeRef" />
         <MonitorDialog ref="dialogMonitorRef" />
         <TerminalDialog ref="dialogTerminalRef" />
 
@@ -249,7 +262,7 @@ import TableSetting from '@/components/table-setting/index.vue';
 import PruneDialog from '@/views/container/container/prune/index.vue';
 import ReNameDialog from '@/views/container/container/rename/index.vue';
 import OperateDialog from '@/views/container/container/operate/index.vue';
-import UpgraeDialog from '@/views/container/container/upgrade/index.vue';
+import UpgradeDialog from '@/views/container/container/upgrade/index.vue';
 import MonitorDialog from '@/views/container/container/monitor/index.vue';
 import ContainerLogDialog from '@/views/container/container/log/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
@@ -288,6 +301,7 @@ const paginationConfig = reactive({
     order: 'null',
 });
 const searchName = ref();
+const searchState = ref('all');
 const dialogUpgradeRef = ref();
 const dialogPortJumpRef = ref();
 const handleRef = ref();
@@ -345,6 +359,7 @@ const search = async (column?: any) => {
     paginationConfig.order = column?.order ? column.order : paginationConfig.order;
     let params = {
         name: searchName.value,
+        state: searchState.value || 'all',
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
         filters: filterItem,

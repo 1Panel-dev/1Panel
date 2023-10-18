@@ -28,6 +28,10 @@ const getType = (status: string) => {
         case 'stopped':
             return 'danger';
         case 'unhealthy':
+        case 'paused':
+        case 'exited':
+        case 'dead':
+        case 'removing':
             return 'warning';
         default:
             return '';
@@ -43,6 +47,7 @@ const loadingStatus = [
     'recreating',
     'creating',
     'starting',
+    'removing',
 ];
 
 const loadingIcon = (status: string): boolean => {
