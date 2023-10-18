@@ -14491,7 +14491,8 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "page",
-                "pageSize"
+                "pageSize",
+                "state"
             ],
             "properties": {
                 "filters": {
@@ -14511,6 +14512,19 @@ const docTemplate = `{
                 },
                 "pageSize": {
                     "type": "integer"
+                },
+                "state": {
+                    "type": "string",
+                    "enum": [
+                        "all",
+                        "created",
+                        "running",
+                        "paused",
+                        "restarting",
+                        "removing",
+                        "exited",
+                        "dead"
+                    ]
                 }
             }
         },

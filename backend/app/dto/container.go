@@ -5,6 +5,7 @@ import "time"
 type PageContainer struct {
 	PageInfo
 	Name    string `json:"name"`
+	State   string `json:"state" validate:"required,oneof=all created running paused restarting removing exited dead"`
 	OrderBy string `json:"orderBy"`
 	Order   string `json:"order"`
 	Filters string `json:"filters"`

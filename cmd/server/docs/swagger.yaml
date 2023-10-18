@@ -1634,9 +1634,21 @@ definitions:
         type: integer
       pageSize:
         type: integer
+      state:
+        enum:
+        - all
+        - created
+        - running
+        - paused
+        - restarting
+        - removing
+        - exited
+        - dead
+        type: string
     required:
     - page
     - pageSize
+    - state
     type: object
   dto.PageInfo:
     properties:
