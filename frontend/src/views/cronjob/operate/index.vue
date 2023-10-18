@@ -27,6 +27,7 @@
                             <el-option value="curl" :label="$t('cronjob.curl')" />
                             <el-option value="ntp" :label="$t('cronjob.ntp')" />
                             <el-option value="cutWebsiteLog" :label="$t('cronjob.cutWebsiteLog')" />
+                            <el-option value="clean" :label="$t('setting.diskClean')" />
                         </el-select>
                         <el-tag v-else>{{ $t('cronjob.' + dialogData.rowData!.type) }}</el-tag>
                     </el-form-item>

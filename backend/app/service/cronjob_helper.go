@@ -64,6 +64,11 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 			if err != nil {
 				global.LOG.Errorf("cut website log file failed, err: %v", err)
 			}
+		case "clean":
+			messageItem := ""
+			messageItem, err = u.handleSystemClean()
+			message = []byte(messageItem)
+			u.HandleRmExpired("LOCAL", "", "", cronjob, nil)
 		}
 
 		if err != nil {
@@ -583,4 +588,8 @@ func (u *CronjobService) handleSnapshot(cronjob *model.Cronjob, startTime time.T
 
 	u.HandleRmExpired(backup.Type, backup.BackupPath, "", cronjob, client)
 	return message, path, nil
+}
+
+func (u *CronjobService) handleSystemClean() (string, error) {
+	return NewISettingService().SystemCleanForCronjob()
 }
