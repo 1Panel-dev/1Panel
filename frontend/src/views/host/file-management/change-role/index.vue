@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="open" :before-close="handleClose" :close-on-click-modal="false" width="50%">
+    <el-drawer v-model="open" :before-close="handleClose" :close-on-click-modal="false" size="50%">
         <template #header>
             <DrawerHeader :header="$t('file.setRole')" :resource="name" :back="handleClose" />
         </template>
@@ -32,7 +32,7 @@ import { MsgSuccess } from '@/utils/message';
 
 const open = ref(false);
 const form = ref<File.FileCreate>({ path: '', isDir: false, mode: 0o755 });
-const loading = ref<Boolean>(false);
+const loading = ref(false);
 const mode = ref('0755');
 const name = ref('');
 

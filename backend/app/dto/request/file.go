@@ -26,8 +26,9 @@ type FileCreate struct {
 }
 
 type FileDelete struct {
-	Path  string `json:"path" validate:"required"`
-	IsDir bool   `json:"isDir"`
+	Path        string `json:"path" validate:"required"`
+	IsDir       bool   `json:"isDir"`
+	ForceDelete bool   `json:"forceDelete"`
 }
 
 type FileBatchDelete struct {

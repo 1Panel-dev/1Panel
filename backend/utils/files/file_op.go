@@ -84,6 +84,14 @@ func (f FileOp) DeleteFile(dst string) error {
 	return f.Fs.Remove(dst)
 }
 
+func (f FileOp) Delete(dst string) error {
+	return os.RemoveAll(dst)
+}
+
+func (f FileOp) RmRf(dst string) error {
+	return cmd.ExecCmd(fmt.Sprintf("rm -rf %s", dst))
+}
+
 func (f FileOp) WriteFile(dst string, in io.Reader, mode fs.FileMode) error {
 	file, err := f.Fs.OpenFile(dst, os.O_RDWR|os.O_CREATE|os.O_TRUNC, mode)
 	if err != nil {

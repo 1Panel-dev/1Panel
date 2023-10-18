@@ -2778,6 +2778,8 @@ definitions:
     type: object
   request.FileDelete:
     properties:
+      forceDelete:
+        type: boolean
       isDir:
         type: boolean
       path:
@@ -3189,6 +3191,16 @@ definitions:
         type: integer
     required:
     - PID
+    type: object
+  request.RecycleBinReduce:
+    properties:
+      from:
+        type: string
+      rName:
+        type: string
+    required:
+    - from
+    - rName
     type: object
   request.RuntimeCreate:
     properties:
@@ -9147,6 +9159,59 @@ paths:
         formatEN: 结束进程 [PID]
         formatZH: 结束进程 [PID]
         paramKeys: []
+  /recycle/clear:
+    post:
+      consumes:
+      - application/json
+      description: 清空回收站文件
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Clear RecycleBin files
+      tags:
+      - RecycleBin
+  /recycle/reduce:
+    post:
+      consumes:
+      - application/json
+      description: 还原回收站文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.RecycleBinReduce'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Reduce RecycleBin files
+      tags:
+      - RecycleBin
+  /recycle/search:
+    post:
+      consumes:
+      - application/json
+      description: 获取回收站文件列表
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PageInfo'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: List RecycleBin files
+      tags:
+      - RecycleBin
   /runtimes:
     post:
       consumes:

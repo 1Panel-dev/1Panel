@@ -18,6 +18,9 @@
                         </tr>
                     </table>
                 </div>
+                <div class="mt-5">
+                    <el-checkbox v-model="forceDelete">{{ $t('file.forceDeleteHelper') }}</el-checkbox>
+                </div>
             </el-col>
         </el-row>
 
@@ -45,6 +48,7 @@ const open = ref(false);
 const files = ref();
 const loading = ref(false);
 const em = defineEmits(['close']);
+const forceDelete = ref(false);
 
 const acceptParams = (props: File.File[]) => {
     files.value = props;
@@ -54,7 +58,7 @@ const acceptParams = (props: File.File[]) => {
 const onConfirm = () => {
     const pros = [];
     for (const s of files.value) {
-        pros.push(DeleteFile({ path: s['path'], isDir: s['isDir'] }));
+        pros.push(DeleteFile({ path: s['path'], isDir: s['isDir'], forceDelete: forceDelete.value }));
     }
     loading.value = true;
     Promise.all(pros)

@@ -63,6 +63,7 @@ ErrFileIsExit: "文件已存在！"
 ErrFileUpload: "{{ .name }} 上傳文件失敗 {{ .detail}}"
 ErrFileDownloadDir: "不支持下載文件夾"
 ErrCmdNotFound: "{{ .name}} 命令不存在，請先在宿主機安裝此命令"
+ErrSourcePathNotFound:  "源目錄不存在"
 
 #website
 ErrDomainIsExist: "域名已存在"

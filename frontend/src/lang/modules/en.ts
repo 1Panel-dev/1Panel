@@ -957,8 +957,18 @@ const message = {
         fileUploadStart: 'Uploading [{0}]....',
         currentSelect: 'Current Select: ',
         unsupportType: 'Unsupported file type',
-        deleteHelper: 'The following resources will be deleted, this operation cannot be rolled back, continue? ',
+        deleteHelper:
+            'Are you sure you want to delete the following files? By default, it will enter the recycle bin after deletion',
         fileHeper: 'Note: 1. Sorting is not supported after searching 2. Folders are not supported by size sorting',
+        forceDeleteHelper: 'Permanently delete the file (without entering the recycle bin, delete it directly)',
+        recycleBin: 'Recycle bin',
+        sourcePath: 'Original path',
+        deleteTime: 'Delete time',
+        reduce: 'Reduction',
+        reduceHelper:
+            'Restore the file to its original path. If a file or directory with the same name exists at the original address of the file, it will be overwritten. Do you want to continue?',
+        clearRecycleBin: 'Clear the recycle bin',
+        clearRecycleBinHelper: 'Do you want to clear the recycle bin? ',
     },
     ssh: {
         autoStart: 'Auto Start',

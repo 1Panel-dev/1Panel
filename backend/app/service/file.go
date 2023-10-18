@@ -133,11 +133,14 @@ func (f *FileService) Create(op request.FileCreate) error {
 
 func (f *FileService) Delete(op request.FileDelete) error {
 	fo := files.NewFileOp()
-	if op.IsDir {
-		return fo.DeleteDir(op.Path)
-	} else {
-		return fo.DeleteFile(op.Path)
+	if op.ForceDelete {
+		if op.IsDir {
+			return fo.DeleteDir(op.Path)
+		} else {
+			return fo.DeleteFile(op.Path)
+		}
 	}
+	return NewIRecycleBinService().Create(request.RecycleBinCreate{SourcePath: op.Path})
 }
 
 func (f *FileService) BatchDelete(op request.FileBatchDelete) error {

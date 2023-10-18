@@ -65,6 +65,7 @@ export namespace File {
     export interface FileDelete {
         path: string;
         isDir: boolean;
+        forceDelete: boolean;
     }
 
     export interface FileBatchDelete {
@@ -144,5 +145,21 @@ export namespace File {
 
     export interface FilePath {
         path: string;
+    }
+
+    export interface RecycleBin {
+        sourcePath: string;
+        name: string;
+        isDir: boolean;
+        size: number;
+        deleteTime: string;
+        rName: string;
+        from: string;
+    }
+
+    export interface RecycleBinReduce {
+        rName: string;
+        from: string;
+        name: string;
     }
 }
