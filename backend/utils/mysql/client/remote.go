@@ -279,7 +279,7 @@ func (r *Remote) SyncDB(version string) ([]SyncDBInfo, error) {
 		if err = rows.Scan(&dbName, &charsetName); err != nil {
 			return datas, err
 		}
-		if dbName == "information_schema" || dbName == "mysql" || dbName == "performance_schema" || dbName == "sys" {
+		if dbName == "information_schema" || dbName == "mysql" || dbName == "performance_schema" || dbName == "sys" || dbName == "recycle_bin" {
 			continue
 		}
 		dataItem := SyncDBInfo{
