@@ -1,6 +1,13 @@
 import i18n from '@/lang';
 import { FormItemRule } from 'element-plus';
 
+const checkNoSpace = (rule: any, value: any, callback: any) => {
+    if (value.indexOf(' ') !== -1) {
+        return callback(new Error(i18n.global.t('setting.noSpace')));
+    }
+    callback();
+};
+
 const checkIp = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.requiredInput')));
@@ -431,6 +438,7 @@ interface CommonRule {
     requiredInput: FormItemRule;
     requiredSelect: FormItemRule;
     requiredSelectBusiness: FormItemRule;
+    noSpace: FormItemRule;
     name: FormItemRule;
     userName: FormItemRule;
     simpleName: FormItemRule;
@@ -483,6 +491,11 @@ export const Rules: CommonRule = {
         type: 'number',
         message: i18n.global.t('commons.rule.requiredSelect'),
         trigger: 'change',
+    },
+    noSpace: {
+        required: true,
+        validator: checkNoSpace,
+        trigger: 'blur',
     },
     simpleName: {
         required: true,

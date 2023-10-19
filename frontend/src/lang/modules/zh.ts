@@ -1006,6 +1006,7 @@ const message = {
         oldPassword: '原密码',
         newPassword: '新密码',
         retryPassword: '确认密码',
+        noSpace: '输入信息不能包含空格符',
         duplicatePassword: '新密码不能与原始密码一致，请重新输入！',
         diskClean: '缓存清理',
 

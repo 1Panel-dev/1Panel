@@ -1050,6 +1050,7 @@ const message = {
         oldPassword: 'Original password',
         newPassword: 'New password',
         retryPassword: 'Confirm password',
+        noSpace: 'Input information cannot include space characters',
         duplicatePassword: 'The new password cannot be the same as the original password, please re-enter!',
         diskClean: 'Cache Clean',
 
