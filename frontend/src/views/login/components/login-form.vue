@@ -9,6 +9,7 @@
                             size="default"
                             :placeholder="$t('commons.login.mfaCode')"
                             v-model.trim="mfaLoginForm.code"
+                            @input="mfaLogin(true)"
                         >
                             <template #prefix>
                                 <el-icon class="el-input__icon">
@@ -28,7 +29,7 @@
                             type="primary"
                             size="default"
                             round
-                            @click="mfaLogin()"
+                            @click="mfaLogin(false)"
                         >
                             {{ $t('commons.button.verify') }}
                         </el-button>
@@ -278,8 +279,8 @@ const login = (formEl: FormInstance | undefined) => {
     });
 };
 
-const mfaLogin = async () => {
-    if (mfaLoginForm.code) {
+const mfaLogin = async (auto: boolean) => {
+    if ((!auto && mfaLoginForm.code) || (auto && mfaLoginForm.code.length === 6)) {
         mfaLoginForm.name = loginForm.name;
         mfaLoginForm.password = loginForm.password;
         const res = await mfaLoginApi(mfaLoginForm);
@@ -328,7 +329,7 @@ onMounted(() => {
                 }
             }
             if (mfaShow.value && !mfaButtonFocused.value) {
-                mfaLogin();
+                mfaLogin(false);
             }
         }
     };
