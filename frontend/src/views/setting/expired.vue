@@ -16,30 +16,22 @@
                         label-position="left"
                         label-width="160px"
                     >
-                        <el-form-item :label="$t('setting.oldPassword')" prop="oldPassword">
-                            <el-input type="password" show-password clearable v-model="passForm.oldPassword" />
+                        <el-form-item :label="$t('setting.oldPassword')" prop="oldPass">
+                            <el-input type="password" show-password clearable v-model.trim="passForm.oldPass" />
                         </el-form-item>
-                        <el-form-item
-                            v-if="settingForm?.complexityVerification === 'disable'"
-                            :label="$t('setting.newPassword')"
-                            prop="newPassword"
-                        >
-                            <el-input type="password" show-password clearable v-model="passForm.newPassword" />
+                        <el-form-item v-if="!isComplexity" :label="$t('setting.newPassword')" prop="newPass">
+                            <el-input type="password" show-password clearable v-model.trim="passForm.newPass" />
                         </el-form-item>
-                        <el-form-item
-                            v-if="settingForm?.complexityVerification === 'enable'"
-                            :label="$t('setting.newPassword')"
-                            prop="newPasswordComplexity"
-                        >
+                        <el-form-item v-if="isComplexity" :label="$t('setting.newPassword')" prop="newPassComplexity">
                             <el-input
                                 type="password"
                                 show-password
                                 clearable
-                                v-model="passForm.newPasswordComplexity"
+                                v-model.trim="passForm.newPassComplexity"
                             />
                         </el-form-item>
-                        <el-form-item :label="$t('setting.retryPassword')" prop="retryPassword">
-                            <el-input type="password" show-password clearable v-model="passForm.retryPassword" />
+                        <el-form-item :label="$t('setting.retryPassword')" prop="rePass">
+                            <el-input type="password" show-password clearable v-model.trim="passForm.rePass" />
                         </el-form-item>
                         <el-form-item>
                             <el-button type="primary" @click="submitChangePassword(passFormRef)">
@@ -61,30 +53,31 @@ import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
 import router from '@/routers';
 import { MsgError, MsgSuccess } from '@/utils/message';
-let settingForm = ref();
+
+let isComplexity = ref(false);
 
 type FormInstance = InstanceType<typeof ElForm>;
 const passFormRef = ref<FormInstance>();
 const passRules = reactive({
-    oldPassword: [Rules.requiredInput],
-    newPassword: [
+    oldPass: [Rules.noSpace, Rules.requiredInput],
+    newPass: [
         Rules.requiredInput,
+        Rules.noSpace,
         { min: 6, message: i18n.global.t('commons.rule.commonPassword'), trigger: 'blur' },
     ],
-    newPasswordComplexity: [Rules.requiredInput, Rules.password],
-    retryPassword: [Rules.requiredInput, { validator: checkPassword, trigger: 'blur' }],
+    newPassComplexity: [Rules.requiredInput, Rules.noSpace, Rules.password],
+    rePass: [Rules.requiredInput, Rules.noSpace, { validator: checkPasswordSame, trigger: 'blur' }],
 });
 const passForm = reactive({
-    oldPassword: '',
-    newPassword: '',
-    newPasswordComplexity: '',
-    retryPassword: '',
+    oldPass: '',
+    newPass: '',
+    newPassComplexity: '',
+    rePass: '',
 });
 
-function checkPassword(rule: any, value: any, callback: any) {
-    let password =
-        settingForm.value.complexityVerification === 'disable' ? passForm.newPassword : passForm.newPasswordComplexity;
-    if (password !== passForm.retryPassword) {
+function checkPasswordSame(rule: any, value: any, callback: any) {
+    let password = !isComplexity.value ? passForm.newPass : passForm.newPassComplexity;
+    if (password !== passForm.rePass) {
         return callback(new Error(i18n.global.t('commons.rule.rePassword')));
     }
     callback();
@@ -94,22 +87,20 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        let password =
-            settingForm.value.complexityVerification === 'disable'
-                ? passForm.newPassword
-                : passForm.newPasswordComplexity;
-        if (password === passForm.oldPassword) {
+        let password = !isComplexity.value ? passForm.newPass : passForm.newPassComplexity;
+        if (password === passForm.oldPass) {
             MsgError(i18n.global.t('setting.duplicatePassword'));
             return;
         }
-        await handleExpired({ oldPassword: passForm.oldPassword, newPassword: password });
+        await handleExpired({ oldPassword: passForm.oldPass, newPassword: password });
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         router.push({ name: 'home' });
     });
 };
 const search = async () => {
     const res = await getSettingInfo();
-    settingForm.value = res.data;
+    let settingForm = res.data;
+    isComplexity.value = settingForm?.complexityVerification === 'enable';
 };
 
 onMounted(() => {
