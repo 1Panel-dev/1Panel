@@ -115,11 +115,19 @@ func GetTxAndContext() (tx *gorm.DB, ctx context.Context) {
 }
 
 func CheckBindAndValidate(req interface{}, c *gin.Context) error {
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBindJSON(req); err != nil {
 		ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return err
 	}
 	if err := global.VALID.Struct(req); err != nil {
+		ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return err
+	}
+	return nil
+}
+
+func CheckBind(req interface{}, c *gin.Context) error {
+	if err := c.ShouldBindJSON(&req); err != nil {
 		ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return err
 	}

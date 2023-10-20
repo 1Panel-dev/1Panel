@@ -47,6 +47,7 @@ func Init() {
 		migrations.AddDefaultNetwork,
 		migrations.UpdateRuntime,
 		migrations.UpdateTag,
+		migrations.AddFavorite,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

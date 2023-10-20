@@ -2280,6 +2280,8 @@ definitions:
         type: string
       extension:
         type: string
+      favoriteID:
+        type: integer
       gid:
         type: string
       group:
@@ -2709,6 +2711,20 @@ definitions:
         type: string
     required:
     - path
+    type: object
+  request.FavoriteCreate:
+    properties:
+      path:
+        type: string
+    required:
+    - path
+    type: object
+  request.FavoriteDelete:
+    properties:
+      id:
+        type: integer
+    required:
+    - id
     type: object
   request.FileBatchDelete:
     properties:
@@ -3195,6 +3211,8 @@ definitions:
   request.RecycleBinReduce:
     properties:
       from:
+        type: string
+      name:
         type: string
       rName:
         type: string
@@ -3955,6 +3973,8 @@ definitions:
         type: string
       extension:
         type: string
+      favoriteID:
+        type: integer
       gid:
         type: string
       group:
@@ -7604,6 +7624,86 @@ paths:
         formatEN: Download file [name]
         formatZH: 下载文件 [name]
         paramKeys: []
+  /files/favorite:
+    post:
+      consumes:
+      - application/json
+      description: 创建收藏
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.FavoriteCreate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Create favorite
+      tags:
+      - File
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - path
+        formatEN: 收藏文件/文件夹 [path]
+        formatZH: 收藏文件/文件夹 [path]
+        paramKeys: []
+  /files/favorite/del:
+    post:
+      consumes:
+      - application/json
+      description: 删除收藏
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.FavoriteDelete'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Delete favorite
+      tags:
+      - File
+      x-panel-log:
+        BeforeFunctions:
+        - db: favorites
+          input_column: id
+          input_value: id
+          isList: false
+          output_column: path
+          output_value: path
+        bodyKeys:
+        - id
+        formatEN: delete avorite [path]
+        formatZH: 删除收藏 [path]
+        paramKeys: []
+  /files/favorite/search:
+    post:
+      consumes:
+      - application/json
+      description: 获取收藏列表
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PageInfo'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: List favorites
+      tags:
+      - File
   /files/mode:
     post:
       consumes:
@@ -7689,6 +7789,72 @@ paths:
         formatEN: Change owner [paths] => [user]/[group]
         formatZH: 修改用户/组 [paths] => [user]/[group]
         paramKeys: []
+  /files/recycle/clear:
+    post:
+      consumes:
+      - application/json
+      description: 清空回收站文件
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Clear RecycleBin files
+      tags:
+      - File
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys: []
+        formatEN: 清空回收站
+        formatZH: 清空回收站
+        paramKeys: []
+  /files/recycle/reduce:
+    post:
+      consumes:
+      - application/json
+      description: 还原回收站文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.RecycleBinReduce'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Reduce RecycleBin files
+      tags:
+      - File
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - name
+        formatEN: Reduce RecycleBin file [name]
+        formatZH: 还原回收站文件 [name]
+        paramKeys: []
+  /files/recycle/search:
+    post:
+      consumes:
+      - application/json
+      description: 获取回收站文件列表
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PageInfo'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: List RecycleBin files
+      tags:
+      - File
   /files/rename:
     post:
       consumes:
@@ -9159,59 +9325,6 @@ paths:
         formatEN: 结束进程 [PID]
         formatZH: 结束进程 [PID]
         paramKeys: []
-  /recycle/clear:
-    post:
-      consumes:
-      - application/json
-      description: 清空回收站文件
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      summary: Clear RecycleBin files
-      tags:
-      - RecycleBin
-  /recycle/reduce:
-    post:
-      consumes:
-      - application/json
-      description: 还原回收站文件
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/request.RecycleBinReduce'
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      summary: Reduce RecycleBin files
-      tags:
-      - RecycleBin
-  /recycle/search:
-    post:
-      consumes:
-      - application/json
-      description: 获取回收站文件列表
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.PageInfo'
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      summary: List RecycleBin files
-      tags:
-      - RecycleBin
   /runtimes:
     post:
       consumes:

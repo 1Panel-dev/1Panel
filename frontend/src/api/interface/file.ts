@@ -21,6 +21,7 @@ export namespace File {
         items: File[];
         extension: string;
         itemTotal: number;
+        favoriteID: number;
     }
 
     export interface ReqFile extends ReqPage {
@@ -161,5 +162,11 @@ export namespace File {
         rName: string;
         from: string;
         name: string;
+    }
+
+    export interface Favorite extends CommonModel {
+        path: string;
+        isDir: boolean;
+        isTxt: boolean;
     }
 }
