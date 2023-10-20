@@ -704,6 +704,7 @@ const message = {
         taskType: '任務類型',
         record: '報告',
         shell: 'Shell 腳本',
+        log: '日誌備份',
         containerCheckBox: '在容器中執行（無需再輸入進入容器命令）',
         containerName: '容器名稱',
         ntp: '時間同步',

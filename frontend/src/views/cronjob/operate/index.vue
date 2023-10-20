@@ -28,6 +28,7 @@
                             <el-option value="ntp" :label="$t('cronjob.ntp')" />
                             <el-option value="cutWebsiteLog" :label="$t('cronjob.cutWebsiteLog')" />
                             <el-option value="clean" :label="$t('setting.diskClean')" />
+                            <el-option value="log" :label="$t('cronjob.log')" />
                         </el-select>
                         <el-tag v-else>{{ $t('cronjob.' + dialogData.rowData!.type) }}</el-tag>
                     </el-form-item>
@@ -176,7 +177,7 @@
                             <el-select class="selectClass" v-model="dialogData.rowData!.targetDirID">
                                 <div v-for="item in backupOptions" :key="item.label">
                                     <el-option
-                                        v-if="item.label !== $t('setting.LOCAL') || dialogData.rowData!.type !== 'snapshot'"
+                                        v-if="item.label !== $t('setting.LOCAL') || (dialogData.rowData!.type !== 'snapshot' && dialogData.rowData!.type !== 'log')"
                                         :value="item.value"
                                         :label="item.label"
                                     />
@@ -195,7 +196,7 @@
                             </span>
                         </el-form-item>
                         <el-form-item
-                            v-if="dialogData.rowData!.targetDirID !== localDirID && dialogData.rowData!.type !== 'snapshot'"
+                            v-if="dialogData.rowData!.targetDirID !== localDirID && dialogData.rowData!.type !== 'snapshot' && dialogData.rowData!.type !== 'log'"
                         >
                             <el-checkbox v-model="dialogData.rowData!.keepLocal">
                                 {{ $t('cronjob.saveLocal') }}
@@ -454,12 +455,14 @@ const changeType = () => {
             dialogData.value.rowData.hour = 2;
             dialogData.value.rowData.minute = 30;
             break;
+        case 'clean':
         case 'website':
             dialogData.value.rowData.specType = 'perWeek';
             dialogData.value.rowData.week = 1;
             dialogData.value.rowData.hour = 1;
             dialogData.value.rowData.minute = 30;
             break;
+        case 'log':
         case 'snapshot':
             dialogData.value.rowData.specType = 'perWeek';
             dialogData.value.rowData.week = 1;
@@ -531,7 +534,8 @@ function isBackup() {
         dialogData.value.rowData!.type === 'website' ||
         dialogData.value.rowData!.type === 'database' ||
         dialogData.value.rowData!.type === 'directory' ||
-        dialogData.value.rowData!.type === 'snapshot'
+        dialogData.value.rowData!.type === 'snapshot' ||
+        dialogData.value.rowData!.type === 'log'
     );
 }
 
