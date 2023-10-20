@@ -896,6 +896,7 @@ func loadConfigInfo(isCreate bool, req dto.ContainerOperate, oldContainer *types
 	}
 	hostConf.NanoCPUs = int64(req.NanoCPUs * 1000000000)
 	hostConf.Memory = int64(req.Memory * 1024 * 1024)
+	hostConf.MemorySwap = 0
 	hostConf.PortBindings = portMap
 	hostConf.Binds = []string{}
 	config.Volumes = make(map[string]struct{})
