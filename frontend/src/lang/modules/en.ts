@@ -1087,6 +1087,7 @@ const message = {
         SFTP: 'SFTP',
         OneDrive: 'Microsoft OneDrive',
         backupDir: 'Backup dir',
+        codeWarning: 'The current authorization code format is incorrect, please confirm again!',
         isCN: 'Domestic version',
         code: 'Auth code',
         codeHelper:
