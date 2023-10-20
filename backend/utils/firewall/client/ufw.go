@@ -207,6 +207,9 @@ func (f *Ufw) PortForward(info Forward, operation string) error {
 func (f *Ufw) loadInfo(line string, fireType string) FireInfo {
 	fields := strings.Fields(line)
 	var itemInfo FireInfo
+	if strings.Contains(line, "LIMIT") || strings.Contains(line, "ALLOW FWD") {
+		return itemInfo
+	}
 	if len(fields) < 4 {
 		return itemInfo
 	}
