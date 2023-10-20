@@ -83,8 +83,9 @@ const message = {
             port: '端口',
             protocol: '协议',
             tableSetting: '列表设置',
-            autoRefresh: '定时刷新',
             refreshRate: '刷新频率',
+            noRefresh: '不刷新',
+            refreshRateUnit: '{0} 秒/次',
         },
         loadingText: {
             Upgrading: '系统升级中，请稍候...',

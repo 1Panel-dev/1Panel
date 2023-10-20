@@ -40,7 +40,7 @@
                         </el-button-group>
                     </el-col>
                     <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
-                        <TableSetting @search="search()" />
+                        <TableSetting title="container-refresh" @search="refresh()" />
                         <div class="search-button">
                             <el-input
                                 v-model="searchName"
@@ -377,6 +377,34 @@ const search = async (column?: any) => {
         .catch(() => {
             loading.value = false;
         });
+};
+
+const refresh = async () => {
+    let filterItem = props.filters ? props.filters : '';
+    let params = {
+        name: searchName.value,
+        state: searchState.value || 'all',
+        page: paginationConfig.currentPage,
+        pageSize: paginationConfig.pageSize,
+        filters: filterItem,
+        orderBy: paginationConfig.orderBy,
+        order: paginationConfig.order,
+    };
+    loadStats();
+    const res = await searchContainer(params);
+    let containers = res.data.items || [];
+    for (const container of containers) {
+        for (const c of data.value) {
+            c.hasLoad = true;
+            if (container.containerID == c.containerID) {
+                for (let key in container) {
+                    if (key !== 'cpuPercent' && key !== 'memoryPercent') {
+                        c[key] = container[key];
+                    }
+                }
+            }
+        }
+    }
 };
 
 const loadStats = async () => {
