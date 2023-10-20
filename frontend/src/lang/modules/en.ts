@@ -83,8 +83,9 @@ const message = {
             port: 'Port',
             protocol: 'Protocol',
             tableSetting: 'Table setting',
-            autoRefresh: 'Auto refresh',
             refreshRate: 'Rate',
+            noRefresh: 'No Refresh',
+            refreshRateUnit: '{0} Seconds/Time',
         },
         loadingText: {
             Upgrading: 'System upgrade, please wait...',
