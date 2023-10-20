@@ -5368,6 +5368,132 @@ const docTemplate = `{
                 }
             }
         },
+        "/files/favorite": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "创建收藏",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "File"
+                ],
+                "summary": "Create favorite",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.FavoriteCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "path"
+                    ],
+                    "formatEN": "收藏文件/文件夹 [path]",
+                    "formatZH": "收藏文件/文件夹 [path]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/files/favorite/del": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "删除收藏",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "File"
+                ],
+                "summary": "Delete favorite",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.FavoriteDelete"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [
+                        {
+                            "db": "favorites",
+                            "input_column": "id",
+                            "input_value": "id",
+                            "isList": false,
+                            "output_column": "path",
+                            "output_value": "path"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "id"
+                    ],
+                    "formatEN": "delete avorite [path]",
+                    "formatZH": "删除收藏 [path]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/files/favorite/search": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取收藏列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "File"
+                ],
+                "summary": "List favorites",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.PageInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/files/mode": {
             "post": {
                 "security": [
@@ -5495,6 +5621,110 @@ const docTemplate = `{
                     "formatEN": "Change owner [paths] =\u003e [user]/[group]",
                     "formatZH": "修改用户/组 [paths] =\u003e [user]/[group]",
                     "paramKeys": []
+                }
+            }
+        },
+        "/files/recycle/clear": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "清空回收站文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "File"
+                ],
+                "summary": "Clear RecycleBin files",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [],
+                    "formatEN": "清空回收站",
+                    "formatZH": "清空回收站",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/files/recycle/reduce": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "还原回收站文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "File"
+                ],
+                "summary": "Reduce RecycleBin files",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.RecycleBinReduce"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "name"
+                    ],
+                    "formatEN": "Reduce RecycleBin file [name]",
+                    "formatZH": "还原回收站文件 [name]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/files/recycle/search": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取回收站文件列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "File"
+                ],
+                "summary": "List RecycleBin files",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.PageInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
                 }
             }
         },
@@ -7823,94 +8053,6 @@ const docTemplate = `{
                     "formatEN": "结束进程 [PID]",
                     "formatZH": "结束进程 [PID]",
                     "paramKeys": []
-                }
-            }
-        },
-        "/recycle/clear": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "清空回收站文件",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "RecycleBin"
-                ],
-                "summary": "Clear RecycleBin files",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            }
-        },
-        "/recycle/reduce": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "还原回收站文件",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "RecycleBin"
-                ],
-                "summary": "Reduce RecycleBin files",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.RecycleBinReduce"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            }
-        },
-        "/recycle/search": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "获取回收站文件列表",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "RecycleBin"
-                ],
-                "summary": "List RecycleBin files",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.PageInfo"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
                 }
             }
         },
@@ -15563,6 +15705,9 @@ const docTemplate = `{
                 "extension": {
                     "type": "string"
                 },
+                "favoriteID": {
+                    "type": "integer"
+                },
                 "gid": {
                     "type": "string"
                 },
@@ -16209,6 +16354,28 @@ const docTemplate = `{
             "properties": {
                 "path": {
                     "type": "string"
+                }
+            }
+        },
+        "request.FavoriteCreate": {
+            "type": "object",
+            "required": [
+                "path"
+            ],
+            "properties": {
+                "path": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.FavoriteDelete": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
                 }
             }
         },
@@ -16936,6 +17103,9 @@ const docTemplate = `{
             ],
             "properties": {
                 "from": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 },
                 "rName": {
@@ -18061,6 +18231,9 @@ const docTemplate = `{
                 },
                 "extension": {
                     "type": "string"
+                },
+                "favoriteID": {
+                    "type": "integer"
                 },
                 "gid": {
                     "type": "string"

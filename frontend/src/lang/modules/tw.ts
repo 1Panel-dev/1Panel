@@ -123,6 +123,7 @@ const message = {
             fileNameErr: '僅支持上傳名稱包含英文、中文、數字或者 .-_ ,長度 1-256 位的文件',
             confirmNoNull: '請確認 {0} 值不為空',
             errPort: '錯誤的端口信息，請確認！',
+            remove: '移出',
         },
         login: {
             username: '用戶名',
@@ -931,7 +932,10 @@ const message = {
         reduce: '還原',
         reduceHelper: '恢復檔案到原路徑，如果檔案原始位址，存在同名檔案或目錄，將會覆蓋，是否繼續？ ',
         clearRecycleBin: '清空回收站',
-        clearRecycleBinHelper: '是否清空回收站？ ',
+        clearRecycleBinHelper: '是否清空回收站？',
+        favorite: '收藏夾',
+        removeFavorite: '是否從收藏夾移出？',
+        addFavorite: '加入收藏夾',
     },
     ssh: {
         autoStart: '開機自啟',

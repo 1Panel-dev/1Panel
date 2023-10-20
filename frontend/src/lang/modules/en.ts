@@ -122,6 +122,7 @@ const message = {
                 'You can upload only files whose name contains 1 to 256 characters, including English, Chinese, digits, or periods (.-_)',
             confirmNoNull: 'Make sure the value {0} is not empty',
             errPort: 'Incorrect port information, please confirm!',
+            remove: 'Remove',
         },
         login: {
             username: 'UserName',
@@ -970,7 +971,10 @@ const message = {
         reduceHelper:
             'Restore the file to its original path. If a file or directory with the same name exists at the original address of the file, it will be overwritten. Do you want to continue?',
         clearRecycleBin: 'Clear the recycle bin',
-        clearRecycleBinHelper: 'Do you want to clear the recycle bin? ',
+        clearRecycleBinHelper: 'Do you want to clear the recycle bin?',
+        favorite: 'favorites',
+        removeFavorite: 'Remove from favorites?',
+        addFavorite: 'Add to favorites',
     },
     ssh: {
         autoStart: 'Auto Start',

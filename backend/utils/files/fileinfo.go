@@ -3,6 +3,7 @@ package files
 import (
 	"bufio"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"io/fs"
@@ -42,6 +43,7 @@ type FileInfo struct {
 	FileMode   os.FileMode `json:"-"`
 	Items      []*FileInfo `json:"items"`
 	ItemTotal  int         `json:"itemTotal"`
+	FavoriteID uint        `json:"favoriteID"`
 }
 
 type FileOption struct {
@@ -88,6 +90,12 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 		Group:     GetGroup(info.Sys().(*syscall.Stat_t).Gid),
 		MimeType:  GetMimeType(op.Path),
 	}
+	favoriteRepo := repo.NewIFavoriteRepo()
+	favorite, _ := favoriteRepo.GetFirst(favoriteRepo.WithByPath(op.Path))
+	if favorite.ID > 0 {
+		file.FavoriteID = favorite.ID
+	}
+
 	if file.IsSymlink {
 		file.LinkPath = GetSymlink(op.Path)
 	}
@@ -266,7 +274,11 @@ func (f *FileInfo) listChildren(option FileOption) error {
 			Uid:       strconv.FormatUint(uint64(df.Sys().(*syscall.Stat_t).Uid), 10),
 			Gid:       strconv.FormatUint(uint64(df.Sys().(*syscall.Stat_t).Gid), 10),
 		}
-
+		favoriteRepo := repo.NewIFavoriteRepo()
+		favorite, _ := favoriteRepo.GetFirst(favoriteRepo.WithByPath(fPath))
+		if favorite.ID > 0 {
+			file.FavoriteID = favorite.ID
+		}
 		if isSymlink {
 			file.LinkPath = GetSymlink(fPath)
 		}
@@ -305,7 +317,7 @@ func (f *FileInfo) getContent() error {
 		if err != nil {
 			return nil
 		}
-		if len(cByte) > 0 && detectBinary(cByte) {
+		if len(cByte) > 0 && DetectBinary(cByte) {
 			return buserr.New(constant.ErrFileCanNotRead)
 		}
 		f.Content = string(cByte)
@@ -315,7 +327,7 @@ func (f *FileInfo) getContent() error {
 	}
 }
 
-func detectBinary(buf []byte) bool {
+func DetectBinary(buf []byte) bool {
 	whiteByte := 0
 	n := min(1024, len(buf))
 	for i := 0; i < n; i++ {

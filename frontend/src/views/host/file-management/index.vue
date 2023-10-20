@@ -98,6 +98,9 @@
                     </div>
 
                     <div class="right-section">
+                        <el-button @click="openFavorite" :icon="Star">
+                            {{ $t('file.favorite') }}
+                        </el-button>
                         <el-button class="btn" @click="openRecycleBin" :icon="Delete">
                             {{ $t('file.recycleBin') }}
                         </el-button>
@@ -140,11 +143,42 @@
                         sortable
                         prop="name"
                     >
-                        <template #default="{ row }">
-                            <svg-icon v-if="row.isDir" className="table-icon" iconName="p-file-folder"></svg-icon>
-                            <svg-icon v-else className="table-icon" :iconName="getIconName(row.extension)"></svg-icon>
-                            <span class="table-link" @click="open(row)" type="primary">{{ row.name }}</span>
-                            <span v-if="row.isSymlink">-> {{ row.linkPath }}</span>
+                        <template #default="{ row, $index }">
+                            <div @mouseenter="showFavorite($index)" @mouseleave="hideFavorite">
+                                <el-row>
+                                    <el-col :span="23">
+                                        <svg-icon
+                                            v-if="row.isDir"
+                                            className="table-icon"
+                                            iconName="p-file-folder"
+                                        ></svg-icon>
+                                        <svg-icon
+                                            v-else
+                                            className="table-icon"
+                                            :iconName="getIconName(row.extension)"
+                                        ></svg-icon>
+                                        <span class="table-link" @click="open(row)" type="primary">{{ row.name }}</span>
+                                        <span v-if="row.isSymlink">-> {{ row.linkPath }}</span>
+                                    </el-col>
+                                    <el-col :span="1">
+                                        <el-button
+                                            v-if="row.favoriteID > 0"
+                                            link
+                                            type="warning"
+                                            :icon="Star"
+                                            @click="removeFavorite(row.favoriteID)"
+                                        ></el-button>
+                                        <div v-else>
+                                            <el-button
+                                                v-if="hoveredRowIndex === $index"
+                                                link
+                                                :icon="Star"
+                                                @click="addFavorite(row)"
+                                            ></el-button>
+                                        </div>
+                                    </el-col>
+                                </el-row>
+                            </div>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('file.mode')" prop="mode" max-width="50">
@@ -213,16 +247,25 @@
             <Detail ref="detailRef" />
             <DeleteFile ref="deleteRef" @close="search" />
             <RecycleBin ref="recycleBinRef" @close="search" />
+            <Favorite ref="favoriteRef" @close="search" />
         </LayoutContent>
     </div>
 </template>
 
 <script setup lang="ts">
 import { nextTick, onMounted, reactive, ref, computed } from '@vue/runtime-core';
-import { GetFilesList, GetFileContent, ComputeDirSize } from '@/api/modules/files';
+import { GetFilesList, GetFileContent, ComputeDirSize, AddFavorite, RemoveFavorite } from '@/api/modules/files';
 import { computeSize, dateFormat, downloadFile, getIcon, getRandomStr } from '@/utils/util';
-import { Delete } from '@element-plus/icons-vue';
+import { Delete, Star } from '@element-plus/icons-vue';
 import { File } from '@/api/interface/file';
+import { Mimetypes, Languages } from '@/global/mimetype';
+import { useRouter } from 'vue-router';
+import { Back, Refresh } from '@element-plus/icons-vue';
+import { MsgSuccess, MsgWarning } from '@/utils/message';
+import { useSearchable } from './hooks/searchable';
+import { ResultData } from '@/api/interface';
+import { GlobalStore } from '@/store';
+
 import i18n from '@/lang';
 import CreateFile from './create/index.vue';
 import ChangeRole from './change-role/index.vue';
@@ -236,16 +279,11 @@ import Move from './move/index.vue';
 import Download from './download/index.vue';
 import Owner from './chown/index.vue';
 import DeleteFile from './delete/index.vue';
-import { Mimetypes, Languages } from '@/global/mimetype';
 import Process from './process/index.vue';
 import Detail from './detail/index.vue';
 import RecycleBin from './recycle-bin/index.vue';
-import { useRouter } from 'vue-router';
-import { Back, Refresh } from '@element-plus/icons-vue';
-import { MsgSuccess, MsgWarning } from '@/utils/message';
-import { useSearchable } from './hooks/searchable';
-import { ResultData } from '@/api/interface';
-import { GlobalStore } from '@/store';
+import Favorite from './favorite/index.vue';
+
 const globalStore = GlobalStore();
 
 interface FilePaths {
@@ -303,6 +341,8 @@ const chownRef = ref();
 const moveOpen = ref(false);
 const deleteRef = ref();
 const recycleBinRef = ref();
+const favoriteRef = ref();
+const hoveredRowIndex = ref(-1);
 
 // editablePath
 const { searchableStatus, searchablePath, searchableInputRef, searchableInputBlur } = useSearchable(paths);
@@ -627,6 +667,10 @@ const openRecycleBin = () => {
     recycleBinRef.value.acceptParams();
 };
 
+const openFavorite = () => {
+    favoriteRef.value.acceptParams();
+};
+
 const changeSort = ({ prop, order }) => {
     req.sortBy = prop;
     req.sortOrder = order;
@@ -635,6 +679,33 @@ const changeSort = ({ prop, order }) => {
     req.pageSize = paginationConfig.pageSize;
     req.containSub = false;
     search();
+};
+
+const showFavorite = (index: any) => {
+    hoveredRowIndex.value = index;
+};
+
+const hideFavorite = () => {
+    hoveredRowIndex.value = -1;
+};
+
+const addFavorite = async (row: File.File) => {
+    try {
+        await AddFavorite(row.path);
+        search();
+    } catch (error) {}
+};
+
+const removeFavorite = async (id: number) => {
+    ElMessageBox.confirm(i18n.global.t('file.removeFavorite'), i18n.global.t('commons.msg.remove'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+    }).then(async () => {
+        try {
+            await RemoveFavorite(id);
+            search();
+        } catch (error) {}
+    });
 };
 
 const buttons = [
@@ -759,7 +830,9 @@ onMounted(() => {
     margin-left: 10px;
 }
 
-.right-section > *:not(:last-child) {
-    margin-right: 10px;
+.right-section {
+    .btn {
+        margin-right: 10px;
+    }
 }
 </style>

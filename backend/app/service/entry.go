@@ -37,4 +37,6 @@ var (
 	snapshotRepo = repo.NewISnapshotRepo()
 
 	runtimeRepo = repo.NewIRunTimeRepo()
+
+	favoriteRepo = repo.NewIFavoriteRepo()
 )

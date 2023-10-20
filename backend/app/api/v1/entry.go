@@ -55,4 +55,5 @@ var (
 	hostToolService = service.NewIHostToolService()
 
 	recycleBinService = service.NewIRecycleBinService()
+	favoriteService   = service.NewIFavoriteService()
 )

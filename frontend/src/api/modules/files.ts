@@ -100,3 +100,15 @@ export const reduceFile = (params: File.RecycleBinReduce) => {
 export const clearRecycle = () => {
     return http.post<any>('files/recycle/clear');
 };
+
+export const SearchFavorite = (params: ReqPage) => {
+    return http.post<ResPage<File.Favorite>>('files/favorite/search', params);
+};
+
+export const AddFavorite = (path: string) => {
+    return http.post<any>('files/favorite', { path: path });
+};
+
+export const RemoveFavorite = (id: number) => {
+    return http.post<any>('files/favorite/del', { id: id });
+};

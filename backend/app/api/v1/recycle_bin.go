@@ -8,14 +8,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Tags RecycleBin
+// @Tags File
 // @Summary List RecycleBin files
 // @Description 获取回收站文件列表
 // @Accept json
 // @Param request body dto.PageInfo true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /recycle/search [post]
+// @Router /files/recycle/search [post]
 func (b *BaseApi) SearchRecycleBinFile(c *gin.Context) {
 	var req dto.PageInfo
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -32,15 +32,15 @@ func (b *BaseApi) SearchRecycleBinFile(c *gin.Context) {
 	})
 }
 
-// @Tags RecycleBin
+// @Tags File
 // @Summary Reduce RecycleBin files
 // @Description 还原回收站文件
 // @Accept json
 // @Param request body request.RecycleBinReduce true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /recycle/reduce [post]
-// @x-panel-log {"bodyKeys":["name],"paramKeys":[],"BeforeFunctions":[],"formatZH":"还原回收站文件 [name]","formatEN":"Reduce RecycleBin file [name]"}
+// @Router /files/recycle/reduce [post]
+// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"还原回收站文件 [name]","formatEN":"Reduce RecycleBin file [name]"}
 func (b *BaseApi) ReduceRecycleBinFile(c *gin.Context) {
 	var req request.RecycleBinReduce
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -53,13 +53,13 @@ func (b *BaseApi) ReduceRecycleBinFile(c *gin.Context) {
 	helper.SuccessWithOutData(c)
 }
 
-// @Tags RecycleBin
+// @Tags File
 // @Summary Clear RecycleBin files
 // @Description 清空回收站文件
 // @Accept json
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /recycle/clear [post]
+// @Router /files/recycle/clear [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"清空回收站","formatEN":"清空回收站"}
 func (b *BaseApi) ClearRecycleBinFile(c *gin.Context) {
 	if err := recycleBinService.Clear(); err != nil {
