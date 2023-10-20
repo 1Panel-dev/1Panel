@@ -733,6 +733,7 @@ const message = {
         taskType: 'Cronjob type',
         record: 'Records',
         shell: 'Shell script',
+        log: 'Backup logs',
         containerCheckBox: 'In container (no need to enter the container command)',
         containerName: 'Container name',
         ntp: 'Time synchronization',
