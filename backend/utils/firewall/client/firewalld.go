@@ -156,7 +156,7 @@ func (f *Firewall) RichRules(rule FireInfo, operation string) error {
 		}
 		ruleStr = fmt.Sprintf("rule source ipset=%s %s", rule.Address, rule.Strategy)
 	} else {
-		ruleStr = "rule family=ipv4 "
+		ruleStr = "rule "
 		if len(rule.Address) != 0 {
 			ruleStr += fmt.Sprintf("source address=%s ", rule.Address)
 		}
