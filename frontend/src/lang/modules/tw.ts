@@ -1020,6 +1020,7 @@ const message = {
         MINIO: 'MINIO',
         SFTP: 'SFTP',
         OneDrive: '微軟 OneDrive',
+        codeWarning: '當前授權碼格式錯誤，請重新確認！',
         backupDir: '備份路徑',
         isCN: '國內版',
         code: '授權碼',

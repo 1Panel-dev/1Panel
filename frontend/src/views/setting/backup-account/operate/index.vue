@@ -52,7 +52,7 @@
                             v-if="dialogData.rowData!.type === 'OneDrive'"
                             :label="$t('setting.code')"
                             prop="varsJson.code"
-                            :rules="Rules.requiredInput"
+                            :rules="rules.driveCode"
                         >
                             <el-input clearable v-model.trim="dialogData.rowData!.varsJson['code']">
                                 <template #append>
@@ -247,7 +247,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import FileList from '@/components/file-list/index.vue';
 import i18n from '@/lang';
@@ -265,6 +265,16 @@ const buckets = ref();
 const errBuckets = ref();
 
 const endpoints = ref('http');
+const rules = reactive({
+    driveCode: [{ validator: checkDriveCode, required: true, trigger: 'blur' }],
+});
+function checkDriveCode(rule: any, value: any, callback: any) {
+    const reg = /^[A-Za-z0-9_.-]{32,60}$/;
+    if (!reg.test(value)) {
+        return callback(new Error(i18n.global.t('setting.codeWarning')));
+    }
+    callback();
+}
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
