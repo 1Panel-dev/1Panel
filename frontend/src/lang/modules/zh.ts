@@ -1044,6 +1044,7 @@ const message = {
         MINIO: 'MINIO',
         SFTP: 'SFTP',
         OneDrive: '微软 OneDrive',
+        codeWarning: '当前授权码格式错误，请重新确认！',
         backupDir: '备份路径',
         isCN: '国内版',
         code: '授权码',
