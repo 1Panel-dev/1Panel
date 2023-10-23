@@ -95,11 +95,12 @@ func ExecCronjobWithTimeOut(cmdStr string, workdir string, timeout time.Duration
 
 	errMsg := ""
 	if len(stderr.String()) != 0 {
-		errMsg = fmt.Sprintf("stderr:\n %s", stderr.String())
+		errMsg = fmt.Sprintf("stderr:\n%s", stderr.String())
+		err = buserr.New(constant.ErrBashExecute)
 	}
 	if len(stdout.String()) != 0 {
 		if len(errMsg) != 0 {
-			errMsg = fmt.Sprintf("%s \n\n; stdout:\n %s", errMsg, stdout.String())
+			errMsg = fmt.Sprintf("%s \n\n stdout:\n%s", errMsg, stdout.String())
 		} else {
 			errMsg = fmt.Sprintf("stdout:\n %s", stdout.String())
 		}

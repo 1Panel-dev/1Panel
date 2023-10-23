@@ -133,3 +133,8 @@ var (
 var (
 	ErrFirewall = "ErrFirewall"
 )
+
+// cronjob
+var (
+	ErrBashExecute = "ErrBashExecute"
+)

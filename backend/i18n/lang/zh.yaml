@@ -125,3 +125,6 @@ ErrUserFindErr: "用户 {{ .name }} 查找失败 {{ .err }}"
 
 #ssh
 ErrFirewall: "当前未检测到系统 firewalld 或 ufw 服务，请检查后重试！"
+
+#cronjob
+ErrBashExecute: "脚本执行错误，请在任务输出文本域中查看 stderr 相关信息。"
