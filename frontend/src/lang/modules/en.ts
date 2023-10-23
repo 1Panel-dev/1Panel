@@ -1886,6 +1886,7 @@ const message = {
             STARTING: 'Starting',
             FATAL: 'Failed to start',
             BACKOFF: 'Start exception',
+            ERROR: 'Error',
             statusCode: 'Status code',
             manage: 'Management',
         },

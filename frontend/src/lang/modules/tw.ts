@@ -1781,6 +1781,7 @@ const message = {
             STARTING: '啟動中',
             FATAL: '啟動失敗',
             BACKOFF: '啟動異常',
+            ERROR: '錯誤',
             statusCode: '狀態碼',
             manage: '管理',
         },
