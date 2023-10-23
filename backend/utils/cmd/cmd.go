@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"os/exec"
 	"strings"
 	"time"
@@ -81,24 +82,19 @@ func ExecCronjobWithTimeOut(cmdStr string, workdir string, timeout time.Duration
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
+	output := new(bytes.Buffer)
+	cmd.Stdout = io.MultiWriter(output, cmd.Stdout)
+	cmd.Stderr = io.MultiWriter(output, cmd.Stderr)
+
 	err := cmd.Run()
 	if ctx.Err() == context.DeadlineExceeded {
 		return "", buserr.New(constant.ErrCmdTimeout)
 	}
 
-	errMsg := ""
 	if len(stderr.String()) != 0 {
-		errMsg = fmt.Sprintf("stderr:\n%s", stderr.String())
 		err = buserr.New(constant.ErrBashExecute)
 	}
-	if len(stdout.String()) != 0 {
-		if len(errMsg) != 0 {
-			errMsg = fmt.Sprintf("%s \n\n stdout:\n%s", errMsg, stdout.String())
-		} else {
-			errMsg = fmt.Sprintf("stdout:\n %s", stdout.String())
-		}
-	}
-	return errMsg, err
+	return output.String(), err
 }
 
 func Execf(cmdStr string, a ...interface{}) (string, error) {
