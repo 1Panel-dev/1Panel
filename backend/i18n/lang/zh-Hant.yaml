@@ -127,4 +127,4 @@ ErrUserFindErr: "用戶 {{ .name }} 查找失敗 {{ .err }}"
 ErrFirewall: "當前未檢測到系統 firewalld 或 ufw 服務，請檢查後重試！"
 
 #cronjob
-ErrBashExecute: "腳本執行錯誤，請在任務輸出文本區域中查看 stderr 相關信息。"
+ErrBashExecute: "腳本執行錯誤，請在任務輸出文本域中查看具體信息。"

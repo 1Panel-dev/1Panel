@@ -127,4 +127,4 @@ ErrUserFindErr: "Failed to find user {{ .name }} {{ .err }}"
 ErrFirewall: "No firewalld or ufw service is detected. Please check and try again!"
 
 #cronjob
-ErrBashExecute: "Script execution error, please check stderr-related information in the task output text field."
+ErrBashExecute: "Script execution error, please check the specific information in the task output text area."
