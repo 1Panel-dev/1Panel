@@ -125,23 +125,29 @@
             <template #main>
                 <div class="mainClass">
                     <el-row :gutter="20" v-show="hasRecords" class="mainRowClass">
-                        <el-col :span="8">
+                        <el-col :span="6">
                             <div>
                                 <ul class="infinite-list" style="overflow: auto">
-                                    <li
+                                    <el-card
                                         v-for="(item, index) in records"
                                         :key="index"
                                         @click="forDetail(item)"
                                         class="infinite-list-item"
                                     >
-                                        <el-icon v-if="item.status === 'Success'"><Select /></el-icon>
-                                        <el-icon v-if="item.status === 'Waiting'"><Loading /></el-icon>
-                                        <el-icon v-if="item.status === 'Failed'"><CloseBold /></el-icon>
-                                        <span v-if="item.id === currentRecord.id" style="color: red">
+                                        <el-tag v-if="item.status === 'Success'" type="success">
+                                            {{ $t('commons.status.success') }}
+                                        </el-tag>
+                                        <el-tag v-if="item.status === 'Waiting'" type="info">
+                                            {{ $t('commons.status.waiting') }}
+                                        </el-tag>
+                                        <el-tag v-if="item.status === 'Failed'" type="danger">
+                                            {{ $t('commons.status.failed') }}
+                                        </el-tag>
+                                        <span v-if="item.id === currentRecord.id" class="select-card">
                                             {{ dateFormat(0, 0, item.startTime) }}
                                         </span>
                                         <span v-else>{{ dateFormat(0, 0, item.startTime) }}</span>
-                                    </li>
+                                    </el-card>
                                 </ul>
                                 <div style="margin-top: 10px; font-size: 12px; float: right">
                                     <el-pagination
@@ -158,7 +164,7 @@
                                 </div>
                             </div>
                         </el-col>
-                        <el-col :span="16">
+                        <el-col :span="18">
                             <el-form label-position="top" :v-key="refresh">
                                 <el-row type="flex" justify="center">
                                     <el-form-item class="descriptionWide" v-if="isBackup()">
@@ -714,30 +720,32 @@ defineExpose({
 
 <style lang="scss" scoped>
 .infinite-list {
-    height: calc(100vh - 435px);
+    height: calc(100vh - 416px);
     padding: 0;
     margin: 0;
-}
-.infinite-list .infinite-list-item {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 30px;
-    background: var(--el-color-primary-light-9);
-    margin: 10px;
-    color: var(--el-color-primary);
-    cursor: pointer;
-    &:hover {
+
+    .el-card {
+        border: var(--panel-border) !important;
+        &:hover {
+            border: 1px solid var(--el-color-primary) !important;
+            box-shadow: 2px 2px 2px #888888;
+        }
         display: flex;
         align-items: center;
         justify-content: center;
-        height: 30px;
-        background: var(--el-color-primary-light-9);
-        margin: 10px;
-        font-weight: 500;
-        color: red;
+        height: 40px;
+        font-size: 14px;
+        margin: 5px;
+        cursor: pointer;
+    }
+    .el-tag {
+        margin-right: 15px;
     }
 }
+.select-card {
+    color: var(--el-color-primary);
+}
+
 .descriptionWide {
     width: 40%;
 }
