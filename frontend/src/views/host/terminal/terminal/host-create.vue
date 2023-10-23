@@ -116,7 +116,7 @@ watch(
 );
 
 const rules = reactive({
-    addr: [Rules.host],
+    addr: [Rules.ipV4V6OrDomain],
     port: [Rules.requiredInput, Rules.port],
     user: [Rules.requiredInput],
     authMode: [Rules.requiredSelect],
