@@ -625,7 +625,7 @@ func loadFailedSecureDatas(line string) dto.SSHHistory {
 			return data
 		}
 		index := 0
-		if strings.Contains("line", " invalid user") {
+		if strings.Contains(line, " invalid user") {
 			index = 2
 		}
 		data = dto.SSHHistory{
