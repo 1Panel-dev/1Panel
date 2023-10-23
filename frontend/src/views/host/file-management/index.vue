@@ -98,9 +98,35 @@
                     </div>
 
                     <div class="right-section">
-                        <el-button @click="openFavorite" :icon="Star">
-                            {{ $t('file.favorite') }}
-                        </el-button>
+                        <el-popover placement="bottom" :width="200" trigger="hover" @before-enter="getFavoriates">
+                            <template #reference>
+                                <el-button @click="openFavorite" :icon="Star">
+                                    {{ $t('file.favorite') }}
+                                </el-button>
+                            </template>
+                            <div class="favorite-item">
+                                <el-table :data="favorites">
+                                    <el-table-column prop="name">
+                                        <template #default="{ row }">
+                                            <span class="table-link" @click="toFavorite(row)" type="primary">
+                                                <svg-icon
+                                                    v-if="row.isDir"
+                                                    className="table-icon"
+                                                    iconName="p-file-folder"
+                                                ></svg-icon>
+                                                <svg-icon
+                                                    v-else
+                                                    className="table-icon"
+                                                    iconName="p-file-normal"
+                                                ></svg-icon>
+                                                {{ row.name }}
+                                            </span>
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
+                            </div>
+                        </el-popover>
+
                         <el-button class="btn" @click="openRecycleBin" :icon="Delete">
                             {{ $t('file.recycleBin') }}
                         </el-button>
@@ -254,7 +280,14 @@
 
 <script setup lang="ts">
 import { nextTick, onMounted, reactive, ref, computed } from '@vue/runtime-core';
-import { GetFilesList, GetFileContent, ComputeDirSize, AddFavorite, RemoveFavorite } from '@/api/modules/files';
+import {
+    GetFilesList,
+    GetFileContent,
+    ComputeDirSize,
+    AddFavorite,
+    RemoveFavorite,
+    SearchFavorite,
+} from '@/api/modules/files';
 import { computeSize, dateFormat, downloadFile, getIcon, getRandomStr } from '@/utils/util';
 import { Delete, Star } from '@element-plus/icons-vue';
 import { File } from '@/api/interface/file';
@@ -343,6 +376,7 @@ const deleteRef = ref();
 const recycleBinRef = ref();
 const favoriteRef = ref();
 const hoveredRowIndex = ref(-1);
+const favorites = ref([]);
 
 // editablePath
 const { searchableStatus, searchablePath, searchableInputRef, searchableInputBlur } = useSearchable(paths);
@@ -408,7 +442,7 @@ const open = async (row: File.File) => {
 
         jump(req.path);
     } else {
-        openCodeEditor(row);
+        openCodeEditor(row.path, row.extension);
     }
 };
 
@@ -557,7 +591,6 @@ const openCompress = (items: File.File[]) => {
 };
 
 const openDeCompress = (item: File.File) => {
-    console.log(item.mimeType);
     if (Mimetypes.get(item.mimeType) == undefined) {
         MsgWarning(i18n.global.t('file.canNotDeCompress'));
         return;
@@ -571,13 +604,13 @@ const openDeCompress = (item: File.File) => {
     deCompressRef.value.acceptParams(fileDeCompress);
 };
 
-const openCodeEditor = (row: File.File) => {
-    codeReq.path = row.path;
+const openCodeEditor = (path: string, extension: string) => {
+    codeReq.path = path;
     codeReq.expand = true;
 
-    if (row.extension != '') {
+    if (extension != '') {
         Languages.forEach((language) => {
-            const ext = row.extension.substring(1);
+            const ext = extension.substring(1);
             if (language.value.indexOf(ext) > -1) {
                 fileEdit.language = language.label;
             }
@@ -708,6 +741,23 @@ const removeFavorite = async (id: number) => {
     });
 };
 
+const getFavoriates = async () => {
+    try {
+        const res = await SearchFavorite(req);
+        favorites.value = res.data.items;
+    } catch (error) {}
+};
+
+const toFavorite = (row: File.Favorite) => {
+    if (row.isDir) {
+        jump(row.path);
+    } else if (row.isTxt) {
+        openCodeEditor(row.path, '.' + row.name.split('.').pop());
+    } else {
+        jump(row.path.substring(0, row.path.lastIndexOf('/')));
+    }
+};
+
 const buttons = [
     {
         label: i18n.global.t('file.open'),
@@ -834,5 +884,10 @@ onMounted(() => {
     .btn {
         margin-right: 10px;
     }
+}
+
+.favorite-item {
+    max-height: 650px;
+    overflow: auto;
 }
 </style>
