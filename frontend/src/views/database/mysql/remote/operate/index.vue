@@ -124,7 +124,7 @@ const rules = reactive({
     name: [Rules.requiredInput],
     type: [Rules.requiredSelect],
     version: [Rules.requiredSelect],
-    address: [Rules.host],
+    address: [Rules.ipV4V6OrDomain],
     port: [Rules.port],
     username: [Rules.requiredInput],
     password: [Rules.requiredInput],
