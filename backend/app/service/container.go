@@ -327,11 +327,6 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate) error {
 		return buserr.New(constant.ErrContainerName)
 	}
 
-	config, hostConf, networkConf, err := loadConfigInfo(true, req, nil)
-	if err != nil {
-		return err
-	}
-	global.LOG.Infof("new container info %s has been made, now start to create", req.Name)
 	if !checkImageExist(client, req.Image) || req.ForcePull {
 		if err := pullImages(ctx, client, req.Image); err != nil {
 			if !req.ForcePull {
@@ -340,6 +335,18 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate) error {
 			global.LOG.Errorf("force pull image %s failed, err: %v", req.Image, err)
 		}
 	}
+	imageInfo, _, err := client.ImageInspectWithRaw(ctx, req.Image)
+	if err != nil {
+		return err
+	}
+	if len(req.Entrypoint) == 0 {
+		req.Entrypoint = imageInfo.Config.Entrypoint
+	}
+	config, hostConf, networkConf, err := loadConfigInfo(true, req, nil)
+	if err != nil {
+		return err
+	}
+	global.LOG.Infof("new container info %s has been made, now start to create", req.Name)
 	container, err := client.ContainerCreate(ctx, config, hostConf, networkConf, &v1.Platform{}, req.Name)
 	if err != nil {
 		_ = client.ContainerRemove(ctx, req.Name, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
