@@ -518,7 +518,7 @@ func (a *AppInstallService) ChangeAppPort(req request.PortUpdate) error {
 		return nil
 	}
 
-	if err := updateInstallInfoInDB(req.Key, "", "port", true, strconv.FormatInt(req.Port, 10)); err != nil {
+	if err := updateInstallInfoInDB(req.Key, req.Name, "port", true, strconv.FormatInt(req.Port, 10)); err != nil {
 		return nil
 	}
 
