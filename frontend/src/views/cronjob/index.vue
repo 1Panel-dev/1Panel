@@ -77,7 +77,7 @@
                             </el-button>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('cronjob.cronSpec')" :min-width="120">
+                    <el-table-column :label="$t('cronjob.cronSpec')" show-overflow-tooltip :min-width="120">
                         <template #default="{ row }">
                             <span v-if="row.specType.indexOf('N') === -1 || row.specType === 'perWeek'">
                                 {{ $t('cronjob.' + row.specType) }}&nbsp;
