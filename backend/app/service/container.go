@@ -331,6 +331,9 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate) error {
 	if len(req.Entrypoint) == 0 {
 		req.Entrypoint = imageInfo.Config.Entrypoint
 	}
+	if len(req.Cmd) == 0 {
+		req.Cmd = imageInfo.Config.Cmd
+	}
 	config, hostConf, networkConf, err := loadConfigInfo(true, req, nil)
 	if err != nil {
 		return err
