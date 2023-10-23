@@ -2,10 +2,8 @@ package systemctl
 
 import (
 	"fmt"
-	"os/exec"
-	"strings"
-
 	"github.com/pkg/errors"
+	"os/exec"
 )
 
 func RunSystemCtl(args ...string) (string, error) {
@@ -33,12 +31,21 @@ func IsEnable(serviceName string) (bool, error) {
 	return out == "enabled\n", nil
 }
 
+// IsExist checks if a service exists.
 func IsExist(serviceName string) (bool, error) {
-	out, err := RunSystemCtl("list-unit-files")
+	cmd := exec.Command("systemctl", "is-enabled", serviceName)
+	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return false, err
+		// If the command fails, check if the output indicates that the service does not exist.
+		if string(output) == fmt.Sprintf("Failed to get unit file state for %s.service: No such file or directory\n", serviceName) {
+			// Return false if the service does not exist.
+			return false, nil
+		}
+		// Return an error if the command fails.
+		return false, fmt.Errorf("failed to run command: %w", err)
 	}
-	return strings.Contains(out, serviceName+".service"), nil
+	// Return true if the service exists.
+	return true, nil
 }
 
 func handlerErr(out string, err error) error {
