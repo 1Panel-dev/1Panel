@@ -54,11 +54,18 @@
                             prop="varsJson.code"
                             :rules="rules.driveCode"
                         >
-                            <el-input clearable v-model.trim="dialogData.rowData!.varsJson['code']">
-                                <template #append>
-                                    <el-button @click="jumpAzure">{{ $t('setting.loadCode') }}</el-button>
-                                </template>
-                            </el-input>
+                            <div style="width: 100%">
+                                <el-input
+                                    style="width: calc(100% - 80px)"
+                                    :autosize="{ minRows: 3, maxRows: 15 }"
+                                    type="textarea"
+                                    clearable
+                                    v-model.trim="dialogData.rowData!.varsJson['code']"
+                                />
+                                <el-button class="append-button" @click="jumpAzure">
+                                    {{ $t('setting.loadCode') }}
+                                </el-button>
+                            </div>
                             <span class="input-help">
                                 {{ $t('setting.codeHelper') }}
                                 <el-link
@@ -269,7 +276,7 @@ const rules = reactive({
     driveCode: [{ validator: checkDriveCode, required: true, trigger: 'blur' }],
 });
 function checkDriveCode(rule: any, value: any, callback: any) {
-    const reg = /^[A-Za-z0-9_.-]{32,60}$/;
+    const reg = /^[A-Za-z0-9_.-]+$/;
     if (!reg.test(value)) {
         return callback(new Error(i18n.global.t('setting.codeWarning')));
     }
@@ -421,3 +428,11 @@ defineExpose({
     acceptParams,
 });
 </script>
+
+<style lang="scss" scoped>
+.append-button {
+    width: 80px;
+    background-color: var(--el-fill-color-light);
+    color: var(--el-color-info);
+}
+</style>
