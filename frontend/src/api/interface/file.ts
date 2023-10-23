@@ -168,5 +168,6 @@ export namespace File {
         path: string;
         isDir: boolean;
         isTxt: boolean;
+        name: string;
     }
 }

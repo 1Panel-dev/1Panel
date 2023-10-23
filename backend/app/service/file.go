@@ -140,7 +140,10 @@ func (f *FileService) Delete(op request.FileDelete) error {
 			return fo.DeleteFile(op.Path)
 		}
 	}
-	return NewIRecycleBinService().Create(request.RecycleBinCreate{SourcePath: op.Path})
+	if err := NewIRecycleBinService().Create(request.RecycleBinCreate{SourcePath: op.Path}); err != nil {
+		return err
+	}
+	return favoriteRepo.Delete(favoriteRepo.WithByPath(op.Path))
 }
 
 func (f *FileService) BatchDelete(op request.FileBatchDelete) error {

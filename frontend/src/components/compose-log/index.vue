@@ -37,7 +37,7 @@
             :placeholder="$t('commons.msg.noneData')"
             :indent-with-tab="true"
             :tabSize="4"
-            style="margin-top: 10px; height: calc(100vh - 375px)"
+            style="margin-top: 10px; height: calc(100vh - 200px)"
             :lineWrapping="true"
             :matchBrackets="true"
             theme="cobalt"
