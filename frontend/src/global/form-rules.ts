@@ -22,6 +22,33 @@ const checkIp = (rule: any, value: any, callback: any) => {
     }
 };
 
+const checkIpV6 = (rule: any, value: any, callback: any) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback(new Error(i18n.global.t('commons.rule.requiredInput')));
+    } else {
+        const IPv4SegmentFormat = '(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])';
+        const IPv4AddressFormat = `(${IPv4SegmentFormat}[.]){3}${IPv4SegmentFormat}`;
+        const IPv6SegmentFormat = '(?:[0-9a-fA-F]{1,4})';
+        const IPv6AddressRegExp = new RegExp(
+            '^(' +
+                `(?:${IPv6SegmentFormat}:){7}(?:${IPv6SegmentFormat}|:)|` +
+                `(?:${IPv6SegmentFormat}:){6}(?:${IPv4AddressFormat}|:${IPv6SegmentFormat}|:)|` +
+                `(?:${IPv6SegmentFormat}:){5}(?::${IPv4AddressFormat}|(:${IPv6SegmentFormat}){1,2}|:)|` +
+                `(?:${IPv6SegmentFormat}:){4}(?:(:${IPv6SegmentFormat}){0,1}:${IPv4AddressFormat}|(:${IPv6SegmentFormat}){1,3}|:)|` +
+                `(?:${IPv6SegmentFormat}:){3}(?:(:${IPv6SegmentFormat}){0,2}:${IPv4AddressFormat}|(:${IPv6SegmentFormat}){1,4}|:)|` +
+                `(?:${IPv6SegmentFormat}:){2}(?:(:${IPv6SegmentFormat}){0,3}:${IPv4AddressFormat}|(:${IPv6SegmentFormat}){1,5}|:)|` +
+                `(?:${IPv6SegmentFormat}:){1}(?:(:${IPv6SegmentFormat}){0,4}:${IPv4AddressFormat}|(:${IPv6SegmentFormat}){1,6}|:)|` +
+                `(?::((?::${IPv6SegmentFormat}){0,5}:${IPv4AddressFormat}|(?::${IPv6SegmentFormat}){1,7}|:))` +
+                ')(%[0-9a-zA-Z-.:]{1,})?$',
+        );
+        if (!IPv6AddressRegExp.test(value) && value !== '') {
+            callback(new Error(i18n.global.t('commons.rule.ip')));
+        } else {
+            callback();
+        }
+    }
+};
+
 const checkIpV4V6OrDomain = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.requiredInput')));
@@ -453,6 +480,7 @@ interface CommonRule {
     integerNumberWith0: FormItemRule;
     floatNumber: FormItemRule;
     ip: FormItemRule;
+    ipV6: FormItemRule;
     ipV4V6OrDomain: FormItemRule;
     host: FormItemRule;
     illegal: FormItemRule;
@@ -573,6 +601,11 @@ export const Rules: CommonRule = {
     },
     ip: {
         validator: checkIp,
+        required: true,
+        trigger: 'blur',
+    },
+    ipV6: {
+        validator: checkIpV6,
         required: true,
         trigger: 'blur',
     },

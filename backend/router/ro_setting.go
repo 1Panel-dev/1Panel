@@ -22,6 +22,8 @@ func (s *SettingRouter) InitSettingRouter(Router *gin.RouterGroup) {
 		router.POST("/expired/handle", baseApi.HandlePasswordExpired)
 		settingRouter.GET("/search/available", baseApi.GetSystemAvailable)
 		settingRouter.POST("/update", baseApi.UpdateSetting)
+		settingRouter.GET("/interface", baseApi.LoadInterfaceAddr)
+		settingRouter.POST("/bind/update", baseApi.UpdateBindInfo)
 		settingRouter.POST("/port/update", baseApi.UpdatePort)
 		settingRouter.POST("/ssl/update", baseApi.UpdateSSL)
 		settingRouter.GET("/ssl/info", baseApi.LoadFromCert)

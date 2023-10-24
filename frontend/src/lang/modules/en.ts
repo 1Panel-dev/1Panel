@@ -1124,6 +1124,12 @@ const message = {
         path: 'Path',
 
         safe: 'Security',
+        bindInfo: 'BindInfo',
+        bindAll: 'Listen All',
+        bindInfoHelper:
+            'Changing the service listening address or protocol may result in service unavailability. Do you want to continue?',
+        ipv6: 'Listen IPv6',
+        bindAddress: 'Listen Address',
         entrance: 'Entrance',
         showEntrance: 'Enable Home Page Notification Not Enabled',
         entranceHelper: 'Enabling secure entry will only allow logging in to the panel through specified secure entry.',

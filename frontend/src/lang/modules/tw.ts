@@ -1118,6 +1118,11 @@ const message = {
         hasNewVersion: '有新版本',
 
         safe: '安全',
+        bindInfo: '監聽地址',
+        bindAll: '監聽所有',
+        bindInfoHelper: '修改服務監聽地址或協議可能導致服務不可用，是否繼續？',
+        ipv6: '監聽 IPv6',
+        bindAddress: '監聽地址',
         entrance: '安全入口',
         showEntrance: '啟用概覽頁未開啟提醒',
         entranceHelper: '開啟安全入口後只能通過指定安全入口登錄面板',

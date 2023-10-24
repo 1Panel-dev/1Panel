@@ -15,7 +15,15 @@
                                     </template>
                                 </el-input>
                             </el-form-item>
-
+                            <el-form-item :label="$t('setting.bindInfo')" prop="bindAddress">
+                                <el-input disabled v-model="form.bindAddressItem">
+                                    <template #append>
+                                        <el-button @click="onChangeBind" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
                             <el-form-item :label="$t('setting.entrance')">
                                 <el-input
                                     type="password"
@@ -148,10 +156,11 @@
         </LayoutContent>
 
         <PortSetting ref="portRef" />
+        <BindSetting ref="bindRef" />
         <MfaSetting ref="mfaRef" @search="search" />
         <SSLSetting ref="sslRef" @search="search" />
         <EntranceSetting ref="entranceRef" @search="search" />
-        <TimeoutSetting ref="timeoutref" @search="search" />
+        <TimeoutSetting ref="timeoutRef" @search="search" />
         <DomainSetting ref="domainRef" @search="search" />
         <AllowIPsSetting ref="allowIPsRef" @search="search" />
     </div>
@@ -161,6 +170,7 @@
 import { ref, reactive, onMounted } from 'vue';
 import { ElForm, ElMessageBox } from 'element-plus';
 import PortSetting from '@/views/setting/safe/port/index.vue';
+import BindSetting from '@/views/setting/safe/bind/index.vue';
 import SSLSetting from '@/views/setting/safe/ssl/index.vue';
 import MfaSetting from '@/views/setting/safe/mfa/index.vue';
 import TimeoutSetting from '@/views/setting/safe/timeout/index.vue';
@@ -177,7 +187,8 @@ const globalStore = GlobalStore();
 const loading = ref(false);
 const entranceRef = ref();
 const portRef = ref();
-const timeoutref = ref();
+const bindRef = ref();
+const timeoutRef = ref();
 const mfaRef = ref();
 
 const sslRef = ref();
@@ -187,6 +198,9 @@ const allowIPsRef = ref();
 
 const form = reactive({
     serverPort: 9999,
+    ipv6: 'disable',
+    bindAddress: '',
+    bindAddressItem: '',
     ssl: 'disable',
     sslType: 'self',
     securityEntrance: '',
@@ -204,6 +218,10 @@ const unset = ref(i18n.global.t('setting.unSetting'));
 const search = async () => {
     const res = await getSettingInfo();
     form.serverPort = Number(res.data.serverPort);
+    form.ipv6 = res.data.ipv6;
+    form.bindAddress = res.data.bindAddress;
+    let proto = form.ipv6 === 'enable' ? 'ipv6' : 'ipv4';
+    form.bindAddressItem = ' [' + proto + '] ' + res.data.bindAddress;
     form.ssl = res.data.ssl;
     form.sslType = res.data.sslType;
     if (form.ssl === 'enable') {
@@ -259,6 +277,9 @@ const onChangeEntrance = () => {
 const onChangePort = () => {
     portRef.value.acceptParams({ serverPort: form.serverPort });
 };
+const onChangeBind = () => {
+    bindRef.value.acceptParams({ ipv6: form.ipv6, bindAddress: form.bindAddress });
+};
 const onChangeBindDomain = () => {
     domainRef.value.acceptParams({ bindDomain: form.bindDomain });
 };
@@ -305,7 +326,7 @@ const loadInfo = async () => {
 };
 
 const onChangeExpirationTime = async () => {
-    timeoutref.value.acceptParams({ expirationDays: form.expirationDays });
+    timeoutRef.value.acceptParams({ expirationDays: form.expirationDays });
 };
 
 function loadTimeOut() {

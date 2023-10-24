@@ -22,6 +22,8 @@ export namespace Setting {
         lastCleanData: string;
 
         serverPort: number;
+        ipv6: string;
+        bindAddress: string;
         ssl: string;
         sslType: string;
         allowIPs: string;

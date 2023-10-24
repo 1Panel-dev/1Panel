@@ -8924,6 +8924,49 @@
                 }
             }
         },
+        "/settings/bind/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新系统监听信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "Update system bind info",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.BindInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "ipv6",
+                        "bindAddress"
+                    ],
+                    "formatEN": "update system bind info =\u003e ipv6: [ipv6], 监听 IP: [bindAddress]",
+                    "formatZH": "修改系统监听信息 =\u003e ipv6: [ipv6], 监听 IP: [bindAddress]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/settings/clean": {
             "post": {
                 "security": [
@@ -9004,6 +9047,28 @@
                     "formatEN": "reset an expired Password",
                     "formatZH": "重置过期密码",
                     "paramKeys": []
+                }
+            }
+        },
+        "/settings/interface": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取系统地址信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "Load system address",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
                 }
             }
         },
@@ -12494,6 +12559,25 @@
                 }
             }
         },
+        "dto.BindInfo": {
+            "type": "object",
+            "required": [
+                "bindAddress",
+                "ipv6"
+            ],
+            "properties": {
+                "bindAddress": {
+                    "type": "string"
+                },
+                "ipv6": {
+                    "type": "string",
+                    "enum": [
+                        "enable",
+                        "disable"
+                    ]
+                }
+            }
+        },
         "dto.CaptchaResponse": {
             "type": "object",
             "properties": {
@@ -15372,6 +15456,9 @@
                 "appStoreVersion": {
                     "type": "string"
                 },
+                "bindAddress": {
+                    "type": "string"
+                },
                 "bindDomain": {
                     "type": "string"
                 },
@@ -15394,6 +15481,9 @@
                     "type": "string"
                 },
                 "expirationTime": {
+                    "type": "string"
+                },
+                "ipv6": {
                     "type": "string"
                 },
                 "language": {

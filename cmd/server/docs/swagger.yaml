@@ -122,6 +122,19 @@ definitions:
     required:
     - type
     type: object
+  dto.BindInfo:
+    properties:
+      bindAddress:
+        type: string
+      ipv6:
+        enum:
+        - enable
+        - disable
+        type: string
+    required:
+    - bindAddress
+    - ipv6
+    type: object
   dto.CaptchaResponse:
     properties:
       captchaID:
@@ -2064,6 +2077,8 @@ definitions:
         type: string
       appStoreVersion:
         type: string
+      bindAddress:
+        type: string
       bindDomain:
         type: string
       complexityVerification:
@@ -2079,6 +2094,8 @@ definitions:
       expirationDays:
         type: string
       expirationTime:
+        type: string
+      ipv6:
         type: string
       language:
         type: string
@@ -9879,6 +9896,34 @@ paths:
       summary: Load local backup dir
       tags:
       - System Setting
+  /settings/bind/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新系统监听信息
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BindInfo'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update system bind info
+      tags:
+      - System Setting
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - ipv6
+        - bindAddress
+        formatEN: 'update system bind info => ipv6: [ipv6], 监听 IP: [bindAddress]'
+        formatZH: '修改系统监听信息 => ipv6: [ipv6], 监听 IP: [bindAddress]'
+        paramKeys: []
   /settings/clean:
     post:
       consumes:
@@ -9933,6 +9978,19 @@ paths:
         formatEN: reset an expired Password
         formatZH: 重置过期密码
         paramKeys: []
+  /settings/interface:
+    get:
+      consumes:
+      - application/json
+      description: 获取系统地址信息
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Load system address
+      tags:
+      - System Setting
   /settings/mfa:
     post:
       consumes:

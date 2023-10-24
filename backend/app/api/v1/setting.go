@@ -151,6 +151,49 @@ func (b *BaseApi) DownloadSSL(c *gin.Context) {
 }
 
 // @Tags System Setting
+// @Summary Load system address
+// @Description 获取系统地址信息
+// @Accept json
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/interface [get]
+func (b *BaseApi) LoadInterfaceAddr(c *gin.Context) {
+	data, err := settingService.LoadInterfaceAddr()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags System Setting
+// @Summary Update system bind info
+// @Description 更新系统监听信息
+// @Accept json
+// @Param request body dto.BindInfo true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/bind/update [post]
+// @x-panel-log {"bodyKeys":["ipv6", "bindAddress"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改系统监听信息 => ipv6: [ipv6], 监听 IP: [bindAddress]","formatEN":"update system bind info => ipv6: [ipv6], 监听 IP: [bindAddress]"}
+func (b *BaseApi) UpdateBindInfo(c *gin.Context) {
+	var req dto.BindInfo
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	if err := settingService.UpdateBindInfo(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags System Setting
 // @Summary Update system port
 // @Description 更新系统端口
 // @Accept json
