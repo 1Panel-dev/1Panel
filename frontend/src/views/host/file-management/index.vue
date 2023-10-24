@@ -85,6 +85,10 @@
                             </el-button>
                         </el-button-group>
 
+                        <el-button class="btn" @click="toTerminal">
+                            {{ $t('menu.terminal') }}
+                        </el-button>
+
                         <el-button-group class="copy-button" v-if="moveOpen">
                             <el-tooltip class="box-item" effect="dark" :content="$t('file.paste')" placement="bottom">
                                 <el-button plain @click="openPaste">{{ $t('file.paste') }}</el-button>
@@ -756,6 +760,10 @@ const toFavorite = (row: File.Favorite) => {
     } else {
         jump(row.path.substring(0, row.path.lastIndexOf('/')));
     }
+};
+
+const toTerminal = () => {
+    router.push({ path: '/hosts/terminal', query: { path: req.path } });
 };
 
 const buttons = [
