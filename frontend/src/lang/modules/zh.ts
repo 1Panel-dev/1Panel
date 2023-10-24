@@ -937,6 +937,7 @@ const message = {
         favorite: '收藏夹',
         removeFavorite: '是否从收藏夹移出？',
         addFavorite: '加入收藏夹子',
+        clearList: '清空列表',
     },
     ssh: {
         autoStart: '开机自启',

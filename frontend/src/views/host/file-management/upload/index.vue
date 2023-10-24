@@ -9,6 +9,26 @@
         <template #header>
             <DrawerHeader :header="$t('file.upload')" :back="handleClose" />
         </template>
+        <div class="button-container">
+            <el-dropdown @command="upload">
+                <el-button type="primary">
+                    {{ $t('file.upload') }}
+                    <el-icon><arrow-down /></el-icon>
+                </el-button>
+                <template #dropdown>
+                    <el-dropdown-menu>
+                        <el-dropdown-item command="file">
+                            {{ $t('file.file') }}
+                        </el-dropdown-item>
+                        <el-dropdown-item command="dir">
+                            {{ $t('file.dir') }}
+                        </el-dropdown-item>
+                    </el-dropdown-menu>
+                </template>
+            </el-dropdown>
+            <el-button @click="clearFiles">{{ $t('file.clearList') }}</el-button>
+        </div>
+
         <el-upload
             action="#"
             drag
@@ -17,8 +37,9 @@
             :on-change="fileOnChange"
             :on-exceed="handleExceed"
             :on-success="hadleSuccess"
-            show-file-list
+            :show-file-list="false"
             multiple
+            v-model:file-list="uploaderFiles"
         >
             <el-icon class="el-icon--upload"><upload-filled /></el-icon>
             <div class="el-upload__text">
@@ -30,6 +51,31 @@
                 <el-progress v-if="loading" text-inside :stroke-width="20" :percentage="uploadPrecent"></el-progress>
             </template>
         </el-upload>
+        <div>
+            <p
+                v-for="(item, index) in uploaderFiles"
+                :key="index"
+                class="file-item"
+                @mouseover="hoverIndex = index"
+                @mouseout="hoverIndex = null"
+            >
+                <el-icon class="file-icon"><Document /></el-icon>
+                <span v-if="item.raw.webkitRelativePath != ''">{{ item.raw.webkitRelativePath }}</span>
+                <span v-else>{{ item.name }}</span>
+                <span v-if="item.status === 'success'" class="success-icon">
+                    <el-icon><Select /></el-icon>
+                </span>
+                <span v-else>
+                    <el-button
+                        class="delete-button"
+                        type="primary"
+                        link
+                        @click="removeFile(index)"
+                        :icon="Close"
+                    ></el-button>
+                </span>
+            </p>
+        </div>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
@@ -42,12 +88,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { nextTick, reactive, ref } from 'vue';
 import { UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile } from 'element-plus';
 import { ChunkUploadFileData, UploadFileData } from '@/api/modules/files';
 import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
+import { Close } from '@element-plus/icons-vue';
 
 interface UploadFileProps {
     path: string;
@@ -66,11 +113,33 @@ const handleClose = () => {
     uploadRef.value!.clearFiles();
     em('close', false);
 };
-
+const state = reactive({
+    uploadEle: null,
+});
 const uploaderFiles = ref<UploadFiles>([]);
+const isUploadFolder = ref(false);
+const hoverIndex = ref(null);
+
+const upload = (commnad: string) => {
+    if (commnad == 'dir') {
+        state.uploadEle.webkitdirectory = true;
+    } else {
+        state.uploadEle.webkitdirectory = false;
+    }
+    isUploadFolder.value = true;
+    uploadRef.value.$el.querySelector('input').click();
+};
+
+const removeFile = (index: number) => {
+    uploaderFiles.value.splice(index, 1);
+};
 
 const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
     uploaderFiles.value = uploadFiles;
+};
+
+const clearFiles = () => {
+    uploadRef.value!.clearFiles();
 };
 
 const handleExceed: UploadProps['onExceed'] = (files) => {
@@ -111,7 +180,11 @@ const submit = async () => {
             const formData = new FormData();
 
             formData.append('filename', file.name);
-            formData.append('path', path.value);
+            if (file.raw.webkitRelativePath != '') {
+                formData.append('path', path.value + '/' + getPathWithoutFilename(file.raw.webkitRelativePath));
+            } else {
+                formData.append('path', path.value);
+            }
             formData.append('chunk', chunk);
             formData.append('chunkIndex', c.toString());
             formData.append('chunkCount', chunkCount.toString());
@@ -149,12 +222,58 @@ const submit = async () => {
     }
 };
 
+const getPathWithoutFilename = (path: string) => {
+    return path ? path.split('/').slice(0, -1).join('/') : path;
+};
+
 const acceptParams = (props: UploadFileProps) => {
     path.value = props.path;
     open.value = true;
     uploadPrecent.value = 0;
     uploadHelper.value = '';
+
+    nextTick(() => {
+        const uploadEle = document.querySelector('.el-upload__input');
+        state.uploadEle = uploadEle;
+    });
 };
 
 defineExpose({ acceptParams });
 </script>
+
+<style lang="scss" scoped>
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.file-item {
+    font-size: 12px;
+    color: #888;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.file-item:hover {
+    background-color: #f5f5f5;
+}
+
+.file-icon {
+    margin-right: 8px;
+}
+
+.delete-button {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.success-icon {
+    color: green;
+    position: absolute;
+    right: 0;
+}
+</style>
