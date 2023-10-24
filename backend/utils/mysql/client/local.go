@@ -269,7 +269,7 @@ func (r *Local) SyncDB(version string) ([]SyncDBInfo, error) {
 		if len(parts) != 2 {
 			continue
 		}
-		if parts[0] == "SCHEMA_NAME" || parts[0] == "information_schema" || parts[0] == "mysql" || parts[0] == "performance_schema" || parts[0] == "sys" || parts[0] == "recycle_bin" {
+		if parts[0] == "SCHEMA_NAME" || parts[0] == "information_schema" || parts[0] == "mysql" || parts[0] == "performance_schema" || parts[0] == "sys" || parts[0] == "__recycle_bin__" {
 			continue
 		}
 		dataItem := SyncDBInfo{
