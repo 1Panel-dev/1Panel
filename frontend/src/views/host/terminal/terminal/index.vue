@@ -64,10 +64,10 @@
                 <template #label>
                     <el-button v-popover="popoverRef" class="tagButton" icon="Plus"></el-button>
                     <el-popover ref="popoverRef" width="250px" trigger="hover" virtual-triggering persistent>
-                        <div style="margin-left: 10px">
+                        <div class="ml-2.5">
                             <el-button link type="primary" @click="onNewSsh">{{ $t('terminal.createConn') }}</el-button>
                         </div>
-                        <div style="margin-left: 10px">
+                        <div class="ml-2.5">
                             <el-button link type="primary" @click="onNewLocal">
                                 {{ $t('terminal.localhost') }}
                             </el-button>
@@ -128,7 +128,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, getCurrentInstance, watch, nextTick, computed } from 'vue';
+import { ref, getCurrentInstance, watch, nextTick, computed, onMounted } from 'vue';
 import Terminal from '@/components/terminal/index.vue';
 import HostDialog from '@/views/host/terminal/terminal/host-create.vue';
 import type Node from 'element-plus/es/components/tree/src/model/node';
@@ -139,6 +139,7 @@ import { Host } from '@/api/interface/host';
 import { getHostTree, testByID } from '@/api/modules/host';
 import { getCommandList } from '@/api/modules/host';
 import { GlobalStore } from '@/store';
+import router from '@/routers';
 
 const dialogRef = ref();
 const ctx = getCurrentInstance() as any;
@@ -183,6 +184,7 @@ interface Tree {
     label: string;
     children?: Tree[];
 }
+const initCmd = ref('');
 
 const acceptParams = async () => {
     globalStore.isFullScreen = false;
@@ -358,8 +360,10 @@ const onConnTerminal = async (title: string, wsID: number, isLocal?: boolean) =>
             ctx.refs[`t-${terminalValue.value}`][0].acceptParams({
                 endpoint: '/api/v1/terminals',
                 args: `id=${wsID}`,
+                initCmd: initCmd.value,
                 error: res.data ? '' : 'Authentication failed.  Please check the host information !',
             });
+        initCmd.value = '';
     });
     tabIndex++;
 };
@@ -376,6 +380,13 @@ function syncTerminal() {
 defineExpose({
     acceptParams,
     cleanTimer,
+});
+
+onMounted(() => {
+    if (router.currentRoute.value.query.path) {
+        const path = String(router.currentRoute.value.query.path);
+        initCmd.value = `cd ${path} \n`;
+    }
 });
 </script>
 

@@ -15,8 +15,9 @@ const termReady = ref(false);
 const webSocketReady = ref(false);
 const term = ref();
 const terminalSocket = ref<WebSocket>();
-const heartbeatTimer = ref<number>();
+const heartbeatTimer = ref<NodeJS.Timer>();
 const latency = ref(0);
+const initCmd = ref('');
 
 const readyWatcher = watch(
     () => webSocketReady.value && termReady.value,
@@ -32,12 +33,14 @@ interface WsProps {
     endpoint: string;
     args: string;
     error: string;
+    initCmd: string;
 }
 const acceptParams = (props: WsProps) => {
     nextTick(() => {
         if (props.error.length !== 0) {
             initError(props.error);
         } else {
+            initCmd.value = props.initCmd;
             init(props.endpoint, props.args);
         }
     });
@@ -162,6 +165,9 @@ const initWebSocket = (endpoint_: string, args: string = '') => {
 
 const runRealTerminal = () => {
     webSocketReady.value = true;
+    if (initCmd.value !== '') {
+        sendMsg(initCmd.value);
+    }
 };
 
 const onWSReceive = (message: MessageEvent) => {
@@ -169,7 +175,12 @@ const onWSReceive = (message: MessageEvent) => {
     switch (wsMsg.type) {
         case 'cmd': {
             term.value.element && term.value.focus();
-            wsMsg.data && term.value.write(Base64.decode(wsMsg.data)); // 这里理论上不用判断，但是Redis和Ctr还没实现Alive处理，所以exit后会一直发数据，todo
+            let receiveMsg = Base64.decode(wsMsg.data);
+            if (initCmd.value != '') {
+                receiveMsg = receiveMsg.replace(initCmd.value.trim(), '').trim();
+                initCmd.value = '';
+            }
+            wsMsg.data && term.value.write(receiveMsg);
             break;
         }
         case 'heartbeat': {
