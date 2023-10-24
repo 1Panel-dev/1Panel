@@ -53,6 +53,7 @@ const forceDelete = ref(false);
 const acceptParams = (props: File.File[]) => {
     files.value = props;
     open.value = true;
+    forceDelete.value = false;
 };
 
 const onConfirm = () => {

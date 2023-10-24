@@ -975,6 +975,7 @@ const message = {
         favorite: 'favorites',
         removeFavorite: 'Remove from favorites?',
         addFavorite: 'Add to favorites',
+        clearList: 'Clear list',
     },
     ssh: {
         autoStart: 'Auto Start',

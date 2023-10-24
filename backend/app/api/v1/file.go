@@ -568,12 +568,13 @@ func (b *BaseApi) Size(c *gin.Context) {
 }
 
 func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int) error {
-	if _, err := os.Stat(path.Dir(dstDir)); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(path.Dir(dstDir), os.ModePerm); err != nil {
+	op := files.NewFileOp()
+	dstDir = strings.TrimSpace(dstDir)
+	if _, err := os.Stat(dstDir); err != nil && os.IsNotExist(err) {
+		if err = op.CreateDir(dstDir, os.ModePerm); err != nil {
 			return err
 		}
 	}
-
 	targetFile, err := os.Create(filepath.Join(dstDir, fileName))
 	if err != nil {
 		return err
