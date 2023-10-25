@@ -332,6 +332,24 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 				}
 			}
 		}
+
+		appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(runtime.AppDetailID))
+		if err != nil {
+			return err
+		}
+		app, err := appRepo.GetFirst(commonRepo.WithByID(appDetail.AppId))
+		if err != nil {
+			return err
+		}
+		fileOp := files.NewFileOp()
+		appVersionDir := path.Join(constant.AppResourceDir, app.Resource, app.Key, appDetail.Version)
+		if !fileOp.Stat(appVersionDir) || appDetail.Update {
+			if err := downloadApp(app, appDetail, nil); err != nil {
+				return err
+			}
+			_ = fileOp.Rename(path.Join(runtime.GetPath(), "run.sh"), path.Join(runtime.GetPath(), "run.sh.bak"))
+			_ = fileOp.CopyFile(path.Join(appVersionDir, "run.sh"), runtime.GetPath())
+		}
 	}
 
 	projectDir := path.Join(constant.RuntimeDir, runtime.Type, runtime.Name)

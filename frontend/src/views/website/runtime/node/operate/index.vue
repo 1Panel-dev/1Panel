@@ -65,22 +65,45 @@
                             </template>
                         </el-input>
                     </el-form-item>
-                    <el-form-item :label="$t('runtime.runScript')" prop="params.EXEC_SCRIPT">
-                        <el-select v-model="runtime.params['EXEC_SCRIPT']">
-                            <el-option
-                                v-for="(script, index) in scripts"
-                                :key="index"
-                                :label="script.name + ' 【 ' + script.script + ' 】'"
-                                :value="script.name"
-                            >
-                                <el-row :gutter="10">
-                                    <el-col :span="4">{{ script.name }}</el-col>
-                                    <el-col :span="10">{{ ' 【 ' + script.script + ' 】' }}</el-col>
-                                </el-row>
-                            </el-option>
-                        </el-select>
-                        <span class="input-help">{{ $t('runtime.runScriptHelper') }}</span>
-                    </el-form-item>
+                    <el-row :gutter="20">
+                        <el-col :span="18">
+                            <el-form-item :label="$t('runtime.runScript')" prop="params.EXEC_SCRIPT">
+                                <el-select
+                                    v-model="runtime.params['EXEC_SCRIPT']"
+                                    v-if="runtime.params['CUSTOM_SCRIPT'] == '0'"
+                                >
+                                    <el-option
+                                        v-for="(script, index) in scripts"
+                                        :key="index"
+                                        :label="script.name + ' 【 ' + script.script + ' 】'"
+                                        :value="script.name"
+                                    >
+                                        <el-row :gutter="10">
+                                            <el-col :span="4">{{ script.name }}</el-col>
+                                            <el-col :span="10">{{ ' 【 ' + script.script + ' 】' }}</el-col>
+                                        </el-row>
+                                    </el-option>
+                                </el-select>
+                                <el-input v-else v-model="runtime.params['EXEC_SCRIPT']"></el-input>
+                                <span class="input-help" v-if="runtime.params['CUSTOM_SCRIPT'] == '0'">
+                                    {{ $t('runtime.runScriptHelper') }}
+                                </span>
+                                <span class="input-help" v-else>
+                                    {{ $t('runtime.customScriptHelper') }}
+                                </span>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="6">
+                            <el-form-item :label="$t('runtime.customScript')" prop="params.CUSTOM_SCRIPT">
+                                <el-switch
+                                    v-model="runtime.params['CUSTOM_SCRIPT']"
+                                    :active-value="'1'"
+                                    :inactive-value="'0'"
+                                    @change="changeScriptType"
+                                />
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
                     <el-row :gutter="20">
                         <el-col :span="9">
                             <el-form-item :label="$t('runtime.appPort')" prop="params.NODE_APP_PORT">
@@ -94,13 +117,13 @@
                                 <span class="input-help">{{ $t('runtime.externalPortHelper') }}</span>
                             </el-form-item>
                         </el-col>
-
                         <el-col :span="6">
                             <el-form-item :label="$t('app.allowPort')" prop="params.HOST_IP">
-                                <el-select v-model="runtime.params['HOST_IP']">
-                                    <el-option :label="$t('runtime.open')" value="0.0.0.0"></el-option>
-                                    <el-option :label="$t('runtime.close')" value="127.0.0.1"></el-option>
-                                </el-select>
+                                <el-switch
+                                    v-model="runtime.params['HOST_IP']"
+                                    :active-value="'0.0.0.0'"
+                                    :inactive-value="'127.0.0.1'"
+                                />
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -178,6 +201,7 @@ const initData = (type: string) => ({
     params: {
         PACKAGE_MANAGER: 'npm',
         HOST_IP: '0.0.0.0',
+        CUSTOM_SCRIPT: '0',
     },
     type: type,
     resource: 'appstore',
@@ -193,12 +217,14 @@ const rules = ref<any>({
     codeDir: [Rules.requiredInput],
     port: [Rules.requiredInput, Rules.paramPort, checkNumberRange(1, 65535)],
     source: [Rules.requiredSelect],
+
     params: {
         NODE_APP_PORT: [Rules.requiredInput, Rules.paramPort, checkNumberRange(1, 65535)],
         PACKAGE_MANAGER: [Rules.requiredSelect],
         HOST_IP: [Rules.requiredSelect],
         EXEC_SCRIPT: [Rules.requiredSelect],
         CONTAINER_NAME: [Rules.requiredInput, Rules.containerName],
+        CUSTOM_SCRIPT: [Rules.requiredInput],
     },
 });
 const scripts = ref<Runtime.NodeScripts[]>([]);
@@ -248,6 +274,13 @@ const handleClose = () => {
 const getPath = (codeDir: string) => {
     runtime.codeDir = codeDir;
     getScripts();
+};
+
+const changeScriptType = () => {
+    runtime.params['EXEC_SCRIPT'] = '';
+    if (runtime.params['CUSTOM_SCRIPT'] == '0') {
+        getScripts();
+    }
 };
 
 const getScripts = () => {
@@ -359,10 +392,11 @@ const getRuntime = async (id: number) => {
             port: data.port,
         });
         editParams.value = data.appParams;
-        if (mode.value == 'edit') {
-            searchApp(data.appID);
+        searchApp(data.appID);
+        if (data.params['CUSTOM_SCRIPT'] == '0') {
+            getScripts();
         }
-        getScripts();
+        open.value = true;
     } catch (error) {}
 };
 
@@ -372,10 +406,10 @@ const acceptParams = async (props: OperateRrops) => {
     if (props.mode === 'create') {
         Object.assign(runtime, initData(props.type));
         searchApp(null);
+        open.value = true;
     } else {
         getRuntime(props.id);
     }
-    open.value = true;
 };
 
 defineExpose({
