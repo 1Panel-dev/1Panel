@@ -98,9 +98,6 @@ func ExecCronjobWithTimeOut(cmdStr string, workdir string, timeout time.Duration
 		return "", buserr.New(constant.ErrCmdTimeout)
 	}
 
-	if len(stderr.String()) != 0 {
-		err = buserr.New(constant.ErrBashExecute)
-	}
 	return output.String(), err
 }
 
