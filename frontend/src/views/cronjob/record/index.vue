@@ -131,8 +131,8 @@
                                     <el-card
                                         v-for="(item, index) in records"
                                         :key="index"
+                                        :class="item.id === currentRecord.id ? 'select-card' : 'primary-card'"
                                         @click="forDetail(item)"
-                                        class="infinite-list-item"
                                     >
                                         <el-tag v-if="item.status === 'Success'" type="success">
                                             {{ $t('commons.status.success') }}
@@ -143,13 +143,12 @@
                                         <el-tag v-if="item.status === 'Failed'" type="danger">
                                             {{ $t('commons.status.failed') }}
                                         </el-tag>
-                                        <span v-if="item.id === currentRecord.id" class="select-card">
+                                        <span>
                                             {{ dateFormat(0, 0, item.startTime) }}
                                         </span>
-                                        <span v-else>{{ dateFormat(0, 0, item.startTime) }}</span>
                                     </el-card>
                                 </ul>
-                                <div style="margin-top: 10px; font-size: 12px; float: right">
+                                <div class="page-item">
                                     <el-pagination
                                         :page-size="searchInfo.pageSize"
                                         :current-page="searchInfo.page"
@@ -723,27 +722,34 @@ defineExpose({
     height: calc(100vh - 416px);
     padding: 0;
     margin: 0;
-
     .el-card {
         border: var(--panel-border) !important;
         &:hover {
-            border: 1px solid var(--el-color-primary) !important;
             box-shadow: 2px 2px 2px #888888;
         }
         display: flex;
         align-items: center;
-        justify-content: center;
         height: 40px;
         font-size: 14px;
         margin: 5px;
         cursor: pointer;
     }
+    .select-card {
+        color: var(--el-color-primary);
+        border: 1px solid var(--el-color-primary) !important;
+        box-shadow: 2px 2px 2px #888888;
+        &::before {
+            position: absolute;
+            width: 3px;
+            height: 40px;
+            content: '';
+            background: $primary-color;
+            border-radius: 10px;
+        }
+    }
     .el-tag {
         margin-right: 15px;
     }
-}
-.select-card {
-    color: var(--el-color-primary);
 }
 
 .descriptionWide {
@@ -751,6 +757,11 @@ defineExpose({
 }
 .description {
     width: 30%;
+}
+.page-item {
+    margin-top: 10px;
+    font-size: 12px;
+    float: right;
 }
 
 @media only screen and (max-width: 1000px) {
