@@ -166,6 +166,7 @@ const search = async () => {
     let filterItem = filters.value;
     let params = {
         name: '',
+        state: 'all',
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
         filters: filterItem,
