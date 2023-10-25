@@ -248,7 +248,7 @@ let groups = ref<Group.GroupInfo[]>([]);
 const paginationConfig = reactive({
     cacheSizeKey: 'website-page-size',
     currentPage: 1,
-    pageSize: 10,
+    pageSize: Number(localStorage.getItem('website-page-size')) || 10,
     total: 0,
 });
 let req = reactive({

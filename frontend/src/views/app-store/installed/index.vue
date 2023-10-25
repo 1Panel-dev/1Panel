@@ -337,7 +337,7 @@ let timer: NodeJS.Timer | null = null;
 const paginationConfig = reactive({
     cacheSizeKey: 'app-installed-page-size',
     currentPage: 1,
-    pageSize: 20,
+    pageSize: Number(localStorage.getItem('app-installed-page-size')) || 20,
     total: 0,
 });
 const open = ref(false);
@@ -415,6 +415,7 @@ const search = () => {
     loading.value = true;
     searchReq.page = paginationConfig.currentPage;
     searchReq.pageSize = paginationConfig.pageSize;
+    localStorage.setItem('app-installed', searchReq.pageSize + '');
     SearchAppInstalled(searchReq)
         .then((res) => {
             data.value = res.data.items;

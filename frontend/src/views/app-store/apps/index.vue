@@ -192,7 +192,7 @@ const language = useI18n().locale.value;
 const paginationConfig = reactive({
     cacheSizeKey: 'app-page-size',
     currentPage: 1,
-    pageSize: 60,
+    pageSize: Number(localStorage.getItem('app-page-size')) || 60,
     total: 0,
 });
 
@@ -219,6 +219,7 @@ const search = async (req: App.AppReq) => {
     loading.value = true;
     req.pageSize = paginationConfig.pageSize;
     req.page = paginationConfig.currentPage;
+    localStorage.setItem('app-page-size', req.pageSize + '');
     await SearchApp(req)
         .then((res) => {
             apps.value = res.data.items;
