@@ -269,7 +269,7 @@ const data = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'mysql-page-size',
     currentPage: 1,
-    pageSize: 10,
+    pageSize: Number(localStorage.getItem('mysql-page-size')) || 10,
     total: 0,
     orderBy: 'created_at',
     order: 'null',
