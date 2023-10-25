@@ -5,6 +5,9 @@
                 <DrawerHeader :header="$t('commons.button.import')" :resource="title" :back="handleClose" />
             </template>
             <div v-loading="loading">
+                <div class="mb-4" v-if="type === 'mysql' || type === 'mariadb'">
+                    <el-alert type="error" :title="$t('database.formatHelper', [remark])" />
+                </div>
                 <el-upload ref="uploadRef" drag :on-change="fileOnChange" class="upload-demo" :auto-upload="false">
                     <el-icon class="el-icon--upload"><upload-filled /></el-icon>
                     <div class="el-upload__text">
@@ -16,7 +19,7 @@
                             v-if="isUpload"
                             text-inside
                             :stroke-width="12"
-                            :percentage="uploadPrecent"
+                            :percentage="uploadPercent"
                         ></el-progress>
                         <div v-if="type === 'mysql'" style="width: 80%" class="el-upload__tip">
                             <span class="input-help">{{ $t('database.supportUpType') }}</span>
@@ -93,7 +96,7 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 
 const loading = ref();
 const isUpload = ref();
-const uploadPrecent = ref<number>(0);
+const uploadPercent = ref<number>(0);
 const selects = ref<any>([]);
 const baseDir = ref();
 
@@ -110,15 +113,18 @@ const upVisible = ref(false);
 const type = ref();
 const name = ref();
 const detailName = ref();
+const remark = ref();
 interface DialogProps {
     type: string;
     name: string;
     detailName: string;
+    remark: string;
 }
 const acceptParams = async (params: DialogProps): Promise<void> => {
     type.value = params.type;
     name.value = params.name;
     detailName.value = params.detailName;
+    remark.value = params.remark;
 
     const pathRes = await loadBaseDir();
     if (type.value === 'mysql') {
@@ -156,15 +162,21 @@ const onRecover = async (row: File.File) => {
         detailName: detailName.value,
         file: baseDir.value + row.name,
     };
-    loading.value = true;
-    await handleRecoverByUpload(params)
-        .then(() => {
-            loading.value = false;
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-        })
-        .catch(() => {
-            loading.value = false;
-        });
+    ElMessageBox.confirm(i18n.global.t('commons.msg.recoverHelper'), i18n.global.t('commons.button.recover'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(async () => {
+        loading.value = true;
+        await handleRecoverByUpload(params)
+            .then(() => {
+                loading.value = false;
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
 };
 
 const uploaderFiles = ref<UploadFiles>([]);
@@ -247,7 +259,7 @@ const submitUpload = async (file: any) => {
                     const progress = Math.round(
                         ((uploadedChunkCount + progressEvent.loaded / progressEvent.total) * 100) / chunkCount,
                     );
-                    uploadPrecent.value = progress;
+                    uploadPercent.value = progress;
                 },
             });
             uploadedChunkCount++;

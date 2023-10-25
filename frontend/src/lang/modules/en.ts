@@ -123,6 +123,7 @@ const message = {
             confirmNoNull: 'Make sure the value {0} is not empty',
             errPort: 'Incorrect port information, please confirm!',
             remove: 'Remove',
+            recoverHelper: 'The current data will be overwritten. Do you want to continue?',
         },
         login: {
             username: 'UserName',
@@ -383,6 +384,8 @@ const message = {
         version: 'DB version',
         userHelper: 'The root user or a database user with root privileges can access the remote database.',
 
+        formatHelper:
+            'The current database character set is {0}, the character set inconsistency may cause recovery failure',
         selectFile: 'Select file',
         dropHelper: 'You can drag and drop the uploaded file here or',
         clickHelper: 'click to upload',

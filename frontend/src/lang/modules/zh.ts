@@ -124,6 +124,7 @@ const message = {
             confirmNoNull: '请确认 {0} 值不为空',
             errPort: '错误的端口信息，请确认！',
             remove: '移出',
+            recoverHelper: '当前数据将被覆盖，是否继续？',
         },
         login: {
             username: '用户名',
@@ -374,6 +375,7 @@ const message = {
         version: '数据库版本',
         userHelper: 'root 用户或者拥有 root 权限的数据库用户',
 
+        formatHelper: '当前数据库字符集为 {0}，字符集不一致可能导致恢复失败',
         selectFile: '选择文件',
         dropHelper: '将上传文件拖拽到此处，或者',
         clickHelper: '点击上传',

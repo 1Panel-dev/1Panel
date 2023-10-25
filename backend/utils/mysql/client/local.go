@@ -233,7 +233,7 @@ func (r *Local) Backup(info BackupInfo) error {
 func (r *Local) Recover(info RecoverInfo) error {
 	fi, _ := os.Open(info.SourceFile)
 	defer fi.Close()
-	cmd := exec.Command("docker", "exec", "-i", r.ContainerName, "mysql", "-uroot", "-p"+r.Password, info.Name)
+	cmd := exec.Command("docker", "exec", "-i", r.ContainerName, "mysql", "-uroot", "-p"+r.Password, "--default-character-set="+info.Format, info.Name)
 	if strings.HasSuffix(info.SourceFile, ".gz") {
 		gzipFile, err := os.Open(info.SourceFile)
 		if err != nil {
