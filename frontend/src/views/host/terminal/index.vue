@@ -59,32 +59,22 @@ onUnmounted(() => {
 
 <style lang="scss">
 .router_card {
-    --el-card-border-radius: 8px;
-    --el-card-padding: 0 !important;
-    padding: 0px;
-    padding-bottom: 2px;
-    padding-top: 2px;
+    --el-card-padding: 0;
 }
+
 .router_card_button {
-    margin-left: 2px;
     .el-radio-button__inner {
         min-width: 100px;
         height: 100%;
-        border: 0 !important;
+        background-color: var(--panel-button-active) !important;
+        box-shadow: none !important;
+        border: 2px solid transparent !important;
     }
 
     .el-radio-button__original-radio:checked + .el-radio-button__inner {
-        border-radius: 3px;
         color: $primary-color;
-        background-color: var(--panel-button-active);
-        box-shadow: 0 0 0 2px $primary-color !important;
-    }
-
-    .el-radio-button:first-child .el-radio-button__inner {
-        border-radius: 3px;
-        color: $primary-color;
-        background-color: var(--panel-button-active);
-        box-shadow: 0 0 0 2px $primary-color !important;
+        border-color: $primary-color !important;
+        border-radius: 4px;
     }
 }
 </style>

@@ -159,7 +159,7 @@
             </template>
         </el-dialog>
 
-        <OperatrDialog @search="search" ref="dialogRef" />
+        <OperateDialog @search="search" ref="dialogRef" />
         <Records @search="search" ref="dialogRecordRef" />
     </div>
 </template>
@@ -167,7 +167,7 @@
 <script lang="ts" setup>
 import TableSetting from '@/components/table-setting/index.vue';
 import Tooltip from '@/components/tooltip/index.vue';
-import OperatrDialog from '@/views/cronjob/operate/index.vue';
+import OperateDialog from '@/views/cronjob/operate/index.vue';
 import Records from '@/views/cronjob/record/index.vue';
 import { loadZero } from '@/utils/util';
 import { onMounted, reactive, ref } from 'vue';
