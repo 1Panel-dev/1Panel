@@ -21,6 +21,14 @@ export const updatePassword = (param: Setting.PasswordUpdate) => {
     return http.post(`/settings/password/update`, param);
 };
 
+export const loadInterfaceAddr = () => {
+    return http.get(`/settings/interface`);
+};
+
+export const updateBindInfo = (ipv6: string, bindAddress: string) => {
+    return http.post(`/settings/bind/update`, { ipv6: ipv6, bindAddress: bindAddress });
+};
+
 export const updatePort = (param: Setting.PortUpdate) => {
     return http.post(`/settings/port/update`, param);
 };

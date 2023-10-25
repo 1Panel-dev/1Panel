@@ -14,6 +14,8 @@ type SettingInfo struct {
 	NtpSite        string `json:"ntpSite"`
 
 	Port           string `json:"port"`
+	Ipv6           string `json:"ipv6"`
+	BindAddress    string `json:"bindAddress"`
 	PanelName      string `json:"panelName"`
 	Theme          string `json:"theme"`
 	Language       string `json:"language"`
@@ -134,6 +136,11 @@ type UpgradeInfo struct {
 
 type SyncTime struct {
 	NtpSite string `json:"ntpSite"`
+}
+
+type BindInfo struct {
+	Ipv6        string `json:"ipv6" validate:"required,oneof=enable disable"`
+	BindAddress string `json:"bindAddress" validate:"required"`
 }
 
 type Upgrade struct {

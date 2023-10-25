@@ -4,10 +4,10 @@ import (
 	"crypto/tls"
 	"encoding/gob"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"path"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/init/app"
 	"github.com/1Panel-dev/1Panel/backend/init/business"
@@ -26,7 +26,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/init/validator"
 	"github.com/1Panel-dev/1Panel/backend/init/viper"
 
-	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
 )
 
@@ -46,19 +45,17 @@ func Start() {
 	hook.Init()
 
 	rootRouter := router.Routers()
-	address := fmt.Sprintf(":%s", global.CONF.System.Port)
-	s := endless.NewServer(address, rootRouter)
-	s.ReadHeaderTimeout = 20 * time.Second
-	s.WriteTimeout = 60 * time.Second
-	s.MaxHeaderBytes = 1 << 20
 
-	if global.CONF.System.SSL == "disable" {
-		global.LOG.Infof("server run success on %s with http", global.CONF.System.Port)
-		if err := s.ListenAndServe(); err != nil {
-			global.LOG.Error(err)
-			panic(err)
-		}
-	} else {
+	tcpItem := "tcp4"
+	if global.CONF.System.Ipv6 == "enable" {
+		tcpItem = "tcp"
+		global.CONF.System.BindAddress = fmt.Sprintf("[%s]", global.CONF.System.BindAddress)
+	}
+	server := &http.Server{
+		Addr:    global.CONF.System.BindAddress + ":" + global.CONF.System.Port,
+		Handler: rootRouter,
+	}
+	if global.CONF.System.SSL == "enable" {
 		certificate, err := os.ReadFile(path.Join(global.CONF.System.BaseDir, "1panel/secret/server.crt"))
 		if err != nil {
 			panic(err)
@@ -71,18 +68,19 @@ func Start() {
 		if err != nil {
 			panic(err)
 		}
-		s := &http.Server{
-			Addr:    address,
-			Handler: rootRouter,
-			TLSConfig: &tls.Config{
-				Certificates: []tls.Certificate{cert},
-			},
+		server.TLSConfig = &tls.Config{
+			Certificates: []tls.Certificate{cert},
 		}
-
-		global.LOG.Infof("server run success on %s with https", global.CONF.System.Port)
-		if err := s.ListenAndServeTLS("", ""); err != nil {
-			global.LOG.Error(err)
-			panic(err)
-		}
+	}
+	global.LOG.Infof("listen at %s:%s [%s]", global.CONF.System.BindAddress, global.CONF.System.Port, tcpItem)
+	ln, err := net.Listen(tcpItem, global.CONF.System.BindAddress+":"+global.CONF.System.Port)
+	if err != nil {
+		panic(err)
+	}
+	type tcpKeepAliveListener struct {
+		*net.TCPListener
+	}
+	if err := server.Serve(tcpKeepAliveListener{ln.(*net.TCPListener)}); err != nil {
+		panic(err)
 	}
 }

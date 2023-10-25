@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
+	"net"
 	"os"
 	"path"
 	"strconv"
@@ -30,10 +31,12 @@ type SettingService struct{}
 
 type ISettingService interface {
 	GetSettingInfo() (*dto.SettingInfo, error)
+	LoadInterfaceAddr() ([]string, error)
 	LoadTimeZone() ([]string, error)
 	Update(key, value string) error
 	UpdatePassword(c *gin.Context, old, new string) error
 	UpdatePort(port uint) error
+	UpdateBindInfo(req dto.BindInfo) error
 	UpdateSSL(c *gin.Context, req dto.SSLUpdate) error
 	LoadFromCert() (*dto.SSLInfo, error)
 	HandlePasswordExpired(c *gin.Context, old, new string) error
@@ -157,6 +160,41 @@ func (u *SettingService) SyncTime(req dto.SyncTime) error {
 	if err := ntp.UpdateSystemTime(ts); err != nil {
 		return err
 	}
+	return nil
+}
+
+func (u *SettingService) LoadInterfaceAddr() ([]string, error) {
+	addrMap := make(map[string]struct{})
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return nil, err
+	}
+	for _, addr := range addrs {
+		ipNet, ok := addr.(*net.IPNet)
+		if ok && ipNet.IP.To16() != nil {
+			addrMap[ipNet.IP.String()] = struct{}{}
+		}
+	}
+	var data []string
+	for key := range addrMap {
+		data = append(data, key)
+	}
+	return data, nil
+}
+
+func (u *SettingService) UpdateBindInfo(req dto.BindInfo) error {
+	if err := settingRepo.Update("Ipv6", req.Ipv6); err != nil {
+		return err
+	}
+	if err := settingRepo.Update("BindAddress", req.BindAddress); err != nil {
+		return err
+	}
+	go func() {
+		_, err := cmd.Exec("systemctl restart 1panel.service")
+		if err != nil {
+			global.LOG.Errorf("restart system with new bind info failed, err: %v", err)
+		}
+	}()
 	return nil
 }
 

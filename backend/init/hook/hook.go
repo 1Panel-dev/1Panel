@@ -18,6 +18,16 @@ func Init() {
 		global.LOG.Errorf("load service port from setting failed, err: %v", err)
 	}
 	global.CONF.System.Port = portSetting.Value
+	ipv6Setting, err := settingRepo.Get(settingRepo.WithByKey("Ipv6"))
+	if err != nil {
+		global.LOG.Errorf("load ipv6 status from setting failed, err: %v", err)
+	}
+	global.CONF.System.Ipv6 = ipv6Setting.Value
+	bindAddressSetting, err := settingRepo.Get(settingRepo.WithByKey("BindAddress"))
+	if err != nil {
+		global.LOG.Errorf("load bind address from setting failed, err: %v", err)
+	}
+	global.CONF.System.BindAddress = bindAddressSetting.Value
 	sslSetting, err := settingRepo.Get(settingRepo.WithByKey("SSL"))
 	if err != nil {
 		global.LOG.Errorf("load service ssl from setting failed, err: %v", err)

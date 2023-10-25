@@ -2,6 +2,8 @@ package configs
 
 type System struct {
 	Port           string `mapstructure:"port"`
+	Ipv6           string `mapstructure:"ipv6"`
+	BindAddress    string `mapstructure:"bindAddress"`
 	SSL            string `mapstructure:"ssl"`
 	DbFile         string `mapstructure:"db_file"`
 	DbPath         string `mapstructure:"db_path"`
