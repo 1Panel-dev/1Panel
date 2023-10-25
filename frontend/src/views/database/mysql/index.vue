@@ -546,6 +546,7 @@ const buttons = [
                 type: currentDB.value.type,
                 name: currentDBName.value,
                 detailName: row.name,
+                remark: row.format,
             };
             uploadRef.value!.acceptParams(params);
         },

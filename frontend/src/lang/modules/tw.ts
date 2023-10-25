@@ -124,6 +124,7 @@ const message = {
             confirmNoNull: '請確認 {0} 值不為空',
             errPort: '錯誤的端口信息，請確認！',
             remove: '移出',
+            recoverHelper: '當前數據將被覆蓋，是否繼續？',
         },
         login: {
             username: '用戶名',
@@ -374,6 +375,7 @@ const message = {
         version: '數據庫版本',
         userHelper: 'root 用戶或者擁有 root 權限的數據庫用戶',
 
+        formatHelper: '當前資料庫字符集為 {0}，字符集不一致可能導致恢復失敗',
         selectFile: '選擇文件',
         dropHelper: '將上傳文件拖拽到此處，或者',
         clickHelper: '點擊上傳',
