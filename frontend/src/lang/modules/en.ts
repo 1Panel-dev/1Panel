@@ -1828,6 +1828,8 @@ const message = {
         module: 'Module',
         nodeOperatorHelper:
             'Is {0} {1} module? The operation may cause abnormality in the operating environment, please confirm before proceeding',
+        customScript: 'Custom startup command',
+        customScriptHelper: 'Please fill in the complete startup command, for example: npm run start',
     },
     process: {
         pid: 'Process ID',
