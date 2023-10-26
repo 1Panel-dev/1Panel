@@ -1833,6 +1833,7 @@ const message = {
             'Is {0} {1} module? The operation may cause abnormality in the operating environment, please confirm before proceeding',
         customScript: 'Custom startup command',
         customScriptHelper: 'Please fill in the complete startup command, for example: npm run start',
+        portError: 'Cannot fill in the same port',
     },
     process: {
         pid: 'Process ID',

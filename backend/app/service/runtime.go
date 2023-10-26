@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
@@ -20,6 +21,7 @@ import (
 	"github.com/subosito/gotenv"
 	"os"
 	"path"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -286,7 +288,26 @@ func (r *RuntimeService) Get(id uint) (*response.RuntimeDTO, error) {
 				}
 				res.Params[k] = port
 			default:
-				res.Params[k] = v
+				if strings.Contains(k, "CONTAINER_PORT") || strings.Contains(k, "HOST_PORT") {
+					if strings.Contains(k, "CONTAINER_PORT") {
+						r := regexp.MustCompile(`_(\d+)$`)
+						matches := r.FindStringSubmatch(k)
+						containerPort, err := strconv.Atoi(v)
+						if err != nil {
+							return nil, err
+						}
+						hostPort, err := strconv.Atoi(envs[fmt.Sprintf("HOST_PORT_%s", matches[1])])
+						if err != nil {
+							return nil, err
+						}
+						res.ExposedPorts = append(res.ExposedPorts, request.ExposedPort{
+							ContainerPort: containerPort,
+							HostPort:      hostPort,
+						})
+					}
+				} else {
+					res.Params[k] = v
+				}
 			}
 		}
 		if v, ok := envs["CONTAINER_PACKAGE_URL"]; ok {
@@ -361,8 +382,9 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 		CodeDir: req.CodeDir,
 		Version: req.Version,
 		NodeConfig: request.NodeConfig{
-			Port:    req.Port,
-			Install: true,
+			Port:         req.Port,
+			Install:      true,
+			ExposedPorts: req.ExposedPorts,
 		},
 	}
 	composeContent, envContent, _, err := handleParams(create, projectDir)
