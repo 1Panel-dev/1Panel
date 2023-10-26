@@ -15,7 +15,7 @@
                         <el-button type="primary" plain @click="onClean()">
                             {{ $t('container.containerPrune') }}
                         </el-button>
-                        <el-button-group style="margin-left: 10px">
+                        <el-button-group class="ml-4">
                             <el-button :disabled="checkStatus('start', null)" @click="onOperate('start', null)">
                                 {{ $t('container.start') }}
                             </el-button>
@@ -241,10 +241,12 @@
             </template>
         </LayoutContent>
 
-        <CodemirrorDialog ref="mydetail" />
+        <OpDialog ref="opRef" @search="search" />
+
+        <CodemirrorDialog ref="myDetail" />
         <PruneDialog @search="search" ref="dialogPruneRef" />
 
-        <ReNameDialog @search="search" ref="dialogReNameRef" />
+        <RenameDialog @search="search" ref="dialogRenameRef" />
         <ContainerLogDialog ref="dialogContainerLogRef" />
         <OperateDialog @search="search" ref="dialogOperateRef" />
         <UpgradeDialog @search="search" ref="dialogUpgradeRef" />
@@ -252,27 +254,27 @@
         <TerminalDialog ref="dialogTerminalRef" />
 
         <PortJumpDialog ref="dialogPortJumpRef" />
-        <HandleDialog @search="search" ref="handleRef" />
     </div>
 </template>
 
 <script lang="ts" setup>
+import OpDialog from '@/components/del-dialog/index.vue';
 import Tooltip from '@/components/tooltip/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import PruneDialog from '@/views/container/container/prune/index.vue';
-import ReNameDialog from '@/views/container/container/rename/index.vue';
+import RenameDialog from '@/views/container/container/rename/index.vue';
 import OperateDialog from '@/views/container/container/operate/index.vue';
 import UpgradeDialog from '@/views/container/container/upgrade/index.vue';
 import MonitorDialog from '@/views/container/container/monitor/index.vue';
 import ContainerLogDialog from '@/views/container/container/log/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
-import HandleDialog from '@/views/container/container/handle/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import Status from '@/components/status/index.vue';
 import { reactive, onMounted, ref, computed } from 'vue';
 import {
     containerListStats,
+    containerOperator,
     inspect,
     loadContainerInfo,
     loadDockerStatus,
@@ -289,7 +291,7 @@ const mobile = computed(() => {
     return globalStore.isMobile();
 });
 
-const loading = ref();
+const loading = ref(false);
 const data = ref();
 const selects = ref<any>([]);
 const paginationConfig = reactive({
@@ -304,7 +306,7 @@ const searchName = ref();
 const searchState = ref('all');
 const dialogUpgradeRef = ref();
 const dialogPortJumpRef = ref();
-const handleRef = ref();
+const opRef = ref();
 
 const dockerStatus = ref('Running');
 const loadStatus = async () => {
@@ -347,10 +349,10 @@ const props = withDefaults(defineProps<Filters>(), {
     filters: '',
 });
 
-const mydetail = ref();
+const myDetail = ref();
 
 const dialogContainerLogRef = ref();
-const dialogReNameRef = ref();
+const dialogRenameRef = ref();
 const dialogPruneRef = ref();
 
 const search = async (column?: any) => {
@@ -511,7 +513,7 @@ const onInspect = async (id: string) => {
         header: i18n.global.t('commons.button.view'),
         detailInfo: detailInfo,
     };
-    mydetail.value!.acceptParams(param);
+    myDetail.value!.acceptParams(param);
 };
 
 const onClean = () => {
@@ -554,17 +556,24 @@ const checkStatus = (operation: string, row: Container.ContainerInfo | null) => 
             return false;
     }
 };
-const onOperate = async (operation: string, row: Container.ContainerInfo | null) => {
+
+const onOperate = async (op: string, row: Container.ContainerInfo | null) => {
     let opList = row ? [row] : selects.value;
-    let msg = i18n.global.t('container.operatorHelper', [i18n.global.t('container.' + operation)]);
-    let containers = [];
+    let msg = i18n.global.t('container.operatorHelper', [i18n.global.t('container.' + op)]);
+    let names = [];
     for (const item of opList) {
-        containers.push(item.name);
+        names.push(item.name);
         if (item.isFromApp) {
-            msg = i18n.global.t('container.operatorAppHelper', [i18n.global.t('container.' + operation)]);
+            msg = i18n.global.t('container.operatorAppHelper', [i18n.global.t('container.' + op)]);
         }
     }
-    handleRef.value.acceptParams({ containers: containers, operation: operation, msg: msg });
+    opRef.value.acceptParams({
+        title: i18n.global.t('container.' + op),
+        names: names,
+        msg: msg,
+        api: containerOperator,
+        params: { names: names, operation: op },
+    });
 };
 
 const buttons = [
@@ -607,7 +616,7 @@ const buttons = [
     {
         label: i18n.global.t('container.rename'),
         click: (row: Container.ContainerInfo) => {
-            dialogReNameRef.value!.acceptParams({ container: row.name });
+            dialogRenameRef.value!.acceptParams({ container: row.name });
         },
         disabled: (row: any) => {
             return row.isFromCompose;

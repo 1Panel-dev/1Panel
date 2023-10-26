@@ -19,8 +19,8 @@ export const editCronjob = (params: Cronjob.CronjobUpdate) => {
     return http.post(`/cronjobs/update`, params);
 };
 
-export const deleteCronjob = (ids: number[], cleanData: boolean) => {
-    return http.post(`/cronjobs/del`, { ids: ids, cleanData: cleanData });
+export const deleteCronjob = (params: Cronjob.CronjobDelete) => {
+    return http.post(`/cronjobs/del`, params);
 };
 
 export const searchRecords = (params: Cronjob.SearchRecord) => {

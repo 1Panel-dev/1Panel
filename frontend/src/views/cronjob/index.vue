@@ -15,15 +15,17 @@
                         <el-button type="primary" @click="onOpenDialog('create')">
                             {{ $t('commons.button.create') }}{{ $t('cronjob.cronTask') }}
                         </el-button>
-                        <el-button plain :disabled="selects.length === 0" @click="onBatchChangeStatus('enable')">
-                            {{ $t('commons.button.enable') }}
-                        </el-button>
-                        <el-button plain :disabled="selects.length === 0" @click="onBatchChangeStatus('disable')">
-                            {{ $t('commons.button.disable') }}
-                        </el-button>
-                        <el-button plain :disabled="selects.length === 0" @click="onDelete(null)">
-                            {{ $t('commons.button.delete') }}
-                        </el-button>
+                        <el-button-group class="ml-4">
+                            <el-button plain :disabled="selects.length === 0" @click="onBatchChangeStatus('enable')">
+                                {{ $t('commons.button.enable') }}
+                            </el-button>
+                            <el-button plain :disabled="selects.length === 0" @click="onBatchChangeStatus('disable')">
+                                {{ $t('commons.button.disable') }}
+                            </el-button>
+                            <el-button plain :disabled="selects.length === 0" @click="onDelete(null)">
+                                {{ $t('commons.button.delete') }}
+                            </el-button>
+                        </el-button-group>
                     </el-col>
                     <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
                         <TableSetting @search="search()" />
@@ -133,38 +135,25 @@
             </template>
         </LayoutContent>
 
-        <el-dialog
-            v-model="deleteVisible"
-            :title="$t('commons.button.clean')"
-            width="30%"
-            :close-on-click-modal="false"
-        >
-            <el-form ref="deleteForm" label-position="left" v-loading="delLoading">
-                <el-form-item>
-                    <el-checkbox v-model="cleanData" :label="$t('cronjob.cleanData')" />
-                    <span class="input-help">
-                        {{ $t('cronjob.cleanDataHelper') }}
-                    </span>
-                </el-form-item>
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="deleteVisible = false" :disabled="delLoading">
-                        {{ $t('commons.button.cancel') }}
-                    </el-button>
-                    <el-button type="primary" @click="onSubmitDelete">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </span>
+        <OpDialog ref="opRef" @search="search">
+            <template #content>
+                <el-form class="mt-4 mb-1" v-if="showClean" ref="deleteForm" label-position="left">
+                    <el-form-item>
+                        <el-checkbox v-model="cleanData" :label="$t('cronjob.cleanData')" />
+                        <span class="input-help">
+                            {{ $t('cronjob.cleanDataHelper') }}
+                        </span>
+                    </el-form-item>
+                </el-form>
             </template>
-        </el-dialog>
-
+        </OpDialog>
         <OperateDialog @search="search" ref="dialogRef" />
         <Records @search="search" ref="dialogRecordRef" />
     </div>
 </template>
 
 <script lang="ts" setup>
+import OpDialog from '@/components/del-dialog/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import Tooltip from '@/components/tooltip/index.vue';
 import OperateDialog from '@/views/cronjob/operate/index.vue';
@@ -181,6 +170,10 @@ const loading = ref();
 const selects = ref<any>([]);
 const isRecordShow = ref();
 
+const opRef = ref();
+const showClean = ref();
+const cleanData = ref();
+
 const data = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'cronjob-page-size',
@@ -191,11 +184,6 @@ const paginationConfig = reactive({
     order: 'null',
 });
 const searchName = ref();
-
-const deleteVisible = ref();
-const deleteCronjobID = ref();
-const delLoading = ref();
-const cleanData = ref();
 
 const weekOptions = [
     { label: i18n.global.t('cronjob.monday'), value: 1 },
@@ -259,71 +247,35 @@ const onOpenDialog = async (
 };
 
 const onDelete = async (row: Cronjob.CronjobInfo | null) => {
+    let names = [];
+    let ids = [];
+    showClean.value = false;
+    cleanData.value = false;
     if (row) {
-        deleteCronjobID.value = row.id;
-        if (row.type !== 'database' && row.type !== 'website' && row.type !== 'directory') {
-            deleteMessageBox();
-            return;
+        ids = [row.id];
+        names = [row.name];
+        if (row.type === 'database' || row.type === 'website' || row.type === 'directory') {
+            showClean.value = true;
         }
-        deleteVisible.value = true;
     } else {
-        deleteCronjobID.value = 0;
         for (const item of selects.value) {
+            names.push(item.name);
+            ids.push(item.id);
             if (item.type === 'database' || item.type === 'website' || item.type === 'directory') {
-                deleteVisible.value = true;
-                return;
+                showClean.value = true;
             }
         }
-        deleteMessageBox();
     }
-};
-
-const deleteMessageBox = async () => {
-    let ids: Array<number> = [];
-    if (deleteCronjobID.value) {
-        ids.push(deleteCronjobID.value);
-    } else {
-        selects.value.forEach((item: Cronjob.CronjobInfo) => {
-            ids.push(item.id);
-        });
-    }
-    ElMessageBox.confirm(i18n.global.t('commons.msg.delete'), i18n.global.t('commons.msg.deleteTitle'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-        type: 'info',
-    }).then(async () => {
-        await deleteCronjob(ids, false)
-            .then(() => {
-                delLoading.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                search();
-            })
-            .catch(() => {
-                delLoading.value = false;
-            });
+    opRef.value.acceptParams({
+        title: i18n.global.t('commons.button.delete'),
+        names: names,
+        msg: i18n.global.t('commons.msg.operatorHelper', [
+            i18n.global.t('cronjob.cronTask'),
+            i18n.global.t('commons.button.delete'),
+        ]),
+        api: deleteCronjob,
+        params: { ids: ids, cleanData: cleanData.value },
     });
-};
-
-const onSubmitDelete = async () => {
-    let ids: Array<number> = [];
-    if (deleteCronjobID.value) {
-        ids.push(deleteCronjobID.value);
-    } else {
-        selects.value.forEach((item: Cronjob.CronjobInfo) => {
-            ids.push(item.id);
-        });
-    }
-    delLoading.value = true;
-    await deleteCronjob(ids, cleanData.value)
-        .then(() => {
-            delLoading.value = false;
-            deleteVisible.value = false;
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            search();
-        })
-        .catch(() => {
-            delLoading.value = false;
-        });
 };
 
 const onChangeStatus = async (id: number, status: string) => {

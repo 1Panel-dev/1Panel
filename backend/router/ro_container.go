@@ -30,6 +30,7 @@ func (s *ContainerRouter) InitContainerRouter(Router *gin.RouterGroup) {
 		baRouter.POST("/clean/log", baseApi.CleanContainerLog)
 		baRouter.POST("/load/log", baseApi.LoadContainerLog)
 		baRouter.POST("/inspect", baseApi.Inspect)
+		baRouter.POST("/rename", baseApi.ContainerRename)
 		baRouter.POST("/operate", baseApi.ContainerOperation)
 		baRouter.POST("/prune", baseApi.ContainerPrune)
 

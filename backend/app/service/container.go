@@ -52,6 +52,7 @@ type IContainerService interface {
 	ContainerInfo(req dto.OperationWithName) (*dto.ContainerOperate, error)
 	ContainerListStats() ([]dto.ContainerListStats, error)
 	LoadResourceLimit() (*dto.ResourceLimit, error)
+	ContainerRename(req dto.ContainerRename) error
 	ContainerLogClean(req dto.OperationWithName) error
 	ContainerOperation(req dto.ContainerOperation) error
 	ContainerLogs(wsConn *websocket.Conn, container, since, tail string, follow bool) error
@@ -514,6 +515,20 @@ func (u *ContainerService) ContainerUpgrade(req dto.ContainerUpgrade) error {
 	return nil
 }
 
+func (u *ContainerService) ContainerRename(req dto.ContainerRename) error {
+	ctx := context.Background()
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return err
+	}
+
+	newContainer, _ := client.ContainerInspect(ctx, req.NewName)
+	if newContainer.ContainerJSONBase != nil {
+		return buserr.New(constant.ErrContainerName)
+	}
+	return client.ContainerRename(ctx, req.Name, req.NewName)
+}
+
 func (u *ContainerService) ContainerOperation(req dto.ContainerOperation) error {
 	var err error
 	ctx := context.Background()
@@ -521,28 +536,24 @@ func (u *ContainerService) ContainerOperation(req dto.ContainerOperation) error 
 	if err != nil {
 		return err
 	}
-	global.LOG.Infof("start container %s operation %s", req.Name, req.Operation)
-	switch req.Operation {
-	case constant.ContainerOpStart:
-		err = client.ContainerStart(ctx, req.Name, types.ContainerStartOptions{})
-	case constant.ContainerOpStop:
-		err = client.ContainerStop(ctx, req.Name, container.StopOptions{})
-	case constant.ContainerOpRestart:
-		err = client.ContainerRestart(ctx, req.Name, container.StopOptions{})
-	case constant.ContainerOpKill:
-		err = client.ContainerKill(ctx, req.Name, "SIGKILL")
-	case constant.ContainerOpPause:
-		err = client.ContainerPause(ctx, req.Name)
-	case constant.ContainerOpUnpause:
-		err = client.ContainerUnpause(ctx, req.Name)
-	case constant.ContainerOpRename:
-		newContainer, _ := client.ContainerInspect(ctx, req.NewName)
-		if newContainer.ContainerJSONBase != nil {
-			return buserr.New(constant.ErrContainerName)
+	for _, item := range req.Names {
+		global.LOG.Infof("start container %s operation %s", item, req.Operation)
+		switch req.Operation {
+		case constant.ContainerOpStart:
+			err = client.ContainerStart(ctx, item, types.ContainerStartOptions{})
+		case constant.ContainerOpStop:
+			err = client.ContainerStop(ctx, item, container.StopOptions{})
+		case constant.ContainerOpRestart:
+			err = client.ContainerRestart(ctx, item, container.StopOptions{})
+		case constant.ContainerOpKill:
+			err = client.ContainerKill(ctx, item, "SIGKILL")
+		case constant.ContainerOpPause:
+			err = client.ContainerPause(ctx, item)
+		case constant.ContainerOpUnpause:
+			err = client.ContainerUnpause(ctx, item)
+		case constant.ContainerOpRemove:
+			err = client.ContainerRemove(ctx, item, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
 		}
-		err = client.ContainerRename(ctx, req.Name, req.NewName)
-	case constant.ContainerOpRemove:
-		err = client.ContainerRemove(ctx, req.Name, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
 	}
 	return err
 }

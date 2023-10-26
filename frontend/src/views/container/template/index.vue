@@ -57,6 +57,7 @@
             </template>
         </LayoutContent>
 
+        <OpDialog ref="opRef" @search="search" />
         <DetailDialog ref="detailRef" />
         <OperatorDialog @search="search" ref="dialogRef" />
     </div>
@@ -64,6 +65,7 @@
 
 <script lang="ts" setup>
 import Tooltip from '@/components/tooltip/index.vue';
+import OpDialog from '@/components/del-dialog/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import { reactive, onMounted, ref } from 'vue';
 import { dateFormatSimple } from '@/utils/util';
@@ -71,7 +73,6 @@ import { Container } from '@/api/interface/container';
 import DetailDialog from '@/views/container/template/detail/index.vue';
 import OperatorDialog from '@/views/container/template/operator/index.vue';
 import { deleteComposeTemplate, loadDockerStatus, searchComposeTemplate } from '@/api/modules/container';
-import { useDeleteData } from '@/hooks/use-delete-data';
 import i18n from '@/lang';
 import router from '@/routers';
 
@@ -88,6 +89,7 @@ const paginationConfig = reactive({
 const searchName = ref();
 
 const detailRef = ref();
+const opRef = ref();
 
 const dockerStatus = ref('Running');
 const loadStatus = async () => {
@@ -148,16 +150,27 @@ const onOpenDialog = async (
 };
 
 const onBatchDelete = async (row: Container.RepoInfo | null) => {
-    let ids: Array<number> = [];
+    let ids = [];
+    let names = [];
     if (row) {
+        names.push(row.name);
         ids.push(row.id);
     } else {
         selects.value.forEach((item: Container.RepoInfo) => {
+            names.push(item.name);
             ids.push(item.id);
         });
     }
-    await useDeleteData(deleteComposeTemplate, { ids: ids }, 'commons.msg.delete');
-    search();
+    opRef.value.acceptParams({
+        title: i18n.global.t('commons.button.delete'),
+        names: names,
+        msg: i18n.global.t('commons.msg.operatorHelper', [
+            i18n.global.t('container.composeTemplate'),
+            i18n.global.t('commons.button.delete'),
+        ]),
+        api: deleteComposeTemplate,
+        params: { ids: ids },
+    });
 };
 
 const buttons = [

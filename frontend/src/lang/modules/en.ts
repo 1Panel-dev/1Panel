@@ -114,6 +114,7 @@ const message = {
             operateConfirm: 'If you are sure about the operation, please input it manually',
             inputOrSelect: 'Please select or enter',
             copyFailed: 'Copy failed',
+            operatorHelper: 'Would you like to continue performing {1} operation on {0}?',
             notFound: 'Sorry, the page you requested does not exist.',
             unSupportType: 'Current file type is not supported!',
             unSupportSize: 'The uploaded file exceeds {0}M, please confirm!',
@@ -502,7 +503,7 @@ const message = {
         containerList: 'Container list',
         operatorHelper: '{0} will be performed on the following container, Do you want to continue?',
         operatorAppHelper:
-            'The {0} operation will be performed on the following containers, some of which are from the App Store. This operation may affect the normal use of the service, Do you want to continue?',
+            'The {0} operation will be performed on the following containers,\n some of which are from the App Store. This operation may affect the normal use of the service. \nDo you want to continue?',
         start: 'Start',
         stop: 'Stop',
         restart: 'Restart',
@@ -845,7 +846,7 @@ const message = {
         quickCommand: 'Quick command',
         quickCommandHelper: 'Frequently used command list for quick selection at the bottom of the terminal interface',
         groupDeleteHelper:
-            'After the group is removed, all connections in the group will be migrated to the default group. Confirm the information',
+            'After the group is removed, all connections in the group will be migrated to the default group. Do you want to continue?',
         command: 'Command',
         quickCmd: 'Quick command',
         addHost: 'Add Host',

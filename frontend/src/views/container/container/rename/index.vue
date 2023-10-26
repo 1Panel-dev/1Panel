@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts" setup>
-import { containerOperator } from '@/api/modules/container';
+import { containerRename } from '@/api/modules/container';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -38,7 +38,6 @@ const loading = ref(false);
 
 const renameForm = reactive({
     name: '',
-    operation: 'rename',
     newName: '',
 });
 
@@ -54,7 +53,7 @@ const onSubmitName = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         loading.value = true;
-        await containerOperator(renameForm)
+        await containerRename(renameForm)
             .then(() => {
                 loading.value = false;
                 emit('search');

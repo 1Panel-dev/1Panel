@@ -70,11 +70,14 @@
                 </ComplexTable>
             </template>
         </LayoutContent>
+
+        <OpDialog ref="opRef" @search="search" />
         <OperatorDialog @search="search" ref="dialogRef" />
     </div>
 </template>
 
 <script lang="ts" setup>
+import OpDialog from '@/components/del-dialog/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import OperatorDialog from '@/views/container/repo/operator/index.vue';
 import { reactive, onMounted, ref } from 'vue';
@@ -83,7 +86,6 @@ import { Container } from '@/api/interface/container';
 import { checkRepoStatus, deleteImageRepo, loadDockerStatus, searchImageRepo } from '@/api/modules/container';
 import i18n from '@/lang';
 import router from '@/routers';
-import { ElMessageBox } from 'element-plus';
 
 const loading = ref();
 const data = ref();
@@ -95,6 +97,8 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchName = ref();
+
+const opRef = ref();
 
 const dockerStatus = ref('Running');
 const loadStatus = async () => {
@@ -149,12 +153,16 @@ const onOpenDialog = async (
 };
 
 const onDelete = async (row: Container.RepoInfo) => {
-    ElMessageBox.confirm(i18n.global.t('commons.msg.delete'), i18n.global.t('commons.button.delete'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-    }).then(async () => {
-        await deleteImageRepo({ ids: [row.id] });
-        search();
+    let ids = [row.id];
+    opRef.value.acceptParams({
+        title: i18n.global.t('commons.button.delete'),
+        names: [row.name],
+        msg: i18n.global.t('commons.msg.operatorHelper', [
+            i18n.global.t('container.repo'),
+            i18n.global.t('commons.button.delete'),
+        ]),
+        api: deleteImageRepo,
+        params: { ids: ids },
     });
 };
 

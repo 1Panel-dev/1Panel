@@ -104,9 +104,13 @@ type PortHelper struct {
 }
 
 type ContainerOperation struct {
-	Name      string `json:"name" validate:"required"`
-	Operation string `json:"operation" validate:"required,oneof=start stop restart kill pause unpause rename remove"`
-	NewName   string `json:"newName"`
+	Names     []string `json:"names" validate:"required"`
+	Operation string   `json:"operation" validate:"required,oneof=start stop restart kill pause unpause remove"`
+}
+
+type ContainerRename struct {
+	Name    string `json:"name" validate:"required"`
+	NewName string `json:"newName"`
 }
 
 type ContainerPrune struct {
