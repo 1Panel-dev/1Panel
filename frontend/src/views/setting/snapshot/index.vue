@@ -139,17 +139,19 @@
                 </span>
             </template>
         </el-drawer>
+
+        <OpDialog ref="opRef" @search="search" />
         <SnapStatus ref="snapStatusRef" @search="search" />
     </div>
 </template>
 
 <script setup lang="ts">
+import OpDialog from '@/components/del-dialog/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { snapshotCreate, searchSnapshotPage, snapshotDelete, updateSnapshotDescription } from '@/api/modules/setting';
 import { onMounted, reactive, ref } from 'vue';
 import { dateFormat } from '@/utils/util';
-import { useDeleteData } from '@/hooks/use-delete-data';
 import { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
@@ -170,6 +172,8 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchName = ref();
+
+const opRef = ref();
 
 const snapStatusRef = ref();
 const recoverStatusRef = ref();
@@ -241,16 +245,27 @@ const loadBackups = async () => {
 };
 
 const batchDelete = async (row: Setting.SnapshotInfo | null) => {
-    let ids: Array<number> = [];
-    if (row === null) {
+    let names = [];
+    let ids = [];
+    if (row) {
+        ids.push(row.id);
+        names.push(row.name);
+    } else {
         selects.value.forEach((item: Setting.SnapshotInfo) => {
             ids.push(item.id);
+            names.push(item.name);
         });
-    } else {
-        ids.push(row.id);
     }
-    await useDeleteData(snapshotDelete, { ids: ids }, 'commons.msg.delete');
-    search();
+    opRef.value.acceptParams({
+        title: i18n.global.t('commons.button.delete'),
+        names: names,
+        msg: i18n.global.t('commons.msg.operatorHelper', [
+            i18n.global.t('setting.snapshot'),
+            i18n.global.t('commons.button.delete'),
+        ]),
+        api: snapshotDelete,
+        params: { ids: ids },
+    });
 };
 
 function restForm() {

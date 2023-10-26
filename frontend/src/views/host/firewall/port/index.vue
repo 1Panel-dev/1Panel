@@ -177,12 +177,14 @@
             </div>
         </div>
 
+        <OpDialog ref="opRef" @search="search" />
         <OperateDialog @search="search" ref="dialogRef" />
     </div>
 </template>
 
 <script lang="ts" setup>
 import FireRouter from '@/views/host/firewall/index.vue';
+import OpDialog from '@/components/del-dialog/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import OperateDialog from '@/views/host/firewall/port/operate/index.vue';
 import FireStatus from '@/views/host/firewall/status/index.vue';
@@ -205,6 +207,8 @@ const maskShow = ref(true);
 const fireStatus = ref('running');
 const fireName = ref();
 const fireStatusRef = ref();
+
+const opRef = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -316,43 +320,40 @@ const onChange = async (info: any) => {
 };
 
 const onDelete = async (row: Host.RuleInfo | null) => {
-    ElMessageBox.confirm(i18n.global.t('commons.msg.delete'), i18n.global.t('commons.msg.deleteTitle'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-        type: 'warning',
-    }).then(async () => {
-        let rules = [];
-        if (row) {
+    let names = [];
+    let rules = [];
+    if (row) {
+        rules.push({
+            operation: 'remove',
+            address: row.address,
+            port: row.port,
+            source: '',
+            protocol: row.protocol,
+            strategy: row.strategy,
+        });
+        names = [row.port + ' (' + row.protocol + ')'];
+    } else {
+        for (const item of selects.value) {
+            names.push(item.port + ' (' + item.protocol + ')');
             rules.push({
                 operation: 'remove',
-                address: row.address,
-                port: row.port,
+                address: item.address,
+                port: item.port,
                 source: '',
-                protocol: row.protocol,
-                strategy: row.strategy,
+                protocol: item.protocol,
+                strategy: item.strategy,
             });
-        } else {
-            for (const item of selects.value) {
-                rules.push({
-                    operation: 'remove',
-                    address: item.address,
-                    port: item.port,
-                    source: '',
-                    protocol: item.protocol,
-                    strategy: item.strategy,
-                });
-            }
         }
-        loading.value = true;
-        await batchOperateRule({ type: 'port', rules: rules })
-            .then(() => {
-                loading.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                search();
-            })
-            .catch(() => {
-                loading.value = false;
-            });
+    }
+    opRef.value.acceptParams({
+        title: i18n.global.t('commons.button.delete'),
+        names: names,
+        msg: i18n.global.t('commons.msg.operatorHelper', [
+            i18n.global.t('firewall.portRule'),
+            i18n.global.t('commons.button.delete'),
+        ]),
+        api: batchOperateRule,
+        params: { type: 'port', rules: rules },
     });
 };
 

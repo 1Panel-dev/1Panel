@@ -36,6 +36,9 @@ export const containerListStats = () => {
 export const containerStats = (id: string) => {
     return http.get<Container.ContainerStats>(`/containers/stats/${id}`);
 };
+export const containerRename = (params: Container.ContainerRename) => {
+    return http.post(`/containers/rename`, params);
+};
 export const containerOperator = (params: Container.ContainerOperate) => {
     return http.post(`/containers/operate`, params);
 };

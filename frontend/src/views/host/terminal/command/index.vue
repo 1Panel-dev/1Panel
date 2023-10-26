@@ -72,14 +72,16 @@
                 </span>
             </template>
         </el-drawer>
+
+        <OpDialog ref="opRef" @search="search" />
     </div>
 </template>
 
 <script setup lang="ts">
 import { Command } from '@/api/interface/command';
+import OpDialog from '@/components/del-dialog/index.vue';
 import { addCommand, editCommand, deleteCommand, getCommandPage } from '@/api/modules/host';
 import { reactive, ref } from 'vue';
-import { useDeleteData } from '@/hooks/use-delete-data';
 import type { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
@@ -96,6 +98,8 @@ const paginationConfig = reactive({
     total: 0,
 });
 const info = ref();
+
+const opRef = ref();
 
 type FormInstance = InstanceType<typeof ElForm>;
 const commandInfoRef = ref<FormInstance>();
@@ -155,16 +159,27 @@ const onEdit = async (row: Command.CommandInfo | null) => {
 };
 
 const batchDelete = async (row: Command.CommandInfo | null) => {
-    let ids: Array<number> = [];
-    if (row === null) {
+    let names = [];
+    let ids = [];
+    if (row) {
+        ids = [row.id];
+        names = [row.name];
+    } else {
         selects.value.forEach((item: Command.CommandInfo) => {
             ids.push(item.id);
+            names.push(item.name);
         });
-    } else {
-        ids.push(row.id);
     }
-    await useDeleteData(deleteCommand, { ids: ids }, 'commons.msg.delete');
-    search();
+    opRef.value.acceptParams({
+        title: i18n.global.t('commons.button.delete'),
+        names: names,
+        msg: i18n.global.t('commons.msg.operatorHelper', [
+            i18n.global.t('terminal.quickCommand'),
+            i18n.global.t('commons.button.delete'),
+        ]),
+        api: deleteCommand,
+        params: { ids: ids },
+    });
 };
 
 const buttons = [

@@ -2,8 +2,11 @@ import { ReqPage } from '.';
 
 export namespace Container {
     export interface ContainerOperate {
-        name: string;
+        names: Array<string>;
         operation: string;
+    }
+    export interface ContainerRename {
+        name: string;
         newName: string;
     }
     export interface ContainerSearch extends ReqPage {

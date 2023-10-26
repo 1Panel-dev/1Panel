@@ -1,49 +1,56 @@
 <template>
-    <el-drawer v-model="deleteVisible" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
-        <template #header>
-            <DrawerHeader :header="$t('container.imageDelete')" :back="handleClose" />
-        </template>
-        <el-form @submit.prevent :model="deleteForm" label-position="top">
-            <el-row type="flex" justify="center">
-                <el-col :span="22">
-                    <el-form-item :label="$t('container.tag')" prop="tagName">
-                        <el-checkbox-group v-model="deleteForm.deleteTags">
-                            <div>
-                                <el-checkbox
-                                    style="width: 100%"
-                                    v-for="item in deleteForm.tags"
-                                    :key="item"
-                                    :value="item"
-                                    :label="item"
-                                />
-                            </div>
-                        </el-checkbox-group>
-                    </el-form-item>
-                </el-col>
-            </el-row>
-        </el-form>
-        <template #footer>
-            <span class="dialog-footer">
-                <el-button @click="deleteVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" :disabled="deleteForm.deleteTags.length === 0" @click="batchDelete()">
-                    {{ $t('commons.button.delete') }}
-                </el-button>
-            </span>
-        </template>
-    </el-drawer>
+    <div>
+        <el-drawer v-model="deleteVisible" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
+            <template #header>
+                <DrawerHeader :header="$t('container.imageDelete')" :back="handleClose" />
+            </template>
+            <el-form @submit.prevent :model="deleteForm" label-position="top">
+                <el-row type="flex" justify="center">
+                    <el-col :span="22">
+                        <el-form-item :label="$t('container.tag')" prop="tagName">
+                            <el-checkbox-group v-model="deleteForm.deleteTags">
+                                <div>
+                                    <el-checkbox
+                                        style="width: 100%"
+                                        v-for="item in deleteForm.tags"
+                                        :key="item"
+                                        :value="item"
+                                        :label="item"
+                                    />
+                                </div>
+                            </el-checkbox-group>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+            </el-form>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="deleteVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button type="primary" :disabled="deleteForm.deleteTags.length === 0" @click="batchDelete()">
+                        {{ $t('commons.button.delete') }}
+                    </el-button>
+                </span>
+            </template>
+        </el-drawer>
+
+        <OpDialog ref="opRef" @search="onSearch" @cancel="handleClose" />
+    </div>
 </template>
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import { ElForm } from 'element-plus';
+import OpDialog from '@/components/del-dialog/index.vue';
 import { imageRemove } from '@/api/modules/container';
-import { useDeleteData } from '@/hooks/use-delete-data';
 import DrawerHeader from '@/components/drawer-header/index.vue';
+import i18n from '@/lang';
 
 const deleteVisible = ref(false);
 const deleteForm = reactive({
     tags: [] as Array<string>,
     deleteTags: [] as Array<string>,
 });
+
+const opRef = ref();
 
 interface DialogProps {
     tags: Array<string>;
@@ -58,14 +65,25 @@ const handleClose = () => {
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
+const onSearch = () => {
+    emit('search');
+};
+
 const batchDelete = async () => {
-    let names: Array<string> = [];
+    let names = [];
     for (const item of deleteForm.deleteTags) {
         names.push(item);
     }
-    await useDeleteData(imageRemove, { names: names }, 'commons.msg.delete');
-    deleteVisible.value = false;
-    emit('search');
+    opRef.value.acceptParams({
+        title: i18n.global.t('commons.button.delete'),
+        names: names,
+        msg: i18n.global.t('commons.msg.operatorHelper', [
+            i18n.global.t('container.image'),
+            i18n.global.t('commons.button.delete'),
+        ]),
+        api: imageRemove,
+        params: { names: names },
+    });
 };
 
 defineExpose({

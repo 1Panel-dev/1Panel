@@ -71,6 +71,7 @@
             </template>
         </LayoutContent>
 
+        <OpDialog ref="opRef" @search="search" />
         <OperateDialog @search="search" ref="dialogRef" />
         <GroupDialog @search="search" ref="dialogGroupRef" />
         <GroupChangeDialog @search="search" ref="dialogGroupChangeRef" />
@@ -79,6 +80,7 @@
 
 <script setup lang="ts">
 import GroupDialog from '@/components/group/index.vue';
+import OpDialog from '@/components/del-dialog/index.vue';
 import GroupChangeDialog from '@/views/host/terminal/host/change-group/index.vue';
 import OperateDialog from '@/views/host/terminal/host/operate/index.vue';
 import { deleteHost, searchHosts } from '@/api/modules/host';
@@ -86,7 +88,6 @@ import { GetGroupList } from '@/api/modules/group';
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { Host } from '@/api/interface/host';
-import { useDeleteData } from '@/hooks/use-delete-data';
 
 const loading = ref();
 const data = ref();
@@ -101,6 +102,8 @@ const paginationConfig = reactive({
 const info = ref();
 const group = ref<string>('');
 const dialogGroupChangeRef = ref();
+
+const opRef = ref();
 
 const acceptParams = () => {
     search();
@@ -131,16 +134,27 @@ const onOpenGroupDialog = () => {
 };
 
 const onBatchDelete = async (row: Host.Host | null) => {
-    let ids: Array<number> = [];
+    let names = [];
+    let ids = [];
     if (row) {
-        ids.push(row.id);
+        names = [row.name + '[' + row.addr + ']'];
+        ids = [row.id];
     } else {
         selects.value.forEach((item: Host.Host) => {
+            names.push(item.name + '[' + item.addr + ']');
             ids.push(item.id);
         });
     }
-    await useDeleteData(deleteHost, { ids: ids }, 'commons.msg.delete');
-    search();
+    opRef.value.acceptParams({
+        title: i18n.global.t('commons.button.delete'),
+        names: names,
+        msg: i18n.global.t('commons.msg.operatorHelper', [
+            i18n.global.t('terminal.host'),
+            i18n.global.t('commons.button.delete'),
+        ]),
+        api: deleteHost,
+        params: { ids: ids },
+    });
 };
 
 const loadGroups = async () => {

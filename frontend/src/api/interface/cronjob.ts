@@ -66,6 +66,10 @@ export namespace Cronjob {
         targetDirID: number;
         retainCopies: number;
     }
+    export interface CronjobDelete {
+        ids: Array<number>;
+        cleanData: boolean;
+    }
     export interface UpdateStatus {
         id: number;
         status: string;

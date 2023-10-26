@@ -2314,12 +2314,11 @@ const docTemplate = `{
                 "x-panel-log": {
                     "BeforeFunctions": [],
                     "bodyKeys": [
-                        "name",
-                        "operation",
-                        "newName"
+                        "names",
+                        "operation"
                     ],
-                    "formatEN": "container [operation] [name] [newName]",
-                    "formatZH": "容器 [name] 执行 [operation] [newName]",
+                    "formatEN": "container [operation] [names]",
+                    "formatZH": "容器 [names] 执行 [operation]",
                     "paramKeys": []
                 }
             }
@@ -2365,6 +2364,49 @@ const docTemplate = `{
                     ],
                     "formatEN": "clean container [pruneType]",
                     "formatZH": "清理容器 [pruneType]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/containers/rename": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "容器重命名",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Container"
+                ],
+                "summary": "Rename Container",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ContainerRename"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "name",
+                        "newName"
+                    ],
+                    "formatEN": "rename container [name] =\u003e [newName]",
+                    "formatZH": "容器重命名 [name] =\u003e [newName]",
                     "paramKeys": []
                 }
             }
@@ -13022,15 +13064,15 @@ const docTemplate = `{
         "dto.ContainerOperation": {
             "type": "object",
             "required": [
-                "name",
+                "names",
                 "operation"
             ],
             "properties": {
-                "name": {
-                    "type": "string"
-                },
-                "newName": {
-                    "type": "string"
+                "names": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "operation": {
                     "type": "string",
@@ -13041,7 +13083,6 @@ const docTemplate = `{
                         "kill",
                         "pause",
                         "unpause",
-                        "rename",
                         "remove"
                     ]
                 }
@@ -13075,6 +13116,20 @@ const docTemplate = `{
                 },
                 "spaceReclaimed": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.ContainerRename": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "newName": {
+                    "type": "string"
                 }
             }
         },

@@ -431,10 +431,10 @@ definitions:
     type: object
   dto.ContainerOperation:
     properties:
-      name:
-        type: string
-      newName:
-        type: string
+      names:
+        items:
+          type: string
+        type: array
       operation:
         enum:
         - start
@@ -443,11 +443,10 @@ definitions:
         - kill
         - pause
         - unpause
-        - rename
         - remove
         type: string
     required:
-    - name
+    - names
     - operation
     type: object
   dto.ContainerPrune:
@@ -470,6 +469,15 @@ definitions:
         type: integer
       spaceReclaimed:
         type: integer
+    type: object
+  dto.ContainerRename:
+    properties:
+      name:
+        type: string
+      newName:
+        type: string
+    required:
+    - name
     type: object
   dto.ContainerStats:
     properties:
@@ -5704,11 +5712,10 @@ paths:
       x-panel-log:
         BeforeFunctions: []
         bodyKeys:
-        - name
+        - names
         - operation
-        - newName
-        formatEN: container [operation] [name] [newName]
-        formatZH: 容器 [name] 执行 [operation] [newName]
+        formatEN: container [operation] [names]
+        formatZH: 容器 [names] 执行 [operation]
         paramKeys: []
   /containers/prune:
     post:
@@ -5738,6 +5745,34 @@ paths:
         - pruneType
         formatEN: clean container [pruneType]
         formatZH: 清理容器 [pruneType]
+        paramKeys: []
+  /containers/rename:
+    post:
+      consumes:
+      - application/json
+      description: 容器重命名
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ContainerRename'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Rename Container
+      tags:
+      - Container
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - name
+        - newName
+        formatEN: rename container [name] => [newName]
+        formatZH: 容器重命名 [name] => [newName]
         paramKeys: []
   /containers/repo:
     get:

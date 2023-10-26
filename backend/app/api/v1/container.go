@@ -374,6 +374,32 @@ func (b *BaseApi) LoadContainerLog(c *gin.Context) {
 }
 
 // @Tags Container
+// @Summary Rename Container
+// @Description 容器重命名
+// @Accept json
+// @Param request body dto.ContainerRename true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /containers/rename [post]
+// @x-panel-log {"bodyKeys":["name","newName"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"容器重命名 [name] => [newName]","formatEN":"rename container [name] => [newName]"}
+func (b *BaseApi) ContainerRename(c *gin.Context) {
+	var req dto.ContainerRename
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := containerService.ContainerRename(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Container
 // @Summary Operate Container
 // @Description 容器操作
 // @Accept json
@@ -381,7 +407,7 @@ func (b *BaseApi) LoadContainerLog(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers/operate [post]
-// @x-panel-log {"bodyKeys":["name","operation","newName"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"容器 [name] 执行 [operation] [newName]","formatEN":"container [operation] [name] [newName]"}
+// @x-panel-log {"bodyKeys":["names","operation"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"容器 [names] 执行 [operation]","formatEN":"container [operation] [names]"}
 func (b *BaseApi) ContainerOperation(c *gin.Context) {
 	var req dto.ContainerOperation
 	if err := c.ShouldBindJSON(&req); err != nil {

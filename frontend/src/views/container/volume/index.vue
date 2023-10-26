@@ -87,6 +87,8 @@
             </template>
         </LayoutContent>
 
+        <OpDialog ref="opRef" @search="search" />
+
         <CodemirrorDialog ref="codemirror" />
         <CreateDialog @search="search" ref="dialogCreateRef" />
     </div>
@@ -94,6 +96,7 @@
 
 <script lang="ts" setup>
 import Tooltip from '@/components/tooltip/index.vue';
+import OpDialog from '@/components/del-dialog/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import CreateDialog from '@/views/container/volume/create/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
@@ -102,7 +105,6 @@ import { computeSize, dateFormat } from '@/utils/util';
 import { deleteVolume, searchVolume, inspect, loadDockerStatus, containerPrune } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import i18n from '@/lang';
-import { useDeleteData } from '@/hooks/use-delete-data';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
@@ -115,6 +117,8 @@ const mobile = computed(() => {
 
 const loading = ref();
 const codemirror = ref();
+
+const opRef = ref();
 
 const data = ref();
 const selects = ref<any>([]);
@@ -214,16 +218,24 @@ const onClean = () => {
 };
 
 const batchDelete = async (row: Container.VolumeInfo | null) => {
-    let names: Array<string> = [];
-    if (row === null) {
+    let names = [];
+    if (row) {
+        names.push(row.name);
+    } else {
         selects.value.forEach((item: Container.VolumeInfo) => {
             names.push(item.name);
         });
-    } else {
-        names.push(row.name);
     }
-    await useDeleteData(deleteVolume, { names: names }, 'commons.msg.delete');
-    search();
+    opRef.value.acceptParams({
+        title: i18n.global.t('commons.button.delete'),
+        names: names,
+        msg: i18n.global.t('commons.msg.operatorHelper', [
+            i18n.global.t('container.volume'),
+            i18n.global.t('commons.button.delete'),
+        ]),
+        api: deleteVolume,
+        params: { names: names },
+    });
 };
 
 const buttons = [

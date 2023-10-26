@@ -95,6 +95,8 @@
         </LayoutContent>
 
         <CodemirrorDialog ref="mydetail" />
+
+        <OpDialog ref="opRef" @search="search" />
         <Pull ref="dialogPullRef" @search="search" />
         <Tag ref="dialogTagRef" @search="search" />
         <Push ref="dialogPushRef" @search="search" />
@@ -107,6 +109,7 @@
 </template>
 
 <script lang="ts" setup>
+import OpDialog from '@/components/del-dialog/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import Tooltip from '@/components/tooltip/index.vue';
 import { reactive, onMounted, ref, computed } from 'vue';
@@ -124,7 +127,6 @@ import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
 import { searchImage, listImageRepo, loadDockerStatus, imageRemove, inspect } from '@/api/modules/container';
 import i18n from '@/lang';
 import router from '@/routers';
-import { useDeleteData } from '@/hooks/use-delete-data';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 
@@ -133,6 +135,8 @@ const mobile = computed(() => {
 });
 
 const loading = ref(false);
+
+const opRef = ref();
 
 const data = ref();
 const repos = ref();
@@ -189,6 +193,20 @@ const search = async () => {
 const loadRepos = async () => {
     const res = await listImageRepo();
     repos.value = res.data || [];
+};
+
+const onDelete = (row: Container.ImageInfo) => {
+    let names = row.tags;
+    opRef.value.acceptParams({
+        title: i18n.global.t('commons.button.delete'),
+        names: names,
+        msg: i18n.global.t('commons.msg.operatorHelper', [
+            i18n.global.t('container.image'),
+            i18n.global.t('commons.button.delete'),
+        ]),
+        api: imageRemove,
+        params: { names: names },
+    });
 };
 
 const onInspect = async (id: string) => {
@@ -256,8 +274,7 @@ const buttons = [
         label: i18n.global.t('commons.button.delete'),
         click: async (row: Container.ImageInfo) => {
             if (!row.tags?.length || row.tags.length <= 1) {
-                await useDeleteData(imageRemove, { names: [row.id] }, 'commons.msg.delete');
-                search();
+                onDelete(row);
                 return;
             }
             let params = {
