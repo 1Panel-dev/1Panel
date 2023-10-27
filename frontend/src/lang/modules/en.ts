@@ -371,7 +371,7 @@ const message = {
         portHelper:
             'This port is the exposed port of the container. You need to save the modification separately and restart the container!',
 
-        loadFromRemote: 'load from Server',
+        loadFromRemote: 'Load from server',
         loadFromRemoteHelper:
             'This action will synchronize the database info on the server to 1Panel, do you want to continue?',
         passwordHelper: 'Unable to retrieve, please modify',
@@ -1129,7 +1129,7 @@ const message = {
         path: 'Path',
 
         safe: 'Security',
-        bindInfo: 'BindInfo',
+        bindInfo: 'Bind Info',
         bindAll: 'Listen All',
         bindInfoHelper:
             'Changing the service listening address or protocol may result in service unavailability. Do you want to continue?',
