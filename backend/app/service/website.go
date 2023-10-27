@@ -227,8 +227,8 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 				errMap["name"] = runtime.Name
 				return buserr.WithMap("ErrPortExist", errMap, nil)
 			}
-			if common.ScanPort(create.Port) {
-				return buserr.WithDetail(constant.ErrPortInUsed, create.Port, nil)
+			if common.ScanPort(port) {
+				return buserr.WithDetail(constant.ErrPortInUsed, port, nil)
 			}
 		}
 	}
