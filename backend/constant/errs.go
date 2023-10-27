@@ -71,6 +71,7 @@ var (
 	ErrUsernameIsNotExist = "ErrUsernameIsNotExist"
 	ErrBackupMatch        = "ErrBackupMatch"
 	ErrBackupExist        = "ErrBackupExist"
+	ErrDomainIsUsed       = "ErrDomainIsUsed"
 )
 
 // ssl

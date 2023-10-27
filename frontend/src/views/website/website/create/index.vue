@@ -458,7 +458,7 @@ const changeType = (type: string) => {
 };
 
 const searchAppInstalled = () => {
-    GetAppInstalled({ type: 'website', unused: true }).then((res) => {
+    GetAppInstalled({ type: 'website', unused: true, all: true, page: 1, pageSize: 100 }).then((res) => {
         appInstalles.value = res.data;
         if (res.data && res.data.length > 0) {
             website.value.appInstallId = res.data[0].id;

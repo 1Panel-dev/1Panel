@@ -45,7 +45,7 @@ type NewAppInstall struct {
 }
 
 type WebsiteInstallCheckReq struct {
-	InstallIds []uint `json:"InstallIds" validate:"required"`
+	InstallIds []uint `json:"InstallIds"`
 }
 
 type WebsiteUpdate struct {

@@ -186,20 +186,6 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		return err
 	}
 	defaultHttpPort := nginxInstall.HttpPort
-	if len(primaryDomainArray) > 1 {
-		portStr := primaryDomainArray[1]
-		portN, err := strconv.Atoi(portStr)
-		if err != nil {
-			return err
-		}
-		if exist, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithDomain(primaryDomain), websiteDomainRepo.WithPort(portN)); len(exist) > 0 {
-			return buserr.New(constant.ErrDomainIsExist)
-		}
-	} else {
-		if exist, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithDomain(primaryDomain), websiteDomainRepo.WithPort(defaultHttpPort)); len(exist) > 0 {
-			return buserr.New(constant.ErrDomainIsExist)
-		}
-	}
 
 	var (
 		domains []model.WebsiteDomain
@@ -221,6 +207,13 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		domains = append(domains, domainModel)
 		if domainModel.Port != defaultHttpPort {
 			ports[domainModel.Port] = struct{}{}
+		}
+	}
+
+	for _, domain := range domains {
+		if exist, _ := websiteDomainRepo.GetFirst(websiteDomainRepo.WithDomain(domain.Domain), websiteDomainRepo.WithPort(domain.Port)); exist.ID > 0 {
+			website, _ := websiteRepo.GetFirst(commonRepo.WithByID(exist.WebsiteID))
+			return buserr.WithName(constant.ErrDomainIsUsed, website.PrimaryDomain)
 		}
 	}
 
@@ -516,8 +509,9 @@ func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) 
 		}
 	}
 
-	if existDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithDomain(create.Domain), websiteDomainRepo.WithPort(create.Port)); len(existDomains) > 0 {
-		return domainModel, buserr.WithDetail(constant.ErrDomainIsExist, create.Domain, nil)
+	if existDomain, _ := websiteDomainRepo.GetFirst(websiteDomainRepo.WithDomain(create.Domain), websiteDomainRepo.WithPort(create.Port)); existDomain.ID > 0 {
+		website, _ := websiteRepo.GetFirst(commonRepo.WithByID(existDomain.WebsiteID))
+		return domainModel, buserr.WithName(constant.ErrDomainIsUsed, website.PrimaryDomain)
 	}
 
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(create.WebsiteID))
