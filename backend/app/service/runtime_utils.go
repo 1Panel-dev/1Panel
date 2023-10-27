@@ -12,6 +12,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/pkg/errors"
 	"github.com/subosito/gotenv"
+	"gopkg.in/yaml.v3"
 	"io"
 	"net/http"
 	"os"
@@ -321,6 +322,11 @@ func handleParams(create request.RuntimeCreate, projectDir string) (composeConte
 			create.Params["RUN_INSTALL"] = "0"
 		}
 		create.Params["CONTAINER_PACKAGE_URL"] = create.Source
+
+		composeContent, err = handleNodeCompose(env, composeContent, create, projectDir)
+		if err != nil {
+			return
+		}
 	}
 
 	newMap := make(map[string]string)
@@ -328,6 +334,7 @@ func handleParams(create request.RuntimeCreate, projectDir string) (composeConte
 	for k, v := range newMap {
 		env[k] = v
 	}
+
 	envStr, err := gotenv.Marshal(env)
 	if err != nil {
 		return
@@ -336,6 +343,58 @@ func handleParams(create request.RuntimeCreate, projectDir string) (composeConte
 		return
 	}
 	envContent = []byte(envStr)
+	return
+}
+
+func handleNodeCompose(env gotenv.Env, composeContent []byte, create request.RuntimeCreate, projectDir string) (composeByte []byte, err error) {
+	existMap := make(map[string]interface{})
+	composeMap := make(map[string]interface{})
+	if err = yaml.Unmarshal(composeContent, &composeMap); err != nil {
+		return
+	}
+	services, serviceValid := composeMap["services"].(map[string]interface{})
+	if !serviceValid {
+		err = buserr.New(constant.ErrFileParse)
+		return
+	}
+	serviceName := ""
+	serviceValue := make(map[string]interface{})
+	for name, service := range services {
+		serviceName = name
+		serviceValue = service.(map[string]interface{})
+		ports, ok := serviceValue["ports"].([]interface{})
+		if ok {
+			ports = []interface{}{}
+			ports = append(ports, "${HOST_IP}:${PANEL_APP_PORT_HTTP}:${NODE_APP_PORT}")
+			for i, port := range create.ExposedPorts {
+				containerPortStr := fmt.Sprintf("CONTAINER_PORT_%d", i)
+				hostPortStr := fmt.Sprintf("HOST_PORT_%d", i)
+				existMap[containerPortStr] = struct{}{}
+				existMap[hostPortStr] = struct{}{}
+				ports = append(ports, fmt.Sprintf("${HOST_IP}:${%s}:${%s}", hostPortStr, containerPortStr))
+				create.Params[containerPortStr] = port.ContainerPort
+				create.Params[hostPortStr] = port.HostPort
+			}
+			serviceValue["ports"] = ports
+		}
+		break
+	}
+	for k := range env {
+		if strings.Contains(k, "CONTAINER_PORT_") || strings.Contains(k, "HOST_PORT_") {
+			if _, ok := existMap[k]; !ok {
+				delete(env, k)
+			}
+		}
+	}
+
+	services[serviceName] = serviceValue
+	composeMap["services"] = services
+	composeByte, err = yaml.Marshal(composeMap)
+	if err != nil {
+		return
+	}
+	fileOp := files.NewFileOp()
+	_ = fileOp.SaveFile(path.Join(projectDir, "docker-compose.yml"), string(composeByte), 0644)
 	return
 }
 

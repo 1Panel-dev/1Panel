@@ -105,16 +105,23 @@
                         </el-col>
                     </el-row>
                     <el-row :gutter="20">
-                        <el-col :span="9">
+                        <el-col :span="7">
                             <el-form-item :label="$t('runtime.appPort')" prop="params.NODE_APP_PORT">
                                 <el-input v-model.number="runtime.params['NODE_APP_PORT']" />
                                 <span class="input-help">{{ $t('runtime.appPortHelper') }}</span>
                             </el-form-item>
                         </el-col>
-                        <el-col :span="9">
+                        <el-col :span="7">
                             <el-form-item :label="$t('runtime.externalPort')" prop="port">
                                 <el-input v-model.number="runtime.port" />
                                 <span class="input-help">{{ $t('runtime.externalPortHelper') }}</span>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="4">
+                            <el-form-item :label="$t('commons.button.add') + $t('commons.table.port')">
+                                <el-button @click="addPort">
+                                    <el-icon><Plus /></el-icon>
+                                </el-button>
                             </el-form-item>
                         </el-col>
                         <el-col :span="6">
@@ -124,6 +131,31 @@
                                     :active-value="'0.0.0.0'"
                                     :inactive-value="'127.0.0.1'"
                                 />
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row :gutter="20" v-for="(port, index) of runtime.exposedPorts" :key="index">
+                        <el-col :span="7">
+                            <el-form-item
+                                :prop="'exposedPorts.' + index + '.containerPort'"
+                                :rules="rules.params.NODE_APP_PORT"
+                            >
+                                <el-input v-model.number="port.containerPort" :placeholder="$t('runtime.appPort')" />
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="7">
+                            <el-form-item
+                                :prop="'exposedPorts.' + index + '.hostPort'"
+                                :rules="rules.params.NODE_APP_PORT"
+                            >
+                                <el-input v-model.number="port.hostPort" :placeholder="$t('runtime.externalPort')" />
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="4">
+                            <el-form-item>
+                                <el-button type="primary" @click="removePort(index)" link>
+                                    {{ $t('commons.button.delete') }}
+                                </el-button>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -170,7 +202,7 @@ import { GetApp, GetAppDetail, SearchApp } from '@/api/modules/app';
 import { CreateRuntime, GetNodeScripts, GetRuntime, UpdateRuntime } from '@/api/modules/runtime';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { reactive, ref, watch } from 'vue';
 import DrawerHeader from '@/components/drawer-header/index.vue';
@@ -209,6 +241,7 @@ const initData = (type: string) => ({
     codeDir: '/',
     port: 3000,
     source: 'https://registry.npmjs.org/',
+    exposedPorts: [],
 });
 let runtime = reactive<Runtime.RuntimeCreate>(initData('node'));
 const rules = ref<any>({
@@ -217,7 +250,6 @@ const rules = ref<any>({
     codeDir: [Rules.requiredInput],
     port: [Rules.requiredInput, Rules.paramPort, checkNumberRange(1, 65535)],
     source: [Rules.requiredSelect],
-
     params: {
         NODE_APP_PORT: [Rules.requiredInput, Rules.paramPort, checkNumberRange(1, 65535)],
         PACKAGE_MANAGER: [Rules.requiredSelect],
@@ -281,6 +313,17 @@ const changeScriptType = () => {
     if (runtime.params['CUSTOM_SCRIPT'] == '0') {
         getScripts();
     }
+};
+
+const addPort = () => {
+    runtime.exposedPorts.push({
+        hostPort: undefined,
+        containerPort: undefined,
+    });
+};
+
+const removePort = (index: number) => {
+    runtime.exposedPorts.splice(index, 1);
 };
 
 const getScripts = () => {
@@ -348,6 +391,25 @@ const submit = async (formEl: FormInstance | undefined) => {
         if (!valid) {
             return;
         }
+        if (runtime.exposedPorts && runtime.exposedPorts.length > 0) {
+            const containerPortMap = new Map();
+            const hostPortMap = new Map();
+            containerPortMap[runtime.params['NODE_APP_PORT']] = true;
+            hostPortMap[runtime.port] = true;
+            for (const port of runtime.exposedPorts) {
+                if (containerPortMap[port.containerPort]) {
+                    MsgError(i18n.global.t('runtime.portError'));
+                    return;
+                }
+                if (hostPortMap[port.hostPort]) {
+                    MsgError(i18n.global.t('runtime.portError'));
+                    return;
+                }
+                hostPortMap[port.hostPort] = true;
+                containerPortMap[port.containerPort] = true;
+            }
+        }
+
         if (mode.value == 'create') {
             loading.value = true;
             CreateRuntime(runtime)
@@ -391,6 +453,7 @@ const getRuntime = async (id: number) => {
             codeDir: data.codeDir,
             port: data.port,
         });
+        runtime.exposedPorts = data.exposedPorts || [];
         editParams.value = data.appParams;
         searchApp(data.appID);
         if (data.params['CUSTOM_SCRIPT'] == '0') {

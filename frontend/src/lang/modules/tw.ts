@@ -1729,6 +1729,7 @@ const message = {
         nodeOperatorHelper: '是否{0} {1} 模組？ 操作可能導致運轉環境異常，請確認後操作',
         customScript: '自訂啟動指令',
         customScriptHelper: '請填寫完整的啟動指令，例如：npm run start',
+        portError: '不能填寫相同連接埠',
     },
     process: {
         pid: '進程ID',
