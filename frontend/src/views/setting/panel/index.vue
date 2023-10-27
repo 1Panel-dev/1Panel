@@ -102,6 +102,15 @@
                                     </template>
                                 </el-input>
                             </el-form-item>
+                            <el-form-item :label="$t('setting.syncTime')">
+                                <el-input disabled v-model="form.localTime">
+                                    <template #append>
+                                        <el-button v-show="!show" @click="onChangeNtp" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
                             <el-form-item :label="$t('setting.systemIP')" prop="systemIP">
                                 <el-input disabled v-if="form.systemIP" v-model="form.systemIP">
                                     <template #append>
@@ -113,15 +122,6 @@
                                 <el-input disabled v-if="!form.systemIP" v-model="unset">
                                     <template #append>
                                         <el-button @click="onChangeSystemIP" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-                            <el-form-item :label="$t('setting.syncTime')">
-                                <el-input disabled v-model="form.localTime">
-                                    <template #append>
-                                        <el-button v-show="!show" @click="onChangeNtp" icon="Setting">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
