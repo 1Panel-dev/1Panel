@@ -221,6 +221,7 @@ func handleTar(sourceDir, targetDir, name, exclusionRules string) error {
 
 	excludes := strings.Split(exclusionRules, ",")
 	excludeRules := ""
+	excludes = append(excludes, "*.sock")
 	for _, exclude := range excludes {
 		if len(exclude) == 0 {
 			continue
