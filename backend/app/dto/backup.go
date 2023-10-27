@@ -41,7 +41,7 @@ type CommonRecover struct {
 type RecordSearch struct {
 	PageInfo
 	Type       string `json:"type" validate:"required"`
-	Name       string `json:"name" validate:"required"`
+	Name       string `json:"name"`
 	DetailName string `json:"detailName"`
 }
 

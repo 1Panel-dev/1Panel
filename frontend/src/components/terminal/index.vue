@@ -40,7 +40,7 @@ const acceptParams = (props: WsProps) => {
         if (props.error.length !== 0) {
             initError(props.error);
         } else {
-            initCmd.value = props.initCmd;
+            initCmd.value = props.initCmd || '';
             init(props.endpoint, props.args);
         }
     });
