@@ -4,7 +4,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
-	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,14 +18,10 @@ import (
 // @x-panel-log {"bodyKeys":["name", "type"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建远程数据库 [name][type]","formatEN":"create database [name][type]"}
 func (b *BaseApi) CreateDatabase(c *gin.Context) {
 	var req dto.DatabaseCreate
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
+
 	if err := databaseService.Create(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -45,14 +40,10 @@ func (b *BaseApi) CreateDatabase(c *gin.Context) {
 // @x-panel-log {"bodyKeys":["name", "type"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"检测远程数据库 [name][type] 连接性","formatEN":"check if database [name][type] is connectable"}
 func (b *BaseApi) CheckDatabase(c *gin.Context) {
 	var req dto.DatabaseCreate
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
+
 	helper.SuccessWithData(c, databaseService.CheckDatabase(req))
 }
 
@@ -66,8 +57,7 @@ func (b *BaseApi) CheckDatabase(c *gin.Context) {
 // @Router /databases/db/search [post]
 func (b *BaseApi) SearchDatabase(c *gin.Context) {
 	var req dto.DatabaseSearch
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 
@@ -135,12 +125,7 @@ func (b *BaseApi) GetDatabase(c *gin.Context) {
 // @Router /db/remote/del/check [post]
 func (b *BaseApi) DeleteCheckDatabase(c *gin.Context) {
 	var req dto.OperateByID
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 
@@ -163,12 +148,7 @@ func (b *BaseApi) DeleteCheckDatabase(c *gin.Context) {
 // @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"ids","isList":true,"db":"databases","output_column":"name","output_value":"names"}],"formatZH":"删除远程数据库 [names]","formatEN":"delete database [names]"}
 func (b *BaseApi) DeleteDatabase(c *gin.Context) {
 	var req dto.DatabaseDelete
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 
@@ -190,12 +170,7 @@ func (b *BaseApi) DeleteDatabase(c *gin.Context) {
 // @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新远程数据库 [name]","formatEN":"update database [name]"}
 func (b *BaseApi) UpdateDatabase(c *gin.Context) {
 	var req dto.DatabaseUpdate
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 

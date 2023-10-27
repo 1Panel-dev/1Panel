@@ -17,14 +17,10 @@ import (
 
 func (b *BaseApi) LoadMonitor(c *gin.Context) {
 	var req dto.MonitorSearch
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
+
 	loc, _ := time.LoadLocation(common.LoadTimeZone())
 	req.StartTime = req.StartTime.In(loc)
 	req.EndTime = req.EndTime.In(loc)

@@ -12,8 +12,8 @@ type PageContainer struct {
 }
 
 type InspectReq struct {
-	ID   string `json:"id"`
-	Type string `json:"type"`
+	ID   string `json:"id" validate:"required"`
+	Type string `json:"type" validate:"required"`
 }
 
 type ContainerInfo struct {
@@ -40,8 +40,8 @@ type ResourceLimit struct {
 type ContainerOperate struct {
 	ContainerID     string         `json:"containerID"`
 	ForcePull       bool           `json:"forcePull"`
-	Name            string         `json:"name"`
-	Image           string         `json:"image"`
+	Name            string         `json:"name" validate:"required"`
+	Image           string         `json:"image" validate:"required"`
 	Network         string         `json:"network"`
 	PublishAllPorts bool           `json:"publishAllPorts"`
 	ExposedPorts    []PortHelper   `json:"exposedPorts"`
@@ -110,7 +110,7 @@ type ContainerOperation struct {
 
 type ContainerRename struct {
 	Name    string `json:"name" validate:"required"`
-	NewName string `json:"newName"`
+	NewName string `json:"newName" validate:"required"`
 }
 
 type ContainerPrune struct {
@@ -135,8 +135,8 @@ type Network struct {
 	Attachable bool      `json:"attachable"`
 }
 type NetworkCreate struct {
-	Name    string   `json:"name"`
-	Driver  string   `json:"driver"`
+	Name    string   `json:"name" validate:"required"`
+	Driver  string   `json:"driver" validate:"required"`
 	Options []string `json:"options"`
 	Subnet  string   `json:"subnet"`
 	Gateway string   `json:"gateway"`
@@ -152,8 +152,8 @@ type Volume struct {
 	CreatedAt  time.Time `json:"createdAt"`
 }
 type VolumeCreate struct {
-	Name    string   `json:"name"`
-	Driver  string   `json:"driver"`
+	Name    string   `json:"name" validate:"required"`
+	Driver  string   `json:"driver" validate:"required"`
 	Options []string `json:"options"`
 	Labels  []string `json:"labels"`
 }

@@ -170,7 +170,7 @@ type RedisConfPersistenceUpdate struct {
 	Save        string `json:"save"`
 }
 type RedisConfUpdateByFile struct {
-	File       string `json:"file"`
+	File       string `json:"file" validate:"required"`
 	RestartNow bool   `json:"restartNow"`
 }
 

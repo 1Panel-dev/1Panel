@@ -521,6 +521,7 @@ const updateContainerID = async () => {
     let params = {
         page: 1,
         pageSize: 1,
+        state: 'all',
         name: dialogData.value.rowData.name,
         filters: '',
         orderBy: 'created_at',

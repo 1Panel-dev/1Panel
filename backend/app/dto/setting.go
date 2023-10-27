@@ -135,7 +135,7 @@ type UpgradeInfo struct {
 }
 
 type SyncTime struct {
-	NtpSite string `json:"ntpSite"`
+	NtpSite string `json:"ntpSite" validate:"required"`
 }
 
 type BindInfo struct {
@@ -144,7 +144,7 @@ type BindInfo struct {
 }
 
 type Upgrade struct {
-	Version string `json:"version"`
+	Version string `json:"version" validate:"required"`
 }
 
 type CleanData struct {

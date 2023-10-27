@@ -6,7 +6,11 @@
         <el-form @submit.prevent ref="newNameRef" v-loading="loading" :model="renameForm" label-position="top">
             <el-row type="flex" justify="center">
                 <el-col :span="22">
-                    <el-form-item :label="$t('container.newName')" :rules="Rules.containerName" prop="newName">
+                    <el-form-item
+                        :label="$t('container.newName')"
+                        :rules="[Rules.containerName, Rules.requiredInput]"
+                        prop="newName"
+                    >
                         <el-input v-model="renameForm.newName"></el-input>
                     </el-form-item>
                 </el-col>

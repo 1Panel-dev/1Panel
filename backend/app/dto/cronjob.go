@@ -65,7 +65,7 @@ type CronjobClean struct {
 
 type CronjobBatchDelete struct {
 	CleanData bool   `json:"cleanData"`
-	IDs       []uint `json:"ids"`
+	IDs       []uint `json:"ids" validate:"required"`
 }
 
 type CronjobInfo struct {

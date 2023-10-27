@@ -428,6 +428,9 @@ definitions:
         items:
           $ref: '#/definitions/dto.VolumeHelper'
         type: array
+    required:
+    - image
+    - name
     type: object
   dto.ContainerOperation:
     properties:
@@ -478,6 +481,7 @@ definitions:
         type: string
     required:
     - name
+    - newName
     type: object
   dto.ContainerStats:
     properties:
@@ -518,6 +522,8 @@ definitions:
         items:
           type: integer
         type: array
+    required:
+    - ids
     type: object
   dto.CronjobClean:
     properties:
@@ -1251,6 +1257,9 @@ definitions:
         type: string
       type:
         type: string
+    required:
+    - id
+    - type
     type: object
   dto.LogOption:
     properties:
@@ -1275,6 +1284,9 @@ definitions:
         type: string
       password:
         type: string
+    required:
+    - name
+    - password
     type: object
   dto.MFALogin:
     properties:
@@ -1286,6 +1298,10 @@ definitions:
         type: string
       password:
         type: string
+    required:
+    - code
+    - name
+    - password
     type: object
   dto.MfaCredential:
     properties:
@@ -1295,6 +1311,10 @@ definitions:
         type: string
       secret:
         type: string
+    required:
+    - code
+    - interval
+    - secret
     type: object
   dto.MysqlConfUpdateByFile:
     properties:
@@ -1588,6 +1608,9 @@ definitions:
         type: array
       subnet:
         type: string
+    required:
+    - driver
+    - name
     type: object
   dto.NginxKey:
     enum:
@@ -1820,6 +1843,8 @@ definitions:
         type: string
       restartNow:
         type: boolean
+    required:
+    - file
     type: object
   dto.RedisPersistence:
     properties:
@@ -1865,6 +1890,25 @@ definitions:
         type: integer
       memory:
         type: integer
+    type: object
+  dto.RuleSearch:
+    properties:
+      info:
+        type: string
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      status:
+        type: string
+      strategy:
+        type: string
+      type:
+        type: string
+    required:
+    - page
+    - pageSize
+    - type
     type: object
   dto.SSHConf:
     properties:
@@ -2214,6 +2258,8 @@ definitions:
     properties:
       ntpSite:
         type: string
+    required:
+    - ntpSite
     type: object
   dto.TreeChild:
     properties:
@@ -2256,6 +2302,8 @@ definitions:
     properties:
       version:
         type: string
+    required:
+    - version
     type: object
   dto.UpgradeInfo:
     properties:
@@ -2289,6 +2337,9 @@ definitions:
         items:
           type: string
         type: array
+    required:
+    - driver
+    - name
     type: object
   dto.VolumeHelper:
     properties:
@@ -2736,6 +2787,13 @@ definitions:
         type: string
     required:
     - path
+    type: object
+  request.ExposedPort:
+    properties:
+      containerPort:
+        type: integer
+      hostPort:
+        type: integer
     type: object
   request.FavoriteCreate:
     properties:
@@ -3253,6 +3311,10 @@ definitions:
         type: boolean
       codeDir:
         type: string
+      exposedPorts:
+        items:
+          $ref: '#/definitions/request.ExposedPort'
+        type: array
       image:
         type: string
       install:
@@ -3309,6 +3371,10 @@ definitions:
         type: boolean
       codeDir:
         type: string
+      exposedPorts:
+        items:
+          $ref: '#/definitions/request.ExposedPort'
+        type: array
       id:
         type: integer
       image:
@@ -8926,7 +8992,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.SearchWithPage'
+          $ref: '#/definitions/dto.RuleSearch'
       responses:
         "200":
           description: OK
