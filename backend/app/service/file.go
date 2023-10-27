@@ -32,7 +32,7 @@ type IFileService interface {
 	ChangeMode(op request.FileCreate) error
 	Compress(c request.FileCompress) error
 	DeCompress(c request.FileDeCompress) error
-	GetContent(op request.FileOption) (response.FileInfo, error)
+	GetContent(op request.FileContentReq) (response.FileInfo, error)
 	SaveContent(edit request.FileEdit) error
 	FileDownload(d request.FileDownload) (string, error)
 	DirSize(req request.DirSizeReq) (response.DirSizeRes, error)
@@ -191,8 +191,10 @@ func (f *FileService) DeCompress(c request.FileDeCompress) error {
 	return fo.Decompress(c.Path, c.Dst, files.CompressType(c.Type))
 }
 
-func (f *FileService) GetContent(op request.FileOption) (response.FileInfo, error) {
-	info, err := files.NewFileInfo(op.FileOption)
+func (f *FileService) GetContent(op request.FileContentReq) (response.FileInfo, error) {
+	info, err := files.NewFileInfo(files.FileOption{
+		Path: op.Path,
+	})
 	if err != nil {
 		return response.FileInfo{}, err
 	}

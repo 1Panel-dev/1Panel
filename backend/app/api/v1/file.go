@@ -248,13 +248,13 @@ func (b *BaseApi) DeCompressFile(c *gin.Context) {
 // @Summary Load file content
 // @Description 获取文件内容
 // @Accept json
-// @Param request body request.FileOption true "request"
+// @Param request body request.FileContentReq true "request"
 // @Success 200 {object} response.FileInfo
 // @Security ApiKeyAuth
 // @Router /files/content [post]
 // @x-panel-log {"bodyKeys":["path"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"获取文件内容 [path]","formatEN":"Load file content [path]"}
 func (b *BaseApi) GetContent(c *gin.Context) {
-	var req request.FileOption
+	var req request.FileContentReq
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
