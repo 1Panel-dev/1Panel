@@ -169,6 +169,8 @@ const search = () => {
                     content.value = content.value + '\n' + res.data.content;
                 }
             }
+        } else {
+            content.value = '';
         }
         end.value = res.data.end;
         nextTick(() => {

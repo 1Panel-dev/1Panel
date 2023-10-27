@@ -9,6 +9,10 @@ type FileOption struct {
 	files.FileOption
 }
 
+type FileContentReq struct {
+	Path string `json:"path" validate:"required"`
+}
+
 type SearchUploadWithPage struct {
 	dto.PageInfo
 	Path string `json:"path" validate:"required"`
