@@ -1,8 +1,6 @@
 package v1
 
 import (
-	"reflect"
-
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
@@ -25,7 +23,14 @@ func (b *BaseApi) SearchAppInstalled(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	if !reflect.DeepEqual(req.PageInfo, dto.PageInfo{}) {
+	if req.All {
+		list, err := appInstallService.SearchForWebsite(req)
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
+		helper.SuccessWithData(c, list)
+	} else {
 		total, list, err := appInstallService.Page(req)
 		if err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
@@ -35,13 +40,6 @@ func (b *BaseApi) SearchAppInstalled(c *gin.Context) {
 			Items: list,
 			Total: total,
 		})
-	} else {
-		list, err := appInstallService.SearchForWebsite(req)
-		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-			return
-		}
-		helper.SuccessWithData(c, list)
 	}
 }
 

@@ -40,6 +40,7 @@ type AppInstalledSearch struct {
 	Tags   []string `json:"tags"`
 	Update bool     `json:"update"`
 	Unused bool     `json:"unused"`
+	All    bool     `json:"all"`
 }
 
 type AppInstalledInfo struct {

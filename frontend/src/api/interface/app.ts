@@ -161,9 +161,10 @@ export namespace App {
         deleteBackup?: boolean;
     }
 
-    export interface AppInstalledSearch {
+    export interface AppInstalledSearch extends ReqPage {
         type: string;
         unused?: boolean;
+        all?: boolean;
     }
 
     export interface AppService {
