@@ -20,8 +20,7 @@ import (
 // @Router /websites/ssl/search [post]
 func (b *BaseApi) PageWebsiteSSL(c *gin.Context) {
 	var req request.WebsiteSSLSearch
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 	if !reflect.DeepEqual(req.PageInfo, dto.PageInfo{}) {
@@ -55,8 +54,7 @@ func (b *BaseApi) PageWebsiteSSL(c *gin.Context) {
 // @x-panel-log {"bodyKeys":["primaryDomain"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建网站 ssl [primaryDomain]","formatEN":"Create website ssl [primaryDomain]"}
 func (b *BaseApi) CreateWebsiteSSL(c *gin.Context) {
 	var req request.WebsiteSSLCreate
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 	res, err := websiteSSLService.Create(req)
@@ -78,8 +76,7 @@ func (b *BaseApi) CreateWebsiteSSL(c *gin.Context) {
 // @x-panel-log {"bodyKeys":["SSLId"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"SSLId","isList":false,"db":"website_ssls","output_column":"primary_domain","output_value":"domain"}],"formatZH":"重置 ssl [domain]","formatEN":"Renew ssl [domain]"}
 func (b *BaseApi) RenewWebsiteSSL(c *gin.Context) {
 	var req request.WebsiteSSLRenew
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 	if err := websiteSSLService.Renew(req.SSLID); err != nil {
@@ -99,8 +96,7 @@ func (b *BaseApi) RenewWebsiteSSL(c *gin.Context) {
 // @Router /websites/ssl/resolve [post]
 func (b *BaseApi) GetDNSResolve(c *gin.Context) {
 	var req request.WebsiteDNSReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 	res, err := websiteSSLService.GetDNSResolve(req)
@@ -122,8 +118,7 @@ func (b *BaseApi) GetDNSResolve(c *gin.Context) {
 // @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"website_ssls","output_column":"primary_domain","output_value":"domain"}],"formatZH":"删除 ssl [domain]","formatEN":"Delete ssl [domain]"}
 func (b *BaseApi) DeleteWebsiteSSL(c *gin.Context) {
 	var req request.WebsiteResourceReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 	if err := websiteSSLService.Delete(req.ID); err != nil {
@@ -188,8 +183,7 @@ func (b *BaseApi) GetWebsiteSSLById(c *gin.Context) {
 // @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"website_ssls","output_column":"primary_domain","output_value":"domain"}],"formatZH":"更新证书设置 [domain]","formatEN":"Update ssl config [domain]"}
 func (b *BaseApi) UpdateWebsiteSSL(c *gin.Context) {
 	var req request.WebsiteSSLUpdate
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 	if err := websiteSSLService.Update(req); err != nil {

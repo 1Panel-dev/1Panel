@@ -22,8 +22,7 @@ import (
 // @Router /apps/installed/search [post]
 func (b *BaseApi) SearchAppInstalled(c *gin.Context) {
 	var req request.AppInstalledSearch
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 	if !reflect.DeepEqual(req.PageInfo, dto.PageInfo{}) {
@@ -72,8 +71,7 @@ func (b *BaseApi) ListAppInstalled(c *gin.Context) {
 // @Router /apps/installed/check [post]
 func (b *BaseApi) CheckAppInstalled(c *gin.Context) {
 	var req request.AppInstalledInfo
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 	if err := global.VALID.Struct(req); err != nil {
@@ -98,8 +96,7 @@ func (b *BaseApi) CheckAppInstalled(c *gin.Context) {
 // @Router /apps/installed/loadport [post]
 func (b *BaseApi) LoadPort(c *gin.Context) {
 	var req dto.OperationWithNameAndType
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 	port, err := appInstallService.LoadPort(req)
@@ -120,8 +117,7 @@ func (b *BaseApi) LoadPort(c *gin.Context) {
 // @Router /apps/installed/conninfo/:key [get]
 func (b *BaseApi) LoadConnInfo(c *gin.Context) {
 	var req dto.OperationWithNameAndType
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 	conn, err := appInstallService.LoadConnInfo(req)
@@ -181,8 +177,7 @@ func (b *BaseApi) SyncInstalled(c *gin.Context) {
 // @x-panel-log {"bodyKeys":["installId","operate"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"installId","isList":false,"db":"app_installs","output_column":"app_id","output_value":"appId"},{"input_column":"id","input_value":"installId","isList":false,"db":"app_installs","output_column":"name","output_value":"appName"},{"input_column":"id","input_value":"appId","isList":false,"db":"apps","output_column":"key","output_value":"appKey"}],"formatZH":"[operate] 应用 [appKey][appName]","formatEN":"[operate] App [appKey][appName]"}
 func (b *BaseApi) OperateInstalled(c *gin.Context) {
 	var req request.AppInstalledOperate
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 	if err := appInstallService.Operate(req); err != nil {
@@ -243,12 +238,7 @@ func (b *BaseApi) GetUpdateVersions(c *gin.Context) {
 // @x-panel-log {"bodyKeys":["key","name","port"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"应用端口修改 [key]-[name] => [port]","formatEN":"Application port update [key]-[name] => [port]"}
 func (b *BaseApi) ChangeAppPort(c *gin.Context) {
 	var req request.PortUpdate
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 	if err := appInstallService.ChangeAppPort(req); err != nil {
@@ -268,8 +258,7 @@ func (b *BaseApi) ChangeAppPort(c *gin.Context) {
 // @Router /apps/installed/conf [post]
 func (b *BaseApi) GetDefaultConfig(c *gin.Context) {
 	var req dto.OperationWithNameAndType
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 	content, err := appInstallService.GetDefaultConfigByKey(req.Type, req.Name)
@@ -314,8 +303,7 @@ func (b *BaseApi) GetParams(c *gin.Context) {
 // @x-panel-log {"bodyKeys":["installId"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"应用参数修改 [installId]","formatEN":"Application param update [installId]"}
 func (b *BaseApi) UpdateInstalled(c *gin.Context) {
 	var req request.AppInstalledUpdate
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 	if err := appInstallService.Update(req); err != nil {
@@ -336,8 +324,7 @@ func (b *BaseApi) UpdateInstalled(c *gin.Context) {
 // @x-panel-log {"bodyKeys":["installId"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"忽略应用 [installId] 版本升级","formatEN":"Application param update [installId]"}
 func (b *BaseApi) IgnoreUpgrade(c *gin.Context) {
 	var req request.AppInstalledIgnoreUpgrade
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 	if err := appInstallService.IgnoreUpgrade(req); err != nil {

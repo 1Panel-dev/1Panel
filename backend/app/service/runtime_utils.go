@@ -362,9 +362,9 @@ func handleNodeCompose(env gotenv.Env, composeContent []byte, create request.Run
 	for name, service := range services {
 		serviceName = name
 		serviceValue = service.(map[string]interface{})
-		ports, ok := serviceValue["ports"].([]interface{})
+		_, ok := serviceValue["ports"].([]interface{})
 		if ok {
-			ports = []interface{}{}
+			var ports []interface{}
 			ports = append(ports, "${HOST_IP}:${PANEL_APP_PORT_HTTP}:${NODE_APP_PORT}")
 			for i, port := range create.ExposedPorts {
 				containerPortStr := fmt.Sprintf("CONTAINER_PORT_%d", i)
