@@ -171,22 +171,35 @@ func (w WebsiteService) GetWebsites() ([]response.WebsiteDTO, error) {
 }
 
 func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) {
-	if exist, _ := websiteRepo.GetBy(websiteRepo.WithDomain(create.PrimaryDomain)); len(exist) > 0 {
+	primaryDomainArray := strings.Split(create.PrimaryDomain, ":")
+	primaryDomain := primaryDomainArray[0]
+
+	if exist, _ := websiteRepo.GetBy(websiteRepo.WithDomain(primaryDomain)); len(exist) > 0 {
 		return buserr.New(constant.ErrDomainIsExist)
 	}
 	if exist, _ := websiteRepo.GetBy(websiteRepo.WithAlias(create.Alias)); len(exist) > 0 {
 		return buserr.New(constant.ErrAliasIsExist)
 	}
-	if exist, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithDomain(create.PrimaryDomain)); len(exist) > 0 {
-		return buserr.New(constant.ErrDomainIsExist)
-	}
+
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return err
 	}
 	defaultHttpPort := nginxInstall.HttpPort
-	primaryDomainArray := strings.Split(create.PrimaryDomain, ":")
-	primaryDomain := primaryDomainArray[0]
+	if len(primaryDomainArray) > 1 {
+		portStr := primaryDomainArray[1]
+		portN, err := strconv.Atoi(portStr)
+		if err != nil {
+			return err
+		}
+		if exist, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithDomain(primaryDomain), websiteDomainRepo.WithPort(portN)); len(exist) > 0 {
+			return buserr.New(constant.ErrDomainIsExist)
+		}
+	} else {
+		if exist, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithDomain(primaryDomain), websiteDomainRepo.WithPort(defaultHttpPort)); len(exist) > 0 {
+			return buserr.New(constant.ErrDomainIsExist)
+		}
+	}
 
 	var (
 		domains []model.WebsiteDomain
