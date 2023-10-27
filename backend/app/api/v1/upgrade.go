@@ -32,10 +32,10 @@ func (b *BaseApi) GetUpgradeInfo(c *gin.Context) {
 // @Router /settings/upgrade [get]
 func (b *BaseApi) GetNotesByVersion(c *gin.Context) {
 	var req dto.Upgrade
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
+
 	notes, err := upgradeService.LoadNotes(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
@@ -55,10 +55,10 @@ func (b *BaseApi) GetNotesByVersion(c *gin.Context) {
 // @x-panel-log {"bodyKeys":["version"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新系统 => [version]","formatEN":"upgrade service => [version]"}
 func (b *BaseApi) Upgrade(c *gin.Context) {
 	var req dto.Upgrade
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
+
 	if err := upgradeService.Upgrade(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

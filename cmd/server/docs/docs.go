@@ -7377,7 +7377,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.SearchWithPage"
+                            "$ref": "#/definitions/dto.RuleSearch"
                         }
                     }
                 ],
@@ -12983,6 +12983,10 @@ const docTemplate = `{
         },
         "dto.ContainerOperate": {
             "type": "object",
+            "required": [
+                "image",
+                "name"
+            ],
             "properties": {
                 "autoRemove": {
                     "type": "boolean"
@@ -13122,7 +13126,8 @@ const docTemplate = `{
         "dto.ContainerRename": {
             "type": "object",
             "required": [
-                "name"
+                "name",
+                "newName"
             ],
             "properties": {
                 "name": {
@@ -13182,6 +13187,9 @@ const docTemplate = `{
         },
         "dto.CronjobBatchDelete": {
             "type": "object",
+            "required": [
+                "ids"
+            ],
             "properties": {
                 "cleanData": {
                     "type": "boolean"
@@ -14272,6 +14280,10 @@ const docTemplate = `{
         },
         "dto.InspectReq": {
             "type": "object",
+            "required": [
+                "id",
+                "type"
+            ],
             "properties": {
                 "id": {
                     "type": "string"
@@ -14294,6 +14306,10 @@ const docTemplate = `{
         },
         "dto.Login": {
             "type": "object",
+            "required": [
+                "name",
+                "password"
+            ],
             "properties": {
                 "authMethod": {
                     "type": "string"
@@ -14320,6 +14336,11 @@ const docTemplate = `{
         },
         "dto.MFALogin": {
             "type": "object",
+            "required": [
+                "code",
+                "name",
+                "password"
+            ],
             "properties": {
                 "authMethod": {
                     "type": "string"
@@ -14337,6 +14358,11 @@ const docTemplate = `{
         },
         "dto.MfaCredential": {
             "type": "object",
+            "required": [
+                "code",
+                "interval",
+                "secret"
+            ],
             "properties": {
                 "code": {
                     "type": "string"
@@ -14751,6 +14777,10 @@ const docTemplate = `{
         },
         "dto.NetworkCreate": {
             "type": "object",
+            "required": [
+                "driver",
+                "name"
+            ],
             "properties": {
                 "driver": {
                     "type": "string"
@@ -15111,6 +15141,9 @@ const docTemplate = `{
         },
         "dto.RedisConfUpdateByFile": {
             "type": "object",
+            "required": [
+                "file"
+            ],
             "properties": {
                 "file": {
                     "type": "string"
@@ -15186,6 +15219,34 @@ const docTemplate = `{
                 },
                 "memory": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.RuleSearch": {
+            "type": "object",
+            "required": [
+                "page",
+                "pageSize",
+                "type"
+            ],
+            "properties": {
+                "info": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "strategy": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
                 }
             }
         },
@@ -15706,6 +15767,9 @@ const docTemplate = `{
         },
         "dto.SyncTime": {
             "type": "object",
+            "required": [
+                "ntpSite"
+            ],
             "properties": {
                 "ntpSite": {
                     "type": "string"
@@ -15770,6 +15834,9 @@ const docTemplate = `{
         },
         "dto.Upgrade": {
             "type": "object",
+            "required": [
+                "version"
+            ],
             "properties": {
                 "version": {
                     "type": "string"
@@ -15806,6 +15873,10 @@ const docTemplate = `{
         },
         "dto.VolumeCreate": {
             "type": "object",
+            "required": [
+                "driver",
+                "name"
+            ],
             "properties": {
                 "driver": {
                     "type": "string"
@@ -16499,6 +16570,17 @@ const docTemplate = `{
             "properties": {
                 "path": {
                     "type": "string"
+                }
+            }
+        },
+        "request.ExposedPort": {
+            "type": "object",
+            "properties": {
+                "containerPort": {
+                    "type": "integer"
+                },
+                "hostPort": {
+                    "type": "integer"
                 }
             }
         },
@@ -17270,6 +17352,12 @@ const docTemplate = `{
                 "codeDir": {
                     "type": "string"
                 },
+                "exposedPorts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/request.ExposedPort"
+                    }
+                },
                 "image": {
                     "type": "string"
                 },
@@ -17354,6 +17442,12 @@ const docTemplate = `{
                 },
                 "codeDir": {
                     "type": "string"
+                },
+                "exposedPorts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/request.ExposedPort"
+                    }
                 },
                 "id": {
                     "type": "integer"

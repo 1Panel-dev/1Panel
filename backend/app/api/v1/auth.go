@@ -25,10 +25,10 @@ type BaseApi struct{}
 // @Router /auth/login [post]
 func (b *BaseApi) Login(c *gin.Context) {
 	var req dto.Login
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
+
 	if req.AuthMethod != "jwt" && !req.IgnoreCaptcha {
 		if err := captcha.VerifyCode(req.CaptchaID, req.Captcha); err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
@@ -60,14 +60,10 @@ func (b *BaseApi) Login(c *gin.Context) {
 // @Header 200 {string} EntranceCode "安全入口"
 func (b *BaseApi) MFALogin(c *gin.Context) {
 	var req dto.MFALogin
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
+
 	entranceItem := c.Request.Header.Get("EntranceCode")
 	var entrance []byte
 	if len(entranceItem) != 0 {

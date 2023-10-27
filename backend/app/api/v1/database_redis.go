@@ -9,7 +9,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
-	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	"github.com/gin-gonic/gin"
 )
@@ -73,14 +72,10 @@ func (b *BaseApi) LoadPersistenceConf(c *gin.Context) {
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 redis 数据库配置信息","formatEN":"update the redis database configuration information"}
 func (b *BaseApi) UpdateRedisConf(c *gin.Context) {
 	var req dto.RedisConfUpdate
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBind(&req, c); err != nil {
 		return
 	}
-	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
+
 	if err := redisService.UpdateConf(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -99,14 +94,10 @@ func (b *BaseApi) UpdateRedisConf(c *gin.Context) {
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改 redis 数据库密码","formatEN":"change the password of the redis database"}
 func (b *BaseApi) ChangeRedisPassword(c *gin.Context) {
 	var req dto.ChangeRedisPass
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
+
 	if len(req.Value) != 0 {
 		value, err := base64.StdEncoding.DecodeString(req.Value)
 		if err != nil {
@@ -134,14 +125,10 @@ func (b *BaseApi) ChangeRedisPassword(c *gin.Context) {
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"redis 数据库持久化配置更新","formatEN":"redis database persistence configuration update"}
 func (b *BaseApi) UpdateRedisPersistenceConf(c *gin.Context) {
 	var req dto.RedisConfPersistenceUpdate
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
+
 	if err := redisService.UpdatePersistenceConf(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -159,8 +146,7 @@ func (b *BaseApi) UpdateRedisPersistenceConf(c *gin.Context) {
 // @Router /databases/redis/backup/search [post]
 func (b *BaseApi) RedisBackupList(c *gin.Context) {
 	var req dto.PageInfo
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 
@@ -187,10 +173,10 @@ func (b *BaseApi) RedisBackupList(c *gin.Context) {
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 redis 数据库配置信息","formatEN":"update the redis database configuration information"}
 func (b *BaseApi) UpdateRedisConfByFile(c *gin.Context) {
 	var req dto.RedisConfUpdateByFile
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
+
 	redisInfo, err := redisService.LoadConf()
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
