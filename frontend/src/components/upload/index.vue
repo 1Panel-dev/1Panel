@@ -78,13 +78,15 @@
                 </ComplexTable>
             </div>
         </el-drawer>
+
+        <OpDialog ref="opRef" @search="search" />
     </div>
 </template>
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import { computeSize } from '@/utils/util';
-import { useDeleteData } from '@/hooks/use-delete-data';
+import OpDialog from '@/components/del-dialog/index.vue';
 import { handleRecoverByUpload } from '@/api/modules/setting';
 import i18n from '@/lang';
 import { UploadFile, UploadFiles, UploadInstance } from 'element-plus';
@@ -99,6 +101,7 @@ const isUpload = ref();
 const uploadPercent = ref<number>(0);
 const selects = ref<any>([]);
 const baseDir = ref();
+const opRef = ref();
 
 const data = ref();
 const title = ref();
@@ -279,15 +282,26 @@ const submitUpload = async (file: any) => {
 
 const onBatchDelete = async (row: File.File | null) => {
     let files: Array<string> = [];
+    let names: Array<string> = [];
     if (row) {
         files.push(baseDir.value + row.name);
+        names.push(row.name);
     } else {
         selects.value.forEach((item: File.File) => {
             files.push(baseDir.value + item.name);
+            names.push(item.name);
         });
     }
-    await useDeleteData(BatchDeleteFile, { paths: files, isDir: false }, 'commons.msg.delete');
-    search();
+    opRef.value.acceptParams({
+        title: i18n.global.t('commons.button.delete'),
+        names: names,
+        msg: i18n.global.t('commons.msg.operatorHelper', [
+            i18n.global.t('commons.button.import'),
+            i18n.global.t('commons.button.delete'),
+        ]),
+        api: BatchDeleteFile,
+        params: { paths: files, isDir: false },
+    });
 };
 
 const buttons = [

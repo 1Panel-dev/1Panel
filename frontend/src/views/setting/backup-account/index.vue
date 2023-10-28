@@ -368,19 +368,23 @@
                 </el-row>
             </template>
         </LayoutContent>
+
+        <OpDialog ref="opRef" @search="search" />
         <DialogOperate ref="dialogRef" @search="search" />
     </div>
 </template>
 <script setup lang="ts">
 import { dateFormat } from '@/utils/util';
 import { onMounted, ref } from 'vue';
+import OpDialog from '@/components/del-dialog/index.vue';
 import { getBackupList, deleteBackup } from '@/api/modules/setting';
 import DialogOperate from '@/views/setting/backup-account/operate/index.vue';
 import { Backup } from '@/api/interface/backup';
 import { ElForm } from 'element-plus';
-import { useDeleteData } from '@/hooks/use-delete-data';
+import i18n from '@/lang';
 
 const data = ref();
+const opRef = ref();
 const reflash = ref(false);
 const localData = ref<Backup.BackupInfo>({
     id: 0,
@@ -531,8 +535,16 @@ const search = async () => {
 };
 
 const onDelete = async (row: Backup.BackupInfo) => {
-    await useDeleteData(deleteBackup, { id: row.id }, 'commons.msg.delete');
-    search();
+    opRef.value.acceptParams({
+        title: i18n.global.t('commons.button.delete'),
+        names: [row.type],
+        msg: i18n.global.t('commons.msg.operatorHelper', [
+            i18n.global.t('setting.backupAccount'),
+            i18n.global.t('commons.button.delete'),
+        ]),
+        api: deleteBackup,
+        params: { id: row.id },
+    });
 };
 
 const dialogRef = ref();

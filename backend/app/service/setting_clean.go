@@ -327,8 +327,8 @@ func (u *SettingService) SystemCleanForCronjob() (string, error) {
 		}
 	}
 	timeNow := time.Now().Format("2006-01-02 15:04:05")
-	logs += fmt.Sprintf("%s: total clean: %s, total count: %d", timeNow, common.LoadSizeUnit2F(float64(size)), fileCount)
 	dropFileOrDirWithLog(path.Join(global.CONF.System.BaseDir, dockerLogPath), &logs, &size, &fileCount)
+	logs += fmt.Sprintf("\n%s: total clean: %s, total count: %d", timeNow, common.LoadSizeUnit2F(float64(size)), fileCount)
 
 	_ = settingRepo.Update("LastCleanTime", timeNow)
 	_ = settingRepo.Update("LastCleanSize", fmt.Sprintf("%v", size))

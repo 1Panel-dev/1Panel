@@ -107,11 +107,13 @@
             </ComplexTable>
         </el-card>
 
+        <OpDialog ref="opRef" @search="search" />
         <ConfirmDialog ref="confirmDialogRef" @confirm="onRecover"></ConfirmDialog>
     </div>
 </template>
 
 <script lang="ts" setup>
+import OpDialog from '@/components/del-dialog/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { Database } from '@/api/interface/database';
 import { redisPersistenceConf, updateRedisPersistenceConf } from '@/api/modules/database';
@@ -121,7 +123,6 @@ import { dateFormat } from '@/utils/util';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
-import { useDeleteData } from '@/hooks/use-delete-data';
 import { MsgInfo, MsgSuccess } from '@/utils/message';
 import { Backup } from '@/api/interface/backup';
 
@@ -139,6 +140,7 @@ const rules = reactive({
     appendfsync: [Rules.requiredSelect],
 });
 const formRef = ref<FormInstance>();
+const opRef = ref();
 
 interface DialogProps {
     status: string;
@@ -220,15 +222,26 @@ const onRecover = async () => {
 
 const onBatchDelete = async (row: Backup.RecordInfo | null) => {
     let ids: Array<number> = [];
+    let names: Array<string> = [];
     if (row) {
         ids.push(row.id);
+        names.push(row.fileName);
     } else {
         selects.value.forEach((item: Backup.RecordInfo) => {
             ids.push(item.id);
+            names.push(item.fileName);
         });
     }
-    await useDeleteData(deleteBackupRecord, { ids: ids }, 'commons.msg.delete');
-    search();
+    opRef.value.acceptParams({
+        title: i18n.global.t('commons.button.delete'),
+        names: names,
+        msg: i18n.global.t('commons.msg.operatorHelper', [
+            i18n.global.t('commons.button.backup'),
+            i18n.global.t('commons.button.delete'),
+        ]),
+        api: deleteBackupRecord,
+        params: { ids: ids },
+    });
 };
 
 const buttons = [

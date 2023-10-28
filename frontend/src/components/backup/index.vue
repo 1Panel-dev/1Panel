@@ -44,13 +44,15 @@
                 <fu-table-operations width="230px" :buttons="buttons" :label="$t('commons.table.operate')" fix />
             </ComplexTable>
         </el-drawer>
+
+        <OpDialog ref="opRef" @search="search" />
     </div>
 </template>
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
+import OpDialog from '@/components/del-dialog/index.vue';
 import { dateFormat, downloadFile } from '@/utils/util';
-import { useDeleteData } from '@/hooks/use-delete-data';
 import { handleBackup, handleRecover } from '@/api/modules/setting';
 import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
@@ -60,6 +62,7 @@ import { MsgSuccess } from '@/utils/message';
 
 const selects = ref<any>([]);
 const loading = ref();
+const opRef = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -153,15 +156,26 @@ const onDownload = async (row: Backup.RecordInfo) => {
 
 const onBatchDelete = async (row: Backup.RecordInfo | null) => {
     let ids: Array<number> = [];
+    let names = [];
     if (row) {
         ids.push(row.id);
+        names.push(row.fileName);
     } else {
         selects.value.forEach((item: Backup.RecordInfo) => {
             ids.push(item.id);
+            names.push(item.fileName);
         });
     }
-    await useDeleteData(deleteBackupRecord, { ids: ids }, 'commons.msg.delete');
-    search();
+    opRef.value.acceptParams({
+        names: names,
+        title: i18n.global.t('commons.button.delete'),
+        api: deleteBackupRecord,
+        msg: i18n.global.t('commons.msg.operatorHelper', [
+            i18n.global.t('commons.button.backup'),
+            i18n.global.t('commons.button.delete'),
+        ]),
+        params: { ids: ids },
+    });
 };
 
 const buttons = [
