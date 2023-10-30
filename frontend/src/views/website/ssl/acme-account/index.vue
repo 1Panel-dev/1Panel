@@ -20,12 +20,15 @@
         </ComplexTable>
         <Create ref="createRef" @close="search()"></Create>
     </el-drawer>
+
+    <OpDialog ref="opRef" @search="search" />
 </template>
+
 <script lang="ts" setup>
+import OpDialog from '@/components/del-dialog/index.vue';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { Website } from '@/api/interface/website';
 import { DeleteAcmeAccount, SearchAcmeAccount } from '@/api/modules/website';
-import { useDeleteData } from '@/hooks/use-delete-data';
 import i18n from '@/lang';
 import { reactive, ref } from 'vue';
 import Create from './create/index.vue';
@@ -40,12 +43,13 @@ const paginationConfig = reactive({
     pageSize: 20,
     total: 0,
 });
+const opRef = ref();
 
 const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
         click: function (row: Website.AcmeAccount) {
-            deleteAccount(row.id);
+            deleteAccount(row);
         },
     },
 ];
@@ -74,9 +78,17 @@ const handleClose = () => {
     open.value = false;
 };
 
-const deleteAccount = async (id: number) => {
-    await useDeleteData(DeleteAcmeAccount, { id: id }, 'commons.msg.delete');
-    search();
+const deleteAccount = async (row: any) => {
+    opRef.value.acceptParams({
+        title: i18n.global.t('commons.button.delete'),
+        names: [row.email],
+        msg: i18n.global.t('commons.msg.operatorHelper', [
+            i18n.global.t('website.acmeAccountManage'),
+            i18n.global.t('commons.button.delete'),
+        ]),
+        api: DeleteAcmeAccount,
+        params: { id: row.id },
+    });
 };
 
 defineExpose({

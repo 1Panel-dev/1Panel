@@ -58,19 +58,21 @@
                 </ComplexTable>
             </template>
         </LayoutContent>
+
         <CreateRuntime ref="createRef" @close="search" />
+        <OpDialog ref="opRef" @search="search" />
     </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
+import OpDialog from '@/components/del-dialog/index.vue';
 import { Runtime } from '@/api/interface/runtime';
 import { DeleteRuntime, SearchRuntimes } from '@/api/modules/runtime';
 import { dateFormat, toLowerCase } from '@/utils/util';
 import CreateRuntime from '@/views/website/runtime/php/create/index.vue';
 import Status from '@/components/status/index.vue';
 import i18n from '@/lang';
-import { useDeleteData } from '@/hooks/use-delete-data';
 import RouterMenu from '../index.vue';
 
 const paginationConfig = reactive({
@@ -86,6 +88,7 @@ let req = reactive<Runtime.RuntimeReq>({
     type: 'php',
 });
 let timer: NodeJS.Timer | null = null;
+const opRef = ref();
 
 const buttons = [
     {
@@ -131,8 +134,16 @@ const openDetail = (row: Runtime.Runtime) => {
 };
 
 const openDelete = async (row: Runtime.Runtime) => {
-    await useDeleteData(DeleteRuntime, { id: row.id }, 'commons.msg.delete');
-    search();
+    opRef.value.acceptParams({
+        title: i18n.global.t('commons.msg.delete'),
+        names: [req.name],
+        msg: i18n.global.t('commons.msg.operatorHelper', [
+            i18n.global.t('website.runtime'),
+            i18n.global.t('commons.msg.delete'),
+        ]),
+        api: DeleteRuntime,
+        params: { id: row.id, forceDelete: true },
+    });
 };
 
 onMounted(() => {

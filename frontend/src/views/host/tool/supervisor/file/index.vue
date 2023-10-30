@@ -42,13 +42,15 @@
             </span>
         </template>
     </el-drawer>
+
+    <OpDialog ref="opRef" @search="getContent" />
 </template>
 <script lang="ts" setup>
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
+import OpDialog from '@/components/del-dialog/index.vue';
 import { onMounted, onUnmounted, reactive, ref, shallowRef } from 'vue';
-import { useDeleteData } from '@/hooks/use-delete-data';
 import { OperateSupervisorProcessFile } from '@/api/modules/host-tool';
 import i18n from '@/lang';
 import { TabsPaneContext } from 'element-plus';
@@ -66,6 +68,7 @@ const req = reactive({
     content: '',
 });
 const title = ref('');
+const opRef = ref();
 
 const view = shallowRef();
 const handleReady = (payload) => {
@@ -136,17 +139,14 @@ const acceptParams = (name: string, file: string, operate: string) => {
 };
 
 const cleanLog = async () => {
-    const clearReq = {
-        name: req.name,
-        operate: 'clear',
-        file: req.file,
-    };
-    try {
-        await useDeleteData(OperateSupervisorProcessFile, clearReq, 'commons.msg.delete');
-        getContent();
-    } catch (error) {
-    } finally {
-    }
+    let log = req.file === 'out.log' ? i18n.global.t('logs.runLog') : i18n.global.t('logs.errLog');
+    opRef.value.acceptParams({
+        title: i18n.global.t('commons.msg.clean'),
+        names: [req.name],
+        msg: i18n.global.t('commons.msg.operatorHelper', [log, i18n.global.t('commons.msg.clean')]),
+        api: OperateSupervisorProcessFile,
+        params: { name: req.name, operate: 'clear', file: req.file },
+    });
 };
 
 const onCloseLog = async () => {

@@ -11,7 +11,7 @@
                                     <el-col :span="8">
                                         <div class="search-button">
                                             <el-input
-                                                typpe="number"
+                                                type="number"
                                                 v-model.number="processSearch.pid"
                                                 clearable
                                                 @clear="search()"
@@ -118,17 +118,19 @@
                 </ComplexTable>
             </template>
         </LayoutContent>
+
+        <OpDialog ref="opRef" @search="search" />
         <ProcessDetail ref="detailRef" />
     </div>
 </template>
 
 <script setup lang="ts">
 import FireRouter from '@/views/host/process/index.vue';
+import OpDialog from '@/components/del-dialog/index.vue';
 import { ref, onMounted, onUnmounted, nextTick, reactive } from 'vue';
 import ProcessDetail from './detail/index.vue';
 import i18n from '@/lang';
 import { StopProcess } from '@/api/modules/process';
-import { useDeleteData } from '@/hooks/use-delete-data';
 
 interface SortStatus {
     prop: '';
@@ -147,6 +149,7 @@ const processSearch = reactive({
     username: '',
     name: '',
 });
+const opRef = ref();
 
 const buttons = [
     {
@@ -158,7 +161,7 @@ const buttons = [
     {
         label: i18n.global.t('process.stopProcess'),
         click: function (row: any) {
-            stopProcess(row.PID);
+            stopProcess(row);
         },
     },
 ];
@@ -277,10 +280,17 @@ const search = () => {
     }
 };
 
-const stopProcess = async (PID: number) => {
-    try {
-        await useDeleteData(StopProcess, { PID: PID }, i18n.global.t('process.stopProcessWarn', [PID]));
-    } catch (error) {}
+const stopProcess = async (row: any) => {
+    opRef.value.acceptParams({
+        title: i18n.global.t('process.stopProcess'),
+        names: [row.name],
+        msg: i18n.global.t('commons.msg.operatorHelper', [
+            i18n.global.t('menu.process'),
+            i18n.global.t('process.stopProcess'),
+        ]),
+        api: StopProcess,
+        params: { PID: row.PID },
+    });
 };
 
 onMounted(() => {

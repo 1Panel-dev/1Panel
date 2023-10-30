@@ -30,12 +30,15 @@
             fix
         />
     </ComplexTable>
+
     <Create ref="createRef" @close="search()" />
     <File ref="fileRef" @close="search()" />
+    <OpDialog ref="opRef" @search="search()" />
 </template>
 
 <script lang="ts" setup name="proxy">
 import { Website } from '@/api/interface/website';
+import OpDialog from '@/components/del-dialog/index.vue';
 import { OperateProxyConfig, GetProxyConfig } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
 import Create from './create/index.vue';
@@ -43,7 +46,6 @@ import File from './file/index.vue';
 import { VideoPlay, VideoPause } from '@element-plus/icons-vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { useDeleteData } from '@/hooks/use-delete-data';
 import { ElMessageBox } from 'element-plus';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
@@ -65,6 +67,7 @@ const loading = ref(false);
 const data = ref();
 const createRef = ref();
 const fileRef = ref();
+const opRef = ref();
 
 const buttons = [
     {
@@ -127,8 +130,16 @@ const openEditFile = (proxyConfig: Website.ProxyConfig) => {
 
 const deleteProxy = async (proxyConfig: Website.ProxyConfig) => {
     proxyConfig.operate = 'delete';
-    await useDeleteData(OperateProxyConfig, proxyConfig, 'commons.msg.delete');
-    search();
+    opRef.value.acceptParams({
+        title: i18n.global.t('commons.msg.delete'),
+        names: [proxyConfig.name],
+        msg: i18n.global.t('commons.msg.operatorHelper', [
+            i18n.global.t('website.proxy'),
+            i18n.global.t('commons.msg.delete'),
+        ]),
+        api: OperateProxyConfig,
+        params: proxyConfig,
+    });
 };
 
 const changeCache = (proxyConfig: Website.ProxyConfig) => {
