@@ -26,6 +26,8 @@
         </ComplexTable>
         <Create ref="createRef" @close="search()"></Create>
     </el-drawer>
+
+    <OpDialog ref="opRef" @search="search" />
 </template>
 
 <script lang="ts" setup>
@@ -35,7 +37,6 @@ import { Website } from '@/api/interface/website';
 import { DeleteDnsAccount, SearchDnsAccount } from '@/api/modules/website';
 import { onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
-import { useDeleteData } from '@/hooks/use-delete-data';
 
 const paginationConfig = reactive({
     cacheSizeKey: 'dns-account-page-size',
@@ -45,8 +46,8 @@ const paginationConfig = reactive({
 });
 let data = ref<Website.DnsAccount[]>();
 let createRef = ref();
-let loading = ref(false);
 let open = ref(false);
+const opRef = ref();
 
 const buttons = [
     {
@@ -91,11 +92,17 @@ const openEdit = (form: Website.DnsAccount) => {
     createRef.value.acceptParams({ mode: 'edit', form: form });
 };
 
-const deleteAccount = async (id: number) => {
-    loading.value = true;
-    await useDeleteData(DeleteDnsAccount, { id: id }, 'commons.msg.delete');
-    loading.value = false;
-    search();
+const deleteAccount = async (row: any) => {
+    opRef.value.acceptParams({
+        title: i18n.global.t('commons.button.delete'),
+        names: [row.name],
+        msg: i18n.global.t('commons.msg.operatorHelper', [
+            i18n.global.t('website.dnsAccountManage'),
+            i18n.global.t('commons.button.delete'),
+        ]),
+        api: DeleteDnsAccount,
+        params: { id: row.id },
+    });
 };
 
 onMounted(() => {

@@ -34,6 +34,7 @@
             @ready="handleReady"
         />
     </div>
+    <OpDialog ref="opRef" @search="getContent()" />
 </template>
 <script lang="ts" setup>
 import { Codemirror } from 'vue-codemirror';
@@ -41,8 +42,8 @@ import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { computed, nextTick, onMounted, onUnmounted, reactive, ref, shallowRef } from 'vue';
 import { OpWebsiteLog } from '@/api/modules/website';
-import { useDeleteData } from '@/hooks/use-delete-data';
 import { downloadFile } from '@/utils/util';
+import i18n from '@/lang';
 
 const extensions = [javascript(), oneDark];
 const props = defineProps({
@@ -69,6 +70,7 @@ const data = ref({
 });
 const tailLog = ref(false);
 let timer: NodeJS.Timer | null = null;
+const opRef = ref();
 
 const view = shallowRef();
 const editorContainer = ref<HTMLDivElement | null>(null);
@@ -147,17 +149,14 @@ const updateEnable = () => {
 };
 
 const cleanLog = async () => {
-    const req = {
-        id: id.value,
-        operate: 'delete',
-        logType: logType.value,
-    };
-    try {
-        await useDeleteData(OpWebsiteLog, req, 'commons.msg.delete');
-        getContent();
-    } catch (error) {
-    } finally {
-    }
+    let log = logType.value === 'access.log' ? i18n.global.t('website.accessLog') : i18n.global.t('website.errLog');
+    opRef.value.acceptParams({
+        title: i18n.global.t('commons.msg.clean'),
+        names: [],
+        msg: i18n.global.t('commons.msg.operatorHelper', [log, i18n.global.t('commons.msg.clean')]),
+        api: OpWebsiteLog,
+        params: { id: id.value, operate: 'delete', logType: logType.value },
+    });
 };
 
 const onDownload = async () => {

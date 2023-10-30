@@ -19,15 +19,16 @@
         />
     </ComplexTable>
     <Domain ref="domainRef" @close="search(id)"></Domain>
+    <OpDialog ref="opRef" @search="search(id)" />
 </template>
 
 <script lang="ts" setup>
 import Domain from './create/index.vue';
 import { Website } from '@/api/interface/website';
+import OpDialog from '@/components/del-dialog/index.vue';
 import { DeleteDomain, GetWebsite, ListDomains } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
 import i18n from '@/lang';
-import { useDeleteData } from '@/hooks/use-delete-data';
 import { Promotion } from '@element-plus/icons-vue';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
@@ -48,12 +49,13 @@ let loading = ref(false);
 const data = ref<Website.Domain[]>([]);
 const domainRef = ref();
 const website = ref<Website.WebsiteDTO>();
+const opRef = ref();
 
 const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
         click: function (row: Website.Domain) {
-            deleteDoamin(row.id);
+            deleteDomain(row);
         },
         disabled: () => {
             return data.value.length == 1;
@@ -73,9 +75,17 @@ const openUrl = (domain: string, port: string) => {
     window.open(url);
 };
 
-const deleteDoamin = async (domainId: number) => {
-    await useDeleteData(DeleteDomain, { id: domainId }, 'commons.msg.delete');
-    search(id.value);
+const deleteDomain = async (row: Website.Domain) => {
+    opRef.value.acceptParams({
+        title: i18n.global.t('commons.msg.delete'),
+        names: [row.domain],
+        msg: i18n.global.t('commons.msg.operatorHelper', [
+            i18n.global.t('website.domain'),
+            i18n.global.t('commons.msg.delete'),
+        ]),
+        api: DeleteDomain,
+        params: { id: row.id },
+    });
 };
 
 const search = (id: number) => {

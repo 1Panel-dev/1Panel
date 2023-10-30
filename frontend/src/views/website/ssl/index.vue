@@ -80,11 +80,14 @@
             <Renew ref="renewRef" @close="search()"></Renew>
             <Detail ref="detailRef"></Detail>
         </LayoutContent>
+
+        <OpDialog ref="opRef" @search="search" />
     </div>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, reactive, ref, computed } from 'vue';
+import OpDialog from '@/components/del-dialog/index.vue';
 import { DeleteSSL, SearchSSL, UpdateSSL } from '@/api/modules/website';
 import DnsAccount from './dns-account/index.vue';
 import AcmeAccount from './acme-account/index.vue';
@@ -94,7 +97,6 @@ import Detail from './detail/index.vue';
 import { dateFormat, getProvider } from '@/utils/util';
 import i18n from '@/lang';
 import { Website } from '@/api/interface/website';
-import { useDeleteData } from '@/hooks/use-delete-data';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
@@ -112,6 +114,7 @@ const renewRef = ref();
 const detailRef = ref();
 let data = ref();
 let loading = ref(false);
+const opRef = ref();
 
 const routerButton = [
     {
@@ -139,7 +142,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
         click: function (row: Website.SSL) {
-            deleteSSL(row.id);
+            deleteSSL(row);
         },
     },
 ];
@@ -191,11 +194,17 @@ const openDetail = (id: number) => {
     detailRef.value.acceptParams(id);
 };
 
-const deleteSSL = async (id: number) => {
-    loading.value = true;
-    await useDeleteData(DeleteSSL, { id: id }, 'commons.msg.delete');
-    loading.value = false;
-    search();
+const deleteSSL = async (row: any) => {
+    opRef.value.acceptParams({
+        title: i18n.global.t('commons.button.delete'),
+        names: [row.primaryDomain],
+        msg: i18n.global.t('commons.msg.operatorHelper', [
+            i18n.global.t('website.ssl'),
+            i18n.global.t('commons.button.delete'),
+        ]),
+        api: DeleteSSL,
+        params: { id: row.id },
+    });
 };
 
 onMounted(() => {
