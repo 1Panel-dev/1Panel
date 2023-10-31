@@ -1019,28 +1019,29 @@ func simplifyPort(ports []types.Port) []string {
 				if start.PublicPort != 0 {
 					itemPortStr = fmt.Sprintf("%s:%v->%v/%s", start.IP, start.PublicPort, start.PrivatePort, start.Type)
 				}
-				datas = append(datas, itemPortStr)
+				datas = append(datas, strings.TrimPrefix(itemPortStr, ":"))
 			} else {
 				itemPortStr := fmt.Sprintf("%s:%v-%v/%s", start.IP, start.PrivatePort, ports[i-1].PrivatePort, start.Type)
 				if start.PublicPort != 0 {
 					itemPortStr = fmt.Sprintf("%s:%v-%v->%v-%v/%s", start.IP, start.PublicPort, ports[i-1].PublicPort, start.PrivatePort, ports[i-1].PrivatePort, start.Type)
 				}
-				datas = append(datas, itemPortStr)
+				datas = append(datas, strings.TrimPrefix(itemPortStr, ":"))
 			}
 			start = ports[i]
-		} else if i == len(ports)-1 {
+		}
+		if i == len(ports)-1 {
 			if ports[i].PrivatePort == start.PrivatePort {
 				itemPortStr := fmt.Sprintf("%s:%v/%s", start.IP, start.PrivatePort, start.Type)
 				if start.PublicPort != 0 {
 					itemPortStr = fmt.Sprintf("%s:%v->%v/%s", start.IP, start.PublicPort, start.PrivatePort, start.Type)
 				}
-				datas = append(datas, itemPortStr)
+				datas = append(datas, strings.TrimPrefix(itemPortStr, ":"))
 			} else {
 				itemPortStr := fmt.Sprintf("%s:%v-%v/%s", start.IP, start.PrivatePort, ports[i].PrivatePort, start.Type)
 				if start.PublicPort != 0 {
 					itemPortStr = fmt.Sprintf("%s:%v-%v->%v-%v/%s", start.IP, start.PublicPort, ports[i].PublicPort, start.PrivatePort, ports[i].PrivatePort, start.Type)
 				}
-				datas = append(datas, itemPortStr)
+				datas = append(datas, strings.TrimPrefix(itemPortStr, ":"))
 			}
 		}
 	}
