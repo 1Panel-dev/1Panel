@@ -6,6 +6,9 @@
         <el-button @click="clear" type="primary" :disabled="data == null || data.length == 0">
             {{ $t('file.clearRecycleBin') }}
         </el-button>
+        <el-button @click="patchDelete" :disabled="data == null || data.length == 0">
+            {{ $t('commons.button.delete') }}
+        </el-button>
         <ComplexTable
             :pagination-config="paginationConfig"
             v-model:selects="selects"
@@ -35,15 +38,16 @@
             ></el-table-column>
             <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fix />
         </ComplexTable>
+        <Delete ref="deleteRef" @close="search" />
     </el-drawer>
 </template>
 
 <script lang="ts" setup>
-import { DeleteFile, clearRecycle, getRecycleList, reduceFile } from '@/api/modules/files';
+import { clearRecycle, getRecycleList, reduceFile } from '@/api/modules/files';
 import { reactive, ref } from 'vue';
 import { dateFormat, computeSize } from '@/utils/util';
 import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
+import Delete from './delete/index.vue';
 
 const open = ref(false);
 const req = reactive({
@@ -62,6 +66,8 @@ const paginationConfig = reactive({
     pageSize: 100,
     total: 0,
 });
+
+const deleteRef = ref();
 
 const handleClose = () => {
     open.value = false;
@@ -86,30 +92,14 @@ const search = async () => {
 };
 
 const singleDel = (row: any) => {
-    ElMessageBox.confirm(i18n.global.t('commons.msg.delete'), i18n.global.t('commons.button.delete'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-    }).then(async () => {
-        files.value = [];
-        files.value.push(row);
-        deleteFile();
-    });
+    files.value = [];
+    files.value.push(row);
+    deleteRef.value.acceptParams(files.value);
 };
 
-const deleteFile = async () => {
-    const pros = [];
-    for (const s of files.value) {
-        pros.push(DeleteFile({ path: s.from + '/' + s.rName, isDir: s.isDir, forceDelete: true }));
-    }
-    loading.value = true;
-    Promise.all(pros)
-        .then(() => {
-            MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
-            search();
-        })
-        .finally(() => {
-            loading.value = false;
-        });
+const patchDelete = () => {
+    files.value = selects.value;
+    deleteRef.value.acceptParams(files.value);
 };
 
 const rdFile = async (row: any) => {

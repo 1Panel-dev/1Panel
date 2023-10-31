@@ -195,7 +195,8 @@
                                             v-if="row.favoriteID > 0"
                                             link
                                             type="warning"
-                                            :icon="Star"
+                                            size="large"
+                                            :icon="StarFilled"
                                             @click="removeFavorite(row.favoriteID)"
                                         ></el-button>
                                         <div v-else>
@@ -293,7 +294,7 @@ import {
     SearchFavorite,
 } from '@/api/modules/files';
 import { computeSize, dateFormat, downloadFile, getIcon, getRandomStr } from '@/utils/util';
-import { Delete, Star } from '@element-plus/icons-vue';
+import { Delete, StarFilled, Star } from '@element-plus/icons-vue';
 import { File } from '@/api/interface/file';
 import { Mimetypes, Languages } from '@/global/mimetype';
 import { useRouter } from 'vue-router';
