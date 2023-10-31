@@ -31,7 +31,7 @@
                         </el-radio-group>
                     </el-form-item>
                     <div v-if="runtime.resource === 'appstore'">
-                        <el-form-item :label="$t('runtime.app')" prop="appId">
+                        <el-form-item :label="$t('runtime.app')" prop="appID">
                             <el-row :gutter="20">
                                 <el-col :span="12">
                                     <el-select
@@ -160,6 +160,7 @@ interface OperateRrops {
     id?: number;
     mode: string;
     type: string;
+    appID?: number;
 }
 
 const open = ref(false);
@@ -368,7 +369,7 @@ const acceptParams = async (props: OperateRrops) => {
         Object.assign(runtime, initData(props.type));
         searchApp(null);
     } else {
-        searchApp(null);
+        searchApp(props.appID);
         getRuntime(props.id);
     }
     open.value = true;

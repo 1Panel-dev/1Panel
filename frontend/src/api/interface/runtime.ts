@@ -15,6 +15,7 @@ export namespace Runtime {
         status: string;
         codeDir: string;
         port: number;
+        appID: number;
     }
 
     export interface RuntimeReq extends ReqPage {
