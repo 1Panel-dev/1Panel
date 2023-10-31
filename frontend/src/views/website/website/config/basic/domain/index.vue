@@ -77,7 +77,7 @@ const openUrl = (domain: string, port: string) => {
 
 const deleteDomain = async (row: Website.Domain) => {
     opRef.value.acceptParams({
-        title: i18n.global.t('commons.msg.delete'),
+        title: i18n.global.t('commons.msg.deleteTitle'),
         names: [row.domain],
         msg: i18n.global.t('commons.msg.operatorHelper', [
             i18n.global.t('website.domain'),

@@ -135,8 +135,8 @@ const openDetail = (row: Runtime.Runtime) => {
 
 const openDelete = async (row: Runtime.Runtime) => {
     opRef.value.acceptParams({
-        title: i18n.global.t('commons.msg.delete'),
-        names: [req.name],
+        title: i18n.global.t('commons.msg.deleteTitle'),
+        names: [row.name],
         msg: i18n.global.t('commons.msg.operatorHelper', [
             i18n.global.t('website.runtime'),
             i18n.global.t('commons.msg.delete'),
