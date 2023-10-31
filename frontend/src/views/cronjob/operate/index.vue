@@ -23,14 +23,34 @@
                             <el-option value="website" :label="$t('cronjob.website')" />
                             <el-option value="database" :label="$t('cronjob.database')" />
                             <el-option value="directory" :label="$t('cronjob.directory')" />
-                            <el-option value="snapshot" :label="$t('cronjob.snapshot')" />
+                            <el-option value="log" :label="$t('cronjob.log')" />
                             <el-option value="curl" :label="$t('cronjob.curl')" />
-                            <el-option value="ntp" :label="$t('cronjob.ntp')" />
                             <el-option value="cutWebsiteLog" :label="$t('cronjob.cutWebsiteLog')" />
                             <el-option value="clean" :label="$t('setting.diskClean')" />
-                            <el-option value="log" :label="$t('cronjob.log')" />
+                            <el-option value="snapshot" :label="$t('cronjob.snapshot')" />
+                            <el-option value="ntp" :label="$t('cronjob.ntp')" />
                         </el-select>
                         <el-tag v-else>{{ $t('cronjob.' + dialogData.rowData!.type) }}</el-tag>
+                        <div v-if="dialogData.rowData!.type === 'log'" class="logText">
+                            <span class="input-help">
+                                {{ $t('cronjob.logHelper1') }}
+                                <el-link class="link" icon="Position" @click="goRouter('/logs/system')" type="primary">
+                                    {{ $t('firewall.quickJump') }}
+                                </el-link>
+                            </span>
+                            <span class="input-help">
+                                {{ $t('cronjob.logHelper2') }}
+                                <el-link class="link" icon="Position" @click="goRouter('/logs/ssh')" type="primary">
+                                    {{ $t('firewall.quickJump') }}
+                                </el-link>
+                            </span>
+                            <span class="input-help">
+                                {{ $t('cronjob.logHelper3') }}
+                                <el-link class="link" icon="Position" @click="goRouter('/logs/website')" type="primary">
+                                    {{ $t('firewall.quickJump') }}
+                                </el-link>
+                            </span>
+                        </div>
                     </el-form-item>
 
                     <el-form-item :label="$t('cronjob.taskName')" prop="name">
@@ -632,5 +652,13 @@ defineExpose({
     margin-right: 10px;
     font-size: 12px;
     margin-top: 5px;
+}
+.logText {
+    line-height: 22px;
+    font-size: 12px;
+    .link {
+        font-size: 12px;
+        margin-top: -3px;
+    }
 }
 </style>
