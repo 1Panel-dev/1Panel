@@ -21,7 +21,7 @@
                         >
                             <el-checkbox v-model="form.input" :label="$t('container.input')" />
                             <el-select v-if="!form.input" clearable v-model="form.bindAddress">
-                                <el-option value="0.0.0.0" :label="$t('setting.bindAll') + ' (0.0.0.0)'"></el-option>
+                                <el-option value="0.0.0.0" label="0.0.0.0"></el-option>
                                 <div v-for="item in interfaceOptions" :key="item">
                                     <el-option v-if="item.indexOf(':') === -1" :value="item" :label="item" />
                                 </div>
@@ -31,7 +31,7 @@
                         <el-form-item v-else :label="$t('setting.bindAddress')" prop="bindAddress" :rules="Rules.ipV6">
                             <el-checkbox v-model="form.input" :label="$t('container.input')" />
                             <el-select v-if="!form.input" clearable v-model="form.bindAddress">
-                                <el-option value="::" :label="$t('setting.bindAll') + ' (::)'"></el-option>
+                                <el-option value="::" label="::"></el-option>
                                 <div v-for="item in interfaceOptions" :key="item">
                                     <el-option v-if="item.indexOf(':') !== -1" :value="item" :label="item" />
                                 </div>

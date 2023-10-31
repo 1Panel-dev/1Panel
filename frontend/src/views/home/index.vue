@@ -10,7 +10,7 @@
         >
             <template #route-button>
                 <div class="router-button">
-                    <el-button link type="primary" @click="restart('1panel')">
+                    <el-button link type="primary" @click="restart('panel')">
                         {{ $t('home.restart_1panel') }}
                     </el-button>
                     <el-divider direction="vertical" />
@@ -542,7 +542,7 @@ const loadSafeStatus = async () => {
 
 const restart = async (type: string) => {
     ElMessageBox.confirm(
-        i18n.global.t('home.restartHelper', [i18n.global.t('home.restart_' + type)]),
+        i18n.global.t('home.restartHelper', [i18n.global.t('home.' + type)]),
         i18n.global.t('commons.msg.operate'),
         {
             confirmButtonText: i18n.global.t('commons.button.confirm'),

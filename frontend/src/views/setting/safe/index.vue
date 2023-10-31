@@ -16,7 +16,7 @@
                                 </el-input>
                             </el-form-item>
                             <el-form-item :label="$t('setting.bindInfo')" prop="bindAddress">
-                                <el-input disabled v-model="form.bindAddressItem">
+                                <el-input disabled v-model="form.bindAddress">
                                     <template #append>
                                         <el-button @click="onChangeBind" icon="Setting">
                                             {{ $t('commons.button.set') }}
@@ -200,7 +200,6 @@ const form = reactive({
     serverPort: 9999,
     ipv6: 'disable',
     bindAddress: '',
-    bindAddressItem: '',
     ssl: 'disable',
     sslType: 'self',
     securityEntrance: '',
@@ -220,8 +219,6 @@ const search = async () => {
     form.serverPort = Number(res.data.serverPort);
     form.ipv6 = res.data.ipv6;
     form.bindAddress = res.data.bindAddress;
-    let proto = form.ipv6 === 'enable' ? 'ipv6' : 'ipv4';
-    form.bindAddressItem = ' [' + proto + '] ' + res.data.bindAddress;
     form.ssl = res.data.ssl;
     form.sslType = res.data.sslType;
     if (form.ssl === 'enable') {

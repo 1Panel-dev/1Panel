@@ -284,8 +284,9 @@ const message = {
     home: {
         restart_1panel: 'Restart Panel',
         restart_system: 'Restart Server',
-        restartHelper:
-            'Do you want to perform the operation [{0}] on this machine? This action will temporarily disable the service. Do you want to continue?',
+        panel: '1Panel',
+        system: '1Panel Server',
+        restartHelper: 'About to restart {0}, do you want to continue?',
         operationSuccess: 'Operation successful! Restarting, please wait...',
         overview: 'Overview',
         entranceHelper:
@@ -739,6 +740,9 @@ const message = {
         record: 'Records',
         shell: 'Shell script',
         log: 'Backup logs',
+        ogHelper1: '1.1Panel System log ',
+        logHelper2: '2. SSH login log of the server ',
+        logHelper3: '3. All site logs ',
         containerCheckBox: 'In container (no need to enter the container command)',
         containerName: 'Container name',
         ntp: 'Time synchronization',
