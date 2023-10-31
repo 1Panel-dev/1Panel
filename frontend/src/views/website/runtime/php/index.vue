@@ -130,7 +130,7 @@ const openCreate = () => {
 };
 
 const openDetail = (row: Runtime.Runtime) => {
-    createRef.value.acceptParams({ type: row.type, mode: 'edit', id: row.id });
+    createRef.value.acceptParams({ type: row.type, mode: 'edit', id: row.id, appID: row.appID });
 };
 
 const openDelete = async (row: Runtime.Runtime) => {
