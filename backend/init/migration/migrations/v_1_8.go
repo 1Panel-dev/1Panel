@@ -28,3 +28,20 @@ var AddBindAddress = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddCommandGroup = &gormigrate.Migration{
+	ID: "20231030-add-command-group",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Command{}); err != nil {
+			return err
+		}
+		defaultCommand := &model.Group{IsDefault: true, Name: "默认", Type: "command"}
+		if err := tx.Create(defaultCommand).Error; err != nil {
+			return err
+		}
+		if err := tx.Model(&model.Command{}).Where("1 = 1").Update("group_id", defaultCommand.ID).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

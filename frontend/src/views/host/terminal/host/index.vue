@@ -74,20 +74,21 @@
         <OpDialog ref="opRef" @search="search" />
         <OperateDialog @search="search" ref="dialogRef" />
         <GroupDialog @search="search" ref="dialogGroupRef" />
-        <GroupChangeDialog @search="search" ref="dialogGroupChangeRef" />
+        <GroupChangeDialog @search="search" @change="onChangeGroup" ref="dialogGroupChangeRef" />
     </div>
 </template>
 
 <script setup lang="ts">
 import GroupDialog from '@/components/group/index.vue';
 import OpDialog from '@/components/del-dialog/index.vue';
-import GroupChangeDialog from '@/views/host/terminal/host/change-group/index.vue';
+import GroupChangeDialog from '@/components/group/change.vue';
 import OperateDialog from '@/views/host/terminal/host/operate/index.vue';
-import { deleteHost, searchHosts } from '@/api/modules/host';
+import { deleteHost, editHostGroup, searchHosts } from '@/api/modules/host';
 import { GetGroupList } from '@/api/modules/group';
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { Host } from '@/api/interface/host';
+import { MsgSuccess } from '@/utils/message';
 
 const loading = ref();
 const data = ref();
@@ -102,6 +103,7 @@ const paginationConfig = reactive({
 const info = ref();
 const group = ref<string>('');
 const dialogGroupChangeRef = ref();
+const currentID = ref();
 
 const opRef = ref();
 
@@ -162,11 +164,22 @@ const loadGroups = async () => {
     groupList.value = res.data;
 };
 
+const onChangeGroup = async (groupID: number) => {
+    let param = {
+        id: currentID.value,
+        groupID: groupID,
+    };
+    await editHostGroup(param);
+    search();
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+};
+
 const buttons = [
     {
         label: i18n.global.t('terminal.groupChange'),
         click: (row: any) => {
-            dialogGroupChangeRef.value!.acceptParams({ id: row.id, group: row.groupBelong });
+            currentID.value = row.id;
+            dialogGroupChangeRef.value!.acceptParams({ group: row.groupBelong, groupType: 'host' });
         },
     },
     {

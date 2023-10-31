@@ -11,7 +11,8 @@ type CommandService struct{}
 
 type ICommandService interface {
 	List() ([]dto.CommandInfo, error)
-	SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error)
+	SearchForTree() ([]dto.CommandTree, error)
+	SearchWithPage(search dto.SearchCommandWithPage) (int64, interface{}, error)
 	Create(commandDto dto.CommandOperate) error
 	Update(id uint, upMap map[string]interface{}) error
 	Delete(ids []uint) error
@@ -37,13 +38,49 @@ func (u *CommandService) List() ([]dto.CommandInfo, error) {
 	return dtoCommands, err
 }
 
-func (u *CommandService) SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error) {
-	total, commands, err := commandRepo.Page(search.Page, search.PageSize, commonRepo.WithLikeName(search.Info))
+func (u *CommandService) SearchForTree() ([]dto.CommandTree, error) {
+	cmdList, err := commandRepo.GetList()
+	if err != nil {
+		return nil, err
+	}
+	groups, err := groupRepo.GetList(commonRepo.WithByType("command"))
+	if err != nil {
+		return nil, err
+	}
+	var lists []dto.CommandTree
+	for _, group := range groups {
+		var data dto.CommandTree
+		data.ID = group.ID + 10000
+		data.Label = group.Name
+		for _, cmd := range cmdList {
+			if cmd.GroupID == group.ID {
+				data.Children = append(data.Children, dto.CommandInfo{ID: cmd.ID, Name: cmd.Name, Command: cmd.Command})
+			}
+		}
+		if len(data.Children) != 0 {
+			lists = append(lists, data)
+		}
+	}
+	return lists, err
+}
+
+func (u *CommandService) SearchWithPage(search dto.SearchCommandWithPage) (int64, interface{}, error) {
+	total, commands, err := commandRepo.Page(search.Page, search.PageSize, commonRepo.WithLikeName(search.Info), commonRepo.WithByGroupID(search.GroupID))
+	if err != nil {
+		return 0, nil, err
+	}
+	groups, _ := groupRepo.GetList(commonRepo.WithByType("command"))
 	var dtoCommands []dto.CommandInfo
 	for _, command := range commands {
 		var item dto.CommandInfo
 		if err := copier.Copy(&item, &command); err != nil {
 			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+		}
+		for _, group := range groups {
+			if command.GroupID == group.ID {
+				item.GroupBelong = group.Name
+				item.GroupID = group.ID
+			}
 		}
 		dtoCommands = append(dtoCommands, item)
 	}

@@ -59,6 +59,9 @@ export const getCommandList = () => {
 export const getCommandPage = (params: Command.CommandSearch) => {
     return http.post<ResPage<Command.CommandInfo>>(`/hosts/command/search`, params);
 };
+export const getCommandTree = () => {
+    return http.get<any>(`/hosts/command/tree`);
+};
 export const addCommand = (params: Command.CommandOperate) => {
     return http.post<Command.CommandOperate>(`/hosts/command`, params);
 };

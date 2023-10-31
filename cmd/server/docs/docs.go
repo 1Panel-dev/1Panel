@@ -5261,7 +5261,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/request.FileOption"
+                            "$ref": "#/definitions/request.FileContentReq"
                         }
                     }
                 ],
@@ -7071,6 +7071,31 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dto.PageResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/hosts/command/tree": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取快速命令树",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Command"
+                ],
+                "summary": "Tree commands",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "Array"
                         }
                     }
                 }
@@ -12733,6 +12758,12 @@ const docTemplate = `{
                 "command": {
                     "type": "string"
                 },
+                "groupBelong": {
+                    "type": "string"
+                },
+                "groupID": {
+                    "type": "integer"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -12750,6 +12781,12 @@ const docTemplate = `{
             "properties": {
                 "command": {
                     "type": "string"
+                },
+                "groupBelong": {
+                    "type": "string"
+                },
+                "groupID": {
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"
@@ -14866,7 +14903,6 @@ const docTemplate = `{
         "dto.OperationWithNameAndType": {
             "type": "object",
             "required": [
-                "name",
                 "type"
             ],
             "properties": {
@@ -15052,7 +15088,6 @@ const docTemplate = `{
         "dto.RecordSearch": {
             "type": "object",
             "required": [
-                "name",
                 "page",
                 "pageSize",
                 "type"
@@ -16463,6 +16498,9 @@ const docTemplate = `{
                 "pageSize"
             ],
             "properties": {
+                "all": {
+                    "type": "boolean"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -16648,6 +16686,17 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.FileContentReq": {
+            "type": "object",
+            "required": [
+                "path"
+            ],
+            "properties": {
+                "path": {
                     "type": "string"
                 }
             }
@@ -17822,9 +17871,6 @@ const docTemplate = `{
         },
         "request.WebsiteInstallCheckReq": {
             "type": "object",
-            "required": [
-                "InstallIds"
-            ],
             "properties": {
                 "InstallIds": {
                     "type": "array",

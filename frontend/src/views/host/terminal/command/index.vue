@@ -8,9 +8,21 @@
                 <el-button type="primary" @click="onCreate()">
                     {{ $t('commons.button.create') }}{{ $t('terminal.quickCommand') }}
                 </el-button>
+                <el-button type="primary" plain @click="onOpenGroupDialog()">
+                    {{ $t('terminal.group') }}
+                </el-button>
                 <el-button type="primary" plain :disabled="selects.length === 0" @click="batchDelete(null)">
                     {{ $t('commons.button.delete') }}
                 </el-button>
+            </template>
+            <template #search>
+                <el-select v-model="group" @change="search()" clearable>
+                    <template #prefix>{{ $t('terminal.group') }}</template>
+                    <el-option :label="$t('commons.table.all')" value=""></el-option>
+                    <div v-for="item in groupList" :key="item.name">
+                        <el-option :value="item.id" :label="item.name" />
+                    </div>
+                </el-select>
             </template>
             <template #main>
                 <ComplexTable
@@ -33,7 +45,14 @@
                         show-overflow-tooltip
                         prop="command"
                     />
-                    <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fix />
+                    <el-table-column
+                        :label="$t('commons.table.group')"
+                        show-overflow-tooltip=""
+                        min-width="100"
+                        prop="groupBelong"
+                        fix
+                    />
+                    <fu-table-operations width="200px" :buttons="buttons" :label="$t('commons.table.operate')" fix />
                 </ComplexTable>
             </template>
         </LayoutContent>
@@ -57,6 +76,13 @@
                         <el-form-item :label="$t('commons.table.name')" prop="name">
                             <el-input clearable v-model="commandInfo.name" />
                         </el-form-item>
+                        <el-form-item :label="$t('commons.table.group')" prop="name">
+                            <el-select filterable v-model="commandInfo.groupID" clearable style="width: 100%">
+                                <div v-for="item in groupList" :key="item.id">
+                                    <el-option :label="item.name" :value="item.id" />
+                                </div>
+                            </el-select>
+                        </el-form-item>
                         <el-form-item :label="$t('terminal.command')" prop="command">
                             <el-input type="textarea" clearable v-model="commandInfo.command" />
                         </el-form-item>
@@ -74,12 +100,16 @@
         </el-drawer>
 
         <OpDialog ref="opRef" @search="search" />
+        <GroupDialog @search="loadGroups" ref="dialogGroupRef" />
+        <GroupChangeDialog @search="search" @change="onChangeGroup" ref="dialogGroupChangeRef" />
     </div>
 </template>
 
 <script setup lang="ts">
 import { Command } from '@/api/interface/command';
+import GroupDialog from '@/components/group/index.vue';
 import OpDialog from '@/components/del-dialog/index.vue';
+import GroupChangeDialog from '@/components/group/change.vue';
 import { addCommand, editCommand, deleteCommand, getCommandPage } from '@/api/modules/host';
 import { reactive, ref } from 'vue';
 import type { ElForm } from 'element-plus';
@@ -87,10 +117,12 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
+import { GetGroupList } from '@/api/modules/group';
 
 const loading = ref();
 const data = ref();
 const selects = ref<any>([]);
+const groupList = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'terminal-command-page-size',
     currentPage: 1,
@@ -98,6 +130,8 @@ const paginationConfig = reactive({
     total: 0,
 });
 const info = ref();
+const group = ref<string>('');
+const dialogGroupChangeRef = ref();
 
 const opRef = ref();
 
@@ -111,26 +145,46 @@ let operate = ref<string>('create');
 
 const acceptParams = () => {
     search();
+    loadGroups();
 };
 
+const defaultGroupID = ref();
 let commandInfo = reactive<Command.CommandOperate>({
     id: 0,
     name: '',
+    groupID: 0,
     command: '',
 });
 
 const cmdVisible = ref<boolean>(false);
 
+const loadGroups = async () => {
+    const res = await GetGroupList({ type: 'command' });
+    groupList.value = res.data;
+    for (const group of groupList.value) {
+        if (group.isDefault) {
+            defaultGroupID.value = group.id;
+            break;
+        }
+    }
+};
+
 const onCreate = async () => {
     commandInfo.id = 0;
     commandInfo.name = '';
     commandInfo.command = '';
+    commandInfo.groupID = defaultGroupID.value;
     operate.value = 'create';
     cmdVisible.value = true;
 };
 
 const handleClose = () => {
     cmdVisible.value = false;
+};
+
+const dialogGroupRef = ref();
+const onOpenGroupDialog = () => {
+    dialogGroupRef.value!.acceptParams({ type: 'command' });
 };
 
 const submitAddCommand = (formEl: FormInstance | undefined) => {
@@ -148,14 +202,11 @@ const submitAddCommand = (formEl: FormInstance | undefined) => {
     });
 };
 
-const onEdit = async (row: Command.CommandInfo | null) => {
-    if (row !== null) {
-        commandInfo.id = row.id;
-        commandInfo.name = row.name;
-        commandInfo.command = row.command;
-        operate.value = 'edit';
-        cmdVisible.value = true;
-    }
+const onChangeGroup = async (groupID: number) => {
+    commandInfo.groupID = groupID;
+    await editCommand(commandInfo);
+    search();
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
 };
 
 const batchDelete = async (row: Command.CommandInfo | null) => {
@@ -184,9 +235,23 @@ const batchDelete = async (row: Command.CommandInfo | null) => {
 
 const buttons = [
     {
+        label: i18n.global.t('terminal.groupChange'),
+        click: (row: any) => {
+            commandInfo = row;
+            dialogGroupChangeRef.value!.acceptParams({
+                group: row.groupBelong,
+                groupType: 'command',
+            });
+        },
+    },
+    {
         label: i18n.global.t('commons.button.edit'),
         icon: 'Edit',
-        click: onEdit,
+        click: (row: any) => {
+            commandInfo = row;
+            operate.value = 'edit';
+            cmdVisible.value = true;
+        },
     },
     {
         label: i18n.global.t('commons.button.delete'),
@@ -199,6 +264,7 @@ const search = async () => {
     let params = {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
+        groupID: Number(group.value),
         info: info.value,
     };
     loading.value = true;
