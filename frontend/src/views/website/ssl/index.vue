@@ -13,6 +13,9 @@
                 <el-button type="primary" @click="openSSL()">
                     {{ $t('ssl.create') }}
                 </el-button>
+                <el-button type="primary" @click="openUpload()">
+                    {{ $t('ssl.upload') }}
+                </el-button>
                 <el-button type="primary" plain @click="openAcmeAccount()">
                     {{ $t('website.acmeAccountManage') }}
                 </el-button>
@@ -79,6 +82,7 @@
             <Create ref="sslCreateRef" @close="search()"></Create>
             <Renew ref="renewRef" @close="search()"></Renew>
             <Detail ref="detailRef"></Detail>
+            <SSLUpload ref="sslUploadRef" @close="search()"></SSLUpload>
         </LayoutContent>
 
         <OpDialog ref="opRef" @search="search" />
@@ -99,6 +103,7 @@ import i18n from '@/lang';
 import { Website } from '@/api/interface/website';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
+import SSLUpload from './upload/index.vue';
 const globalStore = GlobalStore();
 
 const paginationConfig = reactive({
@@ -112,9 +117,10 @@ const dnsAccountRef = ref();
 const sslCreateRef = ref();
 const renewRef = ref();
 const detailRef = ref();
-let data = ref();
-let loading = ref(false);
+const data = ref();
+const loading = ref(false);
 const opRef = ref();
+const sslUploadRef = ref();
 
 const routerButton = [
     {
@@ -186,6 +192,9 @@ const openDnsAccount = () => {
 };
 const openSSL = () => {
     sslCreateRef.value.acceptParams();
+};
+const openUpload = () => {
+    sslUploadRef.value.acceptParams();
 };
 const openRenewSSL = (id: number, websites: Website.Website[]) => {
     renewRef.value.acceptParams({ id: id, websites: websites });

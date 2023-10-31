@@ -11,6 +11,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/1Panel-dev/1Panel/backend/utils/ssl"
 	"path"
 	"strconv"
@@ -30,6 +31,7 @@ type IWebsiteSSLService interface {
 	GetWebsiteSSL(websiteId uint) (response.WebsiteSSLDTO, error)
 	Delete(id uint) error
 	Update(update request.WebsiteSSLUpdate) error
+	Upload(req request.WebsiteSSLUpload) error
 }
 
 func NewIWebsiteSSLService() IWebsiteSSLService {
@@ -288,4 +290,61 @@ func (w WebsiteSSLService) Update(update request.WebsiteSSLUpdate) error {
 	}
 	websiteSSL.AutoRenew = update.AutoRenew
 	return websiteSSLRepo.Save(websiteSSL)
+}
+
+func (w WebsiteSSLService) Upload(req request.WebsiteSSLUpload) error {
+	newSSL := &model.WebsiteSSL{
+		Provider: constant.Manual,
+	}
+
+	if req.Type == "local" {
+		fileOp := files.NewFileOp()
+		if !fileOp.Stat(req.PrivateKeyPath) {
+			return buserr.New("ErrSSLKeyNotFound")
+		}
+		if !fileOp.Stat(req.CertificatePath) {
+			return buserr.New("ErrSSLCertificateNotFound")
+		}
+		if content, err := fileOp.GetContent(req.PrivateKeyPath); err != nil {
+			return err
+		} else {
+			newSSL.PrivateKey = string(content)
+		}
+		if content, err := fileOp.GetContent(req.CertificatePath); err != nil {
+			return err
+		} else {
+			newSSL.Pem = string(content)
+		}
+	} else {
+		newSSL.PrivateKey = req.PrivateKey
+		newSSL.Pem = req.Certificate
+	}
+
+	privateKeyCertBlock, _ := pem.Decode([]byte(newSSL.PrivateKey))
+	if privateKeyCertBlock == nil {
+		return buserr.New("ErrSSLKeyFormat")
+	}
+
+	certBlock, _ := pem.Decode([]byte(newSSL.Pem))
+	if certBlock == nil {
+		return buserr.New("ErrSSLCertificateFormat")
+	}
+	cert, err := x509.ParseCertificate(certBlock.Bytes)
+	if err != nil {
+		return err
+	}
+	newSSL.ExpireDate = cert.NotAfter
+	newSSL.StartDate = cert.NotBefore
+	newSSL.Type = cert.Issuer.CommonName
+	if len(cert.Issuer.Organization) > 0 {
+		newSSL.Organization = cert.Issuer.Organization[0]
+	} else {
+		newSSL.Organization = cert.Issuer.CommonName
+	}
+	if len(cert.DNSNames) > 0 {
+		newSSL.PrimaryDomain = cert.DNSNames[0]
+		newSSL.Domains = strings.Join(cert.DNSNames, ",")
+	}
+
+	return websiteSSLRepo.Create(context.Background(), newSSL)
 }

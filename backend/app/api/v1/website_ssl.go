@@ -192,3 +192,24 @@ func (b *BaseApi) UpdateWebsiteSSL(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, nil)
 }
+
+// @Tags Website SSL
+// @Summary Upload ssl
+// @Description 上传 ssl
+// @Accept json
+// @Param request body request.WebsiteSSLUpload true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/ssl/upload [post]
+// @x-panel-log {"bodyKeys":["type"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"上传 ssl [type]","formatEN":"Upload ssl [type]"}
+func (b *BaseApi) UploadWebsiteSSL(c *gin.Context) {
+	var req request.WebsiteSSLUpload
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteSSLService.Upload(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}

@@ -1626,6 +1626,7 @@ const message = {
         renewWebsite: '该证书已经和以下网站关联，续签会同步应用到这些网站',
         createAcme: '创建账户',
         acmeHelper: 'Acme 账户用于申请免费证书',
+        upload: '上传证书',
     },
     firewall: {
         create: '创建规则',

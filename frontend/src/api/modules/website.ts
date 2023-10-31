@@ -239,3 +239,7 @@ export const ChangePHPVersion = (req: Website.PHPVersionChange) => {
 export const GetDirConfig = (req: Website.ProxyReq) => {
     return http.post<Website.DirConfig>(`/websites/dir`, req);
 };
+
+export const UploadSSL = (req: Website.SSLUpload) => {
+    return http.post<any>(`/websites/ssl/upload`, req);
+};

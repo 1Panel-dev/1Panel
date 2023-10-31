@@ -12227,6 +12227,48 @@
                 }
             }
         },
+        "/websites/ssl/upload": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "上传 ssl",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Website SSL"
+                ],
+                "summary": "Upload ssl",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.WebsiteSSLUpload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "type"
+                    ],
+                    "formatEN": "Upload ssl [type]",
+                    "formatZH": "上传 ssl [type]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/websites/ssl/website/:websiteId": {
             "get": {
                 "security": [
@@ -16854,19 +16896,10 @@
                     "type": "boolean"
                 },
                 "sortBy": {
-                    "type": "string",
-                    "enum": [
-                        "name",
-                        "size",
-                        "modTime"
-                    ]
+                    "type": "string"
                 },
                 "sortOrder": {
-                    "type": "string",
-                    "enum": [
-                        "ascending",
-                        "descending"
-                    ]
+                    "type": "string"
                 }
             }
         },
@@ -18150,6 +18183,33 @@
                 },
                 "id": {
                     "type": "integer"
+                }
+            }
+        },
+        "request.WebsiteSSLUpload": {
+            "type": "object",
+            "required": [
+                "type"
+            ],
+            "properties": {
+                "certificate": {
+                    "type": "string"
+                },
+                "certificatePath": {
+                    "type": "string"
+                },
+                "privateKey": {
+                    "type": "string"
+                },
+                "privateKeyPath": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "paste",
+                        "local"
+                    ]
                 }
             }
         },

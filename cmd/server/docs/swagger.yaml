@@ -2963,15 +2963,8 @@ definitions:
       showHidden:
         type: boolean
       sortBy:
-        enum:
-        - name
-        - size
-        - modTime
         type: string
       sortOrder:
-        enum:
-        - ascending
-        - descending
         type: string
     type: object
   request.FilePathCheck:
@@ -3837,6 +3830,24 @@ definitions:
     required:
     - autoRenew
     - id
+    type: object
+  request.WebsiteSSLUpload:
+    properties:
+      certificate:
+        type: string
+      certificatePath:
+        type: string
+      privateKey:
+        type: string
+      privateKeyPath:
+        type: string
+      type:
+        enum:
+        - paste
+        - local
+        type: string
+    required:
+    - type
     type: object
   request.WebsiteSearch:
     properties:
@@ -12079,6 +12090,33 @@ paths:
         - id
         formatEN: Update ssl config [domain]
         formatZH: 更新证书设置 [domain]
+        paramKeys: []
+  /websites/ssl/upload:
+    post:
+      consumes:
+      - application/json
+      description: 上传 ssl
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteSSLUpload'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Upload ssl
+      tags:
+      - Website SSL
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - type
+        formatEN: Upload ssl [type]
+        formatZH: 上传 ssl [type]
         paramKeys: []
   /websites/ssl/website/:websiteId:
     get:

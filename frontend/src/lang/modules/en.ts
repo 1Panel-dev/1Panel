@@ -1715,6 +1715,7 @@ const message = {
             'This certificate has been associated with the following websites, and the renewal will be applied to these websites simultaneously',
         createAcme: 'Create Account',
         acmeHelper: 'Acme account is used to apply for free certificates',
+        upload: 'Upload Certificate',
     },
     firewall: {
         create: 'Create rule',

@@ -1626,6 +1626,7 @@ const message = {
         renewWebsite: '該證書已經和以下網站關聯，續簽會同步應用到這些網站',
         createAcme: '創建賬戶',
         acmeHelper: 'Acme 賬戶用於申請免費證書',
+        upload: '上傳證書',
     },
     firewall: {
         create: '創建規則',

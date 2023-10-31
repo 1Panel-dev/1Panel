@@ -439,4 +439,12 @@ export namespace Website {
         userGroup: string;
         msg: string;
     }
+
+    export interface SSLUpload {
+        privateKey: string;
+        certificate: string;
+        privateKeyPath: string;
+        certificatePath: string;
+        type: string;
+    }
 }
