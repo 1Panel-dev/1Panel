@@ -1313,6 +1313,7 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) error
 		fpmConfDir      = path.Join(confDir, "php-fpm.conf")
 		phpDir          = path.Join(constant.RuntimeDir, runtime.Type, runtime.Name, "php")
 		oldFmContent, _ = fileOp.GetContent(fpmConfDir)
+		newComposeByte  []byte
 	)
 	envParams := make(map[string]string, len(envs))
 	handleMap(envs, envParams)
@@ -1332,7 +1333,13 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) error
 	if busErr = env.Write(envParams, envPath); busErr != nil {
 		return busErr
 	}
-	if busErr = fileOp.WriteFile(composePath, strings.NewReader(appDetail.DockerCompose), 0775); busErr != nil {
+
+	newComposeByte, busErr = changeServiceName(composePath, appInstall.ServiceName)
+	if busErr != nil {
+		return err
+	}
+
+	if busErr = fileOp.WriteFile(composePath, bytes.NewReader(newComposeByte), 0775); busErr != nil {
 		return busErr
 	}
 	if !req.RetainConfig {
@@ -1362,7 +1369,7 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) error
 	appInstall.AppDetailId = runtime.AppDetailID
 	appInstall.AppId = appDetail.AppId
 	appInstall.Version = appDetail.Version
-	appInstall.DockerCompose = appDetail.DockerCompose
+	appInstall.DockerCompose = string(newComposeByte)
 
 	_ = appInstallRepo.Save(context.Background(), &appInstall)
 	website.RuntimeID = req.RuntimeID
