@@ -38,7 +38,7 @@ func (b *BaseApi) CreateCommand(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Router /hosts/command/search [post]
 func (b *BaseApi) SearchCommand(c *gin.Context) {
-	var req dto.SearchWithPage
+	var req dto.SearchCommandWithPage
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
@@ -53,6 +53,23 @@ func (b *BaseApi) SearchCommand(c *gin.Context) {
 		Items: list,
 		Total: total,
 	})
+}
+
+// @Tags Command
+// @Summary Tree commands
+// @Description 获取快速命令树
+// @Accept json
+// @Success 200 {Array} dto.CommandTree
+// @Security ApiKeyAuth
+// @Router /hosts/command/tree [get]
+func (b *BaseApi) SearchCommandTree(c *gin.Context) {
+	list, err := commandService.SearchForTree()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, list)
 }
 
 // @Tags Command
@@ -110,6 +127,7 @@ func (b *BaseApi) UpdateCommand(c *gin.Context) {
 
 	upMap := make(map[string]interface{})
 	upMap["name"] = req.Name
+	upMap["group_id"] = req.GroupID
 	upMap["command"] = req.Command
 	if err := commandService.Update(req.ID, upMap); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)

@@ -51,7 +51,14 @@
                 <div>
                     <el-select v-model="quickCmd" clearable filterable @change="quickInput" style="width: 25%">
                         <template #prefix>{{ $t('terminal.quickCommand') }}</template>
-                        <el-option v-for="cmd in commandList" :key="cmd.id" :label="cmd.name" :value="cmd.command" />
+                        <el-option-group v-for="group in commandTree" :key="group.label" :label="group.label">
+                            <el-option
+                                v-for="(cmd, index) in group.children"
+                                :key="index"
+                                :label="cmd.name"
+                                :value="cmd.command"
+                            />
+                        </el-option-group>
                     </el-select>
                     <el-input v-model="batchVal" @keyup.enter="batchInput" style="width: 75%">
                         <template #prepend>
@@ -74,7 +81,7 @@
                         </div>
                         <div class="search-button" style="float: none">
                             <el-input
-                                v-model="hostfilterInfo"
+                                v-model="hostFilterInfo"
                                 style="margin-top: 5px"
                                 clearable
                                 suffix-icon="Search"
@@ -136,8 +143,7 @@ import { ElTree } from 'element-plus';
 import screenfull from 'screenfull';
 import i18n from '@/lang';
 import { Host } from '@/api/interface/host';
-import { getHostTree, testByID } from '@/api/modules/host';
-import { getCommandList } from '@/api/modules/host';
+import { getCommandTree, getHostTree, testByID } from '@/api/modules/host';
 import { GlobalStore } from '@/store';
 import router from '@/routers';
 
@@ -165,14 +171,14 @@ const terminalValue = ref();
 const terminalTabs = ref([]) as any;
 let tabIndex = 0;
 
-const commandList = ref();
+const commandTree = ref();
 let quickCmd = ref();
 let batchVal = ref();
 let isBatch = ref<boolean>(false);
 
 const popoverRef = ref();
 
-const hostfilterInfo = ref('');
+const hostFilterInfo = ref('');
 const hostTree = ref<Array<Host.HostTree>>();
 const treeRef = ref<InstanceType<typeof ElTree>>();
 const defaultProps = {
@@ -188,7 +194,7 @@ const initCmd = ref('');
 
 const acceptParams = async () => {
     globalStore.isFullScreen = false;
-    loadCommand();
+    loadCommandTree();
     const res = await getHostTree({});
     hostTree.value = res.data;
     timer = setInterval(() => {
@@ -257,16 +263,16 @@ const loadHostTree = async () => {
     const res = await getHostTree({});
     hostTree.value = res.data;
 };
-watch(hostfilterInfo, (val: any) => {
+watch(hostFilterInfo, (val: any) => {
     treeRef.value!.filter(val);
 });
 const filterHost = (value: string, data: any) => {
     if (!value) return true;
     return data.label.includes(value);
 };
-const loadCommand = async () => {
-    const res = await getCommandList();
-    commandList.value = res.data;
+const loadCommandTree = async () => {
+    const res = await getCommandTree();
+    commandTree.value = res.data || [];
 };
 
 function quickInput(val: any) {

@@ -62,6 +62,11 @@ func (u *GroupService) Delete(id uint) error {
 		if len(websites) > 0 {
 			return buserr.New(constant.ErrGroupIsUsed)
 		}
+	case "command":
+		commands, _ := commandRepo.GetList(commonRepo.WithByGroupID(id))
+		if len(commands) > 0 {
+			return buserr.New(constant.ErrGroupIsUsed)
+		}
 	case "host":
 		hosts, _ := hostRepo.GetList(commonRepo.WithByGroupID(id))
 		if len(hosts) > 0 {

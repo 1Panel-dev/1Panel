@@ -206,6 +206,10 @@ definitions:
     properties:
       command:
         type: string
+      groupBelong:
+        type: string
+      groupID:
+        type: integer
       id:
         type: integer
       name:
@@ -215,6 +219,10 @@ definitions:
     properties:
       command:
         type: string
+      groupBelong:
+        type: string
+      groupID:
+        type: integer
       id:
         type: integer
       name:
@@ -1656,7 +1664,6 @@ definitions:
       type:
         type: string
     required:
-    - name
     - type
     type: object
   dto.Options:
@@ -1790,7 +1797,6 @@ definitions:
       type:
         type: string
     required:
-    - name
     - page
     - pageSize
     - type
@@ -2712,6 +2718,8 @@ definitions:
     type: object
   request.AppInstalledSearch:
     properties:
+      all:
+        type: boolean
       name:
         type: string
       page:
@@ -2839,6 +2847,13 @@ definitions:
     - files
     - name
     - type
+    type: object
+  request.FileContentReq:
+    properties:
+      path:
+        type: string
+    required:
+    - path
     type: object
   request.FileCreate:
     properties:
@@ -3632,8 +3647,6 @@ definitions:
         items:
           type: integer
         type: array
-    required:
-    - InstallIds
     type: object
   request.WebsiteLogReq:
     properties:
@@ -7643,7 +7656,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/request.FileOption'
+          $ref: '#/definitions/request.FileContentReq'
       responses:
         "200":
           description: OK
@@ -8801,6 +8814,21 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Page commands
+      tags:
+      - Command
+  /hosts/command/tree:
+    get:
+      consumes:
+      - application/json
+      description: 获取快速命令树
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: Array
+      security:
+      - ApiKeyAuth: []
+      summary: Tree commands
       tags:
       - Command
   /hosts/command/update:
