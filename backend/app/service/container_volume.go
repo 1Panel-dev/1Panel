@@ -19,7 +19,7 @@ func (u *ContainerService) PageVolume(req dto.SearchWithPage) (int64, interface{
 	if err != nil {
 		return 0, nil, err
 	}
-	list, err := client.VolumeList(context.TODO(), filters.NewArgs())
+	list, err := client.VolumeList(context.TODO(), volume.ListOptions{})
 	if err != nil {
 		return 0, nil, err
 	}
@@ -76,7 +76,7 @@ func (u *ContainerService) ListVolume() ([]dto.Options, error) {
 	if err != nil {
 		return nil, err
 	}
-	list, err := client.VolumeList(context.TODO(), filters.NewArgs())
+	list, err := client.VolumeList(context.TODO(), volume.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func (u *ContainerService) CreateVolume(req dto.VolumeCreate) error {
 	}
 	var array []filters.KeyValuePair
 	array = append(array, filters.Arg("name", req.Name))
-	vos, _ := client.VolumeList(context.TODO(), filters.NewArgs(array...))
+	vos, _ := client.VolumeList(context.TODO(), volume.ListOptions{})
 	if len(vos.Volumes) != 0 {
 		for _, v := range vos.Volumes {
 			if v.Name == req.Name {
