@@ -5,6 +5,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx/components"
+	"gopkg.in/yaml.v3"
 	"path"
 	"strconv"
 	"strings"
@@ -640,4 +641,35 @@ func chownRootDir(path string) error {
 		return err
 	}
 	return nil
+}
+
+func changeServiceName(composePath, newServiceName string) (composeByte []byte, err error) {
+	composeMap := make(map[string]interface{})
+	fileOp := files.NewFileOp()
+	composeContent, _ := fileOp.GetContent(composePath)
+	if err = yaml.Unmarshal(composeContent, &composeMap); err != nil {
+		return
+	}
+	value, ok := composeMap["services"]
+	if !ok {
+		err = buserr.New(constant.ErrFileParse)
+		return
+	}
+	servicesMap := value.(map[string]interface{})
+
+	index := 0
+	serviceName := ""
+	for k := range servicesMap {
+		serviceName = k
+		if index > 0 {
+			continue
+		}
+		index++
+	}
+	if newServiceName != serviceName {
+		servicesMap[newServiceName] = servicesMap[serviceName]
+		delete(servicesMap, serviceName)
+	}
+
+	return yaml.Marshal(composeMap)
 }
