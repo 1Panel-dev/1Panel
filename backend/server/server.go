@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"encoding/gob"
 	"fmt"
-	"net"
 	"net/http"
 	"os"
 	"path"
@@ -71,16 +70,14 @@ func Start() {
 		server.TLSConfig = &tls.Config{
 			Certificates: []tls.Certificate{cert},
 		}
-	}
-	global.LOG.Infof("listen at %s:%s [%s]", global.CONF.System.BindAddress, global.CONF.System.Port, tcpItem)
-	ln, err := net.Listen(tcpItem, global.CONF.System.BindAddress+":"+global.CONF.System.Port)
-	if err != nil {
-		panic(err)
-	}
-	type tcpKeepAliveListener struct {
-		*net.TCPListener
-	}
-	if err := server.Serve(tcpKeepAliveListener{ln.(*net.TCPListener)}); err != nil {
-		panic(err)
+		global.LOG.Infof("listen at https://%s:%s [%s]", global.CONF.System.BindAddress, global.CONF.System.Port, tcpItem)
+		if err := server.ListenAndServeTLS("", ""); err != nil {
+			panic(err)
+		}
+	} else {
+		global.LOG.Infof("listen at http://%s:%s [%s]", global.CONF.System.BindAddress, global.CONF.System.Port, tcpItem)
+		if err := server.ListenAndServe(); err != nil {
+			panic(err)
+		}
 	}
 }
