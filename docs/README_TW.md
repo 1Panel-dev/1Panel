@@ -45,10 +45,6 @@ curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_
 - [教學視頻](https://space.bilibili.com/510493147/channel/collectiondetail?sid=1199760)
 - [社區論壇](https://bbs.fit2cloud.com/c/1p/7)
 
-**加入微信交流羣**
-
-<img src="https://1panel.cn/img/wechat-group.jpg" width="156" height="156" />
-
 ## 安全說明
 
 如果您在使用過程中發現任何安全問題，請通過以下方式直接聯繫我們：
