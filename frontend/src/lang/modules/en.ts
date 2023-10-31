@@ -966,20 +966,21 @@ const message = {
         unsupportType: 'Unsupported file type',
         deleteHelper:
             'Are you sure you want to delete the following files? By default, it will enter the recycle bin after deletion',
-        fileHeper: 'Note: 1. Sorting is not supported after searching 2. Folders are not supported by size sorting',
+        fileHeper: 'Note: 1. Search results do not support sorting. 2. Folders cannot be sorted by size.',
         forceDeleteHelper: 'Permanently delete the file (without entering the recycle bin, delete it directly)',
         recycleBin: 'Recycle bin',
         sourcePath: 'Original path',
         deleteTime: 'Delete time',
         reduce: 'Reduction',
         reduceHelper:
-            'Restore the file to its original path. If a file or directory with the same name exists at the original address of the file, it will be overwritten. Do you want to continue?',
+            'If a file or directory with the same name exists in the original path, it will be overwritten. Do you want to continue?',
         clearRecycleBin: 'Clear the recycle bin',
         clearRecycleBinHelper: 'Do you want to clear the recycle bin?',
         favorite: 'favorites',
         removeFavorite: 'Remove from favorites?',
         addFavorite: 'Add to favorites',
         clearList: 'Clear list',
+        deleteRecycleHelper: 'Are you sure you want to permanently delete the following files?',
     },
     ssh: {
         autoStart: 'Auto Start',
