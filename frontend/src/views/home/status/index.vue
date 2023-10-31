@@ -78,82 +78,69 @@
             </el-popover>
             <span class="input-help">{{ loadStatus(currentInfo.loadUsagePercent) }}</span>
         </el-col>
-        <el-col
-            :xs="12"
-            :sm="12"
-            :md="6"
-            :lg="6"
-            :xl="6"
-            align="center"
-            v-for="(item, index) of currentInfo.diskData"
-            :key="index"
-            v-show="showMore || index < 4"
-        >
-            <el-popover placement="bottom" :width="300" trigger="hover" v-if="chartsOption[`disk${index}`]">
-                <el-row :gutter="5">
-                    <el-tag style="font-weight: 500">{{ $t('home.baseInfo') }}:</el-tag>
-                </el-row>
-                <el-row :gutter="5">
-                    <el-tag class="nameTag">{{ $t('home.mount') }}: {{ item.path }}</el-tag>
-                </el-row>
-                <el-row :gutter="5">
-                    <el-tag class="tagClass">{{ $t('commons.table.type') }}: {{ item.type }}</el-tag>
-                </el-row>
-                <el-row :gutter="5">
-                    <el-tag class="tagClass">{{ $t('home.fileSystem') }}: {{ item.device }}</el-tag>
-                </el-row>
-                <el-row :gutter="5">
-                    <el-col :span="12">
-                        <div><el-tag class="tagClass" style="font-weight: 500">Inode:</el-tag></div>
-                        <el-tag class="tagClass">{{ $t('home.total') }}: {{ item.inodesTotal }}</el-tag>
-                        <el-tag class="tagClass">{{ $t('home.used') }}: {{ item.inodesUsed }}</el-tag>
-                        <el-tag class="tagClass">{{ $t('home.free') }}: {{ item.inodesFree }}</el-tag>
-                        <el-tag class="tagClass">
-                            {{ $t('home.percent') }}: {{ formatNumber(item.inodesUsedPercent) }}%
-                        </el-tag>
-                    </el-col>
+        <template v-for="(item, index) of currentInfo.diskData" :key="index">
+            <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center" v-if="showMore || index < 4">
+                <el-popover placement="bottom" :width="300" trigger="hover" v-if="chartsOption[`disk${index}`]">
+                    <el-row :gutter="5">
+                        <el-tag style="font-weight: 500">{{ $t('home.baseInfo') }}:</el-tag>
+                    </el-row>
+                    <el-row :gutter="5">
+                        <el-tag class="nameTag">{{ $t('home.mount') }}: {{ item.path }}</el-tag>
+                    </el-row>
+                    <el-row :gutter="5">
+                        <el-tag class="tagClass">{{ $t('commons.table.type') }}: {{ item.type }}</el-tag>
+                    </el-row>
+                    <el-row :gutter="5">
+                        <el-tag class="tagClass">{{ $t('home.fileSystem') }}: {{ item.device }}</el-tag>
+                    </el-row>
+                    <el-row :gutter="5">
+                        <el-col :span="12">
+                            <div><el-tag class="tagClass" style="font-weight: 500">Inode:</el-tag></div>
+                            <el-tag class="tagClass">{{ $t('home.total') }}: {{ item.inodesTotal }}</el-tag>
+                            <el-tag class="tagClass">{{ $t('home.used') }}: {{ item.inodesUsed }}</el-tag>
+                            <el-tag class="tagClass">{{ $t('home.free') }}: {{ item.inodesFree }}</el-tag>
+                            <el-tag class="tagClass">
+                                {{ $t('home.percent') }}: {{ formatNumber(item.inodesUsedPercent) }}%
+                            </el-tag>
+                        </el-col>
 
-                    <el-col :span="12">
-                        <div>
-                            <el-tag style="margin-top: 3px; font-weight: 500">{{ $t('monitor.disk') }}:</el-tag>
-                        </div>
-                        <el-tag class="tagClass">{{ $t('home.total') }}: {{ computeSize(item.total) }}</el-tag>
-                        <el-tag class="tagClass">{{ $t('home.used') }}: {{ computeSize(item.used) }}</el-tag>
-                        <el-tag class="tagClass">{{ $t('home.free') }}: {{ computeSize(item.free) }}</el-tag>
-                        <el-tag class="tagClass">
-                            {{ $t('home.percent') }}: {{ formatNumber(item.usedPercent) }}%
-                        </el-tag>
-                    </el-col>
-                </el-row>
-                <template #reference>
-                    <v-charts
-                        height="160px"
-                        :id="`disk${index}`"
-                        type="pie"
-                        :option="chartsOption[`disk${index}`]"
-                        v-if="chartsOption[`disk${index}`]"
-                    />
-                </template>
-            </el-popover>
-            <span class="input-help">{{ computeSize(item.used) }} / {{ computeSize(item.total) }}</span>
-        </el-col>
-        <el-col v-if="!showMore" :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
-            <el-button link type="primary" @click="showMore = true" class="buttonClass">
+                        <el-col :span="12">
+                            <div>
+                                <el-tag style="margin-top: 3px; font-weight: 500">{{ $t('monitor.disk') }}:</el-tag>
+                            </div>
+                            <el-tag class="tagClass">{{ $t('home.total') }}: {{ computeSize(item.total) }}</el-tag>
+                            <el-tag class="tagClass">{{ $t('home.used') }}: {{ computeSize(item.used) }}</el-tag>
+                            <el-tag class="tagClass">{{ $t('home.free') }}: {{ computeSize(item.free) }}</el-tag>
+                            <el-tag class="tagClass">
+                                {{ $t('home.percent') }}: {{ formatNumber(item.usedPercent) }}%
+                            </el-tag>
+                        </el-col>
+                    </el-row>
+                    <template #reference>
+                        <v-charts
+                            height="160px"
+                            :id="`disk${index}`"
+                            type="pie"
+                            :option="chartsOption[`disk${index}`]"
+                            v-if="chartsOption[`disk${index}`]"
+                        />
+                    </template>
+                </el-popover>
+                <span class="input-help">{{ computeSize(item.used) }} / {{ computeSize(item.total) }}</span>
+            </el-col>
+        </template>
+        <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
+            <el-button v-if="!showMore" link type="primary" @click="showMore = true" class="buttonClass">
                 {{ $t('tabs.more') }}
                 <el-icon><Bottom /></el-icon>
             </el-button>
-        </el-col>
-        <el-col
-            v-if="showMore && currentInfo.diskData.length > 5"
-            :xs="12"
-            :sm="12"
-            :md="6"
-            :lg="6"
-            :xl="6"
-            align="center"
-            style="float: right"
-        >
-            <el-button type="primary" link @click="showMore = false" class="buttonClass">
+            <el-button
+                v-if="showMore && currentInfo.diskData.length > 5"
+                type="primary"
+                link
+                @click="showMore = false"
+                class="buttonClass"
+            >
                 {{ $t('tabs.hide') }}
                 <el-icon><Top /></el-icon>
             </el-button>
