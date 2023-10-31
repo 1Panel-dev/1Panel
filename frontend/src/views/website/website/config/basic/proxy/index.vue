@@ -131,7 +131,7 @@ const openEditFile = (proxyConfig: Website.ProxyConfig) => {
 const deleteProxy = async (proxyConfig: Website.ProxyConfig) => {
     proxyConfig.operate = 'delete';
     opRef.value.acceptParams({
-        title: i18n.global.t('commons.msg.delete'),
+        title: i18n.global.t('commons.msg.deleteTitle'),
         names: [proxyConfig.name],
         msg: i18n.global.t('commons.msg.operatorHelper', [
             i18n.global.t('website.proxy'),

@@ -18,7 +18,7 @@
         <br />
         <div v-loading="loading">
             <codemirror
-                style="height: calc(100vh - 430px)"
+                style="height: calc(100vh - 430px); min-height: 300px"
                 :autofocus="true"
                 :placeholder="$t('website.noLog')"
                 :indent-with-tab="true"
@@ -50,7 +50,7 @@ import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import OpDialog from '@/components/del-dialog/index.vue';
-import { onMounted, onUnmounted, reactive, ref, shallowRef } from 'vue';
+import { onUnmounted, reactive, ref, shallowRef } from 'vue';
 import { OperateSupervisorProcessFile } from '@/api/modules/host-tool';
 import i18n from '@/lang';
 import { TabsPaneContext } from 'element-plus';
@@ -154,10 +154,6 @@ const onCloseLog = async () => {
     clearInterval(Number(timer));
     timer = null;
 };
-
-onMounted(() => {
-    getContent();
-});
 
 onUnmounted(() => {
     onCloseLog();

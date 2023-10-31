@@ -290,6 +290,7 @@ const stopProcess = async (row: any) => {
         ]),
         api: StopProcess,
         params: { PID: row.PID },
+        successMsg: i18n.global.t('commons.msg.operationSuccess'),
     });
 };
 

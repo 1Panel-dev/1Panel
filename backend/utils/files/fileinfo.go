@@ -55,8 +55,8 @@ type FileOption struct {
 	ShowHidden bool   `json:"showHidden"`
 	Page       int    `json:"page"`
 	PageSize   int    `json:"pageSize"`
-	SortBy     string `json:"sortBy" validate:"oneof=name size modTime"`
-	SortOrder  string `json:"sortOrder" validate:"oneof=ascending descending"`
+	SortBy     string `json:"sortBy"`
+	SortOrder  string `json:"sortOrder"`
 }
 
 type FileSearchInfo struct {

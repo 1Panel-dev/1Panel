@@ -35,7 +35,11 @@
 </template>
 
 <script setup lang="ts">
+import i18n from '@/lang';
+import { MsgSuccess } from '@/utils/message';
 import { onMounted, reactive, ref } from 'vue';
+
+defineOptions({ name: 'OpDialog' });
 
 const form = reactive({
     msgs: [],
@@ -46,6 +50,7 @@ const form = reactive({
 });
 const loading = ref();
 const open = ref();
+const successMsg = ref('');
 
 interface DialogProps {
     title: string;
@@ -54,6 +59,7 @@ interface DialogProps {
 
     api: Function;
     params: Object;
+    successMsg: string;
 }
 const acceptParams = (props: DialogProps): void => {
     form.title = props.title;
@@ -61,6 +67,7 @@ const acceptParams = (props: DialogProps): void => {
     form.msgs = props.msg.split('\n');
     form.api = props.api;
     form.params = props.params;
+    successMsg.value = props.successMsg;
     open.value = true;
 };
 
@@ -74,6 +81,11 @@ const onConfirm = async () => {
             .then(() => {
                 emit('cancel');
                 emit('search');
+                if (successMsg.value) {
+                    MsgSuccess(successMsg.value);
+                } else {
+                    MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
+                }
                 open.value = false;
                 loading.value = false;
             })
