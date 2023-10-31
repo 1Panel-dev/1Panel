@@ -50,3 +50,11 @@ type WebsiteSSLUpdate struct {
 	ID        uint `json:"id" validate:"required"`
 	AutoRenew bool `json:"autoRenew" validate:"required"`
 }
+
+type WebsiteSSLUpload struct {
+	PrivateKey      string `json:"privateKey"`
+	Certificate     string `json:"certificate"`
+	PrivateKeyPath  string `json:"privateKeyPath"`
+	CertificatePath string `json:"certificatePath"`
+	Type            string `json:"type" validate:"required,oneof=paste local"`
+}

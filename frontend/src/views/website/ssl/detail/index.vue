@@ -28,8 +28,11 @@
                     >
                         {{ ssl.acmeAccount.email }}
                     </el-descriptions-item>
-                    <el-descriptions-item :label="$t('website.brand')">
+                    <el-descriptions-item :label="$t('commons.table.type')">
                         {{ ssl.type }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('website.brand')">
+                        {{ ssl.organization }}
                     </el-descriptions-item>
                     <el-descriptions-item :label="$t('ssl.startDate')">
                         {{ dateFormatSimple(ssl.startDate) }}
