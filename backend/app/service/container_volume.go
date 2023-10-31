@@ -111,9 +111,9 @@ func (u *ContainerService) CreateVolume(req dto.VolumeCreate) error {
 	if err != nil {
 		return err
 	}
-	var array []filters.KeyValuePair
-	array = append(array, filters.Arg("name", req.Name))
-	vos, _ := client.VolumeList(context.TODO(), volume.ListOptions{})
+	arg := filters.NewArgs()
+	arg.Add("name", req.Name)
+	vos, _ := client.VolumeList(context.TODO(), volume.ListOptions{Filters: arg})
 	if len(vos.Volumes) != 0 {
 		for _, v := range vos.Volumes {
 			if v.Name == req.Name {
