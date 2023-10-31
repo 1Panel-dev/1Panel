@@ -47,10 +47,6 @@ curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_
 
 If you have any questions or suggestions, please submit a GitHub Issue or join our WeChat group for communication.
 
-**WeChat Group**
-
-<img src="https://1panel.cn/img/wechat-group.jpg" width="156" height="156"/>
-
 ## Security Information
 
 If you discover any security issues, please contact us through:
