@@ -47,18 +47,18 @@ func (b *BaseApi) OperateSSH(c *gin.Context) {
 // @Summary Update host SSH setting
 // @Description 更新 SSH 配置
 // @Accept json
-// @Param request body dto.SettingUpdate true "request"
+// @Param request body dto.SSHUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /host/ssh/update [post]
 // @x-panel-log {"bodyKeys":["key","value"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改 SSH 配置 [key] => [value]","formatEN":"update SSH setting [key] => [value]"}
 func (b *BaseApi) UpdateSSH(c *gin.Context) {
-	var req dto.SettingUpdate
+	var req dto.SSHUpdate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 
-	if err := sshService.Update(req.Key, req.Value); err != nil {
+	if err := sshService.Update(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

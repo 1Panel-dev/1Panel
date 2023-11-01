@@ -46,6 +46,7 @@ interface DialogProps {
 }
 const drawerVisible = ref();
 const loading = ref();
+const oldPort = ref();
 
 const form = reactive({
     port: 22,
@@ -55,6 +56,7 @@ const formRef = ref<FormInstance>();
 
 const acceptParams = (params: DialogProps): void => {
     form.port = params.port;
+    oldPort.value = params.port;
     drawerVisible.value = true;
 };
 
@@ -72,8 +74,13 @@ const onSave = async (formEl: FormInstance | undefined) => {
             },
         )
             .then(async () => {
+                let params = {
+                    key: 'Port',
+                    oldValue: oldPort.value + '',
+                    newValue: form.port + '',
+                };
                 loading.value = true;
-                await updateSSH('Port', form.port + '')
+                await updateSSH(params)
                     .then(() => {
                         loading.value = false;
                         handleClose();

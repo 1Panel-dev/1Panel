@@ -79,8 +79,13 @@ const onSave = async (formEl: FormInstance | undefined) => {
             },
         )
             .then(async () => {
+                let params = {
+                    key: 'PermitRootLogin',
+                    oldValue: '',
+                    newValue: form.permitRootLogin,
+                };
                 loading.value = true;
-                await updateSSH('PermitRootLogin', form.permitRootLogin)
+                await updateSSH(params)
                     .then(() => {
                         loading.value = false;
                         handleClose();

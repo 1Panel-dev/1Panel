@@ -6558,7 +6558,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.SettingUpdate"
+                            "$ref": "#/definitions/dto.SSHUpdate"
                         }
                     }
                 ],
@@ -15429,6 +15429,23 @@
                 },
                 "successfulCount": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.SSHUpdate": {
+            "type": "object",
+            "required": [
+                "key"
+            ],
+            "properties": {
+                "key": {
+                    "type": "string"
+                },
+                "newValue": {
+                    "type": "string"
+                },
+                "oldValue": {
+                    "type": "string"
                 }
             }
         },

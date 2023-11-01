@@ -128,6 +128,11 @@ export namespace Host {
         permitRootLogin: string;
         useDNS: string;
     }
+    export interface SSHUpdate {
+        key: string;
+        oldValue: string;
+        newValue: string;
+    }
     export interface SSHGenerate {
         encryptionMode: string;
         password: string;

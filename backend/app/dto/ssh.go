@@ -2,6 +2,12 @@ package dto
 
 import "time"
 
+type SSHUpdate struct {
+	Key      string `json:"key" validate:"required"`
+	OldValue string `json:"oldValue"`
+	NewValue string `json:"newValue"`
+}
+
 type SSHInfo struct {
 	AutoStart              bool   `json:"authStart"`
 	Status                 string `json:"status"`

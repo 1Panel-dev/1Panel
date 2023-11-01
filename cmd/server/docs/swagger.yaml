@@ -1989,6 +1989,17 @@ definitions:
       successfulCount:
         type: integer
     type: object
+  dto.SSHUpdate:
+    properties:
+      key:
+        type: string
+      newValue:
+        type: string
+      oldValue:
+        type: string
+    required:
+    - key
+    type: object
   dto.SSLUpdate:
     properties:
       cert:
@@ -8499,7 +8510,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.SettingUpdate'
+          $ref: '#/definitions/dto.SSHUpdate'
       responses:
         "200":
           description: OK
