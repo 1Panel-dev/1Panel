@@ -109,6 +109,12 @@ type FileRoleUpdate struct {
 	Sub   bool   `json:"sub" validate:"required"`
 }
 
+type FileReadByLineReq struct {
+	Path     string `json:"path" validate:"required"`
+	Page     int    `json:"page" validate:"required"`
+	PageSize int    `json:"pageSize" validate:"required"`
+}
+  
 type FileExistReq struct {
 	Name string `json:"name" validate:"required"`
 	Dir  string `json:"dir" validate:"required"`

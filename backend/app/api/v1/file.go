@@ -683,3 +683,27 @@ func (b *BaseApi) Keys(c *gin.Context) {
 	res.Keys = keys
 	helper.SuccessWithData(c, res)
 }
+
+// @Tags File
+// @Summary Read file by Line
+// @Description 按行读取文件
+// @Param request body request.FileReadByLineReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /files/read [post]
+func (b *BaseApi) ReadFileByLine(c *gin.Context) {
+	var req request.FileReadByLineReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	lines, end, err := files.ReadFileByLine(req.Path, req.Page, req.PageSize)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+	}
+	res := response.FileLineContent{
+		End: end,
+	}
+	res.Path = req.Path
+	res.Content = strings.Join(lines, "\n")
+	helper.SuccessWithData(c, res)
+}

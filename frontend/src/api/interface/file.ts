@@ -164,6 +164,12 @@ export namespace File {
         name: string;
     }
 
+    export interface FileReadByLine {
+        path: string;
+        page: number;
+        pageSize: number;
+    }
+
     export interface Favorite extends CommonModel {
         path: string;
         isDir: boolean;
