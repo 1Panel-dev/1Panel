@@ -284,7 +284,7 @@ func (f FileOp) Cut(oldPaths []string, dst string) error {
 	for _, p := range oldPaths {
 		base := filepath.Base(p)
 		dstPath := filepath.Join(dst, base)
-		if err := f.Fs.Rename(p, dstPath); err != nil {
+		if err := cmd.ExecCmd(fmt.Sprintf("mv %s %s", p, dstPath)); err != nil {
 			return err
 		}
 	}
