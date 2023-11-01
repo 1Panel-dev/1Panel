@@ -88,6 +88,27 @@
                                 <span class="input-help">{{ $t('setting.bindDomainHelper') }}</span>
                             </el-form-item>
 
+                            <el-form-item :label="$t('setting.panelSSL')" prop="ssl">
+                                <el-switch
+                                    @change="handleSSL"
+                                    v-model="form.ssl"
+                                    active-value="enable"
+                                    inactive-value="disable"
+                                />
+                                <span class="input-help">{{ $t('setting.https') }}</span>
+                                <div v-if="form.ssl === 'enable' && sslInfo">
+                                    <el-tag>{{ $t('setting.domainOrIP') }} {{ sslInfo.domain }}</el-tag>
+                                    <el-tag style="margin-left: 5px">
+                                        {{ $t('setting.timeOut') }} {{ sslInfo.timeout }}
+                                    </el-tag>
+                                    <div>
+                                        <el-button link type="primary" @click="handleSSL">
+                                            {{ $t('commons.button.view') }}
+                                        </el-button>
+                                    </div>
+                                </div>
+                            </el-form-item>
+
                             <el-form-item :label="$t('setting.expirationTime')" prop="expirationTime">
                                 <el-input disabled v-model="form.expirationTime">
                                     <template #append>
@@ -127,27 +148,6 @@
                                 <span class="input-help">
                                     {{ $t('setting.mfaHelper') }}
                                 </span>
-                            </el-form-item>
-
-                            <el-form-item label="HTTPS" prop="ssl">
-                                <el-switch
-                                    @change="handleSSL"
-                                    v-model="form.ssl"
-                                    active-value="enable"
-                                    inactive-value="disable"
-                                />
-                                <span class="input-help">{{ $t('setting.https') }}</span>
-                                <div v-if="form.ssl === 'enable' && sslInfo">
-                                    <el-tag>{{ $t('setting.domainOrIP') }} {{ sslInfo.domain }}</el-tag>
-                                    <el-tag style="margin-left: 5px">
-                                        {{ $t('setting.timeOut') }} {{ sslInfo.timeout }}
-                                    </el-tag>
-                                    <div>
-                                        <el-button link type="primary" @click="handleSSL">
-                                            {{ $t('commons.button.view') }}
-                                        </el-button>
-                                    </div>
-                                </div>
                             </el-form-item>
                         </el-col>
                     </el-row>

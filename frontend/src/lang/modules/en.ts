@@ -1162,6 +1162,7 @@ const message = {
 
         bindDomain: 'Bind Domain',
         unBindDomain: 'Unbind domain',
+        panelSSL: 'Panel SSL',
         unBindDomainHelper:
             'The action of unbinding a domain name may cause system insecurity. Do you want to continue?',
         bindDomainHelper:
