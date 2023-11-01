@@ -112,7 +112,11 @@
                                 <el-table :data="favorites">
                                     <el-table-column prop="name">
                                         <template #default="{ row }">
-                                            <span class="table-link" @click="toFavorite(row)" type="primary">
+                                            <span
+                                                class="table-link text-ellipsis"
+                                                @click="toFavorite(row)"
+                                                type="primary"
+                                            >
                                                 <svg-icon
                                                     v-if="row.isDir"
                                                     className="table-icon"
@@ -176,7 +180,7 @@
                         <template #default="{ row, $index }">
                             <div @mouseenter="showFavorite($index)" @mouseleave="hideFavorite">
                                 <el-row>
-                                    <el-col :span="23">
+                                    <el-col :span="1">
                                         <svg-icon
                                             v-if="row.isDir"
                                             className="table-icon"
@@ -187,25 +191,33 @@
                                             className="table-icon"
                                             :iconName="getIconName(row.extension)"
                                         ></svg-icon>
-                                        <span class="table-link" @click="open(row)" type="primary">{{ row.name }}</span>
-                                        <span v-if="row.isSymlink">-> {{ row.linkPath }}</span>
+                                    </el-col>
+                                    <el-col :span="22">
+                                        <div class="text-parent">
+                                            <span class="table-link text-ellipsis" @click="open(row)" type="primary">
+                                                {{ row.name }}
+                                            </span>
+                                            <span v-if="row.isSymlink">-> {{ row.linkPath }}</span>
+                                        </div>
                                     </el-col>
                                     <el-col :span="1">
-                                        <el-button
-                                            v-if="row.favoriteID > 0"
-                                            link
-                                            type="warning"
-                                            size="large"
-                                            :icon="StarFilled"
-                                            @click="removeFavorite(row.favoriteID)"
-                                        ></el-button>
-                                        <div v-else>
+                                        <div>
                                             <el-button
-                                                v-if="hoveredRowIndex === $index"
+                                                v-if="row.favoriteID > 0"
                                                 link
-                                                :icon="Star"
-                                                @click="addFavorite(row)"
+                                                type="warning"
+                                                size="large"
+                                                :icon="StarFilled"
+                                                @click="removeFavorite(row.favoriteID)"
                                             ></el-button>
+                                            <div v-else>
+                                                <el-button
+                                                    v-if="hoveredRowIndex === $index"
+                                                    link
+                                                    :icon="Star"
+                                                    @click="addFavorite(row)"
+                                                ></el-button>
+                                            </div>
                                         </div>
                                     </el-col>
                                 </el-row>
@@ -893,6 +905,18 @@ onMounted(() => {
     .btn {
         margin-right: 10px;
     }
+}
+
+.text-parent {
+    display: flex;
+    width: 100%;
+    margin-left: 2px;
+}
+
+.text-ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .favorite-item {
