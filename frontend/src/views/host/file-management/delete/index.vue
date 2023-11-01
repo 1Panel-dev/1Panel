@@ -3,20 +3,12 @@
         <el-row>
             <el-col :span="20" :offset="2">
                 <el-alert :title="$t('file.deleteHelper')" show-icon type="error" :closable="false"></el-alert>
-                <div class="resource">
-                    <table>
-                        <tr v-for="(row, index) in files" :key="index">
-                            <td>
-                                <svg-icon v-if="row.isDir" className="table-icon" iconName="p-file-folder"></svg-icon>
-                                <svg-icon
-                                    v-else
-                                    className="table-icon"
-                                    :iconName="getIconName(row.extension)"
-                                ></svg-icon>
-                                <span>{{ row.name }}</span>
-                            </td>
-                        </tr>
-                    </table>
+                <div class="flx-align-center mb-1 mt-1" v-for="(row, index) in files" :key="index">
+                    <div>
+                        <svg-icon v-if="row.isDir" className="table-icon mr-1 " iconName="p-file-folder"></svg-icon>
+                        <svg-icon v-else className="table-icon mr-1" :iconName="getIconName(row.extension)"></svg-icon>
+                    </div>
+                    <span class="sle">{{ row.name }}</span>
                 </div>
                 <div class="mt-5">
                     <el-checkbox v-model="forceDelete">{{ $t('file.forceDeleteHelper') }}</el-checkbox>

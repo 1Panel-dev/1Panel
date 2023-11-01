@@ -371,7 +371,7 @@ const codeReq = reactive({ path: '', expand: false, page: 1, pageSize: 100 });
 const fileUpload = reactive({ path: '' });
 const fileRename = reactive({ path: '', oldName: '' });
 const fileWget = reactive({ path: '' });
-const fileMove = reactive({ oldPaths: [''], type: '', path: '' });
+const fileMove = reactive({ oldPaths: [''], type: '', path: '', name: '' });
 const processPage = reactive({ open: false });
 
 const createRef = ref();
@@ -690,6 +690,9 @@ const openMove = (type: string) => {
         oldpaths.push(s['path']);
     }
     fileMove.oldPaths = oldpaths;
+    if (selects.value.length == 1) {
+        fileMove.name = selects.value[0].name;
+    }
     moveOpen.value = true;
 };
 
@@ -697,6 +700,7 @@ const closeMove = () => {
     selects.value = [];
     tableRef.value.clearSelects();
     fileMove.oldPaths = [];
+    fileMove.name = '';
     moveOpen.value = false;
 };
 
@@ -906,19 +910,6 @@ onMounted(() => {
         margin-right: 10px;
     }
 }
-
-.text-parent {
-    display: flex;
-    width: 100%;
-    margin-left: 2px;
-}
-
-.text-ellipsis {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
 .favorite-item {
     max-height: 650px;
     overflow: auto;

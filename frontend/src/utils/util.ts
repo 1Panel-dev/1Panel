@@ -329,3 +329,20 @@ export function downloadWithContent(content: string, fileName: string) {
     const event = new MouseEvent('click');
     a.dispatchEvent(event);
 }
+
+export function getDateStr() {
+    let now: Date = new Date();
+
+    let year: number = now.getFullYear();
+    let month: number = now.getMonth() + 1;
+    let date: number = now.getDate();
+    let hours: number = now.getHours();
+    let minutes: number = now.getMinutes();
+    let seconds: number = now.getSeconds();
+
+    let timestamp: string = `${year}-${month < 10 ? '0' + month : month}-${date < 10 ? '0' + date : date}-${
+        hours < 10 ? '0' + hours : hours
+    }-${minutes < 10 ? '0' + minutes : minutes}-${seconds < 10 ? '0' + seconds : seconds}`;
+
+    return timestamp;
+}

@@ -193,7 +193,8 @@ func (f *FileService) DeCompress(c request.FileDeCompress) error {
 
 func (f *FileService) GetContent(op request.FileContentReq) (response.FileInfo, error) {
 	info, err := files.NewFileInfo(files.FileOption{
-		Path: op.Path,
+		Path:   op.Path,
+		Expand: true,
 	})
 	if err != nil {
 		return response.FileInfo{}, err
@@ -236,12 +237,12 @@ func (f *FileService) MvFile(m request.FileMove) error {
 		}
 	}
 	if m.Type == "cut" {
-		return fo.Cut(m.OldPaths, m.NewPath)
+		return fo.Cut(m.OldPaths, m.NewPath, m.Name, m.Cover)
 	}
 	var errs []error
 	if m.Type == "copy" {
 		for _, src := range m.OldPaths {
-			if err := fo.Copy(src, m.NewPath); err != nil {
+			if err := fo.CopyAndReName(src, m.NewPath, m.Name, m.Cover); err != nil {
 				errs = append(errs, err)
 				global.LOG.Errorf("copy file [%s] to [%s] failed, err: %s", src, m.NewPath, err.Error())
 			}
