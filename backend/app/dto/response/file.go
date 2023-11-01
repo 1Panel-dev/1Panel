@@ -38,3 +38,7 @@ type FileLineContent struct {
 	End     bool   `json:"end"`
 	Path    string `json:"path"`
 }
+
+type FileExist struct {
+	Exist bool `json:"exist"`
+}

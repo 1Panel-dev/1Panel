@@ -280,11 +280,21 @@ func (f FileOp) DownloadFile(url, dst string) error {
 	return nil
 }
 
-func (f FileOp) Cut(oldPaths []string, dst string) error {
+func (f FileOp) Cut(oldPaths []string, dst, name string, cover bool) error {
 	for _, p := range oldPaths {
-		base := filepath.Base(p)
-		dstPath := filepath.Join(dst, base)
-		if err := cmd.ExecCmd(fmt.Sprintf("mv %s %s", p, dstPath)); err != nil {
+		var dstPath string
+		if name != "" {
+			dstPath = filepath.Join(dst, name)
+		} else {
+			base := filepath.Base(p)
+			dstPath = filepath.Join(dst, base)
+		}
+		coverFlag := ""
+		if cover {
+			coverFlag = "-f"
+		}
+		cmdStr := fmt.Sprintf("mv %s %s %s", coverFlag, p, dstPath)
+		if err := cmd.ExecCmd(cmdStr); err != nil {
 			return err
 		}
 	}
@@ -312,6 +322,40 @@ func (f FileOp) Copy(src, dst string) error {
 		return f.CopyDir(src, dst)
 	}
 	return f.CopyFile(src, dst)
+}
+
+func (f FileOp) CopyAndReName(src, dst, name string, cover bool) error {
+	if src = path.Clean("/" + src); src == "" {
+		return os.ErrNotExist
+	}
+	if dst = path.Clean("/" + dst); dst == "" {
+		return os.ErrNotExist
+	}
+	if src == "/" || dst == "/" {
+		return os.ErrInvalid
+	}
+	if dst == src {
+		return os.ErrInvalid
+	}
+
+	srcInfo, err := f.Fs.Stat(src)
+	if err != nil {
+		return err
+	}
+
+	if srcInfo.IsDir() {
+		dstPath := dst
+		if name != "" && !cover {
+			dstPath = filepath.Join(dst, name)
+		}
+		return cmd.ExecCmd(fmt.Sprintf("cp -rf %s %s", src, dstPath))
+	} else {
+		dstPath := filepath.Join(dst, name)
+		if cover {
+			dstPath = dst
+		}
+		return cmd.ExecCmd(fmt.Sprintf("cp -f %s %s", src, dstPath))
+	}
 }
 
 func (f FileOp) CopyDir(src, dst string) error {

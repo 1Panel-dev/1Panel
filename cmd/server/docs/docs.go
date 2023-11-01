@@ -16919,6 +16919,12 @@ const docTemplate = `{
                 "type"
             ],
             "properties": {
+                "cover": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
                 "newPath": {
                     "type": "string"
                 },

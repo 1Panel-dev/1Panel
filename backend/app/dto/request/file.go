@@ -78,6 +78,8 @@ type FileMove struct {
 	Type     string   `json:"type" validate:"required"`
 	OldPaths []string `json:"oldPaths" validate:"required"`
 	NewPath  string   `json:"newPath" validate:"required"`
+	Name     string   `json:"name"`
+	Cover    bool     `json:"cover"`
 }
 
 type FileDownload struct {
@@ -111,4 +113,9 @@ type FileReadByLineReq struct {
 	Path     string `json:"path" validate:"required"`
 	Page     int    `json:"page" validate:"required"`
 	PageSize int    `json:"pageSize" validate:"required"`
+}
+  
+type FileExistReq struct {
+	Name string `json:"name" validate:"required"`
+	Dir  string `json:"dir" validate:"required"`
 }
