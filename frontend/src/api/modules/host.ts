@@ -111,8 +111,8 @@ export const getSSHConf = () => {
 export const operateSSH = (operation: string) => {
     return http.post(`/hosts/ssh/operate`, { operation: operation });
 };
-export const updateSSH = (key: string, value: string) => {
-    return http.post(`/hosts/ssh/update`, { key: key, value: value });
+export const updateSSH = (params: Host.SSHUpdate) => {
+    return http.post(`/hosts/ssh/update`, params);
 };
 export const updateSSHByfile = (file: string) => {
     return http.post(`/hosts/ssh/conffile/update`, { file: file });

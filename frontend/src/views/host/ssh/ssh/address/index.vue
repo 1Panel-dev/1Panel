@@ -76,8 +76,13 @@ const onSave = async (formEl: FormInstance | undefined) => {
             },
         )
             .then(async () => {
+                let params = {
+                    key: 'ListenAddress',
+                    oldValue: '',
+                    newValue: form.listenAddress,
+                };
                 loading.value = true;
-                await updateSSH('ListenAddress', form.listenAddress)
+                await updateSSH(params)
                     .then(() => {
                         loading.value = false;
                         handleClose();

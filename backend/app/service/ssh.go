@@ -30,7 +30,7 @@ type ISSHService interface {
 	GetSSHInfo() (*dto.SSHInfo, error)
 	OperateSSH(operation string) error
 	UpdateByFile(value string) error
-	Update(key, value string) error
+	Update(req dto.SSHUpdate) error
 	GenerateSSH(req dto.GenerateSSH) error
 	AnalysisLog(req dto.SearchForAnalysis) (*dto.AnalysisRes, error)
 	LoadSSHSecret(mode string) (string, error)
@@ -114,7 +114,7 @@ func (u *SSHService) OperateSSH(operation string) error {
 	return nil
 }
 
-func (u *SSHService) Update(key, value string) error {
+func (u *SSHService) Update(req dto.SSHUpdate) error {
 	serviceName, err := loadServiceName()
 	if err != nil {
 		return err
@@ -125,10 +125,7 @@ func (u *SSHService) Update(key, value string) error {
 		return err
 	}
 	lines := strings.Split(string(sshConf), "\n")
-	newFiles := updateSSHConf(lines, key, value)
-	if err := settingRepo.Update(key, value); err != nil {
-		return err
-	}
+	newFiles := updateSSHConf(lines, req.Key, req.NewValue)
 	file, err := os.OpenFile(sshPath, os.O_WRONLY|os.O_TRUNC, 0666)
 	if err != nil {
 		return err
@@ -138,10 +135,28 @@ func (u *SSHService) Update(key, value string) error {
 		return err
 	}
 	sudo := cmd.SudoHandleCmd()
-	if key == "Port" {
+	if req.Key == "Port" {
 		stdout, _ := cmd.Execf("%s getenforce", sudo)
 		if stdout == "Enforcing\n" {
-			_, _ = cmd.Execf("%s semanage port -a -t ssh_port_t -p tcp %s", sudo, value)
+			_, _ = cmd.Execf("%s semanage port -a -t ssh_port_t -p tcp %s", sudo, req.NewValue)
+		}
+
+		ruleItem := dto.PortRuleUpdate{
+			OldRule: dto.PortRuleOperate{
+				Operation: "remove",
+				Port:      req.OldValue,
+				Protocol:  "tcp",
+				Strategy:  "accept",
+			},
+			NewRule: dto.PortRuleOperate{
+				Operation: "add",
+				Port:      req.NewValue,
+				Protocol:  "tcp",
+				Strategy:  "accept",
+			},
+		}
+		if err := NewIFirewallService().UpdatePortRule(ruleItem); err != nil {
+			global.LOG.Errorf("reset firewall rules %s -> %s failed, err: %v", req.OldValue, req.OldValue, err)
 		}
 	}
 

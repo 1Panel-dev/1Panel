@@ -267,8 +267,13 @@ const onSave = async (formEl: FormInstance | undefined, key: string, value: stri
         },
     )
         .then(async () => {
+            let params = {
+                key: key,
+                oldValue: '',
+                newValue: value,
+            };
             loading.value = true;
-            await updateSSH(key, value)
+            await updateSSH(params)
                 .then(() => {
                     loading.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
