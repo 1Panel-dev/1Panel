@@ -39,6 +39,11 @@
                             </div>
                         </template>
                     </el-table-column>
+                    <el-table-column :label="$t('website.log')" prop="">
+                        <template #default="{ row }">
+                            <el-button @click="openLog(row)" link type="primary">{{ $t('website.check') }}</el-button>
+                        </template>
+                    </el-table-column>
                     <el-table-column
                         prop="createdAt"
                         :label="$t('commons.table.date')"
@@ -61,6 +66,7 @@
 
         <CreateRuntime ref="createRef" @close="search" />
         <OpDialog ref="opRef" @search="search" />
+        <Log ref="logRef" @close="search" />
     </div>
 </template>
 
@@ -74,6 +80,7 @@ import CreateRuntime from '@/views/website/runtime/php/create/index.vue';
 import Status from '@/components/status/index.vue';
 import i18n from '@/lang';
 import RouterMenu from '../index.vue';
+import Log from '@/views/website/runtime/php/log/index.vue';
 
 const paginationConfig = reactive({
     cacheSizeKey: 'runtime-page-size',
@@ -89,6 +96,7 @@ let req = reactive<Runtime.RuntimeReq>({
 });
 let timer: NodeJS.Timer | null = null;
 const opRef = ref();
+const logRef = ref();
 
 const buttons = [
     {
@@ -131,6 +139,10 @@ const openCreate = () => {
 
 const openDetail = (row: Runtime.Runtime) => {
     createRef.value.acceptParams({ type: row.type, mode: 'edit', id: row.id, appID: row.appID });
+};
+
+const openLog = (row: Runtime.RuntimeDTO) => {
+    logRef.value.acceptParams({ path: row.path + '/' + 'build.log' });
 };
 
 const openDelete = async (row: Runtime.Runtime) => {

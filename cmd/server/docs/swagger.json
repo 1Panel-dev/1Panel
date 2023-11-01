@@ -5659,6 +5659,36 @@
                 }
             }
         },
+        "/files/read": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "按行读取文件",
+                "tags": [
+                    "File"
+                ],
+                "summary": "Read file by Line",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.FileReadByLineReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/files/recycle/clear": {
             "post": {
                 "security": [
@@ -14379,12 +14409,18 @@
         "dto.Login": {
             "type": "object",
             "required": [
+                "authMethod",
+                "language",
                 "name",
                 "password"
             ],
             "properties": {
                 "authMethod": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "jwt",
+                        "session"
+                    ]
                 },
                 "captcha": {
                     "type": "string"
@@ -14396,7 +14432,12 @@
                     "type": "boolean"
                 },
                 "language": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "zh",
+                        "en",
+                        "tw"
+                    ]
                 },
                 "name": {
                     "type": "string"
@@ -16926,6 +16967,25 @@
                 "path"
             ],
             "properties": {
+                "path": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.FileReadByLineReq": {
+            "type": "object",
+            "required": [
+                "page",
+                "pageSize",
+                "path"
+            ],
+            "properties": {
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
                 "path": {
                     "type": "string"
                 }

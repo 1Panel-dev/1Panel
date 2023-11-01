@@ -106,3 +106,9 @@ type FileRoleUpdate struct {
 	Group string `json:"group" validate:"required"`
 	Sub   bool   `json:"sub" validate:"required"`
 }
+
+type FileReadByLineReq struct {
+	Path     string `json:"path" validate:"required"`
+	Page     int    `json:"page" validate:"required"`
+	PageSize int    `json:"pageSize" validate:"required"`
+}

@@ -1279,6 +1279,9 @@ definitions:
   dto.Login:
     properties:
       authMethod:
+        enum:
+        - jwt
+        - session
         type: string
       captcha:
         type: string
@@ -1287,12 +1290,18 @@ definitions:
       ignoreCaptcha:
         type: boolean
       language:
+        enum:
+        - zh
+        - en
+        - tw
         type: string
       name:
         type: string
       password:
         type: string
     required:
+    - authMethod
+    - language
     - name
     - password
     type: object
@@ -2983,6 +2992,19 @@ definitions:
       path:
         type: string
     required:
+    - path
+    type: object
+  request.FileReadByLineReq:
+    properties:
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      path:
+        type: string
+    required:
+    - page
+    - pageSize
     - path
     type: object
   request.FileRename:
@@ -7942,6 +7964,24 @@ paths:
         formatEN: Change owner [paths] => [user]/[group]
         formatZH: 修改用户/组 [paths] => [user]/[group]
         paramKeys: []
+  /files/read:
+    post:
+      description: 按行读取文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.FileReadByLineReq'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Read file by Line
+      tags:
+      - File
   /files/recycle/clear:
     post:
       consumes:

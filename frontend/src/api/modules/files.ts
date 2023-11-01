@@ -109,6 +109,10 @@ export const AddFavorite = (path: string) => {
     return http.post<any>('files/favorite', { path: path });
 };
 
+export const ReadByLine = (req: File.FileReadByLine) => {
+    return http.post<any>('files/read', req);
+};
+
 export const RemoveFavorite = (id: number) => {
     return http.post<any>('files/favorite/del', { id: id });
 };
