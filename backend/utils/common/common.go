@@ -98,11 +98,12 @@ func RandStr(n int) string {
 }
 
 func RandStrAndNum(n int) string {
-	mathRand.Seed(time.Now().UnixNano())
+	source := mathRand.NewSource(time.Now().UnixNano())
+	randGen := mathRand.New(source)
 	const charset = "abcdefghijklmnopqrstuvwxyz0123456789"
-	b := make([]byte, 10)
+	b := make([]byte, n)
 	for i := range b {
-		b[i] = charset[mathRand.Int63()%int64(len(charset))]
+		b[i] = charset[randGen.Intn(len(charset)-1)]
 	}
 	return (string(b))
 }
