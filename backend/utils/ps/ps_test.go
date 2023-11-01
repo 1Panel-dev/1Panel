@@ -2,11 +2,12 @@ package ps
 
 import (
 	"fmt"
-	"github.com/shirou/gopsutil/v3/host"
-	"github.com/shirou/gopsutil/v3/process"
 	"strconv"
 	"testing"
 	"time"
+
+	"github.com/shirou/gopsutil/v3/host"
+	"github.com/shirou/gopsutil/v3/process"
 )
 
 func TestPs(t *testing.T) {
@@ -67,8 +68,8 @@ func TestPs(t *testing.T) {
 			fmt.Println(ss)
 		}
 
-		fmt.Println(fmt.Sprintf("Name: %s PId: %v ParentID: %v Username: %v status:%s startTime: %s numThreads: %v numConnections:%v cpuPercent:%v rss:%s MB IORead: %s IOWrite: %s",
-			name, pro.Pid, parentID, userName, status, startTime, numThreads, numConnections, cpuPercent, rss, ioRead, ioWrite))
+		fmt.Printf("Name: %s PId: %v ParentID: %v Username: %v status:%s startTime: %s numThreads: %v numConnections:%v cpuPercent:%v rss:%s MB IORead: %s IOWrite: %s \n",
+			name, pro.Pid, parentID, userName, status, startTime, numThreads, numConnections, cpuPercent, rss, ioRead, ioWrite)
 	}
 	users, err := host.Users()
 	if err == nil {

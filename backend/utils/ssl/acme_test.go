@@ -8,12 +8,13 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/utils/files"
-	"gopkg.in/yaml.v3"
 	"os"
 	"path"
 	"testing"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
+	"gopkg.in/yaml.v3"
 
 	"github.com/go-acme/lego/v4/acme/api"
 	"github.com/go-acme/lego/v4/certcrypto"
@@ -105,7 +106,9 @@ func TestAppToV2(t *testing.T) {
 		oldAppDir := oldDir + "/" + appDefine.Key
 		newAppDir := newDir + "/" + appDefine.Key
 		if !fileOp.Stat(newAppDir) {
-			fileOp.CreateDir(newAppDir, 0755)
+			if err := fileOp.CreateDir(newAppDir, 0755); err != nil {
+				panic(err)
+			}
 		}
 		// logo
 		oldLogoPath := oldAppDir + "/metadata/logo.png"

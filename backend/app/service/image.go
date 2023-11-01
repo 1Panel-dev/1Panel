@@ -19,6 +19,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/registry"
 	"github.com/docker/docker/pkg/archive"
 )
 
@@ -239,7 +240,7 @@ func (u *ImageService) ImagePull(req dto.ImagePull) (string, error) {
 	}
 	options := types.ImagePullOptions{}
 	if repo.Auth {
-		authConfig := types.AuthConfig{
+		authConfig := registry.AuthConfig{
 			Username: repo.Username,
 			Password: repo.Password,
 		}
@@ -336,7 +337,7 @@ func (u *ImageService) ImagePush(req dto.ImagePush) (string, error) {
 	}
 	options := types.ImagePushOptions{}
 	if repo.Auth {
-		authConfig := types.AuthConfig{
+		authConfig := registry.AuthConfig{
 			Username: repo.Username,
 			Password: repo.Password,
 		}
