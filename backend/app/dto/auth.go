@@ -28,8 +28,8 @@ type Login struct {
 	IgnoreCaptcha bool   `json:"ignoreCaptcha"`
 	Captcha       string `json:"captcha"`
 	CaptchaID     string `json:"captchaID"`
-	AuthMethod    string `json:"authMethod"`
-	Language      string `json:"language"`
+	AuthMethod    string `json:"authMethod" validate:"required,oneof=jwt session"`
+	Language      string `json:"language" validate:"required,oneof=zh en tw"`
 }
 
 type MFALogin struct {

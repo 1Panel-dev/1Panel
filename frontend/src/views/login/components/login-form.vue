@@ -179,7 +179,7 @@ const loginForm = reactive({
     ignoreCaptcha: true,
     captcha: '',
     captchaID: '',
-    authMethod: '',
+    authMethod: 'session',
     agreeLicense: false,
     language: 'zh',
 });
@@ -195,7 +195,7 @@ const mfaLoginForm = reactive({
     password: '',
     secret: '',
     code: '',
-    authMethod: '',
+    authMethod: 'session',
 });
 
 const captcha = reactive({
@@ -232,7 +232,7 @@ const login = (formEl: FormInstance | undefined) => {
             ignoreCaptcha: globalStore.ignoreCaptcha,
             captcha: loginForm.captcha,
             captchaID: captcha.captchaID,
-            authMethod: '',
+            authMethod: 'session',
             language: loginForm.language,
         };
         if (!globalStore.ignoreCaptcha && requestLoginForm.captcha == '') {
