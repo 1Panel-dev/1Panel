@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"encoding/gob"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"path"
@@ -54,6 +55,13 @@ func Start() {
 		Addr:    global.CONF.System.BindAddress + ":" + global.CONF.System.Port,
 		Handler: rootRouter,
 	}
+	ln, err := net.Listen(tcpItem, server.Addr)
+	if err != nil {
+		panic(err)
+	}
+	type tcpKeepAliveListener struct {
+		*net.TCPListener
+	}
 	if global.CONF.System.SSL == "enable" {
 		certificate, err := os.ReadFile(path.Join(global.CONF.System.BaseDir, "1panel/secret/server.crt"))
 		if err != nil {
@@ -71,12 +79,12 @@ func Start() {
 			Certificates: []tls.Certificate{cert},
 		}
 		global.LOG.Infof("listen at https://%s:%s [%s]", global.CONF.System.BindAddress, global.CONF.System.Port, tcpItem)
-		if err := server.ListenAndServeTLS("", ""); err != nil {
+
+		if err := server.ServeTLS(tcpKeepAliveListener{ln.(*net.TCPListener)}, "", ""); err != nil {
 			panic(err)
 		}
 	} else {
-		global.LOG.Infof("listen at http://%s:%s [%s]", global.CONF.System.BindAddress, global.CONF.System.Port, tcpItem)
-		if err := server.ListenAndServe(); err != nil {
+		if err := server.Serve(tcpKeepAliveListener{ln.(*net.TCPListener)}); err != nil {
 			panic(err)
 		}
 	}
