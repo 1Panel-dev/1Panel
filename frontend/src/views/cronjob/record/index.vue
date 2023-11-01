@@ -126,41 +126,39 @@
                 <div class="mainClass">
                     <el-row :gutter="20" v-show="hasRecords" class="mainRowClass">
                         <el-col :span="6">
-                            <div>
-                                <ul class="infinite-list" style="overflow: auto">
-                                    <el-card
-                                        v-for="(item, index) in records"
-                                        :key="index"
-                                        :class="item.id === currentRecord.id ? 'select-card' : 'primary-card'"
-                                        @click="forDetail(item)"
-                                    >
-                                        <el-tag v-if="item.status === 'Success'" type="success">
-                                            {{ $t('commons.status.success') }}
-                                        </el-tag>
-                                        <el-tag v-if="item.status === 'Waiting'" type="info">
-                                            {{ $t('commons.status.waiting') }}
-                                        </el-tag>
-                                        <el-tag v-if="item.status === 'Failed'" type="danger">
-                                            {{ $t('commons.status.failed') }}
-                                        </el-tag>
-                                        <span>
-                                            {{ dateFormat(0, 0, item.startTime) }}
-                                        </span>
-                                    </el-card>
-                                </ul>
-                                <div class="page-item">
-                                    <el-pagination
-                                        :page-size="searchInfo.pageSize"
-                                        :current-page="searchInfo.page"
-                                        @current-change="handleCurrentChange"
-                                        @size-change="handleSizeChange"
-                                        :pager-count="5"
-                                        :page-sizes="[6, 8, 10, 12, 14]"
-                                        small
-                                        layout="total, sizes, prev, pager, next"
-                                        :total="searchInfo.recordTotal"
-                                    />
-                                </div>
+                            <div class="infinite-list" style="overflow: auto">
+                                <el-table :data="records" border :show-header="false" @row-click="forDetail">
+                                    <el-table-column>
+                                        <template #default="{ row }">
+                                            <span v-if="row.id === currentRecord.id" class="select-sign"></span>
+                                            <el-tag v-if="row.status === 'Success'" type="success">
+                                                {{ $t('commons.status.success') }}
+                                            </el-tag>
+                                            <el-tag v-if="row.status === 'Waiting'" type="info">
+                                                {{ $t('commons.status.waiting') }}
+                                            </el-tag>
+                                            <el-tag v-if="row.status === 'Failed'" type="danger">
+                                                {{ $t('commons.status.failed') }}
+                                            </el-tag>
+                                            <span>
+                                                {{ dateFormat(0, 0, row.startTime) }}
+                                            </span>
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
+                            </div>
+                            <div class="page-item">
+                                <el-pagination
+                                    :page-size="searchInfo.pageSize"
+                                    :current-page="searchInfo.page"
+                                    @current-change="handleCurrentChange"
+                                    @size-change="handleSizeChange"
+                                    :pager-count="5"
+                                    :page-sizes="[6, 8, 10, 12, 14]"
+                                    small
+                                    layout="total, sizes, prev, pager, next"
+                                    :total="searchInfo.recordTotal"
+                                />
                             </div>
                         </el-col>
                         <el-col :span="18">
@@ -318,7 +316,7 @@
                                         :placeholder="$t('cronjob.noLogs')"
                                         :indent-with-tab="true"
                                         :tabSize="4"
-                                        style="height: calc(100vh - 484px); width: 100%; margin-top: 5px"
+                                        style="height: calc(100vh - 488px); width: 100%; margin-top: 5px"
                                         :lineWrapping="true"
                                         :matchBrackets="true"
                                         theme="cobalt"
@@ -719,36 +717,22 @@ defineExpose({
 
 <style lang="scss" scoped>
 .infinite-list {
-    height: calc(100vh - 416px);
-    padding: 0;
-    margin: 0;
-    .el-card {
-        border: var(--panel-border) !important;
-        &:hover {
-            box-shadow: 2px 2px 2px #888888;
-        }
-        display: flex;
-        align-items: center;
-        height: 40px;
-        font-size: 14px;
-        margin: 5px;
-        cursor: pointer;
-    }
-    .select-card {
-        color: var(--el-color-primary);
-        border: 1px solid var(--el-color-primary) !important;
-        box-shadow: 2px 2px 2px #888888;
+    height: calc(100vh - 420px);
+    .select-sign {
         &::before {
-            position: absolute;
+            float: left;
+            margin-left: -3px;
+            position: relative;
             width: 3px;
-            height: 40px;
+            height: 24px;
             content: '';
             background: $primary-color;
-            border-radius: 10px;
+            border-radius: 20px;
         }
     }
     .el-tag {
-        margin-right: 15px;
+        margin-left: 20px;
+        margin-right: 20px;
     }
 }
 

@@ -63,11 +63,13 @@ func Start() {
 		*net.TCPListener
 	}
 	if global.CONF.System.SSL == "enable" {
-		certificate, err := os.ReadFile(path.Join(global.CONF.System.BaseDir, "1panel/secret/server.crt"))
+		certPath := path.Join(global.CONF.System.BaseDir, "1panel/secret/server.crt")
+		keyPath := path.Join(global.CONF.System.BaseDir, "1panel/secret/server.key")
+		certificate, err := os.ReadFile(certPath)
 		if err != nil {
 			panic(err)
 		}
-		key, err := os.ReadFile(path.Join(global.CONF.System.BaseDir, "1panel/secret/server.key"))
+		key, err := os.ReadFile(keyPath)
 		if err != nil {
 			panic(err)
 		}
@@ -80,7 +82,7 @@ func Start() {
 		}
 		global.LOG.Infof("listen at https://%s:%s [%s]", global.CONF.System.BindAddress, global.CONF.System.Port, tcpItem)
 
-		if err := server.ServeTLS(tcpKeepAliveListener{ln.(*net.TCPListener)}, "", ""); err != nil {
+		if err := server.ServeTLS(tcpKeepAliveListener{ln.(*net.TCPListener)}, certPath, keyPath); err != nil {
 			panic(err)
 		}
 	} else {
