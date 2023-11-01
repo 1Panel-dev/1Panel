@@ -14386,12 +14386,18 @@ const docTemplate = `{
         "dto.Login": {
             "type": "object",
             "required": [
+                "authMethod",
+                "language",
                 "name",
                 "password"
             ],
             "properties": {
                 "authMethod": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "jwt",
+                        "session"
+                    ]
                 },
                 "captcha": {
                     "type": "string"
@@ -14403,7 +14409,12 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "language": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "zh",
+                        "en",
+                        "tw"
+                    ]
                 },
                 "name": {
                     "type": "string"
@@ -16878,6 +16889,12 @@ const docTemplate = `{
                 "type"
             ],
             "properties": {
+                "cover": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
                 "newPath": {
                     "type": "string"
                 },

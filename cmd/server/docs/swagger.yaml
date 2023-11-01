@@ -1279,6 +1279,9 @@ definitions:
   dto.Login:
     properties:
       authMethod:
+        enum:
+        - jwt
+        - session
         type: string
       captcha:
         type: string
@@ -1287,12 +1290,18 @@ definitions:
       ignoreCaptcha:
         type: boolean
       language:
+        enum:
+        - zh
+        - en
+        - tw
         type: string
       name:
         type: string
       password:
         type: string
     required:
+    - authMethod
+    - language
     - name
     - password
     type: object
@@ -2942,6 +2951,10 @@ definitions:
     type: object
   request.FileMove:
     properties:
+      cover:
+        type: boolean
+      name:
+        type: string
       newPath:
         type: string
       oldPaths:

@@ -32,3 +32,7 @@ type FileProcessKeys struct {
 type FileWgetRes struct {
 	Key string `json:"key"`
 }
+
+type FileExist struct {
+	Exist bool `json:"exist"`
+}

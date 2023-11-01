@@ -17,13 +17,16 @@
             class="mt-5"
         >
             <el-table-column type="selection" fix />
-            <el-table-column
-                :label="$t('commons.table.name')"
-                min-width="100"
-                fix
-                show-overflow-tooltip
-                prop="name"
-            ></el-table-column>
+            <el-table-column prop="name" :label="$t('commons.table.name')" show-overflow-tooltip>
+                <template #default="{ row }">
+                    <span class="text-ellipsis" type="primary">
+                        <svg-icon v-if="row.isDir" className="table-icon" iconName="p-file-folder"></svg-icon>
+                        <svg-icon v-else className="table-icon" iconName="p-file-normal"></svg-icon>
+                        {{ row.name }}
+                    </span>
+                </template>
+            </el-table-column>
+
             <el-table-column :label="$t('file.sourcePath')" show-overflow-tooltip prop="sourcePath"></el-table-column>
             <el-table-column :label="$t('file.size')" prop="size" max-width="50">
                 <template #default="{ row }">

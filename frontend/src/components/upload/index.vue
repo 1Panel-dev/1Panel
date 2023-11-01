@@ -225,7 +225,7 @@ const onSubmit = async () => {
         return;
     }
     const res = await CheckFile(baseDir.value + file.raw.name);
-    if (!res.data) {
+    if (res.data) {
         MsgError(i18n.global.t('commons.msg.fileExist'));
         return;
     }

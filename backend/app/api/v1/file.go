@@ -346,13 +346,11 @@ func (b *BaseApi) CheckFile(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-
-	if _, err := os.Stat(req.Path); err != nil && os.IsNotExist(err) {
-		helper.SuccessWithData(c, true)
+	if _, err := os.Stat(req.Path); err != nil {
+		helper.SuccessWithData(c, false)
 		return
 	}
-
-	helper.SuccessWithData(c, false)
+	helper.SuccessWithData(c, true)
 }
 
 // @Tags File
