@@ -707,3 +707,23 @@ func (b *BaseApi) ReadFileByLine(c *gin.Context) {
 	res.Content = strings.Join(lines, "\n")
 	helper.SuccessWithData(c, res)
 }
+
+// @Tags File
+// @Summary Batch change file mode and owner
+// @Description 批量修改文件权限和用户/组
+// @Accept json
+// @Param request body request.FileRoleReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /files/batch/role [post]
+// @x-panel-log {"bodyKeys":["paths","mode","user","group"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"批量修改文件权限和用户/组 [paths] => [mode]/[user]/[group]","formatEN":"Batch change file mode and owner [paths] => [mode]/[user]/[group]"}
+func (b *BaseApi) BatchChangeModeAndOwner(c *gin.Context) {
+	var req request.FileRoleReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := fileService.BatchChangeModeAndOwner(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+	}
+	helper.SuccessWithOutData(c)
+}

@@ -16,7 +16,7 @@
                 <el-checkbox v-model="form.public.w" :label="$t('file.wRole')" />
                 <el-checkbox v-model="form.public.x" :label="$t('file.xRole')" />
             </el-form-item>
-            <el-form-item :label="$t('file.role')">
+            <el-form-item :label="$t('file.role')" required>
                 <el-input v-model="form.mode" maxlength="4" @input="changeMode"></el-input>
             </el-form-item>
         </el-form>

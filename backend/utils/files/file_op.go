@@ -149,8 +149,11 @@ func (f FileOp) ChownR(dst string, uid string, gid string, sub bool) error {
 	return nil
 }
 
-func (f FileOp) ChmodR(dst string, mode int64) error {
-	cmdStr := fmt.Sprintf(`chmod -R %v "%s"`, fmt.Sprintf("%04o", mode), dst)
+func (f FileOp) ChmodR(dst string, mode int64, sub bool) error {
+	cmdStr := fmt.Sprintf(`chmod %v "%s"`, fmt.Sprintf("%04o", mode), dst)
+	if sub {
+		cmdStr = fmt.Sprintf(`chmod -R %v "%s"`, fmt.Sprintf("%04o", mode), dst)
+	}
 	if cmd.HasNoPasswordSudo() {
 		cmdStr = fmt.Sprintf("sudo %s", cmdStr)
 	}
