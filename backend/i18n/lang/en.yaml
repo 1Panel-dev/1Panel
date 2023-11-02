@@ -76,6 +76,7 @@ ErrBackupExist: 'the backup file corresponds to a portion of the original data t
 ErrPHPResource: 'The local runtime does not support switching！'
 ErrPathPermission: 'A folder with non-1000:1000 permissions was detected in the index directory, which may cause Access denied errors when accessing the website.'
 ErrDomainIsUsed: "Domain is already used by website {{ .name }}"
+ErrDomainFormat: "{{ .name }} domain format error"
 
 #ssl
 ErrSSLCannotDelete: "The certificate is being used by the website and cannot be removed"

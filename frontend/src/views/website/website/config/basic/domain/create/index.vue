@@ -13,11 +13,13 @@
         <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
                 <el-form ref="domainForm" label-position="top" :model="domain" :rules="rules">
-                    <el-form-item :label="$t('website.domain')" prop="domain">
-                        <el-input v-model="domain.domain"></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('commons.table.port')" prop="port">
-                        <el-input v-model.number="domain.port"></el-input>
+                    <el-form-item :label="$t('website.domain')" prop="domains">
+                        <el-input
+                            type="textarea"
+                            :autosize="{ minRows: 4, maxRows: 10 }"
+                            v-model="domain.domains"
+                            :placeholder="$t('website.domainHelper')"
+                        ></el-input>
                     </el-form-item>
                 </el-form>
             </el-col>
@@ -44,17 +46,15 @@ import { MsgSuccess } from '@/utils/message';
 
 const domainForm = ref<FormInstance>();
 
-let rules = ref({
-    domain: [Rules.requiredInput, Rules.domain],
-    port: [Rules.requiredInput],
+const rules = ref({
+    domains: [Rules.requiredInput],
 });
 
-let open = ref(false);
-let loading = ref(false);
-let domain = ref({
-    websiteId: 0,
-    domain: '',
-    port: 80,
+const open = ref(false);
+const loading = ref(false);
+const domain = ref({
+    websiteID: 0,
+    domains: '',
 });
 
 const em = defineEmits(['close']);
@@ -65,7 +65,7 @@ const handleClose = () => {
 };
 
 const acceptParams = async (websiteId: number) => {
-    domain.value.websiteId = Number(websiteId);
+    domain.value.websiteID = Number(websiteId);
     open.value = true;
 };
 

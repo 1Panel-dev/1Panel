@@ -19,7 +19,6 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/i18n"
-	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/spf13/afero"
 
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
@@ -59,7 +58,7 @@ type IWebsiteService interface {
 	UpdateWebsite(req request.WebsiteUpdate) error
 	DeleteWebsite(req request.WebsiteDelete) error
 	GetWebsite(id uint) (response.WebsiteDTO, error)
-	CreateWebsiteDomain(create request.WebsiteDomainCreate) (model.WebsiteDomain, error)
+	CreateWebsiteDomain(create request.WebsiteDomainCreate) ([]model.WebsiteDomain, error)
 	GetWebsiteDomain(websiteId uint) ([]model.WebsiteDomain, error)
 	DeleteWebsiteDomain(domainId uint) error
 
@@ -188,56 +187,18 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 	defaultHttpPort := nginxInstall.HttpPort
 
 	var (
-		domains []model.WebsiteDomain
-		ports   = make(map[int]struct{})
+		otherDomains []model.WebsiteDomain
+		domains      []model.WebsiteDomain
 	)
-	domainArray := strings.Split(create.OtherDomains, "\n")
-	domainArray = append(domainArray, create.PrimaryDomain)
-	for _, domain := range domainArray {
-		if domain == "" {
-			continue
-		}
-		domainModel, err := getDomain(domain, defaultHttpPort)
-		if err != nil {
-			return err
-		}
-		if reflect.DeepEqual(domainModel, model.WebsiteDomain{}) {
-			continue
-		}
-		domains = append(domains, domainModel)
-		if domainModel.Port != defaultHttpPort {
-			ports[domainModel.Port] = struct{}{}
-		}
+	domains, _, _, err = getWebsiteDomains(create.PrimaryDomain, defaultHttpPort, 0)
+	if err != nil {
+		return err
 	}
-
-	for _, domain := range domains {
-		if exist, _ := websiteDomainRepo.GetFirst(websiteDomainRepo.WithDomain(domain.Domain), websiteDomainRepo.WithPort(domain.Port)); exist.ID > 0 {
-			website, _ := websiteRepo.GetFirst(commonRepo.WithByID(exist.WebsiteID))
-			return buserr.WithName(constant.ErrDomainIsUsed, website.PrimaryDomain)
-		}
+	otherDomains, _, _, err = getWebsiteDomains(create.OtherDomains, defaultHttpPort, 0)
+	if err != nil {
+		return err
 	}
-
-	for port := range ports {
-		if existPorts, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithPort(port)); len(existPorts) == 0 {
-			errMap := make(map[string]interface{})
-			errMap["port"] = port
-			appInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithPort(port))
-			if appInstall.ID > 0 {
-				errMap["type"] = i18n.GetMsgByKey("TYPE_APP")
-				errMap["name"] = appInstall.Name
-				return buserr.WithMap("ErrPortExist", errMap, nil)
-			}
-			runtime, _ := runtimeRepo.GetFirst(runtimeRepo.WithPort(port))
-			if runtime != nil {
-				errMap["type"] = i18n.GetMsgByKey("TYPE_RUNTIME")
-				errMap["name"] = runtime.Name
-				return buserr.WithMap("ErrPortExist", errMap, nil)
-			}
-			if common.ScanPort(port) {
-				return buserr.WithDetail(constant.ErrPortInUsed, port, nil)
-			}
-		}
-	}
+	domains = append(domains, otherDomains...)
 
 	defaultDate, _ := time.Parse(constant.DateLayout, constant.DefaultDate)
 	website := &model.Website{
@@ -487,59 +448,34 @@ func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 	return nil
 }
 
-func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) (model.WebsiteDomain, error) {
+func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) ([]model.WebsiteDomain, error) {
 	var (
-		domainModel model.WebsiteDomain
-		ports       []int
-		domains     []string
+		domainModels []model.WebsiteDomain
+		addPorts     []int
+		addDomains   []string
 	)
 	httpPort, _, err := getAppInstallPort(constant.AppOpenresty)
 	if err != nil {
-		return domainModel, err
+		return nil, err
 	}
-
-	if create.Port != httpPort {
-		if existPorts, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithPort(create.Port)); len(existPorts) == 0 {
-			if existAppInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithPort(create.Port)); existAppInstall.ID > 0 {
-				return domainModel, buserr.WithMap(constant.ErrPortInOtherApp, map[string]interface{}{"port": create.Port, "apps": existAppInstall.App.Name}, nil)
-			}
-			if common.ScanPort(create.Port) {
-				return domainModel, buserr.WithDetail(constant.ErrPortInUsed, create.Port, nil)
-			}
-		}
-	}
-
-	if existDomain, _ := websiteDomainRepo.GetFirst(websiteDomainRepo.WithDomain(create.Domain), websiteDomainRepo.WithPort(create.Port)); existDomain.ID > 0 {
-		website, _ := websiteRepo.GetFirst(commonRepo.WithByID(existDomain.WebsiteID))
-		return domainModel, buserr.WithName(constant.ErrDomainIsUsed, website.PrimaryDomain)
-	}
-
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(create.WebsiteID))
 	if err != nil {
-		return domainModel, err
-	}
-	if oldDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(create.WebsiteID), websiteDomainRepo.WithPort(create.Port)); len(oldDomains) == 0 {
-		ports = append(ports, create.Port)
+		return nil, err
 	}
 
-	if oldDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(create.WebsiteID), websiteDomainRepo.WithDomain(create.Domain)); len(oldDomains) == 0 {
-		domains = append(domains, create.Domain)
+	domainModels, addPorts, addDomains, err = getWebsiteDomains(create.Domains, httpPort, create.WebsiteID)
+	if err != nil {
+		return nil, err
+	}
+	go func() {
+		_ = OperateFirewallPort(nil, addPorts)
+	}()
+
+	if err := addListenAndServerName(website, addPorts, addDomains); err != nil {
+		return nil, err
 	}
 
-	if err := addListenAndServerName(website, ports, domains); err != nil {
-		return domainModel, err
-	}
-	domainModel = model.WebsiteDomain{
-		Domain:    create.Domain,
-		Port:      create.Port,
-		WebsiteID: create.WebsiteID,
-	}
-	if create.Port != httpPort {
-		go func() {
-			_ = OperateFirewallPort(nil, []int{create.Port})
-		}()
-	}
-	return domainModel, websiteDomainRepo.Create(context.TODO(), &domainModel)
+	return domainModels, websiteDomainRepo.BatchCreate(context.TODO(), domainModels)
 }
 
 func (w WebsiteService) GetWebsiteDomain(websiteId uint) ([]model.WebsiteDomain, error) {

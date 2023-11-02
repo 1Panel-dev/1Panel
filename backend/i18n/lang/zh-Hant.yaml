@@ -76,6 +76,7 @@ ErrBackupExist: '該備份文件對應部分原數據不存在: {{ .detail}}"'
 ErrPHPResource: '本地運行環境不支持切換！'
 ErrPathPermission: 'index 目錄下檢測到非 1000:1000 權限文件夾，可能導致網站訪問 Access denied 錯誤'
 ErrDomainIsUsed: "域名已被網站【{{ .name }}】使用"
+ErrDomainFormat: "{{ .name }} 域名格式不正確"
 
 #ssl
 ErrSSLCannotDelete: "證書正在被網站使用，無法刪除"

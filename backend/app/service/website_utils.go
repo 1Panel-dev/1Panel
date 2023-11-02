@@ -3,10 +3,13 @@ package service
 import (
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
+	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx/components"
 	"gopkg.in/yaml.v3"
 	"path"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -672,4 +675,71 @@ func changeServiceName(composePath, newServiceName string) (composeByte []byte, 
 	}
 
 	return yaml.Marshal(composeMap)
+}
+
+func getWebsiteDomains(domains string, defaultPort int, websiteID uint) (domainModels []model.WebsiteDomain, addPorts []int, addDomains []string, err error) {
+	var (
+		ports map[int]struct{}
+	)
+	domainArray := strings.Split(domains, "\n")
+	for _, domain := range domainArray {
+		if domain == "" {
+			continue
+		}
+		if !common.IsValidDomain(domain) {
+			err = buserr.WithName("ErrDomainFormat", domain)
+			return
+		}
+		var domainModel model.WebsiteDomain
+		domainModel, err = getDomain(domain, defaultPort)
+		if err != nil {
+			return
+		}
+		if reflect.DeepEqual(domainModel, model.WebsiteDomain{}) {
+			continue
+		}
+		domainModel.WebsiteID = websiteID
+		domainModels = append(domainModels, domainModel)
+		if domainModel.Port != defaultPort {
+			ports[domainModel.Port] = struct{}{}
+		}
+		if exist, _ := websiteDomainRepo.GetFirst(websiteDomainRepo.WithDomain(domainModel.Domain), websiteDomainRepo.WithWebsiteId(websiteID)); exist.ID == 0 {
+			addDomains = append(addDomains, domainModel.Domain)
+		}
+	}
+	for _, domain := range domainModels {
+		if exist, _ := websiteDomainRepo.GetFirst(websiteDomainRepo.WithDomain(domain.Domain), websiteDomainRepo.WithPort(domain.Port)); exist.ID > 0 {
+			website, _ := websiteRepo.GetFirst(commonRepo.WithByID(exist.WebsiteID))
+			err = buserr.WithName(constant.ErrDomainIsUsed, website.PrimaryDomain)
+			return
+		}
+	}
+
+	for port := range ports {
+		addPorts = append(addPorts, port)
+		if existPorts, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithPort(port)); len(existPorts) == 0 {
+			errMap := make(map[string]interface{})
+			errMap["port"] = port
+			appInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithPort(port))
+			if appInstall.ID > 0 {
+				errMap["type"] = i18n.GetMsgByKey("TYPE_APP")
+				errMap["name"] = appInstall.Name
+				err = buserr.WithMap("ErrPortExist", errMap, nil)
+				return
+			}
+			runtime, _ := runtimeRepo.GetFirst(runtimeRepo.WithPort(port))
+			if runtime != nil {
+				errMap["type"] = i18n.GetMsgByKey("TYPE_RUNTIME")
+				errMap["name"] = runtime.Name
+				err = buserr.WithMap("ErrPortExist", errMap, nil)
+				return
+			}
+			if common.ScanPort(port) {
+				err = buserr.WithDetail(constant.ErrPortInUsed, port, nil)
+				return
+			}
+		}
+	}
+
+	return
 }

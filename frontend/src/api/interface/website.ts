@@ -101,9 +101,8 @@ export namespace Website {
     }
 
     export interface DomainCreate {
-        websiteId: number;
-        port: number;
-        domain: string;
+        websiteID: number;
+        domains: string;
     }
 
     export interface DomainDelete {
