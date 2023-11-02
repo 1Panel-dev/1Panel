@@ -220,3 +220,9 @@ func ConvertToPinyin(text string) string {
 
 	return strings.Join(strArr, "")
 }
+
+func IsValidDomain(domain string) bool {
+	pattern := `^([\w\\u4e00-\\u9fa5\\-\\*]{1,100}\.){1,10}([\w\\u4e00-\\u9fa5\\-]{1,24}|[\w\\u4e00-\\u9fa5\\-]{1,24}\.[\w\\u4e00-\\u9fa5\\-]{1,24})$`
+	match, _ := regexp.MatchString(pattern, domain)
+	return match
+}

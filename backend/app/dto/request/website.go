@@ -111,9 +111,8 @@ type WebsiteGroupUpdate struct {
 }
 
 type WebsiteDomainCreate struct {
-	WebsiteID uint   `json:"websiteId" validate:"required"`
-	Port      int    `json:"port" validate:"required"`
-	Domain    string `json:"domain" validate:"required"`
+	WebsiteID uint   `json:"websiteID" validate:"required"`
+	Domains   string `json:"domains" validate:"required"`
 }
 
 type WebsiteDomainDelete struct {
