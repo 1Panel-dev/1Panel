@@ -42,6 +42,9 @@
                             {{ loadZero(dialogData.rowData?.hour) }} :
                             {{ loadZero(dialogData.rowData?.minute) }}
                         </span>
+                        <span v-if="dialogData.rowData?.specType === 'perDay'">
+                            {{ loadZero(dialogData.rowData?.hour) }} : {{ loadZero(dialogData.rowData?.minute) }}
+                        </span>
                         <span v-if="dialogData.rowData?.specType === 'perWeek'">
                             {{ loadWeek(dialogData.rowData?.week) }}&nbsp; {{ loadZero(dialogData.rowData?.hour) }} :
                             {{ loadZero(dialogData.rowData?.minute) }}
@@ -127,7 +130,13 @@
                     <el-row :gutter="20" v-show="hasRecords" class="mainRowClass">
                         <el-col :span="6">
                             <div class="infinite-list" style="overflow: auto">
-                                <el-table :data="records" border :show-header="false" @row-click="forDetail">
+                                <el-table
+                                    style="cursor: pointer"
+                                    :data="records"
+                                    border
+                                    :show-header="false"
+                                    @row-click="forDetail"
+                                >
                                     <el-table-column>
                                         <template #default="{ row }">
                                             <span v-if="row.id === currentRecord.id" class="select-sign"></span>

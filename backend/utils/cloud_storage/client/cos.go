@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	cosSDK "github.com/tencentyun/cos-go-sdk-v5"
@@ -96,6 +97,27 @@ func (cos cosClient) Upload(src, target string) (bool, error) {
 	client, err := cos.newClientWithBucket()
 	if err != nil {
 		return false, err
+	}
+	fileInfo, err := os.Stat(src)
+	if err != nil {
+		return false, err
+	}
+	if fileInfo.Size() > 5368709120 {
+		opt := &cosSDK.MultiUploadOptions{
+			OptIni: &cosSDK.InitiateMultipartUploadOptions{
+				ACLHeaderOptions: nil,
+				ObjectPutHeaderOptions: &cosSDK.ObjectPutHeaderOptions{
+					XCosStorageClass: cos.scType,
+				},
+			},
+			PartSize: 200,
+		}
+		if _, _, err := client.Object.MultiUpload(
+			context.Background(), target, src, opt,
+		); err != nil {
+			return false, err
+		}
+		return true, nil
 	}
 	if _, err := client.Object.PutFromFile(context.Background(), target, src, &cosSDK.ObjectPutOptions{
 		ACLHeaderOptions: nil,
