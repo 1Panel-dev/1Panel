@@ -40,6 +40,7 @@ type IRuntimeService interface {
 	OperateRuntime(req request.RuntimeOperate) error
 	GetNodeModules(req request.NodeModuleReq) ([]response.NodeModule, error)
 	OperateNodeModules(req request.NodeModuleOperateReq) error
+	SyncForRestart() error
 }
 
 func NewRuntimeService() IRuntimeService {
@@ -554,4 +555,19 @@ func (r *RuntimeService) OperateNodeModules(req request.NodeModuleOperateReq) er
 	}
 	cmd += " " + req.Module
 	return cmd2.ExecContainerScript(containerName, cmd, 5*time.Minute)
+}
+
+func (r *RuntimeService) SyncForRestart() error {
+	runtimes, err := runtimeRepo.List()
+	if err != nil {
+		return err
+	}
+	for _, runtime := range runtimes {
+		if runtime.Status == constant.RuntimeBuildIng || runtime.Status == constant.RuntimeReCreating || runtime.Status == constant.RuntimeStarting || runtime.Status == constant.RuntimeCreating {
+			runtime.Status = constant.SystemRestart
+			runtime.Message = "System restart causing interrupt"
+			_ = runtimeRepo.Save(&runtime)
+		}
+	}
+	return nil
 }

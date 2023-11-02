@@ -144,7 +144,7 @@ func TestAppToV2(t *testing.T) {
 			}
 			_ = fileOp.DeleteFile(newVersionDir + "/config.json")
 			oldReadMefile := newVersionDir + "/README.md"
-			// _ = fileOp.Cut([]string{oldReadMefile}, newAppDir)
+			_ = fileOp.Cut([]string{oldReadMefile}, newAppDir, "", false)
 			_ = fileOp.DeleteFile(oldReadMefile)
 		}
 	}
