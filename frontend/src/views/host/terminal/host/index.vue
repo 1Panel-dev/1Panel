@@ -55,12 +55,7 @@
                             <span v-else>{{ row.groupBelong }}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.title')" show-overflow-tooltip prop="name">
-                        <template #default="{ row }">
-                            <span v-if="row.addr === '127.0.0.1'">{{ $t('terminal.localhost') }}</span>
-                            <span v-else>{{ row.name }}</span>
-                        </template>
-                    </el-table-column>
+                    <el-table-column :label="$t('commons.table.title')" show-overflow-tooltip prop="name" />
                     <el-table-column
                         :label="$t('commons.table.description')"
                         show-overflow-tooltip
