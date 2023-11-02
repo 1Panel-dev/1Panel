@@ -176,4 +176,12 @@ export namespace File {
         isTxt: boolean;
         name: string;
     }
+
+    export interface FileRole {
+        paths: string[];
+        mode: number;
+        user: string;
+        group: string;
+        sub: boolean;
+    }
 }

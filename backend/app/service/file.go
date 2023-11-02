@@ -29,7 +29,6 @@ type IFileService interface {
 	Create(op request.FileCreate) error
 	Delete(op request.FileDelete) error
 	BatchDelete(op request.FileBatchDelete) error
-	ChangeMode(op request.FileCreate) error
 	Compress(c request.FileCompress) error
 	DeCompress(c request.FileDeCompress) error
 	GetContent(op request.FileContentReq) (response.FileInfo, error)
@@ -40,6 +39,8 @@ type IFileService interface {
 	Wget(w request.FileWget) (string, error)
 	MvFile(m request.FileMove) error
 	ChangeOwner(req request.FileRoleUpdate) error
+	ChangeMode(op request.FileCreate) error
+	BatchChangeModeAndOwner(op request.FileRoleReq) error
 }
 
 func NewIFileService() IFileService {
@@ -166,11 +167,24 @@ func (f *FileService) BatchDelete(op request.FileBatchDelete) error {
 
 func (f *FileService) ChangeMode(op request.FileCreate) error {
 	fo := files.NewFileOp()
-	if op.Sub {
-		return fo.ChmodR(op.Path, op.Mode)
-	} else {
-		return fo.Chmod(op.Path, fs.FileMode(op.Mode))
+	return fo.ChmodR(op.Path, op.Mode, op.Sub)
+}
+
+func (f *FileService) BatchChangeModeAndOwner(op request.FileRoleReq) error {
+	fo := files.NewFileOp()
+	for _, path := range op.Paths {
+		if !fo.Stat(path) {
+			return buserr.New(constant.ErrPathNotFound)
+		}
+		if err := fo.ChownR(path, op.User, op.Group, op.Sub); err != nil {
+			return err
+		}
+		if err := fo.ChmodR(path, op.Mode, op.Sub); err != nil {
+			return err
+		}
 	}
+	return nil
+
 }
 
 func (f *FileService) ChangeOwner(req request.FileRoleUpdate) error {

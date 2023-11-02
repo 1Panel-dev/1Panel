@@ -80,6 +80,9 @@
                             <el-button plain @click="openCompress(selects)" :disabled="selects.length === 0">
                                 {{ $t('file.compress') }}
                             </el-button>
+                            <el-button plain @click="openBatchRole(selects)" :disabled="selects.length === 0">
+                                {{ $t('file.role') }}
+                            </el-button>
                             <el-button plain @click="batchDelFiles" :disabled="selects.length === 0">
                                 {{ $t('commons.button.delete') }}
                             </el-button>
@@ -291,6 +294,7 @@
             <DeleteFile ref="deleteRef" @close="search" />
             <RecycleBin ref="recycleBinRef" @close="search" />
             <Favorite ref="favoriteRef" @close="search" />
+            <BatchRole ref="batchRoleRef" @close="search" />
         </LayoutContent>
     </div>
 </template>
@@ -333,6 +337,7 @@ import Process from './process/index.vue';
 import Detail from './detail/index.vue';
 import RecycleBin from './recycle-bin/index.vue';
 import Favorite from './favorite/index.vue';
+import BatchRole from './batch-role/index.vue';
 
 const globalStore = GlobalStore();
 
@@ -394,6 +399,7 @@ const recycleBinRef = ref();
 const favoriteRef = ref();
 const hoveredRowIndex = ref(-1);
 const favorites = ref([]);
+const batchRoleRef = ref();
 
 // editablePath
 const { searchableStatus, searchablePath, searchableInputRef, searchableInputBlur } = useSearchable(paths);
@@ -653,6 +659,10 @@ const openUpload = () => {
 const openWget = () => {
     fileWget.path = req.path;
     wgetRef.value.acceptParams(fileWget);
+};
+
+const openBatchRole = (items: File.File[]) => {
+    batchRoleRef.value.acceptParams({ files: items });
 };
 
 const closeWget = (submit: Boolean) => {

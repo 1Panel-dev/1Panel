@@ -116,3 +116,7 @@ export const ReadByLine = (req: File.FileReadByLine) => {
 export const RemoveFavorite = (id: number) => {
     return http.post<any>('files/favorite/del', { id: id });
 };
+
+export const BatchChangeRole = (params: File.FileRole) => {
+    return http.post<any>('files/batch/role', params);
+};

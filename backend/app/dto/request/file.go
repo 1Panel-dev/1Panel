@@ -29,6 +29,14 @@ type FileCreate struct {
 	Sub       bool   `json:"sub"`
 }
 
+type FileRoleReq struct {
+	Paths []string `json:"paths" validate:"required"`
+	Mode  int64    `json:"mode" validate:"required"`
+	User  string   `json:"user" validate:"required"`
+	Group string   `json:"group" validate:"required"`
+	Sub   bool     `json:"sub"`
+}
+
 type FileDelete struct {
 	Path        string `json:"path" validate:"required"`
 	IsDir       bool   `json:"isDir"`
@@ -114,7 +122,7 @@ type FileReadByLineReq struct {
 	Page     int    `json:"page" validate:"required"`
 	PageSize int    `json:"pageSize" validate:"required"`
 }
-  
+
 type FileExistReq struct {
 	Name string `json:"name" validate:"required"`
 	Dir  string `json:"dir" validate:"required"`

@@ -38,6 +38,7 @@ func (f *FileRouter) InitFileRouter(Router *gin.RouterGroup) {
 		fileRouter.GET("/ws", baseApi.Ws)
 		fileRouter.GET("/keys", baseApi.Keys)
 		fileRouter.POST("/read", baseApi.ReadFileByLine)
+		fileRouter.POST("/batch/role", baseApi.BatchChangeModeAndOwner)
 
 		fileRouter.POST("/recycle/search", baseApi.SearchRecycleBinFile)
 		fileRouter.POST("/recycle/reduce", baseApi.ReduceRecycleBinFile)
