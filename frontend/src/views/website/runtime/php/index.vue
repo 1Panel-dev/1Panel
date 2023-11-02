@@ -2,6 +2,13 @@
     <div>
         <RouterMenu />
         <LayoutContent :title="'PHP'" v-loading="loading">
+            <template #prompt>
+                <el-alert type="info" :closable="false">
+                    <template #default>
+                        <span>{{ $t('runtime.systemRestartHelper') }}</span>
+                    </template>
+                </el-alert>
+            </template>
             <template #toolbar>
                 <el-button type="primary" @click="openCreate">
                     {{ $t('runtime.create') }}
@@ -24,7 +31,7 @@
                     <el-table-column :label="$t('commons.table.status')" prop="status">
                         <template #default="{ row }">
                             <el-popover
-                                v-if="row.status === 'error'"
+                                v-if="row.status === 'error' || row.status === 'systemRestart'"
                                 placement="bottom"
                                 :width="400"
                                 trigger="hover"

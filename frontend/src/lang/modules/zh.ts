@@ -233,6 +233,7 @@ const message = {
             starting: '启动中',
             recreating: '重建中',
             creating: '创建中',
+            systemrestart: '中断',
         },
         units: {
             second: '秒',
@@ -1738,6 +1739,7 @@ const message = {
         customScript: '自定义启动命令',
         customScriptHelper: '请填写完整的启动命令，例如：npm run start',
         portError: '不能填写相同端口',
+        systemRestartHelper: '状态说明：中断-系统重启导致状态获取失败',
     },
     process: {
         pid: '进程ID',

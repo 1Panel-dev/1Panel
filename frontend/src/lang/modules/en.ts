@@ -234,6 +234,7 @@ const message = {
             starting: 'Starting',
             recreating: 'Recreating',
             creating: 'Creating',
+            systemrestart: 'Interrupt',
         },
         units: {
             second: 'Second',
@@ -1842,6 +1843,7 @@ const message = {
         customScript: 'Custom startup command',
         customScriptHelper: 'Please fill in the complete startup command, for example: npm run start',
         portError: 'Cannot fill in the same port',
+        systemRestartHelper: 'Status description: Interruption - status acquisition failed due to system restart',
     },
     process: {
         pid: 'Process ID',
