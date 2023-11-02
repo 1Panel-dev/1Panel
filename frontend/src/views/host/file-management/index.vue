@@ -9,7 +9,8 @@
                 v-show="!searchableStatus"
                 tabindex="0"
                 @click="searchableStatus = true"
-                class="address-bar bg-white shadow-md rounded-md px-4 py-2 flex items-center flex-grow"
+                :class="globalStore.$state.themeConfig.theme === 'light' && 'bg-white'"
+                class="address-bar shadow-md rounded-md px-4 py-2 flex items-center flex-grow"
             >
                 <div ref="pathRef" class="w-full">
                     <span ref="breadCrumbRef" class="w-full flex items-center">
@@ -19,7 +20,7 @@
                             </el-link>
                         </span>
                         <span v-for="path in paths" :key="path.url" class="inline-flex items-center">
-                            <span class="mr-2">></span>
+                            <span class="mr-2 arrow">></span>
                             <el-link class="path-segment cursor-pointer mr-2 pathname" @click.stop="jump(path.url)">
                                 {{ path.name }}
                             </el-link>
@@ -32,7 +33,7 @@
                 v-show="searchableStatus"
                 v-model="searchablePath"
                 @blur="searchableInputBlur"
-                class="px-4 py-2 bg-white border rounded-md shadow-md"
+                class="px-4 py-2 border rounded-md shadow-md"
                 @keyup.enter="
                     jump(searchablePath);
                     searchableStatus = false;
@@ -913,5 +914,11 @@ onMounted(() => {
 .favorite-item {
     max-height: 650px;
     overflow: auto;
+}
+.address-bar {
+    border: var(--el-border);
+    .arrow {
+        color: #726e6e;
+    }
 }
 </style>
