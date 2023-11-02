@@ -10,6 +10,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/cron/job"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
+	"github.com/1Panel-dev/1Panel/backend/utils/ntp"
 	"github.com/robfig/cron/v3"
 )
 
@@ -21,6 +22,7 @@ func Run() {
 		interval model.Setting
 		status   model.Setting
 	)
+	syncBeforeStart()
 	if err := global.DB.Where("key = ?", "MonitorStatus").Find(&status).Error; err != nil {
 		global.LOG.Errorf("load monitor status from db failed, err: %v", err)
 	}
@@ -66,4 +68,24 @@ func Run() {
 			global.LOG.Errorf("update cronjob %s %s failed, err: %v", cronJobs[i].Type, cronJobs[i].Name, err)
 		}
 	}
+}
+
+func syncBeforeStart() {
+	var ntpSite model.Setting
+	if err := global.DB.Where("key = ?", "NtpSite").Find(&ntpSite).Error; err != nil {
+		global.LOG.Errorf("load ntp serve from db failed, err: %v", err)
+	}
+	if len(ntpSite.Value) == 0 {
+		ntpSite.Value = "pool.ntp.org"
+	}
+	ntime, err := ntp.GetRemoteTime(ntpSite.Value)
+	if err != nil {
+		global.LOG.Errorf("load remote time with [%s] failed, err: %v", ntpSite.Value, err)
+		return
+	}
+	ts := ntime.Format("2006-01-02 15:04:05")
+	if err := ntp.UpdateSystemTime(ts); err != nil {
+		global.LOG.Errorf("failed to synchronize system time with [%s], err: %v", ntpSite.Value, err)
+	}
+	global.LOG.Debugf("synchronize system time with [%s] successful!", ntpSite.Value)
 }
