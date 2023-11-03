@@ -44,6 +44,9 @@
         <el-tab-pane :label="$t('firewall.postCheck')" name="post">
             <ValueList :id="id" :rule="'post_check'" :param-key="'$postDeny'" v-if="index == 'post'"></ValueList>
         </el-tab-pane>
+        <el-tab-pane :label="$t('firewall.userAgent')" name="ua">
+            <ValueList :id="id" :rule="'user_agent'" :param-key="'$userAgent'" v-if="index == 'ua'"></ValueList>
+        </el-tab-pane>
         <el-tab-pane :label="$t('firewall.fileExtBlockList')" name="fileExtBlockList">
             <FileBlockList :id="id" v-if="index == 'fileExtBlockList'"></FileBlockList>
         </el-tab-pane>

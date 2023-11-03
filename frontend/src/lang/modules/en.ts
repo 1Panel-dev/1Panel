@@ -1788,6 +1788,7 @@ const message = {
         allIP: 'All IP',
         portRule: 'Port rule',
         ipRule: 'IP rule',
+        userAgent: 'User-Agent filter',
     },
     runtime: {
         runtime: 'Runtime',
