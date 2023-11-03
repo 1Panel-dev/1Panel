@@ -179,7 +179,7 @@
                                         </template>
                                         <span class="status-count">{{ dialogData.rowData!.targetDir }}</span>
                                         <el-button
-                                            v-if="currentRecord?.status === 'Success' && dialogData.rowData!.type !== 'snapshot'"
+                                            v-if="currentRecord?.status === 'Success' && dialogData.rowData!.type !== 'snapshot' && dialogData.rowData!.type !== 'log'"
                                             type="primary"
                                             style="margin-left: 10px"
                                             link
@@ -209,6 +209,14 @@
                                         </span>
                                         <span v-else class="status-count">
                                             {{ $t('commons.table.all') }}
+                                        </span>
+                                    </el-form-item>
+                                    <el-form-item class="description" v-if="dialogData.rowData!.type === 'log'">
+                                        <template #label>
+                                            <span class="status-label">{{ $t('cronjob.log') }}</span>
+                                        </template>
+                                        <span class="status-count">
+                                            {{ $t('cronjob.logHelper') }}
                                         </span>
                                     </el-form-item>
                                     <el-form-item class="description" v-if="dialogData.rowData!.type === 'database'">
@@ -702,7 +710,8 @@ function isBackup() {
         dialogData.value.rowData!.type === 'website' ||
         dialogData.value.rowData!.type === 'database' ||
         dialogData.value.rowData!.type === 'directory' ||
-        dialogData.value.rowData!.type === 'snapshot'
+        dialogData.value.rowData!.type === 'snapshot' ||
+        dialogData.value.rowData!.type === 'log'
     );
 }
 function loadWeek(i: number) {

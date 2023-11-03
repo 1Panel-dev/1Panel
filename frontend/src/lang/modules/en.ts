@@ -741,6 +741,7 @@ const message = {
         record: 'Records',
         shell: 'Shell script',
         log: 'Backup logs',
+        logHelper: 'Backup system log',
         ogHelper1: '1.1Panel System log ',
         logHelper2: '2. SSH login log of the server ',
         logHelper3: '3. All site logs ',

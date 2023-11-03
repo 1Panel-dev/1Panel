@@ -135,7 +135,7 @@
             </template>
         </LayoutContent>
 
-        <OpDialog ref="opRef" @search="search">
+        <OpDialog ref="opRef" @search="search" @submit="onSubmitDelete()">
             <template #content>
                 <el-form class="mt-4 mb-1" v-if="showClean" ref="deleteForm" label-position="left">
                     <el-form-item>
@@ -169,6 +169,7 @@ import { MsgSuccess } from '@/utils/message';
 const loading = ref();
 const selects = ref<any>([]);
 const isRecordShow = ref();
+const operateIDs = ref();
 
 const opRef = ref();
 const showClean = ref();
@@ -254,18 +255,20 @@ const onDelete = async (row: Cronjob.CronjobInfo | null) => {
     if (row) {
         ids = [row.id];
         names = [row.name];
-        if (row.type === 'database' || row.type === 'website' || row.type === 'directory') {
+        if (hasBackup(row.type)) {
             showClean.value = true;
         }
+        return;
     } else {
         for (const item of selects.value) {
             names.push(item.name);
             ids.push(item.id);
-            if (item.type === 'database' || item.type === 'website' || item.type === 'directory') {
+            if (hasBackup(item.type)) {
                 showClean.value = true;
             }
         }
     }
+    operateIDs.value = ids;
     opRef.value.acceptParams({
         title: i18n.global.t('commons.button.delete'),
         names: names,
@@ -273,9 +276,15 @@ const onDelete = async (row: Cronjob.CronjobInfo | null) => {
             i18n.global.t('cronjob.cronTask'),
             i18n.global.t('commons.button.delete'),
         ]),
-        api: deleteCronjob,
-        params: { ids: ids, cleanData: cleanData.value },
+        api: null,
+        params: null,
     });
+};
+
+const onSubmitDelete = async () => {
+    await deleteCronjob({ ids: operateIDs.value, cleanData: cleanData.value });
+    MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
+    search();
 };
 
 const onChangeStatus = async (id: number, status: string) => {
@@ -315,6 +324,17 @@ const onHandle = async (row: Cronjob.CronjobInfo) => {
         .catch(() => {
             loading.value = false;
         });
+};
+
+const hasBackup = (type: string) => {
+    return (
+        type === 'app' ||
+        type === 'website' ||
+        type === 'database' ||
+        type === 'directory' ||
+        type === 'snapshot' ||
+        type === 'log'
+    );
 };
 
 const loadDetail = (row: any) => {

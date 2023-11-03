@@ -677,9 +677,14 @@ func (u *CronjobService) handleSystemLog(cronjob model.Cronjob, startTime time.T
 	global.LOG.Debug("backup ssh log successful!")
 
 	fileName := fmt.Sprintf("system_log_%s.tar.gz", startTime.Format("20060102150405"))
-	if err := handleTar(pathItem, pathItem, fileName, ""); err != nil {
+	targetDir := path.Dir(pathItem)
+	if err := handleTar(pathItem, targetDir, fileName, ""); err != nil {
 		return "", err
 	}
+	defer func() {
+		os.RemoveAll(pathItem)
+		os.RemoveAll(path.Join(targetDir, fileName))
+	}()
 
 	client, err := NewIBackupService().NewClient(&backup)
 	if err != nil {
@@ -691,10 +696,14 @@ func (u *CronjobService) handleSystemLog(cronjob model.Cronjob, startTime time.T
 		targetPath = strings.TrimPrefix(backup.BackupPath, "/") + "/log/" + fileName
 	}
 
-	if _, err = client.Upload(path.Join(pathItem, fileName), targetPath); err != nil {
+	if _, err = client.Upload(path.Join(targetDir, fileName), targetPath); err != nil {
 		return "", err
 	}
 
 	u.HandleRmExpired(backup.Type, backup.BackupPath, "", &cronjob, client)
 	return targetPath, nil
+}
+
+func hasBackup(cronjobType string) bool {
+	return cronjobType == "app" || cronjobType == "database" || cronjobType == "website" || cronjobType == "directory" || cronjobType == "snapshot" || cronjobType == "log"
 }
