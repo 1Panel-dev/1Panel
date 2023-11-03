@@ -598,46 +598,49 @@ func (u *CronjobService) handleSystemClean() (string, error) {
 }
 
 func (u *CronjobService) handleSystemLog(cronjob model.Cronjob, startTime time.Time) (string, error) {
-	websites, err := websiteRepo.List()
-	if err != nil {
-		return "", err
-	}
 	backup, err := backupRepo.Get(commonRepo.WithByID(uint(cronjob.TargetDirID)))
 	if err != nil {
 		return "", err
 	}
 
 	pathItem := path.Join(global.CONF.System.BaseDir, "1panel/tmp/log", startTime.Format("20060102150405"))
-	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	websites, err := websiteRepo.List()
 	if err != nil {
 		return "", err
 	}
-	webItem := path.Join(nginxInstall.GetPath(), "www/sites")
-	for _, website := range websites {
-		dirItem := path.Join(pathItem, "website", website.Alias)
-		if _, err := os.Stat(dirItem); err != nil && os.IsNotExist(err) {
-			if err = os.MkdirAll(dirItem, os.ModePerm); err != nil {
-				return "", err
-			}
+	if len(websites) != 0 {
+		nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+		if err != nil {
+			return "", err
 		}
-		itemDir := path.Join(webItem, website.Alias, "log")
-		logFiles, _ := os.ReadDir(itemDir)
-		if len(logFiles) != 0 {
-			for i := 0; i < len(logFiles); i++ {
-				if !logFiles[i].IsDir() {
-					_ = cpBinary([]string{path.Join(itemDir, logFiles[i].Name())}, dirItem)
+		webItem := path.Join(nginxInstall.GetPath(), "www/sites")
+		for _, website := range websites {
+			dirItem := path.Join(pathItem, "website", website.Alias)
+			if _, err := os.Stat(dirItem); err != nil && os.IsNotExist(err) {
+				if err = os.MkdirAll(dirItem, os.ModePerm); err != nil {
+					return "", err
+				}
+			}
+			itemDir := path.Join(webItem, website.Alias, "log")
+			logFiles, _ := os.ReadDir(itemDir)
+			if len(logFiles) != 0 {
+				for i := 0; i < len(logFiles); i++ {
+					if !logFiles[i].IsDir() {
+						_ = cpBinary([]string{path.Join(itemDir, logFiles[i].Name())}, dirItem)
+					}
+				}
+			}
+			itemDir2 := path.Join(global.CONF.System.Backup, "log/website", website.Alias)
+			logFiles2, _ := os.ReadDir(itemDir2)
+			if len(logFiles2) != 0 {
+				for i := 0; i < len(logFiles2); i++ {
+					if !logFiles2[i].IsDir() {
+						_ = cpBinary([]string{path.Join(itemDir2, logFiles2[i].Name())}, dirItem)
+					}
 				}
 			}
 		}
-		itemDir2 := path.Join(global.CONF.System.Backup, "log/website", website.Alias)
-		logFiles2, _ := os.ReadDir(itemDir2)
-		if len(logFiles2) != 0 {
-			for i := 0; i < len(logFiles2); i++ {
-				if !logFiles2[i].IsDir() {
-					_ = cpBinary([]string{path.Join(itemDir2, logFiles2[i].Name())}, dirItem)
-				}
-			}
-		}
+		global.LOG.Debug("backup website log successful!")
 	}
 
 	systemLogDir := path.Join(global.CONF.System.BaseDir, "1panel/log")
@@ -655,6 +658,8 @@ func (u *CronjobService) handleSystemLog(cronjob model.Cronjob, startTime time.T
 			}
 		}
 	}
+	global.LOG.Debug("backup system log successful!")
+
 	loginLogFiles, _ := os.ReadDir("/var/log")
 	loginDir := path.Join(pathItem, "login")
 	if _, err := os.Stat(loginDir); err != nil && os.IsNotExist(err) {
@@ -669,6 +674,7 @@ func (u *CronjobService) handleSystemLog(cronjob model.Cronjob, startTime time.T
 			}
 		}
 	}
+	global.LOG.Debug("backup ssh log successful!")
 
 	fileName := fmt.Sprintf("system_log_%s.tar.gz", startTime.Format("20060102150405"))
 	if err := handleTar(pathItem, pathItem, fileName, ""); err != nil {
