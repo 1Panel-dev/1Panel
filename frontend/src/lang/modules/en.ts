@@ -189,6 +189,7 @@ const message = {
             disableFunction: 'Only support letters ,underscores,and,',
             leechExts: 'Only support letters, numbers and,',
             paramSimple: 'Support lowercase letters and numbers, length 1-128',
+            filePermission: 'File Permission Error',
         },
         res: {
             paramError: 'The request failed, please try again later!',

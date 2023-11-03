@@ -188,6 +188,7 @@ const message = {
             disableFunction: '仅支持字母、下划线和,',
             leechExts: '仅支持字母数字和,',
             paramSimple: '支持小写字母和数字,长度1-128',
+            filePermission: '权限错误',
         },
         res: {
             paramError: '请求失败,请稍后重试!',

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-form ref="ruleForm" label-position="left" :model="form" label-width="100px">
+        <el-form ref="ruleForm" label-position="left" :model="form" label-width="100px" :rules="rules">
             <el-form-item :label="$t('file.owner')">
                 <el-checkbox v-model="form.owner.r" :label="$t('file.rRole')" />
                 <el-checkbox v-model="form.owner.w" :label="$t('file.wRole')" />
@@ -16,15 +16,16 @@
                 <el-checkbox v-model="form.public.w" :label="$t('file.wRole')" />
                 <el-checkbox v-model="form.public.x" :label="$t('file.xRole')" />
             </el-form-item>
-            <el-form-item :label="$t('file.role')" required>
+            <el-form-item :label="$t('file.role')" required prop="mode">
                 <el-input v-model="form.mode" maxlength="4" @input="changeMode"></el-input>
             </el-form-item>
         </el-form>
     </div>
 </template>
 <script setup lang="ts">
-import { FormInstance } from 'element-plus';
-import { computed, ref, toRefs, watch, onUpdated, onMounted } from 'vue';
+import { FormInstance, FormRules } from 'element-plus';
+import { computed, ref, toRefs, watch, onUpdated, onMounted, reactive } from 'vue';
+import { Rules } from '@/global/form-rules';
 
 interface Role {
     r: boolean;
@@ -45,6 +46,9 @@ const roles = ref<string[]>(['0', '1', '2', '3', '4', '5', '6', '7']);
 
 const props = withDefaults(defineProps<Props>(), {
     mode: '0755',
+});
+const rules = reactive<FormRules>({
+    mode: [Rules.requiredInput, Rules.filePermission],
 });
 
 const { mode } = toRefs(props);
