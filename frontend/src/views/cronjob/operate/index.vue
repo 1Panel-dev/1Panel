@@ -30,7 +30,9 @@
                             <el-option value="snapshot" :label="$t('cronjob.snapshot')" />
                             <el-option value="ntp" :label="$t('cronjob.ntp')" />
                         </el-select>
-                        <el-tag v-else>{{ $t('cronjob.' + dialogData.rowData!.type) }}</el-tag>
+                        <div v-else style="width: 100%">
+                            <el-tag>{{ $t('cronjob.' + dialogData.rowData!.type) }}</el-tag>
+                        </div>
                         <div v-if="dialogData.rowData!.type === 'log'" class="logText">
                             <span class="input-help">
                                 {{ $t('cronjob.logHelper1') }}

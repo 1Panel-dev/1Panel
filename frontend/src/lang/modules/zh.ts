@@ -714,6 +714,7 @@ const message = {
         record: '报告',
         shell: 'Shell 脚本',
         log: '备份日志',
+        logHelper: '备份系统日志',
         logHelper1: '1. 1Panel 系统日志',
         logHelper2: '2. 服务器的 SSH 登录日志',
         logHelper3: '3. 所有网站日志',

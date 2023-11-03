@@ -71,28 +71,31 @@ const acceptParams = (props: DialogProps): void => {
     open.value = true;
 };
 
-const emit = defineEmits(['search', 'cancel']);
+const emit = defineEmits(['search', 'cancel', 'submit']);
 
 const onConfirm = async () => {
-    if (form.api) {
-        loading.value = true;
-        await form
-            .api(form.params)
-            .then(() => {
-                emit('cancel');
-                emit('search');
-                if (successMsg.value) {
-                    MsgSuccess(successMsg.value);
-                } else {
-                    MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
-                }
-                open.value = false;
-                loading.value = false;
-            })
-            .catch(() => {
-                loading.value = false;
-            });
+    if (form.api === null) {
+        emit('submit');
+        open.value = false;
+        return;
     }
+    loading.value = true;
+    await form
+        .api(form.params)
+        .then(() => {
+            emit('cancel');
+            emit('search');
+            if (successMsg.value) {
+                MsgSuccess(successMsg.value);
+            } else {
+                MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
+            }
+            open.value = false;
+            loading.value = false;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 onMounted(() => {});

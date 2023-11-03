@@ -713,6 +713,7 @@ const message = {
         record: '報告',
         shell: 'Shell 腳本',
         log: '備份日誌',
+        logHelper: '備份系統日誌',
         logHelper1: '1. 1Panel 系統日誌',
         logHelper2: '2. 服務器的 SSH 登錄日誌',
         logHelper3: '3. 所有網站日誌',
