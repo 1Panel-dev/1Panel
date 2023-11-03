@@ -75,7 +75,7 @@
                             </el-input>
                             <span class="input-help">{{ $t('container.limitHelper') }}</span>
                         </el-form-item>
-                        <el-form-item prop="allowPort" v-if="canEditPort(paramData.app.key)">
+                        <el-form-item prop="allowPort" v-if="!paramModel.isHostMode">
                             <el-checkbox v-model="paramModel.allowPort" :label="$t('app.allowPort')" size="large" />
                             <span class="input-help">{{ $t('app.allowPortHelper') }}</span>
                         </el-form-item>
@@ -122,7 +122,6 @@ import { FormInstance } from 'element-plus';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
-import { canEditPort } from '@/global/business';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
@@ -215,6 +214,7 @@ const get = async () => {
         paramModel.value.containerName = res.data.containerName;
         paramModel.value.advanced = false;
         paramModel.value.dockerCompose = res.data.dockerCompose;
+        paramModel.value.isHostMode = res.data.hostMode;
     } catch (error) {
     } finally {
         loading.value = false;

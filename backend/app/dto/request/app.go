@@ -31,6 +31,7 @@ type AppContainerConfig struct {
 	AllowPort     bool    `json:"allowPort"`
 	EditCompose   bool    `json:"editCompose"`
 	DockerCompose string  `json:"dockerCompose"`
+	HostMode      bool    `json:"hostMode"`
 }
 
 type AppInstalledSearch struct {

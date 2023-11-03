@@ -44,6 +44,7 @@ export namespace App {
         params: AppParams;
         dockerCompose: string;
         image: string;
+        hostMode?: boolean;
     }
 
     export interface AppReq extends ReqPage {
@@ -201,6 +202,7 @@ export namespace App {
         containerName: string;
         allowPort: boolean;
         dockerCompose: string;
+        hostMode?: boolean;
     }
 
     export interface IgnoredApp {

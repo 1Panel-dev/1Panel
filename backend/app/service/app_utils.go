@@ -1196,3 +1196,19 @@ func getAppCommonConfig(envs map[string]interface{}) request.AppContainerConfig 
 
 	return config
 }
+
+func isHostModel(dockerCompose string) bool {
+	composeMap := make(map[string]interface{})
+	_ = yaml.Unmarshal([]byte(dockerCompose), &composeMap)
+	services, serviceValid := composeMap["services"].(map[string]interface{})
+	if !serviceValid {
+		return false
+	}
+	for _, service := range services {
+		serviceValue := service.(map[string]interface{})
+		if value, ok := serviceValue["network_mode"]; ok && value == "host" {
+			return true
+		}
+	}
+	return false
+}

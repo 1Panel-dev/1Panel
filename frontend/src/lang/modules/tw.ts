@@ -1338,6 +1338,7 @@ const message = {
         downloadLogHelper1: '即將下載 {0} 套用所有日誌，是否繼續？ ',
         downloadLogHelper2: '即將下載 {0} 應用最近 {1} 條日誌，是否繼續？ ',
         syncAllAppHelper: '即將同步所有應用，是否繼續？ ',
+        hostModeHelper: '目前應用網路模式為 host 模式，如需放開端口，請在防火牆頁面手動放開',
     },
     website: {
         website: '網站',
