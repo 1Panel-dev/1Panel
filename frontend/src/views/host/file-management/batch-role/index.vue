@@ -5,16 +5,9 @@
         </template>
 
         <el-row>
-            <el-col :span="22" :offset="1">
-                <FileRole v-loading="loading" :mode="mode" @get-mode="getMode"></FileRole>
-                <el-form
-                    ref="fileForm"
-                    label-position="left"
-                    :model="addForm"
-                    label-width="100px"
-                    :rules="rules"
-                    v-loading="loading"
-                >
+            <el-col :span="22" :offset="1" v-loading="loading">
+                <FileRole :mode="mode" @get-mode="getMode"></FileRole>
+                <el-form ref="fileForm" label-position="left" :model="addForm" label-width="100px" :rules="rules">
                     <el-form-item :label="$t('commons.table.user')" prop="user">
                         <el-input v-model.trim="addForm.user" />
                     </el-form-item>
@@ -76,6 +69,7 @@ const addForm = reactive({
 });
 
 const acceptParams = (props: BatchRoleProps) => {
+    addForm.paths = [];
     files.value = props.files;
     files.value.forEach((file) => {
         addForm.paths.push(file.path);
@@ -94,7 +88,12 @@ const getMode = (val: number) => {
 };
 
 const submit = async () => {
+    const regFilePermission = /^[0-7]{3,4}$/;
+    if (!regFilePermission.test(addForm.mode.toString(8))) {
+        return;
+    }
     loading.value = true;
+
     BatchChangeRole(addForm)
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));

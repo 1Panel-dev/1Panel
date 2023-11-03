@@ -461,6 +461,19 @@ const checkParamSimple = (rule: any, value: any, callback: any) => {
     }
 };
 
+const checkFilePermission = (rule, value, callback) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback(new Error(i18n.global.t('commons.rule.filePermission')));
+    } else {
+        const regFilePermission = /^[0-7]{3,4}$/;
+        if (!regFilePermission.test(value)) {
+            callback(new Error(i18n.global.t('commons.rule.filePermission')));
+        } else {
+            callback();
+        }
+    }
+};
+
 interface CommonRule {
     requiredInput: FormItemRule;
     requiredSelect: FormItemRule;
@@ -493,6 +506,7 @@ interface CommonRule {
     disabledFunctions: FormItemRule;
     leechExts: FormItemRule;
     domainWithPort: FormItemRule;
+    filePermission: FormItemRule;
 
     paramCommon: FormItemRule;
     paramComplexity: FormItemRule;
@@ -690,6 +704,11 @@ export const Rules: CommonRule = {
     domainWithPort: {
         required: true,
         validator: checkDomainWithPort,
+        trigger: 'blur',
+    },
+    filePermission: {
+        required: true,
+        validator: checkFilePermission,
         trigger: 'blur',
     },
 };
