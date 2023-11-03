@@ -1688,6 +1688,7 @@ const message = {
         allIP: '所有 IP',
         portRule: '端口規則',
         ipRule: 'IP 規則',
+        userAgent: 'User-Agent 過濾',
     },
     runtime: {
         runtime: '運行環境',

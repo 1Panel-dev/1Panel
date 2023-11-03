@@ -94,7 +94,7 @@ type FileDownload struct {
 	Paths    []string `json:"paths" validate:"required"`
 	Type     string   `json:"type" validate:"required"`
 	Name     string   `json:"name" validate:"required"`
-	Compress bool     `json:"compress" validate:"required"`
+	Compress bool     `json:"compress"`
 }
 
 type FileChunkDownload struct {
@@ -114,7 +114,7 @@ type FileRoleUpdate struct {
 	Path  string `json:"path" validate:"required"`
 	User  string `json:"user" validate:"required"`
 	Group string `json:"group" validate:"required"`
-	Sub   bool   `json:"sub" validate:"required"`
+	Sub   bool   `json:"sub"`
 }
 
 type FileReadByLineReq struct {
