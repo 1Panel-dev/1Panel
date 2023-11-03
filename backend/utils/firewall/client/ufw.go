@@ -146,7 +146,7 @@ func (f *Ufw) Port(port FireInfo, operation string) error {
 	}
 	stdout, err := cmd.Exec(command)
 	if err != nil {
-		return fmt.Errorf("%s port failed, err: %s", operation, stdout)
+		return fmt.Errorf("%s (%s) failed, err: %s", operation, command, stdout)
 	}
 	return nil
 }
@@ -183,7 +183,7 @@ func (f *Ufw) RichRules(rule FireInfo, operation string) error {
 
 	stdout, err := cmd.Exec(ruleStr)
 	if err != nil {
-		return fmt.Errorf("%s rich rules failed, err: %s", operation, stdout)
+		return fmt.Errorf("%s rich rules (%s), failed, err: %s", operation, ruleStr, stdout)
 	}
 	return nil
 }
