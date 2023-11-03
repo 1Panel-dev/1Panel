@@ -18,12 +18,12 @@ import { reactive, ref } from 'vue';
 const paginationConfig = reactive({
     cacheSizeKey: 'favorite-page-size',
     currentPage: 1,
-    pageSize: 100,
+    pageSize: 20,
     total: 0,
 });
 const req = reactive({
     page: 1,
-    pageSize: 100,
+    pageSize: 20,
 });
 const open = ref(false);
 const data = ref([]);
@@ -40,6 +40,8 @@ const acceptParams = () => {
 
 const search = async () => {
     try {
+        req.page = paginationConfig.currentPage;
+        req.pageSize = paginationConfig.pageSize;
         const res = await SearchFavorite(req);
         data.value = res.data.items;
         paginationConfig.total = res.data.total;

@@ -18,7 +18,7 @@ import (
 // @Router /files/favorite/search [post]
 func (b *BaseApi) SearchFavorite(c *gin.Context) {
 	var req dto.PageInfo
-	if err := helper.CheckBind(req, c); err != nil {
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 	total, list, err := favoriteService.Page(req)
