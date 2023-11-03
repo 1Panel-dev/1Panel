@@ -402,7 +402,10 @@ func getFormat(cType CompressType) archiver.CompressedArchive {
 	case TarGz, Gz:
 		format.Compression = archiver.Gz{}
 		format.Archival = archiver.Tar{}
-	case Zip:
+	case SdkTarGz:
+		format.Compression = archiver.Gz{}
+		format.Archival = archiver.Tar{}
+	case SdkZip:
 		format.Archival = archiver.Zip{
 			Compression: zip.Deflate,
 		}

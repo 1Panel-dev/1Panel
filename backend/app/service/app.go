@@ -222,6 +222,25 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 		appDetailDTO.Params = paramMap
 	}
 
+	if appDetailDTO.DockerCompose == "" {
+		filename := path.Base(appDetailDTO.DownloadUrl)
+		dockerComposeUrl := fmt.Sprintf("%s%s", strings.TrimSuffix(appDetailDTO.DownloadUrl, filename), "docker-compose.yml")
+		composeRes, err := http.Get(dockerComposeUrl)
+		if err != nil {
+			return appDetailDTO, buserr.WithDetail("ErrGetCompose", err.Error(), err)
+		}
+		bodyContent, err := io.ReadAll(composeRes.Body)
+		if err != nil {
+			return appDetailDTO, buserr.WithDetail("ErrGetCompose", err.Error(), err)
+		}
+		if composeRes.StatusCode > 200 {
+			return appDetailDTO, buserr.WithDetail("ErrGetCompose", string(bodyContent), err)
+		}
+		detail.DockerCompose = string(bodyContent)
+		_ = appDetailRepo.Update(context.Background(), detail)
+		appDetailDTO.DockerCompose = string(bodyContent)
+	}
+
 	appDetailDTO.HostMode = isHostModel(appDetailDTO.DockerCompose)
 
 	app, err := appRepo.GetFirst(commonRepo.WithByID(detail.AppId))
@@ -696,6 +715,11 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 	if err != nil {
 		return nil, err
 	}
+	if setting.AppStoreSyncStatus == constant.Syncing {
+		res.IsSyncing = true
+		return res, nil
+	}
+
 	appStoreLastModified, _ := strconv.Atoi(setting.AppStoreLastModified)
 	res.AppStoreLastModified = appStoreLastModified
 	if setting.AppStoreLastModified == "" || lastModified != appStoreLastModified {
@@ -722,7 +746,7 @@ func getAppFromRepo(downloadPath string) error {
 	if err := fileOp.DownloadFile(downloadUrl, packagePath); err != nil {
 		return err
 	}
-	if err := fileOp.Decompress(packagePath, constant.ResourceDir, files.Zip); err != nil {
+	if err := fileOp.Decompress(packagePath, constant.ResourceDir, files.SdkZip); err != nil {
 		return err
 	}
 	defer func() {
@@ -747,6 +771,12 @@ func getAppList() (*dto.AppList, error) {
 	return list, nil
 }
 
+var InitTypes = map[string]struct{}{
+	"runtime": {},
+	"php":     {},
+	"node":    {},
+}
+
 func (a AppService) SyncAppListFromRemote() (err error) {
 	global.LOG.Infof("Starting synchronization with App Store...")
 	updateRes, err := a.GetAppUpdate()
@@ -754,9 +784,14 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 		return err
 	}
 	if !updateRes.CanUpdate {
+		if updateRes.IsSyncing {
+			global.LOG.Infof("AppStore is Syncing!")
+			return
+		}
 		global.LOG.Infof("The App Store is at the latest version")
 		return
 	}
+
 	list := &dto.AppList{}
 	if updateRes.AppList == nil {
 		list, err = getAppList()
@@ -766,16 +801,8 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 	} else {
 		list = updateRes.AppList
 	}
-
-	if err = NewISettingService().Update("AppStoreLastModified", strconv.Itoa(list.LastModified)); err != nil {
-		return err
-	}
-
-	defer func() {
-		if err != nil {
-			_ = NewISettingService().Update("AppStoreLastModified", strconv.Itoa(updateRes.AppStoreLastModified))
-		}
-	}()
+	settingService := NewISettingService()
+	_ = settingService.Update("AppStoreSyncStatus", constant.Syncing)
 
 	var (
 		tags      []*model.Tag
@@ -799,6 +826,8 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 
 	baseRemoteUrl := fmt.Sprintf("%s/%s/1panel", global.CONF.System.AppRepo, global.CONF.System.Mode)
 	appsMap := getApps(oldApps, list.Apps)
+
+	global.LOG.Infof("Starting synchronization of application details...")
 	for _, l := range list.Apps {
 		app := appsMap[l.AppProperty.Key]
 		iconRes, err := http.Get(l.Icon)
@@ -825,16 +854,21 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 			version := v.Name
 			detail := detailsMap[version]
 			versionUrl := fmt.Sprintf("%s/%s/%s", baseRemoteUrl, app.Key, version)
-			dockerComposeUrl := fmt.Sprintf("%s/%s", versionUrl, "docker-compose.yml")
-			composeRes, err := http.Get(dockerComposeUrl)
-			if err != nil {
-				return err
+
+			if _, ok := InitTypes[app.Type]; ok {
+				dockerComposeUrl := fmt.Sprintf("%s/%s", versionUrl, "docker-compose.yml")
+				composeRes, err := http.Get(dockerComposeUrl)
+				if err != nil {
+					return err
+				}
+				bodyContent, err := io.ReadAll(composeRes.Body)
+				if err != nil {
+					return err
+				}
+				detail.DockerCompose = string(bodyContent)
+			} else {
+				detail.DockerCompose = ""
 			}
-			bodyContent, err := io.ReadAll(composeRes.Body)
-			if err != nil {
-				return err
-			}
-			detail.DockerCompose = string(bodyContent)
 
 			paramByte, _ := json.Marshal(v.AppForm)
 			detail.Params = string(paramByte)
@@ -851,6 +885,8 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 		app.Details = newDetails
 		appsMap[l.AppProperty.Key] = app
 	}
+
+	global.LOG.Infof("Synchronization of application details Success")
 
 	var (
 		addAppArray    []model.App
@@ -976,6 +1012,10 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 		}
 	}
 	tx.Commit()
+
+	_ = settingService.Update("AppStoreSyncStatus", constant.SyncSuccess)
+	_ = settingService.Update("AppStoreLastModified", strconv.Itoa(list.LastModified))
+
 	global.LOG.Infof("Synchronization with the App Store was successful!")
 	return
 }

@@ -44,8 +44,13 @@ func (b *BaseApi) SyncApp(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
+
 	if !res.CanUpdate {
-		helper.SuccessWithMsg(c, i18n.GetMsgByKey("AppStoreIsUpToDate"))
+		if res.IsSyncing {
+			helper.SuccessWithMsg(c, i18n.GetMsgByKey("AppStoreIsSyncing"))
+		} else {
+			helper.SuccessWithMsg(c, i18n.GetMsgByKey("AppStoreIsUpToDate"))
+		}
 		return
 	}
 	go func() {

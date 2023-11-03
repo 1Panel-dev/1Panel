@@ -45,3 +45,13 @@ var AddCommandGroup = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddAppSyncStatus = &gormigrate.Migration{
+	ID: "20231103-update-table-setting",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "AppStoreSyncStatus", Value: "SyncSuccess"}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

@@ -6,13 +6,13 @@ const (
 	Error       = "Error"
 	Stopped     = "Stopped"
 	Installing  = "Installing"
-	Syncing     = "Syncing"
 	DownloadErr = "DownloadErr"
-	DirNotFound = "DirNotFound"
 	Upgrading   = "Upgrading"
 	UpgradeErr  = "UpgradeErr"
-	PullErr     = "PullErr"
 	Rebuilding  = "Rebuilding"
+	Syncing     = "Syncing"
+	SyncSuccess = "SyncSuccess"
+	SyncErr     = "SyncErr"
 
 	ContainerPrefix = "1Panel-"
 

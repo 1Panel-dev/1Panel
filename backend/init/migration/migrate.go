@@ -51,6 +51,7 @@ func Init() {
 		migrations.AddFavorite,
 		migrations.AddBindAddress,
 		migrations.AddCommandGroup,
+		migrations.AddAppSyncStatus,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

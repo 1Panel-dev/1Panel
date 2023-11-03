@@ -2,6 +2,7 @@ package business
 
 import (
 	"github.com/1Panel-dev/1Panel/backend/app/service"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 )
 
@@ -12,6 +13,7 @@ func Init() {
 }
 
 func syncApp() {
+	_ = service.NewISettingService().Update("AppStoreSyncStatus", constant.SyncSuccess)
 	if err := service.NewIAppService().SyncAppListFromRemote(); err != nil {
 		global.LOG.Errorf("App Store synchronization failed")
 		return

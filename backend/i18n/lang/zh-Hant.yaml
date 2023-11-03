@@ -52,6 +52,8 @@ ErrAppBackup: '{{ .name }} 應用備份失敗 err {{.err}}'
 ErrImagePull: '{{ .name }} 鏡像拉取失敗 err {{.err}}'
 ErrVersionTooLow: '當前 1Panel 版本過低，無法更新應用商店，請升級版本之後操作'
 ErrAppNameExist: '應用名稱已存在'
+AppStoreIsSyncing: '應用程式商店正在同步中，請稍後再試'
+ErrGetCompose: "docker-compose.yml 檔案取得失敗！{{ .detail }}"
 
 #file
 ErrFileCanNotRead: "此文件不支持預覽"
