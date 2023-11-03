@@ -182,49 +182,41 @@
                         prop="name"
                     >
                         <template #default="{ row, $index }">
-                            <div @mouseenter="showFavorite($index)" @mouseleave="hideFavorite">
-                                <el-row>
-                                    <el-col :span="1">
-                                        <svg-icon
-                                            v-if="row.isDir"
-                                            className="table-icon"
-                                            iconName="p-file-folder"
-                                        ></svg-icon>
-                                        <svg-icon
-                                            v-else
-                                            className="table-icon"
-                                            :iconName="getIconName(row.extension)"
-                                        ></svg-icon>
-                                    </el-col>
-                                    <el-col :span="22">
-                                        <div class="text-parent">
-                                            <span class="table-link text-ellipsis" @click="open(row)" type="primary">
-                                                {{ row.name }}
-                                            </span>
-                                            <span v-if="row.isSymlink">-> {{ row.linkPath }}</span>
-                                        </div>
-                                    </el-col>
-                                    <el-col :span="1">
-                                        <div>
-                                            <el-button
-                                                v-if="row.favoriteID > 0"
-                                                link
-                                                type="warning"
-                                                size="large"
-                                                :icon="StarFilled"
-                                                @click="removeFavorite(row.favoriteID)"
-                                            ></el-button>
-                                            <div v-else>
-                                                <el-button
-                                                    v-if="hoveredRowIndex === $index"
-                                                    link
-                                                    :icon="Star"
-                                                    @click="addFavorite(row)"
-                                                ></el-button>
-                                            </div>
-                                        </div>
-                                    </el-col>
-                                </el-row>
+                            <div class="file-row" @mouseenter="showFavorite($index)" @mouseleave="hideFavorite">
+                                <div>
+                                    <svg-icon
+                                        v-if="row.isDir"
+                                        className="table-icon"
+                                        iconName="p-file-folder"
+                                    ></svg-icon>
+                                    <svg-icon
+                                        v-else
+                                        className="table-icon"
+                                        :iconName="getIconName(row.extension)"
+                                    ></svg-icon>
+                                </div>
+                                <div class="file-name">
+                                    <span class="table-link" @click="open(row)" type="primary">{{ row.name }}</span>
+                                    <span v-if="row.isSymlink">-> {{ row.linkPath }}</span>
+                                </div>
+                                <div>
+                                    <el-button
+                                        v-if="row.favoriteID > 0"
+                                        link
+                                        type="warning"
+                                        size="large"
+                                        :icon="StarFilled"
+                                        @click="removeFavorite(row.favoriteID)"
+                                    ></el-button>
+                                    <div v-else>
+                                        <el-button
+                                            v-if="hoveredRowIndex === $index"
+                                            link
+                                            :icon="Star"
+                                            @click="addFavorite(row)"
+                                        ></el-button>
+                                    </div>
+                                </div>
                             </div>
                         </template>
                     </el-table-column>
@@ -924,6 +916,21 @@ onMounted(() => {
 .favorite-item {
     max-height: 650px;
     overflow: auto;
+}
+
+.file-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.file-name {
+    flex-grow: 1;
+    margin-left: 1px;
+    width: 95%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 .address-bar {
     border: var(--el-border);
