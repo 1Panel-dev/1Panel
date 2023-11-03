@@ -223,11 +223,11 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 					req.Port = strings.ReplaceAll(req.Port, "-", ":")
 					req.Protocol = proto
 					if err := u.operatePort(client, req); err != nil {
-						global.LOG.Errorf("%s port %s/%s failed (strategy: %s, address: %s), err: %v", req.Operation, req.Port, req.Protocol, req.Strategy, req.Address, err)
+						return err
 					}
 					req.Port = strings.ReplaceAll(req.Port, ":", "-")
 					if err := u.addPortRecord(req); err != nil {
-						global.LOG.Errorf("add record %s/%s failed (strategy: %s, address: %s), err: %v", req.Port, req.Protocol, req.Strategy, req.Address, err)
+						return err
 					}
 				}
 			}
@@ -242,13 +242,13 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 			}
 			req.Address = addr
 			if err := u.operatePort(client, req); err != nil {
-				global.LOG.Errorf("%s port %s/%s failed (strategy: %s, address: %s), err: %v", req.Operation, req.Port, req.Protocol, req.Strategy, req.Address, err)
+				return err
 			}
 			if len(req.Protocol) == 0 {
 				req.Protocol = "tcp/udp"
 			}
 			if err := u.addPortRecord(req); err != nil {
-				global.LOG.Errorf("add record %s/%s failed (strategy: %s, address: %s), err: %v", req.Port, req.Protocol, req.Strategy, req.Address, err)
+				return err
 			}
 		}
 		return nil
@@ -261,9 +261,11 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 				req.Protocol = proto
 				req.Address = addr
 				if err := u.operatePort(client, req); err != nil {
-					global.LOG.Errorf("%s port %s/%s failed (strategy: %s, address: %s), err: %v", req.Operation, req.Port, req.Protocol, req.Strategy, req.Address, err)
+					return err
 				}
-				_ = u.addPortRecord(req)
+				if err := u.addPortRecord(req); err != nil {
+					return err
+				}
 			}
 		} else {
 			ports := strings.Split(itemPorts, ",")
@@ -276,9 +278,11 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 					req.Port = port
 					req.Protocol = proto
 					if err := u.operatePort(client, req); err != nil {
-						global.LOG.Errorf("%s port %s/%s failed (strategy: %s, address: %s), err: %v", req.Operation, req.Port, req.Protocol, req.Strategy, req.Address, err)
+						return err
 					}
-					_ = u.addPortRecord(req)
+					if err := u.addPortRecord(req); err != nil {
+						return err
+					}
 				}
 			}
 		}
@@ -308,10 +312,12 @@ func (u *FirewallService) OperateAddressRule(req dto.AddrRuleOperate, reload boo
 		}
 		fireInfo.Address = addressList[i]
 		if err := client.RichRules(fireInfo, req.Operation); err != nil {
-			global.LOG.Errorf("%s address %s failed (strategy: %s), err: %v", req.Operation, addressList[i], req.Strategy, err)
+			return err
 		}
 		req.Address = addressList[i]
-		_ = u.addAddressRecord(req)
+		if err := u.addAddressRecord(req); err != nil {
+			return err
+		}
 	}
 	if reload {
 		return client.Reload()
@@ -545,26 +551,33 @@ func (u *FirewallService) addPortRecord(req dto.PortRuleOperate) error {
 		return hostRepo.DeleteFirewallRecord("port", req.Port, req.Protocol, req.Address, req.Strategy)
 	}
 
-	return hostRepo.SaveFirewallRecord(&model.Firewall{
+	if err := hostRepo.SaveFirewallRecord(&model.Firewall{
 		Type:        "port",
 		Port:        req.Port,
 		Protocol:    req.Protocol,
 		Address:     req.Address,
 		Strategy:    req.Strategy,
 		Description: req.Description,
-	})
+	}); err != nil {
+		return fmt.Errorf("add record %s/%s failed (strategy: %s, address: %s), err: %v", req.Port, req.Protocol, req.Strategy, req.Address, err)
+	}
+
+	return nil
 }
 
 func (u *FirewallService) addAddressRecord(req dto.AddrRuleOperate) error {
 	if req.Operation == "remove" {
 		return hostRepo.DeleteFirewallRecord("address", "", "", req.Address, req.Strategy)
 	}
-	return hostRepo.SaveFirewallRecord(&model.Firewall{
+	if err := hostRepo.SaveFirewallRecord(&model.Firewall{
 		Type:        "address",
 		Address:     req.Address,
 		Strategy:    req.Strategy,
 		Description: req.Description,
-	})
+	}); err != nil {
+		return fmt.Errorf("add record failed (strategy: %s, address: %s), err: %v", req.Strategy, req.Address, err)
+	}
+	return nil
 }
 
 func listIpRules(strategy string) ([]string, error) {

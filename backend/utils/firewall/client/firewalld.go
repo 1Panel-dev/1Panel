@@ -132,7 +132,7 @@ func (f *Firewall) Port(port FireInfo, operation string) error {
 
 	stdout, err := cmd.Execf("firewall-cmd --zone=public --%s-port=%s/%s --permanent", operation, port.Port, port.Protocol)
 	if err != nil {
-		return fmt.Errorf("%s port failed, err: %s", operation, stdout)
+		return fmt.Errorf("%s (port: %s/%s strategy: %s) failed, err: %s", operation, port.Port, port.Protocol, port.Strategy, stdout)
 	}
 	return nil
 }
@@ -154,12 +154,12 @@ func (f *Firewall) RichRules(rule FireInfo, operation string) error {
 	ruleStr += rule.Strategy
 	stdout, err := cmd.Execf("firewall-cmd --zone=public --%s-rich-rule '%s' --permanent", operation, ruleStr)
 	if err != nil {
-		return fmt.Errorf("%s rich rules failed, err: %s", operation, stdout)
+		return fmt.Errorf("%s rich rules (%s) failed, err: %s", operation, ruleStr, stdout)
 	}
 	if len(rule.Address) == 0 {
 		stdout1, err := cmd.Execf("firewall-cmd --zone=public --%s-rich-rule '%s' --permanent", operation, strings.ReplaceAll(ruleStr, "family=ipv4 ", "family=ipv6 "))
 		if err != nil {
-			return fmt.Errorf("%s rich rules failed, err: %s", operation, stdout1)
+			return fmt.Errorf("%s rich rules (%s) failed, err: %s", operation, strings.ReplaceAll(ruleStr, "family=ipv4 ", "family=ipv6 "), stdout1)
 		}
 	}
 	return nil
