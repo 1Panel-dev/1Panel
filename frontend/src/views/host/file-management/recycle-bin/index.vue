@@ -55,7 +55,7 @@ import Delete from './delete/index.vue';
 const open = ref(false);
 const req = reactive({
     page: 1,
-    pageSize: 100,
+    pageSize: 20,
 });
 const data = ref([]);
 const em = defineEmits(['close']);
@@ -66,7 +66,7 @@ const files = ref([]);
 const paginationConfig = reactive({
     cacheSizeKey: 'recycle-page-size',
     currentPage: 1,
-    pageSize: 100,
+    pageSize: 20,
     total: 0,
 });
 
@@ -87,6 +87,8 @@ const acceptParams = () => {
 
 const search = async () => {
     try {
+        req.page = paginationConfig.currentPage;
+        req.pageSize = paginationConfig.pageSize;
         const res = await getRecycleList(req);
         data.value = res.data.items;
         paginationConfig.total = res.data.total;
