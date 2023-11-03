@@ -141,36 +141,26 @@ func (f *Firewall) RichRules(rule FireInfo, operation string) error {
 	if cmd.CheckIllegal(operation, rule.Address, rule.Protocol, rule.Port, rule.Strategy) {
 		return buserr.New(constant.ErrCmdIllegal)
 	}
-	ruleStr := ""
-	if strings.Contains(rule.Address, "-") {
-		std, err := cmd.Execf("firewall-cmd --permanent --new-ipset=%s --type=hash:ip", rule.Address)
-		if err != nil {
-			return fmt.Errorf("add new ipset failed, err: %s", std)
-		}
-		std2, err := cmd.Execf("firewall-cmd --permanent --ipset=%s --add-entry=%s", rule.Address, rule.Address)
-		if err != nil {
-			return fmt.Errorf("add entry to ipset failed, err: %s", std2)
-		}
-		if err := f.Reload(); err != nil {
-			return err
-		}
-		ruleStr = fmt.Sprintf("rule source ipset=%s %s", rule.Address, rule.Strategy)
-	} else {
-		ruleStr = "rule "
-		if len(rule.Address) != 0 {
-			ruleStr += fmt.Sprintf("source address=%s ", rule.Address)
-		}
-		if len(rule.Port) != 0 {
-			ruleStr += fmt.Sprintf("port port=%s ", rule.Port)
-		}
-		if len(rule.Protocol) != 0 {
-			ruleStr += fmt.Sprintf("protocol=%s ", rule.Protocol)
-		}
-		ruleStr += rule.Strategy
+	ruleStr := "rule family=ipv4 "
+	if len(rule.Address) != 0 {
+		ruleStr += fmt.Sprintf("source address=%s ", rule.Address)
 	}
+	if len(rule.Port) != 0 {
+		ruleStr += fmt.Sprintf("port port=%s ", rule.Port)
+	}
+	if len(rule.Protocol) != 0 {
+		ruleStr += fmt.Sprintf("protocol=%s ", rule.Protocol)
+	}
+	ruleStr += rule.Strategy
 	stdout, err := cmd.Execf("firewall-cmd --zone=public --%s-rich-rule '%s' --permanent", operation, ruleStr)
 	if err != nil {
 		return fmt.Errorf("%s rich rules failed, err: %s", operation, stdout)
+	}
+	if len(rule.Address) == 0 {
+		stdout1, err := cmd.Execf("firewall-cmd --zone=public --%s-rich-rule '%s' --permanent", operation, strings.ReplaceAll(ruleStr, "family=ipv4 ", "family=ipv6 "))
+		if err != nil {
+			return fmt.Errorf("%s rich rules failed, err: %s", operation, stdout1)
+		}
 	}
 	return nil
 }
