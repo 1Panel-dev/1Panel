@@ -675,6 +675,7 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 		config.ContainerName = install.ContainerName
 	}
 	res.AppContainerConfig = config
+	res.HostMode = isHostModel(install.DockerCompose)
 	return &res, nil
 }
 

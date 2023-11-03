@@ -47,9 +47,10 @@ type AppInstalledCheck struct {
 
 type AppDetailDTO struct {
 	model.AppDetail
-	Enable bool        `json:"enable"`
-	Params interface{} `json:"params"`
-	Image  string      `json:"image"`
+	Enable   bool        `json:"enable"`
+	Params   interface{} `json:"params"`
+	Image    string      `json:"image"`
+	HostMode bool        `json:"hostMode"`
 }
 
 type IgnoredApp struct {

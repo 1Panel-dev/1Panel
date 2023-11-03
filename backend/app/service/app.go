@@ -222,6 +222,8 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 		appDetailDTO.Params = paramMap
 	}
 
+	appDetailDTO.HostMode = isHostModel(appDetailDTO.DockerCompose)
+
 	app, err := appRepo.GetFirst(commonRepo.WithByID(detail.AppId))
 	if err != nil {
 		return appDetailDTO, err
@@ -243,6 +245,7 @@ func (a AppService) GetAppDetailByID(id uint) (*response.AppDetailDTO, error) {
 		return nil, err
 	}
 	res.Params = paramMap
+	res.HostMode = isHostModel(appDetail.DockerCompose)
 	return res, nil
 }
 

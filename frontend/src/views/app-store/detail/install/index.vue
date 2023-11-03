@@ -16,7 +16,14 @@
                     class="common-prompt"
                     :closable="false"
                     type="error"
-                    v-if="canEditPort(installData.app.key)"
+                    v-if="!isHostMode"
+                />
+                <el-alert
+                    :title="$t('app.hostModeHelper')"
+                    class="common-prompt"
+                    :closable="false"
+                    type="warning"
+                    v-else
                 />
                 <el-form
                     @submit.prevent
@@ -92,7 +99,7 @@
                                 {{ $t('container.limitHelper', [limits.memory]) }}{{ req.memoryUnit }}B
                             </span>
                         </el-form-item>
-                        <el-form-item prop="allowPort" v-if="canEditPort(installData.app.key)">
+                        <el-form-item prop="allowPort" v-if="!isHostMode">
                             <el-checkbox v-model="req.allowPort" :label="$t('app.allowPort')" size="large" />
                             <span class="input-help">{{ $t('app.allowPortHelper') }}</span>
                         </el-form-item>
@@ -135,7 +142,6 @@
 import { App } from '@/api/interface/app';
 import { GetApp, GetAppDetail, InstallApp } from '@/api/modules/app';
 import { Rules, checkNumberRange } from '@/global/form-rules';
-import { canEditPort } from '@/global/business';
 import { FormInstance, FormRules } from 'element-plus';
 import { onMounted, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -202,6 +208,7 @@ const handleClose = () => {
     }
 };
 const paramKey = ref(1);
+const isHostMode = ref(false);
 
 const changeUnit = () => {
     if (req.memoryUnit == 'M') {
@@ -216,6 +223,7 @@ const resetForm = () => {
         paramForm.value.clearValidate();
         paramForm.value.resetFields();
     }
+    isHostMode.value = false;
     Object.assign(req, initData());
 };
 
@@ -245,6 +253,8 @@ const getAppDetail = async (version: string) => {
         const res = await GetAppDetail(installData.value.app.id, version, 'app');
         req.appDetailId = res.data.id;
         req.dockerCompose = res.data.dockerCompose;
+        isHostMode.value = res.data.hostMode;
+        console.log(res.data);
         installData.value.params = res.data.params;
         paramKey.value++;
     } catch (error) {
@@ -269,7 +279,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         if (req.memoryLimit < 0) {
             req.memoryLimit = 0;
         }
-        if (canEditPort(installData.value.app.key) && !req.allowPort) {
+        if (!isHostMode.value && !req.allowPort) {
             ElMessageBox.confirm(i18n.global.t('app.installWarn'), i18n.global.t('app.checkTitle'), {
                 confirmButtonText: i18n.global.t('commons.button.confirm'),
                 cancelButtonText: i18n.global.t('commons.button.cancel'),

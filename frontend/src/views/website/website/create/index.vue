@@ -259,7 +259,7 @@
                             </el-input>
                             <span class="input-help">{{ $t('container.limitHelper') }}</span>
                         </el-form-item>
-                        <el-form-item prop="allowPort">
+                        <el-form-item prop="allowPort" v-if="website.type === 'deployment'">
                             <el-checkbox
                                 v-model="website.appinstall.allowPort"
                                 :label="$t('app.allowPort')"

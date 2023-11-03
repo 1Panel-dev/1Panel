@@ -1413,6 +1413,8 @@ const message = {
         downloadLogHelper2:
             'The latest {1} logs of {0} application are about to be downloaded. Do you want to continue? ',
         syncAllAppHelper: 'All applications are about to be synchronized. Do you want to continue? ',
+        hostModeHelper:
+            'The current application network mode is host mode. If you need to open the port, please open it manually on the firewall page.',
     },
     website: {
         website: 'Website',
