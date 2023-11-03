@@ -679,7 +679,7 @@ func changeServiceName(composePath, newServiceName string) (composeByte []byte, 
 
 func getWebsiteDomains(domains string, defaultPort int, websiteID uint) (domainModels []model.WebsiteDomain, addPorts []int, addDomains []string, err error) {
 	var (
-		ports map[int]struct{}
+		ports = make(map[int]struct{})
 	)
 	domainArray := strings.Split(domains, "\n")
 	for _, domain := range domainArray {

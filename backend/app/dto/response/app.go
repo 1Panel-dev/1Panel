@@ -15,6 +15,7 @@ type AppRes struct {
 
 type AppUpdateRes struct {
 	CanUpdate            bool         `json:"canUpdate"`
+	IsSyncing            bool         `json:"isSyncing"`
 	AppStoreLastModified int          `json:"appStoreLastModified"`
 	AppList              *dto.AppList `json:"appList"`
 }
