@@ -17,6 +17,7 @@ export interface GlobalState {
     // assemblySize: string; // small | default | large
     themeConfig: ThemeConfigProp;
     isFullScreen: boolean;
+    isOnRestart: boolean;
     agreeLicense: boolean;
     hasNewVersion: boolean;
     ignoreCaptcha: boolean;

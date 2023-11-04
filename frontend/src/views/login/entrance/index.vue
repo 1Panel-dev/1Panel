@@ -82,6 +82,7 @@ const getStatus = async () => {
 };
 
 onMounted(() => {
+    globalStore.isOnRestart = false;
     getStatus();
     screenWidth.value = document.body.clientWidth;
     window.onresize = () => {
