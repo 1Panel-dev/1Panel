@@ -381,7 +381,7 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
     appRef.value.acceptParams();
     if (isInit) {
         timer = setInterval(async () => {
-            if (isActive.value) {
+            if (isActive.value && !globalStore.isOnRestart) {
                 await onLoadCurrentInfo();
             }
         }, 3000);
@@ -550,6 +550,7 @@ const restart = async (type: string) => {
             type: 'info',
         },
     ).then(async () => {
+        globalStore.isOnRestart = true;
         MsgSuccess(i18n.global.t('home.operationSuccess'));
         await systemRestart(type);
     });

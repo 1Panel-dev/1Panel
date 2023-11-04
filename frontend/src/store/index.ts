@@ -22,6 +22,7 @@ export const GlobalStore = defineStore({
             footer: true,
         },
         isFullScreen: false,
+        isOnRestart: false,
         agreeLicense: false,
         hasNewVersion: false,
         ignoreCaptcha: true,

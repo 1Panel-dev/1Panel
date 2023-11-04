@@ -315,6 +315,7 @@ const loadLanguage = async () => {
 };
 
 onMounted(() => {
+    globalStore.isOnRestart = false;
     loginVerify();
     loadLanguage();
     document.title = globalStore.themeConfig.panelName;
