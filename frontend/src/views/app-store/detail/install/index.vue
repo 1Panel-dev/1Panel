@@ -254,7 +254,6 @@ const getAppDetail = async (version: string) => {
         req.appDetailId = res.data.id;
         req.dockerCompose = res.data.dockerCompose;
         isHostMode.value = res.data.hostMode;
-        console.log(res.data);
         installData.value.params = res.data.params;
         paramKey.value++;
     } catch (error) {

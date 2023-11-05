@@ -52,7 +52,7 @@
                 <div class="btn-container">
                     <div class="left-section">
                         <el-dropdown @command="handleCreate">
-                            <el-button type="primary">
+                            <el-button type="primary" size="small">
                                 {{ $t('commons.button.create') }}
                                 <el-icon><arrow-down /></el-icon>
                             </el-button>
@@ -69,7 +69,7 @@
                                 </el-dropdown-menu>
                             </template>
                         </el-dropdown>
-                        <el-button-group>
+                        <el-button-group size="small">
                             <el-button plain @click="openUpload">{{ $t('file.upload') }}</el-button>
                             <el-button plain @click="openWget">{{ $t('file.remoteFile') }}</el-button>
                             <el-button plain @click="openMove('copy')" :disabled="selects.length === 0">
@@ -89,11 +89,11 @@
                             </el-button>
                         </el-button-group>
 
-                        <el-button class="btn" @click="toTerminal">
+                        <el-button class="btn" @click="toTerminal" size="small">
                             {{ $t('menu.terminal') }}
                         </el-button>
 
-                        <el-button-group class="copy-button" v-if="moveOpen">
+                        <el-button-group class="copy-button" v-if="moveOpen" size="small">
                             <el-tooltip class="box-item" effect="dark" :content="$t('file.paste')" placement="bottom">
                                 <el-button plain @click="openPaste">{{ $t('file.paste') }}</el-button>
                             </el-tooltip>
@@ -108,7 +108,7 @@
                     <div class="right-section">
                         <el-popover placement="bottom" :width="200" trigger="hover" @before-enter="getFavoriates">
                             <template #reference>
-                                <el-button @click="openFavorite" :icon="Star">
+                                <el-button @click="openFavorite" :icon="Star" size="small">
                                     {{ $t('file.favorite') }}
                                 </el-button>
                             </template>
@@ -139,7 +139,7 @@
                             </div>
                         </el-popover>
 
-                        <el-button class="btn" @click="openRecycleBin" :icon="Delete">
+                        <el-button class="btn" @click="openRecycleBin" :icon="Delete" size="small">
                             {{ $t('file.recycleBin') }}
                         </el-button>
                         <div class="search-button">
@@ -149,6 +149,7 @@
                                 @clear="search()"
                                 @keydown.enter="search()"
                                 :placeholder="$t('file.search')"
+                                size="small"
                             >
                                 <template #prepend>
                                     <el-checkbox v-model="req.containSub">
@@ -240,9 +241,9 @@
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('file.size')" prop="size" max-width="50" sortable>
-                        <template #default="{ row }">
+                        <template #default="{ row, $index }">
                             <span v-if="row.isDir">
-                                <el-button type="primary" link small @click="getDirSize(row)">
+                                <el-button type="primary" link small @click="getDirSize(row, $index)">
                                     <span v-if="row.dirSize == undefined">
                                         {{ $t('file.calculate') }}
                                     </span>
@@ -564,14 +565,16 @@ const getFileSize = (size: number) => {
     return computeSize(size);
 };
 
-const getDirSize = async (row: any) => {
+const getDirSize = async (row: any, index: number) => {
     const req = {
         path: row.path,
     };
     loading.value = true;
     await ComputeDirSize(req)
         .then(async (res) => {
-            row.dirSize = res.data.size;
+            let newData = [...data.value];
+            newData[index].dirSize = res.data.size;
+            data.value = newData;
         })
         .finally(() => {
             loading.value = false;
