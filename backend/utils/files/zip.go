@@ -39,5 +39,5 @@ func (z ZipArchiver) Compress(sourcePaths []string, dstFile string) error {
 	if err := cmd.ExecCmdWithDir(cmdStr, baseDir); err != nil {
 		return err
 	}
-	return op.Rename(tmpFile, dstFile)
+	return op.Mv(tmpFile, dstFile)
 }
