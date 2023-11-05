@@ -10,22 +10,12 @@
             <DrawerHeader :header="$t('file.upload')" :back="handleClose" />
         </template>
         <div class="button-container">
-            <el-dropdown @command="upload">
-                <el-button type="primary">
-                    {{ $t('file.upload') }}
-                    <el-icon><arrow-down /></el-icon>
+            <div>
+                <el-button type="primary" @click="upload('file')">
+                    {{ $t('file.upload') }}{{ $t('file.file') }}
                 </el-button>
-                <template #dropdown>
-                    <el-dropdown-menu>
-                        <el-dropdown-item command="file">
-                            {{ $t('file.file') }}
-                        </el-dropdown-item>
-                        <el-dropdown-item command="dir">
-                            {{ $t('file.dir') }}
-                        </el-dropdown-item>
-                    </el-dropdown-menu>
-                </template>
-            </el-dropdown>
+                <el-button type="primary" @click="upload('dir')">{{ $t('file.upload') }}{{ $t('file.dir') }}</el-button>
+            </div>
             <el-button @click="clearFiles">{{ $t('file.clearList') }}</el-button>
         </div>
 
@@ -43,7 +33,7 @@
         >
             <el-icon class="el-icon--upload"><upload-filled /></el-icon>
             <div class="el-upload__text">
-                {{ $t('database.dropHelper') }}
+                {{ $t('file.dropHelper', [$t('file.' + uploadType)]) }}
                 <em>{{ $t('database.clickHelper') }}</em>
             </div>
             <template #tip>
@@ -93,7 +83,7 @@ import { UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile } f
 import { ChunkUploadFileData, UploadFileData } from '@/api/modules/files';
 import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { Close } from '@element-plus/icons-vue';
 
 interface UploadFileProps {
@@ -119,8 +109,10 @@ const state = reactive({
 const uploaderFiles = ref<UploadFiles>([]);
 const isUploadFolder = ref(false);
 const hoverIndex = ref(null);
+const uploadType = ref('file');
 
 const upload = (commnad: string) => {
+    uploadType.value = commnad;
     if (commnad == 'dir') {
         state.uploadEle.webkitdirectory = true;
     } else {
@@ -135,7 +127,15 @@ const removeFile = (index: number) => {
 };
 
 const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
-    uploaderFiles.value = uploadFiles;
+    const reader = new FileReader();
+    reader.readAsDataURL(_uploadFile.raw);
+    reader.onload = async () => {
+        uploaderFiles.value = uploadFiles;
+    };
+    reader.onerror = () => {
+        uploaderFiles.value = uploaderFiles.value.filter((file) => file.uid !== _uploadFile.uid);
+        MsgError(i18n.global.t('file.typeErrOrEmpty', [_uploadFile.name]));
+    };
 };
 
 const clearFiles = () => {
@@ -160,56 +160,59 @@ const submit = async () => {
     const files = uploaderFiles.value.slice();
     for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        const CHUNK_SIZE = 1024 * 1024; // 1MB
         const fileSize = file.size;
 
         uploadHelper.value = i18n.global.t('file.fileUploadStart', [file.name]);
-        if (fileSize == 0) {
+        if (fileSize <= 1024 * 1024 * 50) {
             const formData = new FormData();
             formData.append('file', file.raw);
             formData.append('path', path.value);
             await UploadFileData(formData, {});
+            success++;
+            uploaderFiles.value[i].status = 'success';
+        } else {
+            const CHUNK_SIZE = 1024 * 1024 * 20; // 10MB
+            const chunkCount = Math.ceil(fileSize / CHUNK_SIZE);
+            let uploadedChunkCount = 0;
+            for (let c = 0; c < chunkCount; c++) {
+                const start = c * CHUNK_SIZE;
+                const end = Math.min(start + CHUNK_SIZE, fileSize);
+                const chunk = file.raw.slice(start, end);
+                const formData = new FormData();
+
+                formData.append('filename', file.name);
+                if (file.raw.webkitRelativePath != '') {
+                    formData.append('path', path.value + '/' + getPathWithoutFilename(file.raw.webkitRelativePath));
+                } else {
+                    formData.append('path', path.value);
+                }
+                formData.append('chunk', chunk);
+                formData.append('chunkIndex', c.toString());
+                formData.append('chunkCount', chunkCount.toString());
+
+                try {
+                    await ChunkUploadFileData(formData, {
+                        onUploadProgress: (progressEvent) => {
+                            const progress = Math.round(
+                                ((uploadedChunkCount + progressEvent.loaded / progressEvent.total) * 100) / chunkCount,
+                            );
+                            uploadPrecent.value = progress;
+                        },
+                        timeout: 40000,
+                    });
+                    uploadedChunkCount++;
+                } catch (error) {
+                    uploaderFiles.value[i].status = 'fail';
+                    break;
+                }
+                if (uploadedChunkCount == chunkCount) {
+                    success++;
+                    uploaderFiles.value[i].status = 'success';
+                    break;
+                }
+            }
         }
 
-        const chunkCount = Math.ceil(fileSize / CHUNK_SIZE);
-        let uploadedChunkCount = 0;
-        for (let c = 0; c < chunkCount; c++) {
-            const start = c * CHUNK_SIZE;
-            const end = Math.min(start + CHUNK_SIZE, fileSize);
-            const chunk = file.raw.slice(start, end);
-            const formData = new FormData();
-
-            formData.append('filename', file.name);
-            if (file.raw.webkitRelativePath != '') {
-                formData.append('path', path.value + '/' + getPathWithoutFilename(file.raw.webkitRelativePath));
-            } else {
-                formData.append('path', path.value);
-            }
-            formData.append('chunk', chunk);
-            formData.append('chunkIndex', c.toString());
-            formData.append('chunkCount', chunkCount.toString());
-
-            try {
-                await ChunkUploadFileData(formData, {
-                    onUploadProgress: (progressEvent) => {
-                        const progress = Math.round(
-                            ((uploadedChunkCount + progressEvent.loaded / progressEvent.total) * 100) / chunkCount,
-                        );
-                        uploadPrecent.value = progress;
-                    },
-                    timeout: 40000,
-                });
-                uploadedChunkCount++;
-            } catch (error) {
-                uploaderFiles.value[i].status = 'fail';
-                break;
-            }
-            if (uploadedChunkCount == chunkCount) {
-                success++;
-                uploaderFiles.value[i].status = 'success';
-                break;
-            }
-        }
         if (i == files.length - 1) {
             loading.value = false;
             uploadHelper.value = '';
