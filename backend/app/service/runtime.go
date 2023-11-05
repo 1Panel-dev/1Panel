@@ -87,6 +87,11 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (err error) {
 		if err = checkPortExist(create.Port); err != nil {
 			return err
 		}
+		for _, export := range create.ExposedPorts {
+			if err = checkPortExist(export.HostPort); err != nil {
+				return err
+			}
+		}
 		if containerName, ok := create.Params["CONTAINER_NAME"]; ok {
 			if err := checkContainerName(containerName.(string)); err != nil {
 				return err
@@ -341,6 +346,11 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 				return err
 			}
 			runtime.Port = req.Port
+		}
+		for _, export := range req.ExposedPorts {
+			if err = checkPortExist(export.HostPort); err != nil {
+				return err
+			}
 		}
 		if containerName, ok := req.Params["CONTAINER_NAME"]; ok {
 			envs, err := gotenv.Unmarshal(runtime.Env)

@@ -256,7 +256,6 @@ const rules = ref<any>({
         HOST_IP: [Rules.requiredSelect],
         EXEC_SCRIPT: [Rules.requiredSelect],
         CONTAINER_NAME: [Rules.requiredInput, Rules.containerName],
-        CUSTOM_SCRIPT: [Rules.requiredInput],
     },
 });
 const scripts = ref<Runtime.NodeScripts[]>([]);
@@ -456,7 +455,8 @@ const getRuntime = async (id: number) => {
         runtime.exposedPorts = data.exposedPorts || [];
         editParams.value = data.appParams;
         searchApp(data.appID);
-        if (data.params['CUSTOM_SCRIPT'] == '0') {
+        if (data.params['CUSTOM_SCRIPT'] == undefined || data.params['CUSTOM_SCRIPT'] == '0') {
+            data.params['CUSTOM_SCRIPT'] = '0';
             getScripts();
         }
         open.value = true;
