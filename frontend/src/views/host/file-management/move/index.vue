@@ -20,7 +20,7 @@
                     </el-form-item>
                     <div v-if="changeName">
                         <el-form-item :label="$t('commons.table.name')" prop="name">
-                            <el-input v-model="addForm.name"></el-input>
+                            <el-input v-model="addForm.name" :disabled="addForm.cover"></el-input>
                         </el-form-item>
                         <el-radio-group v-model="addForm.cover" @change="changeType">
                             <el-radio :label="true" size="large">{{ $t('file.replace') }}</el-radio>
