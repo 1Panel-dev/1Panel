@@ -146,6 +146,8 @@ const handleReady = (payload) => {
 const changeType = (type: string) => {
     logReq.logType = type;
     if (logReq.id != undefined) {
+        logReq.page = 0;
+        logReq.pageSize = 500;
         search();
     }
 };
