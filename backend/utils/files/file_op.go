@@ -304,6 +304,14 @@ func (f FileOp) Cut(oldPaths []string, dst, name string, cover bool) error {
 	return nil
 }
 
+func (f FileOp) Mv(oldPath, dstPath string) error {
+	cmdStr := fmt.Sprintf("mv %s  %s", oldPath, dstPath)
+	if err := cmd.ExecCmd(cmdStr); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (f FileOp) Copy(src, dst string) error {
 	if src = path.Clean("/" + src); src == "" {
 		return os.ErrNotExist
