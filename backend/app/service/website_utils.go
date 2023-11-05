@@ -40,7 +40,10 @@ func getDomain(domainStr string, defaultPort int) (model.WebsiteDomain, error) {
 		portStr := domainArray[1]
 		portN, err := strconv.Atoi(portStr)
 		if err != nil {
-			return model.WebsiteDomain{}, err
+			return model.WebsiteDomain{}, buserr.New("ErrTypePort")
+		}
+		if portN <= 0 || portN > 65535 {
+			return model.WebsiteDomain{}, buserr.New("ErrTypePortRange")
 		}
 		domain.Port = portN
 		return domain, nil

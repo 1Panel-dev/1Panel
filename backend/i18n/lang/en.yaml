@@ -18,6 +18,8 @@ ErrPortExist: '{{ .port }} port is already occupied by {{ .type }} [{{ .name }}]
 TYPE_APP: "Application"
 TYPE_RUNTIME: "Runtime environment"
 TYPE_DOMAIN: "Domain name"
+ErrTypePort: 'Port {{name}} format error'
+ErrTypePortRange: 'Port range needs to be between 1-65535'
 
 #app
 ErrPortInUsed: "{{ .detail }} port already in use"

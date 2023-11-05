@@ -18,6 +18,8 @@ ErrPortExist: '{{ .port }} 埠已被 {{ .type }} [{{ .name }}] 佔用'
 TYPE_APP: "應用"
 TYPE_RUNTIME: "運作環境"
 TYPE_DOMAIN: "網域名稱"
+ErrTypePort: '埠 {{name}} 格式錯誤'
+ErrTypePortRange: '連接埠範圍需要在 1-65535 之間'
 
 #app
 ErrPortInUsed: "{{ .detail }} 端口已被佔用！"
