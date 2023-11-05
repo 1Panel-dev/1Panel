@@ -988,6 +988,8 @@ const message = {
         addFavorite: 'Add to favorites',
         clearList: 'Clear list',
         deleteRecycleHelper: 'Are you sure you want to permanently delete the following files?',
+        typeErrOrEmpty: '[{0}] file type is wrong or empty folder',
+        dropHelper: 'Drag [{0}] here, or',
     },
     ssh: {
         autoStart: 'Auto Start',

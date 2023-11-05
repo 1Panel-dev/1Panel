@@ -949,6 +949,8 @@ const message = {
         addFavorite: '加入收藏夾',
         clearList: '清空列表',
         deleteRecycleHelper: '確定永久刪除以下文件？',
+        typeErrOrEmpty: '【{0}】 檔案類型錯誤或為空資料夾',
+        dropHelper: '將【{0}】拖曳到此處，或',
     },
     ssh: {
         autoStart: '開機自啟',
