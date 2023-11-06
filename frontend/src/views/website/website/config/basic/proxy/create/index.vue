@@ -38,7 +38,11 @@
                     <el-row :gutter="10">
                         <el-col :span="12">
                             <el-form-item :label="$t('website.proxyPass')" prop="proxyPass">
-                                <el-input v-model.trim="proxy.proxyAddress" :placeholder="$t('website.proxyHelper')">
+                                <el-input
+                                    v-model.trim="proxy.proxyAddress"
+                                    :placeholder="$t('website.proxyHelper')"
+                                    @blur="getProxyHost"
+                                >
                                     <template #prepend>
                                         <el-select v-model="proxy.proxyProtocol" class="pre-select">
                                             <el-option label="http" value="http://" />
@@ -116,6 +120,7 @@ import { ref } from 'vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { Website } from '@/api/interface/website';
 import { Units } from '@/global/mimetype';
+import { isDomain } from '@/utils/util';
 
 const proxyForm = ref<FormInstance>();
 const rules = ref({
@@ -191,6 +196,14 @@ const addReplaces = () => {
 
 const removeReplace = (index: number) => {
     replaces.value.splice(index, 1);
+};
+
+const getProxyHost = () => {
+    if (isDomain(proxy.value.proxyAddress)) {
+        proxy.value.proxyHost = proxy.value.proxyAddress;
+    } else {
+        proxy.value.proxyHost = '$host';
+    }
 };
 
 const submit = async (formEl: FormInstance | undefined) => {
