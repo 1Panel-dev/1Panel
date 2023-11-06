@@ -288,6 +288,9 @@ func (f FileOp) Cut(oldPaths []string, dst, name string, cover bool) error {
 		var dstPath string
 		if name != "" {
 			dstPath = filepath.Join(dst, name)
+			if f.Stat(dstPath) {
+				dstPath = dst
+			}
 		} else {
 			base := filepath.Base(p)
 			dstPath = filepath.Join(dst, base)

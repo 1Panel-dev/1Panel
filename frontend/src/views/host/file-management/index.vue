@@ -52,7 +52,7 @@
                 <div class="btn-container">
                     <div class="left-section">
                         <el-dropdown @command="handleCreate">
-                            <el-button type="primary" size="small">
+                            <el-button type="primary">
                                 {{ $t('commons.button.create') }}
                                 <el-icon><arrow-down /></el-icon>
                             </el-button>
@@ -69,7 +69,7 @@
                                 </el-dropdown-menu>
                             </template>
                         </el-dropdown>
-                        <el-button-group size="small">
+                        <el-button-group>
                             <el-button plain @click="openUpload">{{ $t('file.upload') }}</el-button>
                             <el-button plain @click="openWget">{{ $t('file.remoteFile') }}</el-button>
                             <el-button plain @click="openMove('copy')" :disabled="selects.length === 0">
@@ -89,11 +89,11 @@
                             </el-button>
                         </el-button-group>
 
-                        <el-button class="btn" @click="toTerminal" size="small">
+                        <el-button class="btn" @click="toTerminal">
                             {{ $t('menu.terminal') }}
                         </el-button>
 
-                        <el-button-group class="copy-button" v-if="moveOpen" size="small">
+                        <el-button-group class="copy-button" v-if="moveOpen">
                             <el-tooltip class="box-item" effect="dark" :content="$t('file.paste')" placement="bottom">
                                 <el-button plain @click="openPaste">{{ $t('file.paste') }}</el-button>
                             </el-tooltip>
@@ -108,7 +108,7 @@
                     <div class="right-section">
                         <el-popover placement="bottom" :width="200" trigger="hover" @before-enter="getFavoriates">
                             <template #reference>
-                                <el-button @click="openFavorite" :icon="Star" size="small">
+                                <el-button @click="openFavorite">
                                     {{ $t('file.favorite') }}
                                 </el-button>
                             </template>
@@ -139,7 +139,7 @@
                             </div>
                         </el-popover>
 
-                        <el-button class="btn" @click="openRecycleBin" :icon="Delete" size="small">
+                        <el-button class="btn" @click="openRecycleBin">
                             {{ $t('file.recycleBin') }}
                         </el-button>
                         <div class="search-button">
@@ -149,7 +149,6 @@
                                 @clear="search()"
                                 @keydown.enter="search()"
                                 :placeholder="$t('file.search')"
-                                size="small"
                             >
                                 <template #prepend>
                                     <el-checkbox v-model="req.containSub">
@@ -304,7 +303,7 @@ import {
     SearchFavorite,
 } from '@/api/modules/files';
 import { computeSize, dateFormat, downloadFile, getIcon, getRandomStr } from '@/utils/util';
-import { Delete, StarFilled, Star } from '@element-plus/icons-vue';
+import { StarFilled, Star } from '@element-plus/icons-vue';
 import { File } from '@/api/interface/file';
 import { Mimetypes, Languages } from '@/global/mimetype';
 import { useRouter } from 'vue-router';
@@ -908,7 +907,7 @@ onMounted(() => {
 }
 
 .left-section > *:not(:first-child) {
-    margin-left: 10px;
+    margin-left: 5px;
 }
 
 .right-section {
