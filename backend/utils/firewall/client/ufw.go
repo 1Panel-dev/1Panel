@@ -183,6 +183,13 @@ func (f *Ufw) RichRules(rule FireInfo, operation string) error {
 
 	stdout, err := cmd.Exec(ruleStr)
 	if err != nil {
+		if strings.Contains(stdout, "ERROR: Invalid position") {
+			stdout, err := cmd.Exec(strings.ReplaceAll(ruleStr, "insert 1 ", ""))
+			if err != nil {
+				return fmt.Errorf("%s rich rules (%s), failed, err: %s", operation, ruleStr, stdout)
+			}
+			return nil
+		}
 		return fmt.Errorf("%s rich rules (%s), failed, err: %s", operation, ruleStr, stdout)
 	}
 	return nil
