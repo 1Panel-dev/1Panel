@@ -2,7 +2,7 @@
     <el-row>
         <el-col :xs="24" :sm="18" :md="14" :lg="14" :xl="14">
             <el-form>
-                <el-form-item prop="enable" :label="$t('website.enable')">
+                <el-form-item prop="enable" :label="$t('website.enable')" v-if="rule != 'user_agent'">
                     <el-switch v-model="enableUpdate.enable" @change="updateEnable"></el-switch>
                 </el-form-item>
                 <el-form-item :label="$t('website.data')">

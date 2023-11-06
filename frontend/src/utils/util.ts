@@ -208,6 +208,18 @@ export function checkDomain(value: string): boolean {
     }
 }
 
+export function isDomain(value: string): boolean {
+    if (value === '') {
+        return true;
+    }
+    const reg = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$/i;
+    if (value !== '' && reg.test(value)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 export function checkIpV4V6(value: string): boolean {
     if (value === '') {
         return true;
