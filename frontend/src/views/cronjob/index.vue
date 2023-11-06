@@ -258,7 +258,6 @@ const onDelete = async (row: Cronjob.CronjobInfo | null) => {
         if (hasBackup(row.type)) {
             showClean.value = true;
         }
-        return;
     } else {
         for (const item of selects.value) {
             names.push(item.name);
