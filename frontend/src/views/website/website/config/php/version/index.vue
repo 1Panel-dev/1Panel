@@ -47,7 +47,7 @@ const props = defineProps({
     },
 });
 
-const runtimeReq = reactive<Runtime.RuntimeReq>({ page: 1, pageSize: 200 });
+const runtimeReq = reactive<Runtime.RuntimeReq>({ page: 1, pageSize: 200, type: 'php' });
 const versionReq = reactive<Website.PHPVersionChange>({
     websiteID: undefined,
     runtimeID: undefined,
