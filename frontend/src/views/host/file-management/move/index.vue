@@ -109,6 +109,21 @@ const changeType = () => {
     }
 };
 
+const mvFile = () => {
+    MoveFile(addForm)
+        .then(() => {
+            if (type.value === 'cut') {
+                MsgSuccess(i18n.global.t('file.moveSuccess'));
+            } else {
+                MsgSuccess(i18n.global.t('file.copySuccess'));
+            }
+            handleClose(true);
+        })
+        .finally(() => {
+            loading.value = false;
+        });
+};
+
 const submit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     await formEl.validate((valid) => {
@@ -116,18 +131,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         loading.value = true;
-        MoveFile(addForm)
-            .then(() => {
-                if (type.value === 'cut') {
-                    MsgSuccess(i18n.global.t('file.moveSuccess'));
-                } else {
-                    MsgSuccess(i18n.global.t('file.copySuccess'));
-                }
-                handleClose(true);
-            })
-            .finally(() => {
-                loading.value = false;
-            });
+        mvFile();
     });
 };
 
@@ -136,20 +140,21 @@ const acceptParams = async (props: MoveProps) => {
     addForm.oldPaths = props.oldPaths;
     addForm.type = props.type;
     addForm.newPath = props.path;
+    type.value = props.type;
     if (props.name && props.name != '') {
         oldName.value = props.name;
-        changeName.value = true;
         const res = await CheckFile(props.path + '/' + props.name);
         if (res.data) {
+            changeName.value = true;
             addForm.cover = false;
             addForm.name = props.name + '-' + getDateStr();
+            open.value = true;
         } else {
-            addForm.cover = true;
-            addForm.name = props.name;
+            mvFile();
         }
+    } else {
+        mvFile();
     }
-    type.value = props.type;
-    open.value = true;
 };
 
 defineExpose({ acceptParams });
