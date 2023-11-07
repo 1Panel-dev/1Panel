@@ -249,7 +249,7 @@ func (u *HostService) Create(req dto.HostOperate) (*dto.HostInfo, error) {
 		return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
 	if req.GroupID == 0 {
-		group, err := groupRepo.Get(groupRepo.WithByIsDefault(true))
+		group, err := groupRepo.Get(groupRepo.WithByHostDefault())
 		if err != nil {
 			return nil, errors.New("get default group failed")
 		}

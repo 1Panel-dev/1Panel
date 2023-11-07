@@ -844,6 +844,7 @@ const message = {
         resource: '資源',
         operate: '操作',
         detail: {
+            groups: '分組',
             hosts: '主機',
             apps: '應用',
             websites: '網站',

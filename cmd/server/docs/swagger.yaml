@@ -1953,7 +1953,7 @@ definitions:
     type: object
   dto.SSHInfo:
     properties:
-      authStart:
+      autoStart:
         type: boolean
       listenAddress:
         type: string
@@ -2152,6 +2152,8 @@ definitions:
       allowIPs:
         type: string
       appStoreLastModified:
+        type: string
+      appStoreSyncStatus:
         type: string
       appStoreVersion:
         type: string
@@ -2675,6 +2677,8 @@ definitions:
         type: string
       editCompose:
         type: boolean
+      hostMode:
+        type: boolean
       memoryLimit:
         type: number
       memoryUnit:
@@ -2773,6 +2777,8 @@ definitions:
       dockerCompose:
         type: string
       editCompose:
+        type: boolean
+      hostMode:
         type: boolean
       installId:
         type: integer
@@ -2934,7 +2940,6 @@ definitions:
       type:
         type: string
     required:
-    - compress
     - name
     - paths
     - type
@@ -3021,6 +3026,26 @@ definitions:
     - newName
     - oldName
     type: object
+  request.FileRoleReq:
+    properties:
+      group:
+        type: string
+      mode:
+        type: integer
+      paths:
+        items:
+          type: string
+        type: array
+      sub:
+        type: boolean
+      user:
+        type: string
+    required:
+    - group
+    - mode
+    - paths
+    - user
+    type: object
   request.FileRoleUpdate:
     properties:
       group:
@@ -3034,7 +3059,6 @@ definitions:
     required:
     - group
     - path
-    - sub
     - user
     type: object
   request.FileWget:
@@ -3118,6 +3142,8 @@ definitions:
         type: string
       editCompose:
         type: boolean
+      hostMode:
+        type: boolean
       memoryLimit:
         type: number
       memoryUnit:
@@ -3155,7 +3181,6 @@ definitions:
       websiteID:
         type: integer
     required:
-    - enable
     - extends
     - return
     - websiteID
@@ -3199,7 +3224,6 @@ definitions:
       content:
         type: string
     required:
-    - backup
     - content
     type: object
   request.NginxConfigUpdate:
@@ -3254,8 +3278,6 @@ definitions:
       websiteID:
         type: integer
     required:
-    - enable
-    - keepPath
     - name
     - operate
     - redirect
@@ -3613,16 +3635,13 @@ definitions:
     type: object
   request.WebsiteDomainCreate:
     properties:
-      domain:
+      domains:
         type: string
-      port:
-        type: integer
-      websiteId:
+      websiteID:
         type: integer
     required:
-    - domain
-    - port
-    - websiteId
+    - domains
+    - websiteID
     type: object
   request.WebsiteDomainDelete:
     properties:
@@ -3668,7 +3687,6 @@ definitions:
       websiteSSLId:
         type: integer
     required:
-    - enable
     - websiteId
     type: object
   request.WebsiteInstallCheckReq:
@@ -3756,7 +3774,6 @@ definitions:
       websiteID:
         type: integer
     required:
-    - retainConfig
     - runtimeID
     - websiteID
     type: object
@@ -3793,10 +3810,8 @@ definitions:
           type: string
         type: object
     required:
-    - cache
     - cacheTime
     - cacheUnit
-    - enable
     - id
     - match
     - modifier
@@ -3835,7 +3850,6 @@ definitions:
         type: string
     required:
     - acmeAccountId
-    - autoRenew
     - primaryDomain
     - provider
     type: object
@@ -3865,7 +3879,6 @@ definitions:
       id:
         type: integer
     required:
-    - autoRenew
     - id
     type: object
   request.WebsiteSSLUpload:
@@ -3968,7 +3981,6 @@ definitions:
       websiteId:
         type: integer
     required:
-    - enable
     - key
     - websiteId
     type: object
@@ -4038,6 +4050,8 @@ definitions:
       downloadUrl:
         type: string
       enable:
+        type: boolean
+      hostMode:
         type: boolean
       id:
         type: integer
@@ -7594,6 +7608,36 @@ paths:
         - paths
         formatEN: Batch delete dir or file [paths]
         formatZH: 批量删除文件/文件夹 [paths]
+        paramKeys: []
+  /files/batch/role:
+    post:
+      consumes:
+      - application/json
+      description: 批量修改文件权限和用户/组
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.FileRoleReq'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Batch change file mode and owner
+      tags:
+      - File
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - paths
+        - mode
+        - user
+        - group
+        formatEN: Batch change file mode and owner [paths] => [mode]/[user]/[group]
+        formatZH: 批量修改文件权限和用户/组 [paths] => [mode]/[user]/[group]
         paramKeys: []
   /files/check:
     post:

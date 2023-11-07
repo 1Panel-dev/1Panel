@@ -117,6 +117,7 @@ export namespace Host {
     }
 
     export interface SSHInfo {
+        autoStart: boolean;
         status: string;
         message: string;
         port: string;

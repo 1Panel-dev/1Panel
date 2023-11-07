@@ -845,6 +845,7 @@ const message = {
         resource: '资源',
         operate: '操作',
         detail: {
+            groups: '分组',
             hosts: '主机',
             apps: '应用',
             websites: '网站',
