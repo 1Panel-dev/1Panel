@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"strings"
 	"sync"
 	"time"
 
@@ -26,6 +27,9 @@ type ConnInfo struct {
 }
 
 func (c *ConnInfo) NewClient() (*ConnInfo, error) {
+	if strings.Contains(c.Addr, ":") {
+		c.Addr = fmt.Sprintf("[%s]", c.Addr)
+	}
 	config := &gossh.ClientConfig{}
 	config.SetDefaults()
 	addr := fmt.Sprintf("%s:%d", c.Addr, c.Port)
@@ -45,7 +49,11 @@ func (c *ConnInfo) NewClient() (*ConnInfo, error) {
 	config.Timeout = c.DialTimeOut
 
 	config.HostKeyCallback = gossh.InsecureIgnoreHostKey()
-	client, err := gossh.Dial("tcp", addr, config)
+	proto := "tcp"
+	if strings.Contains(c.Addr, ":") {
+		proto = "tcp6"
+	}
+	client, err := gossh.Dial(proto, addr, config)
 	if nil != err {
 		return c, err
 	}
