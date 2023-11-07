@@ -25,7 +25,7 @@
             </template>
             <template #search>
                 <div>
-                    <el-select v-model="logReq.id" @change="search()">
+                    <el-select v-model="logReq.id" @change="changeWebsite()">
                         <template #prefix>{{ $t('website.website') }}</template>
                         <el-option
                             v-for="(website, index) in websites"
@@ -150,6 +150,14 @@ const changeType = (type: string) => {
         logReq.pageSize = 500;
         search();
     }
+};
+
+const changeWebsite = () => {
+    logReq.page = 0;
+    logReq.pageSize = 500;
+    end.value = false;
+    content.value = '';
+    search();
 };
 
 const search = () => {
