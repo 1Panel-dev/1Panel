@@ -18,7 +18,7 @@ ErrPortExist: '{{ .port }} 端口已被 {{ .type }} [{{ .name }}] 占用'
 TYPE_APP: "应用"
 TYPE_RUNTIME: "运行环境"
 TYPE_DOMAIN: "域名"
-ErrTypePort: '端口 {{name}} 格式错误'
+ErrTypePort: '端口 {{ .name }} 格式错误'
 ErrTypePortRange: '端口范围需要在 1-65535 之间'
 
 #app
