@@ -32,5 +32,5 @@ func checkCmdAvailability(cmdStr string) error {
 	if cmd.Which(cmdStr) {
 		return nil
 	}
-	return buserr.WithName(cmdStr, constant.ErrCmdNotFound)
+	return buserr.WithName(constant.ErrCmdNotFound, cmdStr)
 }

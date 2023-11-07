@@ -6,7 +6,7 @@
         <el-button @click="clear" type="primary" :disabled="data == null || data.length == 0">
             {{ $t('file.clearRecycleBin') }}
         </el-button>
-        <el-button @click="patchDelete" :disabled="data == null || data.length == 0">
+        <el-button @click="patchDelete" :disabled="data == null || selects.length == 0">
             {{ $t('commons.button.delete') }}
         </el-button>
         <ComplexTable
