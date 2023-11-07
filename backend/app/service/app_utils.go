@@ -419,6 +419,16 @@ func upgradeInstall(installId uint, detailId uint, backup bool) error {
 			_, _ = scriptCmd.CombinedOutput()
 		}
 
+		if detail.DockerCompose == "" {
+			composeDetail, err := fileOp.GetContent(path.Join(detailDir, "docker-compose.yml"))
+			if err != nil {
+				upErr = err
+				return
+			}
+			detail.DockerCompose = string(composeDetail)
+			_ = appDetailRepo.Update(context.Background(), detail)
+		}
+
 		composeMap := make(map[string]interface{})
 		if upErr = yaml.Unmarshal([]byte(detail.DockerCompose), &composeMap); upErr != nil {
 			return
