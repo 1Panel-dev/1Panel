@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/buserr"
@@ -31,6 +32,9 @@ func NewMysqlClient(conn client.DBInfo) (MysqlClient, error) {
 		return client.NewLocal(connArgs, conn.Address, conn.Password, conn.Database), nil
 	}
 
+	if strings.Contains(conn.Address, ":") {
+		conn.Address = fmt.Sprintf("[%s]", conn.Address)
+	}
 	connArgs := fmt.Sprintf("%s:%s@tcp(%s:%d)/?charset=utf8", conn.Username, conn.Password, conn.Address, conn.Port)
 	db, err := sql.Open("mysql", connArgs)
 	if err != nil {
