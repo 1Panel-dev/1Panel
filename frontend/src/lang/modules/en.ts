@@ -880,6 +880,7 @@ const message = {
         resource: 'Resource',
         operate: 'Operate',
         detail: {
+            groups: 'Group',
             hosts: 'Host',
             apps: 'App',
             websites: 'Website',
