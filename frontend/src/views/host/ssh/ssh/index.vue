@@ -322,6 +322,7 @@ const search = async () => {
     const res = await getSSHInfo();
     form.status = res.data.status;
     form.port = Number(res.data.port);
+    autoStart.value = res.data.autoStart ? 'enable' : 'disable';
     form.listenAddress = res.data.listenAddress;
     form.passwordAuthentication = res.data.passwordAuthentication;
     form.pubkeyAuthentication = res.data.pubkeyAuthentication;
