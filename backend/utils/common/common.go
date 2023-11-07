@@ -222,7 +222,10 @@ func ConvertToPinyin(text string) string {
 }
 
 func IsValidDomain(domain string) bool {
-	pattern := `^([\w\\u4e00-\\u9fa5\\-\\*]{1,100}\.){1,10}([\w\\u4e00-\\u9fa5\\-]{1,24}|[\w\\u4e00-\\u9fa5\\-]{1,24}\.[\w\\u4e00-\\u9fa5\\-]{1,24})$`
-	match, _ := regexp.MatchString(pattern, domain)
+	pattern := `^([\w\p{Han}\-\*]{1,100}\.){1,10}([\w\p{Han}\-]{1,24}|[\w\p{Han}\-]{1,24}\.[\w\p{Han}\-]{1,24})(:\d{1,5})?$`
+	match, err := regexp.MatchString(pattern, domain)
+	if err != nil {
+		return false
+	}
 	return match
 }
