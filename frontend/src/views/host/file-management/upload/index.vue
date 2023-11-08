@@ -166,7 +166,11 @@ const submit = async () => {
         if (fileSize <= 1024 * 1024 * 50) {
             const formData = new FormData();
             formData.append('file', file.raw);
-            formData.append('path', path.value);
+            if (file.raw.webkitRelativePath != '') {
+                formData.append('path', path.value + '/' + getPathWithoutFilename(file.raw.webkitRelativePath));
+            } else {
+                formData.append('path', path.value);
+            }
             await UploadFileData(formData, {});
             success++;
             uploaderFiles.value[i].status = 'success';
