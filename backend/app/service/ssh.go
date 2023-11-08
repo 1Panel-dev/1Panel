@@ -109,6 +109,12 @@ func (u *SSHService) OperateSSH(operation string) error {
 	}
 	stdout, err := cmd.Execf("%s systemctl %s %s", sudo, operation, serviceName)
 	if err != nil {
+		if strings.Contains(stdout, "alias name or linked unit file") {
+			stdout, err := cmd.Execf("%s systemctl %s ssh", sudo, operation)
+			if err != nil {
+				return fmt.Errorf("%s ssh(alias name or linked unit file) failed, stdout: %s, err: %v", operation, stdout, err)
+			}
+		}
 		return fmt.Errorf("%s %s failed, stdout: %s, err: %v", operation, serviceName, stdout, err)
 	}
 	return nil

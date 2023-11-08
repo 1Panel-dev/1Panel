@@ -132,7 +132,7 @@ const loadTooltip = () => {
     return i18n.global.t('commons.button.' + (screenfull.isFullscreen ? 'quitFullscreen' : 'fullscreen'));
 };
 const handleClose = async () => {
-    terminalSocket.value!.send('close conn');
+    terminalSocket.value?.send('close conn');
     logVisible.value = false;
 };
 watch(logVisible, (val) => {
