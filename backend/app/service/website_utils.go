@@ -719,7 +719,6 @@ func getWebsiteDomains(domains string, defaultPort int, websiteID uint) (domainM
 	}
 
 	for port := range ports {
-		addPorts = append(addPorts, port)
 		if existPorts, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithPort(port)); len(existPorts) == 0 {
 			errMap := make(map[string]interface{})
 			errMap["port"] = port
@@ -741,6 +740,9 @@ func getWebsiteDomains(domains string, defaultPort int, websiteID uint) (domainM
 				err = buserr.WithDetail(constant.ErrPortInUsed, port, nil)
 				return
 			}
+		}
+		if existPorts, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(websiteID), websiteDomainRepo.WithPort(port)); len(existPorts) == 0 {
+			addPorts = append(addPorts, port)
 		}
 	}
 
