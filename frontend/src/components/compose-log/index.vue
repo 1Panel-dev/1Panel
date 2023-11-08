@@ -86,7 +86,7 @@ const logSearch = reactive({
 });
 
 const handleClose = () => {
-    terminalSocket.value!.send('close conn');
+    terminalSocket.value?.send('close conn');
     open.value = false;
 };
 

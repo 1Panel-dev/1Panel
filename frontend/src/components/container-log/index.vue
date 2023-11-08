@@ -155,7 +155,7 @@ const onClean = async () => {
 };
 
 onBeforeUnmount(() => {
-    terminalSocket.value!.send('close conn');
+    terminalSocket.value?.send('close conn');
 });
 
 defineExpose({
