@@ -68,7 +68,18 @@ func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 			data.Status = constant.StatusEnable
 		}
 	}
-	data.AutoStart, _ = systemctl.IsEnable(serviceName)
+
+	out, err := systemctl.RunSystemCtl("is-enabled", serviceName)
+	if err != nil {
+		data.AutoStart = false
+	} else {
+		if out == "alias\n" {
+			data.AutoStart, _ = systemctl.IsEnable("ssh")
+		} else {
+			data.AutoStart = out == "enabled\n"
+		}
+	}
+
 	sshConf, err := os.ReadFile(sshPath)
 	if err != nil {
 		data.Message = err.Error()
