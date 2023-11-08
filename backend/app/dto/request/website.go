@@ -187,8 +187,8 @@ type WebsiteProxyConfig struct {
 	Operate   string            `json:"operate" validate:"required"`
 	Enable    bool              `json:"enable" `
 	Cache     bool              `json:"cache" `
-	CacheTime int               `json:"cacheTime"  validate:"required"`
-	CacheUnit string            `json:"cacheUnit" validate:"required"`
+	CacheTime int               `json:"cacheTime"  `
+	CacheUnit string            `json:"cacheUnit"`
 	Name      string            `json:"name" validate:"required"`
 	Modifier  string            `json:"modifier" validate:"required"`
 	Match     string            `json:"match" validate:"required"`
