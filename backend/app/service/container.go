@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -55,7 +56,7 @@ type IContainerService interface {
 	ContainerRename(req dto.ContainerRename) error
 	ContainerLogClean(req dto.OperationWithName) error
 	ContainerOperation(req dto.ContainerOperation) error
-	ContainerLogs(wsConn *websocket.Conn, container, since, tail string, follow bool) error
+	ContainerLogs(wsConn *websocket.Conn, containerType, container, since, tail string, follow bool) error
 	ContainerStats(id string) (*dto.ContainerStats, error)
 	Inspect(req dto.InspectReq) (string, error)
 	DeleteNetwork(req dto.BatchDelete) error
@@ -67,7 +68,6 @@ type IContainerService interface {
 	Prune(req dto.ContainerPrune) (dto.ContainerPruneReport, error)
 
 	LoadContainerLogs(req dto.OperationWithNameAndType) string
-	ComposeLogs(wsConn *websocket.Conn, composePath, since, tail string, follow bool) error
 }
 
 func NewIContainerService() IContainerService {
@@ -592,11 +592,15 @@ func (u *ContainerService) ContainerLogClean(req dto.OperationWithName) error {
 	return nil
 }
 
-func (u *ContainerService) ContainerLogs(wsConn *websocket.Conn, container, since, tail string, follow bool) error {
+func (u *ContainerService) ContainerLogs(wsConn *websocket.Conn, containerType, container, since, tail string, follow bool) error {
+	defer func() { wsConn.Close() }()
 	if cmd.CheckIllegal(container, since, tail) {
 		return buserr.New(constant.ErrCmdIllegal)
 	}
 	command := fmt.Sprintf("docker logs %s", container)
+	if containerType == "compose" {
+		command = fmt.Sprintf("docker-compose -f %s logs", container)
+	}
 	if tail != "0" {
 		command += " --tail " + tail
 	}
@@ -608,6 +612,14 @@ func (u *ContainerService) ContainerLogs(wsConn *websocket.Conn, container, sinc
 	}
 	command += " 2>&1"
 	cmd := exec.Command("bash", "-c", command)
+	if !follow {
+		stdout, _ := cmd.CombinedOutput()
+		if err := wsConn.WriteMessage(websocket.TextMessage, stdout); err != nil {
+			global.LOG.Errorf("send message with log to ws failed, err: %v", err)
+		}
+		return nil
+	}
+
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return err
@@ -615,23 +627,40 @@ func (u *ContainerService) ContainerLogs(wsConn *websocket.Conn, container, sinc
 	if err := cmd.Start(); err != nil {
 		return err
 	}
+	defer func() {
+		_ = cmd.Process.Signal(syscall.SIGTERM)
+		_ = cmd.Wait()
+	}()
+	var exitCh chan struct{}
+	if follow {
+		go func() {
+			_, wsData, _ := wsConn.ReadMessage()
+			if string(wsData) == "close conn" {
+				exitCh <- struct{}{}
+			}
+		}()
+	}
 
 	buffer := make([]byte, 1024)
 	for {
-		n, err := stdout.Read(buffer)
-		if err != nil {
-			if err == io.EOF {
-				break
+		select {
+		case <-exitCh:
+			return nil
+		default:
+			n, err := stdout.Read(buffer)
+			if err != nil {
+				if err == io.EOF {
+					return err
+				}
+				global.LOG.Errorf("read bytes from log failed, err: %v", err)
+				continue
 			}
-			global.LOG.Errorf("read bytes from container log failed, err: %v", err)
-			continue
-		}
-		if err = wsConn.WriteMessage(websocket.TextMessage, buffer[:n]); err != nil {
-			global.LOG.Errorf("send message with container log to ws failed, err: %v", err)
-			break
+			if err = wsConn.WriteMessage(websocket.TextMessage, buffer[:n]); err != nil {
+				global.LOG.Errorf("send message with log to ws failed, err: %v", err)
+				return err
+			}
 		}
 	}
-	return nil
 }
 
 func (u *ContainerService) ContainerStats(id string) (*dto.ContainerStats, error) {

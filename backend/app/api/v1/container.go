@@ -434,7 +434,7 @@ func (b *BaseApi) ContainerLogs(c *gin.Context) {
 	follow := c.Query("follow") == "true"
 	tail := c.Query("tail")
 
-	if err := containerService.ContainerLogs(wsConn, container, since, tail, follow); err != nil {
+	if err := containerService.ContainerLogs(wsConn, "container", container, since, tail, follow); err != nil {
 		_ = wsConn.WriteMessage(1, []byte(err.Error()))
 		return
 	}
@@ -658,7 +658,7 @@ func (b *BaseApi) ComposeLogs(c *gin.Context) {
 	follow := c.Query("follow") == "true"
 	tail := c.Query("tail")
 
-	if err := containerService.ComposeLogs(wsConn, compose, since, tail, follow); err != nil {
+	if err := containerService.ContainerLogs(wsConn, "compose", compose, since, tail, follow); err != nil {
 		_ = wsConn.WriteMessage(1, []byte(err.Error()))
 		return
 	}

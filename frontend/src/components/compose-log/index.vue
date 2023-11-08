@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="open" :size="globalStore.isFullScreen ? '100%' : '50%'">
+    <el-drawer v-model="open" :size="globalStore.isFullScreen ? '100%' : '50%'" :before-close="handleClose">
         <template #header>
             <DrawerHeader :header="$t('commons.button.log')" :resource="resource" :back="handleClose">
                 <template #extra v-if="!mobile">
@@ -53,7 +53,7 @@
 <script lang="ts" setup>
 import i18n from '@/lang';
 import { dateFormatForName, downloadWithContent } from '@/utils/util';
-import { computed, onBeforeUnmount, reactive, ref, shallowRef, watch } from 'vue';
+import { computed, reactive, ref, shallowRef, watch } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
@@ -86,8 +86,8 @@ const logSearch = reactive({
 });
 
 const handleClose = () => {
+    terminalSocket.value!.send('close conn');
     open.value = false;
-    terminalSocket.value?.close();
 };
 
 function toggleFullscreen() {
@@ -179,10 +179,6 @@ const acceptParams = (props: DialogProps): void => {
         });
     }
 };
-
-onBeforeUnmount(() => {
-    terminalSocket.value?.close();
-});
 
 defineExpose({
     acceptParams,
