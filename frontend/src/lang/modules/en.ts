@@ -955,7 +955,7 @@ const message = {
         downloading: 'Downloading...',
         infoDetail: 'File Properties',
         list: 'File List',
-        sub: 'Include subdirectory',
+        sub: 'Subdirectory',
         downlodSuccess: 'Download Success',
         theme: 'Theme',
         language: 'Language',

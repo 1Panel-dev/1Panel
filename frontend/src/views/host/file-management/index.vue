@@ -95,7 +95,9 @@
 
                         <el-button-group class="copy-button" v-if="moveOpen">
                             <el-tooltip class="box-item" effect="dark" :content="$t('file.paste')" placement="bottom">
-                                <el-button plain @click="openPaste">{{ $t('file.paste') }}</el-button>
+                                <el-button plain @click="openPaste">
+                                    {{ $t('file.paste') }}({{ fileMove.count }})
+                                </el-button>
                             </el-tooltip>
                             <el-tooltip class="box-item" effect="dark" :content="$t('file.cancel')" placement="bottom">
                                 <el-button plain class="close" @click="closeMove">
@@ -369,7 +371,7 @@ const codeReq = reactive({ path: '', expand: false, page: 1, pageSize: 100 });
 const fileUpload = reactive({ path: '' });
 const fileRename = reactive({ path: '', oldName: '' });
 const fileWget = reactive({ path: '' });
-const fileMove = reactive({ oldPaths: [''], type: '', path: '', name: '' });
+const fileMove = reactive({ oldPaths: [''], type: '', path: '', name: '', count: 0 });
 const processPage = reactive({ open: false });
 
 const createRef = ref();
@@ -690,10 +692,12 @@ const openRename = (item: File.File) => {
 
 const openMove = (type: string) => {
     fileMove.type = type;
+    fileMove.name = '';
     const oldpaths = [];
     for (const s of selects.value) {
         oldpaths.push(s['path']);
     }
+    fileMove.count = selects.value.length;
     fileMove.oldPaths = oldpaths;
     if (selects.value.length == 1) {
         fileMove.name = selects.value[0].name;
@@ -706,6 +710,7 @@ const closeMove = () => {
     tableRef.value.clearSelects();
     fileMove.oldPaths = [];
     fileMove.name = '';
+    fileMove.count = 0;
     moveOpen.value = false;
 };
 
