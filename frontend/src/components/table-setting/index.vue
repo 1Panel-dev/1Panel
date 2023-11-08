@@ -47,6 +47,7 @@ const changeRefresh = () => {
             timer = null;
         }
     }
+    localStorage.setItem(props.title, refreshRate.value + '');
 };
 
 onUnmounted(() => {
