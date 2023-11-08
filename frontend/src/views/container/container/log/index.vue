@@ -4,6 +4,7 @@
             v-model="logVisible"
             :destroy-on-close="true"
             :close-on-click-modal="false"
+            :before-close="handleClose"
             :size="globalStore.isFullScreen ? '100%' : '50%'"
         >
             <template #header>
@@ -58,7 +59,7 @@
             />
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="logVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
                 </span>
             </template>
         </el-drawer>
@@ -131,8 +132,8 @@ const loadTooltip = () => {
     return i18n.global.t('commons.button.' + (screenfull.isFullscreen ? 'quitFullscreen' : 'fullscreen'));
 };
 const handleClose = async () => {
+    terminalSocket.value!.send('close conn');
     logVisible.value = false;
-    terminalSocket.value.close();
 };
 watch(logVisible, (val) => {
     if (screenfull.isEnabled && !val && !mobile.value) screenfull.exit();
@@ -208,7 +209,7 @@ const acceptParams = (props: DialogProps): void => {
 };
 
 onBeforeUnmount(() => {
-    terminalSocket.value?.close();
+    handleClose();
 });
 
 defineExpose({
