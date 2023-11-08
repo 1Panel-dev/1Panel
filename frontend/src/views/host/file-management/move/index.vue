@@ -140,6 +140,7 @@ const acceptParams = async (props: MoveProps) => {
     addForm.oldPaths = props.oldPaths;
     addForm.type = props.type;
     addForm.newPath = props.path;
+    addForm.name = '';
     type.value = props.type;
     if (props.name && props.name != '') {
         oldName.value = props.name;

@@ -919,7 +919,7 @@ const message = {
         infoDetail: '文件屬性',
         root: '根目錄',
         list: '文件列表',
-        sub: '包含子目錄',
+        sub: '子目錄',
         downlodSuccess: '下載完成',
         theme: '主題',
         language: '語言',

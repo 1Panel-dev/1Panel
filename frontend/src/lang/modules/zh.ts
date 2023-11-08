@@ -920,7 +920,7 @@ const message = {
         infoDetail: '文件属性',
         root: '根目录',
         list: '文件列表',
-        sub: '包含子目录',
+        sub: '子目录',
         downlodSuccess: '下载完成',
         theme: '主题',
         language: '语言',
