@@ -121,7 +121,7 @@ export const ApplySSL = (req: Website.SSLApply) => {
 };
 
 export const RenewSSL = (req: Website.SSLRenew) => {
-    return http.post<any>(`/websites/ssl/renew`, req);
+    return http.post<any>(`/websites/ssl/renew`, req, TimeoutEnum.T_10M);
 };
 
 export const UpdateSSL = (req: Website.SSLUpdate) => {
@@ -129,7 +129,7 @@ export const UpdateSSL = (req: Website.SSLUpdate) => {
 };
 
 export const GetDnsResolve = (req: Website.DNSResolveReq) => {
-    return http.post<Website.DNSResolve[]>(`/websites/ssl/resolve`, req, TimeoutEnum.T_60S);
+    return http.post<Website.DNSResolve[]>(`/websites/ssl/resolve`, req, TimeoutEnum.T_5M);
 };
 
 export const GetHTTPSConfig = (id: number) => {
