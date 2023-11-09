@@ -248,6 +248,8 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 	oldInstall.AppId = install.AppId
 	oldInstall.AppDetailId = install.AppDetailId
 	oldInstall.App.ID = install.AppId
+	oldInstall.Env = strings.ReplaceAll(oldInstall.Env, oldInstall.ContainerName, install.ContainerName)
+	oldInstall.ContainerName = install.ContainerName
 	if err := appInstallRepo.Save(context.Background(), &oldInstall); err != nil {
 		global.LOG.Errorf("save db app install failed, err: %v", err)
 		return err
