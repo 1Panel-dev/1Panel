@@ -10079,6 +10079,217 @@
                 }
             }
         },
+        "/toolbox/fail2ban/base": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取 Fail2ban 基础信息",
+                "tags": [
+                    "Fail2ban"
+                ],
+                "summary": "Load fail2ban base info",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Fail2banBaseInfo"
+                        }
+                    }
+                }
+            }
+        },
+        "/toolbox/fail2ban/operate": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "修改 Fail2ban 状态",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Fail2ban"
+                ],
+                "summary": "Operate fail2ban",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.Operate"
+                        }
+                    }
+                ],
+                "responses": {},
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "operation"
+                    ],
+                    "formatEN": "[operation] Fail2ban",
+                    "formatZH": "[operation] Fail2ban",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/toolbox/fail2ban/operate/sshd": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "配置 sshd",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Fail2ban"
+                ],
+                "summary": "Operate sshd of fail2ban",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.Operate"
+                        }
+                    }
+                ],
+                "responses": {},
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "operate",
+                        "ips"
+                    ],
+                    "formatEN": "[operate] ips: [ips]",
+                    "formatZH": "[operate] ips: [ips]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/toolbox/fail2ban/search": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取 Fail2ban ip 列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Fail2ban"
+                ],
+                "summary": "Page fail2ban ip list",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.Fail2banSearch"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.PageResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/toolbox/fail2ban/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "修改 Fail2ban 配置",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Fail2ban"
+                ],
+                "summary": "Update fail2ban conf",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.Fail2banUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "key",
+                        "value"
+                    ],
+                    "formatEN": "update fail2ban conf [key] =\u003e [value]",
+                    "formatZH": "修改 Fail2ban 配置 [key] =\u003e [value]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/toolbox/fail2ban/update/byconf": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "通过文件修改 fail2ban 配置",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Fail2ban"
+                ],
+                "summary": "Update fail2ban conf by file",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateByFile"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/websites": {
             "post": {
                 "security": [
@@ -13992,6 +14203,84 @@
                 }
             }
         },
+        "dto.Fail2banBaseInfo": {
+            "type": "object",
+            "properties": {
+                "banAction": {
+                    "type": "string"
+                },
+                "banTime": {
+                    "type": "string"
+                },
+                "findTime": {
+                    "type": "string"
+                },
+                "isActive": {
+                    "type": "boolean"
+                },
+                "isEnable": {
+                    "type": "boolean"
+                },
+                "logPath": {
+                    "type": "string"
+                },
+                "maxRetry": {
+                    "type": "integer"
+                },
+                "port": {
+                    "type": "integer"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.Fail2banSearch": {
+            "type": "object",
+            "required": [
+                "page",
+                "pageSize",
+                "status"
+            ],
+            "properties": {
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "banned",
+                        "ignore"
+                    ]
+                }
+            }
+        },
+        "dto.Fail2banUpdate": {
+            "type": "object",
+            "required": [
+                "key"
+            ],
+            "properties": {
+                "key": {
+                    "type": "string",
+                    "enum": [
+                        "port",
+                        "banTime",
+                        "findTime",
+                        "maxRetry",
+                        "banAction",
+                        "action",
+                        "logPath"
+                    ]
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.FirewallBaseInfo": {
             "type": "object",
             "properties": {
@@ -15950,6 +16239,14 @@
                     "type": "integer"
                 },
                 "label": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UpdateByFile": {
+            "type": "object",
+            "properties": {
+                "file": {
                     "type": "string"
                 }
             }

@@ -973,6 +973,60 @@ definitions:
     - fileName
     - source
     type: object
+  dto.Fail2banBaseInfo:
+    properties:
+      banAction:
+        type: string
+      banTime:
+        type: string
+      findTime:
+        type: string
+      isActive:
+        type: boolean
+      isEnable:
+        type: boolean
+      logPath:
+        type: string
+      maxRetry:
+        type: integer
+      port:
+        type: integer
+      version:
+        type: string
+    type: object
+  dto.Fail2banSearch:
+    properties:
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      status:
+        enum:
+        - banned
+        - ignore
+        type: string
+    required:
+    - page
+    - pageSize
+    - status
+    type: object
+  dto.Fail2banUpdate:
+    properties:
+      key:
+        enum:
+        - port
+        - banTime
+        - findTime
+        - maxRetry
+        - banAction
+        - action
+        - logPath
+        type: string
+      value:
+        type: string
+    required:
+    - key
+    type: object
   dto.FirewallBaseInfo:
     properties:
       name:
@@ -2294,6 +2348,11 @@ definitions:
       id:
         type: integer
       label:
+        type: string
+    type: object
+  dto.UpdateByFile:
+    properties:
+      file:
         type: string
     type: object
   dto.UpdateDescription:
@@ -10781,6 +10840,140 @@ paths:
         formatEN: upgrade service => [version]
         formatZH: 更新系统 => [version]
         paramKeys: []
+  /toolbox/fail2ban/base:
+    get:
+      description: 获取 Fail2ban 基础信息
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Fail2banBaseInfo'
+      security:
+      - ApiKeyAuth: []
+      summary: Load fail2ban base info
+      tags:
+      - Fail2ban
+  /toolbox/fail2ban/operate:
+    post:
+      consumes:
+      - application/json
+      description: 修改 Fail2ban 状态
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Operate'
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Operate fail2ban
+      tags:
+      - Fail2ban
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - operation
+        formatEN: '[operation] Fail2ban'
+        formatZH: '[operation] Fail2ban'
+        paramKeys: []
+  /toolbox/fail2ban/operate/sshd:
+    post:
+      consumes:
+      - application/json
+      description: 配置 sshd
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Operate'
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Operate sshd of fail2ban
+      tags:
+      - Fail2ban
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - operate
+        - ips
+        formatEN: '[operate] ips: [ips]'
+        formatZH: '[operate] ips: [ips]'
+        paramKeys: []
+  /toolbox/fail2ban/search:
+    post:
+      consumes:
+      - application/json
+      description: 获取 Fail2ban ip 列表
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Fail2banSearch'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Page fail2ban ip list
+      tags:
+      - Fail2ban
+  /toolbox/fail2ban/update:
+    post:
+      consumes:
+      - application/json
+      description: 修改 Fail2ban 配置
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Fail2banUpdate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update fail2ban conf
+      tags:
+      - Fail2ban
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - key
+        - value
+        formatEN: update fail2ban conf [key] => [value]
+        formatZH: 修改 Fail2ban 配置 [key] => [value]
+        paramKeys: []
+  /toolbox/fail2ban/update/byconf:
+    post:
+      consumes:
+      - application/json
+      description: 通过文件修改 fail2ban 配置
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateByFile'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update fail2ban conf by file
+      tags:
+      - Fail2ban
   /websites:
     post:
       consumes:
