@@ -14,7 +14,7 @@ type NginxScopeReq struct {
 
 type NginxConfigUpdate struct {
 	Scope     dto.NginxKey `json:"scope"`
-	Operate   string       `json:"operate" validate:"required;oneof=add update delete"`
+	Operate   string       `json:"operate" validate:"required,oneof=add update delete"`
 	WebsiteID uint         `json:"websiteId" validate:"required"`
 	Params    interface{}  `json:"params"`
 }
