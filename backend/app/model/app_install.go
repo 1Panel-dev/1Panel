@@ -27,18 +27,18 @@ type AppInstall struct {
 }
 
 func (i *AppInstall) GetPath() string {
-	return path.Join(i.getAppPath(), i.Name)
+	return path.Join(i.GetAppPath(), i.Name)
 }
 
 func (i *AppInstall) GetComposePath() string {
-	return path.Join(i.getAppPath(), i.Name, "docker-compose.yml")
+	return path.Join(i.GetAppPath(), i.Name, "docker-compose.yml")
 }
 
 func (i *AppInstall) GetEnvPath() string {
-	return path.Join(i.getAppPath(), i.Name, ".env")
+	return path.Join(i.GetAppPath(), i.Name, ".env")
 }
 
-func (i *AppInstall) getAppPath() string {
+func (i *AppInstall) GetAppPath() string {
 	if i.App.Resource == constant.AppResourceLocal {
 		return path.Join(constant.LocalAppInstallDir, strings.TrimPrefix(i.App.Key, constant.AppResourceLocal))
 	} else {
