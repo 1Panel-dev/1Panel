@@ -148,7 +148,7 @@ type WebsiteLogReq struct {
 }
 
 type WebsiteDefaultUpdate struct {
-	ID uint `json:"id" validate:"required"`
+	ID uint `json:"id"`
 }
 
 type WebsitePHPConfigUpdate struct {
