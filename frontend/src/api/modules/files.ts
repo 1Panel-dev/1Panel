@@ -34,11 +34,11 @@ export const ChangeFileMode = (form: File.FileCreate) => {
 };
 
 export const CompressFile = (form: File.FileCompress) => {
-    return http.post<File.File>('files/compress', form);
+    return http.post<File.File>('files/compress', form, TimeoutEnum.T_10M);
 };
 
 export const DeCompressFile = (form: File.FileDeCompress) => {
-    return http.post<File.File>('files/decompress', form);
+    return http.post<File.File>('files/decompress', form, TimeoutEnum.T_10M);
 };
 
 export const GetFileContent = (params: File.ReqFile) => {
