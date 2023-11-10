@@ -567,12 +567,14 @@ const onOperate = async (op: string, row: Container.ContainerInfo | null) => {
             msg = i18n.global.t('container.operatorAppHelper', [i18n.global.t('container.' + op)]);
         }
     }
+    const successMsg = `${i18n.global.t('container.' + op)}${i18n.global.t('commons.status.success')}`;
     opRef.value.acceptParams({
         title: i18n.global.t('container.' + op),
         names: names,
         msg: msg,
         api: containerOperator,
         params: { names: names, operation: op },
+        successMsg,
     });
 };
 
