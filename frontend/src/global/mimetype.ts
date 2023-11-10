@@ -120,5 +120,5 @@ export const Units = [
     { label: i18n.global.t('commons.units.day'), value: 'd' },
     { label: i18n.global.t('commons.units.week'), value: 'w' },
     { label: i18n.global.t('commons.units.month'), value: 'M' },
-    { label: i18n.global.t('commons.units.year'), value: 'Y' },
+    { label: i18n.global.t('commons.units.year'), value: 'y' },
 ];
