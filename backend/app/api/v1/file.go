@@ -340,7 +340,6 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /files/check [post]
-// @x-panel-log {"bodyKeys":["path"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"检测文件 [path] 是否存在","formatEN":"Check whether file [path] exists"}
 func (b *BaseApi) CheckFile(c *gin.Context) {
 	var req request.FilePathCheck
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

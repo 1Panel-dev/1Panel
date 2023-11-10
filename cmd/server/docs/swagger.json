@@ -5153,15 +5153,6 @@
                     "200": {
                         "description": "OK"
                     }
-                },
-                "x-panel-log": {
-                    "BeforeFunctions": [],
-                    "bodyKeys": [
-                        "path"
-                    ],
-                    "formatEN": "Check whether file [path] exists",
-                    "formatZH": "检测文件 [path] 是否存在",
-                    "paramKeys": []
                 }
             }
         },
@@ -17366,11 +17357,17 @@
         "request.NginxConfigUpdate": {
             "type": "object",
             "required": [
+                "operate",
                 "websiteId"
             ],
             "properties": {
                 "operate": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "add",
+                        "update",
+                        "delete"
+                    ]
                 },
                 "params": {},
                 "scope": {
@@ -18188,8 +18185,6 @@
         "request.WebsiteProxyConfig": {
             "type": "object",
             "required": [
-                "cacheTime",
-                "cacheUnit",
                 "id",
                 "match",
                 "modifier",

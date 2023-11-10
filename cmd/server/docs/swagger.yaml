@@ -3229,6 +3229,10 @@ definitions:
   request.NginxConfigUpdate:
     properties:
       operate:
+        enum:
+        - add
+        - update
+        - delete
         type: string
       params: {}
       scope:
@@ -3236,6 +3240,7 @@ definitions:
       websiteId:
         type: integer
     required:
+    - operate
     - websiteId
     type: object
   request.NginxProxyUpdate:
@@ -3810,8 +3815,6 @@ definitions:
           type: string
         type: object
     required:
-    - cacheTime
-    - cacheUnit
     - id
     - match
     - modifier
@@ -7659,13 +7662,6 @@ paths:
       summary: Check file exist
       tags:
       - File
-      x-panel-log:
-        BeforeFunctions: []
-        bodyKeys:
-        - path
-        formatEN: Check whether file [path] exists
-        formatZH: 检测文件 [path] 是否存在
-        paramKeys: []
   /files/chunkdownload:
     post:
       consumes:
