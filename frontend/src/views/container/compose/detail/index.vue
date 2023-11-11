@@ -249,6 +249,7 @@ const onOperate = async (op: string) => {
         msg: msg,
         api: containerOperator,
         params: { names: names, operation: op },
+        successMsg: `${i18n.global.t('container.' + op)}${i18n.global.t('commons.status.success')}`,
     });
 };
 
