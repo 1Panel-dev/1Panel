@@ -69,6 +69,11 @@ onMounted(() => {
 <style lang="scss">
 .router_card {
     --el-card-padding: 0;
+    .el-card__body {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 }
 
 .router_card_button {
