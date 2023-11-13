@@ -284,9 +284,6 @@ const message = {
     home: {
         restart_1panel: '重启面板',
         restart_system: '重启服务器',
-        panel: '1Panel 面板',
-        system: '1Panel 服务器',
-        restartHelper: '即将重新启动 {0}，是否继续？',
         operationSuccess: '操作成功！正在重启，请稍候...',
         overview: '概览',
         entranceHelper: '设置安全入口有利于提高系统的安全性，如有需要，前往 面板设置-安全 中，启用安全入口',

@@ -286,9 +286,6 @@ const message = {
     home: {
         restart_1panel: 'Restart Panel',
         restart_system: 'Restart Server',
-        panel: '1Panel',
-        system: '1Panel Server',
-        restartHelper: 'About to restart {0}, do you want to continue?',
         operationSuccess: 'Operation successful! Restarting, please wait...',
         overview: 'Overview',
         entranceHelper:
