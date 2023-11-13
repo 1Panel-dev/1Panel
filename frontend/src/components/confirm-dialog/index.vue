@@ -6,8 +6,8 @@
             </div>
         </template>
         <div>
-            <span style="font-size: 12px">{{ operationInfo }}</span>
-            <div style="margin-top: 10px">
+            <span v-if="operationInfo" style="font-size: 12px">{{ operationInfo }}</span>
+            <div :style="{ 'margin-top': operationInfo ? '10px' : '0px' }">
                 <span style="font-size: 12px">{{ $t('commons.msg.operateConfirm') }}</span>
                 <span style="font-size: 12px; color: red; font-weight: 500">'{{ submitInputInfo }}'</span>
             </div>

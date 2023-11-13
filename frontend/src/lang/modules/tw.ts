@@ -284,9 +284,6 @@ const message = {
     home: {
         restart_1panel: '重啟面板',
         restart_system: '重啟服務器',
-        panel: '1Panel 面板',
-        system: '1Panel 服務器',
-        restartHelper: '即將重新啟動 {0}，是否繼續？',
         operationSuccess: '操作成功！正在重啟，請稍候...',
         overview: '概覽',
         entranceHelper: '設置安全入口有利於提高系統的安全性，如有需要，前往 面板設置-安全 中，啟用安全入口',

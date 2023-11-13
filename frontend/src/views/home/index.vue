@@ -10,11 +10,11 @@
         >
             <template #route-button>
                 <div class="router-button">
-                    <el-button link type="primary" @click="restart('panel')">
+                    <el-button link type="primary" @click="onRestart('1panel')">
                         {{ $t('home.restart_1panel') }}
                     </el-button>
                     <el-divider direction="vertical" />
-                    <el-button link type="primary" @click="restart('system')">
+                    <el-button link type="primary" @click="onRestart('system')">
                         {{ $t('home.restart_system') }}
                     </el-button>
                 </div>
@@ -230,10 +230,13 @@
                 </CardWithHeader>
             </el-col>
         </el-row>
+
+        <ConfirmDialog ref="confirmDialogRef" @confirm="onSave"></ConfirmDialog>
     </div>
 </template>
 
 <script lang="ts" setup>
+import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { onMounted, onBeforeUnmount, ref, reactive } from 'vue';
 import Status from '@/views/home/status/index.vue';
 import App from '@/views/home/app/index.vue';
@@ -252,6 +255,8 @@ const router = useRouter();
 const globalStore = GlobalStore();
 
 const statusRef = ref();
+const restartType = ref();
+const confirmDialogRef = ref();
 const appRef = ref();
 
 const isSafety = ref();
@@ -540,20 +545,19 @@ const loadSafeStatus = async () => {
     isSafety.value = res.data.securityEntrance;
 };
 
-const restart = async (type: string) => {
-    ElMessageBox.confirm(
-        i18n.global.t('home.restartHelper', [i18n.global.t('home.' + type)]),
-        i18n.global.t('commons.msg.operate'),
-        {
-            confirmButtonText: i18n.global.t('commons.button.confirm'),
-            cancelButtonText: i18n.global.t('commons.button.cancel'),
-            type: 'info',
-        },
-    ).then(async () => {
-        globalStore.isOnRestart = true;
-        MsgSuccess(i18n.global.t('home.operationSuccess'));
-        await systemRestart(type);
-    });
+const onRestart = (type: string) => {
+    restartType.value = type;
+    let params = {
+        header: i18n.global.t('home.restart_' + type),
+        operationInfo: '',
+        submitInputInfo: i18n.global.t('database.restartNow'),
+    };
+    confirmDialogRef.value!.acceptParams(params);
+};
+const onSave = async () => {
+    globalStore.isOnRestart = true;
+    MsgSuccess(i18n.global.t('home.operationSuccess'));
+    await systemRestart(restartType.value);
 };
 
 const onFocus = () => {
