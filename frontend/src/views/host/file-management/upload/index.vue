@@ -127,14 +127,18 @@ const removeFile = (index: number) => {
 };
 
 const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
-    uploaderFiles.value = uploadFiles;
-    const reader = new FileReader();
-    reader.readAsDataURL(_uploadFile.raw);
-    reader.onload = async () => {};
-    reader.onerror = () => {
-        uploaderFiles.value = uploaderFiles.value.filter((file) => file.uid !== _uploadFile.uid);
-        MsgError(i18n.global.t('file.typeErrOrEmpty', [_uploadFile.name]));
-    };
+    if (_uploadFile.size == 64 || _uploadFile.size == 0) {
+        uploaderFiles.value = uploadFiles;
+        const reader = new FileReader();
+        reader.readAsDataURL(_uploadFile.raw);
+        reader.onload = async () => {};
+        reader.onerror = () => {
+            uploaderFiles.value = uploaderFiles.value.filter((file) => file.uid !== _uploadFile.uid);
+            MsgError(i18n.global.t('file.typeErrOrEmpty', [_uploadFile.name]));
+        };
+    } else {
+        uploaderFiles.value = uploadFiles;
+    }
 };
 
 const clearFiles = () => {
@@ -162,7 +166,7 @@ const submit = async () => {
         const fileSize = file.size;
 
         uploadHelper.value = i18n.global.t('file.fileUploadStart', [file.name]);
-        if (fileSize <= 1024 * 1024 * 50) {
+        if (fileSize <= 1024 * 1024 * 10) {
             const formData = new FormData();
             formData.append('file', file.raw);
             if (file.raw.webkitRelativePath != '') {
@@ -174,7 +178,7 @@ const submit = async () => {
             success++;
             uploaderFiles.value[i].status = 'success';
         } else {
-            const CHUNK_SIZE = 1024 * 1024 * 20; // 10MB
+            const CHUNK_SIZE = 1024 * 1024 * 10;
             const chunkCount = Math.ceil(fileSize / CHUNK_SIZE);
             let uploadedChunkCount = 0;
             for (let c = 0; c < chunkCount; c++) {
