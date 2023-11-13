@@ -44,6 +44,7 @@ curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_
 - [在线文档](https://1panel.cn/docs/)
 - [教学视频](https://space.bilibili.com/510493147/channel/collectiondetail?sid=1199760)
 - [社区论坛](https://bbs.fit2cloud.com/c/1p/7)
+- [如何加入微信交流群?](https://bbs.fit2cloud.com/t/topic/2147/3)
 
 ## 安全说明
 
