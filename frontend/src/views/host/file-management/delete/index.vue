@@ -1,25 +1,36 @@
 <template>
     <el-dialog v-model="open" :title="$t('app.delete')" width="30%" :close-on-click-modal="false">
-        <el-row>
-            <el-col :span="20" :offset="2">
-                <el-alert class="mt-2" :show-icon="true" type="warning" :closable="false">
-                    <div style="line-height: 20px; word-wrap: break-word">
-                        <span>{{ $t('file.deleteHelper') }}</span>
+        <div>
+            <el-row>
+                <el-col :span="20" :offset="2">
+                    <el-alert class="mt-2" :show-icon="true" type="warning" :closable="false">
+                        <div class="delete-warn">
+                            <span>{{ $t('file.deleteHelper') }}</span>
+                        </div>
+                    </el-alert>
+                    <div class="mt-4">
+                        <el-checkbox v-model="forceDelete">{{ $t('file.forceDeleteHelper') }}</el-checkbox>
                     </div>
-                </el-alert>
-                <div class="mt-4">
-                    <el-checkbox v-model="forceDelete">{{ $t('file.forceDeleteHelper') }}</el-checkbox>
-                </div>
-
-                <div class="flx-align-center mb-1" v-for="(row, index) in files" :key="index">
-                    <div>
-                        <svg-icon v-if="row.isDir" className="table-icon mr-1 " iconName="p-file-folder"></svg-icon>
-                        <svg-icon v-else className="table-icon mr-1" :iconName="getIconName(row.extension)"></svg-icon>
+                    <div class="file-list">
+                        <div class="flx-align-center mb-1" v-for="(row, index) in files" :key="index">
+                            <div>
+                                <svg-icon
+                                    v-if="row.isDir"
+                                    className="table-icon mr-1 "
+                                    iconName="p-file-folder"
+                                ></svg-icon>
+                                <svg-icon
+                                    v-else
+                                    className="table-icon mr-1"
+                                    :iconName="getIconName(row.extension)"
+                                ></svg-icon>
+                            </div>
+                            <span class="sle">{{ row.name }}</span>
+                        </div>
                     </div>
-                    <span class="sle">{{ row.name }}</span>
-                </div>
-            </el-col>
-        </el-row>
+                </el-col>
+            </el-row>
+        </div>
 
         <template #footer>
             <span class="dialog-footer">
@@ -84,5 +95,15 @@ defineExpose({
     margin-top: 10px;
     max-height: 400px;
     overflow: auto;
+}
+
+.file-list {
+    height: 400px;
+    overflow-y: auto;
+}
+
+.delete-warn {
+    line-height: 20px;
+    word-wrap: break-word;
 }
 </style>

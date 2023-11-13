@@ -127,11 +127,10 @@ const removeFile = (index: number) => {
 };
 
 const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
+    uploaderFiles.value = uploadFiles;
     const reader = new FileReader();
     reader.readAsDataURL(_uploadFile.raw);
-    reader.onload = async () => {
-        uploaderFiles.value = uploadFiles;
-    };
+    reader.onload = async () => {};
     reader.onerror = () => {
         uploaderFiles.value = uploaderFiles.value.filter((file) => file.uid !== _uploadFile.uid);
         MsgError(i18n.global.t('file.typeErrOrEmpty', [_uploadFile.name]));

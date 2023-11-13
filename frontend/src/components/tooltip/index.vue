@@ -15,6 +15,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 
+defineOptions({ name: 'Tooltip' });
+
 const showTooltip = ref();
 const tooltipBox = ref();
 const tooltipItem = ref();
