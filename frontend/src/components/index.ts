@@ -4,6 +4,7 @@ import RouterButton from './router-button/index.vue';
 import ComplexTable from './complex-table/index.vue';
 import ErrPrompt from './error-prompt/index.vue';
 import OpDialog from './del-dialog/index.vue';
+import Tooltip from '@/components/tooltip/index.vue';
 export default {
     install(app: App) {
         app.component(LayoutContent.name, LayoutContent);
@@ -11,5 +12,6 @@ export default {
         app.component(ComplexTable.name, ComplexTable);
         app.component(ErrPrompt.name, ErrPrompt);
         app.component(OpDialog.name, OpDialog);
+        app.component(Tooltip.name, Tooltip);
     },
 };
