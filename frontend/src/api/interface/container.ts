@@ -119,6 +119,7 @@ export namespace Container {
         name: string;
         tags: Array<string>;
         size: string;
+        isUsed: boolean;
     }
     export interface ImageBuild {
         from: string;

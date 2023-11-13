@@ -286,7 +286,7 @@ const message = {
     home: {
         restart_1panel: 'Restart Panel',
         restart_system: 'Restart Server',
-        operationSuccess: 'Operation successful! Restarting, please wait...',
+        operationSuccess: 'Operation succeeded, rebooting, please refresh the browser manually later!',
         overview: 'Overview',
         entranceHelper:
             'Enabling a secure entrance can help improve system security. If necessary, go to the Control Panel settings, select Security, and enable the secure entrance.',
@@ -519,8 +519,10 @@ const message = {
         containerPruneHelper3: 'This operation cannot be rolled back. Do you want to continue?',
         imagePrune: 'Image prune',
         imagePruneSome: 'Clean unlabeled',
+        imagePruneSomeEmpty: 'No image with the "none" tag is to be cleared',
         imagePruneSomeHelper: 'Clean the images with the tag "none" that are not used by any containers.',
         imagePruneAll: 'Clean unused',
+        imagePruneAllEmpty: 'No unused images to be cleared',
         imagePruneAllHelper: 'Clean the images that are not used by any containers.',
         networkPrune: 'Network prune',
         networkPruneHelper: 'Remove all unused networks. Do you want to continue?',
