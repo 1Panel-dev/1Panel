@@ -60,6 +60,8 @@ var (
 	ErrInstallDirNotFound  = "ErrInstallDirNotFound"
 	ErrContainerName       = "ErrContainerName"
 	ErrAppNameExist        = "ErrAppNameExist"
+	ErrFileNotFound        = "ErrFileNotFound"
+	ErrFileParseApp        = "ErrFileParseApp"
 )
 
 // website
