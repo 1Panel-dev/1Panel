@@ -336,7 +336,6 @@ func deleteAppInstall(install model.AppInstall, deleteBackup bool, forceDelete b
 }
 
 func deleteLink(ctx context.Context, install *model.AppInstall, deleteDB bool, forceDelete bool, deleteBackup bool) error {
-
 	resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(install.ID))
 	if len(resources) == 0 {
 		return nil
@@ -383,25 +382,59 @@ func upgradeInstall(installId uint, detailId uint, backup bool) error {
 			}
 		}
 		var upErr error
+
 		defer func() {
 			if upErr != nil {
+				if backup {
+					if err := NewIBackupService().AppRecover(dto.CommonRecover{Name: install.App.Key, DetailName: install.Name, Type: "app", Source: constant.ResourceLocal}); err != nil {
+						global.LOG.Errorf("recover app [%s] [%s] failed %v", install.App.Key, install.Name, err)
+					}
+				}
 				install.Status = constant.UpgradeErr
 				install.Message = upErr.Error()
 				_ = appInstallRepo.Save(context.Background(), &install)
 			}
 		}()
 
+		fileOp := files.NewFileOp()
 		detailDir := path.Join(constant.ResourceDir, "apps", install.App.Resource, install.App.Key, detail.Version)
 		if install.App.Resource == constant.AppResourceRemote {
 			if upErr = downloadApp(install.App, detail, &install); upErr != nil {
 				return
 			}
+			if detail.DockerCompose == "" {
+				composeDetail, err := fileOp.GetContent(path.Join(detailDir, "docker-compose.yml"))
+				if err != nil {
+					upErr = err
+					return
+				}
+				detail.DockerCompose = string(composeDetail)
+				_ = appDetailRepo.Update(context.Background(), detail)
+			}
 			go func() {
 				_, _ = http.Get(detail.DownloadCallBackUrl)
 			}()
 		}
+
 		if install.App.Resource == constant.AppResourceLocal {
 			detailDir = path.Join(constant.ResourceDir, "apps", "local", strings.TrimPrefix(install.App.Key, "local"), detail.Version)
+		}
+
+		images, err := composeV2.GetDockerComposeImages([]byte(detail.DockerCompose))
+		if err != nil {
+			upErr = err
+			return
+		}
+		dockerCli, err := composeV2.NewClient()
+		if err != nil {
+			upErr = err
+			return
+		}
+		for _, image := range images {
+			if err = dockerCli.PullImage(image, true); err != nil {
+				upErr = buserr.WithNameAndErr("ErrDockerPullImage", "", err)
+				return
+			}
 		}
 
 		command := exec.Command("/bin/bash", "-c", fmt.Sprintf("cp -rn %s/* %s || true", detailDir, install.GetPath()))
@@ -409,7 +442,6 @@ func upgradeInstall(installId uint, detailId uint, backup bool) error {
 		if stdout != nil {
 			global.LOG.Infof("upgrade app [%s] [%s] cp file log : %s ", install.App.Key, install.Name, string(stdout))
 		}
-		fileOp := files.NewFileOp()
 		sourceScripts := path.Join(detailDir, "scripts")
 		if fileOp.Stat(sourceScripts) {
 			dstScripts := path.Join(install.GetPath(), "scripts")
@@ -417,16 +449,6 @@ func upgradeInstall(installId uint, detailId uint, backup bool) error {
 			_ = fileOp.CreateDir(dstScripts, 0755)
 			scriptCmd := exec.Command("cp", "-rf", sourceScripts+"/.", dstScripts+"/")
 			_, _ = scriptCmd.CombinedOutput()
-		}
-
-		if detail.DockerCompose == "" {
-			composeDetail, err := fileOp.GetContent(path.Join(detailDir, "docker-compose.yml"))
-			if err != nil {
-				upErr = err
-				return
-			}
-			detail.DockerCompose = string(composeDetail)
-			_ = appDetailRepo.Update(context.Background(), detail)
 		}
 
 		composeMap := make(map[string]interface{})
@@ -480,24 +502,6 @@ func upgradeInstall(installId uint, detailId uint, backup bool) error {
 		install.DockerCompose = string(composeByte)
 		install.Version = detail.Version
 		install.AppDetailId = detailId
-
-		images, err := getImages(install)
-		if err != nil {
-			upErr = err
-			return
-		}
-		dockerCli, err := composeV2.NewClient()
-		if err != nil {
-			upErr = err
-			return
-		}
-
-		for _, image := range images {
-			if err = dockerCli.PullImage(image, true); err != nil {
-				upErr = buserr.WithNameAndErr("ErrDockerPullImage", "", err)
-				return
-			}
-		}
 
 		if out, err := compose.Down(install.GetComposePath()); err != nil {
 			if out != "" {
@@ -558,26 +562,6 @@ func getContainerNames(install model.AppInstall) ([]string, error) {
 		containerNames = append(containerNames, install.ContainerName)
 	}
 	return containerNames, nil
-}
-
-func getImages(install model.AppInstall) ([]string, error) {
-	envStr, err := coverEnvJsonToStr(install.Env)
-	if err != nil {
-		return nil, err
-	}
-	project, err := composeV2.GetComposeProject(install.Name, install.GetPath(), []byte(install.DockerCompose), []byte(envStr), true)
-	if err != nil {
-		return nil, err
-	}
-	imagesMap := make(map[string]struct{})
-	for _, service := range project.AllServices() {
-		imagesMap[service.Image] = struct{}{}
-	}
-	var images []string
-	for k := range imagesMap {
-		images = append(images, k)
-	}
-	return images, nil
 }
 
 func coverEnvJsonToStr(envJson string) (string, error) {
@@ -897,28 +881,28 @@ func handleLocalAppDetail(versionDir string, appDetail *model.AppDetail) error {
 	fileOp := files.NewFileOp()
 	dockerComposePath := path.Join(versionDir, "docker-compose.yml")
 	if !fileOp.Stat(dockerComposePath) {
-		return errors.New(i18n.GetMsgWithMap("ErrFileNotFound", map[string]interface{}{"name": "docker-compose.yml"}))
+		return buserr.WithName(constant.ErrFileNotFound, "docker-compose.yml")
 	}
 	dockerComposeByte, _ := fileOp.GetContent(dockerComposePath)
 	if dockerComposeByte == nil {
-		return errors.New(i18n.GetMsgWithMap("ErrFileParseApp", map[string]interface{}{"name": "docker-compose.yml"}))
+		return buserr.WithName(constant.ErrFileParseApp, "docker-compose.yml")
 	}
 	appDetail.DockerCompose = string(dockerComposeByte)
 	paramPath := path.Join(versionDir, "data.yml")
 	if !fileOp.Stat(paramPath) {
-		return errors.New(i18n.GetMsgWithMap("ErrFileNotFound", map[string]interface{}{"name": "data.yml"}))
+		return buserr.WithName(constant.ErrFileNotFound, "data.yml")
 	}
 	paramByte, _ := fileOp.GetContent(paramPath)
 	if paramByte == nil {
-		return errors.New(i18n.GetMsgWithMap("ErrFileParseApp", map[string]interface{}{"name": "data.yml"}))
+		return buserr.WithName(constant.ErrFileNotFound, "data.yml")
 	}
 	appParamConfig := dto.LocalAppParam{}
 	if err := yaml.Unmarshal(paramByte, &appParamConfig); err != nil {
-		return errors.New(i18n.GetMsgWithMap("ErrFileParseApp", map[string]interface{}{"name": "data.yml"}))
+		return buserr.WithMap(constant.ErrFileParseApp, map[string]interface{}{"name": "data.yml", "err": err.Error()}, err)
 	}
 	dataJson, err := json.Marshal(appParamConfig.AppParams)
 	if err != nil {
-		return errors.New(i18n.GetMsgWithMap("ErrFileParseApp", map[string]interface{}{"name": "data.yml", "err": err.Error()}))
+		return buserr.WithMap(constant.ErrFileParseApp, map[string]interface{}{"name": "data.yml", "err": err.Error()}, err)
 	}
 	appDetail.Params = string(dataJson)
 	return nil
@@ -928,22 +912,22 @@ func handleLocalApp(appDir string) (app *model.App, err error) {
 	fileOp := files.NewFileOp()
 	configYamlPath := path.Join(appDir, "data.yml")
 	if !fileOp.Stat(configYamlPath) {
-		err = errors.New(i18n.GetMsgWithMap("ErrFileNotFound", map[string]interface{}{"name": "data.yml"}))
+		err = buserr.WithName(constant.ErrFileNotFound, "data.yml")
 		return
 	}
 	iconPath := path.Join(appDir, "logo.png")
 	if !fileOp.Stat(iconPath) {
-		err = errors.New(i18n.GetMsgWithMap("ErrFileNotFound", map[string]interface{}{"name": "logo.png"}))
+		err = buserr.WithName(constant.ErrFileNotFound, "logo.png")
 		return
 	}
 	configYamlByte, err := fileOp.GetContent(configYamlPath)
 	if err != nil {
-		err = errors.New(i18n.GetMsgWithMap("ErrFileParseApp", map[string]interface{}{"name": "data.yml", "err": err.Error()}))
+		err = buserr.WithMap(constant.ErrFileParseApp, map[string]interface{}{"name": "data.yml", "err": err.Error()}, err)
 		return
 	}
 	localAppDefine := dto.LocalAppAppDefine{}
 	if err = yaml.Unmarshal(configYamlByte, &localAppDefine); err != nil {
-		err = errors.New(i18n.GetMsgWithMap("ErrFileParseApp", map[string]interface{}{"name": "data.yml", "err": err.Error()}))
+		err = buserr.WithMap(constant.ErrFileParseApp, map[string]interface{}{"name": "data.yml", "err": err.Error()}, err)
 		return
 	}
 	app = &localAppDefine.AppProperty

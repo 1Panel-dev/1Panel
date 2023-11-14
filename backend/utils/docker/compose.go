@@ -6,6 +6,7 @@ import (
 	"github.com/compose-spec/compose-go/types"
 	"github.com/docker/compose/v2/pkg/api"
 	"github.com/joho/godotenv"
+	"gopkg.in/yaml.v3"
 	"path"
 	"regexp"
 	"strings"
@@ -89,7 +90,7 @@ func GetComposeProject(projectName, workDir string, yml []byte, env []byte, skip
 	projectName = strings.ToLower(projectName)
 	reg, _ := regexp.Compile(`[^a-z0-9_-]+`)
 	projectName = reg.ReplaceAllString(projectName, "")
-	project, err := loader.Load(details, func(options *loader.Options) {
+	project, err := loader.LoadWithContext(context.Background(), details, func(options *loader.Options) {
 		options.SetProjectName(projectName, true)
 		options.ResolvePaths = true
 		options.SkipNormalization = skipNormalization
@@ -104,4 +105,27 @@ func GetComposeProject(projectName, workDir string, yml []byte, env []byte, skip
 func getComposeTimeout() *time.Duration {
 	timeout := time.Minute * time.Duration(10)
 	return &timeout
+}
+
+type ComposeProject struct {
+	Version  string
+	Services map[string]Service `yaml:"services"`
+}
+
+type Service struct {
+	Image string `yaml:"image"`
+}
+
+func GetDockerComposeImages(data []byte) ([]string, error) {
+	var dc ComposeProject
+	err := yaml.Unmarshal(data, &dc)
+	if err != nil {
+		return nil, err
+	}
+
+	var images []string
+	for _, service := range dc.Services {
+		images = append(images, service.Image)
+	}
+	return images, nil
 }
