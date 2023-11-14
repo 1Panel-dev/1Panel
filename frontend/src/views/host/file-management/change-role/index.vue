@@ -6,7 +6,7 @@
 
         <el-row>
             <el-col :span="22" :offset="1">
-                <FileRole v-loading="loading" :mode="mode" @get-mode="getMode"></FileRole>
+                <FileRole v-loading="loading" :mode="mode" @get-mode="getMode" :key="open.toString()"></FileRole>
                 <el-form-item v-if="form.isDir">
                     <el-checkbox v-model="form.sub">{{ $t('file.containSub') }}</el-checkbox>
                 </el-form-item>
