@@ -1577,6 +1577,7 @@ const message = {
         runDirHelper2: '请确保二级运行目录位于 index 目录下',
         openrestryHelper: 'OpenResty 默认 HTTP 端口：{0} HTTPS 端口 ：{1}，可能影响网站域名访问和 HTTPS 强制跳转',
         primaryDomainHelper: '支持域名:端口',
+        acmeAccountType: '账号类型',
     },
     php: {
         short_open_tag: '短标签支持',

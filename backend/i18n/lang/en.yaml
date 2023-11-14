@@ -91,6 +91,7 @@ ErrSSLKeyNotFound: 'The private key file does not exist'
 ErrSSLCertificateNotFound: 'The certificate file does not exist'
 ErrSSLKeyFormat: 'Private key file verification error'
 ErrSSLCertificateFormat: 'Certificate file format error, please use pem format'
+ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid or EabHmacKey cannot be empty'
 
 #mysql
 ErrUserIsExist: "The current user already exists. Please enter a new user"

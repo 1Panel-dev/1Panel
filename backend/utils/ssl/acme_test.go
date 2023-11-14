@@ -2,12 +2,17 @@ package ssl
 
 import (
 	"bytes"
+	"crypto"
+	"crypto/ecdsa"
+	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
+	"crypto/x509/pkix"
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
+	"github.com/go-acme/lego/v4/providers/dns/cloudflare"
 	"os"
 	"path"
 	"testing"
@@ -23,6 +28,8 @@ import (
 	"github.com/go-acme/lego/v4/challenge/dns01"
 	"github.com/go-acme/lego/v4/lego"
 	"github.com/go-acme/lego/v4/registration"
+
+	"log"
 )
 
 type AppList struct {
@@ -171,49 +178,10 @@ func TestCreatePrivate(t *testing.T) {
 
 func TestSSL(t *testing.T) {
 
-	//// 本地ACME测试用
-	//httpClient := &http.Client{
-	//	Transport: &http.Transport{
-	//		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	//	}}
-
-	//priKey, err := rsa.GenerateKey(rand.Reader, 2048)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//derStream := x509.MarshalPKCS1PrivateKey(priKey)
-	//block := &pem.Block{
-	//	Type:  "privateKey",
-	//	Bytes: derStream,
-	//}
-	//file, err := os.Create("private.key")
-	//if err != nil {
-	//	return
-	//}
-	//privateByte := pem.EncodeToMemory(block)
-	//
-	//fmt.Println(string(privateByte))
-	//
-	//if err = pem.Encode(file, block); err != nil {
-	//	return
-	//}
-
-	key, err := os.ReadFile("private.key")
+	priKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
-		panic(err)
+		log.Fatalf("Failed to generate private key: %v", err)
 	}
-
-	block2, _ := pem.Decode(key)
-	priKey, err := x509.ParsePKCS1PrivateKey(block2.Bytes)
-	if err != nil {
-		panic(err)
-	}
-
-	//block, _ := pem.Decode([]byte("vcCzoue3m0ufCzVx673quKBYQOho4uULpwj_P6tR60Q"))
-	//priKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
-	//if err != nil {
-	//	panic(err)
-	//}
 
 	myUser := AcmeUser{
 		Email: "you2@yours.com",
@@ -223,6 +191,7 @@ func TestSSL(t *testing.T) {
 	config := lego.NewConfig(&myUser)
 	//config.CADirURL = "https://acme-v02.api.letsencrypt.org/directory"
 	config.CADirURL = "https://acme-staging-v02.api.letsencrypt.org/directory"
+	config.CADirURL = "https://acme.zerossl.com/v2/DV90"
 	config.UserAgent = "acm_go/0.0.1"
 
 	config.Certificate.KeyType = certcrypto.RSA2048
@@ -238,11 +207,6 @@ func TestSSL(t *testing.T) {
 		panic(err)
 	}
 
-	//reg, err := client.Registration.ResolveAccountByKey()
-	//if err != nil {
-	//	panic(err)
-	//}
-
 	myUser.Registration = reg
 
 	//获取证书
@@ -256,34 +220,13 @@ func TestSSL(t *testing.T) {
 	//}
 
 	//申请证书
+	ewDomain := "tuxpanel.com"
 
 	request := certificate.ObtainRequest{
-		Domains: []string{"1panel.cloud"},
+		Domains: []string{ewDomain},
 		// 证书链
 		Bundle: true,
 	}
-
-	//dns01.NewDNSProviderManual()
-
-	//dnsPodConfig := dnspod.NewDefaultConfig()
-	//dnsPodConfig.LoginToken = "1,1"
-	//provider, err := dnspod.1(dnsPodConfig)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//
-	//alidnsConfig := alidns.NewDefaultConfig()
-	//alidnsConfig.SecretKey = "1"
-	//alidnsConfig.APIKey = "1"
-	//p, err := alidns.NewDNSProviderConfig(alidnsConfig)
-	//if err != nil {
-	//	panic(err)
-	//}
-
-	//p, err := dns01.NewDNSProviderManual()
-	//if err != nil {
-	//	panic(err)
-	//}
 
 	err = client.Challenge.SetDNS01Provider(&manualDnsProvider{}, dns01.AddDNSTimeout(6*time.Minute))
 	if err != nil {
@@ -294,7 +237,7 @@ func TestSSL(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	order, err := core.Orders.New([]string{"1panel.cloud"})
+	order, err := core.Orders.New([]string{ewDomain})
 	if err != nil {
 		panic(err)
 	}
@@ -303,7 +246,6 @@ func TestSSL(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	//core.Challenges.New()
 
 	domain := challenge.GetTargetedDomain(auth)
 	chlng, err := challenge.FindChallenge(challenge.DNS01, auth)
@@ -372,4 +314,144 @@ func TestSSL(t *testing.T) {
 	}
 	fmt.Println(cert2)
 
+}
+
+func generateCSR(privateKey crypto.PrivateKey, domain string) ([]byte, error) {
+	// 创建证书请求的模板
+	template := x509.CertificateRequest{
+		Subject: pkix.Name{
+			CommonName: domain,
+		},
+		SignatureAlgorithm: x509.ECDSAWithSHA256,
+	}
+
+	// 生成 CSR
+	csrBytes, err := x509.CreateCertificateRequest(rand.Reader, &template, privateKey)
+	if err != nil {
+		return nil, err
+	}
+
+	// 将 CSR 编码为 PEM 格式
+	csrPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE REQUEST", Bytes: csrBytes})
+
+	// 这里可以将 CSR 写入文件或者返回
+	err = os.WriteFile("csr.pem", csrPEM, 0644)
+	if err != nil {
+		return nil, err
+	}
+
+	return csrPEM, nil
+}
+
+func TestZeroSSL(t *testing.T) {
+
+	//switch accountType {
+	//case "letsencrypt":
+	//	config.CADirURL = "https://acme-staging-v02.api.letsencrypt.org/directory"
+	//case "zerossl":
+	//	config.CADirURL = "https://acme.zerossl.com/v2/DV90"
+	//case "buypass":
+	//	config.CADirURL = "https://api.test4.buypass.no/acme/directory"
+	//}
+
+	domain := "1panel.store"
+	acmeServer := "https://acme.zerossl.com/v2/DV90"
+
+	//acmeServer = "https://api.test4.buypass.no/acme/directory"
+	//
+	//acmeServer = "https://api.buypass.com/acme/directory"
+
+	priKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	if err != nil {
+		log.Fatalf("Failed to generate private key: %v", err)
+	}
+
+	user := AcmeUser{
+		Email: "zhengkunwang123@sina.com",
+		Key:   priKey,
+	}
+
+	config := lego.NewConfig(&user)
+
+	// 设置ACME服务器URL
+	config.CADirURL = acmeServer
+	config.Certificate.KeyType = certcrypto.RSA2048
+	config.UserAgent = "acm_go/0.0.1"
+
+	// 创建ACME客户端
+	client, err := lego.NewClient(config)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// ZeroSSl
+
+	kid := "xv1T5Ybi4G2otJlbCTVHjg"
+	hmacEncoded := "pc-mEroSmg2quRpVr7e4L5YWzhm5mSDlk4_ivMUBzAkDjbym3Y6g7RLhR1joQH-JP94qy3PEczKVfw7QSLoh8A"
+
+	eabOptions := registration.RegisterEABOptions{
+		TermsOfServiceAgreed: true,
+		Kid:                  kid,
+		HmacEncoded:          hmacEncoded,
+	}
+
+	reg, err := client.Registration.RegisterWithExternalAccountBinding(eabOptions)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// ZeroSSl
+
+	//reg, err := client.Registration.Register(registration.RegisterOptions{TermsOfServiceAgreed: true})
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+
+	user.Registration = reg
+
+	cloudflareConfig := cloudflare.NewDefaultConfig()
+	cloudflareConfig.AuthEmail = "zhengkunwang123@sina.com"
+	cloudflareConfig.AuthKey = "c29c0d604897ec1c5c7f14746623524bf040a"
+	p, err := cloudflare.NewDNSProviderConfig(cloudflareConfig)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err := client.Challenge.SetDNS01Provider(p, dns01.AddDNSTimeout(3*time.Minute)); err != nil {
+		log.Fatal(err)
+	}
+
+	// 申请证书
+	pk, err := certcrypto.GeneratePrivateKey(certcrypto.EC256)
+	if err != nil {
+		return
+	}
+
+	request := certificate.ObtainRequest{
+		Domains:    []string{domain},
+		Bundle:     true,
+		PrivateKey: pk,
+	}
+	certificates, err := client.Certificate.Obtain(request)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// 保存证书
+	err = os.WriteFile("certificate.crt", certificates.Certificate, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = os.WriteFile("private.key", certificates.PrivateKey, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func TestGetEABCre(t *testing.T) {
+	res, err := getZeroSSLEabCredentials("zen@11.com")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("%v", res)
 }

@@ -85,7 +85,7 @@ export const SearchAcmeAccount = (req: ReqPage) => {
 };
 
 export const CreateAcmeAccount = (req: Website.AcmeAccountCreate) => {
-    return http.post<Website.AcmeAccount>(`/websites/acme`, req);
+    return http.post<Website.AcmeAccount>(`/websites/acme`, req, TimeoutEnum.T_10M);
 };
 
 export const DeleteAcmeAccount = (req: Website.DelReq) => {

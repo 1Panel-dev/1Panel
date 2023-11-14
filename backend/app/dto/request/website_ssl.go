@@ -26,7 +26,10 @@ type WebsiteSSLRenew struct {
 }
 
 type WebsiteAcmeAccountCreate struct {
-	Email string `json:"email" validate:"required"`
+	Email      string `json:"email" validate:"required"`
+	Type       string `json:"type" validate:"required,oneof=letsencrypt zerossl buypass google"`
+	EabKid     string `json:"eabKid"`
+	EabHmacKey string `json:"eabHmacKey"`
 }
 
 type WebsiteDnsAccountCreate struct {

@@ -3,6 +3,7 @@ package ssl
 import (
 	"crypto"
 	"encoding/json"
+	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/go-acme/lego/v4/acme"
 	"github.com/go-acme/lego/v4/acme/api"
 	"github.com/go-acme/lego/v4/certificate"
@@ -41,23 +42,15 @@ type AcmeClient struct {
 	User   *AcmeUser
 }
 
-func NewAcmeClient(email, privateKey string) (*AcmeClient, error) {
-	if email == "" {
+func NewAcmeClient(acmeAccount *model.WebsiteAcmeAccount) (*AcmeClient, error) {
+	if acmeAccount.Email == "" {
 		return nil, errors.New("email can not blank")
 	}
-	if privateKey == "" {
-		client, err := NewRegisterClient(email)
-		if err != nil {
-			return nil, err
-		}
-		return client, nil
-	} else {
-		client, err := NewPrivateKeyClient(email, privateKey)
-		if err != nil {
-			return nil, err
-		}
-		return client, nil
+	client, err := NewRegisterClient(acmeAccount)
+	if err != nil {
+		return nil, err
 	}
+	return client, nil
 }
 
 type DnsType string
@@ -78,22 +71,25 @@ type DNSParam struct {
 }
 
 func (c *AcmeClient) UseDns(dnsType DnsType, params string) error {
-	var param DNSParam
-	if err := json.Unmarshal([]byte(params), &param); err != nil {
+	var (
+		param DNSParam
+		p     challenge.Provider
+		err   error
+	)
+
+	if err = json.Unmarshal([]byte(params), &param); err != nil {
 		return err
 	}
 
-	var p challenge.Provider
-	var err error
-	if dnsType == DnsPod {
+	switch dnsType {
+	case DnsPod:
 		dnsPodConfig := dnspod.NewDefaultConfig()
 		dnsPodConfig.LoginToken = param.ID + "," + param.Token
 		p, err = dnspod.NewDNSProviderConfig(dnsPodConfig)
 		if err != nil {
 			return err
 		}
-	}
-	if dnsType == AliYun {
+	case AliYun:
 		alidnsConfig := alidns.NewDefaultConfig()
 		alidnsConfig.SecretKey = param.SecretKey
 		alidnsConfig.APIKey = param.AccessKey
@@ -101,8 +97,7 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string) error {
 		if err != nil {
 			return err
 		}
-	}
-	if dnsType == CloudFlare {
+	case CloudFlare:
 		cloudflareConfig := cloudflare.NewDefaultConfig()
 		cloudflareConfig.AuthEmail = param.Email
 		cloudflareConfig.AuthKey = param.APIkey
