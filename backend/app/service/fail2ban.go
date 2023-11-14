@@ -40,18 +40,24 @@ func (u *Fail2banService) LoadBaseInfo() (dto.Fail2banBaseInfo, error) {
 	}
 	lines := strings.Split(string(conf), "\n")
 
-	isStart := false
+	block := ""
 	for _, line := range lines {
-		if strings.HasPrefix(line, "[sshd]") {
-			isStart = true
+		if strings.HasPrefix(strings.ToLower(line), "[default]") {
+			block = "default"
+			continue
 		}
-		if !isStart {
+		if strings.HasPrefix(line, "[sshd]") {
+			block = "sshd"
+			continue
+		}
+		if strings.HasPrefix(line, "[") {
+			block = ""
+			continue
+		}
+		if block != "default" && block != "sshd" {
 			continue
 		}
 		loadFailValue(line, &baseInfo)
-		if strings.HasPrefix(line, "[") {
-			break
-		}
 	}
 
 	return baseInfo, nil
@@ -150,11 +156,6 @@ func (u *Fail2banService) OperateSSHD(req dto.Fail2banSet) error {
 }
 
 func loadFailValue(line string, baseInfo *dto.Fail2banBaseInfo) {
-	if strings.HasPrefix(line, "port") {
-		itemValue := strings.ReplaceAll(line, "port", "")
-		itemValue = strings.ReplaceAll(itemValue, "=", "")
-		baseInfo.Port, _ = strconv.Atoi(strings.TrimSpace(itemValue))
-	}
 	if strings.HasPrefix(line, "maxretry") {
 		itemValue := strings.ReplaceAll(line, "maxretry", "")
 		itemValue = strings.ReplaceAll(itemValue, "=", "")
@@ -174,10 +175,5 @@ func loadFailValue(line string, baseInfo *dto.Fail2banBaseInfo) {
 		itemValue := strings.ReplaceAll(line, "banaction", "")
 		itemValue = strings.ReplaceAll(itemValue, "=", "")
 		baseInfo.BanAction = strings.TrimSpace(itemValue)
-	}
-	if strings.HasPrefix(line, "logpath") {
-		itemValue := strings.ReplaceAll(line, "logpath", "")
-		itemValue = strings.ReplaceAll(itemValue, "=", "")
-		baseInfo.BanTime = strings.TrimSpace(itemValue)
 	}
 }

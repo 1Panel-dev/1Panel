@@ -8,6 +8,7 @@ type RouterGroup struct {
 	MonitorRouter
 	LogRouter
 	FileRouter
+	ToolboxRouter
 	TerminalRouter
 	CronjobRouter
 	SettingRouter

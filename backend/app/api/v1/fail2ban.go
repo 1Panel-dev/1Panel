@@ -119,6 +119,24 @@ func (b *BaseApi) UpdateFail2banConf(c *gin.Context) {
 }
 
 // @Tags Fail2ban
+// @Summary Load fail2ban conf
+// @Description 获取 fail2ban 配置文件
+// @Accept json
+// @Success 200 string
+// @Security ApiKeyAuth
+// @Router /toolbox/fail2ban/load/conf [get]
+func (b *BaseApi) LoadFail2banConf(c *gin.Context) {
+	path := "/etc/fail2ban/jail.local"
+	file, err := os.ReadFile(path)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, string(file))
+}
+
+// @Tags Fail2ban
 // @Summary Update fail2ban conf by file
 // @Description 通过文件修改 fail2ban 配置
 // @Accept json

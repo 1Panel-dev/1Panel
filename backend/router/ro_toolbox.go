@@ -17,6 +17,7 @@ func (s *ToolboxRouter) InitToolboxRouter(Router *gin.RouterGroup) {
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		toolboxRouter.GET("/fail2ban/base", baseApi.LoadFail2banBaseInfo)
+		toolboxRouter.GET("/fail2ban/load/conf", baseApi.LoadFail2banConf)
 		toolboxRouter.POST("/fail2ban/search", baseApi.SearchFail2ban)
 		toolboxRouter.POST("/fail2ban/operate", baseApi.OperateFail2ban)
 		toolboxRouter.POST("/fail2ban/operate/sshd", baseApi.OperateSSHD)

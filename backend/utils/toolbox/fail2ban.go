@@ -26,6 +26,11 @@ func NewFail2ban() (*Fail2ban, error) {
 		if err := initLocalFile(); err != nil {
 			return nil, err
 		}
+		stdout, err := cmd.Exec("fail2ban-client reload")
+		if err != nil {
+			global.LOG.Errorf("reload fail2ban failed, err: %s", stdout)
+			return nil, err
+		}
 	}
 	return &Fail2ban{}, nil
 }
@@ -43,7 +48,7 @@ func (f *Fail2ban) Version() string {
 		global.LOG.Errorf("load the fail2ban version failed, err: %s", stdout)
 		return "-"
 	}
-	return strings.ReplaceAll(stdout, "\n ", "")
+	return strings.ReplaceAll(stdout, "\n", "")
 }
 
 func (f *Fail2ban) Operate(operate string) error {
@@ -96,7 +101,7 @@ func (f *Fail2ban) ListBanned() ([]string, error) {
 
 func (f *Fail2ban) ListIgnore() ([]string, error) {
 	var lists []string
-	stdout, err := cmd.Exec("fail2ban-client get sshd ignore ip")
+	stdout, err := cmd.Exec("fail2ban-client get sshd ignoreip")
 	if err != nil {
 		return lists, err
 	}
@@ -133,7 +138,7 @@ filter = sshd
 port = 22
 maxretry = 5
 findtime = 300
-bantime = 86400
+bantime = 600
 action = %(action_mwl)s
 logpath = /var/log/secure`
 	if err := os.WriteFile(defaultPath, []byte(initFile), 0640); err != nil {

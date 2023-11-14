@@ -5,12 +5,10 @@ type Fail2banBaseInfo struct {
 	IsActive bool   `json:"isActive"`
 	Version  string `json:"version"`
 
-	Port      int    `json:"port"`
 	MaxRetry  int    `json:"maxRetry"`
 	BanTime   string `json:"banTime"`
 	FindTime  string `json:"findTime"`
 	BanAction string `json:"banAction"`
-	LogPath   string `json:"logPath"`
 }
 
 type Fail2banSearch struct {
