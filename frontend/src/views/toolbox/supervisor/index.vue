@@ -1,6 +1,5 @@
 <template>
     <div>
-        <ToolRouter />
         <el-card v-if="showStopped" class="mask-prompt">
             <span>{{ $t('tool.supervisor.notStartWarn') }}</span>
         </el-card>
@@ -150,7 +149,6 @@
 </template>
 
 <script setup lang="ts">
-import ToolRouter from '@/views/host/tool/index.vue';
 import SuperVisorStatus from './status/index.vue';
 import { ref } from '@vue/runtime-core';
 import ConfigSuperVisor from './config/index.vue';

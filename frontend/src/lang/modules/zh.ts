@@ -831,6 +831,20 @@ const message = {
         keyPassword: '私钥密码',
         emptyTerminal: '暂无终端连接',
     },
+    toolbox: {
+        fail2ban: {
+            operation: '对 Fail2ban 服务进行 [{0}] 操作，是否继续？',
+            maxRetry: '最大重试次数',
+            banTime: '禁用时间',
+            banTimeHelper: '默认禁用时间为 10 分钟，禁用时间为 -1 则表示永久禁用',
+            findTime: '发现周期',
+            banAction: '禁用方式',
+            banActionOption: '通过 {0} 来禁用指定的 IP 地址',
+            allPorts: ' (所有端口)',
+            ignoreIP: 'IP 白名单',
+            bannedIP: 'IP 黑名单',
+        },
+    },
     logs: {
         panelLog: '面板日志',
         operation: '操作日志',
