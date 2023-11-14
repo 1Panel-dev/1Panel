@@ -40,19 +40,28 @@ func (w WebsiteAcmeAccountService) Create(create request.WebsiteAcmeAccountCreat
 		return response.WebsiteAcmeAccountDTO{}, buserr.New(constant.ErrEmailIsExist)
 	}
 
-	client, err := ssl.NewAcmeClient(create.Email, "")
+	if create.Type == "google" && (create.EabKid == "" || create.EabHmacKey == "") {
+		return response.WebsiteAcmeAccountDTO{}, buserr.New(constant.ErrEabKidOrEabHmacKeyCannotBlank)
+	} else {
+		create.EabKid = ""
+		create.EabHmacKey = ""
+	}
+
+	acmeAccount := &model.WebsiteAcmeAccount{
+		Email: create.Email,
+		Type:  create.Type,
+	}
+	client, err := ssl.NewAcmeClient(acmeAccount)
 	if err != nil {
 		return response.WebsiteAcmeAccountDTO{}, err
 	}
-	acmeAccount := model.WebsiteAcmeAccount{
-		Email:      create.Email,
-		URL:        client.User.Registration.URI,
-		PrivateKey: string(ssl.GetPrivateKey(client.User.GetPrivateKey())),
-	}
-	if err := websiteAcmeRepo.Create(acmeAccount); err != nil {
+	acmeAccount.PrivateKey = string(ssl.GetPrivateKey(client.User.GetPrivateKey()))
+	acmeAccount.URL = client.User.Registration.URI
+
+	if err := websiteAcmeRepo.Create(*acmeAccount); err != nil {
 		return response.WebsiteAcmeAccountDTO{}, err
 	}
-	return response.WebsiteAcmeAccountDTO{WebsiteAcmeAccount: acmeAccount}, nil
+	return response.WebsiteAcmeAccountDTO{WebsiteAcmeAccount: *acmeAccount}, nil
 }
 
 func (w WebsiteAcmeAccountService) Delete(id uint) error {

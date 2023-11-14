@@ -78,10 +78,11 @@ var (
 
 // ssl
 var (
-	ErrSSLCannotDelete     = "ErrSSLCannotDelete"
-	ErrAccountCannotDelete = "ErrAccountCannotDelete"
-	ErrSSLApply            = "ErrSSLApply"
-	ErrEmailIsExist        = "ErrEmailIsExist"
+	ErrSSLCannotDelete               = "ErrSSLCannotDelete"
+	ErrAccountCannotDelete           = "ErrAccountCannotDelete"
+	ErrSSLApply                      = "ErrSSLApply"
+	ErrEmailIsExist                  = "ErrEmailIsExist"
+	ErrEabKidOrEabHmacKeyCannotBlank = "ErrEabKidOrEabHmacKeyCannotBlank"
 )
 
 // file

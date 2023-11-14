@@ -12,6 +12,24 @@
                     <el-form-item :label="$t('website.email')" prop="email">
                         <el-input v-model.trim="account.email"></el-input>
                     </el-form-item>
+                    <el-form-item :label="$t('website.acmeAccountType')" prop="type">
+                        <el-select v-model="account.type">
+                            <el-option
+                                v-for="(acme, index) in AcmeAccountTypes"
+                                :key="index"
+                                :label="acme.label"
+                                :value="acme.value"
+                            ></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <div v-if="account.type == 'google'">
+                        <el-form-item label="EAB kid" prop="eabKid">
+                            <el-input v-model.trim="account.eabKid"></el-input>
+                        </el-form-item>
+                        <el-form-item label="EAB HmacKey" prop="eabHmacKey">
+                            <el-input v-model.trim="account.eabHmacKey"></el-input>
+                        </el-form-item>
+                    </div>
                 </el-form>
             </el-col>
         </el-row>
@@ -32,17 +50,26 @@ import { Rules } from '@/global/form-rules';
 import { CreateAcmeAccount } from '@/api/modules/website';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
+import { AcmeAccountTypes } from '@/global/mimetype';
 
-let open = ref();
-let loading = ref(false);
-let accountForm = ref<FormInstance>();
-let rules = ref({
+const open = ref();
+const loading = ref(false);
+const accountForm = ref<FormInstance>();
+const rules = ref({
     email: [Rules.requiredInput, Rules.email],
-});
-let account = ref({
-    email: '',
+    type: [Rules.requiredSelect],
+    eabKid: [Rules.requiredInput],
+    eabHmacKey: [Rules.requiredInput],
 });
 
+const initData = () => ({
+    email: '',
+    type: 'letsencrypt',
+    eabKid: '',
+    eabHmacKey: '',
+});
+
+const account = ref(initData());
 const em = defineEmits(['close']);
 
 const handleClose = () => {
@@ -53,9 +80,7 @@ const handleClose = () => {
 
 const resetForm = () => {
     accountForm.value.resetFields();
-    account.value = {
-        email: '',
-    };
+    account.value = initData();
 };
 
 const acceptParams = () => {

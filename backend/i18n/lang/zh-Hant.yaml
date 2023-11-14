@@ -91,6 +91,7 @@ ErrSSLKeyNotFound: '私鑰文件不存在'
 ErrSSLCertificateNotFound: '證書文件不存在'
 ErrSSLKeyFormat: '私鑰文件校驗錯誤'
 ErrSSLCertificateFormat: '證書文件格式錯誤，請使用 pem 格式'
+ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid 或 EabHmacKey 不能為空'
 
 #mysql
 ErrUserIsExist: "當前用戶已存在，請重新輸入"

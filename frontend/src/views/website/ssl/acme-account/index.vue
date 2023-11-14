@@ -3,12 +3,25 @@
         <template #header>
             <DrawerHeader :header="$t('website.acmeAccountManage')" :back="handleClose" />
         </template>
-        <el-alert :title="$t('ssl.acmeHelper')" type="info" :closable="false" style="margin-bottom: 5px" />
+        <div class="mb-1.5">
+            <el-alert :title="$t('ssl.acmeHelper')" type="info" :closable="false" />
+        </div>
         <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()" v-loading="loading">
             <template #toolbar>
                 <el-button type="primary" @click="openCreate">{{ $t('website.addAccount') }}</el-button>
             </template>
-            <el-table-column :label="$t('website.email')" fix show-overflow-tooltip prop="email"></el-table-column>
+            <el-table-column
+                :label="$t('website.email')"
+                fix
+                show-overflow-tooltip
+                prop="email"
+                min-width="100px"
+            ></el-table-column>
+            <el-table-column :label="$t('website.acmeAccountType')" fix show-overflow-tooltip prop="type">
+                <template #default="{ row }">
+                    {{ getAccountType(row.type) }}
+                </template>
+            </el-table-column>
             <el-table-column label="URL" show-overflow-tooltip prop="url" min-width="300px"></el-table-column>
             <fu-table-operations
                 :ellipsis="1"
@@ -32,11 +45,12 @@ import { DeleteAcmeAccount, SearchAcmeAccount } from '@/api/modules/website';
 import i18n from '@/lang';
 import { reactive, ref } from 'vue';
 import Create from './create/index.vue';
+import { AcmeAccountTypes } from '@/global/mimetype';
 
-let open = ref(false);
-let loading = ref(false);
-let data = ref();
-let createRef = ref();
+const open = ref(false);
+const loading = ref(false);
+const data = ref();
+const createRef = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'acme-account-page-size',
     currentPage: 1,
@@ -89,6 +103,14 @@ const deleteAccount = async (row: any) => {
         api: DeleteAcmeAccount,
         params: { id: row.id },
     });
+};
+
+const getAccountType = (type: string) => {
+    for (const i of AcmeAccountTypes) {
+        if (i.value === type) {
+            return i.label;
+        }
+    }
 };
 
 defineExpose({

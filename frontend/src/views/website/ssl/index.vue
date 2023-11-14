@@ -104,8 +104,8 @@ import { Website } from '@/api/interface/website';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
 import SSLUpload from './upload/index.vue';
-const globalStore = GlobalStore();
 
+const globalStore = GlobalStore();
 const paginationConfig = reactive({
     cacheSizeKey: 'ssl-page-size',
     currentPage: 1,

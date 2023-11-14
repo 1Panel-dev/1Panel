@@ -95,7 +95,7 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 	if err != nil {
 		return res, err
 	}
-	client, err := ssl.NewPrivateKeyClient(acmeAccount.Email, acmeAccount.PrivateKey)
+	client, err := ssl.NewAcmeClient(acmeAccount)
 	if err != nil {
 		return res, err
 	}
@@ -174,7 +174,7 @@ func (w WebsiteSSLService) Renew(sslId uint) error {
 		return err
 	}
 
-	client, err := ssl.NewPrivateKeyClient(acmeAccount.Email, acmeAccount.PrivateKey)
+	client, err := ssl.NewAcmeClient(acmeAccount)
 	if err != nil {
 		return err
 	}
@@ -242,7 +242,7 @@ func (w WebsiteSSLService) GetDNSResolve(req request.WebsiteDNSReq) ([]response.
 		return nil, err
 	}
 
-	client, err := ssl.NewPrivateKeyClient(acmeAccount.Email, acmeAccount.PrivateKey)
+	client, err := ssl.NewAcmeClient(acmeAccount)
 	if err != nil {
 		return nil, err
 	}

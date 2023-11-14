@@ -122,3 +122,10 @@ export const Units = [
     { label: i18n.global.t('commons.units.month'), value: 'M' },
     { label: i18n.global.t('commons.units.year'), value: 'y' },
 ];
+
+export const AcmeAccountTypes = [
+    { label: "Let's Encrypt", value: 'letsencrypt' },
+    { label: 'ZeroSSL', value: 'zerossl' },
+    { label: 'Buypass', value: 'buypass' },
+    { label: 'Google Cloud', value: 'google' },
+];
