@@ -92,7 +92,6 @@ const onSave = async (formEl: FormInstance | undefined) => {
                     loading.value = false;
                     drawerVisible.value = false;
                     emit('search');
-                    return;
                 })
                 .catch(() => {
                     loading.value = false;

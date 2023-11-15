@@ -1,7 +1,7 @@
 <template>
     <div v-loading="loading">
         <div class="app-status" style="margin-top: 20px">
-            <el-card>
+            <el-card v-if="form.isExist">
                 <div>
                     <el-tag effect="dark" type="success">Fail2Ban</el-tag>
                     <el-tag round class="status-content" v-if="form.isActive" type="success">
@@ -171,9 +171,8 @@ import BanAction from '@/views/toolbox/fail2ban/ban-action/index.vue';
 import IPs from '@/views/toolbox/fail2ban/ips/index.vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { getFail2banConf, operateFail2ban, updateFail2banByFile } from '@/api/modules/toolbox';
+import { getFail2banConf, getFail2banBase, operateFail2ban, updateFail2banByFile } from '@/api/modules/toolbox';
 import { ElMessageBox } from 'element-plus';
-import { getFail2banBase } from '@/api/modules/toolbox';
 import { transTimeUnit } from '@/utils/util';
 
 const loading = ref(false);

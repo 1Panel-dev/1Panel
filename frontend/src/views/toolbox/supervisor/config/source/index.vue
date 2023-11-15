@@ -59,5 +59,3 @@ onMounted(() => {
     getConfig();
 });
 </script>
-
-<style scoped></style>

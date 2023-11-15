@@ -53,10 +53,8 @@ function checkIPs(rule: any, value: any, callback: any) {
                 if (checkCidr(item)) {
                     return callback(new Error(i18n.global.t('firewall.addressFormatError')));
                 }
-            } else {
-                if (checkIpV4V6(item)) {
-                    return callback(new Error(i18n.global.t('firewall.addressFormatError')));
-                }
+            } else if (checkIpV4V6(item)) {
+                return callback(new Error(i18n.global.t('firewall.addressFormatError')));
             }
         }
     }
@@ -108,7 +106,6 @@ const onSave = async (formEl: FormInstance | undefined) => {
                     loading.value = false;
                     drawerVisible.value = false;
                     emit('search');
-                    return;
                 })
                 .catch(() => {
                     loading.value = false;
