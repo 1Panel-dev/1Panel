@@ -6,7 +6,7 @@
 
         <el-row>
             <el-col :span="22" :offset="1" v-loading="loading">
-                <FileRole :mode="mode" @get-mode="getMode"></FileRole>
+                <FileRole :mode="mode" @get-mode="getMode" :key="open.toString()"></FileRole>
                 <el-form ref="fileForm" label-position="left" :model="addForm" label-width="100px" :rules="rules">
                     <el-form-item :label="$t('commons.table.user')" prop="user">
                         <el-input v-model.trim="addForm.user" />
