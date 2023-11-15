@@ -131,10 +131,11 @@ func (c *AcmeClient) UseHTTP(path string) error {
 	return nil
 }
 
-func (c *AcmeClient) ObtainSSL(domains []string) (certificate.Resource, error) {
+func (c *AcmeClient) ObtainSSL(domains []string, privateKey crypto.PrivateKey) (certificate.Resource, error) {
 	request := certificate.ObtainRequest{
-		Domains: domains,
-		Bundle:  true,
+		Domains:    domains,
+		Bundle:     true,
+		PrivateKey: privateKey,
 	}
 
 	certificates, err := c.Client.Certificate.Obtain(request)
@@ -222,10 +223,10 @@ func (c *AcmeClient) GetDNSResolve(domains []string) (map[string]Resolve, error)
 			resolves[domain] = Resolve{Err: err.Error()}
 			continue
 		}
-		fqdn, value := dns01.GetRecord(domain, keyAuth)
+		challengeInfo := dns01.GetChallengeInfo(domain, keyAuth)
 		resolves[domain] = Resolve{
-			Key:   fqdn,
-			Value: value,
+			Key:   challengeInfo.FQDN,
+			Value: challengeInfo.Value,
 		}
 	}
 

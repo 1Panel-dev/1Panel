@@ -1,5 +1,5 @@
 <template>
-    <el-drawer :close-on-click-modal="false" v-model="open" :size="'50%'">
+    <el-drawer :close-on-click-modal="false" v-model="open" size="60%">
         <template #header>
             <DrawerHeader :header="$t('website.acmeAccountManage')" :back="handleClose" />
         </template>
@@ -20,6 +20,11 @@
             <el-table-column :label="$t('website.acmeAccountType')" fix show-overflow-tooltip prop="type">
                 <template #default="{ row }">
                     {{ getAccountType(row.type) }}
+                </template>
+            </el-table-column>
+            <el-table-column :label="$t('website.keyType')" fix show-overflow-tooltip prop="keyType">
+                <template #default="{ row }">
+                    {{ getKeyType(row.keyType) }}
                 </template>
             </el-table-column>
             <el-table-column label="URL" show-overflow-tooltip prop="url" min-width="300px"></el-table-column>
@@ -45,7 +50,7 @@ import { DeleteAcmeAccount, SearchAcmeAccount } from '@/api/modules/website';
 import i18n from '@/lang';
 import { reactive, ref } from 'vue';
 import Create from './create/index.vue';
-import { AcmeAccountTypes } from '@/global/mimetype';
+import { AcmeAccountTypes, KeyTypes } from '@/global/mimetype';
 
 const open = ref(false);
 const loading = ref(false);
@@ -113,6 +118,13 @@ const getAccountType = (type: string) => {
     }
 };
 
+const getKeyType = (type: string) => {
+    for (const i of KeyTypes) {
+        if (i.value === type) {
+            return i.label;
+        }
+    }
+};
 defineExpose({
     acceptParams,
 });

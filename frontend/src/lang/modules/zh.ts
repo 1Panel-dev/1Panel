@@ -1578,6 +1578,7 @@ const message = {
         openrestryHelper: 'OpenResty 默认 HTTP 端口：{0} HTTPS 端口 ：{1}，可能影响网站域名访问和 HTTPS 强制跳转',
         primaryDomainHelper: '支持域名:端口',
         acmeAccountType: '账号类型',
+        keyType: '密钥算法',
     },
     php: {
         short_open_tag: '短标签支持',

@@ -26,6 +26,16 @@
                             ></el-option>
                         </el-select>
                     </el-form-item>
+                    <el-form-item :label="$t('website.keyType')" prop="keyType">
+                        <el-select v-model="ssl.keyType">
+                            <el-option
+                                v-for="(keyType, index) in KeyTypes"
+                                :key="index"
+                                :label="keyType.label"
+                                :value="keyType.value"
+                            ></el-option>
+                        </el-select>
+                    </el-form-item>
                     <el-form-item :label="$t('website.provider')" prop="provider">
                         <el-radio-group v-model="ssl.provider" @change="changeProvider()">
                             <el-radio label="dnsAccount">{{ $t('website.dnsAccount') }}</el-radio>
@@ -82,6 +92,7 @@ import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
 import { computed, reactive, ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
+import { KeyTypes } from '@/global/mimetype';
 
 const props = defineProps({
     id: {
@@ -94,27 +105,29 @@ const id = computed(() => {
     return props.id;
 });
 
-let open = ref(false);
-let loading = ref(false);
-let dnsReq = reactive({
+const open = ref(false);
+const loading = ref(false);
+const dnsReq = reactive({
     page: 1,
     pageSize: 20,
 });
-let acmeReq = reactive({
+const acmeReq = reactive({
     page: 1,
     pageSize: 20,
 });
-let dnsAccounts = ref<Website.DnsAccount[]>();
-let acmeAccounts = ref<Website.AcmeAccount[]>();
-let sslForm = ref<FormInstance>();
-let rules = ref({
+const dnsAccounts = ref<Website.DnsAccount[]>();
+const acmeAccounts = ref<Website.AcmeAccount[]>();
+const sslForm = ref<FormInstance>();
+const rules = ref({
     primaryDomain: [Rules.requiredInput, Rules.domain],
     acmeAccountId: [Rules.requiredSelectBusiness],
     dnsAccountId: [Rules.requiredSelectBusiness],
     provider: [Rules.requiredInput],
     autoRenew: [Rules.requiredInput],
+    keyType: [Rules.requiredInput],
 });
-let ssl = ref({
+
+const initData = () => ({
     primaryDomain: '',
     otherDomains: '',
     provider: 'dnsAccount',
@@ -122,9 +135,12 @@ let ssl = ref({
     acmeAccountId: undefined,
     dnsAccountId: undefined,
     autoRenew: true,
+    keyType: 'P256',
 });
-let dnsResolve = ref<Website.DNSResolve[]>([]);
-let hasResolve = ref(false);
+
+const ssl = ref(initData());
+const dnsResolve = ref<Website.DNSResolve[]>([]);
+const hasResolve = ref(false);
 
 const em = defineEmits(['close']);
 const handleClose = () => {
@@ -135,15 +151,7 @@ const handleClose = () => {
 const resetForm = () => {
     sslForm.value?.resetFields();
     dnsResolve.value = [];
-    ssl.value = {
-        primaryDomain: '',
-        otherDomains: '',
-        provider: 'dnsAccount',
-        websiteId: 0,
-        acmeAccountId: undefined,
-        dnsAccountId: undefined,
-        autoRenew: true,
-    };
+    ssl.value = initData();
 };
 
 const acceptParams = () => {
