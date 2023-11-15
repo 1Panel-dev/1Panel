@@ -119,17 +119,16 @@ func (u *Fail2BanService) UpdateConf(req dto.Fail2BanUpdate) error {
 			hasKey = true
 			newFile += fmt.Sprintf("%s = %s\n", req.Key, req.Value)
 			continue
-		} else {
-			if strings.HasPrefix(line, "[") {
-				isEnd = true
-				if !hasKey {
-					newFile += fmt.Sprintf("%s = %s\n", req.Key, req.Value)
-				}
+		}
+		if strings.HasPrefix(line, "[") || index != len(lines)-1 {
+			isEnd = true
+			if !hasKey {
+				newFile += fmt.Sprintf("%s = %s\n", req.Key, req.Value)
 			}
-			newFile += line
-			if index != len(lines)-1 {
-				newFile += "\n"
-			}
+		}
+		newFile += line
+		if index != len(lines)-1 {
+			newFile += "\n"
 		}
 	}
 	file, err := os.OpenFile(defaultFail2BanPath, os.O_WRONLY|os.O_TRUNC, 0640)
