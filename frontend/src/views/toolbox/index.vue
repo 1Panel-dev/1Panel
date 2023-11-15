@@ -16,7 +16,7 @@ const buttons = [
         path: '/toolbox/supervisor',
     },
     {
-        label: 'Fail2ban',
+        label: 'Fail2Ban',
         path: '/toolbox/fail2ban',
     },
 ];

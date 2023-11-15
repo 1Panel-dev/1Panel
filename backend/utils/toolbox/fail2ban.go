@@ -1,6 +1,7 @@
 package toolbox
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -10,18 +11,18 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/systemctl"
 )
 
-type Fail2ban struct{}
+type Fail2Ban struct{}
 
 const defaultPath = "/etc/fail2ban/jail.local"
 
 type FirewallClient interface {
-	Status() (bool, bool, error)
+	Status() (bool, bool, bool, error)
 	Version() (string, error)
 	Operate(operate string) error
 	OperateSSHD(operate, ip string) error
 }
 
-func NewFail2ban() (*Fail2ban, error) {
+func NewFail2Ban() (*Fail2Ban, error) {
 	if _, err := os.Stat(defaultPath); err != nil {
 		if err := initLocalFile(); err != nil {
 			return nil, err
@@ -32,17 +33,18 @@ func NewFail2ban() (*Fail2ban, error) {
 			return nil, err
 		}
 	}
-	return &Fail2ban{}, nil
+	return &Fail2Ban{}, nil
 }
 
-func (f *Fail2ban) Status() (bool, bool) {
+func (f *Fail2Ban) Status() (bool, bool, bool) {
 	isEnable, _ := systemctl.IsEnable("fail2ban.service")
 	isActive, _ := systemctl.IsActive("fail2ban.service")
+	isExist, _ := systemctl.IsExist("fail2ban.service")
 
-	return isEnable, isActive
+	return isEnable, isActive, isExist
 }
 
-func (f *Fail2ban) Version() string {
+func (f *Fail2Ban) Version() string {
 	stdout, err := cmd.Exec("fail2ban-client version")
 	if err != nil {
 		global.LOG.Errorf("load the fail2ban version failed, err: %s", stdout)
@@ -51,7 +53,7 @@ func (f *Fail2ban) Version() string {
 	return strings.ReplaceAll(stdout, "\n", "")
 }
 
-func (f *Fail2ban) Operate(operate string) error {
+func (f *Fail2Ban) Operate(operate string) error {
 	switch operate {
 	case "start", "restart", "stop", "enable", "disable":
 		stdout, err := cmd.Execf("systemctl %s fail2ban.service", operate)
@@ -70,36 +72,38 @@ func (f *Fail2ban) Operate(operate string) error {
 	}
 }
 
-func (f *Fail2ban) OperateSSHD(operate, ip string) error {
-	switch operate {
-	case "banip", "unbanip":
-		stdout, err := cmd.Execf("fail2ban-client set sshd %s %s", operate, ip)
+func (f *Fail2Ban) ReBanIPs(ips []string) error {
+	ipItems, _ := f.ListBanned()
+	stdout, err := cmd.Execf("fail2ban-client unban --all")
+	if err != nil {
+		stdout1, err := cmd.Execf("fail2ban-client set sshd banip %s", strings.Join(ipItems, " "))
 		if err != nil {
-			return fmt.Errorf("%s the fail2ban.service failed, err: %s", operate, stdout)
+			global.LOG.Errorf("rebanip after fail2ban-client unban --all failed, err: %s", stdout1)
 		}
-		return nil
-	default:
-		return fmt.Errorf("not support such operation: %v", operate)
+		return fmt.Errorf("fail2ban-client unban --all failed, err: %s", stdout)
 	}
+	stdout1, err := cmd.Execf("fail2ban-client set sshd banip %s", strings.Join(ips, " "))
+	if err != nil {
+		return fmt.Errorf("handle `fail2ban-client set sshd banip %s` failed, err: %s", strings.Join(ips, " "), stdout1)
+	}
+	return nil
 }
 
-func (f *Fail2ban) ListBanned() ([]string, error) {
+func (f *Fail2Ban) ListBanned() ([]string, error) {
 	var lists []string
 	stdout, err := cmd.Exec("fail2ban-client get sshd banned")
 	if err != nil {
 		return lists, err
 	}
-	addrs := strings.Split(stdout, "'")
-	for _, addr := range addrs {
-		if len(addr) == 0 || addr == "[" || addr == "]" {
-			continue
-		}
-		lists = append(lists, addr)
+	stdout = strings.ReplaceAll(stdout, "\n", "")
+	stdout = strings.ReplaceAll(stdout, "'", "\"")
+	if err := json.Unmarshal([]byte(stdout), &lists); err != nil {
+		return lists, fmt.Errorf("handle json unmarshal (%s) failed, err: %v", stdout, err)
 	}
 	return lists, nil
 }
 
-func (f *Fail2ban) ListIgnore() ([]string, error) {
+func (f *Fail2Ban) ListIgnore() ([]string, error) {
 	var lists []string
 	stdout, err := cmd.Exec("fail2ban-client get sshd ignoreip")
 	if err != nil {
@@ -113,7 +117,7 @@ func (f *Fail2ban) ListIgnore() ([]string, error) {
 		if !strings.HasPrefix(addr, " ") {
 			continue
 		}
-		lists = append(lists, addr)
+		lists = append(lists, strings.ReplaceAll(addr, " ", ""))
 	}
 	return lists, nil
 }

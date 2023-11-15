@@ -60,10 +60,10 @@
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { updateSetting } from '@/api/modules/setting';
 import { FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import DrawerHeader from '@/components/drawer-header/index.vue';
+import { updateFail2ban } from '@/api/modules/toolbox';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -88,17 +88,27 @@ const onSave = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        await updateSetting({ key: 'banAction', value: form.banAction })
-            .then(async () => {
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                loading.value = false;
-                drawerVisible.value = false;
-                emit('search');
-                return;
-            })
-            .catch(() => {
-                loading.value = false;
-            });
+        ElMessageBox.confirm(
+            i18n.global.t('ssh.sshChangeHelper', [i18n.global.t('toolbox.fail2ban.banAction'), form.banAction]),
+            i18n.global.t('toolbox.fail2ban.fail2banChange'),
+            {
+                confirmButtonText: i18n.global.t('commons.button.confirm'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+                type: 'info',
+            },
+        ).then(async () => {
+            await updateFail2ban({ key: 'banaction', value: form.banAction })
+                .then(async () => {
+                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                    loading.value = false;
+                    drawerVisible.value = false;
+                    emit('search');
+                    return;
+                })
+                .catch(() => {
+                    loading.value = false;
+                });
+        });
     });
 };
 

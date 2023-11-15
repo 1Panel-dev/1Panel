@@ -16,12 +16,12 @@ func (s *ToolboxRouter) InitToolboxRouter(Router *gin.RouterGroup) {
 		Use(middleware.PasswordExpired())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
-		toolboxRouter.GET("/fail2ban/base", baseApi.LoadFail2banBaseInfo)
-		toolboxRouter.GET("/fail2ban/load/conf", baseApi.LoadFail2banConf)
-		toolboxRouter.POST("/fail2ban/search", baseApi.SearchFail2ban)
-		toolboxRouter.POST("/fail2ban/operate", baseApi.OperateFail2ban)
+		toolboxRouter.GET("/fail2ban/base", baseApi.LoadFail2BanBaseInfo)
+		toolboxRouter.GET("/fail2ban/load/conf", baseApi.LoadFail2BanConf)
+		toolboxRouter.POST("/fail2ban/search", baseApi.SearchFail2Ban)
+		toolboxRouter.POST("/fail2ban/operate", baseApi.OperateFail2Ban)
 		toolboxRouter.POST("/fail2ban/operate/sshd", baseApi.OperateSSHD)
-		toolboxRouter.POST("/fail2ban/update", baseApi.UpdateFail2banConf)
-		toolboxRouter.POST("/fail2ban/update/byconf", baseApi.UpdateFail2banConfByFile)
+		toolboxRouter.POST("/fail2ban/update", baseApi.UpdateFail2BanConf)
+		toolboxRouter.POST("/fail2ban/update/byconf", baseApi.UpdateFail2BanConfByFile)
 	}
 }

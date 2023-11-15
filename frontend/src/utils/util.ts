@@ -285,6 +285,43 @@ export function getProvider(provider: string): string {
     }
 }
 
+export function splitTime(item: string): any {
+    if (item.indexOf('s') !== -1) {
+        return { time: Number(item.replaceAll('s', '')), unit: 's' };
+    }
+    if (item.indexOf('m') !== -1) {
+        return { time: Number(item.replaceAll('m', '')), unit: 'm' };
+    }
+    if (item.indexOf('h') !== -1) {
+        return { time: Number(item.replaceAll('h', '')), unit: 'h' };
+    }
+    if (item.indexOf('d') !== -1) {
+        return { time: Number(item.replaceAll('d', '')), unit: 'd' };
+    }
+    if (item.indexOf('y') !== -1) {
+        return { time: Number(item.replaceAll('y', '')), unit: 'y' };
+    }
+    return { time: Number(item), unit: 's' };
+}
+export function transTimeUnit(val: string): any {
+    if (val.indexOf('s') !== -1) {
+        return val.replaceAll('s', i18n.global.t('commons.units.second'));
+    }
+    if (val.indexOf('m') !== -1) {
+        return val.replaceAll('m', i18n.global.t('commons.units.minute'));
+    }
+    if (val.indexOf('h') !== -1) {
+        return val.replaceAll('h', i18n.global.t('commons.units.hour'));
+    }
+    if (val.indexOf('d') !== -1) {
+        return val.replaceAll('d', i18n.global.t('commons.units.day'));
+    }
+    if (val.indexOf('y') !== -1) {
+        return val.replaceAll('y', i18n.global.t('commons.units.year'));
+    }
+    return val + i18n.global.t('commons.units.second');
+}
+
 export function getAge(d1: string): string {
     const dateBegin = new Date(d1);
     const dateEnd = new Date();

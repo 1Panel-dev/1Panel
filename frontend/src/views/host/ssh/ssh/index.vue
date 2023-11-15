@@ -38,7 +38,8 @@
                             {{ $t('ssh.autoStart') }}
                         </el-button>
                         <el-switch
-                            style="margin-left: 10px"
+                            size="small"
+                            class="ml-2"
                             inactive-value="disable"
                             active-value="enable"
                             @change="onOperate(autoStart)"

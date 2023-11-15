@@ -1,8 +1,9 @@
 package dto
 
-type Fail2banBaseInfo struct {
+type Fail2BanBaseInfo struct {
 	IsEnable bool   `json:"isEnable"`
 	IsActive bool   `json:"isActive"`
+	IsExist  bool   `json:"isExist"`
 	Version  string `json:"version"`
 
 	MaxRetry  int    `json:"maxRetry"`
@@ -11,17 +12,16 @@ type Fail2banBaseInfo struct {
 	BanAction string `json:"banAction"`
 }
 
-type Fail2banSearch struct {
-	PageInfo
+type Fail2BanSearch struct {
 	Status string `json:"status" validate:"required,oneof=banned ignore"`
 }
 
-type Fail2banUpdate struct {
-	Key   string `json:"key" validate:"required,oneof=port banTime findTime maxRetry banAction action logPath"`
+type Fail2BanUpdate struct {
+	Key   string `json:"key" validate:"required,oneof=port bantime findtime maxretry banaction"`
 	Value string `json:"value"`
 }
 
-type Fail2banSet struct {
+type Fail2BanSet struct {
 	IPs     []string `json:"ips"`
-	Operate string   `json:"status"  validate:"required,oneof=banned unbanned ignore"`
+	Operate string   `json:"operate"  validate:"required,oneof=banned ignore"`
 }

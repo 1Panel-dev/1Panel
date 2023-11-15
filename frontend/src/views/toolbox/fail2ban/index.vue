@@ -3,23 +3,13 @@
         <div class="app-status" style="margin-top: 20px">
             <el-card>
                 <div>
-                    <el-tag style="float: left" effect="dark" type="success">Fail2ban</el-tag>
+                    <el-tag effect="dark" type="success">Fail2Ban</el-tag>
                     <el-tag round class="status-content" v-if="form.isActive" type="success">
                         {{ $t('commons.status.running') }}
                     </el-tag>
-                    <el-popover
-                        v-if="!form.isActive"
-                        placement="top-start"
-                        trigger="hover"
-                        width="450"
-                        :content="form.version"
-                    >
-                        <template #reference>
-                            <el-tag round class="status-content" v-if="!form.isActive" type="info">
-                                {{ $t('commons.status.stopped') }}
-                            </el-tag>
-                        </template>
-                    </el-popover>
+                    <el-tag round class="status-content" v-if="!form.isActive" type="info">
+                        {{ $t('commons.status.stopped') }}
+                    </el-tag>
                     <el-tag class="status-content">{{ form.version }}</el-tag>
                     <span class="buttons">
                         <el-button v-if="form.isActive" type="primary" @click="onOperate('stop')" link>
@@ -37,7 +27,8 @@
                             {{ $t('ssh.autoStart') }}
                         </el-button>
                         <el-switch
-                            style="margin-left: 10px"
+                            size="small"
+                            class="ml-2"
                             inactive-value="disable"
                             active-value="enable"
                             @change="onOperate(autoStart)"
@@ -48,89 +39,113 @@
             </el-card>
         </div>
 
-        <LayoutContent style="margin-top: 20px" :title="$t('menu.config')" :divider="true">
-            <template #toolbar>
-                <el-row>
-                    <el-col :span="16">
-                        <el-button type="primary" plain @click="onLoadList('ignore')">
-                            {{ $t('toolbox.fail2ban.ignoreIP') }}
-                        </el-button>
-                        <el-button type="primary" plain @click="onLoadList('banned')">
-                            {{ $t('toolbox.fail2ban.bannedIP') }}
-                        </el-button>
-                    </el-col>
-                </el-row>
-            </template>
-            <template #main>
-                <el-radio-group v-model="confShowType" @change="changeMode">
-                    <el-radio-button label="base">{{ $t('database.baseConf') }}</el-radio-button>
-                    <el-radio-button label="all">{{ $t('database.allConf') }}</el-radio-button>
-                </el-radio-group>
-                <el-row style="margin-top: 20px" v-if="confShowType === 'base'">
-                    <el-col :span="1"><br /></el-col>
-                    <el-col :xs="24" :sm="20" :md="20" :lg="10" :xl="10">
-                        <el-form :model="form" label-position="left" ref="formRef" label-width="120px">
-                            <el-form-item :label="$t('toolbox.fail2ban.maxRetry')" prop="maxRetry">
-                                <el-input disabled v-model="form.maxRetry">
-                                    <template #append>
-                                        <el-button @click="onChangeMaxRetry" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-                            <el-form-item :label="$t('toolbox.fail2ban.banTime')" prop="banTime">
-                                <el-input disabled v-model="form.banTime">
-                                    <template #append>
-                                        <el-button @click="onChangeBanTime" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                                <span class="input-help">{{ $t('toolbox.fail2ban.banTimeHelper') }}</span>
-                            </el-form-item>
-                            <el-form-item :label="$t('toolbox.fail2ban.findTime')" prop="findTime">
-                                <el-input disabled v-model="form.findTime">
-                                    <template #append>
-                                        <el-button @click="onChangeFindTime" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-                            <el-form-item :label="$t('toolbox.fail2ban.banAction')" prop="banAction">
-                                <el-input disabled v-model="form.banAction">
-                                    <template #append>
-                                        <el-button @click="onChangeBanAction" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-                        </el-form>
-                    </el-col>
-                </el-row>
+        <div v-if="form.isExist">
+            <LayoutContent style="margin-top: 20px" :title="$t('menu.config')" :divider="true">
+                <template #toolbar>
+                    <el-row>
+                        <el-col :span="16">
+                            <el-button type="primary" plain @click="onLoadList('ignore')">
+                                {{ $t('toolbox.fail2ban.ignoreIP') }}
+                            </el-button>
+                            <el-button type="primary" plain @click="onLoadList('banned')">
+                                {{ $t('toolbox.fail2ban.bannedIP') }}
+                            </el-button>
+                        </el-col>
+                    </el-row>
+                </template>
+                <template #main>
+                    <el-radio-group v-model="confShowType" @change="changeMode">
+                        <el-radio-button label="base">{{ $t('database.baseConf') }}</el-radio-button>
+                        <el-radio-button label="all">{{ $t('database.allConf') }}</el-radio-button>
+                    </el-radio-group>
+                    <el-row style="margin-top: 20px" v-if="confShowType === 'base'">
+                        <el-col :span="1"><br /></el-col>
+                        <el-col :xs="24" :sm="20" :md="20" :lg="10" :xl="10">
+                            <el-form :model="form" label-position="left" ref="formRef" label-width="120px">
+                                <el-form-item :label="$t('toolbox.fail2ban.maxRetry')" prop="maxRetry">
+                                    <el-input disabled v-model="form.maxRetry">
+                                        <template #append>
+                                            <el-button @click="onChangeMaxRetry" icon="Setting">
+                                                {{ $t('commons.button.set') }}
+                                            </el-button>
+                                        </template>
+                                    </el-input>
+                                </el-form-item>
+                                <el-form-item :label="$t('toolbox.fail2ban.banTime')" prop="banTime">
+                                    <el-input disabled v-model="form.banTimeItem">
+                                        <template #append>
+                                            <el-button @click="onChangeBanTime" icon="Setting">
+                                                {{ $t('commons.button.set') }}
+                                            </el-button>
+                                        </template>
+                                    </el-input>
+                                    <span class="input-help">{{ $t('toolbox.fail2ban.banTimeHelper') }}</span>
+                                </el-form-item>
+                                <el-form-item :label="$t('toolbox.fail2ban.findTime')" prop="findTime">
+                                    <el-input disabled v-model="form.findTimeItem">
+                                        <template #append>
+                                            <el-button @click="onChangeFindTime" icon="Setting">
+                                                {{ $t('commons.button.set') }}
+                                            </el-button>
+                                        </template>
+                                    </el-input>
+                                </el-form-item>
+                                <el-form-item :label="$t('toolbox.fail2ban.banAction')" prop="banAction">
+                                    <el-input disabled v-model="form.banAction">
+                                        <template #append>
+                                            <el-button @click="onChangeBanAction" icon="Setting">
+                                                {{ $t('commons.button.set') }}
+                                            </el-button>
+                                        </template>
+                                    </el-input>
+                                </el-form-item>
+                            </el-form>
+                        </el-col>
+                    </el-row>
 
-                <div v-if="confShowType === 'all'">
-                    <codemirror
-                        :autofocus="true"
-                        placeholder="# The Fail2ban configuration file does not exist or is empty (/etc/ssh/sshd_config)"
-                        :indent-with-tab="true"
-                        :tabSize="4"
-                        style="margin-top: 10px; height: calc(100vh - 330px)"
-                        :lineWrapping="true"
-                        :matchBrackets="true"
-                        theme="cobalt"
-                        :styleActiveLine="true"
-                        :extensions="extensions"
-                        v-model="sshConf"
-                    />
-                    <el-button :disabled="loading" type="primary" @click="onSaveFile" style="margin-top: 5px">
-                        {{ $t('commons.button.save') }}
-                    </el-button>
-                </div>
-            </template>
-        </LayoutContent>
+                    <div v-if="confShowType === 'all'">
+                        <codemirror
+                            :autofocus="true"
+                            placeholder="# The Fail2Ban configuration file does not exist or is empty (/etc/ssh/sshd_config)"
+                            :indent-with-tab="true"
+                            :tabSize="4"
+                            style="margin-top: 10px; height: calc(100vh - 460px)"
+                            :lineWrapping="true"
+                            :matchBrackets="true"
+                            theme="cobalt"
+                            :styleActiveLine="true"
+                            :extensions="extensions"
+                            v-model="fail2banConf"
+                        />
+                        <el-button :disabled="loading" type="primary" @click="onSaveFile" style="margin-top: 5px">
+                            {{ $t('commons.button.save') }}
+                        </el-button>
+                    </div>
+                </template>
+            </LayoutContent>
+        </div>
+        <div v-else>
+            <LayoutContent title="Fail2Ban" :divider="true">
+                <template #main>
+                    <div class="app-warn">
+                        <div>
+                            <span>{{ $t('toolbox.fail2ban.noFail2ban') }}</span>
+                            <el-link
+                                style="font-size: 12px; margin-left: 5px"
+                                @click="toDoc"
+                                icon="Position"
+                                type="primary"
+                            >
+                                {{ $t('firewall.quickJump') }}
+                            </el-link>
+                            <div>
+                                <img src="@/assets/images/no_app.svg" />
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </LayoutContent>
+        </div>
 
         <MaxRetry ref="maxRetryRef" @search="search" />
         <BanTime ref="banTimeRef" @search="search" />
@@ -156,6 +171,7 @@ import { MsgSuccess } from '@/utils/message';
 import { getFail2banConf, operateFail2ban, updateFail2banByFile } from '@/api/modules/toolbox';
 import { ElMessageBox } from 'element-plus';
 import { getFail2banBase } from '@/api/modules/toolbox';
+import { transTimeUnit } from '@/utils/util';
 
 const loading = ref(false);
 const formRef = ref();
@@ -170,32 +186,39 @@ const listRef = ref();
 
 const autoStart = ref('enable');
 
-const sshConf = ref();
+const fail2banConf = ref();
 const form = reactive({
     isEnable: false,
     isActive: false,
+    isExist: false,
     version: '-',
 
     port: 22,
     maxRetry: 5,
     banTime: '',
+    banTimeItem: '',
     findTime: '',
+    findTimeItem: '',
     banAction: '',
     logPath: '',
 });
 
 const onLoadList = async (type: string) => {
-    listRef.value.acceptParams({ ipType: type });
+    listRef.value.acceptParams({ operate: type });
+};
+
+const toDoc = () => {
+    window.open('https://1panel.cn/docs/user_manual/toolbox/fail2ban/', '_blank');
 };
 
 const onSaveFile = async () => {
-    ElMessageBox.confirm(i18n.global.t('ssh.sshFileChangeHelper'), i18n.global.t('ssh.sshChange'), {
+    ElMessageBox.confirm(i18n.global.t('ssh.sshFileChangeHelper'), i18n.global.t('toolbox.fail2ban.fail2banChange'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
     }).then(async () => {
         loading.value = true;
-        await updateFail2banByFile(sshConf.value)
+        await updateFail2banByFile({ file: fail2banConf.value })
             .then(() => {
                 loading.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -220,7 +243,7 @@ const onChangeBanAction = () => {
 
 const onOperate = async (operation: string) => {
     let msg = operation === 'enable' || operation === 'disable' ? 'ssh.' : 'commons.button.';
-    ElMessageBox.confirm(i18n.global.t('ssh.sshOperate', [i18n.global.t(msg + operation)]), 'SSH', {
+    ElMessageBox.confirm(i18n.global.t('toolbox.fail2ban.operation', [i18n.global.t(msg + operation)]), 'Fail2Ban', {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
@@ -245,7 +268,7 @@ const onOperate = async (operation: string) => {
 
 const loadSSHConf = async () => {
     const res = await getFail2banConf();
-    sshConf.value = res.data || '';
+    fail2banConf.value = res.data || '';
 };
 
 const changeMode = async () => {
@@ -260,12 +283,16 @@ const search = async () => {
     const res = await getFail2banBase();
     form.isEnable = res.data.isEnable;
     form.isActive = res.data.isActive;
+    form.isExist = res.data.isExist;
+    autoStart.value = form.isEnable ? 'enable' : 'disable';
     form.version = res.data.version;
 
     form.port = res.data.port;
     form.maxRetry = res.data.maxRetry;
     form.banTime = res.data.banTime;
+    form.banTimeItem = transTimeUnit(form.banTime);
     form.findTime = res.data.findTime;
+    form.findTimeItem = transTimeUnit(form.findTime);
     form.banAction = res.data.banAction;
     form.logPath = res.data.logPath;
 };

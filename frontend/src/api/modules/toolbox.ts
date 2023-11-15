@@ -1,5 +1,5 @@
 import http from '@/api';
-import { ResPage, UpdateByFile } from '../interface';
+import { UpdateByFile } from '../interface';
 import { Toolbox } from '../interface/toolbox';
 
 // fail2ban
@@ -11,7 +11,7 @@ export const getFail2banConf = () => {
 };
 
 export const searchFail2ban = (param: Toolbox.Fail2banSearch) => {
-    return http.post<ResPage<string>>(`/toolbox/fail2ban/search`, param);
+    return http.post<Array<string>>(`/toolbox/fail2ban/search`, param);
 };
 
 export const operateFail2ban = (operate: string) => {

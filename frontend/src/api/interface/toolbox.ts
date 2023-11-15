@@ -1,9 +1,8 @@
-import { ReqPage } from '.';
-
 export namespace Toolbox {
     export interface Fail2banBaseInfo {
         isEnable: boolean;
         isActive: boolean;
+        isExist: boolean;
         version: string;
 
         port: number;
@@ -14,7 +13,7 @@ export namespace Toolbox {
         logPath: string;
     }
 
-    export interface Fail2banSearch extends ReqPage {
+    export interface Fail2banSearch {
         status: string;
     }
 

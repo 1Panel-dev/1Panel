@@ -10093,17 +10093,39 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "获取 Fail2ban 基础信息",
+                "description": "获取 Fail2Ban 基础信息",
                 "tags": [
-                    "Fail2ban"
+                    "Fail2Ban"
                 ],
                 "summary": "Load fail2ban base info",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.Fail2banBaseInfo"
+                            "$ref": "#/definitions/dto.Fail2BanBaseInfo"
                         }
+                    }
+                }
+            }
+        },
+        "/toolbox/fail2ban/load/conf": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取 fail2ban 配置文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Fail2Ban"
+                ],
+                "summary": "Load fail2ban conf",
+                "responses": {
+                    "200": {
+                        "description": "OK"
                     }
                 }
             }
@@ -10115,12 +10137,12 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "修改 Fail2ban 状态",
+                "description": "修改 Fail2Ban 状态",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
-                    "Fail2ban"
+                    "Fail2Ban"
                 ],
                 "summary": "Operate fail2ban",
                 "parameters": [
@@ -10140,8 +10162,8 @@ const docTemplate = `{
                     "bodyKeys": [
                         "operation"
                     ],
-                    "formatEN": "[operation] Fail2ban",
-                    "formatZH": "[operation] Fail2ban",
+                    "formatEN": "[operation] Fail2Ban",
+                    "formatZH": "[operation] Fail2Ban",
                     "paramKeys": []
                 }
             }
@@ -10158,7 +10180,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Fail2ban"
+                    "Fail2Ban"
                 ],
                 "summary": "Operate sshd of fail2ban",
                 "parameters": [
@@ -10172,17 +10194,7 @@ const docTemplate = `{
                         }
                     }
                 ],
-                "responses": {},
-                "x-panel-log": {
-                    "BeforeFunctions": [],
-                    "bodyKeys": [
-                        "operate",
-                        "ips"
-                    ],
-                    "formatEN": "[operate] ips: [ips]",
-                    "formatZH": "[operate] ips: [ips]",
-                    "paramKeys": []
-                }
+                "responses": {}
             }
         },
         "/toolbox/fail2ban/search": {
@@ -10192,12 +10204,12 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "获取 Fail2ban ip 列表",
+                "description": "获取 Fail2Ban ip",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
-                    "Fail2ban"
+                    "Fail2Ban"
                 ],
                 "summary": "Page fail2ban ip list",
                 "parameters": [
@@ -10207,7 +10219,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.Fail2banSearch"
+                            "$ref": "#/definitions/dto.Fail2BanSearch"
                         }
                     }
                 ],
@@ -10215,7 +10227,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.PageResult"
+                            "type": "Array"
                         }
                     }
                 }
@@ -10228,12 +10240,12 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "修改 Fail2ban 配置",
+                "description": "修改 Fail2Ban 配置",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
-                    "Fail2ban"
+                    "Fail2Ban"
                 ],
                 "summary": "Update fail2ban conf",
                 "parameters": [
@@ -10243,7 +10255,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.Fail2banUpdate"
+                            "$ref": "#/definitions/dto.Fail2BanUpdate"
                         }
                     }
                 ],
@@ -10259,7 +10271,7 @@ const docTemplate = `{
                         "value"
                     ],
                     "formatEN": "update fail2ban conf [key] =\u003e [value]",
-                    "formatZH": "修改 Fail2ban 配置 [key] =\u003e [value]",
+                    "formatZH": "修改 Fail2Ban 配置 [key] =\u003e [value]",
                     "paramKeys": []
                 }
             }
@@ -10276,7 +10288,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Fail2ban"
+                    "Fail2Ban"
                 ],
                 "summary": "Update fail2ban conf by file",
                 "parameters": [
@@ -14210,7 +14222,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.Fail2banBaseInfo": {
+        "dto.Fail2BanBaseInfo": {
             "type": "object",
             "properties": {
                 "banAction": {
@@ -14228,13 +14240,10 @@ const docTemplate = `{
                 "isEnable": {
                     "type": "boolean"
                 },
-                "logPath": {
-                    "type": "string"
+                "isExist": {
+                    "type": "boolean"
                 },
                 "maxRetry": {
-                    "type": "integer"
-                },
-                "port": {
                     "type": "integer"
                 },
                 "version": {
@@ -14242,20 +14251,12 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.Fail2banSearch": {
+        "dto.Fail2BanSearch": {
             "type": "object",
             "required": [
-                "page",
-                "pageSize",
                 "status"
             ],
             "properties": {
-                "page": {
-                    "type": "integer"
-                },
-                "pageSize": {
-                    "type": "integer"
-                },
                 "status": {
                     "type": "string",
                     "enum": [
@@ -14265,7 +14266,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.Fail2banUpdate": {
+        "dto.Fail2BanUpdate": {
             "type": "object",
             "required": [
                 "key"
@@ -14275,12 +14276,10 @@ const docTemplate = `{
                     "type": "string",
                     "enum": [
                         "port",
-                        "banTime",
-                        "findTime",
-                        "maxRetry",
-                        "banAction",
-                        "action",
-                        "logPath"
+                        "bantime",
+                        "findtime",
+                        "maxretry",
+                        "banaction"
                     ]
                 },
                 "value": {

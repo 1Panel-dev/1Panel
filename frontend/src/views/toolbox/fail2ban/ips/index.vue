@@ -1,130 +1,124 @@
 <template>
-    <el-drawer :close-on-click-modal="false" v-model="open" size="30%" :before-close="handleClose">
+    <el-drawer :close-on-click-modal="false" v-model="drawerVisible" size="30%">
         <template #header>
-            <Header :header="$t('toolbox.fail2ban.bannedIP')" :back="handleClose"></Header>
+            <Header :header="$t('toolbox.fail2ban.' + form.operate + 'IP')" :back="handleClose"></Header>
         </template>
 
-        <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search()">
-            <template #toolbar>
-                <el-button type="primary" @click="onAdd">{{ $t('commons.button.add') }}</el-button>
-            </template>
-            <el-table-column :label="$t('commons.table.name')" prop="name">
-                <template #default="{ row }">
-                    <div v-if="!row.edit">
-                        <span>{{ row.name }}</span>
-                    </div>
-                    <el-form @submit.prevent ref="formRef" v-if="row.edit" :model="row">
-                        <el-form-item prop="name" v-if="row.edit" :rules="Rules.name">
-                            <div style="margin-top: 20px; width: 100%"><el-input v-model="row.name" /></div>
-                        </el-form-item>
-                    </el-form>
-                </template>
-            </el-table-column>
-            <el-table-column :label="$t('commons.table.operate')">
-                <template #default="{ row, $index }">
-                    <div>
-                        <el-button link v-if="!row.edit" type="primary" @click="onEdit($index)">
-                            {{ $t('commons.button.edit') }}
-                        </el-button>
-                        <el-button
-                            link
-                            v-if="!row.edit"
-                            :disabled="row.isDefault"
-                            type="primary"
-                            @click="onDelete($index)"
-                        >
-                            {{ $t('commons.button.delete') }}
-                        </el-button>
-                        <el-button link v-if="row.edit" type="primary" @click="search">
-                            {{ $t('commons.button.cancel') }}
-                        </el-button>
-                    </div>
-                </template>
-            </el-table-column>
-        </ComplexTable>
+        <el-form ref="formRef" label-position="top" :model="form" @submit.prevent :rules="rules" v-loading="loading">
+            <el-row type="flex" justify="center">
+                <el-col :span="22">
+                    <el-form-item :label="$t('toolbox.fail2ban.' + form.operate + 'IP')" prop="ips">
+                        <el-input :autosize="{ minRows: 2 }" type="textarea" clearable v-model="form.ips" />
+                    </el-form-item>
+                </el-col>
+            </el-row>
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
+                    {{ $t('commons.button.confirm') }}
+                </el-button>
+            </span>
+        </template>
     </el-drawer>
 </template>
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { searchFail2ban } from '@/api/modules/toolbox';
+import { operatorFail2banSSHD, searchFail2ban } from '@/api/modules/toolbox';
 import Header from '@/components/drawer-header/index.vue';
-import { Rules } from '@/global/form-rules';
 import { FormInstance } from 'element-plus';
+import { MsgSuccess } from '@/utils/message';
+import i18n from '@/lang';
+import { checkCidr, checkIpV4V6 } from '@/utils/util';
 
-const open = ref(false);
-const ipType = ref();
-const data = ref([]);
-const handleClose = () => {
-    open.value = false;
-    data.value = [];
-};
+const emit = defineEmits<{ (e: 'search'): void }>();
 
-const paginationConfig = reactive({
-    currentPage: 1,
-    pageSize: 10,
-    total: 0,
+const drawerVisible = ref(false);
+const loading = ref();
+
+const form = reactive({
+    operate: 'ignore',
+    ips: '',
 });
 
+const rules = reactive({
+    ips: [{ validator: checkIPs, trigger: 'blur' }],
+});
+function checkIPs(rule: any, value: any, callback: any) {
+    if (form.ips !== '') {
+        let addr = form.ips.split('\n');
+        for (const item of addr) {
+            if (item.indexOf('/') !== -1) {
+                if (checkCidr(item)) {
+                    return callback(new Error(i18n.global.t('firewall.addressFormatError')));
+                }
+            } else {
+                if (checkIpV4V6(item)) {
+                    return callback(new Error(i18n.global.t('firewall.addressFormatError')));
+                }
+            }
+        }
+    }
+    callback();
+}
+
 interface DialogProps {
-    ipType: string;
+    operate: string;
 }
 const formRef = ref<FormInstance>();
 const acceptParams = (params: DialogProps): void => {
-    ipType.value = params.ipType;
-    open.value = true;
+    form.operate = params.operate;
+    form.ips = '';
+    drawerVisible.value = true;
     search();
 };
 
 const search = () => {
     let params = {
-        status: ipType.value,
-        page: paginationConfig.currentPage,
-        pageSize: paginationConfig.pageSize,
+        status: form.operate,
     };
     searchFail2ban(params).then((res) => {
-        let dataItem = res.data.items || [];
-        paginationConfig.total = res.data.total;
-        data.value = [];
-        for (const item of dataItem) {
-            data.value.push({ name: item });
-        }
+        let dataItem = res.data || [];
+        form.ips = dataItem.join('\n');
     });
 };
 
-const onAdd = () => {
-    for (const d of data.value) {
-        if (d.name == '') {
-            return;
-        }
-        if (d.edit) {
-            d.edit = false;
-        }
-    }
-    const g = {
-        id: 0,
-        name: '',
-        isDefault: false,
-        edit: true,
-    };
-    data.value.unshift(g);
+const onSave = async (formEl: FormInstance | undefined) => {
+    if (!formEl) return;
+    formEl.validate(async (valid) => {
+        if (!valid) return;
+        ElMessageBox.confirm(
+            i18n.global.t('toolbox.fail2ban.' + form.operate + 'Helper'),
+            i18n.global.t('commons.button.set'),
+            {
+                confirmButtonText: i18n.global.t('commons.button.confirm'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+                type: 'info',
+            },
+        ).then(async () => {
+            let param = {
+                operate: form.operate,
+                ips: form.ips.split('\n'),
+            };
+            loading.value = true;
+            await operatorFail2banSSHD(param)
+                .then(async () => {
+                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                    loading.value = false;
+                    drawerVisible.value = false;
+                    emit('search');
+                    return;
+                })
+                .catch(() => {
+                    loading.value = false;
+                });
+        });
+    });
 };
 
-const onDelete = (index: number) => {
-    data.value.splice(index, 1);
+const handleClose = () => {
+    drawerVisible.value = false;
 };
-
-const onEdit = (index: number) => {
-    for (const i in data.value) {
-        const d = data.value[i];
-        if (d.name == '') {
-            data.value.splice(Number(i), 1);
-        }
-        if (d.edit) {
-            d.edit = false;
-        }
-    }
-    data.value[index].edit = true;
-};
-
 defineExpose({ acceptParams });
 </script>

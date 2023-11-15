@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"strconv"
@@ -10,33 +11,34 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/toolbox"
 )
 
-const defaultFail2banPath = "/etc/fail2ban/jail.local"
+const defaultFail2BanPath = "/etc/fail2ban/jail.local"
 
-type Fail2banService struct{}
+type Fail2BanService struct{}
 
-type IFail2banService interface {
-	LoadBaseInfo() (dto.Fail2banBaseInfo, error)
-	SearchWithPage(search dto.Fail2banSearch) (int64, interface{}, error)
+type IFail2BanService interface {
+	LoadBaseInfo() (dto.Fail2BanBaseInfo, error)
+	Search(search dto.Fail2BanSearch) ([]string, error)
 	Operate(operation string) error
-	OperateSSHD(req dto.Fail2banSet) error
-	UpdateConf(req dto.Fail2banUpdate) error
+	OperateSSHD(req dto.Fail2BanSet) error
+	UpdateConf(req dto.Fail2BanUpdate) error
+	UpdateConfByFile(req dto.UpdateByFile) error
 }
 
-func NewIFail2banService() IFail2banService {
-	return &Fail2banService{}
+func NewIFail2BanService() IFail2BanService {
+	return &Fail2BanService{}
 }
 
-func (u *Fail2banService) LoadBaseInfo() (dto.Fail2banBaseInfo, error) {
-	var baseInfo dto.Fail2banBaseInfo
-	client, err := toolbox.NewFail2ban()
+func (u *Fail2BanService) LoadBaseInfo() (dto.Fail2BanBaseInfo, error) {
+	var baseInfo dto.Fail2BanBaseInfo
+	client, err := toolbox.NewFail2Ban()
 	if err != nil {
 		return baseInfo, err
 	}
-	baseInfo.IsActive, baseInfo.IsEnable = client.Status()
+	baseInfo.IsEnable, baseInfo.IsActive, baseInfo.IsExist = client.Status()
 	baseInfo.Version = client.Version()
-	conf, err := os.ReadFile(defaultFail2banPath)
+	conf, err := os.ReadFile(defaultFail2BanPath)
 	if err != nil {
-		return baseInfo, fmt.Errorf("read fail2ban conf of %s failed, err: %v", defaultFail2banPath, err)
+		return baseInfo, fmt.Errorf("read fail2ban conf of %s failed, err: %v", defaultFail2BanPath, err)
 	}
 	lines := strings.Split(string(conf), "\n")
 
@@ -63,15 +65,11 @@ func (u *Fail2banService) LoadBaseInfo() (dto.Fail2banBaseInfo, error) {
 	return baseInfo, nil
 }
 
-func (u *Fail2banService) SearchWithPage(req dto.Fail2banSearch) (int64, interface{}, error) {
-	var (
-		list      []string
-		backDatas []string
-		err       error
-	)
-	client, err := toolbox.NewFail2ban()
+func (u *Fail2BanService) Search(req dto.Fail2BanSearch) ([]string, error) {
+	var list []string
+	client, err := toolbox.NewFail2Ban()
 	if err != nil {
-		return 0, nil, err
+		return nil, err
 	}
 	if req.Status == "banned" {
 		list, err = client.ListBanned()
@@ -80,82 +78,113 @@ func (u *Fail2banService) SearchWithPage(req dto.Fail2banSearch) (int64, interfa
 		list, err = client.ListIgnore()
 	}
 	if err != nil {
-		return 0, nil, err
+		return nil, err
 	}
 
-	total, start, end := len(list), (req.Page-1)*req.PageSize, req.Page*req.PageSize
-	if start > total {
-		backDatas = make([]string, 0)
-	} else {
-		if end >= total {
-			end = total
-		}
-		backDatas = list[start:end]
-	}
-	return int64(total), backDatas, nil
+	return list, nil
 }
 
-func (u *Fail2banService) Operate(operation string) error {
-	client, err := toolbox.NewFail2ban()
+func (u *Fail2BanService) Operate(operation string) error {
+	client, err := toolbox.NewFail2Ban()
 	if err != nil {
 		return err
 	}
 	return client.Operate(operation)
 }
 
-func (u *Fail2banService) UpdateConf(req dto.Fail2banUpdate) error {
-	conf, err := os.ReadFile(defaultFail2banPath)
+func (u *Fail2BanService) UpdateConf(req dto.Fail2BanUpdate) error {
+	conf, err := os.ReadFile(defaultFail2BanPath)
 	if err != nil {
-		return fmt.Errorf("read fail2ban conf of %s failed, err: %v", defaultFail2banPath, err)
+		return fmt.Errorf("read fail2ban conf of %s failed, err: %v", defaultFail2BanPath, err)
 	}
 	lines := strings.Split(string(conf), "\n")
 
 	isStart, isEnd, hasKey := false, false, false
 	newFile := ""
-	for _, line := range lines {
-		if strings.HasPrefix(line, "[sshd]") {
+	for index, line := range lines {
+		if !isStart && strings.HasPrefix(line, "[sshd]") {
 			isStart = true
+			newFile += fmt.Sprintf("%s\n", line)
+			continue
 		}
 		if !isStart || isEnd {
 			newFile += fmt.Sprintf("%s\n", line)
 			continue
 		}
-
-		if strings.HasPrefix(line, strings.ToLower(req.Key)) {
+		if strings.HasPrefix(line, req.Key) {
 			hasKey = true
 			newFile += fmt.Sprintf("%s = %s\n", req.Key, req.Value)
 			continue
-		}
-		if strings.HasPrefix(line, "[") {
-			isEnd = true
-			if !hasKey {
-				newFile += fmt.Sprintf("%s = %s\n\n", req.Key, req.Value)
+		} else {
+			if strings.HasPrefix(line, "[") {
+				isEnd = true
+				if !hasKey {
+					newFile += fmt.Sprintf("%s = %s\n", req.Key, req.Value)
+				}
 			}
-			newFile += fmt.Sprintf("%s\n", line)
+			newFile += line
+			if index != len(lines)-1 {
+				newFile += "\n"
+			}
 		}
 	}
-	return nil
-}
-
-func (u *Fail2banService) OperateSSHD(req dto.Fail2banSet) error {
-	if strings.HasSuffix(req.Operate, "ignore") {
-		if err := u.UpdateConf(dto.Fail2banUpdate{Key: "ignoreip", Value: strings.Join(req.IPs, ",")}); err != nil {
-			return err
-		}
-	}
-	client, err := toolbox.NewFail2ban()
+	file, err := os.OpenFile(defaultFail2BanPath, os.O_WRONLY|os.O_TRUNC, 0640)
 	if err != nil {
 		return err
 	}
-	for _, item := range req.IPs {
-		if err := client.OperateSSHD(req.Operate, item); err != nil {
-			return err
-		}
+	defer file.Close()
+	write := bufio.NewWriter(file)
+	_, _ = write.WriteString(newFile)
+	write.Flush()
+
+	client, err := toolbox.NewFail2Ban()
+	if err != nil {
+		return err
+	}
+	if err := client.Operate("reload"); err != nil {
+		return err
 	}
 	return nil
 }
 
-func loadFailValue(line string, baseInfo *dto.Fail2banBaseInfo) {
+func (u *Fail2BanService) UpdateConfByFile(req dto.UpdateByFile) error {
+	file, err := os.OpenFile(defaultFail2BanPath, os.O_WRONLY|os.O_TRUNC, 0640)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	write := bufio.NewWriter(file)
+	_, _ = write.WriteString(req.File)
+	write.Flush()
+
+	client, err := toolbox.NewFail2Ban()
+	if err != nil {
+		return err
+	}
+	if err := client.Operate("reload"); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *Fail2BanService) OperateSSHD(req dto.Fail2BanSet) error {
+	if req.Operate == "ignore" {
+		if err := u.UpdateConf(dto.Fail2BanUpdate{Key: "ignoreip", Value: strings.Join(req.IPs, ",")}); err != nil {
+			return err
+		}
+		return nil
+	}
+	client, err := toolbox.NewFail2Ban()
+	if err != nil {
+		return err
+	}
+	if err := client.ReBanIPs(req.IPs); err != nil {
+		return err
+	}
+	return nil
+}
+
+func loadFailValue(line string, baseInfo *dto.Fail2BanBaseInfo) {
 	if strings.HasPrefix(line, "maxretry") {
 		itemValue := strings.ReplaceAll(line, "maxretry", "")
 		itemValue = strings.ReplaceAll(itemValue, "=", "")

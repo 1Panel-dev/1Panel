@@ -28,8 +28,8 @@ const toolboxRouter = {
                     },
                 },
                 {
-                    path: 'fail2ban',
-                    name: 'Fail2ban',
+                    path: 'fail2Ban',
+                    name: 'Fail2Ban',
                     component: () => import('@/views/toolbox/fail2ban/index.vue'),
                     hidden: true,
                     meta: {

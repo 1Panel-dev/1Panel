@@ -12,7 +12,7 @@
                             prop="maxRetry"
                             :rules="Rules.requiredInput"
                         >
-                            <el-input clearable v-model="form.maxRetry">
+                            <el-input clearable v-model.number="form.maxRetry">
                                 <template #append>{{ $t('commons.units.time') }}</template>
                             </el-input>
                         </el-form-item>
@@ -34,10 +34,10 @@
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { updateSetting } from '@/api/modules/setting';
 import { FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import DrawerHeader from '@/components/drawer-header/index.vue';
+import { updateFail2ban } from '@/api/modules/toolbox';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -48,13 +48,13 @@ const drawerVisible = ref();
 const loading = ref();
 
 const form = reactive({
-    maxRetry: '',
+    maxRetry: 5,
 });
 
 const formRef = ref<FormInstance>();
 
 const acceptParams = (params: DialogProps): void => {
-    form.maxRetry = params.maxRetry;
+    form.maxRetry = Number(params.maxRetry);
     drawerVisible.value = true;
 };
 
@@ -62,17 +62,27 @@ const onSave = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        await updateSetting({ key: 'maxRetry', value: form.maxRetry })
-            .then(async () => {
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                loading.value = false;
-                drawerVisible.value = false;
-                emit('search');
-                return;
-            })
-            .catch(() => {
-                loading.value = false;
-            });
+        ElMessageBox.confirm(
+            i18n.global.t('ssh.sshChangeHelper', [i18n.global.t('toolbox.fail2ban.maxRetry'), form.maxRetry]),
+            i18n.global.t('toolbox.fail2ban.fail2banChange'),
+            {
+                confirmButtonText: i18n.global.t('commons.button.confirm'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+                type: 'info',
+            },
+        ).then(async () => {
+            await updateFail2ban({ key: 'maxretry', value: form.maxRetry + '' })
+                .then(async () => {
+                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                    loading.value = false;
+                    drawerVisible.value = false;
+                    emit('search');
+                    return;
+                })
+                .catch(() => {
+                    loading.value = false;
+                });
+        });
     });
 };
 

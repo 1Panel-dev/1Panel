@@ -833,7 +833,11 @@ const message = {
     },
     toolbox: {
         fail2ban: {
-            operation: '对 Fail2ban 服务进行 [{0}] 操作，是否继续？',
+            noFail2ban: '未检测到 Fail2Ban 服务，请参考官方文档进行安装',
+            operation: '对 Fail2Ban 服务进行 [{0}] 操作，是否继续？',
+            fail2banChange: 'Fail2Ban 配置修改',
+            ignoreHelper: '白名单中的 IP 列表将被忽略屏蔽，是否继续？',
+            bannedHelper: '黑名单中的 IP 列表将被服务器屏蔽，是否继续？',
             maxRetry: '最大重试次数',
             banTime: '禁用时间',
             banTimeHelper: '默认禁用时间为 10 分钟，禁用时间为 -1 则表示永久禁用',
@@ -866,6 +870,7 @@ const message = {
             files: '文件管理',
             runtimes: '运行环境',
             process: '进程管理',
+            toolbox: '工具箱',
             logs: '日志审计',
             settings: '面板设置',
             cronjobs: '计划任务',

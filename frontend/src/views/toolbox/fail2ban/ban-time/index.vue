@@ -10,7 +10,7 @@
                         <el-form-item :label="$t('toolbox.fail2ban.banTime')" prop="banTime" :rules="Rules.number">
                             <el-input type="number" v-model.number="form.banTime">
                                 <template #append>
-                                    <el-select v-model.number="form.banTimeUnit" style="width: 115px">
+                                    <el-select v-model.number="form.banTimeUnit" style="width: 100px">
                                         <el-option :label="$t('commons.units.second')" value="s" />
                                         <el-option :label="$t('commons.units.minute')" value="m" />
                                         <el-option :label="$t('commons.units.hour')" value="h" />
@@ -38,10 +38,11 @@
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { updateSetting } from '@/api/modules/setting';
 import { FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import DrawerHeader from '@/components/drawer-header/index.vue';
+import { updateFail2ban } from '@/api/modules/toolbox';
+import { splitTime, transTimeUnit } from '@/utils/util';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -52,14 +53,16 @@ const drawerVisible = ref();
 const loading = ref();
 
 const form = reactive({
-    banTime: -1,
+    banTime: 300,
     banTimeUnit: 's',
 });
 
 const formRef = ref<FormInstance>();
 
 const acceptParams = (params: DialogProps): void => {
-    form.banTime = Number(params.banTime);
+    let item = splitTime(params.banTime);
+    form.banTime = item.time;
+    form.banTimeUnit = item.unit;
     drawerVisible.value = true;
 };
 
@@ -67,17 +70,30 @@ const onSave = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        await updateSetting({ key: 'banTime', value: form.banTime })
-            .then(async () => {
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                loading.value = false;
-                drawerVisible.value = false;
-                emit('search');
-                return;
-            })
-            .catch(() => {
-                loading.value = false;
-            });
+        ElMessageBox.confirm(
+            i18n.global.t('ssh.sshChangeHelper', [
+                i18n.global.t('toolbox.fail2ban.banTime'),
+                form.banTime + transTimeUnit(form.banTimeUnit),
+            ]),
+            i18n.global.t('toolbox.fail2ban.fail2banChange'),
+            {
+                confirmButtonText: i18n.global.t('commons.button.confirm'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+                type: 'info',
+            },
+        ).then(async () => {
+            await updateFail2ban({ key: 'bantime', value: form.banTime + form.banTimeUnit })
+                .then(async () => {
+                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                    loading.value = false;
+                    drawerVisible.value = false;
+                    emit('search');
+                    return;
+                })
+                .catch(() => {
+                    loading.value = false;
+                });
+        });
     });
 };
 
