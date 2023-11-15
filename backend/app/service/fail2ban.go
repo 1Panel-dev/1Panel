@@ -35,6 +35,10 @@ func (u *Fail2BanService) LoadBaseInfo() (dto.Fail2BanBaseInfo, error) {
 		return baseInfo, err
 	}
 	baseInfo.IsEnable, baseInfo.IsActive, baseInfo.IsExist = client.Status()
+	if !baseInfo.IsExist {
+		baseInfo.Version = "-"
+		return baseInfo, nil
+	}
 	baseInfo.Version = client.Version()
 	conf, err := os.ReadFile(defaultFail2BanPath)
 	if err != nil {

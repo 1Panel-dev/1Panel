@@ -833,6 +833,7 @@ const message = {
     toolbox: {
         fail2ban: {
             noFail2ban: '未檢測到 Fail2Ban 服務，請參考官方文檔進行安裝',
+            unActive: '當前未開啟 Fail2Ban 服務，請先開啟！',
             operation: '對 Fail2Ban 服務進行 [{0}] 操作，是否繼續？',
             fail2banChange: 'Fail2Ban 配置修改',
             ignoreHelper: '白名單中的 IP 列表將被忽略屏蔽，是否繼續？',

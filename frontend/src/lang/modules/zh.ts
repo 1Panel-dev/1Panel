@@ -834,6 +834,7 @@ const message = {
     toolbox: {
         fail2ban: {
             noFail2ban: '未检测到 Fail2Ban 服务，请参考官方文档进行安装',
+            unActive: '当前未开启 Fail2Ban 服务，请先开启！',
             operation: '对 Fail2Ban 服务进行 [{0}] 操作，是否继续？',
             fail2banChange: 'Fail2Ban 配置修改',
             ignoreHelper: '白名单中的 IP 列表将被忽略屏蔽，是否继续？',

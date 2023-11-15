@@ -96,7 +96,7 @@ const handleClose = () => {
 };
 
 const toDoc = () => {
-    window.open('https://1panel.cn/docs/', '_blank');
+    window.open('https://1panel.cn/docs/', '_blank', 'noopener,noreferrer');
 };
 
 const toForum = () => {

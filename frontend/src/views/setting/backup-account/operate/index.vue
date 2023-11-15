@@ -348,7 +348,7 @@ function hasEndpoint(val: string) {
 }
 
 const toDoc = () => {
-    window.open('https://1panel.cn/docs/user_manual/settings/', '_blank');
+    window.open('https://1panel.cn/docs/user_manual/settings/', '_blank', 'noopener,noreferrer');
 };
 
 const getBuckets = async (formEl: FormInstance | undefined) => {

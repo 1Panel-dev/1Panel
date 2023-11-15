@@ -23,14 +23,17 @@ type FirewallClient interface {
 }
 
 func NewFail2Ban() (*Fail2Ban, error) {
-	if _, err := os.Stat(defaultPath); err != nil {
-		if err := initLocalFile(); err != nil {
-			return nil, err
-		}
-		stdout, err := cmd.Exec("fail2ban-client reload")
-		if err != nil {
-			global.LOG.Errorf("reload fail2ban failed, err: %s", stdout)
-			return nil, err
+	isExist, _ := systemctl.IsExist("fail2ban.service")
+	if isExist {
+		if _, err := os.Stat(defaultPath); err != nil {
+			if err := initLocalFile(); err != nil {
+				return nil, err
+			}
+			stdout, err := cmd.Exec("fail2ban-client reload")
+			if err != nil {
+				global.LOG.Errorf("reload fail2ban failed, err: %s", stdout)
+				return nil, err
+			}
 		}
 	}
 	return &Fail2Ban{}, nil

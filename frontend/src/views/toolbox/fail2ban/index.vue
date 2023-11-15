@@ -40,7 +40,10 @@
         </div>
 
         <div v-if="form.isExist">
-            <LayoutContent style="margin-top: 20px" :title="$t('menu.config')" :divider="true">
+            <el-card v-if="!form.isActive" class="mask-prompt">
+                <span>{{ $t('toolbox.fail2ban.unActive') }}</span>
+            </el-card>
+            <LayoutContent title="Fail2Ban" :divider="true" :class="{ mask: !form.isActive }">
                 <template #toolbar>
                     <el-row>
                         <el-col :span="16">
@@ -139,7 +142,7 @@
                                 {{ $t('firewall.quickJump') }}
                             </el-link>
                             <div>
-                                <img src="@/assets/images/no_app.svg" />
+                                <img alt="" src="@/assets/images/no_app.svg" />
                             </div>
                         </div>
                     </div>
@@ -208,7 +211,7 @@ const onLoadList = async (type: string) => {
 };
 
 const toDoc = () => {
-    window.open('https://1panel.cn/docs/user_manual/toolbox/fail2ban/', '_blank');
+    window.open('https://1panel.cn/docs/user_manual/toolbox/fail2ban/', '_blank', 'noopener,noreferrer');
 };
 
 const onSaveFile = async () => {

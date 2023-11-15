@@ -869,6 +869,7 @@ const message = {
     toolbox: {
         fail2ban: {
             noFail2ban: 'Fail2Ban service not detected, please refer to the official documentation for installation',
+            unActive: 'The Fail2Ban service is not enabled at present, please enable it first!',
             operation: 'Perform [{0}] operation on Fail2Ban service, continue?',
             fail2banChange: 'Fail2Ban Configuration Modification',
             ignoreHelper: 'The IP list in the whitelist will be ignored for blocking, continue?',
