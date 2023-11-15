@@ -341,10 +341,18 @@ func (w WebsiteSSLService) Upload(req request.WebsiteSSLUpload) error {
 	} else {
 		newSSL.Organization = cert.Issuer.CommonName
 	}
+
+	var domains []string
 	if len(cert.DNSNames) > 0 {
 		newSSL.PrimaryDomain = cert.DNSNames[0]
-		newSSL.Domains = strings.Join(cert.DNSNames, ",")
+		domains = cert.DNSNames[1:]
+	} else if len(cert.IPAddresses) > 0 {
+		newSSL.PrimaryDomain = cert.IPAddresses[0].String()
+		for _, ip := range cert.IPAddresses[1:] {
+			domains = append(domains, ip.String())
+		}
 	}
+	newSSL.Domains = strings.Join(domains, ",")
 
 	return websiteSSLRepo.Create(context.Background(), newSSL)
 }
