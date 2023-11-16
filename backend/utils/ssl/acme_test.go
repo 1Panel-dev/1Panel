@@ -386,8 +386,8 @@ func TestZeroSSL(t *testing.T) {
 
 	// ZeroSSl
 
-	kid := "xv1T5Ybi4G2otJlbCTVHjg"
-	hmacEncoded := "pc-mEroSmg2quRpVr7e4L5YWzhm5mSDlk4_ivMUBzAkDjbym3Y6g7RLhR1joQH-JP94qy3PEczKVfw7QSLoh8A"
+	kid := ""
+	hmacEncoded := ""
 
 	eabOptions := registration.RegisterEABOptions{
 		TermsOfServiceAgreed: true,
@@ -410,8 +410,8 @@ func TestZeroSSL(t *testing.T) {
 	user.Registration = reg
 
 	cloudflareConfig := cloudflare.NewDefaultConfig()
-	cloudflareConfig.AuthEmail = "zhengkunwang123@sina.com"
-	cloudflareConfig.AuthKey = "c29c0d604897ec1c5c7f14746623524bf040a"
+	cloudflareConfig.AuthEmail = ""
+	cloudflareConfig.AuthKey = ""
 	p, err := cloudflare.NewDNSProviderConfig(cloudflareConfig)
 	if err != nil {
 		log.Fatal(err)
