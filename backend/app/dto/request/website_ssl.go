@@ -14,6 +14,7 @@ type WebsiteSSLCreate struct {
 	AcmeAccountID uint   `json:"acmeAccountId" validate:"required"`
 	DnsAccountID  uint   `json:"dnsAccountId"`
 	AutoRenew     bool   `json:"autoRenew"`
+	KeyType       string `json:"keyType"`
 }
 
 type WebsiteDNSReq struct {
@@ -28,6 +29,7 @@ type WebsiteSSLRenew struct {
 type WebsiteAcmeAccountCreate struct {
 	Email      string `json:"email" validate:"required"`
 	Type       string `json:"type" validate:"required,oneof=letsencrypt zerossl buypass google"`
+	KeyType    string `json:"keyType" validate:"required,oneof=P256 P384 2048 3072 4096 8192"`
 	EabKid     string `json:"eabKid"`
 	EabHmacKey string `json:"eabHmacKey"`
 }

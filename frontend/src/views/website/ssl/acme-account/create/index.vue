@@ -22,6 +22,16 @@
                             ></el-option>
                         </el-select>
                     </el-form-item>
+                    <el-form-item :label="$t('website.keyType')" prop="keyType">
+                        <el-select v-model="account.keyType">
+                            <el-option
+                                v-for="(keyType, index) in KeyTypes"
+                                :key="index"
+                                :label="keyType.label"
+                                :value="keyType.value"
+                            ></el-option>
+                        </el-select>
+                    </el-form-item>
                     <div v-if="account.type == 'google'">
                         <el-form-item label="EAB kid" prop="eabKid">
                             <el-input v-model.trim="account.eabKid"></el-input>
@@ -50,7 +60,7 @@ import { Rules } from '@/global/form-rules';
 import { CreateAcmeAccount } from '@/api/modules/website';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { AcmeAccountTypes } from '@/global/mimetype';
+import { AcmeAccountTypes, KeyTypes } from '@/global/mimetype';
 
 const open = ref();
 const loading = ref(false);
@@ -60,6 +70,7 @@ const rules = ref({
     type: [Rules.requiredSelect],
     eabKid: [Rules.requiredInput],
     eabHmacKey: [Rules.requiredInput],
+    keyType: [Rules.requiredSelect],
 });
 
 const initData = () => ({
@@ -67,6 +78,7 @@ const initData = () => ({
     type: 'letsencrypt',
     eabKid: '',
     eabHmacKey: '',
+    keyType: 'P256',
 });
 
 const account = ref(initData());

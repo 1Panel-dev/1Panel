@@ -129,3 +129,11 @@ export const AcmeAccountTypes = [
     { label: 'Buypass', value: 'buypass' },
     { label: 'Google Cloud', value: 'google' },
 ];
+
+export const KeyTypes = [
+    { label: 'EC 256', value: 'P256' },
+    { label: 'EC 384', value: 'P384' },
+    { label: 'RSA 2048', value: '2048' },
+    { label: 'RSA 3072', value: '3072' },
+    { label: 'RSA 4096', value: '4096' },
+];

@@ -1665,6 +1665,7 @@ const message = {
             'OpenResty default HTTP port: {0} HTTPS port: {1}, which may affect website domain name access and HTTPS forced redirect',
         primaryDomainHelper: 'Support domain name: port',
         acmeAccountType: 'Account Type',
+        keyType: 'Key algorithm',
     },
     php: {
         short_open_tag: 'Short tag support',
