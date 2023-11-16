@@ -196,8 +196,11 @@ func opNginx(containerName, operate string) error {
 	if operate == constant.NginxCheck {
 		nginxCmd = fmt.Sprintf("docker exec -i %s %s", containerName, "nginx -t")
 	}
-	if out, err := cmd.ExecWithTimeOut(nginxCmd, 2*time.Second); err != nil {
-		return errors.New(out)
+	if out, err := cmd.ExecWithTimeOut(nginxCmd, 20*time.Second); err != nil {
+		if out != "" {
+			return errors.New(out)
+		}
+		return err
 	}
 	return nil
 }
