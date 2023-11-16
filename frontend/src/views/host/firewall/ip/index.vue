@@ -208,7 +208,7 @@ const onOpenDialog = async (
 };
 
 const toDoc = () => {
-    window.open('https://1panel.cn/docs/user_manual/hosts/firewall/', '_blank');
+    window.open('https://1panel.cn/docs/user_manual/hosts/firewall/', '_blank', 'noopener,noreferrer');
 };
 
 const onChange = async (info: any) => {

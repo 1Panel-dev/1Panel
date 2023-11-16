@@ -41,6 +41,10 @@ type DeleteByName struct {
 	Name string `json:"name" validate:"required"`
 }
 
+type UpdateByFile struct {
+	File string `json:"file"`
+}
+
 type OperationWithNameAndType struct {
 	Name string `json:"name"`
 	Type string `json:"type" validate:"required"`

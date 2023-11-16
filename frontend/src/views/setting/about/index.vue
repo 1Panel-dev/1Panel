@@ -47,16 +47,16 @@ const search = async () => {
 };
 
 const toDoc = () => {
-    window.open('https://1panel.cn/docs/', '_blank');
+    window.open('https://1panel.cn/docs/', '_blank', 'noopener,noreferrer');
 };
 const toGithub = () => {
-    window.open('https://github.com/1Panel-dev/1Panel', '_blank');
+    window.open('https://github.com/1Panel-dev/1Panel', '_blank', 'noopener,noreferrer');
 };
 const toIssue = () => {
-    window.open('https://github.com/1Panel-dev/1Panel/issues', '_blank');
+    window.open('https://github.com/1Panel-dev/1Panel/issues', '_blank', 'noopener,noreferrer');
 };
 const toGithubStar = () => {
-    window.open('https://github.com/1Panel-dev/1Panel', '_blank');
+    window.open('https://github.com/1Panel-dev/1Panel', '_blank', 'noopener,noreferrer');
 };
 
 onMounted(() => {

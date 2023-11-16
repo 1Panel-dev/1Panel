@@ -34,3 +34,6 @@ export interface DescriptionUpdate {
     id: number;
     description: string;
 }
+export interface UpdateByFile {
+    file: string;
+}

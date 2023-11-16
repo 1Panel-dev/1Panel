@@ -47,7 +47,7 @@
                             {{ $t('firewall.quickJump') }}
                         </span>
                         <div>
-                            <img src="@/assets/images/no_app.svg" />
+                            <img alt="" src="@/assets/images/no_app.svg" />
                         </div>
                     </div>
                 </div>
@@ -89,7 +89,7 @@ const setting = () => {
 };
 
 const toDoc = async () => {
-    window.open('https://1panel.cn/docs/user_manual/hosts/supervisor/', '_blank');
+    window.open('https://1panel.cn/docs/user_manual/hosts/supervisor/', '_blank', 'noopener,noreferrer');
 };
 
 const init = async () => {

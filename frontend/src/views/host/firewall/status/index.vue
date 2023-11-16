@@ -26,7 +26,8 @@
                         <el-divider direction="vertical" />
                         <el-button type="primary" link>{{ $t('firewall.noPing') }}</el-button>
                         <el-switch
-                            style="margin-left: 10px"
+                            size="small"
+                            class="ml-2"
                             inactive-value="Disable"
                             active-value="Enable"
                             @change="onPingOperate"

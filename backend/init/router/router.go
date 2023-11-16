@@ -1,10 +1,11 @@
 package router
 
 import (
-	"github.com/gin-contrib/gzip"
 	"html/template"
 	"net/http"
 	"strings"
+
+	"github.com/gin-contrib/gzip"
 
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/i18n"
@@ -94,6 +95,7 @@ func Routers() *gin.Engine {
 		systemRouter.InitNginxRouter(PrivateGroup)
 		systemRouter.InitRuntimeRouter(PrivateGroup)
 		systemRouter.InitProcessRouter(PrivateGroup)
+		systemRouter.InitToolboxRouter(PrivateGroup)
 	}
 
 	return Router
