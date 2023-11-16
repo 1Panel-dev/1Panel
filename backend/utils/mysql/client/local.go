@@ -220,7 +220,7 @@ func (r *Local) Backup(info BackupInfo) error {
 	}
 	outfile, _ := os.OpenFile(path.Join(info.TargetDir, info.FileName), os.O_RDWR|os.O_CREATE, 0755)
 	global.LOG.Infof("start to mysqldump | gzip > %s.gzip", info.TargetDir+"/"+info.FileName)
-	cmd := exec.Command("docker", "exec", r.ContainerName, "mysqldump", "-uroot", "-p"+r.Password, info.Name)
+	cmd := exec.Command("docker", "exec", r.ContainerName, "mysqldump", "-uroot", "-p"+r.Password, "--default-character-set="+info.Format, info.Name)
 	gzipCmd := exec.Command("gzip", "-cf")
 	gzipCmd.Stdin, _ = cmd.StdoutPipe()
 	gzipCmd.Stdout = outfile
