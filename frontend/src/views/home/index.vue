@@ -319,7 +319,11 @@ const currentInfo = ref<Dashboard.CurrentInfo>({
     memoryTotal: 0,
     memoryAvailable: 0,
     memoryUsed: 0,
-    MemoryUsedPercent: 0,
+    memoryUsedPercent: 0,
+    swapMemoryTotal: 0,
+    swapMemoryAvailable: 0,
+    swapMemoryUsed: 0,
+    swapMemoryUsedPercent: 0,
 
     ioReadBytes: 0,
     ioWriteBytes: 0,
@@ -389,7 +393,7 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
             if (isActive.value && !globalStore.isOnRestart) {
                 await onLoadCurrentInfo();
             }
-        }, 3000);
+        }, 300000);
     }
 };
 

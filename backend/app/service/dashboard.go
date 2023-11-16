@@ -123,6 +123,12 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 	currentInfo.MemoryUsed = memoryInfo.Used
 	currentInfo.MemoryUsedPercent = memoryInfo.UsedPercent
 
+	swapInfo, _ := mem.SwapMemory()
+	currentInfo.SwapMemoryTotal = swapInfo.Total
+	currentInfo.SwapMemoryAvailable = swapInfo.Free
+	currentInfo.SwapMemoryUsed = swapInfo.Used
+	currentInfo.SwapMemoryUsedPercent = swapInfo.UsedPercent
+
 	currentInfo.DiskData = loadDiskInfo()
 
 	if ioOption == "all" {

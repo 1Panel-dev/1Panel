@@ -38,7 +38,11 @@ export namespace Dashboard {
         memoryTotal: number;
         memoryAvailable: number;
         memoryUsed: number;
-        MemoryUsedPercent: number;
+        memoryUsedPercent: number;
+        swapMemoryTotal: number;
+        swapMemoryAvailable: number;
+        swapMemoryUsed: number;
+        swapMemoryUsedPercent: number;
 
         ioReadBytes: number;
         ioWriteBytes: number;

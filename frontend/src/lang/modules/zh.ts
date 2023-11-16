@@ -302,6 +302,8 @@ const message = {
         ioDelay: '读写延迟',
         uptime: '启动时间',
         runningTime: '运行时间',
+        mem: '系统',
+        swapMem: 'Swap 分区',
 
         runSmoothly: '运行流畅',
         runNormal: '运行正常',
