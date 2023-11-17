@@ -13,6 +13,10 @@ import (
 	"github.com/go-acme/lego/v4/providers/dns/alidns"
 	"github.com/go-acme/lego/v4/providers/dns/cloudflare"
 	"github.com/go-acme/lego/v4/providers/dns/dnspod"
+	"github.com/go-acme/lego/v4/providers/dns/godaddy"
+	"github.com/go-acme/lego/v4/providers/dns/namecheap"
+	"github.com/go-acme/lego/v4/providers/dns/namedotcom"
+	"github.com/go-acme/lego/v4/providers/dns/namesilo"
 	"github.com/go-acme/lego/v4/providers/http/webroot"
 	"github.com/go-acme/lego/v4/registration"
 	"github.com/pkg/errors"
@@ -59,6 +63,10 @@ const (
 	DnsPod     DnsType = "DnsPod"
 	AliYun     DnsType = "AliYun"
 	CloudFlare DnsType = "CloudFlare"
+	NameSilo   DnsType = "NameSilo"
+	NameCheap  DnsType = "NameCheap"
+	NameCom    DnsType = "NameCom"
+	Godaddy    DnsType = "Godaddy"
 )
 
 type DNSParam struct {
@@ -67,7 +75,9 @@ type DNSParam struct {
 	AccessKey string `json:"accessKey"`
 	SecretKey string `json:"secretKey"`
 	Email     string `json:"email"`
-	APIkey    string `json:"APIkey"`
+	APIkey    string `json:"apiKey"`
+	APIUser   string `json:"apiUser"`
+	APISecret string `json:"apiSecret"`
 }
 
 func (c *AcmeClient) UseDns(dnsType DnsType, params string) error {
@@ -85,34 +95,68 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string) error {
 	case DnsPod:
 		dnsPodConfig := dnspod.NewDefaultConfig()
 		dnsPodConfig.LoginToken = param.ID + "," + param.Token
+		dnsPodConfig.PropagationTimeout = 30 * time.Minute
+		dnsPodConfig.PollingInterval = 30 * time.Second
+		dnsPodConfig.TTL = 3600
 		p, err = dnspod.NewDNSProviderConfig(dnsPodConfig)
-		if err != nil {
-			return err
-		}
 	case AliYun:
 		alidnsConfig := alidns.NewDefaultConfig()
 		alidnsConfig.SecretKey = param.SecretKey
 		alidnsConfig.APIKey = param.AccessKey
+		alidnsConfig.PropagationTimeout = 30 * time.Minute
+		alidnsConfig.PollingInterval = 30 * time.Second
+		alidnsConfig.TTL = 3600
 		p, err = alidns.NewDNSProviderConfig(alidnsConfig)
-		if err != nil {
-			return err
-		}
 	case CloudFlare:
 		cloudflareConfig := cloudflare.NewDefaultConfig()
 		cloudflareConfig.AuthEmail = param.Email
 		cloudflareConfig.AuthKey = param.APIkey
+		cloudflareConfig.PropagationTimeout = 30 * time.Minute
+		cloudflareConfig.PollingInterval = 30 * time.Second
+		cloudflareConfig.TTL = 3600
 		p, err = cloudflare.NewDNSProviderConfig(cloudflareConfig)
-		if err != nil {
-			return err
-		}
+	case NameCheap:
+		namecheapConfig := namecheap.NewDefaultConfig()
+		namecheapConfig.APIKey = param.APIkey
+		namecheapConfig.APIUser = param.APIUser
+		namecheapConfig.PropagationTimeout = 30 * time.Minute
+		namecheapConfig.PollingInterval = 30 * time.Second
+		namecheapConfig.TTL = 3600
+		p, err = namecheap.NewDNSProviderConfig(namecheapConfig)
+	case NameSilo:
+		nameSiloConfig := namesilo.NewDefaultConfig()
+		nameSiloConfig.APIKey = param.APIkey
+		nameSiloConfig.PropagationTimeout = 30 * time.Minute
+		nameSiloConfig.PollingInterval = 30 * time.Second
+		nameSiloConfig.TTL = 3600
+		p, err = namesilo.NewDNSProviderConfig(nameSiloConfig)
+	case Godaddy:
+		godaddyConfig := godaddy.NewDefaultConfig()
+		godaddyConfig.APIKey = param.APIkey
+		godaddyConfig.APISecret = param.APISecret
+		godaddyConfig.PropagationTimeout = 30 * time.Minute
+		godaddyConfig.PollingInterval = 30 * time.Second
+		godaddyConfig.TTL = 3600
+		p, err = godaddy.NewDNSProviderConfig(godaddyConfig)
+	case NameCom:
+		nameComConfig := namedotcom.NewDefaultConfig()
+		nameComConfig.APIToken = param.Token
+		nameComConfig.Username = param.APIUser
+		nameComConfig.PropagationTimeout = 30 * time.Minute
+		nameComConfig.PollingInterval = 30 * time.Second
+		nameComConfig.TTL = 3600
+		p, err = namedotcom.NewDNSProviderConfig(nameComConfig)
+	}
+	if err != nil {
+		return err
 	}
 
-	return c.Client.Challenge.SetDNS01Provider(p, dns01.AddDNSTimeout(3*time.Minute))
+	return c.Client.Challenge.SetDNS01Provider(p, dns01.AddDNSTimeout(10*time.Minute))
 }
 
 func (c *AcmeClient) UseManualDns() error {
 	p := &manualDnsProvider{}
-	if err := c.Client.Challenge.SetDNS01Provider(p, dns01.AddDNSTimeout(3*time.Minute)); err != nil {
+	if err := c.Client.Challenge.SetDNS01Provider(p, dns01.AddDNSTimeout(10*time.Minute)); err != nil {
 		return err
 	}
 	return nil
@@ -151,7 +195,11 @@ func (c *AcmeClient) RenewSSL(certUrl string) (certificate.Resource, error) {
 	if err != nil {
 		return certificate.Resource{}, err
 	}
-	certificates, err = c.Client.Certificate.Renew(*certificates, true, true, "")
+	certificates, err = c.Client.Certificate.RenewWithOptions(*certificates, &certificate.RenewOptions{
+		Bundle:         true,
+		PreferredChain: "",
+		MustStaple:     true,
+	})
 	if err != nil {
 		return certificate.Resource{}, err
 	}

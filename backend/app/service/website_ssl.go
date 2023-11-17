@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"crypto"
 	"crypto/x509"
 	"encoding/pem"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
@@ -14,7 +13,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/1Panel-dev/1Panel/backend/utils/ssl"
-	"github.com/go-acme/lego/v4/certcrypto"
 	"path"
 	"strconv"
 	"strings"
@@ -134,18 +132,10 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 	if create.OtherDomains != "" {
 		domains = append(otherDomainArray, domains...)
 	}
-	var privateKey crypto.PrivateKey
-	if create.KeyType != acmeAccount.KeyType {
-		privateKey, err = certcrypto.GeneratePrivateKey(ssl.KeyType(create.KeyType))
-		if err != nil {
-			return res, err
-		}
-	} else {
-		block, _ := pem.Decode([]byte(acmeAccount.PrivateKey))
-		privateKey, err = x509.ParseECPrivateKey(block.Bytes)
-		if err != nil {
-			return res, err
-		}
+	block, _ := pem.Decode([]byte(acmeAccount.PrivateKey))
+	privateKey, err := x509.ParseECPrivateKey(block.Bytes)
+	if err != nil {
+		return res, err
 	}
 
 	resource, err := client.ObtainSSL(domains, privateKey)
