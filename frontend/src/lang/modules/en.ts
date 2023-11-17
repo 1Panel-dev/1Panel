@@ -305,6 +305,8 @@ const message = {
         ioDelay: 'IO delay',
         uptime: 'Up Time',
         runningTime: 'Running Time',
+        mem: 'System',
+        swapMem: 'Swap Partition',
 
         runSmoothly: 'Run smoothly',
         runNormal: 'Run normal',

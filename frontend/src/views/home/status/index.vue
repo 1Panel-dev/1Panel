@@ -43,13 +43,47 @@
             </span>
         </el-col>
         <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
-            <v-charts
-                height="160px"
-                id="memory"
-                type="pie"
-                :option="chartsOption['memory']"
-                v-if="chartsOption['memory']"
-            />
+            <el-popover placement="bottom" :width="160" trigger="hover">
+                <el-tag style="font-weight: 500">{{ $t('home.mem') }}:</el-tag>
+                <el-tag class="tagClass">
+                    {{ $t('home.total') }}: {{ formatNumber(currentInfo.memoryTotal / 1024 / 1024) }} MB
+                </el-tag>
+                <el-tag class="tagClass">
+                    {{ $t('home.used') }}: {{ formatNumber(currentInfo.memoryUsed / 1024 / 1024) }} MB
+                </el-tag>
+                <el-tag class="tagClass">
+                    {{ $t('home.free') }}: {{ formatNumber(currentInfo.memoryAvailable / 1024 / 1024) }} MB
+                </el-tag>
+                <el-tag class="tagClass">
+                    {{ $t('home.percent') }}: {{ formatNumber(currentInfo.memoryUsedPercent) }}%
+                </el-tag>
+                <div v-if="currentInfo.swapMemoryTotal">
+                    <el-row :gutter="5" class="mt-2">
+                        <el-tag style="font-weight: 500">{{ $t('home.swapMem') }}:</el-tag>
+                    </el-row>
+                    <el-tag class="tagClass">
+                        {{ $t('home.total') }}: {{ formatNumber(currentInfo.swapMemoryTotal / 1024 / 1024) }} MB
+                    </el-tag>
+                    <el-tag class="tagClass">
+                        {{ $t('home.used') }}: {{ formatNumber(currentInfo.swapMemoryUsed / 1024 / 1024) }} MB
+                    </el-tag>
+                    <el-tag class="tagClass">
+                        {{ $t('home.free') }}: {{ formatNumber(currentInfo.swapMemoryAvailable / 1024 / 1024) }} MB
+                    </el-tag>
+                    <el-tag class="tagClass">
+                        {{ $t('home.percent') }}: {{ formatNumber(100 - currentInfo.swapMemoryUsedPercent * 100) }}%
+                    </el-tag>
+                </div>
+                <template #reference>
+                    <v-charts
+                        height="160px"
+                        id="memory"
+                        type="pie"
+                        :option="chartsOption['memory']"
+                        v-if="chartsOption['memory']"
+                    />
+                </template>
+            </el-popover>
             <span class="input-help">
                 ( {{ formatNumber(currentInfo.memoryUsed / 1024 / 1024) }} /
                 {{ formatNumber(currentInfo.memoryTotal / 1024 / 1024) }} ) MB
@@ -193,7 +227,11 @@ const currentInfo = ref<Dashboard.CurrentInfo>({
     memoryTotal: 0,
     memoryAvailable: 0,
     memoryUsed: 0,
-    MemoryUsedPercent: 0,
+    memoryUsedPercent: 0,
+    swapMemoryTotal: 0,
+    swapMemoryAvailable: 0,
+    swapMemoryUsed: 0,
+    swapMemoryUsedPercent: 0,
 
     ioReadBytes: 0,
     ioWriteBytes: 0,
@@ -219,7 +257,7 @@ const acceptParams = (current: Dashboard.CurrentInfo, base: Dashboard.BaseInfo, 
     };
     chartsOption.value['memory'] = {
         title: i18n.global.t('monitor.memory'),
-        data: formatNumber(currentInfo.value.MemoryUsedPercent),
+        data: formatNumber(currentInfo.value.memoryUsedPercent),
     };
     chartsOption.value['load'] = {
         title: i18n.global.t('home.load'),

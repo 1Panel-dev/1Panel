@@ -736,8 +736,6 @@ definitions:
     type: object
   dto.DashboardCurrent:
     properties:
-      MemoryUsedPercent:
-        type: number
       cpuPercent:
         items:
           type: number
@@ -776,6 +774,8 @@ definitions:
         type: integer
       memoryUsed:
         type: integer
+      memoryUsedPercent:
+        type: number
       netBytesRecv:
         type: integer
       netBytesSent:
@@ -784,6 +784,14 @@ definitions:
         type: integer
       shotTime:
         type: string
+      swapMemoryAvailable:
+        type: integer
+      swapMemoryTotal:
+        type: integer
+      swapMemoryUsed:
+        type: integer
+      swapMemoryUsedPercent:
+        type: number
       timeSinceUptime:
         type: string
       uptime:
@@ -2645,10 +2653,16 @@ definitions:
     properties:
       createdAt:
         type: string
+      eabHmacKey:
+        type: string
+      eabKid:
+        type: string
       email:
         type: string
       id:
         type: integer
+      type:
+        type: string
       updatedAt:
         type: string
       url:
@@ -3255,8 +3269,6 @@ definitions:
         type: integer
     required:
     - operate
-    - password
-    - username
     - websiteID
     type: object
   request.NginxCommonReq:
@@ -3290,7 +3302,6 @@ definitions:
         type: integer
     required:
     - operate
-    - websiteId
     type: object
   request.NginxProxyUpdate:
     properties:
@@ -3569,10 +3580,22 @@ definitions:
     type: object
   request.WebsiteAcmeAccountCreate:
     properties:
+      eabHmacKey:
+        type: string
+      eabKid:
+        type: string
       email:
+        type: string
+      type:
+        enum:
+        - letsencrypt
+        - zerossl
+        - buypass
+        - google
         type: string
     required:
     - email
+    - type
     type: object
   request.WebsiteCommonReq:
     properties:
@@ -3638,8 +3661,6 @@ definitions:
     properties:
       id:
         type: integer
-    required:
-    - id
     type: object
   request.WebsiteDelete:
     properties:
@@ -4299,10 +4320,16 @@ definitions:
     properties:
       createdAt:
         type: string
+      eabHmacKey:
+        type: string
+      eabKid:
+        type: string
       email:
         type: string
       id:
         type: integer
+      type:
+        type: string
       updatedAt:
         type: string
       url:

@@ -13866,9 +13866,6 @@
         "dto.DashboardCurrent": {
             "type": "object",
             "properties": {
-                "MemoryUsedPercent": {
-                    "type": "number"
-                },
                 "cpuPercent": {
                     "type": "array",
                     "items": {
@@ -13926,6 +13923,9 @@
                 "memoryUsed": {
                     "type": "integer"
                 },
+                "memoryUsedPercent": {
+                    "type": "number"
+                },
                 "netBytesRecv": {
                     "type": "integer"
                 },
@@ -13937,6 +13937,18 @@
                 },
                 "shotTime": {
                     "type": "string"
+                },
+                "swapMemoryAvailable": {
+                    "type": "integer"
+                },
+                "swapMemoryTotal": {
+                    "type": "integer"
+                },
+                "swapMemoryUsed": {
+                    "type": "integer"
+                },
+                "swapMemoryUsedPercent": {
+                    "type": "number"
                 },
                 "timeSinceUptime": {
                     "type": "string"
@@ -16705,11 +16717,20 @@
                 "createdAt": {
                     "type": "string"
                 },
+                "eabHmacKey": {
+                    "type": "string"
+                },
+                "eabKid": {
+                    "type": "string"
+                },
                 "email": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
+                },
+                "type": {
+                    "type": "string"
                 },
                 "updatedAt": {
                     "type": "string"
@@ -17603,8 +17624,6 @@
             "type": "object",
             "required": [
                 "operate",
-                "password",
-                "username",
                 "websiteID"
             ],
             "properties": {
@@ -17653,8 +17672,7 @@
         "request.NginxConfigUpdate": {
             "type": "object",
             "required": [
-                "operate",
-                "websiteId"
+                "operate"
             ],
             "properties": {
                 "operate": {
@@ -18087,11 +18105,27 @@
         "request.WebsiteAcmeAccountCreate": {
             "type": "object",
             "required": [
-                "email"
+                "email",
+                "type"
             ],
             "properties": {
+                "eabHmacKey": {
+                    "type": "string"
+                },
+                "eabKid": {
+                    "type": "string"
+                },
                 "email": {
                     "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "letsencrypt",
+                        "zerossl",
+                        "buypass",
+                        "google"
+                    ]
                 }
             }
         },
@@ -18186,9 +18220,6 @@
         },
         "request.WebsiteDefaultUpdate": {
             "type": "object",
-            "required": [
-                "id"
-            ],
             "properties": {
                 "id": {
                     "type": "integer"
@@ -19181,11 +19212,20 @@
                 "createdAt": {
                     "type": "string"
                 },
+                "eabHmacKey": {
+                    "type": "string"
+                },
+                "eabKid": {
+                    "type": "string"
+                },
                 "email": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
+                },
+                "type": {
+                    "type": "string"
                 },
                 "updatedAt": {
                     "type": "string"
