@@ -345,15 +345,6 @@ func generateCSR(privateKey crypto.PrivateKey, domain string) ([]byte, error) {
 
 func TestZeroSSL(t *testing.T) {
 
-	//switch accountType {
-	//case "letsencrypt":
-	//	config.CADirURL = "https://acme-staging-v02.api.letsencrypt.org/directory"
-	//case "zerossl":
-	//	config.CADirURL = "https://acme.zerossl.com/v2/DV90"
-	//case "buypass":
-	//	config.CADirURL = "https://api.test4.buypass.no/acme/directory"
-	//}
-
 	domain := "1panel.store"
 	acmeServer := "https://acme.zerossl.com/v2/DV90"
 
@@ -370,6 +361,15 @@ func TestZeroSSL(t *testing.T) {
 		Email: "zhengkunwang123@sina.com",
 		Key:   priKey,
 	}
+
+	//logFile, err := os.OpenFile("/opt/1panel/ssl.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	//if err != nil {
+	//	log.Fatalf("Failed to open log file: %v", err)
+	//}
+	//defer logFile.Close()
+	//
+	//logger := log.New(logFile, "", log.LstdFlags)
+	//legoLogger.Logger = logger
 
 	config := lego.NewConfig(&user)
 

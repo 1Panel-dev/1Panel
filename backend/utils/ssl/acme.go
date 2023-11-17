@@ -150,15 +150,26 @@ func NewRegisterClient(acmeAccount *model.WebsiteAcmeAccount) (*AcmeClient, erro
 
 func newConfig(user *AcmeUser, accountType string) *lego.Config {
 	config := lego.NewConfig(user)
+	//switch accountType {
+	//case "letsencrypt":
+	//	config.CADirURL = "https://acme-v02.api.letsencrypt.org/directory"
+	//case "zerossl":
+	//	config.CADirURL = "https://acme.zerossl.com/v2/DV90"
+	//case "buypass":
+	//	config.CADirURL = "https://api.buypass.com/acme/directory"
+	//case "google":
+	//	config.CADirURL = "https://dv.acme-v02.api.pki.goog/directory"
+	//}
+
 	switch accountType {
-	case "letsEncrypt":
-		config.CADirURL = "https://acme-v02.api.letsencrypt.org/directory"
-	case "zeroSSL":
+	case "letsencrypt":
+		config.CADirURL = "https://acme-staging-v02.api.letsencrypt.org/directory"
+	case "zerossl":
 		config.CADirURL = "https://acme.zerossl.com/v2/DV90"
-	case "buyPass":
-		config.CADirURL = "https://api.buypass.com/acme/directory"
+	case "buypass":
+		config.CADirURL = "https://api.test4.buypass.no/acme/directory"
 	case "google":
-		config.CADirURL = "https://dv.acme-v02.api.pki.goog/directory"
+		config.CADirURL = "https://dv.acme-v02.test-api.pki.goog/directory\""
 	}
 
 	config.UserAgent = "1Panel"

@@ -39,12 +39,36 @@
                             <el-input v-model.trim="account.authorization['token']"></el-input>
                         </el-form-item>
                     </div>
+
                     <div v-if="account.type === 'CloudFlare'">
                         <el-form-item label="EMAIL" prop="authorization.email">
                             <el-input v-model.trim="account.authorization['email']"></el-input>
                         </el-form-item>
-                        <el-form-item label="API Key" prop="authorization.apiKey">
-                            <el-input v-model.trim="account.authorization['apiKey']"></el-input>
+                    </div>
+                    <el-form-item
+                        label="API Key"
+                        prop="authorization.apiKey"
+                        v-if="
+                            account.type === 'CloudFlare' ||
+                            account.type === 'NameCheap' ||
+                            account.type === 'NameSilo' ||
+                            account.type === 'Godaddy'
+                        "
+                    >
+                        <el-input v-model.trim="account.authorization['apiKey']"></el-input>
+                    </el-form-item>
+                    <el-form-item label="API User" prop="authorization.apiUser" v-if="account.type === 'NameCheap'">
+                        <el-input v-model.trim="account.authorization['apiUser']"></el-input>
+                    </el-form-item>
+                    <el-form-item label="API Secret" prop="authorization.apiSecret" v-if="account.type === 'Godaddy'">
+                        <el-input v-model.trim="account.authorization['apiSecret']"></el-input>
+                    </el-form-item>
+                    <div v-if="account.type === 'NameCom'">
+                        <el-form-item label="Username" prop="authorization.apiUser">
+                            <el-input v-model.trim="account.authorization['apiUser']"></el-input>
+                        </el-form-item>
+                        <el-form-item label="Token" prop="authorization.token">
+                            <el-input v-model.trim="account.authorization['token']"></el-input>
                         </el-form-item>
                     </div>
                 </el-form>
@@ -91,12 +115,28 @@ const types = [
         label: 'CloudFlare',
         value: 'CloudFlare',
     },
+    {
+        label: 'NameSilo',
+        value: 'NameSilo',
+    },
+    {
+        label: 'NameCheap',
+        value: 'NameCheap',
+    },
+    {
+        label: 'Name.com',
+        value: 'NameCom',
+    },
+    {
+        label: 'Godaddy',
+        value: 'Godaddy',
+    },
 ];
 
-let open = ref();
-let loading = ref(false);
-let accountForm = ref<FormInstance>();
-let rules = ref<any>({
+const open = ref();
+const loading = ref(false);
+const accountForm = ref<FormInstance>();
+const rules = ref<any>({
     name: [Rules.requiredInput, Rules.linuxName],
     type: [Rules.requiredSelect],
     authorization: {
@@ -106,9 +146,10 @@ let rules = ref<any>({
         token: [Rules.requiredInput],
         email: [Rules.requiredInput],
         apiKey: [Rules.requiredInput],
+        apiUser: [Rules.requiredInput],
     },
 });
-let account = ref({
+const account = ref({
     id: 0,
     name: '',
     type: 'AliYun',
