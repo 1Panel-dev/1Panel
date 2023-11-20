@@ -235,6 +235,10 @@ const message = {
             recreating: '重建中',
             creating: '創建中',
             systemrestart: '中斷',
+            init: '等待申請',
+            ready: '正常',
+            applying: '申請中',
+            applyerror: '失敗',
         },
         units: {
             second: '秒',
@@ -1664,6 +1668,10 @@ const message = {
         createAcme: '創建賬戶',
         acmeHelper: 'Acme 賬戶用於申請免費證書',
         upload: '上傳證書',
+        applyType: '申請方式',
+        apply: '申請',
+        applyStart: '證書申請開始',
+        getDnsResolve: '正在取得 DNS 解析值,請稍後 ...',
     },
     firewall: {
         create: '創建規則',

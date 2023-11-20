@@ -15,6 +15,7 @@ type WebsiteSSLCreate struct {
 	DnsAccountID  uint   `json:"dnsAccountId"`
 	AutoRenew     bool   `json:"autoRenew"`
 	KeyType       string `json:"keyType"`
+	Apply         bool   `json:"apply"`
 }
 
 type WebsiteDNSReq struct {
@@ -24,6 +25,10 @@ type WebsiteDNSReq struct {
 
 type WebsiteSSLRenew struct {
 	SSLID uint `json:"SSLId" validate:"required"`
+}
+
+type WebsiteSSLApply struct {
+	ID uint `json:"ID" validate:"required"`
 }
 
 type WebsiteAcmeAccountCreate struct {

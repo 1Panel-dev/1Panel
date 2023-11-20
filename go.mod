@@ -25,6 +25,7 @@ require (
 	github.com/google/uuid v1.3.1
 	github.com/gorilla/websocket v1.5.0
 	github.com/jinzhu/copier v0.3.5
+	github.com/jinzhu/gorm v1.9.2
 	github.com/joho/godotenv v1.5.1
 	github.com/klauspost/compress v1.16.5
 	github.com/mholt/archiver/v4 v4.0.0-alpha.8

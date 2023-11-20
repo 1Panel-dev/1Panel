@@ -164,6 +164,8 @@ export namespace Website {
         websites?: Website.Website[];
         autoRenew: boolean;
         acmeAccountId?: number;
+        status: string;
+        domains?: string;
     }
 
     export interface SSLCreate {
@@ -445,5 +447,9 @@ export namespace Website {
         privateKeyPath: string;
         certificatePath: string;
         type: string;
+    }
+
+    export interface SSLObtain {
+        ID: number;
     }
 }

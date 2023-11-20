@@ -12342,6 +12342,57 @@
                 }
             }
         },
+        "/websites/ssl/obtain": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "申请证书",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Website SSL"
+                ],
+                "summary": "Apply  ssl",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.WebsiteSSLApply"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [
+                        {
+                            "db": "website_ssls",
+                            "input_column": "id",
+                            "input_value": "ID",
+                            "isList": false,
+                            "output_column": "primary_domain",
+                            "output_value": "domain"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "ID"
+                    ],
+                    "formatEN": "apply ssl [domain]",
+                    "formatZH": "申请证书  [domain]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/websites/ssl/renew": {
             "post": {
                 "security": [
@@ -16729,6 +16780,9 @@
                 "id": {
                     "type": "integer"
                 },
+                "keyType": {
+                    "type": "string"
+                },
                 "type": {
                     "type": "string"
                 },
@@ -16793,6 +16847,12 @@
                 "id": {
                     "type": "integer"
                 },
+                "keyType": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
                 "organization": {
                     "type": "string"
                 },
@@ -16809,6 +16869,9 @@
                     "type": "string"
                 },
                 "startDate": {
+                    "type": "string"
+                },
+                "status": {
                     "type": "string"
                 },
                 "type": {
@@ -18106,6 +18169,7 @@
             "type": "object",
             "required": [
                 "email",
+                "keyType",
                 "type"
             ],
             "properties": {
@@ -18117,6 +18181,17 @@
                 },
                 "email": {
                     "type": "string"
+                },
+                "keyType": {
+                    "type": "string",
+                    "enum": [
+                        "P256",
+                        "P384",
+                        "2048",
+                        "3072",
+                        "4096",
+                        "8192"
+                    ]
                 },
                 "type": {
                     "type": "string",
@@ -18590,6 +18665,17 @@
                 }
             }
         },
+        "request.WebsiteSSLApply": {
+            "type": "object",
+            "required": [
+                "ID"
+            ],
+            "properties": {
+                "ID": {
+                    "type": "integer"
+                }
+            }
+        },
         "request.WebsiteSSLCreate": {
             "type": "object",
             "required": [
@@ -18601,11 +18687,17 @@
                 "acmeAccountId": {
                     "type": "integer"
                 },
+                "apply": {
+                    "type": "boolean"
+                },
                 "autoRenew": {
                     "type": "boolean"
                 },
                 "dnsAccountId": {
                     "type": "integer"
+                },
+                "keyType": {
+                    "type": "string"
                 },
                 "otherDomains": {
                     "type": "string"
@@ -19223,6 +19315,9 @@
                 },
                 "id": {
                     "type": "integer"
+                },
+                "keyType": {
+                    "type": "string"
                 },
                 "type": {
                     "type": "string"

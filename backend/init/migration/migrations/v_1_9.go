@@ -15,3 +15,13 @@ var UpdateAcmeAccount = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var UpdateWebsiteSSL = &gormigrate.Migration{
+	ID: "20231119-update-website-ssl",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.WebsiteSSL{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}

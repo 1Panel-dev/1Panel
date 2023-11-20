@@ -57,15 +57,6 @@
                             ></el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item v-if="ssl.provider === 'dnsManual' && dnsResolve.length > 0">
-                        <span>{{ $t('ssl.dnsResolveHelper') }}</span>
-                        <el-table :data="dnsResolve" border :table-layout="'auto'">
-                            <el-table-column prop="domain" :label="$t('website.domain')" />
-                            <el-table-column prop="resolve" :label="$t('ssl.resolveDomain')" />
-                            <el-table-column prop="value" :label="$t('ssl.value')" />
-                            <el-table-column :label="$t('commons.table.type')">TXT</el-table-column>
-                        </el-table>
-                    </el-form-item>
                     <el-form-item :label="''" prop="autoRenew" v-if="ssl.provider !== 'dnsManual'">
                         <el-checkbox v-model="ssl.autoRenew" :label="$t('ssl.autoRenew')" />
                     </el-form-item>
@@ -86,7 +77,7 @@
 <script lang="ts" setup>
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { Website } from '@/api/interface/website';
-import { CreateSSL, GetDnsResolve, SearchAcmeAccount, SearchDnsAccount } from '@/api/modules/website';
+import { CreateSSL, SearchAcmeAccount, SearchDnsAccount } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
@@ -140,7 +131,6 @@ const initData = () => ({
 
 const ssl = ref(initData());
 const dnsResolve = ref<Website.DNSResolve[]>([]);
-const hasResolve = ref(false);
 
 const em = defineEmits(['close']);
 const handleClose = () => {
@@ -182,44 +172,21 @@ const changeProvider = () => {
     dnsResolve.value = [];
 };
 
-const getDnsResolve = async (acmeAccountId: number, domains: string[]) => {
-    hasResolve.value = false;
-    loading.value = true;
-    try {
-        const res = await GetDnsResolve({ acmeAccountId: acmeAccountId, domains: domains });
-        if (res.data) {
-            dnsResolve.value = res.data;
-            hasResolve.value = true;
-        }
-    } finally {
-        loading.value = false;
-    }
-};
-
 const submit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     await formEl.validate((valid) => {
         if (!valid) {
             return;
         }
-        if (ssl.value.provider != 'dnsManual' || hasResolve.value) {
-            loading.value = true;
-            CreateSSL(ssl.value)
-                .then(() => {
-                    handleClose();
-                    MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
-                })
-                .finally(() => {
-                    loading.value = false;
-                });
-        } else {
-            let domains = [ssl.value.primaryDomain];
-            if (ssl.value.otherDomains != '') {
-                let otherDomains = ssl.value.otherDomains.split('\n');
-                domains = domains.concat(otherDomains);
-            }
-            getDnsResolve(ssl.value.acmeAccountId, domains);
-        }
+        loading.value = true;
+        CreateSSL(ssl.value)
+            .then(() => {
+                handleClose();
+                MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
+            })
+            .finally(() => {
+                loading.value = false;
+            });
     });
 };
 

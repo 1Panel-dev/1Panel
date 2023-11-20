@@ -87,6 +87,27 @@ func (b *BaseApi) RenewWebsiteSSL(c *gin.Context) {
 }
 
 // @Tags Website SSL
+// @Summary Apply  ssl
+// @Description 申请证书
+// @Accept json
+// @Param request body request.WebsiteSSLApply true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/ssl/obtain [post]
+// @x-panel-log {"bodyKeys":["ID"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"ID","isList":false,"db":"website_ssls","output_column":"primary_domain","output_value":"domain"}],"formatZH":"申请证书  [domain]","formatEN":"apply ssl [domain]"}
+func (b *BaseApi) ApplyWebsiteSSL(c *gin.Context) {
+	var req request.WebsiteSSLApply
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteSSLService.ObtainSSL(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}
+
+// @Tags Website SSL
 // @Summary Resolve website ssl
 // @Description 解析网站 ssl
 // @Accept json
