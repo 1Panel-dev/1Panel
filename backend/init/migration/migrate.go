@@ -54,6 +54,7 @@ func Init() {
 		migrations.AddAppSyncStatus,
 
 		migrations.UpdateAcmeAccount,
+		migrations.UpdateWebsiteSSL,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

@@ -17,6 +17,9 @@ type WebsiteSSL struct {
 	AutoRenew     bool      `gorm:"type:varchar(64);not null" json:"autoRenew"`
 	ExpireDate    time.Time `json:"expireDate"`
 	StartDate     time.Time `json:"startDate"`
+	Status        string    `gorm:"not null;default:ready" json:"status"`
+	Message       string    `json:"message"`
+	KeyType       string    `gorm:"not null;default:2048" json:"keyType"`
 
 	AcmeAccount WebsiteAcmeAccount `json:"acmeAccount" gorm:"-:migration"`
 	Websites    []Website          `json:"websites" gorm:"-:migration"`

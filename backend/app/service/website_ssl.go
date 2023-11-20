@@ -11,11 +11,15 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/1Panel-dev/1Panel/backend/utils/ssl"
+	"github.com/go-acme/lego/v4/certcrypto"
+	"github.com/jinzhu/gorm"
 	"path"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type WebsiteSSLService struct {
@@ -32,6 +36,7 @@ type IWebsiteSSLService interface {
 	Delete(id uint) error
 	Update(update request.WebsiteSSLUpdate) error
 	Upload(req request.WebsiteSSLUpload) error
+	ObtainSSL(apply request.WebsiteSSLApply) error
 }
 
 func NewIWebsiteSSLService() IWebsiteSSLService {
@@ -95,79 +100,137 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 	if err != nil {
 		return res, err
 	}
-	client, err := ssl.NewAcmeClient(acmeAccount)
-	if err != nil {
-		return res, err
+	websiteSSL := model.WebsiteSSL{
+		Status:        constant.SSLInit,
+		Provider:      create.Provider,
+		AcmeAccountID: acmeAccount.ID,
+		PrimaryDomain: create.PrimaryDomain,
+		ExpireDate:    time.Now(),
+		KeyType:       create.KeyType,
 	}
 
-	var websiteSSL model.WebsiteSSL
+	var domains []string
+	if create.OtherDomains != "" {
+		otherDomainArray := strings.Split(create.OtherDomains, "\n")
+		for _, domain := range otherDomainArray {
+			if !common.IsValidDomain(domain) {
+				err = buserr.WithName("ErrDomainFormat", domain)
+				return res, err
+			}
+			domains = append(domains, domain)
+		}
+	}
+	websiteSSL.Domains = strings.Join(domains, ",")
 
-	switch create.Provider {
-	case constant.DNSAccount:
+	if create.Provider == constant.DNSAccount || create.Provider == constant.Http {
+		websiteSSL.AutoRenew = create.AutoRenew
+	}
+	if create.Provider == constant.DNSAccount {
 		dnsAccount, err := websiteDnsRepo.GetFirst(commonRepo.WithByID(create.DnsAccountID))
 		if err != nil {
 			return res, err
 		}
-		if err := client.UseDns(ssl.DnsType(dnsAccount.Type), dnsAccount.Authorization); err != nil {
-			return res, err
-		}
-		websiteSSL.AutoRenew = create.AutoRenew
-	case constant.Http:
-		appInstall, err := getAppInstallByKey(constant.AppOpenresty)
-		if err != nil {
-			return request.WebsiteSSLCreate{}, err
-		}
-		if err := client.UseHTTP(path.Join(appInstall.GetPath(), "root")); err != nil {
-			return res, err
-		}
-		websiteSSL.AutoRenew = create.AutoRenew
-	case constant.DnsManual:
-		if err := client.UseManualDns(); err != nil {
-			return res, err
-		}
+		websiteSSL.DnsAccountID = dnsAccount.ID
 	}
-
-	domains := []string{create.PrimaryDomain}
-	otherDomainArray := strings.Split(create.OtherDomains, "\n")
-	if create.OtherDomains != "" {
-		domains = append(otherDomainArray, domains...)
-	}
-	block, _ := pem.Decode([]byte(acmeAccount.PrivateKey))
-	privateKey, err := x509.ParseECPrivateKey(block.Bytes)
-	if err != nil {
-		return res, err
-	}
-
-	resource, err := client.ObtainSSL(domains, privateKey)
-	if err != nil {
-		return res, err
-	}
-
-	if create.Provider == constant.DNSAccount {
-		websiteSSL.DnsAccountID = create.DnsAccountID
-	}
-	websiteSSL.AcmeAccountID = acmeAccount.ID
-	websiteSSL.Provider = create.Provider
-	websiteSSL.Domains = strings.Join(otherDomainArray, ",")
-	websiteSSL.PrimaryDomain = create.PrimaryDomain
-	websiteSSL.PrivateKey = string(resource.PrivateKey)
-	websiteSSL.Pem = string(resource.Certificate)
-	websiteSSL.CertURL = resource.CertURL
-	certBlock, _ := pem.Decode(resource.Certificate)
-	cert, err := x509.ParseCertificate(certBlock.Bytes)
-	if err != nil {
-		return request.WebsiteSSLCreate{}, err
-	}
-	websiteSSL.ExpireDate = cert.NotAfter
-	websiteSSL.StartDate = cert.NotBefore
-	websiteSSL.Type = cert.Issuer.CommonName
-	websiteSSL.Organization = cert.Issuer.Organization[0]
 
 	if err := websiteSSLRepo.Create(context.TODO(), &websiteSSL); err != nil {
 		return res, err
 	}
 
 	return create, nil
+}
+
+func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
+	websiteSSL, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(apply.ID))
+	if err != nil {
+		return err
+	}
+	acmeAccount, err := websiteAcmeRepo.GetFirst(commonRepo.WithByID(websiteSSL.AcmeAccountID))
+	if err != nil {
+		return err
+	}
+	client, err := ssl.NewAcmeClient(acmeAccount)
+	if err != nil {
+		return err
+	}
+
+	switch websiteSSL.Provider {
+	case constant.DNSAccount:
+		dnsAccount, err := websiteDnsRepo.GetFirst(commonRepo.WithByID(websiteSSL.DnsAccountID))
+		if err != nil {
+			return err
+		}
+		if err := client.UseDns(ssl.DnsType(dnsAccount.Type), dnsAccount.Authorization); err != nil {
+			return err
+		}
+	case constant.Http:
+		appInstall, err := getAppInstallByKey(constant.AppOpenresty)
+		if err != nil {
+			if gorm.IsRecordNotFoundError(err) {
+				return buserr.New("ErrOpenrestyNotFound")
+			}
+			return err
+		}
+		if err := client.UseHTTP(path.Join(appInstall.GetPath(), "root")); err != nil {
+			return err
+		}
+	case constant.DnsManual:
+		if err := client.UseManualDns(); err != nil {
+			return err
+		}
+	}
+
+	domains := []string{websiteSSL.PrimaryDomain}
+	domains = append(domains, domains...)
+
+	privateKey, err := certcrypto.GeneratePrivateKey(ssl.KeyType(websiteSSL.KeyType))
+	if err != nil {
+		return err
+	}
+
+	websiteSSL.Status = constant.SSLApply
+	err = websiteSSLRepo.Save(websiteSSL)
+	if err != nil {
+		return err
+	}
+
+	go func() {
+		resource, err := client.ObtainSSL(domains, privateKey)
+		if err != nil {
+			handleError(websiteSSL, err)
+			return
+		}
+		websiteSSL.PrivateKey = string(resource.PrivateKey)
+		websiteSSL.Pem = string(resource.Certificate)
+		websiteSSL.CertURL = resource.CertURL
+		certBlock, _ := pem.Decode(resource.Certificate)
+		cert, err := x509.ParseCertificate(certBlock.Bytes)
+		if err != nil {
+			handleError(websiteSSL, err)
+			return
+		}
+		websiteSSL.ExpireDate = cert.NotAfter
+		websiteSSL.StartDate = cert.NotBefore
+		websiteSSL.Type = cert.Issuer.CommonName
+		websiteSSL.Organization = cert.Issuer.Organization[0]
+		websiteSSL.Status = constant.SSLReady
+		err = websiteSSLRepo.Save(websiteSSL)
+		if err != nil {
+			return
+		}
+	}()
+
+	return nil
+}
+
+func handleError(websiteSSL model.WebsiteSSL, err error) {
+	if websiteSSL.Status == constant.SSLInit || websiteSSL.Status == constant.SSLError {
+		websiteSSL.Status = constant.Error
+	} else {
+		websiteSSL.Status = constant.SSLApplyError
+	}
+	websiteSSL.Message = err.Error()
+	_ = websiteSSLRepo.Save(websiteSSL)
 }
 
 func (w WebsiteSSLService) Renew(sslId uint) error {

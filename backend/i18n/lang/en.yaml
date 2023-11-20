@@ -92,6 +92,8 @@ ErrSSLCertificateNotFound: 'The certificate file does not exist'
 ErrSSLKeyFormat: 'Private key file verification error'
 ErrSSLCertificateFormat: 'Certificate file format error, please use pem format'
 ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid or EabHmacKey cannot be empty'
+ErrOpenrestyNotFound: 'Http mode requires Openresty to be installed first'
+
 
 #mysql
 ErrUserIsExist: "The current user already exists. Please enter a new user"

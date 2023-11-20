@@ -236,6 +236,10 @@ const message = {
             recreating: 'Recreating',
             creating: 'Creating',
             systemrestart: 'Interrupt',
+            init: 'Waiting for application',
+            ready: 'normal',
+            applying: 'Applying',
+            applyerror: 'Failure',
         },
         units: {
             second: 'Second',
@@ -1753,6 +1757,10 @@ const message = {
         createAcme: 'Create Account',
         acmeHelper: 'Acme account is used to apply for free certificates',
         upload: 'Upload Certificate',
+        applyType: 'Application method',
+        apply: 'Apply',
+        applyStart: 'Certificate application starts',
+        getDnsResolve: 'Getting DNS resolution value, please wait...',
     },
     firewall: {
         create: 'Create rule',

@@ -92,6 +92,7 @@ ErrSSLCertificateNotFound: '证书文件不存在'
 ErrSSLKeyFormat: '私钥文件校验失败'
 ErrSSLCertificateFormat: '证书文件格式错误，请使用 pem 格式'
 ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid 或 EabHmacKey 不能为空'
+ErrOpenrestyNotFound: 'Http 模式需要首先安装 Openresty'
 
 #mysql
 ErrUserIsExist: "当前用户已存在，请重新输入"

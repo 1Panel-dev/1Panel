@@ -25,7 +25,7 @@
             </template>
             <template #main>
                 <br />
-                <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()">
+                <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()" v-loading="loading">
                     <el-table-column
                         :label="$t('website.domain')"
                         fix
@@ -38,7 +38,13 @@
                         show-overflow-tooltip
                         prop="domains"
                     ></el-table-column>
-                    <el-table-column :label="$t('ssl.provider')" fix show-overflow-tooltip prop="provider">
+                    <el-table-column
+                        :label="$t('ssl.applyType')"
+                        fix
+                        show-overflow-tooltip
+                        prop="provider"
+                        width="100px"
+                    >
                         <template #default="{ row }">{{ getProvider(row.provider) }}</template>
                     </el-table-column>
                     <el-table-column
@@ -48,12 +54,40 @@
                         prop="acmeAccount.email"
                     ></el-table-column>
                     <el-table-column
+                        :label="$t('commons.table.status')"
+                        fix
+                        show-overflow-tooltip
+                        prop="status"
+                        width="100px"
+                    >
+                        <template #default="{ row }">
+                            <el-popover
+                                v-if="
+                                    row.status === 'error' ||
+                                    row.status === 'applyError' ||
+                                    row.status === 'systemRestart'
+                                "
+                                placement="bottom"
+                                :width="400"
+                                trigger="hover"
+                                :content="row.message"
+                            >
+                                <template #reference>
+                                    <Status :key="row.status" :status="row.status"></Status>
+                                </template>
+                            </el-popover>
+                            <div v-else>
+                                <Status :key="row.status" :status="row.status"></Status>
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
                         :label="$t('website.brand')"
                         fix
                         show-overflow-tooltip
                         prop="organization"
                     ></el-table-column>
-                    <el-table-column :label="$t('ssl.autoRenew')" fix>
+                    <el-table-column :label="$t('ssl.autoRenew')" fix width="100px">
                         <template #default="{ row }">
                             <el-switch
                                 :disabled="row.provider === 'dnsManual' || row.provider === 'manual'"
@@ -80,22 +114,20 @@
             <DnsAccount ref="dnsAccountRef"></DnsAccount>
             <AcmeAccount ref="acmeAccountRef"></AcmeAccount>
             <Create ref="sslCreateRef" @close="search()"></Create>
-            <Renew ref="renewRef" @close="search()"></Renew>
             <Detail ref="detailRef"></Detail>
             <SSLUpload ref="sslUploadRef" @close="search()"></SSLUpload>
+            <Apply ref="applyRef" @search="search" />
+            <OpDialog ref="opRef" @search="search" />
         </LayoutContent>
-
-        <OpDialog ref="opRef" @search="search" />
     </div>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, reactive, ref, computed } from 'vue';
 import OpDialog from '@/components/del-dialog/index.vue';
-import { DeleteSSL, SearchSSL, UpdateSSL } from '@/api/modules/website';
+import { DeleteSSL, ObtainSSL, SearchSSL, UpdateSSL } from '@/api/modules/website';
 import DnsAccount from './dns-account/index.vue';
 import AcmeAccount from './acme-account/index.vue';
-import Renew from './renew/index.vue';
 import Create from './create/index.vue';
 import Detail from './detail/index.vue';
 import { dateFormat, getProvider } from '@/utils/util';
@@ -104,6 +136,7 @@ import { Website } from '@/api/interface/website';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
 import SSLUpload from './upload/index.vue';
+import Apply from './apply/index.vue';
 
 const globalStore = GlobalStore();
 const paginationConfig = reactive({
@@ -121,6 +154,7 @@ const data = ref();
 const loading = ref(false);
 const opRef = ref();
 const sslUploadRef = ref();
+const applyRef = ref();
 
 const routerButton = [
     {
@@ -132,17 +166,24 @@ const routerButton = [
 const buttons = [
     {
         label: i18n.global.t('ssl.detail'),
+        disabled: function (row: Website.SSL) {
+            return row.status === 'init' || row.status === 'error';
+        },
         click: function (row: Website.SSL) {
             openDetail(row.id);
         },
     },
     {
-        label: i18n.global.t('website.renewSSL'),
+        label: i18n.global.t('ssl.apply'),
         disabled: function (row: Website.SSL) {
-            return row.provider === 'manual';
+            return row.status === 'applying';
         },
         click: function (row: Website.SSL) {
-            openRenewSSL(row.id, row.websites);
+            if (row.provider === 'dnsManual') {
+                applyRef.value.acceptParams({ ssl: row });
+            } else {
+                applySSL(row);
+            }
         },
     },
     {
@@ -201,6 +242,22 @@ const openRenewSSL = (id: number, websites: Website.Website[]) => {
 };
 const openDetail = (id: number) => {
     detailRef.value.acceptParams(id);
+};
+
+const applySSL = (row: Website.SSL) => {
+    if (row.status === 'init' || row.status === 'error') {
+        loading.value = true;
+        ObtainSSL({ ID: row.id })
+            .then(() => {
+                MsgSuccess(i18n.global.t('ssl.applyStart'));
+                search();
+            })
+            .finally(() => {
+                loading.value = false;
+            });
+    } else {
+        openRenewSSL(row.id, row.websites);
+    }
 };
 
 const deleteSSL = async (row: any) => {

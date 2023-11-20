@@ -19,7 +19,7 @@
                     <el-descriptions-item :label="$t('website.otherDomains')">
                         {{ ssl.domains }}
                     </el-descriptions-item>
-                    <el-descriptions-item :label="$t('ssl.provider')">
+                    <el-descriptions-item :label="$t('ssl.applyType')">
                         {{ getProvider(ssl.provider) }}
                     </el-descriptions-item>
                     <el-descriptions-item

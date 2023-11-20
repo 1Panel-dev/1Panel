@@ -45,4 +45,10 @@ const (
 
 	ConfigPHP = "php"
 	ConfigFPM = "fpm"
+
+	SSLInit       = "init"
+	SSLError      = "error"
+	SSLReady      = "ready"
+	SSLApply      = "applying"
+	SSLApplyError = "applyError"
 )
