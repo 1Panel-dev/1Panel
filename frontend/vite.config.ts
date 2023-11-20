@@ -84,6 +84,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
             outDir: '../cmd/server/web',
             minify: 'esbuild',
             rollupOptions: {
+								external: ['codemirror'],
                 output: {
                     chunkFileNames: 'assets/js/[name]-[hash].js',
                     entryFileNames: 'assets/js/[name]-[hash].js',
