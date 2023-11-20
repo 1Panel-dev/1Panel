@@ -12,6 +12,10 @@ import i18n from '@/lang';
 
 const buttons = [
     {
+        label: i18n.global.t('toolbox.device.toolbox'),
+        path: '/toolbox/device',
+    },
+    {
         label: i18n.global.t('menu.supervisor'),
         path: '/toolbox/supervisor',
     },

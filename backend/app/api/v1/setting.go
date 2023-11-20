@@ -218,43 +218,6 @@ func (b *BaseApi) HandlePasswordExpired(c *gin.Context) {
 }
 
 // @Tags System Setting
-// @Summary Load time zone options
-// @Description 加载系统可用时区
-// @Success 200
-// @Security ApiKeyAuth
-// @Router /settings/time/option [get]
-func (b *BaseApi) LoadTimeZone(c *gin.Context) {
-	zones, err := settingService.LoadTimeZone()
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	helper.SuccessWithData(c, zones)
-}
-
-// @Tags System Setting
-// @Summary Sync system time
-// @Description 系统时间同步
-// @Accept json
-// @Param request body dto.SyncTime true "request"
-// @Success 200 {string} ntime
-// @Security ApiKeyAuth
-// @Router /settings/time/sync [post]
-// @x-panel-log {"bodyKeys":["ntpSite"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"系统时间同步[ntpSite]","formatEN":"sync system time [ntpSite]"}
-func (b *BaseApi) SyncTime(c *gin.Context) {
-	var req dto.SyncTime
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	if err := settingService.SyncTime(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	helper.SuccessWithData(c, nil)
-}
-
-// @Tags System Setting
 // @Summary Load local backup dir
 // @Description 获取安装根目录
 // @Success 200 {string} path

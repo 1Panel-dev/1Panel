@@ -176,6 +176,13 @@ definitions:
     - groupID
     - id
     type: object
+  dto.ChangePasswd:
+    properties:
+      passwd:
+        type: string
+      user:
+        type: string
+    type: object
   dto.ChangeRedisPass:
     properties:
       value:
@@ -923,6 +930,27 @@ definitions:
     - username
     - version
     type: object
+  dto.DeviceBaseInfo:
+    properties:
+      dns:
+        items:
+          type: string
+        type: array
+      hostname:
+        type: string
+      hosts:
+        items:
+          $ref: '#/definitions/dto.HostHelper'
+        type: array
+      localTime:
+        type: string
+      ntp:
+        type: string
+      timeZone:
+        type: string
+      user:
+        type: string
+    type: object
   dto.DiskInfo:
     properties:
       device:
@@ -1157,6 +1185,13 @@ definitions:
     - addr
     - port
     - user
+    type: object
+  dto.HostHelper:
+    properties:
+      host:
+        type: string
+      ip:
+        type: string
     type: object
   dto.HostOperate:
     properties:
@@ -2334,13 +2369,6 @@ definitions:
     required:
     - id
     type: object
-  dto.SyncTime:
-    properties:
-      ntpSite:
-        type: string
-    required:
-    - ntpSite
-    type: object
   dto.TreeChild:
     properties:
       id:
@@ -2351,6 +2379,13 @@ definitions:
   dto.UpdateByFile:
     properties:
       file:
+        type: string
+    type: object
+  dto.UpdateByNameAndFile:
+    properties:
+      file:
+        type: string
+      name:
         type: string
     type: object
   dto.UpdateDescription:
@@ -10774,46 +10809,6 @@ paths:
         formatEN: update system ssl => [ssl]
         formatZH: 修改系统 ssl => [ssl]
         paramKeys: []
-  /settings/time/option:
-    get:
-      description: 加载系统可用时区
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      summary: Load time zone options
-      tags:
-      - System Setting
-  /settings/time/sync:
-    post:
-      consumes:
-      - application/json
-      description: 系统时间同步
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.SyncTime'
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      security:
-      - ApiKeyAuth: []
-      summary: Sync system time
-      tags:
-      - System Setting
-      x-panel-log:
-        BeforeFunctions: []
-        bodyKeys:
-        - ntpSite
-        formatEN: sync system time [ntpSite]
-        formatZH: 系统时间同步[ntpSite]
-        paramKeys: []
   /settings/update:
     post:
       consumes:
@@ -10888,6 +10883,161 @@ paths:
         formatEN: upgrade service => [version]
         formatZH: 更新系统 => [version]
         paramKeys: []
+  /toolbox/device/base:
+    get:
+      description: 获取设备基础信息
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.DeviceBaseInfo'
+      security:
+      - ApiKeyAuth: []
+      summary: Load device base info
+      tags:
+      - Device
+  /toolbox/device/check/dns:
+    post:
+      consumes:
+      - application/json
+      description: 检查系统 DNS 配置可用性
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SettingUpdate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Check device DNS conf
+      tags:
+      - Device
+  /toolbox/device/conf:
+    post:
+      consumes:
+      - application/json
+      description: 获取系统配置文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OperationWithName'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: load conf
+      tags:
+      - Device
+  /toolbox/device/update/byconf:
+    post:
+      consumes:
+      - application/json
+      description: 通过文件修改配置
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateByNameAndFile'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update device conf by file
+      tags:
+      - Device
+  /toolbox/device/update/conf:
+    post:
+      consumes:
+      - application/json
+      description: 修改系统参数
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SettingUpdate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update device
+      tags:
+      - Device
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - key
+        - value
+        formatEN: update device conf [key] => [value]
+        formatZH: 修改主机参数 [key] => [value]
+        paramKeys: []
+  /toolbox/device/update/host:
+    post:
+      description: 修改系统 hosts
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update device hosts
+      tags:
+      - Device
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - key
+        - value
+        formatEN: update device host [key] => [value]
+        formatZH: 修改主机 Host [key] => [value]
+        paramKeys: []
+  /toolbox/device/update/passwd:
+    post:
+      consumes:
+      - application/json
+      description: 修改系统密码
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ChangePasswd'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update device passwd
+      tags:
+      - Device
+  /toolbox/device/zone/options:
+    get:
+      consumes:
+      - application/json
+      description: 获取系统可用时区选项
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: Array
+      security:
+      - ApiKeyAuth: []
+      summary: list time zone options
+      tags:
+      - Device
   /toolbox/fail2ban/base:
     get:
       description: 获取 Fail2Ban 基础信息

@@ -33,6 +33,7 @@ var (
 	sshService      = service.NewISSHService()
 	firewallService = service.NewIFirewallService()
 
+	deviceService   = service.NewIDeviceService()
 	fail2banService = service.NewIFail2BanService()
 
 	settingService = service.NewISettingService()

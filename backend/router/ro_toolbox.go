@@ -16,6 +16,15 @@ func (s *ToolboxRouter) InitToolboxRouter(Router *gin.RouterGroup) {
 		Use(middleware.PasswordExpired())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
+		toolboxRouter.GET("/device/base", baseApi.LoadDeviceBaseInfo)
+		toolboxRouter.GET("/device/zone/options", baseApi.LoadTimeOption)
+		toolboxRouter.POST("/device/update/conf", baseApi.UpdateDeviceConf)
+		toolboxRouter.POST("/device/update/host", baseApi.UpdateDeviceHost)
+		toolboxRouter.POST("/device/update/passwd", baseApi.UpdateDevicPasswd)
+		toolboxRouter.POST("/device/update/byconf", baseApi.UpdateDevicByFile)
+		toolboxRouter.POST("/device/check/dns", baseApi.CheckDNS)
+		toolboxRouter.POST("/device/conf", baseApi.LoadDeviceConf)
+
 		toolboxRouter.GET("/fail2ban/base", baseApi.LoadFail2BanBaseInfo)
 		toolboxRouter.GET("/fail2ban/load/conf", baseApi.LoadFail2BanConf)
 		toolboxRouter.POST("/fail2ban/search", baseApi.SearchFail2Ban)

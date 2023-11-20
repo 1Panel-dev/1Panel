@@ -21,7 +21,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
-	"github.com/1Panel-dev/1Panel/backend/utils/ntp"
 	"github.com/1Panel-dev/1Panel/backend/utils/ssl"
 	"github.com/gin-gonic/gin"
 	"github.com/robfig/cron/v3"
@@ -32,7 +31,6 @@ type SettingService struct{}
 type ISettingService interface {
 	GetSettingInfo() (*dto.SettingInfo, error)
 	LoadInterfaceAddr() ([]string, error)
-	LoadTimeZone() ([]string, error)
 	Update(key, value string) error
 	UpdatePassword(c *gin.Context, old, new string) error
 	UpdatePort(port uint) error
@@ -40,7 +38,6 @@ type ISettingService interface {
 	UpdateSSL(c *gin.Context, req dto.SSLUpdate) error
 	LoadFromCert() (*dto.SSLInfo, error)
 	HandlePasswordExpired(c *gin.Context, old, new string) error
-	SyncTime(req dto.SyncTime) error
 
 	SystemScan() dto.CleanData
 	SystemClean(req []dto.Clean)
@@ -72,14 +69,6 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 	return &info, err
 }
 
-func (u *SettingService) LoadTimeZone() ([]string, error) {
-	std, err := cmd.Exec("timedatectl list-timezones")
-	if err != nil {
-		return []string{}, nil
-	}
-	return strings.Split(std, "\n"), err
-}
-
 func (u *SettingService) Update(key, value string) error {
 	switch key {
 	case "MonitorStatus":
@@ -107,10 +96,6 @@ func (u *SettingService) Update(key, value string) error {
 				return err
 			}
 		}
-	case "TimeZone":
-		if err := ntp.UpdateSystemTimeZone(value); err != nil {
-			return err
-		}
 	case "AppStoreLastModified":
 		exist, _ := settingRepo.Get(settingRepo.WithByKey("AppStoreLastModified"))
 		if exist.ID == 0 {
@@ -129,13 +114,6 @@ func (u *SettingService) Update(key, value string) error {
 		if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format("2006-01-02 15:04:05")); err != nil {
 			return err
 		}
-	case "TimeZone":
-		go func() {
-			_, err := cmd.Exec("systemctl restart 1panel.service")
-			if err != nil {
-				global.LOG.Errorf("restart system for new time zone failed, err: %v", err)
-			}
-		}()
 	case "BindDomain":
 		if len(value) != 0 {
 			_ = global.SESSION.Clean()
@@ -145,21 +123,6 @@ func (u *SettingService) Update(key, value string) error {
 
 	}
 
-	return nil
-}
-
-func (u *SettingService) SyncTime(req dto.SyncTime) error {
-	if err := settingRepo.Update("NtpSite", req.NtpSite); err != nil {
-		return err
-	}
-	ntime, err := ntp.GetRemoteTime(req.NtpSite)
-	if err != nil {
-		return err
-	}
-	ts := ntime.Format("2006-01-02 15:04:05")
-	if err := ntp.UpdateSystemTime(ts); err != nil {
-		return err
-	}
 	return nil
 }
 

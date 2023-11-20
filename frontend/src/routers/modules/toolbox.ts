@@ -13,10 +13,20 @@ const toolboxRouter = {
         {
             path: '/toolbox',
             name: 'Toolbox',
-            redirect: '/toolbox/supervisor',
+            redirect: '/toolbox/device',
             component: () => import('@/views/toolbox/index.vue'),
             meta: {},
             children: [
+                {
+                    path: 'device',
+                    name: 'Device',
+                    component: () => import('@/views/toolbox/device/index.vue'),
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/toolbox',
+                        requiresAuth: false,
+                    },
+                },
                 {
                     path: 'supervisor',
                     name: 'Supervisor',

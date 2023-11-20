@@ -2,25 +2,25 @@
     <div>
         <el-drawer v-model="drawerVisible" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
             <template #header>
-                <DrawerHeader :header="$t('setting.syncTime')" :back="handleClose" />
+                <DrawerHeader :header="$t('toolbox.device.localTime')" :back="handleClose" />
             </template>
             <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
-                        <el-form-item :label="$t('setting.syncSite')" prop="ntpSite" :rules="Rules.domain">
+                        <el-form-item :label="$t('toolbox.device.syncSite')" prop="ntpSite" :rules="Rules.domain">
                             <el-input v-model="form.ntpSite" />
                             <el-button type="primary" link class="tagClass" @click="form.ntpSite = 'pool.ntp.org'">
                                 {{ $t('website.default') }}
                             </el-button>
                             <el-button type="primary" link class="tagClass" @click="form.ntpSite = 'ntp.aliyun.com'">
-                                {{ $t('setting.ntpALi') }}
+                                {{ $t('toolbox.device.ntpALi') }}
                             </el-button>
                             <el-button type="primary" link class="tagClass" @click="form.ntpSite = 'time.google.com'">
-                                {{ $t('setting.ntpGoogle') }}
+                                {{ $t('toolbox.device.ntpGoogle') }}
                             </el-button>
                         </el-form-item>
 
-                        <el-form-item :label="$t('setting.syncTime')" prop="localTime">
+                        <el-form-item :label="$t('toolbox.device.localTime')" prop="localTime">
                             <el-input v-model="form.localTime" disabled />
                         </el-form-item>
                     </el-col>
@@ -41,10 +41,10 @@
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { syncTime } from '@/api/modules/setting';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { Rules } from '@/global/form-rules';
+import { updateDevice } from '@/api/modules/toolbox';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -73,8 +73,8 @@ const onSyncTime = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         ElMessageBox.confirm(
-            i18n.global.t('setting.syncSiteHelper', [form.ntpSite]),
-            i18n.global.t('setting.syncSite'),
+            i18n.global.t('toolbox.device.syncSiteHelper', [form.ntpSite]),
+            i18n.global.t('toolbox.device.syncSite'),
             {
                 confirmButtonText: i18n.global.t('commons.button.confirm'),
                 cancelButtonText: i18n.global.t('commons.button.cancel'),
@@ -82,10 +82,9 @@ const onSyncTime = async (formEl: FormInstance | undefined) => {
             },
         ).then(async () => {
             loading.value = true;
-            await syncTime(form.ntpSite)
-                .then((res) => {
+            await updateDevice('LocalTime', form.ntpSite)
+                .then(() => {
                     loading.value = false;
-                    form.localTime = res.data;
                     emit('search');
                     handleClose();
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

@@ -1,0 +1,167 @@
+<template>
+    <div>
+        <el-drawer v-model="drawerVisible" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+            <template #header>
+                <DrawerHeader header="Hosts" :back="handleClose" />
+            </template>
+
+            <el-row type="flex" justify="center">
+                <el-col :span="22">
+                    <el-radio-group v-model="confShowType" @change="changeMode">
+                        <el-radio-button label="base">{{ $t('database.baseConf') }}</el-radio-button>
+                        <el-radio-button label="all">{{ $t('database.allConf') }}</el-radio-button>
+                    </el-radio-group>
+                    <table style="width: 100%" class="mt-4" v-if="confShowType === 'base'">
+                        <tr v-if="form.hosts.length !== 0">
+                            <th scope="col" width="25%" align="left">
+                                <label>IP</label>
+                            </th>
+                            <th scope="col" width="70%" align="left">
+                                <label>{{ $t('toolbox.device.hosts') }}</label>
+                            </th>
+                            <th align="left"></th>
+                        </tr>
+                        <tr v-for="(row, index) in form.hosts" :key="index">
+                            <td width="25%">
+                                <el-input placeholder="172.16.10.111" v-model="row.ip" />
+                            </td>
+                            <td width="70%">
+                                <el-input placeholder="test.hostname.com" v-model="row.host" />
+                            </td>
+                            <td>
+                                <el-button link type="primary" @click="handleHostsDelete(index)">
+                                    {{ $t('commons.button.delete') }}
+                                </el-button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left">
+                                <el-button @click="handleHostsAdd()">{{ $t('commons.button.add') }}</el-button>
+                            </td>
+                        </tr>
+                    </table>
+                    <div v-else>
+                        <codemirror
+                            :autofocus="true"
+                            placeholder="# The hosts configuration file does not exist or is empty (/etc/hosts)"
+                            :indent-with-tab="true"
+                            :tabSize="4"
+                            style="margin-top: 10px; height: calc(100vh - 200px)"
+                            :lineWrapping="true"
+                            :matchBrackets="true"
+                            theme="cobalt"
+                            :styleActiveLine="true"
+                            :extensions="extensions"
+                            v-model="hostsConf"
+                        />
+                    </div>
+                </el-col>
+            </el-row>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button :disabled="loading" type="primary" @click="onSave()">
+                        {{ $t('commons.button.confirm') }}
+                    </el-button>
+                </span>
+            </template>
+        </el-drawer>
+    </div>
+</template>
+<script lang="ts" setup>
+import { reactive, ref } from 'vue';
+import i18n from '@/lang';
+import { MsgError, MsgSuccess } from '@/utils/message';
+import DrawerHeader from '@/components/drawer-header/index.vue';
+import { loadDeviceConf, updateDeviceByConf, updateDeviceHost } from '@/api/modules/toolbox';
+import { Codemirror } from 'vue-codemirror';
+import { javascript } from '@codemirror/lang-javascript';
+import { oneDark } from '@codemirror/theme-one-dark';
+import { Toolbox } from '@/api/interface/toolbox';
+
+const emit = defineEmits<{ (e: 'search'): void }>();
+
+const extensions = [javascript(), oneDark];
+const confShowType = ref('base');
+const hostsConf = ref();
+
+const form = reactive({
+    hosts: [],
+});
+
+interface DialogProps {
+    hosts: Array<Toolbox.HostHelper>;
+}
+
+const drawerVisible = ref();
+const loading = ref();
+
+const acceptParams = (params: DialogProps): void => {
+    confShowType.value = 'base';
+    form.hosts = params.hosts;
+    drawerVisible.value = true;
+};
+
+const loadHostsConf = async () => {
+    const res = await loadDeviceConf('Hosts');
+    hostsConf.value = res.data || '';
+};
+
+const changeMode = async () => {
+    if (confShowType.value === 'all') {
+        loadHostsConf();
+    }
+};
+
+const handleHostsAdd = () => {
+    let item = {
+        ip: '',
+        host: '',
+    };
+    form.hosts.push(item);
+};
+const handleHostsDelete = (index: number) => {
+    form.hosts.splice(index, 1);
+};
+
+const onSave = async () => {
+    for (const item of form.hosts) {
+        if (item.ip === '' || item.host === '') {
+            MsgError(i18n.global.t('toolbox.device.hostHelper'));
+            return;
+        }
+    }
+    loading.value = true;
+    if (confShowType.value === 'base') {
+        await updateDeviceHost(form.hosts)
+            .then(() => {
+                loading.value = false;
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                emit('search');
+                handleClose();
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+        return;
+    }
+    await updateDeviceByConf('Hosts', hostsConf.value)
+        .then(() => {
+            loading.value = false;
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            emit('search');
+            handleClose();
+        })
+        .catch(() => {
+            loading.value = false;
+        });
+};
+
+const handleClose = () => {
+    drawerVisible.value = false;
+};
+
+defineExpose({
+    acceptParams,
+});
+</script>
