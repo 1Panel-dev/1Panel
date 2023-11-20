@@ -1,4 +1,22 @@
 export namespace Toolbox {
+    export interface DeviceBaseInfo {
+        dns: Array<string>;
+        hosts: Array<HostHelper>;
+        hostname: string;
+        ntp: string;
+        user: string;
+        timeZone: string;
+        localTime: string;
+    }
+    export interface HostHelper {
+        ip: string;
+        host: string;
+    }
+    export interface TimeZoneOptions {
+        from: string;
+        zones: Array<string>;
+    }
+
     export interface Fail2banBaseInfo {
         isEnable: boolean;
         isActive: boolean;

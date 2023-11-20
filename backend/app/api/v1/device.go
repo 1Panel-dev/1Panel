@@ -70,7 +70,7 @@ func (b *BaseApi) LoadDeviceConf(c *gin.Context) {
 // @Description 通过文件修改配置
 // @Accept json
 // @Param request body dto.UpdateByNameAndFile true "request"
-// @Success 200 {object}
+// @Success 200
 // @Security ApiKeyAuth
 // @Router /toolbox/device/update/byconf [post]
 func (b *BaseApi) UpdateDevicByFile(c *gin.Context) {
@@ -112,9 +112,7 @@ func (b *BaseApi) UpdateDeviceConf(c *gin.Context) {
 // @Tags Device
 // @Summary Update device hosts
 // @Description 修改系统 hosts
-// @Accept json
-// @Param request body {Array} true "request"
-// @Success 200 {object} dto.PageResult
+// @Success 200
 // @Security ApiKeyAuth
 // @Router /toolbox/device/update/host [post]
 // @x-panel-log {"bodyKeys":["key","value"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改主机 Host [key] => [value]","formatEN":"update device host [key] => [value]"}
@@ -168,7 +166,7 @@ func (b *BaseApi) UpdateDevicPasswd(c *gin.Context) {
 // @Param request body dto.SettingUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /toolbox/device/test/dns [post]
+// @Router /toolbox/device/check/dns [post]
 func (b *BaseApi) CheckDNS(c *gin.Context) {
 	var req dto.SettingUpdate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

@@ -1,6 +1,33 @@
 import http from '@/api';
 import { UpdateByFile } from '../interface';
 import { Toolbox } from '../interface/toolbox';
+import { Base64 } from 'js-base64';
+
+// device
+export const getDeviceBase = () => {
+    return http.get<Toolbox.DeviceBaseInfo>(`/toolbox/device/base`);
+};
+export const loadTimeZoneOptions = () => {
+    return http.get<Array<string>>(`/toolbox/device/zone/options`);
+};
+export const updateDevice = (key: string, value: string) => {
+    return http.post(`/toolbox/device/update/conf`, { key: key, value: value });
+};
+export const updateDeviceHost = (param: Array<Toolbox.TimeZoneOptions>) => {
+    return http.post(`/toolbox/device/update/host`, param);
+};
+export const updateDevicePasswd = (user: string, passwd: string) => {
+    return http.post(`/toolbox/device/update/passwd`, { user: user, passwd: Base64.encode(passwd) });
+};
+export const updateDeviceByConf = (name: string, file: string) => {
+    return http.post(`/toolbox/device/update/byconf`, { name: name, file: file });
+};
+export const checkDNS = (key: string, value: string) => {
+    return http.post(`/toolbox/device/check/dns`, { key: key, value: value });
+};
+export const loadDeviceConf = (name: string) => {
+    return http.post(`/toolbox/device/conf`, { name: name });
+};
 
 // fail2ban
 export const getFail2banBase = () => {

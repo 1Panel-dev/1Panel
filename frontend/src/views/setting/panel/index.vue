@@ -93,24 +93,6 @@
                                 </el-input>
                             </el-form-item>
 
-                            <el-form-item :label="$t('setting.timeZone')" prop="timeZone">
-                                <el-input disabled v-model.number="form.timeZone">
-                                    <template #append>
-                                        <el-button @click="onChangeTimeZone" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-                            <el-form-item :label="$t('setting.syncTime')">
-                                <el-input disabled v-model="form.localTime">
-                                    <template #append>
-                                        <el-button v-show="!show" @click="onChangeNtp" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
                             <el-form-item :label="$t('setting.systemIP')" prop="systemIP">
                                 <el-input disabled v-if="form.systemIP" v-model="form.systemIP">
                                     <template #append>
@@ -138,8 +120,6 @@
         <PanelName ref="panelNameRef" @search="search()" />
         <SystemIP ref="systemIPRef" @search="search()" />
         <Timeout ref="timeoutRef" @search="search()" />
-        <TimeZone ref="timezoneRef" @search="search()" />
-        <Ntp ref="ntpRef" @search="search()" />
         <Network ref="networkRef" @search="search()" />
         <Clean ref="cleanRef" @search="search()" />
     </div>
@@ -158,10 +138,8 @@ import UserName from '@/views/setting/panel/username/index.vue';
 import Timeout from '@/views/setting/panel/timeout/index.vue';
 import PanelName from '@/views/setting/panel/name/index.vue';
 import SystemIP from '@/views/setting/panel/systemip/index.vue';
-import TimeZone from '@/views/setting/panel/timezone/index.vue';
 import Network from '@/views/setting/panel/default-network/index.vue';
 import Clean from '@/views/setting/panel/clean/index.vue';
-import Ntp from '@/views/setting/panel/ntp/index.vue';
 
 const loading = ref(false);
 const i18n = useI18n();
@@ -197,8 +175,6 @@ const passwordRef = ref();
 const panelNameRef = ref();
 const systemIPRef = ref();
 const timeoutRef = ref();
-const ntpRef = ref();
-const timezoneRef = ref();
 const networkRef = ref();
 const cleanRef = ref();
 const unset = ref(i18n.t('setting.unSetting'));
@@ -238,12 +214,6 @@ const onChangeTimeout = () => {
 };
 const onChangeSystemIP = () => {
     systemIPRef.value.acceptParams({ systemIP: form.systemIP });
-};
-const onChangeTimeZone = () => {
-    timezoneRef.value.acceptParams({ timeZone: form.timeZone });
-};
-const onChangeNtp = () => {
-    ntpRef.value.acceptParams({ localTime: form.localTime, ntpSite: form.ntpSite });
 };
 const onChangeNetwork = () => {
     networkRef.value.acceptParams({ defaultNetwork: form.defaultNetwork });

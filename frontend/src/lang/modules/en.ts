@@ -873,6 +873,37 @@ const message = {
         emptyTerminal: 'No terminal is currently connected',
     },
     toolbox: {
+        device: {
+            dnsHelper: 'Server Address Domain Resolution',
+            hostsHelper: 'Hostname Resolution',
+            hosts: 'Domain',
+            toolbox: 'Toolbox',
+            hostname: 'Hostname',
+            passwd: 'Host Password',
+            passwdHelper: 'Input characters cannot include $ and &',
+            timeZone: 'System Time Zone',
+            localTime: 'Server Time',
+            timeZoneChangeHelper: 'Modifying the system time zone requires restarting the service. Continue?',
+            timeZoneHelper:
+                'Time zone modification depends on the timedatectl command. If not installed, the modification may fail.',
+            timeZoneCN: 'Beijing',
+            timeZoneAM: 'Los Angeles',
+            timeZoneNY: 'New York',
+            ntpALi: 'Alibaba',
+            ntpGoogle: 'Google',
+            syncSite: 'NTP Server',
+            hostnameHelper:
+                'Hostname modification depends on the hostnamectl command. If not installed, the modification may fail.',
+            userHelper:
+                'The username depends on the whoami command for retrieval. If not installed, retrieval may fail.',
+            passwordHelper:
+                'Password modification depends on the chpasswd command. If not installed, the modification may fail.',
+            hostHelper:
+                'There is an empty value in the provided content. Please check and try again after modification!',
+            dnsCheck: 'Test Availability',
+            dnsOK: 'DNS configuration information is available!',
+            dnsTestFailed: 'DNS configuration information is not available. Please modify and try again!',
+        },
         fail2ban: {
             noFail2ban: 'Fail2Ban service not detected, please refer to the official documentation for installation',
             unActive: 'The Fail2Ban service is not enabled at present, please enable it first!',
