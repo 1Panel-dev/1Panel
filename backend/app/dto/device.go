@@ -1,10 +1,13 @@
 package dto
 
 type DeviceBaseInfo struct {
-	TimeZone    string       `json:"timeZone"`
-	LocalTime   string       `json:"localTime"`
-	NameServers []string     `json:"nameServer"`
-	Hosts       []HostHelper `json:"hosts"`
+	DNS       []string     `json:"dns"`
+	Hosts     []HostHelper `json:"hosts"`
+	Hostname  string       `json:"hostname"`
+	TimeZone  string       `json:"timeZone"`
+	LocalTime string       `json:"localTime"`
+	Ntp       string       `json:"ntp"`
+	User      string       `json:"user"`
 }
 
 type HostHelper struct {
@@ -15,4 +18,9 @@ type HostHelper struct {
 type TimeZoneOptions struct {
 	From  string   `json:"from"`
 	Zones []string `json:"zones"`
+}
+
+type ChangePasswd struct {
+	User   string `json:"user"`
+	Passwd string `json:"passwd"`
 }
