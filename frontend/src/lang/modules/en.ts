@@ -1734,7 +1734,7 @@ const message = {
         saveAndReload: 'Save and Reload',
     },
     ssl: {
-        create: 'Create Certificate',
+        create: 'Apply Certificate',
         provider: 'Type',
         manualCreate: 'manually created',
         acmeAccount: 'Acme Account',

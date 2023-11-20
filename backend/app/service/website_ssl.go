@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/x509"
 	"encoding/pem"
+	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -11,11 +12,15 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/1Panel-dev/1Panel/backend/utils/ssl"
 	"github.com/go-acme/lego/v4/certcrypto"
+	legoLogger "github.com/go-acme/lego/v4/log"
 	"github.com/jinzhu/gorm"
+	"log"
+	"os"
 	"path"
 	"strconv"
 	"strings"
@@ -37,6 +42,7 @@ type IWebsiteSSLService interface {
 	Update(update request.WebsiteSSLUpdate) error
 	Upload(req request.WebsiteSSLUpload) error
 	ObtainSSL(apply request.WebsiteSSLApply) error
+	SyncForRestart() error
 }
 
 func NewIWebsiteSSLService() IWebsiteSSLService {
@@ -51,9 +57,10 @@ func (w WebsiteSSLService) Page(search request.WebsiteSSLSearch) (int64, []respo
 	if err != nil {
 		return 0, nil, err
 	}
-	for _, sslModel := range sslList {
+	for _, model := range sslList {
 		result = append(result, response.WebsiteSSLDTO{
-			WebsiteSSL: sslModel,
+			WebsiteSSL: model,
+			LogPath:    path.Join(constant.SSLLogDir, fmt.Sprintf("%s-ssl-%d.log", model.PrimaryDomain, model.ID)),
 		})
 	}
 	return total, result, err
@@ -141,11 +148,19 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 }
 
 func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
-	websiteSSL, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(apply.ID))
+
+	var (
+		err         error
+		websiteSSL  model.WebsiteSSL
+		acmeAccount *model.WebsiteAcmeAccount
+		dnsAccount  *model.WebsiteDnsAccount
+	)
+
+	websiteSSL, err = websiteSSLRepo.GetFirst(commonRepo.WithByID(apply.ID))
 	if err != nil {
 		return err
 	}
-	acmeAccount, err := websiteAcmeRepo.GetFirst(commonRepo.WithByID(websiteSSL.AcmeAccountID))
+	acmeAccount, err = websiteAcmeRepo.GetFirst(commonRepo.WithByID(websiteSSL.AcmeAccountID))
 	if err != nil {
 		return err
 	}
@@ -156,11 +171,11 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 
 	switch websiteSSL.Provider {
 	case constant.DNSAccount:
-		dnsAccount, err := websiteDnsRepo.GetFirst(commonRepo.WithByID(websiteSSL.DnsAccountID))
+		dnsAccount, err = websiteDnsRepo.GetFirst(commonRepo.WithByID(websiteSSL.DnsAccountID))
 		if err != nil {
 			return err
 		}
-		if err := client.UseDns(ssl.DnsType(dnsAccount.Type), dnsAccount.Authorization); err != nil {
+		if err = client.UseDns(ssl.DnsType(dnsAccount.Type), dnsAccount.Authorization); err != nil {
 			return err
 		}
 	case constant.Http:
@@ -181,7 +196,9 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 	}
 
 	domains := []string{websiteSSL.PrimaryDomain}
-	domains = append(domains, domains...)
+	if websiteSSL.Domains != "" {
+		domains = append(domains, strings.Split(websiteSSL.Domains, ",")...)
+	}
 
 	privateKey, err := certcrypto.GeneratePrivateKey(ssl.KeyType(websiteSSL.KeyType))
 	if err != nil {
@@ -195,6 +212,15 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 	}
 
 	go func() {
+		logFile, _ := os.OpenFile(path.Join(constant.SSLLogDir, fmt.Sprintf("%s-ssl-%d.log", websiteSSL.PrimaryDomain, websiteSSL.ID)), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+		defer logFile.Close()
+		logger := log.New(logFile, "", log.LstdFlags)
+		legoLogger.Logger = logger
+		startMsg := i18n.GetMsgWithMap("ApplySSLStart", map[string]interface{}{"domain": strings.Join(domains, ","), "type": i18n.GetMsgByKey(websiteSSL.Provider)})
+		if websiteSSL.Provider == constant.DNSAccount {
+			startMsg = startMsg + i18n.GetMsgWithMap("DNSAccountName", map[string]interface{}{"name": dnsAccount.Name, "type": dnsAccount.Type})
+		}
+		legoLogger.Logger.Println(startMsg)
 		resource, err := client.ObtainSSL(domains, privateKey)
 		if err != nil {
 			handleError(websiteSSL, err)
@@ -214,6 +240,7 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 		websiteSSL.Type = cert.Issuer.CommonName
 		websiteSSL.Organization = cert.Issuer.Organization[0]
 		websiteSSL.Status = constant.SSLReady
+		legoLogger.Logger.Println(i18n.GetMsgWithMap("ApplySSLSuccess", map[string]interface{}{"domain": strings.Join(domains, ",")}))
 		err = websiteSSLRepo.Save(websiteSSL)
 		if err != nil {
 			return
@@ -230,6 +257,7 @@ func handleError(websiteSSL model.WebsiteSSL, err error) {
 		websiteSSL.Status = constant.SSLApplyError
 	}
 	websiteSSL.Message = err.Error()
+	legoLogger.Logger.Println(i18n.GetErrMsg("ApplySSLFailed", map[string]interface{}{"domain": websiteSSL.PrimaryDomain, "err": err.Error()}))
 	_ = websiteSSLRepo.Save(websiteSSL)
 }
 
@@ -424,4 +452,19 @@ func (w WebsiteSSLService) Upload(req request.WebsiteSSLUpload) error {
 	newSSL.Domains = strings.Join(domains, ",")
 
 	return websiteSSLRepo.Create(context.Background(), newSSL)
+}
+
+func (w WebsiteSSLService) SyncForRestart() error {
+	sslList, err := websiteSSLRepo.List()
+	if err != nil {
+		return err
+	}
+	for _, ssl := range sslList {
+		if ssl.Status == constant.SSLApply {
+			ssl.Status = constant.SystemRestart
+			ssl.Message = "System restart causing interrupt"
+			_ = websiteSSLRepo.Save(ssl)
+		}
+	}
+	return nil
 }

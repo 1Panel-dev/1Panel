@@ -93,6 +93,13 @@ ErrSSLKeyFormat: 'Private key file verification error'
 ErrSSLCertificateFormat: 'Certificate file format error, please use pem format'
 ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid or EabHmacKey cannot be empty'
 ErrOpenrestyNotFound: 'Http mode requires Openresty to be installed first'
+ApplySSLStart: 'Start applying for certificate, domain name [{{ .domain }}] application method [{{ .type }}] '
+dnsAccount: "DNS Automatic"
+dnsManual: "DNS Manual"
+http: "HTTP"
+ApplySSLFailed: 'Application for [{{ .domain }}] certificate failed, {{.detail}} '
+ApplySSLSuccess: 'Application for [{{ .domain }}] certificate successful! ! '
+DNSAccountName: 'DNS account [{{ .name }}] manufacturer [{{.type}}]'
 
 
 #mysql

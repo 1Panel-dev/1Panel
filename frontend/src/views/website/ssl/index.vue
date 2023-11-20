@@ -81,6 +81,11 @@
                             </div>
                         </template>
                     </el-table-column>
+                    <el-table-column :label="$t('website.log')" prop="">
+                        <template #default="{ row }">
+                            <el-button @click="openLog(row)" link type="primary">{{ $t('website.check') }}</el-button>
+                        </template>
+                    </el-table-column>
                     <el-table-column
                         :label="$t('website.brand')"
                         fix
@@ -118,6 +123,7 @@
             <SSLUpload ref="sslUploadRef" @close="search()"></SSLUpload>
             <Apply ref="applyRef" @search="search" />
             <OpDialog ref="opRef" @search="search" />
+            <Log ref="logRef" @close="search()" />
         </LayoutContent>
     </div>
 </template>
@@ -137,6 +143,7 @@ import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
 import SSLUpload from './upload/index.vue';
 import Apply from './apply/index.vue';
+import Log from '@/components/log/index.vue';
 
 const globalStore = GlobalStore();
 const paginationConfig = reactive({
@@ -148,13 +155,13 @@ const paginationConfig = reactive({
 const acmeAccountRef = ref();
 const dnsAccountRef = ref();
 const sslCreateRef = ref();
-const renewRef = ref();
 const detailRef = ref();
 const data = ref();
 const loading = ref(false);
 const opRef = ref();
 const sslUploadRef = ref();
 const applyRef = ref();
+const logRef = ref();
 
 const routerButton = [
     {
@@ -166,19 +173,19 @@ const routerButton = [
 const buttons = [
     {
         label: i18n.global.t('ssl.detail'),
-        disabled: function (row: Website.SSL) {
+        disabled: function (row: Website.SSLDTO) {
             return row.status === 'init' || row.status === 'error';
         },
-        click: function (row: Website.SSL) {
+        click: function (row: Website.SSLDTO) {
             openDetail(row.id);
         },
     },
     {
         label: i18n.global.t('ssl.apply'),
-        disabled: function (row: Website.SSL) {
+        disabled: function (row: Website.SSLDTO) {
             return row.status === 'applying';
         },
-        click: function (row: Website.SSL) {
+        click: function (row: Website.SSLDTO) {
             if (row.provider === 'dnsManual') {
                 applyRef.value.acceptParams({ ssl: row });
             } else {
@@ -188,7 +195,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
-        click: function (row: Website.SSL) {
+        click: function (row: Website.SSLDTO) {
             deleteSSL(row);
         },
     },
@@ -214,7 +221,7 @@ const search = () => {
         });
 };
 
-const updateConfig = (row: Website.SSL) => {
+const updateConfig = (row: Website.SSLDTO) => {
     loading.value = true;
     UpdateSSL({ id: row.id, autoRenew: row.autoRenew })
         .then(() => {
@@ -237,27 +244,23 @@ const openSSL = () => {
 const openUpload = () => {
     sslUploadRef.value.acceptParams();
 };
-const openRenewSSL = (id: number, websites: Website.Website[]) => {
-    renewRef.value.acceptParams({ id: id, websites: websites });
-};
 const openDetail = (id: number) => {
     detailRef.value.acceptParams(id);
 };
+const openLog = (row: Website.SSLDTO) => {
+    logRef.value.acceptParams({ path: row.logPath });
+};
 
-const applySSL = (row: Website.SSL) => {
-    if (row.status === 'init' || row.status === 'error') {
-        loading.value = true;
-        ObtainSSL({ ID: row.id })
-            .then(() => {
-                MsgSuccess(i18n.global.t('ssl.applyStart'));
-                search();
-            })
-            .finally(() => {
-                loading.value = false;
-            });
-    } else {
-        openRenewSSL(row.id, row.websites);
-    }
+const applySSL = (row: Website.SSLDTO) => {
+    loading.value = true;
+    ObtainSSL({ ID: row.id })
+        .then(() => {
+            MsgSuccess(i18n.global.t('ssl.applyStart'));
+            search();
+        })
+        .finally(() => {
+            loading.value = false;
+        });
 };
 
 const deleteSSL = async (row: any) => {

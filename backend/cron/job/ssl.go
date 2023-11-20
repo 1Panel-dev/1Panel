@@ -23,7 +23,7 @@ func (ssl *ssl) Run() {
 	global.LOG.Info("The scheduled certificate update task is currently in progress ...")
 	now := time.Now().Add(10 * time.Second)
 	for _, s := range sslList {
-		if !s.AutoRenew || s.Provider == "manual" || s.Provider == "dnsManual" {
+		if !s.AutoRenew || s.Provider == "manual" || s.Provider == "dnsManual" || s.Status == "applying" {
 			continue
 		}
 		expireDate := s.ExpireDate.In(nyc)

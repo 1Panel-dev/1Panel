@@ -1646,7 +1646,7 @@ const message = {
         saveAndReload: '保存並重載',
     },
     ssl: {
-        create: '創建證書',
+        create: '申請證書',
         provider: '類型',
         manualCreate: '手動創建',
         acmeAccount: 'Acme 賬號',

@@ -4,6 +4,7 @@ import "github.com/1Panel-dev/1Panel/backend/app/model"
 
 type WebsiteSSLDTO struct {
 	model.WebsiteSSL
+	LogPath string `json:"logPath"`
 }
 
 type WebsiteDNSRes struct {
