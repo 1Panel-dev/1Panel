@@ -93,6 +93,13 @@ ErrSSLKeyFormat: '私鑰文件校驗錯誤'
 ErrSSLCertificateFormat: '證書文件格式錯誤，請使用 pem 格式'
 ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid 或 EabHmacKey 不能為空'
 ErrOpenrestyNotFound: 'Http 模式需要先安裝 Openresty'
+ApplySSLStart: '開始申請憑證,網域 [{{ .domain }}] 申請方式 [{{ .type }}] '
+dnsAccount: "DNS 自動"
+dnsManual: "DNS 手排"
+http: "HTTP"
+ApplySSLFailed: '申請 [{{ .domain }}] 憑證失敗, {{.detail}} '
+ApplySSLSuccess: '申請 [{{ .domain }}] 憑證成功！ ！ '
+DNSAccountName: 'DNS 帳號 [{{ .name }}] 廠商 [{{.type}}]'
 
 #mysql
 ErrUserIsExist: "當前用戶已存在，請重新輸入"

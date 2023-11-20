@@ -10,6 +10,7 @@ func Init() {
 	go syncApp()
 	go syncInstalledApp()
 	go syncRuntime()
+	go syncSSL()
 }
 
 func syncApp() {
@@ -29,5 +30,11 @@ func syncInstalledApp() {
 func syncRuntime() {
 	if err := service.NewRuntimeService().SyncForRestart(); err != nil {
 		global.LOG.Errorf("sync runtime status error : %s", err.Error())
+	}
+}
+
+func syncSSL() {
+	if err := service.NewIWebsiteSSLService().SyncForRestart(); err != nil {
+		global.LOG.Errorf("sync ssl status error : %s", err.Error())
 	}
 }

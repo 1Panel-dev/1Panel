@@ -1662,7 +1662,7 @@ const message = {
         saveAndReload: '保存并重载',
     },
     ssl: {
-        create: '创建证书',
+        create: '申请证书',
         provider: '类型',
         manualCreate: '手动创建',
         acmeAccount: 'Acme 账号',

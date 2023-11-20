@@ -165,7 +165,11 @@ export namespace Website {
         autoRenew: boolean;
         acmeAccountId?: number;
         status: string;
-        domains?: string;
+    }
+
+    export interface SSLDTO extends SSL {
+        domains: string;
+        logPath: string;
     }
 
     export interface SSLCreate {

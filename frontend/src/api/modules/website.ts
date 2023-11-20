@@ -93,11 +93,11 @@ export const DeleteAcmeAccount = (req: Website.DelReq) => {
 };
 
 export const SearchSSL = (req: ReqPage) => {
-    return http.post<ResPage<Website.SSL>>(`/websites/ssl/search`, req);
+    return http.post<ResPage<Website.SSLDTO>>(`/websites/ssl/search`, req);
 };
 
 export const ListSSL = (req: Website.SSLReq) => {
-    return http.post<Website.SSL[]>(`/websites/ssl/search`, req);
+    return http.post<Website.SSLDTO[]>(`/websites/ssl/search`, req);
 };
 
 export const CreateSSL = (req: Website.SSLCreate) => {
