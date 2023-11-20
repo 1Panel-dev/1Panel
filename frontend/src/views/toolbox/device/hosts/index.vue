@@ -11,10 +11,10 @@
                         <el-radio-button label="base">{{ $t('database.baseConf') }}</el-radio-button>
                         <el-radio-button label="all">{{ $t('database.allConf') }}</el-radio-button>
                     </el-radio-group>
-                    <el-table style="width: 100%" class="mt-4" v-if="confShowType === 'base'">
+                    <table style="width: 100%" class="mt-4" v-if="confShowType === 'base'">
                         <tr v-if="form.hosts.length !== 0">
                             <th scope="col" width="25%" align="left">
-                                <label>ip</label>
+                                <label>IP</label>
                             </th>
                             <th scope="col" width="70%" align="left">
                                 <label>{{ $t('toolbox.device.hosts') }}</label>
@@ -39,7 +39,7 @@
                                 <el-button @click="handleHostsAdd()">{{ $t('commons.button.add') }}</el-button>
                             </td>
                         </tr>
-                    </el-table>
+                    </table>
                     <div v-else>
                         <codemirror
                             :autofocus="true"
