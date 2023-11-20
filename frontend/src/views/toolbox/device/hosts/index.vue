@@ -11,35 +11,30 @@
                         <el-radio-button label="base">{{ $t('database.baseConf') }}</el-radio-button>
                         <el-radio-button label="all">{{ $t('database.allConf') }}</el-radio-button>
                     </el-radio-group>
-                    <table style="width: 100%" class="mt-4" v-if="confShowType === 'base'">
-                        <tr v-if="form.hosts.length !== 0">
-                            <th scope="col" width="25%" align="left">
-                                <label>IP</label>
-                            </th>
-                            <th scope="col" width="70%" align="left">
-                                <label>{{ $t('toolbox.device.hosts') }}</label>
-                            </th>
-                            <th align="left"></th>
-                        </tr>
-                        <tr v-for="(row, index) in form.hosts" :key="index">
-                            <td width="25%">
-                                <el-input placeholder="172.16.10.111" v-model="row.ip" />
-                            </td>
-                            <td width="70%">
-                                <el-input placeholder="test.hostname.com" v-model="row.host" />
-                            </td>
-                            <td>
-                                <el-button link type="primary" @click="handleHostsDelete(index)">
-                                    {{ $t('commons.button.delete') }}
-                                </el-button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td align="left">
-                                <el-button @click="handleHostsAdd()">{{ $t('commons.button.add') }}</el-button>
-                            </td>
-                        </tr>
-                    </table>
+                    <div v-if="confShowType === 'base'">
+                        <el-table :data="form.hosts">
+                            <el-table-column label="IP" min-width="60">
+                                <template #default="{ row }">
+                                    <el-input placeholder="172.16.10.111" v-model="row.ip" />
+                                </template>
+                            </el-table-column>
+                            <el-table-column :label="$t('toolbox.device.hosts')" min-width="150">
+                                <template #default="{ row }">
+                                    <el-input placeholder="test.hostname.com" v-model="row.host" />
+                                </template>
+                            </el-table-column>
+                            <el-table-column min-width="30">
+                                <template #default="scope">
+                                    <el-button link type="primary" @click="handleHostsDelete(scope.$index)">
+                                        {{ $t('commons.button.delete') }}
+                                    </el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                        <el-button class="ml-3 mt-2" @click="handleHostsAdd()">
+                            {{ $t('commons.button.add') }}
+                        </el-button>
+                    </div>
                     <div v-else>
                         <codemirror
                             :autofocus="true"
