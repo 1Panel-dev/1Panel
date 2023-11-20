@@ -27,7 +27,7 @@
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button :disabled="loading" type="primary" @click="onSavePanelName(formRef)">
+                    <el-button :disabled="loading" type="primary" @click="onSaveHostame(formRef)">
                         {{ $t('commons.button.confirm') }}
                     </el-button>
                 </span>
@@ -63,7 +63,7 @@ const acceptParams = (params: DialogProps): void => {
     drawerVisible.value = true;
 };
 
-const onSavePanelName = async (formEl: FormInstance | undefined) => {
+const onSaveHostame = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
@@ -82,7 +82,6 @@ const onSavePanelName = async (formEl: FormInstance | undefined) => {
                     loading.value = false;
                     drawerVisible.value = false;
                     emit('search');
-                    return;
                 })
                 .catch(() => {
                     loading.value = false;
