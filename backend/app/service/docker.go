@@ -21,6 +21,7 @@ type DockerService struct{}
 type IDockerService interface {
 	UpdateConf(req dto.SettingUpdate) error
 	UpdateLogOption(req dto.LogOption) error
+	UpdateIpv6Option(req dto.Ipv6Option) error
 	UpdateConfByFile(info dto.DaemonJsonUpdateByFile) error
 	LoadDockerStatus() string
 	LoadDockerConf() *dto.DaemonJsonConf
@@ -32,13 +33,17 @@ func NewIDockerService() IDockerService {
 }
 
 type daemonJsonItem struct {
-	Status      string    `json:"status"`
-	Mirrors     []string  `json:"registry-mirrors"`
-	Registries  []string  `json:"insecure-registries"`
-	LiveRestore bool      `json:"live-restore"`
-	IPTables    bool      `json:"iptables"`
-	ExecOpts    []string  `json:"exec-opts"`
-	LogOption   logOption `json:"log-opts"`
+	Status       string    `json:"status"`
+	Mirrors      []string  `json:"registry-mirrors"`
+	Registries   []string  `json:"insecure-registries"`
+	LiveRestore  bool      `json:"live-restore"`
+	Ipv6         bool      `json:"ipv6"`
+	FixedCidrV6  string    `json:"fixed-cidr-v6"`
+	Ip6Tables    bool      `json:"ip6tables"`
+	Experimental bool      `json:"experimental"`
+	IPTables     bool      `json:"iptables"`
+	ExecOpts     []string  `json:"exec-opts"`
+	LogOption    logOption `json:"log-opts"`
 }
 type logOption struct {
 	LogMaxSize string `json:"max-size"`
@@ -110,6 +115,10 @@ func (u *DockerService) LoadDockerConf() *dto.DaemonJsonConf {
 			break
 		}
 	}
+	data.Ipv6 = conf.Ipv6
+	data.FixedCidrV6 = conf.FixedCidrV6
+	data.Ip6Tables = conf.Ip6Tables
+	data.Experimental = conf.Experimental
 	data.LogMaxSize = conf.LogOption.LogMaxSize
 	data.LogMaxFile = conf.LogOption.LogMaxFile
 	data.Mirrors = conf.Mirrors
@@ -148,6 +157,13 @@ func (u *DockerService) UpdateConf(req dto.SettingUpdate) error {
 			delete(daemonMap, "registry-mirrors")
 		} else {
 			daemonMap["registry-mirrors"] = strings.Split(req.Value, ",")
+		}
+	case "Ipv6":
+		if req.Value == "disable" {
+			delete(daemonMap, "ipv6")
+			delete(daemonMap, "fixed-cidr-v6")
+			delete(daemonMap, "ip6tables")
+			delete(daemonMap, "experimental")
 		}
 	case "LogOption":
 		if req.Value == "disable" {
@@ -218,6 +234,48 @@ func (u *DockerService) UpdateLogOption(req dto.LogOption) error {
 	_ = json.Unmarshal(file, &daemonMap)
 
 	changeLogOption(daemonMap, req.LogMaxFile, req.LogMaxSize)
+	if len(daemonMap) == 0 {
+		_ = os.Remove(constant.DaemonJsonPath)
+		return nil
+	}
+	newJson, err := json.MarshalIndent(daemonMap, "", "\t")
+	if err != nil {
+		return err
+	}
+	if err := os.WriteFile(constant.DaemonJsonPath, newJson, 0640); err != nil {
+		return err
+	}
+
+	stdout, err := cmd.Exec("systemctl restart docker")
+	if err != nil {
+		return errors.New(string(stdout))
+	}
+	return nil
+}
+
+func (u *DockerService) UpdateIpv6Option(req dto.Ipv6Option) error {
+	if _, err := os.Stat(constant.DaemonJsonPath); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(path.Dir(constant.DaemonJsonPath), os.ModePerm); err != nil {
+			return err
+		}
+		_, _ = os.Create(constant.DaemonJsonPath)
+	}
+
+	file, err := os.ReadFile(constant.DaemonJsonPath)
+	if err != nil {
+		return err
+	}
+	daemonMap := make(map[string]interface{})
+	_ = json.Unmarshal(file, &daemonMap)
+
+	daemonMap["ipv6"] = true
+	daemonMap["fixed-cidr-v6"] = req.FixedCidrV6
+	if req.Ip6Tables {
+		daemonMap["ip6tables"] = req.Ip6Tables
+	}
+	if req.Experimental {
+		daemonMap["experimental"] = req.Experimental
+	}
 	if len(daemonMap) == 0 {
 		_ = os.Remove(constant.DaemonJsonPath)
 		return nil

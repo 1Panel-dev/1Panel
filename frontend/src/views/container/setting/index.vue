@@ -100,6 +100,19 @@
                                 </el-input>
                             </el-form-item>
 
+                            <el-form-item label="ipv6" prop="ipv6">
+                                <el-switch v-model="form.ipv6" @change="handleIPv6"></el-switch>
+                                <span class="input-help"></span>
+                                <div v-if="ipv6OptionShow">
+                                    <el-tag>{{ $t('container.subnet') }}: {{ form.fixedCidrV6 }}</el-tag>
+                                    <div>
+                                        <el-button @click="handleIPv6" type="primary" link>
+                                            {{ $t('commons.button.view') }}
+                                        </el-button>
+                                    </div>
+                                </div>
+                            </el-form-item>
+
                             <el-form-item :label="$t('container.cutLog')" prop="hasLogOption">
                                 <el-switch v-model="form.logOptionShow" @change="handleLogOption"></el-switch>
                                 <span class="input-help"></span>
@@ -206,6 +219,8 @@
         <Mirror ref="mirrorRef" @search="search" />
         <Registry ref="registriesRef" @search="search" />
         <LogOption ref="logOptionRef" @search="search" />
+        <Ipv6Option ref="ipv6OptionRef" @search="search" />
+        <ConfirmDialog ref="confirmDialogRefIpv6" @confirm="onSaveIPv6" @cancel="search" />
         <ConfirmDialog ref="confirmDialogRefIptable" @confirm="onSubmitOpenIPtable" @cancel="search" />
         <ConfirmDialog ref="confirmDialogRefLog" @confirm="onSubmitSaveLog" @cancel="search" />
         <ConfirmDialog ref="confirmDialogRefLive" @confirm="onSubmitSaveLive" @cancel="search" />
@@ -224,6 +239,7 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import Mirror from '@/views/container/setting/mirror/index.vue';
 import Registry from '@/views/container/setting/registry/index.vue';
 import LogOption from '@/views/container/setting/log/index.vue';
+import Ipv6Option from '@/views/container/setting/ipv6/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import i18n from '@/lang';
 import {
@@ -245,13 +261,16 @@ const extensions = [javascript(), oneDark];
 const confShowType = ref('base');
 
 const logOptionRef = ref();
+const ipv6OptionRef = ref();
 const confirmDialogRefLog = ref();
 const mirrorRef = ref();
 const registriesRef = ref();
 const confirmDialogRefLive = ref();
 const confirmDialogRefCgroup = ref();
 const confirmDialogRefIptable = ref();
+const confirmDialogRefIpv6 = ref();
 const logOptionShow = ref();
+const ipv6OptionShow = ref();
 
 const form = reactive({
     isSwarm: false,
@@ -262,6 +281,12 @@ const form = reactive({
     liveRestore: false,
     iptables: true,
     cgroupDriver: '',
+
+    ipv6: false,
+    fixedCidrV6: '',
+    ip6Tables: false,
+    experimental: false,
+
     logOptionShow: false,
     logMaxSize: '',
     logMaxFile: 3,
@@ -292,6 +317,27 @@ const onChangeMirrors = () => {
 const onChangeRegistries = () => {
     registriesRef.value.acceptParams({ registries: form.registries });
 };
+
+const handleIPv6 = async () => {
+    if (form.ipv6) {
+        ipv6OptionRef.value.acceptParams({
+            fixedCidrV6: form.fixedCidrV6,
+            ip6Tables: form.ip6Tables,
+            experimental: form.experimental,
+        });
+        return;
+    }
+    let params = {
+        header: i18n.global.t('database.confChange'),
+        operationInfo: i18n.global.t('database.restartNowHelper'),
+        submitInputInfo: i18n.global.t('database.restartNow'),
+    };
+    confirmDialogRefIpv6.value!.acceptParams(params);
+};
+const onSaveIPv6 = () => {
+    save('Ipv6', 'disable');
+};
+
 const handleLogOption = async () => {
     if (form.logOptionShow) {
         logOptionRef.value.acceptParams({ logMaxSize: form.logMaxSize, logMaxFile: form.logMaxFile });
@@ -445,6 +491,11 @@ const search = async () => {
         form.logOptionShow = false;
         logOptionShow.value = false;
     }
+    form.ipv6 = res.data.ipv6;
+    ipv6OptionShow.value = form.ipv6;
+    form.fixedCidrV6 = res.data.fixedCidrV6;
+    form.ip6Tables = res.data.ip6Tables;
+    form.experimental = res.data.experimental;
 };
 
 onMounted(() => {

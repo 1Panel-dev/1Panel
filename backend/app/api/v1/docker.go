@@ -83,7 +83,7 @@ func (b *BaseApi) UpdateDaemonJson(c *gin.Context) {
 // @Param request body dto.LogOption true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /containers/daemonjson/update [post]
+// @Router /containers/logoption/update [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 docker daemon.json 日志配置","formatEN":"Updated the docker daemon.json log option"}
 func (b *BaseApi) UpdateLogOption(c *gin.Context) {
 	var req dto.LogOption
@@ -92,6 +92,29 @@ func (b *BaseApi) UpdateLogOption(c *gin.Context) {
 	}
 
 	if err := dockerService.UpdateLogOption(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Container Docker
+// @Summary Update docker daemon.json ipv6 option
+// @Description 修改 docker ipv6 配置
+// @Accept json
+// @Param request body dto.LogOption true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /containers/ipv6option/update [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 docker daemon.json ipv6 配置","formatEN":"Updated the docker daemon.json ipv6 option"}
+func (b *BaseApi) UpdateIpv6Option(c *gin.Context) {
+	var req dto.Ipv6Option
+	if err := helper.CheckBind(&req, c); err != nil {
+		return
+	}
+
+	if err := dockerService.UpdateIpv6Option(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

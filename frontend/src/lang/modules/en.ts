@@ -190,6 +190,7 @@ const message = {
             leechExts: 'Only support letters, numbers and,',
             paramSimple: 'Support lowercase letters and numbers, length 1-128',
             filePermission: 'File Permission Error',
+            formatErr: 'Format error, please check and retry',
         },
         res: {
             paramError: 'The request failed, please try again later!',
@@ -658,6 +659,7 @@ const message = {
         subnet: 'Subnet',
         scope: 'IP Scope',
         gateway: 'Gateway',
+        auxAddress: 'Exclude IP',
 
         volume: 'Volume',
         volumeDir: 'Volume dir',
@@ -716,6 +718,12 @@ const message = {
             'The acceleration URL is preferred to perform operations. If this parameter is set to empty, mirror acceleration is disabled.',
         mirrorsHelper2: 'For details, see the official documents, ',
         registries: 'Insecure registries',
+        ipv6Helper:
+            'When enabling IPv6, you need to add an IPv6 container network. Refer to the official documentation for specific configuration steps.',
+        ipv6CidrHelper: 'IPv6 address pool range for containers',
+        ipv6TablesHelper: 'Automatic configuration of Docker IPv6 for iptables rules',
+        experimentalHelper:
+            'Enabling ip6tables requires this configuration to be turned on; otherwise, ip6tables will be ignored',
         cutLog: 'Log option',
         cutLogHelper1: 'The current configuration will only affect newly created containers.',
         cutLogHelper2: 'Existing containers need to be recreated for the configuration to take effect.',

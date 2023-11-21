@@ -135,13 +135,21 @@ type Network struct {
 	Attachable bool      `json:"attachable"`
 }
 type NetworkCreate struct {
-	Name    string   `json:"name" validate:"required"`
-	Driver  string   `json:"driver" validate:"required"`
-	Options []string `json:"options"`
-	Subnet  string   `json:"subnet"`
-	Gateway string   `json:"gateway"`
-	IPRange string   `json:"ipRange"`
-	Labels  []string `json:"labels"`
+	Name       string          `json:"name" validate:"required"`
+	Driver     string          `json:"driver" validate:"required"`
+	Options    []string        `json:"options"`
+	Ipv4       bool            `json:"ipv4"`
+	Subnet     string          `json:"subnet"`
+	Gateway    string          `json:"gateway"`
+	IPRange    string          `json:"ipRange"`
+	AuxAddress []SettingUpdate `json:"auxAddress"`
+
+	Ipv6         bool            `json:"ipv6"`
+	SubnetV6     string          `json:"subnetV6"`
+	GatewayV6    string          `json:"gatewayV6"`
+	IPRangeV6    string          `json:"ipRangeV6"`
+	AuxAddressV6 []SettingUpdate `json:"auxAddressV6"`
+	Labels       []string        `json:"labels"`
 }
 
 type Volume struct {

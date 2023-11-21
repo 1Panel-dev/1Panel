@@ -678,11 +678,19 @@ definitions:
     properties:
       cgroupDriver:
         type: string
+      experimental:
+        type: boolean
+      fixedCidrV6:
+        type: string
       insecureRegistries:
         items:
           type: string
         type: array
+      ip6Tables:
+        type: boolean
       iptables:
+        type: boolean
+      ipv6:
         type: boolean
       isSwarm:
         type: boolean
@@ -1694,12 +1702,28 @@ definitions:
     type: object
   dto.NetworkCreate:
     properties:
+      auxAddress:
+        items:
+          $ref: '#/definitions/dto.SettingUpdate'
+        type: array
+      auxAddressV6:
+        items:
+          $ref: '#/definitions/dto.SettingUpdate'
+        type: array
       driver:
         type: string
       gateway:
         type: string
+      gatewayV6:
+        type: string
       ipRange:
         type: string
+      ipRangeV6:
+        type: string
+      ipv4:
+        type: boolean
+      ipv6:
+        type: boolean
       labels:
         items:
           type: string
@@ -1711,6 +1735,8 @@ definitions:
           type: string
         type: array
       subnet:
+        type: string
+      subnetV6:
         type: string
     required:
     - driver
@@ -5426,27 +5452,29 @@ paths:
     post:
       consumes:
       - application/json
-      description: 修改 docker 日志配置
+      description: 修改 docker 配置信息
       parameters:
       - description: request
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.LogOption'
+          $ref: '#/definitions/dto.SettingUpdate'
       responses:
         "200":
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Update docker daemon.json log option
+      summary: Update docker daemon.json
       tags:
       - Container Docker
       x-panel-log:
         BeforeFunctions: []
-        bodyKeys: []
-        formatEN: Updated the docker daemon.json log option
-        formatZH: 更新 docker daemon.json 日志配置
+        bodyKeys:
+        - key
+        - value
+        formatEN: Updated the docker daemon.json configuration [key]=>[value]
+        formatZH: 更新 docker daemon.json 配置 [key]=>[value]
         paramKeys: []
   /containers/daemonjson/update/byfile:
     post:
@@ -5820,6 +5848,32 @@ paths:
       summary: Container inspect
       tags:
       - Container
+  /containers/ipv6option/update:
+    post:
+      consumes:
+      - application/json
+      description: 修改 docker ipv6 配置
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LogOption'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update docker daemon.json ipv6 option
+      tags:
+      - Container Docker
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys: []
+        formatEN: Updated the docker daemon.json ipv6 option
+        formatZH: 更新 docker daemon.json ipv6 配置
+        paramKeys: []
   /containers/limit:
     get:
       description: 获取容器限制
@@ -5879,6 +5933,32 @@ paths:
       summary: Load container log
       tags:
       - Container
+  /containers/logoption/update:
+    post:
+      consumes:
+      - application/json
+      description: 修改 docker 日志配置
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LogOption'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update docker daemon.json log option
+      tags:
+      - Container Docker
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys: []
+        formatEN: Updated the docker daemon.json log option
+        formatZH: 更新 docker daemon.json 日志配置
+        paramKeys: []
   /containers/network:
     get:
       consumes:

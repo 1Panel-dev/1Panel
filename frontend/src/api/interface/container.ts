@@ -297,6 +297,12 @@ export namespace Container {
         liveRestore: boolean;
         iptables: boolean;
         cgroupDriver: string;
+
+        ipv6: boolean;
+        fixedCidrV6: string;
+        ip6Tables: boolean;
+        experimental: boolean;
+
         logMaxSize: string;
         logMaxFile: string;
     }
