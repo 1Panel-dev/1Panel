@@ -107,13 +107,11 @@
                 <el-col :span="20" :offset="2">
                     <el-alert :title="msg" show-icon type="error" :closable="false"></el-alert>
                     <div class="resource">
-                        <table>
-                            <tr v-for="(row, index) in operationList" :key="index">
-                                <td>
-                                    <span>{{ row }}</span>
-                                </td>
-                            </tr>
-                        </table>
+                        <ul v-for="(row, index) in operationList" :key="index">
+                            <li>
+                                <span>{{ row }}</span>
+                            </li>
+                        </ul>
                     </div>
                 </el-col>
             </el-row>

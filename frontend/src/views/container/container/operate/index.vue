@@ -64,52 +64,47 @@
                     </el-form-item>
                     <el-form-item v-if="!dialogData.rowData!.publishAllPorts">
                         <el-card class="widthClass">
-                            <table style="width: 100%" class="tab-table">
-                                <tr v-if="dialogData.rowData!.exposedPorts.length !== 0">
-                                    <th scope="col" width="45%" align="left">
-                                        <label>{{ $t('container.server') }}</label>
-                                    </th>
-                                    <th scope="col" width="35%" align="left">
-                                        <label>{{ $t('container.container') }}</label>
-                                    </th>
-                                    <th scope="col" width="20%" align="left">
-                                        <label>{{ $t('commons.table.protocol') }}</label>
-                                    </th>
-                                    <th align="left"></th>
-                                </tr>
-                                <tr v-for="(row, index) in dialogData.rowData!.exposedPorts" :key="index">
-                                    <td width="45%">
-                                        <el-input
-                                            :placeholder="$t('container.serverExample')"
-                                            style="width: 100%"
-                                            v-model="row.host"
-                                        />
-                                    </td>
-                                    <td width="35%">
+                            <el-table
+                                v-if="dialogData.rowData!.exposedPorts.length !== 0"
+                                :data="dialogData.rowData!.exposedPorts"
+                            >
+                                <el-table-column :label="$t('container.server')" min-width="150">
+                                    <template #default="{ row }">
+                                        <el-input :placeholder="$t('container.serverExample')" v-model="row.host" />
+                                    </template>
+                                </el-table-column>
+                                <el-table-column :label="$t('container.container')" min-width="80">
+                                    <template #default="{ row }">
                                         <el-input
                                             :placeholder="$t('container.containerExample')"
-                                            style="width: 100%"
                                             v-model="row.containerPort"
                                         />
-                                    </td>
-                                    <td width="20%">
-                                        <el-select v-model="row.protocol" style="width: 100%">
+                                    </template>
+                                </el-table-column>
+                                <el-table-column :label="$t('commons.table.protocol')" min-width="50">
+                                    <template #default="{ row }">
+                                        <el-select
+                                            v-model="row.protocol"
+                                            style="width: 100%"
+                                            :placeholder="$t('container.serverExample')"
+                                        >
                                             <el-option label="tcp" value="tcp" />
                                             <el-option label="udp" value="udp" />
                                         </el-select>
-                                    </td>
-                                    <td>
-                                        <el-button link style="font-size: 10px" @click="handlePortsDelete(index)">
+                                    </template>
+                                </el-table-column>
+                                <el-table-column min-width="35">
+                                    <template #default="scope">
+                                        <el-button link type="primary" @click="handlePortsDelete(scope.$index)">
                                             {{ $t('commons.button.delete') }}
                                         </el-button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td align="left">
-                                        <el-button @click="handlePortsAdd()">{{ $t('commons.button.add') }}</el-button>
-                                    </td>
-                                </tr>
-                            </table>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+
+                            <el-button class="ml-3 mt-2" @click="handlePortsAdd()">
+                                {{ $t('commons.button.add') }}
+                            </el-button>
                         </el-card>
                     </el-form-item>
                     <el-form-item :label="$t('container.network')" prop="network">

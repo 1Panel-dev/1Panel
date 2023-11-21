@@ -593,8 +593,8 @@ const message = {
         forcePull: 'forced image pull ',
         forcePullHelper: 'Ignore existing images on the server and pull again.',
         server: 'Host',
-        serverExample: 'e.g. 80, 80-88, ip:80 or ip:80-88',
-        containerExample: 'e.g. 80 or 80-88',
+        serverExample: '80, 80-88, ip:80 or ip:80-88',
+        containerExample: '80 or 80-88',
         exposePort: 'Expose port',
         exposeAll: 'Expose all',
         cmdHelper: "e.g. 'nginx' '-g' 'daemon off;' OR nginx -g daemon off;",
@@ -1054,6 +1054,8 @@ const message = {
         disable: 'Disable Autostart',
         sshAlert:
             'The list data is sorted based on login time, but please note that changing time zones or other operations may cause deviations in the time of login logs.',
+        sshAlert2:
+            'You can use Fail2ban in the toolbox to block IP addresses attempting brute force attacks, thus enhancing the security of the host.',
         sshOperate: 'Operation [{0}] on the SSH service is performed. Do you want to continue?',
         sshChange: 'SSH Setting',
         sshChangeHelper: 'This action changed {0} to [{1}]. Do you want to continue?',

@@ -2,7 +2,8 @@
     <div>
         <LayoutContent v-loading="loading" :title="$t('ssh.loginLogs')">
             <template #prompt>
-                <el-alert type="info" :title="$t('ssh.sshAlert')" :closable="false" />
+                <el-alert type="info" :title="$t('ssh.sshAlert2')" :closable="false" />
+                <div class="mt-2"><el-alert type="info" :title="$t('ssh.sshAlert')" :closable="false" /></div>
             </template>
             <template #search>
                 <el-select v-model="searchStatus" @change="search()">
@@ -14,16 +15,7 @@
             </template>
             <template #toolbar>
                 <el-row>
-                    <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
-                        <el-button
-                            type="primary"
-                            @click="onLoadAnalysis"
-                            :disabled="data?.length === 0"
-                            style="margin-left: 5px"
-                        >
-                            {{ $t('ssh.analysis') }}
-                        </el-button>
-                    </el-col>
+                    <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16"></el-col>
                     <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
                         <TableSetting @search="search()" />
                         <div class="search-button">
@@ -73,8 +65,6 @@
                 </ComplexTable>
             </template>
         </LayoutContent>
-
-        <Analysis ref="analysisRef" />
     </div>
 </template>
 
@@ -83,7 +73,6 @@ import TableSetting from '@/components/table-setting/index.vue';
 import { dateFormat } from '@/utils/util';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
 import { loadSSHLogs } from '@/api/modules/host';
-import Analysis from '@/views/host/ssh/log/analysis/index.vue';
 
 const loading = ref();
 const data = ref();
@@ -95,11 +84,6 @@ const paginationConfig = reactive({
 });
 const searchInfo = ref();
 const searchStatus = ref('All');
-const analysisRef = ref();
-
-const onLoadAnalysis = () => {
-    analysisRef.value.acceptParams();
-};
 
 const search = async () => {
     let params = {
