@@ -1414,14 +1414,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "修改 docker 日志配置",
+                "description": "修改 docker 配置信息",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Container Docker"
                 ],
-                "summary": "Update docker daemon.json log option",
+                "summary": "Update docker daemon.json",
                 "parameters": [
                     {
                         "description": "request",
@@ -1429,7 +1429,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.LogOption"
+                            "$ref": "#/definitions/dto.SettingUpdate"
                         }
                     }
                 ],
@@ -1440,9 +1440,12 @@ const docTemplate = `{
                 },
                 "x-panel-log": {
                     "BeforeFunctions": [],
-                    "bodyKeys": [],
-                    "formatEN": "Updated the docker daemon.json log option",
-                    "formatZH": "更新 docker daemon.json 日志配置",
+                    "bodyKeys": [
+                        "key",
+                        "value"
+                    ],
+                    "formatEN": "Updated the docker daemon.json configuration [key]=\u003e[value]",
+                    "formatZH": "更新 docker daemon.json 配置 [key]=\u003e[value]",
                     "paramKeys": []
                 }
             }
@@ -2029,6 +2032,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/containers/ipv6option/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "修改 docker ipv6 配置",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Container Docker"
+                ],
+                "summary": "Update docker daemon.json ipv6 option",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.LogOption"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [],
+                    "formatEN": "Updated the docker daemon.json ipv6 option",
+                    "formatZH": "更新 docker daemon.json ipv6 配置",
+                    "paramKeys": []
+                }
+            }
+        },
         "/containers/limit": {
             "get": {
                 "security": [
@@ -2125,6 +2168,46 @@ const docTemplate = `{
                     "200": {
                         "description": "OK"
                     }
+                }
+            }
+        },
+        "/containers/logoption/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "修改 docker 日志配置",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Container Docker"
+                ],
+                "summary": "Update docker daemon.json log option",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.LogOption"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [],
+                    "formatEN": "Updated the docker daemon.json log option",
+                    "formatZH": "更新 docker daemon.json 日志配置",
+                    "paramKeys": []
                 }
             }
         },
@@ -14023,13 +14106,25 @@ const docTemplate = `{
                 "cgroupDriver": {
                     "type": "string"
                 },
+                "experimental": {
+                    "type": "boolean"
+                },
+                "fixedCidrV6": {
+                    "type": "string"
+                },
                 "insecureRegistries": {
                     "type": "array",
                     "items": {
                         "type": "string"
                     }
                 },
+                "ip6Tables": {
+                    "type": "boolean"
+                },
                 "iptables": {
+                    "type": "boolean"
+                },
+                "ipv6": {
                     "type": "boolean"
                 },
                 "isSwarm": {
@@ -15530,14 +15625,38 @@ const docTemplate = `{
                 "name"
             ],
             "properties": {
+                "auxAddress": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.SettingUpdate"
+                    }
+                },
+                "auxAddressV6": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.SettingUpdate"
+                    }
+                },
                 "driver": {
                     "type": "string"
                 },
                 "gateway": {
                     "type": "string"
                 },
+                "gatewayV6": {
+                    "type": "string"
+                },
                 "ipRange": {
                     "type": "string"
+                },
+                "ipRangeV6": {
+                    "type": "string"
+                },
+                "ipv4": {
+                    "type": "boolean"
+                },
+                "ipv6": {
+                    "type": "boolean"
                 },
                 "labels": {
                     "type": "array",
@@ -15555,6 +15674,9 @@ const docTemplate = `{
                     }
                 },
                 "subnet": {
+                    "type": "string"
+                },
+                "subnetV6": {
                     "type": "string"
                 }
             }

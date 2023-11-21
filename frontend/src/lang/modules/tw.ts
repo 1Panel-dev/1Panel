@@ -189,6 +189,7 @@ const message = {
             leechExts: '僅支持字母數字和,',
             paramSimple: '支持小寫字母和數字,長度 1-128',
             filePermission: '權限錯誤',
+            formatErr: '格式錯誤，檢查後重試',
         },
         res: {
             paramError: '請求失敗,請稍後重試!',
@@ -642,6 +643,7 @@ const message = {
         subnet: '子網',
         scope: 'IP 範圍',
         gateway: '網關',
+        auxAddress: '排除 IP',
 
         volume: '存儲卷',
         volumeDir: '存儲卷目錄',
@@ -692,6 +694,10 @@ const message = {
         mirrorsHelper: '優先使用加速 URL 執行操作，設置為空則取消鏡像加速。',
         mirrorsHelper2: '具體操作配置請參照官方文檔',
         registries: '私有倉庫',
+        ipv6Helper: '開啟 IPv6 後，需要增加 IPv6 的容器網路，具體操作配置請參照官方文檔',
+        ipv6CidrHelper: '容器的 IPv6 地址池範圍',
+        ipv6TablesHelper: 'Docker IPv6 對 iptables 規則的自動配置',
+        experimentalHelper: '開啟 ip6tables 必須開啟此配置，否則 ip6tables 會被忽略',
         cutLog: '日誌切割',
         cutLogHelper1: '當前配置只會影響新創建的容器；',
         cutLogHelper2: '已經創建的容器需要重新創建使配置生效；',

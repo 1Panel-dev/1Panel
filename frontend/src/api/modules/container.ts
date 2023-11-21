@@ -179,6 +179,13 @@ export const updateDaemonJson = (key: string, value: string) => {
 export const updateLogOption = (maxSize: string, maxFile: string) => {
     return http.post(`/containers/logoption/update`, { logMaxSize: maxSize, logMaxFile: maxFile }, TimeoutEnum.T_60S);
 };
+export const updateIpv6Option = (fixedCidrV6: string, ip6Tables: boolean, experimental: boolean) => {
+    return http.post(
+        `/containers/ipv6option/update`,
+        { fixedCidrV6: fixedCidrV6, ip6Tables: ip6Tables, experimental: experimental },
+        TimeoutEnum.T_60S,
+    );
+};
 export const updateDaemonJsonByfile = (params: Container.DaemonJsonUpdateByFile) => {
     return http.post(`/containers/daemonjson/update/byfile`, params);
 };
