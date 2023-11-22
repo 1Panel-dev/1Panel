@@ -52,6 +52,7 @@ type ContainerOperate struct {
 	CPUShares       int64          `json:"cpuShares"`
 	NanoCPUs        float64        `json:"nanoCPUs"`
 	Memory          float64        `json:"memory"`
+	Privileged      bool           `json:"privileged"`
 	AutoRemove      bool           `json:"autoRemove"`
 	Volumes         []VolumeHelper `json:"volumes"`
 	Labels          []string       `json:"labels"`
