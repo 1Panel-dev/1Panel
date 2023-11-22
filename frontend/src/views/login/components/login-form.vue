@@ -286,8 +286,8 @@ const mfaLogin = async (auto: boolean) => {
     if (isLoggingIn) {
         return;
     }
-    isLoggingIn = true;
     if ((!auto && mfaLoginForm.code) || (auto && mfaLoginForm.code.length === 6)) {
+        isLoggingIn = true;
         mfaLoginForm.name = loginForm.name;
         mfaLoginForm.password = loginForm.password;
         const res = await mfaLoginApi(mfaLoginForm);
