@@ -40,6 +40,7 @@ export namespace Container {
         cpuShares: number;
         memory: number;
         volumes: Array<Volume>;
+        privileged: boolean;
         autoRemove: boolean;
         labels: Array<string>;
         labelsStr: string;

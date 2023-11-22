@@ -937,6 +937,7 @@ func loadConfigInfo(isCreate bool, req dto.ContainerOperate, oldContainer *types
 		networkConf = network.NetworkingConfig{}
 	}
 
+	hostConf.Privileged = req.Privileged
 	hostConf.AutoRemove = req.AutoRemove
 	hostConf.CPUShares = req.CPUShares
 	hostConf.PublishAllPorts = req.PublishAllPorts

@@ -576,6 +576,9 @@ const message = {
         custom: 'Custom',
         emptyUser: 'When empty, you will log in as  default',
         containerTerminal: 'Terminal',
+        privileged: 'Privileged',
+        privilegedHelper:
+            'Allows the container to perform certain privileged operations on the host, which may increase container risks. Use with caution!',
 
         upgradeHelper: 'This operation only supports upgrading container versions.',
         ignoreCompare: 'Force Upgrade',
