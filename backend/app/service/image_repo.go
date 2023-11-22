@@ -217,12 +217,12 @@ func (u *ImageRepoService) handleRegistries(newHost, delHost, handle string) err
 	case "create":
 		registries = common.RemoveRepeatElement(append(registries, newHost))
 	case "update":
-		registries = common.RemoveRepeatElement(append(registries, newHost))
 		for i, regi := range registries {
 			if regi == delHost {
 				registries = append(registries[:i], registries[i+1:]...)
 			}
 		}
+		registries = common.RemoveRepeatElement(append(registries, newHost))
 	case "delete":
 		for i, regi := range registries {
 			if regi == delHost {
