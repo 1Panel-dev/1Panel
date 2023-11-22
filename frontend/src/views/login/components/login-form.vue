@@ -189,7 +189,7 @@ const loginRules = reactive({
     password: computed(() => [{ required: true, message: i18n.global.t('commons.rule.password'), trigger: 'blur' }]),
 });
 
-let mfaIsLogin = false;
+let isLoggingIn = false;
 const mfaButtonFocused = ref();
 const mfaLoginForm = reactive({
     name: '',
@@ -224,7 +224,7 @@ function handleCommand(command: string) {
 }
 
 const login = (formEl: FormInstance | undefined) => {
-    if (!formEl) return;
+    if (!formEl || isLoggingIn) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
         let requestLoginForm = {
@@ -245,6 +245,7 @@ const login = (formEl: FormInstance | undefined) => {
             return;
         }
         try {
+            isLoggingIn = true;
             loading.value = true;
             const res = await loginApi(requestLoginForm);
             if (res.code === 406) {
@@ -275,23 +276,24 @@ const login = (formEl: FormInstance | undefined) => {
         } catch (error) {
             loginVerify();
         } finally {
+            isLoggingIn = false;
             loading.value = false;
         }
     });
 };
 
 const mfaLogin = async (auto: boolean) => {
-    if (mfaIsLogin) {
+    if (isLoggingIn) {
         return;
     }
-    mfaIsLogin = true;
+    isLoggingIn = true;
     if ((!auto && mfaLoginForm.code) || (auto && mfaLoginForm.code.length === 6)) {
         mfaLoginForm.name = loginForm.name;
         mfaLoginForm.password = loginForm.password;
         const res = await mfaLoginApi(mfaLoginForm);
         if (res.code === 406) {
             errMfaInfo.value = true;
-            mfaIsLogin = false;
+            isLoggingIn = false;
             return;
         }
         globalStore.setLogStatus(true);
