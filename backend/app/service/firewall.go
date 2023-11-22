@@ -485,19 +485,30 @@ func (u *FirewallService) updatePingStatus(enable string) error {
 	if err != nil {
 		return err
 	}
+	hasV4Line, hasV6Line := false, false
+	if _, err := os.Stat("/proc/sys/net/ipv6/icmp_echo_ignore_all"); err != nil {
+		hasV6Line = true
+	}
 	files := strings.Split(string(lineBytes), "\n")
 	var newFiles []string
-	hasLine := false
 	for _, line := range files {
-		if strings.Contains(line, "net/ipv4/icmp_echo_ignore_all") || strings.HasPrefix(line, "net/ipv4/icmp_echo_ignore_all") {
+		if strings.HasPrefix(strings.ReplaceAll(line, " ", ""), "net/ipv4/icmp_echo_ignore_all") && !hasV4Line {
 			newFiles = append(newFiles, "net/ipv4/icmp_echo_ignore_all="+enable)
-			hasLine = true
-		} else {
-			newFiles = append(newFiles, line)
+			hasV4Line = true
+			continue
 		}
+		if strings.HasPrefix(strings.ReplaceAll(line, " ", ""), "net/ipv6/icmp_echo_ignore_all") && !hasV6Line {
+			newFiles = append(newFiles, "net/ipv6/icmp_echo_ignore_all="+enable)
+			hasV6Line = true
+			continue
+		}
+		newFiles = append(newFiles, line)
 	}
-	if !hasLine {
+	if !hasV4Line {
 		newFiles = append(newFiles, "net/ipv4/icmp_echo_ignore_all="+enable)
+	}
+	if !hasV6Line {
+		newFiles = append(newFiles, "net/ipv6/icmp_echo_ignore_all="+enable)
 	}
 	file, err := os.OpenFile(confPath, os.O_WRONLY|os.O_TRUNC, 0666)
 	if err != nil {
