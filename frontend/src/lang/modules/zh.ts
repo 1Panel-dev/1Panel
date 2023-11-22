@@ -561,6 +561,8 @@ const message = {
         custom: '自定义',
         containerTerminal: '终端',
         emptyUser: '为空时，将使用容器默认的用户登录',
+        privileged: '特权模式',
+        privilegedHelper: '允许容器在主机上执行某些特权操作，可能会增加容器风险，谨慎开启！',
 
         upgradeHelper: '该操作仅支持容器版本升级',
         ignoreCompare: '强制升级',

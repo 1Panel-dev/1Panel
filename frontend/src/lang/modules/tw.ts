@@ -560,6 +560,8 @@ const message = {
         custom: '自定義',
         containerTerminal: '終端',
         emptyUser: '為空時，將使用容器默認的用戶登錄',
+        privileged: '特權模式',
+        privilegedHelper: '允許容器在主機上執行某些特權操作，可能會增加容器風險，請謹慎開啟！',
 
         upgradeHelper: '該操作僅支持容器版本升級',
         ignoreCompare: '強製升級',
