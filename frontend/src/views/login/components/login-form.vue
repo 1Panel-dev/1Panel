@@ -189,6 +189,7 @@ const loginRules = reactive({
     password: computed(() => [{ required: true, message: i18n.global.t('commons.rule.password'), trigger: 'blur' }]),
 });
 
+let mfaIsLogin = false;
 const mfaButtonFocused = ref();
 const mfaLoginForm = reactive({
     name: '',
@@ -280,12 +281,17 @@ const login = (formEl: FormInstance | undefined) => {
 };
 
 const mfaLogin = async (auto: boolean) => {
+    if (mfaIsLogin) {
+        return;
+    }
+    mfaIsLogin = true;
     if ((!auto && mfaLoginForm.code) || (auto && mfaLoginForm.code.length === 6)) {
         mfaLoginForm.name = loginForm.name;
         mfaLoginForm.password = loginForm.password;
         const res = await mfaLoginApi(mfaLoginForm);
         if (res.code === 406) {
             errMfaInfo.value = true;
+            mfaIsLogin = false;
             return;
         }
         globalStore.setLogStatus(true);
