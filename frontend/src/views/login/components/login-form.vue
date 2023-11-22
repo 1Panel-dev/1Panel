@@ -283,9 +283,7 @@ const login = (formEl: FormInstance | undefined) => {
 };
 
 const mfaLogin = async (auto: boolean) => {
-    if (isLoggingIn) {
-        return;
-    }
+    if (isLoggingIn) return;
     if ((!auto && mfaLoginForm.code) || (auto && mfaLoginForm.code.length === 6)) {
         isLoggingIn = true;
         mfaLoginForm.name = loginForm.name;
