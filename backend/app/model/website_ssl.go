@@ -1,6 +1,11 @@
 package model
 
-import "time"
+import (
+	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/constant"
+	"path"
+	"time"
+)
 
 type WebsiteSSL struct {
 	BaseModel
@@ -27,4 +32,8 @@ type WebsiteSSL struct {
 
 func (w WebsiteSSL) TableName() string {
 	return "website_ssls"
+}
+
+func (w WebsiteSSL) GetLogPath() string {
+	return path.Join(constant.SSLLogDir, fmt.Sprintf("%s-ssl-%d.log", w.PrimaryDomain, w.ID))
 }

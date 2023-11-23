@@ -51,7 +51,7 @@ func (u *LogService) ListSystemLogFile() ([]string, error) {
 		if err != nil {
 			return err
 		}
-		if !info.IsDir() {
+		if !info.IsDir() && strings.HasPrefix(info.Name(), "1Panel-") {
 			if info.Name() == "1Panel.log" {
 				files = append(files, time.Now().Format("2006-01-02"))
 				return nil

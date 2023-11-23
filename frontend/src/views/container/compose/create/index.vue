@@ -78,21 +78,12 @@
                                     v-model="form.file"
                                 />
                             </div>
-                            <codemirror
-                                v-if="mode === 'log'"
-                                :autofocus="true"
-                                placeholder="Waiting for docker-compose up output..."
-                                :indent-with-tab="true"
-                                :tabSize="4"
-                                style="width: 100%; height: calc(100vh - 375px)"
-                                :lineWrapping="true"
-                                :matchBrackets="true"
-                                theme="cobalt"
-                                :styleActiveLine="true"
-                                :extensions="extensions"
-                                @ready="handleReady"
-                                v-model="logInfo"
-                                :disabled="true"
+                            <LogFile
+                                ref="logRef"
+                                :config="logConfig"
+                                :default-button="false"
+                                v-if="mode === 'log' && showLog"
+                                :style="'height: calc(100vh - 370px);min-height: 200px'"
                             />
                         </el-form-item>
                     </el-form>
@@ -113,40 +104,37 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
+import { nextTick, onBeforeUnmount, reactive, ref } from 'vue';
 import FileList from '@/components/file-list/index.vue';
 import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, ElMessageBox } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { listComposeTemplate, loadContainerLog, testCompose, upCompose } from '@/api/modules/container';
+import { listComposeTemplate, testCompose, upCompose } from '@/api/modules/container';
 import { loadBaseDir } from '@/api/modules/setting';
-import { formatImageStdout } from '@/utils/docker';
 import { MsgError } from '@/utils/message';
+import { javascript } from '@codemirror/lang-javascript';
+import { oneDark } from '@codemirror/theme-one-dark';
 
+const extensions = [javascript(), oneDark];
+
+const showLog = ref(false);
 const loading = ref();
-
 const mode = ref('edit');
 const onCreating = ref();
 const oldFrom = ref('edit');
-
-const extensions = [javascript(), oneDark];
-const view = shallowRef();
-const handleReady = (payload) => {
-    view.value = payload.view;
-};
-const logInfo = ref();
-
 const drawerVisible = ref(false);
 const templateOptions = ref();
-
 const baseDir = ref();
 const composeFile = ref();
-
 let timer: NodeJS.Timer | null = null;
+const logRef = ref();
+
+const logConfig = reactive({
+    type: 'compose-create',
+    name: '',
+});
 
 const form = reactive({
     name: '',
@@ -174,7 +162,6 @@ const acceptParams = (): void => {
     form.path = '';
     form.file = '';
     form.template = null;
-    logInfo.value = '';
     loadTemplates();
     loadPath();
 };
@@ -243,7 +230,6 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             return;
         }
         loading.value = true;
-        logInfo.value = '';
         await testCompose(form)
             .then(async (res) => {
                 loading.value = false;
@@ -252,8 +238,8 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                     mode.value = 'log';
                     await upCompose(form)
                         .then((res) => {
-                            logInfo.value = '';
-                            loadLogs(res.data);
+                            logConfig.name = res.data;
+                            loadLogs();
                         })
                         .catch(() => {
                             loading.value = false;
@@ -267,26 +253,14 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     });
 };
 
-const loadLogs = async (name: string) => {
-    timer = setInterval(async () => {
-        const res = await loadContainerLog('compose-create', name);
-        logInfo.value = formatImageStdout(res.data);
+const loadLogs = () => {
+    showLog.value = false;
+    nextTick(() => {
+        showLog.value = true;
         nextTick(() => {
-            const state = view.value.state;
-            view.value.dispatch({
-                selection: { anchor: state.doc.length, head: state.doc.length },
-                scrollIntoView: true,
-            });
+            logRef.value.changeTail(true);
         });
-        if (
-            logInfo.value.endsWith('docker-compose up failed!') ||
-            logInfo.value.endsWith('docker-compose up successful!')
-        ) {
-            onCreating.value = false;
-            clearInterval(Number(timer));
-            timer = null;
-        }
-    }, 1000 * 3);
+    });
 };
 
 const loadDir = async (path: string) => {

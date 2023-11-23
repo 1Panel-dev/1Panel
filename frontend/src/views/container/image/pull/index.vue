@@ -31,22 +31,12 @@
                         </el-input>
                     </el-form-item>
                 </el-form>
-
-                <codemirror
-                    v-if="logVisible"
-                    :autofocus="true"
-                    placeholder="Waiting for pull output..."
-                    :indent-with-tab="true"
-                    :tabSize="4"
-                    style="height: calc(100vh - 415px)"
-                    :lineWrapping="true"
-                    :matchBrackets="true"
-                    theme="cobalt"
-                    :styleActiveLine="true"
-                    :extensions="extensions"
-                    @ready="handleReady"
-                    v-model="logInfo"
-                    :disabled="true"
+                <LogFile
+                    ref="logRef"
+                    :config="logConfig"
+                    :default-button="false"
+                    v-if="showLog"
+                    :style="'height: calc(100vh - 370px);min-height: 200px'"
                 />
             </el-col>
         </el-row>
@@ -64,18 +54,15 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
+import { nextTick, reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
-import { imagePull, loadContainerLog } from '@/api/modules/container';
+import { imagePull } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
-import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { formatImageStdout } from '@/utils/docker';
 import { MsgSuccess } from '@/utils/message';
+import LogFile from '@/components/log-file/index.vue';
 
 const drawerVisible = ref(false);
 const form = reactive({
@@ -83,17 +70,15 @@ const form = reactive({
     repoID: null as number,
     imageName: '',
 });
-
+const logConfig = reactive({
+    type: 'image-pull',
+    name: '',
+});
+const showLog = ref(false);
+const logRef = ref();
 const buttonDisabled = ref(false);
-
 const logVisible = ref(false);
 const logInfo = ref();
-const view = shallowRef();
-const handleReady = (payload) => {
-    view.value = payload.view;
-};
-const extensions = [javascript(), oneDark];
-let timer: NodeJS.Timer | null = null;
 
 interface DialogProps {
     repos: Array<Container.RepoOptions>;
@@ -108,6 +93,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     repos.value = params.repos;
     buttonDisabled.value = false;
     logInfo.value = '';
+    showLog.value = false;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -124,35 +110,24 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         const res = await imagePull(form);
         logVisible.value = true;
         buttonDisabled.value = true;
-        loadLogs(res.data);
+        logConfig.name = res.data;
+        search();
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     });
 };
 
-const loadLogs = async (path: string) => {
-    timer = setInterval(async () => {
-        if (logVisible.value) {
-            const res = await loadContainerLog('image-pull', path);
-            logInfo.value = formatImageStdout(res.data);
-            nextTick(() => {
-                const state = view.value.state;
-                view.value.dispatch({
-                    selection: { anchor: state.doc.length, head: state.doc.length },
-                    scrollIntoView: true,
-                });
-            });
-            if (logInfo.value.endsWith('image pull failed!') || logInfo.value.endsWith('image pull successful!')) {
-                clearInterval(Number(timer));
-                timer = null;
-                buttonDisabled.value = false;
-            }
-        }
-    }, 1000 * 3);
+const search = () => {
+    showLog.value = false;
+    nextTick(() => {
+        showLog.value = true;
+        nextTick(() => {
+            logRef.value.changeTail(true);
+        });
+    });
 };
+
 const onCloseLog = async () => {
     emit('search');
-    clearInterval(Number(timer));
-    timer = null;
     drawerVisible.value = false;
 };
 
@@ -164,11 +139,6 @@ function loadDetailInfo(id: number) {
     }
     return '';
 }
-
-onBeforeUnmount(() => {
-    clearInterval(Number(timer));
-    timer = null;
-});
 
 defineExpose({
     acceptParams,

@@ -165,7 +165,9 @@ export namespace File {
     }
 
     export interface FileReadByLine {
-        path: string;
+        id?: number;
+        type: string;
+        name?: string;
         page: number;
         pageSize: number;
     }

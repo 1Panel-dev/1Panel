@@ -5655,6 +5655,36 @@ const docTemplate = `{
                 }
             }
         },
+        "/files/log/read": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "按行读取日志文件",
+                "tags": [
+                    "File"
+                ],
+                "summary": "Read file by Line",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.FileReadByLineReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/files/mode": {
             "post": {
                 "security": [
@@ -5782,36 +5812,6 @@ const docTemplate = `{
                     "formatEN": "Change owner [paths] =\u003e [user]/[group]",
                     "formatZH": "修改用户/组 [paths] =\u003e [user]/[group]",
                     "paramKeys": []
-                }
-            }
-        },
-        "/files/read": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "按行读取文件",
-                "tags": [
-                    "File"
-                ],
-                "summary": "Read file by Line",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.FileReadByLineReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
                 }
             }
         },
@@ -17777,16 +17777,22 @@ const docTemplate = `{
             "required": [
                 "page",
                 "pageSize",
-                "path"
+                "type"
             ],
             "properties": {
+                "ID": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
                 "page": {
                     "type": "integer"
                 },
                 "pageSize": {
                     "type": "integer"
                 },
-                "path": {
+                "type": {
                     "type": "string"
                 }
             }

@@ -7,7 +7,6 @@ import (
 	"io"
 	"os"
 	"os/exec"
-	"path"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -699,18 +698,15 @@ func (u *ContainerService) ContainerStats(id string) (*dto.ContainerStats, error
 
 func (u *ContainerService) LoadContainerLogs(req dto.OperationWithNameAndType) string {
 	filePath := ""
-	switch req.Type {
-	case "image-pull", "image-push", "image-build", "compose-create":
-		filePath = path.Join(global.CONF.System.TmpDir, fmt.Sprintf("docker_logs/%s", req.Name))
-	case "compose-detail":
-		client, err := docker.NewDockerClient()
+	if req.Type == "compose-detail" {
+		cli, err := docker.NewDockerClient()
 		if err != nil {
 			return ""
 		}
 		options := types.ContainerListOptions{All: true}
 		options.Filters = filters.NewArgs()
 		options.Filters.Add("label", fmt.Sprintf("%s=%s", composeProjectLabel, req.Name))
-		containers, err := client.ContainerList(context.Background(), options)
+		containers, err := cli.ContainerList(context.Background(), options)
 		if err != nil {
 			return ""
 		}
@@ -724,9 +720,6 @@ func (u *ContainerService) LoadContainerLogs(req dto.OperationWithNameAndType) s
 				filePath = workdir
 				break
 			}
-		}
-		if req.Type == "compose-create" {
-			filePath = path.Join(path.Dir(filePath), "compose.log")
 		}
 	}
 	if _, err := os.Stat(filePath); err != nil {

@@ -54,21 +54,12 @@
                     </el-form-item>
                 </el-form>
 
-                <codemirror
+                <LogFile
+                    ref="logRef"
+                    :config="logConfig"
+                    :default-button="false"
                     v-if="logVisiable"
-                    :autofocus="true"
-                    placeholder="Waiting for build output..."
-                    :indent-with-tab="true"
-                    :tabSize="4"
-                    style="max-height: 300px"
-                    :lineWrapping="true"
-                    :matchBrackets="true"
-                    theme="cobalt"
-                    :styleActiveLine="true"
-                    :extensions="extensions"
-                    @ready="handleReady"
-                    v-model="logInfo"
-                    :readOnly="true"
+                    :style="'height: calc(100vh - 370px);min-height: 200px'"
                 />
             </el-col>
         </el-row>
@@ -89,26 +80,23 @@ import FileList from '@/components/file-list/index.vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { nextTick, onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
+import { nextTick, reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
-import { imageBuild, loadContainerLog } from '@/api/modules/container';
-import { formatImageStdout } from '@/utils/docker';
+import { imageBuild } from '@/api/modules/container';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const logVisiable = ref<boolean>(false);
-const logInfo = ref();
-const view = shallowRef();
-const handleReady = (payload) => {
-    view.value = payload.view;
-};
 const extensions = [javascript(), oneDark];
-let timer: NodeJS.Timer | null = null;
-
 const buttonDisabled = ref(false);
-
 const drawerVisiable = ref(false);
+const logRef = ref();
+
+const logConfig = reactive({
+    type: 'image-build',
+    name: '',
+});
 const form = reactive({
     from: 'path',
     dockerfile: '',
@@ -129,7 +117,6 @@ const acceptParams = async () => {
     form.dockerfile = '';
     form.tagStr = '';
     form.name = '';
-    logInfo.value = '';
     buttonDisabled.value = false;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
@@ -137,8 +124,6 @@ const emit = defineEmits<{ (e: 'search'): void }>();
 const handleClose = () => {
     drawerVisiable.value = false;
     emit('search');
-    clearInterval(Number(timer));
-    timer = null;
 };
 
 type FormInstance = InstanceType<typeof ElForm>;
@@ -153,37 +138,21 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         }
         const res = await imageBuild(form);
         buttonDisabled.value = true;
-        logVisiable.value = true;
-        loadLogs(res.data);
+        logConfig.name = res.data;
+        loadLogs();
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
     });
 };
 
-const loadLogs = async (path: string) => {
-    timer = setInterval(async () => {
-        if (logVisiable.value) {
-            const res = await loadContainerLog('image-build', path);
-            logInfo.value = formatImageStdout(res.data);
-            nextTick(() => {
-                const state = view.value.state;
-                view.value.dispatch({
-                    selection: { anchor: state.doc.length, head: state.doc.length },
-                    scrollIntoView: true,
-                });
-            });
-            if (logInfo.value.endsWith('image build failed!') || logInfo.value.endsWith('image build successful!')) {
-                clearInterval(Number(timer));
-                timer = null;
-                buttonDisabled.value = false;
-            }
-        }
-    }, 1000 * 3);
+const loadLogs = () => {
+    logVisiable.value = false;
+    nextTick(() => {
+        logVisiable.value = true;
+        nextTick(() => {
+            logRef.value.changeTail(true);
+        });
+    });
 };
-
-onBeforeUnmount(() => {
-    clearInterval(Number(timer));
-    timer = null;
-});
 
 const loadBuildDir = async (path: string) => {
     form.dockerfile = path;

@@ -95,47 +95,47 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string) error {
 	case DnsPod:
 		dnsPodConfig := dnspod.NewDefaultConfig()
 		dnsPodConfig.LoginToken = param.ID + "," + param.Token
-		dnsPodConfig.PropagationTimeout = 30 * time.Minute
-		dnsPodConfig.PollingInterval = 30 * time.Second
+		dnsPodConfig.PropagationTimeout = 60 * time.Minute
+		dnsPodConfig.PollingInterval = 5 * time.Second
 		dnsPodConfig.TTL = 3600
 		p, err = dnspod.NewDNSProviderConfig(dnsPodConfig)
 	case AliYun:
 		alidnsConfig := alidns.NewDefaultConfig()
 		alidnsConfig.SecretKey = param.SecretKey
 		alidnsConfig.APIKey = param.AccessKey
-		alidnsConfig.PropagationTimeout = 30 * time.Minute
-		alidnsConfig.PollingInterval = 30 * time.Second
+		alidnsConfig.PropagationTimeout = 60 * time.Minute
+		alidnsConfig.PollingInterval = 5 * time.Second
 		alidnsConfig.TTL = 3600
 		p, err = alidns.NewDNSProviderConfig(alidnsConfig)
 	case CloudFlare:
 		cloudflareConfig := cloudflare.NewDefaultConfig()
 		cloudflareConfig.AuthEmail = param.Email
 		cloudflareConfig.AuthKey = param.APIkey
-		cloudflareConfig.PropagationTimeout = 30 * time.Minute
-		cloudflareConfig.PollingInterval = 30 * time.Second
+		cloudflareConfig.PropagationTimeout = 60 * time.Minute
+		cloudflareConfig.PollingInterval = 5 * time.Second
 		cloudflareConfig.TTL = 3600
 		p, err = cloudflare.NewDNSProviderConfig(cloudflareConfig)
 	case NameCheap:
 		namecheapConfig := namecheap.NewDefaultConfig()
 		namecheapConfig.APIKey = param.APIkey
 		namecheapConfig.APIUser = param.APIUser
-		namecheapConfig.PropagationTimeout = 30 * time.Minute
-		namecheapConfig.PollingInterval = 30 * time.Second
+		namecheapConfig.PropagationTimeout = 60 * time.Minute
+		namecheapConfig.PollingInterval = 5 * time.Second
 		namecheapConfig.TTL = 3600
 		p, err = namecheap.NewDNSProviderConfig(namecheapConfig)
 	case NameSilo:
 		nameSiloConfig := namesilo.NewDefaultConfig()
 		nameSiloConfig.APIKey = param.APIkey
-		nameSiloConfig.PropagationTimeout = 30 * time.Minute
-		nameSiloConfig.PollingInterval = 30 * time.Second
+		nameSiloConfig.PropagationTimeout = 60 * time.Minute
+		nameSiloConfig.PollingInterval = 5 * time.Second
 		nameSiloConfig.TTL = 3600
 		p, err = namesilo.NewDNSProviderConfig(nameSiloConfig)
 	case Godaddy:
 		godaddyConfig := godaddy.NewDefaultConfig()
 		godaddyConfig.APIKey = param.APIkey
 		godaddyConfig.APISecret = param.APISecret
-		godaddyConfig.PropagationTimeout = 30 * time.Minute
-		godaddyConfig.PollingInterval = 30 * time.Second
+		godaddyConfig.PropagationTimeout = 60 * time.Minute
+		godaddyConfig.PollingInterval = 5 * time.Second
 		godaddyConfig.TTL = 3600
 		p, err = godaddy.NewDNSProviderConfig(godaddyConfig)
 	case NameCom:
