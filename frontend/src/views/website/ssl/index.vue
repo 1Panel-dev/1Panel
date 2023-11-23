@@ -81,7 +81,7 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('website.log')" prop="">
+                    <el-table-column :label="$t('website.log')" width="100px">
                         <template #default="{ row }">
                             <el-button @click="openLog(row)" link type="primary">{{ $t('website.check') }}</el-button>
                         </template>
@@ -143,7 +143,7 @@ import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
 import SSLUpload from './upload/index.vue';
 import Apply from './apply/index.vue';
-import Log from '@/components/log/index.vue';
+import Log from '@/components/log-dialog/index.vue';
 
 const globalStore = GlobalStore();
 const paginationConfig = reactive({
@@ -248,7 +248,7 @@ const openDetail = (id: number) => {
     detailRef.value.acceptParams(id);
 };
 const openLog = (row: Website.SSLDTO) => {
-    logRef.value.acceptParams({ path: row.logPath });
+    logRef.value.acceptParams({ id: row.id, type: 'ssl' });
 };
 
 const applySSL = (row: Website.SSLDTO) => {

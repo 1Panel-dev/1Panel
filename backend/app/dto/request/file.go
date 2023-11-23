@@ -118,9 +118,11 @@ type FileRoleUpdate struct {
 }
 
 type FileReadByLineReq struct {
-	Path     string `json:"path" validate:"required"`
 	Page     int    `json:"page" validate:"required"`
 	PageSize int    `json:"pageSize" validate:"required"`
+	Type     string `json:"type" validate:"required"`
+	ID       uint   `json:"ID"`
+	Name     string `json:"name"`
 }
 
 type FileExistReq struct {

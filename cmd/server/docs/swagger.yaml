@@ -3137,16 +3137,20 @@ definitions:
     type: object
   request.FileReadByLineReq:
     properties:
+      ID:
+        type: integer
+      name:
+        type: string
       page:
         type: integer
       pageSize:
         type: integer
-      path:
+      type:
         type: string
     required:
     - page
     - pageSize
-    - path
+    - type
     type: object
   request.FileRename:
     properties:
@@ -8145,6 +8149,24 @@ paths:
       summary: List favorites
       tags:
       - File
+  /files/log/read:
+    post:
+      description: 按行读取日志文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.FileReadByLineReq'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Read file by Line
+      tags:
+      - File
   /files/mode:
     post:
       consumes:
@@ -8230,24 +8252,6 @@ paths:
         formatEN: Change owner [paths] => [user]/[group]
         formatZH: 修改用户/组 [paths] => [user]/[group]
         paramKeys: []
-  /files/read:
-    post:
-      description: 按行读取文件
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/request.FileReadByLineReq'
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      summary: Read file by Line
-      tags:
-      - File
   /files/recycle/clear:
     post:
       consumes:

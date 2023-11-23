@@ -87,7 +87,7 @@ import CreateRuntime from '@/views/website/runtime/php/create/index.vue';
 import Status from '@/components/status/index.vue';
 import i18n from '@/lang';
 import RouterMenu from '../index.vue';
-import Log from '@/components/log/index.vue';
+import Log from '@/components/log-dialog/index.vue';
 
 const paginationConfig = reactive({
     cacheSizeKey: 'runtime-page-size',
@@ -149,7 +149,7 @@ const openDetail = (row: Runtime.Runtime) => {
 };
 
 const openLog = (row: Runtime.RuntimeDTO) => {
-    logRef.value.acceptParams({ path: row.path + '/' + 'build.log' });
+    logRef.value.acceptParams({ id: row.id, type: 'php' });
 };
 
 const openDelete = async (row: Runtime.Runtime) => {

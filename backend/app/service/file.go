@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 	"time"
@@ -41,6 +42,7 @@ type IFileService interface {
 	ChangeOwner(req request.FileRoleUpdate) error
 	ChangeMode(op request.FileCreate) error
 	BatchChangeModeAndOwner(op request.FileRoleReq) error
+	ReadLogByLine(req request.FileReadByLineReq) (*response.FileLineContent, error)
 }
 
 func NewIFileService() IFileService {
@@ -296,4 +298,63 @@ func (f *FileService) DirSize(req request.DirSizeReq) (response.DirSizeRes, erro
 		return response.DirSizeRes{}, err
 	}
 	return response.DirSizeRes{Size: size}, nil
+}
+
+func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.FileLineContent, error) {
+	logFilePath := ""
+	switch req.Type {
+	case constant.TypeWebsite:
+		website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
+		if err != nil {
+			return nil, err
+		}
+		nginx, err := getNginxFull(&website)
+		if err != nil {
+			return nil, err
+		}
+		sitePath := path.Join(nginx.SiteDir, "sites", website.Alias)
+		logFilePath = path.Join(sitePath, "log", req.Name)
+	case constant.TypePhp:
+		php, err := runtimeRepo.GetFirst(commonRepo.WithByID(req.ID))
+		if err != nil {
+			return nil, err
+		}
+		logFilePath = php.GetLogPath()
+	case constant.TypeSSL:
+		ssl, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(req.ID))
+		if err != nil {
+			return nil, err
+		}
+		logFilePath = ssl.GetLogPath()
+	case constant.TypeSystem:
+		fileName := ""
+		if req.Name == time.Now().Format("2006-01-02") {
+			fileName = "1Panel.log"
+		} else {
+			fileName = "1Panel-" + req.Name + ".log"
+		}
+		logFilePath = path.Join(global.CONF.System.DataDir, "log", fileName)
+		if _, err := os.Stat(logFilePath); err != nil {
+			fileGzPath := path.Join(global.CONF.System.DataDir, "log", fileName+".gz")
+			if _, err := os.Stat(fileGzPath); err != nil {
+				return nil, buserr.New("ErrHttpReqNotFound")
+			}
+			if err := handleGunzip(fileGzPath); err != nil {
+				return nil, fmt.Errorf("handle ungzip file %s failed, err: %v", fileGzPath, err)
+			}
+		}
+	case "image-pull", "image-push", "image-build", "compose-create":
+		logFilePath = path.Join(global.CONF.System.TmpDir, fmt.Sprintf("docker_logs/%s", req.Name))
+	}
+
+	lines, isEndOfFile, err := files.ReadFileByLine(logFilePath, req.Page, req.PageSize)
+	if err != nil {
+		return nil, err
+	}
+	res := &response.FileLineContent{
+		Content: strings.Join(lines, "\n"),
+		End:     isEndOfFile,
+		Path:    logFilePath,
+	}
+	return res, nil
 }

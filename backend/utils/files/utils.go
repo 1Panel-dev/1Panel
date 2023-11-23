@@ -78,6 +78,9 @@ func IsHidden(path string) bool {
 }
 
 func ReadFileByLine(filename string, page, pageSize int) ([]string, bool, error) {
+	if !NewFileOp().Stat(filename) {
+		return nil, true, nil
+	}
 	file, err := os.Open(filename)
 	if err != nil {
 		return nil, false, err

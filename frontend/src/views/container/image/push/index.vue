@@ -34,21 +34,13 @@
                     </el-form-item>
                 </el-form>
 
-                <codemirror
-                    v-if="logVisible"
-                    :autofocus="true"
-                    placeholder="Waiting for push output..."
-                    :indent-with-tab="true"
-                    :tabSize="4"
-                    style="height: calc(100vh - 415px)"
-                    :lineWrapping="true"
-                    :matchBrackets="true"
-                    theme="cobalt"
-                    :styleActiveLine="true"
-                    :extensions="extensions"
-                    @ready="handleReady"
-                    v-model="logInfo"
-                    :disabled="true"
+                <LogFile
+                    ref="logRef"
+                    :config="logConfig"
+                    :default-button="false"
+                    v-if="logVisiable"
+                    :style="'height: calc(100vh - 370px);min-height: 200px'"
+                    v-model:loading="loading"
                 />
             </el-col>
         </el-row>
@@ -58,7 +50,7 @@
                 <el-button @click="drawerVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button :disabled="buttonDisabled" type="primary" @click="onSubmit(formRef)">
+                <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
                     {{ $t('container.push') }}
                 </el-button>
             </span>
@@ -67,17 +59,13 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
+import { nextTick, reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
-import { imagePush, loadContainerLog } from '@/api/modules/container';
+import { imagePush } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
-import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { formatImageStdout } from '@/utils/docker';
 import { MsgSuccess } from '@/utils/message';
 
 const drawerVisible = ref(false);
@@ -88,16 +76,14 @@ const form = reactive({
     name: '',
 });
 
-const buttonDisabled = ref(false);
+const logVisiable = ref(false);
+const loading = ref(false);
 
-const logVisible = ref(false);
-const logInfo = ref();
-const view = shallowRef();
-const handleReady = (payload) => {
-    view.value = payload.view;
-};
-const extensions = [javascript(), oneDark];
-let timer: NodeJS.Timer | null = null;
+const logRef = ref();
+const logConfig = reactive({
+    type: 'image-push',
+    name: '',
+});
 
 interface DialogProps {
     repos: Array<Container.RepoOptions>;
@@ -109,7 +95,8 @@ const dialogData = ref<DialogProps>({
 });
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
-    logVisible.value = false;
+    logVisiable.value = false;
+    loading.value = false;
     drawerVisible.value = true;
     form.tags = params.tags;
     form.repoID = 1;
@@ -127,37 +114,25 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         const res = await imagePush(form);
-        logVisible.value = true;
-        buttonDisabled.value = true;
-        loadLogs(res.data);
+        logVisiable.value = true;
+        logConfig.name = res.data;
+        loadLogs();
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     });
 };
 
-const loadLogs = async (path: string) => {
-    timer = setInterval(async () => {
-        if (logVisible.value) {
-            const res = await loadContainerLog('image-push', path);
-            logInfo.value = formatImageStdout(res.data);
-            nextTick(() => {
-                const state = view.value.state;
-                view.value.dispatch({
-                    selection: { anchor: state.doc.length, head: state.doc.length },
-                    scrollIntoView: true,
-                });
-            });
-            if (logInfo.value.endsWith('image push failed!') || logInfo.value.endsWith('image push successful!')) {
-                clearInterval(Number(timer));
-                timer = null;
-                buttonDisabled.value = false;
-            }
-        }
-    }, 1000 * 3);
+const loadLogs = () => {
+    logVisiable.value = false;
+    nextTick(() => {
+        logVisiable.value = true;
+        nextTick(() => {
+            logRef.value.changeTail(true);
+        });
+    });
 };
+
 const onCloseLog = async () => {
     emit('search');
-    clearInterval(Number(timer));
-    timer = null;
     drawerVisible.value = false;
 };
 
@@ -169,11 +144,6 @@ function loadDetailInfo(id: number) {
     }
     return '';
 }
-
-onBeforeUnmount(() => {
-    clearInterval(Number(timer));
-    timer = null;
-});
 
 defineExpose({
     acceptParams,
