@@ -7,6 +7,22 @@ export namespace Toolbox {
         user: string;
         timeZone: string;
         localTime: string;
+
+        memoryTotal: number;
+        memoryAvailable: number;
+        memoryUsed: number;
+        swapMemoryTotal: number;
+        swapMemoryAvailable: number;
+        swapMemoryUsed: number;
+
+        swapDetails: Array<SwapHelper>;
+    }
+    export interface SwapHelper {
+        operate: string;
+        path: string;
+        size: number;
+        used: number;
+        withRemove: boolean;
     }
     export interface HostHelper {
         ip: string;

@@ -24,6 +24,15 @@
                                     </template>
                                 </el-input>
                             </el-form-item>
+                            <el-form-item label="Swap" prop="swap">
+                                <el-input disabled v-model="form.swapItem">
+                                    <template #append>
+                                        <el-button @click="onChangeSwap" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
                             <el-form-item :label="$t('toolbox.device.hostname')" prop="hostname">
                                 <el-input disabled v-model="form.hostname">
                                     <template #append>
@@ -66,6 +75,7 @@
             </template>
         </LayoutContent>
 
+        <Swap ref="swapRef" @search="search" />
         <Passwd ref="passwdRef" @search="search" />
         <TimeZone ref="timeZoneRef" @search="search" />
         <LocalTime ref="localTimeRef" @search="search" />
@@ -77,6 +87,7 @@
 
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue';
+import Swap from '@/views/toolbox/device/swap/index.vue';
 import Passwd from '@/views/toolbox/device/passwd/index.vue';
 import TimeZone from '@/views/toolbox/device/time-zone/index.vue';
 import LocalTime from '@/views/toolbox/device/local-time/index.vue';
@@ -85,9 +96,11 @@ import Hostname from '@/views/toolbox/device/hostname/index.vue';
 import Hosts from '@/views/toolbox/device/hosts/index.vue';
 import { getDeviceBase } from '@/api/modules/toolbox';
 import i18n from '@/lang';
+import { computeSize } from '@/utils/util';
 
 const loading = ref(false);
 
+const swapRef = ref();
 const timeZoneRef = ref();
 const localTimeRef = ref();
 const passwdRef = ref();
@@ -106,6 +119,16 @@ const form = reactive({
     timeZone: '',
     localTime: '',
     ntp: '',
+
+    swapItem: '',
+    memoryTotal: '',
+    memoryAvailable: '',
+    memoryUsed: '',
+    swapMemoryTotal: '',
+    swapMemoryAvailable: '',
+    swapMemoryUsed: '',
+
+    swapDetails: [],
 });
 
 const onChangeTimeZone = () => {
@@ -126,6 +149,9 @@ const onChangeHostname = () => {
 const onChangeHost = () => {
     hostsRef.value.acceptParams({ hosts: form.hosts });
 };
+const onChangeSwap = () => {
+    swapRef.value.acceptParams();
+};
 
 const search = async () => {
     const res = await getDeviceBase();
@@ -138,6 +164,17 @@ const search = async () => {
     form.dnsItem = form.dns ? i18n.global.t('toolbox.device.dnsHelper') : i18n.global.t('setting.unSetting');
     form.hosts = res.data.hosts || [];
     form.hostItem = form.hosts ? i18n.global.t('toolbox.device.hostsHelper') : i18n.global.t('setting.unSetting');
+
+    form.swapItem = res.data.swapMemoryTotal
+        ? i18n.global.t('toolbox.device.dnsHelper')
+        : i18n.global.t('setting.unSetting');
+    form.memoryTotal = computeSize(res.data.memoryTotal);
+    form.memoryUsed = computeSize(res.data.memoryUsed);
+    form.memoryAvailable = computeSize(res.data.memoryAvailable);
+    form.swapMemoryTotal = computeSize(res.data.swapMemoryTotal);
+    form.swapMemoryUsed = computeSize(res.data.swapMemoryUsed);
+    form.swapMemoryAvailable = computeSize(res.data.swapMemoryAvailable);
+    form.swapDetails = res.data.swapDetails;
 };
 
 onMounted(() => {

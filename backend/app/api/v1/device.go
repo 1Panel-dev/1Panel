@@ -160,6 +160,28 @@ func (b *BaseApi) UpdateDevicPasswd(c *gin.Context) {
 }
 
 // @Tags Device
+// @Summary Update device swap
+// @Description 修改系统 Swap
+// @Accept json
+// @Param request body dto.SwapHelper true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /toolbox/device/update/swap [post]
+// @x-panel-log {"bodyKeys":["opreate","path"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"[opreate] 主机 swap [path]","formatEN":"[opreate] device swap [path]"}
+func (b *BaseApi) UpdateDevicSwap(c *gin.Context) {
+	var req dto.SwapHelper
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := deviceService.UpdateSwap(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Device
 // @Summary Check device DNS conf
 // @Description 检查系统 DNS 配置可用性
 // @Accept json

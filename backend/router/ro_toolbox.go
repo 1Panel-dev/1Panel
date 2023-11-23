@@ -21,6 +21,7 @@ func (s *ToolboxRouter) InitToolboxRouter(Router *gin.RouterGroup) {
 		toolboxRouter.POST("/device/update/conf", baseApi.UpdateDeviceConf)
 		toolboxRouter.POST("/device/update/host", baseApi.UpdateDeviceHost)
 		toolboxRouter.POST("/device/update/passwd", baseApi.UpdateDevicPasswd)
+		toolboxRouter.POST("/device/update/swap", baseApi.UpdateDevicSwap)
 		toolboxRouter.POST("/device/update/byconf", baseApi.UpdateDevicByFile)
 		toolboxRouter.POST("/device/check/dns", baseApi.CheckDNS)
 		toolboxRouter.POST("/device/conf", baseApi.LoadDeviceConf)

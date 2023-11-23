@@ -846,6 +846,9 @@ const message = {
         emptyTerminal: '暂无终端连接',
     },
     toolbox: {
+        swap: {
+            saveHelper: '请先保存当前设置！',
+        },
         device: {
             dnsHelper: '服务器地址域名解析',
             hostsHelper: '主机名解析',
