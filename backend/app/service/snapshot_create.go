@@ -215,7 +215,7 @@ func handleSnapTar(sourceDir, targetDir, name, exclusionRules string) error {
 
 	exStr := ""
 	excludes := strings.Split(exclusionRules, ";")
-	excludes = append(excludes, "*.sock")
+	excludes = append(excludes, "*.sock", "*.db-wal", "*.db-shm")
 	for _, exclude := range excludes {
 		if len(exclude) == 0 {
 			continue
