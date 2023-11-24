@@ -121,14 +121,6 @@ const form = reactive({
     ntp: '',
 
     swapItem: '',
-    memoryTotal: '',
-    memoryAvailable: '',
-    memoryUsed: '',
-    swapMemoryTotal: '',
-    swapMemoryAvailable: '',
-    swapMemoryUsed: '',
-
-    swapDetails: [],
 });
 
 const onChangeTimeZone = () => {
@@ -166,15 +158,8 @@ const search = async () => {
     form.hostItem = form.hosts ? i18n.global.t('toolbox.device.hostsHelper') : i18n.global.t('setting.unSetting');
 
     form.swapItem = res.data.swapMemoryTotal
-        ? i18n.global.t('toolbox.device.dnsHelper')
+        ? computeSize(res.data.swapMemoryTotal)
         : i18n.global.t('setting.unSetting');
-    form.memoryTotal = computeSize(res.data.memoryTotal);
-    form.memoryUsed = computeSize(res.data.memoryUsed);
-    form.memoryAvailable = computeSize(res.data.memoryAvailable);
-    form.swapMemoryTotal = computeSize(res.data.swapMemoryTotal);
-    form.swapMemoryUsed = computeSize(res.data.swapMemoryUsed);
-    form.swapMemoryAvailable = computeSize(res.data.swapMemoryAvailable);
-    form.swapDetails = res.data.swapDetails;
 };
 
 onMounted(() => {

@@ -884,6 +884,21 @@ const message = {
         emptyTerminal: 'No terminal is currently connected',
     },
     toolbox: {
+        swap: {
+            swap: 'Swap Partition',
+            swapHelper1:
+                'The size of the swap should be 1 to 2 times the physical memory, adjustable based on specific requirements;',
+            swapHelper2:
+                'Before creating a swap file, ensure that the system disk has sufficient available space, as the swap file size will occupy the corresponding disk space;',
+            swapHelper3:
+                'Swap can help alleviate memory pressure, but it is only an alternative. Excessive reliance on swap may lead to a decrease in system performance. It is recommended to prioritize increasing memory or optimizing application memory usage;',
+            swapHelper4: 'It is advisable to regularly monitor the usage of swap to ensure normal system operation.',
+            swapDeleteHelper:
+                'This operation will remove the Swap partition {0}. For system security reasons, the corresponding file will not be automatically deleted. If deletion is required, please proceed manually!',
+            saveHelper: 'Please save the current settings first!',
+            saveSwap:
+                'Saving the current configuration will adjust the total usage of the swap partition to {0}. Do you want to continue?',
+        },
         device: {
             dnsHelper: 'Server Address Domain Resolution',
             hostsHelper: 'Hostname Resolution',

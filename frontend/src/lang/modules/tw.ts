@@ -845,6 +845,17 @@ const message = {
         emptyTerminal: '暫無終端連接',
     },
     toolbox: {
+        swap: {
+            swap: 'Swap',
+            swapHelper1: 'Swap 的大小應該是物理內存的 1 到 2 倍，可根據具體情況進行調整；',
+            swapHelper2: '在創建 Swap 文件之前，請確保系統硬盤有足夠的可用空間，Swap 文件的大小將佔用相應的磁盤空間；',
+            swapHelper3:
+                'Swap 可以幫助緩解內存壓力，但僅是一個備選項，過多依賴可能導致系統性能下降，建議優先考慮增加內存或者優化應用程序內存使用；',
+            swapHelper4: '建議定期監控 Swap 的使用情況，以確保系統正常運行。',
+            swapDeleteHelper: '此操作將移除 Swap 分區 {0}，出於系統安全考慮，不會自動刪除該文件，如需刪除請手動操作！',
+            saveHelper: '請先保存當前設置！',
+            saveSwap: '保存當前配置將調整交換分區總佔用到 {0}，是否繼續？',
+        },
         device: {
             dnsHelper: '伺服器地址域名解析',
             hostsHelper: '主機名解析',

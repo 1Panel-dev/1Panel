@@ -7,40 +7,18 @@
 
             <el-row type="flex" justify="center" v-loading="loading">
                 <el-col :span="22">
+                    <el-alert class="common-prompt" :closable="false" type="warning">
+                        <template #default>
+                            <ul style="margin-left: -20px">
+                                <li>{{ $t('toolbox.swap.swapHelper1') }}</li>
+                                <li>{{ $t('toolbox.swap.swapHelper2') }}</li>
+                                <li>{{ $t('toolbox.swap.swapHelper3') }}</li>
+                                <li>{{ $t('toolbox.swap.swapHelper4') }}</li>
+                            </ul>
+                        </template>
+                    </el-alert>
                     <el-card>
                         <el-form label-position="top" class="ml-3">
-                            <el-row type="flex" justify="center" :gutter="20">
-                                <el-col :xs="8" :sm="8" :md="8" :lg="8" :xl="8">
-                                    <el-form-item>
-                                        <template #label>
-                                            <span class="status-label">
-                                                {{ $t('home.disk') }} {{ $t('home.total') }}
-                                            </span>
-                                        </template>
-                                        <span class="status-count">{{ form.memoryTotal }}</span>
-                                    </el-form-item>
-                                </el-col>
-                                <el-col :xs="8" :sm="8" :md="8" :lg="8" :xl="8">
-                                    <el-form-item>
-                                        <template #label>
-                                            <span class="status-label">
-                                                {{ $t('home.disk') }} {{ $t('home.used') }}
-                                            </span>
-                                        </template>
-                                        <span class="status-count">{{ form.memoryUsed }}</span>
-                                    </el-form-item>
-                                </el-col>
-                                <el-col :xs="8" :sm="8" :md="8" :lg="8" :xl="8">
-                                    <el-form-item>
-                                        <template #label>
-                                            <span class="status-label">
-                                                {{ $t('home.disk') }} {{ $t('home.free') }}
-                                            </span>
-                                        </template>
-                                        <span class="status-count">{{ form.memoryAvailable }}</span>
-                                    </el-form-item>
-                                </el-col>
-                            </el-row>
                             <el-row type="flex" justify="center" :gutter="20">
                                 <el-col :xs="8" :sm="8" :md="8" :lg="8" :xl="8">
                                     <el-form-item>
@@ -73,13 +51,21 @@
                     <el-table :data="form.swapDetails" class="mt-5">
                         <el-table-column :label="$t('file.path')" min-width="150" prop="path">
                             <template #default="{ row }">
-                                <el-input v-if="row.isCreate" v-model.number="row.path"></el-input>
+                                <el-input
+                                    placeholder="/var/swap"
+                                    v-if="row.isCreate"
+                                    v-model.number="row.path"
+                                ></el-input>
                                 <span v-else>{{ row.path }}</span>
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('file.size') + ' (MB)'" min-width="120">
                             <template #default="{ row }">
-                                <el-input v-if="row.isCreate || row.isEdit" v-model.number="row.size"></el-input>
+                                <el-input
+                                    placeholder="1024"
+                                    v-if="row.isCreate || row.isEdit"
+                                    v-model.number="row.size"
+                                ></el-input>
                                 <span v-else>{{ row.size }}</span>
                             </template>
                         </el-table-column>
@@ -135,12 +121,9 @@ const isCreate = ref();
 
 const form = reactive({
     swapItem: '',
-    memoryTotal: 0,
-    memoryAvailable: 0,
-    memoryUsed: 0,
-    swapMemoryTotal: 0,
-    swapMemoryAvailable: 0,
-    swapMemoryUsed: 0,
+    swapMemoryTotal: '',
+    swapMemoryAvailable: '',
+    swapMemoryUsed: '',
 
     swapDetails: [],
 });
@@ -167,36 +150,14 @@ const handleAdd = () => {
     isCreate.value = true;
     form.swapDetails.push(item);
 };
-const handleDelete = async (row: any) => {
-    let params = {
-        operate: 'delete',
-        path: row.path,
-        size: 0,
-        used: '0',
-        withRemove: true,
-    };
-    loading.value = true;
-    await updateDeviceSwap(params)
-        .then(() => {
-            loading.value = false;
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            search();
-        })
-        .catch(() => {
-            loading.value = false;
-        });
-};
 
 const search = async () => {
     isCreate.value = false;
     const res = await getDeviceBase();
-    form.memoryTotal = computeSize(res.data.memoryTotal);
-    form.memoryUsed = computeSize(res.data.memoryUsed);
-    form.memoryAvailable = computeSize(res.data.memoryAvailable);
     form.swapMemoryTotal = computeSize(res.data.swapMemoryTotal);
     form.swapMemoryUsed = computeSize(res.data.swapMemoryUsed);
     form.swapMemoryAvailable = computeSize(res.data.swapMemoryAvailable);
-    form.swapDetails = res.data.swapDetails;
+    form.swapDetails = res.data.swapDetails || [];
     for (const item of form.swapDetails) {
         item.isCreate = false;
         item.isEdit = false;
@@ -204,24 +165,66 @@ const search = async () => {
     }
 };
 
+const handleDelete = async (row: any) => {
+    ElMessageBox.confirm(
+        i18n.global.t('toolbox.swap.swapDeleteHelper', [row.path]),
+        i18n.global.t('commons.button.delete'),
+        {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            type: 'info',
+        },
+    ).then(async () => {
+        let params = {
+            operate: 'delete',
+            path: row.path,
+            size: 0,
+            used: '0',
+        };
+        loading.value = true;
+        await updateDeviceSwap(params)
+            .then(() => {
+                loading.value = false;
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                search();
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
+};
+
 const onSave = async (row) => {
-    let params = {
-        operate: row.isCreate ? 'create' : 'update',
-        path: row.path,
-        size: row.size * 1024,
-        used: '0',
-        withRemove: false,
-    };
-    loading.value = true;
-    await updateDeviceSwap(params)
-        .then(() => {
-            loading.value = false;
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            search();
-        })
-        .catch(() => {
-            loading.value = false;
-        });
+    let itemSize = 0;
+    for (const item of form.swapDetails) {
+        itemSize += item.size;
+    }
+    ElMessageBox.confirm(
+        i18n.global.t('toolbox.swap.saveSwap', [itemSize + ' M']),
+        i18n.global.t('commons.button.save'),
+        {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            type: 'info',
+        },
+    ).then(async () => {
+        let params = {
+            operate: row.isCreate ? 'create' : 'update',
+            path: row.path,
+            size: row.size * 1024,
+            used: '0',
+        };
+        loading.value = true;
+        await updateDeviceSwap(params)
+            .then(() => {
+                loading.value = false;
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                search();
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
 };
 
 const handleClose = () => {

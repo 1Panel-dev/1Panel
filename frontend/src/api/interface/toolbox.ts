@@ -8,9 +8,6 @@ export namespace Toolbox {
         timeZone: string;
         localTime: string;
 
-        memoryTotal: number;
-        memoryAvailable: number;
-        memoryUsed: number;
         swapMemoryTotal: number;
         swapMemoryAvailable: number;
         swapMemoryUsed: number;
@@ -21,8 +18,7 @@ export namespace Toolbox {
         operate: string;
         path: string;
         size: number;
-        used: number;
-        withRemove: boolean;
+        used: string;
     }
     export interface HostHelper {
         ip: string;

@@ -847,7 +847,15 @@ const message = {
     },
     toolbox: {
         swap: {
+            swap: 'Swap 分区',
+            swapHelper1: 'Swap 的大小应该是物理内存的 1 到 2 倍，可根据具体情况进行调整；',
+            swapHelper2: '在创建 Swap 文件之前，请确保系统硬盘有足够的可用空间，Swap 文件的大小将占用相应的磁盘空间；',
+            swapHelper3:
+                'Swap 可以帮助缓解内存压力，但仅是一个备选项，过多依赖可能导致系统性能下降，建议优先考虑增加内存或者优化应用程序内存使用；',
+            swapHelper4: '建议定期监控 Swap 的使用情况，以确保系统正常运行。',
+            swapDeleteHelper: '此操作将移除 Swap 分区 {0}，出于系统安全考虑，不会自动删除该文件，如需删除请手动操作！',
             saveHelper: '请先保存当前设置！',
+            saveSwap: '保存当前配置将调整 Swap 分区总占用到 {0}，是否继续？',
         },
         device: {
             dnsHelper: '服务器地址域名解析',
