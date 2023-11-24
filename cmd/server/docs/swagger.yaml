@@ -433,6 +433,8 @@ definitions:
         type: string
       openStdin:
         type: boolean
+      privileged:
+        type: boolean
       publishAllPorts:
         type: boolean
       restartPolicy:
@@ -954,6 +956,16 @@ definitions:
         type: string
       ntp:
         type: string
+      swapDetails:
+        items:
+          $ref: '#/definitions/dto.SwapHelper'
+        type: array
+      swapMemoryAvailable:
+        type: integer
+      swapMemoryTotal:
+        type: integer
+      swapMemoryUsed:
+        type: integer
       timeZone:
         type: string
       user:
@@ -2394,6 +2406,24 @@ definitions:
         type: boolean
     required:
     - id
+    type: object
+  dto.SwapHelper:
+    properties:
+      operate:
+        enum:
+        - create
+        - delete
+        - update
+        type: string
+      path:
+        type: string
+      size:
+        type: integer
+      used:
+        type: string
+    required:
+    - operate
+    - path
     type: object
   dto.TreeChild:
     properties:
@@ -11107,6 +11137,34 @@ paths:
       summary: Update device passwd
       tags:
       - Device
+  /toolbox/device/update/swap:
+    post:
+      consumes:
+      - application/json
+      description: 修改系统 Swap
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SwapHelper'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update device swap
+      tags:
+      - Device
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - operate
+        - path
+        formatEN: '[operate] device swap [path]'
+        formatZH: '[operate] 主机 swap [path]'
+        paramKeys: []
   /toolbox/device/zone/options:
     get:
       consumes:

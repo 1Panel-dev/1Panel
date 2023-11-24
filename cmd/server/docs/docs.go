@@ -10331,6 +10331,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/toolbox/device/update/swap": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "修改系统 Swap",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Device"
+                ],
+                "summary": "Update device swap",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SwapHelper"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "operate",
+                        "path"
+                    ],
+                    "formatEN": "[operate] device swap [path]",
+                    "formatZH": "[operate] 主机 swap [path]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/toolbox/device/zone/options": {
             "get": {
                 "security": [
@@ -13748,6 +13791,9 @@ const docTemplate = `{
                 "openStdin": {
                     "type": "boolean"
                 },
+                "privileged": {
+                    "type": "boolean"
+                },
                 "publishAllPorts": {
                     "type": "boolean"
                 },
@@ -14518,6 +14564,21 @@ const docTemplate = `{
                 },
                 "ntp": {
                     "type": "string"
+                },
+                "swapDetails": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.SwapHelper"
+                    }
+                },
+                "swapMemoryAvailable": {
+                    "type": "integer"
+                },
+                "swapMemoryTotal": {
+                    "type": "integer"
+                },
+                "swapMemoryUsed": {
+                    "type": "integer"
                 },
                 "timeZone": {
                     "type": "string"
@@ -16650,6 +16711,32 @@ const docTemplate = `{
                 },
                 "reDownload": {
                     "type": "boolean"
+                }
+            }
+        },
+        "dto.SwapHelper": {
+            "type": "object",
+            "required": [
+                "operate",
+                "path"
+            ],
+            "properties": {
+                "operate": {
+                    "type": "string",
+                    "enum": [
+                        "create",
+                        "delete",
+                        "update"
+                    ]
+                },
+                "path": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "used": {
+                    "type": "string"
                 }
             }
         },

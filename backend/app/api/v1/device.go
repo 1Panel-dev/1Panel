@@ -73,7 +73,7 @@ func (b *BaseApi) LoadDeviceConf(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /toolbox/device/update/byconf [post]
-func (b *BaseApi) UpdateDevicByFile(c *gin.Context) {
+func (b *BaseApi) UpdateDeviceByFile(c *gin.Context) {
 	var req dto.UpdateByNameAndFile
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
@@ -138,7 +138,7 @@ func (b *BaseApi) UpdateDeviceHost(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /toolbox/device/update/passwd [post]
-func (b *BaseApi) UpdateDevicPasswd(c *gin.Context) {
+func (b *BaseApi) UpdateDevicePasswd(c *gin.Context) {
 	var req dto.ChangePasswd
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
@@ -167,8 +167,8 @@ func (b *BaseApi) UpdateDevicPasswd(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /toolbox/device/update/swap [post]
-// @x-panel-log {"bodyKeys":["opreate","path"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"[opreate] 主机 swap [path]","formatEN":"[opreate] device swap [path]"}
-func (b *BaseApi) UpdateDevicSwap(c *gin.Context) {
+// @x-panel-log {"bodyKeys":["operate","path"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"[operate] 主机 swap [path]","formatEN":"[operate] device swap [path]"}
+func (b *BaseApi) UpdateDeviceSwap(c *gin.Context) {
 	var req dto.SwapHelper
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
