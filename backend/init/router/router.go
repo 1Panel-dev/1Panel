@@ -96,6 +96,7 @@ func Routers() *gin.Engine {
 		systemRouter.InitRuntimeRouter(PrivateGroup)
 		systemRouter.InitProcessRouter(PrivateGroup)
 		systemRouter.InitToolboxRouter(PrivateGroup)
+		systemRouter.InitWebsiteCARouter(PrivateGroup)
 	}
 
 	return Router

@@ -148,7 +148,6 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 }
 
 func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
-
 	var (
 		err         error
 		websiteSSL  model.WebsiteSSL
@@ -212,7 +211,7 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 	}
 
 	go func() {
-		logFile, _ := os.OpenFile(path.Join(constant.SSLLogDir, fmt.Sprintf("%s-ssl-%d.log", websiteSSL.PrimaryDomain, websiteSSL.ID)), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+		logFile, _ := os.OpenFile(path.Join(constant.SSLLogDir, fmt.Sprintf("%s-ssl-%d.log", websiteSSL.PrimaryDomain, websiteSSL.ID)), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
 		defer logFile.Close()
 		logger := log.New(logFile, "", log.LstdFlags)
 		legoLogger.Logger = logger
@@ -443,10 +442,17 @@ func (w WebsiteSSLService) Upload(req request.WebsiteSSLUpload) error {
 	if len(cert.DNSNames) > 0 {
 		newSSL.PrimaryDomain = cert.DNSNames[0]
 		domains = cert.DNSNames[1:]
-	} else if len(cert.IPAddresses) > 0 {
-		newSSL.PrimaryDomain = cert.IPAddresses[0].String()
-		for _, ip := range cert.IPAddresses[1:] {
-			domains = append(domains, ip.String())
+	}
+	if len(cert.IPAddresses) > 0 {
+		if newSSL.PrimaryDomain == "" {
+			newSSL.PrimaryDomain = cert.IPAddresses[0].String()
+			for _, ip := range cert.IPAddresses[1:] {
+				domains = append(domains, ip.String())
+			}
+		} else {
+			for _, ip := range cert.IPAddresses {
+				domains = append(domains, ip.String())
+			}
 		}
 	}
 	newSSL.Domains = strings.Join(domains, ",")

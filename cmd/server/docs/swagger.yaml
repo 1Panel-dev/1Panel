@@ -433,6 +433,8 @@ definitions:
         type: string
       openStdin:
         type: boolean
+      privileged:
+        type: boolean
       publishAllPorts:
         type: boolean
       restartPolicy:
@@ -3680,6 +3682,77 @@ definitions:
     - keyType
     - type
     type: object
+  request.WebsiteCACreate:
+    properties:
+      city:
+        type: string
+      commonName:
+        type: string
+      country:
+        type: string
+      email:
+        type: string
+      keyType:
+        enum:
+        - P256
+        - P384
+        - "2048"
+        - "3072"
+        - "4096"
+        - "8192"
+        type: string
+      name:
+        type: string
+      organization:
+        type: string
+      organizationUint:
+        type: string
+      province:
+        type: string
+    required:
+    - commonName
+    - country
+    - email
+    - keyType
+    - name
+    - organization
+    type: object
+  request.WebsiteCAObtain:
+    properties:
+      domains:
+        type: string
+      id:
+        type: integer
+      keyType:
+        enum:
+        - P256
+        - P384
+        - "2048"
+        - "3072"
+        - "4096"
+        - "8192"
+        type: string
+      time:
+        type: integer
+      unit:
+        type: string
+    required:
+    - domains
+    - id
+    - keyType
+    - time
+    - unit
+    type: object
+  request.WebsiteCASearch:
+    properties:
+      page:
+        type: integer
+      pageSize:
+        type: integer
+    required:
+    - page
+    - pageSize
+    type: object
   request.WebsiteCommonReq:
     properties:
       id:
@@ -4429,6 +4502,23 @@ definitions:
       updatedAt:
         type: string
       url:
+        type: string
+    type: object
+  response.WebsiteCADTO:
+    properties:
+      createdAt:
+        type: string
+      csr:
+        type: string
+      id:
+        type: integer
+      keyType:
+        type: string
+      name:
+        type: string
+      privateKey:
+        type: string
+      updatedAt:
         type: string
     type: object
   response.WebsiteDNSRes:
@@ -11509,6 +11599,144 @@ paths:
       summary: Get AuthBasic conf
       tags:
       - Website
+  /websites/ca:
+    post:
+      consumes:
+      - application/json
+      description: 创建网站 ca
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteCACreate'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/request.WebsiteCACreate'
+      security:
+      - ApiKeyAuth: []
+      summary: Create website ca
+      tags:
+      - Website CA
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - name
+        formatEN: Create website ca [name]
+        formatZH: 创建网站 ca [name]
+        paramKeys: []
+  /websites/ca/{id}:
+    get:
+      consumes:
+      - application/json
+      description: 获取网站 ca
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.WebsiteCADTO'
+      security:
+      - ApiKeyAuth: []
+      summary: Get website ca
+      tags:
+      - Website CA
+  /websites/ca/del:
+    post:
+      consumes:
+      - application/json
+      description: 删除网站 ca
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteCommonReq'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Delete website ca
+      tags:
+      - Website CA
+      x-panel-log:
+        BeforeFunctions:
+        - db: website_cas
+          input_column: id
+          input_value: id
+          isList: false
+          output_column: name
+          output_value: name
+        bodyKeys:
+        - id
+        formatEN: Delete website ca [name]
+        formatZH: 删除网站 ca [name]
+        paramKeys: []
+  /websites/ca/obtain:
+    post:
+      consumes:
+      - application/json
+      description: 自签 SSL 证书
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteCAObtain'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Obtain SSL
+      tags:
+      - Website CA
+      x-panel-log:
+        BeforeFunctions:
+        - db: website_cas
+          input_column: id
+          input_value: id
+          isList: false
+          output_column: name
+          output_value: name
+        bodyKeys:
+        - id
+        formatEN: Obtain SSL [name]
+        formatZH: 自签 SSL 证书 [name]
+        paramKeys: []
+  /websites/ca/search:
+    post:
+      consumes:
+      - application/json
+      description: 获取网站 ca 列表分页
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteCASearch'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Page website ca
+      tags:
+      - Website CA
   /websites/check:
     post:
       consumes:

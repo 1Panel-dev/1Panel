@@ -16,6 +16,9 @@
                 <el-button type="primary" @click="openUpload()">
                     {{ $t('ssl.upload') }}
                 </el-button>
+                <el-button type="primary" plain @click="openCA()">
+                    {{ $t('ssl.selfSigned') }}
+                </el-button>
                 <el-button type="primary" plain @click="openAcmeAccount()">
                     {{ $t('website.acmeAccountManage') }}
                 </el-button>
@@ -95,7 +98,11 @@
                     <el-table-column :label="$t('ssl.autoRenew')" fix width="100px">
                         <template #default="{ row }">
                             <el-switch
-                                :disabled="row.provider === 'dnsManual' || row.provider === 'manual'"
+                                :disabled="
+                                    row.provider === 'dnsManual' ||
+                                    row.provider === 'manual' ||
+                                    row.provider === 'selfSigned'
+                                "
                                 v-model="row.autoRenew"
                                 @change="updateConfig(row)"
                             />
@@ -124,6 +131,7 @@
             <Apply ref="applyRef" @search="search" />
             <OpDialog ref="opRef" @search="search" />
             <Log ref="logRef" @close="search()" />
+            <CA ref="caRef" @close="search()" />
         </LayoutContent>
     </div>
 </template>
@@ -134,6 +142,7 @@ import OpDialog from '@/components/del-dialog/index.vue';
 import { DeleteSSL, ObtainSSL, SearchSSL, UpdateSSL } from '@/api/modules/website';
 import DnsAccount from './dns-account/index.vue';
 import AcmeAccount from './acme-account/index.vue';
+import CA from './ca/index.vue';
 import Create from './create/index.vue';
 import Detail from './detail/index.vue';
 import { dateFormat, getProvider } from '@/utils/util';
@@ -162,6 +171,7 @@ const opRef = ref();
 const sslUploadRef = ref();
 const applyRef = ref();
 const logRef = ref();
+const caRef = ref();
 
 const routerButton = [
     {
@@ -183,7 +193,7 @@ const buttons = [
     {
         label: i18n.global.t('ssl.apply'),
         disabled: function (row: Website.SSLDTO) {
-            return row.status === 'applying';
+            return row.status === 'applying' || row.provider === 'manual' || row.provider === 'selfSigned';
         },
         click: function (row: Website.SSLDTO) {
             if (row.provider === 'dnsManual') {
@@ -249,6 +259,9 @@ const openDetail = (id: number) => {
 };
 const openLog = (row: Website.SSLDTO) => {
     logRef.value.acceptParams({ id: row.id, type: 'ssl' });
+};
+const openCA = () => {
+    caRef.value.acceptParams();
 };
 
 const applySSL = (row: Website.SSLDTO) => {

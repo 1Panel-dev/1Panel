@@ -22,3 +22,7 @@ type WebsiteDnsAccountDTO struct {
 	model.WebsiteDnsAccount
 	Authorization map[string]string `json:"authorization"`
 }
+
+type WebsiteCADTO struct {
+	model.WebsiteCA
+}

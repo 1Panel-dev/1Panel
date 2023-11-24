@@ -27,6 +27,7 @@ const (
 	DnsManual  = "dnsManual"
 	Http       = "http"
 	Manual     = "manual"
+	SelfSigned = "selfSigned"
 
 	StartWeb = "start"
 	StopWeb  = "stop"

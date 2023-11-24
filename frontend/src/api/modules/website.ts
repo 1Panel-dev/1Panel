@@ -247,3 +247,19 @@ export const GetDirConfig = (req: Website.ProxyReq) => {
 export const UploadSSL = (req: Website.SSLUpload) => {
     return http.post<any>(`/websites/ssl/upload`, req);
 };
+
+export const SearchCAs = (req: ReqPage) => {
+    return http.post<ResPage<Website.CA>>(`/websites/ca/search`, req);
+};
+
+export const CreateCA = (req: Website.CACreate) => {
+    return http.post<Website.CA>(`/websites/ca`, req);
+};
+
+export const ObtainSSLByCA = (req: Website.SSLObtainByCA) => {
+    return http.post<any>(`/websites/ca/obtain`, req);
+};
+
+export const DeleteCA = (req: Website.DelReq) => {
+    return http.post<any>(`/websites/ca/del`, req);
+};
