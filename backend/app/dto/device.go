@@ -9,9 +9,6 @@ type DeviceBaseInfo struct {
 	Ntp       string       `json:"ntp"`
 	User      string       `json:"user"`
 
-	MemoryTotal         uint64 `json:"memoryTotal"`
-	MemoryAvailable     uint64 `json:"memoryAvailable"`
-	MemoryUsed          uint64 `json:"memoryUsed"`
 	SwapMemoryTotal     uint64 `json:"swapMemoryTotal"`
 	SwapMemoryAvailable uint64 `json:"swapMemoryAvailable"`
 	SwapMemoryUsed      uint64 `json:"swapMemoryUsed"`
@@ -29,8 +26,6 @@ type SwapHelper struct {
 	Path    string `json:"path" validate:"required"`
 	Size    uint64 `json:"size"`
 	Used    string `json:"used"`
-
-	WithRemove bool `json:"withRemove"`
 }
 
 type TimeZoneOptions struct {
