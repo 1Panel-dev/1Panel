@@ -897,7 +897,9 @@ const message = {
                 'This operation will remove the Swap partition {0}. For system security reasons, the corresponding file will not be automatically deleted. If deletion is required, please proceed manually!',
             saveHelper: 'Please save the current settings first!',
             saveSwap:
-                'Saving the current configuration will adjust the total usage of the swap partition to {0}. Do you want to continue?',
+                'Saving the current configuration will adjust the Swap partition {0} size to {1}. Do you want to continue?',
+            saveSwapHelper: 'The minimum partition size is 40 KB. Please modify and try again!',
+            swapOff: 'The minimum partition size is 40 KB. Setting it to 0 will disable the Swap partition.',
         },
         device: {
             dnsHelper: 'Server Address Domain Resolution',
@@ -905,7 +907,7 @@ const message = {
             hosts: 'Domain',
             toolbox: 'Toolbox',
             hostname: 'Hostname',
-            passwd: 'Host Password',
+            passwd: 'System Password',
             passwdHelper: 'Input characters cannot include $ and &',
             timeZone: 'System Time Zone',
             localTime: 'Server Time',

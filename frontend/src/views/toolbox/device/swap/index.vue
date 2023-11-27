@@ -49,56 +49,38 @@
                     </el-card>
 
                     <el-table :data="form.swapDetails" class="mt-5">
-                        <el-table-column :label="$t('file.path')" min-width="150" prop="path">
+                        <el-table-column :label="$t('file.path')" min-width="120" prop="path">
                             <template #default="{ row }">
-                                <el-input
-                                    placeholder="/var/swap"
-                                    v-if="row.isCreate"
-                                    v-model.number="row.path"
-                                ></el-input>
-                                <span v-else>{{ row.path }}</span>
+                                <span>{{ row.path }}</span>
                             </template>
                         </el-table-column>
-                        <el-table-column :label="$t('file.size') + ' (MB)'" min-width="120">
+                        <el-table-column :label="$t('file.size')" min-width="150">
                             <template #default="{ row }">
-                                <el-input
-                                    placeholder="1024"
-                                    v-if="row.isCreate || row.isEdit"
-                                    v-model.number="row.size"
-                                ></el-input>
-                                <span v-else>{{ row.size }}</span>
+                                <el-input placeholder="1024" v-model.number="row.size">
+                                    <template #append>
+                                        <el-select v-model="row.sizeUnit" style="width: 85px">
+                                            <el-option label="KB" value="KB" />
+                                            <el-option label="MB" value="MB" />
+                                            <el-option label="GB" value="G" />
+                                        </el-select>
+                                    </template>
+                                </el-input>
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('home.used')" min-width="70" prop="used">
                             <template #default="{ row }">
                                 <span v-if="row.used !== '-'">{{ computeSize(row.used * 1024) }}</span>
-                                <span v-else>-</span>
                             </template>
                         </el-table-column>
                         <el-table-column min-width="70">
                             <template #default="scope">
-                                <div v-if="!scope.row.isCreate && !scope.row.isEdit">
-                                    <el-button link type="primary" @click="scope.row.isEdit = true">
-                                        {{ $t('commons.button.edit') }}
-                                    </el-button>
-                                    <el-button link type="primary" @click="handleDelete(scope.row)">
-                                        {{ $t('commons.button.delete') }}
-                                    </el-button>
-                                </div>
-                                <div v-if="scope.row.isCreate || scope.row.isEdit">
-                                    <el-button link type="primary" @click="onSave(scope.row)">
-                                        {{ $t('commons.button.save') }}
-                                    </el-button>
-                                    <el-button link type="primary" @click="search()">
-                                        {{ $t('commons.button.cancel') }}
-                                    </el-button>
-                                </div>
+                                <el-button link type="primary" @click="onSave(scope.row)">
+                                    {{ $t('commons.button.save') }}
+                                </el-button>
                             </template>
                         </el-table-column>
                     </el-table>
-                    <el-button class="ml-3 mt-2" @click="handleAdd()">
-                        {{ $t('commons.button.add') }}
-                    </el-button>
+                    <span class="input-help">{{ $t('toolbox.swap.swapOff') }}</span>
                 </el-col>
             </el-row>
             <template #footer>
@@ -112,12 +94,11 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
-import { MsgSuccess, MsgInfo } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { updateDeviceSwap, getDeviceBase } from '@/api/modules/toolbox';
-import { computeSize } from '@/utils/util';
-
-const isCreate = ref();
+import { computeSize, splitSize } from '@/utils/util';
+import { loadBaseDir } from '@/api/modules/setting';
 
 const form = reactive({
     swapItem: '',
@@ -135,72 +116,54 @@ const acceptParams = (): void => {
     search();
     drawerVisible.value = true;
 };
-const handleAdd = () => {
-    if (isCreate.value) {
-        MsgInfo(i18n.global.t('toolbox.swap.saveHelper'));
-        return;
-    }
-    let item = {
-        path: '',
-        size: '',
-        used: '-',
-        isCreate: true,
-        isEdit: false,
-    };
-    isCreate.value = true;
-    form.swapDetails.push(item);
-};
 
 const search = async () => {
-    isCreate.value = false;
+    loading.value = true;
     const res = await getDeviceBase();
     form.swapMemoryTotal = computeSize(res.data.swapMemoryTotal);
     form.swapMemoryUsed = computeSize(res.data.swapMemoryUsed);
     form.swapMemoryAvailable = computeSize(res.data.swapMemoryAvailable);
     form.swapDetails = res.data.swapDetails || [];
-    for (const item of form.swapDetails) {
-        item.isCreate = false;
-        item.isEdit = false;
-        item.size = Number((item.size / 1024).toFixed(2));
-    }
+
+    await loadBaseDir()
+        .then((res) => {
+            loading.value = false;
+            loadData(res.data.substring(0, res.data.lastIndexOf('/1panel')));
+        })
+        .catch(() => {
+            loading.value = false;
+            loadData('');
+        });
 };
 
-const handleDelete = async (row: any) => {
-    ElMessageBox.confirm(
-        i18n.global.t('toolbox.swap.swapDeleteHelper', [row.path]),
-        i18n.global.t('commons.button.delete'),
-        {
-            confirmButtonText: i18n.global.t('commons.button.confirm'),
-            cancelButtonText: i18n.global.t('commons.button.cancel'),
-            type: 'info',
-        },
-    ).then(async () => {
-        let params = {
-            operate: 'delete',
-            path: row.path,
+const loadData = (path: string) => {
+    let isExist = false;
+    for (const item of form.swapDetails) {
+        if (item.path === path + '/.1panel_swap') {
+            isExist = true;
+        }
+        let itemSize = splitSize(item.size * 1024);
+        item.size = itemSize.size;
+        item.sizeUnit = itemSize.unit;
+    }
+    if (!isExist && path !== '') {
+        form.swapDetails.push({
+            path: path + '/.1panel_swap',
             size: 0,
-            used: '0',
-        };
-        loading.value = true;
-        await updateDeviceSwap(params)
-            .then(() => {
-                loading.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                search();
-            })
-            .catch(() => {
-                loading.value = false;
-            });
-    });
+            used: 0,
+            isNew: true,
+            sizeUnit: 'MB',
+        });
+    }
 };
 
 const onSave = async (row) => {
-    let itemSize = 0;
-    for (const item of form.swapDetails) {
-        itemSize += item.size;
+    if (row.sizeUnit === 'KB' && row.size < 40 && row.size !== 0) {
+        MsgError(i18n.global.t('toolbox.swap.saveSwapHelper'));
+        return;
     }
     ElMessageBox.confirm(
-        i18n.global.t('toolbox.swap.saveSwap', [itemSize + ' M']),
+        i18n.global.t('toolbox.swap.saveSwap', [row.path, row.size + ' ' + row.sizeUnit]),
         i18n.global.t('commons.button.save'),
         {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
@@ -209,10 +172,11 @@ const onSave = async (row) => {
         },
     ).then(async () => {
         let params = {
-            operate: row.isCreate ? 'create' : 'update',
             path: row.path,
             size: row.size * 1024,
             used: '0',
+
+            isNew: row.isNew,
         };
         loading.value = true;
         await updateDeviceSwap(params)

@@ -15,10 +15,11 @@ export namespace Toolbox {
         swapDetails: Array<SwapHelper>;
     }
     export interface SwapHelper {
-        operate: string;
         path: string;
         size: number;
         used: string;
+
+        isNew: boolean;
     }
     export interface HostHelper {
         ip: string;

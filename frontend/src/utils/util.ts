@@ -134,10 +134,25 @@ export function loadZero(i: number) {
 export function computeSize(size: number): string {
     const num = 1024.0;
     if (size < num) return size + ' B';
-    if (size < Math.pow(num, 2)) return (size / num).toFixed(2) + ' KB';
-    if (size < Math.pow(num, 3)) return (size / Math.pow(num, 2)).toFixed(2) + ' MB';
-    if (size < Math.pow(num, 4)) return (size / Math.pow(num, 3)).toFixed(2) + ' GB';
-    return (size / Math.pow(num, 4)).toFixed(2) + ' TB';
+    if (size < Math.pow(num, 2)) return formattedNumber((size / num).toFixed(2)) + ' KB';
+    if (size < Math.pow(num, 3)) return formattedNumber((size / Math.pow(num, 2)).toFixed(2)) + ' MB';
+    if (size < Math.pow(num, 4)) return formattedNumber((size / Math.pow(num, 3)).toFixed(2)) + ' GB';
+    return formattedNumber((size / Math.pow(num, 4)).toFixed(2)) + ' TB';
+}
+
+export function splitSize(size: number): any {
+    const num = 1024.0;
+    if (size < num) return { size: Number(size), unit: 'B' };
+    if (size < Math.pow(num, 2)) return { size: formattedNumber((size / num).toFixed(2)), unit: 'KB' };
+    if (size < Math.pow(num, 3))
+        return { size: formattedNumber((size / Number(Math.pow(num, 2).toFixed(2))).toFixed(2)), unit: 'MB' };
+    if (size < Math.pow(num, 4))
+        return { size: formattedNumber((size / Number(Math.pow(num, 3))).toFixed(2)), unit: 'GB' };
+    return { size: formattedNumber((size / Number(Math.pow(num, 4))).toFixed(2)), unit: 'TB' };
+}
+
+export function formattedNumber(num: string) {
+    return num.endsWith('.00') ? Number(num.slice(0, -3)) : Number(num);
 }
 
 export function computeSizeFromMB(size: number): string {
