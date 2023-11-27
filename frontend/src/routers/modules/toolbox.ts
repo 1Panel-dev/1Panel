@@ -39,7 +39,7 @@ const toolboxRouter = {
                 },
                 {
                     path: 'fail2Ban',
-                    name: 'Fail2Ban',
+                    name: 'Fail2ban',
                     component: () => import('@/views/toolbox/fail2ban/index.vue'),
                     hidden: true,
                     meta: {

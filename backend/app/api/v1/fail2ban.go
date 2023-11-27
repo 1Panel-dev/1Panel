@@ -9,9 +9,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Tags Fail2Ban
+// @Tags Fail2ban
 // @Summary Load fail2ban base info
-// @Description 获取 Fail2Ban 基础信息
+// @Description 获取 Fail2ban 基础信息
 // @Success 200 {object} dto.Fail2BanBaseInfo
 // @Security ApiKeyAuth
 // @Router /toolbox/fail2ban/base [get]
@@ -25,9 +25,9 @@ func (b *BaseApi) LoadFail2BanBaseInfo(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
-// @Tags Fail2Ban
+// @Tags Fail2ban
 // @Summary Page fail2ban ip list
-// @Description 获取 Fail2Ban ip
+// @Description 获取 Fail2ban ip
 // @Accept json
 // @Param request body dto.Fail2BanSearch true "request"
 // @Success 200 {Array} string
@@ -48,14 +48,14 @@ func (b *BaseApi) SearchFail2Ban(c *gin.Context) {
 	helper.SuccessWithData(c, list)
 }
 
-// @Tags Fail2Ban
+// @Tags Fail2ban
 // @Summary Operate fail2ban
-// @Description 修改 Fail2Ban 状态
+// @Description 修改 Fail2ban 状态
 // @Accept json
 // @Param request body dto.Operate true "request"
 // @Security ApiKeyAuth
 // @Router /toolbox/fail2ban/operate [post]
-// @x-panel-log {"bodyKeys":["operation"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"[operation] Fail2Ban","formatEN":"[operation] Fail2Ban"}
+// @x-panel-log {"bodyKeys":["operation"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"[operation] Fail2ban","formatEN":"[operation] Fail2ban"}
 func (b *BaseApi) OperateFail2Ban(c *gin.Context) {
 	var req dto.Operate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -70,7 +70,7 @@ func (b *BaseApi) OperateFail2Ban(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// @Tags Fail2Ban
+// @Tags Fail2ban
 // @Summary Operate sshd of fail2ban
 // @Description 配置 sshd
 // @Accept json
@@ -91,15 +91,15 @@ func (b *BaseApi) OperateSSHD(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// @Tags Fail2Ban
+// @Tags Fail2ban
 // @Summary Update fail2ban conf
-// @Description 修改 Fail2Ban 配置
+// @Description 修改 Fail2ban 配置
 // @Accept json
 // @Param request body dto.Fail2BanUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /toolbox/fail2ban/update [post]
-// @x-panel-log {"bodyKeys":["key","value"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改 Fail2Ban 配置 [key] => [value]","formatEN":"update fail2ban conf [key] => [value]"}
+// @x-panel-log {"bodyKeys":["key","value"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改 Fail2ban 配置 [key] => [value]","formatEN":"update fail2ban conf [key] => [value]"}
 func (b *BaseApi) UpdateFail2BanConf(c *gin.Context) {
 	var req dto.Fail2BanUpdate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -113,7 +113,7 @@ func (b *BaseApi) UpdateFail2BanConf(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// @Tags Fail2Ban
+// @Tags Fail2ban
 // @Summary Load fail2ban conf
 // @Description 获取 fail2ban 配置文件
 // @Accept json
@@ -131,7 +131,7 @@ func (b *BaseApi) LoadFail2BanConf(c *gin.Context) {
 	helper.SuccessWithData(c, string(file))
 }
 
-// @Tags Fail2Ban
+// @Tags Fail2ban
 // @Summary Update fail2ban conf by file
 // @Description 通过文件修改 fail2ban 配置
 // @Accept json

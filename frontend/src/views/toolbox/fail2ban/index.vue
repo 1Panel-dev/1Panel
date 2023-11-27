@@ -3,7 +3,7 @@
         <div class="app-status" style="margin-top: 20px">
             <el-card v-if="form.isExist">
                 <div>
-                    <el-tag effect="dark" type="success">Fail2Ban</el-tag>
+                    <el-tag effect="dark" type="success">Fail2ban</el-tag>
                     <el-tag round class="status-content" v-if="form.isActive" type="success">
                         {{ $t('commons.status.running') }}
                     </el-tag>
@@ -43,7 +43,7 @@
             <el-card v-if="!form.isActive" class="mask-prompt">
                 <span>{{ $t('toolbox.fail2ban.unActive') }}</span>
             </el-card>
-            <LayoutContent title="Fail2Ban" :divider="true" :class="{ mask: !form.isActive }">
+            <LayoutContent title="Fail2ban" :divider="true" :class="{ mask: !form.isActive }">
                 <template #toolbar>
                     <el-row>
                         <el-col :span="16">
@@ -109,7 +109,7 @@
                     <div v-if="confShowType === 'all'">
                         <codemirror
                             :autofocus="true"
-                            placeholder="# The Fail2Ban configuration file does not exist or is empty (/etc/ssh/sshd_config)"
+                            placeholder="# The Fail2ban configuration file does not exist or is empty (/etc/ssh/sshd_config)"
                             :indent-with-tab="true"
                             :tabSize="4"
                             style="margin-top: 10px; height: calc(100vh - 460px)"
@@ -128,7 +128,7 @@
             </LayoutContent>
         </div>
         <div v-else>
-            <LayoutContent title="Fail2Ban" :divider="true">
+            <LayoutContent title="Fail2ban" :divider="true">
                 <template #main>
                     <div class="app-warn">
                         <div>
@@ -245,7 +245,7 @@ const onChangeBanAction = () => {
 
 const onOperate = async (operation: string) => {
     let msg = operation === 'enable' || operation === 'disable' ? 'ssh.' : 'commons.button.';
-    ElMessageBox.confirm(i18n.global.t('toolbox.fail2ban.operation', [i18n.global.t(msg + operation)]), 'Fail2Ban', {
+    ElMessageBox.confirm(i18n.global.t('toolbox.fail2ban.operation', [i18n.global.t(msg + operation)]), 'Fail2ban', {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',

@@ -20,7 +20,7 @@ const buttons = [
         path: '/toolbox/supervisor',
     },
     {
-        label: 'Fail2Ban',
+        label: 'Fail2ban',
         path: '/toolbox/fail2ban',
     },
 ];

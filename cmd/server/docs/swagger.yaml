@@ -2409,12 +2409,8 @@ definitions:
     type: object
   dto.SwapHelper:
     properties:
-      operate:
-        enum:
-        - create
-        - delete
-        - update
-        type: string
+      isNew:
+        type: boolean
       path:
         type: string
       size:
@@ -2422,7 +2418,6 @@ definitions:
       used:
         type: string
     required:
-    - operate
     - path
     type: object
   dto.TreeChild:
@@ -11270,7 +11265,7 @@ paths:
       - Device
   /toolbox/fail2ban/base:
     get:
-      description: 获取 Fail2Ban 基础信息
+      description: 获取 Fail2ban 基础信息
       responses:
         "200":
           description: OK
@@ -11280,7 +11275,7 @@ paths:
       - ApiKeyAuth: []
       summary: Load fail2ban base info
       tags:
-      - Fail2Ban
+      - Fail2ban
   /toolbox/fail2ban/load/conf:
     get:
       consumes:
@@ -11293,12 +11288,12 @@ paths:
       - ApiKeyAuth: []
       summary: Load fail2ban conf
       tags:
-      - Fail2Ban
+      - Fail2ban
   /toolbox/fail2ban/operate:
     post:
       consumes:
       - application/json
-      description: 修改 Fail2Ban 状态
+      description: 修改 Fail2ban 状态
       parameters:
       - description: request
         in: body
@@ -11311,13 +11306,13 @@ paths:
       - ApiKeyAuth: []
       summary: Operate fail2ban
       tags:
-      - Fail2Ban
+      - Fail2ban
       x-panel-log:
         BeforeFunctions: []
         bodyKeys:
         - operation
-        formatEN: '[operation] Fail2Ban'
-        formatZH: '[operation] Fail2Ban'
+        formatEN: '[operation] Fail2ban'
+        formatZH: '[operation] Fail2ban'
         paramKeys: []
   /toolbox/fail2ban/operate/sshd:
     post:
@@ -11336,12 +11331,12 @@ paths:
       - ApiKeyAuth: []
       summary: Operate sshd of fail2ban
       tags:
-      - Fail2Ban
+      - Fail2ban
   /toolbox/fail2ban/search:
     post:
       consumes:
       - application/json
-      description: 获取 Fail2Ban ip
+      description: 获取 Fail2ban ip
       parameters:
       - description: request
         in: body
@@ -11358,12 +11353,12 @@ paths:
       - ApiKeyAuth: []
       summary: Page fail2ban ip list
       tags:
-      - Fail2Ban
+      - Fail2ban
   /toolbox/fail2ban/update:
     post:
       consumes:
       - application/json
-      description: 修改 Fail2Ban 配置
+      description: 修改 Fail2ban 配置
       parameters:
       - description: request
         in: body
@@ -11378,14 +11373,14 @@ paths:
       - ApiKeyAuth: []
       summary: Update fail2ban conf
       tags:
-      - Fail2Ban
+      - Fail2ban
       x-panel-log:
         BeforeFunctions: []
         bodyKeys:
         - key
         - value
         formatEN: update fail2ban conf [key] => [value]
-        formatZH: 修改 Fail2Ban 配置 [key] => [value]
+        formatZH: 修改 Fail2ban 配置 [key] => [value]
         paramKeys: []
   /toolbox/fail2ban/update/byconf:
     post:
@@ -11406,7 +11401,7 @@ paths:
       - ApiKeyAuth: []
       summary: Update fail2ban conf by file
       tags:
-      - Fail2Ban
+      - Fail2ban
   /websites:
     post:
       consumes:

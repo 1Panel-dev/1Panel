@@ -10399,9 +10399,9 @@
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "获取 Fail2Ban 基础信息",
+                "description": "获取 Fail2ban 基础信息",
                 "tags": [
-                    "Fail2Ban"
+                    "Fail2ban"
                 ],
                 "summary": "Load fail2ban base info",
                 "responses": {
@@ -10426,7 +10426,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Fail2Ban"
+                    "Fail2ban"
                 ],
                 "summary": "Load fail2ban conf",
                 "responses": {
@@ -10443,12 +10443,12 @@
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "修改 Fail2Ban 状态",
+                "description": "修改 Fail2ban 状态",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
-                    "Fail2Ban"
+                    "Fail2ban"
                 ],
                 "summary": "Operate fail2ban",
                 "parameters": [
@@ -10468,8 +10468,8 @@
                     "bodyKeys": [
                         "operation"
                     ],
-                    "formatEN": "[operation] Fail2Ban",
-                    "formatZH": "[operation] Fail2Ban",
+                    "formatEN": "[operation] Fail2ban",
+                    "formatZH": "[operation] Fail2ban",
                     "paramKeys": []
                 }
             }
@@ -10486,7 +10486,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Fail2Ban"
+                    "Fail2ban"
                 ],
                 "summary": "Operate sshd of fail2ban",
                 "parameters": [
@@ -10510,12 +10510,12 @@
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "获取 Fail2Ban ip",
+                "description": "获取 Fail2ban ip",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
-                    "Fail2Ban"
+                    "Fail2ban"
                 ],
                 "summary": "Page fail2ban ip list",
                 "parameters": [
@@ -10546,12 +10546,12 @@
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "修改 Fail2Ban 配置",
+                "description": "修改 Fail2ban 配置",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
-                    "Fail2Ban"
+                    "Fail2ban"
                 ],
                 "summary": "Update fail2ban conf",
                 "parameters": [
@@ -10577,7 +10577,7 @@
                         "value"
                     ],
                     "formatEN": "update fail2ban conf [key] =\u003e [value]",
-                    "formatZH": "修改 Fail2Ban 配置 [key] =\u003e [value]",
+                    "formatZH": "修改 Fail2ban 配置 [key] =\u003e [value]",
                     "paramKeys": []
                 }
             }
@@ -10594,7 +10594,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Fail2Ban"
+                    "Fail2ban"
                 ],
                 "summary": "Update fail2ban conf by file",
                 "parameters": [
@@ -16927,17 +16927,11 @@
         "dto.SwapHelper": {
             "type": "object",
             "required": [
-                "operate",
                 "path"
             ],
             "properties": {
-                "operate": {
-                    "type": "string",
-                    "enum": [
-                        "create",
-                        "delete",
-                        "update"
-                    ]
+                "isNew": {
+                    "type": "boolean"
                 },
                 "path": {
                     "type": "string"
