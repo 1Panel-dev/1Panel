@@ -3724,6 +3724,15 @@ definitions:
     - keyType
     - type
     type: object
+  request.WebsiteBatchDelReq:
+    properties:
+      ids:
+        items:
+          type: integer
+        type: array
+    required:
+    - ids
+    type: object
   request.WebsiteCACreate:
     properties:
       city:
@@ -12840,7 +12849,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/request.WebsiteResourceReq'
+          $ref: '#/definitions/request.WebsiteBatchDelReq'
       responses:
         "200":
           description: OK
@@ -12853,12 +12862,12 @@ paths:
         BeforeFunctions:
         - db: website_ssls
           input_column: id
-          input_value: id
-          isList: false
+          input_value: ids
+          isList: true
           output_column: primary_domain
           output_value: domain
         bodyKeys:
-        - id
+        - ids
         formatEN: Delete ssl [domain]
         formatZH: 删除 ssl [domain]
         paramKeys: []

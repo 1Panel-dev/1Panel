@@ -58,6 +58,10 @@ type WebsiteResourceReq struct {
 	ID uint `json:"id" validate:"required"`
 }
 
+type WebsiteBatchDelReq struct {
+	IDs []uint `json:"ids" validate:"required"`
+}
+
 type WebsiteSSLUpdate struct {
 	ID        uint `json:"id" validate:"required"`
 	AutoRenew bool `json:"autoRenew"`

@@ -149,6 +149,7 @@ func (w WebsiteCAService) GetCA(id uint) (response.WebsiteCADTO, error) {
 }
 
 func (w WebsiteCAService) Delete(id uint) error {
+
 	return websiteCARepo.DeleteBy(commonRepo.WithByID(id))
 }
 

@@ -85,7 +85,7 @@ ErrDomainIsUsed: "域名已被網站【{{ .name }}】使用"
 ErrDomainFormat: "{{ .name }} 域名格式不正確"
 
 #ssl
-ErrSSLCannotDelete: "證書正在被網站使用，無法刪除"
+ErrSSLCannotDelete: "{{ .name }} 證書正在被網站使用，無法刪除"
 ErrAccountCannotDelete: "帳號關聯證書，無法刪除"
 ErrSSLApply: "證書續簽成功，openresty reload失敗，請檢查配置！"
 ErrEmailIsExist: '郵箱已存在'

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-dialog v-model="open" :title="form.title" width="30%" :close-on-click-modal="false">
+        <el-dialog v-model="open" :title="form.title" width="30%" :close-on-click-modal="false" @close="handleClose">
             <div v-loading="loading">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
@@ -96,6 +96,11 @@ const onConfirm = async () => {
         .catch(() => {
             loading.value = false;
         });
+};
+
+const handleClose = () => {
+    emit('cancel');
+    open.value = false;
 };
 
 onMounted(() => {});
