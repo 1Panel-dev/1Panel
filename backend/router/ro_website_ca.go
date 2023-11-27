@@ -16,5 +16,6 @@ func (a *WebsiteDnsAccountRouter) InitWebsiteCARouter(Router *gin.RouterGroup) {
 		groupRouter.POST("", baseApi.CreateWebsiteCA)
 		groupRouter.POST("/del", baseApi.DeleteWebsiteCA)
 		groupRouter.POST("/obtain", baseApi.ObtainWebsiteCA)
+		groupRouter.POST("/renew", baseApi.RenewWebsiteCA)
 	}
 }

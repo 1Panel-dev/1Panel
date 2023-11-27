@@ -27,7 +27,7 @@ var AddWebsiteCA = &gormigrate.Migration{
 }
 
 var UpdateWebsiteSSL = &gormigrate.Migration{
-	ID: "20231126-update-website-ssl",
+	ID: "20231127-update-website-ssl",
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.AutoMigrate(&model.WebsiteSSL{}); err != nil {
 			return err

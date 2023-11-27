@@ -19,6 +19,7 @@ type WebsiteSSL struct {
 	Organization  string    `gorm:"type:varchar(64);not null" json:"organization"`
 	DnsAccountID  uint      `gorm:"type:integer;not null" json:"dnsAccountId"`
 	AcmeAccountID uint      `gorm:"type:integer;not null" json:"acmeAccountId"`
+	CaID          uint      `gorm:"type:integer;not null;default:0" json:"caId"`
 	AutoRenew     bool      `gorm:"type:varchar(64);not null" json:"autoRenew"`
 	ExpireDate    time.Time `json:"expireDate"`
 	StartDate     time.Time `json:"startDate"`

@@ -47,7 +47,7 @@ const open = ref(false);
 const loading = ref(false);
 const dnsResolve = ref<Website.DNSResolve[]>([]);
 const sslID = ref(0);
-const em = defineEmits(['close']);
+const em = defineEmits(['close', 'submit']);
 const handleClose = () => {
     open.value = false;
     em('close', false);
@@ -83,6 +83,7 @@ const submit = () => {
         .then(() => {
             MsgSuccess(i18n.global.t('ssl.applyStart'));
             handleClose();
+            em('submit', sslID.value);
         })
         .finally(() => {});
 };

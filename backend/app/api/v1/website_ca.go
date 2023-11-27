@@ -116,3 +116,29 @@ func (b *BaseApi) ObtainWebsiteCA(c *gin.Context) {
 	}
 	helper.SuccessWithOutData(c)
 }
+
+// @Tags Website CA
+// @Summary Obtain SSL
+// @Description 续签 SSL 证书
+// @Accept json
+// @Param request body request.WebsiteCAObtain true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/ca/obtain [post]
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"website_cas","output_column":"name","output_value":"name"}],"formatZH":"自签 SSL 证书 [name]","formatEN":"Obtain SSL [name]"}
+func (b *BaseApi) RenewWebsiteCA(c *gin.Context) {
+	var req request.WebsiteCARenew
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteCAService.ObtainSSL(request.WebsiteCAObtain{
+		SSLID: req.SSLID,
+		Renew: true,
+		Unit:  "year",
+		Time:  1,
+	}); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}

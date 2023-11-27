@@ -37,6 +37,7 @@ interface LogProps {
     type: string;
     style: string;
     name: string;
+    tail: boolean;
 }
 
 const open = ref(false);

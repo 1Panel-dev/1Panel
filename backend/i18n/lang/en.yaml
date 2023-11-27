@@ -103,6 +103,8 @@ ApplySSLFailed: 'Application for [{{ .domain }}] certificate failed, {{.detail}}
 ApplySSLSuccess: 'Application for [{{ .domain }}] certificate successful! ! '
 DNSAccountName: 'DNS account [{{ .name }}] manufacturer [{{.type}}]'
 PushDirLog: 'Certificate pushed to directory [{{ .path }}] {{ .status }}'
+ErrDeleteCAWithSSL: "There is an issued certificate under the current organization and cannot be deleted"
+ErrDeleteWithPanelSSL: "Panel SSL configuration uses this certificate and cannot be deleted"
 
 #mysql
 ErrUserIsExist: "The current user already exists. Please enter a new user"

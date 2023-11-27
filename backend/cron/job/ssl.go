@@ -1,8 +1,10 @@
 package job
 
 import (
+	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/app/service"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"time"
@@ -30,9 +32,25 @@ func (ssl *ssl) Run() {
 		sub := expireDate.Sub(now)
 		if sub.Hours() < 720 {
 			global.LOG.Errorf("Update the SSL certificate for the [%s] domain", s.PrimaryDomain)
-			if err := sslService.Renew(s.ID); err != nil {
-				global.LOG.Errorf("Failed to update the SSL certificate for the [%s] domain , err:%s", s.PrimaryDomain, err.Error())
-				continue
+			if s.Provider == constant.SelfSigned {
+				caService := service.NewIWebsiteCAService()
+				if err := caService.ObtainSSL(request.WebsiteCAObtain{
+					ID:    s.CaID,
+					SSLID: s.ID,
+					Renew: true,
+					Unit:  "year",
+					Time:  1,
+				}); err != nil {
+					global.LOG.Errorf("Failed to update the SSL certificate for the [%s] domain , err:%s", s.PrimaryDomain, err.Error())
+					continue
+				}
+			} else {
+				if err := sslService.ObtainSSL(request.WebsiteSSLApply{
+					ID: s.ID,
+				}); err != nil {
+					global.LOG.Errorf("Failed to update the SSL certificate for the [%s] domain , err:%s", s.PrimaryDomain, err.Error())
+					continue
+				}
 			}
 			global.LOG.Errorf("The SSL certificate for the [%s] domain has been successfully updated", s.PrimaryDomain)
 		}

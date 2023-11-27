@@ -11119,7 +11119,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "自签 SSL 证书",
+                "description": "续签 SSL 证书",
                 "consumes": [
                     "application/json"
                 ],
@@ -12926,57 +12926,6 @@ const docTemplate = `{
                     ],
                     "formatEN": "apply ssl [domain]",
                     "formatZH": "申请证书  [domain]",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/websites/ssl/renew": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "重置网站 ssl",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Website SSL"
-                ],
-                "summary": "Reset website ssl",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.WebsiteSSLRenew"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFunctions": [
-                        {
-                            "db": "website_ssls",
-                            "input_column": "id",
-                            "input_value": "SSLId",
-                            "isList": false,
-                            "output_column": "primary_domain",
-                            "output_value": "domain"
-                        }
-                    ],
-                    "bodyKeys": [
-                        "SSLId"
-                    ],
-                    "formatEN": "Renew ssl [domain]",
-                    "formatZH": "重置 ssl [domain]",
                     "paramKeys": []
                 }
             }
@@ -17517,6 +17466,9 @@ const docTemplate = `{
                 "autoRenew": {
                     "type": "boolean"
                 },
+                "caId": {
+                    "type": "integer"
+                },
                 "certURL": {
                     "type": "string"
                 },
@@ -18979,6 +18931,9 @@ const docTemplate = `{
                 "unit"
             ],
             "properties": {
+                "autoRenew": {
+                    "type": "boolean"
+                },
                 "dir": {
                     "type": "string"
                 },
@@ -19001,6 +18956,12 @@ const docTemplate = `{
                 },
                 "pushDir": {
                     "type": "boolean"
+                },
+                "renew": {
+                    "type": "boolean"
+                },
+                "sslID": {
+                    "type": "integer"
                 },
                 "time": {
                     "type": "integer"
@@ -19534,17 +19495,6 @@ const docTemplate = `{
                 },
                 "pushDir": {
                     "type": "boolean"
-                }
-            }
-        },
-        "request.WebsiteSSLRenew": {
-            "type": "object",
-            "required": [
-                "SSLId"
-            ],
-            "properties": {
-                "SSLId": {
-                    "type": "integer"
                 }
             }
         },

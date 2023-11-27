@@ -11,7 +11,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
-	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
@@ -35,7 +34,6 @@ type IWebsiteSSLService interface {
 	GetSSL(id uint) (*response.WebsiteSSLDTO, error)
 	Search(req request.WebsiteSSLSearch) ([]response.WebsiteSSLDTO, error)
 	Create(create request.WebsiteSSLCreate) (request.WebsiteSSLCreate, error)
-	Renew(sslId uint) error
 	GetDNSResolve(req request.WebsiteDNSReq) ([]response.WebsiteDNSRes, error)
 	GetWebsiteSSL(websiteId uint) (response.WebsiteSSLDTO, error)
 	Delete(ids []uint) error
@@ -72,7 +70,7 @@ func (w WebsiteSSLService) GetSSL(id uint) (*response.WebsiteSSLDTO, error) {
 	if err != nil {
 		return nil, err
 	}
-	res.WebsiteSSL = websiteSSL
+	res.WebsiteSSL = *websiteSSL
 	return &res, nil
 }
 
@@ -157,7 +155,7 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 	var (
 		err         error
-		websiteSSL  model.WebsiteSSL
+		websiteSSL  *model.WebsiteSSL
 		acmeAccount *model.WebsiteAcmeAccount
 		dnsAccount  *model.WebsiteDnsAccount
 	)
@@ -257,89 +255,15 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 	return nil
 }
 
-func handleError(websiteSSL model.WebsiteSSL, err error) {
+func handleError(websiteSSL *model.WebsiteSSL, err error) {
 	if websiteSSL.Status == constant.SSLInit || websiteSSL.Status == constant.SSLError {
 		websiteSSL.Status = constant.Error
 	} else {
 		websiteSSL.Status = constant.SSLApplyError
 	}
 	websiteSSL.Message = err.Error()
-	legoLogger.Logger.Println(i18n.GetErrMsg("ApplySSLFailed", map[string]interface{}{"domain": websiteSSL.PrimaryDomain, "err": err.Error()}))
+	legoLogger.Logger.Println(i18n.GetErrMsg("ApplySSLFailed", map[string]interface{}{"domain": websiteSSL.PrimaryDomain, "detail": err.Error()}))
 	_ = websiteSSLRepo.Save(websiteSSL)
-}
-
-func (w WebsiteSSLService) Renew(sslId uint) error {
-	websiteSSL, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(sslId))
-	if err != nil {
-		return err
-	}
-	acmeAccount, err := websiteAcmeRepo.GetFirst(commonRepo.WithByID(websiteSSL.AcmeAccountID))
-	if err != nil {
-		return err
-	}
-
-	client, err := ssl.NewAcmeClient(acmeAccount)
-	if err != nil {
-		return err
-	}
-	switch websiteSSL.Provider {
-	case constant.DNSAccount:
-		dnsAccount, err := websiteDnsRepo.GetFirst(commonRepo.WithByID(websiteSSL.DnsAccountID))
-		if err != nil {
-			return err
-		}
-		if err := client.UseDns(ssl.DnsType(dnsAccount.Type), dnsAccount.Authorization); err != nil {
-			return err
-		}
-	case constant.Http:
-		appInstall, err := getAppInstallByKey(constant.AppOpenresty)
-		if err != nil {
-			return err
-		}
-		if err := client.UseHTTP(path.Join(constant.AppInstallDir, constant.AppOpenresty, appInstall.Name, "root")); err != nil {
-			return err
-		}
-	case constant.SelfSigned:
-
-	}
-
-	resource, err := client.RenewSSL(websiteSSL.CertURL)
-	if err != nil {
-		return err
-	}
-	websiteSSL.PrivateKey = string(resource.PrivateKey)
-	websiteSSL.Pem = string(resource.Certificate)
-	websiteSSL.CertURL = resource.CertURL
-	certBlock, _ := pem.Decode(resource.Certificate)
-	cert, err := x509.ParseCertificate(certBlock.Bytes)
-	if err != nil {
-		return err
-	}
-	websiteSSL.ExpireDate = cert.NotAfter
-	websiteSSL.StartDate = cert.NotBefore
-	websiteSSL.Type = cert.Issuer.CommonName
-	websiteSSL.Organization = cert.Issuer.Organization[0]
-
-	if err := websiteSSLRepo.Save(websiteSSL); err != nil {
-		return err
-	}
-
-	websites, _ := websiteRepo.GetBy(websiteRepo.WithWebsiteSSLID(sslId))
-	for _, website := range websites {
-		if err := createPemFile(website, websiteSSL); err != nil {
-			global.LOG.Errorf("create website [%s] ssl file failed! err:%s", website.PrimaryDomain, err.Error())
-		}
-	}
-	if len(websites) > 0 {
-		nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-		if err != nil {
-			return err
-		}
-		if err := opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
-			return buserr.New(constant.ErrSSLApply)
-		}
-	}
-	return nil
 }
 
 func (w WebsiteSSLService) GetDNSResolve(req request.WebsiteDNSReq) ([]response.WebsiteDNSRes, error) {
@@ -378,7 +302,7 @@ func (w WebsiteSSLService) GetWebsiteSSL(websiteId uint) (response.WebsiteSSLDTO
 	if err != nil {
 		return res, err
 	}
-	res.WebsiteSSL = websiteSSL
+	res.WebsiteSSL = *websiteSSL
 	return res, nil
 }
 
@@ -391,9 +315,19 @@ func (w WebsiteSSLService) Delete(ids []uint) error {
 				names = append(names, oldSSL.PrimaryDomain)
 			}
 			continue
-		} else {
-			_ = websiteSSLRepo.DeleteBy(commonRepo.WithByID(id))
 		}
+		sslSetting, _ := settingRepo.Get(settingRepo.WithByKey("SSL"))
+		if sslSetting.Value == "enable" {
+			sslID, _ := settingRepo.Get(settingRepo.WithByKey("SSLID"))
+			idValue, _ := strconv.Atoi(sslID.Value)
+			if idValue > 0 {
+				oldSSL, _ := websiteSSLRepo.GetFirst(commonRepo.WithByID(uint(idValue)))
+				if oldSSL.ID > 0 {
+					return buserr.New("ErrDeleteWithPanelSSL")
+				}
+			}
+		}
+		_ = websiteSSLRepo.DeleteBy(commonRepo.WithByID(id))
 	}
 	if len(names) > 0 {
 		return buserr.WithName("ErrSSLCannotDelete", strings.Join(names, ","))
@@ -491,7 +425,7 @@ func (w WebsiteSSLService) SyncForRestart() error {
 		if ssl.Status == constant.SSLApply {
 			ssl.Status = constant.SystemRestart
 			ssl.Message = "System restart causing interrupt"
-			_ = websiteSSLRepo.Save(ssl)
+			_ = websiteSSLRepo.Save(&ssl)
 		}
 	}
 	return nil

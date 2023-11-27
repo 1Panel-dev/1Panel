@@ -149,48 +149,78 @@ func (w WebsiteCAService) GetCA(id uint) (response.WebsiteCADTO, error) {
 }
 
 func (w WebsiteCAService) Delete(id uint) error {
-
+	ssls, _ := websiteSSLRepo.List(websiteSSLRepo.WithByCAID(id))
+	if len(ssls) > 0 {
+		return buserr.New("ErrDeleteCAWithSSL")
+	}
 	return websiteCARepo.DeleteBy(commonRepo.WithByID(id))
 }
 
 func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) error {
-	ca, err := websiteCARepo.GetFirst(commonRepo.WithByID(req.ID))
-	if err != nil {
-		return err
-	}
-	newSSL := &model.WebsiteSSL{
-		Provider: constant.SelfSigned,
-		KeyType:  req.KeyType,
-		PushDir:  req.PushDir,
-	}
-	if req.PushDir {
-		if !files.NewFileOp().Stat(req.Dir) {
-			return buserr.New(constant.ErrLinkPathNotFound)
-		}
-		newSSL.Dir = req.Dir
-	}
 
 	var (
-		domains []string
-		ips     []net.IP
+		domains    []string
+		ips        []net.IP
+		websiteSSL = &model.WebsiteSSL{}
+		err        error
+		ca         model.WebsiteCA
 	)
-	if req.Domains != "" {
-		domainArray := strings.Split(req.Domains, "\n")
-		for _, domain := range domainArray {
-			if !common.IsValidDomain(domain) {
-				err = buserr.WithName("ErrDomainFormat", domain)
-				return err
+	if req.Renew {
+		websiteSSL, err = websiteSSLRepo.GetFirst(commonRepo.WithByID(req.SSLID))
+		if err != nil {
+			return err
+		}
+		ca, err = websiteCARepo.GetFirst(commonRepo.WithByID(websiteSSL.CaID))
+		if err != nil {
+			return err
+		}
+		existDomains := []string{websiteSSL.PrimaryDomain}
+		if websiteSSL.Domains != "" {
+			existDomains = append(existDomains, strings.Split(websiteSSL.Domains, ",")...)
+		}
+		for _, domain := range existDomains {
+			if ipAddress := net.ParseIP(domain); ipAddress == nil {
+				domains = append(domains, domain)
 			} else {
-				if ipAddress := net.ParseIP(domain); ipAddress == nil {
-					domains = append(domains, domain)
-				} else {
-					ips = append(ips, ipAddress)
-				}
+				ips = append(ips, ipAddress)
 			}
 		}
-		if len(domains) > 0 {
-			newSSL.PrimaryDomain = domains[0]
-			newSSL.Domains = strings.Join(domains[1:], ",")
+	} else {
+		ca, err = websiteCARepo.GetFirst(commonRepo.WithByID(req.ID))
+		if err != nil {
+			return err
+		}
+		websiteSSL = &model.WebsiteSSL{
+			Provider:  constant.SelfSigned,
+			KeyType:   req.KeyType,
+			PushDir:   req.PushDir,
+			CaID:      ca.ID,
+			AutoRenew: req.AutoRenew,
+		}
+		if req.PushDir {
+			if !files.NewFileOp().Stat(req.Dir) {
+				return buserr.New(constant.ErrLinkPathNotFound)
+			}
+			websiteSSL.Dir = req.Dir
+		}
+		if req.Domains != "" {
+			domainArray := strings.Split(req.Domains, "\n")
+			for _, domain := range domainArray {
+				if !common.IsValidDomain(domain) {
+					err = buserr.WithName("ErrDomainFormat", domain)
+					return err
+				} else {
+					if ipAddress := net.ParseIP(domain); ipAddress == nil {
+						domains = append(domains, domain)
+					} else {
+						ips = append(ips, ipAddress)
+					}
+				}
+			}
+			if len(domains) > 0 {
+				websiteSSL.PrimaryDomain = domains[0]
+				websiteSSL.Domains = strings.Join(domains[1:], ",")
+			}
 		}
 	}
 
@@ -208,7 +238,7 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) error {
 	}
 
 	var rootPrivateKey any
-	if ssl.KeyType(ca.KeyType) == certcrypto.EC256 || ssl.KeyType(ca.KeyType) == certcrypto.EC384 {
+	if ssl.KeyType(websiteSSL.KeyType) == certcrypto.EC256 || ssl.KeyType(websiteSSL.KeyType) == certcrypto.EC384 {
 		rootPrivateKey, err = x509.ParseECPrivateKey(rootPrivateKeyBlock.Bytes)
 		if err != nil {
 			return err
@@ -219,7 +249,7 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) error {
 			return err
 		}
 	}
-	interPrivateKey, interPublicKey, _, err := createPrivateKey(req.KeyType)
+	interPrivateKey, interPublicKey, _, err := createPrivateKey(websiteSSL.KeyType)
 	if err != nil {
 		return err
 	}
@@ -249,7 +279,7 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) error {
 		return err
 	}
 
-	_, publicKey, privateKeyBytes, err := createPrivateKey(req.KeyType)
+	_, publicKey, privateKeyBytes, err := createPrivateKey(websiteSSL.KeyType)
 	if err != nil {
 		return err
 	}
@@ -281,21 +311,28 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) error {
 		Bytes: cert.Raw,
 	}
 	pemData := pem.EncodeToMemory(certBlock)
-	newSSL.Pem = string(pemData)
-	newSSL.PrivateKey = string(privateKeyBytes)
-	newSSL.ExpireDate = cert.NotAfter
-	newSSL.StartDate = cert.NotBefore
-	newSSL.Type = cert.Issuer.CommonName
-	newSSL.Organization = rootCsr.Subject.Organization[0]
+	websiteSSL.Pem = string(pemData)
+	websiteSSL.PrivateKey = string(privateKeyBytes)
+	websiteSSL.ExpireDate = cert.NotAfter
+	websiteSSL.StartDate = cert.NotBefore
+	websiteSSL.Type = cert.Issuer.CommonName
+	websiteSSL.Organization = rootCsr.Subject.Organization[0]
 
-	if err := websiteSSLRepo.Create(context.Background(), newSSL); err != nil {
-		return err
+	if req.Renew {
+		if err := websiteSSLRepo.Save(websiteSSL); err != nil {
+			return err
+		}
+	} else {
+		if err := websiteSSLRepo.Create(context.Background(), websiteSSL); err != nil {
+			return err
+		}
 	}
-	logFile, _ := os.OpenFile(path.Join(constant.SSLLogDir, fmt.Sprintf("%s-ssl-%d.log", newSSL.PrimaryDomain, newSSL.ID)), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
+
+	logFile, _ := os.OpenFile(path.Join(constant.SSLLogDir, fmt.Sprintf("%s-ssl-%d.log", websiteSSL.PrimaryDomain, websiteSSL.ID)), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
 	defer logFile.Close()
 	logger := log.New(logFile, "", log.LstdFlags)
 	logger.Println(i18n.GetMsgWithMap("ApplySSLSuccess", map[string]interface{}{"domain": strings.Join(domains, ",")}))
-	saveCertificateFile(*newSSL, logger)
+	saveCertificateFile(websiteSSL, logger)
 	return nil
 }
 
