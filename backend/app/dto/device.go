@@ -22,10 +22,11 @@ type HostHelper struct {
 }
 
 type SwapHelper struct {
-	Operate string `json:"operate" validate:"required,oneof=create delete update"`
-	Path    string `json:"path" validate:"required"`
-	Size    uint64 `json:"size"`
-	Used    string `json:"used"`
+	Path string `json:"path" validate:"required"`
+	Size uint64 `json:"size"`
+	Used string `json:"used"`
+
+	IsNew bool `json:"isNew"`
 }
 
 type TimeZoneOptions struct {

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"path"
 	"strconv"
 	"strings"
 	"time"
@@ -116,11 +117,20 @@ func (u *DeviceService) Update(key, value string) error {
 		if err != nil {
 			return errors.New(std)
 		}
-	case "LocalTime":
-		if err := settingRepo.Update("NtpSite", value); err != nil {
-			return err
+	case "Ntp", "LocalTime":
+		ntpValue := value
+		if key == "LocalTime" {
+			ntpItem, err := settingRepo.Get(settingRepo.WithByKey("NtpSite"))
+			if err != nil {
+				return err
+			}
+			ntpValue = ntpItem.Value
+		} else {
+			if err := settingRepo.Update("NtpSite", ntpValue); err != nil {
+				return err
+			}
 		}
-		ntime, err := ntp.GetRemoteTime(value)
+		ntime, err := ntp.GetRemoteTime(ntpValue)
 		if err != nil {
 			return err
 		}
@@ -181,14 +191,17 @@ func (u *DeviceService) UpdatePasswd(req dto.ChangePasswd) error {
 }
 
 func (u *DeviceService) UpdateSwap(req dto.SwapHelper) error {
-	if req.Operate != "create" {
+	if !req.IsNew {
 		std, err := cmd.Execf("%s swapoff %s", cmd.SudoHandleCmd(), req.Path)
 		if err != nil {
 			return fmt.Errorf("handle swapoff %s failed, err: %s", req.Path, std)
 		}
-		if req.Operate == "delete" {
-			return operateSwapWithFile(req)
+	}
+	if req.Size == 0 {
+		if req.Path == path.Join(global.CONF.System.BaseDir, ".1panel_swap") {
+			_ = os.Remove(path.Join(global.CONF.System.BaseDir, ".1panel_swap"))
 		}
+		return operateSwapWithFile(true, req)
 	}
 	std1, err := cmd.Execf("%s dd if=/dev/zero of=%s bs=1024 count=%d", cmd.SudoHandleCmd(), req.Path, req.Size)
 	if err != nil {
@@ -203,7 +216,7 @@ func (u *DeviceService) UpdateSwap(req dto.SwapHelper) error {
 		_, _ = cmd.Execf("%s swapoff %s", cmd.SudoHandleCmd(), req.Path)
 		return fmt.Errorf("handle dd path %s failed, err: %s", req.Path, std3)
 	}
-	return operateSwapWithFile(req)
+	return operateSwapWithFile(false, req)
 }
 
 func (u *DeviceService) LoadConf(name string) (string, error) {
@@ -351,7 +364,7 @@ func loadSwap() []dto.SwapHelper {
 	return data
 }
 
-func operateSwapWithFile(req dto.SwapHelper) error {
+func operateSwapWithFile(delete bool, req dto.SwapHelper) error {
 	conf, err := os.ReadFile(defaultFstab)
 	if err != nil {
 		return fmt.Errorf("read file %s failed, err: %v", defaultFstab, err)
@@ -368,7 +381,7 @@ func operateSwapWithFile(req dto.SwapHelper) error {
 		}
 		newFile += line + "\n"
 	}
-	if req.Operate == "create" {
+	if !delete {
 		newFile += fmt.Sprintf("%s    swap    swap    defaults    0    0\n", req.Path)
 	}
 	file, err := os.OpenFile(defaultFstab, os.O_WRONLY|os.O_TRUNC, 0640)
