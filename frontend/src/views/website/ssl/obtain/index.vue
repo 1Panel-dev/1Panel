@@ -1,26 +1,26 @@
 <template>
     <el-dialog
         v-model="open"
-        :title="$t('website.renewSSL')"
+        :title="$t('ssl.apply')"
         :destroy-on-close="true"
         :close-on-click-modal="false"
         width="30%"
         :before-close="handleClose"
     >
-        <div style="text-align: center" v-loading="loading">
-            <div v-if="websites.length > 0">
+        <div class="text-center" v-loading="loading">
+            <div v-if="ssl.websites && ssl.websites.length > 0">
                 <span>{{ $t('ssl.renewWebsite') }}</span>
                 <div>
                     <br />
                     <span>
-                        <span v-for="(website, index) in websites" :key="index">
+                        <span v-for="(website, index) in ssl.websites" :key="index">
                             <el-tag>{{ website.primaryDomain }}</el-tag>
                         </span>
                     </span>
                 </div>
                 <br />
             </div>
-            <span>{{ $t('ssl.renewConfirm') }}</span>
+            <span>{{ $t('ssl.renewConfirm', [ssl.primaryDomain]) }}</span>
         </div>
         <template #footer>
             <span class="dialog-footer">
@@ -35,44 +35,42 @@
 
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
-import { RenewSSL } from '@/api/modules/website';
+import { ObtainSSL, RenewSSLByCA } from '@/api/modules/website';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { reactive, ref } from 'vue';
+import { ref } from 'vue';
 
 interface RenewProps {
-    id: number;
-    websites: Website.Website[];
+    ssl: Website.SSL;
 }
 
-let open = ref(false);
-let loading = ref(false);
-let renewReq = reactive({
-    SSLId: 0,
-});
-const em = defineEmits(['close']);
+const open = ref(false);
+const loading = ref(false);
+const em = defineEmits(['close', 'submit']);
 const handleClose = () => {
     open.value = false;
     em('close', false);
 };
-const websites = ref([]);
+const ssl = ref();
 
 const acceptParams = async (props: RenewProps) => {
-    renewReq.SSLId = Number(props.id);
-    websites.value = props.websites;
+    ssl.value = props.ssl;
     open.value = true;
 };
 
-const submit = () => {
+const submit = async () => {
     loading.value = true;
-    RenewSSL(renewReq)
-        .then(() => {
-            handleClose();
-            MsgSuccess(i18n.global.t('ssl.renewSuccess'));
-        })
-        .finally(() => {
-            loading.value = false;
-        });
+    try {
+        if (ssl.value.provider == 'selfSigned') {
+            await RenewSSLByCA({ SSLID: ssl.value.id });
+        } else {
+            await ObtainSSL({ ID: ssl.value.id });
+        }
+        handleClose();
+        MsgSuccess(i18n.global.t('ssl.applyStart'));
+        loading.value = false;
+        em('submit', ssl.value.id);
+    } catch (error) {}
 };
 
 defineExpose({

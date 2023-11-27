@@ -96,7 +96,9 @@
                     </el-table-column>
                     <el-table-column :label="$t('website.log')" width="100px">
                         <template #default="{ row }">
-                            <el-button @click="openLog(row)" link type="primary">{{ $t('website.check') }}</el-button>
+                            <el-button @click="openLog(row.id)" link type="primary">
+                                {{ $t('website.check') }}
+                            </el-button>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -108,11 +110,7 @@
                     <el-table-column :label="$t('ssl.autoRenew')" fix width="100px">
                         <template #default="{ row }">
                             <el-switch
-                                :disabled="
-                                    row.provider === 'dnsManual' ||
-                                    row.provider === 'manual' ||
-                                    row.provider === 'selfSigned'
-                                "
+                                :disabled="row.provider === 'dnsManual' || row.provider === 'manual'"
                                 v-model="row.autoRenew"
                                 @change="updateConfig(row)"
                             />
@@ -138,10 +136,11 @@
             <Create ref="sslCreateRef" @close="search()"></Create>
             <Detail ref="detailRef"></Detail>
             <SSLUpload ref="sslUploadRef" @close="search()"></SSLUpload>
-            <Apply ref="applyRef" @search="search" />
+            <Apply ref="applyRef" @search="search" @submit="openLog" />
             <OpDialog ref="opRef" @search="search" @cancel="search" />
             <Log ref="logRef" @close="search()" />
             <CA ref="caRef" @close="search()" />
+            <Obtain ref="obtainRef" @close="search()" @submit="openLog" />
         </LayoutContent>
     </div>
 </template>
@@ -149,7 +148,7 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref, computed } from 'vue';
 import OpDialog from '@/components/del-dialog/index.vue';
-import { DeleteSSL, ObtainSSL, SearchSSL, UpdateSSL } from '@/api/modules/website';
+import { DeleteSSL, SearchSSL, UpdateSSL } from '@/api/modules/website';
 import DnsAccount from './dns-account/index.vue';
 import AcmeAccount from './acme-account/index.vue';
 import CA from './ca/index.vue';
@@ -163,6 +162,7 @@ import { GlobalStore } from '@/store';
 import SSLUpload from './upload/index.vue';
 import Apply from './apply/index.vue';
 import Log from '@/components/log-dialog/index.vue';
+import Obtain from './obtain/index.vue';
 
 const globalStore = GlobalStore();
 const paginationConfig = reactive({
@@ -183,6 +183,7 @@ const applyRef = ref();
 const logRef = ref();
 const caRef = ref();
 let selects = ref<any>([]);
+const obtainRef = ref();
 
 const routerButton = [
     {
@@ -204,7 +205,7 @@ const buttons = [
     {
         label: i18n.global.t('ssl.apply'),
         disabled: function (row: Website.SSLDTO) {
-            return row.status === 'applying' || row.provider === 'manual' || row.provider === 'selfSigned';
+            return row.status === 'applying' || row.provider === 'manual';
         },
         click: function (row: Website.SSLDTO) {
             if (row.provider === 'dnsManual') {
@@ -268,23 +269,16 @@ const openUpload = () => {
 const openDetail = (id: number) => {
     detailRef.value.acceptParams(id);
 };
-const openLog = (row: Website.SSLDTO) => {
-    logRef.value.acceptParams({ id: row.id, type: 'ssl' });
+const openLog = (id: number) => {
+    logRef.value.acceptParams({ id: id, type: 'ssl', tail: true });
 };
+
 const openCA = () => {
     caRef.value.acceptParams();
 };
 
 const applySSL = (row: Website.SSLDTO) => {
-    loading.value = true;
-    ObtainSSL({ ID: row.id })
-        .then(() => {
-            MsgSuccess(i18n.global.t('ssl.applyStart'));
-            search();
-        })
-        .finally(() => {
-            loading.value = false;
-        });
+    obtainRef.value.acceptParams({ ssl: row });
 };
 
 const deleteSSL = async (row: any) => {

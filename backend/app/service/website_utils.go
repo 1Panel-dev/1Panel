@@ -750,7 +750,7 @@ func getWebsiteDomains(domains string, defaultPort int, websiteID uint) (domainM
 	return
 }
 
-func saveCertificateFile(websiteSSL model.WebsiteSSL, logger *log.Logger) {
+func saveCertificateFile(websiteSSL *model.WebsiteSSL, logger *log.Logger) {
 	if websiteSSL.PushDir {
 		fileOp := files.NewFileOp()
 		var (

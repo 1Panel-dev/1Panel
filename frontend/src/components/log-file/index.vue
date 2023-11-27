@@ -46,6 +46,7 @@ interface LogProps {
     id?: number;
     type: string;
     name?: string;
+    tail?: boolean;
 }
 
 const props = defineProps({
@@ -55,6 +56,7 @@ const props = defineProps({
             id: 0,
             type: '',
             name: '',
+            tail: false,
         }),
     },
     style: {
@@ -224,9 +226,16 @@ function isScrolledToBottom(element: HTMLElement): boolean {
 }
 
 const init = () => {
-    tailLog.value = false;
-
+    if (props.config.tail) {
+        tailLog.value = props.config.tail;
+    } else {
+        tailLog.value = false;
+    }
+    if (tailLog.value) {
+        changeTail(false);
+    }
     getContent();
+
     nextTick(() => {
         if (scrollerElement.value) {
             scrollerElement.value.addEventListener('scroll', function () {

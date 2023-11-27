@@ -2792,6 +2792,8 @@ definitions:
         type: integer
       autoRenew:
         type: boolean
+      caId:
+        type: integer
       certURL:
         type: string
       createdAt:
@@ -3770,6 +3772,8 @@ definitions:
     type: object
   request.WebsiteCAObtain:
     properties:
+      autoRenew:
+        type: boolean
       dir:
         type: string
       domains:
@@ -3787,6 +3791,10 @@ definitions:
         type: string
       pushDir:
         type: boolean
+      renew:
+        type: boolean
+      sslID:
+        type: integer
       time:
         type: integer
       unit:
@@ -4151,13 +4159,6 @@ definitions:
     - acmeAccountId
     - primaryDomain
     - provider
-    type: object
-  request.WebsiteSSLRenew:
-    properties:
-      SSLId:
-        type: integer
-    required:
-    - SSLId
     type: object
   request.WebsiteSSLSearch:
     properties:
@@ -11773,7 +11774,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: 自签 SSL 证书
+      description: 续签 SSL 证书
       parameters:
       - description: request
         in: body
@@ -12903,39 +12904,6 @@ paths:
         - ID
         formatEN: apply ssl [domain]
         formatZH: 申请证书  [domain]
-        paramKeys: []
-  /websites/ssl/renew:
-    post:
-      consumes:
-      - application/json
-      description: 重置网站 ssl
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/request.WebsiteSSLRenew'
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      summary: Reset website ssl
-      tags:
-      - Website SSL
-      x-panel-log:
-        BeforeFunctions:
-        - db: website_ssls
-          input_column: id
-          input_value: SSLId
-          isList: false
-          output_column: primary_domain
-          output_value: domain
-        bodyKeys:
-        - SSLId
-        formatEN: Renew ssl [domain]
-        formatZH: 重置 ssl [domain]
         paramKeys: []
   /websites/ssl/resolve:
     post:

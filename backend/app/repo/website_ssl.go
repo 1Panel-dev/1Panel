@@ -14,11 +14,12 @@ type ISSLRepo interface {
 	WithByAlias(alias string) DBOption
 	WithByAcmeAccountId(acmeAccountId uint) DBOption
 	WithByDnsAccountId(dnsAccountId uint) DBOption
+	WithByCAID(caID uint) DBOption
 	Page(page, size int, opts ...DBOption) (int64, []model.WebsiteSSL, error)
-	GetFirst(opts ...DBOption) (model.WebsiteSSL, error)
+	GetFirst(opts ...DBOption) (*model.WebsiteSSL, error)
 	List(opts ...DBOption) ([]model.WebsiteSSL, error)
 	Create(ctx context.Context, ssl *model.WebsiteSSL) error
-	Save(ssl model.WebsiteSSL) error
+	Save(ssl *model.WebsiteSSL) error
 	DeleteBy(opts ...DBOption) error
 }
 
@@ -43,6 +44,12 @@ func (w WebsiteSSLRepo) WithByDnsAccountId(dnsAccountId uint) DBOption {
 	}
 }
 
+func (w WebsiteSSLRepo) WithByCAID(caID uint) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("ca_id = ?", caID)
+	}
+}
+
 func (w WebsiteSSLRepo) Page(page, size int, opts ...DBOption) (int64, []model.WebsiteSSL, error) {
 	var sslList []model.WebsiteSSL
 	db := getDb(opts...).Model(&model.WebsiteSSL{})
@@ -52,8 +59,8 @@ func (w WebsiteSSLRepo) Page(page, size int, opts ...DBOption) (int64, []model.W
 	return count, sslList, err
 }
 
-func (w WebsiteSSLRepo) GetFirst(opts ...DBOption) (model.WebsiteSSL, error) {
-	var website model.WebsiteSSL
+func (w WebsiteSSLRepo) GetFirst(opts ...DBOption) (*model.WebsiteSSL, error) {
+	var website *model.WebsiteSSL
 	db := getDb(opts...).Model(&model.WebsiteSSL{})
 	if err := db.Preload("AcmeAccount").Preload("DnsAccount").First(&website).Error; err != nil {
 		return website, err
@@ -74,7 +81,7 @@ func (w WebsiteSSLRepo) Create(ctx context.Context, ssl *model.WebsiteSSL) error
 	return getTx(ctx).Create(ssl).Error
 }
 
-func (w WebsiteSSLRepo) Save(ssl model.WebsiteSSL) error {
+func (w WebsiteSSLRepo) Save(ssl *model.WebsiteSSL) error {
 	return getDb().Save(&ssl).Error
 }
 

@@ -37,6 +37,9 @@
                             </template>
                         </el-input>
                     </el-form-item>
+                    <el-form-item :label="''" prop="autoRenew">
+                        <el-checkbox v-model="obtain.autoRenew" :label="$t('ssl.autoRenew')" />
+                    </el-form-item>
                     <el-form-item :label="''" prop="pushDir">
                         <el-checkbox v-model="obtain.pushDir" :label="$t('ssl.pushDir')" />
                     </el-form-item>
@@ -93,6 +96,7 @@ const initData = () => ({
     unit: 'day',
     pushDir: false,
     dir: '',
+    autoRenew: true,
 });
 const obtain = ref(initData());
 
