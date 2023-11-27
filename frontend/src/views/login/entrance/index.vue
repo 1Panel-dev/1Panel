@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="login-backgroud" v-if="isSafety && !isErr && !isNotFound">
+        <div class="login-background" v-if="isSafety && !isErr && !isNotFound">
             <div class="login-wrapper">
                 <div :class="screenWidth > 1110 ? 'left inline-block' : ''">
                     <div class="login-title">
@@ -100,7 +100,7 @@ onMounted(() => {
     align-items: center;
 }
 
-.login-backgroud {
+.login-background {
     height: 100vh;
     background: url(@/assets/images/1panel-login-bg.png) no-repeat,
         radial-gradient(153.25% 257.2% at 118.99% 181.67%, rgba(50, 132, 255, 0.2) 0%, rgba(82, 120, 255, 0) 100%)
