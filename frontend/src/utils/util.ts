@@ -1,3 +1,4 @@
+import { AcmeAccountTypes, DNSTypes, KeyTypes } from '@/global/mimetype';
 import i18n from '@/lang';
 
 export function deepCopy<T>(obj: any): T {
@@ -322,6 +323,8 @@ export function getProvider(provider: string): string {
             return i18n.global.t('website.dnsManual');
         case 'http':
             return 'HTTP';
+        case 'selfSigned':
+            return i18n.global.t('ssl.selfSigned');
         default:
             return i18n.global.t('ssl.manualCreate');
     }
@@ -436,4 +439,31 @@ export function getDateStr() {
     }-${minutes < 10 ? '0' + minutes : minutes}-${seconds < 10 ? '0' + seconds : seconds}`;
 
     return timestamp;
+}
+
+export function getAccountName(type: string) {
+    for (const i of AcmeAccountTypes) {
+        if (i.value === type) {
+            return i.label;
+        }
+    }
+    return '';
+}
+
+export function getKeyName(type: string) {
+    for (const i of KeyTypes) {
+        if (i.value === type) {
+            return i.label;
+        }
+    }
+    return '';
+}
+
+export function getDNSName(type: string) {
+    for (const i of DNSTypes) {
+        if (i.value === type) {
+            return i.label;
+        }
+    }
+    return '';
 }

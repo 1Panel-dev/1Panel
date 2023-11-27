@@ -55,6 +55,7 @@ func Init() {
 
 		migrations.UpdateAcmeAccount,
 		migrations.UpdateWebsiteSSL,
+		migrations.AddWebsiteCA,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

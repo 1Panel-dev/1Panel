@@ -12,8 +12,7 @@
             <el-table-column :label="$t('commons.table.name')" fix show-overflow-tooltip prop="name"></el-table-column>
             <el-table-column :label="$t('commons.table.type')" prop="type">
                 <template #default="{ row }">
-                    <span v-if="row.type == 'AliYun'">{{ $t('website.aliyun') }}</span>
-                    <span v-else>{{ row.type }}</span>
+                    <span>{{ getDNSName(row.type) }}</span>
                 </template>
             </el-table-column>
             <fu-table-operations
@@ -37,6 +36,7 @@ import { Website } from '@/api/interface/website';
 import { DeleteDnsAccount, SearchDnsAccount } from '@/api/modules/website';
 import { onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
+import { getDNSName } from '@/utils/util';
 
 const paginationConfig = reactive({
     cacheSizeKey: 'dns-account-page-size',

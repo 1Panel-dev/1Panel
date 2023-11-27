@@ -52,9 +52,20 @@
                             <el-option
                                 v-for="(dns, index) in dnsAccounts"
                                 :key="index"
-                                :label="dns.name + ' ( ' + dns.type + ' )'"
+                                :label="dns.name"
                                 :value="dns.id"
-                            ></el-option>
+                            >
+                                <el-row>
+                                    <el-col :span="6">
+                                        <span>{{ dns.name }}</span>
+                                    </el-col>
+                                    <el-col :span="11">
+                                        <span>
+                                            <el-tag type="success">{{ dns.type }}</el-tag>
+                                        </span>
+                                    </el-col>
+                                </el-row>
+                            </el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item :label="''" prop="autoRenew" v-if="ssl.provider !== 'dnsManual'">

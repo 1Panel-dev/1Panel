@@ -456,4 +456,31 @@ export namespace Website {
     export interface SSLObtain {
         ID: number;
     }
+
+    export interface CA extends CommonModel {
+        name: string;
+        csr: string;
+        privateKey: string;
+        keyType: string;
+    }
+
+    export interface CACreate {
+        name: string;
+        commonName: string;
+        country: string;
+        email: string;
+        organization: string;
+        organizationUint: string;
+        keyType: string;
+        province: string;
+        city: string;
+    }
+
+    export interface SSLObtainByCA {
+        id: number;
+        domains: string;
+        keyType: string;
+        time: number;
+        unit: string;
+    }
 }

@@ -28,7 +28,7 @@
                     >
                         {{ ssl.acmeAccount.email }}
                     </el-descriptions-item>
-                    <el-descriptions-item :label="$t('commons.table.type')">
+                    <el-descriptions-item :label="$t('ssl.commonName')">
                         {{ ssl.type }}
                     </el-descriptions-item>
                     <el-descriptions-item :label="$t('website.brand')">

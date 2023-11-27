@@ -16,7 +16,7 @@
                     <el-form-item :label="$t('commons.table.type')" prop="type">
                         <el-select v-model="account.type" :disabled="accountData.mode === 'edit'">
                             <el-option
-                                v-for="(type, index) in types"
+                                v-for="(type, index) in DNSTypes"
                                 :key="index"
                                 :label="type.label"
                                 :value="type.value"
@@ -92,6 +92,7 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
+import { DNSTypes } from '@/global/mimetype';
 
 interface AccountProps {
     mode: string;
@@ -101,37 +102,6 @@ const accountData = ref<AccountProps>({
     mode: 'add',
     form: {},
 });
-
-const types = [
-    {
-        label: i18n.global.t('website.aliyun'),
-        value: 'AliYun',
-    },
-    {
-        label: 'DNSPod',
-        value: 'DnsPod',
-    },
-    {
-        label: 'CloudFlare',
-        value: 'CloudFlare',
-    },
-    {
-        label: 'NameSilo',
-        value: 'NameSilo',
-    },
-    {
-        label: 'NameCheap',
-        value: 'NameCheap',
-    },
-    {
-        label: 'Name.com',
-        value: 'NameCom',
-    },
-    {
-        label: 'Godaddy',
-        value: 'Godaddy',
-    },
-];
 
 const open = ref();
 const loading = ref(false);

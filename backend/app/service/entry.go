@@ -32,6 +32,7 @@ var (
 	websiteDnsRepo    = repo.NewIWebsiteDnsAccountRepo()
 	websiteSSLRepo    = repo.NewISSLRepo()
 	websiteAcmeRepo   = repo.NewIAcmeAccountRepo()
+	websiteCARepo     = repo.NewIWebsiteCARepo()
 
 	logRepo      = repo.NewILogRepo()
 	snapshotRepo = repo.NewISnapshotRepo()

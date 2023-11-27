@@ -59,4 +59,6 @@ var (
 
 	recycleBinService = service.NewIRecycleBinService()
 	favoriteService   = service.NewIFavoriteService()
+
+	websiteCAService = service.NewIWebsiteCAService()
 )
