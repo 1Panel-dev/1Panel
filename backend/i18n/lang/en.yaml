@@ -20,6 +20,8 @@ TYPE_RUNTIME: "Runtime environment"
 TYPE_DOMAIN: "Domain name"
 ErrTypePort: 'Port {{ .name }} format error'
 ErrTypePortRange: 'Port range needs to be between 1-65535'
+Success: "Success"
+Failed: "Failed"
 
 #app
 ErrPortInUsed: "{{ .detail }} port already in use"
@@ -100,7 +102,7 @@ http: "HTTP"
 ApplySSLFailed: 'Application for [{{ .domain }}] certificate failed, {{.detail}} '
 ApplySSLSuccess: 'Application for [{{ .domain }}] certificate successful! ! '
 DNSAccountName: 'DNS account [{{ .name }}] manufacturer [{{.type}}]'
-
+PushDirLog: 'Certificate pushed to directory [{{ .path }}] {{ .status }}'
 
 #mysql
 ErrUserIsExist: "The current user already exists. Please enter a new user"

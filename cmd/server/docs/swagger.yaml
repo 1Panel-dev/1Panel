@@ -2409,12 +2409,8 @@ definitions:
     type: object
   dto.SwapHelper:
     properties:
-      operate:
-        enum:
-        - create
-        - delete
-        - update
-        type: string
+      isNew:
+        type: boolean
       path:
         type: string
       size:
@@ -2422,7 +2418,6 @@ definitions:
       used:
         type: string
     required:
-    - operate
     - path
     type: object
   dto.TreeChild:
@@ -2761,6 +2756,19 @@ definitions:
       url:
         type: string
     type: object
+  model.WebsiteDnsAccount:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      type:
+        type: string
+      updatedAt:
+        type: string
+    type: object
   model.WebsiteDomain:
     properties:
       createdAt:
@@ -2788,6 +2796,10 @@ definitions:
         type: string
       createdAt:
         type: string
+      dir:
+        type: string
+      dnsAccount:
+        $ref: '#/definitions/model.WebsiteDnsAccount'
       dnsAccountId:
         type: integer
       domains:
@@ -2810,6 +2822,8 @@ definitions:
         type: string
       provider:
         type: string
+      pushDir:
+        type: boolean
       startDate:
         type: string
       status:
@@ -3747,6 +3761,8 @@ definitions:
     type: object
   request.WebsiteCAObtain:
     properties:
+      dir:
+        type: string
       domains:
         type: string
       id:
@@ -3760,6 +3776,8 @@ definitions:
         - "4096"
         - "8192"
         type: string
+      pushDir:
+        type: boolean
       time:
         type: integer
       unit:
@@ -4106,6 +4124,8 @@ definitions:
         type: boolean
       autoRenew:
         type: boolean
+      dir:
+        type: string
       dnsAccountId:
         type: integer
       keyType:
@@ -4116,6 +4136,8 @@ definitions:
         type: string
       provider:
         type: string
+      pushDir:
+        type: boolean
     required:
     - acmeAccountId
     - primaryDomain

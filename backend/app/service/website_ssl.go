@@ -114,6 +114,13 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 		PrimaryDomain: create.PrimaryDomain,
 		ExpireDate:    time.Now(),
 		KeyType:       create.KeyType,
+		PushDir:       create.PushDir,
+	}
+	if create.PushDir {
+		if !files.NewFileOp().Stat(create.Dir) {
+			return res, buserr.New(constant.ErrLinkPathNotFound)
+		}
+		websiteSSL.Dir = create.Dir
 	}
 
 	var domains []string
@@ -240,6 +247,7 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 		websiteSSL.Organization = cert.Issuer.Organization[0]
 		websiteSSL.Status = constant.SSLReady
 		legoLogger.Logger.Println(i18n.GetMsgWithMap("ApplySSLSuccess", map[string]interface{}{"domain": strings.Join(domains, ",")}))
+		saveCertificateFile(websiteSSL, logger)
 		err = websiteSSLRepo.Save(websiteSSL)
 		if err != nil {
 			return

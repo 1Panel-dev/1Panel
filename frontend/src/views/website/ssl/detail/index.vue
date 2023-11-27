@@ -19,15 +19,6 @@
                     <el-descriptions-item :label="$t('website.otherDomains')">
                         {{ ssl.domains }}
                     </el-descriptions-item>
-                    <el-descriptions-item :label="$t('ssl.applyType')">
-                        {{ getProvider(ssl.provider) }}
-                    </el-descriptions-item>
-                    <el-descriptions-item
-                        :label="$t('ssl.acmeAccount')"
-                        v-if="ssl.acmeAccount && ssl.provider !== 'manual'"
-                    >
-                        {{ ssl.acmeAccount.email }}
-                    </el-descriptions-item>
                     <el-descriptions-item :label="$t('ssl.commonName')">
                         {{ ssl.type }}
                     </el-descriptions-item>
@@ -39,6 +30,25 @@
                     </el-descriptions-item>
                     <el-descriptions-item :label="$t('website.expireDate')">
                         {{ dateFormatSimple(ssl.expireDate) }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('ssl.applyType')">
+                        {{ getProvider(ssl.provider) }}
+                    </el-descriptions-item>
+                    <el-descriptions-item
+                        :label="$t('website.dnsAccount')"
+                        v-if="ssl.dnsAccount && ssl.dnsAccount.id > 0"
+                    >
+                        {{ ssl.dnsAccount.name }}
+                        <el-tag type="info">{{ ssl.dnsAccount.type }}</el-tag>
+                    </el-descriptions-item>
+                    <el-descriptions-item
+                        :label="$t('ssl.acmeAccount')"
+                        v-if="ssl.acmeAccount && ssl.acmeAccount.id > 0"
+                    >
+                        {{ ssl.acmeAccount.email }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('ssl.pushDir')" v-if="ssl.pushDir">
+                        {{ ssl.dir }}
                     </el-descriptions-item>
                 </el-descriptions>
             </div>

@@ -37,6 +37,19 @@
                             </template>
                         </el-input>
                     </el-form-item>
+                    <el-form-item :label="''" prop="pushDir">
+                        <el-checkbox v-model="obtain.pushDir" :label="$t('ssl.pushDir')" />
+                    </el-form-item>
+                    <el-form-item :label="$t('ssl.dir')" prop="dir" v-if="obtain.pushDir">
+                        <el-input v-model.trim="obtain.dir">
+                            <template #prepend>
+                                <FileList :path="obtain.dir" @choose="getPath" :dir="true"></FileList>
+                            </template>
+                        </el-input>
+                        <span class="input-help">
+                            {{ $t('ssl.pushDirHelper') }}
+                        </span>
+                    </el-form-item>
                 </el-form>
             </el-col>
         </el-row>
@@ -69,6 +82,7 @@ const rules = ref({
     keyType: [Rules.requiredSelect],
     domains: [Rules.requiredInput],
     time: [Rules.requiredInput, checkNumberRange(1, 1000)],
+    dir: [Rules.requiredInput],
 });
 
 const initData = () => ({
@@ -77,6 +91,8 @@ const initData = () => ({
     id: 0,
     time: 0,
     unit: 'day',
+    pushDir: false,
+    dir: '',
 });
 const obtain = ref(initData());
 
@@ -94,6 +110,10 @@ const handleClose = () => {
 const resetForm = () => {
     obtainForm.value.resetFields();
     obtain.value = initData();
+};
+
+const getPath = (dir: string) => {
+    obtain.value.dir = dir;
 };
 
 const submit = async (formEl: FormInstance | undefined) => {

@@ -16927,17 +16927,11 @@
         "dto.SwapHelper": {
             "type": "object",
             "required": [
-                "operate",
                 "path"
             ],
             "properties": {
-                "operate": {
-                    "type": "string",
-                    "enum": [
-                        "create",
-                        "delete",
-                        "update"
-                    ]
+                "isNew": {
+                    "type": "boolean"
                 },
                 "path": {
                     "type": "string"
@@ -17461,6 +17455,26 @@
                 }
             }
         },
+        "model.WebsiteDnsAccount": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
         "model.WebsiteDomain": {
             "type": "object",
             "properties": {
@@ -17502,6 +17516,12 @@
                 "createdAt": {
                     "type": "string"
                 },
+                "dir": {
+                    "type": "string"
+                },
+                "dnsAccount": {
+                    "$ref": "#/definitions/model.WebsiteDnsAccount"
+                },
                 "dnsAccountId": {
                     "type": "integer"
                 },
@@ -17534,6 +17554,9 @@
                 },
                 "provider": {
                     "type": "string"
+                },
+                "pushDir": {
+                    "type": "boolean"
                 },
                 "startDate": {
                     "type": "string"
@@ -18935,6 +18958,9 @@
                 "unit"
             ],
             "properties": {
+                "dir": {
+                    "type": "string"
+                },
                 "domains": {
                     "type": "string"
                 },
@@ -18951,6 +18977,9 @@
                         "4096",
                         "8192"
                     ]
+                },
+                "pushDir": {
+                    "type": "boolean"
                 },
                 "time": {
                     "type": "integer"
@@ -19464,6 +19493,9 @@
                 "autoRenew": {
                     "type": "boolean"
                 },
+                "dir": {
+                    "type": "string"
+                },
                 "dnsAccountId": {
                     "type": "integer"
                 },
@@ -19478,6 +19510,9 @@
                 },
                 "provider": {
                     "type": "string"
+                },
+                "pushDir": {
+                    "type": "boolean"
                 }
             }
         },

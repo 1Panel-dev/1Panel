@@ -48,14 +48,14 @@ func (w WebsiteSSLRepo) Page(page, size int, opts ...DBOption) (int64, []model.W
 	db := getDb(opts...).Model(&model.WebsiteSSL{})
 	count := int64(0)
 	db = db.Count(&count)
-	err := db.Limit(size).Offset(size * (page - 1)).Preload("AcmeAccount").Preload("Websites").Find(&sslList).Error
+	err := db.Limit(size).Offset(size * (page - 1)).Preload("AcmeAccount").Preload("DnsAccount").Preload("Websites").Find(&sslList).Error
 	return count, sslList, err
 }
 
 func (w WebsiteSSLRepo) GetFirst(opts ...DBOption) (model.WebsiteSSL, error) {
 	var website model.WebsiteSSL
 	db := getDb(opts...).Model(&model.WebsiteSSL{})
-	if err := db.Preload("AcmeAccount").First(&website).Error; err != nil {
+	if err := db.Preload("AcmeAccount").Preload("DnsAccount").First(&website).Error; err != nil {
 		return website, err
 	}
 	return website, nil
@@ -64,7 +64,7 @@ func (w WebsiteSSLRepo) GetFirst(opts ...DBOption) (model.WebsiteSSL, error) {
 func (w WebsiteSSLRepo) List(opts ...DBOption) ([]model.WebsiteSSL, error) {
 	var websites []model.WebsiteSSL
 	db := getDb(opts...).Model(&model.WebsiteSSL{})
-	if err := db.Preload("AcmeAccount").Find(&websites).Error; err != nil {
+	if err := db.Preload("AcmeAccount").Preload("DnsAccount").Find(&websites).Error; err != nil {
 		return websites, err
 	}
 	return websites, nil

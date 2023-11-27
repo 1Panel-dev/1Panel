@@ -1724,6 +1724,9 @@ const message = {
         selfSign: '签发证书',
         days: '有效期',
         domainHelper: '一行一个域名,支持*和IP地址',
+        pushDir: '推送证书到本地目录',
+        dir: '目录',
+        pushDirHelper: '会在此目录下生成两个文件，证书文件：fullchain.pem 密钥文件：privkey.pem',
     },
     firewall: {
         create: '创建规则',

@@ -8,6 +8,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx/components"
 	"gopkg.in/yaml.v3"
+	"log"
 	"path"
 	"reflect"
 	"strconv"
@@ -747,4 +748,27 @@ func getWebsiteDomains(domains string, defaultPort int, websiteID uint) (domainM
 	}
 
 	return
+}
+
+func saveCertificateFile(websiteSSL model.WebsiteSSL, logger *log.Logger) {
+	if websiteSSL.PushDir {
+		fileOp := files.NewFileOp()
+		var (
+			pushErr error
+			MsgMap  = map[string]interface{}{"path": websiteSSL.Dir, "status": i18n.GetMsgByKey("Success")}
+		)
+		if pushErr = fileOp.SaveFile(path.Join(websiteSSL.Dir, "privkey.pem"), websiteSSL.PrivateKey, 0666); pushErr != nil {
+			MsgMap["status"] = i18n.GetMsgByKey("Failed")
+			logger.Println(i18n.GetMsgWithMap("PushDirLog", MsgMap))
+			logger.Println("Push dir failed:" + pushErr.Error())
+		}
+		if pushErr = fileOp.SaveFile(path.Join(websiteSSL.Dir, "fullchain.pem"), websiteSSL.Pem, 0666); pushErr != nil {
+			MsgMap["status"] = i18n.GetMsgByKey("Failed")
+			logger.Println(i18n.GetMsgWithMap("PushDirLog", MsgMap))
+			logger.Println("Push dir failed:" + pushErr.Error())
+		}
+		if pushErr == nil {
+			logger.Println(i18n.GetMsgWithMap("PushDirLog", MsgMap))
+		}
+	}
 }

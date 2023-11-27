@@ -25,8 +25,11 @@ type WebsiteSSL struct {
 	Status        string    `gorm:"not null;default:ready" json:"status"`
 	Message       string    `json:"message"`
 	KeyType       string    `gorm:"not null;default:2048" json:"keyType"`
+	PushDir       bool      `gorm:"not null;default:0" json:"pushDir"`
+	Dir           string    `json:"dir"`
 
 	AcmeAccount WebsiteAcmeAccount `json:"acmeAccount" gorm:"-:migration"`
+	DnsAccount  WebsiteDnsAccount  `json:"dnsAccount" gorm:"-:migration"`
 	Websites    []Website          `json:"websites" gorm:"-:migration"`
 }
 

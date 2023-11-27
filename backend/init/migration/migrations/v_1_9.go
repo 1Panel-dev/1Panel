@@ -16,20 +16,20 @@ var UpdateAcmeAccount = &gormigrate.Migration{
 	},
 }
 
-var UpdateWebsiteSSL = &gormigrate.Migration{
-	ID: "20231119-update-website-ssl",
+var AddWebsiteCA = &gormigrate.Migration{
+	ID: "20231125-add-website-ca",
 	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.WebsiteSSL{}); err != nil {
+		if err := tx.AutoMigrate(&model.WebsiteCA{}); err != nil {
 			return err
 		}
 		return nil
 	},
 }
 
-var AddWebsiteCA = &gormigrate.Migration{
-	ID: "20231125-add-website-ca",
+var UpdateWebsiteSSL = &gormigrate.Migration{
+	ID: "20231126-update-website-ssl",
 	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.WebsiteCA{}); err != nil {
+		if err := tx.AutoMigrate(&model.WebsiteSSL{}); err != nil {
 			return err
 		}
 		return nil

@@ -1836,6 +1836,10 @@ const message = {
         selfSign: 'Issue certificate',
         days: 'validity period',
         domainHelper: 'One domain name per line, supports * and IP address',
+        pushDir: 'Push the certificate to the local directory',
+        dir: 'directory',
+        pushDirHelper:
+            'Two files will be generated in this directory, the certificate file: fullchain.pem and the key file: privkey.pem',
     },
     firewall: {
         create: 'Create rule',
