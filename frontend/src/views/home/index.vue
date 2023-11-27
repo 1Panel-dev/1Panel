@@ -393,7 +393,7 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
             if (isActive.value && !globalStore.isOnRestart) {
                 await onLoadCurrentInfo();
             }
-        }, 300000);
+        }, 3000);
     }
 };
 
