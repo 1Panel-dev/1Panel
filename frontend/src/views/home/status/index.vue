@@ -71,7 +71,7 @@
                         {{ $t('home.free') }}: {{ formatNumber(currentInfo.swapMemoryAvailable / 1024 / 1024) }} MB
                     </el-tag>
                     <el-tag class="tagClass">
-                        {{ $t('home.percent') }}: {{ formatNumber(100 - currentInfo.swapMemoryUsedPercent * 100) }}%
+                        {{ $t('home.percent') }}: {{ formatNumber(currentInfo.swapMemoryUsedPercent * 100) }}%
                     </el-tag>
                 </div>
                 <template #reference>

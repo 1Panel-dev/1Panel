@@ -2,6 +2,7 @@ import http from '@/api';
 import { UpdateByFile } from '../interface';
 import { Toolbox } from '../interface/toolbox';
 import { Base64 } from 'js-base64';
+import { TimeoutEnum } from '@/enums/http-enum';
 
 // device
 export const getDeviceBase = () => {
@@ -18,6 +19,9 @@ export const updateDeviceHost = (param: Array<Toolbox.TimeZoneOptions>) => {
 };
 export const updateDevicePasswd = (user: string, passwd: string) => {
     return http.post(`/toolbox/device/update/passwd`, { user: user, passwd: Base64.encode(passwd) });
+};
+export const updateDeviceSwap = (params: Toolbox.SwapHelper) => {
+    return http.post(`/toolbox/device/update/swap`, params, TimeoutEnum.T_5M);
 };
 export const updateDeviceByConf = (name: string, file: string) => {
     return http.post(`/toolbox/device/update/byconf`, { name: name, file: file });

@@ -24,6 +24,15 @@
                                     </template>
                                 </el-input>
                             </el-form-item>
+                            <el-form-item label="Swap" prop="swap">
+                                <el-input disabled v-model="form.swapItem">
+                                    <template #append>
+                                        <el-button @click="onChangeSwap" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
                             <el-form-item :label="$t('toolbox.device.hostname')" prop="hostname">
                                 <el-input disabled v-model="form.hostname">
                                     <template #append>
@@ -34,9 +43,18 @@
                                 </el-input>
                             </el-form-item>
                             <el-form-item :label="$t('toolbox.device.passwd')" prop="passwd">
-                                <el-input disabled v-model="form.passwd">
+                                <el-input disabled v-model="form.passwd" type="password">
                                     <template #append>
                                         <el-button @click="onChangePasswd" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
+                            <el-form-item :label="$t('toolbox.device.syncSite')" prop="ntp">
+                                <el-input disabled v-model="form.ntp">
+                                    <template #append>
+                                        <el-button @click="onChangeNtp" icon="Setting">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
@@ -54,8 +72,8 @@
                             <el-form-item :label="$t('toolbox.device.localTime')" prop="localTime">
                                 <el-input disabled v-model="form.localTime">
                                     <template #append>
-                                        <el-button @click="onChangeLocalTime" icon="Setting">
-                                            {{ $t('commons.button.set') }}
+                                        <el-button @click="onChangeLocalTime" icon="Refresh">
+                                            {{ $t('commons.button.sync') }}
                                         </el-button>
                                     </template>
                                 </el-input>
@@ -66,9 +84,10 @@
             </template>
         </LayoutContent>
 
+        <Swap ref="swapRef" @search="search" />
         <Passwd ref="passwdRef" @search="search" />
         <TimeZone ref="timeZoneRef" @search="search" />
-        <LocalTime ref="localTimeRef" @search="search" />
+        <Ntp ref="ntpRef" @search="search" />
         <DNS ref="dnsRef" @search="search" />
         <Hostname ref="hostnameRef" @search="search" />
         <Hosts ref="hostsRef" @search="search" />
@@ -77,19 +96,23 @@
 
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue';
+import Swap from '@/views/toolbox/device/swap/index.vue';
 import Passwd from '@/views/toolbox/device/passwd/index.vue';
 import TimeZone from '@/views/toolbox/device/time-zone/index.vue';
-import LocalTime from '@/views/toolbox/device/local-time/index.vue';
+import Ntp from '@/views/toolbox/device/ntp/index.vue';
 import DNS from '@/views/toolbox/device/dns/index.vue';
 import Hostname from '@/views/toolbox/device/hostname/index.vue';
 import Hosts from '@/views/toolbox/device/hosts/index.vue';
-import { getDeviceBase } from '@/api/modules/toolbox';
+import { getDeviceBase, updateDevice } from '@/api/modules/toolbox';
 import i18n from '@/lang';
+import { computeSize } from '@/utils/util';
+import { MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
 
+const swapRef = ref();
 const timeZoneRef = ref();
-const localTimeRef = ref();
+const ntpRef = ref();
 const passwdRef = ref();
 const dnsRef = ref();
 const hostnameRef = ref();
@@ -106,13 +129,27 @@ const form = reactive({
     timeZone: '',
     localTime: '',
     ntp: '',
+
+    swapItem: '',
 });
 
 const onChangeTimeZone = () => {
     timeZoneRef.value.acceptParams({ timeZone: form.timeZone });
 };
-const onChangeLocalTime = () => {
-    localTimeRef.value.acceptParams({ localTime: form.localTime, ntpSite: form.ntp });
+const onChangeNtp = () => {
+    ntpRef.value.acceptParams({ ntpSite: form.ntp });
+};
+const onChangeLocalTime = async () => {
+    loading.value = true;
+    await updateDevice('LocalTime', '')
+        .then(() => {
+            loading.value = false;
+            search();
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 const onChangePasswd = () => {
     passwdRef.value.acceptParams({ user: form.user });
@@ -126,6 +163,9 @@ const onChangeHostname = () => {
 const onChangeHost = () => {
     hostsRef.value.acceptParams({ hosts: form.hosts });
 };
+const onChangeSwap = () => {
+    swapRef.value.acceptParams();
+};
 
 const search = async () => {
     const res = await getDeviceBase();
@@ -138,6 +178,10 @@ const search = async () => {
     form.dnsItem = form.dns ? i18n.global.t('toolbox.device.dnsHelper') : i18n.global.t('setting.unSetting');
     form.hosts = res.data.hosts || [];
     form.hostItem = form.hosts ? i18n.global.t('toolbox.device.hostsHelper') : i18n.global.t('setting.unSetting');
+
+    form.swapItem = res.data.swapMemoryTotal
+        ? computeSize(res.data.swapMemoryTotal)
+        : i18n.global.t('setting.unSetting');
 };
 
 onMounted(() => {

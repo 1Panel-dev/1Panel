@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"path"
+	"strconv"
 	"strings"
 	"time"
 
@@ -14,10 +16,12 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/ntp"
+	"github.com/shirou/gopsutil/v3/mem"
 )
 
 const defaultDNSPath = "/etc/resolv.conf"
 const defaultHostPath = "/etc/hosts"
+const defaultFstab = "/etc/fstab"
 
 type DeviceService struct{}
 
@@ -26,6 +30,7 @@ type IDeviceService interface {
 	Update(key, value string) error
 	UpdateHosts(req []dto.HostHelper) error
 	UpdatePasswd(req dto.ChangePasswd) error
+	UpdateSwap(req dto.SwapHelper) error
 	UpdateByConf(req dto.UpdateByNameAndFile) error
 	LoadTimeZone() ([]string, error)
 	CheckDNS(key, value string) (bool, error)
@@ -46,6 +51,14 @@ func (u *DeviceService) LoadBaseInfo() (dto.DeviceBaseInfo, error) {
 	baseInfo.User = loadUser()
 	ntp, _ := settingRepo.Get(settingRepo.WithByKey("NtpSite"))
 	baseInfo.Ntp = ntp.Value
+
+	swapInfo, _ := mem.SwapMemory()
+	baseInfo.SwapMemoryTotal = swapInfo.Total
+	baseInfo.SwapMemoryAvailable = swapInfo.Free
+	baseInfo.SwapMemoryUsed = swapInfo.Used
+	if baseInfo.SwapMemoryTotal != 0 {
+		baseInfo.SwapDetails = loadSwap()
+	}
 
 	return baseInfo, nil
 }
@@ -104,11 +117,20 @@ func (u *DeviceService) Update(key, value string) error {
 		if err != nil {
 			return errors.New(std)
 		}
-	case "LocalTime":
-		if err := settingRepo.Update("NtpSite", value); err != nil {
-			return err
+	case "Ntp", "LocalTime":
+		ntpValue := value
+		if key == "LocalTime" {
+			ntpItem, err := settingRepo.Get(settingRepo.WithByKey("NtpSite"))
+			if err != nil {
+				return err
+			}
+			ntpValue = ntpItem.Value
+		} else {
+			if err := settingRepo.Update("NtpSite", ntpValue); err != nil {
+				return err
+			}
 		}
-		ntime, err := ntp.GetRemoteTime(value)
+		ntime, err := ntp.GetRemoteTime(ntpValue)
 		if err != nil {
 			return err
 		}
@@ -166,6 +188,35 @@ func (u *DeviceService) UpdatePasswd(req dto.ChangePasswd) error {
 		return errors.New(std)
 	}
 	return nil
+}
+
+func (u *DeviceService) UpdateSwap(req dto.SwapHelper) error {
+	if !req.IsNew {
+		std, err := cmd.Execf("%s swapoff %s", cmd.SudoHandleCmd(), req.Path)
+		if err != nil {
+			return fmt.Errorf("handle swapoff %s failed, err: %s", req.Path, std)
+		}
+	}
+	if req.Size == 0 {
+		if req.Path == path.Join(global.CONF.System.BaseDir, ".1panel_swap") {
+			_ = os.Remove(path.Join(global.CONF.System.BaseDir, ".1panel_swap"))
+		}
+		return operateSwapWithFile(true, req)
+	}
+	std1, err := cmd.Execf("%s dd if=/dev/zero of=%s bs=1024 count=%d", cmd.SudoHandleCmd(), req.Path, req.Size)
+	if err != nil {
+		return fmt.Errorf("handle dd path %s failed, err: %s", req.Path, std1)
+	}
+	std2, err := cmd.Execf("%s mkswap -f %s", cmd.SudoHandleCmd(), req.Path)
+	if err != nil {
+		return fmt.Errorf("handle dd path %s failed, err: %s", req.Path, std2)
+	}
+	std3, err := cmd.Execf("%s swapon %s", cmd.SudoHandleCmd(), req.Path)
+	if err != nil {
+		_, _ = cmd.Execf("%s swapoff %s", cmd.SudoHandleCmd(), req.Path)
+		return fmt.Errorf("handle dd path %s failed, err: %s", req.Path, std3)
+	}
+	return operateSwapWithFile(false, req)
 }
 
 func (u *DeviceService) LoadConf(name string) (string, error) {
@@ -290,4 +341,56 @@ func loadUser() string {
 		return ""
 	}
 	return strings.ReplaceAll(std, "\n", "")
+}
+
+func loadSwap() []dto.SwapHelper {
+	var data []dto.SwapHelper
+	std, err := cmd.Execf("%s swapon --show --summary", cmd.SudoHandleCmd())
+	if err != nil {
+		return data
+	}
+	lines := strings.Split(std, "\n")
+	for index, line := range lines {
+		if index == 0 {
+			continue
+		}
+		parts := strings.Fields(line)
+		if len(parts) < 5 {
+			continue
+		}
+		sizeItem, _ := strconv.Atoi(parts[2])
+		data = append(data, dto.SwapHelper{Path: parts[0], Size: uint64(sizeItem), Used: parts[3]})
+	}
+	return data
+}
+
+func operateSwapWithFile(delete bool, req dto.SwapHelper) error {
+	conf, err := os.ReadFile(defaultFstab)
+	if err != nil {
+		return fmt.Errorf("read file %s failed, err: %v", defaultFstab, err)
+	}
+	lines := strings.Split(string(conf), "\n")
+	newFile := ""
+	for _, line := range lines {
+		if len(line) == 0 {
+			continue
+		}
+		parts := strings.Fields(line)
+		if len(parts) == 6 && parts[0] == req.Path {
+			continue
+		}
+		newFile += line + "\n"
+	}
+	if !delete {
+		newFile += fmt.Sprintf("%s    swap    swap    defaults    0    0\n", req.Path)
+	}
+	file, err := os.OpenFile(defaultFstab, os.O_WRONLY|os.O_TRUNC, 0640)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	write := bufio.NewWriter(file)
+	_, _ = write.WriteString(newFile)
+	write.Flush()
+	return nil
 }

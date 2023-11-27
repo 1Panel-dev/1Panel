@@ -2,7 +2,7 @@
     <div>
         <el-drawer v-model="drawerVisible" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
             <template #header>
-                <DrawerHeader :header="$t('toolbox.device.localTime')" :back="handleClose" />
+                <DrawerHeader :header="$t('toolbox.device.syncSite')" :back="handleClose" />
             </template>
             <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
                 <el-row type="flex" justify="center">
@@ -19,10 +19,6 @@
                                 {{ $t('toolbox.device.ntpGoogle') }}
                             </el-button>
                         </el-form-item>
-
-                        <el-form-item :label="$t('toolbox.device.localTime')" prop="localTime">
-                            <el-input v-model="form.localTime" disabled />
-                        </el-form-item>
                     </el-col>
                 </el-row>
             </el-form>
@@ -30,7 +26,7 @@
                 <span class="dialog-footer">
                     <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
                     <el-button :disabled="loading" type="primary" @click="onSyncTime(formRef)">
-                        {{ $t('commons.button.sync') }}
+                        {{ $t('commons.button.confirm') }}
                     </el-button>
                 </span>
             </template>
@@ -49,21 +45,18 @@ import { updateDevice } from '@/api/modules/toolbox';
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 interface DialogProps {
-    localTime: string;
     ntpSite: string;
 }
 const drawerVisible = ref();
 const loading = ref();
 
 const form = reactive({
-    localTime: '',
     ntpSite: '',
 });
 
 const formRef = ref<FormInstance>();
 
 const acceptParams = (params: DialogProps): void => {
-    form.localTime = params.localTime;
     form.ntpSite = params.ntpSite;
     drawerVisible.value = true;
 };
@@ -82,7 +75,7 @@ const onSyncTime = async (formEl: FormInstance | undefined) => {
             },
         ).then(async () => {
             loading.value = true;
-            await updateDevice('LocalTime', form.ntpSite)
+            await updateDevice('Ntp', form.ntpSite)
                 .then(() => {
                     loading.value = false;
                     emit('search');
