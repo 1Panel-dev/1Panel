@@ -20,6 +20,8 @@ TYPE_RUNTIME: "運作環境"
 TYPE_DOMAIN: "網域名稱"
 ErrTypePort: '埠 {{ .name }} 格式錯誤'
 ErrTypePortRange: '連接埠範圍需要在 1-65535 之間'
+Success: "成功"
+Failed: "失敗"
 
 #app
 ErrPortInUsed: "{{ .detail }} 端口已被佔用！"
@@ -100,6 +102,8 @@ http: "HTTP"
 ApplySSLFailed: '申請 [{{ .domain }}] 憑證失敗, {{.detail}} '
 ApplySSLSuccess: '申請 [{{ .domain }}] 憑證成功！ ！ '
 DNSAccountName: 'DNS 帳號 [{{ .name }}] 廠商 [{{.type}}]'
+PushDirLog: '憑證推送到目錄 [{{ .path }}] {{ .status }}'
+
 
 #mysql
 ErrUserIsExist: "當前用戶已存在，請重新輸入"

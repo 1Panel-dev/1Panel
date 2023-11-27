@@ -1724,6 +1724,9 @@ const message = {
         selfSign: '簽發證書',
         days: '有效期限',
         domainHelper: '一行一個網域名稱,支援*和IP位址',
+        pushDir: '推送憑證到本機目錄',
+        dir: '目錄',
+        pushDirHelper: '會在此目錄下產生兩個文件，憑證檔案：fullchain.pem 金鑰檔案：privkey.pem',
     },
     firewall: {
         create: '創建規則',

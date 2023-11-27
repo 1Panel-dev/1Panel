@@ -16,6 +16,8 @@ type WebsiteSSLCreate struct {
 	AutoRenew     bool   `json:"autoRenew"`
 	KeyType       string `json:"keyType"`
 	Apply         bool   `json:"apply"`
+	PushDir       bool   `json:"pushDir"`
+	Dir           string `json:"dir"`
 }
 
 type WebsiteDNSReq struct {
@@ -91,4 +93,6 @@ type WebsiteCAObtain struct {
 	KeyType string `json:"keyType" validate:"required,oneof=P256 P384 2048 3072 4096 8192"`
 	Time    int    `json:"time" validate:"required"`
 	Unit    string `json:"unit" validate:"required"`
+	PushDir bool   `json:"pushDir"`
+	Dir     string `json:"dir"`
 }

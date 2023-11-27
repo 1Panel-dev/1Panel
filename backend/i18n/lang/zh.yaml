@@ -20,6 +20,8 @@ TYPE_RUNTIME: "运行环境"
 TYPE_DOMAIN: "域名"
 ErrTypePort: '端口 {{ .name }} 格式错误'
 ErrTypePortRange: '端口范围需要在 1-65535 之间'
+Success: "成功"
+Failed: "失败"
 
 #app
 ErrPortInUsed: "{{ .detail }} 端口已被占用！"
@@ -100,6 +102,7 @@ http: "HTTP"
 ApplySSLFailed: '申请  [{{ .domain }}] 证书失败, {{.detail}} '
 ApplySSLSuccess: '申请 [{{ .domain }}] 证书成功！！'
 DNSAccountName: 'DNS 账号 [{{ .name }}] 厂商 [{{.type}}]'
+PushDirLog: '证书推送到目录 [{{ .path }}] {{ .status }}'
 
 #mysql
 ErrUserIsExist: "当前用户已存在，请重新输入"

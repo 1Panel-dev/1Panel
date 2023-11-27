@@ -71,6 +71,19 @@
                     <el-form-item :label="''" prop="autoRenew" v-if="ssl.provider !== 'dnsManual'">
                         <el-checkbox v-model="ssl.autoRenew" :label="$t('ssl.autoRenew')" />
                     </el-form-item>
+                    <el-form-item :label="''" prop="pushDir">
+                        <el-checkbox v-model="ssl.pushDir" :label="$t('ssl.pushDir')" />
+                    </el-form-item>
+                    <el-form-item :label="$t('ssl.dir')" prop="dir" v-if="ssl.pushDir">
+                        <el-input v-model.trim="ssl.dir">
+                            <template #prepend>
+                                <FileList :path="ssl.dir" @choose="getPath" :dir="true"></FileList>
+                            </template>
+                        </el-input>
+                        <span class="input-help">
+                            {{ $t('ssl.pushDirHelper') }}
+                        </span>
+                    </el-form-item>
                 </el-form>
             </el-col>
         </el-row>
@@ -127,6 +140,7 @@ const rules = ref({
     provider: [Rules.requiredInput],
     autoRenew: [Rules.requiredInput],
     keyType: [Rules.requiredInput],
+    dir: [Rules.requiredInput],
 });
 
 const initData = () => ({
@@ -138,6 +152,8 @@ const initData = () => ({
     dnsAccountId: undefined,
     autoRenew: true,
     keyType: 'P256',
+    pushDir: false,
+    dir: '',
 });
 
 const ssl = ref(initData());
@@ -161,6 +177,10 @@ const acceptParams = () => {
     getAcmeAccounts();
     getDnsAccounts();
     open.value = true;
+};
+
+const getPath = (dir: string) => {
+    ssl.value.dir = dir;
 };
 
 const getAcmeAccounts = async () => {

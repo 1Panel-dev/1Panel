@@ -16934,17 +16934,11 @@ const docTemplate = `{
         "dto.SwapHelper": {
             "type": "object",
             "required": [
-                "operate",
                 "path"
             ],
             "properties": {
-                "operate": {
-                    "type": "string",
-                    "enum": [
-                        "create",
-                        "delete",
-                        "update"
-                    ]
+                "isNew": {
+                    "type": "boolean"
                 },
                 "path": {
                     "type": "string"
@@ -17468,6 +17462,26 @@ const docTemplate = `{
                 }
             }
         },
+        "model.WebsiteDnsAccount": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
         "model.WebsiteDomain": {
             "type": "object",
             "properties": {
@@ -17509,6 +17523,12 @@ const docTemplate = `{
                 "createdAt": {
                     "type": "string"
                 },
+                "dir": {
+                    "type": "string"
+                },
+                "dnsAccount": {
+                    "$ref": "#/definitions/model.WebsiteDnsAccount"
+                },
                 "dnsAccountId": {
                     "type": "integer"
                 },
@@ -17541,6 +17561,9 @@ const docTemplate = `{
                 },
                 "provider": {
                     "type": "string"
+                },
+                "pushDir": {
+                    "type": "boolean"
                 },
                 "startDate": {
                     "type": "string"
@@ -18942,6 +18965,9 @@ const docTemplate = `{
                 "unit"
             ],
             "properties": {
+                "dir": {
+                    "type": "string"
+                },
                 "domains": {
                     "type": "string"
                 },
@@ -18958,6 +18984,9 @@ const docTemplate = `{
                         "4096",
                         "8192"
                     ]
+                },
+                "pushDir": {
+                    "type": "boolean"
                 },
                 "time": {
                     "type": "integer"
@@ -19471,6 +19500,9 @@ const docTemplate = `{
                 "autoRenew": {
                     "type": "boolean"
                 },
+                "dir": {
+                    "type": "string"
+                },
                 "dnsAccountId": {
                     "type": "integer"
                 },
@@ -19485,6 +19517,9 @@ const docTemplate = `{
                 },
                 "provider": {
                     "type": "string"
+                },
+                "pushDir": {
+                    "type": "boolean"
                 }
             }
         },

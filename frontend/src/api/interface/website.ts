@@ -482,5 +482,7 @@ export namespace Website {
         keyType: string;
         time: number;
         unit: string;
+        pushDir: boolean;
+        dir: string;
     }
 }

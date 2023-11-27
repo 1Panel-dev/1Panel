@@ -9,16 +9,22 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
+	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/1Panel-dev/1Panel/backend/utils/ssl"
 	"github.com/go-acme/lego/v4/certcrypto"
+	"log"
 	"math/big"
 	"net"
+	"os"
+	"path"
 	"strings"
 	"time"
 )
@@ -154,6 +160,13 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) error {
 	newSSL := &model.WebsiteSSL{
 		Provider: constant.SelfSigned,
 		KeyType:  req.KeyType,
+		PushDir:  req.PushDir,
+	}
+	if req.PushDir {
+		if !files.NewFileOp().Stat(req.Dir) {
+			return buserr.New(constant.ErrLinkPathNotFound)
+		}
+		newSSL.Dir = req.Dir
 	}
 
 	var (
@@ -274,7 +287,15 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) error {
 	newSSL.Type = cert.Issuer.CommonName
 	newSSL.Organization = rootCsr.Subject.Organization[0]
 
-	return websiteSSLRepo.Create(context.Background(), newSSL)
+	if err := websiteSSLRepo.Create(context.Background(), newSSL); err != nil {
+		return err
+	}
+	logFile, _ := os.OpenFile(path.Join(constant.SSLLogDir, fmt.Sprintf("%s-ssl-%d.log", newSSL.PrimaryDomain, newSSL.ID)), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
+	defer logFile.Close()
+	logger := log.New(logFile, "", log.LstdFlags)
+	logger.Println(i18n.GetMsgWithMap("ApplySSLSuccess", map[string]interface{}{"domain": strings.Join(domains, ",")}))
+	saveCertificateFile(*newSSL, logger)
+	return nil
 }
 
 func createPrivateKey(keyType string) (privateKey any, publicKey any, privateKeyBytes []byte, err error) {
