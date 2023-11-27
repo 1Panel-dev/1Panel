@@ -1,9 +1,11 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -173,7 +175,7 @@ type diskInfo struct {
 
 func loadDiskInfo() []dto.DiskInfo {
 	var datas []dto.DiskInfo
-	stdout, err := cmd.Exec("df -hT -P|grep '/'|grep -v tmpfs|grep -v 'snap/core'|grep -v udev")
+	stdout, err := cmd.ExecWithTimeOut("df -hT -P|grep '/'|grep -v tmpfs|grep -v 'snap/core'|grep -v udev", 2*time.Second)
 	if err != nil {
 		return datas
 	}
@@ -207,24 +209,38 @@ func loadDiskInfo() []dto.DiskInfo {
 		mounts = append(mounts, diskInfo{Type: fields[1], Device: fields[0], Mount: fields[6]})
 	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	var wg sync.WaitGroup
+	wg.Add(len(mounts))
 	for i := 0; i < len(mounts); i++ {
-		state, err := disk.Usage(mounts[i].Mount)
-		if err != nil {
-			continue
-		}
-		var itemData dto.DiskInfo
-		itemData.Path = mounts[i].Mount
-		itemData.Type = mounts[i].Type
-		itemData.Device = mounts[i].Device
-		itemData.Total = state.Total
-		itemData.Free = state.Free
-		itemData.Used = state.Used
-		itemData.UsedPercent = state.UsedPercent
-		itemData.InodesTotal = state.InodesTotal
-		itemData.InodesUsed = state.InodesUsed
-		itemData.InodesFree = state.InodesFree
-		itemData.InodesUsedPercent = state.InodesUsedPercent
-		datas = append(datas, itemData)
+		go func(index int) {
+			defer wg.Done()
+			select {
+			case <-ctx.Done():
+				global.LOG.Errorf("load disk info from %s failed, err: timeout", mounts[index].Mount)
+				return
+			default:
+				state, err := disk.Usage(mounts[index].Mount)
+				if err != nil {
+					return
+				}
+				var itemData dto.DiskInfo
+				itemData.Path = mounts[index].Mount
+				itemData.Type = mounts[index].Type
+				itemData.Device = mounts[index].Device
+				itemData.Total = state.Total
+				itemData.Free = state.Free
+				itemData.Used = state.Used
+				itemData.UsedPercent = state.UsedPercent
+				itemData.InodesTotal = state.InodesTotal
+				itemData.InodesUsed = state.InodesUsed
+				itemData.InodesFree = state.InodesFree
+				itemData.InodesUsedPercent = state.InodesUsedPercent
+				datas = append(datas, itemData)
+			}
+		}(i)
 	}
+	wg.Wait()
 	return datas
 }
