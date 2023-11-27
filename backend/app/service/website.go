@@ -2093,15 +2093,8 @@ func (w WebsiteService) OperateRedirect(req request.NginxRedirectReq) (err error
 			})
 		}
 	case "404":
-		if req.KeepPath && !req.RedirectRoot {
-			target = req.Target + "$request_uri"
-		}
 		if req.RedirectRoot {
 			target = "/"
-		} else {
-			if req.KeepPath {
-				target = req.Target + "$request_uri"
-			}
 		}
 		block = &components.Block{
 			Directives: []components.IDirective{
@@ -2116,7 +2109,7 @@ func (w WebsiteService) OperateRedirect(req request.NginxRedirectReq) (err error
 						Directives: []components.IDirective{
 							&components.Directive{
 								Name:       "return",
-								Parameters: []string{"301", target},
+								Parameters: []string{req.Redirect, target},
 							},
 						},
 					},
