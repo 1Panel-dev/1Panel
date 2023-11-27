@@ -25,10 +25,20 @@
                 <el-button type="primary" plain @click="openDnsAccount()">
                     {{ $t('website.dnsAccountManage') }}
                 </el-button>
+                <el-button plain @click="deleteSSL(null)" :disabled="selects.length === 0">
+                    {{ $t('commons.button.delete') }}
+                </el-button>
             </template>
             <template #main>
                 <br />
-                <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()" v-loading="loading">
+                <ComplexTable
+                    :data="data"
+                    :pagination-config="paginationConfig"
+                    @search="search()"
+                    v-model:selects="selects"
+                    v-loading="loading"
+                >
+                    <el-table-column type="selection" width="30" />
                     <el-table-column
                         :label="$t('website.domain')"
                         fix
@@ -129,7 +139,7 @@
             <Detail ref="detailRef"></Detail>
             <SSLUpload ref="sslUploadRef" @close="search()"></SSLUpload>
             <Apply ref="applyRef" @search="search" />
-            <OpDialog ref="opRef" @search="search" />
+            <OpDialog ref="opRef" @search="search" @cancel="search" />
             <Log ref="logRef" @close="search()" />
             <CA ref="caRef" @close="search()" />
         </LayoutContent>
@@ -172,6 +182,7 @@ const sslUploadRef = ref();
 const applyRef = ref();
 const logRef = ref();
 const caRef = ref();
+let selects = ref<any>([]);
 
 const routerButton = [
     {
@@ -277,16 +288,27 @@ const applySSL = (row: Website.SSLDTO) => {
 };
 
 const deleteSSL = async (row: any) => {
+    let names = [];
+    let params = {};
+    if (row == null) {
+        names = selects.value.map((item: Website.SSLDTO) => item.primaryDomain);
+        params = { ids: selects.value.map((item: Website.SSLDTO) => item.id) };
+    } else {
+        names = [row.primaryDomain];
+        params = { ids: [row.id] };
+    }
+
     opRef.value.acceptParams({
         title: i18n.global.t('commons.button.delete'),
-        names: [row.primaryDomain],
+        names: names,
         msg: i18n.global.t('commons.msg.operatorHelper', [
             i18n.global.t('website.ssl'),
             i18n.global.t('commons.button.delete'),
         ]),
         api: DeleteSSL,
-        params: { id: row.id },
+        params: params,
     });
+    search();
 };
 
 onMounted(() => {

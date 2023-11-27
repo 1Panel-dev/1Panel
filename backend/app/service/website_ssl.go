@@ -38,7 +38,7 @@ type IWebsiteSSLService interface {
 	Renew(sslId uint) error
 	GetDNSResolve(req request.WebsiteDNSReq) ([]response.WebsiteDNSRes, error)
 	GetWebsiteSSL(websiteId uint) (response.WebsiteSSLDTO, error)
-	Delete(id uint) error
+	Delete(ids []uint) error
 	Update(update request.WebsiteSSLUpdate) error
 	Upload(req request.WebsiteSSLUpload) error
 	ObtainSSL(apply request.WebsiteSSLApply) error
@@ -299,6 +299,8 @@ func (w WebsiteSSLService) Renew(sslId uint) error {
 		if err := client.UseHTTP(path.Join(constant.AppInstallDir, constant.AppOpenresty, appInstall.Name, "root")); err != nil {
 			return err
 		}
+	case constant.SelfSigned:
+
 	}
 
 	resource, err := client.RenewSSL(websiteSSL.CertURL)
@@ -380,11 +382,23 @@ func (w WebsiteSSLService) GetWebsiteSSL(websiteId uint) (response.WebsiteSSLDTO
 	return res, nil
 }
 
-func (w WebsiteSSLService) Delete(id uint) error {
-	if websites, _ := websiteRepo.GetBy(websiteRepo.WithWebsiteSSLID(id)); len(websites) > 0 {
-		return buserr.New(constant.ErrSSLCannotDelete)
+func (w WebsiteSSLService) Delete(ids []uint) error {
+	var names []string
+	for _, id := range ids {
+		if websites, _ := websiteRepo.GetBy(websiteRepo.WithWebsiteSSLID(id)); len(websites) > 0 {
+			oldSSL, _ := websiteSSLRepo.GetFirst(commonRepo.WithByID(id))
+			if oldSSL.ID > 0 {
+				names = append(names, oldSSL.PrimaryDomain)
+			}
+			continue
+		} else {
+			_ = websiteSSLRepo.DeleteBy(commonRepo.WithByID(id))
+		}
 	}
-	return websiteSSLRepo.DeleteBy(commonRepo.WithByID(id))
+	if len(names) > 0 {
+		return buserr.WithName("ErrSSLCannotDelete", strings.Join(names, ","))
+	}
+	return nil
 }
 
 func (w WebsiteSSLService) Update(update request.WebsiteSSLUpdate) error {

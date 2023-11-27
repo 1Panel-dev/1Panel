@@ -132,17 +132,17 @@ func (b *BaseApi) GetDNSResolve(c *gin.Context) {
 // @Summary Delete website ssl
 // @Description 删除网站 ssl
 // @Accept json
-// @Param request body request.WebsiteResourceReq true "request"
+// @Param request body request.WebsiteBatchDelReq true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /websites/ssl/del [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"website_ssls","output_column":"primary_domain","output_value":"domain"}],"formatZH":"删除 ssl [domain]","formatEN":"Delete ssl [domain]"}
+// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"ids","isList":true,"db":"website_ssls","output_column":"primary_domain","output_value":"domain"}],"formatZH":"删除 ssl [domain]","formatEN":"Delete ssl [domain]"}
 func (b *BaseApi) DeleteWebsiteSSL(c *gin.Context) {
-	var req request.WebsiteResourceReq
+	var req request.WebsiteBatchDelReq
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	if err := websiteSSLService.Delete(req.ID); err != nil {
+	if err := websiteSSLService.Delete(req.IDs); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
