@@ -83,11 +83,13 @@
                                 placement="bottom"
                                 :width="400"
                                 trigger="hover"
-                                :content="row.message"
                             >
                                 <template #reference>
                                     <Status :key="row.status" :status="row.status"></Status>
                                 </template>
+                                <div class="max-h-96 overflow-auto">
+                                    <span>{{ row.message }}</span>
+                                </div>
                             </el-popover>
                             <div v-else>
                                 <Status :key="row.status" :status="row.status"></Status>
@@ -213,6 +215,18 @@ const buttons = [
             } else {
                 applySSL(row);
             }
+        },
+        show: function (row: Website.SSLDTO) {
+            return row.provider != 'manual';
+        },
+    },
+    {
+        label: i18n.global.t('commons.operate.update'),
+        click: function (row: Website.SSLDTO) {
+            sslUploadRef.value.acceptParams(row.id);
+        },
+        show: function (row: Website.SSLDTO) {
+            return row.provider == 'manual';
         },
     },
     {

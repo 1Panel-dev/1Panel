@@ -53,7 +53,7 @@
                 </el-descriptions>
             </div>
             <div v-else-if="curr === 'ssl'">
-                <el-input v-model="ssl.pem" :autosize="{ minRows: 10, maxRows: 15 }" type="textarea" id="textArea" />
+                <el-input v-model="ssl.pem" :autosize="{ minRows: 15, maxRows: 30 }" type="textarea" id="textArea" />
                 <div>
                     <br />
                     <el-button type="primary" @click="copyText(ssl.pem)">{{ $t('file.copy') }}</el-button>
@@ -62,7 +62,7 @@
             <div v-else>
                 <el-input
                     v-model="ssl.privateKey"
-                    :autosize="{ minRows: 10, maxRows: 15 }"
+                    :autosize="{ minRows: 15, maxRows: 30 }"
                     type="textarea"
                     id="textArea"
                 />

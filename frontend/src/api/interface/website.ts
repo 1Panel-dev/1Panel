@@ -451,6 +451,7 @@ export namespace Website {
         privateKeyPath: string;
         certificatePath: string;
         type: string;
+        sslID: number;
     }
 
     export interface SSLObtain {
