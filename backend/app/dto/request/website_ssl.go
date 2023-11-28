@@ -63,8 +63,12 @@ type WebsiteBatchDelReq struct {
 }
 
 type WebsiteSSLUpdate struct {
-	ID        uint `json:"id" validate:"required"`
-	AutoRenew bool `json:"autoRenew"`
+	ID          uint   `json:"id" validate:"required"`
+	AutoRenew   bool   `json:"autoRenew"`
+	Description string `json:"description"`
+	PrivateKey  string `json:"privateKey"`
+	Certificate string `json:"certificate"`
+	Type        string `json:"type" validate:"required,oneof=autoRenew description certificate privateKey"`
 }
 
 type WebsiteSSLUpload struct {
@@ -73,6 +77,7 @@ type WebsiteSSLUpload struct {
 	PrivateKeyPath  string `json:"privateKeyPath"`
 	CertificatePath string `json:"certificatePath"`
 	Type            string `json:"type" validate:"required,oneof=paste local"`
+	SSLID           uint   `json:"sslID"`
 }
 
 type WebsiteCASearch struct {

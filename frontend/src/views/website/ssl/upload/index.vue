@@ -70,13 +70,15 @@ const rules = ref({
     certificatePath: [Rules.requiredInput],
     type: [Rules.requiredSelect],
 });
-const ssl = ref({
+const initData = () => ({
     privateKey: '',
     certificate: '',
     privateKeyPath: '',
     certificatePath: '',
     type: 'paste',
+    sslID: 0,
 });
+const ssl = ref(initData());
 
 const em = defineEmits(['close']);
 const handleClose = () => {
@@ -86,17 +88,14 @@ const handleClose = () => {
 };
 const resetForm = () => {
     sslForm.value?.resetFields();
-    ssl.value = {
-        privateKey: '',
-        certificate: '',
-        privateKeyPath: '',
-        certificatePath: '',
-        type: 'paste',
-    };
+    ssl.value = initData();
 };
 
-const acceptParams = () => {
+const acceptParams = (id: number) => {
     resetForm();
+    if (id && id > 0) {
+        ssl.value.sslID = id;
+    }
     open.value = true;
 };
 

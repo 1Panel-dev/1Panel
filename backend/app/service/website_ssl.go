@@ -345,10 +345,16 @@ func (w WebsiteSSLService) Update(update request.WebsiteSSLUpdate) error {
 }
 
 func (w WebsiteSSLService) Upload(req request.WebsiteSSLUpload) error {
-	newSSL := &model.WebsiteSSL{
+	websiteSSL := &model.WebsiteSSL{
 		Provider: constant.Manual,
 	}
-
+	var err error
+	if req.SSLID > 0 {
+		websiteSSL, err = websiteSSLRepo.GetFirst(commonRepo.WithByID(req.SSLID))
+		if err != nil {
+			return err
+		}
+	}
 	if req.Type == "local" {
 		fileOp := files.NewFileOp()
 		if !fileOp.Stat(req.PrivateKeyPath) {
@@ -360,24 +366,24 @@ func (w WebsiteSSLService) Upload(req request.WebsiteSSLUpload) error {
 		if content, err := fileOp.GetContent(req.PrivateKeyPath); err != nil {
 			return err
 		} else {
-			newSSL.PrivateKey = string(content)
+			websiteSSL.PrivateKey = string(content)
 		}
 		if content, err := fileOp.GetContent(req.CertificatePath); err != nil {
 			return err
 		} else {
-			newSSL.Pem = string(content)
+			websiteSSL.Pem = string(content)
 		}
 	} else {
-		newSSL.PrivateKey = req.PrivateKey
-		newSSL.Pem = req.Certificate
+		websiteSSL.PrivateKey = req.PrivateKey
+		websiteSSL.Pem = req.Certificate
 	}
 
-	privateKeyCertBlock, _ := pem.Decode([]byte(newSSL.PrivateKey))
+	privateKeyCertBlock, _ := pem.Decode([]byte(websiteSSL.PrivateKey))
 	if privateKeyCertBlock == nil {
 		return buserr.New("ErrSSLKeyFormat")
 	}
 
-	certBlock, _ := pem.Decode([]byte(newSSL.Pem))
+	certBlock, _ := pem.Decode([]byte(websiteSSL.Pem))
 	if certBlock == nil {
 		return buserr.New("ErrSSLCertificateFormat")
 	}
@@ -385,23 +391,23 @@ func (w WebsiteSSLService) Upload(req request.WebsiteSSLUpload) error {
 	if err != nil {
 		return err
 	}
-	newSSL.ExpireDate = cert.NotAfter
-	newSSL.StartDate = cert.NotBefore
-	newSSL.Type = cert.Issuer.CommonName
+	websiteSSL.ExpireDate = cert.NotAfter
+	websiteSSL.StartDate = cert.NotBefore
+	websiteSSL.Type = cert.Issuer.CommonName
 	if len(cert.Issuer.Organization) > 0 {
-		newSSL.Organization = cert.Issuer.Organization[0]
+		websiteSSL.Organization = cert.Issuer.Organization[0]
 	} else {
-		newSSL.Organization = cert.Issuer.CommonName
+		websiteSSL.Organization = cert.Issuer.CommonName
 	}
 
 	var domains []string
 	if len(cert.DNSNames) > 0 {
-		newSSL.PrimaryDomain = cert.DNSNames[0]
+		websiteSSL.PrimaryDomain = cert.DNSNames[0]
 		domains = cert.DNSNames[1:]
 	}
 	if len(cert.IPAddresses) > 0 {
-		if newSSL.PrimaryDomain == "" {
-			newSSL.PrimaryDomain = cert.IPAddresses[0].String()
+		if websiteSSL.PrimaryDomain == "" {
+			websiteSSL.PrimaryDomain = cert.IPAddresses[0].String()
 			for _, ip := range cert.IPAddresses[1:] {
 				domains = append(domains, ip.String())
 			}
@@ -411,9 +417,12 @@ func (w WebsiteSSLService) Upload(req request.WebsiteSSLUpload) error {
 			}
 		}
 	}
-	newSSL.Domains = strings.Join(domains, ",")
+	websiteSSL.Domains = strings.Join(domains, ",")
 
-	return websiteSSLRepo.Create(context.Background(), newSSL)
+	if websiteSSL.ID > 0 {
+		return websiteSSLRepo.Save(websiteSSL)
+	}
+	return websiteSSLRepo.Create(context.Background(), websiteSSL)
 }
 
 func (w WebsiteSSLService) SyncForRestart() error {
