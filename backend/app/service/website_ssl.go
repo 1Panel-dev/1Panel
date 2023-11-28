@@ -11,6 +11,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
@@ -41,6 +42,7 @@ type IWebsiteSSLService interface {
 	Upload(req request.WebsiteSSLUpload) error
 	ObtainSSL(apply request.WebsiteSSLApply) error
 	SyncForRestart() error
+	DownloadFile(id uint) (*os.File, error)
 }
 
 func NewIWebsiteSSLService() IWebsiteSSLService {
@@ -423,6 +425,34 @@ func (w WebsiteSSLService) Upload(req request.WebsiteSSLUpload) error {
 		return websiteSSLRepo.Save(websiteSSL)
 	}
 	return websiteSSLRepo.Create(context.Background(), websiteSSL)
+}
+
+func (w WebsiteSSLService) DownloadFile(id uint) (*os.File, error) {
+	websiteSSL, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(id))
+	if err != nil {
+		return nil, err
+	}
+	fileOp := files.NewFileOp()
+	dir := path.Join(global.CONF.System.BaseDir, "1panel/tmp/ssl", websiteSSL.PrimaryDomain)
+	if fileOp.Stat(dir) {
+		if err = fileOp.DeleteDir(dir); err != nil {
+			return nil, err
+		}
+	}
+	if err = fileOp.CreateDir(dir, 0666); err != nil {
+		return nil, err
+	}
+	if err = fileOp.WriteFile(path.Join(dir, "fullchain.pem"), strings.NewReader(websiteSSL.Pem), 0644); err != nil {
+		return nil, err
+	}
+	if err = fileOp.WriteFile(path.Join(dir, "privkey.pem"), strings.NewReader(websiteSSL.PrivateKey), 0644); err != nil {
+		return nil, err
+	}
+	fileName := websiteSSL.PrimaryDomain + ".zip"
+	if err = fileOp.Compress([]string{path.Join(dir, "fullchain.pem"), path.Join(dir, "privkey.pem")}, dir, fileName, files.SdkZip); err != nil {
+		return nil, err
+	}
+	return os.Open(path.Join(dir, fileName))
 }
 
 func (w WebsiteSSLService) SyncForRestart() error {

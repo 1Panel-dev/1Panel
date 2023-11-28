@@ -2800,6 +2800,8 @@ definitions:
         type: string
       createdAt:
         type: string
+      description:
+        type: string
       dir:
         type: string
       dnsAccount:
@@ -4178,10 +4180,24 @@ definitions:
     properties:
       autoRenew:
         type: boolean
+      certificate:
+        type: string
+      description:
+        type: string
       id:
         type: integer
+      privateKey:
+        type: string
+      type:
+        enum:
+        - autoRenew
+        - description
+        - certificate
+        - privateKey
+        type: string
     required:
     - id
+    - type
     type: object
   request.WebsiteSSLUpload:
     properties:
@@ -4193,6 +4209,8 @@ definitions:
         type: string
       privateKeyPath:
         type: string
+      sslID:
+        type: integer
       type:
         enum:
         - paste
@@ -12873,6 +12891,39 @@ paths:
         - ids
         formatEN: Delete ssl [domain]
         formatZH: 删除 ssl [domain]
+        paramKeys: []
+  /websites/ssl/download:
+    post:
+      consumes:
+      - application/json
+      description: 下载证书文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteResourceReq'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Download SSL  file
+      tags:
+      - Website SSL
+      x-panel-log:
+        BeforeFunctions:
+        - db: website_ssls
+          input_column: id
+          input_value: id
+          isList: false
+          output_column: primary_domain
+          output_value: domain
+        bodyKeys:
+        - id
+        formatEN: download ssl file [domain]
+        formatZH: 下载证书文件 [domain]
         paramKeys: []
   /websites/ssl/obtain:
     post:

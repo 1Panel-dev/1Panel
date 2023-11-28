@@ -263,3 +263,10 @@ export const DeleteCA = (req: Website.DelReq) => {
 export const RenewSSLByCA = (req: Website.RenewSSLByCA) => {
     return http.post<any>(`/websites/ca/renew`, req);
 };
+
+export const DownloadFile = (params: Website.SSLDownload) => {
+    return http.download<BlobPart>(`/websites/ssl/download`, params, {
+        responseType: 'blob',
+        timeout: TimeoutEnum.T_40S,
+    });
+};

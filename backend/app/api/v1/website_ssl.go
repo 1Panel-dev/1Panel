@@ -1,7 +1,10 @@
 package v1
 
 import (
+	"net/http"
+	"net/url"
 	"reflect"
+	"strconv"
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -212,4 +215,33 @@ func (b *BaseApi) UploadWebsiteSSL(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Website SSL
+// @Summary Download SSL  file
+// @Description 下载证书文件
+// @Accept json
+// @Param request body request.WebsiteResourceReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router  /websites/ssl/download [post]
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"website_ssls","output_column":"primary_domain","output_value":"domain"}],"formatZH":"下载证书文件 [domain]","formatEN":"download ssl file [domain]"}
+func (b *BaseApi) DownloadWebsiteSSL(c *gin.Context) {
+	var req request.WebsiteResourceReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	file, err := websiteSSLService.DownloadFile(req.ID)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	info, err := file.Stat()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	c.Header("Content-Length", strconv.FormatInt(info.Size(), 10))
+	c.Header("Content-Disposition", "attachment; filename*=utf-8''"+url.PathEscape(info.Name()))
+	http.ServeContent(c.Writer, c.Request, info.Name(), info.ModTime(), file)
 }

@@ -150,7 +150,7 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref, computed } from 'vue';
 import OpDialog from '@/components/del-dialog/index.vue';
-import { DeleteSSL, SearchSSL, UpdateSSL } from '@/api/modules/website';
+import { DeleteSSL, DownloadFile, SearchSSL, UpdateSSL } from '@/api/modules/website';
 import DnsAccount from './dns-account/index.vue';
 import AcmeAccount from './acme-account/index.vue';
 import CA from './ca/index.vue';
@@ -230,12 +230,35 @@ const buttons = [
         },
     },
     {
+        label: i18n.global.t('file.download'),
+        click: function (row: Website.SSLDTO) {
+            onDownload(row);
+        },
+    },
+    {
         label: i18n.global.t('commons.button.delete'),
         click: function (row: Website.SSLDTO) {
             deleteSSL(row);
         },
     },
 ];
+
+const onDownload = (ssl: Website.SSLDTO) => {
+    loading.value = true;
+    DownloadFile({ id: ssl.id })
+        .then((res) => {
+            const downloadUrl = window.URL.createObjectURL(new Blob([res]));
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = downloadUrl;
+            a.download = ssl.primaryDomain + '.zip';
+            const event = new MouseEvent('click');
+            a.dispatchEvent(event);
+        })
+        .finally(() => {
+            loading.value = false;
+        });
+};
 
 const mobile = computed(() => {
     return globalStore.isMobile();
