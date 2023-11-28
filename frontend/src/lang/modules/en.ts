@@ -744,6 +744,12 @@ const message = {
         daemonJsonPath: 'Conf Path',
         serviceUnavailable: 'Docker service is not started at present, please click',
         startIn: ' to start',
+        sockPath: 'Socket Path',
+        sockPathHelper: 'Communication channel between Docker Daemon and the client',
+        sockPathHelper1: 'Default value is unix:///var/run/docker-x.sock',
+        sockPathMsg:
+            'Saving the Socket Path setting may result in Docker service being unavailable. Do you want to continue?',
+        sockPathErr: 'Please select or enter the correct Docker sock file path',
     },
     cronjob: {
         create: 'Create Cronjob',

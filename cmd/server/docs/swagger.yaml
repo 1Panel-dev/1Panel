@@ -2292,6 +2292,8 @@ definitions:
         type: string
       dingVars:
         type: string
+      dockerSockPath:
+        type: string
       email:
         type: string
       emailVars:

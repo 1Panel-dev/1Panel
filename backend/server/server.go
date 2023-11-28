@@ -32,9 +32,9 @@ import (
 func Start() {
 	viper.Init()
 	log.Init()
-	app.Init()
 	db.Init()
 	migration.Init()
+	app.Init()
 	validator.Init()
 	gob.Register(psession.SessionUser{})
 	cache.Init()

@@ -3,10 +3,11 @@ package dto
 import "time"
 
 type SettingInfo struct {
-	UserName      string `json:"userName"`
-	Email         string `json:"email"`
-	SystemIP      string `json:"systemIP"`
-	SystemVersion string `json:"systemVersion"`
+	UserName       string `json:"userName"`
+	Email          string `json:"email"`
+	SystemIP       string `json:"systemIP"`
+	SystemVersion  string `json:"systemVersion"`
+	DockerSockPath string `json:"dockerSockPath"`
 
 	SessionTimeout string `json:"sessionTimeout"`
 	LocalTime      string `json:"localTime"`

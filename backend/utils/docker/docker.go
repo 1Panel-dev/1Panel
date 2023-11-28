@@ -2,6 +2,8 @@ package docker
 
 import (
 	"context"
+
+	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/global"
 
 	"github.com/docker/docker/api/types"
@@ -14,7 +16,12 @@ type Client struct {
 }
 
 func NewClient() (Client, error) {
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	var settingItem model.Setting
+	_ = global.DB.Where("key = ?", "DockerSockPath").First(&settingItem).Error
+	if len(settingItem.Value) == 0 {
+		settingItem.Value = "unix:///var/run/docker.sock"
+	}
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithHost(settingItem.Value), client.WithAPIVersionNegotiation())
 	if err != nil {
 		return Client{}, err
 	}
@@ -25,7 +32,12 @@ func NewClient() (Client, error) {
 }
 
 func NewDockerClient() (*client.Client, error) {
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	var settingItem model.Setting
+	_ = global.DB.Where("key = ?", "DockerSockPath").First(&settingItem).Error
+	if len(settingItem.Value) == 0 {
+		settingItem.Value = "unix:///var/run/docker.sock"
+	}
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithHost(settingItem.Value), client.WithAPIVersionNegotiation())
 	if err != nil {
 		return nil, err
 	}
