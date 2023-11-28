@@ -35,3 +35,13 @@ var UpdateWebsiteSSL = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddDockerSockPath = &gormigrate.Migration{
+	ID: "20231128-add-docker-sock-path",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "DockerSockPath", Value: "unix:///var/run/docker.sock"}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

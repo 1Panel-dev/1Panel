@@ -150,6 +150,16 @@
                                     <el-radio label="systemd">systemd</el-radio>
                                 </el-radio-group>
                             </el-form-item>
+                            <el-form-item :label="$t('container.sockPath')" prop="dockerSockPath">
+                                <el-input disabled v-model="form.dockerSockPath">
+                                    <template #append>
+                                        <el-button @click="onChangeSockPath" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                                <span class="input-help">{{ $t('container.sockPathHelper') }}</span>
+                            </el-form-item>
                         </el-form>
                     </el-col>
                 </el-row>
@@ -220,6 +230,7 @@
         <Registry ref="registriesRef" @search="search" />
         <LogOption ref="logOptionRef" @search="search" />
         <Ipv6Option ref="ipv6OptionRef" @search="search" />
+        <SockPath ref="sockPathRef" @search="search" />
         <ConfirmDialog ref="confirmDialogRefIpv6" @confirm="onSaveIPv6" @cancel="search" />
         <ConfirmDialog ref="confirmDialogRefIptable" @confirm="onSubmitOpenIPtable" @cancel="search" />
         <ConfirmDialog ref="confirmDialogRefLog" @confirm="onSubmitSaveLog" @cancel="search" />
@@ -240,6 +251,7 @@ import Mirror from '@/views/container/setting/mirror/index.vue';
 import Registry from '@/views/container/setting/registry/index.vue';
 import LogOption from '@/views/container/setting/log/index.vue';
 import Ipv6Option from '@/views/container/setting/ipv6/index.vue';
+import SockPath from '@/views/container/setting/sock-path/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import i18n from '@/lang';
 import {
@@ -249,6 +261,7 @@ import {
     updateDaemonJson,
     updateDaemonJsonByfile,
 } from '@/api/modules/container';
+import { getSettingInfo } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
 import { checkNumberRange } from '@/global/form-rules';
 
@@ -271,6 +284,7 @@ const confirmDialogRefIptable = ref();
 const confirmDialogRefIpv6 = ref();
 const logOptionShow = ref();
 const ipv6OptionShow = ref();
+const sockPathRef = ref();
 
 const form = reactive({
     isSwarm: false,
@@ -290,12 +304,13 @@ const form = reactive({
     logOptionShow: false,
     logMaxSize: '',
     logMaxFile: 3,
+
+    dockerSockPath: '',
 });
 const rules = reactive({
     logMaxSize: [checkNumberRange(1, 1024000)],
     logMaxFile: [checkNumberRange(1, 100)],
 });
-
 const formRef = ref<FormInstance>();
 const dockerConf = ref();
 const confirmDialogRefFile = ref();
@@ -316,6 +331,10 @@ const onChangeMirrors = () => {
 };
 const onChangeRegistries = () => {
     registriesRef.value.acceptParams({ registries: form.registries });
+};
+
+const onChangeSockPath = () => {
+    sockPathRef.value.acceptParams({ dockerSockPath: form.dockerSockPath });
 };
 
 const handleIPv6 = async () => {
@@ -496,6 +515,9 @@ const search = async () => {
     form.fixedCidrV6 = res.data.fixedCidrV6;
     form.ip6Tables = res.data.ip6Tables;
     form.experimental = res.data.experimental;
+
+    const settingRes = await getSettingInfo();
+    form.dockerSockPath = settingRes.data.dockerSockPath || 'unix:///var/run/docker-x.sock';
 };
 
 onMounted(() => {

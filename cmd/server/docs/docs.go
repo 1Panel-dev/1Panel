@@ -16760,6 +16760,9 @@ const docTemplate = `{
                 "dingVars": {
                     "type": "string"
                 },
+                "dockerSockPath": {
+                    "type": "string"
+                },
                 "email": {
                     "type": "string"
                 },

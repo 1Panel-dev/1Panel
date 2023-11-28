@@ -7,6 +7,7 @@ export namespace Setting {
         email: string;
         systemIP: string;
         systemVersion: string;
+        dockerSockPath: string;
 
         sessionTimeout: number;
         localTime: string;

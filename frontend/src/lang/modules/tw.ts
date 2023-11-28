@@ -715,6 +715,11 @@ const message = {
         daemonJsonPath: '配置路徑',
         serviceUnavailable: '當前未啟動 Docker 服務，請在',
         startIn: '中開啟',
+        sockPath: 'Socket 路徑',
+        sockPathHelper: 'Docker 守護進程（Docker Daemon）與客戶端之間的通信通道',
+        sockPathHelper1: '默認值為 unix:///var/run/docker-x.sock',
+        sockPathMsg: '保存設定 Socket 路徑可能導致 Docker 服務不可用，是否繼續？',
+        sockPathErr: '請選擇或輸入正確的 Docker sock 文件路徑',
     },
     cronjob: {
         create: '創建計劃任務',
