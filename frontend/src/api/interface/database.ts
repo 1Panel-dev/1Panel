@@ -213,6 +213,13 @@ export namespace Database {
         port: number;
         username: string;
         password: string;
+
+        ssl: boolean;
+        rootCert: string;
+        clientKey: string;
+        clientCert: string;
+        skipVerify: boolean;
+
         description: string;
     }
     export interface SearchDatabasePage {
@@ -239,6 +246,13 @@ export namespace Database {
         port: number;
         username: string;
         password: string;
+
+        ssl: boolean;
+        rootCert: string;
+        clientKey: string;
+        clientCert: string;
+        skipVerify: boolean;
+
         description: string;
     }
     export interface DatabaseUpdate {
@@ -248,6 +262,13 @@ export namespace Database {
         port: number;
         username: string;
         password: string;
+
+        ssl: boolean;
+        rootCert: string;
+        clientKey: string;
+        clientCert: string;
+        skipVerify: boolean;
+
         description: string;
     }
     export interface DatabaseDelete {

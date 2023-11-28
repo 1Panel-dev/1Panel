@@ -35,7 +35,12 @@ func NewMysqlClient(conn client.DBInfo) (MysqlClient, error) {
 	if strings.Contains(conn.Address, ":") {
 		conn.Address = fmt.Sprintf("[%s]", conn.Address)
 	}
-	connArgs := fmt.Sprintf("%s:%s@tcp(%s:%d)/?charset=utf8", conn.Username, conn.Password, conn.Address, conn.Port)
+
+	tlsItem, err := client.ConnWithSSL(conn.SSL, conn.SkipVerify, conn.ClientKey, conn.ClientCert, conn.RootCert)
+	if err != nil {
+		return nil, err
+	}
+	connArgs := fmt.Sprintf("%s:%s@tcp(%s:%d)/?charset=utf8%s", conn.Username, conn.Password, conn.Address, conn.Port, tlsItem)
 	db, err := sql.Open("mysql", connArgs)
 	if err != nil {
 		return nil, err
@@ -57,5 +62,11 @@ func NewMysqlClient(conn client.DBInfo) (MysqlClient, error) {
 		Password: conn.Password,
 		Address:  conn.Address,
 		Port:     conn.Port,
+
+		SSL:        conn.SSL,
+		RootCert:   conn.RootCert,
+		ClientKey:  conn.ClientKey,
+		ClientCert: conn.ClientCert,
+		SkipVerify: conn.SkipVerify,
 	}), nil
 }

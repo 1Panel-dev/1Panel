@@ -391,6 +391,11 @@ const message = {
         address: 'DB address',
         version: 'DB version',
         userHelper: 'The root user or a database user with root privileges can access the remote database.',
+        ssl: 'Use SSL',
+        clientKey: 'Client Private Key',
+        clientCert: 'Client Certificate',
+        caCert: 'CA Certificate',
+        skipVerify: 'Ignore Certificate Validity Check',
 
         formatHelper:
             'The current database character set is {0}, the character set inconsistency may cause recovery failure',

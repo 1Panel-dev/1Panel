@@ -101,13 +101,34 @@ export const listDatabases = (type: string) => {
     return http.get<Array<Database.DatabaseOption>>(`/databases/db/list/${type}`);
 };
 export const checkDatabase = (params: Database.DatabaseCreate) => {
-    return http.post<boolean>(`/databases/db/check`, params, TimeoutEnum.T_40S);
+    let request = deepCopy(params) as Database.DatabaseCreate;
+    if (request.ssl) {
+        request.clientKey = Base64.encode(request.clientKey);
+        request.clientCert = Base64.encode(request.clientCert);
+        request.rootCert = Base64.encode(request.rootCert);
+    }
+
+    return http.post<boolean>(`/databases/db/check`, request, TimeoutEnum.T_40S);
 };
 export const addDatabase = (params: Database.DatabaseCreate) => {
-    return http.post(`/databases/db`, params, TimeoutEnum.T_40S);
+    let request = deepCopy(params) as Database.DatabaseCreate;
+    if (request.ssl) {
+        request.clientKey = Base64.encode(request.clientKey);
+        request.clientCert = Base64.encode(request.clientCert);
+        request.rootCert = Base64.encode(request.rootCert);
+    }
+
+    return http.post(`/databases/db`, request, TimeoutEnum.T_40S);
 };
 export const editDatabase = (params: Database.DatabaseUpdate) => {
-    return http.post(`/databases/db/update`, params, TimeoutEnum.T_40S);
+    let request = deepCopy(params) as Database.DatabaseCreate;
+    if (request.ssl) {
+        request.clientKey = Base64.encode(request.clientKey);
+        request.clientCert = Base64.encode(request.clientCert);
+        request.rootCert = Base64.encode(request.rootCert);
+    }
+
+    return http.post(`/databases/db/update`, request, TimeoutEnum.T_40S);
 };
 export const deleteCheckDatabase = (id: number) => {
     return http.post<Array<string>>(`/databases/db/del/check`, { id: id });

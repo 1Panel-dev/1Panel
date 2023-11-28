@@ -641,6 +641,11 @@ func LoadMysqlClientByFrom(database string) (mysql.MysqlClient, string, error) {
 		dbInfo.Port = databaseItem.Port
 		dbInfo.Username = databaseItem.Username
 		dbInfo.Password = databaseItem.Password
+		dbInfo.SSL = databaseItem.SSL
+		dbInfo.ClientKey = databaseItem.ClientKey
+		dbInfo.ClientCert = databaseItem.ClientCert
+		dbInfo.RootCert = databaseItem.RootCert
+		dbInfo.SkipVerify = databaseItem.SkipVerify
 		version = databaseItem.Version
 
 	} else {

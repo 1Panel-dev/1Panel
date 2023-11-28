@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"encoding/base64"
+
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -20,6 +22,14 @@ func (b *BaseApi) CreateDatabase(c *gin.Context) {
 	var req dto.DatabaseCreate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
+	}
+	if req.SSL {
+		key, _ := base64.StdEncoding.DecodeString(req.ClientKey)
+		req.ClientKey = string(key)
+		cert, _ := base64.StdEncoding.DecodeString(req.ClientCert)
+		req.ClientCert = string(cert)
+		ca, _ := base64.StdEncoding.DecodeString(req.RootCert)
+		req.RootCert = string(ca)
 	}
 
 	if err := databaseService.Create(req); err != nil {
@@ -42,6 +52,14 @@ func (b *BaseApi) CheckDatabase(c *gin.Context) {
 	var req dto.DatabaseCreate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
+	}
+	if req.SSL {
+		clientKey, _ := base64.StdEncoding.DecodeString(req.ClientKey)
+		req.ClientKey = string(clientKey)
+		clientCert, _ := base64.StdEncoding.DecodeString(req.ClientCert)
+		req.ClientCert = string(clientCert)
+		rootCert, _ := base64.StdEncoding.DecodeString(req.RootCert)
+		req.RootCert = string(rootCert)
 	}
 
 	helper.SuccessWithData(c, databaseService.CheckDatabase(req))
@@ -172,6 +190,14 @@ func (b *BaseApi) UpdateDatabase(c *gin.Context) {
 	var req dto.DatabaseUpdate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
+	}
+	if req.SSL {
+		cKey, _ := base64.StdEncoding.DecodeString(req.ClientKey)
+		req.ClientKey = string(cKey)
+		cCert, _ := base64.StdEncoding.DecodeString(req.ClientCert)
+		req.ClientCert = string(cCert)
+		ca, _ := base64.StdEncoding.DecodeString(req.RootCert)
+		req.RootCert = string(ca)
 	}
 
 	if err := databaseService.Update(req); err != nil {

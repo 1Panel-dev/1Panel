@@ -43,7 +43,7 @@
             </span>
         </el-col>
         <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
-            <el-popover placement="bottom" :width="160" trigger="hover">
+            <el-popover placement="bottom" :width="160" trigger="hover" v-if="chartsOption['memory']">
                 <el-tag style="font-weight: 500">{{ $t('home.mem') }}:</el-tag>
                 <el-tag class="tagClass">
                     {{ $t('home.total') }}: {{ formatNumber(currentInfo.memoryTotal / 1024 / 1024) }} MB
@@ -57,10 +57,8 @@
                 <el-tag class="tagClass">
                     {{ $t('home.percent') }}: {{ formatNumber(currentInfo.memoryUsedPercent) }}%
                 </el-tag>
-                <div v-if="currentInfo.swapMemoryTotal">
-                    <el-row :gutter="5" class="mt-2">
-                        <el-tag style="font-weight: 500">{{ $t('home.swapMem') }}:</el-tag>
-                    </el-row>
+                <div v-if="currentInfo.swapMemoryTotal" class="mt-2">
+                    <el-tag style="font-weight: 500">{{ $t('home.swapMem') }}:</el-tag>
                     <el-tag class="tagClass">
                         {{ $t('home.total') }}: {{ formatNumber(currentInfo.swapMemoryTotal / 1024 / 1024) }} MB
                     </el-tag>

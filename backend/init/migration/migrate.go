@@ -57,6 +57,7 @@ func Init() {
 		migrations.UpdateWebsiteSSL,
 		migrations.AddWebsiteCA,
 		migrations.AddDockerSockPath,
+		migrations.AddDatabaseSSL,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

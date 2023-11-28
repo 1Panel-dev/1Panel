@@ -383,6 +383,11 @@ const message = {
         address: '数据库地址',
         version: '数据库版本',
         userHelper: 'root 用户或者拥有 root 权限的数据库用户',
+        ssl: '使用 SSL',
+        clientKey: '客户端私钥',
+        clientCert: '客户端证书',
+        caCert: 'CA 证书',
+        skipVerify: '忽略校验证书可用性检测',
 
         formatHelper: '当前数据库字符集为 {0}，字符集不一致可能导致恢复失败',
         selectFile: '选择文件',
