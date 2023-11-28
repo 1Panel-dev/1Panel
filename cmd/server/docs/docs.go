@@ -12879,6 +12879,57 @@ const docTemplate = `{
                 }
             }
         },
+        "/websites/ssl/download": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "下载证书文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Website SSL"
+                ],
+                "summary": "Download SSL  file",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.WebsiteResourceReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [
+                        {
+                            "db": "website_ssls",
+                            "input_column": "id",
+                            "input_value": "id",
+                            "isList": false,
+                            "output_column": "primary_domain",
+                            "output_value": "domain"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "id"
+                    ],
+                    "formatEN": "download ssl file [domain]",
+                    "formatZH": "下载证书文件 [domain]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/websites/ssl/obtain": {
             "post": {
                 "security": [
@@ -17478,6 +17529,9 @@ const docTemplate = `{
                 "createdAt": {
                     "type": "string"
                 },
+                "description": {
+                    "type": "string"
+                },
                 "dir": {
                     "type": "string"
                 },
@@ -19522,14 +19576,33 @@ const docTemplate = `{
         "request.WebsiteSSLUpdate": {
             "type": "object",
             "required": [
-                "id"
+                "id",
+                "type"
             ],
             "properties": {
                 "autoRenew": {
                     "type": "boolean"
                 },
+                "certificate": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
+                },
+                "privateKey": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "autoRenew",
+                        "description",
+                        "certificate",
+                        "privateKey"
+                    ]
                 }
             }
         },
@@ -19550,6 +19623,9 @@ const docTemplate = `{
                 },
                 "privateKeyPath": {
                     "type": "string"
+                },
+                "sslID": {
+                    "type": "integer"
                 },
                 "type": {
                     "type": "string",

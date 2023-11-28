@@ -3,15 +3,13 @@
         <template #header>
             <DrawerHeader :header="$t('ssl.detail')" :back="handleClose" />
         </template>
-        <div>
+        <div v-loading="loading">
             <el-radio-group v-model="curr">
                 <el-radio-button label="detail">{{ $t('ssl.msg') }}</el-radio-button>
                 <el-radio-button label="ssl">{{ $t('ssl.ssl') }}</el-radio-button>
                 <el-radio-button label="key">{{ $t('ssl.key') }}</el-radio-button>
             </el-radio-group>
-            <br />
-            <br />
-            <div v-if="curr === 'detail'">
+            <div v-if="curr === 'detail'" class="mt-5">
                 <el-descriptions border :column="1">
                     <el-descriptions-item :label="$t('website.primaryDomain')">
                         {{ ssl.primaryDomain }}
@@ -52,14 +50,14 @@
                     </el-descriptions-item>
                 </el-descriptions>
             </div>
-            <div v-else-if="curr === 'ssl'">
+            <div v-else-if="curr === 'ssl'" class="mt-5">
                 <el-input v-model="ssl.pem" :autosize="{ minRows: 15, maxRows: 30 }" type="textarea" id="textArea" />
                 <div>
                     <br />
                     <el-button type="primary" @click="copyText(ssl.pem)">{{ $t('file.copy') }}</el-button>
                 </div>
             </div>
-            <div v-else>
+            <div v-else class="mt-5">
                 <el-input
                     v-model="ssl.privateKey"
                     :autosize="{ minRows: 15, maxRows: 30 }"
@@ -88,6 +86,7 @@ const open = ref(false);
 const id = ref(0);
 const curr = ref('detail');
 const ssl = ref<any>({});
+const loading = ref(false);
 
 const handleClose = () => {
     open.value = false;

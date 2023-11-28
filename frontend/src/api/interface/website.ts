@@ -490,4 +490,8 @@ export namespace Website {
     export interface RenewSSLByCA {
         SSLID: number;
     }
+
+    export interface SSLDownload {
+        id: number;
+    }
 }
