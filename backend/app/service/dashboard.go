@@ -1,9 +1,9 @@
 package service
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -215,26 +215,25 @@ func loadDiskInfo() []dto.DiskInfo {
 		mounts = append(mounts, diskInfo{Type: fields[1], Device: fields[0], Mount: fields[6]})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-	defer cancel()
 	var wg sync.WaitGroup
 	wg.Add(len(mounts))
 	for i := 0; i < len(mounts); i++ {
-		go func(index int) {
+		go func(timeoutCh <-chan time.Time, mount diskInfo) {
 			defer wg.Done()
+
+			var itemData dto.DiskInfo
+			itemData.Path = mount.Mount
+			itemData.Type = mount.Type
+			itemData.Device = mount.Device
 			select {
-			case <-ctx.Done():
-				global.LOG.Errorf("load disk info from %s failed, err: timeout", mounts[index].Mount)
-				return
+			case <-timeoutCh:
+				datas = append(datas, itemData)
+				global.LOG.Errorf("load disk info from %s failed, err: timeout", mount.Mount)
 			default:
-				state, err := disk.Usage(mounts[index].Mount)
+				state, err := disk.Usage(mount.Mount)
 				if err != nil {
 					return
 				}
-				var itemData dto.DiskInfo
-				itemData.Path = mounts[index].Mount
-				itemData.Type = mounts[index].Type
-				itemData.Device = mounts[index].Device
 				itemData.Total = state.Total
 				itemData.Free = state.Free
 				itemData.Used = state.Used
@@ -245,8 +244,12 @@ func loadDiskInfo() []dto.DiskInfo {
 				itemData.InodesUsedPercent = state.InodesUsedPercent
 				datas = append(datas, itemData)
 			}
-		}(i)
+		}(time.After(5*time.Second), mounts[i])
 	}
 	wg.Wait()
+
+	sort.Slice(datas, func(i, j int) bool {
+		return datas[i].Path < datas[j].Path
+	})
 	return datas
 }
