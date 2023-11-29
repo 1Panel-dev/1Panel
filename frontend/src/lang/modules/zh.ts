@@ -1738,6 +1738,7 @@ const message = {
         dir: '目录',
         pushDirHelper: '会在此目录下生成两个文件，证书文件：fullchain.pem 密钥文件：privkey.pem',
         organizationDetail: '机构详情',
+        fromWebsite: '从网站中获取',
     },
     firewall: {
         create: '创建规则',

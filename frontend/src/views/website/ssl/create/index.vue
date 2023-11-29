@@ -6,9 +6,25 @@
         <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
                 <el-form ref="sslForm" label-position="top" :model="ssl" label-width="100px" :rules="rules">
-                    <el-form-item :label="$t('website.primaryDomain')" prop="primaryDomain">
-                        <el-input v-model.trim="ssl.primaryDomain"></el-input>
-                    </el-form-item>
+                    <el-row :gutter="20">
+                        <el-col :span="12">
+                            <el-form-item :label="$t('website.primaryDomain')" prop="primaryDomain">
+                                <el-input v-model.trim="ssl.primaryDomain"></el-input>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item :label="$t('ssl.fromWebsite')">
+                                <el-select v-model="websiteID" @change="changeWebsite">
+                                    <el-option
+                                        v-for="(site, key) in websites"
+                                        :key="key"
+                                        :value="site.id"
+                                        :label="site.primaryDomain"
+                                    ></el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
                     <el-form-item :label="$t('website.otherDomains')" prop="otherDomains">
                         <el-input
                             type="textarea"
@@ -104,7 +120,7 @@
 <script lang="ts" setup>
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { Website } from '@/api/interface/website';
-import { CreateSSL, SearchAcmeAccount, SearchDnsAccount } from '@/api/modules/website';
+import { CreateSSL, ListWebsites, SearchAcmeAccount, SearchDnsAccount } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
@@ -136,6 +152,7 @@ const acmeReq = reactive({
 const dnsAccounts = ref<Website.DnsAccount[]>();
 const acmeAccounts = ref<Website.AcmeAccount[]>();
 const sslForm = ref<FormInstance>();
+const websites = ref();
 const rules = ref({
     primaryDomain: [Rules.requiredInput, Rules.domain],
     acmeAccountId: [Rules.requiredSelectBusiness],
@@ -145,6 +162,7 @@ const rules = ref({
     keyType: [Rules.requiredInput],
     dir: [Rules.requiredInput],
 });
+const websiteID = ref();
 
 const initData = () => ({
     primaryDomain: '',
@@ -173,6 +191,7 @@ const resetForm = () => {
     sslForm.value?.resetFields();
     dnsResolve.value = [];
     ssl.value = initData();
+    websiteID.value = undefined;
 };
 
 const acceptParams = () => {
@@ -180,6 +199,7 @@ const acceptParams = () => {
     ssl.value.websiteId = Number(id.value);
     getAcmeAccounts();
     getDnsAccounts();
+    listwebsites();
     open.value = true;
 };
 
@@ -205,6 +225,28 @@ const getDnsAccounts = async () => {
 
 const changeProvider = () => {
     dnsResolve.value = [];
+};
+
+const listwebsites = async () => {
+    const res = await ListWebsites();
+    websites.value = res.data;
+};
+
+const changeWebsite = () => {
+    if (websiteID.value > 0) {
+        const selectedWebsite = websites.value.find((website) => website.id == websiteID.value);
+
+        if (selectedWebsite && selectedWebsite.domains && selectedWebsite.domains.length > 0) {
+            const primaryDomain = selectedWebsite.domains[0].domain;
+            const otherDomains = selectedWebsite.domains
+                .slice(1)
+                .map((domain) => domain.domain)
+                .join('\n');
+
+            ssl.value.primaryDomain = primaryDomain;
+            ssl.value.otherDomains = otherDomains;
+        }
+    }
 };
 
 const submit = async (formEl: FormInstance | undefined) => {

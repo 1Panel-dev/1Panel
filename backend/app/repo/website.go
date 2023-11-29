@@ -95,7 +95,7 @@ func (w *WebsiteRepo) Page(page, size int, opts ...DBOption) (int64, []model.Web
 
 func (w *WebsiteRepo) List(opts ...DBOption) ([]model.Website, error) {
 	var websites []model.Website
-	err := getDb(opts...).Model(&model.Website{}).Preload("WebsiteSSL").Find(&websites).Error
+	err := getDb(opts...).Model(&model.Website{}).Preload("Domains").Preload("WebsiteSSL").Find(&websites).Error
 	return websites, err
 }
 

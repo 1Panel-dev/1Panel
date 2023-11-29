@@ -1852,6 +1852,7 @@ const message = {
         pushDirHelper:
             'Two files will be generated in this directory, the certificate file: fullchain.pem and the key file: privkey.pem',
         organizationDetail: 'Organization Details',
+        fromWebsite: 'From Websites',
     },
     firewall: {
         create: 'Create rule',
