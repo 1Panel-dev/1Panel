@@ -418,7 +418,7 @@ func getFormat(cType CompressType) archiver.CompressedArchive {
 	case SdkTarGz:
 		format.Compression = archiver.Gz{}
 		format.Archival = archiver.Tar{}
-	case SdkZip:
+	case SdkZip, Zip:
 		format.Archival = archiver.Zip{
 			Compression: zip.Deflate,
 		}
@@ -457,6 +457,10 @@ func (f FileOp) Compress(srcRiles []string, dst string, name string, cType Compr
 
 	switch cType {
 	case Zip:
+		if err := ZipFile(files, out); err == nil {
+			return nil
+		}
+		_ = f.DeleteFile(dstFile)
 		return NewZipArchiver().Compress(srcRiles, dstFile)
 	default:
 		err = format.Archive(context.Background(), out, files)
@@ -481,67 +485,72 @@ func decodeGBK(input string) (string, error) {
 	return decoded, nil
 }
 
-func (f FileOp) Decompress(srcFile string, dst string, cType CompressType) error {
-	switch cType {
-	case Tar, Zip:
-		shellArchiver, err := NewShellArchiver(cType)
-		if err != nil {
-			return err
-		}
-		return shellArchiver.Extract(srcFile, dst)
-	default:
-		format := getFormat(cType)
-		handler := func(ctx context.Context, archFile archiver.File) error {
-			info := archFile.FileInfo
-			if isIgnoreFile(archFile.Name()) {
-				return nil
-			}
-			fileName := archFile.NameInArchive
-			var err error
-			if header, ok := archFile.Header.(cZip.FileHeader); ok {
-				if header.NonUTF8 && header.Flags == 0 {
-					fileName, err = decodeGBK(fileName)
-					if err != nil {
-						return err
-					}
-				}
-			}
-			filePath := filepath.Join(dst, fileName)
-			if archFile.FileInfo.IsDir() {
-				if err := f.Fs.MkdirAll(filePath, info.Mode()); err != nil {
-					return err
-				}
-				return nil
-			} else {
-				parentDir := path.Dir(filePath)
-				if !f.Stat(parentDir) {
-					if err := f.Fs.MkdirAll(parentDir, info.Mode()); err != nil {
-						return err
-					}
-				}
-			}
-			fr, err := archFile.Open()
-			if err != nil {
-				return err
-			}
-			defer fr.Close()
-			fw, err := f.Fs.OpenFile(filePath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, info.Mode())
-			if err != nil {
-				return err
-			}
-			defer fw.Close()
-			if _, err := io.Copy(fw, fr); err != nil {
-				return err
-			}
-
+func (f FileOp) decompressWithSDK(srcFile string, dst string, cType CompressType) error {
+	format := getFormat(cType)
+	handler := func(ctx context.Context, archFile archiver.File) error {
+		info := archFile.FileInfo
+		if isIgnoreFile(archFile.Name()) {
 			return nil
 		}
-		input, err := f.Fs.Open(srcFile)
+		fileName := archFile.NameInArchive
+		var err error
+		if header, ok := archFile.Header.(cZip.FileHeader); ok {
+			if header.NonUTF8 && header.Flags == 0 {
+				fileName, err = decodeGBK(fileName)
+				if err != nil {
+					return err
+				}
+			}
+		}
+		filePath := filepath.Join(dst, fileName)
+		if archFile.FileInfo.IsDir() {
+			if err := f.Fs.MkdirAll(filePath, info.Mode()); err != nil {
+				return err
+			}
+			return nil
+		} else {
+			parentDir := path.Dir(filePath)
+			if !f.Stat(parentDir) {
+				if err := f.Fs.MkdirAll(parentDir, info.Mode()); err != nil {
+					return err
+				}
+			}
+		}
+		fr, err := archFile.Open()
 		if err != nil {
 			return err
 		}
-		return format.Extract(context.Background(), input, nil, handler)
+		defer fr.Close()
+		fw, err := f.Fs.OpenFile(filePath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, info.Mode())
+		if err != nil {
+			return err
+		}
+		defer fw.Close()
+		if _, err := io.Copy(fw, fr); err != nil {
+			return err
+		}
+
+		return nil
 	}
+	input, err := f.Fs.Open(srcFile)
+	if err != nil {
+		return err
+	}
+	return format.Extract(context.Background(), input, nil, handler)
+}
+
+func (f FileOp) Decompress(srcFile string, dst string, cType CompressType) error {
+	if err := f.decompressWithSDK(srcFile, dst, cType); err != nil {
+		if cType == Tar || cType == Zip {
+			shellArchiver, err := NewShellArchiver(cType)
+			if err != nil {
+				return err
+			}
+			return shellArchiver.Extract(srcFile, dst)
+		}
+		return err
+	}
+	return nil
 }
 
 func (f FileOp) Backup(srcFile string) (string, error) {
@@ -576,4 +585,47 @@ func (f FileOp) CopyAndBackup(src string) (string, error) {
 		return backupPath, err
 	}
 	return backupPath, nil
+}
+
+func ZipFile(files []archiver.File, dst afero.File) error {
+	zw := zip.NewWriter(dst)
+	defer zw.Close()
+
+	for _, file := range files {
+		hdr, err := zip.FileInfoHeader(file)
+		if err != nil {
+			return err
+		}
+		hdr.Name = file.NameInArchive
+		if file.IsDir() {
+			if !strings.HasSuffix(hdr.Name, "/") {
+				hdr.Name += "/"
+			}
+			hdr.Method = zip.Store
+		}
+		w, err := zw.CreateHeader(hdr)
+		if err != nil {
+			return err
+		}
+		if file.IsDir() {
+			continue
+		}
+
+		if file.LinkTarget != "" {
+			_, err = w.Write([]byte(filepath.ToSlash(file.LinkTarget)))
+			if err != nil {
+				return err
+			}
+		} else {
+			fileReader, err := file.Open()
+			if err != nil {
+				return err
+			}
+			_, err = io.Copy(w, fileReader)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
