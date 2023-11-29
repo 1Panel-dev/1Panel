@@ -110,7 +110,7 @@ func (b *BaseApi) ObtainWebsiteCA(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	if err := websiteCAService.ObtainSSL(req); err != nil {
+	if _, err := websiteCAService.ObtainSSL(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
@@ -131,7 +131,7 @@ func (b *BaseApi) RenewWebsiteCA(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	if err := websiteCAService.ObtainSSL(request.WebsiteCAObtain{
+	if _, err := websiteCAService.ObtainSSL(request.WebsiteCAObtain{
 		SSLID: req.SSLID,
 		Renew: true,
 		Unit:  "year",

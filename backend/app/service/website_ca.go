@@ -37,7 +37,7 @@ type IWebsiteCAService interface {
 	Create(create request.WebsiteCACreate) (*request.WebsiteCACreate, error)
 	GetCA(id uint) (*response.WebsiteCADTO, error)
 	Delete(id uint) error
-	ObtainSSL(req request.WebsiteCAObtain) error
+	ObtainSSL(req request.WebsiteCAObtain) (*model.WebsiteSSL, error)
 }
 
 func NewIWebsiteCAService() IWebsiteCAService {
@@ -169,10 +169,17 @@ func (w WebsiteCAService) Delete(id uint) error {
 	if len(ssls) > 0 {
 		return buserr.New("ErrDeleteCAWithSSL")
 	}
+	exist, err := websiteCARepo.GetFirst(commonRepo.WithByID(id))
+	if err != nil {
+		return err
+	}
+	if exist.Name == "1Panel" {
+		return buserr.New("ErrDefaultCA")
+	}
 	return websiteCARepo.DeleteBy(commonRepo.WithByID(id))
 }
 
-func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) error {
+func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.WebsiteSSL, error) {
 	var (
 		domains    []string
 		ips        []net.IP
@@ -183,11 +190,11 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) error {
 	if req.Renew {
 		websiteSSL, err = websiteSSLRepo.GetFirst(commonRepo.WithByID(req.SSLID))
 		if err != nil {
-			return err
+			return nil, err
 		}
 		ca, err = websiteCARepo.GetFirst(commonRepo.WithByID(websiteSSL.CaID))
 		if err != nil {
-			return err
+			return nil, err
 		}
 		existDomains := []string{websiteSSL.PrimaryDomain}
 		if websiteSSL.Domains != "" {
@@ -203,7 +210,7 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) error {
 	} else {
 		ca, err = websiteCARepo.GetFirst(commonRepo.WithByID(req.ID))
 		if err != nil {
-			return err
+			return nil, err
 		}
 		websiteSSL = &model.WebsiteSSL{
 			Provider:  constant.SelfSigned,
@@ -214,7 +221,7 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) error {
 		}
 		if req.PushDir {
 			if !files.NewFileOp().Stat(req.Dir) {
-				return buserr.New(constant.ErrLinkPathNotFound)
+				return nil, buserr.New(constant.ErrLinkPathNotFound)
 			}
 			websiteSSL.Dir = req.Dir
 		}
@@ -223,7 +230,7 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) error {
 			for _, domain := range domainArray {
 				if !common.IsValidDomain(domain) {
 					err = buserr.WithName("ErrDomainFormat", domain)
-					return err
+					return nil, err
 				} else {
 					if ipAddress := net.ParseIP(domain); ipAddress == nil {
 						domains = append(domains, domain)
@@ -241,32 +248,32 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) error {
 
 	rootCertBlock, _ := pem.Decode([]byte(ca.CSR))
 	if rootCertBlock == nil {
-		return buserr.New("ErrSSLCertificateFormat")
+		return nil, buserr.New("ErrSSLCertificateFormat")
 	}
 	rootCsr, err := x509.ParseCertificate(rootCertBlock.Bytes)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	rootPrivateKeyBlock, _ := pem.Decode([]byte(ca.PrivateKey))
 	if rootPrivateKeyBlock == nil {
-		return buserr.New("ErrSSLCertificateFormat")
+		return nil, buserr.New("ErrSSLCertificateFormat")
 	}
 
 	var rootPrivateKey any
 	if ssl.KeyType(websiteSSL.KeyType) == certcrypto.EC256 || ssl.KeyType(websiteSSL.KeyType) == certcrypto.EC384 {
 		rootPrivateKey, err = x509.ParseECPrivateKey(rootPrivateKeyBlock.Bytes)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	} else {
 		rootPrivateKey, err = x509.ParsePKCS1PrivateKey(rootPrivateKeyBlock.Bytes)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 	interPrivateKey, interPublicKey, _, err := createPrivateKey(websiteSSL.KeyType)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	notAfter := time.Now()
 	if req.Unit == "year" {
@@ -287,16 +294,16 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) error {
 	}
 	interDer, err := x509.CreateCertificate(rand.Reader, interCsr, rootCsr, interPublicKey, rootPrivateKey)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	interCert, err := x509.ParseCertificate(interDer)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	_, publicKey, privateKeyBytes, err := createPrivateKey(websiteSSL.KeyType)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	csr := &x509.Certificate{
@@ -314,11 +321,11 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) error {
 
 	der, err := x509.CreateCertificate(rand.Reader, csr, interCert, publicKey, interPrivateKey)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	cert, err := x509.ParseCertificate(der)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	certBlock := &pem.Block{
@@ -335,11 +342,11 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) error {
 
 	if req.Renew {
 		if err := websiteSSLRepo.Save(websiteSSL); err != nil {
-			return err
+			return nil, err
 		}
 	} else {
 		if err := websiteSSLRepo.Create(context.Background(), websiteSSL); err != nil {
-			return err
+			return nil, err
 		}
 	}
 
@@ -348,7 +355,7 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) error {
 	logger := log.New(logFile, "", log.LstdFlags)
 	logger.Println(i18n.GetMsgWithMap("ApplySSLSuccess", map[string]interface{}{"domain": strings.Join(domains, ",")}))
 	saveCertificateFile(websiteSSL, logger)
-	return nil
+	return websiteSSL, nil
 }
 
 func createPrivateKey(keyType string) (privateKey any, publicKey any, privateKeyBytes []byte, err error) {
