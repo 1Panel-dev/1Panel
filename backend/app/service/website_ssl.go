@@ -260,6 +260,25 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 		if err != nil {
 			return
 		}
+
+		websites, _ := websiteRepo.GetBy(websiteRepo.WithWebsiteSSLID(websiteSSL.ID))
+		if len(websites) > 0 {
+			for _, website := range websites {
+				legoLogger.Logger.Println(i18n.GetMsgWithMap("ApplyWebSiteSSLLog", map[string]interface{}{"name": website.PrimaryDomain}))
+				if err := createPemFile(website, *websiteSSL); err != nil {
+					legoLogger.Logger.Println(i18n.GetMsgWithMap("ErrUpdateWebsiteSSL", map[string]interface{}{"name": website.PrimaryDomain, "err": err.Error()}))
+				}
+			}
+			nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+			if err != nil {
+				return
+			}
+			if err := opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
+				legoLogger.Logger.Println(i18n.GetMsgByKey(constant.ErrSSLApply))
+				return
+			}
+			legoLogger.Logger.Println(i18n.GetMsgByKey("ApplyWebSiteSSLSuccess"))
+		}
 	}()
 
 	return nil

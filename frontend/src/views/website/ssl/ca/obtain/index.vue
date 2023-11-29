@@ -14,7 +14,7 @@
                             type="textarea"
                             :autosize="{ minRows: 4, maxRows: 10 }"
                             v-model="obtain.domains"
-                            :placeholder="$t('website.domainHelper')"
+                            :placeholder="$t('ssl.domainHelper')"
                         ></el-input>
                     </el-form-item>
                     <el-form-item :label="$t('website.keyType')" prop="keyType">
