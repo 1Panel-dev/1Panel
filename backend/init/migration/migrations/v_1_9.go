@@ -1,7 +1,9 @@
 package migrations
 
 import (
+	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/app/service"
 	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/gorm"
 )
@@ -50,6 +52,26 @@ var AddDatabaseSSL = &gormigrate.Migration{
 	ID: "20231126-add-database-ssl",
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.AutoMigrate(&model.Database{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var AddDefaultCA = &gormigrate.Migration{
+	ID: "20231129-add-default-ca",
+	Migrate: func(tx *gorm.DB) error {
+		caService := service.NewIWebsiteCAService()
+		if _, err := caService.Create(request.WebsiteCACreate{
+			CommonName:       "1Panel-CA",
+			Country:          "CN",
+			KeyType:          "P256",
+			Name:             "1Panel",
+			Organization:     "FIT2CLOUD",
+			OrganizationUint: "1Panel",
+			Province:         "Beijing",
+			City:             "Beijing",
+		}); err != nil {
 			return err
 		}
 		return nil

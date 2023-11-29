@@ -105,6 +105,7 @@ DNSAccountName: 'DNS 账号 [{{ .name }}] 厂商 [{{.type}}]'
 PushDirLog: '证书推送到目录 [{{ .path }}] {{ .status }}'
 ErrDeleteCAWithSSL: "当前机构下存在已签发证书，无法删除"
 ErrDeleteWithPanelSSL: "面板 SSL 配置使用此证书，无法删除"
+ErrDefaultCA: "默认机构不能删除"
 
 #mysql
 ErrUserIsExist: "当前用户已存在，请重新输入"

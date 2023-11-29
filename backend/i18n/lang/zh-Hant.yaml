@@ -105,6 +105,7 @@ DNSAccountName: 'DNS 帳號 [{{ .name }}] 廠商 [{{.type}}]'
 PushDirLog: '憑證推送到目錄 [{{ .path }}] {{ .status }}'
 ErrDeleteCAWithSSL: "目前機構下存在已簽發證書，無法刪除"
 ErrDeleteWithPanelSSL: "面板 SSL 配置使用此證書，無法刪除"
+ErrDefaultCA: "默認機構不能刪除"
 
 
 #mysql
