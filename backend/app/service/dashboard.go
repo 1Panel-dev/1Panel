@@ -209,7 +209,10 @@ func loadDiskInfo() []dto.DiskInfo {
 		mounts = append(mounts, diskInfo{Type: fields[1], Device: fields[0], Mount: fields[6]})
 	}
 
-	var wg sync.WaitGroup
+	var (
+		wg sync.WaitGroup
+		mu sync.Mutex
+	)
 	wg.Add(len(mounts))
 	for i := 0; i < len(mounts); i++ {
 		go func(timeoutCh <-chan time.Time, mount diskInfo) {
@@ -221,11 +224,17 @@ func loadDiskInfo() []dto.DiskInfo {
 			itemData.Device = mount.Device
 			select {
 			case <-timeoutCh:
+				mu.Lock()
 				datas = append(datas, itemData)
+				mu.Unlock()
 				global.LOG.Errorf("load disk info from %s failed, err: timeout", mount.Mount)
 			default:
 				state, err := disk.Usage(mount.Mount)
 				if err != nil {
+					mu.Lock()
+					datas = append(datas, itemData)
+					mu.Unlock()
+					global.LOG.Errorf("load disk info from %s failed, err: %v", mount.Mount, err)
 					return
 				}
 				itemData.Total = state.Total
@@ -236,7 +245,9 @@ func loadDiskInfo() []dto.DiskInfo {
 				itemData.InodesUsed = state.InodesUsed
 				itemData.InodesFree = state.InodesFree
 				itemData.InodesUsedPercent = state.InodesUsedPercent
+				mu.Lock()
 				datas = append(datas, itemData)
+				mu.Unlock()
 			}
 		}(time.After(5*time.Second), mounts[i])
 	}
