@@ -383,6 +383,11 @@ const message = {
         address: '數據庫地址',
         version: '數據庫版本',
         userHelper: 'root 用戶或者擁有 root 權限的數據庫用戶',
+        ssl: '使用 SSL',
+        clientKey: '客户端私钥',
+        clientCert: '客户端证书',
+        caCert: 'CA 证书',
+        skipVerify: '忽略校验证书可用性检测',
 
         formatHelper: '當前資料庫字符集為 {0}，字符集不一致可能導致恢復失敗',
         selectFile: '選擇文件',

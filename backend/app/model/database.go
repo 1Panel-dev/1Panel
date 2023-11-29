@@ -11,5 +11,12 @@ type Database struct {
 	Port         uint   `json:"port" gorm:"type:decimal;not null"`
 	Username     string `json:"username" gorm:"type:varchar(64)"`
 	Password     string `json:"password" gorm:"type:varchar(64)"`
-	Description  string `json:"description" gorm:"type:varchar(256);"`
+
+	SSL        bool   `json:"ssl"`
+	RootCert   string `json:"rootCert" gorm:"type:longText"`
+	ClientKey  string `json:"clientKey" gorm:"type:longText"`
+	ClientCert string `json:"clientCert" gorm:"type:longText"`
+	SkipVerify bool   `json:"skipVerify"`
+
+	Description string `json:"description" gorm:"type:varchar(256);"`
 }

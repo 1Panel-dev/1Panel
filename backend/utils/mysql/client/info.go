@@ -1,9 +1,13 @@
 package client
 
 import (
+	"crypto/tls"
+	"crypto/x509"
+	"errors"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
+	"github.com/go-sql-driver/mysql"
 )
 
 type DBInfo struct {
@@ -13,6 +17,12 @@ type DBInfo struct {
 	Port     uint   `json:"port"`
 	Username string `json:"userName"`
 	Password string `json:"password"`
+
+	SSL        bool   `json:"ssl"`
+	RootCert   string `json:"rootCert"`
+	ClientKey  string `json:"clientKey"`
+	ClientCert string `json:"clientCert"`
+	SkipVerify bool   `json:"skipVerify"`
 
 	Timeout uint `json:"timeout"` // second
 }
@@ -113,4 +123,46 @@ func randomPassword(user string) string {
 		passwdItem = user[:6]
 	}
 	return passwdItem + "@" + common.RandStrAndNum(8)
+}
+
+func VerifyPeerCertFunc(pool *x509.CertPool) func([][]byte, [][]*x509.Certificate) error {
+	return func(rawCerts [][]byte, _ [][]*x509.Certificate) error {
+		if len(rawCerts) == 0 {
+			return errors.New("no certificates available to verify")
+		}
+
+		cert, err := x509.ParseCertificate(rawCerts[0])
+		if err != nil {
+			return err
+		}
+
+		opts := x509.VerifyOptions{Roots: pool}
+		if _, err = cert.Verify(opts); err != nil {
+			return err
+		}
+		return nil
+	}
+}
+
+func ConnWithSSL(ssl, skipVerify bool, clientKey, clientCert, rootCert string) (string, error) {
+	if !ssl {
+		return "", nil
+	}
+	pool := x509.NewCertPool()
+	if ok := pool.AppendCertsFromPEM([]byte(rootCert)); !ok {
+		return "", errors.New("unable to append root cert to pool")
+	}
+	cert, err := tls.X509KeyPair([]byte(clientCert), []byte(clientKey))
+	if err != nil {
+		return "", err
+	}
+	if err := mysql.RegisterTLSConfig("cloudsql", &tls.Config{
+		RootCAs:               pool,
+		Certificates:          []tls.Certificate{cert},
+		InsecureSkipVerify:    skipVerify,
+		VerifyPeerCertificate: VerifyPeerCertFunc(pool),
+	}); err != nil {
+		return "", err
+	}
+	return "&tls=cloudsql", nil
 }

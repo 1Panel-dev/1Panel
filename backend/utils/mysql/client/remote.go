@@ -23,6 +23,12 @@ type Remote struct {
 	Password string
 	Address  string
 	Port     uint
+
+	SSL        bool
+	RootCert   string
+	ClientKey  string
+	ClientCert string
+	SkipVerify bool
 }
 
 func NewRemote(db Remote) *Remote {
@@ -224,7 +230,12 @@ func (r *Remote) Backup(info BackupInfo) error {
 		}
 	}
 	fileNameItem := info.TargetDir + "/" + strings.TrimSuffix(info.FileName, ".gz")
-	dns := fmt.Sprintf("%s:%s@tcp(%s:%v)/%s?charset=%s&parseTime=true&loc=Asia%sShanghai", r.User, r.Password, r.Address, r.Port, info.Name, info.Format, "%2F")
+
+	tlsItem, err := ConnWithSSL(r.SSL, r.SkipVerify, r.ClientKey, r.ClientCert, r.RootCert)
+	if err != nil {
+		return err
+	}
+	dns := fmt.Sprintf("%s:%s@tcp(%s:%v)/%s?charset=%s&parseTime=true&loc=Asia%sShanghai%s", r.User, r.Password, r.Address, r.Port, info.Name, info.Format, "%2F", tlsItem)
 
 	f, _ := os.OpenFile(fileNameItem, os.O_RDWR|os.O_CREATE, 0755)
 	defer f.Close()
@@ -254,7 +265,12 @@ func (r *Remote) Recover(info RecoverInfo) error {
 			_, _ = gzipCmd.CombinedOutput()
 		}()
 	}
-	dns := fmt.Sprintf("%s:%s@tcp(%s:%v)/%s?charset=%s&parseTime=true&loc=Asia%sShanghai", r.User, r.Password, r.Address, r.Port, info.Name, info.Format, "%2F")
+	tlsItem, err := ConnWithSSL(r.SSL, r.SkipVerify, r.ClientKey, r.ClientCert, r.RootCert)
+	if err != nil {
+		return err
+	}
+	dns := fmt.Sprintf("%s:%s@tcp(%s:%v)/%s?charset=%s&parseTime=true&loc=Asia%sShanghai%s", r.User, r.Password, r.Address, r.Port, info.Name, info.Format, "%2F", tlsItem)
+
 	f, err := os.Open(fileName)
 	if err != nil {
 		return err

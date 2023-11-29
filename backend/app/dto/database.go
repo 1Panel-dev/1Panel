@@ -227,17 +227,24 @@ type DatabaseSearch struct {
 }
 
 type DatabaseInfo struct {
-	ID          uint      `json:"id"`
-	CreatedAt   time.Time `json:"createdAt"`
-	Name        string    `json:"name" validate:"max=256"`
-	From        string    `json:"from"`
-	Type        string    `json:"type"`
-	Version     string    `json:"version"`
-	Address     string    `json:"address"`
-	Port        uint      `json:"port"`
-	Username    string    `json:"username"`
-	Password    string    `json:"password"`
-	Description string    `json:"description"`
+	ID        uint      `json:"id"`
+	CreatedAt time.Time `json:"createdAt"`
+	Name      string    `json:"name" validate:"max=256"`
+	From      string    `json:"from"`
+	Type      string    `json:"type"`
+	Version   string    `json:"version"`
+	Address   string    `json:"address"`
+	Port      uint      `json:"port"`
+	Username  string    `json:"username"`
+	Password  string    `json:"password"`
+
+	SSL        bool   `json:"ssl"`
+	RootCert   string `json:"rootCert"`
+	ClientKey  string `json:"clientKey"`
+	ClientCert string `json:"clientCert"`
+	SkipVerify bool   `json:"skipVerify"`
+
+	Description string `json:"description"`
 }
 
 type DatabaseOption struct {
@@ -250,25 +257,39 @@ type DatabaseOption struct {
 }
 
 type DatabaseCreate struct {
-	Name        string `json:"name" validate:"required,max=256"`
-	Type        string `json:"type" validate:"required"`
-	From        string `json:"from" validate:"required,oneof=local remote"`
-	Version     string `json:"version" validate:"required"`
-	Address     string `json:"address"`
-	Port        uint   `json:"port"`
-	Username    string `json:"username" validate:"required"`
-	Password    string `json:"password" validate:"required"`
+	Name     string `json:"name" validate:"required,max=256"`
+	Type     string `json:"type" validate:"required"`
+	From     string `json:"from" validate:"required,oneof=local remote"`
+	Version  string `json:"version" validate:"required"`
+	Address  string `json:"address"`
+	Port     uint   `json:"port"`
+	Username string `json:"username" validate:"required"`
+	Password string `json:"password" validate:"required"`
+
+	SSL        bool   `json:"ssl"`
+	RootCert   string `json:"rootCert"`
+	ClientKey  string `json:"clientKey"`
+	ClientCert string `json:"clientCert"`
+	SkipVerify bool   `json:"skipVerify"`
+
 	Description string `json:"description"`
 }
 
 type DatabaseUpdate struct {
-	ID          uint   `json:"id"`
-	Type        string `json:"type" validate:"required"`
-	Version     string `json:"version" validate:"required"`
-	Address     string `json:"address"`
-	Port        uint   `json:"port"`
-	Username    string `json:"username" validate:"required"`
-	Password    string `json:"password" validate:"required"`
+	ID       uint   `json:"id"`
+	Type     string `json:"type" validate:"required"`
+	Version  string `json:"version" validate:"required"`
+	Address  string `json:"address"`
+	Port     uint   `json:"port"`
+	Username string `json:"username" validate:"required"`
+	Password string `json:"password" validate:"required"`
+
+	SSL        bool   `json:"ssl"`
+	RootCert   string `json:"rootCert"`
+	ClientKey  string `json:"clientKey"`
+	ClientCert string `json:"clientCert"`
+	SkipVerify bool   `json:"skipVerify"`
+
 	Description string `json:"description"`
 }
 

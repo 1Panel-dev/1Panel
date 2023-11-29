@@ -84,7 +84,13 @@ func (u *DatabaseService) CheckDatabase(req dto.DatabaseCreate) bool {
 		Port:     req.Port,
 		Username: req.Username,
 		Password: req.Password,
-		Timeout:  6,
+
+		SSL:        req.SSL,
+		RootCert:   req.RootCert,
+		ClientKey:  req.ClientKey,
+		ClientCert: req.ClientCert,
+		SkipVerify: req.SkipVerify,
+		Timeout:    6,
 	}); err != nil {
 		return false
 	}
@@ -105,7 +111,13 @@ func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
 		Port:     req.Port,
 		Username: req.Username,
 		Password: req.Password,
-		Timeout:  6,
+
+		SSL:        req.SSL,
+		RootCert:   req.RootCert,
+		ClientKey:  req.ClientKey,
+		ClientCert: req.ClientCert,
+		SkipVerify: req.SkipVerify,
+		Timeout:    6,
 	}); err != nil {
 		return err
 	}
@@ -172,7 +184,14 @@ func (u *DatabaseService) Update(req dto.DatabaseUpdate) error {
 		Port:     req.Port,
 		Username: req.Username,
 		Password: req.Password,
-		Timeout:  300,
+
+		SSL:        req.SSL,
+		ClientKey:  req.ClientKey,
+		ClientCert: req.ClientCert,
+		RootCert:   req.RootCert,
+		SkipVerify: req.SkipVerify,
+
+		Timeout: 300,
 	}); err != nil {
 		return err
 	}
@@ -189,6 +208,10 @@ func (u *DatabaseService) Update(req dto.DatabaseUpdate) error {
 	upMap["port"] = req.Port
 	upMap["username"] = req.Username
 	upMap["password"] = pass
-	upMap["description"] = req.Description
+	upMap["ssl"] = req.SSL
+	upMap["client_key"] = req.ClientKey
+	upMap["client_cert"] = req.ClientCert
+	upMap["root_cert"] = req.RootCert
+	upMap["skip_verify"] = req.SkipVerify
 	return databaseRepo.Update(req.ID, upMap)
 }

@@ -54,6 +54,46 @@
                             v-model.trim="dialogData.rowData!.password"
                         />
                     </el-form-item>
+                    <el-form-item>
+                        <el-checkbox
+                            @change="isOK = false"
+                            v-model="dialogData.rowData!.ssl"
+                            :label="$t('database.ssl')"
+                        />
+                    </el-form-item>
+                    <div v-if="dialogData.rowData!.ssl">
+                        <el-form-item :label="$t('database.clientKey')" prop="clientKey">
+                            <el-input
+                                type="textarea"
+                                @change="isOK = false"
+                                clearable
+                                v-model="dialogData.rowData!.clientKey"
+                            />
+                        </el-form-item>
+                        <el-form-item :label="$t('database.clientCert')" prop="clientCert">
+                            <el-input
+                                type="textarea"
+                                @change="isOK = false"
+                                clearable
+                                v-model="dialogData.rowData!.clientCert"
+                            />
+                        </el-form-item>
+                        <el-form-item :label="$t('database.caCert')" prop="rootCert">
+                            <el-input
+                                type="textarea"
+                                @change="isOK = false"
+                                clearable
+                                v-model="dialogData.rowData!.rootCert"
+                            />
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox
+                                @change="isOK = false"
+                                v-model="dialogData.rowData!.skipVerify"
+                                :label="$t('database.skipVerify')"
+                            />
+                        </el-form-item>
+                    </div>
                     <el-form-item :label="$t('commons.table.description')" prop="description">
                         <el-input clearable v-model.trim="dialogData.rowData!.description" />
                     </el-form-item>
@@ -128,6 +168,10 @@ const rules = reactive({
     port: [Rules.port],
     username: [Rules.requiredInput],
     password: [Rules.requiredInput],
+
+    clientKey: [Rules.requiredInput],
+    clientCert: [Rules.requiredInput],
+    caCert: [Rules.requiredInput],
 });
 
 type FormInstance = InstanceType<typeof ElForm>;

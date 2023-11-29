@@ -45,3 +45,13 @@ var AddDockerSockPath = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddDatabaseSSL = &gormigrate.Migration{
+	ID: "20231126-add-database-ssl",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Database{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}
