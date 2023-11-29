@@ -18,6 +18,8 @@ type WebsiteSSLCreate struct {
 	Apply         bool   `json:"apply"`
 	PushDir       bool   `json:"pushDir"`
 	Dir           string `json:"dir"`
+	ID            uint   `json:"id"`
+	Description   string `json:"description"`
 }
 
 type WebsiteDNSReq struct {
@@ -66,9 +68,6 @@ type WebsiteSSLUpdate struct {
 	ID          uint   `json:"id" validate:"required"`
 	AutoRenew   bool   `json:"autoRenew"`
 	Description string `json:"description"`
-	PrivateKey  string `json:"privateKey"`
-	Certificate string `json:"certificate"`
-	Type        string `json:"type" validate:"required,oneof=autoRenew description certificate privateKey"`
 }
 
 type WebsiteSSLUpload struct {

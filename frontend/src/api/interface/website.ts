@@ -166,6 +166,7 @@ export namespace Website {
         acmeAccountId?: number;
         status: string;
         domains: string;
+        description: string;
     }
 
     export interface SSLDTO extends SSL {
@@ -178,6 +179,8 @@ export namespace Website {
         provider: string;
         acmeAccountId: number;
         dnsAccountId: number;
+        id?: number;
+        description: string;
     }
 
     export interface SSLApply {
@@ -192,6 +195,7 @@ export namespace Website {
     export interface SSLUpdate {
         id: number;
         autoRenew: boolean;
+        description: string;
     }
 
     export interface AcmeAccount extends CommonModel {

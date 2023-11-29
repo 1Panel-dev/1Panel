@@ -115,6 +115,7 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 		ExpireDate:    time.Now(),
 		KeyType:       create.KeyType,
 		PushDir:       create.PushDir,
+		Description:   create.Description,
 	}
 	if create.PushDir {
 		if !files.NewFileOp().Stat(create.Dir) {
@@ -150,7 +151,14 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 	if err := websiteSSLRepo.Create(context.TODO(), &websiteSSL); err != nil {
 		return res, err
 	}
-
+	create.ID = websiteSSL.ID
+	go func() {
+		if err = w.ObtainSSL(request.WebsiteSSLApply{
+			ID: websiteSSL.ID,
+		}); err != nil {
+			global.LOG.Errorf("obtain ssl failed, err: %v", err)
+		}
+	}()
 	return create, nil
 }
 
@@ -343,6 +351,7 @@ func (w WebsiteSSLService) Update(update request.WebsiteSSLUpdate) error {
 		return err
 	}
 	websiteSSL.AutoRenew = update.AutoRenew
+	websiteSSL.Description = update.Description
 	return websiteSSLRepo.Save(websiteSSL)
 }
 
