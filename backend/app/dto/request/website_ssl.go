@@ -86,7 +86,6 @@ type WebsiteCASearch struct {
 type WebsiteCACreate struct {
 	CommonName       string `json:"commonName" validate:"required"`
 	Country          string `json:"country" validate:"required"`
-	Email            string `json:"email" validate:"required"`
 	Organization     string `json:"organization" validate:"required"`
 	OrganizationUint string `json:"organizationUint"`
 	Name             string `json:"name" validate:"required"`

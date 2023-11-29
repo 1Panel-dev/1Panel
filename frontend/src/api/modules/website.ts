@@ -270,3 +270,7 @@ export const DownloadFile = (params: Website.SSLDownload) => {
         timeout: TimeoutEnum.T_40S,
     });
 };
+
+export const GetCA = (id: number) => {
+    return http.get<Website.CADTO>(`/websites/ca/${id}`);
+};

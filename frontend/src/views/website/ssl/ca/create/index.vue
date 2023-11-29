@@ -15,9 +15,6 @@
                     <el-form-item :label="$t('ssl.commonName')" prop="commonName">
                         <el-input v-model.trim="ca.commonName"></el-input>
                     </el-form-item>
-                    <el-form-item :label="$t('website.email')" prop="email">
-                        <el-input v-model.trim="ca.email"></el-input>
-                    </el-form-item>
                     <el-form-item :label="$t('ssl.company')" prop="organization">
                         <el-input v-model.trim="ca.organization"></el-input>
                     </el-form-item>
@@ -72,7 +69,6 @@ const caForm = ref<FormInstance>();
 const em = defineEmits(['close']);
 
 const rules = ref({
-    email: [Rules.requiredInput, Rules.email],
     keyType: [Rules.requiredSelect],
     name: [Rules.requiredInput, Rules.name],
     country: [Rules.requiredSelect],
@@ -82,7 +78,6 @@ const rules = ref({
 
 const initData = () => ({
     name: '',
-    email: '',
     keyType: 'P256',
     commonName: '',
     country: 'CN',

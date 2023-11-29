@@ -473,10 +473,18 @@ export namespace Website {
         name: string;
         commonName: string;
         country: string;
-        email: string;
         organization: string;
         organizationUint: string;
         keyType: string;
+        province: string;
+        city: string;
+    }
+
+    export interface CADTO extends CA {
+        commonName: string;
+        country: string;
+        organization: string;
+        organizationUint: string;
         province: string;
         city: string;
     }
