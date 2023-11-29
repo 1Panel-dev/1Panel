@@ -8,6 +8,10 @@ export const useTheme = () => {
     const themeConfig = computed(() => globalStore.themeConfig);
 
     const switchDark = () => {
+        if (themeConfig.value.theme === 'auto') {
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+            themeConfig.value.theme = prefersDark.matches ? 'dark' : 'light';
+        }
         const body = document.documentElement as HTMLElement;
         if (themeConfig.value.theme === 'dark') body.setAttribute('class', 'dark');
         else body.setAttribute('class', '');

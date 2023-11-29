@@ -1106,6 +1106,7 @@ const message = {
         componentSize: '組件大小',
         dark: '暗色',
         light: '亮色',
+        auto: '跟隨系統',
         language: '系統語言',
         languageHelper: '默認跟隨瀏覽器語言，設置後只對當前瀏覽器生效，更換瀏覽器後需要重新設置',
         sessionTimeout: '超時時間',

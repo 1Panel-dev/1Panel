@@ -1162,6 +1162,7 @@ const message = {
         theme: 'Theme',
         dark: 'Dark',
         light: 'Light',
+        auto: 'Follow System',
         language: 'Language',
         languageHelper:
             'By default, it follows the browser language. This parameter takes effect only on the current browser',

@@ -73,6 +73,15 @@ const loadDataFromDB = async () => {
     switchDark();
 };
 
+const updateDarkMode = async (event: MediaQueryListEvent) => {
+    const res = await getSettingInfo();
+    if (res.data.theme !== 'auto') {
+        return;
+    }
+    globalStore.setThemeConfig({ ...themeConfig.value, theme: event.matches ? 'dark' : 'light' });
+    switchDark();
+};
+
 const loadStatus = async () => {
     loading.value = globalStore.isLoading;
     loadinText.value = globalStore.loadingText;
@@ -101,6 +110,17 @@ onBeforeUnmount(() => {
 onMounted(() => {
     loadStatus();
     loadDataFromDB();
+
+    const mqList = window.matchMedia('(prefers-color-scheme: dark)');
+    if (mqList.addEventListener) {
+        mqList.addEventListener('change', (e) => {
+            updateDarkMode(e);
+        });
+    } else if (mqList.addListener) {
+        mqList.addListener((e) => {
+            updateDarkMode(e);
+        });
+    }
 });
 </script>
 
