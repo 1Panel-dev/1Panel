@@ -109,6 +109,18 @@
                         show-overflow-tooltip
                         prop="organization"
                     ></el-table-column>
+                    <el-table-column :label="$t('website.remark')" fix show-overflow-tooltip prop="description">
+                        <template #default="{ row }">
+                            <fu-read-write-switch>
+                                <template #read>
+                                    <MsgInfo :info="row.description" />
+                                </template>
+                                <template #default="{ read }">
+                                    <el-input v-model="row.description" @blur="updateDesc(row, read)" />
+                                </template>
+                            </fu-read-write-switch>
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('ssl.autoRenew')" fix width="100px">
                         <template #default="{ row }">
                             <el-switch
@@ -135,7 +147,7 @@
             </template>
             <DnsAccount ref="dnsAccountRef"></DnsAccount>
             <AcmeAccount ref="acmeAccountRef"></AcmeAccount>
-            <Create ref="sslCreateRef" @close="search()"></Create>
+            <Create ref="sslCreateRef" @close="search()" @submit="openLog"></Create>
             <Detail ref="detailRef"></Detail>
             <SSLUpload ref="sslUploadRef" @close="search()"></SSLUpload>
             <Apply ref="applyRef" @search="search" @submit="openLog" />
@@ -165,6 +177,7 @@ import SSLUpload from './upload/index.vue';
 import Apply from './apply/index.vue';
 import Log from '@/components/log-dialog/index.vue';
 import Obtain from './obtain/index.vue';
+import MsgInfo from '@/components/msg-info/index.vue';
 
 const globalStore = GlobalStore();
 const paginationConfig = reactive({
@@ -280,9 +293,14 @@ const search = () => {
         });
 };
 
+const updateDesc = (row: Website.SSLDTO, bulr: Function) => {
+    bulr();
+    updateConfig(row);
+};
+
 const updateConfig = (row: Website.SSLDTO) => {
     loading.value = true;
-    UpdateSSL({ id: row.id, autoRenew: row.autoRenew })
+    UpdateSSL({ id: row.id, autoRenew: row.autoRenew, description: row.description })
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
         })

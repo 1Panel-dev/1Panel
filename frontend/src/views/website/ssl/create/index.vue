@@ -16,6 +16,9 @@
                             v-model="ssl.otherDomains"
                         ></el-input>
                     </el-form-item>
+                    <el-form-item :label="$t('website.remark')" prop="description">
+                        <el-input v-model="ssl.description"></el-input>
+                    </el-form-item>
                     <el-form-item :label="$t('website.acmeAccount')" prop="acmeAccountId">
                         <el-select v-model="ssl.acmeAccountId">
                             <el-option
@@ -154,12 +157,13 @@ const initData = () => ({
     keyType: 'P256',
     pushDir: false,
     dir: '',
+    description: '',
 });
 
 const ssl = ref(initData());
 const dnsResolve = ref<Website.DNSResolve[]>([]);
 
-const em = defineEmits(['close']);
+const em = defineEmits(['close', 'submit']);
 const handleClose = () => {
     resetForm();
     open.value = false;
@@ -211,8 +215,9 @@ const submit = async (formEl: FormInstance | undefined) => {
         }
         loading.value = true;
         CreateSSL(ssl.value)
-            .then(() => {
+            .then((res: any) => {
                 handleClose();
+                em('submit', res.data.id);
                 MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
             })
             .finally(() => {
