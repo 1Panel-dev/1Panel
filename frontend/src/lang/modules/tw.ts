@@ -1738,6 +1738,7 @@ const message = {
         dir: '目錄',
         pushDirHelper: '會在此目錄下產生兩個文件，憑證檔案：fullchain.pem 金鑰檔案：privkey.pem',
         organizationDetail: '機構詳情',
+        fromWebsite: '從網站獲取',
     },
     firewall: {
         create: '創建規則',

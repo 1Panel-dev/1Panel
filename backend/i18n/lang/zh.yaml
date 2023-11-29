@@ -106,6 +106,9 @@ PushDirLog: '证书推送到目录 [{{ .path }}] {{ .status }}'
 ErrDeleteCAWithSSL: "当前机构下存在已签发证书，无法删除"
 ErrDeleteWithPanelSSL: "面板 SSL 配置使用此证书，无法删除"
 ErrDefaultCA: "默认机构不能删除"
+ApplyWebSiteSSLLog: "开始更新 {{ .name }} 网站证书"
+ErrUpdateWebsiteSSL: "{{ .name }} 网站更新证书失败: {{ .err }}"
+ApplyWebSiteSSLSuccess: "更新网站证书成功"
 
 #mysql
 ErrUserIsExist: "当前用户已存在，请重新输入"
