@@ -18935,7 +18935,6 @@ const docTemplate = `{
             "required": [
                 "commonName",
                 "country",
-                "email",
                 "keyType",
                 "name",
                 "organization"
@@ -18948,9 +18947,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "country": {
-                    "type": "string"
-                },
-                "email": {
                     "type": "string"
                 },
                 "keyType": {
@@ -19532,10 +19528,16 @@ const docTemplate = `{
                 "autoRenew": {
                     "type": "boolean"
                 },
+                "description": {
+                    "type": "string"
+                },
                 "dir": {
                     "type": "string"
                 },
                 "dnsAccountId": {
+                    "type": "integer"
+                },
+                "id": {
                     "type": "integer"
                 },
                 "keyType": {
@@ -19576,33 +19578,17 @@ const docTemplate = `{
         "request.WebsiteSSLUpdate": {
             "type": "object",
             "required": [
-                "id",
-                "type"
+                "id"
             ],
             "properties": {
                 "autoRenew": {
                     "type": "boolean"
-                },
-                "certificate": {
-                    "type": "string"
                 },
                 "description": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
-                },
-                "privateKey": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string",
-                    "enum": [
-                        "autoRenew",
-                        "description",
-                        "certificate",
-                        "privateKey"
-                    ]
                 }
             }
         },
@@ -20189,6 +20175,15 @@ const docTemplate = `{
         "response.WebsiteCADTO": {
             "type": "object",
             "properties": {
+                "city": {
+                    "type": "string"
+                },
+                "commonName": {
+                    "type": "string"
+                },
+                "country": {
+                    "type": "string"
+                },
                 "createdAt": {
                     "type": "string"
                 },
@@ -20204,7 +20199,16 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "organization": {
+                    "type": "string"
+                },
+                "organizationUint": {
+                    "type": "string"
+                },
                 "privateKey": {
+                    "type": "string"
+                },
+                "province": {
                     "type": "string"
                 },
                 "updatedAt": {

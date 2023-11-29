@@ -7,28 +7,29 @@
             <template #toolbar>
                 <el-button type="primary" @click="openCreate">{{ $t('ssl.createCA') }}</el-button>
             </template>
-            <el-table-column
-                :label="$t('commons.table.name')"
-                fix
-                show-overflow-tooltip
-                prop="name"
-                min-width="100px"
-            ></el-table-column>
-            <el-table-column :label="$t('website.keyType')" fix show-overflow-tooltip prop="keyType">
+            <el-table-column :label="$t('commons.table.name')" show-overflow-tooltip prop="name"></el-table-column>
+            <el-table-column :label="$t('website.keyType')" show-overflow-tooltip prop="keyType">
                 <template #default="{ row }">
                     {{ getKeyName(row.keyType) }}
                 </template>
             </el-table-column>
+            <el-table-column
+                prop="createdAt"
+                :label="$t('commons.table.date')"
+                :formatter="dateFormat"
+                show-overflow-tooltip
+            />
             <fu-table-operations
-                :ellipsis="1"
+                :ellipsis="3"
                 :buttons="buttons"
                 :label="$t('commons.table.operate')"
-                fixed="right"
                 fix
+                width="250px"
             />
         </ComplexTable>
         <Create ref="createRef" @close="search()" />
-        <Obtain ref="obtainRef" @close="handleClose()" />
+        <Obtain ref="obtainRef" @close="search()" />
+        <Detail ref="detailRef" />
     </el-drawer>
     <OpDialog ref="opRef" @search="search" />
 </template>
@@ -41,7 +42,8 @@ import { DeleteCA, SearchCAs } from '@/api/modules/website';
 import i18n from '@/lang';
 import { reactive, ref } from 'vue';
 import Create from './create/index.vue';
-import { getKeyName } from '@/utils/util';
+import Detail from './detail/index.vue';
+import { getKeyName, dateFormat } from '@/utils/util';
 import Obtain from './obtain/index.vue';
 
 const open = ref(false);
@@ -57,12 +59,19 @@ const paginationConfig = reactive({
 const opRef = ref();
 const obtainRef = ref();
 const em = defineEmits(['close']);
+const detailRef = ref();
 
 const buttons = [
     {
         label: i18n.global.t('ssl.selfSign'),
         click: function (row: Website.CA) {
             obtain(row);
+        },
+    },
+    {
+        label: i18n.global.t('ssl.detail'),
+        click: function (row: Website.CA) {
+            detailRef.value.acceptParams(row.id);
         },
     },
     {

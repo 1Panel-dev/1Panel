@@ -35,7 +35,7 @@ type WebsiteCAService struct {
 type IWebsiteCAService interface {
 	Page(search request.WebsiteCASearch) (int64, []response.WebsiteCADTO, error)
 	Create(create request.WebsiteCACreate) (*request.WebsiteCACreate, error)
-	GetCA(id uint) (response.WebsiteCADTO, error)
+	GetCA(id uint) (*response.WebsiteCADTO, error)
 	Delete(id uint) error
 	ObtainSSL(req request.WebsiteCAObtain) error
 }
@@ -69,9 +69,10 @@ func (w WebsiteCAService) Create(create request.WebsiteCACreate) (*request.Websi
 	}
 
 	pkixName := pkix.Name{
-		CommonName:   create.CommonName,
-		Country:      []string{create.Country},
-		Organization: []string{create.Organization},
+		CommonName:         create.CommonName,
+		Country:            []string{create.Country},
+		Organization:       []string{create.Organization},
+		OrganizationalUnit: []string{create.OrganizationUint},
 	}
 	if create.Province != "" {
 		pkixName.Province = []string{create.Province}
@@ -138,14 +139,29 @@ func (w WebsiteCAService) Create(create request.WebsiteCACreate) (*request.Websi
 	return &create, nil
 }
 
-func (w WebsiteCAService) GetCA(id uint) (response.WebsiteCADTO, error) {
+func (w WebsiteCAService) GetCA(id uint) (*response.WebsiteCADTO, error) {
+	res := &response.WebsiteCADTO{}
 	ca, err := websiteCARepo.GetFirst(commonRepo.WithByID(id))
 	if err != nil {
-		return response.WebsiteCADTO{}, err
+		return nil, err
 	}
-	return response.WebsiteCADTO{
-		WebsiteCA: ca,
-	}, nil
+	res.WebsiteCA = ca
+	certBlock, _ := pem.Decode([]byte(ca.CSR))
+	if certBlock == nil {
+		return nil, buserr.New("ErrSSLCertificateFormat")
+	}
+	cert, err := x509.ParseCertificate(certBlock.Bytes)
+	if err != nil {
+		return nil, err
+	}
+	res.CommonName = cert.Issuer.CommonName
+	res.Organization = strings.Join(cert.Issuer.Organization, ",")
+	res.Country = strings.Join(cert.Issuer.Country, ",")
+	res.Province = strings.Join(cert.Issuer.Province, ",")
+	res.City = strings.Join(cert.Issuer.Locality, ",")
+	res.OrganizationUint = strings.Join(cert.Issuer.OrganizationalUnit, ",")
+
+	return res, nil
 }
 
 func (w WebsiteCAService) Delete(id uint) error {
@@ -157,7 +173,6 @@ func (w WebsiteCAService) Delete(id uint) error {
 }
 
 func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) error {
-
 	var (
 		domains    []string
 		ips        []net.IP

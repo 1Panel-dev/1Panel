@@ -3747,8 +3747,6 @@ definitions:
         type: string
       country:
         type: string
-      email:
-        type: string
       keyType:
         enum:
         - P256
@@ -3769,7 +3767,6 @@ definitions:
     required:
     - commonName
     - country
-    - email
     - keyType
     - name
     - organization
@@ -4145,9 +4142,13 @@ definitions:
         type: boolean
       autoRenew:
         type: boolean
+      description:
+        type: string
       dir:
         type: string
       dnsAccountId:
+        type: integer
+      id:
         type: integer
       keyType:
         type: string
@@ -4180,24 +4181,12 @@ definitions:
     properties:
       autoRenew:
         type: boolean
-      certificate:
-        type: string
       description:
         type: string
       id:
         type: integer
-      privateKey:
-        type: string
-      type:
-        enum:
-        - autoRenew
-        - description
-        - certificate
-        - privateKey
-        type: string
     required:
     - id
-    - type
     type: object
   request.WebsiteSSLUpload:
     properties:
@@ -4586,6 +4575,12 @@ definitions:
     type: object
   response.WebsiteCADTO:
     properties:
+      city:
+        type: string
+      commonName:
+        type: string
+      country:
+        type: string
       createdAt:
         type: string
       csr:
@@ -4596,7 +4591,13 @@ definitions:
         type: string
       name:
         type: string
+      organization:
+        type: string
+      organizationUint:
+        type: string
       privateKey:
+        type: string
+      province:
         type: string
       updatedAt:
         type: string
