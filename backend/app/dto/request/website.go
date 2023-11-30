@@ -210,7 +210,7 @@ type WebsiteRedirectReq struct {
 type WebsiteWafFileUpdate struct {
 	WebsiteID uint   `json:"websiteID" validate:"required"`
 	Content   string `json:"content" validate:"required"`
-	Type      string `json:"type" validate:"required,oneof=cc ip_white ip_block url_white url_block cookie_block args_check post_check ua_check file_ext_block"`
+	Type      string `json:"type" validate:"required,oneof=cc ip_white ip_block url_white url_block cookie_block args_check post_check ua_check file_ext_block user_agent"`
 }
 
 type WebsiteCommonReq struct {

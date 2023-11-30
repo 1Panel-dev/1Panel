@@ -109,7 +109,7 @@
                         show-overflow-tooltip
                         prop="organization"
                     ></el-table-column>
-                    <el-table-column :label="$t('website.remark')" fix show-overflow-tooltip prop="description">
+                    <el-table-column :label="$t('website.remark')" fix prop="description">
                         <template #default="{ row }">
                             <fu-read-write-switch>
                                 <template #read>
