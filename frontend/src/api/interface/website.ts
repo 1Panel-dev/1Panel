@@ -497,6 +497,7 @@ export namespace Website {
         unit: string;
         pushDir: boolean;
         dir: string;
+        description: string;
     }
 
     export interface RenewSSLByCA {

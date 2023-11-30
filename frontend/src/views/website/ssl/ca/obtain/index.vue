@@ -17,6 +17,9 @@
                             :placeholder="$t('ssl.domainHelper')"
                         ></el-input>
                     </el-form-item>
+                    <el-form-item :label="$t('website.remark')" prop="description">
+                        <el-input v-model="obtain.description"></el-input>
+                    </el-form-item>
                     <el-form-item :label="$t('website.keyType')" prop="keyType">
                         <el-select v-model="obtain.keyType">
                             <el-option
@@ -97,6 +100,7 @@ const initData = () => ({
     pushDir: false,
     dir: '',
     autoRenew: true,
+    description: '',
 });
 const obtain = ref(initData());
 
