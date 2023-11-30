@@ -1134,6 +1134,7 @@ const message = {
         S3: '亚马逊 S3 云存储',
         MINIO: 'MINIO',
         SFTP: 'SFTP',
+        WebDAV: 'WebDAV',
         OneDrive: '微软 OneDrive',
         codeWarning: '当前授权码格式错误，请重新确认！',
         backupDir: '备份路径',

@@ -365,6 +365,51 @@
                             </el-button>
                         </el-alert>
                     </el-col>
+                    <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
+                        <div>
+                            <svg-icon class="card-logo" iconName="p-webdav"></svg-icon>
+                            <span class="card-title">&nbsp;WebDAV</span>
+                            <div style="float: right">
+                                <el-button
+                                    round
+                                    plain
+                                    :disabled="webDAVData.id === 0"
+                                    @click="onOpenDialog('edit', 'WebDAV', webDAVData)"
+                                >
+                                    {{ $t('commons.button.edit') }}
+                                </el-button>
+                                <el-button round :disabled="webDAVData.id === 0" @click="onDelete(webDAVData)">
+                                    {{ $t('commons.button.delete') }}
+                                </el-button>
+                            </div>
+                        </div>
+                        <el-divider class="divider" />
+                        <div v-if="webDAVData.id !== 0" style="margin-left: 20px">
+                            <el-form-item :label="$t('setting.address')">
+                                {{ webDAVData.varsJson['address'] }}
+                            </el-form-item>
+                            <el-form-item :label="$t('commons.table.port')">
+                                {{ webDAVData.varsJson['port'] }}
+                            </el-form-item>
+                            <el-form-item :label="$t('setting.path')">
+                                {{ webDAVData.bucket }}
+                            </el-form-item>
+                            <el-form-item :label="$t('commons.table.createdAt')">
+                                {{ dateFormat(0, 0, webDAVData.createdAt) }}
+                            </el-form-item>
+                        </div>
+                        <el-alert v-else center class="alert" style="height: 257px" :closable="false">
+                            <el-button
+                                size="large"
+                                round
+                                plain
+                                type="primary"
+                                @click="onOpenDialog('create', 'WebDAV')"
+                            >
+                                {{ $t('setting.createBackupAccount', ['WebDAV']) }}
+                            </el-button>
+                        </el-alert>
+                    </el-col>
                 </el-row>
             </template>
         </LayoutContent>
@@ -439,6 +484,20 @@ const sftpData = ref<Backup.BackupInfo>({
     varsJson: {
         address: '',
         port: 22,
+    },
+    createdAt: new Date(),
+});
+const webDAVData = ref<Backup.BackupInfo>({
+    id: 0,
+    type: 'WebDAV',
+    accessKey: '',
+    bucket: '',
+    credential: '',
+    backupPath: '',
+    vars: '',
+    varsJson: {
+        address: '',
+        port: 10080,
     },
     createdAt: new Date(),
 });
@@ -529,6 +588,9 @@ const search = async () => {
                 break;
             case 'OneDrive':
                 oneDriveData.value = bac;
+                break;
+            case 'WebDAV':
+                webDAVData.value = bac;
                 break;
         }
     }

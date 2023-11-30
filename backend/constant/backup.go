@@ -11,6 +11,7 @@ const (
 	MinIo        = "MINIO"
 	Cos          = "COS"
 	Kodo         = "KODO"
+	WebDAV       = "WebDAV"
 
 	OneDriveRedirectURI = "http://localhost/login/authorized"
 )

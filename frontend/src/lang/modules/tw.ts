@@ -1133,6 +1133,7 @@ const message = {
         S3: '亞馬遜 S3 雲存儲',
         MINIO: 'MINIO',
         SFTP: 'SFTP',
+        WebDAV: 'WebDAV',
         OneDrive: '微軟 OneDrive',
         codeWarning: '當前授權碼格式錯誤，請重新確認！',
         backupDir: '備份路徑',

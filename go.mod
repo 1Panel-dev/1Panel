@@ -44,6 +44,7 @@ require (
 	github.com/spf13/afero v1.9.2
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.14.0
+	github.com/studio-b12/gowebdav v0.9.0
 	github.com/subosito/gotenv v1.4.1
 	github.com/swaggo/files v0.0.0-20220728132757-551d4a08d97a
 	github.com/swaggo/gin-swagger v1.5.3

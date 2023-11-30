@@ -1204,6 +1204,7 @@ const message = {
         S3: 'Amazon S3',
         MINIO: 'MINIO',
         SFTP: 'SFTP',
+        WebDAV: 'WebDAV',
         OneDrive: 'Microsoft OneDrive',
         backupDir: 'Backup dir',
         codeWarning: 'The current authorization code format is incorrect, please confirm again!',

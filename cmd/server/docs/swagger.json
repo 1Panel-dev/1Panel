@@ -13762,7 +13762,8 @@
                         "LOCAL",
                         "COS",
                         "KODO",
-                        "OneDrive"
+                        "OneDrive",
+                        "WebDAV"
                     ]
                 },
                 "type": {
@@ -14579,6 +14580,12 @@
                 "address": {
                     "type": "string"
                 },
+                "clientCert": {
+                    "type": "string"
+                },
+                "clientKey": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -14598,6 +14605,15 @@
                 },
                 "port": {
                     "type": "integer"
+                },
+                "rootCert": {
+                    "type": "string"
+                },
+                "skipVerify": {
+                    "type": "boolean"
+                },
+                "ssl": {
+                    "type": "boolean"
                 },
                 "type": {
                     "type": "string"
@@ -14633,6 +14649,12 @@
                 "address": {
                     "type": "string"
                 },
+                "clientCert": {
+                    "type": "string"
+                },
+                "clientKey": {
+                    "type": "string"
+                },
                 "createdAt": {
                     "type": "string"
                 },
@@ -14654,6 +14676,15 @@
                 },
                 "port": {
                     "type": "integer"
+                },
+                "rootCert": {
+                    "type": "string"
+                },
+                "skipVerify": {
+                    "type": "boolean"
+                },
+                "ssl": {
+                    "type": "boolean"
                 },
                 "type": {
                     "type": "string"
@@ -14728,6 +14759,12 @@
                 "address": {
                     "type": "string"
                 },
+                "clientCert": {
+                    "type": "string"
+                },
+                "clientKey": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -14739,6 +14776,15 @@
                 },
                 "port": {
                     "type": "integer"
+                },
+                "rootCert": {
+                    "type": "string"
+                },
+                "skipVerify": {
+                    "type": "boolean"
+                },
+                "ssl": {
+                    "type": "boolean"
                 },
                 "type": {
                     "type": "string"
@@ -14876,7 +14922,8 @@
                         "LOCAL",
                         "COS",
                         "KODO",
-                        "OneDrive"
+                        "OneDrive",
+                        "WebDAV"
                     ]
                 }
             }
@@ -16884,7 +16931,8 @@
                         "MINIO",
                         "COS",
                         "KODO",
-                        "OneDrive"
+                        "OneDrive",
+                        "WebDAV"
                     ]
                 },
                 "id": {
