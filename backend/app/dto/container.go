@@ -168,6 +168,7 @@ type VolumeCreate struct {
 }
 
 type BatchDelete struct {
+	Force bool     `json:"force"`
 	Names []string `json:"names" validate:"required"`
 }
 

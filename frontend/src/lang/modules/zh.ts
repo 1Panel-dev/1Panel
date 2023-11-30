@@ -513,6 +513,7 @@ const message = {
         unpause: '恢复',
         rename: '重命名',
         remove: '删除',
+        removeAll: '删除所有',
         containerPrune: '清理容器',
         containerPruneHelper1: '清理容器 将删除所有处于停止状态的容器。',
         containerPruneHelper2:

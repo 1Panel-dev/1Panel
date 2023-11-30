@@ -524,6 +524,7 @@ const message = {
         unpause: 'Unpause',
         rename: 'Rename',
         remove: 'Remove',
+        removeAll: 'Remove All',
         containerPrune: 'Container prune',
         containerPruneHelper1: 'Cleaning containers will delete all containers that are in a stopped state.',
         containerPruneHelper2:

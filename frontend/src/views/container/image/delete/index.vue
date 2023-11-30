@@ -4,15 +4,24 @@
             <template #header>
                 <DrawerHeader :header="$t('container.imageDelete')" :back="handleClose" />
             </template>
-            <el-form @submit.prevent :model="deleteForm" label-position="top">
+            <el-form @submit.prevent :model="form" label-position="top">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
                         <el-form-item :label="$t('container.tag')" prop="tagName">
-                            <el-checkbox-group v-model="deleteForm.deleteTags">
+                            <div style="width: 100%">
+                                <el-checkbox
+                                    v-model="deleteAll"
+                                    :indeterminate="isIndeterminate"
+                                    @change="handleCheckAllChange"
+                                >
+                                    {{ $t('container.removeAll') }}
+                                </el-checkbox>
+                            </div>
+                            <el-checkbox-group v-model="form.deleteTags" @change="handleCheckedCitiesChange">
                                 <div>
                                     <el-checkbox
                                         style="width: 100%"
-                                        v-for="item in deleteForm.tags"
+                                        v-for="item in form.tags"
                                         :key="item"
                                         :value="item"
                                         :label="item"
@@ -26,7 +35,7 @@
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="deleteVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button type="primary" :disabled="deleteForm.deleteTags.length === 0" @click="batchDelete()">
+                    <el-button type="primary" :disabled="form.deleteTags.length === 0" @click="batchDelete()">
                         {{ $t('commons.button.delete') }}
                     </el-button>
                 </span>
@@ -45,20 +54,29 @@ import DrawerHeader from '@/components/drawer-header/index.vue';
 import i18n from '@/lang';
 
 const deleteVisible = ref(false);
-const deleteForm = reactive({
+const form = reactive({
+    id: '',
+    force: false,
     tags: [] as Array<string>,
     deleteTags: [] as Array<string>,
 });
 
+const deleteAll = ref();
+const isIndeterminate = ref(true);
 const opRef = ref();
 
 interface DialogProps {
+    id: string;
+    isUsed: boolean;
     tags: Array<string>;
 }
 const acceptParams = (params: DialogProps) => {
+    deleteAll.value = false;
     deleteVisible.value = true;
-    deleteForm.deleteTags = [];
-    deleteForm.tags = params.tags;
+    form.deleteTags = [];
+    form.id = params.id;
+    form.tags = params.tags;
+    form.force = !params.isUsed;
 };
 const handleClose = () => {
     deleteVisible.value = false;
@@ -69,20 +87,39 @@ const onSearch = () => {
     emit('search');
 };
 
+const handleCheckAllChange = (val: boolean) => {
+    form.deleteTags = val ? form.tags : [];
+    isIndeterminate.value = false;
+};
+const handleCheckedCitiesChange = (value: string[]) => {
+    const checkedCount = value.length;
+    deleteAll.value = checkedCount === form.tags.length;
+    isIndeterminate.value = checkedCount > 0 && checkedCount < form.tags.length;
+};
+
 const batchDelete = async () => {
     let names = [];
-    for (const item of deleteForm.deleteTags) {
-        names.push(item);
+    let showNames = [];
+    if (deleteAll.value) {
+        names.push(form.id);
+        for (const item of form.deleteTags) {
+            showNames.push(item);
+        }
+    } else {
+        for (const item of form.deleteTags) {
+            names.push(item);
+            showNames.push(item);
+        }
     }
     opRef.value.acceptParams({
         title: i18n.global.t('commons.button.delete'),
-        names: names,
+        names: showNames,
         msg: i18n.global.t('commons.msg.operatorHelper', [
             i18n.global.t('container.image'),
             i18n.global.t('commons.button.delete'),
         ]),
         api: imageRemove,
-        params: { names: names },
+        params: { names: names, force: form.force },
     });
 };
 
