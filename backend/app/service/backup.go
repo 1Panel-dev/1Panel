@@ -69,6 +69,7 @@ func (u *BackupService) List() ([]dto.BackupInfo, error) {
 	dtobas = append(dtobas, u.loadByType("COS", ops))
 	dtobas = append(dtobas, u.loadByType("KODO", ops))
 	dtobas = append(dtobas, u.loadByType("OneDrive", ops))
+	dtobas = append(dtobas, u.loadByType("WebDAV", ops))
 	return dtobas, err
 }
 
@@ -117,7 +118,7 @@ func (u *BackupService) DownloadRecord(info dto.DownloadRecord) (string, error) 
 	}
 	varMap["bucket"] = backup.Bucket
 	switch backup.Type {
-	case constant.Sftp:
+	case constant.Sftp, constant.WebDAV:
 		varMap["username"] = backup.AccessKey
 		varMap["password"] = backup.Credential
 	case constant.OSS, constant.S3, constant.MinIo, constant.Cos, constant.Kodo:
@@ -166,8 +167,7 @@ func (u *BackupService) Create(req dto.BackupOperate) error {
 		}
 	}
 	if req.Type != "LOCAL" {
-		isOk, err := u.checkBackupConn(&backup)
-		if err != nil || !isOk {
+		if _, err := u.checkBackupConn(&backup); err != nil {
 			return buserr.WithMap("ErrBackupCheck", map[string]interface{}{"err": err.Error()}, err)
 		}
 	}
@@ -183,7 +183,7 @@ func (u *BackupService) GetBuckets(backupDto dto.ForBuckets) ([]interface{}, err
 		return nil, err
 	}
 	switch backupDto.Type {
-	case constant.Sftp:
+	case constant.Sftp, constant.WebDAV:
 		varMap["username"] = backupDto.AccessKey
 		varMap["password"] = backupDto.Credential
 	case constant.OSS, constant.S3, constant.MinIo, constant.Cos, constant.Kodo:
@@ -328,7 +328,7 @@ func (u *BackupService) NewClient(backup *model.BackupAccount) (cloud_storage.Cl
 	}
 	varMap["bucket"] = backup.Bucket
 	switch backup.Type {
-	case constant.Sftp:
+	case constant.Sftp, constant.WebDAV:
 		varMap["username"] = backup.AccessKey
 		varMap["password"] = backup.Credential
 	case constant.OSS, constant.S3, constant.MinIo, constant.Cos, constant.Kodo:

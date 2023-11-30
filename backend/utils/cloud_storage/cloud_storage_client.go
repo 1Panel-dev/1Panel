@@ -22,6 +22,8 @@ func NewCloudStorageClient(backupType string, vars map[string]interface{}) (Clou
 		return client.NewOssClient(vars)
 	case constant.Sftp:
 		return client.NewSftpClient(vars)
+	case constant.WebDAV:
+		return client.NewWebDAVClient(vars)
 	case constant.MinIo:
 		return client.NewMinIoClient(vars)
 	case constant.Cos:

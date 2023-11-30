@@ -31,7 +31,7 @@ type CommonBackup struct {
 	DetailName string `json:"detailName"`
 }
 type CommonRecover struct {
-	Source     string `json:"source" validate:"required,oneof=OSS S3 SFTP MINIO LOCAL COS KODO OneDrive"`
+	Source     string `json:"source" validate:"required,oneof=OSS S3 SFTP MINIO LOCAL COS KODO OneDrive WebDAV"`
 	Type       string `json:"type" validate:"required,oneof=app mysql mariadb redis website"`
 	Name       string `json:"name"`
 	DetailName string `json:"detailName"`
@@ -55,7 +55,7 @@ type BackupRecords struct {
 }
 
 type DownloadRecord struct {
-	Source   string `json:"source" validate:"required,oneof=OSS S3 SFTP MINIO LOCAL COS KODO OneDrive"`
+	Source   string `json:"source" validate:"required,oneof=OSS S3 SFTP MINIO LOCAL COS KODO OneDrive WebDAV"`
 	FileDir  string `json:"fileDir" validate:"required"`
 	FileName string `json:"fileName" validate:"required"`
 }

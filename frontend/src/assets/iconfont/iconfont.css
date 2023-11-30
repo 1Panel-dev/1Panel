@@ -1,9 +1,9 @@
 @font-face {
   font-family: "panel"; /* Project id 3575356 */
-  src: url('iconfont.woff2?t=1695287081776') format('woff2'),
-       url('iconfont.woff?t=1695287081776') format('woff'),
-       url('iconfont.ttf?t=1695287081776') format('truetype'),
-       url('iconfont.svg?t=1695287081776#panel') format('svg');
+  src: url('iconfont.woff2?t=1701341406915') format('woff2'),
+       url('iconfont.woff?t=1701341406915') format('woff'),
+       url('iconfont.ttf?t=1701341406915') format('truetype'),
+       url('iconfont.svg?t=1701341406915#panel') format('svg');
 }
 
 .panel {
@@ -12,6 +12,10 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.p-webdav:before {
+  content: "\e622";
 }
 
 .p-xiangqing:before {

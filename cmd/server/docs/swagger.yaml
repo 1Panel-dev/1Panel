@@ -273,6 +273,7 @@ definitions:
         - COS
         - KODO
         - OneDrive
+        - WebDAV
         type: string
       type:
         enum:
@@ -818,6 +819,10 @@ definitions:
     properties:
       address:
         type: string
+      clientCert:
+        type: string
+      clientKey:
+        type: string
       description:
         type: string
       from:
@@ -832,6 +837,12 @@ definitions:
         type: string
       port:
         type: integer
+      rootCert:
+        type: string
+      skipVerify:
+        type: boolean
+      ssl:
+        type: boolean
       type:
         type: string
       username:
@@ -861,6 +872,10 @@ definitions:
     properties:
       address:
         type: string
+      clientCert:
+        type: string
+      clientKey:
+        type: string
       createdAt:
         type: string
       description:
@@ -876,6 +891,12 @@ definitions:
         type: string
       port:
         type: integer
+      rootCert:
+        type: string
+      skipVerify:
+        type: boolean
+      ssl:
+        type: boolean
       type:
         type: string
       username:
@@ -920,6 +941,10 @@ definitions:
     properties:
       address:
         type: string
+      clientCert:
+        type: string
+      clientKey:
+        type: string
       description:
         type: string
       id:
@@ -928,6 +953,12 @@ definitions:
         type: string
       port:
         type: integer
+      rootCert:
+        type: string
+      skipVerify:
+        type: boolean
+      ssl:
+        type: boolean
       type:
         type: string
       username:
@@ -1023,6 +1054,7 @@ definitions:
         - COS
         - KODO
         - OneDrive
+        - WebDAV
         type: string
     required:
     - fileDir
@@ -2380,6 +2412,7 @@ definitions:
         - COS
         - KODO
         - OneDrive
+        - WebDAV
         type: string
       id:
         type: integer

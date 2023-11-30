@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "23044673",
+      "name": "webdav",
+      "font_class": "webdav",
+      "unicode": "e622",
+      "unicode_decimal": 58914
+    },
+    {
       "icon_id": "10293150",
       "name": "详情",
       "font_class": "xiangqing",

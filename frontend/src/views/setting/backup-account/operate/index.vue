@@ -195,9 +195,23 @@
                                 :title="$t('setting.archiveHelper')"
                             />
                         </el-form-item>
-                        <div v-if="dialogData.rowData!.type === 'SFTP'">
-                            <el-form-item :label="$t('setting.address')" prop="varsJson.address" :rules="Rules.host">
+                        <div v-if="isSftpOrWebDAV(dialogData.rowData!.type)">
+                            <el-form-item
+                                v-if="dialogData.rowData!.type === 'SFTP'"
+                                :label="$t('setting.address')"
+                                prop="varsJson.address"
+                                :rules="Rules.host"
+                            >
                                 <el-input v-model.trim="dialogData.rowData!.varsJson['address']" />
+                            </el-form-item>
+                            <el-form-item
+                                v-if="dialogData.rowData!.type === 'WebDAV'"
+                                :label="$t('setting.address')"
+                                prop="varsJson.address"
+                                :rules="Rules.requiredInput"
+                            >
+                                <el-input v-model.trim="dialogData.rowData!.varsJson['address']" />
+                                <span class="input-help">https://172.16.10.111</span>
                             </el-form-item>
                             <el-form-item :label="$t('commons.table.port')" prop="varsJson.port" :rules="[Rules.port]">
                                 <el-input-number
@@ -230,7 +244,7 @@
                             </el-form-item>
                         </div>
                         <el-form-item
-                            v-if="dialogData.rowData!.type !== 'LOCAL' && dialogData.rowData!.type !== 'SFTP'"
+                            v-if="dialogData.rowData!.type !== 'LOCAL' && !isSftpOrWebDAV(dialogData.rowData!.type)"
                             :label="$t('setting.backupDir')"
                             prop="backupPath"
                         >
@@ -345,6 +359,10 @@ function hasBucket(val: string) {
 
 function hasEndpoint(val: string) {
     return val === 'OSS' || val === 'S3';
+}
+
+function isSftpOrWebDAV(val: string) {
+    return val === 'SFTP' || val === 'WebDAV';
 }
 
 const toDoc = () => {
