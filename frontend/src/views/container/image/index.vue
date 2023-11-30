@@ -279,6 +279,7 @@ const buttons = [
             }
             let params = {
                 id: row.id,
+                isUsed: row.isUsed,
                 tags: row.tags,
             };
             dialogDeleteRef.value!.acceptParams(params);
