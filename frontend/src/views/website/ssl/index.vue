@@ -236,7 +236,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.operate.update'),
         click: function (row: Website.SSLDTO) {
-            sslUploadRef.value.acceptParams(row.id);
+            sslUploadRef.value.acceptParams(row);
         },
         show: function (row: Website.SSLDTO) {
             return row.provider == 'manual';

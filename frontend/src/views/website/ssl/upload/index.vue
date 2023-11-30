@@ -36,6 +36,9 @@
                             </el-input>
                         </el-form-item>
                     </div>
+                    <el-form-item :label="$t('website.remark')" prop="description">
+                        <el-input v-model="ssl.description"></el-input>
+                    </el-form-item>
                 </el-form>
             </el-col>
         </el-row>
@@ -58,6 +61,7 @@ import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
+import { Website } from '@/api/interface/website';
 
 const open = ref(false);
 const loading = ref(false);
@@ -77,6 +81,7 @@ const initData = () => ({
     certificatePath: '',
     type: 'paste',
     sslID: 0,
+    description: '',
 });
 const ssl = ref(initData());
 
@@ -91,10 +96,11 @@ const resetForm = () => {
     ssl.value = initData();
 };
 
-const acceptParams = (id: number) => {
+const acceptParams = (websiteSSL: Website.SSLDTO) => {
     resetForm();
-    if (id && id > 0) {
-        ssl.value.sslID = id;
+    if (websiteSSL && websiteSSL.id > 0) {
+        ssl.value.sslID = websiteSSL.id;
+        ssl.value.description = websiteSSL.description;
     }
     open.value = true;
 };

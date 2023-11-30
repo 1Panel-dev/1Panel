@@ -91,7 +91,7 @@
                         </div>
                     </div>
                     <el-form-item :label="' '" v-if="websiteSSL && websiteSSL.id > 0">
-                        <el-descriptions :column="5" border direction="vertical">
+                        <el-descriptions :column="6" border direction="vertical">
                             <el-descriptions-item :label="$t('website.primaryDomain')">
                                 {{ websiteSSL.primaryDomain }}
                             </el-descriptions-item>
@@ -109,6 +109,9 @@
                             </el-descriptions-item>
                             <el-descriptions-item :label="$t('website.expireDate')">
                                 {{ dateFormatSimple(websiteSSL.expireDate) }}
+                            </el-descriptions-item>
+                            <el-descriptions-item :label="$t('website.remark')">
+                                {{ websiteSSL.description }}
                             </el-descriptions-item>
                         </el-descriptions>
                     </el-form-item>

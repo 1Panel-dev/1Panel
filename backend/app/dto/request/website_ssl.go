@@ -77,6 +77,7 @@ type WebsiteSSLUpload struct {
 	CertificatePath string `json:"certificatePath"`
 	Type            string `json:"type" validate:"required,oneof=paste local"`
 	SSLID           uint   `json:"sslID"`
+	Description     string `json:"description"`
 }
 
 type WebsiteCASearch struct {
@@ -95,16 +96,17 @@ type WebsiteCACreate struct {
 }
 
 type WebsiteCAObtain struct {
-	ID        uint   `json:"id" validate:"required"`
-	Domains   string `json:"domains" validate:"required"`
-	KeyType   string `json:"keyType" validate:"required,oneof=P256 P384 2048 3072 4096 8192"`
-	Time      int    `json:"time" validate:"required"`
-	Unit      string `json:"unit" validate:"required"`
-	PushDir   bool   `json:"pushDir"`
-	Dir       string `json:"dir"`
-	AutoRenew bool   `json:"autoRenew"`
-	Renew     bool   `json:"renew"`
-	SSLID     uint   `json:"sslID"`
+	ID          uint   `json:"id" validate:"required"`
+	Domains     string `json:"domains" validate:"required"`
+	KeyType     string `json:"keyType" validate:"required,oneof=P256 P384 2048 3072 4096 8192"`
+	Time        int    `json:"time" validate:"required"`
+	Unit        string `json:"unit" validate:"required"`
+	PushDir     bool   `json:"pushDir"`
+	Dir         string `json:"dir"`
+	AutoRenew   bool   `json:"autoRenew"`
+	Renew       bool   `json:"renew"`
+	SSLID       uint   `json:"sslID"`
+	Description string `json:"description"`
 }
 
 type WebsiteCARenew struct {

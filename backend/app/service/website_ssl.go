@@ -376,7 +376,8 @@ func (w WebsiteSSLService) Update(update request.WebsiteSSLUpdate) error {
 
 func (w WebsiteSSLService) Upload(req request.WebsiteSSLUpload) error {
 	websiteSSL := &model.WebsiteSSL{
-		Provider: constant.Manual,
+		Provider:    constant.Manual,
+		Description: req.Description,
 	}
 	var err error
 	if req.SSLID > 0 {
@@ -384,6 +385,7 @@ func (w WebsiteSSLService) Upload(req request.WebsiteSSLUpload) error {
 		if err != nil {
 			return err
 		}
+		websiteSSL.Description = req.Description
 	}
 	if req.Type == "local" {
 		fileOp := files.NewFileOp()

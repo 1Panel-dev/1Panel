@@ -5,7 +5,7 @@
         </template>
         <div v-loading="loading">
             <el-radio-group v-model="curr">
-                <el-radio-button label="detail">{{ $t('ssl.msg') }}</el-radio-button>
+                <el-radio-button label="detail">{{ $t('ssl.organizationDetail') }}</el-radio-button>
                 <el-radio-button label="ssl">csr</el-radio-button>
                 <el-radio-button label="key">{{ $t('ssl.key') }}</el-radio-button>
             </el-radio-group>

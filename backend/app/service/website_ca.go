@@ -213,11 +213,12 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 			return nil, err
 		}
 		websiteSSL = &model.WebsiteSSL{
-			Provider:  constant.SelfSigned,
-			KeyType:   req.KeyType,
-			PushDir:   req.PushDir,
-			CaID:      ca.ID,
-			AutoRenew: req.AutoRenew,
+			Provider:    constant.SelfSigned,
+			KeyType:     req.KeyType,
+			PushDir:     req.PushDir,
+			CaID:        ca.ID,
+			AutoRenew:   req.AutoRenew,
+			Description: req.Description,
 		}
 		if req.PushDir {
 			if !files.NewFileOp().Stat(req.Dir) {
