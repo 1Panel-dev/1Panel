@@ -8,7 +8,7 @@
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
                         <el-form-item :label="$t('commons.table.name')" prop="name">
-                            <el-input clearable v-model.trim="form.name">
+                            <el-input clearable v-model.trim="form.name" @input="form.username = form.name">
                                 <template #append>
                                     <el-select v-model="form.format" style="width: 120px">
                                         <el-option label="utf8mb4" value="utf8mb4" />
