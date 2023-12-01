@@ -14,29 +14,15 @@ import (
 )
 
 type minIoClient struct {
-	Vars   map[string]interface{}
+	bucket string
 	client *minio.Client
 }
 
 func NewMinIoClient(vars map[string]interface{}) (*minIoClient, error) {
-	var endpoint string
-	var accessKeyID string
-	var secretAccessKey string
-	if _, ok := vars["endpoint"]; ok {
-		endpoint = vars["endpoint"].(string)
-	} else {
-		return nil, constant.ErrInvalidParams
-	}
-	if _, ok := vars["accessKey"]; ok {
-		accessKeyID = vars["accessKey"].(string)
-	} else {
-		return nil, constant.ErrInvalidParams
-	}
-	if _, ok := vars["secretKey"]; ok {
-		secretAccessKey = vars["secretKey"].(string)
-	} else {
-		return nil, constant.ErrInvalidParams
-	}
+	endpoint := loadParamFromVars("endpoint", true, vars)
+	accessKeyID := loadParamFromVars("accessKey", true, vars)
+	secretAccessKey := loadParamFromVars("secretKey", true, vars)
+	bucket := loadParamFromVars("bucket", true, vars)
 	ssl := strings.Split(endpoint, ":")[0]
 	if len(ssl) == 0 || (ssl != "https" && ssl != "http") {
 		return nil, constant.ErrInvalidParams
@@ -59,14 +45,11 @@ func NewMinIoClient(vars map[string]interface{}) (*minIoClient, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &minIoClient{
-		client: client,
-		Vars:   vars,
-	}, nil
+	return &minIoClient{bucket: bucket, client: client}, nil
 }
 
-func (minIo minIoClient) ListBuckets() ([]interface{}, error) {
-	buckets, err := minIo.client.ListBuckets(context.Background())
+func (m minIoClient) ListBuckets() ([]interface{}, error) {
+	buckets, err := m.client.ListBuckets(context.Background())
 	if err != nil {
 		return nil, err
 	}
@@ -77,49 +60,44 @@ func (minIo minIoClient) ListBuckets() ([]interface{}, error) {
 	return result, err
 }
 
-func (minIo minIoClient) Exist(path string) (bool, error) {
-	if _, ok := minIo.Vars["bucket"]; ok {
-		_, err := minIo.client.GetObject(context.Background(), minIo.Vars["bucket"].(string), path, minio.GetObjectOptions{})
-		if err != nil {
-			return false, err
-		}
-		return true, nil
-	} else {
-		return false, constant.ErrInvalidParams
+func (m minIoClient) Exist(path string) (bool, error) {
+	if _, err := m.client.GetObject(context.Background(), m.bucket, path, minio.GetObjectOptions{}); err != nil {
+		return false, err
 	}
+	return true, nil
 }
 
-func (minIo minIoClient) Delete(path string) (bool, error) {
-	if _, ok := minIo.Vars["bucket"]; ok {
-		object, err := minIo.client.GetObject(context.Background(), minIo.Vars["bucket"].(string), path, minio.GetObjectOptions{})
-		if err != nil {
-			return false, err
-		}
-		info, err := object.Stat()
-		if err != nil {
-			return false, err
-		}
-		err = minIo.client.RemoveObject(context.Background(), minIo.Vars["bucket"].(string), path, minio.RemoveObjectOptions{
-			GovernanceBypass: true,
-			VersionID:        info.VersionID,
-		})
-		if err != nil {
-			return false, err
-		}
-		return true, nil
-	} else {
-		return false, constant.ErrInvalidParams
+func (m minIoClient) Size(path string) (int64, error) {
+	obj, err := m.client.GetObject(context.Background(), m.bucket, path, minio.GetObjectOptions{})
+	if err != nil {
+		return 0, err
 	}
+	file, err := obj.Stat()
+	if err != nil {
+		return 0, err
+	}
+	return file.Size, nil
 }
 
-func (minIo minIoClient) Upload(src, target string) (bool, error) {
-	var bucket string
-	if _, ok := minIo.Vars["bucket"]; ok {
-		bucket = minIo.Vars["bucket"].(string)
-	} else {
-		return false, constant.ErrInvalidParams
+func (m minIoClient) Delete(path string) (bool, error) {
+	object, err := m.client.GetObject(context.Background(), m.bucket, path, minio.GetObjectOptions{})
+	if err != nil {
+		return false, err
 	}
+	info, err := object.Stat()
+	if err != nil {
+		return false, err
+	}
+	if err = m.client.RemoveObject(context.Background(), m.bucket, path, minio.RemoveObjectOptions{
+		GovernanceBypass: true,
+		VersionID:        info.VersionID,
+	}); err != nil {
+		return false, err
+	}
+	return true, nil
+}
 
+func (m minIoClient) Upload(src, target string) (bool, error) {
 	file, err := os.Open(src)
 	if err != nil {
 		return false, err
@@ -130,52 +108,36 @@ func (minIo minIoClient) Upload(src, target string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	_, err = minIo.client.PutObject(context.Background(), bucket, target, file, fileStat.Size(), minio.PutObjectOptions{ContentType: "application/octet-stream"})
+	_, err = m.client.PutObject(context.Background(), m.bucket, target, file, fileStat.Size(), minio.PutObjectOptions{ContentType: "application/octet-stream"})
 	if err != nil {
 		return false, err
 	}
 	return true, nil
 }
 
-func (minIo minIoClient) Download(src, target string) (bool, error) {
-	if _, ok := minIo.Vars["bucket"]; ok {
-		object, err := minIo.client.GetObject(context.Background(), minIo.Vars["bucket"].(string), src, minio.GetObjectOptions{})
-		if err != nil {
-			return false, err
-		}
-		localFile, err := os.Create(target)
-		if err != nil {
-			return false, err
-		}
-		if _, err = io.Copy(localFile, object); err != nil {
-			return false, err
-		}
-		return true, nil
-	} else {
-		return false, constant.ErrInvalidParams
-	}
-}
-
-func (minIo *minIoClient) GetBucket() (string, error) {
-	if _, ok := minIo.Vars["bucket"]; ok {
-		return minIo.Vars["bucket"].(string), nil
-	} else {
-		return "", constant.ErrInvalidParams
-	}
-}
-
-func (minIo minIoClient) ListObjects(prefix string) ([]string, error) {
-	bucket, err := minIo.GetBucket()
+func (m minIoClient) Download(src, target string) (bool, error) {
+	object, err := m.client.GetObject(context.Background(), m.bucket, src, minio.GetObjectOptions{})
 	if err != nil {
-		return nil, constant.ErrInvalidParams
+		return false, err
 	}
+	localFile, err := os.Create(target)
+	if err != nil {
+		return false, err
+	}
+	if _, err = io.Copy(localFile, object); err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func (m minIoClient) ListObjects(prefix string) ([]string, error) {
 	opts := minio.ListObjectsOptions{
 		Recursive: true,
 		Prefix:    prefix,
 	}
 
 	var result []string
-	for object := range minIo.client.ListObjects(context.Background(), bucket, opts) {
+	for object := range m.client.ListObjects(context.Background(), m.bucket, opts) {
 		if object.Err != nil {
 			continue
 		}

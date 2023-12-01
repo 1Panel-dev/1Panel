@@ -23,17 +23,11 @@ import (
 )
 
 type oneDriveClient struct {
-	Vars   map[string]interface{}
 	client odsdk.Client
 }
 
 func NewOneDriveClient(vars map[string]interface{}) (*oneDriveClient, error) {
-	token := ""
-	if _, ok := vars["accessToken"]; ok {
-		token = vars["accessToken"].(string)
-	} else {
-		return nil, constant.ErrInvalidParams
-	}
+	token := loadParamFromVars("accessToken", true, vars)
 	ctx := context.Background()
 
 	newToken, err := refreshToken(token)
@@ -51,13 +45,13 @@ func NewOneDriveClient(vars map[string]interface{}) (*oneDriveClient, error) {
 	return &oneDriveClient{client: *client}, nil
 }
 
-func (onedrive oneDriveClient) ListBuckets() ([]interface{}, error) {
+func (o oneDriveClient) ListBuckets() ([]interface{}, error) {
 	return nil, nil
 }
 
-func (onedrive oneDriveClient) Exist(path string) (bool, error) {
+func (o oneDriveClient) Exist(path string) (bool, error) {
 	path = "/" + strings.TrimPrefix(path, "/")
-	fileID, err := onedrive.loadIDByPath(path)
+	fileID, err := o.loadIDByPath(path)
 	if err != nil {
 		return false, err
 	}
@@ -65,26 +59,50 @@ func (onedrive oneDriveClient) Exist(path string) (bool, error) {
 	return len(fileID) != 0, nil
 }
 
-func (onedrive oneDriveClient) Delete(path string) (bool, error) {
+func (o oneDriveClient) Size(path string) (int64, error) {
 	path = "/" + strings.TrimPrefix(path, "/")
-	req, err := onedrive.client.NewRequest("DELETE", fmt.Sprintf("me/drive/root:%s", path), nil)
+	pathItem := "root:" + path
+	if path == "/" {
+		pathItem = "root"
+	}
+	req, err := o.client.NewRequest("GET", fmt.Sprintf("me/drive/%s", pathItem), nil)
+	if err != nil {
+		return 0, fmt.Errorf("new request for file id failed, err: %v", err)
+	}
+	var driveItem myDriverItem
+	if err := o.client.Do(context.Background(), req, false, &driveItem); err != nil {
+		return 0, fmt.Errorf("do request for file id failed, err: %v", err)
+	}
+
+	return driveItem.Size, nil
+}
+
+type myDriverItem struct {
+	Name string `json:"name"`
+	Id   string `json:"id"`
+	Size int64  `json:"size"`
+}
+
+func (o oneDriveClient) Delete(path string) (bool, error) {
+	path = "/" + strings.TrimPrefix(path, "/")
+	req, err := o.client.NewRequest("DELETE", fmt.Sprintf("me/drive/root:%s", path), nil)
 	if err != nil {
 		return false, fmt.Errorf("new request for delete file failed, err: %v \n", err)
 	}
-	if err := onedrive.client.Do(context.Background(), req, false, nil); err != nil {
+	if err := o.client.Do(context.Background(), req, false, nil); err != nil {
 		return false, fmt.Errorf("do request for delete file failed, err: %v \n", err)
 	}
 
 	return true, nil
 }
 
-func (onedrive oneDriveClient) Upload(src, target string) (bool, error) {
+func (o oneDriveClient) Upload(src, target string) (bool, error) {
 	target = "/" + strings.TrimPrefix(target, "/")
-	if _, err := onedrive.loadIDByPath(path.Dir(target)); err != nil {
+	if _, err := o.loadIDByPath(path.Dir(target)); err != nil {
 		if !strings.Contains(err.Error(), "itemNotFound") {
 			return false, err
 		}
-		if err := onedrive.createFolder(path.Dir(target)); err != nil {
+		if err := o.createFolder(path.Dir(target)); err != nil {
 			return false, fmt.Errorf("create dir before upload failed, err: %v", err)
 		}
 	}
@@ -105,7 +123,7 @@ func (onedrive oneDriveClient) Upload(src, target string) (bool, error) {
 	fileName := fileInfo.Name()
 	fileSize := fileInfo.Size()
 
-	folderID, err := onedrive.loadIDByPath(path.Dir(target))
+	folderID, err := o.loadIDByPath(path.Dir(target))
 	if err != nil {
 		return false, err
 	}
@@ -119,13 +137,13 @@ func (onedrive oneDriveClient) Upload(src, target string) (bool, error) {
 		DeferCommit bool                            `json:"deferCommit"`
 	}{sessionCreationRequestInside, false}
 
-	sessionCreationReq, err := onedrive.client.NewRequest("POST", apiURL, sessionCreationRequest)
+	sessionCreationReq, err := o.client.NewRequest("POST", apiURL, sessionCreationRequest)
 	if err != nil {
 		return false, err
 	}
 
 	var sessionCreationResp *NewUploadSessionCreationResponse
-	err = onedrive.client.Do(ctx, sessionCreationReq, false, &sessionCreationResp)
+	err = o.client.Do(ctx, sessionCreationReq, false, &sessionCreationResp)
 	if err != nil {
 		return false, fmt.Errorf("session creation failed %w", err)
 	}
@@ -149,11 +167,11 @@ func (onedrive oneDriveClient) Upload(src, target string) (bool, error) {
 			bufferLast := buffer[:length]
 			buffer = bufferLast
 		}
-		sessionFileUploadReq, err := onedrive.NewSessionFileUploadRequest(fileSessionUploadUrl, splitNow*sizePerSplit, fileSize, bytes.NewReader(buffer))
+		sessionFileUploadReq, err := o.NewSessionFileUploadRequest(fileSessionUploadUrl, splitNow*sizePerSplit, fileSize, bytes.NewReader(buffer))
 		if err != nil {
 			return false, err
 		}
-		if err := onedrive.client.Do(ctx, sessionFileUploadReq, false, &fileUploadResp); err != nil {
+		if err := o.client.Do(ctx, sessionFileUploadReq, false, &fileUploadResp); err != nil {
 			return false, err
 		}
 	}
@@ -164,14 +182,14 @@ func (onedrive oneDriveClient) Upload(src, target string) (bool, error) {
 	return true, nil
 }
 
-func (onedrive oneDriveClient) Download(src, target string) (bool, error) {
+func (o oneDriveClient) Download(src, target string) (bool, error) {
 	src = "/" + strings.TrimPrefix(src, "/")
-	req, err := onedrive.client.NewRequest("GET", fmt.Sprintf("me/drive/root:%s", src), nil)
+	req, err := o.client.NewRequest("GET", fmt.Sprintf("me/drive/root:%s", src), nil)
 	if err != nil {
 		return false, fmt.Errorf("new request for file id failed, err: %v", err)
 	}
 	var driveItem *odsdk.DriveItem
-	if err := onedrive.client.Do(context.Background(), req, false, &driveItem); err != nil {
+	if err := o.client.Do(context.Background(), req, false, &driveItem); err != nil {
 		return false, fmt.Errorf("do request for file id failed, err: %v", err)
 	}
 
@@ -196,19 +214,19 @@ func (onedrive oneDriveClient) Download(src, target string) (bool, error) {
 	return true, nil
 }
 
-func (onedrive *oneDriveClient) ListObjects(prefix string) ([]string, error) {
+func (o *oneDriveClient) ListObjects(prefix string) ([]string, error) {
 	prefix = "/" + strings.TrimPrefix(prefix, "/")
-	folderID, err := onedrive.loadIDByPath(prefix)
+	folderID, err := o.loadIDByPath(prefix)
 	if err != nil {
 		return nil, err
 	}
 
-	req, err := onedrive.client.NewRequest("GET", fmt.Sprintf("me/drive/items/%s/children", folderID), nil)
+	req, err := o.client.NewRequest("GET", fmt.Sprintf("me/drive/items/%s/children", folderID), nil)
 	if err != nil {
 		return nil, fmt.Errorf("new request for list failed, err: %v", err)
 	}
 	var driveItems *odsdk.OneDriveDriveItemsResponse
-	if err := onedrive.client.Do(context.Background(), req, false, &driveItems); err != nil {
+	if err := o.client.Do(context.Background(), req, false, &driveItems); err != nil {
 		return nil, fmt.Errorf("do request for list failed, err: %v", err)
 	}
 
@@ -219,17 +237,17 @@ func (onedrive *oneDriveClient) ListObjects(prefix string) ([]string, error) {
 	return itemList, nil
 }
 
-func (onedrive *oneDriveClient) loadIDByPath(path string) (string, error) {
+func (o *oneDriveClient) loadIDByPath(path string) (string, error) {
 	pathItem := "root:" + path
 	if path == "/" {
 		pathItem = "root"
 	}
-	req, err := onedrive.client.NewRequest("GET", fmt.Sprintf("me/drive/%s", pathItem), nil)
+	req, err := o.client.NewRequest("GET", fmt.Sprintf("me/drive/%s", pathItem), nil)
 	if err != nil {
 		return "", fmt.Errorf("new request for file id failed, err: %v", err)
 	}
 	var driveItem *odsdk.DriveItem
-	if err := onedrive.client.Do(context.Background(), req, false, &driveItem); err != nil {
+	if err := o.client.Do(context.Background(), req, false, &driveItem); err != nil {
 		return "", fmt.Errorf("do request for file id failed, err: %v", err)
 	}
 	return driveItem.Id, nil
@@ -269,18 +287,18 @@ func refreshToken(oldToken string) (string, error) {
 	return accessToken, nil
 }
 
-func (onedrive *oneDriveClient) createFolder(parent string) error {
-	if _, err := onedrive.loadIDByPath(path.Dir(parent)); err != nil {
+func (o *oneDriveClient) createFolder(parent string) error {
+	if _, err := o.loadIDByPath(path.Dir(parent)); err != nil {
 		if !strings.Contains(err.Error(), "itemNotFound") {
 			return err
 		}
-		_ = onedrive.createFolder(path.Dir(parent))
+		_ = o.createFolder(path.Dir(parent))
 	}
-	item2, err := onedrive.loadIDByPath(path.Dir(parent))
+	item2, err := o.loadIDByPath(path.Dir(parent))
 	if err != nil {
 		return err
 	}
-	if _, err := onedrive.client.DriveItems.CreateNewFolder(context.Background(), "", item2, path.Base(parent)); err != nil {
+	if _, err := o.client.DriveItems.CreateNewFolder(context.Background(), "", item2, path.Base(parent)); err != nil {
 		return err
 	}
 	return nil
@@ -307,8 +325,8 @@ type DriveItem struct {
 	WebURL      string `json:"webUrl"`
 }
 
-func (onedrive *oneDriveClient) NewSessionFileUploadRequest(absoluteUrl string, grandOffset, grandTotalSize int64, byteReader *bytes.Reader) (*http.Request, error) {
-	apiUrl, err := onedrive.client.BaseURL.Parse(absoluteUrl)
+func (o *oneDriveClient) NewSessionFileUploadRequest(absoluteUrl string, grandOffset, grandTotalSize int64, byteReader *bytes.Reader) (*http.Request, error) {
+	apiUrl, err := o.client.BaseURL.Parse(absoluteUrl)
 	if err != nil {
 		return nil, err
 	}

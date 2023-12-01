@@ -27,6 +27,14 @@
                 </template>
                 <el-table-column type="selection" fix />
                 <el-table-column :label="$t('commons.table.name')" prop="fileName" show-overflow-tooltip />
+                <el-table-column :label="$t('file.size')" prop="size" show-overflow-tooltip>
+                    <template #default="{ row }">
+                        <span v-if="row.size">
+                            {{ computeSize(row.size) }}
+                        </span>
+                        <span v-else>-</span>
+                    </template>
+                </el-table-column>
                 <el-table-column :label="$t('database.source')" prop="backupType">
                     <template #default="{ row }">
                         <span v-if="row.source">
@@ -52,7 +60,7 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import OpDialog from '@/components/del-dialog/index.vue';
-import { dateFormat, downloadFile } from '@/utils/util';
+import { computeSize, dateFormat, downloadFile } from '@/utils/util';
 import { handleBackup, handleRecover } from '@/api/modules/setting';
 import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
@@ -101,9 +109,16 @@ const search = async () => {
         name: name.value,
         detailName: detailName.value,
     };
-    const res = await searchBackupRecords(params);
-    data.value = res.data.items || [];
-    paginationConfig.total = res.data.total;
+    loading.value = true;
+    await searchBackupRecords(params)
+        .then((res) => {
+            loading.value = false;
+            data.value = res.data.items || [];
+            paginationConfig.total = res.data.total;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const onBackup = async () => {
