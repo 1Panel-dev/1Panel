@@ -2,13 +2,6 @@
     <div>
         <RouterButton :buttons="routerButton" />
         <LayoutContent :title="$t('website.ssl')">
-            <template #prompt>
-                <el-alert type="info" :closable="false">
-                    <template #default>
-                        <span><span v-html="$t('website.encryptHelper')"></span></span>
-                    </template>
-                </el-alert>
-            </template>
             <template #toolbar>
                 <el-button type="primary" @click="openSSL()">
                     {{ $t('ssl.create') }}
