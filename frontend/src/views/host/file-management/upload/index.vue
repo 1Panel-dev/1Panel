@@ -174,7 +174,13 @@ const submit = async () => {
             } else {
                 formData.append('path', path.value);
             }
-            await UploadFileData(formData, {});
+            await UploadFileData(formData, {
+                onUploadProgress: (progressEvent) => {
+                    const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+                    uploadPrecent.value = progress;
+                },
+                timeout: 40000,
+            });
             success++;
             uploaderFiles.value[i].status = 'success';
         } else {
