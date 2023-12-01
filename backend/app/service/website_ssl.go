@@ -153,10 +153,12 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 	}
 	create.ID = websiteSSL.ID
 	go func() {
-		if err = w.ObtainSSL(request.WebsiteSSLApply{
-			ID: websiteSSL.ID,
-		}); err != nil {
-			global.LOG.Errorf("obtain ssl failed, err: %v", err)
+		if create.Provider != constant.DnsManual {
+			if err = w.ObtainSSL(request.WebsiteSSLApply{
+				ID: websiteSSL.ID,
+			}); err != nil {
+				global.LOG.Errorf("obtain ssl failed, err: %v", err)
+			}
 		}
 	}()
 	return create, nil

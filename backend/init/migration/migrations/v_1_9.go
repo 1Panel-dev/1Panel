@@ -19,7 +19,7 @@ var UpdateAcmeAccount = &gormigrate.Migration{
 }
 
 var AddWebsiteCA = &gormigrate.Migration{
-	ID: "20231130-add-website-ca",
+	ID: "20231125-add-website-ca",
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.AutoMigrate(&model.WebsiteCA{}); err != nil {
 			return err
@@ -59,7 +59,7 @@ var AddDatabaseSSL = &gormigrate.Migration{
 }
 
 var AddDefaultCA = &gormigrate.Migration{
-	ID: "20231130-add-default-ca",
+	ID: "20231129-add-default-ca",
 	Migrate: func(tx *gorm.DB) error {
 		caService := service.NewIWebsiteCAService()
 		if _, err := caService.Create(request.WebsiteCACreate{

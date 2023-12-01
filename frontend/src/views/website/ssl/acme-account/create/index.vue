@@ -21,6 +21,9 @@
                                 :value="acme.value"
                             ></el-option>
                         </el-select>
+                        <span class="input-help" v-if="account.type === 'buypass'">
+                            {{ $t('ssl.buypassHelper') }}
+                        </span>
                     </el-form-item>
                     <el-form-item :label="$t('website.keyType')" prop="keyType">
                         <el-select v-model="account.keyType">
@@ -39,6 +42,7 @@
                         <el-form-item label="EAB HmacKey" prop="eabHmacKey">
                             <el-input v-model.trim="account.eabHmacKey"></el-input>
                         </el-form-item>
+                        <span v-html="$t('ssl.googleHelper')"></span>
                     </div>
                 </el-form>
             </el-col>

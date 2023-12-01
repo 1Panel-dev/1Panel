@@ -1742,6 +1742,11 @@ const message = {
         pushDirHelper: '会在此目录下生成两个文件，证书文件：fullchain.pem 密钥文件：privkey.pem',
         organizationDetail: '机构详情',
         fromWebsite: '从网站中获取',
+        dnsMauanlHelper: '手动解析模式需要在创建完之后点击申请按钮获取 DNS 解析值',
+        httpHelper: 'HTTP 模式需要安装 OpenResty',
+        buypassHelper: 'Buypass 大陆地区无法访问',
+        googleHelper:
+            "<a target=“_blank” href='https://cloud.google.com/certificate-manager/docs/public-ca-tutorial?hl=zh-cn'>如何获取 EAB HmacKey 和 EAB kid</a> ",
     },
     firewall: {
         create: '创建规则',

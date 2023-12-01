@@ -61,6 +61,12 @@
                             <el-radio label="dnsManual">{{ $t('website.dnsManual') }}</el-radio>
                             <el-radio label="http">HTTP</el-radio>
                         </el-radio-group>
+                        <span class="input-help" v-if="ssl.provider === 'dnsManual'">
+                            {{ $t('ssl.dnsMauanlHelper') }}
+                        </span>
+                        <span class="input-help" v-if="ssl.provider === 'http'">
+                            {{ $t('ssl.httpHelper') }}
+                        </span>
                     </el-form-item>
                     <el-form-item
                         :label="$t('website.dnsAccount')"
@@ -258,8 +264,10 @@ const submit = async (formEl: FormInstance | undefined) => {
         loading.value = true;
         CreateSSL(ssl.value)
             .then((res: any) => {
+                if (ssl.value.provider != 'dnsManual') {
+                    em('submit', res.data.id);
+                }
                 handleClose();
-                em('submit', res.data.id);
                 MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
             })
             .finally(() => {
