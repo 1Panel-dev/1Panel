@@ -1035,7 +1035,7 @@ const message = {
         clearList: '清空列表',
         deleteRecycleHelper: '確定永久刪除以下文件？',
         typeErrOrEmpty: '【{0}】 檔案類型錯誤或為空資料夾',
-        dropHelper: '將【{0}】拖曳到此處，或',
+        dropHelper: '將需要上傳的文件拖曳到此處',
     },
     ssh: {
         autoStart: '開機自啟',

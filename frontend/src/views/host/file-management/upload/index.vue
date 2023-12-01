@@ -19,9 +19,21 @@
             <el-button @click="clearFiles">{{ $t('file.clearList') }}</el-button>
         </div>
 
+        <div>
+            <div class="el-upload-dragger" @dragover="handleDragover" @drop="handleDrop" @dragleave="handleDragleave">
+                <div class="flex items-center justify-center h-52">
+                    <div>
+                        <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+                        <div class="el-upload__text">
+                            {{ $t('file.dropHelper') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <el-upload
             action="#"
-            drag
             :auto-upload="false"
             ref="uploadRef"
             :on-change="fileOnChange"
@@ -30,17 +42,14 @@
             :show-file-list="false"
             multiple
             v-model:file-list="uploaderFiles"
+            :limit="10"
         >
-            <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-            <div class="el-upload__text">
-                {{ $t('file.dropHelper', [$t('file.' + uploadType)]) }}
-                <em>{{ $t('database.clickHelper') }}</em>
-            </div>
             <template #tip>
                 <el-text>{{ uploadHelper }}</el-text>
                 <el-progress v-if="loading" text-inside :stroke-width="20" :percentage="uploadPrecent"></el-progress>
             </template>
         </el-upload>
+
         <div>
             <p
                 v-for="(item, index) in uploaderFiles"
@@ -126,6 +135,66 @@ const removeFile = (index: number) => {
     uploaderFiles.value.splice(index, 1);
 };
 
+const handleDragover = (event: DragEvent) => {
+    event.preventDefault();
+};
+
+const handleDrop = (event: DragEvent) => {
+    event.preventDefault();
+    const items = event.dataTransfer.items;
+
+    if (items) {
+        for (let i = 0; i < items.length; i++) {
+            const entry = items[i].webkitGetAsEntry();
+            if (entry) {
+                traverseFileTree(entry);
+            }
+        }
+    }
+};
+
+const convertFileToUploadFile = (file: File, path: string): UploadFile => {
+    const uid = Date.now();
+
+    const uploadRawFile: UploadRawFile = new File([file], file.name, {
+        type: file.type,
+        lastModified: file.lastModified,
+    }) as UploadRawFile;
+    uploadRawFile.uid = uid;
+
+    let fileName = file.name;
+    if (path != '') {
+        fileName = path + file.name;
+    }
+    return {
+        name: fileName,
+        size: file.size,
+        status: 'ready',
+        uid: uid,
+        raw: uploadRawFile,
+    };
+};
+
+const traverseFileTree = (item: any, path = '') => {
+    path = path || '';
+    if (item.isFile) {
+        item.file((file: File) => {
+            uploaderFiles.value.push(convertFileToUploadFile(file, path));
+        });
+    } else if (item.isDirectory) {
+        const dirReader = item.createReader();
+        dirReader.readEntries((entries) => {
+            for (let i = 0; i < entries.length; i++) {
+                traverseFileTree(entries[i], path + item.name + '/');
+            }
+        });
+    }
+};
+
+const handleDragleave = (event) => {
+    event.preventDefault();
+};
+
 const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
     if (_uploadFile.size == 64 || _uploadFile.size == 0) {
         uploaderFiles.value = uploadFiles;
@@ -172,8 +241,9 @@ const submit = async () => {
             if (file.raw.webkitRelativePath != '') {
                 formData.append('path', path.value + '/' + getPathWithoutFilename(file.raw.webkitRelativePath));
             } else {
-                formData.append('path', path.value);
+                formData.append('path', path.value + '/' + getPathWithoutFilename(file.name));
             }
+            uploadPrecent.value = 0;
             await UploadFileData(formData, {
                 onUploadProgress: (progressEvent) => {
                     const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
@@ -197,7 +267,7 @@ const submit = async () => {
                 if (file.raw.webkitRelativePath != '') {
                     formData.append('path', path.value + '/' + getPathWithoutFilename(file.raw.webkitRelativePath));
                 } else {
-                    formData.append('path', path.value);
+                    formData.append('path', path.value + '/' + getPathWithoutFilename(file.name));
                 }
                 formData.append('chunk', chunk);
                 formData.append('chunkIndex', c.toString());
