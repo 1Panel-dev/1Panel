@@ -1086,7 +1086,7 @@ const message = {
         clearList: 'Clear list',
         deleteRecycleHelper: 'Are you sure you want to permanently delete the following files?',
         typeErrOrEmpty: '[{0}] file type is wrong or empty folder',
-        dropHelper: 'Drag [{0}] here, or',
+        dropHelper: 'Drag the files you want to upload here',
     },
     ssh: {
         autoStart: 'Auto Start',
