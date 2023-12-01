@@ -10,7 +10,7 @@
                         <el-tag>
                             {{ form.serviceName + ':3306' }}
                         </el-tag>
-                        <el-button @click="onCopy(form.serviceName + ':3306')" icon="DocumentCopy" link></el-button>
+                        <CopyButton :content="form.serviceName + ':3306'" type="icon" />
                         <span class="input-help">
                             {{ $t('database.containerConnHelper') }}
                         </span>
@@ -20,11 +20,7 @@
                             <el-tag>{{ loadConnInfo(true).substring(0, 48) }}...</el-tag>
                         </el-tooltip>
                         <el-tag v-else>{{ loadConnInfo(true) }}</el-tag>
-                        <el-button
-                            @click="onCopy(form.systemIP + ':' + form.port)"
-                            icon="DocumentCopy"
-                            link
-                        ></el-button>
+                        <CopyButton :content="form.systemIP + ':' + form.port" type="icon" />
                         <span class="input-help">{{ $t('database.remoteConnHelper2') }}</span>
                     </el-form-item>
 
@@ -37,11 +33,12 @@
                     <el-form-item :label="$t('database.rootPassword')" :rules="Rules.paramComplexity" prop="password">
                         <el-input type="password" show-password clearable v-model="form.password">
                             <template #append>
-                                <el-button @click="onCopy(form.password)">{{ $t('commons.button.copy') }}</el-button>
-                                <el-divider direction="vertical" />
-                                <el-button @click="random">
-                                    {{ $t('commons.button.random') }}
-                                </el-button>
+                                <el-button-group>
+                                    <CopyButton :content="form.password" />
+                                    <el-button @click="random">
+                                        {{ $t('commons.button.random') }}
+                                    </el-button>
+                                </el-button-group>
                             </template>
                         </el-input>
                     </el-form-item>
@@ -58,19 +55,15 @@
                             <el-tag>{{ loadConnInfo(false).substring(0, 48) }}...</el-tag>
                         </el-tooltip>
                         <el-tag v-else>{{ loadConnInfo(false) }}</el-tag>
-                        <el-button
-                            @click="onCopy(form.remoteIP + ':' + form.port)"
-                            icon="DocumentCopy"
-                            link
-                        ></el-button>
+                        <CopyButton :content="form.remoteIP + ':' + form.port" type="icon" />
                     </el-form-item>
                     <el-form-item :label="$t('commons.login.username')">
                         <el-tag>{{ form.username }}</el-tag>
-                        <el-button @click="onCopy(form.username)" icon="DocumentCopy" link></el-button>
+                        <CopyButton :content="form.username" type="icon" />
                     </el-form-item>
                     <el-form-item :label="$t('commons.login.password')">
                         <el-tag>{{ form.password }}</el-tag>
-                        <el-button @click="onCopy(form.password)" icon="DocumentCopy" link></el-button>
+                        <CopyButton :content="form.password" type="icon" />
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -101,11 +94,9 @@ import { getDatabase, loadRemoteAccess, updateMysqlAccess, updateMysqlPassword }
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { GetAppConnInfo } from '@/api/modules/app';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { MsgError, MsgSuccess } from '@/utils/message';
+import { MsgSuccess } from '@/utils/message';
 import { getRandomStr } from '@/utils/util';
 import { getSettingInfo } from '@/api/modules/setting';
-import useClipboard from 'vue-clipboard3';
-const { toClipboard } = useClipboard();
 
 const loading = ref(false);
 
@@ -154,15 +145,6 @@ function loadConnInfo(isLocal: boolean) {
 
 const random = async () => {
     form.password = getRandomStr(16);
-};
-
-const onCopy = async (value: string) => {
-    try {
-        await toClipboard(value);
-        MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
-    } catch (e) {
-        MsgError(i18n.global.t('commons.msg.copyFailed'));
-    }
 };
 
 const handleClose = () => {

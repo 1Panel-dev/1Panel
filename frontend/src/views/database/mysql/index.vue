@@ -112,27 +112,31 @@
                     <el-table-column :label="$t('commons.login.username')" prop="username" />
                     <el-table-column :label="$t('commons.login.password')" prop="password">
                         <template #default="{ row }">
-                            <div v-if="row.password">
-                                <span style="float: left; line-height: 25px" v-if="!row.showPassword">***********</span>
-                                <div style="cursor: pointer; float: left" v-if="!row.showPassword">
-                                    <el-icon
-                                        style="margin-left: 5px; margin-top: 3px"
-                                        @click="row.showPassword = true"
-                                        :size="16"
-                                    >
-                                        <View />
-                                    </el-icon>
+                            <div class="flex items-center" v-if="row.password">
+                                <div class="star-center" v-if="!row.showPassword">
+                                    <span>**********</span>
                                 </div>
-                                <span style="float: left" v-if="row.showPassword">{{ row.password }}</span>
-                                <div style="cursor: pointer; float: left" v-if="row.showPassword">
-                                    <el-icon class="iconInTable" @click="row.showPassword = false" :size="16">
-                                        <Hide />
-                                    </el-icon>
+                                <div>
+                                    <span v-if="row.showPassword">
+                                        {{ row.password }}
+                                    </span>
                                 </div>
-                                <div style="cursor: pointer; float: left">
-                                    <el-icon class="iconInTable" :size="16" @click="onCopy(row)">
-                                        <DocumentCopy />
-                                    </el-icon>
+                                <el-button
+                                    v-if="!row.showPassword"
+                                    link
+                                    @click="row.showPassword = true"
+                                    icon="View"
+                                    class="ml-1.5"
+                                ></el-button>
+                                <el-button
+                                    v-if="row.showPassword"
+                                    link
+                                    @click="row.showPassword = false"
+                                    icon="Hide"
+                                    class="ml-1.5"
+                                ></el-button>
+                                <div>
+                                    <CopyButton :content="row.password" type="icon" />
                                 </div>
                             </div>
                             <div v-else>
@@ -240,9 +244,7 @@ import { Database } from '@/api/interface/database';
 import { App } from '@/api/interface/app';
 import { GetAppPort } from '@/api/modules/app';
 import router from '@/routers';
-import { MsgError, MsgSuccess } from '@/utils/message';
-import useClipboard from 'vue-clipboard3';
-const { toClipboard } = useClipboard();
+import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 
@@ -452,16 +454,6 @@ const loadDBOptions = async () => {
         search();
     }
 };
-
-const onCopy = async (row: any) => {
-    try {
-        await toClipboard(row.password);
-        MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
-    } catch (e) {
-        MsgError(i18n.global.t('commons.msg.copyFailed'));
-    }
-};
-
 const onDelete = async (row: Database.MysqlDBInfo) => {
     let param = {
         id: row.id,

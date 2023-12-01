@@ -38,7 +38,7 @@
                 <el-input v-model="ca.csr" :autosize="{ minRows: 15, maxRows: 30 }" type="textarea" id="textArea" />
                 <div>
                     <br />
-                    <el-button type="primary" @click="copyText(ca.csr)">{{ $t('file.copy') }}</el-button>
+                    <CopyButton :content="ca.csr" />
                 </div>
             </div>
             <div v-else class="mt-5">
@@ -50,7 +50,7 @@
                 />
                 <div>
                     <br />
-                    <el-button type="primary" @click="copyText(ca.privateKey)">{{ $t('file.copy') }}</el-button>
+                    <CopyButton :content="ca.privateKey" />
                 </div>
             </div>
         </div>
@@ -60,10 +60,6 @@
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { GetCA } from '@/api/modules/website';
 import { ref } from 'vue';
-import i18n from '@/lang';
-import useClipboard from 'vue-clipboard3';
-import { MsgError, MsgSuccess } from '@/utils/message';
-const { toClipboard } = useClipboard();
 
 const open = ref(false);
 const id = ref(0);
@@ -86,15 +82,6 @@ const acceptParams = (caID: number) => {
 const get = async () => {
     const res = await GetCA(id.value);
     ca.value = res.data;
-};
-
-const copyText = async (msg) => {
-    try {
-        await toClipboard(msg);
-        MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
-    } catch (e) {
-        MsgError(i18n.global.t('commons.msg.copyFailed'));
-    }
 };
 
 defineExpose({

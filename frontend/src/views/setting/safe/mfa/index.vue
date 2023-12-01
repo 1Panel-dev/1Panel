@@ -37,19 +37,10 @@
                             </ul>
                         </el-form-item>
                         <el-form-item :label="$t('setting.mfaHelper2')">
-                            <el-image style="width: 120px; height: 120px" :src="qrImage" />
-                            <span class="input-help">
-                                <span style="float: left">{{ $t('setting.secret') }}: {{ form.secret }}</span>
-                                <div style="float: left; margin-top: 2px">
-                                    <el-icon
-                                        color="#409EFC"
-                                        style="cursor: pointer; margin-left: 10px"
-                                        :size="18"
-                                        @click="onCopy()"
-                                    >
-                                        <DocumentCopy />
-                                    </el-icon>
-                                </div>
+                            <el-image class="w-32 h-32" :src="qrImage" />
+                            <span class="input-help flex items-center">
+                                <span>{{ $t('setting.secret') }}: {{ form.secret }}</span>
+                                <CopyButton :content="form.secret" type="icon" />
                             </span>
                         </el-form-item>
                         <el-form-item :label="$t('commons.table.title')" prop="title">
@@ -94,11 +85,9 @@ import { bindMFA, loadMFA } from '@/api/modules/setting';
 import { reactive, ref } from 'vue';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
-import { MsgError, MsgSuccess } from '@/utils/message';
+import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import useClipboard from 'vue-clipboard3';
-const { toClipboard } = useClipboard();
 
 const loading = ref();
 const qrImage = ref();
@@ -126,15 +115,6 @@ const acceptParams = (params: DialogProps): void => {
     form.interval = params.interval;
     loadMfaCode();
     drawerVisible.value = true;
-};
-
-const onCopy = async () => {
-    try {
-        await toClipboard(form.secret);
-        MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
-    } catch (e) {
-        MsgError(i18n.global.t('commons.msg.copyFailed'));
-    }
 };
 
 const loadMfaCodeBefore = async (formEl: FormInstance | undefined) => {

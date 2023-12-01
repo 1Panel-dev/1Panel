@@ -6,8 +6,8 @@
             <h4>{{ $t('commons.login.errDomain1') }}</h4>
             <div>
                 <h4>{{ $t('commons.login.errHelper') }} 1pctl reset domain</h4>
-                <div style="cursor: pointer; float: left">
-                    <el-icon color="#409EFC" style="margin-left: 5px; margin-top: 33px" :size="18" @click="onCopy()">
+                <div class="float-left cursor-pointer">
+                    <el-icon color="#409EFC" class="ml-1.5 mt-8" :size="18" @click="copyText('1pctl reset domain')">
                         <DocumentCopy />
                     </el-icon>
                 </div>
@@ -17,18 +17,7 @@
 </template>
 
 <script setup lang="ts" name="404">
-import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
-
-const onCopy = () => {
-    let input = document.createElement('input');
-    input.value = '1pctl reset domain';
-    document.body.appendChild(input);
-    input.select();
-    document.execCommand('Copy');
-    document.body.removeChild(input);
-    MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
-};
+import { copyText } from '@/utils/util';
 </script>
 
 <style scoped lang="scss">
