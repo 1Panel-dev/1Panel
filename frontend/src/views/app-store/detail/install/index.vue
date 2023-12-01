@@ -65,6 +65,10 @@
                                 :placeholder="$t('app.containerNameHelper')"
                             ></el-input>
                         </el-form-item>
+                        <el-form-item prop="allowPort" v-if="!isHostMode">
+                            <el-checkbox v-model="req.allowPort" :label="$t('app.allowPort')" size="large" />
+                            <span class="input-help">{{ $t('app.allowPortHelper') }}</span>
+                        </el-form-item>
                         <el-form-item
                             :label="$t('container.cpuQuota')"
                             prop="cpuQuota"
@@ -99,10 +103,7 @@
                                 {{ $t('container.limitHelper', [limits.memory]) }}{{ req.memoryUnit }}B
                             </span>
                         </el-form-item>
-                        <el-form-item prop="allowPort" v-if="!isHostMode">
-                            <el-checkbox v-model="req.allowPort" :label="$t('app.allowPort')" size="large" />
-                            <span class="input-help">{{ $t('app.allowPortHelper') }}</span>
-                        </el-form-item>
+
                         <el-form-item prop="editCompose">
                             <el-checkbox v-model="req.editCompose" :label="$t('app.editCompose')" size="large" />
                             <span class="input-help">{{ $t('app.editComposeHelper') }}</span>
