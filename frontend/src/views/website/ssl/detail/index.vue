@@ -54,7 +54,7 @@
                 <el-input v-model="ssl.pem" :autosize="{ minRows: 15, maxRows: 30 }" type="textarea" id="textArea" />
                 <div>
                     <br />
-                    <el-button type="primary" @click="copyText(ssl.pem)">{{ $t('file.copy') }}</el-button>
+                    <CopyButton :content="ssl.pem" />
                 </div>
             </div>
             <div v-else class="mt-5">
@@ -66,7 +66,7 @@
                 />
                 <div>
                     <br />
-                    <el-button type="primary" @click="copyText(ssl.privateKey)">{{ $t('file.copy') }}</el-button>
+                    <CopyButton :content="ssl.privateKey" />
                 </div>
             </div>
         </div>
@@ -77,10 +77,6 @@ import DrawerHeader from '@/components/drawer-header/index.vue';
 import { GetSSL } from '@/api/modules/website';
 import { ref } from 'vue';
 import { dateFormatSimple, getProvider } from '@/utils/util';
-import i18n from '@/lang';
-import useClipboard from 'vue-clipboard3';
-import { MsgError, MsgSuccess } from '@/utils/message';
-const { toClipboard } = useClipboard();
 
 const open = ref(false);
 const id = ref(0);
@@ -103,15 +99,6 @@ const acceptParams = (sslId: number) => {
 const get = async () => {
     const res = await GetSSL(id.value);
     ssl.value = res.data;
-};
-
-const copyText = async (msg) => {
-    try {
-        await toClipboard(msg);
-        MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
-    } catch (e) {
-        MsgError(i18n.global.t('commons.msg.copyFailed'));
-    }
 };
 
 defineExpose({

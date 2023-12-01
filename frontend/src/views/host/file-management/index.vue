@@ -304,13 +304,13 @@ import {
     RemoveFavorite,
     SearchFavorite,
 } from '@/api/modules/files';
-import { computeSize, dateFormat, downloadFile, getIcon, getRandomStr } from '@/utils/util';
+import { computeSize, copyText, dateFormat, downloadFile, getIcon, getRandomStr } from '@/utils/util';
 import { StarFilled, Star } from '@element-plus/icons-vue';
 import { File } from '@/api/interface/file';
 import { Mimetypes, Languages } from '@/global/mimetype';
 import { useRouter } from 'vue-router';
 import { Back, Refresh } from '@element-plus/icons-vue';
-import { MsgSuccess, MsgWarning } from '@/utils/message';
+import { MsgWarning } from '@/utils/message';
 import { useSearchable } from './hooks/searchable';
 import { ResultData } from '@/api/interface';
 import { GlobalStore } from '@/store';
@@ -466,13 +466,7 @@ const open = async (row: File.File) => {
 
 const copyDir = (row: File.File) => {
     if (row?.path) {
-        const input = document.createElement('textarea');
-        input.value = row?.path;
-        document.body.appendChild(input);
-        input.select();
-        document.execCommand('copy');
-        document.body.removeChild(input);
-        MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
+        copyText(row?.path);
     }
 };
 

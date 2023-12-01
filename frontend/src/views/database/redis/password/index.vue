@@ -10,7 +10,7 @@
                         <el-tag>
                             {{ form.serviceName + ':6379' }}
                         </el-tag>
-                        <el-button @click="onCopy(form.serviceName + ':6379')" icon="DocumentCopy" link></el-button>
+                        <CopyButton :content="form.serviceName + ':6379'" type="icon" />
                         <span class="input-help">
                             {{ $t('database.containerConnHelper') }}
                         </span>
@@ -20,17 +20,18 @@
                             <el-tag>{{ loadConnInfo().substring(0, 48) }}...</el-tag>
                         </el-tooltip>
                         <el-tag v-else>{{ loadConnInfo() }}</el-tag>
-                        <el-button @click="onCopy(form.systemIP + ':6379')" icon="DocumentCopy" link></el-button>
+                        <CopyButton :content="form.systemIP + ':6379'" type="icon" />
                         <span class="input-help">{{ $t('database.remoteConnHelper2') }}</span>
                     </el-form-item>
                     <el-form-item :label="$t('commons.login.password')" :rules="Rules.paramComplexity" prop="password">
                         <el-input type="password" show-password clearable v-model="form.password">
                             <template #append>
-                                <el-button @click="onCopy(form.password)">{{ $t('commons.button.copy') }}</el-button>
-                                <el-divider direction="vertical" />
-                                <el-button style="margin-left: 1px" @click="random">
-                                    {{ $t('commons.button.random') }}
-                                </el-button>
+                                <el-button-group>
+                                    <CopyButton :content="form.password" />
+                                    <el-button @click="random">
+                                        {{ $t('commons.button.random') }}
+                                    </el-button>
+                                </el-button-group>
                             </template>
                         </el-input>
                     </el-form-item>
@@ -61,13 +62,11 @@ import { ElForm } from 'element-plus';
 import { changeRedisPassword } from '@/api/modules/database';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { GetAppConnInfo } from '@/api/modules/app';
-import { MsgError, MsgSuccess } from '@/utils/message';
+import { MsgSuccess } from '@/utils/message';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { App } from '@/api/interface/app';
 import { getRandomStr } from '@/utils/util';
-import useClipboard from 'vue-clipboard3';
 import { getSettingInfo } from '@/api/modules/setting';
-const { toClipboard } = useClipboard();
 
 const loading = ref(false);
 
@@ -98,15 +97,6 @@ const handleClose = () => {
 
 const random = async () => {
     form.value.password = getRandomStr(16);
-};
-
-const onCopy = async (value: string) => {
-    try {
-        await toClipboard(value);
-        MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
-    } catch (e) {
-        MsgError(i18n.global.t('commons.msg.copyFailed'));
-    }
 };
 
 const loadPassword = async () => {

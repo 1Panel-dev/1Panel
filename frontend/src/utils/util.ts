@@ -1,5 +1,8 @@
 import { AcmeAccountTypes, DNSTypes, KeyTypes } from '@/global/mimetype';
 import i18n from '@/lang';
+import useClipboard from 'vue-clipboard3';
+const { toClipboard } = useClipboard();
+import { MsgError, MsgSuccess } from '@/utils/message';
 
 export function deepCopy<T>(obj: any): T {
     let newObj: any;
@@ -466,4 +469,13 @@ export function getDNSName(type: string) {
         }
     }
     return '';
+}
+
+export async function copyText(content: string) {
+    try {
+        await toClipboard(content);
+        MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
+    } catch (e) {
+        MsgError(i18n.global.t('commons.msg.copyFailed'));
+    }
 }
