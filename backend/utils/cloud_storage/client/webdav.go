@@ -5,52 +5,26 @@ import (
 	"io"
 	"os"
 
-	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/studio-b12/gowebdav"
 )
 
 type webDAVClient struct {
 	Bucket string
 	client *gowebdav.Client
-	Vars   map[string]interface{}
 }
 
 func NewWebDAVClient(vars map[string]interface{}) (*webDAVClient, error) {
-	var (
-		address  string
-		username string
-		password string
-		bucket   string
-	)
-	if _, ok := vars["address"]; ok {
-		address = vars["address"].(string)
-	} else {
-		return nil, constant.ErrInvalidParams
-	}
-	if _, ok := vars["port"].(float64); !ok {
-		return nil, constant.ErrInvalidParams
-	}
-	if _, ok := vars["username"]; ok {
-		username = vars["username"].(string)
-	} else {
-		return nil, constant.ErrInvalidParams
-	}
-	if _, ok := vars["password"]; ok {
-		password = vars["password"].(string)
-	} else {
-		return nil, constant.ErrInvalidParams
-	}
-	if _, ok := vars["bucket"]; ok {
-		bucket = vars["bucket"].(string)
-	} else {
-		return nil, constant.ErrInvalidParams
-	}
+	address := loadParamFromVars("address", true, vars)
+	port := loadParamFromVars("port", false, vars)
+	password := loadParamFromVars("password", true, vars)
+	username := loadParamFromVars("username", true, vars)
+	bucket := loadParamFromVars("bucket", true, vars)
 
-	client := gowebdav.NewClient(fmt.Sprintf("%s:%v", address, vars["port"]), username, password)
+	client := gowebdav.NewClient(fmt.Sprintf("%s:%s", address, port), username, password)
 	if err := client.Connect(); err != nil {
 		return nil, err
 	}
-	return &webDAVClient{Vars: vars, Bucket: bucket, client: client}, nil
+	return &webDAVClient{Bucket: bucket, client: client}, nil
 }
 
 func (s webDAVClient) Upload(src, target string) (bool, error) {
@@ -113,6 +87,14 @@ func (s webDAVClient) Exist(path string) (bool, error) {
 		return false, err
 	}
 	return true, nil
+}
+
+func (s webDAVClient) Size(path string) (int64, error) {
+	file, err := s.client.Stat(s.Bucket + "/" + path)
+	if err != nil {
+		return 0, err
+	}
+	return file.Size(), nil
 }
 
 func (s webDAVClient) Delete(filePath string) (bool, error) {

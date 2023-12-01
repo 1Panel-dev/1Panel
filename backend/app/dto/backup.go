@@ -52,6 +52,7 @@ type BackupRecords struct {
 	BackupType string    `json:"backupType"`
 	FileDir    string    `json:"fileDir"`
 	FileName   string    `json:"fileName"`
+	Size       int64     `json:"size"`
 }
 
 type DownloadRecord struct {

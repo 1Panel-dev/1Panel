@@ -1,54 +1,36 @@
 package client
 
 import (
-	"github.com/1Panel-dev/1Panel/backend/constant"
+	"fmt"
+
 	osssdk "github.com/aliyun/aliyun-oss-go-sdk/oss"
 )
 
 type ossClient struct {
-	scType string
-	Vars   map[string]interface{}
-	client osssdk.Client
+	scType    string
+	bucketStr string
+	client    osssdk.Client
 }
 
 func NewOssClient(vars map[string]interface{}) (*ossClient, error) {
-	var endpoint string
-	var accessKey string
-	var secretKey string
-	var scType string
-	if _, ok := vars["endpoint"]; ok {
-		endpoint = vars["endpoint"].(string)
-	} else {
-		return nil, constant.ErrInvalidParams
-	}
-	if _, ok := vars["accessKey"]; ok {
-		accessKey = vars["accessKey"].(string)
-	} else {
-		return nil, constant.ErrInvalidParams
-	}
-	if _, ok := vars["scType"]; ok {
-		scType = vars["scType"].(string)
-	} else {
+	endpoint := loadParamFromVars("endpoint", true, vars)
+	accessKey := loadParamFromVars("accessKey", true, vars)
+	secretKey := loadParamFromVars("secretKey", true, vars)
+	bucketStr := loadParamFromVars("bucket", true, vars)
+	scType := loadParamFromVars("scType", true, vars)
+	if len(scType) == 0 {
 		scType = "Standard"
-	}
-	if _, ok := vars["secretKey"]; ok {
-		secretKey = vars["secretKey"].(string)
-	} else {
-		return nil, constant.ErrInvalidParams
 	}
 	client, err := osssdk.New(endpoint, accessKey, secretKey)
 	if err != nil {
 		return nil, err
 	}
-	return &ossClient{
-		scType: scType,
-		Vars:   vars,
-		client: *client,
-	}, nil
+
+	return &ossClient{scType: scType, bucketStr: bucketStr, client: *client}, nil
 }
 
-func (oss ossClient) ListBuckets() ([]interface{}, error) {
-	response, err := oss.client.ListBuckets()
+func (o ossClient) ListBuckets() ([]interface{}, error) {
+	response, err := o.client.ListBuckets()
 	if err != nil {
 		return nil, err
 	}
@@ -59,69 +41,72 @@ func (oss ossClient) ListBuckets() ([]interface{}, error) {
 	return result, err
 }
 
-func (oss ossClient) Exist(path string) (bool, error) {
-	bucket, err := oss.GetBucket()
+func (o ossClient) Exist(path string) (bool, error) {
+	bucket, err := o.client.Bucket(o.bucketStr)
 	if err != nil {
 		return false, err
 	}
 	return bucket.IsObjectExist(path)
-
 }
 
-func (oss ossClient) Delete(path string) (bool, error) {
-	bucket, err := oss.GetBucket()
+func (o ossClient) Size(path string) (int64, error) {
+	bucket, err := o.client.Bucket(o.bucketStr)
+	if err != nil {
+		return 0, err
+	}
+	lor, err := bucket.ListObjectsV2(osssdk.Prefix(path))
+	if err != nil {
+		return 0, err
+	}
+	if len(lor.Objects) == 0 {
+		return 0, fmt.Errorf("no such file %s", path)
+	}
+	return lor.Objects[0].Size, nil
+}
+
+func (o ossClient) Delete(path string) (bool, error) {
+	bucket, err := o.client.Bucket(o.bucketStr)
 	if err != nil {
 		return false, err
 	}
-	err = bucket.DeleteObject(path)
-	if err != nil {
+	if err := bucket.DeleteObject(path); err != nil {
 		return false, err
 	}
 	return true, nil
 }
 
-func (oss ossClient) Upload(src, target string) (bool, error) {
-	bucket, err := oss.GetBucket()
+func (o ossClient) Upload(src, target string) (bool, error) {
+	bucket, err := o.client.Bucket(o.bucketStr)
 	if err != nil {
 		return false, err
 	}
-	err = bucket.UploadFile(target, src, 200*1024*1024, osssdk.Routines(5), osssdk.Checkpoint(true, ""), osssdk.ObjectStorageClass(osssdk.StorageClassType(oss.scType)))
-	if err != nil {
-		return false, err
-	}
-	return true, nil
-}
-
-func (oss ossClient) Download(src, target string) (bool, error) {
-	bucket, err := oss.GetBucket()
-	if err != nil {
-		return false, err
-	}
-	err = bucket.DownloadFile(src, target, 200*1024*1024, osssdk.Routines(5), osssdk.Checkpoint(true, ""))
-	if err != nil {
+	if err := bucket.UploadFile(target, src,
+		200*1024*1024,
+		osssdk.Routines(5),
+		osssdk.Checkpoint(true, ""),
+		osssdk.ObjectStorageClass(osssdk.StorageClassType(o.scType))); err != nil {
 		return false, err
 	}
 	return true, nil
 }
 
-func (oss *ossClient) GetBucket() (*osssdk.Bucket, error) {
-	if _, ok := oss.Vars["bucket"]; ok {
-		bucket, err := oss.client.Bucket(oss.Vars["bucket"].(string))
-		if err != nil {
-			return nil, err
-		}
-		return bucket, nil
-	} else {
-		return nil, constant.ErrInvalidParams
+func (o ossClient) Download(src, target string) (bool, error) {
+	bucket, err := o.client.Bucket(o.bucketStr)
+	if err != nil {
+		return false, err
 	}
+	if err := bucket.DownloadFile(src, target, 200*1024*1024, osssdk.Routines(5), osssdk.Checkpoint(true, "")); err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
-func (oss *ossClient) ListObjects(prefix string) ([]string, error) {
-	bucket, err := oss.GetBucket()
+func (o *ossClient) ListObjects(prefix string) ([]string, error) {
+	bucket, err := o.client.Bucket(o.bucketStr)
 	if err != nil {
-		return nil, constant.ErrInvalidParams
+		return nil, err
 	}
-	lor, err := bucket.ListObjects(osssdk.Prefix(prefix))
+	lor, err := bucket.ListObjectsV2(osssdk.Prefix(prefix))
 	if err != nil {
 		return nil, err
 	}

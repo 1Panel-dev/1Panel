@@ -157,9 +157,7 @@ func (u *CronjobService) handleBackup(cronjob *model.Cronjob, startTime time.Tim
 				return "", err
 			}
 			if len(backup.BackupPath) != 0 {
-				itemPath := strings.TrimPrefix(backup.BackupPath, "/")
-				itemPath = strings.TrimSuffix(itemPath, "/") + "/"
-				itemFileDir = itemPath + itemFileDir
+				itemFileDir = path.Join(strings.TrimPrefix(backup.BackupPath, "/"), itemFileDir)
 			}
 			if _, err = client.Upload(backupDir+"/"+fileName, itemFileDir+"/"+fileName); err != nil {
 				return "", err
@@ -193,9 +191,7 @@ func (u *CronjobService) HandleRmExpired(backType, backupPath, localDir string, 
 				fileItem := file
 				if cronjob.KeepLocal {
 					if len(backupPath) != 0 {
-						itemPath := strings.TrimPrefix(backupPath, "/")
-						itemPath = strings.TrimSuffix(itemPath, "/") + "/"
-						fileItem = itemPath + strings.TrimPrefix(file, localDir+"/")
+						fileItem = path.Join(strings.TrimPrefix(backupPath, "/") + strings.TrimPrefix(file, localDir+"/"))
 					} else {
 						fileItem = strings.TrimPrefix(file, localDir+"/")
 					}
@@ -332,9 +328,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, backup model.Back
 				}()
 			}
 			if len(backup.BackupPath) != 0 {
-				itemPath := strings.TrimPrefix(backup.BackupPath, "/")
-				itemPath = strings.TrimSuffix(itemPath, "/") + "/"
-				itemFileDir = itemPath + itemFileDir
+				itemFileDir = path.Join(strings.TrimPrefix(backup.BackupPath, "/"), itemFileDir)
 			}
 			if _, err = client.Upload(backupDir+"/"+record.FileName, itemFileDir+"/"+record.FileName); err != nil {
 				return paths, err
@@ -475,9 +469,7 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, backup model.BackupAcc
 				}()
 			}
 			if len(backup.BackupPath) != 0 {
-				itemPath := strings.TrimPrefix(backup.BackupPath, "/")
-				itemPath = strings.TrimSuffix(itemPath, "/") + "/"
-				itemFileDir = itemPath + itemFileDir
+				itemFileDir = path.Join(strings.TrimPrefix(backup.BackupPath, "/"), itemFileDir)
 			}
 			if _, err = client.Upload(backupDir+"/"+record.FileName, itemFileDir+"/"+record.FileName); err != nil {
 				return paths, err
@@ -551,9 +543,7 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, backup model.Backu
 				}()
 			}
 			if len(backup.BackupPath) != 0 {
-				itemPath := strings.TrimPrefix(backup.BackupPath, "/")
-				itemPath = strings.TrimSuffix(itemPath, "/") + "/"
-				itemFileDir = itemPath + itemFileDir
+				itemFileDir = path.Join(strings.TrimPrefix(backup.BackupPath, "/"), itemFileDir)
 			}
 			if _, err = client.Upload(backupDir+"/"+record.FileName, itemFileDir+"/"+record.FileName); err != nil {
 				return paths, err

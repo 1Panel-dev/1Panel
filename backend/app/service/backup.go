@@ -81,15 +81,46 @@ func (u *BackupService) SearchRecordsWithPage(search dto.RecordSearch) (int64, [
 		commonRepo.WithByType(search.Type),
 		backupRepo.WithByDetailName(search.DetailName),
 	)
-	var dtobas []dto.BackupRecords
-	for _, group := range records {
+
+	var datas []dto.BackupRecords
+	clientMap := make(map[string]loadSizeHelper)
+	for i := 0; i < len(records); i++ {
 		var item dto.BackupRecords
-		if err := copier.Copy(&item, &group); err != nil {
+		if err := copier.Copy(&item, &records[i]); err != nil {
 			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 		}
-		dtobas = append(dtobas, item)
+		itemPath := path.Join(records[i].FileDir, records[i].FileName)
+		if records[i].Source == "LOCAL" {
+			fileInfo, _ := os.Stat(itemPath)
+			item.Size = fileInfo.Size()
+			datas = append(datas, item)
+			continue
+		}
+		if _, ok := clientMap[records[i].Source]; !ok {
+			backup, err := backupRepo.Get(commonRepo.WithByType(records[i].Source))
+			if err != nil {
+				global.LOG.Errorf("load backup model %s from db failed, err: %v", records[i].Source, err)
+				return total, datas, err
+			}
+			client, err := u.NewClient(&backup)
+			if err != nil {
+				global.LOG.Errorf("load backup client %s from db failed, err: %v", records[i].Source, err)
+				return total, datas, err
+			}
+			item.Size, _ = client.Size(path.Join(strings.TrimLeft(backup.BackupPath, "/"), itemPath))
+			datas = append(datas, item)
+			clientMap[records[i].Source] = loadSizeHelper{backupPath: strings.TrimLeft(backup.BackupPath, "/"), client: client}
+			continue
+		}
+		item.Size, _ = clientMap[records[i].Source].client.Size(path.Join(clientMap[records[i].Source].backupPath, itemPath))
+		datas = append(datas, item)
 	}
-	return total, dtobas, err
+	return total, datas, err
+}
+
+type loadSizeHelper struct {
+	backupPath string
+	client     cloud_storage.CloudStorageClient
 }
 
 func (u *BackupService) LoadOneDriveInfo() (string, error) {
@@ -139,9 +170,7 @@ func (u *BackupService) DownloadRecord(info dto.DownloadRecord) (string, error) 
 	}
 	srcPath := fmt.Sprintf("%s/%s", info.FileDir, info.FileName)
 	if len(backup.BackupPath) != 0 {
-		itemPath := strings.TrimPrefix(backup.BackupPath, "/")
-		itemPath = strings.TrimSuffix(itemPath, "/") + "/"
-		srcPath = itemPath + srcPath
+		srcPath = path.Join(strings.TrimPrefix(backup.BackupPath, "/"), srcPath)
 	}
 	if exist, _ := backClient.Exist(srcPath); exist {
 		isOK, err := backClient.Download(srcPath, targetPath)

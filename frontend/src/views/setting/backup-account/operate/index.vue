@@ -211,7 +211,7 @@
                                 :rules="Rules.requiredInput"
                             >
                                 <el-input v-model.trim="dialogData.rowData!.varsJson['address']" />
-                                <span class="input-help">https://172.16.10.111</span>
+                                <span class="input-help">http://172.16.10.111</span>
                             </el-form-item>
                             <el-form-item :label="$t('commons.table.port')" prop="varsJson.port" :rules="[Rules.port]">
                                 <el-input-number

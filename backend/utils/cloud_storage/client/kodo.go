@@ -4,45 +4,35 @@ import (
 	"context"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/qiniu/go-sdk/v7/auth"
-	"github.com/qiniu/go-sdk/v7/auth/qbox"
 	"github.com/qiniu/go-sdk/v7/storage"
 )
 
 type kodoClient struct {
-	accessKey string
-	secretKey string
-	Vars      map[string]interface{}
-	client    *storage.BucketManager
+	bucket string
+	domain string
+	auth   *auth.Credentials
+	client *storage.BucketManager
 }
 
 func NewKodoClient(vars map[string]interface{}) (*kodoClient, error) {
-	var accessKey string
-	var secretKey string
-	if _, ok := vars["accessKey"]; ok {
-		accessKey = vars["accessKey"].(string)
-	} else {
-		return nil, constant.ErrInvalidParams
-	}
-	if _, ok := vars["secretKey"]; ok {
-		secretKey = vars["secretKey"].(string)
-	} else {
-		return nil, constant.ErrInvalidParams
-	}
+	accessKey := loadParamFromVars("accessKey", true, vars)
+	secretKey := loadParamFromVars("secretKey", true, vars)
+	bucket := loadParamFromVars("bucket", true, vars)
+	domain := loadParamFromVars("domain", true, vars)
 
-	conn := qbox.NewMac(accessKey, secretKey)
+	conn := auth.New(accessKey, secretKey)
 	cfg := storage.Config{
 		UseHTTPS: false,
 	}
 	bucketManager := storage.NewBucketManager(conn, &cfg)
 
-	return &kodoClient{Vars: vars, client: bucketManager, accessKey: accessKey, secretKey: secretKey}, nil
+	return &kodoClient{client: bucketManager, auth: conn, bucket: bucket, domain: domain}, nil
 }
 
-func (kodo kodoClient) ListBuckets() ([]interface{}, error) {
-	buckets, err := kodo.client.Buckets(true)
+func (k kodoClient) ListBuckets() ([]interface{}, error) {
+	buckets, err := k.client.Buckets(true)
 	if err != nil {
 		return nil, err
 	}
@@ -53,38 +43,33 @@ func (kodo kodoClient) ListBuckets() ([]interface{}, error) {
 	return datas, nil
 }
 
-func (kodo kodoClient) Exist(path string) (bool, error) {
-	bucket, err := kodo.GetBucket()
-	if err != nil {
-		return false, err
-	}
-	if _, err := kodo.client.Stat(bucket, path); err != nil {
+func (k kodoClient) Exist(path string) (bool, error) {
+	if _, err := k.client.Stat(k.bucket, path); err != nil {
 		return false, err
 	}
 	return true, nil
 }
 
-func (kodo kodoClient) Delete(path string) (bool, error) {
-	bucket, err := kodo.GetBucket()
+func (k kodoClient) Size(path string) (int64, error) {
+	file, err := k.client.Stat(k.bucket, path)
 	if err != nil {
-		return false, err
+		return 0, err
 	}
-	if err := kodo.client.Delete(bucket, path); err != nil {
+	return file.Fsize, nil
+}
+
+func (k kodoClient) Delete(path string) (bool, error) {
+	if err := k.client.Delete(k.bucket, path); err != nil {
 		return false, err
 	}
 	return true, nil
 }
 
-func (kodo kodoClient) Upload(src, target string) (bool, error) {
-	bucket, err := kodo.GetBucket()
-	if err != nil {
-		return false, err
-	}
+func (k kodoClient) Upload(src, target string) (bool, error) {
 	putPolicy := storage.PutPolicy{
-		Scope: bucket,
+		Scope: k.bucket,
 	}
-	mac := qbox.NewMac(kodo.accessKey, kodo.secretKey)
-	upToken := putPolicy.UploadToken(mac)
+	upToken := putPolicy.UploadToken(k.auth)
 	cfg := storage.Config{UseHTTPS: true, UseCdnDomains: false}
 	resumeUploader := storage.NewResumeUploaderV2(&cfg)
 	ret := storage.PutRet{}
@@ -95,14 +80,9 @@ func (kodo kodoClient) Upload(src, target string) (bool, error) {
 	return true, nil
 }
 
-func (kodo kodoClient) Download(src, target string) (bool, error) {
-	mac := auth.New(kodo.accessKey, kodo.secretKey)
-	if _, ok := kodo.Vars["domain"]; !ok {
-		return false, constant.ErrInvalidParams
-	}
-	domain := kodo.Vars["domain"].(string)
+func (k kodoClient) Download(src, target string) (bool, error) {
 	deadline := time.Now().Add(time.Second * 3600).Unix()
-	privateAccessURL := storage.MakePrivateURL(mac, domain, src, deadline)
+	privateAccessURL := storage.MakePrivateURL(k.auth, k.domain, src, deadline)
 
 	fo := files.NewFileOp()
 	if err := fo.DownloadFile(privateAccessURL, target); err != nil {
@@ -111,24 +91,11 @@ func (kodo kodoClient) Download(src, target string) (bool, error) {
 	return true, nil
 }
 
-func (kodo *kodoClient) GetBucket() (string, error) {
-	if _, ok := kodo.Vars["bucket"]; ok {
-		return kodo.Vars["bucket"].(string), nil
-	} else {
-		return "", constant.ErrInvalidParams
-	}
-}
-
-func (kodo kodoClient) ListObjects(prefix string) ([]string, error) {
-	bucket, err := kodo.GetBucket()
-	if err != nil {
-		return nil, constant.ErrInvalidParams
-	}
-
+func (k kodoClient) ListObjects(prefix string) ([]string, error) {
 	var result []string
 	marker := ""
 	for {
-		entries, _, nextMarker, hashNext, err := kodo.client.ListFiles(bucket, prefix, "", marker, 1000)
+		entries, _, nextMarker, hashNext, err := k.client.ListFiles(k.bucket, prefix, "", marker, 1000)
 		if err != nil {
 			return nil, err
 		}
