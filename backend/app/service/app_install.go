@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"reflect"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -505,6 +506,9 @@ func (a *AppInstallService) GetUpdateVersions(installId uint) ([]dto.AppVersion,
 			})
 		}
 	}
+	sort.Slice(versions, func(i, j int) bool {
+		return common.CompareVersion(versions[i].Version, versions[j].Version)
+	})
 	return versions, nil
 }
 
