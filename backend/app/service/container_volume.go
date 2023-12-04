@@ -9,6 +9,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/volume"
@@ -51,15 +52,20 @@ func (u *ContainerService) PageVolume(req dto.SearchWithPage) (int64, interface{
 		records = list.Volumes[start:end]
 	}
 
+	nyc, _ := time.LoadLocation(common.LoadTimeZone())
 	for _, item := range records {
 		tag := make([]string, 0)
 		for _, val := range item.Labels {
 			tag = append(tag, val)
 		}
-		if len(item.CreatedAt) > 19 {
-			item.CreatedAt = item.CreatedAt[0:19]
+		var createTime time.Time
+		if strings.Contains(item.CreatedAt, "Z") {
+			createTime, _ = time.ParseInLocation("2006-01-02T15:04:05Z", item.CreatedAt, nyc)
+		} else if strings.Contains(item.CreatedAt, "+") {
+			createTime, _ = time.ParseInLocation("2006-01-02T15:04:05+08:00", item.CreatedAt, nyc)
+		} else {
+			createTime, _ = time.ParseInLocation("2006-01-02T15:04:05", item.CreatedAt, nyc)
 		}
-		createTime, _ := time.Parse("2006-01-02T15:04:05", item.CreatedAt)
 		data = append(data, dto.Volume{
 			CreatedAt:  createTime,
 			Name:       item.Name,
