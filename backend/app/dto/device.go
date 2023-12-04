@@ -12,6 +12,7 @@ type DeviceBaseInfo struct {
 	SwapMemoryTotal     uint64 `json:"swapMemoryTotal"`
 	SwapMemoryAvailable uint64 `json:"swapMemoryAvailable"`
 	SwapMemoryUsed      uint64 `json:"swapMemoryUsed"`
+	MaxSize             uint64 `json:"maxSize"`
 
 	SwapDetails []SwapHelper `json:"swapDetails"`
 }

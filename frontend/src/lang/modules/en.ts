@@ -910,7 +910,8 @@ const message = {
             saveHelper: 'Please save the current settings first!',
             saveSwap:
                 'Saving the current configuration will adjust the Swap partition {0} size to {1}. Do you want to continue?',
-            saveSwapHelper: 'The minimum partition size is 40 KB. Please modify and try again!',
+            swapMin: 'The minimum partition size is 40 KB. Please modify and try again!',
+            swapMax: 'The maximum value for partition size is {0}. Please modify and try again!',
             swapOff: 'The minimum partition size is 40 KB. Setting it to 0 will disable the Swap partition.',
         },
         device: {
