@@ -16,6 +16,10 @@ const buttons = [
         path: '/toolbox/device',
     },
     {
+        label: i18n.global.t('setting.diskClean'),
+        path: '/toolbox/clean',
+    },
+    {
         label: i18n.global.t('menu.supervisor'),
         path: '/toolbox/supervisor',
     },
