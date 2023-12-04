@@ -95,7 +95,7 @@ const globalStore = GlobalStore();
 const terminalSocket = ref<WebSocket>();
 
 const logSearch = reactive({
-    isWatch: false,
+    isWatch: true,
     container: '',
     containerID: '',
     mode: 'all',
@@ -197,7 +197,7 @@ const acceptParams = (props: DialogProps): void => {
     logSearch.containerID = props.containerID;
     logSearch.tail = 100;
     logSearch.mode = 'all';
-    logSearch.isWatch = false;
+    logSearch.isWatch = true;
     logSearch.container = props.container;
     searchLogs();
 
