@@ -1522,6 +1522,7 @@ const message = {
         syncAllAppHelper: 'All applications are about to be synchronized. Do you want to continue? ',
         hostModeHelper:
             'The current application network mode is host mode. If you need to open the port, please open it manually on the firewall page.',
+        showLocal: 'Show Local Application',
     },
     website: {
         website: 'Website',
