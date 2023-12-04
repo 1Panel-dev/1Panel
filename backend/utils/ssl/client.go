@@ -110,7 +110,7 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string) error {
 	case CloudFlare:
 		cloudflareConfig := cloudflare.NewDefaultConfig()
 		cloudflareConfig.AuthEmail = param.Email
-		cloudflareConfig.AuthKey = param.APIkey
+		cloudflareConfig.AuthToken = param.APIkey
 		cloudflareConfig.PropagationTimeout = 60 * time.Minute
 		cloudflareConfig.PollingInterval = 5 * time.Second
 		cloudflareConfig.TTL = 3600
