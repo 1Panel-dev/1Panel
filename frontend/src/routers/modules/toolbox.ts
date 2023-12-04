@@ -47,6 +47,16 @@ const toolboxRouter = {
                         requiresAuth: false,
                     },
                 },
+                {
+                    path: 'clean',
+                    name: 'Clean',
+                    component: () => import('@/views/toolbox/clean/index.vue'),
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/toolbox',
+                        requiresAuth: false,
+                    },
+                },
             ],
         },
     ],
