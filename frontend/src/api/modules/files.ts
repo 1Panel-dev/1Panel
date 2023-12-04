@@ -120,3 +120,7 @@ export const RemoveFavorite = (id: number) => {
 export const BatchChangeRole = (params: File.FileRole) => {
     return http.post<any>('files/batch/role', params);
 };
+
+export const GetRecycleStatus = () => {
+    return http.get<string>('files/recycle/status');
+};

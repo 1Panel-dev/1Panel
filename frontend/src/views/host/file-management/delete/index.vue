@@ -8,7 +8,7 @@
                             <span>{{ $t('file.deleteHelper') }}</span>
                         </div>
                     </el-alert>
-                    <div class="mt-4">
+                    <div class="mt-4" v-if="recycleStatus === 'enable'">
                         <el-checkbox v-model="forceDelete">{{ $t('file.forceDeleteHelper') }}</el-checkbox>
                     </div>
                     <div class="file-list">
@@ -49,7 +49,7 @@ import i18n from '@/lang';
 import { ref } from 'vue';
 import { File } from '@/api/interface/file';
 import { getIcon } from '@/utils/util';
-import { DeleteFile } from '@/api/modules/files';
+import { DeleteFile, GetRecycleStatus } from '@/api/modules/files';
 import { MsgSuccess } from '@/utils/message';
 
 const open = ref(false);
@@ -57,11 +57,23 @@ const files = ref();
 const loading = ref(false);
 const em = defineEmits(['close']);
 const forceDelete = ref(false);
+const recycleStatus = ref('enable');
 
 const acceptParams = (props: File.File[]) => {
+    getStatus();
     files.value = props;
     open.value = true;
     forceDelete.value = false;
+};
+
+const getStatus = async () => {
+    try {
+        const res = await GetRecycleStatus();
+        recycleStatus.value = res.data;
+        if (recycleStatus.value === 'disable') {
+            forceDelete.value = true;
+        }
+    } catch (error) {}
 };
 
 const onConfirm = () => {
@@ -98,8 +110,9 @@ defineExpose({
 }
 
 .file-list {
-    height: 400px;
+    max-height: 400px;
     overflow-y: auto;
+    margin-top: 15px;
 }
 
 .delete-warn {

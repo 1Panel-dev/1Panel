@@ -88,7 +88,7 @@ export const Rewrites = [
     'typecho',
     'typecho2',
     'thinkphp',
-		'yii2',
+    'yii2',
     'laravel5',
     'discuz',
     'discuzx',

@@ -1037,6 +1037,8 @@ const message = {
         deleteRecycleHelper: '确定永久删除以下文件？',
         typeErrOrEmpty: '【{0}】 文件类型错误或为空文件夹',
         dropHelper: '将需要上传的文件拖曳到此处',
+        fileRecycleBin: '文件回收站',
+        fileRecycleBinMsg: '已{0}回收站',
     },
     ssh: {
         autoStart: '开机自启',

@@ -59,6 +59,7 @@ func Init() {
 		migrations.AddDockerSockPath,
 		migrations.AddDatabaseSSL,
 		migrations.AddDefaultCA,
+		migrations.AddSettingRecycleBin,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

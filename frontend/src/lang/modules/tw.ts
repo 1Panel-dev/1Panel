@@ -1036,6 +1036,8 @@ const message = {
         deleteRecycleHelper: '確定永久刪除以下文件？',
         typeErrOrEmpty: '【{0}】 檔案類型錯誤或為空資料夾',
         dropHelper: '將需要上傳的文件拖曳到此處',
+        fileRecycleBin: '檔案回收站',
+        fileRecycleBinMsg: '已{0}回收站',
     },
     ssh: {
         autoStart: '開機自啟',

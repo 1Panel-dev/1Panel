@@ -43,6 +43,7 @@ func (f *FileRouter) InitFileRouter(Router *gin.RouterGroup) {
 		fileRouter.POST("/recycle/search", baseApi.SearchRecycleBinFile)
 		fileRouter.POST("/recycle/reduce", baseApi.ReduceRecycleBinFile)
 		fileRouter.POST("/recycle/clear", baseApi.ClearRecycleBinFile)
+		fileRouter.GET("/recycle/status", baseApi.GetRecycleStatus)
 
 		fileRouter.POST("/favorite/search", baseApi.SearchFavorite)
 		fileRouter.POST("/favorite", baseApi.CreateFavorite)

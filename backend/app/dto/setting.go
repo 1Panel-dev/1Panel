@@ -50,6 +50,8 @@ type SettingInfo struct {
 	AppStoreVersion      string `json:"appStoreVersion"`
 	AppStoreLastModified string `json:"appStoreLastModified"`
 	AppStoreSyncStatus   string `json:"appStoreSyncStatus"`
+
+	FileRecycleBin string `json:"fileRecycleBin"`
 }
 
 type SettingUpdate struct {
