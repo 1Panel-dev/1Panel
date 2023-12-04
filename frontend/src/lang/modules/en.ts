@@ -1089,6 +1089,7 @@ const message = {
         dropHelper: 'Drag the files you want to upload here',
         fileRecycleBin: 'File Recycle Bin',
         fileRecycleBinMsg: '{0} recycle bin',
+        wordWrap: 'Automatically wrap',
     },
     ssh: {
         autoStart: 'Auto Start',

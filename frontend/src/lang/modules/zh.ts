@@ -1039,6 +1039,7 @@ const message = {
         dropHelper: '将需要上传的文件拖曳到此处',
         fileRecycleBin: '文件回收站',
         fileRecycleBinMsg: '已{0}回收站',
+        wordWrap: '自动换行',
     },
     ssh: {
         autoStart: '开机自启',
