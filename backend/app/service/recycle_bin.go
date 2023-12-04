@@ -104,7 +104,7 @@ func (r RecycleBinService) Create(create request.RecycleBinCreate) error {
 	}
 
 	rName := fmt.Sprintf("_1p_%s%s_p_%d_%d", "file", rNamePre, size, deleteTime.Unix())
-	return op.Rename(create.SourcePath, path.Join(clashDir, rName))
+	return op.Mv(create.SourcePath, path.Join(clashDir, rName))
 }
 
 func (r RecycleBinService) Reduce(reduce request.RecycleBinReduce) error {
@@ -125,7 +125,7 @@ func (r RecycleBinService) Reduce(reduce request.RecycleBinReduce) error {
 			return err
 		}
 	}
-	return op.Rename(filePath, recycleBinDTO.SourcePath)
+	return op.Mv(filePath, recycleBinDTO.SourcePath)
 }
 
 func (r RecycleBinService) Clear() error {
@@ -140,7 +140,7 @@ func (r RecycleBinService) Clear() error {
 			continue
 		}
 		newDir := path.Join(p.Mountpoint, "1panel_clash")
-		if err := op.Rename(dir, newDir); err != nil {
+		if err := op.Mv(dir, newDir); err != nil {
 			return err
 		}
 		go func() {
