@@ -173,9 +173,6 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 	primaryDomainArray := strings.Split(create.PrimaryDomain, ":")
 	primaryDomain := primaryDomainArray[0]
 
-	if exist, _ := websiteRepo.GetBy(websiteRepo.WithDomain(primaryDomain)); len(exist) > 0 {
-		return buserr.New(constant.ErrDomainIsExist)
-	}
 	if exist, _ := websiteRepo.GetBy(websiteRepo.WithAlias(create.Alias)); len(exist) > 0 {
 		return buserr.New(constant.ErrAliasIsExist)
 	}
