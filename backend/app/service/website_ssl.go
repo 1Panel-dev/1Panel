@@ -454,6 +454,9 @@ func (w WebsiteSSLService) Upload(req request.WebsiteSSLUpload) error {
 	websiteSSL.Domains = strings.Join(domains, ",")
 
 	if websiteSSL.ID > 0 {
+		if err := UpdateSSLConfig(*websiteSSL); err != nil {
+			return err
+		}
 		return websiteSSLRepo.Save(websiteSSL)
 	}
 	return websiteSSLRepo.Create(context.Background(), websiteSSL)

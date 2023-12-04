@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
@@ -771,4 +772,52 @@ func saveCertificateFile(websiteSSL *model.WebsiteSSL, logger *log.Logger) {
 			logger.Println(i18n.GetMsgWithMap("PushDirLog", MsgMap))
 		}
 	}
+}
+
+func GetSystemSSL() (bool, uint) {
+	sslSetting, err := settingRepo.Get(settingRepo.WithByKey("SSL"))
+	if err != nil {
+		global.LOG.Errorf("load service ssl from setting failed, err: %v", err)
+		return false, 0
+	}
+	if sslSetting.Value == "enable" {
+		sslID, _ := settingRepo.Get(settingRepo.WithByKey("SSLID"))
+		idValue, _ := strconv.Atoi(sslID.Value)
+		if idValue > 0 {
+			return true, uint(idValue)
+		}
+	}
+	return false, 0
+}
+
+func UpdateSSLConfig(websiteSSL model.WebsiteSSL) error {
+	websites, _ := websiteRepo.GetBy(websiteRepo.WithWebsiteSSLID(websiteSSL.ID))
+	if len(websites) > 0 {
+		for _, website := range websites {
+			if err := createPemFile(website, websiteSSL); err != nil {
+				return buserr.WithMap("ErrUpdateWebsiteSSL", map[string]interface{}{"name": website.PrimaryDomain, "err": err.Error()}, err)
+			}
+		}
+		nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+		if err != nil {
+			return err
+		}
+		if err := opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
+			return buserr.WithErr(constant.ErrSSLApply, err)
+		}
+	}
+	enable, sslID := GetSystemSSL()
+	if enable && sslID == websiteSSL.ID {
+		fileOp := files.NewFileOp()
+		secretDir := path.Join(global.CONF.System.BaseDir, "1panel/secret")
+		if err := fileOp.WriteFile(path.Join(secretDir, "server.crt"), strings.NewReader(websiteSSL.Pem), 0600); err != nil {
+			global.LOG.Errorf("Failed to update the SSL certificate File for 1Panel System domain [%s] , err:%s", websiteSSL.PrimaryDomain, err.Error())
+			return err
+		}
+		if err := fileOp.WriteFile(path.Join(secretDir, "server.key"), strings.NewReader(websiteSSL.PrivateKey), 0600); err != nil {
+			global.LOG.Errorf("Failed to update the SSL certificate for 1Panel System domain [%s] , err:%s", websiteSSL.PrimaryDomain, err.Error())
+			return err
+		}
+	}
+	return nil
 }

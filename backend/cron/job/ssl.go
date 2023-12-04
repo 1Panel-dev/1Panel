@@ -9,7 +9,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"path"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -21,25 +20,8 @@ func NewSSLJob() *ssl {
 	return &ssl{}
 }
 
-func getSystemSSL() (bool, uint) {
-	settingRepo := repo.NewISettingRepo()
-	sslSetting, err := settingRepo.Get(settingRepo.WithByKey("SSL"))
-	if err != nil {
-		global.LOG.Errorf("load service ssl from setting failed, err: %v", err)
-		return false, 0
-	}
-	if sslSetting.Value == "enable" {
-		sslID, _ := settingRepo.Get(settingRepo.WithByKey("SSLID"))
-		idValue, _ := strconv.Atoi(sslID.Value)
-		if idValue > 0 {
-			return true, uint(idValue)
-		}
-	}
-	return false, 0
-}
-
 func (ssl *ssl) Run() {
-	systemSSLEnable, sslID := getSystemSSL()
+	systemSSLEnable, sslID := service.GetSystemSSL()
 	sslRepo := repo.NewISSLRepo()
 	sslService := service.NewIWebsiteSSLService()
 	sslList, _ := sslRepo.List()
