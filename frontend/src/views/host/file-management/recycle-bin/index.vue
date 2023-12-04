@@ -3,12 +3,17 @@
         <template #header>
             <DrawerHeader :header="$t('file.recycleBin')" :back="handleClose" />
         </template>
-        <el-button @click="clear" type="primary" :disabled="data == null || data.length == 0">
-            {{ $t('file.clearRecycleBin') }}
-        </el-button>
-        <el-button @click="patchDelete" :disabled="data == null || selects.length == 0">
-            {{ $t('commons.button.delete') }}
-        </el-button>
+        <div class="flex space-x-4">
+            <el-button @click="clear" type="primary" :disabled="data == null || data.length == 0">
+                {{ $t('file.clearRecycleBin') }}
+            </el-button>
+            <el-button @click="patchDelete" :disabled="data == null || selects.length == 0">
+                {{ $t('commons.button.delete') }}
+            </el-button>
+            <el-form-item :label="$t('file.fileRecycleBin')">
+                <el-switch v-model="status" active-value="enable" inactive-value="disable" @change="changeStatus" />
+            </el-form-item>
+        </div>
         <ComplexTable
             :pagination-config="paginationConfig"
             v-model:selects="selects"
@@ -46,11 +51,13 @@
 </template>
 
 <script lang="ts" setup>
-import { clearRecycle, getRecycleList, reduceFile } from '@/api/modules/files';
+import { GetRecycleStatus, clearRecycle, getRecycleList, reduceFile } from '@/api/modules/files';
 import { reactive, ref } from 'vue';
 import { dateFormat, computeSize } from '@/utils/util';
 import i18n from '@/lang';
 import Delete from './delete/index.vue';
+import { updateSetting } from '@/api/modules/setting';
+import { MsgSuccess } from '@/utils/message';
 
 const open = ref(false);
 const req = reactive({
@@ -62,6 +69,7 @@ const em = defineEmits(['close']);
 const selects = ref([]);
 const loading = ref(false);
 const files = ref([]);
+const status = ref('enable');
 
 const paginationConfig = reactive({
     cacheSizeKey: 'recycle-page-size',
@@ -83,6 +91,23 @@ const getFileSize = (size: number) => {
 
 const acceptParams = () => {
     search();
+    getStatus();
+};
+
+const getStatus = async () => {
+    try {
+        const res = await GetRecycleStatus();
+        status.value = res.data;
+    } catch (error) {}
+};
+
+const changeStatus = async () => {
+    try {
+        loading.value = true;
+        await updateSetting({ key: 'FileRecycleBin', value: status.value });
+        MsgSuccess(i18n.global.t('file.fileRecycleBinMsg', [i18n.global.t('commons.button.' + status.value)]));
+        loading.value = false;
+    } catch (error) {}
 };
 
 const search = async () => {

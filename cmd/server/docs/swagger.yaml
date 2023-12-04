@@ -95,6 +95,8 @@ definitions:
     type: object
   dto.BatchDelete:
     properties:
+      force:
+        type: boolean
       names:
         items:
           type: string
@@ -2334,6 +2336,8 @@ definitions:
         type: string
       expirationTime:
         type: string
+      fileRecycleBin:
+        type: string
       ipv6:
         type: string
       language:
@@ -3808,6 +3812,8 @@ definitions:
     properties:
       autoRenew:
         type: boolean
+      description:
+        type: string
       dir:
         type: string
       domains:
@@ -4226,6 +4232,8 @@ definitions:
       certificate:
         type: string
       certificatePath:
+        type: string
+      description:
         type: string
       privateKey:
         type: string
@@ -8520,6 +8528,19 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: List RecycleBin files
+      tags:
+      - File
+  /files/recycle/status:
+    get:
+      consumes:
+      - application/json
+      description: 获取回收站状态
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Get RecycleBin status
       tags:
       - File
   /files/rename:

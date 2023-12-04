@@ -5912,6 +5912,28 @@
                 }
             }
         },
+        "/files/recycle/status": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取回收站状态",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "File"
+                ],
+                "summary": "Get RecycleBin status",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/files/rename": {
             "post": {
                 "security": [
@@ -13499,6 +13521,9 @@
                 "names"
             ],
             "properties": {
+                "force": {
+                    "type": "boolean"
+                },
                 "names": {
                     "type": "array",
                     "items": {
@@ -16815,6 +16840,9 @@
                 "expirationTime": {
                     "type": "string"
                 },
+                "fileRecycleBin": {
+                    "type": "string"
+                },
                 "ipv6": {
                     "type": "string"
                 },
@@ -19028,6 +19056,9 @@
                 "autoRenew": {
                     "type": "boolean"
                 },
+                "description": {
+                    "type": "string"
+                },
                 "dir": {
                     "type": "string"
                 },
@@ -19643,6 +19674,9 @@
                     "type": "string"
                 },
                 "certificatePath": {
+                    "type": "string"
+                },
+                "description": {
                     "type": "string"
                 },
                 "privateKey": {

@@ -68,3 +68,19 @@ func (b *BaseApi) ClearRecycleBinFile(c *gin.Context) {
 	}
 	helper.SuccessWithOutData(c)
 }
+
+// @Tags File
+// @Summary Get RecycleBin status
+// @Description 获取回收站状态
+// @Accept json
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /files/recycle/status [get]
+func (b *BaseApi) GetRecycleStatus(c *gin.Context) {
+	settingInfo, err := settingService.GetSettingInfo()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, settingInfo.FileRecycleBin)
+}

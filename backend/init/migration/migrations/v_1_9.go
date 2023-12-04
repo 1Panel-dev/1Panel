@@ -77,3 +77,13 @@ var AddDefaultCA = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddSettingRecycleBin = &gormigrate.Migration{
+	ID: "20231129-add-setting-recycle-bin",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "FileRecycleBin", Value: "enable"}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

@@ -1087,6 +1087,8 @@ const message = {
         deleteRecycleHelper: 'Are you sure you want to permanently delete the following files?',
         typeErrOrEmpty: '[{0}] file type is wrong or empty folder',
         dropHelper: 'Drag the files you want to upload here',
+        fileRecycleBin: 'File Recycle Bin',
+        fileRecycleBinMsg: '{0} recycle bin',
     },
     ssh: {
         autoStart: 'Auto Start',

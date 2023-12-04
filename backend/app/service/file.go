@@ -136,6 +136,10 @@ func (f *FileService) Create(op request.FileCreate) error {
 
 func (f *FileService) Delete(op request.FileDelete) error {
 	fo := files.NewFileOp()
+	recycleBinStatus, _ := settingRepo.Get(settingRepo.WithByKey("FileRecycleBin"))
+	if recycleBinStatus.Value == "disable" {
+		op.ForceDelete = true
+	}
 	if op.ForceDelete {
 		if op.IsDir {
 			return fo.DeleteDir(op.Path)
