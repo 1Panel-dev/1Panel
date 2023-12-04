@@ -61,7 +61,7 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 	if req.Recommend {
 		opts = append(opts, appRepo.GetRecommend())
 	}
-	if req.Resource != "" {
+	if req.Resource != "" && req.Resource != "all" {
 		opts = append(opts, appRepo.WithResource(req.Resource))
 	}
 	if len(req.Tags) != 0 {

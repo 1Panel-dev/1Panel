@@ -65,6 +65,11 @@
         </template>
         <template #rightButton>
             <div class="flex justify-end">
+                <div class="mr-10">
+                    <el-checkbox v-model="req.resource" true-label="all" false-label="remote" @change="search(req)">
+                        {{ $t('app.showLocal') }}
+                    </el-checkbox>
+                </div>
                 <fu-table-pagination
                     v-model:current-page="paginationConfig.currentPage"
                     v-model:page-size="paginationConfig.pageSize"
@@ -201,6 +206,7 @@ const req = reactive({
     tags: [],
     page: 1,
     pageSize: 60,
+    resource: 'all',
 });
 
 const apps = ref<App.AppDTO[]>([]);
