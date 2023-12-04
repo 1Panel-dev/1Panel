@@ -24,6 +24,12 @@
                     <el-option v-for="eol in eols" :key="eol.label" :value="eol.value" :label="eol.label" />
                 </el-select>
             </el-form-item>
+            <el-form-item :label="$t('file.wordWrap')">
+                <el-select v-model="config.wordWrap" @change="changeWarp()">
+                    <el-option :label="$t('commons.button.enable')" value="on"></el-option>
+                    <el-option :label="$t('commons.button.disable')" value="off"></el-option>
+                </el-select>
+            </el-form-item>
         </el-form>
         <div v-loading="loading">
             <div id="codeBox" style="height: 55vh"></div>
@@ -81,16 +87,20 @@ interface EditorConfig {
     theme: string;
     language: string;
     eol: number;
+    wordWrap: WordWrapOptions;
 }
 
 const open = ref(false);
 const loading = ref(false);
 const fileName = ref('');
 
+type WordWrapOptions = 'off' | 'on' | 'wordWrapColumn' | 'bounded';
+
 const config = reactive<EditorConfig>({
     theme: 'vs-dark',
     language: 'plaintext',
     eol: monaco.editor.EndOfLineSequence.LF,
+    wordWrap: 'on',
 });
 
 const eols = [
@@ -145,6 +155,12 @@ const changeEOL = () => {
     editor.getModel().pushEOL(config.eol);
 };
 
+const changeWarp = () => {
+    editor.updateOptions({
+        wordWrap: config.wordWrap,
+    });
+};
+
 const initEditor = () => {
     if (editor) {
         editor.dispose();
@@ -160,8 +176,8 @@ const initEditor = () => {
             folding: true,
             roundedSelection: false,
             overviewRulerBorder: false,
+            wordWrap: 'on',
         });
-
         editor.onDidChangeModelContent(() => {
             if (editor) {
                 form.value.content = editor.getValue();
