@@ -105,7 +105,7 @@
                             </el-button>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.status')" prop="status" width="120px">
+                    <el-table-column :label="$t('commons.table.status')" prop="status" width="120px" sortable>
                         <template #default="{ row }">
                             <el-button
                                 v-if="row.status === 'Running'"
