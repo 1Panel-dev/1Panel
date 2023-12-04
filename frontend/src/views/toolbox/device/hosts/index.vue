@@ -120,12 +120,6 @@ const handleHostsDelete = (index: number) => {
 };
 
 const onSave = async () => {
-    for (const item of form.hosts) {
-        if (item.ip === '' || item.host === '') {
-            MsgError(i18n.global.t('toolbox.device.hostHelper'));
-            return;
-        }
-    }
     loading.value = true;
     if (confShowType.value === 'base') {
         await updateDeviceHost(form.hosts)
@@ -139,6 +133,12 @@ const onSave = async () => {
                 loading.value = false;
             });
         return;
+    }
+    for (const item of form.hosts) {
+        if (item.ip === '' || item.host === '') {
+            MsgError(i18n.global.t('toolbox.device.hostHelper'));
+            return;
+        }
     }
     await updateDeviceByConf('Hosts', hostsConf.value)
         .then(() => {

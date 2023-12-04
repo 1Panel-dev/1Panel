@@ -867,7 +867,8 @@ const message = {
             swapDeleteHelper: '此操作将移除 Swap 分区 {0}，出于系统安全考虑，不会自动删除该文件，如需删除请手动操作！',
             saveHelper: '请先保存当前设置！',
             saveSwap: '保存当前配置将调整 Swap 分区 {0} 大小到 {1}，是否继续？',
-            saveSwapHelper: '分区大小最小值为 40 KB，请修改后重试！',
+            swapMin: '分区大小最小值为 40 KB，请修改后重试！',
+            swapMax: '分区大小最大值为 {0}，请修改后重试！',
             swapOff: '分区大小最小值为 40 KB，设置成 0 则关闭 Swap 分区。',
         },
         device: {

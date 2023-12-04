@@ -56,7 +56,7 @@
                         </el-table-column>
                         <el-table-column :label="$t('file.size')" min-width="150">
                             <template #default="{ row }">
-                                <el-input placeholder="1024" v-model.number="row.size">
+                                <el-input placeholder="1024" type="number" v-model.number="row.size">
                                     <template #append>
                                         <el-select v-model="row.sizeUnit" style="width: 85px">
                                             <el-option label="KB" value="KB" />
@@ -101,10 +101,10 @@ import { computeSize, splitSize } from '@/utils/util';
 import { loadBaseDir } from '@/api/modules/setting';
 
 const form = reactive({
-    swapItem: '',
     swapMemoryTotal: '',
     swapMemoryAvailable: '',
     swapMemoryUsed: '',
+    maxSize: 0,
 
     swapDetails: [],
 });
@@ -124,6 +124,7 @@ const search = async () => {
     form.swapMemoryUsed = computeSize(res.data.swapMemoryUsed);
     form.swapMemoryAvailable = computeSize(res.data.swapMemoryAvailable);
     form.swapDetails = res.data.swapDetails || [];
+    form.maxSize = res.data.maxSize;
 
     await loadBaseDir()
         .then((res) => {
@@ -158,8 +159,17 @@ const loadData = (path: string) => {
 };
 
 const onSave = async (row) => {
-    if (row.sizeUnit === 'KB' && row.size < 40 && row.size !== 0) {
-        MsgError(i18n.global.t('toolbox.swap.saveSwapHelper'));
+    if (row.size === '') {
+        MsgError(i18n.global.t('commons.msg.confirmNoNull', ['Swap ' + i18n.global.t('file.size')]));
+        return;
+    }
+    const itemSize = loadItemSize(row);
+    if (itemSize < 40 && row.size !== 0) {
+        MsgError(i18n.global.t('toolbox.swap.swapMin'));
+        return;
+    }
+    if (itemSize * 1024 > form.maxSize) {
+        MsgError(i18n.global.t('toolbox.swap.swapMax', [computeSize(form.maxSize)]));
         return;
     }
     ElMessageBox.confirm(
@@ -173,7 +183,7 @@ const onSave = async (row) => {
     ).then(async () => {
         let params = {
             path: row.path,
-            size: row.size * 1024,
+            size: itemSize,
             used: '0',
 
             isNew: row.isNew,
@@ -189,6 +199,17 @@ const onSave = async (row) => {
                 loading.value = false;
             });
     });
+};
+
+const loadItemSize = (row: any) => {
+    switch (row.sizeUnit) {
+        case 'KB':
+            return row.size;
+        case 'MB':
+            return row.size * 1024;
+        case 'GB':
+            return row.size * 1024 * 1024;
+    }
 };
 
 const handleClose = () => {

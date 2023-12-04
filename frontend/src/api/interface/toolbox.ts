@@ -11,6 +11,7 @@ export namespace Toolbox {
         swapMemoryTotal: number;
         swapMemoryAvailable: number;
         swapMemoryUsed: number;
+        maxSize: number;
 
         swapDetails: Array<SwapHelper>;
     }
