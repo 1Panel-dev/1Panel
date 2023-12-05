@@ -36,16 +36,14 @@ const (
 type AppOperate string
 
 var (
-	Up      AppOperate = "up"
-	Down    AppOperate = "down"
 	Start   AppOperate = "start"
 	Stop    AppOperate = "stop"
 	Restart AppOperate = "restart"
 	Delete  AppOperate = "delete"
 	Sync    AppOperate = "sync"
 	Backup  AppOperate = "backup"
-	Restore AppOperate = "restore"
 	Update  AppOperate = "update"
 	Rebuild AppOperate = "rebuild"
 	Upgrade AppOperate = "upgrade"
+	Reload  AppOperate = "reload"
 )
