@@ -1091,6 +1091,8 @@ const message = {
         fileRecycleBin: 'File Recycle Bin',
         fileRecycleBinMsg: '{0} recycle bin',
         wordWrap: 'Automatically wrap',
+        deleteHelper2:
+            'Are you sure you want to delete the selected file? The deletion operation cannot be rolled back',
     },
     ssh: {
         autoStart: 'Auto Start',

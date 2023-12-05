@@ -85,6 +85,7 @@ const handleParams = () => {
                     rules[p.envKey] = [Rules.requiredInput];
                 }
             }
+            form[p.envKey] = p.default;
         }
         emit('update:rules', rules);
         updateParam();

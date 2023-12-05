@@ -251,8 +251,11 @@ func (f *FileService) MvFile(m request.FileMove) error {
 	if !fo.Stat(m.NewPath) {
 		return buserr.New(constant.ErrPathNotFound)
 	}
-	for _, path := range m.OldPaths {
-		if path == m.NewPath || strings.Contains(m.NewPath, filepath.Clean(path)+"/") {
+	for _, oldPath := range m.OldPaths {
+		if !fo.Stat(oldPath) {
+			return buserr.WithName(constant.ErrFileNotFound, oldPath)
+		}
+		if oldPath == m.NewPath || strings.Contains(m.NewPath, filepath.Clean(oldPath)+"/") {
 			return buserr.New(constant.ErrMovePathFailed)
 		}
 	}

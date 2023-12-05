@@ -1040,6 +1040,7 @@ const message = {
         fileRecycleBin: '檔案回收站',
         fileRecycleBinMsg: '已{0}回收站',
         wordWrap: '自動換行',
+        deleteHelper2: '確定刪除所選檔案？ 刪除操作不可回滾',
     },
     ssh: {
         autoStart: '開機自啟',

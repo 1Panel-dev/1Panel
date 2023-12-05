@@ -1041,6 +1041,7 @@ const message = {
         fileRecycleBin: '文件回收站',
         fileRecycleBinMsg: '已{0}回收站',
         wordWrap: '自动换行',
+        deleteHelper2: '确定删除所选文件？删除操作不可回滚',
     },
     ssh: {
         autoStart: '开机自启',
