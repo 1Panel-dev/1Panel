@@ -549,6 +549,7 @@ const checkPortValid = () => {
             }
             port.hostPort = port.host.substring(port.host.lastIndexOf(':') + 1);
         } else {
+            port.hostIP = '';
             port.hostPort = port.host;
         }
         if (port.hostPort.indexOf('-') !== -1) {
