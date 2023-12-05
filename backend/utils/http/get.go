@@ -2,6 +2,7 @@ package http
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"net"
@@ -14,6 +15,7 @@ func GetHttpRes(url string) (*http.Response, error) {
 	client := &http.Client{
 		Timeout: time.Second * 300,
 		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			DialContext: (&net.Dialer{
 				Timeout:   60 * time.Second,
 				KeepAlive: 60 * time.Second,

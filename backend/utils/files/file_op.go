@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"bufio"
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
@@ -216,7 +217,11 @@ func (w *WriteCounter) SaveProcess() {
 }
 
 func (f FileOp) DownloadFileWithProcess(url, dst, key string) error {
-	client := &http.Client{}
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
+	}
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil
