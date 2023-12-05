@@ -1425,6 +1425,7 @@ const message = {
         syncAllAppHelper: '即將同步所有應用，是否繼續？ ',
         hostModeHelper: '目前應用網路模式為 host 模式，如需放開端口，請在防火牆頁面手動放開',
         showLocal: '顯示本機應用程式',
+        reload: '重載',
     },
     website: {
         website: '網站',

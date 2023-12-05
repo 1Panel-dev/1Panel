@@ -262,6 +262,8 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 		return syncByID(install.ID)
 	case constant.Upgrade:
 		return upgradeInstall(install.ID, req.DetailId, req.Backup)
+	case constant.Reload:
+		return opNginx(install.ContainerName, constant.NginxReload)
 	default:
 		return errors.New("operate not support")
 	}

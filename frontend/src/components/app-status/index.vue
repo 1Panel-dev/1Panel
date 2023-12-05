@@ -32,6 +32,16 @@
                         <el-divider direction="vertical" />
                         <el-button
                             type="primary"
+                            link
+                            v-if="data.app === 'OpenResty'"
+                            @click="onOperate('reload')"
+                            :disabled="data.status !== 'Running'"
+                        >
+                            {{ $t('app.reload') }}
+                        </el-button>
+                        <el-divider v-if="data.app === 'OpenResty'" direction="vertical" />
+                        <el-button
+                            type="primary"
                             @click="setting"
                             link
                             :disabled="
