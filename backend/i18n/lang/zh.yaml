@@ -156,3 +156,6 @@ ErrFirewall: "当前未检测到系统 firewalld 或 ufw 服务，请检查后�
 
 #cronjob
 ErrBashExecute: "脚本执行错误，请在任务输出文本域中查看具体信息。"
+
+#toolbox
+ErrNotExistUser: "当前用户不存在，请修改后重试！"

@@ -156,3 +156,6 @@ ErrFirewall: "No firewalld or ufw service is detected. Please check and try agai
 
 #cronjob
 ErrBashExecute: "Script execution error, please check the specific information in the task output text area."
+
+#toolbox
+ErrNotExistUser: "The current user does not exist. Please modify and retry!"

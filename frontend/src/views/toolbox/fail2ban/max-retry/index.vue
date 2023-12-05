@@ -4,15 +4,18 @@
             <template #header>
                 <DrawerHeader :header="$t('toolbox.fail2ban.maxRetry')" :back="handleClose" />
             </template>
-            <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
+            <el-form
+                ref="formRef"
+                label-position="top"
+                :rules="rules"
+                :model="form"
+                @submit.prevent
+                v-loading="loading"
+            >
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
-                        <el-form-item
-                            :label="$t('toolbox.fail2ban.maxRetry')"
-                            prop="maxRetry"
-                            :rules="Rules.requiredInput"
-                        >
-                            <el-input clearable v-model.number="form.maxRetry">
+                        <el-form-item :label="$t('toolbox.fail2ban.maxRetry')" prop="maxRetry">
+                            <el-input type="number" clearable v-model.number="form.maxRetry">
                                 <template #append>{{ $t('commons.units.time') }}</template>
                             </el-input>
                         </el-form-item>
@@ -35,7 +38,7 @@ import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
-import { Rules } from '@/global/form-rules';
+import { Rules, checkNumberRange } from '@/global/form-rules';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { updateFail2ban } from '@/api/modules/toolbox';
 
@@ -49,6 +52,10 @@ const loading = ref();
 
 const form = reactive({
     maxRetry: 5,
+});
+
+const rules = reactive({
+    maxRetry: [Rules.number, checkNumberRange(1, 99)],
 });
 
 const formRef = ref<FormInstance>();

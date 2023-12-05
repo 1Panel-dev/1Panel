@@ -144,3 +144,7 @@ var (
 var (
 	ErrBashExecute = "ErrBashExecute"
 )
+
+var (
+	ErrNotExistUser = "ErrNotExistUser"
+)
