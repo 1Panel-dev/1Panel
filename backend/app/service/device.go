@@ -37,6 +37,10 @@ type IDeviceService interface {
 	LoadTimeZone() ([]string, error)
 	CheckDNS(key, value string) (bool, error)
 	LoadConf(name string) (string, error)
+
+	Scan() dto.CleanData
+	Clean(req []dto.Clean)
+	CleanForCronjob() (string, error)
 }
 
 func NewIDeviceService() IDeviceService {

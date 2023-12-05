@@ -203,3 +203,34 @@ func (b *BaseApi) CheckDNS(c *gin.Context) {
 
 	helper.SuccessWithData(c, data)
 }
+
+// @Tags Device
+// @Summary Scan system
+// @Description 扫描系统垃圾文件
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /toolbox/scan [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"扫描系统垃圾文件","formatEN":"scan System Junk Files"}
+func (b *BaseApi) ScanSystem(c *gin.Context) {
+	helper.SuccessWithData(c, deviceService.Scan())
+}
+
+// @Tags Device
+// @Summary Clean system
+// @Description 清理系统垃圾文件
+// @Accept json
+// @Param request body []dto.Clean true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /toolbox/clean [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"清理系统垃圾文件","formatEN":"Clean system junk files"}
+func (b *BaseApi) SystemClean(c *gin.Context) {
+	var req []dto.Clean
+	if err := helper.CheckBind(&req, c); err != nil {
+		return
+	}
+
+	deviceService.Clean(req)
+
+	helper.SuccessWithData(c, nil)
+}

@@ -6,13 +6,14 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"net"
 	"os"
 	"path"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
@@ -38,10 +39,6 @@ type ISettingService interface {
 	UpdateSSL(c *gin.Context, req dto.SSLUpdate) error
 	LoadFromCert() (*dto.SSLInfo, error)
 	HandlePasswordExpired(c *gin.Context, old, new string) error
-
-	SystemScan() dto.CleanData
-	SystemClean(req []dto.Clean)
-	SystemCleanForCronjob() (string, error)
 }
 
 func NewISettingService() ISettingService {

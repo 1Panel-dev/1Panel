@@ -9205,49 +9205,6 @@
                 }
             }
         },
-        "/settings/clean": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "清理系统垃圾文件",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "System Setting"
-                ],
-                "summary": "System clean",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/dto.Clean"
-                            }
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFunctions": [],
-                    "bodyKeys": [],
-                    "formatEN": "Clean system junk files",
-                    "formatZH": "清理系统垃圾文件",
-                    "paramKeys": []
-                }
-            }
-        },
         "/settings/expired/handle": {
             "post": {
                 "security": [
@@ -9490,32 +9447,6 @@
                     ],
                     "formatEN": "update system port =\u003e [serverPort]",
                     "formatZH": "修改系统端口 =\u003e [serverPort]",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/settings/scan": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "扫描系统垃圾文件",
-                "tags": [
-                    "System Setting"
-                ],
-                "summary": "Scan system",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFunctions": [],
-                    "bodyKeys": [],
-                    "formatEN": "scan System Junk Files",
-                    "formatZH": "扫描系统垃圾文件",
                     "paramKeys": []
                 }
             }
@@ -10120,6 +10051,49 @@
                 }
             }
         },
+        "/toolbox/clean": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "清理系统垃圾文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Device"
+                ],
+                "summary": "Clean system",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.Clean"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [],
+                    "formatEN": "Clean system junk files",
+                    "formatZH": "清理系统垃圾文件",
+                    "paramKeys": []
+                }
+            }
+        },
         "/toolbox/device/base": {
             "get": {
                 "security": [
@@ -10634,6 +10608,32 @@
                     "200": {
                         "description": "OK"
                     }
+                }
+            }
+        },
+        "/toolbox/scan": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "扫描系统垃圾文件",
+                "tags": [
+                    "Device"
+                ],
+                "summary": "Scan system",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [],
+                    "formatEN": "scan System Junk Files",
+                    "formatZH": "扫描系统垃圾文件",
+                    "paramKeys": []
                 }
             }
         },
@@ -14842,6 +14842,9 @@
                 },
                 "localTime": {
                     "type": "string"
+                },
+                "maxSize": {
+                    "type": "integer"
                 },
                 "ntp": {
                     "type": "string"
