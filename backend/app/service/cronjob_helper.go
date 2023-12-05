@@ -584,7 +584,7 @@ func (u *CronjobService) handleSnapshot(cronjob *model.Cronjob, startTime time.T
 }
 
 func (u *CronjobService) handleSystemClean() (string, error) {
-	return NewISettingService().SystemCleanForCronjob()
+	return NewIDeviceService().CleanForCronjob()
 }
 
 func (u *CronjobService) handleSystemLog(cronjob model.Cronjob, startTime time.Time) (string, error) {

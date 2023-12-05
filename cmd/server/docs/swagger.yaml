@@ -987,6 +987,8 @@ definitions:
         type: array
       localTime:
         type: string
+      maxSize:
+        type: integer
       ntp:
         type: string
       swapDetails:
@@ -10610,34 +10612,6 @@ paths:
         formatEN: 'update system bind info => ipv6: [ipv6], 监听 IP: [bindAddress]'
         formatZH: '修改系统监听信息 => ipv6: [ipv6], 监听 IP: [bindAddress]'
         paramKeys: []
-  /settings/clean:
-    post:
-      consumes:
-      - application/json
-      description: 清理系统垃圾文件
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          items:
-            $ref: '#/definitions/dto.Clean'
-          type: array
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      summary: System clean
-      tags:
-      - System Setting
-      x-panel-log:
-        BeforeFunctions: []
-        bodyKeys: []
-        formatEN: Clean system junk files
-        formatZH: 清理系统垃圾文件
-        paramKeys: []
   /settings/expired/handle:
     post:
       consumes:
@@ -10794,23 +10768,6 @@ paths:
         - serverPort
         formatEN: update system port => [serverPort]
         formatZH: 修改系统端口 => [serverPort]
-        paramKeys: []
-  /settings/scan:
-    post:
-      description: 扫描系统垃圾文件
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      summary: Scan system
-      tags:
-      - System Setting
-      x-panel-log:
-        BeforeFunctions: []
-        bodyKeys: []
-        formatEN: scan System Junk Files
-        formatZH: 扫描系统垃圾文件
         paramKeys: []
   /settings/search:
     post:
@@ -11192,6 +11149,34 @@ paths:
         formatEN: upgrade service => [version]
         formatZH: 更新系统 => [version]
         paramKeys: []
+  /toolbox/clean:
+    post:
+      consumes:
+      - application/json
+      description: 清理系统垃圾文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/dto.Clean'
+          type: array
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Clean system
+      tags:
+      - Device
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys: []
+        formatEN: Clean system junk files
+        formatZH: 清理系统垃圾文件
+        paramKeys: []
   /toolbox/device/base:
     get:
       description: 获取设备基础信息
@@ -11514,6 +11499,23 @@ paths:
       summary: Update fail2ban conf by file
       tags:
       - Fail2ban
+  /toolbox/scan:
+    post:
+      description: 扫描系统垃圾文件
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Scan system
+      tags:
+      - Device
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys: []
+        formatEN: scan System Junk Files
+        formatZH: 扫描系统垃圾文件
+        paramKeys: []
   /websites:
     post:
       consumes:

@@ -47,13 +47,6 @@ export const handleExpired = (param: Setting.PasswordUpdate) => {
     return http.post(`/settings/expired/handle`, param);
 };
 
-export const scanSystem = () => {
-    return http.post<Setting.CleanData>(`/settings/scan`, {});
-};
-export const cleanSystem = (param: any) => {
-    return http.post(`/settings/clean`, param);
-};
-
 export const loadTimeZone = () => {
     return http.get<Array<string>>(`/settings/time/option`);
 };

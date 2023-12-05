@@ -192,6 +192,9 @@ const loadDetail = (log: string) => {
     if (log.indexOf('[get]') !== -1) {
         log = log.replace('[get]', '[' + i18n.global.t('commons.button.get') + ']');
     }
+    if (log.indexOf('[operate]') !== -1) {
+        log = log.replace('[operate]', '[' + i18n.global.t('commons.table.operate') + ']');
+    }
     if (log.indexOf('[UserName]') !== -1) {
         return log.replace('[UserName]', '[' + i18n.global.t('commons.login.username') + ']');
     }

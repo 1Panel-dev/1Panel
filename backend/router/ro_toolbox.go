@@ -26,6 +26,9 @@ func (s *ToolboxRouter) InitToolboxRouter(Router *gin.RouterGroup) {
 		toolboxRouter.POST("/device/check/dns", baseApi.CheckDNS)
 		toolboxRouter.POST("/device/conf", baseApi.LoadDeviceConf)
 
+		toolboxRouter.POST("/scan", baseApi.ScanSystem)
+		toolboxRouter.POST("/clean", baseApi.SystemClean)
+
 		toolboxRouter.GET("/fail2ban/base", baseApi.LoadFail2BanBaseInfo)
 		toolboxRouter.GET("/fail2ban/load/conf", baseApi.LoadFail2BanConf)
 		toolboxRouter.POST("/fail2ban/search", baseApi.SearchFail2Ban)

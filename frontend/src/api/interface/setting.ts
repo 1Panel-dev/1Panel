@@ -87,23 +87,6 @@ export namespace Setting {
         interval: string;
     }
 
-    export interface CleanData {
-        systemClean: Array<CleanTree>;
-        uploadClean: Array<CleanTree>;
-        downloadClean: Array<CleanTree>;
-        systemLogClean: Array<CleanTree>;
-    }
-    export interface CleanTree {
-        id: string;
-        label: string;
-        children: Array<CleanTree>;
-        type: string;
-        name: string;
-        size: number;
-        isCheck: boolean;
-        isRecommend: boolean;
-    }
-
     export interface SnapshotCreate {
         id: number;
         from: string;

@@ -33,6 +33,14 @@ export const loadDeviceConf = (name: string) => {
     return http.post(`/toolbox/device/conf`, { name: name });
 };
 
+// clean
+export const scan = () => {
+    return http.post<Toolbox.CleanData>(`/toolbox/scan`, {});
+};
+export const clean = (param: any) => {
+    return http.post(`/toolbox/clean`, param);
+};
+
 // fail2ban
 export const getFail2banBase = () => {
     return http.get<Toolbox.Fail2banBaseInfo>(`/toolbox/fail2ban/base`);

@@ -33,7 +33,7 @@ const (
 	taskPath         = "1panel/task"
 )
 
-func (u *SettingService) SystemScan() dto.CleanData {
+func (u *DeviceService) Scan() dto.CleanData {
 	var (
 		SystemClean dto.CleanData
 		treeData    []dto.CleanTree
@@ -133,7 +133,7 @@ func (u *SettingService) SystemScan() dto.CleanData {
 	return SystemClean
 }
 
-func (u *SettingService) SystemClean(req []dto.Clean) {
+func (u *DeviceService) Clean(req []dto.Clean) {
 	size := uint64(0)
 	restart := false
 	for _, item := range req {
@@ -235,7 +235,7 @@ func (u *SettingService) SystemClean(req []dto.Clean) {
 					continue
 				}
 				for _, file := range files {
-					if file.Name() == "1Panel.log" {
+					if file.Name() == "1Panel.log" || file.IsDir() {
 						continue
 					}
 					dropFileOrDir(path.Join(global.CONF.System.BaseDir, logPath, file.Name()))
@@ -276,7 +276,7 @@ func (u *SettingService) SystemClean(req []dto.Clean) {
 	}
 }
 
-func (u *SettingService) SystemCleanForCronjob() (string, error) {
+func (u *DeviceService) CleanForCronjob() (string, error) {
 	logs := ""
 	size := int64(0)
 	fileCount := 0
@@ -541,7 +541,7 @@ func loadTreeWithAllFile(isCheck bool, originalPath, treeType, pathItem string, 
 		return lists
 	}
 	for _, file := range files {
-		if treeType == "system_log" && file.Name() == "1Panel.log" {
+		if treeType == "system_log" && (file.Name() == "1Panel.log" || file.IsDir()) {
 			continue
 		}
 		if (treeType == "upload" || treeType == "download") && file.IsDir() && (file.Name() == "app" || file.Name() == "database" || file.Name() == "website" || file.Name() == "directory") {

@@ -228,7 +228,8 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue';
 import { computeSize } from '@/utils/util';
-import { cleanSystem, scanSystem, getSettingInfo } from '@/api/modules/setting';
+import { getSettingInfo } from '@/api/modules/setting';
+import { clean, scan } from '@/api/modules/toolbox';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
@@ -270,7 +271,7 @@ const form = reactive({
 
 const scanData = async () => {
     loading.value = true;
-    await scanSystem()
+    await scan()
         .then((res) => {
             loading.value = false;
             selectSize.value = 0;
@@ -321,7 +322,7 @@ const onSubmitClean = async () => {
                 break;
             }
         }
-        await cleanSystem(submitCleans.value)
+        await clean(submitCleans.value)
             .then(() => {
                 form.lastCleanSize = selectSize.value + '';
                 form.lastCleanData = submitCleans.value.length + '';
