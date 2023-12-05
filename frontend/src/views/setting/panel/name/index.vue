@@ -7,7 +7,7 @@
             <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
-                        <el-form-item :label="$t('setting.title')" prop="panelName" :rules="Rules.requiredInput">
+                        <el-form-item :label="$t('setting.title')" prop="panelName" :rules="Rules.simpleName">
                             <el-input clearable v-model="form.panelName" />
                         </el-form-item>
                     </el-col>

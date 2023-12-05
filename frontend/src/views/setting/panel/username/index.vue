@@ -2,7 +2,7 @@
     <div>
         <el-drawer v-model="drawerVisible" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
             <template #header>
-                <DrawerHeader :header="$t('commons.login.username')" :back="handleClose" />
+                <DrawerHeader :header="$t('setting.user')" :back="handleClose" />
             </template>
             <el-form
                 ref="formRef"
@@ -14,7 +14,7 @@
             >
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
-                        <el-form-item :label="$t('commons.login.username')" prop="userName">
+                        <el-form-item :label="$t('setting.user')" prop="userName">
                             <el-input clearable v-model.trim="form.userName" />
                         </el-form-item>
                     </el-col>

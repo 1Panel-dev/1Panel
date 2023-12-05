@@ -12,6 +12,8 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
@@ -189,6 +191,9 @@ func (u *DeviceService) UpdateHosts(req []dto.HostHelper) error {
 func (u *DeviceService) UpdatePasswd(req dto.ChangePasswd) error {
 	std, err := cmd.Execf("%s echo '%s:%s' | %s chpasswd", cmd.SudoHandleCmd(), req.User, req.Passwd, cmd.SudoHandleCmd())
 	if err != nil {
+		if strings.Contains(err.Error(), "does not exist") {
+			return buserr.New(constant.ErrNotExistUser)
+		}
 		return errors.New(std)
 	}
 	return nil
