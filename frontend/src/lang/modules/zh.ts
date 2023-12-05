@@ -342,6 +342,7 @@ const message = {
         logout: '退出登录',
     },
     database: {
+        manage: '管理',
         database: '数据库',
         deleteBackupHelper: '同时删除数据库备份',
         delete: '删除操作无法回滚，请输入 "',
