@@ -3,9 +3,15 @@
         <div>
             <el-row>
                 <el-col :span="20" :offset="2">
-                    <el-alert class="mt-2" :show-icon="true" type="warning" :closable="false">
+                    <el-alert
+                        class="mt-2"
+                        :show-icon="true"
+                        :type="recycleStatus === 'enable' ? 'warning' : 'error'"
+                        :closable="false"
+                    >
                         <div class="delete-warn">
-                            <span>{{ $t('file.deleteHelper') }}</span>
+                            <span v-if="recycleStatus === 'enable'">{{ $t('file.deleteHelper') }}</span>
+                            <span v-else>{{ $t('file.deleteHelper2') }}</span>
                         </div>
                     </el-alert>
                     <div class="mt-4" v-if="recycleStatus === 'enable'">
