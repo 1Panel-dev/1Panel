@@ -342,6 +342,7 @@ const message = {
         logout: '退出登錄',
     },
     database: {
+        manage: '管理',
         database: '數據庫',
         deleteBackupHelper: '同時刪除數據庫備份',
         delete: '刪除操作無法回滾，請輸入 "',

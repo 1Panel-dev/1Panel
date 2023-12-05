@@ -345,6 +345,7 @@ const message = {
         logout: 'Logout',
     },
     database: {
+        manage: 'Management',
         database: 'database',
         deleteBackupHelper: 'Delete database backups simultaneously',
         delete: 'Delete operation cannot be rolled back, please input "',
