@@ -165,7 +165,7 @@ export const DNSTypes = [
         value: 'NameCom',
     },
     {
-        label: 'Godaddy',
+        label: 'GoDaddy',
         value: 'Godaddy',
     },
 ];

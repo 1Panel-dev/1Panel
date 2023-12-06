@@ -39,19 +39,20 @@ func (w WebsiteAcmeAccountService) Create(create request.WebsiteAcmeAccountCreat
 	if exist != nil {
 		return nil, buserr.New(constant.ErrEmailIsExist)
 	}
-
-	if create.Type == "google" && (create.EabKid == "" || create.EabHmacKey == "") {
-		return nil, buserr.New(constant.ErrEabKidOrEabHmacKeyCannotBlank)
-	} else {
-		create.EabKid = ""
-		create.EabHmacKey = ""
-	}
-
 	acmeAccount := &model.WebsiteAcmeAccount{
 		Email:   create.Email,
 		Type:    create.Type,
 		KeyType: create.KeyType,
 	}
+
+	if create.Type == "google" {
+		if create.EabKid == "" || create.EabHmacKey == "" {
+			return nil, buserr.New(constant.ErrEabKidOrEabHmacKeyCannotBlank)
+		}
+		acmeAccount.EabKid = create.EabKid
+		acmeAccount.EabHmacKey = create.EabHmacKey
+	}
+
 	client, err := ssl.NewAcmeClient(acmeAccount)
 	if err != nil {
 		return nil, err

@@ -34,6 +34,7 @@
                                 :value="keyType.value"
                             ></el-option>
                         </el-select>
+                        <span class="input-help">{{ $t('ssl.googleCloudHelper') }}</span>
                     </el-form-item>
                     <div v-if="account.type == 'google'">
                         <el-form-item label="EAB kid" prop="eabKid">
