@@ -244,6 +244,21 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 				websiteSSL.PrimaryDomain = domains[0]
 				websiteSSL.Domains = strings.Join(domains[1:], ",")
 			}
+			ipStrings := make([]string, len(ips))
+			for i, ip := range ips {
+				ipStrings[i] = ip.String()
+			}
+			if websiteSSL.PrimaryDomain == "" && len(ips) > 0 {
+				websiteSSL.PrimaryDomain = ipStrings[0]
+				ipStrings = ipStrings[1:]
+			}
+			if len(ipStrings) > 0 {
+				if websiteSSL.Domains != "" {
+					websiteSSL.Domains += ","
+				}
+				websiteSSL.Domains += strings.Join(ipStrings, ",")
+			}
+
 		}
 	}
 
