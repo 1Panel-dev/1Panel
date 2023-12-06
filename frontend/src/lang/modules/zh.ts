@@ -1240,6 +1240,7 @@ const message = {
         bindDomain: '域名绑定',
         unBindDomain: '域名解绑',
         panelSSL: '面板 SSL',
+        panelSSLHelper: '面板 SSL 自动续期后需要手动重启 1Panel 服务才可生效',
         unBindDomainHelper: '解除域名绑定可能造成系统不安全，是否继续？',
         bindDomainHelper: '设置域名绑定后，仅能通过设置中域名访问 1Panel 服务',
         bindDomainHelper1: '绑定域名为空时，则取消域名绑定',
