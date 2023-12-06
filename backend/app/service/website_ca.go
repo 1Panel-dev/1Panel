@@ -276,7 +276,7 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 	}
 
 	var rootPrivateKey any
-	if ssl.KeyType(websiteSSL.KeyType) == certcrypto.EC256 || ssl.KeyType(websiteSSL.KeyType) == certcrypto.EC384 {
+	if ssl.KeyType(ca.KeyType) == certcrypto.EC256 || ssl.KeyType(ca.KeyType) == certcrypto.EC384 {
 		rootPrivateKey, err = x509.ParseECPrivateKey(rootPrivateKeyBlock.Bytes)
 		if err != nil {
 			return nil, err
@@ -396,8 +396,7 @@ func createPrivateKey(keyType string) (privateKey any, publicKey any, privateKey
 		block.Bytes = privateBytes
 		_ = pem.Encode(caPrivateKeyPEM, block)
 	} else {
-		publicKey = privateKey.(*rsa.PrivateKey).PublicKey
-		publicKey = publicKey.(*rsa.PublicKey)
+		publicKey = &privateKey.(*rsa.PrivateKey).PublicKey
 		_ = pem.Encode(caPrivateKeyPEM, &pem.Block{
 			Type:  "RSA PRIVATE KEY",
 			Bytes: x509.MarshalPKCS1PrivateKey(privateKey.(*rsa.PrivateKey)),
