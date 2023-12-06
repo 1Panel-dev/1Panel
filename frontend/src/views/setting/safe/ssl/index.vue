@@ -8,8 +8,15 @@
             size="30%"
         >
             <template #header>
-                <DrawerHeader header="https" :back="handleClose" />
+                <DrawerHeader :header="$t('setting.panelSSL')" :back="handleClose" />
             </template>
+            <el-alert class="common-prompt" :closable="false" type="error">
+                <template #default>
+                    <span>
+                        <span>{{ $t('setting.panelSSLHelper') }}</span>
+                    </span>
+                </template>
+            </el-alert>
             <el-form ref="formRef" label-position="top" :model="form" :rules="rules" v-loading="loading">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">

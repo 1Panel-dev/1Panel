@@ -1276,6 +1276,8 @@ const message = {
         bindDomain: 'Bind Domain',
         unBindDomain: 'Unbind domain',
         panelSSL: 'Panel SSL',
+        panelSSLHelper:
+            'After the automatic renewal of the panel SSL, you need to manually restart the 1Panel service for the changes to take effect.',
         unBindDomainHelper:
             'The action of unbinding a domain name may cause system insecurity. Do you want to continue?',
         bindDomainHelper:
