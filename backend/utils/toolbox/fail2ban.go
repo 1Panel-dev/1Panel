@@ -134,7 +134,7 @@ func initLocalFile() error {
 bantime = 600
 findtime = 300
 maxretry = 5
-banaction = firewallcmd-ipset
+banaction = $banaction
 action = %(action_mwl)s
 #DEFAULT-END
 
@@ -148,6 +148,16 @@ findtime = 300
 bantime = 600
 action = %(action_mwl)s
 logpath = /var/log/secure`
+
+	banaction := ""
+	if active, _ := systemctl.IsActive("firewalld"); active {
+		banaction = "firewallcmd-ipset"
+	} else if active, _ := systemctl.IsActive("ufw"); active {
+		banaction = "ufw"
+	} else {
+		banaction = "iptables-allports"
+	}
+	initFile = strings.ReplaceAll(initFile, "$banaction", banaction)
 	if err := os.WriteFile(defaultPath, []byte(initFile), 0640); err != nil {
 		return err
 	}
