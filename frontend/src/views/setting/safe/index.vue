@@ -299,7 +299,7 @@ const handleSSL = async () => {
         type: 'info',
     })
         .then(async () => {
-            await updateSSL({ ssl: 'disable', domain: '', sslType: '', key: '', cert: '', sslID: 0 });
+            await updateSSL({ ssl: 'disable', domain: '', sslType: form.sslType, key: '', cert: '', sslID: 0 });
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             let href = window.location.href;
             globalStore.isLogin = false;
