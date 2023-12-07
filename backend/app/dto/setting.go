@@ -60,7 +60,7 @@ type SettingUpdate struct {
 }
 
 type SSLUpdate struct {
-	SSLType string `json:"sslType"`
+	SSLType string `json:"sslType" validate:"required,oneof=self select import-paste import-local"`
 	Domain  string `json:"domain"`
 	SSL     string `json:"ssl" validate:"required,oneof=enable disable"`
 	Cert    string `json:"cert"`

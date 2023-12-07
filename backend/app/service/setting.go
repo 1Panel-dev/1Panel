@@ -174,6 +174,7 @@ func (u *SettingService) UpdatePort(port uint) error {
 		return err
 	}
 	go func() {
+		time.Sleep(1 * time.Second)
 		_, err := cmd.Exec("systemctl restart 1panel.service")
 		if err != nil {
 			global.LOG.Errorf("restart system port failed, err: %v", err)
@@ -249,9 +250,20 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 		if err := settingRepo.Update("SSLID", strconv.Itoa(int(req.SSLID))); err != nil {
 			return err
 		}
-	case "import":
+	case "import-paste":
 		secret = req.Cert
 		key = req.Key
+	case "import-local":
+		keyFile, err := os.ReadFile(req.Key)
+		if err != nil {
+			return err
+		}
+		key = string(keyFile)
+		certFile, err := os.ReadFile(req.Cert)
+		if err != nil {
+			return err
+		}
+		secret = string(certFile)
 	}
 
 	fileOp := files.NewFileOp()
@@ -274,6 +286,7 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 		return err
 	}
 	go func() {
+		time.Sleep(1 * time.Second)
 		_, err := cmd.Exec("systemctl restart 1panel.service")
 		if err != nil {
 			global.LOG.Errorf("restart system failed, err: %v", err)

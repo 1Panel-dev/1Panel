@@ -30,6 +30,12 @@
                                 {{ $t('setting.selfSignedHelper') }}
                             </span>
                         </el-form-item>
+                        <el-form-item v-if="form.sslType === 'import'" :label="$t('commons.button.import')" prop="type">
+                            <el-select v-model="form.itemSSLType">
+                                <el-option :label="$t('website.pasteSSL')" value="paste"></el-option>
+                                <el-option :label="$t('website.localSSL')" value="local"></el-option>
+                            </el-select>
+                        </el-form-item>
 
                         <el-form-item v-if="form.timeout">
                             <el-tag>{{ $t('setting.domainOrIP') }} {{ form.domain }}</el-tag>
@@ -46,12 +52,29 @@
                             </el-button>
                         </el-form-item>
 
-                        <div v-if="form.sslType === 'import'">
+                        <div v-if="form.sslType === 'import' && form.itemSSLType === 'paste'">
                             <el-form-item :label="$t('website.privateKey')" prop="key">
                                 <el-input v-model="form.key" :autosize="{ minRows: 5, maxRows: 10 }" type="textarea" />
                             </el-form-item>
                             <el-form-item class="marginTop" :label="$t('website.certificate')" prop="cert">
                                 <el-input v-model="form.cert" :autosize="{ minRows: 5, maxRows: 10 }" type="textarea" />
+                            </el-form-item>
+                        </div>
+
+                        <div v-if="form.sslType === 'import' && form.itemSSLType === 'local'">
+                            <el-form-item :label="$t('website.privateKey')" prop="key">
+                                <el-input v-model="form.key">
+                                    <template #prepend>
+                                        <FileList @choose="getKeyPath" :dir="false"></FileList>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
+                            <el-form-item class="marginTop" :label="$t('website.certificate')" prop="cert">
+                                <el-input v-model="form.cert">
+                                    <template #prepend>
+                                        <FileList @choose="getCertPath" :dir="false"></FileList>
+                                    </template>
+                                </el-input>
                             </el-form-item>
                         </div>
 
@@ -129,6 +152,7 @@ const form = reactive({
     ssl: 'enable',
     domain: '',
     sslType: 'self',
+    itemSSLType: 'paste',
     sslID: null as number,
     cert: '',
     key: '',
@@ -152,7 +176,12 @@ interface DialogProps {
     sslInfo?: Setting.SSLInfo;
 }
 const acceptParams = async (params: DialogProps): Promise<void> => {
-    form.sslType = params.sslType;
+    if (params.sslType.indexOf('-') !== -1) {
+        form.sslType = 'import';
+        form.itemSSLType = params.sslType.split('-')[1];
+    } else {
+        form.sslType = params.sslType;
+    }
     form.cert = params.sslInfo?.cert || '';
     form.key = params.sslInfo?.key || '';
     form.rootPath = params.sslInfo?.rootPath || '';
@@ -183,6 +212,14 @@ const changeSSl = (sslid: number) => {
     itemSSL.value = res[0];
 };
 
+const getKeyPath = (path: string) => {
+    form.key = path;
+};
+
+const getCertPath = (path: string) => {
+    form.cert = path;
+};
+
 const onDownload = async () => {
     await downloadSSL().then(async (file) => {
         const downloadUrl = window.URL.createObjectURL(new Blob([file]));
@@ -204,9 +241,13 @@ const onSaveSSL = async (formEl: FormInstance | undefined) => {
             cancelButtonText: i18n.global.t('commons.button.cancel'),
             type: 'info',
         }).then(async () => {
+            let itemType = form.sslType;
+            if (form.sslType === 'import') {
+                itemType = form.itemSSLType === 'paste' ? 'import-paste' : 'import-local';
+            }
             let param = {
                 ssl: 'enable',
-                sslType: form.sslType,
+                sslType: itemType,
                 domain: '',
                 sslID: form.sslID,
                 cert: form.cert,
