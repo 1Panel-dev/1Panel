@@ -29,9 +29,9 @@ func NewFail2Ban() (*Fail2ban, error) {
 			if err := initLocalFile(); err != nil {
 				return nil, err
 			}
-			stdout, err := cmd.Exec("fail2ban-client reload")
+			stdout, err := cmd.Exec("systemctl restart fail2ban.service")
 			if err != nil {
-				global.LOG.Errorf("reload fail2ban failed, err: %s", stdout)
+				global.LOG.Errorf("restart fail2ban failed, err: %s", stdout)
 				return nil, err
 			}
 		}

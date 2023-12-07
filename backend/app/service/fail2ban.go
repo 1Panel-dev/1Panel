@@ -120,7 +120,7 @@ func (u *Fail2BanService) UpdateConf(req dto.Fail2BanUpdate) error {
 			newFile += fmt.Sprintf("%s = %s\n", req.Key, req.Value)
 			continue
 		}
-		if strings.HasPrefix(line, "[") || index != len(lines)-1 {
+		if strings.HasPrefix(line, "[") || index == len(lines)-1 {
 			isEnd = true
 			if !hasKey {
 				newFile += fmt.Sprintf("%s = %s\n", req.Key, req.Value)

@@ -158,12 +158,12 @@ const message = {
             illegalInput: 'There are illegal characters in the input box.',
             commonName: 'Support English, Chinese, numbers, .-, and _ length 1-128',
             userName: 'Support English, Chinese, numbers and _ length 3-30',
-            simpleName: 'Support English, numbers and _ length 1-30',
+            simpleName: 'Supports non-underscore starting, English, numbers, _, length 1-30',
             dbName: 'Support English, Chinese, numbers, .-, and _ length 1-64',
             imageName: 'Support English, numbers, :/.-_, length 1-150',
             volumeName: 'Support English, numbers, .-_, length 2-30',
             complexityPassword:
-                'Longer than eight characters and contains at least two combinations of letters, digits, and special characters',
+                'Please enter a password combination with a length of 8-30 characters, including letters, numbers, and at least two special characters.',
             commonPassword: 'Please enter a password with more than 6 characters',
             linuxName: 'Length 1-128, the name cannot contain symbols such as {0}',
             email: 'Email format error',
@@ -1277,8 +1277,7 @@ const message = {
             '[ {0} days ] The panel password is about to expire. After the expiration, you need to reset the password',
         complexity: 'Complexity Verification',
         complexityHelper:
-            'The password must contain at least eight characters and contain at least three uppercase letters, lowercase letters, digits, and special characters',
-
+            'After enabling, the password must have a length of 8-30 characters, including letters, numbers, and at least two special characters.',
         bindDomain: 'Bind Domain',
         unBindDomain: 'Unbind domain',
         panelSSL: 'Panel SSL',

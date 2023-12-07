@@ -7,7 +7,11 @@
             <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
-                        <el-form-item :label="$t('toolbox.fail2ban.banTime')" prop="banTime" :rules="Rules.number">
+                        <el-form-item
+                            :label="$t('toolbox.fail2ban.banTime')"
+                            prop="banTime"
+                            :rules="Rules.integerNumber"
+                        >
                             <el-input type="number" v-model.number="form.banTime">
                                 <template #append>
                                     <el-select v-model.number="form.banTimeUnit" style="width: 100px">
