@@ -55,7 +55,7 @@ const form = reactive({
 });
 
 const rules = reactive({
-    maxRetry: [Rules.number, checkNumberRange(1, 99)],
+    maxRetry: [Rules.integerNumber, checkNumberRange(1, 99)],
 });
 
 const formRef = ref<FormInstance>();

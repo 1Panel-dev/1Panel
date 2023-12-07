@@ -107,7 +107,10 @@ func (u *SettingService) Update(key, value string) error {
 
 	switch key {
 	case "ExpirationDays":
-		timeout, _ := strconv.Atoi(value)
+		timeout, err := strconv.Atoi(value)
+		if err != nil {
+			return err
+		}
 		if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format("2006-01-02 15:04:05")); err != nil {
 			return err
 		}
@@ -150,6 +153,7 @@ func (u *SettingService) UpdateBindInfo(req dto.BindInfo) error {
 		return err
 	}
 	go func() {
+		time.Sleep(1 * time.Second)
 		_, err := cmd.Exec("systemctl restart 1panel.service")
 		if err != nil {
 			global.LOG.Errorf("restart system with new bind info failed, err: %v", err)

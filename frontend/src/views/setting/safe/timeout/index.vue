@@ -10,7 +10,7 @@
                         <el-form-item
                             :label="$t('setting.days')"
                             prop="days"
-                            :rules="[Rules.number, checkNumberRange(0, 60)]"
+                            :rules="[Rules.integerNumberWith0, checkNumberRange(0, 60)]"
                         >
                             <el-input clearable v-model.number="form.days" />
                             <span class="input-help">{{ $t('setting.expirationHelper') }}</span>

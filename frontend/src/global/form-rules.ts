@@ -145,7 +145,7 @@ const checkUserName = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.userName')));
     } else {
-        const reg = /[a-zA-Z0-9_\u4e00-\u9fa5]{3,30}$/;
+        const reg = /^[a-zA-Z0-9_\u4e00-\u9fa5]{3,30}$/;
         if (!reg.test(value) && value !== '') {
             callback(new Error(i18n.global.t('commons.rule.userName')));
         } else {
@@ -158,7 +158,7 @@ const checkSimpleName = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.simpleName')));
     } else {
-        const reg = /^[a-zA-Z0-9]{1}[a-zA-Z0-9_]{1,29}$/;
+        const reg = /^[a-zA-Z0-9]{1}[a-zA-Z0-9_]{2,29}$/;
         if (!reg.test(value) && value !== '') {
             callback(new Error(i18n.global.t('commons.rule.simpleName')));
         } else {

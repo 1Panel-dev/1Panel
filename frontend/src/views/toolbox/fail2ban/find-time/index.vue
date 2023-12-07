@@ -10,7 +10,7 @@
                         <el-form-item
                             :label="$t('toolbox.fail2ban.findTime')"
                             prop="findTime"
-                            :rules="Rules.requiredInput"
+                            :rules="Rules.integerNumber"
                         >
                             <el-input clearable v-model.number="form.findTime">
                                 <template #append>
