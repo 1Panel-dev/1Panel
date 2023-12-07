@@ -16,16 +16,16 @@
                             type="warning"
                         />
                         <el-form-item :label="$t('terminal.ip')" prop="addr">
-                            <el-input v-if="!isLocal" clearable v-model.trim="hostInfo.addr" />
+                            <el-input @change="isOK = false" v-if="!isLocal" clearable v-model.trim="hostInfo.addr" />
                             <div style="margin-left: 12px">
                                 <span v-if="isLocal">{{ hostInfo.addr }}</span>
                             </div>
                         </el-form-item>
                         <el-form-item :label="$t('commons.login.username')" prop="user">
-                            <el-input clearable v-model="hostInfo.user" />
+                            <el-input @change="isOK = false" clearable v-model="hostInfo.user" />
                         </el-form-item>
                         <el-form-item :label="$t('terminal.authMode')" prop="authMode">
-                            <el-radio-group v-model="hostInfo.authMode">
+                            <el-radio-group @change="isOK = false" v-model="hostInfo.authMode">
                                 <el-radio label="password">{{ $t('terminal.passwordMode') }}</el-radio>
                                 <el-radio label="key">{{ $t('terminal.keyMode') }}</el-radio>
                             </el-radio-group>
@@ -35,23 +35,35 @@
                             v-if="hostInfo.authMode === 'password'"
                             prop="password"
                         >
-                            <el-input clearable show-password type="password" v-model="hostInfo.password" />
+                            <el-input
+                                @change="isOK = false"
+                                clearable
+                                show-password
+                                type="password"
+                                v-model="hostInfo.password"
+                            />
                         </el-form-item>
                         <el-form-item :label="$t('terminal.key')" v-if="hostInfo.authMode === 'key'" prop="privateKey">
-                            <el-input clearable type="textarea" v-model="hostInfo.privateKey" />
+                            <el-input @change="isOK = false" clearable type="textarea" v-model="hostInfo.privateKey" />
                         </el-form-item>
                         <el-form-item
                             :label="$t('terminal.keyPassword')"
                             v-if="hostInfo.authMode === 'key'"
                             prop="passPhrase"
                         >
-                            <el-input type="password" show-password clearable v-model="hostInfo.passPhrase" />
+                            <el-input
+                                @change="isOK = false"
+                                type="password"
+                                show-password
+                                clearable
+                                v-model="hostInfo.passPhrase"
+                            />
                         </el-form-item>
                         <el-checkbox clearable v-model.number="hostInfo.rememberPassword">
                             {{ $t('terminal.rememberPassword') }}
                         </el-checkbox>
                         <el-form-item style="margin-top: 10px" :label="$t('commons.table.port')" prop="port">
-                            <el-input clearable v-model.number="hostInfo.port" />
+                            <el-input @change="isOK = false" clearable v-model.number="hostInfo.port" />
                         </el-form-item>
                         <el-form-item :label="$t('commons.table.title')" prop="name">
                             <el-input clearable v-model="hostInfo.name" />
@@ -84,7 +96,7 @@ import { Rules } from '@/global/form-rules';
 import { addHost, testByInfo } from '@/api/modules/host';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import i18n from '@/lang';
-import { reactive, ref, watch } from 'vue';
+import { reactive, ref } from 'vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 
 const dialogVisible = ref();
@@ -106,14 +118,6 @@ let hostInfo = reactive<Host.HostOperate>({
     rememberPassword: false,
     description: '',
 });
-
-watch(
-    () => hostInfo,
-    () => {
-        isOK.value = false;
-    },
-    { deep: true },
-);
 
 const rules = reactive({
     addr: [Rules.ipV4V6OrDomain],
