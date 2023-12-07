@@ -916,6 +916,8 @@ const message = {
             allPorts: ' (所有端口)',
             ignoreIP: 'IP 白名單',
             bannedIP: 'IP 黑名單',
+            logPath: '日誌路徑',
+            logPathHelper: '預設為 /var/log/secure 或者 /var/log/auth.log',
         },
     },
     logs: {

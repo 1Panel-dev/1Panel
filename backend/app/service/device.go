@@ -109,6 +109,9 @@ func (u *DeviceService) CheckDNS(key, value string) (bool, error) {
 func (u *DeviceService) Update(key, value string) error {
 	switch key {
 	case "TimeZone":
+		if cmd.CheckIllegal(value) {
+			return buserr.New(constant.ErrCmdIllegal)
+		}
 		if err := ntp.UpdateSystemTimeZone(value); err != nil {
 			return err
 		}
@@ -123,11 +126,17 @@ func (u *DeviceService) Update(key, value string) error {
 			return err
 		}
 	case "Hostname":
+		if cmd.CheckIllegal(value) {
+			return buserr.New(constant.ErrCmdIllegal)
+		}
 		std, err := cmd.Execf("%s hostnamectl set-hostname %s", cmd.SudoHandleCmd(), value)
 		if err != nil {
 			return errors.New(std)
 		}
 	case "Ntp", "LocalTime":
+		if cmd.CheckIllegal(value) {
+			return buserr.New(constant.ErrCmdIllegal)
+		}
 		ntpValue := value
 		if key == "LocalTime" {
 			ntpItem, err := settingRepo.Get(settingRepo.WithByKey("NtpSite"))
@@ -193,6 +202,9 @@ func (u *DeviceService) UpdateHosts(req []dto.HostHelper) error {
 }
 
 func (u *DeviceService) UpdatePasswd(req dto.ChangePasswd) error {
+	if cmd.CheckIllegal(req.User, req.Passwd) {
+		return buserr.New(constant.ErrCmdIllegal)
+	}
 	std, err := cmd.Execf("%s echo '%s:%s' | %s chpasswd", cmd.SudoHandleCmd(), req.User, req.Passwd, cmd.SudoHandleCmd())
 	if err != nil {
 		if strings.Contains(err.Error(), "does not exist") {
@@ -204,6 +216,9 @@ func (u *DeviceService) UpdatePasswd(req dto.ChangePasswd) error {
 }
 
 func (u *DeviceService) UpdateSwap(req dto.SwapHelper) error {
+	if cmd.CheckIllegal(req.Path) {
+		return buserr.New(constant.ErrCmdIllegal)
+	}
 	if !req.IsNew {
 		std, err := cmd.Execf("%s swapoff %s", cmd.SudoHandleCmd(), req.Path)
 		if err != nil {

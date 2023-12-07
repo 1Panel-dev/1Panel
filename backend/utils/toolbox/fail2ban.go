@@ -94,7 +94,7 @@ func (f *Fail2ban) ReBanIPs(ips []string) error {
 
 func (f *Fail2ban) ListBanned() ([]string, error) {
 	var lists []string
-	stdout, err := cmd.Exec("fail2ban-client get sshd banned")
+	stdout, err := cmd.Exec("fail2ban-client get sshd banip")
 	if err != nil {
 		return lists, err
 	}
@@ -147,7 +147,7 @@ maxretry = 5
 findtime = 300
 bantime = 600
 action = %(action_mwl)s
-logpath = /var/log/secure`
+logpath = $logpath`
 
 	banaction := ""
 	if active, _ := systemctl.IsActive("firewalld"); active {
@@ -158,6 +158,14 @@ logpath = /var/log/secure`
 		banaction = "iptables-allports"
 	}
 	initFile = strings.ReplaceAll(initFile, "$banaction", banaction)
+
+	logPath := ""
+	if _, err := os.Stat("/var/log/secure"); err == nil {
+		logPath = "/var/log/secure"
+	} else {
+		logPath = "/var/log/auth.log"
+	}
+	initFile = strings.ReplaceAll(initFile, "$logpath", logPath)
 	if err := os.WriteFile(defaultPath, []byte(initFile), 0640); err != nil {
 		return err
 	}

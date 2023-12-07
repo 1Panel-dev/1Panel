@@ -61,7 +61,7 @@
                                         <el-select v-model="row.sizeUnit" style="width: 85px">
                                             <el-option label="KB" value="KB" />
                                             <el-option label="MB" value="MB" />
-                                            <el-option label="GB" value="G" />
+                                            <el-option label="GB" value="GB" />
                                         </el-select>
                                     </template>
                                 </el-input>
@@ -202,6 +202,7 @@ const onSave = async (row) => {
 };
 
 const loadItemSize = (row: any) => {
+    console.log(row.size, row.sizeUnit);
     switch (row.sizeUnit) {
         case 'KB':
             return row.size;
