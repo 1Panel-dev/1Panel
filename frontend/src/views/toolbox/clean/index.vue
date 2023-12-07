@@ -124,7 +124,7 @@
                                     </el-button>
                                 </div>
                             </div>
-                            <el-collapse v-model="activeNames">
+                            <el-collapse v-model="activeNames" class="mt-5">
                                 <el-collapse-item :title="$t('clean.system')" name="system">
                                     <el-tree
                                         ref="systemRef"

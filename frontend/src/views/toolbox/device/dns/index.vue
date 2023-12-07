@@ -23,7 +23,7 @@
                         <el-form-item label="DNS" prop="dns">
                             <el-input
                                 type="textarea"
-                                :placeholder="$t('setting.allowIPEgs')"
+                                :placeholder="$t('toolbox.device.dnsHelper1')"
                                 :autosize="{ minRows: 8, maxRows: 10 }"
                                 v-model="form.dns"
                             />
