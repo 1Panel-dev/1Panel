@@ -351,11 +351,8 @@ func (w WebsiteSSLService) Delete(ids []uint) error {
 		if sslSetting.Value == "enable" {
 			sslID, _ := settingRepo.Get(settingRepo.WithByKey("SSLID"))
 			idValue, _ := strconv.Atoi(sslID.Value)
-			if idValue > 0 {
-				oldSSL, _ := websiteSSLRepo.GetFirst(commonRepo.WithByID(uint(idValue)))
-				if oldSSL.ID > 0 {
-					return buserr.New("ErrDeleteWithPanelSSL")
-				}
+			if idValue > 0 && uint(idValue) == id {
+				return buserr.New("ErrDeleteWithPanelSSL")
 			}
 		}
 		_ = websiteSSLRepo.DeleteBy(commonRepo.WithByID(id))
