@@ -15,12 +15,16 @@
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
                         <el-form-item :label="$t('container.sockPath')" prop="dockerSockPath">
-                            <el-input placeholder="unix:///var/run/docker.sock" v-model="form.dockerSockPath">
-                                <template #prepend>
+                            <el-input v-model="form.dockerSockPath">
+                                <template #prepend>unix://</template>
+                                <template #append>
                                     <FileList @choose="loadBuildDir"></FileList>
                                 </template>
                             </el-input>
                             <span class="input-help">{{ $t('container.sockPathHelper1') }}</span>
+                            <span class="input-help" style="margin-top: -12px">
+                                {{ $t('container.sockPathHelper2', [form.currentPath]) }}
+                            </span>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -54,6 +58,7 @@ const loading = ref();
 
 const form = reactive({
     dockerSockPath: '',
+    currentPath: '',
 });
 const formRef = ref<FormInstance>();
 const rules = reactive({
@@ -68,7 +73,8 @@ function checkSockPath(rule: any, value: any, callback: any) {
 }
 
 const acceptParams = (params: DialogProps): void => {
-    form.dockerSockPath = params.dockerSockPath;
+    form.dockerSockPath = params.dockerSockPath.replaceAll('unix://', '');
+    form.currentPath = params.dockerSockPath.replaceAll('unix://', '');
     drawerVisible.value = true;
 };
 

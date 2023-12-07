@@ -5,7 +5,7 @@
             :destroy-on-close="true"
             @close="handleClose"
             :close-on-click-modal="false"
-            size="30%"
+            size="50%"
         >
             <template #header>
                 <DrawerHeader :header="$t('setting.panelSSL')" :back="handleClose" />

@@ -171,7 +171,7 @@ const rules = reactive({
 
     clientKey: [Rules.requiredInput],
     clientCert: [Rules.requiredInput],
-    caCert: [Rules.requiredInput],
+    rootCert: [Rules.requiredInput],
 });
 
 type FormInstance = InstanceType<typeof ElForm>;

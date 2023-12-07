@@ -725,7 +725,8 @@ const message = {
         startIn: '中开启',
         sockPath: 'Socket 路径',
         sockPathHelper: 'Docker 守护进程（Docker Daemon）与客户端之间的通信通道',
-        sockPathHelper1: '默认值为 unix:///var/run/docker-x.sock',
+        sockPathHelper1: '默认路径：/var/run/docker.sock',
+        sockPathHelper2: '当前路径：{0}',
         sockPathMsg: '保存设置 Socket 路径可能导致 Docker 服务不可用，是否继续？',
         sockPathErr: '请选择或输入正确的 Docker sock 文件路径',
     },
@@ -874,6 +875,7 @@ const message = {
         },
         device: {
             dnsHelper: '服务器地址域名解析',
+            dnsHelper1: '当存在多个DNS时，需换行显示，例：\n114.114.114.114\n8.8.8.8',
             hostsHelper: '主机名解析',
             hosts: '域名',
             toolbox: '工具箱',

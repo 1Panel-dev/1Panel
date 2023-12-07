@@ -724,7 +724,8 @@ const message = {
         startIn: '中開啟',
         sockPath: 'Socket 路徑',
         sockPathHelper: 'Docker 守護進程（Docker Daemon）與客戶端之間的通信通道',
-        sockPathHelper1: '默認值為 unix:///var/run/docker-x.sock',
+        sockPathHelper1: '默認路徑：/var/run/docker-x.sock',
+        sockPathHelper2: '當前路徑：{0}',
         sockPathMsg: '保存設定 Socket 路徑可能導致 Docker 服務不可用，是否繼續？',
         sockPathErr: '請選擇或輸入正確的 Docker sock 文件路徑',
     },
@@ -873,6 +874,7 @@ const message = {
         },
         device: {
             dnsHelper: '伺服器地址域名解析',
+            dnsHelper1: '當存在多個DNS時，需換行顯示，例：\n114.114.114.114\n8.8.8.8',
             hostsHelper: '主機名解析',
             hosts: '域名',
             toolbox: '工具箱',

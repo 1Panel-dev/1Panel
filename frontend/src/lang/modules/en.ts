@@ -753,7 +753,8 @@ const message = {
         startIn: ' to start',
         sockPath: 'Socket Path',
         sockPathHelper: 'Communication channel between Docker Daemon and the client',
-        sockPathHelper1: 'Default value is unix:///var/run/docker-x.sock',
+        sockPathHelper1: 'Default Path: /var/run/docker-x.sock',
+        sockPathHelper2: 'CurrentPath: {0}',
         sockPathMsg:
             'Saving the Socket Path setting may result in Docker service being unavailable. Do you want to continue?',
         sockPathErr: 'Please select or enter the correct Docker sock file path',
@@ -917,6 +918,8 @@ const message = {
         },
         device: {
             dnsHelper: 'Server Address Domain Resolution',
+            dnsHelper1:
+                'When there are multiple DNS entries, they should be displayed on new lines. e.g.\n114.114.114.114\n8.8.8.8',
             hostsHelper: 'Hostname Resolution',
             hosts: 'Domain',
             toolbox: 'Toolbox',
