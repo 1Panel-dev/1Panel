@@ -87,8 +87,8 @@ const em = defineEmits(['close']);
 const rules = ref({
     keyType: [Rules.requiredSelect],
     domains: [Rules.requiredInput],
-    time: [Rules.requiredInput, checkNumberRange(1, 1000)],
     dir: [Rules.requiredInput],
+    time: [Rules.integerNumber, checkNumberRange(1, 10000)],
 });
 
 const initData = () => ({
@@ -116,7 +116,7 @@ const handleClose = () => {
 };
 
 const resetForm = () => {
-    obtainForm.value.resetFields();
+    obtainForm.value?.resetFields();
     obtain.value = initData();
 };
 

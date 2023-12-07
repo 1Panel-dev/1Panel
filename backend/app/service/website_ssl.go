@@ -498,7 +498,7 @@ func (w WebsiteSSLService) SyncForRestart() error {
 	for _, ssl := range sslList {
 		if ssl.Status == constant.SSLApply {
 			ssl.Status = constant.SystemRestart
-			ssl.Message = "System restart causing interrupt"
+			ssl.Message = i18n.GetMsgByKey("SystemRestart")
 			_ = websiteSSLRepo.Save(&ssl)
 		}
 	}
