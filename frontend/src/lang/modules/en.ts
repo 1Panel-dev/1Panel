@@ -1180,6 +1180,7 @@ const message = {
             'If you do not operate the panel for more than {0} seconds, the panel automatically logs out',
         systemIP: 'System Address',
         systemIPWarning: 'The server address is not currently set. Please set it in the control panel first!',
+        systemIPWarning1: 'The current server address is set to {0}, and quick redirection is not possible!',
         defaultNetwork: 'Network Card',
         syncTime: 'Server Time',
         timeZone: 'Time Zone',

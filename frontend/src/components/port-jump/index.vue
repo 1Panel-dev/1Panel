@@ -24,15 +24,15 @@
 import { ref } from 'vue';
 import { getSettingInfo } from '@/api/modules/setting';
 import i18n from '@/lang';
-import { MsgError } from '@/utils/message';
+import { MsgError, MsgWarning } from '@/utils/message';
 import { useRouter } from 'vue-router';
-import { checkDomain, checkIp } from '@/utils/util';
 const router = useRouter();
 
 const dialogVisible = ref();
 
 interface DialogProps {
     port: any;
+    ip: string;
     protocol: string;
 }
 
@@ -47,11 +47,19 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
         dialogVisible.value = true;
         return;
     }
-    if (!checkIp(res.data.systemIP) || !checkDomain(res.data.systemIP)) {
+    if (res.data.systemIP.indexOf(':') === -1) {
+        if (params.ip && params.ip === 'ipv6') {
+            MsgWarning(i18n.global.t('setting.systemIPWarning1', ['IPv4']));
+            return;
+        }
         window.open(`${protocol}://${res.data.systemIP}:${params.port}`, '_blank');
-        return;
+    } else {
+        if (params.ip && params.ip === 'ipv4') {
+            MsgWarning(i18n.global.t('setting.systemIPWarning1', ['IPv6']));
+            return;
+        }
+        window.open(`${protocol}://[${res.data.systemIP}]:${params.port}`, '_blank');
     }
-    window.open(`${protocol}://[${res.data.systemIP}]:${params.port}`, '_blank');
 };
 
 const goRouter = async (path: string) => {

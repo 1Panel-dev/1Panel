@@ -330,12 +330,15 @@ const goDashboard = async (port: any) => {
         MsgWarning(i18n.global.t('container.unExposedPort'));
         return;
     }
-    if (!port || port.indexOf(':') === -1 || port.indexOf('->') === -1) {
+    if (port.indexOf(':') === -1) {
         MsgWarning(i18n.global.t('commons.msg.errPort'));
         return;
     }
     let portEx = port.match(/:(\d+)/)[1];
-    dialogPortJumpRef.value.acceptParams({ port: portEx });
+
+    let matches = port.match(new RegExp(':', 'g'));
+    let ip = matches && matches.length > 1 ? 'ipv6' : 'ipv4';
+    dialogPortJumpRef.value.acceptParams({ port: portEx, ip: ip });
 };
 
 const goSetting = async () => {

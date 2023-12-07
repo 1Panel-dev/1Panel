@@ -1122,6 +1122,7 @@ const message = {
         sessionTimeoutHelper: '如果用户超过 {0} 秒未操作面板，面板将自动退出登录',
         systemIP: '服务器地址',
         systemIPWarning: '当前未设置服务器地址，请先在面板设置中设置！',
+        systemIPWarning1: '当前服务器地址设置为 {0}，无法快速跳转！',
         defaultNetwork: '默认网卡',
         changePassword: '密码修改',
         oldPassword: '原密码',

@@ -128,6 +128,7 @@ const checkExist = (data: App.CheckInstalled) => {
                 endpoint: '/api/v1/databases/redis/exec',
                 args: '',
                 error: '',
+                initCmd: '',
             });
         });
     }
@@ -141,6 +142,7 @@ const initTerminal = async () => {
                 endpoint: '/api/v1/databases/redis/exec',
                 args: '',
                 error: '',
+                initCmd: '',
             });
         });
     }
