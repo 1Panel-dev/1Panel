@@ -11,13 +11,13 @@
                             <span v-if="dialogData.rowData!.addr === '127.0.0.1' && dialogData.title === 'edit'">
                                 {{ dialogData.rowData!.addr }}
                             </span>
-                            <el-input v-else clearable v-model.trim="dialogData.rowData!.addr" />
+                            <el-input @change="isOK = false" v-else clearable v-model.trim="dialogData.rowData!.addr" />
                         </el-form-item>
                         <el-form-item :label="$t('commons.login.username')" prop="user">
-                            <el-input clearable v-model="dialogData.rowData!.user" />
+                            <el-input @change="isOK = false" clearable v-model="dialogData.rowData!.user" />
                         </el-form-item>
                         <el-form-item :label="$t('terminal.authMode')" prop="authMode">
-                            <el-radio-group v-model="dialogData.rowData!.authMode">
+                            <el-radio-group @change="isOK = false" v-model="dialogData.rowData!.authMode">
                                 <el-radio label="password">{{ $t('terminal.passwordMode') }}</el-radio>
                                 <el-radio label="key">{{ $t('terminal.keyMode') }}</el-radio>
                             </el-radio-group>
@@ -27,14 +27,25 @@
                             v-if="dialogData.rowData!.authMode === 'password'"
                             prop="password"
                         >
-                            <el-input clearable show-password type="password" v-model="dialogData.rowData!.password" />
+                            <el-input
+                                @change="isOK = false"
+                                clearable
+                                show-password
+                                type="password"
+                                v-model="dialogData.rowData!.password"
+                            />
                         </el-form-item>
                         <el-form-item
                             :label="$t('terminal.key')"
                             v-if="dialogData.rowData!.authMode === 'key'"
                             prop="privateKey"
                         >
-                            <el-input clearable type="textarea" v-model="dialogData.rowData!.privateKey" />
+                            <el-input
+                                @change="isOK = false"
+                                clearable
+                                type="textarea"
+                                v-model="dialogData.rowData!.privateKey"
+                            />
                         </el-form-item>
                         <el-form-item
                             :label="$t('terminal.keyPassword')"
@@ -42,6 +53,7 @@
                             prop="passPhrase"
                         >
                             <el-input
+                                @change="isOK = false"
                                 type="password"
                                 show-password
                                 clearable
@@ -52,7 +64,7 @@
                             {{ $t('terminal.rememberPassword') }}
                         </el-checkbox>
                         <el-form-item style="margin-top: 10px" :label="$t('commons.table.port')" prop="port">
-                            <el-input clearable v-model.number="dialogData.rowData!.port" />
+                            <el-input @change="isOK = false" clearable v-model.number="dialogData.rowData!.port" />
                         </el-form-item>
                         <el-form-item :label="$t('commons.table.group')" prop="groupID">
                             <el-select filterable v-model="dialogData.rowData!.groupID" clearable style="width: 100%">
@@ -89,7 +101,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, watch } from 'vue';
+import { ref, reactive } from 'vue';
 import type { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { addHost, editHost, testByInfo } from '@/api/modules/host';
@@ -110,14 +122,6 @@ const drawerVisible = ref(false);
 const dialogData = ref<DialogProps>({
     title: '',
 });
-
-watch(
-    () => dialogData.value.rowData,
-    () => {
-        isOK.value = false;
-    },
-    { deep: true },
-);
 
 const groupList = ref();
 const acceptParams = (params: DialogProps): void => {
