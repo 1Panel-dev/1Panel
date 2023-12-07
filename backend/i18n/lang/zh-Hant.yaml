@@ -22,6 +22,7 @@ ErrTypePort: '埠 {{ .name }} 格式錯誤'
 ErrTypePortRange: '連接埠範圍需要在 1-65535 之間'
 Success: "成功"
 Failed: "失敗"
+SystemRestart: "系統重啟導致任務中斷"
 
 #app
 ErrPortInUsed: "{{ .detail }} 端口已被佔用！"

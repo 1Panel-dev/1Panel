@@ -12,6 +12,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/i18n"
 	cmd2 "github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
@@ -575,7 +576,7 @@ func (r *RuntimeService) SyncForRestart() error {
 	for _, runtime := range runtimes {
 		if runtime.Status == constant.RuntimeBuildIng || runtime.Status == constant.RuntimeReCreating || runtime.Status == constant.RuntimeStarting || runtime.Status == constant.RuntimeCreating {
 			runtime.Status = constant.SystemRestart
-			runtime.Message = "System restart causing interrupt"
+			runtime.Message = i18n.GetMsgByKey("SystemRestart")
 			_ = runtimeRepo.Save(&runtime)
 		}
 	}

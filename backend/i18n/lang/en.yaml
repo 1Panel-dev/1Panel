@@ -22,6 +22,7 @@ ErrTypePort: 'Port {{ .name }} format error'
 ErrTypePortRange: 'Port range needs to be between 1-65535'
 Success: "Success"
 Failed: "Failed"
+SystemRestart: "System restart causes task interruption"
 
 #app
 ErrPortInUsed: "{{ .detail }} port already in use"

@@ -72,8 +72,8 @@ const rules = ref({
     keyType: [Rules.requiredSelect],
     name: [Rules.requiredInput, Rules.name],
     country: [Rules.requiredSelect],
-    organization: [Rules.requiredInput],
-    commonName: [Rules.requiredInput],
+    organization: [Rules.requiredInput, Rules.name],
+    commonName: [Rules.requiredInput, Rules.name],
 });
 
 const initData = () => ({
