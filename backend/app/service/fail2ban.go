@@ -208,4 +208,9 @@ func loadFailValue(line string, baseInfo *dto.Fail2BanBaseInfo) {
 		itemValue = strings.ReplaceAll(itemValue, "=", "")
 		baseInfo.BanAction = strings.TrimSpace(itemValue)
 	}
+	if strings.HasPrefix(line, "logpath") {
+		itemValue := strings.ReplaceAll(line, "logpath", "")
+		itemValue = strings.ReplaceAll(itemValue, "=", "")
+		baseInfo.LogPath = strings.TrimSpace(itemValue)
+	}
 }

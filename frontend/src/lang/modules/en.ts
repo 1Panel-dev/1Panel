@@ -962,6 +962,8 @@ const message = {
             allPorts: ' (All Ports)',
             ignoreIP: 'IP Whitelist',
             bannedIP: 'IP Blacklist',
+            logPath: 'Log Path',
+            logPathHelper: 'Default is /var/log/secure or /var/log/auth.log',
         },
     },
     logs: {

@@ -915,6 +915,8 @@ const message = {
             allPorts: ' (所有端口)',
             ignoreIP: 'IP 白名单',
             bannedIP: 'IP 黑名单',
+            logPath: '日志路径',
+            logPathHelper: '默认 /var/log/secure 或者 /var/log/auth.log',
         },
     },
     logs: {
