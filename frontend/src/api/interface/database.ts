@@ -215,6 +215,7 @@ export namespace Database {
         password: string;
 
         ssl: boolean;
+        hasCA: boolean;
         rootCert: string;
         clientKey: string;
         clientCert: string;

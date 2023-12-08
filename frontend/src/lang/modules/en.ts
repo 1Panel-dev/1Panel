@@ -396,6 +396,7 @@ const message = {
         clientKey: 'Client Private Key',
         clientCert: 'Client Certificate',
         caCert: 'CA Certificate',
+        hasCA: 'Has CA Certificate',
         skipVerify: 'Ignore Certificate Validity Check',
 
         formatHelper:

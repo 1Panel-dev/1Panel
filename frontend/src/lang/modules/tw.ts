@@ -388,6 +388,7 @@ const message = {
         clientKey: '客户端私钥',
         clientCert: '客户端证书',
         caCert: 'CA 证书',
+        hasCA: '擁有 CA 證書',
         skipVerify: '忽略校验证书可用性检测',
 
         formatHelper: '當前資料庫字符集為 {0}，字符集不一致可能導致恢復失敗',
