@@ -9,6 +9,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"os"
 	"path"
 	"reflect"
@@ -1247,6 +1248,7 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) error
 		phpDir          = path.Join(constant.RuntimeDir, runtime.Type, runtime.Name, "php")
 		oldFmContent, _ = fileOp.GetContent(fpmConfDir)
 		newComposeByte  []byte
+		supervisorDir   = path.Join(appInstall.GetPath(), "supervisor")
 	)
 	envParams := make(map[string]string, len(envs))
 	handleMap(envs, envParams)
@@ -1267,7 +1269,7 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) error
 		return busErr
 	}
 
-	newComposeByte, busErr = changeServiceName(composePath, appInstall.ServiceName)
+	newComposeByte, busErr = changeServiceName(appDetail.DockerCompose, appInstall.ServiceName)
 	if busErr != nil {
 		return err
 	}
@@ -1288,6 +1290,22 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) error
 			return busErr
 		}
 	}
+	if common.CompareVersion(appDetail.Version, "7.0") && !fileOp.Stat(supervisorDir) {
+		if appDetail.Update {
+			app, err := appRepo.GetFirst(commonRepo.WithByID(appDetail.AppId))
+			if err != nil {
+				busErr = err
+				return busErr
+			}
+			if busErr = downloadApp(app, appDetail, nil); err != nil {
+				return busErr
+			}
+		}
+		if busErr = fileOp.CopyDir(path.Join(phpDir, "supervisor"), appInstall.GetPath()); err != nil {
+			return busErr
+		}
+	}
+
 	if out, err := compose.Up(appInstall.GetComposePath()); err != nil {
 		if out != "" {
 			busErr = errors.New(out)
