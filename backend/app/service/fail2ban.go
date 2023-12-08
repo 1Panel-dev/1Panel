@@ -8,6 +8,8 @@ import (
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
+	"github.com/1Panel-dev/1Panel/backend/utils/systemctl"
 	"github.com/1Panel-dev/1Panel/backend/utils/toolbox"
 )
 
@@ -97,6 +99,25 @@ func (u *Fail2BanService) Operate(operation string) error {
 }
 
 func (u *Fail2BanService) UpdateConf(req dto.Fail2BanUpdate) error {
+	if req.Key == "banaction" {
+		switch req.Value {
+		case "firewallcmd-ipset":
+			isActive, _ := systemctl.IsActive("firewalld")
+			if !isActive {
+				return buserr.WithName("ErrBanAction", "firewalld")
+			}
+		case "ufw":
+			isActive, _ := systemctl.IsActive("ufw")
+			if !isActive {
+				return buserr.WithName("ErrBanAction", "ufw")
+			}
+		}
+	}
+	if req.Key == "logpath" {
+		if _, err := os.Stat(req.Value); err != nil {
+			return err
+		}
+	}
 	conf, err := os.ReadFile(defaultFail2BanPath)
 	if err != nil {
 		return fmt.Errorf("read fail2ban conf of %s failed, err: %v", defaultFail2BanPath, err)

@@ -161,3 +161,4 @@ ErrBashExecute: "腳本執行錯誤，請在任務輸出文本域中查看具體
 
 #toolbox
 ErrNotExistUser: "當前使用者不存在，請修改後重試！"
+ErrBanAction: "設置失敗，當前 {{ .name }} 服務不可用，請檢查後重試！"

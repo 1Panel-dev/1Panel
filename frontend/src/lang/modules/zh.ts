@@ -902,6 +902,8 @@ const message = {
             dnsTestFailed: 'DNS 配置信息不可用，请修改后重试！',
         },
         fail2ban: {
+            sshPort: '监听 SSH 端口',
+            sshPortHelper: '当前 Fail2ban 监听主机 SSH 连接端口',
             noFail2ban: '未检测到 Fail2ban 服务，请参考官方文档进行安装',
             unActive: '当前未开启 Fail2ban 服务，请先开启！',
             operation: '对 Fail2ban 服务进行 [{0}] 操作，是否继续？',
@@ -911,6 +913,8 @@ const message = {
             maxRetry: '最大重试次数',
             banTime: '禁用时间',
             banTimeHelper: '默认禁用时间为 10 分钟，禁用时间为 -1 则表示永久禁用',
+            banTimeRule: '请输入正确的禁用时间或者 -1',
+            banAllTime: '永久禁用',
             findTime: '发现周期',
             banAction: '禁用方式',
             banActionOption: '通过 {0} 来禁用指定的 IP 地址',

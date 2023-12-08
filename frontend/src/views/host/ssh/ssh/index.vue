@@ -246,7 +246,7 @@ const onOperate = async (operation: string) => {
                 });
         })
         .catch(() => {
-            autoStart.value = operation === 'enable' ? 'disable' : 'enable';
+            search();
         });
 };
 

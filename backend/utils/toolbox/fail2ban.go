@@ -1,7 +1,6 @@
 package toolbox
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -98,10 +97,11 @@ func (f *Fail2ban) ListBanned() ([]string, error) {
 	if err != nil {
 		return lists, err
 	}
-	stdout = strings.ReplaceAll(stdout, "\n", "")
-	stdout = strings.ReplaceAll(stdout, "'", "\"")
-	if err := json.Unmarshal([]byte(stdout), &lists); err != nil {
-		return lists, fmt.Errorf("handle json unmarshal (%s) failed, err: %v", stdout, err)
+	itemList := strings.Split(stdout, "\n")
+	for _, item := range itemList {
+		if len(item) != 0 {
+			lists = append(lists, item)
+		}
 	}
 	return lists, nil
 }
@@ -146,6 +146,7 @@ port = 22
 maxretry = 5
 findtime = 300
 bantime = 600
+banaction = $banaction
 action = %(action_mwl)s
 logpath = $logpath`
 
