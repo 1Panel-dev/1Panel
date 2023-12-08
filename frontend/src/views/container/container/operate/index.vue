@@ -184,9 +184,9 @@
                             {{ $t('container.autoRemove') }}
                         </el-checkbox>
                     </el-form-item>
-                    <el-form-item :label="$t('container.privileged')">
+                    <el-form-item>
                         <el-checkbox v-model="dialogData.rowData!.privileged">
-                            {{ $t('commons.button.start') }}
+                            {{ $t('container.privileged') }}
                         </el-checkbox>
                         <span class="input-help">{{ $t('container.privilegedHelper') }}</span>
                     </el-form-item>

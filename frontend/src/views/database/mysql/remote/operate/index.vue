@@ -62,6 +62,20 @@
                         />
                     </el-form-item>
                     <div v-if="dialogData.rowData!.ssl">
+                        <el-form-item>
+                            <el-checkbox
+                                @change="isOK = false"
+                                v-model="dialogData.rowData!.hasCA"
+                                :label="$t('database.hasCA')"
+                            />
+                        </el-form-item>
+                        <el-form-item>
+                            <el-checkbox
+                                @change="isOK = false"
+                                v-model="dialogData.rowData!.skipVerify"
+                                :label="$t('database.skipVerify')"
+                            />
+                        </el-form-item>
                         <el-form-item :label="$t('database.clientKey')" prop="clientKey">
                             <el-input
                                 type="textarea"
@@ -78,19 +92,12 @@
                                 v-model="dialogData.rowData!.clientCert"
                             />
                         </el-form-item>
-                        <el-form-item :label="$t('database.caCert')" prop="rootCert">
+                        <el-form-item v-if="dialogData.rowData!.hasCA" :label="$t('database.caCert')" prop="rootCert">
                             <el-input
                                 type="textarea"
                                 @change="isOK = false"
                                 clearable
                                 v-model="dialogData.rowData!.rootCert"
-                            />
-                        </el-form-item>
-                        <el-form-item>
-                            <el-checkbox
-                                @change="isOK = false"
-                                v-model="dialogData.rowData!.skipVerify"
-                                :label="$t('database.skipVerify')"
                             />
                         </el-form-item>
                     </div>
@@ -151,6 +158,7 @@ const acceptParams = (params: DialogProps): void => {
     if (dialogData.value.rowData.version.startsWith('10.')) {
         dialogData.value.rowData.version = '10.x';
     }
+    dialogData.value.rowData.hasCA = dialogData.value.rowData.rootCert?.length === 0;
     title.value = i18n.global.t('database.' + dialogData.value.title + 'RemoteDB');
     drawerVisible.value = true;
 };
@@ -188,6 +196,7 @@ const onSubmit = async (formEl: FormInstance | undefined, operation: string) => 
         if (!valid) return;
         dialogData.value.rowData.from = 'remote';
         loading.value = true;
+        dialogData.value.rowData.rootCert = dialogData.value.rowData.hasCA ? dialogData.value.rowData.rootCert : '';
         if (operation === 'check') {
             await checkDatabase(dialogData.value.rowData)
                 .then((res) => {

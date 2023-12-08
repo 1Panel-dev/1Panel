@@ -149,8 +149,10 @@ func ConnWithSSL(ssl, skipVerify bool, clientKey, clientCert, rootCert string) (
 		return "", nil
 	}
 	pool := x509.NewCertPool()
-	if ok := pool.AppendCertsFromPEM([]byte(rootCert)); !ok {
-		return "", errors.New("unable to append root cert to pool")
+	if len(rootCert) != 0 {
+		if ok := pool.AppendCertsFromPEM([]byte(rootCert)); !ok {
+			return "", errors.New("unable to append root cert to pool")
+		}
 	}
 	cert, err := tls.X509KeyPair([]byte(clientCert), []byte(clientKey))
 	if err != nil {

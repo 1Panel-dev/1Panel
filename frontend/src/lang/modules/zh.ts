@@ -387,6 +387,7 @@ const message = {
         ssl: '使用 SSL',
         clientKey: '客户端私钥',
         clientCert: '客户端证书',
+        hasCA: '拥有 CA 证书',
         caCert: 'CA 证书',
         skipVerify: '忽略校验证书可用性检测',
 
