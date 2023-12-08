@@ -160,3 +160,4 @@ ErrBashExecute: "Script execution error, please check the specific information i
 
 #toolbox
 ErrNotExistUser: "The current user does not exist. Please modify and retry!"
+ErrBanAction: "Setting failed, the current {{ .name }} service is unavailable, please check and try again!"

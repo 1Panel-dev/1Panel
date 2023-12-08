@@ -160,3 +160,4 @@ ErrBashExecute: "脚本执行错误，请在任务输出文本域中查看具体
 
 #toolbox
 ErrNotExistUser: "当前用户不存在，请修改后重试！"
+ErrBanAction: "设置失败，当前 {{ .name }} 服务不可用，请检查后重试！"

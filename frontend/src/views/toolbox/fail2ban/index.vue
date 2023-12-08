@@ -65,6 +65,16 @@
                         <el-col :span="1"><br /></el-col>
                         <el-col :xs="24" :sm="20" :md="20" :lg="10" :xl="10">
                             <el-form :model="form" label-position="left" ref="formRef" label-width="120px">
+                                <el-form-item :label="$t('toolbox.fail2ban.sshPort')" prop="port">
+                                    <el-input disabled v-model="form.port">
+                                        <template #append>
+                                            <el-button @click="onChangePort" icon="Setting">
+                                                {{ $t('commons.button.set') }}
+                                            </el-button>
+                                        </template>
+                                    </el-input>
+                                    <span class="input-help">{{ $t('toolbox.fail2ban.sshPortHelper') }}</span>
+                                </el-form-item>
                                 <el-form-item :label="$t('toolbox.fail2ban.maxRetry')" prop="maxRetry">
                                     <el-input disabled v-model="form.maxRetry">
                                         <template #append>
@@ -164,6 +174,7 @@
         <FindTime ref="findTimeRef" @search="search" />
         <BanAction ref="banActionRef" @search="search" />
         <LogPath ref="logPathRef" @search="search" />
+        <Port ref="portRef" @search="search" />
 
         <IPs ref="listRef" />
     </div>
@@ -179,6 +190,7 @@ import BanTime from '@/views/toolbox/fail2ban/ban-time/index.vue';
 import FindTime from '@/views/toolbox/fail2ban/find-time/index.vue';
 import BanAction from '@/views/toolbox/fail2ban/ban-action/index.vue';
 import LogPath from '@/views/toolbox/fail2ban/log-path/index.vue';
+import Port from '@/views/toolbox/fail2ban/port/index.vue';
 import IPs from '@/views/toolbox/fail2ban/ips/index.vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -191,6 +203,7 @@ const formRef = ref();
 const extensions = [javascript(), oneDark];
 const confShowType = ref('base');
 
+const portRef = ref();
 const maxRetryRef = ref();
 const banTimeRef = ref();
 const findTimeRef = ref();
@@ -242,6 +255,9 @@ const onSaveFile = async () => {
             });
     });
 };
+const onChangePort = () => {
+    portRef.value.acceptParams({ port: form.port });
+};
 const onChangeMaxRetry = () => {
     maxRetryRef.value.acceptParams({ maxRetry: form.maxRetry });
 };
@@ -279,7 +295,7 @@ const onOperate = async (operation: string) => {
                 });
         })
         .catch(() => {
-            autoStart.value = operation === 'enable' ? 'disable' : 'enable';
+            search();
         });
 };
 
@@ -307,7 +323,8 @@ const search = async () => {
     form.port = res.data.port;
     form.maxRetry = res.data.maxRetry;
     form.banTime = res.data.banTime;
-    form.banTimeItem = transTimeUnit(form.banTime);
+    form.banTimeItem =
+        form.banTime === '-1' ? i18n.global.t('toolbox.fail2ban.banAllTime') : transTimeUnit(form.banTime);
     form.findTime = res.data.findTime;
     form.findTimeItem = transTimeUnit(form.findTime);
     form.banAction = res.data.banAction;
