@@ -92,36 +92,17 @@ func (w WebsiteCAService) Create(create request.WebsiteCACreate) (*request.Websi
 		MaxPathLenZero:        false,
 		KeyUsage:              x509.KeyUsageCertSign | x509.KeyUsageCRLSign,
 	}
+	var (
+		caPEM = new(bytes.Buffer)
+	)
 
-	privateKey, err := certcrypto.GeneratePrivateKey(ssl.KeyType(create.KeyType))
+	interPrivateKey, interPublicKey, privateBytes, err := createPrivateKey(create.KeyType)
 	if err != nil {
 		return nil, err
 	}
-	var (
-		publicKey       any
-		caPEM           = new(bytes.Buffer)
-		caPrivateKeyPEM = new(bytes.Buffer)
-		privateBlock    = &pem.Block{}
-	)
-	if ssl.KeyType(create.KeyType) == certcrypto.EC256 || ssl.KeyType(create.KeyType) == certcrypto.EC384 {
-		publicKey = &privateKey.(*ecdsa.PrivateKey).PublicKey
-		publicKey = publicKey.(*ecdsa.PublicKey)
-		privateBlock.Type = "EC PRIVATE KEY"
-		privateBytes, err := x509.MarshalECPrivateKey(privateKey.(*ecdsa.PrivateKey))
-		if err != nil {
-			return nil, err
-		}
-		privateBlock.Bytes = privateBytes
-		_ = pem.Encode(caPrivateKeyPEM, privateBlock)
-	} else {
-		publicKey = privateKey.(*rsa.PrivateKey).PublicKey
-		publicKey = publicKey.(*rsa.PublicKey)
-		privateBlock.Type = "RSA PRIVATE KEY"
-		privateBlock.Bytes = x509.MarshalPKCS1PrivateKey(privateKey.(*rsa.PrivateKey))
-	}
-	ca.PrivateKey = string(pem.EncodeToMemory(privateBlock))
+	ca.PrivateKey = string(privateBytes)
 
-	caBytes, err := x509.CreateCertificate(rand.Reader, rootCA, rootCA, publicKey, privateKey)
+	caBytes, err := x509.CreateCertificate(rand.Reader, rootCA, rootCA, interPublicKey, interPrivateKey)
 	if err != nil {
 		return nil, err
 	}
