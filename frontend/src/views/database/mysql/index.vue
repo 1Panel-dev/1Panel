@@ -96,8 +96,12 @@
                             </el-button>
                             <template #dropdown>
                                 <el-dropdown-menu>
-                                    <el-dropdown-item @click="goDashboard('phpMyAdmin')">phpMyAdmin</el-dropdown-item>
-                                    <el-dropdown-item @click="goDashboard('Adminer')" divided>Adminer</el-dropdown-item>
+                                    <el-dropdown-item icon="Position" @click="goDashboard('phpMyAdmin')">
+                                        phpMyAdmin
+                                    </el-dropdown-item>
+                                    <el-dropdown-item icon="Position" @click="goDashboard('Adminer')" divided>
+                                        Adminer
+                                    </el-dropdown-item>
                                 </el-dropdown-menu>
                             </template>
                         </el-dropdown>

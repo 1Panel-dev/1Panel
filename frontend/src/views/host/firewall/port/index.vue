@@ -66,7 +66,6 @@
                                 <div class="search-button">
                                     <el-input
                                         v-model="searchName"
-                                        clearable
                                         suffix-icon="Search"
                                         @change="search()"
                                         :placeholder="$t('commons.button.search')"

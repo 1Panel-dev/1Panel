@@ -13,7 +13,7 @@
                     :closable="false"
                     type="error"
                 />
-                <el-form @submit.prevent ref="formRef" v-loading="loading" :model="form" label-position="top">
+                <el-form @submit.prevent ref="formRef" :model="form" label-position="top">
                     <el-form-item :label="$t('container.oldImage')" prop="oldImage">
                         <el-tooltip placement="top-start" :content="form.imageName" v-if="form.imageName.length > 50">
                             <el-tag>{{ form.imageName.substring(0, 50) }}...:{{ form.oldTag }}</el-tag>
