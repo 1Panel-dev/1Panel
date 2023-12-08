@@ -651,11 +651,9 @@ func chownRootDir(path string) error {
 	return nil
 }
 
-func changeServiceName(composePath, newServiceName string) (composeByte []byte, err error) {
+func changeServiceName(newComposeContent, newServiceName string) (composeByte []byte, err error) {
 	composeMap := make(map[string]interface{})
-	fileOp := files.NewFileOp()
-	composeContent, _ := fileOp.GetContent(composePath)
-	if err = yaml.Unmarshal(composeContent, &composeMap); err != nil {
+	if err = yaml.Unmarshal([]byte(newComposeContent), &composeMap); err != nil {
 		return
 	}
 	value, ok := composeMap["services"]
