@@ -13,10 +13,16 @@ type AppDatabase struct {
 
 type AuthParam struct {
 	RootPassword string `json:"PANEL_DB_ROOT_PASSWORD"`
+	RootUser     string `json:"PANEL_DB_ROOT_USER"`
 }
 
 type RedisAuthParam struct {
 	RootPassword string `json:"PANEL_REDIS_ROOT_PASSWORD"`
+}
+
+type MinioAuthParam struct {
+	RootPassword string `json:"PANEL_MINIO_ROOT_PASSWORD"`
+	RootUser     string `json:"PANEL_MINIO_ROOT_USER"`
 }
 
 type ContainerExec struct {

@@ -118,9 +118,13 @@ var DatabaseKeys = map[string]uint{
 	"memcached":  11211,
 }
 
+var ToolKeys = map[string]uint{
+	"minio": 9001,
+}
+
 func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall, params map[string]interface{}) error {
 	var dbConfig dto.AppDatabase
-	if app.Type == "runtime" && DatabaseKeys[app.Key] > 0 {
+	if DatabaseKeys[app.Key] > 0 {
 		database := &model.Database{
 			AppInstallID: appInstall.ID,
 			Name:         appInstall.Name,
@@ -153,14 +157,6 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 		case "mysql", "mariadb", "postgresql", "mongodb":
 			if password, ok := params["PANEL_DB_ROOT_PASSWORD"]; ok {
 				if password != "" {
-					authParam := dto.AuthParam{
-						RootPassword: password.(string),
-					}
-					authByte, err := json.Marshal(authParam)
-					if err != nil {
-						return err
-					}
-					appInstall.Param = string(authByte)
 					database.Password = password.(string)
 					if app.Key == "mysql" || app.Key == "mariadb" {
 						database.Username = "root"
@@ -168,6 +164,16 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 					if rootUser, ok := params["PANEL_DB_ROOT_USER"]; ok {
 						database.Username = rootUser.(string)
 					}
+					authParam := dto.AuthParam{
+						RootPassword: password.(string),
+						RootUser:     database.Username,
+					}
+					authByte, err := json.Marshal(authParam)
+					if err != nil {
+						return err
+					}
+					appInstall.Param = string(authByte)
+
 				}
 			}
 		case "redis":
@@ -189,6 +195,23 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 			return err
 		}
 	}
+	if ToolKeys[app.Key] > 0 {
+		if app.Key == "minio" {
+			authParam := dto.MinioAuthParam{}
+			if password, ok := params["PANEL_MINIO_ROOT_PASSWORD"]; ok {
+				authParam.RootPassword = password.(string)
+			}
+			if rootUser, ok := params["PANEL_MINIO_ROOT_USER"]; ok {
+				authParam.RootUser = rootUser.(string)
+			}
+			authByte, err := json.Marshal(authParam)
+			if err != nil {
+				return err
+			}
+			appInstall.Param = string(authByte)
+		}
+	}
+
 	if app.Type == "website" || app.Type == "tool" {
 		paramByte, err := json.Marshal(params)
 		if err != nil {
