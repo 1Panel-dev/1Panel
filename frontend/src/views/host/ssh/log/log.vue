@@ -22,7 +22,6 @@
                             <el-input
                                 v-model="searchInfo"
                                 @clear="search()"
-                                clearable
                                 suffix-icon="Search"
                                 @keyup.enter="search()"
                                 @change="search()"

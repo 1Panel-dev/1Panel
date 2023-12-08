@@ -326,7 +326,9 @@ func updateDNS(list []string) error {
 		}
 	}
 	for _, item := range list {
-		newFile += fmt.Sprintf("nameserver %s \n", item)
+		if len(item) != 0 {
+			newFile += fmt.Sprintf("nameserver %s \n", item)
+		}
 	}
 	file, err := os.OpenFile(defaultDNSPath, os.O_WRONLY|os.O_TRUNC, 0640)
 	if err != nil {

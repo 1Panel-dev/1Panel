@@ -22,7 +22,6 @@
                         <div class="search-button">
                             <el-input
                                 v-model="searchName"
-                                clearable
                                 @clear="search()"
                                 suffix-icon="Search"
                                 @keyup.enter="search()"
