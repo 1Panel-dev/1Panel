@@ -184,7 +184,7 @@ const message = {
             paramUrlAndPort: 'The format is http(s)://(domain name/ip):(port)',
             nginxDoc: 'Only supports English case, numbers, and .',
             appName: 'Support English, numbers, - and _, length 2-30, and cannot start and end with -_',
-            containerName: 'Supports letters, numbers, -, _ and .; cannot start with - _ or .; length: 1-127',
+            containerName: 'Supports letters, numbers, -, _ and .; cannot start with - _ or .; length: 2-127',
             mirror: 'Support image accelerator addresses that start with http(s)://, English uppercase and lowercase letters, numbers, periods, and hyphens, and there should be no empty lines.',
             disableFunction: 'Only support letters ,underscores,and,',
             leechExts: 'Only support letters, numbers and,',
