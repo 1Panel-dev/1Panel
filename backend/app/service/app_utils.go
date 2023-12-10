@@ -637,8 +637,12 @@ func handleMap(params map[string]interface{}, envParams map[string]string) {
 }
 
 func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.AppInstall) (err error) {
+	if app.IsLocalApp() {
+		//本地应用,不去官网下载
+		return nil
+	}
 	appResourceDir := path.Join(constant.AppResourceDir, app.Resource)
-	appDownloadDir := path.Join(appResourceDir, app.Key)
+	appDownloadDir := app.GetAppResourcePath()
 	appVersionDir := path.Join(appDownloadDir, appDetail.Version)
 	fileOp := files.NewFileOp()
 	if !appDetail.Update && fileOp.Stat(appVersionDir) {
