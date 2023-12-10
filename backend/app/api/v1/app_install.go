@@ -6,7 +6,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
-	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/gin-gonic/gin"
 )
 
@@ -70,10 +69,6 @@ func (b *BaseApi) ListAppInstalled(c *gin.Context) {
 func (b *BaseApi) CheckAppInstalled(c *gin.Context) {
 	var req request.AppInstalledInfo
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
 	checkData, err := appInstallService.CheckExist(req)
