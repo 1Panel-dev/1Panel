@@ -33,6 +33,30 @@
                     </el-form-item>
                 </el-form>
             </el-col>
+            <el-col :span="22" :offset="1">
+                <div class="descriptions">
+                    <el-descriptions direction="vertical">
+                        <el-descriptions-item>
+                            <el-link @click="toLink(app.website)">
+                                <el-icon><OfficeBuilding /></el-icon>
+                                <span>{{ $t('app.appOfficeWebsite') }}</span>
+                            </el-link>
+                        </el-descriptions-item>
+                        <el-descriptions-item>
+                            <el-link @click="toLink(app.document)">
+                                <el-icon><Document /></el-icon>
+                                <span>{{ $t('app.document') }}</span>
+                            </el-link>
+                        </el-descriptions-item>
+                        <el-descriptions-item>
+                            <el-link @click="toLink(app.github)">
+                                <el-icon><Link /></el-icon>
+                                <span>{{ $t('app.github') }}</span>
+                            </el-link>
+                        </el-descriptions-item>
+                    </el-descriptions>
+                </div>
+            </el-col>
         </el-row>
         <template #footer>
             <span class="dialog-footer">
@@ -69,17 +93,22 @@ const resourceName = ref('');
 const rules = ref<any>({
     detailId: [Rules.requiredSelect],
 });
-
+const app = ref();
 const em = defineEmits(['close']);
 const handleClose = () => {
     open.value = false;
     em('close', open);
 };
 
-const acceptParams = (id: number, name: string, op: string) => {
+const toLink = (link: string) => {
+    window.open(link, '_blank');
+};
+
+const acceptParams = (id: number, name: string, op: string, appDetail: App.AppDetail) => {
     operateReq.installId = id;
     operateReq.operate = op;
     resourceName.value = name;
+    app.value = appDetail;
     GetAppUpdateVersions(id).then((res) => {
         versions.value = res.data;
         if (res.data != null && res.data.length > 0) {
