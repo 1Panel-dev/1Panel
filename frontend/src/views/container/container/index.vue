@@ -43,6 +43,7 @@
                         <TableSetting title="container-refresh" @search="refresh()" />
                         <div class="search-button">
                             <el-input
+                                clearable
                                 v-model="searchName"
                                 @clear="search()"
                                 suffix-icon="Search"

@@ -20,6 +20,7 @@
                         <TableSetting @search="search()" />
                         <div class="search-button">
                             <el-input
+                                clearable
                                 v-model="searchInfo"
                                 @clear="search()"
                                 suffix-icon="Search"
