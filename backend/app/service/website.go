@@ -1210,7 +1210,7 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) error
 	if err != nil {
 		return err
 	}
-	oldRuntime, err := runtimeRepo.GetFirst(commonRepo.WithByID(req.RuntimeID))
+	oldRuntime, err := runtimeRepo.GetFirst(commonRepo.WithByID(website.RuntimeID))
 	if err != nil {
 		return err
 	}
