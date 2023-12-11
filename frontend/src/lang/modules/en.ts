@@ -755,7 +755,6 @@ const message = {
         sockPath: 'Socket Path',
         sockPathHelper: 'Communication channel between Docker Daemon and the client',
         sockPathHelper1: 'Default Path: /var/run/docker-x.sock',
-        sockPathHelper2: 'CurrentPath: {0}',
         sockPathMsg:
             'Saving the Socket Path setting may result in Docker service being unavailable. Do you want to continue?',
         sockPathErr: 'Please select or enter the correct Docker sock file path',
@@ -953,7 +952,7 @@ const message = {
         fail2ban: {
             sshPort: 'Listen to SSH Port',
             sshPortHelper: 'Current Fail2ban listens to the SSH connection port of the host',
-            noFail2ban: 'Fail2ban service not detected, please refer to the official documentation for installation',
+            noFail2ban: 'Fail2ban service not detected, please refer to the official documentation for installation!',
             unActive: 'The Fail2ban service is not enabled at present, please enable it first!',
             operation: 'Perform [{0}] operation on Fail2ban service, continue?',
             fail2banChange: 'Fail2ban Configuration Modification',

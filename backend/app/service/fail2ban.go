@@ -101,17 +101,20 @@ func (u *Fail2BanService) Operate(operation string) error {
 func (u *Fail2BanService) UpdateConf(req dto.Fail2BanUpdate) error {
 	if req.Key == "banaction" {
 		if req.Value == "firewallcmd-ipset" || req.Value == "ufw" {
+			itemName := "ufw"
+			if req.Value == "firewallcmd-ipset" {
+				itemName = "firewallcmd"
+			}
 			client, err := firewall.NewFirewallClient()
 			if err != nil {
 				return err
 			}
+			if client.Name() != itemName {
+				return buserr.WithName("ErrBanAction", itemName)
+			}
 			status, _ := client.Status()
 			if status != "running" {
-				service := "firewalld"
-				if req.Value == "ufw" {
-					service = "ufw"
-				}
-				return buserr.WithName("ErrBanAction", service)
+				return buserr.WithName("ErrBanAction", itemName)
 			}
 		}
 	}

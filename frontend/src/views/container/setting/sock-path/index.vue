@@ -22,9 +22,6 @@
                                 </template>
                             </el-input>
                             <span class="input-help">{{ $t('container.sockPathHelper1') }}</span>
-                            <span class="input-help" style="margin-top: -12px">
-                                {{ $t('container.sockPathHelper2', [form.currentPath]) }}
-                            </span>
                         </el-form-item>
                     </el-col>
                 </el-row>
