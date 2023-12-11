@@ -282,8 +282,37 @@ func (s *Server) UpdatePHPProxy(proxy []string, localPath string) {
 	})
 	if localPath == "" {
 		block.Directives = append(block.Directives, &Directive{
+			Name:       "set",
+			Parameters: []string{"$real_script_name", "$fastcgi_script_name"},
+		})
+		ifDir := &Directive{
+			Name:       "if",
+			Parameters: []string{"($fastcgi_script_name ~ \"^(.+?\\.php)(/.+)$\")"},
+		}
+		ifDir.Block = &Block{
+			Directives: []IDirective{
+				&Directive{
+					Name:       "set",
+					Parameters: []string{"$real_script_name", "$1"},
+				},
+				&Directive{
+					Name:       "set",
+					Parameters: []string{"$path_info", "$2"},
+				},
+			},
+		}
+		block.Directives = append(block.Directives, ifDir)
+		block.Directives = append(block.Directives, &Directive{
 			Name:       "fastcgi_param",
-			Parameters: []string{"SCRIPT_FILENAME", "$document_root$fastcgi_script_name"},
+			Parameters: []string{"SCRIPT_FILENAME", "$document_root$real_script_name"},
+		})
+		block.Directives = append(block.Directives, &Directive{
+			Name:       "fastcgi_param",
+			Parameters: []string{"SCRIPT_NAME", "$real_script_name"},
+		})
+		block.Directives = append(block.Directives, &Directive{
+			Name:       "fastcgi_param",
+			Parameters: []string{"PATH_INFO", "$path_info"},
 		})
 	} else {
 		block.Directives = append(block.Directives, &Directive{
