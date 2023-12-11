@@ -159,7 +159,7 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 			IsFromApp = true
 		}
 
-		ports := simplifyPort(item.Ports)
+		ports := loadContainerPort(item.Ports)
 		backDatas[i] = dto.ContainerInfo{
 			ContainerID:   item.ID,
 			CreateTime:    time.Unix(item.Created, 0).Format("2006-01-02 15:04:05"),
@@ -1012,6 +1012,22 @@ func loadVolumeBinds(binds []string) []dto.VolumeHelper {
 	return datas
 }
 
+func loadContainerPort(ports []types.Port) []string {
+	var (
+		ipv4Ports []types.Port
+		ipv6Ports []types.Port
+	)
+	for _, port := range ports {
+		if strings.Contains(port.IP, ":") {
+			ipv6Ports = append(ipv6Ports, port)
+		} else {
+			ipv4Ports = append(ipv4Ports, port)
+		}
+	}
+	list1 := simplifyPort(ipv4Ports)
+	list2 := simplifyPort(ipv6Ports)
+	return append(list1, list2...)
+}
 func simplifyPort(ports []types.Port) []string {
 	var datas []string
 	if len(ports) == 0 {
