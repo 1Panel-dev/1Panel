@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"unicode"
@@ -78,6 +79,11 @@ func username() {
 		fmt.Println("错误：输入面板用户中包含空格字符！")
 		return
 	}
+	result, err := regexp.MatchString("^[a-zA-Z0-9_\u4e00-\u9fa5]{3,30}$", newUsername)
+	if !result || err != nil {
+		fmt.Println("错误：输入面板用户错误！仅支持英文、中文、数字和_,长度3-30")
+		return
+	}
 
 	db, err := loadDBConn()
 	if err != nil {
@@ -94,7 +100,7 @@ func username() {
 }
 
 func password() {
-	fmt.Print("设置面板密码：")
+	fmt.Print("修改面板密码：")
 	bytePassword, err := term.ReadPassword(int(os.Stdin.Fd()))
 	if err != nil {
 		fmt.Printf("\n错误：面板密码信息读取错误，%v\n", err)
@@ -122,6 +128,9 @@ func password() {
 			fmt.Println("\n错误：面板密码仅支持字母、数字、特殊字符（!@#$%*_,.?），长度 8-30 位！")
 			return
 		}
+	} else if len(newPassword) < 6 {
+		fmt.Println("错误：请输入 6 位以上密码！")
+		return
 	}
 
 	fmt.Print("\n确认密码：")
@@ -164,11 +173,7 @@ func port() {
 	newPortStr, _ := reader.ReadString('\n')
 	newPortStr = strings.Trim(newPortStr, "\n")
 	newPort, err := strconv.Atoi(strings.TrimSpace(newPortStr))
-	if err != nil {
-		fmt.Printf("错误：面板端口信息读取错误，%v\n", err)
-		return
-	}
-	if newPort < 0 || newPort > 65535 {
+	if err != nil || newPort < 0 || newPort > 65535 {
 		fmt.Println("错误：输入的端口号必须在 1 到 65535 之间！")
 		return
 	}
