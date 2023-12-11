@@ -32,10 +32,7 @@ type App struct {
 }
 
 func (i *App) IsLocalApp() bool {
-	if i.Resource == constant.ResourceLocal {
-		return true
-	}
-	return false
+	return i.Resource == constant.ResourceLocal
 }
 func (i *App) GetAppResourcePath() string {
 	if i.IsLocalApp() {

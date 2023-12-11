@@ -22,6 +22,7 @@ import (
 	"github.com/subosito/gotenv"
 	"os"
 	"path"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -108,7 +109,8 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (err error) {
 	if err != nil {
 		return err
 	}
-	appVersionDir := path.Join(constant.AppResourceDir, app.Resource, app.Key, appDetail.Version)
+
+	appVersionDir := filepath.Join(app.GetAppResourcePath(), appDetail.Version)
 	if !fileOp.Stat(appVersionDir) || appDetail.Update {
 		if err := downloadApp(app, appDetail, nil); err != nil {
 			return err
