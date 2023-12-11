@@ -256,7 +256,7 @@ const openInstall = (app: App.App) => {
 };
 
 const openDetail = (key: string) => {
-    detailRef.value.acceptParams(key);
+    detailRef.value.acceptParams(key, 'install');
 };
 
 const sync = () => {

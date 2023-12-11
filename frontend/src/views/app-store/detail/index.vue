@@ -28,7 +28,12 @@
                             :closable="false"
                         />
                     </div>
-                    <el-button round v-if="appDetail.enable" @click="openInstall" type="primary">
+                    <el-button
+                        round
+                        v-if="appDetail.enable && operate === 'install'"
+                        @click="openInstall"
+                        type="primary"
+                    >
                         {{ $t('app.install') }}
                     </el-button>
                 </div>
@@ -92,9 +97,11 @@ const loadingApp = ref(false);
 const installRef = ref();
 const open = ref(false);
 const appKey = ref();
+const operate = ref();
 
-const acceptParams = async (key: string) => {
+const acceptParams = async (key: string, op: string) => {
     appKey.value = key;
+    operate.value = op;
     open.value = true;
     getApp();
 };
