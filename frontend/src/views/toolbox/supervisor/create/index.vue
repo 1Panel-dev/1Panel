@@ -10,7 +10,7 @@
             <el-col :span="22" :offset="1">
                 <el-form ref="processForm" label-position="top" :model="process" label-width="100px" :rules="rules">
                     <el-form-item :label="$t('commons.table.name')" prop="name">
-                        <el-input v-model.trim="process.name" :disabled="process.operate == 'edit'"></el-input>
+                        <el-input v-model.trim="process.name" :disabled="process.operate == 'update'"></el-input>
                     </el-form-item>
                     <el-form-item :label="$t('tool.supervisor.user')" prop="user">
                         <el-input v-model.trim="process.user"></el-input>
@@ -58,7 +58,7 @@ const rules = ref({
     dir: [Rules.requiredInput],
     command: [Rules.requiredInput],
     user: [Rules.requiredInput],
-    numprocsNum: [Rules.requiredInput, checkNumberRange(1, 9999)],
+    numprocsNum: [Rules.requiredInput, Rules.integerNumber, checkNumberRange(1, 9999)],
 });
 const initData = () => ({
     operate: 'create',
