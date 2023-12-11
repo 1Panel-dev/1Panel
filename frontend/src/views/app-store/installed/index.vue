@@ -80,12 +80,10 @@
         <template #main>
             <el-alert type="info" :closable="false" v-if="mode === 'installed'">
                 <template #default>
-                    <span>
-                        <span>{{ $t('app.installHelper') }}</span>
-                        <el-link class="text-xs scroll-ml-1" icon="Position" @click="quickJump()" type="primary">
-                            {{ $t('firewall.quickJump') }}
-                        </el-link>
-                    </span>
+                    {{ $t('app.installHelper') }}
+                    <el-link class="ml-5" icon="Position" @click="quickJump()" type="primary">
+                        {{ $t('firewall.quickJump') }}
+                    </el-link>
                 </template>
             </el-alert>
             <el-alert type="info" :title="$t('app.upgradeHelper')" :closable="false" v-if="mode === 'upgrade'" />
