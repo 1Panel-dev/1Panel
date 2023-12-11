@@ -9,7 +9,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
-	"github.com/1Panel-dev/1Panel/backend/utils/systemctl"
+	"github.com/1Panel-dev/1Panel/backend/utils/firewall"
 	"github.com/1Panel-dev/1Panel/backend/utils/toolbox"
 )
 
@@ -100,16 +100,18 @@ func (u *Fail2BanService) Operate(operation string) error {
 
 func (u *Fail2BanService) UpdateConf(req dto.Fail2BanUpdate) error {
 	if req.Key == "banaction" {
-		switch req.Value {
-		case "firewallcmd-ipset":
-			isActive, _ := systemctl.IsActive("firewalld")
-			if !isActive {
-				return buserr.WithName("ErrBanAction", "firewalld")
+		if req.Value == "firewallcmd-ipset" || req.Value == "ufw" {
+			client, err := firewall.NewFirewallClient()
+			if err != nil {
+				return err
 			}
-		case "ufw":
-			isActive, _ := systemctl.IsActive("ufw")
-			if !isActive {
-				return buserr.WithName("ErrBanAction", "ufw")
+			status, _ := client.Status()
+			if status != "running" {
+				service := "firewalld"
+				if req.Value == "ufw" {
+					service = "ufw"
+				}
+				return buserr.WithName("ErrBanAction", service)
 			}
 		}
 	}
@@ -209,6 +211,11 @@ func (u *Fail2BanService) OperateSSHD(req dto.Fail2BanSet) error {
 }
 
 func loadFailValue(line string, baseInfo *dto.Fail2BanBaseInfo) {
+	if strings.HasPrefix(line, "port") {
+		itemValue := strings.ReplaceAll(line, "port", "")
+		itemValue = strings.ReplaceAll(itemValue, "=", "")
+		baseInfo.Port, _ = strconv.Atoi(strings.TrimSpace(itemValue))
+	}
 	if strings.HasPrefix(line, "maxretry") {
 		itemValue := strings.ReplaceAll(line, "maxretry", "")
 		itemValue = strings.ReplaceAll(itemValue, "=", "")
