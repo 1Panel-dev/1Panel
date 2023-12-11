@@ -1154,7 +1154,7 @@ const message = {
         OneDrive: '微软 OneDrive',
         codeWarning: '当前授权码格式错误，请重新确认！',
         backupDir: '备份路径',
-        isCN: '国内版',
+        isCN: '国内版 (暂不支持)',
         code: '授权码',
         codeHelper:
             '请点击获取按钮，然后登录 OneDrive 复制跳转链接中 code 后面的内容，粘贴到该输入框中，具体操作可参考官方文档。',

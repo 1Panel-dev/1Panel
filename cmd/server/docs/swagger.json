@@ -14977,7 +14977,13 @@
                 "isExist": {
                     "type": "boolean"
                 },
+                "logPath": {
+                    "type": "string"
+                },
                 "maxRetry": {
+                    "type": "integer"
+                },
+                "port": {
                     "type": "integer"
                 },
                 "version": {
@@ -15013,7 +15019,9 @@
                         "bantime",
                         "findtime",
                         "maxretry",
-                        "banaction"
+                        "banaction",
+                        "logpath",
+                        "port"
                     ]
                 },
                 "value": {
@@ -16596,7 +16604,8 @@
         "dto.SSLUpdate": {
             "type": "object",
             "required": [
-                "ssl"
+                "ssl",
+                "sslType"
             ],
             "properties": {
                 "cert": {
@@ -16619,7 +16628,13 @@
                     "type": "integer"
                 },
                 "sslType": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "self",
+                        "select",
+                        "import-paste",
+                        "import-local"
+                    ]
                 }
             }
         },

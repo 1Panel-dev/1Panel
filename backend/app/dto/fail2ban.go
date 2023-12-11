@@ -19,7 +19,7 @@ type Fail2BanSearch struct {
 }
 
 type Fail2BanUpdate struct {
-	Key   string `json:"key" validate:"required,oneof=port bantime findtime maxretry banaction logpath"`
+	Key   string `json:"key" validate:"required,oneof=port bantime findtime maxretry banaction logpath port"`
 	Value string `json:"value"`
 }
 

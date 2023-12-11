@@ -1079,7 +1079,11 @@ definitions:
         type: boolean
       isExist:
         type: boolean
+      logPath:
+        type: string
       maxRetry:
+        type: integer
+      port:
         type: integer
       version:
         type: string
@@ -1103,6 +1107,8 @@ definitions:
         - findtime
         - maxretry
         - banaction
+        - logpath
+        - port
         type: string
       value:
         type: string
@@ -2186,9 +2192,15 @@ definitions:
       sslID:
         type: integer
       sslType:
+        enum:
+        - self
+        - select
+        - import-paste
+        - import-local
         type: string
     required:
     - ssl
+    - sslType
     type: object
   dto.SearchForAnalysis:
     properties:

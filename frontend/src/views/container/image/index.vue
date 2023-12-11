@@ -195,7 +195,7 @@ const loadRepos = async () => {
 };
 
 const onDelete = (row: Container.ImageInfo) => {
-    let names = row.tags || [row.id.replaceAll('sha256:', '').substring(0, 12)];
+    let names = [row.id.replaceAll('sha256:', '').substring(0, 12)];
     opRef.value.acceptParams({
         title: i18n.global.t('commons.button.delete'),
         names: names,
