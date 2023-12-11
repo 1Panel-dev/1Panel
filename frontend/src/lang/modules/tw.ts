@@ -1153,7 +1153,7 @@ const message = {
         OneDrive: '微軟 OneDrive',
         codeWarning: '當前授權碼格式錯誤，請重新確認！',
         backupDir: '備份路徑',
-        isCN: '國內版',
+        isCN: '國內版 (暫不支持)',
         code: '授權碼',
         codeHelper:
             '請點擊獲取按鈕，然後登錄 OneDrive 復製跳轉鏈接中 code 後面的內容，粘貼到該輸入框中，具體操作可參考官方文檔。',

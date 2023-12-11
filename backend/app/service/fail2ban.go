@@ -167,7 +167,7 @@ func (u *Fail2BanService) UpdateConf(req dto.Fail2BanUpdate) error {
 	if err != nil {
 		return err
 	}
-	if err := client.Operate("reload"); err != nil {
+	if err := client.Operate("restart"); err != nil {
 		return err
 	}
 	return nil
@@ -187,7 +187,7 @@ func (u *Fail2BanService) UpdateConfByFile(req dto.UpdateByFile) error {
 	if err != nil {
 		return err
 	}
-	if err := client.Operate("reload"); err != nil {
+	if err := client.Operate("restart"); err != nil {
 		return err
 	}
 	return nil

@@ -14984,7 +14984,13 @@ const docTemplate = `{
                 "isExist": {
                     "type": "boolean"
                 },
+                "logPath": {
+                    "type": "string"
+                },
                 "maxRetry": {
+                    "type": "integer"
+                },
+                "port": {
                     "type": "integer"
                 },
                 "version": {
@@ -15020,7 +15026,9 @@ const docTemplate = `{
                         "bantime",
                         "findtime",
                         "maxretry",
-                        "banaction"
+                        "banaction",
+                        "logpath",
+                        "port"
                     ]
                 },
                 "value": {
@@ -16603,7 +16611,8 @@ const docTemplate = `{
         "dto.SSLUpdate": {
             "type": "object",
             "required": [
-                "ssl"
+                "ssl",
+                "sslType"
             ],
             "properties": {
                 "cert": {
@@ -16626,7 +16635,13 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "sslType": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "self",
+                        "select",
+                        "import-paste",
+                        "import-local"
+                    ]
                 }
             }
         },

@@ -46,7 +46,11 @@
                             <el-input show-password clearable v-model.trim="dialogData.rowData!.credential" />
                         </el-form-item>
                         <el-form-item v-if="dialogData.rowData!.type === 'OneDrive'">
-                            <el-checkbox v-model="dialogData.rowData!.varsJson['isCN']" :label="$t('setting.isCN')" />
+                            <el-checkbox
+                                disabled
+                                v-model="dialogData.rowData!.varsJson['isCN']"
+                                :label="$t('setting.isCN')"
+                            />
                         </el-form-item>
                         <el-form-item
                             v-if="dialogData.rowData!.type === 'OneDrive'"
