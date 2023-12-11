@@ -67,7 +67,7 @@
                         <div>
                             <span>{{ $t('app.checkInstalledWarn', [data.app]) }}</span>
                             <span @click="goRouter(key)">
-                                <el-icon><Position /></el-icon>
+                                <el-icon class="ml-2"><Position /></el-icon>
                                 {{ $t('database.goInstall') }}
                             </span>
                             <div>

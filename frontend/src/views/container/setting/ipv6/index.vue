@@ -75,7 +75,7 @@ const loading = ref();
 const drawerVisible = ref();
 const confirmDialogRef = ref();
 const formRef = ref();
-const showMore = ref(false);
+const showMore = ref(true);
 
 interface DialogProps {
     fixedCidrV6: string;

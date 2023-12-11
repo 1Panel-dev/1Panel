@@ -43,7 +43,7 @@
                         <span v-else-if="!data.ctlExist">{{ $t('tool.supervisor.notSupportCrl') }}</span>
                         <span v-else-if="data.init">{{ $t('tool.supervisor.initHelper') }}</span>
                         <span @click="toDoc()" v-if="!data.isExist || !data.ctlExist">
-                            <el-icon><Position /></el-icon>
+                            <el-icon class="ml-2"><Position /></el-icon>
                             {{ $t('firewall.quickJump') }}
                         </span>
                         <div>

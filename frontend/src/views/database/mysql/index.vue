@@ -190,7 +190,7 @@
                         <div>
                             <span>{{ $t('app.checkInstalledWarn', [$t('database.noMysql')]) }}</span>
                             <span @click="goRouter('app')">
-                                <el-icon><Position /></el-icon>
+                                <el-icon class="ml-2"><Position /></el-icon>
                                 {{ $t('database.goInstall') }}
                             </span>
                             <div>
