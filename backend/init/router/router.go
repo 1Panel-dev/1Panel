@@ -1,11 +1,10 @@
 package router
 
 import (
+	"fmt"
+	"github.com/gin-contrib/gzip"
 	"html/template"
 	"net/http"
-	"strings"
-
-	"github.com/gin-contrib/gzip"
 
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/i18n"
@@ -22,12 +21,10 @@ import (
 func setWebStatic(rootRouter *gin.RouterGroup) {
 	rootRouter.StaticFS("/public", http.FS(web.Favicon))
 	rootRouter.Use(func(c *gin.Context) {
-		if strings.HasPrefix(c.Request.URL.Path, "/assets/") {
-			c.Header("Cache-Control", "max-age=31536000")
-		}
 		c.Next()
 	})
 	rootRouter.GET("/assets/*filepath", func(c *gin.Context) {
+		c.Writer.Header().Set("Cache-Control", fmt.Sprintf("private, max-age=%d", 3600))
 		staticServer := http.FileServer(http.FS(web.Assets))
 		staticServer.ServeHTTP(c.Writer, c.Request)
 	})
