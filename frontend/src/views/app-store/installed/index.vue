@@ -442,7 +442,7 @@ const openOperate = (row: any, op: string) => {
     operateReq.installId = row.id;
     operateReq.operate = op;
     if (op == 'upgrade' || op == 'ignore') {
-        upgradeRef.value.acceptParams(row.id, row.name, op);
+        upgradeRef.value.acceptParams(row.id, row.name, op, row.app);
     } else if (op == 'delete') {
         AppInstalledDeleteCheck(row.id).then(async (res) => {
             const items = res.data;
