@@ -109,13 +109,13 @@ export const getSSHConf = () => {
     return http.get<string>(`/hosts/ssh/conf`);
 };
 export const operateSSH = (operation: string) => {
-    return http.post(`/hosts/ssh/operate`, { operation: operation });
+    return http.post(`/hosts/ssh/operate`, { operation: operation }, TimeoutEnum.T_40S);
 };
 export const updateSSH = (params: Host.SSHUpdate) => {
-    return http.post(`/hosts/ssh/update`, params);
+    return http.post(`/hosts/ssh/update`, params, TimeoutEnum.T_40S);
 };
 export const updateSSHByfile = (file: string) => {
-    return http.post(`/hosts/ssh/conffile/update`, { file: file });
+    return http.post(`/hosts/ssh/conffile/update`, { file: file }, TimeoutEnum.T_40S);
 };
 export const generateSecret = (params: Host.SSHGenerate) => {
     return http.post(`/hosts/ssh/generate`, params);

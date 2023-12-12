@@ -618,12 +618,24 @@ const onDownload = async (record: any, backupID: number) => {
     switch (dialogData.value.rowData.type) {
         case 'database':
             type = i18n.global.t('database.database');
+            if (dialogData.value.rowData!.dbName === 'all') {
+                MsgInfo(i18n.global.t('cronjob.allOptionHelper', [type]));
+                return;
+            }
             break;
         case 'app':
             type = i18n.global.t('app.app');
+            if (dialogData.value.rowData!.appID === 'all') {
+                MsgInfo(i18n.global.t('cronjob.allOptionHelper', [type]));
+                return;
+            }
             break;
         case 'website':
             type = i18n.global.t('website.website');
+            if (dialogData.value.rowData!.website === 'all') {
+                MsgInfo(i18n.global.t('cronjob.allOptionHelper', [type]));
+                return;
+            }
             break;
     }
     if (currentRecord.value.file.indexOf(',') !== -1) {

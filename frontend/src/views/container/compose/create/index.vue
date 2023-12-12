@@ -78,13 +78,15 @@
                                     v-model="form.file"
                                 />
                             </div>
-                            <LogFile
-                                ref="logRef"
-                                :config="logConfig"
-                                :default-button="false"
-                                v-if="mode === 'log' && showLog"
-                                :style="'height: calc(100vh - 370px);min-height: 200px'"
-                            />
+                            <div style="width: 100%">
+                                <LogFile
+                                    ref="logRef"
+                                    :config="logConfig"
+                                    :default-button="false"
+                                    v-if="mode === 'log' && showLog"
+                                    :style="'height: calc(100vh - 370px);min-height: 200px'"
+                                />
+                            </div>
                         </el-form-item>
                     </el-form>
                 </el-col>
