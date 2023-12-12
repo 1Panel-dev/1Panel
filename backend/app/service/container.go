@@ -407,6 +407,7 @@ func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.Contai
 		}
 	}
 	data.AutoRemove = oldContainer.HostConfig.AutoRemove
+	data.Privileged = oldContainer.HostConfig.Privileged
 	data.PublishAllPorts = oldContainer.HostConfig.PublishAllPorts
 	data.RestartPolicy = oldContainer.HostConfig.RestartPolicy.Name
 	if oldContainer.HostConfig.NanoCPUs != 0 {
@@ -440,7 +441,7 @@ func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
 			if !req.ForcePull {
 				return err
 			}
-			global.LOG.Errorf("force pull image %s failed, err: %v", req.Image, err)
+			return fmt.Errorf("pull image %s failed, err: %v", req.Image, err)
 		}
 	}
 
@@ -483,7 +484,7 @@ func (u *ContainerService) ContainerUpgrade(req dto.ContainerUpgrade) error {
 			if !req.ForcePull {
 				return err
 			}
-			global.LOG.Errorf("force pull image %s failed, err: %v", req.Image, err)
+			return fmt.Errorf("pull image %s failed, err: %v", req.Image, err)
 		}
 	}
 	config := oldContainer.Config

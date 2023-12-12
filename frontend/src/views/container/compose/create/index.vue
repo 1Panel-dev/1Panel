@@ -162,6 +162,7 @@ const acceptParams = (): void => {
     form.path = '';
     form.file = '';
     form.template = null;
+    onCreating.value = false;
     loadTemplates();
     loadPath();
 };

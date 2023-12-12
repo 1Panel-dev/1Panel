@@ -15,27 +15,33 @@
                 />
                 <el-form @submit.prevent ref="formRef" :model="form" label-position="top">
                     <el-form-item :label="$t('container.oldImage')" prop="oldImage">
-                        <el-tooltip placement="top-start" :content="form.imageName" v-if="form.imageName.length > 50">
-                            <el-tag>{{ form.imageName.substring(0, 50) }}...:{{ form.oldTag }}</el-tag>
+                        <el-tooltip
+                            placement="top-start"
+                            :content="form.oldImageName"
+                            v-if="form.oldImageName.length > 50"
+                        >
+                            <el-tag>{{ form.oldImageName.substring(0, 50) }}...</el-tag>
                         </el-tooltip>
-                        <el-tag v-else>{{ form.imageName }}:{{ form.oldTag }}</el-tag>
+                        <el-tag v-else>{{ form.oldImageName }}</el-tag>
                     </el-form-item>
-                    <el-form-item prop="newTag" :rules="Rules.imageName">
+                    <el-form-item prop="newImageName" :rules="Rules.imageName">
                         <template #label>
                             <el-tooltip
                                 placement="top-start"
-                                :content="form.imageName"
-                                v-if="form.imageName.length > 40"
+                                :content="form.imageHelper"
+                                v-if="form.imageHelper.length > 40"
                             >
                                 <span>
-                                    {{ $t('container.targetImage') + ' (' + form.imageName.substring(0, 40) + '...)' }}
+                                    {{
+                                        $t('container.targetImage') + ' (' + form.imageHelper.substring(0, 40) + '...)'
+                                    }}
                                 </span>
                             </el-tooltip>
                             <span v-else>
-                                {{ $t('container.targetImage') + ' (' + form.imageName + ')' }}
+                                {{ $t('container.targetImage') + ' (' + form.imageHelper + ')' }}
                             </span>
                         </template>
-                        <el-input v-model="form.newTag" :placeholder="$t('container.targetImageHelper')" />
+                        <el-input v-model="form.newImageName" :placeholder="$t('container.imageNameHelper')" />
                         <span class="input-help">{{ $t('container.upgradeHelper') }}</span>
                     </el-form-item>
                     <el-form-item prop="ignoreCompare">
@@ -79,9 +85,9 @@ const loading = ref(false);
 
 const form = reactive({
     name: '',
-    imageName: '',
-    oldTag: '',
-    newTag: '',
+    oldImageName: '',
+    newImageName: '',
+    imageHelper: '',
     fromApp: false,
     forcePull: false,
 
@@ -100,11 +106,16 @@ interface DialogProps {
 }
 const acceptParams = (props: DialogProps): void => {
     form.name = props.container;
-    form.imageName = props.image.indexOf(':') !== -1 ? props.image.split(':')[0] : props.image;
-    form.oldTag = props.image.indexOf(':') !== -1 ? props.image.split(':')[1] : 'latest';
-    form.newTag = form.oldTag;
+    form.oldImageName = props.image;
     form.fromApp = props.fromApp;
     form.ignoreCompare = false;
+
+    if (props.image.indexOf('sha256:') !== -1) {
+        form.imageHelper = i18n.global.t('container.imageLoadErr');
+        drawerVisible.value = true;
+        return;
+    }
+    form.imageHelper = props.image.indexOf(':') !== -1 ? props.image.split(':')[0] : props.image;
     drawerVisible.value = true;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
@@ -113,7 +124,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        if (!form.ignoreCompare && !compareVersion(form.newTag, form.oldTag)) {
+        if (!form.ignoreCompare && !compareVersion(form.newImageName, form.oldImageName)) {
             MsgWarning(i18n.global.t('container.upgradeWarning'));
             return;
         }
@@ -122,7 +133,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             cancelButtonText: i18n.global.t('commons.button.cancel'),
         }).then(async () => {
             loading.value = true;
-            await upgradeContainer(form.name, form.imageName + ':' + form.newTag, form.forcePull)
+            await upgradeContainer(form.name, form.newImageName, form.forcePull)
                 .then(() => {
                     loading.value = false;
                     emit('search');
@@ -141,14 +152,22 @@ const handleClose = async () => {
 };
 
 function compareVersion(vNew, vOld) {
-    if (vNew === 'latest') {
+    let newImageName = vNew.indexOf(':') !== -1 ? vNew.split(':')[0] : vNew;
+    let oldImageName = vOld.indexOf(':') !== -1 ? vOld.split(':')[0] : vOld;
+    if (newImageName !== oldImageName) {
         return true;
     }
-    let v1 = vNew
+    let newTag = vNew.indexOf(':') !== -1 ? vNew.split(':')[1] : 'latest';
+
+    if (newTag === 'latest') {
+        return true;
+    }
+    let oldTag = vOld.indexOf(':') !== -1 ? vOld.split(':')[1] : 'latest';
+    let v1 = newTag
         .replace('-', '.')
         .replace(/[^\d.]/g, '')
         .split('.');
-    let v2 = vOld
+    let v2 = oldTag
         .replace('-', '.')
         .replace(/[^\d.]/g, '')
         .split('.');
