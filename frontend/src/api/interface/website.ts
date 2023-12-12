@@ -21,6 +21,8 @@ export namespace Website {
         user: string;
         group: string;
         IPV6: boolean;
+        accessLog?: boolean;
+        errorLog?: boolean;
     }
 
     export interface WebsiteDTO extends Website {

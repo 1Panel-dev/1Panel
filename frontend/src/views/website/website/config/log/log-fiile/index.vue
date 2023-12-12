@@ -16,8 +16,8 @@
     <OpDialog ref="opRef" />
 </template>
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
-import { OpWebsiteLog } from '@/api/modules/website';
+import { computed, onMounted, ref } from 'vue';
+import { GetWebsite, OpWebsiteLog } from '@/api/modules/website';
 import i18n from '@/lang';
 import LogFile from '@/components/log-file/index.vue';
 import { MsgSuccess } from '@/utils/message';
@@ -74,4 +74,20 @@ const cleanLog = async () => {
         params: { id: id.value, operate: 'delete', logType: logType.value },
     });
 };
+
+const getWebsite = async () => {
+    try {
+        const res = await GetWebsite(props.id);
+        if (props.logType === 'access.log') {
+            data.value.enable = res.data.accessLog;
+        }
+        if (props.logType === 'error.log') {
+            data.value.enable = res.data.errorLog;
+        }
+    } catch (error) {}
+};
+
+onMounted(() => {
+    getWebsite();
+});
 </script>
