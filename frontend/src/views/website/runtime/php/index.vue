@@ -71,7 +71,7 @@
             </template>
         </LayoutContent>
 
-        <CreateRuntime ref="createRef" @close="search" />
+        <CreateRuntime ref="createRef" @close="search" @submit="openCreateLog" />
         <OpDialog ref="opRef" @search="search" />
         <Log ref="logRef" @close="search" />
     </div>
@@ -149,7 +149,11 @@ const openDetail = (row: Runtime.Runtime) => {
 };
 
 const openLog = (row: Runtime.RuntimeDTO) => {
-    logRef.value.acceptParams({ id: row.id, type: 'php' });
+    logRef.value.acceptParams({ id: row.id, type: 'php', tail: row.status == 'building' });
+};
+
+const openCreateLog = (id: number) => {
+    logRef.value.acceptParams({ id: id, type: 'php', tail: true });
 };
 
 const openDelete = async (row: Runtime.Runtime) => {

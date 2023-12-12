@@ -33,7 +33,7 @@ type RuntimeService struct {
 
 type IRuntimeService interface {
 	Page(req request.RuntimeSearch) (int64, []response.RuntimeDTO, error)
-	Create(create request.RuntimeCreate) error
+	Create(create request.RuntimeCreate) (*model.Runtime, error)
 	Delete(delete request.RuntimeDelete) error
 	Update(req request.RuntimeUpdate) error
 	Get(id uint) (res *response.RuntimeDTO, err error)
@@ -48,7 +48,7 @@ func NewRuntimeService() IRuntimeService {
 	return &RuntimeService{}
 }
 
-func (r *RuntimeService) Create(create request.RuntimeCreate) (err error) {
+func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, error) {
 	var (
 		opts []repo.DBOption
 	)
@@ -60,7 +60,7 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (err error) {
 	}
 	exist, _ := runtimeRepo.GetFirst(opts...)
 	if exist != nil {
-		return buserr.New(constant.ErrNameIsExist)
+		return nil, buserr.New(constant.ErrNameIsExist)
 	}
 	fileOp := files.NewFileOp()
 
@@ -74,45 +74,45 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (err error) {
 				Version:  create.Version,
 				Status:   constant.RuntimeNormal,
 			}
-			return runtimeRepo.Create(context.Background(), runtime)
+			return nil, runtimeRepo.Create(context.Background(), runtime)
 		}
 		exist, _ = runtimeRepo.GetFirst(runtimeRepo.WithImage(create.Image))
 		if exist != nil {
-			return buserr.New(constant.ErrImageExist)
+			return nil, buserr.New(constant.ErrImageExist)
 		}
 	case constant.RuntimeNode:
 		if !fileOp.Stat(create.CodeDir) {
-			return buserr.New(constant.ErrPathNotFound)
+			return nil, buserr.New(constant.ErrPathNotFound)
 		}
 		create.Install = true
-		if err = checkPortExist(create.Port); err != nil {
-			return err
+		if err := checkPortExist(create.Port); err != nil {
+			return nil, err
 		}
 		for _, export := range create.ExposedPorts {
-			if err = checkPortExist(export.HostPort); err != nil {
-				return err
+			if err := checkPortExist(export.HostPort); err != nil {
+				return nil, err
 			}
 		}
 		if containerName, ok := create.Params["CONTAINER_NAME"]; ok {
 			if err := checkContainerName(containerName.(string)); err != nil {
-				return err
+				return nil, err
 			}
 		}
 	}
 
 	appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(create.AppDetailID))
 	if err != nil {
-		return err
+		return nil, err
 	}
 	app, err := appRepo.GetFirst(commonRepo.WithByID(appDetail.AppId))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	appVersionDir := filepath.Join(app.GetAppResourcePath(), appDetail.Version)
 	if !fileOp.Stat(appVersionDir) || appDetail.Update {
-		if err := downloadApp(app, appDetail, nil); err != nil {
-			return err
+		if err = downloadApp(app, appDetail, nil); err != nil {
+			return nil, err
 		}
 	}
 
@@ -128,15 +128,18 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (err error) {
 	switch create.Type {
 	case constant.RuntimePHP:
 		if err = handlePHP(create, runtime, fileOp, appVersionDir); err != nil {
-			return
+			return nil, err
 		}
 	case constant.RuntimeNode:
 		runtime.Port = create.Port
 		if err = handleNode(create, runtime, fileOp, appVersionDir); err != nil {
-			return
+			return nil, err
 		}
 	}
-	return runtimeRepo.Create(context.Background(), runtime)
+	if err := runtimeRepo.Create(context.Background(), runtime); err != nil {
+		return nil, err
+	}
+	return runtime, nil
 }
 
 func (r *RuntimeService) Page(req request.RuntimeSearch) (int64, []response.RuntimeDTO, error) {

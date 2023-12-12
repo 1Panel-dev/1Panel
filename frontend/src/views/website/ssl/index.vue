@@ -91,7 +91,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('website.log')" width="100px">
                         <template #default="{ row }">
-                            <el-button @click="openLog(row.id)" link type="primary">
+                            <el-button @click="openSSLLog(row)" link type="primary" v-if="row.provider != 'manual'">
                                 {{ $t('website.check') }}
                             </el-button>
                         </template>
@@ -319,6 +319,9 @@ const openDetail = (id: number) => {
 };
 const openLog = (id: number) => {
     logRef.value.acceptParams({ id: id, type: 'ssl', tail: true });
+};
+const openSSLLog = (row: Website.SSL) => {
+    logRef.value.acceptParams({ id: row.id, type: 'ssl', tail: row.status === 'applying' });
 };
 
 const openCA = () => {
