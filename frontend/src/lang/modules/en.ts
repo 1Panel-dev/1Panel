@@ -597,7 +597,7 @@ const message = {
             'The upgrade operation requires rebuilding the container, and any non-persistent data will be lost. Do you want to continue?',
         oldImage: 'Current image',
         targetImage: 'Target image',
-        targetImageHelper: 'Please enter the target image version',
+        imageLoadErr: 'System did not detect the container image name, please manually enter the full image name:tag ',
         appHelper:
             'This container is sourced from the application store. Upgrading it may cause the service to be unavailable.',
 

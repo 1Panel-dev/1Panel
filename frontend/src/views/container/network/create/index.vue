@@ -202,10 +202,10 @@ const handleClose = () => {
 const rules = reactive({
     name: [Rules.requiredInput],
     driver: [Rules.requiredSelect],
-    subnet: [{ validator: checkCidr, trigger: 'blur' }],
+    subnet: [{ validator: checkCidr, trigger: 'blur' }, Rules.requiredInput],
     gateway: [{ validator: checkGateway, trigger: 'blur' }],
     scope: [{ validator: checkCidr, trigger: 'blur' }],
-    subnetV6: [{ validator: checkFixedCidrV6, trigger: 'blur' }],
+    subnetV6: [{ validator: checkFixedCidrV6, trigger: 'blur' }, Rules.requiredInput],
     gatewayV6: [{ validator: checkGatewayV6, trigger: 'blur' }],
     scopeV6: [{ validator: checkFixedCidrV6, trigger: 'blur' }],
 });

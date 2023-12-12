@@ -1,5 +1,5 @@
 <template>
-    <el-drawer :close-on-click-modal="false" v-model="drawerVisible" size="30%">
+    <el-drawer :close-on-click-modal="false" :destroy-on-close="true" v-model="drawerVisible" size="30%">
         <template #header>
             <Header :header="$t('toolbox.fail2ban.' + form.operate + 'IP')" :back="handleClose"></Header>
         </template>
