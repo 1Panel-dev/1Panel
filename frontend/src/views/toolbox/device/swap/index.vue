@@ -202,7 +202,6 @@ const onSave = async (row) => {
 };
 
 const loadItemSize = (row: any) => {
-    console.log(row.size, row.sizeUnit);
     switch (row.sizeUnit) {
         case 'KB':
             return row.size;
