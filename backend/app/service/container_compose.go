@@ -216,7 +216,8 @@ func (u *ContainerService) ComposeUpdate(req dto.ComposeUpdate) error {
 	if cmd.CheckIllegal(req.Name, req.Path) {
 		return buserr.New(constant.ErrCmdIllegal)
 	}
-	if _, err := os.Stat(req.Path); err != nil {
+	oldFile, err := os.ReadFile(req.Path)
+	if err != nil {
 		return fmt.Errorf("load file with path %s failed, %v", req.Path, err)
 	}
 	file, err := os.OpenFile(req.Path, os.O_WRONLY|os.O_TRUNC, 0640)
@@ -230,10 +231,16 @@ func (u *ContainerService) ComposeUpdate(req dto.ComposeUpdate) error {
 
 	global.LOG.Infof("docker-compose.yml %s has been replaced, now start to docker-compose restart", req.Path)
 	if stdout, err := compose.Down(req.Path); err != nil {
-		return errors.New(string(stdout))
+		if err := recreateCompose(string(oldFile), req.Path); err != nil {
+			return fmt.Errorf("update failed when handle compose down, err: %s, recreate failed: %v", string(stdout), err)
+		}
+		return fmt.Errorf("update failed when handle compose down, err: %s", string(stdout))
 	}
 	if stdout, err := compose.Up(req.Path); err != nil {
-		return errors.New(string(stdout))
+		if err := recreateCompose(string(oldFile), req.Path); err != nil {
+			return fmt.Errorf("update failed when handle compose up, err: %s, recreate failed: %v", string(stdout), err)
+		}
+		return fmt.Errorf("update failed when handle compose up, err: %s", string(stdout))
 	}
 
 	return nil
@@ -258,6 +265,22 @@ func (u *ContainerService) loadPath(req *dto.ComposeCreate) error {
 		_, _ = write.WriteString(string(req.File))
 		write.Flush()
 		req.Path = path
+	}
+	return nil
+}
+
+func recreateCompose(content, path string) error {
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_TRUNC, 0640)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	write := bufio.NewWriter(file)
+	_, _ = write.WriteString(content)
+	write.Flush()
+
+	if stdout, err := compose.Up(path); err != nil {
+		return errors.New(string(stdout))
 	}
 	return nil
 }
