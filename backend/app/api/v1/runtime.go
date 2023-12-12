@@ -46,11 +46,12 @@ func (b *BaseApi) CreateRuntime(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	if err := runtimeService.Create(req); err != nil {
+	ssl, err := runtimeService.Create(req)
+	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.SuccessWithData(c, ssl)
 }
 
 // @Tags Website

@@ -230,7 +230,7 @@ const phpSources = [
     },
 ];
 
-const em = defineEmits(['close']);
+const em = defineEmits(['close', 'submit']);
 
 const handleClose = () => {
     open.value = false;
@@ -315,9 +315,10 @@ const submit = async (formEl: FormInstance | undefined) => {
         if (mode.value == 'create') {
             loading.value = true;
             CreateRuntime(runtime)
-                .then(() => {
+                .then((res) => {
                     MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
                     handleClose();
+                    em('submit', res.data.id);
                 })
                 .finally(() => {
                     loading.value = false;
@@ -328,6 +329,7 @@ const submit = async (formEl: FormInstance | undefined) => {
                 .then(() => {
                     MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
                     handleClose();
+                    em('submit', runtime.id);
                 })
                 .finally(() => {
                     loading.value = false;
