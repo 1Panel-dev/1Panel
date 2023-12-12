@@ -515,11 +515,6 @@ func (u *FirewallService) updatePingStatus(enable string) error {
 	if err != nil {
 		return fmt.Errorf("update ping status failed, err: %v", stdout)
 	}
-	handle := "-A"
-	if enable == "1" {
-		handle = "-D"
-	}
-	_, _ = cmd.Execf("%s ip6tables %s INPUT -p icmpv6 --icmpv6-type echo-request -j DROP", cmd.SudoHandleCmd(), handle)
 
 	return nil
 }

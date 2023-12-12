@@ -320,7 +320,7 @@ func (u *SSHService) LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error) {
 			case constant.StatusSuccess:
 				commandItem = fmt.Sprintf("cat %s | grep -a Accepted %s", file.Name, command)
 			case constant.StatusFailed:
-				commandItem = fmt.Sprintf("cat %s | grep -aE 'Failed password for|Connection closed by authenticating user' | grep -a 'preauth' %s", file.Name, command)
+				commandItem = fmt.Sprintf("cat %s | grep -aE 'Failed password for|Connection closed by authenticating user' %s", file.Name, command)
 			default:
 				commandItem = fmt.Sprintf("cat %s | grep -aE \"(Failed password for|Connection closed by authenticating user|Accepted)\" | grep -v 'invalid' %s", file.Name, command)
 			}

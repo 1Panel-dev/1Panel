@@ -128,7 +128,8 @@ func password() {
 			fmt.Println("\n错误：面板密码仅支持字母、数字、特殊字符（!@#$%*_,.?），长度 8-30 位！")
 			return
 		}
-	} else if len(newPassword) < 6 {
+	}
+	if len(newPassword) < 6 {
 		fmt.Println("错误：请输入 6 位以上密码！")
 		return
 	}
@@ -173,7 +174,7 @@ func port() {
 	newPortStr, _ := reader.ReadString('\n')
 	newPortStr = strings.Trim(newPortStr, "\n")
 	newPort, err := strconv.Atoi(strings.TrimSpace(newPortStr))
-	if err != nil || newPort < 0 || newPort > 65535 {
+	if err != nil || newPort < 1 || newPort > 65535 {
 		fmt.Println("错误：输入的端口号必须在 1 到 65535 之间！")
 		return
 	}
