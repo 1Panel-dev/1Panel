@@ -8,7 +8,7 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"path"
+	"path/filepath"
 	"reflect"
 	"strconv"
 	"strings"
@@ -173,7 +173,8 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 			return appDetailDTO, err
 		}
 		fileOp := files.NewFileOp()
-		versionPath := path.Join(constant.AppResourceDir, app.Resource, app.Key, detail.Version)
+
+		versionPath := filepath.Join(app.GetAppResourcePath(), detail.Version)
 		if !fileOp.Stat(versionPath) || detail.Update {
 			if err = downloadApp(app, detail, nil); err != nil {
 				return appDetailDTO, err
@@ -181,8 +182,8 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 		}
 		switch app.Type {
 		case constant.RuntimePHP:
-			buildPath := path.Join(versionPath, "build")
-			paramsPath := path.Join(buildPath, "config.json")
+			buildPath := filepath.Join(versionPath, "build")
+			paramsPath := filepath.Join(buildPath, "config.json")
 			if !fileOp.Stat(paramsPath) {
 				return appDetailDTO, buserr.New(constant.ErrFileNotExist)
 			}
@@ -195,7 +196,7 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 				return appDetailDTO, err
 			}
 			appDetailDTO.Params = paramMap
-			composePath := path.Join(buildPath, "docker-compose.yml")
+			composePath := filepath.Join(buildPath, "docker-compose.yml")
 			if !fileOp.Stat(composePath) {
 				return appDetailDTO, buserr.New(constant.ErrFileNotExist)
 			}
@@ -223,7 +224,7 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 	}
 
 	if appDetailDTO.DockerCompose == "" {
-		filename := path.Base(appDetailDTO.DownloadUrl)
+		filename := filepath.Base(appDetailDTO.DownloadUrl)
 		dockerComposeUrl := fmt.Sprintf("%s%s", strings.TrimSuffix(appDetailDTO.DownloadUrl, filename), "docker-compose.yml")
 		composeRes, err := http.Get(dockerComposeUrl)
 		if err != nil {
@@ -489,7 +490,7 @@ func (a AppService) SyncAppListFromLocal() {
 	}
 	for _, dirEntry := range dirEntries {
 		if dirEntry.IsDir() {
-			appDir := path.Join(localAppDir, dirEntry.Name())
+			appDir := filepath.Join(localAppDir, dirEntry.Name())
 			appDirEntries, err := os.ReadDir(appDir)
 			if err != nil {
 				global.LOG.Errorf(i18n.GetMsgWithMap("ErrAppDirNull", map[string]interface{}{"name": dirEntry.Name(), "err": err.Error()}))
@@ -507,7 +508,7 @@ func (a AppService) SyncAppListFromLocal() {
 						Version: appDirEntry.Name(),
 						Status:  constant.AppNormal,
 					}
-					versionDir := path.Join(appDir, appDirEntry.Name())
+					versionDir := filepath.Join(appDir, appDirEntry.Name())
 					if err = handleLocalAppDetail(versionDir, &appDetail); err != nil {
 						global.LOG.Errorf(i18n.GetMsgWithMap("LocalAppVersionErr", map[string]interface{}{"name": app.Name, "version": appDetail.Version, "err": err.Error()}))
 						continue
@@ -742,7 +743,7 @@ func getAppFromRepo(downloadPath string) error {
 	downloadUrl := downloadPath
 	global.LOG.Infof("[AppStore] download file from %s", downloadUrl)
 	fileOp := files.NewFileOp()
-	packagePath := path.Join(constant.ResourceDir, path.Base(downloadUrl))
+	packagePath := filepath.Join(constant.ResourceDir, filepath.Base(downloadUrl))
 	if err := fileOp.DownloadFile(downloadUrl, packagePath); err != nil {
 		return err
 	}
@@ -760,7 +761,7 @@ func getAppList() (*dto.AppList, error) {
 	if err := getAppFromRepo(fmt.Sprintf("%s/%s/1panel.json.zip", global.CONF.System.AppRepo, global.CONF.System.Mode)); err != nil {
 		return nil, err
 	}
-	listFile := path.Join(constant.ResourceDir, "1panel.json")
+	listFile := filepath.Join(constant.ResourceDir, "1panel.json")
 	content, err := os.ReadFile(listFile)
 	if err != nil {
 		return nil, err
