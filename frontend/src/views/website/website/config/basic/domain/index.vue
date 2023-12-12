@@ -5,7 +5,7 @@
         </template>
         <el-table-column width="30px">
             <template #default="{ row }">
-                <el-button link :icon="Promotion" @click="openUrl(row.domain, row.port)"></el-button>
+                <el-button link :icon="Promotion" @click="openUrl(row)"></el-button>
             </template>
         </el-table-column>
         <el-table-column :label="$t('website.domain')" prop="domain"></el-table-column>
@@ -31,6 +31,7 @@ import { computed, onMounted, ref } from 'vue';
 import i18n from '@/lang';
 import { Promotion } from '@element-plus/icons-vue';
 import { GlobalStore } from '@/store';
+import { CheckAppInstalled } from '@/api/modules/app';
 const globalStore = GlobalStore();
 
 const props = defineProps({
@@ -50,6 +51,8 @@ const data = ref<Website.Domain[]>([]);
 const domainRef = ref();
 const website = ref<Website.WebsiteDTO>();
 const opRef = ref();
+const httpPort = ref(80);
+const httpsPort = ref(443);
 
 const buttons = [
     {
@@ -67,10 +70,14 @@ const openCreate = () => {
     domainRef.value.acceptParams(id.value);
 };
 
-const openUrl = (domain: string, port: string) => {
-    let url = website.value.protocol.toLowerCase() + '://' + domain;
-    if (port != '80') {
-        url = url + ':' + port;
+const openUrl = (domain: Website.Domain) => {
+    const protocol = website.value.protocol.toLowerCase();
+    let url = protocol + '://' + domain.domain;
+    if (protocol == 'http' && domain.port != 80) {
+        url = url + ':' + domain.port;
+    }
+    if (protocol == 'https') {
+        url = url + ':' + httpsPort.value;
     }
     window.open(url);
 };
@@ -97,12 +104,22 @@ const search = (id: number) => {
         .finally(() => {
             loading.value = false;
         });
+    onCheck();
 };
 
 const getWebsite = (id: number) => {
     GetWebsite(id).then((res) => {
         website.value = res.data;
     });
+};
+
+const onCheck = async () => {
+    await CheckAppInstalled('openresty', '')
+        .then((res) => {
+            httpPort.value = res.data.httpPort;
+            httpsPort.value = res.data.httpsPort;
+        })
+        .catch(() => {});
 };
 
 onMounted(() => {
