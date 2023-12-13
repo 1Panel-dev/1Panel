@@ -158,7 +158,7 @@ const acceptParams = (params: DialogProps): void => {
     if (dialogData.value.rowData.version.startsWith('10.')) {
         dialogData.value.rowData.version = '10.x';
     }
-    dialogData.value.rowData.hasCA = dialogData.value.rowData.rootCert?.length === 0;
+    dialogData.value.rowData.hasCA = dialogData.value.rowData.rootCert?.length !== 0;
     title.value = i18n.global.t('database.' + dialogData.value.title + 'RemoteDB');
     drawerVisible.value = true;
 };

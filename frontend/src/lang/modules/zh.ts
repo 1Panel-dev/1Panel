@@ -875,7 +875,8 @@ const message = {
         },
         device: {
             dnsHelper: '服务器地址域名解析',
-            dnsHelper1: '当存在多个DNS时，需换行显示，例：\n114.114.114.114\n8.8.8.8',
+            dnsAlert: '请注意！修改 /etc/resolv.conf 文件的配置时，重启系统后会将文件恢复为默认值',
+            dnsHelper1: '当存在多个 DNS 时，需换行显示，例：\n114.114.114.114\n8.8.8.8',
             hostsHelper: '主机名解析',
             hosts: '域名',
             toolbox: '工具箱',

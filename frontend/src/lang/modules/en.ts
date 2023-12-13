@@ -918,6 +918,8 @@ const message = {
         },
         device: {
             dnsHelper: 'Server Address Domain Resolution',
+            dnsAlert:
+                'Attention! Modifying the configuration of /etc/resolv.conf file will restore the file to its default values after system restart.',
             dnsHelper1:
                 'When there are multiple DNS entries, they should be displayed on new lines. e.g.\n114.114.114.114\n8.8.8.8',
             hostsHelper: 'Hostname Resolution',
