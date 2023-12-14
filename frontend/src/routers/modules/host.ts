@@ -1,7 +1,7 @@
 import { Layout } from '@/routers/constant';
 
 const hostRouter = {
-    sort: 7,
+    sort: 6,
     path: '/hosts',
     component: Layout,
     redirect: '/hosts/security',

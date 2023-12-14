@@ -878,7 +878,7 @@ const message = {
             dnsHelper1: '當存在多個DNS時，需換行顯示，例：\n114.114.114.114\n8.8.8.8',
             hostsHelper: '主機名解析',
             hosts: '域名',
-            toolbox: '工具箱',
+            toolbox: '快速設置',
             hostname: '主機名',
             passwd: '系統密碼',
             passwdHelper: '輸入的字符不能包含 $ 和 &',
