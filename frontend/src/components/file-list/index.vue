@@ -103,7 +103,7 @@ const rowName = ref('');
 const data = ref();
 const loading = ref(false);
 const paths = ref<string[]>([]);
-const req = reactive({ path: '/', expand: true, page: 1, pageSize: 300 });
+const req = reactive({ path: '/', expand: true, page: 1, pageSize: 300, showHidden: true });
 const selectRow = ref();
 const popoverVisible = ref(false);
 
@@ -196,13 +196,17 @@ const search = async (req: File.ReqFile) => {
 };
 
 onMounted(() => {
-    req.path = props.path;
+    if (props.path != '') {
+        req.path = props.path;
+    }
     rowName.value = '';
     search(req);
 });
 
 onUpdated(() => {
-    req.path = props.path;
+    if (props.path != '') {
+        req.path = props.path;
+    }
     search(req);
 });
 </script>
