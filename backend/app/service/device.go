@@ -55,10 +55,15 @@ func (u *DeviceService) LoadBaseInfo() (dto.DeviceBaseInfo, error) {
 	baseInfo.Hosts = loadHosts()
 	baseInfo.Hostname = loadHostname()
 	baseInfo.User = loadUser()
-	ntp, _ := settingRepo.Get(settingRepo.WithByKey("NtpSite"))
-	baseInfo.Ntp = ntp.Value
+	ntp, err := settingRepo.Get(settingRepo.WithByKey("NtpSite"))
+	if err == nil {
+		baseInfo.Ntp = ntp.Value
+	}
 
-	swapInfo, _ := mem.SwapMemory()
+	swapInfo, err := mem.SwapMemory()
+	if err != nil {
+		return baseInfo, err
+	}
 	baseInfo.SwapMemoryTotal = swapInfo.Total
 	baseInfo.SwapMemoryAvailable = swapInfo.Free
 	baseInfo.SwapMemoryUsed = swapInfo.Used
@@ -375,7 +380,7 @@ func loadUser() string {
 
 func loadSwap() []dto.SwapHelper {
 	var data []dto.SwapHelper
-	std, err := cmd.Execf("%s swapon --show --summary", cmd.SudoHandleCmd())
+	std, err := cmd.Execf("%s swapon --summary", cmd.SudoHandleCmd())
 	if err != nil {
 		return data
 	}

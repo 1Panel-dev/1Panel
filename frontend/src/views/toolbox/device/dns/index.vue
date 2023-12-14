@@ -5,7 +5,7 @@
                 <DrawerHeader header="DNS" :back="handleClose" />
             </template>
 
-            <el-row type="flex" justify="center">
+            <el-row type="flex" justify="center" v-loading="loading">
                 <el-col :span="22">
                     <el-alert
                         :title="$t('toolbox.device.dnsAlert')"
@@ -24,7 +24,6 @@
                         label-position="top"
                         @submit.prevent
                         :model="form"
-                        v-loading="loading"
                     >
                         <el-form-item label="DNS" prop="dns">
                             <el-input

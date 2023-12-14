@@ -1,11 +1,11 @@
 <template>
-    <div v-loading="loading">
+    <div>
         <el-drawer v-model="passwordVisible" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
             <template #header>
                 <DrawerHeader :header="$t('setting.changePassword')" :back="handleClose" />
             </template>
 
-            <el-row type="flex" justify="center">
+            <el-row type="flex" justify="center" v-loading="loading">
                 <el-col :span="22">
                     <el-form ref="formRef" label-position="top" :model="form" :rules="passRules">
                         <el-alert

@@ -1,5 +1,5 @@
 <template>
-    <div v-loading="loading">
+    <div>
         <el-drawer v-model="drawerVisible" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
             <template #header>
                 <DrawerHeader header="Swap" :back="handleClose" />

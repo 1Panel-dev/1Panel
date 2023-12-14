@@ -10102,7 +10102,7 @@ const docTemplate = `{
             }
         },
         "/toolbox/device/base": {
-            "get": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []

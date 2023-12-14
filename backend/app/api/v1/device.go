@@ -14,7 +14,7 @@ import (
 // @Description 获取设备基础信息
 // @Success 200 {object} dto.DeviceBaseInfo
 // @Security ApiKeyAuth
-// @Router /toolbox/device/base [get]
+// @Router /toolbox/device/base [post]
 func (b *BaseApi) LoadDeviceBaseInfo(c *gin.Context) {
 	data, err := deviceService.LoadBaseInfo()
 	if err != nil {
