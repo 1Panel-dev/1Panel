@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -26,6 +27,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/network"
+	"github.com/docker/docker/api/types/registry"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
 	"github.com/gorilla/websocket"
@@ -805,7 +807,25 @@ func checkImageExist(client *client.Client, image string) bool {
 }
 
 func pullImages(ctx context.Context, client *client.Client, image string) error {
-	out, err := client.ImagePull(ctx, image, types.ImagePullOptions{})
+	options := types.ImagePullOptions{}
+	repos, _ := imageRepoRepo.List()
+	if len(repos) != 0 {
+		for _, repo := range repos {
+			if strings.HasPrefix(image, repo.DownloadUrl) && repo.Auth {
+				authConfig := registry.AuthConfig{
+					Username: repo.Username,
+					Password: repo.Password,
+				}
+				encodedJSON, err := json.Marshal(authConfig)
+				if err != nil {
+					return err
+				}
+				authStr := base64.URLEncoding.EncodeToString(encodedJSON)
+				options.RegistryAuth = authStr
+			}
+		}
+	}
+	out, err := client.ImagePull(ctx, image, options)
 	if err != nil {
 		return err
 	}
