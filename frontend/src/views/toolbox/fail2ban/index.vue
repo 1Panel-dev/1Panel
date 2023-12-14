@@ -40,17 +40,14 @@
         </div>
 
         <div v-if="form.isExist">
-            <el-card v-if="!form.isActive" class="mask-prompt">
-                <span>{{ $t('toolbox.fail2ban.unActive') }}</span>
-            </el-card>
-            <LayoutContent title="Fail2ban" :divider="true" :class="{ mask: !form.isActive }">
+            <LayoutContent title="Fail2ban" :divider="true">
                 <template #toolbar>
                     <el-row>
                         <el-col :span="16">
-                            <el-button type="primary" plain @click="onLoadList('ignore')">
+                            <el-button :disabled="!form.isActive" type="primary" plain @click="onLoadList('ignore')">
                                 {{ $t('toolbox.fail2ban.ignoreIP') }}
                             </el-button>
-                            <el-button type="primary" plain @click="onLoadList('banned')">
+                            <el-button :disabled="!form.isActive" type="primary" plain @click="onLoadList('banned')">
                                 {{ $t('toolbox.fail2ban.bannedIP') }}
                             </el-button>
                         </el-col>
