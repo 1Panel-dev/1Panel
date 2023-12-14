@@ -879,7 +879,7 @@ const message = {
             dnsHelper1: '当存在多个 DNS 时，需换行显示，例：\n114.114.114.114\n8.8.8.8',
             hostsHelper: '主机名解析',
             hosts: '域名',
-            toolbox: '工具箱',
+            toolbox: '快速设置',
             hostname: '主机名',
             passwd: '系统密码',
             passwdHelper: '输入字符不能包含 $ 和 &',
