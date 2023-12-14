@@ -109,6 +109,7 @@ export namespace File {
         path: string;
         name: string;
         url: string;
+        ignoreCertificate?: boolean;
     }
 
     export interface FileWgetRes {
