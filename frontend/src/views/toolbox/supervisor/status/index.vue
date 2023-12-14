@@ -89,7 +89,7 @@ const setting = () => {
 };
 
 const toDoc = async () => {
-    window.open('https://1panel.cn/docs/user_manual/hosts/supervisor/', '_blank', 'noopener,noreferrer');
+    window.open('https://1panel.cn/docs/user_manual/toolbox/supervisor/', '_blank', 'noopener,noreferrer');
 };
 
 const init = async () => {
