@@ -1052,6 +1052,9 @@ const message = {
         fileRecycleBinMsg: '已{0}回收站',
         wordWrap: '自动换行',
         deleteHelper2: '确定删除所选文件？删除操作不可回滚',
+        ignoreCertificate: '忽略不可信证书',
+        ignoreCertificateHelper:
+            '下载时忽略不可信证书可能导致数据泄露或篡改。请谨慎使用此选项，仅在信任下载源的情况下启用',
     },
     ssh: {
         autoStart: '开机自启',

@@ -243,7 +243,7 @@ func (f *FileService) ChangeName(req request.FileRename) error {
 func (f *FileService) Wget(w request.FileWget) (string, error) {
 	fo := files.NewFileOp()
 	key := "file-wget-" + common.GetUuid()
-	return key, fo.DownloadFileWithProcess(w.Url, filepath.Join(w.Path, w.Name), key)
+	return key, fo.DownloadFileWithProcess(w.Url, filepath.Join(w.Path, w.Name), key, w.IgnoreCertificate)
 }
 
 func (f *FileService) MvFile(m request.FileMove) error {

@@ -1105,6 +1105,9 @@ const message = {
         wordWrap: 'Automatically wrap',
         deleteHelper2:
             'Are you sure you want to delete the selected file? The deletion operation cannot be rolled back',
+        ignoreCertificate: 'Ignore Certificate',
+        ignoreCertificateHelper:
+            'Ignoring untrusted certificates during downloads may lead to data leakage or tampering. Please use this option with caution, only when trusting the download source.',
     },
     ssh: {
         autoStart: 'Auto Start',

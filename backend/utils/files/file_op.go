@@ -216,11 +216,12 @@ func (w *WriteCounter) SaveProcess() {
 	}
 }
 
-func (f FileOp) DownloadFileWithProcess(url, dst, key string) error {
-	client := &http.Client{
-		Transport: &http.Transport{
+func (f FileOp) DownloadFileWithProcess(url, dst, key string, ignoreCertificate bool) error {
+	client := &http.Client{}
+	if ignoreCertificate {
+		client.Transport = &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		},
+		}
 	}
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {

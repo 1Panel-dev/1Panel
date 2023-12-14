@@ -77,9 +77,10 @@ type FilePathCheck struct {
 }
 
 type FileWget struct {
-	Url  string `json:"url" validate:"required"`
-	Path string `json:"path" validate:"required"`
-	Name string `json:"name" validate:"required"`
+	Url               string `json:"url" validate:"required"`
+	Path              string `json:"path" validate:"required"`
+	Name              string `json:"name" validate:"required"`
+	IgnoreCertificate bool   `json:"ignoreCertificate"`
 }
 
 type FileMove struct {
