@@ -39,12 +39,16 @@ func (u *Fail2BanService) LoadBaseInfo() (dto.Fail2BanBaseInfo, error) {
 	baseInfo.IsEnable, baseInfo.IsActive, baseInfo.IsExist = client.Status()
 	if !baseInfo.IsActive {
 		baseInfo.Version = "-"
-		return baseInfo, nil
+	} else {
+		baseInfo.Version = client.Version()
 	}
-	baseInfo.Version = client.Version()
 	conf, err := os.ReadFile(defaultFail2BanPath)
 	if err != nil {
-		return baseInfo, fmt.Errorf("read fail2ban conf of %s failed, err: %v", defaultFail2BanPath, err)
+		if baseInfo.IsActive {
+			return baseInfo, fmt.Errorf("read fail2ban conf of %s failed, err: %v", defaultFail2BanPath, err)
+		} else {
+			return baseInfo, nil
+		}
 	}
 	lines := strings.Split(string(conf), "\n")
 
