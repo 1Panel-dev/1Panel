@@ -11190,7 +11190,7 @@ paths:
         formatZH: 清理系统垃圾文件
         paramKeys: []
   /toolbox/device/base:
-    get:
+    post:
       description: 获取设备基础信息
       responses:
         "200":

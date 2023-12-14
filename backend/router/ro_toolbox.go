@@ -16,7 +16,7 @@ func (s *ToolboxRouter) InitToolboxRouter(Router *gin.RouterGroup) {
 		Use(middleware.PasswordExpired())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
-		toolboxRouter.GET("/device/base", baseApi.LoadDeviceBaseInfo)
+		toolboxRouter.POST("/device/base", baseApi.LoadDeviceBaseInfo)
 		toolboxRouter.GET("/device/zone/options", baseApi.LoadTimeOption)
 		toolboxRouter.POST("/device/update/conf", baseApi.UpdateDeviceConf)
 		toolboxRouter.POST("/device/update/host", baseApi.UpdateDeviceHost)

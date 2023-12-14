@@ -5,7 +5,7 @@
                 <DrawerHeader header="Hosts" :back="handleClose" />
             </template>
 
-            <el-row type="flex" justify="center">
+            <el-row type="flex" justify="center" v-loading="loading">
                 <el-col :span="22">
                     <el-radio-group v-model="confShowType" @change="changeMode">
                         <el-radio-button label="base">{{ $t('database.baseConf') }}</el-radio-button>

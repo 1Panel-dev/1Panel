@@ -5,7 +5,7 @@
                 <DrawerHeader :header="$t('toolbox.device.hostname')" :back="handleClose" />
             </template>
 
-            <el-row type="flex" justify="center">
+            <el-row type="flex" justify="center" v-loading="loading">
                 <el-col :span="22">
                     <el-alert
                         :title="$t('toolbox.device.hostnameHelper')"
@@ -13,7 +13,7 @@
                         :closable="false"
                         type="warning"
                     />
-                    <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
+                    <el-form ref="formRef" label-position="top" :model="form" @submit.prevent>
                         <el-form-item
                             :label="$t('toolbox.device.hostname')"
                             prop="hostname"
@@ -76,6 +76,7 @@ const onSaveHostame = async (formEl: FormInstance | undefined) => {
                 type: 'info',
             },
         ).then(async () => {
+            loading.value = true;
             await updateDevice('Hostname', form.hostname)
                 .then(async () => {
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

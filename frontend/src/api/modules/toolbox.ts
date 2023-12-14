@@ -6,16 +6,16 @@ import { TimeoutEnum } from '@/enums/http-enum';
 
 // device
 export const getDeviceBase = () => {
-    return http.get<Toolbox.DeviceBaseInfo>(`/toolbox/device/base`);
+    return http.post<Toolbox.DeviceBaseInfo>(`/toolbox/device/base`, {}, TimeoutEnum.T_60S);
 };
 export const loadTimeZoneOptions = () => {
     return http.get<Array<string>>(`/toolbox/device/zone/options`);
 };
 export const updateDevice = (key: string, value: string) => {
-    return http.post(`/toolbox/device/update/conf`, { key: key, value: value });
+    return http.post(`/toolbox/device/update/conf`, { key: key, value: value }, TimeoutEnum.T_60S);
 };
 export const updateDeviceHost = (param: Array<Toolbox.TimeZoneOptions>) => {
-    return http.post(`/toolbox/device/update/host`, param);
+    return http.post(`/toolbox/device/update/host`, param, TimeoutEnum.T_60S);
 };
 export const updateDevicePasswd = (user: string, passwd: string) => {
     return http.post(`/toolbox/device/update/passwd`, { user: user, passwd: Base64.encode(passwd) });
