@@ -17,44 +17,60 @@ import (
 	"github.com/mozillazg/go-pinyin"
 )
 
-func CompareVersion(version1 string, version2 string) bool {
-	if version1 == version2 {
-		return false
-	}
-	version1s := strings.Split(version1, ".")
-	version2s := strings.Split(version2, ".")
+func CompareVersion(version1, version2 string) bool {
+	v1s := extractNumbers(version1)
+	v2s := extractNumbers(version2)
 
-	if len(version2s) > len(version1s) {
-		for i := 0; i < len(version2s)-len(version1s); i++ {
-			version1s = append(version1s, "0")
-		}
-	}
-	if len(version1s) > len(version2s) {
-		for i := 0; i < len(version1s)-len(version2s); i++ {
-			version2s = append(version2s, "0")
-		}
-	}
+	maxLen := max(len(v1s), len(v2s))
+	v1s = append(v1s, make([]string, maxLen-len(v1s))...)
+	v2s = append(v2s, make([]string, maxLen-len(v2s))...)
 
-	n := min(len(version1s), len(version2s))
-	re := regexp.MustCompile("[0-9]+")
-	for i := 0; i < n; i++ {
-		sVersion1s := re.FindAllString(version1s[i], -1)
-		sVersion2s := re.FindAllString(version2s[i], -1)
-		if len(sVersion1s) == 0 {
-			return false
+	for i := 0; i < maxLen; i++ {
+		v1, err1 := strconv.Atoi(v1s[i])
+		v2, err2 := strconv.Atoi(v2s[i])
+		if err1 != nil {
+			v1 = 0
 		}
-		if len(sVersion2s) == 0 {
-			return false
+		if err2 != nil {
+			v2 = 0
 		}
-		v1num, _ := strconv.Atoi(sVersion1s[0])
-		v2num, _ := strconv.Atoi(sVersion2s[0])
-		if v1num == v2num {
-			continue
+		if v1 != v2 {
+			return v1 > v2
+		}
+	}
+	return false
+}
+
+func extractNumbers(version string) []string {
+	var numbers []string
+	start := -1
+	for i, r := range version {
+		if isDigit(r) {
+			if start == -1 {
+				start = i
+			}
 		} else {
-			return v1num > v2num
+			if start != -1 {
+				numbers = append(numbers, version[start:i])
+				start = -1
+			}
 		}
 	}
-	return true
+	if start != -1 {
+		numbers = append(numbers, version[start:])
+	}
+	return numbers
+}
+
+func isDigit(r rune) bool {
+	return r >= '0' && r <= '9'
+}
+
+func max(x, y int) int {
+	if x > y {
+		return x
+	}
+	return y
 }
 
 func GetSortedVersions(versions []string) []string {
