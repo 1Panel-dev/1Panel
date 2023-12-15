@@ -1398,8 +1398,6 @@ definitions:
     type: object
   dto.ImageTag:
     properties:
-      repoID:
-        type: integer
       sourceID:
         type: string
       targetName:
@@ -3300,6 +3298,8 @@ definitions:
     type: object
   request.FileWget:
     properties:
+      ignoreCertificate:
+        type: boolean
       name:
         type: string
       path:

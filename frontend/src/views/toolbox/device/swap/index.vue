@@ -147,7 +147,7 @@ const loadData = (path: string) => {
         item.size = itemSize.size;
         item.sizeUnit = itemSize.unit;
     }
-    if (!isExist && path !== '') {
+    if (!isExist) {
         form.swapDetails.push({
             path: path + '/.1panel_swap',
             size: 0,

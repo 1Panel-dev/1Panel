@@ -94,6 +94,8 @@ const acceptParams = (props: DialogProps): void => {
     form.hasName = props.image.indexOf('sha256:') === -1;
     if (form.hasName) {
         form.newImageName = props.image;
+    } else {
+        form.newImageName = '';
     }
     drawerVisible.value = true;
 };

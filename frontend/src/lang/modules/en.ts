@@ -635,6 +635,7 @@ const message = {
         imagePush: 'Image push',
         imageDelete: 'Image delete',
         imageDeleteTag: 'Image tag delete',
+        imageTagDeleteHelper: 'Remove other tags associated with this image ID',
         repoName: 'Repo Name',
         imageName: 'Image name',
         pull: 'Pull',

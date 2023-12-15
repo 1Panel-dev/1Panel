@@ -15453,9 +15453,6 @@
                 "targetName"
             ],
             "properties": {
-                "repoID": {
-                    "type": "integer"
-                },
                 "sourceID": {
                     "type": "string"
                 },
@@ -18294,6 +18291,9 @@
                 "url"
             ],
             "properties": {
+                "ignoreCertificate": {
+                    "type": "boolean"
+                },
                 "name": {
                     "type": "string"
                 },
