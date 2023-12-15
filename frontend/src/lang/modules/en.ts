@@ -588,18 +588,13 @@ const message = {
         privilegedHelper:
             'Allows the container to perform certain privileged operations on the host, which may increase container risks. Use with caution!',
 
-        upgradeHelper: 'This operation only supports upgrading container versions.',
-        ignoreCompare: 'Force Upgrade',
-        ignoreCompareHelper:
-            'Skip the comparison between old and new versions, upgrade directly. This operation may result in service unavailability.',
-        upgradeWarning: 'The target version is lower than the original image version. Please try again!',
+        upgradeHelper: 'Repository Name/Image Name: Image Version',
         upgradeWarning2:
-            'The upgrade operation requires rebuilding the container, and any non-persistent data will be lost. Do you want to continue?',
-        oldImage: 'Current image',
-        targetImage: 'Target image',
-        imageLoadErr: 'System did not detect the container image name, please manually enter the full image name:tag ',
-        appHelper:
-            'This container is sourced from the application store. Upgrading it may cause the service to be unavailable.',
+            'The upgrade operation requires rebuilding the container, any unpersisted data will be lost. Do you wish to continue?',
+        oldImage: 'Current Image',
+        targetImage: 'Target Image',
+        imageLoadErr: 'No image name detected for the container',
+        appHelper: 'This container is sourced from the app store; upgrading might render the service unavailable',
 
         input: 'Input',
         forcePull: 'forced image pull ',
@@ -1367,7 +1362,6 @@ const message = {
         rollbackHelper:
             'This recovery is about to be rolled back, which will replace all the files recovered this time. In the process, docker and 1panel services may need to be restarted. Do you want to continue?',
 
-        upgrading: 'Please wait while the upgrade is underway...',
         upgradeHelper: 'The upgrade requires a service restart. Do you want to continue?',
         noUpgrade: 'It is currently the latest version',
         versionHelper:
