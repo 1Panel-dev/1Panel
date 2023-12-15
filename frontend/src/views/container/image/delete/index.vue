@@ -17,7 +17,7 @@
                                     {{ $t('container.removeAll') }}
                                 </el-checkbox>
                             </div>
-                            <el-checkbox-group v-model="form.deleteTags" @change="handleCheckedCitiesChange">
+                            <el-checkbox-group v-model="form.deleteTags" @change="handleCheckedChange">
                                 <div>
                                     <el-checkbox
                                         style="width: 100%"
@@ -91,7 +91,7 @@ const handleCheckAllChange = (val: boolean) => {
     form.deleteTags = val ? form.tags : [];
     isIndeterminate.value = false;
 };
-const handleCheckedCitiesChange = (value: string[]) => {
+const handleCheckedChange = (value: string[]) => {
     const checkedCount = value.length;
     deleteAll.value = checkedCount === form.tags.length;
     isIndeterminate.value = checkedCount > 0 && checkedCount < form.tags.length;

@@ -617,6 +617,7 @@ const message = {
         imagePush: '推送鏡像',
         imageDelete: '刪除鏡像',
         imageDeleteTag: '刪除 Tag',
+        imageTagDeleteHelper: '移除與該映像 ID 相關聯的其他標籤',
         repoName: '倉庫名',
         imageName: '鏡像名',
         httpRepo: 'http 倉庫添加授信需要重啟 docker 服務',

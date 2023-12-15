@@ -133,7 +133,6 @@ export namespace Container {
         imageName: string;
     }
     export interface ImageTag {
-        repoID: number;
         sourceID: string;
         targetName: string;
     }

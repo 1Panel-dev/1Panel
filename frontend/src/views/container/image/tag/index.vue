@@ -1,7 +1,7 @@
 <template>
-    <el-drawer v-model="drawerVisible" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
+    <el-drawer v-model="drawerVisible" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
-            <DrawerHeader :header="$t('container.imageTag')" :resource="form.itemName" :back="handleClose" />
+            <DrawerHeader :header="$t('container.imageTag')" :back="handleClose" />
         </template>
         <el-form v-loading="loading" label-position="top" ref="formRef" :model="form" label-width="80px">
             <el-row type="flex" justify="center">
@@ -13,16 +13,29 @@
                         v-if="form.fromRepo"
                         :label="$t('container.repoName')"
                         :rules="Rules.requiredSelect"
-                        prop="repoID"
+                        prop="repo"
                     >
-                        <el-select style="width: 100%" filterable v-model="form.repoID">
-                            <el-option v-for="item in repos" :key="item.id" :value="item.id" :label="item.name" />
+                        <el-select style="width: 100%" filterable v-model="form.repo" @change="changeRepo">
+                            <el-option v-for="item in repos" :key="item.id" :value="item.name" :label="item.name" />
                         </el-select>
                     </el-form-item>
-                    <el-form-item :label="$t('container.imageName')" :rules="Rules.imageName" prop="targetName">
-                        <el-input v-model="form.targetName">
-                            <template v-if="form.fromRepo" #prepend>{{ loadDetailInfo(form.repoID) }}/</template>
-                        </el-input>
+                    <el-form-item :label="$t('container.imageTag')" :rules="Rules.imageName" prop="targetName">
+                        <el-input v-model="form.targetName" />
+                    </el-form-item>
+
+                    <el-form-item>
+                        <el-checkbox style="width: 100%" v-model="form.deleteTag">
+                            {{ $t('container.imageTagDeleteHelper') }}
+                        </el-checkbox>
+                        <el-checkbox-group class="ml-5" v-if="form.deleteTag" v-model="form.deleteTags">
+                            <el-checkbox
+                                style="width: 100%"
+                                v-for="item in tags"
+                                :key="item"
+                                :value="item"
+                                :label="item"
+                            />
+                        </el-checkbox-group>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -46,7 +59,7 @@ import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
-import { imageTag } from '@/api/modules/container';
+import { imageRemove, imageTag } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
@@ -55,28 +68,35 @@ const loading = ref(false);
 
 const drawerVisible = ref(false);
 const repos = ref();
+const tags = ref();
 const form = reactive({
-    itemName: '',
-    sourceID: '',
-    fromRepo: true,
-    repoID: 1,
+    imageID: '',
+    fromRepo: false,
+    repo: '',
+    originName: '',
     targetName: '',
+
+    deleteTag: false,
+    deleteTags: [],
 });
 
 interface DialogProps {
-    itemName: string;
     repos: Array<Container.RepoOptions>;
-    sourceID: string;
+    imageID: string;
+    tags: Array<string>;
 }
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
     drawerVisible.value = true;
-    form.repoID = 1;
-    form.itemName = params.itemName;
-    form.sourceID = params.sourceID;
-    form.targetName = '';
-    form.fromRepo = true;
+    form.imageID = params.imageID;
+    form.originName = params.tags?.length !== 0 ? params.tags[0] : '';
+    form.targetName = params.tags?.length !== 0 ? params.tags[0] : '';
+    form.fromRepo = false;
+    form.repo = '';
+    form.deleteTag = false;
+    form.deleteTags = [];
     repos.value = params.repos;
+    tags.value = params.tags;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -91,13 +111,17 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        if (!form.fromRepo) {
-            form.repoID = 0;
-        }
+        let params = {
+            sourceID: form.imageID,
+            targetName: form.targetName,
+        };
         loading.value = true;
-        await imageTag(form)
-            .then(() => {
+        await imageTag(params)
+            .then(async () => {
                 loading.value = false;
+                if (form.deleteTag && form.deleteTags.length !== 0) {
+                    await imageRemove({ names: form.deleteTags });
+                }
                 drawerVisible.value = false;
                 emit('search');
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -108,14 +132,18 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     });
 };
 
-function loadDetailInfo(id: number) {
+const changeRepo = (val) => {
+    if (val === 'Docker Hub') {
+        form.targetName = form.originName;
+        return;
+    }
     for (const item of repos.value) {
-        if (item.id === id) {
-            return item.downloadUrl;
+        if (item.name == val) {
+            form.targetName = item.downloadUrl + '/' + form.originName;
+            return;
         }
     }
-    return '';
-}
+};
 
 defineExpose({
     acceptParams,

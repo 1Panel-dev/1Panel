@@ -15460,9 +15460,6 @@ const docTemplate = `{
                 "targetName"
             ],
             "properties": {
-                "repoID": {
-                    "type": "integer"
-                },
                 "sourceID": {
                     "type": "string"
                 },
@@ -18301,6 +18298,9 @@ const docTemplate = `{
                 "url"
             ],
             "properties": {
+                "ignoreCertificate": {
+                    "type": "boolean"
+                },
                 "name": {
                     "type": "string"
                 },

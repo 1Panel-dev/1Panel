@@ -27,7 +27,6 @@ type ImagePull struct {
 }
 
 type ImageTag struct {
-	RepoID     uint   `json:"repoID"`
 	SourceID   string `json:"sourceID" validate:"required"`
 	TargetName string `json:"targetName" validate:"required"`
 }
