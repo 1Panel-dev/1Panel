@@ -12,6 +12,7 @@ type IAcmeAccountRepo interface {
 	Save(account model.WebsiteAcmeAccount) error
 	DeleteBy(opts ...DBOption) error
 	WithEmail(email string) DBOption
+	WithType(acType string) DBOption
 }
 
 func NewIAcmeAccountRepo() IAcmeAccountRepo {
@@ -24,6 +25,11 @@ type WebsiteAcmeAccountRepo struct {
 func (w *WebsiteAcmeAccountRepo) WithEmail(email string) DBOption {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("email = ?", email)
+	}
+}
+func (w *WebsiteAcmeAccountRepo) WithType(acType string) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("type = ?", acType)
 	}
 }
 
