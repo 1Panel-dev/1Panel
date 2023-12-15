@@ -35,7 +35,7 @@ func (w WebsiteAcmeAccountService) Page(search dto.PageInfo) (int64, []response.
 }
 
 func (w WebsiteAcmeAccountService) Create(create request.WebsiteAcmeAccountCreate) (*response.WebsiteAcmeAccountDTO, error) {
-	exist, _ := websiteAcmeRepo.GetFirst(websiteAcmeRepo.WithEmail(create.Email))
+	exist, _ := websiteAcmeRepo.GetFirst(websiteAcmeRepo.WithEmail(create.Email), websiteAcmeRepo.WithType(create.Type))
 	if exist != nil {
 		return nil, buserr.New(constant.ErrEmailIsExist)
 	}

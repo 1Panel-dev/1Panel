@@ -40,7 +40,12 @@
                                     :key="index"
                                     :label="acme.email"
                                     :value="acme.id"
-                                ></el-option>
+                                >
+                                    <span>
+                                        {{ acme.email }}
+                                        <el-tag class="ml-5">{{ getAccountName(acme.type) }}</el-tag>
+                                    </span>
+                                </el-option>
                             </el-select>
                         </el-form-item>
                         <el-form-item :label="$t('website.ssl')" prop="websiteSSLId" :hide-required-asterisk="true">
@@ -162,7 +167,7 @@ import { ElMessageBox, FormInstance } from 'element-plus';
 import { computed, onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
-import { dateFormatSimple, getProvider } from '@/utils/util';
+import { dateFormatSimple, getProvider, getAccountName } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';
 import FileList from '@/components/file-list/index.vue';
 
