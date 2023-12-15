@@ -94,6 +94,7 @@ import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { Close } from '@element-plus/icons-vue';
+import { TimeoutEnum } from '@/enums/http-enum';
 
 interface UploadFileProps {
     path: string;
@@ -235,7 +236,7 @@ const submit = async () => {
         const fileSize = file.size;
 
         uploadHelper.value = i18n.global.t('file.fileUploadStart', [file.name]);
-        if (fileSize <= 1024 * 1024 * 10) {
+        if (fileSize <= 1024 * 1024 * 5) {
             const formData = new FormData();
             formData.append('file', file.raw);
             if (file.raw.webkitRelativePath != '') {
@@ -254,7 +255,7 @@ const submit = async () => {
             success++;
             uploaderFiles.value[i].status = 'success';
         } else {
-            const CHUNK_SIZE = 1024 * 1024 * 10;
+            const CHUNK_SIZE = 1024 * 1024 * 5;
             const chunkCount = Math.ceil(fileSize / CHUNK_SIZE);
             let uploadedChunkCount = 0;
             for (let c = 0; c < chunkCount; c++) {
@@ -281,7 +282,7 @@ const submit = async () => {
                             );
                             uploadPrecent.value = progress;
                         },
-                        timeout: 40000,
+                        timeout: TimeoutEnum.T_60S,
                     });
                     uploadedChunkCount++;
                 } catch (error) {
