@@ -571,14 +571,11 @@ const message = {
         privileged: '特權模式',
         privilegedHelper: '允許容器在主機上執行某些特權操作，可能會增加容器風險，請謹慎開啟！',
 
-        upgradeHelper: '該操作僅支持容器版本升級',
-        ignoreCompare: '強製升級',
-        ignoreCompareHelper: '跳過新老版本比較，直接升級，該操作可能導致服務不可用',
-        upgradeWarning: '當前目標版本低於原鏡像版本，請重新輸入！',
+        upgradeHelper: '倉庫名稱/鏡像名稱:鏡像版本',
         upgradeWarning2: '升級操作需要重建容器，任何未持久化的數據將會丟失，是否繼續？',
         oldImage: '當前鏡像',
         targetImage: '目標鏡像',
-        imageLoadErr: '系統未檢測到容器的鏡像名稱，請手動輸入完整的鏡像名稱:標籤',
+        imageLoadErr: '未檢測到容器的鏡像名稱',
         appHelper: '該容器來源於應用商店，升級可能導致該服務不可用',
 
         input: '手動輸入',

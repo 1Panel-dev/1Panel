@@ -1,14 +1,14 @@
 <template>
     <el-drawer v-model="drawerVisible" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
-            <DrawerHeader :header="$t('commons.button.upgrade')" :resource="form.name" :back="handleClose" />
+            <DrawerHeader :header="$t('commons.button.upgrade')" :resource="form.containerName" :back="handleClose" />
         </template>
 
         <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
                 <el-alert
-                    v-if="form.fromApp"
                     :title="$t('container.appHelper')"
+                    v-if="form.fromApp"
                     class="common-prompt"
                     :closable="false"
                     type="error"
@@ -26,29 +26,13 @@
                     </el-form-item>
                     <el-form-item prop="newImageName" :rules="Rules.imageName">
                         <template #label>
-                            <el-tooltip
-                                placement="top-start"
-                                :content="form.imageHelper"
-                                v-if="form.imageHelper.length > 40"
-                            >
-                                <span>
-                                    {{
-                                        $t('container.targetImage') + ' (' + form.imageHelper.substring(0, 40) + '...)'
-                                    }}
-                                </span>
-                            </el-tooltip>
-                            <span v-else>
-                                {{ $t('container.targetImage') + ' (' + form.imageHelper + ')' }}
+                            {{ $t('container.targetImage') }}
+                            <span v-if="!form.hasName">
+                                {{ ' (' + $t('container.imageLoadErr') + ')' }}
                             </span>
                         </template>
-                        <el-input v-model="form.newImageName" :placeholder="$t('container.imageNameHelper')" />
+                        <el-input v-model="form.newImageName" />
                         <span class="input-help">{{ $t('container.upgradeHelper') }}</span>
-                    </el-form-item>
-                    <el-form-item prop="ignoreCompare">
-                        <el-checkbox v-model="form.ignoreCompare">
-                            {{ $t('container.ignoreCompare') }}
-                        </el-checkbox>
-                        <span class="input-help">{{ $t('container.ignoreCompareHelper') }}</span>
                     </el-form-item>
                     <el-form-item prop="forcePull">
                         <el-checkbox v-model="form.forcePull">
@@ -76,7 +60,7 @@
 import { upgradeContainer } from '@/api/modules/container';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { MsgSuccess, MsgWarning } from '@/utils/message';
+import { MsgSuccess } from '@/utils/message';
 import { ElForm } from 'element-plus';
 import { reactive, ref } from 'vue';
 import DrawerHeader from '@/components/drawer-header/index.vue';
@@ -84,14 +68,13 @@ import DrawerHeader from '@/components/drawer-header/index.vue';
 const loading = ref(false);
 
 const form = reactive({
-    name: '',
+    containerName: '',
     oldImageName: '',
     newImageName: '',
-    imageHelper: '',
+    hasName: true,
+
     fromApp: false,
     forcePull: false,
-
-    ignoreCompare: false,
 });
 
 const formRef = ref<FormInstance>();
@@ -105,17 +88,13 @@ interface DialogProps {
     fromApp: boolean;
 }
 const acceptParams = (props: DialogProps): void => {
-    form.name = props.container;
+    form.containerName = props.container;
     form.oldImageName = props.image;
     form.fromApp = props.fromApp;
-    form.ignoreCompare = false;
-
-    if (props.image.indexOf('sha256:') !== -1) {
-        form.imageHelper = i18n.global.t('container.imageLoadErr');
-        drawerVisible.value = true;
-        return;
+    form.hasName = props.image.indexOf('sha256:') === -1;
+    if (form.hasName) {
+        form.newImageName = props.image;
     }
-    form.imageHelper = props.image.indexOf(':') !== -1 ? props.image.split(':')[0] : props.image;
     drawerVisible.value = true;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
@@ -124,16 +103,12 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        if (!form.ignoreCompare && !compareVersion(form.newImageName, form.oldImageName)) {
-            MsgWarning(i18n.global.t('container.upgradeWarning'));
-            return;
-        }
         ElMessageBox.confirm(i18n.global.t('container.upgradeWarning2'), i18n.global.t('commons.button.upgrade'), {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),
         }).then(async () => {
             loading.value = true;
-            await upgradeContainer(form.name, form.newImageName, form.forcePull)
+            await upgradeContainer(form.containerName, form.newImageName, form.forcePull)
                 .then(() => {
                     loading.value = false;
                     emit('search');
@@ -150,41 +125,6 @@ const handleClose = async () => {
     drawerVisible.value = false;
     emit('search');
 };
-
-function compareVersion(vNew, vOld) {
-    let newImageName = vNew.indexOf(':') !== -1 ? vNew.split(':')[0] : vNew;
-    let oldImageName = vOld.indexOf(':') !== -1 ? vOld.split(':')[0] : vOld;
-    if (newImageName !== oldImageName) {
-        return true;
-    }
-    let newTag = vNew.indexOf(':') !== -1 ? vNew.split(':')[1] : 'latest';
-
-    if (newTag === 'latest') {
-        return true;
-    }
-    let oldTag = vOld.indexOf(':') !== -1 ? vOld.split(':')[1] : 'latest';
-    let v1 = newTag
-        .replace('-', '.')
-        .replace(/[^\d.]/g, '')
-        .split('.');
-    let v2 = oldTag
-        .replace('-', '.')
-        .replace(/[^\d.]/g, '')
-        .split('.');
-
-    for (let i = 0; i < Math.max(v1.length, v2.length); i++) {
-        let num1 = parseInt(v1[i] || 0);
-        let num2 = parseInt(v2[i] || 0);
-
-        if (num1 > num2) {
-            return true;
-        } else if (num1 < num2) {
-            return false;
-        }
-    }
-
-    return false;
-}
 
 defineExpose({
     acceptParams,

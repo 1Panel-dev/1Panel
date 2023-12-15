@@ -572,14 +572,11 @@ const message = {
         privileged: '特权模式',
         privilegedHelper: '允许容器在主机上执行某些特权操作，可能会增加容器风险，谨慎开启！',
 
-        upgradeHelper: '该操作仅支持容器版本升级',
-        ignoreCompare: '强制升级',
-        ignoreCompareHelper: '跳过新老版本比较，直接升级，该操作可能导致服务不可用',
-        upgradeWarning: '当前目标版本低于原镜像版本，请重新输入！',
+        upgradeHelper: '仓库名称/镜像名称:镜像版本',
         upgradeWarning2: '升级操作需要重建容器，任何未持久化的数据将会丢失，是否继续？',
         oldImage: '当前镜像',
         targetImage: '目标镜像',
-        imageLoadErr: '系统未检测到容器的镜像名称，请手动输入完整的镜像名称:标签',
+        imageLoadErr: '未检测到容器的镜像名称',
         appHelper: '该容器来源于应用商店，升级可能导致该服务不可用',
 
         input: '手动输入',

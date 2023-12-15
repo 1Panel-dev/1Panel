@@ -36,7 +36,7 @@
                     :config="logConfig"
                     :default-button="false"
                     v-if="showLog"
-                    :style="'height: calc(100vh - 370px);min-height: 200px'"
+                    :style="'height: calc(100vh - 397px);min-height: 200px'"
                 />
             </el-col>
         </el-row>
