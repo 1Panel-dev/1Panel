@@ -24,6 +24,9 @@
                         <span class="input-help" v-if="account.type === 'buypass'">
                             {{ $t('ssl.buypassHelper') }}
                         </span>
+                        <span class="input-help" v-if="account.type == 'google'">
+                            {{ $t('ssl.googleCloudHelper') }}
+                        </span>
                     </el-form-item>
                     <el-form-item :label="$t('website.keyType')" prop="keyType">
                         <el-select v-model="account.keyType">
@@ -34,7 +37,6 @@
                                 :value="keyType.value"
                             ></el-option>
                         </el-select>
-                        <span class="input-help">{{ $t('ssl.googleCloudHelper') }}</span>
                     </el-form-item>
                     <div v-if="account.type == 'google'">
                         <el-form-item label="EAB kid" prop="eabKid">

@@ -11863,6 +11863,39 @@ paths:
     post:
       consumes:
       - application/json
+      description: 自签 SSL 证书
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteCAObtain'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Obtain SSL
+      tags:
+      - Website CA
+      x-panel-log:
+        BeforeFunctions:
+        - db: website_cas
+          input_column: id
+          input_value: id
+          isList: false
+          output_column: name
+          output_value: name
+        bodyKeys:
+        - id
+        formatEN: Obtain SSL [name]
+        formatZH: 自签 SSL 证书 [name]
+        paramKeys: []
+  /websites/ca/renew:
+    post:
+      consumes:
+      - application/json
       description: 续签 SSL 证书
       parameters:
       - description: request

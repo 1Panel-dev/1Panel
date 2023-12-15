@@ -124,7 +124,7 @@ func (b *BaseApi) ObtainWebsiteCA(c *gin.Context) {
 // @Param request body request.WebsiteCAObtain true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /websites/ca/obtain [post]
+// @Router /websites/ca/renew [post]
 // @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"website_cas","output_column":"name","output_value":"name"}],"formatZH":"自签 SSL 证书 [name]","formatEN":"Obtain SSL [name]"}
 func (b *BaseApi) RenewWebsiteCA(c *gin.Context) {
 	var req request.WebsiteCARenew

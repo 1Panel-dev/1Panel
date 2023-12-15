@@ -1768,6 +1768,7 @@ const message = {
         googleHelper:
             "<a target=“_blank” href='https://cloud.google.com/certificate-manager/docs/public-ca-tutorial?hl=zh-cn'>如何获取 EAB HmacKey 和 EAB kid</a> ",
         googleCloudHelper: 'Google Cloud API 大陆大部分地区无法访问',
+        httpHelper2: 'HTTP 模式无法申请泛域名证书',
     },
     firewall: {
         create: '创建规则',
