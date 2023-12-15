@@ -67,6 +67,9 @@
                         <span class="input-help" v-if="ssl.provider === 'http'">
                             {{ $t('ssl.httpHelper') }}
                         </span>
+                        <span class="input-help text-red-500" v-if="ssl.provider === 'http'">
+                            {{ $t('ssl.httpHelper2') }}
+                        </span>
                     </el-form-item>
                     <el-form-item
                         :label="$t('website.dnsAccount')"

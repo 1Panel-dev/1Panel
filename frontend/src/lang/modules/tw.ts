@@ -1768,6 +1768,7 @@ const message = {
         googleHelper:
             "<a target=“_blank” href='https://cloud.google.com/certificate-manager/docs/public-ca-tutorial?hl=zh-cn'>如何取得EAB HmacKey 和EAB kid</a > ",
         googleCloudHelper: 'Google Cloud API 大陸大部分地區無法存取',
+        httpHelper2: 'HTTP 模式無法申請泛網域憑證',
     },
     firewall: {
         create: '創建規則',
