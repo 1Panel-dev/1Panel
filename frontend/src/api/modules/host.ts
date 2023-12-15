@@ -126,6 +126,3 @@ export const loadSecret = (mode: string) => {
 export const loadSSHLogs = (params: Host.searchSSHLog) => {
     return http.post<Host.sshLog>(`/hosts/ssh/log`, params);
 };
-export const loadAnalysis = (params: Host.analysisSSHLog) => {
-    return http.post<Host.logAnalysisRes>(`/hosts/ssh/log/analysis`, params, TimeoutEnum.T_40S);
-};
