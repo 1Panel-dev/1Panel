@@ -132,28 +132,6 @@ func (b *BaseApi) LoadSSHSecret(c *gin.Context) {
 }
 
 // @Tags SSH
-// @Summary Analysis host SSH logs
-// @Description 分析 SSH 登录日志
-// @Accept json
-// @Param request body dto.SearchForAnalysis true "request"
-// @Success 200 {array} dto.SSHLogAnalysis
-// @Security ApiKeyAuth
-// @Router /host/ssh/log/analysis [post]
-func (b *BaseApi) AnalysisLog(c *gin.Context) {
-	var req dto.SearchForAnalysis
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	data, err := sshService.AnalysisLog(req)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	helper.SuccessWithData(c, data)
-}
-
-// @Tags SSH
 // @Summary Load host SSH logs
 // @Description 获取 SSH 登录日志
 // @Accept json
