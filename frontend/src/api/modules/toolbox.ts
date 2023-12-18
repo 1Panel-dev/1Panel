@@ -18,13 +18,13 @@ export const updateDeviceHost = (param: Array<Toolbox.TimeZoneOptions>) => {
     return http.post(`/toolbox/device/update/host`, param, TimeoutEnum.T_60S);
 };
 export const updateDevicePasswd = (user: string, passwd: string) => {
-    return http.post(`/toolbox/device/update/passwd`, { user: user, passwd: Base64.encode(passwd) });
+    return http.post(`/toolbox/device/update/passwd`, { user: user, passwd: Base64.encode(passwd) }, TimeoutEnum.T_60S);
 };
 export const updateDeviceSwap = (params: Toolbox.SwapHelper) => {
-    return http.post(`/toolbox/device/update/swap`, params, TimeoutEnum.T_5M);
+    return http.post(`/toolbox/device/update/swap`, params, TimeoutEnum.T_60S);
 };
 export const updateDeviceByConf = (name: string, file: string) => {
-    return http.post(`/toolbox/device/update/byconf`, { name: name, file: file });
+    return http.post(`/toolbox/device/update/byconf`, { name: name, file: file }, TimeoutEnum.T_5M);
 };
 export const checkDNS = (key: string, value: string) => {
     return http.post(`/toolbox/device/check/dns`, { key: key, value: value });
@@ -54,17 +54,17 @@ export const searchFail2ban = (param: Toolbox.Fail2banSearch) => {
 };
 
 export const operateFail2ban = (operate: string) => {
-    return http.post(`/toolbox/fail2ban/operate`, { operation: operate });
+    return http.post(`/toolbox/fail2ban/operate`, { operation: operate }, TimeoutEnum.T_5M);
 };
 
 export const operatorFail2banSSHD = (param: Toolbox.Fail2banSet) => {
-    return http.post(`/toolbox/fail2ban/operate/sshd`, param);
+    return http.post(`/toolbox/fail2ban/operate/sshd`, param, TimeoutEnum.T_5M);
 };
 
 export const updateFail2ban = (param: Toolbox.Fail2banUpdate) => {
-    return http.post(`/toolbox/fail2ban/update`, param);
+    return http.post(`/toolbox/fail2ban/update`, param, TimeoutEnum.T_5M);
 };
 
 export const updateFail2banByFile = (param: UpdateByFile) => {
-    return http.post(`/toolbox/fail2ban/update/byconf`, param);
+    return http.post(`/toolbox/fail2ban/update/byconf`, param, TimeoutEnum.T_5M);
 };
