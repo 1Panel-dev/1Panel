@@ -1132,6 +1132,7 @@ definitions:
         enum:
         - start
         - stop
+        - restart
         - disablePing
         - enablePing
         type: string
