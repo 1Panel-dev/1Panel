@@ -1791,6 +1791,7 @@ const message = {
         unUsed: '未使用',
         firewallHelper: '{0}系统防火墙',
         firewallNotStart: '当前未开启系统防火墙，请先开启！',
+        restartFirewallHelper: '该操作将对当前防火墙进行重启操作，是否继续？',
         stopFirewallHelper: '系统防火墙关闭后，服务器将失去安全防护，是否继续？',
         startFirewallHelper: '系统防火墙开启后，可以更好的防护服务器安全，是否继续？',
         noPing: '禁 ping',

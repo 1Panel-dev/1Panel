@@ -1907,6 +1907,7 @@ const message = {
         unUsed: 'Unused',
         firewallHelper: '{0} System firewall',
         firewallNotStart: 'The system firewall is not enabled at present, please enable it first!',
+        restartFirewallHelper: 'This operation will restart the current firewall. Do you want to continue?',
         stopFirewallHelper:
             'After the system firewall is disabled, the server loses security protection. Do you want to continue?',
         startFirewallHelper:
