@@ -414,14 +414,28 @@ func (w WebsiteSSLService) Upload(req request.WebsiteSSLUpload) error {
 		return buserr.New("ErrSSLKeyFormat")
 	}
 
-	certBlock, _ := pem.Decode([]byte(websiteSSL.Pem))
-	if certBlock == nil {
+	var (
+		cert    *x509.Certificate
+		pemData = []byte(websiteSSL.Pem)
+	)
+	for {
+		certBlock, reset := pem.Decode(pemData)
+		if certBlock == nil {
+			break
+		}
+		cert, err = x509.ParseCertificate(certBlock.Bytes)
+		if err != nil {
+			return err
+		}
+		if len(cert.DNSNames) > 0 || len(cert.IPAddresses) > 0 {
+			break
+		}
+		pemData = reset
+	}
+	if pemData == nil {
 		return buserr.New("ErrSSLCertificateFormat")
 	}
-	cert, err := x509.ParseCertificate(certBlock.Bytes)
-	if err != nil {
-		return err
-	}
+
 	websiteSSL.ExpireDate = cert.NotAfter
 	websiteSSL.StartDate = cert.NotBefore
 	websiteSSL.Type = cert.Issuer.CommonName

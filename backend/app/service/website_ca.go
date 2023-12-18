@@ -92,9 +92,6 @@ func (w WebsiteCAService) Create(create request.WebsiteCACreate) (*request.Websi
 		MaxPathLenZero:        false,
 		KeyUsage:              x509.KeyUsageCertSign | x509.KeyUsageCRLSign,
 	}
-	var (
-		caPEM = new(bytes.Buffer)
-	)
 
 	interPrivateKey, interPublicKey, privateBytes, err := createPrivateKey(create.KeyType)
 	if err != nil {
@@ -102,15 +99,15 @@ func (w WebsiteCAService) Create(create request.WebsiteCACreate) (*request.Websi
 	}
 	ca.PrivateKey = string(privateBytes)
 
-	caBytes, err := x509.CreateCertificate(rand.Reader, rootCA, rootCA, interPublicKey, interPrivateKey)
+	rootDer, err := x509.CreateCertificate(rand.Reader, rootCA, rootCA, interPublicKey, interPrivateKey)
 	if err != nil {
 		return nil, err
 	}
+	rootCert, err := x509.ParseCertificate(rootDer)
 	certBlock := &pem.Block{
 		Type:  "CERTIFICATE",
-		Bytes: caBytes,
+		Bytes: rootCert.Raw,
 	}
-	_ = pem.Encode(caPEM, certBlock)
 	pemData := pem.EncodeToMemory(certBlock)
 	ca.CSR = string(pemData)
 
@@ -297,15 +294,26 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 	if err != nil {
 		return nil, err
 	}
-
+	interCertBlock := &pem.Block{
+		Type:  "CERTIFICATE",
+		Bytes: interCert.Raw,
+	}
 	_, publicKey, privateKeyBytes, err := createPrivateKey(websiteSSL.KeyType)
 	if err != nil {
 		return nil, err
 	}
-
+	commonName := ""
+	if len(domains) > 0 {
+		commonName = domains[0]
+	}
+	if len(ips) > 0 {
+		commonName = ips[0].String()
+	}
+	subject := rootCsr.Subject
+	subject.CommonName = commonName
 	csr := &x509.Certificate{
 		SerialNumber:          big.NewInt(time.Now().Unix()),
-		Subject:               rootCsr.Subject,
+		Subject:               subject,
 		NotBefore:             time.Now(),
 		NotAfter:              notAfter,
 		BasicConstraintsValid: true,
@@ -329,8 +337,7 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 		Type:  "CERTIFICATE",
 		Bytes: cert.Raw,
 	}
-	pemData := pem.EncodeToMemory(certBlock)
-	websiteSSL.Pem = string(pemData)
+	websiteSSL.Pem = string(pem.EncodeToMemory(certBlock)) + string(pem.EncodeToMemory(rootCertBlock)) + string(pem.EncodeToMemory(interCertBlock))
 	websiteSSL.PrivateKey = string(privateKeyBytes)
 	websiteSSL.ExpireDate = cert.NotAfter
 	websiteSSL.StartDate = cert.NotBefore
