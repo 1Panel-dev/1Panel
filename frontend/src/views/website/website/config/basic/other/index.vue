@@ -5,6 +5,9 @@
                 <el-form-item :label="$t('website.primaryDomain')" prop="primaryDomain">
                     <el-input v-model="form.primaryDomain"></el-input>
                 </el-form-item>
+                <el-form-item :label="$t('website.alias')" prop="primaryDomain">
+                    <el-input v-model="form.alias" disabled></el-input>
+                </el-form-item>
                 <el-form-item :label="$t('website.group')" prop="webSiteGroupID">
                     <el-select v-model="form.webSiteGroupId">
                         <el-option
@@ -21,6 +24,7 @@
                 <el-form-item prop="IPV6">
                     <el-checkbox v-model="form.IPV6" :label="$t('website.ipv6')" size="large" />
                 </el-form-item>
+
                 <el-form-item>
                     <el-button type="primary" @click="submit(websiteForm)" :disabled="loading">
                         {{ $t('commons.button.save') }}
@@ -58,6 +62,7 @@ const form = reactive({
     remark: '',
     webSiteGroupId: 0,
     IPV6: false,
+    alias: '',
 });
 const rules = ref({
     primaryDomain: [Rules.requiredInput],
@@ -91,6 +96,7 @@ const search = async () => {
         form.remark = res.data.remark;
         form.webSiteGroupId = res.data.webSiteGroupId;
         form.IPV6 = res.data.IPV6;
+        form.alias = res.data.alias;
     });
 };
 

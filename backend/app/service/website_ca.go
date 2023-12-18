@@ -104,6 +104,9 @@ func (w WebsiteCAService) Create(create request.WebsiteCACreate) (*request.Websi
 		return nil, err
 	}
 	rootCert, err := x509.ParseCertificate(rootDer)
+	if err != nil {
+		return nil, err
+	}
 	certBlock := &pem.Block{
 		Type:  "CERTIFICATE",
 		Bytes: rootCert.Raw,

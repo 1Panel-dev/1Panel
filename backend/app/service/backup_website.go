@@ -25,7 +25,7 @@ func (u *BackupService) WebsiteBackup(req dto.CommonBackup) error {
 	if err != nil {
 		return err
 	}
-	website, err := websiteRepo.GetFirst(websiteRepo.WithDomain(req.Name))
+	website, err := websiteRepo.GetFirst(websiteRepo.WithAlias(req.DetailName))
 	if err != nil {
 		return err
 	}
@@ -40,7 +40,7 @@ func (u *BackupService) WebsiteBackup(req dto.CommonBackup) error {
 	record := &model.BackupRecord{
 		Type:       "website",
 		Name:       website.PrimaryDomain,
-		DetailName: "",
+		DetailName: req.DetailName,
 		Source:     "LOCAL",
 		BackupType: "LOCAL",
 		FileDir:    backupDir,
@@ -54,13 +54,13 @@ func (u *BackupService) WebsiteBackup(req dto.CommonBackup) error {
 }
 
 func (u *BackupService) WebsiteRecover(req dto.CommonRecover) error {
-	website, err := websiteRepo.GetFirst(websiteRepo.WithDomain(req.Name))
-	if err != nil {
-		return err
-	}
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(req.File) {
 		return errors.New(fmt.Sprintf("%s file is not exist", req.File))
+	}
+	website, err := websiteRepo.GetFirst(websiteRepo.WithAlias(req.DetailName))
+	if err != nil {
+		return err
 	}
 	global.LOG.Infof("recover website %s from backup file %s", req.Name, req.File)
 	if err := handleWebsiteRecover(&website, req.File, false); err != nil {
@@ -79,15 +79,6 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 		_ = os.RemoveAll(tmpPath)
 	}()
 
-	temPathWithName := tmpPath + "/" + website.Alias
-	if !fileOp.Stat(tmpPath+"/website.json") || !fileOp.Stat(temPathWithName+".conf") || !fileOp.Stat(temPathWithName+".web.tar.gz") {
-		return buserr.WithDetail(constant.ErrBackupExist, ".conf or .web.tar.gz", nil)
-	}
-	if website.Type == constant.Deployment {
-		if !fileOp.Stat(temPathWithName + ".app.tar.gz") {
-			return buserr.WithDetail(constant.ErrBackupExist, ".app.tar.gz", nil)
-		}
-	}
 	var oldWebsite model.Website
 	websiteJson, err := os.ReadFile(tmpPath + "/website.json")
 	if err != nil {
@@ -99,6 +90,16 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 
 	if err := checkValidOfWebsite(&oldWebsite, website); err != nil {
 		return err
+	}
+
+	temPathWithName := tmpPath + "/" + website.Alias
+	if !fileOp.Stat(tmpPath+"/website.json") || !fileOp.Stat(temPathWithName+".conf") || !fileOp.Stat(temPathWithName+".web.tar.gz") {
+		return buserr.WithDetail(constant.ErrBackupExist, ".conf or .web.tar.gz", nil)
+	}
+	if website.Type == constant.Deployment {
+		if !fileOp.Stat(temPathWithName + ".app.tar.gz") {
+			return buserr.WithDetail(constant.ErrBackupExist, ".app.tar.gz", nil)
+		}
 	}
 
 	isOk := false

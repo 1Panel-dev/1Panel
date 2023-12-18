@@ -19,6 +19,7 @@ type IBackupRepo interface {
 	Update(id uint, vars map[string]interface{}) error
 	Delete(opts ...DBOption) error
 	DeleteRecord(ctx context.Context, opts ...DBOption) error
+	UpdateRecord(record *model.BackupRecord) error
 	WithByDetailName(detailName string) DBOption
 	WithByFileName(fileName string) DBOption
 	WithByType(backupType string) DBOption
@@ -103,6 +104,10 @@ func (u *BackupRepo) Create(backup *model.BackupAccount) error {
 
 func (u *BackupRepo) CreateRecord(record *model.BackupRecord) error {
 	return global.DB.Create(record).Error
+}
+
+func (u *BackupRepo) UpdateRecord(record *model.BackupRecord) error {
+	return global.DB.Save(record).Error
 }
 
 func (u *BackupRepo) Update(id uint, vars map[string]interface{}) error {
