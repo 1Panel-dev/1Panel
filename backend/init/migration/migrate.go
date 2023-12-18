@@ -60,6 +60,7 @@ func Init() {
 		migrations.AddDatabaseSSL,
 		migrations.AddDefaultCA,
 		migrations.AddSettingRecycleBin,
+		migrations.UpdateWebsiteBackupRecord,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

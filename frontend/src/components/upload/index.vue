@@ -142,6 +142,9 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     } else {
         baseDir.value = `${pathRes.data}/uploads/${dir}/${name.value}/`;
     }
+    if (type.value === 'website') {
+        baseDir.value = `${pathRes.data}/uploads/database/${type.value}/${detailName.value}/`;
+    }
     upVisible.value = true;
     search();
 };

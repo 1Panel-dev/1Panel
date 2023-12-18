@@ -379,7 +379,7 @@ const buttons = [
             let params = {
                 type: 'website',
                 name: row.primaryDomain,
-                detailName: '',
+                detailName: row.alias,
             };
             dialogBackupRef.value!.acceptParams(params);
         },
@@ -390,7 +390,7 @@ const buttons = [
             let params = {
                 type: 'website',
                 name: row.primaryDomain,
-                detailName: '',
+                detailName: row.alias,
             };
             uploadRef.value!.acceptParams(params);
         },

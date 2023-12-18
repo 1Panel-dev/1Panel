@@ -582,24 +582,6 @@ func (u *FirewallService) addAddressRecord(req dto.AddrRuleOperate) error {
 	return nil
 }
 
-func listIpRules(strategy string) ([]string, error) {
-	client, err := firewall.NewFirewallClient()
-	if err != nil {
-		return nil, err
-	}
-	addrs, err := client.ListAddress()
-	if err != nil {
-		return nil, err
-	}
-	var rules []string
-	for _, addr := range addrs {
-		if addr.Strategy == strategy {
-			rules = append(rules, addr.Address)
-		}
-	}
-	return rules, nil
-}
-
 func checkPortUsed(ports, proto string, apps []portOfApp) string {
 	var portList []int
 	if strings.Contains(ports, "-") || strings.Contains(ports, ",") {

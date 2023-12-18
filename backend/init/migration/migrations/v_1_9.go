@@ -3,6 +3,7 @@ package migrations
 import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/app/service"
 	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/gorm"
@@ -83,6 +84,21 @@ var AddSettingRecycleBin = &gormigrate.Migration{
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.Create(&model.Setting{Key: "FileRecycleBin", Value: "enable"}).Error; err != nil {
 			return err
+		}
+		return nil
+	},
+}
+
+var UpdateWebsiteBackupRecord = &gormigrate.Migration{
+	ID: "20231218-update-backup-record-for-website",
+	Migrate: func(tx *gorm.DB) error {
+		backupRepo := repo.NewIBackupRepo()
+		websitesBackups, _ := backupRepo.ListRecord(repo.NewCommonRepo().WithByType("website"))
+		if len(websitesBackups) > 0 {
+			for _, backup := range websitesBackups {
+				backup.DetailName = backup.Name
+				_ = backupRepo.UpdateRecord(&backup)
+			}
 		}
 		return nil
 	},

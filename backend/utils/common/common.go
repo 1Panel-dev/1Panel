@@ -88,13 +88,6 @@ func IsCrossVersion(version1, version2 string) bool {
 	return v2num > v1num
 }
 
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
 func GetUuid() string {
 	b := make([]byte, 16)
 	_, _ = io.ReadFull(rand.Reader, b)
