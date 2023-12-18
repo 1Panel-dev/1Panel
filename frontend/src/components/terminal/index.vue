@@ -56,7 +56,8 @@ const newTerm = () => {
         },
         cursorBlink: true,
         cursorStyle: 'underline',
-        scrollback: 100,
+        scrollback: 1000,
+        scrollSensitivity: 15,
         tabStopWidth: 4,
     });
 };
