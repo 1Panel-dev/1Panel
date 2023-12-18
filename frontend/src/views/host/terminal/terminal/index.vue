@@ -44,7 +44,7 @@
                     </span>
                 </template>
                 <Terminal
-                    style="height: calc(100vh - 227px); background-color: #000"
+                    style="height: calc(100vh - 229px); background-color: #000"
                     :ref="'t-' + item.index"
                     :key="item.Refresh"
                 ></Terminal>
@@ -82,7 +82,7 @@
                         <div class="search-button" style="float: none">
                             <el-input
                                 v-model="hostFilterInfo"
-                                style="margin-top: 5px"
+                                style="margin-top: 5px; width: 90%"
                                 clearable
                                 suffix-icon="Search"
                                 :placeholder="$t('commons.button.search')"
