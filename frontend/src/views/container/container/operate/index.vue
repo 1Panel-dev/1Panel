@@ -27,12 +27,30 @@
                     <el-alert
                         v-if="dialogData.title === 'edit' && isFromApp(dialogData.rowData!)"
                         :title="$t('container.containerFromAppHelper')"
-                        class="common-prompt"
                         :closable="false"
                         type="error"
                     />
-                    <el-form-item :label="$t('commons.table.name')" prop="name">
-                        <el-input clearable v-model.trim="dialogData.rowData!.name" />
+                    <el-form-item class="mt-5" :label="$t('commons.table.name')" prop="name">
+                        <el-input
+                            :disabled="isFromApp(dialogData.rowData!)"
+                            clearable
+                            v-model.trim="dialogData.rowData!.name"
+                        />
+                        <div v-if="dialogData.title === 'edit' && isFromApp(dialogData.rowData!)">
+                            <span class="input-help">
+                                {{ $t('container.containerFromAppHelper1') }}
+                                <el-button
+                                    style="margin-left: -5px"
+                                    size="small"
+                                    text
+                                    type="primary"
+                                    @click="goRouter()"
+                                >
+                                    <el-icon><Position /></el-icon>
+                                    {{ $t('firewall.quickJump') }}
+                                </el-button>
+                            </span>
+                        </div>
                     </el-form-item>
                     <el-form-item :label="$t('container.image')" prop="image">
                         <el-checkbox v-model="dialogData.rowData!.imageInput" :label="$t('container.input')" />
@@ -278,6 +296,7 @@ import {
 import { Container } from '@/api/interface/container';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { checkIpV4V6, checkPort } from '@/utils/util';
+import router from '@/routers';
 
 const loading = ref(false);
 interface DialogProps {
@@ -372,6 +391,10 @@ const handlePortsAdd = () => {
 };
 const handlePortsDelete = (index: number) => {
     dialogData.value.rowData!.exposedPorts.splice(index, 1);
+};
+
+const goRouter = async () => {
+    router.push({ name: 'AppInstalled' });
 };
 
 const handleVolumesAdd = () => {
