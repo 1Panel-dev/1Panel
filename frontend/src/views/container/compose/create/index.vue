@@ -69,7 +69,7 @@
                                     placeholder="#Define or paste the content of your docker-compose file here"
                                     :indent-with-tab="true"
                                     :tabSize="4"
-                                    style="width: 100%; height: calc(100vh - 375px)"
+                                    style="width: 100%; height: calc(100vh - 376px)"
                                     :lineWrapping="true"
                                     :matchBrackets="true"
                                     theme="cobalt"

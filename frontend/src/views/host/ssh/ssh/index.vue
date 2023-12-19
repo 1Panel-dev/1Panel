@@ -130,7 +130,7 @@
                         placeholder="# The SSH configuration file does not exist or is empty (/etc/ssh/sshd_config)"
                         :indent-with-tab="true"
                         :tabSize="4"
-                        style="margin-top: 10px; height: calc(100vh - 330px)"
+                        style="margin-top: 10px; height: calc(100vh - 405px)"
                         :lineWrapping="true"
                         :matchBrackets="true"
                         theme="cobalt"
