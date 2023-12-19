@@ -40,7 +40,7 @@
                             placeholder="# The DNS configuration file does not exist or is empty (/etc/resolv.conf)"
                             :indent-with-tab="true"
                             :tabSize="4"
-                            style="margin-top: 10px; height: calc(100vh - 200px)"
+                            style="margin-top: 10px; height: calc(100vh - 260px)"
                             :lineWrapping="true"
                             :matchBrackets="true"
                             theme="cobalt"
