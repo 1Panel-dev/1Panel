@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"io/fs"
 	"os"
 	"path"
@@ -70,7 +71,7 @@ func (u *BackupService) AppRecover(req dto.CommonRecover) error {
 
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(req.File) {
-		return errors.New(fmt.Sprintf("%s file is not exist", req.File))
+		return buserr.WithName("ErrFileNotFound", req.File)
 	}
 	if _, err := compose.Down(install.GetComposePath()); err != nil {
 		return err
