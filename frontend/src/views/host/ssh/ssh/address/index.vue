@@ -10,15 +10,40 @@
             <template #header>
                 <DrawerHeader :header="$t('ssh.listenAddress')" :back="handleClose" />
             </template>
-            <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
+            <el-form
+                ref="formRef"
+                label-position="top"
+                :rules="rules"
+                :model="form"
+                @submit.prevent
+                v-loading="loading"
+            >
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
-                        <el-form-item
-                            :label="$t('ssh.listenAddress')"
-                            prop="listenAddress"
-                            :rules="Rules.ipV4V6OrDomain"
-                        >
-                            <el-input clearable v-model="form.listenAddress" />
+                        <el-alert class="common-prompt" :closable="false" type="error">
+                            <template #default>
+                                <span>
+                                    {{ $t('ssh.listenHelper', [form.port]) }}
+                                </span>
+                            </template>
+                        </el-alert>
+                        <el-form-item label="IPv4" prop="listenAddressV4">
+                            <el-checkbox
+                                v-model="form.ipv4All"
+                                @change="form.listenAddressV4 = form.ipv4All ? '0.0.0.0' : form.listenAddressV4"
+                            >
+                                {{ $t('setting.bindAll') }}
+                            </el-checkbox>
+                            <el-input :disabled="form.ipv4All" clearable v-model="form.listenAddressV4"></el-input>
+                        </el-form-item>
+                        <el-form-item label="IPv6" prop="listenAddressV6">
+                            <el-checkbox
+                                v-model="form.ipv6All"
+                                @change="form.listenAddressV6 = form.ipv6All ? '::' : form.listenAddressV6"
+                            >
+                                {{ $t('setting.bindAll') }}
+                            </el-checkbox>
+                            <el-input :disabled="form.ipv6All" clearable v-model="form.listenAddressV6"></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -39,26 +64,66 @@ import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox, FormInstance } from 'element-plus';
-import { Rules } from '@/global/form-rules';
 import { updateSSH } from '@/api/modules/host';
 import DrawerHeader from '@/components/drawer-header/index.vue';
+import { checkIp, checkIpV6 } from '@/utils/util';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 interface DialogProps {
+    port: number;
     address: string;
 }
 const drawerVisible = ref();
 const loading = ref();
 
 const form = reactive({
-    listenAddress: '0.0.0.0',
+    port: 22,
+    ipv4All: false,
+    ipv6All: false,
+    listenAddressV4: '',
+    listenAddressV6: '',
 });
+
+const rules = reactive({
+    listenAddressV4: [{ validator: checkIPv4, trigger: 'blur' }],
+    listenAddressV6: [{ validator: checkIPv6, trigger: 'blur' }],
+});
+
+function checkIPv4(rule: any, value: any, callback: any) {
+    if (value === '') {
+        callback();
+    }
+    if (checkIp(value)) {
+        return callback(new Error(i18n.global.t('commons.rule.ip')));
+    }
+    callback();
+}
+
+function checkIPv6(rule: any, value: any, callback: any) {
+    if (value === '') {
+        callback();
+    }
+    if (checkIpV6(value)) {
+        return callback(new Error(i18n.global.t('commons.rule.ip')));
+    }
+    callback();
+}
 
 const formRef = ref<FormInstance>();
 
 const acceptParams = (params: DialogProps): void => {
-    form.listenAddress = params.address;
+    let items = params.address.split(',');
+    for (const item of items) {
+        if (item.indexOf(':') !== -1) {
+            form.listenAddressV6 = item;
+            form.ipv6All = item === '::';
+            continue;
+        }
+        form.listenAddressV4 = item;
+        form.ipv4All = item === '0.0.0.0';
+    }
+    form.port = params.port;
     drawerVisible.value = true;
 };
 
@@ -66,8 +131,19 @@ const onSave = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
+        let itemAddr = [];
+        if (form.listenAddressV4 !== '') {
+            itemAddr.push(form.listenAddressV4);
+        }
+        if (form.listenAddressV6 !== '') {
+            itemAddr.push(form.listenAddressV6);
+        }
+        let addr =
+            itemAddr.join(',') === '' || itemAddr.join(',') === '0.0.0.0,::'
+                ? i18n.global.t('ssh.allV4V6', [form.port])
+                : itemAddr.join(',');
         ElMessageBox.confirm(
-            i18n.global.t('ssh.sshChangeHelper', [i18n.global.t('ssh.listenAddress'), form.listenAddress]),
+            i18n.global.t('ssh.sshChangeHelper', [i18n.global.t('ssh.listenAddress'), addr]),
             i18n.global.t('ssh.sshChange'),
             {
                 confirmButtonText: i18n.global.t('commons.button.confirm'),
@@ -79,7 +155,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
                 let params = {
                     key: 'ListenAddress',
                     oldValue: '',
-                    newValue: form.listenAddress,
+                    newValue: itemAddr.join(','),
                 };
                 loading.value = true;
                 await updateSSH(params)

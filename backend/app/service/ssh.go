@@ -48,7 +48,7 @@ func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 		Status:                 constant.StatusEnable,
 		Message:                "",
 		Port:                   "22",
-		ListenAddress:          "0.0.0.0",
+		ListenAddress:          "",
 		PasswordAuthentication: "yes",
 		PubkeyAuthentication:   "yes",
 		PermitRootLogin:        "yes",
@@ -90,7 +90,12 @@ func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 			data.Port = strings.ReplaceAll(line, "Port ", "")
 		}
 		if strings.HasPrefix(line, "ListenAddress ") {
-			data.ListenAddress = strings.ReplaceAll(line, "ListenAddress ", "")
+			itemAddr := strings.ReplaceAll(line, "ListenAddress ", "")
+			if len(data.ListenAddress) != 0 {
+				data.ListenAddress += ("," + itemAddr)
+			} else {
+				data.ListenAddress = itemAddr
+			}
 		}
 		if strings.HasPrefix(line, "PasswordAuthentication ") {
 			data.PasswordAuthentication = strings.ReplaceAll(line, "PasswordAuthentication ", "")
@@ -366,32 +371,33 @@ func sortFileList(fileNames []sshFileItem) []sshFileItem {
 	return fileNames
 }
 
-func updateSSHConf(oldFiles []string, param string, value interface{}) []string {
-	hasKey := false
+func updateSSHConf(oldFiles []string, param string, value string) []string {
+	var valueItems []string
+	if param != "ListenAddress" {
+		valueItems = append(valueItems, value)
+	} else {
+		if value != "" {
+			valueItems = strings.Split(value, ",")
+		}
+	}
 	var newFiles []string
 	for _, line := range oldFiles {
-		if strings.HasPrefix(line, param+" ") {
-			newFiles = append(newFiles, fmt.Sprintf("%s %v", param, value))
-			hasKey = true
+		lineItem := strings.TrimSpace(line)
+		if (strings.HasPrefix(lineItem, param) || strings.HasPrefix(lineItem, fmt.Sprintf("#%s", param))) && len(valueItems) != 0 {
+			newFiles = append(newFiles, fmt.Sprintf("%s %s", param, valueItems[0]))
+			valueItems = valueItems[1:]
+			continue
+		}
+		if strings.HasPrefix(lineItem, param) && len(valueItems) == 0 {
+			newFiles = append(newFiles, fmt.Sprintf("#%s", line))
 			continue
 		}
 		newFiles = append(newFiles, line)
 	}
-	if !hasKey {
-		newFiles = []string{}
-		for _, line := range oldFiles {
-			if strings.HasPrefix(line, fmt.Sprintf("#%s ", param)) && !hasKey {
-				newFiles = append(newFiles, fmt.Sprintf("%s %v", param, value))
-				hasKey = true
-				continue
-			}
-			newFiles = append(newFiles, line)
+	if len(valueItems) != 0 {
+		for _, item := range valueItems {
+			newFiles = append(newFiles, fmt.Sprintf("%s %s", param, item))
 		}
-	}
-	if !hasKey {
-		newFiles = []string{}
-		newFiles = append(newFiles, oldFiles...)
-		newFiles = append(newFiles, fmt.Sprintf("%s %v", param, value))
 	}
 	return newFiles
 }
