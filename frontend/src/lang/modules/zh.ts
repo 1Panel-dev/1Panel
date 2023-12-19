@@ -1116,6 +1116,7 @@ const message = {
         passwd: '面板密码',
         emailHelper: '用于密码找回',
         title: '面板别名',
+        titleHelper: '支持非特殊字符开头，英文、中文、数字、空格、.-和_,长度3-30',
         panelPort: '面板端口',
         portHelper: '建议端口范围8888 - 65535，注意：有安全组的服务器请提前在安全组放行新端口',
         portChange: '端口修改',

@@ -1173,6 +1173,8 @@ const message = {
         emailHelper: 'For password retrieval',
         title: 'Panel Alias',
         panelPort: 'Panel Port',
+        titleHelper:
+            'Supports non-special character starting, English, Chinese, numbers, spaces, .- and _, length 3-30',
         portHelper:
             'The recommended port range is 8888 to 65535. Note: If the server has a security group, permit the new port from the security group in advance',
         portChange: 'Port change',

@@ -1116,6 +1116,7 @@ const message = {
         emailHelper: '用於密碼找回',
         title: '面板別名',
         panelPort: '面板端口',
+        titleHelper: '支援非特殊字符開頭，英文、中文、數字、空格、.-和_, 長度3-30',
         portHelper: '建議端口範圍8888 - 65535，註意：有安全組的服務器請提前在安全組放行新端口',
         portChange: '端口修改',
         portChangeHelper: '服務端口修改需要重啟服務，是否繼續？',
