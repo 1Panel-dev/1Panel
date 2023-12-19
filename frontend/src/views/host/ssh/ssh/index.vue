@@ -71,7 +71,7 @@
                                 <span class="input-help">{{ $t('ssh.portHelper') }}</span>
                             </el-form-item>
                             <el-form-item :label="$t('ssh.listenAddress')" prop="listenAddress">
-                                <el-input disabled v-model="form.listenAddress">
+                                <el-input disabled v-model="form.listenAddressItem">
                                     <template #append>
                                         <el-button @click="onChangeAddress" icon="Setting">
                                             {{ $t('commons.button.set') }}
@@ -184,6 +184,7 @@ const form = reactive({
     message: '',
     port: 22,
     listenAddress: '',
+    listenAddressItem: '',
     passwordAuthentication: 'yes',
     pubkeyAuthentication: 'yes',
     encryptionMode: '',
@@ -222,7 +223,7 @@ const onChangeRoot = () => {
     rootsRef.value.acceptParams({ permitRootLogin: form.permitRootLogin });
 };
 const onChangeAddress = () => {
-    addressRef.value.acceptParams({ address: form.listenAddress });
+    addressRef.value.acceptParams({ address: form.listenAddress, port: form.port });
 };
 
 const onOperate = async (operation: string) => {
@@ -325,6 +326,10 @@ const search = async () => {
     form.port = Number(res.data.port);
     autoStart.value = res.data.autoStart ? 'enable' : 'disable';
     form.listenAddress = res.data.listenAddress;
+    form.listenAddressItem =
+        form.listenAddress === '' || form.listenAddress === '0.0.0.0,::'
+            ? i18n.global.t('ssh.allV4V6', [form.port])
+            : form.listenAddress;
     form.passwordAuthentication = res.data.passwordAuthentication;
     form.pubkeyAuthentication = res.data.pubkeyAuthentication;
     form.permitRootLogin = res.data.permitRootLogin;

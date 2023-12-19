@@ -1120,8 +1120,10 @@ const message = {
             'Modifying the configuration file may cause service availability. Exercise caution when performing this operation. Do you want to continue?',
         portHelper: 'Specifies the port number monitored by the SSH service. The default port number is 22.',
         listenAddress: 'Listening address',
-        addressHelper:
-            'Specify the IP address monitored by the SSH service. The default value is 0.0.0.0. That is, all network interfaces are monitored.',
+        allV4V6: '0.0.0.0:{0}(IPv4) and :::{0}(IPv6)',
+        listenHelper:
+            'Canceling IPv4 and IPv6 settings simultaneously will listen on both 0.0.0.0:{0}(IPv4) and :::{0}(IPv6)',
+        addressHelper: 'Specify the IP address on which the SSH service will listen',
         permitRootLogin: 'root user',
         rootSettingHelper: 'The default login mode is SSH for user root.',
         rootHelper1: 'Allow SSH login',
