@@ -111,7 +111,7 @@ func handleRedisBackup(redisInfo *repo.RootInfo, backupDir, fileName string) err
 func handleRedisRecover(redisInfo *repo.RootInfo, recoverFile string, isRollback bool) error {
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(recoverFile) {
-		return fmt.Errorf("%s file is not exist", recoverFile)
+		return buserr.WithName("ErrFileNotFound", recoverFile)
 	}
 
 	appendonly, err := configGetStr(redisInfo.ContainerName, redisInfo.Password, "appendonly")

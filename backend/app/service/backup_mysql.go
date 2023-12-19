@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"os"
 	"path"
 	"path/filepath"
@@ -13,7 +14,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/1Panel-dev/1Panel/backend/utils/mysql/client"
-	"github.com/pkg/errors"
 )
 
 func (u *BackupService) MysqlBackup(req dto.CommonBackup) error {
@@ -125,7 +125,7 @@ func handleMysqlRecover(req dto.CommonRecover, isRollback bool) error {
 	isOk := false
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(req.File) {
-		return errors.New(fmt.Sprintf("%s file is not exist", req.File))
+		return buserr.WithName("ErrFileNotFound", req.File)
 	}
 	dbInfo, err := mysqlRepo.Get(commonRepo.WithByName(req.DetailName), mysqlRepo.WithByMysqlName(req.Name))
 	if err != nil {

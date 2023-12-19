@@ -56,7 +56,7 @@ func (u *BackupService) WebsiteBackup(req dto.CommonBackup) error {
 func (u *BackupService) WebsiteRecover(req dto.CommonRecover) error {
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(req.File) {
-		return errors.New(fmt.Sprintf("%s file is not exist", req.File))
+		return buserr.WithName("ErrFileNotFound", req.File)
 	}
 	website, err := websiteRepo.GetFirst(websiteRepo.WithAlias(req.DetailName))
 	if err != nil {

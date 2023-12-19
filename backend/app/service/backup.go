@@ -91,8 +91,10 @@ func (u *BackupService) SearchRecordsWithPage(search dto.RecordSearch) (int64, [
 		}
 		itemPath := path.Join(records[i].FileDir, records[i].FileName)
 		if records[i].Source == "LOCAL" {
-			fileInfo, _ := os.Stat(itemPath)
-			item.Size = fileInfo.Size()
+			fileInfo, err := os.Stat(itemPath)
+			if err == nil {
+				item.Size = fileInfo.Size()
+			}
 			datas = append(datas, item)
 			continue
 		}
