@@ -577,6 +577,8 @@ const message = {
 
         containerFromAppHelper:
             'Detected that this container originates from the app store. App operations may cause current edits to be invalidated.',
+        containerFromAppHelper1:
+            'Click the `Settings` button in the installed applications list to enter the editing page and modify the container name.',
         command: 'Command',
         console: 'Console Interaction',
         tty: 'TTY (-t)',
