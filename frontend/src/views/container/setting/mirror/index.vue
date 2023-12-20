@@ -70,6 +70,9 @@ function checkMirrors(rule: any, value: any, callback: any) {
         const reg = /^https?:\/\/[a-zA-Z0-9.-]+$/;
         let mirrors = form.mirrors.split('\n');
         for (const item of mirrors) {
+            if (item === '') {
+                continue;
+            }
             if (!reg.test(item)) {
                 return callback(new Error(i18n.global.t('commons.rule.mirror')));
             }

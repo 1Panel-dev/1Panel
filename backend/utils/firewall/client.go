@@ -12,6 +12,7 @@ type FirewallClient interface {
 	Name() string // ufw firewalld
 	Start() error
 	Stop() error
+	Restart() error
 	Reload() error
 	Status() (string, error) // running not running
 	Version() (string, error)

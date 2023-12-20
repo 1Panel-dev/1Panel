@@ -97,7 +97,7 @@ func (f *Fail2ban) ListBanned() ([]string, error) {
 	if err != nil {
 		return lists, err
 	}
-	itemList := strings.Split(stdout, " ")
+	itemList := strings.Split(strings.ReplaceAll(stdout, "\n", ""), " ")
 	for _, item := range itemList {
 		if len(item) != 0 {
 			lists = append(lists, item)
