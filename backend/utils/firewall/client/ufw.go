@@ -65,9 +65,11 @@ func (f *Ufw) Stop() error {
 }
 
 func (f *Ufw) Restart() error {
-	stdout, err := cmd.Execf("%s systemctl restart ufw.service", cmd.SudoHandleCmd())
-	if err != nil {
-		return fmt.Errorf("restart the firewall failed, err: %s", stdout)
+	if err := f.Stop(); err != nil {
+		return err
+	}
+	if err := f.Start(); err != nil {
+		return err
 	}
 	return nil
 }
