@@ -8,7 +8,7 @@ import (
 
 type ContainerRouter struct{}
 
-func (s *ContainerRouter) InitContainerRouter(Router *gin.RouterGroup) {
+func (s *ContainerRouter) InitRouter(Router *gin.RouterGroup) {
 	baRouter := Router.Group("containers").
 		Use(middleware.JwtAuth()).
 		Use(middleware.SessionAuth()).

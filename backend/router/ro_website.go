@@ -9,7 +9,7 @@ import (
 type WebsiteRouter struct {
 }
 
-func (a *WebsiteRouter) InitWebsiteRouter(Router *gin.RouterGroup) {
+func (a *WebsiteRouter) InitRouter(Router *gin.RouterGroup) {
 	groupRouter := Router.Group("websites")
 	groupRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).Use(middleware.PasswordExpired())
 

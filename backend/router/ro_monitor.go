@@ -9,7 +9,7 @@ import (
 
 type MonitorRouter struct{}
 
-func (s *MonitorRouter) InitMonitorRouter(Router *gin.RouterGroup) {
+func (s *MonitorRouter) InitRouter(Router *gin.RouterGroup) {
 	monitorRouter := Router.Group("monitors").
 		Use(middleware.JwtAuth()).
 		Use(middleware.SessionAuth()).

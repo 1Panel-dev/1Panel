@@ -6,7 +6,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (a *WebsiteDnsAccountRouter) InitWebsiteCARouter(Router *gin.RouterGroup) {
+type WebsiteCARouter struct {
+}
+
+func (a *WebsiteCARouter) InitRouter(Router *gin.RouterGroup) {
 	groupRouter := Router.Group("websites/ca")
 	groupRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).Use(middleware.PasswordExpired())
 

@@ -2,20 +2,23 @@ package router
 
 import (
 	"fmt"
-	"github.com/gin-contrib/gzip"
-	"html/template"
-	"net/http"
-
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"github.com/1Panel-dev/1Panel/backend/middleware"
 	rou "github.com/1Panel-dev/1Panel/backend/router"
 	"github.com/1Panel-dev/1Panel/cmd/server/docs"
 	"github.com/1Panel-dev/1Panel/cmd/server/web"
+	"github.com/gin-contrib/gzip"
 	ginI18n "github.com/gin-contrib/i18n"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"html/template"
+	"net/http"
+)
+
+var (
+	Router *gin.Engine
 )
 
 func setWebStatic(rootRouter *gin.RouterGroup) {
@@ -35,7 +38,7 @@ func setWebStatic(rootRouter *gin.RouterGroup) {
 }
 
 func Routers() *gin.Engine {
-	Router := gin.Default()
+	Router = gin.Default()
 	Router.Use(middleware.OperationLog())
 	// Router.Use(middleware.CSRF())
 	// Router.Use(middleware.LoadCsrfToken())
@@ -55,7 +58,6 @@ func Routers() *gin.Engine {
 		"Localize": ginI18n.GetMessage,
 	})
 
-	systemRouter := rou.RouterGroupApp
 	swaggerRouter := Router.Group("1panel")
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	swaggerRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
@@ -71,29 +73,8 @@ func Routers() *gin.Engine {
 	PrivateGroup.Use(middleware.WhiteAllow())
 	PrivateGroup.Use(middleware.BindDomain())
 	PrivateGroup.Use(middleware.GlobalLoading())
-	{
-		systemRouter.InitBaseRouter(PrivateGroup)
-		systemRouter.InitDashboardRouter(PrivateGroup)
-		systemRouter.InitHostRouter(PrivateGroup)
-		systemRouter.InitContainerRouter(PrivateGroup)
-		systemRouter.InitTerminalRouter(PrivateGroup)
-		systemRouter.InitMonitorRouter(PrivateGroup)
-		systemRouter.InitLogRouter(PrivateGroup)
-		systemRouter.InitFileRouter(PrivateGroup)
-		systemRouter.InitCronjobRouter(PrivateGroup)
-		systemRouter.InitSettingRouter(PrivateGroup)
-		systemRouter.InitAppRouter(PrivateGroup)
-		systemRouter.InitWebsiteRouter(PrivateGroup)
-		systemRouter.InitWebsiteGroupRouter(PrivateGroup)
-		systemRouter.InitWebsiteDnsAccountRouter(PrivateGroup)
-		systemRouter.InitDatabaseRouter(PrivateGroup)
-		systemRouter.InitWebsiteSSLRouter(PrivateGroup)
-		systemRouter.InitWebsiteAcmeAccountRouter(PrivateGroup)
-		systemRouter.InitNginxRouter(PrivateGroup)
-		systemRouter.InitRuntimeRouter(PrivateGroup)
-		systemRouter.InitProcessRouter(PrivateGroup)
-		systemRouter.InitToolboxRouter(PrivateGroup)
-		systemRouter.InitWebsiteCARouter(PrivateGroup)
+	for _, router := range rou.RouterGroupApp {
+		router.InitRouter(PrivateGroup)
 	}
 
 	return Router

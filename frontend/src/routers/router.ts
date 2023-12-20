@@ -1,7 +1,11 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import { Layout } from '@/routers/constant';
 
-const modules = import.meta.globEager('./modules/*.ts');
+let modules = import.meta.globEager('./modules/*.ts');
+const xpackModules = import.meta.globEager('../xpack/frontend/routers/*.ts');
+modules = { ...modules, ...xpackModules };
+
+console.log(modules);
 
 const homeRouter: RouteRecordRaw = {
     path: '/',

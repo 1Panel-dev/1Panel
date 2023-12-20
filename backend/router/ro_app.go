@@ -9,7 +9,7 @@ import (
 type AppRouter struct {
 }
 
-func (a *AppRouter) InitAppRouter(Router *gin.RouterGroup) {
+func (a *AppRouter) InitRouter(Router *gin.RouterGroup) {
 	appRouter := Router.Group("apps")
 	appRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).Use(middleware.PasswordExpired())
 

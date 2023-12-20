@@ -9,7 +9,7 @@ import (
 
 type CronjobRouter struct{}
 
-func (s *CronjobRouter) InitCronjobRouter(Router *gin.RouterGroup) {
+func (s *CronjobRouter) InitRouter(Router *gin.RouterGroup) {
 	cmdRouter := Router.Group("cronjobs").
 		Use(middleware.JwtAuth()).
 		Use(middleware.SessionAuth()).

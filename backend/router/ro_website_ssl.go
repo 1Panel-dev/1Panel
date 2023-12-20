@@ -9,7 +9,7 @@ import (
 type WebsiteSSLRouter struct {
 }
 
-func (a *WebsiteSSLRouter) InitWebsiteSSLRouter(Router *gin.RouterGroup) {
+func (a *WebsiteSSLRouter) InitRouter(Router *gin.RouterGroup) {
 	groupRouter := Router.Group("websites/ssl")
 	groupRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).Use(middleware.PasswordExpired())
 

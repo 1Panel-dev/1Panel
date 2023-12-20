@@ -9,7 +9,7 @@ import (
 type RuntimeRouter struct {
 }
 
-func (r *RuntimeRouter) InitRuntimeRouter(Router *gin.RouterGroup) {
+func (r *RuntimeRouter) InitRouter(Router *gin.RouterGroup) {
 	groupRouter := Router.Group("runtimes")
 	groupRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).Use(middleware.PasswordExpired())
 
