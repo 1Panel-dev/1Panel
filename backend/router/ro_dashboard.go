@@ -9,7 +9,7 @@ import (
 
 type DashboardRouter struct{}
 
-func (s *CronjobRouter) InitDashboardRouter(Router *gin.RouterGroup) {
+func (s *DashboardRouter) InitRouter(Router *gin.RouterGroup) {
 	cmdRouter := Router.Group("dashboard").
 		Use(middleware.JwtAuth()).
 		Use(middleware.SessionAuth()).

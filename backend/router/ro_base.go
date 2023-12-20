@@ -7,7 +7,7 @@ import (
 
 type BaseRouter struct{}
 
-func (s *BaseRouter) InitBaseRouter(Router *gin.RouterGroup) {
+func (s *BaseRouter) InitRouter(Router *gin.RouterGroup) {
 	baseRouter := Router.Group("auth")
 	baseApi := v1.ApiGroupApp.BaseApi
 	{

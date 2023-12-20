@@ -9,7 +9,7 @@ import (
 type WebsiteAcmeAccountRouter struct {
 }
 
-func (a *WebsiteAcmeAccountRouter) InitWebsiteAcmeAccountRouter(Router *gin.RouterGroup) {
+func (a *WebsiteAcmeAccountRouter) InitRouter(Router *gin.RouterGroup) {
 	groupRouter := Router.Group("websites/acme")
 	groupRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).Use(middleware.PasswordExpired())
 

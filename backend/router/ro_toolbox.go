@@ -9,7 +9,7 @@ import (
 
 type ToolboxRouter struct{}
 
-func (s *ToolboxRouter) InitToolboxRouter(Router *gin.RouterGroup) {
+func (s *ToolboxRouter) InitRouter(Router *gin.RouterGroup) {
 	toolboxRouter := Router.Group("toolbox").
 		Use(middleware.JwtAuth()).
 		Use(middleware.SessionAuth()).

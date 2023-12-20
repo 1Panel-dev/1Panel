@@ -9,7 +9,7 @@ import (
 type FileRouter struct {
 }
 
-func (f *FileRouter) InitFileRouter(Router *gin.RouterGroup) {
+func (f *FileRouter) InitRouter(Router *gin.RouterGroup) {
 	fileRouter := Router.Group("files")
 	fileRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).Use(middleware.PasswordExpired())
 	baseApi := v1.ApiGroupApp.BaseApi

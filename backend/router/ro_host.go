@@ -9,7 +9,7 @@ import (
 
 type HostRouter struct{}
 
-func (s *HostRouter) InitHostRouter(Router *gin.RouterGroup) {
+func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 	hostRouter := Router.Group("hosts").
 		Use(middleware.JwtAuth()).
 		Use(middleware.SessionAuth()).

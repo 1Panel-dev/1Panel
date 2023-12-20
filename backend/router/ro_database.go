@@ -9,7 +9,7 @@ import (
 
 type DatabaseRouter struct{}
 
-func (s *DatabaseRouter) InitDatabaseRouter(Router *gin.RouterGroup) {
+func (s *DatabaseRouter) InitRouter(Router *gin.RouterGroup) {
 	cmdRouter := Router.Group("databases").
 		Use(middleware.JwtAuth()).
 		Use(middleware.SessionAuth()).

@@ -9,7 +9,7 @@ import (
 type ProcessRouter struct {
 }
 
-func (f *ProcessRouter) InitProcessRouter(Router *gin.RouterGroup) {
+func (f *ProcessRouter) InitRouter(Router *gin.RouterGroup) {
 	processRouter := Router.Group("process")
 	processRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).Use(middleware.PasswordExpired())
 	baseApi := v1.ApiGroupApp.BaseApi

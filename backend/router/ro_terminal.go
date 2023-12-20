@@ -9,7 +9,7 @@ import (
 
 type TerminalRouter struct{}
 
-func (s *TerminalRouter) InitTerminalRouter(Router *gin.RouterGroup) {
+func (s *TerminalRouter) InitRouter(Router *gin.RouterGroup) {
 	terminalRouter := Router.Group("terminals").
 		Use(middleware.JwtAuth()).
 		Use(middleware.SessionAuth()).
