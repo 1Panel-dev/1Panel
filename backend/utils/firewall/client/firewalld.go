@@ -52,6 +52,14 @@ func (f *Firewall) Stop() error {
 	return nil
 }
 
+func (f *Firewall) Restart() error {
+	stdout, err := cmd.Exec("systemctl restart firewalld")
+	if err != nil {
+		return fmt.Errorf("restart the firewall failed, err: %s", stdout)
+	}
+	return nil
+}
+
 func (f *Firewall) Reload() error {
 	stdout, err := cmd.Exec("firewall-cmd --reload")
 	if err != nil {

@@ -196,6 +196,12 @@ func (u *FirewallService) OperateFirewall(operation string) error {
 		}
 		_, _ = cmd.Exec("systemctl restart docker")
 		return nil
+	case "restart":
+		if err := client.Restart(); err != nil {
+			return err
+		}
+		_, _ = cmd.Exec("systemctl restart docker")
+		return nil
 	case "disablePing":
 		return u.updatePingStatus("0")
 	case "enablePing":

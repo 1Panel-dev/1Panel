@@ -49,6 +49,9 @@ function checkIPs(rule: any, value: any, callback: any) {
     if (form.ips !== '') {
         let addr = form.ips.split('\n');
         for (const item of addr) {
+            if (item === '') {
+                continue;
+            }
             if (item.indexOf('/') !== -1) {
                 if (checkCidr(item)) {
                     return callback(new Error(i18n.global.t('firewall.addressFormatError')));
@@ -95,9 +98,16 @@ const onSave = async (formEl: FormInstance | undefined) => {
                 type: 'info',
             },
         ).then(async () => {
+            let ipItems = form.ips.split('\n');
+            let ips = [];
+            for (const item of ipItems) {
+                if (item !== '') {
+                    ips.push(item);
+                }
+            }
             let param = {
                 operate: form.operate,
-                ips: form.ips.split('\n'),
+                ips: ips,
             };
             loading.value = true;
             await operatorFail2banSSHD(param)

@@ -21,7 +21,7 @@
                         :rules="Rules.requiredSelect"
                         prop="repoID"
                     >
-                        <el-select style="width: 100%" filterable v-model="form.repoID">
+                        <el-select clearable style="width: 100%" filterable v-model="form.repoID">
                             <el-option v-for="item in repos" :key="item.id" :value="item.id" :label="item.name" />
                         </el-select>
                     </el-form-item>

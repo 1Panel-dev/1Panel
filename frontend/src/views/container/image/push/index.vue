@@ -18,7 +18,7 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item :label="$t('container.repoName')" :rules="Rules.requiredSelect" prop="repoID">
-                        <el-select style="width: 100%" filterable v-model="form.repoID">
+                        <el-select clearable style="width: 100%" filterable v-model="form.repoID">
                             <el-option
                                 v-for="item in dialogData.repos"
                                 :key="item.id"
