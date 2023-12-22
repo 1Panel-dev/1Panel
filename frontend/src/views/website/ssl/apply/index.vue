@@ -18,7 +18,7 @@
                 <el-table-column prop="resolve" :label="$t('ssl.resolveDomain')">
                     <template #default="{ row }">
                         <span>{{ row.resolve }}</span>
-                        <CopyButton :content="row.value" type="icon" />
+                        <CopyButton :content="row.resolve" type="icon" />
                     </template>
                 </el-table-column>
                 <el-table-column prop="value" :label="$t('ssl.value')">
