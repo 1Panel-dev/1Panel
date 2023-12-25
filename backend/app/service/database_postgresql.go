@@ -3,7 +3,6 @@ package service
 import (
 	"bufio"
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -425,21 +424,8 @@ func (u *PostgresqlService) LoadRemoteAccess(req dto.OperationWithNameAndType) (
 }
 
 func (u *PostgresqlService) LoadVariables(req dto.OperationWithNameAndType) (*dto.PostgresqlVariables, error) {
-	app, err := appInstallRepo.LoadBaseInfo(req.Type, req.Name)
-	if err != nil {
-		return nil, err
-	}
-	variableMap, err := executeSqlForMaps(app.ContainerName, app.Password, "show global variables;")
-	if err != nil {
-		return nil, err
-	}
-	var info dto.PostgresqlVariables
-	arr, err := json.Marshal(variableMap)
-	if err != nil {
-		return nil, err
-	}
-	_ = json.Unmarshal(arr, &info)
-	return &info, nil
+
+	return nil, nil
 }
 
 func (u *PostgresqlService) LoadStatus(req dto.OperationWithNameAndType) (*dto.PostgresqlStatus, error) {
