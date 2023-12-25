@@ -17,6 +17,7 @@ func (s *DatabaseRouter) InitRouter(Router *gin.RouterGroup) {
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		cmdRouter.POST("", baseApi.CreateMysql)
+		cmdRouter.POST("/bind", baseApi.BindUser)
 		cmdRouter.POST("load", baseApi.LoadDBFromRemote)
 		cmdRouter.POST("/change/access", baseApi.ChangeMysqlAccess)
 		cmdRouter.POST("/change/password", baseApi.ChangeMysqlPassword)

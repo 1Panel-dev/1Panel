@@ -374,6 +374,7 @@ const message = {
         confNotFound: '未能找到该应用配置文件，请在应用商店升级该应用至最新版本后重试！',
 
         loadFromRemote: '从服务器获取',
+        userBind: '绑定用户',
         loadFromRemoteHelper: '此操作将同步服务器上数据库信息到 1Panel，是否继续？',
         passwordHelper: '无法获取密码，请修改',
         local: '本地',

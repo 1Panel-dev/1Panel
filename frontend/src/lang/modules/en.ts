@@ -381,6 +381,7 @@ const message = {
             'This port is the exposed port of the container. You need to save the modification separately and restart the container!',
 
         loadFromRemote: 'Load from server',
+        userBind: 'Bind User',
         loadFromRemoteHelper:
             'This action will synchronize the database info on the server to 1Panel, do you want to continue?',
         passwordHelper: 'Unable to retrieve, please modify',

@@ -51,6 +51,13 @@ export const addMysqlDB = (params: Database.MysqlDBCreate) => {
     }
     return http.post(`/databases`, request);
 };
+export const bindUser = (params: Database.BindUser) => {
+    let request = deepCopy(params) as Database.BindUser;
+    if (request.password) {
+        request.password = Base64.encode(request.password);
+    }
+    return http.post(`/databases/bind`, request);
+};
 export const loadDBFromRemote = (params: Database.MysqlLoadDB) => {
     return http.post(`/databases/load`, params);
 };

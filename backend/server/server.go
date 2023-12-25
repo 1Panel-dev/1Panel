@@ -43,6 +43,7 @@ func Start() {
 	cron.Run()
 	business.Init()
 	hook.Init()
+	InitOthers()
 
 	rootRouter := router.Routers()
 
