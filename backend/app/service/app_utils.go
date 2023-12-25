@@ -154,7 +154,7 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 		}
 
 		switch app.Key {
-		case "mysql", "mariadb", "postgresql", "mongodb":
+		case "mysql", "mariadb", constant.AppPostgresql, "mongodb":
 			if password, ok := params["PANEL_DB_ROOT_PASSWORD"]; ok {
 				if password != "" {
 					database.Password = password.(string)
@@ -233,28 +233,57 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 		}
 		var resourceId uint
 		if dbConfig.DbName != "" && dbConfig.DbUser != "" && dbConfig.Password != "" {
-			iMysqlRepo := repo.NewIMysqlRepo()
-			oldMysqlDb, _ := iMysqlRepo.Get(commonRepo.WithByName(dbConfig.DbName), iMysqlRepo.WithByFrom(constant.ResourceLocal))
-			resourceId = oldMysqlDb.ID
-			if oldMysqlDb.ID > 0 {
-				if oldMysqlDb.Username != dbConfig.DbUser || oldMysqlDb.Password != dbConfig.Password {
-					return buserr.New(constant.ErrDbUserNotValid)
+			switch database.Type {
+			case constant.AppPostgresql:
+				iPostgresqlRepo := repo.NewIPostgresqlRepo()
+				oldPostgresqlDb, _ := iPostgresqlRepo.Get(commonRepo.WithByName(dbConfig.DbName), iPostgresqlRepo.WithByFrom(constant.ResourceLocal))
+				resourceId = oldPostgresqlDb.ID
+				if oldPostgresqlDb.ID > 0 {
+					if oldPostgresqlDb.Username != dbConfig.DbUser || oldPostgresqlDb.Password != dbConfig.Password {
+						return buserr.New(constant.ErrDbUserNotValid)
+					}
+				} else {
+					var createPostgresql dto.PostgresqlDBCreate
+					createPostgresql.Name = dbConfig.DbName
+					createPostgresql.Username = dbConfig.DbUser
+					createPostgresql.Database = database.Name
+					createPostgresql.Format = "UTF8"
+					createPostgresql.Password = dbConfig.Password
+					createPostgresql.From = database.From
+					pgdb, err := NewIPostgresqlService().Create(ctx, createPostgresql)
+					if err != nil {
+						return err
+					}
+					resourceId = pgdb.ID
 				}
-			} else {
-				var createMysql dto.MysqlDBCreate
-				createMysql.Name = dbConfig.DbName
-				createMysql.Username = dbConfig.DbUser
-				createMysql.Database = database.Name
-				createMysql.Format = "utf8mb4"
-				createMysql.Permission = "%"
-				createMysql.Password = dbConfig.Password
-				createMysql.From = database.From
-				mysqldb, err := NewIMysqlService().Create(ctx, createMysql)
-				if err != nil {
-					return err
+				break
+			case "mysql", "mariadb":
+				iMysqlRepo := repo.NewIMysqlRepo()
+				oldMysqlDb, _ := iMysqlRepo.Get(commonRepo.WithByName(dbConfig.DbName), iMysqlRepo.WithByFrom(constant.ResourceLocal))
+				resourceId = oldMysqlDb.ID
+				if oldMysqlDb.ID > 0 {
+					if oldMysqlDb.Username != dbConfig.DbUser || oldMysqlDb.Password != dbConfig.Password {
+						return buserr.New(constant.ErrDbUserNotValid)
+					}
+				} else {
+					var createMysql dto.MysqlDBCreate
+					createMysql.Name = dbConfig.DbName
+					createMysql.Username = dbConfig.DbUser
+					createMysql.Database = database.Name
+					createMysql.Format = "utf8mb4"
+					createMysql.Permission = "%"
+					createMysql.Password = dbConfig.Password
+					createMysql.From = database.From
+					mysqldb, err := NewIMysqlService().Create(ctx, createMysql)
+					if err != nil {
+						return err
+					}
+					resourceId = mysqldb.ID
 				}
-				resourceId = mysqldb.ID
+				break
+
 			}
+
 		}
 		var installResource model.AppInstallResource
 		installResource.ResourceId = resourceId
@@ -364,22 +393,41 @@ func deleteLink(ctx context.Context, install *model.AppInstall, deleteDB bool, f
 		return nil
 	}
 	for _, re := range resources {
-		mysqlService := NewIMysqlService()
-		if (re.Key == constant.AppMysql || re.Key == constant.AppMariaDB) && deleteDB {
-			database, _ := mysqlRepo.Get(commonRepo.WithByID(re.ResourceId))
-			if reflect.DeepEqual(database, model.DatabaseMysql{}) {
-				continue
-			}
-			if err := mysqlService.Delete(ctx, dto.MysqlDBDelete{
-				ID:           database.ID,
-				ForceDelete:  forceDelete,
-				DeleteBackup: deleteBackup,
-				Type:         re.Key,
-				Database:     database.MysqlName,
-			}); err != nil && !forceDelete {
-				return err
+		if deleteDB {
+			switch re.Key {
+			case constant.AppMysql, constant.AppMariaDB:
+				mysqlService := NewIMysqlService()
+				database, _ := mysqlRepo.Get(commonRepo.WithByID(re.ResourceId))
+				if reflect.DeepEqual(database, model.DatabaseMysql{}) {
+					continue
+				}
+				if err := mysqlService.Delete(ctx, dto.MysqlDBDelete{
+					ID:           database.ID,
+					ForceDelete:  forceDelete,
+					DeleteBackup: deleteBackup,
+					Type:         re.Key,
+					Database:     database.MysqlName,
+				}); err != nil && !forceDelete {
+					return err
+				}
+			case constant.AppPostgresql:
+				pgsqlService := NewIPostgresqlService()
+				database, _ := postgresqlRepo.Get(commonRepo.WithByID(re.ResourceId))
+				if reflect.DeepEqual(database, model.DatabasePostgresql{}) {
+					continue
+				}
+				if err := pgsqlService.Delete(ctx, dto.PostgresqlDBDelete{
+					ID:           database.ID,
+					ForceDelete:  forceDelete,
+					DeleteBackup: deleteBackup,
+					Type:         re.Key,
+					Database:     database.PostgresqlName,
+				}); err != nil {
+					return err
+				}
 			}
 		}
+
 	}
 	return appInstallResourceRepo.DeleteBy(ctx, appInstallResourceRepo.WithAppInstallId(install.ID))
 }

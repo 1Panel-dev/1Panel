@@ -3,6 +3,7 @@ package repo
 import (
 	"context"
 	"encoding/json"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 
 	"gorm.io/gorm/clause"
 
@@ -170,6 +171,7 @@ type RootInfo struct {
 	Env           string `json:"env"`
 	Key           string `json:"key"`
 	Version       string `json:"version"`
+	AppPath       string `json:"app_path"`
 }
 
 func (a *AppInstallRepo) LoadBaseInfo(key string, name string) (*RootInfo, error) {
@@ -205,7 +207,7 @@ func (a *AppInstallRepo) LoadBaseInfo(key string, name string) (*RootInfo, error
 		if ok {
 			info.Password = password
 		}
-	case "mongodb", "postgresql":
+	case "mongodb", constant.AppPostgresql:
 		user, ok := envMap["PANEL_DB_ROOT_USER"].(string)
 		if ok {
 			info.UserName = user
@@ -230,5 +232,7 @@ func (a *AppInstallRepo) LoadBaseInfo(key string, name string) (*RootInfo, error
 	info.Param = appInstall.Param
 	info.Version = appInstall.Version
 	info.Key = app.Key
+	appInstall.App = app
+	info.AppPath = appInstall.GetAppPath()
 	return &info, nil
 }

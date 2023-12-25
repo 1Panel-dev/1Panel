@@ -14,6 +14,10 @@ const buttons = [
         path: '/databases/mysql',
     },
     {
+        label: 'PostgreSQL',
+        path: '/databases/postgresql',
+    },
+    {
         label: 'Redis',
         path: '/databases/redis',
     },

@@ -13,6 +13,7 @@ var (
 	appInstallResourceRepo = repo.NewIAppInstallResourceRpo()
 
 	mysqlRepo    = repo.NewIMysqlRepo()
+	postgresqlRepo    = repo.NewIPostgresqlRepo()
 	databaseRepo = repo.NewIDatabaseRepo()
 
 	imageRepoRepo = repo.NewIImageRepoRepo()

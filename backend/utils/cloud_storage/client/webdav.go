@@ -61,7 +61,12 @@ func (s webDAVClient) Download(src, target string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-
+	targetStat, err := os.Stat(target)
+	if err == nil {
+		if info.Size() == targetStat.Size() {
+			return true, nil
+		}
+	}
 	file, err := os.Create(target)
 	if err != nil {
 		return false, err

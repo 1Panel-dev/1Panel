@@ -206,3 +206,31 @@ func (b *BaseApi) UpdateDatabase(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, nil)
 }
+
+// @Tags Database
+// @Summary Load Database file
+// @Description 获取数据库文件
+// @Accept json
+// @Param request body dto.OperationWithNameAndType true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /databases/load/file [post]
+func (b *BaseApi) LoadDatabaseFile(c *gin.Context) {
+	var req dto.OperationWithNameAndType
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	var content string
+	var err error
+	switch req.Name {
+	case constant.AppPostgresql:
+		content, err = postgresqlService.LoadDatabaseFile(req)
+	default:
+		content, err = mysqlService.LoadDatabaseFile(req)
+	}
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, content)
+}

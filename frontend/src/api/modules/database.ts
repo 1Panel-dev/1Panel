@@ -8,10 +8,42 @@ import { TimeoutEnum } from '@/enums/http-enum';
 export const searchMysqlDBs = (params: Database.SearchDBWithPage) => {
     return http.post<ResPage<Database.MysqlDBInfo>>(`/databases/search`, params);
 };
+
 export const loadDatabaseFile = (type: string, database: string) => {
     return http.post<string>(`/databases/load/file`, { type: type, name: database });
 };
-
+export const addPostgresqlDB = (params: Database.PostgresqlDBCreate) => {
+    let request = deepCopy(params) as Database.PostgresqlDBCreate;
+    if (request.password) {
+        request.password = Base64.encode(request.password);
+    }
+    return http.post(`/databases/pg`, request);
+};
+export const loadPostgresqlStatus = (type: string, database: string) => {
+    return http.post<Database.PostgresqlStatus>(`/databases/pg/status`, { type: type, name: database });
+};
+export const updatePostgresqlConfByFile = (params: Database.PostgresqlConfUpdateByFile) => {
+    return http.post(`/databases/pg/conf`, params);
+};
+export const searchPostgresqlDBs = (params: Database.SearchDBWithPage) => {
+    return http.post<ResPage<Database.PostgresqlDBInfo>>(`/databases/pg/search`, params);
+};
+export const updatePostgresqlDescription = (params: DescriptionUpdate) => {
+    return http.post(`/databases/pg/description`, params);
+};
+export const deleteCheckPostgresqlDB = (params: Database.PostgresqlDBDeleteCheck) => {
+    return http.post<Array<string>>(`/databases/pg/del/check`, params);
+};
+export const updatePostgresqlPassword = (params: Database.ChangeInfo) => {
+    let request = deepCopy(params) as Database.ChangeInfo;
+    if (request.value) {
+        request.value = Base64.encode(request.value);
+    }
+    return http.post(`/databases/pg/password`, request);
+};
+export const deletePostgresqlDB = (params: Database.PostgresqlDBDelete) => {
+    return http.post(`/databases/pg/del`, params);
+};
 export const addMysqlDB = (params: Database.MysqlDBCreate) => {
     let request = deepCopy(params) as Database.MysqlDBCreate;
     if (request.password) {

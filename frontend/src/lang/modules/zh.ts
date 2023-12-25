@@ -349,6 +349,7 @@ const message = {
         deleteHelper: '" 删除此数据库',
         create: '创建数据库',
         noMysql: '数据库服务 (MySQL 或 MariaDB)',
+        noPostgresql: '数据库服务 Postgresql',
         goUpgrade: '去应用列表升级',
         goInstall: '去应用商店安装',
         source: '来源',

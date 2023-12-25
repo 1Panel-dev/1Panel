@@ -352,6 +352,7 @@ const message = {
         deleteHelper: '" to delete this database',
         create: 'Create database',
         noMysql: 'Database service (MySQL or MariaDB)',
+        noPostgresql: 'Database service Postgresql',
         goUpgrade: 'Go for upgrade',
         goInstall: 'Go for install',
         source: 'Source',

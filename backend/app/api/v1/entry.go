@@ -22,6 +22,7 @@ var (
 	dockerService          = service.NewIDockerService()
 
 	mysqlService    = service.NewIMysqlService()
+	postgresqlService    = service.NewIPostgresqlService()
 	databaseService = service.NewIDatabaseService()
 	redisService    = service.NewIRedisService()
 

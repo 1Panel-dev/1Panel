@@ -3,6 +3,8 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/utils/postgresql"
+	client2 "github.com/1Panel-dev/1Panel/backend/utils/postgresql/client"
 	"os"
 	"path"
 
@@ -78,23 +80,42 @@ func (u *DatabaseService) List(dbType string) ([]dto.DatabaseOption, error) {
 }
 
 func (u *DatabaseService) CheckDatabase(req dto.DatabaseCreate) bool {
-	if _, err := mysql.NewMysqlClient(client.DBInfo{
-		From:     "remote",
-		Address:  req.Address,
-		Port:     req.Port,
-		Username: req.Username,
-		Password: req.Password,
+	switch req.Type {
+	case constant.AppPostgresql:
+		_, err := postgresql.NewPostgresqlClient(client2.DBInfo{
+			From:     "remote",
+			Address:  req.Address,
+			Port:     req.Port,
+			Username: req.Username,
+			Password: req.Password,
 
-		SSL:        req.SSL,
-		RootCert:   req.RootCert,
-		ClientKey:  req.ClientKey,
-		ClientCert: req.ClientCert,
-		SkipVerify: req.SkipVerify,
-		Timeout:    6,
-	}); err != nil {
-		return false
+			SSL:        false,
+			RootCert:   req.RootCert,
+			ClientKey:  req.ClientKey,
+			ClientCert: req.ClientCert,
+			SkipVerify: req.SkipVerify,
+			Timeout:    6,
+		})
+		return err == nil
+	case "mysql", "mariadb":
+		_, err := mysql.NewMysqlClient(client.DBInfo{
+			From:     "remote",
+			Address:  req.Address,
+			Port:     req.Port,
+			Username: req.Username,
+			Password: req.Password,
+
+			SSL:        req.SSL,
+			RootCert:   req.RootCert,
+			ClientKey:  req.ClientKey,
+			ClientCert: req.ClientCert,
+			SkipVerify: req.SkipVerify,
+			Timeout:    6,
+		})
+		return err == nil
 	}
-	return true
+
+	return false
 }
 
 func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
@@ -105,22 +126,45 @@ func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
 		}
 		return constant.ErrRecordExist
 	}
-	if _, err := mysql.NewMysqlClient(client.DBInfo{
-		From:     "remote",
-		Address:  req.Address,
-		Port:     req.Port,
-		Username: req.Username,
-		Password: req.Password,
+	switch req.Type {
+	case constant.AppPostgresql:
+		if _, err := postgresql.NewPostgresqlClient(client2.DBInfo{
+			From:     "remote",
+			Address:  req.Address,
+			Port:     req.Port,
+			Username: req.Username,
+			Password: req.Password,
 
-		SSL:        req.SSL,
-		RootCert:   req.RootCert,
-		ClientKey:  req.ClientKey,
-		ClientCert: req.ClientCert,
-		SkipVerify: req.SkipVerify,
-		Timeout:    6,
-	}); err != nil {
-		return err
+			SSL:        req.SSL,
+			RootCert:   req.RootCert,
+			ClientKey:  req.ClientKey,
+			ClientCert: req.ClientCert,
+			SkipVerify: req.SkipVerify,
+			Timeout:    6,
+		}); err != nil {
+			return err
+		}
+	case "mysql", "mariadb":
+		if _, err := mysql.NewMysqlClient(client.DBInfo{
+			From:     "remote",
+			Address:  req.Address,
+			Port:     req.Port,
+			Username: req.Username,
+			Password: req.Password,
+
+			SSL:        req.SSL,
+			RootCert:   req.RootCert,
+			ClientKey:  req.ClientKey,
+			ClientCert: req.ClientCert,
+			SkipVerify: req.SkipVerify,
+			Timeout:    6,
+		}); err != nil {
+			return err
+		}
+	default:
+		return errors.New("database type not supported")
 	}
+
 	if err := copier.Copy(&db, &req); err != nil {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
@@ -178,22 +222,43 @@ func (u *DatabaseService) Delete(req dto.DatabaseDelete) error {
 }
 
 func (u *DatabaseService) Update(req dto.DatabaseUpdate) error {
-	if _, err := mysql.NewMysqlClient(client.DBInfo{
-		From:     "remote",
-		Address:  req.Address,
-		Port:     req.Port,
-		Username: req.Username,
-		Password: req.Password,
+	switch req.Type {
+	case constant.AppPostgresql:
+		if _, err := postgresql.NewPostgresqlClient(client2.DBInfo{
+			From:     "remote",
+			Address:  req.Address,
+			Port:     req.Port,
+			Username: req.Username,
+			Password: req.Password,
 
-		SSL:        req.SSL,
-		ClientKey:  req.ClientKey,
-		ClientCert: req.ClientCert,
-		RootCert:   req.RootCert,
-		SkipVerify: req.SkipVerify,
+			SSL:        req.SSL,
+			RootCert:   req.RootCert,
+			ClientKey:  req.ClientKey,
+			ClientCert: req.ClientCert,
+			SkipVerify: req.SkipVerify,
+			Timeout:    300,
+		}); err != nil {
+			return err
+		}
+	case "mysql", "mariadb":
+		if _, err := mysql.NewMysqlClient(client.DBInfo{
+			From:     "remote",
+			Address:  req.Address,
+			Port:     req.Port,
+			Username: req.Username,
+			Password: req.Password,
 
-		Timeout: 300,
-	}); err != nil {
-		return err
+			SSL:        req.SSL,
+			RootCert:   req.RootCert,
+			ClientKey:  req.ClientKey,
+			ClientCert: req.ClientCert,
+			SkipVerify: req.SkipVerify,
+			Timeout:    300,
+		}); err != nil {
+			return err
+		}
+	default:
+		return errors.New("database type not supported")
 	}
 
 	pass, err := encrypt.StringEncrypt(req.Password)
@@ -208,6 +273,7 @@ func (u *DatabaseService) Update(req dto.DatabaseUpdate) error {
 	upMap["port"] = req.Port
 	upMap["username"] = req.Username
 	upMap["password"] = pass
+	upMap["description"] = req.Description
 	upMap["ssl"] = req.SSL
 	upMap["client_key"] = req.ClientKey
 	upMap["client_cert"] = req.ClientCert

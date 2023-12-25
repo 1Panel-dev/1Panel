@@ -22,6 +22,7 @@ const (
 	AppOpenresty = "openresty"
 	AppMysql     = "mysql"
 	AppMariaDB   = "mariadb"
+	AppPostgresql = "postgresql"
 	AppRedis     = "redis"
 
 	AppResourceLocal  = "local"
