@@ -1,8 +1,6 @@
 module github.com/1Panel-dev/1Panel
 
-go 1.21
-
-toolchain go1.21.4
+go 1.20
 
 require (
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.5+incompatible
