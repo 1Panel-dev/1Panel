@@ -28,6 +28,7 @@ require (
 	github.com/jinzhu/gorm v1.9.2
 	github.com/joho/godotenv v1.5.1
 	github.com/klauspost/compress v1.16.5
+	github.com/mattn/go-sqlite3 v1.14.19
 	github.com/mholt/archiver/v4 v4.0.0-alpha.8
 	github.com/minio/minio-go/v7 v7.0.36
 	github.com/mojocn/base64Captcha v1.3.6
@@ -60,7 +61,8 @@ require (
 	gopkg.in/ini.v1 v1.67.0
 	gopkg.in/square/go-jose.v2 v2.6.0
 	gopkg.in/yaml.v3 v3.0.1
-	gorm.io/gorm v1.24.6
+	gorm.io/driver/sqlite v1.5.4
+	gorm.io/gorm v1.25.2-0.20230530020048-26663ab9bf55
 )
 
 require (
@@ -250,6 +252,7 @@ require (
 
 replace (
 	github.com/cucumber/godog => github.com/cucumber/godog v0.12.6
+	github.com/mattn/go-sqlite3 => github.com/jgiannuzzi/go-sqlite3 v1.14.17-0.20230719111531-6e53453ccbd3
 	golang.org/x/net => golang.org/x/net v0.17.0
 	k8s.io/api => k8s.io/api v0.22.4
 	k8s.io/apimachinery => k8s.io/apimachinery v0.22.4
