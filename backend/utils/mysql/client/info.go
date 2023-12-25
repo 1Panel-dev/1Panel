@@ -4,9 +4,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"errors"
-	"strings"
 
-	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/go-sql-driver/mysql"
 )
 
@@ -101,28 +99,6 @@ var formatMap = map[string]string{
 	"utf8mb4": "utf8mb4_general_ci",
 	"gbk":     "gbk_chinese_ci",
 	"big5":    "big5_chinese_ci",
-}
-
-func loadNameByDB(name, version string) string {
-	nameItem := common.ConvertToPinyin(name)
-	if strings.HasPrefix(version, "5.6") {
-		if len(nameItem) <= 16 {
-			return nameItem
-		}
-		return strings.TrimSuffix(nameItem[:10], "_") + "_" + common.RandStr(5)
-	}
-	if len(nameItem) <= 32 {
-		return nameItem
-	}
-	return strings.TrimSuffix(nameItem[:25], "_") + "_" + common.RandStr(5)
-}
-
-func randomPassword(user string) string {
-	passwdItem := user
-	if len(user) > 6 {
-		passwdItem = user[:6]
-	}
-	return passwdItem + "@" + common.RandStrAndNum(8)
 }
 
 func VerifyPeerCertFunc(pool *x509.CertPool) func([][]byte, [][]*x509.Certificate) error {

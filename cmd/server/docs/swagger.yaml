@@ -137,6 +137,25 @@ definitions:
     - bindAddress
     - ipv6
     type: object
+  dto.BindUser:
+    properties:
+      database:
+        type: string
+      db:
+        type: string
+      password:
+        type: string
+      permission:
+        type: string
+      username:
+        type: string
+    required:
+    - database
+    - db
+    - password
+    - permission
+    - username
+    type: object
   dto.CaptchaResponse:
     properties:
       captchaID:
@@ -7268,6 +7287,34 @@ paths:
       summary: Load mysql base info
       tags:
       - Database Mysql
+  /databases/bind:
+    post:
+      consumes:
+      - application/json
+      description: 绑定 mysql 数据库用户
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BindUser'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Bind user of mysql database
+      tags:
+      - Database Mysql
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - database
+        - username
+        formatEN: bind mysql database [database] [username]
+        formatZH: 绑定 mysql 数据库名 [database] [username]
+        paramKeys: []
   /databases/change/access:
     post:
       consumes:
@@ -11106,7 +11153,7 @@ paths:
         BeforeFunctions: []
         bodyKeys:
         - version
-        formatEN: upgrade service => [version]
+        formatEN: upgrade system => [version]
         formatZH: 更新系统 => [version]
         paramKeys: []
   /toolbox/clean:

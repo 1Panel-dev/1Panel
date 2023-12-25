@@ -3952,6 +3952,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/databases/bind": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "绑定 mysql 数据库用户",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Database Mysql"
+                ],
+                "summary": "Bind user of mysql database",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.BindUser"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "database",
+                        "username"
+                    ],
+                    "formatEN": "bind mysql database [database] [username]",
+                    "formatZH": "绑定 mysql 数据库名 [database] [username]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/databases/change/access": {
             "post": {
                 "security": [
@@ -10013,7 +10056,7 @@ const docTemplate = `{
                     "bodyKeys": [
                         "version"
                     ],
-                    "formatEN": "upgrade service =\u003e [version]",
+                    "formatEN": "upgrade system =\u003e [version]",
                     "formatZH": "更新系统 =\u003e [version]",
                     "paramKeys": []
                 }
@@ -13598,6 +13641,33 @@ const docTemplate = `{
                         "enable",
                         "disable"
                     ]
+                }
+            }
+        },
+        "dto.BindUser": {
+            "type": "object",
+            "required": [
+                "database",
+                "db",
+                "password",
+                "permission",
+                "username"
+            ],
+            "properties": {
+                "database": {
+                    "type": "string"
+                },
+                "db": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "permission": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         },

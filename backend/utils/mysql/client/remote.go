@@ -333,19 +333,6 @@ func (r *Remote) SyncDB(version string) ([]SyncDBInfo, error) {
 			i++
 		}
 		if len(dataItem.Username) == 0 {
-			dataItem.Username = loadNameByDB(dbName, version)
-			dataItem.Password = randomPassword(dataItem.Username)
-			if err := r.CreateUser(CreateInfo{
-				Name:       dbName,
-				Format:     charsetName,
-				Version:    version,
-				Username:   dataItem.Username,
-				Password:   dataItem.Password,
-				Permission: "%",
-				Timeout:    300,
-			}, false); err != nil {
-				return datas, fmt.Errorf("sync db from remote server failed, err: create user failed %v", err)
-			}
 			dataItem.Permission = "%"
 		} else {
 			if isLocal {

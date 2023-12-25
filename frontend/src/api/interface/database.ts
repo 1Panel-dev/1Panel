@@ -48,6 +48,13 @@ export namespace Database {
         permission: string;
         description: string;
     }
+    export interface BindUser {
+        database: string;
+        db: string;
+        username: string;
+        password: string;
+        permission: string;
+    }
     export interface MysqlLoadDB {
         from: string;
         type: string;

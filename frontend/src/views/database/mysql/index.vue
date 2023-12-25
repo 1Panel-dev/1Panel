@@ -124,10 +124,24 @@
             <template #main v-if="currentDB">
                 <ComplexTable :pagination-config="paginationConfig" @sort-change="search" @search="search" :data="data">
                     <el-table-column :label="$t('commons.table.name')" prop="name" sortable />
-                    <el-table-column :label="$t('commons.login.username')" prop="username" />
+                    <el-table-column :label="$t('commons.login.username')" prop="username">
+                        <template #default="{ row }">
+                            <div class="flex items-center" v-if="row.username">
+                                <span>
+                                    {{ row.username }}
+                                </span>
+                            </div>
+                            <div v-else>
+                                <el-button style="margin-left: -3px" type="primary" link @click="onBind(row)">
+                                    {{ $t('database.userBind') }}
+                                </el-button>
+                            </div>
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('commons.login.password')" prop="password">
                         <template #default="{ row }">
-                            <div class="flex items-center" v-if="row.password">
+                            <span v-if="row.username === ''">-</span>
+                            <div class="flex items-center" v-if="row.password && row.username">
                                 <div class="star-center" v-if="!row.showPassword">
                                     <span>**********</span>
                                 </div>
@@ -154,10 +168,10 @@
                                     <CopyButton :content="row.password" type="icon" />
                                 </div>
                             </div>
-                            <div v-else>
-                                <el-link @click="onChangePassword(row)">
-                                    <span style="font-size: 12px">{{ $t('database.passwordHelper') }}</span>
-                                </el-link>
+                            <div v-if="row.password === '' && row.username">
+                                <el-button style="margin-left: -3px" link type="primary" @click="onChangePassword(row)">
+                                    {{ $t('database.passwordHelper') }}
+                                </el-button>
                             </div>
                         </template>
                     </el-table-column>
@@ -221,6 +235,7 @@
             </template>
         </el-dialog>
 
+        <BindDialog ref="bindRef" @search="search" />
         <PasswordDialog ref="passwordRef" @search="search" />
         <RootPasswordDialog ref="connRef" />
         <UploadDialog ref="uploadRef" />
@@ -235,6 +250,7 @@
 </template>
 
 <script lang="ts" setup>
+import BindDialog from '@/views/database/mysql/bind/index.vue';
 import OperateDialog from '@/views/database/mysql/create/index.vue';
 import DeleteDialog from '@/views/database/mysql/delete/index.vue';
 import PasswordDialog from '@/views/database/mysql/password/index.vue';
@@ -274,6 +290,7 @@ const dbOptionsRemote = ref<Array<Database.DatabaseOption>>([]);
 const currentDB = ref<Database.DatabaseOption>();
 const currentDBName = ref();
 
+const bindRef = ref();
 const checkRef = ref();
 const deleteRef = ref();
 
@@ -508,6 +525,14 @@ const onDelete = async (row: Database.MysqlDBInfo) => {
     }
 };
 
+const onBind = async (row: Database.MysqlDBInfo) => {
+    let param = {
+        database: currentDBName.value,
+        mysqlName: row.name,
+    };
+    bindRef.value.acceptParams(param);
+};
+
 const onChangePassword = async (row: Database.MysqlDBInfo) => {
     let param = {
         id: row.id,
@@ -525,6 +550,9 @@ const onChangePassword = async (row: Database.MysqlDBInfo) => {
 const buttons = [
     {
         label: i18n.global.t('database.changePassword'),
+        disabled: (row: Database.MysqlDBInfo) => {
+            return !row.username;
+        },
         click: (row: Database.MysqlDBInfo) => {
             onChangePassword(row);
         },
