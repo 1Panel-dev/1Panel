@@ -35,6 +35,7 @@ type IMysqlService interface {
 	SearchWithPage(search dto.MysqlDBSearch) (int64, interface{}, error)
 	ListDBOption() ([]dto.MysqlOption, error)
 	Create(ctx context.Context, req dto.MysqlDBCreate) (*model.DatabaseMysql, error)
+	BindUser(req dto.BindUser) error
 	LoadFromRemote(req dto.MysqlLoadDB) error
 	ChangeAccess(info dto.ChangeDBInfo) error
 	ChangePassword(info dto.ChangeDBInfo) error
@@ -142,6 +143,42 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 		return nil, err
 	}
 	return &createItem, nil
+}
+
+func (u *MysqlService) BindUser(req dto.BindUser) error {
+	dbItem, err := mysqlRepo.Get(mysqlRepo.WithByMysqlName(req.Database), commonRepo.WithByName(req.DB))
+	if err != nil {
+		return err
+	}
+	cli, version, err := LoadMysqlClientByFrom(req.Database)
+	if err != nil {
+		return err
+	}
+	defer cli.Close()
+
+	if err := cli.CreateUser(client.CreateInfo{
+		Name:       dbItem.Name,
+		Format:     dbItem.Format,
+		Username:   req.Username,
+		Password:   req.Password,
+		Permission: req.Permission,
+		Version:    version,
+		Timeout:    300,
+	}, false); err != nil {
+		return err
+	}
+	pass, err := encrypt.StringEncrypt(req.Password)
+	if err != nil {
+		return fmt.Errorf("decrypt database db password failed, err: %v", err)
+	}
+	if err := mysqlRepo.Update(dbItem.ID, map[string]interface{}{
+		"username":   req.Username,
+		"password":   pass,
+		"permission": req.Permission,
+	}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *MysqlService) LoadFromRemote(req dto.MysqlLoadDB) error {

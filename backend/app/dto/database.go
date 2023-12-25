@@ -43,6 +43,14 @@ type MysqlDBCreate struct {
 	Description string `json:"description"`
 }
 
+type BindUser struct {
+	Database   string `json:"database" validate:"required"`
+	DB         string `json:"db" validate:"required"`
+	Username   string `json:"username" validate:"required"`
+	Password   string `json:"password" validate:"required"`
+	Permission string `json:"permission" validate:"required"`
+}
+
 type MysqlLoadDB struct {
 	From     string `json:"from" validate:"required,oneof=local remote"`
 	Type     string `json:"type" validate:"required,oneof=mysql mariadb"`

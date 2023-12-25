@@ -307,19 +307,6 @@ func (r *Local) SyncDB(version string) ([]SyncDBInfo, error) {
 			}
 		}
 		if len(dataItem.Username) == 0 {
-			dataItem.Username = loadNameByDB(parts[0], version)
-			dataItem.Password = randomPassword(dataItem.Username)
-			if err := r.CreateUser(CreateInfo{
-				Name:       parts[0],
-				Format:     parts[1],
-				Version:    version,
-				Username:   dataItem.Username,
-				Password:   dataItem.Password,
-				Permission: "%",
-				Timeout:    300,
-			}, false); err != nil {
-				global.LOG.Errorf("sync from remote server failed, err: create user failed %v", err)
-			}
 			dataItem.Permission = "%"
 		} else {
 			if isLocal {
