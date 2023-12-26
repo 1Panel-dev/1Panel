@@ -35,7 +35,7 @@
                         ></el-option>
                     </el-select>
                     <el-button class="left-button">
-                        <el-checkbox v-model="tailLog" @change="changeTail">
+                        <el-checkbox v-model="tailLog" @change="changeTail" :disabled="logConfig.id == undefined">
                             {{ $t('commons.button.watch') }}
                         </el-checkbox>
                     </el-button>
@@ -73,7 +73,7 @@ import LogFile from '@/components/log-file/index.vue';
 
 const logConfig = reactive({
     type: 'website',
-    id: 0,
+    id: undefined,
     name: 'access.log',
 });
 const showLog = ref(false);
