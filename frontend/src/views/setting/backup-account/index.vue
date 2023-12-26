@@ -2,7 +2,7 @@
     <div>
         <LayoutContent :title="$t('commons.button.backup')">
             <template #main>
-                <el-form label-position="left" label-width="130px" :v-key="reflash">
+                <el-form label-width="130px" :v-key="refresh">
                     <el-row :gutter="20">
                         <el-col :span="24">
                             <div>
@@ -414,8 +414,15 @@
             </template>
         </LayoutContent>
 
+        <s3Dialog ref="s3Ref" @search="search" />
+        <ossDialog ref="ossRef" @search="search" />
+        <cosDialog ref="cosRef" @search="search" />
+        <oneDriveDialog ref="oneDriveRef" @search="search" />
+        <kodoDialog ref="kodoRef" @search="search" />
+        <minioDialog ref="minioRef" @search="search" />
+        <sftpDialog ref="sftpRef" @search="search" />
+        <webDavDialog ref="webDavRef" @search="search" />
         <OpDialog ref="opRef" @search="search" />
-        <DialogOperate ref="dialogRef" @search="search" />
     </div>
 </template>
 <script setup lang="ts">
@@ -423,14 +430,31 @@ import { dateFormat } from '@/utils/util';
 import { onMounted, ref } from 'vue';
 import OpDialog from '@/components/del-dialog/index.vue';
 import { getBackupList, deleteBackup } from '@/api/modules/setting';
-import DialogOperate from '@/views/setting/backup-account/operate/index.vue';
+import s3Dialog from '@/views/setting/backup-account/s3/index.vue';
+import ossDialog from '@/views/setting/backup-account/oss/index.vue';
+import cosDialog from '@/views/setting/backup-account/cos/index.vue';
+import oneDriveDialog from '@/views/setting/backup-account/onedrive/index.vue';
+import kodoDialog from '@/views/setting/backup-account/kodo/index.vue';
+import minioDialog from '@/views/setting/backup-account/minio/index.vue';
+import sftpDialog from '@/views/setting/backup-account/sftp/index.vue';
+import webDavDialog from '@/views/setting/backup-account/webdav/index.vue';
 import { Backup } from '@/api/interface/backup';
 import { ElForm } from 'element-plus';
 import i18n from '@/lang';
 
 const data = ref();
 const opRef = ref();
-const reflash = ref(false);
+const refresh = ref(false);
+
+const s3Ref = ref();
+const ossRef = ref();
+const cosRef = ref();
+const oneDriveRef = ref();
+const kodoRef = ref();
+const minioRef = ref();
+const sftpRef = ref();
+const webDavRef = ref();
+
 const localData = ref<Backup.BackupInfo>({
     id: 0,
     type: 'LOCAL',
@@ -453,7 +477,6 @@ const ossData = ref<Backup.BackupInfo>({
     backupPath: '',
     vars: '',
     varsJson: {
-        region: '',
         endpoint: '',
         scType: 'Standard',
     },
@@ -540,6 +563,7 @@ const cosData = ref<Backup.BackupInfo>({
     varsJson: {
         region: '',
         scType: 'Standard',
+        endpoint: '',
     },
     createdAt: new Date(),
 });
@@ -609,7 +633,6 @@ const onDelete = async (row: Backup.BackupInfo) => {
     });
 };
 
-const dialogRef = ref();
 const onOpenDialog = async (
     title: string,
     accountType: string,
@@ -623,7 +646,32 @@ const onOpenDialog = async (
         title,
         rowData: { ...rowData },
     };
-    dialogRef.value!.acceptParams(params);
+    switch (accountType) {
+        case 'S3':
+            s3Ref.value.acceptParams(params);
+            return;
+        case 'OSS':
+            ossRef.value.acceptParams(params);
+            return;
+        case 'COS':
+            cosRef.value.acceptParams(params);
+            return;
+        case 'OneDrive':
+            oneDriveRef.value.acceptParams(params);
+            return;
+        case 'KODO':
+            kodoRef.value.acceptParams(params);
+            return;
+        case 'MINIO':
+            minioRef.value.acceptParams(params);
+            return;
+        case 'SFTP':
+            sftpRef.value.acceptParams(params);
+            return;
+        case 'WebDAV':
+            webDavRef.value.acceptParams(params);
+            return;
+    }
 };
 
 onMounted(() => {

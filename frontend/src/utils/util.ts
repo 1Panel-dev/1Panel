@@ -370,6 +370,19 @@ export function transTimeUnit(val: string): any {
     return val + i18n.global.t('commons.units.second');
 }
 
+export function splitHttp(url: string) {
+    if (url.indexOf('https://') != -1) {
+        return { proto: 'https', url: url.replaceAll('https://', '') };
+    }
+    if (url.indexOf('http://') != -1) {
+        return { proto: 'http', url: url.replaceAll('http://', '') };
+    }
+    return { proto: '', url: url };
+}
+export function spliceHttp(proto: string, url: string) {
+    return proto + '://' + url.replaceAll('https://', '').replaceAll('http://', '');
+}
+
 export function getAge(d1: string): string {
     const dateBegin = new Date(d1);
     const dateEnd = new Date();
