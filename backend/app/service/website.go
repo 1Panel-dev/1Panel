@@ -1413,7 +1413,7 @@ func (w WebsiteService) UpdateSitePermission(req request.WebsiteUpdateDirPermiss
 	if cmd.HasNoPasswordSudo() {
 		chownCmd = fmt.Sprintf("sudo %s", chownCmd)
 	}
-	if out, err := cmd.ExecWithTimeOut(chownCmd, 1*time.Second); err != nil {
+	if out, err := cmd.ExecWithTimeOut(chownCmd, 10*time.Second); err != nil {
 		if out != "" {
 			return errors.New(out)
 		}
