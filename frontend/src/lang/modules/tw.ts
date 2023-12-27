@@ -728,6 +728,7 @@ const message = {
         sockPathHelper1: '默認路徑：/var/run/docker-x.sock',
         sockPathMsg: '保存設定 Socket 路徑可能導致 Docker 服務不可用，是否繼續？',
         sockPathErr: '請選擇或輸入正確的 Docker sock 文件路徑',
+        related: '相關資源',
     },
     cronjob: {
         create: '創建計劃任務',

@@ -729,6 +729,7 @@ const message = {
         sockPathHelper1: '默认路径：/var/run/docker.sock',
         sockPathMsg: '保存设置 Socket 路径可能导致 Docker 服务不可用，是否继续？',
         sockPathErr: '请选择或输入正确的 Docker sock 文件路径',
+        related: '关联资源',
     },
     cronjob: {
         create: '创建计划任务',
