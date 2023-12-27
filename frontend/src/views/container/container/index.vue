@@ -76,15 +76,16 @@
                     @sort-change="search"
                     @search="search"
                     :row-style="{ height: '65px' }"
+                    style="width: 100%"
                 >
-                    <el-table-column type="selection" fix />
+                    <el-table-column type="selection" />
                     <el-table-column
                         :label="$t('commons.table.name')"
-                        :width="mobile ? 300 : 'auto'"
-                        min-width="80"
+                        :width="mobile ? 300 : '200'"
+                        min-width="100"
                         prop="name"
                         sortable
-                        fix
+                        :fixed="mobile ? 'false' : 'left'"
                     >
                         <template #default="{ row }">
                             <Tooltip @click="onInspect(row.containerID)" :text="row.name" />
@@ -93,15 +94,15 @@
                     <el-table-column
                         :label="$t('container.image')"
                         show-overflow-tooltip
-                        min-width="80"
+                        min-width="150"
                         prop="imageName"
                     />
-                    <el-table-column :label="$t('commons.table.status')" min-width="70" prop="state" sortable fix>
+                    <el-table-column :label="$t('commons.table.status')" min-width="100" prop="state" sortable>
                         <template #default="{ row }">
                             <Status :key="row.state" :status="row.state"></Status>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.source')" show-overflow-tooltip min-width="80" fix>
+                    <el-table-column :label="$t('container.source')" show-overflow-tooltip min-width="100">
                         <template #default="{ row }">
                             <div v-if="row.hasLoad">
                                 <div class="source-font">CPU: {{ row.cpuPercent.toFixed(2) }}%</div>
@@ -174,17 +175,56 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.ip')" :width="mobile ? 80 : 'auto'" min-width="70" fix>
+                    <el-table-column :label="$t('container.ip')" :width="mobile ? 80 : 'auto'" min-width="100" fix>
                         <template #default="{ row }">
                             <div v-if="row.network">
                                 <div v-for="(item, index) in row.network" :key="index">{{ item }}</div>
                             </div>
                         </template>
                     </el-table-column>
+                    <el-table-column :label="$t('container.related')" min-width="200">
+                        <template #default="{ row }">
+                            <el-tooltip
+                                v-if="row.appName != ''"
+                                :hide-after="20"
+                                :content="row.appName"
+                                placement="top"
+                            >
+                                <el-button
+                                    icon="Position"
+                                    type="primary"
+                                    plain
+                                    size="small"
+                                    @click="router.push({ name: 'AppInstalled' })"
+                                >
+                                    {{ $t('app.app') }}: {{ row.appName }} [{{ row.appInstallName }}]
+                                </el-button>
+                            </el-tooltip>
+
+                            <el-tooltip
+                                v-if="row.websites != null"
+                                :hide-after="20"
+                                :content="row.websites.join(',')"
+                                placement="top"
+                                class="mt-1"
+                            >
+                                <el-button
+                                    icon="Position"
+                                    type="primary"
+                                    plain
+                                    size="small"
+                                    @click="router.push({ name: 'Website' })"
+                                >
+                                    {{ $t('website.website') }}:
+                                    {{ row.websites.join(',') }}
+                                </el-button>
+                            </el-tooltip>
+                        </template>
+                    </el-table-column>
                     <el-table-column
                         :label="$t('commons.table.port')"
                         :width="mobile ? 260 : 'auto'"
-                        min-width="130"
+                        min-width="200"
                         prop="ports"
                         fix
                     >
@@ -225,7 +265,7 @@
                     </el-table-column>
                     <el-table-column
                         :label="$t('container.upTime')"
-                        min-width="80"
+                        min-width="200"
                         show-overflow-tooltip
                         prop="runTime"
                         fix
@@ -235,7 +275,7 @@
                         :ellipsis="2"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
-                        fix
+                        fixed="right"
                     />
                 </ComplexTable>
             </template>

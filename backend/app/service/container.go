@@ -162,7 +162,7 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 		}
 
 		ports := loadContainerPort(item.Ports)
-		backDatas[i] = dto.ContainerInfo{
+		info := dto.ContainerInfo{
 			ContainerID:   item.ID,
 			CreateTime:    time.Unix(item.Created, 0).Format("2006-01-02 15:04:05"),
 			Name:          item.Names[0][1:],
@@ -174,6 +174,16 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 			IsFromApp:     IsFromApp,
 			IsFromCompose: IsFromCompose,
 		}
+		install, _ := appInstallRepo.GetFirst(appInstallRepo.WithContainerName(info.Name))
+		if install.ID > 0 {
+			info.AppInstallName = install.Name
+			info.AppName = install.App.Name
+			websites, _ := websiteRepo.GetBy(websiteRepo.WithAppInstallId(install.ID))
+			for _, website := range websites {
+				info.Websites = append(info.Websites, website.PrimaryDomain)
+			}
+		}
+		backDatas[i] = info
 		if item.NetworkSettings != nil && len(item.NetworkSettings.Networks) > 0 {
 			networks := make([]string, 0, len(item.NetworkSettings.Networks))
 			for key := range item.NetworkSettings.Networks {
