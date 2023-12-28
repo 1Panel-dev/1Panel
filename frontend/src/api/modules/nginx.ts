@@ -21,3 +21,7 @@ export const GetNginxStatus = () => {
 export const UpdateNginxConfigFile = (req: Nginx.NginxFileUpdate) => {
     return http.post<any>(`/openresty/file`, req);
 };
+
+export const ClearNginxCache = () => {
+    return http.post<any>(`/openresty/clear`);
+};

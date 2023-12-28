@@ -8100,6 +8100,32 @@
                 }
             }
         },
+        "/openResty/clear": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "清理 OpenResty 代理缓存",
+                "tags": [
+                    "OpenResty"
+                ],
+                "summary": "Clear OpenResty proxy cache",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [],
+                    "formatEN": "Clear nginx proxy cache",
+                    "formatZH": "清理 Openresty 代理缓存",
+                    "paramKeys": []
+                }
+            }
+        },
         "/openResty/file": {
             "post": {
                 "security": [
@@ -16197,6 +16223,9 @@
                 "state"
             ],
             "properties": {
+                "excludeAppStore": {
+                    "type": "boolean"
+                },
                 "filters": {
                     "type": "string"
                 },
@@ -16692,6 +16721,7 @@
                     "enum": [
                         "self",
                         "select",
+                        "import",
                         "import-paste",
                         "import-local"
                     ]

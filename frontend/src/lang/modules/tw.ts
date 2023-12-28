@@ -1744,6 +1744,8 @@ const message = {
         nginxConfig: '設置',
         configResource: '配置修改',
         saveAndReload: '保存並重載',
+        clearProxyCache: '清除反代快取',
+        clearProxyCacheWarn: '清除反代快取會影響所有配置快取的網站，並且需要重新啟動 OpenResty， 是否繼續？ ',
     },
     ssl: {
         create: '申請證書',

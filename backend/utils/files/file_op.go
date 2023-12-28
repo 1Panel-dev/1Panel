@@ -89,6 +89,10 @@ func (f FileOp) Delete(dst string) error {
 	return os.RemoveAll(dst)
 }
 
+func (f FileOp) CleanDir(dst string) error {
+	return cmd.ExecCmd(fmt.Sprintf("rm -rf %s/*", dst))
+}
+
 func (f FileOp) RmRf(dst string) error {
 	return cmd.ExecCmd(fmt.Sprintf("rm -rf %s", dst))
 }

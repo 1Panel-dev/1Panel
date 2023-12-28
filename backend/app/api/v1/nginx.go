@@ -101,3 +101,18 @@ func (b *BaseApi) UpdateNginxFile(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, nil)
 }
+
+// @Tags OpenResty
+// @Summary Clear OpenResty proxy cache
+// @Description 清理 OpenResty 代理缓存
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /openResty/clear [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"清理 Openresty 代理缓存","formatEN":"Clear nginx proxy cache"}
+func (b *BaseApi) ClearNginxProxyCache(c *gin.Context) {
+	if err := nginxService.ClearProxyCache(); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}

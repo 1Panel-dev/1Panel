@@ -1858,6 +1858,9 @@ const message = {
         nginxConfig: 'Settings',
         configResource: 'Configuration',
         saveAndReload: 'Save and Reload',
+        clearProxyCache: 'Clear reverse proxy cache',
+        clearProxyCacheWarn:
+            'Clearing the reverse proxy cache will affect all websites configured with cache and requires restarting OpenResty. Do you want to continue? ',
     },
     ssl: {
         create: 'Apply Certificate',
