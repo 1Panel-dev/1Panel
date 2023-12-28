@@ -89,10 +89,21 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 		options.Filters = filters.NewArgs()
 		options.Filters.Add("label", req.Filters)
 	}
-	list, err = client.ContainerList(context.Background(), options)
+	containers, err := client.ContainerList(context.Background(), options)
 	if err != nil {
 		return 0, nil, err
 	}
+	if req.ExcludeAppStore {
+		for _, item := range containers {
+			if created, ok := item.Labels[composeCreatedBy]; ok && created == "Apps" {
+				continue
+			}
+			list = append(list, item)
+		}
+	} else {
+		list = containers
+	}
+
 	if len(req.Name) != 0 {
 		length, count := len(list), 0
 		for count < length {
