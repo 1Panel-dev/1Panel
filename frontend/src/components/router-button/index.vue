@@ -54,7 +54,9 @@ const handleChange = (label: string) => {
 onMounted(() => {
     if (buttonArray.value.length) {
         let isPathExist = false;
-        const btn = buttonArray.value.find((btn) => btn.path === router.currentRoute.value.path);
+        const btn = buttonArray.value.find((btn) => {
+            return router.currentRoute.value.path.startsWith(btn.path);
+        });
         if (btn) {
             isPathExist = true;
             activeName.value = btn.label;

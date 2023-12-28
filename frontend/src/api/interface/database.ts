@@ -48,6 +48,7 @@ export namespace Database {
         permission: string;
         description: string;
     }
+
     export interface BindUser {
         database: string;
         db: string;
@@ -55,6 +56,7 @@ export namespace Database {
         password: string;
         permission: string;
     }
+
     export interface MysqlLoadDB {
         from: string;
         type: string;
@@ -65,6 +67,7 @@ export namespace Database {
         type: string;
         database: string;
     }
+
     export interface MysqlDBDelete {
         id: number;
         type: string;
@@ -144,6 +147,68 @@ export namespace Database {
         type: string;
         database: string;
         name: string;
+    }
+    export interface PostgresqlDBDelete {
+        id: number;
+        type: string;
+        database: string;
+        forceDelete: boolean;
+        deleteBackup: boolean;
+    }
+    export interface PostgresqlStatus {
+        uptime: string;
+        version: string;
+        max_connections: string;
+        autovacuum: string;
+        current_connections: string;
+        hit_ratio: string;
+        shared_buffers: string;
+        buffers_clean: string;
+        maxwritten_clean: string;
+        buffers_backend_fsync: string;
+    }
+    export interface PostgresqlDBDeleteCheck {
+        id: number;
+        type: string;
+        database: string;
+    }
+    export interface PostgresqlDBInfo {
+        id: number;
+        createdAt: Date;
+        name: string;
+        postgresqlName: string;
+        from: string;
+        format: string;
+        username: string;
+        password: string;
+        description: string;
+    }
+    export interface PostgresqlConfUpdateByFile {
+        type: string;
+        database: string;
+        file: string;
+    }
+    export interface PostgresqlDBCreate {
+        name: string;
+        from: string;
+        database: string;
+        format: string;
+        username: string;
+        password: string;
+        permission: string;
+        description: string;
+    }
+    export interface PostgresqlDBInfo {
+        id: number;
+        createdAt: Date;
+        name: string;
+        mysqlName: string;
+        from: string;
+        format: string;
+        username: string;
+        password: string;
+        permission: string;
+        description: string;
     }
     export interface ChangeInfo {
         id: number;

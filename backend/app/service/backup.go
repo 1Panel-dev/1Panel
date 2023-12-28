@@ -41,8 +41,11 @@ type IBackupService interface {
 	ListFiles(req dto.BackupSearchFile) ([]string, error)
 
 	MysqlBackup(db dto.CommonBackup) error
+	PostgresqlBackup(db dto.CommonBackup) error
 	MysqlRecover(db dto.CommonRecover) error
+	PostgresqlRecover(db dto.CommonRecover) error
 	MysqlRecoverByUpload(req dto.CommonRecover) error
+	PostgresqlRecoverByUpload(req dto.CommonRecover) error
 
 	RedisBackup() error
 	RedisRecover(db dto.CommonRecover) error

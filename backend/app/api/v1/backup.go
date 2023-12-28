@@ -300,6 +300,11 @@ func (b *BaseApi) Backup(c *gin.Context) {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 			return
 		}
+	case constant.AppPostgresql:
+		if err := backupService.PostgresqlBackup(req); err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
 	case "website":
 		if err := backupService.WebsiteBackup(req); err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
@@ -343,6 +348,11 @@ func (b *BaseApi) Recover(c *gin.Context) {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 			return
 		}
+	case constant.AppPostgresql:
+		if err := backupService.PostgresqlRecover(req); err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
 	case "website":
 		if err := backupService.WebsiteRecover(req); err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
@@ -380,6 +390,11 @@ func (b *BaseApi) RecoverByUpload(c *gin.Context) {
 	switch req.Type {
 	case "mysql", "mariadb":
 		if err := backupService.MysqlRecoverByUpload(req); err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
+	case constant.AppPostgresql:
+		if err := backupService.PostgresqlRecoverByUpload(req); err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 			return
 		}

@@ -142,6 +142,7 @@ export namespace App {
     }
 
     export interface DatabaseConnInfo {
+        username: string;
         password: string;
         privilege: boolean;
         serviceName: string;

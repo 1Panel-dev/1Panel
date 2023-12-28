@@ -1,0 +1,520 @@
+<template>
+    <div v-loading="loading">
+        <div class="app-status" style="margin-top: 20px" v-if="currentDB?.from === 'remote'">
+            <el-card>
+                <div>
+                    <el-tag style="float: left" effect="dark" type="success">PostgreSQL</el-tag>
+                    <el-tag class="status-content">{{ $t('app.version') }}: {{ currentDB?.version }}</el-tag>
+                </div>
+            </el-card>
+        </div>
+        <LayoutContent :title="'PostgreSQL ' + $t('menu.database')">
+            <template #app v-if="currentDB?.from === 'local'">
+                <AppStatus
+                    :app-key="appKey"
+                    :app-name="appName"
+                    v-model:loading="loading"
+                    v-model:mask-show="maskShow"
+                    @setting="onSetting"
+                    @is-exist="checkExist"
+                ></AppStatus>
+            </template>
+
+            <template #search v-if="currentDB">
+                <el-select v-model="currentDBName" @change="changeDatabase()">
+                    <template #prefix>{{ $t('commons.table.type') }}</template>
+                    <el-option-group :label="$t('database.local')">
+                        <div v-for="(item, index) in dbOptionsLocal" :key="index">
+                            <el-option v-if="item.from === 'local'" :value="item.database" class="optionClass">
+                                <span v-if="item.database.length < 25">{{ item.database }}</span>
+                                <el-tooltip v-else :content="item.database" placement="top">
+                                    <span>{{ item.database.substring(0, 25) }}...</span>
+                                </el-tooltip>
+                            </el-option>
+                        </div>
+                        <el-button link type="primary" class="jumpAdd" @click="goRouter('app')" icon="Position">
+                            {{ $t('database.goInstall') }}
+                        </el-button>
+                    </el-option-group>
+                    <el-option-group :label="$t('database.remote')">
+                        <div v-for="(item, index) in dbOptionsRemote" :key="index">
+                            <el-option v-if="item.from === 'remote'" :value="item.database" class="optionClass">
+                                <span v-if="item.database.length < 25">{{ item.database }}</span>
+                                <el-tooltip v-else :content="item.database" placement="top">
+                                    <span>{{ item.database.substring(0, 25) }}...</span>
+                                </el-tooltip>
+                            </el-option>
+                        </div>
+                        <el-button link type="primary" class="jumpAdd" @click="goRouter('remote')" icon="Position">
+                            {{ $t('database.createRemoteDB') }}
+                        </el-button>
+                    </el-option-group>
+                </el-select>
+            </template>
+
+            <template #toolbar>
+                <el-row>
+                    <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
+                        <el-button
+                            v-if="currentDB && (currentDB.from !== 'local' || postgresqlStatus === 'Running')"
+                            type="primary"
+                            @click="onOpenDialog()"
+                        >
+                            {{ $t('database.create') }}
+                        </el-button>
+                        <el-button
+                            v-if="currentDB && (currentDB.from !== 'local' || postgresqlStatus === 'Running')"
+                            @click="onChangeConn"
+                            type="primary"
+                            plain
+                        >
+                            {{ $t('database.databaseConnInfo') }}
+                        </el-button>
+                        <el-button @click="goRemoteDB" type="primary" plain>
+                            {{ $t('database.remoteDB') }}
+                        </el-button>
+                        <el-button @click="goDashboard()" type="primary" plain>PGAdmin4</el-button>
+                    </el-col>
+                    <el-col :xs="24" :sm="4" :md="4" :lg="4" :xl="4">
+                        <div class="search-button">
+                            <el-input
+                                v-model="searchName"
+                                clearable
+                                @clear="search()"
+                                suffix-icon="Search"
+                                @keyup.enter="search()"
+                                @change="search()"
+                                :placeholder="$t('commons.button.search')"
+                            ></el-input>
+                        </div>
+                    </el-col>
+                </el-row>
+            </template>
+            <template #main v-if="currentDB">
+                <ComplexTable :pagination-config="paginationConfig" @sort-change="search" @search="search" :data="data">
+                    <el-table-column :label="$t('commons.table.name')" prop="name" sortable />
+                    <el-table-column :label="$t('commons.login.username')" prop="username" />
+                    <el-table-column :label="$t('commons.login.password')" prop="password">
+                        <template #default="{ row }">
+                            <div class="flex items-center" v-if="row.password">
+                                <div class="star-center" v-if="!row.showPassword">
+                                    <span>**********</span>
+                                </div>
+                                <div>
+                                    <span v-if="row.showPassword">
+                                        {{ row.password }}
+                                    </span>
+                                </div>
+                                <el-button
+                                    v-if="!row.showPassword"
+                                    link
+                                    @click="row.showPassword = true"
+                                    icon="View"
+                                    class="ml-1.5"
+                                ></el-button>
+                                <el-button
+                                    v-if="row.showPassword"
+                                    link
+                                    @click="row.showPassword = false"
+                                    icon="Hide"
+                                    class="ml-1.5"
+                                ></el-button>
+                                <div>
+                                    <CopyButton :content="row.password" type="icon" />
+                                </div>
+                            </div>
+                            <div v-else>
+                                <el-link @click="onChangePassword(row)">
+                                    <span style="font-size: 12px">{{ $t('database.passwordHelper') }}</span>
+                                </el-link>
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('commons.table.description')" prop="description">
+                        <template #default="{ row }">
+                            <fu-input-rw-switch v-model="row.description" @blur="onChange(row)" />
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        prop="createdAt"
+                        :label="$t('commons.table.date')"
+                        :formatter="dateFormat"
+                        show-overflow-tooltip
+                    />
+                    <fu-table-operations
+                        width="370px"
+                        :buttons="buttons"
+                        :ellipsis="10"
+                        :label="$t('commons.table.operate')"
+                        fix
+                    />
+                </ComplexTable>
+            </template>
+        </LayoutContent>
+
+        <div v-if="dbOptionsLocal.length === 0 && dbOptionsRemote.length === 0">
+            <LayoutContent :title="'PostgreSQL ' + $t('menu.database')" :divider="true">
+                <template #main>
+                    <div class="app-warn">
+                        <div>
+                            <span>{{ $t('app.checkInstalledWarn', [$t('database.noPostgresql')]) }}</span>
+                            <span @click="goRouter('app')">
+                                <el-icon class="ml-2"><Position /></el-icon>
+                                {{ $t('database.goInstall') }}
+                            </span>
+                            <div>
+                                <img src="@/assets/images/no_app.svg" />
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </LayoutContent>
+        </div>
+
+        <el-dialog
+            v-model="dashboardVisible"
+            :title="$t('app.checkTitle')"
+            width="30%"
+            :close-on-click-modal="false"
+            :destroy-on-close="true"
+        >
+            <el-alert :closable="false" :title="$t('app.checkInstalledWarn', [dashboardName])" type="info">
+                <el-link icon="Position" @click="getAppDetail" type="primary">
+                    {{ $t('database.goInstall') }}
+                </el-link>
+            </el-alert>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="dashboardVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+                </span>
+            </template>
+        </el-dialog>
+
+        <PasswordDialog ref="passwordRef" @search="search" />
+        <RootPasswordDialog ref="connRef" />
+        <UploadDialog ref="uploadRef" />
+        <OperateDialog @search="search" ref="dialogRef" />
+        <Backups ref="dialogBackupRef" />
+
+        <AppResources ref="checkRef"></AppResources>
+        <DeleteDialog ref="deleteRef" @search="search" />
+
+        <PortJumpDialog ref="dialogPortJumpRef" />
+    </div>
+</template>
+
+<script lang="ts" setup>
+import OperateDialog from '@/views/database/postgresql/create/index.vue';
+import DeleteDialog from '@/views/database/postgresql/delete/index.vue';
+import PasswordDialog from '@/views/database/postgresql/password/index.vue';
+import RootPasswordDialog from '@/views/database/postgresql/conn/index.vue';
+import AppResources from '@/views/database/postgresql/check/index.vue';
+import AppStatus from '@/components/app-status/index.vue';
+import Backups from '@/components/backup/index.vue';
+import UploadDialog from '@/components/upload/index.vue';
+import PortJumpDialog from '@/components/port-jump/index.vue';
+import { dateFormat } from '@/utils/util';
+import { onMounted, reactive, ref } from 'vue';
+import {
+    deleteCheckPostgresqlDB,
+    listDatabases,
+    searchPostgresqlDBs,
+    updatePostgresqlDescription,
+} from '@/api/modules/database';
+import i18n from '@/lang';
+import { Database } from '@/api/interface/database';
+import { App } from '@/api/interface/app';
+import { GetAppPort } from '@/api/modules/app';
+import router from '@/routers';
+import { MsgSuccess } from '@/utils/message';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
+
+const loading = ref(false);
+const maskShow = ref(true);
+
+const appKey = ref('postgresql');
+const appName = ref();
+
+const dbOptionsLocal = ref<Array<Database.DatabaseOption>>([]);
+const dbOptionsRemote = ref<Array<Database.DatabaseOption>>([]);
+const currentDB = ref<Database.DatabaseOption>();
+const currentDBName = ref();
+
+const checkRef = ref();
+const deleteRef = ref();
+
+const pgadminPort = ref();
+const dashboardName = ref();
+const dashboardKey = ref();
+const dashboardVisible = ref(false);
+
+const dialogPortJumpRef = ref();
+
+const data = ref();
+const paginationConfig = reactive({
+    cacheSizeKey: 'postgresql-page-size',
+    currentPage: 1,
+    pageSize: Number(localStorage.getItem('postgresql-page-size')) || 10,
+    total: 0,
+    orderBy: 'created_at',
+    order: 'null',
+});
+const searchName = ref();
+
+const postgresqlContainer = ref();
+const postgresqlStatus = ref();
+const postgresqlVersion = ref();
+
+const dialogRef = ref();
+const onOpenDialog = async () => {
+    let params = {
+        from: currentDB.value.from,
+        type: currentDB.value.type,
+        database: currentDBName.value,
+    };
+    dialogRef.value!.acceptParams(params);
+};
+
+const dialogBackupRef = ref();
+
+const uploadRef = ref();
+
+const connRef = ref();
+const onChangeConn = async () => {
+    connRef.value!.acceptParams({
+        from: currentDB.value.from,
+        type: currentDB.value.type,
+        database: currentDBName.value,
+    });
+};
+
+const goRemoteDB = async () => {
+    if (currentDB.value) {
+        globalStore.setCurrentDB(currentDB.value.database);
+    }
+    router.push({ name: 'PostgreSQL-Remote' });
+};
+
+const passwordRef = ref();
+
+const onSetting = async () => {
+    if (currentDB.value) {
+        globalStore.setCurrentDB(currentDB.value.database);
+    }
+    router.push({
+        name: 'PostgreSQL-Setting',
+        params: { type: currentDB.value.type, database: currentDB.value.database },
+    });
+};
+
+const changeDatabase = async () => {
+    for (const item of dbOptionsLocal.value) {
+        if (item.database == currentDBName.value) {
+            currentDB.value = item;
+            appKey.value = item.type;
+            appName.value = item.database;
+            search();
+            return;
+        }
+    }
+    for (const item of dbOptionsRemote.value) {
+        if (item.database == currentDBName.value) {
+            currentDB.value = item;
+            break;
+        }
+    }
+    search();
+};
+
+const search = async (column?: any) => {
+    paginationConfig.orderBy = column?.order ? column.prop : paginationConfig.orderBy;
+    paginationConfig.order = column?.order ? column.order : paginationConfig.order;
+    let params = {
+        page: paginationConfig.currentPage,
+        pageSize: paginationConfig.pageSize,
+        info: searchName.value,
+        database: currentDB.value.database,
+        orderBy: paginationConfig.orderBy,
+        order: paginationConfig.order,
+    };
+    const res = await searchPostgresqlDBs(params);
+    data.value = res.data.items || [];
+    paginationConfig.total = res.data.total;
+};
+
+const goRouter = async (target: string) => {
+    if (target === 'app') {
+        router.push({ name: 'AppAll', query: { install: 'postgresql' } });
+        return;
+    }
+    router.push({ name: 'PostgreSQL-Remote' });
+};
+
+const onChange = async (info: any) => {
+    await updatePostgresqlDescription({ id: info.id, description: info.description });
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+};
+
+const goDashboard = async () => {
+    if (pgadminPort.value === 0) {
+        dashboardName.value = 'PGAdmin4';
+        dashboardKey.value = 'pgadmin4';
+        dashboardVisible.value = true;
+        return;
+    }
+    dialogPortJumpRef.value.acceptParams({ port: pgadminPort.value });
+    return;
+};
+
+const getAppDetail = () => {
+    router.push({ name: 'AppAll', query: { install: dashboardKey.value } });
+};
+
+const loadPGAdminPort = async () => {
+    const res = await GetAppPort('pgadmin4', '');
+    pgadminPort.value = res.data;
+};
+
+const checkExist = (data: App.CheckInstalled) => {
+    postgresqlStatus.value = data.status;
+    postgresqlVersion.value = data.version;
+    postgresqlContainer.value = data.containerName;
+};
+
+const loadDBOptions = async () => {
+    const res = await listDatabases('postgresql');
+    let datas = res.data || [];
+    dbOptionsLocal.value = [];
+    dbOptionsRemote.value = [];
+    currentDBName.value = globalStore.currentDB;
+    for (const item of datas) {
+        if (currentDBName.value && item.database === currentDBName.value) {
+            currentDB.value = item;
+            if (item.from === 'local') {
+                appKey.value = item.type;
+                appName.value = item.database;
+            }
+        }
+        if (item.from === 'local') {
+            dbOptionsLocal.value.push(item);
+        } else {
+            dbOptionsRemote.value.push(item);
+        }
+    }
+    if (currentDB.value) {
+        globalStore.setCurrentDB('');
+        search();
+        return;
+    }
+    if (dbOptionsLocal.value.length !== 0) {
+        currentDB.value = dbOptionsLocal.value[0];
+        currentDBName.value = dbOptionsLocal.value[0].database;
+        appKey.value = dbOptionsLocal.value[0].type;
+        appName.value = dbOptionsLocal.value[0].database;
+    }
+    if (!currentDB.value && dbOptionsRemote.value.length !== 0) {
+        currentDB.value = dbOptionsRemote.value[0];
+        currentDBName.value = dbOptionsRemote.value[0].database;
+    }
+    if (currentDB.value) {
+        search();
+    }
+};
+const onDelete = async (row: Database.PostgresqlDBInfo) => {
+    let param = {
+        id: row.id,
+        type: currentDB.value.type,
+        database: currentDBName.value,
+    };
+    const res = await deleteCheckPostgresqlDB(param);
+    if (res.data && res.data.length > 0) {
+        checkRef.value.acceptParams({ items: res.data });
+    } else {
+        deleteRef.value.acceptParams({
+            id: row.id,
+            type: currentDB.value.type,
+            database: currentDBName.value,
+            name: row.name,
+        });
+    }
+};
+
+const onChangePassword = async (row: Database.PostgresqlDBInfo) => {
+    let param = {
+        id: row.id,
+        from: row.from,
+        type: currentDB.value.type,
+        database: currentDBName.value,
+        postgresqlName: row.name,
+        operation: 'password',
+        username: row.username,
+        password: row.password,
+    };
+    passwordRef.value.acceptParams(param);
+};
+
+const buttons = [
+    {
+        label: i18n.global.t('database.changePassword'),
+        click: (row: Database.PostgresqlDBInfo) => {
+            onChangePassword(row);
+        },
+    },
+    {
+        label: i18n.global.t('database.backupList'),
+        click: (row: Database.PostgresqlDBInfo) => {
+            let params = {
+                type: currentDB.value.type,
+                name: currentDBName.value,
+                detailName: row.name,
+            };
+            dialogBackupRef.value!.acceptParams(params);
+        },
+    },
+    {
+        label: i18n.global.t('database.loadBackup'),
+        click: (row: Database.PostgresqlDBInfo) => {
+            let params = {
+                type: currentDB.value.type,
+                name: currentDBName.value,
+                detailName: row.name,
+                remark: row.format,
+            };
+            uploadRef.value!.acceptParams(params);
+        },
+    },
+    {
+        label: i18n.global.t('commons.button.delete'),
+        click: (row: Database.PostgresqlDBInfo) => {
+            onDelete(row);
+        },
+    },
+];
+
+onMounted(() => {
+    loadDBOptions();
+    loadPGAdminPort();
+});
+</script>
+
+<style lang="scss" scoped>
+.iconInTable {
+    margin-left: 5px;
+    margin-top: 3px;
+}
+.jumpAdd {
+    margin-top: 10px;
+    margin-left: 15px;
+    margin-bottom: 5px;
+    font-size: 12px;
+}
+.tagClass {
+    float: right;
+    font-size: 12px;
+    margin-top: 5px;
+}
+.optionClass {
+    min-width: 350px;
+}
+</style>

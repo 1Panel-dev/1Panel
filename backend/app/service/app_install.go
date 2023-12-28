@@ -184,6 +184,7 @@ func (a *AppInstallService) LoadConnInfo(req dto.OperationWithNameAndType) (resp
 	if err != nil {
 		return data, nil
 	}
+	data.Username = app.UserName
 	data.Password = app.Password
 	data.ServiceName = app.ServiceName
 	data.Port = app.Port
@@ -781,7 +782,7 @@ func updateInstallInfoInDB(appKey, appName, param string, isRestart bool, value 
 	if err != nil {
 		return nil
 	}
-	envPath := fmt.Sprintf("%s/%s/%s/.env", constant.AppInstallDir, appKey, appInstall.Name)
+	envPath := fmt.Sprintf("%s/%s/.env", appInstall.AppPath, appInstall.Name)
 	lineBytes, err := os.ReadFile(envPath)
 	if err != nil {
 		return err

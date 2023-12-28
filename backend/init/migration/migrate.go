@@ -19,6 +19,7 @@ func Init() {
 		migrations.AddTableImageRepo,
 		migrations.AddTableWebsite,
 		migrations.AddTableDatabaseMysql,
+		migrations.AddTableDatabasePostgresql,
 		migrations.AddTableSnap,
 		migrations.AddDefaultGroup,
 		migrations.AddTableRuntime,

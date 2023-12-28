@@ -201,6 +201,8 @@ const getTitle = (key: string) => {
             return i18n.global.t('website.website');
         case 'mysql':
             return 'MySQL ' + i18n.global.t('menu.database');
+        case 'postgresql':
+            return 'PostgreSQL ' + i18n.global.t('menu.database');
         case 'redis':
             return 'Redis ' + i18n.global.t('menu.database');
     }

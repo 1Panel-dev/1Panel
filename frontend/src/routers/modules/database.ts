@@ -49,6 +49,37 @@ const databaseRouter = {
                     },
                 },
                 {
+                    path: 'postgresql',
+                    name: 'PostgreSQL',
+                    component: () => import('@/views/database/postgresql/index.vue'),
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/databases',
+                        requiresAuth: false,
+                    },
+                },
+                {
+                    path: 'postgresql/remote',
+                    name: 'PostgreSQL-Remote',
+                    component: () => import('@/views/database/postgresql/remote/index.vue'),
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/databases',
+                        requiresAuth: false,
+                    },
+                },
+                {
+                    path: 'postgresql/setting/:type/:database',
+                    name: 'PostgreSQL-Setting',
+                    component: () => import('@/views/database/postgresql/setting/index.vue'),
+                    props: true,
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/databases',
+                        requiresAuth: false,
+                    },
+                },
+                {
                     path: 'redis',
                     name: 'Redis',
                     component: () => import('@/views/database/redis/index.vue'),
