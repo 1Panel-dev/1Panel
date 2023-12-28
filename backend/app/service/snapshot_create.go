@@ -129,16 +129,16 @@ func snapBackup(snap snapHelper, localDir, targetDir string) {
 }
 
 func snapPanelData(snap snapHelper, localDir, targetDir string) {
-	defer snap.Wg.Done()
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"panel_data": constant.Running})
 	status := constant.StatusDone
 	dataDir := path.Join(global.CONF.System.BaseDir, "1panel")
-	exclusionRules := "./tmp;./log;./cache;"
+	exclusionRules := "./tmp;./log;./cache;./db/1Panel.db-*;"
 	if strings.Contains(localDir, dataDir) {
 		exclusionRules += ("." + strings.ReplaceAll(localDir, dataDir, "") + ";")
 	}
 
 	_ = snapshotRepo.Update(snap.SnapID, map[string]interface{}{"status": "OnSaveData"})
+	checkPointOfWal()
 	if err := handleSnapTar(dataDir, targetDir, "1panel_data.tar.gz", exclusionRules); err != nil {
 		status = err.Error()
 	}
@@ -234,4 +234,10 @@ func handleSnapTar(sourceDir, targetDir, name, exclusionRules string) error {
 		}
 	}
 	return nil
+}
+
+func checkPointOfWal() {
+	if err := global.DB.Exec("PRAGMA wal_checkpoint(TRUNCATE);").Error; err != nil {
+		global.LOG.Errorf("handle check point failed, err: %v", err)
+	}
 }
