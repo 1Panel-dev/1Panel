@@ -3,6 +3,7 @@ package common
 import (
 	"crypto/rand"
 	"fmt"
+	"golang.org/x/net/idna"
 	"io"
 	mathRand "math/rand"
 	"net"
@@ -12,9 +13,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
-	"github.com/mozillazg/go-pinyin"
 )
 
 func CompareVersion(version1, version2 string) bool {
@@ -216,20 +217,6 @@ func LoadTimeZoneByCmd() string {
 	return fields[2]
 }
 
-func ConvertToPinyin(text string) string {
-	args := pinyin.NewArgs()
-	args.Fallback = func(r rune, a pinyin.Args) []string {
-		return []string{string(r)}
-	}
-	p := pinyin.Pinyin(text, args)
-	var strArr []string
-	for i := 0; i < len(p); i++ {
-		strArr = append(strArr, strings.Join(p[i], ""))
-	}
-
-	return strings.Join(strArr, "")
-}
-
 func IsValidDomain(domain string) bool {
 	pattern := `^([\w\p{Han}\-\*]{1,100}\.){1,10}([\w\p{Han}\-]{1,24}|[\w\p{Han}\-]{1,24}\.[\w\p{Han}\-]{1,24})(:\d{1,5})?$`
 	match, err := regexp.MatchString(pattern, domain)
@@ -237,4 +224,22 @@ func IsValidDomain(domain string) bool {
 		return false
 	}
 	return match
+}
+
+func ContainsChinese(text string) bool {
+	for _, char := range text {
+		if unicode.Is(unicode.Han, char) {
+			return true
+		}
+	}
+	return false
+}
+
+func PunycodeEncode(text string) (string, error) {
+	encoder := idna.New()
+	ascii, err := encoder.ToASCII(text)
+	if err != nil {
+		return "", err
+	}
+	return ascii, nil
 }
