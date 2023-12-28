@@ -141,7 +141,7 @@ const onOpenDialog = async (
         version: '16.x',
         address: '',
         port: 5432,
-        username: 'postgres',
+        username: '',
         password: '',
         description: '',
     },

@@ -10,7 +10,7 @@
                         <el-tag>
                             {{ form.serviceName + form.port }}
                         </el-tag>
-                        <CopyButton :content="form.serviceName + form.port" type="icon" />
+                        <CopyButton :content="form.serviceName + ':' + form.port" type="icon" />
                         <span class="input-help">
                             {{ $t('database.containerConnHelper') }}
                         </span>
