@@ -6,6 +6,15 @@
             <span>{{ $t('container.startIn') }}</span>
         </el-card>
         <LayoutContent :title="$t('container.container')" :class="{ mask: dockerStatus != 'Running' }">
+            <template #rightButton>
+                <div class="flex justify-end">
+                    <div class="mr-10">
+                        <el-checkbox v-model="includeAppStore" @change="search()">
+                            {{ $t('container.includeAppstore') }}
+                        </el-checkbox>
+                    </div>
+                </div>
+            </template>
             <template #toolbar>
                 <el-row>
                     <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
@@ -347,6 +356,7 @@ const searchState = ref('all');
 const dialogUpgradeRef = ref();
 const dialogPortJumpRef = ref();
 const opRef = ref();
+const includeAppStore = ref(true);
 
 const dockerStatus = ref('Running');
 const loadStatus = async () => {
@@ -410,6 +420,7 @@ const search = async (column?: any) => {
         filters: filterItem,
         orderBy: paginationConfig.orderBy,
         order: paginationConfig.order,
+        excludeAppStore: !includeAppStore.value,
     };
     loading.value = true;
     loadStats();

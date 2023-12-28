@@ -758,6 +758,7 @@ const message = {
             'Saving the Socket Path setting may result in Docker service being unavailable. Do you want to continue?',
         sockPathErr: 'Please select or enter the correct Docker sock file path',
         related: 'Related resources',
+        includeAppstore: 'Show app store container',
     },
     cronjob: {
         create: 'Create Cronjob',
