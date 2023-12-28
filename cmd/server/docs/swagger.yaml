@@ -1867,6 +1867,8 @@ definitions:
     type: object
   dto.PageContainer:
     properties:
+      excludeAppStore:
+        type: boolean
       filters:
         type: string
       name:
@@ -2200,6 +2202,7 @@ definitions:
         enum:
         - self
         - select
+        - import
         - import-paste
         - import-local
         type: string
@@ -9916,6 +9919,23 @@ paths:
       summary: Load OpenResty conf
       tags:
       - OpenResty
+  /openResty/clear:
+    post:
+      description: 清理 OpenResty 代理缓存
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Clear OpenResty proxy cache
+      tags:
+      - OpenResty
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys: []
+        formatEN: Clear nginx proxy cache
+        formatZH: 清理 Openresty 代理缓存
+        paramKeys: []
   /openResty/file:
     post:
       consumes:

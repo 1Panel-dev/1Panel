@@ -1743,6 +1743,8 @@ const message = {
         nginxConfig: '设置',
         configResource: '配置修改',
         saveAndReload: '保存并重载',
+        clearProxyCache: '清除反代缓存',
+        clearProxyCacheWarn: '清除反代缓存会影响所有配置缓存的网站，并且需要重启 OpenResty， 是否继续？',
     },
     ssl: {
         create: '申请证书',
