@@ -9,6 +9,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"os"
 	"path"
 	"reflect"
@@ -172,8 +173,14 @@ func (w WebsiteService) GetWebsites() ([]response.WebsiteDTO, error) {
 func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) {
 	primaryDomainArray := strings.Split(create.PrimaryDomain, ":")
 	primaryDomain := primaryDomainArray[0]
-
-	if exist, _ := websiteRepo.GetBy(websiteRepo.WithAlias(create.Alias)); len(exist) > 0 {
+	alias := create.Alias
+	if common.ContainsChinese(alias) {
+		alias, err = common.PunycodeEncode(alias)
+		if err != nil {
+			return
+		}
+	}
+	if exist, _ := websiteRepo.GetBy(websiteRepo.WithAlias(alias)); len(exist) > 0 {
 		return buserr.New(constant.ErrAliasIsExist)
 	}
 
@@ -201,7 +208,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 	website := &model.Website{
 		PrimaryDomain:  primaryDomain,
 		Type:           create.Type,
-		Alias:          create.Alias,
+		Alias:          alias,
 		Remark:         create.Remark,
 		Status:         constant.WebRunning,
 		ExpireDate:     defaultDate,

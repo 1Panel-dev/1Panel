@@ -30,27 +30,44 @@ import (
 )
 
 func getDomain(domainStr string, defaultPort int) (model.WebsiteDomain, error) {
-	domain := model.WebsiteDomain{}
+	var (
+		err    error
+		domain = model.WebsiteDomain{}
+		portN  int
+	)
 	domainArray := strings.Split(domainStr, ":")
 	if len(domainArray) == 1 {
-		domain.Domain = domainArray[0]
+		domain.Domain, err = handleChineseDomain(domainArray[0])
+		if err != nil {
+			return domain, err
+		}
 		domain.Port = defaultPort
 		return domain, nil
 	}
 	if len(domainArray) > 1 {
-		domain.Domain = domainArray[0]
-		portStr := domainArray[1]
-		portN, err := strconv.Atoi(portStr)
+		domain.Domain, err = handleChineseDomain(domainArray[0])
 		if err != nil {
-			return model.WebsiteDomain{}, buserr.WithName("ErrTypePort", portStr)
+			return domain, err
+		}
+		portStr := domainArray[1]
+		portN, err = strconv.Atoi(portStr)
+		if err != nil {
+			return domain, buserr.WithName("ErrTypePort", portStr)
 		}
 		if portN <= 0 || portN > 65535 {
-			return model.WebsiteDomain{}, buserr.New("ErrTypePortRange")
+			return domain, buserr.New("ErrTypePortRange")
 		}
 		domain.Port = portN
 		return domain, nil
 	}
-	return model.WebsiteDomain{}, nil
+	return domain, nil
+}
+
+func handleChineseDomain(domain string) (string, error) {
+	if common.ContainsChinese(domain) {
+		return common.PunycodeEncode(domain)
+	}
+	return domain, nil
 }
 
 func createIndexFile(website *model.Website, runtime *model.Runtime) error {
