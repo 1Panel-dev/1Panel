@@ -47,6 +47,7 @@ var repeatKeys = map[string]struct {
 	"location":         {},
 	"include":          {},
 	"sub_filter":       {},
+	"add_header":       {},
 }
 
 func IsRepeatKey(key string) bool {

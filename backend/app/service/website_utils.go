@@ -10,7 +10,9 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx/components"
 	"gopkg.in/yaml.v3"
 	"log"
+	"os"
 	"path"
+	"path/filepath"
 	"reflect"
 	"strconv"
 	"strings"
@@ -833,6 +835,47 @@ func UpdateSSLConfig(websiteSSL model.WebsiteSSL) error {
 			global.LOG.Errorf("Failed to update the SSL certificate for 1Panel System domain [%s] , err:%s", websiteSSL.PrimaryDomain, err.Error())
 			return err
 		}
+	}
+	return nil
+}
+
+func ChangeHSTSConfig(enable bool, nginxInstall model.AppInstall, website model.Website) error {
+	includeDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "proxy")
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(includeDir) {
+		return nil
+	}
+	err := filepath.Walk(includeDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			if filepath.Ext(path) == ".conf" {
+				par, err := parser.NewParser(path)
+				if err != nil {
+					return err
+				}
+				config := par.Parse()
+				config.FilePath = path
+				directives := config.Directives
+				location, ok := directives[0].(*components.Location)
+				if !ok {
+					return nil
+				}
+				if enable {
+					location.UpdateDirective("add_header", []string{"Strict-Transport-Security", "\"max-age=31536000\""})
+				} else {
+					location.RemoveDirective("add_header", []string{"Strict-Transport-Security", "\"max-age=31536000\""})
+				}
+				if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+					return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
+				}
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return err
 	}
 	return nil
 }

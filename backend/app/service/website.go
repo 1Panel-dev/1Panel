@@ -654,6 +654,13 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 		res        response.WebsiteHTTPS
 		websiteSSL model.WebsiteSSL
 	)
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return nil, err
+	}
+	if err = ChangeHSTSConfig(req.Enable, nginxInstall, website); err != nil {
+		return nil, err
+	}
 	res.Enable = req.Enable
 	res.SSLProtocol = req.SSLProtocol
 	res.Algorithm = req.Algorithm
@@ -765,6 +772,7 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 
 		res.SSL = websiteSSL
 	}
+
 	website.Protocol = constant.ProtocolHTTPS
 	if err := applySSL(website, websiteSSL, req); err != nil {
 		return nil, err
@@ -1528,6 +1536,9 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 	}
 	location.UpdateDirective("proxy_pass", []string{req.ProxyPass})
 	location.UpdateDirective("proxy_set_header", []string{"Host", req.ProxyHost})
+	if website.Protocol == constant.ProtocolHTTPS {
+		location.UpdateDirective("add_header", []string{"Strict-Transport-Security", "\"max-age=31536000\""})
+	}
 	location.ChangePath(req.Modifier, req.Match)
 	if req.Cache {
 		location.AddCache(req.CacheTime, req.CacheUnit)
