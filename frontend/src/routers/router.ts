@@ -5,8 +5,6 @@ let modules = import.meta.globEager('./modules/*.ts');
 const xpackModules = import.meta.globEager('../xpack/frontend/routers/*.ts');
 modules = { ...modules, ...xpackModules };
 
-console.log(modules);
-
 const homeRouter: RouteRecordRaw = {
     path: '/',
     component: Layout,
