@@ -4,6 +4,10 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"os"
+	"path"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
@@ -17,8 +21,6 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
-	"os"
-	"path"
 )
 
 type PostgresqlService struct{}
@@ -28,18 +30,14 @@ type IPostgresqlService interface {
 	ListDBOption() ([]dto.PostgresqlOption, error)
 	Create(ctx context.Context, req dto.PostgresqlDBCreate) (*model.DatabasePostgresql, error)
 	LoadFromRemote(req dto.PostgresqlLoadDB) error
-	ChangeAccess(info dto.ChangeDBInfo) error
 	ChangePassword(info dto.ChangeDBInfo) error
-	UpdateVariables(req dto.PostgresqlVariablesUpdate) error
 	UpdateConfByFile(info dto.PostgresqlConfUpdateByFile) error
 	UpdateDescription(req dto.UpdateDescription) error
 	DeleteCheck(req dto.PostgresqlDBDeleteCheck) ([]string, error)
 	Delete(ctx context.Context, req dto.PostgresqlDBDelete) error
 
 	LoadStatus(req dto.OperationWithNameAndType) (*dto.PostgresqlStatus, error)
-	LoadVariables(req dto.OperationWithNameAndType) (*dto.PostgresqlVariables, error)
 	LoadBaseInfo(req dto.OperationWithNameAndType) (*dto.DBBaseInfo, error)
-	LoadRemoteAccess(req dto.OperationWithNameAndType) (bool, error)
 
 	LoadDatabaseFile(req dto.OperationWithNameAndType) (string, error)
 }
@@ -111,7 +109,7 @@ func (u *PostgresqlService) Create(ctx context.Context, req dto.PostgresqlDBCrea
 		return nil, errors.New("Cannot set root as user name")
 	}
 
-	cli, version, err := LoadPostgresqlClientByFrom(req.Database)
+	cli, err := LoadPostgresqlClientByFrom(req.Database)
 	if err != nil {
 		return nil, err
 	}
@@ -119,10 +117,8 @@ func (u *PostgresqlService) Create(ctx context.Context, req dto.PostgresqlDBCrea
 	defer cli.Close()
 	if err := cli.Create(client.CreateInfo{
 		Name:     req.Name,
-		Format:   req.Format,
 		Username: req.Username,
 		Password: req.Password,
-		Version:  version,
 		Timeout:  300,
 	}); err != nil {
 		return nil, err
@@ -134,17 +130,16 @@ func (u *PostgresqlService) Create(ctx context.Context, req dto.PostgresqlDBCrea
 	}
 	return &createItem, nil
 }
-func LoadPostgresqlClientByFrom(database string) (postgresql.PostgresqlClient, string, error) {
+func LoadPostgresqlClientByFrom(database string) (postgresql.PostgresqlClient, error) {
 	var (
-		dbInfo  client.DBInfo
-		version string
-		err     error
+		dbInfo client.DBInfo
+		err    error
 	)
 
 	dbInfo.Timeout = 300
 	databaseItem, err := databaseRepo.Get(commonRepo.WithByName(database))
 	if err != nil {
-		return nil, "", err
+		return nil, err
 	}
 	dbInfo.From = databaseItem.From
 	dbInfo.Database = database
@@ -153,17 +148,10 @@ func LoadPostgresqlClientByFrom(database string) (postgresql.PostgresqlClient, s
 		dbInfo.Port = databaseItem.Port
 		dbInfo.Username = databaseItem.Username
 		dbInfo.Password = databaseItem.Password
-		dbInfo.SSL = databaseItem.SSL
-		dbInfo.ClientKey = databaseItem.ClientKey
-		dbInfo.ClientCert = databaseItem.ClientCert
-		dbInfo.RootCert = databaseItem.RootCert
-		dbInfo.SkipVerify = databaseItem.SkipVerify
-		version = databaseItem.Version
-
 	} else {
 		app, err := appInstallRepo.LoadBaseInfo(databaseItem.Type, database)
 		if err != nil {
-			return nil, "", err
+			return nil, err
 		}
 		dbInfo.From = "local"
 		dbInfo.Address = app.ContainerName
@@ -174,12 +162,42 @@ func LoadPostgresqlClientByFrom(database string) (postgresql.PostgresqlClient, s
 
 	cli, err := postgresql.NewPostgresqlClient(dbInfo)
 	if err != nil {
-		return nil, "", err
+		return nil, err
 	}
-	return cli, version, nil
+	return cli, nil
 }
 func (u *PostgresqlService) LoadFromRemote(req dto.PostgresqlLoadDB) error {
+	client, err := LoadPostgresqlClientByFrom(req.Database)
+	if err != nil {
+		return err
+	}
 
+	databases, err := postgresqlRepo.List(postgresqlRepo.WithByPostgresqlName(req.Database))
+	if err != nil {
+		return err
+	}
+	datas, err := client.SyncDB()
+	if err != nil {
+		return err
+	}
+	for _, data := range datas {
+		hasOld := false
+		for _, oldData := range databases {
+			if strings.EqualFold(oldData.Name, data.Name) && strings.EqualFold(oldData.PostgresqlName, data.PostgresqlName) {
+				hasOld = true
+				break
+			}
+		}
+		if !hasOld {
+			var createItem model.DatabasePostgresql
+			if err := copier.Copy(&createItem, &data); err != nil {
+				return errors.WithMessage(constant.ErrStructTransform, err.Error())
+			}
+			if err := postgresqlRepo.Create(context.Background(), &createItem); err != nil {
+				return err
+			}
+		}
+	}
 	return nil
 }
 
@@ -224,17 +242,16 @@ func (u *PostgresqlService) Delete(ctx context.Context, req dto.PostgresqlDBDele
 	if err != nil && !req.ForceDelete {
 		return err
 	}
-	cli, version, err := LoadPostgresqlClientByFrom(req.Database)
+	cli, err := LoadPostgresqlClientByFrom(req.Database)
 	if err != nil {
 		return err
 	}
 	defer cli.Close()
 	if err := cli.Delete(client.DeleteInfo{
-		Name:       db.Name,
-		Version:    version,
-		Username:   db.Username,
-		Permission: "",
-		Timeout:    300,
+		Name:        db.Name,
+		Username:    db.Username,
+		ForceDelete: req.ForceDelete,
+		Timeout:     300,
 	}); err != nil && !req.ForceDelete {
 		return err
 	}
@@ -264,7 +281,7 @@ func (u *PostgresqlService) ChangePassword(req dto.ChangeDBInfo) error {
 	if cmd.CheckIllegal(req.Value) {
 		return buserr.New(constant.ErrCmdIllegal)
 	}
-	cli, version, err := LoadPostgresqlClientByFrom(req.Database)
+	cli, err := LoadPostgresqlClientByFrom(req.Database)
 	if err != nil {
 		return err
 	}
@@ -275,14 +292,12 @@ func (u *PostgresqlService) ChangePassword(req dto.ChangeDBInfo) error {
 	)
 	passwordInfo.Password = req.Value
 	passwordInfo.Timeout = 300
-	passwordInfo.Version = version
 
 	if req.ID != 0 {
 		postgresqlData, err = postgresqlRepo.Get(commonRepo.WithByID(req.ID))
 		if err != nil {
 			return err
 		}
-		passwordInfo.Name = postgresqlData.Name
 		passwordInfo.Username = postgresqlData.Username
 	} else {
 		dbItem, err := databaseRepo.Get(commonRepo.WithByType(req.Type), commonRepo.WithByFrom(req.From))
@@ -336,45 +351,6 @@ func (u *PostgresqlService) ChangePassword(req dto.ChangeDBInfo) error {
 	return nil
 }
 
-func (u *PostgresqlService) ChangeAccess(req dto.ChangeDBInfo) error {
-	if cmd.CheckIllegal(req.Value) {
-		return buserr.New(constant.ErrCmdIllegal)
-	}
-	cli, version, err := LoadPostgresqlClientByFrom(req.Database)
-	if err != nil {
-		return err
-	}
-	defer cli.Close()
-	var (
-		postgresqlData model.DatabasePostgresql
-		accessInfo     client.AccessChangeInfo
-	)
-	accessInfo.Permission = req.Value
-	accessInfo.Timeout = 300
-	accessInfo.Version = version
-
-	if req.ID != 0 {
-		postgresqlData, err = postgresqlRepo.Get(commonRepo.WithByID(req.ID))
-		if err != nil {
-			return err
-		}
-		accessInfo.Name = postgresqlData.Name
-		accessInfo.Username = postgresqlData.Username
-		accessInfo.Password = postgresqlData.Password
-	} else {
-		accessInfo.Username = "root"
-	}
-	if err := cli.ChangeAccess(accessInfo); err != nil {
-		return err
-	}
-
-	if postgresqlData.ID != 0 {
-		_ = postgresqlRepo.Update(postgresqlData.ID, map[string]interface{}{"permission": req.Value})
-	}
-
-	return nil
-}
-
 func (u *PostgresqlService) UpdateConfByFile(req dto.PostgresqlConfUpdateByFile) error {
 	app, err := appInstallRepo.LoadBaseInfo(req.Type, req.Database)
 	if err != nil {
@@ -389,19 +365,9 @@ func (u *PostgresqlService) UpdateConfByFile(req dto.PostgresqlConfUpdateByFile)
 	write := bufio.NewWriter(file)
 	_, _ = write.WriteString(req.File)
 	write.Flush()
-	cli, _, err := LoadPostgresqlClientByFrom(req.Database)
-	if err != nil {
-		return err
-	}
-	defer cli.Close()
 	if _, err := compose.Restart(fmt.Sprintf("%s/%s/%s/docker-compose.yml", constant.AppInstallDir, req.Type, app.Name)); err != nil {
 		return err
 	}
-	return nil
-}
-
-func (u *PostgresqlService) UpdateVariables(req dto.PostgresqlVariablesUpdate) error {
-
 	return nil
 }
 
@@ -418,29 +384,18 @@ func (u *PostgresqlService) LoadBaseInfo(req dto.OperationWithNameAndType) (*dto
 	return &data, nil
 }
 
-func (u *PostgresqlService) LoadRemoteAccess(req dto.OperationWithNameAndType) (bool, error) {
-
-	return true, nil
-}
-
-func (u *PostgresqlService) LoadVariables(req dto.OperationWithNameAndType) (*dto.PostgresqlVariables, error) {
-
-	return nil, nil
-}
-
 func (u *PostgresqlService) LoadStatus(req dto.OperationWithNameAndType) (*dto.PostgresqlStatus, error) {
 	app, err := appInstallRepo.LoadBaseInfo(req.Type, req.Name)
 	if err != nil {
 		return nil, err
 	}
-	cli, _, err := LoadPostgresqlClientByFrom(app.Name)
+	cli, err := LoadPostgresqlClientByFrom(app.Name)
 	if err != nil {
 		return nil, err
 	}
 	defer cli.Close()
-	status := cli.Status()
+
 	postgresqlStatus := dto.PostgresqlStatus{}
-	copier.Copy(&postgresqlStatus,&status)
 	return &postgresqlStatus, nil
 }
 

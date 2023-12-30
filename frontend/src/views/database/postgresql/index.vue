@@ -70,6 +70,14 @@
                         >
                             {{ $t('database.databaseConnInfo') }}
                         </el-button>
+                        <el-button
+                            v-if="currentDB && (currentDB.from !== 'local' || postgresqlStatus === 'Running')"
+                            @click="loadDB"
+                            type="primary"
+                            plain
+                        >
+                            {{ $t('database.loadFromRemote') }}
+                        </el-button>
                         <el-button @click="goRemoteDB" type="primary" plain>
                             {{ $t('database.remoteDB') }}
                         </el-button>
@@ -218,6 +226,7 @@ import { onMounted, reactive, ref } from 'vue';
 import {
     deleteCheckPostgresqlDB,
     listDatabases,
+    loadPgFromRemote,
     searchPostgresqlDBs,
     updatePostgresqlDescription,
 } from '@/api/modules/database';
@@ -341,6 +350,29 @@ const search = async (column?: any) => {
     const res = await searchPostgresqlDBs(params);
     data.value = res.data.items || [];
     paginationConfig.total = res.data.total;
+};
+
+const loadDB = async () => {
+    ElMessageBox.confirm(i18n.global.t('database.loadFromRemoteHelper'), i18n.global.t('commons.msg.infoTitle'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(async () => {
+        loading.value = true;
+        let params = {
+            from: currentDB.value.from,
+            type: currentDB.value.type,
+            database: currentDBName.value,
+        };
+        await loadPgFromRemote(params)
+            .then(() => {
+                loading.value = false;
+                search();
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
 };
 
 const goRouter = async (target: string) => {

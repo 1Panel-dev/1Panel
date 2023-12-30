@@ -148,6 +148,11 @@ export namespace Database {
         database: string;
         name: string;
     }
+    export interface PgLoadDB {
+        from: string;
+        type: string;
+        database: string;
+    }
     export interface PostgresqlDBDelete {
         id: number;
         type: string;

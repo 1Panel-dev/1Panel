@@ -95,50 +95,6 @@ func (b *BaseApi) ChangePostgresqlPassword(c *gin.Context) {
 }
 
 // @Tags Database Postgresql
-// @Summary Change postgresql access
-// @Description 修改 postgresql 访问权限
-// @Accept json
-// @Param request body dto.ChangeDBInfo true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Router /databases/pg/change/access [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"database_postgresqls","output_column":"name","output_value":"name"}],"formatZH":"更新数据库 [name] 访问权限","formatEN":"Update database [name] access"}
-func (b *BaseApi) ChangePostgresqlAccess(c *gin.Context) {
-	var req dto.ChangeDBInfo
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	if err := postgresqlService.ChangeAccess(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	helper.SuccessWithData(c, nil)
-}
-
-// @Tags Database Postgresql
-// @Summary Update postgresql variables
-// @Description postgresql 性能调优
-// @Accept json
-// @Param request body dto.PostgresqlVariablesUpdate true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Router /databases/pg/variables/update [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"调整 postgresql 数据库性能参数","formatEN":"adjust postgresql database performance parameters"}
-func (b *BaseApi) UpdatePostgresqlVariables(c *gin.Context) {
-	//var req dto.PostgresqlVariablesUpdate
-	//if err := helper.CheckBindAndValidate(&req, c); err != nil {
-	//	return
-	//}
-	//
-	//if err := postgresqlService.UpdateVariables(req); err != nil {
-	//	helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-	//	return
-	//}
-	helper.SuccessWithData(c, nil)
-}
-
-// @Tags Database Postgresql
 // @Summary Update postgresql conf by upload file
 // @Description 上传替换 postgresql 配置文件
 // @Accept json
@@ -213,15 +169,17 @@ func (b *BaseApi) ListPostgresqlDBName(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Router /databases/pg/load [post]
 func (b *BaseApi) LoadPostgresqlDBFromRemote(c *gin.Context) {
-	//var req dto.PostgresqlLoadDB
-	//if err := helper.CheckBindAndValidate(&req, c); err != nil {
-	//	return
-	//}
-	//
-	//if err := postgresqlService.LoadFromRemote(req); err != nil {
-	//	helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-	//	return
-	//}
+	var req dto.PostgresqlLoadDB
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := postgresqlService.LoadFromRemote(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, nil)
 
 	helper.SuccessWithData(c, nil)
 }
@@ -295,7 +253,6 @@ func (b *BaseApi) LoadPostgresqlBaseinfo(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
-
 // @Tags Database Postgresql
 // @Summary Load postgresql status info
 // @Description 获取 postgresql 状态信息
@@ -318,4 +275,3 @@ func (b *BaseApi) LoadPostgresqlStatus(c *gin.Context) {
 
 	helper.SuccessWithData(c, data)
 }
-

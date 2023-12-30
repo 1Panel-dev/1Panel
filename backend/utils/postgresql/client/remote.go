@@ -5,13 +5,14 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/global"
-	"github.com/pkg/errors"
 	"io"
 	"os"
 	"os/exec"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/pkg/errors"
 
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -21,115 +22,83 @@ import (
 
 type Remote struct {
 	Client   *sql.DB
+	From     string
 	Database string
 	User     string
 	Password string
 	Address  string
 	Port     uint
-
-	SSL        bool
-	RootCert   string
-	ClientKey  string
-	ClientCert string
-	SkipVerify bool
 }
 
 func NewRemote(db Remote) *Remote {
 	return &db
 }
-func (r *Remote) Status() Status {
-	status := Status{}
-	var i int64
-	var s string
-	var f float64
-	_ = r.Client.QueryRow("select count(*) from pg_stat_activity WHERE client_addr is not NULL;").Scan(&i)
-	status.CurrentConnections = fmt.Sprintf("%d",i)
-	_ = r.Client.QueryRow("SELECT current_timestamp - pg_postmaster_start_time();").Scan(&s)
-	before,_, _ := strings.Cut(s, ".")
-	status.Uptime = before
-	_ = r.Client.QueryRow("select sum(blks_hit)*100/sum(blks_hit+blks_read) as hit_ratio from pg_stat_database;").Scan(&f)
-	status.HitRatio = fmt.Sprintf("%0.2f",f)
-	var a1,a2,a3 int64
-	_ = r.Client.QueryRow("select buffers_clean, maxwritten_clean, buffers_backend_fsync from pg_stat_bgwriter;").Scan(&a1, &a2, &a3)
-	status.BuffersClean = fmt.Sprintf("%d",a1)
-	status.MaxwrittenClean = fmt.Sprintf("%d",a2)
-	status.BuffersBackendFsync= fmt.Sprintf("%d",a3)
-	rows, err := r.Client.Query("SHOW ALL;")
-	if err == nil {
-		defer rows.Close()
-		for rows.Next() {
-			var k,v string
-			err := rows.Scan(&k, &v,&s)
-			if err != nil {
-				continue
-			}
-			if k == "autovacuum" {
-				status.Autovacuum = v
-			}
-			if k == "max_connections" {
-				status.MaxConnections = v
-			}
-			if k == "server_version" {
-				status.Version = v
-			}
-			if k == "shared_buffers" {
-				status.SharedBuffers = v
-			}
-		}
-	}
-	return status
-}
 func (r *Remote) Create(info CreateInfo) error {
-	createUser := fmt.Sprintf(`CREATE USER "%s" WITH PASSWORD '%s';`, info.Username, info.Password)
-	createDB := fmt.Sprintf(`CREATE DATABASE "%s" OWNER "%s";`, info.Name, info.Username)
-	grant := fmt.Sprintf(`GRANT ALL PRIVILEGES ON DATABASE "%s" TO "%s";`, info.Name, info.Username)
-	if err := r.ExecSQL(createUser, info.Timeout); err != nil {
-		if strings.Contains(strings.ToLower(err.Error()), "already") {
-			return buserr.New(constant.ErrUserIsExist)
-		}
-		return err
-	}
-	if err := r.ExecSQL(createDB, info.Timeout); err != nil {
-		if strings.Contains(strings.ToLower(err.Error()), "already") {
-			_ = r.ExecSQL(fmt.Sprintf(`DROP DATABASE "%s"`, info.Name), info.Timeout)
+	createSql := fmt.Sprintf("CREATE DATABASE %s", info.Name)
+	if err := r.ExecSQL(createSql, info.Timeout); err != nil {
+		if strings.Contains(strings.ToLower(err.Error()), "already exists") {
 			return buserr.New(constant.ErrDatabaseIsExist)
 		}
 		return err
 	}
-	_ = r.ExecSQL(grant, info.Timeout)
+	if err := r.CreateUser(info, true); err != nil {
+		return err
+	}
 	return nil
 }
 
 func (r *Remote) CreateUser(info CreateInfo, withDeleteDB bool) error {
-	sql1 := fmt.Sprintf(`CREATE USER "%s" WITH PASSWORD '%s';
-GRANT ALL PRIVILEGES ON DATABASE "%s" TO "%s";`, info.Username, info.Password, info.Name, info.Username)
-	err := r.ExecSQL(sql1, info.Timeout)
-	if err != nil {
-		if strings.Contains(strings.ToLower(err.Error()), "already") {
+	createSql := fmt.Sprintf("CREATE USER \"%s\" WITH PASSWORD '%s'", info.Username, info.Password)
+	if err := r.ExecSQL(createSql, info.Timeout); err != nil {
+		if strings.Contains(strings.ToLower(err.Error()), "already exists") {
 			return buserr.New(constant.ErrUserIsExist)
 		}
+		if withDeleteDB {
+			_ = r.Delete(DeleteInfo{
+				Name:        info.Name,
+				Username:    info.Username,
+				ForceDelete: true,
+				Timeout:     300})
+		}
+		return err
+	}
+	grantSql := fmt.Sprintf("GRANT ALL PRIVILEGES ON DATABASE %s TO %s", info.Name, info.Username)
+	if err := r.ExecSQL(grantSql, info.Timeout); err != nil {
+		if withDeleteDB {
+			_ = r.Delete(DeleteInfo{
+				Name:        info.Name,
+				Username:    info.Username,
+				ForceDelete: true,
+				Timeout:     300})
+		}
+		return err
 	}
 
 	return nil
 }
 
 func (r *Remote) Delete(info DeleteInfo) error {
-	//暂时不支持强制删除,就算附加了 WITH(FORCE) 也会删除失败
-	err := r.ExecSQL(fmt.Sprintf(`DROP DATABASE "%s"`, info.Name), info.Timeout)
-	if err != nil {
+	if len(info.Name) != 0 {
+		dropSql := fmt.Sprintf("DROP DATABASE %s", info.Name)
+		if err := r.ExecSQL(dropSql, info.Timeout); err != nil && !info.ForceDelete {
+			return err
+		}
+	}
+	dropSql := fmt.Sprintf("DROP ROLE %s", info.Username)
+	if err := r.ExecSQL(dropSql, info.Timeout); err != nil && !info.ForceDelete {
+		if strings.Contains(strings.ToLower(err.Error()), "depend on it") {
+			return buserr.WithDetail(constant.ErrInUsed, info.Username, nil)
+		}
 		return err
 	}
-	return r.ExecSQL(fmt.Sprintf(`DROP USER "%s"`, info.Username), info.Timeout)
+	return nil
 }
 
 func (r *Remote) ChangePassword(info PasswordChangeInfo) error {
-	return r.ExecSQL(fmt.Sprintf(`ALTER USER "%s" WITH ENCRYPTED PASSWORD '%s';`, info.Username, info.Password), info.Timeout)
+	return r.ExecSQL(fmt.Sprintf("ALTER USER \"%s\" WITH ENCRYPTED PASSWORD '%s'", info.Username, info.Password), info.Timeout)
 }
-func (r *Remote) ReloadConf()error {
-	return r.ExecSQL("SELECT pg_reload_conf();",5)
-}
-func (r *Remote) ChangeAccess(info AccessChangeInfo) error {
-	return nil
+func (r *Remote) ReloadConf() error {
+	return r.ExecSQL("SELECT pg_reload_conf()", 5)
 }
 
 func (r *Remote) Backup(info BackupInfo) error {
@@ -173,7 +142,7 @@ func (r *Remote) Recover(info RecoverInfo) error {
 		gzipCmd := exec.Command("gunzip", info.SourceFile)
 		stdout, err := gzipCmd.CombinedOutput()
 		if err != nil {
-			return fmt.Errorf("gunzip file %s failed,	 stdout: %v, err: %v", info.SourceFile, string(stdout), err)
+			return fmt.Errorf("gunzip file %s failed, stdout: %v, err: %v", info.SourceFile, string(stdout), err)
 		}
 		defer func() {
 			gzipCmd := exec.Command("gzip", fileName)
@@ -207,9 +176,29 @@ func (r *Remote) Recover(info RecoverInfo) error {
 	return nil
 }
 
-func (r *Remote) SyncDB(version string) ([]SyncDBInfo, error) {
-	//如果需要同步数据库,则需要强制修改用户密码,否则无法获取真实密码,后面可考虑改为添加服务器账号,手动将账号/数据库添加到管理列表
+func (r *Remote) SyncDB() ([]SyncDBInfo, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 300*time.Second)
+	defer cancel()
+
 	var datas []SyncDBInfo
+	rows, err := r.Client.Query("SELECT datname FROM pg_database;")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var dbName string
+		if err := rows.Scan(&dbName); err != nil {
+			continue
+		}
+		if dbName == "postgres" || dbName == "template1" || dbName == "template0" || dbName == r.User {
+			continue
+		}
+		datas = append(datas, SyncDBInfo{Name: dbName, From: r.From, PostgresqlName: r.Database})
+	}
+	if ctx.Err() == context.DeadlineExceeded {
+		return nil, buserr.New(constant.ErrExecTimeOut)
+	}
 	return datas, nil
 }
 

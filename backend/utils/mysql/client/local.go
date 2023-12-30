@@ -63,13 +63,15 @@ func (r *Local) CreateUser(info CreateInfo, withDeleteDB bool) error {
 			if strings.Contains(strings.ToLower(err.Error()), "error 1396") {
 				return buserr.New(constant.ErrUserIsExist)
 			}
-			_ = r.Delete(DeleteInfo{
-				Name:        info.Name,
-				Version:     info.Version,
-				Username:    info.Username,
-				Permission:  info.Permission,
-				ForceDelete: true,
-				Timeout:     300})
+			if withDeleteDB {
+				_ = r.Delete(DeleteInfo{
+					Name:        info.Name,
+					Version:     info.Version,
+					Username:    info.Username,
+					Permission:  info.Permission,
+					ForceDelete: true,
+					Timeout:     300})
+			}
 			return err
 		}
 		grantStr := fmt.Sprintf("grant all privileges on `%s`.* to %s", info.Name, user)
@@ -82,13 +84,15 @@ func (r *Local) CreateUser(info CreateInfo, withDeleteDB bool) error {
 			grantStr = grantStr + " with grant option;"
 		}
 		if err := r.ExecSQL(grantStr, info.Timeout); err != nil {
-			_ = r.Delete(DeleteInfo{
-				Name:        info.Name,
-				Version:     info.Version,
-				Username:    info.Username,
-				Permission:  info.Permission,
-				ForceDelete: true,
-				Timeout:     300})
+			if withDeleteDB {
+				_ = r.Delete(DeleteInfo{
+					Name:        info.Name,
+					Version:     info.Version,
+					Username:    info.Username,
+					Permission:  info.Permission,
+					ForceDelete: true,
+					Timeout:     300})
+			}
 			return err
 		}
 	}
