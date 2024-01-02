@@ -1,5 +1,5 @@
 import http from '@/api';
-import { ResPage } from '../interface';
+import { ResPage, ReqPage } from '../interface';
 import { Runtime } from '../interface/runtime';
 import { TimeoutEnum } from '@/enums/http-enum';
 
@@ -37,4 +37,24 @@ export const GetNodeModules = (req: Runtime.NodeModuleReq) => {
 
 export const OperateNodeModule = (req: Runtime.NodeModuleReq) => {
     return http.post<any>(`/runtimes/node/modules/operate`, req, TimeoutEnum.T_10M);
+};
+
+export const SearchPHPExtensions = (req: ReqPage) => {
+    return http.post<ResPage<Runtime.PHPExtensions>>(`/runtimes/php/extensions/search`, req);
+};
+
+export const ListPHPExtensions = (req: Runtime.PHPExtensionsList) => {
+    return http.post<Runtime.PHPExtensions[]>(`/runtimes/php/extensions/search`, req);
+};
+
+export const CreatePHPExtensions = (req: Runtime.PHPExtensionsCreate) => {
+    return http.post<any>(`/runtimes/php/extensions`, req);
+};
+
+export const UpdatePHPExtensions = (req: Runtime.PHPExtensionsUpdate) => {
+    return http.post<any>(`/runtimes/php/extensions/update`, req);
+};
+
+export const DeletePHPExtensions = (req: Runtime.PHPExtensionsDelete) => {
+    return http.post<any>(`/runtimes/php/extensions/del`, req);
 };

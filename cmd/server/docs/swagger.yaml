@@ -3706,6 +3706,45 @@ definitions:
       codeDir:
         type: string
     type: object
+  request.PHPExtensionsCreate:
+    properties:
+      extensions:
+        type: string
+      name:
+        type: string
+    required:
+    - extensions
+    - name
+    type: object
+  request.PHPExtensionsDelete:
+    properties:
+      id:
+        type: integer
+    required:
+    - id
+    type: object
+  request.PHPExtensionsSearch:
+    properties:
+      all:
+        type: boolean
+      page:
+        type: integer
+      pageSize:
+        type: integer
+    required:
+    - page
+    - pageSize
+    type: object
+  request.PHPExtensionsUpdate:
+    properties:
+      extensions:
+        type: string
+      id:
+        type: integer
+    required:
+    - extensions
+    - id
+    type: object
   request.PortUpdate:
     properties:
       key:
@@ -4730,6 +4769,19 @@ definitions:
           type: string
         type: object
       uploadMaxSize:
+        type: string
+    type: object
+  response.PHPExtensionsDTO:
+    properties:
+      createdAt:
+        type: string
+      extensions:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updatedAt:
         type: string
     type: object
   response.WebsiteAcmeAccountDTO:
@@ -10612,6 +10664,90 @@ paths:
         formatEN: Operate runtime [name]
         formatZH: 操作运行环境 [name]
         paramKeys: []
+  /runtimes/php/extensions:
+    post:
+      consumes:
+      - application/json
+      description: Create Extensions
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.PHPExtensionsCreate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Create Extensions
+      tags:
+      - PHP Extensions
+  /runtimes/php/extensions/del:
+    post:
+      consumes:
+      - application/json
+      description: Delete Extensions
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.PHPExtensionsDelete'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Extensions
+      tags:
+      - PHP Extensions
+  /runtimes/php/extensions/search:
+    post:
+      consumes:
+      - application/json
+      description: Page Extensions
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.PHPExtensionsSearch'
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/response.PHPExtensionsDTO'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Page Extensions
+      tags:
+      - PHP Extensions
+  /runtimes/php/extensions/update:
+    post:
+      consumes:
+      - application/json
+      description: Update Extensions
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.PHPExtensionsUpdate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update Extensions
+      tags:
+      - PHP Extensions
   /runtimes/search:
     post:
       consumes:

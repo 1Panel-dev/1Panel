@@ -474,6 +474,19 @@ const checkFilePermission = (rule, value, callback) => {
     }
 };
 
+const checkPHPExtensions = (rule, value, callback) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback(new Error(i18n.global.t('commons.rule.phpExtension')));
+    } else {
+        const reg = /^[a-z0-9,_]{3,300}$/;
+        if (!reg.test(value)) {
+            callback(new Error(i18n.global.t('commons.rule.phpExtension')));
+        } else {
+            callback();
+        }
+    }
+};
+
 interface CommonRule {
     requiredInput: FormItemRule;
     requiredSelect: FormItemRule;
@@ -507,6 +520,7 @@ interface CommonRule {
     leechExts: FormItemRule;
     domainWithPort: FormItemRule;
     filePermission: FormItemRule;
+    phpExtensions: FormItemRule;
 
     paramCommon: FormItemRule;
     paramComplexity: FormItemRule;
@@ -709,6 +723,11 @@ export const Rules: CommonRule = {
     filePermission: {
         required: true,
         validator: checkFilePermission,
+        trigger: 'blur',
+    },
+    phpExtensions: {
+        required: true,
+        validator: checkPHPExtensions,
         trigger: 'blur',
     },
 };

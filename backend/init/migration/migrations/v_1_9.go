@@ -103,3 +103,16 @@ var UpdateWebsiteBackupRecord = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddTablePHPExtensions = &gormigrate.Migration{
+	ID: "20240102-add-php-extensions",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.PHPExtensions{}); err != nil {
+			return err
+		}
+		if err := tx.Create(&model.PHPExtensions{Name: "默认", Extensions: "bcmath,gd,gettext,intl,pcntl,shmop,soap,sockets,sysvsem,xmlrpc,zip"}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

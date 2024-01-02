@@ -8995,6 +8995,144 @@ const docTemplate = `{
                 }
             }
         },
+        "/runtimes/php/extensions": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create Extensions",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "PHP Extensions"
+                ],
+                "summary": "Create Extensions",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.PHPExtensionsCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/runtimes/php/extensions/del": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete Extensions",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "PHP Extensions"
+                ],
+                "summary": "Delete Extensions",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.PHPExtensionsDelete"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/runtimes/php/extensions/search": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Page Extensions",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "PHP Extensions"
+                ],
+                "summary": "Page Extensions",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.PHPExtensionsSearch"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.PHPExtensionsDTO"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/runtimes/php/extensions/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update Extensions",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "PHP Extensions"
+                ],
+                "summary": "Update Extensions",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.PHPExtensionsUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/runtimes/search": {
             "post": {
                 "security": [
@@ -19390,6 +19528,65 @@ const docTemplate = `{
                 }
             }
         },
+        "request.PHPExtensionsCreate": {
+            "type": "object",
+            "required": [
+                "extensions",
+                "name"
+            ],
+            "properties": {
+                "extensions": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.PHPExtensionsDelete": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "request.PHPExtensionsSearch": {
+            "type": "object",
+            "required": [
+                "page",
+                "pageSize"
+            ],
+            "properties": {
+                "all": {
+                    "type": "boolean"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                }
+            }
+        },
+        "request.PHPExtensionsUpdate": {
+            "type": "object",
+            "required": [
+                "extensions",
+                "id"
+            ],
+            "properties": {
+                "extensions": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
         "request.PortUpdate": {
             "type": "object",
             "properties": {
@@ -20911,6 +21108,26 @@ const docTemplate = `{
                     }
                 },
                 "uploadMaxSize": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.PHPExtensionsDTO": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "extensions": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updatedAt": {
                     "type": "string"
                 }
             }

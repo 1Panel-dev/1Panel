@@ -97,4 +97,29 @@ export namespace Runtime {
         Module?: string;
         PkgManager?: string;
     }
+
+    export interface PHPExtensions extends CommonModel {
+        id: number;
+        name: string;
+        extensions: string;
+    }
+
+    export interface PHPExtensionsList extends ReqPage {
+        all: boolean;
+    }
+
+    export interface PHPExtensionsCreate {
+        name: string;
+        extensions: string;
+    }
+
+    export interface PHPExtensionsUpdate {
+        id: number;
+        name: string;
+        extensions: string;
+    }
+
+    export interface PHPExtensionsDelete {
+        id: number;
+    }
 }

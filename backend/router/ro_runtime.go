@@ -20,10 +20,16 @@ func (r *RuntimeRouter) InitRouter(Router *gin.RouterGroup) {
 		groupRouter.POST("/del", baseApi.DeleteRuntime)
 		groupRouter.POST("/update", baseApi.UpdateRuntime)
 		groupRouter.GET("/:id", baseApi.GetRuntime)
+
 		groupRouter.POST("/node/package", baseApi.GetNodePackageRunScript)
 		groupRouter.POST("/operate", baseApi.OperateRuntime)
 		groupRouter.POST("/node/modules", baseApi.GetNodeModules)
 		groupRouter.POST("/node/modules/operate", baseApi.OperateNodeModules)
+
+		groupRouter.POST("/php/extensions/search", baseApi.PagePHPExtensions)
+		groupRouter.POST("/php/extensions", baseApi.CreatePHPExtensions)
+		groupRouter.POST("/php/extensions/update", baseApi.UpdatePHPExtensions)
+		groupRouter.POST("/php/extensions/del", baseApi.DeletePHPExtensions)
 	}
 
 }

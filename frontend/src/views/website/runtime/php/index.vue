@@ -13,6 +13,10 @@
                 <el-button type="primary" @click="openCreate">
                     {{ $t('runtime.create') }}
                 </el-button>
+
+                <el-button @click="openExtensions">
+                    {{ $t('php.extensions') }}
+                </el-button>
             </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="items" @search="search()">
@@ -74,6 +78,7 @@
         <CreateRuntime ref="createRef" @close="search" @submit="openCreateLog" />
         <OpDialog ref="opRef" @search="search" />
         <Log ref="logRef" @close="search" />
+        <Extensions ref="extensionsRef" @close="search" />
     </div>
 </template>
 
@@ -88,6 +93,7 @@ import Status from '@/components/status/index.vue';
 import i18n from '@/lang';
 import RouterMenu from '../index.vue';
 import Log from '@/components/log-dialog/index.vue';
+import Extensions from './extensions/index.vue';
 
 const paginationConfig = reactive({
     cacheSizeKey: 'runtime-page-size',
@@ -104,6 +110,7 @@ let req = reactive<Runtime.RuntimeReq>({
 let timer: NodeJS.Timer | null = null;
 const opRef = ref();
 const logRef = ref();
+const extensionsRef = ref();
 
 const buttons = [
     {
@@ -156,13 +163,17 @@ const openCreateLog = (id: number) => {
     logRef.value.acceptParams({ id: id, type: 'php', tail: true });
 };
 
+const openExtensions = () => {
+    extensionsRef.value.acceptParams();
+};
+
 const openDelete = async (row: Runtime.Runtime) => {
     opRef.value.acceptParams({
         title: i18n.global.t('commons.msg.deleteTitle'),
         names: [row.name],
         msg: i18n.global.t('commons.msg.operatorHelper', [
             i18n.global.t('website.runtime'),
-            i18n.global.t('commons.msg.delete'),
+            i18n.global.t('commons.button.delete'),
         ]),
         api: DeleteRuntime,
         params: { id: row.id, forceDelete: true },
