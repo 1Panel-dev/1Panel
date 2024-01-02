@@ -36,9 +36,7 @@ type IPostgresqlService interface {
 	DeleteCheck(req dto.PostgresqlDBDeleteCheck) ([]string, error)
 	Delete(ctx context.Context, req dto.PostgresqlDBDelete) error
 
-	LoadStatus(req dto.OperationWithNameAndType) (*dto.PostgresqlStatus, error)
 	LoadBaseInfo(req dto.OperationWithNameAndType) (*dto.DBBaseInfo, error)
-
 	LoadDatabaseFile(req dto.OperationWithNameAndType) (string, error)
 }
 
@@ -113,6 +111,8 @@ func (u *PostgresqlService) Create(ctx context.Context, req dto.PostgresqlDBCrea
 	if err != nil {
 		return nil, err
 	}
+	defer cli.Close()
+
 	createItem.PostgresqlName = req.Database
 	defer cli.Close()
 	if err := cli.Create(client.CreateInfo{
@@ -130,6 +130,7 @@ func (u *PostgresqlService) Create(ctx context.Context, req dto.PostgresqlDBCrea
 	}
 	return &createItem, nil
 }
+
 func LoadPostgresqlClientByFrom(database string) (postgresql.PostgresqlClient, error) {
 	var (
 		dbInfo client.DBInfo
@@ -166,11 +167,13 @@ func LoadPostgresqlClientByFrom(database string) (postgresql.PostgresqlClient, e
 	}
 	return cli, nil
 }
+
 func (u *PostgresqlService) LoadFromRemote(req dto.PostgresqlLoadDB) error {
 	client, err := LoadPostgresqlClientByFrom(req.Database)
 	if err != nil {
 		return err
 	}
+	defer client.Close()
 
 	databases, err := postgresqlRepo.List(postgresqlRepo.WithByPostgresqlName(req.Database))
 	if err != nil {
@@ -332,7 +335,7 @@ func (u *PostgresqlService) ChangePassword(req dto.ChangeDBInfo) error {
 			}
 
 			global.LOG.Infof("start to update postgresql password used by app %s-%s", appModel.Key, appInstall.Name)
-			if err := updateInstallInfoInDB(appModel.Key, appInstall.Name, "user-password", true, req.Value); err != nil {
+			if err := updateInstallInfoInDB(appModel.Key, appInstall.Name, "password", true, req.Value); err != nil {
 				return err
 			}
 		}
@@ -382,21 +385,6 @@ func (u *PostgresqlService) LoadBaseInfo(req dto.OperationWithNameAndType) (*dto
 	data.Port = int64(app.Port)
 
 	return &data, nil
-}
-
-func (u *PostgresqlService) LoadStatus(req dto.OperationWithNameAndType) (*dto.PostgresqlStatus, error) {
-	app, err := appInstallRepo.LoadBaseInfo(req.Type, req.Name)
-	if err != nil {
-		return nil, err
-	}
-	cli, err := LoadPostgresqlClientByFrom(app.Name)
-	if err != nil {
-		return nil, err
-	}
-	defer cli.Close()
-
-	postgresqlStatus := dto.PostgresqlStatus{}
-	return &postgresqlStatus, nil
 }
 
 func (u *PostgresqlService) LoadDatabaseFile(req dto.OperationWithNameAndType) (string, error) {

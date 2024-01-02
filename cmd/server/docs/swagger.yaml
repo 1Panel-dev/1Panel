@@ -2111,29 +2111,6 @@ definitions:
       type:
         type: string
     type: object
-  dto.PostgresqlStatus:
-    properties:
-      autovacuum:
-        type: string
-      buffers_backend_fsync:
-        type: string
-      buffers_clean:
-        type: string
-      current_connections:
-        type: string
-      hit_ratio:
-        type: string
-      max_connections:
-        type: string
-      maxwritten_clean:
-        type: string
-      shared_buffers:
-        type: string
-      uptime:
-        type: string
-      version:
-        type: string
-    type: object
   dto.RecordSearch:
     properties:
       detailName:
@@ -8145,28 +8122,6 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Page postgresql databases
-      tags:
-      - Database Postgresql
-  /databases/pg/status:
-    post:
-      consumes:
-      - application/json
-      description: 获取 postgresql 状态信息
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.OperationWithNameAndType'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.PostgresqlStatus'
-      security:
-      - ApiKeyAuth: []
-      summary: Load postgresql status info
       tags:
       - Database Postgresql
   /databases/redis/backup/search:

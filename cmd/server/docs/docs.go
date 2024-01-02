@@ -5057,42 +5057,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/databases/pg/status": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "获取 postgresql 状态信息",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Database Postgresql"
-                ],
-                "summary": "Load postgresql status info",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.OperationWithNameAndType"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.PostgresqlStatus"
-                        }
-                    }
-                }
-            }
-        },
         "/databases/redis/backup/search": {
             "post": {
                 "security": [
@@ -17025,41 +16989,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.PostgresqlStatus": {
-            "type": "object",
-            "properties": {
-                "autovacuum": {
-                    "type": "string"
-                },
-                "buffers_backend_fsync": {
-                    "type": "string"
-                },
-                "buffers_clean": {
-                    "type": "string"
-                },
-                "current_connections": {
-                    "type": "string"
-                },
-                "hit_ratio": {
-                    "type": "string"
-                },
-                "max_connections": {
-                    "type": "string"
-                },
-                "maxwritten_clean": {
-                    "type": "string"
-                },
-                "shared_buffers": {
-                    "type": "string"
-                },
-                "uptime": {
-                    "type": "string"
-                },
-                "version": {
                     "type": "string"
                 }
             }

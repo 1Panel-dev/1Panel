@@ -252,26 +252,3 @@ func (b *BaseApi) LoadPostgresqlBaseinfo(c *gin.Context) {
 
 	helper.SuccessWithData(c, data)
 }
-
-// @Tags Database Postgresql
-// @Summary Load postgresql status info
-// @Description 获取 postgresql 状态信息
-// @Accept json
-// @Param request body dto.OperationWithNameAndType true "request"
-// @Success 200 {object} dto.PostgresqlStatus
-// @Security ApiKeyAuth
-// @Router /databases/pg/status [post]
-func (b *BaseApi) LoadPostgresqlStatus(c *gin.Context) {
-	var req dto.OperationWithNameAndType
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	data, err := postgresqlService.LoadStatus(req)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-
-	helper.SuccessWithData(c, data)
-}

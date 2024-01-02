@@ -61,6 +61,5 @@ func (s *DatabaseRouter) InitRouter(Router *gin.RouterGroup) {
 		cmdRouter.POST("/pg/description", baseApi.UpdatePostgresqlDescription)
 		cmdRouter.POST("/pg/del", baseApi.DeletePostgresql)
 		cmdRouter.POST("/pg/conf", baseApi.UpdatePostgresqlConfByFile)
-		cmdRouter.POST("/pg/status", baseApi.LoadPostgresqlStatus)
 	}
 }

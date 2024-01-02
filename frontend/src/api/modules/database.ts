@@ -19,9 +19,6 @@ export const addPostgresqlDB = (params: Database.PostgresqlDBCreate) => {
     }
     return http.post(`/databases/pg`, request);
 };
-export const loadPostgresqlStatus = (type: string, database: string) => {
-    return http.post<Database.PostgresqlStatus>(`/databases/pg/status`, { type: type, name: database });
-};
 export const updatePostgresqlConfByFile = (params: Database.PostgresqlConfUpdateByFile) => {
     return http.post(`/databases/pg/conf`, params);
 };

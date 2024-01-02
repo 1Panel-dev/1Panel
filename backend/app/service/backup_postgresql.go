@@ -102,6 +102,7 @@ func handlePostgresqlBackup(database, dbName, targetDir, fileName string) error 
 	if err != nil {
 		return err
 	}
+	defer cli.Close()
 
 	backupInfo := pgclient.BackupInfo{
 		Name:      dbName,
@@ -130,6 +131,7 @@ func handlePostgresqlRecover(req dto.CommonRecover, isRollback bool) error {
 	if err != nil {
 		return err
 	}
+	defer cli.Close()
 
 	if !isRollback {
 		rollbackFile := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("database/%s/%s_%s.sql.gz", req.Type, req.DetailName, time.Now().Format("20060102150405")))
