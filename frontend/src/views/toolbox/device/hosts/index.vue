@@ -7,6 +7,12 @@
 
             <el-row type="flex" justify="center" v-loading="loading">
                 <el-col :span="22">
+                    <el-alert
+                        :title="$t('toolbox.device.timeZoneHelper')"
+                        class="common-prompt"
+                        :closable="false"
+                        type="warning"
+                    />
                     <el-radio-group v-model="confShowType" @change="changeMode">
                         <el-radio-button label="base">{{ $t('database.baseConf') }}</el-radio-button>
                         <el-radio-button label="all">{{ $t('database.allConf') }}</el-radio-button>
