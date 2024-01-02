@@ -178,6 +178,7 @@ definitions:
         enum:
         - mysql
         - mariadb
+        - postgresql
         type: string
       value:
         type: string
@@ -272,6 +273,7 @@ definitions:
         - mariadb
         - redis
         - website
+        - postgresql
         type: string
     required:
     - type
@@ -303,6 +305,7 @@ definitions:
         - mariadb
         - redis
         - website
+        - postgresql
         type: string
     required:
     - source
@@ -1979,6 +1982,134 @@ definitions:
         type: integer
     required:
     - serverPort
+    type: object
+  dto.PostgresqlConfUpdateByFile:
+    properties:
+      database:
+        type: string
+      file:
+        type: string
+      type:
+        enum:
+        - postgresql
+        - mariadb
+        type: string
+    required:
+    - database
+    - type
+    type: object
+  dto.PostgresqlDBCreate:
+    properties:
+      database:
+        type: string
+      description:
+        type: string
+      format:
+        type: string
+      from:
+        enum:
+        - local
+        - remote
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      permission:
+        type: string
+      username:
+        type: string
+    required:
+    - database
+    - from
+    - name
+    - password
+    - permission
+    - username
+    type: object
+  dto.PostgresqlDBDelete:
+    properties:
+      database:
+        type: string
+      deleteBackup:
+        type: boolean
+      forceDelete:
+        type: boolean
+      id:
+        type: integer
+      type:
+        enum:
+        - postgresql
+        type: string
+    required:
+    - database
+    - id
+    - type
+    type: object
+  dto.PostgresqlDBDeleteCheck:
+    properties:
+      database:
+        type: string
+      id:
+        type: integer
+      type:
+        enum:
+        - postgresql
+        type: string
+    required:
+    - database
+    - id
+    - type
+    type: object
+  dto.PostgresqlDBSearch:
+    properties:
+      database:
+        type: string
+      info:
+        type: string
+      order:
+        type: string
+      orderBy:
+        type: string
+      page:
+        type: integer
+      pageSize:
+        type: integer
+    required:
+    - database
+    - page
+    - pageSize
+    type: object
+  dto.PostgresqlLoadDB:
+    properties:
+      database:
+        type: string
+      from:
+        enum:
+        - local
+        - remote
+        type: string
+      type:
+        enum:
+        - postgresql
+        type: string
+    required:
+    - database
+    - from
+    - type
+    type: object
+  dto.PostgresqlOption:
+    properties:
+      database:
+        type: string
+      from:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      type:
+        type: string
     type: object
   dto.RecordSearch:
     properties:
@@ -7729,6 +7860,270 @@ paths:
       summary: List mysql database names
       tags:
       - Database Mysql
+  /databases/pg:
+    post:
+      consumes:
+      - application/json
+      description: 创建 postgresql 数据库
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PostgresqlDBCreate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Create postgresql database
+      tags:
+      - Database Postgresql
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - name
+        formatEN: create postgresql database [name]
+        formatZH: 创建 postgresql 数据库 [name]
+        paramKeys: []
+  /databases/pg/baseinfo:
+    post:
+      consumes:
+      - application/json
+      description: 获取 postgresql 基础信息
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OperationWithNameAndType'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.DBBaseInfo'
+      security:
+      - ApiKeyAuth: []
+      summary: Load postgresql base info
+      tags:
+      - Database Postgresql
+  /databases/pg/conf:
+    post:
+      consumes:
+      - application/json
+      description: 上传替换 postgresql 配置文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PostgresqlConfUpdateByFile'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update postgresql conf by upload file
+      tags:
+      - Database Postgresql
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys: []
+        formatEN: update the postgresql database configuration information
+        formatZH: 更新 postgresql 数据库配置信息
+        paramKeys: []
+  /databases/pg/del:
+    post:
+      consumes:
+      - application/json
+      description: 删除 postgresql 数据库
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PostgresqlDBDelete'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Delete postgresql database
+      tags:
+      - Database Postgresql
+      x-panel-log:
+        BeforeFunctions:
+        - db: database_postgresqls
+          input_column: id
+          input_value: id
+          isList: false
+          output_column: name
+          output_value: name
+        bodyKeys:
+        - id
+        formatEN: delete postgresql database [name]
+        formatZH: 删除 postgresql 数据库 [name]
+        paramKeys: []
+  /databases/pg/del/check:
+    post:
+      consumes:
+      - application/json
+      description: Postgresql 数据库删除前检查
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PostgresqlDBDeleteCheck'
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Check before delete postgresql database
+      tags:
+      - Database Postgresql
+  /databases/pg/description:
+    post:
+      consumes:
+      - application/json
+      description: 更新 postgresql 数据库库描述信息
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateDescription'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update postgresql database description
+      tags:
+      - Database Postgresql
+      x-panel-log:
+        BeforeFunctions:
+        - db: database_postgresqls
+          input_column: id
+          input_value: id
+          isList: false
+          output_column: name
+          output_value: name
+        bodyKeys:
+        - id
+        - description
+        formatEN: The description of the postgresql database [name] is modified =>
+          [description]
+        formatZH: postgresql 数据库 [name] 描述信息修改 [description]
+        paramKeys: []
+  /databases/pg/load:
+    post:
+      consumes:
+      - application/json
+      description: 从服务器获取
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PostgresqlLoadDB'
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Load postgresql database from remote
+      tags:
+      - Database Postgresql
+  /databases/pg/options:
+    get:
+      consumes:
+      - application/json
+      description: 获取 postgresql 数据库列表
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PageInfo'
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.PostgresqlOption'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: List postgresql database names
+      tags:
+      - Database Postgresql
+  /databases/pg/password:
+    post:
+      consumes:
+      - application/json
+      description: 修改 postgresql 密码
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ChangeDBInfo'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Change postgresql password
+      tags:
+      - Database Postgresql
+      x-panel-log:
+        BeforeFunctions:
+        - db: database_postgresqls
+          input_column: id
+          input_value: id
+          isList: false
+          output_column: name
+          output_value: name
+        bodyKeys:
+        - id
+        formatEN: Update database [name] password
+        formatZH: 更新数据库 [name] 密码
+        paramKeys: []
+  /databases/pg/search:
+    post:
+      consumes:
+      - application/json
+      description: 获取 postgresql 数据库列表分页
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PostgresqlDBSearch'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Page postgresql databases
+      tags:
+      - Database Postgresql
   /databases/redis/backup/search:
     post:
       consumes:

@@ -7,14 +7,6 @@
                         <el-button type="primary" :plain="activeName !== 'conf'" @click="jumpToConf">
                             {{ $t('database.confChange') }}
                         </el-button>
-                        <el-button
-                            type="primary"
-                            :disabled="postgresqlStatus !== 'Running'"
-                            :plain="activeName !== 'status'"
-                            @click="activeName = 'status'"
-                        >
-                            {{ $t('database.currentStatus') }}
-                        </el-button>
                         <el-button type="primary" :plain="activeName !== 'port'" @click="activeName = 'port'">
                             {{ $t('commons.table.port') }}
                         </el-button>
@@ -49,23 +41,10 @@
                         :extensions="extensions"
                         v-model="postgresqlConf"
                     />
-
                     <el-button type="primary" style="margin-top: 10px" @click="onSaveConf">
                         {{ $t('commons.button.save') }}
                     </el-button>
-                    <el-row>
-                        <el-col :span="8">
-                            <el-alert
-                                v-if="useOld"
-                                style="margin-top: 10px"
-                                :title="$t('app.defaultConfigHelper')"
-                                type="info"
-                                :closable="false"
-                            ></el-alert>
-                        </el-col>
-                    </el-row>
                 </div>
-                <Status v-show="activeName === 'status'" ref="statusRef" />
                 <div v-show="activeName === 'port'">
                     <el-form :model="baseInfo" ref="panelFormRef" label-position="top">
                         <el-row>
@@ -114,7 +93,6 @@
 <script lang="ts" setup>
 import { FormInstance } from 'element-plus';
 import ContainerLog from '@/components/container-log/index.vue';
-import Status from '@/views/database/postgresql/setting/status/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { onMounted, reactive, ref } from 'vue';
 import { Codemirror } from 'vue-codemirror';
@@ -142,10 +120,6 @@ const baseInfo = reactive({
 const panelFormRef = ref<FormInstance>();
 const postgresqlConf = ref();
 const upgradeVisible = ref();
-
-const useOld = ref(false);
-
-const statusRef = ref();
 
 const postgresqlName = ref();
 const postgresqlStatus = ref();
@@ -214,7 +188,6 @@ const onSubmitChangeConf = async () => {
     loading.value = true;
     await updatePostgresqlConfByFile(param)
         .then(() => {
-            useOld.value = false;
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
@@ -247,7 +220,6 @@ const loadBaseInfo = async () => {
 };
 
 const loadPostgresqlConf = async () => {
-    useOld.value = false;
     await loadDatabaseFile(props.type + '-conf', props.database)
         .then((res) => {
             loading.value = false;
@@ -269,9 +241,6 @@ const onLoadInfo = async () => {
         postgresqlStatus.value = res.data.status;
         postgresqlVersion.value = res.data.version;
         loadBaseInfo();
-        if (postgresqlStatus.value === 'Running') {
-            statusRef.value!.acceptParams({ type: props.type, database: props.database });
-        }
     });
 };
 

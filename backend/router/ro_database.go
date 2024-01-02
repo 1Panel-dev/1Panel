@@ -53,15 +53,13 @@ func (s *DatabaseRouter) InitRouter(Router *gin.RouterGroup) {
 		cmdRouter.POST("/db/del/check", baseApi.DeleteCheckDatabase)
 		cmdRouter.POST("/db/del", baseApi.DeleteDatabase)
 
-		//PGSQL管理系列接口
 		cmdRouter.POST("/pg", baseApi.CreatePostgresql)
 		cmdRouter.POST("/pg/search", baseApi.SearchPostgresql)
+		cmdRouter.POST("/pg/load", baseApi.LoadPostgresqlDBFromRemote)
 		cmdRouter.POST("/pg/del/check", baseApi.DeleteCheckPostgresql)
 		cmdRouter.POST("/pg/password", baseApi.ChangePostgresqlPassword)
 		cmdRouter.POST("/pg/description", baseApi.UpdatePostgresqlDescription)
 		cmdRouter.POST("/pg/del", baseApi.DeletePostgresql)
 		cmdRouter.POST("/pg/conf", baseApi.UpdatePostgresqlConfByFile)
-		cmdRouter.POST("/pg/status", baseApi.LoadPostgresqlStatus)
-
 	}
 }

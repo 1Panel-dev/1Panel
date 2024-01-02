@@ -256,7 +256,6 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 					}
 					resourceId = pgdb.ID
 				}
-				break
 			case "mysql", "mariadb":
 				iMysqlRepo := repo.NewIMysqlRepo()
 				oldMysqlDb, _ := iMysqlRepo.Get(commonRepo.WithByName(dbConfig.DbName), iMysqlRepo.WithByFrom(constant.ResourceLocal))
@@ -280,8 +279,6 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 					}
 					resourceId = mysqldb.ID
 				}
-				break
-
 			}
 
 		}

@@ -63,51 +63,6 @@ type PostgresqlDBDelete struct {
 	DeleteBackup bool   `json:"deleteBackup"`
 }
 
-type PostgresqlStatus struct {
-	Uptime              string `json:"uptime"`
-	Version             string `json:"version"`
-	MaxConnections      string `json:"max_connections"`
-	Autovacuum          string `json:"autovacuum"`
-	CurrentConnections  string `json:"current_connections"`
-	HitRatio            string `json:"hit_ratio"`
-	SharedBuffers       string `json:"shared_buffers"`
-	BuffersClean        string `json:"buffers_clean"`
-	MaxwrittenClean     string `json:"maxwritten_clean"`
-	BuffersBackendFsync string `json:"buffers_backend_fsync"`
-}
-
-type PostgresqlVariables struct {
-	BinlogCachSize       string `json:"binlog_cache_size"`
-	InnodbBufferPoolSize string `json:"innodb_buffer_pool_size"`
-	InnodbLogBufferSize  string `json:"innodb_log_buffer_size"`
-	JoinBufferSize       string `json:"join_buffer_size"`
-	KeyBufferSize        string `json:"key_buffer_size"`
-	MaxConnections       string `json:"max_connections"`
-	MaxHeapTableSize     string `json:"max_heap_table_size"`
-	QueryCacheSize       string `json:"query_cache_size"`
-	QueryCache_type      string `json:"query_cache_type"`
-	ReadBufferSize       string `json:"read_buffer_size"`
-	ReadRndBufferSize    string `json:"read_rnd_buffer_size"`
-	SortBufferSize       string `json:"sort_buffer_size"`
-	TableOpenCache       string `json:"table_open_cache"`
-	ThreadCacheSize      string `json:"thread_cache_size"`
-	ThreadStack          string `json:"thread_stack"`
-	TmpTableSize         string `json:"tmp_table_size"`
-
-	SlowQueryLog  string `json:"slow_query_log"`
-	LongQueryTime string `json:"long_query_time"`
-}
-
-type PostgresqlVariablesUpdate struct {
-	Type      string                            `json:"type" validate:"required,oneof=postgresql"`
-	Database  string                            `json:"database" validate:"required"`
-	Variables []PostgresqlVariablesUpdateHelper `json:"variables"`
-}
-
-type PostgresqlVariablesUpdateHelper struct {
-	Param string      `json:"param"`
-	Value interface{} `json:"value"`
-}
 type PostgresqlConfUpdateByFile struct {
 	Type     string `json:"type" validate:"required,oneof=postgresql mariadb"`
 	Database string `json:"database" validate:"required"`

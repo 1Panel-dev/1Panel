@@ -3,10 +3,11 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/utils/postgresql"
-	client2 "github.com/1Panel-dev/1Panel/backend/utils/postgresql/client"
 	"os"
 	"path"
+
+	"github.com/1Panel-dev/1Panel/backend/utils/postgresql"
+	client2 "github.com/1Panel-dev/1Panel/backend/utils/postgresql/client"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
@@ -88,13 +89,7 @@ func (u *DatabaseService) CheckDatabase(req dto.DatabaseCreate) bool {
 			Port:     req.Port,
 			Username: req.Username,
 			Password: req.Password,
-
-			SSL:        false,
-			RootCert:   req.RootCert,
-			ClientKey:  req.ClientKey,
-			ClientCert: req.ClientCert,
-			SkipVerify: req.SkipVerify,
-			Timeout:    6,
+			Timeout:  6,
 		})
 		return err == nil
 	case "mysql", "mariadb":
@@ -134,13 +129,7 @@ func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
 			Port:     req.Port,
 			Username: req.Username,
 			Password: req.Password,
-
-			SSL:        req.SSL,
-			RootCert:   req.RootCert,
-			ClientKey:  req.ClientKey,
-			ClientCert: req.ClientCert,
-			SkipVerify: req.SkipVerify,
-			Timeout:    6,
+			Timeout:  6,
 		}); err != nil {
 			return err
 		}
@@ -230,13 +219,7 @@ func (u *DatabaseService) Update(req dto.DatabaseUpdate) error {
 			Port:     req.Port,
 			Username: req.Username,
 			Password: req.Password,
-
-			SSL:        req.SSL,
-			RootCert:   req.RootCert,
-			ClientKey:  req.ClientKey,
-			ClientCert: req.ClientCert,
-			SkipVerify: req.SkipVerify,
-			Timeout:    300,
+			Timeout:  300,
 		}); err != nil {
 			return err
 		}

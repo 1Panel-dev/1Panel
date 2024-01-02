@@ -19,9 +19,6 @@ export const addPostgresqlDB = (params: Database.PostgresqlDBCreate) => {
     }
     return http.post(`/databases/pg`, request);
 };
-export const loadPostgresqlStatus = (type: string, database: string) => {
-    return http.post<Database.PostgresqlStatus>(`/databases/pg/status`, { type: type, name: database });
-};
 export const updatePostgresqlConfByFile = (params: Database.PostgresqlConfUpdateByFile) => {
     return http.post(`/databases/pg/conf`, params);
 };
@@ -30,6 +27,9 @@ export const searchPostgresqlDBs = (params: Database.SearchDBWithPage) => {
 };
 export const updatePostgresqlDescription = (params: DescriptionUpdate) => {
     return http.post(`/databases/pg/description`, params);
+};
+export const loadPgFromRemote = (params: Database.PgLoadDB) => {
+    return http.post(`/databases/pg/load`, params);
 };
 export const deleteCheckPostgresqlDB = (params: Database.PostgresqlDBDeleteCheck) => {
     return http.post<Array<string>>(`/databases/pg/del/check`, params);
@@ -44,6 +44,8 @@ export const updatePostgresqlPassword = (params: Database.ChangeInfo) => {
 export const deletePostgresqlDB = (params: Database.PostgresqlDBDelete) => {
     return http.post(`/databases/pg/del`, params);
 };
+
+// mysql
 export const addMysqlDB = (params: Database.MysqlDBCreate) => {
     let request = deepCopy(params) as Database.MysqlDBCreate;
     if (request.password) {

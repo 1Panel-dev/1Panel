@@ -2,13 +2,14 @@ package service
 
 import (
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/buserr"
-	pgclient "github.com/1Panel-dev/1Panel/backend/utils/postgresql/client"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/buserr"
+	pgclient "github.com/1Panel-dev/1Panel/backend/utils/postgresql/client"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -97,18 +98,14 @@ func (u *BackupService) PostgresqlRecoverByUpload(req dto.CommonRecover) error {
 	return nil
 }
 func handlePostgresqlBackup(database, dbName, targetDir, fileName string) error {
-	dbInfo, err := postgresqlRepo.Get(commonRepo.WithByName(dbName), postgresqlRepo.WithByPostgresqlName(database))
+	cli, err := LoadPostgresqlClientByFrom(database)
 	if err != nil {
 		return err
 	}
-	cli, _, err := LoadPostgresqlClientByFrom(database)
-	if err != nil {
-		return err
-	}
+	defer cli.Close()
 
 	backupInfo := pgclient.BackupInfo{
 		Name:      dbName,
-		Format:    dbInfo.Format,
 		TargetDir: targetDir,
 		FileName:  fileName,
 
@@ -130,16 +127,16 @@ func handlePostgresqlRecover(req dto.CommonRecover, isRollback bool) error {
 	if err != nil {
 		return err
 	}
-	cli, _, err := LoadPostgresqlClientByFrom(req.Name)
+	cli, err := LoadPostgresqlClientByFrom(req.Name)
 	if err != nil {
 		return err
 	}
+	defer cli.Close()
 
 	if !isRollback {
 		rollbackFile := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("database/%s/%s_%s.sql.gz", req.Type, req.DetailName, time.Now().Format("20060102150405")))
 		if err := cli.Backup(client.BackupInfo{
 			Name:      req.DetailName,
-			Format:    dbInfo.Format,
 			TargetDir: path.Dir(rollbackFile),
 			FileName:  path.Base(rollbackFile),
 
@@ -152,7 +149,6 @@ func handlePostgresqlRecover(req dto.CommonRecover, isRollback bool) error {
 				global.LOG.Info("recover failed, start to rollback now")
 				if err := cli.Recover(client.RecoverInfo{
 					Name:       req.DetailName,
-					Format:     dbInfo.Format,
 					SourceFile: rollbackFile,
 
 					Timeout: 300,
@@ -168,10 +164,9 @@ func handlePostgresqlRecover(req dto.CommonRecover, isRollback bool) error {
 	}
 	if err := cli.Recover(client.RecoverInfo{
 		Name:       req.DetailName,
-		Format:     dbInfo.Format,
 		SourceFile: req.File,
-		Username: dbInfo.Username,
-		Timeout: 300,
+		Username:   dbInfo.Username,
+		Timeout:    300,
 	}); err != nil {
 		return err
 	}

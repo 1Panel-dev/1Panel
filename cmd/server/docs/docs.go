@@ -4642,6 +4642,421 @@ const docTemplate = `{
                 }
             }
         },
+        "/databases/pg": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "创建 postgresql 数据库",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Database Postgresql"
+                ],
+                "summary": "Create postgresql database",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.PostgresqlDBCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "name"
+                    ],
+                    "formatEN": "create postgresql database [name]",
+                    "formatZH": "创建 postgresql 数据库 [name]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/databases/pg/baseinfo": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取 postgresql 基础信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Database Postgresql"
+                ],
+                "summary": "Load postgresql base info",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperationWithNameAndType"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.DBBaseInfo"
+                        }
+                    }
+                }
+            }
+        },
+        "/databases/pg/conf": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "上传替换 postgresql 配置文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Database Postgresql"
+                ],
+                "summary": "Update postgresql conf by upload file",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.PostgresqlConfUpdateByFile"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [],
+                    "formatEN": "update the postgresql database configuration information",
+                    "formatZH": "更新 postgresql 数据库配置信息",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/databases/pg/del": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "删除 postgresql 数据库",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Database Postgresql"
+                ],
+                "summary": "Delete postgresql database",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.PostgresqlDBDelete"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [
+                        {
+                            "db": "database_postgresqls",
+                            "input_column": "id",
+                            "input_value": "id",
+                            "isList": false,
+                            "output_column": "name",
+                            "output_value": "name"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "id"
+                    ],
+                    "formatEN": "delete postgresql database [name]",
+                    "formatZH": "删除 postgresql 数据库 [name]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/databases/pg/del/check": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Postgresql 数据库删除前检查",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Database Postgresql"
+                ],
+                "summary": "Check before delete postgresql database",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.PostgresqlDBDeleteCheck"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/databases/pg/description": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新 postgresql 数据库库描述信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Database Postgresql"
+                ],
+                "summary": "Update postgresql database description",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateDescription"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [
+                        {
+                            "db": "database_postgresqls",
+                            "input_column": "id",
+                            "input_value": "id",
+                            "isList": false,
+                            "output_column": "name",
+                            "output_value": "name"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "id",
+                        "description"
+                    ],
+                    "formatEN": "The description of the postgresql database [name] is modified =\u003e [description]",
+                    "formatZH": "postgresql 数据库 [name] 描述信息修改 [description]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/databases/pg/load": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "从服务器获取",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Database Postgresql"
+                ],
+                "summary": "Load postgresql database from remote",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.PostgresqlLoadDB"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/databases/pg/options": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取 postgresql 数据库列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Database Postgresql"
+                ],
+                "summary": "List postgresql database names",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.PageInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.PostgresqlOption"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/databases/pg/password": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "修改 postgresql 密码",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Database Postgresql"
+                ],
+                "summary": "Change postgresql password",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ChangeDBInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [
+                        {
+                            "db": "database_postgresqls",
+                            "input_column": "id",
+                            "input_value": "id",
+                            "isList": false,
+                            "output_column": "name",
+                            "output_value": "name"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "id"
+                    ],
+                    "formatEN": "Update database [name] password",
+                    "formatZH": "更新数据库 [name] 密码",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/databases/pg/search": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取 postgresql 数据库列表分页",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Database Postgresql"
+                ],
+                "summary": "Page postgresql databases",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.PostgresqlDBSearch"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.PageResult"
+                        }
+                    }
+                }
+            }
+        },
         "/databases/redis/backup/search": {
             "post": {
                 "security": [
@@ -13734,7 +14149,8 @@ const docTemplate = `{
                     "type": "string",
                     "enum": [
                         "mysql",
-                        "mariadb"
+                        "mariadb",
+                        "postgresql"
                     ]
                 },
                 "value": {
@@ -13871,7 +14287,8 @@ const docTemplate = `{
                         "mysql",
                         "mariadb",
                         "redis",
-                        "website"
+                        "website",
+                        "postgresql"
                     ]
                 }
             }
@@ -13913,7 +14330,8 @@ const docTemplate = `{
                         "mysql",
                         "mariadb",
                         "redis",
-                        "website"
+                        "website",
+                        "postgresql"
                     ]
                 }
             }
@@ -16385,6 +16803,193 @@ const docTemplate = `{
                     "type": "integer",
                     "maximum": 65535,
                     "minimum": 1
+                }
+            }
+        },
+        "dto.PostgresqlConfUpdateByFile": {
+            "type": "object",
+            "required": [
+                "database",
+                "type"
+            ],
+            "properties": {
+                "database": {
+                    "type": "string"
+                },
+                "file": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "postgresql",
+                        "mariadb"
+                    ]
+                }
+            }
+        },
+        "dto.PostgresqlDBCreate": {
+            "type": "object",
+            "required": [
+                "database",
+                "from",
+                "name",
+                "password",
+                "permission",
+                "username"
+            ],
+            "properties": {
+                "database": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "format": {
+                    "type": "string"
+                },
+                "from": {
+                    "type": "string",
+                    "enum": [
+                        "local",
+                        "remote"
+                    ]
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "permission": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.PostgresqlDBDelete": {
+            "type": "object",
+            "required": [
+                "database",
+                "id",
+                "type"
+            ],
+            "properties": {
+                "database": {
+                    "type": "string"
+                },
+                "deleteBackup": {
+                    "type": "boolean"
+                },
+                "forceDelete": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "postgresql"
+                    ]
+                }
+            }
+        },
+        "dto.PostgresqlDBDeleteCheck": {
+            "type": "object",
+            "required": [
+                "database",
+                "id",
+                "type"
+            ],
+            "properties": {
+                "database": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "postgresql"
+                    ]
+                }
+            }
+        },
+        "dto.PostgresqlDBSearch": {
+            "type": "object",
+            "required": [
+                "database",
+                "page",
+                "pageSize"
+            ],
+            "properties": {
+                "database": {
+                    "type": "string"
+                },
+                "info": {
+                    "type": "string"
+                },
+                "order": {
+                    "type": "string"
+                },
+                "orderBy": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.PostgresqlLoadDB": {
+            "type": "object",
+            "required": [
+                "database",
+                "from",
+                "type"
+            ],
+            "properties": {
+                "database": {
+                    "type": "string"
+                },
+                "from": {
+                    "type": "string",
+                    "enum": [
+                        "local",
+                        "remote"
+                    ]
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "postgresql"
+                    ]
+                }
+            }
+        },
+        "dto.PostgresqlOption": {
+            "type": "object",
+            "properties": {
+                "database": {
+                    "type": "string"
+                },
+                "from": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
                 }
             }
         },
