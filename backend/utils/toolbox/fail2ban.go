@@ -93,12 +93,17 @@ func (f *Fail2ban) ReBanIPs(ips []string) error {
 
 func (f *Fail2ban) ListBanned() ([]string, error) {
 	var lists []string
-	stdout, err := cmd.Exec("fail2ban-client get sshd banip")
+	stdout, err := cmd.Exec("fail2ban-client status sshd | grep 'Banned IP list:'")
 	if err != nil {
 		return lists, err
 	}
-	itemList := strings.Split(strings.ReplaceAll(stdout, "\n", ""), " ")
-	for _, item := range itemList {
+	itemList := strings.Split(strings.Trim(stdout, "\n"), "Banned IP list:")
+	if len(itemList) != 2 {
+		return lists, nil
+	}
+
+	ips := strings.Fields(itemList[1])
+	for _, item := range ips {
 		if len(item) != 0 {
 			lists = append(lists, item)
 		}
