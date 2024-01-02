@@ -44,19 +44,19 @@
                     </div>
                 </template>
             </el-alert>
-            <el-alert :type="loadStatus(status.panelData)" :closable="false">
-                <template #title>
-                    <el-button :icon="loadIcon(status.panelData)" link>{{ $t('setting.panelData') }}</el-button>
-                    <div v-if="showErrorMsg(status.panelData)" class="top-margin">
-                        <span class="err-message">{{ status.panelData }}</span>
-                    </div>
-                </template>
-            </el-alert>
             <el-alert :type="loadStatus(status.backupData)" :closable="false">
                 <template #title>
                     <el-button :icon="loadIcon(status.backupData)" link>{{ $t('setting.backupData') }}</el-button>
                     <div v-if="showErrorMsg(status.backupData)" class="top-margin">
                         <span class="err-message">{{ status.backupData }}</span>
+                    </div>
+                </template>
+            </el-alert>
+            <el-alert :type="loadStatus(status.panelData)" :closable="false">
+                <template #title>
+                    <el-button :icon="loadIcon(status.panelData)" link>{{ $t('setting.panelData') }}</el-button>
+                    <div v-if="showErrorMsg(status.panelData)" class="top-margin">
+                        <span class="err-message">{{ status.panelData }}</span>
                     </div>
                 </template>
             </el-alert>

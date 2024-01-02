@@ -544,10 +544,6 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, req dto.SnapshotCreate,
 		wg.Add(1)
 		go snapBackup(itemHelper, localDir, backupPanelDir)
 	}
-	if snapStatus.PanelData != constant.StatusDone {
-		wg.Add(1)
-		go snapPanelData(itemHelper, localDir, backupPanelDir)
-	}
 
 	if !isCronjob {
 		go func() {
@@ -556,12 +552,16 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, req dto.SnapshotCreate,
 				_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
 				return
 			}
+			snapPanelData(itemHelper, localDir, backupPanelDir)
+			if snapStatus.PanelData != constant.StatusDone {
+				_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
+				return
+			}
 			snapCompress(itemHelper, rootDir)
 			if snapStatus.Compress != constant.StatusDone {
 				_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
 				return
 			}
-
 			snapUpload(itemHelper, req.From, fmt.Sprintf("%s.tar.gz", rootDir))
 			if snapStatus.Upload != constant.StatusDone {
 				_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
@@ -778,7 +778,7 @@ func (u *SnapshotService) handlePanelDatas(snapID uint, fileOp files.FileOp, ope
 			return fmt.Errorf("backup panel data failed, err: %v", err)
 		}
 	case "recover":
-		exclusionRules := "./tmp;./log;./cache;"
+		exclusionRules := "./tmp;./log;./cache;./db/1Panel.db-*;"
 		if strings.Contains(backupDir, target) {
 			exclusionRules += ("." + strings.ReplaceAll(backupDir, target, "") + ";")
 		}
@@ -787,22 +787,26 @@ func (u *SnapshotService) handlePanelDatas(snapID uint, fileOp files.FileOp, ope
 		}
 
 		_ = snapshotRepo.Update(snapID, map[string]interface{}{"recover_status": ""})
+		checkPointOfWal()
 		if err := handleSnapTar(target, u.OriginalPath, "1panel_data.tar.gz", exclusionRules); err != nil {
 			return fmt.Errorf("restore original panel data failed, err: %v", err)
 		}
 		_ = snapshotRepo.Update(snapID, map[string]interface{}{"recover_status": constant.StatusWaiting})
 
 		_ = fileOp.Fs.RemoveAll(path.Join(target, "apps"))
+		checkPointOfWal()
 		if err := u.handleUnTar(source+"/1panel/1panel_data.tar.gz", target); err != nil {
 			return fmt.Errorf("recover panel data failed, err: %v", err)
 		}
 	case "re-recover":
 		_ = fileOp.Fs.RemoveAll(path.Join(target, "apps"))
+		checkPointOfWal()
 		if err := u.handleUnTar(source+"/1panel/1panel_data.tar.gz", target); err != nil {
 			return fmt.Errorf("retry recover panel data failed, err: %v", err)
 		}
 	case "rollback":
 		_ = fileOp.Fs.RemoveAll(path.Join(target, "apps"))
+		checkPointOfWal()
 		if err := u.handleUnTar(source+"/1panel_data.tar.gz", target); err != nil {
 			return fmt.Errorf("rollback panel data failed, err: %v", err)
 		}
@@ -1043,9 +1047,6 @@ func checkIsAllDone(snapID uint) bool {
 		return false
 	}
 	if status.AppData != constant.StatusDone {
-		return false
-	}
-	if status.PanelData != constant.StatusDone {
 		return false
 	}
 	if status.BackupData != constant.StatusDone {
