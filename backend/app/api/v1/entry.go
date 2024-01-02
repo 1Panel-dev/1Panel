@@ -21,10 +21,10 @@ var (
 	imageService           = service.NewIImageService()
 	dockerService          = service.NewIDockerService()
 
-	mysqlService    = service.NewIMysqlService()
-	postgresqlService    = service.NewIPostgresqlService()
-	databaseService = service.NewIDatabaseService()
-	redisService    = service.NewIRedisService()
+	mysqlService      = service.NewIMysqlService()
+	postgresqlService = service.NewIPostgresqlService()
+	databaseService   = service.NewIDatabaseService()
+	redisService      = service.NewIRedisService()
 
 	cronjobService = service.NewICronjobService()
 
@@ -53,8 +53,9 @@ var (
 	snapshotService = service.NewISnapshotService()
 	upgradeService  = service.NewIUpgradeService()
 
-	runtimeService = service.NewRuntimeService()
-	processService = service.NewIProcessService()
+	runtimeService       = service.NewRuntimeService()
+	processService       = service.NewIProcessService()
+	phpExtensionsService = service.NewIPHPExtensionsService()
 
 	hostToolService = service.NewIHostToolService()
 

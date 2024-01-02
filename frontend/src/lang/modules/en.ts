@@ -191,6 +191,7 @@ const message = {
             paramSimple: 'Support lowercase letters and numbers, length 1-128',
             filePermission: 'File Permission Error',
             formatErr: 'Format error, please check and retry',
+            phpExtension: 'Only supports , _ lowercase English and numbers',
         },
         res: {
             paramError: 'The request failed, please try again later!',
@@ -1839,6 +1840,10 @@ const message = {
         uploadMaxSize: 'Upload limit',
         indexHelper:
             'In order to ensure the normal operation of the PHP website, please place the code in the index directory and avoid renaming',
+        extensions: 'Extension template',
+        extension: 'Extension',
+        extensionHelper: 'Please use multiple extensions, split',
+        toExtensionsList: 'View extension list',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: 'The hash table size of the server name',

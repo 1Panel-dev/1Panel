@@ -62,6 +62,8 @@ func Init() {
 		migrations.AddDefaultCA,
 		migrations.AddSettingRecycleBin,
 		migrations.UpdateWebsiteBackupRecord,
+
+		migrations.AddTablePHPExtensions,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

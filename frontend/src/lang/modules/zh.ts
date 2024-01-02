@@ -190,6 +190,7 @@ const message = {
             paramSimple: '支持小写字母和数字,长度1-128',
             filePermission: '权限错误',
             formatErr: '格式错误，检查后重试',
+            phpExtension: '仅支持 , _ 小写英文和数字',
         },
         res: {
             paramError: '请求失败,请稍后重试!',
@@ -1725,6 +1726,10 @@ const message = {
         disableFunctionHelper: '输入要禁用的函数，例如exec，多个请用,分割',
         uploadMaxSize: '上传限制',
         indexHelper: '为保障 PHP 网站正常运行，请将代码放置于主目录下的 index 目录，并避免重命名',
+        extensions: '扩展模版',
+        extension: '扩展',
+        extensionsHelper: '多个扩展请用,分割',
+        toExtensionsList: '查看扩展列表',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '服务器名字的hash表大小',
