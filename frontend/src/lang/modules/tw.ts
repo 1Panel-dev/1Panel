@@ -881,6 +881,7 @@ const message = {
             dnsHelper1: '當存在多個DNS時，需換行顯示，例：\n114.114.114.114\n8.8.8.8',
             hostsHelper: '主機名解析',
             hosts: '域名',
+            hostAlert: '隱藏了已註釋的記錄，請點擊 全部配置 按鈕以查看或設置',
             toolbox: '快速設置',
             hostname: '主機名',
             passwd: '系統密碼',

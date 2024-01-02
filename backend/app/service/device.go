@@ -353,7 +353,7 @@ func loadHosts() []dto.HostHelper {
 		lines := strings.Split(string(hostConf), "\n")
 		for _, line := range lines {
 			parts := strings.Fields(line)
-			if len(parts) < 2 {
+			if len(parts) < 2 || strings.HasPrefix(strings.TrimPrefix(line, " "), "#") {
 				continue
 			}
 			list = append(list, dto.HostHelper{IP: parts[0], Host: strings.Join(parts[1:], " ")})

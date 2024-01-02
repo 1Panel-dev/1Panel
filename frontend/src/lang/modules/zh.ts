@@ -882,6 +882,7 @@ const message = {
             dnsHelper1: '当存在多个 DNS 时，需换行显示，例：\n114.114.114.114\n8.8.8.8',
             hostsHelper: '主机名解析',
             hosts: '域名',
+            hostAlert: '隐藏了已注释的记录，请点击 全部配置 按钮以查看或设置',
             toolbox: '快速设置',
             hostname: '主机名',
             passwd: '系统密码',

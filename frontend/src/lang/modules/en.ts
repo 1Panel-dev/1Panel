@@ -926,6 +926,7 @@ const message = {
                 'When there are multiple DNS entries, they should be displayed on new lines. e.g.\n114.114.114.114\n8.8.8.8',
             hostsHelper: 'Hostname Resolution',
             hosts: 'Domain',
+            hostAlert: 'Hidden commented records, please click the All configuration button to view or set',
             toolbox: 'Quick Setup',
             hostname: 'Hostname',
             passwd: 'System Password',
