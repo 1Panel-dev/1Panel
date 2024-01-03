@@ -19,11 +19,14 @@ const (
 	AppNormal   = "Normal"
 	AppTakeDown = "TakeDown"
 
-	AppOpenresty = "openresty"
-	AppMysql     = "mysql"
-	AppMariaDB   = "mariadb"
+	AppOpenresty  = "openresty"
+	AppMysql      = "mysql"
+	AppMariaDB    = "mariadb"
 	AppPostgresql = "postgresql"
-	AppRedis     = "redis"
+	AppRedis      = "redis"
+	AppPostgres   = "postgres"
+	AppMongodb    = "mongodb"
+	AppMemcached  = "memcached"
 
 	AppResourceLocal  = "local"
 	AppResourceRemote = "remote"

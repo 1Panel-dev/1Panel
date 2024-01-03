@@ -110,12 +110,13 @@ func checkPortExist(port int) error {
 }
 
 var DatabaseKeys = map[string]uint{
-	"mysql":      3306,
-	"mariadb":    3306,
-	"postgresql": 5432,
-	"mongodb":    27017,
-	"redis":      6379,
-	"memcached":  11211,
+	constant.AppMysql:      3306,
+	constant.AppMariaDB:    3306,
+	constant.AppPostgresql: 5432,
+	constant.AppPostgres:   5432,
+	constant.AppMongodb:    27017,
+	constant.AppRedis:      6379,
+	constant.AppMemcached:  11211,
 }
 
 var ToolKeys = map[string]uint{
@@ -154,7 +155,7 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 		}
 
 		switch app.Key {
-		case "mysql", "mariadb", constant.AppPostgresql, "mongodb":
+		case constant.AppMysql, constant.AppMariaDB, constant.AppPostgresql, constant.AppMongodb:
 			if password, ok := params["PANEL_DB_ROOT_PASSWORD"]; ok {
 				if password != "" {
 					database.Password = password.(string)
@@ -176,7 +177,7 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 
 				}
 			}
-		case "redis":
+		case constant.AppRedis:
 			if password, ok := params["PANEL_REDIS_ROOT_PASSWORD"]; ok {
 				if password != "" {
 					authParam := dto.RedisAuthParam{
@@ -234,7 +235,7 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 		var resourceId uint
 		if dbConfig.DbName != "" && dbConfig.DbUser != "" && dbConfig.Password != "" {
 			switch database.Type {
-			case constant.AppPostgresql:
+			case constant.AppPostgresql, constant.AppPostgres:
 				iPostgresqlRepo := repo.NewIPostgresqlRepo()
 				oldPostgresqlDb, _ := iPostgresqlRepo.Get(commonRepo.WithByName(dbConfig.DbName), iPostgresqlRepo.WithByFrom(constant.ResourceLocal))
 				resourceId = oldPostgresqlDb.ID
@@ -256,7 +257,7 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 					}
 					resourceId = pgdb.ID
 				}
-			case "mysql", "mariadb":
+			case constant.AppMysql, constant.AppMariaDB:
 				iMysqlRepo := repo.NewIMysqlRepo()
 				oldMysqlDb, _ := iMysqlRepo.Get(commonRepo.WithByName(dbConfig.DbName), iMysqlRepo.WithByFrom(constant.ResourceLocal))
 				resourceId = oldMysqlDb.ID

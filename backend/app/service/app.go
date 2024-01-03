@@ -53,7 +53,7 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 	var opts []repo.DBOption
 	opts = append(opts, appRepo.OrderByRecommend())
 	if req.Name != "" {
-		opts = append(opts, commonRepo.WithLikeName(req.Name))
+		opts = append(opts, appRepo.WithLikeName(req.Name))
 	}
 	if req.Type != "" {
 		opts = append(opts, appRepo.WithType(req.Type))
