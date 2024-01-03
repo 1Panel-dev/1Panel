@@ -414,7 +414,7 @@ const appInstalles = ref<App.AppInstalled[]>([]);
 const appReq = reactive({
     type: 'website',
     page: 1,
-    pageSize: 20,
+    pageSize: 100,
 });
 const apps = ref<App.App[]>([]);
 const appVersions = ref<string[]>([]);

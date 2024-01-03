@@ -432,6 +432,9 @@ func (a *AppInstallService) SyncAll(systemInit bool) error {
 func (a *AppInstallService) GetServices(key string) ([]response.AppService, error) {
 	var res []response.AppService
 	if DatabaseKeys[key] > 0 {
+		if key == constant.AppPostgres {
+			key = constant.AppPostgresql
+		}
 		dbs, _ := databaseRepo.GetList(commonRepo.WithByType(key))
 		if len(dbs) == 0 {
 			return res, nil

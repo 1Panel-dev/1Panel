@@ -52,6 +52,7 @@
                         </el-button>
                         <el-divider v-if="data.app === 'OpenResty'" direction="vertical" />
                         <el-button
+                            v-if="data.app === 'OpenResty'"
                             type="primary"
                             @click="clear"
                             link
