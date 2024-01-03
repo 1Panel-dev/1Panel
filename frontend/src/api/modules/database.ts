@@ -101,9 +101,6 @@ export const loadMysqlStatus = (type: string, database: string) => {
 export const loadRemoteAccess = (type: string, database: string) => {
     return http.post<boolean>(`/databases/remote`, { type: type, name: database });
 };
-export const loadDBOptions = () => {
-    return http.get<Array<Database.MysqlOption>>(`/databases/options`);
-};
 
 // redis
 export const loadRedisStatus = () => {
@@ -140,6 +137,9 @@ export const searchDatabases = (params: Database.SearchDatabasePage) => {
 };
 export const listDatabases = (type: string) => {
     return http.get<Array<Database.DatabaseOption>>(`/databases/db/list/${type}`);
+};
+export const listDbItems = (type: string) => {
+    return http.get<Array<Database.DbItem>>(`/databases/db/item/${type}`);
 };
 export const checkDatabase = (params: Database.DatabaseCreate) => {
     let request = deepCopy(params) as Database.DatabaseCreate;

@@ -19,7 +19,6 @@ func Init() {
 		migrations.AddTableImageRepo,
 		migrations.AddTableWebsite,
 		migrations.AddTableDatabaseMysql,
-		migrations.AddTableDatabasePostgresql,
 		migrations.AddTableSnap,
 		migrations.AddDefaultGroup,
 		migrations.AddTableRuntime,
@@ -64,6 +63,7 @@ func Init() {
 		migrations.UpdateWebsiteBackupRecord,
 
 		migrations.AddTablePHPExtensions,
+		migrations.AddTableDatabasePostgresql,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

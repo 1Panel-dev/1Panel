@@ -263,6 +263,13 @@ type DatabaseOption struct {
 	Address  string `json:"address"`
 }
 
+type DatabaseItem struct {
+	ID       uint   `json:"id"`
+	From     string `json:"from"`
+	Database string `json:"database"`
+	Name     string `json:"name"`
+}
+
 type DatabaseCreate struct {
 	Name     string `json:"name" validate:"required,max=256"`
 	Type     string `json:"type" validate:"required"`

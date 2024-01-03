@@ -3,14 +3,15 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/buserr"
-	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"os"
 	"path"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/buserr"
+	"github.com/1Panel-dev/1Panel/backend/i18n"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -273,19 +274,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, backup model.Back
 		return paths, err
 	}
 
-	var dbs []model.DatabaseMysql
-	if cronjob.DBName == "all" {
-		dbs, err = mysqlRepo.List()
-		if err != nil {
-			return paths, err
-		}
-	} else {
-		itemID, _ := (strconv.Atoi(cronjob.DBName))
-		dbs, err = mysqlRepo.List(commonRepo.WithByID(uint(itemID)))
-		if err != nil {
-			return paths, err
-		}
-	}
+	dbs := loadDbsForJob(cronjob)
 
 	var client cloud_storage.CloudStorageClient
 	if backup.Type != "LOCAL" {
@@ -297,17 +286,21 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, backup model.Back
 
 	for _, dbInfo := range dbs {
 		var record model.BackupRecord
-
-		database, _ := databaseRepo.Get(commonRepo.WithByName(dbInfo.MysqlName))
-		record.Type = database.Type
+		record.Type = dbInfo.DBType
 		record.Source = "LOCAL"
 		record.BackupType = backup.Type
 
-		record.Name = dbInfo.MysqlName
-		backupDir := path.Join(localDir, fmt.Sprintf("database/%s/%s/%s", database.Type, record.Name, dbInfo.Name))
+		record.Name = dbInfo.Database
+		backupDir := path.Join(localDir, fmt.Sprintf("database/%s/%s/%s", dbInfo.DBType, record.Name, dbInfo.Name))
 		record.FileName = fmt.Sprintf("db_%s_%s.sql.gz", dbInfo.Name, startTime.Format("20060102150405"))
-		if err = handleMysqlBackup(dbInfo.MysqlName, dbInfo.Name, backupDir, record.FileName); err != nil {
-			return paths, err
+		if cronjob.DBType == "mysql" || cronjob.DBType == "mariadb" {
+			if err = handleMysqlBackup(dbInfo.Database, dbInfo.Name, backupDir, record.FileName); err != nil {
+				return paths, err
+			}
+		} else {
+			if err = handlePostgresqlBackup(dbInfo.Database, dbInfo.Name, backupDir, record.FileName); err != nil {
+				return paths, err
+			}
 		}
 
 		record.DetailName = dbInfo.Name
@@ -716,4 +709,53 @@ func (u *CronjobService) handleSystemLog(cronjob model.Cronjob, startTime time.T
 
 func hasBackup(cronjobType string) bool {
 	return cronjobType == "app" || cronjobType == "database" || cronjobType == "website" || cronjobType == "directory" || cronjobType == "snapshot" || cronjobType == "log"
+}
+
+type databaseHelper struct {
+	DBType   string
+	Database string
+	Name     string
+}
+
+func loadDbsForJob(cronjob model.Cronjob) []databaseHelper {
+	var dbs []databaseHelper
+	if cronjob.DBName == "all" {
+		if cronjob.DBType == "mysql" || cronjob.DBType == "mariadb" {
+			mysqlItems, _ := mysqlRepo.List()
+			for _, mysql := range mysqlItems {
+				dbs = append(dbs, databaseHelper{
+					DBType:   cronjob.DBType,
+					Database: mysql.MysqlName,
+					Name:     mysql.Name,
+				})
+			}
+		} else {
+			pgItems, _ := postgresqlRepo.List()
+			for _, pg := range pgItems {
+				dbs = append(dbs, databaseHelper{
+					DBType:   cronjob.DBType,
+					Database: pg.PostgresqlName,
+					Name:     pg.Name,
+				})
+			}
+		}
+		return dbs
+	}
+	itemID, _ := (strconv.Atoi(cronjob.DBName))
+	if cronjob.DBType == "mysql" || cronjob.DBType == "mariadb" {
+		mysqlItem, _ := mysqlRepo.Get(commonRepo.WithByID(uint(itemID)))
+		dbs = append(dbs, databaseHelper{
+			DBType:   cronjob.DBType,
+			Database: mysqlItem.MysqlName,
+			Name:     mysqlItem.Name,
+		})
+	} else {
+		pgItem, _ := postgresqlRepo.Get(commonRepo.WithByID(uint(itemID)))
+		dbs = append(dbs, databaseHelper{
+			DBType:   cronjob.DBType,
+			Database: pgItem.PostgresqlName,
+			Name:     pgItem.Name,
+		})
+	}
+	return dbs
 }

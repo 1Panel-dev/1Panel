@@ -18,6 +18,7 @@ export namespace Cronjob {
         appID: string;
         website: string;
         exclusionRules: string;
+        dbType: string;
         dbName: string;
         url: string;
         sourceDir: string;
@@ -40,6 +41,7 @@ export namespace Cronjob {
         script: string;
         website: string;
         exclusionRules: string;
+        dbType: string;
         dbName: string;
         url: string;
         sourceDir: string;
@@ -59,6 +61,7 @@ export namespace Cronjob {
         script: string;
         website: string;
         exclusionRules: string;
+        dbType: string;
         dbName: string;
         url: string;
         sourceDir: string;

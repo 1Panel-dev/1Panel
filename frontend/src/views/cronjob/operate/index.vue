@@ -136,7 +136,11 @@
                         prop="website"
                     >
                         <el-select class="selectClass" v-model="dialogData.rowData!.website">
-                            <el-option :label="$t('commons.table.all')" value="all" />
+                            <el-option
+                                :disabled="websiteOptions.length === 0"
+                                :label="$t('commons.table.all')"
+                                value="all"
+                            />
                             <el-option v-for="item in websiteOptions" :key="item" :value="item" :label="item" />
                         </el-select>
                         <span class="input-help" v-if="dialogData.rowData!.type === 'cutWebsiteLog'">
@@ -147,7 +151,11 @@
                     <div v-if="dialogData.rowData!.type === 'app'">
                         <el-form-item :label="$t('cronjob.app')" prop="appID">
                             <el-select class="selectClass" clearable v-model="dialogData.rowData!.appID">
-                                <el-option :label="$t('commons.table.all')" value="all" />
+                                <el-option
+                                    :disabled="appOptions.length === 0"
+                                    :label="$t('commons.table.all')"
+                                    value="all"
+                                />
                                 <div v-for="item in appOptions" :key="item.id">
                                     <el-option :value="item.id + ''" :label="item.name">
                                         <span>{{ item.name }}</span>
@@ -161,11 +169,22 @@
                     </div>
 
                     <div v-if="dialogData.rowData!.type === 'database'">
+                        <el-form-item :label="$t('cronjob.database')">
+                            <el-radio-group v-model="dialogData.rowData!.dbType" @change="loadDatabases">
+                                <el-radio label="mysql">MySQL</el-radio>
+                                <el-radio label="mariadb">Mariadb</el-radio>
+                                <el-radio label="postgresql">PostgreSQL</el-radio>
+                            </el-radio-group>
+                        </el-form-item>
                         <el-form-item :label="$t('cronjob.database')" prop="dbName">
                             <el-select class="selectClass" clearable v-model="dialogData.rowData!.dbName">
-                                <el-option :label="$t('commons.table.all')" value="all" />
                                 <el-option
-                                    v-for="item in mysqlInfo.dbs"
+                                    :disabled="dbInfo.dbs.length === 0"
+                                    :label="$t('commons.table.all')"
+                                    value="all"
+                                />
+                                <el-option
+                                    v-for="item in dbInfo.dbs"
                                     :key="item.id"
                                     :value="item.id + ''"
                                     :label="item.name"
@@ -173,9 +192,6 @@
                                     <span>{{ item.name }}</span>
                                     <el-tag class="tagClass">
                                         {{ item.from === 'local' ? $t('database.local') : $t('database.remote') }}
-                                    </el-tag>
-                                    <el-tag class="tagClass">
-                                        {{ item.type === 'mysql' ? 'MySQL' : 'MariaDB' }}
                                     </el-tag>
                                 </el-option>
                             </el-select>
@@ -277,7 +293,7 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { Cronjob } from '@/api/interface/cronjob';
 import { addCronjob, editCronjob } from '@/api/modules/cronjob';
-import { loadDBOptions } from '@/api/modules/database';
+import { listDbItems } from '@/api/modules/database';
 import { GetWebsiteOptions } from '@/api/modules/website';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
@@ -297,10 +313,12 @@ const drawerVisible = ref(false);
 const dialogData = ref<DialogProps>({
     title: '',
 });
+
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
     if (dialogData.value.title === 'create') {
         changeType();
+        dialogData.value.rowData.dbType = 'mysql';
     }
     title.value = i18n.global.t('cronjob.' + dialogData.value.title);
     if (dialogData.value?.rowData?.exclusionRules) {
@@ -310,11 +328,11 @@ const acceptParams = (params: DialogProps): void => {
         dialogData.value.rowData.inContainer = true;
     }
     drawerVisible.value = true;
-    checkMysqlInstalled();
     loadBackups();
     loadAppInstalls();
     loadWebsites();
     loadContainers();
+    loadDatabases();
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -333,11 +351,11 @@ const websiteOptions = ref();
 const backupOptions = ref();
 const appOptions = ref();
 
-const mysqlInfo = reactive({
+const dbInfo = reactive({
     isExist: false,
     name: '',
     version: '',
-    dbs: [] as Array<Database.MysqlOption>,
+    dbs: [] as Array<Database.DbItem>,
 });
 
 const verifySpec = (rule: any, value: any, callback: any) => {
@@ -459,6 +477,11 @@ const hasHour = () => {
     );
 };
 
+const loadDatabases = async () => {
+    const data = await listDbItems(dialogData.value.rowData.dbType);
+    dbInfo.dbs = data.data || [];
+};
+
 const changeType = () => {
     switch (dialogData.value.rowData!.type) {
         case 'shell':
@@ -543,11 +566,6 @@ const loadWebsites = async () => {
 const loadContainers = async () => {
     const res = await listContainer();
     containerOptions.value = res.data || [];
-};
-
-const checkMysqlInstalled = async () => {
-    const data = await loadDBOptions();
-    mysqlInfo.dbs = data.data || [];
 };
 
 function isBackup() {

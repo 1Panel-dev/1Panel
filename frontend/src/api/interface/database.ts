@@ -141,12 +141,10 @@ export namespace Database {
         File: string;
         Position: number;
     }
-    export interface MysqlOption {
-        id: number;
+    export interface PgLoadDB {
         from: string;
         type: string;
         database: string;
-        name: string;
     }
     export interface PgLoadDB {
         from: string;
@@ -315,6 +313,12 @@ export namespace Database {
         database: string;
         version: string;
         address: string;
+    }
+    export interface DbItem {
+        id: number;
+        from: string;
+        database: string;
+        name: string;
     }
     export interface DatabaseCreate {
         name: string;

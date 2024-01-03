@@ -214,12 +214,6 @@ var AddTableDatabaseMysql = &gormigrate.Migration{
 		return tx.AutoMigrate(&model.DatabaseMysql{})
 	},
 }
-var AddTableDatabasePostgresql = &gormigrate.Migration{
-	ID: "20231224-add-table-database_postgresql",
-	Migrate: func(tx *gorm.DB) error {
-		return tx.AutoMigrate(&model.DatabasePostgresql{})
-	},
-}
 var AddTableWebsite = &gormigrate.Migration{
 	ID: "20201009-add-table-website",
 	Migrate: func(tx *gorm.DB) error {
