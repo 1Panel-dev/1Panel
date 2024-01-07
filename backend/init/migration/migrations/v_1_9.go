@@ -116,3 +116,33 @@ var AddTablePHPExtensions = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddTableDatabasePostgresql = &gormigrate.Migration{
+	ID: "20231225-add-table-database_postgresql",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.DatabasePostgresql{}); err != nil {
+			return err
+		}
+		if err := tx.AutoMigrate(&model.Cronjob{}); err != nil {
+			return err
+		}
+		var jobs []model.Cronjob
+		if err := tx.Where("type == ?", "database").Find(&jobs).Error; err != nil {
+			return err
+		}
+		for _, job := range jobs {
+			var db model.DatabaseMysql
+			if err := tx.Where("id == ?", job.DBName).First(&db).Error; err != nil {
+				return err
+			}
+			var database model.Database
+			if err := tx.Where("name == ?", db.MysqlName).First(&database).Error; err != nil {
+				return err
+			}
+			if err := tx.Model(&model.Cronjob{}).Where("id = ?", job.ID).Update("db_type", database.Type).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	},
+}

@@ -30,7 +30,7 @@ func NewLocal(command []string, containerName, username, password, database stri
 }
 
 func (r *Local) Create(info CreateInfo) error {
-	createSql := fmt.Sprintf("CREATE DATABASE %s", info.Name)
+	createSql := fmt.Sprintf("CREATE DATABASE \"%s\"", info.Name)
 	if err := r.ExecSQL(createSql, info.Timeout); err != nil {
 		if strings.Contains(strings.ToLower(err.Error()), "already exists") {
 			return buserr.New(constant.ErrDatabaseIsExist)
@@ -39,7 +39,7 @@ func (r *Local) Create(info CreateInfo) error {
 	}
 
 	if err := r.CreateUser(info, true); err != nil {
-		_ = r.ExecSQL(fmt.Sprintf("DROP DATABASE %s", info.Name), info.Timeout)
+		_ = r.ExecSQL(fmt.Sprintf("DROP DATABASE \"%s\"", info.Name), info.Timeout)
 		return err
 	}
 
@@ -47,7 +47,7 @@ func (r *Local) Create(info CreateInfo) error {
 }
 
 func (r *Local) CreateUser(info CreateInfo, withDeleteDB bool) error {
-	createSql := fmt.Sprintf("CREATE USER \"%s\" WITH PASSWORD '%s'", info.Username, info.Username)
+	createSql := fmt.Sprintf("CREATE USER \"%s\" WITH PASSWORD '%s'", info.Username, info.Password)
 	if err := r.ExecSQL(createSql, info.Timeout); err != nil {
 		if strings.Contains(strings.ToLower(err.Error()), "already exists") {
 			return buserr.New(constant.ErrUserIsExist)
@@ -61,7 +61,7 @@ func (r *Local) CreateUser(info CreateInfo, withDeleteDB bool) error {
 		}
 		return err
 	}
-	grantStr := fmt.Sprintf("GRANT ALL PRIVILEGES ON DATABASE %s TO %s", info.Name, info.Username)
+	grantStr := fmt.Sprintf("GRANT ALL PRIVILEGES ON DATABASE \"%s\" TO \"%s\"", info.Name, info.Username)
 	if err := r.ExecSQL(grantStr, info.Timeout); err != nil {
 		if withDeleteDB {
 			_ = r.Delete(DeleteInfo{
@@ -77,12 +77,12 @@ func (r *Local) CreateUser(info CreateInfo, withDeleteDB bool) error {
 
 func (r *Local) Delete(info DeleteInfo) error {
 	if len(info.Name) != 0 {
-		dropSql := fmt.Sprintf("DROP DATABASE %s", info.Name)
+		dropSql := fmt.Sprintf("DROP DATABASE \"%s\"", info.Name)
 		if err := r.ExecSQL(dropSql, info.Timeout); err != nil && !info.ForceDelete {
 			return err
 		}
 	}
-	dropSql := fmt.Sprintf("DROP ROLE %s", info.Username)
+	dropSql := fmt.Sprintf("DROP USER \"%s\"", info.Username)
 	if err := r.ExecSQL(dropSql, info.Timeout); err != nil && !info.ForceDelete {
 		if strings.Contains(strings.ToLower(err.Error()), "depend on it") {
 			return buserr.WithDetail(constant.ErrInUsed, info.Username, nil)
@@ -147,10 +147,6 @@ func (r *Local) Recover(info RecoverInfo) error {
 	return nil
 }
 
-func (r *Local) ReloadConf() error {
-	return nil
-}
-
 func (r *Local) SyncDB() ([]SyncDBInfo, error) {
 	var datas []SyncDBInfo
 	lines, err := r.ExecSQLForRows("SELECT datname FROM pg_database", 300)
@@ -158,10 +154,11 @@ func (r *Local) SyncDB() ([]SyncDBInfo, error) {
 		return datas, err
 	}
 	for _, line := range lines {
-		if line == "postgres" || line == "template1" || line == "template0" || line == r.Username {
+		itemLine := strings.TrimLeft(line, " ")
+		if len(itemLine) == 0 || itemLine == "postgres" || itemLine == "template1" || itemLine == "template0" || itemLine == r.Username {
 			continue
 		}
-		datas = append(datas, SyncDBInfo{Name: line, From: "local", PostgresqlName: r.Database})
+		datas = append(datas, SyncDBInfo{Name: itemLine, From: "local", PostgresqlName: r.Database})
 	}
 	return datas, nil
 }

@@ -31,6 +31,7 @@ type IDatabaseService interface {
 	DeleteCheck(id uint) ([]string, error)
 	Delete(req dto.DatabaseDelete) error
 	List(dbType string) ([]dto.DatabaseOption, error)
+	LoadItems(dbType string) ([]dto.DatabaseItem, error)
 }
 
 func NewIDatabaseService() IDatabaseService {
@@ -76,6 +77,35 @@ func (u *DatabaseService) List(dbType string) ([]dto.DatabaseOption, error) {
 		}
 		item.Database = db.Name
 		datas = append(datas, item)
+	}
+	return datas, err
+}
+
+func (u *DatabaseService) LoadItems(dbType string) ([]dto.DatabaseItem, error) {
+	dbs, err := databaseRepo.GetList(databaseRepo.WithTypeList(dbType))
+	var datas []dto.DatabaseItem
+	for _, db := range dbs {
+		if dbType == "postgresql" {
+			items, _ := postgresqlRepo.List(postgresqlRepo.WithByPostgresqlName(db.Name))
+			for _, item := range items {
+				var dItem dto.DatabaseItem
+				if err := copier.Copy(&dItem, &item); err != nil {
+					continue
+				}
+				dItem.Database = db.Name
+				datas = append(datas, dItem)
+			}
+		} else {
+			items, _ := mysqlRepo.List(mysqlRepo.WithByMysqlName(db.Name))
+			for _, item := range items {
+				var dItem dto.DatabaseItem
+				if err := copier.Copy(&dItem, &item); err != nil {
+					continue
+				}
+				dItem.Database = db.Name
+				datas = append(datas, dItem)
+			}
+		}
 	}
 	return datas, err
 }

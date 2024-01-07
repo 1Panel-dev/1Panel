@@ -7,6 +7,12 @@
     >
         <el-form ref="deleteForm" v-loading="loading" @submit.prevent>
             <el-form-item>
+                <el-checkbox v-model="deleteReq.forceDelete" :label="$t('app.forceDelete')" />
+                <span class="input-help">
+                    {{ $t('app.forceDeleteHelper') }}
+                </span>
+            </el-form-item>
+            <el-form-item>
                 <el-checkbox v-model="deleteReq.deleteBackup" :label="$t('app.deleteBackup')" />
                 <span class="input-help">
                     {{ $t('database.deleteBackupHelper') }}

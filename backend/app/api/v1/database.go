@@ -113,6 +113,27 @@ func (b *BaseApi) ListDatabase(c *gin.Context) {
 }
 
 // @Tags Database
+// @Summary List databases
+// @Description 获取数据库列表
+// @Success 200 {array} dto.DatabaseItem
+// @Security ApiKeyAuth
+// @Router /databases/db/item/:type [get]
+func (b *BaseApi) LoadDatabaseItems(c *gin.Context) {
+	dbType, err := helper.GetStrParamByKey(c, "type")
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	list, err := databaseService.LoadItems(dbType)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, list)
+}
+
+// @Tags Database
 // @Summary Get databases
 // @Description 获取远程数据库
 // @Success 200 {object} dto.DatabaseInfo

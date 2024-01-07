@@ -794,7 +794,7 @@ func updateInstallInfoInDB(appKey, appName, param string, isRestart bool, value 
 	envKey := ""
 	switch param {
 	case "password":
-		if appKey == "mysql" || appKey == "mariadb" {
+		if appKey == "mysql" || appKey == "mariadb" || appKey == "postgresql" {
 			envKey = "PANEL_DB_ROOT_PASSWORD="
 		} else {
 			envKey = "PANEL_REDIS_ROOT_PASSWORD="

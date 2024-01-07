@@ -17,6 +17,7 @@ type CronjobCreate struct {
 	AppID          string `json:"appID"`
 	Website        string `json:"website"`
 	ExclusionRules string `json:"exclusionRules"`
+	DBType         string `json:"dbType"`
 	DBName         string `json:"dbName"`
 	URL            string `json:"url"`
 	SourceDir      string `json:"sourceDir"`
@@ -40,6 +41,7 @@ type CronjobUpdate struct {
 	AppID          string `json:"appID"`
 	Website        string `json:"website"`
 	ExclusionRules string `json:"exclusionRules"`
+	DBType         string `json:"dbType"`
 	DBName         string `json:"dbName"`
 	URL            string `json:"url"`
 	SourceDir      string `json:"sourceDir"`
@@ -84,6 +86,7 @@ type CronjobInfo struct {
 	AppID          string `json:"appID"`
 	Website        string `json:"website"`
 	ExclusionRules string `json:"exclusionRules"`
+	DBType         string `json:"dbType"`
 	DBName         string `json:"dbName"`
 	URL            string `json:"url"`
 	SourceDir      string `json:"sourceDir"`

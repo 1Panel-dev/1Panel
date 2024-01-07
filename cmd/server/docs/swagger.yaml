@@ -586,6 +586,8 @@ definitions:
         type: integer
       dbName:
         type: string
+      dbType:
+        type: string
       exclusionRules:
         type: string
       hour:
@@ -643,6 +645,8 @@ definitions:
       day:
         type: integer
       dbName:
+        type: string
+      dbType:
         type: string
       exclusionRules:
         type: string
@@ -926,6 +930,17 @@ definitions:
       username:
         type: string
       version:
+        type: string
+    type: object
+  dto.DatabaseItem:
+    properties:
+      database:
+        type: string
+      from:
+        type: string
+      id:
+        type: integer
+      name:
         type: string
     type: object
   dto.DatabaseOption:
@@ -7695,6 +7710,21 @@ paths:
         formatEN: delete database [names]
         formatZH: 删除远程数据库 [names]
         paramKeys: []
+  /databases/db/item/:type:
+    get:
+      description: 获取数据库列表
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.DatabaseItem'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: List databases
+      tags:
+      - Database
   /databases/db/list/:type:
     get:
       description: 获取远程数据库列表

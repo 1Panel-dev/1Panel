@@ -406,7 +406,7 @@ import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { MsgError, MsgInfo, MsgSuccess } from '@/utils/message';
-import { loadDBOptions } from '@/api/modules/database';
+import { listDbItems } from '@/api/modules/database';
 import { ListAppInstalled } from '@/api/modules/app';
 
 const loading = ref();
@@ -440,7 +440,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     recordShow.value = true;
     dialogData.value = params;
     if (dialogData.value.rowData.type === 'database') {
-        const data = await loadDBOptions();
+        const data = await listDbItems('mysql,mariadb,postgresql');
         let itemDBs = data.data || [];
         for (const item of itemDBs) {
             if (item.id == dialogData.value.rowData.dbName) {

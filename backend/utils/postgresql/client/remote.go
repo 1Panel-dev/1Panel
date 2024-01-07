@@ -34,7 +34,7 @@ func NewRemote(db Remote) *Remote {
 	return &db
 }
 func (r *Remote) Create(info CreateInfo) error {
-	createSql := fmt.Sprintf("CREATE DATABASE %s", info.Name)
+	createSql := fmt.Sprintf("CREATE DATABASE \"%s\"", info.Name)
 	if err := r.ExecSQL(createSql, info.Timeout); err != nil {
 		if strings.Contains(strings.ToLower(err.Error()), "already exists") {
 			return buserr.New(constant.ErrDatabaseIsExist)
@@ -62,7 +62,7 @@ func (r *Remote) CreateUser(info CreateInfo, withDeleteDB bool) error {
 		}
 		return err
 	}
-	grantSql := fmt.Sprintf("GRANT ALL PRIVILEGES ON DATABASE %s TO %s", info.Name, info.Username)
+	grantSql := fmt.Sprintf("GRANT ALL PRIVILEGES ON DATABASE \"%s\" TO \"%s\"", info.Name, info.Username)
 	if err := r.ExecSQL(grantSql, info.Timeout); err != nil {
 		if withDeleteDB {
 			_ = r.Delete(DeleteInfo{
@@ -79,12 +79,12 @@ func (r *Remote) CreateUser(info CreateInfo, withDeleteDB bool) error {
 
 func (r *Remote) Delete(info DeleteInfo) error {
 	if len(info.Name) != 0 {
-		dropSql := fmt.Sprintf("DROP DATABASE %s", info.Name)
+		dropSql := fmt.Sprintf("DROP DATABASE \"%s\"", info.Name)
 		if err := r.ExecSQL(dropSql, info.Timeout); err != nil && !info.ForceDelete {
 			return err
 		}
 	}
-	dropSql := fmt.Sprintf("DROP ROLE %s", info.Username)
+	dropSql := fmt.Sprintf("DROP USER \"%s\"", info.Username)
 	if err := r.ExecSQL(dropSql, info.Timeout); err != nil && !info.ForceDelete {
 		if strings.Contains(strings.ToLower(err.Error()), "depend on it") {
 			return buserr.WithDetail(constant.ErrInUsed, info.Username, nil)
@@ -96,9 +96,6 @@ func (r *Remote) Delete(info DeleteInfo) error {
 
 func (r *Remote) ChangePassword(info PasswordChangeInfo) error {
 	return r.ExecSQL(fmt.Sprintf("ALTER USER \"%s\" WITH ENCRYPTED PASSWORD '%s'", info.Username, info.Password), info.Timeout)
-}
-func (r *Remote) ReloadConf() error {
-	return r.ExecSQL("SELECT pg_reload_conf()", 5)
 }
 
 func (r *Remote) Backup(info BackupInfo) error {
@@ -150,7 +147,7 @@ func (r *Remote) Recover(info RecoverInfo) error {
 		}()
 	}
 	recoverCommand := exec.Command("bash", "-c",
-		fmt.Sprintf("docker run --rm --net=host -i postgres:alpine /bin/bash -c 'PGPASSWORD=%s pg_restore -h %s -p %d --verbose --clean --no-privileges --no-owner -Fc -U %s -d %s --role=%s' < %s",
+		fmt.Sprintf("docker run --rm --net=host -i postgres:16.1-alpine /bin/bash -c 'PGPASSWORD=%s pg_restore -h %s -p %d --verbose --clean --no-privileges --no-owner -Fc -U %s -d %s --role=%s' < %s",
 			r.Password, r.Address, r.Port, r.User, info.Name, info.Username, fileName))
 	pipe, _ := recoverCommand.StdoutPipe()
 	stderrPipe, _ := recoverCommand.StderrPipe()
@@ -191,7 +188,7 @@ func (r *Remote) SyncDB() ([]SyncDBInfo, error) {
 		if err := rows.Scan(&dbName); err != nil {
 			continue
 		}
-		if dbName == "postgres" || dbName == "template1" || dbName == "template0" || dbName == r.User {
+		if len(dbName) == 0 || dbName == "postgres" || dbName == "template1" || dbName == "template0" || dbName == r.User {
 			continue
 		}
 		datas = append(datas, SyncDBInfo{Name: dbName, From: r.From, PostgresqlName: r.Database})

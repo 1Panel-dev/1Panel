@@ -48,6 +48,7 @@ func (s *DatabaseRouter) InitRouter(Router *gin.RouterGroup) {
 		cmdRouter.POST("/db", baseApi.CreateDatabase)
 		cmdRouter.GET("/db/:name", baseApi.GetDatabase)
 		cmdRouter.GET("/db/list/:type", baseApi.ListDatabase)
+		cmdRouter.GET("/db/item/:type", baseApi.LoadDatabaseItems)
 		cmdRouter.POST("/db/update", baseApi.UpdateDatabase)
 		cmdRouter.POST("/db/search", baseApi.SearchDatabase)
 		cmdRouter.POST("/db/del/check", baseApi.DeleteCheckDatabase)

@@ -4289,6 +4289,31 @@
                 }
             }
         },
+        "/databases/db/item/:type": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取数据库列表",
+                "tags": [
+                    "Database"
+                ],
+                "summary": "List databases",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.DatabaseItem"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/databases/db/list/:type": {
             "get": {
                 "security": [
@@ -14882,6 +14907,9 @@
                 "dbName": {
                     "type": "string"
                 },
+                "dbType": {
+                    "type": "string"
+                },
                 "exclusionRules": {
                     "type": "string"
                 },
@@ -14965,6 +14993,9 @@
                     "type": "integer"
                 },
                 "dbName": {
+                    "type": "string"
+                },
+                "dbType": {
                     "type": "string"
                 },
                 "exclusionRules": {
@@ -15382,6 +15413,23 @@
                     "type": "string"
                 },
                 "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.DatabaseItem": {
+            "type": "object",
+            "properties": {
+                "database": {
+                    "type": "string"
+                },
+                "from": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
                     "type": "string"
                 }
             }

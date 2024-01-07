@@ -15,7 +15,6 @@ import (
 type PostgresqlClient interface {
 	Create(info client.CreateInfo) error
 	Delete(info client.DeleteInfo) error
-	ReloadConf() error
 	ChangePassword(info client.PasswordChangeInfo) error
 
 	Backup(info client.BackupInfo) error
@@ -26,7 +25,7 @@ type PostgresqlClient interface {
 
 func NewPostgresqlClient(conn client.DBInfo) (PostgresqlClient, error) {
 	if conn.From == "local" {
-		connArgs := []string{"exec", conn.Address, "psql", "-U", conn.Username, "-c"}
+		connArgs := []string{"exec", conn.Address, "psql", "-t", "-U", conn.Username, "-c"}
 		return client.NewLocal(connArgs, conn.Address, conn.Username, conn.Password, conn.Database), nil
 	}
 

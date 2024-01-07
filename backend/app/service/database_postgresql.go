@@ -335,7 +335,7 @@ func (u *PostgresqlService) ChangePassword(req dto.ChangeDBInfo) error {
 			}
 
 			global.LOG.Infof("start to update postgresql password used by app %s-%s", appModel.Key, appInstall.Name)
-			if err := updateInstallInfoInDB(appModel.Key, appInstall.Name, "password", true, req.Value); err != nil {
+			if err := updateInstallInfoInDB(appModel.Key, appInstall.Name, "user-password", true, req.Value); err != nil {
 				return err
 			}
 		}

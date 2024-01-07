@@ -8,7 +8,7 @@
                 <el-col :span="22">
                     <el-form-item :label="$t('database.containerConn')">
                         <el-tag>
-                            {{ form.serviceName + form.port }}
+                            {{ form.serviceName + ':' + form.port }}
                         </el-tag>
                         <CopyButton :content="form.serviceName + ':' + form.port" type="icon" />
                         <span class="input-help">
