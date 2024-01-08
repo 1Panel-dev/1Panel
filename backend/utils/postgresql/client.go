@@ -47,6 +47,7 @@ func NewPostgresqlClient(conn client.DBInfo) (PostgresqlClient, error) {
 
 	return client.NewRemote(client.Remote{
 		Client:   db,
+		From:     "remote",
 		Database: conn.Database,
 		User:     conn.Username,
 		Password: conn.Password,

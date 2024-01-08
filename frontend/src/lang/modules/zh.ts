@@ -376,7 +376,7 @@ const message = {
 
         loadFromRemote: '从服务器获取',
         userBind: '绑定用户',
-        pgBind: '绑定用户(暂不支持绑定已有用户)',
+        pgBind: '绑定用户 (暂不支持绑定已有用户)',
         loadFromRemoteHelper: '此操作将同步服务器上数据库信息到 1Panel，是否继续？',
         passwordHelper: '无法获取密码，请修改',
         local: '本地',
