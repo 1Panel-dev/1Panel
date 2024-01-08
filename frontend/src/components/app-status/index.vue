@@ -158,7 +158,7 @@ const goRouter = async (key: string) => {
 };
 
 const isDB = () => {
-    return key.value === 'mysql' || key.value === 'mariadb';
+    return key.value === 'mysql' || key.value === 'mariadb' || key.value === 'postgresql';
 };
 
 const onCheck = async () => {
