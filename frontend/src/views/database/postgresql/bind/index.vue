@@ -7,8 +7,7 @@
             <el-form v-loading="loading" ref="changeFormRef" :model="form" :rules="rules" label-position="top">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
-                        <el-alert type="warning" :description="$t('database.pgBindHelper')" :closable="false" />
-                        <el-form-item class="mt-5" :label="$t('commons.login.username')" prop="username">
+                        <el-form-item :label="$t('database.pgBind')" prop="username">
                             <el-input v-model="form.username" />
                         </el-form-item>
                         <el-form-item :label="$t('commons.login.password')" prop="password">
