@@ -170,29 +170,6 @@ func (b *BaseApi) UpdateMysqlVariables(c *gin.Context) {
 }
 
 // @Tags Database Mysql
-// @Summary Update mysql conf by upload file
-// @Description 上传替换 mysql 配置文件
-// @Accept json
-// @Param request body dto.MysqlConfUpdateByFile true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Router /databases/conffile/update [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 mysql 数据库配置信息","formatEN":"update the mysql database configuration information"}
-func (b *BaseApi) UpdateMysqlConfByFile(c *gin.Context) {
-	var req dto.MysqlConfUpdateByFile
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	if err := mysqlService.UpdateConfByFile(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-
-	helper.SuccessWithData(c, nil)
-}
-
-// @Tags Database Mysql
 // @Summary Page mysql databases
 // @Description 获取 mysql 数据库列表分页
 // @Accept json
@@ -302,29 +279,6 @@ func (b *BaseApi) DeleteMysql(c *gin.Context) {
 	}
 	tx.Commit()
 	helper.SuccessWithData(c, nil)
-}
-
-// @Tags Database Mysql
-// @Summary Load mysql base info
-// @Description 获取 mysql 基础信息
-// @Accept json
-// @Param request body dto.OperationWithNameAndType true "request"
-// @Success 200 {object} dto.DBBaseInfo
-// @Security ApiKeyAuth
-// @Router /databases/baseinfo [post]
-func (b *BaseApi) LoadBaseinfo(c *gin.Context) {
-	var req dto.OperationWithNameAndType
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	data, err := mysqlService.LoadBaseInfo(req)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-
-	helper.SuccessWithData(c, data)
 }
 
 // @Tags Database Mysql

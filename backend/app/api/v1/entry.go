@@ -21,6 +21,7 @@ var (
 	imageService           = service.NewIImageService()
 	dockerService          = service.NewIDockerService()
 
+	dbCommonService   = service.NewIDBCommonService()
 	mysqlService      = service.NewIMysqlService()
 	postgresqlService = service.NewIPostgresqlService()
 	databaseService   = service.NewIDatabaseService()

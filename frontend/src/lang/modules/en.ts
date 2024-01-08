@@ -383,6 +383,7 @@ const message = {
 
         loadFromRemote: 'Load from server',
         userBind: 'Bind User',
+        pgBind: 'Bind User (Binding existing users is not currently supported)',
         loadFromRemoteHelper:
             'This action will synchronize the database info on the server to 1Panel, do you want to continue?',
         passwordHelper: 'Unable to retrieve, please modify',

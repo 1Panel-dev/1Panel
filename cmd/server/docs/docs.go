@@ -3916,42 +3916,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/databases/baseinfo": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "获取 mysql 基础信息",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Database Mysql"
-                ],
-                "summary": "Load mysql base info",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.OperationWithNameAndType"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.DBBaseInfo"
-                        }
-                    }
-                }
-            }
-        },
         "/databases/bind": {
             "post": {
                 "security": [
@@ -4097,21 +4061,21 @@ const docTemplate = `{
                 }
             }
         },
-        "/databases/conffile/update": {
+        "/databases/common/info": {
             "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "上传替换 mysql 配置文件",
+                "description": "获取数据库基础信息",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
-                    "Database Mysql"
+                    "Database Common"
                 ],
-                "summary": "Update mysql conf by upload file",
+                "summary": "Load base info",
                 "parameters": [
                     {
                         "description": "request",
@@ -4119,7 +4083,76 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.MysqlConfUpdateByFile"
+                            "$ref": "#/definitions/dto.OperationWithNameAndType"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.DBBaseInfo"
+                        }
+                    }
+                }
+            }
+        },
+        "/databases/common/load/file": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取数据库配置文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Database Common"
+                ],
+                "summary": "Load Database conf",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperationWithNameAndType"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/databases/common/update/conf": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "上传替换配置文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Database Common"
+                ],
+                "summary": "Update conf by upload file",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.DBConfUpdateByFile"
                         }
                     }
                 ],
@@ -4130,9 +4163,12 @@ const docTemplate = `{
                 },
                 "x-panel-log": {
                     "BeforeFunctions": [],
-                    "bodyKeys": [],
-                    "formatEN": "update the mysql database configuration information",
-                    "formatZH": "更新 mysql 数据库配置信息",
+                    "bodyKeys": [
+                        "type",
+                        "database"
+                    ],
+                    "formatEN": "update the [type] [database] database configuration information",
+                    "formatZH": "更新 [type] 数据库 [database] 配置信息",
                     "paramKeys": []
                 }
             }
@@ -4595,39 +4631,6 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/databases/load/file": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "获取数据库文件",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Database"
-                ],
-                "summary": "Load Database file",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.OperationWithNameAndType"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            }
-        },
         "/databases/options": {
             "get": {
                 "security": [
@@ -4709,21 +4712,21 @@ const docTemplate = `{
                 }
             }
         },
-        "/databases/pg/baseinfo": {
+        "/databases/pg/:database/load": {
             "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "获取 postgresql 基础信息",
+                "description": "从服务器获取",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Database Postgresql"
                 ],
-                "summary": "Load postgresql base info",
+                "summary": "Load postgresql database from remote",
                 "parameters": [
                     {
                         "description": "request",
@@ -4731,35 +4734,28 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.OperationWithNameAndType"
+                            "$ref": "#/definitions/dto.PostgresqlLoadDB"
                         }
                     }
                 ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.DBBaseInfo"
-                        }
-                    }
-                }
+                "responses": {}
             }
         },
-        "/databases/pg/conf": {
+        "/databases/pg/bind": {
             "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "上传替换 postgresql 配置文件",
+                "description": "绑定 postgresql 数据库用户",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Database Postgresql"
                 ],
-                "summary": "Update postgresql conf by upload file",
+                "summary": "Bind postgresql user",
                 "parameters": [
                     {
                         "description": "request",
@@ -4767,7 +4763,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.PostgresqlConfUpdateByFile"
+                            "$ref": "#/definitions/dto.PostgresqlBindUser"
                         }
                     }
                 ],
@@ -4778,9 +4774,12 @@ const docTemplate = `{
                 },
                 "x-panel-log": {
                     "BeforeFunctions": [],
-                    "bodyKeys": [],
-                    "formatEN": "update the postgresql database configuration information",
-                    "formatZH": "更新 postgresql 数据库配置信息",
+                    "bodyKeys": [
+                        "name",
+                        "username"
+                    ],
+                    "formatEN": "bind postgresql database [name] user [username]",
+                    "formatZH": "绑定 postgresql 数据库 [name] 用户 [username]",
                     "paramKeys": []
                 }
             }
@@ -4925,35 +4924,6 @@ const docTemplate = `{
                     "formatZH": "postgresql 数据库 [name] 描述信息修改 [description]",
                     "paramKeys": []
                 }
-            }
-        },
-        "/databases/pg/load": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "从服务器获取",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Database Postgresql"
-                ],
-                "summary": "Load postgresql database from remote",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.PostgresqlLoadDB"
-                        }
-                    }
-                ],
-                "responses": {}
             }
         },
         "/databases/pg/options": {
@@ -5163,46 +5133,6 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/dto.RedisConfUpdate"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFunctions": [],
-                    "bodyKeys": [],
-                    "formatEN": "update the redis database configuration information",
-                    "formatZH": "更新 redis 数据库配置信息",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/databases/redis/conffile/update": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "上传更新 redis 配置信息",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Database Redis"
-                ],
-                "summary": "Update redis conf by file",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.RedisConfUpdateByFile"
                         }
                     }
                 ],
@@ -15084,6 +15014,30 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.DBConfUpdateByFile": {
+            "type": "object",
+            "required": [
+                "database",
+                "type"
+            ],
+            "properties": {
+                "database": {
+                    "type": "string"
+                },
+                "file": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "mysql",
+                        "mariadb",
+                        "postgresql",
+                        "redis"
+                    ]
+                }
+            }
+        },
         "dto.DaemonJsonConf": {
             "type": "object",
             "properties": {
@@ -16289,28 +16243,6 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.MysqlConfUpdateByFile": {
-            "type": "object",
-            "required": [
-                "database",
-                "type"
-            ],
-            "properties": {
-                "database": {
-                    "type": "string"
-                },
-                "file": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string",
-                    "enum": [
-                        "mysql",
-                        "mariadb"
-                    ]
-                }
-            }
-        },
         "dto.MysqlDBCreate": {
             "type": "object",
             "required": [
@@ -16992,25 +16924,26 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.PostgresqlConfUpdateByFile": {
+        "dto.PostgresqlBindUser": {
             "type": "object",
             "required": [
                 "database",
-                "type"
+                "name",
+                "password",
+                "username"
             ],
             "properties": {
                 "database": {
                     "type": "string"
                 },
-                "file": {
+                "name": {
                     "type": "string"
                 },
-                "type": {
-                    "type": "string",
-                    "enum": [
-                        "postgresql",
-                        "mariadb"
-                    ]
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         },
@@ -17265,20 +17198,6 @@ const docTemplate = `{
                 },
                 "timeout": {
                     "type": "string"
-                }
-            }
-        },
-        "dto.RedisConfUpdateByFile": {
-            "type": "object",
-            "required": [
-                "file"
-            ],
-            "properties": {
-                "file": {
-                    "type": "string"
-                },
-                "restartNow": {
-                    "type": "boolean"
                 }
             }
         },

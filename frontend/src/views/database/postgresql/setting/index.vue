@@ -98,7 +98,7 @@ import { onMounted, reactive, ref } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { loadDatabaseFile, loadMysqlBaseInfo, updatePostgresqlConfByFile } from '@/api/modules/database';
+import { loadDBFile, loadDBBaseInfo, updateDBFile } from '@/api/modules/database';
 import { ChangePort, CheckAppInstalled } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
@@ -186,7 +186,7 @@ const onSubmitChangeConf = async () => {
         file: postgresqlConf.value,
     };
     loading.value = true;
-    await updatePostgresqlConfByFile(param)
+    await updateDBFile(param)
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -211,7 +211,7 @@ const loadContainerLog = async (containerID: string) => {
 };
 
 const loadBaseInfo = async () => {
-    const res = await loadMysqlBaseInfo(props.type, props.database);
+    const res = await loadDBBaseInfo(props.type, props.database);
     postgresqlName.value = res.data?.name;
     baseInfo.port = res.data?.port;
     baseInfo.containerID = res.data?.containerName;
@@ -220,7 +220,7 @@ const loadBaseInfo = async () => {
 };
 
 const loadPostgresqlConf = async () => {
-    await loadDatabaseFile(props.type + '-conf', props.database)
+    await loadDBFile(props.type + '-conf', props.database)
         .then((res) => {
             loading.value = false;
             postgresqlConf.value = res.data;

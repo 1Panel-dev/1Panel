@@ -135,7 +135,7 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import Status from '@/views/database/redis/setting/status/index.vue';
 import Persistence from '@/views/database/redis/setting/persistence/index.vue';
-import { loadDatabaseFile, loadRedisConf, updateRedisConf, updateRedisConfByFile } from '@/api/modules/database';
+import { loadDBFile, loadRedisConf, updateRedisConf, updateDBFile } from '@/api/modules/database';
 import i18n from '@/lang';
 import { checkNumberRange, Rules } from '@/global/form-rules';
 import { ChangePort, GetAppDefaultConfig } from '@/api/modules/app';
@@ -313,11 +313,12 @@ const onSaveFile = async () => {
 };
 const submtiFile = async () => {
     let param = {
+        type: 'redis',
+        database: '',
         file: redisConf.value,
-        restartNow: true,
     };
     loading.value = true;
-    await updateRedisConfByFile(param)
+    await updateDBFile(param)
         .then(() => {
             useOld.value = false;
             loading.value = false;
@@ -340,7 +341,7 @@ const loadform = async () => {
 const loadConfFile = async () => {
     useOld.value = false;
     loading.value = true;
-    await loadDatabaseFile('redis-conf', redisName.value)
+    await loadDBFile('redis-conf', redisName.value)
         .then((res) => {
             loading.value = false;
             redisConf.value = res.data;

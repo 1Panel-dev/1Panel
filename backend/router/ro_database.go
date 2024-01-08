@@ -16,6 +16,10 @@ func (s *DatabaseRouter) InitRouter(Router *gin.RouterGroup) {
 		Use(middleware.PasswordExpired())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
+		cmdRouter.POST("/common/info", baseApi.LoadDBBaseInfo)
+		cmdRouter.POST("/common/load/file", baseApi.LoadDBFile)
+		cmdRouter.POST("/common/update/conf", baseApi.UpdateDBConfByFile)
+
 		cmdRouter.POST("", baseApi.CreateMysql)
 		cmdRouter.POST("/bind", baseApi.BindUser)
 		cmdRouter.POST("load", baseApi.LoadDBFromRemote)
@@ -25,12 +29,9 @@ func (s *DatabaseRouter) InitRouter(Router *gin.RouterGroup) {
 		cmdRouter.POST("/del", baseApi.DeleteMysql)
 		cmdRouter.POST("/description/update", baseApi.UpdateMysqlDescription)
 		cmdRouter.POST("/variables/update", baseApi.UpdateMysqlVariables)
-		cmdRouter.POST("/conffile/update", baseApi.UpdateMysqlConfByFile)
 		cmdRouter.POST("/search", baseApi.SearchMysql)
-		cmdRouter.POST("/load/file", baseApi.LoadDatabaseFile)
 		cmdRouter.POST("/variables", baseApi.LoadVariables)
 		cmdRouter.POST("/status", baseApi.LoadStatus)
-		cmdRouter.POST("/baseinfo", baseApi.LoadBaseinfo)
 		cmdRouter.POST("/remote", baseApi.LoadRemoteAccess)
 		cmdRouter.GET("/options", baseApi.ListDBName)
 
@@ -41,7 +42,6 @@ func (s *DatabaseRouter) InitRouter(Router *gin.RouterGroup) {
 		cmdRouter.POST("/redis/password", baseApi.ChangeRedisPassword)
 		cmdRouter.POST("/redis/backup/search", baseApi.RedisBackupList)
 		cmdRouter.POST("/redis/conf/update", baseApi.UpdateRedisConf)
-		cmdRouter.POST("/redis/conffile/update", baseApi.UpdateRedisConfByFile)
 		cmdRouter.POST("/redis/persistence/update", baseApi.UpdateRedisPersistenceConf)
 
 		cmdRouter.POST("/db/check", baseApi.CheckDatabase)
@@ -56,11 +56,11 @@ func (s *DatabaseRouter) InitRouter(Router *gin.RouterGroup) {
 
 		cmdRouter.POST("/pg", baseApi.CreatePostgresql)
 		cmdRouter.POST("/pg/search", baseApi.SearchPostgresql)
-		cmdRouter.POST("/pg/load", baseApi.LoadPostgresqlDBFromRemote)
+		cmdRouter.POST("/pg/:database/load", baseApi.LoadPostgresqlDBFromRemote)
+		cmdRouter.POST("/pg/bind", baseApi.BindPostgresqlUser)
 		cmdRouter.POST("/pg/del/check", baseApi.DeleteCheckPostgresql)
+		cmdRouter.POST("/pg/del", baseApi.DeletePostgresql)
 		cmdRouter.POST("/pg/password", baseApi.ChangePostgresqlPassword)
 		cmdRouter.POST("/pg/description", baseApi.UpdatePostgresqlDescription)
-		cmdRouter.POST("/pg/del", baseApi.DeletePostgresql)
-		cmdRouter.POST("/pg/conf", baseApi.UpdatePostgresqlConfByFile)
 	}
 }

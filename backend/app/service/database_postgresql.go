@@ -1,7 +1,6 @@
 package service
 
 import (
-	"bufio"
 	"context"
 	"fmt"
 	"os"
@@ -14,7 +13,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
-	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/backend/utils/postgresql"
 	"github.com/1Panel-dev/1Panel/backend/utils/postgresql/client"
@@ -28,16 +26,13 @@ type PostgresqlService struct{}
 type IPostgresqlService interface {
 	SearchWithPage(search dto.PostgresqlDBSearch) (int64, interface{}, error)
 	ListDBOption() ([]dto.PostgresqlOption, error)
+	BindUser(req dto.PostgresqlBindUser) error
 	Create(ctx context.Context, req dto.PostgresqlDBCreate) (*model.DatabasePostgresql, error)
-	LoadFromRemote(req dto.PostgresqlLoadDB) error
+	LoadFromRemote(database string) error
 	ChangePassword(info dto.ChangeDBInfo) error
-	UpdateConfByFile(info dto.PostgresqlConfUpdateByFile) error
 	UpdateDescription(req dto.UpdateDescription) error
 	DeleteCheck(req dto.PostgresqlDBDeleteCheck) ([]string, error)
 	Delete(ctx context.Context, req dto.PostgresqlDBDelete) error
-
-	LoadBaseInfo(req dto.OperationWithNameAndType) (*dto.DBBaseInfo, error)
-	LoadDatabaseFile(req dto.OperationWithNameAndType) (string, error)
 }
 
 func NewIPostgresqlService() IPostgresqlService {
@@ -86,6 +81,37 @@ func (u *PostgresqlService) ListDBOption() ([]dto.PostgresqlOption, error) {
 		dbs = append(dbs, item)
 	}
 	return dbs, err
+}
+
+func (u *PostgresqlService) BindUser(req dto.PostgresqlBindUser) error {
+	dbItem, err := postgresqlRepo.Get(postgresqlRepo.WithByPostgresqlName(req.Database), commonRepo.WithByName(req.Name))
+	if err != nil {
+		return err
+	}
+
+	pgClient, err := LoadPostgresqlClientByFrom(req.Database)
+	if err != nil {
+		return err
+	}
+	if err := pgClient.CreateUser(client.CreateInfo{
+		Name:     req.Name,
+		Username: req.Username,
+		Password: req.Password,
+		Timeout:  300,
+	}, false); err != nil {
+		return err
+	}
+	pass, err := encrypt.StringEncrypt(req.Password)
+	if err != nil {
+		return fmt.Errorf("decrypt database db password failed, err: %v", err)
+	}
+	if err := postgresqlRepo.Update(dbItem.ID, map[string]interface{}{
+		"username": req.Username,
+		"password": pass,
+	}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *PostgresqlService) Create(ctx context.Context, req dto.PostgresqlDBCreate) (*model.DatabasePostgresql, error) {
@@ -168,14 +194,14 @@ func LoadPostgresqlClientByFrom(database string) (postgresql.PostgresqlClient, e
 	return cli, nil
 }
 
-func (u *PostgresqlService) LoadFromRemote(req dto.PostgresqlLoadDB) error {
-	client, err := LoadPostgresqlClientByFrom(req.Database)
+func (u *PostgresqlService) LoadFromRemote(database string) error {
+	client, err := LoadPostgresqlClientByFrom(database)
 	if err != nil {
 		return err
 	}
 	defer client.Close()
 
-	databases, err := postgresqlRepo.List(postgresqlRepo.WithByPostgresqlName(req.Database))
+	databases, err := postgresqlRepo.List(postgresqlRepo.WithByPostgresqlName(database))
 	if err != nil {
 		return err
 	}
@@ -352,53 +378,4 @@ func (u *PostgresqlService) ChangePassword(req dto.ChangeDBInfo) error {
 		return err
 	}
 	return nil
-}
-
-func (u *PostgresqlService) UpdateConfByFile(req dto.PostgresqlConfUpdateByFile) error {
-	app, err := appInstallRepo.LoadBaseInfo(req.Type, req.Database)
-	if err != nil {
-		return err
-	}
-	conf := fmt.Sprintf("%s/%s/%s/data/postgresql.conf", constant.AppInstallDir, req.Type, app.Name)
-	file, err := os.OpenFile(conf, os.O_WRONLY|os.O_TRUNC, 0640)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	write := bufio.NewWriter(file)
-	_, _ = write.WriteString(req.File)
-	write.Flush()
-	if _, err := compose.Restart(fmt.Sprintf("%s/%s/%s/docker-compose.yml", constant.AppInstallDir, req.Type, app.Name)); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (u *PostgresqlService) LoadBaseInfo(req dto.OperationWithNameAndType) (*dto.DBBaseInfo, error) {
-	var data dto.DBBaseInfo
-	app, err := appInstallRepo.LoadBaseInfo(req.Type, req.Name)
-	if err != nil {
-		return nil, err
-	}
-	data.ContainerName = app.ContainerName
-	data.Name = app.Name
-	data.Port = int64(app.Port)
-
-	return &data, nil
-}
-
-func (u *PostgresqlService) LoadDatabaseFile(req dto.OperationWithNameAndType) (string, error) {
-	filePath := ""
-	switch req.Type {
-	case "postgresql-conf":
-		filePath = path.Join(global.CONF.System.DataDir, fmt.Sprintf("apps/postgresql/%s/data/postgresql.conf", req.Name))
-	}
-	if _, err := os.Stat(filePath); err != nil {
-		return "", buserr.New("ErrHttpReqNotFound")
-	}
-	content, err := os.ReadFile(filePath)
-	if err != nil {
-		return "", err
-	}
-	return string(content), nil
 }

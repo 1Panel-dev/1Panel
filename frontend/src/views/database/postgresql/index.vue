@@ -101,10 +101,24 @@
             <template #main v-if="currentDB">
                 <ComplexTable :pagination-config="paginationConfig" @sort-change="search" @search="search" :data="data">
                     <el-table-column :label="$t('commons.table.name')" prop="name" sortable />
-                    <el-table-column :label="$t('commons.login.username')" prop="username" />
+                    <el-table-column :label="$t('commons.login.username')" prop="username">
+                        <template #default="{ row }">
+                            <div class="flex items-center" v-if="row.username">
+                                <span>
+                                    {{ row.username }}
+                                </span>
+                            </div>
+                            <div v-else>
+                                <el-button style="margin-left: -3px" type="primary" link @click="onBind(row)">
+                                    {{ $t('database.userBind') }}
+                                </el-button>
+                            </div>
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('commons.login.password')" prop="password">
                         <template #default="{ row }">
-                            <div class="flex items-center" v-if="row.password">
+                            <span v-if="row.username === '' || row.password === ''">-</span>
+                            <div class="flex items-center" v-else>
                                 <div class="star-center" v-if="!row.showPassword">
                                     <span>**********</span>
                                 </div>
@@ -130,11 +144,6 @@
                                 <div>
                                     <CopyButton :content="row.password" type="icon" />
                                 </div>
-                            </div>
-                            <div v-else>
-                                <el-link @click="onChangePassword(row)">
-                                    <span style="font-size: 12px">{{ $t('database.passwordHelper') }}</span>
-                                </el-link>
                             </div>
                         </template>
                     </el-table-column>
@@ -198,6 +207,7 @@
             </template>
         </el-dialog>
 
+        <BindDialog ref="bindRef" @search="search" />
         <PasswordDialog ref="passwordRef" @search="search" />
         <RootPasswordDialog ref="connRef" />
         <UploadDialog ref="uploadRef" />
@@ -212,6 +222,7 @@
 </template>
 
 <script lang="ts" setup>
+import BindDialog from '@/views/database/postgresql/bind/index.vue';
 import OperateDialog from '@/views/database/postgresql/create/index.vue';
 import DeleteDialog from '@/views/database/postgresql/delete/index.vue';
 import PasswordDialog from '@/views/database/postgresql/password/index.vue';
@@ -252,6 +263,7 @@ const currentDBName = ref();
 
 const checkRef = ref();
 const deleteRef = ref();
+const bindRef = ref();
 
 const pgadminPort = ref();
 const dashboardName = ref();
@@ -352,6 +364,14 @@ const search = async (column?: any) => {
     paginationConfig.total = res.data.total;
 };
 
+const onBind = async (row: Database.PostgresqlDBInfo) => {
+    let param = {
+        name: row.name,
+        database: currentDBName.value,
+    };
+    bindRef.value.acceptParams(param);
+};
+
 const loadDB = async () => {
     ElMessageBox.confirm(i18n.global.t('database.loadFromRemoteHelper'), i18n.global.t('commons.msg.infoTitle'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
@@ -359,12 +379,7 @@ const loadDB = async () => {
         type: 'info',
     }).then(async () => {
         loading.value = true;
-        let params = {
-            from: currentDB.value.from,
-            type: currentDB.value.type,
-            database: currentDBName.value,
-        };
-        await loadPgFromRemote(params)
+        await loadPgFromRemote(currentDBName.value)
             .then(() => {
                 loading.value = false;
                 search();

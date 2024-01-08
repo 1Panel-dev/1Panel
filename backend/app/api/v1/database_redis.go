@@ -1,15 +1,11 @@
 package v1
 
 import (
-	"bufio"
 	"encoding/base64"
-	"fmt"
-	"os"
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
-	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	"github.com/gin-gonic/gin"
 )
 
@@ -160,46 +156,4 @@ func (b *BaseApi) RedisBackupList(c *gin.Context) {
 		Items: list,
 		Total: total,
 	})
-}
-
-// @Tags Database Redis
-// @Summary Update redis conf by file
-// @Description 上传更新 redis 配置信息
-// @Accept json
-// @Param request body dto.RedisConfUpdateByFile true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Router /databases/redis/conffile/update [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 redis 数据库配置信息","formatEN":"update the redis database configuration information"}
-func (b *BaseApi) UpdateRedisConfByFile(c *gin.Context) {
-	var req dto.RedisConfUpdateByFile
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	redisInfo, err := redisService.LoadConf()
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	path := fmt.Sprintf("%s/redis/%s/conf/redis.conf", constant.AppInstallDir, redisInfo.Name)
-	file, err := os.OpenFile(path, os.O_WRONLY|os.O_TRUNC, 0640)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	defer file.Close()
-	write := bufio.NewWriter(file)
-	_, _ = write.WriteString(req.File)
-	write.Flush()
-
-	if req.RestartNow {
-		composeDir := fmt.Sprintf("%s/redis/%s/docker-compose.yml", constant.AppInstallDir, redisInfo.Name)
-		if _, err := compose.Restart(composeDir); err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-			return
-		}
-	}
-
-	helper.SuccessWithData(c, nil)
 }

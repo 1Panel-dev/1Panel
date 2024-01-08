@@ -2,6 +2,27 @@ package dto
 
 import "time"
 
+// common
+type DBConfUpdateByFile struct {
+	Type     string `json:"type" validate:"required,oneof=mysql mariadb postgresql redis"`
+	Database string `json:"database" validate:"required"`
+	File     string `json:"file"`
+}
+type ChangeDBInfo struct {
+	ID       uint   `json:"id"`
+	From     string `json:"from" validate:"required,oneof=local remote"`
+	Type     string `json:"type" validate:"required,oneof=mysql mariadb postgresql"`
+	Database string `json:"database" validate:"required"`
+	Value    string `json:"value" validate:"required"`
+}
+
+type DBBaseInfo struct {
+	Name          string `json:"name"`
+	ContainerName string `json:"containerName"`
+	Port          int64  `json:"port"`
+}
+
+// mysql
 type MysqlDBSearch struct {
 	PageInfo
 	Info     string `json:"info"`
@@ -140,24 +161,6 @@ type MysqlVariablesUpdate struct {
 type MysqlVariablesUpdateHelper struct {
 	Param string      `json:"param"`
 	Value interface{} `json:"value"`
-}
-type MysqlConfUpdateByFile struct {
-	Type     string `json:"type" validate:"required,oneof=mysql mariadb"`
-	Database string `json:"database" validate:"required"`
-	File     string `json:"file"`
-}
-type ChangeDBInfo struct {
-	ID       uint   `json:"id"`
-	From     string `json:"from" validate:"required,oneof=local remote"`
-	Type     string `json:"type" validate:"required,oneof=mysql mariadb postgresql"`
-	Database string `json:"database" validate:"required"`
-	Value    string `json:"value" validate:"required"`
-}
-
-type DBBaseInfo struct {
-	Name          string `json:"name"`
-	ContainerName string `json:"containerName"`
-	Port          int64  `json:"port"`
 }
 
 // redis
