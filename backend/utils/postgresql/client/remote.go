@@ -11,11 +11,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/docker/docker/api/types"
 	"github.com/pkg/errors"
 
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
@@ -106,10 +109,10 @@ func (r *Remote) Backup(info BackupInfo) error {
 		}
 	}
 	fileNameItem := info.TargetDir + "/" + strings.TrimSuffix(info.FileName, ".gz")
-
+	imageTag := loadImageTag()
 	backupCommand := exec.Command("bash", "-c",
-		fmt.Sprintf("docker run --rm --net=host -i postgres:alpine /bin/bash -c 'PGPASSWORD=%s pg_dump  -h %s -p %d --no-owner -Fc -U %s %s' > %s",
-			r.Password, r.Address, r.Port, r.User, info.Name, fileNameItem))
+		fmt.Sprintf("docker run --rm --net=host -i %s /bin/bash -c 'PGPASSWORD=%s pg_dump  -h %s -p %d --no-owner -Fc -U %s %s' > %s",
+			imageTag, r.Password, r.Address, r.Port, r.User, info.Name, fileNameItem))
 	_ = backupCommand.Run()
 	b := make([]byte, 5)
 	n := []byte{80, 71, 68, 77, 80}
@@ -146,9 +149,10 @@ func (r *Remote) Recover(info RecoverInfo) error {
 			_, _ = gzipCmd.CombinedOutput()
 		}()
 	}
+	imageTag := loadImageTag()
 	recoverCommand := exec.Command("bash", "-c",
-		fmt.Sprintf("docker run --rm --net=host -i postgres:16.1-alpine /bin/bash -c 'PGPASSWORD=%s pg_restore -h %s -p %d --verbose --clean --no-privileges --no-owner -Fc -U %s -d %s --role=%s' < %s",
-			r.Password, r.Address, r.Port, r.User, info.Name, info.Username, fileName))
+		fmt.Sprintf("docker run --rm --net=host -i %s /bin/bash -c 'PGPASSWORD=%s pg_restore -h %s -p %d --verbose --clean --no-privileges --no-owner -Fc -U %s -d %s --role=%s' < %s",
+			imageTag, r.Password, r.Address, r.Port, r.User, info.Name, info.Username, fileName))
 	pipe, _ := recoverCommand.StdoutPipe()
 	stderrPipe, _ := recoverCommand.StderrPipe()
 	defer pipe.Close()
@@ -215,4 +219,38 @@ func (r *Remote) ExecSQL(command string, timeout uint) error {
 	}
 
 	return nil
+}
+
+func loadImageTag() string {
+	var (
+		app        model.App
+		appDetails []model.AppDetail
+		itemTag    = "postgres:16.1-alpine"
+	)
+	if err := global.DB.Where("key = ?", "postgresql").First(&app).Error; err != nil {
+		return itemTag
+	}
+	if err := global.DB.Where("app_id = ?", app.ID).Find(&appDetails).Error; err != nil {
+		return itemTag
+	}
+
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return itemTag
+	}
+	images, err := client.ImageList(context.Background(), types.ImageListOptions{})
+	if err != nil {
+		return itemTag
+	}
+
+	for _, item := range appDetails {
+		for _, image := range images {
+			for _, tag := range image.RepoTags {
+				if tag == "postgres:"+item.Version {
+					return tag
+				}
+			}
+		}
+	}
+	return itemTag
 }
