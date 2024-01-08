@@ -43,6 +43,13 @@ type PostgresqlDBCreate struct {
 	Description string `json:"description"`
 }
 
+type PostgresqlBindUser struct {
+	Name     string `json:"name" validate:"required"`
+	Database string `json:"database" validate:"required"`
+	Username string `json:"username" validate:"required"`
+	Password string `json:"password" validate:"required"`
+}
+
 type PostgresqlLoadDB struct {
 	From     string `json:"from" validate:"required,oneof=local remote"`
 	Type     string `json:"type" validate:"required,oneof=postgresql"`

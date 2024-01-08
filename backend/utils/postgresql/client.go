@@ -14,6 +14,7 @@ import (
 
 type PostgresqlClient interface {
 	Create(info client.CreateInfo) error
+	CreateUser(info client.CreateInfo, withDeleteDB bool) error
 	Delete(info client.DeleteInfo) error
 	ChangePassword(info client.PasswordChangeInfo) error
 

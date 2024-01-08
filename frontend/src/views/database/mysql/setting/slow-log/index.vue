@@ -52,7 +52,7 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import { nextTick, onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
 import { Database } from '@/api/interface/database';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
-import { loadDatabaseFile, updateMysqlVariables } from '@/api/modules/database';
+import { loadDBFile, updateMysqlVariables } from '@/api/modules/database';
 import { dateFormatForName, downloadWithContent } from '@/utils/util';
 import i18n from '@/lang';
 import { MsgError, MsgInfo, MsgSuccess } from '@/utils/message';
@@ -175,7 +175,7 @@ const onDownload = async () => {
 };
 
 const loadMysqlSlowlogs = async () => {
-    const res = await loadDatabaseFile(currentDB.type + '-slow-logs', currentDB.database);
+    const res = await loadDBFile(currentDB.type + '-slow-logs', currentDB.database);
     slowLogs.value = res.data || '';
     nextTick(() => {
         const state = view.value.state;

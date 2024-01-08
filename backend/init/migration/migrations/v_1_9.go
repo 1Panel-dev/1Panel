@@ -5,6 +5,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/app/service"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/gorm"
 )
@@ -133,14 +134,15 @@ var AddTableDatabasePostgresql = &gormigrate.Migration{
 		for _, job := range jobs {
 			var db model.DatabaseMysql
 			if err := tx.Where("id == ?", job.DBName).First(&db).Error; err != nil {
-				return err
+				continue
 			}
 			var database model.Database
 			if err := tx.Where("name == ?", db.MysqlName).First(&database).Error; err != nil {
-				return err
+				continue
 			}
 			if err := tx.Model(&model.Cronjob{}).Where("id = ?", job.ID).Update("db_type", database.Type).Error; err != nil {
-				return err
+				global.LOG.Errorf("update db type of cronjob %s failed, err: %v", job.Name, err)
+				continue
 			}
 		}
 		return nil

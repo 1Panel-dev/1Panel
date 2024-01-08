@@ -705,6 +705,23 @@ definitions:
       port:
         type: integer
     type: object
+  dto.DBConfUpdateByFile:
+    properties:
+      database:
+        type: string
+      file:
+        type: string
+      type:
+        enum:
+        - mysql
+        - mariadb
+        - postgresql
+        - redis
+        type: string
+    required:
+    - database
+    - type
+    type: object
   dto.DaemonJsonConf:
     properties:
       cgroupDriver:
@@ -1518,21 +1535,6 @@ definitions:
     - interval
     - secret
     type: object
-  dto.MysqlConfUpdateByFile:
-    properties:
-      database:
-        type: string
-      file:
-        type: string
-      type:
-        enum:
-        - mysql
-        - mariadb
-        type: string
-    required:
-    - database
-    - type
-    type: object
   dto.MysqlDBCreate:
     properties:
       database:
@@ -1998,20 +2000,21 @@ definitions:
     required:
     - serverPort
     type: object
-  dto.PostgresqlConfUpdateByFile:
+  dto.PostgresqlBindUser:
     properties:
       database:
         type: string
-      file:
+      name:
         type: string
-      type:
-        enum:
-        - postgresql
-        - mariadb
+      password:
+        type: string
+      username:
         type: string
     required:
     - database
-    - type
+    - name
+    - password
+    - username
     type: object
   dto.PostgresqlDBCreate:
     properties:
@@ -2184,15 +2187,6 @@ definitions:
         type: string
       timeout:
         type: string
-    type: object
-  dto.RedisConfUpdateByFile:
-    properties:
-      file:
-        type: string
-      restartNow:
-        type: boolean
-    required:
-    - file
     type: object
   dto.RedisPersistence:
     properties:
@@ -7466,28 +7460,6 @@ paths:
         formatEN: create mysql database [name]
         formatZH: 创建 mysql 数据库 [name]
         paramKeys: []
-  /databases/baseinfo:
-    post:
-      consumes:
-      - application/json
-      description: 获取 mysql 基础信息
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.OperationWithNameAndType'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.DBBaseInfo'
-      security:
-      - ApiKeyAuth: []
-      summary: Load mysql base info
-      tags:
-      - Database Mysql
   /databases/bind:
     post:
       consumes:
@@ -7582,31 +7554,75 @@ paths:
         formatEN: Update database [name] password
         formatZH: 更新数据库 [name] 密码
         paramKeys: []
-  /databases/conffile/update:
+  /databases/common/info:
     post:
       consumes:
       - application/json
-      description: 上传替换 mysql 配置文件
+      description: 获取数据库基础信息
       parameters:
       - description: request
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.MysqlConfUpdateByFile'
+          $ref: '#/definitions/dto.OperationWithNameAndType'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.DBBaseInfo'
+      security:
+      - ApiKeyAuth: []
+      summary: Load base info
+      tags:
+      - Database Common
+  /databases/common/load/file:
+    post:
+      consumes:
+      - application/json
+      description: 获取数据库配置文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OperationWithNameAndType'
       responses:
         "200":
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Update mysql conf by upload file
+      summary: Load Database conf
       tags:
-      - Database Mysql
+      - Database Common
+  /databases/common/update/conf:
+    post:
+      consumes:
+      - application/json
+      description: 上传替换配置文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DBConfUpdateByFile'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update conf by upload file
+      tags:
+      - Database Common
       x-panel-log:
         BeforeFunctions: []
-        bodyKeys: []
-        formatEN: update the mysql database configuration information
-        formatZH: 更新 mysql 数据库配置信息
+        bodyKeys:
+        - type
+        - database
+        formatEN: update the [type] [database] database configuration information
+        formatZH: 更新 [type] 数据库 [database] 配置信息
         paramKeys: []
   /databases/db:
     post:
@@ -7898,26 +7914,6 @@ paths:
       summary: Load mysql database from remote
       tags:
       - Database Mysql
-  /databases/load/file:
-    post:
-      consumes:
-      - application/json
-      description: 获取数据库文件
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.OperationWithNameAndType'
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      summary: Load Database file
-      tags:
-      - Database
   /databases/options:
     get:
       consumes:
@@ -7969,53 +7965,51 @@ paths:
         formatEN: create postgresql database [name]
         formatZH: 创建 postgresql 数据库 [name]
         paramKeys: []
-  /databases/pg/baseinfo:
+  /databases/pg/:database/load:
     post:
       consumes:
       - application/json
-      description: 获取 postgresql 基础信息
+      description: 从服务器获取
       parameters:
       - description: request
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.OperationWithNameAndType'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.DBBaseInfo'
+          $ref: '#/definitions/dto.PostgresqlLoadDB'
+      responses: {}
       security:
       - ApiKeyAuth: []
-      summary: Load postgresql base info
+      summary: Load postgresql database from remote
       tags:
       - Database Postgresql
-  /databases/pg/conf:
+  /databases/pg/bind:
     post:
       consumes:
       - application/json
-      description: 上传替换 postgresql 配置文件
+      description: 绑定 postgresql 数据库用户
       parameters:
       - description: request
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.PostgresqlConfUpdateByFile'
+          $ref: '#/definitions/dto.PostgresqlBindUser'
       responses:
         "200":
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Update postgresql conf by upload file
+      summary: Bind postgresql user
       tags:
       - Database Postgresql
       x-panel-log:
         BeforeFunctions: []
-        bodyKeys: []
-        formatEN: update the postgresql database configuration information
-        formatZH: 更新 postgresql 数据库配置信息
+        bodyKeys:
+        - name
+        - username
+        formatEN: bind postgresql database [name] user [username]
+        formatZH: 绑定 postgresql 数据库 [name] 用户 [username]
         paramKeys: []
   /databases/pg/del:
     post:
@@ -8109,24 +8103,6 @@ paths:
           [description]
         formatZH: postgresql 数据库 [name] 描述信息修改 [description]
         paramKeys: []
-  /databases/pg/load:
-    post:
-      consumes:
-      - application/json
-      description: 从服务器获取
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.PostgresqlLoadDB'
-      responses: {}
-      security:
-      - ApiKeyAuth: []
-      summary: Load postgresql database from remote
-      tags:
-      - Database Postgresql
   /databases/pg/options:
     get:
       consumes:
@@ -8259,32 +8235,6 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Update redis conf
-      tags:
-      - Database Redis
-      x-panel-log:
-        BeforeFunctions: []
-        bodyKeys: []
-        formatEN: update the redis database configuration information
-        formatZH: 更新 redis 数据库配置信息
-        paramKeys: []
-  /databases/redis/conffile/update:
-    post:
-      consumes:
-      - application/json
-      description: 上传更新 redis 配置信息
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.RedisConfUpdateByFile'
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      summary: Update redis conf by file
       tags:
       - Database Redis
       x-panel-log:

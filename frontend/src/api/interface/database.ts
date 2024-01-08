@@ -33,7 +33,7 @@ export namespace Database {
         mysqlKey: string;
         containerName: string;
     }
-    export interface MysqlConfUpdateByFile {
+    export interface DBConfUpdate {
         type: string;
         database: string;
         file: string;
@@ -146,10 +146,11 @@ export namespace Database {
         type: string;
         database: string;
     }
-    export interface PgLoadDB {
-        from: string;
-        type: string;
+    export interface PgBind {
+        name: string;
         database: string;
+        username: string;
+        password: string;
     }
     export interface PostgresqlDBDelete {
         id: number;

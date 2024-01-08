@@ -42,6 +42,28 @@ func (b *BaseApi) CreatePostgresql(c *gin.Context) {
 }
 
 // @Tags Database Postgresql
+// @Summary Bind postgresql user
+// @Description 绑定 postgresql 数据库用户
+// @Accept json
+// @Param request body dto.PostgresqlBindUser true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /databases/pg/bind [post]
+// @x-panel-log {"bodyKeys":["name", "username"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"绑定 postgresql 数据库 [name] 用户 [username]","formatEN":"bind postgresql database [name] user [username]"}
+func (b *BaseApi) BindPostgresqlUser(c *gin.Context) {
+	var req dto.PostgresqlBindUser
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := postgresqlService.BindUser(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Database Postgresql
 // @Summary Update postgresql database description
 // @Description 更新 postgresql 数据库库描述信息
 // @Accept json
@@ -95,29 +117,6 @@ func (b *BaseApi) ChangePostgresqlPassword(c *gin.Context) {
 }
 
 // @Tags Database Postgresql
-// @Summary Update postgresql conf by upload file
-// @Description 上传替换 postgresql 配置文件
-// @Accept json
-// @Param request body dto.PostgresqlConfUpdateByFile true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Router /databases/pg/conf [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 postgresql 数据库配置信息","formatEN":"update the postgresql database configuration information"}
-func (b *BaseApi) UpdatePostgresqlConfByFile(c *gin.Context) {
-	var req dto.PostgresqlConfUpdateByFile
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	if err := postgresqlService.UpdateConfByFile(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-
-	helper.SuccessWithData(c, nil)
-}
-
-// @Tags Database Postgresql
 // @Summary Page postgresql databases
 // @Description 获取 postgresql 数据库列表分页
 // @Accept json
@@ -167,19 +166,18 @@ func (b *BaseApi) ListPostgresqlDBName(c *gin.Context) {
 // @Accept json
 // @Param request body dto.PostgresqlLoadDB true "request"
 // @Security ApiKeyAuth
-// @Router /databases/pg/load [post]
+// @Router /databases/pg/:database/load [post]
 func (b *BaseApi) LoadPostgresqlDBFromRemote(c *gin.Context) {
-	var req dto.PostgresqlLoadDB
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+	database, err := helper.GetStrParamByKey(c, "database")
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
 
-	if err := postgresqlService.LoadFromRemote(req); err != nil {
+	if err := postgresqlService.LoadFromRemote(database); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-
-	helper.SuccessWithData(c, nil)
 
 	helper.SuccessWithData(c, nil)
 }
@@ -228,27 +226,4 @@ func (b *BaseApi) DeletePostgresql(c *gin.Context) {
 	}
 	tx.Commit()
 	helper.SuccessWithData(c, nil)
-}
-
-// @Tags Database Postgresql
-// @Summary Load postgresql base info
-// @Description 获取 postgresql 基础信息
-// @Accept json
-// @Param request body dto.OperationWithNameAndType true "request"
-// @Success 200 {object} dto.DBBaseInfo
-// @Security ApiKeyAuth
-// @Router /databases/pg/baseinfo [post]
-func (b *BaseApi) LoadPostgresqlBaseinfo(c *gin.Context) {
-	var req dto.OperationWithNameAndType
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	data, err := postgresqlService.LoadBaseInfo(req)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-
-	helper.SuccessWithData(c, data)
 }

@@ -529,6 +529,7 @@ const onBind = async (row: Database.MysqlDBInfo) => {
     let param = {
         database: currentDBName.value,
         mysqlName: row.name,
+        from: row.from,
     };
     bindRef.value.acceptParams(param);
 };

@@ -5,22 +5,27 @@ import { ResPage, DescriptionUpdate } from '../interface';
 import { Database } from '../interface/database';
 import { TimeoutEnum } from '@/enums/http-enum';
 
-export const searchMysqlDBs = (params: Database.SearchDBWithPage) => {
-    return http.post<ResPage<Database.MysqlDBInfo>>(`/databases/search`, params);
+// common
+export const loadDBBaseInfo = (type: string, database: string) => {
+    return http.post<Database.BaseInfo>(`/databases/common/info`, { type: type, name: database });
+};
+export const loadDBFile = (type: string, database: string) => {
+    return http.post<string>(`/databases/common/load/file`, { type: type, name: database });
+};
+export const updateDBFile = (params: Database.DBConfUpdate) => {
+    return http.post(`/databases/common/update/conf`, params);
 };
 
-export const loadDatabaseFile = (type: string, database: string) => {
-    return http.post<string>(`/databases/load/file`, { type: type, name: database });
-};
+// pg
 export const addPostgresqlDB = (params: Database.PostgresqlDBCreate) => {
     let request = deepCopy(params) as Database.PostgresqlDBCreate;
     if (request.password) {
         request.password = Base64.encode(request.password);
     }
-    return http.post(`/databases/pg`, request);
+    return http.post(`/databases/pg`, request, TimeoutEnum.T_40S);
 };
-export const updatePostgresqlConfByFile = (params: Database.PostgresqlConfUpdateByFile) => {
-    return http.post(`/databases/pg/conf`, params);
+export const bindPostgresqlUser = (params: Database.PgBind) => {
+    return http.post(`/databases/pg/bind`, params, TimeoutEnum.T_40S);
 };
 export const searchPostgresqlDBs = (params: Database.SearchDBWithPage) => {
     return http.post<ResPage<Database.PostgresqlDBInfo>>(`/databases/pg/search`, params);
@@ -28,24 +33,27 @@ export const searchPostgresqlDBs = (params: Database.SearchDBWithPage) => {
 export const updatePostgresqlDescription = (params: DescriptionUpdate) => {
     return http.post(`/databases/pg/description`, params);
 };
-export const loadPgFromRemote = (params: Database.PgLoadDB) => {
-    return http.post(`/databases/pg/load`, params);
+export const loadPgFromRemote = (database: string) => {
+    return http.post(`/databases/pg/${database}/load`);
 };
 export const deleteCheckPostgresqlDB = (params: Database.PostgresqlDBDeleteCheck) => {
-    return http.post<Array<string>>(`/databases/pg/del/check`, params);
+    return http.post<Array<string>>(`/databases/pg/del/check`, params, TimeoutEnum.T_40S);
 };
 export const updatePostgresqlPassword = (params: Database.ChangeInfo) => {
     let request = deepCopy(params) as Database.ChangeInfo;
     if (request.value) {
         request.value = Base64.encode(request.value);
     }
-    return http.post(`/databases/pg/password`, request);
+    return http.post(`/databases/pg/password`, request, TimeoutEnum.T_40S);
 };
 export const deletePostgresqlDB = (params: Database.PostgresqlDBDelete) => {
-    return http.post(`/databases/pg/del`, params);
+    return http.post(`/databases/pg/del`, params, TimeoutEnum.T_40S);
 };
 
 // mysql
+export const searchMysqlDBs = (params: Database.SearchDBWithPage) => {
+    return http.post<ResPage<Database.MysqlDBInfo>>(`/databases/search`, params);
+};
 export const addMysqlDB = (params: Database.MysqlDBCreate) => {
     let request = deepCopy(params) as Database.MysqlDBCreate;
     if (request.password) {
@@ -79,9 +87,6 @@ export const updateMysqlDescription = (params: DescriptionUpdate) => {
 export const updateMysqlVariables = (params: Database.VariablesUpdate) => {
     return http.post(`/databases/variables/update`, params);
 };
-export const updateMysqlConfByFile = (params: Database.MysqlConfUpdateByFile) => {
-    return http.post(`/databases/conffile/update`, params);
-};
 export const deleteCheckMysqlDB = (params: Database.MysqlDBDeleteCheck) => {
     return http.post<Array<string>>(`/databases/del/check`, params);
 };
@@ -89,9 +94,6 @@ export const deleteMysqlDB = (params: Database.MysqlDBDelete) => {
     return http.post(`/databases/del`, params);
 };
 
-export const loadMysqlBaseInfo = (type: string, database: string) => {
-    return http.post<Database.BaseInfo>(`/databases/baseinfo`, { type: type, name: database });
-};
 export const loadMysqlVariables = (type: string, database: string) => {
     return http.post<Database.MysqlVariables>(`/databases/variables`, { type: type, name: database });
 };
