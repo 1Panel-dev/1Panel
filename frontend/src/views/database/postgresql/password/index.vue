@@ -4,12 +4,12 @@
             <template #header>
                 <DrawerHeader :header="title" :resource="changeForm.postgresqlName" :back="handleClose" />
             </template>
-            <el-form v-loading="loading" ref="changeFormRef" :model="changeForm" label-position="top">
+            <el-form v-loading="loading" ref="changeFormRef" :rules="rules" :model="changeForm" label-position="top">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
                         <div v-if="changeForm.operation === 'password'">
-                            <el-form-item :label="$t('commons.login.username')" prop="userName">
-                                <el-input disabled v-model="changeForm.userName"></el-input>
+                            <el-form-item :label="$t('commons.login.username')" prop="username">
+                                <el-input disabled v-model="changeForm.username"></el-input>
                             </el-form-item>
                             <el-form-item :label="$t('commons.login.password')" prop="password">
                                 <el-input
@@ -45,6 +45,7 @@ import { ElForm } from 'element-plus';
 import { deleteCheckPostgresqlDB, updatePostgresqlPassword } from '@/api/modules/database';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
+import { Rules } from '@/global/form-rules';
 
 const loading = ref();
 const changeVisible = ref(false);
@@ -57,12 +58,15 @@ const changeForm = reactive({
     type: '',
     database: '',
     postgresqlName: '',
-    userName: '',
+    username: '',
     password: '',
     operation: '',
     value: '',
 });
 const confirmDialogRef = ref();
+const rules = reactive({
+    password: [Rules.paramComplexity],
+});
 
 interface DialogProps {
     id: number;
@@ -79,13 +83,12 @@ interface DialogProps {
 }
 const acceptParams = (params: DialogProps): void => {
     title.value = i18n.global.t('database.changePassword');
-
     changeForm.id = params.id;
     changeForm.from = params.from;
     changeForm.type = params.type;
     changeForm.database = params.database;
     changeForm.postgresqlName = params.postgresqlName;
-    changeForm.userName = params.username;
+    changeForm.username = params.username;
     changeForm.password = params.password;
     changeForm.operation = params.operation;
     changeForm.value = params.value;

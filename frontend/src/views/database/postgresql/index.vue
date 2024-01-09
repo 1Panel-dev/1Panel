@@ -507,6 +507,9 @@ const onChangePassword = async (row: Database.PostgresqlDBInfo) => {
 const buttons = [
     {
         label: i18n.global.t('database.changePassword'),
+        disabled: (row: Database.PostgresqlDBInfo) => {
+            return !row.username;
+        },
         click: (row: Database.PostgresqlDBInfo) => {
             onChangePassword(row);
         },

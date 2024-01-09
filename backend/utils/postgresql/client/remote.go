@@ -122,6 +122,10 @@ func (r *Remote) ChangePassword(info PasswordChangeInfo) error {
 }
 
 func (r *Remote) Backup(info BackupInfo) error {
+	imageTag, err := loadImageTag()
+	if err != nil {
+		return err
+	}
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(info.TargetDir) {
 		if err := os.MkdirAll(info.TargetDir, os.ModePerm); err != nil {
@@ -129,7 +133,6 @@ func (r *Remote) Backup(info BackupInfo) error {
 		}
 	}
 	fileNameItem := info.TargetDir + "/" + strings.TrimSuffix(info.FileName, ".gz")
-	imageTag := loadImageTag()
 	backupCommand := exec.Command("bash", "-c",
 		fmt.Sprintf("docker run --rm --net=host -i %s /bin/bash -c 'PGPASSWORD=%s pg_dump  -h %s -p %d --no-owner -Fc -U %s %s' > %s",
 			imageTag, r.Password, r.Address, r.Port, r.User, info.Name, fileNameItem))
@@ -156,6 +159,10 @@ func (r *Remote) Backup(info BackupInfo) error {
 }
 
 func (r *Remote) Recover(info RecoverInfo) error {
+	imageTag, err := loadImageTag()
+	if err != nil {
+		return err
+	}
 	fileName := info.SourceFile
 	if strings.HasSuffix(info.SourceFile, ".sql.gz") {
 		fileName = strings.TrimSuffix(info.SourceFile, ".gz")
@@ -169,7 +176,6 @@ func (r *Remote) Recover(info RecoverInfo) error {
 			_, _ = gzipCmd.CombinedOutput()
 		}()
 	}
-	imageTag := loadImageTag()
 	recoverCommand := exec.Command("bash", "-c",
 		fmt.Sprintf("docker run --rm --net=host -i %s /bin/bash -c 'PGPASSWORD=%s pg_restore -h %s -p %d --verbose --clean --no-privileges --no-owner -Fc -U %s -d %s --role=%s' < %s",
 			imageTag, r.Password, r.Address, r.Port, r.User, info.Name, info.Username, fileName))
@@ -241,36 +247,64 @@ func (r *Remote) ExecSQL(command string, timeout uint) error {
 	return nil
 }
 
-func loadImageTag() string {
+func loadImageTag() (string, error) {
 	var (
 		app        model.App
 		appDetails []model.AppDetail
-		itemTag    = "postgres:16.1-alpine"
+		versions   []string
 	)
 	if err := global.DB.Where("key = ?", "postgresql").First(&app).Error; err != nil {
-		return itemTag
-	}
-	if err := global.DB.Where("app_id = ?", app.ID).Find(&appDetails).Error; err != nil {
-		return itemTag
+		versions = []string{"postgres:16.1-alpine", "postgres:16.0-alpine"}
+	} else {
+		if err := global.DB.Where("app_id = ?", app.ID).Find(&appDetails).Error; err != nil {
+			versions = []string{"postgres:16.1-alpine", "postgres:16.0-alpine"}
+		} else {
+			for _, item := range appDetails {
+				versions = append(versions, "postgres:"+item.Version)
+			}
+		}
 	}
 
 	client, err := docker.NewDockerClient()
 	if err != nil {
-		return itemTag
+		return "", err
 	}
 	images, err := client.ImageList(context.Background(), types.ImageListOptions{})
 	if err != nil {
-		return itemTag
+		return "", err
 	}
 
-	for _, item := range appDetails {
+	itemTag := ""
+	for _, item := range versions {
 		for _, image := range images {
 			for _, tag := range image.RepoTags {
-				if tag == "postgres:"+item.Version {
-					return tag
+				if tag == item {
+					itemTag = tag
+					break
 				}
 			}
+			if len(itemTag) != 0 {
+				break
+			}
+		}
+		if len(itemTag) != 0 {
+			break
 		}
 	}
-	return itemTag
+	if len(itemTag) != 0 {
+		return itemTag, nil
+	}
+
+	itemTag = "postgres:16.1-alpine"
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
+	defer cancel()
+	if _, err := client.ImagePull(ctx, itemTag, types.ImagePullOptions{}); err != nil {
+		if ctx.Err() == context.DeadlineExceeded {
+			return itemTag, buserr.New(constant.ErrPgImagePull)
+		}
+		global.LOG.Errorf("image %s pull failed, err: %v", itemTag, err)
+		return itemTag, fmt.Errorf("image %s pull failed, err: %v", itemTag, err)
+	}
+
+	return itemTag, nil
 }

@@ -116,6 +116,7 @@ var (
 	ErrInUsed       = "ErrInUsed"
 	ErrObjectInUsed = "ErrObjectInUsed"
 	ErrPortRules    = "ErrPortRules"
+	ErrPgImagePull  = "ErrPgImagePull"
 )
 
 // runtime
