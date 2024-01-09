@@ -201,35 +201,21 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 				return err
 			}
 		}
-		if database.Type == constant.AppPostgresql {
+		switch database.Type {
+		case constant.AppPostgresql:
 			db, err := postgresqlRepo.Get(commonRepo.WithByID(resource.ResourceId))
 			if err != nil {
 				return err
 			}
-			newDB, envMap, err := reCreatePostgresqlDB(db.ID, database, oldInstall.Env)
-			if err != nil {
-				return err
-			}
-			oldHost := fmt.Sprintf("\"PANEL_DB_HOST\":\"%v\"", envMap["PANEL_DB_HOST"].(string))
-			newHost := fmt.Sprintf("\"PANEL_DB_HOST\":\"%v\"", database.Address)
-			oldInstall.Env = strings.ReplaceAll(oldInstall.Env, oldHost, newHost)
-			envMap["PANEL_DB_HOST"] = database.Address
-			newEnvFile, err = coverEnvJsonToStr(oldInstall.Env)
-			if err != nil {
-				return err
-			}
-			_ = appInstallResourceRepo.BatchUpdateBy(map[string]interface{}{"resource_id": newDB.ID}, commonRepo.WithByID(resource.ID))
-
 			if err := handlePostgresqlRecover(dto.CommonRecover{
-				Name:       newDB.PostgresqlName,
-				DetailName: newDB.Name,
+				Name:       database.Name,
+				DetailName: db.Name,
 				File:       fmt.Sprintf("%s/%s.sql.gz", tmpPath, install.Name),
 			}, true); err != nil {
 				global.LOG.Errorf("handle recover from sql.gz failed, err: %v", err)
 				return err
 			}
-		}
-		if database.Type == "mysql" || database.Type == "mariadb" {
+		case constant.AppMysql, constant.AppMariaDB:
 			db, err := mysqlRepo.Get(commonRepo.WithByID(resource.ResourceId))
 			if err != nil {
 				return err
@@ -295,32 +281,7 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 
 	return nil
 }
-func reCreatePostgresqlDB(dbID uint, database model.Database, oldEnv string) (*model.DatabasePostgresql, map[string]interface{}, error) {
-	postgresqlService := NewIPostgresqlService()
-	ctx := context.Background()
-	_ = postgresqlService.Delete(ctx, dto.PostgresqlDBDelete{ID: dbID, Database: database.Name, Type: database.Type, DeleteBackup: false, ForceDelete: true})
 
-	envMap := make(map[string]interface{})
-	if err := json.Unmarshal([]byte(oldEnv), &envMap); err != nil {
-		return nil, envMap, err
-	}
-	oldName, _ := envMap["PANEL_DB_NAME"].(string)
-	oldUser, _ := envMap["PANEL_DB_USER"].(string)
-	oldPassword, _ := envMap["PANEL_DB_USER_PASSWORD"].(string)
-	createDB, err := postgresqlService.Create(context.Background(), dto.PostgresqlDBCreate{
-		Name:      oldName,
-		From:      database.From,
-		Database:  database.Name,
-		Format:    "UTF8",
-		Username:  oldUser,
-		Password:  oldPassword,
-		SuperUser: true,
-	})
-	if err != nil {
-		return nil, envMap, err
-	}
-	return createDB, envMap, nil
-}
 func reCreateDB(dbID uint, database model.Database, oldEnv string) (*model.DatabaseMysql, map[string]interface{}, error) {
 	mysqlService := NewIMysqlService()
 	ctx := context.Background()
