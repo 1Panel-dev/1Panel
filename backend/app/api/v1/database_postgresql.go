@@ -86,6 +86,28 @@ func (b *BaseApi) UpdatePostgresqlDescription(c *gin.Context) {
 }
 
 // @Tags Database Postgresql
+// @Summary Change postgresql privileges
+// @Description 修改 postgresql 用户权限
+// @Accept json
+// @Param request body dto.ChangeDBInfo true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /databases/pg/privileges [post]
+// @x-panel-log {"bodyKeys":["database", "username"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新数据库 [database] 用户 [username] 权限","formatEN":"Update [user] privileges of database [database]"}
+func (b *BaseApi) ChangePostgresqlPrivileges(c *gin.Context) {
+	var req dto.PostgresqlPrivileges
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := postgresqlService.ChangePrivileges(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Database Postgresql
 // @Summary Change postgresql password
 // @Description 修改 postgresql 密码
 // @Accept json

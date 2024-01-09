@@ -207,6 +207,7 @@
             </template>
         </el-dialog>
 
+        <PrivilegesDialog ref="privilegesRef" @search="search" />
         <BindDialog ref="bindRef" @search="search" />
         <PasswordDialog ref="passwordRef" @search="search" />
         <RootPasswordDialog ref="connRef" />
@@ -226,6 +227,7 @@ import BindDialog from '@/views/database/postgresql/bind/index.vue';
 import OperateDialog from '@/views/database/postgresql/create/index.vue';
 import DeleteDialog from '@/views/database/postgresql/delete/index.vue';
 import PasswordDialog from '@/views/database/postgresql/password/index.vue';
+import PrivilegesDialog from '@/views/database/postgresql/privileges/index.vue';
 import RootPasswordDialog from '@/views/database/postgresql/conn/index.vue';
 import AppResources from '@/views/database/postgresql/check/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
@@ -264,6 +266,7 @@ const currentDBName = ref();
 const checkRef = ref();
 const deleteRef = ref();
 const bindRef = ref();
+const privilegesRef = ref();
 
 const pgadminPort = ref();
 const dashboardName = ref();
@@ -506,6 +509,21 @@ const buttons = [
         label: i18n.global.t('database.changePassword'),
         click: (row: Database.PostgresqlDBInfo) => {
             onChangePassword(row);
+        },
+    },
+    {
+        label: i18n.global.t('database.permission'),
+        disabled: (row: Database.PostgresqlDBInfo) => {
+            return !row.username;
+        },
+        click: (row: Database.PostgresqlDBInfo) => {
+            let param = {
+                database: currentDBName.value,
+                name: row.name,
+                username: row.username,
+                superUser: row.superUser,
+            };
+            privilegesRef.value.acceptParams(param);
         },
     },
     {

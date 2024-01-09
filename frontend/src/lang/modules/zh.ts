@@ -376,7 +376,8 @@ const message = {
 
         loadFromRemote: '从服务器获取',
         userBind: '绑定用户',
-        pgBind: '绑定用户 (暂不支持绑定已有用户)',
+        pgBindHelper: '该操作用于创建新用户并将其绑定到目标数据库，暂不支持选择已存在于数据库中的用户。',
+        pgSuperUser: '超级用户',
         loadFromRemoteHelper: '此操作将同步服务器上数据库信息到 1Panel，是否继续？',
         passwordHelper: '无法获取密码，请修改',
         local: '本地',

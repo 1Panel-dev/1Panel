@@ -2008,6 +2008,8 @@ definitions:
         type: string
       password:
         type: string
+      superUser:
+        type: boolean
       username:
         type: string
     required:
@@ -2033,8 +2035,8 @@ definitions:
         type: string
       password:
         type: string
-      permission:
-        type: string
+      superUser:
+        type: boolean
       username:
         type: string
     required:
@@ -2042,7 +2044,6 @@ definitions:
     - from
     - name
     - password
-    - permission
     - username
     type: object
   dto.PostgresqlDBDelete:
@@ -8159,6 +8160,34 @@ paths:
         - id
         formatEN: Update database [name] password
         formatZH: 更新数据库 [name] 密码
+        paramKeys: []
+  /databases/pg/privileges:
+    post:
+      consumes:
+      - application/json
+      description: 修改 postgresql 用户权限
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ChangeDBInfo'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Change postgresql privileges
+      tags:
+      - Database Postgresql
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - database
+        - username
+        formatEN: Update [user] privileges of database [database]
+        formatZH: 更新数据库 [database] 用户 [username] 权限
         paramKeys: []
   /databases/pg/search:
     post:

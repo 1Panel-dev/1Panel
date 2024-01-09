@@ -16,6 +16,7 @@ type PostgresqlClient interface {
 	Create(info client.CreateInfo) error
 	CreateUser(info client.CreateInfo, withDeleteDB bool) error
 	Delete(info client.DeleteInfo) error
+	ChangePrivileges(info client.Privileges) error
 	ChangePassword(info client.PasswordChangeInfo) error
 
 	Backup(info client.BackupInfo) error

@@ -64,6 +64,7 @@ func Init() {
 
 		migrations.AddTablePHPExtensions,
 		migrations.AddTableDatabasePostgresql,
+		migrations.AddPostgresqlSuperUser,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

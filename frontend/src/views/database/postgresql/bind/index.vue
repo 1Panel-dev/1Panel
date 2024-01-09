@@ -7,11 +7,15 @@
             <el-form v-loading="loading" ref="changeFormRef" :model="form" :rules="rules" label-position="top">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
-                        <el-form-item :label="$t('database.pgBind')" prop="username">
+                        <el-alert type="warning" :title="$t('database.pgBindHelper')" :closable="false" />
+                        <el-form-item class="mt-5" :label="$t('database.userBind')" prop="username">
                             <el-input v-model="form.username" />
                         </el-form-item>
                         <el-form-item :label="$t('commons.login.password')" prop="password">
                             <el-input type="password" clearable show-password v-model="form.password" />
+                        </el-form-item>
+                        <el-form-item :label="$t('database.permission')" prop="superUser">
+                            <el-checkbox v-model="form.superUser">{{ $t('database.pgSuperUser') }}</el-checkbox>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -49,6 +53,7 @@ const form = reactive({
     name: '',
     username: '',
     password: '',
+    superUser: true,
 });
 const confirmDialogRef = ref();
 
@@ -81,6 +86,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             database: form.database,
             username: form.username,
             password: form.password,
+            superUser: form.superUser,
         };
         loading.value = true;
         await bindPostgresqlUser(param)

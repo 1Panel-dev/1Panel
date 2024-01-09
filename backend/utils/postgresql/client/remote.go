@@ -65,6 +65,18 @@ func (r *Remote) CreateUser(info CreateInfo, withDeleteDB bool) error {
 		}
 		return err
 	}
+	if info.SuperUser {
+		if err := r.ChangePrivileges(Privileges{SuperUser: true, Username: info.Username, Timeout: info.Timeout}); err != nil {
+			if withDeleteDB {
+				_ = r.Delete(DeleteInfo{
+					Name:        info.Name,
+					Username:    info.Username,
+					ForceDelete: true,
+					Timeout:     300})
+			}
+			return err
+		}
+	}
 	grantSql := fmt.Sprintf("GRANT ALL PRIVILEGES ON DATABASE \"%s\" TO \"%s\"", info.Name, info.Username)
 	if err := r.ExecSQL(grantSql, info.Timeout); err != nil {
 		if withDeleteDB {
@@ -95,6 +107,14 @@ func (r *Remote) Delete(info DeleteInfo) error {
 		return err
 	}
 	return nil
+}
+
+func (r *Remote) ChangePrivileges(info Privileges) error {
+	super := "SUPERUSER"
+	if !info.SuperUser {
+		super = "NOSUPERUSER"
+	}
+	return r.ExecSQL(fmt.Sprintf("ALTER USER \"%s\" WITH %s", info.Username, super), info.Timeout)
 }
 
 func (r *Remote) ChangePassword(info PasswordChangeInfo) error {

@@ -27,6 +27,9 @@ export const addPostgresqlDB = (params: Database.PostgresqlDBCreate) => {
 export const bindPostgresqlUser = (params: Database.PgBind) => {
     return http.post(`/databases/pg/bind`, params, TimeoutEnum.T_40S);
 };
+export const changePrivileges = (params: Database.PgChangePrivileges) => {
+    return http.post(`/databases/pg/privileges`, params, TimeoutEnum.T_40S);
+};
 export const searchPostgresqlDBs = (params: Database.SearchDBWithPage) => {
     return http.post<ResPage<Database.PostgresqlDBInfo>>(`/databases/pg/search`, params);
 };

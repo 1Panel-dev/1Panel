@@ -148,3 +148,13 @@ var AddTableDatabasePostgresql = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddPostgresqlSuperUser = &gormigrate.Migration{
+	ID: "20231225-add-postgresql-super_user",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.DatabasePostgresql{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}

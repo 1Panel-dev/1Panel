@@ -5016,6 +5016,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/databases/pg/privileges": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "修改 postgresql 用户权限",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Database Postgresql"
+                ],
+                "summary": "Change postgresql privileges",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ChangeDBInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "database",
+                        "username"
+                    ],
+                    "formatEN": "Update [user] privileges of database [database]",
+                    "formatZH": "更新数据库 [database] 用户 [username] 权限",
+                    "paramKeys": []
+                }
+            }
+        },
         "/databases/pg/search": {
             "post": {
                 "security": [
@@ -16942,6 +16985,9 @@ const docTemplate = `{
                 "password": {
                     "type": "string"
                 },
+                "superUser": {
+                    "type": "boolean"
+                },
                 "username": {
                     "type": "string"
                 }
@@ -16954,7 +17000,6 @@ const docTemplate = `{
                 "from",
                 "name",
                 "password",
-                "permission",
                 "username"
             ],
             "properties": {
@@ -16980,8 +17025,8 @@ const docTemplate = `{
                 "password": {
                     "type": "string"
                 },
-                "permission": {
-                    "type": "string"
+                "superUser": {
+                    "type": "boolean"
                 },
                 "username": {
                     "type": "string"

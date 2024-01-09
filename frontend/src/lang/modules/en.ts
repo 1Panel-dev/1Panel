@@ -383,7 +383,9 @@ const message = {
 
         loadFromRemote: 'Load from server',
         userBind: 'Bind User',
-        pgBind: 'Bind User (Binding existing users is not currently supported)',
+        pgBindHelper:
+            'This operation is used to create a new user and bind it to the target database. Currently, selecting users already existing in the database is not supported.',
+        pgSuperUser: 'Super User',
         loadFromRemoteHelper:
             'This action will synchronize the database info on the server to 1Panel, do you want to continue?',
         passwordHelper: 'Unable to retrieve, please modify',
