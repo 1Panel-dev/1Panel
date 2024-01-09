@@ -101,6 +101,9 @@ interface DialogProps {
 const acceptParams = (params: DialogProps): void => {
     form.database = params.database;
     form.mysqlName = params.mysqlName;
+    form.username = '';
+    form.password = '';
+    form.permission = '%';
     form.from = params.from;
     bindVisible.value = true;
 };

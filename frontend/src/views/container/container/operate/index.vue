@@ -240,7 +240,11 @@
                             {{ $t('container.limitHelper', [limits.cpu]) }}{{ $t('commons.units.core') }}
                         </span>
                     </el-form-item>
-                    <el-form-item :label="$t('container.memoryLimit')" prop="memory">
+                    <el-form-item
+                        :label="$t('container.memoryLimit')"
+                        prop="memory"
+                        :rules="checkFloatNumberRange(0, Number(limits.memory))"
+                    >
                         <el-input class="mini-form-item" v-model="dialogData.rowData!.memory">
                             <template #append><div style="width: 35px">MB</div></template>
                         </el-input>
