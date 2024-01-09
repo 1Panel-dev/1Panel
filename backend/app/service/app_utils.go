@@ -251,6 +251,7 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 					createPostgresql.Format = "UTF8"
 					createPostgresql.Password = dbConfig.Password
 					createPostgresql.From = database.From
+					createPostgresql.SuperUser = true
 					pgdb, err := NewIPostgresqlService().Create(ctx, createPostgresql)
 					if err != nil {
 						return err
@@ -365,6 +366,8 @@ func deleteAppInstall(install model.AppInstall, deleteBackup bool, forceDelete b
 		_ = websiteDomainRepo.DeleteAll(ctx)
 	case constant.AppMysql, constant.AppMariaDB:
 		_ = mysqlRepo.Delete(ctx, mysqlRepo.WithByMysqlName(install.Name))
+	case constant.AppPostgresql:
+		_ = postgresqlRepo.Delete(ctx, postgresqlRepo.WithByPostgresqlName(install.Name))
 	}
 
 	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("app"), commonRepo.WithByName(install.App.Key), backupRepo.WithByDetailName(install.Name))
