@@ -193,6 +193,12 @@ func getRecycleBinDTOFromName(filename string) (*response.RecycleBinDTO, error) 
 	if err != nil {
 		return nil, err
 	}
+
+	// 添加安全检查，确保转换后的值在int类型的范围内
+	if size < math.MinInt || size > math.MaxInt {
+		return nil, fmt.Errorf("size out of int range")
+	}
+
 	deleteTime, err := strconv.ParseInt(matches[3], 10, 64)
 	if err != nil {
 		return nil, err
