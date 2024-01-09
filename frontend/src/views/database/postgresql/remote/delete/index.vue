@@ -66,6 +66,7 @@ interface DialogProps {
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const acceptParams = async (prop: DialogProps) => {
+    deleteInfo.value = '';
     deleteReq.value = {
         id: prop.id,
         database: prop.database,

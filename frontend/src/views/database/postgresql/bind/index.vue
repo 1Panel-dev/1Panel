@@ -69,6 +69,9 @@ interface DialogProps {
 const acceptParams = (params: DialogProps): void => {
     form.database = params.database;
     form.name = params.name;
+    form.username = '';
+    form.password = '';
+    form.superUser = true;
     bindVisible.value = true;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();

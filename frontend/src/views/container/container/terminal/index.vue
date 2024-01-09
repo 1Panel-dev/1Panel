@@ -95,6 +95,7 @@ const initTerm = (formEl: FormInstance | undefined) => {
             endpoint: '/api/v1/containers/exec',
             args: `containerid=${form.containerID}&user=${form.user}&command=${form.command}`,
             error: '',
+            initCmd: '',
         });
     });
 };
