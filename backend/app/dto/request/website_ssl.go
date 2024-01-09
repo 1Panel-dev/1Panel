@@ -32,7 +32,8 @@ type WebsiteSSLRenew struct {
 }
 
 type WebsiteSSLApply struct {
-	ID uint `json:"ID" validate:"required"`
+	ID           uint `json:"ID" validate:"required"`
+	SkipDNSCheck bool `json:"SkipDNSCheck"`
 }
 
 type WebsiteAcmeAccountCreate struct {

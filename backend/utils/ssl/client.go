@@ -80,7 +80,7 @@ type DNSParam struct {
 	APISecret string `json:"apiSecret"`
 }
 
-func (c *AcmeClient) UseDns(dnsType DnsType, params string) error {
+func (c *AcmeClient) UseDns(dnsType DnsType, params string, skipDNSCheck bool) error {
 	var (
 		param DNSParam
 		p     challenge.Provider
@@ -149,6 +149,9 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string) error {
 	}
 	if err != nil {
 		return err
+	}
+	if skipDNSCheck {
+		return c.Client.Challenge.SetDNS01Provider(p, dns01.AddDNSTimeout(10*time.Minute), dns01.DisableCompletePropagationRequirement())
 	}
 
 	return c.Client.Challenge.SetDNS01Provider(p, dns01.AddDNSTimeout(10*time.Minute))

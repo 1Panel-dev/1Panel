@@ -203,6 +203,7 @@ export namespace Website {
     export interface AcmeAccount extends CommonModel {
         email: string;
         url: string;
+        type: string;
     }
 
     export interface AcmeAccountCreate {
@@ -462,6 +463,7 @@ export namespace Website {
 
     export interface SSLObtain {
         ID: number;
+        skipDNSCheck: boolean;
     }
 
     export interface CA extends CommonModel {

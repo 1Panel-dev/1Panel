@@ -40,9 +40,20 @@
                             <el-option
                                 v-for="(acme, index) in acmeAccounts"
                                 :key="index"
-                                :label="acme.email"
+                                :label="acme.email + ' [' + getAccountName(acme.type) + '] '"
                                 :value="acme.id"
-                            ></el-option>
+                            >
+                                <el-row>
+                                    <el-col :span="6">
+                                        <span>{{ acme.email }}</span>
+                                    </el-col>
+                                    <el-col :span="11">
+                                        <span>
+                                            <el-tag type="success">{{ getAccountName(acme.type) }}</el-tag>
+                                        </span>
+                                    </el-col>
+                                </el-row>
+                            </el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item :label="$t('website.keyType')" prop="keyType">
@@ -80,7 +91,7 @@
                             <el-option
                                 v-for="(dns, index) in dnsAccounts"
                                 :key="index"
-                                :label="dns.name"
+                                :label="dns.name + ' [' + getDNSName(dns.type) + '] '"
                                 :value="dns.id"
                             >
                                 <el-row>
@@ -89,7 +100,7 @@
                                     </el-col>
                                     <el-col :span="11">
                                         <span>
-                                            <el-tag type="success">{{ dns.type }}</el-tag>
+                                            <el-tag type="success">{{ getDNSName(dns.type) }}</el-tag>
                                         </span>
                                     </el-col>
                                 </el-row>
@@ -136,6 +147,7 @@ import { FormInstance } from 'element-plus';
 import { computed, reactive, ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
 import { KeyTypes } from '@/global/mimetype';
+import { getDNSName, getAccountName } from '@/utils/util';
 
 const props = defineProps({
     id: {
