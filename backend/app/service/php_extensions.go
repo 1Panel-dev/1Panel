@@ -62,7 +62,7 @@ func (p PHPExtensionsService) List() ([]response.PHPExtensionsDTO, error) {
 
 func (p PHPExtensionsService) Create(req request.PHPExtensionsCreate) error {
 	exist, _ := phpExtensionsRepo.GetFirst(commonRepo.WithByName(req.Name))
-	if exist.ID == 0 {
+	if exist.ID > 0 {
 		return buserr.New(constant.ErrNameIsExist)
 	}
 	extension := model.PHPExtensions{

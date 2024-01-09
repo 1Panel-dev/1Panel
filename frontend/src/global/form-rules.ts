@@ -478,7 +478,7 @@ const checkPHPExtensions = (rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.phpExtension')));
     } else {
-        const reg = /^[a-z0-9,_]{3,300}$/;
+        const reg = /^[a-z0-9,_]{1,300}$/;
         if (!reg.test(value)) {
             callback(new Error(i18n.global.t('commons.rule.phpExtension')));
         } else {

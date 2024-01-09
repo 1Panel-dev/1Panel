@@ -54,7 +54,7 @@ const loading = ref(false);
 const updateID = ref(0);
 const extensionsForm = ref<FormInstance>();
 const rules = ref({
-    name: [Rules.requiredInput],
+    name: [Rules.requiredInput, Rules.name],
     extensions: [Rules.requiredInput, Rules.phpExtensions],
 });
 const em = defineEmits(['close']);
