@@ -191,7 +191,7 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 		if err != nil {
 			return err
 		}
-		if err = client.UseDns(ssl.DnsType(dnsAccount.Type), dnsAccount.Authorization); err != nil {
+		if err = client.UseDns(ssl.DnsType(dnsAccount.Type), dnsAccount.Authorization, apply.SkipDNSCheck); err != nil {
 			return err
 		}
 	case constant.Http:

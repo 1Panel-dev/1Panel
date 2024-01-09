@@ -20482,6 +20482,9 @@
             "properties": {
                 "ID": {
                     "type": "integer"
+                },
+                "SkipDNSCheck": {
+                    "type": "boolean"
                 }
             }
         },
