@@ -19,7 +19,7 @@ type PostgresqlDBInfo struct {
 	Format         string    `json:"format"`
 	Username       string    `json:"username"`
 	Password       string    `json:"password"`
-	Permission     string    `json:"permission"`
+	SuperUser      bool      `json:"superUser"`
 	BackupCount    int       `json:"backupCount"`
 	Description    string    `json:"description"`
 }
@@ -39,15 +39,23 @@ type PostgresqlDBCreate struct {
 	Format      string `json:"format"`
 	Username    string `json:"username" validate:"required"`
 	Password    string `json:"password" validate:"required"`
-	Permission  string `json:"permission" validate:"required"`
+	SuperUser   bool   `json:"superUser"`
 	Description string `json:"description"`
 }
 
 type PostgresqlBindUser struct {
-	Name     string `json:"name" validate:"required"`
-	Database string `json:"database" validate:"required"`
-	Username string `json:"username" validate:"required"`
-	Password string `json:"password" validate:"required"`
+	Name      string `json:"name" validate:"required"`
+	Database  string `json:"database" validate:"required"`
+	Username  string `json:"username" validate:"required"`
+	Password  string `json:"password" validate:"required"`
+	SuperUser bool   `json:"superUser"`
+}
+
+type PostgresqlPrivileges struct {
+	Name      string `json:"name" validate:"required"`
+	Database  string `json:"database" validate:"required"`
+	Username  string `json:"username" validate:"required"`
+	SuperUser bool   `json:"superUser"`
 }
 
 type PostgresqlLoadDB struct {

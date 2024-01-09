@@ -20,6 +20,9 @@
                                 </template>
                             </el-input>
                         </el-form-item>
+                        <el-form-item :label="$t('database.permission')" prop="superUser">
+                            <el-checkbox v-model="form.superUser">{{ $t('database.pgSuperUser') }}</el-checkbox>
+                        </el-form-item>
 
                         <el-form-item :label="$t('commons.table.type')" prop="database">
                             <el-tag>{{ form.database + ' [' + form.type + ']' }}</el-tag>
@@ -66,8 +69,7 @@ const form = reactive({
     format: '',
     username: '',
     password: '',
-    permission: '',
-    permissionIPs: '',
+    superUser: true,
     description: '',
 });
 const rules = reactive({
@@ -91,8 +93,7 @@ const acceptParams = (params: DialogProps): void => {
     form.database = params.database;
     form.format = 'UTF8';
     form.username = '';
-    form.permission = '%';
-    form.permissionIPs = '';
+    form.superUser = true;
     form.description = '';
     random();
     createVisible.value = true;

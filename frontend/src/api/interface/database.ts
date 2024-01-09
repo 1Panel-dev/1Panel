@@ -151,6 +151,13 @@ export namespace Database {
         database: string;
         username: string;
         password: string;
+        superUser: boolean;
+    }
+    export interface PgChangePrivileges {
+        name: string;
+        database: string;
+        username: string;
+        superUser: boolean;
     }
     export interface PostgresqlDBDelete {
         id: number;
@@ -158,18 +165,6 @@ export namespace Database {
         database: string;
         forceDelete: boolean;
         deleteBackup: boolean;
-    }
-    export interface PostgresqlStatus {
-        uptime: string;
-        version: string;
-        max_connections: string;
-        autovacuum: string;
-        current_connections: string;
-        hit_ratio: string;
-        shared_buffers: string;
-        buffers_clean: string;
-        maxwritten_clean: string;
-        buffers_backend_fsync: string;
     }
     export interface PostgresqlDBDeleteCheck {
         id: number;
@@ -199,7 +194,7 @@ export namespace Database {
         format: string;
         username: string;
         password: string;
-        permission: string;
+        superUser: boolean;
         description: string;
     }
     export interface PostgresqlDBInfo {
@@ -211,7 +206,7 @@ export namespace Database {
         format: string;
         username: string;
         password: string;
-        permission: string;
+        superUser: boolean;
         description: string;
     }
     export interface ChangeInfo {

@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"io/fs"
 	"os"
 	"path"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -307,13 +308,13 @@ func reCreatePostgresqlDB(dbID uint, database model.Database, oldEnv string) (*m
 	oldUser, _ := envMap["PANEL_DB_USER"].(string)
 	oldPassword, _ := envMap["PANEL_DB_USER_PASSWORD"].(string)
 	createDB, err := postgresqlService.Create(context.Background(), dto.PostgresqlDBCreate{
-		Name:       oldName,
-		From:       database.From,
-		Database:   database.Name,
-		Format:     "UTF8",
-		Username:   oldUser,
-		Password:   oldPassword,
-		Permission: "%",
+		Name:      oldName,
+		From:      database.From,
+		Database:  database.Name,
+		Format:    "UTF8",
+		Username:  oldUser,
+		Password:  oldPassword,
+		SuperUser: true,
 	})
 	if err != nil {
 		return nil, envMap, err

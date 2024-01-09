@@ -46,6 +46,15 @@ func (r *Local) Create(info CreateInfo) error {
 	return nil
 }
 
+func (r *Local) ChangePrivileges(info Privileges) error {
+	super := "SUPERUSER"
+	if !info.SuperUser {
+		super = "NOSUPERUSER"
+	}
+	changeSql := fmt.Sprintf("ALTER USER \"%s\" WITH %s", info.Username, super)
+	return r.ExecSQL(changeSql, info.Timeout)
+}
+
 func (r *Local) CreateUser(info CreateInfo, withDeleteDB bool) error {
 	createSql := fmt.Sprintf("CREATE USER \"%s\" WITH PASSWORD '%s'", info.Username, info.Password)
 	if err := r.ExecSQL(createSql, info.Timeout); err != nil {
@@ -60,6 +69,18 @@ func (r *Local) CreateUser(info CreateInfo, withDeleteDB bool) error {
 				Timeout:     300})
 		}
 		return err
+	}
+	if info.SuperUser {
+		if err := r.ChangePrivileges(Privileges{SuperUser: true, Username: info.Username, Timeout: info.Timeout}); err != nil {
+			if withDeleteDB {
+				_ = r.Delete(DeleteInfo{
+					Name:        info.Name,
+					Username:    info.Username,
+					ForceDelete: true,
+					Timeout:     300})
+			}
+			return err
+		}
 	}
 	grantStr := fmt.Sprintf("GRANT ALL PRIVILEGES ON DATABASE \"%s\" TO \"%s\"", info.Name, info.Username)
 	if err := r.ExecSQL(grantStr, info.Timeout); err != nil {

@@ -29,6 +29,7 @@ type IPostgresqlService interface {
 	BindUser(req dto.PostgresqlBindUser) error
 	Create(ctx context.Context, req dto.PostgresqlDBCreate) (*model.DatabasePostgresql, error)
 	LoadFromRemote(database string) error
+	ChangePrivileges(req dto.PostgresqlPrivileges) error
 	ChangePassword(info dto.ChangeDBInfo) error
 	UpdateDescription(req dto.UpdateDescription) error
 	DeleteCheck(req dto.PostgresqlDBDeleteCheck) ([]string, error)
@@ -84,6 +85,9 @@ func (u *PostgresqlService) ListDBOption() ([]dto.PostgresqlOption, error) {
 }
 
 func (u *PostgresqlService) BindUser(req dto.PostgresqlBindUser) error {
+	if cmd.CheckIllegal(req.Name, req.Username, req.Password) {
+		return buserr.New(constant.ErrCmdIllegal)
+	}
 	dbItem, err := postgresqlRepo.Get(postgresqlRepo.WithByPostgresqlName(req.Database), commonRepo.WithByName(req.Name))
 	if err != nil {
 		return err
@@ -94,10 +98,11 @@ func (u *PostgresqlService) BindUser(req dto.PostgresqlBindUser) error {
 		return err
 	}
 	if err := pgClient.CreateUser(client.CreateInfo{
-		Name:     req.Name,
-		Username: req.Username,
-		Password: req.Password,
-		Timeout:  300,
+		Name:      req.Name,
+		Username:  req.Username,
+		Password:  req.Password,
+		SuperUser: req.SuperUser,
+		Timeout:   300,
 	}, false); err != nil {
 		return err
 	}
@@ -106,8 +111,9 @@ func (u *PostgresqlService) BindUser(req dto.PostgresqlBindUser) error {
 		return fmt.Errorf("decrypt database db password failed, err: %v", err)
 	}
 	if err := postgresqlRepo.Update(dbItem.ID, map[string]interface{}{
-		"username": req.Username,
-		"password": pass,
+		"username":   req.Username,
+		"password":   pass,
+		"super_user": req.SuperUser,
 	}); err != nil {
 		return err
 	}
@@ -142,10 +148,11 @@ func (u *PostgresqlService) Create(ctx context.Context, req dto.PostgresqlDBCrea
 	createItem.PostgresqlName = req.Database
 	defer cli.Close()
 	if err := cli.Create(client.CreateInfo{
-		Name:     req.Name,
-		Username: req.Username,
-		Password: req.Password,
-		Timeout:  300,
+		Name:      req.Name,
+		Username:  req.Username,
+		Password:  req.Password,
+		SuperUser: req.SuperUser,
+		Timeout:   300,
 	}); err != nil {
 		return nil, err
 	}
@@ -303,6 +310,31 @@ func (u *PostgresqlService) Delete(ctx context.Context, req dto.PostgresqlDBDele
 	}
 
 	_ = postgresqlRepo.Delete(ctx, commonRepo.WithByID(db.ID))
+	return nil
+}
+
+func (u *PostgresqlService) ChangePrivileges(req dto.PostgresqlPrivileges) error {
+	if cmd.CheckIllegal(req.Database, req.Username) {
+		return buserr.New(constant.ErrCmdIllegal)
+	}
+	dbItem, err := postgresqlRepo.Get(postgresqlRepo.WithByPostgresqlName(req.Database), commonRepo.WithByName(req.Name))
+	if err != nil {
+		return err
+	}
+	cli, err := LoadPostgresqlClientByFrom(req.Database)
+	if err != nil {
+		return err
+	}
+	defer cli.Close()
+
+	if err := cli.ChangePrivileges(client.Privileges{Username: req.Username, SuperUser: req.SuperUser, Timeout: 300}); err != nil {
+		return err
+	}
+	if err := postgresqlRepo.Update(dbItem.ID, map[string]interface{}{
+		"super_user": req.SuperUser,
+	}); err != nil {
+		return err
+	}
 	return nil
 }
 

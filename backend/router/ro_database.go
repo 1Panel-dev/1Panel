@@ -60,6 +60,7 @@ func (s *DatabaseRouter) InitRouter(Router *gin.RouterGroup) {
 		cmdRouter.POST("/pg/bind", baseApi.BindPostgresqlUser)
 		cmdRouter.POST("/pg/del/check", baseApi.DeleteCheckPostgresql)
 		cmdRouter.POST("/pg/del", baseApi.DeletePostgresql)
+		cmdRouter.POST("/pg/privileges", baseApi.ChangePostgresqlPrivileges)
 		cmdRouter.POST("/pg/password", baseApi.ChangePostgresqlPassword)
 		cmdRouter.POST("/pg/description", baseApi.UpdatePostgresqlDescription)
 	}
