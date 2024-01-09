@@ -294,10 +294,6 @@ func (b *BaseApi) LoadRemoteAccess(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	if req.Type == constant.AppPostgresql {
-		helper.SuccessWithData(c, true)
-		return
-	}
 	isRemote, err := mysqlService.LoadRemoteAccess(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
