@@ -28,6 +28,7 @@ type ImageService struct{}
 type IImageService interface {
 	Page(req dto.SearchWithPage) (int64, interface{}, error)
 	List() ([]dto.Options, error)
+	ListAll() ([]dto.ImageInfo, error)
 	ImageBuild(req dto.ImageBuild) (string, error)
 	ImagePull(req dto.ImagePull) (string, error)
 	ImageLoad(req dto.ImageLoad) error
@@ -95,6 +96,30 @@ func (u *ImageService) Page(req dto.SearchWithPage) (int64, interface{}, error) 
 	}
 
 	return int64(total), backDatas, nil
+}
+
+func (u *ImageService) ListAll() ([]dto.ImageInfo, error) {
+	var records []dto.ImageInfo
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return nil, err
+	}
+	list, err := client.ImageList(context.Background(), types.ImageListOptions{})
+	if err != nil {
+		return nil, err
+	}
+	containers, _ := client.ContainerList(context.Background(), types.ContainerListOptions{All: true})
+	for _, image := range list {
+		size := formatFileSize(image.Size)
+		records = append(records, dto.ImageInfo{
+			ID:        image.ID,
+			Tags:      image.RepoTags,
+			IsUsed:    checkUsed(image.ID, containers),
+			CreatedAt: time.Unix(image.Created, 0),
+			Size:      size,
+		})
+	}
+	return records, nil
 }
 
 func (u *ImageService) List() ([]dto.Options, error) {

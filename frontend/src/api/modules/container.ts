@@ -53,6 +53,9 @@ export const inspect = (params: Container.ContainerInspect) => {
 export const searchImage = (params: SearchWithPage) => {
     return http.post<ResPage<Container.ImageInfo>>(`/containers/image/search`, params);
 };
+export const listAllImage = () => {
+    return http.get<Array<Container.ImageInfo>>(`/containers/image/all`);
+};
 export const listImage = () => {
     return http.get<Array<Container.Options>>(`/containers/image`);
 };

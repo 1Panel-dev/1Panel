@@ -1374,6 +1374,21 @@ definitions:
     - from
     - name
     type: object
+  dto.ImageInfo:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: string
+      isUsed:
+        type: boolean
+      size:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+    type: object
   dto.ImageLoad:
     properties:
       path:
@@ -5965,7 +5980,7 @@ paths:
       - Container Docker
   /containers/image:
     get:
-      description: 获取镜像列表
+      description: 获取镜像名称列表
       produces:
       - application/json
       responses:
@@ -5977,7 +5992,24 @@ paths:
             type: array
       security:
       - ApiKeyAuth: []
-      summary: List images
+      summary: load images options
+      tags:
+      - Container Image
+  /containers/image/all:
+    get:
+      description: 获取所有镜像列表
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.ImageInfo'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: List all images
       tags:
       - Container Image
   /containers/image/build:

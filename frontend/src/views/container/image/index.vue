@@ -231,7 +231,7 @@ const onOpenBuild = () => {
 };
 
 const onOpenPrune = () => {
-    dialogPruneRef.value!.acceptParams({ list: data.value });
+    dialogPruneRef.value!.acceptParams();
 };
 
 const onOpenload = () => {
