@@ -21,7 +21,11 @@
                             :stroke-width="12"
                             :percentage="uploadPercent"
                         ></el-progress>
-                        <div v-if="type === 'mysql'" style="width: 80%" class="el-upload__tip">
+                        <div
+                            v-if="type === 'mysql' || type === 'mariadb' || type === 'postgresql'"
+                            style="width: 80%"
+                            class="el-upload__tip"
+                        >
                             <span class="input-help">{{ $t('database.supportUpType') }}</span>
                             <span class="input-help">
                                 {{ $t('database.zipFormat') }}
@@ -130,20 +134,24 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     remark.value = params.remark;
 
     const pathRes = await loadBaseDir();
-    if (type.value === 'mysql') {
-        title.value = name.value + ' [ ' + detailName.value + ' ]';
-    }
-    if (type.value === 'website' || type.value === 'app') {
-        title.value = name.value;
-    }
-    let dir = type.value === 'mysql' || type.value === 'mariadb' ? 'database/' + type.value : type.value;
-    if (detailName.value) {
-        baseDir.value = `${pathRes.data}/uploads/${dir}/${name.value}/${detailName.value}/`;
-    } else {
-        baseDir.value = `${pathRes.data}/uploads/${dir}/${name.value}/`;
-    }
-    if (type.value === 'website') {
-        baseDir.value = `${pathRes.data}/uploads/database/${type.value}/${detailName.value}/`;
+    switch (type.value) {
+        case 'mysql':
+        case 'mariadb':
+        case 'postgresql':
+            title.value = name.value + ' [ ' + detailName.value + ' ]';
+            if (detailName.value) {
+                baseDir.value = `${pathRes.data}/uploads/database/${type.value}/${name.value}/${detailName.value}/`;
+            } else {
+                baseDir.value = `${pathRes.data}/uploads/database/${type.value}/${name.value}/`;
+            }
+            break;
+        case 'website':
+            title.value = name.value;
+            baseDir.value = `${pathRes.data}/uploads/database/${type.value}/${detailName.value}/`;
+            break;
+        case 'app':
+            title.value = name.value;
+            baseDir.value = `${pathRes.data}/uploads/database/${type.value}/${name.value}/`;
     }
     upVisible.value = true;
     search();
