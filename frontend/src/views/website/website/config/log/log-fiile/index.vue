@@ -7,7 +7,7 @@
         </div>
         <LogFile :config="{ id: id, type: 'website', name: logType }" :style="style">
             <template #button>
-                <el-button @click="cleanLog" icon="Delete" :disabled="data.content === ''">
+                <el-button @click="cleanLog" icon="Delete">
                     {{ $t('commons.button.clean') }}
                 </el-button>
             </template>
