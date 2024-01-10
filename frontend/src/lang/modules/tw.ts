@@ -776,7 +776,7 @@ const message = {
         target: '備份到',
         targetHelper: '第三方備份賬號在面板設置中維護',
         retainCopies: '保留份數',
-        retainCopiesHelper: '執行記錄、日誌文件、備份文件保留份數',
+        retainCopiesHelper: '執行記錄保留份數',
         cronSpecRule: '請輸入正確的執行周期',
         perMonth: '每月',
         perWeek: '每周',

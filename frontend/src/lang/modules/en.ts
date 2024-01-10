@@ -815,7 +815,7 @@ const message = {
         target: 'Target',
         targetHelper: 'Third-party backup accounts are maintained in panel settings.',
         retainCopies: 'Retain copies',
-        retainCopiesHelper: 'Number of copies of execution records, log files, and backup files',
+        retainCopiesHelper: 'Retention of Execution Records',
         cronSpecRule: 'Please enter a correct lifecycle',
         perMonth: 'Every monthly',
         perWeek: 'Every week',
