@@ -26,12 +26,10 @@
                     <el-form-item :label="$t('commons.login.password')" :rules="Rules.paramComplexity" prop="password">
                         <el-input type="password" show-password clearable v-model="form.password">
                             <template #append>
-                                <el-button-group>
-                                    <CopyButton :content="form.password" />
-                                    <el-button @click="random">
-                                        {{ $t('commons.button.random') }}
-                                    </el-button>
-                                </el-button-group>
+                                <CopyButton :content="form.password" />
+                                <el-button @click="random" class="p-ml-5">
+                                    {{ $t('commons.button.random') }}
+                                </el-button>
                             </template>
                         </el-input>
                     </el-form-item>
