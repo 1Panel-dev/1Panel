@@ -156,7 +156,8 @@ const message = {
             requiredInput: 'Please enter the required fields',
             requiredSelect: 'Please select the required fields',
             illegalInput: 'There are illegal characters in the input box.',
-            commonName: 'Support English, Chinese, numbers, .-, and _ length 1-128',
+            commonName:
+                'Supports non-special characters starting with English, Chinese, numbers, .- and _, length 1-128',
             userName: 'Support English, Chinese, numbers and _ length 3-30',
             simpleName: 'Supports non-underscore starting, English, numbers, _, length 1-30',
             dbName: 'Supports non-special character starting, including English, Chinese, numbers, .-_, with a length of 1-64',

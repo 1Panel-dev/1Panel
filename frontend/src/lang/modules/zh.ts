@@ -157,7 +157,7 @@ const message = {
             requiredInput: '请填写必填项',
             requiredSelect: '请选择必选项',
             illegalInput: '输入框中存在不合法字符',
-            commonName: '支持英文、中文、数字、.-和_,长度1-128',
+            commonName: '支持非特殊字符开头,英文、中文、数字、.-和_,长度1-128',
             userName: '支持英文、中文、数字和_,长度3-30',
             simpleName: '支持非下划线开头，英文、数字、_,长度3-30',
             dbName: '支持非特殊字符开头，英文、中文、数字、.-_,长度1-64',
