@@ -332,7 +332,11 @@ const acceptParams = (params: DialogProps): void => {
     loadAppInstalls();
     loadWebsites();
     loadContainers();
-    loadDatabases();
+    if (dialogData.value.rowData?.dbType) {
+        loadDatabases(dialogData.value.rowData.dbType);
+    } else {
+        loadDatabases('mysql');
+    }
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -477,8 +481,8 @@ const hasHour = () => {
     );
 };
 
-const loadDatabases = async () => {
-    const data = await listDbItems(dialogData.value.rowData.dbType);
+const loadDatabases = async (dbType: string) => {
+    const data = await listDbItems(dbType);
     dbInfo.dbs = data.data || [];
 };
 
