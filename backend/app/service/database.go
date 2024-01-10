@@ -233,8 +233,14 @@ func (u *DatabaseService) Delete(req dto.DatabaseDelete) error {
 		return err
 	}
 	if db.From != "local" {
-		if err := mysqlRepo.Delete(context.Background(), mysqlRepo.WithByMysqlName(db.Name)); err != nil && !req.ForceDelete {
-			return err
+		if db.Type == "mysql" || db.Type == "mariadb" {
+			if err := mysqlRepo.Delete(context.Background(), mysqlRepo.WithByMysqlName(db.Name)); err != nil && !req.ForceDelete {
+				return err
+			}
+		} else {
+			if err := postgresqlRepo.Delete(context.Background(), mysqlRepo.WithByMysqlName(db.Name)); err != nil && !req.ForceDelete {
+				return err
+			}
 		}
 	}
 	return nil
