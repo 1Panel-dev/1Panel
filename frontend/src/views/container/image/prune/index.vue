@@ -48,8 +48,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Container } from '@/api/interface/container';
-import { containerPrune } from '@/api/modules/container';
+import { containerPrune, listAllImage } from '@/api/modules/container';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { computeSize } from '@/utils/util';
@@ -61,11 +60,9 @@ const loading = ref();
 const unTagList = ref();
 const unUsedList = ref();
 
-interface DialogProps {
-    list: Array<Container.ImageInfo>;
-}
-const acceptParams = (params: DialogProps): void => {
-    let list = params.list || [];
+const acceptParams = async (): Promise<void> => {
+    const res = await listAllImage();
+    let list = res.data || [];
     unTagList.value = [];
     unUsedList.value = [];
     for (const item of list) {
