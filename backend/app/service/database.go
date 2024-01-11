@@ -238,7 +238,7 @@ func (u *DatabaseService) Delete(req dto.DatabaseDelete) error {
 				return err
 			}
 		} else {
-			if err := postgresqlRepo.Delete(context.Background(), mysqlRepo.WithByMysqlName(db.Name)); err != nil && !req.ForceDelete {
+			if err := postgresqlRepo.Delete(context.Background(), postgresqlRepo.WithByPostgresqlName(db.Name)); err != nil && !req.ForceDelete {
 				return err
 			}
 		}

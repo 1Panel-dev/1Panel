@@ -7,7 +7,6 @@ import (
 	"path"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/buserr"
@@ -351,8 +350,6 @@ func (u *CronjobService) handleCutWebsiteLog(cronjob *model.Cronjob, startTime t
 	}
 	baseDir := path.Join(nginx.GetPath(), "www", "sites")
 	fileOp := files.NewFileOp()
-	var wg sync.WaitGroup
-	wg.Add(len(websites))
 	for _, website := range websites {
 		websiteLogDir := path.Join(baseDir, website.Alias, "log")
 		srcAccessLogPath := path.Join(websiteLogDir, "access.log")
@@ -380,7 +377,6 @@ func (u *CronjobService) handleCutWebsiteLog(cronjob *model.Cronjob, startTime t
 		global.LOG.Infof(msg)
 		msgs = append(msgs, msg)
 	}
-	wg.Wait()
 	u.HandleRmExpired("LOCAL", "", "", cronjob, nil)
 	return msgs, strings.Join(filePaths, ","), err
 }
