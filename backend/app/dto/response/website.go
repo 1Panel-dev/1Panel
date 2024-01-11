@@ -13,6 +13,12 @@ type WebsiteDTO struct {
 	RuntimeName   string `json:"runtimeName"`
 }
 
+type WebsiteOption struct {
+	ID            uint   `json:"id"`
+	PrimaryDomain string `json:"primaryDomain"`
+	Alias         string `json:"alias"`
+}
+
 type WebsitePreInstallCheck struct {
 	Name    string `json:"name"`
 	Status  string `json:"status"`

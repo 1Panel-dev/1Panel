@@ -141,7 +141,17 @@
                                 :label="$t('commons.table.all')"
                                 value="all"
                             />
-                            <el-option v-for="item in websiteOptions" :key="item" :value="item" :label="item" />
+                            <el-option
+                                v-for="(item, index) in websiteOptions"
+                                :key="index"
+                                :value="item.id + ''"
+                                :label="item.primaryDomain"
+                            >
+                                <span>{{ item.primaryDomain }}</span>
+                                <el-tag class="tagClass">
+                                    {{ item.alias }}
+                                </el-tag>
+                            </el-option>
                         </el-select>
                         <span class="input-help" v-if="dialogData.rowData!.type === 'cutWebsiteLog'">
                             {{ $t('cronjob.cutWebsiteLogHelper') }}
@@ -351,7 +361,7 @@ const handleClose = () => {
 const localDirID = ref();
 
 const containerOptions = ref();
-const websiteOptions = ref();
+const websiteOptions = ref([]);
 const backupOptions = ref();
 const appOptions = ref();
 

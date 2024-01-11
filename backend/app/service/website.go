@@ -9,7 +9,6 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"os"
 	"path"
 	"reflect"
@@ -18,6 +17,9 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
+	"github.com/jinzhu/copier"
 
 	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"github.com/spf13/afero"
@@ -55,7 +57,7 @@ type IWebsiteService interface {
 	GetWebsites() ([]response.WebsiteDTO, error)
 	CreateWebsite(create request.WebsiteCreate) error
 	OpWebsite(req request.WebsiteOp) error
-	GetWebsiteOptions() ([]string, error)
+	GetWebsiteOptions() ([]response.WebsiteOption, error)
 	UpdateWebsite(req request.WebsiteUpdate) error
 	DeleteWebsite(req request.WebsiteDelete) error
 	GetWebsite(id uint) (response.WebsiteDTO, error)
@@ -348,14 +350,18 @@ func (w WebsiteService) OpWebsite(req request.WebsiteOp) error {
 	return websiteRepo.Save(context.Background(), &website)
 }
 
-func (w WebsiteService) GetWebsiteOptions() ([]string, error) {
-	webs, err := websiteRepo.GetBy()
+func (w WebsiteService) GetWebsiteOptions() ([]response.WebsiteOption, error) {
+	webs, err := websiteRepo.List()
 	if err != nil {
 		return nil, err
 	}
-	var datas []string
+	var datas []response.WebsiteOption
 	for _, web := range webs {
-		datas = append(datas, web.PrimaryDomain)
+		var item response.WebsiteOption
+		if err := copier.Copy(&item, &web); err != nil {
+			return nil, err
+		}
+		datas = append(datas, item)
 	}
 	return datas, nil
 }
