@@ -499,11 +499,13 @@ const back = () => {
 
 const jump = async (url: string) => {
     const oldUrl = req.path;
+    const oldPageSize = req.pageSize;
     // reset search params before exec jump
     Object.assign(req, initData());
     req.path = url;
     req.containSub = false;
     req.search = '';
+    req.pageSize = oldPageSize;
     let searchResult = await searchFile();
 
     globalStore.setLastFilePath(req.path);
