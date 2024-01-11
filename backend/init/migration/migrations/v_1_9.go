@@ -132,6 +132,12 @@ var AddTableDatabasePostgresql = &gormigrate.Migration{
 			return err
 		}
 		for _, job := range jobs {
+			if job.DBName == "all" {
+				if err := tx.Model(&model.Cronjob{}).Where("id = ?", job.ID).Update("db_type", "mysql").Error; err != nil {
+					global.LOG.Errorf("update db type of cronjob %s failed, err: %v", job.Name, err)
+					continue
+				}
+			}
 			var db model.DatabaseMysql
 			if err := tx.Where("id == ?", job.DBName).First(&db).Error; err != nil {
 				continue
@@ -155,6 +161,30 @@ var AddPostgresqlSuperUser = &gormigrate.Migration{
 		if err := tx.AutoMigrate(&model.DatabasePostgresql{}); err != nil {
 			return err
 		}
+		return nil
+	},
+}
+
+var UpdateCronjobWithWebsite = &gormigrate.Migration{
+	ID: "20230809-update-cronjob-with-website",
+	Migrate: func(tx *gorm.DB) error {
+		var cronjobs []model.Cronjob
+		if err := tx.Where("(type = ? OR type = ?) AND website != ?", "website", "cutWebsiteLog", "all").Find(&cronjobs).Error; err != nil {
+			return err
+		}
+
+		for _, job := range cronjobs {
+			var web model.Website
+			if err := tx.Where("primary_domain = ?", job.Website).First(&web).Error; err != nil {
+				continue
+			}
+			if err := tx.Model(&model.Cronjob{}).
+				Where("id = ?", job.ID).
+				Updates(map[string]interface{}{"website": web.ID}).Error; err != nil {
+				continue
+			}
+		}
+
 		return nil
 	},
 }

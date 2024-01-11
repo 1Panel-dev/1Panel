@@ -340,20 +340,11 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, backup model.Back
 
 func (u *CronjobService) handleCutWebsiteLog(cronjob *model.Cronjob, startTime time.Time) ([]string, string, error) {
 	var (
-		websites  []string
 		err       error
 		filePaths []string
 		msgs      []string
 	)
-	if cronjob.Website == "all" {
-		websites, _ = NewIWebsiteService().GetWebsiteOptions()
-		if len(websites) == 0 {
-			return msgs, "", nil
-		}
-	} else {
-		websites = append(websites, cronjob.Website)
-	}
-
+	websites := loadWebsForJob(*cronjob)
 	nginx, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return msgs, "", nil
@@ -362,42 +353,32 @@ func (u *CronjobService) handleCutWebsiteLog(cronjob *model.Cronjob, startTime t
 	fileOp := files.NewFileOp()
 	var wg sync.WaitGroup
 	wg.Add(len(websites))
-	for _, websiteName := range websites {
-		name := websiteName
-		go func() {
-			website, _ := websiteRepo.GetFirst(websiteRepo.WithDomain(name))
-			if website.ID == 0 {
-				wg.Done()
-				return
-			}
-			websiteLogDir := path.Join(baseDir, website.Alias, "log")
-			srcAccessLogPath := path.Join(websiteLogDir, "access.log")
-			srcErrorLogPath := path.Join(websiteLogDir, "error.log")
-			dstLogDir := path.Join(global.CONF.System.Backup, "log", "website", website.Alias)
-			if !fileOp.Stat(dstLogDir) {
-				_ = os.MkdirAll(dstLogDir, 0755)
-			}
+	for _, website := range websites {
+		websiteLogDir := path.Join(baseDir, website.Alias, "log")
+		srcAccessLogPath := path.Join(websiteLogDir, "access.log")
+		srcErrorLogPath := path.Join(websiteLogDir, "error.log")
+		dstLogDir := path.Join(global.CONF.System.Backup, "log", "website", website.Alias)
+		if !fileOp.Stat(dstLogDir) {
+			_ = os.MkdirAll(dstLogDir, 0755)
+		}
 
-			dstName := fmt.Sprintf("%s_log_%s.gz", website.PrimaryDomain, startTime.Format("20060102150405"))
-			dstFilePath := path.Join(dstLogDir, dstName)
-			filePaths = append(filePaths, dstFilePath)
+		dstName := fmt.Sprintf("%s_log_%s.gz", website.PrimaryDomain, startTime.Format("20060102150405"))
+		dstFilePath := path.Join(dstLogDir, dstName)
+		filePaths = append(filePaths, dstFilePath)
 
-			if err = backupLogFile(dstFilePath, websiteLogDir, fileOp); err != nil {
-				websiteErr := buserr.WithNameAndErr("ErrCutWebsiteLog", name, err)
-				err = websiteErr
-				msgs = append(msgs, websiteErr.Error())
-				global.LOG.Error(websiteErr.Error())
-				wg.Done()
-				return
-			} else {
-				_ = fileOp.WriteFile(srcAccessLogPath, strings.NewReader(""), 0755)
-				_ = fileOp.WriteFile(srcErrorLogPath, strings.NewReader(""), 0755)
-			}
-			msg := i18n.GetMsgWithMap("CutWebsiteLogSuccess", map[string]interface{}{"name": name, "path": dstFilePath})
-			global.LOG.Infof(msg)
-			msgs = append(msgs, msg)
-			wg.Done()
-		}()
+		if err = backupLogFile(dstFilePath, websiteLogDir, fileOp); err != nil {
+			websiteErr := buserr.WithNameAndErr("ErrCutWebsiteLog", website.PrimaryDomain, err)
+			err = websiteErr
+			msgs = append(msgs, websiteErr.Error())
+			global.LOG.Error(websiteErr.Error())
+			continue
+		} else {
+			_ = fileOp.WriteFile(srcAccessLogPath, strings.NewReader(""), 0755)
+			_ = fileOp.WriteFile(srcErrorLogPath, strings.NewReader(""), 0755)
+		}
+		msg := i18n.GetMsgWithMap("CutWebsiteLogSuccess", map[string]interface{}{"name": website.PrimaryDomain, "path": dstFilePath})
+		global.LOG.Infof(msg)
+		msgs = append(msgs, msg)
 	}
 	wg.Wait()
 	u.HandleRmExpired("LOCAL", "", "", cronjob, nil)
@@ -505,16 +486,7 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, backup model.Backu
 		return paths, err
 	}
 
-	var weblist []string
-	if cronjob.Website == "all" {
-		weblist, err = NewIWebsiteService().GetWebsiteOptions()
-		if err != nil {
-			return paths, err
-		}
-	} else {
-		weblist = append(weblist, cronjob.Website)
-	}
-
+	weblist := loadWebsForJob(cronjob)
 	var client cloud_storage.CloudStorageClient
 	if backup.Type != "LOCAL" {
 		client, err = NewIBackupService().NewClient(&backup)
@@ -526,25 +498,21 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, backup model.Backu
 	for _, websiteItem := range weblist {
 		var record model.BackupRecord
 		record.Type = "website"
-		record.Name = cronjob.Website
+		record.Name = websiteItem.PrimaryDomain
+		record.DetailName = websiteItem.Alias
 		record.Source = "LOCAL"
 		record.BackupType = backup.Type
-		website, err := websiteRepo.GetFirst(websiteRepo.WithDomain(websiteItem))
-		if err != nil {
-			return paths, err
-		}
-		backupDir := path.Join(localDir, fmt.Sprintf("website/%s", website.PrimaryDomain))
+		backupDir := path.Join(localDir, fmt.Sprintf("website/%s", websiteItem.PrimaryDomain))
 		record.FileDir = backupDir
 		itemFileDir := strings.TrimPrefix(backupDir, localDir+"/")
 		if !cronjob.KeepLocal && backup.Type != "LOCAL" {
 			record.Source = backup.Type
 			record.FileDir = strings.TrimPrefix(backupDir, localDir+"/")
 		}
-		record.FileName = fmt.Sprintf("website_%s_%s.tar.gz", website.PrimaryDomain, startTime.Format("20060102150405"))
-		if err := handleWebsiteBackup(&website, backupDir, record.FileName); err != nil {
+		record.FileName = fmt.Sprintf("website_%s_%s.tar.gz", websiteItem.PrimaryDomain, startTime.Format("20060102150405"))
+		if err := handleWebsiteBackup(&websiteItem, backupDir, record.FileName); err != nil {
 			return paths, err
 		}
-		record.Name = website.PrimaryDomain
 		if err := backupRepo.CreateRecord(&record); err != nil {
 			global.LOG.Errorf("save backup record failed, err: %v", err)
 			return paths, err
@@ -758,4 +726,18 @@ func loadDbsForJob(cronjob model.Cronjob) []databaseHelper {
 		})
 	}
 	return dbs
+}
+
+func loadWebsForJob(cronjob model.Cronjob) []model.Website {
+	var weblist []model.Website
+	if cronjob.Website == "all" {
+		weblist, _ = websiteRepo.List()
+		return weblist
+	}
+	itemID, _ := (strconv.Atoi(cronjob.Website))
+	webItem, _ := websiteRepo.GetFirst(commonRepo.WithByID(uint(itemID)))
+	if webItem.ID != 0 {
+		weblist = append(weblist, webItem)
+	}
+	return weblist
 }
