@@ -57,6 +57,15 @@
                 <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6">
                     <el-form-item>
                         <template #label>
+                            <span class="status-label">used_memory_peak</span>
+                        </template>
+                        <span class="status-count">{{ redisStatus.used_memory_peak }}</span>
+                        <span class="input-help">{{ $t('database.usedMemoryPeak') }}</span>
+                    </el-form-item>
+                </el-col>
+                <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6">
+                    <el-form-item>
+                        <template #label>
                             <span class="status-label">mem_fragmentation_ratio</span>
                         </template>
                         <span class="status-count">{{ redisStatus.mem_fragmentation_ratio }}</span>
@@ -175,6 +184,7 @@ const loadStatus = async () => {
     redisStatus.tcp_port = res.data.tcp_port;
     redisStatus.connected_clients = res.data.connected_clients;
     redisStatus.used_memory_rss = (Number(res.data.used_memory_rss) / 1024 / 1024).toFixed(2) + ' MB';
+    redisStatus.used_memory_peak = (Number(res.data.used_memory_peak) / 1024 / 1024).toFixed(2) + ' MB';
     redisStatus.used_memory = (Number(res.data.used_memory) / 1024 / 1024).toFixed(2) + ' MB';
     redisStatus.mem_fragmentation_ratio = res.data.mem_fragmentation_ratio;
     redisStatus.total_connections_received = res.data.total_connections_received;
