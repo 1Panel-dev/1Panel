@@ -12,7 +12,7 @@
                         </el-form-item>
                         <el-form-item
                             :label="$t('setting.address')"
-                            prop="varsJson.address"
+                            prop="varsJson.addressItem"
                             :rules="Rules.requiredInput"
                         >
                             <el-input v-model="webdavData.rowData!.varsJson['addressItem']">
