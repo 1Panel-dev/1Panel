@@ -606,12 +606,12 @@ func ZipFile(files []archiver.File, dst afero.File) error {
 		if err != nil {
 			return err
 		}
+		hdr.Method = zip.Deflate
 		hdr.Name = file.NameInArchive
 		if file.IsDir() {
 			if !strings.HasSuffix(hdr.Name, "/") {
 				hdr.Name += "/"
 			}
-			hdr.Method = zip.Store
 		}
 		w, err := zw.CreateHeader(hdr)
 		if err != nil {
