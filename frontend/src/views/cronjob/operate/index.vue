@@ -360,10 +360,10 @@ const handleClose = () => {
 
 const localDirID = ref();
 
-const containerOptions = ref();
+const containerOptions = ref([]);
 const websiteOptions = ref([]);
-const backupOptions = ref();
-const appOptions = ref();
+const backupOptions = ref([]);
+const appOptions = ref([]);
 
 const dbInfo = reactive({
     isExist: false,
