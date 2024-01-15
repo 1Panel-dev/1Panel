@@ -254,8 +254,8 @@
 
                     <el-form-item :label="$t('cronjob.retainCopies')" prop="retainCopies">
                         <el-input-number
+                            style="width: 200px"
                             :min="1"
-                            :max="300"
                             step-strictly
                             :step="1"
                             v-model.number="dialogData.rowData!.retainCopies"
