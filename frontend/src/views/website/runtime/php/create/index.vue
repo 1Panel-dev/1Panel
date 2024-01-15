@@ -82,7 +82,7 @@
                                     </span>
                                 </el-form-item>
                                 <el-form-item :label="$t('php.extensions')">
-                                    <el-select v-model="extensions" @change="changePHPExtension()">
+                                    <el-select v-model="extensions" @change="changePHPExtension()" clearable>
                                         <el-option
                                             v-for="(extension, index) in phpExtensions"
                                             :key="index"
@@ -279,6 +279,7 @@ const searchApp = (appId: number) => {
 };
 
 const changeApp = (appId: number) => {
+    extensions.value = undefined;
     for (const app of apps.value) {
         if (app.id === appId) {
             initParam.value = false;
@@ -291,6 +292,7 @@ const changeApp = (appId: number) => {
 const changeVersion = () => {
     loading.value = true;
     initParam.value = false;
+    extensions.value = undefined;
     GetAppDetail(runtime.appID, runtime.version, 'runtime')
         .then((res) => {
             runtime.appDetailID = res.data.id;
@@ -387,6 +389,9 @@ const listPHPExtensions = async () => {
 };
 
 const changePHPExtension = () => {
+    if (extensions.value == '') {
+        return;
+    }
     runtime.params['PHP_EXTENSIONS'] = extensions.value.split(',');
 };
 
