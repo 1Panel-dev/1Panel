@@ -9,7 +9,7 @@
                                 <svg-icon class="card-logo" iconName="p-file-folder"></svg-icon>
                                 <span class="card-title">&nbsp;{{ $t('setting.LOCAL') }}</span>
                                 <div style="float: right">
-                                    <el-button round @click="onOpenDialog('edit', 'local', localData)">
+                                    <el-button round @click="onOpenDialog('edit', 'LOCAL', localData)">
                                         {{ $t('commons.button.edit') }}
                                     </el-button>
                                 </div>
@@ -414,6 +414,7 @@
             </template>
         </LayoutContent>
 
+        <localDialog ref="localRef" @search="search" />
         <s3Dialog ref="s3Ref" @search="search" />
         <ossDialog ref="ossRef" @search="search" />
         <cosDialog ref="cosRef" @search="search" />
@@ -430,6 +431,7 @@ import { dateFormat } from '@/utils/util';
 import { onMounted, ref } from 'vue';
 import OpDialog from '@/components/del-dialog/index.vue';
 import { getBackupList, deleteBackup } from '@/api/modules/setting';
+import localDialog from '@/views/setting/backup-account/local/index.vue';
 import s3Dialog from '@/views/setting/backup-account/s3/index.vue';
 import ossDialog from '@/views/setting/backup-account/oss/index.vue';
 import cosDialog from '@/views/setting/backup-account/cos/index.vue';
@@ -446,6 +448,7 @@ const data = ref();
 const opRef = ref();
 const refresh = ref(false);
 
+const localRef = ref();
 const s3Ref = ref();
 const ossRef = ref();
 const cosRef = ref();
@@ -647,6 +650,9 @@ const onOpenDialog = async (
         rowData: { ...rowData },
     };
     switch (accountType) {
+        case 'LOCAL':
+            localRef.value.acceptParams(params);
+            return;
         case 'S3':
             s3Ref.value.acceptParams(params);
             return;
