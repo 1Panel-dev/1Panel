@@ -284,7 +284,7 @@
                         :ellipsis="2"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
-                        :fixed="mobile ? 'auto' : 'right'"
+                        :fixed="mobile ? false : 'right'"
                     />
                 </ComplexTable>
             </template>
