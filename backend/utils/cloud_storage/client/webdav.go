@@ -15,12 +15,16 @@ type webDAVClient struct {
 
 func NewWebDAVClient(vars map[string]interface{}) (*webDAVClient, error) {
 	address := loadParamFromVars("address", true, vars)
-	port := loadParamFromVars("port", false, vars)
+	port := loadParamFromVars("port", true, vars)
 	password := loadParamFromVars("password", true, vars)
 	username := loadParamFromVars("username", true, vars)
 	bucket := loadParamFromVars("bucket", true, vars)
 
-	client := gowebdav.NewClient(fmt.Sprintf("%s:%s", address, port), username, password)
+	url := fmt.Sprintf("%s:%s", address, port)
+	if len(port) == 0 {
+		url = address
+	}
+	client := gowebdav.NewClient(url, username, password)
 	if err := client.Connect(); err != nil {
 		return nil, err
 	}
