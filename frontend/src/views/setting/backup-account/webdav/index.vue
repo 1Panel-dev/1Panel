@@ -24,12 +24,8 @@
                                 </template>
                             </el-input>
                         </el-form-item>
-                        <el-form-item :label="$t('commons.table.port')" prop="varsJson.port" :rules="[Rules.port]">
-                            <el-input-number
-                                :min="0"
-                                :max="65535"
-                                v-model.number="webdavData.rowData!.varsJson['port']"
-                            />
+                        <el-form-item :label="$t('commons.table.port')" prop="varsJson.port" :rules="[portRule]">
+                            <el-input-number v-model.number="webdavData.rowData!.varsJson['port']" />
                         </el-form-item>
                         <el-form-item
                             :label="$t('commons.login.username')"
@@ -71,7 +67,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
@@ -79,7 +75,7 @@ import { Backup } from '@/api/interface/backup';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { addBackup, editBackup } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
-import { spliceHttp, splitHttp } from '@/utils/util';
+import { checkPort, spliceHttp, splitHttp } from '@/utils/util';
 
 const loading = ref(false);
 type FormInstance = InstanceType<typeof ElForm>;
@@ -97,6 +93,18 @@ const drawerVisible = ref(false);
 const webdavData = ref<DialogProps>({
     title: '',
 });
+
+const portRule = reactive({ validator: checkportRule, trigger: 'blur', type: 'number' });
+
+function checkportRule(rule: any, value: any, callback: any) {
+    if (value !== undefined && value !== null) {
+        if (checkPort(value)) {
+            return callback(new Error(i18n.global.t('commons.rule.port')));
+        }
+    }
+    callback();
+}
+
 const acceptParams = (params: DialogProps): void => {
     webdavData.value = params;
     if (webdavData.value.title === 'edit') {
