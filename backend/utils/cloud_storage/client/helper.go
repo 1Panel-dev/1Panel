@@ -13,8 +13,6 @@ func loadParamFromVars(key string, isString bool, vars map[string]interface{}) s
 		}
 		return ""
 	}
-	if isString {
-		return vars[key].(string)
-	}
-	return fmt.Sprintf("%v", vars[key].(float64))
+
+	return fmt.Sprintf("%v", vars[key])
 }
