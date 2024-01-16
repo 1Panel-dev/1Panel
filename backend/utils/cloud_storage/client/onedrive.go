@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -14,6 +15,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -157,7 +159,13 @@ func (o oneDriveClient) Upload(src, target string) (bool, error) {
 		splitCount += 1
 	}
 	bfReader := bufio.NewReader(file)
-	var fileUploadResp *UploadSessionUploadResponse
+	httpClient := http.Client{
+		Timeout: time.Minute * 10,
+		Transport: &http.Transport{
+			Proxy:           http.ProxyFromEnvironment,
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
+	}
 	for splitNow := int64(0); splitNow < splitCount; splitNow++ {
 		length, err := bfReader.Read(buffer)
 		if err != nil {
@@ -171,12 +179,15 @@ func (o oneDriveClient) Upload(src, target string) (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		if err := o.client.Do(ctx, sessionFileUploadReq, false, &fileUploadResp); err != nil {
+		res, err := httpClient.Do(sessionFileUploadReq)
+		if err != nil {
 			return false, err
 		}
-	}
-	if fileUploadResp.Id == "" {
-		return false, errors.New("something went wrong. file upload incomplete. consider upload the file in a step-by-step manner")
+		if res.StatusCode != 201 && res.StatusCode != 202 && res.StatusCode != 200 {
+			data, _ := io.ReadAll(res.Body)
+			res.Body.Close()
+			return false, errors.New(string(data))
+		}
 	}
 
 	return true, nil
