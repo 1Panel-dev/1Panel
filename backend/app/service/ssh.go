@@ -104,7 +104,7 @@ func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 			data.PubkeyAuthentication = strings.ReplaceAll(line, "PubkeyAuthentication ", "")
 		}
 		if strings.HasPrefix(line, "PermitRootLogin ") {
-			data.PermitRootLogin = strings.ReplaceAll(line, "PermitRootLogin ", "")
+			data.PermitRootLogin = strings.ReplaceAll(strings.ReplaceAll(line, "PermitRootLogin ", ""), "prohibit-password", "without-password")
 		}
 		if strings.HasPrefix(line, "UseDNS ") {
 			data.UseDNS = strings.ReplaceAll(line, "UseDNS ", "")
