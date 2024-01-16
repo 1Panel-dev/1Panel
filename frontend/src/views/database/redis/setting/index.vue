@@ -90,7 +90,7 @@
                                     <span class="input-help">{{ $t('database.maxmemoryHelper') }}</span>
                                 </el-form-item>
                                 <el-form-item>
-                                    <el-button type="primary" @click="onSubmtiForm(formRef)">
+                                    <el-button type="primary" @click="onSubmitForm(formRef)">
                                         {{ $t('commons.button.save') }}
                                     </el-button>
                                 </el-form-item>
@@ -119,9 +119,9 @@
             </template>
         </LayoutContent>
 
-        <ConfirmDialog ref="confirmDialogRef" @confirm="submtiFile"></ConfirmDialog>
-        <ConfirmDialog ref="confirmFileRef" @confirm="submtiFile"></ConfirmDialog>
-        <ConfirmDialog ref="confirmFormRef" @confirm="submtiForm"></ConfirmDialog>
+        <ConfirmDialog ref="confirmDialogRef" @confirm="submitFile"></ConfirmDialog>
+        <ConfirmDialog ref="confirmFileRef" @confirm="submitFile"></ConfirmDialog>
+        <ConfirmDialog ref="confirmFormRef" @confirm="submitForm"></ConfirmDialog>
         <ConfirmDialog ref="confirmPortRef" @confirm="onChangePort(portRef)"></ConfirmDialog>
     </div>
 </template>
@@ -260,7 +260,7 @@ const onChangePort = async (formEl: FormInstance | undefined) => {
 };
 
 const confirmFormRef = ref();
-const onSubmtiForm = async (formEl: FormInstance | undefined) => {
+const onSubmitForm = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
@@ -272,7 +272,7 @@ const onSubmtiForm = async (formEl: FormInstance | undefined) => {
         confirmFormRef.value!.acceptParams(params);
     });
 };
-const submtiForm = async () => {
+const submitForm = async () => {
     let param = {
         timeout: form.timeout + '',
         maxclients: form.maxclients + '',
@@ -311,10 +311,10 @@ const onSaveFile = async () => {
     };
     confirmDialogRef.value!.acceptParams(params);
 };
-const submtiFile = async () => {
+const submitFile = async () => {
     let param = {
         type: 'redis',
-        database: '',
+        database: redisName.value,
         file: redisConf.value,
     };
     loading.value = true;
