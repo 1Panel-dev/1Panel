@@ -18,7 +18,7 @@ export const GlobalStore = defineStore({
         themeConfig: {
             panelName: '',
             primary: '#005EEB',
-            theme: 'bright',
+            theme: 'auto',
             footer: true,
         },
         isFullScreen: false,
