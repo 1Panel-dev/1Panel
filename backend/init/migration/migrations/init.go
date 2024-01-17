@@ -85,7 +85,7 @@ var AddTableSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "Language", Value: "zh"}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "Theme", Value: "light"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "Theme", Value: "auto"}).Error; err != nil {
 			return err
 		}
 
