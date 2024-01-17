@@ -301,7 +301,7 @@ func delNginxConfig(website model.Website, force bool) error {
 	if err := fileOp.DeleteFile(configPath); err != nil {
 		return err
 	}
-	sitePath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "www", "sites", website.PrimaryDomain)
+	sitePath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "www", "sites", website.Alias)
 	if fileOp.Stat(sitePath) {
 		_ = fileOp.DeleteDir(sitePath)
 	}
