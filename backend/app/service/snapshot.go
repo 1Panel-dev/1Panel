@@ -576,6 +576,11 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, req dto.SnapshotCreate,
 		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
 		return loadLogByStatus(snapStatus), snap.Name, fmt.Errorf("snapshot %s backup failed", snap.Name)
 	}
+	snapPanelData(itemHelper, localDir, backupPanelDir)
+	if snapStatus.PanelData != constant.StatusDone {
+		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
+		return loadLogByStatus(snapStatus), snap.Name, fmt.Errorf("snapshot %s 1panel data failed", snap.Name)
+	}
 	snapCompress(itemHelper, rootDir)
 	if snapStatus.Compress != constant.StatusDone {
 		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
