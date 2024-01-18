@@ -3,6 +3,7 @@ package parser
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx/parser/flag"
 	"io"
 )
@@ -137,17 +138,22 @@ func (s *lexer) scanQuotedString(delimiter rune) flag.Flag {
 
 		if ch == '\\' {
 			if needsEscape(s.peek(), delimiter) {
-				switch s.read() {
+				nextch := s.read()
+				switch nextch {
 				case 'n':
+					fmt.Println("n")
 					buf.WriteRune('\n')
 				case 'r':
+					fmt.Println("r")
 					buf.WriteRune('\r')
 				case 't':
+					fmt.Println("t")
 					buf.WriteRune('\t')
 				case '\\':
 					buf.WriteRune('\\')
-				case delimiter:
-					buf.WriteRune(delimiter)
+				default:
+					buf.WriteRune('\\')
+					buf.WriteRune(nextch)
 				}
 				continue
 			}
