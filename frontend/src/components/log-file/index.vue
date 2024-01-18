@@ -247,6 +247,10 @@ const init = () => {
     });
 };
 
+const clearLog = (): void => {
+    content.value = '';
+};
+
 onUnmounted(() => {
     onCloseLog();
 });
@@ -255,5 +259,5 @@ onMounted(() => {
     init();
 });
 
-defineExpose({ changeTail, onDownload });
+defineExpose({ changeTail, onDownload, clearLog });
 </script>
