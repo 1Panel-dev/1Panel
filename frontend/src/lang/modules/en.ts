@@ -1930,6 +1930,7 @@ const message = {
         httpHelper2: 'Unable to apply for a generic domain name certificate in HTTP mode',
         skipDNSCheck: 'Skip DNS check',
         skipDNSCheckHelper: 'If there is an application timeout problem, please check here, otherwise do not check it',
+        cfHelper: 'Do not use Global API Key',
     },
     firewall: {
         create: 'Create rule',

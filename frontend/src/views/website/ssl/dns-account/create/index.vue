@@ -44,19 +44,21 @@
                         <el-form-item label="EMAIL" prop="authorization.email">
                             <el-input v-model.trim="account.authorization['email']"></el-input>
                         </el-form-item>
+                        <el-form-item label="API Token" prop="authorization.apiKey">
+                            <el-input v-model.trim="account.authorization['apiKey']"></el-input>
+                            <span class="input-help">
+                                {{ $t('ssl.cfHelper') }}
+                            </span>
+                        </el-form-item>
                     </div>
                     <el-form-item
                         label="API Key"
                         prop="authorization.apiKey"
-                        v-if="
-                            account.type === 'CloudFlare' ||
-                            account.type === 'NameCheap' ||
-                            account.type === 'NameSilo' ||
-                            account.type === 'Godaddy'
-                        "
+                        v-if="account.type === 'NameCheap' || account.type === 'NameSilo' || account.type === 'Godaddy'"
                     >
                         <el-input v-model.trim="account.authorization['apiKey']"></el-input>
                     </el-form-item>
+
                     <el-form-item label="API User" prop="authorization.apiUser" v-if="account.type === 'NameCheap'">
                         <el-input v-model.trim="account.authorization['apiUser']"></el-input>
                     </el-form-item>

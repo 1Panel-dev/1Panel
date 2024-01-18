@@ -1811,6 +1811,7 @@ const message = {
         httpHelper2: 'HTTP 模式无法申请泛域名证书',
         skipDNSCheck: '跳过 DNS 校验',
         skipDNSCheckHelper: '如果出现申请超时问题，请勾选此处，其他情况请勿勾选',
+        cfHelper: '请勿使用 Global API Key',
     },
     firewall: {
         create: '创建规则',
