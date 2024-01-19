@@ -66,6 +66,7 @@ func Init() {
 		migrations.AddTableDatabasePostgresql,
 		migrations.AddPostgresqlSuperUser,
 		migrations.UpdateCronjobWithWebsite,
+		migrations.UpdateOneDriveToken,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

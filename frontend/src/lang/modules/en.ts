@@ -1241,6 +1241,8 @@ const message = {
         SFTP: 'SFTP',
         WebDAV: 'WebDAV',
         OneDrive: 'Microsoft OneDrive',
+        refreshTime: 'Token Refresh Time',
+        refreshStatus: 'Token Refresh Status',
         backupDir: 'Backup dir',
         codeWarning: 'The current authorization code format is incorrect, please confirm again!',
         isCN: 'Domestic version (not supported at the moment)',

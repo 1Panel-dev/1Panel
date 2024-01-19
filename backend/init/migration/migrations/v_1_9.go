@@ -1,11 +1,17 @@
 package migrations
 
 import (
+	"encoding/base64"
+	"encoding/json"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/app/service"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/cloud_storage/client"
 	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/gorm"
 )
@@ -183,6 +189,61 @@ var UpdateCronjobWithWebsite = &gormigrate.Migration{
 				Updates(map[string]interface{}{"website": web.ID}).Error; err != nil {
 				continue
 			}
+		}
+
+		return nil
+	},
+}
+
+var UpdateOneDriveToken = &gormigrate.Migration{
+	ID: "20240117-update-onedrive-token",
+	Migrate: func(tx *gorm.DB) error {
+		var (
+			backup        model.BackupAccount
+			clientSetting model.Setting
+			secretSetting model.Setting
+		)
+		_ = tx.Where("type = ?", "OneDrive").First(&backup).Error
+		if backup.ID == 0 {
+			return nil
+		}
+		if len(backup.Credential) == 0 {
+			global.LOG.Error("OneDrive configuration lacks token information, please rebind.")
+			return nil
+		}
+
+		_ = tx.Where("key = ?", "OneDriveID").First(&clientSetting).Error
+		if clientSetting.ID == 0 {
+			global.LOG.Error("system configuration lacks clientID information, please retry.")
+			return nil
+		}
+		_ = tx.Where("key = ?", "OneDriveSc").First(&secretSetting).Error
+		if secretSetting.ID == 0 {
+			global.LOG.Error("system configuration lacks clientID information, please retry.")
+			return nil
+		}
+		idItem, _ := base64.StdEncoding.DecodeString(clientSetting.Value)
+		global.CONF.System.OneDriveID = string(idItem)
+		scItem, _ := base64.StdEncoding.DecodeString(secretSetting.Value)
+		global.CONF.System.OneDriveSc = string(scItem)
+
+		varMap := make(map[string]interface{})
+		token, refreshToken, err := client.RefreshToken("refresh_token", backup.Credential)
+		varMap["refresh_status"] = constant.StatusSuccess
+		varMap["refresh_time"] = time.Now().Format("2006-01-02 15:04:05")
+		if err != nil {
+			varMap["refresh_msg"] = err.Error()
+			varMap["refresh_status"] = constant.StatusFailed
+		}
+		varMap["refresh_token"] = refreshToken
+		itemVars, _ := json.Marshal(varMap)
+		if err := tx.Model(&model.BackupAccount{}).
+			Where("id = ?", backup.ID).
+			Updates(map[string]interface{}{
+				"credential": token,
+				"vars":       string(itemVars),
+			}).Error; err != nil {
+			return err
 		}
 
 		return nil

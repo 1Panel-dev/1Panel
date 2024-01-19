@@ -1166,6 +1166,8 @@ const message = {
         SFTP: 'SFTP',
         WebDAV: 'WebDAV',
         OneDrive: '微软 OneDrive',
+        refreshTime: '令牌刷新时间',
+        refreshStatus: '令牌刷新状态',
         codeWarning: '当前授权码格式错误，请重新确认！',
         backupDir: '备份路径',
         isCN: '国内版 (暂不支持)',

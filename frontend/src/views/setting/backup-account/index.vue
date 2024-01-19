@@ -212,7 +212,7 @@
                                     round
                                     plain
                                     :disabled="oneDriveData.id === 0"
-                                    @click="onOpenDialog('edit', 'SFTP', oneDriveData)"
+                                    @click="onOpenDialog('edit', 'OneDrive', oneDriveData)"
                                 >
                                     {{ $t('commons.button.edit') }}
                                 </el-button>
@@ -226,6 +226,26 @@
                             <el-form-item :label="$t('setting.backupDir')">
                                 <span v-if="oneDriveData.backupPath">{{ oneDriveData.backupPath }}</span>
                                 <span v-else>{{ $t('setting.unSetting') }}</span>
+                            </el-form-item>
+                            <el-form-item :label="$t('setting.refreshTime')">
+                                <span>{{ oneDriveData.varsJson['refresh_time'] }}</span>
+                                <el-button @click="refreshToken" link type="primary" class="ml-2">
+                                    {{ $t('commons.button.refresh') }}
+                                </el-button>
+                            </el-form-item>
+                            <el-form-item :label="$t('setting.refreshStatus')">
+                                <el-tag v-if="oneDriveData.varsJson['refresh_status'] === 'Success'" type="success">
+                                    {{ $t('commons.status.success') }}
+                                </el-tag>
+                                <el-tooltip
+                                    v-if="oneDriveData.varsJson['refresh_status'] === 'Failed'"
+                                    :content="oneDriveData.varsJson['refresh_msg']"
+                                    placement="top"
+                                >
+                                    <el-tag type="danger">
+                                        {{ $t('commons.status.failed') }}
+                                    </el-tag>
+                                </el-tooltip>
                             </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
                                 {{ dateFormat(0, 0, oneDriveData.createdAt) }}
@@ -430,7 +450,7 @@
 import { dateFormat } from '@/utils/util';
 import { onMounted, ref } from 'vue';
 import OpDialog from '@/components/del-dialog/index.vue';
-import { getBackupList, deleteBackup } from '@/api/modules/setting';
+import { getBackupList, deleteBackup, refreshOneDrive } from '@/api/modules/setting';
 import localDialog from '@/views/setting/backup-account/local/index.vue';
 import s3Dialog from '@/views/setting/backup-account/s3/index.vue';
 import ossDialog from '@/views/setting/backup-account/oss/index.vue';
@@ -536,7 +556,9 @@ const oneDriveData = ref<Backup.BackupInfo>({
     backupPath: '',
     vars: '',
     varsJson: {
-        redirectURI: '',
+        refresh_msg: '',
+        refresh_time: '',
+        refresh_status: '',
     },
     createdAt: new Date(),
 });
@@ -678,6 +700,11 @@ const onOpenDialog = async (
             webDavRef.value.acceptParams(params);
             return;
     }
+};
+
+const refreshToken = async () => {
+    await refreshOneDrive();
+    search();
 };
 
 onMounted(() => {
