@@ -28,7 +28,7 @@ type BackupService struct{}
 type IBackupService interface {
 	List() ([]dto.BackupInfo, error)
 	SearchRecordsWithPage(search dto.RecordSearch) (int64, []dto.BackupRecords, error)
-	LoadOneDriveInfo() (string, error)
+	LoadOneDriveInfo() (dto.OneDriveInfo, error)
 	DownloadRecord(info dto.DownloadRecord) (string, error)
 	Create(backupDto dto.BackupOperate) error
 	GetBuckets(backupDto dto.ForBuckets) ([]interface{}, error)
@@ -129,16 +129,29 @@ type loadSizeHelper struct {
 	client     cloud_storage.CloudStorageClient
 }
 
-func (u *BackupService) LoadOneDriveInfo() (string, error) {
-	OneDriveID, err := settingRepo.Get(settingRepo.WithByKey("OneDriveID"))
+func (u *BackupService) LoadOneDriveInfo() (dto.OneDriveInfo, error) {
+	var data dto.OneDriveInfo
+	data.RedirectUri = constant.OneDriveRedirectURI
+	clientID, err := settingRepo.Get(settingRepo.WithByKey("OneDriveID"))
 	if err != nil {
-		return "", err
+		return data, err
 	}
-	idItem, err := base64.StdEncoding.DecodeString(OneDriveID.Value)
+	idItem, err := base64.StdEncoding.DecodeString(clientID.Value)
 	if err != nil {
-		return "", err
+		return data, err
 	}
-	return string(idItem), err
+	data.ClientID = string(idItem)
+	clientSecret, err := settingRepo.Get(settingRepo.WithByKey("OneDriveSc"))
+	if err != nil {
+		return data, err
+	}
+	secretItem, err := base64.StdEncoding.DecodeString(clientSecret.Value)
+	if err != nil {
+		return data, err
+	}
+	data.ClientSecret = string(secretItem)
+
+	return data, err
 }
 
 func (u *BackupService) DownloadRecord(info dto.DownloadRecord) (string, error) {
@@ -418,20 +431,16 @@ func (u *BackupService) loadAccessToken(backup *model.BackupAccount) error {
 	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
 		return fmt.Errorf("unmarshal backup vars failed, err: %v", err)
 	}
-	code, ok := varMap["code"]
-	if !ok {
-		return errors.New("no such token in request, please retry!")
-	}
-	token, refreshToken, err := client.RefreshToken("authorization_code", code.(string))
+	token, refreshToken, err := client.RefreshToken("authorization_code", varMap)
 	if err != nil {
 		return err
 	}
+	delete(varMap, "code")
 	backup.Credential = token
-	varMapItem := make(map[string]interface{})
-	varMapItem["refresh_status"] = constant.StatusSuccess
-	varMapItem["refresh_time"] = time.Now().Format("2006-01-02 15:04:05")
-	varMapItem["refresh_token"] = refreshToken
-	itemVars, err := json.Marshal(varMapItem)
+	varMap["refresh_status"] = constant.StatusSuccess
+	varMap["refresh_time"] = time.Now().Format("2006-01-02 15:04:05")
+	varMap["refresh_token"] = refreshToken
+	itemVars, err := json.Marshal(varMap)
 	if err != nil {
 		return fmt.Errorf("json marshal var map failed, err: %v", err)
 	}
@@ -547,13 +556,7 @@ func (u *BackupService) Run() {
 		global.LOG.Errorf("Failed to refresh OneDrive token, please retry, err: %v", err)
 		return
 	}
-	refreshItem, ok := varMap["refresh_token"]
-	if !ok {
-		global.LOG.Error("Failed to refresh OneDrive token, please retry, err: no such refresh token")
-		return
-	}
-
-	token, refreshToken, err := client.RefreshToken("refresh_token", refreshItem.(string))
+	token, refreshToken, err := client.RefreshToken("refresh_token", varMap)
 	varMap["refresh_status"] = constant.StatusSuccess
 	varMap["refresh_time"] = time.Now().Format("2006-01-02 15:04:05")
 	if err != nil {

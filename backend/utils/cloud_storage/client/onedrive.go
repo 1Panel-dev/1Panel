@@ -15,8 +15,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/1Panel-dev/1Panel/backend/constant"
-	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	odsdk "github.com/goh-chunlin/go-onedrive/onedrive"
 	"golang.org/x/oauth2"
@@ -192,19 +190,18 @@ func (o *oneDriveClient) loadIDByPath(path string) (string, error) {
 	return driveItem.Id, nil
 }
 
-func RefreshToken(grantType, grantCode string) (string, string, error) {
+func RefreshToken(grantType string, varMap map[string]interface{}) (string, string, error) {
 	data := url.Values{}
-	data.Set("client_id", global.CONF.System.OneDriveID)
-	data.Set("client_secret", global.CONF.System.OneDriveSc)
-	data.Set("grant_type", "refresh_token")
+	data.Set("client_id", loadParamFromVars("client_id", true, varMap))
+	data.Set("client_secret", loadParamFromVars("client_secret", true, varMap))
 	if grantType == "refresh_token" {
 		data.Set("grant_type", "refresh_token")
-		data.Set("refresh_token", grantCode)
+		data.Set("refresh_token", loadParamFromVars("refresh_token", true, varMap))
 	} else {
 		data.Set("grant_type", "authorization_code")
-		data.Set("code", grantCode)
+		data.Set("code", loadParamFromVars("code", true, varMap))
 	}
-	data.Set("redirect_uri", constant.OneDriveRedirectURI)
+	data.Set("redirect_uri", loadParamFromVars("redirect_uri", true, varMap))
 	client := &http.Client{}
 	req, err := http.NewRequest("POST", "https://login.microsoftonline.com/common/oauth2/v2.0/token", strings.NewReader(data.Encode()))
 	if err != nil {
