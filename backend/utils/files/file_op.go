@@ -319,7 +319,7 @@ func (f FileOp) Cut(oldPaths []string, dst, name string, cover bool) error {
 }
 
 func (f FileOp) Mv(oldPath, dstPath string) error {
-	cmdStr := fmt.Sprintf("mv %s  %s", oldPath, dstPath)
+	cmdStr := fmt.Sprintf(`mv "%s" "%s"`, oldPath, dstPath)
 	if err := cmd.ExecCmd(cmdStr); err != nil {
 		return err
 	}
