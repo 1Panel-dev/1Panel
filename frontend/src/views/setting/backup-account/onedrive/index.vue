@@ -9,19 +9,50 @@
                 ref="formRef"
                 v-loading="loading"
                 label-position="top"
-                :model="onedriveData.rowData"
+                :model="oneDriveData.rowData"
             >
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
-                        <el-form-item :label="$t('commons.table.type')" prop="type" :rules="Rules.requiredSelect">
-                            <el-tag>{{ $t('setting.' + onedriveData.rowData!.type) }}</el-tag>
+                        <el-form-item :label="$t('commons.table.type')" prop="type">
+                            <el-tag>{{ $t('setting.' + oneDriveData.rowData!.type) }}</el-tag>
                         </el-form-item>
                         <el-form-item>
-                            <el-checkbox
-                                disabled
-                                v-model="onedriveData.rowData!.varsJson['isCN']"
-                                :label="$t('setting.isCN')"
-                            />
+                            <el-radio-group v-model="oneDriveData.rowData!.varsJson['isCN']" @change="changeFrom">
+                                <el-radio-button :label="false">{{ $t('setting.isNotCN') }}</el-radio-button>
+                                <el-radio-button :label="true">{{ $t('setting.isCN') }}</el-radio-button>
+                            </el-radio-group>
+                            <span class="input-help">
+                                {{ $t('setting.cn_onedrive_helper') }}
+                                <el-link
+                                    style="font-size: 12px; margin-left: 5px"
+                                    icon="Position"
+                                    @click="toDoc()"
+                                    type="primary"
+                                >
+                                    {{ $t('firewall.quickJump') }}
+                                </el-link>
+                            </span>
+                        </el-form-item>
+                        <el-form-item
+                            :label="$t('setting.client_id')"
+                            prop="varsJson.client_id"
+                            :rules="Rules.requiredInput"
+                        >
+                            <el-input v-model.trim="oneDriveData.rowData!.varsJson['client_id']" />
+                        </el-form-item>
+                        <el-form-item
+                            :label="$t('setting.client_secret')"
+                            prop="varsJson.client_secret"
+                            :rules="Rules.requiredInput"
+                        >
+                            <el-input v-model.trim="oneDriveData.rowData!.varsJson['client_secret']" />
+                        </el-form-item>
+                        <el-form-item
+                            :label="$t('setting.redirect_uri')"
+                            prop="varsJson.redirect_uri"
+                            :rules="Rules.requiredInput"
+                        >
+                            <el-input v-model.trim="oneDriveData.rowData!.varsJson['redirect_uri']" />
                         </el-form-item>
                         <el-form-item :label="$t('setting.code')" prop="varsJson.code" :rules="rules.driveCode">
                             <div style="width: 100%">
@@ -30,9 +61,9 @@
                                     :autosize="{ minRows: 3, maxRows: 15 }"
                                     type="textarea"
                                     clearable
-                                    v-model.trim="onedriveData.rowData!.varsJson['code']"
+                                    v-model.trim="oneDriveData.rowData!.varsJson['code']"
                                 />
-                                <el-button class="append-button" @click="jumpAzure">
+                                <el-button class="append-button" @click="jumpAzure(formRef)">
                                     {{ $t('setting.loadCode') }}
                                 </el-button>
                             </div>
@@ -49,7 +80,7 @@
                             </span>
                         </el-form-item>
                         <el-form-item :label="$t('setting.backupDir')" prop="backupPath">
-                            <el-input clearable v-model.trim="onedriveData.rowData!.backupPath" placeholder="/1panel" />
+                            <el-input clearable v-model.trim="oneDriveData.rowData!.backupPath" placeholder="/1panel" />
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -94,6 +125,7 @@ function checkDriveCode(rule: any, value: any, callback: any) {
 }
 
 const emit = defineEmits(['search']);
+const ondDriveInfo = ref();
 
 interface DialogProps {
     title: string;
@@ -101,28 +133,75 @@ interface DialogProps {
 }
 const title = ref<string>('');
 const drawerVisible = ref(false);
-const onedriveData = ref<DialogProps>({
+const oneDriveData = ref<DialogProps>({
     title: '',
 });
-const acceptParams = (params: DialogProps): void => {
-    onedriveData.value = params;
-    title.value = i18n.global.t('commons.button.' + onedriveData.value.title);
+const acceptParams = async (params: DialogProps): Promise<void> => {
+    oneDriveData.value = params;
+    oneDriveData.value.rowData.varsJson['isCN'] = oneDriveData.value.rowData.varsJson['isCN'] || false;
+    title.value = i18n.global.t('commons.button.' + oneDriveData.value.title);
     drawerVisible.value = true;
+    const res = await getOneDriveInfo();
+    ondDriveInfo.value = res.data;
+    if (!oneDriveData.value.rowData.id) {
+        oneDriveData.value.rowData.varsJson = {
+            isCN: false,
+            client_id: res.data.client_id,
+            client_secret: res.data.client_secret,
+            redirect_uri: res.data.redirect_uri,
+        };
+    }
+};
+
+const changeFrom = () => {
+    if (oneDriveData.value.rowData.varsJson['isCN']) {
+        oneDriveData.value.rowData.varsJson = {
+            isCN: true,
+            client_id: '',
+            client_secret: '',
+            redirect_uri: '',
+        };
+    } else {
+        oneDriveData.value.rowData.varsJson = {
+            isCN: false,
+            client_id: ondDriveInfo.value.client_id,
+            client_secret: ondDriveInfo.value.client_secret,
+            redirect_uri: ondDriveInfo.value.redirect_uri,
+        };
+    }
 };
 
 const handleClose = () => {
     emit('search');
     drawerVisible.value = false;
 };
-const jumpAzure = async () => {
-    const res = await getOneDriveInfo();
-    let commonUrl = `response_type=code&client_id=${res.data}&redirect_uri=http://localhost/login/authorized&scope=offline_access+Files.ReadWrite.All+User.Read`;
-    if (!onedriveData.value.rowData!.varsJson['isCN']) {
+const jumpAzure = async (formEl: FormInstance | undefined) => {
+    if (!formEl) return;
+    const result = await formEl.validateField('varsJson.client_id', callback);
+    if (!result) {
+        return;
+    }
+    const result1 = await formEl.validateField('varsJson.redirect_uri', callback);
+    if (!result1) {
+        return;
+    }
+    let client_id = oneDriveData.value.rowData.varsJson['client_id'];
+    let redirect_uri = oneDriveData.value.rowData.varsJson['redirect_uri'];
+    let commonUrl = `response_type=code&client_id=${client_id}&redirect_uri=${redirect_uri}&scope=offline_access+Files.ReadWrite.All+User.Read`;
+    if (!oneDriveData.value.rowData!.varsJson['isCN']) {
         window.open('https://login.microsoftonline.com/common/oauth2/v2.0/authorize?' + commonUrl, '_blank');
     } else {
         window.open('https://login.chinacloudapi.cn/common/oauth2/v2.0/authorize?' + commonUrl, '_blank');
     }
 };
+
+function callback(error: any) {
+    if (error) {
+        return error.message;
+    } else {
+        return;
+    }
+}
 
 const toDoc = () => {
     window.open('https://1panel.cn/docs/user_manual/settings/', '_blank', 'noopener,noreferrer');
@@ -132,11 +211,11 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        if (!onedriveData.value.rowData) return;
-        onedriveData.value.rowData.vars = JSON.stringify(onedriveData.value.rowData!.varsJson);
+        if (!oneDriveData.value.rowData) return;
+        oneDriveData.value.rowData.vars = JSON.stringify(oneDriveData.value.rowData!.varsJson);
         loading.value = true;
-        if (onedriveData.value.title === 'create') {
-            await addBackup(onedriveData.value.rowData)
+        if (oneDriveData.value.title === 'create') {
+            await addBackup(oneDriveData.value.rowData)
                 .then(() => {
                     loading.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -148,7 +227,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                 });
             return;
         }
-        await editBackup(onedriveData.value.rowData)
+        await editBackup(oneDriveData.value.rowData)
             .then(() => {
                 loading.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

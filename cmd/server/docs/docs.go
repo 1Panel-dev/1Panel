@@ -9390,7 +9390,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/dto.OneDriveInfo"
                         }
                     }
                 }
@@ -9610,6 +9610,25 @@ const docTemplate = `{
                     "formatEN": "recover [type] data [name][detailName] from [file]",
                     "formatZH": "从 [file] 恢复 [type] 数据 [name][detailName]",
                     "paramKeys": []
+                }
+            }
+        },
+        "/settings/backup/refresh/onedrive": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "刷新 OneDrive token",
+                "tags": [
+                    "Backup Account"
+                ],
+                "summary": "Refresh OneDrive token",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
                 }
             }
         },
@@ -16796,6 +16815,20 @@ const docTemplate = `{
                 "HttpPer",
                 "ProxyCache"
             ]
+        },
+        "dto.OneDriveInfo": {
+            "type": "object",
+            "properties": {
+                "client_id": {
+                    "type": "string"
+                },
+                "client_secret": {
+                    "type": "string"
+                },
+                "redirect_uri": {
+                    "type": "string"
+                }
+            }
         },
         "dto.Operate": {
             "type": "object",

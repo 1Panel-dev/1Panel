@@ -1865,6 +1865,15 @@ definitions:
     - CACHE
     - HttpPer
     - ProxyCache
+  dto.OneDriveInfo:
+    properties:
+      client_id:
+        type: string
+      client_secret:
+        type: string
+      redirect_uri:
+        type: string
+    type: object
   dto.Operate:
     properties:
       operation:
@@ -10936,7 +10945,7 @@ paths:
         "200":
           description: OK
           schema:
-            type: string
+            $ref: '#/definitions/dto.OneDriveInfo'
       security:
       - ApiKeyAuth: []
       summary: Load OneDrive info
@@ -11083,6 +11092,17 @@ paths:
         formatEN: recover [type] data [name][detailName] from [file]
         formatZH: 从 [file] 恢复 [type] 数据 [name][detailName]
         paramKeys: []
+  /settings/backup/refresh/onedrive:
+    post:
+      description: 刷新 OneDrive token
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Refresh OneDrive token
+      tags:
+      - Backup Account
   /settings/backup/search:
     get:
       description: 获取备份账号列表

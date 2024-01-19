@@ -463,6 +463,7 @@ import webDavDialog from '@/views/setting/backup-account/webdav/index.vue';
 import { Backup } from '@/api/interface/backup';
 import { ElForm } from 'element-plus';
 import i18n from '@/lang';
+import { MsgSuccess } from '@/utils/message';
 
 const data = ref();
 const opRef = ref();
@@ -704,6 +705,7 @@ const onOpenDialog = async (
 
 const refreshToken = async () => {
     await refreshOneDrive();
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     search();
 };
 

@@ -21,6 +21,12 @@ type BackupInfo struct {
 	Vars       string    `json:"vars"`
 }
 
+type OneDriveInfo struct {
+	ClientID     string `json:"client_id"`
+	ClientSecret string `json:"client_secret"`
+	RedirectUri  string `json:"redirect_uri"`
+}
+
 type BackupSearchFile struct {
 	Type string `json:"type" validate:"required"`
 }

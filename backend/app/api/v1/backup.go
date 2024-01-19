@@ -102,16 +102,16 @@ func (b *BaseApi) ListBuckets(c *gin.Context) {
 // @Summary Load OneDrive info
 // @Description 获取 OneDrive 信息
 // @Accept json
-// @Success 200 string clientID
+// @Success 200 {object} dto.OneDriveInfo
 // @Security ApiKeyAuth
 // @Router /settings/backup/onedrive [get]
 func (b *BaseApi) LoadOneDriveInfo(c *gin.Context) {
-	clientID, err := backupService.LoadOneDriveInfo()
+	data, err := backupService.LoadOneDriveInfo()
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	helper.SuccessWithData(c, clientID)
+	helper.SuccessWithData(c, data)
 }
 
 // @Tags Backup Account

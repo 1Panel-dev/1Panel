@@ -228,7 +228,12 @@ var UpdateOneDriveToken = &gormigrate.Migration{
 		global.CONF.System.OneDriveSc = string(scItem)
 
 		varMap := make(map[string]interface{})
-		token, refreshToken, err := client.RefreshToken("refresh_token", backup.Credential)
+		varMap["isCN"] = false
+		varMap["client_id"] = global.CONF.System.OneDriveID
+		varMap["client_secret"] = global.CONF.System.OneDriveSc
+		varMap["redirect_uri"] = constant.OneDriveRedirectURI
+		varMap["refresh_token"] = backup.Credential
+		token, refreshToken, err := client.RefreshToken("refresh_token", varMap)
 		varMap["refresh_status"] = constant.StatusSuccess
 		varMap["refresh_time"] = time.Now().Format("2006-01-02 15:04:05")
 		if err != nil {
