@@ -28,12 +28,20 @@ export const Languages = [
         value: ['json'],
     },
     {
+        label: 'lua',
+        value: ['lua'],
+    },
+    {
         label: 'markdown',
         value: ['md'],
     },
     {
         label: 'yaml',
         value: ['yml', 'yaml'],
+    },
+    {
+        label: 'xml',
+        value: ['xml'],
     },
     {
         label: 'php',
