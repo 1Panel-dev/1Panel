@@ -211,6 +211,6 @@ func StartMonitor(removeBefore bool, interval string) error {
 	go service.saveIODataToDB(ctx, float64(intervalItem))
 	go service.saveNetDataToDB(ctx, float64(intervalItem))
 
-	global.MonitorCronID = int(monitorID)
+	global.MonitorCronID = monitorID
 	return nil
 }

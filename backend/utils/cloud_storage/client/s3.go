@@ -97,6 +97,10 @@ func (s s3Client) Delete(path string) (bool, error) {
 }
 
 func (s s3Client) Upload(src, target string) (bool, error) {
+	fileInfo, err := os.Stat(src)
+	if err != nil {
+		return false, err
+	}
 	file, err := os.Open(src)
 	if err != nil {
 		return false, err
@@ -104,6 +108,9 @@ func (s s3Client) Upload(src, target string) (bool, error) {
 	defer file.Close()
 
 	uploader := s3manager.NewUploader(&s.Sess)
+	if fileInfo.Size() > s3manager.MaxUploadParts*s3manager.DefaultUploadPartSize {
+		uploader.PartSize = fileInfo.Size() / (s3manager.MaxUploadParts - 1)
+	}
 	if _, err := uploader.Upload(&s3manager.UploadInput{
 		Bucket:       aws.String(s.bucket),
 		Key:          aws.String(target),

@@ -84,6 +84,9 @@ export const handleRecover = (params: Backup.Recover) => {
 export const handleRecoverByUpload = (params: Backup.Recover) => {
     return http.post(`/settings/backup/recover/byupload`, params, TimeoutEnum.T_1D);
 };
+export const refreshOneDrive = () => {
+    return http.post(`/settings/backup/refresh/onedrive`, {});
+};
 export const downloadBackupRecord = (params: Backup.RecordDownload) => {
     return http.post<string>(`/settings/backup/record/download`, params, TimeoutEnum.T_10M);
 };

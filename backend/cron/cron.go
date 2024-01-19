@@ -44,6 +44,12 @@ func Run() {
 	if _, err := global.Cron.AddJob("@daily", job.NewAppStoreJob()); err != nil {
 		global.LOG.Errorf("can not add  appstore corn job: %s", err.Error())
 	}
+
+	var backup model.BackupAccount
+	_ = global.DB.Where("type = ?", "OneDrive").Find(&backup).Error
+	if backup.ID != 0 {
+		service.StartRefreshOneDriveToken()
+	}
 	global.Cron.Start()
 
 	var cronJobs []model.Cronjob

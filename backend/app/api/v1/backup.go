@@ -50,6 +50,17 @@ func (b *BaseApi) CreateBackup(c *gin.Context) {
 }
 
 // @Tags Backup Account
+// @Summary Refresh OneDrive token
+// @Description 刷新 OneDrive token
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/backup/refresh/onedrive [post]
+func (b *BaseApi) RefreshOneDriveToken(c *gin.Context) {
+	backupService.Run()
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Backup Account
 // @Summary List buckets
 // @Description 获取 bucket 列表
 // @Accept json

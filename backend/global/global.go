@@ -20,6 +20,7 @@ var (
 	CACHE   *badger_db.Cache
 	Viper   *viper.Viper
 
-	Cron          *cron.Cron
-	MonitorCronID int
+	Cron           *cron.Cron
+	MonitorCronID  cron.EntryID
+	OneDriveCronID cron.EntryID
 )

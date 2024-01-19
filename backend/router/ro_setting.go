@@ -45,6 +45,7 @@ func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 		settingRouter.GET("/backup/search", baseApi.ListBackup)
 		settingRouter.GET("/backup/onedrive", baseApi.LoadOneDriveInfo)
 		settingRouter.POST("/backup/backup", baseApi.Backup)
+		settingRouter.POST("/backup/refresh/onedrive", baseApi.RefreshOneDriveToken)
 		settingRouter.POST("/backup/recover", baseApi.Recover)
 		settingRouter.POST("/backup/recover/byupload", baseApi.RecoverByUpload)
 		settingRouter.POST("/backup/search/files", baseApi.LoadFilesFromBackup)
