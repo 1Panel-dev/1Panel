@@ -17,6 +17,7 @@ import (
 	"github.com/go-acme/lego/v4/providers/dns/namecheap"
 	"github.com/go-acme/lego/v4/providers/dns/namedotcom"
 	"github.com/go-acme/lego/v4/providers/dns/namesilo"
+	"github.com/go-acme/lego/v4/providers/dns/tencentcloud"
 	"github.com/go-acme/lego/v4/providers/http/webroot"
 	"github.com/go-acme/lego/v4/registration"
 	"github.com/pkg/errors"
@@ -60,13 +61,14 @@ func NewAcmeClient(acmeAccount *model.WebsiteAcmeAccount) (*AcmeClient, error) {
 type DnsType string
 
 const (
-	DnsPod     DnsType = "DnsPod"
-	AliYun     DnsType = "AliYun"
-	CloudFlare DnsType = "CloudFlare"
-	NameSilo   DnsType = "NameSilo"
-	NameCheap  DnsType = "NameCheap"
-	NameCom    DnsType = "NameCom"
-	Godaddy    DnsType = "Godaddy"
+	DnsPod       DnsType = "DnsPod"
+	AliYun       DnsType = "AliYun"
+	CloudFlare   DnsType = "CloudFlare"
+	NameSilo     DnsType = "NameSilo"
+	NameCheap    DnsType = "NameCheap"
+	NameCom      DnsType = "NameCom"
+	Godaddy      DnsType = "Godaddy"
+	TencentCloud DnsType = "TencentCloud"
 )
 
 type DNSParam struct {
@@ -78,6 +80,7 @@ type DNSParam struct {
 	APIkey    string `json:"apiKey"`
 	APIUser   string `json:"apiUser"`
 	APISecret string `json:"apiSecret"`
+	SecretID  string `json:"secretID"`
 }
 
 func (c *AcmeClient) UseDns(dnsType DnsType, params string, skipDNSCheck bool) error {
@@ -146,6 +149,14 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string, skipDNSCheck bool) e
 		nameComConfig.PollingInterval = 30 * time.Second
 		nameComConfig.TTL = 3600
 		p, err = namedotcom.NewDNSProviderConfig(nameComConfig)
+	case TencentCloud:
+		tencentCloudConfig := tencentcloud.NewDefaultConfig()
+		tencentCloudConfig.SecretID = param.SecretID
+		tencentCloudConfig.SecretKey = param.SecretKey
+		tencentCloudConfig.PropagationTimeout = 30 * time.Minute
+		tencentCloudConfig.PollingInterval = 30 * time.Second
+		tencentCloudConfig.TTL = 3600
+		p, err = tencentcloud.NewDNSProviderConfig(tencentCloudConfig)
 	}
 	if err != nil {
 		return err

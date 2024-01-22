@@ -1717,6 +1717,7 @@ const message = {
         primaryDomainHelper: '支援網域:port',
         acmeAccountType: '賬號類型',
         keyType: '密鑰演算法',
+        tencentCloud: '騰訊雲',
     },
     php: {
         short_open_tag: '短標簽支持',
@@ -1819,6 +1820,8 @@ const message = {
         skipDNSCheck: '跳過 DNS 校驗',
         skipDNSCheckHelper: '如果出現申請超時問題，請勾選此處，其他情況請勿勾選',
         cfHelper: '請勿使用 Global API Key',
+        deprecated: '即將廢棄',
+        deprecatedHelper: '已經停止維護，可能會在以後的某個版本廢棄，請使用騰訊雲方式解析',
     },
     firewall: {
         create: '創建規則',

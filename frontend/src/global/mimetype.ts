@@ -153,7 +153,11 @@ export const DNSTypes = [
         value: 'AliYun',
     },
     {
-        label: 'DNSPod',
+        label: i18n.global.t('website.tencentCloud'),
+        value: 'TencentCloud',
+    },
+    {
+        label: 'DNSPod (' + i18n.global.t('ssl.deprecated') + ')',
         value: 'DnsPod',
     },
     {

@@ -37,7 +37,7 @@
                         v-if="ssl.dnsAccount && ssl.dnsAccount.id > 0"
                     >
                         {{ ssl.dnsAccount.name }}
-                        <el-tag type="info">{{ ssl.dnsAccount.type }}</el-tag>
+                        <el-tag type="info">{{ getDNSName(ssl.dnsAccount.type) }}</el-tag>
                     </el-descriptions-item>
                     <el-descriptions-item
                         :label="$t('ssl.acmeAccount')"
@@ -76,7 +76,7 @@
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { GetSSL } from '@/api/modules/website';
 import { ref } from 'vue';
-import { dateFormatSimple, getProvider } from '@/utils/util';
+import { dateFormatSimple, getProvider, getDNSName } from '@/utils/util';
 
 const open = ref(false);
 const id = ref(0);

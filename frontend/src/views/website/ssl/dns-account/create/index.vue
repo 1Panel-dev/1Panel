@@ -22,10 +22,21 @@
                                 :value="type.value"
                             ></el-option>
                         </el-select>
+                        <span class="input-help text-red-500" v-if="account.type === 'DnsPod'">
+                            {{ $t('ssl.deprecatedHelper') }}
+                        </span>
                     </el-form-item>
                     <div v-if="account.type === 'AliYun'">
                         <el-form-item label="Access Key" prop="authorization.accessKey">
                             <el-input v-model.trim="account.authorization['accessKey']"></el-input>
+                        </el-form-item>
+                        <el-form-item label="Secret Key" prop="authorization.secretKey">
+                            <el-input v-model.trim="account.authorization['secretKey']"></el-input>
+                        </el-form-item>
+                    </div>
+                    <div v-if="account.type === 'TencentCloud'">
+                        <el-form-item label="Secret ID" prop="authorization.secretID">
+                            <el-input v-model.trim="account.authorization['secretID']"></el-input>
                         </el-form-item>
                         <el-form-item label="Secret Key" prop="authorization.secretKey">
                             <el-input v-model.trim="account.authorization['secretKey']"></el-input>
@@ -119,6 +130,7 @@ const rules = ref<any>({
         email: [Rules.requiredInput],
         apiKey: [Rules.requiredInput],
         apiUser: [Rules.requiredInput],
+        secretID: [Rules.requiredInput],
     },
 });
 const account = ref({
