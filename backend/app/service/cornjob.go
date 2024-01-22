@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -28,7 +30,7 @@ type ICronjobService interface {
 	UpdateStatus(id uint, status string) error
 	Delete(req dto.CronjobBatchDelete) error
 	Download(down dto.CronjobDownload) (string, error)
-	StartJob(cronjob *model.Cronjob) (int, error)
+	StartJob(cronjob *model.Cronjob) (string, error)
 	CleanRecord(req dto.CronjobClean) error
 
 	LoadRecordLog(req dto.OperateByID) (string, error)
@@ -184,29 +186,40 @@ func (u *CronjobService) Create(cronjobDto dto.CronjobCreate) error {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
 	cronjob.Status = constant.StatusEnable
-	cronjob.Spec = loadSpec(cronjob)
 
 	global.LOG.Infof("create cronjob %s successful, spec: %s", cronjob.Name, cronjob.Spec)
-	entryID, err := u.StartJob(&cronjob)
+	spec := cronjob.Spec
+	entryIDs, err := u.StartJob(&cronjob)
 	if err != nil {
 		return err
 	}
-	cronjob.EntryID = uint64(entryID)
+	cronjob.Spec = spec
+	cronjob.EntryIDs = entryIDs
 	if err := cronjobRepo.Create(&cronjob); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (u *CronjobService) StartJob(cronjob *model.Cronjob) (int, error) {
-	if cronjob.EntryID != 0 {
-		global.Cron.Remove(cron.EntryID(cronjob.EntryID))
+func (u *CronjobService) StartJob(cronjob *model.Cronjob) (string, error) {
+	if len(cronjob.EntryIDs) != 0 {
+		ids := strings.Split(cronjob.EntryIDs, ",")
+		for _, id := range ids {
+			idItem, _ := strconv.Atoi(id)
+			global.Cron.Remove(cron.EntryID(idItem))
+		}
 	}
-	entryID, err := u.AddCronJob(cronjob)
-	if err != nil {
-		return 0, err
+	specs := strings.Split(cronjob.Spec, ",")
+	var ids []string
+	for _, spec := range specs {
+		cronjob.Spec = spec
+		entryID, err := u.AddCronJob(cronjob)
+		if err != nil {
+			return "", err
+		}
+		ids = append(ids, fmt.Sprintf("%v", entryID))
 	}
-	return entryID, nil
+	return strings.Join(ids, ","), nil
 }
 
 func (u *CronjobService) Delete(req dto.CronjobBatchDelete) error {
@@ -215,8 +228,12 @@ func (u *CronjobService) Delete(req dto.CronjobBatchDelete) error {
 		if cronjob.ID == 0 {
 			return errors.New("find cronjob in db failed")
 		}
-		global.Cron.Remove(cron.EntryID(cronjob.EntryID))
-		global.LOG.Infof("stop cronjob entryID: %d", cronjob.EntryID)
+		ids := strings.Split(cronjob.EntryIDs, ",")
+		for _, id := range ids {
+			idItem, _ := strconv.Atoi(id)
+			global.Cron.Remove(cron.EntryID(idItem))
+		}
+		global.LOG.Infof("stop cronjob entryID: %s", cronjob.EntryIDs)
 		if err := u.CleanRecord(dto.CronjobClean{CronjobID: id, CleanData: req.CleanData}); err != nil {
 			return err
 		}
@@ -238,29 +255,27 @@ func (u *CronjobService) Update(id uint, req dto.CronjobUpdate) error {
 		return constant.ErrRecordNotFound
 	}
 	upMap := make(map[string]interface{})
-	cronjob.EntryID = cronModel.EntryID
+	cronjob.EntryIDs = cronModel.EntryIDs
 	cronjob.Type = cronModel.Type
-	cronjob.Spec = loadSpec(cronjob)
+	spec := cronjob.Spec
 	if cronModel.Status == constant.StatusEnable {
-		newEntryID, err := u.StartJob(&cronjob)
+		newEntryIDs, err := u.StartJob(&cronjob)
 		if err != nil {
 			return err
 		}
-		upMap["entry_id"] = newEntryID
+		upMap["entry_ids"] = newEntryIDs
 	} else {
-		global.Cron.Remove(cron.EntryID(cronjob.EntryID))
+		ids := strings.Split(cronjob.EntryIDs, ",")
+		for _, id := range ids {
+			idItem, _ := strconv.Atoi(id)
+			global.Cron.Remove(cron.EntryID(idItem))
+		}
 	}
 
 	upMap["name"] = req.Name
-	upMap["spec"] = cronjob.Spec
+	upMap["spec"] = spec
 	upMap["script"] = req.Script
 	upMap["container_name"] = req.ContainerName
-	upMap["spec_type"] = req.SpecType
-	upMap["week"] = req.Week
-	upMap["day"] = req.Day
-	upMap["hour"] = req.Hour
-	upMap["minute"] = req.Minute
-	upMap["second"] = req.Second
 	upMap["app_id"] = req.AppID
 	upMap["website"] = req.Website
 	upMap["exclusion_rules"] = req.ExclusionRules
@@ -280,19 +295,23 @@ func (u *CronjobService) UpdateStatus(id uint, status string) error {
 		return errors.WithMessage(constant.ErrRecordNotFound, "record not found")
 	}
 	var (
-		entryID int
-		err     error
+		entryIDs string
+		err      error
 	)
 	if status == constant.StatusEnable {
-		entryID, err = u.StartJob(&cronjob)
+		entryIDs, err = u.StartJob(&cronjob)
 		if err != nil {
 			return err
 		}
 	} else {
-		global.Cron.Remove(cron.EntryID(cronjob.EntryID))
-		global.LOG.Infof("stop cronjob entryID: %d", cronjob.EntryID)
+		ids := strings.Split(cronjob.EntryIDs, ",")
+		for _, id := range ids {
+			idItem, _ := strconv.Atoi(id)
+			global.Cron.Remove(cron.EntryID(idItem))
+		}
+		global.LOG.Infof("stop cronjob entryID: %s", cronjob.EntryIDs)
 	}
-	return cronjobRepo.Update(cronjob.ID, map[string]interface{}{"status": status, "entry_id": entryID})
+	return cronjobRepo.Update(cronjob.ID, map[string]interface{}{"status": status, "entry_ids": entryIDs})
 }
 
 func (u *CronjobService) AddCronJob(cronjob *model.Cronjob) (int, error) {
@@ -327,27 +346,4 @@ func mkdirAndWriteFile(cronjob *model.Cronjob, startTime time.Time, msg []byte) 
 	_, _ = write.WriteString(string(msg))
 	write.Flush()
 	return path, nil
-}
-
-func loadSpec(cronjob model.Cronjob) string {
-	switch cronjob.SpecType {
-	case "perMonth":
-		return fmt.Sprintf("%v %v %v * *", cronjob.Minute, cronjob.Hour, cronjob.Day)
-	case "perWeek":
-		return fmt.Sprintf("%v %v * * %v", cronjob.Minute, cronjob.Hour, cronjob.Week)
-	case "perNDay":
-		return fmt.Sprintf("%v %v */%v * *", cronjob.Minute, cronjob.Hour, cronjob.Day)
-	case "perDay":
-		return fmt.Sprintf("%v %v * * *", cronjob.Minute, cronjob.Hour)
-	case "perNHour":
-		return fmt.Sprintf("%v */%v * * *", cronjob.Minute, cronjob.Hour)
-	case "perHour":
-		return fmt.Sprintf("%v * * * *", cronjob.Minute)
-	case "perNMinute":
-		return fmt.Sprintf("@every %vm", cronjob.Minute)
-	case "perNSecond":
-		return fmt.Sprintf("@every %vs", cronjob.Second)
-	default:
-		return ""
-	}
 }

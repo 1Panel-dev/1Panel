@@ -5,12 +5,8 @@ export namespace Cronjob {
         id: number;
         name: string;
         type: string;
-        specType: string;
-        week: number;
-        day: number;
-        hour: number;
-        minute: number;
-        second: number;
+        spec: string;
+        specObjs: Array<SpecObj>;
 
         script: string;
         inContainer: boolean;
@@ -31,12 +27,8 @@ export namespace Cronjob {
     export interface CronjobCreate {
         name: string;
         type: string;
-        specType: string;
-        week: number;
-        day: number;
-        hour: number;
-        minute: number;
-        second: number;
+        spec: string;
+        specObjs: Array<SpecObj>;
 
         script: string;
         website: string;
@@ -49,14 +41,17 @@ export namespace Cronjob {
         targetDirID: number;
         retainCopies: number;
     }
-    export interface CronjobUpdate {
-        id: number;
+    export interface SpecObj {
         specType: string;
         week: number;
         day: number;
         hour: number;
         minute: number;
         second: number;
+    }
+    export interface CronjobUpdate {
+        id: number;
+        spec: string;
 
         script: string;
         website: string;

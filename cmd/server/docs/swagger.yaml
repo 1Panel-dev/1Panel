@@ -582,20 +582,14 @@ definitions:
         type: string
       containerName:
         type: string
-      day:
-        type: integer
       dbName:
         type: string
       dbType:
         type: string
       exclusionRules:
         type: string
-      hour:
-        type: integer
       keepLocal:
         type: boolean
-      minute:
-        type: integer
       name:
         type: string
       retainCopies:
@@ -603,11 +597,9 @@ definitions:
         type: integer
       script:
         type: string
-      second:
-        type: integer
       sourceDir:
         type: string
-      specType:
+      spec:
         type: string
       targetDirID:
         type: integer
@@ -617,13 +609,9 @@ definitions:
         type: string
       website:
         type: string
-      week:
-        maximum: 6
-        minimum: 0
-        type: integer
     required:
     - name
-    - specType
+    - spec
     - type
     type: object
   dto.CronjobDownload:
@@ -642,22 +630,16 @@ definitions:
         type: string
       containerName:
         type: string
-      day:
-        type: integer
       dbName:
         type: string
       dbType:
         type: string
       exclusionRules:
         type: string
-      hour:
-        type: integer
       id:
         type: integer
       keepLocal:
         type: boolean
-      minute:
-        type: integer
       name:
         type: string
       retainCopies:
@@ -665,11 +647,9 @@ definitions:
         type: integer
       script:
         type: string
-      second:
-        type: integer
       sourceDir:
         type: string
-      specType:
+      spec:
         type: string
       targetDirID:
         type: integer
@@ -677,14 +657,10 @@ definitions:
         type: string
       website:
         type: string
-      week:
-        maximum: 6
-        minimum: 0
-        type: integer
     required:
     - id
     - name
-    - specType
+    - spec
     type: object
   dto.CronjobUpdateStatus:
     properties:
