@@ -1832,6 +1832,7 @@ const message = {
         primaryDomainHelper: 'Support domain name: port',
         acmeAccountType: 'Account Type',
         keyType: 'Key algorithm',
+        tencentCloud: 'Tencent Cloud',
     },
     php: {
         short_open_tag: 'Short tag support',
@@ -1938,6 +1939,9 @@ const message = {
         skipDNSCheck: 'Skip DNS check',
         skipDNSCheckHelper: 'If there is an application timeout problem, please check here, otherwise do not check it',
         cfHelper: 'Do not use Global API Key',
+        deprecated: 'will be deprecated',
+        deprecatedHelper:
+            'Maintenance has been stopped and may be abandoned in a future version. Please use Tencent Cloud method for analysis',
     },
     firewall: {
         create: 'Create rule',

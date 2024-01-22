@@ -1717,6 +1717,7 @@ const message = {
         primaryDomainHelper: '支持域名:端口',
         acmeAccountType: '账号类型',
         keyType: '密钥算法',
+        tencentCloud: '腾讯云',
     },
     php: {
         short_open_tag: '短标签支持',
@@ -1819,6 +1820,8 @@ const message = {
         skipDNSCheck: '跳过 DNS 校验',
         skipDNSCheckHelper: '如果出现申请超时问题，请勾选此处，其他情况请勿勾选',
         cfHelper: '请勿使用 Global API Key',
+        deprecated: '即将废弃',
+        deprecatedHelper: '已经停止维护，可能会在以后的某个版本废弃，请使用腾讯云方式解析',
     },
     firewall: {
         create: '创建规则',
