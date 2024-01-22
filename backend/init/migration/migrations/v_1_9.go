@@ -254,3 +254,20 @@ var UpdateOneDriveToken = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var UpdateCronjobSpec = &gormigrate.Migration{
+	ID: "20240122-update-cronjob-spec",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Cronjob{}); err != nil {
+			return err
+		}
+		_ = tx.Exec("ALTER TABLE cronjobs DROP COLUMN spec_type;").Error
+		_ = tx.Exec("ALTER TABLE cronjobs DROP COLUMN week;").Error
+		_ = tx.Exec("ALTER TABLE cronjobs DROP COLUMN day;").Error
+		_ = tx.Exec("ALTER TABLE cronjobs DROP COLUMN hour;").Error
+		_ = tx.Exec("ALTER TABLE cronjobs DROP COLUMN minute;").Error
+		_ = tx.Exec("ALTER TABLE cronjobs DROP COLUMN second;").Error
+
+		return nil
+	},
+}

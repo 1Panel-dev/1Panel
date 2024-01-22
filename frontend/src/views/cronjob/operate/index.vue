@@ -64,46 +64,64 @@
                     </el-form-item>
 
                     <el-form-item :label="$t('cronjob.cronSpec')" prop="spec">
-                        <el-select class="specTypeClass" v-model="dialogData.rowData!.specType">
-                            <el-option
-                                v-for="item in specOptions"
-                                :key="item.label"
-                                :value="item.value"
-                                :label="item.label"
-                            />
-                        </el-select>
-                        <el-select
-                            v-if="dialogData.rowData!.specType === 'perWeek'"
-                            class="specClass"
-                            v-model="dialogData.rowData!.week"
-                        >
-                            <el-option
-                                v-for="item in weekOptions"
-                                :key="item.label"
-                                :value="item.value"
-                                :label="item.label"
-                            />
-                        </el-select>
-                        <el-input v-if="hasDay()" class="specClass" v-model.number="dialogData.rowData!.day">
-                            <template #append>{{ $t('cronjob.day') }}</template>
-                        </el-input>
-                        <el-input v-if="hasHour()" class="specClass" v-model.number="dialogData.rowData!.hour">
-                            <template #append>{{ $t('commons.units.hour') }}</template>
-                        </el-input>
-                        <el-input
-                            v-if="dialogData.rowData!.specType !== 'perNSecond'"
-                            class="specClass"
-                            v-model.number="dialogData.rowData!.minute"
-                        >
-                            <template #append>{{ $t('commons.units.minute') }}</template>
-                        </el-input>
-                        <el-input
-                            v-if="dialogData.rowData!.specType === 'perNSecond'"
-                            class="specClass"
-                            v-model.number="dialogData.rowData!.second"
-                        >
-                            <template #append>{{ $t('commons.units.second') }}</template>
-                        </el-input>
+                        <div v-for="(specObj, index) of dialogData.rowData.specObjs" :key="index" style="width: 100%">
+                            <el-select class="specTypeClass" v-model="specObj.specType">
+                                <el-option
+                                    v-for="item in specOptions"
+                                    :key="item.label"
+                                    :value="item.value"
+                                    :label="item.label"
+                                />
+                            </el-select>
+                            <el-select v-if="specObj.specType === 'perWeek'" class="specClass" v-model="specObj.week">
+                                <el-option
+                                    v-for="item in weekOptions"
+                                    :key="item.label"
+                                    :value="item.value"
+                                    :label="item.label"
+                                />
+                            </el-select>
+                            <el-input v-if="hasDay(specObj)" class="specClass" v-model.number="specObj.day">
+                                <template #append>
+                                    <div class="append">{{ $t('cronjob.day') }}</div>
+                                </template>
+                            </el-input>
+                            <el-input v-if="hasHour(specObj)" class="specClass" v-model.number="specObj.hour">
+                                <template #append>
+                                    <div class="append">{{ $t('commons.units.hour') }}</div>
+                                </template>
+                            </el-input>
+                            <el-input
+                                v-if="specObj.specType !== 'perNSecond'"
+                                class="specClass"
+                                v-model.number="specObj.minute"
+                            >
+                                <template #append>
+                                    <div class="append">{{ $t('commons.units.minute') }}</div>
+                                </template>
+                            </el-input>
+                            <el-input
+                                v-if="specObj.specType === 'perNSecond'"
+                                class="specClass"
+                                v-model.number="specObj.second"
+                            >
+                                <template #append>
+                                    <div class="append">{{ $t('commons.units.second') }}</div>
+                                </template>
+                            </el-input>
+                            <el-button
+                                link
+                                type="primary"
+                                style="float: right; margin-top: 5px"
+                                @click="handleSpecDelete(index)"
+                            >
+                                {{ $t('commons.button.delete') }}
+                            </el-button>
+                            <el-divider class="divider" />
+                        </div>
+                        <el-button class="mt-3" @click="handleSpecAdd()">
+                            {{ $t('commons.button.add') }}
+                        </el-button>
                     </el-form-item>
 
                     <el-form-item v-if="hasScript()">
@@ -296,7 +314,7 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { checkNumberRange, Rules } from '@/global/form-rules';
+import { Rules } from '@/global/form-rules';
 import FileList from '@/components/file-list/index.vue';
 import { getBackupList } from '@/api/modules/setting';
 import i18n from '@/lang';
@@ -311,6 +329,7 @@ import { useRouter } from 'vue-router';
 import { listContainer } from '@/api/modules/container';
 import { Database } from '@/api/interface/database';
 import { ListAppInstalled } from '@/api/modules/app';
+import { checkScript, loadDefaultSpec, specOptions, transObjToSpec, transSpecToObj, weekOptions } from './../helper';
 const router = useRouter();
 
 interface DialogProps {
@@ -326,6 +345,13 @@ const dialogData = ref<DialogProps>({
 
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
+    if (dialogData.value.rowData?.spec) {
+        let objs = [];
+        for (const item of dialogData.value.rowData.spec.split(',')) {
+            objs.push(transSpecToObj(item));
+        }
+        dialogData.value.rowData.specObjs = objs;
+    }
     if (dialogData.value.title === 'create') {
         changeType();
         dialogData.value.rowData.dbType = 'mysql';
@@ -373,96 +399,52 @@ const dbInfo = reactive({
 });
 
 const verifySpec = (rule: any, value: any, callback: any) => {
-    switch (dialogData.value.rowData!.specType) {
-        case 'perMonth':
-        case 'perNDay':
-            if (
-                !(
-                    Number.isInteger(dialogData.value.rowData!.day) &&
-                    Number.isInteger(dialogData.value.rowData!.hour) &&
-                    Number.isInteger(dialogData.value.rowData!.minute)
-                )
-            ) {
-                callback(new Error(i18n.global.t('cronjob.cronSpecRule')));
-            }
-            break;
-        case 'perWeek':
-            if (
-                !(
-                    Number.isInteger(dialogData.value.rowData!.week) &&
-                    Number.isInteger(dialogData.value.rowData!.hour) &&
-                    Number.isInteger(dialogData.value.rowData!.minute)
-                )
-            ) {
-                callback(new Error(i18n.global.t('cronjob.cronSpecRule')));
-            }
-            break;
-        case 'perDay':
-            if (
-                !(
-                    Number.isInteger(dialogData.value.rowData!.hour) &&
-                    Number.isInteger(dialogData.value.rowData!.minute)
-                )
-            ) {
-                callback(new Error(i18n.global.t('cronjob.cronSpecRule')));
-            }
-            break;
-        case 'perNHour':
-            if (
-                !(
-                    Number.isInteger(dialogData.value.rowData!.hour) &&
-                    Number.isInteger(dialogData.value.rowData!.minute)
-                )
-            ) {
-                callback(new Error(i18n.global.t('cronjob.cronSpecRule')));
-            }
-            break;
-        case 'perHour':
-        case 'perNMinute':
-            if (!Number.isInteger(dialogData.value.rowData!.minute)) {
-                callback(new Error(i18n.global.t('cronjob.cronSpecRule')));
-            }
-            break;
-        case 'perNSecond':
-            if (!Number.isInteger(dialogData.value.rowData!.second)) {
-                callback(new Error(i18n.global.t('cronjob.cronSpecRule')));
-            }
-            break;
+    for (const item of dialogData.value.rowData!.specObjs) {
+        switch (item.specType) {
+            case 'perMonth':
+            case 'perNDay':
+                if (!(Number.isInteger(item.day) && Number.isInteger(item.hour) && Number.isInteger(item.minute))) {
+                    callback(new Error(i18n.global.t('cronjob.cronSpecRule')));
+                }
+                break;
+            case 'perWeek':
+                if (!(Number.isInteger(item.week) && Number.isInteger(item.hour) && Number.isInteger(item.minute))) {
+                    callback(new Error(i18n.global.t('cronjob.cronSpecRule')));
+                }
+                break;
+            case 'perDay':
+                if (!(Number.isInteger(item.hour) && Number.isInteger(item.minute))) {
+                    callback(new Error(i18n.global.t('cronjob.cronSpecRule')));
+                }
+                break;
+            case 'perNHour':
+                if (!(Number.isInteger(item.hour) && Number.isInteger(item.minute))) {
+                    callback(new Error(i18n.global.t('cronjob.cronSpecRule')));
+                }
+                break;
+            case 'perHour':
+            case 'perNMinute':
+                if (!Number.isInteger(item.minute)) {
+                    callback(new Error(i18n.global.t('cronjob.cronSpecRule')));
+                }
+                break;
+            case 'perNSecond':
+                if (!Number.isInteger(item.second)) {
+                    callback(new Error(i18n.global.t('cronjob.cronSpecRule')));
+                }
+                break;
+        }
     }
     callback();
 };
 
-const specOptions = [
-    { label: i18n.global.t('cronjob.perMonth'), value: 'perMonth' },
-    { label: i18n.global.t('cronjob.perWeek'), value: 'perWeek' },
-    { label: i18n.global.t('cronjob.perDay'), value: 'perDay' },
-    { label: i18n.global.t('cronjob.perHour'), value: 'perHour' },
-    { label: i18n.global.t('cronjob.perNDay'), value: 'perNDay' },
-    { label: i18n.global.t('cronjob.perNHour'), value: 'perNHour' },
-    { label: i18n.global.t('cronjob.perNMinute'), value: 'perNMinute' },
-    { label: i18n.global.t('cronjob.perNSecond'), value: 'perNSecond' },
-];
-const weekOptions = [
-    { label: i18n.global.t('cronjob.monday'), value: 1 },
-    { label: i18n.global.t('cronjob.tuesday'), value: 2 },
-    { label: i18n.global.t('cronjob.wednesday'), value: 3 },
-    { label: i18n.global.t('cronjob.thursday'), value: 4 },
-    { label: i18n.global.t('cronjob.friday'), value: 5 },
-    { label: i18n.global.t('cronjob.saturday'), value: 6 },
-    { label: i18n.global.t('cronjob.sunday'), value: 0 },
-];
 const rules = reactive({
     name: [Rules.requiredInput],
     type: [Rules.requiredSelect],
-    specType: [Rules.requiredSelect],
     spec: [
         { validator: verifySpec, trigger: 'blur', required: true },
         { validator: verifySpec, trigger: 'change', required: true },
     ],
-    week: [Rules.requiredSelect, Rules.number],
-    day: [Rules.number, checkNumberRange(1, 31)],
-    hour: [Rules.number, checkNumberRange(1, 23)],
-    minute: [Rules.number, checkNumberRange(1, 59)],
 
     script: [Rules.requiredInput],
     website: [Rules.requiredSelect],
@@ -480,15 +462,11 @@ const loadDir = async (path: string) => {
     dialogData.value.rowData!.sourceDir = path;
 };
 
-const hasDay = () => {
-    return dialogData.value.rowData!.specType === 'perMonth' || dialogData.value.rowData!.specType === 'perNDay';
+const hasDay = (item: any) => {
+    return item.specType === 'perMonth' || item.specType === 'perNDay';
 };
-const hasHour = () => {
-    return (
-        dialogData.value.rowData!.specType !== 'perHour' &&
-        dialogData.value.rowData!.specType !== 'perNMinute' &&
-        dialogData.value.rowData!.specType !== 'perNSecond'
-    );
+const hasHour = (item: any) => {
+    return item.specType !== 'perHour' && item.specType !== 'perNMinute' && item.specType !== 'perNSecond';
 };
 
 const loadDatabases = async (dbType: string) => {
@@ -497,57 +475,34 @@ const loadDatabases = async (dbType: string) => {
 };
 
 const changeType = () => {
-    switch (dialogData.value.rowData!.type) {
-        case 'shell':
-            dialogData.value.rowData.specType = 'perWeek';
-            dialogData.value.rowData.week = 1;
-            dialogData.value.rowData.hour = 1;
-            dialogData.value.rowData.minute = 30;
-            break;
-        case 'app':
-            dialogData.value.rowData.specType = 'perDay';
-            dialogData.value.rowData.hour = 2;
-            dialogData.value.rowData.minute = 30;
-            break;
-        case 'database':
-            dialogData.value.rowData.specType = 'perDay';
-            dialogData.value.rowData.hour = 2;
-            dialogData.value.rowData.minute = 30;
-            break;
-        case 'clean':
-        case 'website':
-            dialogData.value.rowData.specType = 'perWeek';
-            dialogData.value.rowData.week = 1;
-            dialogData.value.rowData.hour = 1;
-            dialogData.value.rowData.minute = 30;
-            break;
-        case 'log':
-        case 'snapshot':
-            dialogData.value.rowData.specType = 'perWeek';
-            dialogData.value.rowData.week = 1;
-            dialogData.value.rowData.hour = 1;
-            dialogData.value.rowData.minute = 30;
-            dialogData.value.rowData.keepLocal = false;
-            dialogData.value.rowData.targetDirID = null;
-            for (const item of backupOptions.value) {
-                if (item.label !== i18n.global.t('setting.LOCAL')) {
-                    dialogData.value.rowData.targetDirID = item.value;
-                    break;
-                }
+    if (dialogData.value.rowData.type === 'snapshot') {
+        dialogData.value.rowData.keepLocal = false;
+        dialogData.value.rowData.targetDirID = null;
+        for (const item of backupOptions.value) {
+            if (item.label !== i18n.global.t('setting.LOCAL')) {
+                dialogData.value.rowData.targetDirID = item.value;
+                break;
             }
-            break;
-        case 'directory':
-            dialogData.value.rowData.specType = 'perDay';
-            dialogData.value.rowData.hour = 1;
-            dialogData.value.rowData.minute = 30;
-            break;
-        case 'curl':
-            dialogData.value.rowData.specType = 'perWeek';
-            dialogData.value.rowData.week = 1;
-            dialogData.value.rowData.hour = 1;
-            dialogData.value.rowData.minute = 30;
-            break;
+        }
     }
+
+    dialogData.value.rowData!.specObjs = [loadDefaultSpec(dialogData.value.rowData.type)];
+};
+
+const handleSpecAdd = () => {
+    let item = {
+        specType: 'perWeek',
+        week: 1,
+        day: 0,
+        hour: 1,
+        minute: 30,
+        second: 0,
+    };
+    dialogData.value.rowData!.specObjs.push(item);
+};
+
+const handleSpecDelete = (index: number) => {
+    dialogData.value.rowData!.specObjs.splice(index, 1);
 };
 
 const loadBackups = async () => {
@@ -597,40 +552,21 @@ function hasScript() {
     return dialogData.value.rowData!.type === 'shell';
 }
 
-function checkScript() {
-    let row = dialogData.value.rowData;
-    switch (row.specType) {
-        case 'perMonth':
-            return row.day > 0 && row.day < 32 && row.hour >= 0 && row.hour < 24 && row.minute >= 0 && row.minute < 60;
-        case 'perWeek':
-            return (
-                row.week >= 0 && row.week < 7 && row.hour >= 0 && row.hour < 24 && row.minute >= 0 && row.minute < 60
-            );
-        case 'perDay':
-            return row.hour >= 0 && row.hour < 24 && row.minute >= 0 && row.minute < 60;
-        case 'perHour':
-            return row.minute >= 0 && row.minute < 60;
-        case 'perNDay':
-            return row.day > 0 && row.day < 366 && row.hour >= 0 && row.hour < 24 && row.minute >= 0 && row.minute < 60;
-        case 'perNHour':
-            return row.hour > 0 && row.hour < 8784 && row.minute >= 0 && row.minute < 60;
-        case 'perNMinute':
-            return row.minute > 0 && row.minute < 527040;
-        case 'perNSecond':
-            return row.second > 0 && row.second < 31622400;
-    }
-}
-
 const onSubmit = async (formEl: FormInstance | undefined) => {
-    dialogData.value.rowData.week = Number(dialogData.value.rowData.week);
-    dialogData.value.rowData.day = Number(dialogData.value.rowData.day);
-    dialogData.value.rowData.hour = Number(dialogData.value.rowData.hour);
-    dialogData.value.rowData.minute = Number(dialogData.value.rowData.minute);
-    dialogData.value.rowData.second = Number(dialogData.value.rowData.second);
-    if (!checkScript()) {
-        MsgError(i18n.global.t('cronjob.cronSpecHelper'));
-        return;
+    const specs = [];
+    for (const item of dialogData.value.rowData.specObjs) {
+        if (!checkScript(item.specType, item.week, item.day, item.hour, item.minute, item.second)) {
+            MsgError(i18n.global.t('cronjob.cronSpecHelper'));
+            return;
+        }
+        const itemSpec = transObjToSpec(item.specType, item.week, item.day, item.hour, item.minute, item.second);
+        if (itemSpec === '') {
+            MsgError(i18n.global.t('cronjob.cronSpecHelper'));
+            return;
+        }
+        specs.push(itemSpec);
     }
+    dialogData.value.rowData.spec = specs.join(',');
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
@@ -660,14 +596,20 @@ defineExpose({
 </script>
 <style scoped lang="scss">
 .specClass {
-    width: 22% !important;
+    width: 20% !important;
     margin-left: 20px;
+    .append {
+        width: 20px;
+    }
 }
 @media only screen and (max-width: 1000px) {
     .specClass {
         width: 100% !important;
         margin-top: 20px;
         margin-left: 0;
+        .append {
+            width: 43px;
+        }
     }
 }
 .specTypeClass {
@@ -694,5 +636,13 @@ defineExpose({
         font-size: 12px;
         margin-top: -3px;
     }
+}
+
+.divider {
+    display: block;
+    height: 1px;
+    width: 100%;
+    margin: 3px 0;
+    border-top: 1px var(--el-border-color) var(--el-border-style);
 }
 </style>

@@ -5,15 +5,9 @@ import "time"
 type Cronjob struct {
 	BaseModel
 
-	Name     string `gorm:"type:varchar(64);not null;unique" json:"name"`
-	Type     string `gorm:"type:varchar(64);not null" json:"type"`
-	SpecType string `gorm:"type:varchar(64);not null" json:"specType"`
-	Spec     string `gorm:"type:varchar(64);not null" json:"spec"`
-	Week     uint64 `gorm:"type:decimal" json:"week"`
-	Day      uint64 `gorm:"type:decimal" json:"day"`
-	Hour     uint64 `gorm:"type:decimal" json:"hour"`
-	Minute   uint64 `gorm:"type:decimal" json:"minute"`
-	Second   uint64 `gorm:"type:decimal" json:"second"`
+	Name string `gorm:"type:varchar(64);not null" json:"name"`
+	Type string `gorm:"type:varchar(64);not null" json:"type"`
+	Spec string `gorm:"type:varchar(64);not null" json:"spec"`
 
 	ContainerName  string `gorm:"type:varchar(64)" json:"containerName"`
 	Script         string `gorm:"longtext" json:"script"`
@@ -29,9 +23,9 @@ type Cronjob struct {
 	TargetDirID  uint64 `gorm:"type:decimal" json:"targetDirID"`
 	RetainCopies uint64 `gorm:"type:decimal" json:"retainCopies"`
 
-	Status  string       `gorm:"type:varchar(64)" json:"status"`
-	EntryID uint64       `gorm:"type:decimal" json:"entryID"`
-	Records []JobRecords `json:"records"`
+	Status   string       `gorm:"type:varchar(64)" json:"status"`
+	EntryIDs string       `gorm:"type:varchar(64)" json:"entryIDs"`
+	Records  []JobRecords `json:"records"`
 }
 
 type JobRecords struct {

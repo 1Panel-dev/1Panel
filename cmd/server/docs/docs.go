@@ -14918,7 +14918,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "name",
-                "specType",
+                "spec",
                 "type"
             ],
             "properties": {
@@ -14927,9 +14927,6 @@ const docTemplate = `{
                 },
                 "containerName": {
                     "type": "string"
-                },
-                "day": {
-                    "type": "integer"
                 },
                 "dbName": {
                     "type": "string"
@@ -14940,14 +14937,8 @@ const docTemplate = `{
                 "exclusionRules": {
                     "type": "string"
                 },
-                "hour": {
-                    "type": "integer"
-                },
                 "keepLocal": {
                     "type": "boolean"
-                },
-                "minute": {
-                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
@@ -14959,13 +14950,10 @@ const docTemplate = `{
                 "script": {
                     "type": "string"
                 },
-                "second": {
-                    "type": "integer"
-                },
                 "sourceDir": {
                     "type": "string"
                 },
-                "specType": {
+                "spec": {
                     "type": "string"
                 },
                 "targetDirID": {
@@ -14979,11 +14967,6 @@ const docTemplate = `{
                 },
                 "website": {
                     "type": "string"
-                },
-                "week": {
-                    "type": "integer",
-                    "maximum": 6,
-                    "minimum": 0
                 }
             }
         },
@@ -15007,7 +14990,7 @@ const docTemplate = `{
             "required": [
                 "id",
                 "name",
-                "specType"
+                "spec"
             ],
             "properties": {
                 "appID": {
@@ -15015,9 +14998,6 @@ const docTemplate = `{
                 },
                 "containerName": {
                     "type": "string"
-                },
-                "day": {
-                    "type": "integer"
                 },
                 "dbName": {
                     "type": "string"
@@ -15028,17 +15008,11 @@ const docTemplate = `{
                 "exclusionRules": {
                     "type": "string"
                 },
-                "hour": {
-                    "type": "integer"
-                },
                 "id": {
                     "type": "integer"
                 },
                 "keepLocal": {
                     "type": "boolean"
-                },
-                "minute": {
-                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
@@ -15050,13 +15024,10 @@ const docTemplate = `{
                 "script": {
                     "type": "string"
                 },
-                "second": {
-                    "type": "integer"
-                },
                 "sourceDir": {
                     "type": "string"
                 },
-                "specType": {
+                "spec": {
                     "type": "string"
                 },
                 "targetDirID": {
@@ -15067,11 +15038,6 @@ const docTemplate = `{
                 },
                 "website": {
                     "type": "string"
-                },
-                "week": {
-                    "type": "integer",
-                    "maximum": 6,
-                    "minimum": 0
                 }
             }
         },

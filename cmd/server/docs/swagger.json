@@ -14911,7 +14911,7 @@
             "type": "object",
             "required": [
                 "name",
-                "specType",
+                "spec",
                 "type"
             ],
             "properties": {
@@ -14920,9 +14920,6 @@
                 },
                 "containerName": {
                     "type": "string"
-                },
-                "day": {
-                    "type": "integer"
                 },
                 "dbName": {
                     "type": "string"
@@ -14933,14 +14930,8 @@
                 "exclusionRules": {
                     "type": "string"
                 },
-                "hour": {
-                    "type": "integer"
-                },
                 "keepLocal": {
                     "type": "boolean"
-                },
-                "minute": {
-                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
@@ -14952,13 +14943,10 @@
                 "script": {
                     "type": "string"
                 },
-                "second": {
-                    "type": "integer"
-                },
                 "sourceDir": {
                     "type": "string"
                 },
-                "specType": {
+                "spec": {
                     "type": "string"
                 },
                 "targetDirID": {
@@ -14972,11 +14960,6 @@
                 },
                 "website": {
                     "type": "string"
-                },
-                "week": {
-                    "type": "integer",
-                    "maximum": 6,
-                    "minimum": 0
                 }
             }
         },
@@ -15000,7 +14983,7 @@
             "required": [
                 "id",
                 "name",
-                "specType"
+                "spec"
             ],
             "properties": {
                 "appID": {
@@ -15008,9 +14991,6 @@
                 },
                 "containerName": {
                     "type": "string"
-                },
-                "day": {
-                    "type": "integer"
                 },
                 "dbName": {
                     "type": "string"
@@ -15021,17 +15001,11 @@
                 "exclusionRules": {
                     "type": "string"
                 },
-                "hour": {
-                    "type": "integer"
-                },
                 "id": {
                     "type": "integer"
                 },
                 "keepLocal": {
                     "type": "boolean"
-                },
-                "minute": {
-                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
@@ -15043,13 +15017,10 @@
                 "script": {
                     "type": "string"
                 },
-                "second": {
-                    "type": "integer"
-                },
                 "sourceDir": {
                     "type": "string"
                 },
-                "specType": {
+                "spec": {
                     "type": "string"
                 },
                 "targetDirID": {
@@ -15060,11 +15031,6 @@
                 },
                 "website": {
                     "type": "string"
-                },
-                "week": {
-                    "type": "integer",
-                    "maximum": 6,
-                    "minimum": 0
                 }
             }
         },

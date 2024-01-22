@@ -81,35 +81,23 @@
                     </el-table-column>
                     <el-table-column :label="$t('cronjob.cronSpec')" show-overflow-tooltip :min-width="120">
                         <template #default="{ row }">
-                            <span v-if="row.specType.indexOf('N') === -1 || row.specType === 'perWeek'">
-                                {{ $t('cronjob.' + row.specType) }}&nbsp;
-                            </span>
-                            <span v-else>{{ $t('cronjob.per') }}</span>
-                            <span v-if="row.specType === 'perMonth'">
-                                {{ row.day }}{{ $t('cronjob.day') }} {{ loadZero(row.hour) }} :
-                                {{ loadZero(row.minute) }}
-                            </span>
-                            <span v-if="row.specType === 'perWeek'">
-                                {{ loadWeek(row.week) }} {{ loadZero(row.hour) }} : {{ loadZero(row.minute) }}
-                            </span>
-                            <span v-if="row.specType === 'perDay'">
-                                &#32;{{ loadZero(row.hour) }} : {{ loadZero(row.minute) }}
-                            </span>
-                            <span v-if="row.specType === 'perNDay'">
-                                {{ row.day }} {{ $t('commons.units.day') }}, {{ loadZero(row.hour) }} :
-                                {{ loadZero(row.minute) }}
-                            </span>
-                            <span v-if="row.specType === 'perNHour'">
-                                {{ row.hour }}{{ $t('commons.units.hour') }}, {{ loadZero(row.minute) }}
-                            </span>
-                            <span v-if="row.specType === 'perHour'">{{ loadZero(row.minute) }}</span>
-                            <span v-if="row.specType === 'perNMinute'">
-                                {{ row.minute }}{{ $t('commons.units.minute') }}
-                            </span>
-                            <span v-if="row.specType === 'perNSecond'">
-                                {{ row.second }}{{ $t('commons.units.second') }}
-                            </span>
-                            {{ $t('cronjob.handle') }}
+                            <div v-for="(item, index) of row.spec.split(',')" :key="index" class="mt-1">
+                                <div v-if="row.expand || (!row.expand && index < 3)">
+                                    <el-tag>
+                                        {{ transSpecToStr(item) }}
+                                    </el-tag>
+                                </div>
+                            </div>
+                            <div v-if="!row.expand && row.spec.split(',').length > 3">
+                                <el-button type="primary" link @click="row.expand = true">
+                                    {{ $t('commons.button.expand') }}...
+                                </el-button>
+                            </div>
+                            <div v-if="row.expand && row.spec.split(',').length > 3">
+                                <el-button type="primary" link @click="row.expand = false">
+                                    {{ $t('commons.button.collapse') }}
+                                </el-button>
+                            </div>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('cronjob.retainCopies')" :min-width="90" prop="retainCopies" />
@@ -158,13 +146,13 @@ import TableSetting from '@/components/table-setting/index.vue';
 import Tooltip from '@/components/tooltip/index.vue';
 import OperateDialog from '@/views/cronjob/operate/index.vue';
 import Records from '@/views/cronjob/record/index.vue';
-import { loadZero } from '@/utils/util';
 import { onMounted, reactive, ref } from 'vue';
 import { deleteCronjob, getCronjobPage, handleOnce, updateStatus } from '@/api/modules/cronjob';
 import i18n from '@/lang';
 import { Cronjob } from '@/api/interface/cronjob';
 import { ElMessageBox } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
+import { transSpecToStr } from './helper';
 
 const loading = ref();
 const selects = ref<any>([]);
@@ -185,16 +173,6 @@ const paginationConfig = reactive({
     order: 'null',
 });
 const searchName = ref();
-
-const weekOptions = [
-    { label: i18n.global.t('cronjob.monday'), value: 1 },
-    { label: i18n.global.t('cronjob.tuesday'), value: 2 },
-    { label: i18n.global.t('cronjob.wednesday'), value: 3 },
-    { label: i18n.global.t('cronjob.thursday'), value: 4 },
-    { label: i18n.global.t('cronjob.friday'), value: 5 },
-    { label: i18n.global.t('cronjob.saturday'), value: 6 },
-    { label: i18n.global.t('cronjob.sunday'), value: 0 },
-];
 
 const search = async (column?: any) => {
     paginationConfig.orderBy = column?.order ? column.prop : paginationConfig.orderBy;
@@ -229,13 +207,17 @@ const dialogRef = ref();
 const onOpenDialog = async (
     title: string,
     rowData: Partial<Cronjob.CronjobInfo> = {
-        specType: 'perMonth',
+        specObjs: [
+            {
+                specType: 'perMonth',
+                week: 1,
+                day: 3,
+                hour: 1,
+                minute: 30,
+                second: 30,
+            },
+        ],
         type: 'shell',
-        week: 1,
-        day: 3,
-        hour: 1,
-        minute: 30,
-        second: 30,
         keepLocal: true,
         retainCopies: 7,
     },
@@ -370,14 +352,7 @@ const buttons = [
         },
     },
 ];
-function loadWeek(i: number) {
-    for (const week of weekOptions) {
-        if (week.value === i) {
-            return week.label;
-        }
-    }
-    return '';
-}
+
 onMounted(() => {
     search();
 });
