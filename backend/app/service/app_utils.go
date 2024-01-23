@@ -492,23 +492,6 @@ func upgradeInstall(installId uint, detailId uint, backup bool) error {
 			detailDir = path.Join(constant.ResourceDir, "apps", "local", strings.TrimPrefix(install.App.Key, "local"), detail.Version)
 		}
 
-		images, err := composeV2.GetDockerComposeImages([]byte(detail.DockerCompose))
-		if err != nil {
-			upErr = err
-			return
-		}
-		dockerCli, err := composeV2.NewClient()
-		if err != nil {
-			upErr = err
-			return
-		}
-		for _, image := range images {
-			if err = dockerCli.PullImage(image, true); err != nil {
-				upErr = buserr.WithNameAndErr("ErrDockerPullImage", "", err)
-				return
-			}
-		}
-
 		command := exec.Command("/bin/bash", "-c", fmt.Sprintf("cp -rn %s/* %s || true", detailDir, install.GetPath()))
 		stdout, _ := command.CombinedOutput()
 		if stdout != nil {
@@ -590,6 +573,29 @@ func upgradeInstall(installId uint, detailId uint, backup bool) error {
 
 		if err = runScript(&install, "upgrade"); err != nil {
 			return
+		}
+
+		content, err := fileOp.GetContent(install.GetEnvPath())
+		if err != nil {
+			upErr = err
+			return
+		}
+
+		images, err := composeV2.GetDockerComposeImages(install.Name, content, []byte(detail.DockerCompose))
+		if err != nil {
+			upErr = err
+			return
+		}
+		dockerCli, err := composeV2.NewClient()
+		if err != nil {
+			upErr = err
+			return
+		}
+		for _, image := range images {
+			if err = dockerCli.PullImage(image, true); err != nil {
+				upErr = buserr.WithNameAndErr("ErrDockerPullImage", "", err)
+				return
+			}
 		}
 
 		if upErr = fileOp.WriteFile(install.GetComposePath(), strings.NewReader(install.DockerCompose), 0775); upErr != nil {
