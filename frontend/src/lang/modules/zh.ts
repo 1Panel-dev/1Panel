@@ -86,6 +86,7 @@ const message = {
             refreshRate: '刷新频率',
             noRefresh: '不刷新',
             refreshRateUnit: '{0} 秒/次',
+            selectColumn: '选择列',
         },
         loadingText: {
             Upgrading: '系统升级中，请稍候...',
