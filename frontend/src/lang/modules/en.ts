@@ -86,6 +86,7 @@ const message = {
             refreshRate: 'Rate',
             noRefresh: 'No Refresh',
             refreshRateUnit: '{0} Seconds/Time',
+            selectColumn: 'Select column',
         },
         loadingText: {
             Upgrading: 'System upgrade, please wait...',

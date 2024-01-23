@@ -13,6 +13,12 @@
                             {{ $t('container.includeAppstore') }}
                         </el-checkbox>
                     </div>
+                    <fu-table-column-select
+                        :columns="columns"
+                        trigger="hover"
+                        :title="$t('commons.table.selectColumn')"
+                        popper-class="popper-class"
+                    />
                 </div>
             </template>
             <template #toolbar>
@@ -86,6 +92,8 @@
                     @search="search"
                     :row-style="{ height: '65px' }"
                     style="width: 100%"
+                    :columns="columns"
+                    localKey="contanerColumn"
                 >
                     <el-table-column type="selection" />
                     <el-table-column
@@ -184,7 +192,12 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.ip')" :width="mobile ? 80 : 'auto'" min-width="100" fix>
+                    <el-table-column
+                        :label="$t('container.ip')"
+                        :width="mobile ? 80 : 'auto'"
+                        min-width="100"
+                        prop="network"
+                    >
                         <template #default="{ row }">
                             <div v-if="row.network">
                                 <div v-for="(item, index) in row.network" :key="index">{{ item }}</div>
@@ -235,7 +248,6 @@
                         :width="mobile ? 260 : 'auto'"
                         min-width="200"
                         prop="ports"
-                        fix
                     >
                         <template #default="{ row }">
                             <div v-if="row.ports">
@@ -277,7 +289,6 @@
                         min-width="200"
                         show-overflow-tooltip
                         prop="runTime"
-                        fix
                     />
                     <fu-table-operations
                         width="180px"
@@ -357,6 +368,7 @@ const dialogUpgradeRef = ref();
 const dialogPortJumpRef = ref();
 const opRef = ref();
 const includeAppStore = ref(true);
+const columns = ref([]);
 
 const dockerStatus = ref('Running');
 const loadStatus = async () => {
