@@ -6,7 +6,6 @@ import (
 	"github.com/compose-spec/compose-go/types"
 	"github.com/docker/compose/v2/pkg/api"
 	"github.com/joho/godotenv"
-	"gopkg.in/yaml.v3"
 	"path"
 	"regexp"
 	"strings"
@@ -116,15 +115,32 @@ type Service struct {
 	Image string `yaml:"image"`
 }
 
-func GetDockerComposeImages(data []byte) ([]string, error) {
-	var dc ComposeProject
-	err := yaml.Unmarshal(data, &dc)
+func GetDockerComposeImages(projectName string, env, yml []byte) ([]string, error) {
+	var (
+		configFiles []types.ConfigFile
+		images      []string
+	)
+	configFiles = append(configFiles, types.ConfigFile{
+		Filename: "docker-compose.yml",
+		Content:  yml},
+	)
+	envMap, err := godotenv.UnmarshalBytes(env)
 	if err != nil {
 		return nil, err
 	}
+	details := types.ConfigDetails{
+		ConfigFiles: configFiles,
+		Environment: envMap,
+	}
 
-	var images []string
-	for _, service := range dc.Services {
+	project, err := loader.LoadWithContext(context.Background(), details, func(options *loader.Options) {
+		options.SetProjectName(projectName, true)
+		options.ResolvePaths = true
+	})
+	if err != nil {
+		return nil, err
+	}
+	for _, service := range project.AllServices() {
 		images = append(images, service.Image)
 	}
 	return images, nil
