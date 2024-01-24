@@ -22,7 +22,7 @@
                                 <el-radio-button :label="true">{{ $t('setting.isCN') }}</el-radio-button>
                             </el-radio-group>
                             <span class="input-help">
-                                {{ $t('setting.cn_onedrive_helper') }}
+                                {{ $t('setting.onedrive_helper') }}
                                 <el-link
                                     style="font-size: 12px; margin-left: 5px"
                                     icon="Position"

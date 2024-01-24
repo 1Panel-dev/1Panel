@@ -43,16 +43,29 @@ func NewICronjobService() ICronjobService {
 func (u *CronjobService) SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error) {
 	total, cronjobs, err := cronjobRepo.Page(search.Page, search.PageSize, commonRepo.WithLikeName(search.Info), commonRepo.WithOrderRuleBy(search.OrderBy, search.Order))
 	var dtoCronjobs []dto.CronjobInfo
+	accounts, _ := backupRepo.List()
 	for _, cronjob := range cronjobs {
 		var item dto.CronjobInfo
 		if err := copier.Copy(&item, &cronjob); err != nil {
 			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 		}
 		if hasBackup(item.Type) {
-			backup, _ := backupRepo.Get(commonRepo.WithByID(uint(item.TargetDirID)))
-			if len(backup.Type) != 0 {
-				item.TargetDir = backup.Type
+			for _, account := range accounts {
+				if int(account.ID) == item.TargetDirID {
+					item.TargetDir = account.Type
+				}
 			}
+			itemAccounts := strings.Split(item.TargetAccountIDs, ",")
+			var targetAccounts []string
+			for _, itemAccount := range itemAccounts {
+				for _, account := range accounts {
+					if itemAccount == fmt.Sprintf("%d", account.ID) {
+						targetAccounts = append(targetAccounts, account.Type)
+						break
+					}
+				}
+			}
+			item.TargetAccounts = strings.Join(targetAccounts, ",")
 		} else {
 			item.TargetDir = "-"
 		}
@@ -105,24 +118,22 @@ func (u *CronjobService) CleanRecord(req dto.CronjobClean) error {
 	if err != nil {
 		return err
 	}
-	if req.CleanData && hasBackup(cronjob.Type) {
-		cronjob.RetainCopies = 0
-		backup, err := backupRepo.Get(commonRepo.WithByID(uint(cronjob.TargetDirID)))
-		if err != nil {
-			return err
-		}
-		if backup.Type != "LOCAL" {
-			localDir, err := loadLocalDir()
+	if req.CleanData {
+		if hasBackup(cronjob.Type) {
+			accountMap, err := u.loadClientMap(cronjob.TargetAccountIDs)
 			if err != nil {
 				return err
 			}
-			client, err := NewIBackupService().NewClient(&backup)
-			if err != nil {
-				return err
-			}
-			u.HandleRmExpired(backup.Type, backup.BackupPath, localDir, &cronjob, client)
+			cronjob.RetainCopies = 0
+			u.removeExpiredBackup(cronjob, accountMap, model.BackupRecord{})
 		} else {
-			u.HandleRmExpired(backup.Type, backup.BackupPath, "", &cronjob, nil)
+			u.removeExpiredLog(cronjob)
+		}
+	} else {
+		records, _ := backupRepo.ListRecord(backupRepo.WithByCronID(cronjob.ID))
+		for _, records := range records {
+			records.CronjobID = 0
+			_ = backupRepo.UpdateRecord(&records)
 		}
 	}
 	delRecords, err := cronjobRepo.ListRecord(cronjobRepo.WithByJobID(int(req.CronjobID)))
@@ -283,8 +294,8 @@ func (u *CronjobService) Update(id uint, req dto.CronjobUpdate) error {
 	upMap["db_name"] = req.DBName
 	upMap["url"] = req.URL
 	upMap["source_dir"] = req.SourceDir
-	upMap["keep_local"] = req.KeepLocal
 	upMap["target_dir_id"] = req.TargetDirID
+	upMap["target_account_ids"] = req.TargetAccountIDs
 	upMap["retain_copies"] = req.RetainCopies
 	return cronjobRepo.Update(id, upMap)
 }

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io"
+	"os"
 	"os/exec"
 	"strings"
 	"time"
@@ -74,24 +74,27 @@ func ExecContainerScript(containerName, cmdStr string, timeout time.Duration) er
 	return nil
 }
 
-func ExecCronjobWithTimeOut(cmdStr string, workdir string, timeout time.Duration) (string, error) {
+func ExecCronjobWithTimeOut(cmdStr, workdir, outPath string, timeout time.Duration) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
+
+	file, err := os.OpenFile(outPath, os.O_WRONLY|os.O_CREATE, 0666)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
 	cmd := exec.Command("bash", "-c", cmdStr)
 	cmd.Dir = workdir
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	output := new(bytes.Buffer)
-	cmd.Stdout = io.MultiWriter(output, cmd.Stdout)
-	cmd.Stderr = io.MultiWriter(output, cmd.Stderr)
+	cmd.Stdout = file
+	cmd.Stderr = file
 
-	err := cmd.Run()
+	err = cmd.Run()
 	if ctx.Err() == context.DeadlineExceeded {
-		return "", buserr.New(constant.ErrCmdTimeout)
+		return buserr.New(constant.ErrCmdTimeout)
 	}
 
-	return output.String(), err
+	return err
 }
 
 func Execf(cmdStr string, a ...interface{}) (string, error) {

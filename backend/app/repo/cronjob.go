@@ -28,6 +28,7 @@ type ICronjobRepo interface {
 	Delete(opts ...DBOption) error
 	DeleteRecord(opts ...DBOption) error
 	StartRecords(cronjobID uint, fromLocal bool, targetPath string) model.JobRecords
+	UpdateRecords(id uint, vars map[string]interface{}) error
 	EndRecords(record model.JobRecords, status, message, records string)
 	PageRecords(page, size int, opts ...DBOption) (int64, []model.JobRecords, error)
 }
@@ -162,6 +163,10 @@ func (u *CronjobRepo) Save(id uint, cronjob model.Cronjob) error {
 }
 func (u *CronjobRepo) Update(id uint, vars map[string]interface{}) error {
 	return global.DB.Model(&model.Cronjob{}).Where("id = ?", id).Updates(vars).Error
+}
+
+func (u *CronjobRepo) UpdateRecords(id uint, vars map[string]interface{}) error {
+	return global.DB.Model(&model.JobRecords{}).Where("id = ?", id).Updates(vars).Error
 }
 
 func (u *CronjobRepo) Delete(opts ...DBOption) error {

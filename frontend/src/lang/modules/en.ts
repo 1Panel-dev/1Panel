@@ -812,6 +812,7 @@ const message = {
         allOptionHelper:
             'The current task plan is to back up all [{0}]. Direct download is not supported at the moment. You can check the backup list of [{0}] menu.',
         exclusionRules: 'Exclusive rule',
+        default_download_path: 'Default Download Link',
         saveLocal: 'Retain local backups (the same as the number of cloud storage copies)',
         url: 'URL Address',
         target: 'Target',

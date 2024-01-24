@@ -12,6 +12,8 @@ type BackupAccount struct {
 
 type BackupRecord struct {
 	BaseModel
+	From       string `gorm:"type:varchar(64)" json:"from"`
+	CronjobID  uint   `gorm:"type:decimal" json:"cronjobID"`
 	Type       string `gorm:"type:varchar(64);not null" json:"type"`
 	Name       string `gorm:"type:varchar(64);not null" json:"name"`
 	DetailName string `gorm:"type:varchar(256)" json:"detailName"`

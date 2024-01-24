@@ -43,7 +43,8 @@ func (u *BackupService) RedisBackup() error {
 			fileName = fmt.Sprintf("%s.tar.gz", timeNow)
 		}
 	}
-	backupDir := path.Join(localDir, fmt.Sprintf("database/redis/%s", redisInfo.Name))
+	itemDir := fmt.Sprintf("database/redis/%s", redisInfo.Name)
+	backupDir := path.Join(localDir, itemDir)
 	if err := handleRedisBackup(redisInfo, backupDir, fileName); err != nil {
 		return err
 	}
@@ -51,7 +52,7 @@ func (u *BackupService) RedisBackup() error {
 		Type:       "redis",
 		Source:     "LOCAL",
 		BackupType: "LOCAL",
-		FileDir:    backupDir,
+		FileDir:    itemDir,
 		FileName:   fileName,
 	}
 	if err := backupRepo.CreateRecord(record); err != nil {

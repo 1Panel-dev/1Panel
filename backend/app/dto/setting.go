@@ -100,7 +100,7 @@ type SnapshotStatus struct {
 
 type SnapshotCreate struct {
 	ID          uint   `json:"id"`
-	From        string `json:"from" validate:"required,oneof=OSS S3 SFTP MINIO COS KODO OneDrive WebDAV"`
+	From        string `json:"from" validate:"required"`
 	Description string `json:"description" validate:"max=256"`
 }
 type SnapshotRecover struct {

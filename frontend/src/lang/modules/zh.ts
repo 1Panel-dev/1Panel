@@ -774,6 +774,7 @@ const message = {
         snapshot: '系统快照',
         allOptionHelper: '当前计划任务为备份所有【{0}】，暂不支持直接下载，可在【{0}】备份列表中查看',
         exclusionRules: '排除规则',
+        default_download_path: '默认下载地址',
         saveLocal: '同时保留本地备份（和云存储保留份数一致）',
         url: 'URL 地址',
         target: '备份到',

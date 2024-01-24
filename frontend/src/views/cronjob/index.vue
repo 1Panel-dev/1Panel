@@ -100,8 +100,14 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('cronjob.retainCopies')" :min-width="90" prop="retainCopies" />
-
+                    <el-table-column :label="$t('cronjob.retainCopies')" :min-width="90" prop="retainCopies">
+                        <template #default="{ row }">
+                            <el-button v-if="hasBackup(row.type)" @click="loadBackups(row)" link type="primary">
+                                {{ row.retainCopies }}
+                            </el-button>
+                            <span v-else>{{ row.retainCopies }}</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('cronjob.lastRecordTime')" :min-width="120" prop="lastRecordTime">
                         <template #default="{ row }">
                             {{ row.lastRecordTime }}
@@ -109,7 +115,30 @@
                     </el-table-column>
                     <el-table-column :min-width="80" :label="$t('cronjob.target')" prop="targetDir">
                         <template #default="{ row }">
-                            {{ row.targetDir }}
+                            <div v-for="(item, index) of row.targetAccounts.split(',')" :key="index" class="mt-1">
+                                <div v-if="row.accountExpand || (!row.accountExpand && index < 3)">
+                                    <el-tag v-if="row.targetAccounts">
+                                        <span v-if="item === row.targetDir">
+                                            <el-icon><Star /></el-icon>
+                                            {{ $t('setting.' + item) }}
+                                        </span>
+                                        <span v-else>
+                                            {{ $t('setting.' + item) }}
+                                        </span>
+                                    </el-tag>
+                                    <span v-else>-</span>
+                                </div>
+                            </div>
+                            <div v-if="!row.accountExpand && row.targetAccounts.split(',').length > 3">
+                                <el-button type="primary" link @click="row.accountExpand = true">
+                                    {{ $t('commons.button.expand') }}...
+                                </el-button>
+                            </div>
+                            <div v-if="row.accountExpand && row.targetAccounts.split(',').length > 3">
+                                <el-button type="primary" link @click="row.accountExpand = false">
+                                    {{ $t('commons.button.collapse') }}
+                                </el-button>
+                            </div>
                         </template>
                     </el-table-column>
                     <fu-table-operations
@@ -137,6 +166,7 @@
         </OpDialog>
         <OperateDialog @search="search" ref="dialogRef" />
         <Records @search="search" ref="dialogRecordRef" />
+        <Backups @search="search" ref="dialogBackupRef" />
     </div>
 </template>
 
@@ -146,6 +176,7 @@ import TableSetting from '@/components/table-setting/index.vue';
 import Tooltip from '@/components/tooltip/index.vue';
 import OperateDialog from '@/views/cronjob/operate/index.vue';
 import Records from '@/views/cronjob/record/index.vue';
+import Backups from '@/views/cronjob/backup/index.vue';
 import { onMounted, reactive, ref } from 'vue';
 import { deleteCronjob, getCronjobPage, handleOnce, updateStatus } from '@/api/modules/cronjob';
 import i18n from '@/lang';
@@ -190,9 +221,16 @@ const search = async (column?: any) => {
             loading.value = false;
             data.value = res.data.items || [];
             for (const item of data.value) {
-                if (item.targetDir !== '-' && item.targetDir !== '') {
-                    item.targetDir = i18n.global.t('setting.' + item.targetDir);
+                item.targetAccounts = item.targetAccounts.split(',') || [];
+                let accounts = [];
+                for (const account of item.targetAccounts) {
+                    if (account == item.targetDir) {
+                        accounts.unshift(account);
+                    } else {
+                        accounts.push(account);
+                    }
                 }
+                item.targetAccounts = accounts.join(',');
             }
             paginationConfig.total = res.data.total;
         })
@@ -202,6 +240,7 @@ const search = async (column?: any) => {
 };
 
 const dialogRecordRef = ref();
+const dialogBackupRef = ref();
 
 const dialogRef = ref();
 const onOpenDialog = async (
@@ -218,7 +257,6 @@ const onOpenDialog = async (
             },
         ],
         type: 'shell',
-        keepLocal: true,
         retainCopies: 7,
     },
 ) => {
@@ -292,6 +330,10 @@ const onBatchChangeStatus = async (status: string) => {
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         search();
     });
+};
+
+const loadBackups = async (row: any) => {
+    dialogBackupRef.value!.acceptParams({ cronjobID: row.id, cronjob: row.name });
 };
 
 const onHandle = async (row: Cronjob.CronjobInfo) => {
