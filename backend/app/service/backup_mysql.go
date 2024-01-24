@@ -2,12 +2,13 @@ package service
 
 import (
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -23,7 +24,8 @@ func (u *BackupService) MysqlBackup(req dto.CommonBackup) error {
 	}
 
 	timeNow := time.Now().Format("20060102150405")
-	targetDir := path.Join(localDir, fmt.Sprintf("database/%s/%s/%s", req.Type, req.Name, req.DetailName))
+	itemDir := fmt.Sprintf("database/%s/%s/%s", req.Type, req.Name, req.DetailName)
+	targetDir := path.Join(localDir, itemDir)
 	fileName := fmt.Sprintf("%s_%s.sql.gz", req.DetailName, timeNow)
 
 	if err := handleMysqlBackup(req.Name, req.DetailName, targetDir, fileName); err != nil {
@@ -36,7 +38,7 @@ func (u *BackupService) MysqlBackup(req dto.CommonBackup) error {
 		DetailName: req.DetailName,
 		Source:     "LOCAL",
 		BackupType: "LOCAL",
-		FileDir:    targetDir,
+		FileDir:    itemDir,
 		FileName:   fileName,
 	}
 	if err := backupRepo.CreateRecord(record); err != nil {

@@ -96,6 +96,9 @@ export const deleteBackupRecord = (params: { ids: number[] }) => {
 export const searchBackupRecords = (params: Backup.SearchBackupRecord) => {
     return http.post<ResPage<Backup.RecordInfo>>(`/settings/backup/record/search`, params);
 };
+export const searchBackupRecordsByCronjob = (params: Backup.SearchBackupRecordByCronjob) => {
+    return http.post<ResPage<Backup.RecordInfo>>(`/settings/backup/record/search/bycronjob`, params);
+};
 
 export const getBackupList = () => {
     return http.get<Array<Backup.BackupInfo>>(`/settings/backup/search`);

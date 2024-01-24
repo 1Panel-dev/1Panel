@@ -28,6 +28,7 @@ type BackupService struct{}
 type IBackupService interface {
 	List() ([]dto.BackupInfo, error)
 	SearchRecordsWithPage(search dto.RecordSearch) (int64, []dto.BackupRecords, error)
+	SearchRecordsByCronjobWithPage(search dto.RecordSearchByCronjob) (int64, []dto.BackupRecords, error)
 	LoadOneDriveInfo() (dto.OneDriveInfo, error)
 	DownloadRecord(info dto.DownloadRecord) (string, error)
 	Create(backupDto dto.BackupOperate) error
@@ -94,14 +95,43 @@ func (u *BackupService) SearchRecordsWithPage(search dto.RecordSearch) (int64, [
 			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 		}
 		itemPath := path.Join(records[i].FileDir, records[i].FileName)
-		if records[i].Source == "LOCAL" {
-			fileInfo, err := os.Stat(itemPath)
-			if err == nil {
-				item.Size = fileInfo.Size()
+		if _, ok := clientMap[records[i].Source]; !ok {
+			backup, err := backupRepo.Get(commonRepo.WithByType(records[i].Source))
+			if err != nil {
+				global.LOG.Errorf("load backup model %s from db failed, err: %v", records[i].Source, err)
+				return total, datas, err
 			}
+			client, err := u.NewClient(&backup)
+			if err != nil {
+				global.LOG.Errorf("load backup client %s from db failed, err: %v", records[i].Source, err)
+				return total, datas, err
+			}
+			item.Size, _ = client.Size(path.Join(strings.TrimLeft(backup.BackupPath, "/"), itemPath))
 			datas = append(datas, item)
+			clientMap[records[i].Source] = loadSizeHelper{backupPath: strings.TrimLeft(backup.BackupPath, "/"), client: client}
 			continue
 		}
+		item.Size, _ = clientMap[records[i].Source].client.Size(path.Join(clientMap[records[i].Source].backupPath, itemPath))
+		datas = append(datas, item)
+	}
+	return total, datas, err
+}
+
+func (u *BackupService) SearchRecordsByCronjobWithPage(search dto.RecordSearchByCronjob) (int64, []dto.BackupRecords, error) {
+	total, records, err := backupRepo.PageRecord(
+		search.Page, search.PageSize,
+		commonRepo.WithOrderBy("created_at desc"),
+		backupRepo.WithByCronID(search.CronjobID),
+	)
+
+	var datas []dto.BackupRecords
+	clientMap := make(map[string]loadSizeHelper)
+	for i := 0; i < len(records); i++ {
+		var item dto.BackupRecords
+		if err := copier.Copy(&item, &records[i]); err != nil {
+			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+		}
+		itemPath := path.Join(records[i].FileDir, records[i].FileName)
 		if _, ok := clientMap[records[i].Source]; !ok {
 			backup, err := backupRepo.Get(commonRepo.WithByType(records[i].Source))
 			if err != nil {
@@ -156,7 +186,11 @@ func (u *BackupService) LoadOneDriveInfo() (dto.OneDriveInfo, error) {
 
 func (u *BackupService) DownloadRecord(info dto.DownloadRecord) (string, error) {
 	if info.Source == "LOCAL" {
-		return info.FileDir + "/" + info.FileName, nil
+		localDir, err := loadLocalDir()
+		if err != nil {
+			return "", err
+		}
+		return path.Join(localDir, info.FileDir, info.FileName), nil
 	}
 	backup, _ := backupRepo.Get(commonRepo.WithByType(info.Source))
 	if backup.ID == 0 {
@@ -380,9 +414,6 @@ func (u *BackupService) NewClient(backup *model.BackupAccount) (cloud_storage.Cl
 	varMap := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
 		return nil, err
-	}
-	if backup.Type == "LOCAL" {
-		return nil, errors.New("not support")
 	}
 	varMap["bucket"] = backup.Bucket
 	switch backup.Type {

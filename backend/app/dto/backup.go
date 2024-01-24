@@ -51,6 +51,11 @@ type RecordSearch struct {
 	DetailName string `json:"detailName"`
 }
 
+type RecordSearchByCronjob struct {
+	PageInfo
+	CronjobID uint `json:"cronjobID" validate:"required"`
+}
+
 type BackupRecords struct {
 	ID         uint      `json:"id"`
 	CreatedAt  time.Time `json:"createdAt"`

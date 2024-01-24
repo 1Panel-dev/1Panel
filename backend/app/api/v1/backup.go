@@ -163,6 +163,32 @@ func (b *BaseApi) SearchBackupRecords(c *gin.Context) {
 }
 
 // @Tags Backup Account
+// @Summary Page backup records by cronjob
+// @Description 通过计划任务获取备份记录列表分页
+// @Accept json
+// @Param request body dto.RecordSearchByCronjob true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/backup/record/search/bycronjob [post]
+func (b *BaseApi) SearchBackupRecordsByCronjob(c *gin.Context) {
+	var req dto.RecordSearchByCronjob
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	total, list, err := backupService.SearchRecordsByCronjobWithPage(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, dto.PageResult{
+		Items: list,
+		Total: total,
+	})
+}
+
+// @Tags Backup Account
 // @Summary Download backup record
 // @Description 下载备份记录
 // @Accept json
@@ -345,14 +371,12 @@ func (b *BaseApi) Recover(c *gin.Context) {
 		return
 	}
 
-	if req.Source != "LOCAL" {
-		downloadPath, err := backupService.DownloadRecord(dto.DownloadRecord{Source: req.Source, FileDir: path.Dir(req.File), FileName: path.Base(req.File)})
-		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, fmt.Errorf("download file failed, err: %v", err))
-			return
-		}
-		req.File = downloadPath
+	downloadPath, err := backupService.DownloadRecord(dto.DownloadRecord{Source: req.Source, FileDir: path.Dir(req.File), FileName: path.Base(req.File)})
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, fmt.Errorf("download file failed, err: %v", err))
+		return
 	}
+	req.File = downloadPath
 	switch req.Type {
 	case "mysql", "mariadb":
 		if err := backupService.MysqlRecover(req); err != nil {

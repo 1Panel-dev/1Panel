@@ -12,6 +12,7 @@ const (
 	Cos          = "COS"
 	Kodo         = "KODO"
 	WebDAV       = "WebDAV"
+	Local        = "LOCAL"
 
 	OneDriveRedirectURI = "http://localhost/login/authorized"
 )

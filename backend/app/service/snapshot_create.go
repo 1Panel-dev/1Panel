@@ -175,7 +175,7 @@ func snapCompress(snap snapHelper, rootDir string) {
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"compress": constant.StatusDone, "size": size})
 }
 
-func snapUpload(snap snapHelper, account string, file string) {
+func snapUpload(snap snapHelper, accounts string, file string) {
 	source := path.Join(global.CONF.System.TmpDir, "system", path.Base(file))
 	defer func() {
 		global.LOG.Debugf("remove snapshot file %s", source)
@@ -183,24 +183,20 @@ func snapUpload(snap snapHelper, account string, file string) {
 	}()
 
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"upload": constant.StatusUploading})
-	backup, err := backupRepo.Get(commonRepo.WithByType(account))
+	accountMap, err := loadClientMapForSnapshot(accounts)
 	if err != nil {
 		snap.Status.Upload = err.Error()
 		_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"upload": err.Error()})
 		return
 	}
-	client, err := NewIBackupService().NewClient(&backup)
-	if err != nil {
-		snap.Status.Upload = err.Error()
-		_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"upload": err.Error()})
-		return
-	}
-	target := path.Join(strings.TrimPrefix(backup.BackupPath, "/"), "system_snapshot", path.Base(file))
-	global.LOG.Debugf("start upload snapshot to %s, dir: %s", backup.Type, target)
-	if _, err := client.Upload(source, target); err != nil {
-		snap.Status.Upload = err.Error()
-		_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"upload": err.Error()})
-		return
+	targetAccounts := strings.Split(accounts, ",")
+	for _, item := range targetAccounts {
+		global.LOG.Debugf("start upload snapshot to %s, dir: %s", item, path.Join(accountMap[item].backupPath, "system_snapshot", path.Base(file)))
+		if _, err := accountMap[item].client.Upload(source, path.Join(accountMap[item].backupPath, "system_snapshot", path.Base(file))); err != nil {
+			snap.Status.Upload = err.Error()
+			_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"upload": err.Error()})
+			return
+		}
 	}
 	snap.Status.Upload = constant.StatusDone
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"upload": constant.StatusDone})
@@ -240,4 +236,33 @@ func checkPointOfWal() {
 	if err := global.DB.Exec("PRAGMA wal_checkpoint(TRUNCATE);").Error; err != nil {
 		global.LOG.Errorf("handle check point failed, err: %v", err)
 	}
+}
+
+func loadClientMapForSnapshot(from string) (map[string]cronjobUploadHelper, error) {
+	clients := make(map[string]cronjobUploadHelper)
+	accounts, err := backupRepo.List()
+	if err != nil {
+		return nil, err
+	}
+	targets := strings.Split(from, ",")
+	for _, target := range targets {
+		if len(target) == 0 {
+			continue
+		}
+		for _, account := range accounts {
+			if target == fmt.Sprintf("%v", account.ID) {
+				client, err := NewIBackupService().NewClient(&account)
+				if err != nil {
+					return nil, err
+				}
+				pathItem := account.BackupPath
+				clients[target] = cronjobUploadHelper{
+					client:     client,
+					backupPath: pathItem,
+					backType:   account.Type,
+				}
+			}
+		}
+	}
+	return clients, nil
 }

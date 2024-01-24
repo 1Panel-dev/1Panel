@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"gorm.io/gorm"
@@ -23,6 +24,7 @@ type IBackupRepo interface {
 	WithByDetailName(detailName string) DBOption
 	WithByFileName(fileName string) DBOption
 	WithByType(backupType string) DBOption
+	WithByCronID(cronjobID uint) DBOption
 }
 
 func NewIBackupRepo() IBackupRepo {
@@ -124,4 +126,10 @@ func (u *BackupRepo) Delete(opts ...DBOption) error {
 
 func (u *BackupRepo) DeleteRecord(ctx context.Context, opts ...DBOption) error {
 	return getTx(ctx, opts...).Delete(&model.BackupRecord{}).Error
+}
+
+func (u *BackupRepo) WithByCronID(cronjobID uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("cronjob_id = ?", cronjobID)
+	}
 }

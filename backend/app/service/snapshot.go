@@ -41,7 +41,7 @@ type ISnapshotService interface {
 	UpdateDescription(req dto.UpdateDescription) error
 	readFromJson(path string) (SnapshotJson, error)
 
-	HandleSnapshot(isCronjob bool, req dto.SnapshotCreate, timeNow string) (string, string, error)
+	HandleSnapshot(isCronjob bool, logPath string, req dto.SnapshotCreate, timeNow string) (string, error)
 }
 
 func NewISnapshotService() ISnapshotService {
@@ -132,7 +132,7 @@ type SnapshotJson struct {
 }
 
 func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
-	if _, _, err := u.HandleSnapshot(false, req, time.Now().Format("20060102150405")); err != nil {
+	if _, err := u.HandleSnapshot(false, "", req, time.Now().Format("20060102150405")); err != nil {
 		return err
 	}
 	return nil
@@ -469,10 +469,10 @@ func (u *SnapshotService) readFromJson(path string) (SnapshotJson, error) {
 	return snap, nil
 }
 
-func (u *SnapshotService) HandleSnapshot(isCronjob bool, req dto.SnapshotCreate, timeNow string) (string, string, error) {
+func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto.SnapshotCreate, timeNow string) (string, error) {
 	localDir, err := loadLocalDir()
 	if err != nil {
-		return "", "", err
+		return "", err
 	}
 	var (
 		rootDir    string
@@ -501,7 +501,7 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, req dto.SnapshotCreate,
 	} else {
 		snap, err = snapshotRepo.Get(commonRepo.WithByID(req.ID))
 		if err != nil {
-			return "", "", err
+			return "", err
 		}
 		snapStatus, _ = snapshotRepo.GetStatus(snap.ID)
 		if snapStatus.ID == 0 {
@@ -523,7 +523,7 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, req dto.SnapshotCreate,
 		BackupDataDir: localDir,
 		PanelDataDir:  path.Join(global.CONF.System.BaseDir, "1panel"),
 	}
-
+	loadLogByStatus(snapStatus, logPath)
 	if snapStatus.PanelInfo != constant.StatusDone {
 		wg.Add(1)
 		go snapJson(itemHelper, jsonItem, rootDir)
@@ -569,30 +569,35 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, req dto.SnapshotCreate,
 			}
 			_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusSuccess})
 		}()
-		return "", "", nil
+		return "", nil
 	}
 	wg.Wait()
 	if !checkIsAllDone(snap.ID) {
 		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
-		return loadLogByStatus(snapStatus), snap.Name, fmt.Errorf("snapshot %s backup failed", snap.Name)
+		loadLogByStatus(snapStatus, logPath)
+		return snap.Name, fmt.Errorf("snapshot %s backup failed", snap.Name)
 	}
 	snapPanelData(itemHelper, localDir, backupPanelDir)
 	if snapStatus.PanelData != constant.StatusDone {
 		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
-		return loadLogByStatus(snapStatus), snap.Name, fmt.Errorf("snapshot %s 1panel data failed", snap.Name)
+		loadLogByStatus(snapStatus, logPath)
+		return snap.Name, fmt.Errorf("snapshot %s 1panel data failed", snap.Name)
 	}
 	snapCompress(itemHelper, rootDir)
 	if snapStatus.Compress != constant.StatusDone {
 		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
-		return loadLogByStatus(snapStatus), snap.Name, fmt.Errorf("snapshot %s compress failed", snap.Name)
+		loadLogByStatus(snapStatus, logPath)
+		return snap.Name, fmt.Errorf("snapshot %s compress failed", snap.Name)
 	}
 	snapUpload(itemHelper, req.From, fmt.Sprintf("%s.tar.gz", rootDir))
 	if snapStatus.Upload != constant.StatusDone {
 		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
-		return loadLogByStatus(snapStatus), snap.Name, fmt.Errorf("snapshot %s upload failed", snap.Name)
+		loadLogByStatus(snapStatus, logPath)
+		return snap.Name, fmt.Errorf("snapshot %s upload failed", snap.Name)
 	}
 	_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusSuccess})
-	return loadLogByStatus(snapStatus), snap.Name, nil
+	loadLogByStatus(snapStatus, logPath)
+	return snap.Name, nil
 }
 
 func (u *SnapshotService) handleDockerDatas(fileOp files.FileOp, operation string, source, target string) error {
@@ -1060,7 +1065,7 @@ func checkIsAllDone(snapID uint) bool {
 	return true
 }
 
-func loadLogByStatus(status model.SnapshotStatus) string {
+func loadLogByStatus(status model.SnapshotStatus, logPath string) {
 	logs := ""
 	logs += fmt.Sprintf("Write 1Panel basic information: %s \n", status.PanelInfo)
 	logs += fmt.Sprintf("Backup 1Panel system files: %s \n", status.Panel)
@@ -1072,5 +1077,11 @@ func loadLogByStatus(status model.SnapshotStatus) string {
 	logs += fmt.Sprintf("Snapshot size: %s \n", status.Size)
 	logs += fmt.Sprintf("Upload snapshot file: %s \n", status.Upload)
 
-	return logs
+	file, err := os.OpenFile(logPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	if err != nil {
+		global.LOG.Errorf("write snapshot logs failed, err: %v", err)
+		return
+	}
+	defer file.Close()
+	_, _ = file.Write([]byte(logs))
 }

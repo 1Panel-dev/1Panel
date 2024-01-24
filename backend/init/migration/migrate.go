@@ -68,6 +68,7 @@ func Init() {
 		migrations.UpdateCronjobWithWebsite,
 		migrations.UpdateOneDriveToken,
 		migrations.UpdateCronjobSpec,
+		migrations.UpdateBackupRecordPath,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

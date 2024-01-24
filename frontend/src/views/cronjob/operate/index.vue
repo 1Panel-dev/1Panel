@@ -114,10 +114,11 @@
                                 type="primary"
                                 style="float: right; margin-top: 5px"
                                 @click="handleSpecDelete(index)"
+                                v-if="dialogData.rowData.specObjs.length > 1"
                             >
                                 {{ $t('commons.button.delete') }}
                             </el-button>
-                            <el-divider class="divider" />
+                            <el-divider v-if="dialogData.rowData.specObjs.length > 1" class="divider" />
                         </div>
                         <el-button class="mt-3" @click="handleSpecAdd()">
                             {{ $t('commons.button.add') }}
@@ -239,14 +240,15 @@
                     </el-form-item>
 
                     <div v-if="isBackup()">
-                        <el-form-item :label="$t('cronjob.target')" prop="targetDirID">
-                            <el-select class="selectClass" v-model="dialogData.rowData!.targetDirID">
+                        <el-form-item :label="$t('cronjob.target')" prop="targetAccountIDList">
+                            <el-select
+                                multiple
+                                class="selectClass"
+                                v-model="dialogData.rowData!.targetAccountIDList"
+                                @change="changeAccount"
+                            >
                                 <div v-for="item in backupOptions" :key="item.label">
-                                    <el-option
-                                        v-if="item.label !== $t('setting.LOCAL') || (dialogData.rowData!.type !== 'snapshot' && dialogData.rowData!.type !== 'log')"
-                                        :value="item.value"
-                                        :label="item.label"
-                                    />
+                                    <el-option :value="item.value" :label="item.label" />
                                 </div>
                             </el-select>
                             <span class="input-help">
@@ -261,12 +263,12 @@
                                 </el-link>
                             </span>
                         </el-form-item>
-                        <el-form-item
-                            v-if="dialogData.rowData!.targetDirID !== localDirID && dialogData.rowData!.type !== 'snapshot' && dialogData.rowData!.type !== 'log'"
-                        >
-                            <el-checkbox v-model="dialogData.rowData!.keepLocal">
-                                {{ $t('cronjob.saveLocal') }}
-                            </el-checkbox>
+                        <el-form-item :label="$t('cronjob.default_download_path')" prop="targetDirID">
+                            <el-select class="selectClass" v-model="dialogData.rowData!.targetDirID">
+                                <div v-for="item in accountOptions" :key="item.label">
+                                    <el-option :value="item.value" :label="item.label" />
+                                </div>
+                            </el-select>
                         </el-form-item>
                     </div>
 
@@ -356,6 +358,13 @@ const acceptParams = (params: DialogProps): void => {
         changeType();
         dialogData.value.rowData.dbType = 'mysql';
     }
+    if (dialogData.value.rowData.targetAccountIDs) {
+        dialogData.value.rowData.targetAccountIDList = [];
+        let ids = dialogData.value.rowData.targetAccountIDs.split(',');
+        for (const id of ids) {
+            dialogData.value.rowData.targetAccountIDList.push(Number(id));
+        }
+    }
     title.value = i18n.global.t('cronjob.' + dialogData.value.title);
     if (dialogData.value?.rowData?.exclusionRules) {
         dialogData.value.rowData.exclusionRules = dialogData.value.rowData.exclusionRules.replaceAll(',', '\n');
@@ -389,6 +398,7 @@ const localDirID = ref();
 const containerOptions = ref([]);
 const websiteOptions = ref([]);
 const backupOptions = ref([]);
+const accountOptions = ref([]);
 const appOptions = ref([]);
 
 const dbInfo = reactive({
@@ -399,6 +409,9 @@ const dbInfo = reactive({
 });
 
 const verifySpec = (rule: any, value: any, callback: any) => {
+    if (dialogData.value.rowData!.specObjs.length === 0) {
+        callback(new Error(i18n.global.t('cronjob.cronSpecRule')));
+    }
     for (const item of dialogData.value.rowData!.specObjs) {
         switch (item.specType) {
             case 'perMonth':
@@ -451,6 +464,7 @@ const rules = reactive({
     dbName: [Rules.requiredSelect],
     url: [Rules.requiredInput],
     sourceDir: [Rules.requiredInput],
+    targetAccountIDList: [Rules.requiredSelect],
     targetDirID: [Rules.requiredSelect, Rules.number],
     retainCopies: [Rules.number],
 });
@@ -475,17 +489,6 @@ const loadDatabases = async (dbType: string) => {
 };
 
 const changeType = () => {
-    if (dialogData.value.rowData.type === 'snapshot') {
-        dialogData.value.rowData.keepLocal = false;
-        dialogData.value.rowData.targetDirID = null;
-        for (const item of backupOptions.value) {
-            if (item.label !== i18n.global.t('setting.LOCAL')) {
-                dialogData.value.rowData.targetDirID = item.value;
-                break;
-            }
-        }
-    }
-
     dialogData.value.rowData!.specObjs = [loadDefaultSpec(dialogData.value.rowData.type)];
 };
 
@@ -514,11 +517,28 @@ const loadBackups = async () => {
         }
         if (item.type === 'LOCAL') {
             localDirID.value = item.id;
-            if (!dialogData.value.rowData!.targetDirID) {
-                dialogData.value.rowData!.targetDirID = item.id;
+            if (!dialogData.value.rowData!.targetAccountIDList) {
+                dialogData.value.rowData!.targetAccountIDList = [item.id];
             }
         }
         backupOptions.value.push({ label: i18n.global.t('setting.' + item.type), value: item.id });
+    }
+    changeAccount();
+};
+
+const changeAccount = async () => {
+    accountOptions.value = [];
+    for (const item of backupOptions.value) {
+        let exit = false;
+        for (const ac of dialogData.value.rowData.targetAccountIDList) {
+            if (item.value == ac) {
+                exit = true;
+                break;
+            }
+        }
+        if (exit) {
+            accountOptions.value.push(item);
+        }
     }
 };
 
@@ -566,6 +586,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         }
         specs.push(itemSpec);
     }
+    dialogData.value.rowData.targetAccountIDs = dialogData.value.rowData.targetAccountIDList.join(',');
     dialogData.value.rowData.spec = specs.join(',');
     if (!formEl) return;
     formEl.validate(async (valid) => {

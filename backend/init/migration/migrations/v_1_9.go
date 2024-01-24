@@ -3,6 +3,10 @@ package migrations
 import (
 	"encoding/base64"
 	"encoding/json"
+	"errors"
+	"fmt"
+	"path"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
@@ -261,13 +265,161 @@ var UpdateCronjobSpec = &gormigrate.Migration{
 		if err := tx.AutoMigrate(&model.Cronjob{}); err != nil {
 			return err
 		}
+		if err := tx.AutoMigrate(&model.BackupRecord{}); err != nil {
+			return err
+		}
+		var (
+			jobs           []model.Cronjob
+			backupAccounts []model.BackupAccount
+			localAccountID uint
+		)
+		mapAccount := make(map[uint]string)
+		mapAccountName := make(map[string]model.BackupAccount)
+		if err := tx.Find(&jobs).Error; err != nil {
+			return err
+		}
+		_ = tx.Find(&backupAccounts).Error
+		for _, item := range backupAccounts {
+			mapAccount[item.ID] = item.Type
+			mapAccountName[item.Type] = item
+			if item.Type == constant.Local {
+				localAccountID = item.ID
+			}
+		}
+		if localAccountID == 0 {
+			return errors.New("local backup account is unset!")
+		}
+		for _, job := range jobs {
+			if job.KeepLocal {
+				if err := tx.Model(&model.Cronjob{}).
+					Where("id = ?", job.ID).
+					Updates(map[string]interface{}{
+						"target_account_ids": fmt.Sprintf("%v,%v", job.TargetDirID, localAccountID),
+						"target_dir_id":      localAccountID,
+					}).Error; err != nil {
+					return err
+				}
+			} else {
+				if err := tx.Model(&model.Cronjob{}).
+					Where("id = ?", job.ID).
+					Updates(map[string]interface{}{
+						"target_account_ids": job.TargetDirID,
+					}).Error; err != nil {
+					return err
+				}
+			}
+			if job.Type != "directory" && job.Type != "database" && job.Type != "website" && job.Type != "app" && job.Type != "snapshot" && job.Type != "log" {
+				continue
+			}
+
+			var records []model.JobRecords
+			_ = tx.Where("cronjob_id = ?", job.ID).Find(&records).Error
+			for _, record := range records {
+				if job.Type == "snapshot" {
+					var snaps []model.Snapshot
+					_ = tx.Where("name like ?", "snapshot_"+"%").Find(&snaps).Error
+					for _, snap := range snaps {
+						item := model.BackupRecord{
+							From:       "cronjob",
+							CronjobID:  job.ID,
+							Type:       "snapshot",
+							Name:       job.Name,
+							FileName:   snap.Name + ".tar.gz",
+							Source:     snap.From,
+							BackupType: snap.From,
+						}
+						_ = tx.Create(&item).Error
+					}
+					continue
+				}
+				if job.Type == "log" {
+					item := model.BackupRecord{
+						From:       "cronjob",
+						CronjobID:  job.ID,
+						Type:       "log",
+						Name:       job.Name,
+						FileDir:    path.Dir(record.File),
+						FileName:   path.Base(record.File),
+						Source:     mapAccount[uint(job.TargetDirID)],
+						BackupType: mapAccount[uint(job.TargetDirID)],
+					}
+					_ = tx.Create(&item).Error
+					continue
+				}
+				if job.Type == "directory" {
+					item := model.BackupRecord{
+						From:       "cronjob",
+						CronjobID:  job.ID,
+						Type:       "directory",
+						Name:       job.Name,
+						FileDir:    path.Dir(record.File),
+						FileName:   path.Base(record.File),
+						BackupType: mapAccount[uint(job.TargetDirID)],
+					}
+					if record.FromLocal {
+						item.Source = constant.Local
+					} else {
+						item.Source = mapAccount[uint(job.TargetDirID)]
+					}
+					_ = tx.Create(&item).Error
+					continue
+				}
+				if strings.Contains(record.File, ",") {
+					files := strings.Split(record.File, ",")
+					for _, file := range files {
+						_ = tx.Model(&model.BackupRecord{}).
+							Where("file_dir = ? AND file_name = ?", path.Dir(file), path.Base(file)).
+							Updates(map[string]interface{}{"cronjob_id": job.ID, "from": "cronjob"}).Error
+					}
+				} else {
+					_ = tx.Model(&model.BackupRecord{}).
+						Where("file_dir = ? AND file_name = ?", path.Dir(record.File), path.Base(record.File)).
+						Updates(map[string]interface{}{"cronjob_id": job.ID, "from": "cronjob"}).Error
+				}
+			}
+		}
+
 		_ = tx.Exec("ALTER TABLE cronjobs DROP COLUMN spec_type;").Error
 		_ = tx.Exec("ALTER TABLE cronjobs DROP COLUMN week;").Error
 		_ = tx.Exec("ALTER TABLE cronjobs DROP COLUMN day;").Error
 		_ = tx.Exec("ALTER TABLE cronjobs DROP COLUMN hour;").Error
 		_ = tx.Exec("ALTER TABLE cronjobs DROP COLUMN minute;").Error
 		_ = tx.Exec("ALTER TABLE cronjobs DROP COLUMN second;").Error
+		_ = tx.Exec("ALTER TABLE cronjobs DROP COLUMN entry_id;").Error
 
+		return nil
+	},
+}
+
+var UpdateBackupRecordPath = &gormigrate.Migration{
+	ID: "20240124-update-cronjob-spec",
+	Migrate: func(tx *gorm.DB) error {
+		var (
+			backupRecords []model.BackupRecord
+			localAccount  model.BackupAccount
+		)
+
+		_ = tx.Where("type = ?", "LOCAL").First(&localAccount).Error
+		if localAccount.ID == 0 {
+			return nil
+		}
+		varMap := make(map[string]string)
+		if err := json.Unmarshal([]byte(localAccount.Vars), &varMap); err != nil {
+			return err
+		}
+		dir, ok := varMap["dir"]
+		if !ok {
+			return errors.New("load local backup dir failed")
+		}
+		if dir != "/" {
+			dir += "/"
+		}
+		_ = tx.Where("source = ?", "LOCAL").Find(&backupRecords).Error
+		for _, record := range backupRecords {
+			_ = tx.Model(&model.BackupRecord{}).
+				Where("id = ?", record.ID).
+				Updates(map[string]interface{}{"file_dir": strings.TrimPrefix(record.FileDir, dir)}).Error
+		}
 		return nil
 	},
 }

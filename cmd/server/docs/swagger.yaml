@@ -588,8 +588,6 @@ definitions:
         type: string
       exclusionRules:
         type: string
-      keepLocal:
-        type: boolean
       name:
         type: string
       retainCopies:
@@ -600,6 +598,8 @@ definitions:
       sourceDir:
         type: string
       spec:
+        type: string
+      targetAccountIDs:
         type: string
       targetDirID:
         type: integer
@@ -638,8 +638,6 @@ definitions:
         type: string
       id:
         type: integer
-      keepLocal:
-        type: boolean
       name:
         type: string
       retainCopies:
@@ -650,6 +648,8 @@ definitions:
       sourceDir:
         type: string
       spec:
+        type: string
+      targetAccountIDs:
         type: string
       targetDirID:
         type: integer
@@ -2147,6 +2147,19 @@ definitions:
     - pageSize
     - type
     type: object
+  dto.RecordSearchByCronjob:
+    properties:
+      cronjobID:
+        type: integer
+      page:
+        type: integer
+      pageSize:
+        type: integer
+    required:
+    - cronjobID
+    - page
+    - pageSize
+    type: object
   dto.RedisConf:
     properties:
       containerName:
@@ -2555,15 +2568,6 @@ definitions:
         maxLength: 256
         type: string
       from:
-        enum:
-        - OSS
-        - S3
-        - SFTP
-        - MINIO
-        - COS
-        - KODO
-        - OneDrive
-        - WebDAV
         type: string
       id:
         type: integer
@@ -11006,6 +11010,26 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Page backup records
+      tags:
+      - Backup Account
+  /settings/backup/record/search/bycronjob:
+    post:
+      consumes:
+      - application/json
+      description: 通过计划任务获取备份记录列表分页
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RecordSearchByCronjob'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Page backup records by cronjob
       tags:
       - Backup Account
   /settings/backup/recover:

@@ -9523,6 +9523,39 @@ const docTemplate = `{
                 }
             }
         },
+        "/settings/backup/record/search/bycronjob": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "通过计划任务获取备份记录列表分页",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Backup Account"
+                ],
+                "summary": "Page backup records by cronjob",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.RecordSearchByCronjob"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/settings/backup/recover": {
             "post": {
                 "security": [
@@ -14937,9 +14970,6 @@ const docTemplate = `{
                 "exclusionRules": {
                     "type": "string"
                 },
-                "keepLocal": {
-                    "type": "boolean"
-                },
                 "name": {
                     "type": "string"
                 },
@@ -14954,6 +14984,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "spec": {
+                    "type": "string"
+                },
+                "targetAccountIDs": {
                     "type": "string"
                 },
                 "targetDirID": {
@@ -15011,9 +15044,6 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "keepLocal": {
-                    "type": "boolean"
-                },
                 "name": {
                     "type": "string"
                 },
@@ -15028,6 +15058,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "spec": {
+                    "type": "string"
+                },
+                "targetAccountIDs": {
                     "type": "string"
                 },
                 "targetDirID": {
@@ -17232,6 +17265,25 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.RecordSearchByCronjob": {
+            "type": "object",
+            "required": [
+                "cronjobID",
+                "page",
+                "pageSize"
+            ],
+            "properties": {
+                "cronjobID": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.RedisConf": {
             "type": "object",
             "properties": {
@@ -17848,17 +17900,7 @@ const docTemplate = `{
                     "maxLength": 256
                 },
                 "from": {
-                    "type": "string",
-                    "enum": [
-                        "OSS",
-                        "S3",
-                        "SFTP",
-                        "MINIO",
-                        "COS",
-                        "KODO",
-                        "OneDrive",
-                        "WebDAV"
-                    ]
+                    "type": "string"
                 },
                 "id": {
                     "type": "integer"

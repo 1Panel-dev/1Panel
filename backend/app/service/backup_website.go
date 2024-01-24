@@ -31,7 +31,8 @@ func (u *BackupService) WebsiteBackup(req dto.CommonBackup) error {
 	}
 
 	timeNow := time.Now().Format("20060102150405")
-	backupDir := path.Join(localDir, fmt.Sprintf("website/%s", req.Name))
+	itemDir := fmt.Sprintf("website/%s", req.Name)
+	backupDir := path.Join(localDir, itemDir)
 	fileName := fmt.Sprintf("%s_%s.tar.gz", website.PrimaryDomain, timeNow)
 	if err := handleWebsiteBackup(&website, backupDir, fileName); err != nil {
 		return err
@@ -43,7 +44,7 @@ func (u *BackupService) WebsiteBackup(req dto.CommonBackup) error {
 		DetailName: req.DetailName,
 		Source:     "LOCAL",
 		BackupType: "LOCAL",
-		FileDir:    backupDir,
+		FileDir:    itemDir,
 		FileName:   fileName,
 	}
 	if err := backupRepo.CreateRecord(record); err != nil {

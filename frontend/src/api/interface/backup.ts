@@ -50,6 +50,9 @@ export namespace Backup {
         name: string;
         detailName: string;
     }
+    export interface SearchBackupRecordByCronjob extends ReqPage {
+        cronjobID: number;
+    }
     export interface Backup {
         type: string;
         name: string;

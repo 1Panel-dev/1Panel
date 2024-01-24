@@ -2,6 +2,52 @@ import { Cronjob } from '@/api/interface/cronjob';
 import i18n from '@/lang';
 import { loadZero } from '@/utils/util';
 
+export const shortcuts = [
+    {
+        text: i18n.global.t('monitor.today'),
+        value: () => {
+            const end = new Date(new Date().setHours(23, 59, 59, 999));
+            const start = new Date(new Date().setHours(0, 0, 0, 0));
+            return [start, end];
+        },
+    },
+    {
+        text: i18n.global.t('monitor.yesterday'),
+        value: () => {
+            const itemDate = new Date(new Date().getTime() - 3600 * 1000 * 24 * 1);
+            const end = new Date(itemDate.setHours(23, 59, 59, 999));
+            const start = new Date(itemDate.setHours(0, 0, 0, 0));
+            return [start, end];
+        },
+    },
+    {
+        text: i18n.global.t('monitor.lastNDay', [3]),
+        value: () => {
+            const itemDate = new Date(new Date().getTime() - 3600 * 1000 * 24 * 3);
+            const end = new Date(new Date().setHours(23, 59, 59, 999));
+            const start = new Date(itemDate.setHours(0, 0, 0, 0));
+            return [start, end];
+        },
+    },
+    {
+        text: i18n.global.t('monitor.lastNDay', [7]),
+        value: () => {
+            const itemDate = new Date(new Date().getTime() - 3600 * 1000 * 24 * 7);
+            const end = new Date(new Date().setHours(23, 59, 59, 999));
+            const start = new Date(itemDate.setHours(0, 0, 0, 0));
+            return [start, end];
+        },
+    },
+    {
+        text: i18n.global.t('monitor.lastNDay', [30]),
+        value: () => {
+            const itemDate = new Date(new Date().getTime() - 3600 * 1000 * 24 * 30);
+            const end = new Date(new Date().setHours(23, 59, 59, 999));
+            const start = new Date(itemDate.setHours(0, 0, 0, 0));
+            return [start, end];
+        },
+    },
+];
 export const specOptions = [
     { label: i18n.global.t('cronjob.perMonth'), value: 'perMonth' },
     { label: i18n.global.t('cronjob.perWeek'), value: 'perWeek' },

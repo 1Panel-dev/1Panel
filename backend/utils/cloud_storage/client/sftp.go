@@ -56,6 +56,17 @@ func (s sftpClient) Upload(src, target string) (bool, error) {
 	}
 	defer srcFile.Close()
 
+	targetFilePath := path.Join(s.bucket, target)
+	targetDir, _ := path.Split(targetFilePath)
+	if _, err = client.Stat(targetDir); err != nil {
+		if os.IsNotExist(err) {
+			if err = client.MkdirAll(targetDir); err != nil {
+				return false, err
+			}
+		} else {
+			return false, err
+		}
+	}
 	dstFile, err := client.Create(path.Join(s.bucket, target))
 	if err != nil {
 		return false, err
