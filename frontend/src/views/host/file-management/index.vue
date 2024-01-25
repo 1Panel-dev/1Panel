@@ -224,19 +224,19 @@
                     </el-table-column>
                     <el-table-column :label="$t('file.mode')" prop="mode" max-width="50">
                         <template #default="{ row }">
-                            <el-link :underline="false" @click="openMode(row)" type="primary">{{ row.mode }}</el-link>
+                            <el-link :underline="false" @click="openMode(row)">{{ row.mode }}</el-link>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.user')" prop="user" show-overflow-tooltip>
                         <template #default="{ row }">
-                            <el-link :underline="false" @click="openChown(row)" type="primary">
+                            <el-link :underline="false" @click="openChown(row)">
                                 {{ row.user ? row.user : '-' }} ({{ row.uid }})
                             </el-link>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('file.group')" prop="group">
                         <template #default="{ row }">
-                            <el-link :underline="false" @click="openChown(row)" type="primary">
+                            <el-link :underline="false" @click="openChown(row)">
                                 {{ row.group ? row.group : '-' }} ({{ row.gid }})
                             </el-link>
                         </template>

@@ -206,41 +206,42 @@
                     </el-table-column>
                     <el-table-column :label="$t('container.related')" min-width="200">
                         <template #default="{ row }">
-                            <el-tooltip
-                                v-if="row.appName != ''"
-                                :hide-after="20"
-                                :content="row.appName"
-                                placement="top"
-                            >
-                                <el-button
-                                    icon="Position"
-                                    type="primary"
-                                    plain
-                                    size="small"
-                                    @click="router.push({ name: 'AppInstalled' })"
+                            <div>
+                                <el-tooltip
+                                    v-if="row.appName != ''"
+                                    :hide-after="20"
+                                    :content="row.appName"
+                                    placement="top"
                                 >
-                                    {{ $t('app.app') }}: {{ row.appName }} [{{ row.appInstallName }}]
-                                </el-button>
-                            </el-tooltip>
-
-                            <el-tooltip
-                                v-if="row.websites != null"
-                                :hide-after="20"
-                                :content="row.websites.join(',')"
-                                placement="top"
-                                class="mt-1"
-                            >
-                                <el-button
-                                    icon="Position"
-                                    type="primary"
-                                    plain
-                                    size="small"
-                                    @click="router.push({ name: 'Website' })"
+                                    <el-button
+                                        icon="Position"
+                                        plain
+                                        size="small"
+                                        @click="router.push({ name: 'AppInstalled' })"
+                                    >
+                                        {{ $t('app.app') }}: {{ row.appName }} [{{ row.appInstallName }}]
+                                    </el-button>
+                                </el-tooltip>
+                            </div>
+                            <div>
+                                <el-tooltip
+                                    v-if="row.websites != null"
+                                    :hide-after="20"
+                                    :content="row.websites.join(',')"
+                                    placement="top"
+                                    class="mt-1"
                                 >
-                                    {{ $t('website.website') }}:
-                                    {{ row.websites.join(',') }}
-                                </el-button>
-                            </el-tooltip>
+                                    <el-button
+                                        icon="Position"
+                                        plain
+                                        size="small"
+                                        @click="router.push({ name: 'Website' })"
+                                    >
+                                        {{ $t('website.website') }}:
+                                        {{ row.websites.join(',') }}
+                                    </el-button>
+                                </el-tooltip>
+                            </div>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -259,13 +260,12 @@
                                                 @click="goDashboard(item)"
                                                 class="tagMargin"
                                                 icon="Position"
-                                                type="primary"
                                                 plain
                                                 size="small"
                                             >
                                                 {{ item.length > 25 ? item.substring(0, 25) + '...' : item }}
                                             </el-button>
-                                            <el-button v-else class="tagMargin" type="primary" plain size="small">
+                                            <el-button v-else class="tagMargin" plain size="small">
                                                 {{ item }}
                                             </el-button>
                                         </el-tooltip>
