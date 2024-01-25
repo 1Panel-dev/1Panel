@@ -107,7 +107,7 @@ func (u *Fail2BanService) UpdateConf(req dto.Fail2BanUpdate) error {
 		if req.Value == "firewallcmd-ipset" || req.Value == "ufw" {
 			itemName := "ufw"
 			if req.Value == "firewallcmd-ipset" {
-				itemName = "firewallcmd"
+				itemName = "firewalld"
 			}
 			client, err := firewall.NewFirewallClient()
 			if err != nil {

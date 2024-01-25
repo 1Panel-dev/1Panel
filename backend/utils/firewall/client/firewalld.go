@@ -106,6 +106,7 @@ func (f *Firewall) ListPort() ([]FireInfo, error) {
 			}
 			itemRule := f.loadInfo(rule)
 			if len(itemRule.Port) != 0 && itemRule.Family == "ipv4" {
+				itemRule.Family = ""
 				datas = append(datas, itemRule)
 			}
 		}
