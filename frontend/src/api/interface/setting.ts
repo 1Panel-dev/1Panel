@@ -90,6 +90,7 @@ export namespace Setting {
     export interface SnapshotCreate {
         id: number;
         from: string;
+        defaultDownload: string;
         description: string;
     }
     export interface SnapshotImport {

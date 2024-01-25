@@ -423,3 +423,20 @@ var UpdateBackupRecordPath = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var UpdateSnapshotRecords = &gormigrate.Migration{
+	ID: "20240124-update-snapshot-records",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Snapshot{}); err != nil {
+			return err
+		}
+		var snaps []model.Snapshot
+		_ = tx.Find(&snaps).Error
+		for _, snap := range snaps {
+			_ = tx.Model(&model.Snapshot{}).
+				Where("id = ?", snap.ID).
+				Updates(map[string]interface{}{"default_download": snap.From}).Error
+		}
+		return nil
+	},
+}
