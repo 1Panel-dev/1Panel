@@ -99,9 +99,10 @@ type SnapshotStatus struct {
 }
 
 type SnapshotCreate struct {
-	ID          uint   `json:"id"`
-	From        string `json:"from" validate:"required"`
-	Description string `json:"description" validate:"max=256"`
+	ID              uint   `json:"id"`
+	From            string `json:"from" validate:"required"`
+	DefaultDownload string `json:"defaultDownload" validate:"required"`
+	Description     string `json:"description" validate:"max=256"`
 }
 type SnapshotRecover struct {
 	IsNew      bool `json:"isNew"`

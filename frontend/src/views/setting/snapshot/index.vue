@@ -111,11 +111,21 @@
                     <el-col :span="22">
                         <el-form-item
                             :label="$t('cronjob.target') + ' ( ' + $t('setting.thirdPartySupport') + ' )'"
-                            prop="from"
+                            prop="fromAccounts"
                         >
-                            <el-select v-model="snapInfo.from" clearable>
+                            <el-select multiple @change="changeAccount" v-model="snapInfo.fromAccounts" clearable>
                                 <el-option
                                     v-for="item in backupOptions"
+                                    :key="item.label"
+                                    :value="item.value"
+                                    :label="item.label"
+                                />
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item :label="$t('cronjob.default_download_path')" prop="default_download">
+                            <el-select v-model="snapInfo.default_download" clearable>
+                                <el-option
+                                    v-for="item in accountOptions"
                                     :key="item.label"
                                     :value="item.value"
                                     :label="item.label"
@@ -180,15 +190,20 @@ const recoverStatusRef = ref();
 const importRef = ref();
 const isRecordShow = ref();
 const backupOptions = ref();
+const accountOptions = ref();
+
 type FormInstance = InstanceType<typeof ElForm>;
 const snapRef = ref<FormInstance>();
 const rules = reactive({
-    from: [Rules.requiredSelect],
+    fromAccounts: [Rules.requiredSelect],
+    default_download: [Rules.requiredSelect],
 });
 
 let snapInfo = reactive<Setting.SnapshotCreate>({
     id: 0,
     from: '',
+    default_download: '',
+    fromAccounts: [],
     description: '',
 });
 
@@ -217,6 +232,7 @@ const submitAddSnapshot = (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         loading.value = true;
+        snapInfo.from = snapInfo.fromAccounts.join(',');
         await snapshotCreate(snapInfo)
             .then(() => {
                 loading.value = false;
@@ -238,8 +254,25 @@ const loadBackups = async () => {
     const res = await getBackupList();
     backupOptions.value = [];
     for (const item of res.data) {
-        if (item.type !== 'LOCAL' && item.id !== 0) {
+        if (item.id !== 0) {
             backupOptions.value.push({ label: i18n.global.t('setting.' + item.type), value: item.type });
+        }
+    }
+    changeAccount();
+};
+
+const changeAccount = async () => {
+    accountOptions.value = [];
+    for (const item of backupOptions.value) {
+        let exit = false;
+        for (const ac of snapInfo.fromAccounts) {
+            if (item.value == ac) {
+                exit = true;
+                break;
+            }
+        }
+        if (exit) {
+            accountOptions.value.push(item);
         }
     }
 };
