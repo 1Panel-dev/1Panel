@@ -53,6 +53,19 @@
                                 </el-link>
                             </span>
                         </div>
+                        <div v-if="dialogData.rowData!.type === 'ntp'">
+                            <span class="input-help">
+                                {{ $t('cronjob.ntp_helper') }}
+                                <el-link
+                                    style="font-size: 12px"
+                                    icon="Position"
+                                    @click="goRouter('/toolbox/device')"
+                                    type="primary"
+                                >
+                                    {{ $t('firewall.quickJump') }}
+                                </el-link>
+                            </span>
+                        </div>
                     </el-form-item>
 
                     <el-form-item :label="$t('cronjob.taskName')" prop="name">
