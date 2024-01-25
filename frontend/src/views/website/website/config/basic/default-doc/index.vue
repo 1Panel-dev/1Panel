@@ -3,11 +3,7 @@
         <el-col :xs="24" :sm="18" :md="8" :lg="8" :xl="8">
             <el-form @submit.prevent ref="defaultForm" label-position="top" :model="defaultModel" :rules="rules">
                 <el-form-item :label="$t('website.defaultDoc')" prop="index">
-                    <el-input
-                        v-model="defaultModel.index"
-                        type="textarea"
-                        :autosize="{ minRows: 8, maxRows: 20 }"
-                    ></el-input>
+                    <el-input v-model="defaultModel.index" type="textarea" :rows="8"></el-input>
                 </el-form-item>
             </el-form>
             <el-button type="primary" @click="submit(defaultForm)" :disabled="loading">

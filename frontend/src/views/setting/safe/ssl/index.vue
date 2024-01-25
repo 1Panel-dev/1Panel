@@ -54,10 +54,10 @@
 
                         <div v-if="form.sslType === 'import' && form.itemSSLType === 'paste'">
                             <el-form-item :label="$t('website.privateKey')" prop="key">
-                                <el-input v-model="form.key" :autosize="{ minRows: 5, maxRows: 10 }" type="textarea" />
+                                <el-input v-model="form.key" :rows="5" type="textarea" />
                             </el-form-item>
                             <el-form-item class="marginTop" :label="$t('website.certificate')" prop="cert">
-                                <el-input v-model="form.cert" :autosize="{ minRows: 5, maxRows: 10 }" type="textarea" />
+                                <el-input v-model="form.cert" :rows="5" type="textarea" />
                             </el-form-item>
                         </div>
 

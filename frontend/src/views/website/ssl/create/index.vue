@@ -26,11 +26,7 @@
                         </el-col>
                     </el-row>
                     <el-form-item :label="$t('website.otherDomains')" prop="otherDomains">
-                        <el-input
-                            type="textarea"
-                            :autosize="{ minRows: 2, maxRows: 6 }"
-                            v-model="ssl.otherDomains"
-                        ></el-input>
+                        <el-input type="textarea" :rows="3" v-model="ssl.otherDomains"></el-input>
                     </el-form-item>
                     <el-form-item :label="$t('website.remark')" prop="description">
                         <el-input v-model="ssl.description"></el-input>

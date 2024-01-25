@@ -58,7 +58,7 @@
                             <div style="width: 100%">
                                 <el-input
                                     style="width: calc(100% - 80px)"
-                                    :autosize="{ minRows: 3, maxRows: 15 }"
+                                    :rows="3"
                                     type="textarea"
                                     clearable
                                     v-model.trim="oneDriveData.rowData!.varsJson['code']"

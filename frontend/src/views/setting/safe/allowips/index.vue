@@ -18,7 +18,7 @@
                             <el-input
                                 type="textarea"
                                 :placeholder="$t('setting.allowIPEgs')"
-                                :autosize="{ minRows: 8, maxRows: 10 }"
+                                :rows="3"
                                 v-model="form.allowIPs"
                             />
                             <span class="input-help">{{ $t('setting.allowIPsHelper1') }}</span>

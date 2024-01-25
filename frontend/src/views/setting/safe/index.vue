@@ -51,7 +51,7 @@
                                 <div style="width: 100%" v-if="form.allowIPs">
                                     <el-input
                                         type="textarea"
-                                        :autosize="{ minRows: 3, maxRows: 5 }"
+                                        :rows="3"
                                         disabled
                                         v-model="form.allowIPs"
                                         style="width: calc(100% - 80px)"

@@ -48,7 +48,7 @@
                         <el-input
                             :placeholder="$t('container.tagHelper')"
                             type="textarea"
-                            :autosize="{ minRows: 2, maxRows: 4 }"
+                            :rows="3"
                             v-model="form.tagStr"
                         />
                     </el-form-item>

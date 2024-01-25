@@ -25,12 +25,7 @@
                             </el-select>
                         </el-form-item>
                         <el-form-item v-if="form.permission === 'ip'" prop="permissionIPs">
-                            <el-input
-                                clearable
-                                :autosize="{ minRows: 2, maxRows: 5 }"
-                                type="textarea"
-                                v-model="form.permissionIPs"
-                            />
+                            <el-input clearable :rows="3" type="textarea" v-model="form.permissionIPs" />
                             <span class="input-help">{{ $t('database.remoteHelper') }}</span>
                         </el-form-item>
                     </el-col>

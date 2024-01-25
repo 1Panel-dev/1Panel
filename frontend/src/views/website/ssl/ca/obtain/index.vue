@@ -12,7 +12,7 @@
                     <el-form-item :label="$t('website.domain')" prop="domains">
                         <el-input
                             type="textarea"
-                            :autosize="{ minRows: 4, maxRows: 10 }"
+                            :rows="4"
                             v-model="obtain.domains"
                             :placeholder="$t('ssl.domainHelper')"
                         ></el-input>

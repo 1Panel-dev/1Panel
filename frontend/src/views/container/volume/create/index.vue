@@ -52,7 +52,7 @@
                         <el-input
                             type="textarea"
                             :placeholder="$t('container.tagHelper')"
-                            :autosize="{ minRows: 2, maxRows: 4 }"
+                            :rows="3"
                             v-model="form.optionStr"
                         />
                     </el-form-item>
@@ -60,7 +60,7 @@
                         <el-input
                             type="textarea"
                             :placeholder="$t('container.tagHelper')"
-                            :autosize="{ minRows: 2, maxRows: 4 }"
+                            :rows="3"
                             v-model="form.labelStr"
                         />
                     </el-form-item>

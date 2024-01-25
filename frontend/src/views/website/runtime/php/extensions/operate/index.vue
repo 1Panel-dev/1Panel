@@ -16,7 +16,7 @@
                         <el-input
                             type="textarea"
                             :placeholder="$t('php.extensionsHelper')"
-                            :autosize="{ minRows: 3, maxRows: 10 }"
+                            :rows="3"
                             v-model="extensions.extensions"
                         />
                     </el-form-item>
