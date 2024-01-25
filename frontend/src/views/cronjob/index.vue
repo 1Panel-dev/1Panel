@@ -83,7 +83,7 @@
                         <template #default="{ row }">
                             <div v-for="(item, index) of row.spec.split(',')" :key="index" class="mt-1">
                                 <div v-if="row.expand || (!row.expand && index < 3)">
-                                    <el-tag>
+                                    <el-tag type="info">
                                         {{ transSpecToStr(item) }}
                                     </el-tag>
                                 </div>
@@ -115,9 +115,9 @@
                     </el-table-column>
                     <el-table-column :min-width="80" :label="$t('cronjob.target')" prop="defaultDownload">
                         <template #default="{ row }">
-                            <div v-for="(item, index) of row.backupAccounts.split(',')" :key="index" class="mt-1">
+                            <div v-for="(item, index) of row.backupAccounts?.split(',')" :key="index" class="mt-1">
                                 <div v-if="row.accountExpand || (!row.accountExpand && index < 3)">
-                                    <el-tag v-if="row.backupAccounts">
+                                    <el-tag type="info" v-if="row.backupAccounts">
                                         <span v-if="item === row.defaultDownload">
                                             <el-icon><Star /></el-icon>
                                             {{ $t('setting.' + item) }}
@@ -129,12 +129,12 @@
                                     <span v-else>-</span>
                                 </div>
                             </div>
-                            <div v-if="!row.accountExpand && row.backupAccounts.split(',').length > 3">
+                            <div v-if="!row.accountExpand && row.backupAccounts?.split(',').length > 3">
                                 <el-button type="primary" link @click="row.accountExpand = true">
                                     {{ $t('commons.button.expand') }}...
                                 </el-button>
                             </div>
-                            <div v-if="row.accountExpand && row.backupAccounts.split(',').length > 3">
+                            <div v-if="row.accountExpand && row.backupAccounts?.split(',').length > 3">
                                 <el-button type="primary" link @click="row.accountExpand = false">
                                     {{ $t('commons.button.collapse') }}
                                 </el-button>

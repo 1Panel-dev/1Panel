@@ -49,9 +49,30 @@
                     <el-table-column prop="version" :label="$t('app.version')" />
                     <el-table-column :label="$t('setting.backupAccount')" min-width="80" prop="from">
                         <template #default="{ row }">
-                            <span v-if="row.from">
-                                {{ $t('setting.' + row.from) }}
-                            </span>
+                            <div v-for="(item, index) of row.from.split(',')" :key="index" class="mt-1">
+                                <div v-if="row.expand || (!row.expand && index < 3)">
+                                    <el-tag v-if="row.from" type="info">
+                                        <span v-if="item === row.defaultDownload">
+                                            <el-icon><Star /></el-icon>
+                                            {{ $t('setting.' + item) }}
+                                        </span>
+                                        <span v-else>
+                                            {{ $t('setting.' + item) }}
+                                        </span>
+                                    </el-tag>
+                                    <span v-else>-</span>
+                                </div>
+                            </div>
+                            <div v-if="!row.expand && row.from.split(',').length > 3">
+                                <el-button type="primary" link @click="row.expand = true">
+                                    {{ $t('commons.button.expand') }}...
+                                </el-button>
+                            </div>
+                            <div v-if="row.expand && row.from.split(',').length > 3">
+                                <el-button type="primary" link @click="row.expand = false">
+                                    {{ $t('commons.button.collapse') }}
+                                </el-button>
+                            </div>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" min-width="80" prop="status">

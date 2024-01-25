@@ -281,7 +281,7 @@ var UpdateCronjobSpec = &gormigrate.Migration{
 			mapAccount[item.ID] = item.Type
 		}
 		for _, job := range jobs {
-			if job.KeepLocal {
+			if job.KeepLocal && mapAccount[uint(job.TargetDirID)] != constant.Local {
 				if err := tx.Model(&model.Cronjob{}).
 					Where("id = ?", job.ID).
 					Updates(map[string]interface{}{
