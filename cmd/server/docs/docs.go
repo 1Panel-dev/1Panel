@@ -3334,39 +3334,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/cronjob/record/log": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "获取计划任务记录日志",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Cronjob"
-                ],
-                "summary": "Load Cronjob record log",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.OperateByID"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            }
-        },
         "/cronjobs": {
             "post": {
                 "security": [
@@ -3611,6 +3578,39 @@ const docTemplate = `{
                     "formatEN": "clean cronjob [name] records",
                     "formatZH": "清空计划任务记录 [name]",
                     "paramKeys": []
+                }
+            }
+        },
+        "/cronjobs/records/log": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取计划任务记录日志",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cronjob"
+                ],
+                "summary": "Load Cronjob record log",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperateByID"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
                 }
             }
         },
@@ -6139,36 +6139,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/files/log/read": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "按行读取日志文件",
-                "tags": [
-                    "File"
-                ],
-                "summary": "Read file by Line",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.FileReadByLineReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            }
-        },
         "/files/mode": {
             "post": {
                 "security": [
@@ -6296,6 +6266,36 @@ const docTemplate = `{
                     "formatEN": "Change owner [paths] =\u003e [user]/[group]",
                     "formatZH": "修改用户/组 [paths] =\u003e [user]/[group]",
                     "paramKeys": []
+                }
+            }
+        },
+        "/files/read": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "按行读取日志文件",
+                "tags": [
+                    "File"
+                ],
+                "summary": "Read file by Line",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.FileReadByLineReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
                 }
             }
         },
@@ -8526,7 +8526,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/openResty": {
+        "/openresty": {
             "get": {
                 "security": [
                     {
@@ -8548,7 +8548,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/openResty/clear": {
+        "/openresty/clear": {
             "post": {
                 "security": [
                     {
@@ -8574,7 +8574,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/openResty/file": {
+        "/openresty/file": {
             "post": {
                 "security": [
                     {
@@ -8614,7 +8614,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/openResty/scope": {
+        "/openresty/scope": {
             "post": {
                 "security": [
                     {
@@ -8653,7 +8653,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/openResty/status": {
+        "/openresty/status": {
             "get": {
                 "security": [
                     {
@@ -8675,7 +8675,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/openResty/update": {
+        "/openresty/update": {
             "post": {
                 "security": [
                     {
@@ -9276,7 +9276,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/settings/backup/": {
+        "/settings/backup/backup": {
             "post": {
                 "security": [
                     {

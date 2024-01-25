@@ -318,7 +318,7 @@ func (b *BaseApi) LoadFilesFromBackup(c *gin.Context) {
 // @Param request body dto.CommonBackup true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /settings/backup/ [post]
+// @Router /settings/backup/backup [post]
 // @x-panel-log {"bodyKeys":["type","name","detailName"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"备份 [type] 数据 [name][detailName]","formatEN":"backup [type] data [name][detailName]"}
 func (b *BaseApi) Backup(c *gin.Context) {
 	var req dto.CommonBackup
