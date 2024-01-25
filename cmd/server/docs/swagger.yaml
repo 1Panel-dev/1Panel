@@ -7098,26 +7098,6 @@ paths:
       summary: Page volumes
       tags:
       - Container Volume
-  /cronjob/record/log:
-    post:
-      consumes:
-      - application/json
-      description: 获取计划任务记录日志
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.OperateByID'
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      summary: Load Cronjob record log
-      tags:
-      - Cronjob
   /cronjobs:
     post:
       consumes:
@@ -7278,6 +7258,26 @@ paths:
         formatEN: clean cronjob [name] records
         formatZH: 清空计划任务记录 [name]
         paramKeys: []
+  /cronjobs/records/log:
+    post:
+      consumes:
+      - application/json
+      description: 获取计划任务记录日志
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OperateByID'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Load Cronjob record log
+      tags:
+      - Cronjob
   /cronjobs/search:
     post:
       consumes:
@@ -8879,24 +8879,6 @@ paths:
       summary: List favorites
       tags:
       - File
-  /files/log/read:
-    post:
-      description: 按行读取日志文件
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/request.FileReadByLineReq'
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      summary: Read file by Line
-      tags:
-      - File
   /files/mode:
     post:
       consumes:
@@ -8982,6 +8964,24 @@ paths:
         formatEN: Change owner [paths] => [user]/[group]
         formatZH: 修改用户/组 [paths] => [user]/[group]
         paramKeys: []
+  /files/read:
+    post:
+      description: 按行读取日志文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.FileReadByLineReq'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Read file by Line
+      tags:
+      - File
   /files/recycle/clear:
     post:
       consumes:
@@ -10388,7 +10388,7 @@ paths:
       summary: Load system log files
       tags:
       - Logs
-  /openResty:
+  /openresty:
     get:
       description: 获取 OpenResty 配置信息
       responses:
@@ -10401,7 +10401,7 @@ paths:
       summary: Load OpenResty conf
       tags:
       - OpenResty
-  /openResty/clear:
+  /openresty/clear:
     post:
       description: 清理 OpenResty 代理缓存
       responses:
@@ -10418,7 +10418,7 @@ paths:
         formatEN: Clear nginx proxy cache
         formatZH: 清理 Openresty 代理缓存
         paramKeys: []
-  /openResty/file:
+  /openresty/file:
     post:
       consumes:
       - application/json
@@ -10444,7 +10444,7 @@ paths:
         formatEN: Update nginx conf
         formatZH: 更新 nginx 配置
         paramKeys: []
-  /openResty/scope:
+  /openresty/scope:
     post:
       consumes:
       - application/json
@@ -10468,7 +10468,7 @@ paths:
       summary: Load partial OpenResty conf
       tags:
       - OpenResty
-  /openResty/status:
+  /openresty/status:
     get:
       description: 获取 OpenResty 状态信息
       responses:
@@ -10481,7 +10481,7 @@ paths:
       summary: Load OpenResty status info
       tags:
       - OpenResty
-  /openResty/update:
+  /openresty/update:
     post:
       consumes:
       - application/json
@@ -10857,7 +10857,7 @@ paths:
         formatEN: create backup account [type]
         formatZH: 创建备份账号 [type]
         paramKeys: []
-  /settings/backup/:
+  /settings/backup/backup:
     post:
       consumes:
       - application/json

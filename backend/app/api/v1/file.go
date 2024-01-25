@@ -689,7 +689,7 @@ func (b *BaseApi) Keys(c *gin.Context) {
 // @Param request body request.FileReadByLineReq true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /files/log/read [post]
+// @Router /files/read [post]
 func (b *BaseApi) ReadFileByLine(c *gin.Context) {
 	var req request.FileReadByLineReq
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
