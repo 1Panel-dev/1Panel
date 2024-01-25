@@ -254,7 +254,7 @@
                         <el-input
                             type="textarea"
                             :placeholder="$t('container.tagHelper')"
-                            :autosize="{ minRows: 2, maxRows: 10 }"
+                            :rows="3"
                             v-model="dialogData.rowData!.labelsStr"
                         />
                     </el-form-item>
@@ -262,7 +262,7 @@
                         <el-input
                             type="textarea"
                             :placeholder="$t('container.tagHelper')"
-                            :autosize="{ minRows: 2, maxRows: 10 }"
+                            :rows="3"
                             v-model="dialogData.rowData!.envStr"
                         />
                     </el-form-item>

@@ -18,7 +18,7 @@
                             <el-input
                                 type="textarea"
                                 :placeholder="$t('container.mirrorHelper')"
-                                :autosize="{ minRows: 8, maxRows: 10 }"
+                                :rows="5"
                                 v-model="form.mirrors"
                             />
                         </el-form-item>

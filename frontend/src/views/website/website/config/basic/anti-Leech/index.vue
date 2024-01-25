@@ -38,11 +38,7 @@
                             <el-switch v-model="form.noneRef" />
                         </el-form-item>
                         <el-form-item :label="$t('website.accessDomain')" prop="domains">
-                            <el-input
-                                v-model="form.domains"
-                                type="textarea"
-                                :autosize="{ minRows: 6, maxRows: 20 }"
-                            ></el-input>
+                            <el-input v-model="form.domains" type="textarea" :rows="6"></el-input>
                         </el-form-item>
                         <el-form-item :label="$t('website.leechReturn')" prop="return">
                             <el-input v-model="form.return" type="text" :maxlength="35"></el-input>

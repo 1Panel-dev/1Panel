@@ -29,7 +29,7 @@
                             <el-input
                                 type="textarea"
                                 :placeholder="$t('toolbox.device.dnsHelper1')"
-                                :autosize="{ minRows: 8, maxRows: 10 }"
+                                :rows="8"
                                 v-model="form.dns"
                             />
                         </el-form-item>

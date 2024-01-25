@@ -36,11 +36,7 @@
                         </el-form-item>
 
                         <el-form-item :label="$t('ssh.key')" prop="primaryKey" v-if="form.encryptionMode">
-                            <el-input
-                                v-model="form.primaryKey"
-                                :autosize="{ minRows: 5, maxRows: 10 }"
-                                type="textarea"
-                            />
+                            <el-input v-model="form.primaryKey" :rows="5" type="textarea" />
                             <div v-if="form.primaryKey">
                                 <el-button icon="CopyDocument" class="marginTop" @click="onCopy(form.primaryKey)">
                                     {{ $t('file.copy') }}

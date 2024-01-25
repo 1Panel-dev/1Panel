@@ -278,7 +278,7 @@
                     <el-form-item :label="$t('website.otherDomains')" prop="otherDomains">
                         <el-input
                             type="textarea"
-                            :autosize="{ minRows: 2, maxRows: 6 }"
+                            :rows="3"
                             v-model="website.otherDomains"
                             :placeholder="$t('website.domainHelper')"
                         ></el-input>

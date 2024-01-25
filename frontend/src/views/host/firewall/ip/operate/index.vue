@@ -10,7 +10,7 @@
                         <el-form-item :label="$t('firewall.address')" prop="address">
                             <el-input
                                 :disabled="dialogData.title === 'edit'"
-                                :autosize="{ minRows: 3, maxRows: 6 }"
+                                :rows="3"
                                 type="textarea"
                                 clearable
                                 v-model.trim="dialogData.rowData!.address"

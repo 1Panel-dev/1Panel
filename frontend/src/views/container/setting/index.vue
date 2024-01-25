@@ -49,7 +49,7 @@
                                 <div style="width: 100%" v-if="form.mirrors">
                                     <el-input
                                         type="textarea"
-                                        :autosize="{ minRows: 3, maxRows: 5 }"
+                                        :rows="5"
                                         disabled
                                         v-model="form.mirrors"
                                         style="width: calc(100% - 80px)"
@@ -82,7 +82,7 @@
                                 <div style="width: 100%" v-if="form.registries">
                                     <el-input
                                         type="textarea"
-                                        :autosize="{ minRows: 3, maxRows: 5 }"
+                                        :rows="5"
                                         disabled
                                         v-model="form.registries"
                                         style="width: calc(100% - 80px)"

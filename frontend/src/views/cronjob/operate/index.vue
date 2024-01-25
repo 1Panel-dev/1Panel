@@ -141,7 +141,7 @@
                     </el-form-item>
 
                     <el-form-item v-if="hasScript()" :label="$t('cronjob.shellContent')" prop="script">
-                        <el-input clearable type="textarea" :rows="4" v-model="dialogData.rowData!.script" />
+                        <el-input clearable type="textarea" :rows="5" v-model="dialogData.rowData!.script" />
                     </el-form-item>
 
                     <el-form-item
@@ -290,7 +290,7 @@
                         <el-input
                             type="textarea"
                             :placeholder="$t('cronjob.rulesHelper')"
-                            :rows="4"
+                            :rows="3"
                             clearable
                             v-model="dialogData.rowData!.exclusionRules"
                         />

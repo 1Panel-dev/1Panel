@@ -18,7 +18,7 @@
                             <el-input
                                 type="textarea"
                                 :placeholder="$t('container.registrieHelper')"
-                                :autosize="{ minRows: 8, maxRows: 10 }"
+                                :rows="5"
                                 v-model="form.registries"
                             />
                         </el-form-item>

@@ -13,12 +13,7 @@
                 />
             </el-form-item>
             <el-form-item :label="$t('website.ipValue')">
-                <el-input
-                    type="textarea"
-                    :autosize="{ minRows: 4, maxRows: 8 }"
-                    v-model="ips"
-                    :placeholder="$t('website.wafInputHelper')"
-                />
+                <el-input type="textarea" :rows="3" v-model="ips" :placeholder="$t('website.wafInputHelper')" />
             </el-form-item>
             <ComplexTable :data="data" v-loading="loading">
                 <template #toolbar>

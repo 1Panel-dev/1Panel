@@ -5,12 +5,7 @@
                 <el-switch v-model="enableUpdate.enable" @change="updateEnable"></el-switch>
             </el-form-item>
             <el-form-item :label="$t('website.ext')">
-                <el-input
-                    type="textarea"
-                    :autosize="{ minRows: 4, maxRows: 8 }"
-                    v-model="exts"
-                    :placeholder="$t('website.wafInputHelper')"
-                />
+                <el-input type="textarea" :rows="3" v-model="exts" :placeholder="$t('website.wafInputHelper')" />
             </el-form-item>
             <ComplexTable :data="data" v-loading="loading">
                 <template #toolbar>

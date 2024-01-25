@@ -35,19 +35,14 @@
                 </el-descriptions>
             </div>
             <div v-else-if="curr === 'ssl'" class="mt-5">
-                <el-input v-model="ca.csr" :autosize="{ minRows: 15, maxRows: 30 }" type="textarea" id="textArea" />
+                <el-input v-model="ca.csr" :rows="15" type="textarea" id="textArea" />
                 <div>
                     <br />
                     <CopyButton :content="ca.csr" />
                 </div>
             </div>
             <div v-else class="mt-5">
-                <el-input
-                    v-model="ca.privateKey"
-                    :autosize="{ minRows: 15, maxRows: 30 }"
-                    type="textarea"
-                    id="textArea"
-                />
+                <el-input v-model="ca.privateKey" :rows="15" type="textarea" id="textArea" />
                 <div>
                     <br />
                     <CopyButton :content="ca.privateKey" />

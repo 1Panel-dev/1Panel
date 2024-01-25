@@ -137,11 +137,7 @@
                         </el-checkbox-group>
                     </el-form-item>
                     <el-form-item prop="algorithm" :label="$t('website.encryptionAlgorithm')">
-                        <el-input
-                            type="textarea"
-                            :autosize="{ minRows: 2, maxRows: 6 }"
-                            v-model.trim="form.algorithm"
-                        ></el-input>
+                        <el-input type="textarea" :rows="3" v-model.trim="form.algorithm"></el-input>
                     </el-form-item>
                     <el-form-item>
                         <el-button type="primary" @click="submit(httpsForm)">
