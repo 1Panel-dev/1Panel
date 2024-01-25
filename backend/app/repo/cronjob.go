@@ -20,7 +20,7 @@ type ICronjobRepo interface {
 	Page(limit, offset int, opts ...DBOption) (int64, []model.Cronjob, error)
 	Create(cronjob *model.Cronjob) error
 	WithByJobID(id int) DBOption
-	WithByBackupID(id uint) DBOption
+	WithByDefaultDownload(account string) DBOption
 	WithByRecordDropID(id int) DBOption
 	WithByRecordFile(file string) DBOption
 	Save(id uint, cronjob model.Cronjob) error
@@ -117,9 +117,9 @@ func (c *CronjobRepo) WithByJobID(id int) DBOption {
 	}
 }
 
-func (c *CronjobRepo) WithByBackupID(id uint) DBOption {
+func (c *CronjobRepo) WithByDefaultDownload(account string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("target_dir_id = ?", id)
+		return g.Where("default_download = ?", account)
 	}
 }
 

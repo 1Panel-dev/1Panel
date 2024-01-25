@@ -7,18 +7,19 @@ type CronjobCreate struct {
 	Type string `json:"type" validate:"required"`
 	Spec string `json:"spec" validate:"required"`
 
-	Script           string `json:"script"`
-	ContainerName    string `json:"containerName"`
-	AppID            string `json:"appID"`
-	Website          string `json:"website"`
-	ExclusionRules   string `json:"exclusionRules"`
-	DBType           string `json:"dbType"`
-	DBName           string `json:"dbName"`
-	URL              string `json:"url"`
-	SourceDir        string `json:"sourceDir"`
-	TargetDirID      int    `json:"targetDirID"`
-	TargetAccountIDs string `json:"targetAccountIDs"`
-	RetainCopies     int    `json:"retainCopies" validate:"number,min=1"`
+	Script         string `json:"script"`
+	ContainerName  string `json:"containerName"`
+	AppID          string `json:"appID"`
+	Website        string `json:"website"`
+	ExclusionRules string `json:"exclusionRules"`
+	DBType         string `json:"dbType"`
+	DBName         string `json:"dbName"`
+	URL            string `json:"url"`
+	SourceDir      string `json:"sourceDir"`
+
+	BackupAccounts  string `json:"backupAccounts"`
+	DefaultDownload string `json:"defaultDownload"`
+	RetainCopies    int    `json:"retainCopies" validate:"number,min=1"`
 }
 
 type CronjobUpdate struct {
@@ -26,18 +27,19 @@ type CronjobUpdate struct {
 	Name string `json:"name" validate:"required"`
 	Spec string `json:"spec" validate:"required"`
 
-	Script           string `json:"script"`
-	ContainerName    string `json:"containerName"`
-	AppID            string `json:"appID"`
-	Website          string `json:"website"`
-	ExclusionRules   string `json:"exclusionRules"`
-	DBType           string `json:"dbType"`
-	DBName           string `json:"dbName"`
-	URL              string `json:"url"`
-	SourceDir        string `json:"sourceDir"`
-	TargetDirID      int    `json:"targetDirID"`
-	TargetAccountIDs string `json:"targetAccountIDs"`
-	RetainCopies     int    `json:"retainCopies" validate:"number,min=1"`
+	Script         string `json:"script"`
+	ContainerName  string `json:"containerName"`
+	AppID          string `json:"appID"`
+	Website        string `json:"website"`
+	ExclusionRules string `json:"exclusionRules"`
+	DBType         string `json:"dbType"`
+	DBName         string `json:"dbName"`
+	URL            string `json:"url"`
+	SourceDir      string `json:"sourceDir"`
+
+	BackupAccounts  string `json:"backupAccounts"`
+	DefaultDownload string `json:"defaultDownload"`
+	RetainCopies    int    `json:"retainCopies" validate:"number,min=1"`
 }
 
 type CronjobUpdateStatus struct {
@@ -66,20 +68,18 @@ type CronjobInfo struct {
 	Type string `json:"type"`
 	Spec string `json:"spec"`
 
-	Script           string `json:"script"`
-	ContainerName    string `json:"containerName"`
-	AppID            string `json:"appID"`
-	Website          string `json:"website"`
-	ExclusionRules   string `json:"exclusionRules"`
-	DBType           string `json:"dbType"`
-	DBName           string `json:"dbName"`
-	URL              string `json:"url"`
-	SourceDir        string `json:"sourceDir"`
-	TargetDir        string `json:"targetDir"`
-	TargetDirID      int    `json:"targetDirID"`
-	TargetAccounts   string `json:"targetAccounts"`
-	TargetAccountIDs string `json:"targetAccountIDs"`
-	RetainCopies     int    `json:"retainCopies"`
+	Script          string `json:"script"`
+	ContainerName   string `json:"containerName"`
+	AppID           string `json:"appID"`
+	Website         string `json:"website"`
+	ExclusionRules  string `json:"exclusionRules"`
+	DBType          string `json:"dbType"`
+	DBName          string `json:"dbName"`
+	URL             string `json:"url"`
+	SourceDir       string `json:"sourceDir"`
+	BackupAccounts  string `json:"backupAccounts"`
+	DefaultDownload string `json:"defaultDownload"`
+	RetainCopies    int    `json:"retainCopies"`
 
 	LastRecordTime string `json:"lastRecordTime"`
 	Status         string `json:"status"`

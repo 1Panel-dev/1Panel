@@ -247,19 +247,19 @@ func (u *CronjobService) handleSystemClean() (string, error) {
 	return NewIDeviceService().CleanForCronjob()
 }
 
-func (u *CronjobService) loadClientMap(targetAccountIDs string) (map[string]cronjobUploadHelper, error) {
+func loadClientMap(backupAccounts string) (map[string]cronjobUploadHelper, error) {
 	clients := make(map[string]cronjobUploadHelper)
 	accounts, err := backupRepo.List()
 	if err != nil {
 		return nil, err
 	}
-	targets := strings.Split(targetAccountIDs, ",")
+	targets := strings.Split(backupAccounts, ",")
 	for _, target := range targets {
 		if len(target) == 0 {
 			continue
 		}
 		for _, account := range accounts {
-			if target == fmt.Sprintf("%v", account.ID) {
+			if target == account.Type {
 				client, err := NewIBackupService().NewClient(&account)
 				if err != nil {
 					return nil, err
@@ -286,11 +286,11 @@ func (u *CronjobService) uploadCronjobBackFile(cronjob model.Cronjob, accountMap
 	defer func() {
 		_ = os.Remove(file)
 	}()
-	targets := strings.Split(cronjob.TargetAccountIDs, ",")
+	accounts := strings.Split(cronjob.BackupAccounts, ",")
 	cloudSrc := strings.TrimPrefix(file, global.CONF.System.TmpDir+"/")
-	for _, target := range targets {
-		if len(target) != 0 {
-			if _, err := accountMap[target].client.Upload(file, path.Join(accountMap[target].backupPath, cloudSrc)); err != nil {
+	for _, account := range accounts {
+		if len(account) != 0 {
+			if _, err := accountMap[account].client.Upload(file, path.Join(accountMap[account].backupPath, cloudSrc)); err != nil {
 				return "", err
 			}
 		}
@@ -314,18 +314,18 @@ func (u *CronjobService) removeExpiredBackup(cronjob model.Cronjob, accountMap m
 		return
 	}
 	for i := int(cronjob.RetainCopies); i < len(records); i++ {
-		targets := strings.Split(cronjob.TargetAccountIDs, ",")
+		accounts := strings.Split(cronjob.BackupAccounts, ",")
 		if cronjob.Type == "snapshot" {
-			for _, target := range targets {
-				if len(target) != 0 {
-					_, _ = accountMap[target].client.Delete(path.Join(accountMap[target].backupPath, "system_snapshot", records[i].FileName))
+			for _, account := range accounts {
+				if len(account) != 0 {
+					_, _ = accountMap[account].client.Delete(path.Join(accountMap[account].backupPath, "system_snapshot", records[i].FileName))
 				}
 			}
 			_ = snapshotRepo.Delete(commonRepo.WithByName(strings.TrimSuffix(records[i].FileName, ".tar.gz")))
 		} else {
-			for _, target := range targets {
-				if len(target) != 0 {
-					_, _ = accountMap[target].client.Delete(path.Join(accountMap[target].backupPath, records[i].FileDir, records[i].FileName))
+			for _, account := range accounts {
+				if len(account) != 0 {
+					_, _ = accountMap[account].client.Delete(path.Join(accountMap[account].backupPath, records[i].FileDir, records[i].FileName))
 				}
 			}
 		}

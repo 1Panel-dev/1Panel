@@ -271,31 +271,22 @@ var UpdateCronjobSpec = &gormigrate.Migration{
 		var (
 			jobs           []model.Cronjob
 			backupAccounts []model.BackupAccount
-			localAccountID uint
 		)
 		mapAccount := make(map[uint]string)
-		mapAccountName := make(map[string]model.BackupAccount)
 		if err := tx.Find(&jobs).Error; err != nil {
 			return err
 		}
 		_ = tx.Find(&backupAccounts).Error
 		for _, item := range backupAccounts {
 			mapAccount[item.ID] = item.Type
-			mapAccountName[item.Type] = item
-			if item.Type == constant.Local {
-				localAccountID = item.ID
-			}
-		}
-		if localAccountID == 0 {
-			return errors.New("local backup account is unset!")
 		}
 		for _, job := range jobs {
 			if job.KeepLocal {
 				if err := tx.Model(&model.Cronjob{}).
 					Where("id = ?", job.ID).
 					Updates(map[string]interface{}{
-						"target_account_ids": fmt.Sprintf("%v,%v", job.TargetDirID, localAccountID),
-						"target_dir_id":      localAccountID,
+						"backup_accounts":  fmt.Sprintf("%v,%v", mapAccount[uint(job.TargetDirID)], constant.Local),
+						"default_download": constant.Local,
 					}).Error; err != nil {
 					return err
 				}
@@ -303,7 +294,8 @@ var UpdateCronjobSpec = &gormigrate.Migration{
 				if err := tx.Model(&model.Cronjob{}).
 					Where("id = ?", job.ID).
 					Updates(map[string]interface{}{
-						"target_account_ids": job.TargetDirID,
+						"backup_accounts":  mapAccount[uint(job.TargetDirID)],
+						"default_download": mapAccount[uint(job.TargetDirID)],
 					}).Error; err != nil {
 					return err
 				}

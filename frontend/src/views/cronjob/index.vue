@@ -113,12 +113,12 @@
                             {{ row.lastRecordTime }}
                         </template>
                     </el-table-column>
-                    <el-table-column :min-width="80" :label="$t('cronjob.target')" prop="targetDir">
+                    <el-table-column :min-width="80" :label="$t('cronjob.target')" prop="defaultDownload">
                         <template #default="{ row }">
-                            <div v-for="(item, index) of row.targetAccounts.split(',')" :key="index" class="mt-1">
+                            <div v-for="(item, index) of row.backupAccounts.split(',')" :key="index" class="mt-1">
                                 <div v-if="row.accountExpand || (!row.accountExpand && index < 3)">
-                                    <el-tag v-if="row.targetAccounts">
-                                        <span v-if="item === row.targetDir">
+                                    <el-tag v-if="row.backupAccounts">
+                                        <span v-if="item === row.defaultDownload">
                                             <el-icon><Star /></el-icon>
                                             {{ $t('setting.' + item) }}
                                         </span>
@@ -129,12 +129,12 @@
                                     <span v-else>-</span>
                                 </div>
                             </div>
-                            <div v-if="!row.accountExpand && row.targetAccounts.split(',').length > 3">
+                            <div v-if="!row.accountExpand && row.backupAccounts.split(',').length > 3">
                                 <el-button type="primary" link @click="row.accountExpand = true">
                                     {{ $t('commons.button.expand') }}...
                                 </el-button>
                             </div>
-                            <div v-if="row.accountExpand && row.targetAccounts.split(',').length > 3">
+                            <div v-if="row.accountExpand && row.backupAccounts.split(',').length > 3">
                                 <el-button type="primary" link @click="row.accountExpand = false">
                                     {{ $t('commons.button.collapse') }}
                                 </el-button>
@@ -221,16 +221,16 @@ const search = async (column?: any) => {
             loading.value = false;
             data.value = res.data.items || [];
             for (const item of data.value) {
-                item.targetAccounts = item.targetAccounts.split(',') || [];
+                let itemAccounts = item.backupAccounts.split(',') || [];
                 let accounts = [];
-                for (const account of item.targetAccounts) {
-                    if (account == item.targetDir) {
+                for (const account of itemAccounts) {
+                    if (account == item.defaultDownload) {
                         accounts.unshift(account);
                     } else {
                         accounts.push(account);
                     }
                 }
-                item.targetAccounts = accounts.join(',');
+                item.itemAccounts = accounts.join(',');
             }
             paginationConfig.total = res.data.total;
         })

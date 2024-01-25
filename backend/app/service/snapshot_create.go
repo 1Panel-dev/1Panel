@@ -183,7 +183,7 @@ func snapUpload(snap snapHelper, accounts string, file string) {
 	}()
 
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"upload": constant.StatusUploading})
-	accountMap, err := loadClientMapForSnapshot(accounts)
+	accountMap, err := loadClientMap(accounts)
 	if err != nil {
 		snap.Status.Upload = err.Error()
 		_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"upload": err.Error()})
@@ -236,33 +236,4 @@ func checkPointOfWal() {
 	if err := global.DB.Exec("PRAGMA wal_checkpoint(TRUNCATE);").Error; err != nil {
 		global.LOG.Errorf("handle check point failed, err: %v", err)
 	}
-}
-
-func loadClientMapForSnapshot(from string) (map[string]cronjobUploadHelper, error) {
-	clients := make(map[string]cronjobUploadHelper)
-	accounts, err := backupRepo.List()
-	if err != nil {
-		return nil, err
-	}
-	targets := strings.Split(from, ",")
-	for _, target := range targets {
-		if len(target) == 0 {
-			continue
-		}
-		for _, account := range accounts {
-			if target == fmt.Sprintf("%v", account.ID) {
-				client, err := NewIBackupService().NewClient(&account)
-				if err != nil {
-					return nil, err
-				}
-				pathItem := account.BackupPath
-				clients[target] = cronjobUploadHelper{
-					client:     client,
-					backupPath: pathItem,
-					backType:   account.Type,
-				}
-			}
-		}
-	}
-	return clients, nil
 }

@@ -489,11 +489,12 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto
 		rootDir = path.Join(localDir, "system", name)
 
 		snap = model.Snapshot{
-			Name:        name,
-			Description: req.Description,
-			From:        req.From,
-			Version:     versionItem.Value,
-			Status:      constant.StatusWaiting,
+			Name:            name,
+			Description:     req.Description,
+			From:            req.From,
+			DefaultDownload: req.DefaultDownload,
+			Version:         versionItem.Value,
+			Status:          constant.StatusWaiting,
 		}
 		_ = snapshotRepo.Create(&snap)
 		snapStatus.SnapID = snap.ID
@@ -577,18 +578,21 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto
 		loadLogByStatus(snapStatus, logPath)
 		return snap.Name, fmt.Errorf("snapshot %s backup failed", snap.Name)
 	}
+	loadLogByStatus(snapStatus, logPath)
 	snapPanelData(itemHelper, localDir, backupPanelDir)
 	if snapStatus.PanelData != constant.StatusDone {
 		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
 		loadLogByStatus(snapStatus, logPath)
 		return snap.Name, fmt.Errorf("snapshot %s 1panel data failed", snap.Name)
 	}
+	loadLogByStatus(snapStatus, logPath)
 	snapCompress(itemHelper, rootDir)
 	if snapStatus.Compress != constant.StatusDone {
 		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
 		loadLogByStatus(snapStatus, logPath)
 		return snap.Name, fmt.Errorf("snapshot %s compress failed", snap.Name)
 	}
+	loadLogByStatus(snapStatus, logPath)
 	snapUpload(itemHelper, req.From, fmt.Sprintf("%s.tar.gz", rootDir))
 	if snapStatus.Upload != constant.StatusDone {
 		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})

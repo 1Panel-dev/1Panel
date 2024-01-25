@@ -18,9 +18,10 @@ export namespace Cronjob {
         dbName: string;
         url: string;
         sourceDir: string;
-        targetDirID: number;
-        targetAccountIDs: string;
-        targetAccountIDList: Array<number>;
+
+        backupAccounts: string;
+        defaultDownload: string;
+        backupAccountList: Array<string>;
         retainCopies: number;
         status: string;
     }
@@ -37,8 +38,9 @@ export namespace Cronjob {
         dbName: string;
         url: string;
         sourceDir: string;
-        targetDirID: number;
-        targetAccountIDs: string;
+
+        backupAccounts: string;
+        defaultDownload: string;
         retainCopies: number;
     }
     export interface SpecObj {
@@ -60,8 +62,9 @@ export namespace Cronjob {
         dbName: string;
         url: string;
         sourceDir: string;
-        targetDirID: number;
-        targetAccountIDs: string;
+
+        backupAccounts: string;
+        defaultDownload: string;
         retainCopies: number;
     }
     export interface CronjobDelete {
