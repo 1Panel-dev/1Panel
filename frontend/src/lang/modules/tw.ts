@@ -390,6 +390,7 @@ const message = {
         address: '數據庫地址',
         version: '數據庫版本',
         userHelper: 'root 用戶或者擁有 root 權限的數據庫用戶',
+        pgUserHelper: '具有超級管理員權限的數據庫使用者',
         ssl: '使用 SSL',
         clientKey: '客户端私钥',
         clientCert: '客户端证书',

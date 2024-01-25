@@ -400,6 +400,7 @@ const message = {
         address: 'DB address',
         version: 'DB version',
         userHelper: 'The root user or a database user with root privileges can access the remote database.',
+        pgUserHelper: 'Database user with superuser privileges.',
         ssl: 'Use SSL',
         clientKey: 'Client Private Key',
         clientCert: 'Client Certificate',

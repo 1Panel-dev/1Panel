@@ -34,6 +34,7 @@
                     </el-form-item>
                     <el-form-item :label="$t('commons.login.username')" prop="username">
                         <el-input @change="isOK = false" clearable v-model.trim="dialogData.rowData!.username" />
+                        <span class="input-help">{{ $t('database.pgUserHelper') }}</span>
                     </el-form-item>
                     <el-form-item :label="$t('commons.login.password')" prop="password">
                         <el-input

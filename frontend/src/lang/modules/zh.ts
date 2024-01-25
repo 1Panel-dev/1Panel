@@ -390,6 +390,7 @@ const message = {
         address: '数据库地址',
         version: '数据库版本',
         userHelper: 'root 用户或者拥有 root 权限的数据库用户',
+        pgUserHelper: '拥有超级管理员权限的数据库用户',
         ssl: '使用 SSL',
         clientKey: '客户端私钥',
         clientCert: '客户端证书',
