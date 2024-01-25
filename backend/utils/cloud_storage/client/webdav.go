@@ -1,9 +1,12 @@
 package client
 
 import (
+	"crypto/tls"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
+	"strings"
 
 	"github.com/studio-b12/gowebdav"
 )
@@ -25,6 +28,14 @@ func NewWebDAVClient(vars map[string]interface{}) (*webDAVClient, error) {
 		url = address
 	}
 	client := gowebdav.NewClient(url, username, password)
+	tlsConfig := &tls.Config{}
+	if strings.HasPrefix(address, "https") {
+		tlsConfig.InsecureSkipVerify = true
+	}
+	var transport http.RoundTripper = &http.Transport{
+		TLSClientConfig: tlsConfig,
+	}
+	client.SetTransport(transport)
 	if err := client.Connect(); err != nil {
 		return nil, err
 	}
@@ -33,22 +44,13 @@ func NewWebDAVClient(vars map[string]interface{}) (*webDAVClient, error) {
 
 func (s webDAVClient) Upload(src, target string) (bool, error) {
 	targetFilePath := s.Bucket + "/" + target
-	fileInfo, err := os.Stat(src)
+	srcFile, err := os.Open(src)
 	if err != nil {
 		return false, err
 	}
-	// 50M
-	if fileInfo.Size() > 52428800 {
-		bytes, _ := os.ReadFile(src)
-		if err := s.client.Write(targetFilePath, bytes, 0644); err != nil {
-			return false, err
-		}
-		return true, nil
-	}
-	file, _ := os.Open(src)
-	defer file.Close()
+	defer srcFile.Close()
 
-	if err := s.client.WriteStream(targetFilePath, file, 0644); err != nil {
+	if err := s.client.WriteStream(targetFilePath, srcFile, 0644); err != nil {
 		return false, err
 	}
 	return true, nil
@@ -76,16 +78,8 @@ func (s webDAVClient) Download(src, target string) (bool, error) {
 		return false, err
 	}
 	defer file.Close()
-	// 50M
-	if info.Size() > 52428800 {
-		reader, _ := s.client.ReadStream(srcPath)
-		if _, err := io.Copy(file, reader); err != nil {
-			return false, err
-		}
-	}
-
-	bytes, _ := s.client.Read(srcPath)
-	if err := os.WriteFile(target, bytes, 0644); err != nil {
+	reader, _ := s.client.ReadStream(srcPath)
+	if _, err := io.Copy(file, reader); err != nil {
 		return false, err
 	}
 	return true, err

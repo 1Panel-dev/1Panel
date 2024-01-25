@@ -107,9 +107,15 @@ const onDownload = async (row: Backup.RecordInfo) => {
         fileDir: row.fileDir,
         fileName: row.fileName,
     };
-    await downloadBackupRecord(params).then(async (res) => {
-        downloadFile(res.data);
-    });
+    loading.value = true;
+    await downloadBackupRecord(params)
+        .then(async (res) => {
+            loading.value = false;
+            downloadFile(res.data);
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const buttons = [
