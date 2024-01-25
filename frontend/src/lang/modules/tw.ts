@@ -755,6 +755,7 @@ const message = {
         containerCheckBox: '在容器中執行（無需再輸入進入容器命令）',
         containerName: '容器名稱',
         ntp: '同步服務器時間',
+        ntp_helper: '默認情況下，使用 [工具箱] - [快速設置] 頁面中配置的 NTP 伺服器',
         app: '備份應用',
         website: '備份網站',
         rulesHelper: '當存在多個壓縮排除規則時，需要換行顯示，例：\n*.log \n*.sql',
