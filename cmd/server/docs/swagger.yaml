@@ -580,11 +580,15 @@ definitions:
     properties:
       appID:
         type: string
+      backupAccounts:
+        type: string
       containerName:
         type: string
       dbName:
         type: string
       dbType:
+        type: string
+      defaultDownload:
         type: string
       exclusionRules:
         type: string
@@ -599,10 +603,6 @@ definitions:
         type: string
       spec:
         type: string
-      targetAccountIDs:
-        type: string
-      targetDirID:
-        type: integer
       type:
         type: string
       url:
@@ -628,11 +628,15 @@ definitions:
     properties:
       appID:
         type: string
+      backupAccounts:
+        type: string
       containerName:
         type: string
       dbName:
         type: string
       dbType:
+        type: string
+      defaultDownload:
         type: string
       exclusionRules:
         type: string
@@ -649,10 +653,6 @@ definitions:
         type: string
       spec:
         type: string
-      targetAccountIDs:
-        type: string
-      targetDirID:
-        type: integer
       url:
         type: string
       website:
@@ -2564,6 +2564,8 @@ definitions:
     type: object
   dto.SnapshotCreate:
     properties:
+      defaultDownload:
+        type: string
       description:
         maxLength: 256
         type: string
@@ -2572,6 +2574,7 @@ definitions:
       id:
         type: integer
     required:
+    - defaultDownload
     - from
     type: object
   dto.SnapshotImport:

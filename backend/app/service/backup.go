@@ -290,7 +290,7 @@ func (u *BackupService) Delete(id uint) error {
 	if backup.Type == constant.OneDrive {
 		global.Cron.Remove(global.OneDriveCronID)
 	}
-	cronjobs, _ := cronjobRepo.List(cronjobRepo.WithByBackupID(id))
+	cronjobs, _ := cronjobRepo.List(cronjobRepo.WithByDefaultDownload(backup.Type))
 	if len(cronjobs) != 0 {
 		return buserr.New(constant.ErrBackupInUsed)
 	}

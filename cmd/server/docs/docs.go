@@ -14958,6 +14958,9 @@ const docTemplate = `{
                 "appID": {
                     "type": "string"
                 },
+                "backupAccounts": {
+                    "type": "string"
+                },
                 "containerName": {
                     "type": "string"
                 },
@@ -14965,6 +14968,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "dbType": {
+                    "type": "string"
+                },
+                "defaultDownload": {
                     "type": "string"
                 },
                 "exclusionRules": {
@@ -14985,12 +14991,6 @@ const docTemplate = `{
                 },
                 "spec": {
                     "type": "string"
-                },
-                "targetAccountIDs": {
-                    "type": "string"
-                },
-                "targetDirID": {
-                    "type": "integer"
                 },
                 "type": {
                     "type": "string"
@@ -15029,6 +15029,9 @@ const docTemplate = `{
                 "appID": {
                     "type": "string"
                 },
+                "backupAccounts": {
+                    "type": "string"
+                },
                 "containerName": {
                     "type": "string"
                 },
@@ -15036,6 +15039,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "dbType": {
+                    "type": "string"
+                },
+                "defaultDownload": {
                     "type": "string"
                 },
                 "exclusionRules": {
@@ -15059,12 +15065,6 @@ const docTemplate = `{
                 },
                 "spec": {
                     "type": "string"
-                },
-                "targetAccountIDs": {
-                    "type": "string"
-                },
-                "targetDirID": {
-                    "type": "integer"
                 },
                 "url": {
                     "type": "string"
@@ -17892,9 +17892,13 @@ const docTemplate = `{
         "dto.SnapshotCreate": {
             "type": "object",
             "required": [
+                "defaultDownload",
                 "from"
             ],
             "properties": {
+                "defaultDownload": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string",
                     "maxLength": 256

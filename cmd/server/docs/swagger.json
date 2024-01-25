@@ -14951,6 +14951,9 @@
                 "appID": {
                     "type": "string"
                 },
+                "backupAccounts": {
+                    "type": "string"
+                },
                 "containerName": {
                     "type": "string"
                 },
@@ -14958,6 +14961,9 @@
                     "type": "string"
                 },
                 "dbType": {
+                    "type": "string"
+                },
+                "defaultDownload": {
                     "type": "string"
                 },
                 "exclusionRules": {
@@ -14978,12 +14984,6 @@
                 },
                 "spec": {
                     "type": "string"
-                },
-                "targetAccountIDs": {
-                    "type": "string"
-                },
-                "targetDirID": {
-                    "type": "integer"
                 },
                 "type": {
                     "type": "string"
@@ -15022,6 +15022,9 @@
                 "appID": {
                     "type": "string"
                 },
+                "backupAccounts": {
+                    "type": "string"
+                },
                 "containerName": {
                     "type": "string"
                 },
@@ -15029,6 +15032,9 @@
                     "type": "string"
                 },
                 "dbType": {
+                    "type": "string"
+                },
+                "defaultDownload": {
                     "type": "string"
                 },
                 "exclusionRules": {
@@ -15052,12 +15058,6 @@
                 },
                 "spec": {
                     "type": "string"
-                },
-                "targetAccountIDs": {
-                    "type": "string"
-                },
-                "targetDirID": {
-                    "type": "integer"
                 },
                 "url": {
                     "type": "string"
@@ -17885,9 +17885,13 @@
         "dto.SnapshotCreate": {
             "type": "object",
             "required": [
+                "defaultDownload",
                 "from"
             ],
             "properties": {
+                "defaultDownload": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string",
                     "maxLength": 256
