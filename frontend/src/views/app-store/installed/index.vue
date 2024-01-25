@@ -157,8 +157,8 @@
                                                     placement="top"
                                                 >
                                                     <el-button
-                                                        link
                                                         type="primary"
+                                                        link
                                                         @click="openLog(installed)"
                                                         :disabled="installed.status === 'DownloadErr'"
                                                     >
@@ -169,7 +169,6 @@
 
                                             <el-button
                                                 class="h-button"
-                                                type="primary"
                                                 plain
                                                 round
                                                 size="small"
@@ -184,7 +183,6 @@
                                             </el-button>
                                             <el-button
                                                 class="h-button"
-                                                type="primary"
                                                 plain
                                                 round
                                                 size="small"
@@ -199,7 +197,6 @@
                                             </el-button>
                                             <el-button
                                                 class="h-button"
-                                                type="primary"
                                                 plain
                                                 round
                                                 size="small"
@@ -210,7 +207,6 @@
                                             </el-button>
                                             <el-button
                                                 class="h-button"
-                                                type="primary"
                                                 plain
                                                 round
                                                 size="small"
@@ -259,9 +255,7 @@
                                             <el-button
                                                 v-for="(button, key) in buttons"
                                                 :key="key"
-                                                :type="
-                                                    button.disabled && button.disabled(installed) ? 'info' : 'primary'
-                                                "
+                                                :type="button.disabled && button.disabled(installed) ? 'info' : ''"
                                                 plain
                                                 round
                                                 size="small"

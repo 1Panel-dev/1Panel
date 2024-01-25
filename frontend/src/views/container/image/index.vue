@@ -72,6 +72,7 @@
                                 v-for="(item, index) of row.tags"
                                 :key="index"
                                 :title="item"
+                                type="info"
                             >
                                 {{ item }}
                             </el-tag>
