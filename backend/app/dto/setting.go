@@ -115,14 +115,15 @@ type SnapshotImport struct {
 	Description string   `json:"description" validate:"max=256"`
 }
 type SnapshotInfo struct {
-	ID          uint      `json:"id"`
-	Name        string    `json:"name"`
-	Description string    `json:"description" validate:"max=256"`
-	From        string    `json:"from"`
-	Status      string    `json:"status"`
-	Message     string    `json:"message"`
-	CreatedAt   time.Time `json:"createdAt"`
-	Version     string    `json:"version"`
+	ID              uint      `json:"id"`
+	Name            string    `json:"name"`
+	Description     string    `json:"description" validate:"max=256"`
+	From            string    `json:"from"`
+	DefaultDownload string    `json:"defaultDownload"`
+	Status          string    `json:"status"`
+	Message         string    `json:"message"`
+	CreatedAt       time.Time `json:"createdAt"`
+	Version         string    `json:"version"`
 
 	InterruptStep    string `json:"interruptStep"`
 	RecoverStatus    string `json:"recoverStatus"`

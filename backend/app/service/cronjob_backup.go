@@ -208,7 +208,8 @@ func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, startTime time.Ti
 	record.FileDir = "system_snapshot"
 
 	req := dto.SnapshotCreate{
-		From: record.BackupType,
+		From:            record.BackupType,
+		DefaultDownload: cronjob.DefaultDownload,
 	}
 	name, err := NewISnapshotService().HandleSnapshot(true, logPath, req, startTime.Format("20060102150405"))
 	if err != nil {
