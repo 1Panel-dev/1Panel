@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/pkg/errors"
 	"io"
 	"os"
 	"os/exec"
@@ -15,6 +16,7 @@ import (
 	"sync"
 	"syscall"
 	"time"
+	"unicode/utf8"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
@@ -637,6 +639,9 @@ func (u *ContainerService) ContainerLogs(wsConn *websocket.Conn, containerType, 
 	cmd := exec.Command("bash", "-c", command)
 	if !follow {
 		stdout, _ := cmd.CombinedOutput()
+		if !utf8.Valid(stdout) {
+			return errors.New("invalid utf8")
+		}
 		if err := wsConn.WriteMessage(websocket.TextMessage, stdout); err != nil {
 			global.LOG.Errorf("send message with log to ws failed, err: %v", err)
 		}
@@ -676,6 +681,10 @@ func (u *ContainerService) ContainerLogs(wsConn *websocket.Conn, containerType, 
 					return err
 				}
 				global.LOG.Errorf("read bytes from log failed, err: %v", err)
+				continue
+			}
+			// check if the bytes is valid utf8
+			if !utf8.Valid(buffer[:n]) {
 				continue
 			}
 			if err = wsConn.WriteMessage(websocket.TextMessage, buffer[:n]); err != nil {
