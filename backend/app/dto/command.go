@@ -2,6 +2,8 @@ package dto
 
 type SearchCommandWithPage struct {
 	SearchWithPage
+	OrderBy string `json:"orderBy"`
+	Order   string `json:"order"`
 	GroupID uint   `json:"groupID"`
 	Info    string `json:"info"`
 }

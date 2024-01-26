@@ -23,7 +23,7 @@ func NewICommandService() ICommandService {
 }
 
 func (u *CommandService) List() ([]dto.CommandInfo, error) {
-	commands, err := commandRepo.GetList()
+	commands, err := commandRepo.GetList(commonRepo.WithOrderBy("name"))
 	if err != nil {
 		return nil, constant.ErrRecordNotFound
 	}
@@ -39,7 +39,7 @@ func (u *CommandService) List() ([]dto.CommandInfo, error) {
 }
 
 func (u *CommandService) SearchForTree() ([]dto.CommandTree, error) {
-	cmdList, err := commandRepo.GetList()
+	cmdList, err := commandRepo.GetList(commonRepo.WithOrderBy("name"))
 	if err != nil {
 		return nil, err
 	}
@@ -65,11 +65,11 @@ func (u *CommandService) SearchForTree() ([]dto.CommandTree, error) {
 }
 
 func (u *CommandService) SearchWithPage(search dto.SearchCommandWithPage) (int64, interface{}, error) {
-	total, commands, err := commandRepo.Page(search.Page, search.PageSize, commonRepo.WithLikeName(search.Info), commonRepo.WithByGroupID(search.GroupID))
+	total, commands, err := commandRepo.Page(search.Page, search.PageSize, commonRepo.WithLikeName(search.Info), commonRepo.WithByGroupID(search.GroupID), commonRepo.WithOrderRuleBy(search.OrderBy, search.Order))
 	if err != nil {
 		return 0, nil, err
 	}
-	groups, _ := groupRepo.GetList(commonRepo.WithByType("command"))
+	groups, _ := groupRepo.GetList(commonRepo.WithByType("command"), commonRepo.WithOrderBy("name"))
 	var dtoCommands []dto.CommandInfo
 	for _, command := range commands {
 		var item dto.CommandInfo
