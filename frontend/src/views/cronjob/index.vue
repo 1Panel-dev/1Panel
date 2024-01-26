@@ -81,11 +81,11 @@
                     </el-table-column>
                     <el-table-column :label="$t('cronjob.cronSpec')" show-overflow-tooltip :min-width="120">
                         <template #default="{ row }">
-                            <div v-for="(item, index) of row.spec.split(',')" :key="index" class="mt-1">
+                            <div v-for="(item, index) of row.spec.split(',')" :key="index">
                                 <div v-if="row.expand || (!row.expand && index < 3)">
-                                    <el-tag type="info">
+                                    <span>
                                         {{ transSpecToStr(item) }}
-                                    </el-tag>
+                                    </span>
                                 </div>
                             </div>
                             <div v-if="!row.expand && row.spec.split(',').length > 3">
@@ -102,8 +102,8 @@
                     </el-table-column>
                     <el-table-column :label="$t('cronjob.retainCopies')" :min-width="90" prop="retainCopies">
                         <template #default="{ row }">
-                            <el-button v-if="hasBackup(row.type)" @click="loadBackups(row)" link type="primary">
-                                {{ row.retainCopies }}
+                            <el-button v-if="hasBackup(row.type)" @click="loadBackups(row)" plain size="small">
+                                {{ row.retainCopies }}{{ $t('cronjob.retainCopiesUnit') }}
                             </el-button>
                             <span v-else>{{ row.retainCopies }}</span>
                         </template>
@@ -115,17 +115,17 @@
                     </el-table-column>
                     <el-table-column :min-width="80" :label="$t('cronjob.target')" prop="defaultDownload">
                         <template #default="{ row }">
-                            <div v-for="(item, index) of row.backupAccounts?.split(',')" :key="index" class="mt-1">
+                            <div v-for="(item, index) of row.backupAccounts?.split(',')" :key="index">
                                 <div v-if="row.accountExpand || (!row.accountExpand && index < 3)">
-                                    <el-tag type="info" v-if="row.backupAccounts">
+                                    <span v-if="row.backupAccounts">
                                         <span v-if="item === row.defaultDownload">
-                                            <el-icon><Star /></el-icon>
                                             {{ $t('setting.' + item) }}
+                                            <el-icon><Star /></el-icon>
                                         </span>
                                         <span v-else>
                                             {{ $t('setting.' + item) }}
                                         </span>
-                                    </el-tag>
+                                    </span>
                                     <span v-else>-</span>
                                 </div>
                             </div>
