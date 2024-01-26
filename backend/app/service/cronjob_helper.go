@@ -290,9 +290,11 @@ func (u *CronjobService) uploadCronjobBackFile(cronjob model.Cronjob, accountMap
 	cloudSrc := strings.TrimPrefix(file, global.CONF.System.TmpDir+"/")
 	for _, account := range accounts {
 		if len(account) != 0 {
+			global.LOG.Debugf("start upload file to %s, dir: %s", account, path.Join(accountMap[account].backupPath, cloudSrc))
 			if _, err := accountMap[account].client.Upload(file, path.Join(accountMap[account].backupPath, cloudSrc)); err != nil {
 				return "", err
 			}
+			global.LOG.Debugf("upload successful!")
 		}
 	}
 	return cloudSrc, nil
