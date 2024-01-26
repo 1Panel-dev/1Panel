@@ -91,7 +91,7 @@ const message = {
         loadingText: {
             Upgrading: '系统升级中，请稍候...',
             Restarting: '系统重启中，请稍候...',
-            Recovering: '从快照恢复中，请稍候...',
+            Recovering: '快照恢复中，请稍候...',
             Rollbacking: '快照回滚中，请稍候...',
         },
         msg: {
@@ -126,7 +126,8 @@ const message = {
             confirmNoNull: '请确认 {0} 值不为空',
             errPort: '错误的端口信息，请确认！',
             remove: '移出',
-            recoverHelper: '当前数据将被覆盖，是否继续？',
+            backupHelper: '当前操作将对 {0} 进行备份，是否继续？',
+            recoverHelper: '将从 {0} 文件进行恢复，该操作不可回滚，是否继续？',
         },
         login: {
             username: '用户名',
