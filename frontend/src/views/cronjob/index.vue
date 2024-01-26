@@ -118,13 +118,16 @@
                             <div v-for="(item, index) of row.backupAccounts?.split(',')" :key="index">
                                 <div v-if="row.accountExpand || (!row.accountExpand && index < 3)">
                                     <span v-if="row.backupAccounts">
-                                        <span v-if="item === row.defaultDownload">
-                                            {{ $t('setting.' + item) }}
-                                            <el-icon><Star /></el-icon>
-                                        </span>
-                                        <span v-else>
+                                        <span>
                                             {{ $t('setting.' + item) }}
                                         </span>
+                                        <el-icon
+                                            size="12"
+                                            v-if="item === row.defaultDownload"
+                                            class="relative top-px left-1"
+                                        >
+                                            <Star />
+                                        </el-icon>
                                     </span>
                                     <span v-else>-</span>
                                 </div>
