@@ -1,5 +1,5 @@
 import http from '@/api';
-import { ResPage } from '../interface';
+import { ResPage, SearchWithPage } from '../interface';
 import { Command } from '../interface/command';
 import { Host } from '../interface/host';
 import { Base64 } from 'js-base64';
@@ -56,7 +56,7 @@ export const deleteHost = (params: { ids: number[] }) => {
 export const getCommandList = () => {
     return http.get<Array<Command.CommandInfo>>(`/hosts/command`, {});
 };
-export const getCommandPage = (params: Command.CommandSearch) => {
+export const getCommandPage = (params: SearchWithPage) => {
     return http.post<ResPage<Command.CommandInfo>>(`/hosts/command/search`, params);
 };
 export const getCommandTree = () => {

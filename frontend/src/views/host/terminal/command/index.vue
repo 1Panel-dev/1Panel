@@ -29,6 +29,7 @@
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
                     :data="data"
+                    @sort-change="search"
                     @search="search"
                 >
                     <el-table-column type="selection" fix />
@@ -38,12 +39,14 @@
                         min-width="100"
                         prop="name"
                         fix
+                        sortable
                     />
                     <el-table-column
                         :label="$t('terminal.command')"
                         min-width="300"
                         show-overflow-tooltip
                         prop="command"
+                        sortable
                     />
                     <el-table-column
                         :label="$t('commons.table.group')"
@@ -128,6 +131,8 @@ const paginationConfig = reactive({
     currentPage: 1,
     pageSize: 10,
     total: 0,
+    orderBy: 'name',
+    order: 'ascending',
 });
 const info = ref();
 const group = ref<string>('');
@@ -260,12 +265,16 @@ const buttons = [
     },
 ];
 
-const search = async () => {
+const search = async (column?: any) => {
+    paginationConfig.orderBy = column?.order ? column.prop : paginationConfig.orderBy;
+    paginationConfig.order = column?.order ? column.order : paginationConfig.order;
     let params = {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
         groupID: Number(group.value),
         info: info.value,
+        orderBy: paginationConfig.orderBy,
+        order: paginationConfig.order,
     };
     loading.value = true;
     await getCommandPage(params)
