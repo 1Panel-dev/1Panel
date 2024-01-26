@@ -125,7 +125,8 @@ const message = {
             confirmNoNull: 'Make sure the value {0} is not empty',
             errPort: 'Incorrect port information, please confirm!',
             remove: 'Remove',
-            recoverHelper: 'The current data will be overwritten. Do you want to continue?',
+            backupHelper: 'The current operation will back up {0}. Do you want to proceed?',
+            recoverHelper: 'Restoring from {0} file. This operation is irreversible. Do you want to continue?',
         },
         login: {
             username: 'UserName',

@@ -169,18 +169,21 @@ const search = async () => {
 };
 
 const onRecover = async (row: File.File) => {
-    let params = {
-        source: 'LOCAL',
-        type: type.value,
-        name: name.value,
-        detailName: detailName.value,
-        file: baseDir.value + row.name,
-    };
-    ElMessageBox.confirm(i18n.global.t('commons.msg.recoverHelper'), i18n.global.t('commons.button.recover'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-        type: 'info',
-    }).then(async () => {
+    ElMessageBox.confirm(
+        i18n.global.t('commons.msg.recoverHelper', [row.name]),
+        i18n.global.t('commons.button.recover'),
+        {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+        },
+    ).then(async () => {
+        let params = {
+            source: 'LOCAL',
+            type: type.value,
+            name: name.value,
+            detailName: detailName.value,
+            file: baseDir.value + row.name,
+        };
         loading.value = true;
         await handleRecoverByUpload(params)
             .then(() => {
