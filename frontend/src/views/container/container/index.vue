@@ -210,7 +210,7 @@
                                 <el-tooltip
                                     v-if="row.appName != ''"
                                     :hide-after="20"
-                                    :content="row.appName"
+                                    :content="$t('app.app') + ': ' + row.appName + '[' + row.appInstallName + ']'"
                                     placement="top"
                                 >
                                     <el-button

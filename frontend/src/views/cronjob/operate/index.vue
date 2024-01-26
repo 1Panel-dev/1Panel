@@ -288,7 +288,8 @@
                             :step="1"
                             v-model.number="dialogData.rowData!.retainCopies"
                         ></el-input-number>
-                        <span class="input-help">{{ $t('cronjob.retainCopiesHelper') }}</span>
+                        <span v-if="isBackup()" class="input-help">{{ $t('cronjob.retainCopiesHelper1') }}</span>
+                        <span v-else class="input-help">{{ $t('cronjob.retainCopiesHelper') }}</span>
                     </el-form-item>
 
                     <el-form-item v-if="dialogData.rowData!.type === 'curl'" :label="$t('cronjob.url')" prop="url">
