@@ -1,5 +1,3 @@
-import { ReqPage } from '.';
-
 export namespace Command {
     export interface CommandInfo {
         id: number;
@@ -12,8 +10,5 @@ export namespace Command {
         name: string;
         groupID: number;
         command: string;
-    }
-    export interface CommandSearch extends ReqPage {
-        info: string;
     }
 }

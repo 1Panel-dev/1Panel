@@ -91,7 +91,7 @@ const message = {
         loadingText: {
             Upgrading: '系統升級中，請稍候...',
             Restarting: '系統重啟中，請稍候...',
-            Recovering: '從快照恢復中，請稍候...',
+            Recovering: '快照恢復中，請稍候...',
             Rollbacking: '快照回滾中，請稍候...',
         },
         msg: {
@@ -126,7 +126,8 @@ const message = {
             confirmNoNull: '請確認 {0} 值不為空',
             errPort: '錯誤的端口信息，請確認！',
             remove: '移出',
-            recoverHelper: '當前數據將被覆蓋，是否繼續？',
+            backupHelper: '當前操作將對 {0} 進行備份，是否繼續？',
+            recoverHelper: '將從 {0} 文件進行恢復，該操作不可回滾，是否繼續？',
         },
         login: {
             username: '用戶名',
@@ -781,7 +782,9 @@ const message = {
         target: '備份到',
         targetHelper: '第三方備份賬號在面板設置中維護',
         retainCopies: '保留份數',
-        retainCopiesHelper: '執行記錄保留份數',
+        retainCopiesHelper: '執行記錄及日誌保留份数',
+        retainCopiesHelper1: '備份文件保留份数',
+        retainCopiesUnit: '份（查看）',
         cronSpecRule: '請輸入正確的執行周期',
         perMonth: '每月',
         perWeek: '每周',

@@ -122,40 +122,58 @@ const search = async () => {
 };
 
 const onBackup = async () => {
-    let params = {
-        type: type.value,
-        name: name.value,
-        detailName: detailName.value,
-    };
-    loading.value = true;
-    await handleBackup(params)
-        .then(() => {
-            loading.value = false;
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            search();
-        })
-        .catch(() => {
-            loading.value = false;
-        });
+    ElMessageBox.confirm(
+        i18n.global.t('commons.msg.backupHelper', [name.value + '( ' + detailName.value + ' )']),
+        i18n.global.t('commons.button.backup'),
+        {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+        },
+    ).then(async () => {
+        let params = {
+            type: type.value,
+            name: name.value,
+            detailName: detailName.value,
+        };
+        loading.value = true;
+        await handleBackup(params)
+            .then(() => {
+                loading.value = false;
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                search();
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
 };
 
 const onRecover = async (row: Backup.RecordInfo) => {
-    let params = {
-        source: row.source,
-        type: type.value,
-        name: name.value,
-        detailName: detailName.value,
-        file: row.fileDir + '/' + row.fileName,
-    };
-    loading.value = true;
-    await handleRecover(params)
-        .then(() => {
-            loading.value = false;
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-        })
-        .catch(() => {
-            loading.value = false;
-        });
+    ElMessageBox.confirm(
+        i18n.global.t('commons.msg.recoverHelper', [row.fileName]),
+        i18n.global.t('commons.button.recover'),
+        {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+        },
+    ).then(async () => {
+        let params = {
+            source: row.source,
+            type: type.value,
+            name: name.value,
+            detailName: detailName.value,
+            file: row.fileDir + '/' + row.fileName,
+        };
+        loading.value = true;
+        await handleRecover(params)
+            .then(() => {
+                loading.value = false;
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
 };
 
 const onDownload = async (row: Backup.RecordInfo) => {
