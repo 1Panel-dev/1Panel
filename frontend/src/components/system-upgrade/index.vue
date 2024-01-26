@@ -9,6 +9,10 @@
                 <span>{{ $t('setting.doc2') }}</span>
             </el-button>
             <el-divider direction="vertical" />
+            <el-button type="primary" link @click="toGithub">
+                <span>{{ $t('setting.project') }}</span>
+            </el-button>
+            <el-divider direction="vertical" />
         </span>
         <span class="version">{{ $t('setting.currentVersion') + version }}</span>
         <el-badge is-dot class="item" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
@@ -101,6 +105,10 @@ const toDoc = () => {
 
 const toForum = () => {
     window.open('https://bbs.fit2cloud.com/c/1p/7', '_blank');
+};
+
+const toGithub = () => {
+    window.open('https://github.com/1Panel-dev/1Panel', '_blank', 'noopener,noreferrer');
 };
 
 const onLoadUpgradeInfo = async () => {
