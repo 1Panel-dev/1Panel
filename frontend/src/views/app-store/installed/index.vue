@@ -69,10 +69,10 @@
             </el-row>
         </template>
         <template #rightButton>
-            <el-button @click="sync" type="primary" link v-if="mode === 'installed' && data != null">
+            <el-button @click="sync" type="primary" plain v-if="mode === 'installed' && data != null">
                 {{ $t('app.sync') }}
             </el-button>
-            <el-button @click="openIngore" type="primary" link v-if="mode === 'upgrade'">
+            <el-button @click="openIngore" type="primary" plain v-if="mode === 'upgrade'">
                 {{ $t('app.showIgnore') }}
             </el-button>
         </template>

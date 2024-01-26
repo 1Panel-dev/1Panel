@@ -220,12 +220,18 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.recover'),
+        disabled: (row: any) => {
+            return row.size === 0;
+        },
         click: (row: Backup.RecordInfo) => {
             onRecover(row);
         },
     },
     {
         label: i18n.global.t('commons.button.download'),
+        disabled: (row: any) => {
+            return row.size === 0;
+        },
         click: (row: Backup.RecordInfo) => {
             onDownload(row);
         },
