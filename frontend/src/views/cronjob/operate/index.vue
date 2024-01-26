@@ -454,7 +454,7 @@ const verifySpec = (rule: any, value: any, callback: any) => {
 };
 
 const rules = reactive({
-    name: [Rules.requiredInput],
+    name: [Rules.requiredInput, Rules.noSpace],
     type: [Rules.requiredSelect],
     spec: [
         { validator: verifySpec, trigger: 'blur', required: true },
