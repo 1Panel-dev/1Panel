@@ -785,7 +785,7 @@ const message = {
         retainCopies: '保留份数',
         retainCopiesHelper: '执行记录及日志保留份数',
         retainCopiesHelper1: '备份文件保留份数',
-        retainCopiesUnit: '份 (查看)',
+        retainCopiesUnit: ' 份',
         cronSpecRule: '请输入正确的执行周期',
         perMonth: '每月',
         perWeek: '每周',

@@ -823,7 +823,7 @@ const message = {
         retainCopies: 'Retain copies',
         retainCopiesHelper: 'Number of copies to retain for execution records and logs',
         retainCopiesHelper1: 'Number of copies to retain for backup files',
-        retainCopiesUnit: 'copies (view)',
+        retainCopiesUnit: ' copies',
         cronSpecRule: 'Please enter a correct lifecycle',
         perMonth: 'Every monthly',
         perWeek: 'Every week',
