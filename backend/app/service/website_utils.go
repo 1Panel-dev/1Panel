@@ -556,7 +556,15 @@ func opWebsite(website *model.Website, operate string) error {
 		case constant.Deployment:
 			server.RemoveDirective("location", []string{"/"})
 		case constant.Runtime:
-			server.RemoveDirective("location", []string{"~", "[^/]\\.php(/|$)"})
+			runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(website.RuntimeID))
+			if err != nil {
+				return err
+			}
+			if runtime.Type == constant.RuntimePHP {
+				server.RemoveDirective("location", []string{"~", "[^/]\\.php(/|$)"})
+			} else {
+				server.RemoveDirective("location", []string{"/"})
+			}
 		}
 		server.UpdateRoot("/usr/share/nginx/html/stop")
 		website.Status = constant.WebStopped
@@ -594,10 +602,19 @@ func opWebsite(website *model.Website, operate string) error {
 		case constant.Runtime:
 			server.UpdateRoot(rootIndex)
 			localPath := ""
-			if website.ProxyType == constant.RuntimeProxyUnix {
-				localPath = path.Join(nginxInstall.Install.GetPath(), rootIndex, "index.php")
+			runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(website.RuntimeID))
+			if err != nil {
+				return err
 			}
-			server.UpdatePHPProxy([]string{website.Proxy}, localPath)
+			if runtime.Type == constant.RuntimePHP {
+				if website.ProxyType == constant.RuntimeProxyUnix {
+					localPath = path.Join(nginxInstall.Install.GetPath(), rootIndex, "index.php")
+				}
+				server.UpdatePHPProxy([]string{website.Proxy}, localPath)
+			} else {
+				proxy := fmt.Sprintf("http://127.0.0.1:%d", runtime.Port)
+				server.UpdateRootProxy([]string{proxy})
+			}
 		}
 		website.Status = constant.WebRunning
 		now := time.Now()
