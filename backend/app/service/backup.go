@@ -8,7 +8,9 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -81,7 +83,6 @@ func (u *BackupService) List() ([]dto.BackupInfo, error) {
 func (u *BackupService) SearchRecordsWithPage(search dto.RecordSearch) (int64, []dto.BackupRecords, error) {
 	total, records, err := backupRepo.PageRecord(
 		search.Page, search.PageSize,
-		commonRepo.WithOrderBy("created_at desc"),
 		commonRepo.WithByName(search.Name),
 		commonRepo.WithByType(search.Type),
 		backupRepo.WithByDetailName(search.DetailName),
@@ -91,13 +92,15 @@ func (u *BackupService) SearchRecordsWithPage(search dto.RecordSearch) (int64, [
 	}
 
 	datas, err := u.loadRecordSize(records)
+	sort.Slice(datas, func(i, j int) bool {
+		return datas[i].CreatedAt.After(datas[j].CreatedAt)
+	})
 	return total, datas, err
 }
 
 func (u *BackupService) SearchRecordsByCronjobWithPage(search dto.RecordSearchByCronjob) (int64, []dto.BackupRecords, error) {
 	total, records, err := backupRepo.PageRecord(
 		search.Page, search.PageSize,
-		commonRepo.WithOrderBy("created_at desc"),
 		backupRepo.WithByCronID(search.CronjobID),
 	)
 	if err != nil {
@@ -105,6 +108,9 @@ func (u *BackupService) SearchRecordsByCronjobWithPage(search dto.RecordSearchBy
 	}
 
 	datas, err := u.loadRecordSize(records)
+	sort.Slice(datas, func(i, j int) bool {
+		return datas[i].CreatedAt.After(datas[j].CreatedAt)
+	})
 	return total, datas, err
 }
 
@@ -437,6 +443,7 @@ func (u *BackupService) loadAccessToken(backup *model.BackupAccount) error {
 func (u *BackupService) loadRecordSize(records []model.BackupRecord) ([]dto.BackupRecords, error) {
 	var datas []dto.BackupRecords
 	clientMap := make(map[string]loadSizeHelper)
+	var wg sync.WaitGroup
 	for i := 0; i < len(records); i++ {
 		var item dto.BackupRecords
 		if err := copier.Copy(&item, &records[i]); err != nil {
@@ -464,10 +471,15 @@ func (u *BackupService) loadRecordSize(records []model.BackupRecord) ([]dto.Back
 			continue
 		}
 		if clientMap[records[i].Source].isOk {
-			item.Size, _ = clientMap[records[i].Source].client.Size(path.Join(clientMap[records[i].Source].backupPath, itemPath))
+			wg.Add(1)
+			go func(index int) {
+				item.Size, _ = clientMap[records[index].Source].client.Size(path.Join(clientMap[records[index].Source].backupPath, itemPath))
+				datas = append(datas, item)
+				wg.Done()
+			}(i)
 		}
-		datas = append(datas, item)
 	}
+	wg.Wait()
 	return datas, nil
 }
 
