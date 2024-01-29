@@ -188,6 +188,7 @@ func (a *AppInstallService) LoadConnInfo(req dto.OperationWithNameAndType) (resp
 	data.Password = app.Password
 	data.ServiceName = app.ServiceName
 	data.Port = app.Port
+	data.ContainerName = app.ContainerName
 	return data, nil
 }
 

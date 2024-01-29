@@ -7,22 +7,41 @@
             <el-row type="flex" justify="center">
                 <el-col :span="22">
                     <el-form-item :label="$t('database.containerConn')">
-                        <el-tag>
-                            {{ form.serviceName + ':6379' }}
-                        </el-tag>
-                        <CopyButton :content="form.serviceName + ':6379'" type="icon" />
+                        <el-card class="mini-border-card">
+                            <el-descriptions :column="1">
+                                <el-descriptions-item :label="$t('database.connAddress')">
+                                    {{ form.containerName }}
+                                    <CopyButton :content="form.containerName" type="icon" />
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t('database.connPort')">
+                                    6379
+                                    <CopyButton content="6379" type="icon" />
+                                </el-descriptions-item>
+                            </el-descriptions>
+                        </el-card>
                         <span class="input-help">
                             {{ $t('database.containerConnHelper') }}
                         </span>
                     </el-form-item>
                     <el-form-item :label="$t('database.remoteConn')">
-                        <el-tooltip v-if="loadConnInfo().length > 48" :content="loadConnInfo()" placement="top">
-                            <el-tag>{{ loadConnInfo().substring(0, 48) }}...</el-tag>
-                        </el-tooltip>
-                        <el-tag v-else>{{ loadConnInfo() }}</el-tag>
-                        <CopyButton :content="form.systemIP + ':6379'" type="icon" />
-                        <span class="input-help">{{ $t('database.remoteConnHelper2') }}</span>
+                        <el-card class="mini-border-card">
+                            <el-descriptions :column="1">
+                                <el-descriptions-item :label="$t('database.connAddress')">
+                                    {{ form.systemIP }}
+                                    <CopyButton :content="form.systemIP" type="icon" />
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t('database.connPort')">
+                                    {{ form.port }}
+                                    <CopyButton :content="form.port + ''" type="icon" />
+                                </el-descriptions-item>
+                            </el-descriptions>
+                        </el-card>
+                        <span class="input-help">
+                            {{ $t('database.remoteConnHelper2') }}
+                        </span>
                     </el-form-item>
+
+                    <el-divider border-style="dashed" />
                     <el-form-item :label="$t('commons.login.password')" :rules="Rules.paramComplexity" prop="password">
                         <el-input type="password" show-password clearable v-model="form.password">
                             <template #append>
@@ -70,8 +89,10 @@ const loading = ref(false);
 
 const dialogVisible = ref(false);
 const form = ref<App.DatabaseConnInfo>({
-    privilege: false,
+    username: '',
     password: '',
+    privilege: false,
+    containerName: '',
     serviceName: '',
     systemIP: '',
     port: 0,
@@ -118,10 +139,6 @@ const onSubmit = async () => {
             loading.value = false;
         });
 };
-
-function loadConnInfo() {
-    return form.value.systemIP + ':' + form.value.port;
-}
 
 const onSave = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;

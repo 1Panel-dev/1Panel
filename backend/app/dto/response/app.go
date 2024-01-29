@@ -1,9 +1,10 @@
 package response
 
 import (
+	"time"
+
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 )
@@ -72,10 +73,11 @@ type AppInstalledDTO struct {
 }
 
 type DatabaseConn struct {
-	Username    string `json:"username"`
-	Password    string `json:"password"`
-	ServiceName string `json:"serviceName"`
-	Port        int64  `json:"port"`
+	Username      string `json:"username"`
+	Password      string `json:"password"`
+	ContainerName string `json:"containerName"`
+	ServiceName   string `json:"serviceName"`
+	Port          int64  `json:"port"`
 }
 
 type AppService struct {

@@ -288,6 +288,13 @@ html {
     }
 }
 
+.mini-border-card {
+    width: 100%;
+    .el-card__body {
+        --el-card-padding: 12px 12px 0 22px;
+    }
+}
+
 .xterm-viewport::-webkit-scrollbar {
     width: 8px;
     height: 8px;

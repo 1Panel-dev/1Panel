@@ -145,6 +145,7 @@ export namespace App {
         username: string;
         password: string;
         privilege: boolean;
+        containerName: string;
         serviceName: string;
         systemIP: string;
         port: number;
