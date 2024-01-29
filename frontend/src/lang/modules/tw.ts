@@ -784,7 +784,7 @@ const message = {
         retainCopies: '保留份數',
         retainCopiesHelper: '執行記錄及日誌保留份数',
         retainCopiesHelper1: '備份文件保留份数',
-        retainCopiesUnit: ' 份',
+        retainCopiesUnit: ' 份 (查看)',
         cronSpecRule: '請輸入正確的執行周期',
         perMonth: '每月',
         perWeek: '每周',
@@ -1348,6 +1348,7 @@ const message = {
     },
     clean: {
         scan: '開始掃描',
+        scanHelper: '輕鬆梳理 1Panel 運行期間積累的垃圾文件',
         clean: '立即清理',
         reScan: '重新掃描',
         cleanHelper: '已勾選文件及目錄清理後無法回滾（系統緩存文件清理需要重啟服務），是否繼續？',

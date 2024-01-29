@@ -143,8 +143,8 @@
                                 />
                             </el-select>
                         </el-form-item>
-                        <el-form-item :label="$t('cronjob.default_download_path')" prop="default_download">
-                            <el-select v-model="snapInfo.default_download" clearable>
+                        <el-form-item :label="$t('cronjob.default_download_path')" prop="defaultDownload">
+                            <el-select v-model="snapInfo.defaultDownload" clearable>
                                 <el-option
                                     v-for="item in accountOptions"
                                     :key="item.label"
@@ -217,13 +217,13 @@ type FormInstance = InstanceType<typeof ElForm>;
 const snapRef = ref<FormInstance>();
 const rules = reactive({
     fromAccounts: [Rules.requiredSelect],
-    default_download: [Rules.requiredSelect],
+    defaultDownload: [Rules.requiredSelect],
 });
 
 let snapInfo = reactive<Setting.SnapshotCreate>({
     id: 0,
     from: '',
-    default_download: '',
+    defaultDownload: '',
     fromAccounts: [],
     description: '',
 });

@@ -85,11 +85,12 @@ func (u *SnapshotService) SnapshotImport(req dto.SnapshotImport) error {
 			snap = strings.ReplaceAll(snap, ".tar.gz", "")
 		}
 		itemSnap := model.Snapshot{
-			Name:        snap,
-			From:        req.From,
-			Version:     nameItems[1],
-			Description: req.Description,
-			Status:      constant.StatusSuccess,
+			Name:            snap,
+			From:            req.From,
+			DefaultDownload: req.From,
+			Version:         nameItems[1],
+			Description:     req.Description,
+			Status:          constant.StatusSuccess,
 			BaseModel: model.BaseModel{
 				CreatedAt: formatTime,
 				UpdatedAt: formatTime,
