@@ -3,6 +3,7 @@ package hook
 import (
 	"encoding/base64"
 
+	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
@@ -70,6 +71,7 @@ func Init() {
 		_, _ = cmd.Execf("%s sed -i '/CHANGE_USER_INFO=true/d' /usr/local/bin/1pctl", sudo)
 	}
 
+	handleCronjobStatus()
 	handleSnapStatus()
 }
 
@@ -116,4 +118,12 @@ func handleSnapStatus() {
 			_ = snapRepo.UpdateStatus(statu.ID, updates)
 		}
 	}
+}
+
+func handleCronjobStatus() {
+	_ = global.DB.Model(&model.JobRecords{}).Where("status = ?", constant.StatusWaiting).
+		Updates(map[string]interface{}{
+			"status":  constant.StatusFailed,
+			"message": "the task was interrupted due to the restart of the 1panel service",
+		}).Error
 }
