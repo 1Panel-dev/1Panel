@@ -265,6 +265,9 @@ func loadClientMap(backupAccounts string) (map[string]cronjobUploadHelper, error
 					return nil, err
 				}
 				pathItem := account.BackupPath
+				if account.BackupPath != "/" {
+					pathItem = strings.TrimPrefix(account.BackupPath, "/")
+				}
 				clients[target] = cronjobUploadHelper{
 					client:     client,
 					backupPath: pathItem,
