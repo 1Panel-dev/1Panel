@@ -43,15 +43,15 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time) e
 		if err := handleAppBackup(&app, backupDir, record.FileName); err != nil {
 			return err
 		}
-		if err := backupRepo.CreateRecord(&record); err != nil {
-			global.LOG.Errorf("save backup record failed, err: %v", err)
-			return err
-		}
 		downloadPath, err := u.uploadCronjobBackFile(cronjob, accountMap, path.Join(backupDir, record.FileName))
 		if err != nil {
 			return err
 		}
 		record.FileDir = path.Dir(downloadPath)
+		if err := backupRepo.CreateRecord(&record); err != nil {
+			global.LOG.Errorf("save backup record failed, err: %v", err)
+			return err
+		}
 		u.removeExpiredBackup(cronjob, accountMap, record)
 	}
 	return nil
@@ -121,7 +121,6 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 			return err
 		}
 		record.FileDir = path.Dir(downloadPath)
-
 		if err := backupRepo.CreateRecord(&record); err != nil {
 			global.LOG.Errorf("save backup record failed, err: %v", err)
 			return err
@@ -153,7 +152,6 @@ func (u *CronjobService) handleDirectory(cronjob model.Cronjob, startTime time.T
 	}
 	record.FileDir = path.Dir(downloadPath)
 	record.FileName = fileName
-
 	if err := backupRepo.CreateRecord(&record); err != nil {
 		global.LOG.Errorf("save backup record failed, err: %v", err)
 		return err
@@ -184,7 +182,6 @@ func (u *CronjobService) handleSystemLog(cronjob model.Cronjob, startTime time.T
 	}
 	record.FileDir = path.Dir(downloadPath)
 	record.FileName = fileName
-
 	if err := backupRepo.CreateRecord(&record); err != nil {
 		global.LOG.Errorf("save backup record failed, err: %v", err)
 		return err
