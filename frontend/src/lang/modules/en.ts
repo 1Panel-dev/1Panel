@@ -823,7 +823,7 @@ const message = {
         retainCopies: 'Retain copies',
         retainCopiesHelper: 'Number of copies to retain for execution records and logs',
         retainCopiesHelper1: 'Number of copies to retain for backup files',
-        retainCopiesUnit: ' copies',
+        retainCopiesUnit: ' copies (View)',
         cronSpecRule: 'Please enter a correct lifecycle',
         perMonth: 'Every monthly',
         perWeek: 'Every week',
@@ -1441,6 +1441,7 @@ const message = {
     },
     clean: {
         scan: 'Start Scanning',
+        scanHelper: 'Easily tidy up junk files accumulated during 1Panel runtime',
         clean: 'Clean Now',
         reScan: 'Rescan',
         cleanHelper:

@@ -16,17 +16,25 @@
                     <el-col :xs="24" :sm="20" :md="20" :lg="10" :xl="10">
                         <div v-if="scanStatus !== 'scanned'">
                             <div v-if="scanStatus === 'beforeScan'">
-                                <el-text class="clean_title">
-                                    {{ $t('clean.lastCleanTime', [form.lastCleanTime || '-']) }}
-                                </el-text>
-                                <div class="mt-4">
-                                    <el-text>
-                                        {{
-                                            $t('clean.lastCleanHelper', [
-                                                form.lastCleanData || '-',
-                                                form.lastCleanSize ? computeSize(Number(form.lastCleanSize)) : '-',
-                                            ])
-                                        }}
+                                <div v-if="form.lastCleanTime">
+                                    <el-text class="clean_title">
+                                        {{ $t('clean.lastCleanTime', [form.lastCleanTime || '-']) }}
+                                    </el-text>
+                                    <div class="mt-4">
+                                        <el-text>
+                                            {{
+                                                $t('clean.lastCleanHelper', [
+                                                    form.lastCleanData || '-',
+                                                    form.lastCleanSize ? computeSize(Number(form.lastCleanSize)) : '-',
+                                                ])
+                                            }}
+                                        </el-text>
+                                    </div>
+                                </div>
+                                <div else>
+                                    <el-text class="clean_title">
+                                        <el-icon><MagicStick /></el-icon>
+                                        {{ $t('clean.scanHelper') }}
                                     </el-text>
                                 </div>
                                 <div class="app-card">
