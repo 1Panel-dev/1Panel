@@ -4,69 +4,97 @@
             <DrawerHeader :header="$t('database.databaseConnInfo')" :back="handleClose" />
         </template>
         <el-form @submit.prevent v-loading="loading" ref="formRef" :model="form" label-position="top">
-            <el-row type="flex" justify="center" v-if="form.from === 'local'">
+            <el-row type="flex" justify="center">
                 <el-col :span="22">
-                    <el-form-item :label="$t('database.containerConn')">
-                        <el-tag>
-                            {{ form.serviceName + ':' + form.port }}
-                        </el-tag>
-                        <CopyButton :content="form.serviceName + ':' + form.port" type="icon" />
+                    <el-form-item :label="$t('database.containerConn')" v-if="form.from === 'local'">
+                        <el-card class="mini-border-card">
+                            <el-descriptions :column="1">
+                                <el-descriptions-item :label="$t('database.connAddress')">
+                                    <el-tooltip
+                                        v-if="loadPgInfo(true).length > 48"
+                                        :content="loadPgInfo(true)"
+                                        placement="top"
+                                    >
+                                        {{ loadPgInfo(true).substring(0, 48) }}...
+                                    </el-tooltip>
+                                    <span else>
+                                        {{ loadPgInfo(true) }}
+                                    </span>
+                                    <CopyButton :content="loadPgInfo(true)" type="icon" />
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t('database.connPort')">
+                                    {{ form.port }}
+                                    <CopyButton :content="form.port + ''" type="icon" />
+                                </el-descriptions-item>
+                            </el-descriptions>
+                        </el-card>
                         <span class="input-help">
                             {{ $t('database.containerConnHelper') }}
                         </span>
                     </el-form-item>
                     <el-form-item :label="$t('database.remoteConn')">
-                        <el-tooltip v-if="loadConnInfo(true).length > 48" :content="loadConnInfo(true)" placement="top">
-                            <el-tag>{{ loadConnInfo(true).substring(0, 48) }}...</el-tag>
-                        </el-tooltip>
-                        <el-tag v-else>{{ loadConnInfo(true) }}</el-tag>
-                        <CopyButton :content="form.systemIP + ':' + form.port" type="icon" />
-                        <span class="input-help">{{ $t('database.remoteConnHelper2') }}</span>
+                        <el-card class="mini-border-card">
+                            <el-descriptions :column="1">
+                                <el-descriptions-item :label="$t('database.connAddress')">
+                                    <el-tooltip
+                                        v-if="loadPgInfo(false).length > 48"
+                                        :content="loadPgInfo(false)"
+                                        placement="top"
+                                    >
+                                        {{ loadPgInfo(false).substring(0, 48) }}...
+                                    </el-tooltip>
+                                    <span else>
+                                        {{ loadPgInfo(false) }}
+                                    </span>
+                                    <CopyButton :content="loadPgInfo(false)" type="icon" />
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t('database.connPort')">
+                                    {{ form.port }}
+                                    <CopyButton :content="form.port + ''" type="icon" />
+                                </el-descriptions-item>
+                            </el-descriptions>
+                        </el-card>
+                        <span v-if="form.from === 'local'" class="input-help">
+                            {{ $t('database.remoteConnHelper2') }}
+                        </span>
                     </el-form-item>
 
                     <el-divider border-style="dashed" />
-                    <el-form-item :label="$t('commons.login.username')" prop="username">
-                        <el-input type="text" readonly disabled v-model="form.username">
-                            <template #append>
-                                <el-button-group>
-                                    <CopyButton :content="form.username" />
-                                </el-button-group>
-                            </template>
-                        </el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('commons.login.password')" :rules="Rules.paramComplexity" prop="password">
-                        <el-input type="password" show-password clearable v-model="form.password">
-                            <template #append>
-                                <CopyButton :content="form.password" />
-                                <el-button @click="random" class="p-ml-5">
-                                    {{ $t('commons.button.random') }}
-                                </el-button>
-                            </template>
-                        </el-input>
-                    </el-form-item>
-                </el-col>
-            </el-row>
-            <el-row type="flex" justify="center" v-if="form.from !== 'local'">
-                <el-col :span="22">
-                    <el-form-item :label="$t('database.remoteConn')">
-                        <el-tooltip
-                            v-if="loadConnInfo(false).length > 48"
-                            :content="loadConnInfo(false)"
-                            placement="top"
+                    <div v-if="form.from === 'local'">
+                        <el-form-item :label="$t('commons.login.username')" prop="username">
+                            <el-input type="text" readonly disabled v-model="form.username">
+                                <template #append>
+                                    <el-button-group>
+                                        <CopyButton :content="form.username" />
+                                    </el-button-group>
+                                </template>
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item
+                            :label="$t('commons.login.password')"
+                            :rules="Rules.paramComplexity"
+                            prop="password"
                         >
-                            <el-tag>{{ loadConnInfo(false).substring(0, 48) }}...</el-tag>
-                        </el-tooltip>
-                        <el-tag v-else>{{ loadConnInfo(false) }}</el-tag>
-                        <CopyButton :content="form.remoteIP + ':' + form.port" type="icon" />
-                    </el-form-item>
-                    <el-form-item :label="$t('commons.login.username')">
-                        <el-tag>{{ form.username }}</el-tag>
-                        <CopyButton :content="form.username" type="icon" />
-                    </el-form-item>
-                    <el-form-item :label="$t('commons.login.password')">
-                        <el-tag>{{ form.password }}</el-tag>
-                        <CopyButton :content="form.password" type="icon" />
-                    </el-form-item>
+                            <el-input type="password" show-password clearable v-model="form.password">
+                                <template #append>
+                                    <CopyButton :content="form.password" />
+                                    <el-button @click="random" class="p-ml-5">
+                                        {{ $t('commons.button.random') }}
+                                    </el-button>
+                                </template>
+                            </el-input>
+                        </el-form-item>
+                    </div>
+                    <div v-if="form.from !== 'local'">
+                        <el-form-item :label="$t('commons.login.username')">
+                            <el-tag>{{ form.username }}</el-tag>
+                            <CopyButton :content="form.username" type="icon" />
+                        </el-form-item>
+                        <el-form-item :label="$t('commons.login.password')">
+                            <el-tag>{{ form.password }}</el-tag>
+                            <CopyButton :content="form.password" type="icon" />
+                        </el-form-item>
+                    </div>
                 </el-col>
             </el-row>
         </el-form>
@@ -105,6 +133,7 @@ const dialogVisible = ref(false);
 const form = reactive({
     systemIP: '',
     password: '',
+    containerName: '',
     serviceName: '',
     privilege: false,
     port: 0,
@@ -137,10 +166,12 @@ const acceptParams = (param: DialogProps): void => {
     dialogVisible.value = true;
 };
 
-function loadConnInfo(isLocal: boolean) {
-    let ip = isLocal ? form.systemIP : form.remoteIP;
-    let info = ip + ':' + form.port;
-    return info;
+function loadPgInfo(isContainer: boolean) {
+    if (isContainer) {
+        return form.from === 'local' ? form.containerName : form.systemIP;
+    } else {
+        return form.from === 'local' ? form.systemIP : form.remoteIP;
+    }
 }
 
 const random = async () => {
@@ -153,7 +184,6 @@ const handleClose = () => {
 
 const loadAccess = async () => {
     if (form.from === 'local') {
-        // const res = await loadRemoteAccess(form.type, form.database);
         form.privilege = false;
     }
 };
@@ -169,6 +199,7 @@ const loadPassword = async () => {
         form.username = res.data.username || '';
         form.password = res.data.password || '';
         form.port = res.data.port || 5432;
+        form.containerName = res.data.containerName || '';
         form.serviceName = res.data.serviceName || '';
         loadSystemIP();
         return;

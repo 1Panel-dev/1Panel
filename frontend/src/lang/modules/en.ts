@@ -514,9 +514,12 @@ const message = {
         rdbHelper3: 'Meeting either condition triggers RDB persistence',
         rdbInfo: 'Ensure that the value in the rule list ranges from 1 to 100000',
 
-        containerConn: 'Container connection address',
-        containerConnHelper: 'PHP runtime environment/container-installed applications use this connection address',
-        remoteConn: 'External connection address',
+        containerConn: 'Container Connection',
+        connAddress: 'Address',
+        connPort: 'Port',
+        containerConnHelper:
+            'This connection address is used by applications running on the PHP execution environment/container installation.',
+        remoteConn: 'External Connection',
         remoteConnHelper2: 'Use this address for non-container or external connections',
         localIP: 'Local IP',
     },

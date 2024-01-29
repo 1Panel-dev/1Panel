@@ -501,9 +501,11 @@ const message = {
         rdbHelper3: '符合任意一个条件将会触发RDB持久化',
         rdbInfo: '请确认规则列表中值在 1-100000 之间',
 
-        containerConn: '容器连接地址',
+        containerConn: '容器连接',
+        connAddress: '地址',
+        connPort: '端口',
         containerConnHelper: 'PHP 运行环境/容器安装的应用使用此连接地址',
-        remoteConn: '外部连接地址',
+        remoteConn: '外部连接',
         remoteConnHelper2: '非容器或外部连接使用此地址',
         localIP: '本机 IP',
     },
