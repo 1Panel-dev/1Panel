@@ -285,7 +285,7 @@ var UpdateCronjobSpec = &gormigrate.Migration{
 				if err := tx.Model(&model.Cronjob{}).
 					Where("id = ?", job.ID).
 					Updates(map[string]interface{}{
-						"backup_accounts":  fmt.Sprintf("%v,%v", mapAccount[uint(job.TargetDirID)], constant.Local),
+						"backup_accounts":  fmt.Sprintf("%v,%v", mapAccount[uint(job.TargetDirID)].Type, constant.Local),
 						"default_download": constant.Local,
 					}).Error; err != nil {
 					return err
@@ -294,8 +294,8 @@ var UpdateCronjobSpec = &gormigrate.Migration{
 				if err := tx.Model(&model.Cronjob{}).
 					Where("id = ?", job.ID).
 					Updates(map[string]interface{}{
-						"backup_accounts":  mapAccount[uint(job.TargetDirID)],
-						"default_download": mapAccount[uint(job.TargetDirID)],
+						"backup_accounts":  mapAccount[uint(job.TargetDirID)].Type,
+						"default_download": mapAccount[uint(job.TargetDirID)].Type,
 					}).Error; err != nil {
 					return err
 				}
