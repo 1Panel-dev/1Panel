@@ -272,16 +272,16 @@ var UpdateCronjobSpec = &gormigrate.Migration{
 			jobs           []model.Cronjob
 			backupAccounts []model.BackupAccount
 		)
-		mapAccount := make(map[uint]string)
+		mapAccount := make(map[uint]model.BackupAccount)
 		if err := tx.Find(&jobs).Error; err != nil {
 			return err
 		}
 		_ = tx.Find(&backupAccounts).Error
 		for _, item := range backupAccounts {
-			mapAccount[item.ID] = item.Type
+			mapAccount[item.ID] = item
 		}
 		for _, job := range jobs {
-			if job.KeepLocal && mapAccount[uint(job.TargetDirID)] != constant.Local {
+			if job.KeepLocal && mapAccount[uint(job.TargetDirID)].Type != constant.Local {
 				if err := tx.Model(&model.Cronjob{}).
 					Where("id = ?", job.ID).
 					Updates(map[string]interface{}{
@@ -316,6 +316,7 @@ var UpdateCronjobSpec = &gormigrate.Migration{
 							CronjobID:  job.ID,
 							Type:       "snapshot",
 							Name:       job.Name,
+							FileDir:    "system_snapshot",
 							FileName:   snap.Name + ".tar.gz",
 							Source:     snap.From,
 							BackupType: snap.From,
@@ -324,16 +325,22 @@ var UpdateCronjobSpec = &gormigrate.Migration{
 					}
 					continue
 				}
+				itemPath := mapAccount[uint(job.TargetDirID)].BackupPath
+				if itemPath != "/" {
+					itemPath = strings.TrimPrefix(itemPath, "/") + "/"
+				} else {
+					itemPath = ""
+				}
 				if job.Type == "log" {
 					item := model.BackupRecord{
 						From:       "cronjob",
 						CronjobID:  job.ID,
 						Type:       "log",
 						Name:       job.Name,
-						FileDir:    path.Dir(record.File),
+						FileDir:    path.Dir(strings.TrimPrefix(record.File, itemPath)),
 						FileName:   path.Base(record.File),
-						Source:     mapAccount[uint(job.TargetDirID)],
-						BackupType: mapAccount[uint(job.TargetDirID)],
+						Source:     mapAccount[uint(job.TargetDirID)].Type,
+						BackupType: mapAccount[uint(job.TargetDirID)].Type,
 					}
 					_ = tx.Create(&item).Error
 					continue
@@ -344,14 +351,14 @@ var UpdateCronjobSpec = &gormigrate.Migration{
 						CronjobID:  job.ID,
 						Type:       "directory",
 						Name:       job.Name,
-						FileDir:    path.Dir(record.File),
+						FileDir:    path.Dir(strings.TrimPrefix(record.File, itemPath)),
 						FileName:   path.Base(record.File),
-						BackupType: mapAccount[uint(job.TargetDirID)],
+						BackupType: mapAccount[uint(job.TargetDirID)].Type,
 					}
 					if record.FromLocal {
 						item.Source = constant.Local
 					} else {
-						item.Source = mapAccount[uint(job.TargetDirID)]
+						item.Source = mapAccount[uint(job.TargetDirID)].Type
 					}
 					_ = tx.Create(&item).Error
 					continue

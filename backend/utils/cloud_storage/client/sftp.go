@@ -108,7 +108,7 @@ func (s sftpClient) Download(src, target string) (bool, error) {
 	}
 	defer dstFile.Close()
 
-	if _, err = io.Copy(srcFile, dstFile); err != nil {
+	if _, err = io.Copy(dstFile, srcFile); err != nil {
 		return false, err
 	}
 	return true, err
