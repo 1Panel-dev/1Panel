@@ -433,12 +433,12 @@ func deleteLink(ctx context.Context, install *model.AppInstall, deleteDB bool, f
 	return appInstallResourceRepo.DeleteBy(ctx, appInstallResourceRepo.WithAppInstallId(install.ID))
 }
 
-func upgradeInstall(installId uint, detailId uint, backup bool) error {
-	install, err := appInstallRepo.GetFirst(commonRepo.WithByID(installId))
+func upgradeInstall(installID uint, detailID uint, backup, pullImage bool) error {
+	install, err := appInstallRepo.GetFirst(commonRepo.WithByID(installID))
 	if err != nil {
 		return err
 	}
-	detail, err := appDetailRepo.GetFirst(commonRepo.WithByID(detailId))
+	detail, err := appDetailRepo.GetFirst(commonRepo.WithByID(detailID))
 	if err != nil {
 		return err
 	}
@@ -556,7 +556,7 @@ func upgradeInstall(installId uint, detailId uint, backup bool) error {
 
 		install.DockerCompose = string(composeByte)
 		install.Version = detail.Version
-		install.AppDetailId = detailId
+		install.AppDetailId = detailID
 
 		if out, err := compose.Down(install.GetComposePath()); err != nil {
 			if out != "" {
@@ -581,20 +581,22 @@ func upgradeInstall(installId uint, detailId uint, backup bool) error {
 			return
 		}
 
-		images, err := composeV2.GetDockerComposeImages(install.Name, content, []byte(detail.DockerCompose))
-		if err != nil {
-			upErr = err
-			return
-		}
-		dockerCli, err := composeV2.NewClient()
-		if err != nil {
-			upErr = err
-			return
-		}
-		for _, image := range images {
-			if err = dockerCli.PullImage(image, true); err != nil {
-				upErr = buserr.WithNameAndErr("ErrDockerPullImage", "", err)
+		if pullImage {
+			images, err := composeV2.GetDockerComposeImages(install.Name, content, []byte(detail.DockerCompose))
+			if err != nil {
+				upErr = err
 				return
+			}
+			dockerCli, err := composeV2.NewClient()
+			if err != nil {
+				upErr = err
+				return
+			}
+			for _, image := range images {
+				if err = dockerCli.PullImage(image, true); err != nil {
+					upErr = buserr.WithNameAndErr("ErrDockerPullImage", "", err)
+					return
+				}
 			}
 		}
 
@@ -839,14 +841,14 @@ func checkContainerNameIsExist(containerName, appDir string) (bool, error) {
 	return false, nil
 }
 
-func upApp(appInstall *model.AppInstall) {
+func upApp(appInstall *model.AppInstall, pullImages bool) {
 	upProject := func(appInstall *model.AppInstall) (err error) {
 		if err == nil {
 			var (
 				out    string
 				errMsg string
 			)
-			if appInstall.App.Type != "php" {
+			if pullImages && appInstall.App.Type != "php" {
 				out, err = compose.Pull(appInstall.GetComposePath())
 				if err != nil {
 					if out != "" {
@@ -861,6 +863,7 @@ func upApp(appInstall *model.AppInstall) {
 					return err
 				}
 			}
+
 			out, err = compose.Up(appInstall.GetComposePath())
 			if err != nil {
 				if out != "" {

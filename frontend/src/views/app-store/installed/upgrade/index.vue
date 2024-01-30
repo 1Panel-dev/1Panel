@@ -31,6 +31,10 @@
                         <el-checkbox v-model="operateReq.backup" :label="$t('app.backupApp')" />
                         <span class="input-help">{{ $t('app.backupAppHelper') }}</span>
                     </el-form-item>
+                    <el-form-item pro="pullImage">
+                        <el-checkbox v-model="operateReq.pullImage" :label="$t('container.forcePull')" size="large" />
+                        <span class="input-help">{{ $t('container.forcePullHelper') }}</span>
+                    </el-form-item>
                 </el-form>
             </el-col>
             <el-col :span="22" :offset="1">
@@ -88,6 +92,7 @@ const operateReq = reactive({
     operate: 'upgrade',
     installId: 0,
     backup: true,
+    pullImage: true,
 });
 const resourceName = ref('');
 const rules = ref<any>({
