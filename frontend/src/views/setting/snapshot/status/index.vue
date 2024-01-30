@@ -4,149 +4,143 @@
             <template #header>
                 <DrawerHeader :header="$t('setting.recoverDetail')" :back="handleClose" />
             </template>
-            <el-form label-width="120px">
-                <el-card>
-                    <template #header>
-                        <div class="card-header">
-                            <span>{{ $t('setting.recover') }}</span>
-                        </div>
-                    </template>
-                    <div v-if="!snapInfo.recoverStatus">
-                        <div v-if="snapInfo.lastRecoveredAt">
-                            <el-form-item :label="$t('commons.table.status')">
-                                <el-tag type="success">
-                                    {{ $t('commons.table.statusSuccess') }}
-                                </el-tag>
-                                <el-button @click="recoverSnapshot(true)" style="margin-left: 10px" type="primary">
-                                    {{ $t('setting.recover') }}
-                                </el-button>
-                            </el-form-item>
-                            <el-form-item :label="$t('setting.lastRecoverAt')">
-                                {{ snapInfo.lastRecoveredAt }}
-                            </el-form-item>
-                        </div>
-                        <div v-else>
-                            <el-form-item>
-                                <el-tag type="info">
-                                    {{ $t('setting.noRecoverRecord') }}
-                                </el-tag>
-                            </el-form-item>
-                            <el-form-item>
-                                <el-button @click="recoverSnapshot(true)" type="primary">
-                                    {{ $t('setting.recover') }}
-                                </el-button>
-                            </el-form-item>
-                        </div>
-                    </div>
-                    <div v-else>
-                        <el-form-item :label="$t('commons.table.status')">
-                            <el-tag type="danger" v-if="snapInfo.recoverStatus === 'Failed'">
-                                {{ $t('commons.table.statusFailed') }}
-                            </el-tag>
-                            <el-tag type="success" v-if="snapInfo.recoverStatus === 'Success'">
-                                {{ $t('commons.table.statusSuccess') }}
-                            </el-tag>
-                            <el-tag type="info" v-if="snapInfo.recoverStatus === 'Waiting'">
-                                {{ $t('commons.table.statusWaiting') }}
-                            </el-tag>
-                            <el-button
-                                style="margin-left: 15px"
-                                @click="recoverSnapshot(true)"
-                                :disabled="snapInfo.recoverStatus !== 'Success'"
-                            >
-                                {{ $t('setting.recover') }}
-                            </el-button>
-                        </el-form-item>
-                        <el-form-item :label="$t('setting.lastRecoverAt')" v-if="snapInfo.recoverStatus !== 'Waiting'">
-                            {{ snapInfo.lastRecoveredAt }}
-                        </el-form-item>
-                        <div v-if="snapInfo.recoverStatus === 'Failed'">
-                            <el-form-item :label="$t('commons.button.log')">
-                                <span style="word-break: break-all; flex-wrap: wrap; word-wrap: break-word">
-                                    {{ snapInfo.recoverMessage }}
-                                </span>
-                            </el-form-item>
-                            <el-form-item>
-                                <el-button @click="dialogVisible = true" type="primary">
-                                    {{ $t('commons.button.retry') }}
-                                </el-button>
-                            </el-form-item>
-                        </div>
-                    </div>
-                </el-card>
 
-                <el-card style="margin-top: 20px" v-if="snapInfo.recoverStatus === 'Failed'">
-                    <template #header>
-                        <div class="card-header">
-                            <span>{{ $t('setting.rollback') }}</span>
-                        </div>
-                    </template>
-                    <div v-if="!snapInfo.rollbackStatus">
-                        <div v-if="snapInfo.lastRollbackedAt">
-                            <el-form-item :label="$t('commons.table.status')">
-                                <el-tag type="success">
-                                    {{ $t('commons.table.statusSuccess') }}
-                                </el-tag>
-                                <el-button @click="rollbackSnapshot" style="margin-left: 10px" type="primary">
+            <el-form label-position="top">
+                <el-row type="flex" justify="center">
+                    <el-col :span="22">
+                        <span class="card-title">{{ $t('setting.recover') }}</span>
+                        <el-divider class="divider" />
+                        <div v-if="!snapInfo.recoverStatus && !snapInfo.lastRecoveredAt">
+                            <el-alert center class="alert" style="height: 257px" :closable="false">
+                                <el-button size="large" round plain type="primary" @click="recoverSnapshot(true)">
                                     {{ $t('setting.recover') }}
                                 </el-button>
-                            </el-form-item>
-                            <el-form-item :label="$t('setting.lastRollbackAt')">
-                                {{ snapInfo.lastRollbackedAt }}
-                            </el-form-item>
+                            </el-alert>
+                        </div>
+                        <el-card class="mini-border-card">
+                            <div v-if="!snapInfo.recoverStatus" class="mini-border-card">
+                                <div v-if="snapInfo.lastRecoveredAt">
+                                    <el-form-item :label="$t('commons.table.status')">
+                                        <el-tag type="success">
+                                            {{ $t('commons.table.statusSuccess') }}
+                                        </el-tag>
+                                        <el-button
+                                            @click="recoverSnapshot(true)"
+                                            style="margin-left: 10px"
+                                            type="primary"
+                                        >
+                                            {{ $t('setting.recover') }}
+                                        </el-button>
+                                    </el-form-item>
+                                    <el-form-item :label="$t('setting.lastRecoverAt')">
+                                        {{ snapInfo.lastRecoveredAt }}
+                                    </el-form-item>
+                                </div>
+                            </div>
+                            <div v-else>
+                                <el-form-item :label="$t('commons.table.status')">
+                                    <el-tag type="danger" v-if="snapInfo.recoverStatus === 'Failed'">
+                                        {{ $t('commons.table.statusFailed') }}
+                                    </el-tag>
+                                    <el-tag type="success" v-if="snapInfo.recoverStatus === 'Success'">
+                                        {{ $t('commons.table.statusSuccess') }}
+                                    </el-tag>
+                                    <el-tag type="info" v-if="snapInfo.recoverStatus === 'Waiting'">
+                                        {{ $t('commons.table.statusWaiting') }}
+                                    </el-tag>
+                                    <!-- <el-button
+                                    style="margin-left: 15px"
+                                    @click="recoverSnapshot(true)"
+                                    :disabled="snapInfo.recoverStatus !== 'Success'"
+                                >
+                                    {{ $t('setting.recover') }}
+                                </el-button> -->
+                                </el-form-item>
+                                <el-form-item
+                                    :label="$t('setting.lastRecoverAt')"
+                                    v-if="snapInfo.recoverStatus !== 'Waiting'"
+                                >
+                                    {{ snapInfo.lastRecoveredAt }}
+                                </el-form-item>
+                                <div v-if="snapInfo.recoverStatus === 'Failed'">
+                                    <el-form-item :label="$t('commons.button.log')">
+                                        <span style="word-break: break-all; flex-wrap: wrap; word-wrap: break-word">
+                                            {{ snapInfo.recoverMessage }}
+                                        </span>
+                                    </el-form-item>
+                                    <el-form-item>
+                                        <el-button @click="dialogVisible = true" type="primary">
+                                            {{ $t('commons.button.retry') }}
+                                        </el-button>
+                                    </el-form-item>
+                                </div>
+                            </div>
+                        </el-card>
+
+                        <span class="card-title">{{ $t('setting.rollback') }}</span>
+                        <el-divider class="divider" />
+                        <div v-if="!snapInfo.rollbackStatus && !snapInfo.lastRollbackedAt">
+                            <el-alert center class="alert" style="height: 257px" :closable="false">
+                                <el-button size="large" round plain type="primary" @click="rollbackSnapshot()">
+                                    {{ $t('setting.rollback') }}
+                                </el-button>
+                            </el-alert>
+                        </div>
+                        <div v-if="!snapInfo.rollbackStatus">
+                            <div v-if="snapInfo.lastRollbackedAt">
+                                <el-form-item :label="$t('commons.table.status')">
+                                    <el-tag type="success">
+                                        {{ $t('commons.table.statusSuccess') }}
+                                    </el-tag>
+                                    <el-button @click="rollbackSnapshot" style="margin-left: 10px" type="primary">
+                                        {{ $t('setting.rollback') }}
+                                    </el-button>
+                                </el-form-item>
+                                <el-form-item :label="$t('setting.lastRollbackAt')">
+                                    {{ snapInfo.lastRollbackedAt }}
+                                </el-form-item>
+                            </div>
                         </div>
                         <div v-else>
-                            <el-form-item>
-                                <el-tag type="info">
-                                    {{ $t('setting.noRollbackRecord') }}
+                            <el-form-item :label="$t('commons.table.status')">
+                                <el-tag type="success" v-if="snapInfo.rollbackStatus === 'Success'">
+                                    {{ $t('commons.table.statusSuccess') }}
                                 </el-tag>
-                            </el-form-item>
-                            <el-form-item>
-                                <el-button @click="rollbackSnapshot" type="primary">
+                                <el-tag type="danger" v-if="snapInfo.rollbackStatus === 'Failed'">
+                                    {{ $t('commons.table.statusFailed') }}
+                                </el-tag>
+                                <el-tag type="info" v-if="snapInfo.rollbackStatus === 'Waiting'">
+                                    {{ $t('commons.table.statusWaiting') }}
+                                </el-tag>
+                                <el-button
+                                    style="margin-left: 15px"
+                                    :disabled="snapInfo.rollbackStatus !== 'Success'"
+                                    @click="rollbackSnapshot"
+                                >
                                     {{ $t('setting.rollback') }}
                                 </el-button>
                             </el-form-item>
-                        </div>
-                    </div>
-                    <div v-else>
-                        <el-form-item :label="$t('commons.table.status')">
-                            <el-tag type="success" v-if="snapInfo.rollbackStatus === 'Success'">
-                                {{ $t('commons.table.statusSuccess') }}
-                            </el-tag>
-                            <el-tag type="danger" v-if="snapInfo.rollbackStatus === 'Failed'">
-                                {{ $t('commons.table.statusFailed') }}
-                            </el-tag>
-                            <el-tag type="info" v-if="snapInfo.rollbackStatus === 'Waiting'">
-                                {{ $t('commons.table.statusWaiting') }}
-                            </el-tag>
-                            <el-button
-                                style="margin-left: 15px"
-                                :disabled="snapInfo.rollbackStatus !== 'Success'"
-                                @click="rollbackSnapshot"
+                            <el-form-item
+                                :label="$t('setting.lastRollbackAt')"
+                                v-if="snapInfo.rollbackStatus !== 'Waiting'"
                             >
-                                {{ $t('setting.rollback') }}
-                            </el-button>
-                        </el-form-item>
-                        <el-form-item
-                            :label="$t('setting.lastRollbackAt')"
-                            v-if="snapInfo.rollbackStatus !== 'Waiting'"
-                        >
-                            {{ snapInfo.lastRollbackedAt }}
-                        </el-form-item>
-                        <div v-if="snapInfo.rollbackStatus === 'Failed'">
-                            <el-form-item :label="$t('commons.button.log')">
-                                <span style="word-break: break-all; flex-wrap: wrap; word-wrap: break-word">
-                                    {{ snapInfo.rollbackMessage }}
-                                </span>
+                                {{ snapInfo.lastRollbackedAt }}
                             </el-form-item>
-                            <el-form-item>
-                                <el-button @click="rollbackSnapshot()" type="primary">
-                                    {{ $t('commons.button.retry') }}
-                                </el-button>
-                            </el-form-item>
+                            <div v-if="snapInfo.rollbackStatus === 'Failed'">
+                                <el-form-item :label="$t('commons.button.log')">
+                                    <span style="word-break: break-all; flex-wrap: wrap; word-wrap: break-word">
+                                        {{ snapInfo.rollbackMessage }}
+                                    </span>
+                                </el-form-item>
+                                <el-form-item>
+                                    <el-button @click="rollbackSnapshot()" type="primary">
+                                        {{ $t('commons.button.retry') }}
+                                    </el-button>
+                                </el-form-item>
+                            </div>
                         </div>
-                    </div>
-                </el-card>
+                    </el-col>
+                </el-row>
             </el-form>
         </el-drawer>
         <el-dialog v-model="dialogVisible" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
@@ -255,3 +249,25 @@ defineExpose({
     acceptParams,
 });
 </script>
+
+<style lang="scss" scoped>
+.divider {
+    display: block;
+    height: 1px;
+    width: 100%;
+    margin: 12px 0;
+    border-top: 1px var(--el-border-color) var(--el-border-style);
+}
+.alert {
+    background-color: rgba(0, 94, 235, 0.03);
+}
+
+.card-title {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 25px;
+}
+.card-logo {
+    font-size: 7px;
+}
+</style>

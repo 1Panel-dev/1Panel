@@ -117,6 +117,9 @@ const rules = reactive({
     driveCode: [{ validator: checkDriveCode, required: true, trigger: 'blur' }],
 });
 function checkDriveCode(rule: any, value: any, callback: any) {
+    if (!value) {
+        return callback(new Error(i18n.global.t('setting.codeWarning')));
+    }
     const reg = /^[A-Za-z0-9_.-]+$/;
     if (!reg.test(value)) {
         return callback(new Error(i18n.global.t('setting.codeWarning')));

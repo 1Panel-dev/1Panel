@@ -117,6 +117,7 @@ const dialogVisible = ref(false);
 const loading = ref();
 const snapID = ref();
 const snapFrom = ref();
+const snapDefaultDownload = ref();
 const snapDescription = ref();
 
 let timer: NodeJS.Timer | null = null;
@@ -124,6 +125,7 @@ let timer: NodeJS.Timer | null = null;
 interface DialogProps {
     id: number;
     from: string;
+    defaultDownload: string;
     description: string;
 }
 
@@ -131,6 +133,7 @@ const acceptParams = (props: DialogProps): void => {
     dialogVisible.value = true;
     snapID.value = props.id;
     snapFrom.value = props.from;
+    snapDefaultDownload.value = props.defaultDownload;
     snapDescription.value = props.description;
     onWatch();
     nextTick(() => {
@@ -167,7 +170,13 @@ const onClose = async () => {
 
 const onRetry = async () => {
     loading.value = true;
-    await snapshotCreate({ id: snapID.value, from: snapFrom.value, description: snapDescription.value })
+    await snapshotCreate({
+        id: snapID.value,
+        fromAccounts: [],
+        from: snapFrom.value,
+        defaultDownload: snapDefaultDownload.value,
+        description: snapDescription.value,
+    })
         .then(() => {
             loading.value = false;
             loadCurrentStatus();
