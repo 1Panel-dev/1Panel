@@ -459,7 +459,7 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		if err = runScript(appInstall, "init"); err != nil {
 			return
 		}
-		upApp(appInstall)
+		upApp(appInstall, req.PullImage)
 	}()
 	go updateToolApp(appInstall)
 	return

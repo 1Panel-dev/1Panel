@@ -1698,7 +1698,7 @@ const message = {
         disable: '未启用',
         disableLeechHelper: '是否禁用防盗链',
         disableLeech: '禁用防盗链',
-        ipv6: '监听 IPV6 端口',
+        ipv6: '监听 IPV6',
         leechReturnError: '请填写 HTTP 状态码',
         selectAcme: '选择 acme 账号',
         imported: '手动创建',

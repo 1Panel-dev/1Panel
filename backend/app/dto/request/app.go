@@ -32,6 +32,7 @@ type AppContainerConfig struct {
 	EditCompose   bool    `json:"editCompose"`
 	DockerCompose string  `json:"dockerCompose"`
 	HostMode      bool    `json:"hostMode"`
+	PullImage     bool    `json:"pullImage"`
 }
 
 type AppInstalledSearch struct {
@@ -67,6 +68,7 @@ type AppInstalledOperate struct {
 	DeleteBackup bool                `json:"deleteBackup"`
 	DeleteDB     bool                `json:"deleteDB"`
 	Backup       bool                `json:"backup"`
+	PullImage    bool                `json:"pullImage"`
 }
 
 type AppInstalledUpdate struct {
