@@ -793,7 +793,7 @@ const message = {
         containerCheckBox: 'In container (no need to enter the container command)',
         containerName: 'Container name',
         ntp: 'Time synchronization',
-        ntp_helper: 'By default, use the NTP server configured in the [Toolbox] - [Quick Setup] page',
+        ntp_helper: 'You can configure the NTP server on the Quick Setup page of the Toolbox.',
         app: 'Backup app',
         website: 'Backup website',
         rulesHelper:
