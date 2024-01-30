@@ -8,7 +8,7 @@
             <el-row type="flex" justify="center">
                 <el-col :span="22">
                     <el-form-item :label="$t('toolbox.fail2ban.' + form.operate + 'IP')" prop="ips">
-                        <el-input :rows="5" type="textarea" clearable v-model="form.ips" />
+                        <el-input :rows="25" type="textarea" clearable v-model="form.ips" />
                     </el-form-item>
                 </el-col>
             </el-row>
