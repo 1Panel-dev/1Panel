@@ -51,15 +51,18 @@
                         <template #default="{ row }">
                             <div v-for="(item, index) of row.from.split(',')" :key="index" class="mt-1">
                                 <div v-if="row.expand || (!row.expand && index < 3)">
-                                    <el-tag v-if="row.from" type="info">
-                                        <span v-if="item === row.defaultDownload">
-                                            <el-icon><Star /></el-icon>
+                                    <span v-if="row.from" type="info">
+                                        <span>
                                             {{ $t('setting.' + item) }}
                                         </span>
-                                        <span v-else>
-                                            {{ $t('setting.' + item) }}
-                                        </span>
-                                    </el-tag>
+                                        <el-icon
+                                            v-if="item === row.defaultDownload"
+                                            size="12"
+                                            class="relative top-px left-1"
+                                        >
+                                            <Star />
+                                        </el-icon>
+                                    </span>
                                     <span v-else>-</span>
                                 </div>
                             </div>
@@ -236,7 +239,11 @@ const onCreate = async () => {
 };
 
 const onImport = () => {
-    importRef.value.acceptParams();
+    let names = [];
+    for (const item of data.value) {
+        names.push(item.name);
+    }
+    importRef.value.acceptParams({ names: names });
 };
 
 const handleClose = () => {
@@ -268,7 +275,12 @@ const submitAddSnapshot = (formEl: FormInstance | undefined) => {
 };
 
 const onLoadStatus = (row: Setting.SnapshotInfo) => {
-    snapStatusRef.value.acceptParams({ id: row.id, from: row.from, description: row.description });
+    snapStatusRef.value.acceptParams({
+        id: row.id,
+        from: row.from,
+        defaultDownload: row.defaultDownload,
+        description: row.description,
+    });
 };
 
 const loadBackups = async () => {

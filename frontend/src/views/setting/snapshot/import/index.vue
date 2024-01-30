@@ -19,7 +19,13 @@
                         </el-form-item>
                         <el-form-item :label="$t('commons.table.name')" prop="names">
                             <el-select style="width: 100%" v-model="form.names" multiple clearable>
-                                <el-option v-for="item in fileNames" :key="item" :value="item" :label="item" />
+                                <el-option
+                                    :disabled="checkDisable(item)"
+                                    v-for="item in fileNames"
+                                    :key="item"
+                                    :value="item"
+                                    :label="item"
+                                />
                             </el-select>
                         </el-form-item>
                         <el-form-item :label="$t('commons.table.description')" prop="description">
@@ -58,6 +64,7 @@ const loading = ref();
 const formRef = ref();
 const backupOptions = ref();
 const fileNames = ref();
+const existNames = ref();
 
 const form = reactive({
     from: '',
@@ -70,8 +77,13 @@ const rules = reactive({
     name: [Rules.requiredSelect],
 });
 
-const acceptParams = (): void => {
+interface DialogProps {
+    names: Array<string>;
+}
+
+const acceptParams = (params: DialogProps): void => {
     form.from = '';
+    existNames.value = params.names;
     form.names = [] as Array<string>;
     loadBackups();
     drawerVisible.value = true;
@@ -80,6 +92,15 @@ const emit = defineEmits(['search']);
 
 const handleClose = () => {
     drawerVisible.value = false;
+};
+
+const checkDisable = (val: string) => {
+    for (const item of existNames.value) {
+        if (val === item + '.tar.gz') {
+            return true;
+        }
+    }
+    return false;
 };
 
 const submitImport = async (formEl: FormInstance | undefined) => {
@@ -107,7 +128,7 @@ const loadBackups = async () => {
             loading.value = false;
             backupOptions.value = [];
             for (const item of res.data) {
-                if (item.type !== 'LOCAL' && item.id !== 0) {
+                if (item.id !== 0) {
                     backupOptions.value.push({ label: i18n.global.t('setting.' + item.type), value: item.type });
                 }
             }

@@ -108,6 +108,7 @@ export namespace Setting {
         id: number;
         name: string;
         from: string;
+        defaultDownload: string;
         description: string;
         status: string;
         message: string;
