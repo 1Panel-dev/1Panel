@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 )
@@ -61,9 +62,35 @@ func (c localClient) Upload(src, target string) (bool, error) {
 }
 
 func (c localClient) Download(src, target string) (bool, error) {
+	localPath := path.Join(c.dir, src)
+	if _, err := os.Stat(path.Dir(target)); err != nil {
+		if os.IsNotExist(err) {
+			if err = os.MkdirAll(path.Dir(target), os.ModePerm); err != nil {
+				return false, err
+			}
+		} else {
+			return false, err
+		}
+	}
+
+	stdout, err := cmd.Execf("\\cp -f %s %s", localPath, target)
+	if err != nil {
+		return false, fmt.Errorf("cp file failed, stdout: %v, err: %v", stdout, err)
+	}
 	return true, nil
 }
 
 func (c localClient) ListObjects(prefix string) ([]string, error) {
-	return nil, nil
+	itemPath := path.Join(c.dir, prefix)
+	var files []string
+	if err := filepath.Walk(itemPath, func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			files = append(files, info.Name())
+		}
+		return nil
+	}); err != nil {
+		return nil, err
+	}
+
+	return files, nil
 }

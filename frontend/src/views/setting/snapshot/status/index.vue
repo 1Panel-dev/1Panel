@@ -17,7 +17,7 @@
                                 </el-button>
                             </el-alert>
                         </div>
-                        <el-card class="mini-border-card">
+                        <el-card v-else class="mini-border-card">
                             <div v-if="!snapInfo.recoverStatus" class="mini-border-card">
                                 <div v-if="snapInfo.lastRecoveredAt">
                                     <el-form-item :label="$t('commons.table.status')">

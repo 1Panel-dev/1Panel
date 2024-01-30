@@ -153,7 +153,7 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 	if len(snap.InterruptStep) != 0 && !req.IsNew {
 		isReTry = true
 	}
-	backup, err := backupRepo.Get(commonRepo.WithByType(snap.From))
+	backup, err := backupRepo.Get(commonRepo.WithByType(snap.DefaultDownload))
 	if err != nil {
 		return err
 	}

@@ -76,46 +76,59 @@ func Init() {
 }
 
 func handleSnapStatus() {
+	msgFailed := "the task was interrupted due to the restart of the 1panel service"
+	_ = global.DB.Model(&model.Snapshot{}).Where("status = ?", "OnSaveData").
+		Updates(map[string]interface{}{"status": constant.StatusSuccess}).Error
+
+	_ = global.DB.Model(&model.Snapshot{}).Where("status = ?", constant.StatusWaiting).
+		Updates(map[string]interface{}{
+			"status":  constant.StatusFailed,
+			"message": msgFailed,
+		}).Error
+
+	_ = global.DB.Model(&model.Snapshot{}).Where("recover_status = ?", constant.StatusWaiting).
+		Updates(map[string]interface{}{
+			"recover_status":  constant.StatusFailed,
+			"recover_message": msgFailed,
+		}).Error
+
+	_ = global.DB.Model(&model.Snapshot{}).Where("rollback_status = ?", constant.StatusWaiting).
+		Updates(map[string]interface{}{
+			"rollback_status":  constant.StatusFailed,
+			"rollback_message": msgFailed,
+		}).Error
+
 	snapRepo := repo.NewISnapshotRepo()
-	snaps, _ := snapRepo.GetList()
-	for _, snap := range snaps {
-		if snap.Status == "OnSaveData" {
-			_ = snapRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusSuccess})
-		}
-		if snap.Status == constant.StatusWaiting {
-			_ = snapRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed, "message": "the task was interrupted due to the restart of the 1panel service"})
-		}
-	}
 
 	status, _ := snapRepo.GetStatusList()
-	for _, statu := range status {
+	for _, item := range status {
 		updates := make(map[string]interface{})
-		if statu.Panel == constant.StatusRunning {
+		if item.Panel == constant.StatusRunning {
 			updates["panel"] = constant.StatusFailed
 		}
-		if statu.PanelInfo == constant.StatusRunning {
+		if item.PanelInfo == constant.StatusRunning {
 			updates["panel_info"] = constant.StatusFailed
 		}
-		if statu.DaemonJson == constant.StatusRunning {
+		if item.DaemonJson == constant.StatusRunning {
 			updates["daemon_json"] = constant.StatusFailed
 		}
-		if statu.AppData == constant.StatusRunning {
+		if item.AppData == constant.StatusRunning {
 			updates["app_data"] = constant.StatusFailed
 		}
-		if statu.PanelData == constant.StatusRunning {
+		if item.PanelData == constant.StatusRunning {
 			updates["panel_data"] = constant.StatusFailed
 		}
-		if statu.BackupData == constant.StatusRunning {
+		if item.BackupData == constant.StatusRunning {
 			updates["backup_data"] = constant.StatusFailed
 		}
-		if statu.Compress == constant.StatusRunning {
+		if item.Compress == constant.StatusRunning {
 			updates["compress"] = constant.StatusFailed
 		}
-		if statu.Upload == constant.StatusUploading {
+		if item.Upload == constant.StatusUploading {
 			updates["upload"] = constant.StatusFailed
 		}
 		if len(updates) != 0 {
-			_ = snapRepo.UpdateStatus(statu.ID, updates)
+			_ = snapRepo.UpdateStatus(item.ID, updates)
 		}
 	}
 }

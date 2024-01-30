@@ -191,12 +191,14 @@ func snapUpload(snap snapHelper, accounts string, file string) {
 	}
 	targetAccounts := strings.Split(accounts, ",")
 	for _, item := range targetAccounts {
-		global.LOG.Debugf("start upload snapshot to %s, dir: %s", item, path.Join(accountMap[item].backupPath, "system_snapshot", path.Base(file)))
+		global.LOG.Debugf("start upload snapshot to %s, path: %s", item, path.Join(accountMap[item].backupPath, "system_snapshot", path.Base(file)))
 		if _, err := accountMap[item].client.Upload(source, path.Join(accountMap[item].backupPath, "system_snapshot", path.Base(file))); err != nil {
+			global.LOG.Debugf("upload to %s failed, err: %v", item, err)
 			snap.Status.Upload = err.Error()
 			_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"upload": err.Error()})
 			return
 		}
+		global.LOG.Debugf("upload to %s successful", item)
 	}
 	snap.Status.Upload = constant.StatusDone
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"upload": constant.StatusDone})
