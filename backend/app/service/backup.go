@@ -83,6 +83,7 @@ func (u *BackupService) List() ([]dto.BackupInfo, error) {
 func (u *BackupService) SearchRecordsWithPage(search dto.RecordSearch) (int64, []dto.BackupRecords, error) {
 	total, records, err := backupRepo.PageRecord(
 		search.Page, search.PageSize,
+		commonRepo.WithOrderBy("created_at desc"),
 		commonRepo.WithByName(search.Name),
 		commonRepo.WithByType(search.Type),
 		backupRepo.WithByDetailName(search.DetailName),
@@ -101,6 +102,7 @@ func (u *BackupService) SearchRecordsWithPage(search dto.RecordSearch) (int64, [
 func (u *BackupService) SearchRecordsByCronjobWithPage(search dto.RecordSearchByCronjob) (int64, []dto.BackupRecords, error) {
 	total, records, err := backupRepo.PageRecord(
 		search.Page, search.PageSize,
+		commonRepo.WithOrderBy("created_at desc"),
 		backupRepo.WithByCronID(search.CronjobID),
 	)
 	if err != nil {
