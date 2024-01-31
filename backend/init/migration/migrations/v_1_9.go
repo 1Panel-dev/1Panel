@@ -290,6 +290,7 @@ var UpdateCronjobSpec = &gormigrate.Migration{
 					}).Error; err != nil {
 					return err
 				}
+				job.DefaultDownload = constant.Local
 			} else {
 				if err := tx.Model(&model.Cronjob{}).
 					Where("id = ?", job.ID).
@@ -299,9 +300,17 @@ var UpdateCronjobSpec = &gormigrate.Migration{
 					}).Error; err != nil {
 					return err
 				}
+				job.DefaultDownload = mapAccount[uint(job.TargetDirID)].Type
 			}
 			if job.Type != "directory" && job.Type != "database" && job.Type != "website" && job.Type != "app" && job.Type != "snapshot" && job.Type != "log" {
 				continue
+			}
+
+			itemPath := mapAccount[uint(job.TargetDirID)].BackupPath
+			if job.DefaultDownload == constant.Local || itemPath == "/" {
+				itemPath = ""
+			} else {
+				itemPath = strings.TrimPrefix(itemPath, "/") + "/"
 			}
 
 			var records []model.JobRecords
@@ -324,12 +333,6 @@ var UpdateCronjobSpec = &gormigrate.Migration{
 						_ = tx.Create(&item).Error
 					}
 					continue
-				}
-				itemPath := mapAccount[uint(job.TargetDirID)].BackupPath
-				if itemPath != "/" {
-					itemPath = strings.TrimPrefix(itemPath, "/") + "/"
-				} else {
-					itemPath = ""
 				}
 				if job.Type == "log" {
 					item := model.BackupRecord{
@@ -367,12 +370,12 @@ var UpdateCronjobSpec = &gormigrate.Migration{
 					files := strings.Split(record.File, ",")
 					for _, file := range files {
 						_ = tx.Model(&model.BackupRecord{}).
-							Where("file_dir = ? AND file_name = ?", path.Dir(file), path.Base(file)).
+							Where("file_dir = ? AND file_name = ?", path.Dir(strings.TrimPrefix(file, itemPath)), path.Base(file)).
 							Updates(map[string]interface{}{"cronjob_id": job.ID, "from": "cronjob"}).Error
 					}
 				} else {
 					_ = tx.Model(&model.BackupRecord{}).
-						Where("file_dir = ? AND file_name = ?", path.Dir(record.File), path.Base(record.File)).
+						Where("file_dir = ? AND file_name = ?", path.Dir(strings.TrimPrefix(record.File, itemPath)), path.Base(record.File)).
 						Updates(map[string]interface{}{"cronjob_id": job.ID, "from": "cronjob"}).Error
 				}
 			}
