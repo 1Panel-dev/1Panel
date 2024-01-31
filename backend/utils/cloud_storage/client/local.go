@@ -81,8 +81,11 @@ func (c localClient) Download(src, target string) (bool, error) {
 }
 
 func (c localClient) ListObjects(prefix string) ([]string, error) {
-	itemPath := path.Join(c.dir, prefix)
 	var files []string
+	itemPath := path.Join(c.dir, prefix)
+	if _, err := os.Stat(itemPath); err != nil {
+		return files, nil
+	}
 	if err := filepath.Walk(itemPath, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
 			files = append(files, info.Name())

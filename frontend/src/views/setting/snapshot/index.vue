@@ -296,17 +296,24 @@ const loadBackups = async () => {
 
 const changeAccount = async () => {
     accountOptions.value = [];
+    let isInAccounts = false;
     for (const item of backupOptions.value) {
-        let exit = false;
+        let exist = false;
         for (const ac of snapInfo.fromAccounts) {
             if (item.value == ac) {
-                exit = true;
+                exist = true;
                 break;
             }
         }
-        if (exit) {
+        if (exist) {
+            if (item.value === snapInfo.defaultDownload) {
+                isInAccounts = true;
+            }
             accountOptions.value.push(item);
         }
+    }
+    if (!isInAccounts) {
+        snapInfo.defaultDownload = '';
     }
 };
 
