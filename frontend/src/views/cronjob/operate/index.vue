@@ -253,7 +253,7 @@
                                 multiple
                                 class="selectClass"
                                 v-model="dialogData.rowData!.backupAccountList"
-                                @change="changeAccount(true)"
+                                @change="changeAccount"
                             >
                                 <div v-for="item in backupOptions" :key="item.label">
                                     <el-option :value="item.value" :label="item.label" />
@@ -523,24 +523,28 @@ const loadBackups = async () => {
         }
         backupOptions.value.push({ label: i18n.global.t('setting.' + item.type), value: item.type });
     }
-    changeAccount(false);
+    changeAccount();
 };
 
-const changeAccount = async (handleChange: boolean) => {
+const changeAccount = async () => {
     accountOptions.value = [];
+    let isInAccounts = false;
     for (const item of backupOptions.value) {
-        let exit = false;
+        let exist = false;
         for (const ac of dialogData.value.rowData.backupAccountList) {
             if (item.value == ac) {
-                exit = true;
+                exist = true;
                 break;
             }
         }
-        if (exit) {
+        if (exist) {
+            if (item.value === dialogData.value.rowData.defaultDownload) {
+                isInAccounts = true;
+            }
             accountOptions.value.push(item);
         }
     }
-    if (handleChange) {
+    if (!isInAccounts) {
         dialogData.value.rowData.defaultDownload = '';
     }
 };
