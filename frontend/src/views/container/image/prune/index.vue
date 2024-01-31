@@ -23,7 +23,7 @@
             <div v-if="!withTagAll">
                 <ul v-for="(item, index) in unTagList" :key="index">
                     <li>
-                        {{ item.tags[0] }}
+                        {{ item.tags[0] || '< none >' }}
                     </li>
                 </ul>
             </div>
@@ -66,7 +66,11 @@ const acceptParams = async (): Promise<void> => {
     unTagList.value = [];
     unUsedList.value = [];
     for (const item of list) {
-        if (item.tags && item.tags.length === 1 && item.tags[0].indexOf('<none>') !== -1 && !item.isUsed) {
+        if (
+            !item.tags ||
+            item.tags.length === 0 ||
+            (item.tags.length === 1 && item.tags[0].indexOf('<none>') !== -1 && !item.isUsed)
+        ) {
             unTagList.value.push(item);
         }
         if (!item.isUsed) {
