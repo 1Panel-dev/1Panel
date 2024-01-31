@@ -14,7 +14,7 @@ type localClient struct {
 }
 
 func NewLocalClient(vars map[string]interface{}) (*localClient, error) {
-	dir := loadParamFromVars("dir", true, vars)
+	dir := loadParamFromVars("dir", vars)
 	return &localClient{dir: dir}, nil
 }
 

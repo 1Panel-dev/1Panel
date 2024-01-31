@@ -17,11 +17,11 @@ type cosClient struct {
 }
 
 func NewCosClient(vars map[string]interface{}) (*cosClient, error) {
-	region := loadParamFromVars("region", true, vars)
-	accessKey := loadParamFromVars("accessKey", true, vars)
-	secretKey := loadParamFromVars("secretKey", true, vars)
-	bucket := loadParamFromVars("bucket", true, vars)
-	scType := loadParamFromVars("scType", true, vars)
+	region := loadParamFromVars("region", vars)
+	accessKey := loadParamFromVars("accessKey", vars)
+	secretKey := loadParamFromVars("secretKey", vars)
+	bucket := loadParamFromVars("bucket", vars)
+	scType := loadParamFromVars("scType", vars)
 	if len(scType) == 0 {
 		scType = "Standard"
 	}

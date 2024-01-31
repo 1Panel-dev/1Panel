@@ -19,10 +19,10 @@ type minIoClient struct {
 }
 
 func NewMinIoClient(vars map[string]interface{}) (*minIoClient, error) {
-	endpoint := loadParamFromVars("endpoint", true, vars)
-	accessKeyID := loadParamFromVars("accessKey", true, vars)
-	secretAccessKey := loadParamFromVars("secretKey", true, vars)
-	bucket := loadParamFromVars("bucket", true, vars)
+	endpoint := loadParamFromVars("endpoint", vars)
+	accessKeyID := loadParamFromVars("accessKey", vars)
+	secretAccessKey := loadParamFromVars("secretKey", vars)
+	bucket := loadParamFromVars("bucket", vars)
 	ssl := strings.Split(endpoint, ":")[0]
 	if len(ssl) == 0 || (ssl != "https" && ssl != "http") {
 		return nil, constant.ErrInvalidParams

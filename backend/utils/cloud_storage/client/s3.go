@@ -18,12 +18,12 @@ type s3Client struct {
 }
 
 func NewS3Client(vars map[string]interface{}) (*s3Client, error) {
-	accessKey := loadParamFromVars("accessKey", true, vars)
-	secretKey := loadParamFromVars("secretKey", true, vars)
-	endpoint := loadParamFromVars("endpoint", true, vars)
-	region := loadParamFromVars("region", true, vars)
-	bucket := loadParamFromVars("bucket", true, vars)
-	scType := loadParamFromVars("scType", true, vars)
+	accessKey := loadParamFromVars("accessKey", vars)
+	secretKey := loadParamFromVars("secretKey", vars)
+	endpoint := loadParamFromVars("endpoint", vars)
+	region := loadParamFromVars("region", vars)
+	bucket := loadParamFromVars("bucket", vars)
+	scType := loadParamFromVars("scType", vars)
 	if len(scType) == 0 {
 		scType = "Standard"
 	}

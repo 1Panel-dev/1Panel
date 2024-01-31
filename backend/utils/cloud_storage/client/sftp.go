@@ -19,11 +19,11 @@ type sftpClient struct {
 }
 
 func NewSftpClient(vars map[string]interface{}) (*sftpClient, error) {
-	address := loadParamFromVars("address", true, vars)
-	port := loadParamFromVars("port", false, vars)
-	password := loadParamFromVars("password", true, vars)
-	username := loadParamFromVars("username", true, vars)
-	bucket := loadParamFromVars("bucket", true, vars)
+	address := loadParamFromVars("address", vars)
+	port := loadParamFromVars("port", vars)
+	password := loadParamFromVars("password", vars)
+	username := loadParamFromVars("username", vars)
+	bucket := loadParamFromVars("bucket", vars)
 
 	auth := []ssh.AuthMethod{ssh.Password(password)}
 	clientConfig := &ssh.ClientConfig{

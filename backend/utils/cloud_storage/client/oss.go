@@ -13,11 +13,11 @@ type ossClient struct {
 }
 
 func NewOssClient(vars map[string]interface{}) (*ossClient, error) {
-	endpoint := loadParamFromVars("endpoint", true, vars)
-	accessKey := loadParamFromVars("accessKey", true, vars)
-	secretKey := loadParamFromVars("secretKey", true, vars)
-	bucketStr := loadParamFromVars("bucket", true, vars)
-	scType := loadParamFromVars("scType", true, vars)
+	endpoint := loadParamFromVars("endpoint", vars)
+	accessKey := loadParamFromVars("accessKey", vars)
+	secretKey := loadParamFromVars("secretKey", vars)
+	bucketStr := loadParamFromVars("bucket", vars)
+	scType := loadParamFromVars("scType", vars)
 	if len(scType) == 0 {
 		scType = "Standard"
 	}
