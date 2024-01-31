@@ -17,11 +17,11 @@ type webDAVClient struct {
 }
 
 func NewWebDAVClient(vars map[string]interface{}) (*webDAVClient, error) {
-	address := loadParamFromVars("address", true, vars)
-	port := loadParamFromVars("port", true, vars)
-	password := loadParamFromVars("password", true, vars)
-	username := loadParamFromVars("username", true, vars)
-	bucket := loadParamFromVars("bucket", true, vars)
+	address := loadParamFromVars("address", vars)
+	port := loadParamFromVars("port", vars)
+	password := loadParamFromVars("password", vars)
+	username := loadParamFromVars("username", vars)
+	bucket := loadParamFromVars("bucket", vars)
 
 	url := fmt.Sprintf("%s:%s", address, port)
 	if len(port) == 0 {

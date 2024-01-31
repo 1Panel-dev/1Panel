@@ -17,10 +17,10 @@ type kodoClient struct {
 }
 
 func NewKodoClient(vars map[string]interface{}) (*kodoClient, error) {
-	accessKey := loadParamFromVars("accessKey", true, vars)
-	secretKey := loadParamFromVars("secretKey", true, vars)
-	bucket := loadParamFromVars("bucket", true, vars)
-	domain := loadParamFromVars("domain", true, vars)
+	accessKey := loadParamFromVars("accessKey", vars)
+	secretKey := loadParamFromVars("secretKey", vars)
+	bucket := loadParamFromVars("bucket", vars)
+	domain := loadParamFromVars("domain", vars)
 
 	conn := auth.New(accessKey, secretKey)
 	cfg := storage.Config{

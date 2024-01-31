@@ -25,7 +25,8 @@ type oneDriveClient struct {
 }
 
 func NewOneDriveClient(vars map[string]interface{}) (*oneDriveClient, error) {
-	token := loadParamFromVars("accessToken", true, vars)
+	token := loadParamFromVars("accessToken", vars)
+	isCN := loadParamFromVars("isCN", vars)
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
@@ -33,6 +34,9 @@ func NewOneDriveClient(vars map[string]interface{}) (*oneDriveClient, error) {
 	tc := oauth2.NewClient(ctx, ts)
 
 	client := odsdk.NewClient(tc)
+	if isCN == "true" {
+		client.BaseURL, _ = url.Parse("https://microsoftgraph.chinacloudapi.cn/v1.0/")
+	}
 	return &oneDriveClient{client: *client}, nil
 }
 
@@ -192,18 +196,23 @@ func (o *oneDriveClient) loadIDByPath(path string) (string, error) {
 
 func RefreshToken(grantType string, varMap map[string]interface{}) (string, string, error) {
 	data := url.Values{}
-	data.Set("client_id", loadParamFromVars("client_id", true, varMap))
-	data.Set("client_secret", loadParamFromVars("client_secret", true, varMap))
+	isCN := loadParamFromVars("isCN", varMap)
+	data.Set("client_id", loadParamFromVars("client_id", varMap))
+	data.Set("client_secret", loadParamFromVars("client_secret", varMap))
 	if grantType == "refresh_token" {
 		data.Set("grant_type", "refresh_token")
-		data.Set("refresh_token", loadParamFromVars("refresh_token", true, varMap))
+		data.Set("refresh_token", loadParamFromVars("refresh_token", varMap))
 	} else {
 		data.Set("grant_type", "authorization_code")
-		data.Set("code", loadParamFromVars("code", true, varMap))
+		data.Set("code", loadParamFromVars("code", varMap))
 	}
-	data.Set("redirect_uri", loadParamFromVars("redirect_uri", true, varMap))
+	data.Set("redirect_uri", loadParamFromVars("redirect_uri", varMap))
 	client := &http.Client{}
-	req, err := http.NewRequest("POST", "https://login.microsoftonline.com/common/oauth2/v2.0/token", strings.NewReader(data.Encode()))
+	url := "https://login.microsoftonline.com/common/oauth2/v2.0/token"
+	if isCN == "true" {
+		url = "https://login.chinacloudapi.cn/common/oauth2/v2.0/token"
+	}
+	req, err := http.NewRequest("POST", url, strings.NewReader(data.Encode()))
 	if err != nil {
 		return "", "", fmt.Errorf("new http post client for access token failed, err: %v", err)
 	}
