@@ -34,7 +34,7 @@ func (u *BackupService) WebsiteBackup(req dto.CommonBackup) error {
 	itemDir := fmt.Sprintf("website/%s", req.Name)
 	backupDir := path.Join(localDir, itemDir)
 	fileName := fmt.Sprintf("%s_%s.tar.gz", website.PrimaryDomain, timeNow)
-	if err := handleWebsiteBackup(&website, backupDir, fileName, ""); err != nil {
+	if err := handleWebsiteBackup(&website, backupDir, fileName); err != nil {
 		return err
 	}
 
@@ -106,7 +106,7 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 	isOk := false
 	if !isRollback {
 		rollbackFile := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("website/%s_%s.tar.gz", website.Alias, time.Now().Format("20060102150405")))
-		if err := handleWebsiteBackup(website, path.Dir(rollbackFile), path.Base(rollbackFile), ""); err != nil {
+		if err := handleWebsiteBackup(website, path.Dir(rollbackFile), path.Base(rollbackFile)); err != nil {
 			return fmt.Errorf("backup website %s for rollback before recover failed, err: %v", website.Alias, err)
 		}
 		defer func() {
@@ -181,7 +181,7 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 	return nil
 }
 
-func handleWebsiteBackup(website *model.Website, backupDir, fileName, exclusionRules string) error {
+func handleWebsiteBackup(website *model.Website, backupDir, fileName string) error {
 	fileOp := files.NewFileOp()
 	tmpDir := fmt.Sprintf("%s/%s", backupDir, strings.ReplaceAll(fileName, ".tar.gz", ""))
 	if !fileOp.Stat(tmpDir) {
@@ -233,11 +233,11 @@ func handleWebsiteBackup(website *model.Website, backupDir, fileName, exclusionR
 	}
 
 	websiteDir := fmt.Sprintf("%s/openresty/%s/www/sites/%s", constant.AppInstallDir, nginxInfo.Name, website.Alias)
-	if err := handleTar(websiteDir, tmpDir, fmt.Sprintf("%s.web.tar.gz", website.Alias), exclusionRules); err != nil {
+	if err := handleTar(websiteDir, tmpDir, fmt.Sprintf("%s.web.tar.gz", website.Alias), ""); err != nil {
 		return err
 	}
 	global.LOG.Info("put web.tar.gz into tmp dir successful, now start to tar tmp dir")
-	if err := handleTar(tmpDir, backupDir, fileName, exclusionRules); err != nil {
+	if err := handleTar(tmpDir, backupDir, fileName, ""); err != nil {
 		return err
 	}
 

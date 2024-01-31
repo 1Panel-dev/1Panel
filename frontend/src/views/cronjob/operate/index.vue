@@ -297,7 +297,7 @@
                     </el-form-item>
 
                     <el-form-item
-                        v-if="dialogData.rowData!.type === 'directory' || dialogData.rowData!.type === 'website'"
+                        v-if="dialogData.rowData!.type === 'directory'"
                         :label="$t('cronjob.exclusionRules')"
                         prop="exclusionRules"
                     >
