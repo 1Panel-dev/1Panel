@@ -303,6 +303,10 @@ func reCreateDB(dbID uint, database model.Database, oldEnv string) (*model.Datab
 		Password:   oldPassword,
 		Permission: "%",
 	})
+	cronjobs, _ := cronjobRepo.List(cronjobRepo.WithByDbName(fmt.Sprintf("%v", dbID)))
+	for _, job := range cronjobs {
+		_ = cronjobRepo.Update(job.ID, map[string]interface{}{"db_name": fmt.Sprintf("%v", createDB.ID)})
+	}
 	if err != nil {
 		return nil, envMap, err
 	}
