@@ -427,7 +427,8 @@ export function toLowerCase(str: string) {
 
 export function downloadFile(filePath: string) {
     let url = `${import.meta.env.VITE_API_URL as string}/files/download?`;
-    window.open(url + 'path=' + filePath, '_blank');
+    let path = encodeURIComponent(filePath);
+    window.open(url + 'path=' + path, '_blank');
 }
 
 export function downloadWithContent(content: string, fileName: string) {
@@ -439,7 +440,6 @@ export function downloadWithContent(content: string, fileName: string) {
     const event = new MouseEvent('click');
     a.dispatchEvent(event);
 }
-
 export function getDateStr() {
     let now: Date = new Date();
 

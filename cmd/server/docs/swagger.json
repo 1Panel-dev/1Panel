@@ -5965,7 +5965,7 @@
             }
         },
         "/files/download": {
-            "post": {
+            "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -5979,30 +5979,10 @@
                     "File"
                 ],
                 "summary": "Download file",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.FileDownload"
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK"
                     }
-                },
-                "x-panel-log": {
-                    "BeforeFunctions": [],
-                    "bodyKeys": [
-                        "name"
-                    ],
-                    "formatEN": "Download file [name]",
-                    "formatZH": "下载文件 [name]",
-                    "paramKeys": []
                 }
             }
         },

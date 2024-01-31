@@ -8773,17 +8773,10 @@ paths:
         formatZH: 删除文件/文件夹 [path]
         paramKeys: []
   /files/download:
-    post:
+    get:
       consumes:
       - application/json
       description: 下载文件
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/request.FileDownload'
       responses:
         "200":
           description: OK
@@ -8792,13 +8785,6 @@ paths:
       summary: Download file
       tags:
       - File
-      x-panel-log:
-        BeforeFunctions: []
-        bodyKeys:
-        - name
-        formatEN: Download file [name]
-        formatZH: 下载文件 [name]
-        paramKeys: []
   /files/favorite:
     post:
       consumes:
