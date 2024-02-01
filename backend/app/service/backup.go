@@ -341,6 +341,7 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 					_ = backupRepo.Update(req.ID, (map[string]interface{}{"vars": oldVars}))
 					return err
 				}
+				global.CONF.System.Backup = dirStr
 			}
 		}
 	}

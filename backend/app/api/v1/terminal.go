@@ -105,7 +105,7 @@ func (b *BaseApi) RedisWsSsh(c *gin.Context) {
 	defer killBash(redisConf.ContainerName, commands, pidMap)
 	defer slave.Close()
 
-	tty, err := terminal.NewLocalWsSession(cols, rows, wsConn, slave, true)
+	tty, err := terminal.NewLocalWsSession(cols, rows, wsConn, slave, false)
 	if wshandleError(wsConn, err) {
 		return
 	}
@@ -173,7 +173,7 @@ func (b *BaseApi) ContainerWsSsh(c *gin.Context) {
 	defer killBash(containerID, command, pidMap)
 	defer slave.Close()
 
-	tty, err := terminal.NewLocalWsSession(cols, rows, wsConn, slave, false)
+	tty, err := terminal.NewLocalWsSession(cols, rows, wsConn, slave, true)
 	if wshandleError(wsConn, err) {
 		return
 	}
