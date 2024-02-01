@@ -53,6 +53,7 @@ type CronjobDownload struct {
 }
 
 type CronjobClean struct {
+	IsDelete  bool `json:"isDelete"`
 	CleanData bool `json:"cleanData"`
 	CronjobID uint `json:"cronjobID" validate:"required"`
 }

@@ -14924,6 +14924,9 @@ const docTemplate = `{
                 },
                 "cronjobID": {
                     "type": "integer"
+                },
+                "isDelete": {
+                    "type": "boolean"
                 }
             }
         },

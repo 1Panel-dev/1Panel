@@ -573,6 +573,8 @@ definitions:
         type: boolean
       cronjobID:
         type: integer
+      isDelete:
+        type: boolean
     required:
     - cronjobID
     type: object
