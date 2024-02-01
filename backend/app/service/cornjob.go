@@ -108,7 +108,8 @@ func (u *CronjobService) CleanRecord(req dto.CronjobClean) error {
 		} else {
 			u.removeExpiredLog(cronjob)
 		}
-	} else {
+	}
+	if req.IsDelete {
 		records, _ := backupRepo.ListRecord(backupRepo.WithByCronID(cronjob.ID))
 		for _, records := range records {
 			records.CronjobID = 0
@@ -224,7 +225,7 @@ func (u *CronjobService) Delete(req dto.CronjobBatchDelete) error {
 			global.Cron.Remove(cron.EntryID(idItem))
 		}
 		global.LOG.Infof("stop cronjob entryID: %s", cronjob.EntryIDs)
-		if err := u.CleanRecord(dto.CronjobClean{CronjobID: id, CleanData: req.CleanData}); err != nil {
+		if err := u.CleanRecord(dto.CronjobClean{CronjobID: id, CleanData: req.CleanData, IsDelete: true}); err != nil {
 			return err
 		}
 		if err := cronjobRepo.Delete(commonRepo.WithByID(id)); err != nil {

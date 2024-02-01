@@ -322,16 +322,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.recover'),
         click: (row: File.File) => {
-            if (type.value !== 'app') {
-                onRecover(row);
-            } else {
-                ElMessageBox.confirm(i18n.global.t('app.restoreWarn'), i18n.global.t('commons.button.recover'), {
-                    confirmButtonText: i18n.global.t('commons.button.confirm'),
-                    cancelButtonText: i18n.global.t('commons.button.cancel'),
-                }).then(async () => {
-                    onRecover(row);
-                });
-            }
+            onRecover(row);
         },
     },
     {

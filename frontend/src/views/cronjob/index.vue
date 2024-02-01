@@ -304,9 +304,16 @@ const onDelete = async (row: Cronjob.CronjobInfo | null) => {
 };
 
 const onSubmitDelete = async () => {
-    await deleteCronjob({ ids: operateIDs.value, cleanData: cleanData.value });
-    MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
-    search();
+    loading.value = true;
+    await deleteCronjob({ ids: operateIDs.value, cleanData: cleanData.value })
+        .then(() => {
+            loading.value = false;
+            MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
+            search();
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const onChangeStatus = async (id: number, status: string) => {

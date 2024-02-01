@@ -14917,6 +14917,9 @@
                 },
                 "cronjobID": {
                     "type": "integer"
+                },
+                "isDelete": {
+                    "type": "boolean"
                 }
             }
         },

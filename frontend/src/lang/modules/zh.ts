@@ -1476,7 +1476,6 @@ const message = {
         installHelper: '配置镜像加速可以解决镜像拉取失败的问题',
         upgradeHelper: '异常应用需要先同步到正常状态',
         installWarn: '当前未勾选端口外部访问，将无法通过外网IP:端口访问，是否继续？',
-        restoreWarn: '恢复操作将删除该应用当前数据并重启。此操作不可回滚，是否继续?',
         showIgnore: '查看忽略应用',
         cancelIgnore: '取消忽略',
         ignoreList: '忽略列表',
