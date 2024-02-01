@@ -334,7 +334,7 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 	if backup.Type == "LOCAL" {
 		if dir, ok := varMap["dir"]; ok {
 			if dirStr, isStr := dir.(string); isStr {
-				if strings.HasSuffix(dirStr, "/") {
+				if strings.HasSuffix(dirStr, "/") && dirStr != "/" {
 					dirStr = dirStr[:strings.LastIndex(dirStr, "/")]
 				}
 				if err := copyDir(oldDir, dirStr); err != nil {
