@@ -18630,6 +18630,9 @@ const docTemplate = `{
                     "type": "object",
                     "additionalProperties": true
                 },
+                "pullImage": {
+                    "type": "boolean"
+                },
                 "services": {
                     "type": "object",
                     "additionalProperties": {
@@ -18701,6 +18704,9 @@ const docTemplate = `{
                 },
                 "operate": {
                     "type": "string"
+                },
+                "pullImage": {
+                    "type": "boolean"
                 }
             }
         },
@@ -18780,6 +18786,9 @@ const docTemplate = `{
                 "params": {
                     "type": "object",
                     "additionalProperties": true
+                },
+                "pullImage": {
+                    "type": "boolean"
                 }
             }
         },
@@ -19330,6 +19339,9 @@ const docTemplate = `{
                 "params": {
                     "type": "object",
                     "additionalProperties": true
+                },
+                "pullImage": {
+                    "type": "boolean"
                 }
             }
         },
