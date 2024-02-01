@@ -74,7 +74,7 @@ const form = reactive({
 
 const rules = reactive({
     from: [Rules.requiredSelect],
-    name: [Rules.requiredSelect],
+    names: [Rules.requiredSelect],
 });
 
 interface DialogProps {
@@ -139,6 +139,7 @@ const loadBackups = async () => {
 };
 
 const loadFiles = async () => {
+    form.names = [];
     const res = await getFilesFromBackup(form.from);
     fileNames.value = res.data || [];
 };

@@ -18623,6 +18623,9 @@
                     "type": "object",
                     "additionalProperties": true
                 },
+                "pullImage": {
+                    "type": "boolean"
+                },
                 "services": {
                     "type": "object",
                     "additionalProperties": {
@@ -18694,6 +18697,9 @@
                 },
                 "operate": {
                     "type": "string"
+                },
+                "pullImage": {
+                    "type": "boolean"
                 }
             }
         },
@@ -18773,6 +18779,9 @@
                 "params": {
                     "type": "object",
                     "additionalProperties": true
+                },
+                "pullImage": {
+                    "type": "boolean"
                 }
             }
         },
@@ -19323,6 +19332,9 @@
                 "params": {
                     "type": "object",
                     "additionalProperties": true
+                },
+                "pullImage": {
+                    "type": "boolean"
                 }
             }
         },

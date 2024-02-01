@@ -3061,6 +3061,8 @@ definitions:
       params:
         additionalProperties: true
         type: object
+      pullImage:
+        type: boolean
       services:
         additionalProperties:
           type: string
@@ -3109,6 +3111,8 @@ definitions:
         type: integer
       operate:
         type: string
+      pullImage:
+        type: boolean
     required:
     - installId
     - operate
@@ -3162,6 +3166,8 @@ definitions:
       params:
         additionalProperties: true
         type: object
+      pullImage:
+        type: boolean
     required:
     - installId
     - params
@@ -3532,6 +3538,8 @@ definitions:
       params:
         additionalProperties: true
         type: object
+      pullImage:
+        type: boolean
     type: object
   request.NginxAntiLeechUpdate:
     properties:

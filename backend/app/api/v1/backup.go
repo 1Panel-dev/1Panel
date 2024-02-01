@@ -302,12 +302,7 @@ func (b *BaseApi) LoadFilesFromBackup(c *gin.Context) {
 		return
 	}
 
-	data, err := backupService.ListFiles(req)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-
+	data := backupService.ListFiles(req)
 	helper.SuccessWithData(c, data)
 }
 
