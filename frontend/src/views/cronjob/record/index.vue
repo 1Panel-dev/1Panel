@@ -86,7 +86,7 @@
             <template #main>
                 <div class="mainClass">
                     <el-row :gutter="20" v-show="hasRecords" class="mainRowClass">
-                        <el-col :span="6">
+                        <el-col :span="7">
                             <div class="infinite-list" style="overflow: auto">
                                 <el-table
                                     style="cursor: pointer"
@@ -120,7 +120,7 @@
                                     :current-page="searchInfo.page"
                                     @current-change="handleCurrentChange"
                                     @size-change="handleSizeChange"
-                                    :pager-count="5"
+                                    :pager-count="3"
                                     :page-sizes="[6, 8, 10, 12, 14]"
                                     small
                                     layout="total, sizes, prev, pager, next"
@@ -128,7 +128,7 @@
                                 />
                             </div>
                         </el-col>
-                        <el-col :span="18">
+                        <el-col :span="17">
                             <el-form label-position="top" :v-key="refresh">
                                 <el-row type="flex" justify="center">
                                     <el-form-item class="descriptionWide">
@@ -495,12 +495,12 @@ defineExpose({
     float: right;
 }
 
-@media only screen and (max-width: 1000px) {
+@media only screen and (max-width: 1400px) {
     .mainClass {
         overflow: auto;
     }
     .mainRowClass {
-        min-width: 900px;
+        min-width: 1200px;
     }
 }
 </style>
