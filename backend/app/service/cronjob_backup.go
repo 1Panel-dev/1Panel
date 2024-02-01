@@ -12,6 +12,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 )
 
 func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time) error {
@@ -39,7 +40,7 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time) e
 		record.DetailName = app.Name
 		record.Source, record.BackupType = loadRecordPath(cronjob, accountMap)
 		backupDir := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("app/%s/%s", app.App.Key, app.Name))
-		record.FileName = fmt.Sprintf("app_%s_%s.tar.gz", app.Name, startTime.Format("20060102150405"))
+		record.FileName = fmt.Sprintf("app_%s_%s.tar.gz", app.Name, startTime.Format("20060102150405")+common.RandStrAndNum(5))
 		if err := handleAppBackup(&app, backupDir, record.FileName); err != nil {
 			return err
 		}
@@ -72,7 +73,7 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Tim
 		record.DetailName = web.Alias
 		record.Source, record.BackupType = loadRecordPath(cronjob, accountMap)
 		backupDir := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("website/%s", web.PrimaryDomain))
-		record.FileName = fmt.Sprintf("website_%s_%s.tar.gz", web.PrimaryDomain, startTime.Format("20060102150405"))
+		record.FileName = fmt.Sprintf("website_%s_%s.tar.gz", web.PrimaryDomain, startTime.Format("20060102150405")+common.RandStrAndNum(5))
 		if err := handleWebsiteBackup(&web, backupDir, record.FileName); err != nil {
 			return err
 		}
@@ -106,7 +107,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 		record.Source, record.BackupType = loadRecordPath(cronjob, accountMap)
 
 		backupDir := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("database/%s/%s/%s", dbInfo.DBType, record.Name, dbInfo.Name))
-		record.FileName = fmt.Sprintf("db_%s_%s.sql.gz", dbInfo.Name, startTime.Format("20060102150405"))
+		record.FileName = fmt.Sprintf("db_%s_%s.sql.gz", dbInfo.Name, startTime.Format("20060102150405")+common.RandStrAndNum(5))
 		if cronjob.DBType == "mysql" || cronjob.DBType == "mariadb" {
 			if err := handleMysqlBackup(dbInfo.Database, dbInfo.Name, backupDir, record.FileName); err != nil {
 				return err
@@ -135,7 +136,7 @@ func (u *CronjobService) handleDirectory(cronjob model.Cronjob, startTime time.T
 	if err != nil {
 		return err
 	}
-	fileName := fmt.Sprintf("directory%s_%s.tar.gz", strings.ReplaceAll(cronjob.SourceDir, "/", "_"), startTime.Format("20060102150405"))
+	fileName := fmt.Sprintf("directory%s_%s.tar.gz", strings.ReplaceAll(cronjob.SourceDir, "/", "_"), startTime.Format("20060102150405")+common.RandStrAndNum(5))
 	backupDir := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("%s/%s", cronjob.Type, cronjob.Name))
 	if err := handleTar(cronjob.SourceDir, backupDir, fileName, cronjob.ExclusionRules); err != nil {
 		return err
@@ -165,8 +166,9 @@ func (u *CronjobService) handleSystemLog(cronjob model.Cronjob, startTime time.T
 	if err != nil {
 		return err
 	}
-	fileName := fmt.Sprintf("system_log_%s.tar.gz", startTime.Format("20060102150405"))
-	backupDir := path.Join(global.CONF.System.TmpDir, "log", startTime.Format("20060102150405"))
+	nameItem := startTime.Format("20060102150405") + common.RandStrAndNum(5)
+	fileName := fmt.Sprintf("system_log_%s.tar.gz", nameItem)
+	backupDir := path.Join(global.CONF.System.TmpDir, "log", nameItem)
 	if err := handleBackupLogs(backupDir, fileName); err != nil {
 		return err
 	}
@@ -208,7 +210,7 @@ func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, startTime time.Ti
 		From:            record.BackupType,
 		DefaultDownload: cronjob.DefaultDownload,
 	}
-	name, err := NewISnapshotService().HandleSnapshot(true, logPath, req, startTime.Format("20060102150405"))
+	name, err := NewISnapshotService().HandleSnapshot(true, logPath, req, startTime.Format("20060102150405")+common.RandStrAndNum(5))
 	if err != nil {
 		return err
 	}

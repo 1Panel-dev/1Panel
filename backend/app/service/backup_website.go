@@ -15,6 +15,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/pkg/errors"
@@ -33,7 +34,7 @@ func (u *BackupService) WebsiteBackup(req dto.CommonBackup) error {
 	timeNow := time.Now().Format("20060102150405")
 	itemDir := fmt.Sprintf("website/%s", req.Name)
 	backupDir := path.Join(localDir, itemDir)
-	fileName := fmt.Sprintf("%s_%s.tar.gz", website.PrimaryDomain, timeNow)
+	fileName := fmt.Sprintf("%s_%s.tar.gz", website.PrimaryDomain, timeNow+common.RandStrAndNum(5))
 	if err := handleWebsiteBackup(&website, backupDir, fileName); err != nil {
 		return err
 	}
