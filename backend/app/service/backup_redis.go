@@ -14,6 +14,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/pkg/errors"
@@ -34,7 +35,7 @@ func (u *BackupService) RedisBackup() error {
 	}
 	global.LOG.Infof("appendonly in redis conf is %s", appendonly)
 
-	timeNow := time.Now().Format("20060102150405")
+	timeNow := time.Now().Format("20060102150405") + common.RandStrAndNum(5)
 	fileName := fmt.Sprintf("%s.rdb", timeNow)
 	if appendonly == "yes" {
 		if strings.HasPrefix(redisInfo.Version, "6.") {

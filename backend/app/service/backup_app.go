@@ -16,6 +16,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/pkg/errors"
@@ -38,7 +39,7 @@ func (u *BackupService) AppBackup(req dto.CommonBackup) error {
 	itemDir := fmt.Sprintf("app/%s/%s", req.Name, req.DetailName)
 	backupDir := path.Join(localDir, itemDir)
 
-	fileName := fmt.Sprintf("%s_%s.tar.gz", req.DetailName, timeNow)
+	fileName := fmt.Sprintf("%s_%s.tar.gz", req.DetailName, timeNow+common.RandStrAndNum(5))
 	if err := handleAppBackup(&install, backupDir, fileName); err != nil {
 		return err
 	}

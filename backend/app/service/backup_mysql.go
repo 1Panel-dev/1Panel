@@ -13,6 +13,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/1Panel-dev/1Panel/backend/utils/mysql/client"
 )
@@ -26,7 +27,7 @@ func (u *BackupService) MysqlBackup(req dto.CommonBackup) error {
 	timeNow := time.Now().Format("20060102150405")
 	itemDir := fmt.Sprintf("database/%s/%s/%s", req.Type, req.Name, req.DetailName)
 	targetDir := path.Join(localDir, itemDir)
-	fileName := fmt.Sprintf("%s_%s.sql.gz", req.DetailName, timeNow)
+	fileName := fmt.Sprintf("%s_%s.sql.gz", req.DetailName, timeNow+common.RandStrAndNum(5))
 
 	if err := handleMysqlBackup(req.Name, req.DetailName, targetDir, fileName); err != nil {
 		return err
