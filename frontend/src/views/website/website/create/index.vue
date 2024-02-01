@@ -520,6 +520,7 @@ const changeRuntimeType = () => {
         runtimeReq.value.status = 'normal';
     } else {
         runtimeReq.value.status = 'running';
+        website.value.appinstall.advanced = false;
     }
     website.value.runtimeID = undefined;
     getRuntimes();
