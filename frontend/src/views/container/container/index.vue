@@ -102,6 +102,7 @@
                         min-width="100"
                         prop="name"
                         sortable
+                        fix
                         :fixed="mobile ? 'false' : 'left'"
                     >
                         <template #default="{ row }">
@@ -291,6 +292,7 @@
                         prop="runTime"
                     />
                     <fu-table-operations
+                        fix
                         width="180px"
                         :ellipsis="2"
                         :buttons="buttons"
