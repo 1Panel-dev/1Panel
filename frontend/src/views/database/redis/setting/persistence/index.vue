@@ -292,10 +292,10 @@ const onSave = async (formEl: FormInstance | undefined, type: string) => {
             MsgInfo(i18n.global.t('database.rdbInfo'));
             return;
         }
-        itemSaves.push(item.second + '', item.count + '');
+        itemSaves.push(item.second + ' ' + item.count);
     }
     param.type = type;
-    param.save = itemSaves.join(' ');
+    param.save = itemSaves.join(',');
     emit('loading', true);
     await updateRedisPersistenceConf(param)
         .then(() => {
