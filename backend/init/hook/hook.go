@@ -2,6 +2,8 @@ package hook
 
 import (
 	"encoding/base64"
+	"encoding/json"
+	"os"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
@@ -73,6 +75,7 @@ func Init() {
 
 	handleCronjobStatus()
 	handleSnapStatus()
+	loadLocalDir()
 }
 
 func handleSnapStatus() {
@@ -139,4 +142,34 @@ func handleCronjobStatus() {
 			"status":  constant.StatusFailed,
 			"message": "the task was interrupted due to the restart of the 1panel service",
 		}).Error
+}
+
+func loadLocalDir() {
+	var backup model.BackupAccount
+	_ = global.DB.Where("type = ?", "LOCAL").First(&backup).Error
+	if backup.ID == 0 {
+		global.LOG.Errorf("no such backup account `%s` in db", "LOCAL")
+		return
+	}
+	varMap := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
+		global.LOG.Errorf("json unmarshal backup.Vars: %v failed, err: %v", backup.Vars, err)
+		return
+	}
+	if _, ok := varMap["dir"]; !ok {
+		global.LOG.Error("load local backup dir failed")
+		return
+	}
+	baseDir, ok := varMap["dir"].(string)
+	if ok {
+		if _, err := os.Stat(baseDir); err != nil && os.IsNotExist(err) {
+			if err = os.MkdirAll(baseDir, os.ModePerm); err != nil {
+				global.LOG.Errorf("mkdir %s failed, err: %v", baseDir, err)
+				return
+			}
+		}
+		global.CONF.System.Backup = baseDir
+		return
+	}
+	global.LOG.Errorf("error type dir: %T", varMap["dir"])
 }
