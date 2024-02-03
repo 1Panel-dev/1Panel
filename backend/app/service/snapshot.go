@@ -77,10 +77,6 @@ func (u *SnapshotService) SnapshotImport(req dto.SnapshotImport) error {
 		if !strings.HasPrefix(shortName, "1panel_v") || !strings.HasSuffix(shortName, ".tar.gz") || len(nameItems) != 3 {
 			return fmt.Errorf("incorrect snapshot name format of %s", shortName)
 		}
-		formatTime, err := time.Parse("20060102150405", strings.ReplaceAll(nameItems[2], ".tar.gz", ""))
-		if err != nil {
-			return fmt.Errorf("incorrect snapshot name format of %s", shortName)
-		}
 		if strings.HasSuffix(snap, ".tar.gz") {
 			snap = strings.ReplaceAll(snap, ".tar.gz", "")
 		}
@@ -91,10 +87,6 @@ func (u *SnapshotService) SnapshotImport(req dto.SnapshotImport) error {
 			Version:         nameItems[1],
 			Description:     req.Description,
 			Status:          constant.StatusSuccess,
-			BaseModel: model.BaseModel{
-				CreatedAt: formatTime,
-				UpdatedAt: formatTime,
-			},
 		}
 		if err := snapshotRepo.Create(&itemSnap); err != nil {
 			return err
