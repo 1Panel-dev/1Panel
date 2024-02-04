@@ -98,12 +98,12 @@
                     <el-table-column type="selection" />
                     <el-table-column
                         :label="$t('commons.table.name')"
-                        :width="mobile ? 300 : '200'"
+                        :width="mobile ? 300 : 200"
                         min-width="100"
                         prop="name"
                         sortable
                         fix
-                        :fixed="mobile ? 'false' : 'left'"
+                        :fixed="mobile ? false : 'left'"
                     >
                         <template #default="{ row }">
                             <Tooltip @click="onInspect(row.containerID)" :text="row.name" />
