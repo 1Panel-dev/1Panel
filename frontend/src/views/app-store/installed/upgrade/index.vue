@@ -31,7 +31,7 @@
                         <el-checkbox v-model="operateReq.backup" :label="$t('app.backupApp')" />
                         <span class="input-help">{{ $t('app.backupAppHelper') }}</span>
                     </el-form-item>
-                    <el-form-item pro="pullImage">
+                    <el-form-item pro="pullImage" v-if="operateReq.operate === 'upgrade'">
                         <el-checkbox v-model="operateReq.pullImage" :label="$t('container.forcePull')" size="large" />
                         <span class="input-help">{{ $t('container.forcePullHelper') }}</span>
                     </el-form-item>
