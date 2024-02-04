@@ -198,6 +198,9 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 		}
 		_ = os.Remove(path.Join(secretDir, "server.crt"))
 		_ = os.Remove(path.Join(secretDir, "server.key"))
+		sID, _ := c.Cookie(constant.SessionName)
+		c.SetCookie(constant.SessionName, sID, 0, "", "", false, false)
+
 		go func() {
 			_, err := cmd.Exec("systemctl restart 1panel.service")
 			if err != nil {
@@ -289,6 +292,9 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 	if err := settingRepo.Update("SSL", req.SSL); err != nil {
 		return err
 	}
+
+	sID, _ := c.Cookie(constant.SessionName)
+	c.SetCookie(constant.SessionName, sID, 0, "", "", true, false)
 	go func() {
 		time.Sleep(1 * time.Second)
 		_, err := cmd.Exec("systemctl restart 1panel.service")

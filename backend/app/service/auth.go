@@ -109,6 +109,10 @@ func (u *AuthService) generateSession(c *gin.Context, name, authMethod string) (
 	if err != nil {
 		return nil, err
 	}
+	httpsSetting, err := settingRepo.Get(settingRepo.WithByKey("SSL"))
+	if err != nil {
+		return nil, err
+	}
 	lifeTime, err := strconv.Atoi(setting.Value)
 	if err != nil {
 		return nil, err
@@ -129,7 +133,7 @@ func (u *AuthService) generateSession(c *gin.Context, name, authMethod string) (
 	sessionUser, err := global.SESSION.Get(sID)
 	if err != nil {
 		sID = uuid.New().String()
-		c.SetCookie(constant.SessionName, sID, 0, "", "", false, false)
+		c.SetCookie(constant.SessionName, sID, 0, "", "", httpsSetting.Value == "enable", false)
 		err := global.SESSION.Set(sID, sessionUser, lifeTime)
 		if err != nil {
 			return nil, err
@@ -144,9 +148,13 @@ func (u *AuthService) generateSession(c *gin.Context, name, authMethod string) (
 }
 
 func (u *AuthService) LogOut(c *gin.Context) error {
+	httpsSetting, err := settingRepo.Get(settingRepo.WithByKey("SSL"))
+	if err != nil {
+		return err
+	}
 	sID, _ := c.Cookie(constant.SessionName)
 	if sID != "" {
-		c.SetCookie(constant.SessionName, sID, -1, "", "", false, false)
+		c.SetCookie(constant.SessionName, sID, -1, "", "", httpsSetting.Value == "enable", false)
 		err := global.SESSION.Delete(sID)
 		if err != nil {
 			return err
