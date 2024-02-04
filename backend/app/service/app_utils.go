@@ -1066,7 +1066,7 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool) ([]respons
 		}
 		var versions []string
 		for _, detail := range details {
-			if detail.IgnoreUpgrade {
+			if detail.IgnoreUpgrade || installed.Version == "latest" {
 				continue
 			}
 			if common.IsCrossVersion(installed.Version, detail.Version) && !app.CrossVersionUpdate {
