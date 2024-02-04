@@ -5,7 +5,7 @@
         </template>
         <div class="brief" v-loading="loadingApp">
             <div class="detail flex">
-                <div class="w-12 h-12 bg-gray-100 rounded p-1 shadow-md icon">
+                <div class="w-12 h-12 rounded p-1 shadow-md icon">
                     <img :src="app.icon" alt="App Icon" class="w-full h-full rounded" />
                 </div>
                 <div class="ml-4">
@@ -20,7 +20,6 @@
                     <br />
                     <div v-if="!loadingDetail" class="mb-2">
                         <el-alert
-                            style="width: 300px"
                             v-if="!appDetail.enable"
                             :title="$t('app.limitHelper')"
                             type="warning"
@@ -39,33 +38,31 @@
                 </div>
             </div>
             <div class="divider"></div>
-            <div>
-                <el-row>
-                    <el-col :span="12">
-                        <div class="descriptions">
-                            <el-descriptions direction="vertical">
-                                <el-descriptions-item>
-                                    <el-link @click="toLink(app.website)">
-                                        <el-icon><OfficeBuilding /></el-icon>
-                                        <span>{{ $t('app.appOfficeWebsite') }}</span>
-                                    </el-link>
-                                </el-descriptions-item>
-                                <el-descriptions-item>
-                                    <el-link @click="toLink(app.document)">
-                                        <el-icon><Document /></el-icon>
-                                        <span>{{ $t('app.document') }}</span>
-                                    </el-link>
-                                </el-descriptions-item>
-                                <el-descriptions-item>
-                                    <el-link @click="toLink(app.github)">
-                                        <el-icon><Link /></el-icon>
-                                        <span>{{ $t('app.github') }}</span>
-                                    </el-link>
-                                </el-descriptions-item>
-                            </el-descriptions>
-                        </div>
-                    </el-col>
-                </el-row>
+            <div class="descriptions">
+                <div>
+                    <el-descriptions direction="vertical">
+                        <el-descriptions-item>
+                            <div class="icons">
+                                <el-link @click="toLink(app.website)">
+                                    <el-icon><OfficeBuilding /></el-icon>
+                                    <span>{{ $t('app.appOfficeWebsite') }}</span>
+                                </el-link>
+                            </div>
+                        </el-descriptions-item>
+                        <el-descriptions-item>
+                            <el-link @click="toLink(app.document)">
+                                <el-icon><Document /></el-icon>
+                                <span>{{ $t('app.document') }}</span>
+                            </el-link>
+                        </el-descriptions-item>
+                        <el-descriptions-item>
+                            <el-link @click="toLink(app.github)">
+                                <el-icon><Link /></el-icon>
+                                <span>{{ $t('app.github') }}</span>
+                            </el-link>
+                        </el-descriptions-item>
+                    </el-descriptions>
+                </div>
             </div>
         </div>
         <MdEditor
@@ -161,11 +158,11 @@ defineExpose({
 
 <style lang="scss">
 .brief {
-    padding: 10px;
     .name {
         span {
             font-weight: 500;
             font-size: 18px;
+            color: var(--el-text-color-regular);
         }
     }
 
@@ -188,6 +185,9 @@ defineExpose({
 
     .descriptions {
         margin-top: 5px;
+        .icons {
+            margin-left: 20px;
+        }
     }
 }
 </style>
