@@ -827,7 +827,7 @@ const message = {
         retainCopiesHelper: 'Number of copies to retain for execution records and logs',
         retainCopiesHelper1: 'Number of copies to retain for backup files',
         retainCopiesUnit: ' copies (View)',
-        cronSpecRule: 'Please enter a correct lifecycle',
+        cronSpecRule: 'The execution period format in line {0} is incorrect. Please check and try again!',
         perMonth: 'Every monthly',
         perWeek: 'Every week',
         perHour: 'Every hour',

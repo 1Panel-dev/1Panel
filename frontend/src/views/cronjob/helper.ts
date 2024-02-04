@@ -78,6 +78,11 @@ function loadWeek(i: number) {
 
 export function loadDefaultSpec(type: string) {
     let item = {} as Cronjob.SpecObj;
+    item.week = 0;
+    item.day = 0;
+    item.hour = 0;
+    item.minute = 0;
+    item.second = 0;
     switch (type) {
         case 'shell':
             item.specType = 'perWeek';
@@ -122,27 +127,6 @@ export function loadDefaultSpec(type: string) {
             break;
     }
     return item;
-}
-
-export function checkScript(specType: string, week, day, hour, minute, second) {
-    switch (specType) {
-        case 'perMonth':
-            return day > 0 && day < 32 && hour >= 0 && hour < 24 && minute >= 0 && minute < 60;
-        case 'perWeek':
-            return week >= 0 && week < 7 && hour >= 0 && hour < 24 && minute >= 0 && minute < 60;
-        case 'perDay':
-            return hour >= 0 && hour < 24 && minute >= 0 && minute < 60;
-        case 'perHour':
-            return minute >= 0 && minute < 60;
-        case 'perNDay':
-            return day > 0 && day < 366 && hour >= 0 && hour < 24 && minute >= 0 && minute < 60;
-        case 'perNHour':
-            return hour > 0 && hour < 8784 && minute >= 0 && minute < 60;
-        case 'perNMinute':
-            return minute > 0 && minute < 527040;
-        case 'perNSecond':
-            return second > 0 && second < 31622400;
-    }
 }
 
 export function transObjToSpec(specType: string, week, day, hour, minute, second): string {

@@ -78,7 +78,7 @@
 
                     <el-form-item :label="$t('cronjob.cronSpec')" prop="spec">
                         <div v-for="(specObj, index) of dialogData.rowData.specObjs" :key="index" style="width: 100%">
-                            <el-select class="specTypeClass" v-model="specObj.specType">
+                            <el-select class="specTypeClass" v-model="specObj.specType" @change="changeSpecType(index)">
                                 <el-option
                                     v-for="item in specOptions"
                                     :key="item.label"
@@ -133,10 +133,10 @@
                             </el-button>
                             <el-divider v-if="dialogData.rowData.specObjs.length > 1" class="divider" />
                         </div>
-                        <el-button class="mt-3" @click="handleSpecAdd()">
-                            {{ $t('commons.button.add') }}
-                        </el-button>
                     </el-form-item>
+                    <el-button class="mb-3" @click="handleSpecAdd()">
+                        {{ $t('commons.button.add') }}
+                    </el-button>
 
                     <el-form-item v-if="hasScript()">
                         <el-checkbox v-model="dialogData.rowData!.inContainer">
@@ -340,7 +340,7 @@ import { useRouter } from 'vue-router';
 import { listContainer } from '@/api/modules/container';
 import { Database } from '@/api/interface/database';
 import { ListAppInstalled } from '@/api/modules/app';
-import { checkScript, loadDefaultSpec, specOptions, transObjToSpec, transSpecToObj, weekOptions } from './../helper';
+import { loadDefaultSpec, specOptions, transObjToSpec, transSpecToObj, weekOptions } from './../helper';
 const router = useRouter();
 
 interface DialogProps {
@@ -413,40 +413,87 @@ const dbInfo = reactive({
 
 const verifySpec = (rule: any, value: any, callback: any) => {
     if (dialogData.value.rowData!.specObjs.length === 0) {
-        callback(new Error(i18n.global.t('cronjob.cronSpecRule')));
+        callback(new Error(i18n.global.t('commons.rule.requiredInput')));
     }
-    for (const item of dialogData.value.rowData!.specObjs) {
+    for (let i = 0; i < dialogData.value.rowData!.specObjs.length; i++) {
+        let item = dialogData.value.rowData!.specObjs[i];
+        if (
+            !Number.isInteger(item.day) ||
+            !Number.isInteger(item.hour) ||
+            !Number.isInteger(item.minute) ||
+            !Number.isInteger(item.second) ||
+            !Number.isInteger(item.week)
+        ) {
+            callback(new Error(i18n.global.t('cronjob.cronSpecRule', [i + 1])));
+            return;
+        }
         switch (item.specType) {
             case 'perMonth':
+                if (
+                    item.day < 0 ||
+                    item.day > 31 ||
+                    item.hour < 0 ||
+                    item.hour > 23 ||
+                    item.minute < 0 ||
+                    item.minute > 59
+                ) {
+                    callback(new Error(i18n.global.t('cronjob.cronSpecRule', [i + 1])));
+                    return;
+                }
+                break;
             case 'perNDay':
-                if (!(Number.isInteger(item.day) && Number.isInteger(item.hour) && Number.isInteger(item.minute))) {
-                    callback(new Error(i18n.global.t('cronjob.cronSpecRule')));
+                if (
+                    item.day < 0 ||
+                    item.day > 366 ||
+                    item.hour < 0 ||
+                    item.hour > 23 ||
+                    item.minute < 0 ||
+                    item.minute > 59
+                ) {
+                    callback(new Error(i18n.global.t('cronjob.cronSpecRule', [i + 1])));
+                    return;
                 }
                 break;
             case 'perWeek':
-                if (!(Number.isInteger(item.week) && Number.isInteger(item.hour) && Number.isInteger(item.minute))) {
-                    callback(new Error(i18n.global.t('cronjob.cronSpecRule')));
+                if (
+                    item.week < 0 ||
+                    item.week > 6 ||
+                    item.hour < 0 ||
+                    item.hour > 23 ||
+                    item.minute < 0 ||
+                    item.minute > 59
+                ) {
+                    callback(new Error(i18n.global.t('cronjob.cronSpecRule', [i + 1])));
+                    return;
                 }
                 break;
             case 'perDay':
-                if (!(Number.isInteger(item.hour) && Number.isInteger(item.minute))) {
-                    callback(new Error(i18n.global.t('cronjob.cronSpecRule')));
+                if (item.hour < 0 || item.hour > 23 || item.minute < 0 || item.minute > 59) {
+                    callback(new Error(i18n.global.t('cronjob.cronSpecRule', [i + 1])));
+                    return;
                 }
                 break;
             case 'perNHour':
-                if (!(Number.isInteger(item.hour) && Number.isInteger(item.minute))) {
-                    callback(new Error(i18n.global.t('cronjob.cronSpecRule')));
+                if (item.hour < 0 || item.hour > 8784 || item.minute < 0 || item.minute > 59) {
+                    callback(new Error(i18n.global.t('cronjob.cronSpecRule', [i + 1])));
+                    return;
                 }
                 break;
             case 'perHour':
+                if (item.minute < 0 || item.minute > 59) {
+                    callback(new Error(i18n.global.t('cronjob.cronSpecRule', [i + 1])));
+                    return;
+                }
             case 'perNMinute':
-                if (!Number.isInteger(item.minute)) {
-                    callback(new Error(i18n.global.t('cronjob.cronSpecRule')));
+                if (item.minute < 0 || item.minute > 527040) {
+                    callback(new Error(i18n.global.t('cronjob.cronSpecRule', [i + 1])));
+                    return;
                 }
                 break;
             case 'perNSecond':
-                if (!Number.isInteger(item.second)) {
-                    callback(new Error(i18n.global.t('cronjob.cronSpecRule')));
+                if (item.second < 0 || item.second > 31622400) {
+                    callback(new Error(i18n.global.t('cronjob.cronSpecRule', [i + 1])));
+                    return;
                 }
                 break;
         }
@@ -493,6 +540,35 @@ const loadDatabases = async (dbType: string) => {
 
 const changeType = () => {
     dialogData.value.rowData!.specObjs = [loadDefaultSpec(dialogData.value.rowData.type)];
+};
+
+const changeSpecType = (index: number) => {
+    let item = dialogData.value.rowData!.specObjs[index];
+    switch (item.specType) {
+        case 'perMonth':
+        case 'perNDay':
+            item.day = 3;
+            item.hour = 1;
+            item.minute = 30;
+            break;
+        case 'perWeek':
+            item.week = 1;
+            item.hour = 1;
+            item.minute = 30;
+            break;
+        case 'perDay':
+        case 'perNHour':
+            item.hour = 2;
+            item.minute = 30;
+            break;
+        case 'perHour':
+        case 'perNMinute':
+            item.minute = 30;
+            break;
+        case 'perNSecond':
+            item.second = 30;
+            break;
+    }
 };
 
 const handleSpecAdd = () => {
@@ -582,10 +658,6 @@ function hasScript() {
 const onSubmit = async (formEl: FormInstance | undefined) => {
     const specs = [];
     for (const item of dialogData.value.rowData.specObjs) {
-        if (!checkScript(item.specType, item.week, item.day, item.hour, item.minute, item.second)) {
-            MsgError(i18n.global.t('cronjob.cronSpecHelper'));
-            return;
-        }
         const itemSpec = transObjToSpec(item.specType, item.week, item.day, item.hour, item.minute, item.second);
         if (itemSpec === '') {
             MsgError(i18n.global.t('cronjob.cronSpecHelper'));
