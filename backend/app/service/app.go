@@ -397,7 +397,7 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		}
 		index++
 	}
-	if app.Limit == 0 && appInstall.Name != serviceName {
+	if app.Limit == 0 && appInstall.Name != serviceName && len(servicesMap) == 1 {
 		servicesMap[appInstall.Name] = servicesMap[serviceName]
 		delete(servicesMap, serviceName)
 		serviceName = appInstall.Name
