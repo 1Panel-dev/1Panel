@@ -28,7 +28,7 @@ require (
 	github.com/jinzhu/copier v0.3.5
 	github.com/jinzhu/gorm v1.9.2
 	github.com/joho/godotenv v1.5.1
-	github.com/klauspost/compress v1.16.5
+	github.com/klauspost/compress v1.17.2
 	github.com/mholt/archiver/v4 v4.0.0-alpha.8
 	github.com/minio/minio-go/v7 v7.0.36
 	github.com/mojocn/base64Captcha v1.3.6
@@ -165,7 +165,7 @@ require (
 	github.com/minio/md5-simd v1.1.2 // indirect
 	github.com/minio/sha256-simd v1.0.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
-	github.com/moby/buildkit v0.12.2 // indirect
+	github.com/moby/buildkit v0.12.5 // indirect
 	github.com/moby/locker v1.0.1 // indirect
 	github.com/moby/patternmatcher v0.6.0 // indirect
 	github.com/moby/sys/sequential v0.5.0 // indirect
