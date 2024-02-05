@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path"
 	"strings"
 
 	"github.com/studio-b12/gowebdav"
@@ -43,7 +44,7 @@ func NewWebDAVClient(vars map[string]interface{}) (*webDAVClient, error) {
 }
 
 func (s webDAVClient) Upload(src, target string) (bool, error) {
-	targetFilePath := s.Bucket + "/" + target
+	targetFilePath := path.Join(s.Bucket, target)
 	srcFile, err := os.Open(src)
 	if err != nil {
 		return false, err
@@ -62,7 +63,7 @@ func (s webDAVClient) ListBuckets() ([]interface{}, error) {
 }
 
 func (s webDAVClient) Download(src, target string) (bool, error) {
-	srcPath := s.Bucket + "/" + src
+	srcPath := path.Join(s.Bucket, src)
 	info, err := s.client.Stat(srcPath)
 	if err != nil {
 		return false, err
@@ -85,30 +86,30 @@ func (s webDAVClient) Download(src, target string) (bool, error) {
 	return true, err
 }
 
-func (s webDAVClient) Exist(path string) (bool, error) {
-	if _, err := s.client.Stat(s.Bucket + "/" + path); err != nil {
+func (s webDAVClient) Exist(pathItem string) (bool, error) {
+	if _, err := s.client.Stat(path.Join(s.Bucket, pathItem)); err != nil {
 		return false, err
 	}
 	return true, nil
 }
 
-func (s webDAVClient) Size(path string) (int64, error) {
-	file, err := s.client.Stat(s.Bucket + "/" + path)
+func (s webDAVClient) Size(pathItem string) (int64, error) {
+	file, err := s.client.Stat(path.Join(s.Bucket, pathItem))
 	if err != nil {
 		return 0, err
 	}
 	return file.Size(), nil
 }
 
-func (s webDAVClient) Delete(filePath string) (bool, error) {
-	if err := s.client.Remove(s.Bucket + "/" + filePath); err != nil {
+func (s webDAVClient) Delete(pathItem string) (bool, error) {
+	if err := s.client.Remove(path.Join(s.Bucket, pathItem)); err != nil {
 		return false, err
 	}
 	return true, nil
 }
 
 func (s webDAVClient) ListObjects(prefix string) ([]string, error) {
-	files, err := s.client.ReadDir(s.Bucket + "/" + prefix)
+	files, err := s.client.ReadDir(path.Join(s.Bucket, prefix))
 	if err != nil {
 		return nil, err
 	}

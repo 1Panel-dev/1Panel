@@ -1174,6 +1174,7 @@ const message = {
         MINIO: 'MINIO',
         SFTP: 'SFTP',
         WebDAV: 'WebDAV',
+        WebDAVAlist: 'WebDAV 连接 Alist 可参考官方文档',
         OneDrive: '微软 OneDrive',
         isCN: '世纪互联',
         isNotCN: '国际版',
@@ -1184,7 +1185,7 @@ const message = {
         refreshTime: '令牌刷新时间',
         refreshStatus: '令牌刷新状态',
         codeWarning: '当前授权码格式错误，请重新确认！',
-        backupDir: '备份路径',
+        backupDir: '备份目录',
         code: '授权码',
         codeHelper:
             '请点击获取按钮，然后登录 OneDrive 复制跳转链接中 code 后面的内容，粘贴到该输入框中，具体操作可参考官方文档。',

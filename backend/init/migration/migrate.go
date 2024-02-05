@@ -70,6 +70,8 @@ func Init() {
 		migrations.UpdateCronjobSpec,
 		migrations.UpdateBackupRecordPath,
 		migrations.UpdateSnapshotRecords,
+
+		migrations.UpdateWebDavConf,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

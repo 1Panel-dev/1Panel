@@ -39,7 +39,7 @@
                                 v-model.trim="sftpData.rowData!.credential"
                             />
                         </el-form-item>
-                        <el-form-item :label="$t('setting.path')" prop="bucket" :rules="[Rules.requiredInput]">
+                        <el-form-item :label="$t('setting.backupDir')" prop="bucket" :rules="[Rules.requiredInput]">
                             <el-input v-model.trim="sftpData.rowData!.bucket" />
                         </el-form-item>
                     </el-col>

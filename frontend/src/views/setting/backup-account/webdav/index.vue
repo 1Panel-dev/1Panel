@@ -12,20 +12,21 @@
                         </el-form-item>
                         <el-form-item
                             :label="$t('setting.address')"
-                            prop="varsJson.addressItem"
+                            prop="varsJson.address"
                             :rules="Rules.requiredInput"
                         >
-                            <el-input v-model="webdavData.rowData!.varsJson['addressItem']">
-                                <template #prepend>
-                                    <el-select v-model.trim="addressProto" style="width: 100px">
-                                        <el-option label="http" value="http" />
-                                        <el-option label="https" value="https" />
-                                    </el-select>
-                                </template>
-                            </el-input>
-                        </el-form-item>
-                        <el-form-item :label="$t('commons.table.port')" prop="varsJson.port" :rules="[portRule]">
-                            <el-input-number v-model.number="webdavData.rowData!.varsJson['port']" />
+                            <el-input v-model="webdavData.rowData!.varsJson['address']" />
+                            <span class="input-help">
+                                {{ $t('setting.WebDAVAlist') }}
+                                <el-link
+                                    style="font-size: 12px; margin-left: 5px"
+                                    icon="Position"
+                                    @click="toDoc()"
+                                    type="primary"
+                                >
+                                    {{ $t('firewall.quickJump') }}
+                                </el-link>
+                            </span>
                         </el-form-item>
                         <el-form-item
                             :label="$t('commons.login.username')"
@@ -46,7 +47,7 @@
                                 v-model.trim="webdavData.rowData!.credential"
                             />
                         </el-form-item>
-                        <el-form-item :label="$t('setting.path')" prop="bucket" :rules="[Rules.requiredInput]">
+                        <el-form-item :label="$t('setting.backupDir')" prop="bucket" :rules="[Rules.requiredInput]">
                             <el-input v-model.trim="webdavData.rowData!.bucket" />
                         </el-form-item>
                     </el-col>
@@ -67,7 +68,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
+import { ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
@@ -75,13 +76,11 @@ import { Backup } from '@/api/interface/backup';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { addBackup, editBackup } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
-import { checkPort, spliceHttp, splitHttp } from '@/utils/util';
 
 const loading = ref(false);
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 
-const addressProto = ref('http');
 const emit = defineEmits(['search']);
 
 interface DialogProps {
@@ -94,24 +93,8 @@ const webdavData = ref<DialogProps>({
     title: '',
 });
 
-const portRule = reactive({ validator: checkportRule, trigger: 'blur', type: 'number' });
-
-function checkportRule(rule: any, value: any, callback: any) {
-    if (value !== undefined && value !== null) {
-        if (checkPort(value)) {
-            return callback(new Error(i18n.global.t('commons.rule.port')));
-        }
-    }
-    callback();
-}
-
 const acceptParams = (params: DialogProps): void => {
     webdavData.value = params;
-    if (webdavData.value.title === 'edit') {
-        let httpItem = splitHttp(webdavData.value.rowData!.varsJson['address']);
-        webdavData.value.rowData!.varsJson['addressItem'] = httpItem.url;
-        addressProto.value = httpItem.proto;
-    }
     title.value = i18n.global.t('commons.button.' + webdavData.value.title);
     drawerVisible.value = true;
 };
@@ -121,15 +104,15 @@ const handleClose = () => {
     drawerVisible.value = false;
 };
 
+const toDoc = () => {
+    window.open('https://1panel.cn/docs/user_manual/settings/', '_blank', 'noopener,noreferrer');
+};
+
 const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
         if (!webdavData.value.rowData) return;
-        webdavData.value.rowData!.varsJson['address'] = spliceHttp(
-            addressProto.value,
-            webdavData.value.rowData!.varsJson['addressItem'],
-        );
         webdavData.value.rowData.vars = JSON.stringify(webdavData.value.rowData!.varsJson);
         loading.value = true;
         if (webdavData.value.title === 'create') {

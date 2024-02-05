@@ -1250,6 +1250,7 @@ const message = {
         MINIO: 'MINIO',
         SFTP: 'SFTP',
         WebDAV: 'WebDAV',
+        WebDAVAlist: 'WebDAV connect Alist can refer to the official documentation',
         OneDrive: 'Microsoft OneDrive',
         isCN: 'Century Internet',
         isNotCN: 'International Version',
