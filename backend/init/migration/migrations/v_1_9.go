@@ -314,7 +314,7 @@ var UpdateCronjobSpec = &gormigrate.Migration{
 			}
 
 			var records []model.JobRecords
-			_ = tx.Where("cronjob_id = ?", job.ID).Find(&records).Error
+			_ = tx.Where("cronjob_id = ? AND status = ?", job.ID, constant.StatusSuccess).Find(&records).Error
 			for _, record := range records {
 				if job.Type == "snapshot" {
 					var snaps []model.Snapshot
@@ -329,6 +329,9 @@ var UpdateCronjobSpec = &gormigrate.Migration{
 							FileName:   snap.Name + ".tar.gz",
 							Source:     snap.From,
 							BackupType: snap.From,
+							BaseModel: model.BaseModel{
+								CreatedAt: job.CreatedAt,
+							},
 						}
 						_ = tx.Create(&item).Error
 					}
@@ -344,6 +347,9 @@ var UpdateCronjobSpec = &gormigrate.Migration{
 						FileName:   path.Base(record.File),
 						Source:     mapAccount[uint(job.TargetDirID)].Type,
 						BackupType: mapAccount[uint(job.TargetDirID)].Type,
+						BaseModel: model.BaseModel{
+							CreatedAt: job.CreatedAt,
+						},
 					}
 					_ = tx.Create(&item).Error
 					continue
@@ -357,6 +363,9 @@ var UpdateCronjobSpec = &gormigrate.Migration{
 						FileDir:    path.Dir(strings.TrimPrefix(record.File, itemPath)),
 						FileName:   path.Base(record.File),
 						BackupType: mapAccount[uint(job.TargetDirID)].Type,
+						BaseModel: model.BaseModel{
+							CreatedAt: job.CreatedAt,
+						},
 					}
 					if record.FromLocal {
 						item.Source = constant.Local
