@@ -34,6 +34,9 @@ func NewSftpClient(vars map[string]interface{}) (*sftpClient, error) {
 			return nil
 		},
 	}
+	if _, err := ssh.Dial("tcp", fmt.Sprintf("%s:%s", address, port), clientConfig); err != nil {
+		return nil, err
+	}
 
 	return &sftpClient{bucket: bucket, connInfo: fmt.Sprintf("%s:%s", address, port), config: clientConfig}, nil
 }
