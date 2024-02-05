@@ -475,6 +475,8 @@ func (u *BackupService) loadRecordSize(records []model.BackupRecord) ([]dto.Back
 				datas = append(datas, item)
 				wg.Done()
 			}(i)
+		} else {
+			datas = append(datas, item)
 		}
 	}
 	wg.Wait()
