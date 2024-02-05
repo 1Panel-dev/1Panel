@@ -314,9 +314,9 @@ var UpdateCronjobSpec = &gormigrate.Migration{
 			}
 
 			var records []model.JobRecords
-			_ = tx.Where("cronjob_id = ? AND status = ?", job.ID, constant.StatusSuccess).Find(&records).Error
+			_ = tx.Where("cronjob_id = ?", job.ID).Find(&records).Error
 			for _, record := range records {
-				if job.Type == "snapshot" {
+				if job.Type == "snapshot" && job.Status == constant.StatusSuccess {
 					var snaps []model.Snapshot
 					_ = tx.Where("name like ?", "snapshot_"+"%").Find(&snaps).Error
 					for _, snap := range snaps {
@@ -337,7 +337,7 @@ var UpdateCronjobSpec = &gormigrate.Migration{
 					}
 					continue
 				}
-				if job.Type == "log" {
+				if job.Type == "log" && job.Status == constant.StatusSuccess {
 					item := model.BackupRecord{
 						From:       "cronjob",
 						CronjobID:  job.ID,
@@ -354,7 +354,7 @@ var UpdateCronjobSpec = &gormigrate.Migration{
 					_ = tx.Create(&item).Error
 					continue
 				}
-				if job.Type == "directory" {
+				if job.Type == "directory" && job.Status == constant.StatusSuccess {
 					item := model.BackupRecord{
 						From:       "cronjob",
 						CronjobID:  job.ID,
