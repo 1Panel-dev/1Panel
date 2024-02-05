@@ -372,7 +372,7 @@
                             <el-form-item :label="$t('commons.table.port')">
                                 {{ sftpData.varsJson['port'] }}
                             </el-form-item>
-                            <el-form-item :label="$t('setting.path')">
+                            <el-form-item :label="$t('setting.backupDir')">
                                 {{ sftpData.bucket }}
                             </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
@@ -408,10 +408,7 @@
                             <el-form-item :label="$t('setting.address')">
                                 {{ webDAVData.varsJson['address'] }}
                             </el-form-item>
-                            <el-form-item :label="$t('commons.table.port')">
-                                {{ webDAVData.varsJson['port'] }}
-                            </el-form-item>
-                            <el-form-item :label="$t('setting.path')">
+                            <el-form-item :label="$t('setting.backupDir')">
                                 {{ webDAVData.bucket }}
                             </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">

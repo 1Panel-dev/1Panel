@@ -451,3 +451,29 @@ var UpdateSnapshotRecords = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var UpdateWebDavConf = &gormigrate.Migration{
+	ID: "20240205-update-webdav-conf",
+	Migrate: func(tx *gorm.DB) error {
+		var backup model.BackupAccount
+		_ = tx.Where("type = ?", constant.WebDAV).First(&backup).Error
+		if backup.ID == 0 {
+			return nil
+		}
+		varMap := make(map[string]interface{})
+		if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
+			return err
+		}
+		delete(varMap, "addressItem")
+		if port, ok := varMap["port"]; ok {
+			varMap["address"] = fmt.Sprintf("%s:%v", varMap["address"], port)
+			delete(varMap, "port")
+		}
+
+		vars, _ := json.Marshal(varMap)
+		if err := tx.Model(&model.BackupAccount{}).Where("id = ?", backup.ID).Updates(map[string]interface{}{"vars": string(vars)}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
