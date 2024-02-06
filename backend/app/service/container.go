@@ -434,7 +434,7 @@ func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.Contai
 	data.AutoRemove = oldContainer.HostConfig.AutoRemove
 	data.Privileged = oldContainer.HostConfig.Privileged
 	data.PublishAllPorts = oldContainer.HostConfig.PublishAllPorts
-	data.RestartPolicy = oldContainer.HostConfig.RestartPolicy.Name
+	data.RestartPolicy = string(oldContainer.HostConfig.RestartPolicy.Name)
 	if oldContainer.HostConfig.NanoCPUs != 0 {
 		data.NanoCPUs = float64(oldContainer.HostConfig.NanoCPUs) / 1000000000
 	}
@@ -985,7 +985,7 @@ func loadConfigInfo(isCreate bool, req dto.ContainerOperate, oldContainer *types
 	hostConf.AutoRemove = req.AutoRemove
 	hostConf.CPUShares = req.CPUShares
 	hostConf.PublishAllPorts = req.PublishAllPorts
-	hostConf.RestartPolicy = container.RestartPolicy{Name: req.RestartPolicy}
+	hostConf.RestartPolicy = container.RestartPolicy{Name: container.RestartPolicyMode(req.RestartPolicy)}
 	if req.RestartPolicy == "on-failure" {
 		hostConf.RestartPolicy.MaximumRetryCount = 5
 	}
