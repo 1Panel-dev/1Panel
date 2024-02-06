@@ -1511,13 +1511,19 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 
 	switch req.Operate {
 	case "create":
-		config = parser.NewStringParser(string(nginx_conf.Proxy)).Parse()
+		config, err = parser.NewStringParser(string(nginx_conf.Proxy)).Parse()
+		if err != nil {
+			return
+		}
 	case "edit":
 		par, err = parser.NewParser(includePath)
 		if err != nil {
 			return
 		}
-		config = par.Parse()
+		config, err = par.Parse()
+		if err != nil {
+			return
+		}
 		oldContent, err = fileOp.GetContent(includePath)
 		if err != nil {
 			return
@@ -1533,6 +1539,7 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 		_ = fileOp.Rename(backPath, includePath)
 		return updateNginxConfig(constant.NginxScopeServer, nil, &website)
 	}
+
 	config.FilePath = includePath
 	directives := config.Directives
 	location, ok := directives[0].(*components.Location)
@@ -1610,7 +1617,10 @@ func (w WebsiteService) GetProxies(id uint) (res []request.WebsiteProxyConfig, e
 			return
 		}
 		proxyConfig.Content = string(content)
-		config = parser.NewStringParser(string(content)).Parse()
+		config, err = parser.NewStringParser(string(content)).Parse()
+		if err != nil {
+			return nil, err
+		}
 		directives := config.GetDirectives()
 
 		location, ok := directives[0].(*components.Location)
@@ -2057,7 +2067,10 @@ func (w WebsiteService) OperateRedirect(req request.NginxRedirectReq) (err error
 		if err != nil {
 			return
 		}
-		config = oldPar.Parse()
+		config, err = oldPar.Parse()
+		if err != nil {
+			return
+		}
 		oldContent, err = fileOp.GetContent(includePath)
 		if err != nil {
 			return
@@ -2198,7 +2211,10 @@ func (w WebsiteService) GetRedirect(id uint) (res []response.NginxRedirectConfig
 			return
 		}
 		redirectConfig.Content = string(content)
-		config = parser.NewStringParser(string(content)).Parse()
+		config, err = parser.NewStringParser(string(content)).Parse()
+		if err != nil {
+			return
+		}
 
 		dirs := config.GetDirectives()
 		if len(dirs) > 0 {

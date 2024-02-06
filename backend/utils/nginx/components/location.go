@@ -22,6 +22,10 @@ type Location struct {
 	Replaces   map[string]string
 }
 
+func (l *Location) GetCodeBlock() string {
+	return ""
+}
+
 func NewLocation(directive IDirective) *Location {
 	location := &Location{
 		Modifier: "",

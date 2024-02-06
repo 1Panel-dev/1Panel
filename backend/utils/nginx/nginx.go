@@ -10,5 +10,5 @@ func GetConfig(path string) (*components.Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	return p.Parse(), nil
+	return p.Parse()
 }

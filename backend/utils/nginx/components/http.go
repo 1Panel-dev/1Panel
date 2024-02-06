@@ -11,6 +11,10 @@ type Http struct {
 	Line       int
 }
 
+func (h *Http) GetCodeBlock() string {
+	return ""
+}
+
 func (h *Http) GetComment() string {
 	return h.Comment
 }

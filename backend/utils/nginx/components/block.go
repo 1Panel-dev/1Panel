@@ -1,9 +1,11 @@
 package components
 
 type Block struct {
-	Line       int
-	Comment    string
-	Directives []IDirective
+	Line        int
+	Comment     string
+	Directives  []IDirective
+	IsLuaBlock  bool
+	LiteralCode string
 }
 
 func (b *Block) GetDirectives() []IDirective {
@@ -16,6 +18,10 @@ func (b *Block) GetComment() string {
 
 func (b *Block) GetLine() int {
 	return b.Line
+}
+
+func (b *Block) GetCodeBlock() string {
+	return b.LiteralCode
 }
 
 func (b *Block) FindDirectives(directiveName string) []IDirective {
