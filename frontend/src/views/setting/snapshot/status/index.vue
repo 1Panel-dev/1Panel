@@ -48,13 +48,6 @@
                                     <el-tag type="info" v-if="snapInfo.recoverStatus === 'Waiting'">
                                         {{ $t('commons.table.statusWaiting') }}
                                     </el-tag>
-                                    <!-- <el-button
-                                    style="margin-left: 15px"
-                                    @click="recoverSnapshot(true)"
-                                    :disabled="snapInfo.recoverStatus !== 'Success'"
-                                >
-                                    {{ $t('setting.recover') }}
-                                </el-button> -->
                                 </el-form-item>
                                 <el-form-item
                                     :label="$t('setting.lastRecoverAt')"
@@ -77,66 +70,68 @@
                             </div>
                         </el-card>
 
-                        <span class="card-title">{{ $t('setting.rollback') }}</span>
-                        <el-divider class="divider" />
-                        <div v-if="!snapInfo.rollbackStatus && !snapInfo.lastRollbackedAt">
-                            <el-alert center class="alert" style="height: 257px" :closable="false">
-                                <el-button size="large" round plain type="primary" @click="rollbackSnapshot()">
-                                    {{ $t('setting.rollback') }}
-                                </el-button>
-                            </el-alert>
-                        </div>
-                        <div v-if="!snapInfo.rollbackStatus">
-                            <div v-if="snapInfo.lastRollbackedAt">
+                        <div v-if="snapInfo.recoverStatus === 'Failed'">
+                            <span class="card-title">{{ $t('setting.rollback') }}</span>
+                            <el-divider class="divider" />
+                            <div v-if="!snapInfo.rollbackStatus && !snapInfo.lastRollbackedAt">
+                                <el-alert center class="alert" style="height: 257px" :closable="false">
+                                    <el-button size="large" round plain type="primary" @click="rollbackSnapshot()">
+                                        {{ $t('setting.rollback') }}
+                                    </el-button>
+                                </el-alert>
+                            </div>
+                            <div v-if="!snapInfo.rollbackStatus">
+                                <div v-if="snapInfo.lastRollbackedAt">
+                                    <el-form-item :label="$t('commons.table.status')">
+                                        <el-tag type="success">
+                                            {{ $t('commons.table.statusSuccess') }}
+                                        </el-tag>
+                                        <el-button @click="rollbackSnapshot" style="margin-left: 10px" type="primary">
+                                            {{ $t('setting.rollback') }}
+                                        </el-button>
+                                    </el-form-item>
+                                    <el-form-item :label="$t('setting.lastRollbackAt')">
+                                        {{ snapInfo.lastRollbackedAt }}
+                                    </el-form-item>
+                                </div>
+                            </div>
+                            <div v-else>
                                 <el-form-item :label="$t('commons.table.status')">
-                                    <el-tag type="success">
+                                    <el-tag type="success" v-if="snapInfo.rollbackStatus === 'Success'">
                                         {{ $t('commons.table.statusSuccess') }}
                                     </el-tag>
-                                    <el-button @click="rollbackSnapshot" style="margin-left: 10px" type="primary">
+                                    <el-tag type="danger" v-if="snapInfo.rollbackStatus === 'Failed'">
+                                        {{ $t('commons.table.statusFailed') }}
+                                    </el-tag>
+                                    <el-tag type="info" v-if="snapInfo.rollbackStatus === 'Waiting'">
+                                        {{ $t('commons.table.statusWaiting') }}
+                                    </el-tag>
+                                    <el-button
+                                        style="margin-left: 15px"
+                                        :disabled="snapInfo.rollbackStatus !== 'Success'"
+                                        @click="rollbackSnapshot"
+                                    >
                                         {{ $t('setting.rollback') }}
                                     </el-button>
                                 </el-form-item>
-                                <el-form-item :label="$t('setting.lastRollbackAt')">
+                                <el-form-item
+                                    :label="$t('setting.lastRollbackAt')"
+                                    v-if="snapInfo.rollbackStatus !== 'Waiting'"
+                                >
                                     {{ snapInfo.lastRollbackedAt }}
                                 </el-form-item>
-                            </div>
-                        </div>
-                        <div v-else>
-                            <el-form-item :label="$t('commons.table.status')">
-                                <el-tag type="success" v-if="snapInfo.rollbackStatus === 'Success'">
-                                    {{ $t('commons.table.statusSuccess') }}
-                                </el-tag>
-                                <el-tag type="danger" v-if="snapInfo.rollbackStatus === 'Failed'">
-                                    {{ $t('commons.table.statusFailed') }}
-                                </el-tag>
-                                <el-tag type="info" v-if="snapInfo.rollbackStatus === 'Waiting'">
-                                    {{ $t('commons.table.statusWaiting') }}
-                                </el-tag>
-                                <el-button
-                                    style="margin-left: 15px"
-                                    :disabled="snapInfo.rollbackStatus !== 'Success'"
-                                    @click="rollbackSnapshot"
-                                >
-                                    {{ $t('setting.rollback') }}
-                                </el-button>
-                            </el-form-item>
-                            <el-form-item
-                                :label="$t('setting.lastRollbackAt')"
-                                v-if="snapInfo.rollbackStatus !== 'Waiting'"
-                            >
-                                {{ snapInfo.lastRollbackedAt }}
-                            </el-form-item>
-                            <div v-if="snapInfo.rollbackStatus === 'Failed'">
-                                <el-form-item :label="$t('commons.button.log')">
-                                    <span style="word-break: break-all; flex-wrap: wrap; word-wrap: break-word">
-                                        {{ snapInfo.rollbackMessage }}
-                                    </span>
-                                </el-form-item>
-                                <el-form-item>
-                                    <el-button @click="rollbackSnapshot()" type="primary">
-                                        {{ $t('commons.button.retry') }}
-                                    </el-button>
-                                </el-form-item>
+                                <div v-if="snapInfo.rollbackStatus === 'Failed'">
+                                    <el-form-item :label="$t('commons.button.log')">
+                                        <span style="word-break: break-all; flex-wrap: wrap; word-wrap: break-word">
+                                            {{ snapInfo.rollbackMessage }}
+                                        </span>
+                                    </el-form-item>
+                                    <el-form-item>
+                                        <el-button @click="rollbackSnapshot()" type="primary">
+                                            {{ $t('commons.button.retry') }}
+                                        </el-button>
+                                    </el-form-item>
+                                </div>
                             </div>
                         </div>
                     </el-col>

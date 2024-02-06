@@ -330,7 +330,7 @@ var UpdateCronjobSpec = &gormigrate.Migration{
 							Source:     snap.From,
 							BackupType: snap.From,
 							BaseModel: model.BaseModel{
-								CreatedAt: job.CreatedAt,
+								CreatedAt: record.CreatedAt,
 							},
 						}
 						_ = tx.Create(&item).Error
@@ -348,7 +348,7 @@ var UpdateCronjobSpec = &gormigrate.Migration{
 						Source:     mapAccount[uint(job.TargetDirID)].Type,
 						BackupType: mapAccount[uint(job.TargetDirID)].Type,
 						BaseModel: model.BaseModel{
-							CreatedAt: job.CreatedAt,
+							CreatedAt: record.CreatedAt,
 						},
 					}
 					_ = tx.Create(&item).Error
@@ -364,7 +364,7 @@ var UpdateCronjobSpec = &gormigrate.Migration{
 						FileName:   path.Base(record.File),
 						BackupType: mapAccount[uint(job.TargetDirID)].Type,
 						BaseModel: model.BaseModel{
-							CreatedAt: job.CreatedAt,
+							CreatedAt: record.CreatedAt,
 						},
 					}
 					if record.FromLocal {
