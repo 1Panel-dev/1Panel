@@ -18,6 +18,7 @@ const (
 	Comment
 	Illegal
 	Regex
+	LuaCode
 )
 
 var (

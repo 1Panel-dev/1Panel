@@ -132,7 +132,10 @@ func createProxyFile(website *model.Website, runtime *model.Runtime) error {
 			return err
 		}
 	}
-	config := parser.NewStringParser(string(nginx_conf.Proxy)).Parse()
+	config, err := parser.NewStringParser(string(nginx_conf.Proxy)).Parse()
+	if err != nil {
+		return err
+	}
 	config.FilePath = filePath
 	directives := config.Directives
 	location, ok := directives[0].(*components.Location)
@@ -208,7 +211,10 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 	nginxFileName := website.Alias + ".conf"
 	configPath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "conf", "conf.d", nginxFileName)
 	nginxContent := string(nginx_conf.WebsiteDefault)
-	config := parser.NewStringParser(nginxContent).Parse()
+	config, err := parser.NewStringParser(nginxContent).Parse()
+	if err != nil {
+		return err
+	}
 	servers := config.FindServers()
 	if len(servers) == 0 {
 		return errors.New("nginx config is not valid")
@@ -872,7 +878,10 @@ func ChangeHSTSConfig(enable bool, nginxInstall model.AppInstall, website model.
 				if err != nil {
 					return err
 				}
-				config := par.Parse()
+				config, err := par.Parse()
+				if err != nil {
+					return err
+				}
 				config.FilePath = path
 				directives := config.Directives
 				location, ok := directives[0].(*components.Location)

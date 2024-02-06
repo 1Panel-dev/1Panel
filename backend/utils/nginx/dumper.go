@@ -65,6 +65,21 @@ func DumpDirective(d components.IDirective, style *Style) string {
 
 func DumpBlock(b components.IBlock, style *Style, startLine int) string {
 	var buf bytes.Buffer
+
+	if b.GetCodeBlock() != "" {
+		luaLines := strings.Split(b.GetCodeBlock(), "\n")
+		for i, line := range luaLines {
+			if strings.Replace(line, " ", "", -1) == "" {
+				continue
+			}
+			buf.WriteString(line)
+			if i != len(luaLines)-1 {
+				buf.WriteString("\n")
+			}
+		}
+		return buf.String()
+	}
+
 	line := startLine
 	if b.GetLine() > startLine {
 		for i := 0; i < b.GetLine()-startLine; i++ {

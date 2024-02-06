@@ -11,6 +11,10 @@ type Server struct {
 	Line       int
 }
 
+func (s *Server) GetCodeBlock() string {
+	return ""
+}
+
 func NewServer(directive IDirective) (*Server, error) {
 	server := &Server{}
 	if block := directive.GetBlock(); block != nil {

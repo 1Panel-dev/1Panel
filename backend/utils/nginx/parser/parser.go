@@ -2,17 +2,19 @@ package parser
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	components "github.com/1Panel-dev/1Panel/backend/utils/nginx/components"
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx/parser/flag"
 	"os"
+	"strings"
 )
 
 type Parser struct {
 	lexer             *lexer
 	currentToken      flag.Flag
 	followingToken    flag.Flag
-	blockWrappers     map[string]func(*components.Directive) components.IDirective
+	blockWrappers     map[string]func(*components.Directive) (components.IDirective, error)
 	directiveWrappers map[string]func(*components.Directive) components.IDirective
 }
 
@@ -39,18 +41,21 @@ func NewParserFromLexer(lexer *lexer) *Parser {
 	parser.nextToken()
 	parser.nextToken()
 
-	parser.blockWrappers = map[string]func(*components.Directive) components.IDirective{
-		"http": func(directive *components.Directive) components.IDirective {
-			return parser.wrapHttp(directive)
+	parser.blockWrappers = map[string]func(*components.Directive) (components.IDirective, error){
+		"http": func(directive *components.Directive) (components.IDirective, error) {
+			return parser.wrapHttp(directive), nil
 		},
-		"server": func(directive *components.Directive) components.IDirective {
-			return parser.wrapServer(directive)
+		"server": func(directive *components.Directive) (components.IDirective, error) {
+			return parser.wrapServer(directive), nil
 		},
-		"location": func(directive *components.Directive) components.IDirective {
-			return parser.wrapLocation(directive)
+		"location": func(directive *components.Directive) (components.IDirective, error) {
+			return parser.wrapLocation(directive), nil
 		},
-		"upstream": func(directive *components.Directive) components.IDirective {
-			return parser.wrapUpstream(directive)
+		"upstream": func(directive *components.Directive) (components.IDirective, error) {
+			return parser.wrapUpstream(directive), nil
+		},
+		"_by_lua_block": func(directive *components.Directive) (components.IDirective, error) {
+			return parser.wrapLuaBlock(directive)
 		},
 	}
 
@@ -76,14 +81,19 @@ func (p *Parser) followingTokenIs(t flag.Type) bool {
 	return p.followingToken.Type == t
 }
 
-func (p *Parser) Parse() *components.Config {
-	return &components.Config{
-		FilePath: p.lexer.file,
-		Block:    p.parseBlock(),
+func (p *Parser) Parse() (*components.Config, error) {
+	parsedBlock, err := p.parseBlock(false)
+	if err != nil {
+		return nil, err
 	}
+	c := &components.Config{
+		FilePath: p.lexer.file,
+		Block:    parsedBlock,
+	}
+	return c, err
 }
 
-func (p *Parser) parseBlock() *components.Block {
+func (p *Parser) parseBlock(inBlock bool) (*components.Block, error) {
 	context := &components.Block{
 		Comment:    "",
 		Directives: make([]components.IDirective, 0),
@@ -93,10 +103,22 @@ func (p *Parser) parseBlock() *components.Block {
 parsingloop:
 	for {
 		switch {
-		case p.curTokenIs(flag.EOF) || p.curTokenIs(flag.BlockEnd):
+		case p.curTokenIs(flag.EOF):
+			if inBlock {
+				return nil, errors.New("unexpected eof in block")
+			}
 			break parsingloop
+		case p.curTokenIs(flag.BlockEnd):
+			break parsingloop
+		case p.curTokenIs(flag.LuaCode):
+			context.IsLuaBlock = true
+			context.LiteralCode = p.currentToken.Literal
 		case p.curTokenIs(flag.Keyword):
-			context.Directives = append(context.Directives, p.parseStatement())
+			s, err := p.parseStatement()
+			if err != nil {
+				return nil, err
+			}
+			context.Directives = append(context.Directives, s)
 		case p.curTokenIs(flag.Comment):
 			context.Directives = append(context.Directives, &components.Comment{
 				Detail: p.currentToken.Literal,
@@ -106,10 +128,10 @@ parsingloop:
 		p.nextToken()
 	}
 
-	return context
+	return context, nil
 }
 
-func (p *Parser) parseStatement() components.IDirective {
+func (p *Parser) parseStatement() (components.IDirective, error) {
 	d := &components.Directive{
 		Name: p.currentToken.Literal,
 		Line: p.currentToken.Line,
@@ -121,30 +143,38 @@ func (p *Parser) parseStatement() components.IDirective {
 
 	if p.curTokenIs(flag.Semicolon) {
 		if dw, ok := p.directiveWrappers[d.Name]; ok {
-			return dw(d)
+			return dw(d), nil
 		}
 		if p.followingTokenIs(flag.Comment) && p.currentToken.Line == p.followingToken.Line {
 			d.Comment = p.followingToken.Literal
 			p.nextToken()
 		}
-		return d
+		return d, nil
 	}
 
 	if p.curTokenIs(flag.BlockStart) {
-
 		inLineComment := ""
 		if p.followingTokenIs(flag.Comment) && p.currentToken.Line == p.followingToken.Line {
 			inLineComment = p.followingToken.Literal
 			p.nextToken()
 			p.nextToken()
 		}
-		block := p.parseBlock()
+		block, err := p.parseBlock(false)
+		if err != nil {
+			return nil, err
+		}
+
 		block.Comment = inLineComment
 		d.Block = block
+
+		if strings.HasSuffix(d.Name, "_by_lua_block") {
+			return p.blockWrappers["_by_lua_block"](d)
+		}
+
 		if bw, ok := p.blockWrappers[d.Name]; ok {
 			return bw(d)
 		}
-		return d
+		return d, nil
 	}
 
 	panic(fmt.Errorf("unexpected token %s (%s) on line %d, column %d", p.currentToken.Type.String(), p.currentToken.Literal, p.currentToken.Line, p.currentToken.Column))
@@ -167,6 +197,10 @@ func (p *Parser) wrapUpstream(directive *components.Directive) *components.Upstr
 func (p *Parser) wrapHttp(directive *components.Directive) *components.Http {
 	h, _ := components.NewHttp(directive)
 	return h
+}
+
+func (p *Parser) wrapLuaBlock(directive *components.Directive) (*components.LuaBlock, error) {
+	return components.NewLuaBlock(directive)
 }
 
 func (p *Parser) parseUpstreamServer(directive *components.Directive) *components.UpstreamServer {

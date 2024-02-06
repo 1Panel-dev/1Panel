@@ -7,6 +7,7 @@ type IBlock interface {
 	UpdateDirective(name string, params []string)
 	GetComment() string
 	GetLine() int
+	GetCodeBlock() string
 }
 
 type IDirective interface {

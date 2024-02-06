@@ -12,6 +12,10 @@ type Upstream struct {
 	Line            int
 }
 
+func (us *Upstream) GetCodeBlock() string {
+	return ""
+}
+
 func (us *Upstream) GetName() string {
 	return "upstream"
 }

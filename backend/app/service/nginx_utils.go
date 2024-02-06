@@ -37,7 +37,10 @@ func getNginxFull(website *model.Website) (dto.NginxFull, error) {
 	if err != nil {
 		return nginxFull, err
 	}
-	config := parser.NewStringParser(string(content)).Parse()
+	config, err := parser.NewStringParser(string(content)).Parse()
+	if err != nil {
+		return dto.NginxFull{}, err
+	}
 	config.FilePath = nginxConfig.FilePath
 	nginxConfig.OldContent = string(content)
 	nginxConfig.Config = config
@@ -54,7 +57,10 @@ func getNginxFull(website *model.Website) (dto.NginxFull, error) {
 		if err != nil {
 			return nginxFull, err
 		}
-		siteConfig := parser.NewStringParser(string(siteNginxContent)).Parse()
+		siteConfig, err := parser.NewStringParser(string(siteNginxContent)).Parse()
+		if err != nil {
+			return dto.NginxFull{}, err
+		}
 		siteConfig.FilePath = siteConfigPath
 		siteNginxConfig.Config = siteConfig
 		siteNginxConfig.OldContent = string(siteNginxContent)
@@ -156,15 +162,22 @@ func deleteNginxConfig(scope string, params []dto.NginxParam, website *model.Web
 }
 
 func getNginxParamsFromStaticFile(scope dto.NginxKey, newParams []dto.NginxParam) []dto.NginxParam {
-	newConfig := &components.Config{}
+	var (
+		newConfig = &components.Config{}
+		err       error
+	)
+
 	updateScope := "in"
 	switch scope {
 	case dto.SSL:
-		newConfig = parser.NewStringParser(string(nginx_conf.SSL)).Parse()
+		newConfig, err = parser.NewStringParser(string(nginx_conf.SSL)).Parse()
 	case dto.CACHE:
-		newConfig = parser.NewStringParser(string(nginx_conf.Cache)).Parse()
+		newConfig, err = parser.NewStringParser(string(nginx_conf.Cache)).Parse()
 	case dto.ProxyCache:
-		newConfig = parser.NewStringParser(string(nginx_conf.ProxyCache)).Parse()
+		newConfig, err = parser.NewStringParser(string(nginx_conf.ProxyCache)).Parse()
+	}
+	if err != nil {
+		return nil
 	}
 	for _, dir := range newConfig.GetDirectives() {
 		addParam := dto.NginxParam{
