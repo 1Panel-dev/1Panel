@@ -215,7 +215,7 @@ const loadData = async () => {
                 data: netRxDatas.value,
             },
         ],
-        formatStr: 'KB/s',
+        formatStr: 'KB',
     };
 };
 const handleClose = async () => {

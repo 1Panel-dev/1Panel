@@ -5,7 +5,7 @@
 import { onMounted, nextTick, watch, onBeforeUnmount } from 'vue';
 import * as echarts from 'echarts';
 import { GlobalStore } from '@/store';
-import { computeSizeFromKBs, computeSizeFromMB } from '@/utils/util';
+import { computeSizeFromKBs, computeSizeFromKB, computeSizeFromMB } from '@/utils/util';
 const globalStore = GlobalStore();
 const props = defineProps({
     id: {
@@ -139,6 +139,11 @@ function initChart() {
                     case 'KB/s':
                         for (const item of datas) {
                             res += item.marker + ' ' + item.seriesName + '：' + computeSizeFromKBs(item.data) + '<br/>';
+                        }
+                        break;
+                    case 'KB':
+                        for (const item of datas) {
+                            res += item.marker + ' ' + item.seriesName + '：' + computeSizeFromKB(item.data) + '<br/>';
                         }
                         break;
                     case 'MB':
