@@ -67,7 +67,7 @@ const rules = reactive({
 
 function checkMirrors(rule: any, value: any, callback: any) {
     if (form.mirrors !== '') {
-        const reg = /^https?:\/\/[a-zA-Z0-9.-]+$/;
+        const reg = /^https?:\/\/[a-zA-Z0-9./-]+$/;
         let mirrors = form.mirrors.split('\n');
         for (const item of mirrors) {
             if (item === '') {
