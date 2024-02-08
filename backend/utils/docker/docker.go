@@ -2,6 +2,7 @@ package docker
 
 import (
 	"context"
+	"github.com/docker/docker/api/types/container"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/global"
@@ -45,7 +46,7 @@ func NewDockerClient() (*client.Client, error) {
 }
 
 func (c Client) ListAllContainers() ([]types.Container, error) {
-	var options types.ContainerListOptions
+	var options container.ListOptions
 	containers, err := c.cli.ContainerList(context.Background(), options)
 	if err != nil {
 		return nil, err
@@ -55,7 +56,7 @@ func (c Client) ListAllContainers() ([]types.Container, error) {
 
 func (c Client) ListContainersByName(names []string) ([]types.Container, error) {
 	var (
-		options types.ContainerListOptions
+		options container.ListOptions
 		res     []types.Container
 	)
 	options.All = true

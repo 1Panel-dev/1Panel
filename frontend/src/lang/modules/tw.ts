@@ -1071,6 +1071,7 @@ const message = {
         ignoreCertificate: '忽略不可信證書',
         ignoreCertificateHelper:
             '下載時忽略不可信證書可能導致數據洩露或篡改。請謹慎使用此選項，僅在信任下載源的情況下啟用',
+        uploadOverLimit: '文件數量超過 1000！ 請壓縮後上傳',
     },
     ssh: {
         autoStart: '開機自啟',
