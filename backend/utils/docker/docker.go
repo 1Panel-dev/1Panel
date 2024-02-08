@@ -57,7 +57,6 @@ func (c Client) ListAllContainers() ([]types.Container, error) {
 func (c Client) ListContainersByName(names []string) ([]types.Container, error) {
 	var (
 		options container.ListOptions
-		res     []types.Container
 	)
 	options.All = true
 	if len(names) > 0 {
@@ -71,12 +70,7 @@ func (c Client) ListContainersByName(names []string) ([]types.Container, error) 
 	if err != nil {
 		return nil, err
 	}
-	for _, container := range containers {
-		if container.Names[0] == "/"+names[0] {
-			res = append(res, container)
-		}
-	}
-	return res, nil
+	return containers, nil
 }
 
 func (c Client) CreateNetwork(name string) error {

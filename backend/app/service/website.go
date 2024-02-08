@@ -820,30 +820,27 @@ func (w WebsiteService) PreInstallCheck(req request.WebsiteInstallCheckReq) ([]r
 	} else {
 		checkIds = append(req.InstallIds, appInstall.ID)
 	}
-	for _, id := range checkIds {
-		if err := syncByID(id); err != nil {
-			return nil, err
-		}
-	}
 	if len(checkIds) > 0 {
 		installList, _ := appInstallRepo.ListBy(commonRepo.WithIdsIn(checkIds))
 		for _, install := range installList {
+			if err = syncAppInstallStatus(&install); err != nil {
+				return nil, err
+			}
 			res = append(res, response.WebsitePreInstallCheck{
 				Name:    install.Name,
 				Status:  install.Status,
 				Version: install.Version,
 				AppName: install.App.Name,
 			})
-			if install.Status != constant.StatusRunning {
+			if install.Status != constant.Running {
 				showErr = true
 			}
 		}
 	}
 	if showErr {
 		return res, nil
-	} else {
-		return nil, nil
 	}
+	return nil, nil
 }
 
 func (w WebsiteService) GetWafConfig(req request.WebsiteWafReq) (response.WebsiteWafConfig, error) {

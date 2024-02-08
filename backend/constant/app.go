@@ -12,7 +12,7 @@ const (
 	Rebuilding  = "Rebuilding"
 	Syncing     = "Syncing"
 	SyncSuccess = "SyncSuccess"
-	SyncErr     = "SyncErr"
+	Paused      = "Paused"
 
 	ContainerPrefix = "1Panel-"
 
