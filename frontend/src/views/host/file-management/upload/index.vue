@@ -42,7 +42,7 @@
             :show-file-list="false"
             multiple
             v-model:file-list="uploaderFiles"
-            :limit="10"
+            :limit="1000"
         >
             <template #tip>
                 <el-text>{{ uploadHelper }}</el-text>
@@ -70,6 +70,7 @@
                         type="primary"
                         link
                         @click="removeFile(index)"
+                        :disabled="loading"
                         :icon="Close"
                     ></el-button>
                 </span>
@@ -254,12 +255,9 @@ const clearFiles = () => {
     uploadRef.value!.clearFiles();
 };
 
-const handleExceed: UploadProps['onExceed'] = (files) => {
+const handleExceed: UploadProps['onExceed'] = () => {
     uploadRef.value!.clearFiles();
-    for (let i = 0; i < files.length; i++) {
-        const file = files[i] as UploadRawFile;
-        uploadRef.value!.handleStart(file);
-    }
+    MsgWarning(i18n.global.t('file.uploadOverLimit'));
 };
 
 const hadleSuccess: UploadProps['onSuccess'] = (res, file) => {
