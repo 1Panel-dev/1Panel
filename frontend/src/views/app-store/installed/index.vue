@@ -222,25 +222,32 @@
                                             </el-button>
                                         </div>
                                         <div class="d-description">
-                                            <el-tag class="middle-center">
+                                            <el-button class="tagMargin" plain size="small">
                                                 {{ $t('app.version') }}：{{ installed.version }}
-                                            </el-tag>
-                                            <el-tag
-                                                class="middle-center"
+                                            </el-button>
+
+                                            <el-button
                                                 v-if="installed.httpPort > 0"
                                                 @click="goDashboard(installed.httpPort, 'http')"
+                                                class="tagMargin"
+                                                icon="Position"
+                                                plain
+                                                size="small"
                                             >
-                                                <el-icon class="middle-center"><Position /></el-icon>
                                                 {{ $t('app.busPort') }}：{{ installed.httpPort }}
-                                            </el-tag>
-                                            <el-tag
-                                                class="middle-center"
+                                            </el-button>
+
+                                            <el-button
                                                 v-if="installed.httpsPort > 0"
                                                 @click="goDashboard(installed.httpsPort, 'https')"
+                                                class="tagMargin"
+                                                icon="Position"
+                                                plain
+                                                size="small"
                                             >
-                                                <el-icon class="middle-center"><Position /></el-icon>
                                                 {{ $t('app.busPort') }}：{{ installed.httpsPort }}
-                                            </el-tag>
+                                            </el-button>
+
                                             <div class="description">
                                                 <span>
                                                     {{ $t('app.alreadyRun') }}： {{ getAge(installed.createdAt) }}

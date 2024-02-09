@@ -1052,6 +1052,10 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool) ([]respons
 		if updated && (installed.App.Type == "php" || installed.Status == constant.Installing || (installed.App.Key == constant.AppMysql && installed.Version == "5.6.51")) {
 			continue
 		}
+		if err := syncAppInstallStatus(&installed); err != nil {
+			global.LOG.Error("sync app install status error : ", err)
+		}
+
 		installDTO := response.AppInstalledDTO{
 			AppInstall: installed,
 			Path:       installed.GetPath(),
