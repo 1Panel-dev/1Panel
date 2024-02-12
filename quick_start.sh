@@ -1,7 +1,7 @@
 #!/bin/bash
 # Instalar a Última Versão Estável do 1Panel
 
-osCheck=`uname -a`
+osCheck=$(uname -a)
 if [[ $osCheck =~ 'x86_64' ]];then
     architecture="amd64"
 elif [[ $osCheck =~ 'arm64' ]] || [[ $osCheck =~ 'aarch64' ]];then
@@ -45,6 +45,17 @@ if [ -f ${package_file_name} ];then
         rm -rf 1panel-${VERSION}-linux-${architecture}
         tar zxvf ${package_file_name}
         cd 1panel-${VERSION}-linux-${architecture}
+
+        # Exclua os arquivos install.sh e 1pctl
+        rm -f install.sh 1pctl
+
+        # Baixe os novos arquivos do seu repositório GitHub
+        curl -LOk -o install.sh https://raw.githubusercontent.com/jefferson-system-help-oficial/1Panel-brasil-oficial/dev/install.sh
+        curl -LOk -o 1pctl https://raw.githubusercontent.com/jefferson-system-help-oficial/1Panel-brasil-oficial/dev/1pctl
+
+        # Move o script baixado para o diretório
+        mv install.sh 1pctl 1panel-${VERSION}-linux-${architecture}
+
         /bin/bash install.sh
         exit 0
     else
@@ -70,5 +81,15 @@ if [ $? != 0 ];then
     exit 1
 fi
 cd 1panel-${VERSION}-linux-${architecture}
+
+# Exclua os arquivos install.sh e 1pctl
+rm -f install.sh 1pctl
+
+# Baixe os novos arquivos do seu repositório GitHub
+curl -LOk -o install.sh https://raw.githubusercontent.com/jefferson-system-help-oficial/1Panel-brasil-oficial/dev/install.sh
+curl -LOk -o 1pctl https://raw.githubusercontent.com/jefferson-system-help-oficial/1Panel-brasil-oficial/dev/1pctl
+
+# Move o script baixado para o diretório
+mv install.sh 1pctl 1panel-${VERSION}-linux-${architecture}
 
 /bin/bash install.sh
