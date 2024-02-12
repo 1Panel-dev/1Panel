@@ -1,20 +1,17 @@
-Aqui está o código HTML traduzido para o português brasileiro:
-
-```html
 <p align="center"><a href="https://1panel.cn"><img src="http://1panel.oss-cn-hangzhou.aliyuncs.com/img/1panel-logo.png" alt="1Panel" width="300" /></a></p>
-<p align="center"><b>Painel de Administração de Servidores Linux Moderno e de Código Aberto</b></p>
+<p align="center"><b>Painel de Gerenciamento de Manutenção de Servidores Linux Moderno e de Código Aberto</b></p>
 <p align="center">
   <a href="https://www.gnu.org/licenses/gpl-3.0.html"><img src="https://shields.io/github/license/1Panel-dev/1Panel?color=%231890FF" alt="Licença: GPL v3"></a>
   <a href="https://app.codacy.com/gh/1Panel-dev/1Panel?utm_source=github.com&utm_medium=referral&utm_content=1Panel-dev/1Panel&utm_campaign=Badge_Grade_Dashboard"><img src="https://app.codacy.com/project/badge/Grade/da67574fd82b473992781d1386b937ef" alt="Codacy"></a>
   <a href="https://github.com/1Panel-dev/1Panel/releases"><img src="https://img.shields.io/github/v/release/1Panel-dev/1Panel" alt="Versão do GitHub"></a>
   <a href="https://github.com/1Panel-dev/1Panel"><img src="https://img.shields.io/github/stars/1Panel-dev/1Panel?color=%231890FF&style=flat-square" alt="Estrelas"></a>
   <a href="https://app.fossa.com/projects/git%2Bgithub.com%2F1Panel-dev%2F1Panel?ref=badge_shield"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2F1Panel-dev%2F1Panel.svg?type=shield" alt="Status FOSSA"></a><br>
-  [<a href="docs/README_TW.md">中文(繁體)</a>] | [<a href="docs/README_EN.md">Inglês</a>] | [<a href="docs/README_JP.md">Japonês</a>]
+  [<a href="docs/README_TW.md">中文(繁體)</a>] | [<a href="docs/README_EN.md">English</a>] | [<a href="docs/README_JP.md">日本語</a>]
 </p>
 
 ------------------------------
 
-O 1Panel é um Painel de Administração de Servidores Linux moderno e de código aberto. As características e vantagens do 1Panel incluem:
+1Panel é um painel de administração de servidores Linux moderno e de código aberto. As características e vantagens do 1Panel incluem:
 
 - **Rápida Criação de Sites**: Integração profunda com Wordpress e [Halo](https://github.com/halo-dev/halo/), configuração de domínio, configuração de certificados SSL, etc., tudo em um clique;
 - **Gerenciamento Eficiente**: Gerencie facilmente servidores Linux via web, incluindo monitoramento de hospedagem, gerenciamento de arquivos, gerenciamento de bancos de dados, gerenciamento de contêineres, etc.;
@@ -22,9 +19,9 @@ O 1Panel é um Painel de Administração de Servidores Linux moderno e de códig
 - **Backup com um Clique**: Suporta backup e restauração com um clique, fazendo backup de dados para vários tipos de armazenamento em nuvem, garantindo que nada seja perdido;
 - **Loja de Aplicativos**: Seleção de várias ferramentas de código aberto e software de alta qualidade para facilitar a instalação e atualização.
 
-## Demonstração da Interface de Usuário
+## UI Exibição
 
-![Demonstração da Interface de Usuário](https://resource.fit2cloud.com/1panel/img/overview.png)
+![Exibição UI](https://resource.fit2cloud.com/1panel/img/overview.png)
 
 ## Começando Rapidamente
 
@@ -74,5 +71,3 @@ Licenciado sob a Licença Pública Geral GNU versão 3 (GPLv3) (a "Licença"); v
 <https://www.gnu.org/licenses/gpl-3.0.html>
 
 A menos que exigido por lei aplicável ou acordado por escrito, o software distribuído sob a Licença é distribuído "COMO ESTÁ", SEM GARANTIAS OU CONDIÇÕES DE QUALQUER TIPO, expressas ou implícitas. Consulte a Licença para os idiomas específicos que regem permissões e limitações sob a Licença.
-```
-
