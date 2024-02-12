@@ -22,7 +22,7 @@
 
 <div align="center">
   <h3>Colaborador: Jefferson_System_Help</h3>
-  <p>Jefferson_System_Help é um colaborador oficial do 1Panel Brasil. Ele oferece tutoriais, dicas e informações sobre como usar o 1Panel de maneira eficaz. Você pode encontrar seus vídeos no <a href="https://www.youtube.com/@SYSTEMHELP">canal oficial do 1Panel Brasil</a>.</p>
+  <p>Jefferson_System_Help é um colaborador oficial do 1Panel Brasil. Ele oferece tutoriais, dicas e informações sobre como usar o 1Panel de maneira eficaz. Você pode encontrar seus vídeos instalçao  no <a href="https://www.youtube.com/@SYSTEMHELP">canal oficial do 1Panel Brasil</a>.</p>
 </div>
 
 
