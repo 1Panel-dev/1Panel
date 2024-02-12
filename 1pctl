@@ -1,0 +1,221 @@
+#!/bin/bash
+action=$1
+target=$2
+args=$@
+
+BASE_DIR=/opt
+ORIGINAL_PORT=9999
+ORIGINAL_VERSION=v1.9.6
+ORIGINAL_ENTRANCE=entrance
+ORIGINAL_USERNAME=username
+ORIGINAL_PASSWORD=password
+
+function usage() {
+    echo "Script de Controle do 1Panel"
+    echo
+    echo "Uso: "
+    echo "  ./1pctl [COMANDO] [ARGS...]"
+    echo "  ./1pctl --help"
+    echo
+    echo "Comandos: "
+    echo "  status              Verifica o status do serviço 1Panel"
+    echo "  start               Inicia o serviço 1Panel"
+    echo "  stop                Para o serviço 1Panel"
+    echo "  restart             Reinicia o serviço 1Panel"
+    echo "  uninstall           Desinstala o serviço 1Panel"
+    echo "  user-info           Obtém informações do usuário 1Panel"
+    echo "  listen-ip           Altera o IP de escuta do 1Panel"
+    echo "  version             Exibe informações da versão do 1Panel"
+    echo "  update              Atualiza informações do sistema 1Panel"
+    echo "  reset               Reseta informações do sistema 1Panel"
+    echo "  restore             Restaura o serviço e dados do 1Panel"
+}
+function status() {
+    systemctl status 1panel.service
+}
+function start() {
+    systemctl start 1panel.service
+    status
+}
+function stop() {
+    systemctl stop 1panel.service
+    status
+}
+function restart() {
+    systemctl restart 1panel.service
+    status
+}
+function uninstall() {
+    read -p "A desinstalação removerá completamente o serviço e o diretório de dados do 1Panel, deseja continuar [s/n] : " yn
+    if [ "$yn" == "Y" ] || [ "$yn" == "y" ]; then
+        echo -e "================== Iniciando Desinstalação do Painel de Gerenciamento de Servidores Linux 1Panel =================="
+        echo -e ""
+        echo -e "1) Parando o serviço 1Panel..."
+        systemctl stop 1panel.service
+    else
+        exit 0
+    fi
+
+    echo -e "2) Removendo o serviço e o diretório de dados do 1Panel..."
+    rm -rf $BASE_DIR/1panel /usr/local/bin/{1pctl,1panel} /etc/systemd/system/1panel.service
+
+    echo -e "3) Recarregando arquivo de configuração do serviço..."
+    systemctl daemon-reload
+    systemctl reset-failed
+
+    echo -e ""
+    echo -e "================================== Desinstalação Concluída =================================="
+}
+function user-info() {
+    1panel user-info
+}
+function listen-ip() {
+    1panel listen-ip
+}
+function listen_ipv4() {
+    1panel listen-ip ipv4
+    restart
+}
+function listen_ipv6() {
+    1panel listen-ip ipv6
+    restart
+}
+function restore() {
+    read -p "O 1Panel será restaurado para a versão estável anterior, deseja continuar [s/n] : " yn
+    if [ "$yn" == "Y" ] || [ "$yn" == "y" ]; then
+        echo -e ""
+        1panel restore
+        systemctl daemon-reload
+        restart
+        echo -e ""
+        1panel version
+    else
+        exit 0
+    fi
+}
+function version() {
+    1panel version
+}
+function reset() {
+    1panel reset
+}
+function reset_domain() {
+    1panel reset domain
+}
+function reset_entrance() {
+    1panel reset entrance
+}
+function reset_https() {
+    1panel reset https
+    restart
+}
+function reset_ips() {
+    1panel reset ips
+}
+function reset_mfa() {
+    1panel reset mfa
+}
+function update() {
+    1panel update
+}
+function update_username() {
+    1panel update username
+}
+function update_password() {
+    1panel update password
+}
+function update_port() {
+    1panel update port
+}
+
+function main() {
+    case "${action}" in
+        status)
+            status
+            ;;
+        start)
+            start
+            ;;
+        stop)
+            stop
+            ;;
+        restart)
+            restart
+            ;;
+        restore)
+            restore
+            ;;
+        uninstall)
+            uninstall
+            ;;
+        user-info)
+            user-info
+            ;;
+        listen-ip)
+            case "${target}" in
+                ipv4)
+                    listen_ipv4
+                    ;;
+                ipv6)
+                    listen_ipv6
+                    ;;
+                *)
+                    listen-ip
+                    ;;
+            esac
+            ;;
+        version)
+            version
+            ;;
+        reset)
+            case "${target}" in
+                domain)
+                    reset_domain
+                    ;;
+                entrance)
+                    reset_entrance
+                    ;;
+                https)
+                    reset_https
+                    ;;
+                ips)
+                    reset_ips
+                    ;;
+                mfa)
+                    reset_mfa
+                    ;;
+                *)
+                    reset
+                    ;;
+            esac
+            ;;
+        update)
+            case "${target}" in
+                username)
+                    update_username
+                    ;;
+                password)
+                    update_password
+                    ;;
+                port)
+                    update_port
+                    ;;
+                *)
+                    update
+                    ;;
+            esac
+            ;;
+        help)
+            usage
+            ;;
+        --help)
+            usage
+            ;;
+        "")
+            usage
+            ;;
+        *)
+        echo "Parâmetro não suportado, utilize 'help' ou '--help' para obter ajuda"
+    esac
+}
+main
