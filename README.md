@@ -1,15 +1,33 @@
-<p align="center"><a href="https://1panel.cn"><img src="http://1panel.oss-cn-hangzhou.aliyuncs.com/img/1panel-logo.png" alt="1Panel" width="300" /></a></p>
-<p align="center"><b>Painel de Gerenciamento de Manutenção de Servidores Linux Moderno e de Código Aberto</b></p>
-<p align="center">
+<div align="center">
+  <a href="https://1panel.cn"><img src="http://1panel.oss-cn-hangzhou.aliyuncs.com/img/1panel-logo.png" alt="1Panel" width="300" /></a>
+</div>
+
+<h1 align="center">Painel de Gerenciamento de Servidores Linux Moderno e de Código Aberto</h1>
+
+<p align="center">Esta versão do 1Panel realiza a instalação em português, enquanto o painel da web permanece no idioma original.</p>
+
+<div align="center">
   <a href="https://www.gnu.org/licenses/gpl-3.0.html"><img src="https://shields.io/github/license/1Panel-dev/1Panel?color=%231890FF" alt="Licença: GPL v3"></a>
   <a href="https://app.codacy.com/gh/1Panel-dev/1Panel?utm_source=github.com&utm_medium=referral&utm_content=1Panel-dev/1Panel&utm_campaign=Badge_Grade_Dashboard"><img src="https://app.codacy.com/project/badge/Grade/da67574fd82b473992781d1386b937ef" alt="Codacy"></a>
   <a href="https://github.com/1Panel-dev/1Panel/releases"><img src="https://img.shields.io/github/v/release/1Panel-dev/1Panel" alt="Versão do GitHub"></a>
   <a href="https://github.com/1Panel-dev/1Panel"><img src="https://img.shields.io/github/stars/1Panel-dev/1Panel?color=%231890FF&style=flat-square" alt="Estrelas"></a>
-  <a href="https://app.fossa.com/projects/git%2Bgithub.com%2F1Panel-dev%2F1Panel?ref=badge_shield"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2F1Panel-dev%2F1Panel.svg?type=shield" alt="Status FOSSA"></a><br>
-  [<a href="docs/README_TW.md">中文(繁體)</a>] | [<a href="docs/README_EN.md">English</a>] | [<a href="docs/README_JP.md">日本語</a>]
-</p>
+  <a href="https://app.fossa.com/projects/git%2Bgithub.com%2F1Panel-dev%2F1Panel?ref=badge_shield"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2F1Panel-dev%2F1Panel.svg?type=shield" alt="Status FOSSA"></a>
+</div>
 
-------------------------------
+---
+
+<h2 align="center">Agradecimentos Especiais</h2>
+
+<p align="center">Gostaríamos de expressar nossa sincera gratidão ao Jefferson_System_Help pelo seu valioso trabalho e dedicação como colaborador oficial do 1Panel Brasil. Seu compromisso em fornecer suporte e recursos educacionais tem sido fundamental para nossa comunidade.</p>
+
+<div align="center">
+  <h3>Colaborador: Jefferson_System_Help</h3>
+  <p>Jefferson_System_Help é um colaborador oficial do 1Panel Brasil. Ele oferece tutoriais, dicas e informações sobre como usar o 1Panel de maneira eficaz. Você pode encontrar seus vídeos no <a href="https://www.youtube.com/@SYSTEMHELP">canal oficial do 1Panel Brasil</a>.</p>
+</div>
+
+
+---
+
 
 1Panel é um painel de administração de servidores Linux moderno e de código aberto. As características e vantagens do 1Panel incluem:
 
