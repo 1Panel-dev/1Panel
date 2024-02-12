@@ -31,6 +31,8 @@
 
 1Panel é um painel de administração de servidores Linux moderno e de código aberto. As características e vantagens do 1Panel incluem:
 
+ATENÇAO O 1PANEL RODA  SEM PRECISAR FORMATAR SUA VPS !  ELE È UMA CAIXA DE  ULTILIDADE ! SYSTEM-BOX
+
 - **Rápida Criação de Sites**: Integração profunda com Wordpress e [Halo](https://github.com/halo-dev/halo/), configuração de domínio, configuração de certificados SSL, etc., tudo em um clique;
 - **Gerenciamento Eficiente**: Gerencie facilmente servidores Linux via web, incluindo monitoramento de hospedagem, gerenciamento de arquivos, gerenciamento de bancos de dados, gerenciamento de contêineres, etc.;
 - **Seguro e Confiável**: Gerenciamento e implantação de aplicativos baseados em contêineres, com mínima exposição a vulnerabilidades, fornecendo recursos como firewall e auditoria de logs;
