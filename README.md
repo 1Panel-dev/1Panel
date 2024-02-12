@@ -36,7 +36,7 @@
 Execute o seguinte comando para instalar o 1Panel com um clique:
 
 ```sh
-curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_start.sh && sudo bash quick_start.sh
+curl -sSL https://raw.githubusercontent.com/jefferson-system-help-oficial/1Panel-brasil-oficial/dev/quick_start.sh -o quick_start.sh && sudo bash quick_start.sh^C
 ```
 
 **Recursos de Aprendizado**
