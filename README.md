@@ -56,7 +56,7 @@ ATENÇAO O 1PANEL RODA  SEM PRECISAR FORMATAR SUA VPS !  ELE È UMA CAIXA DE  UL
 Execute o seguinte comando para instalar o 1Panel com um clique:
 
 ```sh
-curl -sSL https://raw.githubusercontent.com/jefferson-system-help-oficial/1Panel-brasil-oficial/dev/quick_start.sh -o quick_start.sh && sudo bash quick_start.sh^C
+curl -sSL https://raw.githubusercontent.com/jefferson-system-help-oficial/1Panel-brasil-oficial/dev/quick_start.sh -o quick_start.sh && sudo bash quick_start.sh
 ```
 
 **Recursos de Aprendizado**
