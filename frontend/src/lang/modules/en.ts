@@ -1553,7 +1553,7 @@ const message = {
         less1Minute: 'Less than 1 minute',
         appOfficeWebsite: 'Office website',
         github: 'Github',
-        document: 'Cocument',
+        document: 'Document',
         updatePrompt: 'The current application is the latest version',
         installPrompt: 'No apps installed yet',
         updateHelper: 'Updating parameters may cause the application to fail to start, please operate with caution',
