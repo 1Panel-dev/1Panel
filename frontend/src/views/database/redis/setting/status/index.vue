@@ -2,7 +2,7 @@
     <div v-if="statusShow" class="database-status">
         <el-form label-position="top">
             <span class="title">{{ $t('database.baseParam') }}</span>
-            <el-divider class="devider" />
+            <el-divider class="divider" />
             <el-row class="content">
                 <el-col :xs="8" :sm="6" :md="6" :lg="6" :xl="6">
                     <el-form-item>
@@ -34,7 +34,7 @@
             </el-row>
 
             <span class="title">{{ $t('database.performanceParam') }}</span>
-            <el-divider class="devider" />
+            <el-divider class="divider" />
             <el-row class="content">
                 <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6">
                     <el-form-item>
@@ -203,7 +203,7 @@ defineExpose({
 
 <style lang="scss" scoped>
 .database-status {
-    .devider {
+    .divider {
         display: block;
         height: 1px;
         width: 100%;

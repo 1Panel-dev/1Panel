@@ -181,7 +181,7 @@ func (u *DockerService) UpdateConf(req dto.SettingUpdate) error {
 		} else {
 			daemonMap["iptables"] = false
 		}
-	case "Dirver":
+	case "Driver":
 		if opts, ok := daemonMap["exec-opts"]; ok {
 			if optsValue, isArray := opts.([]interface{}); isArray {
 				for i := 0; i < len(optsValue); i++ {

@@ -1,7 +1,7 @@
 <template>
     <div v-loading="loading">
         <div v-show="isOnDetail">
-            <ComposeDetial @back="backList" ref="composeDetailRef" />
+            <ComposeDetail @back="backList" ref="composeDetailRef" />
         </div>
         <el-card v-if="dockerStatus != 'Running'" class="mask-prompt">
             <span>{{ $t('container.serviceUnavailable') }}</span>
@@ -97,7 +97,7 @@ import { reactive, onMounted, ref } from 'vue';
 import EditDialog from '@/views/container/compose/edit/index.vue';
 import CreateDialog from '@/views/container/compose/create/index.vue';
 import DeleteDialog from '@/views/container/compose/delete/index.vue';
-import ComposeDetial from '@/views/container/compose/detail/index.vue';
+import ComposeDetail from '@/views/container/compose/detail/index.vue';
 import { loadContainerLog, loadDockerStatus, searchCompose } from '@/api/modules/container';
 import i18n from '@/lang';
 import { Container } from '@/api/interface/container';

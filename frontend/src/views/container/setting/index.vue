@@ -414,7 +414,7 @@ const handleCgroup = async () => {
     confirmDialogRefCgroup.value!.acceptParams(params);
 };
 const onSubmitSaveCgroup = () => {
-    save('Dirver', form.cgroupDriver);
+    save('Driver', form.cgroupDriver);
 };
 
 const save = async (key: string, value: string) => {

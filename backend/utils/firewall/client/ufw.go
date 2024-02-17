@@ -141,7 +141,7 @@ func (f *Ufw) Port(port FireInfo, operation string) error {
 	case "drop":
 		port.Strategy = "deny"
 	default:
-		return fmt.Errorf("unsupport strategy %s", port.Strategy)
+		return fmt.Errorf("unsupported strategy %s", port.Strategy)
 	}
 	if cmd.CheckIllegal(port.Protocol, port.Port) {
 		return buserr.New(constant.ErrCmdIllegal)
@@ -168,7 +168,7 @@ func (f *Ufw) RichRules(rule FireInfo, operation string) error {
 	case "drop":
 		rule.Strategy = "deny"
 	default:
-		return fmt.Errorf("unsupport strategy %s", rule.Strategy)
+		return fmt.Errorf("unsupported strategy %s", rule.Strategy)
 	}
 
 	if cmd.CheckIllegal(operation, rule.Protocol, rule.Address, rule.Port) {

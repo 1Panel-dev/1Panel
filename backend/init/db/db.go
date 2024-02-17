@@ -17,13 +17,13 @@ import (
 func Init() {
 	if _, err := os.Stat(global.CONF.System.DbPath); err != nil {
 		if err := os.MkdirAll(global.CONF.System.DbPath, os.ModePerm); err != nil {
-			panic(fmt.Errorf("init db dir falied, err: %v", err))
+			panic(fmt.Errorf("init db dir failed, err: %v", err))
 		}
 	}
 	fullPath := global.CONF.System.DbPath + "/" + global.CONF.System.DbFile
 	if _, err := os.Stat(fullPath); err != nil {
 		if _, err := os.Create(fullPath); err != nil {
-			panic(fmt.Errorf("init db file falied, err: %v", err))
+			panic(fmt.Errorf("init db file failed, err: %v", err))
 		}
 	}
 

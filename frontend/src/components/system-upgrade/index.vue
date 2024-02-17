@@ -36,9 +36,9 @@
         </template>
         <div class="panel-MdEditor">
             <el-alert :closable="false">
-                <span class="line-heigth">{{ $t('setting.versionHelper') }}</span>
-                <li class="line-heigth">{{ $t('setting.versionHelper1') }}</li>
-                <li class="line-heigth">{{ $t('setting.versionHelper2') }}</li>
+                <span class="line-height">{{ $t('setting.versionHelper') }}</span>
+                <li class="line-height">{{ $t('setting.versionHelper1') }}</li>
+                <li class="line-height">{{ $t('setting.versionHelper2') }}</li>
             </el-alert>
             <div class="default-theme" style="margin-left: 20px">
                 <h2 class="inline-block">{{ $t('app.version') }}</h2>
@@ -161,7 +161,7 @@ onMounted(() => {
     text-decoration: none;
     letter-spacing: 0.5px;
 }
-.line-heigth {
+.line-height {
     line-height: 25px;
 }
 .panel-MdEditor {

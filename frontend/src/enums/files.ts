@@ -7,7 +7,7 @@ export enum CompressType {
     Xz = 'xz',
 }
 
-export enum CompressExtention {
+export enum CompressExtension {
     zip = '.zip',
     gz = '.gz',
     bz2 = '.tar.bz2',

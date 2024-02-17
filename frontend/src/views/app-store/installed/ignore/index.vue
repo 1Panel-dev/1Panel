@@ -17,7 +17,7 @@
                             </div>
                         </el-col>
                         <el-col :span="6">
-                            <el-button type="primary" link @click="cancelIngore(app.detailID)">
+                            <el-button type="primary" link @click="cancelIgnore(app.detailID)">
                                 {{ $t('app.cancelIgnore') }}
                             </el-button>
                         </el-col>
@@ -61,7 +61,7 @@ const getApps = async () => {
     } catch (error) {}
 };
 
-const cancelIngore = async (id: number) => {
+const cancelIgnore = async (id: number) => {
     loading.value = true;
     await IgnoreUpgrade({ detailID: id, operate: 'cancel' })
         .then(() => {

@@ -57,7 +57,7 @@ import { computed, reactive, ref } from 'vue';
 import { File } from '@/api/interface/file';
 import { FormInstance, FormRules } from 'element-plus';
 import { Rules } from '@/global/form-rules';
-import { CompressExtention, CompressType } from '@/enums/files';
+import { CompressExtension, CompressType } from '@/enums/files';
 import { CompressFile } from '@/api/modules/files';
 import FileList from '@/components/file-list/index.vue';
 import DrawerHeader from '@/components/drawer-header/index.vue';
@@ -87,7 +87,7 @@ const operate = ref('compress');
 const em = defineEmits(['close']);
 
 const extension = computed(() => {
-    return CompressExtention[form.value.type];
+    return CompressExtension[form.value.type];
 });
 
 const handleClose = () => {

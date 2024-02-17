@@ -152,7 +152,7 @@ func Dump(dns string, opts ...DumpOption) error {
 			var columns []string
 			columns, err = lineRows.Columns()
 			if err != nil {
-				global.LOG.Errorf("get columes falied, err: %v", err)
+				global.LOG.Errorf("get columes failed, err: %v", err)
 				return err
 			}
 			columnTypes, err := lineRows.ColumnTypes()

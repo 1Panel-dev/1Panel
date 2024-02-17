@@ -261,8 +261,8 @@ func loadArch() (string, error) {
 		if std == "armv7l\n" {
 			return "armv7", nil
 		}
-		return "", fmt.Errorf("unsupport such arch: arm-%s", std)
+		return "", fmt.Errorf("unsupported such arch: arm-%s", std)
 	default:
-		return "", fmt.Errorf("unsupport such arch: %s", runtime.GOARCH)
+		return "", fmt.Errorf("unsupported such arch: %s", runtime.GOARCH)
 	}
 }

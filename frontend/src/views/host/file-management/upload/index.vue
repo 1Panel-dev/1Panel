@@ -46,7 +46,7 @@
         >
             <template #tip>
                 <el-text>{{ uploadHelper }}</el-text>
-                <el-progress v-if="loading" text-inside :stroke-width="20" :percentage="uploadPrecent"></el-progress>
+                <el-progress v-if="loading" text-inside :stroke-width="20" :percentage="uploadPercent"></el-progress>
             </template>
         </el-upload>
 
@@ -103,7 +103,7 @@ interface UploadFileProps {
 
 const uploadRef = ref<UploadInstance>();
 const loading = ref(false);
-let uploadPrecent = ref(0);
+let uploadPercent = ref(0);
 const open = ref(false);
 const path = ref();
 let uploadHelper = ref('');
@@ -124,9 +124,9 @@ const uploadType = ref('file');
 const tmpFiles = ref<UploadFiles>([]);
 const breakFlag = ref(false);
 
-const upload = (commnad: string) => {
-    uploadType.value = commnad;
-    if (commnad == 'dir') {
+const upload = (command: string) => {
+    uploadType.value = command;
+    if (command == 'dir') {
         state.uploadEle.webkitdirectory = true;
     } else {
         state.uploadEle.webkitdirectory = false;
@@ -281,11 +281,11 @@ const submit = async () => {
             } else {
                 formData.append('path', path.value + '/' + getPathWithoutFilename(file.name));
             }
-            uploadPrecent.value = 0;
+            uploadPercent.value = 0;
             await UploadFileData(formData, {
                 onUploadProgress: (progressEvent) => {
                     const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
-                    uploadPrecent.value = progress;
+                    uploadPercent.value = progress;
                 },
                 timeout: 40000,
             });
@@ -317,7 +317,7 @@ const submit = async () => {
                             const progress = Math.round(
                                 ((uploadedChunkCount + progressEvent.loaded / progressEvent.total) * 100) / chunkCount,
                             );
-                            uploadPrecent.value = progress;
+                            uploadPercent.value = progress;
                         },
                         timeout: TimeoutEnum.T_60S,
                     });
@@ -353,7 +353,7 @@ const getPathWithoutFilename = (path: string) => {
 const acceptParams = (props: UploadFileProps) => {
     path.value = props.path;
     open.value = true;
-    uploadPrecent.value = 0;
+    uploadPercent.value = 0;
     uploadHelper.value = '';
 
     nextTick(() => {

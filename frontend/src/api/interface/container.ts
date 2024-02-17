@@ -245,7 +245,7 @@ export namespace Container {
         path: string;
         template: number;
     }
-    export interface ComposeOpration {
+    export interface ComposeOperation {
         name: string;
         operation: string;
         path: string;

@@ -23,7 +23,7 @@ func syncApp() {
 
 func syncInstalledApp() {
 	if err := service.NewIAppInstalledService().SyncAll(true); err != nil {
-		global.LOG.Errorf("sync instaled app error: %s", err.Error())
+		global.LOG.Errorf("sync installed app error: %s", err.Error())
 	}
 }
 

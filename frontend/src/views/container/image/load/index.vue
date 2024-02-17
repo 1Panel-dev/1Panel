@@ -18,10 +18,10 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button :disabeld="loading" @click="loadVisible = false">
+                <el-button :disabled="loading" @click="loadVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button :disabeld="loading" type="primary" @click="onSubmit(formRef)">
+                <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
                     {{ $t('commons.button.import') }}
                 </el-button>
             </span>

@@ -27,8 +27,8 @@ class RequestHttp {
                     ...config.headers,
                 };
                 if (config.url === '/auth/login' || config.url === '/auth/mfalogin') {
-                    let entrace = Base64.encode(globalStore.entrance);
-                    config.headers.EntranceCode = entrace;
+                    let entrance = Base64.encode(globalStore.entrance);
+                    config.headers.EntranceCode = entrance;
                 }
                 return {
                     ...config,

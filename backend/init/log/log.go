@@ -56,8 +56,8 @@ type MineFormatter struct{}
 func (s *MineFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	detailInfo := ""
 	if entry.Caller != nil {
-		funcion := strings.ReplaceAll(entry.Caller.Function, "github.com/1Panel-dev/1Panel/backend/", "")
-		detailInfo = fmt.Sprintf("(%s: %d)", funcion, entry.Caller.Line)
+		function := strings.ReplaceAll(entry.Caller.Function, "github.com/1Panel-dev/1Panel/backend/", "")
+		detailInfo = fmt.Sprintf("(%s: %d)", function, entry.Caller.Line)
 	}
 	if len(entry.Data) == 0 {
 		msg := fmt.Sprintf("[%s] [%s] %s %s \n", time.Now().Format(TimeFormat), strings.ToUpper(entry.Level.String()), entry.Message, detailInfo)

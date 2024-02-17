@@ -7,7 +7,7 @@
         :title="$t('file.downloadProcess')"
     >
         <div v-for="(value, index) in res" :key="index">
-            <span>{{ value['percent'] === 100 ? $t('file.downlodSuccess') : $t('file.downloading') }}</span>
+            <span>{{ value['percent'] === 100 ? $t('file.downloadSuccess') : $t('file.downloading') }}</span>
             <MsgInfo :info="value['name']" width="250" />
             <el-progress v-if="value['total'] == 0" :percentage="100" :indeterminate="true" :duration="1" />
             <el-progress v-else :text-inside="true" :stroke-width="15" :percentage="value['percent']"></el-progress>

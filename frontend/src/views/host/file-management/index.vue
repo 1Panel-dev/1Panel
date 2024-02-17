@@ -541,10 +541,10 @@ const getPaths = (reqPath: string) => {
     }
 };
 
-const handleCreate = (commnad: string) => {
+const handleCreate = (command: string) => {
     fileCreate.path = req.path;
     fileCreate.isDir = false;
-    if (commnad === 'dir') {
+    if (command === 'dir') {
         fileCreate.isDir = true;
     }
     createRef.value.acceptParams(fileCreate);

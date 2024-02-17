@@ -38,7 +38,7 @@
                     ref="logRef"
                     :config="logConfig"
                     :default-button="false"
-                    v-if="logVisiable"
+                    v-if="logVisible"
                     :style="'height: calc(100vh - 370px);min-height: 200px'"
                     v-model:loading="loading"
                 />
@@ -76,7 +76,7 @@ const form = reactive({
     name: '',
 });
 
-const logVisiable = ref(false);
+const logVisible = ref(false);
 const loading = ref(false);
 
 const logRef = ref();
@@ -95,7 +95,7 @@ const dialogData = ref<DialogProps>({
 });
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
-    logVisiable.value = false;
+    logVisible.value = false;
     loading.value = false;
     drawerVisible.value = true;
     form.tags = params.tags;
@@ -114,7 +114,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         const res = await imagePush(form);
-        logVisiable.value = true;
+        logVisible.value = true;
         logConfig.name = res.data;
         loadLogs();
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -122,9 +122,9 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
 };
 
 const loadLogs = () => {
-    logVisiable.value = false;
+    logVisible.value = false;
     nextTick(() => {
-        logVisiable.value = true;
+        logVisible.value = true;
         nextTick(() => {
             logRef.value.changeTail(true);
         });

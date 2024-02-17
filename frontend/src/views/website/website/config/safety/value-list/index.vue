@@ -96,7 +96,7 @@ const enableUpdate = ref<Website.WafUpdate>({
 let add = ref({
     value: '',
     remark: '',
-    enbale: 1,
+    enable: 1,
 });
 let contentArray = ref([]);
 
@@ -132,7 +132,7 @@ const openCreate = () => {
     let newArray = [];
     newArray[0] = add.value.value;
     newArray[1] = add.value.remark;
-    newArray[2] = add.value.enbale;
+    newArray[2] = add.value.enable;
 
     data.value.push(newArray);
     submit(newArray);
@@ -161,7 +161,7 @@ const submit = async (addArray: string[]) => {
             add.value = {
                 value: '',
                 remark: '',
-                enbale: 1,
+                enable: 1,
             };
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             get();
