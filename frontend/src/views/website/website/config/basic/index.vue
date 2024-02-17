@@ -1,7 +1,7 @@
 <template>
     <el-tabs tab-position="left" v-model="tabIndex">
         <el-tab-pane :label="$t('website.domainConfig')">
-            <Doamin :key="id" :id="id" v-if="tabIndex == '0' && id > 0"></Doamin>
+            <Domain :key="id" :id="id" v-if="tabIndex == '0' && id > 0"></Domain>
         </el-tab-pane>
         <el-tab-pane :label="$t('website.sitePath')">
             <SitePath :id="id" v-if="tabIndex == '1'"></SitePath>
@@ -39,7 +39,7 @@
 <script lang="ts" setup name="Basic">
 import { computed, onMounted, ref } from 'vue';
 
-import Doamin from './domain/index.vue';
+import Domain from './domain/index.vue';
 import Default from './default-doc/index.vue';
 import LimitConn from './limit-conn/index.vue';
 import Other from './other/index.vue';

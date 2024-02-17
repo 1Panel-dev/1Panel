@@ -164,7 +164,7 @@ const getContent = () => {
         }
         data.value = res.data;
         if (res.data.content != '') {
-            if (stopSignals.some((singal) => res.data.content.endsWith(singal))) {
+            if (stopSignals.some((signal) => res.data.content.endsWith(signal))) {
                 onCloseLog();
             }
             if (end.value) {

@@ -128,7 +128,7 @@ function checkDriveCode(rule: any, value: any, callback: any) {
 }
 
 const emit = defineEmits(['search']);
-const ondDriveInfo = ref();
+const oneDriveInfo = ref();
 
 interface DialogProps {
     title: string;
@@ -145,7 +145,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     title.value = i18n.global.t('commons.button.' + oneDriveData.value.title);
     drawerVisible.value = true;
     const res = await getOneDriveInfo();
-    ondDriveInfo.value = res.data;
+    oneDriveInfo.value = res.data;
     if (!oneDriveData.value.rowData.id) {
         oneDriveData.value.rowData.varsJson = {
             isCN: false,
@@ -167,9 +167,9 @@ const changeFrom = () => {
     } else {
         oneDriveData.value.rowData.varsJson = {
             isCN: false,
-            client_id: ondDriveInfo.value.client_id,
-            client_secret: ondDriveInfo.value.client_secret,
-            redirect_uri: ondDriveInfo.value.redirect_uri,
+            client_id: oneDriveInfo.value.client_id,
+            client_secret: oneDriveInfo.value.client_secret,
+            redirect_uri: oneDriveInfo.value.redirect_uri,
         };
     }
 };
