@@ -11,7 +11,7 @@
                                     <el-col :span="8">
                                         <div class="search-button">
                                             <el-input
-                                                typpe="number"
+                                                type="number"
                                                 v-model.number="netSearch.processID"
                                                 clearable
                                                 @clear="search()"

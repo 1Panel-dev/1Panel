@@ -104,7 +104,7 @@
                         >
                             <el-select v-model="website.appInstallId">
                                 <el-option
-                                    v-for="(appInstall, index) in appInstalles"
+                                    v-for="(appInstall, index) in appInstalls"
                                     :key="index"
                                     :label="appInstall.name"
                                     :value="appInstall.id"
@@ -410,7 +410,7 @@ const open = ref(false);
 const loading = ref(false);
 const groups = ref<Group.GroupInfo[]>([]);
 
-const appInstalles = ref<App.AppInstalled[]>([]);
+const appInstalls = ref<App.AppInstalled[]>([]);
 const appReq = reactive({
     type: 'website',
     page: 1,
@@ -442,8 +442,8 @@ const changeType = (type: string) => {
     switch (type) {
         case 'deployment':
             website.value.appType = 'installed';
-            if (appInstalles.value && appInstalles.value.length > 0) {
-                website.value.appInstallId = appInstalles.value[0].id;
+            if (appInstalls.value && appInstalls.value.length > 0) {
+                website.value.appInstallId = appInstalls.value[0].id;
             }
             break;
         case 'runtime':
@@ -459,7 +459,7 @@ const changeType = (type: string) => {
 
 const searchAppInstalled = () => {
     GetAppInstalled({ type: 'website', unused: true, all: true, page: 1, pageSize: 100 }).then((res) => {
-        appInstalles.value = res.data;
+        appInstalls.value = res.data;
         if (res.data && res.data.length > 0) {
             website.value.appInstallId = res.data[0].id;
         }

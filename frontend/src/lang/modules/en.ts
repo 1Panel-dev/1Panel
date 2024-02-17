@@ -1084,7 +1084,7 @@ const message = {
         infoDetail: 'File Properties',
         list: 'File List',
         sub: 'Subdirectory',
-        downlodSuccess: 'Download Success',
+        downloadSuccess: 'Download Success',
         theme: 'Theme',
         language: 'Language',
         eol: 'End Of Line',
@@ -1099,7 +1099,7 @@ const message = {
         uploadFailed: '[{0}] File Upload file',
         fileUploadStart: 'Uploading [{0}]....',
         currentSelect: 'Current Select: ',
-        unsupportType: 'Unsupported file type',
+        unsupportedType: 'Unsupported file type',
         deleteHelper:
             'Are you sure you want to delete the following files? By default, it will enter the recycle bin after deletion',
         fileHeper: 'Note: 1. Search results do not support sorting. 2. Folders cannot be sorted by size.',

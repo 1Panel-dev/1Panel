@@ -13,7 +13,7 @@ import { onMounted, ref } from 'vue';
 const props = defineProps({
     status: {
         type: String,
-        default: 'runnning',
+        default: 'running',
     },
 });
 let status = ref('running');

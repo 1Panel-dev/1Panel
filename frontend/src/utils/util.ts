@@ -201,9 +201,9 @@ let icons = new Map([
     ['.pdf', 'p-file-pdf'],
 ]);
 
-export function getIcon(extention: string): string {
-    if (icons.get(extention) != undefined) {
-        const icon = icons.get(extention);
+export function getIcon(extension: string): string {
+    if (icons.get(extension) != undefined) {
+        const icon = icons.get(extension);
         return String(icon);
     } else {
         return 'p-file-normal';

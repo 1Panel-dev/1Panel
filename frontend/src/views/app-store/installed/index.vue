@@ -72,7 +72,7 @@
             <el-button @click="sync" type="primary" plain v-if="mode === 'installed' && data != null">
                 {{ $t('app.sync') }}
             </el-button>
-            <el-button @click="openIngore" type="primary" plain v-if="mode === 'upgrade'">
+            <el-button @click="openIgnore" type="primary" plain v-if="mode === 'upgrade'">
                 {{ $t('app.showIgnore') }}
             </el-button>
         </template>
@@ -458,7 +458,7 @@ const openOperate = (row: any, op: string) => {
     }
 };
 
-const openIngore = () => {
+const openIgnore = () => {
     ignoreRef.value.acceptParams();
 };
 

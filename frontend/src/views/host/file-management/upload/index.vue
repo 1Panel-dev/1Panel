@@ -124,9 +124,9 @@ const uploadType = ref('file');
 const tmpFiles = ref<UploadFiles>([]);
 const breakFlag = ref(false);
 
-const upload = (commnad: string) => {
-    uploadType.value = commnad;
-    if (commnad == 'dir') {
+const upload = (command: string) => {
+    uploadType.value = command;
+    if (command == 'dir') {
         state.uploadEle.webkitdirectory = true;
     } else {
         state.uploadEle.webkitdirectory = false;

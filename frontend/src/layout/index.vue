@@ -1,5 +1,5 @@
 <template>
-    <div :class="classObj" class="app-wrapper" v-loading="loading" :element-loading-text="loadinText" fullscreen>
+    <div :class="classObj" class="app-wrapper" v-loading="loading" :element-loading-text="loadingText" fullscreen>
         <div v-if="classObj.mobile && classObj.openSidebar" class="drawer-bg" @click="handleClickOutside" />
         <div class="app-sidebar" v-if="!globalStore.isFullScreen">
             <Sidebar />
@@ -31,7 +31,7 @@ const globalStore = GlobalStore();
 
 const i18n = useI18n();
 const loading = ref(false);
-const loadinText = ref();
+const loadingText = ref();
 const themeConfig = computed(() => globalStore.themeConfig);
 const { switchDark } = useTheme();
 
@@ -84,7 +84,7 @@ const updateDarkMode = async (event: MediaQueryListEvent) => {
 
 const loadStatus = async () => {
     loading.value = globalStore.isLoading;
-    loadinText.value = globalStore.loadingText;
+    loadingText.value = globalStore.loadingText;
     if (loading.value) {
         timer = setInterval(async () => {
             await getSystemAvailable()

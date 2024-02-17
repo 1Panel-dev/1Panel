@@ -93,7 +93,7 @@
                     :row-style="{ height: '65px' }"
                     style="width: 100%"
                     :columns="columns"
-                    localKey="contanerColumn"
+                    localKey="containerColumn"
                 >
                     <el-table-column type="selection" />
                     <el-table-column

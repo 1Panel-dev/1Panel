@@ -37,7 +37,7 @@
 
 <script setup lang="ts">
 import { FormInstance, FormRules } from 'element-plus';
-import { CompressExtention, CompressType } from '@/enums/files';
+import { CompressExtension, CompressType } from '@/enums/files';
 import { computed, reactive, ref } from 'vue';
 import { DownloadFile } from '@/api/modules/files';
 import { File } from '@/api/interface/file';
@@ -76,7 +76,7 @@ let addForm = ref({
 });
 
 const extension = computed(() => {
-    return CompressExtention[addForm.value.type];
+    return CompressExtension[addForm.value.type];
 });
 
 const submit = async (formEl: FormInstance | undefined) => {
