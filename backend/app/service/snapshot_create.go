@@ -97,11 +97,11 @@ func snapAppData(snap snapHelper, targetDir string) {
 			}
 		}
 	}
-	for _, rumtime := range runtimes {
+	for _, runtime := range runtimes {
 		for _, existImage := range existImages {
-			if rumtime.Image == existImage && !duplicateMap[rumtime.Image] {
-				imageSaveList = append(imageSaveList, rumtime.Image)
-				duplicateMap[rumtime.Image] = true
+			if runtime.Image == existImage && !duplicateMap[runtime.Image] {
+				imageSaveList = append(imageSaveList, runtime.Image)
+				duplicateMap[runtime.Image] = true
 			}
 		}
 	}
