@@ -327,7 +327,7 @@
         <Check ref="preCheckRef"></Check>
         <el-card width="30%" v-if="!versionExist" class="mask-prompt">
             <span>
-                {{ $t('runtime.openrestryWarn') }}
+                {{ $t('runtime.openrestyWarn') }}
             </span>
         </el-card>
     </el-drawer>

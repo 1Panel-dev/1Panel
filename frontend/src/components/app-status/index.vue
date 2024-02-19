@@ -66,7 +66,7 @@
 
                     <span class="warn" v-if="key === 'openresty' && (httpPort != 80 || httpsPort != 443)">
                         <el-alert class="helper" type="error" :closable="false">
-                            {{ $t('website.openrestryHelper', [httpPort, httpsPort]) }}
+                            {{ $t('website.openrestyHelper', [httpPort, httpsPort]) }}
                         </el-alert>
                     </span>
                 </div>
