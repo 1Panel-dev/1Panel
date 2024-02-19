@@ -2,9 +2,9 @@ package i18n
 
 import (
 	"embed"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"strings"
 
-	ginI18n "github.com/gin-contrib/i18n"
 	"github.com/gin-gonic/gin"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/text/language"
@@ -12,13 +12,13 @@ import (
 )
 
 func GetMsgWithMap(key string, maps map[string]interface{}) string {
-	content := ""
+	var content string
 	if maps == nil {
-		content = ginI18n.MustGetMessage(&i18n.LocalizeConfig{
+		content, _ = global.I18n.Localize(&i18n.LocalizeConfig{
 			MessageID: key,
 		})
 	} else {
-		content = ginI18n.MustGetMessage(&i18n.LocalizeConfig{
+		content, _ = global.I18n.Localize(&i18n.LocalizeConfig{
 			MessageID:    key,
 			TemplateData: maps,
 		})
@@ -32,13 +32,13 @@ func GetMsgWithMap(key string, maps map[string]interface{}) string {
 }
 
 func GetErrMsg(key string, maps map[string]interface{}) string {
-	content := ""
+	var content string
 	if maps == nil {
-		content = ginI18n.MustGetMessage(&i18n.LocalizeConfig{
+		content, _ = global.I18n.Localize(&i18n.LocalizeConfig{
 			MessageID: key,
 		})
 	} else {
-		content = ginI18n.MustGetMessage(&i18n.LocalizeConfig{
+		content, _ = global.I18n.Localize(&i18n.LocalizeConfig{
 			MessageID:    key,
 			TemplateData: maps,
 		})
@@ -47,7 +47,7 @@ func GetErrMsg(key string, maps map[string]interface{}) string {
 }
 
 func GetMsgByKey(key string) string {
-	content := ginI18n.MustGetMessage(&i18n.LocalizeConfig{
+	content, _ := global.I18n.Localize(&i18n.LocalizeConfig{
 		MessageID: key,
 	})
 	return content
@@ -55,24 +55,22 @@ func GetMsgByKey(key string) string {
 
 //go:embed lang/*
 var fs embed.FS
+var bundle *i18n.Bundle
 
-func GinI18nLocalize() gin.HandlerFunc {
-	return ginI18n.Localize(
-		ginI18n.WithBundle(&ginI18n.BundleCfg{
-			RootPath:         "./lang",
-			AcceptLanguage:   []language.Tag{language.Chinese, language.English, language.TraditionalChinese},
-			DefaultLanguage:  language.Chinese,
-			FormatBundleFile: "yaml",
-			UnmarshalFunc:    yaml.Unmarshal,
-			Loader:           &ginI18n.EmbedLoader{FS: fs},
-		}),
-		ginI18n.WithGetLngHandle(
-			func(context *gin.Context, defaultLng string) string {
-				lng := context.GetHeader("Accept-Language")
-				if lng == "" {
-					return defaultLng
-				}
-				return lng
-			},
-		))
+func UseI18n() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		lang := context.GetHeader("Accept-Language")
+		if lang == "" {
+			lang = "zh"
+		}
+		global.I18n = i18n.NewLocalizer(bundle, lang)
+	}
+}
+
+func Init() {
+	bundle = i18n.NewBundle(language.Chinese)
+	bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
+	_, _ = bundle.LoadMessageFileFS(fs, "lang/zh.yaml")
+	_, _ = bundle.LoadMessageFileFS(fs, "lang/en.yaml")
+	_, _ = bundle.LoadMessageFileFS(fs, "lang/zh-Hant.yaml")
 }

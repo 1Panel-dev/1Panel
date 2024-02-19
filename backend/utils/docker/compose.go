@@ -4,7 +4,11 @@ import (
 	"context"
 	"github.com/compose-spec/compose-go/v2/loader"
 	"github.com/compose-spec/compose-go/v2/types"
+	"github.com/docker/cli/cli/command"
+	"github.com/docker/cli/cli/flags"
 	"github.com/docker/compose/v2/pkg/api"
+	"github.com/docker/compose/v2/pkg/compose"
+	"github.com/docker/docker/client"
 	"github.com/joho/godotenv"
 	"path"
 	"regexp"
@@ -17,7 +21,7 @@ type ComposeService struct {
 	project *types.Project
 }
 
-func (s *ComposeService) SetProject(project *types.Project) {
+func (s ComposeService) SetProject(project *types.Project) {
 	s.project = project
 	for i, s := range project.Services {
 		s.CustomLabels = map[string]string{
@@ -32,7 +36,7 @@ func (s *ComposeService) SetProject(project *types.Project) {
 	}
 }
 
-func (s *ComposeService) ComposeUp() error {
+func (s ComposeService) ComposeUp() error {
 	return s.Up(context.Background(), s.project, api.UpOptions{
 		Create: api.CreateOptions{
 			Timeout: getComposeTimeout(),
@@ -43,32 +47,63 @@ func (s *ComposeService) ComposeUp() error {
 	})
 }
 
-func (s *ComposeService) ComposeDown() error {
-	return s.Down(context.Background(), s.project.Name, api.DownOptions{})
+func NewComposeService(ops ...command.DockerCliOption) (*ComposeService, error) {
+	apiClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		return nil, err
+	}
+	ops = append(ops, command.WithAPIClient(apiClient), command.WithDefaultContextStoreConfig())
+	cli, err := command.NewDockerCli(ops...)
+	if err != nil {
+		return nil, err
+	}
+	cliOp := flags.NewClientOptions()
+	if err := cli.Initialize(cliOp); err != nil {
+		return nil, err
+	}
+	service := compose.NewComposeService(cli)
+	return &ComposeService{service, nil}, nil
 }
 
-func (s *ComposeService) ComposeStart() error {
-	return s.Start(context.Background(), s.project.Name, api.StartOptions{})
-}
+func UpComposeProject(project *types.Project) error {
+	for i, s := range project.Services {
+		s.CustomLabels = map[string]string{
+			api.ProjectLabel:     project.Name,
+			api.ServiceLabel:     s.Name,
+			api.VersionLabel:     api.ComposeVersion,
+			api.WorkingDirLabel:  project.WorkingDir,
+			api.ConfigFilesLabel: strings.Join(project.ComposeFiles, ","),
+			api.OneoffLabel:      "False",
+		}
+		project.Services[i] = s
+	}
 
-func (s *ComposeService) ComposeRestart() error {
-	return s.Restart(context.Background(), s.project.Name, api.RestartOptions{})
-}
+	apiClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		return err
+	}
+	var ops []command.CLIOption
+	ops = append(ops, command.WithAPIClient(apiClient), command.WithDefaultContextStoreConfig())
+	cli, err := command.NewDockerCli(ops...)
+	if err != nil {
+		return err
+	}
+	cliOp := flags.NewClientOptions()
+	if err = cli.Initialize(cliOp); err != nil {
+		return err
+	}
+	service := compose.NewComposeService(cli)
+	composeService := ComposeService{Service: service}
 
-func (s *ComposeService) ComposeStop() error {
-	return s.Stop(context.Background(), s.project.Name, api.StopOptions{})
-}
-
-func (s *ComposeService) ComposeCreate() error {
-	return s.Create(context.Background(), s.project, api.CreateOptions{})
-}
-
-func (s *ComposeService) ComposeBuild() error {
-	return s.Build(context.Background(), s.project, api.BuildOptions{})
-}
-
-func (s *ComposeService) ComposePull() error {
-	return s.Pull(context.Background(), s.project, api.PullOptions{})
+	return composeService.Up(context.Background(), project, api.UpOptions{
+		Create: api.CreateOptions{
+			Timeout: getComposeTimeout(),
+		},
+		Start: api.StartOptions{
+			WaitTimeout: *getComposeTimeout(),
+			Wait:        true,
+		},
+	})
 }
 
 func GetComposeProject(projectName, workDir string, yml []byte, env []byte, skipNormalization bool) (*types.Project, error) {
