@@ -59,6 +59,7 @@ ErrVersionTooLow: '當前 1Panel 版本過低，無法更新應用商店，請�
 ErrAppNameExist: '應用名稱已存在'
 AppStoreIsSyncing: '應用程式商店正在同步中，請稍後再試'
 ErrGetCompose: "docker-compose.yml 檔案取得失敗！{{ .detail }}"
+ErrAppWarn: "狀態異常，請查看日誌"
 
 #file
 ErrFileCanNotRead: "此文件不支持預覽"

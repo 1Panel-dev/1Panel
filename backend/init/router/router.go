@@ -9,11 +9,9 @@ import (
 	"github.com/1Panel-dev/1Panel/cmd/server/docs"
 	"github.com/1Panel-dev/1Panel/cmd/server/web"
 	"github.com/gin-contrib/gzip"
-	ginI18n "github.com/gin-contrib/i18n"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"html/template"
 	"net/http"
 )
 
@@ -53,10 +51,7 @@ func Routers() *gin.Engine {
 		c.Writer.Flush()
 	})
 
-	Router.Use(i18n.GinI18nLocalize())
-	Router.SetFuncMap(template.FuncMap{
-		"Localize": ginI18n.GetMessage,
-	})
+	Router.Use(i18n.UseI18n())
 
 	swaggerRouter := Router.Group("1panel")
 	docs.SwaggerInfo.BasePath = "/api/v1"

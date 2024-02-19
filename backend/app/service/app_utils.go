@@ -902,6 +902,22 @@ func rebuildApp(appInstall model.AppInstall) error {
 			_ = handleErr(appInstall, err, out)
 			return
 		}
+		envByte, err := files.NewFileOp().GetContent(appInstall.GetEnvPath())
+		if err != nil {
+			_ = handleErr(appInstall, err, out)
+			return
+		}
+
+		project, err := composeV2.GetComposeProject(appInstall.Name, appInstall.GetPath(), []byte(appInstall.DockerCompose), envByte, true)
+		if err != nil {
+			_ = handleErr(appInstall, err, out)
+			return
+		}
+		if err = composeV2.UpComposeProject(project); err != nil {
+			_ = handleErr(appInstall, err, out)
+			return
+		}
+
 		appInstall.Status = constant.Running
 		_ = appInstallRepo.Save(context.Background(), &appInstall)
 	}()
@@ -1040,8 +1056,8 @@ func handleErr(install model.AppInstall, err error, out string) error {
 	if out != "" {
 		install.Message = out
 		reErr = errors.New(out)
-		install.Status = constant.Error
 	}
+	install.Status = constant.Error
 	_ = appInstallRepo.Save(context.Background(), &install)
 	return reErr
 }

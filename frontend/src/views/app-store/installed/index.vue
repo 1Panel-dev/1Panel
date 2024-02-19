@@ -469,6 +469,9 @@ const operate = async () => {
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             search();
+            setTimeout(() => {
+                search();
+            }, 1500);
         })
         .catch(() => {
             search();
@@ -610,7 +613,7 @@ onMounted(() => {
     search();
     timer = setInterval(() => {
         search();
-    }, 10000 * 6);
+    }, 1000 * 60);
 });
 
 onUnmounted(() => {

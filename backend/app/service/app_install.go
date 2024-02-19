@@ -411,7 +411,7 @@ func (a *AppInstallService) SyncAll(systemInit bool) error {
 		return err
 	}
 	for _, i := range allList {
-		if i.Status == constant.Installing || i.Status == constant.Upgrading {
+		if i.Status == constant.Installing || i.Status == constant.Upgrading || i.Status == constant.Rebuilding {
 			if systemInit {
 				i.Status = constant.Error
 				i.Message = "1Panel restart causes the task to terminate"
@@ -689,7 +689,7 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 }
 
 func syncAppInstallStatus(appInstall *model.AppInstall) error {
-	if appInstall.Status == constant.Installing {
+	if appInstall.Status == constant.Installing || appInstall.Status == constant.Rebuilding {
 		return nil
 	}
 	containerNames, err := getContainerNames(*appInstall)
@@ -752,6 +752,9 @@ func syncAppInstallStatus(appInstall *model.AppInstall) error {
 		}
 		if len(notFoundNames) > 0 {
 			msg += buserr.WithName("ErrContainerNotFound", strings.Join(notFoundNames, ",")).Error()
+		}
+		if msg == "" {
+			msg = buserr.New("ErrAppWarn").Error()
 		}
 		appInstall.Message = msg
 		appInstall.Status = constant.UnHealthy
