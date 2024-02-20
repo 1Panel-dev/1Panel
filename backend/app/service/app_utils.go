@@ -687,6 +687,12 @@ func handleMap(params map[string]interface{}, envParams map[string]string) {
 			envParams[k] = strconv.Itoa(int(t))
 		case int:
 			envParams[k] = strconv.Itoa(t)
+		case []interface{}:
+			strArray := make([]string, len(t))
+			for i := range t {
+				strArray[i] = strings.ToLower(fmt.Sprintf("%v", t[i]))
+			}
+			envParams[k] = strings.Join(strArray, ",")
 		default:
 			envParams[k] = t.(string)
 		}
