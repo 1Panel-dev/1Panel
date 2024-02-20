@@ -268,11 +268,13 @@ func (u *BackupService) BatchDeleteRecord(ids []uint) error {
 	for _, record := range records {
 		backupAccount, err := backupRepo.Get(commonRepo.WithByType(record.Source))
 		if err != nil {
-			return err
+			global.LOG.Errorf("load backup account %s info from db failed, err: %v", record.Source, err)
+			continue
 		}
 		client, err := u.NewClient(&backupAccount)
 		if err != nil {
-			return err
+			global.LOG.Errorf("new client for backup account %s failed, err: %v", record.Source, err)
+			continue
 		}
 		if _, err = client.Delete(path.Join(record.FileDir, record.FileName)); err != nil {
 			global.LOG.Errorf("remove file %s from %s failed, err: %v", path.Join(record.FileDir, record.FileName), record.Source, err)
