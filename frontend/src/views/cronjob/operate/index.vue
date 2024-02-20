@@ -248,7 +248,7 @@
                     </el-form-item>
 
                     <div v-if="isBackup()">
-                        <el-form-item :label="$t('cronjob.target')" prop="backupAccountList">
+                        <el-form-item :label="$t('setting.backupAccount')" prop="backupAccountList">
                             <el-select
                                 multiple
                                 class="selectClass"
@@ -366,6 +366,7 @@ const acceptParams = (params: DialogProps): void => {
     if (dialogData.value.title === 'create') {
         changeType();
         dialogData.value.rowData.dbType = 'mysql';
+        dialogData.value.rowData.defaultDownload = 'LOCAL';
     }
     if (dialogData.value.rowData.backupAccounts) {
         dialogData.value.rowData.backupAccountList = dialogData.value.rowData.backupAccounts.split(',');
