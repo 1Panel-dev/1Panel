@@ -71,7 +71,6 @@ onMounted(() => {
 
     .svg-icon {
         font-size: 7px;
-        margin-bottom: 3px;
     }
     span {
         line-height: 20px;

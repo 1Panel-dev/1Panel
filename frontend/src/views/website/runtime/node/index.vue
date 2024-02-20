@@ -4,8 +4,8 @@
         <LayoutContent :title="'Node.js'" v-loading="loading">
             <template #prompt>
                 <el-alert type="info" :closable="false">
-                    <template #default>
-                        <span><span v-html="$t('runtime.statusHelper')"></span></span>
+                    <template #title>
+                        <span v-html="$t('runtime.statusHelper')"></span>
                     </template>
                 </el-alert>
             </template>

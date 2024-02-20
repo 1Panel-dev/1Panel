@@ -5,9 +5,11 @@
                 <el-form label-width="130px" :v-key="refresh">
                     <el-row :gutter="20">
                         <el-col :span="24">
-                            <div>
-                                <svg-icon class="card-logo" iconName="p-file-folder"></svg-icon>
-                                <span class="card-title">&nbsp;{{ $t('setting.LOCAL') }}</span>
+                            <div class="flx-justify-between">
+                                <span class="flx-align-center">
+                                    <svg-icon class="card-logo" iconName="p-file-folder"></svg-icon>
+                                    <span class="card-title">&nbsp;{{ $t('setting.LOCAL') }}</span>
+                                </span>
                                 <div style="float: right">
                                     <el-button round @click="onOpenDialog('edit', 'LOCAL', localData)">
                                         {{ $t('commons.button.edit') }}
@@ -32,17 +34,19 @@
                 </div>
 
                 <el-alert type="info" :closable="false" class="common-div">
-                    <template #default>
-                        <div style="margin-bottom: 3px"><span v-html="$t('setting.backupAlert')"></span></div>
+                    <template #title>
+                        <span v-html="$t('setting.backupAlert')"></span>
                     </template>
                 </el-alert>
 
                 <el-row :gutter="20" class="common-div">
                     <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
-                        <div>
-                            <svg-icon class="card-logo" iconName="p-aws"></svg-icon>
-                            <span class="card-title">&nbsp;{{ $t('setting.S3') }}</span>
-                            <div style="float: right">
+                        <div class="flx-justify-between">
+                            <span class="flx-align-center">
+                                <svg-icon class="card-logo" iconName="p-aws"></svg-icon>
+                                <span class="card-title">&nbsp;{{ $t('setting.S3') }}</span>
+                            </span>
+                            <div>
                                 <el-button
                                     round
                                     :disabled="s3Data.id === 0"
@@ -54,8 +58,8 @@
                                     {{ $t('commons.button.delete') }}
                                 </el-button>
                             </div>
-                            <el-divider class="divider" />
                         </div>
+                        <el-divider class="divider" />
                         <div v-if="s3Data.id !== 0" style="margin-left: 20px">
                             <el-form-item label="Region">
                                 {{ s3Data.varsJson['region'] }}
@@ -95,10 +99,12 @@
                         </el-alert>
                     </el-col>
                     <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
-                        <div>
-                            <svg-icon class="card-logo" iconName="p-oss"></svg-icon>
-                            <span class="card-title">&nbsp;{{ $t('setting.OSS') }}</span>
-                            <div style="float: right">
+                        <div class="flx-justify-between">
+                            <span class="flx-align-center">
+                                <svg-icon class="card-logo" iconName="p-oss"></svg-icon>
+                                <span class="card-title">&nbsp;{{ $t('setting.OSS') }}</span>
+                            </span>
+                            <div>
                                 <el-button
                                     round
                                     :disabled="ossData.id === 0"
@@ -151,10 +157,12 @@
                 </el-row>
                 <el-row :gutter="20" class="common-div">
                     <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
-                        <div>
-                            <svg-icon class="card-logo" iconName="p-tengxunyun1"></svg-icon>
-                            <span class="card-title">&nbsp;{{ $t('setting.COS') }}</span>
-                            <div style="float: right">
+                        <div class="flx-justify-between">
+                            <span class="flx-align-center">
+                                <svg-icon class="card-logo" iconName="p-tengxunyun1"></svg-icon>
+                                <span class="card-title">&nbsp;{{ $t('setting.COS') }}</span>
+                            </span>
+                            <div>
                                 <el-button
                                     round
                                     :disabled="cosData.id === 0"
@@ -166,8 +174,8 @@
                                     {{ $t('commons.button.delete') }}
                                 </el-button>
                             </div>
-                            <el-divider class="divider" />
                         </div>
+                        <el-divider class="divider" />
                         <div v-if="cosData.id !== 0" style="margin-left: 20px">
                             <el-form-item label="Region">
                                 {{ cosData.varsJson['region'] }}
@@ -204,10 +212,12 @@
                         </el-alert>
                     </el-col>
                     <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
-                        <div>
-                            <svg-icon class="card-logo" iconName="p-onedrive"></svg-icon>
-                            <span class="card-title">&nbsp;{{ $t('setting.OneDrive') }}</span>
-                            <div style="float: right">
+                        <div class="flx-justify-between">
+                            <span class="flx-align-center">
+                                <svg-icon class="card-logo" iconName="p-onedrive"></svg-icon>
+                                <span class="card-title">&nbsp;{{ $t('setting.OneDrive') }}</span>
+                            </span>
+                            <div>
                                 <el-button
                                     round
                                     plain
@@ -266,10 +276,12 @@
                 </el-row>
                 <el-row :gutter="20" style="margin-top: 20px">
                     <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
-                        <div>
-                            <svg-icon class="card-logo" iconName="p-qiniuyun"></svg-icon>
-                            <span class="card-title">&nbsp;{{ $t('setting.KODO') }}</span>
-                            <div style="float: right">
+                        <div class="flx-justify-between">
+                            <span class="flx-align-center">
+                                <svg-icon class="card-logo" iconName="p-qiniuyun"></svg-icon>
+                                <span class="card-title">&nbsp;{{ $t('setting.KODO') }}</span>
+                            </span>
+                            <div>
                                 <el-button
                                     round
                                     :disabled="kodoData.id === 0"
@@ -306,10 +318,12 @@
                         </el-alert>
                     </el-col>
                     <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
-                        <div>
-                            <svg-icon class="card-logo" iconName="p-minio"></svg-icon>
-                            <span class="card-title">&nbsp;MINIO</span>
-                            <div style="float: right">
+                        <div class="flx-justify-between">
+                            <span class="flx-align-center">
+                                <svg-icon class="card-logo" iconName="p-minio"></svg-icon>
+                                <span class="card-title">&nbsp;MINIO</span>
+                            </span>
+                            <div>
                                 <el-button
                                     round
                                     :disabled="minioData.id === 0"
@@ -347,10 +361,12 @@
                 </el-row>
                 <el-row :gutter="20" style="margin-top: 20px">
                     <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
-                        <div>
-                            <svg-icon class="card-logo" iconName="p-SFTP"></svg-icon>
-                            <span class="card-title">&nbsp;SFTP</span>
-                            <div style="float: right">
+                        <div class="flx-justify-between">
+                            <span class="flx-align-center">
+                                <svg-icon class="card-logo" iconName="p-SFTP"></svg-icon>
+                                <span class="card-title">&nbsp;SFTP</span>
+                            </span>
+                            <div>
                                 <el-button
                                     round
                                     plain
@@ -386,10 +402,12 @@
                         </el-alert>
                     </el-col>
                     <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
-                        <div>
-                            <svg-icon class="card-logo" iconName="p-webdav"></svg-icon>
-                            <span class="card-title">&nbsp;WebDAV</span>
-                            <div style="float: right">
+                        <div class="flx-justify-between">
+                            <span class="flx-align-center">
+                                <svg-icon class="card-logo" iconName="p-webdav"></svg-icon>
+                                <span class="card-title">&nbsp;WebDAV</span>
+                            </span>
+                            <div>
                                 <el-button
                                     round
                                     plain

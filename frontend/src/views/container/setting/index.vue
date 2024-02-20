@@ -66,7 +66,7 @@
                                     </template>
                                 </el-input>
                                 <span class="input-help">{{ $t('container.mirrorsHelper') }}</span>
-                                <span class="input-help">
+                                <span class="input-help flx-align-center" style="display: flex">
                                     {{ $t('container.mirrorsHelper2') }}
                                     <el-link
                                         style="font-size: 12px; margin-left: 5px"

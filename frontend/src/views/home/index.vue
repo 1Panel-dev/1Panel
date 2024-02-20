@@ -26,8 +26,8 @@
             type="warning"
             @close="hideEntrance"
         >
-            <template #default>
-                <span>
+            <template #title>
+                <span class="flx-align-center">
                     <span>{{ $t('home.entranceHelper') }}</span>
                     <el-link
                         style="font-size: 12px; margin-left: 5px"

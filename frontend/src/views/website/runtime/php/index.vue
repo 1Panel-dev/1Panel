@@ -4,7 +4,7 @@
         <LayoutContent :title="'PHP'" v-loading="loading">
             <template #prompt>
                 <el-alert type="info" :closable="false">
-                    <template #default>
+                    <template #title>
                         <span>{{ $t('runtime.systemRestartHelper') }}</span>
                     </template>
                 </el-alert>

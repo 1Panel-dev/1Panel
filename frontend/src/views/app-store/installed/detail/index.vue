@@ -30,11 +30,7 @@
                                 v-model.number="paramModel.params[p.key]"
                                 :disabled="!p.edit"
                             ></el-input>
-                            <el-select
-                                v-model="paramModel.params[p.key]"
-                                v-else-if="p.type == 'select'"
-                                :multiple="p.multiple"
-                            >
+                            <el-select v-model="paramModel.params[p.key]" v-else-if="p.type == 'select'">
                                 <el-option
                                     v-for="value in p.values"
                                     :key="value.label"
@@ -205,7 +201,6 @@ const get = async () => {
                     type: d.type,
                     values: d.values,
                     showValue: d.showValue,
-                    multiple: d.multiple,
                 });
                 rules.params[d.key] = [Rules.requiredInput];
                 if (d.rule) {

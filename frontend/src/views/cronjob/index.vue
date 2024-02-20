@@ -113,7 +113,7 @@
                             {{ row.lastRecordTime }}
                         </template>
                     </el-table-column>
-                    <el-table-column :min-width="80" :label="$t('setting.backupAccount')" prop="defaultDownload">
+                    <el-table-column :min-width="80" :label="$t('cronjob.target')" prop="defaultDownload">
                         <template #default="{ row }">
                             <div v-for="(item, index) of row.backupAccounts?.split(',')" :key="index">
                                 <div v-if="row.accountExpand || (!row.accountExpand && index < 3)">

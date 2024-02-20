@@ -21,7 +21,7 @@
                     <template #prompt>
                         <el-alert type="info" :closable="false">
                             <template #default>
-                                <span>
+                                <span class="flx-align-center">
                                     <span>{{ $t('firewall.dockerHelper', [fireName]) }}</span>
                                     <el-link
                                         style="font-size: 12px; margin-left: 5px"

@@ -133,7 +133,10 @@
             >
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
-                        <el-form-item :label="$t('setting.backupAccount')" prop="fromAccounts">
+                        <el-form-item
+                            :label="$t('cronjob.target') + ' ( ' + $t('setting.thirdPartySupport') + ' )'"
+                            prop="fromAccounts"
+                        >
                             <el-select multiple @change="changeAccount" v-model="snapInfo.fromAccounts" clearable>
                                 <el-option
                                     v-for="item in backupOptions"

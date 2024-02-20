@@ -12,8 +12,8 @@
         <LayoutContent v-if="!isOnDetail" :title="$t('container.compose')" :class="{ mask: dockerStatus != 'Running' }">
             <template #prompt>
                 <el-alert type="info" :closable="false">
-                    <template #default>
-                        <span>
+                    <template #title>
+                        <span class="flx-align-center">
                             <span>{{ $t('container.composeHelper', [baseDir]) }}</span>
                             <el-button type="primary" link @click="toFolder">
                                 <el-icon>
