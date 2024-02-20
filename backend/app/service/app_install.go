@@ -639,10 +639,11 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 	for _, form := range appForm.FormFields {
 		if v, ok := envs[form.EnvKey]; ok {
 			appParam := response.AppParam{
-				Edit: false,
-				Key:  form.EnvKey,
-				Rule: form.Rule,
-				Type: form.Type,
+				Edit:     false,
+				Key:      form.EnvKey,
+				Rule:     form.Rule,
+				Type:     form.Type,
+				Multiple: form.Multiple,
 			}
 			if form.Edit {
 				appParam.Edit = true
@@ -654,10 +655,20 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 				appInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithServiceName(v.(string)))
 				appParam.ShowValue = appInstall.Name
 			} else if form.Type == "select" {
-				for _, fv := range form.Values {
-					if fv.Value == v {
-						appParam.ShowValue = fv.Label
-						break
+				if form.Multiple {
+					if v == "" {
+						appParam.Value = []string{}
+					} else {
+						if str, ok := v.(string); ok {
+							appParam.Value = strings.Split(str, ",")
+						}
+					}
+				} else {
+					for _, fv := range form.Values {
+						if fv.Value == v {
+							appParam.ShowValue = fv.Label
+							break
+						}
 					}
 				}
 				appParam.Values = form.Values
@@ -665,14 +676,15 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 			params = append(params, appParam)
 		} else {
 			params = append(params, response.AppParam{
-				Edit:    form.Edit,
-				Key:     form.EnvKey,
-				Rule:    form.Rule,
-				Type:    form.Type,
-				LabelZh: form.LabelZh,
-				LabelEn: form.LabelEn,
-				Value:   form.Default,
-				Values:  form.Values,
+				Edit:     form.Edit,
+				Key:      form.EnvKey,
+				Rule:     form.Rule,
+				Type:     form.Type,
+				LabelZh:  form.LabelZh,
+				LabelEn:  form.LabelEn,
+				Value:    form.Default,
+				Values:   form.Values,
+				Multiple: form.Multiple,
 			})
 		}
 	}
