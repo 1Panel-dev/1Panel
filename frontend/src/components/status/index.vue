@@ -1,9 +1,11 @@
 <template>
     <el-tag :type="getType(status)" round effect="light">
-        {{ $t('commons.status.' + status) }}
-        <el-icon v-if="loadingIcon(status)" class="is-loading">
-            <Loading />
-        </el-icon>
+        <span class="flx-align-center">
+            {{ $t('commons.status.' + status) }}
+            <el-icon v-if="loadingIcon(status)" class="is-loading">
+                <Loading />
+            </el-icon>
+        </span>
     </el-tag>
 </template>
 

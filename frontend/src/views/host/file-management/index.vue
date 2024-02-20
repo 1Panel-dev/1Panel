@@ -43,8 +43,8 @@
         <LayoutContent :title="$t('file.file')" v-loading="loading">
             <template #prompt>
                 <el-alert type="info" :closable="false">
-                    <template #default>
-                        <span><span v-html="$t('file.fileHeper')"></span></span>
+                    <template #title>
+                        <span v-html="$t('file.fileHeper')"></span>
                     </template>
                 </el-alert>
             </template>
