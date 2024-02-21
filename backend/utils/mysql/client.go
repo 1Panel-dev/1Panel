@@ -9,6 +9,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/mysql/client"
 )
 
@@ -50,6 +51,7 @@ func NewMysqlClient(conn client.DBInfo) (MysqlClient, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(conn.Timeout)*time.Second)
 	defer cancel()
 	if err := db.PingContext(ctx); err != nil {
+		global.LOG.Errorf("test mysql conn failed, err: %v", err)
 		return nil, err
 	}
 	if ctx.Err() == context.DeadlineExceeded {
