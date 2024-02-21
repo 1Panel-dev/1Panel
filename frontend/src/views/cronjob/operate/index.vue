@@ -230,6 +230,9 @@
                                     <el-tag class="tagClass">
                                         {{ item.from === 'local' ? $t('database.local') : $t('database.remote') }}
                                     </el-tag>
+                                    <el-tag class="tagClass">
+                                        {{ item.database }}
+                                    </el-tag>
                                 </el-option>
                             </el-select>
                         </el-form-item>
