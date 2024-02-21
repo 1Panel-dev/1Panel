@@ -135,7 +135,6 @@ func ConnWithSSL(ssl, skipVerify bool, clientKey, clientCert, rootCert string) (
 			return "", errors.New("unable to append root cert to pool")
 		}
 		tlsConfig.RootCAs = pool
-		tlsConfig.VerifyPeerCertificate = VerifyPeerCertFunc(pool)
 	}
 	if len(clientCert) != 0 && len(clientKey) != 0 {
 		cert, err := tls.X509KeyPair([]byte(clientCert), []byte(clientKey))
