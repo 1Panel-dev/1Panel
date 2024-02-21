@@ -176,10 +176,6 @@ const rules = reactive({
     port: [Rules.port],
     username: [Rules.requiredInput],
     password: [Rules.requiredInput],
-
-    clientKey: [Rules.requiredInput],
-    clientCert: [Rules.requiredInput],
-    rootCert: [Rules.requiredInput],
 });
 
 type FormInstance = InstanceType<typeof ElForm>;

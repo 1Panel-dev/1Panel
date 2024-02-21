@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"errors"
 
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/go-sql-driver/mysql"
 )
 
@@ -124,22 +125,27 @@ func ConnWithSSL(ssl, skipVerify bool, clientKey, clientCert, rootCert string) (
 	if !ssl {
 		return "", nil
 	}
-	pool := x509.NewCertPool()
+	tlsConfig := &tls.Config{
+		InsecureSkipVerify: skipVerify,
+	}
 	if len(rootCert) != 0 {
+		pool := x509.NewCertPool()
 		if ok := pool.AppendCertsFromPEM([]byte(rootCert)); !ok {
+			global.LOG.Error("append certs from pem failed")
 			return "", errors.New("unable to append root cert to pool")
 		}
+		tlsConfig.RootCAs = pool
+		tlsConfig.VerifyPeerCertificate = VerifyPeerCertFunc(pool)
 	}
-	cert, err := tls.X509KeyPair([]byte(clientCert), []byte(clientKey))
-	if err != nil {
-		return "", err
+	if len(clientCert) != 0 && len(clientKey) != 0 {
+		cert, err := tls.X509KeyPair([]byte(clientCert), []byte(clientKey))
+		if err != nil {
+			return "", err
+		}
+		tlsConfig.Certificates = []tls.Certificate{cert}
 	}
-	if err := mysql.RegisterTLSConfig("cloudsql", &tls.Config{
-		RootCAs:               pool,
-		Certificates:          []tls.Certificate{cert},
-		InsecureSkipVerify:    skipVerify,
-		VerifyPeerCertificate: VerifyPeerCertFunc(pool),
-	}); err != nil {
+	if err := mysql.RegisterTLSConfig("cloudsql", tlsConfig); err != nil {
+		global.LOG.Errorf("register tls config failed, err: %v", err)
 		return "", err
 	}
 	return "&tls=cloudsql", nil
