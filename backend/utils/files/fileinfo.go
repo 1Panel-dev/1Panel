@@ -299,11 +299,14 @@ func (f *FileInfo) listChildren(option FileOption) error {
 				isInvalidLink = true
 			}
 		}
-
+		size, err := CalFileSize(f.Fs, fPath)
+		if err != nil {
+			return err
+		}
 		file := &FileInfo{
 			Fs:        f.Fs,
 			Name:      name,
-			Size:      df.Size(),
+			Size:      size,
 			ModTime:   df.ModTime(),
 			FileMode:  df.Mode(),
 			IsDir:     df.IsDir(),
