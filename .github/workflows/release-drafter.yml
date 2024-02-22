@@ -15,7 +15,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: '18.14'
+          node-version: '20.2'
       - name: Build Web
         run: |
           cd frontend && npm install && npm run build:pro
@@ -24,7 +24,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v4
         with:
-          go-version: '1.20.x'
+          go-version: '1.21.x'
       - name: Build Release
         uses: goreleaser/goreleaser-action@v4
         with:
