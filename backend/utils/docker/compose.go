@@ -2,6 +2,11 @@ package docker
 
 import (
 	"context"
+	"path"
+	"regexp"
+	"strings"
+	"time"
+
 	"github.com/compose-spec/compose-go/v2/loader"
 	"github.com/compose-spec/compose-go/v2/types"
 	"github.com/docker/cli/cli/command"
@@ -10,59 +15,11 @@ import (
 	"github.com/docker/compose/v2/pkg/compose"
 	"github.com/docker/docker/client"
 	"github.com/joho/godotenv"
-	"path"
-	"regexp"
-	"strings"
-	"time"
 )
 
 type ComposeService struct {
 	api.Service
 	project *types.Project
-}
-
-func (s ComposeService) SetProject(project *types.Project) {
-	s.project = project
-	for i, s := range project.Services {
-		s.CustomLabels = map[string]string{
-			api.ProjectLabel:     project.Name,
-			api.ServiceLabel:     s.Name,
-			api.VersionLabel:     api.ComposeVersion,
-			api.WorkingDirLabel:  project.WorkingDir,
-			api.ConfigFilesLabel: strings.Join(project.ComposeFiles, ","),
-			api.OneoffLabel:      "False",
-		}
-		project.Services[i] = s
-	}
-}
-
-func (s ComposeService) ComposeUp() error {
-	return s.Up(context.Background(), s.project, api.UpOptions{
-		Create: api.CreateOptions{
-			Timeout: getComposeTimeout(),
-		},
-		Start: api.StartOptions{
-			WaitTimeout: *getComposeTimeout(),
-		},
-	})
-}
-
-func NewComposeService(ops ...command.DockerCliOption) (*ComposeService, error) {
-	apiClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-	if err != nil {
-		return nil, err
-	}
-	ops = append(ops, command.WithAPIClient(apiClient), command.WithDefaultContextStoreConfig())
-	cli, err := command.NewDockerCli(ops...)
-	if err != nil {
-		return nil, err
-	}
-	cliOp := flags.NewClientOptions()
-	if err := cli.Initialize(cliOp); err != nil {
-		return nil, err
-	}
-	service := compose.NewComposeService(cli)
-	return &ComposeService{service, nil}, nil
 }
 
 func UpComposeProject(project *types.Project) error {

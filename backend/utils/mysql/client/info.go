@@ -102,25 +102,6 @@ var formatMap = map[string]string{
 	"big5":    "big5_chinese_ci",
 }
 
-func VerifyPeerCertFunc(pool *x509.CertPool) func([][]byte, [][]*x509.Certificate) error {
-	return func(rawCerts [][]byte, _ [][]*x509.Certificate) error {
-		if len(rawCerts) == 0 {
-			return errors.New("no certificates available to verify")
-		}
-
-		cert, err := x509.ParseCertificate(rawCerts[0])
-		if err != nil {
-			return err
-		}
-
-		opts := x509.VerifyOptions{Roots: pool}
-		if _, err = cert.Verify(opts); err != nil {
-			return err
-		}
-		return nil
-	}
-}
-
 func ConnWithSSL(ssl, skipVerify bool, clientKey, clientCert, rootCert string) (string, error) {
 	if !ssl {
 		return "", nil

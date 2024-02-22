@@ -3,7 +3,6 @@ package common
 import (
 	"crypto/rand"
 	"fmt"
-	"golang.org/x/net/idna"
 	"io"
 	mathRand "math/rand"
 	"net"
@@ -14,6 +13,8 @@ import (
 	"strings"
 	"time"
 	"unicode"
+
+	"golang.org/x/net/idna"
 
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 )
@@ -141,15 +142,6 @@ func ScanPortWithProto(port int, proto string) bool {
 		return ScanUDPPort(port)
 	}
 	return ScanPort(port)
-}
-
-func ExistWithStrArray(str string, arr []string) bool {
-	for _, a := range arr {
-		if strings.Contains(a, str) {
-			return true
-		}
-	}
-	return false
 }
 
 func IsNum(s string) bool {

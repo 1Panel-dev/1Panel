@@ -38,18 +38,6 @@ func WithData() DumpOption {
 	}
 }
 
-func WithTables(tables ...string) DumpOption {
-	return func(option *dumpOption) {
-		option.tables = tables
-	}
-}
-
-func WithAllTable() DumpOption {
-	return func(option *dumpOption) {
-		option.isAllTable = true
-	}
-}
-
 func WithWriter(writer io.Writer) DumpOption {
 	return func(option *dumpOption) {
 		option.writer = writer

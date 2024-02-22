@@ -165,24 +165,6 @@ func (b *BaseApi) SearchPostgresql(c *gin.Context) {
 }
 
 // @Tags Database Postgresql
-// @Summary List postgresql database names
-// @Description 获取 postgresql 数据库列表
-// @Accept json
-// @Param request body dto.PageInfo true "request"
-// @Success 200 {array} dto.PostgresqlOption
-// @Security ApiKeyAuth
-// @Router /databases/pg/options [get]
-func (b *BaseApi) ListPostgresqlDBName(c *gin.Context) {
-	list, err := postgresqlService.ListDBOption()
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-
-	helper.SuccessWithData(c, list)
-}
-
-// @Tags Database Postgresql
 // @Summary Load postgresql database from remote
 // @Description 从服务器获取
 // @Accept json
