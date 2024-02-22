@@ -7,11 +7,6 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
-	http2 "github.com/1Panel-dev/1Panel/backend/utils/http"
-	cZip "github.com/klauspost/compress/zip"
-	"golang.org/x/text/encoding/simplifiedchinese"
-	"golang.org/x/text/transform"
 	"io"
 	"io/fs"
 	"net/http"
@@ -22,6 +17,12 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	http2 "github.com/1Panel-dev/1Panel/backend/utils/http"
+	cZip "github.com/klauspost/compress/zip"
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
 
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/mholt/archiver/v4"
@@ -85,10 +86,6 @@ func (f FileOp) DeleteFile(dst string) error {
 	return f.Fs.Remove(dst)
 }
 
-func (f FileOp) Delete(dst string) error {
-	return os.RemoveAll(dst)
-}
-
 func (f FileOp) CleanDir(dst string) error {
 	return cmd.ExecCmd(fmt.Sprintf("rm -rf %s/*", dst))
 }
@@ -127,14 +124,6 @@ func (f FileOp) SaveFile(dst string, content string, mode fs.FileMode) error {
 	_, _ = write.WriteString(content)
 	write.Flush()
 	return nil
-}
-
-func (f FileOp) Chmod(dst string, mode fs.FileMode) error {
-	return f.Fs.Chmod(dst, mode)
-}
-
-func (f FileOp) Chown(dst string, uid int, gid int) error {
-	return f.Fs.Chown(dst, uid, gid)
 }
 
 func (f FileOp) ChownR(dst string, uid string, gid string, sub bool) error {
@@ -561,40 +550,6 @@ func (f FileOp) Decompress(srcFile string, dst string, cType CompressType) error
 		return err
 	}
 	return nil
-}
-
-func (f FileOp) Backup(srcFile string) (string, error) {
-	backupPath := srcFile + "_bak"
-	info, _ := f.Fs.Stat(backupPath)
-	if info != nil {
-		if info.IsDir() {
-			_ = f.DeleteDir(backupPath)
-		} else {
-			_ = f.DeleteFile(backupPath)
-		}
-	}
-	if err := f.Rename(srcFile, backupPath); err != nil {
-		return backupPath, err
-	}
-
-	return backupPath, nil
-}
-
-func (f FileOp) CopyAndBackup(src string) (string, error) {
-	backupPath := src + "_bak"
-	info, _ := f.Fs.Stat(backupPath)
-	if info != nil {
-		if info.IsDir() {
-			_ = f.DeleteDir(backupPath)
-		} else {
-			_ = f.DeleteFile(backupPath)
-		}
-	}
-	_ = f.CreateDir(backupPath, 0755)
-	if err := f.Copy(src, backupPath); err != nil {
-		return backupPath, err
-	}
-	return backupPath, nil
 }
 
 func ZipFile(files []archiver.File, dst afero.File) error {

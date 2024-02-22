@@ -19,21 +19,9 @@ type sourceOption struct {
 }
 type SourceOption func(*sourceOption)
 
-func WithDryRun() SourceOption {
-	return func(o *sourceOption) {
-		o.dryRun = true
-	}
-}
-
 func WithMergeInsert(size int) SourceOption {
 	return func(o *sourceOption) {
 		o.mergeInsert = size
-	}
-}
-
-func WithDebug() SourceOption {
-	return func(o *sourceOption) {
-		o.debug = true
 	}
 }
 

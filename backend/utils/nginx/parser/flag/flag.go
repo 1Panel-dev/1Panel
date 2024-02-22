@@ -1,9 +1,5 @@
 package flag
 
-import (
-	"fmt"
-)
-
 type Type int
 
 const (
@@ -47,32 +43,12 @@ type Flag struct {
 	Column  int
 }
 
-func (t Flag) String() string {
-	return fmt.Sprintf("{Type:%s,Literal:\"%s\",Line:%d,Column:%d}", t.Type, t.Literal, t.Line, t.Column)
-}
-
 func (t Flag) Lit(literal string) Flag {
 	t.Literal = literal
 	return t
 }
 
-func (t Flag) EqualTo(t2 Flag) bool {
-	return t.Type == t2.Type && t.Literal == t2.Literal
-}
-
 type Flags []Flag
-
-func (fs Flags) EqualTo(flags Flags) bool {
-	if len(fs) != len(flags) {
-		return false
-	}
-	for i, t := range fs {
-		if !t.EqualTo(flags[i]) {
-			return false
-		}
-	}
-	return true
-}
 
 func (t Flag) Is(typ Type) bool {
 	return t.Type == typ

@@ -2119,19 +2119,6 @@ definitions:
     - from
     - type
     type: object
-  dto.PostgresqlOption:
-    properties:
-      database:
-        type: string
-      from:
-        type: string
-      id:
-        type: integer
-      name:
-        type: string
-      type:
-        type: string
-    type: object
   dto.RecordSearch:
     properties:
       detailName:
@@ -8140,30 +8127,6 @@ paths:
           [description]
         formatZH: postgresql 数据库 [name] 描述信息修改 [description]
         paramKeys: []
-  /databases/pg/options:
-    get:
-      consumes:
-      - application/json
-      description: 获取 postgresql 数据库列表
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.PageInfo'
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/dto.PostgresqlOption'
-            type: array
-      security:
-      - ApiKeyAuth: []
-      summary: List postgresql database names
-      tags:
-      - Database Postgresql
   /databases/pg/password:
     post:
       consumes:

@@ -3,6 +3,8 @@ package ssl
 import (
 	"crypto"
 	"encoding/json"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/go-acme/lego/v4/acme"
 	"github.com/go-acme/lego/v4/acme/api"
@@ -21,7 +23,6 @@ import (
 	"github.com/go-acme/lego/v4/providers/http/webroot"
 	"github.com/go-acme/lego/v4/registration"
 	"github.com/pkg/errors"
-	"time"
 )
 
 type AcmeUser struct {
@@ -197,23 +198,6 @@ func (c *AcmeClient) ObtainSSL(domains []string, privateKey crypto.PrivateKey) (
 	}
 
 	certificates, err := c.Client.Certificate.Obtain(request)
-	if err != nil {
-		return certificate.Resource{}, err
-	}
-
-	return *certificates, nil
-}
-
-func (c *AcmeClient) RenewSSL(certUrl string) (certificate.Resource, error) {
-	certificates, err := c.Client.Certificate.Get(certUrl, true)
-	if err != nil {
-		return certificate.Resource{}, err
-	}
-	certificates, err = c.Client.Certificate.RenewWithOptions(*certificates, &certificate.RenewOptions{
-		Bundle:         true,
-		PreferredChain: "",
-		MustStaple:     true,
-	})
 	if err != nil {
 		return certificate.Resource{}, err
 	}

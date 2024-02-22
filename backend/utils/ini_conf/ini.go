@@ -17,20 +17,3 @@ func GetIniValue(filePath, Group, Key string) (string, error) {
 	}
 	return startKey.Value(), nil
 }
-
-func SetIniValue(filePath, Group, Key, value string) error {
-	cfg, err := ini.Load(filePath)
-	if err != nil {
-		return err
-	}
-	service, err := cfg.GetSection(Group)
-	if err != nil {
-		return err
-	}
-	targetKey := service.Key(Key)
-	if err != nil {
-		return err
-	}
-	targetKey.SetValue(value)
-	return cfg.SaveTo(filePath)
-}

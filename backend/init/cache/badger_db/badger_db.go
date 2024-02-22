@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/dgraph-io/badger/v4"
-	"github.com/pkg/errors"
 )
 
 type Cache struct {
@@ -16,18 +15,6 @@ func NewCacheDB(db *badger.DB) *Cache {
 	return &Cache{
 		db: db,
 	}
-}
-
-func (c *Cache) SetNX(key string, value interface{}) error {
-	err := c.db.Update(func(txn *badger.Txn) error {
-		_, err := txn.Get([]byte(key))
-		if errors.Is(err, badger.ErrKeyNotFound) {
-			v := []byte(fmt.Sprintf("%v", value))
-			return txn.Set([]byte(key), v)
-		}
-		return err
-	})
-	return err
 }
 
 func (c *Cache) Set(key string, value interface{}) error {

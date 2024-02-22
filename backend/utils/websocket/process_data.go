@@ -3,15 +3,16 @@ package websocket
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
+	"strings"
+	"sync"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/shirou/gopsutil/v3/host"
 	"github.com/shirou/gopsutil/v3/net"
 	"github.com/shirou/gopsutil/v3/process"
-	"sort"
-	"strings"
-	"sync"
-	"time"
 )
 
 type WsInput struct {
@@ -85,18 +86,6 @@ type processConnect struct {
 }
 
 type ProcessConnects []processConnect
-
-func (p ProcessConnects) Len() int {
-	return len(p)
-}
-
-func (p ProcessConnects) Less(i, j int) bool {
-	return p[i].PID < p[j].PID
-}
-
-func (p ProcessConnects) Swap(i, j int) {
-	p[i], p[j] = p[j], p[i]
-}
 
 type sshSession struct {
 	Username  string `json:"username"`

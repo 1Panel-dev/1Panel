@@ -4947,45 +4947,6 @@
                 }
             }
         },
-        "/databases/pg/options": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "获取 postgresql 数据库列表",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Database Postgresql"
-                ],
-                "summary": "List postgresql database names",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.PageInfo"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/dto.PostgresqlOption"
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/databases/pg/password": {
             "post": {
                 "security": [
@@ -17193,26 +17154,6 @@
                     "enum": [
                         "postgresql"
                     ]
-                }
-            }
-        },
-        "dto.PostgresqlOption": {
-            "type": "object",
-            "properties": {
-                "database": {
-                    "type": "string"
-                },
-                "from": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
                 }
             }
         },
