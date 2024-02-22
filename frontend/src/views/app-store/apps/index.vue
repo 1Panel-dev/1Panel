@@ -361,15 +361,13 @@ onMounted(() => {
 
         .app-desc {
             margin-top: 8px;
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-
-            text-overflow: ellipsis;
             height: 43px;
-
             .desc {
+                overflow: hidden;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                text-overflow: ellipsis;
                 font-size: 14px;
                 color: var(--el-text-color-regular);
             }
