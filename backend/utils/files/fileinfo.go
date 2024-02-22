@@ -72,6 +72,10 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 		return nil, err
 	}
 
+	size, err := CalFileSize(appFs, op.Path)
+	if err != nil {
+		return nil, err
+	}
 	file := &FileInfo{
 		Fs:        appFs,
 		Path:      op.Path,
@@ -79,7 +83,7 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 		IsDir:     info.IsDir(),
 		FileMode:  info.Mode(),
 		ModTime:   info.ModTime(),
-		Size:      info.Size(),
+		Size:      size,
 		IsSymlink: IsSymlink(info.Mode()),
 		Extension: filepath.Ext(info.Name()),
 		IsHidden:  IsHidden(op.Path),
@@ -148,6 +152,45 @@ func (f *FileInfo) search(search string, count int) (files []FileSearchInfo, tot
 		return
 	}
 	return
+}
+
+func CalFileSize(appFs afero.Fs, path string) (int64, error) {
+	var size int64 = 0
+	afs := &afero.Afero{Fs: appFs}
+	info, err := appFs.Stat(path)
+	if err != nil {
+		return 0, err
+	}
+	size += info.Size()
+	if !info.IsDir() {
+		return size, nil
+	}
+	if dirSize, err := calDirSize(afs, path); err != nil {
+		return 0, err
+	} else {
+		size += dirSize
+	}
+	return size, nil
+}
+
+func calDirSize(afs *afero.Afero, path string) (int64, error) {
+	var size int64 = 0
+	dirFiles, err := afs.ReadDir(path)
+	if err != nil {
+		return 0, err
+	}
+	for _, file := range dirFiles {
+		size += file.Size()
+		if !file.IsDir() {
+			continue
+		}
+		if dirSize, err := calDirSize(afs, path+"/"+file.Name()); err != nil {
+			return 0, err
+		} else {
+			size += dirSize
+		}
+	}
+	return size, nil
 }
 
 func sortFileList(list []FileSearchInfo, sortBy, sortOrder string) {
