@@ -76,6 +76,7 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	file := &FileInfo{
 		Fs:        appFs,
 		Path:      op.Path,
