@@ -64,7 +64,7 @@ type FileDeCompress struct {
 
 type FileEdit struct {
 	Path    string `json:"path"  validate:"required"`
-	Content string `json:"content"  validate:"required"`
+	Content string `json:"content"`
 }
 
 type FileRename struct {
