@@ -903,24 +903,8 @@ func rebuildApp(appInstall model.AppInstall) error {
 			_ = handleErr(appInstall, err, out)
 			return
 		}
-		fileOp := files.NewFileOp()
-		envByte, err := fileOp.GetContent(appInstall.GetEnvPath())
+		out, err = compose.Up(appInstall.GetComposePath())
 		if err != nil {
-			_ = handleErr(appInstall, err, out)
-			return
-		}
-		composeByte, err := fileOp.GetContent(dockerComposePath)
-		if err != nil {
-			_ = handleErr(appInstall, err, out)
-			return
-		}
-
-		project, err := composeV2.GetComposeProject(appInstall.Name, appInstall.GetPath(), composeByte, envByte, true)
-		if err != nil {
-			_ = handleErr(appInstall, err, out)
-			return
-		}
-		if err = composeV2.UpComposeProject(project); err != nil {
 			_ = handleErr(appInstall, err, out)
 			return
 		}
