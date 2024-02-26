@@ -1166,7 +1166,6 @@ const message = {
         createBackupAccount: '添加 {0}',
         noTypeForCreate: '當前無可創建備份類型',
         LOCAL: '服務器磁盤',
-        currentPath: '當前路徑',
         OSS: '阿裏雲 OSS',
         S3: '亞馬遜 S3 雲存儲',
         MINIO: 'MINIO',
