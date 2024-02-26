@@ -11,7 +11,7 @@
                             <el-tag>{{ $t('setting.' + dialogData.rowData!.type) }}</el-tag>
                         </el-form-item>
                         <el-form-item
-                            :label="$t('setting.currentPath')"
+                            :label="$t('setting.backupDir')"
                             prop="varsJson['dir']"
                             :rules="Rules.requiredInput"
                         >

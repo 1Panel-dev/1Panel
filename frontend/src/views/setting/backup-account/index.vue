@@ -18,7 +18,7 @@
                             </div>
                             <el-divider class="divider" />
                             <div style="margin-left: 20px">
-                                <el-form-item :label="$t('setting.currentPath')">
+                                <el-form-item :label="$t('setting.backupDir')">
                                     {{ localData.varsJson['dir'] }}
                                 </el-form-item>
                                 <el-form-item :label="$t('commons.table.createdAt')">

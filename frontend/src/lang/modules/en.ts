@@ -1243,7 +1243,6 @@ const message = {
         createBackupAccount: 'Add {0}',
         noTypeForCreate: 'No backup type is currently created',
         LOCAL: 'Server disks',
-        currentPath: 'Current path',
         OSS: 'Ali OSS',
         S3: 'Amazon S3',
         MINIO: 'MINIO',
