@@ -354,8 +354,8 @@ func deleteAppInstall(install model.AppInstall, deleteBackup bool, forceDelete b
 					websiteApp, _ := appRepo.GetFirst(commonRepo.WithByID(websiteAppInstall.AppId))
 					if websiteApp.Type == constant.RuntimePHP {
 						go func() {
-							_, _ = compose.Down(install.GetComposePath())
-							_ = op.DeleteDir(install.GetPath())
+							_, _ = compose.Down(websiteAppInstall.GetComposePath())
+							_ = op.DeleteDir(websiteAppInstall.GetPath())
 						}()
 						_ = appInstallRepo.Delete(ctx, websiteAppInstall)
 					}
