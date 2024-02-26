@@ -234,7 +234,6 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 				}
 				isReTry = false
 			}
-			_ = u.saveJson(snapJson, rootDir)
 
 			_, _ = cmd.Exec("systemctl stop docker")
 			if !isReTry || snap.InterruptStep == "DockerDir" {
@@ -253,6 +252,7 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 				isReTry = false
 			}
 		}
+		_ = u.saveJson(snapJson, u.OriginalPath)
 
 		if !isReTry || snap.InterruptStep == "DaemonJson" {
 			if err := u.handleDaemonJson(fileOp, operation, rootDir+"/docker/daemon.json", u.OriginalPath); err != nil {
@@ -625,20 +625,41 @@ func (u *SnapshotService) handleDockerDatas(fileOp files.FileOp, operation strin
 
 func (u *SnapshotService) handleDockerDatasWithSave(fileOp files.FileOp, operation, source, target string) error {
 	switch operation {
+	case "snapshot":
+		var wg sync.WaitGroup
+		wg.Add(1)
+		var status model.SnapshotStatus
+		go snapAppData(snapHelper{Wg: &wg, Status: &status}, u.OriginalPath)
+		wg.Wait()
+		if status.AppData != constant.StatusDone {
+			return errors.New(status.AppData)
+		}
 	case "recover":
 		if err := u.handleDockerDatasWithSave(fileOp, "snapshot", "", u.OriginalPath); err != nil {
 			return fmt.Errorf("backup docker data failed, err: %v", err)
+		}
+		if _, err := os.Stat(path.Join(source, "docker/docker_image.tar")); err != nil {
+			global.LOG.Debug("no such docker images in snapshot")
+			return nil
 		}
 		std, err := cmd.Execf("docker load < %s", path.Join(source, "docker/docker_image.tar"))
 		if err != nil {
 			return errors.New(std)
 		}
 	case "re-recover":
+		if _, err := os.Stat(path.Join(source, "docker/docker_image.tar")); err != nil {
+			global.LOG.Debug("no such docker images in snapshot")
+			return nil
+		}
 		std, err := cmd.Execf("docker load < %s", path.Join(source, "docker/docker_image.tar"))
 		if err != nil {
 			return errors.New(std)
 		}
 	case "rollback":
+		if _, err := os.Stat(path.Join(source, "docker/docker_image.tar")); err != nil {
+			global.LOG.Debug("no such docker images in snapshot")
+			return nil
+		}
 		std, err := cmd.Execf("docker load < %s", path.Join(source, "docker_image.tar"))
 		if err != nil {
 			return errors.New(std)

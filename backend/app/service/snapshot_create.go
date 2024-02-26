@@ -106,12 +106,14 @@ func snapAppData(snap snapHelper, targetDir string) {
 		}
 	}
 
-	global.LOG.Debugf("docker save %s | gzip -c > %s", strings.Join(imageSaveList, " "), path.Join(targetDir, "docker_image.tar"))
-	std, err := cmd.Execf("docker save %s | gzip -c > %s", strings.Join(imageSaveList, " "), path.Join(targetDir, "docker_image.tar"))
-	if err != nil {
-		snap.Status.AppData = err.Error()
-		_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"app_data": std})
-		return
+	if len(imageSaveList) != 0 {
+		global.LOG.Debugf("docker save %s | gzip -c > %s", strings.Join(imageSaveList, " "), path.Join(targetDir, "docker_image.tar"))
+		std, err := cmd.Execf("docker save %s | gzip -c > %s", strings.Join(imageSaveList, " "), path.Join(targetDir, "docker_image.tar"))
+		if err != nil {
+			snap.Status.AppData = err.Error()
+			_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"app_data": std})
+			return
+		}
 	}
 	snap.Status.AppData = constant.StatusDone
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"app_data": constant.StatusDone})
