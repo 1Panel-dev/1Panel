@@ -301,7 +301,7 @@ const submit = async () => {
                 const chunk = file.raw.slice(start, end);
                 const formData = new FormData();
 
-                formData.append('filename', file.name);
+                formData.append('filename', getFilenameFromPath(file.name));
                 if (file.raw.webkitRelativePath != '') {
                     formData.append('path', path.value + '/' + getPathWithoutFilename(file.raw.webkitRelativePath));
                 } else {
@@ -348,6 +348,10 @@ const submit = async () => {
 
 const getPathWithoutFilename = (path: string) => {
     return path ? path.split('/').slice(0, -1).join('/') : path;
+};
+
+const getFilenameFromPath = (path) => {
+    return path ? path.split('/').pop() : path;
 };
 
 const acceptParams = (props: UploadFileProps) => {
