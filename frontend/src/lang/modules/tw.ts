@@ -2003,6 +2003,22 @@ const message = {
             statusCode: '狀態碼',
             manage: '管理',
         },
+        xpack: {
+            name: 'X-Pack',
+            waf: {
+                name: 'WAF',
+                blackWhite: '黑白名單',
+                globalSetting: '全域設定',
+                websiteSetting: '網站設定',
+                blockRecords: '封鎖記錄',
+            },
+            monitor: {
+                name: '網站監控',
+            },
+            tamper: {
+                name: '防篡改',
+            },
+        },
     },
 };
 export default {

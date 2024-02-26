@@ -2141,6 +2141,22 @@ const message = {
             statusCode: 'Status code',
             manage: 'Management',
         },
+        xpack: {
+            name: 'X-Pack',
+            waf: {
+                name: 'WAF',
+                blackWhite: 'black and white list',
+                globalSetting: 'Global Setting',
+                websiteSetting: 'Website Settings',
+                blockRecords: 'Block records',
+            },
+            monitor: {
+                name: 'Website monitoring',
+            },
+            tamper: {
+                name: 'Tamper-proof',
+            },
+        },
     },
 };
 

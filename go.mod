@@ -311,7 +311,7 @@ replace (
 	github.com/containerd/containerd => github.com/containerd/containerd v1.7.13
 	github.com/cucumber/godog => github.com/cucumber/godog v0.12.6
 	github.com/docker/buildx => github.com/docker/buildx v0.12.0-rc2.0.20231219140829-617f538cb315
-	github.com/mattn/go-sqlite3 => github.com/jgiannuzzi/go-sqlite3 v1.14.17-0.20230719111531-6e53453ccbd3
+	github.com/mattn/go-sqlite3 => github.com/jgiannuzzi/go-sqlite3 v1.14.17-0.20240122133042-fb824c8e339e
 	github.com/moby/buildkit => github.com/moby/buildkit v0.13.0-beta3
 	golang.org/x/net => golang.org/x/net v0.17.0
 	k8s.io/api => k8s.io/api v0.29.2
