@@ -12,11 +12,11 @@
 
 1Panel is a modern and Open-Source linux server operation and management panel, the functions and advantages of 1Panel include:
 
-- **Quick website building**: Deeply integrated with Wordpress and [Halo](https://github.com/halo-dev/halo/), with one-click solutions for domain name binding, SSL certificate configuration, and more;
-- **Efficient management**: Easily manage Linux servers through the web interface, including application management, host monitoring, file management, database management, container management, and more;
-- **Secure and reliable**: Minimal vulnerability exposure, with firewall and security audit functions provided;
-- **One-click backup**: Support for one-click backup and restore, with backup data stored in the cloud and never lost;
-- **App Store**: Curate a variety of high-quality open-source tools and application software, enabling you to easily install and upgrade them.
+- **Efficient Management**: Users can easily manage Linux servers through a web graphical interface, achieving functions such as host monitoring, file management, database management, and container management.
+- **Rapid Website Building**: Deep integration of open-source website building software WordPress and [Halo](https://github.com/halo-dev/halo/), with operations such as domain binding and SSL certificate configuration completed with one click.
+- **Application Store**: Curates a variety of high-quality open-source tools and application software, assisting users in easy installation and upgrades.
+- **Security and Reliability**: Based on container management and application deployment, minimizing vulnerability exposure, while providing features such as firewall and log auditing.
+- **One-Click Backup**: Supports one-click backup and restoration, allowing users to backup data to various cloud storage media, ensuring data is never lost.
 
 ## UI Display
 
