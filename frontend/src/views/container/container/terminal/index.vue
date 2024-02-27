@@ -44,13 +44,17 @@
                 {{ $t('commons.button.conn') }}
             </el-button>
             <el-button v-else @click="onClose()">{{ $t('commons.button.disconn') }}</el-button>
-            <Terminal style="height: calc(100vh - 302px)" ref="terminalRef"></Terminal>
+            <Terminal
+                style="height: calc(100vh - 302px); margin-top: 18px"
+                ref="terminalRef"
+                v-if="terminalOpen"
+            ></Terminal>
         </el-form>
     </el-drawer>
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
+import { reactive, ref, nextTick } from 'vue';
 import { ElForm, FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import Terminal from '@/components/terminal/index.vue';
@@ -91,6 +95,7 @@ const initTerm = (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         terminalOpen.value = true;
+        await nextTick();
         terminalRef.value!.acceptParams({
             endpoint: '/api/v1/containers/exec',
             args: `containerid=${form.containerID}&user=${form.user}&command=${form.command}`,
