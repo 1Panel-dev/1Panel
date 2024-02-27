@@ -701,7 +701,7 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 }
 
 func syncAppInstallStatus(appInstall *model.AppInstall) error {
-	if appInstall.Status == constant.Installing || appInstall.Status == constant.Rebuilding {
+	if appInstall.Status == constant.Installing || appInstall.Status == constant.Rebuilding || appInstall.Status == constant.Upgrading {
 		return nil
 	}
 	containerNames, err := getContainerNames(*appInstall)

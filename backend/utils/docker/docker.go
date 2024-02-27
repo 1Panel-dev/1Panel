@@ -48,12 +48,15 @@ func NewDockerClient() (*client.Client, error) {
 
 func (c Client) ListContainersByName(names []string) ([]types.Container, error) {
 	var (
-		options container.ListOptions
+		options  container.ListOptions
+		namesMap = make(map[string]bool)
+		res      []types.Container
 	)
 	options.All = true
 	if len(names) > 0 {
 		var array []filters.KeyValuePair
 		for _, n := range names {
+			namesMap["/"+n] = true
 			array = append(array, filters.Arg("name", n))
 		}
 		options.Filters = filters.NewArgs(array...)
@@ -62,7 +65,12 @@ func (c Client) ListContainersByName(names []string) ([]types.Container, error) 
 	if err != nil {
 		return nil, err
 	}
-	return containers, nil
+	for _, con := range containers {
+		if _, ok := namesMap[con.Names[0]]; ok {
+			res = append(res, con)
+		}
+	}
+	return res, nil
 }
 
 func (c Client) CreateNetwork(name string) error {
