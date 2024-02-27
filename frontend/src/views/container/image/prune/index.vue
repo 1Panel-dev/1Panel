@@ -22,7 +22,7 @@
             </span>
             <div v-if="!withTagAll">
                 <ul v-for="(item, index) in unTagList" :key="index">
-                    <li v-if="item.tags">
+                    <li v-if="item.tags && item.tags[0]">
                         {{ item.tags[0] }}
                     </li>
                     <li v-else>
@@ -32,7 +32,7 @@
             </div>
             <div v-else>
                 <ul v-for="(item, index) in unUsedList" :key="index">
-                    <li v-if="item.tags">{{ item.tags.join(', ') }}</li>
+                    <li v-if="item.tags && item.tags[0]">{{ item.tags.join(', ') }}</li>
                     <li v-else>{{ item.id.replaceAll('sha256:', '').substring(0, 12) }}</li>
                 </ul>
             </div>
