@@ -26,7 +26,7 @@
                                 <el-link
                                     style="font-size: 12px; margin-left: 5px"
                                     icon="Position"
-                                    @click="toDoc()"
+                                    @click="toDoc(true)"
                                     type="primary"
                                 >
                                     {{ $t('firewall.quickJump') }}
@@ -72,7 +72,7 @@
                                 <el-link
                                     style="font-size: 12px; margin-left: 5px"
                                     icon="Position"
-                                    @click="toDoc()"
+                                    @click="toDoc(false)"
                                     type="primary"
                                 >
                                     {{ $t('firewall.quickJump') }}
@@ -206,8 +206,9 @@ function callback(error: any) {
     }
 }
 
-const toDoc = () => {
-    window.open('https://1panel.cn/docs/user_manual/settings/', '_blank', 'noopener,noreferrer');
+const toDoc = (isConf: boolean) => {
+    let item = isConf ? '#onedrive' : '#onedrive_1';
+    window.open('https://1panel.cn/docs/user_manual/settings/' + item, '_blank', 'noopener,noreferrer');
 };
 
 const onSubmit = async (formEl: FormInstance | undefined) => {

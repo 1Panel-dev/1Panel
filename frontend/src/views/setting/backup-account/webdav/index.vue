@@ -105,7 +105,7 @@ const handleClose = () => {
 };
 
 const toDoc = () => {
-    window.open('https://1panel.cn/docs/user_manual/settings/', '_blank', 'noopener,noreferrer');
+    window.open('https://1panel.cn/docs/user_manual/settings/#webdav-alist', '_blank', 'noopener,noreferrer');
 };
 
 const onSubmit = async (formEl: FormInstance | undefined) => {
