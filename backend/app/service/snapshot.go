@@ -337,13 +337,14 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 		defer func() {
 			global.Cron.Start()
 		}()
-		snapJson, err := u.readFromJson(fmt.Sprintf("%s/snapshot.json", rootDir))
-		if err != nil {
-			updateRollbackStatus(snap.ID, constant.StatusFailed, fmt.Sprintf("decompress file failed, err: %v", err))
+
+		u.OriginalPath = fmt.Sprintf("%s/1panel_original/original_%s", global.CONF.System.BaseDir, snap.Name)
+		if _, err := os.Stat(u.OriginalPath); err != nil && os.IsNotExist(err) {
 			return
 		}
-		u.OriginalPath = fmt.Sprintf("%s/1panel_original/original_%s", snapJson.OldBaseDir, snap.Name)
-		if _, err := os.Stat(u.OriginalPath); err != nil && os.IsNotExist(err) {
+		snapJson, err := u.readFromJson(fmt.Sprintf("%s/snapshot.json", u.OriginalPath))
+		if err != nil {
+			updateRollbackStatus(snap.ID, constant.StatusFailed, fmt.Sprintf("read snapjson file failed, err: %v", err))
 			return
 		}
 
