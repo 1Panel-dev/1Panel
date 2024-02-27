@@ -234,6 +234,7 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 				}
 				isReTry = false
 			}
+			_ = u.saveJson(snapJson, u.OriginalPath)
 
 			_, _ = cmd.Exec("systemctl stop docker")
 			if !isReTry || snap.InterruptStep == "DockerDir" {
@@ -244,6 +245,7 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 				isReTry = false
 			}
 		} else {
+			_ = u.saveJson(snapJson, u.OriginalPath)
 			if !isReTry || snap.InterruptStep == "DockerDir" {
 				if err := u.handleDockerDatasWithSave(fileOp, operation, rootDir, ""); err != nil {
 					updateRecoverStatus(snap.ID, "DockerDir", constant.StatusFailed, err.Error())
@@ -252,7 +254,6 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 				isReTry = false
 			}
 		}
-		_ = u.saveJson(snapJson, u.OriginalPath)
 
 		if !isReTry || snap.InterruptStep == "DaemonJson" {
 			if err := u.handleDaemonJson(fileOp, operation, rootDir+"/docker/daemon.json", u.OriginalPath); err != nil {
