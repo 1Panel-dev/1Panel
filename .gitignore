@@ -39,6 +39,8 @@ frontend/auto-imports.d.ts
 frontend/components.d.ts
 frontend/src/xpack
 backend/xpack
+backend/router/entry_xpack.go
+backend/server/init_xpack.go
 
 .history/
 dist/
