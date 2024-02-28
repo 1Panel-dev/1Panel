@@ -72,12 +72,12 @@ import MdEditor from 'md-editor-v3';
 import i18n from '@/lang';
 import 'md-editor-v3/lib/style.css';
 import { MsgSuccess } from '@/utils/message';
-import { onMounted, ref } from 'vue';
+import { type Ref, onMounted, ref } from 'vue';
 import { GlobalStore } from '@/store';
 import { ElMessageBox } from 'element-plus';
 const globalStore = GlobalStore();
 
-const version = ref();
+const version: Ref<string> = ref('');
 const loading = ref(false);
 const drawerVisible = ref(false);
 const upgradeInfo = ref();
