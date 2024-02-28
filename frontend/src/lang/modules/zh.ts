@@ -2004,6 +2004,22 @@ const message = {
             manage: '管理',
         },
     },
+    xpack: {
+        name: 'X-Pack',
+        waf: {
+            name: 'WAF',
+            blackWhite: '黑白名单',
+            globalSetting: '全局设置',
+            websiteSetting: '网站设置',
+            blockRecords: '封锁记录',
+        },
+        monitor: {
+            name: '网站监控',
+        },
+        tamper: {
+            name: '防篡改',
+        },
+    },
 };
 export default {
     ...fit2cloudZhLocale,
