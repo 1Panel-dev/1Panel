@@ -77,7 +77,7 @@ import { GlobalStore } from '@/store';
 import { ElMessageBox } from 'element-plus';
 const globalStore = GlobalStore();
 
-const version = ref();
+const version = ref<string>('');
 const loading = ref(false);
 const drawerVisible = ref(false);
 const upgradeInfo = ref();
