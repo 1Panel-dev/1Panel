@@ -1,0 +1,160 @@
+{
+  "waf": "on",
+  "mode": "protection",
+  "secret": "qwer1234",
+  "redis": {
+    "state": "off",
+    "host": "127.0.0.1",
+    "port": 6379,
+    "password": "Calong@2015",
+    "ssl": false,
+    "poolSize": 10
+  },
+  "ipWhite": {
+    "state": "on"
+  },
+  "ipBlack": {
+    "state": "on",
+    "code": 403,
+    "action": "deny",
+    "type": "ipBlack",
+    "res": "ip"
+  },
+  "urlWhite": {
+    "state": "on"
+  },
+  "urlBlack": {
+    "type": "urlBlack",
+    "state": "on",
+    "code": 403,
+    "action": "deny"
+  },
+  "uaWhite": {
+    "state": "off"
+  },
+  "uaBlack": {
+    "type": "uaBlack",
+    "state": "on",
+    "code": 403,
+    "action": "deny"
+  },
+  "notFoundCount": {
+    "state": "on",
+    "type": "notFoundCount",
+    "threshold": 10,
+    "duration": 60,
+    "action": "deny",
+    "ipBlock": "on",
+    "ipBlockTime": 600
+  },
+  "methodWhite": {
+    "type": "methodWhite",
+    "state": "on",
+    "code": 444,
+    "action": "deny"
+  },
+  "bot": {
+    "state": "on",
+    "type": "bot",
+    "uri": "/1pwaf/bot/trap",
+    "action": "REDIRECT_JS",
+    "ipBlock": "on",
+    "ipBlockTime": 600
+  },
+  "geoRestrict": {
+    "state": "on",
+    "rules": [],
+    "action": "deny"
+  },
+  "defaultIpBlack": {
+    "state": "on",
+    "type": "defaultIpBlack",
+    "code": 444,
+    "action": "deny"
+  },
+  "xss": {
+    "state": "on",
+    "type": "xss",
+    "code": 444,
+    "action": "deny"
+  },
+  "sql": {
+    "state": "on",
+    "type": "sql",
+    "code": 444,
+    "action": "deny"
+  },
+  "cc": {
+    "state": "on",
+    "type": "cc",
+    "rule": "cc",
+    "tokenTimeOut": 1800,
+    "threshold": 100,
+    "duration": 60,
+    "action": "deny",
+    "ipBlock": "on",
+    "ipBlockTime": 600
+  },
+  "ccurl": {
+    "state": "on",
+    "type": "urlcc",
+    "rule": "urlcc",
+    "action": "deny",
+    "ipBlock": "on",
+    "ipBlockTime": 600
+  },
+  "attackCount": {
+    "state": "on",
+    "type": "attackCount",
+    "threshold": 20,
+    "duration": 60,
+    "action": "deny",
+    "ipBlock": "on",
+    "ipBlockTime": 600
+  },
+  "fileExtCheck": {
+    "state": "on",
+    "action": "deny",
+    "code": 403,
+    "type": "fileExtCheck",
+    "extList": [
+      "php",
+      "jsp",
+      "asp",
+      "exe",
+      "sh"
+    ]
+  },
+  "cookie": {
+    "type": "cookie",
+    "state": "on",
+    "code": 403,
+    "action": "deny",
+    "ipBlock": "on",
+    "ipBlockTime": 600
+  },
+  "header": {
+    "state": "on",
+    "type": "header",
+    "code": 403,
+    "action": "deny",
+    "ipBlock": "on",
+    "ipBlockTime": 600
+  },
+  "defaultUaBlack": {
+    "type": "defaultUaBlack",
+    "state": "on",
+    "code": 403,
+    "ipBlock": "on",
+    "ipBlockTime": 600,
+    "action": "deny"
+  },
+  "args": {
+    "type": "args",
+    "state": "on",
+    "code": 403,
+    "action": "deny",
+    "ipBlock": "on",
+    "ipBlockTime": 600
+  }
+}

@@ -1,0 +1,7 @@
+{
+    "rules":[
+        {"state":"on","rule":"/TomcatBypass/Command/Base64"},
+        {"state":"on","rule":"j\\S*ndi\\S*:\\S*(?:dap|dns)\\S+"},
+        {"state":"on","rule":"(/acunetix-wvs-test-for-some-inexistent-file|netsparker|acunetix_wvs_security_test|AppScan|XSS@HERE)"}
+    ]
+}

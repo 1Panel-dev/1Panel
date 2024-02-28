@@ -1,0 +1,88 @@
+{
+  "rules": [
+    {
+      "state": "on",
+      "rule": "select.+(from|limit)"
+    },
+    {
+      "state": "on",
+      "rule": "(?:(union(.*?)select))"
+    },
+    {
+      "state": "on",
+      "rule": "having|rongjitest"
+    },
+    {
+      "state": "on",
+      "rule": "sleep\\((\\s*)(\\d*)(\\s*)\\)"
+    },
+    {
+      "state": "on",
+      "rule": "benchmark\\((.*)\\,(.*)\\)"
+    },
+    {
+      "state": "on",
+      "rule": "(?:from\\W+information_schema\\W)"
+    },
+    {
+      "state": "on",
+      "rule": "(?:(?:current_)user|database|schema|connection_id)\\s*\\("
+    },
+    {
+      "state": "on",
+      "rule": "(?:etc\\/\\W*passwd)"
+    },
+    {
+      "state": "on",
+      "rule": "into(\\s+)+(?:dump|out)file\\s*"
+    },
+    {
+      "state": "on",
+      "rule": "group\\s+by.+\\("
+    },
+    {
+      "state": "on",
+      "rule": "xwork.MethodAccessor"
+    },
+    {
+      "state": "on",
+      "rule": "(?:define|eval|file_get_contents|include|require|require_once|shell_exec|phpinfo|system|passthru|preg_\\w+|execute|echo|print|print_r|var_dump|(fp)open|alert|showmodaldialog)\\("
+    },
+    {
+      "state": "on",
+      "rule": "xwork\\.MethodAccessor"
+    },
+    {
+      "state": "on",
+      "rule": "(gopher|doc|php|glob|file|phar|zlib|ftp|ldap|dict|ogg|data)\\:\\/"
+    },
+    {
+      "state": "on",
+      "rule": "java\\.lang"
+    },
+    {
+      "state": "on",
+      "rule": "\\$_(GET|post|cookie|files|session|env|phplib|GLOBALS|SERVER)\\["
+    },
+    {
+      "state": "on",
+      "rule": "\\<(iframe|script|body|img|layer|div|meta|style|base|object|input)"
+    },
+    {
+      "state": "on",
+      "rule": "(onmouseover|onerror|onload)\\="
+    },
+    {
+      "state": "on",
+      "rule": "/shell?cd+/tmp;\\s*rm+-rf\\+\\*;\\s*wget"
+    },
+    {
+      "state": "on",
+      "rule": "/systembc/password.php"
+    },
+    {
+      "state":"on",
+      "rule":"(Acunetix-Aspect|Acunetix-Aspect-Password|Acunetix-Aspect-Queries|X-WIPP|X-RequestManager-Memo|X-Request-Memo|X-Scan-Memo)"
+    }
+  ]
+}

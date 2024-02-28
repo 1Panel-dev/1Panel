@@ -1,0 +1,23 @@
+{
+  "rules": [
+    {
+      "state": "on",
+      "rule": "no Cookie",
+      "name": "拦截不带Cookie的请求",
+      "conditions": [
+        {
+          "field": "URL",
+          "pattern": "/test/\\d+\\.html"
+        },
+        {
+          "field": "Cookie",
+          "pattern": ""
+        }
+      ],
+      "action": "deny",
+      "autoIpBlock": "off",
+      "ipBlockTimeout": 60,
+      "description": "拦截不带Cookie的请求"
+    }
+  ]
+}

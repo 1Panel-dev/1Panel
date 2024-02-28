@@ -1,0 +1,88 @@
+{
+  "rules": [
+    {
+      "state": "on",
+      "rule": "\\.\\./"
+    },
+    {
+      "state": "on",
+      "rule": "\\:\\$"
+    },
+    {
+      "state": "on",
+      "rule": "\\$\\{"
+    },
+    {
+      "state": "on",
+      "rule": "select.+(from|limit)"
+    },
+    {
+      "state": "on",
+      "rule": "(?:(union(.*?)select))"
+    },
+    {
+      "state": "on",
+      "rule": "having|rongjitest"
+    },
+    {
+      "state": "on",
+      "rule": "sleep\\((\\s*)(\\d*)(\\s*)\\)"
+    },
+    {
+      "state": "on",
+      "rule": "benchmark\\((.*)\\,(.*)\\)"
+    },
+    {
+      "state": "on",
+      "rule": "base64_decode\\("
+    },
+    {
+      "state": "on",
+      "rule": "(?:from\\W+information_schema\\W)"
+    },
+    {
+      "state": "on",
+      "rule": "(?:(?:current_)user|database|schema|connection_id)\\s*\\("
+    },
+    {
+      "state": "on",
+      "rule": "(?:etc\\/\\W*passwd)"
+    },
+    {
+      "state": "on",
+      "rule": "into(\\s+)+(?:dump|out)file\\s*"
+    },
+    {
+      "state": "on",
+      "rule": "group\\s+by.+\\("
+    },
+    {
+      "state": "on",
+      "rule": "xwork.MethodAccessor"
+    },
+    {
+      "state": "on",
+      "rule": "(?:define|eval|file_get_contents|include|require|require_once|shell_exec|phpinfo|system|passthru|preg_\\w+|execute|echo|print|print_r|var_dump|(fp)open|alert|showmodaldialog)\\("
+    },
+    {
+      "state": "on",
+      "rule": "xwork\\.MethodAccessor"
+    },
+    {
+      "state": "on",
+      "rule": "(gopher|doc|php|glob|file|phar|zlib|ftp|ldap|dict|ogg|data)\\:\\/"
+    },
+    {
+      "state": "on",
+      "rule": "java\\.lang"
+    },
+    {
+      "state": "on",
+      "rule": "\\$_(GET|post|cookie|files|session|env|phplib|GLOBALS|SERVER)\\["
+    },
+    {
+      "state":"on",
+      "rule":"(CustomCookie|acunetixCookie)"
+    }
+  ]
+}

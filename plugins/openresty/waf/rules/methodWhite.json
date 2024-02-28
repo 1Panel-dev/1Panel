@@ -1,0 +1,88 @@
+{
+  "rules": [
+    {
+      "state": "on",
+      "rule": "GET"
+    },
+    {
+      "state": "on",
+      "rule": "POST"
+    },
+    {
+      "state": "on",
+      "rule": "PUT"
+    },
+    {
+      "state": "on",
+      "rule": "DELETE"
+    },
+    {
+      "state": "on",
+      "rule": "PATCH"
+    },
+    {
+      "state": "on",
+      "rule": "HEAD"
+    },
+    {
+      "state": "on",
+      "rule": "OPTIONS"
+    },
+    {
+      "state": "on",
+      "rule": "TRACE"
+    },
+    {
+      "state": "on",
+      "rule": "CONNECT"
+    },
+    {
+      "state": "on",
+      "rule": "PROPFIND"
+    },
+    {
+      "state": "on",
+      "rule": "PROPPATCH"
+    },
+    {
+      "state": "on",
+      "rule": "MKCOL"
+    },
+    {
+      "state": "on",
+      "rule": "COPY"
+    },
+    {
+      "state": "on",
+      "rule": "MOVE"
+    },
+    {
+      "state": "on",
+      "rule": "LOCK"
+    },
+    {
+      "state": "on",
+      "rule": "UNLOCK"
+    },
+    {
+      "state": "on",
+      "rule": "LINK"
+    },
+    {
+      "state": "on",
+      "rule": "UNLINK"
+    },
+    {
+      "state": "on",
+      "rule": "WRAPPED"
+    },
+    {
+      "state": "on",
+      "rule": "PROPFIND"
+    },
+    {
+      "state": "on",
+      "rule": "SRARCH"
+    }
+  ]
+}
