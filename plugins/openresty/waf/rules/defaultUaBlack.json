@@ -1,0 +1,16 @@
+{
+  "nextId": 3,
+  "rules": [
+    {
+      "id": 1,
+      "state": "on",
+      "type": "defaultUABlack",
+      "action": "deny",
+      "rule": "HTTrack|Apache-HttpClient|harvest|audit|dirbuster|pangolin|nmap|sqln|hydra|Parser|libwww|BBBike|sqlmap|w3af|owasp|Nikto|fimap|havij|zmeu|BabyKrokodil|netsparker|httperf| SF/",
+      "ipBlock": "on",
+      "ipBlockTimeout": 600,
+      "code": 403,
+      "description": "一些不友好ua"
+    }
+  ]
+}

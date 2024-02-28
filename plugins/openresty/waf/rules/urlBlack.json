@@ -1,0 +1,44 @@
+{
+  "rules": [
+    {
+      "state": "on",
+      "rule": "\\.(svn|htaccess|bash_history)"
+    },
+    {
+      "state": "on",
+      "rule": "\\.(bak|inc|old|mdb|sql|backup|java|class)$"
+    },
+    {
+      "state": "on",
+      "rule": "(vhost|bbs|host|wwwroot|www|site|root|hytop|flashfxp).*\\.rar"
+    },
+    {
+      "state": "on",
+      "rule": "(phpmyadmin|jmx-console|jmxinvokerservlet)"
+    },
+    {
+      "state": "on",
+      "rule": "(?:phpMyAdmin2|phpMyAdmin|phpmyadmin|dbadmin|pma|myadmin|admin|mysql)/scripts/setup%.php"
+    },
+    {
+      "state": "on",
+      "rule": "java\\.lang"
+    },
+    {
+      "state": "on",
+      "rule": "/(attachments|upimg|images|css|uploadfiles|html|uploads|templets|static|template|data|inc|forumdata|upload|includes|cache|avatar)/(\\\\w+).(php|jsp)"
+    },
+    {
+      "state": "on",
+      "rule": "wp-includes/wlwmanifest.xml"
+    },
+    {
+      "state": "on",
+      "rule": "<php>die(@md5(HelloThinkCMF))</php>"
+    },
+    {
+      "state": "on",
+      "rule": "/boaform/admin/formLogin"
+    }
+  ]
+}

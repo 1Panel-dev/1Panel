@@ -1,0 +1,10 @@
+{
+  "rules": [
+    {
+      "name": "拦截IP",
+      "state": "on",
+      "type": "ipv4",
+      "ipv4": "123"
+    }
+  ]
+}
