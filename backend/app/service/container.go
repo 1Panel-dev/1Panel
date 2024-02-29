@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/pkg/errors"
 	"io"
 	"os"
 	"os/exec"
@@ -17,6 +16,8 @@ import (
 	"syscall"
 	"time"
 	"unicode/utf8"
+
+	"github.com/pkg/errors"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
@@ -683,7 +684,6 @@ func (u *ContainerService) ContainerLogs(wsConn *websocket.Conn, containerType, 
 				global.LOG.Errorf("read bytes from log failed, err: %v", err)
 				continue
 			}
-			// check if the bytes is valid utf8
 			if !utf8.Valid(buffer[:n]) {
 				continue
 			}
@@ -723,7 +723,6 @@ func (u *ContainerService) ContainerStats(id string) (*dto.ContainerStats, error
 	if cache, ok := stats.MemoryStats.Stats["cache"]; ok {
 		data.Cache = float64(cache) / 1024 / 1024
 	}
-	data.Memory = data.Memory - data.Cache
 	data.NetworkRX, data.NetworkTX = calculateNetwork(stats.Networks)
 	data.ShotTime = stats.Read
 	return &data, nil
@@ -791,7 +790,7 @@ func calculateCPUPercentUnix(stats *types.StatsJSON) float64 {
 }
 func calculateMemPercentUnix(memStats types.MemoryStats) float64 {
 	memPercent := 0.0
-	memUsage := float64(memStats.Usage - memStats.Stats["cache"])
+	memUsage := float64(memStats.Usage)
 	memLimit := float64(memStats.Limit)
 	if memUsage > 0.0 && memLimit > 0.0 {
 		memPercent = (memUsage / memLimit) * 100.0
@@ -895,6 +894,7 @@ func loadCpuAndMem(client *client.Client, container string) dto.ContainerListSta
 	data.MemoryCache = stats.MemoryStats.Stats["cache"]
 	data.MemoryUsage = stats.MemoryStats.Usage
 	data.MemoryLimit = stats.MemoryStats.Limit
+
 	data.MemoryPercent = calculateMemPercentUnix(stats.MemoryStats)
 	return data
 }
