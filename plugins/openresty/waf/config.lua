@@ -99,6 +99,8 @@ local function init_global_config()
     config.html_res = html_res
 
     _M.waf_dir = waf_dir
+    _M.waf_db_dir = waf_dir .. "db/"
+    _M.waf_db_path =  _M.waf_db_dir .. "1pwaf.db"
     _M.config_dir = config_dir
 end
 

@@ -13,7 +13,7 @@ local function init_dir(path)
     end
 end
 
-local function check_table(table_name)
+local function check_table(table_name,wafdb)
     if wafdb == nil then
         return false
     end
@@ -35,32 +35,27 @@ function _M.init_db()
     if not ok then
         return false
     end
-    if wafdb then
+    local wafdb
+    init_dir(config.waf_db_dir)
+    wafdb = sqlite3.open(config.waf_db_path)
+    if wafdb == nil then
         return false
     end
-    local path = config.waf_dir .. "db/"
-    init_dir(path)
-    local db_path = path .. "1pwaf.db"
-    if wafdb == nil or not wafdb:isopen() then
-        wafdb = sqlite3.open(db_path)
-        if wafdb == nil then
-            return false
-        end
-        wafdb:exec([[PRAGMA journal_mode = wal]])
-        wafdb:exec([[PRAGMA synchronous = 0]])
-        wafdb:exec([[PRAGMA page_size = 8192]])
-        wafdb:exec([[PRAGMA journal_size_limit = 2147483648]])
-    end
+    wafdb:exec([[PRAGMA journal_mode = wal]])
+    wafdb:exec([[PRAGMA synchronous = 0]])
+    wafdb:exec([[PRAGMA page_size = 8192]])
+    wafdb:exec([[PRAGMA journal_size_limit = 2147483648]])
     local status = {}
-    if not check_table("attack_log") then
+    if not check_table("attack_log",wafdb) then
         status = wafdb:exec([[
             CREATE TABLE attack_log (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id TEXT PRIMARY KEY,
                 ip TEXT,
-                ip_city TEXT,
-                ip_country TEXT,
-                ip_subdivisions TEXT,
-                ip_continent TEXT,
+                ip_iso TEXT,
+                ip_country_zh TEXT,
+                ip_country_en TEXT,
+                ip_province_zh TEXT,
+                ip_province_en TEXT,
                 ip_longitude TEXT,
                 ip_latitude TEXT,
                 time INTEGER,
@@ -71,16 +66,39 @@ function _M.init_db()
                 method TEXT,
                 uri TEXT,
                 user_agent TEXT,
-                rule TEXT,
+                rule_type TEXT,
+                match_rule TEXT,
+                match_value TEXT,
                 nginx_log TEXT,
                 blocking_time INTEGER,
                 action TEXT,
-                msg TEXT,
-                params TEXT,
                 is_block INTEGER
             )]])
+    end
 
-        ngx.log(ngx.ERR, "init db status" .. status)
+    if not check_table("block_ip",wafdb) then
+        status = wafdb:exec([[
+            CREATE TABLE block_ip (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ip TEXT,
+                is_block INTEGER,
+                attack_log_id INTEGER
+            )]])
+
+        ngx.log(ngx.ERR, "init block_ip status"..status)
+    end
+
+    if not check_table("waf_stat",wafdb) then
+        status = wafdb:exec([[
+            CREATE TABLE waf_stat (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                day TEXT,
+                req_count INTEGER,
+                attack_count INTEGER,
+                count_4xx INTEGER,
+                count_5xx INTEGER
+            )]])
+        ngx.log(ngx.ERR, "init waf_stat status"..status)
     end
 
     ngx.log(ngx.ERR, "init db success")

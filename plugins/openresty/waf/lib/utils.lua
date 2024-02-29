@@ -5,6 +5,11 @@ local tonumber = tonumber
 local ipairs = ipairs
 local type = type
 local find_str = string.find
+local gmatch_str = string.gmatch
+local gsub_str = string.gsub
+local format_str = string.format
+local random = math.random
+
 
 local _M = {}
 
@@ -119,5 +124,48 @@ end
 
 function _M.get_headers()
     return ngx.req.get_headers(20000)
+end
+
+function _M.is_intranet_address(ip_addr)
+    if not ip_addr then
+        return false
+    end
+    if ip_addr == "unknown" then
+        return false
+    end
+    if find_str(ip_addr, ':') then
+        return false
+    end
+    
+    local parts = {}
+    for part in gmatch_str(ip_addr, "%d+") do
+        insert_table(parts, tonumber(part))
+    end
+    if parts[1] == 10 or
+            (parts[1] == 192 and parts[2] == 168) or
+            (parts[1] == 172 and parts[2] >= 16 and parts[2] <= 31) then
+        return true
+    else
+        return false
+    end
+end
+
+
+function _M.uuid()
+    local template ='xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
+    return gsub_str(template, '[xy]', function (c)
+        local v = (c == 'x') and random(0, 0xf) or random(8, 0xb)
+        return format_str('%x', v)
+    end)
+end
+
+function _M.get_wafdb(waf_db_path)
+    local ok, sqlite3 = pcall(function()
+        return require "lsqlite3"
+    end)
+    if not ok then
+        return nil
+    end
+    return sqlite3.open(waf_db_path)
 end
 return _M
