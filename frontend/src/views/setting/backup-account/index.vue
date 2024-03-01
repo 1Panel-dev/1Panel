@@ -464,7 +464,6 @@
 <script setup lang="ts">
 import { dateFormat } from '@/utils/util';
 import { onMounted, ref } from 'vue';
-import OpDialog from '@/components/del-dialog/index.vue';
 import { getBackupList, deleteBackup, refreshOneDrive } from '@/api/modules/setting';
 import localDialog from '@/views/setting/backup-account/local/index.vue';
 import s3Dialog from '@/views/setting/backup-account/s3/index.vue';

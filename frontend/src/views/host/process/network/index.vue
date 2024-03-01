@@ -9,45 +9,25 @@
                             <el-form-item style="float: right">
                                 <el-row :gutter="20">
                                     <el-col :span="8">
-                                        <div class="search-button">
-                                            <el-input
-                                                type="number"
-                                                v-model.number="netSearch.processID"
-                                                clearable
-                                                @clear="search()"
-                                                suffix-icon="Search"
-                                                @keyup.enter="search()"
-                                                @change="search()"
-                                                :placeholder="$t('process.pid')"
-                                            ></el-input>
-                                        </div>
+                                        <TableSearch
+                                            @search="search()"
+                                            :placeholder="$t('process.pid')"
+                                            v-model:searchName="netSearch.processID"
+                                        />
                                     </el-col>
                                     <el-col :span="8">
-                                        <div class="search-button">
-                                            <el-input
-                                                v-model.trim="netSearch.processName"
-                                                clearable
-                                                @clear="search()"
-                                                suffix-icon="Search"
-                                                @keyup.enter="search()"
-                                                @change="search()"
-                                                :placeholder="$t('process.processName')"
-                                            ></el-input>
-                                        </div>
+                                        <TableSearch
+                                            @search="search()"
+                                            :placeholder="$t('process.processName')"
+                                            v-model:searchName="netSearch.processName"
+                                        />
                                     </el-col>
                                     <el-col :span="8">
-                                        <div class="search-button">
-                                            <el-input
-                                                type="number"
-                                                v-model.number="netSearch.port"
-                                                clearable
-                                                @clear="search()"
-                                                suffix-icon="Search"
-                                                @keyup.enter="search()"
-                                                @change="search()"
-                                                :placeholder="$t('commons.table.port')"
-                                            ></el-input>
-                                        </div>
+                                        <TableSearch
+                                            @search="search()"
+                                            :placeholder="$t('commons.table.port')"
+                                            v-model:searchName="netSearch.port"
+                                        />
                                     </el-col>
                                 </el-row>
                             </el-form-item>
@@ -210,10 +190,10 @@ const sendMsg = () => {
 const search = () => {
     if (isWsOpen()) {
         if (typeof netSearch.processID === 'string') {
-            netSearch.processID = undefined;
+            netSearch.processID = Number(netSearch.processID);
         }
         if (typeof netSearch.port === 'string') {
-            netSearch.port = undefined;
+            netSearch.port = Number(netSearch.port);
         }
         processSocket.send(JSON.stringify(netSearch));
     }

@@ -154,7 +154,6 @@
 
 <script lang="ts" setup>
 import { onMounted, reactive, ref, computed } from 'vue';
-import OpDialog from '@/components/del-dialog/index.vue';
 import { DeleteSSL, DownloadFile, SearchSSL, UpdateSSL } from '@/api/modules/website';
 import DnsAccount from './dns-account/index.vue';
 import AcmeAccount from './acme-account/index.vue';

@@ -50,16 +50,7 @@
                     </div>
                 </el-col>
                 <el-col :xs="24" :sm="4" :md="4" :lg="4" :xl="4">
-                    <div class="search-button">
-                        <el-input
-                            v-model="req.name"
-                            clearable
-                            @clear="searchByName('')"
-                            suffix-icon="Search"
-                            @change="searchByName(req.name)"
-                            :placeholder="$t('commons.button.search')"
-                        ></el-input>
-                    </div>
+                    <TableSearch @search="searchByName()" v-model:searchName="req.name" />
                 </el-col>
             </el-row>
         </template>
@@ -298,8 +289,7 @@ const getTagValue = (key: string) => {
     }
 };
 
-const searchByName = (name: string) => {
-    req.name = name;
+const searchByName = () => {
     search(req);
 };
 

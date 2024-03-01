@@ -16,18 +16,8 @@
                     </el-col>
                     <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
                         <div class="flx-align-center">
-                            <div class="search-button">
-                                <el-input
-                                    v-model="searchIP"
-                                    clearable
-                                    @clear="search()"
-                                    suffix-icon="Search"
-                                    @keyup.enter="search()"
-                                    @change="search()"
-                                    :placeholder="$t('commons.button.search') + ' ip'"
-                                ></el-input>
-                            </div>
                             <TableSetting @search="search()" />
+                            <TableSearch @search="search()" v-model:searchName="searchIP" />
                         </div>
                     </el-col>
                 </el-row>
@@ -78,7 +68,6 @@
 </template>
 
 <script setup lang="ts">
-import TableSetting from '@/components/table-setting/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { dateFormat } from '@/utils/util';
 import { cleanLogs, getLoginLogs } from '@/api/modules/log';

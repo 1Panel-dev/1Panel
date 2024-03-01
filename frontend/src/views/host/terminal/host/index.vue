@@ -15,17 +15,7 @@
                         </el-button>
                     </el-col>
                     <el-col :span="4">
-                        <div class="search-button">
-                            <el-input
-                                v-model="info"
-                                clearable
-                                @clear="search()"
-                                suffix-icon="Search"
-                                @keyup.enter="search()"
-                                @change="search()"
-                                :placeholder="$t('commons.button.search')"
-                            ></el-input>
-                        </div>
+                        <TableSearch @search="search()" v-model:searchName="info" />
                     </el-col>
                 </el-row>
             </template>
@@ -75,7 +65,6 @@
 
 <script setup lang="ts">
 import GroupDialog from '@/components/group/index.vue';
-import OpDialog from '@/components/del-dialog/index.vue';
 import GroupChangeDialog from '@/components/group/change.vue';
 import OperateDialog from '@/views/host/terminal/host/operate/index.vue';
 import { deleteHost, editHostGroup, searchHosts } from '@/api/modules/host';

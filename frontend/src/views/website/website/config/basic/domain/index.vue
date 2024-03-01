@@ -25,7 +25,6 @@
 <script lang="ts" setup>
 import Domain from './create/index.vue';
 import { Website } from '@/api/interface/website';
-import OpDialog from '@/components/del-dialog/index.vue';
 import { DeleteDomain, GetWebsite, ListDomains } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
 import i18n from '@/lang';

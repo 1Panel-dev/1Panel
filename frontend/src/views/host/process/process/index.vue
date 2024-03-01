@@ -9,44 +9,25 @@
                             <el-form-item style="float: right">
                                 <el-row :gutter="20">
                                     <el-col :span="8">
-                                        <div class="search-button">
-                                            <el-input
-                                                type="number"
-                                                v-model.number="processSearch.pid"
-                                                clearable
-                                                @clear="search()"
-                                                suffix-icon="Search"
-                                                @keyup.enter="search()"
-                                                @change="search()"
-                                                :placeholder="$t('process.pid')"
-                                            ></el-input>
-                                        </div>
+                                        <TableSearch
+                                            @search="search()"
+                                            :placeholder="$t('process.pid')"
+                                            v-model:searchName="processSearch.pid"
+                                        />
                                     </el-col>
                                     <el-col :span="8">
-                                        <div class="search-button">
-                                            <el-input
-                                                v-model.trim="processSearch.name"
-                                                clearable
-                                                @clear="search()"
-                                                suffix-icon="Search"
-                                                @keyup.enter="search()"
-                                                @change="search()"
-                                                :placeholder="$t('commons.table.name')"
-                                            ></el-input>
-                                        </div>
+                                        <TableSearch
+                                            @search="search()"
+                                            :placeholder="$t('commons.table.name')"
+                                            v-model:searchName="processSearch.name"
+                                        />
                                     </el-col>
                                     <el-col :span="8">
-                                        <div class="search-button">
-                                            <el-input
-                                                v-model.trim="processSearch.username"
-                                                clearable
-                                                @clear="search()"
-                                                suffix-icon="Search"
-                                                @keyup.enter="search()"
-                                                @change="search()"
-                                                :placeholder="$t('commons.table.user')"
-                                            ></el-input>
-                                        </div>
+                                        <TableSearch
+                                            @search="search()"
+                                            :placeholder="$t('commons.table.user')"
+                                            v-model:searchName="processSearch.username"
+                                        />
                                     </el-col>
                                 </el-row>
                             </el-form-item>
@@ -126,7 +107,6 @@
 
 <script setup lang="ts">
 import FireRouter from '@/views/host/process/index.vue';
-import OpDialog from '@/components/del-dialog/index.vue';
 import { ref, onMounted, onUnmounted, nextTick, reactive } from 'vue';
 import ProcessDetail from './detail/index.vue';
 import i18n from '@/lang';
@@ -274,7 +254,7 @@ const search = () => {
     if (isWsOpen() && !isGetData.value) {
         isGetData.value = true;
         if (typeof processSearch.pid === 'string') {
-            processSearch.pid = undefined;
+            processSearch.pid = Number(processSearch.pid);
         }
         processSocket.send(JSON.stringify(processSearch));
     }

@@ -4,6 +4,8 @@ import RouterButton from './router-button/index.vue';
 import ComplexTable from './complex-table/index.vue';
 import ErrPrompt from './error-prompt/index.vue';
 import OpDialog from './del-dialog/index.vue';
+import TableSearch from './table-search/index.vue';
+import TableSetting from './table-setting/index.vue';
 import Tooltip from '@/components/tooltip/index.vue';
 import CopyButton from '@/components/copy-button/index.vue';
 export default {
@@ -15,5 +17,7 @@ export default {
         app.component(OpDialog.name, OpDialog);
         app.component(Tooltip.name, Tooltip);
         app.component(CopyButton.name, CopyButton);
+        app.component(TableSearch.name, TableSearch);
+        app.component(TableSetting.name, TableSetting);
     },
 };
