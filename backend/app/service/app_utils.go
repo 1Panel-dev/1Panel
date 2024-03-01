@@ -849,38 +849,34 @@ func checkContainerNameIsExist(containerName, appDir string) (bool, error) {
 
 func upApp(appInstall *model.AppInstall, pullImages bool) {
 	upProject := func(appInstall *model.AppInstall) (err error) {
-		if err == nil {
-			var (
-				out    string
-				errMsg string
-			)
-			if pullImages && appInstall.App.Type != "php" {
-				out, err = compose.Pull(appInstall.GetComposePath())
-				if err != nil {
-					if out != "" {
-						if strings.Contains(out, "no such host") {
-							errMsg = i18n.GetMsgByKey("ErrNoSuchHost") + ":"
-						}
-						if strings.Contains(out, "timeout") {
-							errMsg = i18n.GetMsgByKey("ErrImagePullTimeOut") + ":"
-						}
-						appInstall.Message = errMsg + out
-					}
-					return err
-				}
-			}
-
-			out, err = compose.Up(appInstall.GetComposePath())
+		var (
+			out    string
+			errMsg string
+		)
+		if pullImages && appInstall.App.Type != "php" {
+			out, err = compose.Pull(appInstall.GetComposePath())
 			if err != nil {
 				if out != "" {
+					if strings.Contains(out, "no such host") {
+						errMsg = i18n.GetMsgByKey("ErrNoSuchHost") + ":"
+					}
+					if strings.Contains(out, "timeout") {
+						errMsg = i18n.GetMsgByKey("ErrImagePullTimeOut") + ":"
+					}
 					appInstall.Message = errMsg + out
 				}
 				return err
 			}
-			return
-		} else {
-			return
 		}
+
+		out, err = compose.Up(appInstall.GetComposePath())
+		if err != nil {
+			if out != "" {
+				appInstall.Message = errMsg + out
+			}
+			return err
+		}
+		return
 	}
 	if err := upProject(appInstall); err != nil {
 		appInstall.Status = constant.Error

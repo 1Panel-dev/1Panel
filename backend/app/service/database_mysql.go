@@ -342,7 +342,7 @@ func (u *MysqlService) ChangePassword(req dto.ChangeDBInfo) error {
 			}
 
 			global.LOG.Infof("start to update mysql password used by app %s-%s", appModel.Key, appInstall.Name)
-			if err := updateInstallInfoInDB(appModel.Key, appInstall.Name, "user-password", true, req.Value); err != nil {
+			if err := updateInstallInfoInDB(appModel.Key, appInstall.Name, "user-password", req.Value); err != nil {
 				return err
 			}
 		}
@@ -355,7 +355,7 @@ func (u *MysqlService) ChangePassword(req dto.ChangeDBInfo) error {
 		return nil
 	}
 
-	if err := updateInstallInfoInDB(req.Type, req.Database, "password", false, req.Value); err != nil {
+	if err := updateInstallInfoInDB(req.Type, req.Database, "password", req.Value); err != nil {
 		return err
 	}
 	return nil

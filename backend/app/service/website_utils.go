@@ -2,13 +2,6 @@ package service
 
 import (
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/buserr"
-	"github.com/1Panel-dev/1Panel/backend/global"
-	"github.com/1Panel-dev/1Panel/backend/i18n"
-	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
-	"github.com/1Panel-dev/1Panel/backend/utils/common"
-	"github.com/1Panel-dev/1Panel/backend/utils/nginx/components"
-	"gopkg.in/yaml.v3"
 	"log"
 	"os"
 	"path"
@@ -17,6 +10,14 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/buserr"
+	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/i18n"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
+	"github.com/1Panel-dev/1Panel/backend/utils/nginx/components"
+	"gopkg.in/yaml.v3"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 
@@ -114,7 +115,7 @@ func createIndexFile(website *model.Website, runtime *model.Runtime) error {
 	return nil
 }
 
-func createProxyFile(website *model.Website, runtime *model.Runtime) error {
+func createProxyFile(website *model.Website) error {
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return err
@@ -191,7 +192,7 @@ func createWebsiteFolder(nginxInstall model.AppInstall, website *model.Website, 
 			}
 		}
 		if website.Type == constant.Proxy {
-			if err := createProxyFile(website, runtime); err != nil {
+			if err := createProxyFile(website); err != nil {
 				return err
 			}
 		}

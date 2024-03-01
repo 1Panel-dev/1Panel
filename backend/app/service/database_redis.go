@@ -55,10 +55,10 @@ func (u *RedisService) UpdateConf(req dto.RedisConfUpdate) error {
 }
 
 func (u *RedisService) ChangePassword(req dto.ChangeRedisPass) error {
-	if err := updateInstallInfoInDB("redis", "", "password", true, req.Value); err != nil {
+	if err := updateInstallInfoInDB("redis", "", "password", req.Value); err != nil {
 		return err
 	}
-	if err := updateInstallInfoInDB("redis-commander", "", "password", true, req.Value); err != nil {
+	if err := updateInstallInfoInDB("redis-commander", "", "password", req.Value); err != nil {
 		return err
 	}
 

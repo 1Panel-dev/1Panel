@@ -280,7 +280,7 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 	if err := fileOp.WriteFile(path.Join(secretDir, "server.key.tmp"), strings.NewReader(key), 0600); err != nil {
 		return err
 	}
-	if err := checkCertValid(req.Domain); err != nil {
+	if err := checkCertValid(); err != nil {
 		return err
 	}
 	if err := fileOp.Rename(path.Join(secretDir, "server.crt.tmp"), path.Join(secretDir, "server.crt")); err != nil {
@@ -418,7 +418,7 @@ func loadInfoFromCert() (*dto.SSLInfo, error) {
 	}, nil
 }
 
-func checkCertValid(domain string) error {
+func checkCertValid() error {
 	certificate, err := os.ReadFile(path.Join(global.CONF.System.BaseDir, "1panel/secret/server.crt.tmp"))
 	if err != nil {
 		return err
