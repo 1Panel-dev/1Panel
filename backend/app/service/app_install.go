@@ -527,7 +527,7 @@ func (a *AppInstallService) ChangeAppPort(req request.PortUpdate) error {
 		return nil
 	}
 
-	if err := updateInstallInfoInDB(req.Key, req.Name, "port", true, strconv.FormatInt(req.Port, 10)); err != nil {
+	if err := updateInstallInfoInDB(req.Key, req.Name, "port", strconv.FormatInt(req.Port, 10)); err != nil {
 		return nil
 	}
 
@@ -776,7 +776,7 @@ func syncAppInstallStatus(appInstall *model.AppInstall) error {
 	return nil
 }
 
-func updateInstallInfoInDB(appKey, appName, param string, isRestart bool, value interface{}) error {
+func updateInstallInfoInDB(appKey, appName, param string, value interface{}) error {
 	if param != "password" && param != "port" && param != "user-password" {
 		return nil
 	}
