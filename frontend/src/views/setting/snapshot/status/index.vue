@@ -261,6 +261,7 @@ defineExpose({
     font-size: 14px;
     font-weight: 500;
     line-height: 25px;
+    color: var(--el-button-text-color, var(--el-text-color-regular));
 }
 .card-logo {
     font-size: 7px;
