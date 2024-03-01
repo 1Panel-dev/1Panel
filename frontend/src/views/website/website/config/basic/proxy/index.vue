@@ -38,7 +38,6 @@
 
 <script lang="ts" setup name="proxy">
 import { Website } from '@/api/interface/website';
-import OpDialog from '@/components/del-dialog/index.vue';
 import { OperateProxyConfig, GetProxyConfig } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
 import Create from './create/index.vue';

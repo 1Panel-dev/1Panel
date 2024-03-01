@@ -53,18 +53,7 @@
                 </el-col>
 
                 <el-col :xs="24" :sm="4" :md="4" :lg="4" :xl="4">
-                    <div class="search-button">
-                        <el-input
-                            class="table-button"
-                            v-model="searchReq.name"
-                            clearable
-                            @clear="search()"
-                            suffix-icon="Search"
-                            @keyup.enter="search()"
-                            @change="search()"
-                            :placeholder="$t('commons.button.search')"
-                        ></el-input>
-                    </div>
+                    <TableSearch @search="search()" v-model:searchName="searchReq.name" />
                 </el-col>
             </el-row>
         </template>

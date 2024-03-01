@@ -8,17 +8,7 @@
                         <el-col :span="8"></el-col>
                         <el-col :span="8"></el-col>
                         <el-col :span="8">
-                            <div class="search-button">
-                                <el-input
-                                    v-model.trim="sshSearch.loginUser"
-                                    clearable
-                                    @clear="search()"
-                                    suffix-icon="Search"
-                                    @keyup.enter="search()"
-                                    @change="search()"
-                                    :placeholder="$t('commons.table.user')"
-                                ></el-input>
-                            </div>
+                            <TableSearch @search="search()" v-model:searchName="sshSearch.loginUser" />
                         </el-col>
                     </el-row>
                 </div>

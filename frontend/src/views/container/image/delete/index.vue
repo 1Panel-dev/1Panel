@@ -48,7 +48,6 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import { ElForm } from 'element-plus';
-import OpDialog from '@/components/del-dialog/index.vue';
 import { imageRemove } from '@/api/modules/container';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import i18n from '@/lang';

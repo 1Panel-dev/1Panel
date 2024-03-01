@@ -59,7 +59,6 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import OpDialog from '@/components/del-dialog/index.vue';
 import { computeSize, dateFormat, downloadFile } from '@/utils/util';
 import { handleBackup, handleRecover } from '@/api/modules/setting';
 import i18n from '@/lang';

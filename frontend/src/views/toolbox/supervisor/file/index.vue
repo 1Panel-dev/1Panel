@@ -49,7 +49,6 @@
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
-import OpDialog from '@/components/del-dialog/index.vue';
 import { onUnmounted, reactive, ref, shallowRef } from 'vue';
 import { OperateSupervisorProcessFile } from '@/api/modules/host-tool';
 import i18n from '@/lang';

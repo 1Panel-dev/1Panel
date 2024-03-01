@@ -111,7 +111,6 @@
 <script setup lang="ts">
 import { Command } from '@/api/interface/command';
 import GroupDialog from '@/components/group/index.vue';
-import OpDialog from '@/components/del-dialog/index.vue';
 import GroupChangeDialog from '@/components/group/change.vue';
 import { addCommand, editCommand, deleteCommand, getCommandPage } from '@/api/modules/host';
 import { reactive, ref } from 'vue';

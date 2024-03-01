@@ -114,8 +114,6 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import Tooltip from '@/components/tooltip/index.vue';
-import OpDialog from '@/components/del-dialog/index.vue';
 import MonitorDialog from '@/views/container/container/monitor/index.vue';
 import ContainerLogDialog from '@/views/container/container/log/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';

@@ -84,7 +84,6 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
-import OpDialog from '@/components/del-dialog/index.vue';
 import { Runtime } from '@/api/interface/runtime';
 import { DeleteRuntime, SearchRuntimes } from '@/api/modules/runtime';
 import { dateFormat, toLowerCase } from '@/utils/util';

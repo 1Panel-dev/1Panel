@@ -18,17 +18,7 @@
                     <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16"></el-col>
                     <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
                         <TableSetting @search="search()" />
-                        <div class="search-button">
-                            <el-input
-                                clearable
-                                v-model="searchInfo"
-                                @clear="search()"
-                                suffix-icon="Search"
-                                @keyup.enter="search()"
-                                @change="search()"
-                                :placeholder="$t('commons.button.search')"
-                            ></el-input>
-                        </div>
+                        <TableSearch @search="search()" v-model:searchName="searchInfo" />
                     </el-col>
                 </el-row>
             </template>
@@ -69,7 +59,6 @@
 </template>
 
 <script setup lang="ts">
-import TableSetting from '@/components/table-setting/index.vue';
 import { dateFormat } from '@/utils/util';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
 import { loadSSHLogs } from '@/api/modules/host';

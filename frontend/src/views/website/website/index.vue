@@ -32,17 +32,7 @@
                         </el-button>
                     </el-col>
                     <el-col :xs="24" :sm="4" :md="4" :lg="4" :xl="4">
-                        <div class="search-button">
-                            <el-input
-                                v-model="req.name"
-                                clearable
-                                @clear="search()"
-                                suffix-icon="Search"
-                                @keyup.enter="search()"
-                                @change="search()"
-                                :placeholder="$t('commons.button.search')"
-                            ></el-input>
-                        </div>
+                        <TableSearch @search="search()" v-model:searchName="req.name" />
                     </el-col>
                 </el-row>
             </template>
@@ -185,7 +175,6 @@
 </template>
 
 <script lang="ts" setup>
-import Tooltip from '@/components/tooltip/index.vue';
 import Backups from '@/components/backup/index.vue';
 import UploadDialog from '@/components/upload/index.vue';
 import DefaultServer from '@/views/website/website/default/index.vue';
@@ -451,9 +440,3 @@ onMounted(() => {
     listGroup();
 });
 </script>
-<style lang="scss" scoped>
-.search-button {
-    float: right;
-    display: inline;
-}
-</style>
