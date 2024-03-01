@@ -367,8 +367,6 @@ function _M.cc_url()
         local urlcc_config = get_site_config("ccurl")
         local uri = ngx.var.uri
 
-        ngx.log(ngx.ERR, "ccrules is" .. cjson.encode(urlcc_rules))
-
         local m, mr = match_rule(urlcc_rules, uri)
         if not m or not mr then
             return

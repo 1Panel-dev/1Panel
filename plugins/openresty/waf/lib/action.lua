@@ -138,6 +138,7 @@ function _M.exec_action(rule_config, match_rule, data)
     ngx.ctx.rule_table = rule_config
     ngx.ctx.action = action
     ngx.ctx.hitData = data
+    
     ngx.ctx.isAttack = true
 
     if rule_config.ipBlock and rule_config.ipBlock == 'on' then

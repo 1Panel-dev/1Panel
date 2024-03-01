@@ -129,32 +129,24 @@
     "type": "cookie",
     "state": "on",
     "code": 403,
-    "action": "deny",
-    "ipBlock": "on",
-    "ipBlockTime": 600
+    "action": "deny"
   },
   "header": {
     "state": "on",
     "type": "header",
     "code": 403,
-    "action": "deny",
-    "ipBlock": "on",
-    "ipBlockTime": 600
+    "action": "deny"
   },
   "defaultUaBlack": {
     "type": "defaultUaBlack",
     "state": "on",
     "code": 403,
-    "ipBlock": "on",
-    "ipBlockTime": 600,
     "action": "deny"
   },
   "args": {
     "type": "args",
     "state": "on",
     "code": 403,
-    "action": "deny",
-    "ipBlock": "on",
-    "ipBlockTime": 600
+    "action": "deny"
   }
 }
