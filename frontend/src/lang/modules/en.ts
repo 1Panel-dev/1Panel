@@ -291,6 +291,7 @@ const message = {
         process: 'Process',
         network: 'Network',
         supervisor: 'Supervisor',
+        name: 'Tamper Proof',
     },
     home: {
         restart_1panel: 'Restart Panel',
@@ -2145,16 +2146,42 @@ const message = {
             name: 'X-Pack',
             waf: {
                 name: 'WAF',
-                blackWhite: 'black and white list',
+                blackWhite: 'Black and White List',
                 globalSetting: 'Global Setting',
-                websiteSetting: 'Website Settings',
-                blockRecords: 'Block records',
+                websiteSetting: 'Website Setting',
+                blockRecords: 'Block Records',
             },
             monitor: {
-                name: 'Website monitoring',
+                name: 'Website Monitoring',
             },
             tamper: {
-                name: 'Tamper-proof',
+                tamperHelper1:
+                    'One-click deployment type of website, it is recommended to enable the application directory anti-tampering function;',
+                tamperHelper2:
+                    'If the website cannot be used normally or backup and restore fail after enabling the anti-tampering function, please disable the anti-tampering function first;',
+                tamperHelper3:
+                    'Enabling tamper-proofing will restrict reading, writing, deleting, permission, and owner modification operations of protected files under non-excluded directories. Please choose carefully when setting [Exclude Directory] and [Protect].',
+                op: 'Operation',
+                create: 'Create',
+                file: 'File',
+                tamperPath: 'Protection Directory',
+                tamperPathEdit: 'Modify Path',
+                log: 'Intercept Logs',
+                totalProtect: 'Total Protection',
+                todayProtect: 'Today’s Protection',
+                addRule: 'Add Rule',
+                ignore: 'Exclude Directory',
+                ignoreHelper: 'One per line, e.g., \ntmp\n./tmp',
+                ignoreHelper1: 'Add folder names or specific paths to ignore',
+                ignoreHelper2: 'To ignore specific folders, use relative paths starting with ./',
+                protect: 'Protect',
+                protectHelper: 'One per line, e.g., \npng\n./test.css',
+                protectHelper1: 'Specify file names, suffixes, or specific files for protection',
+                protectHelper2: 'To protect specific files, use relative paths starting with ./',
+                enableHelper:
+                    'The anti-tampering function of website {0} is about to be enabled to enhance website security. Do you want to continue?',
+                disableHelper:
+                    'The anti-tampering function of website {0} is about to be disabled. Do you want to continue?',
             },
         },
     },

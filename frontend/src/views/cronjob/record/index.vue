@@ -245,7 +245,7 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import { MsgSuccess } from '@/utils/message';
 import { listDbItems } from '@/api/modules/database';
 import { ListAppInstalled } from '@/api/modules/app';
-import { shortcuts } from './../helper';
+import { shortcuts } from '@/utils/shortcuts';
 
 const loading = ref();
 const refresh = ref(false);
