@@ -54,7 +54,7 @@ func (u *CommandRepo) GetList(opts ...DBOption) ([]model.Command, error) {
 	return commands, err
 }
 
-func (c *CommandRepo) WithByInfo(info string) DBOption {
+func (u *CommandRepo) WithByInfo(info string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		if len(info) == 0 {
 			return g

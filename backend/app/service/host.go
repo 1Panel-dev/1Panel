@@ -54,8 +54,8 @@ func (u *HostService) TestByInfo(req dto.HostConnTest) bool {
 		}
 		req.Password = host.Password
 		req.AuthMode = host.AuthMode
-		req.PrivateKey = host.PrivateKey
-		req.PassPhrase = host.PassPhrase
+		req.PrivateKey, _ = encrypt.StringDecrypt(host.PrivateKey)
+		req.PassPhrase, _ = encrypt.StringDecrypt(host.PassPhrase)
 	}
 
 	var connInfo ssh.ConnInfo
