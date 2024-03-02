@@ -6,10 +6,6 @@ local ipairs = ipairs
 local type = type
 local find_str = string.find
 local gmatch_str = string.gmatch
-local gsub_str = string.gsub
-local format_str = string.format
-local random = math.random
-
 
 local _M = {}
 
@@ -148,15 +144,6 @@ function _M.is_intranet_address(ip_addr)
     else
         return false
     end
-end
-
-
-function _M.uuid()
-    local template ='xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
-    return gsub_str(template, '[xy]', function (c)
-        local v = (c == 'x') and random(0, 0xf) or random(8, 0xb)
-        return format_str('%x', v)
-    end)
 end
 
 function _M.get_wafdb(waf_db_path)

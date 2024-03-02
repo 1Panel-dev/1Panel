@@ -48,7 +48,7 @@ function _M.init_db()
     local status = {}
     if not check_table("attack_log",wafdb) then
         status = wafdb:exec([[
-            CREATE TABLE attack_log (
+            CREATE TABLE req_logs (
                 id TEXT PRIMARY KEY,
                 ip TEXT,
                 ip_iso TEXT,
@@ -72,7 +72,8 @@ function _M.init_db()
                 nginx_log TEXT,
                 blocking_time INTEGER,
                 action TEXT,
-                is_block INTEGER
+                is_block INTEGER,
+                is_attack INTEGER
             )]])
     end
 
@@ -95,12 +96,13 @@ function _M.init_db()
                 day TEXT,
                 req_count INTEGER,
                 attack_count INTEGER,
-                count_4xx INTEGER,
-                count_5xx INTEGER
+                count4xx INTEGER,
+                count5xx INTEGER,
+                create_date DATETIME
             )]])
         ngx.log(ngx.ERR, "init waf_stat status"..status)
     end
-
+    
     ngx.log(ngx.ERR, "init db success")
 end
 

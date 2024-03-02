@@ -8,32 +8,58 @@ local upper_str = string.upper
 local tonumber = tonumber
 local pairs = pairs
 
-
-local function writeAttackLog()
-    local rule_table = ngx.ctx.rule_table
-    local action = ngx.ctx.action
-    local rule = rule_table.rule
-
-    local rule_type = rule_table.type
-    if not rule_type then
-        rule_type = "default"
+local function write_req_Log(wafdb,attack)
+    local rule_table = nil
+    local action = ""
+    local rule = nil
+    local rule_type = ""
+    local is_attack = 0
+    local is_block = 0
+    local blocking_time = 0
+ 
+    if attack then
+        rule_table = ngx.ctx.rule_table
+        action = ngx.ctx.action
+        rule = rule_table.rule
+        rule_type = rule_table.type
+        is_attack = 1
+        if not rule_type then
+            rule_type = "default"
+        end
+        if ngx.ctx.ipBlocked then
+            is_block = 1
+            blocking_time = tonumber(rule_table.ipBlockTime)
+        end
     end
 
     local real_ip = ngx.ctx.ip
     local geoip = ngx.ctx.geoip
-    local country = geoip.country
+    local country
+    local province
+    local longitude = 0.0
+    local latitude = 0.0
+    local iso = "CN"
+    if geoip then
+        country = geoip.country
+        province = geoip.province
+        longitude = geoip.longitude
+        latitude = geoip.latitude
+        iso = geoip.iso
+    else 
+        ngx.log(ngx.ERR, real_ip .. " 无法获取地址")
+    end
     if not country then
-        country["zh"] = "unknown"
-        country["en"] = "unknown"
+        country = {
+            ["zh"] = "unknown",
+            ["en"] = "unknown"
+        }
     end
-    local province = geoip.province
     if not province then
-        province["zh"] = "unknown"
-        province["en"] = "unknown"
+        province = {
+            ["zh"] = "unknown",
+            ["en"] = "unknown"
+        }
     end
-    local longitude = geoip.longitude
-    local latitude = geoip.latitude
-    local iso = geoip.iso
 
     local method = ngx.req.get_method()
     local uri = ngx.var.request_uri
@@ -41,8 +67,6 @@ local function writeAttackLog()
     local host = ngx.var.server_name
     local protocol = ngx.var.server_protocol
     local website_key = ngx.ctx.website_key
- 
-
    
     local logs_str = method .. "  " .. uri .. " "..protocol.."\n"
     local headers = ngx.req.get_headers(20000)
@@ -53,38 +77,24 @@ local function writeAttackLog()
         end
         logs_str = logs_str .. upper_str(k) .. ": " .. value .. "\n"
     end
-    
-
-    local isBlock = 0
-    local blocking_time = 0
-    if ngx.ctx.ipBlocked then
-        isBlock = 1
-        blocking_time = tonumber(rule_table.ipBlockTime)
-    end
 
     local log_id = uuid()
     local time = os.time()
     local localtime = os.date("%Y-%m-%d %H:%M:%S", time)
-
-
-    local wafdb = utils.get_wafdb(config.waf_db_path)
-    if wafdb == nil then
-        return false
-    end
     
     local insertQuery = [[
-        INSERT INTO attack_log (
+        INSERT INTO req_logs (
             id, ip, ip_iso, ip_country_zh, ip_country_en,
             ip_province_zh, ip_province_en, ip_longitude, ip_latitude,
             time, localtime, server_name,  website_key, host, method, 
             uri, user_agent, rule_type,match_rule, match_value,
-            nginx_log, blocking_time, action, is_block
+            nginx_log, blocking_time, action, is_block,is_attack
         ) VALUES (
             :id, :real_ip, :iso,  :country_zh, :country_en,
             :province_zh, :province_en,:longitude, :latitude,
             :time, :localtime, :server_name,:host, :website_key, :method, 
             :uri, :ua, :rule_type, :match_rule, :match_value,
-            :logs_str, :blocking_time, :action, :is_block
+            :logs_str, :blocking_time, :action, :is_block, :is_attack
         )
      ]]
 
@@ -114,7 +124,8 @@ local function writeAttackLog()
         logs_str = logs_str, 
         blocking_time = blocking_time or 0,
         action = action,
-        is_block = isBlock
+        is_block = is_block,
+        is_attack = is_attack
     }
 
     local code = stmt:step()
@@ -161,11 +172,48 @@ local function count_not_found()
     end
 end
 
+local function count_req_status(wafdb,is_attack)
+    local today = ngx.today()
+    local status = ngx.status
+
+    local stmt_exist = wafdb:prepare("SELECT COUNT(*) FROM waf_stat WHERE day = ?")
+    stmt_exist:bind_values(today)
+    stmt_exist:step()
+    local count = stmt_exist:get_uvalues()
+
+    local req_count_update = 1
+    local count_4xx_update = (status >= 400 and status < 500) and 1 or 0
+    local count_5xx_update = (status >= 500) and 1 or 0
+    local attack_count_update = is_attack and 1 or 0
+    local code = 0
+    
+    if count > 0 then
+        local stmt = wafdb:prepare("UPDATE waf_stat SET req_count = req_count + ?, count4xx = count4xx + ?, count5xx = count5xx + ?, attack_count = attack_count + ? WHERE day = ?")
+        stmt:bind_values(req_count_update, count_4xx_update, count_5xx_update, attack_count_update, today)
+        code = stmt:step()
+        stmt:finalize()
+    else
+        local stmt = wafdb:prepare("INSERT INTO waf_stat (day, req_count, count4xx, count5xx, attack_count,create_date) VALUES (?, ?, ?, ?, ?,DATETIME('now'))")
+        stmt:bind_values(today, req_count_update, count_4xx_update, count_5xx_update, attack_count_update)
+        code = stmt:step()
+        stmt:finalize()
+    end
+
+    if code ~= 101 then
+        local errorMsg = wafdb:errmsg()
+        if errorMsg then
+            ngx.log(ngx.ERR, "update waf_stat error ", errorMsg .. "  ")
+        end
+    end
+end
+
 if config.is_waf_on() then
     count_not_found()
-    local isAttack = ngx.ctx.isAttack
-
-    if isAttack then
-        writeAttackLog()
+    local is_attack = ngx.ctx.is_attack
+    
+    local wafdb = utils.get_wafdb(config.waf_db_path)
+    if wafdb ~= nil then
+        count_req_status(wafdb,is_attack)
+        write_req_Log(wafdb,is_attack)
     end
 end
