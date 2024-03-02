@@ -138,8 +138,7 @@ function _M.exec_action(rule_config, match_rule, data)
     ngx.ctx.rule_table = rule_config
     ngx.ctx.action = action
     ngx.ctx.hitData = data
-    
-    ngx.ctx.isAttack = true
+    ngx.ctx.is_attack = true
 
     if rule_config.ipBlock and rule_config.ipBlock == 'on' then
         _M.block_ip(ngx.ctx.ip, rule_config)
@@ -151,13 +150,7 @@ function _M.exec_action(rule_config, match_rule, data)
 
     attack_count(rule_config.type)
 
-    local msg = "访问 IP " .. ngx.ctx.ip .. " 访问 URL" .. ngx.var.uri .. " 触发动作 " .. action .. "User-Agent" .. ngx.ctx.ua .. "  规则类型 " .. rule_config.type .. "  规则 " .. rule_config.rule
-    if ngx.ctx.country then
-        msg = "国家" .. ngx.ctx.country["zh"]
-    end
-    if ngx.ctx.city then
-        msg = "省份" .. ngx.ctx.city["zh"]
-    end
+    local msg = "访问 IP " .. ngx.ctx.ip .. " 访问 URL" .. ngx.var.uri .. " 触发动作 " .. action .. " User-Agent " .. ngx.ctx.ua .. "  规则类型 " .. rule_config.type .. "  规则 " .. rule_config.rule
 
     ngx.log(ngx.ERR, msg)
     if action == "allow" then

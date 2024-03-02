@@ -146,7 +146,7 @@ end
 if config.is_waf_on() then
     init()
     waf_api()
-
+    
     if lib.is_white_ip() then
         return true
     end
