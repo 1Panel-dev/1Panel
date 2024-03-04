@@ -24,6 +24,14 @@ type DashboardBase struct {
 	CurrentInfo DashboardCurrent `json:"currentInfo"`
 }
 
+type OsInfo struct {
+	OS             string `json:"os"`
+	Platform       string `json:"platform"`
+	PlatformFamily string `json:"platformFamily"`
+	KernelArch     string `json:"kernelArch"`
+	KernelVersion  string `json:"kernelVersion"`
+}
+
 type DashboardCurrent struct {
 	Uptime          uint64 `json:"uptime"`
 	TimeSinceUptime string `json:"timeSinceUptime"`

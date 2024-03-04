@@ -1887,6 +1887,19 @@ definitions:
       option:
         type: string
     type: object
+  dto.OsInfo:
+    properties:
+      kernelArch:
+        type: string
+      kernelVersion:
+        type: string
+      os:
+        type: string
+      platform:
+        type: string
+      platformFamily:
+        type: string
+    type: object
   dto.PageContainer:
     properties:
       excludeAppStore:
@@ -3319,7 +3332,6 @@ definitions:
       path:
         type: string
     required:
-    - content
     - path
     type: object
   request.FileMove:
@@ -7410,6 +7422,21 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Load dashboard base info
+      tags:
+      - Dashboard
+  /dashboard/base/os:
+    get:
+      consumes:
+      - application/json
+      description: 获取服务器基础数据
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.OsInfo'
+      security:
+      - ApiKeyAuth: []
+      summary: Load os info
       tags:
       - Dashboard
   /dashboard/current/:ioOption/:netOption:

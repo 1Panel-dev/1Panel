@@ -1405,14 +1405,15 @@ const message = {
         createSnapshot: 'Create snapshot',
         importSnapshot: 'Sync snapshot',
         recover: 'Recover',
-        noRecoverRecord: 'No recovery record has been recorded',
         lastRecoverAt: 'Last recovery time',
         lastRollbackAt: 'Last rollback time',
-        noRollbackRecord: 'No rollback record has been recorded',
         reDownload: 'Download the backup file again',
         recoverRecord: 'Recover record',
         recoverHelper:
             'The recovery is about to start from snapshot {0}, and the recovery needs to restart docker and 1panel service, do you want to continue?',
+        recoverHelper1:
+            'Will start restoring from snapshot {0}, please ensure that the server architecture matches the one where the snapshot was created.',
+        recoverHelper2: 'Restoring snapshots between different server architectures is not supported.',
         rollback: 'Rollback',
         rollbackHelper:
             'This recovery is about to be rolled back, which will replace all the files recovered this time. In the process, docker and 1panel services may need to be restarted. Do you want to continue?',

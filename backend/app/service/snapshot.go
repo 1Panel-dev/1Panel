@@ -19,6 +19,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
+	"github.com/shirou/gopsutil/v3/host"
 )
 
 type SnapshotService struct {
@@ -134,6 +135,9 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 	if err != nil {
 		return err
 	}
+	if hasOs(snap.Name) && !strings.Contains(snap.Name, loadOs()) {
+		return fmt.Errorf("Restoring snapshots(%s) between different server architectures(%s) is not supported.", snap.Name, loadOs())
+	}
 	if !req.IsNew && len(snap.InterruptStep) != 0 && len(snap.RollbackStatus) != 0 {
 		return fmt.Errorf("the snapshot has been rolled back and cannot be restored again")
 	}
@@ -189,9 +193,10 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto
 
 	if req.ID == 0 {
 		versionItem, _ := settingRepo.Get(settingRepo.WithByKey("SystemVersion"))
-		name := fmt.Sprintf("1panel_%s_%s", versionItem.Value, timeNow)
+
+		name := fmt.Sprintf("1panel_%s_%s_%s", versionItem.Value, loadOs(), timeNow)
 		if isCronjob {
-			name = fmt.Sprintf("snapshot_1panel_%s_%s", versionItem.Value, timeNow)
+			name = fmt.Sprintf("snapshot_1panel_%s_%s_%s", versionItem.Value, loadOs(), timeNow)
 		}
 		rootDir = path.Join(localDir, "system", name)
 
@@ -480,4 +485,24 @@ func loadLogByStatus(status model.SnapshotStatus, logPath string) {
 	}
 	defer file.Close()
 	_, _ = file.Write([]byte(logs))
+}
+
+func hasOs(name string) bool {
+	return strings.Contains(name, "amd64") ||
+		strings.Contains(name, "arm64") ||
+		strings.Contains(name, "armv7") ||
+		strings.Contains(name, "ppc64le") ||
+		strings.Contains(name, "s390x")
+}
+
+func loadOs() string {
+	hostInfo, _ := host.Info()
+	switch hostInfo.KernelArch {
+	case "x86_64":
+		return "amd64"
+	case "armv7l":
+		return "armv7"
+	default:
+		return hostInfo.KernelArch
+	}
 }

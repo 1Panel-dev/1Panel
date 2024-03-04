@@ -22,6 +22,7 @@ import (
 type DashboardService struct{}
 
 type IDashboardService interface {
+	LoadOsInfo() (*dto.OsInfo, error)
 	LoadBaseInfo(ioOption string, netOption string) (*dto.DashboardBase, error)
 	LoadCurrentInfo(ioOption string, netOption string) *dto.DashboardCurrent
 
@@ -47,6 +48,27 @@ func (u *DashboardService) Restart(operation string) error {
 		}
 	}()
 	return nil
+}
+
+func (u *DashboardService) LoadOsInfo() (*dto.OsInfo, error) {
+	var baseInfo dto.OsInfo
+	hostInfo, err := host.Info()
+	if err != nil {
+		return nil, err
+	}
+	baseInfo.OS = hostInfo.OS
+	baseInfo.Platform = hostInfo.Platform
+	baseInfo.PlatformFamily = hostInfo.PlatformFamily
+	baseInfo.KernelArch = hostInfo.KernelArch
+	baseInfo.KernelVersion = hostInfo.KernelVersion
+
+	if baseInfo.KernelArch == "armv7l" {
+		baseInfo.KernelArch = "armv7"
+	}
+	if baseInfo.KernelArch == "x86_64" {
+		baseInfo.KernelArch = "amd64"
+	}
+	return &baseInfo, nil
 }
 
 func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto.DashboardBase, error) {

@@ -9,6 +9,22 @@ import (
 )
 
 // @Tags Dashboard
+// @Summary Load os info
+// @Description 获取服务器基础数据
+// @Accept json
+// @Success 200 {object} dto.OsInfo
+// @Security ApiKeyAuth
+// @Router /dashboard/base/os [get]
+func (b *BaseApi) LoadDashboardOsInfo(c *gin.Context) {
+	data, err := dashboardService.LoadOsInfo()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags Dashboard
 // @Summary Load dashboard base info
 // @Description 获取首页基础数据
 // @Accept json

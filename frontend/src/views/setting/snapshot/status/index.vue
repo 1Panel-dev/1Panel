@@ -172,7 +172,8 @@ import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { snapshotRecover, snapshotRollback } from '@/api/modules/setting';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
+import { loadOsInfo } from '@/api/modules/dashboard';
 
 const drawerVisible = ref(false);
 const snapInfo = ref();
@@ -210,7 +211,27 @@ const doRecover = async (isNew: boolean) => {
 };
 
 const recoverSnapshot = async (isNew: boolean) => {
-    ElMessageBox.confirm(i18n.global.t('setting.recoverHelper', [snapInfo.value.name]), {
+    let msg = i18n.global.t('setting.recoverHelper', [snapInfo.value.name]);
+    if (
+        snapInfo.value.name.indexOf('amd64') === -1 &&
+        snapInfo.value.name.indexOf('arm64') === -1 &&
+        snapInfo.value.name.indexOf('armv7') === -1 &&
+        snapInfo.value.name.indexOf('ppc64le') === -1 &&
+        snapInfo.value.name.indexOf('s390x') === -1
+    ) {
+        msg = i18n.global.t('setting.recoverHelper1', [snapInfo.value.name]);
+    } else {
+        const res = await loadOsInfo();
+        let osVal = res.data.kernelArch;
+        if (osVal === '') {
+            msg = i18n.global.t('setting.recoverHelper1', [snapInfo.value.name]);
+        } else if (snapInfo.value.name.indexOf(osVal) === -1) {
+            MsgError(i18n.global.t('setting.recoverHelper2'));
+            return;
+        }
+    }
+
+    ElMessageBox.confirm(msg, i18n.global.t('commons.button.recover'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
