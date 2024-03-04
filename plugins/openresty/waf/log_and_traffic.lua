@@ -8,7 +8,7 @@ local upper_str = string.upper
 local tonumber = tonumber
 local pairs = pairs
 
-local function write_req_Log(wafdb,attack)
+local function write_req_log(wafdb,attack)
     local rule_table = nil
     local action = ""
     local rule = nil
@@ -73,7 +73,11 @@ local function write_req_Log(wafdb,attack)
     for k, v in pairs(headers) do
         local value = ""
         if v then
-            value = v
+            if type(v) == "table" then
+                value = table.concat(v, ",")
+            else
+                value = v
+            end
         end
         logs_str = logs_str .. upper_str(k) .. ": " .. value .. "\n"
     end
@@ -214,6 +218,6 @@ if config.is_waf_on() then
     local wafdb = utils.get_wafdb(config.waf_db_path)
     if wafdb ~= nil then
         count_req_status(wafdb,is_attack)
-        write_req_Log(wafdb,is_attack)
+        write_req_log(wafdb,is_attack)
     end
 end

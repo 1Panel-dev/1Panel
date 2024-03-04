@@ -1,6 +1,6 @@
 local geoip = require "geoip"
 local lib = require "lib"
-local fileUtils = require "file"
+local file_utils = require "file"
 local config = require "config"
 local cc = require "cc"
 local utils = require "utils"
@@ -11,7 +11,7 @@ local sub_str = string.sub
 local find_str = string.find
 local split_str = utils.split
 local encode = cjson.encode
-local read_file2table = fileUtils.read_file2table
+local read_file2table = file_utils.read_file2table
 local tonumber = tonumber
 local date = os.date
 local format_str = string.format
@@ -64,9 +64,10 @@ local function init()
     if not ua then
         ua = ""
     end
-    ngx.ctx.ua = ua
-    geoip.init()
 
+    geoip.init()
+    
+    ngx.ctx.ua = ua
     ngx.ctx.geoip = get_geo_ip(ip)
 
     local msg = "访问 IP  " .. ip
@@ -143,9 +144,16 @@ local function waf_api()
     end
 end
 
+ngx.log(ngx.ERR,"access waf")
+
 if config.is_waf_on() then
     init()
     waf_api()
+    
+    if ngx.ctx.website_key == "unknown" then
+        ngx.exit(403)
+        return
+    end
     
     if lib.is_white_ip() then
         return true
@@ -174,5 +182,4 @@ if config.is_waf_on() then
     lib.cookie_check()
     lib.post_check()
     lib.header_check()
-
 end

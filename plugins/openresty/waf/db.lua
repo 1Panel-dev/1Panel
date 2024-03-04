@@ -28,7 +28,7 @@ local function check_table(table_name,wafdb)
     return rows > 0
 end
 
-function _M.init_db()
+function _M.init()
     local ok, sqlite3 = pcall(function()
         return require "lsqlite3"
     end)

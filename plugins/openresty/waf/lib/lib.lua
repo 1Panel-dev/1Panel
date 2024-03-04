@@ -1,7 +1,7 @@
 local redis_util = require "redis_util"
 local action = require "action"
 local cc = require "cc"
-local fileUtils = require "file"
+local file_utils = require "file"
 local ck = require "resty.cookie"
 local geo = require "geoip"
 local libinjection = require "resty.libinjection"
@@ -154,7 +154,7 @@ local function get_request_body()
     if not body_data then
         local body_file = ngx.req.get_body_file()
         if body_file then
-            body_data = fileUtils.read_file2string(body_file, true)
+            body_data = file_utils.read_file2string(body_file, true)
         end
     end
     return body_data
