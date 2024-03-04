@@ -109,7 +109,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 		backupDir := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("database/%s/%s/%s", dbInfo.DBType, record.Name, dbInfo.Name))
 		record.FileName = fmt.Sprintf("db_%s_%s.sql.gz", dbInfo.Name, startTime.Format("20060102150405")+common.RandStrAndNum(5))
 		if cronjob.DBType == "mysql" || cronjob.DBType == "mariadb" {
-			if err := handleMysqlBackup(dbInfo.Database, dbInfo.Name, backupDir, record.FileName); err != nil {
+			if err := handleMysqlBackup(dbInfo.Database, dbInfo.DBType, dbInfo.Name, backupDir, record.FileName); err != nil {
 				return err
 			}
 		} else {
