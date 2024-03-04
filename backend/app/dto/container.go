@@ -38,8 +38,8 @@ type ContainerInfo struct {
 }
 
 type ResourceLimit struct {
-	CPU    int `json:"cpu"`
-	Memory int `json:"memory"`
+	CPU    int    `json:"cpu"`
+	Memory uint64 `json:"memory"`
 }
 
 type ContainerOperate struct {
