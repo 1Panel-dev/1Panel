@@ -867,7 +867,7 @@ const message = {
         ip: '主機地址',
         authMode: '認證方式',
         passwordMode: '密碼認證',
-        rememberPassword: '記住密碼',
+        rememberPassword: '記住認證資訊',
         keyMode: '私鑰認證',
         key: '私鑰',
         keyPassword: '私鑰密碼',

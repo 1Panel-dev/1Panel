@@ -909,7 +909,7 @@ const message = {
         ip: 'Address',
         authMode: 'Auth Mode',
         passwordMode: 'Password',
-        rememberPassword: 'Remember password',
+        rememberPassword: 'Remember Authentication Information',
         keyMode: 'PrivateKey',
         key: 'Private key',
         keyPassword: 'Private key password',

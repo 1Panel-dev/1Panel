@@ -868,7 +868,7 @@ const message = {
         ip: '主机地址',
         authMode: '认证方式',
         passwordMode: '密码认证',
-        rememberPassword: '记住密码',
+        rememberPassword: '记住认证信息',
         keyMode: '私钥认证',
         key: '私钥',
         keyPassword: '私钥密码',
