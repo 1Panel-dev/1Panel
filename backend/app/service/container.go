@@ -337,7 +337,7 @@ func (u *ContainerService) LoadResourceLimit() (*dto.ResourceLimit, error) {
 
 	data := dto.ResourceLimit{
 		CPU:    cpuCounts,
-		Memory: int(memoryInfo.Total),
+		Memory: memoryInfo.Total,
 	}
 	return &data, nil
 }
