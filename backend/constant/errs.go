@@ -62,6 +62,7 @@ var (
 	ErrAppNameExist        = "ErrAppNameExist"
 	ErrFileNotFound        = "ErrFileNotFound"
 	ErrFileParseApp        = "ErrFileParseApp"
+	ErrAppParamKey         = "ErrAppParamKey"
 )
 
 // website

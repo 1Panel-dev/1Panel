@@ -60,6 +60,7 @@ ErrAppNameExist: 'App name is already exist'
 AppStoreIsSyncing: 'The App Store is syncing, please try again later'
 ErrGetCompose: "Failed to obtain docker-compose.yml file! {{ .detail }}"
 ErrAppWarn: "Abnormal status, please check the log"
+ErrAppParamKey: "Parameter {{ .name }} field exception"
 
 #file
 ErrFileCanNotRead: "File can not read"

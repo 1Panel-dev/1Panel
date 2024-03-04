@@ -60,6 +60,7 @@ ErrAppNameExist: '应用名称已存在'
 AppStoreIsSyncing: '应用商店正在同步中，请稍后再试'
 ErrGetCompose: "docker-compose.yml 文件获取失败！{{ .detail }}"
 ErrAppWarn: "状态异常，请查看日志"
+ErrAppParamKey: "参数 {{ .name }} 字段异常"
 
 #file
 ErrFileCanNotRead: "此文件不支持预览"
