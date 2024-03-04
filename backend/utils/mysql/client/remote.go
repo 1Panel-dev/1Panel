@@ -1,11 +1,14 @@
 package client
 
 import (
+	"compress/gzip"
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
+	"path"
 	"strings"
 	"time"
 
@@ -13,7 +16,8 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
-	"github.com/1Panel-dev/1Panel/backend/utils/mysql/helper"
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/client"
 )
 
 type Remote struct {
@@ -229,56 +233,63 @@ func (r *Remote) Backup(info BackupInfo) error {
 			return fmt.Errorf("mkdir %s failed, err: %v", info.TargetDir, err)
 		}
 	}
-	fileNameItem := info.TargetDir + "/" + strings.TrimSuffix(info.FileName, ".gz")
-
-	tlsItem, err := ConnWithSSL(r.SSL, r.SkipVerify, r.ClientKey, r.ClientCert, r.RootCert)
+	outfile, _ := os.OpenFile(path.Join(info.TargetDir, info.FileName), os.O_RDWR|os.O_CREATE, 0755)
+	global.LOG.Infof("start to mysqldump | gzip > %s.gzip", info.TargetDir+"/"+info.FileName)
+	image, err := loadImage(info.Type, info.Version)
 	if err != nil {
 		return err
 	}
-	dns := fmt.Sprintf("%s:%s@tcp(%s:%v)/%s?charset=%s&parseTime=true&loc=Asia%sShanghai%s", r.User, r.Password, r.Address, r.Port, info.Name, info.Format, "%2F", tlsItem)
+	backupCmd := fmt.Sprintf("docker run --rm --net=host -i %s /bin/bash -c 'mysqldump -h %s -P %d -u%s -p%s %s --default-character-set=%s %s'",
+		image, r.Address, r.Port, r.User, r.Password, sslSkip(info.Version), info.Format, info.Name)
 
-	f, _ := os.OpenFile(fileNameItem, os.O_RDWR|os.O_CREATE, 0755)
-	defer f.Close()
-	if err := helper.Dump(dns, helper.WithData(), helper.WithDropTable(), helper.WithWriter(f)); err != nil {
-		return err
-	}
+	global.LOG.Debug(backupCmd)
+	cmd := exec.Command("bash", "-c", backupCmd)
 
-	gzipCmd := exec.Command("gzip", fileNameItem)
-	stdout, err := gzipCmd.CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("gzip file %s failed, stdout: %v, err: %v", strings.TrimSuffix(info.FileName, ".gz"), string(stdout), err)
-	}
+	gzipCmd := exec.Command("gzip", "-cf")
+	gzipCmd.Stdin, _ = cmd.StdoutPipe()
+	gzipCmd.Stdout = outfile
+	_ = gzipCmd.Start()
+	_ = cmd.Run()
+	_ = gzipCmd.Wait()
 	return nil
 }
 
 func (r *Remote) Recover(info RecoverInfo) error {
-	fileName := info.SourceFile
-	if strings.HasSuffix(info.SourceFile, ".sql.gz") {
-		fileName = strings.TrimSuffix(info.SourceFile, ".gz")
-		gzipCmd := exec.Command("gunzip", info.SourceFile)
-		stdout, err := gzipCmd.CombinedOutput()
-		if err != nil {
-			return fmt.Errorf("gunzip file %s failed, stdout: %v, err: %v", info.SourceFile, string(stdout), err)
-		}
-		defer func() {
-			gzipCmd := exec.Command("gzip", fileName)
-			_, _ = gzipCmd.CombinedOutput()
-		}()
-	}
-	tlsItem, err := ConnWithSSL(r.SSL, r.SkipVerify, r.ClientKey, r.ClientCert, r.RootCert)
-	if err != nil {
-		return err
-	}
-	dns := fmt.Sprintf("%s:%s@tcp(%s:%v)/%s?charset=%s&parseTime=true&loc=Asia%sShanghai%s", r.User, r.Password, r.Address, r.Port, info.Name, info.Format, "%2F", tlsItem)
+	fi, _ := os.Open(info.SourceFile)
+	defer fi.Close()
 
-	f, err := os.Open(fileName)
+	image, err := loadImage(info.Type, info.Version)
 	if err != nil {
 		return err
 	}
-	defer f.Close()
-	if err := helper.Source(dns, f, helper.WithMergeInsert(1000)); err != nil {
-		return err
+
+	recoverCmd := fmt.Sprintf("docker run --rm --net=host -i %s /bin/bash -c 'mysql -h %s -P %d -u%s -p%s %s --default-character-set=%s %s'",
+		image, r.Address, r.Port, r.User, r.Password, sslSkip(info.Version), info.Format, info.Name)
+
+	global.LOG.Debug(recoverCmd)
+	cmd := exec.Command("bash", "-c", recoverCmd)
+
+	if strings.HasSuffix(info.SourceFile, ".gz") {
+		gzipFile, err := os.Open(info.SourceFile)
+		if err != nil {
+			return err
+		}
+		defer gzipFile.Close()
+		gzipReader, err := gzip.NewReader(gzipFile)
+		if err != nil {
+			return err
+		}
+		defer gzipReader.Close()
+		cmd.Stdin = gzipReader
+	} else {
+		cmd.Stdin = fi
 	}
+	stdout, err := cmd.CombinedOutput()
+	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
+	if err != nil || strings.HasPrefix(string(stdStr), "ERROR ") {
+		return errors.New(stdStr)
+	}
+
 	return nil
 }
 
@@ -388,4 +399,46 @@ func (r *Remote) ExecSQLForHosts(timeout uint) ([]string, error) {
 		rows = append(rows, host)
 	}
 	return rows, nil
+}
+
+func loadImage(dbType, version string) (string, error) {
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		fmt.Println(err)
+	}
+	images, err := cli.ImageList(context.Background(), types.ImageListOptions{})
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	for _, image := range images {
+		for _, tag := range image.RepoTags {
+			if !strings.HasPrefix(tag, dbType+":") {
+				continue
+			}
+			if dbType == "mariadb" && strings.HasPrefix(tag, "mariadb:") {
+				return tag, nil
+			}
+			if strings.HasPrefix(version, "5.6") && strings.HasPrefix(tag, "mysql:5.6") {
+				return tag, nil
+			}
+			if strings.HasPrefix(version, "5.7") && strings.HasPrefix(tag, "mysql:5.7") {
+				return tag, nil
+			}
+			if strings.HasPrefix(version, "8.") && strings.HasPrefix(tag, "mysql:8.") {
+				return tag, nil
+			}
+		}
+	}
+	if dbType == "mariadb" || version == "8.x" {
+		return "mysql:8.2.0", nil
+	}
+	return "mysql:" + version, nil
+}
+
+func sslSkip(version string) string {
+	if strings.HasPrefix(version, "5.6") || strings.HasPrefix(version, "5.7") {
+		return "--skip-ssl"
+	}
+	return "--ssl-mode=DISABLED"
 }
