@@ -992,6 +992,15 @@ func handleLocalAppDetail(versionDir string, appDetail *model.AppDetail) error {
 	if err != nil {
 		return buserr.WithMap(constant.ErrFileParseApp, map[string]interface{}{"name": "data.yml", "err": err.Error()}, err)
 	}
+	var appParam dto.AppForm
+	if err = json.Unmarshal(dataJson, &appParam); err != nil {
+		return buserr.WithMap(constant.ErrFileParseApp, map[string]interface{}{"name": "data.yml", "err": err.Error()}, err)
+	}
+	for _, formField := range appParam.FormFields {
+		if strings.Contains(formField.EnvKey, " ") {
+			return buserr.WithName(constant.ErrAppParamKey, formField.EnvKey)
+		}
+	}
 	appDetail.Params = string(dataJson)
 	return nil
 }
