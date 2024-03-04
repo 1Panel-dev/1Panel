@@ -1,4 +1,11 @@
 export namespace Dashboard {
+    export interface OsInfo {
+        os: string;
+        platform: string;
+        platformFamily: string;
+        kernelArch: string;
+        kernelVersion: string;
+    }
     export interface BaseInfo {
         websiteNumber: number;
         databaseNumber: number;

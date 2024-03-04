@@ -3830,6 +3830,31 @@ const docTemplate = `{
                 }
             }
         },
+        "/dashboard/base/os": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取服务器基础数据",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Load os info",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.OsInfo"
+                        }
+                    }
+                }
+            }
+        },
         "/dashboard/current/:ioOption/:netOption": {
             "get": {
                 "security": [
@@ -16828,6 +16853,26 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.OsInfo": {
+            "type": "object",
+            "properties": {
+                "kernelArch": {
+                    "type": "string"
+                },
+                "kernelVersion": {
+                    "type": "string"
+                },
+                "os": {
+                    "type": "string"
+                },
+                "platform": {
+                    "type": "string"
+                },
+                "platformFamily": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.PageContainer": {
             "type": "object",
             "required": [
@@ -18967,7 +19012,6 @@ const docTemplate = `{
         "request.FileEdit": {
             "type": "object",
             "required": [
-                "content",
                 "path"
             ],
             "properties": {
