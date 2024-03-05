@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -14,20 +13,7 @@ import (
 )
 
 func Exec(cmdStr string) (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
-	defer cancel()
-	cmd := exec.Command("bash", "-c", cmdStr)
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	err := cmd.Run()
-	if ctx.Err() == context.DeadlineExceeded {
-		return "", buserr.New(constant.ErrCmdTimeout)
-	}
-	if err != nil {
-		return handleErr(stdout, stderr, err)
-	}
-	return stdout.String(), nil
+	return ExecWithTimeOut(cmdStr, 20*time.Second)
 }
 
 func handleErr(stdout, stderr bytes.Buffer, err error) (string, error) {
@@ -46,19 +32,28 @@ func handleErr(stdout, stderr bytes.Buffer, err error) (string, error) {
 }
 
 func ExecWithTimeOut(cmdStr string, timeout time.Duration) (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
 	cmd := exec.Command("bash", "-c", cmdStr)
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
-	err := cmd.Run()
-	if ctx.Err() == context.DeadlineExceeded {
+	if err := cmd.Start(); err != nil {
+		return "", err
+	}
+	done := make(chan error, 1)
+	go func() {
+		done <- cmd.Wait()
+	}()
+	after := time.After(timeout)
+	select {
+	case <-after:
+		_ = cmd.Process.Kill()
 		return "", buserr.New(constant.ErrCmdTimeout)
+	case err := <-done:
+		if err != nil {
+			return handleErr(stdout, stderr, err)
+		}
 	}
-	if err != nil {
-		return handleErr(stdout, stderr, err)
-	}
+
 	return stdout.String(), nil
 }
 
@@ -75,9 +70,6 @@ func ExecContainerScript(containerName, cmdStr string, timeout time.Duration) er
 }
 
 func ExecCronjobWithTimeOut(cmdStr, workdir, outPath string, timeout time.Duration) error {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-
 	file, err := os.OpenFile(outPath, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		return err
@@ -88,13 +80,24 @@ func ExecCronjobWithTimeOut(cmdStr, workdir, outPath string, timeout time.Durati
 	cmd.Dir = workdir
 	cmd.Stdout = file
 	cmd.Stderr = file
-
-	err = cmd.Run()
-	if ctx.Err() == context.DeadlineExceeded {
-		return buserr.New(constant.ErrCmdTimeout)
+	if err := cmd.Start(); err != nil {
+		return err
 	}
-
-	return err
+	done := make(chan error, 1)
+	go func() {
+		done <- cmd.Wait()
+	}()
+	after := time.After(timeout)
+	select {
+	case <-after:
+		_ = cmd.Process.Kill()
+		return buserr.New(constant.ErrCmdTimeout)
+	case err := <-done:
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func Execf(cmdStr string, a ...interface{}) (string, error) {
@@ -122,20 +125,29 @@ func ExecWithCheck(name string, a ...string) (string, error) {
 }
 
 func ExecScript(scriptPath, workDir string) (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
-	defer cancel()
 	cmd := exec.Command("bash", scriptPath)
-	cmd.Dir = workDir
 	var stdout, stderr bytes.Buffer
+	cmd.Dir = workDir
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
-	err := cmd.Run()
-	if ctx.Err() == context.DeadlineExceeded {
+	if err := cmd.Start(); err != nil {
+		return "", err
+	}
+	done := make(chan error, 1)
+	go func() {
+		done <- cmd.Wait()
+	}()
+	after := time.After(10 * time.Minute)
+	select {
+	case <-after:
+		_ = cmd.Process.Kill()
 		return "", buserr.New(constant.ErrCmdTimeout)
+	case err := <-done:
+		if err != nil {
+			return handleErr(stdout, stderr, err)
+		}
 	}
-	if err != nil {
-		return handleErr(stdout, stderr, err)
-	}
+
 	return stdout.String(), nil
 }
 
