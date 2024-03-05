@@ -205,7 +205,10 @@ func loadDiskInfo() []dto.DiskInfo {
 	var datas []dto.DiskInfo
 	stdout, err := cmd.ExecWithTimeOut("df -hT -P|grep '/'|grep -v tmpfs|grep -v 'snap/core'|grep -v udev", 2*time.Second)
 	if err != nil {
-		return datas
+		stdout, err = cmd.ExecWithTimeOut("df -lhT -P|grep '/'|grep -v tmpfs|grep -v 'snap/core'|grep -v udev", 1*time.Second)
+		if err != nil {
+			return datas
+		}
 	}
 	lines := strings.Split(stdout, "\n")
 

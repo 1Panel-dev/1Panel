@@ -37,7 +37,7 @@ func (u *SnapshotService) HandleSnapshotRecover(snap model.Snapshot, isRecover b
 			global.LOG.Debug("handle backup before recover successful!")
 			req.IsNew = true
 		}
-		if req.IsNew || snap.InterruptStep == "Download" || (!req.IsNew || req.ReDownload) {
+		if req.IsNew || snap.InterruptStep == "Download" || req.ReDownload {
 			if err := handleDownloadSnapshot(snap, baseDir); err != nil {
 				updateRecoverStatus(snap.ID, isRecover, "Backup", constant.StatusFailed, err.Error())
 				return
