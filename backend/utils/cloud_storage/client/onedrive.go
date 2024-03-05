@@ -116,7 +116,7 @@ func (o oneDriveClient) Upload(src, target string) (bool, error) {
 	}
 	var isOk bool
 	if fileInfo.Size() < 4*1024*1024 {
-		isOk, err = o.upSmall(ctx, src, folderID, fileInfo.Size())
+		isOk, err = o.upSmall(src, folderID, fileInfo.Size())
 	} else {
 		isOk, err = o.upBig(ctx, src, folderID, fileInfo.Size())
 	}
@@ -300,7 +300,7 @@ func (o *oneDriveClient) NewSessionFileUploadRequest(absoluteUrl string, grandOf
 	return req, err
 }
 
-func (o *oneDriveClient) upSmall(ctx context.Context, srcPath, folderID string, fileSize int64) (bool, error) {
+func (o *oneDriveClient) upSmall(srcPath, folderID string, fileSize int64) (bool, error) {
 	file, err := os.Open(srcPath)
 	if err != nil {
 		return false, err

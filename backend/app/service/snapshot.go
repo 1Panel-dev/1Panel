@@ -265,17 +265,23 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto
 				_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
 				return
 			}
-			snapPanelData(itemHelper, localDir, backupPanelDir)
+			if snapStatus.PanelData != constant.StatusDone {
+				snapPanelData(itemHelper, localDir, backupPanelDir)
+			}
 			if snapStatus.PanelData != constant.StatusDone {
 				_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
 				return
 			}
-			snapCompress(itemHelper, rootDir)
+			if snapStatus.Compress != constant.StatusDone {
+				snapCompress(itemHelper, rootDir)
+			}
 			if snapStatus.Compress != constant.StatusDone {
 				_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
 				return
 			}
-			snapUpload(itemHelper, req.From, fmt.Sprintf("%s.tar.gz", rootDir))
+			if snapStatus.Upload != constant.StatusDone {
+				snapUpload(itemHelper, req.From, fmt.Sprintf("%s.tar.gz", rootDir))
+			}
 			if snapStatus.Upload != constant.StatusDone {
 				_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
 				return
