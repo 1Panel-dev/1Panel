@@ -1001,6 +1001,34 @@ func handleLocalAppDetail(versionDir string, appDetail *model.AppDetail) error {
 			return buserr.WithName(constant.ErrAppParamKey, formField.EnvKey)
 		}
 	}
+
+	var dataMap map[string]interface{}
+	err = yaml.Unmarshal(paramByte, &dataMap)
+	if err != nil {
+		return buserr.WithMap(constant.ErrFileParseApp, map[string]interface{}{"name": "data.yml", "err": err.Error()}, err)
+	}
+
+	additionalProperties, ok := dataMap["additionalProperties"].(map[string]interface{})
+	if !ok {
+		return buserr.WithName(constant.ErrAppParamKey, "additionalProperties")
+	}
+
+	formFieldsInterface, ok := additionalProperties["formFields"]
+	if ok {
+		formFields, ok := formFieldsInterface.([]interface{})
+		if !ok {
+			return buserr.WithName(constant.ErrAppParamKey, "formFields")
+		}
+		for _, item := range formFields {
+			field := item.(map[string]interface{})
+			for key, value := range field {
+				if value == nil {
+					return buserr.WithName(constant.ErrAppParamKey, key)
+				}
+			}
+		}
+	}
+
 	appDetail.Params = string(dataJson)
 	return nil
 }
