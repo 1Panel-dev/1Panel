@@ -72,7 +72,7 @@ func (u *SnapshotService) SnapshotImport(req dto.SnapshotImport) error {
 	for _, snap := range req.Names {
 		shortName := strings.TrimPrefix(snap, "snapshot_")
 		nameItems := strings.Split(shortName, "_")
-		if !strings.HasPrefix(shortName, "1panel_v") || !strings.HasSuffix(shortName, ".tar.gz") || len(nameItems) != 3 {
+		if !strings.HasPrefix(shortName, "1panel_v") || !strings.HasSuffix(shortName, ".tar.gz") || len(nameItems) < 3 {
 			return fmt.Errorf("incorrect snapshot name format of %s", shortName)
 		}
 		if strings.HasSuffix(snap, ".tar.gz") {
