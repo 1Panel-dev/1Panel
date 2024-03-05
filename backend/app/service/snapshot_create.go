@@ -140,6 +140,8 @@ func snapPanelData(snap snapHelper, localDir, targetDir string) {
 	}
 
 	_ = snapshotRepo.Update(snap.SnapID, map[string]interface{}{"status": "OnSaveData"})
+	sysIP, _ := settingRepo.Get(settingRepo.WithByKey("SystemIP"))
+	_ = settingRepo.Update("SystemIP", "")
 	checkPointOfWal()
 	if err := handleSnapTar(dataDir, targetDir, "1panel_data.tar.gz", exclusionRules); err != nil {
 		status = err.Error()
@@ -148,6 +150,7 @@ func snapPanelData(snap snapHelper, localDir, targetDir string) {
 
 	snap.Status.PanelData = status
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"panel_data": status})
+	_ = settingRepo.Update("SystemIP", sysIP.Value)
 }
 
 func snapCompress(snap snapHelper, rootDir string) {
