@@ -216,6 +216,7 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto
 		if err != nil {
 			return "", err
 		}
+		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusWaiting})
 		snapStatus, _ = snapshotRepo.GetStatus(snap.ID)
 		if snapStatus.ID == 0 {
 			snapStatus.SnapID = snap.ID
