@@ -1,12 +1,5 @@
-name: 问题咨询
-description: 提出针对本项目安装部署、使用及其他方面的相关问题
-title: "[QUESTION]"
-labels: question
-assignees: wanghe-fit2cloud
-body:
-  - type: textarea
-    id: description
-    attributes:
-      label: "请描述您的问题"
-    validations:
-      required: true
+blank_issues_enabled: false
+contact_links:
+  - name: 问题与讨论 / Questions & Discussions
+    url: https://github.com/1Panel-dev/1Panel/discussions
+    about: 提出针对本项目安装部署、使用及其他方面的相关问题 / Raise questions about the installation, deployment, use and other aspects of the project.
