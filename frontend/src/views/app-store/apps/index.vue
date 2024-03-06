@@ -57,7 +57,7 @@
         <template #rightButton>
             <div class="flex justify-end">
                 <div class="mr-10">
-                    <el-checkbox v-model="req.resource" true-label="all" false-label="remote" @change="search(req)">
+                    <el-checkbox v-model="req.resource" true-value="all" false-value="remote" @change="search(req)">
                         {{ $t('app.showLocal') }}
                     </el-checkbox>
                 </div>

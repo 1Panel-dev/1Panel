@@ -4,6 +4,7 @@
             <el-radio-button
                 class="router_card_button"
                 :label="button.label"
+                :value="button.label"
                 v-for="(button, index) in buttonArray"
                 size="large"
                 :key="index"

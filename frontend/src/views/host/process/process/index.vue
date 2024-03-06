@@ -6,7 +6,7 @@
                 <el-row>
                     <el-col :span="24">
                         <div style="width: 100%">
-                            <el-form-item style="float: right">
+                            <el-form-item class="float-right">
                                 <el-row :gutter="20">
                                     <el-col :span="8">
                                         <TableSearch

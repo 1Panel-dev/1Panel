@@ -8,8 +8,8 @@
         <el-form ref="deleteForm" v-loading="loading">
             <el-form-item>
                 <el-radio-group v-model="withTagAll">
-                    <el-radio :label="false">{{ $t('container.imagePruneSome') }}</el-radio>
-                    <el-radio :label="true">{{ $t('container.imagePruneAll') }}</el-radio>
+                    <el-radio :value="false">{{ $t('container.imagePruneSome') }}</el-radio>
+                    <el-radio :value="true">{{ $t('container.imagePruneAll') }}</el-radio>
                 </el-radio-group>
             </el-form-item>
             <span v-if="withTagAll">

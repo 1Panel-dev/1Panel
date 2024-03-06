@@ -23,7 +23,7 @@
             </template>
 
             <template #search v-if="currentDB">
-                <el-select v-model="currentDBName" @change="changeDatabase()">
+                <el-select v-model="currentDBName" @change="changeDatabase()" class="p-w-200">
                     <template #prefix>{{ $t('commons.table.type') }}</template>
                     <el-option-group :label="$t('database.local')">
                         <div v-for="(item, index) in dbOptionsLocal" :key="index">

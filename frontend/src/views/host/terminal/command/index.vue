@@ -16,7 +16,7 @@
                 </el-button>
             </template>
             <template #search>
-                <el-select v-model="group" @change="search()" clearable>
+                <el-select v-model="group" @change="search()" clearable class="p-w-200">
                     <template #prefix>{{ $t('terminal.group') }}</template>
                     <el-option :label="$t('commons.table.all')" value=""></el-option>
                     <div v-for="item in groupList" :key="item.name">

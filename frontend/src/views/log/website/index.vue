@@ -25,7 +25,7 @@
             </template>
             <template #search>
                 <div>
-                    <el-select v-model="logConfig.id" @change="changeWebsite()">
+                    <el-select v-model="logConfig.id" @change="changeWebsite()" class="p-w-200">
                         <template #prefix>{{ $t('website.website') }}</template>
                         <el-option
                             v-for="(website, index) in websites"

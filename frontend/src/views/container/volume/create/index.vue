@@ -33,8 +33,8 @@
                         </el-form-item>
                         <el-form-item :label="$t('container.version')" prop="nfsVersion">
                             <el-radio-group v-model="form.nfsVersion">
-                                <el-radio label="v3">NFS</el-radio>
-                                <el-radio label="v4">NFS4</el-radio>
+                                <el-radio value="v3">NFS</el-radio>
+                                <el-radio value="v4">NFS4</el-radio>
                             </el-radio-group>
                         </el-form-item>
                         <el-form-item :label="$t('container.mountpoint')" prop="nfsMount">

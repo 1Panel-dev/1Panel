@@ -91,14 +91,14 @@
                             v-model="chartOption"
                             @change="changeOption"
                         >
-                            <el-radio-button label="network">{{ $t('home.network') }}</el-radio-button>
-                            <el-radio-button label="io">{{ $t('home.io') }}</el-radio-button>
+                            <el-radio-button value="network">{{ $t('home.network') }}</el-radio-button>
+                            <el-radio-button value="io">{{ $t('home.io') }}</el-radio-button>
                         </el-radio-group>
                         <el-select
                             v-if="chartOption === 'network'"
                             @change="onLoadBaseInfo(false, 'network')"
                             v-model="searchInfo.netOption"
-                            style="float: right"
+                            class="p-w-200 float-right"
                         >
                             <template #prefix>{{ $t('home.networkCard') }}</template>
                             <el-option
@@ -112,7 +112,7 @@
                             v-if="chartOption === 'io'"
                             v-model="searchInfo.ioOption"
                             @change="onLoadBaseInfo(false, 'io')"
-                            style="float: right"
+                            class="p-w-200 float-right"
                         >
                             <template #prefix>{{ $t('home.disk') }}</template>
                             <el-option

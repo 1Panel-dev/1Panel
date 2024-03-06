@@ -76,8 +76,8 @@
                     </el-form-item>
                     <el-form-item :label="$t('commons.table.port')">
                         <el-radio-group v-model="dialogData.rowData!.publishAllPorts" class="ml-4">
-                            <el-radio :label="false">{{ $t('container.exposePort') }}</el-radio>
-                            <el-radio :label="true">{{ $t('container.exposeAll') }}</el-radio>
+                            <el-radio :value="false">{{ $t('container.exposePort') }}</el-radio>
+                            <el-radio :value="true">{{ $t('container.exposeAll') }}</el-radio>
                         </el-radio-group>
                     </el-form-item>
                     <el-form-item v-if="!dialogData.rowData!.publishAllPorts">
@@ -139,8 +139,8 @@
                         <div v-for="(row, index) in dialogData.rowData!.volumes" :key="index" style="width: 100%">
                             <el-card class="mt-1">
                                 <el-radio-group v-model="row.isVolume">
-                                    <el-radio-button :label="true">{{ $t('container.volumeOption') }}</el-radio-button>
-                                    <el-radio-button :label="false">{{ $t('container.hostOption') }}</el-radio-button>
+                                    <el-radio-button :value="true">{{ $t('container.volumeOption') }}</el-radio-button>
+                                    <el-radio-button :value="false">{{ $t('container.hostOption') }}</el-radio-button>
                                 </el-radio-group>
                                 <el-button
                                     class="float-right mt-3"
@@ -216,10 +216,10 @@
                     </el-form-item>
                     <el-form-item :label="$t('container.restartPolicy')" prop="restartPolicy">
                         <el-radio-group v-model="dialogData.rowData!.restartPolicy">
-                            <el-radio label="no">{{ $t('container.no') }}</el-radio>
-                            <el-radio label="always">{{ $t('container.always') }}</el-radio>
-                            <el-radio label="on-failure">{{ $t('container.onFailure') }}</el-radio>
-                            <el-radio label="unless-stopped">{{ $t('container.unlessStopped') }}</el-radio>
+                            <el-radio value="no">{{ $t('container.no') }}</el-radio>
+                            <el-radio value="always">{{ $t('container.always') }}</el-radio>
+                            <el-radio value="on-failure">{{ $t('container.onFailure') }}</el-radio>
+                            <el-radio value="unless-stopped">{{ $t('container.unlessStopped') }}</el-radio>
                         </el-radio-group>
                     </el-form-item>
                     <el-form-item :label="$t('container.cpuShare')" prop="cpuShares">

@@ -37,7 +37,7 @@
                     </template>
                     <template #search>
                         <div class="flx-align-center">
-                            <el-select v-model="searchStrategy" @change="search()" clearable>
+                            <el-select v-model="searchStrategy" @change="search()" clearable class="p-w-200">
                                 <template #prefix>{{ $t('firewall.strategy') }}</template>
                                 <el-option :label="$t('commons.table.all')" value=""></el-option>
                                 <el-option :label="$t('firewall.allow')" value="accept"></el-option>

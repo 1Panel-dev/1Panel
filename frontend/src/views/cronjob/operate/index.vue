@@ -208,9 +208,9 @@
                     <div v-if="dialogData.rowData!.type === 'database'">
                         <el-form-item :label="$t('cronjob.database')">
                             <el-radio-group v-model="dialogData.rowData!.dbType" @change="loadDatabases">
-                                <el-radio label="mysql">MySQL</el-radio>
-                                <el-radio label="mariadb">Mariadb</el-radio>
-                                <el-radio label="postgresql">PostgreSQL</el-radio>
+                                <el-radio value="mysql">MySQL</el-radio>
+                                <el-radio value="mariadb">Mariadb</el-radio>
+                                <el-radio value="postgresql">PostgreSQL</el-radio>
                             </el-radio-group>
                         </el-form-item>
                         <el-form-item :label="$t('cronjob.database')" prop="dbName">

@@ -92,7 +92,7 @@
                                 <el-radio :label="'installed'" :value="'installed'">
                                     {{ $t('website.appInstalled') }}
                                 </el-radio>
-                                <el-radio :label="'new'">
+                                <el-radio :label="'new'" :value="'new'">
                                     {{ $t('website.appNew') }}
                                 </el-radio>
                             </el-radio-group>

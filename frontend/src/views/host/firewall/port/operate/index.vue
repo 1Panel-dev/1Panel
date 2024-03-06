@@ -27,8 +27,8 @@
 
                         <el-form-item :label="$t('firewall.source')" prop="source">
                             <el-radio-group v-model="dialogData.rowData!.source">
-                                <el-radio label="anyWhere">{{ $t('firewall.anyWhere') }}</el-radio>
-                                <el-radio label="address">{{ $t('firewall.address') }}</el-radio>
+                                <el-radio value="anyWhere">{{ $t('firewall.anyWhere') }}</el-radio>
+                                <el-radio value="address">{{ $t('firewall.address') }}</el-radio>
                             </el-radio-group>
                         </el-form-item>
 
@@ -44,8 +44,8 @@
 
                         <el-form-item :label="$t('firewall.strategy')" prop="strategy">
                             <el-radio-group v-model="dialogData.rowData!.strategy">
-                                <el-radio label="accept">{{ $t('firewall.accept') }}</el-radio>
-                                <el-radio label="drop">{{ $t('firewall.drop') }}</el-radio>
+                                <el-radio value="accept">{{ $t('firewall.accept') }}</el-radio>
+                                <el-radio value="drop">{{ $t('firewall.drop') }}</el-radio>
                             </el-radio-group>
                         </el-form-item>
                         <el-form-item :label="$t('commons.table.description')" prop="description">

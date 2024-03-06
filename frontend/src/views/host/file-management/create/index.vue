@@ -29,8 +29,8 @@
                     </el-form-item>
                     <el-form-item :label="$t('file.linkType')" v-if="addForm.isLink" prop="linkType">
                         <el-radio-group v-model="addForm.isSymlink">
-                            <el-radio :label="true">{{ $t('file.softLink') }}</el-radio>
-                            <el-radio :label="false">{{ $t('file.hardLink') }}</el-radio>
+                            <el-radio :value="true">{{ $t('file.softLink') }}</el-radio>
+                            <el-radio :value="false">{{ $t('file.hardLink') }}</el-radio>
                         </el-radio-group>
                     </el-form-item>
                     <el-form-item v-if="addForm.isLink" :label="$t('file.linkPath')" prop="linkPath">

@@ -28,6 +28,7 @@
                                     v-model="runtime.appID"
                                     :disabled="mode === 'edit'"
                                     @change="changeApp(runtime.appID)"
+                                    class="p-w-200"
                                 >
                                     <el-option
                                         v-for="(app, index) in apps"
@@ -42,6 +43,7 @@
                                     v-model="runtime.version"
                                     :disabled="mode === 'edit'"
                                     @change="changeVersion()"
+                                    class="p-w-200"
                                 >
                                     <el-option
                                         v-for="(version, index) in appVersions"

@@ -53,8 +53,8 @@
         <LayoutContent style="margin-top: 20px" :title="$t('menu.config')" :divider="true">
             <template #main>
                 <el-radio-group v-model="confShowType" @change="changeMode">
-                    <el-radio-button label="base">{{ $t('database.baseConf') }}</el-radio-button>
-                    <el-radio-button label="all">{{ $t('database.allConf') }}</el-radio-button>
+                    <el-radio-button value="base">{{ $t('database.baseConf') }}</el-radio-button>
+                    <el-radio-button value="all">{{ $t('database.allConf') }}</el-radio-button>
                 </el-radio-group>
                 <el-row style="margin-top: 20px" v-if="confShowType === 'base'">
                     <el-col :span="1"><br /></el-col>

@@ -6,7 +6,7 @@
                 <div class="mt-2"><el-alert type="info" :title="$t('ssh.sshAlert')" :closable="false" /></div>
             </template>
             <template #search>
-                <el-select v-model="searchStatus" @change="search()">
+                <el-select v-model="searchStatus" @change="search()" class="p-w-200">
                     <template #prefix>{{ $t('commons.table.status') }}</template>
                     <el-option :label="$t('commons.table.all')" value="All"></el-option>
                     <el-option :label="$t('commons.status.success')" value="Success"></el-option>

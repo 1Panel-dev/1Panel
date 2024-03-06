@@ -64,9 +64,9 @@
                     </el-form-item>
                     <el-form-item :label="$t('website.provider')" prop="provider">
                         <el-radio-group v-model="ssl.provider" @change="changeProvider()">
-                            <el-radio label="dnsAccount">{{ $t('website.dnsAccount') }}</el-radio>
-                            <el-radio label="dnsManual">{{ $t('website.dnsManual') }}</el-radio>
-                            <el-radio label="http">HTTP</el-radio>
+                            <el-radio value="dnsAccount">{{ $t('website.dnsAccount') }}</el-radio>
+                            <el-radio value="dnsManual">{{ $t('website.dnsManual') }}</el-radio>
+                            <el-radio value="http">HTTP</el-radio>
                         </el-radio-group>
                         <span class="input-help" v-if="ssl.provider === 'dnsManual'">
                             {{ $t('ssl.dnsMauanlHelper') }}

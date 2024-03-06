@@ -61,7 +61,7 @@
                 </el-row>
             </template>
             <template #search>
-                <el-select v-model="searchState" @change="search()" clearable>
+                <el-select v-model="searchState" @change="search()" clearable class="p-w-200">
                     <template #prefix>{{ $t('commons.table.status') }}</template>
                     <el-option :label="$t('commons.table.all')" value="all"></el-option>
                     <el-option :label="$t('commons.status.created')" value="created"></el-option>

@@ -37,13 +37,19 @@
                     </template>
                     <template #search>
                         <div class="flx-align-center">
-                            <el-select v-model="searchStatus" @change="search()" clearable>
+                            <el-select v-model="searchStatus" @change="search()" clearable class="p-w-200">
                                 <template #prefix>{{ $t('commons.table.status') }}</template>
                                 <el-option :label="$t('commons.table.all')" value=""></el-option>
                                 <el-option :label="$t('firewall.unUsed')" value="free"></el-option>
                                 <el-option :label="$t('firewall.used')" value="used"></el-option>
                             </el-select>
-                            <el-select v-model="searchStrategy" style="margin-left: 10px" @change="search()" clearable>
+                            <el-select
+                                v-model="searchStrategy"
+                                style="margin-left: 10px"
+                                @change="search()"
+                                clearable
+                                class="p-w-200"
+                            >
                                 <template #prefix>{{ $t('firewall.strategy') }}</template>
                                 <el-option :label="$t('commons.table.all')" value=""></el-option>
                                 <el-option :label="$t('firewall.accept')" value="accept"></el-option>
