@@ -166,3 +166,7 @@ CutWebsiteLogSuccess: "{{ .name }} website log cut successfully, backup path {{ 
 #toolbox
 ErrNotExistUser: "The current user does not exist. Please modify and retry!"
 ErrBanAction: "Setting failed, the current {{ .name }} service is unavailable, please check and try again!"
+
+#waf
+ErrScope: "Modification of this configuration is not supported"
+ErrStateChange: "State modification failed"

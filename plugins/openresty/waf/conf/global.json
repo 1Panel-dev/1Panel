@@ -117,7 +117,7 @@
     "action": "deny",
     "code": 403,
     "type": "fileExtCheck",
-    "extList": [
+    "rules": [
       "php",
       "jsp",
       "asp",
