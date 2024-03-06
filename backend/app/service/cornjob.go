@@ -11,7 +11,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
-	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/jinzhu/copier"
@@ -33,7 +32,7 @@ type ICronjobService interface {
 	StartJob(cronjob *model.Cronjob) (string, error)
 	CleanRecord(req dto.CronjobClean) error
 
-	LoadRecordLog(req dto.OperateByID) (string, error)
+	LoadRecordLog(req dto.OperateByID) string
 }
 
 func NewICronjobService() ICronjobService {
@@ -77,19 +76,19 @@ func (u *CronjobService) SearchRecords(search dto.SearchRecord) (int64, interfac
 	return total, dtoCronjobs, err
 }
 
-func (u *CronjobService) LoadRecordLog(req dto.OperateByID) (string, error) {
+func (u *CronjobService) LoadRecordLog(req dto.OperateByID) string {
 	record, err := cronjobRepo.GetRecord(commonRepo.WithByID(req.ID))
 	if err != nil {
-		return "", err
+		return ""
 	}
 	if _, err := os.Stat(record.Records); err != nil {
-		return "", buserr.New("ErrHttpReqNotFound")
+		return ""
 	}
 	content, err := os.ReadFile(record.Records)
 	if err != nil {
-		return "", err
+		return ""
 	}
-	return string(content), nil
+	return string(content)
 }
 
 func (u *CronjobService) CleanRecord(req dto.CronjobClean) error {

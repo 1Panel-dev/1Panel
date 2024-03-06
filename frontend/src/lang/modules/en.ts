@@ -806,7 +806,7 @@ const message = {
         database: 'Backup database',
         missBackupAccount: 'The backup account could not be found',
         syncDate: 'Synchronization time ',
-        releaseMemory: 'Free memory',
+        clean: 'Cache Clean',
         curl: 'Access URL',
         taskName: 'Cronjob name',
         cronSpec: 'Lifecycle',

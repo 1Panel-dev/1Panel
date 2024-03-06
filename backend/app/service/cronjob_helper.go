@@ -82,7 +82,10 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 		}
 
 		if err != nil {
-			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), string(message))
+			if len(message) != 0 {
+				record.Records, _ = mkdirAndWriteFile(cronjob, record.StartTime, message)
+			}
+			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), record.Records)
 			return
 		}
 		if len(message) != 0 {

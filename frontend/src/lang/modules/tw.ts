@@ -768,7 +768,7 @@ const message = {
         database: '備份數據庫',
         missBackupAccount: '未能找到備份賬號',
         syncDate: '同步時間 ',
-        releaseMemory: '釋放內存',
+        clean: '缓存清理',
         curl: '訪問 URL',
         taskName: '任務名稱',
         cronSpec: '執行周期',
