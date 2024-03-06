@@ -3,6 +3,7 @@ package files
 import (
 	"bufio"
 	"github.com/spf13/afero"
+	"io"
 	"net/http"
 	"os"
 	"os/user"
@@ -87,25 +88,25 @@ func ReadFileByLine(filename string, page, pageSize int) ([]string, bool, error)
 	}
 	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
+	reader := bufio.NewReaderSize(file, 8192)
 
 	var lines []string
 	currentLine := 0
 	startLine := (page - 1) * pageSize
 	endLine := startLine + pageSize
 
-	for scanner.Scan() {
+	for {
+		line, _, err := reader.ReadLine()
+		if err == io.EOF {
+			break
+		}
 		if currentLine >= startLine && currentLine < endLine {
-			lines = append(lines, scanner.Text())
+			lines = append(lines, string(line))
 		}
 		currentLine++
 		if currentLine >= endLine {
 			break
 		}
-	}
-
-	if err := scanner.Err(); err != nil {
-		return nil, false, err
 	}
 
 	isEndOfFile := currentLine < endLine
