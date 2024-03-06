@@ -215,6 +215,16 @@ if config.is_waf_on() then
     count_not_found()
     local is_attack = ngx.ctx.is_attack
     
+    if not ngx.ctx.ip then
+        ngx.ctx.ip = utils.get_real_ip()
+        ngx.ctx.geoip = utils.get_geo_ip(ngx.ctx.ip)
+        local ua = utils.get_header("user-agent")
+        if not ua then
+            ua = ""
+        end
+    end
+    
+    
     local wafdb = utils.get_wafdb(config.waf_db_path)
     if wafdb ~= nil then
         count_req_status(wafdb,is_attack)

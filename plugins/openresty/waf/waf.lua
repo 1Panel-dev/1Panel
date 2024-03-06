@@ -42,20 +42,7 @@ local function get_website_key()
     return s_name
 end
 
-local function get_geo_ip(ip)
-    if utils.is_intranet_address(ip) then
-        return {
-            country = { ["zh"] = "内网", ["en"] = "intranet" },
-            province = { ["zh"] = "内网", ["en"] = "intranet" },
-            city = { ["zh"] = "内网", ["en"] = "intranet" },
-            longitude = 0,
-            latitude = 0,
-            iso = "local"
-        }
-    else
-        return geoip.lookup(ip)
-    end
-end
+
 
 local function init()
     local ip = utils.get_real_ip()
@@ -64,21 +51,10 @@ local function init()
     if not ua then
         ua = ""
     end
-
-    geoip.init()
     
     ngx.ctx.ua = ua
-    ngx.ctx.geoip = get_geo_ip(ip)
-
-    local msg = "访问 IP  " .. ip
-    if ngx.ctx.geoip.country then
-        msg = msg .. " 国家 " .. cjson.encode(ngx.ctx.geoip.country)
-    end
-    if ngx.ctx.geoip.province then
-        msg = msg .. " 省份 " .. cjson.encode(ngx.ctx.geoip.province)
-    end
-    ngx.log(ngx.ERR, msg)
-
+    ngx.ctx.geoip = utils.get_geo_ip(ip)
+    
     ngx.ctx.website_key = get_website_key()
     ngx.ctx.method = ngx.req.get_method()
     ngx.ctx.content_type = utils.get_header("content-type")
@@ -143,8 +119,6 @@ local function waf_api()
         return_json(encode(data))
     end
 end
-
-ngx.log(ngx.ERR,"access waf")
 
 if config.is_waf_on() then
     init()

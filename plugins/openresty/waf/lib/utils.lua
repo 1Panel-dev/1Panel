@@ -1,3 +1,4 @@
+local geoip = require "geoip"
 local sub_str = string.sub
 local pairs = pairs
 local insert_table = table.insert
@@ -6,6 +7,7 @@ local ipairs = ipairs
 local type = type
 local find_str = string.find
 local gmatch_str = string.gmatch
+local cjson = require "cjson"
 
 local _M = {}
 
@@ -112,6 +114,32 @@ function _M.get_real_ip()
     end
 
     return "unknown"
+end
+
+function _M.get_geo_ip(ip)
+    if _M.is_intranet_address(ip) then
+        return {
+            country = { ["zh"] = "内网", ["en"] = "intranet" },
+            province = { ["zh"] = "内网", ["en"] = "intranet" },
+            city = { ["zh"] = "内网", ["en"] = "intranet" },
+            longitude = 0,
+            latitude = 0,
+            iso = "local"
+        }
+    else
+        geoip.init()
+        local geo_res = geoip.lookup(ip)
+        local msg = "访问 IP  " .. ip
+        if geo_res.country then
+            msg = msg .. " 国家 " .. cjson.encode(geo_res.country)
+        end
+        if geo_res.province then
+            msg = msg .. " 省份 " .. cjson.encode(geo_res.province)
+        end
+        ngx.log(ngx.ERR, msg)
+        return  geo_res
+        
+    end
 end
 
 function _M.get_header(headerKey)

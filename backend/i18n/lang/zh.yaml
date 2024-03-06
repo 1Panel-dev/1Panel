@@ -166,3 +166,7 @@ CutWebsiteLogSuccess: "{{ .name }} 网站日志切割成功，备份路径 {{ .p
 #toolbox
 ErrNotExistUser: "当前用户不存在，请修改后重试！"
 ErrBanAction: "设置失败，当前 {{ .name }} 服务不可用，请检查后重试！"
+
+#waf
+ErrScope: "不支持修改此配置"
+ErrStateChange: "状态修改失败"

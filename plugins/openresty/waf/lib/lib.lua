@@ -531,7 +531,7 @@ function _M.post_check()
                 local match = ngx_re_match(m[0], 'Content-Disposition: form-data; (.+)filename="(.+)\\.(.*)"', 'ijo')
                 if match then
                     local extension = match[3]
-                    for _, ext in ipairs(rule.extList) do
+                    for _, ext in ipairs(rule.rules) do
                         if extension == ext then
                             exec_action(rule)
                         end
