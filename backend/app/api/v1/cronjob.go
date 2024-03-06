@@ -101,11 +101,7 @@ func (b *BaseApi) LoadRecordLog(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	content, err := cronjobService.LoadRecordLog(req)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
+	content := cronjobService.LoadRecordLog(req)
 	helper.SuccessWithData(c, content)
 }
 

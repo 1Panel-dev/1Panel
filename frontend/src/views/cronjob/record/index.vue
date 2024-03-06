@@ -405,10 +405,6 @@ const forDetail = async (row: Cronjob.Record) => {
     loadRecord(row);
 };
 const loadRecord = async (row: Cronjob.Record) => {
-    if (row.status === 'Failed') {
-        currentRecordDetail.value = row.records;
-        return;
-    }
     if (row.records) {
         const res = await getRecordLog(row.id);
         currentRecordDetail.value = res.data;

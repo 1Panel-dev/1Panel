@@ -769,7 +769,7 @@ const message = {
         database: '备份数据库',
         missBackupAccount: '未能找到备份账号',
         syncDate: '同步时间 ',
-        releaseMemory: '释放内存',
+        clean: '缓存清理',
         curl: '访问 URL',
         taskName: '任务名称',
         cronSpec: '执行周期',
