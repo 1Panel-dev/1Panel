@@ -487,6 +487,19 @@ const checkPHPExtensions = (rule, value, callback) => {
     }
 };
 
+const checkHttpOrHttps = (rule, value, callback) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback(new Error(i18n.global.t('commons.rule.paramHttp')));
+    } else {
+        const regHttpHttps = /^(http|https):\/\//;
+        if (!regHttpHttps.test(value)) {
+            callback(new Error(i18n.global.t('commons.rule.paramHttp')));
+        } else {
+            callback();
+        }
+    }
+};
+
 interface CommonRule {
     requiredInput: FormItemRule;
     requiredSelect: FormItemRule;
@@ -527,6 +540,7 @@ interface CommonRule {
     paramPort: FormItemRule;
     paramExtUrl: FormItemRule;
     paramSimple: FormItemRule;
+    paramHttp: FormItemRule;
 }
 
 export const Rules: CommonRule = {
@@ -728,6 +742,11 @@ export const Rules: CommonRule = {
     phpExtensions: {
         required: true,
         validator: checkPHPExtensions,
+        trigger: 'blur',
+    },
+    paramHttp: {
+        required: true,
+        validator: checkHttpOrHttps,
         trigger: 'blur',
     },
 };

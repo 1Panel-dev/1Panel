@@ -193,6 +193,7 @@ const message = {
             filePermission: '權限錯誤',
             formatErr: '格式錯誤，檢查後重試',
             phpExtension: '僅支持 , _ 小寫英文和數字',
+            paramHttp: '必須以 http:// 或 https:// 開頭',
         },
         res: {
             paramError: '請求失敗,請稍後重試!',
@@ -2061,6 +2062,11 @@ const message = {
                 httpHelper: '限制網站的請求方法類型',
                 geoRule: '地區存取限制',
                 geoHelper: '限制某些地區造訪你的網站',
+                ipLocation: 'IP 歸屬地',
+                action: '動作',
+                ruleType: '攻擊類型',
+                ipHelper: '請輸入 IP',
+                attackLog: '攻擊日誌',
             },
             monitor: {
                 name: '網站監控',

@@ -195,6 +195,7 @@ const message = {
             filePermission: 'File Permission Error',
             formatErr: 'Format error, please check and retry',
             phpExtension: 'Only supports , _ lowercase English and numbers',
+            paramHttp: 'Must start with http:// or https://',
         },
         res: {
             paramError: 'The request failed, please try again later!',
@@ -2206,6 +2207,11 @@ const message = {
                 httpHelper: 'Restrict the request method type of the website',
                 geoRule: 'Regional access restrictions',
                 geoHelper: 'Restrict access to your website from certain regions',
+                ipLocation: 'IP home location',
+                action: 'action',
+                ruleType: 'attack type',
+                ipHelper: 'Please enter IP',
+                attackLog: 'Attack Log',
             },
             monitor: {
                 name: 'Website Monitoring',
