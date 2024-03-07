@@ -28,13 +28,13 @@
 
                             <el-form-item :label="$t('setting.theme')" prop="theme">
                                 <el-radio-group @change="onSave('Theme', form.theme)" v-model="form.theme">
-                                    <el-radio-button label="light">
+                                    <el-radio-button value="light">
                                         <span>{{ $t('setting.light') }}</span>
                                     </el-radio-button>
-                                    <el-radio-button label="dark">
+                                    <el-radio-button value="dark">
                                         <span>{{ $t('setting.dark') }}</span>
                                     </el-radio-button>
-                                    <el-radio-button label="auto">
+                                    <el-radio-button value="auto">
                                         <span>{{ $t('setting.auto') }}</span>
                                     </el-radio-button>
                                 </el-radio-group>
@@ -56,9 +56,9 @@
                                     @change="onSave('Language', form.language)"
                                     v-model="form.language"
                                 >
-                                    <el-radio label="zh">中文(简体)</el-radio>
-                                    <el-radio label="tw">中文(繁體)</el-radio>
-                                    <el-radio label="en">English</el-radio>
+                                    <el-radio value="zh">中文(简体)</el-radio>
+                                    <el-radio value="tw">中文(繁體)</el-radio>
+                                    <el-radio value="en">English</el-radio>
                                 </el-radio-group>
                             </el-form-item>
 

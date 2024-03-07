@@ -26,8 +26,8 @@
                     </el-form-item>
                     <el-form-item :label="$t('container.auth')" prop="auth">
                         <el-radio-group v-model="dialogData.rowData!.auth">
-                            <el-radio :label="true">{{ $t('commons.true') }}</el-radio>
-                            <el-radio :label="false">{{ $t('commons.false') }}</el-radio>
+                            <el-radio :value="true">{{ $t('commons.true') }}</el-radio>
+                            <el-radio :value="false">{{ $t('commons.false') }}</el-radio>
                         </el-radio-group>
                     </el-form-item>
                     <el-form-item v-if="dialogData.rowData!.auth" :label="$t('commons.login.username')" prop="username">

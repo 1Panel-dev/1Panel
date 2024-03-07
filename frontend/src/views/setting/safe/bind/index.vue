@@ -9,8 +9,8 @@
                     <el-col :span="22">
                         <el-form-item :label="$t('setting.ipv6')" prop="ipv6" :rules="Rules.requiredSelect">
                             <el-radio-group style="width: 100%" v-model="form.ipv6" @change="onChangeMode()">
-                                <el-radio label="enable">{{ $t('commons.button.enable') }}</el-radio>
-                                <el-radio label="disable">{{ $t('commons.button.disable') }}</el-radio>
+                                <el-radio value="enable">{{ $t('commons.button.enable') }}</el-radio>
+                                <el-radio value="disable">{{ $t('commons.button.disable') }}</el-radio>
                             </el-radio-group>
                         </el-form-item>
                         <el-form-item

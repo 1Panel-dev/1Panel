@@ -17,7 +17,7 @@
                 </el-row>
             </template>
             <template #search>
-                <el-select class="float-left" v-model="logConfig.name" @change="search()">
+                <el-select class="float-left p-w-200" v-model="logConfig.name" @change="search()">
                     <template #prefix>{{ $t('commons.button.log') }}</template>
                     <el-option v-for="(item, index) in fileList" :key="index" :label="item" :value="item" />
                 </el-select>

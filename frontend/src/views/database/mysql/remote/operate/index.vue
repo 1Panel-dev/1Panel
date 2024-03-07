@@ -21,18 +21,18 @@
                     </el-form-item>
                     <el-form-item :label="$t('commons.table.type')" prop="type">
                         <el-radio-group v-model="dialogData.rowData!.type" @change="changeType">
-                            <el-radio-button label="mysql">MySQL</el-radio-button>
-                            <el-radio-button label="mariadb">MariaDB</el-radio-button>
+                            <el-radio-button value="mysql">MySQL</el-radio-button>
+                            <el-radio-button value="mariadb">MariaDB</el-radio-button>
                         </el-radio-group>
                     </el-form-item>
                     <el-form-item :label="$t('database.version')" prop="version">
                         <el-radio-group v-model="dialogData.rowData!.version" @change="isOK = false">
                             <div v-if="dialogData.rowData!.type === 'mysql'">
-                                <el-radio label="8.x" />
-                                <el-radio label="5.7" />
-                                <el-radio label="5.6" />
+                                <el-radio label="8.x" value="8.x" />
+                                <el-radio label="5.7" value="5.7" />
+                                <el-radio label="5.6" value="5.6" />
                             </div>
-                            <el-radio v-else label="10.x" />
+                            <el-radio v-else label="10.x" value="10.x" />
                         </el-radio-group>
                     </el-form-item>
                     <el-form-item :label="$t('database.address')" prop="address">

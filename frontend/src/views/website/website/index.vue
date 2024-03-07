@@ -38,7 +38,7 @@
             </template>
             <template v-if="nginxIsExist && !openNginxConfig" #search>
                 <div :class="{ mask: nginxStatus != 'Running' }">
-                    <el-select v-model="req.websiteGroupId" @change="search()">
+                    <el-select v-model="req.websiteGroupId" @change="search()" class="p-w-200">
                         <template #prefix>{{ $t('website.group') }}</template>
                         <el-option :label="$t('commons.table.all')" :value="0"></el-option>
                         <el-option

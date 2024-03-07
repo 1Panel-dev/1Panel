@@ -21,7 +21,7 @@
                 </el-row>
             </template>
             <template #search>
-                <el-select v-model="searchGroup" @change="search()" clearable>
+                <el-select v-model="searchGroup" @change="search()" clearable class="p-w-200">
                     <template #prefix>{{ $t('logs.resource') }}</template>
                     <el-option :label="$t('commons.table.all')" value=""></el-option>
                     <el-option :label="$t('logs.detail.apps')" value="apps"></el-option>
@@ -36,7 +36,13 @@
                     <el-option :label="$t('logs.detail.logs')" value="logs"></el-option>
                     <el-option :label="$t('logs.detail.settings')" value="settings"></el-option>
                 </el-select>
-                <el-select v-model="searchStatus" @change="search()" clearable style="margin-left: 10px">
+                <el-select
+                    v-model="searchStatus"
+                    @change="search()"
+                    clearable
+                    style="margin-left: 10px"
+                    class="p-w-200"
+                >
                     <template #prefix>{{ $t('commons.table.status') }}</template>
                     <el-option :label="$t('commons.table.all')" value=""></el-option>
                     <el-option :label="$t('commons.status.success')" value="Success"></el-option>

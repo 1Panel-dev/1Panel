@@ -15,9 +15,9 @@
                     <el-form ref="formRef" @submit.prevent label-position="top" :model="form" :rules="rules">
                         <el-form-item :label="$t('container.from')">
                             <el-radio-group v-model="form.from" @change="changeFrom">
-                                <el-radio label="edit">{{ $t('commons.button.edit') }}</el-radio>
-                                <el-radio label="path">{{ $t('container.pathSelect') }}</el-radio>
-                                <el-radio label="template">{{ $t('container.composeTemplate') }}</el-radio>
+                                <el-radio value="edit">{{ $t('commons.button.edit') }}</el-radio>
+                                <el-radio value="path">{{ $t('container.pathSelect') }}</el-radio>
+                                <el-radio value="template">{{ $t('container.composeTemplate') }}</el-radio>
                             </el-radio-group>
                         </el-form-item>
                         <el-form-item v-if="form.from === 'path'" prop="path">

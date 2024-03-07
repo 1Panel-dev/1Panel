@@ -57,7 +57,7 @@
                     <template #default="{ row }">
                         <el-checkbox
                             v-model="rowName"
-                            :true-label="row.name"
+                            :true-value="row.name"
                             :disabled="disabledDir(row)"
                             @change="checkFile(row)"
                         />

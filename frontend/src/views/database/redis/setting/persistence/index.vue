@@ -21,9 +21,9 @@
                                 </el-form-item>
                                 <el-form-item label="appendfsync" prop="appendfsync">
                                     <el-radio-group style="width: 100%" v-model="form.appendfsync">
-                                        <el-radio label="always">always</el-radio>
-                                        <el-radio label="everysec">everysec</el-radio>
-                                        <el-radio label="no">no</el-radio>
+                                        <el-radio value="always">always</el-radio>
+                                        <el-radio value="everysec">everysec</el-radio>
+                                        <el-radio value="no">no</el-radio>
                                     </el-radio-group>
                                 </el-form-item>
                                 <el-form-item>

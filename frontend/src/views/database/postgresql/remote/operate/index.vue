@@ -21,9 +21,9 @@
                     </el-form-item>
                     <el-form-item :label="$t('database.version')" prop="version">
                         <el-radio-group v-model="dialogData.rowData!.version" @change="isOK = false">
-                            <el-radio label="16.x" />
-                            <el-radio label="15.x" />
-                            <el-radio label="14.x" />
+                            <el-radio label="16.x" value="16.x" />
+                            <el-radio label="15.x" value="15.x" />
+                            <el-radio label="14.x" value="14.x" />
                         </el-radio-group>
                     </el-form-item>
                     <el-form-item :label="$t('database.address')" prop="address">

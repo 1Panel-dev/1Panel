@@ -18,8 +18,8 @@
                         </el-form-item>
                         <el-form-item>
                             <el-radio-group v-model="oneDriveData.rowData!.varsJson['isCN']" @change="changeFrom">
-                                <el-radio-button :label="false">{{ $t('setting.isNotCN') }}</el-radio-button>
-                                <el-radio-button :label="true">{{ $t('setting.isCN') }}</el-radio-button>
+                                <el-radio-button :value="false">{{ $t('setting.isNotCN') }}</el-radio-button>
+                                <el-radio-button :value="true">{{ $t('setting.isCN') }}</el-radio-button>
                             </el-radio-group>
                             <span class="input-help">
                                 {{ $t('setting.onedrive_helper') }}

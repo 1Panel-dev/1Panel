@@ -38,8 +38,8 @@
         <LayoutContent style="margin-top: 20px" :title="$t('container.setting')" :divider="true">
             <template #main>
                 <el-radio-group v-model="confShowType" @change="changeMode">
-                    <el-radio-button label="base">{{ $t('database.baseConf') }}</el-radio-button>
-                    <el-radio-button label="all">{{ $t('database.allConf') }}</el-radio-button>
+                    <el-radio-button value="base">{{ $t('database.baseConf') }}</el-radio-button>
+                    <el-radio-button value="all">{{ $t('database.allConf') }}</el-radio-button>
                 </el-radio-group>
                 <el-row style="margin-top: 20px" v-if="confShowType === 'base'">
                     <el-col :span="1"><br /></el-col>
@@ -146,8 +146,8 @@
                             </el-form-item>
                             <el-form-item label="cgroup-driver" prop="cgroupDriver">
                                 <el-radio-group v-model="form.cgroupDriver" @change="handleCgroup">
-                                    <el-radio label="cgroupfs">cgroupfs</el-radio>
-                                    <el-radio label="systemd">systemd</el-radio>
+                                    <el-radio value="cgroupfs">cgroupfs</el-radio>
+                                    <el-radio value="systemd">systemd</el-radio>
                                 </el-radio-group>
                             </el-form-item>
                             <el-form-item :label="$t('container.sockPath')" prop="dockerSockPath">

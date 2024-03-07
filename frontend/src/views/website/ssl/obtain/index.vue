@@ -14,7 +14,7 @@
                     <br />
                     <span>
                         <span v-for="(website, index) in ssl.websites" :key="index">
-                            <el-tag>{{ website.primaryDomain }}</el-tag>
+                            <el-tag type="info">{{ website.primaryDomain }}</el-tag>
                         </span>
                     </span>
                 </div>

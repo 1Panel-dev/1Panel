@@ -44,10 +44,10 @@
                 <h2 class="inline-block">{{ $t('app.version') }}</h2>
             </div>
             <el-radio-group class="inline-block tag" v-model="upgradeVersion" @change="changeOption">
-                <el-radio v-if="upgradeInfo.newVersion" :label="upgradeInfo.newVersion">
+                <el-radio v-if="upgradeInfo.newVersion" :value="upgradeInfo.newVersion">
                     {{ upgradeInfo.newVersion }} {{ $t('setting.newVersion') }}
                 </el-radio>
-                <el-radio :label="upgradeInfo.latestVersion">
+                <el-radio :value="upgradeInfo.latestVersion">
                     {{ upgradeInfo.latestVersion }} {{ $t('setting.latestVersion') }}
                 </el-radio>
             </el-radio-group>

@@ -36,7 +36,7 @@ const getType = (status: string) => {
         case 'removing':
             return 'warning';
         default:
-            return '';
+            return 'info';
     }
 };
 
