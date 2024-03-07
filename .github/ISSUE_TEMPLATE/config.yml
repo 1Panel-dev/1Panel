@@ -4,8 +4,5 @@ contact_links:
     url: https://github.com/1Panel-dev/1Panel/discussions
     about: 提出针对本项目安装部署、使用及其他方面的相关问题 / Raise questions about the installation, deployment, use and other aspects of the project.
   - name: 对 1Panel 项目有其他问题
-    url: https://1panel.cn
-    about: 如果想要进一步了解 1Panel 项目，欢迎发送邮件到 support@fit2cloud.com 进行提问。
-  - name: 反馈安全问题 (Report Security Bug)
-    url: mailto://support@fit2cloud.com
-    about: 请通过邮箱 support@fit2cloud.com 反馈安全问题 (Please report security vulnerabilities to support@fit2cloud.com)
+    url: https://bbs.fit2cloud.com/c/1p/7
+    about: 如果你对 1Panel 有其他想要提问的，我们欢迎到我们的官方社区进行提问。
