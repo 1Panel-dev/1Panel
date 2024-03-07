@@ -25,7 +25,7 @@
                 @change="updateParam"
             ></el-input>
             <el-select
-                style="width: 100%"
+                class="p-w-200"
                 v-model="form[p.envKey]"
                 v-if="p.type == 'service'"
                 @change="changeService(form[p.envKey], p.services)"
@@ -42,7 +42,7 @@
                     {{ $t('app.toInstall') }}
                 </el-link>
             </span>
-            <el-select v-model="form[p.envKey]" v-if="p.type == 'select'" :multiple="p.multiple">
+            <el-select v-model="form[p.envKey]" v-if="p.type == 'select'" :multiple="p.multiple" class="p-w-200">
                 <el-option
                     v-for="service in p.values"
                     :key="service.label"
@@ -56,7 +56,7 @@
                         <el-select
                             v-model="form[p.envKey]"
                             @change="getServices(p.child.envKey, form[p.envKey], p)"
-                            style="width: 100%"
+                            class="p-w-200"
                         >
                             <el-option
                                 v-for="service in p.values"
@@ -73,6 +73,7 @@
                             v-model="form[p.child.envKey]"
                             v-if="p.child.type == 'service'"
                             @change="changeService(form[p.child.envKey], p.services)"
+                            class="p-w-200"
                         >
                             <el-option
                                 v-for="service in p.services"
