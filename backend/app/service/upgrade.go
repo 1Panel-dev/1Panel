@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"runtime"
 	"strings"
 	"time"
 
@@ -250,19 +249,24 @@ func (u *UpgradeService) loadReleaseNotes(path string) (string, error) {
 }
 
 func loadArch() (string, error) {
-	switch runtime.GOARCH {
-	case "amd64", "ppc64le", "s390x", "arm64":
-		return runtime.GOARCH, nil
-	case "arm":
-		std, err := cmd.Exec("uname -m")
-		if err != nil {
-			return "", fmt.Errorf("std: %s, err: %s", std, err.Error())
-		}
-		if std == "armv7l\n" {
-			return "armv7", nil
-		}
-		return "", fmt.Errorf("unsupported such arch: arm-%s", std)
-	default:
-		return "", fmt.Errorf("unsupported such arch: %s", runtime.GOARCH)
+	std, err := cmd.Exec("uname -a")
+	if err != nil {
+		return "", fmt.Errorf("std: %s, err: %s", std, err.Error())
 	}
+	if strings.Contains(std, "x86_64") {
+		return "amd64", nil
+	}
+	if strings.Contains(std, "arm64") || strings.Contains(std, "aarch64") {
+		return "arm64", nil
+	}
+	if strings.Contains(std, "armv7l") {
+		return "armv7", nil
+	}
+	if strings.Contains(std, "ppc64le") {
+		return "ppc64le", nil
+	}
+	if strings.Contains(std, "s390x") {
+		return "s390x", nil
+	}
+	return "", fmt.Errorf("unsupported such arch: %s", std)
 }
