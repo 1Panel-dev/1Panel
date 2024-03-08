@@ -124,7 +124,7 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/glebarez/go-sqlite v1.22.0 // indirect
-	github.com/go-jose/go-jose/v3 v3.0.1 // indirect
+	github.com/go-jose/go-jose/v3 v3.0.3 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
@@ -310,7 +310,6 @@ replace (
 	github.com/containerd/containerd => github.com/containerd/containerd v1.7.13
 	github.com/cucumber/godog => github.com/cucumber/godog v0.12.6
 	github.com/docker/buildx => github.com/docker/buildx v0.12.0-rc2.0.20231219140829-617f538cb315
-	github.com/go-jose/go-jose/v3 => github.com/go-jose/go-jose/v3 v3.0.3
 	github.com/mattn/go-sqlite3 => github.com/jgiannuzzi/go-sqlite3 v1.14.17-0.20240122133042-fb824c8e339e
 	github.com/moby/buildkit => github.com/moby/buildkit v0.13.0-beta3
 	golang.org/x/net => golang.org/x/net v0.17.0
