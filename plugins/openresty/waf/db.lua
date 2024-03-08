@@ -28,7 +28,7 @@ local function check_table(table_name,wafdb)
     return rows > 0
 end
 
-function _M.init()
+local function init_db_config(db_path)
     local ok, sqlite3 = pcall(function()
         return require "lsqlite3"
     end)
@@ -36,8 +36,7 @@ function _M.init()
         return false
     end
     local wafdb
-    init_dir(config.waf_db_dir)
-    wafdb = sqlite3.open(config.waf_db_path)
+    wafdb = sqlite3.open(db_path)
     if wafdb == nil then
         return false
     end
@@ -45,9 +44,43 @@ function _M.init()
     wafdb:exec([[PRAGMA synchronous = 0]])
     wafdb:exec([[PRAGMA page_size = 8192]])
     wafdb:exec([[PRAGMA journal_size_limit = 2147483648]])
+    return wafdb
+end
+
+function _M.init()
+    init_dir(config.waf_db_dir)
+    local ok, sqlite3 = pcall(function()
+        return require "lsqlite3"
+    end)
+    if not ok then
+        return false
+    end
+    local wafdb
+    local logdb
+    init_dir(config.waf_db_dir)
+    wafdb = init_db_config(config.waf_db_path)
+    if not wafdb then
+        return false
+    end
+
     local status = {}
-    if not check_table("attack_log",wafdb) then
+    if not check_table("waf_stat",wafdb) then
         status = wafdb:exec([[
+            CREATE TABLE waf_stat (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                day TEXT,
+                req_count INTEGER,
+                attack_count INTEGER,
+                count4xx INTEGER,
+                count5xx INTEGER,
+                create_date DATETIME
+            )]])
+        ngx.log(ngx.ERR, "init waf_stat status"..status)
+    end
+    
+    logdb = init_db_config(config.waf_log_db_path)
+    if not check_table("req_logs",logdb) then
+        status = logdb:exec([[
             CREATE TABLE req_logs (
                 id TEXT PRIMARY KEY,
                 ip TEXT,
@@ -58,8 +91,7 @@ function _M.init()
                 ip_province_en TEXT,
                 ip_longitude TEXT,
                 ip_latitude TEXT,
-                time INTEGER,
-                localtime TEXT,
+                localtime DATETIME,
                 server_name TEXT,
                 website_key TEXT,
                 host TEXT,
@@ -77,30 +109,16 @@ function _M.init()
             )]])
     end
 
-    if not check_table("block_ip",wafdb) then
-        status = wafdb:exec([[
+    if not check_table("block_ip",logdb) then
+        status = logdb:exec([[
             CREATE TABLE block_ip (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 ip TEXT,
                 is_block INTEGER,
+                blocking_time INTEGER,
                 attack_log_id INTEGER
             )]])
-
         ngx.log(ngx.ERR, "init block_ip status"..status)
-    end
-
-    if not check_table("waf_stat",wafdb) then
-        status = wafdb:exec([[
-            CREATE TABLE waf_stat (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                day TEXT,
-                req_count INTEGER,
-                attack_count INTEGER,
-                count4xx INTEGER,
-                count5xx INTEGER,
-                create_date DATETIME
-            )]])
-        ngx.log(ngx.ERR, "init waf_stat status"..status)
     end
     
     ngx.log(ngx.ERR, "init db success")

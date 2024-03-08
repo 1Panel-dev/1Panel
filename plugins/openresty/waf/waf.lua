@@ -53,8 +53,7 @@ local function init()
     end
     
     ngx.ctx.ua = ua
-    ngx.ctx.geoip = utils.get_geo_ip(ip)
-    
+    ngx.ctx.ip_location = utils.get_ip_location(ip)
     ngx.ctx.website_key = get_website_key()
     ngx.ctx.method = ngx.req.get_method()
     ngx.ctx.content_type = utils.get_header("content-type")

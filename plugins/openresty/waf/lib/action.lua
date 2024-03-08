@@ -38,11 +38,10 @@ end
 
 function _M.block_ip(ip, rule)
     local ok, err = nil, nil
-    local msg = "拉黑IP :  " .. ip .. "国家 " .. ngx.ctx.geoip.country["zh"]
+    local msg = "拉黑IP :  " .. ip .. "国家 " .. ngx.ctx.ip_location.country["zh"]
     if rule then
         msg = msg .. " 规则 " .. rule.type
     end
-
     ngx.log(ngx.ERR, msg)
 
     if config.redis_on then
@@ -56,7 +55,7 @@ function _M.block_ip(ip, rule)
         if exists == 0 then
             ok, err = red:set(key, 1)
             if ok then
-                ngx.ctx.ipBlocked = true
+                ngx.ctx.ip_blocked = true
             else
                 ngx.log(ngx.ERR, "failed to set redis key " .. key, err)
             end
@@ -76,14 +75,14 @@ function _M.block_ip(ip, rule)
         if not exists then
             ok, err = wafBlackIp:set(ip, 1, rule.ipBlockTime)
             if ok then
-                ngx.ctx.ipBlocked = true
+                ngx.ctx.ip_blocked = true
             else
                 ngx.log(ngx.ERR, "failed to set key " .. ip, err)
             end
         elseif rule.ipBlockTime > 0 then
             ok, err = wafBlackIp:expire(ip, rule.ipBlockTime)
             if ok then
-                ngx.ctx.ipBlocked = true
+                ngx.ctx.ip_blocked = true
             else
                 ngx.log(ngx.ERR, "failed to expire key " .. ip, err)
             end
@@ -150,7 +149,7 @@ function _M.exec_action(rule_config, match_rule, data)
 
     attack_count(rule_config.type)
 
-    local msg = "访问 IP " .. ngx.ctx.ip .. " 访问 URL" .. ngx.var.uri .. " 触发动作 " .. action .. " User-Agent " .. ngx.ctx.ua .. "  规则类型 " .. rule_config.type .. "  规则 " .. rule_config.rule
+    local msg = "访问 IP " .. ngx.ctx.ip .. " 访问 URL" .. ngx.var.uri .. " 触发动作 " .. action .. "  规则类型 " .. rule_config.type .. " 规则 " .. rule_config.rule .. " User-Agent " .. ngx.ctx.ua 
 
     ngx.log(ngx.ERR, msg)
     if action == "allow" then

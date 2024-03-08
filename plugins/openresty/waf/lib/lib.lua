@@ -182,9 +182,9 @@ end
 
 function _M.allow_location_check()
     if is_state_on("geoRestrict") then
-        local geo_ip = ngx.ctx.geoip
-        if geo_ip and geo_ip.iso and geo_ip.iso ~= "" then
-            local iso = geo_ip.iso
+        local ip_location = ngx.ctx.ip_location
+        if ip_location and ip_location.iso and ip_location.iso ~= "" then
+            local iso = ip_location.iso
             local geo_config = get_site_config("geoRestrict")
             local exist = false
             for _, rule in ipairs(geo_config.rules) do
