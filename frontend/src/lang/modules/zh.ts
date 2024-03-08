@@ -2098,6 +2098,21 @@ const message = {
             enableHelper: '即将启用 {0} 网站的防窜改功能，以提升网站安全性，是否继续？',
             disableHelper: '即将关闭 {0} 网站的防窜改功能，是否继续？',
         },
+        setting: {
+            setting: '界面设置',
+            title: '面板描述',
+            titleHelper: '将会显示在用户登录页面 (例: Linux 服务器运维管理面板)',
+            logo: 'Logo',
+            logoHelper: '将会显示在菜单收缩时管理页面左上方 (建议图片大小为: 82px*82px)',
+            logoWithText: 'Logo (带文字)',
+            logoWithTextHelper: '将会显示在菜单展开时管理页面左上方 (建议图片大小为: 185px*55px)',
+            favicon: '网站图标',
+            faviconHelper: '网站图标 (建议图片大小为: 16px*16px)',
+            reUpload: '重新上传',
+            supportType: '只能上传 jpg/png/jpeg 文件!',
+            setDefault: '恢复默认',
+            reset: '重置',
+        },
     },
 };
 export default {
