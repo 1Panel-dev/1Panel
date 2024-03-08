@@ -154,10 +154,6 @@ func snapPanelData(snap snapHelper, localDir, targetDir string) {
 }
 
 func snapCompress(snap snapHelper, rootDir string) {
-	defer func() {
-		global.LOG.Debugf("remove snapshot file %s", rootDir)
-		_ = os.RemoveAll(rootDir)
-	}()
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"compress": constant.StatusRunning})
 	tmpDir := path.Join(global.CONF.System.TmpDir, "system")
 	fileName := fmt.Sprintf("%s.tar.gz", path.Base(rootDir))
@@ -178,15 +174,13 @@ func snapCompress(snap snapHelper, rootDir string) {
 	snap.Status.Compress = constant.StatusDone
 	snap.Status.Size = size
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"compress": constant.StatusDone, "size": size})
+
+	global.LOG.Debugf("remove snapshot file %s", rootDir)
+	_ = os.RemoveAll(rootDir)
 }
 
 func snapUpload(snap snapHelper, accounts string, file string) {
 	source := path.Join(global.CONF.System.TmpDir, "system", path.Base(file))
-	defer func() {
-		global.LOG.Debugf("remove snapshot file %s", source)
-		_ = os.Remove(source)
-	}()
-
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"upload": constant.StatusUploading})
 	accountMap, err := loadClientMap(accounts)
 	if err != nil {
@@ -207,6 +201,9 @@ func snapUpload(snap snapHelper, accounts string, file string) {
 	}
 	snap.Status.Upload = constant.StatusDone
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"upload": constant.StatusDone})
+
+	global.LOG.Debugf("remove snapshot file %s", source)
+	_ = os.Remove(source)
 }
 
 func handleSnapTar(sourceDir, targetDir, name, exclusionRules string) error {
