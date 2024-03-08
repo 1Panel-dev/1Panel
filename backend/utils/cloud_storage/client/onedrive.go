@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -14,6 +15,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	odsdk "github.com/goh-chunlin/go-onedrive/onedrive"
@@ -321,7 +323,6 @@ func (o *oneDriveClient) upSmall(srcPath, folderID string, fileSize int64) (bool
 	if err := o.client.Do(context.Background(), req, false, &response); err != nil {
 		return false, fmt.Errorf("do request for list failed, err: %v", err)
 	}
-	fmt.Println(response)
 	return true, nil
 }
 
@@ -362,7 +363,13 @@ func (o *oneDriveClient) upBig(ctx context.Context, srcPath, folderID string, fi
 		splitCount += 1
 	}
 	bfReader := bufio.NewReader(file)
-	var fileUploadResp *UploadSessionUploadResponse
+	httpClient := http.Client{
+		Timeout: time.Minute * 10,
+		Transport: &http.Transport{
+			Proxy:           http.ProxyFromEnvironment,
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
+	}
 	for splitNow := int64(0); splitNow < splitCount; splitNow++ {
 		length, err := bfReader.Read(buffer)
 		if err != nil {
@@ -376,12 +383,15 @@ func (o *oneDriveClient) upBig(ctx context.Context, srcPath, folderID string, fi
 		if err != nil {
 			return false, err
 		}
-		if err := o.client.Do(ctx, sessionFileUploadReq, false, &fileUploadResp); err != nil {
+		res, err := httpClient.Do(sessionFileUploadReq)
+		if err != nil {
 			return false, err
 		}
-	}
-	if fileUploadResp.Id == "" {
-		return false, errors.New("something went wrong. file upload incomplete. consider upload the file in a step-by-step manner")
+		if res.StatusCode != 201 && res.StatusCode != 202 && res.StatusCode != 200 {
+			data, _ := io.ReadAll(res.Body)
+			res.Body.Close()
+			return false, errors.New(string(data))
+		}
 	}
 	return true, nil
 }
