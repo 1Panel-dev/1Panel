@@ -1,6 +1,6 @@
 <template>
     <div v-if="recordShow" v-loading="loading">
-        <div class="app-status" style="margin-top: 20px">
+        <div class="app-status p-mt-20">
             <el-card>
                 <div>
                     <el-popover
@@ -17,7 +17,7 @@
                             </el-tag>
                         </template>
                     </el-popover>
-                    <el-tag v-if="dialogData.rowData.name.length < 15" style="float: left" effect="dark" type="success">
+                    <el-tag v-if="dialogData.rowData.name.length < 15" class="float-left" effect="dark" type="success">
                         {{ $t('cronjob.' + dialogData.rowData.type) }} - {{ dialogData.rowData.name }}
                     </el-tag>
 
@@ -73,7 +73,7 @@
                         ></el-date-picker>
                     </el-col>
                     <el-col :span="16">
-                        <el-select @change="search()" v-model="searchInfo.status">
+                        <el-select @change="search()" v-model="searchInfo.status" class="p-w-200">
                             <template #prefix>{{ $t('commons.table.status') }}</template>
                             <el-option :label="$t('commons.table.all')" value="" />
                             <el-option :label="$t('commons.status.success')" value="Success" />

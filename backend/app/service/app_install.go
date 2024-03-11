@@ -749,8 +749,10 @@ func syncAppInstallStatus(appInstall *model.AppInstall) error {
 
 	switch {
 	case count == 0:
-		appInstall.Status = constant.Error
-		appInstall.Message = buserr.WithName("ErrContainerNotFound", strings.Join(containerNames, ",")).Error()
+		if appInstall.Status != constant.Error {
+			appInstall.Status = constant.SyncErr
+			appInstall.Message = buserr.WithName("ErrContainerNotFound", strings.Join(containerNames, ",")).Error()
+		}
 	case exitedCount == total:
 		appInstall.Status = constant.Stopped
 	case runningCount == total:

@@ -13,6 +13,7 @@ const (
 	Syncing     = "Syncing"
 	SyncSuccess = "SyncSuccess"
 	Paused      = "Paused"
+	SyncErr     = "SyncErr"
 
 	ContainerPrefix = "1Panel-"
 

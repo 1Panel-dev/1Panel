@@ -51,6 +51,7 @@ const message = {
             uninstall: '卸载',
             fullscreen: '全屏',
             quitFullscreen: '退出全屏',
+            update: '编辑',
         },
         search: {
             timeStart: '开始时间',
@@ -244,6 +245,7 @@ const message = {
             ready: '正常',
             applying: '申请中',
             applyerror: '失败',
+            syncerr: '失败',
         },
         units: {
             second: '秒',
@@ -2068,6 +2070,12 @@ const message = {
             ruleType: '攻击类型',
             ipHelper: '请输入 IP',
             attackLog: '攻击日志',
+            rule: '规则',
+            ipArr: 'IPV4 范围',
+            ipStart: '起始 IP',
+            ipEnd: '结束 IP',
+            ipv4: 'IPV4',
+            ipv6: 'IPV6',
         },
         monitor: {
             name: '网站监控',

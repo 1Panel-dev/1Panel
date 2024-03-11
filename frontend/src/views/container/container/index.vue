@@ -195,7 +195,7 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.related')" min-width="200">
+                    <el-table-column :label="$t('container.related')" min-width="200" prop="appName">
                         <template #default="{ row }">
                             <div>
                                 <el-tooltip
@@ -288,6 +288,7 @@
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         :fixed="mobile ? false : 'right'"
+                        prop="operate"
                     />
                 </ComplexTable>
             </template>

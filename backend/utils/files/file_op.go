@@ -126,6 +126,21 @@ func (f FileOp) SaveFile(dst string, content string, mode fs.FileMode) error {
 	return nil
 }
 
+func (f FileOp) SaveFileWithByte(dst string, content []byte, mode fs.FileMode) error {
+	if !f.Stat(path.Dir(dst)) {
+		_ = f.CreateDir(path.Dir(dst), mode.Perm())
+	}
+	file, err := f.Fs.OpenFile(dst, os.O_RDWR|os.O_CREATE|os.O_TRUNC, mode)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	write := bufio.NewWriter(file)
+	_, _ = write.Write(content)
+	write.Flush()
+	return nil
+}
+
 func (f FileOp) ChownR(dst string, uid string, gid string, sub bool) error {
 	cmdStr := fmt.Sprintf(`chown %s:%s "%s"`, uid, gid, dst)
 	if sub {
