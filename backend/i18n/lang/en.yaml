@@ -170,3 +170,5 @@ ErrBanAction: "Setting failed, the current {{ .name }} service is unavailable, p
 #waf
 ErrScope: "Modification of this configuration is not supported"
 ErrStateChange: "State modification failed"
+ErrRuleExist: "Rule is Exist"
+ErrRuleNotExist: "Rule is not Exist"

@@ -15,7 +15,7 @@
                         </el-button>
                     </el-col>
                     <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
-                        <div class="flx-align-center">
+                        <div class="flex justify-end">
                             <TableSetting @search="search()" />
                             <TableSearch @search="search()" v-model:searchName="searchIP" />
                         </div>
@@ -25,14 +25,14 @@
 
             <template #search>
                 <div class="flx-align-center">
-                    <el-select v-model="searchStatus" @change="search()" clearable>
+                    <el-select v-model="searchStatus" @change="search()" clearable class="p-w-200">
                         <template #prefix>{{ $t('commons.table.status') }}</template>
                         <el-option :label="$t('commons.table.all')" value=""></el-option>
                         <el-option :label="$t('commons.status.success')" value="Success"></el-option>
                         <el-option :label="$t('commons.status.failed')" value="Failed"></el-option>
                     </el-select>
 
-                    <el-button type="primary" plain @click="onClean()" style="margin-left: 10px">
+                    <el-button type="primary" plain @click="onClean()" class="ml-2.5">
                         {{ $t('logs.deleteLogs') }}
                     </el-button>
                 </div>

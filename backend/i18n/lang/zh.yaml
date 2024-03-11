@@ -170,3 +170,5 @@ ErrBanAction: "设置失败，当前 {{ .name }} 服务不可用，请检查后�
 #waf
 ErrScope: "不支持修改此配置"
 ErrStateChange: "状态修改失败"
+ErrRuleExist: "规则名称已存在"
+ErrRuleNotExist: "规则不存在"
