@@ -5,6 +5,11 @@ export interface ThemeConfigProp {
     primary: string;
     theme: string; // dark | bright ｜ auto
     footer: boolean;
+
+    title: string;
+    logo: string;
+    logoWithText: string;
+    favicon: string;
 }
 
 export interface GlobalState {

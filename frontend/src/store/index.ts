@@ -20,6 +20,11 @@ export const GlobalStore = defineStore({
             primary: '#005EEB',
             theme: 'auto',
             footer: true,
+
+            title: '',
+            logo: '',
+            logoWithText: '',
+            favicon: '',
         },
         isFullScreen: false,
         isOnRestart: false,

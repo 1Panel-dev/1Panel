@@ -2245,6 +2245,24 @@ const message = {
                 disableHelper:
                     'The anti-tampering function of website {0} is about to be disabled. Do you want to continue?',
             },
+            setting: {
+                setting: 'Interface Settings',
+                title: 'Panel Description',
+                titleHelper:
+                    'Will be displayed on the user login page (e.g., Linux Server Operation and Maintenance Management Panel)',
+                logo: 'Logo',
+                logoHelper:
+                    'Will be displayed on the top left of the management page when the menu is collapsed (recommended image size: 82px*82px)',
+                logoWithText: 'Logo (with text)',
+                logoWithTextHelper:
+                    'Will be displayed on the top left of the management page when the menu is expanded (recommended image size: 185px*55px)',
+                favicon: 'Website Icon',
+                faviconHelper: 'Website icon (recommended image size: 16px*16px)',
+                reUpload: 'Re-upload',
+                supportType: 'Only jpg/png/jpeg files are allowed!',
+                setDefault: 'Restore Default',
+                reset: 'Reset',
+            },
         },
     },
 };
