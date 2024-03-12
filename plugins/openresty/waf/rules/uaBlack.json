@@ -1,5 +1,11 @@
 {
   "rules": [
-
+    {
+      "name": "UaBlack",
+      "state": "on",
+      "action": "deny",
+      "rule": "ua-blacklist",
+      "description": "测试"
+    }
   ]
 }

@@ -38,11 +38,10 @@ end
 
 function _M.block_ip(ip, rule)
     local ok, err = nil, nil
-    local msg = "拉黑IP :  " .. ip .. "国家 " .. ngx.ctx.geoip.country["zh"]
+    local msg = "拉黑IP :  " .. ip .. "国家 " .. ngx.ctx.ip_location.country["zh"]
     if rule then
         msg = msg .. " 规则 " .. rule.type
     end
-
     ngx.log(ngx.ERR, msg)
 
     if config.redis_on then
@@ -56,7 +55,7 @@ function _M.block_ip(ip, rule)
         if exists == 0 then
             ok, err = red:set(key, 1)
             if ok then
-                ngx.ctx.ipBlocked = true
+                ngx.ctx.ip_blocked = true
             else
                 ngx.log(ngx.ERR, "failed to set redis key " .. key, err)
             end
@@ -76,14 +75,14 @@ function _M.block_ip(ip, rule)
         if not exists then
             ok, err = wafBlackIp:set(ip, 1, rule.ipBlockTime)
             if ok then
-                ngx.ctx.ipBlocked = true
+                ngx.ctx.ip_blocked = true
             else
                 ngx.log(ngx.ERR, "failed to set key " .. ip, err)
             end
         elseif rule.ipBlockTime > 0 then
             ok, err = wafBlackIp:expire(ip, rule.ipBlockTime)
             if ok then
-                ngx.ctx.ipBlocked = true
+                ngx.ctx.ip_blocked = true
             else
                 ngx.log(ngx.ERR, "failed to expire key " .. ip, err)
             end
@@ -128,15 +127,10 @@ end
 
 function _M.exec_action(rule_config, match_rule, data)
     local action = rule_config.action
-
     if match_rule then
-        rule_config.rule = match_rule.rule
-    else
-        rule_config.rule = "默认"
+        rule_config.match_rule = match_rule
     end
-
-    ngx.ctx.rule_table = rule_config
-    ngx.ctx.action = action
+    ngx.ctx.exec_rule = rule_config
     ngx.ctx.hitData = data
     ngx.ctx.is_attack = true
 
@@ -144,13 +138,12 @@ function _M.exec_action(rule_config, match_rule, data)
         _M.block_ip(ngx.ctx.ip, rule_config)
     end
 
-    if rule_config.type == nil then
-        rule_config.type = "默认"
-    end
-
     attack_count(rule_config.type)
 
-    local msg = "访问 IP " .. ngx.ctx.ip .. " 访问 URL" .. ngx.var.uri .. " 触发动作 " .. action .. " User-Agent " .. ngx.ctx.ua .. "  规则类型 " .. rule_config.type .. "  规则 " .. rule_config.rule
+    local msg = "访问 IP " .. ngx.ctx.ip .. " 访问 URL" .. ngx.var.uri .. " 触发动作 " .. action .. "  规则类型 " .. rule_config.type
+    if match_rule then
+        msg = msg .. " 触发规则 " .. match_rule.type
+    end
 
     ngx.log(ngx.ERR, msg)
     if action == "allow" then

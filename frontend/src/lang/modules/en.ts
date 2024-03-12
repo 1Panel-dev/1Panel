@@ -2225,6 +2225,20 @@ const message = {
             ipEnd: 'End IP',
             ipv4: 'IPV4',
             ipv6: 'IPV6',
+            urlDefense: 'URL rules',
+            urlHelper: 'Forbidden URL',
+            dirFilter: 'Directory filter',
+            sqlInject: 'SQL injection',
+            xss: 'XSS',
+            phpExec: 'PHP script execution',
+            oneWordTrojan: 'One word Trojan',
+            appFilter: 'Apply dangerous directory filtering',
+            webshell: 'Webshell',
+            args: 'Malicious parameters',
+            protocolFilter: 'Protocol filter',
+            javaFileter: 'Java Dangerous File Filtering',
+            scannerFilter: 'Scanner filter',
+            escapeFilter: 'escape filter',
         },
         monitor: {
             name: 'Website Monitor',
@@ -2259,7 +2273,7 @@ const message = {
             disableHelper:
                 'The anti-tampering function of website {0} is about to be disabled. Do you want to continue?',
         },
-			setting: {
+        setting: {
             setting: 'Interface Settings',
             title: 'Panel Description',
             titleHelper:

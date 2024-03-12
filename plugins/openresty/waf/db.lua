@@ -28,7 +28,7 @@ local function check_table(table_name,wafdb)
     return rows > 0
 end
 
-function _M.init()
+local function init_db_config(db_path)
     local ok, sqlite3 = pcall(function()
         return require "lsqlite3"
     end)
@@ -36,8 +36,7 @@ function _M.init()
         return false
     end
     local wafdb
-    init_dir(config.waf_db_dir)
-    wafdb = sqlite3.open(config.waf_db_path)
+    wafdb = sqlite3.open(db_path)
     if wafdb == nil then
         return false
     end
@@ -45,50 +44,17 @@ function _M.init()
     wafdb:exec([[PRAGMA synchronous = 0]])
     wafdb:exec([[PRAGMA page_size = 8192]])
     wafdb:exec([[PRAGMA journal_size_limit = 2147483648]])
+    return wafdb
+end
+
+function _M.init()
+    init_dir(config.waf_db_dir)
+    local  wafdb = init_db_config(config.waf_db_path)
+    if not wafdb then
+        return false
+    end
+
     local status = {}
-    if not check_table("attack_log",wafdb) then
-        status = wafdb:exec([[
-            CREATE TABLE req_logs (
-                id TEXT PRIMARY KEY,
-                ip TEXT,
-                ip_iso TEXT,
-                ip_country_zh TEXT,
-                ip_country_en TEXT,
-                ip_province_zh TEXT,
-                ip_province_en TEXT,
-                ip_longitude TEXT,
-                ip_latitude TEXT,
-                time INTEGER,
-                localtime TEXT,
-                server_name TEXT,
-                website_key TEXT,
-                host TEXT,
-                method TEXT,
-                uri TEXT,
-                user_agent TEXT,
-                rule_type TEXT,
-                match_rule TEXT,
-                match_value TEXT,
-                nginx_log TEXT,
-                blocking_time INTEGER,
-                action TEXT,
-                is_block INTEGER,
-                is_attack INTEGER
-            )]])
-    end
-
-    if not check_table("block_ip",wafdb) then
-        status = wafdb:exec([[
-            CREATE TABLE block_ip (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                ip TEXT,
-                is_block INTEGER,
-                attack_log_id INTEGER
-            )]])
-
-        ngx.log(ngx.ERR, "init block_ip status"..status)
-    end
-
     if not check_table("waf_stat",wafdb) then
         status = wafdb:exec([[
             CREATE TABLE waf_stat (
@@ -101,6 +67,51 @@ function _M.init()
                 create_date DATETIME
             )]])
         ngx.log(ngx.ERR, "init waf_stat status"..status)
+    end
+
+    local logdb = init_db_config(config.waf_log_db_path)
+    if not check_table("req_logs",logdb) then
+        status = logdb:exec([[
+            CREATE TABLE req_logs (
+                id TEXT PRIMARY KEY,
+                ip TEXT,
+                ip_iso TEXT,
+                ip_country_zh TEXT,
+                ip_country_en TEXT,
+                ip_province_zh TEXT,
+                ip_province_en TEXT,
+                ip_longitude TEXT,
+                ip_latitude TEXT,
+                localtime DATETIME,
+                server_name TEXT,
+                website_key TEXT,
+                host TEXT,
+                method TEXT,
+                uri TEXT,
+                user_agent TEXT,
+                exec_rule TEXT,
+                rule_type TEXT,
+                match_rule TEXT,
+                match_value TEXT,
+                nginx_log TEXT,
+                blocking_time INTEGER,
+                action TEXT,
+                is_block INTEGER,
+                is_attack INTEGER
+            )]])
+    end
+
+    if not check_table("block_ips",logdb) then
+        status = logdb:exec([[
+            CREATE TABLE block_ips (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ip TEXT,
+                is_block INTEGER,
+                blocking_time INTEGER,
+                req_log_id TEXT,
+                create_date DATETIME
+            )]])
+        ngx.log(ngx.ERR, "init block_ip status"..status)
     end
     
     ngx.log(ngx.ERR, "init db success")

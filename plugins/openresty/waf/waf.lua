@@ -53,8 +53,7 @@ local function init()
     end
     
     ngx.ctx.ua = ua
-    ngx.ctx.geoip = utils.get_geo_ip(ip)
-    
+    ngx.ctx.ip_location = utils.get_ip_location(ip)
     ngx.ctx.website_key = get_website_key()
     ngx.ctx.method = ngx.req.get_method()
     ngx.ctx.content_type = utils.get_header("content-type")
@@ -132,26 +131,27 @@ if config.is_waf_on() then
     if lib.is_white_ip() then
         return true
     end
-    lib.default_ip_black()
     lib.black_ip()
+    lib.default_ip_black()
 
     if lib.is_white_ua() then
         return true
     end
-    lib.default_ua_black()
     lib.black_ua()
-
+    lib.default_ua_black()
+    
     lib.cc_url()
     if lib.is_white_url() then
         return true
     end
     lib.black_url()
+    lib.default_url_black()
 
     lib.allow_location_check()
-    lib.acl()
-    lib.bot_check()
     lib.method_check()
+    lib.acl()
     lib.cc()
+    lib.bot_check()
     lib.args_check()
     lib.cookie_check()
     lib.post_check()

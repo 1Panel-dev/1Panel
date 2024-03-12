@@ -2,87 +2,129 @@
   "rules": [
     {
       "state": "on",
-      "rule": "GET"
+      "rule": "GET",
+      "name": "GET",
+      "type": "httpMethod"
     },
     {
       "state": "on",
-      "rule": "POST"
+      "rule": "POST",
+      "name": "POST",
+      "type": "httpMethod"
     },
     {
       "state": "on",
-      "rule": "PUT"
+      "rule": "PUT",
+      "name": "PUT",
+      "type": "httpMethod"
     },
     {
       "state": "on",
-      "rule": "DELETE"
+      "rule": "DELETE",
+      "name": "DELETE",
+      "type": "httpMethod"
     },
     {
       "state": "on",
-      "rule": "PATCH"
+      "rule": "PATCH",
+      "name": "PATCH",
+      "type": "httpMethod"
     },
     {
       "state": "on",
-      "rule": "HEAD"
+      "rule": "HEAD",
+      "name": "HEAD",
+      "type": "httpMethod"
     },
     {
       "state": "on",
-      "rule": "OPTIONS"
+      "rule": "OPTIONS",
+      "name": "OPTIONS",
+      "type": "httpMethod"
     },
     {
       "state": "on",
-      "rule": "TRACE"
+      "rule": "TRACE",
+      "name": "TRACE",
+      "type": "httpMethod"
     },
     {
       "state": "on",
-      "rule": "CONNECT"
+      "rule": "CONNECT",
+      "name": "CONNECT",
+      "type": "httpMethod"
     },
     {
       "state": "on",
-      "rule": "PROPFIND"
+      "rule": "PROPFIND",
+      "name": "PROPFIND",
+      "type": "httpMethod"
     },
     {
       "state": "on",
-      "rule": "PROPPATCH"
+      "rule": "PROPPATCH",
+      "name": "PROPPATCH",
+      "type": "httpMethod"
     },
     {
       "state": "on",
-      "rule": "MKCOL"
+      "rule": "MKCOL",
+      "name": "MKCOL",
+      "type": "httpMethod"
     },
     {
       "state": "on",
-      "rule": "COPY"
+      "rule": "COPY",
+      "name": "COPY",
+      "type": "httpMethod"
     },
     {
       "state": "on",
-      "rule": "MOVE"
+      "rule": "MOVE",
+      "name": "MOVE",
+      "type": "httpMethod"
     },
     {
       "state": "on",
-      "rule": "LOCK"
+      "rule": "LOCK",
+      "name": "LOCK",
+      "type": "httpMethod"
     },
     {
       "state": "on",
-      "rule": "UNLOCK"
+      "rule": "UNLOCK",
+      "name": "UNLOCK",
+      "type": "httpMethod"
     },
     {
       "state": "on",
-      "rule": "LINK"
+      "rule": "LINK",
+      "name": "LINK",
+      "type": "httpMethod"
     },
     {
       "state": "on",
-      "rule": "UNLINK"
+      "rule": "UNLINK",
+      "name": "UNLINK",
+      "type": "httpMethod"
     },
     {
       "state": "on",
-      "rule": "WRAPPED"
+      "rule": "WRAPPED",
+      "name": "WRAPPED",
+      "type": "httpMethod"
     },
     {
       "state": "on",
-      "rule": "PROPFIND"
+      "rule": "PROPFIND",
+      "name": "PROPFIND",
+      "type": "httpMethod"
     },
     {
       "state": "on",
-      "rule": "SRARCH"
+      "rule": "SRARCH",
+      "name": "SRARCH",
+      "type": "httpMethod"
     }
   ]
 }

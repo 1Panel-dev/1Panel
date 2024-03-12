@@ -83,6 +83,7 @@ local function init_global_config()
     rules.args = read_rule(global_rule_dir, "args")
     rules.cookie = read_rule(global_rule_dir, "cookie")
     rules.defaultUaBlack = read_rule(global_rule_dir, "defaultUaBlack")
+    rules.defaultUrlBlack = read_rule(global_rule_dir, "defaultUrlBlack")
     rules.header = read_rule(global_rule_dir, "header")
 
     config.global_rules = rules
@@ -101,6 +102,7 @@ local function init_global_config()
     _M.waf_dir = waf_dir
     _M.waf_db_dir = waf_dir .. "db/"
     _M.waf_db_path =  _M.waf_db_dir .. "1pwaf.db"
+    _M.waf_log_db_path =  _M.waf_db_dir .. "req_log.db"
     _M.config_dir = config_dir
 end
 
