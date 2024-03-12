@@ -1,14 +1,3 @@
 {
-  "rules": [
-    {
-      "state": "on",
-      "action": "allow",
-      "rule": "/console/posts/editor"
-    },
-    {
-      "state": "on",
-      "action": "allow",
-      "rule": "/apis/api.console.halo.run/v1alpha1/posts"
-    }
-  ]
+  "rules": []
 }

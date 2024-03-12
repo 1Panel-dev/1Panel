@@ -4,7 +4,23 @@
       "name": "拦截IP",
       "state": "on",
       "type": "ipv4",
-      "ipv4": "123"
+      "ipv4": "123",
+      "description": "拦截IP"
+    },
+    {
+      "name": "拦截IP",
+      "state": "on",
+      "type": "ipv6",
+      "ipv6": "kjdhsakjdhsakjdhakshd",
+      "description": "拦截IP"
+    },
+    {
+      "name": "拦截IP",
+      "state": "on",
+      "type": "ipArr",
+      "ipStart": "192.168.1.1",
+      "ipEnd": "192.168.1.10",
+      "description": "拦截IP"
     }
   ]
 }

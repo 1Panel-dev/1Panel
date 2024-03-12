@@ -6,7 +6,6 @@ local ck = require "resty.cookie"
 local geo = require "geoip"
 local libinjection = require "resty.libinjection"
 local config = require "config"
-local cjson = require "cjson"
 local utils = require "utils"
 
 local pairs = pairs
@@ -14,12 +13,13 @@ local ipairs = ipairs
 local tostring = tostring
 local type = type
 local next = next
-local tonumber = tonumber
 local concat_table = table.concat
 local ngx_re_find = ngx.re.find
-local decode = cjson.decode
 local ngx_re_gmatch = ngx.re.gmatch
 local ngx_re_match = ngx.re.match
+local ipv4_to_int = utils.ipv4_to_int
+local is_ip_in_array = utils.is_ip_in_array
+local is_ipv6 = utils.is_ipv6
 
 local exec_action = action.exec_action
 
@@ -97,7 +97,7 @@ local function match_ip(ip_rule, ip, ipn)
         return false
     end
     local ip_rule_type = ip_rule.type
-    if utils.is_ipv6(ip) and ip_rule_type == "ipv6" then
+    if is_ipv6(ip) and ip_rule_type == "ipv6" then
         if ip == ip_rule.ipv6 then
             return true
         end
@@ -105,12 +105,13 @@ local function match_ip(ip_rule, ip, ipn)
     end
 
     if ip_rule.type == "ipv4" then
-        if ipn == tonumber(ip_rule.ipv4) then
+        if ipn == ipv4_to_int(ip_rule.ipv4) then
             return true
         end
     elseif ip_rule.type == "ipArr" then
-        local ipArr = ip_rule.ipArr
-        if utils.is_ip_in_array(ipn, ipArr.start, ipArr["end"]) then
+        local ip_start_n = ipv4_to_int(ip_rule.ipStart)
+        local ip_end_n = ipv4_to_int(ip_rule.ipEnd)
+        if is_ip_in_array(ipn, ip_start_n, ip_end_n) then
             return true
         end
     elseif ip_rule.type == "ipGroup" then
@@ -120,33 +121,49 @@ local function match_ip(ip_rule, ip, ipn)
     return false
 end
 
-local function xss_and_sql_check(body)
-    if body then
-        if is_global_state_on("xss") or is_global_state_on("sql") then
-            for k, v in pairs(body) do
-                if type(v) == 'string' then
-                    if is_site_state_on("xss") then
-                        local is_xss, fingerprint = libinjection.xss(tostring(v))
-                        local xss_config = get_site_config("xss")
-                        if is_xss then
-                            exec_action(xss_config, { rule = tostring(k) .. '=' .. tostring(v) })
-                            return
-                        end
-                    end
-                    if is_site_state_on("sql") then
-                        local is_sqli, fingerprint = libinjection.sqli(tostring(v))
-                        local sql_config = get_site_config("sql")
-                        if is_sqli then
-                            exec_action(sql_config, { rule = tostring(k) .. '=' .. tostring(v) })
-                            return
-                        end
-                    end
-                end
-            end
-        end
-
+local function get_boundary()
+    local header = utils.get_headers()["content-type"]
+    if not header then
+        return nil
     end
+
+    if type(header) == "table" then
+        header = header[1]
+    end
+
+    local m = ngx_re_match(header, ";%s*boundary=\"([^\"]+)\"")
+    if m then
+        return m
+    end
+
+    return ngx_re_match(header, ";%s*boundary=([^\",;]+)")
 end
+
+
+local function xss_and_sql_check(kv)
+    if type(kv) ~= 'string' then
+        return
+        
+    end
+    if  is_site_state_on("xss") then
+        local is_xss, fingerprint = libinjection.xss(tostring(kv))
+        local xss_config = get_site_config("xss")
+        if is_xss then
+            exec_action(xss_config, { rule = kv })
+            return
+        end
+    end
+    if  is_site_state_on("sql") then
+        local is_sqli, fingerprint = libinjection.sqli(tostring(kv))
+        local sql_config = get_site_config("sql")
+        if is_sqli then
+            exec_action(sql_config, { rule = kv })
+            return
+        end
+    end
+    
+end
+
 
 local function get_request_body()
     ngx.req.read_body()
@@ -182,9 +199,9 @@ end
 
 function _M.allow_location_check()
     if is_state_on("geoRestrict") then
-        local geo_ip = ngx.ctx.geoip
-        if geo_ip and geo_ip.iso and geo_ip.iso ~= "" then
-            local iso = geo_ip.iso
+        local ip_location = ngx.ctx.ip_location
+        if ip_location and ip_location.iso and ip_location.iso ~= "" then
+            local iso = ip_location.iso
             local geo_config = get_site_config("geoRestrict")
             local exist = false
             for _, rule in ipairs(geo_config.rules) do
@@ -233,7 +250,7 @@ function _M.black_ip()
         if ip == "unknown" then
             return false
         end
-        local exists = nil
+        local exists = false
 
         if config.is_redis_on() then
             exists = redis_util.get("black_ip:" .. ip)
@@ -241,14 +258,12 @@ function _M.black_ip()
             exists = ngx.shared.waf_black_ip:get(ip)
         end
 
-        if not exists then
-            local ip_black_list = get_global_rules("ipBlack")
-            local ipn = utils.ipv4_to_int(ip)
-            for _, ip_rule in pairs(ip_black_list) do
-                if match_ip(ip_rule, ip, ipn) then
-                    exists = true
-                    break
-                end
+        local ip_black_list = get_global_rules("ipBlack")
+        local ipn = ipv4_to_int(ip)
+        for _, ip_rule in pairs(ip_black_list) do
+            if match_ip(ip_rule, ip, ipn) then
+                exists = true
+                break
             end
         end
 
@@ -424,6 +439,20 @@ function _M.black_url()
     end
 end
 
+function _M.default_url_black()
+    if is_state_on("defaultUrlBlack") then
+        local url = ngx.var.uri
+        if url == nil or url == "" then
+            return false
+        end
+        local m, mr = match_rule(get_global_rules('defaultUrlBlack'), url)
+        if m then
+            exec_action(get_global_config('defaultUrlBlack'), mr)
+            return
+        end
+    end
+end
+
 function _M.args_check()
     if is_state_on("args") then
         local args = ngx.req.get_uri_args()
@@ -436,13 +465,14 @@ function _M.args_check()
                 end
                 if val_arr and type(val_arr) ~= "boolean" and val_arr ~= "" then
                     local m, mr = match_rule(args_list, utils.unescape_uri(val_arr))
+                    ngx.log(ngx.ERR, "args_check: ", m, " ", mr.rule, " ", val_arr)
                     if m then
                         exec_action(get_global_config("args"), mr)
                         return
                     end
+                    xss_and_sql_check(val_arr)
                 end
             end
-            xss_and_sql_check(args)
         end
     end
 end
@@ -453,8 +483,7 @@ function _M.cookie_check()
         local cookieList = get_site_rule('cookie')
         local m, mr = match_rule(cookieList, cookie)
         if m then
-            local rule_config = get_global_config('cookie')
-            exec_action(rule_config, mr)
+            exec_action(get_global_config('cookie'), mr)
             return true
         end
     end
@@ -500,15 +529,10 @@ function _M.post_check()
         return
     end
 
-    if ngx_re_find(content_type, '^application/json', "ijo") then
-        local data = get_request_body()
-        if data then
-            xss_and_sql_check(decode(data))
-        end
-    end
+    local boundary =  get_boundary()
 
-    if is_site_state_on('fileExtCheck') and ngx_re_find(content_type, [[multipart]], 'ijo') then
-        if not ngx_re_match(content_type, '^multipart/form-data; boundary=') then
+    if boundary and  is_site_state_on('fileExtCheck') then
+        if not ngx_re_match(content_type, '^multipart/form-data; boundary=') or  not   ngx_re_find(content_type, [[multipart]], 'ijo')then
             return
         end
         local boundary_value = ngx_re_match(content_type, '^multipart/form-data; boundary=(.+)')
@@ -539,6 +563,27 @@ function _M.post_check()
                 end
             else
                 break
+            end
+        end
+    else
+        ngx.req.read_body()
+        local body_obj = ngx.req.get_post_args()
+        if not body_obj then
+            return
+        end
+      
+        for key, val in pairs(body_obj) do
+            if is_global_state_on("xss") or is_global_state_on("sql") then
+                xss_and_sql_check(key)
+                xss_and_sql_check(val)
+            end
+            if is_state_on("args") then
+                local post_rules = get_global_rules("args")
+                local m, mr = match_rule(post_rules, val)
+                if m then
+                    exec_action(get_global_config("args"), mr)
+                    return
+                end
             end
         end
     end

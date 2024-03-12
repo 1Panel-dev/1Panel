@@ -7,6 +7,7 @@ local ipairs = ipairs
 local type = type
 local find_str = string.find
 local gmatch_str = string.gmatch
+local pcall = pcall
 local cjson = require "cjson"
 
 local _M = {}
@@ -116,15 +117,13 @@ function _M.get_real_ip()
     return "unknown"
 end
 
-function _M.get_geo_ip(ip)
+function _M.get_ip_location(ip)
     if _M.is_intranet_address(ip) then
         return {
-            country = { ["zh"] = "内网", ["en"] = "intranet" },
-            province = { ["zh"] = "内网", ["en"] = "intranet" },
-            city = { ["zh"] = "内网", ["en"] = "intranet" },
+            country = { ["zh"] = "内网", ["en"] = "Intranet" },
             longitude = 0,
             latitude = 0,
-            iso = "local"
+            iso = "Local"
         }
     else
         geoip.init()

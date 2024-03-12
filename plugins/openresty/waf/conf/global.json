@@ -39,7 +39,7 @@
     "action": "deny"
   },
   "notFoundCount": {
-    "state": "on",
+    "state": "off",
     "type": "notFoundCount",
     "threshold": 10,
     "duration": 60,
@@ -85,18 +85,18 @@
     "action": "deny"
   },
   "cc": {
-    "state": "on",
+    "state": "off",
     "type": "cc",
     "rule": "cc",
     "tokenTimeOut": 1800,
-    "threshold": 100,
+    "threshold": 120,
     "duration": 60,
     "action": "deny",
     "ipBlock": "on",
     "ipBlockTime": 600
   },
   "ccurl": {
-    "state": "on",
+    "state": "off",
     "type": "urlcc",
     "rule": "urlcc",
     "action": "deny",
@@ -104,7 +104,7 @@
     "ipBlockTime": 600
   },
   "attackCount": {
-    "state": "on",
+    "state": "off",
     "type": "attackCount",
     "threshold": 20,
     "duration": 60,
@@ -139,6 +139,12 @@
   },
   "defaultUaBlack": {
     "type": "defaultUaBlack",
+    "state": "on",
+    "code": 403,
+    "action": "deny"
+  },
+  "defaultUrlBlack": {
+    "type": "defaultUrlBlack",
     "state": "on",
     "code": 403,
     "action": "deny"
