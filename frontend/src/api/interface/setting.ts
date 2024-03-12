@@ -45,6 +45,7 @@ export namespace Setting {
         emailVars: string;
         weChatVars: string;
         dingVars: string;
+        snapshotIgnore: string;
     }
     export interface SettingUpdate {
         key: string;

@@ -72,6 +72,8 @@ func Init() {
 		migrations.UpdateSnapshotRecords,
 
 		migrations.UpdateWebDavConf,
+
+		migrations.AddSnapshotIgnore,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

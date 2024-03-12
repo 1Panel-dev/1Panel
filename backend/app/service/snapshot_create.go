@@ -138,7 +138,14 @@ func snapPanelData(snap snapHelper, localDir, targetDir string) {
 	if strings.Contains(localDir, dataDir) {
 		exclusionRules += ("." + strings.ReplaceAll(localDir, dataDir, "") + ";")
 	}
-
+	ignoreVal, _ := settingRepo.Get(settingRepo.WithByKey("SnapshotIgnore"))
+	rules := strings.Split(ignoreVal.Value, ",")
+	for _, ignore := range rules {
+		if len(ignore) == 0 || cmd.CheckIllegal(ignore) {
+			continue
+		}
+		exclusionRules += ("." + strings.ReplaceAll(ignore, dataDir, "") + ";")
+	}
 	_ = snapshotRepo.Update(snap.SnapID, map[string]interface{}{"status": "OnSaveData"})
 	sysIP, _ := settingRepo.Get(settingRepo.WithByKey("SystemIP"))
 	_ = settingRepo.Update("SystemIP", "")
@@ -213,6 +220,7 @@ func handleSnapTar(sourceDir, targetDir, name, exclusionRules string) error {
 		}
 	}
 
+	exMap := make(map[string]struct{})
 	exStr := ""
 	excludes := strings.Split(exclusionRules, ";")
 	excludes = append(excludes, "*.sock")
@@ -220,8 +228,12 @@ func handleSnapTar(sourceDir, targetDir, name, exclusionRules string) error {
 		if len(exclude) == 0 {
 			continue
 		}
+		if _, ok := exMap[exclude]; ok {
+			continue
+		}
 		exStr += " --exclude "
 		exStr += exclude
+		exMap[exclude] = struct{}{}
 	}
 
 	commands := fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read -zcf %s %s -C %s .", targetDir+"/"+name, exStr, sourceDir)

@@ -7,6 +7,9 @@
                         <el-button type="primary" @click="onCreate()">
                             {{ $t('setting.createSnapshot') }}
                         </el-button>
+                        <el-button type="primary" plain @click="onIgnore()">
+                            {{ $t('setting.ignoreRule') }}
+                        </el-button>
                         <el-button type="primary" plain @click="onImport()">
                             {{ $t('setting.importSnapshot') }}
                         </el-button>
@@ -163,6 +166,7 @@
 
         <OpDialog ref="opRef" @search="search" />
         <SnapStatus ref="snapStatusRef" @search="search" />
+        <IgnoreRule ref="ignoreRef" />
     </div>
 </template>
 
@@ -175,6 +179,7 @@ import { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { Setting } from '@/api/interface/setting';
+import IgnoreRule from '@/views/setting/snapshot/ignore-rule/index.vue';
 import SnapStatus from '@/views/setting/snapshot/snap_status/index.vue';
 import RecoverStatus from '@/views/setting/snapshot/status/index.vue';
 import SnapshotImport from '@/views/setting/snapshot/import/index.vue';
@@ -193,6 +198,7 @@ const paginationConfig = reactive({
 const searchName = ref();
 
 const opRef = ref();
+const ignoreRef = ref();
 
 const snapStatusRef = ref();
 const recoverStatusRef = ref();
@@ -229,6 +235,10 @@ const onImport = () => {
         names.push(item.name);
     }
     importRef.value.acceptParams({ names: names });
+};
+
+const onIgnore = () => {
+    ignoreRef.value.acceptParams();
 };
 
 const handleClose = () => {
