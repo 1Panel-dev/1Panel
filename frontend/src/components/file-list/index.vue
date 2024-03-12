@@ -116,6 +116,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    isAll: {
+        type: Boolean,
+        default: false,
+    },
     disabled: {
         type: Boolean,
         default: false,
@@ -142,6 +146,9 @@ const closePage = () => {
 };
 
 const disabledDir = (row: File.File) => {
+    if (props.isAll) {
+        return false;
+    }
     if (!props.dir) {
         return row.isDir;
     }
