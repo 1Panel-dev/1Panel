@@ -6,7 +6,7 @@
         <div class="brief" v-loading="loadingApp">
             <div class="detail flex">
                 <div class="w-12 h-12 rounded p-1 shadow-md icon">
-                    <img :src="app.icon" alt="App Icon" class="w-full h-full rounded" />
+                    <img :src="app.icon" alt="App Icon" class="w-full h-full rounded" style="object-fit: contain" />
                 </div>
                 <div class="ml-4">
                     <div class="name mb-2">
