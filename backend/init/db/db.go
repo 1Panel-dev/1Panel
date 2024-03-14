@@ -6,12 +6,10 @@ import (
 	"os"
 	"time"
 
-	"gorm.io/gorm/logger"
-
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
-
-	"github.com/1Panel-dev/1Panel/backend/global"
+	"gorm.io/gorm/logger"
 )
 
 func Init() {

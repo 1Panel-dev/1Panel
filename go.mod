@@ -181,7 +181,6 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/mattn/go-shellwords v1.0.12 // indirect
-	github.com/mattn/go-sqlite3 v1.14.22 // indirect
 	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d // indirect
 	github.com/miekg/dns v1.1.58 // indirect
 	github.com/miekg/pkcs11 v1.1.1 // indirect
@@ -309,7 +308,6 @@ replace (
 	github.com/containerd/containerd => github.com/containerd/containerd v1.7.13
 	github.com/cucumber/godog => github.com/cucumber/godog v0.12.6
 	github.com/docker/buildx => github.com/docker/buildx v0.12.0-rc2.0.20231219140829-617f538cb315
-	github.com/mattn/go-sqlite3 => github.com/jgiannuzzi/go-sqlite3 v1.14.17-0.20240122133042-fb824c8e339e
 	github.com/moby/buildkit => github.com/moby/buildkit v0.13.0-beta3
 	golang.org/x/net => golang.org/x/net v0.17.0
 	k8s.io/api => k8s.io/api v0.29.2
