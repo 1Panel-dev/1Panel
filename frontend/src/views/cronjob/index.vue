@@ -105,32 +105,35 @@
                     </el-table-column>
                     <el-table-column :min-width="80" :label="$t('setting.backupAccount')" prop="defaultDownload">
                         <template #default="{ row }">
-                            <div v-for="(item, index) of row.backupAccounts?.split(',')" :key="index">
-                                <div v-if="row.accountExpand || (!row.accountExpand && index < 3)">
-                                    <span v-if="row.backupAccounts">
-                                        <span>
-                                            {{ $t('setting.' + item) }}
+                            <span v-if="!hasBackup(row.type)">-</span>
+                            <div v-else>
+                                <div v-for="(item, index) of row.backupAccounts?.split(',')" :key="index">
+                                    <div v-if="row.accountExpand || (!row.accountExpand && index < 3)">
+                                        <span v-if="row.backupAccounts">
+                                            <span>
+                                                {{ $t('setting.' + item) }}
+                                            </span>
+                                            <el-icon
+                                                size="12"
+                                                v-if="item === row.defaultDownload"
+                                                class="relative top-px left-1"
+                                            >
+                                                <Star />
+                                            </el-icon>
                                         </span>
-                                        <el-icon
-                                            size="12"
-                                            v-if="item === row.defaultDownload"
-                                            class="relative top-px left-1"
-                                        >
-                                            <Star />
-                                        </el-icon>
-                                    </span>
-                                    <span v-else>-</span>
+                                        <span v-else>-</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div v-if="!row.accountExpand && row.backupAccounts?.split(',').length > 3">
-                                <el-button type="primary" link @click="row.accountExpand = true">
-                                    {{ $t('commons.button.expand') }}...
-                                </el-button>
-                            </div>
-                            <div v-if="row.accountExpand && row.backupAccounts?.split(',').length > 3">
-                                <el-button type="primary" link @click="row.accountExpand = false">
-                                    {{ $t('commons.button.collapse') }}
-                                </el-button>
+                                <div v-if="!row.accountExpand && row.backupAccounts?.split(',').length > 3">
+                                    <el-button type="primary" link @click="row.accountExpand = true">
+                                        {{ $t('commons.button.expand') }}...
+                                    </el-button>
+                                </div>
+                                <div v-if="row.accountExpand && row.backupAccounts?.split(',').length > 3">
+                                    <el-button type="primary" link @click="row.accountExpand = false">
+                                        {{ $t('commons.button.collapse') }}
+                                    </el-button>
+                                </div>
                             </div>
                         </template>
                     </el-table-column>
