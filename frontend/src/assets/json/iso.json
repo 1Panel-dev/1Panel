@@ -1,0 +1,1150 @@
+[
+    {
+        "iso": "CN",
+        "zh": "中国",
+        "tw": "中國",
+        "en": "China"
+    },
+    {
+        "iso": "HK",
+        "zh": "中国香港",
+        "tw": "中國香港",
+        "en": "Hong Kong"
+    },
+    {
+        "iso": "MO",
+        "zh": "中国澳门",
+        "tw": "中國澳門",
+        "en": "Macau"
+    },
+    {
+        "iso": "TW",
+        "zh": "中国台湾",
+        "tw": "中國台灣",
+        "en": "Taiwan"
+    },
+    {
+        "iso": "AF",
+        "zh": "阿富汗",
+        "tw": "阿富汗",
+        "en": "Afghanistan"
+    },
+    {
+        "iso": "AL",
+        "zh": "阿尔巴尼亚",
+        "tw": "阿爾巴尼亞",
+        "en": "Albania"
+    },
+    {
+        "iso": "DZ",
+        "zh": "阿尔及利亚",
+        "tw": "阿爾及利亞",
+        "en": "Algeria"
+    },
+    {
+        "iso": "AO",
+        "zh": "安哥拉",
+        "tw": "安哥拉",
+        "en": "Angola"
+    },
+    {
+        "iso": "AR",
+        "zh": "阿根廷",
+        "tw": "阿根廷",
+        "en": "Argentina"
+    },
+    {
+        "iso": "AM",
+        "zh": "亚美尼亚",
+        "tw": "亞美尼亞",
+        "en": "Armenia"
+    },
+    {
+        "iso": "AU",
+        "zh": "澳大利亚",
+        "tw": "澳大利亞",
+        "en": "Australia"
+    },
+    {
+        "iso": "AT",
+        "zh": "奥地利",
+        "tw": "奧地利",
+        "en": "Austria"
+    },
+    {
+        "iso": "AZ",
+        "zh": "阿塞拜疆",
+        "tw": "阿塞拜疆",
+        "en": "Azerbaijan"
+    },
+    {
+        "iso": "BS",
+        "zh": "巴哈马",
+        "tw": "巴哈馬",
+        "en": "Bahamas"
+    },
+    {
+        "iso": "BH",
+        "zh": "巴林",
+        "tw": "巴林",
+        "en": "Bahrain"
+    },
+    {
+        "iso": "BD",
+        "zh": "孟加拉国",
+        "tw": "孟加拉國",
+        "en": "Bangladesh"
+    },
+    {
+        "iso": "BY",
+        "zh": "白俄罗斯",
+        "tw": "白俄羅斯",
+        "en": "Belarus"
+    },
+    {
+        "iso": "BE",
+        "zh": "比利时",
+        "tw": "比利時",
+        "en": "Belgium"
+    },
+    {
+        "iso": "BZ",
+        "zh": "伯利兹",
+        "tw": "貝里斯",
+        "en": "Belize"
+    },
+    {
+        "iso": "BJ",
+        "zh": "贝宁",
+        "tw": "貝南",
+        "en": "Benin"
+    },
+    {
+        "iso": "BT",
+        "zh": "不丹",
+        "tw": "不丹",
+        "en": "Bhutan"
+    },
+    {
+        "iso": "BO",
+        "zh": "玻利维亚",
+        "tw": "玻利維亞",
+        "en": "Bolivia"
+    },
+    {
+        "iso": "BA",
+        "zh": "波斯尼亚和黑塞哥维那",
+        "tw": "波斯尼亞和黑塞哥維那",
+        "en": "Bosnia and Herz."
+    },
+    {
+        "iso": "BW",
+        "zh": "博茨瓦纳",
+        "tw": "博茨瓦納",
+        "en": "Botswana"
+    },
+    {
+        "iso": "BR",
+        "zh": "巴西",
+        "tw": "巴西",
+        "en": "Brazil"
+    },
+    {
+        "iso": "VG",
+        "zh": "英属维京群岛",
+        "tw": "英屬維京群島",
+        "en": "British Virgin Islands"
+    },
+    {
+        "iso": "BN",
+        "zh": "文莱",
+        "tw": "文萊",
+        "en": "Brunei"
+    },
+    {
+        "iso": "BG",
+        "zh": "保加利亚",
+        "tw": "保加利亞",
+        "en": "Bulgaria"
+    },
+    {
+        "iso": "BF",
+        "zh": "布基纳法索",
+        "tw": "布基納法索",
+        "en": "Burkina Faso"
+    },
+    {
+        "iso": "BI",
+        "zh": "布隆迪",
+        "tw": "布隆迪",
+        "en": "Burundi"
+    },
+    {
+        "iso": "KH",
+        "zh": "柬埔寨",
+        "tw": "柬埔寨",
+        "en": "Cambodia"
+    },
+    {
+        "iso": "CM",
+        "zh": "喀麦隆",
+        "tw": "喀麥隆",
+        "en": "Cameroon"
+    },
+    {
+        "iso": "CA",
+        "zh": "加拿大",
+        "tw": "加拿大",
+        "en": "Canada"
+    },
+    {
+        "iso": "CV",
+        "zh": "佛得角",
+        "tw": "佛得角",
+        "en": "Cape Verde"
+    },
+    {
+        "iso": "KY",
+        "zh": "开曼群岛",
+        "tw": "開曼群島",
+        "en": "Cayman Islands"
+    },
+    {
+        "iso": "CF",
+        "zh": "中非共和国",
+        "tw": "中非共和國",
+        "en": "Central African Rep."
+    },
+    {
+        "iso": "TD",
+        "zh": "乍得",
+        "tw": "乍得",
+        "en": "Chad"
+    },
+    {
+        "iso": "CL",
+        "zh": "智利",
+        "tw": "智利",
+        "en": "Chile"
+    },
+
+    {
+        "iso": "CO",
+        "zh": "哥伦比亚",
+        "tw": "哥倫比亞",
+        "en": "Colombia"
+    },
+    {
+        "iso": "KM",
+        "zh": "科摩罗",
+        "tw": "科摩羅",
+        "en": "Comoros"
+    },
+    {
+        "iso": "CG",
+        "zh": "刚果",
+        "tw": "剛果",
+        "en": "Congo"
+    },
+    {
+        "iso": "CR",
+        "zh": "哥斯达黎加",
+        "tw": "哥斯達黎加",
+        "en": "Costa Rica"
+    },
+    {
+        "iso": "HR",
+        "zh": "克罗地亚",
+        "tw": "克羅地亞",
+        "en": "Croatia"
+    },
+    {
+        "iso": "CU",
+        "zh": "古巴",
+        "tw": "古巴",
+        "en": "Cuba"
+    },
+    {
+        "iso": "CY",
+        "zh": "塞浦路斯",
+        "tw": "塞普勒斯",
+        "en": "Cyprus"
+    },
+    {
+        "iso": "CZ",
+        "zh": "捷克共和国",
+        "tw": "捷克共和國",
+        "en": "Czech Rep."
+    },
+    {
+        "iso": "CI",
+        "zh": "科特迪瓦",
+        "tw": "象牙海岸",
+        "en": "Côte d'Ivoire"
+    },
+    {
+        "iso": "CD",
+        "zh": "刚果民主共和国",
+        "tw": "剛果民主共和國",
+        "en": "Dem. Rep. Congo"
+    },
+    {
+        "iso": "KP",
+        "zh": "朝鲜",
+        "tw": "朝鮮",
+        "en": "Dem. Rep. Korea"
+    },
+    {
+        "iso": "DK",
+        "zh": "丹麦",
+        "tw": "丹麥",
+        "en": "Denmark"
+    },
+    {
+        "iso": "DJ",
+        "zh": "吉布提",
+        "tw": "吉布提",
+        "en": "Djibouti"
+    },
+    {
+        "iso": "DO",
+        "zh": "多米尼加共和国",
+        "tw": "多明尼加共和國",
+        "en": "Dominican Rep."
+    },
+    {
+        "iso": "EC",
+        "zh": "厄瓜多尔",
+        "tw": "厄瓜多爾",
+        "en": "Ecuador"
+    },
+    {
+        "iso": "EG",
+        "zh": "埃及",
+        "tw": "埃及",
+        "en": "Egypt"
+    },
+    {
+        "iso": "SV",
+        "zh": "萨尔瓦多",
+        "tw": "薩爾瓦多",
+        "en": "El Salvador"
+    },
+    {
+        "iso": "GQ",
+        "zh": "赤道几内亚",
+        "tw": "赤道幾內亞",
+        "en": "Equatorial Guinea"
+    },
+    {
+        "iso": "ER",
+        "zh": "厄立特里亚",
+        "tw": "厄立特里亞",
+        "en": "Eritrea"
+    },
+    {
+        "iso": "EE",
+        "zh": "爱沙尼亚",
+        "tw": "愛沙尼亞",
+        "en": "Estonia"
+    },
+    {
+        "iso": "ET",
+        "zh": "埃塞俄比亚",
+        "tw": "埃塞俄比亞",
+        "en": "Ethiopia"
+    },
+    {
+        "iso": "FK",
+        "zh": "福克兰群岛",
+        "tw": "福克蘭群島",
+        "en": "Falkland Is."
+    },
+    {
+        "iso": "FJ",
+        "zh": "斐济",
+        "tw": "斐濟",
+        "en": "Fiji"
+    },
+    {
+        "iso": "FI",
+        "zh": "芬兰",
+        "tw": "芬蘭",
+        "en": "Finland"
+    },
+    {
+        "iso": "FR",
+        "zh": "法国",
+        "tw": "法國",
+        "en": "France"
+    },
+    {
+        "iso": "GA",
+        "zh": "加蓬",
+        "tw": "加蓬",
+        "en": "Gabon"
+    },
+    {
+        "iso": "GM",
+        "zh": "冈比亚",
+        "tw": "岡比亞",
+        "en": "Gambia"
+    },
+    {
+        "iso": "GE",
+        "zh": "格鲁吉亚",
+        "tw": "喬治亞",
+        "en": "Georgia"
+    },
+    {
+        "iso": "DE",
+        "zh": "德国",
+        "tw": "德國",
+        "en": "Germany"
+    },
+    {
+        "iso": "GH",
+        "zh": "加纳",
+        "tw": "加納",
+        "en": "Ghana"
+    },
+    {
+        "iso": "GR",
+        "zh": "希腊",
+        "tw": "希臘",
+        "en": "Greece"
+    },
+    {
+        "iso": "GL",
+        "zh": "格陵兰",
+        "tw": "格陵蘭",
+        "en": "Greenland"
+    },
+    {
+        "iso": "GT",
+        "zh": "危地马拉",
+        "tw": "危地馬拉",
+        "en": "Guatemala"
+    },
+    {
+        "iso": "GN",
+        "zh": "几内亚",
+        "tw": "幾內亞",
+        "en": "Guinea"
+    },
+    {
+        "iso": "GW",
+        "zh": "几内亚比绍",
+        "tw": "幾內亞比索",
+        "en": "Guinea-Bissau"
+    },
+    {
+        "iso": "GY",
+        "zh": "圭亚那",
+        "tw": "圭亞那",
+        "en": "Guyana"
+    },
+    {
+        "iso": "HT",
+        "zh": "海地",
+        "tw": "海地",
+        "en": "Haiti"
+    },
+    {
+        "iso": "HN",
+        "zh": "洪都拉斯",
+        "tw": "洪都拉斯",
+        "en": "Honduras"
+    },
+    {
+        "iso": "HU",
+        "zh": "匈牙利",
+        "tw": "匈牙利",
+        "en": "Hungary"
+    },
+    {
+        "iso": "IS",
+        "zh": "冰岛",
+        "tw": "冰島",
+        "en": "Iceland"
+    },
+    {
+        "iso": "IN",
+        "zh": "印度",
+        "tw": "印度",
+        "en": "India"
+    },
+    {
+        "iso": "ID",
+        "zh": "印度尼西亚",
+        "tw": "印尼",
+        "en": "Indonesia"
+    },
+    {
+        "iso": "IR",
+        "zh": "伊朗",
+        "tw": "伊朗",
+        "en": "Iran"
+    },
+    {
+        "iso": "IQ",
+        "zh": "伊拉克",
+        "tw": "伊拉克",
+        "en": "Iraq"
+    },
+    {
+        "iso": "IE",
+        "zh": "爱尔兰",
+        "tw": "愛爾蘭",
+        "en": "Ireland"
+    },
+    {
+        "iso": "IM",
+        "zh": "马恩岛",
+        "tw": "曼岛",
+        "en": "Isle of Man"
+    },
+    {
+        "iso": "IL",
+        "zh": "以色列",
+        "tw": "以色列",
+        "en": "Israel"
+    },
+    {
+        "iso": "IT",
+        "zh": "意大利",
+        "tw": "義大利",
+        "en": "Italy"
+    },
+    {
+        "iso": "JM",
+        "zh": "牙买加",
+        "tw": "牙買加",
+        "en": "Jamaica"
+    },
+    {
+        "iso": "JP",
+        "zh": "日本",
+        "tw": "日本",
+        "en": "Japan"
+    },
+    {
+        "iso": "JO",
+        "zh": "约旦",
+        "tw": "約旦",
+        "en": "Jordan"
+    },
+    {
+        "iso": "KZ",
+        "zh": "哈萨克斯坦",
+        "tw": "哈薩克斯坦",
+        "en": "Kazakhstan"
+    },
+    {
+        "iso": "KE",
+        "zh": "肯尼亚",
+        "tw": "肯亞",
+        "en": "Kenya"
+    },
+    {
+        "iso": "KR",
+        "zh": "韩国",
+        "tw": "韓國",
+        "en": "Korea"
+    },
+    {
+        "iso": "KW",
+        "zh": "科威特",
+        "tw": "科威特",
+        "en": "Kuwait"
+    },
+    {
+        "iso": "KG",
+        "zh": "吉尔吉斯斯坦",
+        "tw": "吉爾吉斯斯坦",
+        "en": "Kyrgyzstan"
+    },
+    {
+        "iso": "LA",
+        "zh": "老挝",
+        "tw": "寮國",
+        "en": "Lao PDR"
+    },
+    {
+        "iso": "LV",
+        "zh": "拉脱维亚",
+        "tw": "拉脫維亞",
+        "en": "Latvia"
+    },
+    {
+        "iso": "LB",
+        "zh": "黎巴嫩",
+        "tw": "黎巴嫩",
+        "en": "Lebanon"
+    },
+    {
+        "iso": "LS",
+        "zh": "莱索托",
+        "tw": "賴索托",
+        "en": "Lesotho"
+    },
+    {
+        "iso": "LR",
+        "zh": "利比里亚",
+        "tw": "賴比瑞亞",
+        "en": "Liberia"
+    },
+    {
+        "iso": "LY",
+        "zh": "利比亚",
+        "tw": "利比亞",
+        "en": "Libya"
+    },
+    {
+        "iso": "LT",
+        "zh": "立陶宛",
+        "tw": "立陶宛",
+        "en": "Lithuania"
+    },
+    {
+        "iso": "LU",
+        "zh": "卢森堡",
+        "tw": "盧森堡",
+        "en": "Luxembourg"
+    },
+    {
+        "iso": "MK",
+        "zh": "马其顿",
+        "tw": "馬其頓",
+        "en": "Macedonia"
+    },
+    {
+        "iso": "MG",
+        "zh": "马达加斯加",
+        "tw": "馬達加斯加",
+        "en": "Madagascar"
+    },
+    {
+        "iso": "MW",
+        "zh": "马拉维",
+        "tw": "馬拉威",
+        "en": "Malawi"
+    },
+    {
+        "iso": "MY",
+        "zh": "马来西亚",
+        "tw": "馬來西亞",
+        "en": "Malaysia"
+    },
+    {
+        "iso": "MV",
+        "zh": "马尔代夫",
+        "tw": "馬爾代夫",
+        "en": "Maldives"
+    },
+    {
+        "iso": "ML",
+        "zh": "马里",
+        "tw": "馬里",
+        "en": "Mali"
+    },
+    {
+        "iso": "MT",
+        "zh": "马耳他",
+        "tw": "馬爾他",
+        "en": "Malta"
+    },
+    {
+        "iso": "MR",
+        "zh": "毛里塔尼亚",
+        "tw": "毛里塔尼亞",
+        "en": "Mauritania"
+    },
+    {
+        "iso": "MU",
+        "zh": "毛里求斯",
+        "tw": "毛里求斯",
+        "en": "Mauritius"
+    },
+    {
+        "iso": "MX",
+        "zh": "墨西哥",
+        "tw": "墨西哥",
+        "en": "Mexico"
+    },
+    {
+        "iso": "MD",
+        "zh": "摩尔多瓦",
+        "tw": "摩爾多瓦",
+        "en": "Moldova"
+    },
+    {
+        "iso": "MC",
+        "zh": "摩纳哥",
+        "tw": "摩納哥",
+        "en": "Monaco"
+    },
+    {
+        "iso": "MN",
+        "zh": "蒙古",
+        "tw": "蒙古",
+        "en": "Mongolia"
+    },
+    {
+        "iso": "ME",
+        "zh": "黑山共和国",
+        "tw": "黑山共和國",
+        "en": "Montenegro"
+    },
+    {
+        "iso": "MA",
+        "zh": "摩洛哥",
+        "tw": "摩洛哥",
+        "en": "Morocco"
+    },
+    {
+        "iso": "MZ",
+        "zh": "莫桑比克",
+        "tw": "莫桑比克",
+        "en": "Mozambique"
+    },
+    {
+        "iso": "MM",
+        "zh": "缅甸",
+        "tw": "緬甸",
+        "en": "Myanmar"
+    },
+    {
+        "iso": "NA",
+        "zh": "纳米比亚",
+        "tw": "納米比亞",
+        "en": "Namibia"
+    },
+    {
+        "iso": "NP",
+        "zh": "尼泊尔",
+        "tw": "尼泊爾",
+        "en": "Nepal"
+    },
+    {
+        "iso": "NL",
+        "zh": "荷兰",
+        "tw": "荷蘭",
+        "en": "Netherlands"
+    },
+    {
+        "iso": "NC",
+        "zh": "新喀里多尼亚",
+        "tw": "新喀里多尼亞",
+        "en": "New Caledonia"
+    },
+    {
+        "iso": "NZ",
+        "zh": "新西兰",
+        "tw": "新西蘭",
+        "en": "New Zealand"
+    },
+    {
+        "iso": "NI",
+        "zh": "尼加拉瓜",
+        "tw": "尼加拉瓜",
+        "en": "Nicaragua"
+    },
+    {
+        "iso": "NE",
+        "zh": "尼日尔",
+        "tw": "尼日爾",
+        "en": "Niger"
+    },
+    {
+        "iso": "NG",
+        "zh": "尼日利亚",
+        "tw": "尼日利亞",
+        "en": "Nigeria"
+    },
+    {
+        "iso": "NO",
+        "zh": "挪威",
+        "tw": "挪威",
+        "en": "Norway"
+    },
+    {
+        "iso": "OM",
+        "zh": "阿曼",
+        "tw": "阿曼",
+        "en": "Oman"
+    },
+    {
+        "iso": "PK",
+        "zh": "巴基斯坦",
+        "tw": "巴基斯坦",
+        "en": "Pakistan"
+    },
+    {
+        "iso": "PA",
+        "zh": "巴拿马",
+        "tw": "巴拿馬",
+        "en": "Panama"
+    },
+    {
+        "iso": "PG",
+        "zh": "巴布亚新几内亚",
+        "tw": "巴布亞新幾內亞",
+        "en": "Papua New Guinea"
+    },
+    {
+        "iso": "PY",
+        "zh": "巴拉圭",
+        "tw": "巴拉圭",
+        "en": "Paraguay"
+    },
+    {
+        "iso": "PE",
+        "zh": "秘鲁",
+        "tw": "秘魯",
+        "en": "Peru"
+    },
+    {
+        "iso": "PH",
+        "zh": "菲律宾",
+        "tw": "菲律賓",
+        "en": "Philippines"
+    },
+    {
+        "iso": "PL",
+        "zh": "波兰",
+        "tw": "波蘭",
+        "en": "Poland"
+    },
+    {
+        "iso": "PT",
+        "zh": "葡萄牙",
+        "tw": "葡萄牙",
+        "en": "Portugal"
+    },
+    {
+        "iso": "PR",
+        "zh": "波多黎各",
+        "tw": "波多黎各",
+        "en": "Puerto Rico"
+    },
+    {
+        "iso": "QA",
+        "zh": "卡塔尔",
+        "tw": "卡塔爾",
+        "en": "Qatar"
+    },
+    {
+        "iso": "RE",
+        "zh": "留尼旺",
+        "tw": "留尼旺",
+        "en": "Reunion"
+    },
+    {
+        "iso": "RO",
+        "zh": "罗马尼亚",
+        "tw": "羅馬尼亞",
+        "en": "Romania"
+    },
+    {
+        "iso": "RU",
+        "zh": "俄罗斯",
+        "tw": "俄羅斯",
+        "en": "Russia"
+    },
+    {
+        "iso": "RW",
+        "zh": "卢旺达",
+        "tw": "盧旺達",
+        "en": "Rwanda"
+    },
+    {
+        "iso": "GS",
+        "zh": "南乔治亚和南桑威奇群岛",
+        "tw": "南喬治亞和南三明治群島",
+        "en": "S. Geo. and S. Sandw. Is."
+    },
+    {
+        "iso": "SS",
+        "zh": "南苏丹",
+        "tw": "南蘇丹",
+        "en": "S. Sudan"
+    },
+    {
+        "iso": "SM",
+        "zh": "圣马力诺",
+        "tw": "聖馬力諾",
+        "en": "San Marino"
+    },
+    {
+        "iso": "SA",
+        "zh": "沙特阿拉伯",
+        "tw": "沙地阿拉伯",
+        "en": "Saudi Arabia"
+    },
+    {
+        "iso": "SN",
+        "zh": "塞内加尔",
+        "tw": "塞內加爾",
+        "en": "Senegal"
+    },
+    {
+        "iso": "RS",
+        "zh": "塞尔维亚",
+        "tw": "塞爾維亞",
+        "en": "Serbia"
+    },
+    {
+        "iso": "SL",
+        "zh": "塞拉利昂",
+        "tw": "塞拉利昂",
+        "en": "Sierra Leone"
+    },
+    {
+        "iso": "SG",
+        "zh": "新加坡",
+        "tw": "新加坡",
+        "en": "Singapore"
+    },
+    {
+        "iso": "SK",
+        "zh": "斯洛伐克",
+        "tw": "斯洛伐克",
+        "en": "Slovakia"
+    },
+    {
+        "iso": "SI",
+        "zh": "斯洛文尼亚",
+        "tw": "斯洛文尼亞",
+        "en": "Slovenia"
+    },
+    {
+        "iso": "SB",
+        "zh": "所罗门群岛",
+        "tw": "所羅門群島",
+        "en": "Solomon Is."
+    },
+    {
+        "iso": "SO",
+        "zh": "索马里",
+        "tw": "索馬里",
+        "en": "Somalia"
+    },
+    {
+        "iso": "ZA",
+        "zh": "南非",
+        "tw": "南非",
+        "en": "South Africa"
+    },
+    {
+        "iso": "ES",
+        "zh": "西班牙",
+        "tw": "西班牙",
+        "en": "Spain"
+    },
+    {
+        "iso": "LK",
+        "zh": "斯里兰卡",
+        "tw": "斯里蘭卡",
+        "en": "Sri Lanka"
+    },
+    {
+        "iso": "SD",
+        "zh": "苏丹",
+        "tw": "蘇丹",
+        "en": "Sudan"
+    },
+    {
+        "iso": "SR",
+        "zh": "苏里南",
+        "tw": "蘇利南",
+        "en": "Suriname"
+    },
+    {
+        "iso": "SZ",
+        "zh": "斯威士兰",
+        "tw": "斯威士蘭",
+        "en": "Swaziland"
+    },
+    {
+        "iso": "SE",
+        "zh": "瑞典",
+        "tw": "瑞典",
+        "en": "Sweden"
+    },
+    {
+        "iso": "CH",
+        "zh": "瑞士",
+        "tw": "瑞士",
+        "en": "Switzerland"
+    },
+    {
+        "iso": "SY",
+        "zh": "叙利亚",
+        "tw": "敘利亞",
+        "en": "Syria"
+    },
+
+    {
+        "iso": "TJ",
+        "zh": "塔吉克斯坦",
+        "tw": "塔吉克斯坦",
+        "en": "Tajikistan"
+    },
+    {
+        "iso": "TZ",
+        "zh": "坦桑尼亚",
+        "tw": "坦桑尼亞",
+        "en": "Tanzania"
+    },
+    {
+        "iso": "TH",
+        "zh": "泰国",
+        "tw": "泰國",
+        "en": "Thailand"
+    },
+    {
+        "iso": "TG",
+        "zh": "多哥",
+        "tw": "多哥",
+        "en": "Togo"
+    },
+    {
+        "iso": "TO",
+        "zh": "汤加",
+        "tw": "湯加",
+        "en": "Tonga"
+    },
+    {
+        "iso": "TT",
+        "zh": "特立尼达和多巴哥",
+        "tw": "特立尼達和多巴哥",
+        "en": "Trinidad and Tobago"
+    },
+    {
+        "iso": "TN",
+        "zh": "突尼斯",
+        "tw": "突尼斯",
+        "en": "Tunisia"
+    },
+    {
+        "iso": "TR",
+        "zh": "土耳其",
+        "tw": "土耳其",
+        "en": "Turkey"
+    },
+    {
+        "iso": "TM",
+        "zh": "土库曼斯坦",
+        "tw": "土庫曼斯坦",
+        "en": "Turkmenistan"
+    },
+    {
+        "iso": "VI",
+        "zh": "美属维尔京群岛",
+        "tw": "美屬維爾京群島",
+        "en": "U.S. Virgin Islands"
+    },
+    {
+        "iso": "UG",
+        "zh": "乌干达",
+        "tw": "烏干達",
+        "en": "Uganda"
+    },
+    {
+        "iso": "UA",
+        "zh": "乌克兰",
+        "tw": "烏克蘭",
+        "en": "Ukraine"
+    },
+    {
+        "iso": "AE",
+        "zh": "阿拉伯联合酋长国",
+        "tw": "阿拉伯聯合大公國",
+        "en": "United Arab Emirates"
+    },
+    {
+        "iso": "GB",
+        "zh": "英国",
+        "tw": "英國",
+        "en": "United Kingdom"
+    },
+    {
+        "iso": "US",
+        "zh": "美国",
+        "tw": "美國",
+        "en": "United States"
+    },
+    {
+        "iso": "UY",
+        "zh": "乌拉圭",
+        "tw": "烏拉圭",
+        "en": "Uruguay"
+    },
+    {
+        "iso": "UZ",
+        "zh": "乌兹别克斯坦",
+        "tw": "烏茲別克斯坦",
+        "en": "Uzbekistan"
+    },
+    {
+        "iso": "VU",
+        "zh": "瓦努阿图",
+        "tw": "瓦努阿圖",
+        "en": "Vanuatu"
+    },
+    {
+        "iso": "VA",
+        "zh": "梵蒂冈城",
+        "tw": "梵蒂岡城",
+        "en": "Vatican City"
+    },
+    {
+        "iso": "VE",
+        "zh": "委内瑞拉",
+        "tw": "委內瑞拉",
+        "en": "Venezuela"
+    },
+    {
+        "iso": "VN",
+        "zh": "越南",
+        "tw": "越南",
+        "en": "Vietnam"
+    },
+    {
+        "iso": "EH",
+        "zh": "西撒哈拉",
+        "tw": "西撒哈拉",
+        "en": "W. Sahara"
+    },
+    {
+        "iso": "YE",
+        "zh": "也门",
+        "tw": "也門",
+        "en": "Yemen"
+    },
+    {
+        "iso": "YU",
+        "zh": "南斯拉夫",
+        "tw": "南斯拉夫",
+        "en": "Yugoslavia"
+    },
+    {
+        "iso": "ZR",
+        "zh": "扎伊尔",
+        "tw": "扎伊爾",
+        "en": "Zaire"
+    },
+    {
+        "iso": "ZM",
+        "zh": "赞比亚",
+        "tw": "贊比亞",
+        "en": "Zambia"
+    },
+    {
+        "iso": "ZW",
+        "zh": "津巴布韦",
+        "tw": "津巴布韋",
+        "en": "Zimbabwe"
+    }
+]

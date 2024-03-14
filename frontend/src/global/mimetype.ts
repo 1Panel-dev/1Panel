@@ -181,3 +181,79 @@ export const DNSTypes = [
         value: 'Godaddy',
     },
 ];
+
+export const Fields = [
+    {
+        label: 'URL',
+        value: 'URL',
+    },
+    {
+        label: 'IP',
+        value: 'IP',
+    },
+    {
+        label: 'Header',
+        value: 'Header',
+    },
+    {
+        label: 'Host',
+        value: 'Host',
+    },
+];
+
+export const Patterns = [
+    {
+        label: i18n.global.t('xpack.waf.contain'),
+        value: 'contain',
+    },
+    {
+        label: i18n.global.t('xpack.waf.equal'),
+        value: 'eq',
+    },
+    {
+        label: i18n.global.t('xpack.waf.regex'),
+        value: 'regex',
+    },
+    {
+        label: i18n.global.t('xpack.waf.notEqual'),
+        value: 'notEq',
+    },
+];
+
+export const HttpCodes = [
+    {
+        label: i18n.global.t('xpack.waf.badReq'),
+        value: 400,
+    },
+    {
+        label: i18n.global.t('xpack.waf.forbidden'),
+        value: 403,
+    },
+    {
+        label: i18n.global.t('xpack.waf.noRes'),
+        value: 444,
+    },
+    {
+        label: i18n.global.t('xpack.waf.serverErr'),
+        value: 500,
+    },
+];
+
+export const Actions = [
+    {
+        label: i18n.global.t('xpack.waf.actionAllow'),
+        value: 'allow',
+    },
+    {
+        label: i18n.global.t('xpack.waf.deny'),
+        value: 'deny',
+    },
+    {
+        label: i18n.global.t('xpack.waf.captcha'),
+        value: 'captcha',
+    },
+    {
+        label: i18n.global.t('xpack.waf.fiveSeconds'),
+        value: 'five_seconds',
+    },
+];
