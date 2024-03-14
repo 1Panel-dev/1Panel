@@ -360,6 +360,7 @@ const message = {
         goUpgrade: '去应用列表升级',
         goInstall: '去应用商店安装',
         source: '来源',
+        isDelete: '已删除',
         permission: '权限',
         permissionForIP: '指定 IP',
         permissionAll: '所有人(%)',
@@ -380,7 +381,7 @@ const message = {
         confChange: '配置修改',
         confNotFound: '未能找到该应用配置文件，请在应用商店升级该应用至最新版本后重试！',
 
-        loadFromRemote: '从服务器获取',
+        loadFromRemote: '从服务器同步',
         userBind: '绑定用户',
         pgBindHelper: '该操作用于创建新用户并将其绑定到目标数据库，暂不支持选择已存在于数据库中的用户。',
         pgSuperUser: '超级用户',

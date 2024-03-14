@@ -15,3 +15,13 @@ var AddSnapshotIgnore = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddDatabaseIsDelete = &gormigrate.Migration{
+	ID: "20240314-add-database-is-delete",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.DatabaseMysql{}, &model.DatabasePostgresql{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}

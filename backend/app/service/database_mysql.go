@@ -190,11 +190,13 @@ func (u *MysqlService) LoadFromRemote(req dto.MysqlLoadDB) error {
 	if err != nil {
 		return err
 	}
+	deleteList := databases
 	for _, data := range datas {
 		hasOld := false
-		for _, oldData := range databases {
-			if strings.EqualFold(oldData.Name, data.Name) && strings.EqualFold(oldData.MysqlName, data.MysqlName) {
+		for i := 0; i < len(databases); i++ {
+			if strings.EqualFold(databases[i].Name, data.Name) && strings.EqualFold(databases[i].MysqlName, data.MysqlName) {
 				hasOld = true
+				deleteList = append(deleteList[:i], deleteList[i+1:]...)
 				break
 			}
 		}
@@ -207,6 +209,9 @@ func (u *MysqlService) LoadFromRemote(req dto.MysqlLoadDB) error {
 				return err
 			}
 		}
+	}
+	for _, delItem := range deleteList {
+		_ = mysqlRepo.Update(delItem.ID, map[string]interface{}{"is_delete": true})
 	}
 	return nil
 }

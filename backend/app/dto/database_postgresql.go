@@ -20,7 +20,7 @@ type PostgresqlDBInfo struct {
 	Username       string    `json:"username"`
 	Password       string    `json:"password"`
 	SuperUser      bool      `json:"superUser"`
-	BackupCount    int       `json:"backupCount"`
+	IsDelete       bool      `json:"isDelete"`
 	Description    string    `json:"description"`
 }
 

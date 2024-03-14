@@ -17818,6 +17818,9 @@ const docTemplate = `{
                 "sessionTimeout": {
                     "type": "string"
                 },
+                "snapshotIgnore": {
+                    "type": "string"
+                },
                 "ssl": {
                     "type": "string"
                 },
