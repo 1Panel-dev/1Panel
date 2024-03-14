@@ -1,5 +1,5 @@
 import { GlobalStore } from '@/store';
-import { searchXSetting } from '@/xpack/frontend/api/modules/setting';
+import { searchXSetting } from '@/xpack/api/modules/setting';
 import { computed } from 'vue';
 
 export const useLogo = async () => {
