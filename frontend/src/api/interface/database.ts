@@ -23,6 +23,7 @@ export namespace Database {
         username: string;
         password: string;
         permission: string;
+        isDelete: string;
         description: string;
     }
     export interface BaseInfo {
@@ -207,6 +208,7 @@ export namespace Database {
         username: string;
         password: string;
         superUser: boolean;
+        isDelete: string;
         description: string;
     }
     export interface ChangeInfo {

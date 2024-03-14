@@ -364,6 +364,7 @@ const message = {
         goUpgrade: 'Go for upgrade',
         goInstall: 'Go for install',
         source: 'Source',
+        isDelete: 'Deleted',
         permission: 'Permission',
         permissionForIP: 'IP',
         permissionAll: 'All of them(%)',
@@ -388,7 +389,7 @@ const message = {
         portHelper:
             'This port is the exposed port of the container. You need to save the modification separately and restart the container!',
 
-        loadFromRemote: 'Load from server',
+        loadFromRemote: 'Sync from Server',
         userBind: 'Bind User',
         pgBindHelper:
             'This operation is used to create a new user and bind it to the target database. Currently, selecting users already existing in the database is not supported.',

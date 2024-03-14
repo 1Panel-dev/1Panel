@@ -9,5 +9,6 @@ type DatabaseMysql struct {
 	Username    string `json:"username" gorm:"type:varchar(256);not null"`
 	Password    string `json:"password" gorm:"type:varchar(256);not null"`
 	Permission  string `json:"permission" gorm:"type:varchar(256);not null"`
+	IsDelete    bool   `json:"isDelete" gorm:"type:varchar(64)"`
 	Description string `json:"description" gorm:"type:varchar(256);"`
 }

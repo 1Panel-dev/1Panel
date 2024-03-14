@@ -90,7 +90,18 @@
             </template>
             <template #main v-if="currentDB">
                 <ComplexTable :pagination-config="paginationConfig" @sort-change="search" @search="search" :data="data">
-                    <el-table-column :label="$t('commons.table.name')" prop="name" sortable />
+                    <el-table-column :label="$t('commons.table.name')" prop="name" sortable>
+                        <template #default="{ row }">
+                            <Tooltip v-if="!row.isDelete" :islink="false" :text="row.name" />
+                            <div v-else>
+                                <span v-if="row.name.length < 15">{{ row.name }}</span>
+                                <el-tooltip v-else :content="row.name">{{ row.name.substring(0, 10) }}...</el-tooltip>
+                                <el-tag round type="info" class="ml-1" size="small">
+                                    {{ $t('database.isDelete') }}
+                                </el-tag>
+                            </div>
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('commons.login.username')" prop="username">
                         <template #default="{ row }">
                             <div class="flex items-center" v-if="row.username">
@@ -99,7 +110,13 @@
                                 </span>
                             </div>
                             <div v-else>
-                                <el-button style="margin-left: -3px" type="primary" link @click="onBind(row)">
+                                <el-button
+                                    :disabled="row.isDelete"
+                                    style="margin-left: -3px"
+                                    type="primary"
+                                    link
+                                    @click="onBind(row)"
+                                >
                                     {{ $t('database.userBind') }}
                                 </el-button>
                             </div>
@@ -498,7 +515,7 @@ const buttons = [
     {
         label: i18n.global.t('database.changePassword'),
         disabled: (row: Database.PostgresqlDBInfo) => {
-            return !row.username;
+            return !row.username || row.isDelete;
         },
         click: (row: Database.PostgresqlDBInfo) => {
             onChangePassword(row);
@@ -507,7 +524,7 @@ const buttons = [
     {
         label: i18n.global.t('database.permission'),
         disabled: (row: Database.PostgresqlDBInfo) => {
-            return !row.username;
+            return !row.username || row.isDelete;
         },
         click: (row: Database.PostgresqlDBInfo) => {
             let param = {
@@ -521,6 +538,9 @@ const buttons = [
     },
     {
         label: i18n.global.t('database.backupList'),
+        disabled: (row: Database.PostgresqlDBInfo) => {
+            return row.isDelete;
+        },
         click: (row: Database.PostgresqlDBInfo) => {
             let params = {
                 type: currentDB.value.type,
@@ -532,6 +552,9 @@ const buttons = [
     },
     {
         label: i18n.global.t('database.loadBackup'),
+        disabled: (row: Database.PostgresqlDBInfo) => {
+            return row.isDelete;
+        },
         click: (row: Database.PostgresqlDBInfo) => {
             let params = {
                 type: currentDB.value.type,

@@ -41,7 +41,7 @@ type MysqlDBInfo struct {
 	Username    string    `json:"username"`
 	Password    string    `json:"password"`
 	Permission  string    `json:"permission"`
-	BackupCount int       `json:"backupCount"`
+	IsDelete    bool      `json:"isDelete"`
 	Description string    `json:"description"`
 }
 
