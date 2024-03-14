@@ -407,6 +407,9 @@ const forDetail = async (row: Cronjob.Record) => {
 const loadRecord = async (row: Cronjob.Record) => {
     if (row.records) {
         const res = await getRecordLog(row.id);
+        if (currentRecordDetail.value === res.data) {
+            return;
+        }
         currentRecordDetail.value = res.data;
         const state = view.value.state;
         view.value.dispatch({
