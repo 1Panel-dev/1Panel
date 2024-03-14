@@ -12,7 +12,7 @@
                     >
                         {{ $t('app.all') }}
                     </el-button>
-                    <div v-for="item in tags.slice(0, 6)" :key="item.key" class="inline">
+                    <div v-for="item in tags.slice(0, 7)" :key="item.key" class="inline">
                         <el-button
                             class="tag-button"
                             :class="activeTag === item.key ? '' : 'no-active'"
@@ -38,7 +38,7 @@
                             <template #dropdown>
                                 <el-dropdown-menu>
                                     <el-dropdown-item
-                                        v-for="item in tags.slice(6)"
+                                        v-for="item in tags.slice(7)"
                                         @click="changeTag(item.key)"
                                         :key="item.key"
                                     >
@@ -106,7 +106,7 @@
                                     <div class="app-content">
                                         <div class="app-header">
                                             <span class="app-title">{{ app.name }}</span>
-                                            <el-text type="success" style="margin-left: 10px" v-if="app.installed">
+                                            <el-text type="success" class="!ml-2" v-if="app.installed">
                                                 {{ $t('app.allReadyInstalled') }}
                                             </el-text>
                                             <el-button
@@ -274,7 +274,7 @@ const changeTag = (key: string) => {
         req.tags = [key];
     }
     const index = tags.value.findIndex((tag) => tag.key === key);
-    if (index > 5) {
+    if (index > 6) {
         moreTag.value = key;
     } else {
         moreTag.value = '';
