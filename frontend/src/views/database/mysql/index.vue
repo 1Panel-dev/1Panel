@@ -131,7 +131,7 @@
                     <el-table-column :label="$t('commons.login.password')" prop="password">
                         <template #default="{ row }">
                             <span v-if="row.username === ''">-</span>
-                            <div class="flex items-center" v-if="row.password && row.username">
+                            <div class="flex items-center word-break" v-if="row.password && row.username">
                                 <div class="star-center" v-if="!row.showPassword">
                                     <span>**********</span>
                                 </div>
@@ -630,5 +630,8 @@ onMounted(() => {
 }
 .optionClass {
     min-width: 350px;
+}
+.word-break {
+    flex-flow: row wrap;
 }
 </style>
