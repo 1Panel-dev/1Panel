@@ -50,7 +50,7 @@ curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_
 
 如果您在使用过程中发现任何安全问题，请通过以下方式直接联系我们：
 
-- 邮箱：support@fit2cloud.com
+- 邮箱：wanghe@fit2cloud.com
 
 ## Star History
 
