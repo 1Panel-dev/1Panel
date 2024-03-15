@@ -1824,7 +1824,7 @@ const message = {
         imported: 'Manually Created',
         importType: 'Import Type',
         pasteSSL: 'Paste code',
-        localSSL: 'Select local file',
+        localSSL: 'Select server file',
         privateKeyPath: 'Private key file',
         certificatePath: 'Certificate file',
         ipWhiteListHelper: 'The role of IP whitelist: all rules are invalid for IP whitelist',
