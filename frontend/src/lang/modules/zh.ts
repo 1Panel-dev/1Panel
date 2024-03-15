@@ -1706,7 +1706,7 @@ const message = {
         imported: '手动创建',
         importType: '导入方式',
         pasteSSL: '粘贴代码',
-        localSSL: '选择本地文件',
+        localSSL: '选择服务器文件',
         privateKeyPath: '私钥文件',
         certificatePath: '证书文件',
         ipWhiteListHelper: 'IP 白名单的作用：所有规则对IP白名单无效',
