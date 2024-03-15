@@ -181,33 +181,20 @@ func SyncRuntimeContainerStatus(runtime *model.Runtime) error {
 	}
 	container := containers[0]
 
-	interval := 10 * time.Second
-	retries := 60
-	for i := 0; i < retries; i++ {
-		resp, err := cli.InspectContainer(container.ID)
-		if err != nil {
-			time.Sleep(interval)
-			continue
+	switch container.State {
+	case "exited":
+		runtime.Status = constant.RuntimeError
+	case "running":
+		runtime.Status = constant.RuntimeRunning
+	case "paused":
+		runtime.Status = constant.RuntimeStopped
+	default:
+		if runtime.Status != constant.RuntimeBuildIng {
+			runtime.Status = constant.RuntimeStopped
 		}
-		if resp.State.Health != nil {
-			status := strings.ToLower(resp.State.Health.Status)
-			switch status {
-			case "starting":
-				runtime.Status = constant.RuntimeStarting
-				_ = runtimeRepo.Save(runtime)
-			case "healthy":
-				runtime.Status = constant.RuntimeRunning
-				_ = runtimeRepo.Save(runtime)
-				return nil
-			case "unhealthy":
-				runtime.Status = constant.RuntimeUnhealthy
-				_ = runtimeRepo.Save(runtime)
-				return nil
-			}
-		}
-		time.Sleep(interval)
 	}
-	return nil
+
+	return runtimeRepo.Save(runtime)
 }
 
 func buildRuntime(runtime *model.Runtime, oldImageID string, rebuild bool) {

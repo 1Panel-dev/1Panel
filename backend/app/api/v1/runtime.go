@@ -203,3 +203,19 @@ func (b *BaseApi) OperateNodeModules(c *gin.Context) {
 	}
 	helper.SuccessWithOutData(c)
 }
+
+// @Tags Runtime
+// @Summary Sync runtime status
+// @Description 同步运行环境状态
+// @Accept json
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /runtimes/sync [post]
+func (b *BaseApi) SyncStatus(c *gin.Context) {
+	err := runtimeService.SyncRuntimeStatus()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}

@@ -58,3 +58,7 @@ export const UpdatePHPExtensions = (req: Runtime.PHPExtensionsUpdate) => {
 export const DeletePHPExtensions = (req: Runtime.PHPExtensionsDelete) => {
     return http.post<any>(`/runtimes/php/extensions/del`, req);
 };
+
+export const SyncRuntime = () => {
+    return http.post(`/runtimes/sync`, {});
+};
