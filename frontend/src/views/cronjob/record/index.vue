@@ -407,10 +407,11 @@ const forDetail = async (row: Cronjob.Record) => {
 const loadRecord = async (row: Cronjob.Record) => {
     if (row.records) {
         const res = await getRecordLog(row.id);
-        if (currentRecordDetail.value === res.data) {
+        let log = res.data.replace(/\x1B\[[0-?]*[ -/]*[@-~]/g, '');
+        if (currentRecordDetail.value === log) {
             return;
         }
-        currentRecordDetail.value = res.data;
+        currentRecordDetail.value = log;
         const state = view.value.state;
         view.value.dispatch({
             selection: { anchor: state.doc.length, head: state.doc.length },
