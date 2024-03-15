@@ -90,7 +90,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import { Runtime } from '@/api/interface/runtime';
-import { OperateRuntime, SearchRuntimes } from '@/api/modules/runtime';
+import { OperateRuntime, SearchRuntimes, SyncRuntime } from '@/api/modules/runtime';
 import { dateFormat } from '@/utils/util';
 import OperateNode from '@/views/website/runtime/node/operate/index.vue';
 import Status from '@/components/status/index.vue';
@@ -192,6 +192,10 @@ const search = async () => {
     }
 };
 
+const sync = () => {
+    SyncRuntime();
+};
+
 const openModules = (row: Runtime.Runtime) => {
     moduleRef.value.acceptParams({ id: row.id, packageManager: row.params['PACKAGE_MANAGER'] });
 };
@@ -243,10 +247,12 @@ const toFolder = (folder: string) => {
 };
 
 onMounted(() => {
+    sync();
     search();
     timer = setInterval(() => {
         search();
-    }, 10000 * 3);
+        sync();
+    }, 1000 * 10);
 });
 
 onUnmounted(() => {
