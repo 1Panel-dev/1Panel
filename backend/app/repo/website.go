@@ -18,6 +18,7 @@ type IWebsiteRepo interface {
 	WithDefaultServer() DBOption
 	WithDomainLike(domain string) DBOption
 	WithRuntimeID(runtimeID uint) DBOption
+	WithIDs(ids []uint) DBOption
 	Page(page, size int, opts ...DBOption) (int64, []model.Website, error)
 	List(opts ...DBOption) ([]model.Website, error)
 	GetFirst(opts ...DBOption) (model.Website, error)
@@ -36,9 +37,15 @@ func NewIWebsiteRepo() IWebsiteRepo {
 type WebsiteRepo struct {
 }
 
-func (w *WebsiteRepo) WithAppInstallId(appInstallId uint) DBOption {
+func (w *WebsiteRepo) WithAppInstallId(appInstallID uint) DBOption {
 	return func(db *gorm.DB) *gorm.DB {
-		return db.Where("app_install_id = ?", appInstallId)
+		return db.Where("app_install_id = ?", appInstallID)
+	}
+}
+
+func (w *WebsiteRepo) WithIDs(ids []uint) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("id in (?)", ids)
 	}
 }
 

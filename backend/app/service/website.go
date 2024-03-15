@@ -119,7 +119,16 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 	}
 	opts = append(opts, commonRepo.WithOrderRuleBy(req.OrderBy, req.Order))
 	if req.Name != "" {
-		opts = append(opts, websiteRepo.WithDomainLike(req.Name))
+		domains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithDomainLike(req.Name))
+		if len(domains) > 0 {
+			var websiteIds []uint
+			for _, domain := range domains {
+				websiteIds = append(websiteIds, domain.WebsiteID)
+			}
+			opts = append(opts, websiteRepo.WithIDs(websiteIds))
+		} else {
+			opts = append(opts, websiteRepo.WithDomainLike(req.Name))
+		}
 	}
 	if req.WebsiteGroupID != 0 {
 		opts = append(opts, websiteRepo.WithGroupID(req.WebsiteGroupID))

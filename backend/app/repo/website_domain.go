@@ -14,6 +14,7 @@ type IWebsiteDomainRepo interface {
 	WithWebsiteId(websiteId uint) DBOption
 	WithPort(port int) DBOption
 	WithDomain(domain string) DBOption
+	WithDomainLike(domain string) DBOption
 	Page(page, size int, opts ...DBOption) (int64, []model.WebsiteDomain, error)
 	GetFirst(opts ...DBOption) (model.WebsiteDomain, error)
 	GetBy(opts ...DBOption) ([]model.WebsiteDomain, error)
@@ -42,6 +43,11 @@ func (w WebsiteDomainRepo) WithPort(port int) DBOption {
 func (w WebsiteDomainRepo) WithDomain(domain string) DBOption {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("domain = ?", domain)
+	}
+}
+func (w WebsiteDomainRepo) WithDomainLike(domain string) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("domain like ?", "%"+domain+"%")
 	}
 }
 func (w WebsiteDomainRepo) Page(page, size int, opts ...DBOption) (int64, []model.WebsiteDomain, error) {
