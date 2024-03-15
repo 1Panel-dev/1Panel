@@ -18,7 +18,7 @@
                 </el-button>
             </template>
             <template #main v-if="showTable">
-                <ComplexTable :data="data" :class="{ mask: !supervisorStatus.isRunning }">
+                <ComplexTable :data="data" :class="{ mask: !supervisorStatus.isRunning }" v-loading="dataLoading">
                     <el-table-column
                         :label="$t('commons.table.name')"
                         fix
@@ -175,6 +175,7 @@ const supervisorStatus = ref({
     isRunning: false,
     init: true,
 });
+const dataLoading = ref(false);
 
 const setting = () => {
     setSuperVisor.value = true;
@@ -213,8 +214,9 @@ const search = async () => {
     if (!supervisorStatus.value.isExist) {
         return;
     }
-    loading.value = true;
+
     let needLoadStatus = false;
+    dataLoading.value = true;
     try {
         const res = await GetSupervisorProcess();
         data.value = res.data;
@@ -229,8 +231,10 @@ const search = async () => {
         if (supervisorStatus.value.isRunning && needLoadStatus) {
             setTimeout(loadStatus, 1000);
         }
-    } catch (error) {}
-    loading.value = false;
+    } catch (error) {
+    } finally {
+        dataLoading.value = false;
+    }
 };
 
 const loadStatus = async () => {
