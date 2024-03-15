@@ -153,22 +153,20 @@ func (r RecycleBinService) Clear() error {
 }
 
 func getClashDir(realPath string) (string, error) {
-	trimmedPath := strings.Trim(realPath, "/")
-	parts := strings.Split(trimmedPath, "/")
-	dir := ""
-	if len(parts) > 0 {
-		dir = parts[0]
-		partitions, err := disk.Partitions(false)
-		if err != nil {
-			return "", err
+	partitions, err := disk.Partitions(false)
+	if err != nil {
+		return "", err
+	}
+	for _, p := range partitions {
+		if p.Mountpoint == "/" {
+			continue
 		}
-		for _, p := range partitions {
-			if p.Mountpoint == dir {
-				if err = createClashDir(path.Join(p.Mountpoint, ".1panel_clash")); err != nil {
-					return "", err
-				}
-				return dir, nil
+		if strings.HasPrefix(realPath, p.Mountpoint) {
+			clashDir := path.Join(p.Mountpoint, ".1panel_clash")
+			if err = createClashDir(path.Join(p.Mountpoint, ".1panel_clash")); err != nil {
+				return "", err
 			}
+			return clashDir, nil
 		}
 	}
 	return constant.RecycleBinDir, createClashDir(constant.RecycleBinDir)
