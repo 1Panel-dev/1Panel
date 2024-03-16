@@ -138,7 +138,7 @@ local function write_req_log(attack)
         is_block = is_block,
         is_attack = is_attack
     }
-    local code = stmt:step()
+    stmt:step()
     stmt:finalize()
 
     local code2 = 101
@@ -160,11 +160,9 @@ local function write_req_log(attack)
 
     wafdb:execute([[COMMIT]])
     
-    if code ~= 101 or code2 ~= 101 then
-        local error_msg = wafdb:errmsg()
-        if error_msg then
-            ngx.log(ngx.ERR, "insert attack_log error ", error_msg .. "  ")
-        end
+    local error_msg = wafdb:errmsg()
+    if error_msg then
+        ngx.log(ngx.ERR, "insert attack_log error ", error_msg .. "  ")
     end
 
 end
@@ -201,45 +199,25 @@ local function count_not_found()
     end
 end
 
+local add_count = function(shared_dict,key)
+    local count, _ = shared_dict:incr(key, 1)
+    if not count then
+        shared_dict:set(key, 1)
+    end
+end
+
 local function count_req_status(is_attack)
-    local wafdb = utils.get_wafdb(config.waf_db_path)
-    if not wafdb then
-        ngx.log(ngx.ERR, "get log db failed")
-        return
-    end
-    
-    local today = ngx.today()
     local status = ngx.status
-
-    local stmt_exist = wafdb:prepare("SELECT COUNT(*) FROM waf_stat WHERE day = ?")
-    stmt_exist:bind_values(today)
-    stmt_exist:step()
-    local count = stmt_exist:get_uvalues()
-    stmt_exist:finalize()
-    
-    local req_count_update = 1
-    local count_4xx_update = (status >= 400 and status < 500) and 1 or 0
-    local count_5xx_update = (status >= 500) and 1 or 0
-    local attack_count_update = is_attack and 1 or 0
-    local code = 0
-    
-    if count > 0 then
-        local stmt = wafdb:prepare("UPDATE waf_stat SET req_count = req_count + ?, count4xx = count4xx + ?, count5xx = count5xx + ?, attack_count = attack_count + ? WHERE day = ?")
-        stmt:bind_values(req_count_update, count_4xx_update, count_5xx_update, attack_count_update, today)
-        code = stmt:step()
-        stmt:finalize()
-    else
-        local stmt = wafdb:prepare("INSERT INTO waf_stat (day, req_count, count4xx, count5xx, attack_count,create_date) VALUES (?, ?, ?, ?, ?,DATETIME('now'))")
-        stmt:bind_values(today, req_count_update, count_4xx_update, count_5xx_update, attack_count_update)
-        code = stmt:step()
-        stmt:finalize()
+    local req_count = ngx.shared.dict_req_count
+    add_count(req_count, "req_count")
+    if (status >= 400 and status < 500) then
+        add_count(req_count, "count_4xx")
     end
-
-    if code ~= 101 then
-        local error_msg = wafdb:errmsg()
-        if error_msg then
-            ngx.log(ngx.ERR, "update waf_stat error ", error_msg .. "  ")
-        end
+    if (status >= 500) then
+        add_count(req_count, "count_5xx")
+    end
+    if is_attack then
+        add_count(req_count, "attack_count")
     end
 end
 
@@ -250,12 +228,10 @@ if config.is_waf_on() then
     if not ngx.ctx.ip then
         ngx.ctx.ip = utils.get_real_ip()
         ngx.ctx.ip_location = utils.get_ip_location(ngx.ctx.ip)
-        local ua = utils.get_header("user-agent")
-        if not ua then
-            ua = ""
-        end
     end
     
     count_req_status(is_attack)
-    write_req_log(is_attack)
+    if is_attack then
+        write_req_log(is_attack)
+    end
 end

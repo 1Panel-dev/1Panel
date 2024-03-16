@@ -1,7 +1,9 @@
 {
-  "waf": "on",
-  "mode": "protection",
-  "secret": "qwer1234",
+  "waf": {
+    "state": "on",
+    "mode": "protection",
+    "secret": "qwer1234"
+  },
   "redis": {
     "state": "off",
     "host": "127.0.0.1",
@@ -11,7 +13,9 @@
     "poolSize": 10
   },
   "ipWhite": {
-    "state": "on"
+    "state": "on",
+    "type": "ipWhite",
+    "action": "allow"
   },
   "ipBlack": {
     "state": "on",
@@ -21,7 +25,9 @@
     "res": "ip"
   },
   "urlWhite": {
-    "state": "on"
+    "type": "urlWhite",
+    "state": "on",
+    "action": "allow"
   },
   "urlBlack": {
     "type": "urlBlack",
@@ -30,7 +36,9 @@
     "action": "deny"
   },
   "uaWhite": {
-    "state": "off"
+    "type": "uaWhite",
+    "state": "off",
+    "action": "allow"
   },
   "uaBlack": {
     "type": "uaBlack",
@@ -64,7 +72,9 @@
   "geoRestrict": {
     "state": "on",
     "rules": [],
-    "action": "deny"
+    "code": 444,
+    "action": "deny",
+    "type": "geoRestrict"
   },
   "defaultIpBlack": {
     "state": "on",
@@ -87,7 +97,6 @@
   "cc": {
     "state": "off",
     "type": "cc",
-    "rule": "cc",
     "tokenTimeOut": 1800,
     "threshold": 120,
     "duration": 60,
@@ -98,7 +107,6 @@
   "ccurl": {
     "state": "off",
     "type": "urlcc",
-    "rule": "urlcc",
     "action": "deny",
     "ipBlock": "on",
     "ipBlockTime": 600
@@ -112,18 +120,11 @@
     "ipBlock": "on",
     "ipBlockTime": 600
   },
-  "fileExtCheck": {
+  "fileExt": {
     "state": "on",
     "action": "deny",
     "code": 403,
-    "type": "fileExtCheck",
-    "rules": [
-      "php",
-      "jsp",
-      "asp",
-      "exe",
-      "sh"
-    ]
+    "type": "fileExtCheck"
   },
   "cookie": {
     "type": "cookie",

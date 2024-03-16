@@ -465,7 +465,6 @@ function _M.args_check()
                 end
                 if val_arr and type(val_arr) ~= "boolean" and val_arr ~= "" then
                     local m, mr = match_rule(args_list, utils.unescape_uri(val_arr))
-                    ngx.log(ngx.ERR, "args_check: ", m, " ", mr.rule, " ", val_arr)
                     if m then
                         exec_action(get_global_config("args"), mr)
                         return
@@ -531,7 +530,7 @@ function _M.post_check()
 
     local boundary =  get_boundary()
 
-    if boundary and  is_site_state_on('fileExtCheck') then
+    if boundary and  is_state_on('fileExt') then
         if not ngx_re_match(content_type, '^multipart/form-data; boundary=') or  not   ngx_re_find(content_type, [[multipart]], 'ijo')then
             return
         end
@@ -548,7 +547,7 @@ function _M.post_check()
             return
         end
 
-        local rule = get_site_config("fileExtCheck")
+        local rule = get_site_rule("fileExt")
         while true do
             local m = iterator()
             if m then
