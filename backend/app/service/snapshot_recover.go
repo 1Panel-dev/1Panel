@@ -215,7 +215,7 @@ func recoverAppData(src string) error {
 
 func recoverDaemonJson(src string, fileOp files.FileOp) error {
 	daemonJsonPath := "/etc/docker/daemon.json"
-	_, errSrc := os.Stat(src)
+	_, errSrc := os.Stat(path.Join(src, "docker/daemon.json"))
 	_, errPath := os.Stat(daemonJsonPath)
 	if os.IsNotExist(errSrc) && os.IsNotExist(errPath) {
 		global.LOG.Debug("the daemon.json file does not exist, nothing happens.")
