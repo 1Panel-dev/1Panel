@@ -2167,7 +2167,7 @@ const message = {
             count4xx: '4xx quantity',
             count5xx: '5xx quantity',
             todayStatus: 'Today Status',
-            reqMap: 'Request map (30 days)',
+            reqMap: 'Attack map (30 days)',
             resource: 'source',
             count: 'Quantity',
             hight: 'high',

@@ -142,7 +142,11 @@ function _M.exec_action(rule_config, match_rule, data)
 
     local msg = "访问 IP " .. ngx.ctx.ip .. " 访问 URL" .. ngx.var.uri .. " 触发动作 " .. action .. "  规则类型 " .. rule_config.type
     if match_rule then
-        msg = msg .. " 触发规则 " .. match_rule.type
+        if match_rule.type then
+            msg = msg .. " 触发规则类型 " .. match_rule.type
+        else 
+            msg = msg .. " 触发规则 " .. match_rule.rule
+        end
     end
 
     ngx.log(ngx.ERR, msg)

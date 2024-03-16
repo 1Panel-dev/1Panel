@@ -156,4 +156,5 @@ if config.is_waf_on() then
     lib.cookie_check()
     lib.post_check()
     lib.header_check()
+    
 end

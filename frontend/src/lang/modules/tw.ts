@@ -2024,7 +2024,7 @@ const message = {
             count4xx: '4xx 數量',
             count5xx: '5xx 數量',
             todayStatus: '今日狀態',
-            reqMap: '請求地圖（30日）',
+            reqMap: '攔截地圖（30日）',
             resource: '來源',
             count: '數量',
             hight: '高',

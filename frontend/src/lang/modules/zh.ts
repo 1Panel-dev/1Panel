@@ -2025,7 +2025,7 @@ const message = {
             count4xx: '4xx 数量',
             count5xx: '5xx 数量',
             todayStatus: '今日状态',
-            reqMap: '请求地图（30日）',
+            reqMap: '拦截地图（30日）',
             resource: '来源',
             count: '数量',
             hight: '高',

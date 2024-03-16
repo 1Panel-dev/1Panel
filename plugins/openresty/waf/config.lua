@@ -145,15 +145,15 @@ function _M.get_html_res(name)
 end
 
 function _M.is_waf_on()
-    return config.global_config["waf"] == "on" and true or false
+    return _M.is_global_state_on("waf")
 end
 
 function _M.is_redis_on()
-    return config.global_config["redis"] == "on" and true or false
+    return _M.is_global_state_on("redis")
 end
 
 function _M.get_secret()
-    return config.global_config["secret"]
+    return config.global_config["waf"]["secret"]
 end
 
 return _M
