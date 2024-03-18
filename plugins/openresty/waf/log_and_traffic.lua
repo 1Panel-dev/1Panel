@@ -222,6 +222,9 @@ local function count_req_status(is_attack)
 end
 
 if config.is_waf_on() then
+    if ngx.ctx.is_waf_url then
+        return
+    end
     count_not_found()
     local is_attack = ngx.ctx.is_attack
     

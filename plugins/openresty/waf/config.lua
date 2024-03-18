@@ -5,7 +5,7 @@ local utils = require "utils"
 local read_rule = file_utils.read_rule
 local read_file2string = file_utils.read_file2string
 local read_file2table = file_utils.read_file2table
-local set_content_to_json_file = file_utils.set_content_to_json_file
+local set_content_to_file = file_utils.set_content_to_file
 local list_dir = lfs.dir
 local attributes = lfs.attributes
 local match_str = string.match
@@ -68,21 +68,16 @@ local function ini_waf_info()
     end
 end
 
+
+
 local function init_global_config()
     local global_config_file = config_dir .. 'global.json'
     global_config = file_utils.read_file2table(global_config_file)
-    local token = utils.random_string(20)
-    global_config["waf"]["token"] = token
-    
-    local waf_dict = ngx.shared.waf
-    waf_dict:set("token", token, 7200)
-    
-    set_content_to_json_file(global_config,global_config_file)
     config.global_config = global_config
-
     config.isProtectionMode = global_config["mode"] == "protection" and true or false
-    
 
+    _M.get_token()
+    
     local rules = {}
     rules.uaBlack = read_rule(global_rule_dir, "uaBlack")
     rules.uaWhite = read_rule(global_rule_dir, "uaWhite")
@@ -114,6 +109,21 @@ local function init_global_config()
     _M.waf_db_path =  _M.waf_db_dir .. "1pwaf.db"
     _M.waf_log_db_path =  _M.waf_db_dir .. "req_log.db"
     _M.config_dir = config_dir
+
+
+    local waf_dict = ngx.shared.waf
+    waf_dict:set("config", config)
+end
+
+local function get_config()
+    local waf_dict = ngx.shared.waf
+    local config_table =  waf_dict:get("config")
+    if config_table == nil then
+        init_global_config()
+        return config
+    end
+    config = config_table
+    return config_table
 end
 
 function _M.load_config_file()
@@ -123,35 +133,35 @@ function _M.load_config_file()
 end
 
 function _M.get_site_config(website_key)
-    return config.site_config[website_key]
+    return get_config().site_config[website_key]
 end
 
 function _M.get_site_rules(website_key)
-    return config.site_rules[website_key]
+    return get_config().site_rules[website_key]
 end
 
 function _M.get_global_config(name)
-    return config.global_config[name]
+    return get_config().global_config[name]
 end
 
 function _M.get_global_rules(name)
-    return config.global_rules[name]
+    return get_config().global_rules[name]
 end
 
 function _M.is_global_state_on(name)
-    return config.global_config[name]["state"] == "on" and true or false
+    return get_config().global_config[name]["state"] == "on" and true or false
 end
 
 function _M.is_site_state_on(name)
-    return config.site_config[name]["state"] == "on" and true or false
+    return get_config().site_config[name]["state"] == "on" and true or false
 end
 
 function _M.get_redis_config()
-    return config.global_config["redis"]
+    return get_config().global_config["redis"]
 end
 
 function _M.get_html_res(name)
-    return config.html_res[name]
+    return get_config().html_res[name]
 end
 
 function _M.is_waf_on()
@@ -163,7 +173,7 @@ function _M.is_redis_on()
 end
 
 function _M.get_secret()
-    return config.global_config["waf"]["secret"]
+    return get_config().global_config["waf"]["secret"]
 end
 
 function _M.get_token()
@@ -172,9 +182,8 @@ function _M.get_token()
     if not token then
         token = utils.random_string(20)
         waf_dict:set("token", token, 86400)
-        global_config["waf"]["token"] = token
-        local global_config_file = config_dir .. 'global.json'
-        set_content_to_json_file(global_config,global_config_file)
+        local token_path = config_dir .. 'token'
+        set_content_to_file(token,token_path)
     end    
     return token
 end

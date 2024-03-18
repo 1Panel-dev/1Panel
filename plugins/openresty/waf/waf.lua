@@ -97,10 +97,12 @@ local function waf_api()
         end
     end
     if uri == "/slide_check_" .. ngx.md5(ngx.ctx.ip) .. ".js" then
+        ngx.ctx.is_waf_url = true
         return_js("slide_js")
     end
 
     if uri == "/5s_check_" .. ngx.md5(ngx.ctx.ip) .. ".js" then
+        ngx.ctx.is_waf_url = true
         return_js("five_second_js")
     end
     local method = ngx.req.get_method()
@@ -115,16 +117,21 @@ local function waf_api()
     if not body_data then
         return false
     end
+    ngx.log(ngx.ERR,"1111")
     local args
     if body_data then
         args = cjson.decode(body_data)
     end
+    ngx.log(ngx.ERR,"2222")
     if args == nil or args.token == nil then
         return false
     end
+    ngx.log(ngx.ERR,"token",args.token)
+    ngx.log(ngx.ERR,"config token",config.get_token())
     if args.token ~= config.get_token() then
         return false
     end
+    ngx.ctx.is_waf_url = true
     if uri == '/reload_waf_config' then
         config.load_config_file()
         ngx.exit(200)
@@ -158,7 +165,7 @@ if config.is_waf_on() then
     lib.black_ua()
     lib.default_ua_black()
     
-    lib.cc_url()
+    --lib.cc_url()
     if lib.is_white_url() then
         return true
     end
@@ -169,10 +176,9 @@ if config.is_waf_on() then
     lib.method_check()
     lib.acl()
     lib.cc()
-    lib.bot_check()
+    --lib.bot_check()
     lib.args_check()
     lib.cookie_check()
     lib.post_check()
     lib.header_check()
-    
 end

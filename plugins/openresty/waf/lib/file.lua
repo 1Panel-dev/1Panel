@@ -59,11 +59,13 @@ function _M.read_file2table(file_path)
     return decode(str)
 end
 
-function _M.set_content_to_json_file(data, file_path)
-    local json_str = cjson.encode(data)
+function _M.set_content_to_file(data, file_path)
+    if data == nil or file_path == nil then
+        return 
+    end
     local file = open_file(file_path, "w")
     if file then
-        file:write(json_str)
+        file:write(data)
         file:close()
     end
 end     
