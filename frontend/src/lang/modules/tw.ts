@@ -1266,7 +1266,7 @@ const message = {
             '即將回滾本次恢復，回滾將替換所有本次恢復的文件，過程中可能需要重啟 docker 以及 1panel 服務，是否繼續？',
 
         upgrading: '正在升級中，請稍候...',
-        upgradeHelper: '升級操作需要重啟服務，是否繼續？',
+        upgradeHelper: '升級操作需要重啟 1Panel 服務，是否繼續？',
         noUpgrade: '當前已經是最新版本',
         versionHelper: '1Panel 版本號命名規則為： [大版本].[功能版本].[Bug 修復版本]，例：',
         versionHelper1: 'v1.0.1 是 v1.0.0 之後的 Bug 修復版本',
