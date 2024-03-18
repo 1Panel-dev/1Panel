@@ -143,7 +143,6 @@ end
 local function xss_and_sql_check(kv)
     if type(kv) ~= 'string' then
         return
-        
     end
     if  is_site_state_on("xss") then
         local is_xss, fingerprint = libinjection.xss(tostring(kv))
@@ -161,7 +160,6 @@ local function xss_and_sql_check(kv)
             return
         end
     end
-    
 end
 
 
@@ -464,13 +462,13 @@ function _M.args_check()
                     val_arr = concat_table(val, ", ")
                 end
                 if val_arr and type(val_arr) ~= "boolean" and val_arr ~= "" then
-                    local m, mr = match_rule(args_list, utils.unescape_uri(val_arr))
-                    ngx.log(ngx.ERR, "args_check: ", m, " ", mr.rule, " ", val_arr)
+                    local check_value = utils.unescape_uri(val_arr)
+                    xss_and_sql_check(check_value)
+                    local m, mr = match_rule(args_list,check_value)
                     if m then
                         exec_action(get_global_config("args"), mr)
                         return
                     end
-                    xss_and_sql_check(val_arr)
                 end
             end
         end
@@ -496,21 +494,19 @@ function _M.header_check()
         local headers_config = get_site_config("header")
         local referer = ngx.var.http_referer
         if referer and referer ~= "" then
-            local m = match_rule(headers_rule, referer)
+            local check_value = utils.unescape_uri(referer)
+            local m = match_rule(headers_rule, check_value)
             if m then
                 exec_action(headers_config)
             end
+            xss_and_sql_check(check_value)
         end
         local headers = utils.get_headers()
         if headers then
-            for k, v in pairs(headers) do
-                local m1, mr1 = match_rule(headers_rule, k)
-                if m1 then
-                    exec_action(headers_config, mr1)
-                end
-                local m2, mr2 = match_rule(headers_rule, v)
-                if m2 then
-                    exec_action(headers_config, mr2)
+            for _, v in pairs(headers) do
+                local m, mr = match_rule(headers_rule, v)
+                if m then
+                    exec_action(headers_config, mr)
                 end
             end
         end
@@ -531,7 +527,7 @@ function _M.post_check()
 
     local boundary =  get_boundary()
 
-    if boundary and  is_site_state_on('fileExtCheck') then
+    if boundary and  is_state_on('fileExt') then
         if not ngx_re_match(content_type, '^multipart/form-data; boundary=') or  not   ngx_re_find(content_type, [[multipart]], 'ijo')then
             return
         end
@@ -548,7 +544,7 @@ function _M.post_check()
             return
         end
 
-        local rule = get_site_config("fileExtCheck")
+        local rule = get_site_rule("fileExt")
         while true do
             local m = iterator()
             if m then

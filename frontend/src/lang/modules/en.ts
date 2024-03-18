@@ -1426,7 +1426,7 @@ const message = {
         rollbackHelper:
             'This recovery is about to be rolled back, which will replace all the files recovered this time. In the process, docker and 1panel services may need to be restarted. Do you want to continue?',
 
-        upgradeHelper: 'The upgrade requires a service restart. Do you want to continue?',
+        upgradeHelper: 'The upgrade requires restarting the 1Panel service. Do you want to continue?',
         noUpgrade: 'It is currently the latest version',
         versionHelper:
             'Name rules: [major version].[functional version].[Bug fix version], as shown in the following example:',
@@ -2167,7 +2167,7 @@ const message = {
             count4xx: '4xx quantity',
             count5xx: '5xx quantity',
             todayStatus: 'Today Status',
-            reqMap: 'Request map (30 days)',
+            reqMap: 'Attack map (30 days)',
             resource: 'source',
             count: 'Quantity',
             hight: 'high',

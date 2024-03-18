@@ -2,21 +2,23 @@
   "rules": [
     {
       "state": "on",
-      "rule": "no Cookie",
-      "name": "拦截不带Cookie的请求",
+      "name": "no cookie",
       "conditions": [
         {
           "field": "URL",
-          "pattern": "/test/\\d+\\.html"
+          "pattern": "eq",
+          "rule": "/test/\\d+\\.html"
         },
         {
           "field": "Cookie",
-          "pattern": ""
+          "pattern": "eq",
+          "rule": ""
         }
       ],
       "action": "deny",
-      "autoIpBlock": "off",
-      "ipBlockTimeout": 60,
+      "res": "",
+      "ipBlock": "off",
+      "ipBlockTime": 60,
       "description": "拦截不带Cookie的请求"
     }
   ]

@@ -7,19 +7,7 @@
                     path: '/',
                 },
             ]"
-        >
-            <template #route-button>
-                <div class="router-button">
-                    <el-button link type="primary" @click="onRestart('1panel')">
-                        {{ $t('home.restart_1panel') }}
-                    </el-button>
-                    <el-divider direction="vertical" />
-                    <el-button link type="primary" @click="onRestart('system')">
-                        {{ $t('home.restart_system') }}
-                    </el-button>
-                </div>
-            </template>
-        </RouterButton>
+        />
         <el-alert
             v-if="!isSafety && globalStore.showEntranceWarn"
             style="margin-top: 20px"
@@ -230,13 +218,10 @@
                 </CardWithHeader>
             </el-col>
         </el-row>
-
-        <ConfirmDialog ref="confirmDialogRef" @confirm="onSave"></ConfirmDialog>
     </div>
 </template>
 
 <script lang="ts" setup>
-import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { onMounted, onBeforeUnmount, ref, reactive } from 'vue';
 import Status from '@/views/home/status/index.vue';
 import App from '@/views/home/app/index.vue';
@@ -246,17 +231,14 @@ import i18n from '@/lang';
 import { Dashboard } from '@/api/interface/dashboard';
 import { dateFormatForSecond, computeSize } from '@/utils/util';
 import { useRouter } from 'vue-router';
-import { loadBaseInfo, loadCurrentInfo, systemRestart } from '@/api/modules/dashboard';
+import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
 import { getIOOptions, getNetworkOptions } from '@/api/modules/monitor';
 import { getSettingInfo, loadUpgradeInfo } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
-import { MsgSuccess } from '@/utils/message';
 const router = useRouter();
 const globalStore = GlobalStore();
 
 const statusRef = ref();
-const restartType = ref();
-const confirmDialogRef = ref();
 const appRef = ref();
 
 const isSafety = ref();
@@ -547,21 +529,6 @@ const loadUpgradeStatus = async () => {
 const loadSafeStatus = async () => {
     const res = await getSettingInfo();
     isSafety.value = res.data.securityEntrance;
-};
-
-const onRestart = (type: string) => {
-    restartType.value = type;
-    let params = {
-        header: i18n.global.t('home.restart_' + type),
-        operationInfo: '',
-        submitInputInfo: i18n.global.t('database.restartNow'),
-    };
-    confirmDialogRef.value!.acceptParams(params);
-};
-const onSave = async () => {
-    globalStore.isOnRestart = true;
-    MsgSuccess(i18n.global.t('home.operationSuccess'));
-    await systemRestart(restartType.value);
 };
 
 const onFocus = () => {

@@ -35,13 +35,12 @@ local function init_db_config(db_path)
     if not ok then
         return false
     end
-    local wafdb
-    wafdb = sqlite3.open(db_path)
+    local wafdb = sqlite3.open(db_path)
     if wafdb == nil then
         return false
     end
     wafdb:exec([[PRAGMA journal_mode = wal]])
-    wafdb:exec([[PRAGMA synchronous = 0]])
+    wafdb:exec([[PRAGMA synchronous = OFF]])
     wafdb:exec([[PRAGMA page_size = 8192]])
     wafdb:exec([[PRAGMA journal_size_limit = 2147483648]])
     return wafdb

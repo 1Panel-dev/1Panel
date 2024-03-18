@@ -59,6 +59,16 @@ function _M.read_file2table(file_path)
     return decode(str)
 end
 
+function _M.set_content_to_json_file(data, file_path)
+    local json_str = cjson.encode(data)
+    local file = open_file(file_path, "w")
+    if file then
+        file:write(json_str)
+        file:close()
+    end
+end     
+
+
 function _M.read_file2string(file_path, binary)
     if not file_path then
         ngx.log(ngx.ERR, "No file found ", file_path)
