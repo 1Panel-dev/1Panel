@@ -32,16 +32,3 @@ build_backend_on_darwin:
 build_all: build_frontend build_backend_on_linux
 
 build_on_local: clean_assets build_frontend build_backend_on_darwin upx_bin
-
-
-build_backend_on_linux_xpack:
-	cd $(SERVER_PATH) \
-    && GOOS=$(GOOS) GOARCH=$(GOARCH) $(GOBUILD) -tags=xpack -trimpath -ldflags '-s -w' -o $(BUILD_PATH)/$(APP_NAME) $(MAIN)
-
-build_backend_on_darwin_xpack:
-	cd $(SERVER_PATH) \
-    && GOOS=linux GOARCH=amd64 $(GOBUILD) -tags=xpack -trimpath -ldflags '-s -w'  -o $(BUILD_PATH)/$(APP_NAME) $(MAIN)
-
-build_all_xpack: build_frontend build_backend_on_linux_xpack
-
-build_on_local_xpack: clean_assets build_frontend build_backend_on_darwin_xpack upx_bin
