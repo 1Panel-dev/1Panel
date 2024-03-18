@@ -1,10 +1,11 @@
 local file_utils = require "file"
 local lfs = require "lfs"
-local cjson = require "cjson"
+local utils = require "utils"
 
 local read_rule = file_utils.read_rule
 local read_file2string = file_utils.read_file2string
 local read_file2table = file_utils.read_file2table
+local set_content_to_json_file = file_utils.set_content_to_json_file
 local list_dir = lfs.dir
 local attributes = lfs.attributes
 local match_str = string.match
@@ -16,6 +17,7 @@ local site_dir = waf_dir .. 'sites/'
 
 local _M = {}
 local config = {}
+local global_config = {}
 
 local function init_sites_config()
     local site_config = {}
@@ -55,9 +57,7 @@ local function init_sites_config()
             end
         end
     end
-    ngx.log(ngx.NOTICE, "Load config" .. cjson.encode(site_config))
     config.site_config = site_config
-    ngx.log(ngx.NOTICE, "Load rules" .. cjson.encode(site_rules))
     config.site_rules = site_rules
 end
 
@@ -69,9 +69,19 @@ local function ini_waf_info()
 end
 
 local function init_global_config()
-    local global_config = read_file2table(config_dir .. 'global.json')
+    local global_config_file = config_dir .. 'global.json'
+    global_config = file_utils.read_file2table(global_config_file)
+    local token = utils.random_string(20)
+    global_config["waf"]["token"] = token
+    
+    local waf_dict = ngx.shared.waf
+    waf_dict:set("token", token, 7200)
+    
+    set_content_to_json_file(global_config,global_config_file)
     config.global_config = global_config
+
     config.isProtectionMode = global_config["mode"] == "protection" and true or false
+    
 
     local rules = {}
     rules.uaBlack = read_rule(global_rule_dir, "uaBlack")
@@ -154,6 +164,19 @@ end
 
 function _M.get_secret()
     return config.global_config["waf"]["secret"]
+end
+
+function _M.get_token()
+    local waf_dict = ngx.shared.waf
+    local token = waf_dict:get("token")
+    if not token then
+        token = utils.random_string(20)
+        waf_dict:set("token", token, 86400)
+        global_config["waf"]["token"] = token
+        local global_config_file = config_dir .. 'global.json'
+        set_content_to_json_file(global_config,global_config_file)
+    end    
+    return token
 end
 
 return _M

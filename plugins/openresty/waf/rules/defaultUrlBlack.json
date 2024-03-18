@@ -74,6 +74,54 @@
     },
     {
       "state": "on",
+      "rule": "/password_change.cgi",
+      "name": "appFilter5",
+      "type": "appFilter"
+    },
+    {
+      "state": "on",
+      "rule": "/service/extdirect",
+      "name": "appFilter6",
+      "type": "appFilter"
+    },
+    {
+      "state": "on",
+      "rule": "/api/jsonws/invoke",
+      "name": "appFilter7",
+      "type": "appFilter"
+    },
+    {
+      "state": "on",
+      "rule": "/jars/upload",
+      "name": "appFilter8",
+      "type": "appFilter"
+    },
+    {
+      "state": "on",
+      "rule": "/example/tree/a/search",
+      "name": "appFilter9",
+      "type": "appFilter"
+    },
+    {
+      "state": "on",
+      "rule": "/actuator/gateway/routes/hacktest",
+      "name": "appFilter10",
+      "type": "appFilter"
+    },
+    {
+      "state": "on",
+      "rule": "/api/v1/method.callAnon/getPasswordPolicy",
+      "name": "appFilter11",
+      "type": "appFilter"
+    },
+    {
+      "state": "on",
+      "rule": "/functionRouter",
+      "name": "appFilter12",
+      "type": "appFilter"
+    },
+    {
+      "state": "on",
       "rule": "(?:(union(.*?)select))",
       "name": "sqlInject1",
       "type": "sqlInject"

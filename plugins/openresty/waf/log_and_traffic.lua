@@ -160,10 +160,10 @@ local function write_req_log(attack)
 
     wafdb:execute([[COMMIT]])
     
-    local error_msg = wafdb:errmsg()
-    if error_msg then
-        ngx.log(ngx.ERR, "insert attack_log error ", error_msg .. "  ")
-    end
+    --local error_msg = wafdb:errmsg()
+    --if error_msg then
+    --    ngx.log(ngx.ERR, "insert attack_log error ", error_msg .. "  ")
+    --end
 
 end
 
