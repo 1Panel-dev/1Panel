@@ -5,6 +5,9 @@ local format_str = string.format
 local _M = {}
 
 local function deny(status_code, res)
+    if not status_code then
+        status_code = 403
+    end
     ngx.status = status_code
     if res then
         ngx.header.content_type = "text/html; charset=UTF-8"
@@ -38,11 +41,11 @@ end
 
 function _M.block_ip(ip, rule)
     local ok, err = nil, nil
-    local msg = "拉黑IP :  " .. ip .. "国家 " .. ngx.ctx.ip_location.country["zh"]
-    if rule then
-        msg = msg .. " 规则 " .. rule.type
-    end
-    ngx.log(ngx.ERR, msg)
+    --local msg = "拉黑IP :  " .. ip .. "国家 " .. ngx.ctx.ip_location.country["zh"]
+    --if rule then
+    --    msg = msg .. " 规则 " .. rule.type
+    --end
+    --ngx.log(ngx.ERR, msg)
 
     if config.redis_on then
         local red, err1 = redis_util.get_conn()
@@ -140,26 +143,22 @@ function _M.exec_action(rule_config, match_rule, data)
 
     attack_count(rule_config.type)
 
-    local msg = "访问 IP " .. ngx.ctx.ip .. " 访问 URL" .. ngx.var.uri .. " 触发动作 " .. action .. "  规则类型 " .. rule_config.type
-    if match_rule then
-        if match_rule.type then
-            msg = msg .. " 触发规则类型 " .. match_rule.type
-        else 
-            msg = msg .. " 触发规则 " .. match_rule.rule
-        end
-    end
-
-    ngx.log(ngx.ERR, msg)
+    --local msg = "访问 IP " .. ngx.ctx.ip .. " 访问 URL" .. ngx.var.uri .. " 触发动作 " .. action .. "  规则类型 " .. rule_config.type
+    --if match_rule then
+    --    if match_rule.type then
+    --        msg = msg .. " 触发规则类型 " .. match_rule.type
+    --    else 
+    --        msg = msg .. " 触发规则 " .. match_rule.rule
+    --    end
+    --end
+    --
+    --ngx.log(ngx.ERR, msg)
     if action == "allow" then
         return
 
     elseif action == "deny" then
-        if rule_config.code and rule_config.code ~= 444 then
-            deny(rule_config.code, rule_config.res)
-        else
-            deny(444)
-        end
-
+        deny(rule_config.code, rule_config.res)
+        
     elseif action == "slide" then
         slide()
 
@@ -167,7 +166,7 @@ function _M.exec_action(rule_config, match_rule, data)
         five_second()
 
     else
-        redirect(444)
+        redirect(403)
     end
 
 end

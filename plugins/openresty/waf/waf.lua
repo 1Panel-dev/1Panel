@@ -1,4 +1,3 @@
-local geoip = require "geoip"
 local lib = require "lib"
 local file_utils = require "file"
 local config = require "config"
@@ -104,8 +103,26 @@ local function waf_api()
     if uri == "/5s_check_" .. ngx.md5(ngx.ctx.ip) .. ".js" then
         return_js("five_second_js")
     end
-
+    local method = ngx.req.get_method()
+    if method ~= 'POST' then
+        return false
+    end
     if ngx.var.remote_addr ~= '127.0.0.1' then
+        return false
+    end
+    ngx.req.read_body()
+    local body_data = ngx.req.get_body_data()
+    if not body_data then
+        return false
+    end
+    local args
+    if body_data then
+        args = cjson.decode(body_data)
+    end
+    if args == nil or args.token == nil then
+        return false
+    end
+    if args.token ~= config.get_token() then
         return false
     end
     if uri == '/reload_waf_config' then
@@ -118,6 +135,7 @@ local function waf_api()
         return_json(encode(data))
     end
 end
+
 
 if config.is_waf_on() then
     init()

@@ -8,7 +8,8 @@ local type = type
 local find_str = string.find
 local gmatch_str = string.gmatch
 local pcall = pcall
-local cjson = require "cjson"
+local random = math.random
+local unescape_uri = ngx.unescape_uri
 
 local _M = {}
 
@@ -34,7 +35,7 @@ end
 function _M.unescape_uri(str)
     local newStr = str
     for t = 1, 2 do
-        local temp = ngx.unescape_uri(newStr)
+        local temp = unescape_uri(newStr)
         if not temp then
             break
         end
@@ -128,14 +129,14 @@ function _M.get_ip_location(ip)
     else
         geoip.init()
         local geo_res = geoip.lookup(ip)
-        local msg = "访问 IP  " .. ip
-        if geo_res.country then
-            msg = msg .. " 国家 " .. cjson.encode(geo_res.country)
-        end
-        if geo_res.province then
-            msg = msg .. " 省份 " .. cjson.encode(geo_res.province)
-        end
-        ngx.log(ngx.ERR, msg)
+        --local msg = "访问 IP  " .. ip
+        --if geo_res.country then
+        --    msg = msg .. " 国家 " .. cjson.encode(geo_res.country)
+        --end
+        --if geo_res.province then
+        --    msg = msg .. " 省份 " .. cjson.encode(geo_res.province)
+        --end
+        --ngx.log(ngx.ERR, msg)
         return  geo_res
         
     end
@@ -182,4 +183,18 @@ function _M.get_wafdb(waf_db_path)
     end
     return sqlite3.open(waf_db_path)
 end
+
+
+math.randomseed(os.time())
+
+function _M.random_string(length)
+    local charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    local str = ""
+    for i = 1, length do
+        local rand_index = random(1, #charset)
+        str = str .. sub_str(charset, rand_index, rand_index)
+    end
+    return str
+end
+
 return _M
