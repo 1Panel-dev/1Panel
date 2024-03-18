@@ -13,7 +13,7 @@
                         >
                             {{ $t('app.all') }}
                         </el-button>
-                        <div v-for="item in tags.slice(0, 6)" :key="item.key" class="inline">
+                        <div v-for="item in tags.slice(0, 7)" :key="item.key" class="inline">
                             <el-button
                                 class="tag-button"
                                 :class="activeTag === item.key ? '' : 'no-active'"
@@ -39,7 +39,7 @@
                                 <template #dropdown>
                                     <el-dropdown-menu>
                                         <el-dropdown-item
-                                            v-for="item in tags.slice(6)"
+                                            v-for="item in tags.slice(7)"
                                             @click="changeTag(item.key)"
                                             :key="item.key"
                                         >
