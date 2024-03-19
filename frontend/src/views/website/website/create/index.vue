@@ -102,7 +102,7 @@
                             :label="$t('website.appInstalled')"
                             prop="appInstallId"
                         >
-                            <el-select v-model="website.appInstallId">
+                            <el-select v-model="website.appInstallId" class="p-w-200">
                                 <el-option
                                     v-for="(appInstall, index) in appInstalls"
                                     :key="index"
@@ -115,7 +115,11 @@
                             <el-form-item :label="$t('app.app')" prop="appinstall.appId">
                                 <el-row :gutter="20">
                                     <el-col :span="12">
-                                        <el-select v-model="website.appinstall.appId" @change="changeApp()">
+                                        <el-select
+                                            v-model="website.appinstall.appId"
+                                            @change="changeApp()"
+                                            class="p-w-200"
+                                        >
                                             <el-option
                                                 v-for="(app, index) in apps"
                                                 :key="index"
@@ -128,6 +132,7 @@
                                         <el-select
                                             v-model="website.appinstall.version"
                                             @change="getAppDetail(website.appinstall.version)"
+                                            class="p-w-200"
                                         >
                                             <el-option
                                                 v-for="(version, index) in appVersions"

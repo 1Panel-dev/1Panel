@@ -14,6 +14,6 @@ import { useRoute } from 'vue-router';
 import { computed } from 'vue';
 
 const key = computed(() => {
-    return useRoute().path + Math.random();
+    return useRoute()?.path + Math.random();
 });
 </script>

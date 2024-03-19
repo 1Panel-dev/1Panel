@@ -37,7 +37,7 @@
                     :label="service.label"
                 ></el-option>
             </el-select>
-            <span v-if="p.type === 'service' && p.services.length === 0">
+            <span v-if="p.type === 'service' && p.services.length === 0" class="ml-1.5">
                 <el-link type="primary" :underline="false" @click="toPage(p.key)">
                     {{ $t('app.toInstall') }}
                 </el-link>
@@ -108,7 +108,6 @@ import { GetAppService } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import { App } from '@/api/interface/app';
 import { useRouter } from 'vue-router';
-import { useI18n } from 'vue-i18n';
 import { getDBName } from '@/utils/util';
 const router = useRouter();
 
@@ -248,7 +247,7 @@ const changeService = (value: string, services: App.AppService[]) => {
 };
 
 const getLabel = (row: ParamObj): string => {
-    const language = useI18n().locale.value;
+    const language = localStorage.getItem('lang') || 'zh';
     if (language == 'zh' || language == 'tw') {
         return row.labelZh;
     } else {
