@@ -107,9 +107,7 @@ import { getRandomStr } from '@/utils/util';
 import { GetAppService } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import { App } from '@/api/interface/app';
-import { useRouter } from 'vue-router';
 import { getDBName } from '@/utils/util';
-const router = useRouter();
 
 interface ParamObj extends App.FromField {
     services: App.AppService[];
@@ -256,7 +254,7 @@ const getLabel = (row: ParamObj): string => {
 };
 
 const toPage = (key: string) => {
-    router.push({ name: 'AppAll', query: { install: key } });
+    window.location.href = '/apps/all?install=' + key;
 };
 
 onMounted(() => {

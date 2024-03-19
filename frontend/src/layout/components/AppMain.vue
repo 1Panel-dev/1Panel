@@ -10,10 +10,9 @@
 
 <script setup lang="ts">
 import cacheRouter from '@/routers/cache-router';
-import { useRoute } from 'vue-router';
 import { computed } from 'vue';
 
 const key = computed(() => {
-    return useRoute()?.path + Math.random();
+    return Math.random();
 });
 </script>
