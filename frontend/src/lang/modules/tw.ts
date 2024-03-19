@@ -2123,6 +2123,11 @@ const message = {
             redisConfig: 'Redis 配置',
             redisHelper: '開啟 Redis 可以將暫時拉黑的 IP 持久化',
             wafHelper: '關閉之後所有網站將失去防護',
+            attackIP: '攻擊 IP',
+            attackParam: '攻擊訊息',
+            execRule: '命中規則',
+            acl: 'ACL',
+            sql: 'SQL 注入',
         },
         monitor: {
             name: '網站監控',

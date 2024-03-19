@@ -2269,6 +2269,11 @@ const message = {
             redisConfig: 'Redis configuration',
             redisHelper: 'Enable Redis to persist temporarily blocked IPs',
             wafHelper: 'All websites will lose protection after closing',
+            attackIP: 'Attack IP',
+            attackParam: 'Attack information',
+            execRule: 'Hit rule',
+            acl: 'ACL',
+            sql: 'SQL injection',
         },
         monitor: {
             name: 'Website Monitor',
