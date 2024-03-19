@@ -390,7 +390,7 @@ const changeTag = (key: string) => {
         searchReq.tags = [key];
     }
     const index = tags.value.findIndex((tag) => tag.key === key);
-    if (index > 5) {
+    if (index > 6) {
         moreTag.value = key;
     } else {
         moreTag.value = '';
