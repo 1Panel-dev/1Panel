@@ -586,18 +586,44 @@ function _M.post_check()
 
 end
 
+local function match_acl_rule(match_value, pattern,rule)
+    if pattern == "eq" then
+        if match_value == rule then
+            return true
+        end
+        
+    elseif  pattern == "notEq" then
+        if match_value ~= rule then
+            return true
+        end  
+    
+    elseif   pattern == "regex"  then
+        if matches(match_value, rule) then
+            return true
+        end
+        
+    elseif pattern == "contain"   then
+        if ngx_re_find(match_value, rule, "isjo") then
+            return true
+        end
+    end
+end
+
 function _M.acl()
     local rules = get_site_rule("acl")
     for _, rule in pairs(rules) do
         if rule.state == nil or rule.state == "off" then
             goto continue
         end
+        ngx.log(ngx.ERR,"acl rule: "..rule.name .. "state"..rule.state)
         local conditions = rule.conditions
         local match = true
+        local condition_rule = ""
         for _, condition in pairs(conditions) do
             local field = condition.field
             local field_name = condition.name
             local pattern = condition.pattern
+            condition_rule = condition.rule
             local match_value = ''
             if field == 'URL' then
                 match_value = ngx.var.request_uri
@@ -639,20 +665,22 @@ function _M.acl()
             end
 
             if pattern == '' then
-                if match_value ~= nil and match_value ~= '' then
-                    match = false
-                    break
-                end
-            else
-                if not matches(match_value, pattern) then
-                    match = false
-                    break
-                end
+                match = false
+                break
+            end    
+            
+            if not match_acl_rule(match_value, pattern,condition_rule) then
+                match = false
+                break
             end
         end
         if match then
             rule.type = "acl"
-            exec_action(rule)
+            local mr = {
+                type = rule.name,
+                rule = condition_rule
+            }
+            exec_action(rule,mr)
         end
         :: continue ::
     end

@@ -2124,6 +2124,11 @@ const message = {
             redisConfig: 'Redis 配置',
             redisHelper: '开启 Redis 可以将临时拉黑的 IP 持久化',
             wafHelper: '关闭之后所有网站将失去防护',
+            attackIP: '攻击 IP',
+            attackParam: '攻击信息',
+            execRule: '命中规则',
+            acl: 'ACL',
+            sql: 'SQL 注入',
         },
         monitor: {
             name: '网站监控',

@@ -500,3 +500,11 @@ export async function copyText(content: string) {
         MsgError(i18n.global.t('commons.msg.copyFailed'));
     }
 }
+
+export function getRuleType(ruleType: string) {
+    return i18n.global.t(`xpack.waf.${ruleType}`);
+}
+
+export function getAction(action: string) {
+    return i18n.global.t(`xpack.waf.${action}`);
+}

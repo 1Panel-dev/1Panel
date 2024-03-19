@@ -59,6 +59,9 @@ local function init_sites_config()
     end
     config.site_config = site_config
     config.site_rules = site_rules
+
+    local waf_dict = ngx.shared.waf
+    waf_dict:set("config", config)
 end
 
 local function ini_waf_info()
@@ -120,6 +123,7 @@ local function get_config()
     local config_table =  waf_dict:get("config")
     if config_table == nil then
         init_global_config()
+        init_sites_config()
         return config
     end
     config = config_table
