@@ -162,6 +162,9 @@ const getContent = () => {
         if (!end.value && res.data.end) {
             lastContent.value = content.value;
         }
+        res.data.content = res.data.content.replace(/\\u(\w{4})/g, function (match, grp) {
+            return String.fromCharCode(parseInt(grp, 16));
+        });
         data.value = res.data;
         if (res.data.content != '') {
             if (stopSignals.some((signal) => res.data.content.endsWith(signal))) {

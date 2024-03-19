@@ -110,7 +110,12 @@
                             <Status :key="row.state" :status="row.state"></Status>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.source')" show-overflow-tooltip min-width="100">
+                    <el-table-column
+                        :label="$t('container.source')"
+                        show-overflow-tooltip
+                        prop="resource"
+                        min-width="100"
+                    >
                         <template #default="{ row }">
                             <div v-if="row.hasLoad">
                                 <div class="source-font">CPU: {{ row.cpuPercent.toFixed(2) }}%</div>
