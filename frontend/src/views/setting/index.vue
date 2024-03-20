@@ -28,6 +28,10 @@ const buttons = [
         path: '/settings/snapshot',
     },
     {
+        label: i18n.global.t('setting.license'),
+        path: '/settings/license',
+    },
+    {
         label: i18n.global.t('setting.about'),
         path: '/settings/about',
     },

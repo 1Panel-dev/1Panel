@@ -150,3 +150,16 @@ var (
 var (
 	ErrNotExistUser = "ErrNotExistUser"
 )
+
+// license
+var (
+	LicenseCodeError    = "LicenseCodeError"
+	LicenseDataError    = "LicenseDataError"
+	DecodeRootCertError = "DecodeRootCertError"
+	ParseRootCertError  = "ParseRootCertError"
+	ParseCertError      = "ParseCertError"
+	VerifyCertError     = "VerifyCertError"
+	HostNameError       = "HostNameError"
+	LicenseTrialError   = "LicenseTrialError"
+	LicenseProductError = "LicenseProductError"
+)
