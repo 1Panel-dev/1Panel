@@ -5,7 +5,7 @@ PR are always welcome, even if they only contain small fixes like typos or a few
 
 Please submit a PR broken down into small changes bit by bit. A PR consisting of a lot features and code changes may be hard to review. It is recommended to submit PRs in an incremental fashion.
 
-This [development guideline](https://kubeoperator.io/docs/dev/dev_manual/) contains information about repository structure, how to setup development environment, how to run it, and more.
+This [development guideline](https://1panel.cn/docs/dev_manual/dev_manual/) contains information about repository structure, how to setup development environment, how to run it, and more.
 
 Note: If you split your pull request to small changes, please make sure any of the changes goes to master will not break anything. Otherwise, it can not be merged until this feature complete.
 
