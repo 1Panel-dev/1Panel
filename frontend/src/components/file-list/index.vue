@@ -8,7 +8,7 @@
         popper-class="file-list"
     >
         <template #reference>
-            <el-button :icon="Folder" :disabled="disabled" @click="popoverVisible = true"></el-button>
+            <el-button :icon="Folder" :disabled="disabled" @click="openPage()"></el-button>
         </template>
         <div>
             <el-button class="close" link @click="closePage">
@@ -143,6 +143,12 @@ const selectFile = () => {
 const closePage = () => {
     popoverVisible.value = false;
     selectRow.value = {};
+};
+
+const openPage = () => {
+    popoverVisible.value = true;
+    selectRow.value = {};
+    rowName.value = '';
 };
 
 const disabledDir = (row: File.File) => {
