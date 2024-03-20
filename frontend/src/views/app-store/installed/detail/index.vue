@@ -122,7 +122,6 @@ import { App } from '@/api/interface/app';
 import { GetAppInstallParams, UpdateAppInstallParams } from '@/api/modules/app';
 import { reactive, ref } from 'vue';
 import Header from '@/components/drawer-header/index.vue';
-import { useI18n } from 'vue-i18n';
 import { FormInstance } from 'element-plus';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';
@@ -130,6 +129,7 @@ import i18n from '@/lang';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
+import { getLanguage } from '@/utils/util';
 
 const extensions = [javascript(), oneDark];
 
@@ -228,7 +228,7 @@ const get = async () => {
 };
 
 const getLabel = (row: EditForm): string => {
-    const language = useI18n().locale.value;
+    const language = getLanguage();
     if (language == 'zh' || language == 'tw') {
         return row.labelZh;
     } else {

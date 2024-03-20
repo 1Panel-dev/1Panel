@@ -25,7 +25,6 @@ defineProps({
 <style lang="scss" scoped>
 .config-card {
     cursor: pointer;
-    margin: 10px;
     .config-header {
         margin-bottom: 18px;
         display: flex;

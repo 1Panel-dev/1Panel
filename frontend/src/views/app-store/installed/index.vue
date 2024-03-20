@@ -317,11 +317,10 @@ import AppDetail from '../detail/index.vue';
 import ComposeLogs from '@/components/compose-log/index.vue';
 import { App } from '@/api/interface/app';
 import Status from '@/components/status/index.vue';
-import { getAge } from '@/utils/util';
+import { getAge, getLanguage } from '@/utils/util';
 import { useRouter } from 'vue-router';
 import { MsgSuccess } from '@/utils/message';
 import { toFolder } from '@/global/business';
-import { useI18n } from 'vue-i18n';
 
 const data = ref<any>();
 const loading = ref(false);
@@ -361,7 +360,7 @@ const router = useRouter();
 const activeName = ref(i18n.global.t('app.installed'));
 const mode = ref('installed');
 const moreTag = ref('');
-const language = useI18n().locale.value;
+const language = getLanguage();
 const appDetail = ref();
 
 const sync = () => {

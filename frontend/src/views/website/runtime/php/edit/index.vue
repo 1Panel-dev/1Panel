@@ -24,8 +24,8 @@
 <script setup lang="ts">
 import { App } from '@/api/interface/app';
 import { Rules } from '@/global/form-rules';
+import { getLanguage } from '@/utils/util';
 import { computed, onMounted, reactive, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
 
 interface ParamObj extends App.InstallParams {
     prop: string;
@@ -97,7 +97,7 @@ const handleParams = () => {
 };
 
 const getLabel = (row: ParamObj): string => {
-    const language = useI18n().locale.value;
+    const language = getLanguage();
     if (language == 'zh' || language == 'tw') {
         return row.labelZh;
     } else {
