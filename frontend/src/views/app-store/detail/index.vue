@@ -78,13 +78,13 @@
 import { GetApp, GetAppDetail } from '@/api/modules/app';
 import MdEditor from 'md-editor-v3';
 import { ref } from 'vue';
-import { useI18n } from 'vue-i18n';
 import Install from './install/index.vue';
 import router from '@/routers';
 import { GlobalStore } from '@/store';
+import { getLanguage } from '@/utils/util';
 const globalStore = GlobalStore();
 
-const language = useI18n().locale.value;
+const language = getLanguage();
 
 const app = ref<any>({});
 const appDetail = ref<any>({});

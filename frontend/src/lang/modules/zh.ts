@@ -1348,8 +1348,8 @@ const message = {
         doc: '官方文档',
         star: '点亮 Star',
         description: '1Panel，现代化、开源的 Linux 服务器运维管理面板。',
-        forum: '论坛',
-        doc2: '文档',
+        forum: '论坛求助',
+        doc2: '使用手冊',
         currentVersion: '当前运行版本：',
     },
     clean: {
@@ -2129,6 +2129,9 @@ const message = {
             execRule: '命中规则',
             acl: 'ACL',
             sql: 'SQL 注入',
+            cc: 'CC 攻击',
+            isBlocking: '封禁中',
+            isFree: '已解封',
         },
         monitor: {
             name: '网站监控',

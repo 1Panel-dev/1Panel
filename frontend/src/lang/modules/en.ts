@@ -1446,8 +1446,8 @@ const message = {
         doc: 'Official document',
         star: 'Star',
         description: '1Panel, Modern, open source Linux server operation and maintenance management panel.',
-        forum: 'Forum',
-        doc2: 'Document',
+        forum: 'Forum Help',
+        doc2: 'User Manual',
         currentVersion: 'Version',
     },
     clean: {
@@ -2274,6 +2274,9 @@ const message = {
             execRule: 'Hit rule',
             acl: 'ACL',
             sql: 'SQL injection',
+            cc: 'CC attack',
+            isBlocking: 'Blocking',
+            isFree: 'Unblocked',
         },
         monitor: {
             name: 'Website Monitor',

@@ -174,8 +174,8 @@ import Detail from '../detail/index.vue';
 import Install from '../detail/install/index.vue';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
-import { useI18n } from 'vue-i18n';
 import { GlobalStore } from '@/store';
+import { getLanguage } from '@/utils/util';
 
 const globalStore = GlobalStore();
 
@@ -183,7 +183,7 @@ const mobile = computed(() => {
     return globalStore.isMobile();
 });
 
-const language = useI18n().locale.value;
+const language = getLanguage();
 
 const paginationConfig = reactive({
     cacheSizeKey: 'app-page-size',

@@ -1347,8 +1347,8 @@ const message = {
         doc: '官方文檔',
         star: '點亮 Star',
         description: '1Panel，現代化、開源的 Linux 服務器運維管理面板。',
-        forum: '論壇',
-        doc2: '文檔',
+        forum: '論壇求助',
+        doc2: '使用手冊',
         currentVersion: '當前運行版本：',
     },
     clean: {
@@ -2128,6 +2128,9 @@ const message = {
             execRule: '命中規則',
             acl: 'ACL',
             sql: 'SQL 注入',
+            cc: 'CC 攻擊',
+            isBlocking: '封鎖中',
+            isFree: '已解封',
         },
         monitor: {
             name: '網站監控',

@@ -43,11 +43,11 @@
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
 import { SearchApp } from '@/api/modules/app';
+import { getLanguage } from '@/utils/util';
 import { reactive, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 const router = useRouter();
-const language = useI18n().locale.value;
+const language = getLanguage();
 
 let req = reactive({
     name: '',
