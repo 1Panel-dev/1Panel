@@ -174,12 +174,12 @@ ErrRuleExist: "规则名称已存在"
 ErrRuleNotExist: "规则不存在"
 
 #license
-LicenseCodeError: "LicenseCode 格式不符合规范，请重新导入",
-LicenseDataError: "LicenseData 数据 JSON 解析失败",
-DecodeRootCertError: "解码根证书失败",
-ParseRootCertError: "根证书语法转换失败",
-ParseCertError: "证书语法转换失败",
-VerifyCertError: "校验证书失败",
-HostNameError: "hostName 获取失败",
-LicenseTrialError: "License 已激活或失效，请重新导入",
-LicenseProductError: "License 文件未包含产品信息",
+LicenseCodeError: "LicenseCode 格式不符合规范，请重新导入"
+LicenseDataError: "LicenseData 数据 JSON 解析失败"
+DecodeRootCertError: "解码根证书失败"
+ParseRootCertError: "根证书语法转换失败"
+ParseCertError: "证书语法转换失败"
+VerifyCertError: "校验证书失败"
+HostNameError: "hostName 获取失败"
+LicenseTrialError: "License 已激活或失效，请重新导入"
+LicenseProductError: "License 文件未包含产品信息"

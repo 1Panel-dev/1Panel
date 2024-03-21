@@ -2,7 +2,7 @@
     <div>
         <LayoutContent v-loading="loading" :title="$t('setting.license')" :divider="true">
             <template #main>
-                <el-alert style="margin-top: 20px" type="warning" @close="hideEntrance" v-if="show">
+                <el-alert style="margin-top: 20px" type="warning" @close="hideEntrance" v-if="show == true">
                     <template #title>
                         <span class="flx-align-center">
                             <span>{{ $t('license.importLicense') }}</span>
@@ -11,7 +11,7 @@
                 </el-alert>
                 <el-row :gutter="20" style="margin-top: 20px">
                     <el-col :xs="24" :sm="24" :md="16" :lg="16" :xl="16">
-                        <CardWithHeader :header="$t('home.overview')" height="146px" v-if="show">
+                        <CardWithHeader :header="$t('home.overview')" height="146px" v-if="show == true">
                             <template #body>
                                 <div class="h-overview">
                                     <el-row>
@@ -26,7 +26,7 @@
                             </template>
                         </CardWithHeader>
 
-                        <CardWithHeader :header="$t('home.systemInfo')" v-else>
+                        <CardWithHeader :header="$t('home.systemInfo')" v-if="show == false">
                             <template #body>
                                 <el-scrollbar>
                                     <div class="h-overview">
@@ -175,7 +175,7 @@ const globalStore = GlobalStore();
 const loading = ref();
 const uploadRef = ref<UploadInstance>();
 const uploaderFiles = ref<UploadFiles>([]);
-const show = ref(true);
+const show = ref(null);
 
 const license = reactive({
     licenseName: '',
@@ -225,6 +225,8 @@ const get = async () => {
                     license.expiresAt = timestampToDate(res.data.products[0].expiresAt);
                 }
                 show.value = false;
+            } else {
+                show.value = true;
             }
         })
         .catch(() => {
@@ -243,17 +245,22 @@ const fileOnChange = async (_uploadFile: UploadFile, uploadFiles: UploadFiles) =
     formData.append('file', file.raw);
 
     await UploadFileData(formData)
-        .then(async () => {
-            loading.value = false;
-            uploadRef.value!.clearFiles();
-            uploaderFiles.value = [];
-            MsgSuccess(i18n.global.t('license.updateSuccess'));
+        .then(async (res) => {
+            if (res) {
+                license.licenseName = res.data.licenseName;
+                // await get();
+                loading.value = false;
+                uploadRef.value!.clearFiles();
+                uploaderFiles.value = [];
+                MsgSuccess(i18n.global.t('license.updateSuccess'));
+                window.location.reload(); // 刷新页面
+            }
         })
-        .catch(() => {
+        .catch((error) => {
             loading.value = false;
             uploadRef.value!.clearFiles();
             uploaderFiles.value = [];
-            MsgError(i18n.global.t('license.importError'));
+            MsgError(i18n.global.t(error.message));
         });
 };
 

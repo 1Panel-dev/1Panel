@@ -1356,6 +1356,7 @@ const message = {
     license: {
         importLicense: '請導入許可證',
         community: '社區版',
+        pro: '專業版',
         authorizationId: '訂閱授權 ID',
         authorizedUser: '被授權方',
         expiresAt: '到期時間',
@@ -1370,7 +1371,18 @@ const message = {
         allowOnlyOne: '只能上傳一個 License 檔案',
         updateSuccess: 'License 更新成功',
         importError: 'License 導入失敗，許可證檔案異常',
-        pro: '1Panel 專業版',
+        levelUpPro: '升級專業版',
+        knowMorePro: '瞭解更多專業版資訊',
+
+        LicenseCodeError: 'LicenseCode 格式不符合規範，請重新匯入',
+        LicenseDataError: 'LicenseData 資料 JSON 解析失敗',
+        DecodeRootCertError: '解碼根憑證失敗',
+        ParseRootCertError: '根憑證語法轉換失敗',
+        ParseCertError: '憑證語法轉換失敗',
+        VerifyCertError: '憑證驗證失敗',
+        HostNameError: '無法獲取 hostName',
+        LicenseTrialError: 'License 已啟用或已過期，請重新匯入',
+        LicenseProductError: 'License 檔案未包含產品資訊',
     },
     clean: {
         scan: '開始掃描',

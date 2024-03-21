@@ -1357,6 +1357,7 @@ const message = {
     license: {
         importLicense: '请导入许可证',
         community: '社区版',
+        pro: '专业版',
         authorizationId: '订阅授权 ID',
         authorizedUser: '被授权方',
         expiresAt: '到期时间',
@@ -1371,7 +1372,18 @@ const message = {
         allowOnlyOne: '只能上传一个 License 文件',
         updateSuccess: 'License 更新成功',
         importError: 'License 导入失败，许可证文件异常',
-        pro: '1Panel 专业版',
+        levelUpPro: '升级专业版',
+        knowMorePro: '了解更多专业版信息',
+
+        LicenseCodeError: 'LicenseCode 格式不符合规范，请重新导入',
+        LicenseDataError: 'LicenseData 数据 JSON 解析失败',
+        DecodeRootCertError: '解码根证书失败',
+        ParseRootCertError: '根证书语法转换失败',
+        ParseCertError: '证书语法转换失败',
+        VerifyCertError: '校验证书失败',
+        HostNameError: 'hostName 获取失败',
+        LicenseTrialError: 'License 已激活或失效，请重新导入',
+        LicenseProductError: 'License 文件未包含产品信息',
     },
     clean: {
         scan: '开始扫描',

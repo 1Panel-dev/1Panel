@@ -7,7 +7,52 @@
                     path: '/',
                 },
             ]"
-        />
+        >
+            <template #route-button>
+                <div class="router-button">
+                    <span class="version" v-if="show === true || show === undefined">
+                        {{ $t('license.community') }}
+                    </span>
+                    <span class="version" v-else>{{ $t('license.pro') }}</span>
+
+                    <template v-if="show">
+                        <el-divider direction="vertical" />
+                        <el-button link type="primary" @click="dialogFormVisible = true">
+                            {{ $t('license.levelUpPro') }}
+                        </el-button>
+                    </template>
+                </div>
+            </template>
+        </RouterButton>
+
+        <el-dialog v-model="dialogFormVisible" :title="$t('license.levelUpPro')" width="500">
+            <div style="text-align: center; margin-top: 20px">
+                <div style="justify-self: center">
+                    <img style="width: 80px" src="@/assets/images/1panel-logo-light.png" />
+                </div>
+                <h3>{{ $t('setting.description') }}</h3>
+                <el-upload
+                    action="#"
+                    ref="uploadRef"
+                    class="upload-demo"
+                    :limit="1"
+                    :on-exceed="handleExceed"
+                    :on-change="fileOnChange"
+                    :auto-upload="false"
+                    v-model:file-list="uploaderFiles"
+                >
+                    <template #trigger>
+                        <el-button type="primary">{{ $t('license.importLicense') }}</el-button>
+                    </template>
+                </el-upload>
+                <div style="margin-top: 10px">
+                    <el-link @click="toHalo">
+                        <span>{{ $t('license.knowMorePro') }}</span>
+                    </el-link>
+                </div>
+            </div>
+        </el-dialog>
+
         <el-alert
             v-if="!isSafety && globalStore.showEntranceWarn"
             style="margin-top: 20px"
@@ -233,8 +278,10 @@ import { dateFormatForSecond, computeSize } from '@/utils/util';
 import { useRouter } from 'vue-router';
 import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
 import { getIOOptions, getNetworkOptions } from '@/api/modules/monitor';
-import { getSettingInfo, loadUpgradeInfo } from '@/api/modules/setting';
+import { getLicense, getSettingInfo, loadUpgradeInfo, UploadFileData } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
+import { MsgError, MsgSuccess } from '@/utils/message';
+import { genFileId, UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile } from 'element-plus';
 const router = useRouter();
 const globalStore = GlobalStore();
 
@@ -258,6 +305,22 @@ const timeNetDatas = ref<Array<string>>([]);
 
 const ioOptions = ref();
 const netOptions = ref();
+
+const dialogFormVisible = ref(false);
+
+const uploadRef = ref<UploadInstance>();
+const uploaderFiles = ref<UploadFiles>([]);
+const loading = ref();
+const show = ref(null);
+
+const license = reactive({
+    licenseName: '',
+    trial: true,
+    expiresAt: '',
+    assigneeName: '',
+    productName: '',
+});
+
 const searchInfo = reactive({
     ioOption: 'all',
     netOption: 'all',
@@ -538,7 +601,65 @@ const onBlur = () => {
     isActive.value = false;
 };
 
+const handleExceed: UploadProps['onExceed'] = (files) => {
+    uploadRef.value!.clearFiles();
+    const file = files[0] as UploadRawFile;
+    file.uid = genFileId();
+    uploadRef.value!.handleStart(file);
+};
+
+const get = async () => {
+    await getLicense()
+        .then((res) => {
+            loading.value = false;
+            if (res.data !== undefined) {
+                if (res.data.licenseName !== '' && res.data.licenseName != undefined) {
+                    show.value = false;
+                }
+            } else {
+                show.value = true;
+            }
+        })
+        .catch(() => {
+            show.value = true;
+            loading.value = false;
+        });
+};
+
+const toHalo = () => {
+    window.open('https://halo.test.lxware.cn/', '_blank', 'noopener,noreferrer');
+};
+
+const fileOnChange = async (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
+    uploaderFiles.value = uploadFiles;
+    const files = uploaderFiles.value.slice();
+    if (files.length !== 1) {
+        MsgError(i18n.global.t('license.allowOnlyOne'));
+    }
+    const file = files[0];
+    const formData = new FormData();
+    formData.append('file', file.raw);
+
+    await UploadFileData(formData)
+        .then(async (res) => {
+            if (res) {
+                license.licenseName = res.data.licenseName;
+                // await get();
+                uploadRef.value!.clearFiles();
+                uploaderFiles.value = [];
+                MsgSuccess(i18n.global.t('license.updateSuccess'));
+                window.location.reload(); // 刷新页面
+            }
+        })
+        .catch((error) => {
+            uploadRef.value!.clearFiles();
+            uploaderFiles.value = [];
+            MsgError(i18n.global.t(error.message));
+        });
+};
+
 onMounted(() => {
+    get();
     window.addEventListener('focus', onFocus);
     window.addEventListener('blur', onBlur);
     loadSafeStatus();
@@ -605,6 +726,24 @@ onBeforeUnmount(() => {
     .el-tag {
         margin-right: 10px;
         margin-bottom: 10px;
+    }
+}
+
+.version {
+    font-size: 14px;
+    color: #858585;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+}
+
+.system-link {
+    margin-left: 15px;
+
+    .svg-icon {
+        font-size: 7px;
+    }
+    span {
+        line-height: 20px;
     }
 }
 </style>

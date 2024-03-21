@@ -80,7 +80,7 @@ import { ElMessageBox } from 'element-plus';
 const globalStore = GlobalStore();
 
 const version = ref<string>('');
-const licenseVersion = ref<string>('社区版');
+const licenseVersion = ref<string>('');
 const loading = ref(false);
 const drawerVisible = ref(false);
 const upgradeInfo = ref();
@@ -97,7 +97,9 @@ const search = async () => {
     const res = await getSettingInfo();
     const rst = await getLicense();
     if (rst.data !== undefined && rst.data.licenseName !== '') {
-        licenseVersion.value = '专业版';
+        licenseVersion.value = i18n.global.t('license.pro');
+    } else {
+        licenseVersion.value = i18n.global.t('license.community');
     }
     version.value = res.data.systemVersion;
 };
