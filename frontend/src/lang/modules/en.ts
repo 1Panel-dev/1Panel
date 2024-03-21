@@ -1455,6 +1455,7 @@ const message = {
     license: {
         importLicense: 'Please import license',
         community: 'Community',
+        pro: 'Pro',
         authorizationId: 'Subscription Authorization ID',
         authorizedUser: 'Authorized User',
         expiresAt: 'Expires At',
@@ -1469,7 +1470,18 @@ const message = {
         allowOnlyOne: 'Only one License file can be uploaded',
         updateSuccess: 'License updated successfully',
         importError: 'License import failed, license file abnormal',
-        pro: '1Panel Pro',
+        levelUpPro: 'Upgrade to Pro Version',
+        knowMorePro: 'Learn More about the Professional Version',
+
+        LicenseCodeError: 'LicenseCode format does not comply with the specification, please import again',
+        LicenseDataError: 'LicenseData data JSON parsing failed',
+        DecodeRootCertError: 'Decoding root certificate failed',
+        ParseRootCertError: 'Root certificate syntax conversion failed',
+        ParseCertError: 'Certificate syntax conversion failed',
+        VerifyCertError: 'Certificate verification failed',
+        HostNameError: 'Failed to get hostName',
+        LicenseTrialError: 'License is already activated or expired, please import again',
+        LicenseProductError: 'License file does not contain product information',
     },
     clean: {
         scan: 'Start Scanning',

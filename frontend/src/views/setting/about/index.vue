@@ -77,7 +77,6 @@ import { dateFormat } from '@/utils/util';
 
 const version = ref();
 const loading = ref();
-const uploadRef = ref();
 
 const search = async () => {
     const res = await getSettingInfo();

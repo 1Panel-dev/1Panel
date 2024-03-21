@@ -1,4 +1,5 @@
 import { DateTimeFormats } from '@intlify/core-base';
+import { CommonModel } from '@/api/interface/index';
 
 export namespace Setting {
     export interface SettingInfo {
