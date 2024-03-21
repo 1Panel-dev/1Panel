@@ -172,7 +172,7 @@
                                             {{ $t('home.platformVersion') }}
                                         </span>
                                     </template>
-                                    {{ baseInfo.platform }}-{{ baseInfo.platformVersion }}
+                                    {{ baseInfo.platformVersion === "" ? baseInfo.platform : (baseInfo.platform + "-" + baseInfo.platformVersion) }}
                                 </el-descriptions-item>
                                 <el-descriptions-item class-name="system-content">
                                     <template #label>
