@@ -10,7 +10,7 @@ require (
 	github.com/dgraph-io/badger/v4 v4.2.0
 	github.com/docker/cli v25.0.3+incompatible
 	github.com/docker/compose/v2 v2.24.6
-	github.com/docker/docker v25.0.3+incompatible
+	github.com/docker/docker v25.0.5+incompatible
 	github.com/docker/go-connections v0.5.0
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/gin-contrib/gzip v0.0.6
