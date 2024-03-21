@@ -1349,7 +1349,7 @@ const message = {
         star: '点亮 Star',
         description: '1Panel，现代化、开源的 Linux 服务器运维管理面板。',
         forum: '论坛求助',
-        doc2: '使用手冊',
+        doc2: '使用手册',
         currentVersion: '当前运行版本：',
     },
     clean: {
