@@ -10,145 +10,50 @@
                     </template>
                 </el-alert>
                 <el-row :gutter="20" style="margin-top: 20px">
-                    <el-col :xs="24" :sm="24" :md="16" :lg="16" :xl="16">
-                        <CardWithHeader :header="$t('home.overview')" height="146px" v-if="!hasLicense()">
-                            <template #body>
-                                <div class="h-overview">
-                                    <el-row>
-                                        <el-col :span="6">
-                                            <span>{{ $t('setting.license') }}</span>
-                                        </el-col>
-                                        <el-col :span="6">
-                                            <span>{{ $t('license.community') }}</span>
-                                        </el-col>
-                                    </el-row>
-                                </div>
-                            </template>
-                        </CardWithHeader>
-
-                        <CardWithHeader :header="$t('home.systemInfo')" v-else>
-                            <template #body>
-                                <el-scrollbar>
-                                    <div class="h-overview">
-                                        <el-row>
-                                            <el-col :span="6">
-                                                <span>{{ $t('license.authorizationId') }}</span>
-                                            </el-col>
-                                            <el-col :span="6">
-                                                <span>{{ license.licenseName }}</span>
-                                            </el-col>
-                                        </el-row>
-                                        <div class="h-app-divider" />
-                                        <el-row>
-                                            <el-col :span="6">
-                                                <span>{{ $t('license.authorizedUser') }}</span>
-                                            </el-col>
-                                            <el-col :span="6">
-                                                <span>{{ license.assigneeName }}</span>
-                                            </el-col>
-                                        </el-row>
-                                        <div class="h-app-divider" />
-                                        <el-row>
-                                            <el-col :span="6">
-                                                <span>{{ $t('license.expiresAt') }}</span>
-                                            </el-col>
-                                            <el-col :span="6">
-                                                <span>{{ license.expiresAt }}</span>
-                                            </el-col>
-                                        </el-row>
-                                        <div class="h-app-divider" />
-                                        <el-row>
-                                            <el-col :span="6">
-                                                <span>{{ $t('license.versionName') }}</span>
-                                            </el-col>
-                                            <el-col :span="6">
-                                                <span>{{ license.productName }}</span>
-                                            </el-col>
-                                        </el-row>
-                                        <div class="h-app-divider" />
-                                        <el-row>
-                                            <el-col :span="6">
-                                                <span>{{ $t('license.versionType') }}</span>
-                                            </el-col>
-                                            <el-col :span="6">
-                                                <span>{{ $t('license.pro') }}</span>
-                                            </el-col>
-                                        </el-row>
-                                    </div>
-                                </el-scrollbar>
-                            </template>
-                        </CardWithHeader>
+                    <el-col :xs="24" :sm="24" :md="15" :lg="15" :xl="15">
+                        <div class="descriptions">
+                            <el-descriptions :column="1" direction="horizontal" size="large" border v-if="hasLicense()">
+                                <el-descriptions-item :label="$t('license.authorizationId')">
+                                    {{ license.licenseName }}
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t('license.authorizedUser')">
+                                    {{ license.assigneeName }}
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t('license.expiresAt')">
+                                    {{ license.expiresAt }}
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t('license.versionName')">
+                                    {{ license.productName }}
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t('license.versionType')">
+                                    {{ license.trial ? $t('license.trial') : $t('license.office') }}
+                                </el-descriptions-item>
+                            </el-descriptions>
+                        </div>
                     </el-col>
 
-                    <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
+                    <el-col :xs="24" :sm="24" :md="9" :lg="9" :xl="9">
                         <CardWithHeader :header="$t('license.quickUpdate')">
                             <template #body>
                                 <div class="h-app-card">
                                     <el-row :gutter="10">
                                         <el-col :span="15">
-                                            <div class="h-app-content">
-                                                <div>
-                                                    <span class="h-app-title">{{ $t('license.importLicense') }}：</span>
-                                                </div>
-                                            </div>
+                                            <div class="h-app-content">{{ $t('license.importLicense') }}：</div>
                                         </el-col>
                                         <el-col :span="5">
-                                            <el-upload
-                                                action="#"
-                                                ref="uploadRef"
-                                                class="upload-demo"
-                                                :limit="1"
-                                                :on-exceed="handleExceed"
-                                                :on-change="fileOnChange"
-                                                :auto-upload="false"
-                                                v-model:file-list="uploaderFiles"
-                                            >
-                                                <template #trigger>
-                                                    <el-button
-                                                        v-if="license.licenseName === ''"
-                                                        class="h-app-button"
-                                                        type="primary"
-                                                        plain
-                                                        round
-                                                        size="small"
-                                                    >
-                                                        {{ $t('license.import') }}
-                                                    </el-button>
-                                                    <el-button
-                                                        v-else
-                                                        class="h-app-button"
-                                                        type="primary"
-                                                        plain
-                                                        round
-                                                        size="small"
-                                                    >
-                                                        {{ $t('license.update') }}
-                                                    </el-button>
-                                                </template>
-                                            </el-upload>
+                                            <el-button type="primary" plain round size="small" @click="toUpload">
+                                                {{ $t('license.import') }}
+                                            </el-button>
                                         </el-col>
                                     </el-row>
                                 </div>
                                 <div class="h-app-card">
                                     <el-row :gutter="10">
                                         <el-col :span="15">
-                                            <div class="h-app-content">
-                                                <div>
-                                                    <span class="h-app-title">
-                                                        {{ $t('license.technicalAdvice') }}：
-                                                    </span>
-                                                </div>
-                                            </div>
+                                            <div class="h-app-content">{{ $t('license.technicalAdvice') }}：</div>
                                         </el-col>
                                         <el-col :span="5">
-                                            <el-button
-                                                class="h-app-button"
-                                                type="primary"
-                                                plain
-                                                round
-                                                size="small"
-                                                @click="toHalo()"
-                                            >
+                                            <el-button type="primary" plain round size="small" @click="toHalo()">
                                                 {{ $t('license.advice') }}
                                             </el-button>
                                         </el-col>
@@ -160,21 +65,21 @@
                 </el-row>
             </template>
         </LayoutContent>
+
+        <Upload ref="uploadRef" @search="search()" />
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue';
 import { GlobalStore } from '@/store';
+import { getLicense } from '@/api/modules/setting';
 import CardWithHeader from '@/components/card-with-header/index.vue';
-import { genFileId, UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile } from 'element-plus';
-import { MsgError, MsgSuccess } from '@/utils/message';
-import { getLicense, UploadFileData } from '@/api/modules/setting';
+import Upload from '@/views/setting/license/upload/index.vue';
 import i18n from '@/lang';
 const globalStore = GlobalStore();
 const loading = ref();
-const uploadRef = ref<UploadInstance>();
-const uploaderFiles = ref<UploadFiles>([]);
+const uploadRef = ref();
 
 const license = reactive({
     licenseName: '',
@@ -185,13 +90,6 @@ const license = reactive({
 
     status: '',
 });
-
-const handleExceed: UploadProps['onExceed'] = (files) => {
-    uploadRef.value!.clearFiles();
-    const file = files[0] as UploadRawFile;
-    file.uid = genFileId();
-    uploadRef.value!.handleStart(file);
-};
 
 const hideEntrance = () => {
     globalStore.setShowEntranceWarn(false);
@@ -240,30 +138,8 @@ const hasLicense = () => {
     return license.status === 'Enable';
 };
 
-const fileOnChange = async (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
-    uploaderFiles.value = uploadFiles;
-    const files = uploaderFiles.value.slice();
-    if (files.length !== 1) {
-        MsgError(i18n.global.t('license.allowOnlyOne'));
-    }
-    const file = files[0];
-    const formData = new FormData();
-    formData.append('file', file.raw);
-
-    await UploadFileData(formData)
-        .then(async () => {
-            loading.value = false;
-            uploadRef.value!.clearFiles();
-            uploaderFiles.value = [];
-            search();
-            MsgSuccess(i18n.global.t('license.updateSuccess'));
-        })
-        .catch(() => {
-            loading.value = false;
-            uploadRef.value!.clearFiles();
-            uploaderFiles.value = [];
-            MsgError(i18n.global.t('license.importError'));
-        });
+const toUpload = () => {
+    uploadRef.value.acceptParams();
 };
 
 onMounted(() => {
@@ -273,7 +149,6 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .h-app-card {
-    cursor: pointer;
     padding: 10px 15px;
     margin-right: 10px;
     line-height: 18px;
@@ -291,12 +166,5 @@ onMounted(() => {
     &:hover {
         background-color: rgba(0, 94, 235, 0.03);
     }
-}
-
-.h-app-divider {
-    margin-bottom: 13px;
-    margin-top: 13px;
-    border: 0;
-    border-top: var(--panel-border);
 }
 </style>
