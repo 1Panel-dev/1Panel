@@ -22,11 +22,19 @@
                                 <el-descriptions-item :label="$t('license.expiresAt')">
                                     {{ license.expiresAt }}
                                 </el-descriptions-item>
-                                <el-descriptions-item :label="$t('license.versionName')">
+                                <el-descriptions-item :label="$t('license.productName')">
                                     {{ license.productName }}
                                 </el-descriptions-item>
-                                <el-descriptions-item :label="$t('license.versionType')">
-                                    {{ license.trial ? $t('license.trial') : $t('license.office') }}
+                                <el-descriptions-item :label="$t('license.productStatus')">
+                                    <el-tooltip
+                                        v-if="license.status.indexOf('lost') !== -1"
+                                        :content="$t('license.lostHelper')"
+                                    >
+                                        <el-tag type="info">
+                                            {{ $t('license.' + license.status) }}
+                                        </el-tag>
+                                    </el-tooltip>
+                                    <el-tag v-else>{{ $t('license.' + license.status) }}</el-tag>
                                 </el-descriptions-item>
                             </el-descriptions>
                         </div>

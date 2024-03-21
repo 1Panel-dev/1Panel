@@ -2,7 +2,7 @@
     <el-drawer
         v-model="open"
         :before-close="handleClose"
-        size="40%"
+        size="30%"
         :destroy-on-close="true"
         :close-on-click-modal="false"
     >
