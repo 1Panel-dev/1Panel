@@ -1,5 +1,4 @@
 import { DateTimeFormats } from '@intlify/core-base';
-import { CommonModel } from '@/api/interface/index';
 
 export namespace Setting {
     export interface SettingInfo {
@@ -141,29 +140,12 @@ export namespace Setting {
         latestVersion: string;
         releaseNote: string;
     }
-    export interface LicenseCreate {
-        name: string;
-        appName: string;
-        trial: boolean;
-        expiresAt: Date;
-    }
-    export interface LicenseUpdate {
-        id: number;
-        name: string;
-        appName: string;
-        trial: boolean;
-        expiresAt: Date;
-    }
 
-    export interface License extends CommonModel {
+    export interface License {
         licenseName: string;
         assigneeName: string;
-        products: Array<Project>;
+        productPro: string;
         trial: boolean;
-    }
-
-    export interface Project extends CommonModel {
-        name: string;
-        expiresAt: number;
+        status: string;
     }
 }

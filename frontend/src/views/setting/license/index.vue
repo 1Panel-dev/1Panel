@@ -2,7 +2,7 @@
     <div>
         <LayoutContent v-loading="loading" :title="$t('setting.license')" :divider="true">
             <template #main>
-                <el-alert style="margin-top: 20px" type="warning" @close="hideEntrance" v-if="show">
+                <el-alert style="margin-top: 20px" type="warning" @close="hideEntrance" v-if="!hasLicense()">
                     <template #title>
                         <span class="flx-align-center">
                             <span>{{ $t('license.importLicense') }}</span>
@@ -11,7 +11,7 @@
                 </el-alert>
                 <el-row :gutter="20" style="margin-top: 20px">
                     <el-col :xs="24" :sm="24" :md="16" :lg="16" :xl="16">
-                        <CardWithHeader :header="$t('home.overview')" height="146px" v-if="show">
+                        <CardWithHeader :header="$t('home.overview')" height="146px" v-if="!hasLicense()">
                             <template #body>
                                 <div class="h-overview">
                                     <el-row>
@@ -164,7 +164,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, onBeforeMount } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { GlobalStore } from '@/store';
 import CardWithHeader from '@/components/card-with-header/index.vue';
 import { genFileId, UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile } from 'element-plus';
@@ -175,7 +175,6 @@ const globalStore = GlobalStore();
 const loading = ref();
 const uploadRef = ref<UploadInstance>();
 const uploaderFiles = ref<UploadFiles>([]);
-const show = ref(true);
 
 const license = reactive({
     licenseName: '',
@@ -183,6 +182,8 @@ const license = reactive({
     expiresAt: '',
     assigneeName: '',
     productName: '',
+
+    status: '',
 });
 
 const handleExceed: UploadProps['onExceed'] = (files) => {
@@ -211,25 +212,32 @@ const timestampToDate = (timestamp: number) => {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 };
 
-const get = async () => {
+const search = async () => {
+    loading.value = false;
     await getLicense()
         .then((res) => {
-            loading.value = false;
-            if (res.data !== undefined) {
-                license.licenseName = res.data.licenseName;
-                license.assigneeName = res.data.assigneeName;
-                license.productName = res.data.products[0].name;
-                if (res.data.products[0].expiresAt === 0) {
-                    license.expiresAt = i18n.global.t('license.indefinitePeriod');
-                } else {
-                    license.expiresAt = timestampToDate(res.data.products[0].expiresAt);
-                }
-                show.value = false;
+            license.status = res.data.status;
+            if (res.data.status !== 'Enable') {
+                return;
+            }
+            license.licenseName = res.data.licenseName;
+            license.assigneeName = res.data.assigneeName;
+            license.trial = res.data.trial;
+            if (res.data.productPro) {
+                license.productName = 'product-1panel-pro';
+                license.expiresAt =
+                    res.data.productPro === '0'
+                        ? i18n.global.t('license.indefinitePeriod')
+                        : timestampToDate(Number(res.data.productPro));
             }
         })
         .catch(() => {
             loading.value = false;
         });
+};
+
+const hasLicense = () => {
+    return license.status === 'Enable';
 };
 
 const fileOnChange = async (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
@@ -247,6 +255,7 @@ const fileOnChange = async (_uploadFile: UploadFile, uploadFiles: UploadFiles) =
             loading.value = false;
             uploadRef.value!.clearFiles();
             uploaderFiles.value = [];
+            search();
             MsgSuccess(i18n.global.t('license.updateSuccess'));
         })
         .catch(() => {
@@ -258,11 +267,7 @@ const fileOnChange = async (_uploadFile: UploadFile, uploadFiles: UploadFiles) =
 };
 
 onMounted(() => {
-    getLicense();
-});
-
-onBeforeMount(() => {
-    get();
+    search();
 });
 </script>
 
