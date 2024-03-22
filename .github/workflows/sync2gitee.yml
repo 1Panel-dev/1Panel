@@ -9,7 +9,7 @@ jobs:
         uses: Yikun/hub-mirror-action@master
         with:
           src: 'github/1Panel-dev'
-          dst: 'gitee/fit2cloud-xlab'
+          dst: 'gitee/fit2cloud-feizhiyun'
           dst_key: ${{ secrets.GITEE_PRIVATE_KEY }}
           dst_token:  ${{ secrets.GITEE_TOKEN }}
           static_list: "1Panel"
