@@ -2,39 +2,38 @@
     <div>
         <LayoutContent v-loading="loading" :title="$t('setting.license')" :divider="true">
             <template #main>
-                <el-alert style="margin-top: 20px" type="warning" @close="hideEntrance" v-if="!hasLicense()">
-                    <template #title>
-                        <span class="flx-align-center">
-                            <span>{{ $t('license.importLicense') }}</span>
-                        </span>
-                    </template>
-                </el-alert>
-                <el-row :gutter="20" style="margin-top: 20px">
+                <el-row :gutter="20" class="mt-5; mb-10">
                     <el-col :xs="24" :sm="24" :md="15" :lg="15" :xl="15">
                         <div class="descriptions">
-                            <el-descriptions :column="1" direction="horizontal" size="large" border v-if="hasLicense()">
+                            <el-descriptions :column="1" direction="horizontal" size="large" border>
                                 <el-descriptions-item :label="$t('license.authorizationId')">
-                                    {{ license.licenseName }}
+                                    {{ license.licenseName || '-' }}
+                                    <el-button type="primary" class="ml-3" plain @click="onSync" size="small">
+                                        {{ $t('commons.button.sync') }}
+                                    </el-button>
                                 </el-descriptions-item>
                                 <el-descriptions-item :label="$t('license.authorizedUser')">
-                                    {{ license.assigneeName }}
+                                    {{ license.assigneeName || '-' }}
                                 </el-descriptions-item>
                                 <el-descriptions-item :label="$t('license.expiresAt')">
-                                    {{ license.expiresAt }}
+                                    {{ license.expiresAt || '-' }}
                                 </el-descriptions-item>
                                 <el-descriptions-item :label="$t('license.productName')">
-                                    {{ license.productName }}
+                                    {{ license.productName || '-' }}
                                 </el-descriptions-item>
                                 <el-descriptions-item :label="$t('license.productStatus')">
-                                    <el-tooltip
-                                        v-if="license.status.indexOf('lost') !== -1"
-                                        :content="$t('license.lostHelper')"
-                                    >
-                                        <el-tag type="info">
-                                            {{ $t('license.' + license.status) }}
-                                        </el-tag>
-                                    </el-tooltip>
-                                    <el-tag v-else>{{ $t('license.' + license.status) }}</el-tag>
+                                    <div v-if="license.status">
+                                        <el-tooltip
+                                            v-if="license.status.indexOf('lost') !== -1"
+                                            :content="$t('license.lostHelper')"
+                                        >
+                                            <el-tag type="info">
+                                                {{ $t('license.' + license.status) }}
+                                            </el-tag>
+                                        </el-tooltip>
+                                        <el-tag v-else>{{ $t('license.' + license.status) }}</el-tag>
+                                    </div>
+                                    <span v-else>-</span>
                                 </el-descriptions-item>
                             </el-descriptions>
                         </div>
@@ -80,12 +79,11 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue';
-import { GlobalStore } from '@/store';
-import { getLicense } from '@/api/modules/setting';
+import { getLicense, syncLicense } from '@/api/modules/setting';
 import CardWithHeader from '@/components/card-with-header/index.vue';
 import Upload from '@/views/setting/license/upload/index.vue';
 import i18n from '@/lang';
-const globalStore = GlobalStore();
+import { MsgSuccess } from '@/utils/message';
 const loading = ref();
 const uploadRef = ref();
 
@@ -99,12 +97,21 @@ const license = reactive({
     status: '',
 });
 
-const hideEntrance = () => {
-    globalStore.setShowEntranceWarn(false);
-};
-
 const toHalo = () => {
     window.open('https://halo.test.lxware.cn/', '_blank', 'noopener,noreferrer');
+};
+
+const onSync = async () => {
+    loading.value = true;
+    await syncLicense()
+        .then(() => {
+            loading.value = false;
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            search();
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const timestampToDate = (timestamp: number) => {
@@ -119,9 +126,10 @@ const timestampToDate = (timestamp: number) => {
 };
 
 const search = async () => {
-    loading.value = false;
+    loading.value = true;
     await getLicense()
         .then((res) => {
+            loading.value = false;
             license.status = res.data.status;
             if (res.data.status !== 'Enable') {
                 return;
@@ -140,10 +148,6 @@ const search = async () => {
         .catch(() => {
             loading.value = false;
         });
-};
-
-const hasLicense = () => {
-    return license.status === 'Enable';
 };
 
 const toUpload = () => {

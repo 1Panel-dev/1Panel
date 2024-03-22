@@ -14,12 +14,8 @@ export const getLicense = () => {
     return http.get<Setting.License>(`/licenses/get`);
 };
 
-export const addLicense = (params: Setting.LicenseCreate) => {
-    return http.post<Setting.LicenseCreate>(`/licenses`, params);
-};
-
-export const updateLicense = (params: Setting.LicenseUpdate) => {
-    return http.post<Setting.LicenseUpdate>(`/licenses/update`, params);
+export const syncLicense = () => {
+    return http.post(`/licenses/sync`);
 };
 
 export const getSettingInfo = () => {
