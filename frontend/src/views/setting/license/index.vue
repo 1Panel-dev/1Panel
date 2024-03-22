@@ -84,8 +84,10 @@ import CardWithHeader from '@/components/card-with-header/index.vue';
 import Upload from '@/views/setting/license/upload/index.vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
+import { GlobalStore } from '@/store';
 const loading = ref();
 const uploadRef = ref();
+const globalStore = GlobalStore();
 
 const license = reactive({
     licenseName: '',
@@ -131,6 +133,7 @@ const search = async () => {
         .then((res) => {
             loading.value = false;
             license.status = res.data.status;
+            globalStore.isProductPro = res.data.status === 'Enable';
             if (res.data.status !== 'Enable') {
                 return;
             }

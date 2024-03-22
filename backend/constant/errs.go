@@ -43,6 +43,9 @@ var (
 	ErrNameIsExist         = "ErrNameIsExist"
 	ErrDemoEnvironment     = "ErrDemoEnvironment"
 	ErrCmdIllegal          = "ErrCmdIllegal"
+	ErrXpackNotFound       = "ErrXpackNotFound"
+	ErrXpackNotActive      = "ErrXpackNotActive"
+	ErrXpackOutOfDate      = "ErrXpackOutOfDate"
 )
 
 // app
