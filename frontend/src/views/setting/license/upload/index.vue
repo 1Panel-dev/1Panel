@@ -88,6 +88,7 @@ const submit = async () => {
             em('search');
             open.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            window.location.reload();
         })
         .catch(() => {
             loading.value = false;
