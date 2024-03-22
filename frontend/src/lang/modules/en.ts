@@ -2277,6 +2277,18 @@ const message = {
             cc: 'CC attack',
             isBlocking: 'Blocking',
             isFree: 'Unblocked',
+            unLock: 'Unlock',
+            unLockHelper: 'Do you want to unblock IP: {0}?',
+            saveDefault: 'Save default',
+            saveToWebsite: 'Apply to website',
+            saveToWebsiteHelper: 'Apply current settings to all websites? ',
+            websiteHelper:
+                'Here are the default settings for creating a website. Modifications need to be applied to the website to take effect',
+            websiteHelper2:
+                'Here are the default settings for creating a website. Please modify the specific configuration at the website',
+            ipGroup: 'IP group',
+            ipGroupHelper:
+                'One IP or IP segment per line, supports IPv4 and IPv6, for example: 192.168.1.1 or 192.168.1.0/24',
         },
         monitor: {
             name: 'Website Monitor',

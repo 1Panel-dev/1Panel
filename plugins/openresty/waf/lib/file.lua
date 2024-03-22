@@ -3,6 +3,7 @@ local pairs = pairs
 local insert_table = table.insert
 local lower_str = string.lower
 local open_file = io.open
+local gsub_str =  string.gsub
 local decode = cjson.decode
 
 local _M = {}
@@ -54,9 +55,25 @@ function _M.read_file2table(file_path)
     if file == nil then
         return nil
     end
-    str = file:read("*a")
+    local str = file:read("*a")
     file:close()
     return decode(str)
+end
+
+function _M.read_list2table(filePath)
+    local file, err = open_file(filePath, "r")
+    if not file then
+        ngx.log(ngx.ERR, "Failed to open file ", err)
+        return
+    end
+    
+    local t = {}
+    for line in file:lines() do
+        line = gsub_str(line, "[\r\n]", "")
+        insert_table(t, line)
+    end
+    file:close()
+    return t
 end
 
 function _M.set_content_to_file(data, file_path)

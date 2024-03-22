@@ -42,54 +42,39 @@ end
 
 function _M.block_ip(ip, rule)
     local ok, err = nil, nil
-    --local msg = "拉黑IP :  " .. ip .. "国家 " .. ngx.ctx.ip_location.country["zh"]
-    --if rule then
-    --    msg = msg .. " 规则 " .. rule.type
-    --end
-    --ngx.log(ngx.ERR, msg)
+    local msg = "拉黑IP :  " .. ip .. "国家 " .. ngx.ctx.ip_location.country["zh"]
+    if rule then
+        msg = msg .. " 规则 " .. rule.type
+    end
+    ngx.log(ngx.ERR, msg)
 
-    if config.redis_on then
+    if config.is_redis_on() then
         local red, err1 = redis_util.get_conn()
         if not red then
             return nil, err1
         end
         local key = "black_ip:" .. ip
-
         local exists = red:exists(key)
         if exists == 0 then
             ok, err = red:set(key, 1)
-            if ok then
-                ngx.ctx.ip_blocked = true
-            else
-                ngx.log(ngx.ERR, "failed to set redis key " .. key, err)
-            end
         end
-
         if rule.ipBlockTime > 0 then
             ok, err = red:expire(key, rule.ipBlockTime)
-            if not ok then
-                ngx.log(ngx.ERR, "failed to expire redis key " .. key, err)
-            end
         end
-
+        if not ok then
+            ngx.log(ngx.ERR, "failed to expire redis key " .. key, err)
+        end
         redis_util.close_conn(red)
     else
-        local wafBlackIp = ngx.shared.waf_black_ip
-        local exists = wafBlackIp:get(ip)
+        local block_ip_dict = ngx.shared.waf_block_ip
+        local exists = block_ip_dict:get(ip)
         if not exists then
-            ok, err = wafBlackIp:set(ip, 1, rule.ipBlockTime)
-            if ok then
-                ngx.ctx.ip_blocked = true
-            else
-                ngx.log(ngx.ERR, "failed to set key " .. ip, err)
-            end
+            ok, err = block_ip_dict:set(ip, 1, rule.ipBlockTime)
         elseif rule.ipBlockTime > 0 then
-            ok, err = wafBlackIp:expire(ip, rule.ipBlockTime)
-            if ok then
-                ngx.ctx.ip_blocked = true
-            else
-                ngx.log(ngx.ERR, "failed to expire key " .. ip, err)
-            end
+            ok, err = block_ip_dict:expire(ip, rule.ipBlockTime)
+        end
+        if not ok then
+            ngx.log(ngx.ERR, "failed to block ip " .. ip, err)
         end
     end
 
@@ -137,9 +122,12 @@ function _M.exec_action(rule_config, match_rule, data)
     ngx.ctx.exec_rule = rule_config
     ngx.ctx.hitData = data
     ngx.ctx.is_attack = true
-
+    ngx.ctx.ip_blocked= false
+    
     if rule_config.ipBlock and rule_config.ipBlock == 'on' then
-        _M.block_ip(ngx.ctx.ip, rule_config)
+        if _M.block_ip(ngx.ctx.ip, rule_config) then
+            ngx.ctx.ip_blocked= true
+        end
     end
 
     attack_count(rule_config.type)

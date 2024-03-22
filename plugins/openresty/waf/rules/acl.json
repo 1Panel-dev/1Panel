@@ -16,6 +16,7 @@
         }
       ],
       "action": "deny",
+      "code": 403,
       "res": "",
       "ipBlock": "off",
       "ipBlockTime": 60,

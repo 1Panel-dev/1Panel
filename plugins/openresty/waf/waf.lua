@@ -117,17 +117,13 @@ local function waf_api()
     if not body_data then
         return false
     end
-    ngx.log(ngx.ERR,"1111")
     local args
     if body_data then
         args = cjson.decode(body_data)
     end
-    ngx.log(ngx.ERR,"2222")
     if args == nil or args.token == nil then
         return false
     end
-    ngx.log(ngx.ERR,"token",args.token)
-    ngx.log(ngx.ERR,"config token",config.get_token())
     if args.token ~= config.get_token() then
         return false
     end
@@ -136,10 +132,16 @@ local function waf_api()
         config.load_config_file()
         ngx.exit(200)
     end
-    if uri == '/get_black_ip' then
+    if uri == '/get_block_ip' then
         --TODO 从 redis 获取黑名单
-        local data = ngx.shared.waf_black_ip:get_keys(0)
+        local block_ip_dict = ngx.shared.waf_block_ip
+        local data = block_ip_dict:get_keys(0)
         return_json(encode(data))
+    end
+    if uri == '/remove_block_ip' and args.ip then
+        local block_ip_dict = ngx.shared.waf_block_ip
+        block_ip_dict:delete(args.ip)
+        ngx.exit(200)
     end
 end
 
@@ -166,6 +168,8 @@ if config.is_waf_on() then
     lib.default_ua_black()
     
     --lib.cc_url()
+    lib.cc()
+    
     if lib.is_white_url() then
         return true
     end
@@ -175,7 +179,6 @@ if config.is_waf_on() then
     lib.allow_location_check()
     lib.method_check()
     lib.acl()
-    lib.cc()
     --lib.bot_check()
     lib.args_check()
     lib.cookie_check()
