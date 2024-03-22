@@ -10,7 +10,7 @@ jobs:
     name: 为 PR 添加标签
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions-ecosystem/action-add-labels@v1
         with:
           github_token: ${{ secrets.GITHUBTOKEN }}
