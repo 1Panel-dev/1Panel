@@ -18,7 +18,7 @@ function _M.set_access_token(k, v)
         --local prefix = "ac_token:"
         --redis_util.set(prefix .. accesstoken, accesstoken, timeout)
     else
-        local limit = ngx.shared.waf_accesstoken
+        local limit = ngx.shared.waf_limit
         limit:set(key, value, 7200)
     end
 
@@ -51,7 +51,7 @@ function _M.check_access_token()
             return true
         end
     else
-        local limit = ngx.shared.waf_accesstoken
+        local limit = ngx.shared.waf_limit
         value = limit:get(key)
     end
     if value and value == accesstoken then

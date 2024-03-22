@@ -1,11 +1,13 @@
 local file_utils = require "file"
 local lfs = require "lfs"
 local utils = require "utils"
+local cjson = require "cjson"
 
 local read_rule = file_utils.read_rule
 local read_file2string = file_utils.read_file2string
 local read_file2table = file_utils.read_file2table
 local set_content_to_file = file_utils.set_content_to_file
+local read_list2table = file_utils.read_list2table
 local list_dir = lfs.dir
 local attributes = lfs.attributes
 local match_str = string.match
@@ -14,6 +16,7 @@ local waf_dir = "/usr/local/openresty/1pwaf/"
 local config_dir = waf_dir .. 'conf/'
 local global_rule_dir = waf_dir .. 'rules/'
 local site_dir = waf_dir .. 'sites/'
+local ip_group_dir = global_rule_dir .. 'ip_group/'
 
 local _M = {}
 local config = {}
@@ -44,6 +47,7 @@ local function init_sites_config()
                                     local s_rule = nil
                                     if rule_type == "methodWhite" then
                                         s_rule = read_rule(rule_dir, rule_type, true)
+                                        
                                     else
                                         s_rule = read_rule(rule_dir, rule_type)
                                     end
@@ -59,9 +63,6 @@ local function init_sites_config()
     end
     config.site_config = site_config
     config.site_rules = site_rules
-
-    local waf_dict = ngx.shared.waf
-    waf_dict:set("config", config)
 end
 
 local function ini_waf_info()
@@ -71,7 +72,21 @@ local function ini_waf_info()
     end
 end
 
-
+local function load_ip_group()
+    local ip_group_list = {}
+    for entry in list_dir(ip_group_dir) do
+        if entry ~= "." and entry ~= ".." then
+            local group_path = ip_group_dir .. entry
+            local group_value = read_list2table(group_path)
+            ip_group_list[entry] = group_value
+        end
+    end
+    local waf_dict = ngx.shared.waf
+    local ok , err =  waf_dict:set("ip_group_list",  cjson.encode(ip_group_list))
+    if not ok then 
+        ngx.log(ngx.ERR, "Failed to set ip_group_list",err)
+    end
+end
 
 local function init_global_config()
     local global_config_file = config_dir .. 'global.json'
@@ -86,14 +101,14 @@ local function init_global_config()
     rules.uaWhite = read_rule(global_rule_dir, "uaWhite")
     rules.urlBlack = read_rule(global_rule_dir, "urlBlack")
     rules.urlWhite = read_rule(global_rule_dir, "urlWhite")
-    rules.ipBlack = read_rule(global_rule_dir, "ipBlack")
     rules.ipWhite = read_rule(global_rule_dir, "ipWhite")
     rules.args = read_rule(global_rule_dir, "args")
     rules.cookie = read_rule(global_rule_dir, "cookie")
     rules.defaultUaBlack = read_rule(global_rule_dir, "defaultUaBlack")
     rules.defaultUrlBlack = read_rule(global_rule_dir, "defaultUrlBlack")
     rules.header = read_rule(global_rule_dir, "header")
-
+    rules.ipBlack = read_rule(global_rule_dir, "ipBlack")
+    
     config.global_rules = rules
 
     local html_res = {}
@@ -113,27 +128,28 @@ local function init_global_config()
     _M.waf_log_db_path =  _M.waf_db_dir .. "req_log.db"
     _M.config_dir = config_dir
 
-
-    local waf_dict = ngx.shared.waf
-    waf_dict:set("config", config)
-end
-
-local function get_config()
-    local waf_dict = ngx.shared.waf
-    local config_table =  waf_dict:get("config")
-    if config_table == nil then
-        init_global_config()
-        init_sites_config()
-        return config
-    end
-    config = config_table
-    return config_table
 end
 
 function _M.load_config_file()
     ini_waf_info()
     init_global_config()
     init_sites_config()
+    load_ip_group()
+    
+    local waf_dict = ngx.shared.waf
+    local ok,err = waf_dict:set("config", cjson.encode(config))
+    if not ok then 
+        ngx.log(ngx.ERR, "Failed to set config",err)
+    end
+end
+
+local function get_config()
+    local waf_dict = ngx.shared.waf
+    local cache_config = waf_dict:get("config")
+    if not cache_config then
+        return config
+    end
+    return cjson.decode(cache_config) 
 end
 
 function _M.get_site_config(website_key)

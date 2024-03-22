@@ -5,7 +5,7 @@ local config = require "config"
 uuid.seed()
 
 local update_req_count = function()
-    local req_count =  ngx.shared.dict_req_count
+    local req_count =  ngx.shared.waf_req_count
     local req_count_update = req_count:get("req_count") or 0
     req_count:set("req_count", 0)
     local count_4xx_update = req_count:get("count_4xx") or 0

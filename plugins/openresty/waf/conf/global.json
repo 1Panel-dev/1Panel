@@ -79,19 +79,19 @@
   "defaultIpBlack": {
     "state": "on",
     "type": "defaultIpBlack",
-    "code": 444,
+    "code": 403,
     "action": "deny"
   },
   "xss": {
     "state": "on",
     "type": "xss",
-    "code": 444,
+    "code": 403,
     "action": "deny"
   },
   "sql": {
     "state": "on",
     "type": "sql",
-    "code": 444,
+    "code": 403,
     "action": "deny"
   },
   "cc": {

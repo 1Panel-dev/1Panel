@@ -7,6 +7,8 @@ local geo = require "geoip"
 local libinjection = require "resty.libinjection"
 local config = require "config"
 local utils = require "utils"
+local ipmatcher = require "resty.ipmatcher"
+local cjson = require "cjson"
 
 local pairs = pairs
 local ipairs = ipairs
@@ -108,14 +110,33 @@ local function match_ip(ip_rule, ip, ipn)
         if ipn == ipv4_to_int(ip_rule.ipv4) then
             return true
         end
+        
     elseif ip_rule.type == "ipArr" then
         local ip_start_n = ipv4_to_int(ip_rule.ipStart)
         local ip_end_n = ipv4_to_int(ip_rule.ipEnd)
         if is_ip_in_array(ipn, ip_start_n, ip_end_n) then
             return true
         end
+        
     elseif ip_rule.type == "ipGroup" then
-        --TODO 匹配 IP 组
+        if ip_rule.ipGroup == nil or  ip_rule.ipGroup == "" then
+            return false
+        end
+        local waf_dict = ngx.shared.waf
+        local ip_group_list = waf_dict:get("ip_group_list")
+        if ip_group_list == nil then
+            return false
+        end
+        local ip_group_obj = cjson.decode(ip_group_list)
+        local ip_group = ip_group_obj[ip_rule.ipGroup]
+        if ip_group == nil then
+            return false
+        end
+        local ip_matcher = ipmatcher.new(ip_group)
+        local ok = ip_matcher:match(ip)
+        if ok then
+            return true
+        end
     end
 
     return false
@@ -243,19 +264,24 @@ function _M.default_ip_black()
 end
 
 function _M.black_ip()
+    local ip = ngx.ctx.ip
+    if ip == "unknown" then
+        return false
+    end
+    local exists = false
+    if config.is_redis_on() then
+        exists = redis_util.get("black_ip:" .. ip)
+    else
+        local block_ip_dict = ngx.shared.waf_block_ip
+        exists = block_ip_dict:get(ip)
+    end
+
+    if exists then
+        ngx.exit(444)
+        return true
+    end
+
     if is_global_state_on("ipBlack") then
-        local ip = ngx.ctx.ip
-        if ip == "unknown" then
-            return false
-        end
-        local exists = false
-
-        if config.is_redis_on() then
-            exists = redis_util.get("black_ip:" .. ip)
-        else
-            exists = ngx.shared.waf_black_ip:get(ip)
-        end
-
         local ip_black_list = get_global_rules("ipBlack")
         local ipn = ipv4_to_int(ip)
         for _, ip_rule in pairs(ip_black_list) do
@@ -268,11 +294,7 @@ function _M.black_ip()
         if exists then
             exec_action(get_global_config("ipBlack"))
         end
-
-        return exists
     end
-
-    return false
 end
 
 function _M.method_check()
@@ -352,20 +374,30 @@ function _M.cc()
 
         if config.is_redis_on() then
             key = "cc_req_count:" .. key
+            local exist = redis_util.get(key)
+            if exist then
+                ngx.exit(444)
+                return
+            end
             local count, _ = redis_util.incr(key, cc_config.duration)
             if not count then
                 redis_util.set(key, 1, cc_config.duration)
-            elseif count > cc_config.threshold then
-                exec_action(cc_config, { rule = cc_config.rule })
+            elseif count >= cc_config.threshold then
+                exec_action(cc_config)
                 return
             end
         else
+            local block_ip_dict = ngx.shared.waf_block_ip
+            local exists = block_ip_dict:get(ip)
+            if exists then
+                ngx.exit(444)
+            end
             local limit = ngx.shared.waf_limit
             local count, _ = limit:incr(key, 1, 0, cc_config.duration)
             if not count then
                 limit:set(key, 1, cc_config.duration)
-            elseif count > cc_config.threshold then
-                exec_action(cc_config, { rule = cc_config.rule })
+            elseif count >= cc_config.threshold then
+                exec_action(cc_config)
                 return
             end
         end
@@ -615,7 +647,6 @@ function _M.acl()
         if rule.state == nil or rule.state == "off" then
             goto continue
         end
-        ngx.log(ngx.ERR,"acl rule: "..rule.name .. "state"..rule.state)
         local conditions = rule.conditions
         local match = true
         local condition_rule = ""

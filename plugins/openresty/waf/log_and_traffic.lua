@@ -208,7 +208,7 @@ end
 
 local function count_req_status(is_attack)
     local status = ngx.status
-    local req_count = ngx.shared.dict_req_count
+    local req_count = ngx.shared.waf_req_count
     add_count(req_count, "req_count")
     if (status >= 400 and status < 500) then
         add_count(req_count, "count_4xx")
