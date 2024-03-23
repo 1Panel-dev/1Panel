@@ -122,13 +122,13 @@ local function match_ip(ip_rule, ip, ipn)
         if ip_rule.ipGroup == nil or  ip_rule.ipGroup == "" then
             return false
         end
-        local waf_dict = ngx.shared.waf
-        local ip_group_list = waf_dict:get("ip_group_list")
+        local ip_group_list = cache:get("ip_group_list", {
+            ipc_shm = "ipc_shared_dict",
+        })
         if ip_group_list == nil then
             return false
         end
-        local ip_group_obj = cjson.decode(ip_group_list)
-        local ip_group = ip_group_obj[ip_rule.ipGroup]
+        local ip_group = ip_group_list[ip_rule.ipGroup]
         if ip_group == nil then
             return false
         end

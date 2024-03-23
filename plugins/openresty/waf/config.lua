@@ -3,6 +3,7 @@ local lfs = require "lfs"
 local utils = require "utils"
 local cjson = require "cjson"
 
+
 local read_rule = file_utils.read_rule
 local read_file2string = file_utils.read_file2string
 local read_file2table = file_utils.read_file2table
@@ -81,10 +82,11 @@ local function load_ip_group()
             ip_group_list[entry] = group_value
         end
     end
-    local waf_dict = ngx.shared.waf
-    local ok , err =  waf_dict:set("ip_group_list",  cjson.encode(ip_group_list))
-    if not ok then 
-        ngx.log(ngx.ERR, "Failed to set ip_group_list",err)
+    local ok, err = cache:set("ip_group_list", {
+        ipc_shm = "ipc_shared_dict",
+    },ip_group_list)
+    if not ok then
+        ngx.log(ngx.ERR, "Failed to set config",err)
     end
 end
 
@@ -136,20 +138,22 @@ function _M.load_config_file()
     init_sites_config()
     load_ip_group()
     
-    local waf_dict = ngx.shared.waf
-    local ok,err = waf_dict:set("config", cjson.encode(config))
-    if not ok then 
+    local ok, err = cache:set("config", {
+        ipc_shm = "ipc_shared_dict",
+    },config)
+    if not ok then
         ngx.log(ngx.ERR, "Failed to set config",err)
     end
 end
 
 local function get_config()
-    local waf_dict = ngx.shared.waf
-    local cache_config = waf_dict:get("config")
+    local cache_config = cache:get("config", {
+        ipc_shm = "ipc_shared_dict",
+    })
     if not cache_config then
         return config
     end
-    return cjson.decode(cache_config) 
+    return cache_config
 end
 
 function _M.get_site_config(website_key)
