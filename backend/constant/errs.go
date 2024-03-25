@@ -18,6 +18,8 @@ const (
 	CodeErrDomain         = 409
 	CodeErrInternalServer = 500
 	CodeErrHeader         = 406
+
+	CodeErrXpack = 410
 )
 
 // internal

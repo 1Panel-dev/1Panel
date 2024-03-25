@@ -174,7 +174,7 @@ ErrRuleExist: "Rule is Exist"
 ErrRuleNotExist: "Rule is not Exist"
 
 #license
-ErrLicense: "License format error, please re-import!"
+ErrLicense: "License format error, {{ .err }}, please re-import!"
 ErrLicenseCheckInLocal: "Local license check failed, error {{ .err }}, please try again!"
 ErrLicenseCheckInRemote: "Remote license check failed, error {{ .err }}, please try again!"
 ErrLicenseSave: "Failed to save license information, error {{ .err }}, please try again!"
