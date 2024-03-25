@@ -175,7 +175,7 @@ ErrRuleExist: "規則名稱已存在"
 ErrRuleNotExist: "規則不存在"
 
 #license
-ErrLicense: "License 格式錯誤，請重新匯入！"
+ErrLicense: "License 格式錯誤，{{ .err }}，請重新匯入！"
 ErrLicenseCheckInLocal: "License 本地校驗失敗，錯誤 {{ .err }}，請重試！"
 ErrLicenseCheckInRemote: "License 遠程校驗失敗，錯誤 {{ .err }}，請重試！"
 ErrLicenseSave: "License 資訊保存失敗，錯誤 {{ .err }}，請重試！"
