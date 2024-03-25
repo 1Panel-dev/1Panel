@@ -2,73 +2,80 @@
     <div>
         <div class="app-status" v-if="data.isExist">
             <el-card>
-                <div>
-                    <el-tag effect="dark" type="success">{{ data.app }}</el-tag>
-                    <Status class="status-content" :key="refresh" :status="data.status"></Status>
-                    <el-tag class="status-content">{{ $t('app.version') }}:{{ data.version }}</el-tag>
+                <div class="flex items-center">
+                    <div>
+                        <el-tag effect="dark" type="success">{{ data.app }}</el-tag>
+                    </div>
+                    <div>
+                        <Status class="status-content" :key="refresh" :status="data.status"></Status>
+                    </div>
+                    <div>
+                        <el-tag class="status-content">{{ $t('app.version') }}:{{ data.version }}</el-tag>
+                    </div>
+                    <div>
+                        <span class="buttons">
+                            <el-button
+                                type="primary"
+                                v-if="data.status != 'Running'"
+                                link
+                                @click="onOperate('start')"
+                                :disabled="data.status === 'Installing'"
+                            >
+                                {{ $t('app.start') }}
+                            </el-button>
+                            <el-button type="primary" v-if="data.status === 'Running'" link @click="onOperate('stop')">
+                                {{ $t('app.stop') }}
+                            </el-button>
+                            <el-divider direction="vertical" />
+                            <el-button
+                                type="primary"
+                                link
+                                :disabled="data.status === 'Installing'"
+                                @click="onOperate('restart')"
+                            >
+                                {{ $t('app.restart') }}
+                            </el-button>
+                            <el-divider direction="vertical" />
+                            <el-button
+                                type="primary"
+                                link
+                                v-if="data.app === 'OpenResty'"
+                                @click="onOperate('reload')"
+                                :disabled="data.status !== 'Running'"
+                            >
+                                {{ $t('app.reload') }}
+                            </el-button>
+                            <el-divider v-if="data.app === 'OpenResty'" direction="vertical" />
+                            <el-button
+                                type="primary"
+                                @click="setting"
+                                link
+                                :disabled="
+                                    data.status === 'Installing' ||
+                                    (data.status !== 'Running' && data.app === 'OpenResty')
+                                "
+                            >
+                                {{ $t('commons.button.set') }}
+                            </el-button>
+                            <el-divider v-if="data.app === 'OpenResty'" direction="vertical" />
+                            <el-button
+                                v-if="data.app === 'OpenResty'"
+                                type="primary"
+                                @click="clear"
+                                link
+                                :disabled="
+                                    data.status === 'Installing' ||
+                                    (data.status !== 'Running' && data.app === 'OpenResty')
+                                "
+                            >
+                                {{ $t('nginx.clearProxyCache') }}
+                            </el-button>
+                        </span>
+                    </div>
 
-                    <span class="buttons">
-                        <el-button
-                            type="primary"
-                            v-if="data.status != 'Running'"
-                            link
-                            @click="onOperate('start')"
-                            :disabled="data.status === 'Installing'"
-                        >
-                            {{ $t('app.start') }}
-                        </el-button>
-                        <el-button type="primary" v-if="data.status === 'Running'" link @click="onOperate('stop')">
-                            {{ $t('app.stop') }}
-                        </el-button>
-                        <el-divider direction="vertical" />
-                        <el-button
-                            type="primary"
-                            link
-                            :disabled="data.status === 'Installing'"
-                            @click="onOperate('restart')"
-                        >
-                            {{ $t('app.restart') }}
-                        </el-button>
-                        <el-divider direction="vertical" />
-                        <el-button
-                            type="primary"
-                            link
-                            v-if="data.app === 'OpenResty'"
-                            @click="onOperate('reload')"
-                            :disabled="data.status !== 'Running'"
-                        >
-                            {{ $t('app.reload') }}
-                        </el-button>
-                        <el-divider v-if="data.app === 'OpenResty'" direction="vertical" />
-                        <el-button
-                            type="primary"
-                            @click="setting"
-                            link
-                            :disabled="
-                                data.status === 'Installing' || (data.status !== 'Running' && data.app === 'OpenResty')
-                            "
-                        >
-                            {{ $t('commons.button.set') }}
-                        </el-button>
-                        <el-divider v-if="data.app === 'OpenResty'" direction="vertical" />
-                        <el-button
-                            v-if="data.app === 'OpenResty'"
-                            type="primary"
-                            @click="clear"
-                            link
-                            :disabled="
-                                data.status === 'Installing' || (data.status !== 'Running' && data.app === 'OpenResty')
-                            "
-                        >
-                            {{ $t('nginx.clearProxyCache') }}
-                        </el-button>
-                    </span>
-
-                    <span class="warn" v-if="key === 'openresty' && (httpPort != 80 || httpsPort != 443)">
-                        <el-alert class="helper" type="error" :closable="false">
-                            {{ $t('website.openrestyHelper', [httpPort, httpsPort]) }}
-                        </el-alert>
-                    </span>
+                    <div class="ml-5" v-if="key === 'openresty' && (httpPort != 80 || httpsPort != 443)">
+                        <el-text type="danger">{{ $t('website.openrestyHelper', [httpPort, httpsPort]) }}</el-text>
+                    </div>
                 </div>
             </el-card>
         </div>
@@ -237,12 +244,3 @@ onMounted(() => {
     onCheck();
 });
 </script>
-
-<style lang="scss">
-.warn {
-    margin-left: 20px;
-    .helper {
-        display: inline;
-    }
-}
-</style>

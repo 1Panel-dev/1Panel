@@ -20,7 +20,7 @@
                 </el-form-item>
                 <el-form-item v-if="configDir" :label="$t('website.runDir')">
                     <el-space wrap>
-                        <el-select v-model="update.siteDir">
+                        <el-select v-model="update.siteDir" class="p-w-200">
                             <el-option
                                 v-for="(item, index) in dirs"
                                 :label="item"
