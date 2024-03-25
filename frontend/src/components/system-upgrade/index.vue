@@ -14,6 +14,10 @@
             </el-button>
             <el-divider direction="vertical" />
         </span>
+        <el-button type="primary" link @click="toHalo">
+            {{ isProductPro ? $t('license.pro') : $t('license.community') }}
+            <span class="version">{{ ': ' + version }}</span>
+        </el-button>
         <el-badge is-dot class="item" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
             <el-button type="primary" link @click="onLoadUpgradeInfo">
                 <span>（{{ $t('setting.hasNewVersion') }}）</span>
@@ -77,6 +81,7 @@ import { ElMessageBox } from 'element-plus';
 const globalStore = GlobalStore();
 
 const version = ref<string>('');
+const isProductPro = ref();
 const loading = ref(false);
 const drawerVisible = ref(false);
 const upgradeInfo = ref();
@@ -96,6 +101,10 @@ const search = async () => {
 
 const handleClose = () => {
     drawerVisible.value = false;
+};
+
+const toHalo = () => {
+    window.open('https://halo.test.lxware.cn/', '_blank', 'noopener,noreferrer');
 };
 
 const toDoc = () => {
@@ -149,6 +158,7 @@ const onUpgrade = async () => {
 };
 
 onMounted(() => {
+    isProductPro.value = globalStore.isProductPro;
     search();
 });
 </script>

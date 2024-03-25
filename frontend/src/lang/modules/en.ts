@@ -1462,8 +1462,9 @@ const message = {
         expiresAt: 'Expiration Time',
         productName: 'Product Name',
         productStatus: 'Product Status',
-        lost01: 'Lost * 1',
-        lost02: 'Lost * 2',
+        Lost01: 'Lost * 1',
+        Lost02: 'Lost * 2',
+        Lost03: 'Lost',
         Enable: 'Enabled',
         Disable: 'Disabled',
         lostHelper:

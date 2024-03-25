@@ -46,6 +46,8 @@ import { UploadFileData } from '@/api/modules/setting';
 import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const loading = ref(false);
 const open = ref(false);
@@ -85,7 +87,7 @@ const submit = async () => {
             loading.value = false;
             uploadRef.value!.clearFiles();
             uploaderFiles.value = [];
-            em('search');
+            globalStore.isProductPro = true;
             open.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             window.location.reload();
