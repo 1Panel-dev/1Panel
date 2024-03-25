@@ -4,7 +4,7 @@
             <template #main>
                 <el-row :gutter="20" class="mt-5; mb-10">
                     <el-col :xs="24" :sm="24" :md="15" :lg="15" :xl="15">
-                        <div class="descriptions">
+                        <div class="descriptions" v-if="hasLicense()">
                             <el-descriptions :column="1" direction="horizontal" size="large" border>
                                 <el-descriptions-item :label="$t('license.authorizationId')">
                                     {{ license.licenseName || '-' }}
@@ -37,10 +37,25 @@
                                 </el-descriptions-item>
                             </el-descriptions>
                         </div>
+
+                        <CardWithHeader :header="$t('home.overview')" height="160px" v-if="!hasLicense()">
+                            <template #body>
+                                <div class="h-overview">
+                                    <el-row>
+                                        <el-col :span="6">
+                                            <span>{{ $t('setting.license') }}</span>
+                                        </el-col>
+                                        <el-col :span="6">
+                                            <span>{{ $t('license.community') }}</span>
+                                        </el-col>
+                                    </el-row>
+                                </div>
+                            </template>
+                        </CardWithHeader>
                     </el-col>
 
                     <el-col :xs="24" :sm="24" :md="9" :lg="9" :xl="9">
-                        <CardWithHeader :header="$t('license.quickUpdate')">
+                        <CardWithHeader :header="$t('license.quickUpdate')" height="160px">
                             <template #body>
                                 <div class="h-app-card">
                                     <el-row :gutter="10">
@@ -84,8 +99,10 @@ import CardWithHeader from '@/components/card-with-header/index.vue';
 import Upload from '@/views/setting/license/upload/index.vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
+import { GlobalStore } from '@/store';
 const loading = ref();
 const uploadRef = ref();
+const globalStore = GlobalStore();
 
 const license = reactive({
     licenseName: '',
@@ -115,14 +132,19 @@ const onSync = async () => {
 };
 
 const timestampToDate = (timestamp: number) => {
-    const date = new Date(timestamp);
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-    const seconds = date.getSeconds();
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    const date = new Date(timestamp * 1000);
+    const y = date.getFullYear();
+    let m: string | number = date.getMonth() + 1;
+    m = m < 10 ? `0${String(m)}` : m;
+    let d: string | number = date.getDate();
+    d = d < 10 ? `0${String(d)}` : d;
+    let h: string | number = date.getHours();
+    h = h < 10 ? `0${String(h)}` : h;
+    let minute: string | number = date.getMinutes();
+    minute = minute < 10 ? `0${String(minute)}` : minute;
+    let second: string | number = date.getSeconds();
+    second = second < 10 ? `0${String(second)}` : second;
+    return `${y}-${m}-${d} ${h}:${minute}:${second}`;
 };
 
 const search = async () => {
@@ -131,6 +153,7 @@ const search = async () => {
         .then((res) => {
             loading.value = false;
             license.status = res.data.status;
+            globalStore.isProductPro = res.data.status === 'Enable';
             if (res.data.status !== 'Enable') {
                 return;
             }
@@ -148,6 +171,10 @@ const search = async () => {
         .catch(() => {
             loading.value = false;
         });
+};
+
+const hasLicense = () => {
+    return license.status === 'Enable';
 };
 
 const toUpload = () => {

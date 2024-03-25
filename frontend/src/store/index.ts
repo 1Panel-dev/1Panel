@@ -36,6 +36,8 @@ export const GlobalStore = defineStore({
         currentDB: '',
         showEntranceWarn: true,
         defaultNetwork: 'all',
+
+        isProductPro: false,
     }),
     getters: {},
     actions: {

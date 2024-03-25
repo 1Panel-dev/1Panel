@@ -1,13 +1,13 @@
 import http from '@/api';
 import { deepCopy } from '@/utils/util';
 import { Base64 } from 'js-base64';
-import { ResPage, SearchWithPage, DescriptionUpdate, ResultData } from '../interface';
+import { ResPage, SearchWithPage, DescriptionUpdate } from '../interface';
 import { Backup } from '../interface/backup';
 import { Setting } from '../interface/setting';
 import { TimeoutEnum } from '@/enums/http-enum';
 
 export const UploadFileData = (params: FormData) => {
-    return http.upload<ResultData<Setting.License>>('/licenses/upload', params);
+    return http.upload('/licenses/upload', params);
 };
 
 export const getLicense = () => {

@@ -7,11 +7,9 @@
                         <img style="width: 80px" src="@/assets/images/1panel-logo-light.png" />
                     </div>
                     <h3>{{ $t('setting.description') }}</h3>
-
                     <h3>
                         <SystemUpgrade />
                     </h3>
-
                     <div style="margin-top: 10px">
                         <el-link @click="toDoc">
                             <el-icon><Document /></el-icon>
@@ -43,7 +41,6 @@ import SystemUpgrade from '@/components/system-upgrade/index.vue';
 
 const version = ref();
 const loading = ref();
-
 const search = async () => {
     const res = await getSettingInfo();
     version.value = res.data.systemVersion;
@@ -78,12 +75,5 @@ onMounted(() => {
     span {
         line-height: 20px;
     }
-}
-
-.version {
-    font-size: 14px;
-    color: #858585;
-    text-decoration: none;
-    letter-spacing: 0.5px;
 }
 </style>

@@ -1378,6 +1378,9 @@ const message = {
         indefinitePeriod: '无限期',
         levelUpPro: '升级专业版',
         knowMorePro: '了解更多专业版信息',
+        noLicense: '该部分为 Xpack 功能，请先在 面板设置-许可证 界面导入 License',
+        goImport: '去导入',
+        closeAlert: '当前页面可在面板设置中关闭显示',
     },
     clean: {
         scan: '开始扫描',

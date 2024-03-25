@@ -14,9 +14,6 @@
             </el-button>
             <el-divider direction="vertical" />
         </span>
-        <el-button type="primary" link @click="toHalo">
-            <span class="version">{{ licenseVersion + ': ' + version }}</span>
-        </el-button>
         <el-badge is-dot class="item" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
             <el-button type="primary" link @click="onLoadUpgradeInfo">
                 <span>（{{ $t('setting.hasNewVersion') }}）</span>
@@ -69,7 +66,7 @@
 </template>
 <script setup lang="ts">
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { getLicense, getSettingInfo, loadReleaseNotes, loadUpgradeInfo, upgrade } from '@/api/modules/setting';
+import { getSettingInfo, loadReleaseNotes, loadUpgradeInfo, upgrade } from '@/api/modules/setting';
 import MdEditor from 'md-editor-v3';
 import i18n from '@/lang';
 import 'md-editor-v3/lib/style.css';
@@ -80,7 +77,6 @@ import { ElMessageBox } from 'element-plus';
 const globalStore = GlobalStore();
 
 const version = ref<string>('');
-const licenseVersion = ref<string>('');
 const loading = ref(false);
 const drawerVisible = ref(false);
 const upgradeInfo = ref();
@@ -95,21 +91,11 @@ const props = defineProps({
 
 const search = async () => {
     const res = await getSettingInfo();
-    const rst = await getLicense();
-    if (rst.data !== undefined && rst.data.licenseName !== '') {
-        licenseVersion.value = i18n.global.t('license.pro');
-    } else {
-        licenseVersion.value = i18n.global.t('license.community');
-    }
     version.value = res.data.systemVersion;
 };
 
 const handleClose = () => {
     drawerVisible.value = false;
-};
-
-const toHalo = () => {
-    window.open('https://halo.test.lxware.cn/', '_blank', 'noopener,noreferrer');
 };
 
 const toDoc = () => {

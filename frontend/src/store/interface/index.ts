@@ -31,6 +31,8 @@ export interface GlobalState {
     currentDB: string;
     showEntranceWarn: boolean;
     defaultNetwork: string;
+
+    isProductPro: boolean;
 }
 
 export interface MenuState {
