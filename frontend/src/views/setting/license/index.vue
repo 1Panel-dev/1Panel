@@ -8,23 +8,33 @@
                             <el-descriptions :column="1" direction="horizontal" size="large" border>
                                 <el-descriptions-item :label="$t('license.authorizationId')">
                                     {{ license.licenseName || '-' }}
-                                    <el-button type="primary" class="ml-3" plain @click="onSync" size="small">
+                                    <el-button
+                                        type="primary"
+                                        class="ml-3"
+                                        plain
+                                        @click="onSync"
+                                        size="small"
+                                        v-if="showSync()"
+                                    >
                                         {{ $t('commons.button.sync') }}
                                     </el-button>
                                 </el-descriptions-item>
                                 <el-descriptions-item :label="$t('license.authorizedUser')">
                                     {{ license.assigneeName || '-' }}
                                 </el-descriptions-item>
-                                <el-descriptions-item :label="$t('license.expiresAt')">
-                                    {{ license.expiresAt || '-' }}
-                                </el-descriptions-item>
                                 <el-descriptions-item :label="$t('license.productName')">
                                     {{ license.productName || '-' }}
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t('license.trialInfo')">
+                                    {{ license.trial ? $t('license.trial') : $t('license.office') }}
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t('license.expiresAt')">
+                                    {{ license.expiresAt || '-' }}
                                 </el-descriptions-item>
                                 <el-descriptions-item :label="$t('license.productStatus')">
                                     <div v-if="license.status">
                                         <el-tooltip
-                                            v-if="license.status.indexOf('lost') !== -1"
+                                            v-if="license.status.indexOf('Lost') !== -1"
                                             :content="$t('license.lostHelper')"
                                         >
                                             <el-tag type="info">
@@ -40,7 +50,7 @@
 
                         <CardWithHeader :header="$t('home.overview')" height="160px" v-if="!hasLicense()">
                             <template #body>
-                                <div class="h-overview">
+                                <div class="h-app-card">
                                     <el-row>
                                         <el-col :span="6">
                                             <span>{{ $t('setting.license') }}</span>
@@ -58,7 +68,7 @@
                         <CardWithHeader :header="$t('license.quickUpdate')" height="160px">
                             <template #body>
                                 <div class="h-app-card">
-                                    <el-row :gutter="10">
+                                    <el-row>
                                         <el-col :span="15">
                                             <div class="h-app-content">{{ $t('license.importLicense') }}：</div>
                                         </el-col>
@@ -70,7 +80,7 @@
                                     </el-row>
                                 </div>
                                 <div class="h-app-card">
-                                    <el-row :gutter="10">
+                                    <el-row>
                                         <el-col :span="15">
                                             <div class="h-app-content">{{ $t('license.technicalAdvice') }}：</div>
                                         </el-col>
@@ -177,6 +187,10 @@ const hasLicense = () => {
     return license.status === 'Enable';
 };
 
+const showSync = () => {
+    return license.status.indexOf('Lost') !== -1 || license.status === 'Disable';
+};
+
 const toUpload = () => {
     uploadRef.value.acceptParams();
 };
@@ -191,17 +205,6 @@ onMounted(() => {
     padding: 10px 15px;
     margin-right: 10px;
     line-height: 18px;
-
-    .h-app-content {
-        padding-left: 15px;
-        .h-app-desc {
-            span {
-                font-weight: 400;
-                font-size: 12px;
-                color: var(--el-text-color-regular);
-            }
-        }
-    }
     &:hover {
         background-color: rgba(0, 94, 235, 0.03);
     }
