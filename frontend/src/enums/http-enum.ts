@@ -9,6 +9,7 @@ export enum ResultEnum {
     ERRGLOBALLOADDING = 407,
     ERRIP = 408,
     ERRDOMAIN = 409,
+    ERRXPACK = 410,
     TIMEOUT = 20000,
     TYPE = 'success',
 }

@@ -73,6 +73,11 @@ class RequestHttp {
                     });
                     return Promise.reject(data);
                 }
+                if (data.code == ResultEnum.ERRXPACK) {
+                    globalStore.isProductPro = false;
+                    window.location.reload();
+                    return Promise.reject(data);
+                }
                 if (data.code == ResultEnum.ERRGLOBALLOADDING) {
                     globalStore.setGlobalLoading(true);
                     globalStore.setLoadingText(data.message);

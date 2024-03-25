@@ -43,6 +43,9 @@ var (
 	ErrNameIsExist         = "ErrNameIsExist"
 	ErrDemoEnvironment     = "ErrDemoEnvironment"
 	ErrCmdIllegal          = "ErrCmdIllegal"
+	ErrXpackNotFound       = "ErrXpackNotFound"
+	ErrXpackNotActive      = "ErrXpackNotActive"
+	ErrXpackOutOfDate      = "ErrXpackOutOfDate"
 )
 
 // app
@@ -149,4 +152,13 @@ var (
 
 var (
 	ErrNotExistUser = "ErrNotExistUser"
+)
+
+// license
+var (
+	ErrLicense              = "ErrLicense"
+	ErrLicenseCheckInLocal  = "ErrLicenseCheckInLocal"
+	ErrLicenseCheckInRemote = "ErrLicenseCheckInRemote"
+	ErrLicenseSave          = "ErrLicenseSave"
+	ErrLicenseSync          = "ErrLicenseSync"
 )

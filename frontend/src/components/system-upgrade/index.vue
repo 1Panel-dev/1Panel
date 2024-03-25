@@ -14,7 +14,6 @@
             </el-button>
             <el-divider direction="vertical" />
         </span>
-        <span class="version">{{ $t('setting.currentVersion') + version }}</span>
         <el-badge is-dot class="item" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
             <el-button type="primary" link @click="onLoadUpgradeInfo">
                 <span>（{{ $t('setting.hasNewVersion') }}）</span>

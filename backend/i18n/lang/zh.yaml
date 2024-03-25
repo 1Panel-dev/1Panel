@@ -172,3 +172,14 @@ ErrScope: "不支持修改此配置"
 ErrStateChange: "状态修改失败"
 ErrRuleExist: "规则名称已存在"
 ErrRuleNotExist: "规则不存在"
+
+#license
+ErrLicense: "License 格式错误，请重新导入！"
+ErrLicenseCheckInLocal: "License 本地校验失败，错误 {{ .err }}，请重试！"
+ErrLicenseCheckInRemote: "License 远程校验失败，错误 {{ .err }}，请重试！"
+ErrLicenseSave: "License 信息保存失败，错误 {{ .err }}，请重试！"
+ErrLicenseSync: "License 信息同步失败，错误 {{ .err }}，请重试！"
+ErrXpackNotFound: "该部分为 Xpack 功能，请先在 面板设置-许可证 界面导入 License"
+ErrXpackNotActive: "该部分为 Xpack 功能，请先在 面板设置-许可证 界面同步 License 状态"
+ErrXpackOutOfDate: "当前 License 已过期，请重新在 面板设置-许可证 界面导入 License"
+

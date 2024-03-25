@@ -7,7 +7,41 @@
                     path: '/',
                 },
             ]"
-        />
+        >
+            <template #route-button>
+                <div class="router-button">
+                    <span class="version" v-if="show">
+                        {{ $t('license.community') }}
+                    </span>
+                    <span class="version" v-else>{{ $t('license.pro') }}</span>
+
+                    <template v-if="show">
+                        <el-divider direction="vertical" />
+                        <el-button link type="primary" @click="dialogFormVisible = true">
+                            {{ $t('license.levelUpPro') }}
+                        </el-button>
+                    </template>
+                </div>
+            </template>
+        </RouterButton>
+
+        <el-dialog v-model="dialogFormVisible" :title="$t('license.levelUpPro')" width="500">
+            <div style="text-align: center; margin-top: 20px">
+                <div style="justify-self: center">
+                    <img style="width: 80px" src="@/assets/images/1panel-logo-light.png" />
+                </div>
+                <h3>{{ $t('setting.description') }}</h3>
+                <el-button type="primary" plain @click="toUpload">
+                    {{ $t('license.importLicense') }}
+                </el-button>
+                <div style="margin-top: 10px">
+                    <el-link @click="toHalo">
+                        <span>{{ $t('license.knowMorePro') }}</span>
+                    </el-link>
+                </div>
+            </div>
+        </el-dialog>
+
         <el-alert
             v-if="!isSafety && globalStore.showEntranceWarn"
             style="margin-top: 20px"
@@ -218,6 +252,8 @@
                 </CardWithHeader>
             </el-col>
         </el-row>
+
+        <Upload ref="uploadRef" @search="search()" />
     </div>
 </template>
 
@@ -233,8 +269,9 @@ import { dateFormatForSecond, computeSize } from '@/utils/util';
 import { useRouter } from 'vue-router';
 import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
 import { getIOOptions, getNetworkOptions } from '@/api/modules/monitor';
-import { getSettingInfo, loadUpgradeInfo } from '@/api/modules/setting';
+import { getLicense, getSettingInfo, loadUpgradeInfo } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
+import Upload from '@/views/setting/license/upload/index.vue';
 const router = useRouter();
 const globalStore = GlobalStore();
 
@@ -258,6 +295,23 @@ const timeNetDatas = ref<Array<string>>([]);
 
 const ioOptions = ref();
 const netOptions = ref();
+
+const dialogFormVisible = ref(false);
+
+const uploadRef = ref();
+const loading = ref();
+const show = ref(null);
+
+const license = reactive({
+    licenseName: '',
+    trial: true,
+    expiresAt: '',
+    assigneeName: '',
+    productName: '',
+
+    status: '',
+});
+
 const searchInfo = reactive({
     ioOption: 'all',
     netOption: 'all',
@@ -538,7 +592,30 @@ const onBlur = () => {
     isActive.value = false;
 };
 
+const search = async () => {
+    loading.value = true;
+    await getLicense()
+        .then((res) => {
+            loading.value = false;
+            license.status = res.data.status;
+            show.value = license.status !== 'Enable';
+        })
+        .catch(() => {
+            show.value = true;
+            loading.value = false;
+        });
+};
+
+const toHalo = () => {
+    window.open('https://halo.test.lxware.cn/', '_blank', 'noopener,noreferrer');
+};
+
+const toUpload = () => {
+    uploadRef.value.acceptParams();
+};
+
 onMounted(() => {
+    search();
     window.addEventListener('focus', onFocus);
     window.addEventListener('blur', onBlur);
     loadSafeStatus();
@@ -605,6 +682,24 @@ onBeforeUnmount(() => {
     .el-tag {
         margin-right: 10px;
         margin-bottom: 10px;
+    }
+}
+
+.version {
+    font-size: 14px;
+    color: #858585;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+}
+
+.system-link {
+    margin-left: 15px;
+
+    .svg-icon {
+        font-size: 7px;
+    }
+    span {
+        line-height: 20px;
     }
 }
 </style>

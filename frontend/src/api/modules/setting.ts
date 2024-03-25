@@ -6,6 +6,18 @@ import { Backup } from '../interface/backup';
 import { Setting } from '../interface/setting';
 import { TimeoutEnum } from '@/enums/http-enum';
 
+export const UploadFileData = (params: FormData) => {
+    return http.upload('/licenses/upload', params);
+};
+
+export const getLicense = () => {
+    return http.get<Setting.License>(`/licenses/get`);
+};
+
+export const syncLicense = () => {
+    return http.post(`/licenses/sync`);
+};
+
 export const getSettingInfo = () => {
     return http.post<Setting.SettingInfo>(`/settings/search`);
 };

@@ -23,7 +23,7 @@ import { MenuStore } from '@/store/modules/menu';
 import { DeviceType } from '@/enums/app';
 import { useI18n } from 'vue-i18n';
 import { useTheme } from '@/hooks/use-theme';
-import { getSettingInfo, getSystemAvailable } from '@/api/modules/setting';
+import { getLicense, getSettingInfo, getSystemAvailable } from '@/api/modules/setting';
 useResize();
 
 const menuStore = MenuStore();
@@ -73,6 +73,11 @@ const loadDataFromDB = async () => {
     switchDark();
 };
 
+const loadProductProFromDB = async () => {
+    const res = await getLicense();
+    globalStore.isProductPro = res.data.status === 'Enable';
+};
+
 const updateDarkMode = async (event: MediaQueryListEvent) => {
     const res = await getSettingInfo();
     if (res.data.theme !== 'auto') {
@@ -110,6 +115,7 @@ onBeforeUnmount(() => {
 onMounted(() => {
     loadStatus();
     loadDataFromDB();
+    loadProductProFromDB();
 
     const mqList = window.matchMedia('(prefers-color-scheme: dark)');
     if (mqList.addEventListener) {

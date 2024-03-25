@@ -140,4 +140,12 @@ export namespace Setting {
         latestVersion: string;
         releaseNote: string;
     }
+
+    export interface License {
+        licenseName: string;
+        assigneeName: string;
+        productPro: string;
+        trial: boolean;
+        status: string;
+    }
 }
