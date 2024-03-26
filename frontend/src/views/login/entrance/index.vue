@@ -4,7 +4,7 @@
             <div class="login-wrapper">
                 <div :class="screenWidth > 1110 ? 'left inline-block' : ''">
                     <div class="login-title">
-                        <span>{{ $t('commons.login.title') }}</span>
+                        <span>{{ globalStore.themeConfig.title || $t('setting.description') }}</span>
                     </div>
                     <img src="@/assets/images/1panel-login.png" alt="" v-if="screenWidth > 1110" />
                 </div>

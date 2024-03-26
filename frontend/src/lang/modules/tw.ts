@@ -1346,7 +1346,7 @@ const message = {
         issue: '問題反饋',
         doc: '官方文檔',
         star: '點亮 Star',
-        description: '1Panel，現代化、開源的 Linux 服務器運維管理面板。',
+        description: 'Linux 服務器運維管理面板',
         forum: '論壇求助',
         doc2: '使用手冊',
         currentVersion: '當前運行版本：',
@@ -2173,10 +2173,9 @@ const message = {
         },
         tamper: {
             tamper: '防篡改',
-            tamperHelper1: '一鍵部署類型的網站，建議啟用應用目錄防篡改功能；',
-            tamperHelper2: '如果在啟用防篡改功能後出現網站無法正常使用或備份、恢復失敗的情況，請先關閉防篡改功能；',
-            tamperHelper3:
-                '啟用防篡改，將限制非排除目錄下受保護文件的讀寫、刪除、權限和所有者修改操作，請在設定 [排除目錄] 和 [保護] 時謹慎選擇。',
+            tamperHelper1:
+                '一鍵部署類型的網站，建議啟用應用目錄防篡改功能；如出現網站無法正常使用或備份、恢復失敗的情況，請先關閉防篡改功能；',
+            tamperHelper2: '將限制非排除目錄下受保護文件的讀寫、刪除、權限和所有者修改操作',
             op: '操作',
             create: '創建',
             file: '文件',

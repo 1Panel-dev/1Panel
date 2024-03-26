@@ -11,11 +11,18 @@ defineProps<{ isCollapse: boolean }>();
 const globalStore = GlobalStore();
 
 const getLogoUrl = (isCollapse: boolean) => {
-    const theme = globalStore.$state.themeConfig.theme || 'light';
     if (isCollapse) {
-        return new URL(`../../../../assets/images/1panel-logo-${theme}.png`, import.meta.url).href;
+        if (globalStore.themeConfig.logo) {
+            return globalStore.themeConfig.logo;
+        } else {
+            return new URL(`../../../../assets/images/1panel-logo-light.png`, import.meta.url).href;
+        }
     } else {
-        return new URL(`../../../../assets/images/1panel-menu-${theme}.png`, import.meta.url).href;
+        if (globalStore.themeConfig.logoWithText) {
+            return globalStore.themeConfig.logoWithText;
+        } else {
+            return new URL(`../../../../assets/images/1panel-menu-light.png`, import.meta.url).href;
+        }
     }
 };
 </script>
