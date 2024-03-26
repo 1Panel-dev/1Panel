@@ -88,6 +88,15 @@ const updateDarkMode = async (event: MediaQueryListEvent) => {
     switchDark();
 };
 
+const initStatus = () => {
+    document.title = globalStore.themeConfig.panelName;
+    const link = (document.querySelector("link[rel*='icon']") || document.createElement('link')) as HTMLLinkElement;
+    link.type = 'image/x-icon';
+    link.rel = 'shortcut icon';
+    link.href = globalStore.themeConfig.favicon;
+    document.getElementsByTagName('head')[0].appendChild(link);
+};
+
 const loadStatus = async () => {
     loading.value = globalStore.isLoading;
     loadingText.value = globalStore.loadingText;
@@ -114,6 +123,7 @@ onBeforeUnmount(() => {
     timer = null;
 });
 onMounted(() => {
+    initStatus();
     loadStatus();
     loadDataFromDB();
     loadProductProFromDB();

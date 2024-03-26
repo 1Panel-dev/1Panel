@@ -4,16 +4,16 @@
             <template #main>
                 <div style="text-align: center; margin-top: 20px">
                     <div style="justify-self: center">
-                        <img style="width: 80px" src="@/assets/images/1panel-logo-light.png" />
+                        <img style="width: 80px" :src="getLogoUrl()" />
                     </div>
-                    <h3>{{ $t('setting.description') }}</h3>
+                    <h3>{{ globalStore.themeConfig.title || $t('setting.description') }}</h3>
                     <h3>
                         <SystemUpgrade />
                     </h3>
                     <div style="margin-top: 10px">
                         <el-link @click="toDoc">
                             <el-icon><Document /></el-icon>
-                            <span>{{ $t('setting.doc') }}</span>
+                            <span>{{ $t('setting.doc2') }}</span>
                         </el-link>
                         <el-link @click="toGithub" class="system-link">
                             <svg-icon iconName="p-huaban88"></svg-icon>
@@ -38,6 +38,8 @@
 import { getSettingInfo, getSystemAvailable } from '@/api/modules/setting';
 import { onMounted, ref } from 'vue';
 import SystemUpgrade from '@/components/system-upgrade/index.vue';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const version = ref();
 const loading = ref();
@@ -57,6 +59,14 @@ const toIssue = () => {
 };
 const toGithubStar = () => {
     window.open('https://github.com/1Panel-dev/1Panel', '_blank', 'noopener,noreferrer');
+};
+
+const getLogoUrl = () => {
+    if (globalStore.themeConfig.logo) {
+        return globalStore.themeConfig.logo;
+    } else {
+        return new URL(`../../../../assets/images/1panel-logo-light.png`, import.meta.url).href;
+    }
 };
 
 onMounted(() => {

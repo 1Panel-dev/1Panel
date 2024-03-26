@@ -1445,7 +1445,7 @@ const message = {
         issue: 'Feedback',
         doc: 'Official document',
         star: 'Star',
-        description: '1Panel, Modern, open source Linux server operation and maintenance management panel.',
+        description: 'Linux server operation and maintenance management panel',
         forum: 'Forum Help',
         doc2: 'User Manual',
         currentVersion: 'Version',
@@ -2325,11 +2325,9 @@ const message = {
         tamper: {
             tamper: 'Tamper',
             tamperHelper1:
-                'One-click deployment type of website, it is recommended to enable the application directory anti-tampering function;',
+                'For one-click deployment type websites, it is recommended to enable the application directory anti-tamper function; if the website cannot be used normally or backup and restore fail, please disable the anti-tamper function first;',
             tamperHelper2:
-                'If the website cannot be used normally or backup and restore fail after enabling the anti-tampering function, please disable the anti-tampering function first;',
-            tamperHelper3:
-                'Enabling tamper-proofing will restrict reading, writing, deleting, permission, and owner modification operations of protected files under non-excluded directories. Please choose carefully when setting [Exclude Directory] and [Protect].',
+                'It will restrict the read, write, delete, permission, and owner modification operations of protected files under non-excluded directories',
             op: 'Operation',
             create: 'Create',
             file: 'File',
