@@ -163,10 +163,12 @@ const search = async () => {
         .then((res) => {
             loading.value = false;
             license.status = res.data.status;
-            globalStore.isProductPro = res.data.status === 'Enable';
-            if (res.data.status !== 'Enable') {
+            globalStore.isProductPro =
+                res.data.status === 'Enable' || res.data.status === 'Lost01' || res.data.status === 'Lost02';
+            if (!globalStore.isProductPro || res.data.status === 'Lost03') {
                 return;
             }
+            console.log('csdcasd');
             license.licenseName = res.data.licenseName;
             license.assigneeName = res.data.assigneeName;
             license.trial = res.data.trial;
@@ -184,7 +186,7 @@ const search = async () => {
 };
 
 const hasLicense = () => {
-    return license.status === 'Enable';
+    return globalStore.isProductPro;
 };
 
 const showSync = () => {

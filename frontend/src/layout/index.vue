@@ -75,7 +75,8 @@ const loadDataFromDB = async () => {
 
 const loadProductProFromDB = async () => {
     const res = await getLicense();
-    globalStore.isProductPro = res.data.status === 'Enable';
+    globalStore.isProductPro =
+        res.data.status === 'Enable' || res.data.status === 'Lost01' || res.data.status === 'Lost02';
 };
 
 const updateDarkMode = async (event: MediaQueryListEvent) => {
