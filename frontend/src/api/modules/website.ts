@@ -144,18 +144,6 @@ export const PreCheck = (req: Website.CheckReq) => {
     return http.post<Website.CheckRes[]>(`/websites/check`, req);
 };
 
-export const GetWafConfig = (req: Website.WafReq) => {
-    return http.post<Website.WafRes>(`/websites/waf/config`, req);
-};
-
-export const UpdateWafEnable = (req: Website.WafUpdate) => {
-    return http.post<any>(`/websites/waf/update`, req);
-};
-
-export const UpdateWafFile = (req: Website.WafFileUpdate) => {
-    return http.post<any>(`/websites/waf/file/update`, req);
-};
-
 export const UpdateNginxFile = (req: Website.NginxUpdate) => {
     return http.post<any>(`/websites/nginx/update`, req);
 };
