@@ -31,11 +31,6 @@ type WebsiteNginxConfig struct {
 	Params []NginxParam `json:"params"`
 }
 
-type WebsiteWafConfig struct {
-	Enable  bool   `json:"enable"`
-	Content string `json:"content"`
-}
-
 type WebsiteHTTPS struct {
 	Enable      bool             `json:"enable"`
 	HttpConfig  string           `json:"httpConfig"`
