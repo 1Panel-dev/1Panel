@@ -98,7 +98,7 @@
             </template>
         </LayoutContent>
 
-        <Upload ref="uploadRef" @search="search()" />
+        <LicenseImport ref="licenseRef" />
     </div>
 </template>
 
@@ -106,12 +106,12 @@
 import { ref, reactive, onMounted } from 'vue';
 import { getLicense, syncLicense } from '@/api/modules/setting';
 import CardWithHeader from '@/components/card-with-header/index.vue';
-import Upload from '@/views/setting/license/upload/index.vue';
+import LicenseImport from '@/components/license-import/index.vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
 const loading = ref();
-const uploadRef = ref();
+const licenseRef = ref();
 const globalStore = GlobalStore();
 
 const license = reactive({
@@ -194,7 +194,7 @@ const showSync = () => {
 };
 
 const toUpload = () => {
-    uploadRef.value.acceptParams();
+    licenseRef.value.acceptParams();
 };
 
 onMounted(() => {

@@ -1458,11 +1458,12 @@ const message = {
 
         license: 'License',
     },
-    license: {
+    License: {
         community: 'Community Edition',
         pro: 'Professional Edition',
-        trial: 'Trial Version',
-        office: 'Official Version',
+        trial: 'Trial Edition',
+        office: 'Official Edition',
+        trialInfo: 'Version',
         authorizationId: 'Subscription Authorization ID',
         authorizedUser: 'Authorized User',
         expiresAt: 'Expiration Time',
@@ -1474,16 +1475,23 @@ const message = {
         Enable: 'Enabled',
         Disable: 'Disabled',
         lostHelper:
-            'The license needs to be regularly synchronized for availability. Please ensure normal access to the external network. After three losses of contact, the license binding will be released.',
+            'The License needs to be periodically synchronized for availability. Please ensure normal external network access. After three losses of connection, the License binding will be released.',
         quickUpdate: 'Quick Update',
         import: 'Import',
+        power: 'Authorize',
         importLicense: 'Import License',
-        importHelper: 'Click or drag the License file here',
+        importHelper: 'Please click or drag the license file here',
         technicalAdvice: 'Technical Advice',
         advice: 'Consultation',
         indefinitePeriod: 'Indefinite Period',
         levelUpPro: 'Upgrade to Professional Edition',
-        knowMorePro: 'Learn More about Professional Edition',
+        knowMorePro: 'Learn More',
+        closeAlert: 'The current page can be closed in the panel settings',
+        introduce: 'Feature Introduction',
+        waf: '1Panel WAF effectively prevents common attacks such as CC attacks, malicious data collection, API abuse, and hacker penetration testing behaviors, providing strong protection for your website security.',
+        tamper: '1Panel Tamper Protection effectively safeguards data from tampering and malicious attacks, ensuring data reliability and security.',
+        setting:
+            '1Panel interface settings allow you to customize panel logos, welcome messages, and other information.',
     },
     clean: {
         scan: 'Start Scanning',

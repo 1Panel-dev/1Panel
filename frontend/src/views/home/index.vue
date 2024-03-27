@@ -234,7 +234,7 @@
             </el-col>
         </el-row>
 
-        <License ref="licenseRef" />
+        <LicenseImport ref="licenseRef" />
     </div>
 </template>
 
@@ -243,6 +243,7 @@ import { onMounted, onBeforeUnmount, ref, reactive } from 'vue';
 import Status from '@/views/home/status/index.vue';
 import App from '@/views/home/app/index.vue';
 import VCharts from '@/components/v-charts/index.vue';
+import LicenseImport from '@/components/license-import/index.vue';
 import CardWithHeader from '@/components/card-with-header/index.vue';
 import i18n from '@/lang';
 import { Dashboard } from '@/api/interface/dashboard';
@@ -252,7 +253,6 @@ import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
 import { getIOOptions, getNetworkOptions } from '@/api/modules/monitor';
 import { getSettingInfo, loadUpgradeInfo } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
-import License from '@/views/home/license/index.vue';
 const router = useRouter();
 const globalStore = GlobalStore();
 
