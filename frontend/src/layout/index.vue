@@ -23,6 +23,7 @@ import { MenuStore } from '@/store/modules/menu';
 import { DeviceType } from '@/enums/app';
 import { useI18n } from 'vue-i18n';
 import { useTheme } from '@/hooks/use-theme';
+import { useLogo } from '@/hooks/use-logo';
 import { getLicense, getSettingInfo, getSystemAvailable } from '@/api/modules/setting';
 useResize();
 
@@ -88,12 +89,12 @@ const updateDarkMode = async (event: MediaQueryListEvent) => {
     switchDark();
 };
 
-const initStatus = () => {
-    document.title = globalStore.themeConfig.panelName;
+const initFavicon = () => {
+    let favicon = localStorage.getItem('1p-favicon');
     const link = (document.querySelector("link[rel*='icon']") || document.createElement('link')) as HTMLLinkElement;
     link.type = 'image/x-icon';
     link.rel = 'shortcut icon';
-    link.href = globalStore.themeConfig.favicon;
+    link.href = favicon ? '/api/v1/images/favicon' : '/public/favicon.png';
     document.getElementsByTagName('head')[0].appendChild(link);
 };
 
@@ -123,9 +124,10 @@ onBeforeUnmount(() => {
     timer = null;
 });
 onMounted(() => {
-    initStatus();
     loadStatus();
+    initFavicon();
     loadDataFromDB();
+    useLogo();
     loadProductProFromDB();
 
     const mqList = window.matchMedia('(prefers-color-scheme: dark)');
