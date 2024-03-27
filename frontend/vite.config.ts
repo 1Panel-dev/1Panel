@@ -83,6 +83,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         build: {
             outDir: '../cmd/server/web',
             minify: 'esbuild',
+            target: 'esnext',
             rollupOptions: {
                 output: {
                     chunkFileNames: 'assets/js/[name]-[hash].js',
