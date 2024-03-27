@@ -9151,6 +9151,28 @@
                 }
             }
         },
+        "/runtimes/sync": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "同步运行环境状态",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Runtime"
+                ],
+                "summary": "Sync runtime status",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/runtimes/update": {
             "post": {
                 "security": [
@@ -13908,144 +13930,6 @@
                     ],
                     "formatEN": "Update website [primaryDomain]",
                     "formatZH": "更新网站 [primaryDomain]",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/websites/waf/config": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "获取网站 waf 配置",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Website WAF"
-                ],
-                "summary": "Load websit waf conf",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.WebsiteWafReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.WebsiteWafConfig"
-                        }
-                    }
-                }
-            }
-        },
-        "/websites/waf/file/update": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "更新 网站 waf 配置文件",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Website WAF"
-                ],
-                "summary": "Update website waf  file",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.WebsiteWafUpdate"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFunctions": [
-                        {
-                            "db": "websites",
-                            "input_column": "id",
-                            "input_value": "websiteId",
-                            "isList": false,
-                            "output_column": "primary_domain",
-                            "output_value": "domain"
-                        }
-                    ],
-                    "bodyKeys": [
-                        "websiteId"
-                    ],
-                    "formatEN": "WAF conf file update [domain]",
-                    "formatZH": "WAF 配置文件修改 [domain]",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/websites/waf/update": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "更新 网站 waf 配置",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Website WAF"
-                ],
-                "summary": "Update website waf conf",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.WebsiteWafUpdate"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFunctions": [
-                        {
-                            "db": "websites",
-                            "input_column": "id",
-                            "input_value": "websiteId",
-                            "isList": false,
-                            "output_column": "primary_domain",
-                            "output_value": "domain"
-                        }
-                    ],
-                    "bodyKeys": [
-                        "websiteId"
-                    ],
-                    "formatEN": "WAF conf update [domain]",
-                    "formatZH": "WAF 配置修改 [domain]",
                     "paramKeys": []
                 }
             }
@@ -20770,43 +20654,6 @@
                 }
             }
         },
-        "request.WebsiteWafReq": {
-            "type": "object",
-            "required": [
-                "key",
-                "rule",
-                "websiteId"
-            ],
-            "properties": {
-                "key": {
-                    "type": "string"
-                },
-                "rule": {
-                    "type": "string"
-                },
-                "websiteId": {
-                    "type": "integer"
-                }
-            }
-        },
-        "request.WebsiteWafUpdate": {
-            "type": "object",
-            "required": [
-                "key",
-                "websiteId"
-            ],
-            "properties": {
-                "enable": {
-                    "type": "boolean"
-                },
-                "key": {
-                    "type": "string"
-                },
-                "websiteId": {
-                    "type": "integer"
-                }
-            }
-        },
         "response.AppDTO": {
             "type": "object",
             "properties": {
@@ -21484,17 +21331,6 @@
                 },
                 "version": {
                     "type": "string"
-                }
-            }
-        },
-        "response.WebsiteWafConfig": {
-            "type": "object",
-            "properties": {
-                "content": {
-                    "type": "string"
-                },
-                "enable": {
-                    "type": "boolean"
                 }
             }
         }

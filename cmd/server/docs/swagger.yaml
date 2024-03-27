@@ -4517,31 +4517,6 @@ definitions:
     - id
     - user
     type: object
-  request.WebsiteWafReq:
-    properties:
-      key:
-        type: string
-      rule:
-        type: string
-      websiteId:
-        type: integer
-    required:
-    - key
-    - rule
-    - websiteId
-    type: object
-  request.WebsiteWafUpdate:
-    properties:
-      enable:
-        type: boolean
-      key:
-        type: string
-      websiteId:
-        type: integer
-    required:
-    - key
-    - websiteId
-    type: object
   response.AppDTO:
     properties:
       createdAt:
@@ -4989,13 +4964,6 @@ definitions:
         type: string
       version:
         type: string
-    type: object
-  response.WebsiteWafConfig:
-    properties:
-      content:
-        type: string
-      enable:
-        type: boolean
     type: object
 host: localhost
 info:
@@ -10791,6 +10759,19 @@ paths:
       summary: List runtimes
       tags:
       - Runtime
+  /runtimes/sync:
+    post:
+      consumes:
+      - application/json
+      description: 同步运行环境状态
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Sync runtime status
+      tags:
+      - Runtime
   /runtimes/update:
     post:
       consumes:
@@ -13809,93 +13790,5 @@ paths:
         - primaryDomain
         formatEN: Update website [primaryDomain]
         formatZH: 更新网站 [primaryDomain]
-        paramKeys: []
-  /websites/waf/config:
-    post:
-      consumes:
-      - application/json
-      description: 获取网站 waf 配置
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/request.WebsiteWafReq'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.WebsiteWafConfig'
-      security:
-      - ApiKeyAuth: []
-      summary: Load websit waf conf
-      tags:
-      - Website WAF
-  /websites/waf/file/update:
-    post:
-      consumes:
-      - application/json
-      description: 更新 网站 waf 配置文件
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/request.WebsiteWafUpdate'
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      summary: Update website waf  file
-      tags:
-      - Website WAF
-      x-panel-log:
-        BeforeFunctions:
-        - db: websites
-          input_column: id
-          input_value: websiteId
-          isList: false
-          output_column: primary_domain
-          output_value: domain
-        bodyKeys:
-        - websiteId
-        formatEN: WAF conf file update [domain]
-        formatZH: WAF 配置文件修改 [domain]
-        paramKeys: []
-  /websites/waf/update:
-    post:
-      consumes:
-      - application/json
-      description: 更新 网站 waf 配置
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/request.WebsiteWafUpdate'
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      summary: Update website waf conf
-      tags:
-      - Website WAF
-      x-panel-log:
-        BeforeFunctions:
-        - db: websites
-          input_column: id
-          input_value: websiteId
-          isList: false
-          output_column: primary_domain
-          output_value: domain
-        bodyKeys:
-        - websiteId
-        formatEN: WAF conf update [domain]
-        formatZH: WAF 配置修改 [domain]
         paramKeys: []
 swagger: "2.0"
