@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -197,7 +198,7 @@ func createWebsiteFolder(nginxInstall model.AppInstall, website *model.Website, 
 			}
 		}
 	}
-	return fileOp.CopyDir(path.Join(nginxFolder, "www", "common", "waf", "rules"), path.Join(siteFolder, "waf"))
+	return nil
 }
 
 func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, appInstall *model.AppInstall, runtime *model.Runtime) error {
@@ -233,12 +234,8 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 	server.UpdateServerName(serverNames)
 
 	siteFolder := path.Join("/www", "sites", website.Alias)
-	commonFolder := path.Join("/www", "common")
 	server.UpdateDirective("access_log", []string{path.Join(siteFolder, "log", "access.log")})
 	server.UpdateDirective("error_log", []string{path.Join(siteFolder, "log", "error.log")})
-	server.UpdateDirective("access_by_lua_file", []string{path.Join(commonFolder, "waf", "access.lua")})
-	server.UpdateDirective("set", []string{"$RulePath", path.Join(siteFolder, "waf", "rules")})
-	server.UpdateDirective("set", []string{"$logdir", path.Join(siteFolder, "log")})
 
 	rootIndex := path.Join("/www/sites", website.Alias, "index")
 	switch website.Type {
@@ -285,6 +282,92 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 	return nil
 }
 
+func createWafConfig(website *model.Website, domains []model.WebsiteDomain) error {
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return err
+	}
+	wafDataPath := path.Join(nginxInstall.GetPath(), "1pwaf", "data")
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(wafDataPath) {
+		return nil
+	}
+	websitesConfigPath := path.Join(wafDataPath, "conf", "sites.json")
+	content, err := fileOp.GetContent(websitesConfigPath)
+	if err != nil {
+		return err
+	}
+	var websitesArray []request.WafWebsite
+	if len(content) != 0 {
+		if err := json.Unmarshal(content, &websitesArray); err != nil {
+			return err
+		}
+	}
+	wafWebsite := request.WafWebsite{
+		Key:     website.Alias,
+		Domains: make([]string, 0),
+		Host:    make([]string, 0),
+	}
+
+	for _, domain := range domains {
+		wafWebsite.Domains = append(wafWebsite.Domains, domain.Domain)
+		if domain.Port != 80 && domain.Port != 443 {
+			wafWebsite.Host = append(wafWebsite.Host, domain.Domain+":"+string(rune(domain.Port)))
+		}
+	}
+	websitesArray = append(websitesArray, wafWebsite)
+	websitesContent, err := json.Marshal(websitesArray)
+	if err != nil {
+		return err
+	}
+	if err := fileOp.SaveFileWithByte(websitesConfigPath, websitesContent, 0644); err != nil {
+		return err
+	}
+
+	var (
+		sitesDir          = path.Join(wafDataPath, "sites")
+		defaultConfigPath = path.Join(wafDataPath, "conf", "siteConfig.json")
+		defaultRuleDir    = path.Join(wafDataPath, "rules")
+		websiteDir        = path.Join(sitesDir, website.Alias)
+	)
+
+	defaultConfigContent, err := fileOp.GetContent(defaultConfigPath)
+	if err != nil {
+		return err
+	}
+
+	if !fileOp.Stat(websiteDir) {
+		if err = fileOp.CreateDir(websiteDir, 0755); err != nil {
+			return err
+		}
+	}
+	defer func() {
+		if err != nil {
+			_ = fileOp.DeleteDir(websiteDir)
+		}
+	}()
+
+	if err = fileOp.SaveFileWithByte(path.Join(websiteDir, "config.json"), defaultConfigContent, 0644); err != nil {
+		return err
+	}
+
+	websiteRuleDir := path.Join(websiteDir, "rules")
+	if !fileOp.Stat(websiteRuleDir) {
+		if err := fileOp.CreateDir(websiteRuleDir, 0755); err != nil {
+			return err
+		}
+	}
+	defaultRulesName := []string{"acl", "args", "cookie", "defaultUaBlack", "defaultUrlBlack", "fileExt", "header", "methodWhite"}
+	for _, ruleName := range defaultRulesName {
+		srcPath := path.Join(defaultRuleDir, ruleName+".json")
+		if err = fileOp.Copy(srcPath, websiteRuleDir); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func delNginxConfig(website model.Website, force bool) error {
 	nginxApp, err := appRepo.GetFirst(appRepo.WithKey(constant.AppOpenresty))
 	if err != nil {
@@ -312,6 +395,52 @@ func delNginxConfig(website model.Website, force bool) error {
 	if fileOp.Stat(sitePath) {
 		_ = fileOp.DeleteDir(sitePath)
 	}
+
+	if err := opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
+		if force {
+			return nil
+		}
+		return err
+	}
+	return nil
+}
+
+func delWafConfig(website model.Website, force bool) error {
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return err
+	}
+	wafDataPath := path.Join(nginxInstall.GetPath(), "1pwaf", "data")
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(wafDataPath) {
+		return nil
+	}
+	websitesConfigPath := path.Join(wafDataPath, "conf", "sites.json")
+	content, err := fileOp.GetContent(websitesConfigPath)
+	if err != nil {
+		return err
+	}
+	var websitesArray []request.WafWebsite
+	var newWebsiteArray []request.WafWebsite
+	if len(content) > 0 {
+		if err = json.Unmarshal(content, &websitesArray); err != nil {
+			return err
+		}
+	}
+	for _, wafWebsite := range websitesArray {
+		if wafWebsite.Key != website.Alias {
+			newWebsiteArray = append(newWebsiteArray, wafWebsite)
+		}
+	}
+	websitesContent, err := json.Marshal(newWebsiteArray)
+	if err != nil {
+		return err
+	}
+	if err := fileOp.SaveFileWithByte(websitesConfigPath, websitesContent, 0644); err != nil {
+		return err
+	}
+
+	_ = fileOp.DeleteDir(path.Join(wafDataPath, "sites", website.Alias))
 
 	if err := opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
 		if force {

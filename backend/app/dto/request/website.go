@@ -69,19 +69,7 @@ type WebsiteOp struct {
 	Operate string `json:"operate"`
 }
 
-type WebsiteWafReq struct {
-	WebsiteID uint   `json:"websiteId" validate:"required"`
-	Key       string `json:"key" validate:"required"`
-	Rule      string `json:"rule" validate:"required"`
-}
-
 type WebsiteRedirectUpdate struct {
-	WebsiteID uint   `json:"websiteId" validate:"required"`
-	Key       string `json:"key" validate:"required"`
-	Enable    bool   `json:"enable"`
-}
-
-type WebsiteWafUpdate struct {
 	WebsiteID uint   `json:"websiteId" validate:"required"`
 	Key       string `json:"key" validate:"required"`
 	Enable    bool   `json:"enable"`
@@ -207,12 +195,12 @@ type WebsiteRedirectReq struct {
 	WebsiteID uint `json:"websiteId" validate:"required"`
 }
 
-type WebsiteWafFileUpdate struct {
-	WebsiteID uint   `json:"websiteID" validate:"required"`
-	Content   string `json:"content" validate:"required"`
-	Type      string `json:"type" validate:"required,oneof=cc ip_white ip_block url_white url_block cookie_block args_check post_check ua_check file_ext_block user_agent"`
-}
-
 type WebsiteCommonReq struct {
 	ID uint `json:"id" validate:"required"`
+}
+
+type WafWebsite struct {
+	Key     string   `json:"key"`
+	Domains []string `json:"domains"`
+	Host    []string `json:"host"`
 }
