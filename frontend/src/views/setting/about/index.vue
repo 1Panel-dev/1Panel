@@ -63,9 +63,9 @@ const toGithubStar = () => {
 
 const getLogoUrl = () => {
     if (globalStore.themeConfig.logo) {
-        return globalStore.themeConfig.logo;
+        return '/api/v1/images/logo';
     } else {
-        return new URL(`../../../../assets/images/1panel-logo-light.png`, import.meta.url).href;
+        return new URL(`../../../assets/images/1panel-logo-light.png`, import.meta.url).href;
     }
 };
 

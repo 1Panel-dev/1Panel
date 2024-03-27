@@ -13,13 +13,13 @@ const globalStore = GlobalStore();
 const getLogoUrl = (isCollapse: boolean) => {
     if (isCollapse) {
         if (globalStore.themeConfig.logo) {
-            return globalStore.themeConfig.logo;
+            return '/api/v1/images/logo';
         } else {
             return new URL(`../../../../assets/images/1panel-logo-light.png`, import.meta.url).href;
         }
     } else {
         if (globalStore.themeConfig.logoWithText) {
-            return globalStore.themeConfig.logoWithText;
+            return '/api/v1/images/logoWithText';
         } else {
             return new URL(`../../../../assets/images/1panel-menu-light.png`, import.meta.url).href;
         }
@@ -35,6 +35,7 @@ const getLogoUrl = (isCollapse: boolean) => {
     height: 55px;
     img {
         object-fit: contain;
+        width: 95%;
         height: 40px;
     }
 }

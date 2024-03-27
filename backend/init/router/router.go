@@ -2,6 +2,8 @@ package router
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"github.com/1Panel-dev/1Panel/backend/middleware"
@@ -12,7 +14,6 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"net/http"
 )
 
 var (
@@ -21,6 +22,7 @@ var (
 
 func setWebStatic(rootRouter *gin.RouterGroup) {
 	rootRouter.StaticFS("/public", http.FS(web.Favicon))
+	rootRouter.Static("/api/v1/images", "./uploads")
 	rootRouter.Use(func(c *gin.Context) {
 		c.Next()
 	})
