@@ -326,10 +326,10 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		}
 	}
 
-	if err = configDefaultNginx(website, domains, appInstall, runtime); err != nil {
+	if err = createWafConfig(website, domains); err != nil {
 		return err
 	}
-	if err = createWafConfig(website, domains); err != nil {
+	if err = configDefaultNginx(website, domains, appInstall, runtime); err != nil {
 		return err
 	}
 
