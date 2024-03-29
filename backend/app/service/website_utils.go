@@ -365,6 +365,13 @@ func createWafConfig(website *model.Website, domains []model.WebsiteDomain) erro
 		}
 	}
 
+	if err = opNginx(nginxInstall.ContainerName, constant.NginxCheck); err != nil {
+		return err
+	}
+	if err = opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
+		return err
+	}
+
 	return nil
 }
 
