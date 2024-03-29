@@ -36,7 +36,7 @@ const getLogoUrl = (isCollapse: boolean) => {
     img {
         object-fit: contain;
         width: 95%;
-        height: 40px;
+        height: 50px;
     }
 }
 </style>
