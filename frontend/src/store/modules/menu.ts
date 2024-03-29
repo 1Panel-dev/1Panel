@@ -30,3 +30,5 @@ export const MenuStore = defineStore({
     },
     persist: piniaPersistConfig('MenuStore'),
 });
+
+export default MenuStore;

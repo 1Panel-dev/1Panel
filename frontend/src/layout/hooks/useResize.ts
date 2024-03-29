@@ -1,8 +1,6 @@
 import { watch, onBeforeMount, onMounted, onBeforeUnmount } from 'vue';
 import { useRoute } from 'vue-router';
-
-import { MenuStore } from '@/store/modules/menu';
-import { GlobalStore } from '@/store';
+import { GlobalStore, MenuStore } from '@/store';
 import { DeviceType } from '@/enums/app';
 /** 参考 Bootstrap 的响应式设计 WIDTH = 600 */
 const WIDTH = 600;

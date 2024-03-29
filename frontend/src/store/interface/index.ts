@@ -17,9 +17,7 @@ export interface GlobalState {
     loadingText: string;
     isLogin: boolean;
     entrance: string;
-    csrfToken: string;
     language: string; // zh | en | tw
-    // assemblySize: string; // small | default | large
     themeConfig: ThemeConfigProp;
     isFullScreen: boolean;
     isOnRestart: boolean;
@@ -33,14 +31,11 @@ export interface GlobalState {
     defaultNetwork: string;
 
     isProductPro: boolean;
+    productProExpires: number;
 }
 
 export interface MenuState {
     isCollapse: boolean;
     menuList: RouteRecordRaw[];
     withoutAnimation: boolean;
-}
-
-export interface AuthState {
-    authRouter: string[];
 }

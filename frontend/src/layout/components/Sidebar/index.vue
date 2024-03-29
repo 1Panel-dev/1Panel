@@ -33,7 +33,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { RouteRecordRaw, useRoute } from 'vue-router';
-import { MenuStore } from '@/store/modules/menu';
 import { loadingSvg } from '@/utils/svg';
 import Logo from './components/Logo.vue';
 import Collapse from './components/Collapse.vue';
@@ -42,7 +41,7 @@ import router, { menuList } from '@/routers/router';
 import { logOutApi } from '@/api/modules/auth';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
-import { GlobalStore } from '@/store';
+import { GlobalStore, MenuStore } from '@/store';
 import { MsgSuccess } from '@/utils/message';
 import { isString } from '@vueuse/core';
 const route = useRoute();

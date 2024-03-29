@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { MenuStore } from '@/store/modules/menu';
+import { MenuStore } from '@/store';
 const menuStore = MenuStore();
 const isCollapse = computed(() => menuStore.isCollapse);
 </script>
