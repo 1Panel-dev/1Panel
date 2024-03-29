@@ -75,7 +75,6 @@ const loadDataFromDB = async () => {
 
 const loadDataFromXDB = async () => {
     const res = await searchXSetting();
-    localStorage.setItem('1p-favicon', res.data.logo);
     globalStore.themeConfig.title = res.data.title;
     globalStore.themeConfig.logo = res.data.logo;
     globalStore.themeConfig.logoWithText = res.data.logoWithText;
@@ -110,7 +109,7 @@ const updateDarkMode = async (event: MediaQueryListEvent) => {
 };
 
 const initFavicon = () => {
-    let favicon = localStorage.getItem('1p-favicon');
+    let favicon = globalStore.themeConfig.favicon;
     const link = (document.querySelector("link[rel*='icon']") || document.createElement('link')) as HTMLLinkElement;
     link.type = 'image/x-icon';
     link.rel = 'shortcut icon';

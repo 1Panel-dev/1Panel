@@ -1458,7 +1458,7 @@ const message = {
 
         license: 'License',
     },
-    License: {
+    license: {
         community: 'Community Edition',
         pro: 'Professional Edition',
         trial: 'Trial Edition',

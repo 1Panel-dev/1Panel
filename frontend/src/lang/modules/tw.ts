@@ -1358,7 +1358,7 @@ const message = {
 
         license: '許可證',
     },
-    License: {
+    license: {
         community: '社區版',
         pro: '專業版',
         trial: '試用版',
