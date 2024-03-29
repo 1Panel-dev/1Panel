@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { MenuStore } from '@/store/modules/menu';
+import { MenuStore } from '@/store';
 const menuStore = MenuStore();
 </script>
 <template>

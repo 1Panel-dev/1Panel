@@ -18,13 +18,12 @@
 import { onMounted, computed, ref, watch, onBeforeUnmount } from 'vue';
 import { Sidebar, Footer, AppMain, MobileHeader } from './components';
 import useResize from './hooks/useResize';
-import { GlobalStore } from '@/store';
-import { MenuStore } from '@/store/modules/menu';
+import { GlobalStore, MenuStore } from '@/store';
 import { DeviceType } from '@/enums/app';
 import { useI18n } from 'vue-i18n';
 import { useTheme } from '@/hooks/use-theme';
-import { useLogo } from '@/hooks/use-logo';
 import { getLicense, getSettingInfo, getSystemAvailable } from '@/api/modules/setting';
+import { searchXSetting } from '@/xpack/api/modules/setting';
 useResize();
 
 const menuStore = MenuStore();
@@ -74,10 +73,31 @@ const loadDataFromDB = async () => {
     switchDark();
 };
 
+const loadDataFromXDB = async () => {
+    const res = await searchXSetting();
+    localStorage.setItem('1p-favicon', res.data.logo);
+    globalStore.themeConfig.title = res.data.title;
+    globalStore.themeConfig.logo = res.data.logo;
+    globalStore.themeConfig.logoWithText = res.data.logoWithText;
+    globalStore.themeConfig.favicon = res.data.favicon;
+
+    initFavicon();
+};
+
 const loadProductProFromDB = async () => {
     const res = await getLicense();
     globalStore.isProductPro =
         res.data.status === 'Enable' || res.data.status === 'Lost01' || res.data.status === 'Lost02';
+
+    if (globalStore.isProductPro) {
+        loadDataFromXDB();
+        globalStore.productProExpires = Number(res.data.productPro);
+    } else {
+        globalStore.themeConfig.title = '';
+        globalStore.themeConfig.logo = '';
+        globalStore.themeConfig.logoWithText = '';
+        globalStore.themeConfig.favicon = '';
+    }
 };
 
 const updateDarkMode = async (event: MediaQueryListEvent) => {
@@ -127,7 +147,6 @@ onMounted(() => {
     loadStatus();
     initFavicon();
     loadDataFromDB();
-    useLogo();
     loadProductProFromDB();
 
     const mqList = window.matchMedia('(prefers-color-scheme: dark)');

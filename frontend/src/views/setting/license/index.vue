@@ -168,7 +168,9 @@ const search = async () => {
             if (!globalStore.isProductPro || res.data.status === 'Lost03') {
                 return;
             }
-            console.log('csdcasd');
+            if (globalStore.isProductPro) {
+                globalStore.productProExpires = Number(res.data.productPro);
+            }
             license.licenseName = res.data.licenseName;
             license.assigneeName = res.data.assigneeName;
             license.trial = res.data.trial;

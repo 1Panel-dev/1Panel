@@ -42,9 +42,6 @@ class RequestHttp {
         this.service.interceptors.response.use(
             (response: AxiosResponse) => {
                 const { data } = response;
-                if (response.headers['x-csrf-token']) {
-                    globalStore.setCsrfToken(response.headers['x-csrf-token']);
-                }
                 if (data.code == ResultEnum.OVERDUE || data.code == ResultEnum.FORBIDDEN) {
                     globalStore.setLogStatus(false);
                     router.push({
