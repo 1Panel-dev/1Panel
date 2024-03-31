@@ -28,6 +28,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/init/viper"
 
 	"github.com/gin-gonic/gin"
+	"github.com/bddjr/hlfhr"
 )
 
 func Start() {
@@ -54,10 +55,10 @@ func Start() {
 		tcpItem = "tcp"
 		global.CONF.System.BindAddress = fmt.Sprintf("[%s]", global.CONF.System.BindAddress)
 	}
-	server := &http.Server{
+	server := hlfhr.New(&http.Server{
 		Addr:    global.CONF.System.BindAddress + ":" + global.CONF.System.Port,
 		Handler: rootRouter,
-	}
+	})
 	ln, err := net.Listen(tcpItem, server.Addr)
 	if err != nil {
 		panic(err)
