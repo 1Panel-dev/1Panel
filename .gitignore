@@ -42,11 +42,6 @@ frontend/src/xpack
 backend/xpack
 backend/router/entry_xpack.go
 backend/server/init_xpack.go
-plugins/openresty/waf/db
-plugins/openresty/waf/data
-plugins/openresty/waf/sites
-plugins/openresty/waf/conf/websites.json
-
 
 .history/
 dist/
