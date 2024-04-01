@@ -4,11 +4,12 @@ import (
 	"crypto/tls"
 	"encoding/gob"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"net"
 	"net/http"
 	"os"
 	"path"
+
+	"github.com/1Panel-dev/1Panel/backend/i18n"
 
 	"github.com/1Panel-dev/1Panel/backend/init/app"
 	"github.com/1Panel-dev/1Panel/backend/init/business"
@@ -27,8 +28,8 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/init/validator"
 	"github.com/1Panel-dev/1Panel/backend/init/viper"
 
+	"github.com/1Panel-dev/1Panel/backend/server/hlfhr"
 	"github.com/gin-gonic/gin"
-	"github.com/bddjr/hlfhr"
 )
 
 func Start() {
