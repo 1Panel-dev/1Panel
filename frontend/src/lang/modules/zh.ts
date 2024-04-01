@@ -1390,7 +1390,7 @@ const message = {
         closeAlert: '当前页面可在面板设置中关闭显示',
         introduce: '功能介绍',
         waf: '1Panel WAF 有效防CC攻击、防恶意采集、防刷接口等常见攻击和黑客渗透测试行为，强力守护您网站业务安全。',
-        tamper: '1Panel 防篡改有效保护数据免受篡改和恶意攻击，确保数据的可靠性和安全性。',
+        tamper: '1Panel 防篡改功能是一种用于保护网站免受未经授权的修改或篡改的安全措施。',
         setting: '1Panel 界面设置可自定义面板 Logo、欢迎简介等信息。',
     },
     clean: {
