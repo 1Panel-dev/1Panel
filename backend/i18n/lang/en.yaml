@@ -172,6 +172,9 @@ ErrScope: "Modification of this configuration is not supported"
 ErrStateChange: "State modification failed"
 ErrRuleExist: "Rule is Exist"
 ErrRuleNotExist: "Rule is not Exist"
+ErrParseIP: "IP format error"
+ErrDefaultIP: "default is a reserved name, please change it to another name"
+ErrGroupInUse: "The IP group is used by the black/white list and cannot be deleted"
 
 #license
 ErrLicense: "License format error, {{ .err }}, please re-import!"

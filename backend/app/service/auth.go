@@ -1,6 +1,7 @@
 package service
 
 import (
+	"crypto/hmac"
 	"strconv"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -42,7 +43,7 @@ func (u *AuthService) Login(c *gin.Context, info dto.Login, entrance string) (*d
 	if err != nil {
 		return nil, constant.ErrAuth
 	}
-	if info.Password != pass || nameSetting.Value != info.Name {
+	if !hmac.Equal([]byte(info.Password), []byte(pass)) || nameSetting.Value != info.Name {
 		return nil, constant.ErrAuth
 	}
 	entranceSetting, err := settingRepo.Get(settingRepo.WithByKey("SecurityEntrance"))
@@ -78,7 +79,7 @@ func (u *AuthService) MFALogin(c *gin.Context, info dto.MFALogin, entrance strin
 	if err != nil {
 		return nil, err
 	}
-	if info.Password != pass || nameSetting.Value != info.Name {
+	if !hmac.Equal([]byte(info.Password), []byte(pass)) || nameSetting.Value != info.Name {
 		return nil, constant.ErrAuth
 	}
 	entranceSetting, err := settingRepo.Get(settingRepo.WithByKey("SecurityEntrance"))
@@ -168,7 +169,7 @@ func (u *AuthService) VerifyCode(code string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return setting.Value == code, nil
+	return hmac.Equal([]byte(setting.Value), []byte(code)), nil
 }
 
 func (u *AuthService) CheckIsSafety(code string) (string, error) {
