@@ -1389,7 +1389,7 @@ const message = {
         introduce: '功能介紹',
         waf: '升級專業版可以獲得攔截地圖、日誌、封鎖記錄、地理位置封鎖、自訂規則、自訂攔截頁面等功能',
         tamper: '1Panel 防篡改功能是一種用於保護網站免受未經授權的修改或篡改的安全措施。',
-        setting: '1Panel 介面設置可自定義面板 Logo、歡迎簡介等信息。',
+        setting: '1Panel 介面設置功能可自定義面板 Logo、歡迎簡介等信息。',
     },
     clean: {
         scan: '開始掃描',
