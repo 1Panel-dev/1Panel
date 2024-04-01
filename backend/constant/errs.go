@@ -158,9 +158,8 @@ var (
 
 // license
 var (
-	ErrLicense              = "ErrLicense"
-	ErrLicenseCheckInLocal  = "ErrLicenseCheckInLocal"
-	ErrLicenseCheckInRemote = "ErrLicenseCheckInRemote"
-	ErrLicenseSave          = "ErrLicenseSave"
-	ErrLicenseSync          = "ErrLicenseSync"
+	ErrLicense      = "ErrLicense"
+	ErrLicenseCheck = "ErrLicenseCheck"
+	ErrLicenseSave  = "ErrLicenseSave"
+	ErrLicenseSync  = "ErrLicenseSync"
 )
