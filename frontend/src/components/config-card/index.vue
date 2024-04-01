@@ -9,7 +9,9 @@
             <span>
                 {{ header }}
             </span>
-            <slot name="header-r" />
+            <div class="header-r">
+                <slot name="header-r" />
+            </div>
         </div>
 
         <el-text type="info">{{ description }}</el-text>
@@ -44,11 +46,14 @@ defineProps({
     .config-header {
         margin-bottom: 18px;
         display: flex;
-        justify-content: space-between;
+        justify-content: space-start;
         align-items: center;
         span {
             font-weight: normal;
             font-size: 18px;
+        }
+        .header-r {
+            margin-left: 20px;
         }
     }
 
