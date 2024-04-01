@@ -1488,7 +1488,7 @@ const message = {
         knowMorePro: 'Learn More',
         closeAlert: 'The current page can be closed in the panel settings',
         introduce: 'Feature Introduction',
-        waf: '1Panel WAF effectively prevents common attacks such as CC attacks, malicious data collection, API abuse, and hacker penetration testing behaviors, providing strong protection for your website security.',
+        waf: 'Upgrade to the professional version to get interception maps, logs, blocking records, geographical location blocking, custom rules, custom blocking pages and other functions',
         tamper: '1Panel tamper-proof function is a security measure used to protect a website from unauthorized modifications or tampering.',
         setting:
             '1Panel interface settings allow you to customize panel logos, welcome messages, and other information.',
