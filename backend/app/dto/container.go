@@ -98,6 +98,7 @@ type ContainerStats struct {
 }
 
 type VolumeHelper struct {
+	Type         string `json:"type"`
 	SourceDir    string `json:"sourceDir"`
 	ContainerDir string `json:"containerDir"`
 	Mode         string `json:"mode"`

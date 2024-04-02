@@ -56,10 +56,10 @@ export namespace Container {
         protocol: string;
     }
     export interface Volume {
+        type: string;
         sourceDir: string;
         containerDir: string;
         mode: string;
-        isVolume: boolean;
     }
     export interface ContainerInfo {
         containerID: string;
