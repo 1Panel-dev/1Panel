@@ -1451,6 +1451,12 @@ const message = {
         currentVersion: 'Version',
 
         license: 'License',
+        advancedMenuShow: 'Advanced Menu Display',
+        showMainAdvancedMenu:
+            'If only one menu is retained, only the main advanced menu will be displayed in the sidebar',
+        showAll: 'Show All',
+        ifShow: 'Whether to Show',
+        menu: 'Menu',
     },
     license: {
         community: 'Community Edition',

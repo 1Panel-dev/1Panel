@@ -1352,6 +1352,11 @@ const message = {
         currentVersion: '當前運行版本：',
 
         license: '許可證',
+        advancedMenuShow: '高級功能選單顯示',
+        showMainAdvancedMenu: '如果只保留 1 個選單，則側邊欄只會顯示高級功能主選單',
+        showAll: '全部顯示',
+        ifShow: '是否顯示',
+        menu: '選單',
     },
     license: {
         community: '社區版',
