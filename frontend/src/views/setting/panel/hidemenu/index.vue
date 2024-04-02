@@ -4,27 +4,12 @@
             <template #header>
                 <DrawerHeader :header="$t('setting.advancedMenuShow')" :back="handleClose" />
             </template>
-            <!--            <el-tree-->
-            <!--                node-key="id"-->
-            <!--                :default-expand-all="true"-->
-            <!--                :data="treeData.hideMenu"-->
-            <!--                :default-checked-keys="defaultCheck"-->
-            <!--                :props="defaultProps"-->
-            <!--                @check-change="onChange"-->
-            <!--                show-checkbox-->
-            <!--            >-->
-            <!--                <template #default="{ data }">-->
-            <!--                    <div class="float-left">-->
-            <!--                        <span>{{ i18n.global.t(data.title) }}</span>-->
-            <!--                    </div>-->
-            <!--                </template>-->
-            <!--            </el-tree>-->
 
             <ComplexTable
                 :data="treeData.hideMenu"
+                :show-header="false"
                 style="width: 100%; margin-bottom: 20px"
                 row-key="id"
-                border
                 default-expand-all
             >
                 <el-table-column prop="title" :label="$t('setting.menu')">
@@ -68,11 +53,6 @@ interface DialogProps {
 }
 const menuList = ref();
 
-// const defaultProps = {
-//     children: 'children',
-//     label: 'label',
-// };
-
 const treeData = reactive({
     hideMenu: [],
     checkedData: [],
@@ -95,10 +75,6 @@ function loadCheck(data: any, checkList: any) {
         }
     }
 }
-
-// function onChange(data: any, isCheck: boolean) {
-//     data.isCheck = isCheck;
-// }
 
 const onSaveStatus = async (row: any) => {
     if (row.label === '/xpack') {
@@ -137,20 +113,6 @@ const onSaveStatus = async (row: any) => {
             treeData.hideMenu[0].isCheck = false;
         }
     }
-
-    // 遍历树，高级功能的开关按钮自动控制
-    // const chiddrens = treeData.hideMenu[0].children;
-    //
-    // if (!treeData.hideMenu[0].isCheck) {
-    // }
-    //
-    // let flag = false;
-    // for (const item of treeData.hideMenu[0].children) {
-    //     if (item.isCheck) {
-    //         row.isCheck = true;
-    //     }
-    // }
-    // treeData.hideMenu[0].isCheck = flag;
 };
 
 const acceptParams = (params: DialogProps): void => {

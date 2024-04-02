@@ -126,7 +126,6 @@ const search = async () => {
         let menuItem = JSON.parse(JSON.stringify(item));
         let menuChildren: RouteRecordRaw[] = [];
         if (menuItem.path === '/xpack') {
-            // 如果隐藏数组包含 '/xpack', 则是全部显示
             if (checkedLabels.length) {
                 // 部分隐藏逻辑实现，勾选了才显示
                 menuItem.children.forEach((child: any) => {

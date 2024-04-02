@@ -110,9 +110,6 @@
                                         </el-button>
                                     </template>
                                 </el-input>
-                                <span class="input-help">
-                                    {{ $t('setting.showMainAdvancedMenu') }}
-                                </span>
                             </el-form-item>
                         </el-col>
                     </el-row>
