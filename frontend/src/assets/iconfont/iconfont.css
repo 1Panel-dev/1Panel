@@ -1,9 +1,9 @@
 @font-face {
   font-family: "panel"; /* Project id 3575356 */
-  src: url('iconfont.woff2?t=1701341406915') format('woff2'),
-       url('iconfont.woff?t=1701341406915') format('woff'),
-       url('iconfont.ttf?t=1701341406915') format('truetype'),
-       url('iconfont.svg?t=1701341406915#panel') format('svg');
+  src: url('iconfont.woff2?t=1712045188451') format('woff2'),
+       url('iconfont.woff?t=1712045188451') format('woff'),
+       url('iconfont.ttf?t=1712045188451') format('truetype'),
+       url('iconfont.svg?t=1712045188451#panel') format('svg');
 }
 
 .panel {
@@ -12,6 +12,58 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.p-xpack:before {
+  content: "\eb70";
+}
+
+.p-waf-4:before {
+  content: "\e608";
+}
+
+.p-waf-1:before {
+  content: "\e62a";
+}
+
+.p-waf-2:before {
+  content: "\e682";
+}
+
+.p-waf-3:before {
+  content: "\e666";
+}
+
+.p-setting-1:before {
+  content: "\e626";
+}
+
+.p-setting-2:before {
+  content: "\e630";
+}
+
+.p-setting-3:before {
+  content: "\e617";
+}
+
+.p-tamper-4:before {
+  content: "\e7c3";
+}
+
+.p-tamper-2:before {
+  content: "\e610";
+}
+
+.p-tamper-3:before {
+  content: "\ec4d";
+}
+
+.p-tamper-1:before {
+  content: "\e687";
+}
+
+.p-tongji:before {
+  content: "\e856";
 }
 
 .p-webdav:before {

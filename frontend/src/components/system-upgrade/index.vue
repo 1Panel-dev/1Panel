@@ -15,8 +15,8 @@
             <el-divider direction="vertical" />
         </span>
         <el-button type="primary" link @click="toHalo">
-            {{ isProductPro ? $t('license.pro') : $t('license.community') }}
-            <span class="version">{{ ': ' + version }}</span>
+            {{ isProductPro ? $t('license.pro') : $t('license.community') }} :
+            <span class="version">{{ version }}</span>
         </el-button>
         <el-badge is-dot class="item" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
             <el-button type="primary" link @click="onLoadUpgradeInfo">
@@ -104,7 +104,7 @@ const handleClose = () => {
 };
 
 const toHalo = () => {
-    window.open('https://halo.test.lxware.cn/', '_blank', 'noopener,noreferrer');
+    window.open('https://www.lxware.cn/1panel' + '', '_blank', 'noopener,noreferrer');
 };
 
 const toDoc = () => {
