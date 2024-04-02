@@ -29,6 +29,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/registry"
 	"github.com/docker/docker/client"
@@ -442,7 +443,7 @@ func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.Contai
 	if oldContainer.HostConfig.Memory != 0 {
 		data.Memory = float64(oldContainer.HostConfig.Memory) / 1024 / 1024
 	}
-	data.Volumes = loadVolumeBinds(oldContainer.HostConfig.Binds)
+	data.Volumes = loadVolumeBinds(oldContainer.Mounts)
 
 	return &data, nil
 }
@@ -994,10 +995,19 @@ func loadConfigInfo(isCreate bool, req dto.ContainerOperate, oldContainer *types
 	hostConf.MemorySwap = 0
 	hostConf.PortBindings = portMap
 	hostConf.Binds = []string{}
+	hostConf.Mounts = []mount.Mount{}
 	config.Volumes = make(map[string]struct{})
 	for _, volume := range req.Volumes {
-		config.Volumes[volume.ContainerDir] = struct{}{}
-		hostConf.Binds = append(hostConf.Binds, fmt.Sprintf("%s:%s:%s", volume.SourceDir, volume.ContainerDir, volume.Mode))
+		if volume.Type == "volume" {
+			hostConf.Mounts = append(hostConf.Mounts, mount.Mount{
+				Type:   mount.Type(volume.Type),
+				Source: volume.SourceDir,
+				Target: volume.ContainerDir,
+			})
+			config.Volumes[volume.ContainerDir] = struct{}{}
+		} else {
+			hostConf.Binds = append(hostConf.Binds, fmt.Sprintf("%s:%s:%s", volume.SourceDir, volume.ContainerDir, volume.Mode))
+		}
 	}
 	return &config, &hostConf, &networkConf, nil
 }
@@ -1024,39 +1034,20 @@ func reCreateAfterUpdate(name string, client *client.Client, config *container.C
 	global.LOG.Errorf("recreate after container update successful")
 }
 
-func loadVolumeBinds(binds []string) []dto.VolumeHelper {
+func loadVolumeBinds(binds []types.MountPoint) []dto.VolumeHelper {
 	var datas []dto.VolumeHelper
 	for _, bind := range binds {
-		parts := strings.Split(bind, ":")
 		var volumeItem dto.VolumeHelper
-		if len(parts) > 3 {
-			continue
+		volumeItem.Type = string(bind.Type)
+		if bind.Type == "volume" {
+			volumeItem.SourceDir = bind.Name
+		} else {
+			volumeItem.SourceDir = bind.Source
 		}
-		volumeItem.SourceDir = parts[0]
-		if len(parts) == 1 {
-			volumeItem.ContainerDir = parts[0]
+		volumeItem.ContainerDir = bind.Destination
+		volumeItem.Mode = "ro"
+		if bind.RW {
 			volumeItem.Mode = "rw"
-		}
-		if len(parts) == 2 {
-			switch parts[1] {
-			case "r", "ro":
-				volumeItem.ContainerDir = parts[0]
-				volumeItem.Mode = "ro"
-			case "rw":
-				volumeItem.ContainerDir = parts[0]
-				volumeItem.Mode = "rw"
-			default:
-				volumeItem.ContainerDir = parts[1]
-				volumeItem.Mode = "rw"
-			}
-		}
-		if len(parts) == 3 {
-			volumeItem.ContainerDir = parts[1]
-			if parts[2] == "r" {
-				volumeItem.Mode = "ro"
-			} else {
-				volumeItem.Mode = parts[2]
-			}
 		}
 		datas = append(datas, volumeItem)
 	}

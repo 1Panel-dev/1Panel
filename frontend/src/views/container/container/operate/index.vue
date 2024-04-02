@@ -138,9 +138,9 @@
                     <el-form-item :label="$t('container.mount')">
                         <div v-for="(row, index) in dialogData.rowData!.volumes" :key="index" style="width: 100%">
                             <el-card class="mt-1">
-                                <el-radio-group v-model="row.isVolume">
-                                    <el-radio-button :value="true">{{ $t('container.volumeOption') }}</el-radio-button>
-                                    <el-radio-button :value="false">{{ $t('container.hostOption') }}</el-radio-button>
+                                <el-radio-group v-model="row.type">
+                                    <el-radio-button value="volume">{{ $t('container.volumeOption') }}</el-radio-button>
+                                    <el-radio-button value="bind">{{ $t('container.hostOption') }}</el-radio-button>
                                 </el-radio-group>
                                 <el-button
                                     class="float-right mt-3"
@@ -152,7 +152,10 @@
                                 </el-button>
                                 <el-row class="mt-4" :gutter="5">
                                     <el-col :span="10">
-                                        <el-form-item v-if="row.isVolume" :label="$t('container.volumeOption')">
+                                        <el-form-item
+                                            v-if="row.type === 'volume'"
+                                            :label="$t('container.volumeOption')"
+                                        >
                                             <el-select filterable v-model="row.sourceDir">
                                                 <div v-for="(item, indexV) of volumes" :key="indexV">
                                                     <el-tooltip :hide-after="20" :content="item.option" placement="top">
@@ -403,10 +406,10 @@ const goRouter = async () => {
 
 const handleVolumesAdd = () => {
     let item = {
+        type: 'bind',
         sourceDir: '',
         containerDir: '',
         mode: 'rw',
-        isVolume: true,
     };
     dialogData.value.rowData!.volumes.push(item);
 };
@@ -427,18 +430,6 @@ const loadImageOptions = async () => {
 const loadVolumeOptions = async () => {
     const res = await listVolume();
     volumes.value = res.data;
-    for (const item of dialogData.value.rowData.volumes) {
-        let isVolume = false;
-        for (const v of volumes.value) {
-            if (item.sourceDir == v.option) {
-                item.isVolume = true;
-                break;
-            }
-            if (!isVolume) {
-                item.isVolume = false;
-            }
-        }
-    }
 };
 const loadNetworkOptions = async () => {
     const res = await listNetwork();

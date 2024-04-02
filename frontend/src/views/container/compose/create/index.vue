@@ -30,33 +30,27 @@
                                 </template>
                             </el-input>
                         </el-form-item>
-                        <el-row :gutter="20">
-                            <el-col :span="12">
-                                <el-form-item v-if="form.from === 'edit' || form.from === 'template'" prop="name">
-                                    <el-input @input="changePath" v-model.trim="form.name">
-                                        <template #prefix>
-                                            <span style="margin-right: 8px">{{ $t('file.dir') }}</span>
-                                        </template>
-                                    </el-input>
-                                    <span class="input-help">
-                                        {{ $t('container.composePathHelper', [composeFile]) }}
-                                    </span>
-                                </el-form-item>
-                            </el-col>
-                            <el-col :span="12">
-                                <el-form-item v-if="form.from === 'template'" prop="template">
-                                    <el-select v-model="form.template" @change="changeTemplate">
-                                        <template #prefix>{{ $t('container.template') }}</template>
-                                        <el-option
-                                            v-for="item in templateOptions"
-                                            :key="item.id"
-                                            :value="item.id"
-                                            :label="item.name"
-                                        />
-                                    </el-select>
-                                </el-form-item>
-                            </el-col>
-                        </el-row>
+                        <el-form-item v-if="form.from === 'template'" prop="template">
+                            <el-select v-model="form.template" @change="changeTemplate">
+                                <template #prefix>{{ $t('container.template') }}</template>
+                                <el-option
+                                    v-for="item in templateOptions"
+                                    :key="item.id"
+                                    :value="item.id"
+                                    :label="item.name"
+                                />
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item v-if="form.from === 'edit' || form.from === 'template'" prop="name">
+                            <el-input @input="changePath" v-model.trim="form.name">
+                                <template #prefix>
+                                    <span style="margin-right: 8px">{{ $t('file.dir') }}</span>
+                                </template>
+                            </el-input>
+                            <span class="input-help">
+                                {{ $t('container.composePathHelper', [composeFile]) }}
+                            </span>
+                        </el-form-item>
                         <el-form-item>
                             <div v-if="form.from === 'edit' || form.from === 'template'" style="width: 100%">
                                 <el-radio-group v-model="mode" size="small">
@@ -81,6 +75,7 @@
                             <div style="width: 100%">
                                 <LogFile
                                     ref="logRef"
+                                    v-model:is-reading="isReading"
                                     :config="logConfig"
                                     :default-button="false"
                                     v-if="mode === 'log' && showLog"
@@ -97,7 +92,7 @@
                 <el-button @click="drawerVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button type="primary" :disabled="onCreating" @click="onSubmit(formRef)">
+                <el-button type="primary" :disabled="isReading" @click="onSubmit(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -124,7 +119,6 @@ const extensions = [javascript(), oneDark];
 const showLog = ref(false);
 const loading = ref();
 const mode = ref('edit');
-const onCreating = ref();
 const oldFrom = ref('edit');
 const drawerVisible = ref(false);
 const templateOptions = ref();
@@ -132,6 +126,7 @@ const baseDir = ref();
 const composeFile = ref();
 let timer: NodeJS.Timer | null = null;
 const logRef = ref();
+const isReading = ref();
 
 const logConfig = reactive({
     type: 'compose-create',
@@ -164,7 +159,6 @@ const acceptParams = (): void => {
     form.path = '';
     form.file = '';
     form.template = null;
-    onCreating.value = false;
     loadTemplates();
     loadPath();
 };
@@ -237,7 +231,6 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             .then(async (res) => {
                 loading.value = false;
                 if (res.data) {
-                    onCreating.value = true;
                     mode.value = 'log';
                     await upCompose(form)
                         .then((res) => {
@@ -246,7 +239,6 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                         })
                         .catch(() => {
                             loading.value = false;
-                            onCreating.value = false;
                         });
                 }
             })

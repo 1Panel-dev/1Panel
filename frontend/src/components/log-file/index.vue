@@ -98,7 +98,7 @@ const readReq = reactive({
     page: 0,
     pageSize: 2000,
 });
-const emit = defineEmits(['update:loading', 'update:hasContent']);
+const emit = defineEmits(['update:loading', 'update:hasContent', 'update:isReading']);
 
 const handleReady = (payload) => {
     view.value = payload.view;
@@ -152,6 +152,7 @@ const stopSignals = [
 ];
 
 const getContent = () => {
+    emit('update:isReading', true);
     if (!end.value) {
         readReq.page += 1;
     }
@@ -219,6 +220,7 @@ const onDownload = async () => {
 };
 
 const onCloseLog = async () => {
+    emit('update:isReading', false);
     tailLog.value = false;
     clearInterval(Number(timer));
     timer = null;
