@@ -46,6 +46,7 @@ export namespace Setting {
         weChatVars: string;
         dingVars: string;
         snapshotIgnore: string;
+        xpackHideMenu: string;
     }
     export interface SettingUpdate {
         key: string;

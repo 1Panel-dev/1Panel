@@ -25,3 +25,13 @@ var AddDatabaseIsDelete = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddXpackHideMenu = &gormigrate.Migration{
+	ID: "20240328-add-xpack-hide-menu",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "XpackHideMenu", Value: "{\n\t\"id\": \"1\",\n\t\"label\": \"/xpack\",\n\t\"isCheck\": false,\n\t\"title\": \"xpack.name\",\n\t\"children\": [{\n\t\t\t\"id\": \"2\",\n\t\t\t\"title\": \"xpack.waf.name\",\n\t\t\t\"path\": \"/xpack/waf\",\n\t\t\t\"label\": \"WAF\",\n\t\t\t\"isCheck\": true\n\t\t},\n\t\t{\n\t\t\t\"id\": \"3\",\n\t\t\t\"title\": \"xpack.monitor.name\",\n\t\t\t\"path\": \"/xpack/monitor\",\n\t\t\t\"label\": \"webMonitor\",\n\t\t\t\"isCheck\": true\n\t\t},\n\t\t{\n\t\t\t\"id\": \"4\",\n\t\t\t\"title\": \"xpack.tamper.tamper\",\n\t\t\t\"path\": \"/xpack/tamper\",\n\t\t\t\"label\": \"Tamper\",\n\t\t\t\"isCheck\": false\n\t\t}\n\t]\n}"}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
