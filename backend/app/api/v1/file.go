@@ -335,9 +335,11 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
             global.LOG.Error(e)
             continue
         }
+        stat, statErr := os.Stat(dstFilename)
         if overwrite {
             _ = os.Remove(dstFilename)
         }
+        
         err = os.Rename(tmpFilename, dstFilename)
         if err != nil {
             _ = os.Remove(tmpFilename)
@@ -345,6 +347,9 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
             failures[file.Filename] = e
             global.LOG.Error(e)
             continue
+        }
+        if statErr == nil {
+            _ = os.Chmod(dstFilename, stat.Mode())
         }
         success++
     }
