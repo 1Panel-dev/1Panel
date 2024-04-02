@@ -32,10 +32,8 @@
                 >
                     {{ $t('license.power') }}
                 </el-button>
-                <div class="mt-3">
-                    <el-link @click="toHalo">
-                        <span>{{ $t('license.knowMorePro') }}</span>
-                    </el-link>
+                <div class="mt-3 mb-5">
+                    <el-button text type="primary" @click="toHalo">{{ $t('license.knowMorePro') }}</el-button>
                 </div>
             </div>
         </el-dialog>
@@ -73,7 +71,7 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
 };
 
 const toHalo = () => {
-    window.open('https://halo.test.lxware.cn/', '_blank', 'noopener,noreferrer');
+    window.open('https://www.lxware.cn/1panel' + '', '_blank', 'noopener,noreferrer');
 };
 
 const submit = async () => {

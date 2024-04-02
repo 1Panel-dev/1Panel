@@ -6,6 +6,97 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "5387846",
+      "name": "钻石_o",
+      "font_class": "xpack",
+      "unicode": "eb70",
+      "unicode_decimal": 60272
+    },
+    {
+      "icon_id": "8229531",
+      "name": "ACL策略",
+      "font_class": "waf-4",
+      "unicode": "e608",
+      "unicode_decimal": 58888
+    },
+    {
+      "icon_id": "8765146",
+      "name": "地图",
+      "font_class": "waf-1",
+      "unicode": "e62a",
+      "unicode_decimal": 58922
+    },
+    {
+      "icon_id": "16563651",
+      "name": "8-4限制区域",
+      "font_class": "waf-2",
+      "unicode": "e682",
+      "unicode_decimal": 59010
+    },
+    {
+      "icon_id": "17064153",
+      "name": "拦截",
+      "font_class": "waf-3",
+      "unicode": "e666",
+      "unicode_decimal": 58982
+    },
+    {
+      "icon_id": "899647",
+      "name": "欢迎页",
+      "font_class": "setting-1",
+      "unicode": "e626",
+      "unicode_decimal": 58918
+    },
+    {
+      "icon_id": "1114667",
+      "name": "图标",
+      "font_class": "setting-2",
+      "unicode": "e630",
+      "unicode_decimal": 58928
+    },
+    {
+      "icon_id": "12010559",
+      "name": "注册网站",
+      "font_class": "setting-3",
+      "unicode": "e617",
+      "unicode_decimal": 58903
+    },
+    {
+      "icon_id": "435944",
+      "name": "日志",
+      "font_class": "tamper-4",
+      "unicode": "e7c3",
+      "unicode_decimal": 59331
+    },
+    {
+      "icon_id": "5799978",
+      "name": "扫描",
+      "font_class": "tamper-2",
+      "unicode": "e610",
+      "unicode_decimal": 58896
+    },
+    {
+      "icon_id": "5961299",
+      "name": "安全",
+      "font_class": "tamper-3",
+      "unicode": "ec4d",
+      "unicode_decimal": 60493
+    },
+    {
+      "icon_id": "28131805",
+      "name": "完整性检查",
+      "font_class": "tamper-1",
+      "unicode": "e687",
+      "unicode_decimal": 59015
+    },
+    {
+      "icon_id": "5838475",
+      "name": "统计",
+      "font_class": "tongji",
+      "unicode": "e856",
+      "unicode_decimal": 59478
+    },
+    {
       "icon_id": "23044673",
       "name": "webdav",
       "font_class": "webdav",

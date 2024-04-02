@@ -125,7 +125,7 @@ const license = reactive({
 });
 
 const toHalo = () => {
-    window.open('https://halo.test.lxware.cn/', '_blank', 'noopener,noreferrer');
+    window.open('https://www.lxware.cn/1panel' + '', '_blank', 'noopener,noreferrer');
 };
 
 const onSync = async () => {
