@@ -273,7 +273,7 @@ const submit = async () => {
         const fileSize = file.size;
 
         uploadHelper.value = i18n.global.t('file.fileUploadStart', [file.name]);
-        if (fileSize <= 1024 * 1024 * 5) {
+        if (fileSize <= 1024 * 1024 * 10) {
             const formData = new FormData();
             formData.append('file', file.raw);
             if (file.raw.webkitRelativePath != '') {
@@ -281,6 +281,7 @@ const submit = async () => {
             } else {
                 formData.append('path', path.value + '/' + getPathWithoutFilename(file.name));
             }
+            formData.append('overwrite', 'True');
             uploadPercent.value = 0;
             await UploadFileData(formData, {
                 onUploadProgress: (progressEvent) => {
