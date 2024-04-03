@@ -1457,10 +1457,11 @@ const message = {
         currentVersion: 'Version',
 
         license: 'License',
-        advancedMenuShow: 'Advanced Menu Display',
+        advancedMenuHide: 'Advanced Menu Hide',
         showMainAdvancedMenu:
             'If only one menu is retained, only the main advanced menu will be displayed in the sidebar',
         showAll: 'Show All',
+        hideALL: 'Hide All',
         ifShow: 'Whether to Show',
         menu: 'Menu',
         confirmMessage: 'The page will be refreshed to update the advanced menu list. Continue?',

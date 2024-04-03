@@ -102,7 +102,7 @@
                                 </el-input>
                             </el-form-item>
 
-                            <el-form-item :label="$t('setting.advancedMenuShow')">
+                            <el-form-item :label="$t('setting.advancedMenuHide')">
                                 <el-input disabled v-model="form.proHideMenus">
                                     <template #append>
                                         <el-button v-show="!show" @click="onChangeHideMenus" icon="Setting">
@@ -214,7 +214,7 @@ const search = async () => {
 };
 
 function extractTitles(node: Node, result: string[]): void {
-    if (node.isCheck && !node.children) {
+    if (!node.isCheck && !node.children) {
         result.push(i18n.t(node.title));
     }
     if (node.children) {
@@ -232,7 +232,7 @@ function getCheckedTitles(json: Node): string[] {
     }
     if (result.length === json.children.length) {
         result = [];
-        result.push(i18n.t('setting.showAll'));
+        result.push(i18n.t('setting.hideALL'));
     }
     return result;
 }
