@@ -1,9 +1,10 @@
 import fit2cloudTwLocale from 'fit2cloud-ui-plus/src/locale/lang/zh-cn';
 let xpackTwLocale = {};
-try {
-    const commercialTranslationModule = await import('@/xpack/lang/tw');
-    xpackTwLocale = commercialTranslationModule.default || {};
-} catch (error) {}
+const xpackModules = import.meta.globEager('../../xpack/lang/tw.ts');
+if (xpackModules['../../xpack/lang/tw.ts']) {
+    xpackTwLocale = xpackModules['../../xpack/lang/tw.ts'].default || {};
+}
+
 const message = {
     commons: {
         true: '是',
