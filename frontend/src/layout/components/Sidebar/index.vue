@@ -100,7 +100,6 @@ const systemLogOut = async () => {
 };
 
 function extractLabels(node: Node, result: string[]): void {
-    // 未勾选的才隐藏
     if (node.isCheck) {
         result.push(node.label);
     }
@@ -135,6 +134,11 @@ const search = async () => {
                     }
                     if (child.hidden === false) {
                         menuChildren.push(child);
+                        if (checkedLabels.length === 2) {
+                            menuItem.meta.title = child.meta.title;
+                        } else {
+                            menuItem.meta.title = 'xpack.menu';
+                        }
                     }
                 });
                 menuItem.meta.hideInSidebar = false;

@@ -2,7 +2,7 @@
     <div>
         <el-drawer v-model="drawerVisible" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
             <template #header>
-                <DrawerHeader :header="$t('setting.advancedMenuShow')" :back="handleClose" />
+                <DrawerHeader :header="$t('setting.advancedMenuHide')" :back="handleClose" />
             </template>
 
             <ComplexTable
@@ -125,7 +125,7 @@ const handleClose = () => {
 };
 
 const saveHideMenus = async () => {
-    ElMessageBox.confirm(i18n.global.t('setting.confirmMessage'), i18n.global.t('setting.advancedMenuShow'), {
+    ElMessageBox.confirm(i18n.global.t('setting.confirmMessage'), i18n.global.t('setting.advancedMenuHide'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
