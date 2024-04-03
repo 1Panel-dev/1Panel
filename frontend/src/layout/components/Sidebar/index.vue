@@ -127,7 +127,6 @@ const search = async () => {
         let menuChildren: RouteRecordRaw[] = [];
         if (menuItem.path === '/xpack') {
             if (checkedLabels.length) {
-                // 部分隐藏逻辑实现，勾选了才显示
                 menuItem.children.forEach((child: any) => {
                     for (const str of checkedLabels) {
                         if (child.name === str) {
@@ -152,7 +151,6 @@ const search = async () => {
             rstMenuList.push(menuItem);
         }
     });
-    // 重新赋值
     menuStore.menuList = rstMenuList;
 };
 

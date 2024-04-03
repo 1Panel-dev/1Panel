@@ -79,12 +79,10 @@ function loadCheck(data: any, checkList: any) {
 const onSaveStatus = async (row: any) => {
     if (row.label === '/xpack') {
         if (!row.isCheck) {
-            // 如果父节点的开关关闭，子节点全部关闭
             for (const item of treeData.hideMenu[0].children) {
                 item.isCheck = false;
             }
         } else {
-            // 如果全部子节点关闭，父节点打开，则所有子节点自动打开
             let flag = false;
             for (const item of treeData.hideMenu[0].children) {
                 if (item.isCheck) {
@@ -99,11 +97,9 @@ const onSaveStatus = async (row: any) => {
         }
     } else {
         let flag = false;
-        // 如果有一个子节点打开，则父节点也打开
         if (row.isCheck) {
             treeData.hideMenu[0].isCheck = true;
         }
-        // 如果全部子开关关闭，则父节点也关闭
         for (const item of treeData.hideMenu[0].children) {
             if (item.isCheck) {
                 flag = true;
@@ -142,7 +138,6 @@ const saveHideMenus = async () => {
                 drawerVisible.value = false;
                 emit('search');
                 window.location.reload();
-                return;
             })
             .catch(() => {
                 loading.value = false;
@@ -154,5 +149,3 @@ defineExpose({
     acceptParams,
 });
 </script>
-
-<style scoped lang="scss"></style>
