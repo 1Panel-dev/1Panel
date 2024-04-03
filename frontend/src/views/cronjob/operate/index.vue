@@ -152,6 +152,26 @@
                             <el-option v-for="item in containerOptions" :key="item" :value="item" :label="item" />
                         </el-select>
                     </el-form-item>
+                    <el-form-item
+                        v-if="hasScript() && dialogData.rowData!.inContainer"
+                        :label="$t('container.command')"
+                        prop="command"
+                        :rules="Rules.requiredInput"
+                    >
+                        <el-checkbox style="width: 100px" border v-model="dialogData.rowData!.isCustom">
+                            {{ $t('container.custom') }}
+                        </el-checkbox>
+                        <el-select
+                            style="width: calc(100% - 100px)"
+                            filterable
+                            clearable
+                            v-model="dialogData.rowData!.command"
+                        >
+                            <el-option value="ash" label="/bin/ash" />
+                            <el-option value="bash" label="/bin/bash" />
+                            <el-option value="sh" label="/bin/sh" />
+                        </el-select>
+                    </el-form-item>
 
                     <el-form-item v-if="hasScript()" :label="$t('cronjob.shellContent')" prop="script">
                         <el-input clearable type="textarea" :rows="5" v-model="dialogData.rowData!.script" />
@@ -374,6 +394,12 @@ const acceptParams = (params: DialogProps): void => {
     if (dialogData.value.rowData.backupAccounts) {
         dialogData.value.rowData.backupAccountList = dialogData.value.rowData.backupAccounts.split(',');
     }
+    dialogData.value.rowData!.command = dialogData.value.rowData!.command || 'sh';
+    dialogData.value.rowData!.isCustom =
+        dialogData.value.rowData!.command !== 'sh' &&
+        dialogData.value.rowData!.command !== 'bash' &&
+        dialogData.value.rowData!.command === 'ash';
+
     title.value = i18n.global.t('cronjob.' + dialogData.value.title);
     if (dialogData.value?.rowData?.exclusionRules) {
         dialogData.value.rowData.exclusionRules = dialogData.value.rowData.exclusionRules.replaceAll(',', '\n');

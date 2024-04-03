@@ -35,3 +35,13 @@ var AddXpackHideMenu = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddCronjobCommand = &gormigrate.Migration{
+	ID: "20240403-add-cronjob-command",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Cronjob{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}

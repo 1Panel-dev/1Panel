@@ -38,7 +38,11 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 			_ = cronjobRepo.UpdateRecords(record.ID, map[string]interface{}{"records": record.Records})
 			script := cronjob.Script
 			if len(cronjob.ContainerName) != 0 {
-				script = fmt.Sprintf("docker exec %s %s", cronjob.ContainerName, cronjob.Script)
+				command := "sh"
+				if len(cronjob.Command) != 0 {
+					command = cronjob.Command
+				}
+				script = fmt.Sprintf("docker exec %s %s -c \"%s\"", cronjob.ContainerName, command, strings.ReplaceAll(cronjob.Script, "\"", "\\\""))
 			}
 			err = u.handleShell(cronjob.Type, cronjob.Name, script, record.Records)
 			u.removeExpiredLog(*cronjob)
