@@ -39,7 +39,7 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { DialogProps } from 'element-plus';
+import { DialogProps, ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import { updateSetting } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
@@ -129,19 +129,25 @@ const handleClose = () => {
 };
 
 const saveHideMenus = async () => {
-    const updateJson = JSON.stringify(treeData.hideMenu[0]);
-    await updateSetting({ key: 'XpackHideMenu', value: updateJson })
-        .then(async () => {
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            loading.value = false;
-            drawerVisible.value = false;
-            emit('search');
-            window.location.reload();
-            return;
-        })
-        .catch(() => {
-            loading.value = false;
-        });
+    ElMessageBox.confirm(i18n.global.t('setting.confirmMessage'), i18n.global.t('setting.advancedMenuShow'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(async () => {
+        const updateJson = JSON.stringify(treeData.hideMenu[0]);
+        await updateSetting({ key: 'XpackHideMenu', value: updateJson })
+            .then(async () => {
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                loading.value = false;
+                drawerVisible.value = false;
+                emit('search');
+                window.location.reload();
+                return;
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
 };
 
 defineExpose({

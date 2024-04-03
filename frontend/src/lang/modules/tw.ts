@@ -1362,6 +1362,7 @@ const message = {
         showAll: '全部顯示',
         ifShow: '是否顯示',
         menu: '選單',
+        confirmMessage: '即將刷新頁面更新高級功能菜單列表，是否繼續？',
     },
     license: {
         community: '社區版',

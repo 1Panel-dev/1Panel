@@ -29,7 +29,7 @@ var AddDatabaseIsDelete = &gormigrate.Migration{
 var AddXpackHideMenu = &gormigrate.Migration{
 	ID: "20240328-add-xpack-hide-menu",
 	Migrate: func(tx *gorm.DB) error {
-		if err := tx.Create(&model.Setting{Key: "XpackHideMenu", Value: "{\n    \"id\": \"1\",\n    \"label\": \"/xpack\",\n    \"isCheck\": false,\n    \"title\": \"xpack.menu\",\n    \"children\": [\n        {\n            \"id\": \"2\",\n            \"title\": \"xpack.waf.name\",\n            \"path\": \"/xpack/waf/dashboard\",\n            \"label\": \"Dashboard\",\n            \"isCheck\": false\n        },\n        {\n            \"id\": \"3\",\n            \"title\": \"xpack.tamper.tamper\",\n            \"path\": \"/xpack/tamper\",\n            \"label\": \"Tamper\",\n            \"isCheck\": true\n        },\n        {\n            \"id\": \"4\",\n            \"title\": \"xpack.setting.setting\",\n            \"path\": \"/xpack/setting\",\n            \"label\": \"XSetting\",\n            \"isCheck\": true\n        }\n    ]\n}"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "XpackHideMenu", Value: "{\"id\":\"1\",\"label\":\"/xpack\",\"isCheck\":false,\"title\":\"xpack.menu\",\"children\":[{\"id\":\"2\",\"title\":\"xpack.waf.name\",\"path\":\"/xpack/waf/dashboard\",\"label\":\"Dashboard\",\"isCheck\":false},{\"id\":\"3\",\"title\":\"xpack.tamper.tamper\",\"path\":\"/xpack/tamper\",\"label\":\"Tamper\",\"isCheck\":true},{\"id\":\"4\",\"title\":\"xpack.setting.setting\",\"path\":\"/xpack/setting\",\"label\":\"XSetting\",\"isCheck\":true}]}"}).Error; err != nil {
 			return err
 		}
 		return nil

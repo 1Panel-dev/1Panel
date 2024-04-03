@@ -1364,6 +1364,7 @@ const message = {
         showAll: '全部显示',
         ifShow: '是否显示',
         menu: '菜单',
+        confirmMessage: '即将刷新页面更新高级功能菜单列表，是否继续？',
     },
     license: {
         community: '社区版',

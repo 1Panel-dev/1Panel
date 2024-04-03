@@ -1463,6 +1463,7 @@ const message = {
         showAll: 'Show All',
         ifShow: 'Whether to Show',
         menu: 'Menu',
+        confirmMessage: 'The page will be refreshed to update the advanced menu list. Continue?',
     },
     license: {
         community: 'Community Edition',
