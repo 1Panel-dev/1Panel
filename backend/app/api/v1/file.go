@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-
+	
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
@@ -303,6 +303,15 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
 	}
 	files := form.File["file"]
 	paths := form.Value["path"]
+	
+	overwrite := true
+	if ow, ok := form.Value["overwrite"]; ok {
+		if len(ow) != 0 {
+			parseBool, _ := strconv.ParseBool(ow[0])
+			overwrite = parseBool
+		}
+	}
+	
 	if len(paths) == 0 || !strings.Contains(paths[0], "/") {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error paths in request"))
 		return
@@ -317,11 +326,30 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
 	success := 0
 	failures := make(buserr.MultiErr)
 	for _, file := range files {
-		if err := c.SaveUploadedFile(file, path.Join(paths[0], file.Filename)); err != nil {
+		dstFilename := path.Join(paths[0], file.Filename)
+		tmpFilename := dstFilename + ".tmp"
+		if err := c.SaveUploadedFile(file, tmpFilename); err != nil {
+			_ = os.Remove(tmpFilename)
 			e := fmt.Errorf("upload [%s] file failed, err: %v", file.Filename, err)
 			failures[file.Filename] = e
 			global.LOG.Error(e)
 			continue
+		}
+		stat, statErr := os.Stat(dstFilename)
+		if overwrite {
+			_ = os.Remove(dstFilename)
+		}
+		
+		err = os.Rename(tmpFilename, dstFilename)
+		if err != nil {
+			_ = os.Remove(tmpFilename)
+			e := fmt.Errorf("upload [%s] file failed, err: %v", file.Filename, err)
+			failures[file.Filename] = e
+			global.LOG.Error(e)
+			continue
+		}
+		if statErr == nil {
+			_ = os.Chmod(dstFilename, stat.Mode())
 		}
 		success++
 	}
@@ -471,29 +499,29 @@ func (b *BaseApi) DownloadChunkFiles(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrFileDownloadDir, err)
 		return
 	}
-
+	
 	c.Writer.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", req.Name))
 	c.Writer.Header().Set("Content-Type", "application/octet-stream")
 	c.Writer.Header().Set("Content-Length", strconv.FormatInt(info.Size(), 10))
 	c.Writer.Header().Set("Accept-Ranges", "bytes")
-
+	
 	if c.Request.Header.Get("Range") != "" {
 		rangeHeader := c.Request.Header.Get("Range")
 		rangeArr := strings.Split(rangeHeader, "=")[1]
 		rangeParts := strings.Split(rangeArr, "-")
-
+		
 		startPos, _ := strconv.ParseInt(rangeParts[0], 10, 64)
-
+		
 		var endPos int64
 		if rangeParts[1] == "" {
 			endPos = info.Size() - 1
 		} else {
 			endPos, _ = strconv.ParseInt(rangeParts[1], 10, 64)
 		}
-
+		
 		c.Writer.Header().Set("Content-Range", fmt.Sprintf("bytes %d-%d/%d", startPos, endPos, info.Size()))
 		c.Writer.WriteHeader(http.StatusPartialContent)
-
+		
 		buffer := make([]byte, 1024*1024)
 		file, err := os.Open(filePath)
 		if err != nil {
@@ -501,7 +529,7 @@ func (b *BaseApi) DownloadChunkFiles(c *gin.Context) {
 			return
 		}
 		defer file.Close()
-
+		
 		_, _ = file.Seek(startPos, 0)
 		reader := io.LimitReader(file, endPos-startPos+1)
 		_, err = io.CopyBuffer(c.Writer, reader, buffer)
@@ -549,7 +577,7 @@ func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int)
 		return err
 	}
 	defer targetFile.Close()
-
+	
 	for i := 0; i < chunkCount; i++ {
 		chunkPath := filepath.Join(fileDir, fmt.Sprintf("%s.%d", fileName, i))
 		chunkData, err := os.ReadFile(chunkPath)
@@ -561,7 +589,7 @@ func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int)
 			return err
 		}
 	}
-
+	
 	return files.NewFileOp().DeleteDir(fileDir)
 }
 
@@ -611,7 +639,7 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 		_ = os.MkdirAll(fileDir, 0755)
 	}
 	filePath := filepath.Join(fileDir, filename)
-
+	
 	defer func() {
 		if err != nil {
 			_ = os.Remove(fileDir)
@@ -621,27 +649,27 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 		emptyFile *os.File
 		chunkData []byte
 	)
-
+	
 	emptyFile, err = os.Create(filePath)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
 	defer emptyFile.Close()
-
+	
 	chunkData, err = io.ReadAll(uploadFile)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, buserr.WithMap(constant.ErrFileUpload, map[string]interface{}{"name": filename, "detail": err.Error()}, err))
 		return
 	}
-
+	
 	chunkPath := filepath.Join(fileDir, fmt.Sprintf("%s.%d", filename, chunkIndex))
 	err = os.WriteFile(chunkPath, chunkData, 0644)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, buserr.WithMap(constant.ErrFileUpload, map[string]interface{}{"name": filename, "detail": err.Error()}, err))
 		return
 	}
-
+	
 	if chunkIndex+1 == chunkCount {
 		err = mergeChunks(filename, fileDir, c.PostForm("path"), chunkCount)
 		if err != nil {
