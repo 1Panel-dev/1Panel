@@ -9,6 +9,7 @@ type Cronjob struct {
 	Type string `gorm:"type:varchar(64);not null" json:"type"`
 	Spec string `gorm:"type:varchar(64);not null" json:"spec"`
 
+	Command        string `gorm:"type:varchar(64)" json:"command"`
 	ContainerName  string `gorm:"type:varchar(64)" json:"containerName"`
 	Script         string `gorm:"longtext" json:"script"`
 	Website        string `gorm:"type:varchar(64)" json:"website"`

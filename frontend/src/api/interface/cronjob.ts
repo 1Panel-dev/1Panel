@@ -9,6 +9,8 @@ export namespace Cronjob {
         specObjs: Array<SpecObj>;
 
         script: string;
+        isCustom: boolean;
+        command: string;
         inContainer: boolean;
         containerName: string;
         appID: string;

@@ -8,6 +8,7 @@ type CronjobCreate struct {
 	Spec string `json:"spec" validate:"required"`
 
 	Script         string `json:"script"`
+	Command        string `json:"command"`
 	ContainerName  string `json:"containerName"`
 	AppID          string `json:"appID"`
 	Website        string `json:"website"`
@@ -28,6 +29,7 @@ type CronjobUpdate struct {
 	Spec string `json:"spec" validate:"required"`
 
 	Script         string `json:"script"`
+	Command        string `json:"command"`
 	ContainerName  string `json:"containerName"`
 	AppID          string `json:"appID"`
 	Website        string `json:"website"`
@@ -70,6 +72,7 @@ type CronjobInfo struct {
 	Spec string `json:"spec"`
 
 	Script          string `json:"script"`
+	Command         string `json:"command"`
 	ContainerName   string `json:"containerName"`
 	AppID           string `json:"appID"`
 	Website         string `json:"website"`

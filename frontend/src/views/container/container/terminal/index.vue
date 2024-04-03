@@ -82,7 +82,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     title.value = params.container;
     form.isCustom = false;
     form.user = '';
-    form.command = '/bin/bash';
+    form.command = '/bin/sh';
     terminalOpen.value = false;
 };
 
