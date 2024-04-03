@@ -130,24 +130,24 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 		}
 		global.LOG.Info("backup original data successful, now start to upgrade!")
 
-		if err := cpBinary([]string{tmpDir + "/1panel"}, "/usr/local/bin/1panel"); err != nil {
+		if err := common.CopyFile(path.Join(tmpDir, "1panel"), "/usr/local/bin"); err != nil {
 			global.LOG.Errorf("upgrade 1panel failed, err: %v", err)
 			u.handleRollback(originalDir, 1)
 			return
 		}
 
-		if err := cpBinary([]string{tmpDir + "/1pctl"}, "/usr/local/bin/1pctl"); err != nil {
+		if err := common.CopyFile(path.Join(tmpDir, "1pctl"), "/usr/local/bin"); err != nil {
 			global.LOG.Errorf("upgrade 1pctl failed, err: %v", err)
 			u.handleRollback(originalDir, 2)
 			return
 		}
-		if _, err := cmd.Execf("sed -i -e 's#BASE_DIR=.*#BASE_DIR=%s#g' /usr/local/bin/1pctl", global.CONF.System.BaseDir); err != nil {
+		if _, err := cmd.Execf("sed -i -e 's#BASE_DIR=.*#BASE_DIR=%s#g' /usr/local/bin", global.CONF.System.BaseDir); err != nil {
 			global.LOG.Errorf("upgrade basedir in 1pctl failed, err: %v", err)
 			u.handleRollback(originalDir, 2)
 			return
 		}
 
-		if err := cpBinary([]string{tmpDir + "/1panel.service"}, "/etc/systemd/system/1panel.service"); err != nil {
+		if err := common.CopyFile(path.Join(tmpDir, "1panel.service"), "/etc/systemd/system"); err != nil {
 			global.LOG.Errorf("upgrade 1panel.service failed, err: %v", err)
 			u.handleRollback(originalDir, 3)
 			return
@@ -181,24 +181,23 @@ func (u *UpgradeService) handleBackup(fileOp files.FileOp, originalDir string) e
 }
 
 func (u *UpgradeService) handleRollback(originalDir string, errStep int) {
-	dbPath := global.CONF.System.DbPath + "/1Panel.db"
 	_ = settingRepo.Update("SystemStatus", "Free")
-	if err := cpBinary([]string{originalDir + "/1Panel.db"}, dbPath); err != nil {
+	if err := common.CopyFile(path.Join(originalDir, "1Panel.db"), global.CONF.System.DbPath); err != nil {
 		global.LOG.Errorf("rollback 1panel failed, err: %v", err)
 	}
-	if err := cpBinary([]string{originalDir + "/1panel"}, "/usr/local/bin/1panel"); err != nil {
+	if err := common.CopyFile(path.Join(originalDir, "1panel"), "/usr/local/bin"); err != nil {
 		global.LOG.Errorf("rollback 1pctl failed, err: %v", err)
 	}
 	if errStep == 1 {
 		return
 	}
-	if err := cpBinary([]string{originalDir + "/1pctl"}, "/usr/local/bin/1pctl"); err != nil {
+	if err := common.CopyFile(path.Join(originalDir, "1pctl"), "/usr/local/bin"); err != nil {
 		global.LOG.Errorf("rollback 1panel failed, err: %v", err)
 	}
 	if errStep == 2 {
 		return
 	}
-	if err := cpBinary([]string{originalDir + "/1panel.service"}, "/etc/systemd/system/1panel.service"); err != nil {
+	if err := common.CopyFile(path.Join(originalDir, "1panel.service"), "/etc/systemd/system"); err != nil {
 		global.LOG.Errorf("rollback 1panel failed, err: %v", err)
 	}
 }

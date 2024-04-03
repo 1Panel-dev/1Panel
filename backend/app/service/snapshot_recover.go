@@ -13,6 +13,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/pkg/errors"
 )
@@ -88,7 +89,7 @@ func (u *SnapshotService) HandleSnapshotRecover(snap model.Snapshot, isRecover b
 	}
 
 	if req.IsNew || snap.InterruptStep == "1PanelBinary" {
-		if err := recoverPanel(path.Join(snapFileDir, "1panel/1panel"), "/usr/local/bin/1panel"); err != nil {
+		if err := recoverPanel(path.Join(snapFileDir, "1panel/1panel"), "/usr/local/bin"); err != nil {
 			updateRecoverStatus(snap.ID, isRecover, "1PanelBinary", constant.StatusFailed, err.Error())
 			return
 		}
@@ -96,7 +97,7 @@ func (u *SnapshotService) HandleSnapshotRecover(snap model.Snapshot, isRecover b
 		req.IsNew = true
 	}
 	if req.IsNew || snap.InterruptStep == "1PctlBinary" {
-		if err := recoverPanel(path.Join(snapFileDir, "1panel/1pctl"), "/usr/local/bin/1pctl"); err != nil {
+		if err := recoverPanel(path.Join(snapFileDir, "1panel/1pctl"), "/usr/local/bin"); err != nil {
 			updateRecoverStatus(snap.ID, isRecover, "1PctlBinary", constant.StatusFailed, err.Error())
 			return
 		}
@@ -104,7 +105,7 @@ func (u *SnapshotService) HandleSnapshotRecover(snap model.Snapshot, isRecover b
 		req.IsNew = true
 	}
 	if req.IsNew || snap.InterruptStep == "1PanelService" {
-		if err := recoverPanel(path.Join(snapFileDir, "1panel/1panel.service"), "/etc/systemd/system/1panel.service"); err != nil {
+		if err := recoverPanel(path.Join(snapFileDir, "1panel/1panel.service"), "/etc/systemd/system"); err != nil {
 			updateRecoverStatus(snap.ID, isRecover, "1PanelService", constant.StatusFailed, err.Error())
 			return
 		}
@@ -235,10 +236,8 @@ func recoverPanel(src string, dst string) error {
 	if _, err := os.Stat(src); err != nil {
 		return fmt.Errorf("file is not found in %s, err: %v", src, err)
 	}
-	global.LOG.Debugf(fmt.Sprintf("\\cp -f %s %s", src, dst))
-	stdout, err := cmd.Exec(fmt.Sprintf("\\cp -f %s %s", src, dst))
-	if err != nil {
-		return fmt.Errorf("cp file failed, stdout: %v, err: %v", stdout, err)
+	if err := common.CopyFile(src, dst); err != nil {
+		return fmt.Errorf("cp file failed, err: %v", err)
 	}
 	return nil
 }
