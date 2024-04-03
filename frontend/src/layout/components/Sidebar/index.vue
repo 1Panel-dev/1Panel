@@ -44,6 +44,8 @@ import { ElMessageBox } from 'element-plus';
 import { GlobalStore, MenuStore } from '@/store';
 import { MsgSuccess } from '@/utils/message';
 import { isString } from '@vueuse/core';
+import { getSettingInfo } from '@/api/modules/setting';
+
 const route = useRoute();
 const menuStore = MenuStore();
 const globalStore = GlobalStore();
@@ -53,9 +55,20 @@ const activeMenu = computed(() => {
 });
 const isCollapse = computed((): boolean => menuStore.isCollapse);
 
-const routerMenus = computed((): RouteRecordRaw[] => menuStore.menuList);
+let routerMenus = computed((): RouteRecordRaw[] => {
+    return menuStore.menuList.filter((route) => route.meta && !route.meta.hideInSidebar);
+});
 
 const screenWidth = ref(0);
+
+interface Node {
+    id: string;
+    title: string;
+    path?: string;
+    label: string;
+    isCheck: boolean;
+    children?: Node[];
+}
 const listeningWindow = () => {
     window.onresize = () => {
         return (() => {
@@ -85,8 +98,65 @@ const logout = () => {
 const systemLogOut = async () => {
     await logOutApi();
 };
+
+function extractLabels(node: Node, result: string[]): void {
+    // 未勾选的才隐藏
+    if (node.isCheck) {
+        result.push(node.label);
+    }
+    if (node.children) {
+        for (const childNode of node.children) {
+            extractLabels(childNode, result);
+        }
+    }
+}
+
+function getCheckedLabels(json: Node): string[] {
+    let result: string[] = [];
+    extractLabels(json, result);
+    return result;
+}
+
+const search = async () => {
+    const res = await getSettingInfo();
+    const json: Node = JSON.parse(res.data.xpackHideMenu);
+    const checkedLabels = getCheckedLabels(json);
+    let rstMenuList: RouteRecordRaw[] = [];
+    menuStore.menuList.forEach((item) => {
+        let menuItem = JSON.parse(JSON.stringify(item));
+        let menuChildren: RouteRecordRaw[] = [];
+        if (menuItem.path === '/xpack') {
+            if (checkedLabels.length) {
+                menuItem.children.forEach((child: any) => {
+                    for (const str of checkedLabels) {
+                        if (child.name === str) {
+                            child.hidden = false;
+                        }
+                    }
+                    if (child.hidden === false) {
+                        menuChildren.push(child);
+                    }
+                });
+                menuItem.meta.hideInSidebar = false;
+            }
+            menuItem.children = menuChildren as RouteRecordRaw[];
+            rstMenuList.push(menuItem);
+        } else {
+            menuItem.children.forEach((child: any) => {
+                if (child.hidden == undefined || child.hidden == false) {
+                    menuChildren.push(child);
+                }
+            });
+            menuItem.children = menuChildren as RouteRecordRaw[];
+            rstMenuList.push(menuItem);
+        }
+    });
+    menuStore.menuList = rstMenuList;
+};
+
 onMounted(() => {
     menuStore.setMenuList(menuList);
+    search();
 });
 </script>
 

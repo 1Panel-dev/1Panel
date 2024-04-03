@@ -75,6 +75,7 @@ func Init() {
 
 		migrations.AddSnapshotIgnore,
 		migrations.AddDatabaseIsDelete,
+		migrations.AddXpackHideMenu,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

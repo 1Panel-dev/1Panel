@@ -48,7 +48,7 @@ rolesRoutes.forEach((item) => {
     let menuItem = JSON.parse(JSON.stringify(item));
     let menuChildren: RouteRecordRaw[] = [];
     menuItem.children.forEach((child: any) => {
-        if (child.hidden == null || child.hidden == false) {
+        if (child.hidden == undefined || child.hidden == false) {
             menuChildren.push(child);
         }
     });

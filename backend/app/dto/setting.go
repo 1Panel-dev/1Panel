@@ -54,6 +54,7 @@ type SettingInfo struct {
 	FileRecycleBin string `json:"fileRecycleBin"`
 
 	SnapshotIgnore string `json:"snapshotIgnore"`
+	XpackHideMenu  string `json:"xpackHideMenu"`
 }
 
 type SettingUpdate struct {

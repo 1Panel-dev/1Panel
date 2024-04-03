@@ -101,6 +101,16 @@
                                     </template>
                                 </el-input>
                             </el-form-item>
+
+                            <el-form-item :label="$t('setting.advancedMenuShow')">
+                                <el-input disabled v-model="form.proHideMenus">
+                                    <template #append>
+                                        <el-button v-show="!show" @click="onChangeHideMenus" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
                         </el-col>
                     </el-row>
                 </el-form>
@@ -113,6 +123,7 @@
         <SystemIP ref="systemIPRef" @search="search()" />
         <Timeout ref="timeoutRef" @search="search()" />
         <Network ref="networkRef" @search="search()" />
+        <HideMenu ref="hideMenuRef" @search="search()" />
     </div>
 </template>
 
@@ -130,6 +141,7 @@ import Timeout from '@/views/setting/panel/timeout/index.vue';
 import PanelName from '@/views/setting/panel/name/index.vue';
 import SystemIP from '@/views/setting/panel/systemip/index.vue';
 import Network from '@/views/setting/panel/default-network/index.vue';
+import HideMenu from '@/views/setting/panel/hidemenu/index.vue';
 
 const loading = ref(false);
 const i18n = useI18n();
@@ -152,6 +164,9 @@ const form = reactive({
     complexityVerification: '',
     defaultNetwork: '',
     defaultNetworkVal: '',
+
+    proHideMenus: ref(i18n.t('setting.unSetting')),
+    hideMenuList: '',
 });
 
 const show = ref();
@@ -162,7 +177,17 @@ const panelNameRef = ref();
 const systemIPRef = ref();
 const timeoutRef = ref();
 const networkRef = ref();
+const hideMenuRef = ref();
 const unset = ref(i18n.t('setting.unSetting'));
+
+interface Node {
+    id: string;
+    title: string;
+    path?: string;
+    label: string;
+    isCheck: boolean;
+    children?: Node[];
+}
 
 const search = async () => {
     const res = await getSettingInfo();
@@ -179,7 +204,38 @@ const search = async () => {
     form.complexityVerification = res.data.complexityVerification;
     form.defaultNetwork = res.data.defaultNetwork;
     form.defaultNetworkVal = res.data.defaultNetwork === 'all' ? i18n.t('commons.table.all') : res.data.defaultNetwork;
+    form.proHideMenus = res.data.xpackHideMenu;
+    form.hideMenuList = res.data.xpackHideMenu;
+
+    // 提取隐藏节点的 title 并显示
+    const json: Node = JSON.parse(res.data.xpackHideMenu);
+    const checkedTitles = getCheckedTitles(json);
+    form.proHideMenus = checkedTitles.toString();
 };
+
+function extractTitles(node: Node, result: string[]): void {
+    if (node.isCheck && !node.children) {
+        result.push(i18n.t(node.title));
+    }
+    if (node.children) {
+        for (const childNode of node.children) {
+            extractTitles(childNode, result);
+        }
+    }
+}
+
+function getCheckedTitles(json: Node): string[] {
+    let result: string[] = [];
+    extractTitles(json, result);
+    if (result.length === 0) {
+        result.push(i18n.t('setting.unSetting'));
+    }
+    if (result.length === json.children.length) {
+        result = [];
+        result.push(i18n.t('setting.showAll'));
+    }
+    return result;
+}
 
 const onChangePassword = () => {
     passwordRef.value.acceptParams({ complexityVerification: form.complexityVerification });
@@ -198,6 +254,10 @@ const onChangeSystemIP = () => {
 };
 const onChangeNetwork = () => {
     networkRef.value.acceptParams({ defaultNetwork: form.defaultNetwork });
+};
+
+const onChangeHideMenus = () => {
+    hideMenuRef.value.acceptParams({ menuList: form.hideMenuList });
 };
 
 const onSave = async (key: string, val: any) => {

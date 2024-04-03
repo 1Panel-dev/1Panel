@@ -1359,6 +1359,12 @@ const message = {
         currentVersion: '当前运行版本：',
 
         license: '许可证',
+        advancedMenuShow: '高级功能菜单显示',
+        showMainAdvancedMenu: '如果只保留 1 个菜单，则侧边栏只会显示高级功能主菜单',
+        showAll: '全部显示',
+        ifShow: '是否显示',
+        menu: '菜单',
+        confirmMessage: '即将刷新页面更新高级功能菜单列表，是否继续？',
     },
     license: {
         community: '社区版',
