@@ -1,9 +1,9 @@
 import fit2cloudEnLocale from 'fit2cloud-ui-plus/src/locale/lang/en';
 let xpackEnLocale = {};
-try {
-    const commercialTranslationModule = await import('@/xpack/lang/en');
-    xpackEnLocale = commercialTranslationModule.default || {};
-} catch (error) {}
+const xpackModules = import.meta.globEager('../../xpack/lang/en.ts');
+if (xpackModules['../../xpack/lang/en.ts']) {
+    xpackEnLocale = xpackModules['../../xpack/lang/en.ts'].default || {};
+}
 
 const message = {
     commons: {
