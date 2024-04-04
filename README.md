@@ -19,6 +19,8 @@
 - **安全可靠**：基于容器管理并部署应用，实现最小的漏洞暴露面，同时提供防火墙和日志审计等功能；
 - **一键备份**：支持一键备份和恢复，用户可以将数据备份到各类云端存储介质，永不丢失。
 
+1Panel 三分钟速览：https://www.bilibili.com/video/BV1Mt421n7LZ/
+
 ## UI 展示
 
 ![UI展示](https://resource.fit2cloud.com/1panel/img/overview.png)
