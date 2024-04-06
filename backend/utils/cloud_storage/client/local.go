@@ -6,7 +6,7 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 )
 
 type localClient struct {
@@ -54,9 +54,8 @@ func (c localClient) Upload(src, target string) (bool, error) {
 		}
 	}
 
-	stdout, err := cmd.Execf("\\cp -f %s %s", src, path.Join(c.dir, target))
-	if err != nil {
-		return false, fmt.Errorf("cp file failed, stdout: %v, err: %v", stdout, err)
+	if err := common.CopyFile(src, target); err != nil {
+		return false, fmt.Errorf("cp file failed, err: %v", err)
 	}
 	return true, nil
 }
@@ -73,9 +72,8 @@ func (c localClient) Download(src, target string) (bool, error) {
 		}
 	}
 
-	stdout, err := cmd.Execf("\\cp -f %s %s", localPath, target)
-	if err != nil {
-		return false, fmt.Errorf("cp file failed, stdout: %v, err: %v", stdout, err)
+	if err := common.CopyFile(localPath, target); err != nil {
+		return false, fmt.Errorf("cp file failed, err: %v", err)
 	}
 	return true, nil
 }

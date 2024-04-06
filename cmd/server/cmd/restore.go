@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	cmdUtils "github.com/1Panel-dev/1Panel/backend/utils/cmd"
-	"github.com/pkg/errors"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 
 	"github.com/spf13/cobra"
 )
@@ -43,19 +43,19 @@ var restoreCmd = &cobra.Command{
 		tmpPath = path.Join(upgradeDir, tmpPath, "original")
 		fmt.Printf("(0/4) 开始从 %s 目录回滚 1Panel 服务及数据... \n", tmpPath)
 
-		if err := cpBinary(path.Join(tmpPath, "1panel"), "/usr/local/bin/1panel"); err != nil {
+		if err := common.CopyFile(path.Join(tmpPath, "1panel"), "/usr/local/bin"); err != nil {
 			return err
 		}
 		fmt.Println("(1/4) 1panel 二进制回滚成功")
-		if err := cpBinary(path.Join(tmpPath, "1pctl"), "/usr/local/bin/1pctl"); err != nil {
+		if err := common.CopyFile(path.Join(tmpPath, "1pctl"), "/usr/local/bin"); err != nil {
 			return err
 		}
 		fmt.Println("(2/4) 1panel 脚本回滚成功")
-		if err := cpBinary(path.Join(tmpPath, "1panel.service"), "/etc/systemd/system/1panel.service"); err != nil {
+		if err := common.CopyFile(path.Join(tmpPath, "1panel.service"), "/etc/systemd/system"); err != nil {
 			return err
 		}
 		fmt.Println("(3/4) 1panel 服务回滚成功")
-		if err := cpBinary(path.Join(tmpPath, "1Panel.db"), path.Join(baseDir, "1panel", "db", "1Panel.db")); err != nil {
+		if err := common.CopyFile(path.Join(tmpPath, "1Panel.db"), path.Join(baseDir, "1panel", "db")); err != nil {
 			return err
 		}
 		fmt.Printf("(4/4) 1panel 数据回滚成功 \n\n")
@@ -86,12 +86,4 @@ func loadRestorePath(upgradeDir string) (string, error) {
 		return folders[i] > folders[j]
 	})
 	return folders[0], nil
-}
-
-func cpBinary(src string, dst string) error {
-	stderr, err := cmdUtils.Exec(fmt.Sprintf("\\cp -f %s %s", src, dst))
-	if err != nil {
-		return errors.New(stderr)
-	}
-	return nil
 }

@@ -385,15 +385,6 @@ func updateRecoverStatus(id uint, isRecover bool, interruptStep, status, message
 	}
 }
 
-func cpBinary(src []string, dst string) error {
-	global.LOG.Debugf(fmt.Sprintf("\\cp -f %s %s", strings.Join(src, " "), dst))
-	stdout, err := cmd.Exec(fmt.Sprintf("\\cp -f %s %s", strings.Join(src, " "), dst))
-	if err != nil {
-		return fmt.Errorf("cp file failed, stdout: %v, err: %v", stdout, err)
-	}
-	return nil
-}
-
 func (u *SnapshotService) handleUnTar(sourceDir, targetDir string) error {
 	if _, err := os.Stat(targetDir); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(targetDir, os.ModePerm); err != nil {

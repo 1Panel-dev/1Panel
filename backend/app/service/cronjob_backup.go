@@ -326,7 +326,7 @@ func handleBackupLogs(targetDir, fileName string) error {
 			if len(logFiles) != 0 {
 				for i := 0; i < len(logFiles); i++ {
 					if !logFiles[i].IsDir() {
-						_ = cpBinary([]string{path.Join(itemDir, logFiles[i].Name())}, dirItem)
+						_ = common.CopyFile(path.Join(itemDir, logFiles[i].Name()), dirItem)
 					}
 				}
 			}
@@ -335,7 +335,7 @@ func handleBackupLogs(targetDir, fileName string) error {
 			if len(logFiles2) != 0 {
 				for i := 0; i < len(logFiles2); i++ {
 					if !logFiles2[i].IsDir() {
-						_ = cpBinary([]string{path.Join(itemDir2, logFiles2[i].Name())}, dirItem)
+						_ = common.CopyFile(path.Join(itemDir2, logFiles2[i].Name()), dirItem)
 					}
 				}
 			}
@@ -354,7 +354,7 @@ func handleBackupLogs(targetDir, fileName string) error {
 	if len(systemLogFiles) != 0 {
 		for i := 0; i < len(systemLogFiles); i++ {
 			if !systemLogFiles[i].IsDir() {
-				_ = cpBinary([]string{path.Join(systemLogDir, systemLogFiles[i].Name())}, systemDir)
+				_ = common.CopyFile(path.Join(systemLogDir, systemLogFiles[i].Name()), systemDir)
 			}
 		}
 	}
@@ -370,7 +370,7 @@ func handleBackupLogs(targetDir, fileName string) error {
 	if len(loginLogFiles) != 0 {
 		for i := 0; i < len(loginLogFiles); i++ {
 			if !loginLogFiles[i].IsDir() && (strings.HasPrefix(loginLogFiles[i].Name(), "secure") || strings.HasPrefix(loginLogFiles[i].Name(), "auth.log")) {
-				_ = cpBinary([]string{path.Join("/var/log", loginLogFiles[i].Name())}, loginDir)
+				_ = common.CopyFile(path.Join("/var/log", loginLogFiles[i].Name()), loginDir)
 			}
 		}
 	}

@@ -6,6 +6,8 @@ import (
 	"io"
 	mathRand "math/rand"
 	"net"
+	"os"
+	"path"
 	"reflect"
 	"regexp"
 	"sort"
@@ -80,6 +82,29 @@ func GetSortedVersions(versions []string) []string {
 		return CompareVersion(versions[i], versions[j])
 	})
 	return versions
+}
+
+func CopyFile(src, dst string) error {
+	source, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer source.Close()
+
+	if path.Base(src) != path.Base(dst) {
+		dst = path.Join(dst, path.Base(src))
+	}
+	dest, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer dest.Close()
+
+	_, err = io.Copy(dest, source)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func IsCrossVersion(version1, version2 string) bool {

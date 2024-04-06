@@ -43,7 +43,15 @@ func snapPanel(snap snapHelper, targetDir string) {
 	defer snap.Wg.Done()
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"panel": constant.Running})
 	status := constant.StatusDone
-	if err := cpBinary([]string{"/usr/local/bin/1panel", "/usr/local/bin/1pctl", "/etc/systemd/system/1panel.service"}, targetDir); err != nil {
+	if err := common.CopyFile("/usr/local/bin/1panel", targetDir); err != nil {
+		status = err.Error()
+	}
+
+	if err := common.CopyFile("/usr/local/bin/1pctl", targetDir); err != nil {
+		status = err.Error()
+	}
+
+	if err := common.CopyFile("/etc/systemd/system/1panel.service", targetDir); err != nil {
 		status = err.Error()
 	}
 	snap.Status.Panel = status
@@ -59,7 +67,7 @@ func snapDaemonJson(snap snapHelper, targetDir string) {
 		return
 	}
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"daemon_json": constant.Running})
-	if err := cpBinary([]string{"/etc/docker/daemon.json"}, path.Join(targetDir, "daemon.json")); err != nil {
+	if err := common.CopyFile("/etc/docker/daemon.json", targetDir); err != nil {
 		status = err.Error()
 	}
 	snap.Status.DaemonJson = status
