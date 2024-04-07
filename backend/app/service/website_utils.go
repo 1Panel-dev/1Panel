@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/utils/xpack"
 	"log"
 	"os"
 	"path"
@@ -400,6 +401,7 @@ func delNginxConfig(website model.Website, force bool) error {
 	}
 	sitePath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "www", "sites", website.Alias)
 	if fileOp.Stat(sitePath) {
+		xpack.RemoveTamper(website.Alias)
 		_ = fileOp.DeleteDir(sitePath)
 	}
 

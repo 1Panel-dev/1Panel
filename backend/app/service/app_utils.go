@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/utils/xpack"
 	"math"
 	"net/http"
 	"os"
@@ -364,6 +365,7 @@ func deleteAppInstall(install model.AppInstall, deleteBackup bool, forceDelete b
 		}
 		_ = websiteRepo.DeleteAll(ctx)
 		_ = websiteDomainRepo.DeleteAll(ctx)
+		xpack.RemoveTamper("")
 	case constant.AppMysql, constant.AppMariaDB:
 		_ = mysqlRepo.Delete(ctx, mysqlRepo.WithByMysqlName(install.Name))
 	case constant.AppPostgresql:
