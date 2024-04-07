@@ -1368,8 +1368,8 @@ const message = {
         confirmMessage: '即将刷新页面更新高级功能菜单列表，是否继续？',
     },
     license: {
-        community: '社区版',
-        pro: '专业版',
+        community: '社区版：',
+        pro: '专业版：',
         trial: '试用版',
         office: '正式版',
         trialInfo: '版本',

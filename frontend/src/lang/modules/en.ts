@@ -1467,8 +1467,8 @@ const message = {
         confirmMessage: 'The page will be refreshed to update the advanced menu list. Continue?',
     },
     license: {
-        community: 'Community Edition',
-        pro: 'Professional Edition',
+        community: 'Community Edition: ',
+        pro: 'Professional Edition: ',
         trial: 'Trial Edition',
         office: 'Official Edition',
         trialInfo: 'Version',
