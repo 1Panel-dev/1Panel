@@ -141,7 +141,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 			u.handleRollback(originalDir, 2)
 			return
 		}
-		if _, err := cmd.Execf("sed -i -e 's#BASE_DIR=.*#BASE_DIR=%s#g' /usr/local/bin", global.CONF.System.BaseDir); err != nil {
+		if _, err := cmd.Execf("sed -i -e 's#BASE_DIR=.*#BASE_DIR=%s#g' /usr/local/bin/1pctl", global.CONF.System.BaseDir); err != nil {
 			global.LOG.Errorf("upgrade basedir in 1pctl failed, err: %v", err)
 			u.handleRollback(originalDir, 2)
 			return
