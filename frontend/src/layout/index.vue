@@ -23,7 +23,6 @@ import { DeviceType } from '@/enums/app';
 import { useI18n } from 'vue-i18n';
 import { useTheme } from '@/hooks/use-theme';
 import { getLicense, getSettingInfo, getSystemAvailable } from '@/api/modules/setting';
-import { searchXSetting } from '@/xpack/api/modules/setting';
 useResize();
 
 const menuStore = MenuStore();
@@ -74,13 +73,29 @@ const loadDataFromDB = async () => {
 };
 
 const loadDataFromXDB = async () => {
-    const res = await searchXSetting();
-    globalStore.themeConfig.title = res.data.title;
-    globalStore.themeConfig.logo = res.data.logo;
-    globalStore.themeConfig.logoWithText = res.data.logoWithText;
-    globalStore.themeConfig.favicon = res.data.favicon;
-
+    const xpackModules = import.meta.globEager('../xpack/api/modules/*.ts');
+    if (xpackModules['../xpack/api/modules/setting.ts']) {
+        const searchXSetting = xpackModules['../xpack/api/modules/setting.ts'].searchXSetting;
+        if (searchXSetting) {
+            const res = await searchXSetting();
+            globalStore.themeConfig.title = res.data.title;
+            globalStore.themeConfig.logo = res.data.logo;
+            globalStore.themeConfig.logoWithText = res.data.logoWithText;
+            globalStore.themeConfig.favicon = res.data.favicon;
+        } else {
+            resetSetting();
+        }
+    } else {
+        resetSetting();
+    }
     initFavicon();
+};
+
+const resetSetting = () => {
+    globalStore.themeConfig.title = '';
+    globalStore.themeConfig.logo = '';
+    globalStore.themeConfig.logoWithText = '';
+    globalStore.themeConfig.favicon = '';
 };
 
 const loadProductProFromDB = async () => {
