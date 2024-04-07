@@ -42,6 +42,7 @@ frontend/src/xpack
 backend/xpack
 backend/router/entry_xpack.go
 backend/server/init_xpack.go
+backend/utils/xpack/xpack_xpack.go
 
 .history/
 dist/
