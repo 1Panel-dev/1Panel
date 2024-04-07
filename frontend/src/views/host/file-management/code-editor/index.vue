@@ -197,14 +197,18 @@ const quickSave = () => {
 
 const saveContent = (closePage: boolean) => {
     loading.value = true;
-    SaveFileContent(form.value).then(() => {
-        loading.value = false;
-        open.value = !closePage;
-        MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
-        if (closePage) {
-            handleClose();
-        }
-    });
+    SaveFileContent(form.value)
+        .then(() => {
+            loading.value = false;
+            open.value = !closePage;
+            MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+            if (closePage) {
+                handleClose();
+            }
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const acceptParams = (props: EditProps) => {
