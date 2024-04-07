@@ -1,14 +1,19 @@
 <template>
     <div class="logo">
-        <img :src="getLogoUrl(isCollapse)" alt="logo" />
+        <img :src="getLogoUrl(isCollapse)" style="cursor: pointer" alt="logo" @click="goHome" />
     </div>
 </template>
 
 <script setup lang="ts">
+import router from '@/routers';
 import { GlobalStore } from '@/store';
 
 defineProps<{ isCollapse: boolean }>();
 const globalStore = GlobalStore();
+
+const goHome = () => {
+    router.push({ name: 'home' });
+};
 
 const getLogoUrl = (isCollapse: boolean) => {
     if (isCollapse) {
@@ -36,7 +41,7 @@ const getLogoUrl = (isCollapse: boolean) => {
     img {
         object-fit: contain;
         width: 95%;
-        height: 50px;
+        height: 45px;
     }
 }
 </style>

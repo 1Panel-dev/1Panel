@@ -1367,8 +1367,8 @@ const message = {
         confirmMessage: '即將刷新頁面更新高級功能菜單列表，是否繼續？',
     },
     license: {
-        community: '社區版',
-        pro: '專業版',
+        community: '社區版：',
+        pro: '專業版：',
         trial: '試用版',
         office: '正式版',
         trialInfo: '版本',

@@ -15,12 +15,12 @@
             <el-divider direction="vertical" />
         </span>
         <el-button type="primary" link @click="toHalo">
-            {{ isProductPro ? $t('license.pro') : $t('license.community') }} :
+            {{ isProductPro ? $t('license.pro') : $t('license.community') }}
             <span class="version">{{ version }}</span>
         </el-button>
-        <el-badge is-dot class="item" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
+        <el-badge is-dot style="margin-left: -3px" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
             <el-button type="primary" link @click="onLoadUpgradeInfo">
-                <span>（{{ $t('setting.hasNewVersion') }}）</span>
+                <span>({{ $t('setting.hasNewVersion') }})</span>
             </el-button>
         </el-badge>
         <el-button
@@ -29,7 +29,7 @@
             link
             @click="onLoadUpgradeInfo"
         >
-            <span>（{{ $t('setting.upgradeCheck') }}）</span>
+            <span>({{ $t('setting.upgradeCheck') }})</span>
         </el-button>
         <el-tag v-if="version === 'Waiting'" round style="margin-left: 10px">{{ $t('setting.upgrading') }}</el-tag>
     </div>
