@@ -1,1 +1,5 @@
 *.ts linguist-language=Go
+*.js linguist-language=Go
+*.css linguist-language=Go
+*.scss linguist-language=Go
+*.html linguist-language=Go
