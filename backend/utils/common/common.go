@@ -94,14 +94,16 @@ func CopyFile(src, dst string) error {
 	if path.Base(src) != path.Base(dst) {
 		dst = path.Join(dst, path.Base(src))
 	}
-	dest, err := os.Create(dst)
+	target, err := os.OpenFile(dst+"_temp", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
 		return err
 	}
-	defer dest.Close()
+	defer target.Close()
 
-	_, err = io.Copy(dest, source)
-	if err != nil {
+	if _, err = io.Copy(target, source); err != nil {
+		return err
+	}
+	if err = os.Rename(dst+"_temp", dst); err != nil {
 		return err
 	}
 	return nil
