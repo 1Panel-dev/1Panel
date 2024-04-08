@@ -15,7 +15,7 @@
                     <el-col :span="22">
                         <el-form-item
                             :label="$t('monitor.storeDays')"
-                            :rules="[Rules.integerNumber, checkNumberRange(1, 30)]"
+                            :rules="[Rules.integerNumber, checkNumberRange(1, 365)]"
                             prop="monitorStoreDays"
                         >
                             <el-input clearable v-model.number="form.monitorStoreDays" />
