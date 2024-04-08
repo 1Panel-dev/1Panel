@@ -95,15 +95,15 @@ func (b *BaseApi) LoadMonitor(c *gin.Context) {
 // @Router /hosts/monitor/clean [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"清空监控数据","formatEN":"clean monitor datas"}
 func (b *BaseApi) CleanMonitor(c *gin.Context) {
-	if err := global.DB.Exec("DELETE FROM monitor_bases").Error; err != nil {
+	if err := global.MonitorDB.Exec("DELETE FROM monitor_bases").Error; err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	if err := global.DB.Exec("DELETE FROM monitor_ios").Error; err != nil {
+	if err := global.MonitorDB.Exec("DELETE FROM monitor_ios").Error; err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	if err := global.DB.Exec("DELETE FROM monitor_networks").Error; err != nil {
+	if err := global.MonitorDB.Exec("DELETE FROM monitor_networks").Error; err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

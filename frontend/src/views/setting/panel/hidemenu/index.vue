@@ -39,9 +39,9 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { DialogProps, ElMessageBox } from 'element-plus';
+import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
-import { updateSetting } from '@/api/modules/setting';
+import { updateMenu } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
 
 const drawerVisible = ref();
@@ -131,7 +131,7 @@ const saveHideMenus = async () => {
         type: 'info',
     }).then(async () => {
         const updateJson = JSON.stringify(treeData.hideMenu[0]);
-        await updateSetting({ key: 'XpackHideMenu', value: updateJson })
+        await updateMenu({ key: 'XpackHideMenu', value: updateJson })
             .then(async () => {
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 loading.value = false;
