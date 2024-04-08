@@ -101,6 +101,20 @@ export const batchOperateRule = (params: Host.BatchRule) => {
     return http.post(`/hosts/firewall/batch`, params, TimeoutEnum.T_60S);
 };
 
+// monitors
+export const loadMonitor = (param: Host.MonitorSearch) => {
+    return http.post<Array<Host.MonitorData>>(`/hosts/monitor/search`, param);
+};
+export const getNetworkOptions = () => {
+    return http.get<Array<string>>(`/hosts/monitor/netoptions`);
+};
+export const getIOOptions = () => {
+    return http.get<Array<string>>(`/hosts/monitor/iooptions`);
+};
+export const cleanMonitors = () => {
+    return http.post(`/hosts/monitor/clean`, {});
+};
+
 // ssh
 export const getSSHInfo = () => {
     return http.post<Host.SSHInfo>(`/hosts/ssh/search`);

@@ -35,6 +35,11 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 		hostRouter.POST("/firewall/update/addr", baseApi.UpdateAddrRule)
 		hostRouter.POST("/firewall/update/description", baseApi.UpdateFirewallDescription)
 
+		hostRouter.POST("/monitor/search", baseApi.LoadMonitor)
+		hostRouter.POST("/monitor/clean", baseApi.CleanMonitor)
+		hostRouter.GET("/monitor/netoptions", baseApi.GetNetworkOptions)
+		hostRouter.GET("/monitor/iooptions", baseApi.GetIOOptions)
+
 		hostRouter.GET("/ssh/conf", baseApi.LoadSSHConf)
 		hostRouter.POST("/ssh/search", baseApi.GetSSHInfo)
 		hostRouter.POST("/ssh/update", baseApi.UpdateSSH)

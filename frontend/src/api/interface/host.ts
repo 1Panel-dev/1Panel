@@ -116,6 +116,18 @@ export namespace Host {
         rules: Array<RulePort>;
     }
 
+    export interface MonitorData {
+        param: string;
+        date: Array<Date>;
+        value: Array<any>;
+    }
+    export interface MonitorSearch {
+        param: string;
+        info: string;
+        startTime: Date;
+        endTime: Date;
+    }
+
     export interface SSHInfo {
         autoStart: boolean;
         status: string;

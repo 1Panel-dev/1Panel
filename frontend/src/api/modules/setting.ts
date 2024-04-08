@@ -29,6 +29,10 @@ export const updateSetting = (param: Setting.SettingUpdate) => {
     return http.post(`/settings/update`, param);
 };
 
+export const updateMenu = (param: Setting.SettingUpdate) => {
+    return http.post(`/settings/menu/update`, param);
+};
+
 export const updatePassword = (param: Setting.PasswordUpdate) => {
     return http.post(`/settings/password/update`, param);
 };
@@ -64,10 +68,6 @@ export const loadTimeZone = () => {
 };
 export const syncTime = (ntpSite: string) => {
     return http.post<string>(`/settings/time/sync`, { ntpSite: ntpSite });
-};
-
-export const cleanMonitors = () => {
-    return http.post(`/settings/monitor/clean`, {});
 };
 
 export const loadMFA = (param: Setting.MFARequest) => {

@@ -51,7 +51,8 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue';
 import { ElMessageBox, FormInstance } from 'element-plus';
-import { cleanMonitors, getSettingInfo, getSystemAvailable, updateSetting } from '@/api/modules/setting';
+import { cleanMonitors } from '@/api/modules/host';
+import { getSettingInfo, getSystemAvailable, updateSetting } from '@/api/modules/setting';
 import MonitorRouter from '@/views/host/monitor/index.vue';
 import Interval from '@/views/host/monitor/setting/interval/index.vue';
 import StoreDays from '@/views/host/monitor/setting/days/index.vue';
@@ -105,7 +106,15 @@ const onClean = async () => {
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
     }).then(async () => {
-        await cleanMonitors();
+        loading.value = true;
+        await cleanMonitors()
+            .then(() => {
+                loading.value = false;
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            })
+            .catch(() => {
+                loading.value = false;
+            });
     });
 };
 

@@ -8090,6 +8090,62 @@
                 }
             }
         },
+        "/hosts/monitor/clean": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "清空监控数据",
+                "tags": [
+                    "Monitor"
+                ],
+                "summary": "Clean monitor datas",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [],
+                    "formatEN": "clean monitor datas",
+                    "formatZH": "清空监控数据",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/hosts/monitor/search": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取监控数据",
+                "tags": [
+                    "Monitor"
+                ],
+                "summary": "Load monitor datas",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.MonitorSearch"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/hosts/search": {
             "post": {
                 "security": [
@@ -9916,6 +9972,46 @@
                 }
             }
         },
+        "/settings/menu/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新系统菜单配置",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "Update system setting",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SettingUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [],
+                    "formatEN": "modify system advanced function menu hidden settings.",
+                    "formatZH": "修改系统高级功能菜单隐藏设置",
+                    "paramKeys": []
+                }
+            }
+        },
         "/settings/mfa": {
             "post": {
                 "security": [
@@ -9988,32 +10084,6 @@
                     "bodyKeys": [],
                     "formatEN": "bind mfa",
                     "formatZH": "mfa 绑定",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/settings/monitor/clean": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "清空监控数据",
-                "tags": [
-                    "System Setting"
-                ],
-                "summary": "Clean monitor datas",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFunctions": [],
-                    "bodyKeys": [],
-                    "formatEN": "clean monitor datas",
-                    "formatZH": "清空监控数据",
                     "paramKeys": []
                 }
             }
@@ -14807,6 +14877,9 @@
                 "backupAccounts": {
                     "type": "string"
                 },
+                "command": {
+                    "type": "string"
+                },
                 "containerName": {
                     "type": "string"
                 },
@@ -14876,6 +14949,9 @@
                     "type": "string"
                 },
                 "backupAccounts": {
+                    "type": "string"
+                },
+                "command": {
                     "type": "string"
                 },
                 "containerName": {
@@ -16197,6 +16273,34 @@
                     "type": "string"
                 },
                 "secret": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.MonitorSearch": {
+            "type": "object",
+            "required": [
+                "param"
+            ],
+            "properties": {
+                "endTime": {
+                    "type": "string"
+                },
+                "info": {
+                    "type": "string"
+                },
+                "param": {
+                    "type": "string",
+                    "enum": [
+                        "all",
+                        "cpu",
+                        "memory",
+                        "load",
+                        "io",
+                        "network"
+                    ]
+                },
+                "startTime": {
                     "type": "string"
                 }
             }
@@ -17721,6 +17825,9 @@
                 },
                 "weChatVars": {
                     "type": "string"
+                },
+                "xpackHideMenu": {
+                    "type": "string"
                 }
             }
         },
@@ -17966,6 +18073,9 @@
                     "type": "string"
                 },
                 "sourceDir": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 }
             }

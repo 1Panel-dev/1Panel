@@ -202,13 +202,13 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue';
-import { loadMonitor, getNetworkOptions } from '@/api/modules/monitor';
-import { Monitor } from '@/api/interface/monitor';
+import { loadMonitor, getNetworkOptions } from '@/api/modules/host';
 import { computeSizeFromKBs, dateFormatWithoutYear } from '@/utils/util';
 import i18n from '@/lang';
 import MonitorRouter from '@/views/host/monitor/index.vue';
 import { GlobalStore } from '@/store';
 import { shortcuts } from '@/utils/shortcuts';
+import { Host } from '@/api/interface/host';
 
 const globalStore = GlobalStore();
 
@@ -229,7 +229,7 @@ const netOptions = ref();
 const chartsOption = ref({ loadLoadChart: null, loadCPUChart: null, loadMemoryChart: null, loadNetworkChart: null });
 
 const searchTime = ref();
-const searchInfo = reactive<Monitor.MonitorSearch>({
+const searchInfo = reactive<Host.MonitorSearch>({
     param: '',
     info: '',
     startTime: new Date(new Date().setHours(0, 0, 0, 0)),
@@ -372,7 +372,7 @@ const loadNetworkOptions = async () => {
     search('all');
 };
 
-function initLoadCharts(item: Monitor.MonitorData) {
+function initLoadCharts(item: Host.MonitorData) {
     let itemLoadDate = item.date.length === 0 ? loadEmptyDate(timeRangeLoad.value) : item.date;
     let loadDate = itemLoadDate.map(function (item: any) {
         return dateFormatWithoutYear(item);
@@ -428,7 +428,7 @@ function initLoadCharts(item: Monitor.MonitorData) {
     };
 }
 
-function initIOCharts(item: Monitor.MonitorData) {
+function initIOCharts(item: Host.MonitorData) {
     let itemIODate = item.date?.length === 0 ? loadEmptyDate(timeRangeIO.value) : item.date;
     let ioDate = itemIODate.map(function (item: any) {
         return dateFormatWithoutYear(item);
