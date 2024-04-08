@@ -61,6 +61,28 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 }
 
 // @Tags System Setting
+// @Summary Update system setting
+// @Description 更新系统菜单配置
+// @Accept json
+// @Param request body dto.SettingUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/menu/update [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改系统高级功能菜单隐藏设置","formatEN":"modify system advanced function menu hidden settings."}
+func (b *BaseApi) UpdateMenu(c *gin.Context) {
+	var req dto.SettingUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := settingService.Update(req.Key, req.Value); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags System Setting
 // @Summary Update system password
 // @Description 更新系统登录密码
 // @Accept json
@@ -225,30 +247,6 @@ func (b *BaseApi) HandlePasswordExpired(c *gin.Context) {
 // @Router /settings/basedir [get]
 func (b *BaseApi) LoadBaseDir(c *gin.Context) {
 	helper.SuccessWithData(c, global.CONF.System.DataDir)
-}
-
-// @Tags System Setting
-// @Summary Clean monitor datas
-// @Description 清空监控数据
-// @Success 200
-// @Security ApiKeyAuth
-// @Router /settings/monitor/clean [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"清空监控数据","formatEN":"clean monitor datas"}
-func (b *BaseApi) CleanMonitor(c *gin.Context) {
-	if err := global.DB.Exec("DELETE FROM monitor_bases").Error; err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	if err := global.DB.Exec("DELETE FROM monitor_ios").Error; err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	if err := global.DB.Exec("DELETE FROM monitor_networks").Error; err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-
-	helper.SuccessWithData(c, nil)
 }
 
 // @Tags System Setting

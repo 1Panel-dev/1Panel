@@ -24,7 +24,7 @@ const settingRouter = {
                     hidden: true,
                     meta: {
                         requiresAuth: true,
-                        activeMenu: 'Setting',
+                        activeMenu: '/settings',
                     },
                 },
                 {

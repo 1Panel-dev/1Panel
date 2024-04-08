@@ -15,6 +15,13 @@ import (
 	"github.com/shirou/gopsutil/v3/net"
 )
 
+// @Tags Monitor
+// @Summary Load monitor datas
+// @Description 获取监控数据
+// @Param request body dto.MonitorSearch true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /hosts/monitor/search [post]
 func (b *BaseApi) LoadMonitor(c *gin.Context) {
 	var req dto.MonitorSearch
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -78,6 +85,30 @@ func (b *BaseApi) LoadMonitor(c *gin.Context) {
 		backdatas = append(backdatas, itemData)
 	}
 	helper.SuccessWithData(c, backdatas)
+}
+
+// @Tags Monitor
+// @Summary Clean monitor datas
+// @Description 清空监控数据
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /hosts/monitor/clean [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"清空监控数据","formatEN":"clean monitor datas"}
+func (b *BaseApi) CleanMonitor(c *gin.Context) {
+	if err := global.DB.Exec("DELETE FROM monitor_bases").Error; err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	if err := global.DB.Exec("DELETE FROM monitor_ios").Error; err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	if err := global.DB.Exec("DELETE FROM monitor_networks").Error; err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, nil)
 }
 
 func (b *BaseApi) GetNetworkOptions(c *gin.Context) {

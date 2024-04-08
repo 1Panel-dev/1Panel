@@ -584,6 +584,8 @@ definitions:
         type: string
       backupAccounts:
         type: string
+      command:
+        type: string
       containerName:
         type: string
       dbName:
@@ -631,6 +633,8 @@ definitions:
       appID:
         type: string
       backupAccounts:
+        type: string
+      command:
         type: string
       containerName:
         type: string
@@ -1527,6 +1531,26 @@ definitions:
     - code
     - interval
     - secret
+    type: object
+  dto.MonitorSearch:
+    properties:
+      endTime:
+        type: string
+      info:
+        type: string
+      param:
+        enum:
+        - all
+        - cpu
+        - memory
+        - load
+        - io
+        - network
+        type: string
+      startTime:
+        type: string
+    required:
+    - param
     type: object
   dto.MysqlDBCreate:
     properties:
@@ -2556,6 +2580,8 @@ definitions:
         type: string
       weChatVars:
         type: string
+      xpackHideMenu:
+        type: string
     type: object
   dto.SettingUpdate:
     properties:
@@ -2716,6 +2742,8 @@ definitions:
       mode:
         type: string
       sourceDir:
+        type: string
+      type:
         type: string
     type: object
   files.FileInfo:
@@ -10098,6 +10126,41 @@ paths:
       summary: Create group
       tags:
       - Firewall
+  /hosts/monitor/clean:
+    post:
+      description: 清空监控数据
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Clean monitor datas
+      tags:
+      - Monitor
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys: []
+        formatEN: clean monitor datas
+        formatZH: 清空监控数据
+        paramKeys: []
+  /hosts/monitor/search:
+    post:
+      description: 获取监控数据
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.MonitorSearch'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Load monitor datas
+      tags:
+      - Monitor
   /hosts/search:
     post:
       consumes:
@@ -11244,6 +11307,32 @@ paths:
       summary: Load system address
       tags:
       - System Setting
+  /settings/menu/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新系统菜单配置
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SettingUpdate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update system setting
+      tags:
+      - System Setting
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys: []
+        formatEN: modify system advanced function menu hidden settings.
+        formatZH: 修改系统高级功能菜单隐藏设置
+        paramKeys: []
   /settings/mfa:
     post:
       consumes:
@@ -11291,23 +11380,6 @@ paths:
         bodyKeys: []
         formatEN: bind mfa
         formatZH: mfa 绑定
-        paramKeys: []
-  /settings/monitor/clean:
-    post:
-      description: 清空监控数据
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      summary: Clean monitor datas
-      tags:
-      - System Setting
-      x-panel-log:
-        BeforeFunctions: []
-        bodyKeys: []
-        formatEN: clean monitor datas
-        formatZH: 清空监控数据
         paramKeys: []
   /settings/password/update:
     post:

@@ -250,7 +250,7 @@ import { Dashboard } from '@/api/interface/dashboard';
 import { dateFormatForSecond, computeSize } from '@/utils/util';
 import { useRouter } from 'vue-router';
 import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
-import { getIOOptions, getNetworkOptions } from '@/api/modules/monitor';
+import { getIOOptions, getNetworkOptions } from '@/api/modules/host';
 import { getSettingInfo, loadUpgradeInfo } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 const router = useRouter();
