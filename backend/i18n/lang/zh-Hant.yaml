@@ -176,6 +176,8 @@ ErrRuleNotExist: "規則不存在"
 ErrParseIP: "IP 格式錯誤"
 ErrDefaultIP: "default 為保留名稱，請更換其他名稱"
 ErrGroupInUse: "IP 群組被黑/白名單使用，無法刪除"
+ErrGroupExist: "IP 群組名稱已存在"
+ErrIPRange: "IP 範圍錯誤"
 
 #license
 ErrLicense: "許可證格式錯誤，請檢查後重試！"

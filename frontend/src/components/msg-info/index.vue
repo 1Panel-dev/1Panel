@@ -17,6 +17,7 @@ defineProps({
         default: '',
     },
 });
+defineOptions({ name: 'MsgInfo' });
 </script>
 
 <style scoped>

@@ -175,6 +175,8 @@ ErrRuleNotExist: "Rule is not Exist"
 ErrParseIP: "IP format error"
 ErrDefaultIP: "default is a reserved name, please change it to another name"
 ErrGroupInUse: "The IP group is used by the black/white list and cannot be deleted"
+ErrGroupExist: "IP group name already exists"
+ErrIPRange: "Wrong IP range"
 
 #license
 ErrLicense: "License format error, please check and try again!"
