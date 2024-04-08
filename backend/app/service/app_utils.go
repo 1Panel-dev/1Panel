@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/utils/xpack"
+	"github.com/docker/docker/api/types/container"
 	"math"
 	"net/http"
 	"os"
@@ -38,7 +39,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	composeV2 "github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
-	dockerTypes "github.com/docker/docker/api/types"
 	"github.com/pkg/errors"
 )
 
@@ -695,8 +695,8 @@ func handleMap(params map[string]interface{}, envParams map[string]string) {
 				strArray[i] = strings.ToLower(fmt.Sprintf("%v", t[i]))
 			}
 			envParams[k] = strings.Join(strArray, ",")
-		default:
-			envParams[k] = t.(string)
+		case map[string]interface{}:
+			handleMap(t, envParams)
 		}
 	}
 }
@@ -829,7 +829,7 @@ func checkContainerNameIsExist(containerName, appDir string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	var options dockerTypes.ContainerListOptions
+	var options container.ListOptions
 	list, err := client.ContainerList(context.Background(), options)
 	if err != nil {
 		return false, err

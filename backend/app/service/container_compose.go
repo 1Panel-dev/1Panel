@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"github.com/docker/docker/api/types/container"
 	"io"
 	"os"
 	"os/exec"
@@ -20,7 +21,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"golang.org/x/net/context"
 )
@@ -40,7 +40,7 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 		return 0, nil, err
 	}
 
-	options := types.ContainerListOptions{All: true}
+	options := container.ListOptions{All: true}
 	options.Filters = filters.NewArgs()
 	options.Filters.Add("label", composeProjectLabel)
 

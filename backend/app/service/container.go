@@ -88,7 +88,9 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 	if err != nil {
 		return 0, nil, err
 	}
-	options := types.ContainerListOptions{All: true}
+	options := container.ListOptions{
+		All: true,
+	}
 	if len(req.Filters) != 0 {
 		options.Filters = filters.NewArgs()
 		options.Filters.Add("label", req.Filters)
@@ -217,7 +219,7 @@ func (u *ContainerService) List() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	containers, err := client.ContainerList(context.Background(), types.ContainerListOptions{All: true})
+	containers, err := client.ContainerList(context.Background(), container.ListOptions{All: true})
 	if err != nil {
 		return nil, err
 	}
@@ -238,7 +240,7 @@ func (u *ContainerService) ContainerListStats() ([]dto.ContainerListStats, error
 	if err != nil {
 		return nil, err
 	}
-	list, err := client.ContainerList(context.Background(), types.ContainerListOptions{All: true})
+	list, err := client.ContainerList(context.Background(), container.ListOptions{All: true})
 	if err != nil {
 		return nil, err
 	}
@@ -377,14 +379,14 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate) error {
 		return err
 	}
 	global.LOG.Infof("new container info %s has been made, now start to create", req.Name)
-	container, err := client.ContainerCreate(ctx, config, hostConf, networkConf, &v1.Platform{}, req.Name)
+	con, err := client.ContainerCreate(ctx, config, hostConf, networkConf, &v1.Platform{}, req.Name)
 	if err != nil {
-		_ = client.ContainerRemove(ctx, req.Name, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
+		_ = client.ContainerRemove(ctx, req.Name, container.RemoveOptions{RemoveVolumes: true, Force: true})
 		return err
 	}
 	global.LOG.Infof("create container %s successful! now check if the container is started and delete the container information if it is not.", req.Name)
-	if err := client.ContainerStart(ctx, container.ID, types.ContainerStartOptions{}); err != nil {
-		_ = client.ContainerRemove(ctx, req.Name, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
+	if err := client.ContainerStart(ctx, con.ID, container.StartOptions{}); err != nil {
+		_ = client.ContainerRemove(ctx, req.Name, container.RemoveOptions{RemoveVolumes: true, Force: true})
 		return fmt.Errorf("create successful but start failed, err: %v", err)
 	}
 	return nil
@@ -472,7 +474,7 @@ func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
 		}
 	}
 
-	if err := client.ContainerRemove(ctx, req.ContainerID, types.ContainerRemoveOptions{Force: true}); err != nil {
+	if err := client.ContainerRemove(ctx, req.ContainerID, container.RemoveOptions{Force: true}); err != nil {
 		return err
 	}
 
@@ -483,13 +485,13 @@ func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
 	}
 
 	global.LOG.Infof("new container info %s has been update, now start to recreate", req.Name)
-	container, err := client.ContainerCreate(ctx, config, hostConf, networkConf, &v1.Platform{}, req.Name)
+	con, err := client.ContainerCreate(ctx, config, hostConf, networkConf, &v1.Platform{}, req.Name)
 	if err != nil {
 		reCreateAfterUpdate(req.Name, client, oldContainer.Config, oldContainer.HostConfig, oldContainer.NetworkSettings)
 		return fmt.Errorf("update container failed, err: %v", err)
 	}
 	global.LOG.Infof("update container %s successful! now check if the container is started.", req.Name)
-	if err := client.ContainerStart(ctx, container.ID, types.ContainerStartOptions{}); err != nil {
+	if err := client.ContainerStart(ctx, con.ID, container.StartOptions{}); err != nil {
 		return fmt.Errorf("update successful but start failed, err: %v", err)
 	}
 
@@ -524,18 +526,18 @@ func (u *ContainerService) ContainerUpgrade(req dto.ContainerUpgrade) error {
 			break
 		}
 	}
-	if err := client.ContainerRemove(ctx, req.Name, types.ContainerRemoveOptions{Force: true}); err != nil {
+	if err := client.ContainerRemove(ctx, req.Name, container.RemoveOptions{Force: true}); err != nil {
 		return err
 	}
 
 	global.LOG.Infof("new container info %s has been update, now start to recreate", req.Name)
-	container, err := client.ContainerCreate(ctx, config, hostConf, &networkConf, &v1.Platform{}, req.Name)
+	con, err := client.ContainerCreate(ctx, config, hostConf, &networkConf, &v1.Platform{}, req.Name)
 	if err != nil {
 		reCreateAfterUpdate(req.Name, client, oldContainer.Config, oldContainer.HostConfig, oldContainer.NetworkSettings)
 		return fmt.Errorf("upgrade container failed, err: %v", err)
 	}
 	global.LOG.Infof("upgrade container %s successful! now check if the container is started.", req.Name)
-	if err := client.ContainerStart(ctx, container.ID, types.ContainerStartOptions{}); err != nil {
+	if err := client.ContainerStart(ctx, con.ID, container.StartOptions{}); err != nil {
 		return fmt.Errorf("upgrade successful but start failed, err: %v", err)
 	}
 
@@ -567,7 +569,7 @@ func (u *ContainerService) ContainerOperation(req dto.ContainerOperation) error 
 		global.LOG.Infof("start container %s operation %s", item, req.Operation)
 		switch req.Operation {
 		case constant.ContainerOpStart:
-			err = client.ContainerStart(ctx, item, types.ContainerStartOptions{})
+			err = client.ContainerStart(ctx, item, container.StartOptions{})
 		case constant.ContainerOpStop:
 			err = client.ContainerStop(ctx, item, container.StopOptions{})
 		case constant.ContainerOpRestart:
@@ -579,7 +581,7 @@ func (u *ContainerService) ContainerOperation(req dto.ContainerOperation) error 
 		case constant.ContainerOpUnpause:
 			err = client.ContainerUnpause(ctx, item)
 		case constant.ContainerOpRemove:
-			err = client.ContainerRemove(ctx, item, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
+			err = client.ContainerRemove(ctx, item, container.RemoveOptions{RemoveVolumes: true, Force: true})
 		}
 	}
 	return err
@@ -613,7 +615,7 @@ func (u *ContainerService) ContainerLogClean(req dto.OperationWithName) error {
 		_ = os.Remove(file)
 	}
 
-	if err := client.ContainerStart(ctx, containerItem.ID, types.ContainerStartOptions{}); err != nil {
+	if err := client.ContainerStart(ctx, containerItem.ID, container.StartOptions{}); err != nil {
 		return err
 	}
 	return nil
@@ -736,7 +738,7 @@ func (u *ContainerService) LoadContainerLogs(req dto.OperationWithNameAndType) s
 		if err != nil {
 			return ""
 		}
-		options := types.ContainerListOptions{All: true}
+		options := container.ListOptions{All: true}
 		options.Filters = filters.NewArgs()
 		options.Filters.Add("label", fmt.Sprintf("%s=%s", composeProjectLabel, req.Name))
 		containers, err := cli.ContainerList(context.Background(), options)
@@ -1028,7 +1030,7 @@ func reCreateAfterUpdate(name string, client *client.Client, config *container.C
 		global.LOG.Errorf("recreate after container update failed, err: %v", err)
 		return
 	}
-	if err := client.ContainerStart(ctx, oldContainer.ID, types.ContainerStartOptions{}); err != nil {
+	if err := client.ContainerStart(ctx, oldContainer.ID, container.StartOptions{}); err != nil {
 		global.LOG.Errorf("restart after container update failed, err: %v", err)
 	}
 	global.LOG.Errorf("recreate after container update successful")
