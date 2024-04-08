@@ -13,13 +13,14 @@ import (
 )
 
 var (
-	DB      *gorm.DB
-	LOG     *logrus.Logger
-	CONF    configs.ServerConfig
-	VALID   *validator.Validate
-	SESSION *psession.PSession
-	CACHE   *badger_db.Cache
-	Viper   *viper.Viper
+	DB        *gorm.DB
+	MonitorDB *gorm.DB
+	LOG       *logrus.Logger
+	CONF      configs.ServerConfig
+	VALID     *validator.Validate
+	SESSION   *psession.PSession
+	CACHE     *badger_db.Cache
+	Viper     *viper.Viper
 
 	Cron           *cron.Cron
 	MonitorCronID  cron.EntryID

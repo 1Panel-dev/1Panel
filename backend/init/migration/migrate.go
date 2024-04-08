@@ -77,6 +77,7 @@ func Init() {
 		migrations.AddDatabaseIsDelete,
 		migrations.AddXpackHideMenu,
 		migrations.AddCronjobCommand,
+		migrations.NewMonitorDB,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)
