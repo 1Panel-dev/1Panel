@@ -2,6 +2,7 @@ package migrations
 
 import (
 	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/gorm"
 )
@@ -41,6 +42,68 @@ var AddCronjobCommand = &gormigrate.Migration{
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.AutoMigrate(&model.Cronjob{}); err != nil {
 			return err
+		}
+		return nil
+	},
+}
+
+var NewMonitorDB = &gormigrate.Migration{
+	ID: "20240408-new-monitor-db",
+	Migrate: func(tx *gorm.DB) error {
+		var (
+			bases    []model.MonitorBase
+			ios      []model.MonitorIO
+			networks []model.MonitorNetwork
+		)
+		if err := tx.Find(&bases).Error; err != nil {
+			return err
+		}
+		if err := tx.Find(&ios).Error; err != nil {
+			return err
+		}
+		if err := tx.Find(&networks).Error; err != nil {
+			return err
+		}
+		if err := global.MonitorDB.AutoMigrate(&model.MonitorBase{}, &model.MonitorIO{}, &model.MonitorNetwork{}); err != nil {
+			return err
+		}
+
+		_ = global.MonitorDB.Exec("DELETE FROM monitor_bases").Error
+		_ = global.MonitorDB.Exec("DELETE FROM monitor_ios").Error
+		_ = global.MonitorDB.Exec("DELETE FROM monitor_networks").Error
+
+		for i := 0; i <= len(bases)/200; i++ {
+			var itemData []model.MonitorBase
+			if 200*(i+1) <= len(bases) {
+				itemData = bases[200*i : 200*(i+1)]
+			} else {
+				itemData = bases[200*i:]
+			}
+			if err := global.MonitorDB.Create(&itemData).Error; err != nil {
+				return err
+			}
+		}
+		for i := 0; i <= len(ios)/200; i++ {
+			var itemData []model.MonitorIO
+			if 200*(i+1) <= len(ios) {
+				itemData = ios[200*i : 200*(i+1)]
+			} else {
+				itemData = ios[200*i:]
+			}
+			if err := global.MonitorDB.Create(&itemData).Error; err != nil {
+				return err
+			}
+		}
+		for i := 0; i <= len(networks)/200; i++ {
+			var itemData []model.MonitorNetwork
+			if 200*(i+1) <= len(networks) {
+				itemData = networks[200*i : 200*(i+1)]
+			} else {
+				itemData = networks[200*i:]
+			}
+			if err := global.MonitorDB.Create(&itemData).Error; err != nil {
+				return err
+			}
 		}
 		return nil
 	},
