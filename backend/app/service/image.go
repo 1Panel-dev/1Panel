@@ -7,6 +7,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/image"
 	"io"
 	"os"
 	"path"
@@ -43,7 +45,7 @@ func NewIImageService() IImageService {
 }
 func (u *ImageService) Page(req dto.SearchWithPage) (int64, interface{}, error) {
 	var (
-		list      []types.ImageSummary
+		list      []image.Summary
 		records   []dto.ImageInfo
 		backDatas []dto.ImageInfo
 	)
@@ -51,11 +53,11 @@ func (u *ImageService) Page(req dto.SearchWithPage) (int64, interface{}, error) 
 	if err != nil {
 		return 0, nil, err
 	}
-	list, err = client.ImageList(context.Background(), types.ImageListOptions{})
+	list, err = client.ImageList(context.Background(), image.ListOptions{})
 	if err != nil {
 		return 0, nil, err
 	}
-	containers, _ := client.ContainerList(context.Background(), types.ContainerListOptions{All: true})
+	containers, _ := client.ContainerList(context.Background(), container.ListOptions{All: true})
 	if len(req.Info) != 0 {
 		length, count := len(list), 0
 		for count < length {
@@ -104,11 +106,11 @@ func (u *ImageService) ListAll() ([]dto.ImageInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	list, err := client.ImageList(context.Background(), types.ImageListOptions{})
+	list, err := client.ImageList(context.Background(), image.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
-	containers, _ := client.ContainerList(context.Background(), types.ContainerListOptions{All: true})
+	containers, _ := client.ContainerList(context.Background(), container.ListOptions{All: true})
 	for _, image := range list {
 		size := formatFileSize(image.Size)
 		records = append(records, dto.ImageInfo{
@@ -124,14 +126,14 @@ func (u *ImageService) ListAll() ([]dto.ImageInfo, error) {
 
 func (u *ImageService) List() ([]dto.Options, error) {
 	var (
-		list      []types.ImageSummary
+		list      []image.Summary
 		backDatas []dto.Options
 	)
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		return nil, err
 	}
-	list, err = client.ImageList(context.Background(), types.ImageListOptions{})
+	list, err = client.ImageList(context.Background(), image.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
