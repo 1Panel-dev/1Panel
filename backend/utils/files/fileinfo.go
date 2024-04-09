@@ -311,20 +311,22 @@ func (f *FileInfo) listChildren(option FileOption) error {
 }
 
 func (f *FileInfo) getContent() error {
-	if f.Size <= 10*1024*1024 {
-		afs := &afero.Afero{Fs: f.Fs}
-		cByte, err := afs.ReadFile(f.Path)
-		if err != nil {
-			return nil
-		}
-		if len(cByte) > 0 && DetectBinary(cByte) {
-			return buserr.New(constant.ErrFileCanNotRead)
-		}
-		f.Content = string(cByte)
-		return nil
-	} else {
+	if IsBlockDevice(f.FileMode) {
 		return buserr.New(constant.ErrFileCanNotRead)
 	}
+	if f.Size > 10*1024*1024 {
+		return buserr.New("ErrFileToLarge")
+	}
+	afs := &afero.Afero{Fs: f.Fs}
+	cByte, err := afs.ReadFile(f.Path)
+	if err != nil {
+		return nil
+	}
+	if len(cByte) > 0 && DetectBinary(cByte) {
+		return buserr.New(constant.ErrFileCanNotRead)
+	}
+	f.Content = string(cByte)
+	return nil
 }
 
 func DetectBinary(buf []byte) bool {
