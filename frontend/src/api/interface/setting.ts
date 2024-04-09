@@ -47,6 +47,7 @@ export namespace Setting {
         dingVars: string;
         snapshotIgnore: string;
         xpackHideMenu: string;
+        noAuthSetting: string;
     }
     export interface SettingUpdate {
         key: string;

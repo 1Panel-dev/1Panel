@@ -55,6 +55,7 @@ type SettingInfo struct {
 
 	SnapshotIgnore string `json:"snapshotIgnore"`
 	XpackHideMenu  string `json:"xpackHideMenu"`
+	NoAuthSetting  string `json:"noAuthSetting"`
 }
 
 type SettingUpdate struct {

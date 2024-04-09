@@ -121,6 +121,15 @@ func (b *BaseApi) CheckIsSafety(c *gin.Context) {
 	helper.SuccessWithData(c, status)
 }
 
+func (b *BaseApi) GetResponsePage(c *gin.Context) {
+	pageCode, err := authService.GetResponsePage()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, pageCode)
+}
+
 // @Tags Auth
 // @Summary Check System isDemo
 // @Description 判断是否为demo环境

@@ -47,6 +47,16 @@
                                 <span class="input-help">{{ $t('setting.entranceHelper') }}</span>
                             </el-form-item>
 
+                            <el-form-item :label="$t('setting.noAuthSetting')">
+                                <el-input disabled v-model="form.noAuthSetting">
+                                    <template #append>
+                                        <el-button @click="onChangeResponse" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
+
                             <el-form-item :label="$t('setting.allowIPs')">
                                 <div style="width: 100%" v-if="form.allowIPs">
                                     <el-input
@@ -163,6 +173,7 @@
         <TimeoutSetting ref="timeoutRef" @search="search" />
         <DomainSetting ref="domainRef" @search="search" />
         <AllowIPsSetting ref="allowIPsRef" @search="search" />
+        <ResponseSetting ref="responseRef" @search="search()" />
     </div>
 </template>
 
@@ -171,6 +182,7 @@ import { ref, reactive, onMounted } from 'vue';
 import { ElForm, ElMessageBox } from 'element-plus';
 import PortSetting from '@/views/setting/safe/port/index.vue';
 import BindSetting from '@/views/setting/safe/bind/index.vue';
+import ResponseSetting from '@/views/setting/safe/response/index.vue';
 import SSLSetting from '@/views/setting/safe/ssl/index.vue';
 import MfaSetting from '@/views/setting/safe/mfa/index.vue';
 import TimeoutSetting from '@/views/setting/safe/timeout/index.vue';
@@ -190,6 +202,7 @@ const portRef = ref();
 const bindRef = ref();
 const timeoutRef = ref();
 const mfaRef = ref();
+const responseRef = ref();
 
 const sslRef = ref();
 const sslInfo = ref<Setting.SSLInfo>();
@@ -210,7 +223,39 @@ const form = reactive({
     mfaInterval: 30,
     allowIPs: '',
     bindDomain: '',
+    noAuthSetting: i18n.global.t('setting.help200'),
 });
+
+const noAuthOptions = [
+    {
+        value: '200',
+        label: i18n.global.t('setting.help200'),
+    },
+    {
+        value: '400',
+        label: '400 - ' + i18n.global.t('setting.error400'),
+    },
+    {
+        value: '401',
+        label: '401 - ' + i18n.global.t('setting.error401'),
+    },
+    {
+        value: '403',
+        label: '403 - ' + i18n.global.t('setting.error403'),
+    },
+    {
+        value: '404',
+        label: '404 - ' + i18n.global.t('setting.error404'),
+    },
+    {
+        value: '408',
+        label: '408 - ' + i18n.global.t('setting.error408'),
+    },
+    {
+        value: '416',
+        label: '416 - ' + i18n.global.t('setting.error416'),
+    },
+];
 
 const unset = ref(i18n.global.t('setting.unSetting'));
 
@@ -232,6 +277,12 @@ const search = async () => {
     form.mfaInterval = Number(res.data.mfaInterval);
     form.allowIPs = res.data.allowIPs.replaceAll(',', '\n');
     form.bindDomain = res.data.bindDomain;
+
+    for (const item of noAuthOptions) {
+        if (item.value === res.data.noAuthSetting) {
+            form.noAuthSetting = item.label;
+        }
+    }
 };
 
 const onSaveComplexity = async () => {
@@ -276,6 +327,9 @@ const onChangePort = () => {
 };
 const onChangeBind = () => {
     bindRef.value.acceptParams({ ipv6: form.ipv6, bindAddress: form.bindAddress });
+};
+const onChangeResponse = () => {
+    responseRef.value.acceptParams({ noAuthSetting: form.noAuthSetting, noAuthOptions: noAuthOptions });
 };
 const onChangeBindDomain = () => {
     domainRef.value.acceptParams({ bindDomain: form.bindDomain });
