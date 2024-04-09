@@ -93,6 +93,8 @@ interface EditorConfig {
 const open = ref(false);
 const loading = ref(false);
 const fileName = ref('');
+const codeThemeKey = 'code-theme';
+const warpKey = 'code-warp';
 
 type WordWrapOptions = 'off' | 'on' | 'wordWrapColumn' | 'bounded';
 
@@ -149,6 +151,7 @@ const changeLanguage = () => {
 
 const changeTheme = () => {
     monaco.editor.setTheme(config.theme);
+    localStorage.setItem(codeThemeKey, config.theme);
 };
 
 const changeEOL = () => {
@@ -156,6 +159,7 @@ const changeEOL = () => {
 };
 
 const changeWarp = () => {
+    localStorage.setItem(warpKey, config.wordWrap);
     editor.updateOptions({
         wordWrap: config.wordWrap,
     });
@@ -217,6 +221,9 @@ const acceptParams = (props: EditProps) => {
     config.language = props.language;
     fileName.value = props.name;
     config.eol = monaco.editor.EndOfLineSequence.LF;
+
+    config.theme = localStorage.getItem(codeThemeKey) || 'vs-dark';
+    config.wordWrap = (localStorage.getItem(warpKey) as WordWrapOptions) || 'on';
     open.value = true;
 };
 
