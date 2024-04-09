@@ -64,6 +64,14 @@ func (f FileOp) CreateFile(dst string) error {
 	return nil
 }
 
+func (f FileOp) CreateFileWithMode(dst string, mode fs.FileMode) error {
+	file, err := f.Fs.OpenFile(dst, os.O_CREATE, mode)
+	if err != nil {
+		return err
+	}
+	return file.Close()
+}
+
 func (f FileOp) LinkFile(source string, dst string, isSymlink bool) error {
 	if isSymlink {
 		osFs := afero.OsFs{}

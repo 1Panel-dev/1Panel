@@ -120,18 +120,25 @@ func (f *FileService) Create(op request.FileCreate) error {
 	if fo.Stat(op.Path) {
 		return buserr.New(constant.ErrFileIsExit)
 	}
-	if op.IsDir {
-		return fo.CreateDir(op.Path, fs.FileMode(op.Mode))
-	} else {
-		if op.IsLink {
-			if !fo.Stat(op.LinkPath) {
-				return buserr.New(constant.ErrLinkPathNotFound)
-			}
-			return fo.LinkFile(op.LinkPath, op.Path, op.IsSymlink)
+	mode := op.Mode
+	if mode == 0 {
+		fileInfo, err := os.Stat(filepath.Dir(op.Path))
+		if err == nil {
+			mode = int64(fileInfo.Mode().Perm())
 		} else {
-			return fo.CreateFile(op.Path)
+			mode = 0755
 		}
 	}
+	if op.IsDir {
+		return fo.CreateDir(op.Path, fs.FileMode(mode))
+	}
+	if op.IsLink {
+		if !fo.Stat(op.LinkPath) {
+			return buserr.New(constant.ErrLinkPathNotFound)
+		}
+		return fo.LinkFile(op.LinkPath, op.Path, op.IsSymlink)
+	}
+	return fo.CreateFileWithMode(op.Path, fs.FileMode(mode))
 }
 
 func (f *FileService) Delete(op request.FileDelete) error {

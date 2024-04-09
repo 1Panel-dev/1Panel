@@ -55,7 +55,7 @@ export namespace File {
     export interface FileCreate {
         path: string;
         isDir: boolean;
-        mode: number;
+        mode?: number;
         isLink?: boolean;
         isSymlink?: boolean;
         linkPath?: boolean;
