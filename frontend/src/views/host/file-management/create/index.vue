@@ -125,6 +125,9 @@ const submit = async (formEl: FormInstance | undefined) => {
         Object.assign(addItem, addForm);
         addItem['path'] = getPath.value;
         loading.value = true;
+        if (!setRole.value) {
+            addItem['mode'] = undefined;
+        }
         CreateFile(addItem as File.FileCreate)
             .then(() => {
                 MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
