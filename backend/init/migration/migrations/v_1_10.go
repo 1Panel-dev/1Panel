@@ -108,3 +108,13 @@ var NewMonitorDB = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddNoAuthSetting = &gormigrate.Migration{
+	ID: "20240328-add-no-auth-setting",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "NoAuthSetting", Value: "200"}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

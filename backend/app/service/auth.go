@@ -20,6 +20,7 @@ type AuthService struct{}
 
 type IAuthService interface {
 	CheckIsSafety(code string) (string, error)
+	GetResponsePage() (string, error)
 	VerifyCode(code string) (bool, error)
 	Login(c *gin.Context, info dto.Login, entrance string) (*dto.UserLoginInfo, error)
 	LogOut(c *gin.Context) error
@@ -184,4 +185,12 @@ func (u *AuthService) CheckIsSafety(code string) (string, error) {
 		return "pass", nil
 	}
 	return "unpass", nil
+}
+
+func (u *AuthService) GetResponsePage() (string, error) {
+	pageCode, err := settingRepo.Get(settingRepo.WithByKey("NoAuthSetting"))
+	if err != nil {
+		return "", err
+	}
+	return pageCode.Value, nil
 }

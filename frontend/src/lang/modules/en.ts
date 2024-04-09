@@ -1388,6 +1388,15 @@ const message = {
         sslDisable: 'Disable',
         sslDisableHelper:
             'If the https service is disabled, you need to restart the panel for it to take effect. Do you want to continue?',
+        noAuthSetting: 'Unauthorized Setting',
+        responseSetting: 'Response Setting',
+        help200: '200 - Help Page',
+        error400: 'Bad Request',
+        error401: 'Unauthorized',
+        error403: 'Forbidden',
+        error404: 'Not Found',
+        error408: 'Request Timeout',
+        error416: 'Range Not Satisfiable',
 
         https: 'Setting up HTTPS protocol access for the panel can enhance the security of panel access.',
         certType: 'Certificate type',

@@ -15,8 +15,13 @@
                 </div>
             </div>
         </div>
-        <div v-if="!isSafety && !isErr && !isNotFound">
+
+        <div v-if="pageCode === '200' || !pageCode">
             <UnSafe />
+        </div>
+
+        <div v-if="pageCode !== '200' && pageCode">
+            <ErrCode :code="pageCode" />
         </div>
         <div v-if="isErr && mySafetyCode.code === 'err-ip' && !isNotFound">
             <ErrIP />
@@ -24,18 +29,15 @@
         <div v-if="isErr && mySafetyCode.code === 'err-domain' && !isNotFound">
             <ErrDomain />
         </div>
-        <div v-if="isNotFound">
-            <ErrFound />
-        </div>
     </div>
 </template>
 
 <script setup lang="ts" name="login">
-import { checkIsSafety } from '@/api/modules/auth';
+import { checkIsSafety, getResponsePage } from '@/api/modules/auth';
 import LoginForm from '../components/login-form.vue';
 import UnSafe from '@/components/error-message/unsafe.vue';
 import ErrIP from '@/components/error-message/err_ip.vue';
-import ErrFound from '@/components/error-message/404.vue';
+import ErrCode from '@/components/error-message/error_code.vue';
 import ErrDomain from '@/components/error-message/err_domain.vue';
 import { ref, onMounted } from 'vue';
 import { GlobalStore } from '@/store';
@@ -45,6 +47,8 @@ const isSafety = ref(true);
 const screenWidth = ref(null);
 const isErr = ref();
 const isNotFound = ref();
+
+const pageCode = ref();
 
 const mySafetyCode = defineProps({
     code: {
@@ -73,6 +77,8 @@ const getStatus = async () => {
     }
     isNotFound.value = false;
     if (res.data !== 'pass') {
+        const resCode = await getResponsePage();
+        pageCode.value = resCode.data;
         isSafety.value = false;
         return;
     }
