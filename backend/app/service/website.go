@@ -179,8 +179,6 @@ func (w WebsiteService) GetWebsites() ([]response.WebsiteDTO, error) {
 }
 
 func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) {
-	primaryDomainArray := strings.Split(create.PrimaryDomain, ":")
-	primaryDomain := primaryDomainArray[0]
 	alias := create.Alias
 	if common.ContainsChinese(alias) {
 		alias, err = common.PunycodeEncode(alias)
@@ -214,7 +212,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 
 	defaultDate, _ := time.Parse(constant.DateLayout, constant.DefaultDate)
 	website := &model.Website{
-		PrimaryDomain:  primaryDomain,
+		PrimaryDomain:  create.PrimaryDomain,
 		Type:           create.Type,
 		Alias:          alias,
 		Remark:         create.Remark,
