@@ -54,7 +54,7 @@ const open = ref(false);
 const loading = ref(false);
 const processForm = ref<FormInstance>();
 const rules = ref({
-    name: [Rules.requiredInput, Rules.simpleName],
+    name: [Rules.requiredInput, Rules.linuxName],
     dir: [Rules.requiredInput],
     command: [Rules.requiredInput],
     user: [Rules.requiredInput],
