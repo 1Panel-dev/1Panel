@@ -16,6 +16,10 @@ func IsSymlink(mode os.FileMode) bool {
 	return mode&os.ModeSymlink != 0
 }
 
+func IsBlockDevice(mode os.FileMode) bool {
+	return mode&os.ModeDevice != 0 && mode&os.ModeCharDevice == 0
+}
+
 func GetMimeType(path string) string {
 	file, err := os.Open(path)
 	if err != nil {
