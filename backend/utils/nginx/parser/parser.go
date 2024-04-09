@@ -61,7 +61,7 @@ func NewParserFromLexer(lexer *lexer) *Parser {
 
 	parser.directiveWrappers = map[string]func(*components.Directive) components.IDirective{
 		"server": func(directive *components.Directive) components.IDirective {
-			return parser.wrapServer(directive)
+			return parser.parseUpstreamServer(directive)
 		},
 	}
 
