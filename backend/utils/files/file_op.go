@@ -157,7 +157,7 @@ func (f FileOp) ChownR(dst string, uid string, gid string, sub bool) error {
 	if cmd.HasNoPasswordSudo() {
 		cmdStr = fmt.Sprintf("sudo %s", cmdStr)
 	}
-	if msg, err := cmd.ExecWithTimeOut(cmdStr, 2*time.Second); err != nil {
+	if msg, err := cmd.ExecWithTimeOut(cmdStr, 10*time.Second); err != nil {
 		if msg != "" {
 			return errors.New(msg)
 		}
@@ -174,7 +174,7 @@ func (f FileOp) ChmodR(dst string, mode int64, sub bool) error {
 	if cmd.HasNoPasswordSudo() {
 		cmdStr = fmt.Sprintf("sudo %s", cmdStr)
 	}
-	if msg, err := cmd.ExecWithTimeOut(cmdStr, 2*time.Second); err != nil {
+	if msg, err := cmd.ExecWithTimeOut(cmdStr, 10*time.Second); err != nil {
 		if msg != "" {
 			return errors.New(msg)
 		}
