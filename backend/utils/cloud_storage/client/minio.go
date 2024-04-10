@@ -120,10 +120,12 @@ func (m minIoClient) Download(src, target string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	defer object.Close()
 	localFile, err := os.Create(target)
 	if err != nil {
 		return false, err
 	}
+	defer localFile.Close()
 	if _, err = io.Copy(localFile, object); err != nil {
 		return false, err
 	}
