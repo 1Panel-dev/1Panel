@@ -626,22 +626,26 @@ func (u *ContainerService) ContainerLogs(wsConn *websocket.Conn, containerType, 
 	if cmd.CheckIllegal(container, since, tail) {
 		return buserr.New(constant.ErrCmdIllegal)
 	}
-	command := fmt.Sprintf("docker logs %s", container)
+	commandName := "docker"
+	commandArg := []string{"logs", container}
 	if containerType == "compose" {
-		command = fmt.Sprintf("docker-compose -f %s logs", container)
+		commandName = "docker-compose"
+		commandArg = []string{"-f", container, "logs"}
 	}
 	if tail != "0" {
-		command += " --tail " + tail
+		commandArg = append(commandArg, "--tail")
+		commandArg = append(commandArg, tail)
 	}
 	if since != "all" {
-		command += " --since " + since
+		commandArg = append(commandArg, "--since")
+		commandArg = append(commandArg, since)
 	}
 	if follow {
-		command += " -f"
+		commandArg = append(commandArg, "-f")
 	}
-	command += " 2>&1"
-	cmd := exec.Command("bash", "-c", command)
 	if !follow {
+		commandArg = append(commandArg, "2>&1")
+		cmd := exec.Command(commandName, commandArg...)
 		stdout, _ := cmd.CombinedOutput()
 		if !utf8.Valid(stdout) {
 			return errors.New("invalid utf8")
@@ -652,50 +656,52 @@ func (u *ContainerService) ContainerLogs(wsConn *websocket.Conn, containerType, 
 		return nil
 	}
 
+	cmd := exec.Command(commandName, commandArg...)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
+		_ = cmd.Process.Signal(syscall.SIGTERM)
 		return err
 	}
 	if err := cmd.Start(); err != nil {
+		_ = cmd.Process.Signal(syscall.SIGTERM)
 		return err
 	}
-	defer func() {
-		_ = cmd.Process.Signal(syscall.SIGTERM)
-		_ = cmd.Wait()
+	exitCh := make(chan struct{})
+	go func() {
+		_, wsData, _ := wsConn.ReadMessage()
+		if string(wsData) == "close conn" {
+			_ = cmd.Process.Signal(syscall.SIGTERM)
+			exitCh <- struct{}{}
+		}
 	}()
-	var exitCh chan struct{}
-	if follow {
-		go func() {
-			_, wsData, _ := wsConn.ReadMessage()
-			if string(wsData) == "close conn" {
-				exitCh <- struct{}{}
-			}
-		}()
-	}
 
-	buffer := make([]byte, 1024)
-	for {
-		select {
-		case <-exitCh:
-			return nil
-		default:
-			n, err := stdout.Read(buffer)
-			if err != nil {
-				if err == io.EOF {
-					return err
+	go func() {
+		buffer := make([]byte, 1024)
+		for {
+			select {
+			case <-exitCh:
+				return
+			default:
+				n, err := stdout.Read(buffer)
+				if err != nil {
+					if err == io.EOF {
+						return
+					}
+					global.LOG.Errorf("read bytes from log failed, err: %v", err)
+					continue
 				}
-				global.LOG.Errorf("read bytes from log failed, err: %v", err)
-				continue
-			}
-			if !utf8.Valid(buffer[:n]) {
-				continue
-			}
-			if err = wsConn.WriteMessage(websocket.TextMessage, buffer[:n]); err != nil {
-				global.LOG.Errorf("send message with log to ws failed, err: %v", err)
-				return err
+				if !utf8.Valid(buffer[:n]) {
+					continue
+				}
+				if err = wsConn.WriteMessage(websocket.TextMessage, buffer[:n]); err != nil {
+					global.LOG.Errorf("send message with log to ws failed, err: %v", err)
+					return
+				}
 			}
 		}
-	}
+	}()
+	_ = cmd.Wait()
+	return nil
 }
 
 func (u *ContainerService) ContainerStats(id string) (*dto.ContainerStats, error) {
