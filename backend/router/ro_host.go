@@ -36,6 +36,7 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 		hostRouter.POST("/firewall/update/description", baseApi.UpdateFirewallDescription)
 
 		hostRouter.POST("/monitor/search", baseApi.LoadMonitor)
+		hostRouter.GET("/monitor/gpu", baseApi.LoadGpuInfo)
 		hostRouter.POST("/monitor/clean", baseApi.CleanMonitor)
 		hostRouter.GET("/monitor/netoptions", baseApi.GetNetworkOptions)
 		hostRouter.GET("/monitor/iooptions", baseApi.GetIOOptions)

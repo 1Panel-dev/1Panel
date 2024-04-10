@@ -30,6 +30,17 @@ const hostRouter = {
             },
         },
         {
+            path: '/hosts/monitor/gpu',
+            name: 'GPU',
+            component: () => import('@/views/host/monitor/gpu/index.vue'),
+            hidden: true,
+            meta: {
+                activeMenu: '/hosts/monitor/monitor',
+                title: 'menu.monitor',
+                requiresAuth: false,
+            },
+        },
+        {
             path: '/hosts/monitor/setting',
             name: 'MonitorSetting',
             component: () => import('@/views/host/monitor/setting/index.vue'),

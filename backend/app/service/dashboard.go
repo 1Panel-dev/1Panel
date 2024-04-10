@@ -11,6 +11,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	"github.com/1Panel-dev/1Panel/backend/utils/gpu"
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/host"
@@ -154,6 +155,7 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 	currentInfo.SwapMemoryUsedPercent = swapInfo.UsedPercent
 
 	currentInfo.DiskData = loadDiskInfo()
+	currentInfo.GPUData = loadGPUInfo()
 
 	if ioOption == "all" {
 		diskInfo, _ := disk.IOCounters()
@@ -288,4 +290,29 @@ func loadDiskInfo() []dto.DiskInfo {
 		return datas[i].Path < datas[j].Path
 	})
 	return datas
+}
+
+func loadGPUInfo() []dto.GPUInfo {
+	ok, client := gpu.New()
+	if !ok {
+		return nil
+	}
+	info, err := client.LoadGpuInfo()
+	if err != nil || len(info.Gpu) == 0 {
+		return nil
+	}
+	var data []dto.GPUInfo
+	for _, gpu := range info.Gpu {
+		data = append(data, dto.GPUInfo{
+			Index:       gpu.Index,
+			ProductName: gpu.ProductName,
+			Util:        gpu.GPUUtil,
+			Temp:        gpu.Temperature,
+			Perf:        gpu.PerformanceState,
+			PowerUsage:  gpu.PowerDraw + " / " + gpu.MaxPowerLimit,
+			MemoryUsage: gpu.MemUsed + " / " + gpu.MemTotal,
+			FanSpeed:    gpu.FanSpeed,
+		})
+	}
+	return data
 }

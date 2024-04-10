@@ -16,6 +16,10 @@ const buttons = [
         path: '/hosts/monitor/monitor',
     },
     {
+        label: 'GPU',
+        path: '/hosts/monitor/gpu',
+    },
+    {
         label: i18n.global.t('commons.button.set'),
         path: '/hosts/monitor/setting',
     },

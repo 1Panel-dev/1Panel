@@ -8123,6 +8123,25 @@ const docTemplate = `{
                 }
             }
         },
+        "/hosts/monitor/gpu": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取 GPU 数据",
+                "tags": [
+                    "Monitor"
+                ],
+                "summary": "Load gpu datas",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/hosts/monitor/search": {
             "post": {
                 "security": [
@@ -15194,6 +15213,12 @@ const docTemplate = `{
                         "$ref": "#/definitions/dto.DiskInfo"
                     }
                 },
+                "gpuData": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.GPUInfo"
+                    }
+                },
                 "ioCount": {
                     "type": "integer"
                 },
@@ -15773,6 +15798,35 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "vars": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.GPUInfo": {
+            "type": "object",
+            "properties": {
+                "fanSpeed": {
+                    "type": "string"
+                },
+                "index": {
+                    "type": "integer"
+                },
+                "memoryUsage": {
+                    "type": "string"
+                },
+                "perf": {
+                    "type": "string"
+                },
+                "powerUsage": {
+                    "type": "string"
+                },
+                "productName": {
+                    "type": "string"
+                },
+                "temp": {
+                    "type": "string"
+                },
+                "util": {
                     "type": "string"
                 }
             }
@@ -17788,6 +17842,9 @@ const docTemplate = `{
                 "monitorStoreDays": {
                     "type": "string"
                 },
+                "noAuthSetting": {
+                    "type": "string"
+                },
                 "ntpSite": {
                     "type": "string"
                 },
@@ -18915,7 +18972,6 @@ const docTemplate = `{
         "request.FileCreate": {
             "type": "object",
             "required": [
-                "mode",
                 "path"
             ],
             "properties": {

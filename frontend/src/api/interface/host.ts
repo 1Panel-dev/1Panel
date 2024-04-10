@@ -121,6 +121,37 @@ export namespace Host {
         date: Array<Date>;
         value: Array<any>;
     }
+    export interface GPUInfo {
+        cudaVersion: string;
+        driverVersion: string;
+        gpu: Array<GPU>;
+    }
+    export interface GPU {
+        index: number;
+        productName: string;
+        persistenceMode: string;
+        busID: string;
+        displayActive: string;
+        ecc: string;
+        fanSpeed: string;
+
+        temperature: string;
+        performanceState: string;
+        powerDraw: string;
+        maxPowerLimit: string;
+        memUsed: string;
+        memTotal: string;
+        gpuUtil: string;
+        computeMode: string;
+        migMode: string;
+        processes: Array<Process>;
+    }
+    export interface Process {
+        pid: string;
+        type: string;
+        processName: string;
+        usedMemory: string;
+    }
     export interface MonitorSearch {
         param: string;
         info: string;

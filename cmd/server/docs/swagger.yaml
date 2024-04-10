@@ -795,6 +795,10 @@ definitions:
         items:
           $ref: '#/definitions/dto.DiskInfo'
         type: array
+      gpuData:
+        items:
+          $ref: '#/definitions/dto.GPUInfo'
+        type: array
       ioCount:
         type: integer
       ioReadBytes:
@@ -1189,6 +1193,25 @@ definitions:
     - credential
     - type
     - vars
+    type: object
+  dto.GPUInfo:
+    properties:
+      fanSpeed:
+        type: string
+      index:
+        type: integer
+      memoryUsage:
+        type: string
+      perf:
+        type: string
+      powerUsage:
+        type: string
+      productName:
+        type: string
+      temp:
+        type: string
+      util:
+        type: string
     type: object
   dto.GenerateLoad:
     properties:
@@ -2550,6 +2573,8 @@ definitions:
         type: string
       monitorStoreDays:
         type: string
+      noAuthSetting:
+        type: string
       ntpSite:
         type: string
       panelName:
@@ -3311,7 +3336,6 @@ definitions:
       sub:
         type: boolean
     required:
-    - mode
     - path
     type: object
   request.FileDeCompress:
@@ -10143,6 +10167,17 @@ paths:
         formatEN: clean monitor datas
         formatZH: 清空监控数据
         paramKeys: []
+  /hosts/monitor/gpu:
+    get:
+      description: 获取 GPU 数据
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Load gpu datas
+      tags:
+      - Monitor
   /hosts/monitor/search:
     post:
       description: 获取监控数据

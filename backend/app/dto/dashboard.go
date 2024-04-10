@@ -69,6 +69,8 @@ type DashboardCurrent struct {
 	NetBytesSent uint64 `json:"netBytesSent"`
 	NetBytesRecv uint64 `json:"netBytesRecv"`
 
+	GPUData []GPUInfo `json:"gpuData"`
+
 	ShotTime time.Time `json:"shotTime"`
 }
 
@@ -85,4 +87,15 @@ type DiskInfo struct {
 	InodesUsed        uint64  `json:"inodesUsed"`
 	InodesFree        uint64  `json:"inodesFree"`
 	InodesUsedPercent float64 `json:"inodesUsedPercent"`
+}
+
+type GPUInfo struct {
+	Index       uint   `json:"index"`
+	ProductName string `json:"productName"`
+	Util        string `json:"util"`
+	Temp        string `json:"temp"`
+	Perf        string `json:"perf"`
+	PowerUsage  string `json:"powerUsage"`
+	MemoryUsage string `json:"memoryUsage"`
+	FanSpeed    string `json:"fanSpeed"`
 }

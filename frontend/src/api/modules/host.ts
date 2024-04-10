@@ -105,6 +105,9 @@ export const batchOperateRule = (params: Host.BatchRule) => {
 export const loadMonitor = (param: Host.MonitorSearch) => {
     return http.post<Array<Host.MonitorData>>(`/hosts/monitor/search`, param);
 };
+export const loadGPUInfo = () => {
+    return http.get<Host.GPUInfo>(`/hosts/monitor/gpu`);
+};
 export const getNetworkOptions = () => {
     return http.get<Array<string>>(`/hosts/monitor/netoptions`);
 };

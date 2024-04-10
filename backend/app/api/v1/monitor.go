@@ -10,6 +10,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
+	"github.com/1Panel-dev/1Panel/backend/utils/gpu"
 	"github.com/gin-gonic/gin"
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/net"
@@ -85,6 +86,25 @@ func (b *BaseApi) LoadMonitor(c *gin.Context) {
 		backdatas = append(backdatas, itemData)
 	}
 	helper.SuccessWithData(c, backdatas)
+}
+
+// @Tags Monitor
+// @Summary Load gpu datas
+// @Description 获取 GPU 数据
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /hosts/monitor/gpu [get]
+func (b *BaseApi) LoadGpuInfo(c *gin.Context) {
+	ok, client := gpu.New()
+	if !ok {
+		helper.SuccessWithOutData(c)
+	}
+	info, err := client.LoadGpuInfo()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, info)
 }
 
 // @Tags Monitor
