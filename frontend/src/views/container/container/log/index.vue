@@ -143,6 +143,7 @@ const searchLogs = async () => {
         MsgError(i18n.global.t('container.linesHelper'));
         return;
     }
+    terminalSocket.value?.send('close conn');
     terminalSocket.value?.close();
     logInfo.value = '';
     const href = window.location.href;

@@ -102,7 +102,7 @@ func (b *BaseApi) RedisWsSsh(c *gin.Context) {
 	if wshandleError(wsConn, err) {
 		return
 	}
-	defer killBash(redisConf.ContainerName, commands, pidMap)
+	defer killBash(redisConf.ContainerName, pidMap)
 	defer slave.Close()
 
 	tty, err := terminal.NewLocalWsSession(cols, rows, wsConn, slave, false)
@@ -170,7 +170,7 @@ func (b *BaseApi) ContainerWsSsh(c *gin.Context) {
 	if wshandleError(wsConn, err) {
 		return
 	}
-	defer killBash(containerID, command, pidMap)
+	defer killBash(containerID, pidMap)
 	defer slave.Close()
 
 	tty, err := terminal.NewLocalWsSession(cols, rows, wsConn, slave, true)
@@ -221,26 +221,26 @@ func loadMapFromDockerTop(containerID string) map[string]string {
 	lines := strings.Split(stdout, "\n")
 	for _, line := range lines {
 		parts := strings.Fields(line)
-		if len(parts) != 2 {
+		if len(parts) == 0 {
 			continue
 		}
-		pidMap[parts[0]] = parts[1]
+		pidMap[parts[0]] = strings.Join(parts, " ")
 	}
 	return pidMap
 }
 
-func killBash(containerID, comm string, pidMap map[string]string) {
+func killBash(containerID string, pidMap map[string]string) {
 	sudo := cmd.SudoHandleCmd()
 	newPidMap := loadMapFromDockerTop(containerID)
-	for pid, command := range newPidMap {
+	for pid, newCmd := range newPidMap {
 		isOld := false
-		for pid2 := range pidMap {
-			if pid == pid2 {
+		for pid2, oldCmd := range pidMap {
+			if pid == pid2 && oldCmd == newCmd {
 				isOld = true
 				break
 			}
 		}
-		if !isOld && command == comm {
+		if !isOld {
 			_, _ = cmd.Execf("%s kill -9 %s", sudo, pid)
 		}
 	}
