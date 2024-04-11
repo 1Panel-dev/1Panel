@@ -10,6 +10,7 @@ import (
 	"os/user"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"sync"
 )
 
@@ -140,4 +141,11 @@ func GetParentMode(path string) (os.FileMode, error) {
 		}
 		absPath = parentDir
 	}
+}
+
+func IsInvalidChar(name string) bool {
+	if strings.Contains(name, "&") {
+		return true
+	}
+	return false
 }
