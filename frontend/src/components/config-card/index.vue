@@ -1,20 +1,24 @@
 <template>
     <el-card class="config-card">
-        <span class="web-tag" v-if="website">
-            <el-tooltip :content="$t('xpack.waf.websiteHelper')" placement="bottom">
-                <el-tag type="primary" size="small">{{ $t('menu.website') }}</el-tag>
-            </el-tooltip>
-        </span>
         <div class="config-header">
             <span>
                 {{ header }}
             </span>
+
             <div class="header-r">
                 <slot name="header-r" />
             </div>
         </div>
 
-        <el-text type="info">{{ description }}</el-text>
+        <el-text type="info">
+            {{ description }}
+        </el-text>
+        <span class="ml-5" v-if="website">
+            <el-tooltip :content="$t('xpack.waf.websiteHelper')" placement="bottom">
+                <el-tag type="primary" size="small">{{ $t('menu.website') }}</el-tag>
+            </el-tooltip>
+        </span>
+
         <div class="config-content">
             <slot name="content-r" />
         </div>
