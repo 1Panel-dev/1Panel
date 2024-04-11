@@ -223,39 +223,8 @@ const form = reactive({
     mfaInterval: 30,
     allowIPs: '',
     bindDomain: '',
-    noAuthSetting: i18n.global.t('setting.help200'),
+    noAuthSetting: '200 - ' + i18n.global.t('setting.help200'),
 });
-
-const noAuthOptions = [
-    {
-        value: '200',
-        label: i18n.global.t('setting.help200'),
-    },
-    {
-        value: '400',
-        label: '400 - ' + i18n.global.t('setting.error400'),
-    },
-    {
-        value: '401',
-        label: '401 - ' + i18n.global.t('setting.error401'),
-    },
-    {
-        value: '403',
-        label: '403 - ' + i18n.global.t('setting.error403'),
-    },
-    {
-        value: '404',
-        label: '404 - ' + i18n.global.t('setting.error404'),
-    },
-    {
-        value: '408',
-        label: '408 - ' + i18n.global.t('setting.error408'),
-    },
-    {
-        value: '416',
-        label: '416 - ' + i18n.global.t('setting.error416'),
-    },
-];
 
 const unset = ref(i18n.global.t('setting.unSetting'));
 
@@ -277,11 +246,10 @@ const search = async () => {
     form.mfaInterval = Number(res.data.mfaInterval);
     form.allowIPs = res.data.allowIPs.replaceAll(',', '\n');
     form.bindDomain = res.data.bindDomain;
-
-    for (const item of noAuthOptions) {
-        if (item.value === res.data.noAuthSetting) {
-            form.noAuthSetting = item.label;
-        }
+    if (res.data.noAuthSetting !== '200') {
+        form.noAuthSetting = res.data.noAuthSetting + ' - ' + i18n.global.t('setting.error' + res.data.noAuthSetting);
+    } else {
+        form.noAuthSetting = res.data.noAuthSetting + ' - ' + i18n.global.t('setting.help200');
     }
 };
 
@@ -329,7 +297,7 @@ const onChangeBind = () => {
     bindRef.value.acceptParams({ ipv6: form.ipv6, bindAddress: form.bindAddress });
 };
 const onChangeResponse = () => {
-    responseRef.value.acceptParams({ noAuthSetting: form.noAuthSetting, noAuthOptions: noAuthOptions });
+    responseRef.value.acceptParams({ noAuthSetting: form.noAuthSetting });
 };
 const onChangeBindDomain = () => {
     domainRef.value.acceptParams({ bindDomain: form.bindDomain });

@@ -326,6 +326,7 @@ const acceptParams = (current: Dashboard.CurrentInfo, base: Dashboard.BaseInfo, 
                 data: formatNumber(currentInfo.value.diskData[i].usedPercent),
             };
         }
+        currentInfo.value.gpuData = currentInfo.value.gpuData || [];
         for (let i = 0; i < currentInfo.value.gpuData.length; i++) {
             chartsOption.value['gpu' + i] = {
                 title: 'GPU-' + currentInfo.value.gpuData[i].index,

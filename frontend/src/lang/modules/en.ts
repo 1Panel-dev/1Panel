@@ -1396,8 +1396,10 @@ const message = {
         sslDisableHelper:
             'If the https service is disabled, you need to restart the panel for it to take effect. Do you want to continue?',
         noAuthSetting: 'Unauthorized Setting',
+        noAuthSettingHelper:
+            'When the user is not logged in and has not correctly entered the security gateway, authorized IP, or bound domain, this response can hide panel features.',
         responseSetting: 'Response Setting',
-        help200: '200 - Help Page',
+        help200: 'Help Page',
         error400: 'Bad Request',
         error401: 'Unauthorized',
         error403: 'Forbidden',

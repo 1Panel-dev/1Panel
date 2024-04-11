@@ -12,14 +12,15 @@
                             prop="noAuthSetting"
                             :rules="Rules.requiredSelect"
                         >
-                            <el-select v-model="form.noAuthSetting" filterable>
+                            <el-select v-model="form.noAuthSetting">
                                 <el-option
                                     v-for="item in options"
-                                    :key="item"
+                                    :key="item.value"
                                     :label="item.label"
                                     :value="item.value"
                                 />
                             </el-select>
+                            <span class="input-help">{{ $t('setting.noAuthSettingHelper') }}</span>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -54,7 +55,36 @@ const form = reactive({
     noAuthSetting: '',
 });
 
-const options = ref([]);
+const options = [
+    {
+        value: '200',
+        label: '200 - ' + i18n.global.t('setting.help200'),
+    },
+    {
+        value: '400',
+        label: '400 - ' + i18n.global.t('setting.error400'),
+    },
+    {
+        value: '401',
+        label: '401 - ' + i18n.global.t('setting.error401'),
+    },
+    {
+        value: '403',
+        label: '403 - ' + i18n.global.t('setting.error403'),
+    },
+    {
+        value: '404',
+        label: '404 - ' + i18n.global.t('setting.error404'),
+    },
+    {
+        value: '408',
+        label: '408 - ' + i18n.global.t('setting.error408'),
+    },
+    {
+        value: '416',
+        label: '416 - ' + i18n.global.t('setting.error416'),
+    },
+];
 
 interface DialogProps {
     noAuthSetting: string;
@@ -62,7 +92,6 @@ interface DialogProps {
 }
 
 const acceptParams = (params: DialogProps): void => {
-    options.value = params.noAuthOptions;
     form.noAuthSetting = params.noAuthSetting;
     drawerVisible.value = true;
 };

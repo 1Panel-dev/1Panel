@@ -1,33 +1,41 @@
 <template>
     <div>
-        <div class="login-background" v-if="isSafety && !isErr && !isNotFound">
-            <div class="login-wrapper">
-                <div :class="screenWidth > 1110 ? 'left inline-block' : ''">
-                    <div class="login-title">
-                        <span>{{ globalStore.themeConfig.title || $t('setting.description') }}</span>
+        <div v-if="!loading">
+            <div class="login-background" v-if="errStatus === ''">
+                <div class="login-wrapper">
+                    <div :class="screenWidth > 1110 ? 'left inline-block' : ''">
+                        <div class="login-title">
+                            <span>{{ globalStore.themeConfig.title || $t('setting.description') }}</span>
+                        </div>
+                        <img src="@/assets/images/1panel-login.png" alt="" v-if="screenWidth > 1110" />
                     </div>
-                    <img src="@/assets/images/1panel-login.png" alt="" v-if="screenWidth > 1110" />
-                </div>
-                <div :class="screenWidth > 1110 ? 'right inline-block' : ''">
-                    <div class="login-container">
-                        <LoginForm ref="loginRef"></LoginForm>
+                    <div :class="screenWidth > 1110 ? 'right inline-block' : ''">
+                        <div class="login-container">
+                            <LoginForm ref="loginRef"></LoginForm>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div v-if="pageCode === '200' || !pageCode">
-            <UnSafe />
-        </div>
-
-        <div v-if="pageCode !== '200' && pageCode">
-            <ErrCode :code="pageCode" />
-        </div>
-        <div v-if="isErr && mySafetyCode.code === 'err-ip' && !isNotFound">
-            <ErrIP />
-        </div>
-        <div v-if="isErr && mySafetyCode.code === 'err-domain' && !isNotFound">
-            <ErrDomain />
+            <div v-else>
+                <div v-if="!pageCode || pageCode === '200'">
+                    <div v-if="errStatus === 'err-unsafe'">
+                        <UnSafe />
+                    </div>
+                    <div v-if="errStatus === 'err-ip'">
+                        <ErrIP />
+                    </div>
+                    <div v-if="errStatus === 'err-domain'">
+                        <ErrDomain />
+                    </div>
+                    <div v-if="errStatus === 'not-found'">
+                        <ErrFound />
+                    </div>
+                </div>
+                <div v-else>
+                    <ErrCode :code="pageCode" />
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -39,16 +47,15 @@ import UnSafe from '@/components/error-message/unsafe.vue';
 import ErrIP from '@/components/error-message/err_ip.vue';
 import ErrCode from '@/components/error-message/error_code.vue';
 import ErrDomain from '@/components/error-message/err_domain.vue';
+import ErrFound from '@/components/error-message/404.vue';
 import { ref, onMounted } from 'vue';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 
-const isSafety = ref(true);
 const screenWidth = ref(null);
-const isErr = ref();
-const isNotFound = ref();
-
-const pageCode = ref();
+const errStatus = ref();
+const pageCode = ref('');
+const loading = ref();
 
 const mySafetyCode = defineProps({
     code: {
@@ -59,32 +66,45 @@ const mySafetyCode = defineProps({
 });
 
 const getStatus = async () => {
-    isErr.value = true;
     let code = mySafetyCode.code;
-    if (code === 'err-ip' || code === 'err-domain') {
-        code = globalStore.entrance;
-    }
-    const res = await checkIsSafety(code);
-    isErr.value = false;
-    globalStore.entrance = '';
-    if (res.data === 'disable') {
-        if (code === '') {
-            isNotFound.value = false;
-        } else {
-            isNotFound.value = true;
-        }
-        return;
-    }
-    isNotFound.value = false;
-    if (res.data !== 'pass') {
-        const resCode = await getResponsePage();
-        pageCode.value = resCode.data;
-        isSafety.value = false;
-        return;
-    }
-    if (res.data === 'pass') {
-        globalStore.entrance = code;
-    }
+    loading.value = true;
+    await getResponsePage()
+        .then(async (res) => {
+            pageCode.value = res.data;
+            if (code === 'err-ip' || code === 'err-domain') {
+                errStatus.value = code;
+                loading.value = false;
+                return;
+            }
+            await checkIsSafety(code)
+                .then((safeRes) => {
+                    if (safeRes.data === 'disable') {
+                        if (code !== '') {
+                            errStatus.value = 'not-found';
+                            loading.value = false;
+                            return;
+                        }
+                    }
+                    if (safeRes.data === 'pass') {
+                        globalStore.entrance = code;
+                        errStatus.value = '';
+                        loading.value = false;
+                        return;
+                    }
+                    loading.value = false;
+                    errStatus.value = 'err-unsafe';
+                })
+                .catch(() => {
+                    pageCode.value = '200';
+                    errStatus.value = 'err-unsafe';
+                    loading.value = false;
+                });
+        })
+        .catch(() => {
+            pageCode.value = '200';
+            errStatus.value = 'err-found';
+            loading.value = false;
+        });
 };
 
 onMounted(() => {
