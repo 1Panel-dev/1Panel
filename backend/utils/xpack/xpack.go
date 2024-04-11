@@ -2,5 +2,8 @@
 
 package xpack
 
-func RemoveTamper(website string) {
+func RemoveTamper(website string) {}
+
+func LoadGpuInfo() []interface{} {
+	return nil
 }

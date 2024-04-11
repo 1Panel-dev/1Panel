@@ -892,6 +892,13 @@ const message = {
         up: 'Up',
         down: 'Down',
         interval: 'Interval(min)',
+
+        gpuUtil: 'GPU Utilization',
+        temperature: 'Temperature',
+        performanceState: 'Performance State',
+        powerUsage: 'Power Usage',
+        memoryUsage: 'Memory Usage',
+        fanSpeed: 'Fan Speed',
     },
     terminal: {
         conn: 'connection',
@@ -1505,10 +1512,11 @@ const message = {
         knowMorePro: 'Learn More',
         closeAlert: 'The current page can be closed in the panel settings',
         introduce: 'Feature Introduction',
-        waf: 'Upgrade to the professional version to get interception maps, logs, blocking records, geographical location blocking, custom rules, custom blocking pages and other functions',
-        tamper: '1Panel tamper-proof function is a security measure used to protect a website from unauthorized modifications or tampering.',
+        waf: 'Upgrading to the professional version can provide features such as interception map, logs, block records, geographical location blocking, custom rules, custom interception pages, etc.',
+        tamper: 'Upgrading to the professional version can protect websites from unauthorized modifications or tampering.',
+        gpu: 'Upgrading to the professional version can help users visually monitor important parameters of GPU such as workload, temperature, memory usage in real time.',
         setting:
-            '1Panel interface settings function allow you to customize panel logos, welcome messages, and other information.',
+            'Upgrading to the professional version allows customization of panel logo, welcome message, and other information.',
     },
     clean: {
         scan: 'Start Scanning',

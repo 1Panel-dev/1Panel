@@ -79,6 +79,7 @@ func Init() {
 		migrations.AddCronjobCommand,
 		migrations.NewMonitorDB,
 		migrations.AddNoAuthSetting,
+		migrations.UpdateXpackHideMenu,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

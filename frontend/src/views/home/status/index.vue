@@ -161,6 +161,59 @@
                 <span class="input-help">{{ computeSize(item.used) }} / {{ computeSize(item.total) }}</span>
             </el-col>
         </template>
+        <template v-for="(item, index) of currentInfo.gpuData" :key="index">
+            <el-col
+                :xs="12"
+                :sm="12"
+                :md="6"
+                :lg="6"
+                :xl="6"
+                align="center"
+                v-if="showMore || index < 4 - currentInfo.diskData.length"
+            >
+                <el-popover placement="bottom" :width="250" trigger="hover" v-if="chartsOption[`gpu${index}`]">
+                    <el-row :gutter="5">
+                        <el-tag style="font-weight: 500">{{ $t('home.baseInfo') }}:</el-tag>
+                    </el-row>
+                    <el-row :gutter="5">
+                        <el-tag class="tagClass">{{ $t('monitor.gpuUtil') }}: {{ item.gpuUtil }}</el-tag>
+                    </el-row>
+                    <el-row :gutter="5">
+                        <el-tag class="tagClass">
+                            {{ $t('monitor.temperature') }}: {{ item.temperature.replaceAll('C', '°C') }}
+                        </el-tag>
+                    </el-row>
+                    <el-row :gutter="5">
+                        <el-tag class="tagClass">
+                            {{ $t('monitor.performanceState') }}: {{ item.performanceState }}
+                        </el-tag>
+                    </el-row>
+                    <el-row :gutter="5">
+                        <el-tag class="tagClass">{{ $t('monitor.powerUsage') }}: {{ item.powerUsage }}</el-tag>
+                    </el-row>
+                    <el-row :gutter="5">
+                        <el-tag class="tagClass">{{ $t('monitor.memoryUsage') }}: {{ item.memoryUsage }}</el-tag>
+                    </el-row>
+                    <el-row :gutter="5">
+                        <el-tag class="tagClass">{{ $t('monitor.fanSpeed') }}: {{ item.fanSpeed }}</el-tag>
+                    </el-row>
+                    <template #reference>
+                        <v-charts
+                            @click="goGPU()"
+                            height="160px"
+                            :id="`gpu${index}`"
+                            type="pie"
+                            :option="chartsOption[`gpu${index}`]"
+                            v-if="chartsOption[`gpu${index}`]"
+                        />
+                    </template>
+                </el-popover>
+                <el-tooltip :content="item.productName" v-if="item.productName.length > 25">
+                    <span class="input-help">{{ item.productName.substring(0, 22) }}...</span>
+                </el-tooltip>
+                <span class="input-help" v-else>{{ item.productName }}</span>
+            </el-col>
+        </template>
         <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
             <el-button v-if="!showMore" link type="primary" @click="showMore = true" class="buttonClass">
                 {{ $t('tabs.more') }}
@@ -183,6 +236,7 @@
 <script setup lang="ts">
 import { Dashboard } from '@/api/interface/dashboard';
 import { computeSize } from '@/utils/util';
+import router from '@/routers';
 import i18n from '@/lang';
 import { nextTick, ref } from 'vue';
 const showMore = ref(true);
@@ -238,6 +292,7 @@ const currentInfo = ref<Dashboard.CurrentInfo>({
     ioWriteTime: 0,
 
     diskData: [],
+    gpuData: [],
 
     netBytesSent: 0,
     netBytesRecv: 0,
@@ -271,7 +326,13 @@ const acceptParams = (current: Dashboard.CurrentInfo, base: Dashboard.BaseInfo, 
                 data: formatNumber(currentInfo.value.diskData[i].usedPercent),
             };
         }
-        if (currentInfo.value.diskData.length > 5) {
+        for (let i = 0; i < currentInfo.value.gpuData.length; i++) {
+            chartsOption.value['gpu' + i] = {
+                title: 'GPU-' + currentInfo.value.gpuData[i].index,
+                data: formatNumber(Number(currentInfo.value.gpuData[i].gpuUtil.replaceAll(' %', ''))),
+            };
+        }
+        if (currentInfo.value.diskData.length + currentInfo.value.gpuData.length > 5) {
             showMore.value = isInit ? false : showMore.value || false;
         }
     });
@@ -289,6 +350,10 @@ function loadStatus(val: number) {
     }
     return i18n.global.t('home.runJam');
 }
+
+const goGPU = () => {
+    router.push({ name: 'GPU' });
+};
 
 function formatNumber(val: number) {
     return Number(val.toFixed(2));
