@@ -447,6 +447,10 @@ const handleSearchResult = (res: ResultData<File.File>) => {
 
 const open = async (row: File.File) => {
     if (row.isDir) {
+        if (row.name == '.1panel_clash') {
+            MsgWarning(i18n.global.t('file.clashOpenAlert'));
+            return;
+        }
         const name = row.name;
         if (req.path.endsWith('/')) {
             req.path = req.path + name;
@@ -830,6 +834,9 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        disabled: (row: File.File) => {
+            return row.name == '.1panel_clash';
+        },
         click: delFile,
     },
     {

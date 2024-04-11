@@ -56,7 +56,7 @@ import { ref } from 'vue';
 import { File } from '@/api/interface/file';
 import { getIcon } from '@/utils/util';
 import { DeleteFile, GetRecycleStatus } from '@/api/modules/files';
-import { MsgSuccess } from '@/utils/message';
+import { MsgSuccess, MsgWarning } from '@/utils/message';
 
 const open = ref(false);
 const files = ref();
@@ -85,6 +85,10 @@ const getStatus = async () => {
 const onConfirm = () => {
     const pros = [];
     for (const s of files.value) {
+        if (s['path'].indexOf('.1panel_clash') > -1) {
+            MsgWarning(i18n.global.t('file.clashDleteAlert'));
+            return;
+        }
         pros.push(DeleteFile({ path: s['path'], isDir: s['isDir'], forceDelete: forceDelete.value }));
     }
     loading.value = true;
