@@ -57,7 +57,7 @@
                         </el-form-item>
                         <el-form-item label="API Token" prop="authorization.apiKey">
                             <el-input v-model.trim="account.authorization['apiKey']"></el-input>
-                            <span class="input-help">
+                            <span class="input-help text-red-500">
                                 {{ $t('ssl.cfHelper') }}
                             </span>
                         </el-form-item>

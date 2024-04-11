@@ -180,7 +180,7 @@ const initEditor = () => {
             folding: true,
             roundedSelection: false,
             overviewRulerBorder: false,
-            wordWrap: 'on',
+            wordWrap: config.wordWrap,
         });
         editor.onDidChangeModelContent(() => {
             if (editor) {

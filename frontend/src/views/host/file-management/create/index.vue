@@ -67,7 +67,7 @@ import i18n from '@/lang';
 import FileRole from '@/components/file-role/index.vue';
 import { Rules } from '@/global/form-rules';
 import FileList from '@/components/file-list/index.vue';
-import { MsgSuccess } from '@/utils/message';
+import { MsgSuccess, MsgWarning } from '@/utils/message';
 
 const fileForm = ref<FormInstance>();
 let loading = ref(false);
@@ -118,6 +118,10 @@ const submit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     await formEl.validate((valid) => {
         if (!valid) {
+            return;
+        }
+        if (getPath.value.indexOf('.1panel_clash') > -1) {
+            MsgWarning(i18n.global.t('file.clashDitNotSuppport'));
             return;
         }
 

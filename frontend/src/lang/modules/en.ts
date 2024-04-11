@@ -1144,6 +1144,9 @@ const message = {
         ignoreCertificateHelper:
             'Ignoring untrusted certificates during downloads may lead to data leakage or tampering. Please use this option with caution, only when trusting the download source.',
         uploadOverLimit: 'The number of files exceeds 1000! Please compress and upload',
+        clashDitNotSuppport: 'File names are prohibited from containing .1panel_clash',
+        clashDeleteAlert: 'The Recycle Bin folder cannot be deleted',
+        clashOpenAlert: 'Please click the [Recycle Bin] button to open the recycle bin directory',
     },
     ssh: {
         autoStart: 'Auto Start',
