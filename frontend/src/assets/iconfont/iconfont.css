@@ -1,9 +1,9 @@
 @font-face {
   font-family: "panel"; /* Project id 3575356 */
-  src: url('iconfont.woff2?t=1712045188451') format('woff2'),
-       url('iconfont.woff?t=1712045188451') format('woff'),
-       url('iconfont.ttf?t=1712045188451') format('truetype'),
-       url('iconfont.svg?t=1712045188451#panel') format('svg');
+  src: url('iconfont.woff2?t=1712805038256') format('woff2'),
+       url('iconfont.woff?t=1712805038256') format('woff'),
+       url('iconfont.ttf?t=1712805038256') format('truetype'),
+       url('iconfont.svg?t=1712805038256#panel') format('svg');
 }
 
 .panel {
@@ -15,7 +15,15 @@
 }
 
 .p-xpack:before {
-  content: "\eb70";
+  content: "\e604";
+}
+
+.p-gpu-2:before {
+  content: "\e6d8";
+}
+
+.p-gpu-1:before {
+  content: "\e623";
 }
 
 .p-waf-4:before {

@@ -853,6 +853,13 @@ const message = {
         up: '上行',
         down: '下行',
         interval: '采集间隔（分钟）',
+
+        gpuUtil: 'GPU 使用率',
+        temperature: '温度',
+        performanceState: '性能状态',
+        powerUsage: '功耗',
+        memoryUsage: '显存使用率',
+        fanSpeed: '风扇转速',
     },
     terminal: {
         conn: '连接',
@@ -1405,9 +1412,10 @@ const message = {
         knowMorePro: '了解更多',
         closeAlert: '当前页面可在面板设置中关闭显示',
         introduce: '功能介绍',
-        waf: '升级专业版可以获得拦截地图、日志、封锁记录、地理位置封禁、自定义规则、自定义拦截页面等功能',
-        tamper: '1Panel 防篡改功能是一种用于保护网站免受未经授权的修改或篡改的安全措施。',
-        setting: '1Panel 界面设置功能可自定义面板 Logo、欢迎简介等信息。',
+        waf: '升级专业版可以获得拦截地图、日志、封锁记录、地理位置封禁、自定义规则、自定义拦截页面等功能。',
+        tamper: '升级专业版可以保护网站免受未经授权的修改或篡改。',
+        gpu: '升级专业版可以帮助用户实时直观查看到 GPU 的工作负载、温度、显存等重要参数。',
+        setting: '升级专业版可以自定义面板 Logo、欢迎简介等信息。',
     },
     clean: {
         scan: '开始扫描',

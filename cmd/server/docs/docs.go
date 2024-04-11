@@ -15194,6 +15194,12 @@ const docTemplate = `{
                         "$ref": "#/definitions/dto.DiskInfo"
                     }
                 },
+                "gpuData": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.GPUInfo"
+                    }
+                },
                 "ioCount": {
                     "type": "integer"
                 },
@@ -15773,6 +15779,47 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "vars": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.GPUInfo": {
+            "type": "object",
+            "properties": {
+                "fanSpeed": {
+                    "type": "string"
+                },
+                "gpuUtil": {
+                    "type": "string"
+                },
+                "index": {
+                    "type": "integer"
+                },
+                "maxPowerLimit": {
+                    "type": "string"
+                },
+                "memTotal": {
+                    "type": "string"
+                },
+                "memUsed": {
+                    "type": "string"
+                },
+                "memoryUsage": {
+                    "type": "string"
+                },
+                "performanceState": {
+                    "type": "string"
+                },
+                "powerDraw": {
+                    "type": "string"
+                },
+                "powerUsage": {
+                    "type": "string"
+                },
+                "productName": {
+                    "type": "string"
+                },
+                "temperature": {
                     "type": "string"
                 }
             }
@@ -17788,6 +17835,9 @@ const docTemplate = `{
                 "monitorStoreDays": {
                     "type": "string"
                 },
+                "noAuthSetting": {
+                    "type": "string"
+                },
                 "ntpSite": {
                     "type": "string"
                 },
@@ -18915,7 +18965,6 @@ const docTemplate = `{
         "request.FileCreate": {
             "type": "object",
             "required": [
-                "mode",
                 "path"
             ],
             "properties": {

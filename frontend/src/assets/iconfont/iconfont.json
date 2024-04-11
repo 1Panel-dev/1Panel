@@ -6,11 +6,25 @@
   "description": "",
   "glyphs": [
     {
-      "icon_id": "5387846",
-      "name": "钻石_o",
+      "icon_id": "4657672",
+      "name": "会员",
       "font_class": "xpack",
-      "unicode": "eb70",
-      "unicode_decimal": 60272
+      "unicode": "e604",
+      "unicode_decimal": 58884
+    },
+    {
+      "icon_id": "640495",
+      "name": "详细信息",
+      "font_class": "gpu-2",
+      "unicode": "e6d8",
+      "unicode_decimal": 59096
+    },
+    {
+      "icon_id": "6176565",
+      "name": "监控",
+      "font_class": "gpu-1",
+      "unicode": "e623",
+      "unicode_decimal": 58915
     },
     {
       "icon_id": "8229531",

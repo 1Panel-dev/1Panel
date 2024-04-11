@@ -118,3 +118,13 @@ var AddNoAuthSetting = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var UpdateXpackHideMenu = &gormigrate.Migration{
+	ID: "20240411-update-xpack-hide-menu",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Model(&model.Setting{}).Where("key", "XpackHideMenu").Updates(map[string]interface{}{"value": "{\"id\":\"1\",\"label\":\"/xpack\",\"isCheck\":true,\"title\":\"xpack.menu\",\"children\":[{\"id\":\"2\",\"title\":\"xpack.waf.name\",\"path\":\"/xpack/waf/dashboard\",\"label\":\"Dashboard\",\"isCheck\":true},{\"id\":\"3\",\"title\":\"xpack.tamper.tamper\",\"path\":\"/xpack/tamper\",\"label\":\"Tamper\",\"isCheck\":true},{\"id\":\"4\",\"title\":\"xpack.gpu.gpu\",\"path\":\"/xpack/gpu\",\"label\":\"GPU\",\"isCheck\":true},{\"id\":\"5\",\"title\":\"xpack.setting.setting\",\"path\":\"/xpack/setting\",\"label\":\"XSetting\",\"isCheck\":true}]}"}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

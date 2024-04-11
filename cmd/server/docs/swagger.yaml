@@ -795,6 +795,10 @@ definitions:
         items:
           $ref: '#/definitions/dto.DiskInfo'
         type: array
+      gpuData:
+        items:
+          $ref: '#/definitions/dto.GPUInfo'
+        type: array
       ioCount:
         type: integer
       ioReadBytes:
@@ -1189,6 +1193,33 @@ definitions:
     - credential
     - type
     - vars
+    type: object
+  dto.GPUInfo:
+    properties:
+      fanSpeed:
+        type: string
+      gpuUtil:
+        type: string
+      index:
+        type: integer
+      maxPowerLimit:
+        type: string
+      memTotal:
+        type: string
+      memUsed:
+        type: string
+      memoryUsage:
+        type: string
+      performanceState:
+        type: string
+      powerDraw:
+        type: string
+      powerUsage:
+        type: string
+      productName:
+        type: string
+      temperature:
+        type: string
     type: object
   dto.GenerateLoad:
     properties:
@@ -2550,6 +2581,8 @@ definitions:
         type: string
       monitorStoreDays:
         type: string
+      noAuthSetting:
+        type: string
       ntpSite:
         type: string
       panelName:
@@ -3311,7 +3344,6 @@ definitions:
       sub:
         type: boolean
     required:
-    - mode
     - path
     type: object
   request.FileDeCompress:

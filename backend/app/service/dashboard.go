@@ -11,6 +11,8 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	"github.com/1Panel-dev/1Panel/backend/utils/copier"
+	"github.com/1Panel-dev/1Panel/backend/utils/xpack"
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/host"
@@ -154,6 +156,7 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 	currentInfo.SwapMemoryUsedPercent = swapInfo.UsedPercent
 
 	currentInfo.DiskData = loadDiskInfo()
+	currentInfo.GPUData = loadGPUInfo()
 
 	if ioOption == "all" {
 		diskInfo, _ := disk.IOCounters()
@@ -288,4 +291,22 @@ func loadDiskInfo() []dto.DiskInfo {
 		return datas[i].Path < datas[j].Path
 	})
 	return datas
+}
+
+func loadGPUInfo() []dto.GPUInfo {
+	list := xpack.LoadGpuInfo()
+	if len(list) == 0 {
+		return nil
+	}
+	var data []dto.GPUInfo
+	for _, gpu := range list {
+		var dataItem dto.GPUInfo
+		if err := copier.Copy(&dataItem, &gpu); err != nil {
+			continue
+		}
+		dataItem.PowerUsage = dataItem.PowerDraw + " / " + dataItem.MaxPowerLimit
+		dataItem.MemoryUsage = dataItem.MemUsed + " / " + dataItem.MemTotal
+		data = append(data, dataItem)
+	}
+	return data
 }

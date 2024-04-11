@@ -852,6 +852,13 @@ const message = {
         up: '上行',
         down: '下行',
         interval: '采集間隔（分鐘）',
+
+        gpuUtil: 'GPU 使用率',
+        temperature: '溫度',
+        performanceState: '性能狀態',
+        powerUsage: '功耗',
+        memoryUsage: '顯存使用率',
+        fanSpeed: '風扇轉速',
     },
     terminal: {
         conn: '連接',
@@ -1404,9 +1411,10 @@ const message = {
         knowMorePro: '了解更多',
         closeAlert: '當前頁面可在面板設置中關閉顯示',
         introduce: '功能介紹',
-        waf: '升級專業版可以獲得攔截地圖、日誌、封鎖記錄、地理位置封鎖、自訂規則、自訂攔截頁面等功能',
-        tamper: '1Panel 防篡改功能是一種用於保護網站免受未經授權的修改或篡改的安全措施。',
-        setting: '1Panel 介面設置功能可自定義面板 Logo、歡迎簡介等信息。',
+        waf: '升級專業版可以獲得攔截地圖、日誌、封鎖記錄、地理位置封禁、自定義規則、自定義攔截頁面等功能。',
+        tamper: '升級專業版可以保護網站免受未經授權的修改或篡改。',
+        gpu: '升級專業版可以幫助用戶實時直觀查看到 GPU 的工作負載、溫度、顯存等重要參數。',
+        setting: '升級專業版可以自定義面板 Logo、歡迎簡介等信息。',
     },
     clean: {
         scan: '開始掃描',

@@ -59,6 +59,8 @@ export namespace Dashboard {
 
         diskData: Array<DiskInfo>;
 
+        gpuData: Array<GPUInfo>;
+
         netBytesSent: number;
         netBytesRecv: number;
 
@@ -77,5 +79,15 @@ export namespace Dashboard {
         inodesUsed: number;
         inodesFree: number;
         inodesUsedPercent: number;
+    }
+    export interface GPUInfo {
+        index: number;
+        productName: string;
+        gpuUtil: string;
+        temperature: string;
+        performanceState: string;
+        powerUsage: string;
+        memoryUsage: string;
+        fanSpeed: string;
     }
 }
