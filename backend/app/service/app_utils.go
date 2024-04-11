@@ -1227,12 +1227,16 @@ func addDockerComposeCommonParam(composeMap map[string]interface{}, serviceName 
 		return buserr.New(constant.ErrFileParse)
 	}
 	serviceValue := service.(map[string]interface{})
-	deploy := map[string]interface{}{
-		"resources": map[string]interface{}{
-			"limits": map[string]interface{}{
-				"cpus":   "${CPUS}",
-				"memory": "${MEMORY_LIMIT}",
-			},
+
+	deploy := map[string]interface{}{}
+
+	if de, ok := serviceValue["deploy"]; ok {
+		deploy = de.(map[string]interface{})
+	}
+	deploy["resources"] = map[string]interface{}{
+		"limits": map[string]interface{}{
+			"cpus":   "${CPUS}",
+			"memory": "${MEMORY_LIMIT}",
 		},
 	}
 	serviceValue["deploy"] = deploy
