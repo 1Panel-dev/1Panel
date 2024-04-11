@@ -322,7 +322,7 @@ func (f FileOp) Cut(oldPaths []string, dst, name string, cover bool) error {
 			coverFlag = "-f"
 		}
 
-		cmdStr := fmt.Sprintf(`mv %s "%s" "%s"`, coverFlag, p, dstPath)
+		cmdStr := fmt.Sprintf(`mv %s '%s' '%s'`, coverFlag, p, dstPath)
 		if err := cmd.ExecCmd(cmdStr); err != nil {
 			return err
 		}
@@ -331,7 +331,7 @@ func (f FileOp) Cut(oldPaths []string, dst, name string, cover bool) error {
 }
 
 func (f FileOp) Mv(oldPath, dstPath string) error {
-	cmdStr := fmt.Sprintf(`mv "%s" "%s"`, oldPath, dstPath)
+	cmdStr := fmt.Sprintf(`mv '%s' '%s'`, oldPath, dstPath)
 	if err := cmd.ExecCmd(cmdStr); err != nil {
 		return err
 	}
@@ -385,13 +385,13 @@ func (f FileOp) CopyAndReName(src, dst, name string, cover bool) error {
 		if name != "" && !cover {
 			dstPath = filepath.Join(dst, name)
 		}
-		return cmd.ExecCmd(fmt.Sprintf(`cp -rf "%s" "%s"`, src, dstPath))
+		return cmd.ExecCmd(fmt.Sprintf(`cp -rf '%s' '%s'`, src, dstPath))
 	} else {
 		dstPath := filepath.Join(dst, name)
 		if cover {
 			dstPath = dst
 		}
-		return cmd.ExecCmd(fmt.Sprintf(`cp -f "%s" "%s"`, src, dstPath))
+		return cmd.ExecCmd(fmt.Sprintf(`cp -f '%s' '%s'`, src, dstPath))
 	}
 }
 
@@ -404,12 +404,12 @@ func (f FileOp) CopyDir(src, dst string) error {
 	if err = f.Fs.MkdirAll(dstDir, srcInfo.Mode()); err != nil {
 		return err
 	}
-	return cmd.ExecCmd(fmt.Sprintf(`cp -rf "%s" "%s"`, src, dst+"/"))
+	return cmd.ExecCmd(fmt.Sprintf(`cp -rf '%s' '%s'`, src, dst+"/"))
 }
 
 func (f FileOp) CopyFile(src, dst string) error {
 	dst = filepath.Clean(dst) + string(filepath.Separator)
-	return cmd.ExecCmd(fmt.Sprintf(`cp -f "%s" "%s"`, src, dst+"/"))
+	return cmd.ExecCmd(fmt.Sprintf(`cp -f '%s' '%s'`, src, dst+"/"))
 }
 
 func (f FileOp) GetDirSize(path string) (float64, error) {
