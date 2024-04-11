@@ -78,6 +78,11 @@ const getStatus = async () => {
             }
             await checkIsSafety(code)
                 .then((safeRes) => {
+                    if (safeRes.data === 'unpass') {
+                        loading.value = false;
+                        errStatus.value = 'err-unsafe';
+                        return;
+                    }
                     if (safeRes.data === 'disable') {
                         if (code !== '') {
                             errStatus.value = 'not-found';
@@ -85,14 +90,9 @@ const getStatus = async () => {
                             return;
                         }
                     }
-                    if (safeRes.data === 'pass') {
-                        globalStore.entrance = code;
-                        errStatus.value = '';
-                        loading.value = false;
-                        return;
-                    }
+                    globalStore.entrance = code;
+                    errStatus.value = '';
                     loading.value = false;
-                    errStatus.value = 'err-unsafe';
                 })
                 .catch(() => {
                     pageCode.value = '200';
