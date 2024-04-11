@@ -116,6 +116,9 @@ func (f *FileService) GetFileTree(op request.FileOption) ([]response.FileTree, e
 }
 
 func (f *FileService) Create(op request.FileCreate) error {
+	if files.IsInvalidChar(op.Path) {
+		return buserr.New("ErrInvalidChar")
+	}
 	fo := files.NewFileOp()
 	if fo.Stat(op.Path) {
 		return buserr.New(constant.ErrFileIsExit)
@@ -243,6 +246,9 @@ func (f *FileService) SaveContent(edit request.FileEdit) error {
 }
 
 func (f *FileService) ChangeName(req request.FileRename) error {
+	if files.IsInvalidChar(req.NewName) {
+		return buserr.New("ErrInvalidChar")
+	}
 	fo := files.NewFileOp()
 	return fo.Rename(req.OldName, req.NewName)
 }
