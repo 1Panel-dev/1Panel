@@ -9986,7 +9986,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "更新系统菜单配置",
+                "description": "隐藏高级功能菜单",
                 "consumes": [
                     "application/json"
                 ],
@@ -10013,8 +10013,8 @@ const docTemplate = `{
                 "x-panel-log": {
                     "BeforeFunctions": [],
                     "bodyKeys": [],
-                    "formatEN": "modify system advanced function menu hidden settings.",
-                    "formatZH": "修改系统高级功能菜单隐藏设置",
+                    "formatEN": "Hide advanced feature menu.",
+                    "formatZH": "隐藏高级功能菜单",
                     "paramKeys": []
                 }
             }

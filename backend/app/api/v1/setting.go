@@ -62,13 +62,13 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Update system setting
-// @Description 更新系统菜单配置
+// @Description 隐藏高级功能菜单
 // @Accept json
 // @Param request body dto.SettingUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /settings/menu/update [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改系统高级功能菜单隐藏设置","formatEN":"modify system advanced function menu hidden settings."}
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"隐藏高级功能菜单","formatEN":"Hide advanced feature menu."}
 func (b *BaseApi) UpdateMenu(c *gin.Context) {
 	var req dto.SettingUpdate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
