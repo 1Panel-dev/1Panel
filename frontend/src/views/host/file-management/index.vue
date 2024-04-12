@@ -447,7 +447,7 @@ const handleSearchResult = (res: ResultData<File.File>) => {
 
 const open = async (row: File.File) => {
     if (row.isDir) {
-        if (row.name == '.1panel_clash') {
+        if (row.name.indexOf('.1panel_clash') > -1) {
             MsgWarning(i18n.global.t('file.clashOpenAlert'));
             return;
         }
