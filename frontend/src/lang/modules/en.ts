@@ -1489,6 +1489,7 @@ const message = {
     },
     license: {
         community: 'Community Edition: ',
+        community2: 'Community Edition',
         pro: 'Professional Edition: ',
         trial: 'Trial Edition',
         office: 'Official Edition',
@@ -1514,6 +1515,7 @@ const message = {
         advice: 'Consultation',
         indefinitePeriod: 'Indefinite Period',
         levelUpPro: 'Upgrade to Professional Edition',
+        licenseSync: 'License Sync',
         knowMorePro: 'Learn More',
         closeAlert: 'The current page can be closed in the panel settings',
         introduce: 'Feature Introduction',

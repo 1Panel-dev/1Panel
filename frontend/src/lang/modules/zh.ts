@@ -1389,6 +1389,7 @@ const message = {
     },
     license: {
         community: '社区版：',
+        community2: '社区版',
         pro: '专业版：',
         trial: '试用版',
         office: '正式版',
@@ -1413,6 +1414,7 @@ const message = {
         advice: '咨询',
         indefinitePeriod: '无限期',
         levelUpPro: '升级专业版',
+        licenseSync: '许可证同步',
         knowMorePro: '了解更多',
         closeAlert: '当前页面可在面板设置中关闭显示',
         introduce: '功能介绍',
