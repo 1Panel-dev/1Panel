@@ -1,0 +1,191 @@
+Claro, aquí está la traducción al español:
+
+ErrInvalidParams: "Error de parámetro de solicitud: {{ .detail }}"
+ErrTokenParse: "Error de generación de token: {{ .detail }}"
+ErrInitialPassword: "Error de contraseña inicial"
+ErrInternalServer: "Error interno del servicio: {{ .detail }}"
+ErrRecordExist: "El registro ya existe"
+ErrRecordNotFound: "Registros no encontrados"
+ErrStructTransform: "Error de conversión de tipo: {{ .detail }}"
+ErrNotLogin: "El usuario no ha iniciado sesión: {{ .detail }}"
+ErrPasswordExpired: "La contraseña actual ha caducado: {{ .detail }}"
+ErrNotSupportType: "El sistema no admite el tipo actual: {{ .detail }}"
+
+#common
+ErrNameIsExist: "El nombre ya existe"
+ErrDemoEnvironment: "Servidor de demostración, se prohíbe esta operación"
+ErrCmdTimeout: "¡Tiempo de ejecución del comando agotado!"
+ErrCmdIllegal: "El comando contiene caracteres ilegales. ¡Modifique e inténtelo de nuevo!"
+ErrPortExist: 'El puerto {{ .port }} ya está ocupado por {{ .type }} [{{ .name }}]'
+TYPE_APP: "Aplicación"
+TYPE_RUNTIME: "Entorno de ejecución"
+TYPE_DOMAIN: "Nombre de dominio"
+ErrTypePort: 'Error de formato de puerto {{ .name }}'
+ErrTypePortRange: 'El rango de puertos debe estar entre 1-65535'
+Success: "Éxito"
+Failed: "Fallido"
+SystemRestart: "El reinicio del sistema causa la interrupción de la tarea"
+
+#app
+ErrPortInUsed: "El puerto {{ .detail }} ya está en uso"
+ErrAppLimit: "La aplicación excede el límite de instalación"
+ErrAppRequired: "Se requiere la aplicación {{ .detail }}"
+ErrNotInstall: "Aplicación no instalada"
+ErrPortInOtherApp: "El puerto {{ .port }} ya está en uso por la aplicación {{ .apps }}"
+ErrDbUserNotValid: "¡Base de datos de acciones, el nombre de usuario y la contraseña no coinciden!"
+ErrDockerComposeNotValid: "¡Error de formato de archivo docker-compose!"
+ErrUpdateBuWebsite: '¡La aplicación se actualizó correctamente, pero falló la modificación del archivo de configuración del sitio web, verifique la configuración!'
+Err1PanelNetworkFailed: '¡Fallo en la creación de la red de contenedores predeterminada! {{ .detail }}'
+ErrFileParse: '¡Error al analizar el archivo docker-compose de la aplicación!'
+ErrInstallDirNotFound: 'el directorio de instalación no existe'
+AppStoreIsUpToDate: '¡La tienda de aplicaciones ya está actualizada!'
+LocalAppVersionNull: '¡La aplicación {{.name}} no se sincronizó a la versión! No se pudo agregar a la lista de aplicaciones'
+LocalAppVersionErr: '¡Falló la sincronización de la versión {{.version}} de {{.name}}! {{.err}}'
+ErrFileNotFound: 'El archivo {{.name}} no existe'
+ErrFileParseApp: 'Error al analizar el archivo {{.name}} {{.err}}'
+ErrAppDirNull: 'la carpeta de versión no existe'
+LocalAppErr: "¡Falló la sincronización de la aplicación {{.name}}! {{.err}}"
+ErrContainerName: "El nombre del contenedor ya existe"
+ErrAppSystemRestart: "El reinicio de 1Panel hace que la tarea termine"
+ErrCreateHttpClient: "No se pudo crear la solicitud HTTP {{.err}}"
+ErrHttpReqTimeOut: "Solicitud agotada {{.err}}"
+ErrHttpReqFailed: "Solicitud fallida {{.err}}"
+ErrHttpReqNotFound: "El archivo no existe"
+ErrNoSuchHost: "Fallo de conexión de red"
+ErrImagePullTimeOut: 'Tiempo de espera para extraer la imagen'
+ErrContainerNotFound: 'El contenedor {{ .name }} no existe'
+ErrContainerMsg: 'El contenedor {{ .name }} está anormal, verifique el registro en la página del contenedor para obtener más detalles'
+ErrAppBackup: 'Error de respaldo de la aplicación {{ .name }} err {{.err}}'
+ErrImagePull: 'Error al extraer la imagen {{ .name }} err {{.err}}'
+ErrVersionTooLow: 'La versión actual de 1Panel es demasiado baja para actualizar la tienda de aplicaciones, actualice la versión'
+ErrAppNameExist: 'El nombre de la aplicación ya existe'
+AppStoreIsSyncing: 'La tienda de aplicaciones se está sincronizando, inténtalo de nuevo más tarde'
+ErrGetCompose: "¡No se pudo obtener el archivo docker-compose.yml! {{ .detail }}"
+ErrAppWarn: "Estado anormal, compruebe el registro"
+ErrAppParamKey: "Excepción en el campo de parámetro {{ .name }}"
+
+#file
+ErrFileCanNotRead: "No se puede leer el archivo"
+ErrFileToLarge: "el archivo es demasiado grande"
+ErrPathNotFound: "No se encontró la ruta"
+ErrMovePathFailed: "¡La ruta de destino no puede contener la ruta original!"
+ErrLinkPathNotFound: "La ruta de destino no existe"
+ErrFileIsExit: "¡El archivo ya existe!"
+ErrFileUpload: "Error al cargar el archivo {{.name}} {{.detail}}"
+ErrFileDownloadDir: "Carpeta de descarga no compatible"
+ErrCmdNotFound: "El comando {{ .name }} no existe, instale este comando en el host primero"
+ErrSourcePathNotFound: "El directorio de origen no existe"
+ErrFavoriteExist: "Esta ruta ha sido recopilada"
+ErrInvalidChar: "Se prohíben caracteres ilegales"
+
+#website
+ErrDomainIsExist: "El dominio ya existe"
+ErrAliasIsExist: "El alias ya existe"
+ErrAppDelete: 'Otro sitio web usa esta aplicación'
+ErrGroupIsUsed: 'El grupo está en uso y no se puede eliminar'
+ErrBackupMatch: 'el archivo de respaldo no coincide con los datos parciales actuales del sitio web: {{ .detail}}"'
+ErrBackupExist: 'el archivo de respaldo corresponde a una parte de los datos originales que no existe: {{ .detail}}"'
+ErrPHPResource: '¡El entorno de ejecución local no admite el cambio!'
+ErrPathPermission: 'Se detectó una carpeta con permisos que no son 1000:1000 en el directorio de índice, lo que puede causar errores de acceso denegado al acceder al sitio web.'
+ErrDomainIsUsed: "El dominio ya está siendo usado por el sitio web {{ .name }}"
+ErrDomainFormat: "Error de formato de dominio {{ .name }}"
+
+#ssl
+ErrSSLCannotDelete: "El certificado {{ .name }} se está utilizando en el sitio web y no se puede eliminar"
+ErrAccountCannotDelete: "No se puede eliminar el certificado asociado a la cuenta"
+ErrSSLApply: "El certificado se firmó con éxito, pero falló la recarga de openresty, ¡revise la configuración!"
+ErrEmailIsExist: 'El correo electrónico ya existe'
+ErrSSLKeyNotFound: 'El archivo de clave privada no existe'
+ErrSSLCertificateNotFound: 'El archivo de certificado no existe'
+ErrSSLKeyFormat: 'Error de verificación del archivo de clave privada'
+ErrSSLCertificateFormat: 'Error de formato de archivo de certificado, utilice el formato pem'
+ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid o EabHmacKey no pueden estar vacíos'
+ErrOpenrestyNotFound: 'El modo HTTP requiere que primero se instale Openresty'
+ApplySSLStart: 'Inicio de la solicitud de certificado, nombre de dominio [{{ .domain }}] método de aplicación [{{ .type }}]'
+dnsAccount: "DNS automático"
+dnsManual: "DNS manual"
+http: "HTTP"
+ApplySSLFailed: 'Error al solicitar el certificado [{{ .domain }}], {{.detail}}'
+ApplySSLSuccess: '¡Solicitud de certificado [{{ .domain }}] exitosa!'
+DNSAccountName: 'Cuenta DNS [{{ .name }}] fabricante [{{.type}}]'
+PushDirLog: 'Certificado empujado al directorio [{{ .path }}] {{ .status }}'
+ErrDeleteCAWithSSL: "Hay un certificado emitido bajo la organización actual y no se puede eliminar"
+ErrDeleteWithPanelSSL: "La configuración SSL del panel usa este certificado y no se puede eliminar"
+ErrDefaultCA: "La organización predeterminada no se puede eliminar"
+ApplyWebSiteSSLLog: "Inicio de la actualización del certificado del sitio web {{ .name }}"
+ErrUpdateWebsiteSSL: "Error al actualizar el certificado del sitio web {{ .name }}: {{ .err }}"
+ApplyWebSiteSSLSuccess: "Actualizar el certificado del sitio web con éxito"
+
+#mysql
+ErrUserIsExist: "El usuario actual ya existe. Ingrese un nuevo usuario"
+ErrDatabaseIsExist: "La base de datos actual ya existe. Ingrese una nueva base de datos"
+ErrExecTimeOut: "Tiempo de ejecución SQL agotado, compruebe la base de datos"
+ErrRemoteExist: "La base de datos remota ya existe con ese nombre, modifíquela e inténtelo de nuevo"
+ErrLocalExist: "La base de datos local ya existe con ese nombre, modifíquela e inténtelo de nuevo"
+
+#redis
+ErrTypeOfRedis: "El tipo de archivo de recuperación no coincide con el modo de persistencia actual. Modifique el tipo de archivo e inténtelo de nuevo"
+
+#container 
+ErrInUsed: "{{ .detail }} se está usando y no se puede eliminar"
+ErrObjectInUsed: "Este objeto está en uso y no se puede eliminar"
+ErrPortRules: "El número de puertos no coincide, ¡vuelva a ingresar!"
+ErrPgImagePull: "Tiempo de espera de extracción de imagen. Configure la aceleración de imágenes o extraiga manualmente la imagen postgres:16.0-alpine e inténtelo de nuevo"
+
+#runtime
+ErrDirNotFound: "¡La carpeta de compilación no existe! ¡Compruebe la integridad del archivo!"
+ErrFileNotExist: "¡El archivo {{ .detail }} no existe! ¡Compruebe la integridad del archivo fuente!"
+ErrImageBuildErr: "Error de compilación de imagen"
+ErrImageExist: "¡La imagen ya existe!"
+ErrDelWithWebsite: "El entorno de ejecución se ha asociado con un sitio web y no se puede eliminar"
+ErrRuntimeStart: "Error al iniciar"
+ErrPackageJsonNotFound: "El archivo package.json no existe"
+ErrScriptsNotFound: "No se encontró el elemento de configuración de scripts en package.json"
+ErrContainerNameNotFound: "No se puede obtener el nombre del contenedor, verifique el archivo .env"
+ErrNodeModulesNotFound: "¡La carpeta node_modules no existe! Edite el entorno de ejecución o espere a que el entorno de ejecución se inicie correctamente"
+
+#setting
+ErrBackupInUsed: "La cuenta de respaldo ya se está utilizando en un trabajo programado y no se puede eliminar."
+ErrBackupCheck: "Falló la prueba de conexión de la cuenta de respaldo {{ .err}}"
+ErrOSSConn: "No se puede recuperar la última versión, compruebe si el servidor puede conectarse a la red externa."
+ErrEntrance: "Error en la información de la entrada de seguridad. ¡Compruebe e inténtelo de nuevo!"
+
+#tool
+ErrConfigNotFound: "El archivo de configuración no existe"
+ErrConfigParse: "Error de formato del archivo de configuración"
+ErrConfigIsNull: "No se permite que el archivo de configuración esté vacío"
+ErrConfigDirNotFound: "El directorio de ejecución no existe"
+ErrConfigAlreadyExist: "Ya existe un archivo de configuración con el mismo nombre"
+ErrUserFindErr: "Error al encontrar al usuario {{ .name }} {{ .err }}"
+
+#ssh
+ErrFirewall: "No se detecta el servicio firewalld o ufw. ¡Compruebe e inténtelo de nuevo!"
+
+#cronjob
+ErrBashExecute: "Error de ejecución del script, compruebe la información específica en el área de texto de salida de la tarea."
+ErrCutWebsiteLog: "Error al cortar el registro del sitio web {{ .name }}, error {{ .err }}"
+CutWebsiteLogSuccess: "Registro del sitio web {{ .name }} cortado con éxito, ruta de respaldo {{ .path }}"
+
+#toolbox
+ErrNotExistUser: "El usuario actual no existe. ¡Modifique e inténtelo de nuevo!"
+ErrBanAction: "Error en el ajuste, el servicio {{ .name }} actual no está disponible, ¡revise e inténtelo de nuevo!"
+
+#waf
+ErrScope: "No se admite la modificación de esta configuración"
+ErrStateChange: "Error en la modificación del estado"
+ErrRuleExist: "La regla ya existe"
+ErrRuleNotExist: "La regla no existe"
+ErrParseIP: "Error de formato IP"
+ErrDefaultIP: "predeterminado es un nombre reservado, cámbielo a otro nombre"
+ErrGroupInUse: "El grupo de IP está siendo utilizado por la lista negra/blanca y no se puede eliminar"
+ErrGroupExist: "El nombre del grupo de IP ya existe"
+ErrIPRange: "Rango de IP incorrecto"
+
+#license
+ErrLicense: "Error de formato de licencia, ¡compruebe e inténtelo de nuevo!"
+ErrLicenseCheck: "Error de verificación de licencia, ¡compruebe e inténtelo de nuevo!"
+ErrLicenseSave: "Error al guardar la información de la licencia, error {{ .err }}, ¡inténtelo de nuevo!"
+ErrLicenseSync: "Error al sincronizar la información de la licencia, ¡no se detectó información de licencia en la base de datos!"
+ErrXpackNotFound: "Esta sección es una característica de la edición profesional, ¡importe la licencia primero en la interfaz de Configuración del Panel-Licencia!"
+ErrXpackNotActive: "Esta sección es una característica de la edición profesional, ¡sincronice primero el estado de la licencia en la interfaz de Configuración del Panel-Licencia!"
+ErrXpackOutOfDate: "La licencia actual ha caducado, vuelva a importar la licencia en la interfaz de Configuración del Panel-Licencia"
