@@ -2214,7 +2214,7 @@
             "type": "Feature",
             "properties": {
                 "adcode": 150000,
-                "name": "内蒙古自治区",
+                "name": "内蒙古",
                 "center": [111.670801, 40.818311],
                 "centroid": [114.077429, 44.331087],
                 "childrenNum": 12,
@@ -14264,7 +14264,7 @@
             "type": "Feature",
             "properties": {
                 "adcode": 450000,
-                "name": "广西壮族自治区",
+                "name": "广西",
                 "center": [108.320004, 22.82402],
                 "centroid": [108.7944, 23.833381],
                 "childrenNum": 14,
@@ -20015,7 +20015,7 @@
             "type": "Feature",
             "properties": {
                 "adcode": 540000,
-                "name": "西藏自治区",
+                "name": "西藏",
                 "center": [91.132212, 29.660361],
                 "centroid": [88.388277, 31.56375],
                 "childrenNum": 7,
@@ -24659,7 +24659,7 @@
             "type": "Feature",
             "properties": {
                 "adcode": 640000,
-                "name": "宁夏回族自治区",
+                "name": "宁夏",
                 "center": [106.278179, 38.46637],
                 "centroid": [106.169866, 37.291332],
                 "childrenNum": 5,
@@ -25054,7 +25054,7 @@
             "type": "Feature",
             "properties": {
                 "adcode": 650000,
-                "name": "新疆维吾尔自治区",
+                "name": "新疆",
                 "center": [87.617733, 43.792818],
                 "centroid": [85.294711, 41.371801],
                 "childrenNum": 24,
@@ -26710,7 +26710,7 @@
             "type": "Feature",
             "properties": {
                 "adcode": 810000,
-                "name": "香港特别行政区",
+                "name": "香港",
                 "center": [114.173355, 22.320048],
                 "centroid": [114.134357, 22.377366],
                 "childrenNum": 18,
@@ -26874,7 +26874,7 @@
             "type": "Feature",
             "properties": {
                 "adcode": 820000,
-                "name": "澳门特别行政区",
+                "name": "澳门",
                 "center": [113.54909, 22.198951],
                 "centroid": [113.566988, 22.159307],
                 "childrenNum": 8,
