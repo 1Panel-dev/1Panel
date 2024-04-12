@@ -32,7 +32,7 @@ const screenWidth = ref(null);
 const getStatus = async () => {
     const res = await checkIsSafety(globalStore.entrance);
     if (res.data === 'unpass') {
-        router.replace({ name: 'entrance', params: { code: 0 } });
+        router.replace({ name: 'entrance', params: { code: globalStore.entrance } });
     }
 };
 

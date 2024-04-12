@@ -1388,6 +1388,7 @@ const message = {
     },
     license: {
         community: '社區版：',
+        community2: '社區版',
         pro: '專業版：',
         trial: '試用版',
         office: '正式版',
@@ -1412,6 +1413,7 @@ const message = {
         advice: '諮詢',
         indefinitePeriod: '無限期',
         levelUpPro: '升級專業版',
+        licenseSync: '許可證同步',
         knowMorePro: '了解更多',
         closeAlert: '當前頁面可在面板設置中關閉顯示',
         introduce: '功能介紹',

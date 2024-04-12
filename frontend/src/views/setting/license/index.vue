@@ -4,7 +4,7 @@
             <template #main>
                 <el-row :gutter="20" class="mt-5; mb-10">
                     <el-col :xs="24" :sm="24" :md="15" :lg="15" :xl="15">
-                        <div class="descriptions" v-if="hasLicense()">
+                        <div class="descriptions" v-if="hasLicense">
                             <el-descriptions :column="1" direction="horizontal" size="large" border>
                                 <el-descriptions-item :label="$t('license.authorizationId')">
                                     {{ license.licenseName || '-' }}
@@ -48,7 +48,7 @@
                             </el-descriptions>
                         </div>
 
-                        <CardWithHeader :header="$t('home.overview')" height="160px" v-if="!hasLicense()">
+                        <CardWithHeader :header="$t('home.overview')" height="160px" v-if="!hasLicense">
                             <template #body>
                                 <div class="h-app-card">
                                     <el-row>
@@ -56,7 +56,7 @@
                                             <span>{{ $t('setting.license') }}</span>
                                         </el-col>
                                         <el-col :span="6">
-                                            <span>{{ $t('license.community') }}</span>
+                                            <span>{{ $t('license.community2') }}</span>
                                         </el-col>
                                     </el-row>
                                 </div>
@@ -113,6 +113,7 @@ import { GlobalStore } from '@/store';
 const loading = ref();
 const licenseRef = ref();
 const globalStore = GlobalStore();
+const hasLicense = ref();
 
 const license = reactive({
     licenseName: '',
@@ -165,9 +166,11 @@ const search = async () => {
             license.status = res.data.status;
             globalStore.isProductPro =
                 res.data.status === 'Enable' || res.data.status === 'Lost01' || res.data.status === 'Lost02';
-            if (!globalStore.isProductPro || res.data.status === 'Lost03') {
+            if (res.data.status === '') {
+                hasLicense.value = false;
                 return;
             }
+            hasLicense.value = true;
             if (globalStore.isProductPro) {
                 globalStore.productProExpires = Number(res.data.productPro);
             }
@@ -185,10 +188,6 @@ const search = async () => {
         .catch(() => {
             loading.value = false;
         });
-};
-
-const hasLicense = () => {
-    return globalStore.isProductPro;
 };
 
 const showSync = () => {
