@@ -43,7 +43,7 @@ func (u *UpgradeService) SearchUpgrade() (*dto.UpgradeInfo, error) {
 		global.LOG.Infof("load latest version failed, err: %v", err)
 		return nil, err
 	}
-	if !common.CompareVersion(string(latestVersion), currentVersion.Value) {
+	if !common.ComparePanelVersion(string(latestVersion), currentVersion.Value) {
 		return nil, err
 	}
 	upgrade.LatestVersion = latestVersion
