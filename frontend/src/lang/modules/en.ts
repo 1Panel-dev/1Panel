@@ -599,6 +599,8 @@ const message = {
         cpuShare: 'CPU Share',
         cpuShareHelper:
             'The default CPU share for a container is 1024, which can be increased to give the container more CPU time.',
+        inputIpv4: 'Please enter the IPv4 address',
+        inputIpv6: 'Please enter the IPv6 address',
 
         containerFromAppHelper:
             'Detected that this container originates from the app store. App operations may cause current edits to be invalidated.',

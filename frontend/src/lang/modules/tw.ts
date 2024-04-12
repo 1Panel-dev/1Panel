@@ -581,6 +581,8 @@ const message = {
         ip: 'IP 地址',
         cpuShare: 'CPU 權重',
         cpuShareHelper: '容器默認份額為 1024 個 CPU，增大可使當前容器獲得更多的 CPU 時間',
+        inputIpv4: '請輸入 IPv4 地址',
+        inputIpv6: '請輸入 IPv6 地址',
 
         containerFromAppHelper: '檢測到該容器來源於應用商店，應用操作可能會導致當前編輯失效',
         containerFromAppHelper1: '在已安裝應用程式列表點擊 `參數` 按鈕，進入編輯頁面即可修改容器名稱。',
