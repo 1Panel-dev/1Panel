@@ -13032,7 +13032,7 @@ const docTemplate = `{
                 "tags": [
                     "Website"
                 ],
-                "summary": "Load websit php conf",
+                "summary": "Load website php conf",
                 "parameters": [
                     {
                         "type": "integer",

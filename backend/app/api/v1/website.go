@@ -370,7 +370,7 @@ func (b *BaseApi) ChangeDefaultServer(c *gin.Context) {
 }
 
 // @Tags Website
-// @Summary Load websit php conf
+// @Summary Load website php conf
 // @Description 获取网站 php 配置
 // @Accept json
 // @Param id path integer true "request"

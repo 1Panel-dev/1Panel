@@ -131,7 +131,7 @@ type MysqlStatus struct {
 }
 
 type MysqlVariables struct {
-	BinlogCachSize       string `json:"binlog_cache_size"`
+	BinlogCacheSize       string `json:"binlog_cache_size"`
 	InnodbBufferPoolSize string `json:"innodb_buffer_pool_size"`
 	InnodbLogBufferSize  string `json:"innodb_log_buffer_size"`
 	JoinBufferSize       string `json:"join_buffer_size"`
