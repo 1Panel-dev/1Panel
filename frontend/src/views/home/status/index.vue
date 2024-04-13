@@ -1,7 +1,12 @@
 <template>
     <el-row :gutter="10">
         <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
-            <el-popover placement="bottom" :width="300" trigger="hover" v-if="chartsOption['cpu']">
+            <el-popover
+                placement="bottom"
+                :width="currentInfo.cpuPercent.length < 36 ? 300 : (currentInfo.cpuPercent.length / 12) * 150"
+                trigger="hover"
+                v-if="chartsOption['cpu']"
+            >
                 <div>
                     <el-tooltip
                         effect="dark"
@@ -23,11 +28,9 @@
                     }}
                 </el-tag>
                 <br />
-                <el-row :gutter="5">
-                    <el-col :span="12" v-for="(item, index) of currentInfo.cpuPercent" :key="index">
-                        <el-tag class="tagClass">CPU-{{ index }}: {{ formatNumber(item) }}%</el-tag>
-                    </el-col>
-                </el-row>
+                <div v-for="(item, index) of currentInfo.cpuPercent" :key="index">
+                    <el-tag class="tagCPUClass">CPU-{{ index }}: {{ formatNumber(item) }}%</el-tag>
+                </div>
                 <template #reference>
                     <v-charts
                         height="160px"
@@ -368,6 +371,15 @@ defineExpose({
 <style scoped lang="scss">
 .tagClass {
     margin-top: 3px;
+}
+
+.tagCPUClass {
+    justify-content: flex-start !important;
+    text-align: left !important;
+    float: left;
+    margin-top: 3px;
+    margin-left: 4px;
+    width: 100px;
 }
 
 .buttonClass {

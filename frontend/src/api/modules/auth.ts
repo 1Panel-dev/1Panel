@@ -22,7 +22,7 @@ export const checkIsSafety = (code: string) => {
 };
 
 export const getResponsePage = () => {
-    return http.get<string>(`/auth/respagecode`);
+    return http.get<string>(`/respagecode`);
 };
 
 export const checkIsDemo = () => {
