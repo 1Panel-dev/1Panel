@@ -13282,7 +13282,7 @@ paths:
             $ref: '#/definitions/response.PHPConfig'
       security:
       - ApiKeyAuth: []
-      summary: Load websit php conf
+      summary: Load website php conf
       tags:
       - Website
   /websites/php/update:

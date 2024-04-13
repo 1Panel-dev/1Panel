@@ -121,7 +121,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         if (getPath.value.indexOf('.1panel_clash') > -1) {
-            MsgWarning(i18n.global.t('file.clashDitNotSuppport'));
+            MsgWarning(i18n.global.t('file.clashDitNotSupport'));
             return;
         }
 

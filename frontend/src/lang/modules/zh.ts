@@ -1089,7 +1089,7 @@ const message = {
         ignoreCertificateHelper:
             '下载时忽略不可信证书可能导致数据泄露或篡改。请谨慎使用此选项，仅在信任下载源的情况下启用',
         uploadOverLimit: '文件数量超过 1000！请压缩后上传',
-        clashDitNotSuppport: '文件名禁止包含 .1panel_clash',
+        clashDitNotSupport: '文件名禁止包含 .1panel_clash',
         clashDleteAlert: '回收站文件夹不能删除',
         clashOpenAlert: '回收站目录请点击【回收站】按钮打开',
     },
