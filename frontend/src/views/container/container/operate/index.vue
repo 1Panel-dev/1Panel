@@ -135,6 +135,14 @@
                             />
                         </el-select>
                     </el-form-item>
+
+                    <el-form-item label="ipv4" prop="ipv4">
+                        <el-input v-model="dialogData.rowData!.ipv4" :placeholder="$t('container.inputIpv4')" />
+                    </el-form-item>
+                    <el-form-item label="ipv6" prop="ipv6">
+                        <el-input v-model="dialogData.rowData!.ipv6" :placeholder="$t('container.inputIpv6')" />
+                    </el-form-item>
+
                     <el-form-item :label="$t('container.mount')">
                         <div v-for="(row, index) in dialogData.rowData!.volumes" :key="index" style="width: 100%">
                             <el-card class="mt-1">

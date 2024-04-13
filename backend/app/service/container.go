@@ -413,6 +413,14 @@ func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.Contai
 			break
 		}
 	}
+
+	networkSettings := oldContainer.NetworkSettings
+	bridgeNetworkSettings := networkSettings.Networks[data.Network]
+	ipv4Address := bridgeNetworkSettings.IPAMConfig.IPv4Address
+	ipv6Address := bridgeNetworkSettings.IPAMConfig.IPv6Address
+	data.Ipv4 = ipv4Address
+	data.Ipv6 = ipv6Address
+
 	data.Cmd = oldContainer.Config.Cmd
 	data.OpenStdin = oldContainer.Config.OpenStdin
 	data.Tty = oldContainer.Config.Tty
@@ -985,8 +993,21 @@ func loadConfigInfo(isCreate bool, req dto.ContainerOperate, oldContainer *types
 		case "host", "none", "bridge":
 			hostConf.NetworkMode = container.NetworkMode(req.Network)
 		}
-		networkConf.EndpointsConfig = map[string]*network.EndpointSettings{req.Network: {}}
+		if req.Ipv4 != "" || req.Ipv6 != "" {
+			networkConf.EndpointsConfig = map[string]*network.EndpointSettings{
+				req.Network: {
+					IPAMConfig: &network.EndpointIPAMConfig{
+						IPv4Address: req.Ipv4,
+						IPv6Address: req.Ipv6,
+					},
+				}}
+		} else {
+			networkConf.EndpointsConfig = map[string]*network.EndpointSettings{req.Network: {}}
+		}
 	} else {
+		if req.Ipv4 != "" || req.Ipv6 != "" {
+			return nil, nil, nil, fmt.Errorf("Please set up the network")
+		}
 		networkConf = network.NetworkingConfig{}
 	}
 

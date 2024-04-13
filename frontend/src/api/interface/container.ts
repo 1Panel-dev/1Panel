@@ -27,6 +27,8 @@ export namespace Container {
         imageInput: boolean;
         forcePull: boolean;
         network: string;
+        ipv4: string;
+        ipv6: string;
         cmdStr: string;
         entrypointStr: string;
         memoryItem: number;

@@ -48,6 +48,8 @@ type ContainerOperate struct {
 	Name            string         `json:"name" validate:"required"`
 	Image           string         `json:"image" validate:"required"`
 	Network         string         `json:"network"`
+	Ipv4            string         `json:"ipv4"`
+	Ipv6            string         `json:"ipv6"`
 	PublishAllPorts bool           `json:"publishAllPorts"`
 	ExposedPorts    []PortHelper   `json:"exposedPorts"`
 	Tty             bool           `json:"tty"`
