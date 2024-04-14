@@ -23,6 +23,7 @@ const GlobalStore = defineStore({
             logoWithText: '',
             favicon: '',
         },
+        openMenuTabs: false,
         isFullScreen: false,
         isOnRestart: false,
         agreeLicense: false,
@@ -39,6 +40,9 @@ const GlobalStore = defineStore({
     }),
     getters: {},
     actions: {
+        setOpenMenuTabs(openMenuTabs: boolean) {
+            this.openMenuTabs = openMenuTabs;
+        },
         setScreenFull() {
             this.isFullScreen = !this.isFullScreen;
         },

@@ -40,6 +40,17 @@
                                 </el-radio-group>
                             </el-form-item>
 
+                            <el-form-item :label="$t('setting.menuTabs')" prop="menuTabs">
+                                <el-radio-group @change="onSave('MenuTabs', form.menuTabs)" v-model="form.menuTabs">
+                                    <el-radio-button value="enable">
+                                        <span>{{ $t('commons.button.enable') }}</span>
+                                    </el-radio-button>
+                                    <el-radio-button value="disable">
+                                        <span>{{ $t('commons.button.disable') }}</span>
+                                    </el-radio-button>
+                                </el-radio-group>
+                            </el-form-item>
+
                             <el-form-item :label="$t('setting.title')" prop="panelName">
                                 <el-input disabled v-model="form.panelName">
                                     <template #append>
@@ -160,6 +171,7 @@ const form = reactive({
     panelName: '',
     systemIP: '',
     theme: '',
+    menuTabs: '',
     language: '',
     complexityVerification: '',
     defaultNetwork: '',
@@ -200,6 +212,7 @@ const search = async () => {
     form.panelName = res.data.panelName;
     form.systemIP = res.data.systemIP;
     form.theme = res.data.theme;
+    form.menuTabs = res.data.menuTabs;
     form.language = res.data.language;
     form.complexityVerification = res.data.complexityVerification;
     form.defaultNetwork = res.data.defaultNetwork;
@@ -269,6 +282,9 @@ const onSave = async (key: string, val: any) => {
     if (key === 'Theme') {
         globalStore.setThemeConfig({ ...themeConfig.value, theme: val });
         switchDark();
+    }
+    if (key === 'MenuTabs') {
+        globalStore.setOpenMenuTabs(val === 'enable');
     }
     let param = {
         key: key,

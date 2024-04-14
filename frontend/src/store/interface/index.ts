@@ -20,6 +20,7 @@ export interface GlobalState {
     language: string; // zh | en | tw
     themeConfig: ThemeConfigProp;
     isFullScreen: boolean;
+    openMenuTabs: boolean;
     isOnRestart: boolean;
     agreeLicense: boolean;
     hasNewVersion: boolean;

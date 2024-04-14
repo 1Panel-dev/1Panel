@@ -351,6 +351,9 @@ const message = {
     tabs: {
         more: 'More',
         hide: 'Hide',
+        close: 'Close',
+        closeLeft: 'Close left',
+        closeRight: 'Close right',
         closeCurrent: 'Close current',
         closeOther: 'Close other',
         closeAll: 'Close All',
@@ -1227,6 +1230,7 @@ const message = {
         portChange: 'Port change',
         portChangeHelper: 'Modify the service port and restart the service. Do you want to continue?',
         theme: 'Theme',
+        menuTabs: 'Menu tabs',
         dark: 'Dark',
         light: 'Light',
         auto: 'Follow System',
