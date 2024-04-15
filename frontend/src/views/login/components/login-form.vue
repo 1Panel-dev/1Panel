@@ -153,13 +153,14 @@ import { ref, reactive, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import type { ElForm } from 'element-plus';
 import { loginApi, getCaptcha, mfaLoginApi, checkIsDemo, getLanguage } from '@/api/modules/auth';
-import { GlobalStore, MenuStore } from '@/store';
+import { GlobalStore, MenuStore, TabsStore } from '@/store';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
 
 const globalStore = GlobalStore();
 const menuStore = MenuStore();
+const tabsStore = TabsStore();
 const usei18n = useI18n();
 
 const errAuthInfo = ref(false);
@@ -270,6 +271,7 @@ const login = (formEl: FormInstance | undefined) => {
             globalStore.setLogStatus(true);
             globalStore.setAgreeLicense(true);
             menuStore.setMenuList([]);
+            tabsStore.removeAllTabs();
             MsgSuccess(i18n.global.t('commons.msg.loginSuccess'));
             router.push({ name: 'home' });
         } catch (error) {
@@ -295,6 +297,7 @@ const mfaLogin = async (auto: boolean) => {
         }
         globalStore.setLogStatus(true);
         menuStore.setMenuList([]);
+        tabsStore.removeAllTabs();
         MsgSuccess(i18n.global.t('commons.msg.loginSuccess'));
         router.push({ name: 'home' });
     }

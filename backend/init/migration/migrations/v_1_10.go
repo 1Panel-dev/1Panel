@@ -128,3 +128,13 @@ var UpdateXpackHideMenu = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddMenuTabsSetting = &gormigrate.Migration{
+	ID: "20240415-add-menu-tabs-setting",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "MenuTabs", Value: "disable"}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

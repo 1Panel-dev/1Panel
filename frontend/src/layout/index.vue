@@ -2,13 +2,13 @@
     <div :class="classObj" class="app-wrapper" v-loading="loading" :element-loading-text="loadingText" fullscreen>
         <div v-if="classObj.mobile && classObj.openSidebar" class="drawer-bg" @click="handleClickOutside" />
         <div class="app-sidebar" v-if="!globalStore.isFullScreen">
-            <Sidebar />
+            <Sidebar @menu-click="handleMenuClick" :menu-router="!classObj.openMenuTabs" />
         </div>
 
         <div class="main-container">
             <mobile-header v-if="classObj.mobile" />
-            <app-main class="app-main" />
-
+            <Tabs v-if="classObj.openMenuTabs" />
+            <app-main :keep-alive="classObj.openMenuTabs ? tabsStore.cachedTabs : null" class="app-main" />
             <Footer class="app-footer" v-if="!globalStore.isFullScreen" />
         </div>
     </div>
@@ -16,17 +16,21 @@
 
 <script setup lang="ts">
 import { onMounted, computed, ref, watch, onBeforeUnmount } from 'vue';
-import { Sidebar, Footer, AppMain, MobileHeader } from './components';
+import { Sidebar, Footer, AppMain, MobileHeader, Tabs } from './components';
 import useResize from './hooks/useResize';
-import { GlobalStore, MenuStore } from '@/store';
+import { GlobalStore, MenuStore, TabsStore } from '@/store';
 import { DeviceType } from '@/enums/app';
 import { useI18n } from 'vue-i18n';
 import { useTheme } from '@/hooks/use-theme';
 import { getLicense, getSettingInfo, getSystemAvailable } from '@/api/modules/setting';
+import { useRoute, useRouter } from 'vue-router';
 useResize();
 
+const router = useRouter();
+const route = useRoute();
 const menuStore = MenuStore();
 const globalStore = GlobalStore();
+const tabsStore = TabsStore();
 
 const i18n = useI18n();
 const loading = ref(false);
@@ -36,12 +40,18 @@ const { switchDark } = useTheme();
 
 let timer: NodeJS.Timer | null = null;
 
+onMounted(() => {
+    if (!tabsStore.activeTabPath) {
+        handleMenuClick('/');
+    }
+});
 const classObj = computed(() => {
     return {
         fullScreen: globalStore.isFullScreen,
         hideSidebar: menuStore.isCollapse,
         openSidebar: !menuStore.isCollapse,
         mobile: globalStore.device === DeviceType.Mobile,
+        openMenuTabs: globalStore.openMenuTabs,
         withoutAnimation: menuStore.withoutAnimation,
     };
 });
@@ -59,6 +69,11 @@ watch(
         }
     },
 );
+const handleMenuClick = async (path) => {
+    await router.push({ path: path });
+    tabsStore.addTab(route);
+    tabsStore.activeTabPath = route.path;
+};
 
 const loadDataFromDB = async () => {
     const res = await getSettingInfo();
@@ -66,6 +81,7 @@ const loadDataFromDB = async () => {
     i18n.locale.value = res.data.language;
     i18n.warnHtmlMessage = false;
     globalStore.entrance = res.data.securityEntrance;
+    globalStore.setOpenMenuTabs(res.data.menuTabs === 'enable');
     globalStore.updateLanguage(res.data.language);
     globalStore.setThemeConfig({ ...themeConfig.value, theme: res.data.theme });
     globalStore.setThemeConfig({ ...themeConfig.value, panelName: res.data.panelName });

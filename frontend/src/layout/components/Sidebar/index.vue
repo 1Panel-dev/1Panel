@@ -10,10 +10,11 @@
         <el-scrollbar>
             <el-menu
                 :default-active="activeMenu"
-                :router="true"
+                :router="menuRouter"
                 :collapse="isCollapse"
                 :collapse-transition="false"
                 :unique-opened="true"
+                @select="handleMenuClick"
             >
                 <SubItem :menuList="routerMenus" />
                 <el-menu-item :index="''">
@@ -31,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, defineEmits } from 'vue';
 import { RouteRecordRaw, useRoute } from 'vue-router';
 import { loadingSvg } from '@/utils/svg';
 import Logo from './components/Logo.vue';
@@ -49,6 +50,13 @@ import { getSettingInfo } from '@/api/modules/setting';
 const route = useRoute();
 const menuStore = MenuStore();
 const globalStore = GlobalStore();
+defineProps({
+    menuRouter: {
+        type: Boolean,
+        default: true,
+        required: false,
+    },
+});
 const activeMenu = computed(() => {
     const { meta, path } = route;
     return isString(meta.activeMenu) ? meta.activeMenu : path;
@@ -79,7 +87,10 @@ const listeningWindow = () => {
     };
 };
 listeningWindow();
-
+const emit = defineEmits(['menuClick']);
+const handleMenuClick = (path) => {
+    emit('menuClick', path);
+};
 const logout = () => {
     ElMessageBox.confirm(i18n.global.t('commons.msg.sureLogOut'), i18n.global.t('commons.msg.infoTitle'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),

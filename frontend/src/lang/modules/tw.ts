@@ -348,6 +348,9 @@ const message = {
     tabs: {
         more: '更多',
         hide: '收起',
+        close: '關閉',
+        closeLeft: '關閉左側',
+        closeRight: '關閉右側',
         closeCurrent: '關閉當前',
         closeOther: '關閉其它',
         closeAll: '關閉所有',
@@ -1165,6 +1168,7 @@ const message = {
         portChange: '端口修改',
         portChangeHelper: '服務端口修改需要重啟服務，是否繼續？',
         theme: '主題顏色',
+        menuTabs: '菜單標簽頁',
         componentSize: '組件大小',
         dark: '暗色',
         light: '亮色',

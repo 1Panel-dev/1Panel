@@ -19,6 +19,7 @@ type SettingInfo struct {
 	BindAddress    string `json:"bindAddress"`
 	PanelName      string `json:"panelName"`
 	Theme          string `json:"theme"`
+	MenuTabs       string `json:"menuTabs"`
 	Language       string `json:"language"`
 	DefaultNetwork string `json:"defaultNetwork"`
 	LastCleanTime  string `json:"lastCleanTime"`

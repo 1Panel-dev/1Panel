@@ -80,6 +80,7 @@ func Init() {
 		migrations.NewMonitorDB,
 		migrations.AddNoAuthSetting,
 		migrations.UpdateXpackHideMenu,
+		migrations.AddMenuTabsSetting,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

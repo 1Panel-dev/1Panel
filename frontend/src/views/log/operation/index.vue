@@ -202,6 +202,9 @@ const loadDetail = (log: string) => {
     if (log.indexOf('[Theme]') !== -1) {
         return log.replace('[Theme]', '[' + i18n.global.t('setting.theme') + ']');
     }
+    if (log.indexOf('[MenuTabs]') !== -1) {
+        return log.replace('[MenuTabs]', '[' + i18n.global.t('setting.menuTabs') + ']');
+    }
     if (log.indexOf('[SessionTimeout]') !== -1) {
         return log.replace('[SessionTimeout]', '[' + i18n.global.t('setting.sessionTimeout') + ']');
     }
