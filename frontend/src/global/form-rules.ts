@@ -219,6 +219,19 @@ const checkLinuxName = (rule: any, value: any, callback: any) => {
     }
 };
 
+const checkSupervisorName = (rule: any, value: any, callback: any) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback(new Error(i18n.global.t('commons.rule.supervisorName')));
+    } else {
+        const reg = /^[a-zA-Z0-9]{1}[a-zA-Z0-9_-]{1,128}$/;
+        if (!reg.test(value) && value !== '') {
+            callback(new Error(i18n.global.t('commons.rule.supervisorName')));
+        } else {
+            callback();
+        }
+    }
+};
+
 const checkDatabaseName = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.databaseName')));
@@ -534,6 +547,7 @@ interface CommonRule {
     domainWithPort: FormItemRule;
     filePermission: FormItemRule;
     phpExtensions: FormItemRule;
+    supervisorName: FormItemRule;
 
     paramCommon: FormItemRule;
     paramComplexity: FormItemRule;
@@ -723,6 +737,11 @@ export const Rules: CommonRule = {
         required: true,
         trigger: 'blur',
         validator: checkLeechExts,
+    },
+    supervisorName: {
+        required: true,
+        trigger: 'blur',
+        validator: checkSupervisorName,
     },
     paramSimple: {
         required: true,
