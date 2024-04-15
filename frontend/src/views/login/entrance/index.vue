@@ -60,7 +60,6 @@ const loading = ref();
 const mySafetyCode = defineProps({
     code: {
         type: String,
-        required: true,
         default: '',
     },
 });
@@ -94,10 +93,18 @@ const getStatus = async () => {
                     errStatus.value = '';
                     loading.value = false;
                 })
-                .catch(() => {
-                    pageCode.value = '200';
-                    errStatus.value = 'err-unsafe';
+                .catch((errRes) => {
+                    pageCode.value = pageCode.value || '200';
                     loading.value = false;
+                    if (errRes?.code === 408) {
+                        errStatus.value = 'err-ip';
+                        return;
+                    }
+                    if (errRes?.code === 409) {
+                        errStatus.value = 'err-domain';
+                        return;
+                    }
+                    errStatus.value = 'err-unsafe';
                 });
         })
         .catch(() => {

@@ -100,6 +100,10 @@ const resetSetting = () => {
 
 const loadProductProFromDB = async () => {
     const res = await getLicense();
+    if (!res.data) {
+        globalStore.isProductPro = false;
+        return;
+    }
     globalStore.isProductPro =
         res.data.status === 'Enable' || res.data.status === 'Lost01' || res.data.status === 'Lost02';
 

@@ -13,7 +13,7 @@ router.beforeEach((to, from, next) => {
     if (to.name !== 'entrance' && !globalStore.isLogin) {
         next({
             name: 'entrance',
-            params: to.params,
+            params: { code: to.params?.code || globalStore.entrance },
         });
         NProgress.done();
         return;
