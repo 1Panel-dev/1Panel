@@ -157,6 +157,8 @@ import { GlobalStore, MenuStore, TabsStore } from '@/store';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
+import { getLicense } from '@/api/modules/setting';
+import { initFavicon } from '@/utils/xpack';
 
 const globalStore = GlobalStore();
 const menuStore = MenuStore();
@@ -273,6 +275,7 @@ const login = (formEl: FormInstance | undefined) => {
             menuStore.setMenuList([]);
             tabsStore.removeAllTabs();
             MsgSuccess(i18n.global.t('commons.msg.loginSuccess'));
+            loadProductProFromDB();
             router.push({ name: 'home' });
         } catch (error) {
             loginVerify();
@@ -299,6 +302,7 @@ const mfaLogin = async (auto: boolean) => {
         menuStore.setMenuList([]);
         tabsStore.removeAllTabs();
         MsgSuccess(i18n.global.t('commons.msg.loginSuccess'));
+        loadProductProFromDB();
         router.push({ name: 'home' });
     }
 };
@@ -322,19 +326,29 @@ const loadLanguage = async () => {
     } catch (error) {}
 };
 
-const loadFavicon = () => {
-    let favicon = globalStore.themeConfig.favicon;
-    const link = (document.querySelector("link[rel*='icon']") || document.createElement('link')) as HTMLLinkElement;
-    link.type = 'image/x-icon';
-    link.rel = 'shortcut icon';
-    link.href = favicon ? '/api/v1/images/favicon' : '/public/favicon.png';
-    document.getElementsByTagName('head')[0].appendChild(link);
+const loadProductProFromDB = async () => {
+    const res = await getLicense();
+    if (!res.data) {
+        globalStore.isProductPro = false;
+        return;
+    }
+    globalStore.isProductPro =
+        res.data.status === 'Enable' || res.data.status === 'Lost01' || res.data.status === 'Lost02';
+
+    if (globalStore.isProductPro) {
+        globalStore.productProExpires = Number(res.data.productPro);
+    } else {
+        globalStore.themeConfig.title = '';
+        globalStore.themeConfig.logo = '';
+        globalStore.themeConfig.logoWithText = '';
+        globalStore.themeConfig.favicon = '';
+    }
 };
 
 onMounted(() => {
     globalStore.isOnRestart = false;
     loginVerify();
-    loadFavicon();
+    initFavicon();
     loadLanguage();
     document.title = globalStore.themeConfig.panelName;
     loginForm.agreeLicense = globalStore.agreeLicense;

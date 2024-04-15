@@ -1,10 +1,10 @@
 <template>
     <div>
-        <div class="login-background">
+        <div class="login-background" v-loading="loading">
             <div class="login-wrapper">
                 <div :class="screenWidth > 1110 ? 'left inline-block' : ''">
                     <div class="login-title">
-                        <span>{{ globalStore.themeConfig.title || $t('setting.description') }}</span>
+                        <span>{{ gStore.themeConfig.title || $t('setting.description') }}</span>
                     </div>
                     <img src="@/assets/images/1panel-login.png" alt="" v-if="screenWidth > 1110" />
                 </div>
@@ -24,16 +24,55 @@ import LoginForm from './components/login-form.vue';
 import { ref, onMounted } from 'vue';
 import router from '@/routers';
 import { GlobalStore } from '@/store';
+import { initFavicon, resetXSetting } from '@/utils/xpack';
 
-const globalStore = GlobalStore();
+const gStore = GlobalStore();
+const loading = ref();
 
 const screenWidth = ref(null);
 
 const getStatus = async () => {
-    const res = await checkIsSafety(globalStore.entrance);
-    if (res.data === 'unpass') {
-        router.replace({ name: 'entrance', params: { code: globalStore.entrance } });
+    loading.value = true;
+    await checkIsSafety(gStore.entrance)
+        .then((res) => {
+            if (res.data === 'unpass') {
+                loading.value = false;
+                router.replace({ name: 'entrance', params: { code: gStore.entrance } });
+                return;
+            }
+            loadDataFromXDB();
+        })
+        .catch(() => {
+            loading.value = false;
+        });
+};
+
+const loadDataFromXDB = async () => {
+    const xpackModules = import.meta.globEager('../../xpack/api/modules/*.ts');
+    if (xpackModules['../../xpack/api/modules/setting.ts']) {
+        const searchXSetting = xpackModules['../../xpack/api/modules/setting.ts'].searchXSetting;
+        if (searchXSetting) {
+            await searchXSetting()
+                .then((resItem) => {
+                    gStore.themeConfig.title = resItem.data.title;
+                    gStore.themeConfig.logo = resItem.data.logo;
+                    gStore.themeConfig.logoWithText = resItem.data.logoWithText;
+                    gStore.themeConfig.favicon = resItem.data.favicon;
+                })
+                .catch(() => {
+                    loading.value = false;
+                    resetXSetting();
+                });
+        } else {
+            loading.value = false;
+            resetXSetting();
+        }
+    } else {
+        loading.value = false;
+        resetXSetting();
     }
+    loading.value = false;
+    initFavicon();
 };
 
 onMounted(() => {

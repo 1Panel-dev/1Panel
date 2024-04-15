@@ -24,6 +24,7 @@ import { useI18n } from 'vue-i18n';
 import { useTheme } from '@/hooks/use-theme';
 import { getLicense, getSettingInfo, getSystemAvailable } from '@/api/modules/setting';
 import { useRoute, useRouter } from 'vue-router';
+import { initFavicon, resetXSetting } from '@/utils/xpack';
 useResize();
 
 const router = useRouter();
@@ -99,19 +100,12 @@ const loadDataFromXDB = async () => {
             globalStore.themeConfig.logoWithText = res.data.logoWithText;
             globalStore.themeConfig.favicon = res.data.favicon;
         } else {
-            resetSetting();
+            resetXSetting();
         }
     } else {
-        resetSetting();
+        resetXSetting();
     }
     initFavicon();
-};
-
-const resetSetting = () => {
-    globalStore.themeConfig.title = '';
-    globalStore.themeConfig.logo = '';
-    globalStore.themeConfig.logoWithText = '';
-    globalStore.themeConfig.favicon = '';
 };
 
 const loadProductProFromDB = async () => {
@@ -141,15 +135,6 @@ const updateDarkMode = async (event: MediaQueryListEvent) => {
     }
     globalStore.setThemeConfig({ ...themeConfig.value, theme: event.matches ? 'dark' : 'light' });
     switchDark();
-};
-
-const initFavicon = () => {
-    let favicon = globalStore.themeConfig.favicon;
-    const link = (document.querySelector("link[rel*='icon']") || document.createElement('link')) as HTMLLinkElement;
-    link.type = 'image/x-icon';
-    link.rel = 'shortcut icon';
-    link.href = favicon ? '/api/v1/images/favicon' : '/public/favicon.png';
-    document.getElementsByTagName('head')[0].appendChild(link);
 };
 
 const loadStatus = async () => {
