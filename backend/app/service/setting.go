@@ -99,12 +99,6 @@ func (u *SettingService) Update(key, value string) error {
 			_ = settingRepo.Create("AppStoreLastModified", value)
 			return nil
 		}
-	case "MenuTabs":
-		exist, _ := settingRepo.Get(settingRepo.WithByKey("MenuTabs"))
-		if exist.ID == 0 {
-			_ = settingRepo.Create("MenuTabs", value)
-			return nil
-		}
 	}
 
 	if err := settingRepo.Update(key, value); err != nil {

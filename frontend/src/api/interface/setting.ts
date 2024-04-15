@@ -16,6 +16,7 @@ export namespace Setting {
 
         panelName: string;
         theme: string;
+        menuTabs: string;
         language: string;
         defaultNetwork: string;
         lastCleanTime: string;
