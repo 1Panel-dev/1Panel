@@ -292,8 +292,8 @@ const search = async (param: string) => {
                     });
                     cpuData = cpuData.length === 0 ? loadEmptyData() : cpuData;
                     chartsOption.value['loadCPUChart'] = {
-                        xDatas: baseDate,
-                        yDatas: [
+                        xData: baseDate,
+                        yData: [
                             {
                                 name: 'CPU',
                                 data: cpuData,
@@ -309,8 +309,8 @@ const search = async (param: string) => {
                     });
                     memoryData = memoryData.length === 0 ? loadEmptyData() : memoryData;
                     chartsOption.value['loadMemoryChart'] = {
-                        xDatas: baseDate,
-                        yDatas: [
+                        xData: baseDate,
+                        yData: [
                             {
                                 name: i18n.global.t('monitor.memory'),
                                 data: memoryData,
@@ -342,8 +342,8 @@ const search = async (param: string) => {
                 networkOut = networkOut.length === 0 ? loadEmptyData() : networkOut;
 
                 chartsOption.value['loadNetworkChart'] = {
-                    xDatas: networkDate,
-                    yDatas: [
+                    xData: networkDate,
+                    yData: [
                         {
                             name: i18n.global.t('monitor.up'),
                             data: networkUp,
@@ -394,8 +394,8 @@ function initLoadCharts(item: Host.MonitorData) {
     });
     loadUsage = loadUsage.length === 0 ? loadEmptyData() : loadUsage;
     chartsOption.value['loadLoadChart'] = {
-        xDatas: loadDate,
-        yDatas: [
+        xData: loadDate,
+        yData: [
             {
                 name: '1 ' + i18n.global.t('commons.units.minute'),
                 data: load1Data,
@@ -450,8 +450,8 @@ function initIOCharts(item: Host.MonitorData) {
     });
     ioTime = ioTime.length === 0 ? loadEmptyData() : ioTime;
     chartsOption.value['loadIOChart'] = {
-        xDatas: ioDate,
-        yDatas: [
+        xData: ioDate,
+        yData: [
             {
                 name: i18n.global.t('monitor.read'),
                 data: ioRead,

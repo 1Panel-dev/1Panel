@@ -27,7 +27,7 @@ const props = defineProps({
     option: {
         type: Object,
         required: true,
-    }, // option: { title , xDatas, yDatas, formatStr, yAxis, grid, tooltip}
+    }, // option: { title , xData, yData, formatStr, yAxis, grid, tooltip}
 });
 
 const seriesStyle = [
@@ -91,8 +91,8 @@ function initChart() {
     const theme = globalStore.$state.themeConfig.theme || 'light';
 
     const series = [];
-    if (props.option?.yDatas?.length) {
-        props.option?.yDatas.forEach((item: any, index: number) => {
+    if (props.option?.yData?.length) {
+        props.option?.yData.forEach((item: any, index: number) => {
             series.push({
                 name: item?.name,
                 type: 'line',
@@ -176,7 +176,7 @@ function initChart() {
             },
             icon: 'circle',
         },
-        xAxis: { data: props.option.xDatas, boundaryGap: false },
+        xAxis: { data: props.option.xData, boundaryGap: false },
         yAxis: props.option.yAxis
             ? yAxis
             : {
@@ -190,7 +190,7 @@ function initChart() {
                   },
               },
         series: series,
-        dataZoom: [{ startValue: props?.option.xDatas[0], show: props.dataZoom }],
+        dataZoom: [{ startValue: props?.option.xData[0], show: props.dataZoom }],
     };
     // 渲染数据
     itemChart.setOption(option, true);
