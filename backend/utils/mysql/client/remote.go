@@ -294,17 +294,17 @@ func (r *Remote) Recover(info RecoverInfo) error {
 }
 
 func (r *Remote) SyncDB(version string) ([]SyncDBInfo, error) {
-	var datas []SyncDBInfo
+	var lists []SyncDBInfo
 	rows, err := r.Client.Query("select schema_name, default_character_set_name from information_schema.SCHEMATA")
 	if err != nil {
-		return datas, err
+		return lists, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		var dbName, charsetName string
 		if err = rows.Scan(&dbName, &charsetName); err != nil {
-			return datas, err
+			return lists, err
 		}
 		if dbName == "information_schema" || dbName == "mysql" || dbName == "performance_schema" || dbName == "sys" || dbName == "__recycle_bin__" || dbName == "recycle_bin" {
 			continue
@@ -317,7 +317,7 @@ func (r *Remote) SyncDB(version string) ([]SyncDBInfo, error) {
 		}
 		userRows, err := r.Client.Query("select user,host from mysql.db where db = ?", dbName)
 		if err != nil {
-			return datas, err
+			return lists, err
 		}
 
 		var permissionItem []string
@@ -326,7 +326,7 @@ func (r *Remote) SyncDB(version string) ([]SyncDBInfo, error) {
 		for userRows.Next() {
 			var user, host string
 			if err = userRows.Scan(&user, &host); err != nil {
-				return datas, err
+				return lists, err
 			}
 			if user == "root" {
 				continue
@@ -353,12 +353,12 @@ func (r *Remote) SyncDB(version string) ([]SyncDBInfo, error) {
 				dataItem.Permission = strings.Join(permissionItem, ",")
 			}
 		}
-		datas = append(datas, dataItem)
+		lists = append(lists, dataItem)
 	}
 	if err = rows.Err(); err != nil {
-		return datas, err
+		return lists, err
 	}
-	return datas, nil
+	return lists, nil
 }
 
 func (r *Remote) Close() {

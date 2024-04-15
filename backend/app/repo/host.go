@@ -124,11 +124,11 @@ func (h *HostRepo) GetFirewallRecord(opts ...DBOption) (model.Firewall, error) {
 }
 
 func (h *HostRepo) ListFirewallRecord() ([]model.Firewall, error) {
-	var datas []model.Firewall
-	if err := global.DB.Find(&datas).Error; err != nil {
-		return datas, nil
+	var lists []model.Firewall
+	if err := global.DB.Find(&lists).Error; err != nil {
+		return lists, nil
 	}
-	return datas, nil
+	return lists, nil
 }
 
 func (h *HostRepo) SaveFirewallRecord(firewall *model.Firewall) error {

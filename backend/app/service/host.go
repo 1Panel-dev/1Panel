@@ -200,7 +200,7 @@ func (u *HostService) SearchForTree(search dto.SearchForTree) ([]dto.HostTree, e
 	if err != nil {
 		return nil, err
 	}
-	var datas []dto.HostTree
+	var lists []dto.HostTree
 	for _, group := range groups {
 		var data dto.HostTree
 		data.ID = group.ID + 10000
@@ -215,10 +215,10 @@ func (u *HostService) SearchForTree(search dto.SearchForTree) ([]dto.HostTree, e
 			}
 		}
 		if len(data.Children) != 0 {
-			datas = append(datas, data)
+			lists = append(lists, data)
 		}
 	}
-	return datas, err
+	return lists, err
 }
 
 func (u *HostService) Create(req dto.HostOperate) (*dto.HostInfo, error) {

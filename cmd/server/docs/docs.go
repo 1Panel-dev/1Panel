@@ -8108,7 +8108,7 @@ const docTemplate = `{
                 "tags": [
                     "Monitor"
                 ],
-                "summary": "Clean monitor datas",
+                "summary": "Clean monitor data",
                 "responses": {
                     "200": {
                         "description": "OK"
@@ -8117,7 +8117,7 @@ const docTemplate = `{
                 "x-panel-log": {
                     "BeforeFunctions": [],
                     "bodyKeys": [],
-                    "formatEN": "clean monitor datas",
+                    "formatEN": "clean monitor data",
                     "formatZH": "清空监控数据",
                     "paramKeys": []
                 }
@@ -8134,7 +8134,7 @@ const docTemplate = `{
                 "tags": [
                     "Monitor"
                 ],
-                "summary": "Load monitor datas",
+                "summary": "Load monitor data",
                 "parameters": [
                     {
                         "description": "request",
@@ -14675,6 +14675,12 @@ const docTemplate = `{
                 "image": {
                     "type": "string"
                 },
+                "ipv4": {
+                    "type": "string"
+                },
+                "ipv6": {
+                    "type": "string"
+                },
                 "labels": {
                     "type": "array",
                     "items": {
@@ -17812,6 +17818,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "localTime": {
+                    "type": "string"
+                },
+                "menuTabs": {
                     "type": "string"
                 },
                 "messageType": {

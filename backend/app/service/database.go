@@ -44,15 +44,15 @@ func (u *DatabaseService) SearchWithPage(search dto.DatabaseSearch) (int64, inte
 		commonRepo.WithLikeName(search.Info),
 		databaseRepo.WithoutByFrom("local"),
 	)
-	var datas []dto.DatabaseInfo
+	var lists []dto.DatabaseInfo
 	for _, db := range dbs {
 		var item dto.DatabaseInfo
 		if err := copier.Copy(&item, &db); err != nil {
 			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 		}
-		datas = append(datas, item)
+		lists = append(lists, item)
 	}
-	return total, datas, err
+	return total, lists, err
 }
 
 func (u *DatabaseService) Get(name string) (dto.DatabaseInfo, error) {
@@ -69,21 +69,21 @@ func (u *DatabaseService) Get(name string) (dto.DatabaseInfo, error) {
 
 func (u *DatabaseService) List(dbType string) ([]dto.DatabaseOption, error) {
 	dbs, err := databaseRepo.GetList(databaseRepo.WithTypeList(dbType))
-	var datas []dto.DatabaseOption
+	var lists []dto.DatabaseOption
 	for _, db := range dbs {
 		var item dto.DatabaseOption
 		if err := copier.Copy(&item, &db); err != nil {
 			return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 		}
 		item.Database = db.Name
-		datas = append(datas, item)
+		lists = append(lists, item)
 	}
-	return datas, err
+	return lists, err
 }
 
 func (u *DatabaseService) LoadItems(dbType string) ([]dto.DatabaseItem, error) {
 	dbs, err := databaseRepo.GetList(databaseRepo.WithTypeList(dbType))
-	var datas []dto.DatabaseItem
+	var lists []dto.DatabaseItem
 	for _, db := range dbs {
 		if dbType == "postgresql" {
 			items, _ := postgresqlRepo.List(postgresqlRepo.WithByPostgresqlName(db.Name))
@@ -93,7 +93,7 @@ func (u *DatabaseService) LoadItems(dbType string) ([]dto.DatabaseItem, error) {
 					continue
 				}
 				dItem.Database = db.Name
-				datas = append(datas, dItem)
+				lists = append(lists, dItem)
 			}
 		} else {
 			items, _ := mysqlRepo.List(mysqlRepo.WithByMysqlName(db.Name))
@@ -103,11 +103,11 @@ func (u *DatabaseService) LoadItems(dbType string) ([]dto.DatabaseItem, error) {
 					continue
 				}
 				dItem.Database = db.Name
-				datas = append(datas, dItem)
+				lists = append(lists, dItem)
 			}
 		}
 	}
-	return datas, err
+	return lists, err
 }
 
 func (u *DatabaseService) CheckDatabase(req dto.DatabaseCreate) bool {

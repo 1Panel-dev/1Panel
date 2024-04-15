@@ -473,9 +473,9 @@ function initIOCharts(item: Host.MonitorData) {
         ],
         tooltip: {
             trigger: 'axis',
-            formatter: function (datas: any) {
-                let res = datas[0].name + '<br/>';
-                for (const item of datas) {
+            formatter: function (lists: any) {
+                let res = lists[0].name + '<br/>';
+                for (const item of lists) {
                     if (
                         item.seriesName === i18n.global.t('monitor.read') ||
                         item.seriesName === i18n.global.t('monitor.write')

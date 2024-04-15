@@ -92,11 +92,11 @@ func (u *BackupService) SearchRecordsWithPage(search dto.RecordSearch) (int64, [
 		return 0, nil, err
 	}
 
-	datas, err := u.loadRecordSize(records)
-	sort.Slice(datas, func(i, j int) bool {
-		return datas[i].CreatedAt.After(datas[j].CreatedAt)
+	lists, err := u.loadRecordSize(records)
+	sort.Slice(lists, func(i, j int) bool {
+		return lists[i].CreatedAt.After(lists[j].CreatedAt)
 	})
-	return total, datas, err
+	return total, lists, err
 }
 
 func (u *BackupService) SearchRecordsByCronjobWithPage(search dto.RecordSearchByCronjob) (int64, []dto.BackupRecords, error) {
@@ -109,11 +109,11 @@ func (u *BackupService) SearchRecordsByCronjobWithPage(search dto.RecordSearchBy
 		return 0, nil, err
 	}
 
-	datas, err := u.loadRecordSize(records)
-	sort.Slice(datas, func(i, j int) bool {
-		return datas[i].CreatedAt.After(datas[j].CreatedAt)
+	lists, err := u.loadRecordSize(records)
+	sort.Slice(lists, func(i, j int) bool {
+		return lists[i].CreatedAt.After(lists[j].CreatedAt)
 	})
-	return total, datas, err
+	return total, lists, err
 }
 
 type loadSizeHelper struct {
@@ -345,14 +345,14 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 }
 
 func (u *BackupService) ListFiles(req dto.BackupSearchFile) []string {
-	var datas []string
+	var lists []string
 	backup, err := backupRepo.Get(backupRepo.WithByType(req.Type))
 	if err != nil {
-		return datas
+		return lists
 	}
 	client, err := u.NewClient(&backup)
 	if err != nil {
-		return datas
+		return lists
 	}
 	prefix := "system_snapshot"
 	if len(backup.BackupPath) != 0 {
@@ -361,14 +361,14 @@ func (u *BackupService) ListFiles(req dto.BackupSearchFile) []string {
 	files, err := client.ListObjects(prefix)
 	if err != nil {
 		global.LOG.Debugf("load files from %s failed, err: %v", req.Type, err)
-		return datas
+		return lists
 	}
 	for _, file := range files {
 		if len(file) != 0 {
-			datas = append(datas, path.Base(file))
+			lists = append(lists, path.Base(file))
 		}
 	}
-	return datas
+	return lists
 }
 
 func (u *BackupService) NewClient(backup *model.BackupAccount) (cloud_storage.CloudStorageClient, error) {
@@ -441,7 +441,7 @@ func (u *BackupService) loadAccessToken(backup *model.BackupAccount) error {
 }
 
 func (u *BackupService) loadRecordSize(records []model.BackupRecord) ([]dto.BackupRecords, error) {
-	var datas []dto.BackupRecords
+	var lists []dto.BackupRecords
 	clientMap := make(map[string]loadSizeHelper)
 	var wg sync.WaitGroup
 	for i := 0; i < len(records); i++ {
@@ -455,18 +455,18 @@ func (u *BackupService) loadRecordSize(records []model.BackupRecord) ([]dto.Back
 			if err != nil {
 				global.LOG.Errorf("load backup model %s from db failed, err: %v", records[i].Source, err)
 				clientMap[records[i].Source] = loadSizeHelper{}
-				datas = append(datas, item)
+				lists = append(lists, item)
 				continue
 			}
 			client, err := u.NewClient(&backup)
 			if err != nil {
 				global.LOG.Errorf("load backup client %s from db failed, err: %v", records[i].Source, err)
 				clientMap[records[i].Source] = loadSizeHelper{}
-				datas = append(datas, item)
+				lists = append(lists, item)
 				continue
 			}
 			item.Size, _ = client.Size(path.Join(strings.TrimLeft(backup.BackupPath, "/"), itemPath))
-			datas = append(datas, item)
+			lists = append(lists, item)
 			clientMap[records[i].Source] = loadSizeHelper{backupPath: strings.TrimLeft(backup.BackupPath, "/"), client: client, isOk: true}
 			continue
 		}
@@ -474,15 +474,15 @@ func (u *BackupService) loadRecordSize(records []model.BackupRecord) ([]dto.Back
 			wg.Add(1)
 			go func(index int) {
 				item.Size, _ = clientMap[records[index].Source].client.Size(path.Join(clientMap[records[index].Source].backupPath, itemPath))
-				datas = append(datas, item)
+				lists = append(lists, item)
 				wg.Done()
 			}(i)
 		} else {
-			datas = append(datas, item)
+			lists = append(lists, item)
 		}
 	}
 	wg.Wait()
-	return datas, nil
+	return lists, nil
 }
 
 func loadLocalDir() (string, error) {

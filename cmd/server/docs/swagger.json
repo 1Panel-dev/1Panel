@@ -8101,7 +8101,7 @@
                 "tags": [
                     "Monitor"
                 ],
-                "summary": "Clean monitor datas",
+                "summary": "Clean monitor data",
                 "responses": {
                     "200": {
                         "description": "OK"
@@ -8110,7 +8110,7 @@
                 "x-panel-log": {
                     "BeforeFunctions": [],
                     "bodyKeys": [],
-                    "formatEN": "clean monitor datas",
+                    "formatEN": "clean monitor data",
                     "formatZH": "清空监控数据",
                     "paramKeys": []
                 }
@@ -8127,7 +8127,7 @@
                 "tags": [
                     "Monitor"
                 ],
-                "summary": "Load monitor datas",
+                "summary": "Load monitor data",
                 "parameters": [
                     {
                         "description": "request",
@@ -14668,6 +14668,12 @@
                 "image": {
                     "type": "string"
                 },
+                "ipv4": {
+                    "type": "string"
+                },
+                "ipv6": {
+                    "type": "string"
+                },
                 "labels": {
                     "type": "array",
                     "items": {
@@ -17805,6 +17811,9 @@
                     "type": "string"
                 },
                 "localTime": {
+                    "type": "string"
+                },
+                "menuTabs": {
                     "type": "string"
                 },
                 "messageType": {

@@ -63,15 +63,15 @@ func NewIAppInstalledService() IAppInstallService {
 }
 
 func (a *AppInstallService) GetInstallList() ([]dto.AppInstallInfo, error) {
-	var datas []dto.AppInstallInfo
+	var lists []dto.AppInstallInfo
 	appInstalls, err := appInstallRepo.ListBy()
 	if err != nil {
 		return nil, err
 	}
 	for _, install := range appInstalls {
-		datas = append(datas, dto.AppInstallInfo{ID: install.ID, Key: install.App.Key, Name: install.Name})
+		lists = append(lists, dto.AppInstallInfo{ID: install.ID, Key: install.App.Key, Name: install.Name})
 	}
-	return datas, nil
+	return lists, nil
 }
 
 func (a *AppInstallService) Page(req request.AppInstalledSearch) (int64, []response.AppInstalledDTO, error) {

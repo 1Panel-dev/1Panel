@@ -85,14 +85,14 @@ func (u *ContainerService) ListNetwork() ([]dto.Options, error) {
 	if err != nil {
 		return nil, err
 	}
-	var datas []dto.Options
+	var lists []dto.Options
 	for _, item := range list {
-		datas = append(datas, dto.Options{Option: item.Name})
+		lists = append(lists, dto.Options{Option: item.Name})
 	}
-	sort.Slice(datas, func(i, j int) bool {
-		return datas[i].Option < datas[j].Option
+	sort.Slice(lists, func(i, j int) bool {
+		return lists[i].Option < lists[j].Option
 	})
-	return datas, nil
+	return lists, nil
 }
 
 func (u *ContainerService) DeleteNetwork(req dto.BatchDelete) error {

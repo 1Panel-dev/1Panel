@@ -164,7 +164,7 @@ func saveLoginLogs(c *gin.Context, err error) {
 	logs.IP = c.ClientIP()
 	qqWry, err := qqwry.NewQQwry()
 	if err != nil {
-		global.LOG.Errorf("load qqwry datas failed: %s", err)
+		global.LOG.Errorf("load qqwry data failed: %s", err)
 	}
 	res := qqWry.Find(logs.IP)
 	logs.Agent = c.GetHeader("User-Agent")

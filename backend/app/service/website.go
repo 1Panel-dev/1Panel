@@ -363,15 +363,15 @@ func (w WebsiteService) GetWebsiteOptions() ([]response.WebsiteOption, error) {
 	if err != nil {
 		return nil, err
 	}
-	var datas []response.WebsiteOption
+	var lists []response.WebsiteOption
 	for _, web := range webs {
 		var item response.WebsiteOption
 		if err := copier.Copy(&item, &web); err != nil {
 			return nil, err
 		}
-		datas = append(datas, item)
+		lists = append(lists, item)
 	}
-	return datas, nil
+	return lists, nil
 }
 
 func (w WebsiteService) UpdateWebsite(req request.WebsiteUpdate) error {

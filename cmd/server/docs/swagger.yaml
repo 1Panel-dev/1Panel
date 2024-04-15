@@ -444,6 +444,10 @@ definitions:
         type: boolean
       image:
         type: string
+      ipv4:
+        type: string
+      ipv6:
+        type: string
       labels:
         items:
           type: string
@@ -2566,6 +2570,8 @@ definitions:
       lastCleanTime:
         type: string
       localTime:
+        type: string
+      menuTabs:
         type: string
       messageType:
         type: string
@@ -10166,13 +10172,13 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Clean monitor datas
+      summary: Clean monitor data
       tags:
       - Monitor
       x-panel-log:
         BeforeFunctions: []
         bodyKeys: []
-        formatEN: clean monitor datas
+        formatEN: clean monitor data
         formatZH: 清空监控数据
         paramKeys: []
   /hosts/monitor/search:
@@ -10190,7 +10196,7 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Load monitor datas
+      summary: Load monitor data
       tags:
       - Monitor
   /hosts/search:

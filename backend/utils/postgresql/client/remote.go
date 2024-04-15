@@ -207,7 +207,7 @@ func (r *Remote) SyncDB() ([]SyncDBInfo, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 300*time.Second)
 	defer cancel()
 
-	var datas []SyncDBInfo
+	var lists []SyncDBInfo
 	rows, err := r.Client.Query("SELECT datname FROM pg_database;")
 	if err != nil {
 		return nil, err
@@ -221,12 +221,12 @@ func (r *Remote) SyncDB() ([]SyncDBInfo, error) {
 		if len(dbName) == 0 || dbName == "postgres" || dbName == "template1" || dbName == "template0" || dbName == r.User {
 			continue
 		}
-		datas = append(datas, SyncDBInfo{Name: dbName, From: r.From, PostgresqlName: r.Database})
+		lists = append(lists, SyncDBInfo{Name: dbName, From: r.From, PostgresqlName: r.Database})
 	}
 	if ctx.Err() == context.DeadlineExceeded {
 		return nil, buserr.New(constant.ErrExecTimeOut)
 	}
-	return datas, nil
+	return lists, nil
 }
 
 func (r *Remote) Close() {

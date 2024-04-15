@@ -441,11 +441,11 @@ const checkExist = (data: App.CheckInstalled) => {
 
 const loadDBOptions = async () => {
     const res = await listDatabases('postgresql');
-    let datas = res.data || [];
+    let lists = res.data || [];
     dbOptionsLocal.value = [];
     dbOptionsRemote.value = [];
     currentDBName.value = globalStore.currentDB;
-    for (const item of datas) {
+    for (const item of lists) {
         if (currentDBName.value && item.database === currentDBName.value) {
             currentDB.value = item;
             if (item.from === 'local') {

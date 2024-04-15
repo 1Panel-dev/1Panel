@@ -130,7 +130,7 @@ func OperationLog() gin.HandlerFunc {
 
 		c.Next()
 
-		datas := writer.body.Bytes()
+		lists := writer.body.Bytes()
 		if c.Request.Header.Get("Content-Encoding") == "gzip" {
 			buf := bytes.NewReader(writer.body.Bytes())
 			reader, err := gzip.NewReader(buf)
@@ -146,10 +146,10 @@ func OperationLog() gin.HandlerFunc {
 				return
 			}
 			defer reader.Close()
-			datas, _ = io.ReadAll(reader)
+			lists, _ = io.ReadAll(reader)
 		}
 		var res response
-		_ = json.Unmarshal(datas, &res)
+		_ = json.Unmarshal(lists, &res)
 		if res.Code == 200 {
 			record.Status = constant.StatusSuccess
 		} else {

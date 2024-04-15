@@ -70,7 +70,7 @@ func (u *FirewallService) LoadBaseInfo() (dto.FirewallBaseInfo, error) {
 
 func (u *FirewallService) SearchWithPage(req dto.RuleSearch) (int64, interface{}, error) {
 	var (
-		datas     []fireClient.FireInfo
+		lists     []fireClient.FireInfo
 		backDatas []fireClient.FireInfo
 	)
 
@@ -86,11 +86,11 @@ func (u *FirewallService) SearchWithPage(req dto.RuleSearch) (int64, interface{}
 		if len(req.Info) != 0 {
 			for _, port := range ports {
 				if strings.Contains(port.Port, req.Info) {
-					datas = append(datas, port)
+					lists = append(lists, port)
 				}
 			}
 		} else {
-			datas = ports
+			lists = ports
 		}
 	} else {
 		addrs, err := client.ListAddress()
@@ -100,23 +100,23 @@ func (u *FirewallService) SearchWithPage(req dto.RuleSearch) (int64, interface{}
 		if len(req.Info) != 0 {
 			for _, addr := range addrs {
 				if strings.Contains(addr.Address, req.Info) {
-					datas = append(datas, addr)
+					lists = append(lists, addr)
 				}
 			}
 		} else {
-			datas = addrs
+			lists = addrs
 		}
 	}
 
 	if req.Type == "port" {
 		apps := u.loadPortByApp()
-		for i := 0; i < len(datas); i++ {
-			datas[i].UsedStatus = checkPortUsed(datas[i].Port, datas[i].Protocol, apps)
+		for i := 0; i < len(lists); i++ {
+			lists[i].UsedStatus = checkPortUsed(lists[i].Port, lists[i].Protocol, apps)
 		}
 	}
 	var datasFilterStatus []fireClient.FireInfo
 	if len(req.Status) != 0 {
-		for _, data := range datas {
+		for _, data := range lists {
 			if req.Status == "free" && len(data.UsedStatus) == 0 {
 				datasFilterStatus = append(datasFilterStatus, data)
 			}
@@ -125,7 +125,7 @@ func (u *FirewallService) SearchWithPage(req dto.RuleSearch) (int64, interface{}
 			}
 		}
 	} else {
-		datasFilterStatus = datas
+		datasFilterStatus = lists
 	}
 	var datasFilterStrategy []fireClient.FireInfo
 	if len(req.Strategy) != 0 {
@@ -429,13 +429,13 @@ type portOfApp struct {
 }
 
 func (u *FirewallService) loadPortByApp() []portOfApp {
-	var datas []portOfApp
+	var lists []portOfApp
 	apps, err := appInstallRepo.ListBy()
 	if err != nil {
-		return datas
+		return lists
 	}
 	for i := 0; i < len(apps); i++ {
-		datas = append(datas, portOfApp{
+		lists = append(lists, portOfApp{
 			AppName:   apps[i].App.Key,
 			HttpPort:  strconv.Itoa(apps[i].HttpPort),
 			HttpsPort: strconv.Itoa(apps[i].HttpsPort),
@@ -443,11 +443,11 @@ func (u *FirewallService) loadPortByApp() []portOfApp {
 	}
 	systemPort, err := settingRepo.Get(settingRepo.WithByKey("ServerPort"))
 	if err != nil {
-		return datas
+		return lists
 	}
-	datas = append(datas, portOfApp{AppName: "1panel", HttpPort: systemPort.Value})
+	lists = append(lists, portOfApp{AppName: "1panel", HttpPort: systemPort.Value})
 
-	return datas
+	return lists
 }
 
 func (u *FirewallService) cleanUnUsedData(client firewall.FirewallClient) {

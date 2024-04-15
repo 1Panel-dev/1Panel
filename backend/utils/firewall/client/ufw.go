@@ -84,7 +84,7 @@ func (f *Ufw) ListPort() ([]FireInfo, error) {
 		return nil, err
 	}
 	portInfos := strings.Split(stdout, "\n")
-	var datas []FireInfo
+	var lists []FireInfo
 	isStart := false
 	for _, line := range portInfos {
 		if strings.HasPrefix(line, "-") {
@@ -97,10 +97,10 @@ func (f *Ufw) ListPort() ([]FireInfo, error) {
 		itemFire := f.loadInfo(line, "port")
 		if len(itemFire.Port) != 0 && itemFire.Port != "Anywhere" && !strings.Contains(itemFire.Port, ".") {
 			itemFire.Port = strings.ReplaceAll(itemFire.Port, ":", "-")
-			datas = append(datas, itemFire)
+			lists = append(lists, itemFire)
 		}
 	}
-	return datas, nil
+	return lists, nil
 }
 
 func (f *Ufw) ListAddress() ([]FireInfo, error) {
@@ -109,7 +109,7 @@ func (f *Ufw) ListAddress() ([]FireInfo, error) {
 		return nil, err
 	}
 	portInfos := strings.Split(stdout, "\n")
-	var datas []FireInfo
+	var lists []FireInfo
 	isStart := false
 	for _, line := range portInfos {
 		if strings.HasPrefix(line, "-") {
@@ -128,10 +128,10 @@ func (f *Ufw) ListAddress() ([]FireInfo, error) {
 			itemFire.Port = ""
 		}
 		if len(itemFire.Port) == 0 && len(itemFire.Address) != 0 {
-			datas = append(datas, itemFire)
+			lists = append(lists, itemFire)
 		}
 	}
-	return datas, nil
+	return lists, nil
 }
 
 func (f *Ufw) Port(port FireInfo, operation string) error {

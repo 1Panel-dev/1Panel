@@ -186,12 +186,12 @@ func (u *MysqlService) LoadFromRemote(req dto.MysqlLoadDB) error {
 	if err != nil {
 		return err
 	}
-	datas, err := client.SyncDB(version)
+	lists, err := client.SyncDB(version)
 	if err != nil {
 		return err
 	}
 	deleteList := databases
-	for _, data := range datas {
+	for _, data := range lists {
 		hasOld := false
 		for i := 0; i < len(databases); i++ {
 			if strings.EqualFold(databases[i].Name, data.Name) && strings.EqualFold(databases[i].MysqlName, data.MysqlName) {

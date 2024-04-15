@@ -36,11 +36,11 @@ func (k kodoClient) ListBuckets() ([]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	var datas []interface{}
+	var lists []interface{}
 	for _, bucket := range buckets {
-		datas = append(datas, bucket)
+		lists = append(lists, bucket)
 	}
-	return datas, nil
+	return lists, nil
 }
 
 func (k kodoClient) Exist(path string) (bool, error) {

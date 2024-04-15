@@ -309,7 +309,7 @@ func (u *SSHService) LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error) {
 	nyc, _ := time.LoadLocation(common.LoadTimeZone())
 	qqWry, err := qqwry.NewQQwry()
 	if err != nil {
-		global.LOG.Errorf("load qqwry datas failed: %s", err)
+		global.LOG.Errorf("load qqwry data failed: %s", err)
 	}
 	for _, file := range fileList {
 		commandItem := ""
@@ -408,13 +408,13 @@ func updateSSHConf(oldFiles []string, param string, value string) []string {
 
 func loadSSHData(command string, showCountFrom, showCountTo, currentYear int, qqWry *qqwry.QQwry, nyc *time.Location) ([]dto.SSHHistory, int, int) {
 	var (
-		datas        []dto.SSHHistory
+		lists        []dto.SSHHistory
 		successCount int
 		failedCount  int
 	)
 	stdout2, err := cmd.Exec(command)
 	if err != nil {
-		return datas, 0, 0
+		return lists, 0, 0
 	}
 	lines := strings.Split(string(stdout2), "\n")
 	for i := len(lines) - 1; i >= 0; i-- {
@@ -426,7 +426,7 @@ func loadSSHData(command string, showCountFrom, showCountTo, currentYear int, qq
 				if successCount+failedCount >= showCountFrom && successCount+failedCount < showCountTo {
 					itemData.Area = qqWry.Find(itemData.Address).Area
 					itemData.Date = loadDate(currentYear, itemData.DateStr, nyc)
-					datas = append(datas, itemData)
+					lists = append(lists, itemData)
 				}
 				failedCount++
 			}
@@ -436,7 +436,7 @@ func loadSSHData(command string, showCountFrom, showCountTo, currentYear int, qq
 				if successCount+failedCount >= showCountFrom && successCount+failedCount < showCountTo {
 					itemData.Area = qqWry.Find(itemData.Address).Area
 					itemData.Date = loadDate(currentYear, itemData.DateStr, nyc)
-					datas = append(datas, itemData)
+					lists = append(lists, itemData)
 				}
 				failedCount++
 			}
@@ -446,13 +446,13 @@ func loadSSHData(command string, showCountFrom, showCountTo, currentYear int, qq
 				if successCount+failedCount >= showCountFrom && successCount+failedCount < showCountTo {
 					itemData.Area = qqWry.Find(itemData.Address).Area
 					itemData.Date = loadDate(currentYear, itemData.DateStr, nyc)
-					datas = append(datas, itemData)
+					lists = append(lists, itemData)
 				}
 				successCount++
 			}
 		}
 	}
-	return datas, successCount, failedCount
+	return lists, successCount, failedCount
 }
 
 func loadSuccessDatas(line string) dto.SSHHistory {

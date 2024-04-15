@@ -205,12 +205,12 @@ type diskInfo struct {
 }
 
 func loadDiskInfo() []dto.DiskInfo {
-	var datas []dto.DiskInfo
+	var lists []dto.DiskInfo
 	stdout, err := cmd.ExecWithTimeOut("df -hT -P|grep '/'|grep -v tmpfs|grep -v 'snap/core'|grep -v udev", 2*time.Second)
 	if err != nil {
 		stdout, err = cmd.ExecWithTimeOut("df -lhT -P|grep '/'|grep -v tmpfs|grep -v 'snap/core'|grep -v udev", 1*time.Second)
 		if err != nil {
-			return datas
+			return lists
 		}
 	}
 	lines := strings.Split(stdout, "\n")
@@ -259,14 +259,14 @@ func loadDiskInfo() []dto.DiskInfo {
 			select {
 			case <-timeoutCh:
 				mu.Lock()
-				datas = append(datas, itemData)
+				lists = append(lists, itemData)
 				mu.Unlock()
 				global.LOG.Errorf("load disk info from %s failed, err: timeout", mount.Mount)
 			default:
 				state, err := disk.Usage(mount.Mount)
 				if err != nil {
 					mu.Lock()
-					datas = append(datas, itemData)
+					lists = append(lists, itemData)
 					mu.Unlock()
 					global.LOG.Errorf("load disk info from %s failed, err: %v", mount.Mount, err)
 					return
@@ -280,17 +280,17 @@ func loadDiskInfo() []dto.DiskInfo {
 				itemData.InodesFree = state.InodesFree
 				itemData.InodesUsedPercent = state.InodesUsedPercent
 				mu.Lock()
-				datas = append(datas, itemData)
+				lists = append(lists, itemData)
 				mu.Unlock()
 			}
 		}(time.After(5*time.Second), mounts[i])
 	}
 	wg.Wait()
 
-	sort.Slice(datas, func(i, j int) bool {
-		return datas[i].Path < datas[j].Path
+	sort.Slice(lists, func(i, j int) bool {
+		return lists[i].Path < lists[j].Path
 	})
-	return datas
+	return lists
 }
 
 func loadGPUInfo() []dto.GPUInfo {

@@ -16,7 +16,7 @@ import (
 )
 
 // @Tags Monitor
-// @Summary Load monitor datas
+// @Summary Load monitor data
 // @Description 获取监控数据
 // @Param request body dto.MonitorSearch true "request"
 // @Success 200
@@ -88,12 +88,12 @@ func (b *BaseApi) LoadMonitor(c *gin.Context) {
 }
 
 // @Tags Monitor
-// @Summary Clean monitor datas
+// @Summary Clean monitor data
 // @Description 清空监控数据
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /hosts/monitor/clean [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"清空监控数据","formatEN":"clean monitor datas"}
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"清空监控数据","formatEN":"clean monitor data"}
 func (b *BaseApi) CleanMonitor(c *gin.Context) {
 	if err := global.MonitorDB.Exec("DELETE FROM monitor_bases").Error; err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)

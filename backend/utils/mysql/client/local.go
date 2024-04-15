@@ -263,10 +263,10 @@ func (r *Local) Recover(info RecoverInfo) error {
 }
 
 func (r *Local) SyncDB(version string) ([]SyncDBInfo, error) {
-	var datas []SyncDBInfo
+	var lists []SyncDBInfo
 	lines, err := r.ExecSQLForRows("SELECT SCHEMA_NAME, DEFAULT_CHARACTER_SET_NAME FROM information_schema.SCHEMATA", 300)
 	if err != nil {
-		return datas, err
+		return lists, err
 	}
 	for _, line := range lines {
 		parts := strings.Fields(line)
@@ -284,7 +284,7 @@ func (r *Local) SyncDB(version string) ([]SyncDBInfo, error) {
 		}
 		userLines, err := r.ExecSQLForRows(fmt.Sprintf("select user,host from mysql.db where db = '%s'", parts[0]), 300)
 		if err != nil {
-			return datas, err
+			return lists, err
 		}
 
 		var permissionItem []string
@@ -320,9 +320,9 @@ func (r *Local) SyncDB(version string) ([]SyncDBInfo, error) {
 				dataItem.Permission = strings.Join(permissionItem, ",")
 			}
 		}
-		datas = append(datas, dataItem)
+		lists = append(lists, dataItem)
 	}
-	return datas, nil
+	return lists, nil
 }
 
 func (r *Local) Close() {}

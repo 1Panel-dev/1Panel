@@ -622,11 +622,11 @@ var UpdateDatabase = &gormigrate.Migration{
 			return err
 		}
 
-		var datas []model.Database
-		if err := tx.Find(&datas).Error; err != nil {
+		var lists []model.Database
+		if err := tx.Find(&lists).Error; err != nil {
 			return nil
 		}
-		for _, data := range datas {
+		for _, data := range lists {
 			pass, err := encrypt.StringEncrypt(data.Password)
 			if err != nil {
 				global.LOG.Errorf("encrypt database %s password failed, err: %v", data.Name, err)

@@ -223,16 +223,16 @@ func (u *ContainerService) List() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	var datas []string
+	var lists []string
 	for _, container := range containers {
 		for _, name := range container.Names {
 			if len(name) != 0 {
-				datas = append(datas, strings.TrimPrefix(name, "/"))
+				lists = append(lists, strings.TrimPrefix(name, "/"))
 			}
 		}
 	}
 
-	return datas, nil
+	return lists, nil
 }
 
 func (u *ContainerService) ContainerListStats() ([]dto.ContainerListStats, error) {
@@ -244,17 +244,17 @@ func (u *ContainerService) ContainerListStats() ([]dto.ContainerListStats, error
 	if err != nil {
 		return nil, err
 	}
-	var datas []dto.ContainerListStats
+	var lists []dto.ContainerListStats
 	var wg sync.WaitGroup
 	wg.Add(len(list))
 	for i := 0; i < len(list); i++ {
 		go func(item types.Container) {
-			datas = append(datas, loadCpuAndMem(client, item.ID))
+			lists = append(lists, loadCpuAndMem(client, item.ID))
 			wg.Done()
 		}(list[i])
 	}
 	wg.Wait()
-	return datas, nil
+	return lists, nil
 }
 
 func (u *ContainerService) Inspect(req dto.InspectReq) (string, error) {
@@ -1068,7 +1068,7 @@ func reCreateAfterUpdate(name string, client *client.Client, config *container.C
 }
 
 func loadVolumeBinds(binds []types.MountPoint) []dto.VolumeHelper {
-	var datas []dto.VolumeHelper
+	var lists []dto.VolumeHelper
 	for _, bind := range binds {
 		var volumeItem dto.VolumeHelper
 		volumeItem.Type = string(bind.Type)
@@ -1082,9 +1082,9 @@ func loadVolumeBinds(binds []types.MountPoint) []dto.VolumeHelper {
 		if bind.RW {
 			volumeItem.Mode = "rw"
 		}
-		datas = append(datas, volumeItem)
+		lists = append(lists, volumeItem)
 	}
-	return datas
+	return lists
 }
 
 func loadContainerPort(ports []types.Port) []string {
@@ -1104,9 +1104,9 @@ func loadContainerPort(ports []types.Port) []string {
 	return append(list1, list2...)
 }
 func simplifyPort(ports []types.Port) []string {
-	var datas []string
+	var lists []string
 	if len(ports) == 0 {
-		return datas
+		return lists
 	}
 	if len(ports) == 1 {
 		ip := ""
@@ -1117,8 +1117,8 @@ func simplifyPort(ports []types.Port) []string {
 		if ports[0].PublicPort != 0 {
 			itemPortStr = fmt.Sprintf("%s%v->%v/%s", ip, ports[0].PublicPort, ports[0].PrivatePort, ports[0].Type)
 		}
-		datas = append(datas, itemPortStr)
-		return datas
+		lists = append(lists, itemPortStr)
+		return lists
 	}
 
 	sort.Slice(ports, func(i, j int) bool {
@@ -1136,7 +1136,7 @@ func simplifyPort(ports []types.Port) []string {
 				if len(start.IP) == 0 {
 					itemPortStr = strings.TrimPrefix(itemPortStr, ":")
 				}
-				datas = append(datas, itemPortStr)
+				lists = append(lists, itemPortStr)
 			} else {
 				itemPortStr := fmt.Sprintf("%s:%v-%v/%s", start.IP, start.PrivatePort, ports[i-1].PrivatePort, start.Type)
 				if start.PublicPort != 0 {
@@ -1145,7 +1145,7 @@ func simplifyPort(ports []types.Port) []string {
 				if len(start.IP) == 0 {
 					itemPortStr = strings.TrimPrefix(itemPortStr, ":")
 				}
-				datas = append(datas, itemPortStr)
+				lists = append(lists, itemPortStr)
 			}
 			start = ports[i]
 		}
@@ -1158,7 +1158,7 @@ func simplifyPort(ports []types.Port) []string {
 				if len(start.IP) == 0 {
 					itemPortStr = strings.TrimPrefix(itemPortStr, ":")
 				}
-				datas = append(datas, itemPortStr)
+				lists = append(lists, itemPortStr)
 			} else {
 				itemPortStr := fmt.Sprintf("%s:%v-%v/%s", start.IP, start.PrivatePort, ports[i].PrivatePort, start.Type)
 				if start.PublicPort != 0 {
@@ -1167,9 +1167,9 @@ func simplifyPort(ports []types.Port) []string {
 				if len(start.IP) == 0 {
 					itemPortStr = strings.TrimPrefix(itemPortStr, ":")
 				}
-				datas = append(datas, itemPortStr)
+				lists = append(lists, itemPortStr)
 			}
 		}
 	}
-	return datas
+	return lists
 }
