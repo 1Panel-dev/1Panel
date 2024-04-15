@@ -54,7 +54,10 @@ func (f FileOp) GetContent(dst string) ([]byte, error) {
 }
 
 func (f FileOp) CreateDir(dst string, mode fs.FileMode) error {
-	return f.Fs.MkdirAll(dst, mode)
+	if err := f.Fs.MkdirAll(dst, mode); err != nil {
+		return err
+	}
+	return f.ChmodR(dst, int64(mode), true)
 }
 
 func (f FileOp) CreateFile(dst string) error {
