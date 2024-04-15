@@ -18,6 +18,10 @@ export const syncLicense = () => {
     return http.post(`/licenses/sync`);
 };
 
+export const unbindLicense = () => {
+    return http.post(`/licenses/unbind`);
+};
+
 export const getSettingInfo = () => {
     return http.post<Setting.SettingInfo>(`/settings/search`);
 };
