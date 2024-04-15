@@ -416,10 +416,14 @@ func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.Contai
 
 	networkSettings := oldContainer.NetworkSettings
 	bridgeNetworkSettings := networkSettings.Networks[data.Network]
-	ipv4Address := bridgeNetworkSettings.IPAMConfig.IPv4Address
-	ipv6Address := bridgeNetworkSettings.IPAMConfig.IPv6Address
-	data.Ipv4 = ipv4Address
-	data.Ipv6 = ipv6Address
+	if bridgeNetworkSettings.IPAMConfig != nil {
+		ipv4Address := bridgeNetworkSettings.IPAMConfig.IPv4Address
+		data.Ipv4 = ipv4Address
+		ipv6Address := bridgeNetworkSettings.IPAMConfig.IPv6Address
+		data.Ipv6 = ipv6Address
+	} else {
+		data.Ipv4 = bridgeNetworkSettings.IPAddress
+	}
 
 	data.Cmd = oldContainer.Config.Cmd
 	data.OpenStdin = oldContainer.Config.OpenStdin
