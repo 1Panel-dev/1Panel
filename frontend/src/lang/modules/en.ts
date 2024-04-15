@@ -172,6 +172,7 @@ const message = {
             dbName: 'Supports non-special character starting, including English, Chinese, numbers, .-_, with a length of 1-64',
             imageName: 'Support English, numbers, :/.-_, length 1-150',
             volumeName: 'Support English, numbers, .-_, length 2-30',
+            supervisorName: 'Supports non-special characters starting with English, numbers, - and _, length 1-128',
             complexityPassword:
                 'Please enter a password combination with a length of 8-30 characters, including letters, numbers, and at least two special characters.',
             commonPassword: 'Please enter a password with more than 6 characters',

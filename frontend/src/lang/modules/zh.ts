@@ -172,6 +172,7 @@ const message = {
             dbName: '支持非特殊字符开头，英文、中文、数字、.-_,长度1-64',
             imageName: '支持英文、数字、:/.-_,长度1-150',
             volumeName: '支持英文、数字、.-和_,长度2-30',
+            supervisorName: '支持非特殊字符开头,英文、数字、-和_,长度1-128',
             complexityPassword: '请输入长度为 8-30 位且包含字母、数字、特殊字符至少两项的密码组合',
             commonPassword: '请输入 6 位以上长度密码',
             linuxName: '长度1-128，名称不能含有{0}等符号',
