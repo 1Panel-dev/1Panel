@@ -18,6 +18,9 @@
                                     >
                                         {{ $t('commons.button.sync') }}
                                     </el-button>
+                                    <el-button type="primary" class="ml-3" plain @click="onUnBind()" size="small">
+                                        {{ $t('license.unbind') }}
+                                    </el-button>
                                 </el-descriptions-item>
                                 <el-descriptions-item :label="$t('license.authorizedUser')">
                                     {{ license.assigneeName || '-' }}
@@ -104,7 +107,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue';
-import { getLicense, syncLicense } from '@/api/modules/setting';
+import { getLicense, syncLicense, unbindLicense } from '@/api/modules/setting';
 import CardWithHeader from '@/components/card-with-header/index.vue';
 import LicenseImport from '@/components/license-import/index.vue';
 import i18n from '@/lang';
@@ -135,11 +138,30 @@ const onSync = async () => {
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            search();
+            window.location.reload();
         })
         .catch(() => {
             loading.value = false;
         });
+};
+
+const onUnBind = async () => {
+    ElMessageBox.confirm(i18n.global.t('license.unbindHelper'), i18n.global.t('license.unbind'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(async () => {
+        loading.value = true;
+        await unbindLicense()
+            .then(() => {
+                loading.value = false;
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                window.location.reload();
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
 };
 
 const timestampToDate = (timestamp: number) => {

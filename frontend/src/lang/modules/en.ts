@@ -1516,6 +1516,8 @@ const message = {
         quickUpdate: 'Quick Update',
         import: 'Import',
         power: 'Authorize',
+        unbind: 'Unbind License',
+        unbindHelper: 'All Pro related Settings will be cleared after unbinding. Do you want to continue? ',
         importLicense: 'Import License',
         importHelper: 'Please click or drag the license file here',
         technicalAdvice: 'Technical Advice',

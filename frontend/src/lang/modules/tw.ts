@@ -1414,6 +1414,8 @@ const message = {
         quickUpdate: '快速更新',
         import: '導入',
         power: '授 權',
+        unbind: '解除綁定',
+        unbindHelper: '解除綁定後將清除所有專業版相關設置，是否繼續？',
         importLicense: '導入許可證',
         importHelper: '請點擊或拖動許可文件到此處',
         technicalAdvice: '技術諮詢',
