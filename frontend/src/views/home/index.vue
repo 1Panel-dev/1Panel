@@ -505,8 +505,8 @@ function loadUpTime(uptime: number) {
 const loadData = async () => {
     if (chartOption.value === 'io') {
         chartsOption.value['ioChart'] = {
-            xDatas: timeIODatas.value,
-            yDatas: [
+            xData: timeIODatas.value,
+            yData: [
                 {
                     name: i18n.global.t('monitor.read'),
                     data: ioReadBytes.value,
@@ -520,8 +520,8 @@ const loadData = async () => {
         };
     } else {
         chartsOption.value['networkChart'] = {
-            xDatas: timeNetDatas.value,
-            yDatas: [
+            xData: timeNetDatas.value,
+            yData: [
                 {
                     name: i18n.global.t('monitor.up'),
                     data: netBytesSents.value,
