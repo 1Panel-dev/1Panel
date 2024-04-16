@@ -15,17 +15,17 @@
                 </el-select>
             </el-form-item>
             <el-form-item :label="$t('file.language')">
-                <el-select v-model="config.language" @change="changeLanguage()" class="p-w-200">
+                <el-select v-model="config.language" @change="changeLanguage()" class="!w-32">
                     <el-option v-for="lang in Languages" :key="lang.label" :value="lang.label" :label="lang.label" />
                 </el-select>
             </el-form-item>
             <el-form-item :label="$t('file.eol')">
-                <el-select v-model="config.eol" @change="changeEOL()" class="p-w-200">
+                <el-select v-model="config.eol" @change="changeEOL()" class="p-w-150">
                     <el-option v-for="eol in eols" :key="eol.label" :value="eol.value" :label="eol.label" />
                 </el-select>
             </el-form-item>
             <el-form-item :label="$t('file.wordWrap')">
-                <el-select v-model="config.wordWrap" @change="changeWarp()" class="p-w-200">
+                <el-select v-model="config.wordWrap" @change="changeWarp()" class="p-w-100">
                     <el-option :label="$t('commons.button.enable')" value="on"></el-option>
                     <el-option :label="$t('commons.button.disable')" value="off"></el-option>
                 </el-select>
