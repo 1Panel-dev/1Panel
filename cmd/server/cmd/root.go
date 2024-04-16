@@ -59,6 +59,14 @@ func getSettingByKey(db *gorm.DB, key string) string {
 	return setting.Value
 }
 
+type LoginLog struct{}
+
+func isDefault(db *gorm.DB) bool {
+	logCount := int64(0)
+	_ = db.Model(&LoginLog{}).Where("status = ?", "Success").Count(&logCount).Error
+	return logCount == 0
+}
+
 func setSettingByKey(db *gorm.DB, key, value string) error {
 	return db.Model(&setting{}).Where("key = ?", key).Updates(map[string]interface{}{"value": value}).Error
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"os"
+	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
@@ -57,21 +58,7 @@ func Init() {
 		global.LOG.Fatalf("init service before start failed, err: %v", err)
 	}
 
-	if global.CONF.System.ChangeUserInfo {
-		if err := settingRepo.Update("UserName", common.RandStrAndNum(10)); err != nil {
-			global.LOG.Fatalf("init username before start failed, err: %v", err)
-		}
-		pass, _ := encrypt.StringEncrypt(common.RandStrAndNum(10))
-		if err := settingRepo.Update("Password", pass); err != nil {
-			global.LOG.Fatalf("init password before start failed, err: %v", err)
-		}
-		if err := settingRepo.Update("SecurityEntrance", common.RandStrAndNum(10)); err != nil {
-			global.LOG.Fatalf("init entrance before start failed, err: %v", err)
-		}
-
-		sudo := cmd.SudoHandleCmd()
-		_, _ = cmd.Execf("%s sed -i '/CHANGE_USER_INFO=true/d' /usr/local/bin/1pctl", sudo)
-	}
+	handleUserInfo(global.CONF.System.ChangeUserInfo, settingRepo)
 
 	handleCronjobStatus()
 	handleSnapStatus()
@@ -172,4 +159,42 @@ func loadLocalDir() {
 		return
 	}
 	global.LOG.Errorf("error type dir: %T", varMap["dir"])
+}
+
+func handleUserInfo(tags string, settingRepo repo.ISettingRepo) {
+	if len(tags) == 0 {
+		return
+	}
+	if tags == "all" {
+		if err := settingRepo.Update("UserName", common.RandStrAndNum(10)); err != nil {
+			global.LOG.Fatalf("init username before start failed, err: %v", err)
+		}
+		pass, _ := encrypt.StringEncrypt(common.RandStrAndNum(10))
+		if err := settingRepo.Update("Password", pass); err != nil {
+			global.LOG.Fatalf("init password before start failed, err: %v", err)
+		}
+		if err := settingRepo.Update("SecurityEntrance", common.RandStrAndNum(10)); err != nil {
+			global.LOG.Fatalf("init entrance before start failed, err: %v", err)
+		}
+		return
+	}
+	if strings.Contains(global.CONF.System.ChangeUserInfo, "username") {
+		if err := settingRepo.Update("UserName", common.RandStrAndNum(10)); err != nil {
+			global.LOG.Fatalf("init username before start failed, err: %v", err)
+		}
+	}
+	if strings.Contains(global.CONF.System.ChangeUserInfo, "password") {
+		pass, _ := encrypt.StringEncrypt(common.RandStrAndNum(10))
+		if err := settingRepo.Update("Password", pass); err != nil {
+			global.LOG.Fatalf("init password before start failed, err: %v", err)
+		}
+	}
+	if strings.Contains(global.CONF.System.ChangeUserInfo, "entrance") {
+		if err := settingRepo.Update("SecurityEntrance", common.RandStrAndNum(10)); err != nil {
+			global.LOG.Fatalf("init entrance before start failed, err: %v", err)
+		}
+	}
+
+	sudo := cmd.SudoHandleCmd()
+	_, _ = cmd.Execf("%s sed -i '/CHANGE_USER_INFO=%v/d' /usr/local/bin/1pctl", sudo, global.CONF.System.ChangeUserInfo)
 }
