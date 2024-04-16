@@ -74,7 +74,19 @@
                     </div>
 
                     <div class="ml-5" v-if="key === 'openresty' && (httpPort != 80 || httpsPort != 443)">
-                        <el-text type="danger">{{ $t('website.openrestyHelper', [httpPort, httpsPort]) }}</el-text>
+                        <el-tooltip
+                            effect="dark"
+                            :content="$t('website.openrestyHelper', [httpPort, httpsPort])"
+                            placement="top-start"
+                        >
+                            <el-alert
+                                :title="$t('app.checkTitle')"
+                                :closable="false"
+                                type="warning"
+                                show-icon
+                                class="h-8"
+                            />
+                        </el-tooltip>
                     </div>
                 </div>
             </el-card>
