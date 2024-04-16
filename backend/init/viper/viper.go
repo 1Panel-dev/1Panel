@@ -96,7 +96,7 @@ func Init() {
 	global.CONF.System.Username = username
 	global.CONF.System.Password = password
 	global.CONF.System.Entrance = entrance
-	global.CONF.System.ChangeUserInfo = loadChange()
+	global.CONF.System.ChangeUserInfo = loadChangeInfo()
 	global.Viper = v
 }
 
@@ -112,10 +112,10 @@ func loadParams(param string) string {
 	return info
 }
 
-func loadChange() bool {
+func loadChangeInfo() string {
 	stdout, err := cmd.Exec("grep '^CHANGE_USER_INFO=' /usr/bin/1pctl | cut -d'=' -f2")
 	if err != nil {
-		return false
+		return ""
 	}
-	return stdout == "true\n"
+	return strings.ReplaceAll(stdout, "\n", "")
 }

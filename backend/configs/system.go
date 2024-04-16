@@ -22,7 +22,7 @@ type System struct {
 	Entrance       string `mapstructure:"entrance"`
 	IsDemo         bool   `mapstructure:"is_demo"`
 	AppRepo        string `mapstructure:"app_repo"`
-	ChangeUserInfo bool   `mapstructure:"change_user_info"`
+	ChangeUserInfo string `mapstructure:"change_user_info"`
 	OneDriveID     string `mapstructure:"one_drive_id"`
 	OneDriveSc     string `mapstructure:"one_drive_sc"`
 }
