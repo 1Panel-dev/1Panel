@@ -656,7 +656,6 @@ func (u *ContainerService) ContainerLogs(wsConn *websocket.Conn, containerType, 
 		commandArg = append(commandArg, "-f")
 	}
 	if !follow {
-		commandArg = append(commandArg, "2>&1")
 		cmd := exec.Command(commandName, commandArg...)
 		stdout, _ := cmd.CombinedOutput()
 		if !utf8.Valid(stdout) {

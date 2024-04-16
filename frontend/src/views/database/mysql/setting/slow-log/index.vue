@@ -56,6 +56,8 @@ import { loadDBFile, updateMysqlVariables } from '@/api/modules/database';
 import { dateFormatForName, downloadWithContent } from '@/utils/util';
 import i18n from '@/lang';
 import { MsgError, MsgInfo, MsgSuccess } from '@/utils/message';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const extensions = [javascript(), oneDark];
 const slowLogs = ref();
@@ -120,7 +122,18 @@ const handleSlowLogs = async () => {
 };
 
 const getDynamicHeight = () => {
-    return variables.slow_query_log === 'ON' ? `calc(100vh - 437px)` : `calc(100vh - 383px)`;
+    if (variables.slow_query_log === 'ON') {
+        if (globalStore.openMenuTabs) {
+            return `calc(100vh - 467px)`;
+        } else {
+            return `calc(100vh - 437px)`;
+        }
+    }
+    if (globalStore.openMenuTabs) {
+        return `calc(100vh - 413px)`;
+    } else {
+        return `calc(100vh - 383px)`;
+    }
 };
 
 const changeSlowLogs = () => {

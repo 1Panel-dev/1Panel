@@ -170,7 +170,7 @@
                         placeholder="# The Docker configuration file does not exist or is empty (/etc/docker/daemon.json)"
                         :indent-with-tab="true"
                         :tabSize="4"
-                        style="margin-top: 10px; height: calc(100vh - 430px)"
+                        :style="{ height: `calc(100vh - ${loadHeight()})`, 'margin-top': '10px' }"
                         :lineWrapping="true"
                         :matchBrackets="true"
                         theme="cobalt"
@@ -264,6 +264,8 @@ import {
 import { getSettingInfo } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
 import { checkNumberRange } from '@/global/form-rules';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const unset = ref(i18n.global.t('setting.unSetting'));
 const submitInput = ref();
@@ -324,6 +326,10 @@ const onSaveFile = async () => {
         submitInputInfo: i18n.global.t('database.restartNow'),
     };
     confirmDialogRefFile.value!.acceptParams(params);
+};
+
+const loadHeight = () => {
+    return globalStore.openMenuTabs ? '450px' : '430px';
 };
 
 const onChangeMirrors = () => {

@@ -21,7 +21,7 @@
             </template>
             <template #main v-if="redisIsExist && !isOnSetting">
                 <Terminal
-                    style="height: calc(100vh - 370px)"
+                    :style="{ height: `calc(100vh - ${loadHeight()})` }"
                     :key="isRefresh"
                     ref="terminalRef"
                     v-show="terminalShow"
@@ -68,6 +68,8 @@ import { nextTick, onBeforeUnmount, ref } from 'vue';
 import { App } from '@/api/interface/app';
 import { GetAppPort } from '@/api/modules/app';
 import router from '@/routers';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const loading = ref(false);
 const maskShow = ref(true);
@@ -92,6 +94,10 @@ const onSetting = async () => {
     terminalRef.value?.onClose(false);
     terminalShow.value = false;
     settingRef.value!.acceptParams({ status: redisStatus.value, redisName: redisName.value });
+};
+
+const loadHeight = () => {
+    return globalStore.openMenuTabs ? '400px' : '370px';
 };
 
 const goDashboard = async () => {
