@@ -31,7 +31,7 @@
             :placeholder="$t('commons.msg.noneData')"
             :indent-with-tab="true"
             :tabSize="4"
-            style="margin-top: 10px; height: calc(100vh - 375px)"
+            :style="{ height: `calc(100vh - ${loadHeight()})`, 'margin-top': '10px' }"
             :lineWrapping="true"
             :matchBrackets="true"
             theme="cobalt"
@@ -53,6 +53,8 @@ import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { MsgError, MsgSuccess } from '@/utils/message';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const extensions = [javascript(), oneDark];
 
@@ -62,6 +64,10 @@ const handleReady = (payload) => {
     view.value = payload.view;
 };
 const terminalSocket = ref<WebSocket>();
+
+const loadHeight = () => {
+    return globalStore.openMenuTabs ? '405px' : '375px';
+};
 
 const logSearch = reactive({
     isWatch: false,

@@ -44,7 +44,7 @@
                     </span>
                 </template>
                 <Terminal
-                    style="height: calc(100vh - 229px); background-color: #000"
+                    :style="{ height: `calc(100vh - ${loadHeight()})`, 'background-color': '#000' }"
                     :ref="'t-' + item.index"
                     :key="item.Refresh"
                 ></Terminal>
@@ -121,13 +121,19 @@
             </el-tab-pane>
             <div v-if="terminalTabs.length === 0">
                 <el-empty
-                    style="background-color: #000; height: calc(100vh - 200px)"
+                    :style="{ height: `calc(100vh - ${loadEmptyHeight()})`, 'background-color': '#000' }"
                     :description="$t('terminal.emptyTerminal')"
                 ></el-empty>
             </div>
         </el-tabs>
         <el-tooltip :content="loadTooltip()" placement="top">
-            <el-button @click="toggleFullscreen" v-if="!mobile" class="fullScreen" icon="FullScreen"></el-button>
+            <el-button
+                @click="toggleFullscreen"
+                v-if="!mobile"
+                class="fullScreen"
+                :style="{ top: loadFullScreenHeight() }"
+                icon="FullScreen"
+            ></el-button>
         </el-tooltip>
 
         <HostDialog ref="dialogRef" @on-conn-terminal="onConnTerminal" @load-host-tree="loadHostTree" />
@@ -234,6 +240,16 @@ const cleanTimer = () => {
             terminal.status = ctx.refs[`t-${terminal.index}`][0].onClose();
         }
     }
+};
+
+const loadHeight = () => {
+    return globalStore.openMenuTabs ? '269px' : '229px';
+};
+const loadEmptyHeight = () => {
+    return globalStore.openMenuTabs ? '240px' : '200px';
+};
+const loadFullScreenHeight = () => {
+    return globalStore.openMenuTabs ? '66px' : '90px';
 };
 
 const handleTabsRemove = (targetName: string, action: 'remove' | 'add') => {
@@ -436,7 +452,6 @@ onMounted(() => {
     border: none;
     position: absolute;
     right: 50px;
-    top: 90px;
     font-weight: 600;
     font-size: 14px;
 }

@@ -57,7 +57,7 @@
                         :placeholder="$t('commons.msg.noneData')"
                         :indent-with-tab="true"
                         :tabSize="4"
-                        style="margin-top: 10px; height: calc(100vh - 375px)"
+                        :style="{ height: `calc(100vh - ${loadHeight()})`, 'margin-top': '10px' }"
                         :lineWrapping="true"
                         :matchBrackets="true"
                         theme="cobalt"
@@ -153,6 +153,8 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import router from '@/routers';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const loading = ref(false);
 
@@ -194,6 +196,10 @@ const dialogContainerLogRef = ref();
 const jumpToConf = async () => {
     activeName.value = 'conf';
     loadMysqlConf();
+};
+
+const loadHeight = () => {
+    return globalStore.openMenuTabs ? '405px' : '375px';
 };
 
 const jumpToSlowlog = async () => {

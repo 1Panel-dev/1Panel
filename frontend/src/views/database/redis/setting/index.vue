@@ -40,7 +40,7 @@
                         :placeholder="$t('commons.msg.noneData')"
                         :indent-with-tab="true"
                         :tabSize="4"
-                        style="margin-top: 10px; height: calc(100vh - 380px)"
+                        :style="{ height: `calc(100vh - ${loadHeight()})`, 'margin-top': '10px' }"
                         :lineWrapping="true"
                         :matchBrackets="true"
                         theme="cobalt"
@@ -140,6 +140,8 @@ import i18n from '@/lang';
 import { checkNumberRange, Rules } from '@/global/form-rules';
 import { ChangePort, GetAppDefaultConfig } from '@/api/modules/app';
 import { MsgSuccess } from '@/utils/message';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const extensions = [javascript(), oneDark];
 
@@ -148,6 +150,10 @@ const loading = ref(false);
 const view = shallowRef();
 const handleReady = (payload) => {
     view.value = payload.view;
+};
+
+const loadHeight = () => {
+    return globalStore.openMenuTabs ? '410px' : '380px';
 };
 
 const form = reactive({
