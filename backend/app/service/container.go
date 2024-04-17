@@ -657,6 +657,7 @@ func (u *ContainerService) ContainerLogs(wsConn *websocket.Conn, containerType, 
 	}
 	if !follow {
 		cmd := exec.Command(commandName, commandArg...)
+		cmd.Stderr = cmd.Stdout
 		stdout, _ := cmd.CombinedOutput()
 		if !utf8.Valid(stdout) {
 			return errors.New("invalid utf8")
@@ -673,6 +674,7 @@ func (u *ContainerService) ContainerLogs(wsConn *websocket.Conn, containerType, 
 		_ = cmd.Process.Signal(syscall.SIGTERM)
 		return err
 	}
+	cmd.Stderr = cmd.Stdout
 	if err := cmd.Start(); err != nil {
 		_ = cmd.Process.Signal(syscall.SIGTERM)
 		return err
