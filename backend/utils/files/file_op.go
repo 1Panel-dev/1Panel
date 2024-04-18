@@ -54,17 +54,14 @@ func (f FileOp) GetContent(dst string) ([]byte, error) {
 }
 
 func (f FileOp) CreateDir(dst string, mode fs.FileMode) error {
+	return f.Fs.MkdirAll(dst, mode)
+}
+
+func (f FileOp) CreateDirWithMode(dst string, mode fs.FileMode) error {
 	if err := f.Fs.MkdirAll(dst, mode); err != nil {
 		return err
 	}
-	modStr := fmt.Sprintf("%o", mode)
-
-	modeInt, err := strconv.ParseInt(modStr, 10, 64)
-	if err != nil {
-		modeInt = 0755
-	}
-
-	return f.ChmodR(dst, modeInt, true)
+	return f.ChmodRWithMode(dst, mode, true)
 }
 
 func (f FileOp) CreateFile(dst string) error {
@@ -180,6 +177,23 @@ func (f FileOp) ChmodR(dst string, mode int64, sub bool) error {
 	cmdStr := fmt.Sprintf(`chmod %v "%s"`, fmt.Sprintf("%04o", mode), dst)
 	if sub {
 		cmdStr = fmt.Sprintf(`chmod -R %v "%s"`, fmt.Sprintf("%04o", mode), dst)
+	}
+	if cmd.HasNoPasswordSudo() {
+		cmdStr = fmt.Sprintf("sudo %s", cmdStr)
+	}
+	if msg, err := cmd.ExecWithTimeOut(cmdStr, 10*time.Second); err != nil {
+		if msg != "" {
+			return errors.New(msg)
+		}
+		return err
+	}
+	return nil
+}
+
+func (f FileOp) ChmodRWithMode(dst string, mode fs.FileMode, sub bool) error {
+	cmdStr := fmt.Sprintf(`chmod %v "%s"`, fmt.Sprintf("%o", mode.Perm()), dst)
+	if sub {
+		cmdStr = fmt.Sprintf(`chmod -R %v "%s"`, fmt.Sprintf("%o", mode.Perm()), dst)
 	}
 	if cmd.HasNoPasswordSudo() {
 		cmdStr = fmt.Sprintf("sudo %s", cmdStr)
