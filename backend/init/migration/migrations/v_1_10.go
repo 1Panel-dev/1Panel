@@ -74,8 +74,10 @@ var NewMonitorDB = &gormigrate.Migration{
 				} else {
 					itemData = bases[200*i:]
 				}
-				if err := global.MonitorDB.Create(&itemData).Error; err != nil {
-					return err
+				if len(itemData) != 0 {
+					if err := global.MonitorDB.Create(&itemData).Error; err != nil {
+						return err
+					}
 				}
 			}
 		}
@@ -87,8 +89,10 @@ var NewMonitorDB = &gormigrate.Migration{
 				} else {
 					itemData = ios[200*i:]
 				}
-				if err := global.MonitorDB.Create(&itemData).Error; err != nil {
-					return err
+				if len(itemData) != 0 {
+					if err := global.MonitorDB.Create(&itemData).Error; err != nil {
+						return err
+					}
 				}
 			}
 		}
@@ -100,8 +104,10 @@ var NewMonitorDB = &gormigrate.Migration{
 				} else {
 					itemData = networks[200*i:]
 				}
-				if err := global.MonitorDB.Create(&itemData).Error; err != nil {
-					return err
+				if len(itemData) != 0 {
+					if err := global.MonitorDB.Create(&itemData).Error; err != nil {
+						return err
+					}
 				}
 			}
 		}
