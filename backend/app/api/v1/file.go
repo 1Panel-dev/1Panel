@@ -596,7 +596,7 @@ func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int)
 	dstDir = strings.TrimSpace(dstDir)
 	mode, _ := files.GetParentMode(dstDir)
 	if mode == 0 {
-		mode = os.ModePerm
+		mode = 0755
 	}
 	if _, err := os.Stat(dstDir); err != nil && os.IsNotExist(err) {
 		if err = op.CreateDir(dstDir, mode); err != nil {
