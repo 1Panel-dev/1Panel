@@ -149,7 +149,7 @@
                 }
             }
         },
-        "/apps/ingored": {
+        "/apps/ignored": {
             "get": {
                 "security": [
                     {

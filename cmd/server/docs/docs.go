@@ -156,7 +156,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/apps/ingored": {
+        "/apps/ignored": {
             "get": {
                 "security": [
                     {

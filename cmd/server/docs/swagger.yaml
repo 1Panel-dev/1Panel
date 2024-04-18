@@ -5120,7 +5120,7 @@ paths:
       summary: Get app detail by id
       tags:
       - App
-  /apps/ingored:
+  /apps/ignored:
     get:
       consumes:
       - application/json
