@@ -137,7 +137,7 @@ func (b *BaseApi) GetAppDetailByID(c *gin.Context) {
 // @Accept json
 // @Success 200 {object} response.IgnoredApp
 // @Security ApiKeyAuth
-// @Router /apps/ingored [get]
+// @Router /apps/ignored [get]
 func (b *BaseApi) GetIgnoredApp(c *gin.Context) {
 	res, err := appService.GetIgnoredApp()
 	if err != nil {
