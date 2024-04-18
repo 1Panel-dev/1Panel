@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path"
@@ -274,6 +275,21 @@ func loadClientMap(backupAccounts string) (map[string]cronjobUploadHelper, error
 				pathItem := account.BackupPath
 				if account.BackupPath != "/" {
 					pathItem = strings.TrimPrefix(account.BackupPath, "/")
+				}
+				if target == constant.Local {
+					varMap := make(map[string]interface{})
+					if err := json.Unmarshal([]byte(account.Vars), &varMap); err != nil {
+						return nil, err
+					}
+					if _, ok := varMap["dir"]; !ok {
+						return nil, errors.New("load local backup dir failed")
+					}
+					baseDir, ok := varMap["dir"].(string)
+					if ok {
+						pathItem = baseDir
+					} else {
+						return nil, fmt.Errorf("error type dir: %T", varMap["dir"])
+					}
 				}
 				clients[target] = cronjobUploadHelper{
 					client:     client,
