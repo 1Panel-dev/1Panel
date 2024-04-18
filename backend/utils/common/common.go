@@ -123,6 +123,11 @@ func CopyFile(src, dst string) error {
 	if path.Base(src) != path.Base(dst) {
 		dst = path.Join(dst, path.Base(src))
 	}
+	if _, err := os.Stat(path.Dir(dst)); err != nil {
+		if os.IsNotExist(err) {
+			_ = os.MkdirAll(path.Dir(dst), os.ModePerm)
+		}
+	}
 	target, err := os.OpenFile(dst+"_temp", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
 		return err
