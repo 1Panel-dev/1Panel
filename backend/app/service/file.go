@@ -133,7 +133,7 @@ func (f *FileService) Create(op request.FileCreate) error {
 		}
 	}
 	if op.IsDir {
-		return fo.CreateDir(op.Path, fs.FileMode(mode))
+		return fo.CreateDirWithMode(op.Path, fs.FileMode(mode))
 	}
 	if op.IsLink {
 		if !fo.Stat(op.LinkPath) {
