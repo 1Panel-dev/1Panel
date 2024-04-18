@@ -57,7 +57,14 @@ func (f FileOp) CreateDir(dst string, mode fs.FileMode) error {
 	if err := f.Fs.MkdirAll(dst, mode); err != nil {
 		return err
 	}
-	return f.ChmodR(dst, int64(mode), true)
+	modStr := fmt.Sprintf("%o", mode)
+
+	modeInt, err := strconv.ParseInt(modStr, 10, 64)
+	if err != nil {
+		modeInt = 0755
+	}
+
+	return f.ChmodR(dst, modeInt, true)
 }
 
 func (f FileOp) CreateFile(dst string) error {

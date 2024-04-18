@@ -129,7 +129,7 @@ func GetParentMode(path string) (os.FileMode, error) {
 	for {
 		fileInfo, err := os.Stat(absPath)
 		if err == nil {
-			return fileInfo.Mode(), nil
+			return fileInfo.Mode() & os.ModePerm, nil
 		}
 		if !os.IsNotExist(err) {
 			return 0, err
