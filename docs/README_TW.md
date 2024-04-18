@@ -52,6 +52,13 @@ curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_
 - 郵箱：support@fit2cloud.com
 - 電話：400-052-0755
 
+## 我們的其他明星專案
+
+- [JumpServer](https://github.com/jumpserver/jumpserver/) - 受歡迎的開源堡壘機管理工具
+- [DataEase](https://github.com/dataease/dataease/) - 開源的數據可視化和分析工具，適用於所有人
+- [MeterSphere](https://github.com/metersphere/metersphere/) - 一站式開源自動化測試平台
+- [Halo](https://github.com/halo-dev/halo/) - 強大且易於使用的開源網站建設工具
+
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=1Panel-dev/1Panel&type=Date)](https://star-history.com/#1Panel-dev/1Panel&Date)

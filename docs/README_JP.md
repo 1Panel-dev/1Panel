@@ -54,6 +54,13 @@ curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_
 - メール: support@fit2cloud.com
 - 電話番号: 400-052-0755
 
+## その他の主要プロジェクト
+
+- [JumpServer](https://github.com/jumpserver/jumpserver/) - 人気のあるオープンソースのバスチョンホスト管理ツール
+- [DataEase](https://github.com/dataease/dataease/) - 誰でも利用できるオープンソースのデータ可視化および分析ツール
+- [MeterSphere](https://github.com/metersphere/metersphere/) - オールインワンのオープンソース自動化テストプラットフォーム
+- [Halo](https://github.com/halo-dev/halo/) - 強力で使いやすいオープンソースのウェブサイト構築ツール
+
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=1Panel-dev/1Panel&type=Date)](https://star-history.com/#1Panel-dev/1Panel&Date)
