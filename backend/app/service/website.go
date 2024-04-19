@@ -1954,7 +1954,7 @@ func (w WebsiteService) UpdateAntiLeech(req request.NginxAntiLeechUpdate) (err e
 			Parameters: []string{"off"},
 		})
 		validDir := &components.Directive{
-			Name:       "valid_referrers",
+			Name:       "valid_referers",
 			Parameters: []string{},
 		}
 		if req.NoneRef {
@@ -2023,7 +2023,7 @@ func (w WebsiteService) GetAntiLeech(id uint) (*response.NginxAntiLeechRes, erro
 		}
 		lDirectives := location.GetBlock().GetDirectives()
 		for _, lDir := range lDirectives {
-			if lDir.GetName() == "valid_referrers" {
+			if lDir.GetName() == "valid_referers" {
 				res.Enable = true
 				params := lDir.GetParameters()
 				for _, param := range params {
