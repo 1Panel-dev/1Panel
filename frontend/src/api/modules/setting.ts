@@ -13,6 +13,9 @@ export const UploadFileData = (params: FormData) => {
 export const getLicense = () => {
     return http.get<Setting.License>(`/licenses/get`);
 };
+export const getLicenseStatus = () => {
+    return http.get<Setting.LicenseStatus>(`/licenses/get/status`);
+};
 
 export const syncLicense = () => {
     return http.post(`/licenses/sync`);

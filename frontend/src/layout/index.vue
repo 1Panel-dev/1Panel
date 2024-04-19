@@ -22,7 +22,7 @@ import { GlobalStore, MenuStore, TabsStore } from '@/store';
 import { DeviceType } from '@/enums/app';
 import { useI18n } from 'vue-i18n';
 import { useTheme } from '@/hooks/use-theme';
-import { getLicense, getSettingInfo, getSystemAvailable } from '@/api/modules/setting';
+import { getLicenseStatus, getSettingInfo, getSystemAvailable } from '@/api/modules/setting';
 import { useRoute, useRouter } from 'vue-router';
 import { initFavicon, resetXSetting } from '@/utils/xpack';
 useResize();
@@ -109,7 +109,7 @@ const loadDataFromXDB = async () => {
 };
 
 const loadProductProFromDB = async () => {
-    const res = await getLicense();
+    const res = await getLicenseStatus();
     if (!res.data) {
         globalStore.isProductPro = false;
         return;
