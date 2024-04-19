@@ -178,7 +178,7 @@ func CheckIllegal(args ...string) bool {
 		if strings.Contains(arg, "&") || strings.Contains(arg, "|") || strings.Contains(arg, ";") ||
 			strings.Contains(arg, "$") || strings.Contains(arg, "'") || strings.Contains(arg, "`") ||
 			strings.Contains(arg, "(") || strings.Contains(arg, ")") || strings.Contains(arg, "\"") ||
-			strings.Contains(arg, "\n") || strings.Contains(arg, "\r") || strings.Contains(arg, ">") {
+			strings.Contains(arg, "\n") || strings.Contains(arg, "\r") || strings.Contains(arg, ">") || strings.Contains(arg, "<") {
 			return true
 		}
 	}
