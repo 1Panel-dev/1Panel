@@ -157,7 +157,7 @@ import { GlobalStore, MenuStore, TabsStore } from '@/store';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
-import { getLicense } from '@/api/modules/setting';
+import { getLicenseStatus } from '@/api/modules/setting';
 import { initFavicon } from '@/utils/xpack';
 
 const globalStore = GlobalStore();
@@ -327,7 +327,7 @@ const loadLanguage = async () => {
 };
 
 const loadProductProFromDB = async () => {
-    const res = await getLicense();
+    const res = await getLicenseStatus();
     if (!res.data) {
         globalStore.isProductPro = false;
         return;

@@ -151,4 +151,8 @@ export namespace Setting {
         trial: boolean;
         status: string;
     }
+    export interface LicenseStatus {
+        productPro: string;
+        status: string;
+    }
 }
