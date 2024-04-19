@@ -53,7 +53,7 @@
 <script lang="ts" setup>
 import i18n from '@/lang';
 import { dateFormatForName, downloadWithContent } from '@/utils/util';
-import { computed, reactive, ref, shallowRef, watch } from 'vue';
+import { computed, onBeforeUnmount, reactive, ref, shallowRef, watch } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
@@ -128,6 +128,7 @@ const searchLogs = async () => {
         MsgError(i18n.global.t('container.linesHelper'));
         return;
     }
+    terminalSocket.value?.send('close conn');
     terminalSocket.value?.close();
     logInfo.value = '';
     const href = window.location.href;
@@ -179,6 +180,10 @@ const acceptParams = (props: DialogProps): void => {
         });
     }
 };
+
+onBeforeUnmount(() => {
+    handleClose();
+});
 
 defineExpose({
     acceptParams,
