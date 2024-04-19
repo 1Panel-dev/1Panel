@@ -72,7 +72,7 @@ const rules = reactive({
 
 function checkSecurityEntrance(rule: any, value: any, callback: any) {
     if (form.securityEntrance !== '') {
-        const reg = /^[A-Za-z0-9]{6,10}$/;
+        const reg = /^[A-Za-z0-9]{5,116}$/;
         if (!reg.test(form.securityEntrance)) {
             return callback(new Error(i18n.global.t('setting.entranceError')));
         }
