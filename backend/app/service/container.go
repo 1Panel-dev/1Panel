@@ -701,7 +701,7 @@ func (u *ContainerService) ContainerLogs(wsConn *websocket.Conn, containerType, 
 						return
 					}
 					global.LOG.Errorf("read bytes from log failed, err: %v", err)
-					continue
+					return
 				}
 				if !utf8.Valid(buffer[:n]) {
 					continue
