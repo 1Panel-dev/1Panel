@@ -173,8 +173,8 @@ func (u *UpgradeService) handleBackup(fileOp files.FileOp, originalDir string) e
 	if err := fileOp.Copy("/etc/systemd/system/1panel.service", originalDir); err != nil {
 		return err
 	}
-	dbPath := global.CONF.System.DbPath + "/" + global.CONF.System.DbFile
-	if err := fileOp.Copy(dbPath, originalDir); err != nil {
+	checkPointOfWal()
+	if err := handleTar(path.Join(global.CONF.System.BaseDir, "1panel/db"), originalDir, "db.tar.gz", "./1Panel.db-*"); err != nil {
 		return err
 	}
 	return nil
@@ -182,8 +182,17 @@ func (u *UpgradeService) handleBackup(fileOp files.FileOp, originalDir string) e
 
 func (u *UpgradeService) handleRollback(originalDir string, errStep int) {
 	_ = settingRepo.Update("SystemStatus", "Free")
-	if err := common.CopyFile(path.Join(originalDir, "1Panel.db"), global.CONF.System.DbPath); err != nil {
-		global.LOG.Errorf("rollback 1panel failed, err: %v", err)
+
+	checkPointOfWal()
+	if _, err := os.Stat(path.Join(originalDir, "1Panel.db")); err == nil {
+		if err := common.CopyFile(path.Join(originalDir, "1Panel.db"), global.CONF.System.DbPath); err != nil {
+			global.LOG.Errorf("rollback 1panel db failed, err: %v", err)
+		}
+	}
+	if _, err := os.Stat(path.Join(originalDir, "db.tar.gz")); err == nil {
+		if err := handleUnTar(path.Join(originalDir, "db.tar.gz"), global.CONF.System.DbPath); err != nil {
+			global.LOG.Errorf("rollback 1panel db failed, err: %v", err)
+		}
 	}
 	if err := common.CopyFile(path.Join(originalDir, "1panel"), "/usr/local/bin"); err != nil {
 		global.LOG.Errorf("rollback 1pctl failed, err: %v", err)
