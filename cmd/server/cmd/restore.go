@@ -6,9 +6,11 @@ import (
 	"path"
 	"sort"
 	"strings"
+	"time"
 
 	cmdUtils "github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
+	"github.com/pkg/errors"
 
 	"github.com/spf13/cobra"
 )
@@ -55,14 +57,30 @@ var restoreCmd = &cobra.Command{
 			return err
 		}
 		fmt.Println("(3/4) 1panel 服务回滚成功")
-		if err := common.CopyFile(path.Join(tmpPath, "1Panel.db"), path.Join(baseDir, "1panel", "db")); err != nil {
-			return err
+		checkPointOfWal()
+		if _, err := os.Stat(path.Join(tmpPath, "1Panel.db")); err == nil {
+			if err := common.CopyFile(path.Join(tmpPath, "1Panel.db"), path.Join(baseDir, "1panel/db")); err != nil {
+				return err
+			}
+		}
+		if _, err := os.Stat(path.Join(tmpPath, "db.tar.gz")); err == nil {
+			if err := handleUnTar(path.Join(tmpPath, "db.tar.gz"), path.Join(baseDir, "1panel")); err != nil {
+				return err
+			}
 		}
 		fmt.Printf("(4/4) 1panel 数据回滚成功 \n\n")
 
 		fmt.Println("回滚成功！正在重启服务，请稍候...")
 		return nil
 	},
+}
+
+func checkPointOfWal() {
+	db, err := loadDBConn()
+	if err != nil {
+		return
+	}
+	_ = db.Exec("PRAGMA wal_checkpoint(TRUNCATE);").Error
 }
 
 func loadRestorePath(upgradeDir string) (string, error) {
@@ -86,4 +104,19 @@ func loadRestorePath(upgradeDir string) (string, error) {
 		return folders[i] > folders[j]
 	})
 	return folders[0], nil
+}
+
+func handleUnTar(sourceFile, targetDir string) error {
+	if _, err := os.Stat(targetDir); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(targetDir, os.ModePerm); err != nil {
+			return err
+		}
+	}
+
+	commands := fmt.Sprintf("tar zxvfC %s %s", sourceFile, targetDir)
+	stdout, err := cmdUtils.ExecWithTimeOut(commands, 20*time.Second)
+	if err != nil {
+		return errors.New(stdout)
+	}
+	return nil
 }
