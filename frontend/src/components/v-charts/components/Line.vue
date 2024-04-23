@@ -83,7 +83,8 @@ const seriesStyle = [
 
 function initChart() {
     let itemChart = echarts?.getInstanceByDom(document.getElementById(props.id) as HTMLElement);
-    // 如果不存在，就进行初始化
+    const optionItem = itemChart?.getOption();
+    const itemSelect = optionItem?.legend;
     if (itemChart == null) {
         itemChart = echarts.init(document.getElementById(props.id) as HTMLElement);
     }
@@ -109,10 +110,9 @@ function initChart() {
             yAxis.push({
                 splitLine: {
                     show: true,
-                    //分隔辅助线
                     lineStyle: {
-                        type: 'dashed', //线的类型 虚线0
-                        opacity: theme === 'dark' ? 0.1 : 1, //透明度
+                        type: 'dashed',
+                        opacity: theme === 'dark' ? 0.1 : 1,
                     },
                 },
                 ...item,
@@ -120,7 +120,6 @@ function initChart() {
         });
     }
 
-    // 把配置和数据放这里
     const option = {
         title: [
             {
@@ -168,7 +167,7 @@ function initChart() {
             },
         },
         grid: props.option.grid || { left: '7%', right: '7%', bottom: '20%' },
-        legend: {
+        legend: itemSelect || {
             right: 10,
             itemWidth: 8,
             textStyle: {
