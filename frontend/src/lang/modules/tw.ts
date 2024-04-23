@@ -1811,6 +1811,7 @@ const message = {
         acmeAccountType: '賬號類型',
         keyType: '密鑰演算法',
         tencentCloud: '騰訊雲',
+        containWarn: '其他域名中包含主域名，请重新輸入',
     },
     php: {
         short_open_tag: '短標簽支持',
