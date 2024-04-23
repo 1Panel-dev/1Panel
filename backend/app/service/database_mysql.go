@@ -456,7 +456,7 @@ func (u *MysqlService) LoadRemoteAccess(req dto.OperationWithNameAndType) (bool,
 	if err != nil {
 		return false, err
 	}
-	hosts, err := executeSqlForRows(app.ContainerName, app.Password, "select host from mysql.user where user='root';")
+	hosts, err := executeSqlForRows(app.ContainerName, app.Key, app.Password, "select host from mysql.user where user='root';")
 	if err != nil {
 		return false, err
 	}
@@ -474,7 +474,7 @@ func (u *MysqlService) LoadVariables(req dto.OperationWithNameAndType) (*dto.Mys
 	if err != nil {
 		return nil, err
 	}
-	variableMap, err := executeSqlForMaps(app.ContainerName, app.Password, "show global variables;")
+	variableMap, err := executeSqlForMaps(app.ContainerName, app.Key, app.Password, "show global variables;")
 	if err != nil {
 		return nil, err
 	}
@@ -493,7 +493,7 @@ func (u *MysqlService) LoadStatus(req dto.OperationWithNameAndType) (*dto.MysqlS
 		return nil, err
 	}
 
-	statusMap, err := executeSqlForMaps(app.ContainerName, app.Password, "show global status;")
+	statusMap, err := executeSqlForMaps(app.ContainerName, app.Key, app.Password, "show global status;")
 	if err != nil {
 		return nil, err
 	}
@@ -517,7 +517,7 @@ func (u *MysqlService) LoadStatus(req dto.OperationWithNameAndType) (*dto.MysqlS
 
 	info.File = "OFF"
 	info.Position = "OFF"
-	rows, err := executeSqlForRows(app.ContainerName, app.Password, "show master status;")
+	rows, err := executeSqlForRows(app.ContainerName, app.Key, app.Password, "show master status;")
 	if err != nil {
 		return nil, err
 	}
@@ -532,8 +532,8 @@ func (u *MysqlService) LoadStatus(req dto.OperationWithNameAndType) (*dto.MysqlS
 	return &info, nil
 }
 
-func executeSqlForMaps(containerName, password, command string) (map[string]string, error) {
-	cmd := exec.Command("docker", "exec", containerName, "mysql", "-uroot", "-p"+password, "-e", command)
+func executeSqlForMaps(containerName, dbType, password, command string) (map[string]string, error) {
+	cmd := exec.Command("docker", "exec", containerName, dbType, "-uroot", "-p"+password, "-e", command)
 	stdout, err := cmd.CombinedOutput()
 	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
 	if err != nil || strings.HasPrefix(string(stdStr), "ERROR ") {
@@ -551,8 +551,8 @@ func executeSqlForMaps(containerName, password, command string) (map[string]stri
 	return rowMap, nil
 }
 
-func executeSqlForRows(containerName, password, command string) ([]string, error) {
-	cmd := exec.Command("docker", "exec", containerName, "mysql", "-uroot", "-p"+password, "-e", command)
+func executeSqlForRows(containerName, dbType, password, command string) ([]string, error) {
+	cmd := exec.Command("docker", "exec", containerName, dbType, "-uroot", "-p"+password, "-e", command)
 	stdout, err := cmd.CombinedOutput()
 	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
 	if err != nil || strings.HasPrefix(string(stdStr), "ERROR ") {
@@ -614,6 +614,7 @@ func LoadMysqlClientByFrom(database string) (mysql.MysqlClient, string, error) {
 	if err != nil {
 		return nil, "", err
 	}
+	dbInfo.Type = databaseItem.Type
 	dbInfo.From = databaseItem.From
 	dbInfo.Database = database
 	if dbInfo.From != "local" {

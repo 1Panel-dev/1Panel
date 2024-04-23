@@ -10,6 +10,7 @@ import (
 )
 
 type DBInfo struct {
+	Type     string `json:"type"`
 	From     string `json:"from"`
 	Database string `json:"database"`
 	Address  string `json:"address"`
