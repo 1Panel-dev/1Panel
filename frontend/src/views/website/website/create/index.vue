@@ -349,7 +349,7 @@ import { ElForm, FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
 import Params from '@/views/app-store/detail/params/index.vue';
 import Check from '../check/index.vue';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { GetGroupList } from '@/api/modules/group';
 import { Group } from '@/api/interface/group';
 import { SearchRuntimes } from '@/api/modules/runtime';
@@ -582,6 +582,16 @@ const changeAppType = (type: string) => {
     }
 };
 
+function isSubsetOfStrArray(primaryDomain: string, otherDomains: string): boolean {
+    const arr: string[] = otherDomains.split('\n');
+    for (const item of arr) {
+        if (primaryDomain === item) {
+            return false;
+        }
+    }
+    return true;
+}
+
 const submit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     await formEl.validate((valid) => {
@@ -589,6 +599,12 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         loading.value = true;
+        const flag = isSubsetOfStrArray(website.value.primaryDomain, website.value.otherDomains);
+        if (!flag) {
+            MsgError(i18n.global.t('website.containWarn'));
+            loading.value = false;
+            return false;
+        }
         PreCheck({})
             .then((res) => {
                 if (res.data) {
