@@ -51,11 +51,11 @@ require (
 	github.com/swaggo/swag v1.16.3
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.46
 	github.com/xlzd/gotp v0.1.0
-	golang.org/x/crypto v0.19.0
-	golang.org/x/net v0.21.0
+	golang.org/x/crypto v0.21.0
+	golang.org/x/net v0.23.0
 	golang.org/x/oauth2 v0.17.0
-	golang.org/x/sys v0.17.0
-	golang.org/x/term v0.17.0
+	golang.org/x/sys v0.18.0
+	golang.org/x/term v0.18.0
 	golang.org/x/text v0.14.0
 	gopkg.in/ini.v1 v1.67.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -315,7 +315,7 @@ replace (
 	github.com/cucumber/godog => github.com/cucumber/godog v0.12.6
 	github.com/docker/buildx => github.com/docker/buildx v0.12.0-rc2.0.20231219140829-617f538cb315
 	github.com/moby/buildkit => github.com/moby/buildkit v0.13.0-beta3
-	golang.org/x/net => golang.org/x/net v0.17.0
+	golang.org/x/net => golang.org/x/net v0.23.0
 	k8s.io/api => k8s.io/api v0.29.2
 	k8s.io/apimachinery => k8s.io/apimachinery v0.29.2
 	k8s.io/client-go => k8s.io/client-go v0.29.2
