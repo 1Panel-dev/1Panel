@@ -105,7 +105,7 @@
                                         <span v-if="node.label.length <= 25">
                                             <a @click="onClickConn(node, data)">{{ node.label }}</a>
                                         </span>
-                                        <el-tooltip v-else :content="node.label" placement="top-start">
+                                        <el-tooltip v-else :content="node.label" placement="right">
                                             <span>
                                                 <a @click="onClickConn(node, data)">
                                                     {{ node.label.substring(0, 22) }}...
