@@ -288,6 +288,10 @@ func createWafConfig(website *model.Website, domains []model.WebsiteDomain) erro
 	if err != nil {
 		return err
 	}
+
+	if !common.CompareVersion(nginxInstall.Version, "1.21.4.3-2-0") {
+		return nil
+	}
 	wafDataPath := path.Join(nginxInstall.GetPath(), "1pwaf", "data")
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(wafDataPath) {
@@ -418,6 +422,9 @@ func delWafConfig(website model.Website, force bool) error {
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return err
+	}
+	if !common.CompareVersion(nginxInstall.Version, "1.21.4.3-2-0") {
+		return nil
 	}
 	wafDataPath := path.Join(nginxInstall.GetPath(), "1pwaf", "data")
 	fileOp := files.NewFileOp()
