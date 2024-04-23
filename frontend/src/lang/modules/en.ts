@@ -1936,6 +1936,7 @@ const message = {
         acmeAccountType: 'Account Type',
         keyType: 'Key algorithm',
         tencentCloud: 'Tencent Cloud',
+        containWarn: 'The domain name contains the main domain, please re-enter',
     },
     php: {
         short_open_tag: 'Short tag support',
