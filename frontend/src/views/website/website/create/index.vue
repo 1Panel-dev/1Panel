@@ -582,10 +582,10 @@ const changeAppType = (type: string) => {
     }
 };
 
-function isSubsetOfStrArray(str1: string, str2: string): boolean {
-    const arr: string[] = str2.split('\n');
+function isSubsetOfStrArray(primaryDomain: string, otherDomains: string): boolean {
+    const arr: string[] = otherDomains.split('\n');
     for (const item of arr) {
-        if (str1 === item) {
+        if (primaryDomain === item) {
             return false;
         }
     }
