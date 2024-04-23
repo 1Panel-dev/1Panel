@@ -1428,6 +1428,8 @@ const message = {
         rootCrtDownload: 'Root certificate download',
         primaryKey: 'Primary key',
         certificate: 'Certificate',
+        backupJump:
+            'Backup files not in the current backup list, please try downloading from the file directory and importing for backup.',
 
         snapshot: 'Snapshot',
         status: 'Snapshot status',

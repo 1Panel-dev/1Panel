@@ -1259,6 +1259,7 @@ const message = {
         accountKey: '账户密钥',
         address: '地址',
         path: '路径',
+        backupJump: '未在当前备份列表中的备份文件，请尝试从文件目录中下载后导入备份。',
 
         snapshot: '快照',
         ignoreRule: '排除规则',

@@ -1258,6 +1258,7 @@ const message = {
         accountKey: '賬戶密鑰',
         address: '地址',
         path: '路徑',
+        backupJump: '未在當前備份列表中的備份檔案，請嘗試從檔案目錄中下載後導入備份。',
 
         snapshot: '快照',
         status: '快照狀態',
