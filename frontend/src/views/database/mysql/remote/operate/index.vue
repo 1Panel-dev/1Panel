@@ -32,7 +32,10 @@
                                 <el-radio label="5.7" value="5.7" />
                                 <el-radio label="5.6" value="5.6" />
                             </div>
-                            <el-radio v-else label="10.x" value="10.x" />
+                            <div v-else>
+                                <el-radio label="10.x" value="10.x" />
+                                <el-radio label="11.x" value="11.x" />
+                            </div>
                         </el-radio-group>
                     </el-form-item>
                     <el-form-item :label="$t('database.address')" prop="address">
