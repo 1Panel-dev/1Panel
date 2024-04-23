@@ -279,7 +279,7 @@ func loadWebsForJob(cronjob model.Cronjob) []model.Website {
 		weblist, _ = websiteRepo.List()
 		return weblist
 	}
-	itemID, _ := (strconv.Atoi(cronjob.Website))
+	itemID, _ := strconv.Atoi(cronjob.Website)
 	webItem, _ := websiteRepo.GetFirst(commonRepo.WithByID(uint(itemID)))
 	if webItem.ID != 0 {
 		weblist = append(weblist, webItem)

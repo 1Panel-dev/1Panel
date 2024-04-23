@@ -28,7 +28,7 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 		message []byte
 		err     error
 	)
-	record := cronjobRepo.StartRecords(cronjob.ID, cronjob.KeepLocal, "")
+	record := cronjobRepo.StartRecords(cronjob.ID, cronjob.KeepLocal)
 	go func() {
 		switch cronjob.Type {
 		case "shell":
@@ -343,20 +343,24 @@ func (u *CronjobService) removeExpiredBackup(cronjob model.Cronjob, accountMap m
 	}
 	for i := int(cronjob.RetainCopies); i < len(records); i++ {
 		accounts := strings.Split(cronjob.BackupAccounts, ",")
-		if cronjob.Type == "snapshot" {
-			for _, account := range accounts {
-				if len(account) != 0 {
-					_, _ = accountMap[account].client.Delete(path.Join(accountMap[account].backupPath, "system_snapshot", records[i].FileName))
+		var deleteFilePath string
+		for _, account := range accounts {
+			if len(account) != 0 {
+				if account == constant.Local {
+					deleteFilePath = path.Join(records[i].FileDir, records[i].FileName)
+				} else {
+					deleteFilePath = path.Join(accountMap[account].backupPath, records[i].FileDir, records[i].FileName)
 				}
-			}
-			_ = snapshotRepo.Delete(commonRepo.WithByName(strings.TrimSuffix(records[i].FileName, ".tar.gz")))
-		} else {
-			for _, account := range accounts {
-				if len(account) != 0 {
-					_, _ = accountMap[account].client.Delete(path.Join(accountMap[account].backupPath, records[i].FileDir, records[i].FileName))
+				if ok, err := accountMap[account].client.Delete(deleteFilePath); !ok {
+					global.LOG.Errorf("handle remove expired err: %v", err)
 				}
 			}
 		}
+
+		if cronjob.Type == "snapshot" {
+			_ = snapshotRepo.Delete(commonRepo.WithByName(strings.TrimSuffix(records[i].FileName, ".tar.gz")))
+		}
+
 		_ = backupRepo.DeleteRecord(context.Background(), commonRepo.WithByID(records[i].ID))
 	}
 }
