@@ -3,7 +3,6 @@ package v1
 import (
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -93,16 +92,17 @@ func (b *BaseApi) RedisWsSsh(c *gin.Context) {
 	}
 
 	defer wsConn.Close()
-	commands := "redis-cli"
+	commands := []string{"redis-cli"}
 	if len(redisConf.Requirepass) != 0 {
-		commands = fmt.Sprintf("redis-cli -a %s --no-auth-warning", redisConf.Requirepass)
+		commands = []string{"redis-cli", "-a", redisConf.Requirepass, "--no-auth-warning"}
 	}
 	pidMap := loadMapFromDockerTop(redisConf.ContainerName)
-	slave, err := terminal.NewCommand(fmt.Sprintf("docker exec -it %s %s", redisConf.ContainerName, commands))
+	itemCmds := append([]string{"exec", "-it", redisConf.ContainerName}, commands...)
+	slave, err := terminal.NewCommand(itemCmds)
 	if wshandleError(wsConn, err) {
 		return
 	}
-	defer killBash(redisConf.ContainerName, pidMap)
+	defer killBash(redisConf.ContainerName, strings.Join(commands, " "), pidMap)
 	defer slave.Close()
 
 	tty, err := terminal.NewLocalWsSession(cols, rows, wsConn, slave, false)
@@ -161,16 +161,16 @@ func (b *BaseApi) ContainerWsSsh(c *gin.Context) {
 		return
 	}
 
-	commands := fmt.Sprintf("docker exec -it %s %s", containerID, command)
+	commands := []string{"exec", "-it", containerID, command}
 	if len(user) != 0 {
-		commands = fmt.Sprintf("docker exec -it -u %s %s %s", user, containerID, command)
+		commands = []string{"exec", "-it", "-u", user, containerID, command}
 	}
 	pidMap := loadMapFromDockerTop(containerID)
 	slave, err := terminal.NewCommand(commands)
 	if wshandleError(wsConn, err) {
 		return
 	}
-	defer killBash(containerID, pidMap)
+	defer killBash(containerID, command, pidMap)
 	defer slave.Close()
 
 	tty, err := terminal.NewLocalWsSession(cols, rows, wsConn, slave, true)
@@ -221,26 +221,26 @@ func loadMapFromDockerTop(containerID string) map[string]string {
 	lines := strings.Split(stdout, "\n")
 	for _, line := range lines {
 		parts := strings.Fields(line)
-		if len(parts) == 0 {
+		if len(parts) < 2 {
 			continue
 		}
-		pidMap[parts[0]] = strings.Join(parts, " ")
+		pidMap[parts[0]] = strings.Join(parts[1:], " ")
 	}
 	return pidMap
 }
 
-func killBash(containerID string, pidMap map[string]string) {
+func killBash(containerID, comm string, pidMap map[string]string) {
 	sudo := cmd.SudoHandleCmd()
 	newPidMap := loadMapFromDockerTop(containerID)
-	for pid, newCmd := range newPidMap {
+	for pid, command := range newPidMap {
 		isOld := false
-		for pid2, oldCmd := range pidMap {
-			if pid == pid2 && oldCmd == newCmd {
+		for pid2 := range pidMap {
+			if pid == pid2 {
 				isOld = true
 				break
 			}
 		}
-		if !isOld {
+		if !isOld && command == comm {
 			_, _ = cmd.Execf("%s kill -9 %s", sudo, pid)
 		}
 	}

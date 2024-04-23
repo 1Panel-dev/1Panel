@@ -25,8 +25,8 @@ type LocalCommand struct {
 	pty *os.File
 }
 
-func NewCommand(commands string) (*LocalCommand, error) {
-	cmd := exec.Command("sh", "-c", commands)
+func NewCommand(commands []string) (*LocalCommand, error) {
+	cmd := exec.Command("docker", commands...)
 
 	pty, err := pty.Start(cmd)
 	if err != nil {
