@@ -1937,6 +1937,8 @@ const message = {
         keyType: 'Key algorithm',
         tencentCloud: 'Tencent Cloud',
         containWarn: 'The domain name contains the main domain, please re-enter',
+        rewriteHelper2:
+            'Applications such as WordPress installed from the app store have pseudo-static configuration by default. Repeated configuration may result in errors',
     },
     php: {
         short_open_tag: 'Short tag support',
