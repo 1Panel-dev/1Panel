@@ -8,6 +8,7 @@ export namespace Setting {
         systemIP: string;
         systemVersion: string;
         dockerSockPath: string;
+        developerMode: string;
 
         sessionTimeout: number;
         localTime: string;

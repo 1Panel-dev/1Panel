@@ -49,8 +49,8 @@ func ComparePanelVersion(version1, version2 string) bool {
 	if version1 == version2 {
 		return false
 	}
-	version1s := strings.Split(version1, ".")
-	version2s := strings.Split(version2, ".")
+	version1s := SplitStr(version1, ".", "-")
+	version2s := SplitStr(version2, ".", "-")
 
 	if len(version2s) > len(version1s) {
 		for i := 0; i < len(version2s)-len(version1s); i++ {
@@ -68,7 +68,15 @@ func ComparePanelVersion(version1, version2 string) bool {
 		if version1s[i] == version2s[i] {
 			continue
 		} else {
-			return version1s[i] > version2s[i]
+			v1, err1 := strconv.Atoi(version1s[i])
+			if err1 != nil {
+				return version1s[i] > version2s[i]
+			}
+			v2, err2 := strconv.Atoi(version2s[i])
+			if err2 != nil {
+				return version1s[i] > version2s[i]
+			}
+			return v1 > v2
 		}
 	}
 	return true
@@ -295,4 +303,17 @@ func PunycodeEncode(text string) (string, error) {
 		return "", err
 	}
 	return ascii, nil
+}
+
+func SplitStr(str string, spi ...string) []string {
+	lists := []string{str}
+	var results []string
+	for _, s := range spi {
+		results = []string{}
+		for _, list := range lists {
+			results = append(results, strings.Split(list, s)...)
+		}
+		lists = results
+	}
+	return results
 }

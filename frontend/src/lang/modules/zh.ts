@@ -1190,6 +1190,7 @@ const message = {
         noSpace: '输入信息不能包含空格符',
         duplicatePassword: '新密码不能与原始密码一致，请重新输入！',
         diskClean: '缓存清理',
+        developerMode: '内测模式',
 
         thirdParty: '第三方账号',
         createBackupAccount: '添加 {0}',
@@ -1296,6 +1297,7 @@ const message = {
         versionHelper: '1Panel 版本号命名规则为： [大版本].[功能版本].[Bug 修复版本]，例：',
         versionHelper1: 'v1.0.1 是 v1.0.0 之后的 Bug 修复版本',
         versionHelper2: 'v1.1.0 是 v1.0.0 之后的功能版本',
+        testVersion: '(内测版本)',
         newVersion: '(Bug 修复版本)',
         latestVersion: '(功能版本)',
         upgradeCheck: '检查更新',

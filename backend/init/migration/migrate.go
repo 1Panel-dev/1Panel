@@ -81,6 +81,7 @@ func Init() {
 		migrations.AddNoAuthSetting,
 		migrations.UpdateXpackHideMenu,
 		migrations.AddMenuTabsSetting,
+		migrations.AddDeveloperSetting,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

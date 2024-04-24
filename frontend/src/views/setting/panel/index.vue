@@ -113,6 +113,20 @@
                                 </el-input>
                             </el-form-item>
 
+                            <el-form-item :label="$t('setting.developerMode')" prop="developerMode">
+                                <el-radio-group
+                                    @change="onSave('DeveloperMode', form.developerMode)"
+                                    v-model="form.developerMode"
+                                >
+                                    <el-radio-button value="enable">
+                                        <span>{{ $t('commons.button.enable') }}</span>
+                                    </el-radio-button>
+                                    <el-radio-button value="disable">
+                                        <span>{{ $t('commons.button.disable') }}</span>
+                                    </el-radio-button>
+                                </el-radio-group>
+                            </el-form-item>
+
                             <el-form-item :label="$t('setting.advancedMenuHide')">
                                 <el-input disabled v-model="form.proHideMenus">
                                     <template #append>
@@ -176,6 +190,7 @@ const form = reactive({
     complexityVerification: '',
     defaultNetwork: '',
     defaultNetworkVal: '',
+    developerMode: '',
 
     proHideMenus: ref(i18n.t('setting.unSetting')),
     hideMenuList: '',
@@ -219,6 +234,7 @@ const search = async () => {
     form.defaultNetworkVal = res.data.defaultNetwork === 'all' ? i18n.t('commons.table.all') : res.data.defaultNetwork;
     form.proHideMenus = res.data.xpackHideMenu;
     form.hideMenuList = res.data.xpackHideMenu;
+    form.developerMode = res.data.developerMode;
 
     // 提取隐藏节点的 title 并显示
     const json: Node = JSON.parse(res.data.xpackHideMenu);
