@@ -1812,6 +1812,7 @@ const message = {
         keyType: '密钥算法',
         tencentCloud: '腾讯云',
         containWarn: '其他域名中包含主域名，请重新输入',
+        rewriteHelper2: '从应用商店安装的 WordPress 等应用，默认已经配置好伪静态，重复配置可能会报错',
     },
     php: {
         short_open_tag: '短标签支持',
