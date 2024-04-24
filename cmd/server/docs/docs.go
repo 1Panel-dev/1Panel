@@ -14675,6 +14675,12 @@ const docTemplate = `{
                 "image": {
                     "type": "string"
                 },
+                "ipv4": {
+                    "type": "string"
+                },
+                "ipv6": {
+                    "type": "string"
+                },
                 "labels": {
                     "type": "array",
                     "items": {
@@ -17775,6 +17781,9 @@ const docTemplate = `{
                 "defaultNetwork": {
                     "type": "string"
                 },
+                "developerMode": {
+                    "type": "string"
+                },
                 "dingVars": {
                     "type": "string"
                 },
@@ -17812,6 +17821,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "localTime": {
+                    "type": "string"
+                },
+                "menuTabs": {
                     "type": "string"
                 },
                 "messageType": {
@@ -18075,6 +18087,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "releaseNote": {
+                    "type": "string"
+                },
+                "testVersion": {
                     "type": "string"
                 }
             }

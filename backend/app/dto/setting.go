@@ -8,6 +8,7 @@ type SettingInfo struct {
 	SystemIP       string `json:"systemIP"`
 	SystemVersion  string `json:"systemVersion"`
 	DockerSockPath string `json:"dockerSockPath"`
+	DeveloperMode  string `json:"developerMode"`
 
 	SessionTimeout string `json:"sessionTimeout"`
 	LocalTime      string `json:"localTime"`
@@ -140,6 +141,7 @@ type SnapshotInfo struct {
 }
 
 type UpgradeInfo struct {
+	TestVersion   string `json:"testVersion"`
 	NewVersion    string `json:"newVersion"`
 	LatestVersion string `json:"latestVersion"`
 	ReleaseNote   string `json:"releaseNote"`

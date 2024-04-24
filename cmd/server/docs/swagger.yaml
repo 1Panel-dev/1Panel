@@ -444,6 +444,10 @@ definitions:
         type: boolean
       image:
         type: string
+      ipv4:
+        type: string
+      ipv6:
+        type: string
       labels:
         items:
           type: string
@@ -2541,6 +2545,8 @@ definitions:
         type: string
       defaultNetwork:
         type: string
+      developerMode:
+        type: string
       dingVars:
         type: string
       dockerSockPath:
@@ -2566,6 +2572,8 @@ definitions:
       lastCleanTime:
         type: string
       localTime:
+        type: string
+      menuTabs:
         type: string
       messageType:
         type: string
@@ -2739,6 +2747,8 @@ definitions:
       newVersion:
         type: string
       releaseNote:
+        type: string
+      testVersion:
         type: string
     type: object
   dto.UserLoginInfo:

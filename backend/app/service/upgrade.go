@@ -7,12 +7,11 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
-	"github.com/1Panel-dev/1Panel/backend/buserr"
-	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
@@ -37,45 +36,30 @@ func (u *UpgradeService) SearchUpgrade() (*dto.UpgradeInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	latestVersion, err := u.loadVersion(true, currentVersion.Value)
+	DeveloperMode, err := settingRepo.Get(settingRepo.WithByKey("DeveloperMode"))
 	if err != nil {
-		global.LOG.Infof("load latest version failed, err: %v", err)
 		return nil, err
 	}
-	if !common.ComparePanelVersion(string(latestVersion), currentVersion.Value) {
-		return nil, err
-	}
-	upgrade.LatestVersion = latestVersion
-	if latestVersion[0:4] == currentVersion.Value[0:4] {
-		upgrade.NewVersion = ""
-	} else {
-		newerVersion, err := u.loadVersion(false, currentVersion.Value)
-		if err != nil {
-			global.LOG.Infof("load newer version failed, err: %v", err)
-			return nil, err
-		}
-		if newerVersion == currentVersion.Value {
-			upgrade.NewVersion = ""
-		} else {
-			upgrade.NewVersion = newerVersion
-		}
-	}
+
+	upgrade.TestVersion, upgrade.NewVersion, upgrade.LatestVersion = u.loadVersionByMode(DeveloperMode.Value, currentVersion.Value)
 	itemVersion := upgrade.LatestVersion
 	if upgrade.NewVersion != "" {
 		itemVersion = upgrade.NewVersion
 	}
 	notes, err := u.loadReleaseNotes(fmt.Sprintf("%s/%s/%s/release/1panel-%s-release-notes", global.CONF.System.RepoUrl, global.CONF.System.Mode, itemVersion, itemVersion))
-
 	if err != nil {
-		return nil, fmt.Errorf("load releases-notes of version %s failed, err: %v", latestVersion, err)
+		return nil, fmt.Errorf("load releases-notes of version %s failed, err: %v", itemVersion, err)
 	}
 	upgrade.ReleaseNote = notes
 	return &upgrade, nil
 }
 
 func (u *UpgradeService) LoadNotes(req dto.Upgrade) (string, error) {
-	notes, err := u.loadReleaseNotes(fmt.Sprintf("%s/%s/%s/release/1panel-%s-release-notes", global.CONF.System.RepoUrl, global.CONF.System.Mode, req.Version, req.Version))
+	mode := global.CONF.System.Mode
+	if strings.Contains(req.Version, "beta") {
+		mode = "beta"
+	}
+	notes, err := u.loadReleaseNotes(fmt.Sprintf("%s/%s/%s/release/1panel-%s-release-notes", global.CONF.System.RepoUrl, mode, req.Version, req.Version))
 	if err != nil {
 		return "", fmt.Errorf("load releases-notes of version %s failed, err: %v", req.Version, err)
 	}
@@ -211,36 +195,92 @@ func (u *UpgradeService) handleRollback(originalDir string, errStep int) {
 	}
 }
 
-func (u *UpgradeService) loadVersion(isLatest bool, currentVersion string) (string, error) {
-	path := fmt.Sprintf("%s/%s/latest", global.CONF.System.RepoUrl, global.CONF.System.Mode)
+func (u *UpgradeService) loadVersionByMode(developer, currentVersion string) (string, string, string) {
+	var current, latest string
+	if global.CONF.System.Mode == "dev" {
+		betaVersionLatest := u.loadVersion(true, currentVersion, "beta")
+		devVersionLatest := u.loadVersion(true, currentVersion, "dev")
+		if common.ComparePanelVersion(betaVersionLatest, devVersionLatest) {
+			return betaVersionLatest, "", ""
+		}
+		return devVersionLatest, "", ""
+	}
+
+	latest = u.loadVersion(true, currentVersion, "stable")
+	current = u.loadVersion(false, currentVersion, "stable")
+	if len(developer) == 0 || developer == "disable" {
+		return "", current, latest
+	}
+	betaVersionLatest := u.loadVersion(true, currentVersion, "beta")
+
+	return betaVersionLatest, current, latest
+}
+
+func (u *UpgradeService) loadVersion(isLatest bool, currentVersion, mode string) string {
+	path := fmt.Sprintf("%s/%s/latest", global.CONF.System.RepoUrl, mode)
 	if !isLatest {
-		path = fmt.Sprintf("%s/%s/latest.current", global.CONF.System.RepoUrl, global.CONF.System.Mode)
+		path = fmt.Sprintf("%s/%s/latest.current", global.CONF.System.RepoUrl, mode)
 	}
 	latestVersionRes, err := http.Get(path)
 	if err != nil {
-		return "", buserr.New(constant.ErrOSSConn)
+		global.LOG.Errorf("load latest version from oss failed, err: %v", err)
+		return ""
 	}
 	defer latestVersionRes.Body.Close()
-	version, err := io.ReadAll(latestVersionRes.Body)
-	if err != nil {
-		return "", buserr.New(constant.ErrOSSConn)
+	versionByte, err := io.ReadAll(latestVersionRes.Body)
+	version := string(versionByte)
+	if err != nil || strings.Contains(version, "<") {
+		global.LOG.Errorf("load latest version from oss failed, err: %v", version)
+		return ""
 	}
 	if isLatest {
-		return string(version), nil
+		return u.checkVersion(version, currentVersion)
 	}
 
 	versionMap := make(map[string]string)
-	if err := json.Unmarshal(version, &versionMap); err != nil {
-		return "", buserr.New(constant.ErrOSSConn)
+	if err := json.Unmarshal(versionByte, &versionMap); err != nil {
+		global.LOG.Errorf("load latest version from oss failed (error unmarshal), err: %v", err)
+		return ""
 	}
 
-	if len(currentVersion) < 4 {
-		return "", fmt.Errorf("current version is error format: %s", currentVersion)
+	versionPart := strings.Split(currentVersion, ".")
+	if len(versionPart) < 3 {
+		global.LOG.Errorf("current version is error format: %s", currentVersion)
+		return ""
+	}
+	num, _ := strconv.Atoi(versionPart[1])
+	if num == 0 {
+		global.LOG.Errorf("current version is error format: %s", currentVersion)
+		return ""
+	}
+	if num >= 10 {
+		if version, ok := versionMap[currentVersion[0:5]]; ok {
+			return u.checkVersion(version, currentVersion)
+		}
+		return ""
 	}
 	if version, ok := versionMap[currentVersion[0:4]]; ok {
-		return version, nil
+		return u.checkVersion(version, currentVersion)
 	}
-	return "", buserr.New(constant.ErrOSSConn)
+	return ""
+}
+
+func (u *UpgradeService) checkVersion(v2, v1 string) string {
+	addSuffix := false
+	if !strings.Contains(v1, "-") {
+		v1 = v1 + "-lts"
+	}
+	if !strings.Contains(v2, "-") {
+		addSuffix = true
+		v2 = v2 + "-lts"
+	}
+	if common.ComparePanelVersion(v2, v1) {
+		if addSuffix {
+			return strings.TrimSuffix(v2, "-lts")
+		}
+		return v2
+	}
+	return ""
 }
 
 func (u *UpgradeService) loadReleaseNotes(path string) (string, error) {
