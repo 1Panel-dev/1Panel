@@ -16,6 +16,7 @@ type ICommandRepo interface {
 	Update(id uint, vars map[string]interface{}) error
 	Delete(opts ...DBOption) error
 	Get(opts ...DBOption) (model.Command, error)
+	WithLikeName(name string) DBOption
 }
 
 func NewICommandRepo() ICommandRepo {
@@ -78,4 +79,13 @@ func (u *CommandRepo) Delete(opts ...DBOption) error {
 		db = opt(db)
 	}
 	return db.Delete(&model.Command{}).Error
+}
+
+func (a CommandRepo) WithLikeName(name string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		if len(name) == 0 {
+			return g
+		}
+		return g.Where("name like ? or command like ?", "%"+name+"%", "%"+name+"%")
+	}
 }

@@ -65,7 +65,7 @@ func (u *CommandService) SearchForTree() ([]dto.CommandTree, error) {
 }
 
 func (u *CommandService) SearchWithPage(search dto.SearchCommandWithPage) (int64, interface{}, error) {
-	total, commands, err := commandRepo.Page(search.Page, search.PageSize, commonRepo.WithLikeName(search.Info), commonRepo.WithByGroupID(search.GroupID), commonRepo.WithOrderRuleBy(search.OrderBy, search.Order))
+	total, commands, err := commandRepo.Page(search.Page, search.PageSize, commandRepo.WithLikeName(search.Name), commonRepo.WithLikeName(search.Info), commonRepo.WithByGroupID(search.GroupID), commonRepo.WithOrderRuleBy(search.OrderBy, search.Order))
 	if err != nil {
 		return 0, nil, err
 	}

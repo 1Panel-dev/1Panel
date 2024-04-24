@@ -16,13 +16,20 @@
                 </el-button>
             </template>
             <template #search>
-                <el-select v-model="group" @change="search()" clearable class="p-w-200">
-                    <template #prefix>{{ $t('terminal.group') }}</template>
-                    <el-option :label="$t('commons.table.all')" value=""></el-option>
-                    <div v-for="item in groupList" :key="item.name">
-                        <el-option :value="item.id" :label="item.name" />
-                    </div>
-                </el-select>
+                <el-row :gutter="5">
+                    <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
+                        <el-select v-model="group" @change="search()" clearable class="p-w-200">
+                            <template #prefix>{{ $t('terminal.group') }}</template>
+                            <el-option :label="$t('commons.table.all')" value=""></el-option>
+                            <div v-for="item in groupList" :key="item.name">
+                                <el-option :value="item.id" :label="item.name" />
+                            </div>
+                        </el-select>
+                    </el-col>
+                    <el-col :xs="24" :sm="4" :md="4" :lg="4" :xl="4">
+                        <TableSearch @search="search()" v-model:searchName="commandReq.name" />
+                    </el-col>
+                </el-row>
             </template>
             <template #main>
                 <ComplexTable
@@ -160,6 +167,10 @@ let commandInfo = reactive<Command.CommandOperate>({
     command: '',
 });
 
+const commandReq = reactive({
+    name: '',
+});
+
 const cmdVisible = ref<boolean>(false);
 
 const loadGroups = async () => {
@@ -274,6 +285,7 @@ const search = async (column?: any) => {
         info: info.value,
         orderBy: paginationConfig.orderBy,
         order: paginationConfig.order,
+        name: commandReq.name,
     };
     loading.value = true;
     await getCommandPage(params)

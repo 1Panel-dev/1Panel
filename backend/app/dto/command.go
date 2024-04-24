@@ -6,6 +6,7 @@ type SearchCommandWithPage struct {
 	Order   string `json:"order"`
 	GroupID uint   `json:"groupID"`
 	Info    string `json:"info"`
+	Name    string `json:"name"`
 }
 
 type CommandOperate struct {
