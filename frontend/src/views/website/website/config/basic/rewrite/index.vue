@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-form-item :label="$t('website.rewriteMode')">
-            <el-select v-model="req.name" filterable @change="getRewriteConfig(req.name)">
+            <el-select v-model="req.name" filterable @change="getRewriteConfig(req.name)" class="p-w-200">
                 <el-option :label="$t('website.current')" :value="'current'"></el-option>
                 <el-option
                     v-for="(rewrite, index) in Rewrites"
@@ -11,6 +11,7 @@
                 ></el-option>
             </el-select>
         </el-form-item>
+        <el-text type="warning">{{ $t('website.rewriteHelper2') }}</el-text>
         <Codemirror
             ref="codeRef"
             v-loading="loading"
@@ -26,7 +27,7 @@
             :extensions="extensions"
             v-model="content"
         />
-        <div style="margin-top: 10px">
+        <div class="mt-2">
             <el-form-item>
                 <el-alert :title="$t('website.rewriteHelper')" type="info" :closable="false" />
             </el-form-item>
