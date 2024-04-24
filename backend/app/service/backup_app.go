@@ -22,18 +22,18 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (u *BackupService) AppBackup(req dto.CommonBackup) error {
+func (u *BackupService) AppBackup(req dto.CommonBackup) (*model.BackupRecord, error) {
 	localDir, err := loadLocalDir()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	app, err := appRepo.GetFirst(appRepo.WithKey(req.Name))
 	if err != nil {
-		return err
+		return nil, err
 	}
 	install, err := appInstallRepo.GetFirst(commonRepo.WithByName(req.DetailName), appInstallRepo.WithAppId(app.ID))
 	if err != nil {
-		return err
+		return nil, err
 	}
 	timeNow := time.Now().Format("20060102150405")
 	itemDir := fmt.Sprintf("app/%s/%s", req.Name, req.DetailName)
@@ -41,7 +41,7 @@ func (u *BackupService) AppBackup(req dto.CommonBackup) error {
 
 	fileName := fmt.Sprintf("%s_%s.tar.gz", req.DetailName, timeNow+common.RandStrAndNum(5))
 	if err := handleAppBackup(&install, backupDir, fileName); err != nil {
-		return err
+		return nil, err
 	}
 
 	record := &model.BackupRecord{
@@ -56,9 +56,9 @@ func (u *BackupService) AppBackup(req dto.CommonBackup) error {
 
 	if err := backupRepo.CreateRecord(record); err != nil {
 		global.LOG.Errorf("save backup record failed, err: %v", err)
-		return err
+		return nil, err
 	}
-	return nil
+	return record, nil
 }
 
 func (u *BackupService) AppRecover(req dto.CommonRecover) error {

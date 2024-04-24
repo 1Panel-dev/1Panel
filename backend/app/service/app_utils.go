@@ -450,23 +450,40 @@ func upgradeInstall(installID uint, detailID uint, backup, pullImage bool) error
 	install.Status = constant.Upgrading
 
 	go func() {
+		var (
+			upErr      error
+			backupFile string
+		)
+		global.LOG.Infof(i18n.GetMsgByKey("UpgradeAppStart"))
 		if backup {
-			if err = NewIBackupService().AppBackup(dto.CommonBackup{Name: install.App.Key, DetailName: install.Name}); err != nil {
-				global.LOG.Errorf(i18n.GetMsgWithMap("ErrAppBackup", map[string]interface{}{"name": install.Name, "err": err.Error()}))
+			backupRecord, err := NewIBackupService().AppBackup(dto.CommonBackup{Name: install.App.Key, DetailName: install.Name})
+			if err == nil {
+				localDir, err := loadLocalDir()
+				if err == nil {
+					backupFile = path.Join(localDir, backupRecord.FileDir, backupRecord.FileName)
+				} else {
+					global.LOG.Errorf(i18n.GetMsgWithName("ErrAppBackup", install.Name, err))
+				}
+			} else {
+				global.LOG.Errorf(i18n.GetMsgWithName("ErrAppBackup", install.Name, err))
 			}
 		}
-		var upErr error
 
 		defer func() {
 			if upErr != nil {
+				global.LOG.Infof(i18n.GetMsgWithName("ErrAppUpgrade", install.Name, upErr))
 				if backup {
-					if err := NewIBackupService().AppRecover(dto.CommonRecover{Name: install.App.Key, DetailName: install.Name, Type: "app", Source: constant.ResourceLocal}); err != nil {
+					global.LOG.Infof(i18n.GetMsgWithName("AppRecover", install.Name, nil))
+					if err := NewIBackupService().AppRecover(dto.CommonRecover{Name: install.App.Key, DetailName: install.Name, Type: "app", Source: constant.ResourceLocal, File: backupFile}); err != nil {
 						global.LOG.Errorf("recover app [%s] [%s] failed %v", install.App.Key, install.Name, err)
 					}
 				}
-				install.Status = constant.UpgradeErr
-				install.Message = upErr.Error()
-				_ = appInstallRepo.Save(context.Background(), &install)
+				existInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(installID))
+				if existInstall.ID > 0 {
+					existInstall.Status = constant.UpgradeErr
+					existInstall.Message = upErr.Error()
+					_ = appInstallRepo.Save(context.Background(), &existInstall)
+				}
 			}
 		}()
 
@@ -546,36 +563,21 @@ func upgradeInstall(installID uint, detailID uint, backup, pullImage bool) error
 		if upErr = addDockerComposeCommonParam(composeMap, install.ServiceName, config, envs); upErr != nil {
 			return
 		}
-		paramByte, upErr := json.Marshal(envs)
-		if upErr != nil {
+		paramByte, err := json.Marshal(envs)
+		if err != nil {
+			upErr = err
 			return
 		}
 		install.Env = string(paramByte)
-		composeByte, upErr := yaml.Marshal(composeMap)
-		if upErr != nil {
+		composeByte, err := yaml.Marshal(composeMap)
+		if err != nil {
+			upErr = err
 			return
 		}
 
 		install.DockerCompose = string(composeByte)
 		install.Version = detail.Version
 		install.AppDetailId = detailID
-
-		if out, err := compose.Down(install.GetComposePath()); err != nil {
-			if out != "" {
-				upErr = errors.New(out)
-				return
-			}
-			return
-		}
-		envParams := make(map[string]string, len(envs))
-		handleMap(envs, envParams)
-		if err = env.Write(envParams, install.GetEnvPath()); err != nil {
-			return
-		}
-
-		if err = runScript(&install, "upgrade"); err != nil {
-			return
-		}
 
 		content, err := fileOp.GetContent(install.GetEnvPath())
 		if err != nil {
@@ -595,11 +597,32 @@ func upgradeInstall(installID uint, detailID uint, backup, pullImage bool) error
 				return
 			}
 			for _, image := range images {
+				global.LOG.Infof(i18n.GetMsgWithName("PullImageStart", image, nil))
 				if err = dockerCli.PullImage(image, true); err != nil {
 					upErr = buserr.WithNameAndErr("ErrDockerPullImage", "", err)
 					return
+				} else {
+					global.LOG.Infof(i18n.GetMsgByKey("PullImageSuccess"))
 				}
 			}
+		}
+
+		if out, err := compose.Down(install.GetComposePath()); err != nil {
+			if out != "" {
+				upErr = errors.New(out)
+				return
+			}
+			upErr = err
+			return
+		}
+		envParams := make(map[string]string, len(envs))
+		handleMap(envs, envParams)
+		if upErr = env.Write(envParams, install.GetEnvPath()); upErr != nil {
+			return
+		}
+
+		if upErr = runScript(&install, "upgrade"); upErr != nil {
+			return
 		}
 
 		if upErr = fileOp.WriteFile(install.GetComposePath(), strings.NewReader(install.DockerCompose), 0775); upErr != nil {
@@ -615,6 +638,7 @@ func upgradeInstall(installID uint, detailID uint, backup, pullImage bool) error
 		}
 		install.Status = constant.Running
 		_ = appInstallRepo.Save(context.Background(), &install)
+		global.LOG.Infof(i18n.GetMsgWithName("UpgradeAppSuccess", install.Name, nil))
 	}()
 
 	return appInstallRepo.Save(context.Background(), &install)
