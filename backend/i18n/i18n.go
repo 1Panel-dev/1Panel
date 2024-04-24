@@ -31,6 +31,27 @@ func GetMsgWithMap(key string, maps map[string]interface{}) string {
 	}
 }
 
+func GetMsgWithName(key string, name string, err error) string {
+	var (
+		content string
+		dataMap = make(map[string]interface{})
+	)
+	dataMap["name"] = name
+	if err != nil {
+		dataMap["err"] = err.Error()
+	}
+	content, _ = global.I18n.Localize(&i18n.LocalizeConfig{
+		MessageID:    key,
+		TemplateData: dataMap,
+	})
+	content = strings.ReplaceAll(content, "<no value>", "")
+	if content == "" {
+		return key
+	} else {
+		return content
+	}
+}
+
 func GetErrMsg(key string, maps map[string]interface{}) string {
 	var content string
 	if maps == nil {

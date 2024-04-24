@@ -323,7 +323,7 @@ func (b *BaseApi) Backup(c *gin.Context) {
 
 	switch req.Type {
 	case "app":
-		if err := backupService.AppBackup(req); err != nil {
+		if _, err := backupService.AppBackup(req); err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 			return
 		}

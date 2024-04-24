@@ -61,6 +61,12 @@ AppStoreIsSyncing: '应用商店正在同步中，请稍后再试'
 ErrGetCompose: "docker-compose.yml 文件获取失败！{{ .detail }}"
 ErrAppWarn: "状态异常，请查看日志"
 ErrAppParamKey: "参数 {{ .name }} 字段异常"
+ErrAppUpgrade: "应用 {{ .name }} 升级失败 {{ .err }}"
+AppRecover: "应用  {{ .name }} 回滚 "
+PullImageStart: "开始拉取镜像 {{ .name }}"
+PullImageSuccess: "镜像拉取成功"
+UpgradeAppStart: "开始升级应用 {{ .name }}"
+UpgradeAppSuccess: "应用  {{ .name }} 升级成功"
 
 #file
 ErrFileCanNotRead: "此文件不支持预览"

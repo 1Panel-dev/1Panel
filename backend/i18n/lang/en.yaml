@@ -61,6 +61,12 @@ AppStoreIsSyncing: 'The App Store is syncing, please try again later'
 ErrGetCompose: "Failed to obtain docker-compose.yml file! {{ .detail }}"
 ErrAppWarn: "Abnormal status, please check the log"
 ErrAppParamKey: "Parameter {{ .name }} field exception"
+ErrAppUpgrade: "Failed to upgrade application {{ .name }} {{ .err }}"
+AppRecover: "App {{ .name }} rolled back "
+PullImageStart: "Start pulling image {{ .name }}"
+PullImageSuccess: "Image pulled successfully"
+UpgradeAppStart: "Start upgrading application {{ .name }}"
+UpgradeAppSuccess: "App {{ .name }} upgraded successfully"
 
 #file
 ErrFileCanNotRead: "File can not read"

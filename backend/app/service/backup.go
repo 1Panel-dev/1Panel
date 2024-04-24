@@ -55,7 +55,7 @@ type IBackupService interface {
 	WebsiteBackup(db dto.CommonBackup) error
 	WebsiteRecover(req dto.CommonRecover) error
 
-	AppBackup(db dto.CommonBackup) error
+	AppBackup(db dto.CommonBackup) (*model.BackupRecord, error)
 	AppRecover(req dto.CommonRecover) error
 
 	Run()
