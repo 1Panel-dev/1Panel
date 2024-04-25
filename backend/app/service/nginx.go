@@ -2,13 +2,14 @@ package service
 
 import (
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	"io"
 	"net/http"
 	"os"
 	"path"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
@@ -76,6 +77,7 @@ func (n NginxService) GetStatus() (response.NginxStatus, error) {
 	if err != nil {
 		return response.NginxStatus{}, err
 	}
+	defer res.Body.Close()
 	content, err := io.ReadAll(res.Body)
 	if err != nil {
 		return response.NginxStatus{}, err

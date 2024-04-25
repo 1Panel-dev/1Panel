@@ -230,6 +230,7 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 		if err != nil {
 			return appDetailDTO, buserr.WithDetail("ErrGetCompose", err.Error(), err)
 		}
+		defer composeRes.Body.Close()
 		bodyContent, err := io.ReadAll(composeRes.Body)
 		if err != nil {
 			return appDetailDTO, buserr.WithDetail("ErrGetCompose", err.Error(), err)
@@ -835,6 +836,7 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 		if err != nil {
 			return err
 		}
+		defer iconRes.Body.Close()
 		body, err := io.ReadAll(iconRes.Body)
 		if err != nil {
 			return err
@@ -862,6 +864,7 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 				if err != nil {
 					return err
 				}
+				defer composeRes.Body.Close()
 				bodyContent, err := io.ReadAll(composeRes.Body)
 				if err != nil {
 					return err

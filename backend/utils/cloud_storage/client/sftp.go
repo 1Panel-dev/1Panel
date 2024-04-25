@@ -50,12 +50,12 @@ func (s sftpClient) Upload(src, target string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	defer sshClient.Close()
 	client, err := sftp.NewClient(sshClient)
 	if err != nil {
 		return false, err
 	}
 	defer client.Close()
-	defer sshClient.Close()
 
 	srcFile, err := os.Open(src)
 	if err != nil {

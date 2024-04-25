@@ -5,8 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/utils/xpack"
-	"github.com/docker/docker/api/types/container"
 	"math"
 	"net/http"
 	"os"
@@ -16,6 +14,9 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/backend/utils/xpack"
+	"github.com/docker/docker/api/types/container"
 
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 
@@ -596,6 +597,7 @@ func upgradeInstall(installID uint, detailID uint, backup, pullImage bool) error
 				upErr = err
 				return
 			}
+			defer dockerCli.Close()
 			for _, image := range images {
 				global.LOG.Infof(i18n.GetMsgWithName("PullImageStart", image, nil))
 				if err = dockerCli.PullImage(image, true); err != nil {
@@ -853,6 +855,7 @@ func checkContainerNameIsExist(containerName, appDir string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	defer client.Close()
 	var options container.ListOptions
 	list, err := client.ContainerList(context.Background(), options)
 	if err != nil {

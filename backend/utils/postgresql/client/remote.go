@@ -269,6 +269,7 @@ func loadImageTag() (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer client.Close()
 	images, err := client.ImageList(context.Background(), types.ImageListOptions{})
 	if err != nil {
 		return "", err

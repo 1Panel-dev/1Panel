@@ -486,6 +486,7 @@ func (b *BaseApi) Download(c *gin.Context) {
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 	}
+	defer file.Close()
 	info, _ := file.Stat()
 	c.Header("Content-Length", strconv.FormatInt(info.Size(), 10))
 	c.Header("Content-Disposition", "attachment; filename*=utf-8''"+url.PathEscape(info.Name()))
@@ -643,6 +644,7 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
+	defer uploadFile.Close()
 	chunkIndex, err := strconv.Atoi(c.PostForm("chunkIndex"))
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
