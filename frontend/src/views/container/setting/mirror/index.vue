@@ -46,6 +46,7 @@ import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { updateDaemonJson } from '@/api/modules/container';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { FormInstance } from 'element-plus';
+import { emptyLineFilter } from '@/utils/util';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -101,7 +102,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
 
 const onSubmit = async () => {
     loading.value = true;
-    await updateDaemonJson('Mirrors', form.mirrors.replaceAll('\n', ','))
+    await updateDaemonJson('Mirrors', emptyLineFilter(form.mirrors, '\n').replaceAll('\n', ','))
         .then(() => {
             loading.value = false;
             emit('search');

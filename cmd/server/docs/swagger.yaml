@@ -5948,8 +5948,8 @@ paths:
         bodyKeys:
         - key
         - value
-        formatEN: Updated the docker daemon.json configuration [key]=>[value]
-        formatZH: 更新 docker daemon.json 配置 [key]=>[value]
+        formatEN: Updated configuration [key]
+        formatZH: 更新配置 [key]
         paramKeys: []
   /containers/daemonjson/update/byfile:
     post:
@@ -5974,8 +5974,8 @@ paths:
       x-panel-log:
         BeforeFunctions: []
         bodyKeys: []
-        formatEN: Updated the docker daemon.json configuration
-        formatZH: 更新 docker daemon.json 配置
+        formatEN: Updated configuration file
+        formatZH: 更新配置文件
         paramKeys: []
   /containers/docker/operate:
     post:
@@ -6363,8 +6363,8 @@ paths:
       x-panel-log:
         BeforeFunctions: []
         bodyKeys: []
-        formatEN: Updated the docker daemon.json ipv6 option
-        formatZH: 更新 docker daemon.json ipv6 配置
+        formatEN: Updated the ipv6 option
+        formatZH: 更新 ipv6 配置
         paramKeys: []
   /containers/limit:
     get:
@@ -6448,8 +6448,8 @@ paths:
       x-panel-log:
         BeforeFunctions: []
         bodyKeys: []
-        formatEN: Updated the docker daemon.json log option
-        formatZH: 更新 docker daemon.json 日志配置
+        formatEN: Updated the log option
+        formatZH: 更新日志配置
         paramKeys: []
   /containers/network:
     get:

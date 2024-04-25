@@ -1444,8 +1444,8 @@ const docTemplate = `{
                         "key",
                         "value"
                     ],
-                    "formatEN": "Updated the docker daemon.json configuration [key]=\u003e[value]",
-                    "formatZH": "更新 docker daemon.json 配置 [key]=\u003e[value]",
+                    "formatEN": "Updated configuration [key]",
+                    "formatZH": "更新配置 [key]",
                     "paramKeys": []
                 }
             }
@@ -1484,8 +1484,8 @@ const docTemplate = `{
                 "x-panel-log": {
                     "BeforeFunctions": [],
                     "bodyKeys": [],
-                    "formatEN": "Updated the docker daemon.json configuration",
-                    "formatZH": "更新 docker daemon.json 配置",
+                    "formatEN": "Updated configuration file",
+                    "formatZH": "更新配置文件",
                     "paramKeys": []
                 }
             }
@@ -2094,8 +2094,8 @@ const docTemplate = `{
                 "x-panel-log": {
                     "BeforeFunctions": [],
                     "bodyKeys": [],
-                    "formatEN": "Updated the docker daemon.json ipv6 option",
-                    "formatZH": "更新 docker daemon.json ipv6 配置",
+                    "formatEN": "Updated the ipv6 option",
+                    "formatZH": "更新 ipv6 配置",
                     "paramKeys": []
                 }
             }
@@ -2233,8 +2233,8 @@ const docTemplate = `{
                 "x-panel-log": {
                     "BeforeFunctions": [],
                     "bodyKeys": [],
-                    "formatEN": "Updated the docker daemon.json log option",
-                    "formatZH": "更新 docker daemon.json 日志配置",
+                    "formatEN": "Updated the log option",
+                    "formatZH": "更新日志配置",
                     "paramKeys": []
                 }
             }
