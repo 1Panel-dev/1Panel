@@ -46,6 +46,7 @@ import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { updateDaemonJson } from '@/api/modules/container';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { FormInstance } from 'element-plus';
+import { emptyLineFilter } from '@/utils/util';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -97,7 +98,7 @@ const onSave = async () => {
 
 const onSubmit = async () => {
     loading.value = true;
-    await updateDaemonJson('Registries', form.registries.replaceAll('\n', ','))
+    await updateDaemonJson('Registries', emptyLineFilter(form.registries, '\n').replaceAll('\n', ','))
         .then(() => {
             loading.value = false;
             handleClose();
