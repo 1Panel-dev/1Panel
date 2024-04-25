@@ -1483,7 +1483,7 @@ const message = {
         issue: 'Feedback',
         doc: 'Official document',
         star: 'Star',
-        description: 'Linux server operation and maintenance management panel',
+        description: 'Linux Server Panel',
         forum: 'Forum Help',
         doc2: 'User Manual',
         currentVersion: 'Version',
