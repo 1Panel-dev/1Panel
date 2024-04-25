@@ -4,11 +4,12 @@ import (
 	"context"
 	"crypto/tls"
 	"errors"
-	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"net"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 )
 
 func GetHttpRes(url string) (*http.Response, error) {
@@ -42,6 +43,7 @@ func GetHttpRes(url string) (*http.Response, error) {
 			return nil, buserr.WithMap("ErrHttpReqFailed", map[string]interface{}{"err": err.Error()}, err)
 		}
 	}
+	defer resp.Body.Close()
 	if resp.StatusCode == 404 {
 		return nil, buserr.New("ErrHttpReqNotFound")
 	}

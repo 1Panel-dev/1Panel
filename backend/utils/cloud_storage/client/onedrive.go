@@ -223,11 +223,11 @@ func RefreshToken(grantType string, varMap map[string]interface{}) (string, stri
 	if err != nil {
 		return "", "", fmt.Errorf("request for access token failed, err: %v", err)
 	}
+	defer resp.Body.Close()
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", "", fmt.Errorf("read data from response body failed, err: %v", err)
 	}
-	defer resp.Body.Close()
 
 	tokenMap := map[string]interface{}{}
 	if err := json.Unmarshal(respBody, &tokenMap); err != nil {
@@ -387,9 +387,9 @@ func (o *oneDriveClient) upBig(ctx context.Context, srcPath, folderID string, fi
 		if err != nil {
 			return false, err
 		}
+		res.Body.Close()
 		if res.StatusCode != 201 && res.StatusCode != 202 && res.StatusCode != 200 {
 			data, _ := io.ReadAll(res.Body)
-			res.Body.Close()
 			return false, errors.New(string(data))
 		}
 	}

@@ -7,13 +7,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/image"
 	"io"
 	"os"
 	"path"
 	"strings"
 	"time"
+
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/image"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
@@ -53,6 +54,7 @@ func (u *ImageService) Page(req dto.SearchWithPage) (int64, interface{}, error) 
 	if err != nil {
 		return 0, nil, err
 	}
+	defer client.Close()
 	list, err = client.ImageList(context.Background(), image.ListOptions{})
 	if err != nil {
 		return 0, nil, err
@@ -106,6 +108,7 @@ func (u *ImageService) ListAll() ([]dto.ImageInfo, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer client.Close()
 	list, err := client.ImageList(context.Background(), image.ListOptions{})
 	if err != nil {
 		return nil, err
@@ -133,6 +136,7 @@ func (u *ImageService) List() ([]dto.Options, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer client.Close()
 	list, err = client.ImageList(context.Background(), image.ListOptions{})
 	if err != nil {
 		return nil, err
@@ -152,6 +156,7 @@ func (u *ImageService) ImageBuild(req dto.ImageBuild) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer client.Close()
 	fileName := "Dockerfile"
 	if req.From == "edit" {
 		dir := fmt.Sprintf("%s/docker/build/%s", constant.DataDir, strings.ReplaceAll(req.Name, ":", "_"))
@@ -235,6 +240,7 @@ func (u *ImageService) ImagePull(req dto.ImagePull) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer client.Close()
 	dockerLogDir := path.Join(global.CONF.System.TmpDir, "docker_logs")
 	if _, err := os.Stat(dockerLogDir); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(dockerLogDir, os.ModePerm); err != nil {
@@ -305,10 +311,12 @@ func (u *ImageService) ImageLoad(req dto.ImageLoad) error {
 	if err != nil {
 		return err
 	}
+	defer client.Close()
 	res, err := client.ImageLoad(context.TODO(), file, true)
 	if err != nil {
 		return err
 	}
+	defer res.Body.Close()
 	content, err := io.ReadAll(res.Body)
 	if err != nil {
 		return err
@@ -324,6 +332,7 @@ func (u *ImageService) ImageSave(req dto.ImageSave) error {
 	if err != nil {
 		return err
 	}
+	defer client.Close()
 
 	out, err := client.ImageSave(context.TODO(), []string{req.TagName})
 	if err != nil {
@@ -346,6 +355,7 @@ func (u *ImageService) ImageTag(req dto.ImageTag) error {
 	if err != nil {
 		return err
 	}
+	defer client.Close()
 
 	if err := client.ImageTag(context.TODO(), req.SourceID, req.TargetName); err != nil {
 		return err
@@ -358,6 +368,7 @@ func (u *ImageService) ImagePush(req dto.ImagePush) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer client.Close()
 	repo, err := imageRepoRepo.Get(commonRepo.WithByID(req.RepoID))
 	if err != nil {
 		return "", err
@@ -416,6 +427,7 @@ func (u *ImageService) ImageRemove(req dto.BatchDelete) error {
 	if err != nil {
 		return err
 	}
+	defer client.Close()
 	for _, id := range req.Names {
 		if _, err := client.ImageRemove(context.TODO(), id, types.ImageRemoveOptions{Force: req.Force, PruneChildren: true}); err != nil {
 			if strings.Contains(err.Error(), "image is being used") || strings.Contains(err.Error(), "is using") {

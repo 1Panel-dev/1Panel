@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"github.com/docker/docker/api/types/container"
 	"io"
 	"os"
 	"os/exec"
@@ -12,6 +11,8 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/docker/docker/api/types/container"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -39,6 +40,7 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 	if err != nil {
 		return 0, nil, err
 	}
+	defer client.Close()
 
 	options := container.ListOptions{All: true}
 	options.Filters = filters.NewArgs()

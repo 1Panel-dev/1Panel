@@ -19,6 +19,7 @@ func (u *ContainerService) PageNetwork(req dto.SearchWithPage) (int64, interface
 	if err != nil {
 		return 0, nil, err
 	}
+	defer client.Close()
 	list, err := client.NetworkList(context.TODO(), types.NetworkListOptions{})
 	if err != nil {
 		return 0, nil, err
@@ -81,6 +82,7 @@ func (u *ContainerService) ListNetwork() ([]dto.Options, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer client.Close()
 	list, err := client.NetworkList(context.TODO(), types.NetworkListOptions{})
 	if err != nil {
 		return nil, err
@@ -100,6 +102,7 @@ func (u *ContainerService) DeleteNetwork(req dto.BatchDelete) error {
 	if err != nil {
 		return err
 	}
+	defer client.Close()
 	for _, id := range req.Names {
 		if err := client.NetworkRemove(context.TODO(), id); err != nil {
 			if strings.Contains(err.Error(), "has active endpoints") {
@@ -115,6 +118,7 @@ func (u *ContainerService) CreateNetwork(req dto.NetworkCreate) error {
 	if err != nil {
 		return err
 	}
+	defer client.Close()
 	var (
 		ipams    []network.IPAMConfig
 		enableV6 bool

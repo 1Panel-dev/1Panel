@@ -712,6 +712,7 @@ func syncAppInstallStatus(appInstall *model.AppInstall) error {
 	if err != nil {
 		return err
 	}
+	defer cli.Close()
 	containers, err := cli.ListContainersByName(containerNames)
 	if err != nil {
 		return err

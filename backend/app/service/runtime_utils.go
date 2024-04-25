@@ -3,6 +3,15 @@ package service
 import (
 	"bytes"
 	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"os/exec"
+	"path"
+	"path/filepath"
+	"strings"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
@@ -13,14 +22,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/subosito/gotenv"
 	"gopkg.in/yaml.v3"
-	"io"
-	"net/http"
-	"os"
-	"os/exec"
-	"path"
-	"path/filepath"
-	"strings"
-	"time"
 )
 
 func handleNode(create request.RuntimeCreate, runtime *model.Runtime, fileOp files.FileOp, appVersionDir string) (err error) {
@@ -53,7 +54,12 @@ func handleNode(create request.RuntimeCreate, runtime *model.Runtime, fileOp fil
 	}
 
 	go func() {
-		_, _ = http.Get(nodeDetail.DownloadCallBackUrl)
+		res, err := http.Get(nodeDetail.DownloadCallBackUrl)
+		if err != nil {
+			global.LOG.Errorf("http request failed(handleNode), err: %v", err)
+			return
+		}
+		res.Body.Close()
 	}()
 	go startRuntime(runtime)
 
@@ -172,6 +178,7 @@ func SyncRuntimeContainerStatus(runtime *model.Runtime) error {
 	if err != nil {
 		return err
 	}
+	defer cli.Close()
 	containers, err := cli.ListContainersByName(containerNames)
 	if err != nil {
 		return err
@@ -228,6 +235,7 @@ func buildRuntime(runtime *model.Runtime, oldImageID string, rebuild bool) {
 		if oldImageID != "" {
 			client, err := docker.NewClient()
 			if err == nil {
+				defer client.Close()
 				newImageID, err := client.GetImageIDByName(runtime.Image)
 				if err == nil && newImageID != oldImageID {
 					global.LOG.Infof("delete imageID [%s] ", oldImageID)
@@ -390,6 +398,7 @@ func checkContainerName(name string) error {
 	if err != nil {
 		return err
 	}
+	defer dockerCli.Close()
 	names, err := dockerCli.ListContainersByName([]string{name})
 	if err != nil {
 		return err

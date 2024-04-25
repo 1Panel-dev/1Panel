@@ -55,6 +55,7 @@ func (u *DockerService) LoadDockerStatus() string {
 	if err != nil {
 		return constant.Stopped
 	}
+	defer client.Close()
 	if _, err := client.Ping(context.Background()); err != nil {
 		return constant.Stopped
 	}
@@ -72,6 +73,7 @@ func (u *DockerService) LoadDockerConf() *dto.DaemonJsonConf {
 	if err != nil {
 		data.Status = constant.Stopped
 	} else {
+		defer client.Close()
 		if _, err := client.Ping(ctx); err != nil {
 			data.Status = constant.Stopped
 		}

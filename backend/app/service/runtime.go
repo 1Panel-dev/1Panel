@@ -4,6 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
+	"path"
+	"path/filepath"
+	"regexp"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
@@ -19,13 +27,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/pkg/errors"
 	"github.com/subosito/gotenv"
-	"os"
-	"path"
-	"path/filepath"
-	"regexp"
-	"strconv"
-	"strings"
-	"time"
 )
 
 type RuntimeService struct {
@@ -193,6 +194,7 @@ func (r *RuntimeService) Delete(runtimeDelete request.RuntimeDelete) error {
 			if err != nil {
 				return err
 			}
+			defer client.Close()
 			imageID, err := client.GetImageIDByName(runtime.Image)
 			if err != nil {
 				return err
@@ -420,6 +422,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 		if err != nil {
 			return err
 		}
+		defer client.Close()
 		imageID, err := client.GetImageIDByName(oldImage)
 		if err != nil {
 			return err

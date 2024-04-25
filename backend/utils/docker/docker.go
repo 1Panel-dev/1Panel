@@ -33,6 +33,10 @@ func NewClient() (Client, error) {
 	}, nil
 }
 
+func (c Client) Close() {
+	_ = c.cli.Close()
+}
+
 func NewDockerClient() (*client.Client, error) {
 	var settingItem model.Setting
 	_ = global.DB.Where("key = ?", "DockerSockPath").First(&settingItem).Error
@@ -150,6 +154,7 @@ func CreateDefaultDockerNetwork() error {
 		global.LOG.Errorf("init docker client error %s", err.Error())
 		return err
 	}
+	defer cli.Close()
 	if !cli.NetworkExist("1panel-network") {
 		if err := cli.CreateNetwork("1panel-network"); err != nil {
 			global.LOG.Errorf("create default docker network  error %s", err.Error())

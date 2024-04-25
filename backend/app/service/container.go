@@ -88,6 +88,7 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 	if err != nil {
 		return 0, nil, err
 	}
+	defer client.Close()
 	options := container.ListOptions{
 		All: true,
 	}
@@ -219,6 +220,7 @@ func (u *ContainerService) List() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer client.Close()
 	containers, err := client.ContainerList(context.Background(), container.ListOptions{All: true})
 	if err != nil {
 		return nil, err
@@ -240,6 +242,7 @@ func (u *ContainerService) ContainerListStats() ([]dto.ContainerListStats, error
 	if err != nil {
 		return nil, err
 	}
+	defer client.Close()
 	list, err := client.ContainerList(context.Background(), container.ListOptions{All: true})
 	if err != nil {
 		return nil, err
@@ -262,6 +265,7 @@ func (u *ContainerService) Inspect(req dto.InspectReq) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer client.Close()
 	var inspectInfo interface{}
 	switch req.Type {
 	case "container":
@@ -289,6 +293,7 @@ func (u *ContainerService) Prune(req dto.ContainerPrune) (dto.ContainerPruneRepo
 	if err != nil {
 		return report, err
 	}
+	defer client.Close()
 	pruneFilters := filters.NewArgs()
 	if req.WithTagAll {
 		pruneFilters.Add("dangling", "false")
@@ -350,6 +355,7 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate) error {
 	if err != nil {
 		return err
 	}
+	defer client.Close()
 	ctx := context.Background()
 	newContainer, _ := client.ContainerInspect(ctx, req.Name)
 	if newContainer.ContainerJSONBase != nil {
@@ -397,6 +403,7 @@ func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.Contai
 	if err != nil {
 		return nil, err
 	}
+	defer client.Close()
 	ctx := context.Background()
 	oldContainer, err := client.ContainerInspect(ctx, req.Name)
 	if err != nil {
@@ -467,6 +474,7 @@ func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
 	if err != nil {
 		return err
 	}
+	defer client.Close()
 	ctx := context.Background()
 	newContainer, _ := client.ContainerInspect(ctx, req.Name)
 	if newContainer.ContainerJSONBase != nil && newContainer.ID != req.ContainerID {
@@ -515,6 +523,7 @@ func (u *ContainerService) ContainerUpgrade(req dto.ContainerUpgrade) error {
 	if err != nil {
 		return err
 	}
+	defer client.Close()
 	ctx := context.Background()
 	oldContainer, err := client.ContainerInspect(ctx, req.Name)
 	if err != nil {
@@ -562,6 +571,7 @@ func (u *ContainerService) ContainerRename(req dto.ContainerRename) error {
 	if err != nil {
 		return err
 	}
+	defer client.Close()
 
 	newContainer, _ := client.ContainerInspect(ctx, req.NewName)
 	if newContainer.ContainerJSONBase != nil {
@@ -577,6 +587,7 @@ func (u *ContainerService) ContainerOperation(req dto.ContainerOperation) error 
 	if err != nil {
 		return err
 	}
+	defer client.Close()
 	for _, item := range req.Names {
 		global.LOG.Infof("start container %s operation %s", item, req.Operation)
 		switch req.Operation {
@@ -604,6 +615,7 @@ func (u *ContainerService) ContainerLogClean(req dto.OperationWithName) error {
 	if err != nil {
 		return err
 	}
+	defer client.Close()
 	ctx := context.Background()
 	containerItem, err := client.ContainerInspect(ctx, req.Name)
 	if err != nil {
@@ -722,6 +734,7 @@ func (u *ContainerService) ContainerStats(id string) (*dto.ContainerStats, error
 	if err != nil {
 		return nil, err
 	}
+	defer client.Close()
 	res, err := client.ContainerStats(context.TODO(), id, false)
 	if err != nil {
 		return nil, err
@@ -757,6 +770,7 @@ func (u *ContainerService) LoadContainerLogs(req dto.OperationWithNameAndType) s
 		if err != nil {
 			return ""
 		}
+		defer cli.Close()
 		options := container.ListOptions{All: true}
 		options.Filters = filters.NewArgs()
 		options.Filters.Add("label", fmt.Sprintf("%s=%s", composeProjectLabel, req.Name))
@@ -897,12 +911,11 @@ func loadCpuAndMem(client *client.Client, container string) dto.ContainerListSta
 		return data
 	}
 
+	defer res.Body.Close()
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		res.Body.Close()
 		return data
 	}
-	res.Body.Close()
 	var stats *types.StatsJSON
 	if err := json.Unmarshal(body, &stats); err != nil {
 		return data
