@@ -518,3 +518,14 @@ export function getAction(action: string) {
 export function getLanguage() {
     return localStorage.getItem('lang') || 'zh';
 }
+
+export function emptyLineFilter(str: string, spilt: string) {
+    let list = str.split(spilt);
+    let results = [];
+    for (let i = 0; i < list.length; i++) {
+        if (list[i].trim() !== '') {
+            results.push(list[i]);
+        }
+    }
+    return results.join(spilt);
+}
