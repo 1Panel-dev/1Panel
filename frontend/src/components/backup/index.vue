@@ -31,7 +31,7 @@
                 :data="data"
             >
                 <template #toolbar>
-                    <el-button type="primary" @click="onBackup()">
+                    <el-button type="primary" :disabled="status && status != 'Running'" @click="onBackup()">
                         {{ $t('commons.button.backup') }}
                     </el-button>
                     <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
@@ -98,11 +98,13 @@ const type = ref();
 const name = ref();
 const detailName = ref();
 const backupPath = ref();
+const status = ref();
 
 interface DialogProps {
     type: string;
     name: string;
     detailName: string;
+    status: string;
 }
 const acceptParams = (params: DialogProps): void => {
     type.value = params.type;
@@ -112,6 +114,7 @@ const acceptParams = (params: DialogProps): void => {
     name.value = params.name;
     detailName.value = params.detailName;
     backupVisible.value = true;
+    status.value = params.status;
     search();
 };
 const handleClose = () => {
