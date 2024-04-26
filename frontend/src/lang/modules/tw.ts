@@ -1195,7 +1195,8 @@ const message = {
         noSpace: '輸入信息不能包括空格符號',
         duplicatePassword: '新密碼不能與原始密碼一致，請重新輸入！',
         diskClean: '缓存清理',
-        developerMode: '內測模式',
+        開發者模式: '預覽體驗計劃',
+        開發者模式幫助程序: '獲取 1Panel 的預覽版本，以分享有關新功能和更新的反饋',
 
         thirdParty: '第三方賬號',
         createBackupAccount: '添加 {0}',

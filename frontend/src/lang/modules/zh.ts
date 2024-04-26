@@ -1196,7 +1196,8 @@ const message = {
         noSpace: '输入信息不能包含空格符',
         duplicatePassword: '新密码不能与原始密码一致，请重新输入！',
         diskClean: '缓存清理',
-        developerMode: '内测模式',
+        developerMode: '预览体验计划',
+        developerModeHelper: '获取 1Panel 的预览版本，以分享有关新功能和更新的反馈',
 
         thirdParty: '第三方账号',
         createBackupAccount: '添加 {0}',

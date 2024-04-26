@@ -1272,7 +1272,8 @@ const message = {
         noSpace: 'Input information cannot include space characters',
         duplicatePassword: 'The new password cannot be the same as the original password, please re-enter!',
         diskClean: 'Cache Clean',
-        developerMode: 'Internal mode',
+        developerMode: 'Preview Experience Program',
+        developerModeHelper: 'Get a preview version of 1Panel to provide feedback on new features and updates',
 
         thirdParty: 'Third-party account',
         createBackupAccount: 'Add {0}',
