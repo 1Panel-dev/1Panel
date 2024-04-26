@@ -3,7 +3,6 @@ package files
 import (
 	"bufio"
 	"fmt"
-	"github.com/spf13/afero"
 	"io"
 	"net/http"
 	"os"
@@ -12,6 +11,8 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/spf13/afero"
 )
 
 func IsSymlink(mode os.FileMode) bool {
@@ -144,8 +145,5 @@ func GetParentMode(path string) (os.FileMode, error) {
 }
 
 func IsInvalidChar(name string) bool {
-	if strings.Contains(name, "&") {
-		return true
-	}
-	return false
+	return strings.Contains(name, "&")
 }

@@ -314,6 +314,7 @@ func (f FileOp) DownloadFile(url, dst string) error {
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 
 	out, err := os.Create(dst)
 	if err != nil {
@@ -324,8 +325,6 @@ func (f FileOp) DownloadFile(url, dst string) error {
 	if _, err = io.Copy(out, resp.Body); err != nil {
 		return fmt.Errorf("save download file [%s] error, err %s", dst, err.Error())
 	}
-	out.Close()
-	resp.Body.Close()
 	return nil
 }
 

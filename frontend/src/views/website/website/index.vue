@@ -111,11 +111,12 @@
                             </el-button>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('website.remark')" prop="remark" min-width="120px">
-                        <template #default="{ row }">
-                            <MsgInfo :info="row.remark" />
-                        </template>
-                    </el-table-column>
+                    <el-table-column
+                        :label="$t('website.remark')"
+                        prop="remark"
+                        show-overflow-tooltip
+                        min-width="120px"
+                    ></el-table-column>
                     <el-table-column
                         :label="$t('commons.table.protocol')"
                         prop="protocol"
@@ -194,7 +195,6 @@ import { dateFormatSimple } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
 import { VideoPlay, VideoPause } from '@element-plus/icons-vue';
-import MsgInfo from '@/components/msg-info/index.vue';
 import { GetGroupList } from '@/api/modules/group';
 import { Group } from '@/api/interface/group';
 import { GlobalStore } from '@/store';
