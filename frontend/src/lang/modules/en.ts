@@ -58,6 +58,8 @@ const message = {
             fullscreen: 'Fullscreen',
             quitFullscreen: 'Quit Fullscreen',
             update: 'Edit',
+            showAll: 'Show All',
+            hideSome: 'Hide Some',
         },
         search: {
             timeStart: 'Time start',

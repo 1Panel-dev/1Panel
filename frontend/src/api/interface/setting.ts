@@ -140,6 +140,7 @@ export namespace Setting {
         upload: string;
     }
     export interface UpgradeInfo {
+        testVersion: string;
         newVersion: string;
         latestVersion: string;
         releaseNote: string;
