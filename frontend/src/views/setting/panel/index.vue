@@ -125,6 +125,7 @@
                                         <span>{{ $t('commons.button.disable') }}</span>
                                     </el-radio-button>
                                 </el-radio-group>
+                                <span class="input-help">{{ $t('setting.developerModeHelper') }}</span>
                             </el-form-item>
 
                             <el-form-item :label="$t('setting.advancedMenuHide')">
