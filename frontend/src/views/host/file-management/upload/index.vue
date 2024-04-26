@@ -111,27 +111,24 @@ let uploadHelper = ref('');
 const em = defineEmits(['close']);
 const handleClose = () => {
     open.value = false;
-    uploadRef.value!.clearFiles();
+    clearFiles();
     em('close', false);
 };
 const state = reactive({
     uploadEle: null,
 });
 const uploaderFiles = ref<UploadFiles>([]);
-const isUploadFolder = ref(false);
 const hoverIndex = ref(null);
-const uploadType = ref('file');
 const tmpFiles = ref<UploadFiles>([]);
 const breakFlag = ref(false);
 
 const upload = (command: string) => {
-    uploadType.value = command;
     if (command == 'dir') {
         state.uploadEle.webkitdirectory = true;
     } else {
         state.uploadEle.webkitdirectory = false;
     }
-    isUploadFolder.value = true;
+    uploadRef.value.$el.querySelector('input').value = '';
     uploadRef.value.$el.querySelector('input').click();
 };
 
@@ -253,10 +250,11 @@ const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
 
 const clearFiles = () => {
     uploadRef.value!.clearFiles();
+    uploaderFiles.value = [];
 };
 
 const handleExceed: UploadProps['onExceed'] = () => {
-    uploadRef.value!.clearFiles();
+    clearFiles();
     MsgWarning(i18n.global.t('file.uploadOverLimit'));
 };
 
@@ -339,8 +337,7 @@ const submit = async () => {
             loading.value = false;
             uploadHelper.value = '';
             if (success == files.length) {
-                uploadRef.value!.clearFiles();
-                uploaderFiles.value = [];
+                clearFiles();
                 MsgSuccess(i18n.global.t('file.uploadSuccess'));
             }
         }
