@@ -1697,6 +1697,8 @@ const message = {
             'The current application network mode is host mode. If you need to open the port, please open it manually on the firewall page.',
         showLocal: 'Show Local Application',
         reload: 'Reload',
+        upgradeWarn:
+            'Upgrading the application will replace the docker-compose.yml file. If there is any change, please replace it after upgrading',
     },
     website: {
         website: 'Website',
@@ -1948,6 +1950,8 @@ const message = {
         containWarn: 'The domain name contains the main domain, please re-enter',
         rewriteHelper2:
             'Applications such as WordPress installed from the app store have pseudo-static configuration by default. Repeated configuration may result in errors',
+        websiteBackupWarn:
+            'Only supports importing local backups, importing backups from other machines may cause recovery failure',
     },
     php: {
         short_open_tag: 'Short tag support',

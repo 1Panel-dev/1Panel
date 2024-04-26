@@ -1583,6 +1583,7 @@ const message = {
         hostModeHelper: '当前应用网络模式为 host 模式，如需放开端口，请在防火墙页面手动放开',
         showLocal: '显示本地应用',
         reload: '重载',
+        upgradeWarn: '升级应用会替换 docker-compose.yml 文件，如有更改，请升级之后替换',
     },
     website: {
         website: '网站',
@@ -1822,6 +1823,7 @@ const message = {
         tencentCloud: '腾讯云',
         containWarn: '其他域名中包含主域名，请重新输入',
         rewriteHelper2: '从应用商店安装的 WordPress 等应用，默认已经配置好伪静态，重复配置可能会报错',
+        websiteBackupWarn: '仅支持导入本机备份，导入其他机器备份可能会恢复失败',
     },
     php: {
         short_open_tag: '短标签支持',
