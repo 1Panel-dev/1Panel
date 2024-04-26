@@ -168,10 +168,6 @@
                                                 plain
                                                 round
                                                 size="small"
-                                                :disabled="
-                                                    installed.status !== 'Running' ||
-                                                    installed.app.status === 'TakeDown'
-                                                "
                                                 @click="openUploads(installed.app.key, installed.name)"
                                                 v-if="mode === 'installed'"
                                             >
@@ -182,11 +178,9 @@
                                                 plain
                                                 round
                                                 size="small"
-                                                :disabled="
-                                                    installed.status !== 'Running' ||
-                                                    installed.app.status === 'TakeDown'
+                                                @click="
+                                                    openBackups(installed.app.key, installed.name, installed.status)
                                                 "
-                                                @click="openBackups(installed.app.key, installed.name)"
                                                 v-if="mode === 'installed'"
                                             >
                                                 {{ $t('commons.button.backup') }}
@@ -575,11 +569,12 @@ const buttons = [
     },
 ];
 
-const openBackups = (key: string, name: string) => {
+const openBackups = (key: string, name: string, status: string) => {
     let params = {
         type: 'app',
         name: key,
         detailName: name,
+        status: status,
     };
     backupRef.value.acceptParams(params);
 };
