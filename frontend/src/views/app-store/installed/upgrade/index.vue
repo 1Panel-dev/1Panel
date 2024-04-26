@@ -35,6 +35,7 @@
                         <el-checkbox v-model="operateReq.pullImage" :label="$t('container.forcePull')" size="large" />
                         <span class="input-help">{{ $t('container.forcePullHelper') }}</span>
                     </el-form-item>
+                    <el-text type="warning">{{ $t('app.upgradeWarn') }}</el-text>
                 </el-form>
             </el-col>
             <el-col :span="22" :offset="1">

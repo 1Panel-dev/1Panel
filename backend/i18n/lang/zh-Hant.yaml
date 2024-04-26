@@ -90,7 +90,7 @@ ErrGroupIsUsed: '分組正在使用中，無法刪除'
 ErrBackupMatch: '該備份文件與當前網站部分數據不匹配: {{ .detail}}"'
 ErrBackupExist: '該備份文件對應部分原數據不存在: {{ .detail}}"'
 ErrPHPResource: '本地運行環境不支持切換！'
-ErrPathPermission: 'index 目錄下檢測到非 1000:1000 權限文件夾，可能導致網站訪問 Access denied 錯誤'
+ErrPathPermission: 'index 目錄下偵測到非 1000:1000 權限資料夾，可能導致網站存取 Access denied 錯誤，請點擊上方儲存按鈕'
 ErrDomainIsUsed: "域名已被網站【{{ .name }}】使用"
 ErrDomainFormat: "{{ .name }} 域名格式不正確"
 
@@ -178,13 +178,15 @@ ErrBanAction: "設置失敗，當前 {{ .name }} 服務不可用，請檢查後�
 #waf
 ErrScope: "不支援修改此配置"
 ErrStateChange: "狀態修改失敗"
-ErrRuleExist: "規則名稱已存在"
+ErrRuleExist: "規則已存在"
 ErrRuleNotExist: "規則不存在"
 ErrParseIP: "IP 格式錯誤"
 ErrDefaultIP: "default 為保留名稱，請更換其他名稱"
 ErrGroupInUse: "IP 群組被黑/白名單使用，無法刪除"
 ErrGroupExist: "IP 群組名稱已存在"
 ErrIPRange: "IP 範圍錯誤"
+ErrIPExist: "IP 已存在"
+
 
 #license
 ErrLicense: "許可證格式錯誤，請檢查後重試！"

@@ -8,6 +8,9 @@
                 <div class="mb-4" v-if="type === 'mysql' || type === 'mariadb'">
                     <el-alert type="error" :title="$t('database.formatHelper', [remark])" />
                 </div>
+                <div class="mb-4" v-if="type === 'website'">
+                    <el-alert :closable="false" type="warning" :title="$t('website.websiteBackupWarn')"></el-alert>
+                </div>
                 <el-upload ref="uploadRef" drag :on-change="fileOnChange" class="upload-demo" :auto-upload="false">
                     <el-icon class="el-icon--upload"><upload-filled /></el-icon>
                     <div class="el-upload__text">
