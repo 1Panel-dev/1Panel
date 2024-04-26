@@ -1,12 +1,7 @@
 <template>
     <el-row :gutter="10">
         <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
-            <el-popover
-                placement="bottom"
-                :width="currentInfo.cpuPercent.length < 36 ? 300 : (currentInfo.cpuPercent.length / 12) * 150"
-                trigger="hover"
-                v-if="chartsOption['cpu']"
-            >
+            <el-popover placement="bottom" :width="loadWidth()" trigger="hover" v-if="chartsOption['cpu']">
                 <div>
                     <el-tooltip
                         effect="dark"
@@ -14,7 +9,7 @@
                         v-if="baseInfo.cpuModelName.length > 40"
                         placement="top"
                     >
-                        <el-tag>
+                        <el-tag class="cpuModeTag">
                             {{ baseInfo.cpuModelName.substring(0, 40) + '...' }}
                         </el-tag>
                     </el-tooltip>
@@ -22,14 +17,24 @@
                         {{ baseInfo.cpuModelName }}
                     </el-tag>
                 </div>
-                <el-tag class="tagClass">
-                    {{ $t('home.core') }} *{{ baseInfo.cpuCores }} {{ $t('home.logicCore') }} *{{
-                        baseInfo.cpuLogicalCores
-                    }}
-                </el-tag>
+                <el-tag class="cpuDetailTag">{{ $t('home.core') }} *{{ baseInfo.cpuCores }}</el-tag>
+                <el-tag class="cpuDetailTag">{{ $t('home.logicCore') }} *{{ baseInfo.cpuLogicalCores }}</el-tag>
                 <br />
                 <div v-for="(item, index) of currentInfo.cpuPercent" :key="index">
-                    <el-tag class="tagCPUClass">CPU-{{ index }}: {{ formatNumber(item) }}%</el-tag>
+                    <el-tag v-if="cpuShowAll || (!cpuShowAll && index < 32)" class="tagCPUClass">
+                        CPU-{{ index }}: {{ formatNumber(item) }}%
+                    </el-tag>
+                </div>
+
+                <div v-if="currentInfo.cpuPercent.length > 32" class="mt-1 float-right">
+                    <el-button v-if="!cpuShowAll" @click="cpuShowAll = true" link type="primary" size="small">
+                        {{ $t('commons.button.showAll') }}
+                        <el-icon><DArrowRight /></el-icon>
+                    </el-button>
+                    <el-button v-if="cpuShowAll" @click="cpuShowAll = false" link type="primary" size="small">
+                        {{ $t('commons.button.hideSome') }}
+                        <el-icon><DArrowLeft /></el-icon>
+                    </el-button>
                 </div>
                 <template #reference>
                     <v-charts
@@ -302,6 +307,8 @@ const currentInfo = ref<Dashboard.CurrentInfo>({
     shotTime: new Date(),
 });
 
+const cpuShowAll = ref();
+
 const chartsOption = ref({ cpu: null, memory: null, load: null });
 
 const acceptParams = (current: Dashboard.CurrentInfo, base: Dashboard.BaseInfo, isInit: boolean): void => {
@@ -359,6 +366,14 @@ const goGPU = () => {
     router.push({ name: 'GPU' });
 };
 
+const loadWidth = () => {
+    if (!cpuShowAll.value || currentInfo.value.cpuPercent.length < 32) {
+        return 310;
+    }
+    let line = Math.floor(currentInfo.value.cpuPercent.length / 16);
+    return line * 141 + 28;
+};
+
 function formatNumber(val: number) {
     return Number(val.toFixed(2));
 }
@@ -369,6 +384,18 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
+.cpuModeTag {
+    justify-content: flex-start !important;
+    text-align: left !important;
+    width: 280px;
+}
+.cpuDetailTag {
+    justify-content: flex-start !important;
+    text-align: left !important;
+    width: 140px;
+    margin-top: 3px;
+    margin-left: 1px;
+}
 .tagClass {
     margin-top: 3px;
 }
@@ -378,8 +405,8 @@ defineExpose({
     text-align: left !important;
     float: left;
     margin-top: 3px;
-    margin-left: 4px;
-    width: 100px;
+    margin-left: 1px;
+    width: 140px;
 }
 
 .buttonClass {

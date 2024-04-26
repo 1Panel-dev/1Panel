@@ -58,6 +58,8 @@ const message = {
             fullscreen: '全屏',
             quitFullscreen: '退出全屏',
             update: '编辑',
+            showAll: '显示所有',
+            hideSome: '隐藏部分',
         },
         search: {
             timeStart: '开始时间',
