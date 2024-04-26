@@ -2,8 +2,18 @@
     <div>
         <div class="flex items-center">
             <div class="flex-shrink-0 flex items-center mr-4">
-                <el-button :icon="Back" @click="back" circle :disabled="paths.length == 0" />
-                <el-button :icon="Refresh" circle @click="search" />
+                <el-tooltip :content="$t('file.back')" placement="top">
+                    <el-button :icon="Back" @click="back" circle :disabled="paths.length == 0" />
+                </el-tooltip>
+                <el-tooltip :content="$t('file.right')" placement="top">
+                    <el-button :icon="Right" @click="right" circle :disabled="paths.length == 0" />
+                </el-tooltip>
+                <el-tooltip :content="$t('file.top')" placement="top">
+                    <el-button :icon="Top" @click="top" circle :disabled="paths.length == 0" />
+                </el-tooltip>
+                <el-tooltip :content="$t('file.refresh')" placement="top">
+                    <el-button :icon="Refresh" circle @click="search" />
+                </el-tooltip>
             </div>
             <div
                 v-show="!searchableStatus"
@@ -305,7 +315,7 @@ import {
     SearchFavorite,
 } from '@/api/modules/files';
 import { computeSize, copyText, dateFormat, downloadFile, getIcon, getRandomStr } from '@/utils/util';
-import { StarFilled, Star } from '@element-plus/icons-vue';
+import { StarFilled, Star, Top, Right } from '@element-plus/icons-vue';
 import { File } from '@/api/interface/file';
 import { Mimetypes, Languages } from '@/global/mimetype';
 import { useRouter } from 'vue-router';
@@ -362,6 +372,8 @@ let req = reactive(initData());
 let loading = ref(false);
 const paths = ref<FilePaths[]>([]);
 let pathWidth = ref(0);
+const history: string[] = [];
+let pointer = -1;
 
 const fileCreate = reactive({ path: '/', isDir: false, mode: 0o755 });
 const fileCompress = reactive({ files: [''], name: '', dst: '', operate: 'compress' });
@@ -461,7 +473,6 @@ const open = async (row: File.File) => {
             url: req.path,
             name: name,
         });
-
         jump(req.path);
     } else {
         openCodeEditor(row.path, row.extension);
@@ -491,7 +502,23 @@ const handlePath = () => {
     }
 };
 
+const right = () => {
+    if (pointer < history.length - 1) {
+        pointer++;
+        let url = history[pointer];
+        backForwardJump(url);
+    }
+};
+
 const back = () => {
+    if (pointer > 0) {
+        pointer--;
+        let url = history[pointer];
+        backForwardJump(url);
+    }
+};
+
+const top = () => {
     if (paths.value.length > 0) {
         let url = '/';
         if (paths.value.length >= 2) {
@@ -502,6 +529,10 @@ const back = () => {
 };
 
 const jump = async (url: string) => {
+    history.splice(pointer + 1);
+    history.push(url);
+    pointer = history.length - 1;
+
     const oldUrl = req.path;
     const oldPageSize = req.pageSize;
     // reset search params before exec jump
@@ -519,6 +550,22 @@ const jump = async (url: string) => {
         MsgWarning(i18n.global.t('commons.res.notFound'));
         return;
     }
+    handleSearchResult(searchResult);
+    getPaths(req.path);
+    nextTick(function () {
+        handlePath();
+    });
+};
+
+const backForwardJump = async (url: string) => {
+    const oldPageSize = req.pageSize;
+    // reset search params before exec jump
+    Object.assign(req, initData());
+    req.path = url;
+    req.containSub = false;
+    req.search = '';
+    req.pageSize = oldPageSize;
+    let searchResult = await searchFile();
     handleSearchResult(searchResult);
     getPaths(req.path);
     nextTick(function () {

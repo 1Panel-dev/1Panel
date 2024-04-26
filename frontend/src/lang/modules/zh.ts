@@ -1100,6 +1100,10 @@ const message = {
         clashDitNotSupport: '文件名禁止包含 .1panel_clash',
         clashDleteAlert: '回收站文件夹不能删除',
         clashOpenAlert: '回收站目录请点击【回收站】按钮打开',
+        right: '前进',
+        back: '后退',
+        top: '返回上一级',
+        refresh: '刷新',
     },
     ssh: {
         autoStart: '开机自启',

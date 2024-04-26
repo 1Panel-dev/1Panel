@@ -1155,6 +1155,10 @@ const message = {
         clashDitNotSupport: 'File names are prohibited from containing .1panel_clash',
         clashDeleteAlert: 'The Recycle Bin folder cannot be deleted',
         clashOpenAlert: 'Please click the [Recycle Bin] button to open the recycle bin directory',
+        right: 'Forward',
+        back: 'Back',
+        top: 'Go Back',
+        refresh: 'Refresh',
     },
     ssh: {
         autoStart: 'Auto Start',
