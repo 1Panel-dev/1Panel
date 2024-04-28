@@ -126,7 +126,6 @@ const proxyForm = ref<FormInstance>();
 const rules = ref({
     name: [Rules.requiredInput, Rules.appName],
     match: [Rules.requiredInput],
-    modifier: [Rules.requiredInput],
     cacheTime: [Rules.requiredInput, checkNumberRange(1, 65535)],
     proxyPass: [Rules.requiredInput],
     proxyHost: [Rules.requiredInput],
