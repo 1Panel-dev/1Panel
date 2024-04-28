@@ -728,6 +728,14 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 		res.CanUpdate = true
 		return res, err
 	}
+	apps, _ := appRepo.GetBy(appRepo.WithResource(constant.AppResourceRemote))
+	for _, app := range apps {
+		if app.Icon == "" {
+			res.CanUpdate = true
+			return res, err
+		}
+	}
+
 	list, err := getAppList()
 	if err != nil {
 		return res, err
@@ -836,12 +844,16 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 		if err != nil {
 			return err
 		}
-		defer iconRes.Body.Close()
 		body, err := io.ReadAll(iconRes.Body)
 		if err != nil {
 			return err
 		}
-		iconStr := base64.StdEncoding.EncodeToString(body)
+		iconStr := ""
+		if !strings.Contains(string(body), "xml") {
+			iconStr = base64.StdEncoding.EncodeToString(body)
+		}
+		_ = iconRes.Body.Close()
+
 		app.Icon = iconStr
 		app.TagsKey = l.AppProperty.Tags
 		if l.AppProperty.Recommend > 0 {

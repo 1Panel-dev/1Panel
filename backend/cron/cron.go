@@ -1,6 +1,8 @@
 package cron
 
 import (
+	"fmt"
+	mathRand "math/rand"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -41,7 +43,7 @@ func Run() {
 	if _, err := global.Cron.AddJob("@daily", job.NewSSLJob()); err != nil {
 		global.LOG.Errorf("can not add  ssl corn job: %s", err.Error())
 	}
-	if _, err := global.Cron.AddJob("@daily", job.NewAppStoreJob()); err != nil {
+	if _, err := global.Cron.AddJob(fmt.Sprintf("%v %v * * *", mathRand.Intn(60), mathRand.Intn(3)), job.NewAppStoreJob()); err != nil {
 		global.LOG.Errorf("can not add  appstore corn job: %s", err.Error())
 	}
 
