@@ -27,6 +27,9 @@ var whiteUrlList = map[string]struct{}{
 	"/api/v1/databases/variables":     {},
 	"/api/v1/databases/status":        {},
 	"/api/v1/databases/baseinfo":      {},
+
+	"/api/v1/waf/attack/stat":    {},
+	"/api/v1/waf/config/website": {},
 }
 
 func DemoHandle() gin.HandlerFunc {
