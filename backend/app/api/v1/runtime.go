@@ -76,6 +76,20 @@ func (b *BaseApi) DeleteRuntime(c *gin.Context) {
 	helper.SuccessWithOutData(c)
 }
 
+func (b *BaseApi) DeleteRuntimeCheck(c *gin.Context) {
+	runTimeId, err := helper.GetIntParamByKey(c, "runTimeId")
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		return
+	}
+	checkData, err := runtimeService.DeleteCheck(runTimeId)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, checkData)
+}
+
 // @Tags Runtime
 // @Summary Update runtime
 // @Description 更新运行环境
