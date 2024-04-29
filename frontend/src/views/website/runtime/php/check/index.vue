@@ -83,7 +83,9 @@ const acceptParams = (props: CheckRrops) => {
 };
 
 const toPage = (key: string) => {
-    router.push({ name: key });
+    if (key === 'website') {
+        router.push({ name: 'Website' });
+    }
 };
 
 const onConfirm = () => {

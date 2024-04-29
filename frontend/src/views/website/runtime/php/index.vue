@@ -174,7 +174,7 @@ const openDelete = async (row: Runtime.Runtime) => {
     RuntimeDeleteCheck(row.id).then(async (res) => {
         const items = res.data;
         if (res.data && res.data.length > 0) {
-            checkRef.value.acceptParams({ items: items, key: 'Website', installID: row.id });
+            checkRef.value.acceptParams({ items: items, key: 'website', installID: row.id });
         } else {
             opRef.value.acceptParams({
                 title: i18n.global.t('commons.msg.deleteTitle'),
