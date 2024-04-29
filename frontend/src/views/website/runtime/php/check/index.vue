@@ -83,15 +83,7 @@ const acceptParams = (props: CheckRrops) => {
 };
 
 const toPage = (key: string) => {
-    if (key === 'app') {
-        open.value = false;
-    }
-    if (key === 'website') {
-        router.push({ name: 'Website' });
-    }
-    if (key === 'database') {
-        router.push({ name: 'MySQL' });
-    }
+    router.push({ name: key });
 };
 
 const onConfirm = () => {

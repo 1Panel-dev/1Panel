@@ -103,7 +103,7 @@ import router from '@/routers/router';
 import ComposeLogs from '@/components/compose-log/index.vue';
 import { Promotion } from '@element-plus/icons-vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
-import AppResources from '@/views/website/runtime/node/check/index.vue';
+import AppResources from '@/views/website/runtime/php/check/index.vue';
 
 let timer: NodeJS.Timer | null = null;
 const loading = ref(false);
