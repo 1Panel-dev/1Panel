@@ -40,7 +40,7 @@ func (u *BackupService) AppBackup(req dto.CommonBackup) (*model.BackupRecord, er
 	backupDir := path.Join(localDir, itemDir)
 
 	fileName := fmt.Sprintf("%s_%s.tar.gz", req.DetailName, timeNow+common.RandStrAndNum(5))
-	if err := handleAppBackup(&install, backupDir, fileName); err != nil {
+	if err := handleAppBackup(&install, backupDir, fileName, ""); err != nil {
 		return nil, err
 	}
 
@@ -84,7 +84,7 @@ func (u *BackupService) AppRecover(req dto.CommonRecover) error {
 	return nil
 }
 
-func handleAppBackup(install *model.AppInstall, backupDir, fileName string) error {
+func handleAppBackup(install *model.AppInstall, backupDir, fileName string, excludes string) error {
 	fileOp := files.NewFileOp()
 	tmpDir := fmt.Sprintf("%s/%s", backupDir, strings.ReplaceAll(fileName, ".tar.gz", ""))
 	if !fileOp.Stat(tmpDir) {
@@ -103,7 +103,7 @@ func handleAppBackup(install *model.AppInstall, backupDir, fileName string) erro
 	}
 
 	appPath := install.GetPath()
-	if err := handleTar(appPath, tmpDir, "app.tar.gz", ""); err != nil {
+	if err := handleTar(appPath, tmpDir, "app.tar.gz", excludes); err != nil {
 		return err
 	}
 
@@ -164,7 +164,7 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 
 	if !isRollback {
 		rollbackFile := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("app/%s_%s.tar.gz", install.Name, time.Now().Format("20060102150405")))
-		if err := handleAppBackup(install, path.Dir(rollbackFile), path.Base(rollbackFile)); err != nil {
+		if err := handleAppBackup(install, path.Dir(rollbackFile), path.Base(rollbackFile), ""); err != nil {
 			return fmt.Errorf("backup app %s for rollback before recover failed, err: %v", install.Name, err)
 		}
 		defer func() {

@@ -797,6 +797,7 @@ const message = {
         snapshot: '系統快照',
         allOptionHelper: '當前計劃任務為備份所有【{0}】，暫不支持直接下載，可在【{0}】備份列表中查看',
         exclusionRules: '排除規則',
+        exclusionRulesHelper: '排除規則將對此次備份的所有壓縮操作生效',
         default_download_path: '默認下載地址',
         saveLocal: '同時保留本地備份（和雲存儲保留份數一致）',
         url: 'URL 地址',
