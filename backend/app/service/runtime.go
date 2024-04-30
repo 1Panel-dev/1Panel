@@ -44,6 +44,7 @@ type IRuntimeService interface {
 	OperateNodeModules(req request.NodeModuleOperateReq) error
 	SyncForRestart() error
 	SyncRuntimeStatus() error
+	DeleteCheck(installID uint) ([]dto.AppResource, error)
 }
 
 func NewRuntimeService() IRuntimeService {
@@ -175,6 +176,18 @@ func (r *RuntimeService) Page(req request.RuntimeSearch) (int64, []response.Runt
 		res = append(res, runtimeDTO)
 	}
 	return total, res, nil
+}
+
+func (r *RuntimeService) DeleteCheck(runTimeId uint) ([]dto.AppResource, error) {
+	var res []dto.AppResource
+	websites, _ := websiteRepo.GetBy(websiteRepo.WithRuntimeID(runTimeId))
+	for _, website := range websites {
+		res = append(res, dto.AppResource{
+			Type: "website",
+			Name: website.PrimaryDomain,
+		})
+	}
+	return res, nil
 }
 
 func (r *RuntimeService) Delete(runtimeDelete request.RuntimeDelete) error {

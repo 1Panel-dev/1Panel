@@ -79,13 +79,14 @@
         <OpDialog ref="opRef" @search="search" />
         <Log ref="logRef" @close="search" />
         <Extensions ref="extensionsRef" @close="search" />
+        <AppResources ref="checkRef" @close="search" />
     </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import { Runtime } from '@/api/interface/runtime';
-import { DeleteRuntime, SearchRuntimes } from '@/api/modules/runtime';
+import { DeleteRuntime, RuntimeDeleteCheck, SearchRuntimes } from '@/api/modules/runtime';
 import { dateFormat, toLowerCase } from '@/utils/util';
 import CreateRuntime from '@/views/website/runtime/php/create/index.vue';
 import Status from '@/components/status/index.vue';
@@ -93,6 +94,7 @@ import i18n from '@/lang';
 import RouterMenu from '../index.vue';
 import Log from '@/components/log-dialog/index.vue';
 import Extensions from './extensions/index.vue';
+import AppResources from '@/views/website/runtime/php/check/index.vue';
 
 const paginationConfig = reactive({
     cacheSizeKey: 'runtime-page-size',
@@ -110,6 +112,8 @@ let timer: NodeJS.Timer | null = null;
 const opRef = ref();
 const logRef = ref();
 const extensionsRef = ref();
+
+const checkRef = ref();
 
 const buttons = [
     {
@@ -167,15 +171,22 @@ const openExtensions = () => {
 };
 
 const openDelete = async (row: Runtime.Runtime) => {
-    opRef.value.acceptParams({
-        title: i18n.global.t('commons.msg.deleteTitle'),
-        names: [row.name],
-        msg: i18n.global.t('commons.msg.operatorHelper', [
-            i18n.global.t('website.runtime'),
-            i18n.global.t('commons.button.delete'),
-        ]),
-        api: DeleteRuntime,
-        params: { id: row.id, forceDelete: true },
+    RuntimeDeleteCheck(row.id).then(async (res) => {
+        const items = res.data;
+        if (res.data && res.data.length > 0) {
+            checkRef.value.acceptParams({ items: items, key: 'website', installID: row.id });
+        } else {
+            opRef.value.acceptParams({
+                title: i18n.global.t('commons.msg.deleteTitle'),
+                names: [row.name],
+                msg: i18n.global.t('commons.msg.operatorHelper', [
+                    i18n.global.t('website.runtime'),
+                    i18n.global.t('commons.button.delete'),
+                ]),
+                api: DeleteRuntime,
+                params: { id: row.id, forceDelete: true },
+            });
+        }
     });
 };
 

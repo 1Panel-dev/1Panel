@@ -84,13 +84,14 @@
         <ComposeLogs ref="composeLogRef" />
         <PortJumpDialog ref="dialogPortJumpRef" />
         <Modules ref="moduleRef" />
+        <AppResources ref="checkRef" @close="search" />
     </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import { Runtime } from '@/api/interface/runtime';
-import { OperateRuntime, SearchRuntimes, SyncRuntime } from '@/api/modules/runtime';
+import { OperateRuntime, RuntimeDeleteCheck, SearchRuntimes, SyncRuntime } from '@/api/modules/runtime';
 import { dateFormat } from '@/utils/util';
 import OperateNode from '@/views/website/runtime/node/operate/index.vue';
 import Status from '@/components/status/index.vue';
@@ -102,6 +103,7 @@ import router from '@/routers/router';
 import ComposeLogs from '@/components/compose-log/index.vue';
 import { Promotion } from '@element-plus/icons-vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
+import AppResources from '@/views/website/runtime/php/check/index.vue';
 
 let timer: NodeJS.Timer | null = null;
 const loading = ref(false);
@@ -111,6 +113,7 @@ const deleteRef = ref();
 const dialogPortJumpRef = ref();
 const composeLogRef = ref();
 const moduleRef = ref();
+const checkRef = ref();
 
 const paginationConfig = reactive({
     cacheSizeKey: 'runtime-page-size',
@@ -209,7 +212,14 @@ const openDetail = (row: Runtime.Runtime) => {
 };
 
 const openDelete = async (row: Runtime.Runtime) => {
-    deleteRef.value.acceptParams(row.id, row.name);
+    RuntimeDeleteCheck(row.id).then(async (res) => {
+        const items = res.data;
+        if (res.data && res.data.length > 0) {
+            checkRef.value.acceptParams({ items: items, key: 'website', installID: row.id });
+        } else {
+            deleteRef.value.acceptParams(row.id, row.name);
+        }
+    });
 };
 
 const openLog = (row: any) => {
