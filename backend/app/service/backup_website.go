@@ -35,7 +35,7 @@ func (u *BackupService) WebsiteBackup(req dto.CommonBackup) error {
 	itemDir := fmt.Sprintf("website/%s", req.Name)
 	backupDir := path.Join(localDir, itemDir)
 	fileName := fmt.Sprintf("%s_%s.tar.gz", website.PrimaryDomain, timeNow+common.RandStrAndNum(5))
-	if err := handleWebsiteBackup(&website, backupDir, fileName); err != nil {
+	if err := handleWebsiteBackup(&website, backupDir, fileName, ""); err != nil {
 		return err
 	}
 
@@ -107,7 +107,7 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 	isOk := false
 	if !isRollback {
 		rollbackFile := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("website/%s_%s.tar.gz", website.Alias, time.Now().Format("20060102150405")))
-		if err := handleWebsiteBackup(website, path.Dir(rollbackFile), path.Base(rollbackFile)); err != nil {
+		if err := handleWebsiteBackup(website, path.Dir(rollbackFile), path.Base(rollbackFile), ""); err != nil {
 			return fmt.Errorf("backup website %s for rollback before recover failed, err: %v", website.Alias, err)
 		}
 		defer func() {
@@ -182,7 +182,7 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 	return nil
 }
 
-func handleWebsiteBackup(website *model.Website, backupDir, fileName string) error {
+func handleWebsiteBackup(website *model.Website, backupDir, fileName string, excludes string) error {
 	fileOp := files.NewFileOp()
 	tmpDir := fmt.Sprintf("%s/%s", backupDir, strings.ReplaceAll(fileName, ".tar.gz", ""))
 	if !fileOp.Stat(tmpDir) {
@@ -216,7 +216,7 @@ func handleWebsiteBackup(website *model.Website, backupDir, fileName string) err
 		if err != nil {
 			return err
 		}
-		if err := handleAppBackup(&app, tmpDir, fmt.Sprintf("%s.app.tar.gz", website.Alias)); err != nil {
+		if err := handleAppBackup(&app, tmpDir, fmt.Sprintf("%s.app.tar.gz", website.Alias), excludes); err != nil {
 			return err
 		}
 		global.LOG.Info("put app.tar.gz into tmp dir successful")
@@ -226,7 +226,7 @@ func handleWebsiteBackup(website *model.Website, backupDir, fileName string) err
 			return err
 		}
 		if runtime.Type == constant.RuntimeNode {
-			if err := handleRuntimeBackup(runtime, tmpDir, fmt.Sprintf("%s.runtime.tar.gz", website.Alias)); err != nil {
+			if err := handleRuntimeBackup(runtime, tmpDir, fmt.Sprintf("%s.runtime.tar.gz", website.Alias), excludes); err != nil {
 				return err
 			}
 			global.LOG.Info("put runtime.tar.gz into tmp dir successful")
@@ -234,7 +234,7 @@ func handleWebsiteBackup(website *model.Website, backupDir, fileName string) err
 	}
 
 	websiteDir := fmt.Sprintf("%s/openresty/%s/www/sites/%s", constant.AppInstallDir, nginxInfo.Name, website.Alias)
-	if err := handleTar(websiteDir, tmpDir, fmt.Sprintf("%s.web.tar.gz", website.Alias), ""); err != nil {
+	if err := handleTar(websiteDir, tmpDir, fmt.Sprintf("%s.web.tar.gz", website.Alias), excludes); err != nil {
 		return err
 	}
 	global.LOG.Info("put web.tar.gz into tmp dir successful, now start to tar tmp dir")

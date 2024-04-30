@@ -4,18 +4,19 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/app/model"
-	"github.com/1Panel-dev/1Panel/backend/constant"
-	"github.com/1Panel-dev/1Panel/backend/global"
-	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"io/fs"
 	"os"
 	"path"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
 )
 
-func handleRuntimeBackup(runtime *model.Runtime, backupDir, fileName string) error {
+func handleRuntimeBackup(runtime *model.Runtime, backupDir, fileName string, excludes string) error {
 	fileOp := files.NewFileOp()
 	tmpDir := fmt.Sprintf("%s/%s", backupDir, strings.ReplaceAll(fileName, ".tar.gz", ""))
 	if !fileOp.Stat(tmpDir) {
@@ -34,7 +35,7 @@ func handleRuntimeBackup(runtime *model.Runtime, backupDir, fileName string) err
 	}
 
 	appPath := runtime.GetPath()
-	if err := handleTar(appPath, tmpDir, "runtime.tar.gz", ""); err != nil {
+	if err := handleTar(appPath, tmpDir, "runtime.tar.gz", excludes); err != nil {
 		return err
 	}
 	if err := handleTar(tmpDir, backupDir, fileName, ""); err != nil {
@@ -72,7 +73,7 @@ func handleRuntimeRecover(runtime *model.Runtime, recoverFile string, isRollback
 
 	if !isRollback {
 		rollbackFile := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("runtime/%s_%s.tar.gz", runtime.Name, time.Now().Format("20060102150405")))
-		if err := handleRuntimeBackup(runtime, path.Dir(rollbackFile), path.Base(rollbackFile)); err != nil {
+		if err := handleRuntimeBackup(runtime, path.Dir(rollbackFile), path.Base(rollbackFile), ""); err != nil {
 			return fmt.Errorf("backup runtime %s for rollback before recover failed, err: %v", runtime.Name, err)
 		}
 		defer func() {

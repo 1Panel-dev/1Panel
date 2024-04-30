@@ -320,7 +320,7 @@
                     </el-form-item>
 
                     <el-form-item
-                        v-if="dialogData.rowData!.type === 'directory'"
+                        v-if="hasExclusionRules()"
                         :label="$t('cronjob.exclusionRules')"
                         prop="exclusionRules"
                     >
@@ -331,6 +331,7 @@
                             clearable
                             v-model="dialogData.rowData!.exclusionRules"
                         />
+                        <span class="input-help">{{ $t('cronjob.exclusionRulesHelper') }}</span>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -678,6 +679,14 @@ function isBackup() {
         dialogData.value.rowData!.type === 'directory' ||
         dialogData.value.rowData!.type === 'snapshot' ||
         dialogData.value.rowData!.type === 'log'
+    );
+}
+
+function hasExclusionRules() {
+    return (
+        dialogData.value.rowData!.type === 'app' ||
+        dialogData.value.rowData!.type === 'website' ||
+        dialogData.value.rowData!.type === 'directory'
     );
 }
 
