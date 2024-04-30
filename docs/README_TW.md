@@ -49,11 +49,11 @@ curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_
 
 如果您在使用過程中發現任何安全問題，請通過以下方式直接聯繫我們：
 
-- 郵箱：support@fit2cloud.com
-- 電話：400-052-0755
+- 郵箱：wanghe@fit2cloud.com
 
 ## 我們的其他明星專案
 
+- [MaxKB](https://github.com/1Panel-dev/MaxKB/) - 基於 LLM 大語言模型的開源知識庫問答系統
 - [JumpServer](https://github.com/jumpserver/jumpserver/) - 受歡迎的開源堡壘機管理工具
 - [DataEase](https://github.com/dataease/dataease/) - 開源的數據可視化和分析工具，適用於所有人
 - [MeterSphere](https://github.com/metersphere/metersphere/) - 一站式開源自動化測試平台

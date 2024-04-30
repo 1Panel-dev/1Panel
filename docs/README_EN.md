@@ -51,16 +51,15 @@ If you have any questions or suggestions, please submit a GitHub Issue or join o
 
 If you discover any security issues, please contact us through:
 
-- Email: support@fit2cloud.com
-- Phone: 400-052-0755
+- email: wanghe@fit2cloud.com
 
 ## Our Other Star Projects
 
+- [MaxKB](https://github.com/1Panel-dev/MaxKB/) - Open-Source Knowledge Base Question-Answering System Based on LLM Large Language Model
 - [JumpServer](https://github.com/jumpserver/jumpserver/) - A popular open-source PAM system
 - [DataEase](https://github.com/dataease/dataease/) - An open-source data visualization and analysis tool for everyone
 - [MeterSphere](https://github.com/metersphere/metersphere/) - An all-in-one open-source automated testing platform
 - [Halo](https://github.com/halo-dev/halo/) - A powerful and user-friendly open-source website building tool
-
 
 ## Star History
 

@@ -51,11 +51,11 @@ curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_
 
 セキュリティ上の問題を発見された場合は、下記までご連絡ください:
 
-- メール: support@fit2cloud.com
-- 電話番号: 400-052-0755
+- メール: wanghe@fit2cloud.com
 
 ## その他の主要プロジェクト
 
+- [MaxKB](https://github.com/1Panel-dev/MaxKB/) - LLMベースのオープンソース知識ベースの質問応答システム
 - [JumpServer](https://github.com/jumpserver/jumpserver/) - 人気のあるオープンソースのバスチョンホスト管理ツール
 - [DataEase](https://github.com/dataease/dataease/) - 誰でも利用できるオープンソースのデータ可視化および分析ツール
 - [MeterSphere](https://github.com/metersphere/metersphere/) - オールインワンのオープンソース自動化テストプラットフォーム

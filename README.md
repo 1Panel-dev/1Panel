@@ -54,16 +54,17 @@ curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_
 
 - 邮箱：wanghe@fit2cloud.com
 
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=1Panel-dev/1Panel&type=Date)](https://star-history.com/#1Panel-dev/1Panel&Date)
-
 ## 我们的其他明星项目
+
+- [MaxKB](https://github.com/1Panel-dev/MaxKB/) - 基于 LLM 大语言模型的开源知识库问答系统
 - [JumpServer](https://github.com/jumpserver/jumpserver/) - 广受欢迎的开源堡垒机
 - [DataEase](https://github.com/dataease/dataease/) - 人人可用的开源数据可视化分析工具
 - [MeterSphere](https://github.com/metersphere/metersphere/) - 一站式开源自动化测试平台
 - [Halo](https://github.com/halo-dev/halo/) - 强大易用的开源建站工具
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=1Panel-dev/1Panel&type=Date)](https://star-history.com/#1Panel-dev/1Panel&Date)
 
 ## FOSSA Status
 
