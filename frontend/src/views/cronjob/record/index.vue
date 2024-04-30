@@ -154,20 +154,23 @@
                                         <template #label>
                                             <span class="status-label">{{ $t('commons.table.status') }}</span>
                                         </template>
-                                        <el-tooltip v-if="currentRecord?.status === 'Failed'" placement="top">
-                                            <template #content>
-                                                <div style="width: 300px; word-break: break-all">
-                                                    {{ currentRecord?.message }}
-                                                </div>
-                                            </template>
-                                            <el-tag type="danger">{{ $t('commons.table.statusFailed') }}</el-tag>
-                                        </el-tooltip>
+                                        <el-tag type="danger" v-if="currentRecord?.status === 'Failed'">
+                                            {{ $t('commons.table.statusFailed') }}
+                                        </el-tag>
                                         <el-tag type="success" v-if="currentRecord?.status === 'Success'">
                                             {{ $t('commons.table.statusSuccess') }}
                                         </el-tag>
                                         <el-tag type="info" v-if="currentRecord?.status === 'Waiting'">
                                             {{ $t('commons.table.statusWaiting') }}
                                         </el-tag>
+                                    </el-form-item>
+                                </el-row>
+                                <el-row v-if="currentRecord?.status === 'Failed'">
+                                    <el-form-item class="w-full">
+                                        <template #label>
+                                            <span class="status-label">{{ $t('commons.table.message') }}</span>
+                                        </template>
+                                        {{ currentRecord?.message }}
                                     </el-form-item>
                                 </el-row>
                                 <el-row v-if="currentRecord?.records">

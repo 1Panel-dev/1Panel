@@ -16,9 +16,9 @@
         </span>
         <el-button type="primary" link @click="toHalo">
             {{ isProductPro ? $t('license.pro') : $t('license.community') }}
-            <span class="version">{{ version }}</span>
         </el-button>
-        <el-badge is-dot style="margin-left: -3px" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
+        <span class="version">{{ version }}</span>
+        <el-badge is-dot style="margin-top: -3px" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
             <el-button type="primary" link @click="onLoadUpgradeInfo">
                 <span>({{ $t('setting.hasNewVersion') }})</span>
             </el-button>
