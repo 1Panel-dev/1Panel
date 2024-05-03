@@ -21,17 +21,7 @@
 
 1Panel 三分钟速览：https://www.bilibili.com/video/BV1Mt421n7LZ/
 
-## UI 展示
-
-![UI展示](https://resource.fit2cloud.com/1panel/img/overview.png)
-
 ## 快速开始
-
-**在线体验**
-
-- 环境地址：<https://demo.1panel.cn/>
-- 用户名：demo
-- 密码：1panel
 
 **一键安装**
 
@@ -44,31 +34,24 @@ curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_
 **学习资料**
 
 - [在线文档](https://1panel.cn/docs/)
-- [教学视频](https://space.bilibili.com/510493147/channel/collectiondetail?sid=1199760)
 - [社区论坛](https://bbs.fit2cloud.com/c/1p/7)
 - [如何加入微信交流群?](https://bbs.fit2cloud.com/t/topic/2147)
 
-## 安全说明
+## UI 展示
 
-如果您在使用过程中发现任何安全问题，请通过以下方式直接联系我们：
-
-- 邮箱：wanghe@fit2cloud.com
-
-## 我们的其他明星项目
-
-- [MaxKB](https://github.com/1Panel-dev/MaxKB/) - 基于 LLM 大语言模型的开源知识库问答系统
-- [JumpServer](https://github.com/jumpserver/jumpserver/) - 广受欢迎的开源堡垒机
-- [DataEase](https://github.com/dataease/dataease/) - 人人可用的开源数据可视化分析工具
-- [MeterSphere](https://github.com/metersphere/metersphere/) - 一站式开源自动化测试平台
-- [Halo](https://github.com/halo-dev/halo/) - 强大易用的开源建站工具
+![UI展示](https://resource.fit2cloud.com/1panel/img/overview.png)
 
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=1Panel-dev/1Panel&type=Date)](https://star-history.com/#1Panel-dev/1Panel&Date)
 
-## FOSSA Status
+## 我们的其他明星项目
 
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2F1Panel-dev%2F1Panel.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2F1Panel-dev%2F1Panel?ref=badge_large)
+- [MaxKB](https://github.com/1Panel-dev/MaxKB/) - 基于 LLM 大语言模型的开源知识库问答系统
+- [JumpServer](https://github.com/jumpserver/jumpserver/) - 广受欢迎的开源堡垒机
+- [Halo](https://github.com/halo-dev/halo/) - 强大易用的开源建站工具
+- [DataEase](https://github.com/dataease/dataease/) - 人人可用的开源数据可视化分析工具
+- [MeterSphere](https://github.com/metersphere/metersphere/) - 开源自动化测试平台
 
 ## License
 
