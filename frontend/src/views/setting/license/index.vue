@@ -48,6 +48,9 @@
                                     </div>
                                     <span v-else>-</span>
                                 </el-descriptions-item>
+                                <el-descriptions-item class="descriptions" :label="$t('commons.table.message')">
+                                    {{ license.message }}
+                                </el-descriptions-item>
                             </el-descriptions>
                         </div>
 
@@ -126,6 +129,7 @@ const license = reactive({
     productName: '',
 
     status: '',
+    message: '',
 });
 
 const toHalo = () => {
@@ -197,6 +201,7 @@ const search = async () => {
                 globalStore.productProExpires = Number(res.data.productPro);
             }
             license.licenseName = res.data.licenseName;
+            license.message = res.data.message;
             license.assigneeName = res.data.assigneeName;
             license.trial = res.data.trial;
             if (res.data.productPro) {
@@ -233,5 +238,12 @@ onMounted(() => {
     &:hover {
         background-color: rgba(0, 94, 235, 0.03);
     }
+}
+:deep(.el-descriptions__content) {
+    max-width: 300px;
+}
+.descriptions {
+    word-break: break-all;
+    word-wrap: break-word;
 }
 </style>
