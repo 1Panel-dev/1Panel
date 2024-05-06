@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"strings"
@@ -312,12 +313,32 @@ func (f *FileService) FileDownload(d request.FileDownload) (string, error) {
 }
 
 func (f *FileService) DirSize(req request.DirSizeReq) (response.DirSizeRes, error) {
+	var (
+		res response.DirSizeRes
+	)
+	if req.Path == "/proc" {
+		return res, nil
+	}
+	cmd := exec.Command("du", "-s", req.Path)
+	output, err := cmd.Output()
+	if err == nil {
+		fields := strings.Fields(string(output))
+		if len(fields) == 2 {
+			var cmdSize int64
+			_, err = fmt.Sscanf(fields[0], "%d", &cmdSize)
+			if err == nil {
+				res.Size = float64(cmdSize * 1024)
+				return res, nil
+			}
+		}
+	}
 	fo := files.NewFileOp()
 	size, err := fo.GetDirSize(req.Path)
 	if err != nil {
-		return response.DirSizeRes{}, err
+		return res, err
 	}
-	return response.DirSizeRes{Size: size}, nil
+	res.Size = size
+	return res, nil
 }
 
 func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.FileLineContent, error) {

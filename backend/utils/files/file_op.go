@@ -15,7 +15,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
@@ -436,20 +435,20 @@ func (f FileOp) CopyFile(src, dst string) error {
 }
 
 func (f FileOp) GetDirSize(path string) (float64, error) {
-	var m sync.Map
-	var wg sync.WaitGroup
-
-	wg.Add(1)
-	go ScanDir(f.Fs, path, &m, &wg)
-	wg.Wait()
-
-	var dirSize float64
-	m.Range(func(k, v interface{}) bool {
-		dirSize = dirSize + v.(float64)
-		return true
+	var size int64
+	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			size += info.Size()
+		}
+		return nil
 	})
-
-	return dirSize, nil
+	if err != nil {
+		return 0, err
+	}
+	return float64(size), nil
 }
 
 func getFormat(cType CompressType) archiver.CompressedArchive {
