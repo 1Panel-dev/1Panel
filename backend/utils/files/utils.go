@@ -10,9 +10,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"sync"
-
-	"github.com/spf13/afero"
 )
 
 func IsSymlink(mode os.FileMode) bool {
@@ -61,22 +58,6 @@ func GetGroup(gid uint32) string {
 		return ""
 	}
 	return usr.Name
-}
-
-func ScanDir(fs afero.Fs, path string, dirMap *sync.Map, wg *sync.WaitGroup) {
-	afs := &afero.Afero{Fs: fs}
-	files, _ := afs.ReadDir(path)
-	for _, f := range files {
-		if f.IsDir() {
-			wg.Add(1)
-			go ScanDir(fs, filepath.Join(path, f.Name()), dirMap, wg)
-		} else {
-			if f.Size() > 0 {
-				dirMap.Store(filepath.Join(path, f.Name()), float64(f.Size()))
-			}
-		}
-	}
-	defer wg.Done()
 }
 
 const dotCharacter = 46
