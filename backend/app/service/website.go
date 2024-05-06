@@ -180,6 +180,9 @@ func (w WebsiteService) GetWebsites() ([]response.WebsiteDTO, error) {
 
 func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) {
 	alias := create.Alias
+	if alias == "default" {
+		return buserr.New("ErrDefaultAlias")
+	}
 	if common.ContainsChinese(alias) {
 		alias, err = common.PunycodeEncode(alias)
 		if err != nil {

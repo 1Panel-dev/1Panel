@@ -93,6 +93,7 @@ ErrPHPResource: '本地运行环境不支持切换！'
 ErrPathPermission: 'index 目录下检测到非 1000:1000 权限文件夹，可能导致网站访问 Access denied 错误，请点击上方保存按钮'
 ErrDomainIsUsed: "域名已被网站【{{ .name }}】使用"
 ErrDomainFormat: "{{ .name }} 域名格式不正确"
+ErrDefaultAlias: "default 为保留代号，请使用其他代号"
 
 #ssl
 ErrSSLCannotDelete: "{{ .name }} 证书正在被网站使用，无法删除"
