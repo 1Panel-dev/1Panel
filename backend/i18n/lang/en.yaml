@@ -93,6 +93,7 @@ ErrPHPResource: 'The local runtime does not support switching！'
 ErrPathPermission: 'A folder with non-1000:1000 permissions was detected in the index directory, which may cause an Access denied error when accessing the website. Please click the save button above'
 ErrDomainIsUsed: "Domain is already used by website {{ .name }}"
 ErrDomainFormat: "{{ .name }} domain format error"
+ErrDefaultAlias: "default is a reserved code name, please use another code name"
 
 #ssl
 ErrSSLCannotDelete: "The certificate {{ .name }} is being used by the website and cannot be removed"

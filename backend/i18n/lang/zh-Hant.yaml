@@ -93,6 +93,7 @@ ErrPHPResource: '本地運行環境不支持切換！'
 ErrPathPermission: 'index 目錄下偵測到非 1000:1000 權限資料夾，可能導致網站存取 Access denied 錯誤，請點擊上方儲存按鈕'
 ErrDomainIsUsed: "域名已被網站【{{ .name }}】使用"
 ErrDomainFormat: "{{ .name }} 域名格式不正確"
+ErrDefaultAlias: "default 為保留代號，請使用其他代號"
 
 #ssl
 ErrSSLCannotDelete: "{{ .name }} 證書正在被網站使用，無法刪除"
