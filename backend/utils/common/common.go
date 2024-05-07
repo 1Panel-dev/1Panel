@@ -317,3 +317,7 @@ func SplitStr(str string, spi ...string) []string {
 	}
 	return results
 }
+
+func IsValidIP(ip string) bool {
+	return net.ParseIP(ip) != nil
+}

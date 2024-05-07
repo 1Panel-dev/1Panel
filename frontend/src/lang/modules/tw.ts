@@ -1929,6 +1929,10 @@ const message = {
         cfHelper: '請勿使用 Global API Key',
         deprecated: '即將廢棄',
         deprecatedHelper: '已經停止維護，可能會在以後的某個版本廢棄，請使用騰訊雲方式解析',
+        disableCNAME: '停用 CNAME',
+        disableCNAMEHelper: '有 CNAME 配置的域名，如果申請失敗，可以勾選此處',
+        nameserver: 'DNS 伺服器',
+        nameserverHelper: '使用自訂的 DNS 伺服器來校驗網域名稱',
     },
     firewall: {
         create: '創建規則',

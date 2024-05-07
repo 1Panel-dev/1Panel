@@ -21,10 +21,6 @@
                 <br />
             </div>
             <span>{{ $t('ssl.renewConfirm', [ssl.primaryDomain]) }}</span>
-            <div class="mt-3">
-                <el-checkbox v-model="skipDNSCheck">{{ $t('ssl.skipDNSCheck') }}</el-checkbox>
-                <span class="input-help">{{ $t('ssl.skipDNSCheckHelper') }}</span>
-            </div>
         </div>
         <template #footer>
             <span class="dialog-footer">
@@ -56,12 +52,10 @@ const handleClose = () => {
     em('close', false);
 };
 const ssl = ref();
-const skipDNSCheck = ref(false);
 
 const acceptParams = async (props: RenewProps) => {
     ssl.value = props.ssl;
     open.value = true;
-    skipDNSCheck.value = false;
 };
 
 const submit = async () => {
@@ -70,7 +64,7 @@ const submit = async () => {
         if (ssl.value.provider == 'selfSigned') {
             await RenewSSLByCA({ SSLID: ssl.value.id });
         } else {
-            await ObtainSSL({ ID: ssl.value.id, skipDNSCheck: skipDNSCheck.value });
+            await ObtainSSL({ ID: ssl.value.id });
         }
         handleClose();
         MsgSuccess(i18n.global.t('ssl.applyStart'));

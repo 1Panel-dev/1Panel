@@ -1929,6 +1929,10 @@ const message = {
         cfHelper: '请勿使用 Global API Key',
         deprecated: '即将废弃',
         deprecatedHelper: '已经停止维护，可能会在以后的某个版本废弃，请使用腾讯云方式解析',
+        disableCNAME: '禁用 CNAME',
+        disableCNAMEHelper: '有 CNAME 配置的域名，如果申请失败，可以勾选此处',
+        nameserver: 'DNS 服务器',
+        nameserverHelper: '使用自定义的 DNS 服务器来校验域名',
     },
     firewall: {
         create: '创建规则',

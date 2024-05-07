@@ -22,6 +22,20 @@ const checkIp = (rule: any, value: any, callback: any) => {
     }
 };
 
+const checkIpv4 = (rule: any, value: any, callback: any) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback();
+    } else {
+        const reg =
+            /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+        if (!reg.test(value) && value !== '') {
+            callback(new Error(i18n.global.t('commons.rule.ip')));
+        } else {
+            callback();
+        }
+    }
+};
+
 const checkIpV6 = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.requiredInput')));
@@ -533,6 +547,7 @@ interface CommonRule {
     floatNumber: FormItemRule;
     ip: FormItemRule;
     ipV6: FormItemRule;
+    ipv4: FormItemRule;
     ipV4V6OrDomain: FormItemRule;
     host: FormItemRule;
     illegal: FormItemRule;
@@ -766,6 +781,10 @@ export const Rules: CommonRule = {
     paramHttp: {
         required: true,
         validator: checkHttpOrHttps,
+        trigger: 'blur',
+    },
+    ipv4: {
+        validator: checkIpv4,
         trigger: 'blur',
     },
 };

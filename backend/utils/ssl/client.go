@@ -3,6 +3,7 @@ package ssl
 import (
 	"crypto"
 	"encoding/json"
+	"os"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -84,7 +85,7 @@ type DNSParam struct {
 	SecretID  string `json:"secretID"`
 }
 
-func (c *AcmeClient) UseDns(dnsType DnsType, params string, skipDNSCheck bool, nameservers []string) error {
+func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.WebsiteSSL) error {
 	var (
 		param DNSParam
 		p     challenge.Provider
@@ -162,11 +163,23 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string, skipDNSCheck bool, n
 	if err != nil {
 		return err
 	}
+	var nameservers []string
+	if websiteSSL.Nameserver1 != "" {
+		nameservers = append(nameservers, websiteSSL.Nameserver1)
+	}
+	if websiteSSL.Nameserver2 != "" {
+		nameservers = append(nameservers, websiteSSL.Nameserver2)
+	}
+	if websiteSSL.DisableCNAME {
+		_ = os.Setenv("LEGO_DISABLE_CNAME_SUPPORT", "true")
+	} else {
+		_ = os.Setenv("LEGO_DISABLE_CNAME_SUPPORT", "false")
+	}
 
 	return c.Client.Challenge.SetDNS01Provider(p,
 		dns01.CondOption(len(nameservers) > 0,
 			dns01.AddRecursiveNameservers(nameservers)),
-		dns01.CondOption(skipDNSCheck,
+		dns01.CondOption(websiteSSL.SkipDNS,
 			dns01.DisableCompletePropagationRequirement()),
 		dns01.AddDNSTimeout(10*time.Minute),
 	)
