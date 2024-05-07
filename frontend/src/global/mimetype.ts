@@ -161,7 +161,7 @@ export const DNSTypes = [
         value: 'DnsPod',
     },
     {
-        label: 'CloudFlare',
+        label: 'Cloudflare',
         value: 'CloudFlare',
     },
     {
