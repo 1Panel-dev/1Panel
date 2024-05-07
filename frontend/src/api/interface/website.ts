@@ -165,10 +165,14 @@ export namespace Website {
         provider: string;
         websites?: Website.Website[];
         autoRenew: boolean;
-        acmeAccountId?: number;
+        acmeAccountId: number;
         status: string;
         domains: string;
         description: string;
+        dnsAccountId?: number;
+        pushDir: boolean;
+        dir: string;
+        keyType: string;
     }
 
     export interface SSLDTO extends SSL {
@@ -198,6 +202,14 @@ export namespace Website {
         id: number;
         autoRenew: boolean;
         description: string;
+        primaryDomain: string;
+        otherDomains: string;
+        acmeAccountId: number;
+        provider: string;
+        dnsAccountId?: number;
+        keyType: string;
+        pushDir: boolean;
+        dir: string;
     }
 
     export interface AcmeAccount extends CommonModel {

@@ -136,7 +136,7 @@
 <script lang="ts" setup>
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { Website } from '@/api/interface/website';
-import { CreateSSL, ListWebsites, SearchAcmeAccount, SearchDnsAccount } from '@/api/modules/website';
+import { CreateSSL, ListWebsites, SearchAcmeAccount, SearchDnsAccount, UpdateSSL } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
@@ -182,6 +182,7 @@ const rules = ref({
 const websiteID = ref();
 
 const initData = () => ({
+    id: 0,
     primaryDomain: '',
     otherDomains: '',
     provider: 'dnsAccount',
@@ -196,8 +197,8 @@ const initData = () => ({
 });
 
 const ssl = ref(initData());
+const operate = ref('create');
 const dnsResolve = ref<Website.DNSResolve[]>([]);
-
 const em = defineEmits(['close', 'submit']);
 const handleClose = () => {
     resetForm();
@@ -211,8 +212,26 @@ const resetForm = () => {
     websiteID.value = undefined;
 };
 
-const acceptParams = () => {
-    resetForm();
+const acceptParams = (op: string, websiteSSL: Website.SSLDTO) => {
+    operate.value = op;
+    if (op == 'create') {
+        resetForm();
+    }
+    if (op == 'edit') {
+        console.log(websiteSSL);
+        ssl.value.acmeAccountId = websiteSSL.acmeAccountId;
+        if (websiteSSL.dnsAccountId > 0) {
+            ssl.value.dnsAccountId = websiteSSL.dnsAccountId;
+        }
+        ssl.value.primaryDomain = websiteSSL.primaryDomain;
+        ssl.value.pushDir = websiteSSL.pushDir;
+        ssl.value.dir = websiteSSL.dir;
+        ssl.value.otherDomains = websiteSSL.domains;
+        ssl.value.autoRenew = websiteSSL.autoRenew;
+        ssl.value.description = websiteSSL.description;
+        ssl.value.id = websiteSSL.id;
+        ssl.value.provider = websiteSSL.provider;
+    }
     ssl.value.websiteId = Number(id.value);
     getAcmeAccounts();
     getDnsAccounts();
@@ -227,7 +246,7 @@ const getPath = (dir: string) => {
 const getAcmeAccounts = async () => {
     const res = await SearchAcmeAccount(acmeReq);
     acmeAccounts.value = res.data.items || [];
-    if (acmeAccounts.value.length > 0) {
+    if (acmeAccounts.value.length > 0 && ssl.value.acmeAccountId == undefined) {
         ssl.value.acmeAccountId = res.data.items[0].id;
     }
 };
@@ -235,7 +254,7 @@ const getAcmeAccounts = async () => {
 const getDnsAccounts = async () => {
     const res = await SearchDnsAccount(dnsReq);
     dnsAccounts.value = res.data.items || [];
-    if (dnsAccounts.value.length > 0) {
+    if (dnsAccounts.value.length > 0 && ssl.value.dnsAccountId == undefined) {
         ssl.value.dnsAccountId = res.data.items[0].id;
     }
 };
@@ -273,17 +292,42 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         loading.value = true;
-        CreateSSL(ssl.value)
-            .then((res: any) => {
-                if (ssl.value.provider != 'dnsManual') {
-                    em('submit', res.data.id);
-                }
-                handleClose();
-                MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
-            })
-            .finally(() => {
-                loading.value = false;
-            });
+        if (operate.value == 'create') {
+            CreateSSL(ssl.value)
+                .then((res: any) => {
+                    if (ssl.value.provider != 'dnsManual') {
+                        em('submit', res.data.id);
+                    }
+                    handleClose();
+                    MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
+                })
+                .finally(() => {
+                    loading.value = false;
+                });
+        }
+        if (operate.value == 'edit') {
+            const sslUpdate = {
+                id: ssl.value.id,
+                primaryDomain: ssl.value.primaryDomain,
+                otherDomains: ssl.value.otherDomains,
+                acmeAccountId: ssl.value.acmeAccountId,
+                dnsAccountId: ssl.value.dnsAccountId,
+                autoRenew: ssl.value.autoRenew,
+                keyType: ssl.value.keyType,
+                pushDir: ssl.value.pushDir,
+                dir: ssl.value.dir,
+                description: ssl.value.description,
+                provider: ssl.value.provider,
+            };
+            UpdateSSL(sslUpdate)
+                .then(() => {
+                    handleClose();
+                    MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+                })
+                .finally(() => {
+                    loading.value = false;
+                });
+        }
     });
 };
 

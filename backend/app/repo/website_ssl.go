@@ -21,6 +21,7 @@ type ISSLRepo interface {
 	Create(ctx context.Context, ssl *model.WebsiteSSL) error
 	Save(ssl *model.WebsiteSSL) error
 	DeleteBy(opts ...DBOption) error
+	SaveByMap(ssl *model.WebsiteSSL, params map[string]interface{}) error
 }
 
 type WebsiteSSLRepo struct {
@@ -82,7 +83,15 @@ func (w WebsiteSSLRepo) Create(ctx context.Context, ssl *model.WebsiteSSL) error
 }
 
 func (w WebsiteSSLRepo) Save(ssl *model.WebsiteSSL) error {
-	return getDb().Save(&ssl).Error
+	return getDb().Model(&model.WebsiteSSL{BaseModel: model.BaseModel{
+		ID: ssl.ID,
+	}}).Save(&ssl).Error
+}
+
+func (w WebsiteSSLRepo) SaveByMap(ssl *model.WebsiteSSL, params map[string]interface{}) error {
+	return getDb().Model(&model.WebsiteSSL{BaseModel: model.BaseModel{
+		ID: ssl.ID,
+	}}).Updates(params).Error
 }
 
 func (w WebsiteSSLRepo) DeleteBy(opts ...DBOption) error {

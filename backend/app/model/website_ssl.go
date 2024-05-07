@@ -9,24 +9,24 @@ import (
 
 type WebsiteSSL struct {
 	BaseModel
-	PrimaryDomain string    `gorm:"type:varchar(256);not null" json:"primaryDomain"`
-	PrivateKey    string    `gorm:"type:longtext;not null" json:"privateKey"`
-	Pem           string    `gorm:"type:longtext;not null" json:"pem"`
-	Domains       string    `gorm:"type:varchar(256);not null" json:"domains"`
-	CertURL       string    `gorm:"type:varchar(256);not null" json:"certURL"`
-	Type          string    `gorm:"type:varchar(64);not null" json:"type"`
-	Provider      string    `gorm:"type:varchar(64);not null" json:"provider"`
-	Organization  string    `gorm:"type:varchar(64);not null" json:"organization"`
-	DnsAccountID  uint      `gorm:"type:integer;not null" json:"dnsAccountId"`
-	AcmeAccountID uint      `gorm:"type:integer;not null" json:"acmeAccountId"`
-	CaID          uint      `gorm:"type:integer;not null;default:0" json:"caId"`
-	AutoRenew     bool      `gorm:"type:varchar(64);not null" json:"autoRenew"`
+	PrimaryDomain string    `json:"primaryDomain"`
+	PrivateKey    string    `json:"privateKey"`
+	Pem           string    `json:"pem"`
+	Domains       string    `json:"domains"`
+	CertURL       string    `json:"certURL"`
+	Type          string    `json:"type"`
+	Provider      string    `json:"provider"`
+	Organization  string    `json:"organization"`
+	DnsAccountID  uint      `json:"dnsAccountId"`
+	AcmeAccountID uint      `gorm:"column:acme_account_id" json:"acmeAccountId" `
+	CaID          uint      `json:"caId"`
+	AutoRenew     bool      `json:"autoRenew"`
 	ExpireDate    time.Time `json:"expireDate"`
 	StartDate     time.Time `json:"startDate"`
-	Status        string    `gorm:"not null;default:ready" json:"status"`
+	Status        string    `json:"status"`
 	Message       string    `json:"message"`
-	KeyType       string    `gorm:"not null;default:2048" json:"keyType"`
-	PushDir       bool      `gorm:"not null;default:0" json:"pushDir"`
+	KeyType       string    `json:"keyType"`
+	PushDir       bool      `json:"pushDir"`
 	Dir           string    `json:"dir"`
 	Description   string    `json:"description"`
 

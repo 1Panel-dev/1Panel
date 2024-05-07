@@ -346,6 +346,7 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 	websiteSSL.StartDate = cert.NotBefore
 	websiteSSL.Type = cert.Issuer.CommonName
 	websiteSSL.Organization = rootCsr.Subject.Organization[0]
+	websiteSSL.Status = constant.SSLReady
 
 	if req.Renew {
 		if err := websiteSSLRepo.Save(websiteSSL); err != nil {

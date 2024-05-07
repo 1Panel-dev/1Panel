@@ -32,8 +32,9 @@ type WebsiteSSLRenew struct {
 }
 
 type WebsiteSSLApply struct {
-	ID           uint `json:"ID" validate:"required"`
-	SkipDNSCheck bool `json:"SkipDNSCheck"`
+	ID           uint     `json:"ID" validate:"required"`
+	SkipDNSCheck bool     `json:"skipDNSCheck"`
+	Nameservers  []string `json:"nameservers"`
 }
 
 type WebsiteAcmeAccountCreate struct {
@@ -66,9 +67,18 @@ type WebsiteBatchDelReq struct {
 }
 
 type WebsiteSSLUpdate struct {
-	ID          uint   `json:"id" validate:"required"`
-	AutoRenew   bool   `json:"autoRenew"`
-	Description string `json:"description"`
+	ID            uint   `json:"id" validate:"required"`
+	AutoRenew     bool   `json:"autoRenew"`
+	Description   string `json:"description"`
+	PrimaryDomain string `json:"primaryDomain" validate:"required"`
+	OtherDomains  string `json:"otherDomains"`
+	Provider      string `json:"provider" validate:"required"`
+	AcmeAccountID uint   `json:"acmeAccountId" validate:"required"`
+	DnsAccountID  uint   `json:"dnsAccountId"`
+	KeyType       string `json:"keyType"`
+	Apply         bool   `json:"apply"`
+	PushDir       bool   `json:"pushDir"`
+	Dir           string `json:"dir"`
 }
 
 type WebsiteSSLUpload struct {
