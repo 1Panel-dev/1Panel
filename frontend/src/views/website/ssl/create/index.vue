@@ -119,6 +119,30 @@
                             {{ $t('ssl.pushDirHelper') }}
                         </span>
                     </el-form-item>
+                    <el-form-item :label="''" prop="disableCNAME">
+                        <el-checkbox v-model="ssl.disableCNAME" :label="$t('ssl.disableCNAME')" />
+                        <span class="input-help">
+                            {{ $t('ssl.disableCNAMEHelper') }}
+                        </span>
+                    </el-form-item>
+                    <el-form-item :label="''" prop="skipDNS">
+                        <el-checkbox v-model="ssl.skipDNS" :label="$t('ssl.skipDNSCheck')" />
+                        <span class="input-help">
+                            {{ $t('ssl.skipDNSCheckHelper') }}
+                        </span>
+                    </el-form-item>
+                    <el-form-item :label="$t('ssl.nameserver') + '1'" prop="nameserver1">
+                        <el-input v-model.trim="ssl.nameserver1"></el-input>
+                        <span class="input-help">
+                            {{ $t('ssl.nameserverHelper') }}
+                        </span>
+                    </el-form-item>
+                    <el-form-item :label="$t('ssl.nameserver') + '2'" prop="nameserver1">
+                        <el-input v-model.trim="ssl.nameserver2"></el-input>
+                        <span class="input-help">
+                            {{ $t('ssl.nameserverHelper') }}
+                        </span>
+                    </el-form-item>
                 </el-form>
             </el-col>
         </el-row>
@@ -178,6 +202,8 @@ const rules = ref({
     autoRenew: [Rules.requiredInput],
     keyType: [Rules.requiredInput],
     dir: [Rules.requiredInput],
+    nameserver1: [Rules.ipv4],
+    nameserver2: [Rules.ipv4],
 });
 const websiteID = ref();
 
@@ -194,6 +220,10 @@ const initData = () => ({
     pushDir: false,
     dir: '',
     description: '',
+    disableCNAME: false,
+    skipDNS: false,
+    nameserver1: '',
+    nameserver2: '',
 });
 
 const ssl = ref(initData());
@@ -231,6 +261,10 @@ const acceptParams = (op: string, websiteSSL: Website.SSLDTO) => {
         ssl.value.description = websiteSSL.description;
         ssl.value.id = websiteSSL.id;
         ssl.value.provider = websiteSSL.provider;
+        ssl.value.skipDNS = websiteSSL.skipDNS;
+        ssl.value.disableCNAME = websiteSSL.disableCNAME;
+        ssl.value.nameserver1 = websiteSSL.nameserver1;
+        ssl.value.nameserver2 = websiteSSL.nameserver2;
     }
     ssl.value.websiteId = Number(id.value);
     getAcmeAccounts();
@@ -318,6 +352,10 @@ const submit = async (formEl: FormInstance | undefined) => {
                 dir: ssl.value.dir,
                 description: ssl.value.description,
                 provider: ssl.value.provider,
+                disableCNAME: ssl.value.disableCNAME,
+                skipDNS: ssl.value.skipDNS,
+                nameserver1: ssl.value.nameserver1,
+                nameserver2: ssl.value.nameserver2,
             };
             UpdateSSL(sslUpdate)
                 .then(() => {

@@ -127,7 +127,6 @@ const rules = ref<any>({
         secretKey: [Rules.requiredInput],
         id: [Rules.requiredInput],
         token: [Rules.requiredInput],
-        email: [Rules.requiredInput],
         apiKey: [Rules.requiredInput],
         apiUser: [Rules.requiredInput],
         secretID: [Rules.requiredInput],

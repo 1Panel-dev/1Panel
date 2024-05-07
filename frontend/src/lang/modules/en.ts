@@ -2062,6 +2062,10 @@ const message = {
         deprecated: 'will be deprecated',
         deprecatedHelper:
             'Maintenance has been stopped and may be abandoned in a future version. Please use Tencent Cloud method for analysis',
+        disableCNAME: 'Disable CNAME',
+        disableCNAMEHelper: 'Domain name with CNAME configuration, if the application fails, you can check here',
+        nameserver: 'DNS server',
+        nameserverHelper: 'Use a custom DNS server to verify domain names',
     },
     firewall: {
         create: 'Create rule',

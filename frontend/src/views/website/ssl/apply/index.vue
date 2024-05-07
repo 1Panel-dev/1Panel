@@ -31,11 +31,6 @@
             </el-table>
         </div>
 
-        <div class="mt-3">
-            <el-checkbox v-model="skipDNSCheck">{{ $t('ssl.skipDNSCheck') }}</el-checkbox>
-            <span class="input-help">{{ $t('ssl.skipDNSCheckHelper') }}</span>
-        </div>
-
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
@@ -67,13 +62,11 @@ const handleClose = () => {
     open.value = false;
     em('close', false);
 };
-const skipDNSCheck = ref(false);
 
 const acceptParams = async (props: RenewProps) => {
     open.value = true;
     dnsResolve.value = [];
     sslID.value = props.ssl.id;
-    skipDNSCheck.value = false;
     getDnsResolve(props.ssl);
 };
 
@@ -96,7 +89,7 @@ const getDnsResolve = async (row: Website.SSL) => {
 };
 
 const submit = () => {
-    ObtainSSL({ ID: sslID.value, skipDNSCheck: skipDNSCheck.value })
+    ObtainSSL({ ID: sslID.value })
         .then(() => {
             MsgSuccess(i18n.global.t('ssl.applyStart'));
             handleClose();

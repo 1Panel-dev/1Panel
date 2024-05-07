@@ -82,6 +82,8 @@ func Init() {
 		migrations.UpdateXpackHideMenu,
 		migrations.AddMenuTabsSetting,
 		migrations.AddDeveloperSetting,
+
+		migrations.AddWebsiteSSLColumn,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

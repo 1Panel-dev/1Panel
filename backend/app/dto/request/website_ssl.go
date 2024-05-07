@@ -20,6 +20,10 @@ type WebsiteSSLCreate struct {
 	Dir           string `json:"dir"`
 	ID            uint   `json:"id"`
 	Description   string `json:"description"`
+	DisableCNAME  bool   `json:"disableCNAME"`
+	SkipDNS       bool   `json:"skipDNS"`
+	Nameserver1   string `json:"nameserver1"`
+	Nameserver2   string `json:"nameserver2"`
 }
 
 type WebsiteDNSReq struct {
@@ -79,6 +83,10 @@ type WebsiteSSLUpdate struct {
 	Apply         bool   `json:"apply"`
 	PushDir       bool   `json:"pushDir"`
 	Dir           string `json:"dir"`
+	DisableCNAME  bool   `json:"disableCNAME"`
+	SkipDNS       bool   `json:"skipDNS"`
+	Nameserver1   string `json:"nameserver1"`
+	Nameserver2   string `json:"nameserver2"`
 }
 
 type WebsiteSSLUpload struct {

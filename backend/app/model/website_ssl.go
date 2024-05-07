@@ -29,6 +29,10 @@ type WebsiteSSL struct {
 	PushDir       bool      `json:"pushDir"`
 	Dir           string    `json:"dir"`
 	Description   string    `json:"description"`
+	SkipDNS       bool      `json:"skipDNS"`
+	Nameserver1   string    `json:"nameserver1"`
+	Nameserver2   string    `json:"nameserver2"`
+	DisableCNAME  bool      `json:"disableCNAME"`
 
 	AcmeAccount WebsiteAcmeAccount `json:"acmeAccount" gorm:"-:migration"`
 	DnsAccount  WebsiteDnsAccount  `json:"dnsAccount" gorm:"-:migration"`

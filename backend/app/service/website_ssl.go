@@ -102,6 +102,12 @@ func (w WebsiteSSLService) Search(search request.WebsiteSSLSearch) ([]response.W
 }
 
 func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.WebsiteSSLCreate, error) {
+	if create.Nameserver1 != "" && !common.IsValidIP(create.Nameserver1) {
+		return create, buserr.New("ErrParseIP")
+	}
+	if create.Nameserver2 != "" && !common.IsValidIP(create.Nameserver2) {
+		return create, buserr.New("ErrParseIP")
+	}
 	var res request.WebsiteSSLCreate
 	acmeAccount, err := websiteAcmeRepo.GetFirst(commonRepo.WithByID(create.AcmeAccountID))
 	if err != nil {
@@ -116,6 +122,10 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 		KeyType:       create.KeyType,
 		PushDir:       create.PushDir,
 		Description:   create.Description,
+		Nameserver1:   create.Nameserver1,
+		Nameserver2:   create.Nameserver2,
+		SkipDNS:       create.SkipDNS,
+		DisableCNAME:  create.DisableCNAME,
 	}
 	if create.PushDir {
 		if !files.NewFileOp().Stat(create.Dir) {
@@ -191,7 +201,7 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 		if err != nil {
 			return err
 		}
-		if err = client.UseDns(ssl.DnsType(dnsAccount.Type), dnsAccount.Authorization, apply.SkipDNSCheck, apply.Nameservers); err != nil {
+		if err = client.UseDns(ssl.DnsType(dnsAccount.Type), dnsAccount.Authorization, *websiteSSL); err != nil {
 			return err
 		}
 	case constant.Http:
@@ -374,6 +384,10 @@ func (w WebsiteSSLService) Update(update request.WebsiteSSLUpdate) error {
 	updateParams["provider"] = update.Provider
 	updateParams["key_type"] = update.KeyType
 	updateParams["push_dir"] = update.PushDir
+	updateParams["disable_cname"] = update.DisableCNAME
+	updateParams["skip_dns"] = update.SkipDNS
+	updateParams["nameserver1"] = update.Nameserver1
+	updateParams["nameserver2"] = update.Nameserver2
 
 	acmeAccount, err := websiteAcmeRepo.GetFirst(commonRepo.WithByID(update.AcmeAccountID))
 	if err != nil {

@@ -173,6 +173,10 @@ export namespace Website {
         pushDir: boolean;
         dir: string;
         keyType: string;
+        nameserver1: string;
+        nameserver2: string;
+        disableCNAME: boolean;
+        skipDNS: boolean;
     }
 
     export interface SSLDTO extends SSL {
@@ -452,7 +456,6 @@ export namespace Website {
 
     export interface SSLObtain {
         ID: number;
-        skipDNSCheck: boolean;
     }
 
     export interface CA extends CommonModel {

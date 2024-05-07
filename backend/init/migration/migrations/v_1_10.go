@@ -154,3 +154,13 @@ var AddDeveloperSetting = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddWebsiteSSLColumn = &gormigrate.Migration{
+	ID: "20240508-update-website-ssl",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.WebsiteSSL{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}
