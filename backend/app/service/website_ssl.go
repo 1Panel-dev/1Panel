@@ -191,7 +191,7 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 		if err != nil {
 			return err
 		}
-		if err = client.UseDns(ssl.DnsType(dnsAccount.Type), dnsAccount.Authorization, apply.SkipDNSCheck); err != nil {
+		if err = client.UseDns(ssl.DnsType(dnsAccount.Type), dnsAccount.Authorization, apply.SkipDNSCheck, apply.Nameservers); err != nil {
 			return err
 		}
 	case constant.Http:
@@ -368,9 +368,49 @@ func (w WebsiteSSLService) Update(update request.WebsiteSSLUpdate) error {
 	if err != nil {
 		return err
 	}
-	websiteSSL.AutoRenew = update.AutoRenew
-	websiteSSL.Description = update.Description
-	return websiteSSLRepo.Save(websiteSSL)
+	updateParams := make(map[string]interface{})
+	updateParams["primary_domain"] = update.PrimaryDomain
+	updateParams["description"] = update.Description
+	updateParams["provider"] = update.Provider
+	updateParams["key_type"] = update.KeyType
+	updateParams["push_dir"] = update.PushDir
+
+	acmeAccount, err := websiteAcmeRepo.GetFirst(commonRepo.WithByID(update.AcmeAccountID))
+	if err != nil {
+		return err
+	}
+	updateParams["acme_account_id"] = acmeAccount.ID
+
+	if update.PushDir {
+		if !files.NewFileOp().Stat(update.Dir) {
+			return buserr.New(constant.ErrLinkPathNotFound)
+		}
+		updateParams["dir"] = update.Dir
+	}
+	var domains []string
+	if update.OtherDomains != "" {
+		otherDomainArray := strings.Split(update.OtherDomains, "\n")
+		for _, domain := range otherDomainArray {
+			if !common.IsValidDomain(domain) {
+				return buserr.WithName("ErrDomainFormat", domain)
+			}
+			domains = append(domains, domain)
+		}
+	}
+	updateParams["domains"] = strings.Join(domains, ",")
+	if update.Provider == constant.DNSAccount || update.Provider == constant.Http {
+		updateParams["auto_renew"] = update.AutoRenew
+	} else {
+		updateParams["auto_renew"] = false
+	}
+	if update.Provider == constant.DNSAccount {
+		dnsAccount, err := websiteDnsRepo.GetFirst(commonRepo.WithByID(update.DnsAccountID))
+		if err != nil {
+			return err
+		}
+		updateParams["dns_account_id"] = dnsAccount.ID
+	}
+	return websiteSSLRepo.SaveByMap(websiteSSL, updateParams)
 }
 
 func (w WebsiteSSLService) Upload(req request.WebsiteSSLUpload) error {

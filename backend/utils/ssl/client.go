@@ -84,7 +84,7 @@ type DNSParam struct {
 	SecretID  string `json:"secretID"`
 }
 
-func (c *AcmeClient) UseDns(dnsType DnsType, params string, skipDNSCheck bool) error {
+func (c *AcmeClient) UseDns(dnsType DnsType, params string, skipDNSCheck bool, nameservers []string) error {
 	var (
 		param DNSParam
 		p     challenge.Provider
@@ -99,15 +99,15 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string, skipDNSCheck bool) e
 	case DnsPod:
 		dnsPodConfig := dnspod.NewDefaultConfig()
 		dnsPodConfig.LoginToken = param.ID + "," + param.Token
-		dnsPodConfig.PropagationTimeout = 60 * time.Minute
-		dnsPodConfig.PollingInterval = 5 * time.Second
+		dnsPodConfig.PropagationTimeout = 15 * time.Minute
+		dnsPodConfig.PollingInterval = 10 * time.Second
 		dnsPodConfig.TTL = 3600
 		p, err = dnspod.NewDNSProviderConfig(dnsPodConfig)
 	case AliYun:
 		alidnsConfig := alidns.NewDefaultConfig()
 		alidnsConfig.SecretKey = param.SecretKey
 		alidnsConfig.APIKey = param.AccessKey
-		alidnsConfig.PropagationTimeout = 60 * time.Minute
+		alidnsConfig.PropagationTimeout = 15 * time.Minute
 		alidnsConfig.PollingInterval = 5 * time.Second
 		alidnsConfig.TTL = 3600
 		p, err = alidns.NewDNSProviderConfig(alidnsConfig)
@@ -115,58 +115,61 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string, skipDNSCheck bool) e
 		cloudflareConfig := cloudflare.NewDefaultConfig()
 		cloudflareConfig.AuthEmail = param.Email
 		cloudflareConfig.AuthToken = param.APIkey
-		cloudflareConfig.PropagationTimeout = 60 * time.Minute
-		cloudflareConfig.PollingInterval = 5 * time.Second
+		cloudflareConfig.PropagationTimeout = 15 * time.Minute
+		cloudflareConfig.PollingInterval = 10 * time.Second
 		cloudflareConfig.TTL = 3600
 		p, err = cloudflare.NewDNSProviderConfig(cloudflareConfig)
 	case NameCheap:
 		namecheapConfig := namecheap.NewDefaultConfig()
 		namecheapConfig.APIKey = param.APIkey
 		namecheapConfig.APIUser = param.APIUser
-		namecheapConfig.PropagationTimeout = 60 * time.Minute
+		namecheapConfig.PropagationTimeout = 15 * time.Minute
 		namecheapConfig.PollingInterval = 5 * time.Second
 		namecheapConfig.TTL = 3600
 		p, err = namecheap.NewDNSProviderConfig(namecheapConfig)
 	case NameSilo:
 		nameSiloConfig := namesilo.NewDefaultConfig()
 		nameSiloConfig.APIKey = param.APIkey
-		nameSiloConfig.PropagationTimeout = 60 * time.Minute
-		nameSiloConfig.PollingInterval = 5 * time.Second
+		nameSiloConfig.PropagationTimeout = 15 * time.Minute
+		nameSiloConfig.PollingInterval = 10 * time.Second
 		nameSiloConfig.TTL = 3600
 		p, err = namesilo.NewDNSProviderConfig(nameSiloConfig)
 	case Godaddy:
 		godaddyConfig := godaddy.NewDefaultConfig()
 		godaddyConfig.APIKey = param.APIkey
 		godaddyConfig.APISecret = param.APISecret
-		godaddyConfig.PropagationTimeout = 60 * time.Minute
-		godaddyConfig.PollingInterval = 5 * time.Second
+		godaddyConfig.PropagationTimeout = 15 * time.Minute
+		godaddyConfig.PollingInterval = 10 * time.Second
 		godaddyConfig.TTL = 3600
 		p, err = godaddy.NewDNSProviderConfig(godaddyConfig)
 	case NameCom:
 		nameComConfig := namedotcom.NewDefaultConfig()
 		nameComConfig.APIToken = param.Token
 		nameComConfig.Username = param.APIUser
-		nameComConfig.PropagationTimeout = 30 * time.Minute
-		nameComConfig.PollingInterval = 30 * time.Second
+		nameComConfig.PropagationTimeout = 15 * time.Minute
+		nameComConfig.PollingInterval = 10 * time.Second
 		nameComConfig.TTL = 3600
 		p, err = namedotcom.NewDNSProviderConfig(nameComConfig)
 	case TencentCloud:
 		tencentCloudConfig := tencentcloud.NewDefaultConfig()
 		tencentCloudConfig.SecretID = param.SecretID
 		tencentCloudConfig.SecretKey = param.SecretKey
-		tencentCloudConfig.PropagationTimeout = 30 * time.Minute
-		tencentCloudConfig.PollingInterval = 30 * time.Second
+		tencentCloudConfig.PropagationTimeout = 15 * time.Minute
+		tencentCloudConfig.PollingInterval = 10 * time.Second
 		tencentCloudConfig.TTL = 3600
 		p, err = tencentcloud.NewDNSProviderConfig(tencentCloudConfig)
 	}
 	if err != nil {
 		return err
 	}
-	if skipDNSCheck {
-		return c.Client.Challenge.SetDNS01Provider(p, dns01.AddDNSTimeout(10*time.Minute), dns01.DisableCompletePropagationRequirement())
-	}
 
-	return c.Client.Challenge.SetDNS01Provider(p, dns01.AddDNSTimeout(10*time.Minute))
+	return c.Client.Challenge.SetDNS01Provider(p,
+		dns01.CondOption(len(nameservers) > 0,
+			dns01.AddRecursiveNameservers(nameservers)),
+		dns01.CondOption(skipDNSCheck,
+			dns01.DisableCompletePropagationRequirement()),
+		dns01.AddDNSTimeout(10*time.Minute),
+	)
 }
 
 func (c *AcmeClient) UseManualDns() error {

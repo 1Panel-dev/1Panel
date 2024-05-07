@@ -138,11 +138,11 @@
                     />
                 </ComplexTable>
             </template>
-            <DnsAccount ref="dnsAccountRef"></DnsAccount>
-            <AcmeAccount ref="acmeAccountRef"></AcmeAccount>
-            <Create ref="sslCreateRef" @close="search()" @submit="openLog"></Create>
-            <Detail ref="detailRef"></Detail>
-            <SSLUpload ref="sslUploadRef" @close="search()"></SSLUpload>
+            <DnsAccount ref="dnsAccountRef" />
+            <AcmeAccount ref="acmeAccountRef" />
+            <Create ref="sslCreateRef" @close="search()" @submit="openLog" />
+            <Detail ref="detailRef" />
+            <SSLUpload ref="sslUploadRef" @close="search()" />
             <Apply ref="applyRef" @search="search" @submit="openLog" />
             <OpDialog ref="opRef" @search="search" @cancel="search" />
             <Log ref="logRef" @close="search()" />
@@ -189,8 +189,8 @@ const sslUploadRef = ref();
 const applyRef = ref();
 const logRef = ref();
 const caRef = ref();
-let selects = ref<any>([]);
 const obtainRef = ref();
+let selects = ref<any>([]);
 
 const routerButton = [
     {
@@ -232,6 +232,15 @@ const buttons = [
         },
         show: function (row: Website.SSLDTO) {
             return row.provider == 'manual';
+        },
+    },
+    {
+        label: i18n.global.t('commons.button.edit'),
+        click: function (row: Website.SSLDTO) {
+            onEdit(row);
+        },
+        disabled: function (row: Website.SSLDTO) {
+            return row.provider == 'selfSigned';
         },
     },
     {
@@ -292,7 +301,7 @@ const updateDesc = (row: Website.SSLDTO, bulr: Function) => {
 
 const updateConfig = (row: Website.SSLDTO) => {
     loading.value = true;
-    UpdateSSL({ id: row.id, autoRenew: row.autoRenew, description: row.description })
+    UpdateSSL(row)
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
         })
@@ -308,8 +317,12 @@ const openDnsAccount = () => {
     dnsAccountRef.value.acceptParams();
 };
 const openSSL = () => {
-    sslCreateRef.value.acceptParams();
+    sslCreateRef.value.acceptParams('create');
 };
+const onEdit = (row: Website.SSL) => {
+    sslCreateRef.value.acceptParams('edit', row);
+};
+
 const openUpload = () => {
     sslUploadRef.value.acceptParams();
 };
