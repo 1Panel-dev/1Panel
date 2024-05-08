@@ -250,18 +250,18 @@ func checkValidOfWebsite(oldWebsite, website *model.Website) error {
 		return buserr.WithDetail(constant.ErrBackupMatch, fmt.Sprintf("oldName: %s, oldType: %v", oldWebsite.Alias, oldWebsite.Type), nil)
 	}
 	if oldWebsite.AppInstallID != 0 {
-		_, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
+		_, err := appInstallRepo.GetFirst(commonRepo.WithByID(oldWebsite.AppInstallID))
 		if err != nil {
 			return buserr.WithDetail(constant.ErrBackupMatch, "app", nil)
 		}
 	}
 	if oldWebsite.RuntimeID != 0 {
-		if _, err := runtimeRepo.GetFirst(commonRepo.WithByID(website.RuntimeID)); err != nil {
+		if _, err := runtimeRepo.GetFirst(commonRepo.WithByID(oldWebsite.RuntimeID)); err != nil {
 			return buserr.WithDetail(constant.ErrBackupMatch, "runtime", nil)
 		}
 	}
 	if oldWebsite.WebsiteSSLID != 0 {
-		if _, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(website.WebsiteSSLID)); err != nil {
+		if _, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(oldWebsite.WebsiteSSLID)); err != nil {
 			return buserr.WithDetail(constant.ErrBackupMatch, "ssl", nil)
 		}
 	}
