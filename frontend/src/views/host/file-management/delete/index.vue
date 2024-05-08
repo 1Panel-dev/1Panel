@@ -2,7 +2,7 @@
     <el-dialog v-model="open" :title="$t('app.delete')" width="30%" :close-on-click-modal="false">
         <div>
             <el-row>
-                <el-col :span="20" :offset="2">
+                <el-col :span="22" :offset="1">
                     <el-alert
                         class="mt-2"
                         :show-icon="true"
@@ -15,8 +15,11 @@
                         </div>
                     </el-alert>
                     <div class="mt-4" v-if="recycleStatus === 'enable'">
-                        <el-checkbox v-model="forceDelete">{{ $t('file.forceDeleteHelper') }}</el-checkbox>
+                        <el-checkbox v-model="forceDelete" class="force-delete">
+                            <span>{{ $t('file.forceDeleteHelper') }}</span>
+                        </el-checkbox>
                     </div>
+
                     <div class="file-list">
                         <div class="flx-align-center mb-1" v-for="(row, index) in files" :key="index">
                             <div>
@@ -128,5 +131,11 @@ defineExpose({
 .delete-warn {
     line-height: 20px;
     word-wrap: break-word;
+}
+
+.force-delete {
+    white-space: pre-line;
+    word-wrap: break-word;
+    line-height: 50px;
 }
 </style>
