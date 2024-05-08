@@ -82,7 +82,7 @@ func (w WebsiteCAService) Create(create request.WebsiteCACreate) (*request.Websi
 	}
 
 	rootCA := &x509.Certificate{
-		SerialNumber:          big.NewInt(time.Now().Unix()),
+		SerialNumber:          big.NewInt(time.Now().Unix() + 1),
 		Subject:               pkixName,
 		NotBefore:             time.Now(),
 		NotAfter:              time.Now().AddDate(10, 0, 0),
@@ -279,7 +279,7 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 		notAfter = notAfter.AddDate(0, 0, req.Time)
 	}
 	interCsr := &x509.Certificate{
-		SerialNumber:          big.NewInt(time.Now().Unix()),
+		SerialNumber:          big.NewInt(time.Now().Unix() + 2),
 		Subject:               rootCsr.Subject,
 		NotBefore:             time.Now(),
 		NotAfter:              notAfter,
@@ -315,7 +315,7 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 	subject := rootCsr.Subject
 	subject.CommonName = commonName
 	csr := &x509.Certificate{
-		SerialNumber:          big.NewInt(time.Now().Unix()),
+		SerialNumber:          big.NewInt(time.Now().Unix() + 3),
 		Subject:               subject,
 		NotBefore:             time.Now(),
 		NotAfter:              notAfter,
