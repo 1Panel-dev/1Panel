@@ -70,6 +70,11 @@ func (sws *LocalWsSession) masterWrite(data []byte) error {
 }
 
 func (sws *LocalWsSession) receiveWsMsg(exitCh chan bool) {
+	defer func() {
+		if r := recover(); r != nil {
+			global.LOG.Errorf("[xpack] A panic occurred during receive ws message, error message: %v", r)
+		}
+	}()
 	wsConn := sws.wsConn
 	defer setQuit(exitCh)
 	defer global.LOG.Debug("thread of receive ws msg has exited now")
