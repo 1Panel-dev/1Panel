@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"os"
+	"path"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -63,6 +64,7 @@ func Init() {
 	handleCronjobStatus()
 	handleSnapStatus()
 	loadLocalDir()
+	initDir()
 }
 
 func handleSnapStatus() {
@@ -197,4 +199,14 @@ func handleUserInfo(tags string, settingRepo repo.ISettingRepo) {
 
 	sudo := cmd.SudoHandleCmd()
 	_, _ = cmd.Execf("%s sed -i '/CHANGE_USER_INFO=%v/d' /usr/local/bin/1pctl", sudo, global.CONF.System.ChangeUserInfo)
+}
+
+func initDir() {
+	composePath := path.Join(global.CONF.System.BaseDir, "1panel/docker/compose/")
+	if _, err := os.Stat(composePath); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(composePath, os.ModePerm); err != nil {
+			global.LOG.Errorf("mkdir %s failed, err: %v", composePath, err)
+			return
+		}
+	}
 }
