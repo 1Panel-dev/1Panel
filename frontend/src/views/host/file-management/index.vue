@@ -3,10 +3,10 @@
         <div class="flex items-center">
             <div class="flex-shrink-0 flex items-center mr-4">
                 <el-tooltip :content="$t('file.back')" placement="top">
-                    <el-button :icon="Back" @click="back" circle :disabled="paths.length == 0" />
+                    <el-button :icon="Back" @click="back" circle />
                 </el-tooltip>
                 <el-tooltip :content="$t('file.right')" placement="top">
-                    <el-button :icon="Right" @click="right" circle :disabled="paths.length == 0" />
+                    <el-button :icon="Right" @click="right" circle />
                 </el-tooltip>
                 <el-tooltip :content="$t('file.top')" placement="top">
                     <el-button :icon="Top" @click="top" circle :disabled="paths.length == 0" />
