@@ -1304,7 +1304,7 @@ const message = {
         versionHelper: '1Panel 版本號命名規則為： [大版本].[功能版本].[Bug 修復版本]，例：',
         versionHelper1: 'v1.0.1 是 v1.0.0 之後的 Bug 修復版本',
         versionHelper2: 'v1.1.0 是 v1.0.0 之後的功能版本',
-        testVersion: '(內測版本)',
+        testVersion: '(預發布版本)',
         newVersion: '(Bug 修復版本)',
         latestVersion: '(功能版本)',
         upgradeCheck: '檢查更新',

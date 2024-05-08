@@ -55,7 +55,11 @@ func (u *UpgradeService) SearchUpgrade() (*dto.UpgradeInfo, error) {
 	if len(itemVersion) == 0 {
 		return &upgrade, nil
 	}
-	notes, err := u.loadReleaseNotes(fmt.Sprintf("%s/%s/%s/release/1panel-%s-release-notes", global.CONF.System.RepoUrl, global.CONF.System.Mode, itemVersion, itemVersion))
+	mode := global.CONF.System.Mode
+	if strings.Contains(itemVersion, "beta") {
+		mode = "beta"
+	}
+	notes, err := u.loadReleaseNotes(fmt.Sprintf("%s/%s/%s/release/1panel-%s-release-notes", global.CONF.System.RepoUrl, mode, itemVersion, itemVersion))
 	if err != nil {
 		return nil, fmt.Errorf("load releases-notes of version %s failed, err: %v", itemVersion, err)
 	}
@@ -215,14 +219,34 @@ func (u *UpgradeService) loadVersionByMode(developer, currentVersion string) (st
 		return devVersionLatest, "", ""
 	}
 
+	betaVersionLatest := ""
 	latest = u.loadVersion(true, currentVersion, "stable")
 	current = u.loadVersion(false, currentVersion, "stable")
-	if len(developer) == 0 || developer == "disable" {
-		return "", current, latest
+	if developer == "enable" {
+		betaVersionLatest = u.loadVersion(true, currentVersion, "beta")
 	}
-	betaVersionLatest := u.loadVersion(true, currentVersion, "beta")
+	if current != latest {
+		return betaVersionLatest, current, latest
+	}
 
-	return betaVersionLatest, current, latest
+	versionPart := strings.Split(current, ".")
+	if len(versionPart) < 3 {
+		return betaVersionLatest, current, latest
+	}
+	num, _ := strconv.Atoi(versionPart[1])
+	if num == 0 {
+		return betaVersionLatest, current, latest
+	}
+	if num >= 10 {
+		if current[:6] == currentVersion[:6] {
+			return betaVersionLatest, current, ""
+		}
+		return betaVersionLatest, "", latest
+	}
+	if current[:5] == currentVersion[:5] {
+		return betaVersionLatest, current, ""
+	}
+	return betaVersionLatest, "", latest
 }
 
 func (u *UpgradeService) loadVersion(isLatest bool, currentVersion, mode string) string {
