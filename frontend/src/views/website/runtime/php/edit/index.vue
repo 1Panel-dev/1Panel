@@ -9,6 +9,7 @@
                 allow-create
                 default-first-option
                 @change="updateParam"
+                clearable
             >
                 <el-option
                     v-for="service in p.values"
