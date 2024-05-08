@@ -42,9 +42,18 @@ func (u *UpgradeService) SearchUpgrade() (*dto.UpgradeInfo, error) {
 	}
 
 	upgrade.TestVersion, upgrade.NewVersion, upgrade.LatestVersion = u.loadVersionByMode(DeveloperMode.Value, currentVersion.Value)
-	itemVersion := upgrade.LatestVersion
-	if upgrade.NewVersion != "" {
+	var itemVersion string
+	if len(upgrade.LatestVersion) != 0 {
+		itemVersion = upgrade.LatestVersion
+	}
+	if len(upgrade.NewVersion) != 0 {
 		itemVersion = upgrade.NewVersion
+	}
+	if (global.CONF.System.Mode == "dev" || DeveloperMode.Value == "enable") && len(upgrade.TestVersion) != 0 {
+		itemVersion = upgrade.TestVersion
+	}
+	if len(itemVersion) == 0 {
+		return &upgrade, nil
 	}
 	notes, err := u.loadReleaseNotes(fmt.Sprintf("%s/%s/%s/release/1panel-%s-release-notes", global.CONF.System.RepoUrl, global.CONF.System.Mode, itemVersion, itemVersion))
 	if err != nil {
