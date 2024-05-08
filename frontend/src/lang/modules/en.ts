@@ -691,6 +691,9 @@ const message = {
         tag: 'Tag',
         tagHelper: 'one in a row, for example, \nkey1=value1\nkey2=value2',
         imageNameHelper: 'Image name and Tag, for example: nginx:latest',
+        cleanBuildCache: 'Clean Build Cache',
+        delBuildCacheHelper:
+            'Cleaning the build cache will delete all cached artifacts generated during builds. This action cannot be undone. Continue?',
 
         network: 'Network',
         createNetwork: 'Create network',
