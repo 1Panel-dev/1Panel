@@ -87,8 +87,8 @@ ErrDomainIsExist: "域名已存在"
 ErrAliasIsExist: "代號已存在"
 ErrAppDelete: '其他網站使用此應用,無法刪除'
 ErrGroupIsUsed: '分組正在使用中，無法刪除'
-ErrBackupMatch: '該備份文件與當前網站部分數據不匹配: {{ .detail}}"'
-ErrBackupExist: '該備份文件對應部分原數據不存在: {{ .detail}}"'
+ErrBackupMatch: '該備份文件與當前網站部分數據不匹配: {{ .detail}}'
+ErrBackupExist: '該備份文件對應部分原數據不存在: {{ .detail}}'
 ErrPHPResource: '本地運行環境不支持切換！'
 ErrPathPermission: 'index 目錄下偵測到非 1000:1000 權限資料夾，可能導致網站存取 Access denied 錯誤，請點擊上方儲存按鈕'
 ErrDomainIsUsed: "域名已被網站【{{ .name }}】使用"
