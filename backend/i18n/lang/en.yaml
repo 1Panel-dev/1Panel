@@ -87,8 +87,8 @@ ErrDomainIsExist: "Domain is already exist"
 ErrAliasIsExist: "Alias is already exist"
 ErrAppDelete: 'Other Website use this App'
 ErrGroupIsUsed: 'The group is in use and cannot be deleted'
-ErrBackupMatch: 'the backup file does not match the current partial data of the website: {{ .detail}}"'
-ErrBackupExist: 'the backup file corresponds to a portion of the original data that does not exist: {{ .detail}}"'
+ErrBackupMatch: 'the backup file does not match the current partial data of the website: {{ .detail}}'
+ErrBackupExist: 'the backup file corresponds to a portion of the original data that does not exist: {{ .detail}}'
 ErrPHPResource: 'The local runtime does not support switching！'
 ErrPathPermission: 'A folder with non-1000:1000 permissions was detected in the index directory, which may cause an Access denied error when accessing the website. Please click the save button above'
 ErrDomainIsUsed: "Domain is already used by website {{ .name }}"
