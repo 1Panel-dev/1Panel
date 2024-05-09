@@ -1933,6 +1933,7 @@ const message = {
         disableCNAMEHelper: '有 CNAME 配置的域名，如果申请失败，可以勾选此处',
         nameserver: 'DNS 服务器',
         nameserverHelper: '使用自定义的 DNS 服务器来校验域名',
+        edit: '编辑证书',
     },
     firewall: {
         create: '创建规则',

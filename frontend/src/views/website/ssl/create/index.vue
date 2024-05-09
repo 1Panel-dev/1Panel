@@ -1,7 +1,7 @@
 <template>
     <el-drawer :close-on-click-modal="false" v-model="open" size="50%">
         <template #header>
-            <DrawerHeader :header="$t('ssl.create')" :back="handleClose" />
+            <DrawerHeader :header="$t('ssl.' + operate)" :back="handleClose" />
         </template>
         <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
@@ -40,7 +40,7 @@
                                 :value="acme.id"
                             >
                                 <el-row>
-                                    <el-col :span="6">
+                                    <el-col :span="11">
                                         <span>{{ acme.email }}</span>
                                     </el-col>
                                     <el-col :span="11">
