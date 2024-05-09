@@ -41,11 +41,6 @@ const { switchDark } = useTheme();
 
 let timer: NodeJS.Timer | null = null;
 
-onMounted(() => {
-    if (!tabsStore.activeTabPath) {
-        handleMenuClick('/');
-    }
-});
 const classObj = computed(() => {
     return {
         fullScreen: globalStore.isFullScreen,
@@ -163,6 +158,10 @@ onBeforeUnmount(() => {
     timer = null;
 });
 onMounted(() => {
+    if (globalStore.openMenuTabs && !tabsStore.activeTabPath) {
+        handleMenuClick('/');
+    }
+
     loadStatus();
     initFavicon();
     loadDataFromDB();
