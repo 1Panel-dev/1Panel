@@ -48,13 +48,13 @@
             </div>
             <el-radio-group class="inline-block tag" v-model="upgradeVersion" @change="changeOption">
                 <el-radio v-if="upgradeInfo.newVersion" :value="upgradeInfo.newVersion">
-                    {{ upgradeInfo.newVersion }} {{ $t('setting.newVersion') }}
+                    {{ upgradeInfo.newVersion }}
                 </el-radio>
                 <el-radio v-if="upgradeInfo.latestVersion" :value="upgradeInfo.latestVersion">
-                    {{ upgradeInfo.latestVersion }} {{ $t('setting.latestVersion') }}
+                    {{ upgradeInfo.latestVersion }}
                 </el-radio>
                 <el-radio v-if="upgradeInfo.testVersion" :value="upgradeInfo.testVersion">
-                    {{ upgradeInfo.testVersion }} {{ $t('setting.testVersion') }}
+                    {{ upgradeInfo.testVersion }}
                 </el-radio>
             </el-radio-group>
             <MdEditor
