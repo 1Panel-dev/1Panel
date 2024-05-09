@@ -271,7 +271,7 @@ func (u *ImageService) ImagePull(req dto.ImagePull) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	options := types.ImagePullOptions{}
+	options := image.PullOptions{}
 	if repo.Auth {
 		authConfig := registry.AuthConfig{
 			Username: repo.Username,
@@ -373,19 +373,17 @@ func (u *ImageService) ImagePush(req dto.ImagePush) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	options := types.ImagePushOptions{}
-	if repo.Auth {
-		authConfig := registry.AuthConfig{
-			Username: repo.Username,
-			Password: repo.Password,
-		}
-		encodedJSON, err := json.Marshal(authConfig)
-		if err != nil {
-			return "", err
-		}
-		authStr := base64.URLEncoding.EncodeToString(encodedJSON)
-		options.RegistryAuth = authStr
+	options := image.PushOptions{All: true}
+	authConfig := registry.AuthConfig{
+		Username: repo.Username,
+		Password: repo.Password,
 	}
+	encodedJSON, err := json.Marshal(authConfig)
+	if err != nil {
+		return "", err
+	}
+	authStr := base64.URLEncoding.EncodeToString(encodedJSON)
+	options.RegistryAuth = authStr
 	newName := fmt.Sprintf("%s/%s", repo.DownloadUrl, req.Name)
 	if newName != req.TagName {
 		if err := client.ImageTag(context.TODO(), req.TagName, newName); err != nil {
