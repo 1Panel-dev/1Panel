@@ -29,6 +29,8 @@ builds:
       - arm
       - ppc64le
       - s390x
+      - loong64
+      - riscv64
 
 archives:
   - format: tar.gz
