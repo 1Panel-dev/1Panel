@@ -362,11 +362,11 @@ func createWafConfig(website *model.Website, domains []model.WebsiteDomain) erro
 			return err
 		}
 	}
-	defaultRulesName := []string{"acl", "args", "cookie", "defaultUaBlack", "defaultUrlBlack", "fileExt", "header", "methodWhite"}
+	defaultRulesName := []string{"acl", "args", "cookie", "defaultUaBlack", "defaultUrlBlack", "fileExt", "header", "methodWhite", "cdn"}
 	for _, ruleName := range defaultRulesName {
 		srcPath := path.Join(defaultRuleDir, ruleName+".json")
-		if err = fileOp.Copy(srcPath, websiteRuleDir); err != nil {
-			return err
+		if fileOp.Stat(srcPath) {
+			_ = fileOp.Copy(srcPath, websiteRuleDir)
 		}
 	}
 
