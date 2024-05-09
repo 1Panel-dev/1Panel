@@ -1,6 +1,7 @@
 package client
 
 import (
+	"bytes"
 	"compress/gzip"
 	"context"
 	"errors"
@@ -230,11 +231,17 @@ func (r *Local) Backup(info BackupInfo) error {
 	}
 	global.LOG.Infof("start to %s | gzip > %s.gzip", dumpCmd, info.TargetDir+"/"+info.FileName)
 	cmd := exec.Command("docker", "exec", r.ContainerName, dumpCmd, "-uroot", "-p"+r.Password, "--default-character-set="+info.Format, info.Name)
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+
 	gzipCmd := exec.Command("gzip", "-cf")
 	gzipCmd.Stdin, _ = cmd.StdoutPipe()
 	gzipCmd.Stdout = outfile
 	_ = gzipCmd.Start()
-	_ = cmd.Run()
+
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("handle backup database failed, err: %v", stderr.String())
+	}
 	_ = gzipCmd.Wait()
 	return nil
 }
