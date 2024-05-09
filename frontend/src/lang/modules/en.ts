@@ -2066,6 +2066,7 @@ const message = {
         disableCNAMEHelper: 'Domain name with CNAME configuration, if the application fails, you can check here',
         nameserver: 'DNS server',
         nameserverHelper: 'Use a custom DNS server to verify domain names',
+        edit: 'Edit certificate',
     },
     firewall: {
         create: 'Create rule',
