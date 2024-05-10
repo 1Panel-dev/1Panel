@@ -96,7 +96,11 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 		return err
 	}
 
-	downloadPath := fmt.Sprintf("%s/%s/%s/release", global.CONF.System.RepoUrl, global.CONF.System.Mode, req.Version)
+	mode := global.CONF.System.Mode
+	if strings.Contains(req.Version, "beta") {
+		mode = "beta"
+	}
+	downloadPath := fmt.Sprintf("%s/%s/%s/release", global.CONF.System.RepoUrl, mode, req.Version)
 	fileName := fmt.Sprintf("1panel-%s-%s-%s.tar.gz", req.Version, "linux", itemArch)
 	_ = settingRepo.Update("SystemStatus", "Upgrading")
 	go func() {
