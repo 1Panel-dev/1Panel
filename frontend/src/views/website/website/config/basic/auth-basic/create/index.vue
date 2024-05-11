@@ -1,5 +1,11 @@
 <template>
-    <el-drawer v-model="open" :close-on-click-modal="false" size="40%" :before-close="handleClose">
+    <el-drawer
+        v-model="open"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        size="40%"
+        :before-close="handleClose"
+    >
         <template #header>
             <DrawerHeader
                 :header="$t('commons.button.' + authBasic.operate) + $t('website.basicAuth')"

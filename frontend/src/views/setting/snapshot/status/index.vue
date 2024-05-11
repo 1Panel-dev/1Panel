@@ -1,6 +1,6 @@
 <template>
     <div v-loading="loading">
-        <el-drawer v-model="drawerVisible">
+        <el-drawer v-model="drawerVisible" :close-on-click-modal="false" :close-on-press-escape="false">
             <template #header>
                 <DrawerHeader :header="$t('setting.recoverDetail')" :back="handleClose" />
             </template>

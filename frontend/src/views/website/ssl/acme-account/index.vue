@@ -1,5 +1,5 @@
 <template>
-    <el-drawer :close-on-click-modal="false" v-model="open" size="60%">
+    <el-drawer :close-on-click-modal="false" :close-on-press-escape="false" v-model="open" size="60%">
         <template #header>
             <DrawerHeader :header="$t('website.acmeAccountManage')" :back="handleClose" />
         </template>

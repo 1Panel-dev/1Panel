@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="open" size="40%">
+    <el-drawer v-model="open" size="40%" :close-on-click-modal="false" :close-on-press-escape="false">
         <template #header>
             <DrawerHeader :header="$t('file.changeOwner')" :resource="name" :back="handleClose" />
         </template>

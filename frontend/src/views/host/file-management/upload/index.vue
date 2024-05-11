@@ -5,6 +5,7 @@
         size="40%"
         :destroy-on-close="true"
         :close-on-click-modal="false"
+        :close-on-press-escape="false"
     >
         <template #header>
             <DrawerHeader :header="$t('file.upload')" :back="handleClose" />

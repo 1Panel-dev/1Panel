@@ -1,6 +1,12 @@
 <template>
     <div>
-        <el-drawer v-model="bindVisible" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
+        <el-drawer
+            v-model="bindVisible"
+            :destroy-on-close="true"
+            :close-on-click-modal="false"
+            :close-on-press-escape="false"
+            width="30%"
+        >
             <template #header>
                 <DrawerHeader :header="$t('database.userBind')" :resource="form.mysqlName" :back="handleClose" />
             </template>

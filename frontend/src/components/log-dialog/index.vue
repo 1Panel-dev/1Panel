@@ -3,6 +3,7 @@
         v-model="open"
         :destroy-on-close="true"
         :close-on-click-modal="false"
+        :close-on-press-escape="false"
         :size="globalStore.isFullScreen ? '100%' : '50%'"
     >
         <template #header>

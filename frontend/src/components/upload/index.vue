@@ -1,6 +1,12 @@
 <template>
     <div>
-        <el-drawer v-model="upVisible" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+        <el-drawer
+            v-model="upVisible"
+            :destroy-on-close="true"
+            :close-on-click-modal="false"
+            :close-on-press-escape="false"
+            size="50%"
+        >
             <template #header>
                 <DrawerHeader :header="$t('commons.button.import')" :resource="title" :back="handleClose" />
             </template>

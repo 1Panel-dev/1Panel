@@ -1,5 +1,5 @@
 <template>
-    <el-drawer :close-on-click-modal="false" v-model="open" size="40%">
+    <el-drawer :close-on-click-modal="false" :close-on-press-escape="false" v-model="open" size="40%">
         <template #header>
             <DrawerHeader :header="$t('website.defaultServer')" :back="handleClose"></DrawerHeader>
         </template>

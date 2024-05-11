@@ -4,6 +4,7 @@
         :before-close="handleClose"
         :destroy-on-close="true"
         :close-on-click-modal="false"
+        :close-on-press-escape="false"
         size="40%"
     >
         <template #header>

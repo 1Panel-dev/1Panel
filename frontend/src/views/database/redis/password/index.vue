@@ -1,5 +1,11 @@
 <template>
-    <el-drawer v-model="dialogVisible" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
+    <el-drawer
+        v-model="dialogVisible"
+        :destroy-on-close="true"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        size="30%"
+    >
         <template #header>
             <DrawerHeader :header="$t('database.databaseConnInfo')" :back="handleClose" />
         </template>

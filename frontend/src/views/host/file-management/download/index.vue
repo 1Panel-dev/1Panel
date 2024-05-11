@@ -4,6 +4,7 @@
         :title="$t('file.download')"
         :destroy-on-close="true"
         :close-on-click-modal="false"
+        :close-on-press-escape="false"
         :before-close="handleClose"
         size="40%"
     >
