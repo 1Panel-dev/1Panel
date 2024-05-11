@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-drawer v-model="drawerVisible" size="30%">
+        <el-drawer v-model="drawerVisible" size="30%" :close-on-click-modal="false" :close-on-press-escape="false">
             <template #header>
                 <DrawerHeader :header="$t('setting.importSnapshot')" :back="handleClose" />
             </template>

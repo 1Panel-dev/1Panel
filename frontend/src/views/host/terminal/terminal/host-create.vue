@@ -1,6 +1,12 @@
 <template>
     <div>
-        <el-drawer v-model="dialogVisible" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+        <el-drawer
+            v-model="dialogVisible"
+            :destroy-on-close="true"
+            :close-on-click-modal="false"
+            :close-on-press-escape="false"
+            size="50%"
+        >
             <template #header>
                 <DrawerHeader :header="$t('terminal.addHost')" :back="handleClose" />
             </template>

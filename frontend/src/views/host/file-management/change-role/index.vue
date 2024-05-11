@@ -1,5 +1,11 @@
 <template>
-    <el-drawer v-model="open" :before-close="handleClose" :close-on-click-modal="false" size="50%">
+    <el-drawer
+        v-model="open"
+        :before-close="handleClose"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        size="50%"
+    >
         <template #header>
             <DrawerHeader :header="$t('file.setRole')" :resource="name" :back="handleClose" />
         </template>

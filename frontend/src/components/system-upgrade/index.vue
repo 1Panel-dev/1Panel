@@ -33,7 +33,14 @@
         </el-button>
         <el-tag v-if="version === 'Waiting'" round style="margin-left: 10px">{{ $t('setting.upgrading') }}</el-tag>
     </div>
-    <el-drawer :close-on-click-modal="false" :key="refresh" v-model="drawerVisible" size="50%" append-to-body>
+    <el-drawer
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        :key="refresh"
+        v-model="drawerVisible"
+        size="50%"
+        append-to-body
+    >
         <template #header>
             <DrawerHeader :header="$t('commons.button.upgrade')" :back="handleClose" />
         </template>

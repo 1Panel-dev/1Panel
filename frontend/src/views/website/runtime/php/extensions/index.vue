@@ -1,5 +1,11 @@
 <template>
-    <el-drawer :close-on-click-modal="false" v-model="open" size="50%" :before-close="handleClose">
+    <el-drawer
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        v-model="open"
+        size="50%"
+        :before-close="handleClose"
+    >
         <template #header>
             <DrawerHeader :header="$t('php.extensions')" :back="handleClose" />
         </template>

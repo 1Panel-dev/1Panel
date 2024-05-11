@@ -1,6 +1,12 @@
 <template>
     <div>
-        <el-drawer v-model="changeVisible" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
+        <el-drawer
+            v-model="changeVisible"
+            :destroy-on-close="true"
+            :close-on-click-modal="false"
+            :close-on-press-escape="false"
+            width="30%"
+        >
             <template #header>
                 <DrawerHeader :header="title" :resource="changeForm.postgresqlName" :back="handleClose" />
             </template>

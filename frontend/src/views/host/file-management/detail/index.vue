@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="open" width="30%">
+    <el-drawer v-model="open" width="30%" :close-on-click-modal="false" :close-on-press-escape="false">
         <template #header>
             <DrawerHeader :header="$t('file.info')" :back="handleClose" />
         </template>

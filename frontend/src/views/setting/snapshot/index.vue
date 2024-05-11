@@ -112,7 +112,7 @@
         </LayoutContent>
         <RecoverStatus ref="recoverStatusRef" @search="search()"></RecoverStatus>
         <SnapshotImport ref="importRef" @search="search()" />
-        <el-drawer v-model="drawerVisible" size="50%">
+        <el-drawer v-model="drawerVisible" size="50%" :close-on-click-modal="false" :close-on-press-escape="false">
             <template #header>
                 <DrawerHeader :header="$t('setting.createSnapshot')" :back="handleClose" />
             </template>

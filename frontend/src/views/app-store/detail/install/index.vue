@@ -1,6 +1,7 @@
 <template>
     <el-drawer
         :close-on-click-modal="false"
+        :close-on-press-escape="false"
         v-model="open"
         :title="$t('app.install')"
         size="50%"

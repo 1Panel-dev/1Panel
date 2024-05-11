@@ -2,6 +2,7 @@
     <el-drawer
         v-model="open"
         :close-on-click-modal="false"
+        :close-on-press-escape="false"
         :title="$t('website.addDomain')"
         size="40%"
         :before-close="handleClose"

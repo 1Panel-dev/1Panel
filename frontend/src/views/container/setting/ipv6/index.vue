@@ -4,6 +4,7 @@
             v-model="drawerVisible"
             :destroy-on-close="true"
             :close-on-click-modal="false"
+            :close-on-press-escape="false"
             @close="handleClose"
             size="30%"
         >

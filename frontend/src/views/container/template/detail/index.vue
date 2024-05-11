@@ -1,5 +1,11 @@
 <template>
-    <el-drawer v-model="detailVisible" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+    <el-drawer
+        v-model="detailVisible"
+        :destroy-on-close="true"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        size="50%"
+    >
         <template #header>
             <div class="card-header">
                 <span>{{ $t('commons.button.view') }}</span>

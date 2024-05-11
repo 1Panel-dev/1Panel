@@ -1,5 +1,11 @@
 <template>
-    <el-drawer v-model="open" :size="globalStore.isFullScreen ? '100%' : '50%'" :before-close="handleClose">
+    <el-drawer
+        v-model="open"
+        :size="globalStore.isFullScreen ? '100%' : '50%'"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        :before-close="handleClose"
+    >
         <template #header>
             <DrawerHeader :header="$t('commons.button.log')" :resource="resource" :back="handleClose">
                 <template #extra v-if="!mobile">

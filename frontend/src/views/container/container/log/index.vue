@@ -4,6 +4,7 @@
             v-model="logVisible"
             :destroy-on-close="true"
             :close-on-click-modal="false"
+            :close-on-press-escape="false"
             :before-close="handleClose"
             :size="globalStore.isFullScreen ? '100%' : '50%'"
         >

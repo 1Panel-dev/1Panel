@@ -1,5 +1,5 @@
 <template>
-    <el-drawer :close-on-click-modal="false" v-model="open" size="50%">
+    <el-drawer :close-on-click-modal="false" :close-on-press-escape="false" v-model="open" size="50%">
         <template #header>
             <DrawerHeader :header="$t('ssl.detail')" :back="handleClose" />
         </template>
