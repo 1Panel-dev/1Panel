@@ -13,6 +13,10 @@
                 <el-button type="primary" @click="openCreate">
                     {{ $t('runtime.create') }}
                 </el-button>
+
+                <el-button type="primary" plain @click="onOpenBuildCache()">
+                    {{ $t('container.cleanBuildCache') }}
+                </el-button>
             </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="items" @search="search()">
@@ -104,6 +108,9 @@ import ComposeLogs from '@/components/compose-log/index.vue';
 import { Promotion } from '@element-plus/icons-vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import AppResources from '@/views/website/runtime/php/check/index.vue';
+import { ElMessageBox } from 'element-plus';
+import { containerPrune } from '@/api/modules/container';
+import { MsgSuccess } from '@/utils/message';
 
 let timer: NodeJS.Timer | null = null;
 const loading = ref(false);
@@ -219,6 +226,29 @@ const openDelete = async (row: Runtime.Runtime) => {
         } else {
             deleteRef.value.acceptParams(row.id, row.name);
         }
+    });
+};
+
+const onOpenBuildCache = () => {
+    ElMessageBox.confirm(i18n.global.t('container.delBuildCacheHelper'), i18n.global.t('container.cleanBuildCache'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(async () => {
+        loading.value = true;
+        let params = {
+            pruneType: 'buildcache',
+            withTagAll: false,
+        };
+        await containerPrune(params)
+            .then((res) => {
+                loading.value = false;
+                MsgSuccess(i18n.global.t('container.cleanSuccess', [res.data.deletedNumber]));
+                search();
+            })
+            .catch(() => {
+                loading.value = false;
+            });
     });
 };
 

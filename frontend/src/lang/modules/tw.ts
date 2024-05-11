@@ -672,6 +672,8 @@ const message = {
         tag: '標簽',
         tagHelper: '一行一個，例： \nkey1=value1\nkey2=value2',
         imageNameHelper: '鏡像名稱及 Tag，例：nginx:latest',
+        cleanBuildCache: '清理建置快取',
+        delBuildCacheHelper: '清理建置快取將刪除所有建置所產生的快取，此操作無法回復。是否繼續？',
 
         network: '網絡',
         createNetwork: '創建網絡',

@@ -123,7 +123,7 @@ type ContainerRename struct {
 }
 
 type ContainerPrune struct {
-	PruneType  string `json:"pruneType" validate:"required,oneof=container image volume network"`
+	PruneType  string `json:"pruneType" validate:"required,oneof=container image volume network buildcache"`
 	WithTagAll bool   `json:"withTagAll"`
 }
 

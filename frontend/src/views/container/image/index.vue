@@ -19,6 +19,9 @@
                         <el-button type="primary" plain @click="onOpenBuild">
                             {{ $t('container.imageBuild') }}
                         </el-button>
+                        <el-button type="primary" plain @click="onOpenBuildCache()">
+                            {{ $t('container.cleanBuildCache') }}
+                        </el-button>
                         <el-button type="primary" plain @click="onOpenPrune()">
                             {{ $t('container.imagePrune') }}
                         </el-button>
@@ -112,10 +115,19 @@ import Build from '@/views/container/image/build/index.vue';
 import Delete from '@/views/container/image/delete/index.vue';
 import Prune from '@/views/container/image/prune/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
-import { searchImage, listImageRepo, loadDockerStatus, imageRemove, inspect } from '@/api/modules/container';
+import {
+    searchImage,
+    listImageRepo,
+    loadDockerStatus,
+    imageRemove,
+    inspect,
+    containerPrune,
+} from '@/api/modules/container';
 import i18n from '@/lang';
 import router from '@/routers';
 import { GlobalStore } from '@/store';
+import { ElMessageBox } from 'element-plus';
+import { MsgSuccess } from '@/utils/message';
 const globalStore = GlobalStore();
 
 const mobile = computed(() => {
@@ -220,6 +232,29 @@ const onOpenBuild = () => {
 
 const onOpenPrune = () => {
     dialogPruneRef.value!.acceptParams();
+};
+
+const onOpenBuildCache = () => {
+    ElMessageBox.confirm(i18n.global.t('container.delBuildCacheHelper'), i18n.global.t('container.cleanBuildCache'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(async () => {
+        loading.value = true;
+        let params = {
+            pruneType: 'buildcache',
+            withTagAll: false,
+        };
+        await containerPrune(params)
+            .then((res) => {
+                loading.value = false;
+                MsgSuccess(i18n.global.t('container.cleanSuccess', [res.data.deletedNumber]));
+                search();
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
 };
 
 const onOpenload = () => {

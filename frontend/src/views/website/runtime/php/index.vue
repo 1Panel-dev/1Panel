@@ -17,6 +17,10 @@
                 <el-button @click="openExtensions">
                     {{ $t('php.extensions') }}
                 </el-button>
+
+                <el-button type="primary" plain @click="onOpenBuildCache()">
+                    {{ $t('container.cleanBuildCache') }}
+                </el-button>
             </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="items" @search="search()">
@@ -95,6 +99,9 @@ import RouterMenu from '../index.vue';
 import Log from '@/components/log-dialog/index.vue';
 import Extensions from './extensions/index.vue';
 import AppResources from '@/views/website/runtime/php/check/index.vue';
+import { ElMessageBox } from 'element-plus';
+import { containerPrune } from '@/api/modules/container';
+import { MsgSuccess } from '@/utils/message';
 
 const paginationConfig = reactive({
     cacheSizeKey: 'runtime-page-size',
@@ -187,6 +194,29 @@ const openDelete = async (row: Runtime.Runtime) => {
                 params: { id: row.id, forceDelete: true },
             });
         }
+    });
+};
+
+const onOpenBuildCache = () => {
+    ElMessageBox.confirm(i18n.global.t('container.delBuildCacheHelper'), i18n.global.t('container.cleanBuildCache'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(async () => {
+        loading.value = true;
+        let params = {
+            pruneType: 'buildcache',
+            withTagAll: false,
+        };
+        await containerPrune(params)
+            .then((res) => {
+                loading.value = false;
+                MsgSuccess(i18n.global.t('container.cleanSuccess', [res.data.deletedNumber]));
+                search();
+            })
+            .catch(() => {
+                loading.value = false;
+            });
     });
 };
 
