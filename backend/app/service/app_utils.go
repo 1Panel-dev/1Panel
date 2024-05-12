@@ -455,7 +455,7 @@ func upgradeInstall(installID uint, detailID uint, backup, pullImage bool) error
 			upErr      error
 			backupFile string
 		)
-		global.LOG.Infof(i18n.GetMsgByKey("UpgradeAppStart"))
+		global.LOG.Infof(i18n.GetMsgWithName("UpgradeAppStart", install.Name, nil))
 		if backup {
 			backupRecord, err := NewIBackupService().AppBackup(dto.CommonBackup{Name: install.App.Key, DetailName: install.Name})
 			if err == nil {
@@ -587,7 +587,8 @@ func upgradeInstall(installID uint, detailID uint, backup, pullImage bool) error
 		}
 
 		if pullImage {
-			images, err := composeV2.GetDockerComposeImages(install.Name, content, []byte(detail.DockerCompose))
+			projectName := strings.ToLower(install.Name)
+			images, err := composeV2.GetDockerComposeImages(projectName, content, []byte(detail.DockerCompose))
 			if err != nil {
 				upErr = err
 				return
