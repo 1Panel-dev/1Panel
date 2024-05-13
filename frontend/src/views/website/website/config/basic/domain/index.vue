@@ -76,7 +76,12 @@ const openUrl = (domain: Website.Domain) => {
         url = url + ':' + domain.port;
     }
     if (protocol == 'https') {
-        url = url + ':' + httpsPort.value;
+        if (httpsPort.value != 443) {
+            url = url + ':' + httpsPort.value;
+        }
+        if (domain.port != 80) {
+            url = 'http://' + domain.domain + ':' + domain.port;
+        }
     }
     window.open(url);
 };
