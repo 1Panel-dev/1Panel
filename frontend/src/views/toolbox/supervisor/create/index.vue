@@ -21,7 +21,7 @@
                         </el-input>
                     </el-form-item>
                     <el-form-item :label="$t('tool.supervisor.command')" prop="command">
-                        <el-input v-model.trim="process.command"></el-input>
+                        <el-input v-model="process.command"></el-input>
                     </el-form-item>
                     <el-form-item :label="$t('tool.supervisor.numprocs')" prop="numprocsNum">
                         <el-input type="number" v-model.number="process.numprocsNum"></el-input>
