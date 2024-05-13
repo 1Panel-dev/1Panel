@@ -239,8 +239,8 @@ const buttons = [
         click: function (row: Website.SSLDTO) {
             onEdit(row);
         },
-        disabled: function (row: Website.SSLDTO) {
-            return row.provider == 'selfSigned';
+        show: function (row: Website.SSLDTO) {
+            return row.provider != 'manual' && row.provider != 'selfSigned';
         },
     },
     {
