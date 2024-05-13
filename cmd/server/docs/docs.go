@@ -5109,42 +5109,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/databases/redis/backup/search": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "获取 redis 备份记录分页",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Database Redis"
-                ],
-                "summary": "Page redis backups",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.PageInfo"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.PageResult"
-                        }
-                    }
-                }
-            }
-        },
         "/databases/redis/conf": {
             "get": {
                 "security": [
@@ -5153,10 +5117,24 @@ const docTemplate = `{
                     }
                 ],
                 "description": "获取 redis 配置信息",
+                "consumes": [
+                    "application/json"
+                ],
                 "tags": [
                     "Database Redis"
                 ],
                 "summary": "Load redis conf",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperationWithName"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -5255,10 +5233,24 @@ const docTemplate = `{
                     }
                 ],
                 "description": "获取 redis 持久化配置",
+                "consumes": [
+                    "application/json"
+                ],
                 "tags": [
                     "Database Redis"
                 ],
                 "summary": "Load redis persistence conf",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperationWithName"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -5317,10 +5309,24 @@ const docTemplate = `{
                     }
                 ],
                 "description": "获取 redis 状态信息",
+                "consumes": [
+                    "application/json"
+                ],
                 "tags": [
                     "Database Redis"
                 ],
                 "summary": "Load redis status info",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperationWithName"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -14323,9 +14329,13 @@ const docTemplate = `{
         "dto.ChangeRedisPass": {
             "type": "object",
             "required": [
+                "database",
                 "value"
             ],
             "properties": {
+                "database": {
+                    "type": "string"
+                },
                 "value": {
                     "type": "string"
                 }
@@ -14761,7 +14771,8 @@ const docTemplate = `{
                         "container",
                         "image",
                         "volume",
-                        "network"
+                        "network",
+                        "buildcache"
                     ]
                 },
                 "withTagAll": {
@@ -17296,8 +17307,14 @@ const docTemplate = `{
         },
         "dto.RedisConf": {
             "type": "object",
+            "required": [
+                "database"
+            ],
             "properties": {
                 "containerName": {
+                    "type": "string"
+                },
+                "database": {
                     "type": "string"
                 },
                 "maxclients": {
@@ -17323,6 +17340,7 @@ const docTemplate = `{
         "dto.RedisConfPersistenceUpdate": {
             "type": "object",
             "required": [
+                "database",
                 "type"
             ],
             "properties": {
@@ -17330,6 +17348,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "appendonly": {
+                    "type": "string"
+                },
+                "database": {
                     "type": "string"
                 },
                 "save": {
@@ -17346,7 +17367,13 @@ const docTemplate = `{
         },
         "dto.RedisConfUpdate": {
             "type": "object",
+            "required": [
+                "database"
+            ],
             "properties": {
+                "database": {
+                    "type": "string"
+                },
                 "maxclients": {
                     "type": "string"
                 },
@@ -17360,11 +17387,17 @@ const docTemplate = `{
         },
         "dto.RedisPersistence": {
             "type": "object",
+            "required": [
+                "database"
+            ],
             "properties": {
                 "appendfsync": {
                     "type": "string"
                 },
                 "appendonly": {
+                    "type": "string"
+                },
+                "database": {
                     "type": "string"
                 },
                 "save": {
@@ -17374,8 +17407,14 @@ const docTemplate = `{
         },
         "dto.RedisStatus": {
             "type": "object",
+            "required": [
+                "database"
+            ],
             "properties": {
                 "connected_clients": {
+                    "type": "string"
+                },
+                "database": {
                     "type": "string"
                 },
                 "instantaneous_ops_per_sec": {
@@ -18578,6 +18617,9 @@ const docTemplate = `{
                 "dir": {
                     "type": "string"
                 },
+                "disableCNAME": {
+                    "type": "boolean"
+                },
                 "dnsAccount": {
                     "$ref": "#/definitions/model.WebsiteDnsAccount"
                 },
@@ -18599,6 +18641,12 @@ const docTemplate = `{
                 "message": {
                     "type": "string"
                 },
+                "nameserver1": {
+                    "type": "string"
+                },
+                "nameserver2": {
+                    "type": "string"
+                },
                 "organization": {
                     "type": "string"
                 },
@@ -18615,6 +18663,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "pushDir": {
+                    "type": "boolean"
+                },
+                "skipDNS": {
                     "type": "boolean"
                 },
                 "startDate": {
@@ -20542,7 +20593,6 @@ const docTemplate = `{
             "required": [
                 "id",
                 "match",
-                "modifier",
                 "name",
                 "operate",
                 "proxyHost",
@@ -20627,7 +20677,13 @@ const docTemplate = `{
                 "ID": {
                     "type": "integer"
                 },
-                "SkipDNSCheck": {
+                "nameservers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "skipDNSCheck": {
                     "type": "boolean"
                 }
             }
@@ -20655,6 +20711,9 @@ const docTemplate = `{
                 "dir": {
                     "type": "string"
                 },
+                "disableCNAME": {
+                    "type": "boolean"
+                },
                 "dnsAccountId": {
                     "type": "integer"
                 },
@@ -20662,6 +20721,12 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "keyType": {
+                    "type": "string"
+                },
+                "nameserver1": {
+                    "type": "string"
+                },
+                "nameserver2": {
                     "type": "string"
                 },
                 "otherDomains": {
@@ -20674,6 +20739,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "pushDir": {
+                    "type": "boolean"
+                },
+                "skipDNS": {
                     "type": "boolean"
                 }
             }
@@ -20699,17 +20767,59 @@ const docTemplate = `{
         "request.WebsiteSSLUpdate": {
             "type": "object",
             "required": [
-                "id"
+                "acmeAccountId",
+                "id",
+                "primaryDomain",
+                "provider"
             ],
             "properties": {
+                "acmeAccountId": {
+                    "type": "integer"
+                },
+                "apply": {
+                    "type": "boolean"
+                },
                 "autoRenew": {
                     "type": "boolean"
                 },
                 "description": {
                     "type": "string"
                 },
+                "dir": {
+                    "type": "string"
+                },
+                "disableCNAME": {
+                    "type": "boolean"
+                },
+                "dnsAccountId": {
+                    "type": "integer"
+                },
                 "id": {
                     "type": "integer"
+                },
+                "keyType": {
+                    "type": "string"
+                },
+                "nameserver1": {
+                    "type": "string"
+                },
+                "nameserver2": {
+                    "type": "string"
+                },
+                "otherDomains": {
+                    "type": "string"
+                },
+                "primaryDomain": {
+                    "type": "string"
+                },
+                "provider": {
+                    "type": "string"
+                },
+                "pushDir": {
+                    "type": "boolean"
+                },
+                "skipDNS": {
+                    "type": "boolean"
                 }
             }
         },

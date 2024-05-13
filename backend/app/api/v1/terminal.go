@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/copier"
@@ -86,23 +87,24 @@ func (b *BaseApi) RedisWsSsh(c *gin.Context) {
 	if wshandleError(wsConn, errors.WithMessage(err, "invalid param rows in request")) {
 		return
 	}
-	redisConf, err := redisService.LoadConf()
-	if wshandleError(wsConn, errors.WithMessage(err, "load redis container failed")) {
+	name := c.Query("name")
+	redisInfo, err := appInstallService.LoadConnInfo(dto.OperationWithNameAndType{Type: "redis", Name: name})
+	if wshandleError(wsConn, errors.WithMessage(err, "invalid param rows in request")) {
 		return
 	}
 
 	defer wsConn.Close()
 	commands := []string{"redis-cli"}
-	if len(redisConf.Requirepass) != 0 {
-		commands = []string{"redis-cli", "-a", redisConf.Requirepass, "--no-auth-warning"}
+	if len(redisInfo.Password) != 0 {
+		commands = []string{"redis-cli", "-a", redisInfo.Password, "--no-auth-warning"}
 	}
-	pidMap := loadMapFromDockerTop(redisConf.ContainerName)
-	itemCmds := append([]string{"exec", "-it", redisConf.ContainerName}, commands...)
+	pidMap := loadMapFromDockerTop(redisInfo.Password)
+	itemCmds := append([]string{"exec", "-it", redisInfo.ContainerName}, commands...)
 	slave, err := terminal.NewCommand(itemCmds)
 	if wshandleError(wsConn, err) {
 		return
 	}
-	defer killBash(redisConf.ContainerName, strings.Join(commands, " "), pidMap)
+	defer killBash(redisInfo.ContainerName, strings.Join(commands, " "), pidMap)
 	defer slave.Close()
 
 	tty, err := terminal.NewLocalWsSession(cols, rows, wsConn, slave, false)

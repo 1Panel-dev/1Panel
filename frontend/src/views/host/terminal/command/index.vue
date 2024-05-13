@@ -42,7 +42,7 @@
                     <el-table-column type="selection" fix />
                     <el-table-column
                         :label="$t('commons.table.name')"
-                        show-overflow-tooltip=""
+                        show-overflow-tooltip
                         min-width="100"
                         prop="name"
                         fix
@@ -57,7 +57,7 @@
                     />
                     <el-table-column
                         :label="$t('commons.table.group')"
-                        show-overflow-tooltip=""
+                        show-overflow-tooltip
                         min-width="100"
                         prop="groupBelong"
                         fix

@@ -49,7 +49,7 @@ type IBackupService interface {
 	MysqlRecoverByUpload(req dto.CommonRecover) error
 	PostgresqlRecoverByUpload(req dto.CommonRecover) error
 
-	RedisBackup() error
+	RedisBackup(db dto.CommonBackup) error
 	RedisRecover(db dto.CommonRecover) error
 
 	WebsiteBackup(db dto.CommonBackup) error

@@ -78,7 +78,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
@@ -87,19 +87,16 @@ import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { GetAppConnInfo } from '@/api/modules/app';
 import { MsgSuccess } from '@/utils/message';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { App } from '@/api/interface/app';
 import { getRandomStr } from '@/utils/util';
 import { getSettingInfo } from '@/api/modules/setting';
 
 const loading = ref(false);
 
 const dialogVisible = ref(false);
-const form = ref<App.DatabaseConnInfo>({
-    username: '',
+const form = reactive({
+    database: '',
     password: '',
-    privilege: false,
     containerName: '',
-    serviceName: '',
     systemIP: '',
     port: 0,
 });
@@ -111,8 +108,12 @@ const emit = defineEmits(['checkExist', 'closeTerminal']);
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 
-const acceptParams = (): void => {
-    form.value.password = '';
+interface DialogProps {
+    database: string;
+}
+const acceptParams = (params: DialogProps): void => {
+    form.database = params.database;
+    form.password = '';
     loadPassword();
     dialogVisible.value = true;
 };
@@ -121,20 +122,22 @@ const handleClose = () => {
 };
 
 const random = async () => {
-    form.value.password = getRandomStr(16);
+    form.password = getRandomStr(16);
 };
 
 const loadPassword = async () => {
-    const res = await GetAppConnInfo('redis', '');
+    const res = await GetAppConnInfo('redis', form.database);
+    form.containerName = res.data.containerName;
+    form.password = res.data.password;
+    form.port = res.data.port;
     const settingInfoRes = await getSettingInfo();
-    form.value = res.data;
-    form.value.systemIP = settingInfoRes.data.systemIP || i18n.global.t('database.localIP');
+    form.systemIP = settingInfoRes.data.systemIP || i18n.global.t('database.localIP');
 };
 
 const onSubmit = async () => {
     loading.value = true;
     emit('closeTerminal');
-    await changeRedisPassword(form.value.password)
+    await changeRedisPassword(form.database, form.password)
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

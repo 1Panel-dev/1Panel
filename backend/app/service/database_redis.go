@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path"
-	"path/filepath"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -23,11 +21,9 @@ type IRedisService interface {
 	UpdatePersistenceConf(req dto.RedisConfPersistenceUpdate) error
 	ChangePassword(info dto.ChangeRedisPass) error
 
-	LoadStatus() (*dto.RedisStatus, error)
-	LoadConf() (*dto.RedisConf, error)
-	LoadPersistenceConf() (*dto.RedisPersistence, error)
-
-	SearchBackupListWithPage(req dto.PageInfo) (int64, interface{}, error)
+	LoadStatus(req dto.OperationWithName) (*dto.RedisStatus, error)
+	LoadConf(req dto.OperationWithName) (*dto.RedisConf, error)
+	LoadPersistenceConf(req dto.OperationWithName) (*dto.RedisPersistence, error)
 }
 
 func NewIRedisService() IRedisService {
@@ -35,7 +31,7 @@ func NewIRedisService() IRedisService {
 }
 
 func (u *RedisService) UpdateConf(req dto.RedisConfUpdate) error {
-	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", "")
+	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", req.Database)
 	if err != nil {
 		return err
 	}
@@ -55,7 +51,7 @@ func (u *RedisService) UpdateConf(req dto.RedisConfUpdate) error {
 }
 
 func (u *RedisService) ChangePassword(req dto.ChangeRedisPass) error {
-	if err := updateInstallInfoInDB("redis", "", "password", req.Value); err != nil {
+	if err := updateInstallInfoInDB("redis", req.Database, "password", req.Value); err != nil {
 		return err
 	}
 	if err := updateInstallInfoInDB("redis-commander", "", "password", req.Value); err != nil {
@@ -66,7 +62,7 @@ func (u *RedisService) ChangePassword(req dto.ChangeRedisPass) error {
 }
 
 func (u *RedisService) UpdatePersistenceConf(req dto.RedisConfPersistenceUpdate) error {
-	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", "")
+	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", req.Database)
 	if err != nil {
 		return err
 	}
@@ -88,8 +84,8 @@ func (u *RedisService) UpdatePersistenceConf(req dto.RedisConfPersistenceUpdate)
 	return nil
 }
 
-func (u *RedisService) LoadStatus() (*dto.RedisStatus, error) {
-	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", "")
+func (u *RedisService) LoadStatus(req dto.OperationWithName) (*dto.RedisStatus, error) {
+	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", req.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -116,8 +112,8 @@ func (u *RedisService) LoadStatus() (*dto.RedisStatus, error) {
 	return &info, nil
 }
 
-func (u *RedisService) LoadConf() (*dto.RedisConf, error) {
-	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", "")
+func (u *RedisService) LoadConf(req dto.OperationWithName) (*dto.RedisConf, error) {
+	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", req.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -133,8 +129,8 @@ func (u *RedisService) LoadConf() (*dto.RedisConf, error) {
 	return &item, nil
 }
 
-func (u *RedisService) LoadPersistenceConf() (*dto.RedisPersistence, error) {
-	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", "")
+func (u *RedisService) LoadPersistenceConf(req dto.OperationWithName) (*dto.RedisPersistence, error) {
+	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", req.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -149,46 +145,6 @@ func (u *RedisService) LoadPersistenceConf() (*dto.RedisPersistence, error) {
 		return nil, err
 	}
 	return &item, nil
-}
-
-func (u *RedisService) SearchBackupListWithPage(req dto.PageInfo) (int64, interface{}, error) {
-	var (
-		list      []dto.DatabaseFileRecords
-		backDatas []dto.DatabaseFileRecords
-	)
-	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", "")
-	if err != nil {
-		return 0, nil, err
-	}
-	localDir, err := loadLocalDir()
-	if err != nil {
-		return 0, nil, err
-	}
-	backupDir := path.Join(localDir, fmt.Sprintf("database/redis/%s", redisInfo.Name))
-	_ = filepath.Walk(backupDir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return nil
-		}
-		if !info.IsDir() {
-			list = append(list, dto.DatabaseFileRecords{
-				CreatedAt: info.ModTime().Format("2006-01-02 15:04:05"),
-				Size:      int(info.Size()),
-				FileDir:   backupDir,
-				FileName:  info.Name(),
-			})
-		}
-		return nil
-	})
-	total, start, end := len(list), (req.Page-1)*req.PageSize, req.Page*req.PageSize
-	if start > total {
-		backDatas = make([]dto.DatabaseFileRecords, 0)
-	} else {
-		if end >= total {
-			end = total
-		}
-		backDatas = list[start:end]
-	}
-	return int64(total), backDatas, nil
 }
 
 func configGetStr(containerName, password, param string) (string, error) {

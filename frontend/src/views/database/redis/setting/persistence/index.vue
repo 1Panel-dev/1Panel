@@ -139,14 +139,17 @@ const rules = reactive({
     appendfsync: [Rules.requiredSelect],
 });
 const formRef = ref<FormInstance>();
+const database = ref();
 const opRef = ref();
 
 interface DialogProps {
+    database: string;
     status: string;
 }
 const persistenceShow = ref(false);
 const acceptParams = (prop: DialogProps): void => {
     persistenceShow.value = true;
+    database.value = prop.database;
     if (prop.status === 'Running') {
         loadform();
         search();
@@ -179,7 +182,7 @@ const handleDelete = (index: number) => {
 const search = async () => {
     let params = {
         type: 'redis',
-        name: '',
+        name: database.value,
         detailName: '',
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
@@ -190,7 +193,7 @@ const search = async () => {
 };
 const onBackup = async () => {
     emit('loading', true);
-    await handleBackup({ name: '', detailName: '', type: 'redis' })
+    await handleBackup({ name: database.value, detailName: '', type: 'redis' })
         .then(() => {
             emit('loading', false);
             search();
@@ -204,7 +207,7 @@ const onRecover = async () => {
     let param = {
         source: currentRow.value.source,
         type: 'redis',
-        name: '',
+        name: database.value,
         detailName: '',
         file: currentRow.value.fileDir + '/' + currentRow.value.fileName,
     };
@@ -266,6 +269,7 @@ const buttons = [
 
 const onSave = async (formEl: FormInstance | undefined, type: string) => {
     let param = {} as Database.RedisConfPersistenceUpdate;
+    param.database = database.value;
     if (type == 'aof') {
         if (!formEl) return;
         formEl.validate(async (valid) => {
@@ -308,7 +312,7 @@ const onSave = async (formEl: FormInstance | undefined, type: string) => {
 
 const loadform = async () => {
     form.saves = [];
-    const res = await redisPersistenceConf();
+    const res = await redisPersistenceConf(database.value);
     form.appendonly = res.data?.appendonly;
     form.appendfsync = res.data?.appendfsync;
     let itemSaves = res.data?.save.split(' ');

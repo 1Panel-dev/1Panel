@@ -35,12 +35,11 @@ func (s *DatabaseRouter) InitRouter(Router *gin.RouterGroup) {
 		cmdRouter.POST("/remote", baseApi.LoadRemoteAccess)
 		cmdRouter.GET("/options", baseApi.ListDBName)
 
-		cmdRouter.GET("/redis/persistence/conf", baseApi.LoadPersistenceConf)
-		cmdRouter.GET("/redis/status", baseApi.LoadRedisStatus)
-		cmdRouter.GET("/redis/conf", baseApi.LoadRedisConf)
+		cmdRouter.POST("/redis/persistence/conf", baseApi.LoadPersistenceConf)
+		cmdRouter.POST("/redis/status", baseApi.LoadRedisStatus)
+		cmdRouter.POST("/redis/conf", baseApi.LoadRedisConf)
 		cmdRouter.GET("/redis/exec", baseApi.RedisWsSsh)
 		cmdRouter.POST("/redis/password", baseApi.ChangeRedisPassword)
-		cmdRouter.POST("/redis/backup/search", baseApi.RedisBackupList)
 		cmdRouter.POST("/redis/conf/update", baseApi.UpdateRedisConf)
 		cmdRouter.POST("/redis/persistence/update", baseApi.UpdateRedisPersistenceConf)
 

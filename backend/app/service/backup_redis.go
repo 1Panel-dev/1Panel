@@ -20,12 +20,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (u *BackupService) RedisBackup() error {
+func (u *BackupService) RedisBackup(db dto.CommonBackup) error {
 	localDir, err := loadLocalDir()
 	if err != nil {
 		return err
 	}
-	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", "")
+	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", db.Name)
 	if err != nil {
 		return err
 	}
@@ -51,6 +51,7 @@ func (u *BackupService) RedisBackup() error {
 	}
 	record := &model.BackupRecord{
 		Type:       "redis",
+		Name:       db.Name,
 		Source:     "LOCAL",
 		BackupType: "LOCAL",
 		FileDir:    itemDir,
@@ -64,7 +65,7 @@ func (u *BackupService) RedisBackup() error {
 }
 
 func (u *BackupService) RedisRecover(req dto.CommonRecover) error {
-	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", "")
+	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", req.Name)
 	if err != nil {
 		return err
 	}

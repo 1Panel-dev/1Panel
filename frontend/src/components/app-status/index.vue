@@ -167,7 +167,7 @@ let refresh = ref(1);
 const httpPort = ref(0);
 const httpsPort = ref(0);
 
-const em = defineEmits(['setting', 'isExist', 'before', 'update:loading', 'update:maskShow']);
+const em = defineEmits(['setting', 'isExist', 'before', 'after', 'update:loading', 'update:maskShow']);
 const setting = () => {
     em('setting', false);
 };
@@ -227,6 +227,7 @@ const onOperate = async (operation: string) => {
                     em('update:loading', false);
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                     onCheck();
+                    em('after');
                 })
                 .catch(() => {
                     em('update:loading', false);

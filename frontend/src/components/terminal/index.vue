@@ -176,12 +176,14 @@ const onWSReceive = (message: MessageEvent) => {
     switch (wsMsg.type) {
         case 'cmd': {
             term.value.element && term.value.focus();
-            let receiveMsg = Base64.decode(wsMsg.data);
-            if (initCmd.value != '') {
-                receiveMsg = receiveMsg.replace(initCmd.value.trim(), '').trim();
-                initCmd.value = '';
+            if (wsMsg.data) {
+                let receiveMsg = Base64.decode(wsMsg.data);
+                if (initCmd.value != '') {
+                    receiveMsg = receiveMsg?.replace(initCmd.value.trim(), '').trim();
+                    initCmd.value = '';
+                }
+                term.value.write(receiveMsg);
             }
-            wsMsg.data && term.value.write(receiveMsg);
             break;
         }
         case 'heartbeat': {

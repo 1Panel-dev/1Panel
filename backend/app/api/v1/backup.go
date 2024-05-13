@@ -343,7 +343,7 @@ func (b *BaseApi) Backup(c *gin.Context) {
 			return
 		}
 	case "redis":
-		if err := backupService.RedisBackup(); err != nil {
+		if err := backupService.RedisBackup(req); err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 			return
 		}

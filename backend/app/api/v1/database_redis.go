@@ -12,11 +12,17 @@ import (
 // @Tags Database Redis
 // @Summary Load redis status info
 // @Description 获取 redis 状态信息
+// @Accept json
+// @Param request body dto.OperationWithName true "request"
 // @Success 200 {object} dto.RedisStatus
 // @Security ApiKeyAuth
 // @Router /databases/redis/status [get]
 func (b *BaseApi) LoadRedisStatus(c *gin.Context) {
-	data, err := redisService.LoadStatus()
+	var req dto.OperationWithName
+	if err := helper.CheckBind(&req, c); err != nil {
+		return
+	}
+	data, err := redisService.LoadStatus(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -28,11 +34,17 @@ func (b *BaseApi) LoadRedisStatus(c *gin.Context) {
 // @Tags Database Redis
 // @Summary Load redis conf
 // @Description 获取 redis 配置信息
+// @Accept json
+// @Param request body dto.OperationWithName true "request"
 // @Success 200 {object} dto.RedisConf
 // @Security ApiKeyAuth
 // @Router /databases/redis/conf [get]
 func (b *BaseApi) LoadRedisConf(c *gin.Context) {
-	data, err := redisService.LoadConf()
+	var req dto.OperationWithName
+	if err := helper.CheckBind(&req, c); err != nil {
+		return
+	}
+	data, err := redisService.LoadConf(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -44,11 +56,17 @@ func (b *BaseApi) LoadRedisConf(c *gin.Context) {
 // @Tags Database Redis
 // @Summary Load redis persistence conf
 // @Description 获取 redis 持久化配置
+// @Accept json
+// @Param request body dto.OperationWithName true "request"
 // @Success 200 {object} dto.RedisPersistence
 // @Security ApiKeyAuth
 // @Router /databases/redis/persistence/conf [get]
 func (b *BaseApi) LoadPersistenceConf(c *gin.Context) {
-	data, err := redisService.LoadPersistenceConf()
+	var req dto.OperationWithName
+	if err := helper.CheckBind(&req, c); err != nil {
+		return
+	}
+	data, err := redisService.LoadPersistenceConf(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -130,30 +148,4 @@ func (b *BaseApi) UpdateRedisPersistenceConf(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, nil)
-}
-
-// @Tags Database Redis
-// @Summary Page redis backups
-// @Description 获取 redis 备份记录分页
-// @Accept json
-// @Param request body dto.PageInfo true "request"
-// @Success 200 {object} dto.PageResult
-// @Security ApiKeyAuth
-// @Router /databases/redis/backup/search [post]
-func (b *BaseApi) RedisBackupList(c *gin.Context) {
-	var req dto.PageInfo
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	total, list, err := redisService.SearchBackupListWithPage(req)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-
-	helper.SuccessWithData(c, dto.PageResult{
-		Items: list,
-		Total: total,
-	})
 }
