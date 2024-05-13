@@ -323,6 +323,13 @@ func (u *ContainerService) Prune(req dto.ContainerPrune) (dto.ContainerPruneRepo
 		}
 		report.DeletedNumber = len(rep.NetworksDeleted)
 	case "volume":
+		versions, err := client.ServerVersion(context.Background())
+		if err != nil {
+			return report, err
+		}
+		if common.ComparePanelVersion(versions.APIVersion, "1.42") {
+			pruneFilters.Add("all", "true")
+		}
 		rep, err := client.VolumesPrune(context.Background(), pruneFilters)
 		if err != nil {
 			return report, err
