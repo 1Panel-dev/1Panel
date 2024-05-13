@@ -207,9 +207,12 @@ definitions:
     type: object
   dto.ChangeRedisPass:
     properties:
+      database:
+        type: string
       value:
         type: string
     required:
+    - database
     - value
     type: object
   dto.Clean:
@@ -506,6 +509,7 @@ definitions:
         - image
         - volume
         - network
+        - buildcache
         type: string
       withTagAll:
         type: boolean
@@ -2225,6 +2229,8 @@ definitions:
     properties:
       containerName:
         type: string
+      database:
+        type: string
       maxclients:
         type: string
       maxmemory:
@@ -2237,12 +2243,16 @@ definitions:
         type: string
       timeout:
         type: string
+    required:
+    - database
     type: object
   dto.RedisConfPersistenceUpdate:
     properties:
       appendfsync:
         type: string
       appendonly:
+        type: string
+      database:
         type: string
       save:
         type: string
@@ -2252,16 +2262,21 @@ definitions:
         - rbd
         type: string
     required:
+    - database
     - type
     type: object
   dto.RedisConfUpdate:
     properties:
+      database:
+        type: string
       maxclients:
         type: string
       maxmemory:
         type: string
       timeout:
         type: string
+    required:
+    - database
     type: object
   dto.RedisPersistence:
     properties:
@@ -2269,12 +2284,18 @@ definitions:
         type: string
       appendonly:
         type: string
+      database:
+        type: string
       save:
         type: string
+    required:
+    - database
     type: object
   dto.RedisStatus:
     properties:
       connected_clients:
+        type: string
+      database:
         type: string
       instantaneous_ops_per_sec:
         type: string
@@ -2300,6 +2321,8 @@ definitions:
         type: string
       used_memory_rss:
         type: string
+    required:
+    - database
     type: object
   dto.ResourceLimit:
     properties:
@@ -3070,6 +3093,8 @@ definitions:
         type: string
       dir:
         type: string
+      disableCNAME:
+        type: boolean
       dnsAccount:
         $ref: '#/definitions/model.WebsiteDnsAccount'
       dnsAccountId:
@@ -3084,6 +3109,10 @@ definitions:
         type: string
       message:
         type: string
+      nameserver1:
+        type: string
+      nameserver2:
+        type: string
       organization:
         type: string
       pem:
@@ -3095,6 +3124,8 @@ definitions:
       provider:
         type: string
       pushDir:
+        type: boolean
+      skipDNS:
         type: boolean
       startDate:
         type: string
@@ -4422,7 +4453,6 @@ definitions:
     required:
     - id
     - match
-    - modifier
     - name
     - operate
     - proxyHost
@@ -4446,7 +4476,11 @@ definitions:
     properties:
       ID:
         type: integer
-      SkipDNSCheck:
+      nameservers:
+        items:
+          type: string
+        type: array
+      skipDNSCheck:
         type: boolean
     required:
     - ID
@@ -4463,11 +4497,17 @@ definitions:
         type: string
       dir:
         type: string
+      disableCNAME:
+        type: boolean
       dnsAccountId:
         type: integer
       id:
         type: integer
       keyType:
+        type: string
+      nameserver1:
+        type: string
+      nameserver2:
         type: string
       otherDomains:
         type: string
@@ -4476,6 +4516,8 @@ definitions:
       provider:
         type: string
       pushDir:
+        type: boolean
+      skipDNS:
         type: boolean
     required:
     - acmeAccountId
@@ -4496,14 +4538,43 @@ definitions:
     type: object
   request.WebsiteSSLUpdate:
     properties:
+      acmeAccountId:
+        type: integer
+      apply:
+        type: boolean
       autoRenew:
         type: boolean
       description:
         type: string
+      dir:
+        type: string
+      disableCNAME:
+        type: boolean
+      dnsAccountId:
+        type: integer
       id:
         type: integer
+      keyType:
+        type: string
+      nameserver1:
+        type: string
+      nameserver2:
+        type: string
+      otherDomains:
+        type: string
+      primaryDomain:
+        type: string
+      provider:
+        type: string
+      pushDir:
+        type: boolean
+      skipDNS:
+        type: boolean
     required:
+    - acmeAccountId
     - id
+    - primaryDomain
+    - provider
     type: object
   request.WebsiteSSLUpload:
     properties:
@@ -8277,31 +8348,18 @@ paths:
       summary: Page postgresql databases
       tags:
       - Database Postgresql
-  /databases/redis/backup/search:
-    post:
+  /databases/redis/conf:
+    get:
       consumes:
       - application/json
-      description: 获取 redis 备份记录分页
+      description: 获取 redis 配置信息
       parameters:
       - description: request
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.PageInfo'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.PageResult'
-      security:
-      - ApiKeyAuth: []
-      summary: Page redis backups
-      tags:
-      - Database Redis
-  /databases/redis/conf:
-    get:
-      description: 获取 redis 配置信息
+          $ref: '#/definitions/dto.OperationWithName'
       responses:
         "200":
           description: OK
@@ -8366,7 +8424,16 @@ paths:
         paramKeys: []
   /databases/redis/persistence/conf:
     get:
+      consumes:
+      - application/json
       description: 获取 redis 持久化配置
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OperationWithName'
       responses:
         "200":
           description: OK
@@ -8405,7 +8472,16 @@ paths:
         paramKeys: []
   /databases/redis/status:
     get:
+      consumes:
+      - application/json
       description: 获取 redis 状态信息
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OperationWithName'
       responses:
         "200":
           description: OK

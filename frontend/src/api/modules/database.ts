@@ -108,20 +108,20 @@ export const loadRemoteAccess = (type: string, database: string) => {
 };
 
 // redis
-export const loadRedisStatus = () => {
-    return http.get<Database.RedisStatus>(`/databases/redis/status`);
+export const loadRedisStatus = (database: string) => {
+    return http.post<Database.RedisStatus>(`/databases/redis/status`, { name: database });
 };
-export const loadRedisConf = () => {
-    return http.get<Database.RedisConf>(`/databases/redis/conf`);
+export const loadRedisConf = (database: string) => {
+    return http.post<Database.RedisConf>(`/databases/redis/conf`, { name: database });
 };
-export const redisPersistenceConf = () => {
-    return http.get<Database.RedisPersistenceConf>(`/databases/redis/persistence/conf`);
+export const redisPersistenceConf = (database: string) => {
+    return http.post<Database.RedisPersistenceConf>(`/databases/redis/persistence/conf`, { name: database });
 };
-export const changeRedisPassword = (value: string) => {
-    if (value) {
-        value = Base64.encode(value);
+export const changeRedisPassword = (database: string, password: string) => {
+    if (password) {
+        password = Base64.encode(password);
     }
-    return http.post(`/databases/redis/password`, { value: value });
+    return http.post(`/databases/redis/password`, { database: database, value: password });
 };
 export const updateRedisPersistenceConf = (params: Database.RedisConfPersistenceUpdate) => {
     return http.post(`/databases/redis/persistence/update`, params);
@@ -129,7 +129,7 @@ export const updateRedisPersistenceConf = (params: Database.RedisConfPersistence
 export const updateRedisConf = (params: Database.RedisConfUpdate) => {
     return http.post(`/databases/redis/conf/update`, params);
 };
-export const updateRedisConfByFile = (params: Database.RedisConfUpdateByFile) => {
+export const updateRedisConfByFile = (params: Database.DBConfUpdate) => {
     return http.post(`/databases/redis/conffile/update`, params);
 };
 
