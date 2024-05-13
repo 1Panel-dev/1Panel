@@ -307,7 +307,7 @@ func (h *HostToolService) OperateSupervisorProcess(req request.SupervisorProcess
 		if err != nil {
 			return err
 		}
-		_, _ = section.NewKey("command", req.Command)
+		_, _ = section.NewKey("command", strings.TrimSpace(req.Command))
 		_, _ = section.NewKey("directory", req.Dir)
 		_, _ = section.NewKey("autorestart", "true")
 		_, _ = section.NewKey("startsecs", "3")
@@ -338,7 +338,7 @@ func (h *HostToolService) OperateSupervisorProcess(req request.SupervisorProcess
 		}
 
 		commandKey := section.Key("command")
-		commandKey.SetValue(req.Command)
+		commandKey.SetValue(strings.TrimSpace(req.Command))
 		directoryKey := section.Key("directory")
 		directoryKey.SetValue(req.Dir)
 		userKey := section.Key("user")
