@@ -256,7 +256,7 @@ const acceptParams = (op: string, websiteSSL: Website.SSLDTO) => {
         ssl.value.primaryDomain = websiteSSL.primaryDomain;
         ssl.value.pushDir = websiteSSL.pushDir;
         ssl.value.dir = websiteSSL.dir;
-        ssl.value.otherDomains = websiteSSL.domains;
+        ssl.value.otherDomains = websiteSSL.domains?.replace(/,/g, '\n');
         ssl.value.autoRenew = websiteSSL.autoRenew;
         ssl.value.description = websiteSSL.description;
         ssl.value.id = websiteSSL.id;
