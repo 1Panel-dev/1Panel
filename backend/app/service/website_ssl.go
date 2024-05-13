@@ -431,6 +431,7 @@ func (w WebsiteSSLService) Upload(req request.WebsiteSSLUpload) error {
 	websiteSSL := &model.WebsiteSSL{
 		Provider:    constant.Manual,
 		Description: req.Description,
+		Status:      constant.SSLReady,
 	}
 	var err error
 	if req.SSLID > 0 {
