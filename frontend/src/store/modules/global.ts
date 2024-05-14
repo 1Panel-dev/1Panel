@@ -32,6 +32,7 @@ const GlobalStore = defineStore({
         device: DeviceType.Desktop,
         lastFilePath: '',
         currentDB: '',
+        currentRedisDB: '',
         showEntranceWarn: true,
         defaultNetwork: 'all',
 
@@ -79,6 +80,9 @@ const GlobalStore = defineStore({
         },
         setCurrentDB(name: string) {
             this.currentDB = name;
+        },
+        setCurrentRedisDB(name: string) {
+            this.currentRedisDB = name;
         },
         setShowEntranceWarn(show: boolean) {
             this.showEntranceWarn = show;

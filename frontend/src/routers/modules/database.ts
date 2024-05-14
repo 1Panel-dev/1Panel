@@ -89,6 +89,16 @@ const databaseRouter = {
                         requiresAuth: false,
                     },
                 },
+                {
+                    path: 'redis/remote',
+                    name: 'Redis-Remote',
+                    component: () => import('@/views/database/redis/remote/index.vue'),
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/databases',
+                        requiresAuth: false,
+                    },
+                },
             ],
         },
     ],

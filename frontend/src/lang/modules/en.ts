@@ -514,6 +514,7 @@ const message = {
         keyspaceMisses: 'Number of failed attempts to find the database key',
         hit: 'Find the database key hit ratio',
         latestForkUsec: 'The number of microseconds spent on the last fork() operation',
+        redisCliHelper: 'redis-cli service not detected, please enable the service first!',
 
         recoverHelper: 'Data is about to be overwritten with [{0}]. Do you want to continue?',
         submitIt: 'Overwrite the data',

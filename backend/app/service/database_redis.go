@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,6 +12,8 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
+	"github.com/1Panel-dev/1Panel/backend/utils/docker"
+	"github.com/docker/docker/api/types/container"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -24,6 +27,9 @@ type IRedisService interface {
 	LoadStatus(req dto.OperationWithName) (*dto.RedisStatus, error)
 	LoadConf(req dto.OperationWithName) (*dto.RedisConf, error)
 	LoadPersistenceConf(req dto.OperationWithName) (*dto.RedisPersistence, error)
+
+	CheckHasCli() bool
+	InstallCli() error
 }
 
 func NewIRedisService() IRedisService {
@@ -48,6 +54,33 @@ func (u *RedisService) UpdateConf(req dto.RedisConfUpdate) error {
 	}
 
 	return nil
+}
+
+func (u *RedisService) CheckHasCli() bool {
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return false
+	}
+	defer client.Close()
+	containerLists, err := client.ContainerList(context.Background(), container.ListOptions{})
+	if err != nil {
+		return false
+	}
+	for _, item := range containerLists {
+		if strings.ReplaceAll(item.Names[0], "/", "") == "1Panel-redis-cli-tools" {
+			return true
+		}
+	}
+	return false
+}
+
+func (u *RedisService) InstallCli() error {
+	item := dto.ContainerOperate{
+		Name:    "1Panel-redis-cli-tools",
+		Image:   "redis:7.2.4",
+		Network: "1panel-network",
+	}
+	return NewIContainerService().ContainerCreate(item)
 }
 
 func (u *RedisService) ChangePassword(req dto.ChangeRedisPass) error {

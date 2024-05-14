@@ -7,7 +7,8 @@ import (
 	"path"
 
 	"github.com/1Panel-dev/1Panel/backend/utils/postgresql"
-	client2 "github.com/1Panel-dev/1Panel/backend/utils/postgresql/client"
+	pg_client "github.com/1Panel-dev/1Panel/backend/utils/postgresql/client"
+	redis_client "github.com/1Panel-dev/1Panel/backend/utils/redis"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
@@ -113,13 +114,20 @@ func (u *DatabaseService) LoadItems(dbType string) ([]dto.DatabaseItem, error) {
 func (u *DatabaseService) CheckDatabase(req dto.DatabaseCreate) bool {
 	switch req.Type {
 	case constant.AppPostgresql:
-		_, err := postgresql.NewPostgresqlClient(client2.DBInfo{
+		_, err := postgresql.NewPostgresqlClient(pg_client.DBInfo{
 			From:     "remote",
 			Address:  req.Address,
 			Port:     req.Port,
 			Username: req.Username,
 			Password: req.Password,
 			Timeout:  6,
+		})
+		return err == nil
+	case constant.AppRedis:
+		_, err := redis_client.NewRedisClient(redis_client.DBInfo{
+			Address:  req.Address,
+			Port:     req.Port,
+			Password: req.Password,
 		})
 		return err == nil
 	case "mysql", "mariadb":
@@ -153,13 +161,21 @@ func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
 	}
 	switch req.Type {
 	case constant.AppPostgresql:
-		if _, err := postgresql.NewPostgresqlClient(client2.DBInfo{
+		if _, err := postgresql.NewPostgresqlClient(pg_client.DBInfo{
 			From:     "remote",
 			Address:  req.Address,
 			Port:     req.Port,
 			Username: req.Username,
 			Password: req.Password,
 			Timeout:  6,
+		}); err != nil {
+			return err
+		}
+	case constant.AppRedis:
+		if _, err := redis_client.NewRedisClient(redis_client.DBInfo{
+			Address:  req.Address,
+			Port:     req.Port,
+			Password: req.Password,
 		}); err != nil {
 			return err
 		}
@@ -249,7 +265,7 @@ func (u *DatabaseService) Delete(req dto.DatabaseDelete) error {
 func (u *DatabaseService) Update(req dto.DatabaseUpdate) error {
 	switch req.Type {
 	case constant.AppPostgresql:
-		if _, err := postgresql.NewPostgresqlClient(client2.DBInfo{
+		if _, err := postgresql.NewPostgresqlClient(pg_client.DBInfo{
 			From:     "remote",
 			Address:  req.Address,
 			Port:     req.Port,
