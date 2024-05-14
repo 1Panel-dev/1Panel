@@ -124,6 +124,9 @@ var AddTablePHPExtensions = &gormigrate.Migration{
 		if err := tx.Create(&model.PHPExtensions{Name: "默认", Extensions: "bcmath,gd,gettext,intl,pcntl,shmop,soap,sockets,sysvsem,xmlrpc,zip"}).Error; err != nil {
 			return err
 		}
+		if err := tx.Create(&model.PHPExtensions{Name: "WordPress", Extensions: "exif,igbinary,imagick,intl,zip,apcu,memcached,opcache,redis,bc,image,shmop,mysqli,pdo_mysql"}).Error; err != nil {
+			return err
+		}
 		if err := tx.Create(&model.PHPExtensions{Name: "苹果CMS-V10", Extensions: "mysqli,pdo_mysql,zip,gd,redis,memcache,memcached"}).Error; err != nil {
 			return err
 		}
