@@ -28,6 +28,9 @@
 
                             <el-form-item :label="$t('setting.theme')" prop="theme">
                                 <el-radio-group @change="onSave('Theme', form.theme)" v-model="form.theme">
+                                    <el-radio-button v-if="isProductPro" value="dark-gold">
+                                        <span>{{ $t('xpack.setting.darkGold') }}</span>
+                                    </el-radio-button>
                                     <el-radio-button value="light">
                                         <span>{{ $t('setting.light') }}</span>
                                     </el-radio-button>
@@ -154,7 +157,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted, computed } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { ElForm } from 'element-plus';
 import { getSettingInfo, updateSetting, getSystemAvailable } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
@@ -168,12 +171,16 @@ import PanelName from '@/views/setting/panel/name/index.vue';
 import SystemIP from '@/views/setting/panel/systemip/index.vue';
 import Network from '@/views/setting/panel/default-network/index.vue';
 import HideMenu from '@/views/setting/panel/hidemenu/index.vue';
+import { storeToRefs } from 'pinia';
+import { updateXSetting } from '@/xpack/api/modules/setting';
 
 const loading = ref(false);
 const i18n = useI18n();
 const globalStore = GlobalStore();
-const themeConfig = computed(() => globalStore.themeConfig);
-const { switchDark } = useTheme();
+
+const { themeConfig, isProductPro } = storeToRefs(globalStore);
+
+const { switchTheme } = useTheme();
 
 const form = reactive({
     userName: '',
@@ -298,7 +305,20 @@ const onSave = async (key: string, val: any) => {
     }
     if (key === 'Theme') {
         globalStore.setThemeConfig({ ...themeConfig.value, theme: val });
-        switchDark();
+        switchTheme();
+        if (isProductPro.value) {
+            let formData = new FormData();
+            formData.append('theme', val);
+            await updateXSetting(formData)
+                .then(async () => {
+                    loading.value = false;
+                    MsgSuccess(i18n.t('commons.msg.operationSuccess'));
+                })
+                .catch(() => {
+                    loading.value = false;
+                });
+            return;
+        }
     }
     if (key === 'MenuTabs') {
         globalStore.setOpenMenuTabs(val === 'enable');

@@ -6,7 +6,10 @@ import { onMounted, nextTick, watch, onBeforeUnmount } from 'vue';
 import * as echarts from 'echarts';
 import { GlobalStore } from '@/store';
 import { computeSizeFromKBs, computeSizeFromKB, computeSizeFromMB } from '@/utils/util';
+import { storeToRefs } from 'pinia';
 const globalStore = GlobalStore();
+const { isDarkTheme } = storeToRefs(globalStore);
+
 const props = defineProps({
     id: {
         type: String,
@@ -89,8 +92,6 @@ function initChart() {
         itemChart = echarts.init(document.getElementById(props.id) as HTMLElement);
     }
 
-    const theme = globalStore.$state.themeConfig.theme || 'light';
-
     const series = [];
     if (props.option?.yData?.length) {
         props.option?.yData.forEach((item: any, index: number) => {
@@ -112,7 +113,7 @@ function initChart() {
                     show: true,
                     lineStyle: {
                         type: 'dashed',
-                        opacity: theme === 'dark' ? 0.1 : 1,
+                        opacity: isDarkTheme.value ? 0.1 : 1,
                     },
                 },
                 ...item,
@@ -184,7 +185,7 @@ function initChart() {
                       //分隔辅助线
                       lineStyle: {
                           type: 'dashed', //线的类型 虚线0
-                          opacity: theme === 'dark' ? 0.1 : 1, //透明度
+                          opacity: isDarkTheme.value ? 0.1 : 1, //透明度
                       },
                   },
               },

@@ -5,7 +5,10 @@
 import { onMounted, nextTick, watch, onBeforeUnmount } from 'vue';
 import * as echarts from 'echarts';
 import { GlobalStore } from '@/store';
+import { storeToRefs } from 'pinia';
 const globalStore = GlobalStore();
+const { isDarkGoldTheme, isDarkTheme } = storeToRefs(globalStore);
+
 const props = defineProps({
     id: {
         type: String,
@@ -30,7 +33,6 @@ function initChart() {
     if (myChart === null || myChart === undefined) {
         myChart = echarts.init(document.getElementById(props.id) as HTMLElement);
     }
-    const theme = globalStore.$state.themeConfig.theme || 'light';
     let percentText = String(props.option.data).split('.');
     const option = {
         title: [
@@ -47,7 +49,7 @@ function initChart() {
                         },
                     },
 
-                    color: theme === 'dark' ? '#ffffff' : '#0f0f0f',
+                    color: isDarkTheme.value ? '#ffffff' : '#0f0f0f',
                     lineHeight: 25,
                     // fontSize: 20,
                     fontWeight: 500,
@@ -56,7 +58,7 @@ function initChart() {
                 top: '32%',
                 subtext: props.option.title,
                 subtextStyle: {
-                    color: theme === 'dark' ? '#BBBFC4' : '#646A73',
+                    color: isDarkTheme.value ? '#BBBFC4' : '#646A73',
                     fontSize: 13,
                 },
                 textAlign: 'center',
@@ -91,17 +93,17 @@ function initChart() {
                 showBackground: true,
                 coordinateSystem: 'polar',
                 backgroundStyle: {
-                    color: theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 94, 235, 0.05)',
+                    color: isDarkTheme.value ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 94, 235, 0.05)',
                 },
                 color: [
                     new echarts.graphic.LinearGradient(0, 1, 0, 0, [
                         {
                             offset: 0,
-                            color: 'rgba(81, 192, 255, .1)',
+                            color: isDarkGoldTheme.value ? '#836c4c' : 'rgba(81, 192, 255, .1)',
                         },
                         {
                             offset: 1,
-                            color: '#4261F6',
+                            color: isDarkGoldTheme.value ? '#eaba63' : '#4261F6',
                         },
                     ]),
                 ],
@@ -117,12 +119,12 @@ function initChart() {
                 label: {
                     show: false,
                 },
-                color: theme === 'dark' ? '#16191D' : '#fff',
+                color: isDarkTheme.value ? '#16191D' : '#fff',
                 data: [
                     {
                         value: 0,
                         itemStyle: {
-                            shadowColor: theme === 'dark' ? '#16191D' : 'rgba(0, 94, 235, 0.1)',
+                            shadowColor: isDarkTheme.value ? '#16191D' : 'rgba(0, 94, 235, 0.1)',
                             shadowBlur: 5,
                         },
                     },

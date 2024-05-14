@@ -6,6 +6,10 @@ import '@/styles/common.scss';
 import '@/assets/iconfont/iconfont.css';
 import '@/assets/iconfont/iconfont.js';
 import '@/styles/style.css';
+const styleModule = import.meta.glob('xpack/styles/index.scss');
+for (const path in styleModule) {
+    styleModule[path]?.();
+}
 
 import directives from '@/directives/index';
 import router from '@/routers/index';

@@ -39,7 +39,10 @@ const GlobalStore = defineStore({
         isProductPro: false,
         productProExpires: 0,
     }),
-    getters: {},
+    getters: {
+        isDarkTheme: (state) => state.themeConfig.theme === 'dark' || state.themeConfig.theme === 'dark-gold',
+        isDarkGoldTheme: (state) => state.themeConfig.theme === 'dark-gold' && state.isProductPro,
+    },
     actions: {
         setOpenMenuTabs(openMenuTabs: boolean) {
             this.openMenuTabs = openMenuTabs;

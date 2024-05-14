@@ -12,6 +12,7 @@ import DefineOptions from 'unplugin-vue-define-options/vite';
 import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
+import svgLoader from 'vite-svg-loader';
 
 const prefix = `monaco-editor/esm/vs`;
 
@@ -24,6 +25,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
             alias: {
                 '@': resolve(__dirname, './src'),
                 'vue-i18n': 'vue-i18n/dist/vue-i18n.cjs.js',
+                xpack: resolve(__dirname, './src/xpack'),
             },
         },
         css: {
@@ -75,6 +77,9 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
                         importStyle: 'sass',
                     }),
                 ],
+            }),
+            svgLoader({
+                defaultImport: 'url',
             }),
         ],
         esbuild: {

@@ -1,8 +1,8 @@
 <template>
     <div>
-        <el-dialog v-model="open" :close-on-click-modal="false" @close="handleClose">
+        <el-dialog class="level-up-pro" v-model="open" :close-on-click-modal="false" @close="handleClose">
             <div style="text-align: center" v-loading="loading">
-                <span class="text-3xl font-medium">{{ $t('license.levelUpPro') }}</span>
+                <span class="text-3xl font-medium title">{{ $t('license.levelUpPro') }}</span>
                 <el-row type="flex" justify="center" class="mt-6">
                     <el-col :span="22">
                         <el-upload

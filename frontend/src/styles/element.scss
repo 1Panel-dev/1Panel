@@ -1,3 +1,17 @@
+:root {
+    --el-color-primary: #005eeb;
+    --el-color-primary-dark-2: #0054d3;
+    --el-color-primary-light-1: #196eed;
+    --el-color-primary-light-2: #337eef;
+    --el-color-primary-light-3: #4c8ef1;
+    --el-color-primary-light-4: #669ef3;
+    --el-color-primary-light-5: #7faef5;
+    --el-color-primary-light-6: #99bef7;
+    --el-color-primary-light-7: #b2cef9;
+    --el-color-primary-light-8: #ccdefb;
+    --el-color-primary-light-9: #e5eefd;
+}
+
 html {
     --el-box-shadow-light: 0px 0px 4px rgba(0, 94, 235, 0.1) !important;
 
@@ -205,4 +219,8 @@ html {
     span {
         vertical-align: text-top !important;
     }
+}
+
+.logo {
+    color: var(--el-color-primary);
 }

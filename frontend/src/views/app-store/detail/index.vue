@@ -38,6 +38,7 @@
                         v-if="appDetail.enable && operate === 'install'"
                         @click="openInstall"
                         type="primary"
+                        class="brief-button"
                     >
                         {{ $t('app.install') }}
                     </el-button>
@@ -71,11 +72,7 @@
                 </div>
             </div>
         </div>
-        <MdEditor
-            previewOnly
-            v-model="app.readMe"
-            :theme="globalStore.$state.themeConfig.theme === 'dark' ? 'dark' : 'light'"
-        />
+        <MdEditor previewOnly v-model="app.readMe" :theme="isDarkTheme ? 'dark' : 'light'" />
     </el-drawer>
     <Install ref="installRef"></Install>
 </template>
@@ -88,7 +85,9 @@ import Install from './install/index.vue';
 import router from '@/routers';
 import { GlobalStore } from '@/store';
 import { getLanguage } from '@/utils/util';
+import { storeToRefs } from 'pinia';
 const globalStore = GlobalStore();
+const { isDarkTheme } = storeToRefs(globalStore);
 
 const language = getLanguage();
 
