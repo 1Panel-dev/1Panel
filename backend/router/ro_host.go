@@ -56,6 +56,11 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 		hostRouter.GET("/command/tree", baseApi.SearchCommandTree)
 		hostRouter.POST("/command/update", baseApi.UpdateCommand)
 
+		hostRouter.GET("/command/redis", baseApi.ListRedisCommand)
+		hostRouter.POST("/command/redis", baseApi.CreateRedisCommand)
+		hostRouter.POST("/command/redis/search", baseApi.SearchRedisCommand)
+		hostRouter.POST("/command/redis/del", baseApi.DeleteRedisCommand)
+
 		hostRouter.POST("/tool", baseApi.GetToolStatus)
 		hostRouter.POST("/tool/init", baseApi.InitToolConfig)
 		hostRouter.POST("/tool/operate", baseApi.OperateTool)

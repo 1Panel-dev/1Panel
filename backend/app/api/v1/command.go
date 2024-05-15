@@ -29,6 +29,28 @@ func (b *BaseApi) CreateCommand(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+// @Tags Redis Command
+// @Summary Create redis command
+// @Description 创建 Redis 快速命令
+// @Accept json
+// @Param request body dto.RedisCommand true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /hosts/command/redis [post]
+// @x-panel-log {"bodyKeys":["name","command"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建 redis 快捷命令 [name][command]","formatEN":"create quick command for redis [name][command]"}
+func (b *BaseApi) CreateRedisCommand(c *gin.Context) {
+	var req dto.RedisCommand
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := commandService.CreateRedisCommand(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
 // @Tags Command
 // @Summary Page commands
 // @Description 获取快速命令列表分页
@@ -55,6 +77,32 @@ func (b *BaseApi) SearchCommand(c *gin.Context) {
 	})
 }
 
+// @Tags Redis Command
+// @Summary Page redis commands
+// @Description 获取 redis 快速命令列表分页
+// @Accept json
+// @Param request body dto.SearchWithPage true "request"
+// @Success 200 {object} dto.PageResult
+// @Security ApiKeyAuth
+// @Router /hosts/command/redis/search [post]
+func (b *BaseApi) SearchRedisCommand(c *gin.Context) {
+	var req dto.SearchWithPage
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	total, list, err := commandService.SearchRedisCommandWithPage(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, dto.PageResult{
+		Items: list,
+		Total: total,
+	})
+}
+
 // @Tags Command
 // @Summary Tree commands
 // @Description 获取快速命令树
@@ -64,6 +112,22 @@ func (b *BaseApi) SearchCommand(c *gin.Context) {
 // @Router /hosts/command/tree [get]
 func (b *BaseApi) SearchCommandTree(c *gin.Context) {
 	list, err := commandService.SearchForTree()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, list)
+}
+
+// @Tags Redis Command
+// @Summary List redis commands
+// @Description 获取 redis 快速命令列表
+// @Success 200 {Array} dto.RedisCommand
+// @Security ApiKeyAuth
+// @Router /hosts/command/redis [get]
+func (b *BaseApi) ListRedisCommand(c *gin.Context) {
+	list, err := commandService.ListRedisCommand()
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -104,6 +168,28 @@ func (b *BaseApi) DeleteCommand(c *gin.Context) {
 	}
 
 	if err := commandService.Delete(req.Ids); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Redis Command
+// @Summary Delete redis command
+// @Description 删除 redis 快速命令
+// @Accept json
+// @Param request body dto.BatchDeleteReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /hosts/command/redis/del [post]
+// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"ids","isList":true,"db":"redis_commands","output_column":"name","output_value":"names"}],"formatZH":"删除 redis 快捷命令 [names]","formatEN":"delete quick command of redis [names]"}
+func (b *BaseApi) DeleteRedisCommand(c *gin.Context) {
+	var req dto.BatchDeleteReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := commandService.DeleteRedisCommand(req.Ids); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

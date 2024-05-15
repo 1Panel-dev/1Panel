@@ -30,3 +30,9 @@ type CommandTree struct {
 	Label    string        `json:"label"`
 	Children []CommandInfo `json:"children"`
 }
+
+type RedisCommand struct {
+	ID      uint   `json:"id"`
+	Name    string `json:"name"`
+	Command string `json:"command"`
+}

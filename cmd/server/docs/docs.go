@@ -7647,6 +7647,156 @@ const docTemplate = `{
                 }
             }
         },
+        "/hosts/command/redis": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取 redis 快速命令列表",
+                "tags": [
+                    "Redis Command"
+                ],
+                "summary": "List redis commands",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "Array"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "创建 Redis 快速命令",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Redis Command"
+                ],
+                "summary": "Create redis command",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.RedisCommand"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "name",
+                        "command"
+                    ],
+                    "formatEN": "create quick command for redis [name][command]",
+                    "formatZH": "创建 redis 快捷命令 [name][command]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/hosts/command/redis/del": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "删除 redis 快速命令",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Redis Command"
+                ],
+                "summary": "Delete redis command",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.BatchDeleteReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [
+                        {
+                            "db": "redis_commands",
+                            "input_column": "id",
+                            "input_value": "ids",
+                            "isList": true,
+                            "output_column": "name",
+                            "output_value": "names"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "ids"
+                    ],
+                    "formatEN": "delete quick command of redis [names]",
+                    "formatZH": "删除 redis 快捷命令 [names]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/hosts/command/redis/search": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取 redis 快速命令列表分页",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Redis Command"
+                ],
+                "summary": "Page redis commands",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SearchWithPage"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.PageResult"
+                        }
+                    }
+                }
+            }
+        },
         "/hosts/command/search": {
             "post": {
                 "security": [
@@ -17321,6 +17471,20 @@ const docTemplate = `{
                 },
                 "pageSize": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.RedisCommand": {
+            "type": "object",
+            "properties": {
+                "command": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },

@@ -164,3 +164,13 @@ var AddWebsiteSSLColumn = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddRedisCommand = &gormigrate.Migration{
+	ID: "20240515-add-redis-command",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.RedisCommand{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}

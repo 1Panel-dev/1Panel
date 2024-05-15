@@ -2225,6 +2225,15 @@ definitions:
     - page
     - pageSize
     type: object
+  dto.RedisCommand:
+    properties:
+      command:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
   dto.RedisConf:
     properties:
       containerName:
@@ -9958,6 +9967,101 @@ paths:
         formatEN: delete quick command [names]
         formatZH: 删除快捷命令 [names]
         paramKeys: []
+  /hosts/command/redis:
+    get:
+      description: 获取 redis 快速命令列表
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: Array
+      security:
+      - ApiKeyAuth: []
+      summary: List redis commands
+      tags:
+      - Redis Command
+    post:
+      consumes:
+      - application/json
+      description: 创建 Redis 快速命令
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RedisCommand'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Create redis command
+      tags:
+      - Redis Command
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - name
+        - command
+        formatEN: create quick command for redis [name][command]
+        formatZH: 创建 redis 快捷命令 [name][command]
+        paramKeys: []
+  /hosts/command/redis/del:
+    post:
+      consumes:
+      - application/json
+      description: 删除 redis 快速命令
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BatchDeleteReq'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Delete redis command
+      tags:
+      - Redis Command
+      x-panel-log:
+        BeforeFunctions:
+        - db: redis_commands
+          input_column: id
+          input_value: ids
+          isList: true
+          output_column: name
+          output_value: names
+        bodyKeys:
+        - ids
+        formatEN: delete quick command of redis [names]
+        formatZH: 删除 redis 快捷命令 [names]
+        paramKeys: []
+  /hosts/command/redis/search:
+    post:
+      consumes:
+      - application/json
+      description: 获取 redis 快速命令列表分页
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SearchWithPage'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Page redis commands
+      tags:
+      - Redis Command
   /hosts/command/search:
     post:
       consumes:

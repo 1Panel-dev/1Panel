@@ -503,6 +503,7 @@ const message = {
         hit: '查找數據庫鍵命中率',
         latestForkUsec: '最近一次 fork() 操作耗費的微秒數',
         redisCliHelper: '未檢測到 redis-cli 服務，請先啟用服務！',
+        redisQuickCmd: 'Redis 快速命令',
 
         recoverHelper: '即將使用 [{0}] 對數據進行覆蓋，是否繼續?',
         submitIt: '覆蓋數據',

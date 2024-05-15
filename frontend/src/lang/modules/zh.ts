@@ -503,6 +503,7 @@ const message = {
         hit: '查找数据库键命中率',
         latestForkUsec: '最近一次 fork() 操作耗费的微秒数',
         redisCliHelper: '未检测到 redis-cli 服务，请先启用服务！',
+        redisQuickCmd: 'Redis 快速命令',
 
         recoverHelper: '即将使用 [{0}] 对数据进行覆盖，是否继续?',
         submitIt: '覆盖数据',
