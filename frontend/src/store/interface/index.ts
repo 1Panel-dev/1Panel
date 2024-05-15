@@ -28,6 +28,7 @@ export interface GlobalState {
     device: DeviceType;
     lastFilePath: string;
     currentDB: string;
+    currentRedisDB: string;
     showEntranceWarn: boolean;
     defaultNetwork: string;
 

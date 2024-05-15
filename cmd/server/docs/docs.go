@@ -5110,7 +5110,7 @@ const docTemplate = `{
             }
         },
         "/databases/redis/conf": {
-            "get": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -5185,6 +5185,25 @@ const docTemplate = `{
                 }
             }
         },
+        "/databases/redis/install/cli": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "安装 redis cli",
+                "tags": [
+                    "Database Redis"
+                ],
+                "summary": "Install redis-cli",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/databases/redis/password": {
             "post": {
                 "security": [
@@ -5226,7 +5245,7 @@ const docTemplate = `{
             }
         },
         "/databases/redis/persistence/conf": {
-            "get": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -5302,7 +5321,7 @@ const docTemplate = `{
             }
         },
         "/databases/redis/status": {
-            "get": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []

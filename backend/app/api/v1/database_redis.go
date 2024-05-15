@@ -16,7 +16,7 @@ import (
 // @Param request body dto.OperationWithName true "request"
 // @Success 200 {object} dto.RedisStatus
 // @Security ApiKeyAuth
-// @Router /databases/redis/status [get]
+// @Router /databases/redis/status [post]
 func (b *BaseApi) LoadRedisStatus(c *gin.Context) {
 	var req dto.OperationWithName
 	if err := helper.CheckBind(&req, c); err != nil {
@@ -38,7 +38,7 @@ func (b *BaseApi) LoadRedisStatus(c *gin.Context) {
 // @Param request body dto.OperationWithName true "request"
 // @Success 200 {object} dto.RedisConf
 // @Security ApiKeyAuth
-// @Router /databases/redis/conf [get]
+// @Router /databases/redis/conf [post]
 func (b *BaseApi) LoadRedisConf(c *gin.Context) {
 	var req dto.OperationWithName
 	if err := helper.CheckBind(&req, c); err != nil {
@@ -60,7 +60,7 @@ func (b *BaseApi) LoadRedisConf(c *gin.Context) {
 // @Param request body dto.OperationWithName true "request"
 // @Success 200 {object} dto.RedisPersistence
 // @Security ApiKeyAuth
-// @Router /databases/redis/persistence/conf [get]
+// @Router /databases/redis/persistence/conf [post]
 func (b *BaseApi) LoadPersistenceConf(c *gin.Context) {
 	var req dto.OperationWithName
 	if err := helper.CheckBind(&req, c); err != nil {
@@ -73,6 +73,25 @@ func (b *BaseApi) LoadPersistenceConf(c *gin.Context) {
 	}
 
 	helper.SuccessWithData(c, data)
+}
+
+func (b *BaseApi) CheckHasCli(c *gin.Context) {
+	helper.SuccessWithData(c, redisService.CheckHasCli())
+}
+
+// @Tags Database Redis
+// @Summary Install redis-cli
+// @Description 安装 redis cli
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /databases/redis/install/cli [post]
+func (b *BaseApi) InstallCli(c *gin.Context) {
+	if err := redisService.InstallCli(); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithOutData(c)
 }
 
 // @Tags Database Redis

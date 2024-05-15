@@ -117,6 +117,12 @@ export const loadRedisConf = (database: string) => {
 export const redisPersistenceConf = (database: string) => {
     return http.post<Database.RedisPersistenceConf>(`/databases/redis/persistence/conf`, { name: database });
 };
+export const checkRedisCli = () => {
+    return http.get<boolean>(`/databases/redis/check`);
+};
+export const installRedisCli = () => {
+    return http.post(`/databases/redis/install/cli`, {}, TimeoutEnum.T_5M);
+};
 export const changeRedisPassword = (database: string, password: string) => {
     if (password) {
         password = Base64.encode(password);

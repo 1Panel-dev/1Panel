@@ -3,6 +3,7 @@ package v1
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -88,23 +89,38 @@ func (b *BaseApi) RedisWsSsh(c *gin.Context) {
 		return
 	}
 	name := c.Query("name")
-	redisInfo, err := appInstallService.LoadConnInfo(dto.OperationWithNameAndType{Type: "redis", Name: name})
-	if wshandleError(wsConn, errors.WithMessage(err, "invalid param rows in request")) {
-		return
-	}
-
+	from := c.Query("from")
 	defer wsConn.Close()
 	commands := []string{"redis-cli"}
-	if len(redisInfo.Password) != 0 {
-		commands = []string{"redis-cli", "-a", redisInfo.Password, "--no-auth-warning"}
+	database, err := databaseService.Get(name)
+	if wshandleError(wsConn, errors.WithMessage(err, "no such database in db")) {
+		return
 	}
-	pidMap := loadMapFromDockerTop(redisInfo.Password)
-	itemCmds := append([]string{"exec", "-it", redisInfo.ContainerName}, commands...)
+	if from == "local" {
+		redisInfo, err := appInstallService.LoadConnInfo(dto.OperationWithNameAndType{Name: name, Type: "redis"})
+		if wshandleError(wsConn, errors.WithMessage(err, "no such database in db")) {
+			return
+		}
+		name = redisInfo.ContainerName
+		if len(database.Password) != 0 {
+			commands = []string{"redis-cli", "-a", database.Password, "--no-auth-warning"}
+		}
+	} else {
+		itemPort := fmt.Sprintf("%v", database.Port)
+		commands = []string{"redis-cli", "-h", database.Address, "-p", itemPort}
+		if len(database.Password) != 0 {
+			commands = []string{"redis-cli", "-h", database.Address, "-p", itemPort, "-a", database.Password, "--no-auth-warning"}
+		}
+		name = "1Panel-redis-cli-tools"
+	}
+
+	pidMap := loadMapFromDockerTop(name)
+	itemCmds := append([]string{"exec", "-it", name}, commands...)
 	slave, err := terminal.NewCommand(itemCmds)
 	if wshandleError(wsConn, err) {
 		return
 	}
-	defer killBash(redisInfo.ContainerName, strings.Join(commands, " "), pidMap)
+	defer killBash(name, strings.Join(commands, " "), pidMap)
 	defer slave.Close()
 
 	tty, err := terminal.NewLocalWsSession(cols, rows, wsConn, slave, false)

@@ -8349,7 +8349,7 @@ paths:
       tags:
       - Database Postgresql
   /databases/redis/conf:
-    get:
+    post:
       consumes:
       - application/json
       description: 获取 redis 配置信息
@@ -8396,6 +8396,17 @@ paths:
         formatEN: update the redis database configuration information
         formatZH: 更新 redis 数据库配置信息
         paramKeys: []
+  /databases/redis/install/cli:
+    post:
+      description: 安装 redis cli
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Install redis-cli
+      tags:
+      - Database Redis
   /databases/redis/password:
     post:
       consumes:
@@ -8423,7 +8434,7 @@ paths:
         formatZH: 修改 redis 数据库密码
         paramKeys: []
   /databases/redis/persistence/conf:
-    get:
+    post:
       consumes:
       - application/json
       description: 获取 redis 持久化配置
@@ -8471,7 +8482,7 @@ paths:
         formatZH: redis 数据库持久化配置更新
         paramKeys: []
   /databases/redis/status:
-    get:
+    post:
       consumes:
       - application/json
       description: 获取 redis 状态信息
