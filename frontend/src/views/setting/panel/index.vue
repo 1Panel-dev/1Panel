@@ -234,7 +234,6 @@ const search = async () => {
     form.ntpSite = res.data.ntpSite;
     form.panelName = res.data.panelName;
     form.systemIP = res.data.systemIP;
-    form.theme = res.data.theme;
     form.menuTabs = res.data.menuTabs;
     form.language = res.data.language;
     form.complexityVerification = res.data.complexityVerification;
@@ -253,8 +252,10 @@ const search = async () => {
         const xpackRes = await getXpackSetting();
         if (xpackRes) {
             form.theme = xpackRes.data.theme || 'dark-gold';
+            return;
         }
     }
+    form.theme = res.data.theme;
 };
 
 function extractTitles(node: Node, result: string[]): void {
