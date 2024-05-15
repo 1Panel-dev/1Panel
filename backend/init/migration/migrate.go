@@ -84,6 +84,7 @@ func Init() {
 		migrations.AddDeveloperSetting,
 
 		migrations.AddWebsiteSSLColumn,
+		migrations.AddRedisCommand,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

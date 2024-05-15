@@ -72,6 +72,19 @@ export const deleteCommand = (params: { ids: number[] }) => {
     return http.post(`/hosts/command/del`, params);
 };
 
+export const getRedisCommandList = () => {
+    return http.get<Array<Command.RedisCommand>>(`/hosts/command/redis`, {});
+};
+export const getRedisCommandPage = (params: SearchWithPage) => {
+    return http.post<ResPage<Command.RedisCommand>>(`/hosts/command/redis/search`, params);
+};
+export const addRedisCommand = (params: Command.RedisCommand) => {
+    return http.post(`/hosts/command/redis`, params);
+};
+export const deleteRedisCommand = (params: { ids: number[] }) => {
+    return http.post(`/hosts/command/redis/del`, params);
+};
+
 // firewall
 export const loadFireBaseInfo = () => {
     return http.get<Host.FirewallBase>(`/hosts/firewall/base`);

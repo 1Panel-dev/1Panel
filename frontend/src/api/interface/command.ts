@@ -11,4 +11,9 @@ export namespace Command {
         groupID: number;
         command: string;
     }
+    export interface RedisCommand {
+        id: number;
+        name: string;
+        command: string;
+    }
 }
