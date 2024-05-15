@@ -16,3 +16,20 @@ export function initFavicon() {
     link.href = favicon ? '/api/v1/images/favicon' : '/public/favicon.png';
     document.getElementsByTagName('head')[0].appendChild(link);
 }
+
+export async function getXpackSetting() {
+    const searchXSettingGlob = import.meta.glob('xpack/api/modules/setting.ts');
+    const module = await searchXSettingGlob?.['../xpack/api/modules/setting.ts']?.();
+    const res = module?.searchXSetting();
+    if (!res) {
+        resetXSetting();
+        return;
+    }
+    return res;
+}
+
+export async function updateXpackSetting(fromData: FormData) {
+    const searchXSettingGlob = import.meta.glob('xpack/api/modules/setting.ts');
+    const module = await searchXSettingGlob?.['../xpack/api/modules/setting.ts']?.();
+    return module?.updateXSetting(fromData);
+}

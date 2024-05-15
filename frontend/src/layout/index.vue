@@ -24,7 +24,7 @@ import { useI18n } from 'vue-i18n';
 import { useTheme } from '@/hooks/use-theme';
 import { getLicenseStatus, getSettingInfo, getSystemAvailable } from '@/api/modules/setting';
 import { useRoute, useRouter } from 'vue-router';
-import { initFavicon, resetXSetting } from '@/utils/xpack';
+import { getXpackSetting, initFavicon, resetXSetting } from '@/utils/xpack';
 useResize();
 
 const router = useRouter();
@@ -83,24 +83,16 @@ const loadDataFromDB = async () => {
 };
 
 const loadDataFromXDB = async () => {
-    const xpackModules = import.meta.globEager('../xpack/api/modules/*.ts');
-    if (xpackModules['../xpack/api/modules/setting.ts']) {
-        const searchXSetting = xpackModules['../xpack/api/modules/setting.ts'].searchXSetting;
-        if (searchXSetting) {
-            const res = await searchXSetting();
-            globalStore.setThemeConfig({
-                ...themeConfig.value,
-                title: res.data.title,
-                logo: res.data.logo,
-                logoWithText: res.data.logoWithText,
-                favicon: res.data.favicon,
-                theme: res.data.theme || 'dark-gold',
-            });
-        } else {
-            resetXSetting();
-        }
-    } else {
-        resetXSetting();
+    const res = await getXpackSetting();
+    if (res) {
+        globalStore.setThemeConfig({
+            ...themeConfig.value,
+            title: res.data.title,
+            logo: res.data.logo,
+            logoWithText: res.data.logoWithText,
+            favicon: res.data.favicon,
+            theme: res.data.theme || 'dark-gold',
+        });
     }
     initFavicon();
 };

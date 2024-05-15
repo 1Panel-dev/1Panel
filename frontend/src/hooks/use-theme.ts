@@ -18,7 +18,6 @@ export const useTheme = () => {
                 prefersDark.addListener(switchAccordingUserProxyTheme);
             }
         } else {
-            // TODO: removeEventListener is invalid
             prefersDark.removeEventListener('change', switchAccordingUserProxyTheme);
             prefersDark.removeListener(switchAccordingUserProxyTheme);
         }

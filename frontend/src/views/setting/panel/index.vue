@@ -172,7 +172,7 @@ import SystemIP from '@/views/setting/panel/systemip/index.vue';
 import Network from '@/views/setting/panel/default-network/index.vue';
 import HideMenu from '@/views/setting/panel/hidemenu/index.vue';
 import { storeToRefs } from 'pinia';
-import { updateXSetting } from '@/xpack/api/modules/setting';
+import { getXpackSetting, updateXpackSetting } from '@/utils/xpack';
 
 const loading = ref(false);
 const i18n = useI18n();
@@ -248,6 +248,13 @@ const search = async () => {
     const json: Node = JSON.parse(res.data.xpackHideMenu);
     const checkedTitles = getCheckedTitles(json);
     form.proHideMenus = checkedTitles.toString();
+
+    if (isProductPro.value) {
+        const xpackRes = await getXpackSetting();
+        if (xpackRes) {
+            form.theme = xpackRes.data.theme || 'dark-gold';
+        }
+    }
 };
 
 function extractTitles(node: Node, result: string[]): void {
@@ -309,10 +316,11 @@ const onSave = async (key: string, val: any) => {
         if (isProductPro.value) {
             let formData = new FormData();
             formData.append('theme', val);
-            await updateXSetting(formData)
+            await updateXpackSetting(formData)
                 .then(async () => {
                     loading.value = false;
                     MsgSuccess(i18n.t('commons.msg.operationSuccess'));
+                    await search();
                 })
                 .catch(() => {
                     loading.value = false;
