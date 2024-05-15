@@ -112,7 +112,13 @@
                 </el-row>
             </template>
             <template #main v-if="currentDB">
-                <ComplexTable :pagination-config="paginationConfig" @sort-change="search" @search="search" :data="data">
+                <ComplexTable
+                    :pagination-config="paginationConfig"
+                    :class="{ mask: maskShow && currentDB.from !== 'local' }"
+                    @sort-change="search"
+                    @search="search"
+                    :data="data"
+                >
                     <el-table-column :label="$t('commons.table.name')" prop="name" sortable min-width="90">
                         <template #default="{ row }">
                             <Tooltip v-if="!row.isDelete" :islink="false" :text="row.name" />
@@ -209,6 +215,13 @@
                 </ComplexTable>
             </template>
         </LayoutContent>
+
+        <el-card
+            v-if="mysqlStatus != 'Running' && currentDB && !loading && maskShow && currentDB?.from === 'local'"
+            class="mask-prompt"
+        >
+            <span>{{ $t('commons.service.serviceNotStarted', ['MySQL']) }}</span>
+        </el-card>
 
         <div v-if="dbOptionsLocal.length === 0 && dbOptionsRemote.length === 0">
             <LayoutContent :title="'MySQL ' + $t('menu.database')" :divider="true">
