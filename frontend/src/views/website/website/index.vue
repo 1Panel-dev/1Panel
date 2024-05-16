@@ -88,7 +88,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('website.sitePath')" prop="sitePath">
                         <template #default="{ row }">
-                            <el-button type="primary" link @click="toFolder(row.sitePath)">
+                            <el-button type="primary" link @click="toFolder(row.sitePath + '/index')">
                                 <el-icon>
                                     <FolderOpened />
                                 </el-icon>

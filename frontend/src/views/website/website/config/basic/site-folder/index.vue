@@ -7,8 +7,8 @@
                 </el-form-item>
                 <el-form-item :label="$t('website.primaryPath')">
                     <el-space wrap>
-                        {{ website.sitePath }}
-                        <el-button type="primary" link @click="toFolder(website.sitePath)">
+                        {{ website.sitePath + '/index' }}
+                        <el-button type="primary" link @click="toFolder(website.sitePath + '/index')">
                             <el-icon>
                                 <FolderOpened />
                             </el-icon>
