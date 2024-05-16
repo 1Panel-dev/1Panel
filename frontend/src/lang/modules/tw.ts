@@ -763,6 +763,11 @@ const message = {
         sockPathErr: '請選擇或輸入正確的 Docker sock 文件路徑',
         related: '相關資源',
         includeAppstore: '顯示應用程式商店容器',
+
+        cleanDockerDiskZone: '清理 Docker 使用的磁碟空間',
+        cleanImagesHelper: '( 清理所有未被任何容器使用的鏡像 )',
+        cleanContainersHelper: '( 清理所有處於停止狀態的容器 )',
+        cleanVolumesHelper: '( 清理所有未被使用的本地存儲卷 )',
     },
     cronjob: {
         create: '創建計劃任務',
@@ -1493,6 +1498,12 @@ const message = {
         shell: 'Shell 腳本計劃任務',
         containerShell: '容器內執行 Shell 腳本計劃任務',
         curl: 'CURL 計劃任務',
+
+        containerTrash: '容器垃圾',
+        images: '鏡像',
+        containers: '容器',
+        volumes: '存儲卷',
+        buildCache: '容器建置快取',
     },
     app: {
         app: '應用',

@@ -36,6 +36,7 @@ export namespace Toolbox {
         uploadClean: Array<CleanTree>;
         downloadClean: Array<CleanTree>;
         systemLogClean: Array<CleanTree>;
+        containerClean: Array<CleanTree>;
     }
     export interface CleanTree {
         id: string;

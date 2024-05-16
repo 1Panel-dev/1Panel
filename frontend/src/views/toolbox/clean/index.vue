@@ -33,7 +33,9 @@
                                 </div>
                                 <div else>
                                     <el-text class="clean_title">
-                                        <el-icon><MagicStick /></el-icon>
+                                        <el-icon>
+                                            <MagicStick />
+                                        </el-icon>
                                         {{ $t('clean.scanHelper') }}
                                     </el-text>
                                 </div>
@@ -50,6 +52,24 @@
                                                     </el-text>
                                                 </div>
                                                 <span class="input-help">{{ $t('clean.systemHelper') }}</span>
+                                            </el-col>
+                                        </el-row>
+                                    </el-card>
+                                    <el-card class="e-card">
+                                        <el-row>
+                                            <el-col :span="4">
+                                                <svg-icon iconName="p-docker" class="svg-icon"></svg-icon>
+                                                <el-button link class="card_icon" />
+                                            </el-col>
+                                            <el-col :span="20">
+                                                <div>
+                                                    <el-text class="mx-1 card_title" type="primary">
+                                                        {{ $t('clean.containerTrash') }}
+                                                    </el-text>
+                                                </div>
+                                                <span class="input-help">
+                                                    {{ $t('container.cleanDockerDiskZone') }}
+                                                </span>
                                             </el-col>
                                         </el-row>
                                     </el-card>
@@ -156,6 +176,30 @@
                                         </template>
                                     </el-tree>
                                 </el-collapse-item>
+
+                                <el-collapse-item :title="$t('clean.containerTrash')" name="container_trash">
+                                    <el-tree
+                                        ref="containerRef"
+                                        :data="cleanData.containerClean"
+                                        node-key="id"
+                                        :default-checked-keys="containerDefaultCheck"
+                                        show-checkbox
+                                        :props="defaultProps"
+                                        @check-change="onChange"
+                                    >
+                                        <template #default="{ node, data }">
+                                            <div class="float-left">
+                                                <span>{{ load18n(data.label) }}</span>
+                                            </div>
+                                            <div class="ml-4 float-left">
+                                                <span v-if="data.size">{{ computeSize(data.size) }}</span>
+                                            </div>
+                                            <div class="ml-4 float-left">
+                                                <span>{{ loadTag(node, data) }}</span>
+                                            </div>
+                                        </template>
+                                    </el-tree>
+                                </el-collapse-item>
                                 <el-collapse-item :title="$t('clean.upload')" name="upload">
                                     <el-tree
                                         ref="uploadRef"
@@ -241,6 +285,7 @@ import { clean, scan } from '@/api/modules/toolbox';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
+
 const globalStore = GlobalStore();
 
 const loading = ref();
@@ -258,6 +303,7 @@ const cleanData = reactive({
     uploadClean: [],
     downloadClean: [],
     systemLogClean: [],
+    containerClean: [],
 });
 const systemRef = ref();
 const systemDefaultCheck = ref([]);
@@ -267,7 +313,9 @@ const downloadRef = ref();
 const downloadDefaultCheck = ref([]);
 const systemLogRef = ref();
 const systemLogDefaultCheck = ref([]);
-const activeNames = ref(['system', 'upload', 'download', 'system_log']);
+const containerRef = ref();
+const containerDefaultCheck = ref([]);
+const activeNames = ref(['system', 'upload', 'download', 'system_log', 'container_trash']);
 
 const submitCleans = ref();
 
@@ -300,10 +348,15 @@ const scanData = async () => {
             for (const item of cleanData.systemLogClean) {
                 totalSize.value += item.size;
             }
+            cleanData.containerClean = res.data.containerClean || [];
+            for (const item of cleanData.containerClean) {
+                totalSize.value += item.size;
+            }
             loadCheck(cleanData.systemClean, systemDefaultCheck.value);
             loadCheck(cleanData.uploadClean, uploadDefaultCheck.value);
             loadCheck(cleanData.downloadClean, downloadDefaultCheck.value);
             loadCheck(cleanData.systemLogClean, systemLogDefaultCheck.value);
+            loadCheck(cleanData.containerClean, containerDefaultCheck.value);
             scanStatus.value = 'scanned';
         })
         .catch(() => {
@@ -324,6 +377,7 @@ const onSubmitClean = async () => {
         loadSubmitCheck(cleanData.uploadClean);
         loadSubmitCheck(cleanData.downloadClean);
         loadSubmitCheck(cleanData.systemLogClean);
+        loadSubmitCheck(cleanData.containerClean);
         for (const item of submitCleans.value) {
             if (item.treeType === 'cache') {
                 restart = true;
@@ -416,6 +470,12 @@ function onChange(data: any, isCheck: boolean) {
             selectSize.value = selectSize.value + Number(item.size);
         }
     }
+    let containerSelects = containerRef.value.getCheckedNodes(false, true);
+    for (const item of containerSelects) {
+        if (item.children === null) {
+            selectSize.value = selectSize.value + Number(item.size);
+        }
+    }
 }
 
 function loadCheck(data: any, checkList: any) {
@@ -443,6 +503,15 @@ function loadTag(node: any, data: any) {
     }
     if (data.size === 0) {
         return i18n.global.t('clean.statusClean');
+    }
+    if (data.label === 'container_images') {
+        return i18n.global.t('container.cleanImagesHelper');
+    }
+    if (data.label === 'container_containers') {
+        return i18n.global.t('container.cleanContainersHelper');
+    }
+    if (data.label === 'container_volumes') {
+        return i18n.global.t('container.cleanVolumesHelper');
     }
     if (data.label === 'upgrade') {
         return i18n.global.t('clean.upgradeHelper');
@@ -509,6 +578,14 @@ function load18n(label: string) {
             return i18n.global.t('clean.containerShell');
         case 'curl':
             return i18n.global.t('clean.curl');
+        case 'container_images':
+            return i18n.global.t('clean.images');
+        case 'container_containers':
+            return i18n.global.t('clean.containers');
+        case 'container_volumes':
+            return i18n.global.t('clean.volumes');
+        case 'build_cache':
+            return i18n.global.t('clean.buildCache');
         default:
             return label;
     }
@@ -524,32 +601,45 @@ onMounted(() => {
 .app-card {
     cursor: pointer;
     width: 100%;
+
     &:hover .app-icon {
         transform: scale(1.2);
     }
+
     .e-card {
         margin-top: 20px;
         cursor: pointer;
         border: var(--panel-border) !important;
+
         &:hover {
             cursor: pointer;
             border: 1px solid var(--el-color-primary) !important;
         }
     }
 }
+
 .card_icon {
     font-size: 36px;
     float: right;
     margin-right: 15px;
 }
+
 .card_title {
     font-size: 18px;
 }
+
 .clean_title {
     font-size: 22px;
 }
+
 .large_button {
     float: right;
     margin-top: -40px;
+}
+
+.svg-icon {
+    font-size: 14px;
+    float: right;
+    margin-right: 15px;
 }
 </style>
