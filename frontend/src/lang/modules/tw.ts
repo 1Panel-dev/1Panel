@@ -976,6 +976,12 @@ const message = {
             logPath: '日誌路徑',
             logPathHelper: '預設為 /var/log/secure 或者 /var/log/auth.log',
         },
+        ftp: {
+            ftp: 'FTP 帳戶',
+            enableHelper: '啟用選取的 FTP 帳號後，該 FTP 帳號將恢復訪問權限，是否繼續操作？',
+            disableHelper: '停用選取的 FTP 帳號後，該 FTP 帳號將失去訪問權限，是否繼續操作？',
+            syncHelper: '同步伺服器與資料庫中的 FTP 帳戶資料，是否繼續操作？',
+        },
     },
     logs: {
         panelLog: '面板日誌',

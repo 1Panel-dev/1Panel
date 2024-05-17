@@ -76,4 +76,26 @@ export namespace Toolbox {
         ips: Array<string>;
         operate: string;
     }
+
+    export interface FtpInfo {
+        id: number;
+        user: string;
+        password: string;
+        status: string;
+        path: string;
+        description: string;
+    }
+    export interface FtpCreate {
+        user: string;
+        password: string;
+        path: string;
+        description: string;
+    }
+    export interface FtpUpdate {
+        id: number;
+        password: string;
+        status: string;
+        path: string;
+        description: string;
+    }
 }

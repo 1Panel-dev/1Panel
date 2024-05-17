@@ -2,6 +2,7 @@ package migrations
 
 import (
 	"encoding/json"
+
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/global"
@@ -200,5 +201,15 @@ var AddMonitorMenu = &gormigrate.Migration{
 			return err
 		}
 		return tx.Model(&model.Setting{}).Where("key", "XpackHideMenu").Updates(map[string]interface{}{"value": string(data)}).Error
+	},
+}
+
+var AddFtp = &gormigrate.Migration{
+	ID: "20240517-add-ftp",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Ftp{}); err != nil {
+			return err
+		}
+		return nil
 	},
 }

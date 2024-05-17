@@ -1029,6 +1029,14 @@ const message = {
             logPath: 'Log Path',
             logPathHelper: 'Default is /var/log/secure or /var/log/auth.log',
         },
+        ftp: {
+            ftp: 'FTP Account',
+            enableHelper:
+                'Enabling the selected FTP account will restore its access permissions. Do you want to continue?',
+            disableHelper:
+                'Disabling the selected FTP account will revoke its access permissions. Do you want to continue?',
+            syncHelper: 'Sync FTP account data between server and database. Do you want to continue?',
+        },
     },
     logs: {
         panelLog: 'Panel logs',

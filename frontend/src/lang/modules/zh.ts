@@ -977,6 +977,12 @@ const message = {
             logPath: '日志路径',
             logPathHelper: '默认 /var/log/secure 或者 /var/log/auth.log',
         },
+        ftp: {
+            ftp: 'FTP 账户',
+            enableHelper: '启用选中的 FTP 账号后，该 FTP 账号恢复访问权限，是否继续操作？',
+            disableHelper: '停用选中的 FTP 账号后，该 FTP 账号将失去访问权限，是否继续操作？',
+            syncHelper: '同步服务器与数据库中的 FTP 账户数据，是否继续操作？',
+        },
     },
     logs: {
         panelLog: '面板日志',
