@@ -1,6 +1,8 @@
 package migrations
 
 import (
+	"encoding/json"
+	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/go-gormigrate/gormigrate/v2"
@@ -172,5 +174,31 @@ var AddRedisCommand = &gormigrate.Migration{
 			return err
 		}
 		return nil
+	},
+}
+
+var AddMonitorMenu = &gormigrate.Migration{
+	ID: "20240517-update-xpack-hide-menu",
+	Migrate: func(tx *gorm.DB) error {
+		var (
+			setting model.Setting
+			menu    dto.XpackHideMenu
+		)
+		tx.Model(&model.Setting{}).Where("key", "XpackHideMenu").First(&setting)
+		if err := json.Unmarshal([]byte(setting.Value), &menu); err != nil {
+			return err
+		}
+		menu.Children = append(menu.Children, dto.XpackHideMenu{
+			ID:      "6",
+			Title:   "xpack.monitor.name",
+			Path:    "/xpack/monitor/dashboard",
+			Label:   "MonitorDashboard",
+			IsCheck: true,
+		})
+		data, err := json.Marshal(menu)
+		if err != nil {
+			return err
+		}
+		return tx.Model(&model.Setting{}).Where("key", "XpackHideMenu").Updates(map[string]interface{}{"value": string(data)}).Error
 	},
 }

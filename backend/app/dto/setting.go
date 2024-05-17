@@ -186,3 +186,12 @@ type Clean struct {
 	Name     string `json:"name"`
 	Size     uint64 `json:"size"`
 }
+
+type XpackHideMenu struct {
+	ID       string          `json:"id"`
+	Label    string          `json:"label"`
+	IsCheck  bool            `json:"isCheck"`
+	Title    string          `json:"title"`
+	Path     string          `json:"path,omitempty"`
+	Children []XpackHideMenu `json:"children,omitempty"`
+}
