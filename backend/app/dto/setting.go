@@ -165,6 +165,7 @@ type CleanData struct {
 	UploadClean    []CleanTree `json:"uploadClean"`
 	DownloadClean  []CleanTree `json:"downloadClean"`
 	SystemLogClean []CleanTree `json:"systemLogClean"`
+	ContainerClean []CleanTree `json:"containerClean"`
 }
 
 type CleanTree struct {

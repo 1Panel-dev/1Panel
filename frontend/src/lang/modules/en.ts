@@ -796,6 +796,11 @@ const message = {
         sockPathErr: 'Please select or enter the correct Docker sock file path',
         related: 'Related resources',
         includeAppstore: 'Show app store container',
+
+        cleanDockerDiskZone: 'Clean up disk space used by Docker',
+        cleanImagesHelper: '( Clean up all images that are not used by any containers )',
+        cleanContainersHelper: '( Clean up all stopped containers )',
+        cleanVolumesHelper: '( Clean up all unused local volumes )',
     },
     cronjob: {
         create: 'Create Cronjob',
@@ -1601,6 +1606,12 @@ const message = {
         shell: 'Shell script scheduled tasks',
         containerShell: 'Container internal Shell script scheduled tasks',
         curl: 'CURL scheduled tasks',
+
+        containerTrash: 'Container Trash',
+        images: 'Images',
+        containers: 'Containers',
+        volumes: 'Volumes',
+        buildCache: 'Container Build Cache',
     },
     app: {
         app: 'Application',

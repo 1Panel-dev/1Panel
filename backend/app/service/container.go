@@ -337,7 +337,9 @@ func (u *ContainerService) Prune(req dto.ContainerPrune) (dto.ContainerPruneRepo
 		report.DeletedNumber = len(rep.VolumesDeleted)
 		report.SpaceReclaimed = int(rep.SpaceReclaimed)
 	case "buildcache":
-		rep, err := client.BuildCachePrune(context.Background(), types.BuildCachePruneOptions{})
+		opts := types.BuildCachePruneOptions{}
+		opts.All = true
+		rep, err := client.BuildCachePrune(context.Background(), opts)
 		if err != nil {
 			return report, err
 		}
