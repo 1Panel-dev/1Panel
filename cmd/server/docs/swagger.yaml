@@ -1202,6 +1202,37 @@ definitions:
     - type
     - vars
     type: object
+  dto.FtpCreate:
+    properties:
+      description:
+        type: string
+      password:
+        type: string
+      path:
+        type: string
+      user:
+        type: string
+    required:
+    - password
+    - path
+    - user
+    type: object
+  dto.FtpUpdate:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      password:
+        type: string
+      path:
+        type: string
+      status:
+        type: string
+    required:
+    - password
+    - path
+    type: object
   dto.GPUInfo:
     properties:
       fanSpeed:
@@ -11162,7 +11193,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.BatchDeleteReq'
+          $ref: '#/definitions/dto.OperateByID'
       responses:
         "200":
           description: OK
@@ -11176,7 +11207,7 @@ paths:
         - db: backup_accounts
           input_column: id
           input_value: id
-          isList: true
+          isList: false
           output_column: type
           output_value: types
         bodyKeys:
@@ -12397,6 +12428,143 @@ paths:
       summary: Update fail2ban conf by file
       tags:
       - Fail2ban
+  /toolbox/ftp:
+    post:
+      consumes:
+      - application/json
+      description: 创建 FTP 账户
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.FtpCreate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Create FTP user
+      tags:
+      - FTP
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - user
+        - path
+        formatEN: create FTP [user][path]
+        formatZH: 创建 FTP 账户 [user][path]
+        paramKeys: []
+  /toolbox/ftp/del:
+    post:
+      consumes:
+      - application/json
+      description: 删除 FTP 账户
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BatchDeleteReq'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Delete FTP user
+      tags:
+      - FTP
+      x-panel-log:
+        BeforeFunctions:
+        - db: ftps
+          input_column: id
+          input_value: ids
+          isList: true
+          output_column: user
+          output_value: users
+        bodyKeys:
+        - ids
+        formatEN: delete FTP users [users]
+        formatZH: 删除 FTP 账户 [users]
+        paramKeys: []
+  /toolbox/ftp/search:
+    post:
+      consumes:
+      - application/json
+      description: 获取 FTP 账户列表分页
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SearchWithPage'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Page FTP user
+      tags:
+      - FTP
+  /toolbox/ftp/sync:
+    post:
+      consumes:
+      - application/json
+      description: 同步 FTP 账户
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BatchDeleteReq'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Sync FTP user
+      tags:
+      - FTP
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys: []
+        formatEN: sync FTP users
+        formatZH: 同步 FTP 账户
+        paramKeys: []
+  /toolbox/ftp/update:
+    post:
+      consumes:
+      - application/json
+      description: 修改 FTP 账户
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.FtpUpdate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update FTP user
+      tags:
+      - FTP
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - user
+        - path
+        formatEN: update FTP [user][path]
+        formatZH: 修改 FTP 账户 [user][path]
+        paramKeys: []
   /toolbox/scan:
     post:
       description: 扫描系统垃圾文件

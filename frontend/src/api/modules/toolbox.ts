@@ -1,8 +1,9 @@
 import http from '@/api';
-import { UpdateByFile } from '../interface';
+import { ReqPage, ResPage, UpdateByFile } from '../interface';
 import { Toolbox } from '../interface/toolbox';
 import { Base64 } from 'js-base64';
 import { TimeoutEnum } from '@/enums/http-enum';
+import { deepCopy } from '@/utils/util';
 
 // device
 export const getDeviceBase = () => {
@@ -67,4 +68,33 @@ export const updateFail2ban = (param: Toolbox.Fail2banUpdate) => {
 
 export const updateFail2banByFile = (param: UpdateByFile) => {
     return http.post(`/toolbox/fail2ban/update/byconf`, param, TimeoutEnum.T_5M);
+};
+
+// ftp
+export const searchFtp = (param: ReqPage) => {
+    return http.post<ResPage<Toolbox.FtpInfo>>(`/toolbox/ftp/search`, param);
+};
+
+export const syncFtp = () => {
+    return http.post(`/toolbox/ftp/sync`);
+};
+
+export const createFtp = (params: Toolbox.FtpCreate) => {
+    let request = deepCopy(params) as Toolbox.FtpCreate;
+    if (request.password) {
+        request.password = Base64.encode(request.password);
+    }
+    return http.post(`/toolbox/ftp`, request);
+};
+
+export const updateFtp = (params: Toolbox.FtpUpdate) => {
+    let request = deepCopy(params) as Toolbox.FtpUpdate;
+    if (request.password) {
+        request.password = Base64.encode(request.password);
+    }
+    return http.post(`/toolbox/ftp/update`, request);
+};
+
+export const deleteFtp = (params: { ids: number[] }) => {
+    return http.post(`/toolbox/ftp/del`, params);
 };

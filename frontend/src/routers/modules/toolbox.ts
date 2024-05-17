@@ -38,6 +38,16 @@ const toolboxRouter = {
                     },
                 },
                 {
+                    path: 'ftp',
+                    name: 'FTP',
+                    component: () => import('@/views/toolbox/ftp/index.vue'),
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/toolbox',
+                        requiresAuth: false,
+                    },
+                },
+                {
                     path: 'fail2Ban',
                     name: 'Fail2ban',
                     component: () => import('@/views/toolbox/fail2ban/index.vue'),

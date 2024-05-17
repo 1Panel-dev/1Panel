@@ -118,11 +118,11 @@ func (b *BaseApi) LoadOneDriveInfo(c *gin.Context) {
 // @Summary Delete backup account
 // @Description 删除备份账号
 // @Accept json
-// @Param request body dto.BatchDeleteReq true "request"
+// @Param request body dto.OperateByID true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /settings/backup/del [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":true,"db":"backup_accounts","output_column":"type","output_value":"types"}],"formatZH":"删除备份账号 [types]","formatEN":"delete backup account [types]"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"backup_accounts","output_column":"type","output_value":"types"}],"formatZH":"删除备份账号 [types]","formatEN":"delete backup account [types]"}
 func (b *BaseApi) DeleteBackup(c *gin.Context) {
 	var req dto.OperateByID
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

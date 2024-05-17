@@ -62,6 +62,10 @@ const buttons = [
         path: '/toolbox/supervisor',
     },
     {
+        label: 'FTP',
+        path: '/toolbox/ftp',
+    },
+    {
         label: 'Fail2ban',
         path: '/toolbox/fail2ban',
     },

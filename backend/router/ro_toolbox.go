@@ -36,5 +36,11 @@ func (s *ToolboxRouter) InitRouter(Router *gin.RouterGroup) {
 		toolboxRouter.POST("/fail2ban/operate/sshd", baseApi.OperateSSHD)
 		toolboxRouter.POST("/fail2ban/update", baseApi.UpdateFail2BanConf)
 		toolboxRouter.POST("/fail2ban/update/byconf", baseApi.UpdateFail2BanConfByFile)
+
+		toolboxRouter.POST("/ftp/search", baseApi.SearchFtp)
+		toolboxRouter.POST("/ftp", baseApi.CreateFtp)
+		toolboxRouter.POST("/ftp/update", baseApi.UpdateFtp)
+		toolboxRouter.POST("/ftp/del", baseApi.DeleteFtp)
+		toolboxRouter.POST("/ftp/sync", baseApi.SyncFtp)
 	}
 }
