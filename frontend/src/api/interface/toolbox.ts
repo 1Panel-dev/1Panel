@@ -1,3 +1,5 @@
+import { ReqPage } from '.';
+
 export namespace Toolbox {
     export interface DeviceBaseInfo {
         dns: Array<string>;
@@ -77,6 +79,10 @@ export namespace Toolbox {
         operate: string;
     }
 
+    export interface FtpBaseInfo {
+        isActive: boolean;
+        isExist: boolean;
+    }
     export interface FtpInfo {
         id: number;
         user: string;
@@ -97,5 +103,17 @@ export namespace Toolbox {
         status: string;
         path: string;
         description: string;
+    }
+    export interface FtpSearchLog extends ReqPage {
+        user: string;
+        operation: string;
+    }
+    export interface FtpLog {
+        ip: string;
+        user: string;
+        time: string;
+        operation: string;
+        status: string;
+        size: string;
     }
 }

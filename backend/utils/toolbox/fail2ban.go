@@ -15,7 +15,7 @@ type Fail2ban struct{}
 const defaultPath = "/etc/fail2ban/jail.local"
 
 type FirewallClient interface {
-	Status() (bool, bool, bool, error)
+	Status() (bool, bool, bool)
 	Version() (string, error)
 	Operate(operate string) error
 	OperateSSHD(operate, ip string) error

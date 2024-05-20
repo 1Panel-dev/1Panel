@@ -11555,6 +11555,28 @@ const docTemplate = `{
                 }
             }
         },
+        "/toolbox/ftp/base": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取 FTP 基础信息",
+                "tags": [
+                    "FTP"
+                ],
+                "summary": "Load FTP base info",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.FtpBaseInfo"
+                        }
+                    }
+                }
+            }
+        },
         "/toolbox/ftp/del": {
             "post": {
                 "security": [
@@ -11602,6 +11624,80 @@ const docTemplate = `{
                     ],
                     "formatEN": "delete FTP users [users]",
                     "formatZH": "删除 FTP 账户 [users]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/toolbox/ftp/log/search": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取 FTP 操作日志",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "FTP"
+                ],
+                "summary": "Load FTP operation log",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.FtpLogSearch"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.PageResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/toolbox/ftp/operate": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "修改 FTP 状态",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "FTP"
+                ],
+                "summary": "Operate FTP",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.Operate"
+                        }
+                    }
+                ],
+                "responses": {},
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "operation"
+                    ],
+                    "formatEN": "[operation] FTP",
+                    "formatZH": "[operation] FTP",
                     "paramKeys": []
                 }
             }
@@ -16182,6 +16278,17 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.FtpBaseInfo": {
+            "type": "object",
+            "properties": {
+                "isActive": {
+                    "type": "boolean"
+                },
+                "isExist": {
+                    "type": "boolean"
+                }
+            }
+        },
         "dto.FtpCreate": {
             "type": "object",
             "required": [
@@ -16198,6 +16305,27 @@ const docTemplate = `{
                 },
                 "path": {
                     "type": "string"
+                },
+                "user": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.FtpLogSearch": {
+            "type": "object",
+            "required": [
+                "page",
+                "pageSize"
+            ],
+            "properties": {
+                "operation": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
                 },
                 "user": {
                     "type": "string"

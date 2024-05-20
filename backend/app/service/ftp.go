@@ -13,15 +13,58 @@ import (
 type FtpService struct{}
 
 type IFtpService interface {
+	LoadBaseInfo() (dto.FtpBaseInfo, error)
 	SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error)
+	Operate(operation string) error
 	Create(req dto.FtpCreate) error
 	Delete(req dto.BatchDeleteReq) error
 	Update(req dto.FtpUpdate) error
 	Sync() error
+	LoadLog(req dto.FtpLogSearch) (int64, interface{}, error)
 }
 
 func NewIFtpService() IFtpService {
 	return &FtpService{}
+}
+
+func (f *FtpService) LoadBaseInfo() (dto.FtpBaseInfo, error) {
+	var baseInfo dto.FtpBaseInfo
+	client, err := toolbox.NewFtpClient()
+	if err != nil {
+		return baseInfo, err
+	}
+	baseInfo.IsActive, baseInfo.IsExist = client.Status()
+	return baseInfo, nil
+}
+
+func (f *FtpService) LoadLog(req dto.FtpLogSearch) (int64, interface{}, error) {
+	client, err := toolbox.NewFtpClient()
+	if err != nil {
+		return 0, nil, err
+	}
+	logItem, err := client.LoadLogs(req.User, req.Operation)
+	if err != nil {
+		return 0, nil, err
+	}
+	var logs []toolbox.FtpLog
+	total, start, end := len(logItem), (req.Page-1)*req.PageSize, req.Page*req.PageSize
+	if start > total {
+		logs = make([]toolbox.FtpLog, 0)
+	} else {
+		if end >= total {
+			end = total
+		}
+		logs = logItem[start:end]
+	}
+	return int64(total), logs, nil
+}
+
+func (u *FtpService) Operate(operation string) error {
+	client, err := toolbox.NewFtpClient()
+	if err != nil {
+		return err
+	}
+	return client.Operate(operation)
 }
 
 func (f *FtpService) SearchWithPage(req dto.SearchWithPage) (int64, interface{}, error) {

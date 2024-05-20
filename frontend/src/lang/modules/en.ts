@@ -1031,6 +1031,8 @@ const message = {
         },
         ftp: {
             ftp: 'FTP Account',
+            noFtp: 'FTP (pure-ftpd) service not detected, please refer to the official documentation for installation!',
+            operation: 'Perform [{0}] operation on FTP service, continue?',
             enableHelper:
                 'Enabling the selected FTP account will restore its access permissions. Do you want to continue?',
             disableHelper:
