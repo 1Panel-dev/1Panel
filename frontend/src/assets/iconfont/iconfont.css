@@ -1,9 +1,9 @@
 @font-face {
   font-family: "panel"; /* Project id 3575356 */
-  src: url('iconfont.woff2?t=1712830223091') format('woff2'),
-       url('iconfont.woff?t=1712830223091') format('woff'),
-       url('iconfont.ttf?t=1712830223091') format('truetype'),
-       url('iconfont.svg?t=1712830223091#panel') format('svg');
+  src: url('iconfont.woff2?t=1716193696248') format('woff2'),
+       url('iconfont.woff?t=1716193696248') format('woff'),
+       url('iconfont.ttf?t=1716193696248') format('truetype'),
+       url('iconfont.svg?t=1716193696248#panel') format('svg');
 }
 
 .panel {
@@ -12,6 +12,10 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.p-monitor-1:before {
+  content: "\e60d";
 }
 
 .p-xpack:before {
@@ -24,6 +28,10 @@
 
 .p-gpu-1:before {
   content: "\e623";
+}
+
+.p-monitor-4:before {
+  content: "\ec4e";
 }
 
 .p-waf-4:before {
@@ -40,6 +48,10 @@
 
 .p-waf-3:before {
   content: "\e666";
+}
+
+.p-monitor-2:before {
+  content: "\ec4f";
 }
 
 .p-setting-1:before {
@@ -68,6 +80,10 @@
 
 .p-tamper-1:before {
   content: "\e687";
+}
+
+.p-monitor-3:before {
+  content: "\ec50";
 }
 
 .p-tongji:before {
