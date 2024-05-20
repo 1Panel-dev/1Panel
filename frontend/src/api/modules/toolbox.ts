@@ -71,10 +71,18 @@ export const updateFail2banByFile = (param: UpdateByFile) => {
 };
 
 // ftp
+export const getFtpBase = () => {
+    return http.get<Toolbox.FtpBaseInfo>(`/toolbox/ftp/base`);
+};
+export const searchFtpLog = (param: Toolbox.FtpSearchLog) => {
+    return http.post<ResPage<Toolbox.FtpLog>>(`/toolbox/ftp/log/search`, param);
+};
 export const searchFtp = (param: ReqPage) => {
     return http.post<ResPage<Toolbox.FtpInfo>>(`/toolbox/ftp/search`, param);
 };
-
+export const operateFtp = (operate: string) => {
+    return http.post(`/toolbox/ftp/operate`, { operation: operate }, TimeoutEnum.T_5M);
+};
 export const syncFtp = () => {
     return http.post(`/toolbox/ftp/sync`);
 };

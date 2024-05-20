@@ -10,6 +10,70 @@ import (
 )
 
 // @Tags FTP
+// @Summary Load FTP base info
+// @Description 获取 FTP 基础信息
+// @Success 200 {object} dto.FtpBaseInfo
+// @Security ApiKeyAuth
+// @Router /toolbox/ftp/base [get]
+func (b *BaseApi) LoadFtpBaseInfo(c *gin.Context) {
+	data, err := ftpService.LoadBaseInfo()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags FTP
+// @Summary Load FTP operation log
+// @Description 获取 FTP 操作日志
+// @Accept json
+// @Param request body dto.FtpLogSearch true "request"
+// @Success 200 {object} dto.PageResult
+// @Security ApiKeyAuth
+// @Router /toolbox/ftp/log/search [post]
+func (b *BaseApi) LoadFtpLogInfo(c *gin.Context) {
+	var req dto.FtpLogSearch
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	total, list, err := ftpService.LoadLog(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, dto.PageResult{
+		Items: list,
+		Total: total,
+	})
+}
+
+// @Tags FTP
+// @Summary Operate FTP
+// @Description 修改 FTP 状态
+// @Accept json
+// @Param request body dto.Operate true "request"
+// @Security ApiKeyAuth
+// @Router /toolbox/ftp/operate [post]
+// @x-panel-log {"bodyKeys":["operation"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"[operation] FTP","formatEN":"[operation] FTP"}
+func (b *BaseApi) OperateFtp(c *gin.Context) {
+	var req dto.Operate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := ftpService.Operate(req.Operation); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags FTP
 // @Summary Page FTP user
 // @Description 获取 FTP 账户列表分页
 // @Accept json

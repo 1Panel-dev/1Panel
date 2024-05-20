@@ -1,6 +1,8 @@
 package dto
 
-import "time"
+import (
+	"time"
+)
 
 type FtpInfo struct {
 	ID        uint      `json:"id"`
@@ -11,6 +13,17 @@ type FtpInfo struct {
 	Path        string `json:"path"`
 	Status      string `json:"status"`
 	Description string `json:"description"`
+}
+
+type FtpBaseInfo struct {
+	IsActive bool `json:"isActive"`
+	IsExist  bool `json:"isExist"`
+}
+
+type FtpLogSearch struct {
+	PageInfo
+	User      string `json:"user"`
+	Operation string `json:"operation"`
 }
 
 type FtpCreate struct {

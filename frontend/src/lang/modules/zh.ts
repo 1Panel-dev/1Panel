@@ -979,6 +979,8 @@ const message = {
         },
         ftp: {
             ftp: 'FTP 账户',
+            noFtp: '未检测到 FTP (pure-ftpd) 服务，请参考官方文档进行安装！',
+            operation: '对 FTP 服务进行 [{0}] 操作，是否继续？',
             enableHelper: '启用选中的 FTP 账号后，该 FTP 账号恢复访问权限，是否继续操作？',
             disableHelper: '停用选中的 FTP 账号后，该 FTP 账号将失去访问权限，是否继续操作？',
             syncHelper: '同步服务器与数据库中的 FTP 账户数据，是否继续操作？',
