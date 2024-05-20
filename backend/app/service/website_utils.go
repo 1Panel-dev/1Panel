@@ -431,6 +431,10 @@ func delWafConfig(website model.Website, force bool) error {
 	if !fileOp.Stat(wafDataPath) {
 		return nil
 	}
+	monitorDir := path.Join(wafDataPath, "db", "sites", website.Alias)
+	if fileOp.Stat(monitorDir) {
+		_ = fileOp.DeleteDir(monitorDir)
+	}
 	websitesConfigPath := path.Join(wafDataPath, "conf", "sites.json")
 	content, err := fileOp.GetContent(websitesConfigPath)
 	if err != nil {

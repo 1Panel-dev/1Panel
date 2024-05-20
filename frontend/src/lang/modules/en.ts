@@ -1560,6 +1560,8 @@ const message = {
         gpu: 'Upgrading to the professional version can help users visually monitor important parameters of GPU such as workload, temperature, memory usage in real time.',
         setting:
             'Upgrading to the professional version allows customization of panel logo, welcome message, and other information.',
+        monitor:
+            'Upgrade to the professional version to view the real-time status of the website, visitor trends, visitor sources, request logs and other information. ',
     },
     clean: {
         scan: 'Start Scanning',

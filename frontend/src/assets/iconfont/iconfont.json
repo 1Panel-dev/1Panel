@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "8156501",
+      "name": "e6d8",
+      "font_class": "monitor-1",
+      "unicode": "e60d",
+      "unicode_decimal": 58893
+    },
+    {
       "icon_id": "3722144",
       "name": "钻石",
       "font_class": "xpack",
@@ -25,6 +32,13 @@
       "font_class": "gpu-1",
       "unicode": "e623",
       "unicode_decimal": 58915
+    },
+    {
+      "icon_id": "40398413",
+      "name": "监控",
+      "font_class": "monitor-4",
+      "unicode": "ec4e",
+      "unicode_decimal": 60494
     },
     {
       "icon_id": "8229531",
@@ -53,6 +67,13 @@
       "font_class": "waf-3",
       "unicode": "e666",
       "unicode_decimal": 58982
+    },
+    {
+      "icon_id": "40398423",
+      "name": "地图",
+      "font_class": "monitor-2",
+      "unicode": "ec4f",
+      "unicode_decimal": 60495
     },
     {
       "icon_id": "899647",
@@ -102,6 +123,13 @@
       "font_class": "tamper-1",
       "unicode": "e687",
       "unicode_decimal": 59015
+    },
+    {
+      "icon_id": "40398652",
+      "name": "日志",
+      "font_class": "monitor-3",
+      "unicode": "ec50",
+      "unicode_decimal": 60496
     },
     {
       "icon_id": "5838475",
