@@ -479,9 +479,12 @@ func loadFailedAuthDatas(line string) dto.SSHHistory {
 		return data
 	}
 	data.DateStr = dataStr
-	if index == 2 {
+	switch index {
+	case 1:
+		data.User = parts[9]
+	case 2:
 		data.User = parts[10]
-	} else {
+	default:
 		data.User = parts[7]
 	}
 	data.AuthMode = parts[6+index]
@@ -543,14 +546,22 @@ func loadDate(currentYear int, DateStr string, nyc *time.Location) time.Time {
 
 func analyzeDateStr(parts []string) (int, string) {
 	t, err := time.Parse("2006-01-02T15:04:05.999999-07:00", parts[0])
-	if err != nil {
+	if err == nil {
+		if len(parts) < 12 {
+			return 0, ""
+		}
+		return 0, t.Format("2006 Jan 2 15:04:05")
+	}
+	t, err = time.Parse("2006-01-02 15:04:05", fmt.Sprintf("%s %s", parts[0], parts[1]))
+	if err == nil {
 		if len(parts) < 14 {
 			return 0, ""
 		}
-		return 2, fmt.Sprintf("%s %s %s", parts[0], parts[1], parts[2])
+		return 1, t.Format("2006 Jan 2 15:04:05")
 	}
-	if len(parts) < 12 {
+
+	if len(parts) < 14 {
 		return 0, ""
 	}
-	return 0, t.Format("2006 Jan 2 15:04:05")
+	return 2, fmt.Sprintf("%s %s %s", parts[0], parts[1], parts[2])
 }
