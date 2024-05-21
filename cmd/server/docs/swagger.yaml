@@ -3050,6 +3050,8 @@ definitions:
         type: boolean
       expireDate:
         type: string
+      ftpId:
+        type: integer
       group:
         type: string
       httpConfig:
@@ -4248,6 +4250,10 @@ definitions:
         - new
         - installed
         type: string
+      ftpPassword:
+        type: string
+      ftpUser:
+        type: string
       otherDomains:
         type: string
       port:
@@ -5080,6 +5086,8 @@ definitions:
         type: string
       expireDate:
         type: string
+      ftpId:
+        type: integer
       group:
         type: string
       httpConfig:

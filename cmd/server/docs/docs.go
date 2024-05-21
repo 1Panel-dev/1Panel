@@ -19029,6 +19029,9 @@ const docTemplate = `{
                 "expireDate": {
                     "type": "string"
                 },
+                "ftpId": {
+                    "type": "integer"
+                },
                 "group": {
                     "type": "string"
                 },
@@ -20820,6 +20823,12 @@ const docTemplate = `{
                         "installed"
                     ]
                 },
+                "ftpPassword": {
+                    "type": "string"
+                },
+                "ftpUser": {
+                    "type": "string"
+                },
                 "otherDomains": {
                     "type": "string"
                 },
@@ -22061,6 +22070,9 @@ const docTemplate = `{
                 },
                 "expireDate": {
                     "type": "string"
+                },
+                "ftpId": {
+                    "type": "integer"
                 },
                 "group": {
                     "type": "string"

@@ -14,7 +14,7 @@
                 :back="handleClose"
             />
         </template>
-        <el-form ref="formRef" label-position="top" :model="dialogData.rowData" :rules="rules">
+        <el-form ref="formRef" label-position="top" :model="dialogData.rowData" :rules="rules" v-loading="loading">
             <el-row type="flex" justify="center">
                 <el-col :span="22">
                     <el-form-item :label="$t('commons.login.username')" prop="user">
@@ -25,7 +25,11 @@
                         />
                     </el-form-item>
                     <el-form-item :label="$t('commons.login.password')" prop="password">
-                        <el-input clearable v-model="dialogData.rowData!.password" />
+                        <el-input type="password" clearable v-model="dialogData.rowData!.password" show-password>
+                            <template #append>
+                                <el-button @click="random">{{ $t('commons.button.random') }}</el-button>
+                            </template>
+                        </el-input>
                     </el-form-item>
                     <el-form-item :label="$t('file.root')" prop="path">
                         <el-input v-model="dialogData.rowData!.path">
@@ -43,7 +47,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="onSubmit(formRef)">
+                <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -61,6 +65,7 @@ import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { Toolbox } from '@/api/interface/toolbox';
 import { createFtp, updateFtp } from '@/api/modules/toolbox';
+import { getRandomStr } from '@/utils/util';
 
 interface DialogProps {
     title: string;
@@ -81,14 +86,18 @@ const acceptParams = (params: DialogProps): void => {
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
+const random = async () => {
+    dialogData.value.rowData.password = getRandomStr(16);
+};
+
 const handleClose = () => {
     drawerVisible.value = false;
 };
 
 const rules = reactive({
-    user: [Rules.requiredInput, Rules.noSpace],
-    password: [Rules.requiredInput],
-    path: [Rules.requiredInput],
+    user: [Rules.simpleName],
+    password: [Rules.simplePassword],
+    path: [Rules.requiredInput, Rules.noSpace],
 });
 
 type FormInstance = InstanceType<typeof ElForm>;

@@ -122,7 +122,7 @@ func (b *BaseApi) CreateFtp(c *gin.Context) {
 		}
 		req.Password = string(pass)
 	}
-	if err := ftpService.Create(req); err != nil {
+	if _, err := ftpService.Create(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

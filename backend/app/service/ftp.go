@@ -1,6 +1,9 @@
 package service
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -16,7 +19,7 @@ type IFtpService interface {
 	LoadBaseInfo() (dto.FtpBaseInfo, error)
 	SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error)
 	Operate(operation string) error
-	Create(req dto.FtpCreate) error
+	Create(req dto.FtpCreate) (uint, error)
 	Delete(req dto.BatchDeleteReq) error
 	Update(req dto.FtpUpdate) error
 	Sync() error
@@ -122,32 +125,39 @@ func (f *FtpService) Sync() error {
 	return nil
 }
 
-func (f *FtpService) Create(req dto.FtpCreate) error {
+func (f *FtpService) Create(req dto.FtpCreate) (uint, error) {
+	if _, err := os.Stat(req.Path); err != nil {
+		if os.IsNotExist(err) {
+			fmt.Println(os.MkdirAll(req.Path, os.ModePerm))
+		} else {
+			return 0, err
+		}
+	}
 	pass, err := encrypt.StringEncrypt(req.Password)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	userInDB, _ := ftpRepo.Get(hostRepo.WithByUser(req.User))
 	if userInDB.ID != 0 {
-		return constant.ErrRecordExist
+		return 0, constant.ErrRecordExist
 	}
 	client, err := toolbox.NewFtpClient()
 	if err != nil {
-		return err
+		return 0, err
 	}
 	if err := client.UserAdd(req.User, req.Password, req.Path); err != nil {
-		return err
+		return 0, err
 	}
 	var ftp model.Ftp
 	if err := copier.Copy(&ftp, &req); err != nil {
-		return errors.WithMessage(constant.ErrStructTransform, err.Error())
+		return 0, errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
 	ftp.Status = constant.StatusEnable
 	ftp.Password = pass
 	if err := ftpRepo.Create(&ftp); err != nil {
-		return err
+		return 0, err
 	}
-	return nil
+	return ftp.ID, nil
 }
 
 func (f *FtpService) Delete(req dto.BatchDeleteReq) error {

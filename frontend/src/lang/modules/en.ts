@@ -170,7 +170,8 @@ const message = {
             commonName:
                 'Supports non-special characters starting with English, Chinese, numbers, .- and _, length 1-128',
             userName: 'Support English, Chinese, numbers and _ length 3-30',
-            simpleName: 'Supports non-underscore starting, English, numbers, _, length 1-30',
+            simpleName: 'Supports non-underscore starting, English, numbers, _, length 3-30',
+            simplePassword: 'Supports non-underscore starting, English, numbers, _, length 6-30',
             dbName: 'Supports non-special character starting, including English, Chinese, numbers, .-_, with a length of 1-64',
             imageName: 'Support English, numbers, :/.-_, length 1-150',
             volumeName: 'Support English, numbers, .-_, length 2-30',
@@ -1736,6 +1737,10 @@ const message = {
         zipFormat: '.tar.gz compressed package structure: test.tar.gz compressed package must contain {0} file',
         proxy: 'Reverse Proxy',
         alias: 'Path Name',
+        ftpUser: 'FTP Account',
+        ftpPassword: 'FTP Password',
+        ftpHelper:
+            'Create an FTP account corresponding to the site while creating the site, and the FTP directory points to the directory where the site is located.',
         remark: 'Remark',
         group: 'Group',
         groupSetting: 'Group Management',

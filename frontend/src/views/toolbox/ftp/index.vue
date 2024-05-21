@@ -63,7 +63,7 @@
                         <el-table-column :label="$t('commons.login.password')" prop="password">
                             <template #default="{ row }">
                                 <div v-if="row.password.length === 0">-</div>
-                                <div v-else class="flex items-center">
+                                <div v-else class="flex items-center flex-wrap">
                                     <div class="star-center" v-if="!row.showPassword">
                                         <span>**********</span>
                                     </div>
@@ -117,7 +117,11 @@
                                 </el-button>
                             </template>
                         </el-table-column>
-                        <el-table-column :label="$t('file.root')" :min-width="120" prop="path" show-overflow-tooltip />
+                        <el-table-column :label="$t('file.root')" :min-width="120" prop="path">
+                            <template #default="{ row }">
+                                <Tooltip @click="toFolder(row.path)" :text="row.path" />
+                            </template>
+                        </el-table-column>
                         <el-table-column
                             :label="$t('commons.table.description')"
                             :min-width="80"
@@ -126,12 +130,13 @@
                         />
                         <el-table-column
                             :label="$t('commons.table.createdAt')"
+                            show-overflow-tooltip
                             :formatter="dateFormat"
                             :min-width="80"
                             prop="createdAt"
                         />
                         <fu-table-operations
-                            width="240px"
+                            width="200px"
                             :buttons="buttons"
                             :ellipsis="10"
                             :label="$t('commons.table.operate')"
@@ -175,6 +180,7 @@ import { deleteFtp, searchFtp, updateFtp, syncFtp, operateFtp, getFtpBase } from
 import OperateDialog from '@/views/toolbox/ftp/operate/index.vue';
 import LogDialog from '@/views/toolbox/ftp/log/index.vue';
 import { Toolbox } from '@/api/interface/toolbox';
+import router from '@/routers';
 
 const loading = ref();
 const selects = ref<any>([]);
@@ -230,6 +236,10 @@ const search = async (column?: any) => {
 
 const toDoc = () => {
     window.open('https://1panel.cn/docs/user_manual/toolbox/ftp/', '_blank', 'noopener,noreferrer');
+};
+
+const toFolder = (folder: string) => {
+    router.push({ path: '/hosts/files', query: { path: folder } });
 };
 
 const onOperate = async (operation: string) => {
@@ -348,7 +358,7 @@ const buttons = [
             return row.status === 'deleted';
         },
         click: (row: Toolbox.FtpInfo) => {
-            dialogLogRef.value!.acceptParams({ user: row.user });
+            dialogLogRef.value!.acceptParams({ user: row.user, path: row.path });
         },
     },
     {

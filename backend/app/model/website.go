@@ -26,6 +26,7 @@ type Website struct {
 	WebsiteSSLID   uint `gorm:"type:integer" json:"webSiteSSLId"`
 	RuntimeID      uint `gorm:"type:integer" json:"runtimeID"`
 	AppInstallID   uint `gorm:"type:integer" json:"appInstallId"`
+	FtpID          uint `gorm:"type:integer" json:"ftpId"`
 
 	User  string `gorm:"type:varchar;" json:"user"`
 	Group string `gorm:"type:varchar;" json:"group"`

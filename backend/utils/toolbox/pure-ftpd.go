@@ -16,7 +16,8 @@ import (
 )
 
 type Ftp struct {
-	DefaultUser string
+	DefaultUser  string
+	DefaultGroup string
 }
 
 type FtpClient interface {
@@ -33,7 +34,11 @@ type FtpClient interface {
 func NewFtpClient() (*Ftp, error) {
 	userItem, err := user.LookupId("1000")
 	if err == nil {
-		return &Ftp{DefaultUser: userItem.Username}, err
+		groupItem, err := user.LookupGroupId(userItem.Gid)
+		if err != nil {
+			return nil, err
+		}
+		return &Ftp{DefaultUser: userItem.Username, DefaultGroup: groupItem.Name}, err
 	}
 	if err.Error() != user.UnknownUserIdError(1000).Error() {
 		return nil, err
@@ -45,7 +50,7 @@ func NewFtpClient() (*Ftp, error) {
 		if err != nil {
 			return nil, errors.New(stdout2)
 		}
-		return &Ftp{DefaultUser: "1panel"}, nil
+		return &Ftp{DefaultUser: "1panel", DefaultGroup: groupItem.Name}, nil
 	}
 	if err.Error() != user.UnknownGroupIdError("1000").Error() {
 		return nil, err
@@ -54,11 +59,11 @@ func NewFtpClient() (*Ftp, error) {
 	if err != nil {
 		return nil, errors.New(string(stdout))
 	}
-	stdout2, err := cmd.Execf("useradd -u 1000 -g %s %s", groupItem.Name, userItem.Username)
+	stdout2, err := cmd.Execf("useradd -u 1000 -g 1panel %s", userItem.Username)
 	if err != nil {
 		return nil, errors.New(stdout2)
 	}
-	return &Ftp{DefaultUser: "1panel"}, nil
+	return &Ftp{DefaultUser: "1panel", DefaultGroup: "1panel"}, nil
 }
 
 func (f *Ftp) Status() (bool, bool) {
@@ -87,7 +92,7 @@ func (f *Ftp) UserAdd(username, passwd, path string) error {
 		return errors.New(std)
 	}
 	_ = f.Reload()
-	std2, err := cmd.Execf("chown %s %s", f.DefaultUser, path)
+	std2, err := cmd.Execf("chown -R %s:%s %s", f.DefaultUser, f.DefaultGroup, path)
 	if err != nil {
 		return errors.New(std2)
 	}
@@ -170,19 +175,19 @@ func (f *Ftp) LoadLogs(user, operation string) ([]FtpLog, error) {
 	logItem := ""
 	if _, err := os.Stat("/etc/pure-ftpd/conf"); err != nil && os.IsNotExist(err) {
 		std, err := cmd.Exec("cat /etc/pure-ftpd/pure-ftpd.conf | grep AltLog | grep clf:")
-		if err != nil {
-			return logs, err
+		logItem = "/var/log/pureftpd.log"
+		if err == nil && !strings.HasPrefix(logItem, "#") {
+			logItem = std
 		}
-		logItem = std
 	} else {
 		if err != nil {
 			return logs, err
 		}
 		std, err := cmd.Exec("cat /etc/pure-ftpd/conf/AltLog")
-		if err != nil {
-			return nil, err
+		logItem = "/var/log/pure-ftpd/transfer.log"
+		if err != nil && !strings.HasPrefix(logItem, "#") {
+			logItem = std
 		}
-		logItem = std
 	}
 
 	logItem = strings.ReplaceAll(logItem, "AltLog", "")
