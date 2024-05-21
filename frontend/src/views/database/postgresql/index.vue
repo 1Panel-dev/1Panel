@@ -131,7 +131,7 @@
                     <el-table-column :label="$t('commons.login.password')" prop="password">
                         <template #default="{ row }">
                             <span v-if="row.username === '' || row.password === ''">-</span>
-                            <div class="flex items-center" v-else>
+                            <div class="flex items-center flex-wrap" v-else>
                                 <div class="star-center" v-if="!row.showPassword">
                                     <span>**********</span>
                                 </div>

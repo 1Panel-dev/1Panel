@@ -64,6 +64,8 @@ export namespace Website {
         otherDomains: string;
         proxy: string;
         proxyType: string;
+        ftpUser: string;
+        ftpPassword: string;
     }
 
     export interface WebSiteUpdateReq {

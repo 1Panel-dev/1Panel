@@ -27,6 +27,9 @@ type WebsiteCreate struct {
 	AppID        uint          `json:"appID"`
 	AppInstallID uint          `json:"appInstallID"`
 
+	FtpUser     string `json:"ftpUser"`
+	FtpPassword string `json:"ftpPassword"`
+
 	RuntimeID uint `json:"runtimeID"`
 	RuntimeConfig
 }

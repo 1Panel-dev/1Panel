@@ -331,6 +331,14 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		return err
 	}
 
+	if len(create.FtpUser) != 0 && len(create.FtpPassword) != 0 {
+		itemID, err := NewIFtpService().Create(dto.FtpCreate{User: create.FtpUser, Password: create.FtpPassword, Path: path.Join(global.CONF.System.BaseDir, "1panel/apps/openresty/openresty/www/sites", create.Alias, "index")})
+		if err != nil {
+			global.LOG.Errorf("create ftp for website failed, err: %v", err)
+		}
+		website.FtpID = itemID
+	}
+
 	if err = createWafConfig(website, domains); err != nil {
 		return err
 	}

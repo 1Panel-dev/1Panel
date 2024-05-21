@@ -19022,6 +19022,9 @@
                 "expireDate": {
                     "type": "string"
                 },
+                "ftpId": {
+                    "type": "integer"
+                },
                 "group": {
                     "type": "string"
                 },
@@ -20813,6 +20816,12 @@
                         "installed"
                     ]
                 },
+                "ftpPassword": {
+                    "type": "string"
+                },
+                "ftpUser": {
+                    "type": "string"
+                },
                 "otherDomains": {
                     "type": "string"
                 },
@@ -22054,6 +22063,9 @@
                 },
                 "expireDate": {
                     "type": "string"
+                },
+                "ftpId": {
+                    "type": "integer"
                 },
                 "group": {
                     "type": "string"

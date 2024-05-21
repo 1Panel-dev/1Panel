@@ -23,7 +23,7 @@
                     <el-table-column :label="$t('commons.login.username')" prop="username" />
                     <el-table-column :label="$t('commons.login.password')" prop="password">
                         <template #default="{ row }">
-                            <div class="flex items-center">
+                            <div class="flex items-center flex-wrap">
                                 <div class="star-center">
                                     <span v-if="!row.showPassword">**********</span>
                                 </div>

@@ -15,9 +15,8 @@
             <el-option value="GET" :label="$t('file.download')" />
         </el-select>
 
-        <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
-            <el-table-column label="ip" prop="ip" />
-            <el-table-column :label="$t('commons.login.username')" prop="user" />
+        <ComplexTable class="mt-2" :pagination-config="paginationConfig" :data="data" @search="search">
+            <el-table-column label="ip" prop="ip" show-overflow-tooltip />
             <el-table-column :label="$t('commons.table.status')" show-overflow-tooltip prop="status">
                 <template #default="{ row }">
                     <el-tag v-if="row.status === '200'">{{ $t('commons.status.success') }}</el-tag>
@@ -26,12 +25,12 @@
             </el-table-column>
             <el-table-column :label="$t('commons.table.operate')" show-overflow-tooltip>
                 <template #default="{ row }">
-                    {{ loadFileName(row.operation) }}
+                    {{ loadOperation(row.operation) }}
                 </template>
             </el-table-column>
             <el-table-column :label="$t('file.file')" show-overflow-tooltip>
                 <template #default="{ row }">
-                    {{ loadOperation(row.operation) }}
+                    {{ loadFileName(row.operation) }}
                 </template>
             </el-table-column>
             <el-table-column :label="$t('file.size')" show-overflow-tooltip prop="size">
@@ -66,14 +65,18 @@ const paginationConfig = reactive({
 });
 const data = ref();
 
+const itemPath = ref();
 interface DialogProps {
     user: string;
+    path: string;
 }
 const loading = ref();
 const drawerVisible = ref(false);
 
 const acceptParams = (params: DialogProps): void => {
     paginationConfig.user = params.user;
+    paginationConfig.operation = '';
+    itemPath.value = params.path;
     search();
     drawerVisible.value = true;
 };
@@ -101,7 +104,7 @@ const search = async () => {
         });
 };
 
-const loadFileName = (operation: string) => {
+const loadOperation = (operation: string) => {
     if (operation.startsWith('"PUT')) {
         return i18n.global.t('file.upload');
     }
@@ -109,8 +112,12 @@ const loadFileName = (operation: string) => {
         return i18n.global.t('file.download');
     }
 };
-const loadOperation = (operation: string) => {
-    return operation.replaceAll('"', '').replaceAll('PUT', '').replaceAll('GET', '');
+const loadFileName = (operation: string) => {
+    return operation
+        .replaceAll('"', '')
+        .replaceAll('PUT', '')
+        .replaceAll('GET', '')
+        .replaceAll(itemPath.value + '/', '');
 };
 
 defineExpose({

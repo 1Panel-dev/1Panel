@@ -205,9 +205,9 @@ var AddMonitorMenu = &gormigrate.Migration{
 }
 
 var AddFtp = &gormigrate.Migration{
-	ID: "20240517-add-ftp",
+	ID: "20240521-add-ftp",
 	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.Ftp{}); err != nil {
+		if err := tx.AutoMigrate(&model.Ftp{}, model.Website{}); err != nil {
 			return err
 		}
 		return nil

@@ -181,6 +181,19 @@ const checkSimpleName = (rule: any, value: any, callback: any) => {
     }
 };
 
+const checkSimplePassword = (rule: any, value: any, callback: any) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback(new Error(i18n.global.t('commons.rule.simplePassword')));
+    } else {
+        const reg = /^[a-zA-Z0-9]{1}[a-zA-Z0-9_]{5,29}$/;
+        if (!reg.test(value) && value !== '') {
+            callback(new Error(i18n.global.t('commons.rule.simplePassword')));
+        } else {
+            callback();
+        }
+    }
+};
+
 const checkDBName = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.dbName')));
@@ -535,6 +548,7 @@ interface CommonRule {
     name: FormItemRule;
     userName: FormItemRule;
     simpleName: FormItemRule;
+    simplePassword: FormItemRule;
     dbName: FormItemRule;
     imageName: FormItemRule;
     volumeName: FormItemRule;
@@ -599,6 +613,11 @@ export const Rules: CommonRule = {
     simpleName: {
         required: true,
         validator: checkSimpleName,
+        trigger: 'blur',
+    },
+    simplePassword: {
+        required: true,
+        validator: checkSimplePassword,
         trigger: 'blur',
     },
     dbName: {

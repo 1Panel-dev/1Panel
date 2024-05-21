@@ -3,6 +3,8 @@ import { ReqPage, ResPage } from '../interface';
 import { Website } from '../interface/website';
 import { File } from '../interface/file';
 import { TimeoutEnum } from '@/enums/http-enum';
+import { deepCopy } from '@/utils/util';
+import { Base64 } from 'js-base64';
 
 export const SearchWebsites = (req: Website.WebSiteSearch) => {
     return http.post<ResPage<Website.WebsiteDTO>>(`/websites/search`, req);
@@ -13,7 +15,11 @@ export const ListWebsites = () => {
 };
 
 export const CreateWebsite = (req: Website.WebSiteCreateReq) => {
-    return http.post<any>(`/websites`, req);
+    let request = deepCopy(req) as Website.WebSiteCreateReq;
+    if (request.ftpPassword) {
+        request.ftpPassword = Base64.encode(request.ftpPassword);
+    }
+    return http.post<any>(`/websites`, request);
 };
 
 export const OpWebsite = (req: Website.WebSiteOp) => {

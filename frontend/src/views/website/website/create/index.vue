@@ -300,6 +300,33 @@
                             </span>
                         </div>
                     </el-form-item>
+
+                    <el-form-item prop="enableFtp" v-if="website.type === 'static' || website.type === 'runtime'">
+                        <el-checkbox
+                            @change="random"
+                            v-model="website.enableFtp"
+                            :label="$t('website.enableFtp')"
+                            size="large"
+                        />
+                        <span class="input-help">{{ $t('website.ftpHelper') }}</span>
+                    </el-form-item>
+                    <el-row :gutter="20" v-if="website.enableFtp">
+                        <el-col :span="12">
+                            <el-form-item prop="ftpUser" :label="$t('website.ftpUser')">
+                                <el-input v-model="website.ftpUser" />
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item prop="ftpPassword" :label="$t('website.ftpPassword')">
+                                <el-input type="password" clearable v-model="website.ftpPassword" show-password>
+                                    <template #append>
+                                        <el-button @click="random">{{ $t('commons.button.random') }}</el-button>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+
                     <el-form-item
                         v-if="website.type === 'proxy'"
                         :label="$t('website.proxyAddress')"
@@ -316,7 +343,7 @@
                         </el-input>
                     </el-form-item>
                     <el-form-item :label="$t('website.remark')" prop="remark">
-                        <el-input v-model="website.remark"></el-input>
+                        <el-input type="textarea" :rows="3" clearable v-model="website.remark" />
                     </el-form-item>
                 </el-form>
             </el-col>
@@ -354,6 +381,7 @@ import { GetGroupList } from '@/api/modules/group';
 import { Group } from '@/api/interface/group';
 import { SearchRuntimes } from '@/api/modules/runtime';
 import { Runtime } from '@/api/interface/runtime';
+import { getRandomStr } from '@/utils/util';
 
 const websiteForm = ref<FormInstance>();
 const website = ref({
@@ -383,6 +411,9 @@ const website = ref({
         allowPort: false,
     },
     IPV6: false,
+    enableFtp: false,
+    ftpUser: '',
+    ftpPassword: '',
     proxyType: 'tcp',
     port: 9000,
     proxyProtocol: 'http://',
@@ -406,6 +437,8 @@ const rules = ref<any>({
         memoryLimit: [Rules.requiredInput, checkNumberRange(0, 9999999999)],
         containerName: [Rules.containerName],
     },
+    ftpUser: [Rules.simpleName],
+    ftpPassword: [Rules.simplePassword],
     proxyType: [Rules.requiredSelect],
     port: [Rules.port],
     runtimeType: [Rules.requiredInput],
@@ -441,6 +474,10 @@ const em = defineEmits(['close']);
 const handleClose = () => {
     open.value = false;
     em('close', false);
+};
+
+const random = async () => {
+    website.value.ftpPassword = getRandomStr(16);
 };
 
 const changeType = (type: string) => {
@@ -613,6 +650,10 @@ const submit = async (formEl: FormInstance | undefined) => {
                 } else {
                     if (website.value.type === 'proxy') {
                         website.value.proxy = website.value.proxyProtocol + website.value.proxyAddress;
+                    }
+                    if (!website.value.enableFtp) {
+                        website.value.ftpUser = '';
+                        website.value.ftpPassword = '';
                     }
                     CreateWebsite(website.value)
                         .then(() => {
