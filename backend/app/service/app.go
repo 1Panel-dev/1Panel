@@ -849,7 +849,7 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 			return err
 		}
 		iconStr := ""
-		if !strings.Contains(string(body), "xml") {
+		if !strings.Contains(string(body), "<xml>") {
 			iconStr = base64.StdEncoding.EncodeToString(body)
 		}
 		_ = iconRes.Body.Close()
