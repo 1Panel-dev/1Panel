@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/image"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/global"
@@ -85,7 +86,7 @@ func (c Client) CreateNetwork(name string) error {
 }
 
 func (c Client) DeleteImage(imageID string) error {
-	if _, err := c.cli.ImageRemove(context.Background(), imageID, types.ImageRemoveOptions{Force: true}); err != nil {
+	if _, err := c.cli.ImageRemove(context.Background(), imageID, image.RemoveOptions{Force: true}); err != nil {
 		return err
 	}
 	return nil
@@ -105,7 +106,7 @@ func (c Client) PullImage(imageName string, force bool) error {
 			return nil
 		}
 	}
-	if _, err := c.cli.ImagePull(context.Background(), imageName, types.ImagePullOptions{}); err != nil {
+	if _, err := c.cli.ImagePull(context.Background(), imageName, image.PullOptions{}); err != nil {
 		return err
 	}
 	return nil
@@ -114,7 +115,7 @@ func (c Client) PullImage(imageName string, force bool) error {
 func (c Client) GetImageIDByName(imageName string) (string, error) {
 	filter := filters.NewArgs()
 	filter.Add("reference", imageName)
-	list, err := c.cli.ImageList(context.Background(), types.ImageListOptions{
+	list, err := c.cli.ImageList(context.Background(), image.ListOptions{
 		Filters: filter,
 	})
 	if err != nil {
@@ -129,7 +130,7 @@ func (c Client) GetImageIDByName(imageName string) (string, error) {
 func (c Client) CheckImageExist(imageName string) (bool, error) {
 	filter := filters.NewArgs()
 	filter.Add("reference", imageName)
-	list, err := c.cli.ImageList(context.Background(), types.ImageListOptions{
+	list, err := c.cli.ImageList(context.Background(), image.ListOptions{
 		Filters: filter,
 	})
 	if err != nil {

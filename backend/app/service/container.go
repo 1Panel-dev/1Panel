@@ -29,6 +29,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/registry"
@@ -870,8 +871,8 @@ func calculateNetwork(network map[string]types.NetworkStats) (float64, float64) 
 	return rx, tx
 }
 
-func checkImageExist(client *client.Client, image string) bool {
-	images, err := client.ImageList(context.Background(), types.ImageListOptions{})
+func checkImageExist(client *client.Client, imageItem string) bool {
+	images, err := client.ImageList(context.Background(), image.ListOptions{})
 	if err != nil {
 		fmt.Println(err)
 		return false
@@ -879,7 +880,7 @@ func checkImageExist(client *client.Client, image string) bool {
 
 	for _, img := range images {
 		for _, tag := range img.RepoTags {
-			if tag == image || tag == image+":latest" {
+			if tag == imageItem || tag == imageItem+":latest" {
 				return true
 			}
 		}
