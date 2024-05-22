@@ -14,6 +14,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/image"
 	"github.com/pkg/errors"
 
 	"github.com/1Panel-dev/1Panel/backend/buserr"
@@ -270,7 +271,7 @@ func loadImageTag() (string, error) {
 		return "", err
 	}
 	defer client.Close()
-	images, err := client.ImageList(context.Background(), types.ImageListOptions{})
+	images, err := client.ImageList(context.Background(), image.ListOptions{})
 	if err != nil {
 		return "", err
 	}

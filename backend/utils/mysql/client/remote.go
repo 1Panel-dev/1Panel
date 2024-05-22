@@ -17,7 +17,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
 )
 
@@ -417,7 +417,7 @@ func loadImage(dbType, version string) (string, error) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	images, err := cli.ImageList(context.Background(), types.ImageListOptions{})
+	images, err := cli.ImageList(context.Background(), image.ListOptions{})
 	if err != nil {
 		fmt.Println(err)
 	}

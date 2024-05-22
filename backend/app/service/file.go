@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"os/exec"
@@ -14,6 +15,9 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"golang.org/x/net/html/charset"
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
 
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
@@ -227,6 +231,23 @@ func (f *FileService) GetContent(op request.FileContentReq) (response.FileInfo, 
 		Path:   op.Path,
 		Expand: true,
 	})
+
+	content := []byte(info.Content)
+	var decodeName string
+	if len(content) > 1024 {
+		_, decodeName, _ = charset.DetermineEncoding(content[:1024], "")
+	} else {
+		_, decodeName, _ = charset.DetermineEncoding(content, "")
+	}
+	if decodeName == "windows-1252" {
+		reader := strings.NewReader(info.Content)
+		item := transform.NewReader(reader, simplifiedchinese.GBK.NewDecoder())
+		contents, err := io.ReadAll(item)
+		if err != nil {
+			return response.FileInfo{}, err
+		}
+		info.Content = string(contents)
+	}
 	if err != nil {
 		return response.FileInfo{}, err
 	}
