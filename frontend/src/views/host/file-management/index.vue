@@ -128,23 +128,30 @@
                                 <el-table :data="favorites">
                                     <el-table-column prop="name">
                                         <template #default="{ row }">
-                                            <span
-                                                class="table-link text-ellipsis"
-                                                @click="toFavorite(row)"
-                                                type="primary"
+                                            <el-tooltip
+                                                class="box-item"
+                                                effect="dark"
+                                                :content="row.path"
+                                                placement="top"
                                             >
-                                                <svg-icon
-                                                    v-if="row.isDir"
-                                                    className="table-icon"
-                                                    iconName="p-file-folder"
-                                                ></svg-icon>
-                                                <svg-icon
-                                                    v-else
-                                                    className="table-icon"
-                                                    iconName="p-file-normal"
-                                                ></svg-icon>
-                                                {{ row.name }}
-                                            </span>
+                                                <span
+                                                    class="table-link text-ellipsis"
+                                                    @click="toFavorite(row)"
+                                                    type="primary"
+                                                >
+                                                    <svg-icon
+                                                        v-if="row.isDir"
+                                                        className="table-icon"
+                                                        iconName="p-file-folder"
+                                                    ></svg-icon>
+                                                    <svg-icon
+                                                        v-else
+                                                        className="table-icon"
+                                                        iconName="p-file-normal"
+                                                    ></svg-icon>
+                                                    {{ row.name }}
+                                                </span>
+                                            </el-tooltip>
                                         </template>
                                     </el-table-column>
                                 </el-table>
