@@ -33,13 +33,11 @@
                         fix
                         show-overflow-tooltip
                     ></el-table-column>
-                    <el-table-column
-                        :label="$t('tool.supervisor.dir')"
-                        prop="dir"
-                        min-width="100px"
-                        fix
-                        show-overflow-tooltip
-                    ></el-table-column>
+                    <el-table-column :label="$t('tool.supervisor.dir')" prop="dir" min-width="100px" fix>
+                        <template #default="{ row }">
+                            <Tooltip @click="toFolder(row.dir)" :text="row.dir" />
+                        </template>
+                    </el-table-column>
                     <el-table-column
                         :label="$t('tool.supervisor.user')"
                         prop="user"
@@ -161,6 +159,7 @@ import i18n from '@/lang';
 import { HostTool } from '@/api/interface/host-tool';
 import { MsgSuccess } from '@/utils/message';
 import { VideoPlay, VideoPause, RefreshRight } from '@element-plus/icons-vue';
+import router from '@/routers';
 const globalStore = GlobalStore();
 
 const loading = ref(false);
@@ -184,6 +183,10 @@ const setting = () => {
 const getStatus = (status: any) => {
     supervisorStatus.value = status;
     search();
+};
+
+const toFolder = (folder: string) => {
+    router.push({ path: '/hosts/files', query: { path: folder } });
 };
 
 const showStopped = computed((): boolean => {
