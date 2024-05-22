@@ -244,7 +244,7 @@
                             </el-link>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('file.group')" prop="group">
+                    <el-table-column :label="$t('file.group')" prop="group" show-overflow-tooltip>
                         <template #default="{ row }">
                             <el-link :underline="false" @click="openChown(row)">
                                 {{ row.group ? row.group : '-' }} ({{ row.gid }})
@@ -863,7 +863,9 @@ const buttons = [
     },
     {
         label: i18n.global.t('file.mode'),
-        click: openMode,
+        click: (row: File.File) => {
+            openBatchRole([row]);
+        },
     },
     {
         label: i18n.global.t('file.compress'),
