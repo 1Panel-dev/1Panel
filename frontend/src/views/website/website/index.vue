@@ -54,7 +54,7 @@
                 <ComplexTable
                     :pagination-config="paginationConfig"
                     :data="data"
-                    @sort-change="search"
+                    @sort-change="changeSort"
                     @search="search()"
                     :class="{ mask: nginxStatus != 'Running' }"
                 >
@@ -251,12 +251,22 @@ let req = reactive({
 const mobile = computed(() => {
     return globalStore.isMobile();
 });
-const search = async (column?: any) => {
+
+const changeSort = ({ prop, order }) => {
+    if (order) {
+        req.orderBy = prop == 'primaryDomain' ? 'primary_domain' : prop;
+        req.order = order;
+    } else {
+        req.orderBy = 'created_at';
+        req.order = 'null';
+    }
+    search();
+};
+
+const search = async () => {
     req.page = paginationConfig.currentPage;
     req.pageSize = paginationConfig.pageSize;
-    req.orderBy = column?.order ? column.prop : 'created_at';
-    req.orderBy = req.orderBy === 'primaryDomain' ? 'primary_domain' : req.orderBy;
-    req.order = column?.order ? column.order : 'null';
+
     loading.value = true;
     await SearchWebsites(req)
         .then((res) => {
