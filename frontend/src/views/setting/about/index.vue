@@ -4,7 +4,8 @@
             <template #main>
                 <div style="text-align: center; margin-top: 20px">
                     <div style="justify-self: center">
-                        <img style="width: 80px" :src="getLogoUrl()" />
+                        <img v-if="globalStore.themeConfig.logo" style="width: 80px" :src="'/api/v1/images/logo'" />
+                        <PrimaryLogo v-else />
                     </div>
                     <h3>{{ globalStore.themeConfig.title || $t('setting.description') }}</h3>
                     <h3>
@@ -39,6 +40,7 @@ import { getSettingInfo, getSystemAvailable } from '@/api/modules/setting';
 import { onMounted, ref } from 'vue';
 import SystemUpgrade from '@/components/system-upgrade/index.vue';
 import { GlobalStore } from '@/store';
+import PrimaryLogo from '@/assets/images/1panel-logo.svg?component';
 const globalStore = GlobalStore();
 
 const version = ref();
@@ -59,14 +61,6 @@ const toIssue = () => {
 };
 const toGithubStar = () => {
     window.open('https://github.com/1Panel-dev/1Panel', '_blank', 'noopener,noreferrer');
-};
-
-const getLogoUrl = () => {
-    if (globalStore.themeConfig.logo) {
-        return '/api/v1/images/logo';
-    } else {
-        return new URL(`../../../assets/images/1panel-logo-light.png`, import.meta.url).href;
-    }
 };
 
 onMounted(() => {

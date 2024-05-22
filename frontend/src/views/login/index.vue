@@ -24,7 +24,7 @@ import LoginForm from './components/login-form.vue';
 import { ref, onMounted } from 'vue';
 import router from '@/routers';
 import { GlobalStore } from '@/store';
-import { initFavicon, resetXSetting } from '@/utils/xpack';
+import { getXpackSetting, initFavicon } from '@/utils/xpack';
 
 const gStore = GlobalStore();
 const loading = ref();
@@ -48,28 +48,12 @@ const getStatus = async () => {
 };
 
 const loadDataFromXDB = async () => {
-    const xpackModules = import.meta.globEager('../../xpack/api/modules/*.ts');
-    if (xpackModules['../../xpack/api/modules/setting.ts']) {
-        const searchXSetting = xpackModules['../../xpack/api/modules/setting.ts'].searchXSetting;
-        if (searchXSetting) {
-            await searchXSetting()
-                .then((resItem) => {
-                    gStore.themeConfig.title = resItem.data.title;
-                    gStore.themeConfig.logo = resItem.data.logo;
-                    gStore.themeConfig.logoWithText = resItem.data.logoWithText;
-                    gStore.themeConfig.favicon = resItem.data.favicon;
-                })
-                .catch(() => {
-                    loading.value = false;
-                    resetXSetting();
-                });
-        } else {
-            loading.value = false;
-            resetXSetting();
-        }
-    } else {
-        loading.value = false;
-        resetXSetting();
+    const res = await getXpackSetting();
+    if (res) {
+        gStore.themeConfig.title = res.data.title;
+        gStore.themeConfig.logo = res.data.logo;
+        gStore.themeConfig.logoWithText = res.data.logoWithText;
+        gStore.themeConfig.favicon = res.data.favicon;
     }
     loading.value = false;
     initFavicon();

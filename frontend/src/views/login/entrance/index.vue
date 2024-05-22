@@ -50,7 +50,7 @@ import ErrDomain from '@/components/error-message/err_domain.vue';
 import ErrFound from '@/components/error-message/404.vue';
 import { ref, onMounted } from 'vue';
 import { GlobalStore } from '@/store';
-import { initFavicon, resetXSetting } from '@/utils/xpack';
+import { getXpackSetting, initFavicon } from '@/utils/xpack';
 const globalStore = GlobalStore();
 
 const screenWidth = ref(null);
@@ -116,28 +116,12 @@ const getStatus = async () => {
 };
 
 const loadDataFromXDB = async () => {
-    const xpackModules = import.meta.globEager('../../../xpack/api/modules/*.ts');
-    if (xpackModules['../../../xpack/api/modules/setting.ts']) {
-        const searchXSetting = xpackModules['../../../xpack/api/modules/setting.ts'].searchXSetting;
-        if (searchXSetting) {
-            await searchXSetting()
-                .then((res) => {
-                    globalStore.themeConfig.title = res.data.title;
-                    globalStore.themeConfig.logo = res.data.logo;
-                    globalStore.themeConfig.logoWithText = res.data.logoWithText;
-                    globalStore.themeConfig.favicon = res.data.favicon;
-                })
-                .catch(() => {
-                    loading.value = false;
-                    resetXSetting();
-                });
-        } else {
-            loading.value = false;
-            resetXSetting();
-        }
-    } else {
-        loading.value = false;
-        resetXSetting();
+    const res = await getXpackSetting();
+    if (res) {
+        globalStore.themeConfig.title = res.data.title;
+        globalStore.themeConfig.logo = res.data.logo;
+        globalStore.themeConfig.logoWithText = res.data.logoWithText;
+        globalStore.themeConfig.favicon = res.data.favicon;
     }
     loading.value = false;
     initFavicon();

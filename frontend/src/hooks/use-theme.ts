@@ -1,48 +1,62 @@
-import { computed, onBeforeMount } from 'vue';
-import { getLightColor, getDarkColor } from '@/utils/theme/tool';
+import { onBeforeMount, watch } from 'vue';
 import { GlobalStore } from '@/store';
-import { MsgSuccess } from '@/utils/message';
+import { storeToRefs } from 'pinia';
 
 export const useTheme = () => {
-    const globalStore = GlobalStore();
-    const themeConfig = computed(() => globalStore.themeConfig);
+    const { themeConfig } = storeToRefs(GlobalStore());
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
 
-    const switchDark = () => {
+    /**
+     * This method is only executed when loading or manually switching for the first time.
+     */
+    const switchTheme = () => {
         if (themeConfig.value.theme === 'auto') {
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
             themeConfig.value.theme = prefersDark.matches ? 'dark' : 'light';
+            if (prefersDark.addEventListener) {
+                prefersDark.addEventListener('change', switchAccordingUserProxyTheme);
+            } else if (prefersDark.addListener) {
+                prefersDark.addListener(switchAccordingUserProxyTheme);
+            }
+        } else {
+            prefersDark.removeEventListener('change', switchAccordingUserProxyTheme);
+            prefersDark.removeListener(switchAccordingUserProxyTheme);
         }
-        const body = document.documentElement as HTMLElement;
-        if (themeConfig.value.theme === 'dark') body.setAttribute('class', 'dark');
-        else body.setAttribute('class', '');
+        updateTheme(themeConfig.value.theme);
     };
 
-    const changePrimary = (val: string) => {
-        if (!val) {
-            val = '#409EFF';
-            MsgSuccess('主题颜色已重置为 #409EFF');
-        }
-        globalStore.setThemeConfig({ ...themeConfig.value, primary: val });
-        document.documentElement.style.setProperty(
-            '--el-color-primary-dark-2',
-            `${getDarkColor(themeConfig.value.primary, 0.1)}`,
-        );
-        document.documentElement.style.setProperty('--el-color-primary', themeConfig.value.primary);
-        for (let i = 1; i <= 9; i++) {
-            document.documentElement.style.setProperty(
-                `--el-color-primary-light-${i}`,
-                `${getLightColor(themeConfig.value.primary, i / 10)}`,
-            );
-        }
+    const switchAccordingUserProxyTheme = (event: MediaQueryListEvent) => {
+        const preferTheme = event.matches ? 'dark' : 'light';
+
+        themeConfig.value.theme = preferTheme;
+        updateTheme(preferTheme);
+    };
+
+    const updateTheme = (theme: string) => {
+        const body = document.documentElement as HTMLElement;
+        body.setAttribute('class', theme);
     };
 
     onBeforeMount(() => {
-        switchDark();
-        changePrimary(themeConfig.value.primary);
+        updateTheme(themeConfig.value.theme);
+    });
+
+    /**
+     * Called internally by the system for automatically switching themes
+     */
+    const autoSwitchTheme = () => {
+        let preferTheme = themeConfig.value.theme;
+        if (themeConfig.value.theme === 'auto') {
+            preferTheme = prefersDark.matches ? 'dark' : 'light';
+        }
+        updateTheme(preferTheme);
+    };
+
+    watch(themeConfig, () => {
+        autoSwitchTheme();
     });
 
     return {
-        switchDark,
-        changePrimary,
+        autoSwitchTheme,
+        switchTheme,
     };
 };

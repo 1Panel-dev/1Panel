@@ -24,7 +24,7 @@ import { useI18n } from 'vue-i18n';
 import { useTheme } from '@/hooks/use-theme';
 import { getLicenseStatus, getSettingInfo, getSystemAvailable } from '@/api/modules/setting';
 import { useRoute, useRouter } from 'vue-router';
-import { initFavicon, resetXSetting } from '@/utils/xpack';
+import { getXpackSetting, initFavicon, resetXSetting } from '@/utils/xpack';
 useResize();
 
 const router = useRouter();
@@ -37,7 +37,7 @@ const i18n = useI18n();
 const loading = ref(false);
 const loadingText = ref();
 const themeConfig = computed(() => globalStore.themeConfig);
-const { switchDark } = useTheme();
+const { switchTheme } = useTheme();
 
 let timer: NodeJS.Timer | null = null;
 
@@ -79,26 +79,20 @@ const loadDataFromDB = async () => {
     globalStore.entrance = res.data.securityEntrance;
     globalStore.setOpenMenuTabs(res.data.menuTabs === 'enable');
     globalStore.updateLanguage(res.data.language);
-    globalStore.setThemeConfig({ ...themeConfig.value, theme: res.data.theme });
-    globalStore.setThemeConfig({ ...themeConfig.value, panelName: res.data.panelName });
-    switchDark();
+    globalStore.setThemeConfig({ ...themeConfig.value, theme: res.data.theme, panelName: res.data.panelName });
 };
 
 const loadDataFromXDB = async () => {
-    const xpackModules = import.meta.globEager('../xpack/api/modules/*.ts');
-    if (xpackModules['../xpack/api/modules/setting.ts']) {
-        const searchXSetting = xpackModules['../xpack/api/modules/setting.ts'].searchXSetting;
-        if (searchXSetting) {
-            const res = await searchXSetting();
-            globalStore.themeConfig.title = res.data.title;
-            globalStore.themeConfig.logo = res.data.logo;
-            globalStore.themeConfig.logoWithText = res.data.logoWithText;
-            globalStore.themeConfig.favicon = res.data.favicon;
-        } else {
-            resetXSetting();
-        }
-    } else {
-        resetXSetting();
+    const res = await getXpackSetting();
+    if (res) {
+        globalStore.setThemeConfig({
+            ...themeConfig.value,
+            title: res.data.title,
+            logo: res.data.logo,
+            logoWithText: res.data.logoWithText,
+            favicon: res.data.favicon,
+            theme: res.data.theme || 'dark-gold',
+        });
     }
     initFavicon();
 };
@@ -116,20 +110,8 @@ const loadProductProFromDB = async () => {
         loadDataFromXDB();
         globalStore.productProExpires = Number(res.data.productPro);
     } else {
-        globalStore.themeConfig.title = '';
-        globalStore.themeConfig.logo = '';
-        globalStore.themeConfig.logoWithText = '';
-        globalStore.themeConfig.favicon = '';
+        resetXSetting();
     }
-};
-
-const updateDarkMode = async (event: MediaQueryListEvent) => {
-    const res = await getSettingInfo();
-    if (res.data.theme !== 'auto') {
-        return;
-    }
-    globalStore.setThemeConfig({ ...themeConfig.value, theme: event.matches ? 'dark' : 'light' });
-    switchDark();
 };
 
 const loadStatus = async () => {
@@ -166,17 +148,7 @@ onMounted(() => {
     initFavicon();
     loadDataFromDB();
     loadProductProFromDB();
-
-    const mqList = window.matchMedia('(prefers-color-scheme: dark)');
-    if (mqList.addEventListener) {
-        mqList.addEventListener('change', (e) => {
-            updateDarkMode(e);
-        });
-    } else if (mqList.addListener) {
-        mqList.addListener((e) => {
-            updateDarkMode(e);
-        });
-    }
+    switchTheme();
 });
 </script>
 

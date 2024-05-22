@@ -87,6 +87,7 @@
         "vite-plugin-eslint": "^1.6.0",
         "vite-plugin-html": "^3.2.0",
         "vite-plugin-vue-setup-extend": "^0.4.0",
+        "vite-svg-loader": "^5.1.0",
         "vue-tsc": "^0.29.8"
     },
     "overrides": {

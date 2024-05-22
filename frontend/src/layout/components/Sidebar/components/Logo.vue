@@ -1,34 +1,33 @@
 <template>
-    <div class="logo">
-        <img :src="getLogoUrl(isCollapse)" style="cursor: pointer" alt="logo" @click="goHome" />
+    <div class="logo" style="cursor: pointer" @click="goHome">
+        <template v-if="isCollapse">
+            <img v-if="globalStore.themeConfig.logo" :src="'/api/v1/images/logo'" style="cursor: pointer" alt="logo" />
+            <MenuLogo v-else />
+        </template>
+        <template v-else>
+            <img
+                v-if="globalStore.themeConfig.logoWithText"
+                :src="'/api/v1/images/logoWithText'"
+                style="cursor: pointer"
+                alt="logo"
+            />
+            <PrimaryLogo v-else />
+        </template>
     </div>
 </template>
 
 <script setup lang="ts">
 import router from '@/routers';
 import { GlobalStore } from '@/store';
+import PrimaryLogo from '@/assets/images/1panel-logo.svg?component';
+import MenuLogo from '@/assets/images/1panel-menu-logo.svg?component';
 
 defineProps<{ isCollapse: boolean }>();
+
 const globalStore = GlobalStore();
 
 const goHome = () => {
     router.push({ name: 'home' });
-};
-
-const getLogoUrl = (isCollapse: boolean) => {
-    if (isCollapse) {
-        if (globalStore.themeConfig.logo) {
-            return '/api/v1/images/logo';
-        } else {
-            return new URL(`../../../../assets/images/1panel-logo-light.png`, import.meta.url).href;
-        }
-    } else {
-        if (globalStore.themeConfig.logoWithText) {
-            return '/api/v1/images/logoWithText';
-        } else {
-            return new URL(`../../../../assets/images/1panel-menu-light.png`, import.meta.url).href;
-        }
-    }
 };
 </script>
 

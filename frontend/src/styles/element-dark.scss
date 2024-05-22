@@ -335,4 +335,29 @@ html.dark {
     .file-item:hover {
         background-color: #4f4f4f;
     }
+
+    .level-up-pro {
+        --dark-gold-base-color: #eaba63;
+        --dark-gold-text-color: #1f2329;
+        --el-color-primary: var(--dark-gold-base-color);
+
+        .title {
+            color: var(--dark-gold-base-color);
+        }
+        .el-button--primary {
+            &.is-plain {
+                background: var(--dark-gold-base-color);
+                --el-button-text-color: var(--dark-gold-text-color);
+
+                &.is-disabled {
+                    background: #1d2023;
+                    border-color: #303438;
+                }
+            }
+
+            &.is-text {
+                --el-button-text-color: var(--dark-gold-base-color);
+            }
+        }
+    }
 }

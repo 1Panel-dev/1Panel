@@ -64,11 +64,7 @@
                     {{ upgradeInfo.testVersion }}
                 </el-radio>
             </el-radio-group>
-            <MdEditor
-                v-model="upgradeInfo.releaseNote"
-                previewOnly
-                :theme="globalStore.$state.themeConfig.theme === 'dark' ? 'dark' : 'light'"
-            />
+            <MdEditor v-model="upgradeInfo.releaseNote" previewOnly :theme="isDarkTheme ? 'dark' : 'light'" />
         </div>
         <template #footer>
             <span class="dialog-footer">
@@ -88,7 +84,10 @@ import { MsgSuccess } from '@/utils/message';
 import { onMounted, ref } from 'vue';
 import { GlobalStore } from '@/store';
 import { ElMessageBox } from 'element-plus';
+import { storeToRefs } from 'pinia';
+
 const globalStore = GlobalStore();
+const { isDarkTheme } = storeToRefs(globalStore);
 
 const version = ref<string>('');
 const isProductPro = ref();
