@@ -1,4 +1,4 @@
-import { onBeforeMount } from 'vue';
+import { onBeforeMount, watch } from 'vue';
 import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
 
@@ -40,7 +40,23 @@ export const useTheme = () => {
         updateTheme(themeConfig.value.theme);
     });
 
+    /**
+     * Called internally by the system for automatically switching themes
+     */
+    const autoSwitchTheme = () => {
+        let preferTheme = themeConfig.value.theme;
+        if (themeConfig.value.theme === 'auto') {
+            preferTheme = prefersDark.matches ? 'dark' : 'light';
+        }
+        updateTheme(preferTheme);
+    };
+
+    watch(themeConfig, () => {
+        autoSwitchTheme();
+    });
+
     return {
+        autoSwitchTheme,
         switchTheme,
     };
 };
