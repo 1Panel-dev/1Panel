@@ -129,7 +129,10 @@ func (r *Local) Backup(info BackupInfo) error {
 			return fmt.Errorf("mkdir %s failed, err: %v", info.TargetDir, err)
 		}
 	}
-	outfile, _ := os.OpenFile(path.Join(info.TargetDir, info.FileName), os.O_RDWR|os.O_CREATE, 0755)
+	outfile, err := os.OpenFile(path.Join(info.TargetDir, info.FileName), os.O_RDWR|os.O_CREATE, 0755)
+	if err == nil {
+		defer outfile.Close()
+	}
 	global.LOG.Infof("start to pg_dump | gzip > %s.gzip", info.TargetDir+"/"+info.FileName)
 	cmd := exec.Command("docker", "exec", r.ContainerName, "pg_dump", "-F", "c", "-U", r.Username, "-d", info.Name)
 	gzipCmd := exec.Command("gzip", "-cf")
