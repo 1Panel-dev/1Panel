@@ -609,7 +609,7 @@ func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int)
 	if err != nil {
 		return err
 	}
-
+	defer targetFile.Close()
 	for i := 0; i < chunkCount; i++ {
 		chunkPath := filepath.Join(fileDir, fmt.Sprintf("%s.%d", fileName, i))
 		chunkData, err := os.ReadFile(chunkPath)
