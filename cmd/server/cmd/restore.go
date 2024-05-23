@@ -27,7 +27,7 @@ var restoreCmd = &cobra.Command{
 			fmt.Println("请使用 sudo 1pctl restore 或者切换到 root 用户")
 			return nil
 		}
-		stdout, err := cmdUtils.Exec("grep '^BASE_DIR=' /usr/bin/1pctl | cut -d'=' -f2")
+		stdout, err := cmdUtils.Exec("grep '^BASE_DIR=' /usr/local/bin/1pctl | cut -d'=' -f2")
 		if err != nil {
 			return fmt.Errorf("handle load `BASE_DIR` failed, err: %v", err)
 		}
