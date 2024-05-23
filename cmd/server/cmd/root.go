@@ -34,13 +34,13 @@ type setting struct {
 }
 
 func loadDBConn() (*gorm.DB, error) {
-	stdout, err := cmdUtils.Exec("grep '^BASE_DIR=' /usr/bin/1pctl | cut -d'=' -f2")
+	stdout, err := cmdUtils.Exec("grep '^BASE_DIR=' /usr/local/bin/1pctl | cut -d'=' -f2")
 	if err != nil {
 		return nil, fmt.Errorf("handle load `BASE_DIR` failed, err: %v", err)
 	}
 	baseDir := strings.ReplaceAll(stdout, "\n", "")
 	if len(baseDir) == 0 {
-		return nil, fmt.Errorf("error `BASE_DIR` find in /usr/bin/1pctl \n")
+		return nil, fmt.Errorf("error `BASE_DIR` find in /usr/local/bin/1pctl \n")
 	}
 	if strings.HasSuffix(baseDir, "/") {
 		baseDir = baseDir[:strings.LastIndex(baseDir, "/")]
