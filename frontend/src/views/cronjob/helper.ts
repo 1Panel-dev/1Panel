@@ -92,10 +92,12 @@ export function transObjToSpec(specType: string, week, day, hour, minute, second
         case 'perWeek':
             return `${minute} ${hour} * * ${week}`;
         case 'perNDay':
+            day = Number(day) + 1 + '';
             return `${minute} ${hour} */${day} * *`;
         case 'perDay':
             return `${minute} ${hour} * * *`;
         case 'perNHour':
+            hour = Number(hour) + 1 + '';
             return `${minute} */${hour} * * *`;
         case 'perHour':
             return `${minute} * * * *`;
@@ -139,13 +141,13 @@ export function transSpecToObj(spec: string) {
     }
     if (specs[1].indexOf('*/') !== -1) {
         specItem.specType = 'perNHour';
-        specItem.hour = Number(specs[1].replaceAll('*/', ''));
+        specItem.hour = Number(specs[1].replaceAll('*/', '')) - 1;
         return specItem;
     }
     specItem.hour = Number(specs[1]);
     if (specs[2].indexOf('*/') !== -1) {
         specItem.specType = 'perNDay';
-        specItem.day = Number(specs[2].replaceAll('*/', ''));
+        specItem.day = Number(specs[2].replaceAll('*/', '')) - 1;
         return specItem;
     }
     if (specs[2] !== '*') {
