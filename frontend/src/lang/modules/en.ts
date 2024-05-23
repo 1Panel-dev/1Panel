@@ -269,6 +269,7 @@ const message = {
             year: 'Year',
             time: 'Time',
             core: 'Core',
+            millisecond: 'Millisecond',
         },
         operate: {
             down: 'Stop',
