@@ -608,6 +608,8 @@ func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int,
 	dstInfo, statErr := os.Stat(dstFileName)
 	if statErr == nil {
 		mode = dstInfo.Mode()
+	} else {
+		mode = 0644
 	}
 	if overwrite {
 		_ = os.Remove(dstFileName)
