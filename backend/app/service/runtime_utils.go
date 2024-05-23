@@ -150,6 +150,7 @@ func runComposeCmdWithLog(operate string, composePath string, logPath string) er
 		global.LOG.Errorf("Failed to open log file: %v", err)
 		return err
 	}
+	defer logFile.Close()
 	multiWriterStdout := io.MultiWriter(os.Stdout, logFile)
 	cmd.Stdout = multiWriterStdout
 	var stderrBuf bytes.Buffer
