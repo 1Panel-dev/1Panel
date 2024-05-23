@@ -235,7 +235,10 @@ func (r *Remote) Backup(info BackupInfo) error {
 			return fmt.Errorf("mkdir %s failed, err: %v", info.TargetDir, err)
 		}
 	}
-	outfile, _ := os.OpenFile(path.Join(info.TargetDir, info.FileName), os.O_RDWR|os.O_CREATE, 0755)
+	outfile, err := os.OpenFile(path.Join(info.TargetDir, info.FileName), os.O_RDWR|os.O_CREATE, 0755)
+	if err == nil {
+		defer outfile.Close()
+	}
 	dumpCmd := "mysqldump"
 	if r.Type == constant.AppMariaDB {
 		dumpCmd = "mariadb-dump"
