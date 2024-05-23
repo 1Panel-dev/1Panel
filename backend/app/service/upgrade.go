@@ -175,7 +175,7 @@ func (u *UpgradeService) handleBackup(fileOp files.FileOp, originalDir string) e
 		return err
 	}
 	checkPointOfWal()
-	if err := handleTar(path.Join(global.CONF.System.BaseDir, "1panel/db"), originalDir, "db.tar.gz", "./1Panel.db-*"); err != nil {
+	if err := handleTar(path.Join(global.CONF.System.BaseDir, "1panel/db"), originalDir, "db.tar.gz", "db/1Panel.db-*"); err != nil {
 		return err
 	}
 	return nil
