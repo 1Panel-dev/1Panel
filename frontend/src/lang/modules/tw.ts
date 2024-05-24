@@ -267,6 +267,7 @@ const message = {
             year: '年',
             time: '次',
             core: '核',
+            millisecond: '毫秒',
         },
         operate: {
             down: '停止',
