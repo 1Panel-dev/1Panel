@@ -592,7 +592,7 @@ func (b *BaseApi) Size(c *gin.Context) {
 	helper.SuccessWithData(c, res)
 }
 
-func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int) error {
+func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int, overwrite bool) error {
 	op := files.NewFileOp()
 	dstDir = strings.TrimSpace(dstDir)
 	mode, _ := files.GetParentMode(dstDir)
@@ -604,8 +604,17 @@ func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int)
 			return err
 		}
 	}
-
-	targetFile, err := os.OpenFile(filepath.Join(dstDir, fileName), os.O_RDWR|os.O_CREATE, mode)
+	dstFileName := filepath.Join(dstDir, fileName)
+	dstInfo, statErr := os.Stat(dstFileName)
+	if statErr == nil {
+		mode = dstInfo.Mode()
+	} else {
+		mode = 0644
+	}
+	if overwrite {
+		_ = os.Remove(dstFileName)
+	}
+	targetFile, err := os.OpenFile(dstFileName, os.O_RDWR|os.O_CREATE, mode)
 	if err != nil {
 		return err
 	}
@@ -704,7 +713,11 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 	}
 
 	if chunkIndex+1 == chunkCount {
-		err = mergeChunks(filename, fileDir, c.PostForm("path"), chunkCount)
+		overwrite := true
+		if ow := c.PostForm("overwrite"); ow != "" {
+			overwrite, _ = strconv.ParseBool(ow)
+		}
+		err = mergeChunks(filename, fileDir, c.PostForm("path"), chunkCount, overwrite)
 		if err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, buserr.WithMap(constant.ErrFileUpload, map[string]interface{}{"name": filename, "detail": err.Error()}, err))
 			return
