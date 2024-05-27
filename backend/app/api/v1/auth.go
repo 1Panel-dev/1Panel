@@ -114,12 +114,29 @@ func (b *BaseApi) Captcha(c *gin.Context) {
 // @Router /auth/issafety [get]
 func (b *BaseApi) CheckIsSafety(c *gin.Context) {
 	code := c.DefaultQuery("code", "")
-	isSafe := authService.CheckIsSafety(code)
-	if !isSafe {
+	status, err := authService.CheckIsSafety(code)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	if status == "disable" && len(code) != 0 {
+		helper.ErrorWithDetail(c, constant.CodeErrNotFound, constant.ErrTypeInternalServer, err)
+		return
+	}
+	if status == "unpass" {
 		helper.ErrResponse(c, middleware.LoadErrCode("err-entrance"))
 		return
 	}
 	helper.SuccessWithOutData(c)
+}
+
+func (b *BaseApi) GetResponsePage(c *gin.Context) {
+	pageCode, err := authService.GetResponsePage()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, pageCode)
 }
 
 // @Tags Auth

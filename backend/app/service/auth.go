@@ -19,7 +19,8 @@ import (
 type AuthService struct{}
 
 type IAuthService interface {
-	CheckIsSafety(code string) bool
+	CheckIsSafety(code string) (string, error)
+	GetResponsePage() (string, error)
 	VerifyCode(code string) (bool, error)
 	Login(c *gin.Context, info dto.Login, entrance string) (*dto.UserLoginInfo, error)
 	LogOut(c *gin.Context) error
@@ -172,16 +173,24 @@ func (u *AuthService) VerifyCode(code string) (bool, error) {
 	return hmac.Equal([]byte(setting.Value), []byte(code)), nil
 }
 
-func (u *AuthService) CheckIsSafety(code string) bool {
+func (u *AuthService) CheckIsSafety(code string) (string, error) {
 	status, err := settingRepo.Get(settingRepo.WithByKey("SecurityEntrance"))
 	if err != nil {
-		return true
+		return "", err
 	}
 	if len(status.Value) == 0 {
-		return true
+		return "disable", nil
 	}
 	if status.Value == code {
-		return true
+		return "pass", nil
 	}
-	return false
+	return "unpass", nil
+}
+
+func (u *AuthService) GetResponsePage() (string, error) {
+	pageCode, err := settingRepo.Get(settingRepo.WithByKey("NoAuthSetting"))
+	if err != nil {
+		return "", err
+	}
+	return pageCode.Value, nil
 }
