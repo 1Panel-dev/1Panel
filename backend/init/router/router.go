@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	v1 "github.com/1Panel-dev/1Panel/backend/app/api/v1"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"github.com/1Panel-dev/1Panel/backend/middleware"
@@ -64,8 +63,6 @@ func Routers() *gin.Engine {
 		PublicGroup.GET("/health", func(c *gin.Context) {
 			c.JSON(200, "ok")
 		})
-		baseApi := v1.ApiGroupApp.BaseApi
-		PublicGroup.GET("/api/v1/respagecode", baseApi.GetResponsePage)
 		PublicGroup.Use(gzip.Gzip(gzip.DefaultCompression))
 		setWebStatic(PublicGroup)
 	}

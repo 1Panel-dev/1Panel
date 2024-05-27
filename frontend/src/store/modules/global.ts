@@ -38,6 +38,8 @@ const GlobalStore = defineStore({
 
         isProductPro: false,
         productProExpires: 0,
+
+        errStatus: '',
     }),
     getters: {
         isDarkTheme: (state) => state.themeConfig.theme === 'dark' || state.themeConfig.theme === 'dark-gold',

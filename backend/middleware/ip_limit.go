@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"errors"
 	"net"
 	"strings"
 
@@ -35,7 +34,7 @@ func WhiteAllow() gin.HandlerFunc {
 				return
 			}
 		}
-		helper.ErrorWithDetail(c, constant.CodeErrIP, constant.ErrTypeInternalServer, errors.New("IP address not allowed"))
+		helper.ErrResponse(c, LoadErrCode("err-ip"))
 	}
 }
 

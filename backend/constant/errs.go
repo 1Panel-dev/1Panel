@@ -8,16 +8,14 @@ const (
 	CodeSuccess           = 200
 	CodeErrBadRequest     = 400
 	CodeErrUnauthorized   = 401
-	CodeErrUnSafety       = 402
-	CodeErrForbidden      = 403
-	CodeErrNotFound       = 404
-	CodePasswordExpired   = 405
 	CodeAuth              = 406
 	CodeGlobalLoading     = 407
-	CodeErrIP             = 408
-	CodeErrDomain         = 409
 	CodeErrInternalServer = 500
-	CodeErrHeader         = 406
+
+	CodeErrIP           = 310
+	CodeErrDomain       = 311
+	CodeErrEntrance     = 312
+	CodePasswordExpired = 313
 
 	CodeErrXpack = 410
 )

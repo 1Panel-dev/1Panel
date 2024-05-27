@@ -18,22 +18,20 @@
             </div>
 
             <div v-else>
-                <div v-if="!pageCode || pageCode === '200'">
-                    <div v-if="errStatus === 'err-unsafe'">
-                        <UnSafe />
-                    </div>
-                    <div v-if="errStatus === 'err-ip'">
-                        <ErrIP />
-                    </div>
-                    <div v-if="errStatus === 'err-domain'">
-                        <ErrDomain />
-                    </div>
-                    <div v-if="errStatus === 'not-found'">
-                        <ErrFound />
-                    </div>
+                <div v-if="errStatus === 'err-unsafe'">
+                    <UnSafe />
                 </div>
-                <div v-else>
-                    <ErrCode :code="pageCode" />
+                <div v-if="errStatus === 'err-ip'">
+                    <ErrIP />
+                </div>
+                <div v-if="errStatus === 'err-domain'">
+                    <ErrDomain />
+                </div>
+                <div v-if="errStatus.indexOf('code-') !== -1">
+                    <ErrCode :code="errStatus.replaceAll('code-', '')" />
+                </div>
+                <div v-if="errStatus === 'not-found'">
+                    <ErrFound />
                 </div>
             </div>
         </div>
@@ -41,7 +39,7 @@
 </template>
 
 <script setup lang="ts" name="login">
-import { checkIsSafety, getResponsePage } from '@/api/modules/auth';
+import { checkIsSafety } from '@/api/modules/auth';
 import LoginForm from '../components/login-form.vue';
 import UnSafe from '@/components/error-message/unsafe.vue';
 import ErrIP from '@/components/error-message/err_ip.vue';
@@ -54,8 +52,7 @@ import { getXpackSetting, initFavicon } from '@/utils/xpack';
 const globalStore = GlobalStore();
 
 const screenWidth = ref(null);
-const errStatus = ref();
-const pageCode = ref('');
+const errStatus = ref('');
 const loading = ref();
 
 const mySafetyCode = defineProps({
@@ -66,52 +63,35 @@ const mySafetyCode = defineProps({
 });
 
 const getStatus = async () => {
+    let info = globalStore.errStatus;
+    if (info?.startsWith('err-') || info?.startsWith('code-')) {
+        errStatus.value = info;
+        return;
+    }
     let code = mySafetyCode.code;
+    globalStore.entrance = code;
     loading.value = true;
-    await getResponsePage()
-        .then(async (res) => {
-            pageCode.value = res.data;
-            if (code === 'err-ip' || code === 'err-domain') {
-                errStatus.value = code;
-                loading.value = false;
-                return;
-            }
-            await checkIsSafety(code)
-                .then((safeRes) => {
-                    if (safeRes.data === 'unpass') {
-                        loading.value = false;
-                        errStatus.value = 'err-unsafe';
-                        return;
-                    }
-                    if (safeRes.data === 'disable') {
-                        if (code !== '') {
-                            errStatus.value = 'not-found';
-                            loading.value = false;
-                            return;
-                        }
-                    }
-                    globalStore.entrance = code;
-                    errStatus.value = '';
-                    loadDataFromXDB();
-                })
-                .catch((errRes) => {
-                    pageCode.value = pageCode.value || '200';
-                    loading.value = false;
-                    if (errRes?.code === 408) {
-                        errStatus.value = 'err-ip';
-                        return;
-                    }
-                    if (errRes?.code === 409) {
-                        errStatus.value = 'err-domain';
-                        return;
-                    }
-                    errStatus.value = 'err-unsafe';
-                });
-        })
-        .catch(() => {
-            pageCode.value = '200';
-            errStatus.value = 'err-found';
+    await checkIsSafety(code)
+        .then(() => {
             loading.value = false;
+            errStatus.value = '';
+            loadDataFromXDB();
+        })
+        .catch((err) => {
+            loading.value = false;
+            switch (err.response.status) {
+                case 310:
+                    errStatus.value = 'err-ip';
+                    return;
+                case 311:
+                    errStatus.value = 'err-domain';
+                    return;
+                case 312:
+                    errStatus.value = 'err-entrance';
+                    return;
+                default:
+                    errStatus.value = 'code-' + err.response.status;
+            }
         });
 };
 
