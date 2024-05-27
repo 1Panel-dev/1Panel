@@ -133,3 +133,8 @@ func CheckBind(req interface{}, c *gin.Context) error {
 	}
 	return nil
 }
+
+func ErrResponse(ctx *gin.Context, code int) {
+	ctx.JSON(code, nil)
+	ctx.Abort()
+}

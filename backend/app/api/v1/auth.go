@@ -8,6 +8,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/middleware"
 	"github.com/1Panel-dev/1Panel/backend/utils/captcha"
 	"github.com/1Panel-dev/1Panel/backend/utils/qqwry"
 	"github.com/gin-gonic/gin"
@@ -113,21 +114,12 @@ func (b *BaseApi) Captcha(c *gin.Context) {
 // @Router /auth/issafety [get]
 func (b *BaseApi) CheckIsSafety(c *gin.Context) {
 	code := c.DefaultQuery("code", "")
-	status, err := authService.CheckIsSafety(code)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+	isSafe := authService.CheckIsSafety(code)
+	if !isSafe {
+		helper.ErrResponse(c, middleware.LoadErrCode("err-entrance"))
 		return
 	}
-	helper.SuccessWithData(c, status)
-}
-
-func (b *BaseApi) GetResponsePage(c *gin.Context) {
-	pageCode, err := authService.GetResponsePage()
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	helper.SuccessWithData(c, pageCode)
+	helper.SuccessWithOutData(c)
 }
 
 // @Tags Auth

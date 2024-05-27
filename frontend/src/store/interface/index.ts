@@ -34,6 +34,8 @@ export interface GlobalState {
 
     isProductPro: boolean;
     productProExpires: number;
+
+    errStatus: string;
 }
 
 export interface MenuState {
