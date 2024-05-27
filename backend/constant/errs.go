@@ -8,6 +8,7 @@ const (
 	CodeSuccess           = 200
 	CodeErrBadRequest     = 400
 	CodeErrUnauthorized   = 401
+	CodeErrNotFound       = 404
 	CodeAuth              = 406
 	CodeGlobalLoading     = 407
 	CodeErrInternalServer = 500

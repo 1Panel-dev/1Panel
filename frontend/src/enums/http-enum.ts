@@ -8,6 +8,7 @@ export enum ResultEnum {
     ERROR = 500,
     OVERDUE = 401,
     FORBIDDEN = 403,
+    NOTFOUND = 404,
     ERRAUTH = 406,
     ERRGLOBALLOADDING = 407,
     ERRXPACK = 410,

@@ -51,6 +51,10 @@ class RequestHttp {
                     });
                     return Promise.reject(data);
                 }
+                if (data.code == ResultEnum.NOTFOUND) {
+                    globalStore.errStatus = 'err-found';
+                    return;
+                }
                 if (data.code == ResultEnum.ERRXPACK) {
                     globalStore.isProductPro = false;
                     window.location.reload();
@@ -77,6 +81,7 @@ class RequestHttp {
             async (error: AxiosError) => {
                 globalStore.errStatus = '';
                 const { response } = error;
+                console.log(response.status);
                 if (error.message.indexOf('timeout') !== -1) MsgError('请求超时！请您稍后重试');
                 if (response) {
                     switch (response.status) {
