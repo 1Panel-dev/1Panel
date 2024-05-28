@@ -27,7 +27,7 @@ type NginxRewriteReq struct {
 type NginxRewriteUpdate struct {
 	WebsiteID uint   `json:"websiteId" validate:"required"`
 	Name      string `json:"name" validate:"required"`
-	Content   string `json:"content" validate:"required"`
+	Content   string `json:"content"`
 }
 
 type NginxProxyUpdate struct {
