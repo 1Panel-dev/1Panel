@@ -31,6 +31,8 @@
 curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_start.sh && sudo bash quick_start.sh
 ```
 
+如果是用于离线环境，推荐使用 [安装包方式](https://1panel.cn/docs/installation/package_installation/) 进行安装部署。
+
 **学习资料**
 
 - [在线文档](https://1panel.cn/docs/)
