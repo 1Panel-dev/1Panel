@@ -231,6 +231,9 @@ func (f *FileService) GetContent(op request.FileContentReq) (response.FileInfo, 
 		Path:   op.Path,
 		Expand: true,
 	})
+	if err != nil {
+		return response.FileInfo{}, err
+	}
 
 	content := []byte(info.Content)
 	var decodeName string
@@ -247,9 +250,6 @@ func (f *FileService) GetContent(op request.FileContentReq) (response.FileInfo, 
 			return response.FileInfo{}, err
 		}
 		info.Content = string(contents)
-	}
-	if err != nil {
-		return response.FileInfo{}, err
 	}
 	return response.FileInfo{FileInfo: *info}, nil
 }
