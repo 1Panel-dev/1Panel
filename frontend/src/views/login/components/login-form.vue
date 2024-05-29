@@ -123,10 +123,7 @@
                     <el-form-item prop="agreeLicense">
                         <el-checkbox v-model="loginForm.agreeLicense">
                             <template #default>
-                                <span
-                                    style="white-space: pre-wrap; line-height: 14px"
-                                    v-html="$t('commons.login.licenseHelper')"
-                                ></span>
+                                <span class="agree" v-html="$t('commons.login.licenseHelper')"></span>
                             </template>
                         </el-checkbox>
                         <span
@@ -451,6 +448,8 @@ onMounted(() => {
         width: 100%;
         height: 45px;
         margin-top: 10px;
+        background-color: #005eeb;
+        color: #ffffff;
     }
 
     .demo {
@@ -471,11 +470,24 @@ onMounted(() => {
         }
     }
 
-    .l-select {
-        :deep(.el-input__wrapper) {
-            background: none !important;
-            box-shadow: none !important;
-        }
+    .agree {
+        white-space: pre-wrap;
+        line-height: 14px;
+        color: #005eeb;
+    }
+
+    :deep(.el-checkbox__input .el-checkbox__inner) {
+        background-color: #fff !important;
+        border-color: #fff !important;
+    }
+
+    :deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
+        background-color: #005eeb !important;
+        border-color: #005eeb !important;
+    }
+
+    :deep(.el-checkbox__input.is-checked .el-checkbox__inner::after) {
+        border-color: #fff !important;
     }
 }
 </style>
