@@ -43,6 +43,7 @@ type AppInstalledSearch struct {
 	Update bool     `json:"update"`
 	Unused bool     `json:"unused"`
 	All    bool     `json:"all"`
+	Sync   bool     `json:"sync"`
 }
 
 type AppInstalledInfo struct {

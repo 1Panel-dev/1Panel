@@ -353,6 +353,7 @@ const searchReq = reactive({
     name: '',
     tags: [],
     update: false,
+    sync: false,
 });
 const router = useRouter();
 const activeName = ref(i18n.global.t('app.installed'));
@@ -417,7 +418,6 @@ const search = () => {
     loading.value = true;
     searchReq.page = paginationConfig.currentPage;
     searchReq.pageSize = paginationConfig.pageSize;
-    localStorage.setItem('app-installed', searchReq.pageSize + '');
     SearchAppInstalled(searchReq)
         .then((res) => {
             data.value = res.data.items;
@@ -468,10 +468,17 @@ const operate = async () => {
     await InstalledOp(operateReq)
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            searchReq.sync = true;
             search();
             setTimeout(() => {
                 search();
-            }, 1500);
+            }, 3000);
+            setTimeout(() => {
+                search();
+            }, 5000);
+            setTimeout(() => {
+                search();
+            }, 10000);
         })
         .catch(() => {
             search();
@@ -612,9 +619,13 @@ onMounted(() => {
         searchReq.update = true;
     }
     search();
+    setTimeout(() => {
+        searchReq.sync = true;
+        search();
+    }, 1000);
     timer = setInterval(() => {
         search();
-    }, 1000 * 60);
+    }, 1000 * 20);
 });
 
 onUnmounted(() => {

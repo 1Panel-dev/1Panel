@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/docker/docker/api/types"
 	"math"
 	"os"
 	"path"
@@ -11,6 +12,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"gopkg.in/yaml.v3"
@@ -118,7 +120,7 @@ func (a *AppInstallService) Page(req request.AppInstalledSearch) (int64, []respo
 		}
 	}
 
-	installDTOs, err := handleInstalled(installs, req.Update)
+	installDTOs, err := handleInstalled(installs, req.Update, req.Sync)
 	if err != nil {
 		return 0, nil, err
 	}
@@ -220,7 +222,7 @@ func (a *AppInstallService) SearchForWebsite(req request.AppInstalledSearch) ([]
 		}
 	}
 
-	return handleInstalled(installs, false)
+	return handleInstalled(installs, false, true)
 }
 
 func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
@@ -700,24 +702,39 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 	return &res, nil
 }
 
+func measureExecutionTime(name string, fn func() error) error {
+	start := time.Now()          // 记录开始时间
+	err := fn()                  // 执行函数
+	elapsed := time.Since(start) // 计算执行时间
+
+	fmt.Printf("%s took %s\n", name, elapsed) // 输出函数名和执行时间
+	return err
+}
+
 func syncAppInstallStatus(appInstall *model.AppInstall) error {
 	if appInstall.Status == constant.Installing || appInstall.Status == constant.Rebuilding || appInstall.Status == constant.Upgrading {
 		return nil
 	}
-	containerNames, err := getContainerNames(*appInstall)
-	if err != nil {
-		return err
+	var err error
+	containerNames := []string{appInstall.ContainerName}
+	if appInstall.ContainerName == "" {
+		containerNames, err = getContainerNames(*appInstall)
+		if err != nil {
+			return err
+		}
 	}
+
 	cli, err := docker.NewClient()
 	if err != nil {
 		return err
 	}
 	defer cli.Close()
-	containers, err := cli.ListContainersByName(containerNames)
+
+	var containers []types.Container
+	containers, err = cli.ListContainersByName(containerNames)
 	if err != nil {
 		return err
 	}
-
 	var (
 		runningCount         int
 		exitedCount          int

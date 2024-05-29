@@ -57,7 +57,7 @@ func (c Client) ListContainersByName(names []string) ([]types.Container, error) 
 		namesMap = make(map[string]bool)
 		res      []types.Container
 	)
-	options.All = true
+	options.All = false
 	if len(names) > 0 {
 		var array []filters.KeyValuePair
 		for _, n := range names {

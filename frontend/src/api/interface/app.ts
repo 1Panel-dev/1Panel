@@ -99,6 +99,7 @@ export namespace App {
         tags?: string[];
         update?: boolean;
         unused?: boolean;
+        sync?: boolean;
     }
     export interface ChangePort {
         key: string;
