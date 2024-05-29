@@ -195,6 +195,8 @@ const handleParams = () => {
                 if (p.rule && p.rule != '') {
                     rules[p.envKey].push(Rules[p.rule]);
                 }
+            } else {
+                delete rules[p.envKey];
             }
             if (p.type === 'apps') {
                 getServices(p.child.envKey, p.default, p);
