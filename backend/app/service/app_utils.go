@@ -1117,14 +1117,16 @@ func handleErr(install model.AppInstall, err error, out string) error {
 	return reErr
 }
 
-func handleInstalled(appInstallList []model.AppInstall, updated bool) ([]response.AppInstalledDTO, error) {
+func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool) ([]response.AppInstalledDTO, error) {
 	var res []response.AppInstalledDTO
 	for _, installed := range appInstallList {
 		if updated && (installed.App.Type == "php" || installed.Status == constant.Installing || (installed.App.Key == constant.AppMysql && installed.Version == "5.6.51")) {
 			continue
 		}
-		if err := syncAppInstallStatus(&installed); err != nil {
-			global.LOG.Error("sync app install status error : ", err)
+		if sync {
+			if err := syncAppInstallStatus(&installed); err != nil {
+				global.LOG.Error("sync app install status error : ", err)
+			}
 		}
 
 		installDTO := response.AppInstalledDTO{
