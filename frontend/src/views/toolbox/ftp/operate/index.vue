@@ -111,8 +111,8 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
+        loading.value = true;
         if (dialogData.value.title === 'edit') {
-            loading.value = true;
             await updateFtp(dialogData.value.rowData)
                 .then(() => {
                     loading.value = false;

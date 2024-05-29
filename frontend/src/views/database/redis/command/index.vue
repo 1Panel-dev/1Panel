@@ -21,22 +21,46 @@
                 <el-table-column type="selection" fix />
                 <el-table-column :label="$t('commons.table.name')" min-width="50">
                     <template #default="{ row }">
-                        <el-input v-if="row.isOn" v-model="row.name" />
+                        <el-input v-if="row.lineStatus === 'create' || row.lineStatus === 'edit'" v-model="row.name" />
                         <span v-else>{{ row.name }}</span>
                     </template>
                 </el-table-column>
                 <el-table-column :label="$t('terminal.quickCommand')" min-width="120">
                     <template #default="{ row }">
-                        <el-input v-if="row.isOn" v-model="row.command" />
-                        <span v-else>{{ row.name }}</span>
+                        <el-input
+                            v-if="row.lineStatus === 'create' || row.lineStatus === 'edit'"
+                            v-model="row.command"
+                        />
+                        <span v-else>{{ row.command }}</span>
                     </template>
                 </el-table-column>
                 <el-table-column min-width="40">
                     <template #default="scope">
-                        <el-button link type="primary" @click="handleCmdCreate(scope.row)">
+                        <el-button
+                            v-if="scope.row.lineStatus === 'create'"
+                            link
+                            type="primary"
+                            @click="handleCmdSave(scope.row)"
+                        >
                             {{ $t('commons.button.save') }}
                         </el-button>
-                        <el-button link type="primary" @click="handleCmdDelete(scope.$index)">
+                        <el-button
+                            v-if="!scope.row.lineStatus || scope.row.lineStatus === 'saved'"
+                            link
+                            type="primary"
+                            @click="scope.row.lineStatus = 'create'"
+                        >
+                            {{ $t('commons.button.edit') }}
+                        </el-button>
+                        <el-button v-if="scope.row.lineStatus === 'create'" link type="primary" @click="search()">
+                            {{ $t('commons.button.cancel') }}
+                        </el-button>
+                        <el-button
+                            v-if="scope.row.lineStatus !== 'create'"
+                            link
+                            type="primary"
+                            @click="handleCmdDelete(scope.$index)"
+                        >
                             {{ $t('commons.button.delete') }}
                         </el-button>
                     </template>
@@ -55,7 +79,7 @@
 
 <script setup lang="ts">
 import { Command } from '@/api/interface/command';
-import { addRedisCommand, deleteRedisCommand, getRedisCommandPage } from '@/api/modules/host';
+import { saveRedisCommand, deleteRedisCommand, getRedisCommandPage } from '@/api/modules/host';
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
@@ -87,21 +111,20 @@ const handleCmdAdd = () => {
     let item = {
         name: '',
         command: '',
-        isOn: true,
+        lineStatus: 'create',
     };
     data.value.push(item);
 };
 const handleCmdDelete = (index: number) => {
     batchDelete(data.value[index]);
-    data.value.splice(index, 1);
 };
 
-const handleCmdCreate = async (row: any) => {
+const handleCmdSave = async (row: any) => {
     loading.value = true;
-    await addRedisCommand(row)
+    await saveRedisCommand(row)
         .then(() => {
             loading.value = false;
-            row.isOn = false;
+            row.lineStatus = 'saved';
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             search();
         })

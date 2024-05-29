@@ -10069,7 +10069,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: 创建 Redis 快速命令
+      description: 保存 Redis 快速命令
       parameters:
       - description: request
         in: body
@@ -10082,7 +10082,7 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Create redis command
+      summary: Save redis command
       tags:
       - Redis Command
       x-panel-log:
@@ -10090,8 +10090,8 @@ paths:
         bodyKeys:
         - name
         - command
-        formatEN: create quick command for redis [name][command]
-        formatZH: 创建 redis 快捷命令 [name][command]
+        formatEN: save quick command for redis [name][command]
+        formatZH: 保存 redis 快捷命令 [name][command]
         paramKeys: []
   /hosts/command/redis/del:
     post:

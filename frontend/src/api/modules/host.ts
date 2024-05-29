@@ -78,7 +78,7 @@ export const getRedisCommandList = () => {
 export const getRedisCommandPage = (params: SearchWithPage) => {
     return http.post<ResPage<Command.RedisCommand>>(`/hosts/command/redis/search`, params);
 };
-export const addRedisCommand = (params: Command.RedisCommand) => {
+export const saveRedisCommand = (params: Command.RedisCommand) => {
     return http.post(`/hosts/command/redis`, params);
 };
 export const deleteRedisCommand = (params: { ids: number[] }) => {

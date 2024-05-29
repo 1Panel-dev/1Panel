@@ -57,7 +57,7 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 		hostRouter.POST("/command/update", baseApi.UpdateCommand)
 
 		hostRouter.GET("/command/redis", baseApi.ListRedisCommand)
-		hostRouter.POST("/command/redis", baseApi.CreateRedisCommand)
+		hostRouter.POST("/command/redis", baseApi.SaveRedisCommand)
 		hostRouter.POST("/command/redis/search", baseApi.SearchRedisCommand)
 		hostRouter.POST("/command/redis/del", baseApi.DeleteRedisCommand)
 

@@ -128,13 +128,6 @@
                             prop="description"
                             show-overflow-tooltip
                         />
-                        <el-table-column
-                            :label="$t('commons.table.createdAt')"
-                            show-overflow-tooltip
-                            :formatter="dateFormat"
-                            :min-width="80"
-                            prop="createdAt"
-                        />
                         <fu-table-operations
                             width="200px"
                             :buttons="buttons"
@@ -174,7 +167,6 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
-import { dateFormat } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';
 import { deleteFtp, searchFtp, updateFtp, syncFtp, operateFtp, getFtpBase } from '@/api/modules/toolbox';
 import OperateDialog from '@/views/toolbox/ftp/operate/index.vue';
@@ -363,9 +355,6 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
-        disabled: (row: Toolbox.FtpInfo) => {
-            return row.status === 'deleted';
-        },
         click: (row: Toolbox.FtpInfo) => {
             onDelete(row);
         },
