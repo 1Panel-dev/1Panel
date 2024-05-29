@@ -16,6 +16,7 @@ const GlobalStore = defineStore({
             panelName: '',
             primary: '#005EEB',
             theme: 'auto',
+            isGold: false,
             footer: true,
 
             title: '',
@@ -42,8 +43,8 @@ const GlobalStore = defineStore({
         errStatus: '',
     }),
     getters: {
-        isDarkTheme: (state) => state.themeConfig.theme === 'dark' || state.themeConfig.theme === 'dark-gold',
-        isDarkGoldTheme: (state) => state.themeConfig.theme === 'dark-gold' && state.isProductPro,
+        isDarkTheme: (state) => state.themeConfig.theme === 'dark' || state.themeConfig.isGold,
+        isDarkGoldTheme: (state) => state.themeConfig.isGold && state.isProductPro,
     },
     actions: {
         setOpenMenuTabs(openMenuTabs: boolean) {

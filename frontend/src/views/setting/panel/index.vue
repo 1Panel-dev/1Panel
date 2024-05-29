@@ -190,7 +190,7 @@ const loading = ref(false);
 const i18n = useI18n();
 const globalStore = GlobalStore();
 
-const { themeConfig, isProductPro } = storeToRefs(globalStore);
+const { isProductPro } = storeToRefs(globalStore);
 
 const { switchTheme } = useTheme();
 
@@ -279,7 +279,7 @@ const search = async () => {
     if (isProductPro.value) {
         const xpackRes = await getXpackSetting();
         if (xpackRes) {
-            form.theme = xpackRes.data.theme || 'dark-gold';
+            form.theme = xpackRes.data.theme === 'dark-gold' ? 'dark-gold' : res.data.theme;
             return;
         }
     }
@@ -350,7 +350,12 @@ const onSave = async (key: string, val: any) => {
         globalStore.updateLanguage(val);
     }
     if (key === 'Theme') {
-        globalStore.setThemeConfig({ ...themeConfig.value, theme: val });
+        if (val === 'dark-gold') {
+            globalStore.themeConfig.isGold = true;
+        } else {
+            globalStore.themeConfig.isGold = false;
+            globalStore.themeConfig.theme = val;
+        }
         switchTheme();
         if (isProductPro.value) {
             let formData = new FormData();

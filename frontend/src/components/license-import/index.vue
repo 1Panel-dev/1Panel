@@ -47,8 +47,11 @@ import { MsgSuccess } from '@/utils/message';
 import { UploadFileData } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile, genFileId } from 'element-plus';
+import { useTheme } from '@/hooks/use-theme';
+import { getXpackSetting } from '@/utils/xpack';
 const globalStore = GlobalStore();
 
+const { switchTheme } = useTheme();
 const loading = ref(false);
 const open = ref(false);
 const uploadRef = ref<UploadInstance>();
@@ -84,10 +87,15 @@ const submit = async () => {
     loading.value = true;
     await UploadFileData(formData)
         .then(async () => {
+            globalStore.isProductPro = true;
+            const xpackRes = await getXpackSetting();
+            if (xpackRes) {
+                globalStore.themeConfig.isGold = xpackRes.data.theme === 'dark-gold';
+            }
             loading.value = false;
+            switchTheme();
             uploadRef.value!.clearFiles();
             uploaderFiles.value = [];
-            globalStore.isProductPro = true;
             open.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             window.location.reload();

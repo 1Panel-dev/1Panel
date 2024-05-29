@@ -91,7 +91,7 @@ const loadDataFromXDB = async () => {
             logo: res.data.logo,
             logoWithText: res.data.logoWithText,
             favicon: res.data.favicon,
-            theme: res.data.theme || 'dark-gold',
+            isGold: res.data.theme === 'dark-gold',
         });
     }
     initFavicon();
