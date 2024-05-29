@@ -174,7 +174,7 @@ onMounted(() => {
         text-align: right;
         margin-right: 10%;
         span:first-child {
-            color: $primary-color;
+            color: #005eeb;
             font-size: 40px;
             font-family: pingFangSC-Regular;
             font-weight: 600;
