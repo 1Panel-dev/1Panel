@@ -128,3 +128,13 @@ func GetParentMode(path string) (os.FileMode, error) {
 func IsInvalidChar(name string) bool {
 	return strings.Contains(name, "&")
 }
+
+func IsEmptyDir(dir string) bool {
+	f, err := os.Open(dir)
+	if err != nil {
+		return false
+	}
+	defer f.Close()
+	_, err = f.Readdirnames(1)
+	return err == io.EOF
+}
