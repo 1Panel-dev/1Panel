@@ -222,7 +222,10 @@ func loadDiskInfo() []dto.DiskInfo {
 		if len(fields) < 7 {
 			continue
 		}
-		if fields[1] == "tmpfs" {
+		if strings.HasPrefix(fields[6], "/snap") || len(strings.Split(fields[6], "/")) > 10 {
+			continue
+		}
+		if strings.TrimSpace(fields[1]) == "tmpfs" {
 			continue
 		}
 		if strings.Contains(fields[2], "K") {
