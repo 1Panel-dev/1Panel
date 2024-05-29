@@ -7674,14 +7674,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "创建 Redis 快速命令",
+                "description": "保存 Redis 快速命令",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Redis Command"
                 ],
-                "summary": "Create redis command",
+                "summary": "Save redis command",
                 "parameters": [
                     {
                         "description": "request",
@@ -7704,8 +7704,8 @@ const docTemplate = `{
                         "name",
                         "command"
                     ],
-                    "formatEN": "create quick command for redis [name][command]",
-                    "formatZH": "创建 redis 快捷命令 [name][command]",
+                    "formatEN": "save quick command for redis [name][command]",
+                    "formatZH": "保存 redis 快捷命令 [name][command]",
                     "paramKeys": []
                 }
             }

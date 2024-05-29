@@ -171,7 +171,7 @@ const message = {
                 'Supports non-special characters starting with English, Chinese, numbers, .- and _, length 1-128',
             userName: 'Support English, Chinese, numbers and _ length 3-30',
             simpleName: 'Supports non-underscore starting, English, numbers, _, length 3-30',
-            simplePassword: 'Supports non-underscore starting, English, numbers, _, length 6-30',
+            simplePassword: 'Supports non-underscore starting, English, numbers, _, length 1-30',
             dbName: 'Supports non-special character starting, including English, Chinese, numbers, .-_, with a length of 1-64',
             imageName: 'Support English, numbers, :/.-_, length 1-150',
             volumeName: 'Support English, numbers, .-_, length 2-30',

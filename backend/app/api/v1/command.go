@@ -30,21 +30,21 @@ func (b *BaseApi) CreateCommand(c *gin.Context) {
 }
 
 // @Tags Redis Command
-// @Summary Create redis command
-// @Description 创建 Redis 快速命令
+// @Summary Save redis command
+// @Description 保存 Redis 快速命令
 // @Accept json
 // @Param request body dto.RedisCommand true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /hosts/command/redis [post]
-// @x-panel-log {"bodyKeys":["name","command"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建 redis 快捷命令 [name][command]","formatEN":"create quick command for redis [name][command]"}
-func (b *BaseApi) CreateRedisCommand(c *gin.Context) {
+// @x-panel-log {"bodyKeys":["name","command"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"保存 redis 快捷命令 [name][command]","formatEN":"save quick command for redis [name][command]"}
+func (b *BaseApi) SaveRedisCommand(c *gin.Context) {
 	var req dto.RedisCommand
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 
-	if err := commandService.CreateRedisCommand(req); err != nil {
+	if err := commandService.SaveRedisCommand(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

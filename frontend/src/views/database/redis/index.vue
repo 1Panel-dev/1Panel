@@ -51,20 +51,19 @@
                     </el-option-group>
                 </el-select>
             </template>
-            <template #toolbar v-if="!isOnSetting && redisIsExist">
-                <div :class="{ mask: redisStatus != 'Running' }">
+            <template #toolbar v-if="!isOnSetting && currentDB">
+                <div :class="{ mask: redisStatus != 'Running' && currentDB.from === 'local' }">
                     <el-button type="primary" plain @click="onChangePassword">
                         {{ $t('database.databaseConnInfo') }}
                     </el-button>
                     <el-button @click="goRemoteDB" type="primary" plain>
                         {{ $t('database.remoteDB') }}
                     </el-button>
-                    <el-button type="primary" plain @click="goDashboard" icon="Position">Redis-Commander</el-button>
                 </div>
             </template>
         </LayoutContent>
 
-        <div v-if="redisIsExist && !isOnSetting" class="mt-5">
+        <div v-if="currentDB && !isOnSetting" class="mt-5">
             <Terminal
                 :style="{ height: `calc(100vh - ${loadHeight()})` }"
                 :key="isRefresh"
@@ -75,7 +74,7 @@
                 v-if="redisStatus !== 'Running' || (currentDB.from === 'remote' && !redisCliExist)"
                 :style="{ height: `calc(100vh - ${loadHeight()})`, 'background-color': '#000' }"
                 :description="
-                    currentDB.from !== 'remote'
+                    currentDB.from === 'remote'
                         ? $t('commons.service.serviceNotStarted', ['Redis'])
                         : $t('database.redisCliHelper')
                 "
@@ -116,7 +115,6 @@
             </template>
         </el-dialog>
 
-        <PortJumpDialog ref="dialogPortJumpRef" />
         <QuickCmd ref="dialogQuickCmdRef" @reload="loadQuickCmd" />
     </div>
 </template>
@@ -126,10 +124,9 @@ import Setting from '@/views/database/redis/setting/index.vue';
 import Password from '@/views/database/redis/password/index.vue';
 import Terminal from '@/components/terminal/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
-import PortJumpDialog from '@/components/port-jump/index.vue';
 import QuickCmd from '@/views/database/redis/command/index.vue';
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
-import { CheckAppInstalled, GetAppPort } from '@/api/modules/app';
+import { CheckAppInstalled } from '@/api/modules/app';
 import router from '@/routers';
 import { GlobalStore } from '@/store';
 import { listDatabases, checkRedisCli, installRedisCli } from '@/api/modules/database';
@@ -149,7 +146,6 @@ const redisIsExist = ref(false);
 const redisStatus = ref();
 const terminalShow = ref(false);
 
-const redisCommandPort = ref();
 const commandVisible = ref(false);
 
 const redisCliExist = ref();
@@ -165,8 +161,6 @@ const quickCmd = ref();
 const quickCmdList = ref([]);
 const dialogQuickCmdRef = ref();
 
-const dialogPortJumpRef = ref();
-
 const isRefresh = ref();
 
 const onSetting = async () => {
@@ -180,13 +174,6 @@ const loadHeight = () => {
     return globalStore.openMenuTabs ? '470px' : '380px';
 };
 
-const goDashboard = async () => {
-    if (redisCommandPort.value === 0) {
-        commandVisible.value = true;
-        return;
-    }
-    dialogPortJumpRef.value.acceptParams({ port: redisCommandPort.value });
-};
 const getAppDetail = (key: string) => {
     router.push({ name: 'AppAll', query: { install: key } });
 };
@@ -195,11 +182,6 @@ const goRemoteDB = async () => {
         globalStore.setCurrentRedisDB(currentDBName.value);
     }
     router.push({ name: 'Redis-Remote' });
-};
-
-const loadDashboardPort = async () => {
-    const res = await GetAppPort('redis-commander', '');
-    redisCommandPort.value = res.data;
 };
 
 const passwordRef = ref();
@@ -331,8 +313,14 @@ const closeTerminal = async (isKeepShow: boolean) => {
 };
 
 const checkCliValid = async () => {
-    const res = await checkRedisCli();
-    redisCliExist.value = res.data;
+    await checkRedisCli()
+        .then((res) => {
+            redisCliExist.value = res.data;
+            loadDBOptions();
+        })
+        .catch(() => {
+            loadDBOptions();
+        });
 };
 const installCli = async () => {
     loading.value = true;
@@ -341,6 +329,7 @@ const installCli = async () => {
             loading.value = false;
             redisCliExist.value = true;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            reOpenTerminal();
         })
         .catch(() => {
             loading.value = false;
@@ -363,9 +352,7 @@ const onSetQuickCmd = () => {
 };
 
 onMounted(() => {
-    loadDBOptions();
     loadQuickCmd();
-    loadDashboardPort();
     checkCliValid();
 });
 const onBefore = () => {

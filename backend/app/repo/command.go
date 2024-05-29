@@ -21,7 +21,7 @@ type ICommandRepo interface {
 	PageRedis(limit, offset int, opts ...DBOption) (int64, []model.RedisCommand, error)
 	GetRedis(opts ...DBOption) (model.RedisCommand, error)
 	GetRedisList(opts ...DBOption) ([]model.RedisCommand, error)
-	CreateRedis(command *model.RedisCommand) error
+	SaveRedis(command *model.RedisCommand) error
 	DeleteRedis(opts ...DBOption) error
 }
 
@@ -107,8 +107,8 @@ func (u *CommandRepo) Create(command *model.Command) error {
 	return global.DB.Create(command).Error
 }
 
-func (u *CommandRepo) CreateRedis(command *model.RedisCommand) error {
-	return global.DB.Create(command).Error
+func (u *CommandRepo) SaveRedis(command *model.RedisCommand) error {
+	return global.DB.Save(command).Error
 }
 
 func (u *CommandRepo) Update(id uint, vars map[string]interface{}) error {

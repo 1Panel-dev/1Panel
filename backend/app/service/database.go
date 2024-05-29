@@ -275,6 +275,14 @@ func (u *DatabaseService) Update(req dto.DatabaseUpdate) error {
 		}); err != nil {
 			return err
 		}
+	case constant.AppRedis:
+		if _, err := redis_client.NewRedisClient(redis_client.DBInfo{
+			Address:  req.Address,
+			Port:     req.Port,
+			Password: req.Password,
+		}); err != nil {
+			return err
+		}
 	case "mysql", "mariadb":
 		if _, err := mysql.NewMysqlClient(client.DBInfo{
 			From:     "remote",

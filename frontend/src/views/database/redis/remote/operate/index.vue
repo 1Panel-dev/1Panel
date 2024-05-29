@@ -95,7 +95,7 @@ const acceptParams = (params: DialogProps): void => {
         dialogData.value.rowData.version = '6.x';
     }
     if (dialogData.value.rowData.version.startsWith('7.')) {
-        dialogData.value.rowData.version = '7,x';
+        dialogData.value.rowData.version = '7.x';
     }
     title.value = i18n.global.t('database.' + dialogData.value.title + 'RemoteDB');
     drawerVisible.value = true;

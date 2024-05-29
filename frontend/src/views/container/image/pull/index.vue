@@ -92,6 +92,13 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     form.fromRepo = true;
     form.imageName = '';
     repos.value = params.repos;
+    form.repoID = 1;
+    for (const item of repos.value) {
+        if (item.name === 'Docker Hub' && item.downloadUrl === 'docker.io') {
+            form.repoID = item.id;
+            break;
+        }
+    }
     buttonDisabled.value = false;
     logInfo.value = '';
     showLog.value = false;

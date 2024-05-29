@@ -10,7 +10,7 @@
             <DrawerHeader header="FTP" :resource="paginationConfig.user" :back="handleClose" />
         </template>
         <el-select @change="search" class="p-w-200" clearable v-model="paginationConfig.operation">
-            <template #prefix>{{ $t('container.lines') }}</template>
+            <template #prefix>{{ $t('commons.table.operate') }}</template>
             <el-option value="PUT" :label="$t('file.upload')" />
             <el-option value="GET" :label="$t('file.download')" />
         </el-select>

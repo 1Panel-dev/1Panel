@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
@@ -19,7 +20,7 @@ type ICommandService interface {
 
 	SearchRedisCommandWithPage(search dto.SearchWithPage) (int64, interface{}, error)
 	ListRedisCommand() ([]dto.RedisCommand, error)
-	CreateRedisCommand(commandDto dto.RedisCommand) error
+	SaveRedisCommand(commandDto dto.RedisCommand) error
 	DeleteRedisCommand(ids []uint) error
 }
 
@@ -153,15 +154,12 @@ func (u *CommandService) ListRedisCommand() ([]dto.RedisCommand, error) {
 	return dtoCommands, err
 }
 
-func (u *CommandService) CreateRedisCommand(commandDto dto.RedisCommand) error {
-	command, _ := commandRepo.GetRedis(commonRepo.WithByName(commandDto.Name))
-	if command.ID != 0 {
-		return constant.ErrRecordExist
-	}
+func (u *CommandService) SaveRedisCommand(commandDto dto.RedisCommand) error {
+	var command model.RedisCommand
 	if err := copier.Copy(&command, &commandDto); err != nil {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
-	if err := commandRepo.CreateRedis(&command); err != nil {
+	if err := commandRepo.SaveRedis(&command); err != nil {
 		return err
 	}
 	return nil
