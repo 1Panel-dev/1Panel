@@ -159,6 +159,8 @@ const onUnBind = async () => {
         await unbindLicense()
             .then(() => {
                 loading.value = false;
+                globalStore.isProductPro = false;
+                globalStore.themeConfig.isGold = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 window.location.reload();
             })

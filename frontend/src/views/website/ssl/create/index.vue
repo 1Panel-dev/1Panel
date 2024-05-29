@@ -248,7 +248,6 @@ const acceptParams = (op: string, websiteSSL: Website.SSLDTO) => {
         resetForm();
     }
     if (op == 'edit') {
-        console.log(websiteSSL);
         ssl.value.acmeAccountId = websiteSSL.acmeAccountId;
         if (websiteSSL.dnsAccountId > 0) {
             ssl.value.dnsAccountId = websiteSSL.dnsAccountId;
