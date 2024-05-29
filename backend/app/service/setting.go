@@ -33,6 +33,7 @@ type ISettingService interface {
 	GetSettingInfo() (*dto.SettingInfo, error)
 	LoadInterfaceAddr() ([]string, error)
 	Update(key, value string) error
+	UpdateProxy(req dto.ProxyUpdate) error
 	UpdatePassword(c *gin.Context, old, new string) error
 	UpdatePort(port uint) error
 	UpdateBindInfo(req dto.BindInfo) error
@@ -62,6 +63,12 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 	if err := json.Unmarshal(arr, &info); err != nil {
 		return nil, err
 	}
+	if info.ProxyPasswdKeep != constant.StatusEnable {
+		info.ProxyPasswd = ""
+	} else {
+		info.ProxyPasswd, _ = encrypt.StringDecrypt(info.ProxyPasswd)
+	}
+
 	info.LocalTime = time.Now().Format("2006-01-02 15:04:05 MST -0700")
 	return &info, err
 }
@@ -159,6 +166,29 @@ func (u *SettingService) UpdateBindInfo(req dto.BindInfo) error {
 			global.LOG.Errorf("restart system with new bind info failed, err: %v", err)
 		}
 	}()
+	return nil
+}
+
+func (u *SettingService) UpdateProxy(req dto.ProxyUpdate) error {
+	if err := settingRepo.Update("ProxyUrl", req.ProxyUrl); err != nil {
+		return err
+	}
+	if err := settingRepo.Update("ProxyType", req.ProxyType); err != nil {
+		return err
+	}
+	if err := settingRepo.Update("ProxyPort", req.ProxyPort); err != nil {
+		return err
+	}
+	if err := settingRepo.Update("ProxyUser", req.ProxyUser); err != nil {
+		return err
+	}
+	pass, _ := encrypt.StringEncrypt(req.ProxyPasswd)
+	if err := settingRepo.Update("ProxyPasswd", pass); err != nil {
+		return err
+	}
+	if err := settingRepo.Update("ProxyPasswdKeep", req.ProxyPasswdKeep); err != nil {
+		return err
+	}
 	return nil
 }
 

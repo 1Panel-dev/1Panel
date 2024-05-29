@@ -10345,6 +10345,49 @@
                 }
             }
         },
+        "/settings/proxy/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "服务器代理配置",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "Update proxy setting",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProxyUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "proxyUrl",
+                        "proxyPort"
+                    ],
+                    "formatEN": "set proxy [proxyPort]:[proxyPort].",
+                    "formatZH": "服务器代理配置 [proxyPort]:[proxyPort]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/settings/search": {
             "post": {
                 "security": [
@@ -17810,6 +17853,29 @@
                 }
             }
         },
+        "dto.ProxyUpdate": {
+            "type": "object",
+            "properties": {
+                "proxyPasswd": {
+                    "type": "string"
+                },
+                "proxyPasswdKeep": {
+                    "type": "string"
+                },
+                "proxyPort": {
+                    "type": "string"
+                },
+                "proxyType": {
+                    "type": "string"
+                },
+                "proxyUrl": {
+                    "type": "string"
+                },
+                "proxyUser": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.RecordSearch": {
             "type": "object",
             "required": [
@@ -18459,6 +18525,24 @@
                     "type": "string"
                 },
                 "port": {
+                    "type": "string"
+                },
+                "proxyPasswd": {
+                    "type": "string"
+                },
+                "proxyPasswdKeep": {
+                    "type": "string"
+                },
+                "proxyPort": {
+                    "type": "string"
+                },
+                "proxyType": {
+                    "type": "string"
+                },
+                "proxyUrl": {
+                    "type": "string"
+                },
+                "proxyUser": {
                     "type": "string"
                 },
                 "securityEntrance": {
@@ -20245,7 +20329,6 @@
         "request.NginxRewriteUpdate": {
             "type": "object",
             "required": [
-                "content",
                 "name",
                 "websiteId"
             ],

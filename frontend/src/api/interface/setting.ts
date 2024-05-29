@@ -50,10 +50,25 @@ export namespace Setting {
         snapshotIgnore: string;
         xpackHideMenu: string;
         noAuthSetting: string;
+
+        proxyUrl: string;
+        proxyType: string;
+        proxyPort: string;
+        proxyUser: string;
+        proxyPasswd: string;
+        proxyPasswdKeep: string;
     }
     export interface SettingUpdate {
         key: string;
         value: string;
+    }
+    export interface ProxyUpdate {
+        proxyUrl: string;
+        proxyType: string;
+        proxyPort: string;
+        proxyUser: string;
+        proxyPasswd: string;
+        proxyPasswdKeep: string;
     }
     export interface SSLUpdate {
         ssl: string;

@@ -116,6 +116,16 @@
                                 </el-input>
                             </el-form-item>
 
+                            <el-form-item :label="$t('setting.proxy')" prop="proxyShow">
+                                <el-input disabled v-model="form.proxyShow">
+                                    <template #append>
+                                        <el-button @click="onChangeProxy" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
+
                             <el-form-item :label="$t('setting.developerMode')" prop="developerMode">
                                 <el-radio-group
                                     @change="onSave('DeveloperMode', form.developerMode)"
@@ -150,6 +160,7 @@
         <UserName ref="userNameRef" />
         <PanelName ref="panelNameRef" @search="search()" />
         <SystemIP ref="systemIPRef" @search="search()" />
+        <Proxy ref="proxyRef" @search="search()" />
         <Timeout ref="timeoutRef" @search="search()" />
         <Network ref="networkRef" @search="search()" />
         <HideMenu ref="hideMenuRef" @search="search()" />
@@ -169,6 +180,7 @@ import UserName from '@/views/setting/panel/username/index.vue';
 import Timeout from '@/views/setting/panel/timeout/index.vue';
 import PanelName from '@/views/setting/panel/name/index.vue';
 import SystemIP from '@/views/setting/panel/systemip/index.vue';
+import Proxy from '@/views/setting/panel/proxy/index.vue';
 import Network from '@/views/setting/panel/default-network/index.vue';
 import HideMenu from '@/views/setting/panel/hidemenu/index.vue';
 import { storeToRefs } from 'pinia';
@@ -200,6 +212,14 @@ const form = reactive({
     defaultNetworkVal: '',
     developerMode: '',
 
+    proxyShow: '',
+    proxyUrl: '',
+    proxyType: '',
+    proxyPort: '',
+    proxyUser: '',
+    proxyPasswd: '',
+    proxyPasswdKeep: '',
+
     proHideMenus: ref(i18n.t('setting.unSetting')),
     hideMenuList: '',
 });
@@ -210,6 +230,7 @@ const userNameRef = ref();
 const passwordRef = ref();
 const panelNameRef = ref();
 const systemIPRef = ref();
+const proxyRef = ref();
 const timeoutRef = ref();
 const networkRef = ref();
 const hideMenuRef = ref();
@@ -243,7 +264,14 @@ const search = async () => {
     form.hideMenuList = res.data.xpackHideMenu;
     form.developerMode = res.data.developerMode;
 
-    // 提取隐藏节点的 title 并显示
+    form.proxyUrl = res.data.proxyUrl;
+    form.proxyType = res.data.proxyType;
+    form.proxyPort = res.data.proxyPort;
+    form.proxyShow = form.proxyUrl ? form.proxyUrl + ':' + form.proxyPort : unset.value;
+    form.proxyUser = res.data.proxyUser;
+    form.proxyPasswd = res.data.proxyPasswd;
+    form.proxyPasswdKeep = res.data.proxyPasswdKeep;
+
     const json: Node = JSON.parse(res.data.xpackHideMenu);
     const checkedTitles = getCheckedTitles(json);
     form.proHideMenus = checkedTitles.toString();
@@ -296,6 +324,16 @@ const onChangeTimeout = () => {
 };
 const onChangeSystemIP = () => {
     systemIPRef.value.acceptParams({ systemIP: form.systemIP });
+};
+const onChangeProxy = () => {
+    proxyRef.value.acceptParams({
+        url: form.proxyUrl,
+        type: form.proxyType,
+        port: form.proxyPort,
+        user: form.proxyUser,
+        passwd: form.proxyPasswd,
+        passwdKeep: form.proxyPasswdKeep,
+    });
 };
 const onChangeNetwork = () => {
     networkRef.value.acceptParams({ defaultNetwork: form.defaultNetwork });

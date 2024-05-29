@@ -10,22 +10,29 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/buserr"
+	"github.com/1Panel-dev/1Panel/backend/utils/xpack"
 )
 
 func GetHttpRes(url string) (*http.Response, error) {
 	client := &http.Client{
 		Timeout: time.Second * 300,
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			DialContext: (&net.Dialer{
-				Timeout:   60 * time.Second,
-				KeepAlive: 60 * time.Second,
-			}).DialContext,
-			TLSHandshakeTimeout:   5 * time.Second,
-			ResponseHeaderTimeout: 10 * time.Second,
-			IdleConnTimeout:       15 * time.Second,
-		},
 	}
+	transportItem := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		DialContext: (&net.Dialer{
+			Timeout:   60 * time.Second,
+			KeepAlive: 60 * time.Second,
+		}).DialContext,
+		TLSHandshakeTimeout:   5 * time.Second,
+		ResponseHeaderTimeout: 10 * time.Second,
+		IdleConnTimeout:       15 * time.Second,
+	}
+	ok, transport := xpack.LoadRequestTransport()
+	if ok {
+		transportItem.DialContext = transport.DialContext
+		transportItem.Proxy = transport.Proxy
+	}
+	client.Transport = transportItem
 
 	req, err := http.NewRequestWithContext(context.Background(), "GET", url, nil)
 	if err != nil {

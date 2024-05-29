@@ -295,7 +295,7 @@ const onSync = async () => {
         await syncFtp()
             .then(() => {
                 loading.value = false;
-                MsgSuccess(i18n.global.t('toolbox.ftp.operationSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 search();
             })
             .catch(() => {

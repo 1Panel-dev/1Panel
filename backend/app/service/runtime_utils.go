@@ -19,6 +19,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
+	httpUtil "github.com/1Panel-dev/1Panel/backend/utils/http"
 	"github.com/pkg/errors"
 	"github.com/subosito/gotenv"
 	"gopkg.in/yaml.v3"
@@ -54,12 +55,10 @@ func handleNode(create request.RuntimeCreate, runtime *model.Runtime, fileOp fil
 	}
 
 	go func() {
-		res, err := http.Get(nodeDetail.DownloadCallBackUrl)
-		if err != nil {
+		if _ , _, err := httpUtil.HandleGet(nodeDetail.DownloadCallBackUrl, http.MethodGet); err != nil {
 			global.LOG.Errorf("http request failed(handleNode), err: %v", err)
 			return
 		}
-		res.Body.Close()
 	}()
 	go startRuntime(runtime)
 

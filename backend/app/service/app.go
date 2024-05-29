@@ -26,6 +26,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	http2 "github.com/1Panel-dev/1Panel/backend/utils/http"
+	httpUtil "github.com/1Panel-dev/1Panel/backend/utils/http"
 	"gopkg.in/yaml.v3"
 )
 
@@ -226,21 +227,16 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 	if appDetailDTO.DockerCompose == "" {
 		filename := filepath.Base(appDetailDTO.DownloadUrl)
 		dockerComposeUrl := fmt.Sprintf("%s%s", strings.TrimSuffix(appDetailDTO.DownloadUrl, filename), "docker-compose.yml")
-		composeRes, err := http.Get(dockerComposeUrl)
+		statusCode, composeRes, err := httpUtil.HandleGet(dockerComposeUrl, http.MethodGet)
 		if err != nil {
 			return appDetailDTO, buserr.WithDetail("ErrGetCompose", err.Error(), err)
 		}
-		defer composeRes.Body.Close()
-		bodyContent, err := io.ReadAll(composeRes.Body)
-		if err != nil {
-			return appDetailDTO, buserr.WithDetail("ErrGetCompose", err.Error(), err)
+		if statusCode > 200 {
+			return appDetailDTO, buserr.WithDetail("ErrGetCompose", string(composeRes), err)
 		}
-		if composeRes.StatusCode > 200 {
-			return appDetailDTO, buserr.WithDetail("ErrGetCompose", string(bodyContent), err)
-		}
-		detail.DockerCompose = string(bodyContent)
+		detail.DockerCompose = string(composeRes)
 		_ = appDetailRepo.Update(context.Background(), detail)
-		appDetailDTO.DockerCompose = string(bodyContent)
+		appDetailDTO.DockerCompose = string(composeRes)
 	}
 
 	appDetailDTO.HostMode = isHostModel(appDetailDTO.DockerCompose)
@@ -840,19 +836,14 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 	global.LOG.Infof("Starting synchronization of application details...")
 	for _, l := range list.Apps {
 		app := appsMap[l.AppProperty.Key]
-		iconRes, err := http.Get(l.Icon)
-		if err != nil {
-			return err
-		}
-		body, err := io.ReadAll(iconRes.Body)
+		_, iconRes, err := httpUtil.HandleGet(l.Icon, http.MethodGet)
 		if err != nil {
 			return err
 		}
 		iconStr := ""
-		if !strings.Contains(string(body), "<xml>") {
-			iconStr = base64.StdEncoding.EncodeToString(body)
+		if !strings.Contains(string(iconRes), "<xml>") {
+			iconStr = base64.StdEncoding.EncodeToString(iconRes)
 		}
-		_ = iconRes.Body.Close()
 
 		app.Icon = iconStr
 		app.TagsKey = l.AppProperty.Tags
@@ -872,16 +863,11 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 
 			if _, ok := InitTypes[app.Type]; ok {
 				dockerComposeUrl := fmt.Sprintf("%s/%s", versionUrl, "docker-compose.yml")
-				composeRes, err := http.Get(dockerComposeUrl)
+				_, composeRes, err := httpUtil.HandleGet(dockerComposeUrl, http.MethodGet)
 				if err != nil {
 					return err
 				}
-				defer composeRes.Body.Close()
-				bodyContent, err := io.ReadAll(composeRes.Body)
-				if err != nil {
-					return err
-				}
-				detail.DockerCompose = string(bodyContent)
+				detail.DockerCompose = string(composeRes)
 			} else {
 				detail.DockerCompose = ""
 			}

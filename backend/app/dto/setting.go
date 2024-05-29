@@ -58,6 +58,13 @@ type SettingInfo struct {
 	SnapshotIgnore string `json:"snapshotIgnore"`
 	XpackHideMenu  string `json:"xpackHideMenu"`
 	NoAuthSetting  string `json:"noAuthSetting"`
+
+	ProxyUrl        string `json:"proxyUrl"`
+	ProxyType       string `json:"proxyType"`
+	ProxyPort       string `json:"proxyPort"`
+	ProxyUser       string `json:"proxyUser"`
+	ProxyPasswd     string `json:"proxyPasswd"`
+	ProxyPasswdKeep string `json:"proxyPasswdKeep"`
 }
 
 type SettingUpdate struct {
@@ -158,6 +165,15 @@ type BindInfo struct {
 
 type Upgrade struct {
 	Version string `json:"version" validate:"required"`
+}
+
+type ProxyUpdate struct {
+	ProxyUrl        string `json:"proxyUrl"`
+	ProxyType       string `json:"proxyType"`
+	ProxyPort       string `json:"proxyPort"`
+	ProxyUser       string `json:"proxyUser"`
+	ProxyPasswd     string `json:"proxyPasswd"`
+	ProxyPasswdKeep string `json:"proxyPasswdKeep"`
 }
 
 type CleanData struct {

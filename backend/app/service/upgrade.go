@@ -3,7 +3,6 @@ package service
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 	"path"
@@ -16,6 +15,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
+	httpUtil "github.com/1Panel-dev/1Panel/backend/utils/http"
 )
 
 type UpgradeService struct{}
@@ -258,15 +258,13 @@ func (u *UpgradeService) loadVersion(isLatest bool, currentVersion, mode string)
 	if !isLatest {
 		path = fmt.Sprintf("%s/%s/latest.current", global.CONF.System.RepoUrl, mode)
 	}
-	latestVersionRes, err := http.Get(path)
+	_, latestVersionRes, err := httpUtil.HandleGet(path, http.MethodGet)
 	if err != nil {
 		global.LOG.Errorf("load latest version from oss failed, err: %v", err)
 		return ""
 	}
-	defer latestVersionRes.Body.Close()
-	versionByte, err := io.ReadAll(latestVersionRes.Body)
-	version := string(versionByte)
-	if err != nil || strings.Contains(version, "<") {
+	version := string(latestVersionRes)
+	if strings.Contains(version, "<") {
 		global.LOG.Errorf("load latest version from oss failed, err: %v", version)
 		return ""
 	}
@@ -275,7 +273,7 @@ func (u *UpgradeService) loadVersion(isLatest bool, currentVersion, mode string)
 	}
 
 	versionMap := make(map[string]string)
-	if err := json.Unmarshal(versionByte, &versionMap); err != nil {
+	if err := json.Unmarshal(latestVersionRes, &versionMap); err != nil {
 		global.LOG.Errorf("load latest version from oss failed (error unmarshal), err: %v", err)
 		return ""
 	}
@@ -321,16 +319,11 @@ func (u *UpgradeService) checkVersion(v2, v1 string) string {
 }
 
 func (u *UpgradeService) loadReleaseNotes(path string) (string, error) {
-	releaseNotes, err := http.Get(path)
+	_, releaseNotes, err := httpUtil.HandleGet(path, http.MethodGet)
 	if err != nil {
 		return "", err
 	}
-	defer releaseNotes.Body.Close()
-	release, err := io.ReadAll(releaseNotes.Body)
-	if err != nil {
-		return "", err
-	}
-	return string(release), nil
+	return string(releaseNotes), nil
 }
 
 func loadArch() (string, error) {

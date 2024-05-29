@@ -40,6 +40,14 @@ export const updateMenu = (param: Setting.SettingUpdate) => {
     return http.post(`/settings/menu/update`, param);
 };
 
+export const updateProxy = (params: Setting.ProxyUpdate) => {
+    let request = deepCopy(params) as Setting.ProxyUpdate;
+    if (request.proxyPasswd) {
+        request.proxyPasswd = Base64.encode(request.proxyPasswd);
+    }
+    return http.post(`/settings/proxy/update`, request);
+};
+
 export const updatePassword = (param: Setting.PasswordUpdate) => {
     return http.post(`/settings/password/update`, param);
 };
