@@ -225,7 +225,7 @@ func loadDiskInfo() []dto.DiskInfo {
 		if fields[1] == "tmpfs" {
 			continue
 		}
-		if strings.Contains(fields[2], "M") || strings.Contains(fields[2], "K") {
+		if strings.Contains(fields[2], "K") {
 			continue
 		}
 		if strings.Contains(fields[6], "docker") {
