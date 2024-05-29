@@ -87,6 +87,7 @@ func Init() {
 		migrations.AddRedisCommand,
 		migrations.AddMonitorMenu,
 		migrations.AddFtp,
+		migrations.AddProxy,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

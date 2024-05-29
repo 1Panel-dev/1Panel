@@ -2247,6 +2247,21 @@ definitions:
     - from
     - type
     type: object
+  dto.ProxyUpdate:
+    properties:
+      proxyPasswd:
+        type: string
+      proxyPasswdKeep:
+        type: string
+      proxyPort:
+        type: string
+      proxyType:
+        type: string
+      proxyUrl:
+        type: string
+      proxyUser:
+        type: string
+    type: object
   dto.RecordSearch:
     properties:
       detailName:
@@ -2680,6 +2695,18 @@ definitions:
       panelName:
         type: string
       port:
+        type: string
+      proxyPasswd:
+        type: string
+      proxyPasswdKeep:
+        type: string
+      proxyPort:
+        type: string
+      proxyType:
+        type: string
+      proxyUrl:
+        type: string
+      proxyUser:
         type: string
       securityEntrance:
         type: string
@@ -3873,7 +3900,6 @@ definitions:
       websiteId:
         type: integer
     required:
-    - content
     - name
     - websiteId
     type: object
@@ -11726,6 +11752,34 @@ paths:
         - serverPort
         formatEN: update system port => [serverPort]
         formatZH: 修改系统端口 => [serverPort]
+        paramKeys: []
+  /settings/proxy/update:
+    post:
+      consumes:
+      - application/json
+      description: 服务器代理配置
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProxyUpdate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update proxy setting
+      tags:
+      - System Setting
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - proxyUrl
+        - proxyPort
+        formatEN: set proxy [proxyPort]:[proxyPort].
+        formatZH: 服务器代理配置 [proxyPort]:[proxyPort]
         paramKeys: []
   /settings/search:
     post:

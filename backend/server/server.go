@@ -4,11 +4,12 @@ import (
 	"crypto/tls"
 	"encoding/gob"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"net"
 	"net/http"
 	"os"
 	"path"
+
+	"github.com/1Panel-dev/1Panel/backend/i18n"
 
 	"github.com/1Panel-dev/1Panel/backend/init/app"
 	"github.com/1Panel-dev/1Panel/backend/init/business"
@@ -36,6 +37,7 @@ func Start() {
 	log.Init()
 	db.Init()
 	migration.Init()
+	InitOthers()
 	app.Init()
 	validator.Init()
 	gob.Register(psession.SessionUser{})
@@ -45,7 +47,6 @@ func Start() {
 	cron.Run()
 	business.Init()
 	hook.Init()
-	InitOthers()
 
 	rootRouter := router.Routers()
 

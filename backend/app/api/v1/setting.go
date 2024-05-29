@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"encoding/base64"
 	"errors"
 	"os"
 	"path"
@@ -54,6 +55,37 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 	}
 
 	if err := settingService.Update(req.Key, req.Value); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags System Setting
+// @Summary Update proxy setting
+// @Description 服务器代理配置
+// @Accept json
+// @Param request body dto.ProxyUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/proxy/update [post]
+// @x-panel-log {"bodyKeys":["proxyUrl","proxyPort"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"服务器代理配置 [proxyPort]:[proxyPort]","formatEN":"set proxy [proxyPort]:[proxyPort]."}
+func (b *BaseApi) UpdateProxy(c *gin.Context) {
+	var req dto.ProxyUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if len(req.ProxyPasswd) != 0 && len(req.ProxyType) != 0 {
+		pass, err := base64.StdEncoding.DecodeString(req.ProxyPasswd)
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			return
+		}
+		req.ProxyPasswd = string(pass)
+	}
+
+	if err := settingService.UpdateProxy(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

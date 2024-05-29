@@ -3,14 +3,15 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/utils/docker"
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/filters"
 	"os"
 	"path"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/utils/docker"
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/filters"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/global"
@@ -514,6 +515,9 @@ func loadLogTree(fileOp fileUtils.FileOp) []dto.CleanTree {
 func loadContainerTree() []dto.CleanTree {
 	var treeData []dto.CleanTree
 	client, err := docker.NewDockerClient()
+	if err != nil {
+		return treeData
+	}
 	diskUsage, err := client.DiskUsage(context.Background(), types.DiskUsageOptions{})
 	if err != nil {
 		return treeData

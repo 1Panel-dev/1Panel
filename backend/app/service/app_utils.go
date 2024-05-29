@@ -15,6 +15,7 @@ import (
 	"strconv"
 	"strings"
 
+	httpUtil "github.com/1Panel-dev/1Panel/backend/utils/http"
 	"github.com/1Panel-dev/1Panel/backend/utils/xpack"
 	"github.com/docker/docker/api/types/container"
 
@@ -504,7 +505,7 @@ func upgradeInstall(installID uint, detailID uint, backup, pullImage bool) error
 				_ = appDetailRepo.Update(context.Background(), detail)
 			}
 			go func() {
-				_, _ = http.Get(detail.DownloadCallBackUrl)
+				_, _, _ = httpUtil.HandleGet(detail.DownloadCallBackUrl, http.MethodGet)
 			}()
 		}
 
@@ -782,7 +783,7 @@ func copyData(app model.App, appDetail model.AppDetail, appInstall *model.AppIns
 			return
 		}
 		go func() {
-			_, _ = http.Get(appDetail.DownloadCallBackUrl)
+			_, _, _ = httpUtil.HandleGet(appDetail.DownloadCallBackUrl, http.MethodGet)
 		}()
 	}
 	appKey := app.Key
