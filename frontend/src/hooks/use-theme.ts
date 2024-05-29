@@ -32,6 +32,9 @@ export const useTheme = () => {
     };
 
     const updateTheme = (theme: string) => {
+        if (theme === 'auto') {
+            theme = prefersDark.matches ? 'dark' : 'light';
+        }
         const body = document.documentElement as HTMLElement;
         body.setAttribute('class', theme);
     };
