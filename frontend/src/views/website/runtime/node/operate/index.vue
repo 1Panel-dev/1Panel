@@ -165,6 +165,7 @@
                         <el-select v-model="runtime.params['PACKAGE_MANAGER']">
                             <el-option label="npm" value="npm"></el-option>
                             <el-option label="yarn" value="yarn"></el-option>
+                            <el-option v-if="hasPnpm" label="pnpm" value="pnpm"></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item :label="$t('runtime.imageSource')" prop="source">
@@ -206,7 +207,7 @@ import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
-import { reactive, ref, watch } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 
 interface OperateRrops {
@@ -262,6 +263,13 @@ const rules = ref<any>({
 });
 const scripts = ref<Runtime.NodeScripts[]>([]);
 const em = defineEmits(['close']);
+
+const hasPnpm = computed(() => {
+    if (runtime.version == undefined) {
+        return false;
+    }
+    return parseFloat(runtime.version) > 18;
+});
 
 const imageSources = [
     {
