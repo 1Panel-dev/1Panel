@@ -28,8 +28,8 @@ export async function getXpackSetting() {
     return res;
 }
 
-export async function updateXpackSetting(fromData: FormData) {
+export async function updateXpackSettingByKey(key: string, value: string) {
     const searchXSettingGlob = import.meta.glob('xpack/api/modules/setting.ts');
     const module = await searchXSettingGlob?.['../xpack/api/modules/setting.ts']?.();
-    return module?.updateXSetting(fromData);
+    return module?.updateXSettingByKey(key, value);
 }

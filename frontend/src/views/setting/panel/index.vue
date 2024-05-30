@@ -184,7 +184,7 @@ import Proxy from '@/views/setting/panel/proxy/index.vue';
 import Network from '@/views/setting/panel/default-network/index.vue';
 import HideMenu from '@/views/setting/panel/hidemenu/index.vue';
 import { storeToRefs } from 'pinia';
-import { getXpackSetting, updateXpackSetting } from '@/utils/xpack';
+import { getXpackSetting, updateXpackSettingByKey } from '@/utils/xpack';
 
 const loading = ref(false);
 const i18n = useI18n();
@@ -357,18 +357,11 @@ const onSave = async (key: string, val: any) => {
             globalStore.themeConfig.theme = val;
         }
         switchTheme();
-        if (isProductPro.value) {
-            let formData = new FormData();
-            formData.append('theme', val);
-            await updateXpackSetting(formData)
-                .then(async () => {
-                    loading.value = false;
-                    MsgSuccess(i18n.t('commons.msg.operationSuccess'));
-                    await search();
-                })
-                .catch(() => {
-                    loading.value = false;
-                });
+        updateXpackSettingByKey('Theme', val === 'dark-gold' ? 'dark-gold' : '');
+        if (val === 'dark-gold') {
+            MsgSuccess(i18n.t('commons.msg.operationSuccess'));
+            loading.value = false;
+            search();
             return;
         }
     }
