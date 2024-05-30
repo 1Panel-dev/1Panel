@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/systemctl"
 )
@@ -152,14 +153,25 @@ func (f *Ftp) LoadList() ([]FtpList, error) {
 		if len(parts) < 2 {
 			continue
 		}
-		lists = append(lists, FtpList{User: parts[0], Path: strings.ReplaceAll(parts[1], "/./", "")})
+		std2, err := cmd.Execf("pure-pw  show %s | grep 'Allowed client IPs :'", parts[0])
+		if err != nil {
+			global.LOG.Errorf("handle pure-pw show %s faile, err: %v", parts[0], std2)
+			continue
+		}
+		status := constant.StatusDisable
+		itemStd := strings.ReplaceAll(std2, "\n", "")
+		if len(strings.TrimSpace(strings.ReplaceAll(itemStd, "Allowed client IPs :", ""))) == 0 {
+			status = constant.StatusEnable
+		}
+		lists = append(lists, FtpList{User: parts[0], Path: strings.ReplaceAll(parts[1], "/./", ""), Status: status})
 	}
 	return lists, nil
 }
 
 type FtpList struct {
-	User string
-	Path string
+	User   string
+	Path   string
+	Status string
 }
 
 func (f *Ftp) Reload() error {

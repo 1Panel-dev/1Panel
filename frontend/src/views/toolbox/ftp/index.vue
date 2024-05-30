@@ -122,12 +122,11 @@
                                 <Tooltip @click="toFolder(row.path)" :text="row.path" />
                             </template>
                         </el-table-column>
-                        <el-table-column
-                            :label="$t('commons.table.description')"
-                            :min-width="80"
-                            prop="description"
-                            show-overflow-tooltip
-                        />
+                        <el-table-column :label="$t('commons.table.description')" prop="description">
+                            <template #default="{ row }">
+                                <fu-input-rw-switch v-model="row.description" @blur="onChange(row)" />
+                            </template>
+                        </el-table-column>
                         <fu-table-operations
                             width="200px"
                             :buttons="buttons"
@@ -268,6 +267,11 @@ const onChangeStatus = async (row: Toolbox.FtpInfo, status: string) => {
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         search();
     });
+};
+
+const onChange = async (row: any) => {
+    await await updateFtp(row);
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
 };
 
 const onOpenDialog = async (title: string, rowData: Partial<Toolbox.FtpInfo> = {}) => {
