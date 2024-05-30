@@ -874,7 +874,6 @@ func calculateNetwork(network map[string]types.NetworkStats) (float64, float64) 
 func checkImageExist(client *client.Client, imageItem string) bool {
 	images, err := client.ImageList(context.Background(), image.ListOptions{})
 	if err != nil {
-		fmt.Println(err)
 		return false
 	}
 

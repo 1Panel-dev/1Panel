@@ -252,7 +252,7 @@ func (r *Remote) Backup(info BackupInfo) error {
 	backupCmd := fmt.Sprintf("docker run --rm --net=host -i %s /bin/bash -c '%s -h %s -P %d -u%s -p%s %s --default-character-set=%s %s'",
 		image, dumpCmd, r.Address, r.Port, r.User, r.Password, sslSkip(info.Version, r.Type), info.Format, info.Name)
 
-	global.LOG.Debug(backupCmd)
+	global.LOG.Debug(strings.ReplaceAll(backupCmd, r.Password, "******"))
 	cmd := exec.Command("bash", "-c", backupCmd)
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
@@ -281,7 +281,7 @@ func (r *Remote) Recover(info RecoverInfo) error {
 	recoverCmd := fmt.Sprintf("docker run --rm --net=host -i %s /bin/bash -c '%s -h %s -P %d -u%s -p%s %s --default-character-set=%s %s'",
 		image, r.Type, r.Address, r.Port, r.User, r.Password, sslSkip(info.Version, r.Type), info.Format, info.Name)
 
-	global.LOG.Debug(recoverCmd)
+	global.LOG.Debug(strings.ReplaceAll(recoverCmd, r.Password, "******"))
 	cmd := exec.Command("bash", "-c", recoverCmd)
 
 	if strings.HasSuffix(info.SourceFile, ".gz") {
@@ -419,11 +419,11 @@ func (r *Remote) ExecSQLForHosts(timeout uint) ([]string, error) {
 func loadImage(dbType, version string) (string, error) {
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
-		fmt.Println(err)
+		return "", err
 	}
 	images, err := cli.ImageList(context.Background(), image.ListOptions{})
 	if err != nil {
-		fmt.Println(err)
+		return "", err
 	}
 
 	for _, image := range images {
@@ -445,10 +445,20 @@ func loadImage(dbType, version string) (string, error) {
 			}
 		}
 	}
-	if dbType == "mariadb" || version == "8.x" {
-		return "mysql:8.2.0", nil
+	return loadVersion(dbType, version), nil
+}
+
+func loadVersion(dbType string, version string) string {
+	if dbType == "mariadb" {
+		return "mariadb:11.3.2 "
 	}
-	return "mysql:" + version, nil
+	if strings.HasPrefix(version, "5.6") {
+		return "mysql:5.6.51"
+	}
+	if strings.HasPrefix(version, "5.7") {
+		return "mysql:5.7.44"
+	}
+	return "mysql:8.2.0"
 }
 
 func sslSkip(version, dbType string) string {

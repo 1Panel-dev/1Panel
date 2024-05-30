@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
-	"fmt"
 	"os"
 	"path"
 	"strings"
@@ -104,7 +103,6 @@ func (u *DockerService) LoadDockerConf() *dto.DaemonJsonConf {
 		return &data
 	}
 	if err := json.Unmarshal(arr, &conf); err != nil {
-		fmt.Println(err)
 		return &data
 	}
 	if _, ok := daemonMap["iptables"]; !ok {
