@@ -46,6 +46,9 @@ func Run() {
 	if _, err := global.Cron.AddJob(fmt.Sprintf("%v %v * * *", mathRand.Intn(60), mathRand.Intn(3)), job.NewAppStoreJob()); err != nil {
 		global.LOG.Errorf("can not add  appstore corn job: %s", err.Error())
 	}
+	if _, err := global.Cron.AddJob("@daily", job.NewCacheJob()); err != nil {
+		global.LOG.Errorf("can not add  cache corn job: %s", err.Error())
+	}
 
 	var backup model.BackupAccount
 	_ = global.DB.Where("type = ?", "OneDrive").Find(&backup).Error

@@ -49,7 +49,8 @@ func Init() {
 	if err != nil {
 		panic(err)
 	}
-
+	_ = cache.DropAll()
+	global.CacheDb = cache
 	global.CACHE = badger_db.NewCacheDB(cache)
 	global.LOG.Info("init cache successfully")
 }

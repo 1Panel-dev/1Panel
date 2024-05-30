@@ -4,6 +4,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/configs"
 	"github.com/1Panel-dev/1Panel/backend/init/cache/badger_db"
 	"github.com/1Panel-dev/1Panel/backend/init/session/psession"
+	"github.com/dgraph-io/badger/v4"
 	"github.com/go-playground/validator/v10"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/robfig/cron/v3"
@@ -20,6 +21,7 @@ var (
 	VALID     *validator.Validate
 	SESSION   *psession.PSession
 	CACHE     *badger_db.Cache
+	CacheDb   *badger.DB
 	Viper     *viper.Viper
 
 	Cron           *cron.Cron
