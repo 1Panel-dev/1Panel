@@ -70,12 +70,7 @@
                         >
                             {{ $t('database.create') }}
                         </el-button>
-                        <el-button
-                            v-if="currentDB && (currentDB.from !== 'local' || mysqlStatus === 'Running')"
-                            @click="onChangeConn"
-                            type="primary"
-                            plain
-                        >
+                        <el-button v-if="currentDB" @click="onChangeConn" type="primary" plain>
                             {{ $t('database.databaseConnInfo') }}
                         </el-button>
                         <el-button
@@ -114,7 +109,7 @@
             <template #main v-if="currentDB">
                 <ComplexTable
                     :pagination-config="paginationConfig"
-                    :class="{ mask: maskShow && currentDB.from !== 'local' }"
+                    :class="{ mask: maskShow }"
                     @sort-change="search"
                     @search="search"
                     :data="data"
@@ -394,6 +389,7 @@ const changeDatabase = async () => {
     }
     for (const item of dbOptionsRemote.value) {
         if (item.database == currentDBName.value) {
+            maskShow.value = false;
             currentDB.value = item;
             break;
         }

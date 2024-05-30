@@ -73,6 +73,7 @@ type AppInstalledDTO struct {
 }
 
 type DatabaseConn struct {
+	Status        string `json:"status"`
 	Username      string `json:"username"`
 	Password      string `json:"password"`
 	ContainerName string `json:"containerName"`

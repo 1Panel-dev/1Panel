@@ -51,15 +51,13 @@
                     </el-option-group>
                 </el-select>
             </template>
-            <template #toolbar v-if="!isOnSetting && currentDB">
-                <div :class="{ mask: redisStatus != 'Running' && currentDB.from === 'local' }">
-                    <el-button type="primary" plain @click="onChangePassword">
-                        {{ $t('database.databaseConnInfo') }}
-                    </el-button>
-                    <el-button @click="goRemoteDB" type="primary" plain>
-                        {{ $t('database.remoteDB') }}
-                    </el-button>
-                </div>
+            <template #toolbar v-if="!isOnSetting">
+                <el-button v-if="currentDB" type="primary" plain @click="onLoadConn">
+                    {{ $t('database.databaseConnInfo') }}
+                </el-button>
+                <el-button @click="goRemoteDB" type="primary" plain>
+                    {{ $t('database.remoteDB') }}
+                </el-button>
             </template>
         </LayoutContent>
 
@@ -71,13 +69,10 @@
                 v-show="redisStatus === 'Running' && terminalShow"
             />
             <el-empty
+                :class="{ mask: maskShow }"
                 v-if="redisStatus !== 'Running' || (currentDB.from === 'remote' && !redisCliExist)"
                 :style="{ height: `calc(100vh - ${loadHeight()})`, 'background-color': '#000' }"
-                :description="
-                    currentDB.from === 'remote'
-                        ? $t('commons.service.serviceNotStarted', ['Redis'])
-                        : $t('database.redisCliHelper')
-                "
+                :description="loadErrMsg()"
             >
                 <el-button v-if="currentDB.from === 'remote'" type="primary" @click="installCli">
                     {{ $t('commons.button.enable') }}
@@ -94,8 +89,15 @@
             </div>
         </div>
 
+        <el-card
+            v-if="redisStatus != 'Running' && currentDB && !loading && maskShow && currentDB?.from === 'local'"
+            class="mask-prompt"
+        >
+            <span>{{ $t('commons.service.serviceNotStarted', ['Redis']) }}</span>
+        </el-card>
+
         <Setting ref="settingRef" style="margin-top: 30px" />
-        <Password ref="passwordRef" @check-exist="reOpenTerminal" @close-terminal="closeTerminal(true)" />
+        <Conn ref="connRef" @check-exist="reOpenTerminal" @close-terminal="closeTerminal(true)" />
         <el-dialog
             v-model="commandVisible"
             :title="$t('app.checkTitle')"
@@ -121,7 +123,7 @@
 
 <script lang="ts" setup>
 import Setting from '@/views/database/redis/setting/index.vue';
-import Password from '@/views/database/redis/password/index.vue';
+import Conn from '@/views/database/redis/conn/index.vue';
 import Terminal from '@/components/terminal/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
 import QuickCmd from '@/views/database/redis/command/index.vue';
@@ -184,9 +186,13 @@ const goRemoteDB = async () => {
     router.push({ name: 'Redis-Remote' });
 };
 
-const passwordRef = ref();
-const onChangePassword = async () => {
-    passwordRef.value!.acceptParams({ database: currentDBName.value });
+const connRef = ref();
+const onLoadConn = async () => {
+    connRef.value!.acceptParams({
+        from: currentDB.value.from,
+        type: currentDB.value.type,
+        database: currentDBName.value,
+    });
 };
 
 const goRouter = async (target: string) => {
@@ -209,6 +215,7 @@ const changeDatabase = async () => {
     }
     for (const item of dbOptionsRemote.value) {
         if (item.database == currentDBName.value) {
+            maskShow.value = false;
             currentDB.value = item;
             break;
         }
@@ -255,6 +262,11 @@ const loadDBOptions = async () => {
     }
 };
 
+const loadErrMsg = () => {
+    return currentDB.value.from === 'local'
+        ? i18n.global.t('commons.service.serviceNotStarted', ['Redis'])
+        : i18n.global.t('database.redisCliHelper');
+};
 const reOpenTerminal = async () => {
     closeTerminal(false);
     initTerminal();

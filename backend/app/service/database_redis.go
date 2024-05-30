@@ -13,6 +13,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
+	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
 	"github.com/docker/docker/api/types/container"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -87,8 +88,16 @@ func (u *RedisService) ChangePassword(req dto.ChangeRedisPass) error {
 	if err := updateInstallInfoInDB("redis", req.Database, "password", req.Value); err != nil {
 		return err
 	}
-	if err := updateInstallInfoInDB("redis-commander", "", "password", req.Value); err != nil {
+	remote, err := databaseRepo.Get(commonRepo.WithByName(req.Database))
+	if err != nil {
 		return err
+	}
+	if remote.From == "local" {
+		pass, err := encrypt.StringEncrypt(req.Value)
+		if err != nil {
+			return fmt.Errorf("decrypt database password failed, err: %v", err)
+		}
+		_ = databaseRepo.Update(remote.ID, map[string]interface{}{"password": pass})
 	}
 
 	return nil

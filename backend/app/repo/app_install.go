@@ -3,6 +3,7 @@ package repo
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/1Panel-dev/1Panel/backend/constant"
 
 	"gorm.io/gorm/clause"
@@ -160,6 +161,7 @@ func (a *AppInstallRepo) BatchUpdateBy(maps map[string]interface{}, opts ...DBOp
 type RootInfo struct {
 	ID            uint   `json:"id"`
 	Name          string `json:"name"`
+	Status        string `json:"status"`
 	Port          int64  `json:"port"`
 	HttpsPort     int64  `json:"httpsPort"`
 	UserName      string `json:"userName"`
@@ -234,5 +236,6 @@ func (a *AppInstallRepo) LoadBaseInfo(key string, name string) (*RootInfo, error
 	info.Key = app.Key
 	appInstall.App = app
 	info.AppPath = appInstall.GetAppPath()
+	info.Status = appInstall.Status
 	return &info, nil
 }

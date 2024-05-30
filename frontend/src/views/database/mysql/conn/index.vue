@@ -68,7 +68,11 @@
 
                     <div v-if="form.from === 'local'">
                         <el-form-item :label="$t('database.remoteAccess')" prop="privilege">
-                            <el-switch v-model="form.privilege" @change="onSaveAccess" />
+                            <el-switch
+                                v-model="form.privilege"
+                                :disabled="form.status !== 'Running'"
+                                @change="onSaveAccess"
+                            />
                             <span class="input-help">{{ $t('database.remoteConnHelper') }}</span>
                         </el-form-item>
                         <el-form-item
@@ -109,7 +113,7 @@
                 <el-button :disabled="loading" @click="dialogVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
+                <el-button :disabled="loading || form.status !== 'Running'" type="primary" @click="onSave(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -134,6 +138,7 @@ const loading = ref(false);
 
 const dialogVisible = ref(false);
 const form = reactive({
+    status: '',
     systemIP: '',
     password: '',
     serviceName: '',
@@ -201,6 +206,7 @@ const loadSystemIP = async () => {
 const loadPassword = async () => {
     if (form.from === 'local') {
         const res = await GetAppConnInfo(form.type, form.database);
+        form.status = res.data.status;
         form.password = res.data.password || '';
         form.port = res.data.port || 3306;
         form.serviceName = res.data.serviceName || '';

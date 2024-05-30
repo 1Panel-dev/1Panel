@@ -184,6 +184,7 @@ func (a *AppInstallService) LoadConnInfo(req dto.OperationWithNameAndType) (resp
 	if err != nil {
 		return data, nil
 	}
+	data.Status = app.Status
 	data.Username = app.UserName
 	data.Password = app.Password
 	data.ServiceName = app.ServiceName
