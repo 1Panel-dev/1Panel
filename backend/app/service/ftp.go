@@ -104,8 +104,8 @@ func (f *FtpService) Sync() error {
 		for _, itemInDB := range listsInDB {
 			if item.User == itemInDB.User {
 				sameData[item.User] = struct{}{}
-				if item.Path != itemInDB.Path {
-					_ = ftpRepo.Update(itemInDB.ID, map[string]interface{}{"path": item.Path, "status": constant.StatusDisable})
+				if item.Path != itemInDB.Path || item.Status != itemInDB.Status {
+					_ = ftpRepo.Update(itemInDB.ID, map[string]interface{}{"path": item.Path, "status": item.Status})
 				}
 				break
 			}
@@ -113,7 +113,7 @@ func (f *FtpService) Sync() error {
 	}
 	for _, item := range lists {
 		if _, ok := sameData[item.User]; !ok {
-			_ = ftpRepo.Create(&model.Ftp{User: item.User, Path: item.Path, Status: constant.StatusDisable})
+			_ = ftpRepo.Create(&model.Ftp{User: item.User, Path: item.Path, Status: item.Status})
 		}
 	}
 	for _, item := range listsInDB {
@@ -127,7 +127,7 @@ func (f *FtpService) Sync() error {
 func (f *FtpService) Create(req dto.FtpCreate) (uint, error) {
 	if _, err := os.Stat(req.Path); err != nil {
 		if os.IsNotExist(err) {
-			if  err := os.MkdirAll(req.Path, os.ModePerm); err != nil {
+			if err := os.MkdirAll(req.Path, os.ModePerm); err != nil {
 				return 0, err
 			}
 		} else {
