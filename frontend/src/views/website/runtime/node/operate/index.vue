@@ -373,6 +373,9 @@ const changeApp = (appID: number) => {
 
 const changeVersion = () => {
     loading.value = true;
+    if (runtime.params['PACKAGE_MANAGER'] == 'pnpm' && !hasPnpm.value) {
+        runtime.params['PACKAGE_MANAGER'] = 'npm';
+    }
     GetAppDetail(runtime.appID, runtime.version, 'runtime')
         .then((res) => {
             runtime.appDetailID = res.data.id;
