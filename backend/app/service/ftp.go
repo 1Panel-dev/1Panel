@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -128,7 +127,9 @@ func (f *FtpService) Sync() error {
 func (f *FtpService) Create(req dto.FtpCreate) (uint, error) {
 	if _, err := os.Stat(req.Path); err != nil {
 		if os.IsNotExist(err) {
-			fmt.Println(os.MkdirAll(req.Path, os.ModePerm))
+			if  err := os.MkdirAll(req.Path, os.ModePerm); err != nil {
+				return 0, err
+			}
 		} else {
 			return 0, err
 		}
