@@ -83,7 +83,7 @@ import { saveRedisCommand, deleteRedisCommand, getRedisCommandPage } from '@/api
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 
 const drawerVisible = ref();
 const loading = ref();
@@ -120,6 +120,10 @@ const handleCmdDelete = (index: number) => {
 };
 
 const handleCmdSave = async (row: any) => {
+    if (row.name === '' || row.command === '') {
+        MsgError(i18n.global.t('toolbox.device.hostHelper'));
+        return;
+    }
     loading.value = true;
     await saveRedisCommand(row)
         .then(() => {
