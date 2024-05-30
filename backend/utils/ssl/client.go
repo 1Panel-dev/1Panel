@@ -85,6 +85,12 @@ type DNSParam struct {
 	SecretID  string `json:"secretID"`
 }
 
+var (
+	propagationTimeout = 30 * time.Minute
+	pollingInterval    = 10 * time.Second
+	ttl                = 3600
+)
+
 func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.WebsiteSSL) error {
 	var (
 		param DNSParam
@@ -100,64 +106,64 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.Web
 	case DnsPod:
 		dnsPodConfig := dnspod.NewDefaultConfig()
 		dnsPodConfig.LoginToken = param.ID + "," + param.Token
-		dnsPodConfig.PropagationTimeout = 15 * time.Minute
-		dnsPodConfig.PollingInterval = 10 * time.Second
-		dnsPodConfig.TTL = 3600
+		dnsPodConfig.PropagationTimeout = propagationTimeout
+		dnsPodConfig.PollingInterval = pollingInterval
+		dnsPodConfig.TTL = ttl
 		p, err = dnspod.NewDNSProviderConfig(dnsPodConfig)
 	case AliYun:
 		alidnsConfig := alidns.NewDefaultConfig()
 		alidnsConfig.SecretKey = param.SecretKey
 		alidnsConfig.APIKey = param.AccessKey
-		alidnsConfig.PropagationTimeout = 15 * time.Minute
-		alidnsConfig.PollingInterval = 5 * time.Second
-		alidnsConfig.TTL = 3600
+		alidnsConfig.PropagationTimeout = propagationTimeout
+		alidnsConfig.PollingInterval = pollingInterval
+		alidnsConfig.TTL = ttl
 		p, err = alidns.NewDNSProviderConfig(alidnsConfig)
 	case CloudFlare:
 		cloudflareConfig := cloudflare.NewDefaultConfig()
 		cloudflareConfig.AuthEmail = param.Email
 		cloudflareConfig.AuthToken = param.APIkey
-		cloudflareConfig.PropagationTimeout = 15 * time.Minute
-		cloudflareConfig.PollingInterval = 10 * time.Second
+		cloudflareConfig.PropagationTimeout = propagationTimeout
+		cloudflareConfig.PollingInterval = pollingInterval
 		cloudflareConfig.TTL = 3600
 		p, err = cloudflare.NewDNSProviderConfig(cloudflareConfig)
 	case NameCheap:
 		namecheapConfig := namecheap.NewDefaultConfig()
 		namecheapConfig.APIKey = param.APIkey
 		namecheapConfig.APIUser = param.APIUser
-		namecheapConfig.PropagationTimeout = 15 * time.Minute
-		namecheapConfig.PollingInterval = 5 * time.Second
-		namecheapConfig.TTL = 3600
+		namecheapConfig.PropagationTimeout = propagationTimeout
+		namecheapConfig.PollingInterval = pollingInterval
+		namecheapConfig.TTL = ttl
 		p, err = namecheap.NewDNSProviderConfig(namecheapConfig)
 	case NameSilo:
 		nameSiloConfig := namesilo.NewDefaultConfig()
 		nameSiloConfig.APIKey = param.APIkey
-		nameSiloConfig.PropagationTimeout = 15 * time.Minute
-		nameSiloConfig.PollingInterval = 10 * time.Second
-		nameSiloConfig.TTL = 3600
+		nameSiloConfig.PropagationTimeout = propagationTimeout
+		nameSiloConfig.PollingInterval = pollingInterval
+		nameSiloConfig.TTL = ttl
 		p, err = namesilo.NewDNSProviderConfig(nameSiloConfig)
 	case Godaddy:
 		godaddyConfig := godaddy.NewDefaultConfig()
 		godaddyConfig.APIKey = param.APIkey
 		godaddyConfig.APISecret = param.APISecret
-		godaddyConfig.PropagationTimeout = 15 * time.Minute
-		godaddyConfig.PollingInterval = 10 * time.Second
-		godaddyConfig.TTL = 3600
+		godaddyConfig.PropagationTimeout = propagationTimeout
+		godaddyConfig.PollingInterval = pollingInterval
+		godaddyConfig.TTL = ttl
 		p, err = godaddy.NewDNSProviderConfig(godaddyConfig)
 	case NameCom:
 		nameComConfig := namedotcom.NewDefaultConfig()
 		nameComConfig.APIToken = param.Token
 		nameComConfig.Username = param.APIUser
-		nameComConfig.PropagationTimeout = 15 * time.Minute
-		nameComConfig.PollingInterval = 10 * time.Second
-		nameComConfig.TTL = 3600
+		nameComConfig.PropagationTimeout = propagationTimeout
+		nameComConfig.PollingInterval = pollingInterval
+		nameComConfig.TTL = ttl
 		p, err = namedotcom.NewDNSProviderConfig(nameComConfig)
 	case TencentCloud:
 		tencentCloudConfig := tencentcloud.NewDefaultConfig()
 		tencentCloudConfig.SecretID = param.SecretID
 		tencentCloudConfig.SecretKey = param.SecretKey
-		tencentCloudConfig.PropagationTimeout = 15 * time.Minute
-		tencentCloudConfig.PollingInterval = 10 * time.Second
-		tencentCloudConfig.TTL = 3600
+		tencentCloudConfig.PropagationTimeout = propagationTimeout
+		tencentCloudConfig.PollingInterval = pollingInterval
+		tencentCloudConfig.TTL = ttl
 		p, err = tencentcloud.NewDNSProviderConfig(tencentCloudConfig)
 	}
 	if err != nil {
