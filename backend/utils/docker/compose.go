@@ -2,65 +2,18 @@ package docker
 
 import (
 	"context"
+	"github.com/compose-spec/compose-go/v2/loader"
+	"github.com/compose-spec/compose-go/v2/types"
+	"github.com/docker/compose/v2/pkg/api"
+	"github.com/joho/godotenv"
 	"path"
 	"regexp"
 	"strings"
-	"time"
-
-	"github.com/compose-spec/compose-go/v2/loader"
-	"github.com/compose-spec/compose-go/v2/types"
-	"github.com/docker/cli/cli/command"
-	"github.com/docker/cli/cli/flags"
-	"github.com/docker/compose/v2/pkg/api"
-	"github.com/docker/compose/v2/pkg/compose"
-	"github.com/docker/docker/client"
-	"github.com/joho/godotenv"
 )
 
 type ComposeService struct {
 	api.Service
 	project *types.Project
-}
-
-func UpComposeProject(project *types.Project) error {
-	for i, s := range project.Services {
-		s.CustomLabels = map[string]string{
-			api.ProjectLabel:     project.Name,
-			api.ServiceLabel:     s.Name,
-			api.VersionLabel:     api.ComposeVersion,
-			api.WorkingDirLabel:  project.WorkingDir,
-			api.ConfigFilesLabel: strings.Join(project.ComposeFiles, ","),
-			api.OneoffLabel:      "False",
-		}
-		project.Services[i] = s
-	}
-
-	apiClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-	if err != nil {
-		return err
-	}
-	var ops []command.CLIOption
-	ops = append(ops, command.WithAPIClient(apiClient), command.WithDefaultContextStoreConfig())
-	cli, err := command.NewDockerCli(ops...)
-	if err != nil {
-		return err
-	}
-	cliOp := flags.NewClientOptions()
-	if err = cli.Initialize(cliOp); err != nil {
-		return err
-	}
-	service := compose.NewComposeService(cli)
-	composeService := ComposeService{Service: service}
-
-	return composeService.Up(context.Background(), project, api.UpOptions{
-		Create: api.CreateOptions{
-			Timeout: getComposeTimeout(),
-		},
-		Start: api.StartOptions{
-			WaitTimeout: *getComposeTimeout(),
-			Wait:        true,
-		},
-	})
 }
 
 func GetComposeProject(projectName, workDir string, yml []byte, env []byte, skipNormalization bool) (*types.Project, error) {
@@ -91,11 +44,6 @@ func GetComposeProject(projectName, workDir string, yml []byte, env []byte, skip
 	}
 	project.ComposeFiles = []string{path.Join(workDir, "docker-compose.yml")}
 	return project, nil
-}
-
-func getComposeTimeout() *time.Duration {
-	timeout := time.Minute * time.Duration(10)
-	return &timeout
 }
 
 type ComposeProject struct {

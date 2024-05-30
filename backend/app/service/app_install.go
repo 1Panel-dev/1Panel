@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/docker/docker/api/types"
+	"gopkg.in/yaml.v3"
 	"math"
 	"os"
 	"path"
@@ -12,10 +14,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"time"
-
-	"github.com/1Panel-dev/1Panel/backend/utils/files"
-	"gopkg.in/yaml.v3"
 
 	"github.com/1Panel-dev/1Panel/backend/utils/env"
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx"
@@ -701,15 +699,6 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 	res.AppContainerConfig = config
 	res.HostMode = isHostModel(install.DockerCompose)
 	return &res, nil
-}
-
-func measureExecutionTime(name string, fn func() error) error {
-	start := time.Now()          // 记录开始时间
-	err := fn()                  // 执行函数
-	elapsed := time.Since(start) // 计算执行时间
-
-	fmt.Printf("%s took %s\n", name, elapsed) // 输出函数名和执行时间
-	return err
 }
 
 func syncAppInstallStatus(appInstall *model.AppInstall) error {
