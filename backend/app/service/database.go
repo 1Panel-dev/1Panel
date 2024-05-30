@@ -70,6 +70,9 @@ func (u *DatabaseService) Get(name string) (dto.DatabaseInfo, error) {
 
 func (u *DatabaseService) List(dbType string) ([]dto.DatabaseOption, error) {
 	dbs, err := databaseRepo.GetList(databaseRepo.WithTypeList(dbType))
+	if err != nil {
+		return nil, err
+	}
 	var datas []dto.DatabaseOption
 	for _, db := range dbs {
 		var item dto.DatabaseOption

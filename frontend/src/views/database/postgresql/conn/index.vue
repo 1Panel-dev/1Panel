@@ -112,7 +112,7 @@
                 <el-button :disabled="loading" @click="dialogVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
+                <el-button :disabled="loading || form.status !== 'Running'" type="primary" @click="onSave(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -137,6 +137,7 @@ const loading = ref(false);
 
 const dialogVisible = ref(false);
 const form = reactive({
+    status: '',
     systemIP: '',
     password: '',
     containerName: '',
@@ -202,6 +203,7 @@ const loadSystemIP = async () => {
 const loadPassword = async () => {
     if (form.from === 'local') {
         const res = await GetAppConnInfo(form.type, form.database);
+        form.status = res.data.status;
         form.username = res.data.username || '';
         form.password = res.data.password || '';
         form.port = res.data.port || 5432;

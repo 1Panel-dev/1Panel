@@ -185,6 +185,7 @@ const onCheck = async () => {
         .then((res) => {
             data.value = res.data;
             em('isExist', res.data);
+            em('update:maskShow', res.data.status !== 'Running');
             operateReq.installId = res.data.appInstallId;
             httpPort.value = res.data.httpPort;
             httpsPort.value = res.data.httpsPort;
