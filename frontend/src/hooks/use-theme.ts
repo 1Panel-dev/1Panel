@@ -8,6 +8,10 @@ export const useTheme = () => {
             body.setAttribute('class', 'dark-gold');
             return;
         }
+        if (globalStore.themeConfig.theme === 'auto') {
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+            globalStore.themeConfig.theme = prefersDark.matches ? 'dark' : 'light';
+        }
         const body = document.documentElement as HTMLElement;
         if (globalStore.themeConfig.theme === 'dark') body.setAttribute('class', 'dark');
         else body.setAttribute('class', '');
