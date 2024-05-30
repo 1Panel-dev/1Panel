@@ -108,7 +108,7 @@ const handleClose = () => {
 };
 
 const rules = reactive({
-    name: [Rules.requiredInput],
+    name: [Rules.simpleName, Rules.noSpace],
     type: [Rules.requiredSelect],
     version: [Rules.requiredSelect],
     address: [Rules.ipV4V6OrDomain],
