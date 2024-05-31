@@ -1299,6 +1299,7 @@ const message = {
         backupJump: '未在当前备份列表中的备份文件，请尝试从文件目录中下载后导入备份。',
 
         snapshot: '快照',
+        deleteHelper: '将删除该快照的所有备份文件，包括第三方备份账号中的文件。',
         ignoreRule: '排除规则',
         ignoreHelper: '快照时将使用该规则对 1Panel 数据目录进行压缩备份，请谨慎修改。',
         ignoreHelper1: '一行一个，例： \n*.log\n/opt/1panel/cache',

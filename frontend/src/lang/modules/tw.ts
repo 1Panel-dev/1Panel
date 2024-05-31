@@ -1298,6 +1298,7 @@ const message = {
         backupJump: '未在當前備份列表中的備份檔案，請嘗試從檔案目錄中下載後導入備份。',
 
         snapshot: '快照',
+        deleteHelper: '將刪除該快照的所有備份文件，包括第三方備份賬號中的文件。',
         status: '快照狀態',
         ignoreRule: '排除規則',
         ignoreHelper: '快照時將使用該規則對 1Panel 數據目錄進行壓縮備份，請謹慎修改。',

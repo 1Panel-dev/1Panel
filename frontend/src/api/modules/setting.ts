@@ -183,7 +183,7 @@ export const snapshotImport = (param: Setting.SnapshotImport) => {
 export const updateSnapshotDescription = (param: DescriptionUpdate) => {
     return http.post(`/settings/snapshot/description/update`, param);
 };
-export const snapshotDelete = (param: { ids: number[] }) => {
+export const snapshotDelete = (param: { ids: number[]; deleteWithFile: boolean }) => {
     return http.post(`/settings/snapshot/del`, param);
 };
 export const snapshotRecover = (param: Setting.SnapshotRecover) => {

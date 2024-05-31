@@ -164,7 +164,18 @@
             </template>
         </el-drawer>
 
-        <OpDialog ref="opRef" @search="search" />
+        <OpDialog ref="opRef" @search="search">
+            <template #content>
+                <el-form class="mt-4 mb-1" ref="deleteForm" label-position="left">
+                    <el-form-item>
+                        <el-checkbox v-model="cleanData" :label="$t('cronjob.cleanData')" />
+                        <span class="input-help">
+                            {{ $t('setting.deleteHelper') }}
+                        </span>
+                    </el-form-item>
+                </el-form>
+            </template>
+        </OpDialog>
         <SnapStatus ref="snapStatusRef" @search="search" />
         <IgnoreRule ref="ignoreRef" />
     </div>
@@ -221,6 +232,7 @@ let snapInfo = reactive<Setting.SnapshotCreate>({
     fromAccounts: [],
     description: '',
 });
+const cleanData = ref();
 
 const drawerVisible = ref<boolean>(false);
 
@@ -332,7 +344,7 @@ const batchDelete = async (row: Setting.SnapshotInfo | null) => {
             i18n.global.t('commons.button.delete'),
         ]),
         api: snapshotDelete,
-        params: { ids: ids },
+        params: { ids: ids, deleteWithFile: cleanData.value },
     });
 };
 

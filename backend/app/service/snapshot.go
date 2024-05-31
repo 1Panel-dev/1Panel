@@ -32,7 +32,7 @@ type ISnapshotService interface {
 	SnapshotRecover(req dto.SnapshotRecover) error
 	SnapshotRollback(req dto.SnapshotRecover) error
 	SnapshotImport(req dto.SnapshotImport) error
-	Delete(req dto.BatchDeleteReq) error
+	Delete(req dto.SnapshotBatchDelete) error
 
 	LoadSnapShotStatus(id uint) (*dto.SnapshotStatus, error)
 
@@ -323,25 +323,23 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto
 	return snap.Name, nil
 }
 
-func (u *SnapshotService) Delete(req dto.BatchDeleteReq) error {
-	backups, _ := snapshotRepo.GetList(commonRepo.WithIdsIn(req.Ids))
-	localDir, err := loadLocalDir()
-	if err != nil {
-		return err
-	}
-	for _, snap := range backups {
-		itemFile := path.Join(localDir, "system", snap.Name)
-		_ = os.RemoveAll(itemFile)
-
-		itemTarFile := path.Join(global.CONF.System.TmpDir, "system", snap.Name+".tar.gz")
-		_ = os.Remove(itemTarFile)
+func (u *SnapshotService) Delete(req dto.SnapshotBatchDelete) error {
+	snaps, _ := snapshotRepo.GetList(commonRepo.WithIdsIn(req.Ids))
+	for _, snap := range snaps {
+		targetAccounts, err := loadClientMap(snap.From)
+		if err != nil {
+			return err
+		}
+		for _, item := range targetAccounts {
+			global.LOG.Debugf("remove snapshot file %s.tar.gz from %s", snap.Name, item.backType)
+			_, _ = item.client.Delete(path.Join(item.backupPath, "system_snapshot", snap.Name+".tar.gz"))
+		}
 
 		_ = snapshotRepo.DeleteStatus(snap.ID)
+		if err := snapshotRepo.Delete(commonRepo.WithByID(snap.ID)); err != nil {
+			return err
+		}
 	}
-	if err := snapshotRepo.Delete(commonRepo.WithIdsIn(req.Ids)); err != nil {
-		return err
-	}
-
 	return nil
 }
 
