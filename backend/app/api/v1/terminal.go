@@ -79,6 +79,13 @@ func (b *BaseApi) RedisWsSsh(c *gin.Context) {
 		global.LOG.Errorf("gin context http handler failed, err: %v", err)
 		return
 	}
+	defer wsConn.Close()
+
+	if global.CONF.System.IsDemo {
+		if wshandleError(wsConn, errors.New("   demo server, prohibit this operation!")) {
+			return
+		}
+	}
 
 	cols, err := strconv.Atoi(c.DefaultQuery("cols", "80"))
 	if wshandleError(wsConn, errors.WithMessage(err, "invalid param cols in request")) {
@@ -90,7 +97,6 @@ func (b *BaseApi) RedisWsSsh(c *gin.Context) {
 	}
 	name := c.Query("name")
 	from := c.Query("from")
-	defer wsConn.Close()
 	commands := []string{"redis-cli"}
 	database, err := databaseService.Get(name)
 	if wshandleError(wsConn, errors.WithMessage(err, "no such database in db")) {
@@ -147,6 +153,12 @@ func (b *BaseApi) ContainerWsSsh(c *gin.Context) {
 		return
 	}
 	defer wsConn.Close()
+
+	if global.CONF.System.IsDemo {
+		if wshandleError(wsConn, errors.New("   demo server, prohibit this operation!")) {
+			return
+		}
+	}
 
 	containerID := c.Query("containerid")
 	command := c.Query("command")
