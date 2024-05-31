@@ -1,6 +1,6 @@
 <template>
     <div v-loading="loading">
-        <div class="app-status" style="margin-top: 20px" v-if="currentDB?.from === 'remote'">
+        <div class="app-status" style="margin-top: 20px" v-if="currentDB && currentDB.from === 'remote'">
             <el-card>
                 <div>
                     <el-tag style="float: left" effect="dark" type="success">Redis</el-tag>
@@ -14,13 +14,12 @@
                     :app-key="'redis'"
                     :app-name="appName"
                     v-model:loading="loading"
-                    v-model:mask-show="maskShow"
                     @before="onBefore"
                     @after="onAfter"
                     @setting="onSetting"
                 ></AppStatus>
             </template>
-            <template #search v-if="!isOnSetting && redisIsExist">
+            <template #search v-if="!isOnSetting && currentDB">
                 <el-select v-model="currentDBName" @change="changeDatabase()" class="p-w-200">
                     <template #prefix>{{ $t('commons.table.type') }}</template>
                     <el-option-group :label="$t('database.local')">
@@ -69,7 +68,6 @@
                 v-show="redisStatus === 'Running' && terminalShow"
             />
             <el-empty
-                :class="{ mask: maskShow }"
                 v-if="redisStatus !== 'Running' || (currentDB.from === 'remote' && !redisCliExist)"
                 :style="{ height: `calc(100vh - ${loadHeight()})`, 'background-color': '#000' }"
                 :description="loadErrMsg()"
@@ -89,12 +87,24 @@
             </div>
         </div>
 
-        <el-card
-            v-if="redisStatus != 'Running' && currentDB && !loading && maskShow && currentDB?.from === 'local'"
-            class="mask-prompt"
-        >
-            <span>{{ $t('commons.service.serviceNotStarted', ['Redis']) }}</span>
-        </el-card>
+        <div v-if="dbOptionsLocal.length === 0 && dbOptionsRemote.length === 0">
+            <LayoutContent :title="'Redis ' + $t('menu.database')" :divider="true">
+                <template #main>
+                    <div class="app-warn">
+                        <div>
+                            <span>{{ $t('app.checkInstalledWarn', ['Redis']) }}</span>
+                            <span @click="goRouter('app')">
+                                <el-icon class="ml-2"><Position /></el-icon>
+                                {{ $t('database.goInstall') }}
+                            </span>
+                            <div>
+                                <img src="@/assets/images/no_app.svg" />
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </LayoutContent>
+        </div>
 
         <Setting ref="settingRef" style="margin-top: 30px" />
         <Conn ref="connRef" @check-exist="reOpenTerminal" @close-terminal="closeTerminal(true)" />
@@ -139,7 +149,6 @@ import { getRedisCommandList } from '@/api/modules/host';
 const globalStore = GlobalStore();
 
 const loading = ref(false);
-const maskShow = ref(true);
 
 const terminalRef = ref<InstanceType<typeof Terminal> | null>(null);
 const settingRef = ref();
@@ -215,7 +224,6 @@ const changeDatabase = async () => {
     }
     for (const item of dbOptionsRemote.value) {
         if (item.database == currentDBName.value) {
-            maskShow.value = false;
             currentDB.value = item;
             break;
         }
