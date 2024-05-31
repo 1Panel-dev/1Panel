@@ -19,13 +19,13 @@
             </el-button>
             <el-table :data="data" class="mt-5" @selection-change="handleSelectionChange">
                 <el-table-column type="selection" fix />
-                <el-table-column :label="$t('commons.table.name')" min-width="50">
+                <el-table-column :label="$t('commons.table.name')" min-width="50" show-overflow-tooltip>
                     <template #default="{ row }">
                         <el-input v-if="row.lineStatus === 'create' || row.lineStatus === 'edit'" v-model="row.name" />
                         <span v-else>{{ row.name }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column :label="$t('terminal.quickCommand')" min-width="120">
+                <el-table-column :label="$t('terminal.quickCommand')" min-width="120" show-overflow-tooltip>
                     <template #default="{ row }">
                         <el-input
                             v-if="row.lineStatus === 'create' || row.lineStatus === 'edit'"

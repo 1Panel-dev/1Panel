@@ -166,7 +166,7 @@ type MysqlVariablesUpdateHelper struct {
 // redis
 type ChangeRedisPass struct {
 	Database string `json:"database" validate:"required"`
-	Value    string `json:"value" validate:"required"`
+	Value    string `json:"value"`
 }
 
 type RedisConfUpdate struct {

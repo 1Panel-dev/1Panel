@@ -9,7 +9,7 @@
         <template #header>
             <DrawerHeader :header="$t('database.databaseConnInfo')" :back="handleClose" />
         </template>
-        <el-form @submit.prevent v-loading="loading" ref="formRef" :model="form" label-position="top">
+        <el-form @submit.prevent v-loading="loading" ref="formRef" :model="form" label-position="top" :rules="rules">
             <el-row type="flex" justify="center">
                 <el-col :span="22">
                     <el-form-item :label="$t('database.containerConn')" v-if="form.from === 'local'">
@@ -66,12 +66,7 @@
                     </el-form-item>
 
                     <el-divider border-style="dashed" />
-                    <el-form-item
-                        :label="$t('commons.login.password')"
-                        v-if="form.from === 'local'"
-                        :rules="Rules.paramComplexity"
-                        prop="password"
-                    >
+                    <el-form-item :label="$t('commons.login.password')" v-if="form.from === 'local'" prop="password">
                         <el-input type="password" show-password clearable v-model="form.password">
                             <template #append>
                                 <CopyButton :content="form.password" />
@@ -109,7 +104,6 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { changeRedisPassword, getDatabase } from '@/api/modules/database';
@@ -135,6 +129,21 @@ const form = reactive({
     database: '',
     remoteIP: '',
 });
+const rules = reactive({
+    password: [{ validator: checkPassword, trigger: 'blur' }],
+});
+
+function checkPassword(rule: any, value: any, callback: any) {
+    if (form.password !== '') {
+        const reg = /^[a-zA-Z0-9]{1}[a-zA-Z0-9.%@!~_-]{4,126}[a-zA-Z0-9]{1}$/;
+        if (!reg.test(value) && value !== '') {
+            callback(new Error(i18n.global.t('commons.rule.paramComplexity', ['.%@!~_-'])));
+        } else {
+            callback();
+        }
+    }
+    callback();
+}
 
 const confirmDialogRef = ref();
 
