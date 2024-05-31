@@ -154,9 +154,15 @@ func (u *CommandService) ListRedisCommand() ([]dto.RedisCommand, error) {
 	return dtoCommands, err
 }
 
-func (u *CommandService) SaveRedisCommand(commandDto dto.RedisCommand) error {
+func (u *CommandService) SaveRedisCommand(req dto.RedisCommand) error {
+	if req.ID == 0 {
+		command, _ := commandRepo.GetRedis(commonRepo.WithByName(req.Name))
+		if command.ID != 0 {
+			return constant.ErrRecordExist
+		}
+	}
 	var command model.RedisCommand
-	if err := copier.Copy(&command, &commandDto); err != nil {
+	if err := copier.Copy(&command, &req); err != nil {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
 	if err := commandRepo.SaveRedis(&command); err != nil {
