@@ -37,7 +37,6 @@ func Start() {
 	log.Init()
 	db.Init()
 	migration.Init()
-	InitOthers()
 	app.Init()
 	validator.Init()
 	gob.Register(psession.SessionUser{})
@@ -45,6 +44,7 @@ func Start() {
 	session.Init()
 	gin.SetMode("debug")
 	cron.Run()
+	InitOthers()
 	business.Init()
 	hook.Init()
 
