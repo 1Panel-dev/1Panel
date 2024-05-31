@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/docker/docker/api/types"
 	"math"
 	"net/http"
 	"os"
@@ -39,6 +40,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
+	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	composeV2 "github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/pkg/errors"
@@ -1118,14 +1120,45 @@ func handleErr(install model.AppInstall, err error, out string) error {
 }
 
 func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool) ([]response.AppInstalledDTO, error) {
-	var res []response.AppInstalledDTO
+	var (
+		res        []response.AppInstalledDTO
+		containers []types.Container
+	)
+	if sync {
+		cli, err := docker.NewClient()
+		if err != nil {
+			return nil, err
+		}
+		defer cli.Close()
+		containers, err = cli.ListAllContainers()
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	for _, installed := range appInstallList {
 		if updated && (installed.App.Type == "php" || installed.Status == constant.Installing || (installed.App.Key == constant.AppMysql && installed.Version == "5.6.51")) {
 			continue
 		}
 		if sync {
-			if err := syncAppInstallStatus(&installed); err != nil {
-				global.LOG.Error("sync app install status error : ", err)
+			exist := false
+			for _, contain := range containers {
+				if contain.Names[0] == "/"+installed.ContainerName {
+					exist = true
+					switch contain.State {
+					case "exited":
+						installed.Status = constant.Stopped
+					case "running":
+						installed.Status = constant.Running
+					case "paused":
+						installed.Status = constant.Paused
+					}
+					break
+				}
+			}
+			if !exist {
+				installed.Status = constant.Error
+				installed.Message = buserr.WithName("ErrContainerNotFound", installed.ContainerName).Error()
 			}
 		}
 

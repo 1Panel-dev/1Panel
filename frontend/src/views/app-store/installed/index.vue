@@ -625,7 +625,7 @@ onMounted(() => {
     }, 1000);
     timer = setInterval(() => {
         search();
-    }, 1000 * 20);
+    }, 1000 * 30);
 });
 
 onUnmounted(() => {
