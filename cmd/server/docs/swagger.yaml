@@ -3323,6 +3323,8 @@ definitions:
         type: integer
       pageSize:
         type: integer
+      sync:
+        type: boolean
       tags:
         items:
           type: string

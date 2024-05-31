@@ -19488,6 +19488,9 @@ const docTemplate = `{
                 "pageSize": {
                     "type": "integer"
                 },
+                "sync": {
+                    "type": "boolean"
+                },
                 "tags": {
                     "type": "array",
                     "items": {

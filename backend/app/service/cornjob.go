@@ -71,6 +71,7 @@ func (u *CronjobService) SearchRecords(search dto.SearchRecord) (int64, interfac
 		if err := copier.Copy(&item, &record); err != nil {
 			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 		}
+		item.StartTime = record.StartTime.Format("2006-01-02 15:04:05")
 		dtoCronjobs = append(dtoCronjobs, item)
 	}
 	return total, dtoCronjobs, err
