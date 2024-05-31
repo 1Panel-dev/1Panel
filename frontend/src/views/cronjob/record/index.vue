@@ -108,7 +108,7 @@
                                                 {{ $t('commons.status.failed') }}
                                             </el-tag>
                                             <span>
-                                                {{ dateFormat(0, 0, row.startTime) }}
+                                                {{ row.startTime }}
                                             </span>
                                         </template>
                                     </el-table-column>

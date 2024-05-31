@@ -98,12 +98,12 @@ type SearchRecord struct {
 }
 
 type Record struct {
-	ID         uint      `json:"id"`
-	StartTime  time.Time `json:"startTime"`
-	Records    string    `json:"records"`
-	Status     string    `json:"status"`
-	Message    string    `json:"message"`
-	TargetPath string    `json:"targetPath"`
-	Interval   int       `json:"interval"`
-	File       string    `json:"file"`
+	ID         uint   `json:"id"`
+	StartTime  string `json:"startTime"`
+	Records    string `json:"records"`
+	Status     string `json:"status"`
+	Message    string `json:"message"`
+	TargetPath string `json:"targetPath"`
+	Interval   int    `json:"interval"`
+	File       string `json:"file"`
 }
