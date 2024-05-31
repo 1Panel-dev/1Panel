@@ -34,6 +34,13 @@ var whiteUrlList = map[string]struct{}{
 
 func DemoHandle() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if c.Request.URL.Path == "/api/v1/containers/exec" || c.Request.URL.Path == "/api/v1/databases/redis/exec" {
+			c.JSON(http.StatusInternalServerError, dto.Response{
+				Code:    http.StatusInternalServerError,
+				Message: buserr.New(constant.ErrDemoEnvironment).Error(),
+			})
+			return
+		}
 		if strings.Contains(c.Request.URL.Path, "search") || c.Request.Method == http.MethodGet {
 			c.Next()
 			return
