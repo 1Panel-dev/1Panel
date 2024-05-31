@@ -363,7 +363,8 @@ const loadQuickCmd = async () => {
 
 const quickInput = (val: any) => {
     if (val) {
-        terminalRef.value?.sendMsg(val + '\n');
+        terminalRef.value?.sendMsg(val);
+        quickCmd.value = '';
     }
 };
 

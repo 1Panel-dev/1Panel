@@ -25,6 +25,7 @@
                         </el-alert>
                         <el-form-item :label="$t('setting.proxyType')" prop="proxyType">
                             <el-select v-model="form.proxyType" clearable>
+                                <el-option value="" :label="$t('commons.button.close')" />
                                 <el-option value="socks5" label="SOCKS5" />
                                 <el-option value="http" label="HTTP" />
                                 <el-option value="https" label="HTTPS" />
@@ -105,8 +106,8 @@ interface DialogProps {
     passwdKeep: string;
 }
 const acceptParams = (params: DialogProps): void => {
-    form.proxyUrl = params.url || '127.0.0.1';
-    form.proxyType = params.type || 'socks5';
+    form.proxyUrl = params.url;
+    form.proxyType = params.type;
     form.proxyPortItem = params.port ? Number(params.port) : 7890;
     form.proxyUser = params.user;
     form.proxyPasswd = params.passwd;
