@@ -1,6 +1,6 @@
 <template>
     <div v-show="settingShow" v-loading="loading">
-        <LayoutContent :title="'Redis ' + $t('commons.button.set')" :reload="true">
+        <LayoutContent :title="database + ' ' + $t('commons.button.set')" :reload="true">
             <template #buttons>
                 <el-button type="primary" :plain="activeName !== 'conf'" @click="changeTab('conf')">
                     {{ $t('database.confChange') }}
@@ -201,7 +201,7 @@ const changeTab = (val: string) => {
             break;
         case 'tuning':
         case 'port':
-            loadform();
+            loadForm();
             break;
         case 'status':
             statusRef.value!.acceptParams({ status: redisStatus.value, database: database.value });
@@ -288,7 +288,7 @@ const submitForm = async () => {
     loading.value = true;
     await updateRedisConf(param)
         .then(() => {
-            loadform();
+            loadForm();
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
@@ -336,7 +336,7 @@ const submitFile = async () => {
         });
 };
 
-const loadform = async () => {
+const loadForm = async () => {
     const res = await loadRedisConf(database.value);
     form.name = res.data?.name;
     form.timeout = Number(res.data?.timeout);

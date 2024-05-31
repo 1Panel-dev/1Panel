@@ -215,7 +215,9 @@
             v-if="mysqlStatus != 'Running' && currentDB && !loading && maskShow && currentDB?.from === 'local'"
             class="mask-prompt"
         >
-            <span>{{ $t('commons.service.serviceNotStarted', ['MySQL']) }}</span>
+            <span>
+                {{ $t('commons.service.serviceNotStarted', [currentDB.type === 'mysql' ? 'MySQL' : 'Mariadb']) }}
+            </span>
         </el-card>
 
         <div v-if="dbOptionsLocal.length === 0 && dbOptionsRemote.length === 0">
