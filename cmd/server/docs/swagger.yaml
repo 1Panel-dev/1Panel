@@ -2744,6 +2744,17 @@ definitions:
     required:
     - key
     type: object
+  dto.SnapshotBatchDelete:
+    properties:
+      deleteWithFile:
+        type: boolean
+      ids:
+        items:
+          type: integer
+        type: array
+    required:
+    - ids
+    type: object
   dto.SnapshotCreate:
     properties:
       defaultDownload:
@@ -11846,7 +11857,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.BatchDeleteReq'
+          $ref: '#/definitions/dto.SnapshotBatchDelete'
       responses:
         "200":
           description: OK

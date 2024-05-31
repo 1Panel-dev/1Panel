@@ -168,13 +168,13 @@ func (b *BaseApi) RollbackSnapshot(c *gin.Context) {
 // @Summary Delete system backup
 // @Description 删除系统快照
 // @Accept json
-// @Param request body dto.BatchDeleteReq true "request"
+// @Param request body dto.SnapshotBatchDelete true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /settings/snapshot/del [post]
 // @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"ids","isList":true,"db":"snapshots","output_column":"name","output_value":"name"}],"formatZH":"删除系统快照 [name]","formatEN":"Delete system backup [name]"}
 func (b *BaseApi) DeleteSnapshot(c *gin.Context) {
-	var req dto.BatchDeleteReq
+	var req dto.SnapshotBatchDelete
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}

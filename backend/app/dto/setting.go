@@ -122,6 +122,10 @@ type SnapshotRecover struct {
 	ReDownload bool `json:"reDownload"`
 	ID         uint `json:"id" validate:"required"`
 }
+type SnapshotBatchDelete struct {
+	DeleteWithFile bool   `json:"deleteWithFile"`
+	Ids            []uint `json:"ids" validate:"required"`
+}
 type SnapshotImport struct {
 	From        string   `json:"from"`
 	Names       []string `json:"names"`

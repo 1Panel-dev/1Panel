@@ -1472,6 +1472,8 @@ const message = {
             'Backup files not in the current backup list, please try downloading from the file directory and importing for backup.',
 
         snapshot: 'Snapshot',
+        deleteHelper:
+            'All backup files for the snapshot, including those in the third-party backup account, will be deleted.',
         status: 'Snapshot status',
         ignoreRule: 'Ignore Rule',
         ignoreHelper:
