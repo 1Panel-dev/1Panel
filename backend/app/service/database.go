@@ -43,6 +43,7 @@ func (u *DatabaseService) SearchWithPage(search dto.DatabaseSearch) (int64, inte
 	total, dbs, err := databaseRepo.Page(search.Page, search.PageSize,
 		databaseRepo.WithTypeList(search.Type),
 		commonRepo.WithLikeName(search.Info),
+		commonRepo.WithOrderRuleBy(search.OrderBy, search.Order),
 		databaseRepo.WithoutByFrom("local"),
 	)
 	var datas []dto.DatabaseInfo
