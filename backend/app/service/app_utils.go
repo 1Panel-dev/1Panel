@@ -937,6 +937,12 @@ func rebuildApp(appInstall model.AppInstall) error {
 			_ = handleErr(appInstall, err, out)
 			return
 		}
+		containerNames, err := getContainerNames(appInstall)
+		if err != nil {
+			_ = handleErr(appInstall, err, out)
+			return
+		}
+		appInstall.ContainerName = strings.Join(containerNames, ",")
 
 		appInstall.Status = constant.Running
 		_ = appInstallRepo.Save(context.Background(), &appInstall)
@@ -1119,10 +1125,65 @@ func handleErr(install model.AppInstall, err error, out string) error {
 	return reErr
 }
 
-func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool) ([]response.AppInstalledDTO, error) {
+func doNotNeedSync(installed model.AppInstall) bool {
+	return installed.Status == constant.Installing || installed.Status == constant.Rebuilding || installed.Status == constant.Upgrading || installed.Status == constant.Syncing
+}
+
+func synAppInstall(containers map[string]types.Container, appInstall *model.AppInstall) {
+	containerNames := strings.Split(appInstall.ContainerName, ",")
+	if len(containers) == 0 {
+		appInstall.Status = constant.Error
+		appInstall.Message = buserr.WithName("ErrContainerNotFound", strings.Join(containerNames, ",")).Error()
+		return
+	}
+	notFoundNames := make([]string, 0)
+	exitNames := make([]string, 0)
+	exitedCount := 0
+	pausedCount := 0
+	runningCount := 0
+	total := len(containerNames)
+	for _, name := range containerNames {
+		if con, ok := containers["/"+name]; ok {
+			switch con.State {
+			case "exited":
+				exitedCount++
+				exitNames = append(exitNames, name)
+			case "running":
+				runningCount++
+			case "paused":
+				pausedCount++
+			}
+		} else {
+			notFoundNames = append(notFoundNames, name)
+		}
+	}
+	switch {
+	case exitedCount == total:
+		appInstall.Status = constant.Stopped
+	case runningCount == total:
+		appInstall.Status = constant.Running
+	case pausedCount == total:
+		appInstall.Status = constant.Paused
+	default:
+		var msg string
+		if exitedCount > 0 {
+			msg = buserr.WithName("ErrContainerMsg", strings.Join(exitNames, ",")).Error()
+		}
+		if len(notFoundNames) > 0 {
+			msg += buserr.WithName("ErrContainerNotFound", strings.Join(notFoundNames, ",")).Error()
+		}
+		if msg == "" {
+			msg = buserr.New("ErrAppWarn").Error()
+		}
+		appInstall.Message = msg
+		appInstall.Status = constant.UnHealthy
+	}
+}
+
+func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool) ([]response.AppInstallDTO, error) {
 	var (
-		res        []response.AppInstalledDTO
-		containers []types.Container
+		res           []response.AppInstallDTO
+		containersMap map[string]types.Container
 	)
 	if sync {
 		cli, err := docker.NewClient()
@@ -1130,9 +1191,13 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 			return nil, err
 		}
 		defer cli.Close()
-		containers, err = cli.ListAllContainers()
+		containers, err := cli.ListAllContainers()
 		if err != nil {
 			return nil, err
+		}
+		containersMap = make(map[string]types.Container, len(containers))
+		for _, contain := range containers {
+			containersMap[contain.Names[0]] = contain
 		}
 	}
 
@@ -1140,31 +1205,24 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 		if updated && (installed.App.Type == "php" || installed.Status == constant.Installing || (installed.App.Key == constant.AppMysql && installed.Version == "5.6.51")) {
 			continue
 		}
-		if sync {
-			exist := false
-			for _, contain := range containers {
-				if contain.Names[0] == "/"+installed.ContainerName {
-					exist = true
-					switch contain.State {
-					case "exited":
-						installed.Status = constant.Stopped
-					case "running":
-						installed.Status = constant.Running
-					case "paused":
-						installed.Status = constant.Paused
-					}
-					break
-				}
-			}
-			if !exist {
-				installed.Status = constant.Error
-				installed.Message = buserr.WithName("ErrContainerNotFound", installed.ContainerName).Error()
-			}
+		if sync && !doNotNeedSync(installed) {
+			synAppInstall(containersMap, &installed)
 		}
 
-		installDTO := response.AppInstalledDTO{
-			AppInstall: installed,
-			Path:       installed.GetPath(),
+		installDTO := response.AppInstallDTO{
+			ID:          installed.ID,
+			Name:        installed.Name,
+			AppID:       installed.AppId,
+			AppDetailID: installed.AppDetailId,
+			Version:     installed.Version,
+			Status:      installed.Status,
+			Message:     installed.Message,
+			HttpPort:    installed.HttpPort,
+			HttpsPort:   installed.HttpsPort,
+			Icon:        installed.App.Icon,
+			AppName:     installed.App.Name,
+			AppKey:      installed.App.Key,
+			AppType:     installed.App.Type,
 		}
 		app, err := appRepo.GetFirst(commonRepo.WithByID(installed.AppId))
 		if err != nil {

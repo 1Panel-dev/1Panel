@@ -100,11 +100,11 @@
                         <el-card class="e-card">
                             <el-row :gutter="20">
                                 <el-col :xs="3" :sm="3" :md="3" :lg="4" :xl="4">
-                                    <div class="icon" @click.stop="openDetail(installed.app)">
+                                    <div class="icon" @click.stop="openDetail(installed.appKey)">
                                         <el-avatar
                                             shape="square"
                                             :size="66"
-                                            :src="'data:image/png;base64,' + installed.app.icon"
+                                            :src="'data:image/png;base64,' + installed.icon"
                                         />
                                     </div>
                                 </el-col>
@@ -168,7 +168,7 @@
                                                 plain
                                                 round
                                                 size="small"
-                                                @click="openUploads(installed.app.key, installed.name)"
+                                                @click="openUploads(installed.appKey, installed.name)"
                                                 v-if="mode === 'installed'"
                                             >
                                                 {{ $t('database.loadBackup') }}
@@ -178,9 +178,7 @@
                                                 plain
                                                 round
                                                 size="small"
-                                                @click="
-                                                    openBackups(installed.app.key, installed.name, installed.status)
-                                                "
+                                                @click="openBackups(installed.appKey, installed.name, installed.status)"
                                                 v-if="mode === 'installed'"
                                             >
                                                 {{ $t('commons.button.backup') }}
@@ -203,7 +201,7 @@
                                                 :disabled="
                                                     (installed.status !== 'Running' &&
                                                         installed.status !== 'UpgradeErr') ||
-                                                    installed.app.status === 'TakeDown'
+                                                    installed.appStatus === 'TakeDown'
                                                 "
                                                 @click="openOperate(installed, 'upgrade')"
                                                 v-if="mode === 'upgrade'"
@@ -414,18 +412,12 @@ const getTagValue = (key: string) => {
     }
 };
 
-const search = () => {
-    loading.value = true;
+const search = async () => {
     searchReq.page = paginationConfig.currentPage;
     searchReq.pageSize = paginationConfig.pageSize;
-    SearchAppInstalled(searchReq)
-        .then((res) => {
-            data.value = res.data.items;
-            paginationConfig.total = res.data.total;
-        })
-        .finally(() => {
-            loading.value = false;
-        });
+    const res = await SearchAppInstalled(searchReq);
+    data.value = res.data.items;
+    paginationConfig.total = res.data.total;
     GetAppTags().then((res) => {
         tags.value = res.data;
     });
@@ -435,8 +427,8 @@ const goDashboard = async (port: any, protocol: string) => {
     dialogPortJumpRef.value.acceptParams({ port: port, protocol: protocol });
 };
 
-const openDetail = (app: App.App) => {
-    appDetail.value.acceptParams(app.key, 'detail');
+const openDetail = (appKey: string) => {
+    appDetail.value.acceptParams(appKey, 'detail');
 };
 
 const openOperate = (row: any, op: string) => {
@@ -448,7 +440,7 @@ const openOperate = (row: any, op: string) => {
         AppInstalledDeleteCheck(row.id).then(async (res) => {
             const items = res.data;
             if (res.data && res.data.length > 0) {
-                checkRef.value.acceptParams({ items: items, key: row.app.key, installID: row.id });
+                checkRef.value.acceptParams({ items: items, key: row.appKey, installID: row.id });
             } else {
                 deleteRef.value.acceptParams(row);
             }
@@ -475,10 +467,7 @@ const operate = async () => {
             }, 3000);
             setTimeout(() => {
                 search();
-            }, 5000);
-            setTimeout(() => {
-                search();
-            }, 10000);
+            }, 15000);
         })
         .catch(() => {
             search();
@@ -596,7 +585,7 @@ const openUploads = (key: string, name: string) => {
 };
 
 const openParam = (row: any) => {
-    appParamRef.value.acceptParams({ app: row.app, id: row.id });
+    appParamRef.value.acceptParams({ id: row.id });
 };
 
 const isAppErr = (row: any) => {
@@ -618,7 +607,9 @@ onMounted(() => {
         mode.value = 'upgrade';
         searchReq.update = true;
     }
+    loading.value = true;
     search();
+    loading.value = false;
     setTimeout(() => {
         searchReq.sync = true;
         search();

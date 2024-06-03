@@ -89,14 +89,21 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	var appDTOs []*response.AppDTO
+	var appDTOs []*response.AppDto
 	for _, ap := range apps {
 		ap.ReadMe = ""
 		ap.Website = ""
 		ap.Document = ""
 		ap.Github = ""
-		appDTO := &response.AppDTO{
-			App: ap,
+		appDTO := &response.AppDto{
+			ID:          ap.ID,
+			Name:        ap.Name,
+			Key:         ap.Key,
+			Type:        ap.Type,
+			Icon:        ap.Icon,
+			ShortDescZh: ap.ShortDescZh,
+			ShortDescEn: ap.ShortDescEn,
+			Resource:    ap.Resource,
 		}
 		appDTOs = append(appDTOs, appDTO)
 		appTags, err := appTagRepo.GetByAppId(ap.ID)
@@ -436,6 +443,14 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		return
 	}
 	appInstall.Env = string(paramByte)
+
+	containerNames, err := getContainerNames(*appInstall)
+	if err != nil {
+		return
+	}
+	if len(containerNames) > 0 {
+		appInstall.ContainerName = strings.Join(containerNames, ",")
+	}
 	if err = appInstallRepo.Create(ctx, appInstall); err != nil {
 		return
 	}

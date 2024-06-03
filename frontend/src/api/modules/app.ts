@@ -40,7 +40,7 @@ export const ChangePort = (params: App.ChangePort) => {
 };
 
 export const SearchAppInstalled = (search: App.AppInstallSearch) => {
-    return http.post<ResPage<App.AppInstalled>>('apps/installed/search', search);
+    return http.post<ResPage<App.AppInstallDto>>('apps/installed/search', search);
 };
 
 export const ListAppInstalled = () => {

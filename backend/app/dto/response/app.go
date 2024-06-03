@@ -10,7 +10,7 @@ import (
 )
 
 type AppRes struct {
-	Items []*AppDTO `json:"items"`
+	Items []*AppDto `json:"items"`
 	Total int64     `json:"total"`
 }
 
@@ -26,6 +26,21 @@ type AppDTO struct {
 	Installed bool        `json:"installed"`
 	Versions  []string    `json:"versions"`
 	Tags      []model.Tag `json:"tags"`
+}
+
+type AppDto struct {
+	Name        string      `json:"name"`
+	Key         string      `json:"key"`
+	ID          uint        `json:"ID"`
+	ShortDescZh string      `json:"shortDescZh"`
+	ShortDescEn string      `json:"shortDescEn"`
+	Icon        string      `json:"icon"`
+	Type        string      `json:"type"`
+	Status      string      `json:"status"`
+	Resource    string      `json:"resource"`
+	Installed   bool        `json:"installed"`
+	Versions    []string    `json:"versions"`
+	Tags        []model.Tag `json:"tags"`
 }
 
 type TagDTO struct {
@@ -70,6 +85,27 @@ type AppInstalledDTO struct {
 	Icon      string `json:"icon"`
 	CanUpdate bool   `json:"canUpdate"`
 	Path      string `json:"path"`
+}
+
+type AppInstallDTO struct {
+	ID          uint   `json:"id"`
+	Name        string `json:"name"`
+	AppID       uint   `json:"appID"`
+	AppDetailID uint   `json:"appDetailID"`
+	Version     string `json:"version"`
+	Status      string `json:"status"`
+	Message     string `json:"message"`
+	HttpPort    int    `json:"httpPort"`
+	HttpsPort   int    `json:"httpsPort"`
+	Path        string `json:"path"`
+	CanUpdate   bool   `json:"canUpdate"`
+	Icon        string `json:"icon"`
+	AppName     string `json:"appName"`
+	Ready       int    `json:"ready"`
+	Total       int    `json:"total"`
+	AppKey      string `json:"appKey"`
+	AppType     string `json:"appType"`
+	AppStatus   string `json:"appStatus"`
 }
 
 type DatabaseConn struct {
