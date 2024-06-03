@@ -88,6 +88,7 @@ func Init() {
 		migrations.AddMonitorMenu,
 		migrations.AddFtp,
 		migrations.AddProxy,
+		migrations.AddCronJobColumn,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

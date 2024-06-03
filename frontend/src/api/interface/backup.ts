@@ -57,6 +57,7 @@ export namespace Backup {
         type: string;
         name: string;
         detailName: string;
+        secret: string;
     }
     export interface Recover {
         source: string;
@@ -64,5 +65,6 @@ export namespace Backup {
         name: string;
         detailName: string;
         file: string;
+        secret: string;
     }
 }

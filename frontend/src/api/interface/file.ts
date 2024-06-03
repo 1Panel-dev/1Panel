@@ -80,12 +80,14 @@ export namespace File {
         dst: string;
         name: string;
         replace: boolean;
+        secret: string;
     }
 
     export interface FileDeCompress {
         path: string;
         dst: string;
         type: string;
+        secret: string;
     }
 
     export interface FileEdit {

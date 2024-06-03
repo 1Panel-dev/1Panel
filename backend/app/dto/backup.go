@@ -35,6 +35,7 @@ type CommonBackup struct {
 	Type       string `json:"type" validate:"required,oneof=app mysql mariadb redis website postgresql"`
 	Name       string `json:"name"`
 	DetailName string `json:"detailName"`
+	Secret     string `json:"secret"`
 }
 type CommonRecover struct {
 	Source     string `json:"source" validate:"required,oneof=OSS S3 SFTP MINIO LOCAL COS KODO OneDrive WebDAV"`
@@ -42,6 +43,7 @@ type CommonRecover struct {
 	Name       string `json:"name"`
 	DetailName string `json:"detailName"`
 	File       string `json:"file"`
+	Secret     string `json:"secret"`
 }
 
 type RecordSearch struct {

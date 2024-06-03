@@ -550,7 +550,7 @@ func (w WebsiteSSLService) DownloadFile(id uint) (*os.File, error) {
 		return nil, err
 	}
 	fileName := websiteSSL.PrimaryDomain + ".zip"
-	if err = fileOp.Compress([]string{path.Join(dir, "fullchain.pem"), path.Join(dir, "privkey.pem")}, dir, fileName, files.SdkZip); err != nil {
+	if err = fileOp.Compress([]string{path.Join(dir, "fullchain.pem"), path.Join(dir, "privkey.pem")}, dir, fileName, files.SdkZip, ""); err != nil {
 		return nil, err
 	}
 	return os.Open(path.Join(dir, fileName))

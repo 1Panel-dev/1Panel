@@ -113,6 +113,7 @@ export namespace Setting {
         fromAccounts: Array<string>;
         defaultDownload: string;
         description: string;
+        secret: string;
     }
     export interface SnapshotImport {
         from: string;
@@ -123,6 +124,7 @@ export namespace Setting {
         id: number;
         isNew: boolean;
         reDownload: boolean;
+        secret: string;
     }
     export interface SnapshotInfo {
         id: number;
@@ -141,6 +143,7 @@ export namespace Setting {
         rollbackStatus: string;
         rollbackMessage: string;
         lastRollbackedAt: string;
+        secret: string;
     }
     export interface SnapshotStatus {
         panel: string;

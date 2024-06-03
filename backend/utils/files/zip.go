@@ -17,14 +17,14 @@ func NewZipArchiver() ShellArchiver {
 	return &ZipArchiver{}
 }
 
-func (z ZipArchiver) Extract(filePath, dstDir string) error {
+func (z ZipArchiver) Extract(filePath, dstDir string, secret string) error {
 	if err := checkCmdAvailability("unzip"); err != nil {
 		return err
 	}
 	return cmd.ExecCmd(fmt.Sprintf("unzip -qo %s -d %s", filePath, dstDir))
 }
 
-func (z ZipArchiver) Compress(sourcePaths []string, dstFile string) error {
+func (z ZipArchiver) Compress(sourcePaths []string, dstFile string, _ string) error {
 	var err error
 	tmpFile := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("%s%s.zip", common.RandStr(50), time.Now().Format("20060102150405")))
 	op := NewFileOp()

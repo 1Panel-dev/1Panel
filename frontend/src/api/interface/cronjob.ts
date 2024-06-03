@@ -26,6 +26,7 @@ export namespace Cronjob {
         backupAccountList: Array<string>;
         retainCopies: number;
         status: string;
+        secret: string;
     }
     export interface CronjobCreate {
         name: string;
@@ -44,6 +45,7 @@ export namespace Cronjob {
         backupAccounts: string;
         defaultDownload: string;
         retainCopies: number;
+        secret: string;
     }
     export interface SpecObj {
         specType: string;
@@ -68,6 +70,7 @@ export namespace Cronjob {
         backupAccounts: string;
         defaultDownload: string;
         retainCopies: number;
+        secret: string;
     }
     export interface CronjobDelete {
         ids: Array<number>;

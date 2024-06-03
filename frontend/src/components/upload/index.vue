@@ -68,6 +68,14 @@
                         >
                             {{ $t('commons.button.delete') }}
                         </el-button>
+                        <el-form-item
+                            :label="$t('setting.compressPassword')"
+                            prop="secret"
+                            style="margin-top: 10px"
+                            v-if="type === 'app' || type === 'website'"
+                        >
+                            <el-input v-model="secret"></el-input>
+                        </el-form-item>
                     </template>
                     <el-table-column type="selection" fix />
                     <el-table-column :label="$t('commons.table.name')" show-overflow-tooltip prop="name" />
@@ -129,6 +137,7 @@ const type = ref();
 const name = ref();
 const detailName = ref();
 const remark = ref();
+const secret = ref();
 interface DialogProps {
     type: string;
     name: string;
@@ -191,6 +200,7 @@ const onRecover = async (row: File.File) => {
             name: name.value,
             detailName: detailName.value,
             file: baseDir.value + row.name,
+            secret: secret.value,
         };
         loading.value = true;
         await handleRecoverByUpload(params)

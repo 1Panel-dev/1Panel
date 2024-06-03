@@ -66,7 +66,7 @@ func (u *BackupService) PostgresqlRecoverByUpload(req dto.CommonRecover) error {
 				return fmt.Errorf("mkdir %s failed, err: %v", dstDir, err)
 			}
 		}
-		if err := handleUnTar(req.File, dstDir); err != nil {
+		if err := handleUnTar(req.File, dstDir, ""); err != nil {
 			_ = os.RemoveAll(dstDir)
 			return err
 		}

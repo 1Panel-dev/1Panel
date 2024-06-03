@@ -765,7 +765,7 @@ func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.App
 		global.LOG.Errorf("download app[%s] error %v", app.Name, err)
 		return
 	}
-	if err = fileOp.Decompress(filePath, appResourceDir, files.SdkTarGz); err != nil {
+	if err = fileOp.Decompress(filePath, appResourceDir, files.SdkTarGz, ""); err != nil {
 		global.LOG.Errorf("decompress app[%s] error %v", app.Name, err)
 		return
 	}

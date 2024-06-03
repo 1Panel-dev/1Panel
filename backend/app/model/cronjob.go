@@ -1,6 +1,8 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type Cronjob struct {
 	BaseModel
@@ -31,6 +33,7 @@ type Cronjob struct {
 	Status   string       `gorm:"type:varchar(64)" json:"status"`
 	EntryIDs string       `gorm:"type:varchar(64)" json:"entryIDs"`
 	Records  []JobRecords `json:"records"`
+	Secret   string       `gorm:"type:varchar(64)" json:"secret"`
 }
 
 type JobRecords struct {

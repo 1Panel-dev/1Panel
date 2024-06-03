@@ -1535,6 +1535,7 @@ const message = {
         ifShow: 'Whether to Show',
         menu: 'Menu',
         confirmMessage: 'The page will be refreshed to update the advanced menu list. Continue?',
+        compressPassword: 'Compression Password',
     },
     license: {
         community: 'Community Edition: ',

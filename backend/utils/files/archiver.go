@@ -7,8 +7,8 @@ import (
 )
 
 type ShellArchiver interface {
-	Extract(filePath, dstDir string) error
-	Compress(sourcePaths []string, dstFile string) error
+	Extract(filePath, dstDir string, secret string) error
+	Compress(sourcePaths []string, dstFile string, secret string) error
 }
 
 func NewShellArchiver(compressType CompressType) (ShellArchiver, error) {
@@ -18,6 +18,8 @@ func NewShellArchiver(compressType CompressType) (ShellArchiver, error) {
 			return nil, err
 		}
 		return NewTarArchiver(compressType), nil
+	case TarGz:
+		return NewTarGzArchiver(), nil
 	case Zip:
 		if err := checkCmdAvailability("zip"); err != nil {
 			return nil, err

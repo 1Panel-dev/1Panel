@@ -16,7 +16,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 )
 
-func handleRuntimeBackup(runtime *model.Runtime, backupDir, fileName string, excludes string) error {
+func handleRuntimeBackup(runtime *model.Runtime, backupDir, fileName string, excludes string, secret string) error {
 	fileOp := files.NewFileOp()
 	tmpDir := fmt.Sprintf("%s/%s", backupDir, strings.ReplaceAll(fileName, ".tar.gz", ""))
 	if !fileOp.Stat(tmpDir) {
@@ -35,19 +35,19 @@ func handleRuntimeBackup(runtime *model.Runtime, backupDir, fileName string, exc
 	}
 
 	appPath := runtime.GetPath()
-	if err := handleTar(appPath, tmpDir, "runtime.tar.gz", excludes); err != nil {
+	if err := handleTar(appPath, tmpDir, "runtime.tar.gz", excludes, secret); err != nil {
 		return err
 	}
-	if err := handleTar(tmpDir, backupDir, fileName, ""); err != nil {
+	if err := handleTar(tmpDir, backupDir, fileName, "", secret); err != nil {
 		return err
 	}
 	return nil
 }
 
-func handleRuntimeRecover(runtime *model.Runtime, recoverFile string, isRollback bool) error {
+func handleRuntimeRecover(runtime *model.Runtime, recoverFile string, isRollback bool, secret string) error {
 	isOk := false
 	fileOp := files.NewFileOp()
-	if err := handleUnTar(recoverFile, path.Dir(recoverFile)); err != nil {
+	if err := handleUnTar(recoverFile, path.Dir(recoverFile), secret); err != nil {
 		return err
 	}
 	tmpPath := strings.ReplaceAll(recoverFile, ".tar.gz", "")
@@ -73,13 +73,13 @@ func handleRuntimeRecover(runtime *model.Runtime, recoverFile string, isRollback
 
 	if !isRollback {
 		rollbackFile := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("runtime/%s_%s.tar.gz", runtime.Name, time.Now().Format("20060102150405")))
-		if err := handleRuntimeBackup(runtime, path.Dir(rollbackFile), path.Base(rollbackFile), ""); err != nil {
+		if err := handleRuntimeBackup(runtime, path.Dir(rollbackFile), path.Base(rollbackFile), "", secret); err != nil {
 			return fmt.Errorf("backup runtime %s for rollback before recover failed, err: %v", runtime.Name, err)
 		}
 		defer func() {
 			if !isOk {
 				global.LOG.Info("recover failed, start to rollback now")
-				if err := handleRuntimeRecover(runtime, rollbackFile, true); err != nil {
+				if err := handleRuntimeRecover(runtime, rollbackFile, true, secret); err != nil {
 					global.LOG.Errorf("rollback runtime %s from %s failed, err: %v", runtime.Name, rollbackFile, err)
 					return
 				}
@@ -100,7 +100,7 @@ func handleRuntimeRecover(runtime *model.Runtime, recoverFile string, isRollback
 	_ = fileOp.Rename(runtimeDir, backPath)
 	_ = fileOp.CreateDir(runtimeDir, 0755)
 
-	if err := handleUnTar(tmpPath+"/runtime.tar.gz", fmt.Sprintf("%s/%s", constant.RuntimeDir, runtime.Type)); err != nil {
+	if err := handleUnTar(tmpPath+"/runtime.tar.gz", fmt.Sprintf("%s/%s", constant.RuntimeDir, runtime.Type), secret); err != nil {
 		global.LOG.Errorf("handle recover from runtime.tar.gz failed, err: %v", err)
 		_ = fileOp.DeleteDir(runtimeDir)
 		_ = fileOp.Rename(backPath, runtimeDir)

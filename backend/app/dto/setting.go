@@ -116,11 +116,13 @@ type SnapshotCreate struct {
 	From            string `json:"from" validate:"required"`
 	DefaultDownload string `json:"defaultDownload" validate:"required"`
 	Description     string `json:"description" validate:"max=256"`
+	Secret          string `json:"secret"`
 }
 type SnapshotRecover struct {
-	IsNew      bool `json:"isNew"`
-	ReDownload bool `json:"reDownload"`
-	ID         uint `json:"id" validate:"required"`
+	IsNew      bool   `json:"isNew"`
+	ReDownload bool   `json:"reDownload"`
+	ID         uint   `json:"id" validate:"required"`
+	Secret     string `json:"secret"`
 }
 type SnapshotBatchDelete struct {
 	DeleteWithFile bool   `json:"deleteWithFile"`

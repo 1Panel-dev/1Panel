@@ -43,6 +43,14 @@
                     <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
                         {{ $t('commons.button.delete') }}
                     </el-button>
+                    <el-form-item
+                        :label="$t('setting.compressPassword')"
+                        prop="secret"
+                        style="margin-top: 10px"
+                        v-if="type === 'app' || type === 'website'"
+                    >
+                        <el-input v-model="secret"></el-input>
+                    </el-form-item>
                 </template>
                 <el-table-column type="selection" fix />
                 <el-table-column :label="$t('commons.table.name')" prop="fileName" show-overflow-tooltip />
@@ -105,6 +113,7 @@ const name = ref();
 const detailName = ref();
 const backupPath = ref();
 const status = ref();
+const secret = ref();
 
 interface DialogProps {
     type: string;
@@ -180,6 +189,7 @@ const onBackup = async () => {
             type: type.value,
             name: name.value,
             detailName: detailName.value,
+            secret: secret.value,
         };
         loading.value = true;
         await handleBackup(params)
@@ -209,6 +219,7 @@ const onRecover = async (row: Backup.RecordInfo) => {
             name: name.value,
             detailName: detailName.value,
             file: row.fileDir + '/' + row.fileName,
+            secret: secret.value,
         };
         loading.value = true;
         await handleRecover(params)
