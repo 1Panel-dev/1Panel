@@ -1044,14 +1044,16 @@ func (w WebsiteService) OpWebsiteLog(req request.WebsiteLogReq) (*response.Websi
 	case constant.EnableLog:
 		key := "access_log"
 		logPath := path.Join("/www", "sites", website.Alias, "log", req.LogType)
+		params := []string{logPath}
 		switch req.LogType {
 		case constant.AccessLog:
+			params = append(params, "main")
 			website.AccessLog = true
 		case constant.ErrorLog:
 			key = "error_log"
 			website.ErrorLog = true
 		}
-		if err := updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: key, Params: []string{logPath}}}, &website); err != nil {
+		if err := updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: key, Params: params}}, &website); err != nil {
 			return nil, err
 		}
 		if err := websiteRepo.Save(context.Background(), &website); err != nil {
