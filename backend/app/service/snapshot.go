@@ -256,7 +256,7 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto
 	}
 	if snapStatus.BackupData != constant.StatusDone {
 		wg.Add(1)
-		go snapBackup(itemHelper, localDir, backupPanelDir, secret)
+		go snapBackup(itemHelper, localDir, backupPanelDir)
 	}
 
 	if !isCronjob {
@@ -267,14 +267,14 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto
 				return
 			}
 			if snapStatus.PanelData != constant.StatusDone {
-				snapPanelData(itemHelper, localDir, backupPanelDir, secret)
+				snapPanelData(itemHelper, localDir, backupPanelDir)
 			}
 			if snapStatus.PanelData != constant.StatusDone {
 				_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
 				return
 			}
 			if snapStatus.Compress != constant.StatusDone {
-				snapCompress(itemHelper, rootDir)
+				snapCompress(itemHelper, rootDir, secret)
 			}
 			if snapStatus.Compress != constant.StatusDone {
 				_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
@@ -298,14 +298,14 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto
 		return snap.Name, fmt.Errorf("snapshot %s backup failed", snap.Name)
 	}
 	loadLogByStatus(snapStatus, logPath)
-	snapPanelData(itemHelper, localDir, backupPanelDir, secret)
+	snapPanelData(itemHelper, localDir, backupPanelDir)
 	if snapStatus.PanelData != constant.StatusDone {
 		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
 		loadLogByStatus(snapStatus, logPath)
 		return snap.Name, fmt.Errorf("snapshot %s 1panel data failed", snap.Name)
 	}
 	loadLogByStatus(snapStatus, logPath)
-	snapCompress(itemHelper, rootDir)
+	snapCompress(itemHelper, rootDir, secret)
 	if snapStatus.Compress != constant.StatusDone {
 		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
 		loadLogByStatus(snapStatus, logPath)

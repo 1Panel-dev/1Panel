@@ -127,18 +127,18 @@ func snapAppData(snap snapHelper, targetDir string) {
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"app_data": constant.StatusDone})
 }
 
-func snapBackup(snap snapHelper, localDir, targetDir string, secret string) {
+func snapBackup(snap snapHelper, localDir, targetDir string) {
 	defer snap.Wg.Done()
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"backup_data": constant.Running})
 	status := constant.StatusDone
-	if err := handleSnapTar(localDir, targetDir, "1panel_backup.tar.gz", "./system;./system_snapshot;", secret); err != nil {
+	if err := handleSnapTar(localDir, targetDir, "1panel_backup.tar.gz", "./system;./system_snapshot;", ""); err != nil {
 		status = err.Error()
 	}
 	snap.Status.BackupData = status
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"backup_data": status})
 }
 
-func snapPanelData(snap snapHelper, localDir, targetDir string, secret string) {
+func snapPanelData(snap snapHelper, localDir, targetDir string) {
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"panel_data": constant.Running})
 	status := constant.StatusDone
 	dataDir := path.Join(global.CONF.System.BaseDir, "1panel")
@@ -158,7 +158,7 @@ func snapPanelData(snap snapHelper, localDir, targetDir string, secret string) {
 	sysIP, _ := settingRepo.Get(settingRepo.WithByKey("SystemIP"))
 	_ = settingRepo.Update("SystemIP", "")
 	checkPointOfWal()
-	if err := handleSnapTar(dataDir, targetDir, "1panel_data.tar.gz", exclusionRules, secret); err != nil {
+	if err := handleSnapTar(dataDir, targetDir, "1panel_data.tar.gz", exclusionRules, ""); err != nil {
 		status = err.Error()
 	}
 	_ = snapshotRepo.Update(snap.SnapID, map[string]interface{}{"status": constant.StatusWaiting})
@@ -168,11 +168,11 @@ func snapPanelData(snap snapHelper, localDir, targetDir string, secret string) {
 	_ = settingRepo.Update("SystemIP", sysIP.Value)
 }
 
-func snapCompress(snap snapHelper, rootDir string) {
+func snapCompress(snap snapHelper, rootDir string, secret string) {
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"compress": constant.StatusRunning})
 	tmpDir := path.Join(global.CONF.System.TmpDir, "system")
 	fileName := fmt.Sprintf("%s.tar.gz", path.Base(rootDir))
-	if err := snap.FileOp.Compress([]string{rootDir}, tmpDir, fileName, files.TarGz, ""); err != nil {
+	if err := handleSnapTar(rootDir, tmpDir, fileName, "", secret); err != nil {
 		snap.Status.Compress = err.Error()
 		_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"compress": err.Error()})
 		return
@@ -243,10 +243,21 @@ func handleSnapTar(sourceDir, targetDir, name, exclusionRules string, secret str
 		exStr += exclude
 		exMap[exclude] = struct{}{}
 	}
+	path := ""
+	if strings.Contains(sourceDir, "/") {
+		itemDir := strings.ReplaceAll(sourceDir[strings.LastIndex(sourceDir, "/"):], "/", "")
+		aheadDir := sourceDir[:strings.LastIndex(sourceDir, "/")]
+		if len(aheadDir) == 0 {
+			aheadDir = "/"
+		}
+		path += fmt.Sprintf("-C %s %s", aheadDir, itemDir)
+	} else {
+		path = sourceDir
+	}
 	commands := ""
 	if secret != "" {
 		extraCmd := "| openssl enc -aes-256-cbc -salt -k " + secret + " -out"
-		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read -zcf %s -C %s %s %s", " -"+exStr, sourceDir, extraCmd, targetDir+"/"+name)
+		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read -zcf %s %s %s %s", " -"+exStr, path, extraCmd, targetDir+"/"+name)
 	} else {
 		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read -zcf %s %s -C %s .", targetDir+"/"+name, exStr, sourceDir)
 	}
