@@ -285,7 +285,7 @@ type DatabaseCreate struct {
 	Address  string `json:"address"`
 	Port     uint   `json:"port"`
 	Username string `json:"username" validate:"required"`
-	Password string `json:"password" validate:"required"`
+	Password string `json:"password"`
 
 	SSL        bool   `json:"ssl"`
 	RootCert   string `json:"rootCert"`
