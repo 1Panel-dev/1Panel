@@ -73,7 +73,7 @@ const handleClose = () => {
     em('close', open);
 };
 
-const acceptParams = async (app: App.AppInstalled) => {
+const acceptParams = async (app: App.AppInstallDto) => {
     deleteReq.value = {
         operate: 'delete',
         installId: 0,
@@ -83,7 +83,7 @@ const acceptParams = async (app: App.AppInstalled) => {
     };
     deleteInfo.value = '';
     deleteReq.value.installId = app.id;
-    appType.value = app.app.type;
+    appType.value = app.appType;
     deleteHelper.value = i18n.global.t('website.deleteConfirmHelper', [app.name]);
     appInstallName.value = app.name;
     open.value = true;

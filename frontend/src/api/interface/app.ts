@@ -121,6 +121,27 @@ export namespace App {
         app: App;
     }
 
+    export interface AppInstallDto {
+        id: number;
+        name: string;
+        appID: number;
+        appDetailID: number;
+        version: string;
+        status: string;
+        message: string;
+        httpPort: number;
+        httpsPort: number;
+        path: string;
+        canUpdate: boolean;
+        icon: string;
+        appName: string;
+        ready: number;
+        total: number;
+        appKey: string;
+        appType: string;
+        appStatus: string;
+    }
+
     export interface AppInstalledInfo {
         id: number;
         key: string;

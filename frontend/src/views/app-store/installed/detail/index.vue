@@ -166,7 +166,6 @@ const acceptParams = async (props: ParamProps) => {
     submitModel.value.installId = props.id;
     params.value = [];
     paramData.value.id = props.id;
-    paramData.value.app = props.app;
     paramModel.value.params = {};
     edit.value = false;
     await get();

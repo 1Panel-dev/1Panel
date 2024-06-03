@@ -39,11 +39,11 @@ type AppInstallService struct {
 }
 
 type IAppInstallService interface {
-	Page(req request.AppInstalledSearch) (int64, []response.AppInstalledDTO, error)
+	Page(req request.AppInstalledSearch) (int64, []response.AppInstallDTO, error)
 	CheckExist(req request.AppInstalledInfo) (*response.AppInstalledCheck, error)
 	LoadPort(req dto.OperationWithNameAndType) (int64, error)
 	LoadConnInfo(req dto.OperationWithNameAndType) (response.DatabaseConn, error)
-	SearchForWebsite(req request.AppInstalledSearch) ([]response.AppInstalledDTO, error)
+	SearchForWebsite(req request.AppInstalledSearch) ([]response.AppInstallDTO, error)
 	Operate(req request.AppInstalledOperate) error
 	Update(req request.AppInstalledUpdate) error
 	IgnoreUpgrade(req request.AppInstalledIgnoreUpgrade) error
@@ -74,7 +74,7 @@ func (a *AppInstallService) GetInstallList() ([]dto.AppInstallInfo, error) {
 	return datas, nil
 }
 
-func (a *AppInstallService) Page(req request.AppInstalledSearch) (int64, []response.AppInstalledDTO, error) {
+func (a *AppInstallService) Page(req request.AppInstalledSearch) (int64, []response.AppInstallDTO, error) {
 	var (
 		opts     []repo.DBOption
 		total    int64
@@ -191,7 +191,7 @@ func (a *AppInstallService) LoadConnInfo(req dto.OperationWithNameAndType) (resp
 	return data, nil
 }
 
-func (a *AppInstallService) SearchForWebsite(req request.AppInstalledSearch) ([]response.AppInstalledDTO, error) {
+func (a *AppInstallService) SearchForWebsite(req request.AppInstalledSearch) ([]response.AppInstallDTO, error) {
 	var (
 		installs []model.AppInstall
 		err      error
@@ -705,84 +705,27 @@ func syncAppInstallStatus(appInstall *model.AppInstall) error {
 	if appInstall.Status == constant.Installing || appInstall.Status == constant.Rebuilding || appInstall.Status == constant.Upgrading {
 		return nil
 	}
-	var err error
-	containerNames := []string{appInstall.ContainerName}
-	if appInstall.ContainerName == "" {
-		containerNames, err = getContainerNames(*appInstall)
-		if err != nil {
-			return err
-		}
-	}
-
 	cli, err := docker.NewClient()
 	if err != nil {
 		return err
 	}
 	defer cli.Close()
 
-	var containers []types.Container
+	var (
+		containers     []types.Container
+		containersMap  map[string]types.Container
+		containerNames = strings.Split(appInstall.ContainerName, ",")
+	)
 	containers, err = cli.ListContainersByName(containerNames)
 	if err != nil {
 		return err
 	}
-	var (
-		runningCount         int
-		exitedCount          int
-		pausedCount          int
-		exitedContainerNames []string
-		total                = len(containerNames)
-		count                = len(containers)
-	)
-
-	foundNames := make(map[string]bool)
+	containersMap = make(map[string]types.Container)
 	for _, con := range containers {
-		foundNames[con.Names[0]] = true
-		switch con.State {
-		case "exited":
-			exitedContainerNames = append(exitedContainerNames, strings.TrimPrefix(con.Names[0], "/"))
-			exitedCount++
-		case "running":
-			runningCount++
-		case "paused":
-			pausedCount++
-		}
+		containersMap[con.Names[0]] = con
 	}
-
-	var notFoundNames []string
-	for _, name := range containerNames {
-		if !foundNames["/"+name] {
-			notFoundNames = append(notFoundNames, name)
-		}
-	}
-
-	switch {
-	case count == 0:
-		if appInstall.Status != constant.Error {
-			appInstall.Status = constant.SyncErr
-			appInstall.Message = buserr.WithName("ErrContainerNotFound", strings.Join(containerNames, ",")).Error()
-		}
-	case exitedCount == total:
-		appInstall.Status = constant.Stopped
-	case runningCount == total:
-		appInstall.Status = constant.Running
-	case pausedCount == total:
-		appInstall.Status = constant.Paused
-	default:
-		var msg string
-		if exitedCount > 0 {
-			msg = buserr.WithName("ErrContainerMsg", strings.Join(exitedContainerNames, ",")).Error()
-		}
-		if len(notFoundNames) > 0 {
-			msg += buserr.WithName("ErrContainerNotFound", strings.Join(notFoundNames, ",")).Error()
-		}
-		if msg == "" {
-			msg = buserr.New("ErrAppWarn").Error()
-		}
-		appInstall.Message = msg
-		appInstall.Status = constant.UnHealthy
-	}
+	synAppInstall(containersMap, appInstall)
 	_ = appInstallRepo.Save(context.Background(), appInstall)
-
 	return nil
 }
 
