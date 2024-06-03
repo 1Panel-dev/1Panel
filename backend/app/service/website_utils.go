@@ -235,7 +235,7 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 	server.UpdateServerName(serverNames)
 
 	siteFolder := path.Join("/www", "sites", website.Alias)
-	server.UpdateDirective("access_log", []string{path.Join(siteFolder, "log", "access.log")})
+	server.UpdateDirective("access_log", []string{path.Join(siteFolder, "log", "access.log"), "main"})
 	server.UpdateDirective("error_log", []string{path.Join(siteFolder, "log", "error.log")})
 
 	rootIndex := path.Join("/www/sites", website.Alias, "index")
