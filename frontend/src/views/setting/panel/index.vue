@@ -29,7 +29,7 @@
                             <el-form-item :label="$t('setting.theme')" prop="theme">
                                 <el-radio-group @change="onSave('Theme', form.theme)" v-model="form.theme">
                                     <el-radio-button v-if="isProductPro" value="dark-gold">
-                                        <span>{{ $t('xpack.setting.darkGold') }}</span>
+                                        <span>{{ $t('setting.darkGold') }}</span>
                                     </el-radio-button>
                                     <el-radio-button value="light">
                                         <span>{{ $t('setting.light') }}</span>

@@ -178,6 +178,16 @@ func (f *FtpService) Delete(req dto.BatchDeleteReq) error {
 }
 
 func (f *FtpService) Update(req dto.FtpUpdate) error {
+	if _, err := os.Stat(req.Path); err != nil {
+		if os.IsNotExist(err) {
+			if err := os.MkdirAll(req.Path, os.ModePerm); err != nil {
+				return err
+			}
+		} else {
+			return err
+		}
+	}
+
 	pass, err := encrypt.StringEncrypt(req.Password)
 	if err != nil {
 		return err

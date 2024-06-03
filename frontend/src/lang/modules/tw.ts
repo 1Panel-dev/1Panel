@@ -60,6 +60,8 @@ const message = {
             update: '編輯',
             showAll: '顯示所有',
             hideSome: '隱藏部分',
+            agree: '同意',
+            notAgree: '不同意',
         },
         search: {
             timeStart: '開始時間',
@@ -159,6 +161,9 @@ const message = {
             licenseHelper:
                 '同意 &laquo; <a href="https://www.fit2cloud.com/legal/licenses.html" target="_blank"> 飛致雲社區軟件許可協議</a> &raquo;',
             errorAgree: '請點擊同意社區軟件許可協議',
+            agreeTitle: '服務協議及隱私保護',
+            agreeContent:
+                '為了更好的保障您的合法權益，請您閱讀並同意以下協議 &laquo; <a href="https://www.fit2cloud.com/legal/licenses.html" target="_blank"> 飛致雲社區軟件許可協議 </a> &raquo;',
             logout: '退出登錄',
         },
         rule: {
@@ -1197,6 +1202,7 @@ const message = {
         menuTabs: '菜單標簽頁',
         componentSize: '組件大小',
         dark: '暗色',
+        darkGold: '黑金',
         light: '亮色',
         auto: '跟隨系統',
         language: '系統語言',
