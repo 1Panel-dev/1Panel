@@ -16,7 +16,7 @@ type App struct {
 	Type               string `json:"type" gorm:"type:varchar(64);not null"`
 	Status             string `json:"status" gorm:"type:varchar(64);not null"`
 	Required           string `json:"required" gorm:"type:varchar(64);"`
-	CrossVersionUpdate bool   `json:"crossVersionUpdate"`
+	CrossVersionUpdate bool   `json:"crossVersionUpdate" yaml:"crossVersionUpdate"`
 	Limit              int    `json:"limit" gorm:"type:Integer;not null"`
 	Website            string `json:"website" gorm:"type:varchar(64);not null"`
 	Github             string `json:"github" gorm:"type:varchar(64);not null"`
