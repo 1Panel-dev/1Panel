@@ -127,7 +127,7 @@
                             </template>
                         </el-checkbox>
                         <span
-                            v-if="errAgree && loginForm.agreeLicense === false"
+                            v-if="!loginForm.agreeLicense && !globalStore.isMobile()"
                             class="input-error"
                             style="line-height: 14px"
                         >
@@ -142,6 +142,26 @@
                 </div>
             </div>
         </div>
+        <el-dialog v-model="agreeVisible" center :destroy-on-close="true" :close-on-click-modal="false" width="80%">
+            <el-row type="flex" justify="center">
+                <span class="text-base mb-4">
+                    {{ $t('commons.login.agreeTitle') }}
+                </span>
+            </el-row>
+            <div>
+                <span v-html="$t('commons.login.agreeContent')"></span>
+            </div>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="agreeVisible = false">
+                        {{ $t('commons.button.notAgree') }}
+                    </el-button>
+                    <el-button type="primary" @click="agreeWithLogin()">
+                        {{ $t('commons.button.agree') }}
+                    </el-button>
+                </span>
+            </template>
+        </el-dialog>
     </div>
 </template>
 
@@ -166,7 +186,7 @@ const errAuthInfo = ref(false);
 const errCaptcha = ref(false);
 const errMfaInfo = ref(false);
 const isDemo = ref(false);
-const errAgree = ref(false);
+const agreeVisible = ref(false);
 
 type FormInstance = InstanceType<typeof ElForm>;
 
@@ -222,10 +242,22 @@ function handleCommand(command: string) {
     }
 }
 
+const agreeWithLogin = () => {
+    agreeVisible.value = false;
+    loginForm.agreeLicense = true;
+    login(loginFormRef.value);
+};
+
 const login = (formEl: FormInstance | undefined) => {
     if (!formEl || isLoggingIn) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
+        if (!loginForm.agreeLicense) {
+            if (globalStore.isMobile()) {
+                agreeVisible.value = true;
+            }
+            return;
+        }
         let requestLoginForm = {
             name: loginForm.name,
             password: loginForm.password,
@@ -237,10 +269,6 @@ const login = (formEl: FormInstance | undefined) => {
         };
         if (!globalStore.ignoreCaptcha && requestLoginForm.captcha == '') {
             errCaptcha.value = true;
-            return;
-        }
-        if (loginForm.agreeLicense == false) {
-            errAgree.value = true;
             return;
         }
         try {
