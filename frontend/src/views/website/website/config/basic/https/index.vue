@@ -13,6 +13,7 @@
                     <el-switch v-model="form.enable" @change="changeEnable"></el-switch>
                 </el-form-item>
                 <div v-if="form.enable">
+                    <el-text type="warning" class="!ml-2">{{ $t('website.ipWebsiteWarn') }}</el-text>
                     <el-divider content-position="left">{{ $t('website.SSLConfig') }}</el-divider>
                     <el-form-item :label="$t('website.HTTPConfig')" prop="httpConfig">
                         <el-select v-model="form.httpConfig" style="width: 240px">

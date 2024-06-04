@@ -36,9 +36,9 @@
                 <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
                     <el-table-column label="ID" prop="id" width="140" show-overflow-tooltip>
                         <template #default="{ row }">
-                            <el-button text type="primary" @click="onInspect(row.id)">
+                            <el-text type="primary" class="cursor-pointer" @click="onInspect(row.id)">
                                 {{ row.id.replaceAll('sha256:', '').substring(0, 12) }}
-                            </el-button>
+                            </el-text>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" prop="isUsed" width="100">

@@ -52,7 +52,9 @@
                         show-overflow-tooltip
                     >
                         <template #default="{ row }">
-                            <el-button text type="primary" @click="loadDetail(row)">{{ row.name }}</el-button>
+                            <el-text type="primary" class="cursor-pointer" @click="loadDetail(row)">
+                                {{ row.name }}
+                            </el-text>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('container.from')" prop="createdBy" min-width="80" fix>

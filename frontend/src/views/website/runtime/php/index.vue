@@ -32,9 +32,9 @@
                         show-overflow-tooltip
                     >
                         <template #default="{ row }">
-                            <el-button text type="primary" @click="openDetail(row)">
+                            <el-text type="primary" class="cursor-pointer" @click="openDetail(row)">
                                 {{ row.name }}
-                            </el-button>
+                            </el-text>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('runtime.resource')" prop="resource">

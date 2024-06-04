@@ -6,7 +6,7 @@ const containerRouter = {
     component: Layout,
     redirect: '/containers/container',
     meta: {
-        icon: 'p-docker',
+        icon: 'p-docker1',
         title: 'menu.container',
     },
     children: [

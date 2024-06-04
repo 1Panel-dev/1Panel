@@ -1877,6 +1877,7 @@ const message = {
         containWarn: '其他域名中包含主域名，请重新输入',
         rewriteHelper2: '从应用商店安装的 WordPress 等应用，默认已经配置好伪静态，重复配置可能会报错',
         websiteBackupWarn: '仅支持导入本机备份，导入其他机器备份可能会恢复失败',
+        ipWebsiteWarn: 'IP 为域名的网站，需要设置为默认站点才能正常访问',
     },
     php: {
         short_open_tag: '短标签支持',
