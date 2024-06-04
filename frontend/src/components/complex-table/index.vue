@@ -18,10 +18,11 @@
 
         <div class="complex-table__pagination" v-if="props.paginationConfig">
             <slot name="pagination">
-                <fu-table-pagination
+                <el-pagination
                     v-model:current-page="paginationConfig.currentPage"
                     v-model:page-size="paginationConfig.pageSize"
                     :total="paginationConfig.total"
+                    :page-sizes="[5, 10, 20, 50, 100]"
                     @size-change="sizeChange"
                     @current-change="currentChange"
                     :small="mobile"

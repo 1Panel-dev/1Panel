@@ -17,13 +17,13 @@
 
         <ComplexTable class="mt-2" :pagination-config="paginationConfig" :data="data" @search="search">
             <el-table-column label="ip" prop="ip" show-overflow-tooltip />
-            <el-table-column :label="$t('commons.table.status')" show-overflow-tooltip prop="status">
+            <el-table-column :label="$t('commons.table.status')" min-width="50" show-overflow-tooltip prop="status">
                 <template #default="{ row }">
                     <el-tag v-if="row.status === '200'">{{ $t('commons.status.success') }}</el-tag>
                     <el-tag v-else type="danger">{{ $t('commons.status.failed') }}</el-tag>
                 </template>
             </el-table-column>
-            <el-table-column :label="$t('commons.table.operate')" show-overflow-tooltip>
+            <el-table-column :label="$t('commons.table.operate')" min-width="40" show-overflow-tooltip>
                 <template #default="{ row }">
                     {{ loadOperation(row.operation) }}
                 </template>
@@ -33,12 +33,12 @@
                     {{ loadFileName(row.operation) }}
                 </template>
             </el-table-column>
-            <el-table-column :label="$t('file.size')" show-overflow-tooltip prop="size">
+            <el-table-column :label="$t('file.size')" show-overflow-tooltip prop="size" min-width="60">
                 <template #default="{ row }">
                     {{ computeSizeFromByte(Number(row.size)) }}
                 </template>
             </el-table-column>
-            <el-table-column :label="$t('commons.table.date')" prop="time" show-overflow-tooltip />
+            <el-table-column :label="$t('commons.table.date')" prop="time" show-overflow-tooltip min-width="100" />
         </ComplexTable>
         <template #footer>
             <span class="dialog-footer">
