@@ -396,7 +396,7 @@ func (u *SnapshotService) handleUnTar(sourceDir, targetDir string, secret string
 	} else {
 		commands = fmt.Sprintf("tar -zxvf %s %s", sourceDir+" -C ", targetDir+" > /dev/null 2>&1")
 	}
-	global.LOG.Debug(commands)
+	global.LOG.Debug(strings.ReplaceAll(commands, secret, "******"))
 	stdout, err := cmd.ExecWithTimeOut(commands, 30*time.Minute)
 	if err != nil {
 		if len(stdout) != 0 {
