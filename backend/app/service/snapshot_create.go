@@ -131,7 +131,7 @@ func snapBackup(snap snapHelper, localDir, targetDir string) {
 	defer snap.Wg.Done()
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"backup_data": constant.Running})
 	status := constant.StatusDone
-	if err := handleSnapTar(localDir, targetDir, "1panel_backup.tar.gz", "./system;./system_snapshot;"); err != nil {
+	if err := handleSnapTar(localDir, targetDir, "1panel_backup.tar.gz", "./system;./system_snapshot;", ""); err != nil {
 		status = err.Error()
 	}
 	snap.Status.BackupData = status
@@ -158,7 +158,7 @@ func snapPanelData(snap snapHelper, localDir, targetDir string) {
 	sysIP, _ := settingRepo.Get(settingRepo.WithByKey("SystemIP"))
 	_ = settingRepo.Update("SystemIP", "")
 	checkPointOfWal()
-	if err := handleSnapTar(dataDir, targetDir, "1panel_data.tar.gz", exclusionRules); err != nil {
+	if err := handleSnapTar(dataDir, targetDir, "1panel_data.tar.gz", exclusionRules, ""); err != nil {
 		status = err.Error()
 	}
 	_ = snapshotRepo.Update(snap.SnapID, map[string]interface{}{"status": constant.StatusWaiting})
@@ -168,11 +168,11 @@ func snapPanelData(snap snapHelper, localDir, targetDir string) {
 	_ = settingRepo.Update("SystemIP", sysIP.Value)
 }
 
-func snapCompress(snap snapHelper, rootDir string) {
+func snapCompress(snap snapHelper, rootDir string, secret string) {
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"compress": constant.StatusRunning})
 	tmpDir := path.Join(global.CONF.System.TmpDir, "system")
 	fileName := fmt.Sprintf("%s.tar.gz", path.Base(rootDir))
-	if err := snap.FileOp.Compress([]string{rootDir}, tmpDir, fileName, files.TarGz); err != nil {
+	if err := handleSnapTar(rootDir, tmpDir, fileName, "", secret); err != nil {
 		snap.Status.Compress = err.Error()
 		_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"compress": err.Error()})
 		return
@@ -221,7 +221,7 @@ func snapUpload(snap snapHelper, accounts string, file string) {
 	_ = os.Remove(source)
 }
 
-func handleSnapTar(sourceDir, targetDir, name, exclusionRules string) error {
+func handleSnapTar(sourceDir, targetDir, name, exclusionRules string, secret string) error {
 	if _, err := os.Stat(targetDir); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(targetDir, os.ModePerm); err != nil {
 			return err
@@ -243,9 +243,25 @@ func handleSnapTar(sourceDir, targetDir, name, exclusionRules string) error {
 		exStr += exclude
 		exMap[exclude] = struct{}{}
 	}
-
-	commands := fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read -zcf %s %s -C %s .", targetDir+"/"+name, exStr, sourceDir)
-	global.LOG.Debug(commands)
+	path := ""
+	if strings.Contains(sourceDir, "/") {
+		itemDir := strings.ReplaceAll(sourceDir[strings.LastIndex(sourceDir, "/"):], "/", "")
+		aheadDir := sourceDir[:strings.LastIndex(sourceDir, "/")]
+		if len(aheadDir) == 0 {
+			aheadDir = "/"
+		}
+		path += fmt.Sprintf("-C %s %s", aheadDir, itemDir)
+	} else {
+		path = sourceDir
+	}
+	commands := ""
+	if secret != "" {
+		extraCmd := "| openssl enc -aes-256-cbc -salt -k " + secret + " -out"
+		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read -zcf %s %s %s %s", " -"+exStr, path, extraCmd, targetDir+"/"+name)
+	} else {
+		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read -zcf %s %s -C %s .", targetDir+"/"+name, exStr, sourceDir)
+	}
+	global.LOG.Debug(strings.ReplaceAll(commands, secret, "******"))
 	stdout, err := cmd.ExecWithTimeOut(commands, 30*time.Minute)
 	if err != nil {
 		if len(stdout) != 0 {

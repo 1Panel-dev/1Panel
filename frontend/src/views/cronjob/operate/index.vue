@@ -300,6 +300,13 @@
                                 </el-link>
                             </span>
                         </el-form-item>
+                        <el-form-item
+                            :label="$t('setting.compressPassword')"
+                            prop="secret"
+                            v-if="isBackup() && dialogData.rowData!.type !== 'database'"
+                        >
+                            <el-input v-model="dialogData.rowData!.secret" />
+                        </el-form-item>
                         <el-form-item :label="$t('cronjob.default_download_path')" prop="defaultDownload">
                             <el-select class="selectClass" v-model="dialogData.rowData!.defaultDownload">
                                 <div v-for="item in accountOptions" :key="item.label">

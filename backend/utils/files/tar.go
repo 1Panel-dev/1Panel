@@ -17,11 +17,11 @@ func NewTarArchiver(compressType CompressType) ShellArchiver {
 	}
 }
 
-func (t TarArchiver) Extract(FilePath string, dstDir string) error {
+func (t TarArchiver) Extract(FilePath string, dstDir string, secret string) error {
 	return cmd.ExecCmd(fmt.Sprintf("%s %s %s -C %s", t.Cmd, t.getOptionStr("extract"), FilePath, dstDir))
 }
 
-func (t TarArchiver) Compress(sourcePaths []string, dstFile string) error {
+func (t TarArchiver) Compress(sourcePaths []string, dstFile string, secret string) error {
 	return nil
 }
 

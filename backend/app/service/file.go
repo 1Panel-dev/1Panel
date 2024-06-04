@@ -218,12 +218,12 @@ func (f *FileService) Compress(c request.FileCompress) error {
 	if !c.Replace && fo.Stat(filepath.Join(c.Dst, c.Name)) {
 		return buserr.New(constant.ErrFileIsExit)
 	}
-	return fo.Compress(c.Files, c.Dst, c.Name, files.CompressType(c.Type))
+	return fo.Compress(c.Files, c.Dst, c.Name, files.CompressType(c.Type), c.Secret)
 }
 
 func (f *FileService) DeCompress(c request.FileDeCompress) error {
 	fo := files.NewFileOp()
-	return fo.Decompress(c.Path, c.Dst, files.CompressType(c.Type))
+	return fo.Decompress(c.Path, c.Dst, files.CompressType(c.Type), c.Secret)
 }
 
 func (f *FileService) GetContent(op request.FileContentReq) (response.FileInfo, error) {
@@ -325,7 +325,7 @@ func (f *FileService) FileDownload(d request.FileDownload) (string, error) {
 			return "", err
 		}
 		fo := files.NewFileOp()
-		if err := fo.Compress(d.Paths, tempPath, d.Name, files.CompressType(d.Type)); err != nil {
+		if err := fo.Compress(d.Paths, tempPath, d.Name, files.CompressType(d.Type), ""); err != nil {
 			return "", err
 		}
 		filePath = filepath.Join(tempPath, d.Name)

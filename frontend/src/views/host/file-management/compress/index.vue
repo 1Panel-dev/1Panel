@@ -37,6 +37,9 @@
                             </template>
                         </el-input>
                     </el-form-item>
+                    <el-form-item :label="$t('setting.compressPassword')" prop="secret" v-if="form.type === 'tar.gz'">
+                        <el-input v-model="form.secret"></el-input>
+                    </el-form-item>
                     <el-form-item>
                         <el-checkbox v-model="form.replace" :label="$t('file.replace')"></el-checkbox>
                     </el-form-item>
@@ -79,7 +82,7 @@ const rules = reactive<FormRules>({
 
 const fileForm = ref<FormInstance>();
 const loading = ref(false);
-const form = ref<File.FileCompress>({ files: [], type: 'zip', dst: '', name: '', replace: false });
+const form = ref<File.FileCompress>({ files: [], type: 'zip', dst: '', name: '', replace: false, secret: '' });
 const options = ref<string[]>([]);
 const open = ref(false);
 const title = ref('');

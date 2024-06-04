@@ -10,6 +10,9 @@
                     <el-col :span="22">
                         <span class="card-title">{{ $t('setting.recover') }}</span>
                         <el-divider class="divider" />
+                        <el-form-item :label="$t('setting.compressPassword')" prop="secret">
+                            <el-input v-model="snapInfo.secret"></el-input>
+                        </el-form-item>
                         <div v-if="!snapInfo.recoverStatus && !snapInfo.lastRecoveredAt">
                             <el-alert center class="alert" style="height: 257px" :closable="false">
                                 <el-button size="large" round plain type="primary" @click="recoverSnapshot(true)">
@@ -197,7 +200,12 @@ const handleClose = () => {
 
 const doRecover = async (isNew: boolean) => {
     loading.value = true;
-    await snapshotRecover({ id: snapInfo.value.id, isNew: isNew, reDownload: reDownload.value })
+    await snapshotRecover({
+        id: snapInfo.value.id,
+        isNew: isNew,
+        reDownload: reDownload.value,
+        secret: snapInfo.value.secret,
+    })
         .then(() => {
             emit('search');
             loading.value = false;

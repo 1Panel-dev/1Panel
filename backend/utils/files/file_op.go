@@ -476,7 +476,7 @@ func getFormat(cType CompressType) archiver.CompressedArchive {
 	return format
 }
 
-func (f FileOp) Compress(srcRiles []string, dst string, name string, cType CompressType) error {
+func (f FileOp) Compress(srcRiles []string, dst string, name string, cType CompressType, secret string) error {
 	format := getFormat(cType)
 
 	fileMaps := make(map[string]string, len(srcRiles))
@@ -505,7 +505,13 @@ func (f FileOp) Compress(srcRiles []string, dst string, name string, cType Compr
 			return nil
 		}
 		_ = f.DeleteFile(dstFile)
-		return NewZipArchiver().Compress(srcRiles, dstFile)
+		return NewZipArchiver().Compress(srcRiles, dstFile, "")
+	case TarGz:
+		err = NewTarGzArchiver().Compress(srcRiles, dstFile, secret)
+		if err != nil {
+			_ = f.DeleteFile(dstFile)
+			return err
+		}
 	default:
 		err = format.Archive(context.Background(), out, files)
 		if err != nil {
@@ -583,14 +589,22 @@ func (f FileOp) decompressWithSDK(srcFile string, dst string, cType CompressType
 	return format.Extract(context.Background(), input, nil, handler)
 }
 
-func (f FileOp) Decompress(srcFile string, dst string, cType CompressType) error {
+func (f FileOp) Decompress(srcFile string, dst string, cType CompressType, secret string) error {
 	if err := f.decompressWithSDK(srcFile, dst, cType); err != nil {
-		if cType == Tar || cType == Zip {
-			shellArchiver, err := NewShellArchiver(cType)
-			if err != nil {
-				return err
+		if cType == Tar || cType == Zip || cType == TarGz {
+			if secret != "" {
+				shellArchiver, err := NewShellArchiver(TarGz)
+				if err != nil {
+					return err
+				}
+				return shellArchiver.Extract(srcFile, dst, secret)
+			} else {
+				shellArchiver, err := NewShellArchiver(cType)
+				if err != nil {
+					return err
+				}
+				return shellArchiver.Extract(srcFile, dst, secret)
 			}
-			return shellArchiver.Extract(srcFile, dst)
 		}
 		return err
 	}

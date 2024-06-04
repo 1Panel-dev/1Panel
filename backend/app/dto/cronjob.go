@@ -1,6 +1,8 @@
 package dto
 
-import "time"
+import (
+	"time"
+)
 
 type CronjobCreate struct {
 	Name string `json:"name" validate:"required"`
@@ -21,6 +23,7 @@ type CronjobCreate struct {
 	BackupAccounts  string `json:"backupAccounts"`
 	DefaultDownload string `json:"defaultDownload"`
 	RetainCopies    int    `json:"retainCopies" validate:"number,min=1"`
+	Secret          string `json:"secret"`
 }
 
 type CronjobUpdate struct {
@@ -42,6 +45,7 @@ type CronjobUpdate struct {
 	BackupAccounts  string `json:"backupAccounts"`
 	DefaultDownload string `json:"defaultDownload"`
 	RetainCopies    int    `json:"retainCopies" validate:"number,min=1"`
+	Secret          string `json:"secret"`
 }
 
 type CronjobUpdateStatus struct {
@@ -87,6 +91,7 @@ type CronjobInfo struct {
 
 	LastRecordTime string `json:"lastRecordTime"`
 	Status         string `json:"status"`
+	Secret         string `json:"secret"`
 }
 
 type SearchRecord struct {

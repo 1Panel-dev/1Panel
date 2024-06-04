@@ -117,7 +117,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 		defer func() {
 			_ = os.Remove(rootDir)
 		}()
-		if err := handleUnTar(rootDir+"/"+fileName, rootDir); err != nil {
+		if err := handleUnTar(rootDir+"/"+fileName, rootDir, ""); err != nil {
 			global.LOG.Errorf("decompress file failed, err: %v", err)
 			_ = settingRepo.Update("SystemStatus", "Free")
 			return
@@ -175,7 +175,7 @@ func (u *UpgradeService) handleBackup(fileOp files.FileOp, originalDir string) e
 		return err
 	}
 	checkPointOfWal()
-	if err := handleTar(path.Join(global.CONF.System.BaseDir, "1panel/db"), originalDir, "db.tar.gz", "db/1Panel.db-*"); err != nil {
+	if err := handleTar(path.Join(global.CONF.System.BaseDir, "1panel/db"), originalDir, "db.tar.gz", "db/1Panel.db-*", ""); err != nil {
 		return err
 	}
 	return nil
@@ -191,7 +191,7 @@ func (u *UpgradeService) handleRollback(originalDir string, errStep int) {
 		}
 	}
 	if _, err := os.Stat(path.Join(originalDir, "db.tar.gz")); err == nil {
-		if err := handleUnTar(path.Join(originalDir, "db.tar.gz"), global.CONF.System.DbPath); err != nil {
+		if err := handleUnTar(path.Join(originalDir, "db.tar.gz"), global.CONF.System.DbPath, ""); err != nil {
 			global.LOG.Errorf("rollback 1panel db failed, err: %v", err)
 		}
 	}

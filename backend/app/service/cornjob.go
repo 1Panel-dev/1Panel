@@ -173,6 +173,7 @@ func (u *CronjobService) Create(cronjobDto dto.CronjobCreate) error {
 	if cronjob.ID != 0 {
 		return constant.ErrRecordExist
 	}
+	cronjob.Secret = cronjobDto.Secret
 	if err := copier.Copy(&cronjob, &cronjobDto); err != nil {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
@@ -279,6 +280,7 @@ func (u *CronjobService) Update(id uint, req dto.CronjobUpdate) error {
 	upMap["backup_accounts"] = req.BackupAccounts
 	upMap["default_download"] = req.DefaultDownload
 	upMap["retain_copies"] = req.RetainCopies
+	upMap["secret"] = req.Secret
 	return cronjobRepo.Update(id, upMap)
 }
 

@@ -146,6 +146,9 @@
                                 />
                             </el-select>
                         </el-form-item>
+                        <el-form-item :label="$t('setting.compressPassword')" prop="secret">
+                            <el-input v-model="snapInfo.secret"></el-input>
+                        </el-form-item>
                         <el-form-item :label="$t('commons.table.description')" prop="description">
                             <el-input type="textarea" clearable v-model="snapInfo.description" />
                         </el-form-item>
@@ -231,6 +234,7 @@ let snapInfo = reactive<Setting.SnapshotCreate>({
     defaultDownload: '',
     fromAccounts: [],
     description: '',
+    secret: '',
 });
 const cleanData = ref();
 

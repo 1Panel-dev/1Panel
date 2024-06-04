@@ -54,12 +54,14 @@ type FileCompress struct {
 	Type    string   `json:"type" validate:"required"`
 	Name    string   `json:"name" validate:"required"`
 	Replace bool     `json:"replace"`
+	Secret  string   `json:"secret"`
 }
 
 type FileDeCompress struct {
-	Dst  string `json:"dst"  validate:"required"`
-	Type string `json:"type"  validate:"required"`
-	Path string `json:"path" validate:"required"`
+	Dst    string `json:"dst"  validate:"required"`
+	Type   string `json:"type"  validate:"required"`
+	Path   string `json:"path" validate:"required"`
+	Secret string `json:"secret"`
 }
 
 type FileEdit struct {

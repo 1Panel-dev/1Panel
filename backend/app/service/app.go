@@ -767,7 +767,7 @@ func getAppFromRepo(downloadPath string) error {
 	if err := fileOp.DownloadFile(downloadUrl, packagePath); err != nil {
 		return err
 	}
-	if err := fileOp.Decompress(packagePath, constant.ResourceDir, files.SdkZip); err != nil {
+	if err := fileOp.Decompress(packagePath, constant.ResourceDir, files.SdkZip, ""); err != nil {
 		return err
 	}
 	defer func() {

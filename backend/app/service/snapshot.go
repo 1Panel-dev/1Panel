@@ -39,7 +39,7 @@ type ISnapshotService interface {
 	UpdateDescription(req dto.UpdateDescription) error
 	readFromJson(path string) (SnapshotJson, error)
 
-	HandleSnapshot(isCronjob bool, logPath string, req dto.SnapshotCreate, timeNow string) (string, error)
+	HandleSnapshot(isCronjob bool, logPath string, req dto.SnapshotCreate, timeNow string, secret string) (string, error)
 }
 
 func NewISnapshotService() ISnapshotService {
@@ -123,7 +123,7 @@ type SnapshotJson struct {
 }
 
 func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
-	if _, err := u.HandleSnapshot(false, "", req, time.Now().Format("20060102150405")); err != nil {
+	if _, err := u.HandleSnapshot(false, "", req, time.Now().Format("20060102150405"), req.Secret); err != nil {
 		return err
 	}
 	return nil
@@ -180,7 +180,7 @@ func (u *SnapshotService) readFromJson(path string) (SnapshotJson, error) {
 	return snap, nil
 }
 
-func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto.SnapshotCreate, timeNow string) (string, error) {
+func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto.SnapshotCreate, timeNow string, secret string) (string, error) {
 	localDir, err := loadLocalDir()
 	if err != nil {
 		return "", err
@@ -274,7 +274,7 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto
 				return
 			}
 			if snapStatus.Compress != constant.StatusDone {
-				snapCompress(itemHelper, rootDir)
+				snapCompress(itemHelper, rootDir, secret)
 			}
 			if snapStatus.Compress != constant.StatusDone {
 				_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
@@ -305,7 +305,7 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto
 		return snap.Name, fmt.Errorf("snapshot %s 1panel data failed", snap.Name)
 	}
 	loadLogByStatus(snapStatus, logPath)
-	snapCompress(itemHelper, rootDir)
+	snapCompress(itemHelper, rootDir, secret)
 	if snapStatus.Compress != constant.StatusDone {
 		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
 		loadLogByStatus(snapStatus, logPath)
@@ -383,15 +383,20 @@ func updateRecoverStatus(id uint, isRecover bool, interruptStep, status, message
 	}
 }
 
-func (u *SnapshotService) handleUnTar(sourceDir, targetDir string) error {
+func (u *SnapshotService) handleUnTar(sourceDir, targetDir string, secret string) error {
 	if _, err := os.Stat(targetDir); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(targetDir, os.ModePerm); err != nil {
 			return err
 		}
 	}
-
-	commands := fmt.Sprintf("tar -zxf %s -C %s .", sourceDir, targetDir)
-	global.LOG.Debug(commands)
+	commands := ""
+	if secret != "" {
+		extraCmd := "openssl enc -d -aes-256-cbc -k " + secret + " -in " + sourceDir + " | "
+		commands = fmt.Sprintf("%s tar -zxvf - -C %s", extraCmd, targetDir+" > /dev/null 2>&1")
+	} else {
+		commands = fmt.Sprintf("tar -zxvf %s %s", sourceDir+" -C ", targetDir+" > /dev/null 2>&1")
+	}
+	global.LOG.Debug(strings.ReplaceAll(commands, secret, "******"))
 	stdout, err := cmd.ExecWithTimeOut(commands, 30*time.Minute)
 	if err != nil {
 		if len(stdout) != 0 {
