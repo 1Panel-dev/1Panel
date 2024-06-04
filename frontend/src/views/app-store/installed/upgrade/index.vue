@@ -1,5 +1,5 @@
 <template>
-    <el-drawer :close-on-click-modal="false" :close-on-press-escape="false" v-model="open" size="30%">
+    <el-drawer :close-on-click-modal="false" :close-on-press-escape="false" v-model="open" size="50%">
         <template #header>
             <Header
                 :header="$t('commons.button.' + operateReq.operate)"
@@ -7,39 +7,9 @@
                 :back="handleClose"
             ></Header>
         </template>
-        <el-row>
+        <el-row :gutter="10">
             <el-col :span="22" :offset="1">
-                <el-form
-                    @submit.prevent
-                    ref="updateRef"
-                    :rules="rules"
-                    label-position="top"
-                    :model="operateReq"
-                    v-loading="loading"
-                >
-                    <el-form-item :label="$t('app.versionSelect')" prop="detailId">
-                        <el-select v-model="operateReq.detailId">
-                            <el-option
-                                v-for="(version, index) in versions"
-                                :key="index"
-                                :value="version.detailId"
-                                :label="version.version"
-                            ></el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item prop="backup" v-if="operateReq.operate === 'upgrade'">
-                        <el-checkbox v-model="operateReq.backup" :label="$t('app.backupApp')" />
-                        <span class="input-help">{{ $t('app.backupAppHelper') }}</span>
-                    </el-form-item>
-                    <el-form-item pro="pullImage" v-if="operateReq.operate === 'upgrade'">
-                        <el-checkbox v-model="operateReq.pullImage" :label="$t('container.forcePull')" size="large" />
-                        <span class="input-help">{{ $t('container.forcePullHelper') }}</span>
-                    </el-form-item>
-                    <el-text type="warning">{{ $t('app.upgradeWarn') }}</el-text>
-                </el-form>
-            </el-col>
-            <el-col :span="22" :offset="1">
-                <div class="descriptions">
+                <div>
                     <el-descriptions direction="vertical">
                         <el-descriptions-item>
                             <el-link @click="toLink(app.website)">
@@ -62,6 +32,60 @@
                     </el-descriptions>
                 </div>
             </el-col>
+            <el-col :span="22" :offset="1">
+                <el-form
+                    @submit.prevent
+                    ref="updateRef"
+                    :rules="rules"
+                    label-position="top"
+                    :model="operateReq"
+                    v-loading="loading"
+                >
+                    <el-form-item :label="$t('app.versionSelect')" prop="detailId">
+                        <el-select v-model="operateReq.version" @change="getVersions(operateReq.version)">
+                            <el-option
+                                v-for="(version, index) in versions"
+                                :key="index"
+                                :value="version.version"
+                                :label="version.version"
+                            ></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item prop="backup" v-if="operateReq.operate === 'upgrade'">
+                        <el-checkbox v-model="operateReq.backup" :label="$t('app.backupApp')" />
+                        <span class="input-help">{{ $t('app.backupAppHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item pro="pullImage" v-if="operateReq.operate === 'upgrade'">
+                        <el-checkbox v-model="operateReq.pullImage" :label="$t('container.forcePull')" size="large" />
+                        <span class="input-help">{{ $t('container.forcePullHelper') }}</span>
+                    </el-form-item>
+                </el-form>
+            </el-col>
+
+            <el-col :span="22" :offset="1" v-if="operateReq.operate === 'upgrade'">
+                <el-text type="warning">{{ $t('app.upgradeWarn') }}</el-text>
+                <el-button class="ml-1.5" type="text" @click="openDiff()">{{ $t('app.showDiff') }}</el-button>
+                <div>
+                    <el-checkbox v-model="useNewCompose" :label="$t('app.useCustom')" size="large" />
+                </div>
+                <div v-if="useNewCompose">
+                    <el-text type="danger">{{ $t('app.useCustomHelper') }}</el-text>
+                </div>
+                <codemirror
+                    v-if="useNewCompose"
+                    :autofocus="true"
+                    placeholder=""
+                    :indent-with-tab="true"
+                    :tabSize="4"
+                    style="width: 100%; height: calc(100vh - 500px); margin-top: 10px"
+                    :lineWrapping="true"
+                    :matchBrackets="true"
+                    theme="cobalt"
+                    :styleActiveLine="true"
+                    :extensions="extensions"
+                    v-model="newCompose"
+                />
+            </el-col>
         </el-row>
         <template #footer>
             <span class="dialog-footer">
@@ -71,6 +95,7 @@
                 </el-button>
             </span>
         </template>
+        <Diff ref="composeDiffRef" @confirm="getNewCompose" />
     </el-drawer>
 </template>
 <script lang="ts" setup>
@@ -82,8 +107,14 @@ import { reactive, ref, onBeforeUnmount } from 'vue';
 import Header from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
+import Diff from './diff/index.vue';
 import bus from '../../bus';
+import { Codemirror } from 'vue-codemirror';
+import { javascript } from '@codemirror/lang-javascript';
+import { oneDark } from '@codemirror/theme-one-dark';
+const extensions = [javascript(), oneDark];
 
+const composeDiffRef = ref();
 const updateRef = ref<FormInstance>();
 const open = ref(false);
 const loading = ref(false);
@@ -94,39 +125,94 @@ const operateReq = reactive({
     installId: 0,
     backup: true,
     pullImage: true,
+    version: '',
+    dockerCompose: '',
 });
 const resourceName = ref('');
 const rules = ref<any>({
     detailId: [Rules.requiredSelect],
 });
 const app = ref();
+const oldContent = ref('');
+const newContent = ref('');
 const em = defineEmits(['close']);
 const handleClose = () => {
     open.value = false;
     em('close', open);
 };
 
+const newCompose = ref('');
+const useNewCompose = ref(false);
+const appInstallID = ref(0);
+
 const toLink = (link: string) => {
     window.open(link, '_blank');
 };
 
-const acceptParams = (id: number, name: string, op: string, appDetail: App.AppDetail) => {
+const openDiff = () => {
+    composeDiffRef.value.acceptParams(oldContent.value, newContent.value);
+};
+
+const getNewCompose = (compose: string) => {
+    if (compose !== '') {
+        newCompose.value = compose;
+        useNewCompose.value = true;
+    } else {
+        newCompose.value = newContent.value;
+        useNewCompose.value = false;
+    }
+};
+
+const initData = () => {
+    newCompose.value = '';
+    useNewCompose.value = false;
+    operateReq.backup = true;
+    operateReq.pullImage = true;
+    operateReq.dockerCompose = '';
+};
+
+const acceptParams = (id: number, name: string, dockerCompose: string, op: string, appDetail: App.AppDetail) => {
+    initData();
     operateReq.installId = id;
     operateReq.operate = op;
     resourceName.value = name;
     app.value = appDetail;
-    GetAppUpdateVersions(id).then((res) => {
-        versions.value = res.data;
+    oldContent.value = dockerCompose;
+    appInstallID.value = id;
+    getVersions('');
+    open.value = true;
+};
+
+const getVersions = async (version: string) => {
+    const req = {
+        appInstallID: appInstallID.value,
+    };
+    if (version !== '') {
+        req['updateVersion'] = version;
+    }
+    try {
+        const res = await GetAppUpdateVersions(req);
+        versions.value = res.data || [];
         if (res.data != null && res.data.length > 0) {
-            operateReq.detailId = res.data[0].detailId;
+            let item = res.data[0];
+            if (version != '') {
+                item = res.data.find((v) => v.version === version);
+            }
+            operateReq.detailId = item.detailId;
+            operateReq.version = item.version;
+            newContent.value = item.dockerCompose;
+            newCompose.value = item.dockerCompose;
+            useNewCompose.value = false;
         }
-        open.value = true;
-    });
+    } catch (error) {}
 };
 
 const operate = async () => {
     loading.value = true;
     if (operateReq.operate === 'upgrade') {
+        if (useNewCompose.value) {
+            operateReq.dockerCompose = newCompose.value;
+        }
         await InstalledOp(operateReq)
             .then(() => {
                 MsgSuccess(i18n.global.t('app.upgradeStart'));

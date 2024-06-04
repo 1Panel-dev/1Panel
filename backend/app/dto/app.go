@@ -37,8 +37,9 @@ type AppOssConfig struct {
 }
 
 type AppVersion struct {
-	Version  string `json:"version"`
-	DetailId uint   `json:"detailId"`
+	Version       string `json:"version"`
+	DetailId      uint   `json:"detailId"`
+	DockerCompose string `json:"dockerCompose"`
 }
 
 type AppList struct {

@@ -439,12 +439,65 @@ func deleteLink(ctx context.Context, install *model.AppInstall, deleteDB bool, f
 	return appInstallResourceRepo.DeleteBy(ctx, appInstallResourceRepo.WithAppInstallId(install.ID))
 }
 
-func upgradeInstall(installID uint, detailID uint, backup, pullImage bool) error {
-	install, err := appInstallRepo.GetFirst(commonRepo.WithByID(installID))
+func getUpgradeCompose(install model.AppInstall, detail model.AppDetail) (string, error) {
+	if detail.DockerCompose == "" {
+		return "", nil
+	}
+	composeMap := make(map[string]interface{})
+	if err := yaml.Unmarshal([]byte(detail.DockerCompose), &composeMap); err != nil {
+		return "", err
+	}
+	value, ok := composeMap["services"]
+	if !ok {
+		return "", buserr.New(constant.ErrFileParse)
+	}
+	servicesMap := value.(map[string]interface{})
+	if len(servicesMap) == 1 {
+		index := 0
+		oldServiceName := ""
+		for k := range servicesMap {
+			oldServiceName = k
+			index++
+			if index > 0 {
+				break
+			}
+		}
+		servicesMap[install.ServiceName] = servicesMap[oldServiceName]
+		if install.ServiceName != oldServiceName {
+			delete(servicesMap, oldServiceName)
+		}
+	}
+	envs := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(install.Env), &envs); err != nil {
+		return "", err
+	}
+	config := getAppCommonConfig(envs)
+	if config.ContainerName == "" {
+		config.ContainerName = install.ContainerName
+		envs[constant.ContainerName] = install.ContainerName
+	}
+	config.Advanced = true
+	if err := addDockerComposeCommonParam(composeMap, install.ServiceName, config, envs); err != nil {
+		return "", err
+	}
+	paramByte, err := json.Marshal(envs)
+	if err != nil {
+		return "", err
+	}
+	install.Env = string(paramByte)
+	composeByte, err := yaml.Marshal(composeMap)
+	if err != nil {
+		return "", err
+	}
+	return string(composeByte), nil
+}
+
+func upgradeInstall(req request.AppInstallUpgrade) error {
+	install, err := appInstallRepo.GetFirst(commonRepo.WithByID(req.InstallID))
 	if err != nil {
 		return err
 	}
-	detail, err := appDetailRepo.GetFirst(commonRepo.WithByID(detailID))
+	detail, err := appDetailRepo.GetFirst(commonRepo.WithByID(req.DetailID))
 	if err != nil {
 		return err
 	}
@@ -459,7 +512,7 @@ func upgradeInstall(installID uint, detailID uint, backup, pullImage bool) error
 			backupFile string
 		)
 		global.LOG.Infof(i18n.GetMsgWithName("UpgradeAppStart", install.Name, nil))
-		if backup {
+		if req.Backup {
 			backupRecord, err := NewIBackupService().AppBackup(dto.CommonBackup{Name: install.App.Key, DetailName: install.Name})
 			if err == nil {
 				localDir, err := loadLocalDir()
@@ -476,13 +529,13 @@ func upgradeInstall(installID uint, detailID uint, backup, pullImage bool) error
 		defer func() {
 			if upErr != nil {
 				global.LOG.Infof(i18n.GetMsgWithName("ErrAppUpgrade", install.Name, upErr))
-				if backup {
+				if req.Backup {
 					global.LOG.Infof(i18n.GetMsgWithName("AppRecover", install.Name, nil))
 					if err := NewIBackupService().AppRecover(dto.CommonRecover{Name: install.App.Key, DetailName: install.Name, Type: "app", Source: constant.ResourceLocal, File: backupFile}); err != nil {
 						global.LOG.Errorf("recover app [%s] [%s] failed %v", install.App.Key, install.Name, err)
 					}
 				}
-				existInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(installID))
+				existInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(req.InstallID))
 				if existInstall.ID > 0 {
 					existInstall.Status = constant.UpgradeErr
 					existInstall.Message = upErr.Error()
@@ -529,59 +582,19 @@ func upgradeInstall(installID uint, detailID uint, backup, pullImage bool) error
 			_, _ = scriptCmd.CombinedOutput()
 		}
 
-		composeMap := make(map[string]interface{})
-		if upErr = yaml.Unmarshal([]byte(detail.DockerCompose), &composeMap); upErr != nil {
-			return
-		}
-		value, ok := composeMap["services"]
-		if !ok {
-			upErr = buserr.New(constant.ErrFileParse)
-			return
-		}
-		servicesMap := value.(map[string]interface{})
-		if len(servicesMap) == 1 {
-			index := 0
-			oldServiceName := ""
-			for k := range servicesMap {
-				oldServiceName = k
-				index++
-				if index > 0 {
-					break
-				}
+		var newCompose string
+		if req.DockerCompose == "" {
+			newCompose, upErr = getUpgradeCompose(install, detail)
+			if upErr != nil {
+				return
 			}
-			servicesMap[install.ServiceName] = servicesMap[oldServiceName]
-			if install.ServiceName != oldServiceName {
-				delete(servicesMap, oldServiceName)
-			}
-		}
-		envs := make(map[string]interface{})
-		if upErr = json.Unmarshal([]byte(install.Env), &envs); upErr != nil {
-			return
-		}
-		config := getAppCommonConfig(envs)
-		if config.ContainerName == "" {
-			config.ContainerName = install.ContainerName
-			envs[constant.ContainerName] = install.ContainerName
-		}
-		config.Advanced = true
-		if upErr = addDockerComposeCommonParam(composeMap, install.ServiceName, config, envs); upErr != nil {
-			return
-		}
-		paramByte, err := json.Marshal(envs)
-		if err != nil {
-			upErr = err
-			return
-		}
-		install.Env = string(paramByte)
-		composeByte, err := yaml.Marshal(composeMap)
-		if err != nil {
-			upErr = err
-			return
+		} else {
+			newCompose = req.DockerCompose
 		}
 
-		install.DockerCompose = string(composeByte)
+		install.DockerCompose = newCompose
 		install.Version = detail.Version
-		install.AppDetailId = detailID
+		install.AppDetailId = req.DetailID
 
 		content, err := fileOp.GetContent(install.GetEnvPath())
 		if err != nil {
@@ -589,7 +602,7 @@ func upgradeInstall(installID uint, detailID uint, backup, pullImage bool) error
 			return
 		}
 
-		if pullImage {
+		if req.PullImage {
 			projectName := strings.ToLower(install.Name)
 			images, err := composeV2.GetDockerComposeImages(projectName, content, []byte(detail.DockerCompose))
 			if err != nil {
@@ -619,6 +632,10 @@ func upgradeInstall(installID uint, detailID uint, backup, pullImage bool) error
 				return
 			}
 			upErr = err
+			return
+		}
+		envs := make(map[string]interface{})
+		if upErr = json.Unmarshal([]byte(install.Env), &envs); upErr != nil {
 			return
 		}
 		envParams := make(map[string]string, len(envs))
@@ -1134,6 +1151,7 @@ func synAppInstall(containers map[string]types.Container, appInstall *model.AppI
 	if len(containers) == 0 {
 		appInstall.Status = constant.Error
 		appInstall.Message = buserr.WithName("ErrContainerNotFound", strings.Join(containerNames, ",")).Error()
+		_ = appInstallRepo.Save(context.Background(), appInstall)
 		return
 	}
 	notFoundNames := make([]string, 0)
@@ -1178,6 +1196,7 @@ func synAppInstall(containers map[string]types.Container, appInstall *model.AppI
 		appInstall.Message = msg
 		appInstall.Status = constant.UnHealthy
 	}
+	_ = appInstallRepo.Save(context.Background(), appInstall)
 }
 
 func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool) ([]response.AppInstallDTO, error) {
@@ -1223,6 +1242,10 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 			AppName:     installed.App.Name,
 			AppKey:      installed.App.Key,
 			AppType:     installed.App.Type,
+			Path:        installed.GetPath(),
+		}
+		if updated {
+			installDTO.DockerCompose = installed.DockerCompose
 		}
 		app, err := appRepo.GetFirst(commonRepo.WithByID(installed.AppId))
 		if err != nil {
