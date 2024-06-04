@@ -6,6 +6,160 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "4630923",
+      "name": "docker",
+      "font_class": "docker1",
+      "unicode": "e689",
+      "unicode_decimal": 59017
+    },
+    {
+      "icon_id": "37759945",
+      "name": "Firefox",
+      "font_class": "Firefox",
+      "unicode": "e87c",
+      "unicode_decimal": 59516
+    },
+    {
+      "icon_id": "1120947",
+      "name": "mac",
+      "font_class": "m-ios",
+      "unicode": "e60e",
+      "unicode_decimal": 58894
+    },
+    {
+      "icon_id": "1354850",
+      "name": "PC",
+      "font_class": "m-pc",
+      "unicode": "e771",
+      "unicode_decimal": 59249
+    },
+    {
+      "icon_id": "1948990",
+      "name": "浏览器-世界之窗",
+      "font_class": "m-theworld",
+      "unicode": "e947",
+      "unicode_decimal": 59719
+    },
+    {
+      "icon_id": "3176588",
+      "name": "Android",
+      "font_class": "m-android",
+      "unicode": "e9e0",
+      "unicode_decimal": 59872
+    },
+    {
+      "icon_id": "3547761",
+      "name": "tencent",
+      "font_class": "m-tencent",
+      "unicode": "e609",
+      "unicode_decimal": 58889
+    },
+    {
+      "icon_id": "3846904",
+      "name": "Windows",
+      "font_class": "m-windows",
+      "unicode": "e6a0",
+      "unicode_decimal": 59040
+    },
+    {
+      "icon_id": "6172784",
+      "name": "cloud-machine",
+      "font_class": "m-machine",
+      "unicode": "e862",
+      "unicode_decimal": 59490
+    },
+    {
+      "icon_id": "6189402",
+      "name": "mobile",
+      "font_class": "m-mobile",
+      "unicode": "e620",
+      "unicode_decimal": 58912
+    },
+    {
+      "icon_id": "7172218",
+      "name": "UC浏览器",
+      "font_class": "m-ucweb",
+      "unicode": "e603",
+      "unicode_decimal": 58883
+    },
+    {
+      "icon_id": "7736005",
+      "name": "edge",
+      "font_class": "m-edge",
+      "unicode": "e8e2",
+      "unicode_decimal": 59618
+    },
+    {
+      "icon_id": "8714496",
+      "name": "2345浏览器",
+      "font_class": "m-2345explorer",
+      "unicode": "e60a",
+      "unicode_decimal": 58890
+    },
+    {
+      "icon_id": "11983530",
+      "name": "chrome",
+      "font_class": "m-chrome",
+      "unicode": "ea09",
+      "unicode_decimal": 59913
+    },
+    {
+      "icon_id": "11983549",
+      "name": "opera",
+      "font_class": "m-opera",
+      "unicode": "ea0e",
+      "unicode_decimal": 59918
+    },
+    {
+      "icon_id": "12463174",
+      "name": "linux",
+      "font_class": "m-linux",
+      "unicode": "e80b",
+      "unicode_decimal": 59403
+    },
+    {
+      "icon_id": "13354966",
+      "name": "maxthonlogo",
+      "font_class": "m-maxthon",
+      "unicode": "e676",
+      "unicode_decimal": 58998
+    },
+    {
+      "icon_id": "18583105",
+      "name": "macbook",
+      "font_class": "m-mac",
+      "unicode": "ef2d",
+      "unicode_decimal": 61229
+    },
+    {
+      "icon_id": "19448086",
+      "name": "IE",
+      "font_class": "m-ie",
+      "unicode": "eaab",
+      "unicode_decimal": 60075
+    },
+    {
+      "icon_id": "32828855",
+      "name": "Chrome-OS",
+      "font_class": "Chrome-OS",
+      "unicode": "e60b",
+      "unicode_decimal": 58891
+    },
+    {
+      "icon_id": "34065043",
+      "name": "Safari浏览器",
+      "font_class": "m-safari",
+      "unicode": "e60c",
+      "unicode_decimal": 58892
+    },
+    {
+      "icon_id": "37095081",
+      "name": "bro360se",
+      "font_class": "m-360se",
+      "unicode": "e678",
+      "unicode_decimal": 59000
+    },
+    {
       "icon_id": "8156501",
       "name": "e6d8",
       "font_class": "monitor-1",

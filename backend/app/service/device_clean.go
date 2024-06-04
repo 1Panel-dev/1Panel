@@ -522,70 +522,35 @@ func loadContainerTree() []dto.CleanTree {
 	if err != nil {
 		return treeData
 	}
-	var listImage []dto.CleanTree
 	imageSize := uint64(0)
 	for _, file := range diskUsage.Images {
 		if file.Containers == 0 {
-			name := "none"
-			if file.RepoTags != nil {
-				name = file.RepoTags[0]
-			}
-			item := dto.CleanTree{
-				ID:          file.ID,
-				Label:       name,
-				Type:        "images",
-				Size:        uint64(file.Size),
-				Name:        name,
-				IsCheck:     false,
-				IsRecommend: true,
-			}
-			imageSize += item.Size
-			listImage = append(listImage, item)
+			imageSize += uint64(file.Size)
 		}
 	}
-	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "container_images", Size: imageSize, Children: listImage, Type: "images", IsRecommend: true})
+	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "container_images", Size: imageSize, Children: nil, Type: "images", IsRecommend: true})
 
-	var listContainer []dto.CleanTree
 	containerSize := uint64(0)
 	for _, file := range diskUsage.Containers {
 		if file.State != "running" {
-			item := dto.CleanTree{
-				ID:          file.ID,
-				Label:       file.Names[0],
-				Type:        "containers",
-				Size:        uint64(file.SizeRw),
-				Name:        file.Names[0],
-				IsCheck:     false,
-				IsRecommend: true,
-			}
-			containerSize += item.Size
-			listContainer = append(listContainer, item)
+			containerSize += uint64(file.SizeRw)
 		}
 	}
-	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "container_containers", Size: containerSize, Children: listContainer, Type: "containers", IsRecommend: true})
+	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "container_containers", Size: containerSize, Children: nil, Type: "containers", IsRecommend: true})
 
-	var listVolume []dto.CleanTree
 	volumeSize := uint64(0)
 	for _, file := range diskUsage.Volumes {
 		if file.UsageData.RefCount <= 0 {
-			item := dto.CleanTree{
-				ID:          uuid.NewString(),
-				Label:       file.Name,
-				Type:        "volumes",
-				Size:        uint64(file.UsageData.Size),
-				Name:        file.Name,
-				IsCheck:     false,
-				IsRecommend: true,
-			}
-			volumeSize += item.Size
-			listVolume = append(listVolume, item)
+			volumeSize += uint64(file.UsageData.Size)
 		}
 	}
-	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "container_volumes", Size: volumeSize, Children: listVolume, Type: "volumes", IsRecommend: true})
+	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "container_volumes", Size: volumeSize, Children: nil, Type: "volumes", IsRecommend: true})
 
 	var buildCacheTotalSize int64
 	for _, cache := range diskUsage.BuildCache {
-		buildCacheTotalSize += cache.Size
+		if cache.Type == "source.local" {
+			buildCacheTotalSize += cache.Size
+		}
 	}
 	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "build_cache", Size: uint64(buildCacheTotalSize), Type: "build_cache", IsRecommend: true})
 	return treeData
