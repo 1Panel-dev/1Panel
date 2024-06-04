@@ -34,9 +34,17 @@
                     @search="search"
                 >
                     <el-table-column type="selection" :selectable="selectable" fix />
-                    <el-table-column :label="$t('commons.table.name')" width="130" prop="name" fix>
+                    <el-table-column
+                        :label="$t('commons.table.name')"
+                        width="130"
+                        prop="name"
+                        fix
+                        show-overflow-tooltip
+                    >
                         <template #default="{ row }">
-                            <Tooltip @click="onInspect(row.id)" :text="row.name" />
+                            <el-button text type="primary" @click="onInspect(row.id)">
+                                {{ row.name }}
+                            </el-button>
                         </template>
                     </el-table-column>
                     <el-table-column width="90">

@@ -40,9 +40,12 @@
                         :width="mobile ? 220 : 'auto'"
                         prop="name"
                         fix
+                        show-overflow-tooltip
                     >
                         <template #default="{ row }">
-                            <Tooltip @click="onInspect(row.name)" :text="row.name" />
+                            <el-button text type="primary" @click="onInspect(row.name)">
+                                {{ row.name }}
+                            </el-button>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('container.volumeDir')" min-width="100">

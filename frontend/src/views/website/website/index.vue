@@ -65,9 +65,12 @@
                         min-width="120px"
                         :width="mobile ? 220 : 'auto'"
                         sortable
+                        show-overflow-tooltip
                     >
                         <template #default="{ row }">
-                            <Tooltip @click="openConfig(row.id)" :text="row.primaryDomain" />
+                            <el-button text type="primary" @click="openConfig(row.id)">
+                                {{ row.primaryDomain }}
+                            </el-button>
                         </template>
                     </el-table-column>
                     <el-table-column

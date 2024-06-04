@@ -20,9 +20,17 @@
             </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="items" @search="search()">
-                    <el-table-column :label="$t('commons.table.name')" fix prop="name" min-width="120px">
+                    <el-table-column
+                        :label="$t('commons.table.name')"
+                        fix
+                        prop="name"
+                        min-width="120px"
+                        show-overflow-tooltip
+                    >
                         <template #default="{ row }">
-                            <Tooltip :text="row.name" @click="openDetail(row)" />
+                            <el-button text type="primary" @click="openDetail(row)">
+                                {{ row.name }}
+                            </el-button>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('runtime.codeDir')" prop="codeDir">

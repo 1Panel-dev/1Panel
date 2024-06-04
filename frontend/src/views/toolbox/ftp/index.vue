@@ -117,9 +117,9 @@
                                 </el-button>
                             </template>
                         </el-table-column>
-                        <el-table-column :label="$t('file.root')" :min-width="120" prop="path">
+                        <el-table-column :label="$t('file.root')" :min-width="120" prop="path" show-overflow-tooltip>
                             <template #default="{ row }">
-                                <Tooltip @click="toFolder(row.path)" :text="row.path" />
+                                <el-button text type="primary" @click="toFolder(row.path)">{{ row.path }}</el-button>
                             </template>
                         </el-table-column>
                         <el-table-column
