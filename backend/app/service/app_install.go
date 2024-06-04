@@ -5,11 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
+	httpUtil "github.com/1Panel-dev/1Panel/backend/utils/http"
 	"github.com/docker/docker/api/types"
 	"gopkg.in/yaml.v3"
 	"math"
+	"net/http"
 	"os"
 	"path"
+	"path/filepath"
 	"reflect"
 	"sort"
 	"strconv"
@@ -49,7 +52,7 @@ type IAppInstallService interface {
 	IgnoreUpgrade(req request.AppInstalledIgnoreUpgrade) error
 	SyncAll(systemInit bool) error
 	GetServices(key string) ([]response.AppService, error)
-	GetUpdateVersions(installId uint) ([]dto.AppVersion, error)
+	GetUpdateVersions(req request.AppUpdateVersion) ([]dto.AppVersion, error)
 	GetParams(id uint) (*response.AppConfig, error)
 	ChangeAppPort(req request.PortUpdate) error
 	GetDefaultConfigByKey(key, name string) (string, error)
@@ -262,7 +265,14 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 	case constant.Sync:
 		return syncAppInstallStatus(&install)
 	case constant.Upgrade:
-		return upgradeInstall(install.ID, req.DetailId, req.Backup, req.PullImage)
+		upgradeReq := request.AppInstallUpgrade{
+			InstallID:     install.ID,
+			DetailID:      req.DetailId,
+			Backup:        req.Backup,
+			PullImage:     req.PullImage,
+			DockerCompose: req.DockerCompose,
+		}
+		return upgradeInstall(upgradeReq)
 	case constant.Reload:
 		return opNginx(install.ContainerName, constant.NginxReload)
 	default:
@@ -484,8 +494,8 @@ func (a *AppInstallService) GetServices(key string) ([]response.AppService, erro
 	return res, nil
 }
 
-func (a *AppInstallService) GetUpdateVersions(installId uint) ([]dto.AppVersion, error) {
-	install, err := appInstallRepo.GetFirst(commonRepo.WithByID(installId))
+func (a *AppInstallService) GetUpdateVersions(req request.AppUpdateVersion) ([]dto.AppVersion, error) {
+	install, err := appInstallRepo.GetFirst(commonRepo.WithByID(req.AppInstallID))
 	var versions []dto.AppVersion
 	if err != nil {
 		return versions, err
@@ -506,9 +516,28 @@ func (a *AppInstallService) GetUpdateVersions(installId uint) ([]dto.AppVersion,
 			continue
 		}
 		if common.CompareVersion(detail.Version, install.Version) {
+			var newCompose string
+			if req.UpdateVersion != "" && req.UpdateVersion == detail.Version && detail.DockerCompose == "" && !app.IsLocalApp() {
+				filename := filepath.Base(detail.DownloadUrl)
+				dockerComposeUrl := fmt.Sprintf("%s%s", strings.TrimSuffix(detail.DownloadUrl, filename), "docker-compose.yml")
+				statusCode, composeRes, err := httpUtil.HandleGet(dockerComposeUrl, http.MethodGet)
+				if err != nil {
+					return versions, err
+				}
+				if statusCode > 200 {
+					return versions, err
+				}
+				detail.DockerCompose = string(composeRes)
+				_ = appDetailRepo.Update(context.Background(), detail)
+			}
+			newCompose, err = getUpgradeCompose(install, detail)
+			if err != nil {
+				return versions, err
+			}
 			versions = append(versions, dto.AppVersion{
-				Version:  detail.Version,
-				DetailId: detail.ID,
+				Version:       detail.Version,
+				DetailId:      detail.ID,
+				DockerCompose: newCompose,
 			})
 		}
 	}

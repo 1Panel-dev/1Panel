@@ -205,14 +205,13 @@ func (b *BaseApi) GetServices(c *gin.Context) {
 // @Param appInstallId path integer true "request"
 // @Success 200 {array} dto.AppVersion
 // @Security ApiKeyAuth
-// @Router /apps/installed/:appInstallId/versions [get]
+// @Router /apps/installed/update/versions [post]
 func (b *BaseApi) GetUpdateVersions(c *gin.Context) {
-	appInstallId, err := helper.GetIntParamByKey(c, "appInstallId")
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+	var req request.AppUpdateVersion
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	versions, err := appInstallService.GetUpdateVersions(appInstallId)
+	versions, err := appInstallService.GetUpdateVersions(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

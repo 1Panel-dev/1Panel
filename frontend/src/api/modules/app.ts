@@ -79,8 +79,8 @@ export const GetAppService = (key: string | undefined) => {
     return http.get<App.AppService[]>(`apps/services/${key}`);
 };
 
-export const GetAppUpdateVersions = (id: number) => {
-    return http.get<any>(`apps/installed/${id}/versions`);
+export const GetAppUpdateVersions = (req: App.AppUpdateVersionReq) => {
+    return http.post<any>(`apps/installed/update/versions`, req);
 };
 
 export const GetAppDefaultConfig = (key: string, name: string) => {

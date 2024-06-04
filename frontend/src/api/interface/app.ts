@@ -236,4 +236,9 @@ export namespace App {
         version: string;
         icon: string;
     }
+
+    export interface AppUpdateVersionReq {
+        appInstallID: number;
+        updateVersion?: string;
+    }
 }

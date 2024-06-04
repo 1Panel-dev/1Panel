@@ -1744,7 +1744,16 @@ const message = {
         showLocal: 'Show Local Application',
         reload: 'Reload',
         upgradeWarn:
-            'Upgrading the application will replace the docker-compose.yml file. If there is any change, please replace it after upgrading',
+            'Upgrading the application will replace the docker-compose.yml file. If there are any changes, you can click to view the file comparison',
+        newVersion: 'New version',
+        oldVersion: 'Current version',
+        composeDiff: 'File comparison',
+        showDiff: 'View comparison',
+        useNew: 'Use custom version',
+        useDefault: 'Use default version',
+        useCustom: 'Customize docker-compose.yml',
+        useCustomHelper:
+            'Using a custom docker-compose.yml file may cause the application upgrade to fail. If it is not necessary, do not check it',
     },
     website: {
         website: 'Website',
