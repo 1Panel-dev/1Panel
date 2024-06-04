@@ -58,7 +58,7 @@
                                     <el-card class="e-card">
                                         <el-row>
                                             <el-col :span="4">
-                                                <svg-icon iconName="p-docker" class="svg-icon"></svg-icon>
+                                                <svg-icon iconName="p-docker1" class="svg-icon"></svg-icon>
                                                 <el-button link class="card_icon" />
                                             </el-col>
                                             <el-col :span="20">
