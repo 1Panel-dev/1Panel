@@ -33,9 +33,17 @@
                         fix
                         show-overflow-tooltip
                     ></el-table-column>
-                    <el-table-column :label="$t('tool.supervisor.dir')" prop="dir" min-width="100px" fix>
+                    <el-table-column
+                        :label="$t('tool.supervisor.dir')"
+                        prop="dir"
+                        min-width="100px"
+                        fix
+                        show-overflow-tooltip
+                    >
                         <template #default="{ row }">
-                            <Tooltip @click="toFolder(row.dir)" :text="row.dir" />
+                            <el-button text type="primary" @click="toFolder(row.dir)">
+                                {{ row.dir }}
+                            </el-button>
                         </template>
                     </el-table-column>
                     <el-table-column

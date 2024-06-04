@@ -42,9 +42,17 @@
                     :data="data"
                 >
                     <el-table-column type="selection" fix />
-                    <el-table-column :label="$t('cronjob.taskName')" :min-width="120" prop="name" sortable>
+                    <el-table-column
+                        :label="$t('cronjob.taskName')"
+                        :min-width="120"
+                        prop="name"
+                        sortable
+                        show-overflow-tooltip
+                    >
                         <template #default="{ row }">
-                            <Tooltip @click="loadDetail(row)" :text="row.name" />
+                            <el-button text type="primary" @click="loadDetail(row)">
+                                {{ row.name }}
+                            </el-button>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" :min-width="80" prop="status" sortable>

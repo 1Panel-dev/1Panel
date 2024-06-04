@@ -94,9 +94,12 @@
                         sortable
                         fix
                         :fixed="mobile ? false : 'left'"
+                        show-overflow-tooltip
                     >
                         <template #default="{ row }">
-                            <Tooltip @click="onInspect(row.containerID)" :text="row.name" />
+                            <el-button text type="primary" @click="onInspect(row.containerID)">
+                                {{ row.name }}
+                            </el-button>
                         </template>
                     </el-table-column>
                     <el-table-column
