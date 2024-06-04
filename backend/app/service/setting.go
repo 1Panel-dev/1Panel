@@ -347,12 +347,18 @@ func (u *SettingService) LoadFromCert() (*dto.SSLInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	data, err := loadInfoFromCert()
-	if err != nil {
-		return nil, err
-	}
+	var data *dto.SSLInfo
 	switch sslType.Value {
+	case "self":
+		data, err = loadInfoFromCert()
+		if err != nil {
+			return nil, err
+		}
 	case "import":
+		data, err = loadInfoFromCert()
+		if err != nil {
+			return nil, err
+		}
 		if _, err := os.Stat(path.Join(global.CONF.System.BaseDir, "1panel/secret/server.crt")); err != nil {
 			return nil, fmt.Errorf("load server.crt file failed, err: %v", err)
 		}
@@ -370,6 +376,12 @@ func (u *SettingService) LoadFromCert() (*dto.SSLInfo, error) {
 			return nil, err
 		}
 		id, _ := strconv.Atoi(sslID.Value)
+		ssl, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(uint(id)))
+		if err != nil {
+			return nil, err
+		}
+		data.Timeout = ssl.ExpireDate.Format("2006-01-02 15:04:05")
+		data.Domain = ssl.Domains
 		data.SSLID = uint(id)
 	}
 	return data, nil

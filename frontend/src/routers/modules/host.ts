@@ -31,7 +31,7 @@ const hostRouter = {
         },
         {
             path: '/hosts/monitor/setting',
-            name: 'MonitorSetting',
+            name: 'HostMonitorSetting',
             component: () => import('@/views/host/monitor/setting/index.vue'),
             hidden: true,
             meta: {
