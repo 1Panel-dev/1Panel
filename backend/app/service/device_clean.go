@@ -522,7 +522,6 @@ func loadContainerTree() []dto.CleanTree {
 	if err != nil {
 		return treeData
 	}
-	var listImage []dto.CleanTree
 	imageSize := uint64(0)
 	for _, file := range diskUsage.Images {
 		if file.Containers == 0 {
@@ -540,12 +539,10 @@ func loadContainerTree() []dto.CleanTree {
 				IsRecommend: true,
 			}
 			imageSize += item.Size
-			listImage = append(listImage, item)
 		}
 	}
 	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "container_images", Size: imageSize, Children: nil, Type: "images", IsRecommend: true})
 
-	var listContainer []dto.CleanTree
 	containerSize := uint64(0)
 	for _, file := range diskUsage.Containers {
 		if file.State != "running" {
@@ -559,12 +556,10 @@ func loadContainerTree() []dto.CleanTree {
 				IsRecommend: true,
 			}
 			containerSize += item.Size
-			listContainer = append(listContainer, item)
 		}
 	}
 	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "container_containers", Size: containerSize, Children: nil, Type: "containers", IsRecommend: true})
 
-	var listVolume []dto.CleanTree
 	volumeSize := uint64(0)
 	for _, file := range diskUsage.Volumes {
 		if file.UsageData.RefCount <= 0 {
@@ -578,7 +573,6 @@ func loadContainerTree() []dto.CleanTree {
 				IsRecommend: true,
 			}
 			volumeSize += item.Size
-			listVolume = append(listVolume, item)
 		}
 	}
 	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "container_volumes", Size: volumeSize, Children: nil, Type: "volumes", IsRecommend: true})
