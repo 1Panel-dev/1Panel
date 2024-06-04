@@ -124,7 +124,11 @@ func (b *BaseApi) CheckIsSafety(c *gin.Context) {
 		return
 	}
 	if status == "unpass" {
-		helper.ErrResponse(c, middleware.LoadErrCode("err-entrance"))
+		if middleware.LoadErrCode("err-entrance") != 200 {
+			helper.ErrResponse(c, middleware.LoadErrCode("err-entrance"))
+			return
+		}
+		helper.ErrorWithDetail(c, constant.CodeErrEntrance, constant.ErrTypeInternalServer, nil)
 		return
 	}
 	helper.SuccessWithOutData(c)

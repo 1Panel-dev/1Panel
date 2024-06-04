@@ -55,6 +55,22 @@ class RequestHttp {
                     globalStore.errStatus = 'err-found';
                     return;
                 }
+                if (data.code == ResultEnum.ERRIP) {
+                    globalStore.errStatus = 'err-ip';
+                    return;
+                }
+                if (data.code == ResultEnum.ERRDOMAIN) {
+                    globalStore.errStatus = 'err-domain';
+                    return;
+                }
+                if (data.code == ResultEnum.UNSAFETY) {
+                    globalStore.errStatus = 'err-unsafe';
+                    return;
+                }
+                if (data.code == ResultEnum.EXPIRED) {
+                    globalStore.errStatus = 'err-entrance';
+                    return;
+                }
                 if (data.code == ResultEnum.ERRXPACK) {
                     globalStore.isProductPro = false;
                     window.location.reload();
@@ -109,7 +125,6 @@ class RequestHttp {
                             router.push({ name: 'Expired' });
                             return;
                         case 500:
-                        case 400:
                         case 407:
                             checkStatus(
                                 response.status,
@@ -122,6 +137,7 @@ class RequestHttp {
                                 name: 'entrance',
                                 params: { code: globalStore.entrance },
                             });
+                            return;
                     }
                 }
                 if (!window.navigator.onLine) router.replace({ path: '/500' });
