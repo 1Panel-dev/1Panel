@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
-	"github.com/1Panel-dev/1Panel/backend/constant"
 )
 
 func LoadErrCode(errInfo string) int {
@@ -22,21 +21,12 @@ func LoadErrCode(errInfo string) int {
 	case "403":
 		return http.StatusForbidden
 	case "404":
-		return http.StatusFound
+		return http.StatusNotFound
 	case "408":
 		return http.StatusRequestTimeout
 	case "416":
 		return http.StatusRequestedRangeNotSatisfiable
 	default:
-		if errInfo == "err-ip" {
-			return constant.CodeErrIP
-		}
-		if errInfo == "err-domain" {
-			return constant.CodeErrDomain
-		}
-		if errInfo == "err-entrance" {
-			return constant.CodeErrEntrance
-		}
 		return http.StatusOK
 	}
 }

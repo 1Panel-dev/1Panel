@@ -83,21 +83,8 @@ const getStatus = async () => {
             loading.value = false;
             loadDataFromXDB();
         })
-        .catch((err) => {
+        .catch(() => {
             loading.value = false;
-            switch (err.response.status) {
-                case 310:
-                    errStatus.value = 'err-ip';
-                    return;
-                case 311:
-                    errStatus.value = 'err-domain';
-                    return;
-                case 312:
-                    errStatus.value = 'err-entrance';
-                    return;
-                default:
-                    errStatus.value = 'code-' + err.response.status;
-            }
         });
 };
 

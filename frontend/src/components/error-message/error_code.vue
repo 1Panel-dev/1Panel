@@ -19,17 +19,20 @@ const props = defineProps({
     code: String,
 });
 const loadErrInfo = () => {
+    console.log(props.code);
     switch (props.code) {
+        case '400':
+            return '400 Bad Request';
         case '401':
             return '401 Unauthorized';
         case '403':
             return '403 Forbidden';
         case '404':
-            return '403 Not Found';
+            return '404 Not Found';
         case '408':
             return '408 Request Timeout';
         case '416':
-            return '408 Requested Not Satisfiable';
+            return '416 Requested Not Satisfiable';
     }
 };
 </script>
