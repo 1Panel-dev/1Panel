@@ -3,6 +3,7 @@ package redis
 import (
 	"fmt"
 
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/go-redis/redis"
 )
 
@@ -20,6 +21,7 @@ func NewRedisClient(conn DBInfo) (*redis.Client, error) {
 	})
 
 	if _, err := client.Ping().Result(); err != nil {
+		global.LOG.Errorf("check redis conn failed, err: %v", err)
 		return client, err
 	}
 	return client, nil

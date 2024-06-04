@@ -122,7 +122,7 @@ func (f *Ftp) SetPath(username, path string) error {
 	if err != nil {
 		return errors.New(std)
 	}
-	std2, err := cmd.Execf("chown %s %s", f.DefaultUser, path)
+	std2, err := cmd.Execf("chown -R %s:%s %s", f.DefaultUser, f.DefaultGroup, path)
 	if err != nil {
 		return errors.New(std2)
 	}
