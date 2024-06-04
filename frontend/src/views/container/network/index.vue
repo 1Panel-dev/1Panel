@@ -42,9 +42,9 @@
                         show-overflow-tooltip
                     >
                         <template #default="{ row }">
-                            <el-button text type="primary" @click="onInspect(row.id)">
+                            <el-text type="primary" class="cursor-pointer" @click="onInspect(row.id)">
                                 {{ row.name }}
-                            </el-button>
+                            </el-text>
                         </template>
                     </el-table-column>
                     <el-table-column width="90">

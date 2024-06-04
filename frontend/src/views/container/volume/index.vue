@@ -43,9 +43,9 @@
                         show-overflow-tooltip
                     >
                         <template #default="{ row }">
-                            <el-button text type="primary" @click="onInspect(row.name)">
+                            <el-text type="primary" class="cursor-pointer" @click="onInspect(row.name)">
                                 {{ row.name }}
-                            </el-button>
+                            </el-text>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('container.volumeDir')" min-width="100">

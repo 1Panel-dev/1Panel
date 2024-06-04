@@ -39,9 +39,9 @@
                         show-overflow-tooltip
                     >
                         <template #default="{ row }">
-                            <el-button text type="primary" @click="onOpenDetail(row)">
+                            <el-text type="primary" class="cursor-pointer" @click="onOpenDetail(row)">
                                 {{ row.name }}
-                            </el-button>
+                            </el-text>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('container.description')" prop="description" min-width="200" fix />

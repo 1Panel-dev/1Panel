@@ -68,9 +68,9 @@
                         show-overflow-tooltip
                     >
                         <template #default="{ row }">
-                            <el-button text type="primary" @click="openConfig(row.id)">
+                            <el-text type="primary" class="cursor-pointer" @click="openConfig(row.id)">
                                 {{ row.primaryDomain }}
-                            </el-button>
+                            </el-text>
                         </template>
                     </el-table-column>
                     <el-table-column

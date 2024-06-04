@@ -50,9 +50,9 @@
                         show-overflow-tooltip
                     >
                         <template #default="{ row }">
-                            <el-button text type="primary" @click="loadDetail(row)">
+                            <el-text type="primary" class="cursor-pointer" @click="loadDetail(row)">
                                 {{ row.name }}
-                            </el-button>
+                            </el-text>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" :min-width="80" prop="status" sortable>
