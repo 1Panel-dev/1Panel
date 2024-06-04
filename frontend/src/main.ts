@@ -21,15 +21,10 @@ import Components from '@/components';
 import ElementPlus from 'element-plus';
 import Fit2CloudPlus from 'fit2cloud-ui-plus';
 import * as Icons from '@element-plus/icons-vue';
-import VueDiff from 'vue-diff';
-import 'vue-diff/dist/index.css';
-import yaml from 'highlight.js/lib/languages/yaml';
-VueDiff.hljs.registerLanguage('yaml', yaml);
 
 const app = createApp(App);
 app.component('SvgIcon', SvgIcon);
 app.use(ElementPlus);
-app.use(VueDiff);
 app.use(Fit2CloudPlus, { locale: i18n.global.messages.value[localStorage.getItem('lang') || 'zh'] });
 
 Object.keys(Icons).forEach((key) => {
