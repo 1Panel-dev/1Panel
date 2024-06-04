@@ -10,3 +10,12 @@ type Firewall struct {
 	Strategy    string `gorm:"type:varchar(64);not null" json:"strategy"`
 	Description string `gorm:"type:varchar(64);not null" json:"description"`
 }
+
+type Forward struct {
+	BaseModel
+
+	Protocol   string `gorm:"type:varchar(64);not null" json:"protocol"`
+	SourcePort string `gorm:"type:varchar(64);not null" json:"sourcePort"`
+	TargetIP   string `gorm:"type:varchar(64);not null" json:"targetIp"`
+	TargetPort string `gorm:"type:varchar(64);not null" json:"targetPort"`
+}

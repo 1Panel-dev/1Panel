@@ -103,6 +103,30 @@ func (f *Ufw) ListPort() ([]FireInfo, error) {
 	return datas, nil
 }
 
+func (f *Ufw) ListForward() ([]FireInfo, error) {
+	iptables, err := NewIptables()
+	if err != nil {
+		return nil, err
+	}
+	rules, err := iptables.NatList()
+	if err != nil {
+		return nil, err
+	}
+
+	var list []FireInfo
+	for _, rule := range rules {
+		dest := strings.SplitN(rule.DestPort, ":", 2)
+		list = append(list, FireInfo{
+			Num:        rule.Num,
+			Protocol:   rule.Protocol,
+			Port:       rule.SrcPort,
+			TargetIP:   dest[0],
+			TargetPort: dest[1],
+		})
+	}
+	return list, nil
+}
+
 func (f *Ufw) ListAddress() ([]FireInfo, error) {
 	stdout, err := cmd.Execf("%s status verbose", f.CmdStr)
 	if err != nil {
@@ -206,17 +230,18 @@ func (f *Ufw) RichRules(rule FireInfo, operation string) error {
 }
 
 func (f *Ufw) PortForward(info Forward, operation string) error {
-	ruleStr := fmt.Sprintf("firewall-cmd --%s-forward-port=port=%s:proto=%s:toport=%s --permanent", operation, info.Port, info.Protocol, info.Target)
-	if len(info.Address) != 0 {
-		ruleStr = fmt.Sprintf("firewall-cmd --%s-forward-port=port=%s:proto=%s:toaddr=%s:toport=%s --permanent", operation, info.Port, info.Protocol, info.Address, info.Target)
+	iptables, err := NewIptables()
+	if err != nil {
+		return err
 	}
 
-	stdout, err := cmd.Exec(ruleStr)
-	if err != nil {
-		return fmt.Errorf("%s port forward failed, err: %s", operation, stdout)
+	if operation == "add" {
+		err = iptables.NatAdd(info.Protocol, info.Port, info.TargetIP, info.TargetPort, true)
+	} else {
+		err = iptables.NatRemove(info.Num, info.Protocol, info.Port, info.TargetIP, info.TargetPort)
 	}
-	if err := f.Reload(); err != nil {
-		return err
+	if err != nil {
+		return fmt.Errorf("%s port forward failed, err: %s", operation, err)
 	}
 	return nil
 }
@@ -257,4 +282,13 @@ func (f *Ufw) loadInfo(line string, fireType string) FireInfo {
 	itemInfo.Address = fields[3]
 
 	return itemInfo
+}
+
+func (f *Ufw) EnableForward() error {
+	iptables, err := NewIptables()
+	if err != nil {
+		return err
+	}
+
+	return iptables.Reload()
 }

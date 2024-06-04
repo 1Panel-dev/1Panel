@@ -18,11 +18,14 @@ type FirewallClient interface {
 	Version() (string, error)
 
 	ListPort() ([]client.FireInfo, error)
+	ListForward() ([]client.FireInfo, error)
 	ListAddress() ([]client.FireInfo, error)
 
 	Port(port client.FireInfo, operation string) error
 	RichRules(rule client.FireInfo, operation string) error
 	PortForward(info client.Forward, operation string) error
+
+	EnableForward() error
 }
 
 func NewFirewallClient() (FirewallClient, error) {
