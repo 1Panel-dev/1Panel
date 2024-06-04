@@ -2,6 +2,7 @@ package service
 
 import (
 	"os"
+	"sort"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -48,6 +49,9 @@ func (f *FtpService) LoadLog(req dto.FtpLogSearch) (int64, interface{}, error) {
 	if err != nil {
 		return 0, nil, err
 	}
+	sort.Slice(logItem, func(i, j int) bool {
+		return logItem[i].Time > logItem[j].Time
+	})
 	var logs []toolbox.FtpLog
 	total, start, end := len(logItem), (req.Page-1)*req.PageSize, req.Page*req.PageSize
 	if start > total {
