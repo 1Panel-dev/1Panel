@@ -45,6 +45,7 @@ export const updateProxy = (params: Setting.ProxyUpdate) => {
     if (request.proxyPasswd) {
         request.proxyPasswd = Base64.encode(request.proxyPasswd);
     }
+    request.proxyType = request.proxyType === 'close' ? '' : request.proxyType;
     return http.post(`/settings/proxy/update`, request);
 };
 
