@@ -1546,6 +1546,8 @@ const message = {
         menu: 'Menu',
         confirmMessage: 'The page will be refreshed to update the advanced menu list. Continue?',
         compressPassword: 'Compression Password',
+        backupRecoverMessage:
+            'If you need to set a compression or decompression password, please enter it. (Leave blank if not needed)',
     },
     license: {
         community: 'Community Edition: ',

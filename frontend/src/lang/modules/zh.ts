@@ -1439,6 +1439,7 @@ const message = {
         menu: '菜单',
         confirmMessage: '即将刷新页面更新高级功能菜单列表，是否继续？',
         compressPassword: '压缩密码',
+        backupRecoverMessage: '如果需要设置压缩或者解压缩密码，请输入。（不填则不设置）',
     },
     license: {
         community: '社区版：',

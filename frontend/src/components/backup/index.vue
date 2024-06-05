@@ -43,14 +43,6 @@
                     <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
                         {{ $t('commons.button.delete') }}
                     </el-button>
-                    <el-form-item
-                        :label="$t('setting.compressPassword')"
-                        prop="secret"
-                        style="margin-top: 10px"
-                        v-if="type === 'app' || type === 'website'"
-                    >
-                        <el-input v-model="secret"></el-input>
-                    </el-form-item>
                 </template>
                 <el-table-column type="selection" fix />
                 <el-table-column :label="$t('commons.table.name')" prop="fileName" show-overflow-tooltip />
@@ -82,22 +74,28 @@
 
         <OpDialog ref="opRef" @search="search" />
     </div>
+
+    <AppBackUp ref="backupRef" @close="search" />
+    <AppRecover ref="recoverRef" />
 </template>
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import { computeSize, dateFormat, downloadFile } from '@/utils/util';
-import { getBackupList, handleBackup, handleRecover } from '@/api/modules/setting';
+import { getBackupList } from '@/api/modules/setting';
 import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { deleteBackupRecord, downloadBackupRecord, searchBackupRecords } from '@/api/modules/setting';
 import { Backup } from '@/api/interface/backup';
-import { MsgSuccess } from '@/utils/message';
 import router from '@/routers';
+import AppBackUp from '@/views/app-store/installed/backup/index.vue';
+import AppRecover from '@/views/app-store/installed/recover/index.vue';
 
 const selects = ref<any>([]);
 const loading = ref();
 const opRef = ref();
+const backupRef = ref();
+const recoverRef = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -177,60 +175,25 @@ const search = async () => {
 };
 
 const onBackup = async () => {
-    ElMessageBox.confirm(
-        i18n.global.t('commons.msg.backupHelper', [name.value + '( ' + detailName.value + ' )']),
-        i18n.global.t('commons.button.backup'),
-        {
-            confirmButtonText: i18n.global.t('commons.button.confirm'),
-            cancelButtonText: i18n.global.t('commons.button.cancel'),
-        },
-    ).then(async () => {
-        let params = {
-            type: type.value,
-            name: name.value,
-            detailName: detailName.value,
-            secret: secret.value,
-        };
-        loading.value = true;
-        await handleBackup(params)
-            .then(() => {
-                loading.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                search();
-            })
-            .catch(() => {
-                loading.value = false;
-            });
-    });
+    let params = {
+        type: type.value,
+        name: name.value,
+        detailName: detailName.value,
+        secret: secret.value,
+    };
+    backupRef.value.acceptParams(params);
 };
 
 const onRecover = async (row: Backup.RecordInfo) => {
-    ElMessageBox.confirm(
-        i18n.global.t('commons.msg.recoverHelper', [row.fileName]),
-        i18n.global.t('commons.button.recover'),
-        {
-            confirmButtonText: i18n.global.t('commons.button.confirm'),
-            cancelButtonText: i18n.global.t('commons.button.cancel'),
-        },
-    ).then(async () => {
-        let params = {
-            source: row.source,
-            type: type.value,
-            name: name.value,
-            detailName: detailName.value,
-            file: row.fileDir + '/' + row.fileName,
-            secret: secret.value,
-        };
-        loading.value = true;
-        await handleRecover(params)
-            .then(() => {
-                loading.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            })
-            .catch(() => {
-                loading.value = false;
-            });
-    });
+    let params = {
+        source: row.source,
+        type: type.value,
+        name: name.value,
+        detailName: detailName.value,
+        file: row.fileDir + '/' + row.fileName,
+        secret: secret.value,
+    };
+    recoverRef.value.acceptParams(params);
 };
 
 const onDownload = async (row: Backup.RecordInfo) => {

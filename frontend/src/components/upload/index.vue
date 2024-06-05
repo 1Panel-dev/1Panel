@@ -68,14 +68,6 @@
                         >
                             {{ $t('commons.button.delete') }}
                         </el-button>
-                        <el-form-item
-                            :label="$t('setting.compressPassword')"
-                            prop="secret"
-                            style="margin-top: 10px"
-                            v-if="type === 'app' || type === 'website'"
-                        >
-                            <el-input v-model="secret"></el-input>
-                        </el-form-item>
                     </template>
                     <el-table-column type="selection" fix />
                     <el-table-column :label="$t('commons.table.name')" show-overflow-tooltip prop="name" />
@@ -102,12 +94,12 @@
 
         <OpDialog ref="opRef" @search="search" />
     </div>
+    <AppRecover ref="recoverRef" />
 </template>
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import { computeSize } from '@/utils/util';
-import { handleRecoverByUpload } from '@/api/modules/setting';
 import i18n from '@/lang';
 import { UploadFile, UploadFiles, UploadInstance } from 'element-plus';
 import { File } from '@/api/interface/file';
@@ -115,6 +107,7 @@ import DrawerHeader from '@/components/drawer-header/index.vue';
 import { BatchDeleteFile, CheckFile, ChunkUploadFileData, GetUploadList } from '@/api/modules/files';
 import { loadBaseDir } from '@/api/modules/setting';
 import { MsgError, MsgSuccess } from '@/utils/message';
+import AppRecover from '@/views/app-store/installed/recover/index.vue';
 
 const loading = ref();
 const isUpload = ref();
@@ -122,6 +115,7 @@ const uploadPercent = ref<number>(0);
 const selects = ref<any>([]);
 const baseDir = ref();
 const opRef = ref();
+const recoverRef = ref();
 
 const data = ref();
 const title = ref();
@@ -186,32 +180,16 @@ const search = async () => {
 };
 
 const onRecover = async (row: File.File) => {
-    ElMessageBox.confirm(
-        i18n.global.t('commons.msg.recoverHelper', [row.name]),
-        i18n.global.t('commons.button.recover'),
-        {
-            confirmButtonText: i18n.global.t('commons.button.confirm'),
-            cancelButtonText: i18n.global.t('commons.button.cancel'),
-        },
-    ).then(async () => {
-        let params = {
-            source: 'LOCAL',
-            type: type.value,
-            name: name.value,
-            detailName: detailName.value,
-            file: baseDir.value + row.name,
-            secret: secret.value,
-        };
-        loading.value = true;
-        await handleRecoverByUpload(params)
-            .then(() => {
-                loading.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            })
-            .catch(() => {
-                loading.value = false;
-            });
-    });
+    let params = {
+        source: 'LOCAL',
+        type: type.value,
+        name: name.value,
+        detailName: detailName.value,
+        file: baseDir.value + row.name,
+        secret: secret.value,
+        recoverType: 'upload',
+    };
+    recoverRef.value.acceptParams(params);
 };
 
 const uploaderFiles = ref<UploadFiles>([]);
