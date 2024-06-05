@@ -3,6 +3,7 @@ package files
 import (
 	"archive/zip"
 	"bufio"
+	"bytes"
 	"context"
 	"crypto/tls"
 	"encoding/json"
@@ -322,6 +323,25 @@ func (f FileOp) DownloadFile(url, dst string) error {
 	defer out.Close()
 
 	if _, err = io.Copy(out, resp.Body); err != nil {
+		return fmt.Errorf("save download file [%s] error, err %s", dst, err.Error())
+	}
+	return nil
+}
+
+func (f FileOp) DownloadFileWithProxy(url, dst string) error {
+	_, resp, err := http2.HandleGet(url, http.MethodGet)
+	if err != nil {
+		return err
+	}
+
+	out, err := os.Create(dst)
+	if err != nil {
+		return fmt.Errorf("create download file [%s] error, err %s", dst, err.Error())
+	}
+	defer out.Close()
+
+	reader := bytes.NewReader(resp)
+	if _, err = io.Copy(out, reader); err != nil {
 		return fmt.Errorf("save download file [%s] error, err %s", dst, err.Error())
 	}
 	return nil

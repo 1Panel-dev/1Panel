@@ -1043,6 +1043,7 @@ const message = {
             ftp: 'FTP Account',
             noFtp: 'FTP (pure-ftpd) service not detected, please refer to the official documentation for installation!',
             operation: 'Perform [{0}] operation on FTP service, continue?',
+            noPasswdMsg: 'Can not get the current FTP account password, please set the password and try again! ',
             enableHelper:
                 'Enabling the selected FTP account will restore its access permissions. Do you want to continue?',
             disableHelper:
