@@ -170,7 +170,7 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { deleteFtp, searchFtp, updateFtp, syncFtp, operateFtp, getFtpBase } from '@/api/modules/toolbox';
 import OperateDialog from '@/views/toolbox/ftp/operate/index.vue';
 import LogDialog from '@/views/toolbox/ftp/log/index.vue';
@@ -262,6 +262,10 @@ const onOperate = async (operation: string) => {
 };
 
 const onChangeStatus = async (row: Toolbox.FtpInfo, status: string) => {
+    if (row.password.length === 0) {
+        MsgError(i18n.global.t('toolbox.ftp.noPasswdMsg'));
+        return;
+    }
     ElMessageBox.confirm(i18n.global.t('toolbox.ftp.' + status + 'Helper'), i18n.global.t('cronjob.changeStatus'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),

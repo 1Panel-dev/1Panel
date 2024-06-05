@@ -988,6 +988,7 @@ const message = {
             ftp: 'FTP 帳戶',
             noFtp: '未檢測到 FTP (pure-ftpd) 服務，請參考官方文檔進行安裝！',
             operation: '對 FTP 服務進行 [{0}] 操作，是否繼續？',
+            noPasswdMsg: '無法獲取當前 FTP 賬號密碼，請先設置密碼後重試！',
             enableHelper: '啟用選取的 FTP 帳號後，該 FTP 帳號將恢復訪問權限，是否繼續操作？',
             disableHelper: '停用選取的 FTP 帳號後，該 FTP 帳號將失去訪問權限，是否繼續操作？',
             syncHelper: '同步伺服器與資料庫中的 FTP 帳戶資料，是否繼續操作？',
