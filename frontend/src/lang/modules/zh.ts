@@ -1634,6 +1634,7 @@ const message = {
         useDefault: '使用默认版本',
         useCustom: '自定义 docker-compose.yml',
         useCustomHelper: '使用自定义 docker-compose.yml 文件，可能会导致应用升级失败，如无必要，请勿勾选',
+        diffHelper: '左侧为旧版本，右侧为新版，编辑之后点击使用自定义版本保存',
     },
     website: {
         website: '网站',

@@ -7,47 +7,18 @@
         width="60%"
     >
         <el-row :gutter="10">
-            <el-col :span="11" :offset="1" class="mt-2">
-                <el-text type="info">{{ $t('app.oldVersion') }}</el-text>
-                <codemirror
-                    placeholder=""
-                    :indent-with-tab="true"
-                    :tabSize="4"
-                    style="width: 100%; height: calc(100vh - 500px)"
-                    :lineWrapping="true"
-                    :matchBrackets="true"
-                    theme="cobalt"
-                    :styleActiveLine="true"
-                    :extensions="extensions"
-                    v-model="oldContent"
-                    :readOnly="true"
-                />
-            </el-col>
-            <el-col :span="11" class="mt-2">
-                <el-text type="success">{{ $t('app.newVersion') }}</el-text>
-                <el-text type="warning" class="!ml-5">编辑之后点击使用自定义版本保存</el-text>
-                <codemirror
-                    :autofocus="true"
-                    placeholder=""
-                    :indent-with-tab="true"
-                    :tabSize="4"
-                    style="width: 100%; height: calc(100vh - 500px)"
-                    :lineWrapping="true"
-                    :matchBrackets="true"
-                    theme="cobalt"
-                    :styleActiveLine="true"
-                    :extensions="extensions"
-                    v-model="newContent"
-                />
+            <el-col :span="22" :offset="1">
+                <el-text type="warning">{{ $t('app.diffHelper') }}</el-text>
+                <div ref="container" class="compose-diff"></div>
             </el-col>
         </el-row>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="success" @click="confirm(newContent)">
+                <el-button type="success" @click="confirm(true)">
                     {{ $t('app.useNew') }}
                 </el-button>
-                <el-button type="primary" @click="confirm('')">
+                <el-button type="primary" @click="confirm(false)">
                     {{ $t('app.useDefault') }}
                 </el-button>
             </span>
@@ -56,33 +27,77 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
-const extensions = [javascript(), oneDark];
+import { nextTick, ref } from 'vue';
+import * as monaco from 'monaco-editor';
 
 const open = ref(false);
 const newContent = ref('');
 const oldContent = ref('');
 const em = defineEmits(['confirm']);
 
+let originalModel = null;
+let modifiedModel = null;
+let editor: monaco.editor.IStandaloneDiffEditor = null;
+
+const container = ref();
+
 const handleClose = () => {
     open.value = false;
+    if (editor) {
+        editor.dispose();
+    }
 };
 
 const acceptParams = (oldCompose: string, newCompose: string) => {
     oldContent.value = oldCompose;
     newContent.value = newCompose;
     open.value = true;
+    initEditor();
 };
 
-const confirm = (content: string) => {
+const confirm = (useEditor: boolean) => {
+    let content = '';
+    if (useEditor) {
+        content = editor.getModifiedEditor().getValue();
+    } else {
+        content = '';
+    }
     em('confirm', content);
     handleClose();
+};
+
+const initEditor = () => {
+    if (editor) {
+        editor.dispose();
+    }
+    nextTick(() => {
+        originalModel = monaco.editor.createModel(oldContent.value, 'yaml');
+        modifiedModel = monaco.editor.createModel(newContent.value, 'yaml');
+
+        editor = monaco.editor.createDiffEditor(container.value, {
+            theme: 'vs-dark',
+            readOnly: false,
+            automaticLayout: true,
+            folding: true,
+            roundedSelection: false,
+            overviewRulerBorder: false,
+        });
+
+        editor.setModel({
+            original: originalModel,
+            modified: modifiedModel,
+        });
+    });
 };
 
 defineExpose({
     acceptParams,
 });
 </script>
+
+<style scoped>
+.compose-diff {
+    width: 100%;
+    height: calc(100vh - 350px);
+}
+</style>

@@ -1,9 +1,9 @@
 @font-face {
   font-family: "panel"; /* Project id 3575356 */
-  src: url('iconfont.woff2?t=1717468101688') format('woff2'),
-       url('iconfont.woff?t=1717468101688') format('woff'),
-       url('iconfont.ttf?t=1717468101688') format('truetype'),
-       url('iconfont.svg?t=1717468101688#panel') format('svg');
+  src: url('iconfont.woff2?t=1717570629440') format('woff2'),
+       url('iconfont.woff?t=1717570629440') format('woff'),
+       url('iconfont.ttf?t=1717570629440') format('truetype'),
+       url('iconfont.svg?t=1717570629440#panel') format('svg');
 }
 
 .panel {
@@ -15,7 +15,7 @@
 }
 
 .p-docker1:before {
-  content: "\e689";
+  content: "\e76a";
 }
 
 .p-Firefox:before {
