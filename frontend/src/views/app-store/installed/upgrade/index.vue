@@ -149,7 +149,10 @@ const toLink = (link: string) => {
     window.open(link, '_blank');
 };
 
-const openDiff = () => {
+const openDiff = async () => {
+    if (newContent.value === '') {
+        await getVersions(operateReq.version);
+    }
     composeDiffRef.value.acceptParams(oldContent.value, newContent.value);
 };
 
