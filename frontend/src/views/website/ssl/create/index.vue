@@ -264,6 +264,7 @@ const acceptParams = (op: string, websiteSSL: Website.SSLDTO) => {
         ssl.value.disableCNAME = websiteSSL.disableCNAME;
         ssl.value.nameserver1 = websiteSSL.nameserver1;
         ssl.value.nameserver2 = websiteSSL.nameserver2;
+        ssl.value.keyType = websiteSSL.keyType;
     }
     ssl.value.websiteId = Number(id.value);
     getAcmeAccounts();

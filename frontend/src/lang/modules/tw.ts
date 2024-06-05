@@ -1746,7 +1746,7 @@ const message = {
         sitePath: '網站目錄',
         siteAlias: '網站代號',
         primaryPath: 'root 目錄',
-        folderTitle: '網站主要包含四個文件夾',
+        folderTitle: '網站主要包含以下資料夾',
         wafFolder: '防火墻規則',
         indexFolder: '網站root目錄',
         logFolder: '網站日誌',
@@ -1807,7 +1807,7 @@ const message = {
         rewriteHelper: '若設置偽靜態後，網站無法正常訪問，請嘗試設置回default',
         runDir: '運行目錄',
         runUserHelper:
-            '通過 PHP 運行環境部署的網站，需要將 index 和子目錄下的所有文件、文件夾所有者和用戶組設置為 1000',
+            '透過 PHP 容器運行環境部署的網站，需要將 index 和子目錄下的所有檔案、資料夾擁有者和使用者群組設定為 1000，本地 PHP 環境需要參考本機 PHP-FPM 使用者和使用者群組設定',
         userGroup: '運行用戶/組',
         uGroup: '用戶組',
         proxyPath: '前端請求路徑',
