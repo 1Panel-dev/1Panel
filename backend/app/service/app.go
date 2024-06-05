@@ -367,7 +367,7 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 	}
 
 	value, ok := composeMap["services"]
-	if !ok {
+	if !ok || value == nil {
 		err = buserr.New(constant.ErrFileParse)
 		return
 	}
