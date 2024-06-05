@@ -11,6 +11,15 @@ import (
 )
 
 func HandleGet(url, method string) (int, []byte, error) {
+	var transport *http.Transport
+	ok, transportItem := xpack.LoadRequestTransport()
+	if ok {
+		transport = transportItem
+	}
+	return HandleGetWithTransport(url, method, transport)
+}
+
+func HandleGetWithTransport(url, method string, transport *http.Transport) (int, []byte, error) {
 	defer func() {
 		if r := recover(); r != nil {
 			global.LOG.Errorf(" A panic occurred during handle request, error message: %v", r)
@@ -18,11 +27,7 @@ func HandleGet(url, method string) (int, []byte, error) {
 		}
 	}()
 
-	client := http.Client{Timeout: 10 * time.Second}
-	ok, transport := xpack.LoadRequestTransport()
-	if ok {
-		client.Transport = transport
-	}
+	client := http.Client{Timeout: 10 * time.Second, Transport: transport}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	request, err := http.NewRequestWithContext(ctx, method, url, nil)
