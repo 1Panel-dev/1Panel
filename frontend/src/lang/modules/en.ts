@@ -1874,7 +1874,7 @@ const message = {
         sitePath: 'Website Directory',
         siteAlias: 'Site  Alias',
         primaryPath: 'Root directory',
-        folderTitle: 'The website mainly contains four folders',
+        folderTitle: 'The website mainly contains the following folders',
         wafFolder: 'Firewall Rules',
         indexFolder: 'Website root directory',
         logFolder: 'website log',
@@ -1938,7 +1938,7 @@ const message = {
             'If the website cannot be accessed normally after setting pseudo-static, please try to set it back to default',
         runDir: 'Run Directory',
         runUserHelper:
-            'For websites deployed through the PHP runtime environment, all files, folder owners, and user groups under the index and subdirectories need to be set to 1000, command: chown -R 1000:1000 index',
+            'For websites deployed through the PHP container runtime environment, you need to set the owner and user group of all files and folders under index and subdirectories to 1000. For the local PHP environment, refer to the local PHP-FPM user and user group settings',
         userGroup: 'User/Group',
         uGroup: 'Group',
         proxyPath: 'Proxy Path',

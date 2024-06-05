@@ -37,7 +37,7 @@
 </template>
 
 <script lang="ts" setup name="Basic">
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 
 import Domain from './domain/index.vue';
 import Default from './default-doc/index.vue';
@@ -62,5 +62,14 @@ const id = computed(() => {
 });
 const tabIndex = ref('0');
 
-onMounted(() => {});
+watch(tabIndex, (newVal) => {
+    localStorage.setItem('site-tabIndex', newVal);
+});
+
+onMounted(() => {
+    const storedTabIndex = localStorage.getItem('site-tabIndex');
+    if (storedTabIndex !== null) {
+        tabIndex.value = storedTabIndex;
+    }
+});
 </script>

@@ -1747,7 +1747,7 @@ const message = {
         sitePath: '网站目录',
         siteAlias: '网站代号',
         primaryPath: 'root 目录',
-        folderTitle: '网站主要包含四个文件夹',
+        folderTitle: '网站主要包含以下文件夹',
         wafFolder: '防火墙规则',
         indexFolder: '网站 root 目录（PHP 运行环境 静态网站代码存放目录）',
         logFolder: '网站日志',
@@ -1808,7 +1808,7 @@ const message = {
         rewriteHelper: '若设置伪静态后，网站无法正常访问，请尝试设置回default',
         runDir: '运行目录',
         runUserHelper:
-            '通过 PHP 运行环境部署的网站，需要将 index 和子目录下的所有文件、文件夹所有者和用户组设置为 1000',
+            '通过 PHP 容器运行环境部署的网站，需要将 index 和子目录下的所有文件、文件夹所有者和用户组设置为 1000，本地 PHP 环境需要参考本地 PHP-FPM 用户和用户组设置',
         userGroup: '运行用户/组',
         uGroup: '用户组',
         proxyPath: '前端请求路径',
