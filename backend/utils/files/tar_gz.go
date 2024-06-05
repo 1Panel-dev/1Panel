@@ -2,10 +2,11 @@ package files
 
 import (
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/global"
-	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"path/filepath"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 )
 
 type TarGzArchiver struct {
@@ -24,7 +25,11 @@ func (t TarGzArchiver) Extract(filePath, dstDir string, secret string) error {
 	} else {
 		commands = fmt.Sprintf("tar -zxvf %s %s", filePath+" -C ", dstDir+" > /dev/null 2>&1")
 	}
-	global.LOG.Debug(strings.ReplaceAll(commands, secret, "******"))
+	if len(secret) != 0 {
+		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
+	} else {
+		global.LOG.Debug(commands)
+	}
 	if err = cmd.ExecCmd(commands); err != nil {
 		return err
 	}
@@ -48,9 +53,13 @@ func (t TarGzArchiver) Compress(sourcePaths []string, dstFile string, secret str
 		extraCmd := "| openssl enc -aes-256-cbc -salt -k " + secret + " -out"
 		commands = fmt.Sprintf("tar -zcf %s %s %s", path, extraCmd, dstFile)
 	} else {
-		commands = fmt.Sprintf("tar -zcf %s %s", dstFile, path)
+		commands = fmt.Sprintf("tar -zcf %s -C %s %s", dstFile, aheadDir, itemDir)
 	}
-	global.LOG.Debug(strings.ReplaceAll(commands, secret, "******"))
+	if len(secret) != 0 {
+		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
+	} else {
+		global.LOG.Debug(commands)
+	}
 	if err = cmd.ExecCmd(commands); err != nil {
 		return err
 	}

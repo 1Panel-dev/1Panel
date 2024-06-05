@@ -39,7 +39,7 @@ func (u *SnapshotService) HandleSnapshotRecover(snap model.Snapshot, isRecover b
 			req.IsNew = true
 		}
 		if req.IsNew || snap.InterruptStep == "Decompress" {
-			if err := u.handleUnTar(fmt.Sprintf("%s/%s.tar.gz", baseDir, snap.Name), baseDir, req.Secret); err != nil {
+			if err := handleUnTar(fmt.Sprintf("%s/%s.tar.gz", baseDir, snap.Name), baseDir, req.Secret); err != nil {
 				updateRecoverStatus(snap.ID, isRecover, "Decompress", constant.StatusFailed, fmt.Sprintf("decompress file failed, err: %v", err))
 				return
 			}
@@ -55,6 +55,9 @@ func (u *SnapshotService) HandleSnapshotRecover(snap model.Snapshot, isRecover b
 			req.IsNew = true
 		}
 		snapFileDir = fmt.Sprintf("%s/%s", baseDir, snap.Name)
+		if _, err := os.Stat(snapFileDir); err != nil {
+			snapFileDir = baseDir
+		}
 	} else {
 		snapFileDir = fmt.Sprintf("%s/1panel_original/original_%s", global.CONF.System.BaseDir, snap.Name)
 		if _, err := os.Stat(snapFileDir); err != nil {
