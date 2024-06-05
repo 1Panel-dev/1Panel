@@ -32,7 +32,16 @@
                             </el-select>
                         </el-form-item>
                         <el-form-item :label="$t('setting.proxyUrl')" prop="proxyUrl">
-                            <el-input clearable v-model.trim="form.proxyUrl" />
+                            <el-input
+                                clearable
+                                v-model.trim="form.proxyUrl"
+                                v-if="form.proxyType == 'http' || form.proxyType === 'https'"
+                            >
+                                <template #prepend>
+                                    <span>{{ form.proxyType }}</span>
+                                </template>
+                            </el-input>
+                            <el-input clearable v-model.trim="form.proxyUrl" v-else />
                         </el-form-item>
                         <el-form-item :label="$t('setting.proxyPort')" prop="proxyPortItem">
                             <el-input clearable type="number" v-model.number="form.proxyPortItem" />
@@ -120,18 +129,23 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        if (form.proxyType === '' || form.proxyType === 'close') {
-            form.proxyUrl = '';
-            form.proxyPort = '';
-            form.proxyUser = '';
-            form.proxyPasswd = '';
-            form.proxyPasswdKeep = '';
-        } else {
-            form.proxyPort = form.proxyPortItem + '';
-            form.proxyPasswdKeep = form.proxyPasswdKeepItem ? 'Enable' : 'Disable';
+        let isClose = form.proxyType === '' || form.proxyType === 'close';
+        let params = {
+            proxyType: isClose ? '' : form.proxyType,
+            proxyUrl: isClose ? '' : form.proxyUrl,
+            proxyPort: isClose ? '' : form.proxyPortItem + '',
+            proxyUser: isClose ? '' : form.proxyUser,
+            proxyPasswd: isClose ? '' : form.proxyPasswd,
+            proxyPasswdKeep: '',
+        };
+        if (!isClose) {
+            params.proxyPasswdKeep = form.proxyPasswdKeepItem ? 'Enable' : 'Disable';
+        }
+        if (form.proxyType === 'http' || form.proxyType === 'https') {
+            params.proxyUrl = form.proxyType + '://' + form.proxyUrl;
         }
         loading.value = true;
-        await updateProxy(form)
+        await updateProxy(params)
             .then(async () => {
                 loading.value = false;
                 emit('search');
