@@ -108,7 +108,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 		defer func() {
 			global.Cron.Start()
 		}()
-		if err := fileOp.DownloadFile(downloadPath+"/"+fileName, rootDir+"/"+fileName); err != nil {
+		if err := fileOp.DownloadFileWithProxy(downloadPath+"/"+fileName, rootDir+"/"+fileName); err != nil {
 			global.LOG.Errorf("download service file failed, err: %v", err)
 			_ = settingRepo.Update("SystemStatus", "Free")
 			return

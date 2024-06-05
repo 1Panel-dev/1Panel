@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/docker/docker/api/types"
 	"math"
 	"net/http"
 	"os"
@@ -15,6 +14,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/docker/docker/api/types"
 
 	httpUtil "github.com/1Panel-dev/1Panel/backend/utils/http"
 	"github.com/1Panel-dev/1Panel/backend/utils/xpack"
@@ -778,7 +779,7 @@ func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.App
 		}
 	}()
 
-	if err = fileOp.DownloadFile(appDetail.DownloadUrl, filePath); err != nil {
+	if err = fileOp.DownloadFileWithProxy(appDetail.DownloadUrl, filePath); err != nil {
 		global.LOG.Errorf("download app[%s] error %v", app.Name, err)
 		return
 	}

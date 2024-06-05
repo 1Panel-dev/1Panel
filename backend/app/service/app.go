@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -27,6 +26,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	http2 "github.com/1Panel-dev/1Panel/backend/utils/http"
 	httpUtil "github.com/1Panel-dev/1Panel/backend/utils/http"
+	"github.com/1Panel-dev/1Panel/backend/utils/xpack"
 	"gopkg.in/yaml.v3"
 )
 
@@ -710,16 +710,11 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 	}
 
 	versionUrl := fmt.Sprintf("%s/%s/1panel.json.version.txt", global.CONF.System.AppRepo, global.CONF.System.Mode)
-	versionRes, err := http2.GetHttpRes(versionUrl)
+	_, versionRes, err := http2.HandleGet(versionUrl, http.MethodGet)
 	if err != nil {
 		return nil, err
 	}
-	defer versionRes.Body.Close()
-	body, err := io.ReadAll(versionRes.Body)
-	if err != nil {
-		return nil, err
-	}
-	lastModifiedStr := string(body)
+	lastModifiedStr := string(versionRes)
 	lastModified, err := strconv.Atoi(lastModifiedStr)
 	if err != nil {
 		return nil, err
@@ -845,13 +840,18 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 		oldAppIds = append(oldAppIds, old.ID)
 	}
 
+	var transport *http.Transport
+	ok, transportItem := xpack.LoadRequestTransport()
+	if ok {
+		transport = transportItem
+	}
 	baseRemoteUrl := fmt.Sprintf("%s/%s/1panel", global.CONF.System.AppRepo, global.CONF.System.Mode)
 	appsMap := getApps(oldApps, list.Apps)
 
 	global.LOG.Infof("Starting synchronization of application details...")
 	for _, l := range list.Apps {
 		app := appsMap[l.AppProperty.Key]
-		_, iconRes, err := httpUtil.HandleGet(l.Icon, http.MethodGet)
+		_, iconRes, err := httpUtil.HandleGetWithTransport(l.Icon, http.MethodGet, transport)
 		if err != nil {
 			return err
 		}
@@ -878,7 +878,7 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 
 			if _, ok := InitTypes[app.Type]; ok {
 				dockerComposeUrl := fmt.Sprintf("%s/%s", versionUrl, "docker-compose.yml")
-				_, composeRes, err := httpUtil.HandleGet(dockerComposeUrl, http.MethodGet)
+				_, composeRes, err := httpUtil.HandleGetWithTransport(dockerComposeUrl, http.MethodGet, transport)
 				if err != nil {
 					return err
 				}

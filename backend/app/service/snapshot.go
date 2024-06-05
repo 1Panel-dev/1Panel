@@ -326,13 +326,15 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto
 func (u *SnapshotService) Delete(req dto.SnapshotBatchDelete) error {
 	snaps, _ := snapshotRepo.GetList(commonRepo.WithIdsIn(req.Ids))
 	for _, snap := range snaps {
-		targetAccounts, err := loadClientMap(snap.From)
-		if err != nil {
-			return err
-		}
-		for _, item := range targetAccounts {
-			global.LOG.Debugf("remove snapshot file %s.tar.gz from %s", snap.Name, item.backType)
-			_, _ = item.client.Delete(path.Join(item.backupPath, "system_snapshot", snap.Name+".tar.gz"))
+		if req.DeleteWithFile {
+			targetAccounts, err := loadClientMap(snap.From)
+			if err != nil {
+				return err
+			}
+			for _, item := range targetAccounts {
+				global.LOG.Debugf("remove snapshot file %s.tar.gz from %s", snap.Name, item.backType)
+				_, _ = item.client.Delete(path.Join(item.backupPath, "system_snapshot", snap.Name+".tar.gz"))
+			}
 		}
 
 		_ = snapshotRepo.DeleteStatus(snap.ID)
