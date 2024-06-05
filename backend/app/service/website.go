@@ -454,7 +454,8 @@ func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 
 	tx, ctx := helper.GetTxAndContext()
 	defer tx.Rollback()
-	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("website"), commonRepo.WithByName(website.Alias))
+
+	go NewIBackupService().DeleteRecordByName("website", website.PrimaryDomain, website.Alias, req.DeleteBackup)
 	if err := websiteRepo.DeleteBy(ctx, commonRepo.WithByID(req.ID)); err != nil {
 		return err
 	}
@@ -463,14 +464,6 @@ func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 	}
 	tx.Commit()
 
-	if req.DeleteBackup {
-		localDir, _ := loadLocalDir()
-		backupDir := path.Join(localDir, fmt.Sprintf("website/%s", website.Alias))
-		if _, err := os.Stat(backupDir); err == nil {
-			_ = os.RemoveAll(backupDir)
-		}
-		global.LOG.Infof("delete website %s backups successful", website.Alias)
-	}
 	uploadDir := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/uploads/website/%s", website.Alias))
 	if _, err := os.Stat(uploadDir); err == nil {
 		_ = os.RemoveAll(uploadDir)
