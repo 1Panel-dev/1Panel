@@ -165,7 +165,11 @@ func handleTar(sourceDir, targetDir, name, exclusionRules string, secret string)
 	} else {
 		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read -zcf %s %s %s", targetDir+"/"+name, excludeRules, path)
 	}
-	global.LOG.Debug(strings.ReplaceAll(commands, secret, "******"))
+	if len(secret) != 0 {
+		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
+	} else {
+		global.LOG.Debug(commands)
+	}
 	stdout, err := cmd.ExecWithTimeOut(commands, 24*time.Hour)
 	if err != nil {
 		if len(stdout) != 0 {
@@ -189,7 +193,11 @@ func handleUnTar(sourceFile, targetDir string, secret string) error {
 	} else {
 		commands = fmt.Sprintf("tar -zxvf %s %s", sourceFile+" -C ", targetDir+" > /dev/null 2>&1")
 	}
-	global.LOG.Debug(strings.ReplaceAll(commands, secret, "******"))
+	if len(secret) != 0 {
+		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
+	} else {
+		global.LOG.Debug(commands)
+	}
 	stdout, err := cmd.ExecWithTimeOut(commands, 24*time.Hour)
 	if err != nil {
 		global.LOG.Errorf("do handle untar failed, stdout: %s, err: %v", stdout, err)

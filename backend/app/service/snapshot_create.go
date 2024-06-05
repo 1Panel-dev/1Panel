@@ -261,7 +261,11 @@ func handleSnapTar(sourceDir, targetDir, name, exclusionRules string, secret str
 	} else {
 		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read -zcf %s %s -C %s .", targetDir+"/"+name, exStr, sourceDir)
 	}
-	global.LOG.Debug(strings.ReplaceAll(commands, secret, "******"))
+	if len(secret) != 0 {
+		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
+	} else {
+		global.LOG.Debug(commands)
+	}
 	stdout, err := cmd.ExecWithTimeOut(commands, 30*time.Minute)
 	if err != nil {
 		if len(stdout) != 0 {
