@@ -32,7 +32,15 @@
                         show-overflow-tooltip
                     >
                         <template #default="{ row }">
-                            <el-text type="primary" class="cursor-pointer" @click="openDetail(row)">
+                            <el-text
+                                type="primary"
+                                class="cursor-pointer"
+                                @click="openDetail(row)"
+                                v-if="row.status != 'building'"
+                            >
+                                {{ row.name }}
+                            </el-text>
+                            <el-text type="info" class="cursor-pointer" v-else>
                                 {{ row.name }}
                             </el-text>
                         </template>
@@ -142,6 +150,9 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        disabled: function (row: Runtime.Runtime) {
+            return row.status === 'building';
+        },
         click: function (row: Runtime.Runtime) {
             openDelete(row);
         },
