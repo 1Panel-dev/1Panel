@@ -68,7 +68,7 @@ class RequestHttp {
                     return;
                 }
                 if (data.code == ResultEnum.EXPIRED) {
-                    globalStore.errStatus = 'err-entrance';
+                    router.push({ name: 'Expired' });
                     return;
                 }
                 if (data.code == ResultEnum.ERRXPACK) {

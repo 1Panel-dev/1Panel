@@ -106,7 +106,7 @@ interface DialogProps {
     passwdKeep: string;
 }
 const acceptParams = (params: DialogProps): void => {
-    form.proxyUrl = params.url;
+    form.proxyUrl = params.url || '127.0.0.1';
     form.proxyType = params.type;
     form.proxyPortItem = params.port ? Number(params.port) : 7890;
     form.proxyUser = params.user;
