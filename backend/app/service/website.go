@@ -948,7 +948,7 @@ func (w WebsiteService) PreInstallCheck(req request.WebsiteInstallCheckReq) ([]r
 	if len(checkIds) > 0 {
 		installList, _ := appInstallRepo.ListBy(commonRepo.WithIdsIn(checkIds))
 		for _, install := range installList {
-			if err = syncAppInstallStatus(&install); err != nil {
+			if err = syncAppInstallStatus(&install, false); err != nil {
 				return nil, err
 			}
 			res = append(res, response.WebsitePreInstallCheck{

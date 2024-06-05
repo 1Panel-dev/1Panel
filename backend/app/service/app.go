@@ -460,7 +460,7 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 	go func() {
 		defer func() {
 			if err != nil {
-				appInstall.Status = constant.Error
+				appInstall.Status = constant.UpErr
 				appInstall.Message = err.Error()
 				_ = appInstallRepo.Save(context.Background(), appInstall)
 			}

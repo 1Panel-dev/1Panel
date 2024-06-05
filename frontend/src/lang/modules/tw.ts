@@ -261,6 +261,7 @@ const message = {
             applying: '申請中',
             applyerror: '失敗',
             syncerr: '失敗',
+            uperr: '失败',
         },
         units: {
             second: '秒',
