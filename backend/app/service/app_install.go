@@ -153,7 +153,7 @@ func (a *AppInstallService) CheckExist(req request.AppInstalledInfo) (*response.
 	if reflect.DeepEqual(appInstall, model.AppInstall{}) {
 		return res, nil
 	}
-	if err = syncAppInstallStatus(&appInstall); err != nil {
+	if err = syncAppInstallStatus(&appInstall, false); err != nil {
 		return nil, err
 	}
 
@@ -244,26 +244,26 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 		if err != nil {
 			return handleErr(install, err, out)
 		}
-		return syncAppInstallStatus(&install)
+		return syncAppInstallStatus(&install, false)
 	case constant.Stop:
 		out, err := compose.Stop(dockerComposePath)
 		if err != nil {
 			return handleErr(install, err, out)
 		}
-		return syncAppInstallStatus(&install)
+		return syncAppInstallStatus(&install, false)
 	case constant.Restart:
 		out, err := compose.Restart(dockerComposePath)
 		if err != nil {
 			return handleErr(install, err, out)
 		}
-		return syncAppInstallStatus(&install)
+		return syncAppInstallStatus(&install, false)
 	case constant.Delete:
 		if err := deleteAppInstall(install, req.DeleteBackup, req.ForceDelete, req.DeleteDB); err != nil && !req.ForceDelete {
 			return err
 		}
 		return nil
 	case constant.Sync:
-		return syncAppInstallStatus(&install)
+		return syncAppInstallStatus(&install, true)
 	case constant.Upgrade:
 		upgradeReq := request.AppInstallUpgrade{
 			InstallID:     install.ID,
@@ -431,7 +431,7 @@ func (a *AppInstallService) SyncAll(systemInit bool) error {
 			continue
 		}
 		if !systemInit {
-			if err = syncAppInstallStatus(&i); err != nil {
+			if err = syncAppInstallStatus(&i, false); err != nil {
 				global.LOG.Errorf("sync install app[%s] error,mgs: %s", i.Name, err.Error())
 			}
 		}
@@ -730,7 +730,7 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 	return &res, nil
 }
 
-func syncAppInstallStatus(appInstall *model.AppInstall) error {
+func syncAppInstallStatus(appInstall *model.AppInstall, force bool) error {
 	if appInstall.Status == constant.Installing || appInstall.Status == constant.Rebuilding || appInstall.Status == constant.Upgrading {
 		return nil
 	}
@@ -753,8 +753,7 @@ func syncAppInstallStatus(appInstall *model.AppInstall) error {
 	for _, con := range containers {
 		containersMap[con.Names[0]] = con
 	}
-	synAppInstall(containersMap, appInstall)
-	_ = appInstallRepo.Save(context.Background(), appInstall)
+	synAppInstall(containersMap, appInstall, force)
 	return nil
 }
 

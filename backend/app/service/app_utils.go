@@ -929,7 +929,7 @@ func upApp(appInstall *model.AppInstall, pullImages bool) {
 		return
 	}
 	if err := upProject(appInstall); err != nil {
-		appInstall.Status = constant.Error
+		appInstall.Status = constant.UpErr
 	} else {
 		appInstall.Status = constant.Running
 	}
@@ -1137,18 +1137,22 @@ func handleErr(install model.AppInstall, err error, out string) error {
 		install.Message = out
 		reErr = errors.New(out)
 	}
-	install.Status = constant.Error
+	install.Status = constant.UpErr
 	_ = appInstallRepo.Save(context.Background(), &install)
 	return reErr
 }
 
 func doNotNeedSync(installed model.AppInstall) bool {
-	return installed.Status == constant.Installing || installed.Status == constant.Rebuilding || installed.Status == constant.Upgrading || installed.Status == constant.Syncing
+	return installed.Status == constant.Installing || installed.Status == constant.Rebuilding || installed.Status == constant.Upgrading ||
+		installed.Status == constant.Syncing
 }
 
-func synAppInstall(containers map[string]types.Container, appInstall *model.AppInstall) {
+func synAppInstall(containers map[string]types.Container, appInstall *model.AppInstall, force bool) {
 	containerNames := strings.Split(appInstall.ContainerName, ",")
 	if len(containers) == 0 {
+		if appInstall.Status == constant.UpErr && !force {
+			return
+		}
 		appInstall.Status = constant.Error
 		appInstall.Message = buserr.WithName("ErrContainerNotFound", strings.Join(containerNames, ",")).Error()
 		_ = appInstallRepo.Save(context.Background(), appInstall)
@@ -1182,6 +1186,12 @@ func synAppInstall(containers map[string]types.Container, appInstall *model.AppI
 		appInstall.Status = constant.Running
 	case pausedCount == total:
 		appInstall.Status = constant.Paused
+	case len(notFoundNames) == total:
+		if appInstall.Status == constant.UpErr && !force {
+			return
+		}
+		appInstall.Status = constant.Error
+		appInstall.Message = buserr.WithName("ErrContainerNotFound", strings.Join(notFoundNames, ",")).Error()
 	default:
 		var msg string
 		if exitedCount > 0 {
@@ -1225,7 +1235,7 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 			continue
 		}
 		if sync && !doNotNeedSync(installed) {
-			synAppInstall(containersMap, &installed)
+			synAppInstall(containersMap, &installed, false)
 		}
 
 		installDTO := response.AppInstallDTO{

@@ -263,6 +263,7 @@ const message = {
             applying: 'Applying',
             applyerror: 'Failure',
             syncerr: 'Error',
+            uperr: 'Error',
         },
         units: {
             second: 'Second',
