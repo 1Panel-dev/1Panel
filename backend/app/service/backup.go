@@ -37,6 +37,7 @@ type IBackupService interface {
 	GetBuckets(backupDto dto.ForBuckets) ([]interface{}, error)
 	Update(ireq dto.BackupOperate) error
 	Delete(id uint) error
+	DeleteRecordByName(backupType, name, detailName string, withDeleteFile bool) error
 	BatchDeleteRecord(ids []uint) error
 	NewClient(backup *model.BackupAccount) (cloud_storage.CloudStorageClient, error)
 
@@ -258,6 +259,35 @@ func (u *BackupService) Delete(id uint) error {
 		return buserr.New(constant.ErrBackupInUsed)
 	}
 	return backupRepo.Delete(commonRepo.WithByID(id))
+}
+
+func (u *BackupService) DeleteRecordByName(backupType, name, detailName string, withDeleteFile bool) error {
+	if !withDeleteFile {
+		return backupRepo.DeleteRecord(context.Background(), commonRepo.WithByType(backupType), commonRepo.WithByName(name), backupRepo.WithByDetailName(detailName))
+	}
+
+	records, err := backupRepo.ListRecord(commonRepo.WithByType(backupType), commonRepo.WithByName(name), backupRepo.WithByDetailName(detailName))
+	if err != nil {
+		return err
+	}
+
+	for _, record := range records {
+		backupAccount, err := backupRepo.Get(commonRepo.WithByType(record.Source))
+		if err != nil {
+			global.LOG.Errorf("load backup account %s info from db failed, err: %v", record.Source, err)
+			continue
+		}
+		client, err := u.NewClient(&backupAccount)
+		if err != nil {
+			global.LOG.Errorf("new client for backup account %s failed, err: %v", record.Source, err)
+			continue
+		}
+		if _, err = client.Delete(path.Join(record.FileDir, record.FileName)); err != nil {
+			global.LOG.Errorf("remove file %s from %s failed, err: %v", path.Join(record.FileDir, record.FileName), record.Source, err)
+		}
+		_ = backupRepo.DeleteRecord(context.Background(), commonRepo.WithByID(record.ID))
+	}
+	return nil
 }
 
 func (u *BackupService) BatchDeleteRecord(ids []uint) error {
