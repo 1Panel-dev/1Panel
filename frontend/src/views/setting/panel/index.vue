@@ -357,12 +357,14 @@ const onSave = async (key: string, val: any) => {
             globalStore.themeConfig.theme = val;
         }
         switchTheme();
-        updateXpackSettingByKey('Theme', val === 'dark-gold' ? 'dark-gold' : '');
-        if (val === 'dark-gold') {
-            MsgSuccess(i18n.t('commons.msg.operationSuccess'));
-            loading.value = false;
-            search();
-            return;
+        if (globalStore.isProductPro) {
+            updateXpackSettingByKey('Theme', val === 'dark-gold' ? 'dark-gold' : '');
+            if (val === 'dark-gold') {
+                MsgSuccess(i18n.t('commons.msg.operationSuccess'));
+                loading.value = false;
+                search();
+                return;
+            }
         }
     }
     if (key === 'MenuTabs') {
