@@ -1438,6 +1438,7 @@ const message = {
         menu: '選單',
         confirmMessage: '即將刷新頁面更新高級功能菜單列表，是否繼續？',
         compressPassword: '壓縮密碼',
+        backupRecoverMessage: '如果需要設定壓縮或者解壓縮密碼，請輸入。（不填則不設定）',
     },
     license: {
         community: '社區版：',
