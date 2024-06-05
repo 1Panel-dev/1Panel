@@ -13,11 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18.14'
+          node-version: '20.2'
       - name: Build Web
         id: build_frontend
         run: |
@@ -25,10 +25,10 @@ jobs:
         env:
           NODE_OPTIONS: --max-old-space-size=8192
       - name: Setup Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
-          go-version: '1.20.x'
+          go-version: '1.22'
       - name: Build Server
-        uses: goreleaser/goreleaser-action@v4
+        uses: goreleaser/goreleaser-action@v6
         with:
           args: release --snapshot --clean
