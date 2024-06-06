@@ -104,6 +104,7 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 			ShortDescZh: ap.ShortDescZh,
 			ShortDescEn: ap.ShortDescEn,
 			Resource:    ap.Resource,
+			Limit:       ap.Limit,
 		}
 		appDTOs = append(appDTOs, appDTO)
 		appTags, err := appTagRepo.GetByAppId(ap.ID)

@@ -40,6 +40,7 @@ type AppDto struct {
 	Resource    string      `json:"resource"`
 	Installed   bool        `json:"installed"`
 	Versions    []string    `json:"versions"`
+	Limit       int         `json:"limit"`
 	Tags        []model.Tag `json:"tags"`
 }
 
