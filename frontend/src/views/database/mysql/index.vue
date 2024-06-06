@@ -512,6 +512,9 @@ const loadDBOptions = async () => {
         }
     }
     if (currentDB.value) {
+        if (currentDB.value.from === 'remote') {
+            maskShow.value = false;
+        }
         globalStore.setCurrentDB('');
         search();
         return;
