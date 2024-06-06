@@ -31,30 +31,35 @@
                                 <el-option value="https" label="HTTPS" />
                             </el-select>
                         </el-form-item>
-                        <el-form-item :label="$t('setting.proxyUrl')" prop="proxyUrl">
-                            <el-input
-                                clearable
-                                v-model.trim="form.proxyUrl"
-                                v-if="form.proxyType == 'http' || form.proxyType === 'https'"
-                            >
-                                <template #prepend>
-                                    <span>{{ form.proxyType }}</span>
-                                </template>
-                            </el-input>
-                            <el-input clearable v-model.trim="form.proxyUrl" v-else />
-                        </el-form-item>
-                        <el-form-item :label="$t('setting.proxyPort')" prop="proxyPortItem">
-                            <el-input clearable type="number" v-model.number="form.proxyPortItem" />
-                        </el-form-item>
-                        <el-form-item :label="$t('commons.login.username')" prop="proxyUser">
-                            <el-input clearable v-model.trim="form.proxyUser" />
-                        </el-form-item>
-                        <el-form-item :label="$t('commons.login.password')" prop="proxyPasswd">
-                            <el-input type="password" show-password clearable v-model.trim="form.proxyPasswd" />
-                        </el-form-item>
-                        <el-form-item>
-                            <el-checkbox v-model="form.proxyPasswdKeepItem" :label="$t('setting.proxyPasswdKeep')" />
-                        </el-form-item>
+                        <div v-if="form.proxyType !== 'close'">
+                            <el-form-item :label="$t('setting.proxyUrl')" prop="proxyUrl">
+                                <el-input
+                                    clearable
+                                    v-model.trim="form.proxyUrl"
+                                    v-if="form.proxyType == 'http' || form.proxyType === 'https'"
+                                >
+                                    <template #prepend>
+                                        <span>{{ form.proxyType }}</span>
+                                    </template>
+                                </el-input>
+                                <el-input clearable v-model.trim="form.proxyUrl" v-else />
+                            </el-form-item>
+                            <el-form-item :label="$t('setting.proxyPort')" prop="proxyPortItem">
+                                <el-input clearable type="number" v-model.number="form.proxyPortItem" />
+                            </el-form-item>
+                            <el-form-item :label="$t('commons.login.username')" prop="proxyUser">
+                                <el-input clearable v-model.trim="form.proxyUser" />
+                            </el-form-item>
+                            <el-form-item :label="$t('commons.login.password')" prop="proxyPasswd">
+                                <el-input type="password" show-password clearable v-model.trim="form.proxyPasswd" />
+                            </el-form-item>
+                            <el-form-item>
+                                <el-checkbox
+                                    v-model="form.proxyPasswdKeepItem"
+                                    :label="$t('setting.proxyPasswdKeep')"
+                                />
+                            </el-form-item>
+                        </div>
                     </el-col>
                 </el-row>
             </el-form>
@@ -119,6 +124,8 @@ const acceptParams = (params: DialogProps): void => {
     if (params.url) {
         if (params.type === 'http' || params.type === 'https') {
             form.proxyUrl = params.url.replaceAll(params.type + '://', '');
+        } else {
+            form.proxyUrl = params.url;
         }
     } else {
         form.proxyUrl = '127.0.0.1';

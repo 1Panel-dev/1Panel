@@ -69,6 +69,7 @@
             />
             <el-empty
                 v-if="redisStatus !== 'Running' || (currentDB.from === 'remote' && !redisCliExist)"
+                :image-size="80"
                 :style="{ height: `calc(100vh - ${loadHeight()})`, 'background-color': '#000' }"
                 :description="loadErrMsg()"
             >

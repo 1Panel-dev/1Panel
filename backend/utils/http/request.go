@@ -22,7 +22,7 @@ func HandleGet(url, method string) (int, []byte, error) {
 func HandleGetWithTransport(url, method string, transport *http.Transport) (int, []byte, error) {
 	defer func() {
 		if r := recover(); r != nil {
-			global.LOG.Errorf(" A panic occurred during handle request, error message: %v", r)
+			global.LOG.Errorf("handle request failed, error message: %v", r)
 			return
 		}
 	}()
