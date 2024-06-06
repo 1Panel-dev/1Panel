@@ -10,12 +10,12 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/xpack"
 )
 
-func HandleGet(url, method string) (int, []byte, error) {
+func HandleGet(url, method string, timeout int) (int, []byte, error) {
 	transport := xpack.LoadRequestTransport()
-	return HandleGetWithTransport(url, method, transport)
+	return HandleGetWithTransport(url, method, transport, timeout)
 }
 
-func HandleGetWithTransport(url, method string, transport *http.Transport) (int, []byte, error) {
+func HandleGetWithTransport(url, method string, transport *http.Transport, timeout int) (int, []byte, error) {
 	defer func() {
 		if r := recover(); r != nil {
 			global.LOG.Errorf("handle request failed, error message: %v", r)
@@ -23,8 +23,8 @@ func HandleGetWithTransport(url, method string, transport *http.Transport) (int,
 		}
 	}()
 
-	client := http.Client{Timeout: 10 * time.Second, Transport: transport}
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	client := http.Client{Timeout: time.Duration(timeout) * time.Second, Transport: transport}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
 	defer cancel()
 	request, err := http.NewRequestWithContext(ctx, method, url, nil)
 	if err != nil {

@@ -234,7 +234,7 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 	if appDetailDTO.DockerCompose == "" {
 		filename := filepath.Base(appDetailDTO.DownloadUrl)
 		dockerComposeUrl := fmt.Sprintf("%s%s", strings.TrimSuffix(appDetailDTO.DownloadUrl, filename), "docker-compose.yml")
-		statusCode, composeRes, err := httpUtil.HandleGet(dockerComposeUrl, http.MethodGet)
+		statusCode, composeRes, err := httpUtil.HandleGet(dockerComposeUrl, http.MethodGet, constant.TimeOut20s)
 		if err != nil {
 			return appDetailDTO, buserr.WithDetail("ErrGetCompose", err.Error(), err)
 		}
@@ -710,7 +710,7 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 	}
 
 	versionUrl := fmt.Sprintf("%s/%s/1panel.json.version.txt", global.CONF.System.AppRepo, global.CONF.System.Mode)
-	_, versionRes, err := http2.HandleGet(versionUrl, http.MethodGet)
+	_, versionRes, err := http2.HandleGet(versionUrl, http.MethodGet, constant.TimeOut20s)
 	if err != nil {
 		return nil, err
 	}
@@ -847,7 +847,7 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 	global.LOG.Infof("Starting synchronization of application details...")
 	for _, l := range list.Apps {
 		app := appsMap[l.AppProperty.Key]
-		_, iconRes, err := httpUtil.HandleGetWithTransport(l.Icon, http.MethodGet, transport)
+		_, iconRes, err := httpUtil.HandleGetWithTransport(l.Icon, http.MethodGet, transport, constant.TimeOut20s)
 		if err != nil {
 			return err
 		}
@@ -874,7 +874,7 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 
 			if _, ok := InitTypes[app.Type]; ok {
 				dockerComposeUrl := fmt.Sprintf("%s/%s", versionUrl, "docker-compose.yml")
-				_, composeRes, err := httpUtil.HandleGetWithTransport(dockerComposeUrl, http.MethodGet, transport)
+				_, composeRes, err := httpUtil.HandleGetWithTransport(dockerComposeUrl, http.MethodGet, transport, constant.TimeOut20s)
 				if err != nil {
 					return err
 				}

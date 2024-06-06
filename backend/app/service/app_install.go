@@ -4,10 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/utils/files"
-	httpUtil "github.com/1Panel-dev/1Panel/backend/utils/http"
-	"github.com/docker/docker/api/types"
-	"gopkg.in/yaml.v3"
 	"math"
 	"net/http"
 	"os"
@@ -17,6 +13,11 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
+	httpUtil "github.com/1Panel-dev/1Panel/backend/utils/http"
+	"github.com/docker/docker/api/types"
+	"gopkg.in/yaml.v3"
 
 	"github.com/1Panel-dev/1Panel/backend/utils/env"
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx"
@@ -520,7 +521,7 @@ func (a *AppInstallService) GetUpdateVersions(req request.AppUpdateVersion) ([]d
 			if req.UpdateVersion != "" && req.UpdateVersion == detail.Version && detail.DockerCompose == "" && !app.IsLocalApp() {
 				filename := filepath.Base(detail.DownloadUrl)
 				dockerComposeUrl := fmt.Sprintf("%s%s", strings.TrimSuffix(detail.DownloadUrl, filename), "docker-compose.yml")
-				statusCode, composeRes, err := httpUtil.HandleGet(dockerComposeUrl, http.MethodGet)
+				statusCode, composeRes, err := httpUtil.HandleGet(dockerComposeUrl, http.MethodGet, constant.TimeOut20s)
 				if err != nil {
 					return versions, err
 				}

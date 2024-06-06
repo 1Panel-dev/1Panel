@@ -561,7 +561,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 				_ = appDetailRepo.Update(context.Background(), detail)
 			}
 			go func() {
-				_, _, _ = httpUtil.HandleGet(detail.DownloadCallBackUrl, http.MethodGet)
+				_, _, _ = httpUtil.HandleGet(detail.DownloadCallBackUrl, http.MethodGet, constant.TimeOut5s)
 			}()
 		}
 
@@ -803,7 +803,7 @@ func copyData(app model.App, appDetail model.AppDetail, appInstall *model.AppIns
 			return
 		}
 		go func() {
-			_, _, _ = httpUtil.HandleGet(appDetail.DownloadCallBackUrl, http.MethodGet)
+			_, _, _ = httpUtil.HandleGet(appDetail.DownloadCallBackUrl, http.MethodGet, constant.TimeOut5s)
 		}()
 	}
 	appKey := app.Key
