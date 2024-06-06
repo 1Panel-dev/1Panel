@@ -167,7 +167,7 @@
             </template>
         </el-drawer>
 
-        <OpDialog ref="opRef" @search="search">
+        <OpDialog ref="opRef" @search="search" @submit="onSubmitDelete()">
             <template #content>
                 <el-form class="mt-4 mb-1" ref="deleteForm" label-position="left">
                     <el-form-item>
@@ -220,6 +220,8 @@ const importRef = ref();
 const isRecordShow = ref();
 const backupOptions = ref();
 const accountOptions = ref();
+
+const operateIDs = ref();
 
 type FormInstance = InstanceType<typeof ElForm>;
 const snapRef = ref<FormInstance>();
@@ -340,6 +342,7 @@ const batchDelete = async (row: Setting.SnapshotInfo | null) => {
             names.push(item.name);
         });
     }
+    operateIDs.value = ids;
     opRef.value.acceptParams({
         title: i18n.global.t('commons.button.delete'),
         names: names,
@@ -347,9 +350,22 @@ const batchDelete = async (row: Setting.SnapshotInfo | null) => {
             i18n.global.t('setting.snapshot'),
             i18n.global.t('commons.button.delete'),
         ]),
-        api: snapshotDelete,
-        params: { ids: ids, deleteWithFile: cleanData.value },
+        api: null,
+        params: null,
     });
+};
+
+const onSubmitDelete = async () => {
+    loading.value = true;
+    await snapshotDelete({ ids: operateIDs.value, deleteWithFile: cleanData.value })
+        .then(() => {
+            loading.value = false;
+            MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
+            search();
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 function restForm() {

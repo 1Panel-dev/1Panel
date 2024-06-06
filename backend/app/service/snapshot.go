@@ -392,15 +392,12 @@ func (u *SnapshotService) handleUnTar(sourceDir, targetDir string, secret string
 		}
 	}
 	commands := ""
-	if secret != "" {
+	if len(secret) != 0 {
 		extraCmd := "openssl enc -d -aes-256-cbc -k " + secret + " -in " + sourceDir + " | "
 		commands = fmt.Sprintf("%s tar -zxvf - -C %s", extraCmd, targetDir+" > /dev/null 2>&1")
-	} else {
-		commands = fmt.Sprintf("tar zxvfC %s %s", sourceDir, targetDir)
-	}
-	if len(secret) != 0 {
 		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
 	} else {
+		commands = fmt.Sprintf("tar zxvfC %s %s", sourceDir, targetDir)
 		global.LOG.Debug(commands)
 	}
 	stdout, err := cmd.ExecWithTimeOut(commands, 30*time.Minute)
