@@ -914,7 +914,8 @@ onMounted(() => {
     }
     pathWidth.value = pathRef.value.offsetWidth;
     search();
-
+    history.push(req.path);
+    pointer = history.length - 1;
     nextTick(function () {
         handlePath();
     });
