@@ -2,9 +2,7 @@ package http
 
 import (
 	"context"
-	"crypto/tls"
 	"errors"
-	"net"
 	"net/http"
 	"strings"
 	"time"
@@ -17,22 +15,8 @@ func GetHttpRes(url string) (*http.Response, error) {
 	client := &http.Client{
 		Timeout: time.Second * 300,
 	}
-	transportItem := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		DialContext: (&net.Dialer{
-			Timeout:   60 * time.Second,
-			KeepAlive: 60 * time.Second,
-		}).DialContext,
-		TLSHandshakeTimeout:   5 * time.Second,
-		ResponseHeaderTimeout: 10 * time.Second,
-		IdleConnTimeout:       15 * time.Second,
-	}
-	ok, transport := xpack.LoadRequestTransport()
-	if ok {
-		transportItem.DialContext = transport.DialContext
-		transportItem.Proxy = transport.Proxy
-	}
-	client.Transport = transportItem
+	transport := xpack.LoadRequestTransport()
+	client.Transport = transport
 
 	req, err := http.NewRequestWithContext(context.Background(), "GET", url, nil)
 	if err != nil {

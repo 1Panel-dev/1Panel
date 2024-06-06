@@ -11,11 +11,7 @@ import (
 )
 
 func HandleGet(url, method string) (int, []byte, error) {
-	var transport *http.Transport
-	ok, transportItem := xpack.LoadRequestTransport()
-	if ok {
-		transport = transportItem
-	}
+	transport := xpack.LoadRequestTransport()
 	return HandleGetWithTransport(url, method, transport)
 }
 
