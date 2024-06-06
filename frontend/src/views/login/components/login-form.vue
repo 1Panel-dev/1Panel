@@ -127,7 +127,7 @@
                             </template>
                         </el-checkbox>
                         <span
-                            v-if="!loginForm.agreeLicense && !globalStore.isMobile()"
+                            v-if="!loginForm.agreeLicense && !_isMobile()"
                             class="input-error"
                             style="line-height: 14px"
                         >
@@ -189,6 +189,10 @@ const isDemo = ref(false);
 const agreeVisible = ref(false);
 
 type FormInstance = InstanceType<typeof ElForm>;
+const _isMobile = () => {
+    const rect = document.body.getBoundingClientRect();
+    return rect.width - 1 < 600;
+};
 
 const loginButtonFocused = ref();
 const loginFormRef = ref<FormInstance>();
@@ -253,7 +257,7 @@ const login = (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         if (!loginForm.agreeLicense) {
-            if (globalStore.isMobile()) {
+            if (_isMobile()) {
                 agreeVisible.value = true;
             }
             return;
