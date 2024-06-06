@@ -10,9 +10,6 @@
                     <el-col :span="22">
                         <span class="card-title">{{ $t('setting.recover') }}</span>
                         <el-divider class="divider" />
-                        <el-form-item :label="$t('setting.compressPassword')" prop="secret">
-                            <el-input v-model="snapInfo.secret"></el-input>
-                        </el-form-item>
                         <div v-if="!snapInfo.recoverStatus && !snapInfo.lastRecoveredAt">
                             <el-alert center class="alert" style="height: 257px" :closable="false">
                                 <el-button size="large" round plain type="primary" @click="recoverSnapshot(true)">
@@ -166,6 +163,8 @@
             </template>
         </el-dialog>
     </div>
+
+    <SnapRecover ref="recoverRef" @close="handleClose" />
 </template>
 
 <script setup lang="ts">
@@ -174,9 +173,10 @@ import { Setting } from '@/api/interface/setting';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { snapshotRecover, snapshotRollback } from '@/api/modules/setting';
+import { snapshotRollback } from '@/api/modules/setting';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { loadOsInfo } from '@/api/modules/dashboard';
+import SnapRecover from '@/views/setting/snapshot/recover/index.vue';
 
 const drawerVisible = ref(false);
 const snapInfo = ref();
@@ -184,6 +184,7 @@ const loading = ref();
 
 const dialogVisible = ref();
 const reDownload = ref();
+const recoverRef = ref();
 
 interface DialogProps {
     snapInfo: Setting.SnapshotInfo;
@@ -196,26 +197,17 @@ const emit = defineEmits(['search']);
 
 const handleClose = () => {
     drawerVisible.value = false;
+    dialogVisible.value = false;
 };
 
 const doRecover = async (isNew: boolean) => {
-    loading.value = true;
-    await snapshotRecover({
+    let params = {
         id: snapInfo.value.id,
         isNew: isNew,
         reDownload: reDownload.value,
         secret: snapInfo.value.secret,
-    })
-        .then(() => {
-            emit('search');
-            loading.value = false;
-            dialogVisible.value = false;
-            drawerVisible.value = false;
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-        })
-        .catch(() => {
-            loading.value = false;
-        });
+    };
+    recoverRef.value.acceptParams(params);
 };
 
 const recoverSnapshot = async (isNew: boolean) => {
