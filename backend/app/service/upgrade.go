@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
@@ -258,7 +259,7 @@ func (u *UpgradeService) loadVersion(isLatest bool, currentVersion, mode string)
 	if !isLatest {
 		path = fmt.Sprintf("%s/%s/latest.current", global.CONF.System.RepoUrl, mode)
 	}
-	_, latestVersionRes, err := httpUtil.HandleGet(path, http.MethodGet)
+	_, latestVersionRes, err := httpUtil.HandleGet(path, http.MethodGet, constant.TimeOut20s)
 	if err != nil {
 		global.LOG.Errorf("load latest version from oss failed, err: %v", err)
 		return ""
@@ -319,7 +320,7 @@ func (u *UpgradeService) checkVersion(v2, v1 string) string {
 }
 
 func (u *UpgradeService) loadReleaseNotes(path string) (string, error) {
-	_, releaseNotes, err := httpUtil.HandleGet(path, http.MethodGet)
+	_, releaseNotes, err := httpUtil.HandleGet(path, http.MethodGet, constant.TimeOut20s)
 	if err != nil {
 		return "", err
 	}

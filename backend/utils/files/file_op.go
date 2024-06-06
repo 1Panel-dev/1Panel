@@ -18,6 +18,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	http2 "github.com/1Panel-dev/1Panel/backend/utils/http"
 	cZip "github.com/klauspost/compress/zip"
@@ -329,7 +330,7 @@ func (f FileOp) DownloadFile(url, dst string) error {
 }
 
 func (f FileOp) DownloadFileWithProxy(url, dst string) error {
-	_, resp, err := http2.HandleGet(url, http.MethodGet)
+	_, resp, err := http2.HandleGet(url, http.MethodGet, constant.TimeOut5m)
 	if err != nil {
 		return err
 	}

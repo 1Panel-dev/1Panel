@@ -55,7 +55,7 @@ func handleNode(create request.RuntimeCreate, runtime *model.Runtime, fileOp fil
 	}
 
 	go func() {
-		if _ , _, err := httpUtil.HandleGet(nodeDetail.DownloadCallBackUrl, http.MethodGet); err != nil {
+		if _, _, err := httpUtil.HandleGet(nodeDetail.DownloadCallBackUrl, http.MethodGet, constant.TimeOut5s); err != nil {
 			global.LOG.Errorf("http request failed(handleNode), err: %v", err)
 			return
 		}
