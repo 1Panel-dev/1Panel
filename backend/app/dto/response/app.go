@@ -88,25 +88,26 @@ type AppInstalledDTO struct {
 }
 
 type AppInstallDTO struct {
-	ID            uint   `json:"id"`
-	Name          string `json:"name"`
-	AppID         uint   `json:"appID"`
-	AppDetailID   uint   `json:"appDetailID"`
-	Version       string `json:"version"`
-	Status        string `json:"status"`
-	Message       string `json:"message"`
-	HttpPort      int    `json:"httpPort"`
-	HttpsPort     int    `json:"httpsPort"`
-	Path          string `json:"path"`
-	CanUpdate     bool   `json:"canUpdate"`
-	Icon          string `json:"icon"`
-	AppName       string `json:"appName"`
-	Ready         int    `json:"ready"`
-	Total         int    `json:"total"`
-	AppKey        string `json:"appKey"`
-	AppType       string `json:"appType"`
-	AppStatus     string `json:"appStatus"`
-	DockerCompose string `json:"dockerCompose"`
+	ID            uint      `json:"id"`
+	Name          string    `json:"name"`
+	AppID         uint      `json:"appID"`
+	AppDetailID   uint      `json:"appDetailID"`
+	Version       string    `json:"version"`
+	Status        string    `json:"status"`
+	Message       string    `json:"message"`
+	HttpPort      int       `json:"httpPort"`
+	HttpsPort     int       `json:"httpsPort"`
+	Path          string    `json:"path"`
+	CanUpdate     bool      `json:"canUpdate"`
+	Icon          string    `json:"icon"`
+	AppName       string    `json:"appName"`
+	Ready         int       `json:"ready"`
+	Total         int       `json:"total"`
+	AppKey        string    `json:"appKey"`
+	AppType       string    `json:"appType"`
+	AppStatus     string    `json:"appStatus"`
+	DockerCompose string    `json:"dockerCompose"`
+	CreatedAt     time.Time `json:"createdAt"`
 }
 
 type DatabaseConn struct {
