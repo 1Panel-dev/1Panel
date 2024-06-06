@@ -840,11 +840,7 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 		oldAppIds = append(oldAppIds, old.ID)
 	}
 
-	var transport *http.Transport
-	ok, transportItem := xpack.LoadRequestTransport()
-	if ok {
-		transport = transportItem
-	}
+	transport := xpack.LoadRequestTransport()
 	baseRemoteUrl := fmt.Sprintf("%s/%s/1panel", global.CONF.System.AppRepo, global.CONF.System.Mode)
 	appsMap := getApps(oldApps, list.Apps)
 
