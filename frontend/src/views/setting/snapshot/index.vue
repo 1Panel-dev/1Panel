@@ -382,6 +382,7 @@ const search = async () => {
         pageSize: paginationConfig.pageSize,
     };
     const res = await searchSnapshotPage(params);
+    cleanData.value = false;
     data.value = res.data.items || [];
     paginationConfig.total = res.data.total;
 };
