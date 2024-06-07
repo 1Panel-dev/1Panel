@@ -35,7 +35,17 @@
 
                 <el-alert type="info" :closable="false" class="common-div">
                     <template #title>
-                        <span v-html="$t('setting.backupAlert')"></span>
+                        <span>
+                            {{ $t('setting.backupAlert') }}
+                            <el-link
+                                class="ml-1.5"
+                                type="primary"
+                                target="_blank"
+                                href="https://1panel.cn/docs/user_manual/settings/#3"
+                            >
+                                {{ $t('setting.doc') }}
+                            </el-link>
+                        </span>
                     </template>
                 </el-alert>
 
@@ -736,8 +746,8 @@ onMounted(() => {
     margin: 12px 0;
     border-top: 1px var(--el-border-color) var(--el-border-style);
 }
-.alert {
-    background-color: rgba(0, 94, 235, 0.03);
+.alert-span {
+    color: var(--el-color-primary);
 }
 
 .common-div {

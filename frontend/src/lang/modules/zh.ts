@@ -1295,8 +1295,7 @@ const message = {
         scArchive: '归档存储，适用于极低访问频率（例如半年访问1次）的业务场景。',
         scDeep_Archive: '深度归档存储，适用于极低访问频率（例如1年访问1~2次）的业务场景。',
         archiveHelper: '归档存储的文件无法直接下载，需要先在对应的云服务商网站进行恢复操作，请谨慎使用！',
-        backupAlert:
-            "理论上只要云厂商兼容 S3 协议，就可以用现有的亚马逊 S3 云存储来备份，具体配置参考 <a target=“_blank” href='https://1panel.cn/docs/user_manual/settings/#3'>官方文档</a> ",
+        backupAlert: '理论上只要云厂商兼容 S3 协议，就可以用现有的亚马逊 S3 云存储来备份，具体配置参考',
         domain: '加速域名',
         backupAccount: '备份账号',
         loadBucket: '获取桶',
@@ -1977,8 +1976,7 @@ const message = {
         dnsMauanlHelper: '手动解析模式需要在创建完之后点击申请按钮获取 DNS 解析值',
         httpHelper: 'HTTP 模式需要安装 OpenResty',
         buypassHelper: 'Buypass 大陆地区无法访问',
-        googleHelper:
-            "<a target=“_blank” href='https://cloud.google.com/certificate-manager/docs/public-ca-tutorial?hl=zh-cn'>如何获取 EAB HmacKey 和 EAB kid</a> ",
+        googleHelper: '如何获取 EAB HmacKey 和 EAB kid',
         googleCloudHelper: 'Google Cloud API 大陆大部分地区无法访问',
         httpHelper2: 'HTTP 模式无法申请泛域名证书',
         skipDNSCheck: '跳过 DNS 校验',
