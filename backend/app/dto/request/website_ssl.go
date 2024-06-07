@@ -77,7 +77,7 @@ type WebsiteSSLUpdate struct {
 	PrimaryDomain string `json:"primaryDomain" validate:"required"`
 	OtherDomains  string `json:"otherDomains"`
 	Provider      string `json:"provider" validate:"required"`
-	AcmeAccountID uint   `json:"acmeAccountId" validate:"required"`
+	AcmeAccountID uint   `json:"acmeAccountId"`
 	DnsAccountID  uint   `json:"dnsAccountId"`
 	KeyType       string `json:"keyType"`
 	Apply         bool   `json:"apply"`

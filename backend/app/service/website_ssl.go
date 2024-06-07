@@ -389,11 +389,13 @@ func (w WebsiteSSLService) Update(update request.WebsiteSSLUpdate) error {
 	updateParams["nameserver1"] = update.Nameserver1
 	updateParams["nameserver2"] = update.Nameserver2
 
-	acmeAccount, err := websiteAcmeRepo.GetFirst(commonRepo.WithByID(update.AcmeAccountID))
-	if err != nil {
-		return err
+	if websiteSSL.Provider != constant.SelfSigned {
+		acmeAccount, err := websiteAcmeRepo.GetFirst(commonRepo.WithByID(update.AcmeAccountID))
+		if err != nil {
+			return err
+		}
+		updateParams["acme_account_id"] = acmeAccount.ID
 	}
-	updateParams["acme_account_id"] = acmeAccount.ID
 
 	if update.PushDir {
 		if !files.NewFileOp().Stat(update.Dir) {
@@ -412,7 +414,7 @@ func (w WebsiteSSLService) Update(update request.WebsiteSSLUpdate) error {
 		}
 	}
 	updateParams["domains"] = strings.Join(domains, ",")
-	if update.Provider == constant.DNSAccount || update.Provider == constant.Http {
+	if update.Provider == constant.DNSAccount || update.Provider == constant.Http || update.Provider == constant.SelfSigned {
 		updateParams["auto_renew"] = update.AutoRenew
 	} else {
 		updateParams["auto_renew"] = false
