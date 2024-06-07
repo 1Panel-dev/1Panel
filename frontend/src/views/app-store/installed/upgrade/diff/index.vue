@@ -67,9 +67,6 @@ const confirm = (useEditor: boolean) => {
 };
 
 const initEditor = () => {
-    if (editor) {
-        editor.dispose();
-    }
     nextTick(() => {
         originalModel = monaco.editor.createModel(oldContent.value, 'yaml');
         modifiedModel = monaco.editor.createModel(newContent.value, 'yaml');

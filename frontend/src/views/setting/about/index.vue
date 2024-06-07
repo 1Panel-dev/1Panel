@@ -12,7 +12,7 @@
                         <SystemUpgrade />
                     </h3>
                     <div style="margin-top: 10px">
-                        <el-link @click="toDoc">
+                        <el-link @click="toDoc" class="system-link">
                             <el-icon><Document /></el-icon>
                             <span>{{ $t('setting.doc2') }}</span>
                         </el-link>
