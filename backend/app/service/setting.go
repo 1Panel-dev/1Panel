@@ -347,7 +347,7 @@ func (u *SettingService) LoadFromCert() (*dto.SSLInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	var data *dto.SSLInfo
+	var data dto.SSLInfo
 	switch sslType.Value {
 	case "self":
 		data, err = loadInfoFromCert()
@@ -380,11 +380,11 @@ func (u *SettingService) LoadFromCert() (*dto.SSLInfo, error) {
 		if err != nil {
 			return nil, err
 		}
-		data.Timeout = ssl.ExpireDate.Format("2006-01-02 15:04:05")
 		data.Domain = ssl.Domains
 		data.SSLID = uint(id)
+		data.Timeout = ssl.ExpireDate.Format("2006-01-02 15:04:05")
 	}
-	return data, nil
+	return &data, nil
 }
 
 func (u *SettingService) HandlePasswordExpired(c *gin.Context, old, new string) error {
@@ -426,23 +426,23 @@ func (u *SettingService) UpdatePassword(c *gin.Context, old, new string) error {
 	return nil
 }
 
-func loadInfoFromCert() (*dto.SSLInfo, error) {
+func loadInfoFromCert() (dto.SSLInfo, error) {
 	var info dto.SSLInfo
 	certFile := path.Join(global.CONF.System.BaseDir, "1panel/secret/server.crt")
 	if _, err := os.Stat(certFile); err != nil {
-		return &info, err
+		return info, err
 	}
 	certData, err := os.ReadFile(certFile)
 	if err != nil {
-		return &info, err
+		return info, err
 	}
 	certBlock, _ := pem.Decode(certData)
 	if certBlock == nil {
-		return &info, err
+		return info, err
 	}
 	certObj, err := x509.ParseCertificate(certBlock.Bytes)
 	if err != nil {
-		return &info, err
+		return info, err
 	}
 	var domains []string
 	if len(certObj.IPAddresses) != 0 {
@@ -453,7 +453,7 @@ func loadInfoFromCert() (*dto.SSLInfo, error) {
 	if len(certObj.DNSNames) != 0 {
 		domains = append(domains, certObj.DNSNames...)
 	}
-	return &dto.SSLInfo{
+	return dto.SSLInfo{
 		Domain:   strings.Join(domains, ","),
 		Timeout:  certObj.NotAfter.Format("2006-01-02 15:04:05"),
 		RootPath: path.Join(global.CONF.System.BaseDir, "1panel/secret/server.crt"),
