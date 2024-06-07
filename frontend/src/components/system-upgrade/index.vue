@@ -187,7 +187,7 @@ onMounted(() => {
 <style lang="scss" scoped>
 .version {
     font-size: 14px;
-    color: #858585;
+    color: var(--dark-gold-base-color);
     text-decoration: none;
     letter-spacing: 0.5px;
 }
