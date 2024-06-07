@@ -2,25 +2,25 @@
     <div class="flx-center">
         <span v-if="props.footer">
             <el-button type="primary" link @click="toForum">
-                <span>{{ $t('setting.forum') }}</span>
+                <span class="font-normal">{{ $t('setting.forum') }}</span>
             </el-button>
             <el-divider direction="vertical" />
             <el-button type="primary" link @click="toDoc">
-                <span>{{ $t('setting.doc2') }}</span>
+                <span class="font-normal">{{ $t('setting.doc2') }}</span>
             </el-button>
             <el-divider direction="vertical" />
             <el-button type="primary" link @click="toGithub">
-                <span>{{ $t('setting.project') }}</span>
+                <span class="font-normal">{{ $t('setting.project') }}</span>
             </el-button>
             <el-divider direction="vertical" />
         </span>
         <el-button type="primary" link @click="toHalo">
-            {{ isProductPro ? $t('license.pro') : $t('license.community') }}
+            <span class="font-normal">{{ isProductPro ? $t('license.pro') : $t('license.community') }}</span>
         </el-button>
         <span class="version">{{ version }}</span>
         <el-badge is-dot style="margin-top: -3px" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
             <el-button type="primary" link @click="onLoadUpgradeInfo">
-                <span>({{ $t('setting.hasNewVersion') }})</span>
+                <span class="font-normal">({{ $t('setting.hasNewVersion') }})</span>
             </el-button>
         </el-badge>
         <el-button

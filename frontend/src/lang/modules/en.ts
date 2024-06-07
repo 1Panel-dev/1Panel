@@ -2114,11 +2114,11 @@ const message = {
             'Two files will be generated in this directory, the certificate file: fullchain.pem and the key file: privkey.pem',
         organizationDetail: 'Organization Details',
         fromWebsite: 'From Websites',
-        dnsMauanlHelper: '手動解析模式需要在建立完之後點選申請按鈕取得 DNS 解析值',
-        httpHelper: 'HTTP 模式需要安裝 OpenResty',
-        buypassHelper: 'Buypass 大陸地區無法訪問',
-        googleHelper:
-            "<a target=“_blank” href='https://cloud.google.com/certificate-manager/docs/public-ca-tutorial?hl=zh-cn'>如何取得EAB HmacKey 和EAB kid</a > ",
+        dnsMauanlHelper:
+            'In manual resolution mode, you need to click the apply button after creation to obtain the DNS resolution value',
+        httpHelper: 'HTTP mode requires OpenResty to be installed',
+        buypassHelper: 'Buypass is not accessible in mainland China',
+        googleHelper: 'How to get EAB HmacKey and EAB kid',
         googleCloudHelper: 'Google Cloud API is not accessible in most parts of mainland China',
         httpHelper2: 'Unable to apply for a generic domain name certificate in HTTP mode',
         skipDNSCheck: 'Skip DNS check',

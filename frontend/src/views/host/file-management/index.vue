@@ -19,7 +19,6 @@
                 v-show="!searchableStatus"
                 tabindex="0"
                 @click="searchableStatus = true"
-                :class="globalStore.$state.themeConfig.theme === 'light' && 'bg-white'"
                 class="address-bar shadow-md rounded-md px-4 py-2 flex items-center flex-grow"
             >
                 <div ref="pathRef" class="w-full">

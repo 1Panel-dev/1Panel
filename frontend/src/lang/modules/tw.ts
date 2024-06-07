@@ -1294,8 +1294,7 @@ const message = {
         scArchive: '歸檔存儲，適用於極低訪問頻率（例如半年訪問1次）的業務場景。',
         scDeep_Archive: '深度歸檔存儲，適用於極低訪問頻率（例如1年訪問1~2次）的業務場景。',
         archiveHelper: '歸檔存儲的文件無法直接下載，需要先在對應的雲服務商網站進行恢復操作，請謹慎使用！',
-        backupAlert:
-            "理論上只要雲廠商兼容 S3 協議，就可以用現有的亞馬遜 S3 雲存儲來備份，具體配置參考 <a target=「_blank」 href='https://1panel.cn/docs/user_manual/settings/#3'>官方文檔</a> ",
+        backupAlert: '理論上只要雲廠商兼容 S3 協議，就可以用現有的亞馬遜 S3 雲存儲來備份，具體配置參考 ',
         domain: '加速域名',
         backupAccount: '備份賬號',
         loadBucket: '獲取桶',
@@ -1976,8 +1975,7 @@ const message = {
         dnsMauanlHelper: '手動解析模式需要在建立完之後點選申請按鈕取得 DNS 解析值',
         httpHelper: 'HTTP 模式需要安裝 OpenResty',
         buypassHelper: 'Buypass 大陸地區無法訪問',
-        googleHelper:
-            "<a target=“_blank” href='https://cloud.google.com/certificate-manager/docs/public-ca-tutorial?hl=zh-cn'>如何取得EAB HmacKey 和EAB kid</a > ",
+        googleHelper: '如何取得EAB HmacKey 和EAB kid',
         googleCloudHelper: 'Google Cloud API 大陸大部分地區無法存取',
         httpHelper2: 'HTTP 模式無法申請泛網域憑證',
         skipDNSCheck: '跳過 DNS 校驗',
