@@ -3,11 +3,11 @@
         <LayoutContent v-loading="loading" :title="$t('setting.about')" :divider="true">
             <template #main>
                 <div style="text-align: center; margin-top: 20px">
-                    <div style="justify-self: center">
+                    <div style="justify-self: center" class="logo">
                         <img v-if="globalStore.themeConfig.logo" style="width: 80px" :src="'/api/v1/images/logo'" />
                         <PrimaryLogo v-else />
                     </div>
-                    <h3>{{ globalStore.themeConfig.title || $t('setting.description') }}</h3>
+                    <h3 class="description">{{ globalStore.themeConfig.title || $t('setting.description') }}</h3>
                     <h3>
                         <SystemUpgrade />
                     </h3>
@@ -79,6 +79,20 @@ onMounted(() => {
     span {
         line-height: 20px;
         font-weight: 400;
+    }
+}
+.description {
+    color: var(--el-text-color-regular);
+}
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 55px;
+    img {
+        object-fit: contain;
+        width: 95%;
+        height: 45px;
     }
 }
 </style>
