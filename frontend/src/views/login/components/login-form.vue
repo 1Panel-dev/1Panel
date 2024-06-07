@@ -171,12 +171,12 @@ import { useRouter } from 'vue-router';
 import type { ElForm } from 'element-plus';
 import { loginApi, getCaptcha, mfaLoginApi, checkIsDemo, getLanguage } from '@/api/modules/auth';
 import { GlobalStore, MenuStore, TabsStore } from '@/store';
-import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
-import { getLicenseStatus } from '@/api/modules/setting';
-import { initFavicon } from '@/utils/xpack';
+import { getSettingInfo } from '@/api/modules/setting';
 
+const i18n = useI18n();
+const themeConfig = computed(() => globalStore.themeConfig);
 const globalStore = GlobalStore();
 const menuStore = MenuStore();
 const tabsStore = TabsStore();
@@ -208,8 +208,8 @@ const loginForm = reactive({
 });
 
 const loginRules = reactive({
-    name: computed(() => [{ required: true, message: i18n.global.t('commons.rule.username'), trigger: 'blur' }]),
-    password: computed(() => [{ required: true, message: i18n.global.t('commons.rule.password'), trigger: 'blur' }]),
+    name: computed(() => [{ required: true, message: i18n.t('commons.rule.username'), trigger: 'blur' }]),
+    password: computed(() => [{ required: true, message: i18n.t('commons.rule.password'), trigger: 'blur' }]),
 });
 
 let isLoggingIn = false;
@@ -303,8 +303,8 @@ const login = (formEl: FormInstance | undefined) => {
             globalStore.setAgreeLicense(true);
             menuStore.setMenuList([]);
             tabsStore.removeAllTabs();
-            MsgSuccess(i18n.global.t('commons.msg.loginSuccess'));
-            loadProductProFromDB();
+            MsgSuccess(i18n.t('commons.msg.loginSuccess'));
+            loadDataFromDB();
             router.push({ name: 'home' });
         } catch (error) {
             loginVerify();
@@ -330,8 +330,8 @@ const mfaLogin = async (auto: boolean) => {
         globalStore.setLogStatus(true);
         menuStore.setMenuList([]);
         tabsStore.removeAllTabs();
-        MsgSuccess(i18n.global.t('commons.msg.loginSuccess'));
-        loadProductProFromDB();
+        MsgSuccess(i18n.t('commons.msg.loginSuccess'));
+        loadDataFromDB();
         router.push({ name: 'home' });
     }
 };
@@ -355,29 +355,20 @@ const loadLanguage = async () => {
     } catch (error) {}
 };
 
-const loadProductProFromDB = async () => {
-    const res = await getLicenseStatus();
-    if (!res.data) {
-        globalStore.isProductPro = false;
-        return;
-    }
-    globalStore.isProductPro =
-        res.data.status === 'Enable' || res.data.status === 'Lost01' || res.data.status === 'Lost02';
-
-    if (globalStore.isProductPro) {
-        globalStore.productProExpires = Number(res.data.productPro);
-    } else {
-        globalStore.themeConfig.title = '';
-        globalStore.themeConfig.logo = '';
-        globalStore.themeConfig.logoWithText = '';
-        globalStore.themeConfig.favicon = '';
-    }
+const loadDataFromDB = async () => {
+    const res = await getSettingInfo();
+    document.title = res.data.panelName;
+    i18n.locale.value = res.data.language;
+    i18n.warnHtmlMessage = false;
+    globalStore.entrance = res.data.securityEntrance;
+    globalStore.setOpenMenuTabs(res.data.menuTabs === 'enable');
+    globalStore.updateLanguage(res.data.language);
+    globalStore.setThemeConfig({ ...themeConfig.value, theme: res.data.theme, panelName: res.data.panelName });
 };
 
 onMounted(() => {
     globalStore.isOnRestart = false;
     loginVerify();
-    initFavicon();
     loadLanguage();
     document.title = globalStore.themeConfig.panelName;
     loginForm.agreeLicense = globalStore.agreeLicense;

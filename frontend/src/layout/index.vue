@@ -20,11 +20,9 @@ import { Sidebar, Footer, AppMain, MobileHeader, Tabs } from './components';
 import useResize from './hooks/useResize';
 import { GlobalStore, MenuStore, TabsStore } from '@/store';
 import { DeviceType } from '@/enums/app';
-import { useI18n } from 'vue-i18n';
-import { useTheme } from '@/hooks/use-theme';
-import { getLicenseStatus, getSettingInfo, getSystemAvailable } from '@/api/modules/setting';
+import { getSystemAvailable } from '@/api/modules/setting';
 import { useRoute, useRouter } from 'vue-router';
-import { getXpackSetting, initFavicon, resetXSetting } from '@/utils/xpack';
+import { loadProductProFromDB } from '@/utils/xpack';
 useResize();
 
 const router = useRouter();
@@ -33,11 +31,8 @@ const menuStore = MenuStore();
 const globalStore = GlobalStore();
 const tabsStore = TabsStore();
 
-const i18n = useI18n();
 const loading = ref(false);
 const loadingText = ref();
-const themeConfig = computed(() => globalStore.themeConfig);
-const { switchTheme } = useTheme();
 
 let timer: NodeJS.Timer | null = null;
 
@@ -71,49 +66,6 @@ const handleMenuClick = async (path) => {
     tabsStore.activeTabPath = route.path;
 };
 
-const loadDataFromDB = async () => {
-    const res = await getSettingInfo();
-    document.title = res.data.panelName;
-    i18n.locale.value = res.data.language;
-    i18n.warnHtmlMessage = false;
-    globalStore.entrance = res.data.securityEntrance;
-    globalStore.setOpenMenuTabs(res.data.menuTabs === 'enable');
-    globalStore.updateLanguage(res.data.language);
-    globalStore.setThemeConfig({ ...themeConfig.value, theme: res.data.theme, panelName: res.data.panelName });
-};
-
-const loadDataFromXDB = async () => {
-    const res = await getXpackSetting();
-    if (res) {
-        globalStore.setThemeConfig({
-            ...themeConfig.value,
-            title: res.data.title,
-            logo: res.data.logo,
-            logoWithText: res.data.logoWithText,
-            favicon: res.data.favicon,
-            isGold: res.data.theme === 'dark-gold',
-        });
-    }
-    initFavicon();
-};
-
-const loadProductProFromDB = async () => {
-    const res = await getLicenseStatus();
-    if (!res.data) {
-        globalStore.isProductPro = false;
-        return;
-    }
-    globalStore.isProductPro =
-        res.data.status === 'Enable' || res.data.status === 'Lost01' || res.data.status === 'Lost02';
-
-    if (globalStore.isProductPro) {
-        loadDataFromXDB();
-        globalStore.productProExpires = Number(res.data.productPro);
-    } else {
-        resetXSetting();
-    }
-};
-
 const loadStatus = async () => {
     loading.value = globalStore.isLoading;
     loadingText.value = globalStore.loadingText;
@@ -145,10 +97,7 @@ onMounted(() => {
     }
 
     loadStatus();
-    initFavicon();
-    loadDataFromDB();
     loadProductProFromDB();
-    switchTheme();
 });
 </script>
 
