@@ -48,7 +48,7 @@ import ErrDomain from '@/components/error-message/err_domain.vue';
 import ErrFound from '@/components/error-message/404.vue';
 import { ref, onMounted, watch } from 'vue';
 import { GlobalStore } from '@/store';
-import { getXpackSetting, initFavicon } from '@/utils/xpack';
+import { getXpackSettingForTheme } from '@/utils/xpack';
 const globalStore = GlobalStore();
 
 const screenWidth = ref(null);
@@ -81,23 +81,11 @@ const getStatus = async () => {
     await checkIsSafety(code)
         .then(() => {
             loading.value = false;
-            loadDataFromXDB();
+            getXpackSettingForTheme();
         })
         .catch(() => {
             loading.value = false;
         });
-};
-
-const loadDataFromXDB = async () => {
-    const res = await getXpackSetting();
-    if (res) {
-        globalStore.themeConfig.title = res.data.title;
-        globalStore.themeConfig.logo = res.data.logo;
-        globalStore.themeConfig.logoWithText = res.data.logoWithText;
-        globalStore.themeConfig.favicon = res.data.favicon;
-    }
-    loading.value = false;
-    initFavicon();
 };
 
 onMounted(() => {

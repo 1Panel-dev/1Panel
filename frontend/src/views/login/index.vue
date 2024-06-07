@@ -24,7 +24,7 @@ import LoginForm from './components/login-form.vue';
 import { ref, onMounted } from 'vue';
 import router from '@/routers';
 import { GlobalStore } from '@/store';
-import { getXpackSetting, initFavicon } from '@/utils/xpack';
+import { getXpackSettingForTheme } from '@/utils/xpack';
 
 const gStore = GlobalStore();
 const loading = ref();
@@ -35,28 +35,16 @@ const getStatus = async () => {
     loading.value = true;
     await checkIsSafety(gStore.entrance)
         .then((res) => {
+            loading.value = false;
             if (res.data === 'unpass') {
-                loading.value = false;
                 router.replace({ name: 'entrance', params: { code: gStore.entrance } });
                 return;
             }
-            loadDataFromXDB();
+            getXpackSettingForTheme();
         })
         .catch(() => {
             loading.value = false;
         });
-};
-
-const loadDataFromXDB = async () => {
-    const res = await getXpackSetting();
-    if (res) {
-        gStore.themeConfig.title = res.data.title;
-        gStore.themeConfig.logo = res.data.logo;
-        gStore.themeConfig.logoWithText = res.data.logoWithText;
-        gStore.themeConfig.favicon = res.data.favicon;
-    }
-    loading.value = false;
-    initFavicon();
 };
 
 onMounted(() => {
