@@ -271,6 +271,18 @@ html.dark {
     .el-descriptions__content.el-descriptions__cell.is-bordered-content {
         color: #999999;
     }
+    .el-descriptions--large .el-descriptions__body .el-descriptions__table.is-bordered .el-descriptions__cell {
+        padding: 12px 15px;
+        background-color: transparent;
+    }
+    .el-descriptions__body {
+        background-color: transparent;
+    }
+    .el-descriptions__label {
+        color: var(--el-color-primary) !important;
+        margin-right: 16px;
+    }
+
     .terminal-tabs {
         background: none !important;
         .el-tabs__header {

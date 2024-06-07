@@ -13,6 +13,7 @@ export function resetXSetting() {
 }
 
 export function initFavicon() {
+    document.title = globalStore.themeConfig.panelName;
     let favicon = globalStore.themeConfig.favicon;
     const link = (document.querySelector("link[rel*='icon']") || document.createElement('link')) as HTMLLinkElement;
     link.type = 'image/x-icon';
