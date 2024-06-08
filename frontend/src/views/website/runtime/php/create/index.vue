@@ -111,7 +111,13 @@
                                 <el-form-item>
                                     <el-alert type="info" :closable="false">
                                         <span>{{ $t('runtime.extendHelper') }}</span>
-                                        <span v-html="$t('runtime.phpPluginHelper')"></span>
+                                        <el-link
+                                            target="_blank"
+                                            type="primary"
+                                            href="https://1panel.cn/docs/user_manual/websites/php/#php_1"
+                                        >
+                                            {{ $t('php.toExtensionsList') }}
+                                        </el-link>
                                         <br />
                                     </el-alert>
                                 </el-form-item>

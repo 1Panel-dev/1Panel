@@ -23,7 +23,7 @@
                         <el-form-item :label="$t('website.cacheTime')" prop="cacheTime" v-if="form.cache">
                             <el-input v-model.number="form.cacheTime" maxlength="15">
                                 <template #append>
-                                    <el-select v-model="form.cacheUint" style="width: 100px">
+                                    <el-select v-model="form.cacheUint" class="w-s-button p-w-100">
                                         <el-option
                                             v-for="(unit, index) in Units"
                                             :key="index"

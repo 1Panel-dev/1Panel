@@ -2218,8 +2218,6 @@ const message = {
         extendHelper:
             'Extensions that do not exist in the list can be selected after manual input, for example: input sockets, and then select the first one in the drop-down list,',
         rebuildHelper: 'After editing the extension, you need to rebuild the PHP application to take effect',
-        phpPluginHelper:
-            '<a target="_blank" href="https://1panel.cn/docs/user_manual/websites/php/#php_1">View PHP extension list</a> ',
         rebuild: 'Rebuild PHP App',
         source: 'PHP extension source',
         ustc: 'University of Science and Technology of China',
