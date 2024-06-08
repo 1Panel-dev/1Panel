@@ -248,6 +248,7 @@
                                             v-if="mode === 'installed' && installed.status != 'Installing'"
                                         >
                                             <el-button
+                                                class="app-button"
                                                 v-for="(button, key) in buttons"
                                                 :key="key"
                                                 :type="button.disabled && button.disabled(installed) ? 'info' : ''"

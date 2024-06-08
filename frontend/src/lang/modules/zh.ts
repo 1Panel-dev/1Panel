@@ -2062,8 +2062,6 @@ const message = {
         edit: '编辑运行环境',
         extendHelper: '列表中不存在的扩展，可以手动输入之后选择，例:输入 sockets ，然后在下拉列表中选择第一个，',
         rebuildHelper: '编辑扩展后需要【重建】PHP 应用之后才能生效',
-        phpPluginHelper:
-            "<a target=“_blank” href='https://1panel.cn/docs/user_manual/websites/php/#php_1'>查看 PHP 扩展列表</a> ",
         rebuild: '重建 PHP 应用',
         source: 'PHP 扩展源',
         ustc: '中国科学技术大学',

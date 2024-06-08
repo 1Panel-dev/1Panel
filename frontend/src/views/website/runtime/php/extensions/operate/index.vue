@@ -20,9 +20,13 @@
                             v-model="extensions.extensions"
                         />
                     </el-form-item>
-                    <a target="“_blank”" href="https://1panel.cn/docs/user_manual/websites/php/#php_1">
+                    <el-link
+                        target="_blank"
+                        type="primary"
+                        href="https://1panel.cn/docs/user_manual/websites/php/#php_1"
+                    >
                         {{ $t('php.toExtensionsList') }}
-                    </a>
+                    </el-link>
                 </el-form>
             </el-col>
         </el-row>
