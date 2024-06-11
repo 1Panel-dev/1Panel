@@ -242,43 +242,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/apps/installed/:appInstallId/versions": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "通过 install id 获取应用更新版本",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "App"
-                ],
-                "summary": "Search app update version by install id",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "request",
-                        "name": "appInstallId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/dto.AppVersion"
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/apps/installed/check": {
             "post": {
                 "security": [
@@ -774,6 +737,43 @@ const docTemplate = `{
                     "formatEN": "Sync the list of installed apps",
                     "formatZH": "同步已安装应用列表",
                     "paramKeys": []
+                }
+            }
+        },
+        "/apps/installed/update/versions": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "通过 install id 获取应用更新版本",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "App"
+                ],
+                "summary": "Search app update version by install id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "request",
+                        "name": "appInstallId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.AppVersion"
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -3636,7 +3636,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.SearchWithPage"
+                            "$ref": "#/definitions/dto.PageCronjob"
                         }
                     }
                 ],
@@ -14612,6 +14612,9 @@ const docTemplate = `{
                 "detailId": {
                     "type": "integer"
                 },
+                "dockerCompose": {
+                    "type": "string"
+                },
                 "version": {
                     "type": "string"
                 }
@@ -14850,8 +14853,7 @@ const docTemplate = `{
         "dto.ChangeRedisPass": {
             "type": "object",
             "required": [
-                "database",
-                "value"
+                "database"
             ],
             "properties": {
                 "database": {
@@ -14947,6 +14949,9 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "secret": {
+                    "type": "string"
+                },
                 "type": {
                     "type": "string",
                     "enum": [
@@ -14974,6 +14979,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "secret": {
                     "type": "string"
                 },
                 "source": {
@@ -15450,6 +15458,9 @@ const docTemplate = `{
                 "script": {
                     "type": "string"
                 },
+                "secret": {
+                    "type": "string"
+                },
                 "sourceDir": {
                     "type": "string"
                 },
@@ -15525,6 +15536,9 @@ const docTemplate = `{
                     "minimum": 1
                 },
                 "script": {
+                    "type": "string"
+                },
+                "secret": {
                     "type": "string"
                 },
                 "sourceDir": {
@@ -15814,7 +15828,6 @@ const docTemplate = `{
             "required": [
                 "from",
                 "name",
-                "password",
                 "type",
                 "username",
                 "version"
@@ -15983,6 +15996,8 @@ const docTemplate = `{
         "dto.DatabaseSearch": {
             "type": "object",
             "required": [
+                "order",
+                "orderBy",
                 "page",
                 "pageSize"
             ],
@@ -15991,10 +16006,19 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "order": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "null",
+                        "ascending",
+                        "descending"
+                    ]
                 },
                 "orderBy": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "name",
+                        "created_at"
+                    ]
                 },
                 "page": {
                     "type": "integer"
@@ -16010,7 +16034,6 @@ const docTemplate = `{
         "dto.DatabaseUpdate": {
             "type": "object",
             "required": [
-                "password",
                 "type",
                 "username",
                 "version"
@@ -17079,6 +17102,8 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "database",
+                "order",
+                "orderBy",
                 "page",
                 "pageSize"
             ],
@@ -17090,10 +17115,19 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "order": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "null",
+                        "ascending",
+                        "descending"
+                    ]
                 },
                 "orderBy": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "name",
+                        "created_at"
+                    ]
                 },
                 "page": {
                     "type": "integer"
@@ -17527,6 +17561,8 @@ const docTemplate = `{
         "dto.PageContainer": {
             "type": "object",
             "required": [
+                "order",
+                "orderBy",
                 "page",
                 "pageSize",
                 "state"
@@ -17542,10 +17578,20 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "order": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "null",
+                        "ascending",
+                        "descending"
+                    ]
                 },
                 "orderBy": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "name",
+                        "status",
+                        "created_at"
+                    ]
                 },
                 "page": {
                     "type": "integer"
@@ -17565,6 +17611,42 @@ const docTemplate = `{
                         "exited",
                         "dead"
                     ]
+                }
+            }
+        },
+        "dto.PageCronjob": {
+            "type": "object",
+            "required": [
+                "order",
+                "orderBy",
+                "page",
+                "pageSize"
+            ],
+            "properties": {
+                "info": {
+                    "type": "string"
+                },
+                "order": {
+                    "type": "string",
+                    "enum": [
+                        "null",
+                        "ascending",
+                        "descending"
+                    ]
+                },
+                "orderBy": {
+                    "type": "string",
+                    "enum": [
+                        "name",
+                        "status",
+                        "created_at"
+                    ]
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
                 }
             }
         },
@@ -17810,6 +17892,8 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "database",
+                "order",
+                "orderBy",
                 "page",
                 "pageSize"
             ],
@@ -17821,10 +17905,19 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "order": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "null",
+                        "ascending",
+                        "descending"
+                    ]
                 },
                 "orderBy": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "name",
+                        "created_at"
+                    ]
                 },
                 "page": {
                     "type": "integer"
@@ -18415,12 +18508,6 @@ const docTemplate = `{
                 "info": {
                     "type": "string"
                 },
-                "order": {
-                    "type": "string"
-                },
-                "orderBy": {
-                    "type": "string"
-                },
                 "page": {
                     "type": "integer"
                 },
@@ -18643,6 +18730,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "secret": {
+                    "type": "string"
                 }
             }
         },
@@ -18678,6 +18768,9 @@ const docTemplate = `{
                 },
                 "reDownload": {
                     "type": "boolean"
+                },
+                "secret": {
+                    "type": "string"
                 }
             }
         },
@@ -19472,6 +19565,9 @@ const docTemplate = `{
                 "detailId": {
                     "type": "integer"
                 },
+                "dockerCompose": {
+                    "type": "string"
+                },
                 "forceDelete": {
                     "type": "boolean"
                 },
@@ -19689,6 +19785,9 @@ const docTemplate = `{
                 "replace": {
                     "type": "boolean"
                 },
+                "secret": {
+                    "type": "string"
+                },
                 "type": {
                     "type": "string"
                 }
@@ -19749,6 +19848,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "path": {
+                    "type": "string"
+                },
+                "secret": {
                     "type": "string"
                 },
                 "type": {
@@ -21449,7 +21551,6 @@ const docTemplate = `{
         "request.WebsiteSSLUpdate": {
             "type": "object",
             "required": [
-                "acmeAccountId",
                 "id",
                 "primaryDomain",
                 "provider"
@@ -21541,6 +21642,8 @@ const docTemplate = `{
         "request.WebsiteSearch": {
             "type": "object",
             "required": [
+                "order",
+                "orderBy",
                 "page",
                 "pageSize"
             ],
@@ -21549,10 +21652,21 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "order": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "null",
+                        "ascending",
+                        "descending"
+                    ]
                 },
                 "orderBy": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "primary_domain",
+                        "type",
+                        "status",
+                        "created_at"
+                    ]
                 },
                 "page": {
                     "type": "integer"

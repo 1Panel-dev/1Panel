@@ -1,9 +1,9 @@
 package dto
 
 type SearchCommandWithPage struct {
-	SearchWithPage
-	OrderBy string `json:"orderBy"`
-	Order   string `json:"order"`
+	PageInfo
+	OrderBy string `json:"orderBy" validate:"required,oneof=name command created_at"`
+	Order   string `json:"order" validate:"required,oneof=null ascending descending"`
 	GroupID uint   `json:"groupID"`
 	Info    string `json:"info"`
 	Name    string `json:"name"`

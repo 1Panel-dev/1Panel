@@ -21,7 +21,7 @@ import (
 type CronjobService struct{}
 
 type ICronjobService interface {
-	SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error)
+	SearchWithPage(search dto.PageCronjob) (int64, interface{}, error)
 	SearchRecords(search dto.SearchRecord) (int64, interface{}, error)
 	Create(cronjobDto dto.CronjobCreate) error
 	HandleOnce(id uint) error
@@ -39,7 +39,7 @@ func NewICronjobService() ICronjobService {
 	return &CronjobService{}
 }
 
-func (u *CronjobService) SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error) {
+func (u *CronjobService) SearchWithPage(search dto.PageCronjob) (int64, interface{}, error) {
 	total, cronjobs, err := cronjobRepo.Page(search.Page, search.PageSize, commonRepo.WithLikeName(search.Info), commonRepo.WithOrderRuleBy(search.OrderBy, search.Order))
 	var dtoCronjobs []dto.CronjobInfo
 	for _, cronjob := range cronjobs {
