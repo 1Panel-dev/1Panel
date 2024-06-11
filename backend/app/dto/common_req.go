@@ -2,9 +2,7 @@ package dto
 
 type SearchWithPage struct {
 	PageInfo
-	Info    string `json:"info"`
-	OrderBy string `json:"orderBy"`
-	Order   string `json:"order"`
+	Info string `json:"info"`
 }
 
 type PageInfo struct {

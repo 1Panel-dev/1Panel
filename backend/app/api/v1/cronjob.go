@@ -36,12 +36,12 @@ func (b *BaseApi) CreateCronjob(c *gin.Context) {
 // @Summary Page cronjobs
 // @Description 获取计划任务分页
 // @Accept json
-// @Param request body dto.SearchWithPage true "request"
+// @Param request body dto.PageCronjob true "request"
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Router /cronjobs/search [post]
 func (b *BaseApi) SearchCronjob(c *gin.Context) {
-	var req dto.SearchWithPage
+	var req dto.PageCronjob
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}

@@ -4,6 +4,13 @@ import (
 	"time"
 )
 
+type PageCronjob struct {
+	PageInfo
+	Info    string `json:"info"`
+	OrderBy string `json:"orderBy" validate:"required,oneof=name status created_at"`
+	Order   string `json:"order" validate:"required,oneof=null ascending descending"`
+}
+
 type CronjobCreate struct {
 	Name string `json:"name" validate:"required"`
 	Type string `json:"type" validate:"required"`
