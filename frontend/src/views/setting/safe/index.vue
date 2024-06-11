@@ -224,6 +224,7 @@ const form = reactive({
     allowIPs: '',
     bindDomain: '',
     noAuthSetting: '200 - ' + i18n.global.t('setting.help200'),
+    noAuthSettingValue: '200',
 });
 
 const unset = ref(i18n.global.t('setting.unSetting'));
@@ -246,6 +247,7 @@ const search = async () => {
     form.mfaInterval = Number(res.data.mfaInterval);
     form.allowIPs = res.data.allowIPs.replaceAll(',', '\n');
     form.bindDomain = res.data.bindDomain;
+    form.noAuthSettingValue = res.data.noAuthSetting;
     if (res.data.noAuthSetting !== '200') {
         form.noAuthSetting = res.data.noAuthSetting + ' - ' + i18n.global.t('setting.error' + res.data.noAuthSetting);
     } else {
@@ -297,7 +299,7 @@ const onChangeBind = () => {
     bindRef.value.acceptParams({ ipv6: form.ipv6, bindAddress: form.bindAddress });
 };
 const onChangeResponse = () => {
-    responseRef.value.acceptParams({ noAuthSetting: form.noAuthSetting });
+    responseRef.value.acceptParams({ noAuthSetting: form.noAuthSettingValue });
 };
 const onChangeBindDomain = () => {
     domainRef.value.acceptParams({ bindDomain: form.bindDomain });
