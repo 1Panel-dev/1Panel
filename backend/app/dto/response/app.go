@@ -88,6 +88,12 @@ type AppInstalledDTO struct {
 	Path      string `json:"path"`
 }
 
+type AppDetail struct {
+	Website  string `json:"website"`
+	Document string `json:"document"`
+	Github   string `json:"github"`
+}
+
 type AppInstallDTO struct {
 	ID            uint      `json:"id"`
 	Name          string    `json:"name"`
@@ -109,6 +115,7 @@ type AppInstallDTO struct {
 	AppStatus     string    `json:"appStatus"`
 	DockerCompose string    `json:"dockerCompose"`
 	CreatedAt     time.Time `json:"createdAt"`
+	App           AppDetail `json:"app"`
 }
 
 type DatabaseConn struct {

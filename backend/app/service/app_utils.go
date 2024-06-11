@@ -1255,6 +1255,11 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 			AppType:     installed.App.Type,
 			Path:        installed.GetPath(),
 			CreatedAt:   installed.CreatedAt,
+			App: response.AppDetail{
+				Github:   installed.App.Github,
+				Website:  installed.App.Website,
+				Document: installed.App.Document,
+			},
 		}
 		if updated {
 			installDTO.DockerCompose = installed.DockerCompose
