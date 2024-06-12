@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
@@ -236,20 +237,20 @@ func (f *FileService) GetContent(op request.FileContentReq) (response.FileInfo, 
 	}
 
 	content := []byte(info.Content)
-	var decodeName string
 	if len(content) > 1024 {
-		_, decodeName, _ = charset.DetermineEncoding(content[:1024], "")
-	} else {
-		_, decodeName, _ = charset.DetermineEncoding(content, "")
+		content = content[:1024]
 	}
-	if decodeName == "windows-1252" {
-		reader := strings.NewReader(info.Content)
-		item := transform.NewReader(reader, simplifiedchinese.GBK.NewDecoder())
-		contents, err := io.ReadAll(item)
-		if err != nil {
-			return response.FileInfo{}, err
+	if !utf8.Valid(content) {
+		_, decodeName, _ := charset.DetermineEncoding(content, "")
+		if decodeName == "windows-1252" {
+			reader := strings.NewReader(info.Content)
+			item := transform.NewReader(reader, simplifiedchinese.GBK.NewDecoder())
+			contents, err := io.ReadAll(item)
+			if err != nil {
+				return response.FileInfo{}, err
+			}
+			info.Content = string(contents)
 		}
-		info.Content = string(contents)
 	}
 	return response.FileInfo{FileInfo: *info}, nil
 }

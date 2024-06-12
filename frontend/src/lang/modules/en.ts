@@ -1729,7 +1729,8 @@ const message = {
         takeDown: 'TakeDown',
         allReadyInstalled: 'Installed',
         installHelper: 'Configuring image acceleration can solve the problem of image pull failure',
-        upgradeHelper: 'The abnormal application needs to be synchronized to the normal state first',
+        upgradeHelper:
+            'Abnormal applications need to be synchronized to normal status first. If the upgrade fails, please check the failure reason in the log audit-system log',
         installWarn:
             'Currently, if the port external access is not checked, it will not be able to access through the external network IP: port. Do you want to continue?',
         showIgnore: 'View ignore application',
