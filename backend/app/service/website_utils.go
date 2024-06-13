@@ -863,7 +863,7 @@ func changeServiceName(newComposeContent, newServiceName string) (composeByte []
 		return
 	}
 	value, ok := composeMap["services"]
-	if !ok {
+	if !ok || value == nil {
 		err = buserr.New(constant.ErrFileParse)
 		return
 	}
