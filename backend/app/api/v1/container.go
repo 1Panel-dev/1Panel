@@ -347,6 +347,26 @@ func (b *BaseApi) ContainerRename(c *gin.Context) {
 }
 
 // @Tags Container
+// @Summary Commit Container
+// @Description 容器提交生成新镜像
+// @Accept json
+// @Param request body dto.ContainerCommit true "request"
+// @Success 200
+// @Router /containers/commit [post]
+func (b *BaseApi) ContainerCommit(c *gin.Context) {
+	var req dto.ContainerCommit
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := containerService.ContainerCommit(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Container
 // @Summary Operate Container
 // @Description 容器操作
 // @Accept json

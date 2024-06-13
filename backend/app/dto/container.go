@@ -1,6 +1,8 @@
 package dto
 
-import "time"
+import (
+	"time"
+)
 
 type PageContainer struct {
 	PageInfo
@@ -120,6 +122,15 @@ type ContainerOperation struct {
 type ContainerRename struct {
 	Name    string `json:"name" validate:"required"`
 	NewName string `json:"newName" validate:"required"`
+}
+
+type ContainerCommit struct {
+	ContainerId   string `json:"containerID" validate:"required"`
+	ContainerName string `json:"containerName"`
+	NewImageName  string `json:"newImageName"`
+	Comment       string `json:"comment"`
+	Author        string `json:"author"`
+	Pause         bool   `json:"pause"`
 }
 
 type ContainerPrune struct {

@@ -811,6 +811,13 @@ const message = {
         cleanImagesHelper: '( Clean up all images that are not used by any containers )',
         cleanContainersHelper: '( Clean up all stopped containers )',
         cleanVolumesHelper: '( Clean up all unused local volumes )',
+
+        makeImage: 'Create Image',
+        newImageName: 'New Image Name',
+        commitMessage: 'Commit Message',
+        author: 'Author',
+        ifPause: 'Pause Container During Creation',
+        ifMakeImageWithContainer: 'Create New Image from This Container?',
     },
     cronjob: {
         create: 'Create Cronjob',
