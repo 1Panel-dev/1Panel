@@ -449,7 +449,7 @@ func getUpgradeCompose(install model.AppInstall, detail model.AppDetail) (string
 		return "", err
 	}
 	value, ok := composeMap["services"]
-	if !ok {
+	if !ok || value == nil {
 		return "", buserr.New(constant.ErrFileParse)
 	}
 	servicesMap := value.(map[string]interface{})
