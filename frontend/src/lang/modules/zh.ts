@@ -1,8 +1,8 @@
 import fit2cloudZhLocale from 'fit2cloud-ui-plus/src/locale/lang/zh-cn';
 let xpackZhLocale = {};
-const xpackModules = import.meta.globEager('../../xpack/lang/zh.ts');
+const xpackModules = import.meta.glob('../../xpack/lang/zh.ts', { eager: true });
 if (xpackModules['../../xpack/lang/zh.ts']) {
-    xpackZhLocale = xpackModules['../../xpack/lang/zh.ts'].default || {};
+    xpackZhLocale = xpackModules['../../xpack/lang/zh.ts']['default'] || {};
 }
 
 const message = {

@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import { Layout } from '@/routers/constant';
 
-let modules = import.meta.globEager('./modules/*.ts');
-const xpackModules = import.meta.globEager('../xpack/routers/*.ts');
+let modules: Record<string, RouteRecordRaw> = import.meta.glob('./modules/*.ts', { eager: true });
+const xpackModules: Record<string, RouteRecordRaw> = import.meta.glob('../xpack/routers/*.ts', { eager: true });
 modules = { ...modules, ...xpackModules };
 
 const homeRouter: RouteRecordRaw = {
@@ -30,7 +30,7 @@ export const routerArray: RouteRecordRaw[] = [];
 
 export const rolesRoutes = [
     ...Object.keys(modules)
-        .map((key) => modules[key].default)
+        .map((key) => modules[key]['default'])
         .sort((r1, r2) => {
             r1.sort ??= Number.MAX_VALUE;
             r2.sort ??= Number.MAX_VALUE;
@@ -47,6 +47,9 @@ export const menuList: RouteRecordRaw[] = [];
 rolesRoutes.forEach((item) => {
     let menuItem = JSON.parse(JSON.stringify(item));
     let menuChildren: RouteRecordRaw[] = [];
+    if (menuItem.children == undefined) {
+        return;
+    }
     menuItem.children.forEach((child: any) => {
         if (child.hidden == undefined || child.hidden == false) {
             menuChildren.push(child);

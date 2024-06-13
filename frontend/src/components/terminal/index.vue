@@ -4,9 +4,9 @@
 
 <script lang="ts" setup>
 import { ref, watch, onBeforeUnmount, nextTick } from 'vue';
-import { Terminal } from 'xterm';
-import 'xterm/css/xterm.css';
-import { FitAddon } from 'xterm-addon-fit';
+import { Terminal } from '@xterm/xterm';
+import '@xterm/xterm/css/xterm.css';
+import { FitAddon } from '@xterm/addon-fit';
 import { Base64 } from 'js-base64';
 
 const terminalElement = ref<HTMLDivElement | null>(null);

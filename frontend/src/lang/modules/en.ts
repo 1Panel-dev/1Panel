@@ -1,8 +1,8 @@
 import fit2cloudEnLocale from 'fit2cloud-ui-plus/src/locale/lang/en';
 let xpackEnLocale = {};
-const xpackModules = import.meta.globEager('../../xpack/lang/en.ts');
+const xpackModules = import.meta.glob('../../xpack/lang/en.ts', { eager: true });
 if (xpackModules['../../xpack/lang/en.ts']) {
-    xpackEnLocale = xpackModules['../../xpack/lang/en.ts'].default || {};
+    xpackEnLocale = xpackModules['../../xpack/lang/en.ts']['default'] || {};
 }
 
 const message = {

@@ -1,8 +1,8 @@
 import fit2cloudTwLocale from 'fit2cloud-ui-plus/src/locale/lang/zh-cn';
 let xpackTwLocale = {};
-const xpackModules = import.meta.globEager('../../xpack/lang/tw.ts');
+const xpackModules = import.meta.glob('../../xpack/lang/tw.ts', { eager: true });
 if (xpackModules['../../xpack/lang/tw.ts']) {
-    xpackTwLocale = xpackModules['../../xpack/lang/tw.ts'].default || {};
+    xpackTwLocale = xpackModules['../../xpack/lang/tw.ts']['default'] || {};
 }
 
 const message = {
