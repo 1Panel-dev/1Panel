@@ -448,7 +448,7 @@ onMounted(() => {
     font-weight: 600;
 }
 .fullScreen {
-    background-color: #efefef;
+    background-color: transparent;
     border: none;
     position: absolute;
     right: 50px;
