@@ -361,6 +361,7 @@ const loadDataFromDB = async () => {
     i18n.locale.value = res.data.language;
     i18n.warnHtmlMessage = false;
     globalStore.entrance = res.data.securityEntrance;
+    globalStore.setDefaultNetwork(res.data.defaultNetwork);
     globalStore.setOpenMenuTabs(res.data.menuTabs === 'enable');
     globalStore.updateLanguage(res.data.language);
     globalStore.setThemeConfig({ ...themeConfig.value, theme: res.data.theme, panelName: res.data.panelName });
