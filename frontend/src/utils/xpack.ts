@@ -1,4 +1,4 @@
-import { getLicenseStatus } from '@/api/modules/setting';
+import { getLicenseStatus, getSettingInfo } from '@/api/modules/setting';
 import { useTheme } from '@/hooks/use-theme';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
@@ -33,6 +33,14 @@ export async function getXpackSetting() {
     return res;
 }
 
+const loadDataFromDB = async () => {
+    const res = await getSettingInfo();
+    document.title = res.data.panelName;
+    globalStore.entrance = res.data.securityEntrance;
+    globalStore.setDefaultNetwork(res.data.defaultNetwork);
+    globalStore.setOpenMenuTabs(res.data.menuTabs === 'enable');
+};
+
 export async function loadProductProFromDB() {
     const res = await getLicenseStatus();
     if (!res.data) {
@@ -48,6 +56,7 @@ export async function loadProductProFromDB() {
     }
     switchTheme();
     initFavicon();
+    loadDataFromDB();
 }
 
 export async function getXpackSettingForTheme() {
