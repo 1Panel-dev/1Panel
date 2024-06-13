@@ -563,6 +563,16 @@ func applySSL(website model.Website, websiteSSL model.WebsiteSSL, req request.We
 	if err != nil {
 		return nil
 	}
+	domains, err := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(website.ID))
+	if err != nil {
+		return nil
+	}
+	noDefaultPort := true
+	for _, domain := range domains {
+		if domain.Port == 80 {
+			noDefaultPort = false
+		}
+	}
 	config := nginxFull.SiteConfig.Config
 	server := config.FindServers()[0]
 
@@ -582,13 +592,17 @@ func applySSL(website model.Website, websiteSSL model.WebsiteSSL, req request.We
 		server.RemoveListenByBind(httpPortIPV6)
 		server.RemoveDirective("if", []string{"($scheme"})
 	case constant.HTTPToHTTPS:
-		server.UpdateListen(httpPort, website.DefaultServer)
+		if !noDefaultPort {
+			server.UpdateListen(httpPort, website.DefaultServer)
+		}
 		if website.IPV6 {
 			server.UpdateListen(httpPortIPV6, website.DefaultServer)
 		}
 		server.AddHTTP2HTTPS()
 	case constant.HTTPAlso:
-		server.UpdateListen(httpPort, website.DefaultServer)
+		if !noDefaultPort {
+			server.UpdateListen(httpPort, website.DefaultServer)
+		}
 		server.RemoveDirective("if", []string{"($scheme"})
 		if website.IPV6 {
 			server.UpdateListen(httpPortIPV6, website.DefaultServer)
