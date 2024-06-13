@@ -166,7 +166,7 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 
 func (w WebsiteService) GetWebsites() ([]response.WebsiteDTO, error) {
 	var websiteDTOs []response.WebsiteDTO
-	websites, err := websiteRepo.List()
+	websites, err := websiteRepo.List(commonRepo.WithOrderRuleBy("primary_domain", "ascending"))
 	if err != nil {
 		return nil, err
 	}
