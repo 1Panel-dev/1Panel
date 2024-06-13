@@ -18,7 +18,12 @@ export function initFavicon() {
     const link = (document.querySelector("link[rel*='icon']") || document.createElement('link')) as HTMLLinkElement;
     link.type = 'image/x-icon';
     link.rel = 'shortcut icon';
-    link.href = favicon ? '/api/v1/images/favicon' : '/public/favicon.png';
+    if (globalStore.isDarkGoldTheme) {
+        let goldLink = new URL(`../assets/images/favicon-gold.png`, import.meta.url).href;
+        link.href = favicon ? '/api/v1/images/favicon' : goldLink;
+    } else {
+        link.href = favicon ? '/api/v1/images/favicon' : '/public/favicon.png';
+    }
     document.getElementsByTagName('head')[0].appendChild(link);
 }
 
@@ -29,9 +34,11 @@ export async function getXpackSetting() {
         searchXSetting = xpackModules['../xpack/api/modules/setting.ts']['searchXSetting'] || {};
         const res = await searchXSetting();
         if (!res) {
+            initFavicon();
             resetXSetting();
             return;
         }
+        initFavicon();
         return res;
     }
 }
