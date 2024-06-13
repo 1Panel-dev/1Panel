@@ -30,6 +30,11 @@ var whiteUrlList = map[string]struct{}{
 
 	"/api/v1/waf/attack/stat":    {},
 	"/api/v1/waf/config/website": {},
+
+	"/api/v1/monitor/stat":         {},
+	"/api/v1/monitor/visitors":     {},
+	"/api/v1/monitor/visitors/loc": {},
+	"/api/v1/monitor/qps":          {},
 }
 
 func DemoHandle() gin.HandlerFunc {
