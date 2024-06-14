@@ -776,6 +776,13 @@ const message = {
         cleanImagesHelper: '( 清理所有未被任何容器使用的鏡像 )',
         cleanContainersHelper: '( 清理所有處於停止狀態的容器 )',
         cleanVolumesHelper: '( 清理所有未被使用的本地存儲卷 )',
+
+        makeImage: '製作鏡像',
+        newImageName: '新鏡像名稱',
+        commitMessage: '提交信息',
+        author: '作者',
+        ifPause: '製作過程中是否暫停容器',
+        ifMakeImageWithContainer: '是否根據此容器製作新鏡像？',
     },
     cronjob: {
         create: '創建計劃任務',

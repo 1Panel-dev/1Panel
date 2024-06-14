@@ -21,6 +21,9 @@ export const updateContainer = (params: Container.ContainerHelper) => {
 export const upgradeContainer = (name: string, image: string, forcePull: boolean) => {
     return http.post(`/containers/upgrade`, { name: name, image: image, forcePull: forcePull }, TimeoutEnum.T_10M);
 };
+export const commitContainer = (params: Container.ContainerCommit) => {
+    return http.post(`/containers/commit`, params);
+};
 export const loadContainerInfo = (name: string) => {
     return http.post<Container.ContainerHelper>(`/containers/info`, { name: name });
 };

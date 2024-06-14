@@ -60,6 +60,7 @@ type IContainerService interface {
 	ContainerListStats() ([]dto.ContainerListStats, error)
 	LoadResourceLimit() (*dto.ResourceLimit, error)
 	ContainerRename(req dto.ContainerRename) error
+	ContainerCommit(req dto.ContainerCommit) error
 	ContainerLogClean(req dto.OperationWithName) error
 	ContainerOperation(req dto.ContainerOperation) error
 	ContainerLogs(wsConn *websocket.Conn, containerType, container, since, tail string, follow bool) error
@@ -595,6 +596,28 @@ func (u *ContainerService) ContainerRename(req dto.ContainerRename) error {
 		return buserr.New(constant.ErrContainerName)
 	}
 	return client.ContainerRename(ctx, req.Name, req.NewName)
+}
+
+func (u *ContainerService) ContainerCommit(req dto.ContainerCommit) error {
+	ctx := context.Background()
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+	options := container.CommitOptions{
+		Reference: req.NewImageName,
+		Comment:   req.Comment,
+		Author:    req.Author,
+		Changes:   nil,
+		Pause:     req.Pause,
+		Config:    nil,
+	}
+	_, err = client.ContainerCommit(ctx, req.ContainerId, options)
+	if err != nil {
+		return fmt.Errorf("failed to commit container, err: %v", err)
+	}
+	return nil
 }
 
 func (u *ContainerService) ContainerOperation(req dto.ContainerOperation) error {

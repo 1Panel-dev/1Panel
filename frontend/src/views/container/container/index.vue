@@ -311,6 +311,7 @@
         <ContainerLogDialog ref="dialogContainerLogRef" />
         <OperateDialog @search="search" ref="dialogOperateRef" />
         <UpgradeDialog @search="search" ref="dialogUpgradeRef" />
+        <CommitDialog @search="search" ref="dialogCommitRef" />
         <MonitorDialog ref="dialogMonitorRef" />
         <TerminalDialog ref="dialogTerminalRef" />
 
@@ -323,6 +324,7 @@ import PruneDialog from '@/views/container/container/prune/index.vue';
 import RenameDialog from '@/views/container/container/rename/index.vue';
 import OperateDialog from '@/views/container/container/operate/index.vue';
 import UpgradeDialog from '@/views/container/container/upgrade/index.vue';
+import CommitDialog from '@/views/container/container/commit/index.vue';
 import MonitorDialog from '@/views/container/container/monitor/index.vue';
 import ContainerLogDialog from '@/views/container/container/log/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
@@ -363,6 +365,7 @@ const paginationConfig = reactive({
 const searchName = ref();
 const searchState = ref('all');
 const dialogUpgradeRef = ref();
+const dialogCommitRef = ref();
 const dialogPortJumpRef = ref();
 const opRef = ref();
 const includeAppStore = ref(true);
@@ -686,6 +689,15 @@ const buttons = [
         },
         disabled: (row: any) => {
             return row.isFromCompose;
+        },
+    },
+    {
+        label: i18n.global.t('container.makeImage'),
+        click: (row: Container.ContainerInfo) => {
+            dialogCommitRef.value!.acceptParams({ containerID: row.containerID, containerName: row.name });
+        },
+        disabled: (row: any) => {
+            return checkStatus('commit', row);
         },
     },
     {
