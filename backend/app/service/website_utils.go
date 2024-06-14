@@ -609,6 +609,10 @@ func applySSL(website model.Website, websiteSSL model.WebsiteSSL, req request.We
 		}
 	}
 
+	if !req.Hsts {
+		server.RemoveDirective("add_header", []string{"Strict-Transport-Security", "\"max-age=31536000\""})
+	}
+
 	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return err
 	}
@@ -630,6 +634,13 @@ func applySSL(website model.Website, websiteSSL model.WebsiteSSL, req request.We
 			nginxParams[i].Params = []string{req.Algorithm}
 		}
 	}
+	if req.Hsts {
+		nginxParams = append(nginxParams, dto.NginxParam{
+			Name:   "add_header",
+			Params: []string{"Strict-Transport-Security", "\"max-age=31536000\""},
+		})
+	}
+
 	if err := updateNginxConfig(constant.NginxScopeServer, nginxParams, &website); err != nil {
 		return err
 	}

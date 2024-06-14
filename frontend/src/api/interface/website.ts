@@ -263,6 +263,7 @@ export namespace Website {
         httpConfig: string;
         SSLProtocol: string[];
         algorithm: string;
+        hsts: boolean;
     }
 
     export interface CheckReq {
