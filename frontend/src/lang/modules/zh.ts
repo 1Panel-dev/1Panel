@@ -2050,7 +2050,7 @@ const message = {
         targetIP: '目标 IP',
         targetPort: '目标端口',
         forwardHelper1: '如果是本机端口转发，目标IP为：127.0.0.1',
-        forwardHelper2: '如果目标IP不填写，则默认为本机端口转发!',
+        forwardHelper2: '如果目标IP不填写，则默认为本机端口转发',
     },
     runtime: {
         runtime: '运行环境',

@@ -102,7 +102,7 @@ func (b *BaseApi) OperatePortRule(c *gin.Context) {
 // @Param request body dto.ForwardRuleOperate true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /hosts/firewall/forward [put]
+// @Router /hosts/firewall/forward [post]
 // @x-panel-log {"bodyKeys":["source_port"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新端口转发规则 [source_port]","formatEN":"update port forward rules [source_port]"}
 func (b *BaseApi) OperateForwardRule(c *gin.Context) {
 	var req dto.ForwardRuleOperate

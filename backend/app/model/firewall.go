@@ -15,7 +15,7 @@ type Forward struct {
 	BaseModel
 
 	Protocol   string `gorm:"type:varchar(64);not null" json:"protocol"`
-	SourcePort string `gorm:"type:varchar(64);not null" json:"sourcePort"`
-	TargetIP   string `gorm:"type:varchar(64);not null" json:"targetIp"`
+	Port       string `gorm:"type:varchar(64);not null" json:"port"`
+	TargetIP   string `gorm:"type:varchar(64);not null" json:"targetIP"`
 	TargetPort string `gorm:"type:varchar(64);not null" json:"targetPort"`
 }

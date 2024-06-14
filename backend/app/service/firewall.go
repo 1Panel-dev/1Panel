@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -302,8 +303,17 @@ func (u *FirewallService) OperateForwardRule(req dto.ForwardRuleOperate) error {
 		return err
 	}
 
+	sort.SliceStable(req.Rules, func(i, j int) bool {
+		n1, _ := strconv.Atoi(req.Rules[i].Num)
+		n2, _ := strconv.Atoi(req.Rules[j].Num)
+		return n1 > n2
+	})
+
 	for _, r := range req.Rules {
 		for _, p := range strings.Split(r.Protocol, "/") {
+			if r.TargetIP == "" {
+				r.TargetIP = "127.0.0.1"
+			}
 			if err = client.PortForward(fireClient.Forward{
 				Num:        r.Num,
 				Protocol:   p,

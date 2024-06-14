@@ -106,7 +106,7 @@ export namespace Host {
         operation: string;
         protocol: string;
         port: string;
-        targetIp: string;
+        targetIP: string;
         targetPort: string;
     }
     export interface RuleIP {

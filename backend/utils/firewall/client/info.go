@@ -8,7 +8,7 @@ type FireInfo struct {
 	Strategy string `json:"strategy"` // accept drop
 
 	Num        string `json:"num"`
-	TargetIP   string `json:"targetIp"`
+	TargetIP   string `json:"targetIP"`
 	TargetPort string `json:"targetPort"`
 
 	UsedStatus  string `json:"usedStatus"`
@@ -19,7 +19,7 @@ type Forward struct {
 	Num        string `json:"num"`
 	Protocol   string `json:"protocol"`
 	Port       string `json:"port"`
-	TargetIP   string `json:"targetIp"`
+	TargetIP   string `json:"targetIP"`
 	TargetPort string `json:"targetPort"`
 }
 

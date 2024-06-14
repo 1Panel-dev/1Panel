@@ -70,11 +70,11 @@ func (iptables *Iptables) NatList() ([]IptablesNatInfo, error) {
 }
 
 func (iptables *Iptables) NatAdd(protocol, src, destIp, destPort string, save bool) error {
-	str := fmt.Sprintf("%s iptables -t nat -A PREROUTING -p %s --dport %s -j REDIRECT --to-port %s", iptables.CmdStr, protocol, src, destPort)
+	rule := fmt.Sprintf("%s iptables -t nat -A PREROUTING -p %s --dport %s -j REDIRECT --to-port %s", iptables.CmdStr, protocol, src, destPort)
 	if destIp != "" && destIp != "127.0.0.1" && destIp != "localhost" {
-		str = fmt.Sprintf("%s iptables -t nat -A PREROUTING -p %s --dport %s -j DNAT --to-destination %s:%s", iptables.CmdStr, protocol, src, destIp, destPort)
+		rule = fmt.Sprintf("%s iptables -t nat -A PREROUTING -p %s --dport %s -j DNAT --to-destination %s:%s", iptables.CmdStr, protocol, src, destIp, destPort)
 	}
-	stdout, err := cmd.Exec(str)
+	stdout, err := cmd.Exec(rule)
 	if err != nil {
 		return err
 	}
@@ -85,7 +85,7 @@ func (iptables *Iptables) NatAdd(protocol, src, destIp, destPort string, save bo
 	if save {
 		return global.DB.Save(&model.Forward{
 			Protocol:   protocol,
-			SourcePort: src,
+			Port:       src,
 			TargetIP:   destIp,
 			TargetPort: destPort,
 		}).Error
@@ -103,7 +103,7 @@ func (iptables *Iptables) NatRemove(num string, protocol, src, destIp, destPort 
 	}
 
 	global.DB.Where(
-		"protocol = ? AND sourcePort = ? AND targetIp = ? AND targetPort = ?",
+		"protocol = ? AND port = ? AND target_ip = ? AND target_port = ?",
 		protocol,
 		src,
 		destIp,
@@ -124,7 +124,7 @@ func (iptables *Iptables) Reload() error {
 	var rules []model.Forward
 	global.DB.Find(&rules)
 	for _, forward := range rules {
-		if err := iptables.NatAdd(forward.Protocol, forward.SourcePort, forward.TargetIP, forward.TargetPort, false); err != nil {
+		if err := iptables.NatAdd(forward.Protocol, forward.Port, forward.TargetIP, forward.TargetPort, false); err != nil {
 			return err
 		}
 	}

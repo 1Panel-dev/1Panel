@@ -44,35 +44,9 @@
                             <el-table-column type="selection" fix />
                             <el-table-column :label="$t('commons.table.protocol')" :min-width="70" prop="protocol" />
                             <el-table-column :label="$t('firewall.sourcePort')" :min-width="70" prop="port" />
-                            <!-- <el-table-column :label="$t('commons.table.status')" :min-width="120">
+                            <el-table-column :min-width="80" :label="$t('firewall.targetIP')" prop="targetIP">
                                 <template #default="{ row }">
-                                    <div v-if="row.port.indexOf('-') !== -1 && row.usedStatus">
-                                        <el-tag type="info" class="mt-1">
-                                            {{ $t('firewall.used') + ' * ' + row.usedPorts.length }}
-                                        </el-tag>
-                                        <el-popover placement="right" popper-class="limit-height-popover" :width="250">
-                                            <template #default>
-                                                <ul v-for="(item, index) in row.usedPorts" :key="index">
-                                                    <li>{{ item }}</li>
-                                                </ul>
-                                            </template>
-                                            <template #reference>
-                                                <svg-icon iconName="p-xiangqing" class="svg-icon"></svg-icon>
-                                            </template>
-                                        </el-popover>
-                                    </div>
-                                    <div v-else>
-                                        <el-tag type="info" v-if="row.usedStatus">
-                                            <span v-if="row.usedStatus === 'inUsed'">{{ $t('firewall.used') }}</span>
-                                            <span v-else>{{ $t('firewall.used') + ' ' + row.usedStatus }}</span>
-                                        </el-tag>
-                                        <el-tag type="success" v-else>{{ $t('firewall.unUsed') }}</el-tag>
-                                    </div>
-                                </template>
-                            </el-table-column> -->
-                            <el-table-column :min-width="80" :label="$t('firewall.targetIP')" prop="targetIp">
-                                <template #default="{ row }">
-                                    <span v-if="row.targetIp">{{ row.targetIp }}</span>
+                                    <span v-if="row.targetIP">{{ row.targetIP }}</span>
                                     <span v-else>127.0.0.1</span>
                                 </template>
                             </el-table-column>
@@ -138,7 +112,7 @@ const opRef = ref();
 
 const data = ref();
 const paginationConfig = reactive({
-    cacheSizeKey: 'firewall-port-page-size',
+    cacheSizeKey: 'firewall-forward-page-size',
     currentPage: 1,
     pageSize: 10,
     total: 0,
@@ -164,9 +138,6 @@ const search = async () => {
         .then((res) => {
             loading.value = false;
             data.value = res.data.items || [];
-            for (const item of data.value) {
-                item.usedPorts = item.usedStatus ? item.usedStatus.split(',') : [];
-            }
             paginationConfig.total = res.data.total;
         })
         .catch(() => {
@@ -180,7 +151,7 @@ const onOpenDialog = async (
     rowData: Partial<Host.RuleForward> = {
         protocol: 'tcp',
         port: '8080',
-        targetIp: '',
+        targetIP: '',
         targetPort: '',
     },
 ) => {
