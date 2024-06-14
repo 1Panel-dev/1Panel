@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"crypto"
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
@@ -226,9 +227,32 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 		domains = append(domains, strings.Split(websiteSSL.Domains, ",")...)
 	}
 
-	privateKey, err := certcrypto.GeneratePrivateKey(ssl.KeyType(websiteSSL.KeyType))
-	if err != nil {
-		return err
+	var privateKey crypto.PrivateKey
+	if websiteSSL.PrivateKey == "" {
+		privateKey, err = certcrypto.GeneratePrivateKey(ssl.KeyType(websiteSSL.KeyType))
+		if err != nil {
+			return err
+		}
+	} else {
+		block, _ := pem.Decode([]byte(websiteSSL.PrivateKey))
+		if block == nil {
+			return buserr.New("invalid PEM block")
+		}
+		var privKey crypto.PrivateKey
+		keyType := ssl.KeyType(websiteSSL.KeyType)
+		switch keyType {
+		case certcrypto.EC256, certcrypto.EC384:
+			privKey, err = x509.ParseECPrivateKey(block.Bytes)
+			if err != nil {
+				return nil
+			}
+		case certcrypto.RSA2048, certcrypto.RSA3072, certcrypto.RSA4096:
+			privKey, err = x509.ParsePKCS1PrivateKey(block.Bytes)
+			if err != nil {
+				return nil
+			}
+		}
+		privateKey = privKey
 	}
 
 	websiteSSL.Status = constant.SSLApply
@@ -382,7 +406,7 @@ func (w WebsiteSSLService) Update(update request.WebsiteSSLUpdate) error {
 	updateParams["primary_domain"] = update.PrimaryDomain
 	updateParams["description"] = update.Description
 	updateParams["provider"] = update.Provider
-	updateParams["key_type"] = update.KeyType
+	//updateParams["key_type"] = update.KeyType
 	updateParams["push_dir"] = update.PushDir
 	updateParams["disable_cname"] = update.DisableCNAME
 	updateParams["skip_dns"] = update.SkipDNS

@@ -53,7 +53,7 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item :label="$t('website.keyType')" prop="keyType">
-                        <el-select v-model="ssl.keyType">
+                        <el-select v-model="ssl.keyType" :disabled="operate == 'edit'">
                             <el-option
                                 v-for="(keyType, index) in KeyTypes"
                                 :key="index"
