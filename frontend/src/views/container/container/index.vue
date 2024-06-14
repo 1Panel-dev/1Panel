@@ -692,6 +692,15 @@ const buttons = [
         },
     },
     {
+        label: i18n.global.t('container.makeImage'),
+        click: (row: Container.ContainerInfo) => {
+            dialogCommitRef.value!.acceptParams({ containerID: row.containerID, containerName: row.name });
+        },
+        disabled: (row: any) => {
+            return checkStatus('commit', row);
+        },
+    },
+    {
         label: i18n.global.t('container.start'),
         click: (row: Container.ContainerInfo) => {
             onOperate('start', row);
@@ -716,15 +725,6 @@ const buttons = [
         },
         disabled: (row: any) => {
             return checkStatus('restart', row);
-        },
-    },
-    {
-        label: i18n.global.t('container.makeImage'),
-        click: (row: Container.ContainerInfo) => {
-            dialogCommitRef.value!.acceptParams({ containerID: row.containerID, containerName: row.name });
-        },
-        disabled: (row: any) => {
-            return checkStatus('commit', row);
         },
     },
     {
