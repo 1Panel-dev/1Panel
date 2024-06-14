@@ -22,6 +22,10 @@
                             <el-option :label="$t('website.HTTPSOnly')" :value="'HTTPSOnly'"></el-option>
                         </el-select>
                     </el-form-item>
+                    <el-form-item :label="'HSTS'" prop="hsts">
+                        <el-checkbox v-model="form.hsts">{{ $t('commons.button.start') }}</el-checkbox>
+                        <span class="input-help">{{ $t('website.hstsHelper') }}</span>
+                    </el-form-item>
                     <el-form-item :label="$t('website.sslConfig')" prop="type">
                         <el-select v-model="form.type" @change="changeType(form.type)">
                             <el-option :label="$t('website.oldSSL')" :value="'existed'"></el-option>
@@ -190,6 +194,7 @@ const form = reactive({
     privateKeyPath: '',
     certificatePath: '',
     httpConfig: 'HTTPToHTTPS',
+    hsts: true,
     algorithm:
         'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:!aNULL:!eNULL:!EXPORT:!DSS:!DES:!RC4:!3DES:!MD5:!PSK:!KRB5:!SRP:!CAMELLIA:!SEED',
     SSLProtocol: ['TLSv1.3', 'TLSv1.2', 'TLSv1.1', 'TLSv1'],
@@ -199,6 +204,7 @@ const ssls = ref();
 const acmeAccounts = ref();
 const websiteSSL = ref();
 const rules = ref({
+    hsts: [Rules.requiredInput],
     type: [Rules.requiredSelect],
     privateKey: [Rules.requiredInput],
     certificate: [Rules.requiredInput],
@@ -285,6 +291,7 @@ const get = () => {
                 websiteSSL.value = res.data.SSL;
                 form.acmeAccountID = res.data.SSL.acmeAccountId;
             }
+            form.hsts = res.data.hsts;
         }
         listSSL();
         listAcmeAccount();

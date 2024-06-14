@@ -37,6 +37,7 @@ type WebsiteHTTPS struct {
 	SSL         model.WebsiteSSL `json:"SSL"`
 	SSLProtocol []string         `json:"SSLProtocol"`
 	Algorithm   string           `json:"algorithm"`
+	Hsts        bool             `json:"hsts"`
 }
 
 type WebsiteLog struct {

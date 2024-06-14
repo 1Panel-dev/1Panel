@@ -123,6 +123,7 @@ type WebsiteHTTPSOp struct {
 	HttpConfig      string   `json:"httpConfig"  validate:"oneof=HTTPSOnly HTTPAlso HTTPToHTTPS"`
 	SSLProtocol     []string `json:"SSLProtocol"`
 	Algorithm       string   `json:"algorithm"`
+	Hsts            bool     `json:"hsts"`
 }
 
 type WebsiteNginxUpdate struct {

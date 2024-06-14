@@ -754,7 +754,7 @@ func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, 
 	} else {
 		res.HttpConfig = constant.HTTPToHTTPS
 	}
-	params, err := getNginxParamsByKeys(constant.NginxScopeServer, []string{"ssl_protocols", "ssl_ciphers"}, &website)
+	params, err := getNginxParamsByKeys(constant.NginxScopeServer, []string{"ssl_protocols", "ssl_ciphers", "add_header"}, &website)
 	if err != nil {
 		return res, err
 	}
@@ -764,6 +764,9 @@ func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, 
 		}
 		if p.Name == "ssl_ciphers" {
 			res.Algorithm = p.Params[0]
+		}
+		if p.Name == "add_header" && len(p.Params) > 0 && p.Params[0] == "Strict-Transport-Security" {
+			res.Hsts = true
 		}
 	}
 	return res, nil
@@ -782,7 +785,7 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 	if err != nil {
 		return nil, err
 	}
-	if err = ChangeHSTSConfig(req.Enable, nginxInstall, website); err != nil {
+	if err = ChangeHSTSConfig(req.Hsts, nginxInstall, website); err != nil {
 		return nil, err
 	}
 	res.Enable = req.Enable
@@ -1616,9 +1619,6 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 	}
 	location.UpdateDirective("proxy_pass", []string{req.ProxyPass})
 	location.UpdateDirective("proxy_set_header", []string{"Host", req.ProxyHost})
-	if website.Protocol == constant.ProtocolHTTPS {
-		location.UpdateDirective("add_header", []string{"Strict-Transport-Security", "\"max-age=31536000\""})
-	}
 	location.ChangePath(req.Modifier, req.Match)
 	if req.Cache {
 		location.AddCache(req.CacheTime, req.CacheUnit)
