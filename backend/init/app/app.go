@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
+	"github.com/1Panel-dev/1Panel/backend/utils/firewall"
 	"path"
 
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -31,6 +32,10 @@ func Init() {
 	}
 
 	_ = docker.CreateDefaultDockerNetwork()
+
+	if f, err := firewall.NewFirewallClient(); err == nil {
+		_ = f.EnableForward()
+	}
 }
 
 func createDir(fileOp files.FileOp, dirPath string) {

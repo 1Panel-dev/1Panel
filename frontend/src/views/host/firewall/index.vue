@@ -16,6 +16,10 @@ const buttons = [
         path: '/hosts/firewall/port',
     },
     {
+        label: i18n.global.t('firewall.forwardRule'),
+        path: '/hosts/firewall/forward',
+    },
+    {
         label: i18n.global.t('firewall.ipRule'),
         path: '/hosts/firewall/ip',
     },

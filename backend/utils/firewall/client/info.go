@@ -7,13 +7,29 @@ type FireInfo struct {
 	Protocol string `json:"protocol"` // tcp udp tcp/udp
 	Strategy string `json:"strategy"` // accept drop
 
+	Num        string `json:"num"`
+	TargetIP   string `json:"targetIP"`
+	TargetPort string `json:"targetPort"`
+
 	UsedStatus  string `json:"usedStatus"`
 	Description string `json:"description"`
 }
 
 type Forward struct {
-	Protocol string `json:"protocol"`
-	Address  string `json:"address"`
-	Port     string `json:"port"`
-	Target   string `json:"target"`
+	Num        string `json:"num"`
+	Protocol   string `json:"protocol"`
+	Port       string `json:"port"`
+	TargetIP   string `json:"targetIP"`
+	TargetPort string `json:"targetPort"`
+}
+
+type IptablesNatInfo struct {
+	Num         string `json:"num"`
+	Target      string `json:"target"`
+	Protocol    string `json:"protocol"`
+	Opt         string `json:"opt"`
+	Source      string `json:"source"`
+	Destination string `json:"destination"`
+	SrcPort     string `json:"srcPort"`
+	DestPort    string `json:"destPort"`
 }

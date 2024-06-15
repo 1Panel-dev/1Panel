@@ -29,6 +29,17 @@ type PortRuleOperate struct {
 	Description string `json:"description"`
 }
 
+type ForwardRuleOperate struct {
+	Rules []struct {
+		Operation  string `json:"operation" validate:"required,oneof=add remove"`
+		Num        string `json:"num"`
+		Protocol   string `json:"protocol" validate:"required,oneof=tcp udp tcp/udp"`
+		Port       string `json:"port" validate:"required"`
+		TargetIP   string `json:"targetIP"`
+		TargetPort string `json:"targetPort" validate:"required"`
+	} `json:"rules"`
+}
+
 type UpdateFirewallDescription struct {
 	Type     string `json:"type"`
 	Address  string `json:"address"`

@@ -74,12 +74,17 @@ export namespace Host {
     export interface RuleInfo extends ReqPage {
         family: string;
         address: string;
+        destination: string;
         port: string;
+        srcPort: string;
+        destPort: string;
         protocol: string;
         strategy: string;
 
         usedStatus: string;
         description: string;
+
+        [key: string]: any;
     }
     export interface UpdateDescription {
         address: string;
@@ -96,6 +101,13 @@ export namespace Host {
         protocol: string;
         strategy: string;
         description: string;
+    }
+    export interface RuleForward {
+        operation: string;
+        protocol: string;
+        port: string;
+        targetIP: string;
+        targetPort: string;
     }
     export interface RuleIP {
         operation: string;

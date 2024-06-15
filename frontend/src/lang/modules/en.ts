@@ -1,4 +1,5 @@
 import fit2cloudEnLocale from 'fit2cloud-ui-plus/src/locale/lang/en';
+
 let xpackEnLocale = {};
 const xpackModules = import.meta.glob('../../xpack/lang/en.ts', { eager: true });
 if (xpackModules['../../xpack/lang/en.ts']) {
@@ -2204,8 +2205,14 @@ const message = {
         addressHelper2: 'For multiple IPs or IP ranges, separate with commas: 172.16.10.11, 172.16.0.0/24',
         allIP: 'All IP',
         portRule: 'Port rule',
+        forwardRule: 'Forwarding',
         ipRule: 'IP rule',
         userAgent: 'User-Agent filter',
+        sourcePort: 'Source Port',
+        targetIP: 'Destination IP',
+        targetPort: 'Destination Port',
+        forwardHelper1: 'In the case of local port forwarding, the destination IP is: 127.0.0.1',
+        forwardHelper2: 'If the destination IP is not filled in, it will be forwarded to the local port by default',
     },
     runtime: {
         runtime: 'Runtime',

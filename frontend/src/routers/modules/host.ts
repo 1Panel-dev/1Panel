@@ -61,6 +61,16 @@ const hostRouter = {
             },
         },
         {
+            path: '/hosts/firewall/forward',
+            name: 'FirewallForward',
+            component: () => import('@/views/host/firewall/forward/index.vue'),
+            hidden: true,
+            meta: {
+                activeMenu: '/hosts/firewall/port',
+                requiresAuth: false,
+            },
+        },
+        {
             path: '/hosts/firewall/ip',
             name: 'FirewallIP',
             component: () => import('@/views/host/firewall/ip/index.vue'),
