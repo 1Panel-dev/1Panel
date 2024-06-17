@@ -205,6 +205,7 @@ onMounted(() => {
         font-size: 14px;
     }
     :deep(.default-theme h2) {
+        color: var(--dark-gold-base-color);
         margin: 13px, 0;
         padding: 0;
         font-size: 16px;
