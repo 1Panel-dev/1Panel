@@ -33,7 +33,6 @@
             </template>
             <template #main>
                 <Basic :id="id" v-if="index === 'basic'"></Basic>
-                <Safety :id="id" v-if="index === 'safety'"></Safety>
                 <Log :id="id" v-if="index === 'log'"></Log>
                 <Resource :id="id" v-if="index === 'resource'"></Resource>
                 <PHP :id="id" v-if="index === 'php'"></PHP>
