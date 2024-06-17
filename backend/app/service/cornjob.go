@@ -29,7 +29,7 @@ type ICronjobService interface {
 	UpdateStatus(id uint, status string) error
 	Delete(req dto.CronjobBatchDelete) error
 	Download(down dto.CronjobDownload) (string, error)
-	StartJob(cronjob *model.Cronjob) (string, error)
+	StartJob(cronjob *model.Cronjob, isUpdate bool) (string, error)
 	CleanRecord(req dto.CronjobClean) error
 
 	LoadRecordLog(req dto.OperateByID) string
@@ -181,7 +181,7 @@ func (u *CronjobService) Create(cronjobDto dto.CronjobCreate) error {
 
 	global.LOG.Infof("create cronjob %s successful, spec: %s", cronjob.Name, cronjob.Spec)
 	spec := cronjob.Spec
-	entryIDs, err := u.StartJob(&cronjob)
+	entryIDs, err := u.StartJob(&cronjob, false)
 	if err != nil {
 		return err
 	}
@@ -193,8 +193,8 @@ func (u *CronjobService) Create(cronjobDto dto.CronjobCreate) error {
 	return nil
 }
 
-func (u *CronjobService) StartJob(cronjob *model.Cronjob) (string, error) {
-	if len(cronjob.EntryIDs) != 0 {
+func (u *CronjobService) StartJob(cronjob *model.Cronjob, isUpdate bool) (string, error) {
+	if len(cronjob.EntryIDs) != 0 && isUpdate {
 		ids := strings.Split(cronjob.EntryIDs, ",")
 		for _, id := range ids {
 			idItem, _ := strconv.Atoi(id)
@@ -251,7 +251,7 @@ func (u *CronjobService) Update(id uint, req dto.CronjobUpdate) error {
 	cronjob.Type = cronModel.Type
 	spec := cronjob.Spec
 	if cronModel.Status == constant.StatusEnable {
-		newEntryIDs, err := u.StartJob(&cronjob)
+		newEntryIDs, err := u.StartJob(&cronjob, true)
 		if err != nil {
 			return err
 		}
@@ -294,7 +294,7 @@ func (u *CronjobService) UpdateStatus(id uint, status string) error {
 		err      error
 	)
 	if status == constant.StatusEnable {
-		entryIDs, err = u.StartJob(&cronjob)
+		entryIDs, err = u.StartJob(&cronjob, false)
 		if err != nil {
 			return err
 		}
