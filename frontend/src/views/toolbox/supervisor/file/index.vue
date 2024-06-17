@@ -1,7 +1,19 @@
 <template>
-    <el-drawer :close-on-click-modal="false" :close-on-press-escape="false" v-model="open" size="50%">
+    <el-drawer
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        v-model="open"
+        :size="globalStore.isFullScreen ? '100%' : '50%'"
+        :before-close="handleClose"
+    >
         <template #header>
-            <DrawerHeader :header="title" :back="handleClose"></DrawerHeader>
+            <DrawerHeader :header="title" :back="handleClose">
+                <template #extra v-if="!mobile">
+                    <el-tooltip :content="loadTooltip()" placement="top">
+                        <el-button @click="toggleFullscreen" class="fullScreen" icon="FullScreen" plain></el-button>
+                    </el-tooltip>
+                </template>
+            </DrawerHeader>
         </template>
         <div v-if="req.file != 'config'">
             <el-tabs v-model="req.file" type="card" @tab-click="handleChange">
@@ -49,11 +61,13 @@
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { onUnmounted, reactive, ref, shallowRef } from 'vue';
+import { computed, onUnmounted, reactive, ref, shallowRef } from 'vue';
 import { OperateSupervisorProcessFile } from '@/api/modules/host-tool';
 import i18n from '@/lang';
 import { TabsPaneContext } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
+import screenfull from 'screenfull';
+import { GlobalStore } from '@/store';
 
 const extensions = [javascript(), oneDark];
 const loading = ref(false);
@@ -68,6 +82,7 @@ const req = reactive({
 });
 const title = ref('');
 const opRef = ref();
+const globalStore = GlobalStore();
 
 const view = shallowRef();
 const handleReady = (payload) => {
@@ -76,6 +91,19 @@ const handleReady = (payload) => {
 let timer: NodeJS.Timer | null = null;
 
 const em = defineEmits(['search']);
+
+const mobile = computed(() => {
+    return globalStore.isMobile();
+});
+
+function toggleFullscreen() {
+    if (screenfull.isEnabled) {
+        screenfull.toggle();
+    }
+}
+const loadTooltip = () => {
+    return i18n.global.t('commons.button.' + (screenfull.isFullscreen ? 'quitFullscreen' : 'fullscreen'));
+};
 
 const getContent = () => {
     loading.value = true;
@@ -135,6 +163,11 @@ const acceptParams = (name: string, file: string, operate: string) => {
     title.value = file == 'config' ? i18n.global.t('website.source') : i18n.global.t('commons.button.log');
     getContent();
     open.value = true;
+    if (!mobile.value) {
+        screenfull.on('change', () => {
+            globalStore.isFullScreen = screenfull.isFullscreen;
+        });
+    }
 };
 
 const cleanLog = async () => {
