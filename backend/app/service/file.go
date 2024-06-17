@@ -410,7 +410,7 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 		logFilePath = path.Join(global.CONF.System.TmpDir, fmt.Sprintf("docker_logs/%s", req.Name))
 	}
 
-	lines, isEndOfFile, err := files.ReadFileByLine(logFilePath, req.Page, req.PageSize)
+	lines, isEndOfFile, total, err := files.ReadFileByLine(logFilePath, req.Page, req.PageSize, req.Latest)
 	if err != nil {
 		return nil, err
 	}
@@ -418,6 +418,7 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 		Content: strings.Join(lines, "\n"),
 		End:     isEndOfFile,
 		Path:    logFilePath,
+		Total:   total,
 	}
 	return res, nil
 }

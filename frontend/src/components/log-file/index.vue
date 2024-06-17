@@ -12,35 +12,23 @@
             </span>
         </div>
         <div class="mt-2.5">
-            <Codemirror
-                ref="logContainer"
-                :style="styleObject"
-                :autofocus="true"
-                :placeholder="$t('website.noLog')"
-                :indent-with-tab="true"
-                :tabSize="4"
-                :lineWrapping="true"
-                :matchBrackets="true"
-                theme="cobalt"
-                :styleActiveLine="true"
-                :extensions="extensions"
-                v-model="content"
-                :disabled="true"
-                @ready="handleReady"
-            />
+            <highlightjs
+                ref="editorRef"
+                class="editor-main"
+                language="JavaScript"
+                :autodetect="false"
+                :code="content"
+            ></highlightjs>
         </div>
     </div>
 </template>
 <script lang="ts" setup>
-import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
-import { computed, nextTick, onMounted, onUnmounted, reactive, ref, shallowRef } from 'vue';
+import { nextTick, onMounted, onUnmounted, reactive, ref } from 'vue';
 import { downloadFile } from '@/utils/util';
 import { ReadByLine } from '@/api/modules/files';
 import { watch } from 'vue';
 
-const extensions = [javascript(), oneDark];
+const editorRef = ref();
 
 interface LogProps {
     id?: number;
@@ -61,7 +49,7 @@ const props = defineProps({
     },
     style: {
         type: String,
-        default: 'height: calc(100vh - 200px); width: 100%; min-height: 400px',
+        default: 'height: calc(100vh - 200px); width: 100%; min-height: 400px; overflow: auto;',
     },
     defaultButton: {
         type: Boolean,
@@ -84,28 +72,22 @@ const data = ref({
 
 let timer: NodeJS.Timer | null = null;
 const tailLog = ref(false);
-const view = shallowRef();
 const content = ref('');
 const end = ref(false);
 const lastContent = ref('');
-const logContainer = ref();
 const scrollerElement = ref<HTMLElement | null>(null);
+const minPage = ref(1);
+const maxPage = ref(1);
 
 const readReq = reactive({
     id: 0,
     type: '',
     name: '',
-    page: 0,
-    pageSize: 2000,
+    page: 1,
+    pageSize: 500,
+    latest: false,
 });
 const emit = defineEmits(['update:loading', 'update:hasContent', 'update:isReading']);
-
-const handleReady = (payload) => {
-    view.value = payload.view;
-    const editorContainer = payload.container;
-    const editorElement = editorContainer.querySelector('.cm-editor');
-    scrollerElement.value = editorElement.querySelector('.cm-scroller') as HTMLElement;
-};
 
 const loading = ref(props.loading);
 
@@ -121,25 +103,6 @@ const changeLoading = () => {
     emit('update:loading', loading.value);
 };
 
-const styleObject = computed(() => {
-    const styles = {};
-    let style = 'height: calc(100vh - 200px); width: 100%; min-height: 400px';
-    if (props.style != null && props.style != '') {
-        style = props.style;
-    }
-    style.split(';').forEach((styleRule) => {
-        const [property, value] = styleRule.split(':');
-        if (property && value) {
-            const formattedProperty = property
-                .trim()
-                .replace(/([a-z])([A-Z])/g, '$1-$2')
-                .toLowerCase();
-            styles[formattedProperty] = value.trim();
-        }
-    });
-    return styles;
-});
-
 const stopSignals = [
     'docker-compose up failed!',
     'docker-compose up successful!',
@@ -151,11 +114,8 @@ const stopSignals = [
     'image push successful!',
 ];
 
-const getContent = () => {
+const getContent = (pre: boolean) => {
     emit('update:isReading', true);
-    if (!end.value) {
-        readReq.page += 1;
-    }
     readReq.id = props.config.id;
     readReq.type = props.config.type;
     readReq.name = props.config.name;
@@ -163,6 +123,7 @@ const getContent = () => {
         if (!end.value && res.data.end) {
             lastContent.value = content.value;
         }
+
         res.data.content = res.data.content.replace(/\\u(\w{4})/g, function (match, grp) {
             return String.fromCharCode(parseInt(grp, 16));
         });
@@ -175,28 +136,38 @@ const getContent = () => {
                 if (lastContent.value == '') {
                     content.value = res.data.content;
                 } else {
-                    content.value = lastContent.value + '\n' + res.data.content;
+                    content.value = pre
+                        ? res.data.content + '\n' + lastContent.value
+                        : lastContent.value + '\n' + res.data.content;
                 }
             } else {
                 if (content.value == '') {
                     content.value = res.data.content;
                 } else {
-                    content.value = content.value + '\n' + res.data.content;
+                    content.value = pre
+                        ? res.data.content + '\n' + content.value
+                        : content.value + '\n' + res.data.content;
                 }
             }
         }
         end.value = res.data.end;
         emit('update:hasContent', content.value !== '');
         nextTick(() => {
-            const state = view.value.state;
-            view.value.dispatch({
-                selection: { anchor: state.doc.length, head: state.doc.length },
-            });
-            view.value.focus();
-            const firstLine = view.value.state.doc.line(view.value.state.doc.lines);
-            const { top } = view.value.lineBlockAt(firstLine.from);
-            scrollerElement.value.scrollTo({ top, behavior: 'instant' });
+            if (pre) {
+                if (scrollerElement.value.scrollHeight > 2000) {
+                    scrollerElement.value.scrollTop = 2000;
+                }
+            } else {
+                scrollerElement.value.scrollTop = scrollerElement.value.scrollHeight;
+            }
         });
+
+        if (readReq.latest) {
+            readReq.page = res.data.total;
+            readReq.latest = false;
+            maxPage.value = res.data.total;
+            minPage.value = res.data.total;
+        }
     });
 };
 
@@ -206,7 +177,7 @@ const changeTail = (fromOutSide: boolean) => {
     }
     if (tailLog.value) {
         timer = setInterval(() => {
-            getContent();
+            getContent(false);
         }, 1000 * 2);
     } else {
         onCloseLog();
@@ -230,6 +201,10 @@ function isScrolledToBottom(element: HTMLElement): boolean {
     return element.scrollTop + element.clientHeight + 1 >= element.scrollHeight;
 }
 
+function isScrolledToTop(element: HTMLElement): boolean {
+    return element.scrollTop === 0;
+}
+
 const init = () => {
     if (props.config.tail) {
         tailLog.value = props.config.tail;
@@ -239,21 +214,38 @@ const init = () => {
     if (tailLog.value) {
         changeTail(false);
     }
-    getContent();
+    readReq.latest = true;
+    getContent(false);
 
-    nextTick(() => {
-        if (scrollerElement.value) {
-            scrollerElement.value.addEventListener('scroll', function () {
-                if (isScrolledToBottom(scrollerElement.value)) {
-                    getContent();
-                }
-            });
-        }
-    });
+    nextTick(() => {});
 };
 
 const clearLog = (): void => {
     content.value = '';
+};
+
+const initCodemirror = () => {
+    nextTick(() => {
+        if (editorRef.value) {
+            scrollerElement.value = editorRef.value.$el as HTMLElement;
+            scrollerElement.value.addEventListener('scroll', function () {
+                if (isScrolledToBottom(scrollerElement.value)) {
+                    readReq.page = maxPage.value;
+                    getContent(false);
+                }
+                if (isScrolledToTop(scrollerElement.value)) {
+                    readReq.page = minPage.value - 1;
+                    if (readReq.page < 1) {
+                        return;
+                    }
+                    minPage.value = readReq.page;
+                    getContent(true);
+                }
+            });
+            let hljsDom = scrollerElement.value.querySelector('.hljs') as HTMLElement;
+            hljsDom.style['min-height'] = '300px';
+        }
+    });
 };
 
 onUnmounted(() => {
@@ -261,8 +253,17 @@ onUnmounted(() => {
 });
 
 onMounted(() => {
+    initCodemirror();
     init();
 });
 
 defineExpose({ changeTail, onDownload, clearLog });
 </script>
+<style lang="scss" scoped>
+.editor-main {
+    height: calc(100vh - 480px);
+    width: 100%;
+    min-height: 400px;
+    overflow: auto;
+}
+</style>

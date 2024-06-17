@@ -1,7 +1,7 @@
 {
     "name": "1Panel-Frontend",
     "private": true,
-    "version": "1.7",
+    "version": "1.10",
     "description": "1Panel 前端",
     "scripts": {
         "dev": "vite",
@@ -25,6 +25,7 @@
         "@codemirror/legacy-modes": "^6.4.0",
         "@codemirror/theme-one-dark": "^6.1.2",
         "@element-plus/icons-vue": "^1.1.4",
+        "@highlightjs/vue-plugin": "^2.1.0",
         "@vueuse/core": "^8.9.4",
         "@xterm/addon-fit": "^0.10.0",
         "@xterm/xterm": "^5.5.0",
@@ -32,6 +33,7 @@
         "echarts": "^5.5.0",
         "element-plus": "^2.7.5",
         "fit2cloud-ui-plus": "^1.1.4",
+        "highlight.js": "^11.9.0",
         "js-base64": "^3.7.7",
         "md-editor-v3": "^2.11.3",
         "monaco-editor": "^0.34.1",

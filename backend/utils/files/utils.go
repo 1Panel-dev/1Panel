@@ -66,19 +66,44 @@ func IsHidden(path string) bool {
 	return path[0] == dotCharacter
 }
 
-func ReadFileByLine(filename string, page, pageSize int) ([]string, bool, error) {
-	if !NewFileOp().Stat(filename) {
-		return nil, true, nil
-	}
-	file, err := os.Open(filename)
+func countLines(path string) (int, error) {
+	file, err := os.Open(path)
 	if err != nil {
-		return nil, false, err
+		return 0, err
 	}
 	defer file.Close()
 
+	scanner := bufio.NewScanner(file)
+	lineCount := 0
+	for scanner.Scan() {
+		lineCount++
+	}
+	if err := scanner.Err(); err != nil {
+		return 0, err
+	}
+	return lineCount, nil
+}
+
+func ReadFileByLine(filename string, page, pageSize int, latest bool) (lines []string, isEndOfFile bool, total int, err error) {
+	if !NewFileOp().Stat(filename) {
+		return
+	}
+	file, err := os.Open(filename)
+	if err != nil {
+		return
+	}
+	defer file.Close()
+
+	totalLines, err := countLines(filename)
+	if err != nil {
+		return
+	}
+	total = (totalLines + pageSize - 1) / pageSize
 	reader := bufio.NewReaderSize(file, 8192)
 
-	var lines []string
+	if latest {
+		page = total
+	}
 	currentLine := 0
 	startLine := (page - 1) * pageSize
 	endLine := startLine + pageSize
@@ -97,9 +122,8 @@ func ReadFileByLine(filename string, page, pageSize int) ([]string, bool, error)
 		}
 	}
 
-	isEndOfFile := currentLine < endLine
-
-	return lines, isEndOfFile, nil
+	isEndOfFile = currentLine < endLine
+	return
 }
 
 func GetParentMode(path string) (os.FileMode, error) {
