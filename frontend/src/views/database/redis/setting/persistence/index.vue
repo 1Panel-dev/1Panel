@@ -193,7 +193,7 @@ const search = async () => {
 };
 const onBackup = async () => {
     emit('loading', true);
-    await handleBackup({ name: database.value, detailName: '', type: 'redis' })
+    await handleBackup({ name: database.value, detailName: '', type: 'redis', secret: '' })
         .then(() => {
             emit('loading', false);
             search();
@@ -210,6 +210,7 @@ const onRecover = async () => {
         name: database.value,
         detailName: '',
         file: currentRow.value.fileDir + '/' + currentRow.value.fileName,
+        secret: '',
     };
     emit('loading', true);
     await handleRecover(param)

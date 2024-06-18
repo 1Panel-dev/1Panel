@@ -64,6 +64,11 @@ func (u *DashboardService) LoadOsInfo() (*dto.OsInfo, error) {
 	baseInfo.KernelArch = hostInfo.KernelArch
 	baseInfo.KernelVersion = hostInfo.KernelVersion
 
+	diskInfo, err := disk.Usage(global.CONF.System.BaseDir)
+	if err == nil {
+		baseInfo.DiskSize = int64(diskInfo.Free)
+	}
+
 	if baseInfo.KernelArch == "armv7l" {
 		baseInfo.KernelArch = "armv7"
 	}

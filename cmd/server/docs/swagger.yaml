@@ -403,6 +403,23 @@ definitions:
     - name
     - path
     type: object
+  dto.ContainerCommit:
+    properties:
+      author:
+        type: string
+      comment:
+        type: string
+      containerID:
+        type: string
+      containerName:
+        type: string
+      newImageName:
+        type: string
+      pause:
+        type: boolean
+    required:
+    - containerID
+    type: object
   dto.ContainerListStats:
     properties:
       containerID:
@@ -1218,6 +1235,38 @@ definitions:
     - type
     - vars
     type: object
+  dto.ForwardRuleOperate:
+    properties:
+      rules:
+        items:
+          properties:
+            num:
+              type: string
+            operation:
+              enum:
+              - add
+              - remove
+              type: string
+            port:
+              type: string
+            protocol:
+              enum:
+              - tcp
+              - udp
+              - tcp/udp
+              type: string
+            targetIP:
+              type: string
+            targetPort:
+              type: string
+          required:
+          - operation
+          - port
+          - protocol
+          - targetPort
+          type: object
+        type: array
+    type: object
   dto.FtpBaseInfo:
     properties:
       isActive:
@@ -2029,6 +2078,8 @@ definitions:
     type: object
   dto.OsInfo:
     properties:
+      diskSize:
+        type: integer
       kernelArch:
         type: string
       kernelVersion:
@@ -4487,6 +4538,8 @@ definitions:
         type: string
       enable:
         type: boolean
+      hsts:
+        type: boolean
       httpConfig:
         enum:
         - HTTPSOnly
@@ -5266,6 +5319,8 @@ definitions:
         type: string
       enable:
         type: boolean
+      hsts:
+        type: boolean
       httpConfig:
         type: string
     type: object
@@ -6001,6 +6056,24 @@ paths:
         formatEN: clean container [name] logs
         formatZH: 清理容器 [name] 日志
         paramKeys: []
+  /containers/commit:
+    post:
+      consumes:
+      - application/json
+      description: 容器提交生成新镜像
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ContainerCommit'
+      responses:
+        "200":
+          description: OK
+      summary: Commit Container
+      tags:
+      - Container
   /containers/compose:
     post:
       consumes:
@@ -10377,6 +10450,33 @@ paths:
       summary: Create group
       tags:
       - Firewall
+  /hosts/firewall/forward:
+    post:
+      consumes:
+      - application/json
+      description: 更新防火墙端口转发规则
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ForwardRuleOperate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Create group
+      tags:
+      - Firewall
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - source_port
+        formatEN: update port forward rules [source_port]
+        formatZH: 更新端口转发规则 [source_port]
+        paramKeys: []
   /hosts/firewall/ip:
     post:
       consumes:

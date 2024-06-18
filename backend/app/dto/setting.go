@@ -143,6 +143,7 @@ type SnapshotInfo struct {
 	Message         string    `json:"message"`
 	CreatedAt       time.Time `json:"createdAt"`
 	Version         string    `json:"version"`
+	Size            int64     `json:"size"`
 
 	InterruptStep    string `json:"interruptStep"`
 	RecoverStatus    string `json:"recoverStatus"`

@@ -30,6 +30,8 @@ type OsInfo struct {
 	PlatformFamily string `json:"platformFamily"`
 	KernelArch     string `json:"kernelArch"`
 	KernelVersion  string `json:"kernelVersion"`
+
+	DiskSize int64 `json:"diskSize"`
 }
 
 type DashboardCurrent struct {

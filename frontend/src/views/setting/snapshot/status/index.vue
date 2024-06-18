@@ -62,7 +62,7 @@
                                         </span>
                                     </el-form-item>
                                     <el-form-item>
-                                        <el-button @click="dialogVisible = true" type="primary">
+                                        <el-button @click="recoverSnapshot(false)" type="primary">
                                             {{ $t('commons.button.retry') }}
                                         </el-button>
                                     </el-form-item>
@@ -138,30 +138,6 @@
                 </el-row>
             </el-form>
         </el-drawer>
-        <el-dialog v-model="dialogVisible" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
-            <template #header>
-                <div class="card-header">
-                    <span>{{ $t('commons.button.retry') }}</span>
-                </div>
-            </template>
-            <div>
-                <span>{{ $t('setting.reDownload') }}</span>
-                <el-switch style="margin-left: 15px" v-model="reDownload" />
-            </div>
-            <div style="margin-top: 15px">
-                <span>{{ $t('setting.recoverHelper', [snapInfo.name]) }}</span>
-            </div>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button :disabled="loading" @click="dialogVisible = false">
-                        {{ $t('commons.button.cancel') }}
-                    </el-button>
-                    <el-button :disabled="loading" type="primary" @click="doRecover(false)">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </span>
-            </template>
-        </el-dialog>
     </div>
 
     <SnapRecover ref="recoverRef" @close="handleClose" />
@@ -174,7 +150,7 @@ import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { snapshotRollback } from '@/api/modules/setting';
-import { MsgError, MsgSuccess } from '@/utils/message';
+import { MsgSuccess } from '@/utils/message';
 import { loadOsInfo } from '@/api/modules/dashboard';
 import SnapRecover from '@/views/setting/snapshot/recover/index.vue';
 
@@ -182,8 +158,6 @@ const drawerVisible = ref(false);
 const snapInfo = ref();
 const loading = ref();
 
-const dialogVisible = ref();
-const reDownload = ref();
 const recoverRef = ref();
 
 interface DialogProps {
@@ -197,61 +171,42 @@ const emit = defineEmits(['search']);
 
 const handleClose = () => {
     drawerVisible.value = false;
-    dialogVisible.value = false;
-};
-
-const doRecover = async (isNew: boolean) => {
-    let params = {
-        id: snapInfo.value.id,
-        isNew: isNew,
-        reDownload: reDownload.value,
-        secret: snapInfo.value.secret,
-    };
-    recoverRef.value.acceptParams(params);
 };
 
 const recoverSnapshot = async (isNew: boolean) => {
-    let msg = i18n.global.t('setting.recoverHelper', [snapInfo.value.name]);
-    if (
-        snapInfo.value.name.indexOf('amd64') === -1 &&
-        snapInfo.value.name.indexOf('arm64') === -1 &&
-        snapInfo.value.name.indexOf('armv7') === -1 &&
-        snapInfo.value.name.indexOf('ppc64le') === -1 &&
-        snapInfo.value.name.indexOf('s390x') === -1
-    ) {
-        msg = i18n.global.t('setting.recoverHelper1', [snapInfo.value.name]);
-    } else {
-        const res = await loadOsInfo();
-        let osVal = res.data.kernelArch;
-        if (osVal === '') {
-            msg = i18n.global.t('setting.recoverHelper1', [snapInfo.value.name]);
-        } else if (snapInfo.value.name.indexOf(osVal) === -1) {
-            MsgError(i18n.global.t('setting.recoverHelper2'));
-            return;
-        }
-    }
+    loading.value = true;
+    await loadOsInfo()
+        .then((res) => {
+            loading.value = false;
+            let params = {
+                id: snapInfo.value.id,
+                isNew: isNew,
+                name: snapInfo.value.name,
+                reDownload: false,
+                secret: snapInfo.value.secret,
 
-    ElMessageBox.confirm(msg, i18n.global.t('commons.button.recover'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-        type: 'info',
-    }).then(async () => {
-        doRecover(isNew);
-    });
+                arch: res.data.kernelArch,
+                size: snapInfo.value.size,
+                freeSize: res.data.diskSize,
+            };
+            recoverRef.value.acceptParams(params);
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const rollbackSnapshot = async () => {
-    ElMessageBox.confirm(i18n.global.t('setting.rollbackHelper'), {
+    ElMessageBox.confirm(i18n.global.t('setting.rollbackHelper'), i18n.global.t('setting.rollback'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
     }).then(async () => {
         loading.value = true;
-        await snapshotRollback({ id: snapInfo.value.id, isNew: false, reDownload: false })
+        await snapshotRollback({ id: snapInfo.value.id, isNew: false, reDownload: false, secret: '' })
             .then(() => {
                 emit('search');
                 loading.value = false;
-                dialogVisible.value = false;
                 drawerVisible.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             })
@@ -283,8 +238,5 @@ defineExpose({
     font-weight: 500;
     line-height: 25px;
     color: var(--el-button-text-color, var(--el-text-color-regular));
-}
-.card-logo {
-    font-size: 7px;
 }
 </style>

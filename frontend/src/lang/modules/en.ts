@@ -1512,15 +1512,20 @@ const message = {
         lastRecoverAt: 'Last recovery time',
         lastRollbackAt: 'Last rollback time',
         reDownload: 'Download the backup file again',
-        recoverRecord: 'Recover record',
+        statusSuccess: 'Success',
+        statusFailed: 'Failed',
+        recoverErrArch: 'Snapshot recovery between different server architectures is not supported!',
+        recoverErrSize: 'Detected insufficient disk space, please check or clean up and try again!',
         recoverHelper:
-            'The recovery is about to start from snapshot {0}, and the recovery needs to restart docker and 1panel service, do you want to continue?',
-        recoverHelper1:
-            'Will start restoring from snapshot {0}, please ensure that the server architecture matches the one where the snapshot was created.',
-        recoverHelper2: 'Restoring snapshots between different server architectures is not supported.',
+            'Starting recovery from snapshot {0}, please confirm the following information before proceeding:',
+        recoverHelper1: 'Recovery requires restarting Docker and 1Panel services',
+        recoverHelper2:
+            'Please ensure there is sufficient disk space on the server (Snapshot file size: {0}, Available space: {1})',
+        recoverHelper3:
+            'Please ensure the server architecture matches the architecture of the server where the snapshot was created (Current server architecture: {0})',
         rollback: 'Rollback',
         rollbackHelper:
-            'This recovery is about to be rolled back, which will replace all the files recovered this time. In the process, docker and 1panel services may need to be restarted. Do you want to continue?',
+            'Rolling back this recovery will replace all files from this recovery, and may require restarting Docker and 1Panel services. Do you want to continue?',
 
         upgradeHelper: 'The upgrade requires restarting the 1Panel service. Do you want to continue?',
         noUpgrade: 'It is currently the latest version',
@@ -1554,8 +1559,7 @@ const message = {
         menu: 'Menu',
         confirmMessage: 'The page will be refreshed to update the advanced menu list. Continue?',
         compressPassword: 'Compression Password',
-        backupRecoverMessage:
-            'If you need to set a compression or decompression password, please enter it. (Leave blank if not needed)',
+        backupRecoverMessage: 'Please enter the compression or decompression password (leave blank to not set)',
     },
     license: {
         community: 'Community Edition: ',
