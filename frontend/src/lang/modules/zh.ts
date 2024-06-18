@@ -1893,6 +1893,12 @@ const message = {
         websiteBackupWarn: '仅支持导入本机备份，导入其他机器备份可能会恢复失败',
         ipWebsiteWarn: 'IP 为域名的网站，需要设置为默认站点才能正常访问',
         hstsHelper: '开启 HSTS 可以增加网站安全性',
+        defaultHtml: '默认页面',
+        website404: '网站 404 错误页',
+        domain404: '网站不存在页',
+        indexHtml: '静态网站默认页',
+        stopHtml: '网站停用页',
+        indePhp: 'PHP 网站默认页',
         sslExpireDate: '证书过期时间',
     },
     php: {

@@ -778,3 +778,45 @@ func (b *BaseApi) GetDirConfig(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, res)
 }
+
+// @Tags Website
+// @Summary Get default html
+// @Description 获取默认 html
+// @Accept json
+// @Success 200 {object} response.FileInfo
+// @Security ApiKeyAuth
+// @Router /websites/default/html/:type [get]
+func (b *BaseApi) GetDefaultHtml(c *gin.Context) {
+	resourceType, err := helper.GetStrParamByKey(c, "type")
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		return
+	}
+	fileInfo, err := websiteService.GetDefaultHtml(resourceType)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, fileInfo)
+}
+
+// @Tags Website
+// @Summary Update default html
+// @Description 更新默认 html
+// @Accept json
+// @Param request body request.WebsiteHtmlUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/default/html/update [post]
+// @x-panel-log {"bodyKeys":["type"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新默认 html","formatEN":"Update default html"}
+func (b *BaseApi) UpdateDefaultHtml(c *gin.Context) {
+	var req request.WebsiteHtmlUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteService.UpdateDefaultHtml(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}

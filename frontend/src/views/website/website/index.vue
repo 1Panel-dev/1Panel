@@ -30,6 +30,9 @@
                         <el-button type="primary" plain @click="openDefault">
                             {{ $t('website.defaultServer') }}
                         </el-button>
+                        <el-button type="primary" plain @click="openDefaultHtml">
+                            {{ $t('website.defaultHtml') }}
+                        </el-button>
                     </el-col>
                     <el-col :xs="24" :sm="4" :md="4" :lg="4" :xl="4">
                         <TableSearch @search="search()" v-model:searchName="req.name" />
@@ -182,6 +185,7 @@
         <DefaultServer ref="defaultRef" />
         <GroupDialog @search="listGroup" ref="groupRef" />
         <NginxConfig v-if="openNginxConfig" v-loading="loading" :containerName="containerName" :status="nginxStatus" />
+        <DefaultHtml ref="defaultHtmlRef" />
     </div>
 </template>
 
@@ -189,16 +193,17 @@
 import Backups from '@/components/backup/index.vue';
 import UploadDialog from '@/components/upload/index.vue';
 import DefaultServer from '@/views/website/website/default/index.vue';
-import { onMounted, reactive, ref, computed } from '@vue/runtime-core';
-import CreateWebSite from './create/index.vue';
-import DeleteWebsite from './delete/index.vue';
+import DefaultHtml from '@/views/website/website/html/index.vue';
+import CreateWebSite from '@/views/website/website/create/index.vue';
+import DeleteWebsite from '@/views/website/website/delete/index.vue';
+import NginxConfig from '@/views/website/website/nginx/index.vue';
 import GroupDialog from '@/components/group/index.vue';
-import { OpWebsite, SearchWebsites, UpdateWebsite } from '@/api/modules/website';
-import { Website } from '@/api/interface/website';
 import AppStatus from '@/components/app-status/index.vue';
-import NginxConfig from './nginx/index.vue';
 import i18n from '@/lang';
 import router from '@/routers';
+import { onMounted, reactive, ref, computed } from '@vue/runtime-core';
+import { OpWebsite, SearchWebsites, UpdateWebsite } from '@/api/modules/website';
+import { Website } from '@/api/interface/website';
 import { App } from '@/api/interface/app';
 import { ElMessageBox } from 'element-plus';
 import { dateFormatSimple } from '@/utils/util';
@@ -232,6 +237,7 @@ const maskShow = ref(true);
 const createRef = ref();
 const deleteRef = ref();
 const groupRef = ref();
+const defaultHtmlRef = ref();
 const openNginxConfig = ref(false);
 const nginxIsExist = ref(false);
 const containerName = ref('');
@@ -416,6 +422,10 @@ const openGroup = () => {
 
 const openDefault = () => {
     defaultRef.value.acceptParams();
+};
+
+const openDefaultHtml = () => {
+    defaultHtmlRef.value.acceptParams();
 };
 
 const checkExist = (data: App.CheckInstalled) => {
