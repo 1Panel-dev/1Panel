@@ -7,8 +7,12 @@
         width="70%"
         @opened="onOpen"
         :top="'5vh'"
+        :fullscreen="isFullscreen"
     >
         <el-form :inline="true" :model="config" class="mt-1.5">
+            <el-tooltip :content="loadTooltip()" placement="top">
+                <el-button @click="toggleFullscreen" class="fullScreen" icon="FullScreen" plain></el-button>
+            </el-tooltip>
             <el-form-item :label="$t('file.theme')">
                 <el-select v-model="config.theme" @change="changeTheme()" class="p-w-200">
                     <el-option v-for="item in themes" :key="item.label" :value="item.value" :label="item.label" />
@@ -98,6 +102,8 @@ const warpKey = 'code-warp';
 
 type WordWrapOptions = 'off' | 'on' | 'wordWrapColumn' | 'bounded';
 
+const isFullscreen = ref(false);
+
 const config = reactive<EditorConfig>({
     theme: 'vs-dark',
     language: 'plaintext',
@@ -145,6 +151,13 @@ const handleClose = () => {
     }
     em('close', open.value);
 };
+
+const loadTooltip = () => {
+    return i18n.global.t('commons.button.' + (isFullscreen.value ? 'quitFullscreen' : 'fullscreen'));
+};
+function toggleFullscreen() {
+    isFullscreen.value = !isFullscreen.value;
+}
 const changeLanguage = () => {
     monaco.editor.setModelLanguage(editor.getModel(), config.language);
 };
@@ -243,5 +256,13 @@ defineExpose({ acceptParams });
 <style>
 .dialog-top {
     top: 0;
+}
+.fullScreen {
+    background-color: transparent;
+    border: none;
+    position: absolute;
+    right: 50px;
+    font-weight: 600;
+    font-size: 14px;
 }
 </style>
