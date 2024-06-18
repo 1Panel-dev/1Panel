@@ -53,7 +53,7 @@ type WebsiteService struct {
 }
 
 type IWebsiteService interface {
-	PageWebsite(req request.WebsiteSearch) (int64, []response.WebsiteDTO, error)
+	PageWebsite(req request.WebsiteSearch) (int64, []response.WebsiteRes, error)
 	GetWebsites() ([]response.WebsiteDTO, error)
 	CreateWebsite(create request.WebsiteCreate) error
 	OpWebsite(req request.WebsiteOp) error
@@ -102,9 +102,9 @@ func NewIWebsiteService() IWebsiteService {
 	return &WebsiteService{}
 }
 
-func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []response.WebsiteDTO, error) {
+func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []response.WebsiteRes, error) {
 	var (
-		websiteDTOs []response.WebsiteDTO
+		websiteDTOs []response.WebsiteRes
 		opts        []repo.DBOption
 	)
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
@@ -154,11 +154,22 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 			runtimeName = runtime.Name
 		}
 		sitePath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "www", "sites", web.Alias)
-		websiteDTOs = append(websiteDTOs, response.WebsiteDTO{
-			Website:     web,
-			AppName:     appName,
-			RuntimeName: runtimeName,
-			SitePath:    sitePath,
+
+		websiteDTOs = append(websiteDTOs, response.WebsiteRes{
+			ID:            web.ID,
+			CreatedAt:     web.CreatedAt,
+			Protocol:      web.Protocol,
+			PrimaryDomain: web.PrimaryDomain,
+			Type:          web.Type,
+			Remark:        web.Remark,
+			Status:        web.Status,
+			Alias:         web.Alias,
+			AppName:       appName,
+			ExpireDate:    web.ExpireDate,
+			SSLExpireDate: web.WebsiteSSL.ExpireDate,
+			SSLStatus:     checkSSLStatus(web.WebsiteSSL.ExpireDate),
+			RuntimeName:   runtimeName,
+			SitePath:      sitePath,
 		})
 	}
 	return total, websiteDTOs, nil

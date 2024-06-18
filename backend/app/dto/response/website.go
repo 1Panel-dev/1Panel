@@ -2,6 +2,7 @@ package response
 
 import (
 	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"time"
 )
 
 type WebsiteDTO struct {
@@ -11,6 +12,24 @@ type WebsiteDTO struct {
 	SitePath      string `json:"sitePath"`
 	AppName       string `json:"appName"`
 	RuntimeName   string `json:"runtimeName"`
+	SiteDir       string `gorm:"type:varchar;" json:"siteDir"`
+}
+
+type WebsiteRes struct {
+	ID            uint      `json:"id"`
+	CreatedAt     time.Time `json:"createdAt"`
+	Protocol      string    `json:"protocol"`
+	PrimaryDomain string    `json:"primaryDomain"`
+	Type          string    `json:"type"`
+	Alias         string    `json:"alias"`
+	Remark        string    `json:"remark"`
+	Status        string    `json:"status"`
+	ExpireDate    time.Time `json:"expireDate"`
+	SitePath      string    `json:"sitePath"`
+	AppName       string    `json:"appName"`
+	RuntimeName   string    `json:"runtimeName"`
+	SSLExpireDate time.Time `json:"sslExpireDate"`
+	SSLStatus     string    `json:"sslStatus"`
 }
 
 type WebsiteOption struct {
