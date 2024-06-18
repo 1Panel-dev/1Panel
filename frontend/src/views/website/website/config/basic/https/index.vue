@@ -319,6 +319,7 @@ const submit = async (formEl: FormInstance | undefined) => {
 const changeEnable = (enable: boolean) => {
     if (enable) {
         listSSL();
+        form.hsts = true;
     }
     if (resData.value.enable && !enable) {
         ElMessageBox.confirm(i18n.global.t('website.disableHTTPSHelper'), i18n.global.t('website.disableHTTPS'), {

@@ -1888,6 +1888,7 @@ const message = {
         websiteBackupWarn: '僅支援導入本機備份，導入其他機器備份可能會恢復失敗',
         ipWebsiteWarn: 'IP 為網域名稱的網站，需要設定為預設網站才能正常存取',
         hstsHelper: '開啟 HSTS 可以增加網站安全性',
+        sslExpireDate: '憑證過期時間',
     },
     php: {
         short_open_tag: '短標簽支持',

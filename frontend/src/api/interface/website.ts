@@ -32,6 +32,19 @@ export namespace Website {
         appName: string;
         runtimeName: string;
     }
+    export interface WebsiteRes extends CommonModel {
+        protocol: string;
+        primaryDomain: string;
+        type: string;
+        alias: string;
+        remark: string;
+        status: string;
+        expireDate: string;
+        sitePath: string;
+        appName: string;
+        runtimeName: string;
+        sslExpireDate: Date;
+    }
 
     export interface NewAppInstall {
         name: string;

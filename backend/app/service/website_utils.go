@@ -1080,3 +1080,15 @@ func ChangeHSTSConfig(enable bool, nginxInstall model.AppInstall, website model.
 	}
 	return nil
 }
+
+func checkSSLStatus(expireDate time.Time) string {
+	now := time.Now()
+	daysUntilExpiry := int(expireDate.Sub(now).Hours() / 24)
+
+	if daysUntilExpiry < 0 {
+		return "danger"
+	} else if daysUntilExpiry <= 10 {
+		return "warning"
+	}
+	return "success"
+}
