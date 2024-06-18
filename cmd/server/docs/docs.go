@@ -1111,6 +1111,34 @@ const docTemplate = `{
                 }
             }
         },
+        "/containers/commit": {
+            "post": {
+                "description": "容器提交生成新镜像",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Container"
+                ],
+                "summary": "Commit Container",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ContainerCommit"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/containers/compose": {
             "post": {
                 "security": [
@@ -8003,6 +8031,48 @@ const docTemplate = `{
                     "200": {
                         "description": "OK"
                     }
+                }
+            }
+        },
+        "/hosts/firewall/forward": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新防火墙端口转发规则",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Firewall"
+                ],
+                "summary": "Create group",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ForwardRuleOperate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "source_port"
+                    ],
+                    "formatEN": "update port forward rules [source_port]",
+                    "formatZH": "更新端口转发规则 [source_port]",
+                    "paramKeys": []
                 }
             }
         },
@@ -15136,6 +15206,32 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.ContainerCommit": {
+            "type": "object",
+            "required": [
+                "containerID"
+            ],
+            "properties": {
+                "author": {
+                    "type": "string"
+                },
+                "comment": {
+                    "type": "string"
+                },
+                "containerID": {
+                    "type": "string"
+                },
+                "containerName": {
+                    "type": "string"
+                },
+                "newImageName": {
+                    "type": "string"
+                },
+                "pause": {
+                    "type": "boolean"
+                }
+            }
+        },
         "dto.ContainerListStats": {
             "type": "object",
             "properties": {
@@ -16344,6 +16440,52 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.ForwardRuleOperate": {
+            "type": "object",
+            "properties": {
+                "rules": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "operation",
+                            "port",
+                            "protocol",
+                            "targetPort"
+                        ],
+                        "properties": {
+                            "num": {
+                                "type": "string"
+                            },
+                            "operation": {
+                                "type": "string",
+                                "enum": [
+                                    "add",
+                                    "remove"
+                                ]
+                            },
+                            "port": {
+                                "type": "string"
+                            },
+                            "protocol": {
+                                "type": "string",
+                                "enum": [
+                                    "tcp",
+                                    "udp",
+                                    "tcp/udp"
+                                ]
+                            },
+                            "targetIP": {
+                                "type": "string"
+                            },
+                            "targetPort": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "dto.FtpBaseInfo": {
             "type": "object",
             "properties": {
@@ -17541,6 +17683,9 @@ const docTemplate = `{
         "dto.OsInfo": {
             "type": "object",
             "properties": {
+                "diskSize": {
+                    "type": "integer"
+                },
                 "kernelArch": {
                     "type": "string"
                 },
@@ -21207,6 +21352,9 @@ const docTemplate = `{
                 "enable": {
                     "type": "boolean"
                 },
+                "hsts": {
+                    "type": "boolean"
+                },
                 "httpConfig": {
                     "type": "string",
                     "enum": [
@@ -22369,6 +22517,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "enable": {
+                    "type": "boolean"
+                },
+                "hsts": {
                     "type": "boolean"
                 },
                 "httpConfig": {

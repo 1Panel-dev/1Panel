@@ -71,6 +71,14 @@
                             </div>
                         </template>
                     </el-table-column>
+                    <el-table-column :label="$t('file.size')" prop="size" min-width="60" show-overflow-tooltip>
+                        <template #default="{ row }">
+                            <span v-if="row.size">
+                                {{ computeSize(row.size) }}
+                            </span>
+                            <span v-else>-</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" min-width="80" prop="status">
                         <template #default="{ row }">
                             <el-button
@@ -188,7 +196,7 @@
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { snapshotCreate, searchSnapshotPage, snapshotDelete, updateSnapshotDescription } from '@/api/modules/setting';
 import { onMounted, reactive, ref } from 'vue';
-import { dateFormat } from '@/utils/util';
+import { computeSize, dateFormat } from '@/utils/util';
 import { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';

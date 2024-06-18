@@ -5,6 +5,8 @@ export namespace Dashboard {
         platformFamily: string;
         kernelArch: string;
         kernelVersion: string;
+
+        diskSize: number;
     }
     export interface BaseInfo {
         websiteNumber: number;

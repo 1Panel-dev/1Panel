@@ -73,8 +73,8 @@ func (u *SnapshotService) HandleSnapshotRecover(snap model.Snapshot, isRecover b
 	if snap.InterruptStep == "Readjson" {
 		req.IsNew = true
 	}
-	if req.IsNew || snap.InterruptStep == "AppData" {
-		if err := recoverAppData(snapFileDir); err != nil {
+	if isRecover && (req.IsNew || snap.InterruptStep == "AppData") {
+		if err := recoverAppData(snapFileDir); err == nil {
 			updateRecoverStatus(snap.ID, isRecover, "DockerDir", constant.StatusFailed, fmt.Sprintf("handle recover app data failed, err: %v", err))
 			return
 		}
@@ -163,14 +163,14 @@ func backupBeforeRecover(snap model.Snapshot, secret string) error {
 	_ = os.MkdirAll(path.Join(baseDir, "1panel"), os.ModePerm)
 	_ = os.MkdirAll(path.Join(baseDir, "docker"), os.ModePerm)
 
-	wg.Add(5)
+	wg.Add(4)
 	itemHelper.Wg = &wg
 	go snapJson(itemHelper, jsonItem, baseDir)
 	go snapPanel(itemHelper, path.Join(baseDir, "1panel"))
 	go snapDaemonJson(itemHelper, path.Join(baseDir, "docker"))
-	go snapAppData(itemHelper, path.Join(baseDir, "docker"))
 	go snapBackup(itemHelper, global.CONF.System.Backup, path.Join(baseDir, "1panel"))
 	wg.Wait()
+	itemHelper.Status.AppData = constant.StatusDone
 
 	allDone, msg := checkAllDone(status)
 	if !allDone {

@@ -48,13 +48,9 @@ func NewISnapshotService() ISnapshotService {
 
 func (u *SnapshotService) SearchWithPage(req dto.SearchWithPage) (int64, interface{}, error) {
 	total, systemBackups, err := snapshotRepo.Page(req.Page, req.PageSize, commonRepo.WithLikeName(req.Info))
-	var dtoSnap []dto.SnapshotInfo
-	for _, systemBackup := range systemBackups {
-		var item dto.SnapshotInfo
-		if err := copier.Copy(&item, &systemBackup); err != nil {
-			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
-		}
-		dtoSnap = append(dtoSnap, item)
+	dtoSnap, err := loadSnapSize(systemBackups)
+	if err != nil {
+		return 0, nil, err
 	}
 	return total, dtoSnap, err
 }
@@ -509,4 +505,49 @@ func loadOs() string {
 	default:
 		return hostInfo.KernelArch
 	}
+}
+
+func loadSnapSize(records []model.Snapshot) ([]dto.SnapshotInfo, error) {
+	var datas []dto.SnapshotInfo
+	clientMap := make(map[string]loadSizeHelper)
+	var wg sync.WaitGroup
+	for i := 0; i < len(records); i++ {
+		var item dto.SnapshotInfo
+		if err := copier.Copy(&item, &records[i]); err != nil {
+			return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+		}
+		itemPath := fmt.Sprintf("system_snapshot/%s.tar.gz", item.Name)
+		if _, ok := clientMap[records[i].DefaultDownload]; !ok {
+			backup, err := backupRepo.Get(commonRepo.WithByType(records[i].DefaultDownload))
+			if err != nil {
+				global.LOG.Errorf("load backup model %s from db failed, err: %v", records[i].DefaultDownload, err)
+				clientMap[records[i].DefaultDownload] = loadSizeHelper{}
+				datas = append(datas, item)
+				continue
+			}
+			client, err := NewIBackupService().NewClient(&backup)
+			if err != nil {
+				global.LOG.Errorf("load backup client %s from db failed, err: %v", records[i].DefaultDownload, err)
+				clientMap[records[i].DefaultDownload] = loadSizeHelper{}
+				datas = append(datas, item)
+				continue
+			}
+			item.Size, _ = client.Size(path.Join(strings.TrimLeft(backup.BackupPath, "/"), itemPath))
+			datas = append(datas, item)
+			clientMap[records[i].DefaultDownload] = loadSizeHelper{backupPath: strings.TrimLeft(backup.BackupPath, "/"), client: client, isOk: true}
+			continue
+		}
+		if clientMap[records[i].DefaultDownload].isOk {
+			wg.Add(1)
+			go func(index int) {
+				item.Size, _ = clientMap[records[index].DefaultDownload].client.Size(path.Join(clientMap[records[index].DefaultDownload].backupPath, itemPath))
+				datas = append(datas, item)
+				wg.Done()
+			}(i)
+		} else {
+			datas = append(datas, item)
+		}
+	}
+	wg.Wait()
+	return datas, nil
 }

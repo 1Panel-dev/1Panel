@@ -1334,12 +1334,15 @@ const message = {
         reDownload: '重新下載備份文件',
         statusSuccess: '成功',
         statusFailed: '失敗',
-        recoverHelper: '即將從快照 {0} 開始恢復，恢復需要重啟 docker 以及 1panel 服務，是否繼續？',
-        recoverHelper1: '即將從快照 {0} 開始恢復，請確保伺服器架構與創建快照伺服器架構信息保持一致。',
-        recoverHelper2: '不支持在不同伺服器架構之間進行快照恢復操作。',
+        recoverErrArch: '不支援在不同伺服器架構之間進行快照恢復操作!',
+        recoverErrSize: '檢測到目前磁碟空間不足，請檢查或清理後重試!',
+        recoverHelper: '即將從快照 {0} 開始恢復，恢復前請確認以下資訊：',
+        recoverHelper1: '恢復需要重新啟動 Docker 以及 1Panel 服務',
+        recoverHelper2: '請確保伺服器磁碟空間充足 ( 快照檔案大小: {0}, 可用空間: {1} )',
+        recoverHelper3: '請確保伺服器架構與建立快照伺服器架構資訊保持一致 (目前伺服器架構: {0} )',
         rollback: '回滾',
         rollbackHelper:
-            '即將回滾本次恢復，回滾將替換所有本次恢復的文件，過程中可能需要重啟 docker 以及 1panel 服務，是否繼續？',
+            '即將回滾本次恢復，回滾將替換所有本次恢復的檔案，過程中可能需要重新啟動 Docker 以及 1Panel 服務，是否繼續？',
 
         upgrading: '正在升級中，請稍候...',
         upgradeHelper: '升級操作需要重啟 1Panel 服務，是否繼續？',
@@ -1444,7 +1447,7 @@ const message = {
         menu: '選單',
         confirmMessage: '即將刷新頁面更新高級功能菜單列表，是否繼續？',
         compressPassword: '壓縮密碼',
-        backupRecoverMessage: '如果需要設定壓縮或者解壓縮密碼，請輸入。（不填則不設定）',
+        backupRecoverMessage: '請輸入壓縮或解壓縮密碼（留空則不設定）',
     },
     license: {
         community: '社區版：',
