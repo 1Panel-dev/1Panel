@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/1Panel-dev/1Panel/backend/utils/firewall"
 	"path"
@@ -34,7 +35,7 @@ func Init() {
 	_ = docker.CreateDefaultDockerNetwork()
 
 	if f, err := firewall.NewFirewallClient(); err == nil {
-		_ = f.EnableForward()
+		fmt.Println(f.EnableForward())
 	}
 }
 
