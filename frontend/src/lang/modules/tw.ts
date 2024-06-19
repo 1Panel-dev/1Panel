@@ -1111,6 +1111,8 @@ const message = {
         recycleBin: '回收站',
         sourcePath: '原路徑',
         deleteTime: '刪除時間',
+        confirmReduce: '確定還原以下文件？',
+        reduceSuccess: '還原成功',
         reduce: '還原',
         reduceHelper: '如果原路徑存在同名檔案或目錄，將會被覆蓋，是否繼續？',
         clearRecycleBin: '清空回收站',

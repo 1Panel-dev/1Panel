@@ -1114,6 +1114,8 @@ const message = {
         sourcePath: '原路径',
         deleteTime: '删除时间',
         reduce: '还原',
+        confirmReduce: '确定还原以下文件？',
+        reduceSuccess: '还原成功',
         reduceHelper: '如果原路径存在同名文件或目录，将会被覆盖，是否继续？',
         clearRecycleBin: '清空回收站',
         clearRecycleBinHelper: '是否清空回收站？',
