@@ -96,6 +96,9 @@ type IWebsiteService interface {
 	OperateRedirect(req request.NginxRedirectReq) (err error)
 	GetRedirect(id uint) (res []response.NginxRedirectConfig, err error)
 	UpdateRedirectFile(req request.NginxRedirectUpdate) (err error)
+
+	UpdateDefaultHtml(req request.WebsiteHtmlUpdate) error
+	GetDefaultHtml(resourceType string) (*response.WebsiteHtmlRes, error)
 }
 
 func NewIWebsiteService() IWebsiteService {
@@ -2458,4 +2461,92 @@ func (w WebsiteService) LoadWebsiteDirConfig(req request.WebsiteCommonReq) (*res
 	}
 
 	return res, nil
+}
+
+func (w WebsiteService) GetDefaultHtml(resourceType string) (*response.WebsiteHtmlRes, error) {
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return nil, err
+	}
+	rootPath := path.Join(nginxInstall.GetPath(), "root")
+	fileOp := files.NewFileOp()
+	defaultPath := path.Join(rootPath, "default")
+	if !fileOp.Stat(defaultPath) {
+		_ = fileOp.CreateDir(defaultPath, 0755)
+	}
+
+	res := &response.WebsiteHtmlRes{}
+
+	switch resourceType {
+	case "404":
+		resourcePath := path.Join(defaultPath, "404.html")
+		if content, _ := getResourceContent(fileOp, resourcePath); content != "" {
+			res.Content = content
+			return res, nil
+		}
+		res.Content = string(nginx_conf.NotFoundHTML)
+		return res, nil
+	case "php":
+		resourcePath := path.Join(defaultPath, "index.php")
+		if content, _ := getResourceContent(fileOp, resourcePath); content != "" {
+			res.Content = content
+			return res, nil
+		}
+		res.Content = string(nginx_conf.IndexPHP)
+		return res, nil
+	case "index":
+		resourcePath := path.Join(defaultPath, "index.html")
+		if content, _ := getResourceContent(fileOp, resourcePath); content != "" {
+			res.Content = content
+			return res, nil
+		}
+		res.Content = string(nginx_conf.Index)
+		return res, nil
+	case "domain404":
+		resourcePath := path.Join(rootPath, "404.html")
+		if content, _ := getResourceContent(fileOp, resourcePath); content != "" {
+			res.Content = content
+			return res, nil
+		}
+		res.Content = string(nginx_conf.DomainNotFoundHTML)
+		return res, nil
+	case "stop":
+		resourcePath := path.Join(rootPath, "stop", "index.html")
+		if content, _ := getResourceContent(fileOp, resourcePath); content != "" {
+			res.Content = content
+			return res, nil
+		}
+		res.Content = string(nginx_conf.StopHTML)
+		return res, nil
+	}
+	return res, nil
+}
+
+func (w WebsiteService) UpdateDefaultHtml(req request.WebsiteHtmlUpdate) error {
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return err
+	}
+	rootPath := path.Join(nginxInstall.GetPath(), "root")
+	fileOp := files.NewFileOp()
+	defaultPath := path.Join(rootPath, "default")
+	if !fileOp.Stat(defaultPath) {
+		_ = fileOp.CreateDir(defaultPath, 0755)
+	}
+	var resourcePath string
+	switch req.Type {
+	case "404":
+		resourcePath = path.Join(defaultPath, "404.html")
+	case "php":
+		resourcePath = path.Join(defaultPath, "index.php")
+	case "index":
+		resourcePath = path.Join(defaultPath, "index.html")
+	case "domain404":
+		resourcePath = path.Join(rootPath, "404.html")
+	case "stop":
+		resourcePath = path.Join(rootPath, "stop", "index.html")
+	default:
+		return nil
+	}
+	return fileOp.SaveFile(resourcePath, req.Content, 0644)
 }

@@ -82,3 +82,7 @@ type WebsiteDirConfig struct {
 	UserGroup string   `json:"userGroup"`
 	Msg       string   `json:"msg"`
 }
+
+type WebsiteHtmlRes struct {
+	Content string `json:"content"`
+}

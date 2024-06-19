@@ -2032,6 +2032,12 @@ const message = {
             'Only supports importing local backups, importing backups from other machines may cause recovery failure',
         ipWebsiteWarn: 'Websites with IP as domain names need to be set as default sites to be accessed normally',
         hstsHelper: 'Enabling HSTS can increase website security',
+        defaultHtml: 'Default page',
+        website404: 'Website 404 error page',
+        domain404: 'Website page does not exist',
+        indexHtml: 'Static website default page',
+        stopHtml: 'Website stop page',
+        indePhp: 'PHP website default page',
         sslExpireDate: 'Certificate expiration date',
     },
     php: {

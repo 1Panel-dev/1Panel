@@ -317,7 +317,7 @@ func createWafConfig(website *model.Website, domains []model.WebsiteDomain) erro
 	for _, domain := range domains {
 		wafWebsite.Domains = append(wafWebsite.Domains, domain.Domain)
 		if domain.Port != 80 && domain.Port != 443 {
-			wafWebsite.Host = append(wafWebsite.Host, domain.Domain+":"+string(rune(domain.Port)))
+			wafWebsite.Host = append(wafWebsite.Host, domain.Domain+":"+strconv.Itoa(domain.Port))
 		}
 	}
 	websitesArray = append(websitesArray, wafWebsite)
@@ -1091,4 +1091,15 @@ func checkSSLStatus(expireDate time.Time) string {
 		return "warning"
 	}
 	return "success"
+}
+
+func getResourceContent(fileOp files.FileOp, resourcePath string) (string, error) {
+	if fileOp.Stat(resourcePath) {
+		content, err := fileOp.GetContent(resourcePath)
+		if err != nil {
+			return "", err
+		}
+		return string(content), nil
+	}
+	return "", nil
 }

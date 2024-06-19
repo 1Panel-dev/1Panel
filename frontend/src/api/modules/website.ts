@@ -268,3 +268,11 @@ export const DownloadFile = (params: Website.SSLDownload) => {
 export const GetCA = (id: number) => {
     return http.get<Website.CADTO>(`/websites/ca/${id}`);
 };
+
+export const GetDefaultHtml = (type: string) => {
+    return http.get<Website.WebsiteHtml>(`/websites/default/html/${type}`);
+};
+
+export const UpdateDefaultHtml = (req: Website.WebsiteHtmlUpdate) => {
+    return http.post(`/websites/default/html/update`, req);
+};

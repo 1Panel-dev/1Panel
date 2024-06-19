@@ -208,3 +208,12 @@ type WafWebsite struct {
 	Domains []string `json:"domains"`
 	Host    []string `json:"host"`
 }
+
+type WebsiteHtmlReq struct {
+	Type string `json:"type" validate:"required"`
+}
+
+type WebsiteHtmlUpdate struct {
+	Type    string `json:"type" validate:"required"`
+	Content string `json:"content" validate:"required"`
+}

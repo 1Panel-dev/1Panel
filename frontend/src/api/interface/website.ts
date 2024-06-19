@@ -519,4 +519,12 @@ export namespace Website {
     export interface SSLDownload {
         id: number;
     }
+
+    export interface WebsiteHtml {
+        content: string;
+    }
+    export interface WebsiteHtmlUpdate {
+        type: string;
+        content: string;
+    }
 }
