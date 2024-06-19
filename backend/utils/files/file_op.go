@@ -611,25 +611,15 @@ func (f FileOp) decompressWithSDK(srcFile string, dst string, cType CompressType
 }
 
 func (f FileOp) Decompress(srcFile string, dst string, cType CompressType, secret string) error {
-	if err := f.decompressWithSDK(srcFile, dst, cType); err != nil {
-		if cType == Tar || cType == Zip || cType == TarGz {
-			if secret != "" {
-				shellArchiver, err := NewShellArchiver(TarGz)
-				if err != nil {
-					return err
-				}
-				return shellArchiver.Extract(srcFile, dst, secret)
-			} else {
-				shellArchiver, err := NewShellArchiver(cType)
-				if err != nil {
-					return err
-				}
-				return shellArchiver.Extract(srcFile, dst, secret)
+	if cType == Tar || cType == Zip || cType == TarGz {
+		shellArchiver, err := NewShellArchiver(cType)
+		if err == nil {
+			if err = shellArchiver.Extract(srcFile, dst, secret); err == nil {
+				return nil
 			}
 		}
-		return err
 	}
-	return nil
+	return f.decompressWithSDK(srcFile, dst, cType)
 }
 
 func ZipFile(files []archiver.File, dst afero.File) error {

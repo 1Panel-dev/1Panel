@@ -119,6 +119,9 @@ const getContent = (pre: boolean) => {
     readReq.id = props.config.id;
     readReq.type = props.config.type;
     readReq.name = props.config.name;
+    if (readReq.page < 1) {
+        readReq.page = 1;
+    }
     ReadByLine(readReq).then((res) => {
         if (!end.value && res.data.end) {
             lastContent.value = content.value;
@@ -178,7 +181,7 @@ const changeTail = (fromOutSide: boolean) => {
     if (tailLog.value) {
         timer = setInterval(() => {
             getContent(false);
-        }, 1000 * 2);
+        }, 1000 * 3);
     } else {
         onCloseLog();
     }
