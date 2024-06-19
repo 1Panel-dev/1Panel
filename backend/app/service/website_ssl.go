@@ -129,8 +129,9 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 		DisableCNAME:  create.DisableCNAME,
 	}
 	if create.PushDir {
-		if !files.NewFileOp().Stat(create.Dir) {
-			return res, buserr.New(constant.ErrLinkPathNotFound)
+		fileOP := files.NewFileOp()
+		if !fileOP.Stat(create.Dir) {
+			_ = fileOP.CreateDir(create.Dir, 0755)
 		}
 		websiteSSL.Dir = create.Dir
 	}
