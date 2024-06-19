@@ -330,9 +330,7 @@ func createWafConfig(website *model.Website, domains []model.WebsiteDomain) erro
 
 	for _, domain := range domains {
 		wafWebsite.Domains = append(wafWebsite.Domains, domain.Domain)
-		if domain.Port != 80 && domain.Port != 443 {
-			wafWebsite.Host = append(wafWebsite.Host, domain.Domain+":"+strconv.Itoa(domain.Port))
-		}
+		wafWebsite.Host = append(wafWebsite.Host, domain.Domain+":"+strconv.Itoa(domain.Port))
 	}
 	websitesArray = append(websitesArray, wafWebsite)
 	websitesContent, err := json.Marshal(websitesArray)
