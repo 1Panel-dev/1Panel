@@ -72,7 +72,9 @@
                     </el-table-column>
                     <el-table-column :label="$t('website.log')" prop="">
                         <template #default="{ row }">
-                            <el-button @click="openLog(row)" link type="primary">{{ $t('website.check') }}</el-button>
+                            <el-button @click="openLog(row)" link type="primary" :disabled="row.resource == 'local'">
+                                {{ $t('website.check') }}
+                            </el-button>
                         </template>
                     </el-table-column>
                     <el-table-column
