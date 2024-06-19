@@ -1900,8 +1900,9 @@ const message = {
         domain404: '网站不存在页',
         indexHtml: '静态网站默认页',
         stopHtml: '网站停用页',
-        indePhp: 'PHP 网站默认页',
+        indexPHP: 'PHP 网站默认页',
         sslExpireDate: '证书过期时间',
+        website404Helper: '网站 404 错误页仅支持 PHP 运行环境网站和静态网站',
     },
     php: {
         short_open_tag: '短标签支持',

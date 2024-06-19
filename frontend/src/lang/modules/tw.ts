@@ -1898,8 +1898,9 @@ const message = {
         domain404: '網站不存在頁面',
         indexHtml: '靜態網站預設頁',
         stopHtml: '網站停用頁',
-        indePhp: 'PHP 網站預設頁',
+        indexPHP: 'PHP 網站預設頁',
         sslExpireDate: '憑證過期時間',
+        website404Helper: '網站 404 錯誤頁僅支援 PHP 運行環境網站和靜態網站',
     },
     php: {
         short_open_tag: '短標簽支持',

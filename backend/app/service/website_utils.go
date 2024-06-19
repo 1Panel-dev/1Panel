@@ -80,18 +80,23 @@ func createIndexFile(website *model.Website, runtime *model.Runtime) error {
 	if err != nil {
 		return err
 	}
+	var (
+		indexPath      string
+		indexContent   string
+		websiteService = NewIWebsiteService()
+		indexFolder    = path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "index")
+	)
 
-	indexFolder := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "www", "sites", website.Alias, "index")
-	indexPath := ""
-	indexContent := ""
 	switch website.Type {
 	case constant.Static:
 		indexPath = path.Join(indexFolder, "index.html")
-		indexContent = string(nginx_conf.Index)
+		indexHtml, _ := websiteService.GetDefaultHtml("index")
+		indexContent = indexHtml.Content
 	case constant.Runtime:
 		if runtime.Type == constant.RuntimePHP {
 			indexPath = path.Join(indexFolder, "index.php")
-			indexContent = string(nginx_conf.IndexPHP)
+			indexPhp, _ := websiteService.GetDefaultHtml("php")
+			indexContent = indexPhp.Content
 		}
 	}
 
@@ -114,6 +119,13 @@ func createIndexFile(website *model.Website, runtime *model.Runtime) error {
 	if err := fileOp.WriteFile(indexPath, strings.NewReader(indexContent), 0755); err != nil {
 		return err
 	}
+
+	html404, _ := websiteService.GetDefaultHtml("404")
+	path404 := path.Join(indexFolder, "404.html")
+	if err := fileOp.WriteFile(path404, strings.NewReader(html404.Content), 0755); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -245,12 +257,14 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 		server.UpdateRootProxy([]string{proxy})
 	case constant.Static:
 		server.UpdateRoot(rootIndex)
+		server.UpdateDirective("error_page", []string{"404", "/404.html"})
 	case constant.Proxy:
 		nginxInclude := fmt.Sprintf("/www/sites/%s/proxy/*.conf", website.Alias)
 		server.UpdateDirective("include", []string{nginxInclude})
 	case constant.Runtime:
 		switch runtime.Type {
 		case constant.RuntimePHP:
+			server.UpdateDirective("error_page", []string{"404", "/404.html"})
 			if runtime.Resource == constant.ResourceLocal {
 				switch runtime.Type {
 				case constant.RuntimePHP:

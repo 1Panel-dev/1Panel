@@ -346,7 +346,8 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 	}
 
 	if len(create.FtpUser) != 0 && len(create.FtpPassword) != 0 {
-		itemID, err := NewIFtpService().Create(dto.FtpCreate{User: create.FtpUser, Password: create.FtpPassword, Path: path.Join(global.CONF.System.BaseDir, "1panel/apps/openresty/openresty/www/sites", website.Alias, "index")})
+		indexDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "index")
+		itemID, err := NewIFtpService().Create(dto.FtpCreate{User: create.FtpUser, Password: create.FtpPassword, Path: indexDir})
 		if err != nil {
 			global.LOG.Errorf("create ftp for website failed, err: %v", err)
 		}

@@ -2039,8 +2039,9 @@ const message = {
         domain404: 'Website page does not exist',
         indexHtml: 'Static website default page',
         stopHtml: 'Website stop page',
-        indePhp: 'PHP website default page',
+        indexPHP: 'PHP website default page',
         sslExpireDate: 'Certificate expiration date',
+        website404Helper: 'Website 404 error page only supports PHP runtime environment websites and static websites',
     },
     php: {
         short_open_tag: 'Short tag support',
