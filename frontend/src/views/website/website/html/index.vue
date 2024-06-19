@@ -9,18 +9,22 @@
                     <el-option :value="'404'" :label="$t('website.website404')"></el-option>
                     <el-option :value="'domain404'" :label="$t('website.domain404')"></el-option>
                     <el-option :value="'index'" :label="$t('website.indexHtml')"></el-option>
-                    <el-option :value="'php'" :label="$t('website.indePhp')"></el-option>
+                    <el-option :value="'php'" :label="$t('website.indexPHP')"></el-option>
                     <el-option :value="'stop'" :label="$t('website.stopHtml')"></el-option>
                 </el-select>
+                <div class="mt-1.5">
+                    <el-text v-if="type == '404'" type="info">
+                        {{ $t('website.website404Helper') }}
+                    </el-text>
+                </div>
                 <div ref="htmlRef" class="default-html"></div>
             </el-col>
         </el-row>
-
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
                 <el-button type="primary" @click="submit()" :disabled="loading">
-                    {{ $t('commons.button.confirm') }}
+                    {{ $t('commons.button.save') }}
                 </el-button>
             </span>
         </template>
@@ -89,7 +93,6 @@ const submit = async () => {
         const content = view.value.state.doc.toString();
         await UpdateDefaultHtml({ type: type.value, content: content });
         MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
-        handleClose();
     } catch (error) {
     } finally {
         loading.value = false;
@@ -102,6 +105,6 @@ defineExpose({ acceptParams });
 .default-html {
     width: 100%;
     min-height: 300px;
-    margin-top: 20px;
+    margin-top: 10px;
 }
 </style>
