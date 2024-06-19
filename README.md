@@ -9,7 +9,7 @@
   [<a href="docs/README_TW.md">中文(繁體)</a>] | [<a href="docs/README_EN.md">English</a>] | [<a href="docs/README_JP.md">日本語</a>]
 </p>
 
-[![Watch the video](https://resource.fit2cloud.com/1panel/img/overview.png)](https://www.bilibili.com/video/BV1Mt421n7LZ/)
+[![Watch the video](https://resource.fit2cloud.com/1panel/img/overview_video.png)](https://www.bilibili.com/video/BV1Mt421n7LZ/)
 
 ------------------------------
 
