@@ -16,6 +16,9 @@
             <el-button @click="patchDelete" :disabled="data == null || selects.length == 0">
                 {{ $t('commons.button.delete') }}
             </el-button>
+            <el-button @click="patchReduce" :disabled="data == null || selects.length == 0">
+                {{ $t('file.reduce') }}
+            </el-button>
             <el-form-item :label="$t('file.fileRecycleBin')">
                 <el-switch v-model="status" active-value="enable" inactive-value="disable" @change="changeStatus" />
             </el-form-item>
@@ -53,6 +56,7 @@
             <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fix />
         </ComplexTable>
         <Delete ref="deleteRef" @close="search" />
+        <Reduce ref="reduceRef" @close="search" />
     </el-drawer>
 </template>
 
@@ -62,6 +66,7 @@ import { reactive, ref } from 'vue';
 import { dateFormat, computeSize } from '@/utils/util';
 import i18n from '@/lang';
 import Delete from './delete/index.vue';
+import Reduce from './reduce/index.vue';
 import { updateSetting } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
 
@@ -85,6 +90,7 @@ const paginationConfig = reactive({
 });
 
 const deleteRef = ref();
+const reduceRef = ref();
 
 const handleClose = () => {
     open.value = false;
@@ -136,6 +142,11 @@ const singleDel = (row: any) => {
 const patchDelete = () => {
     files.value = selects.value;
     deleteRef.value.acceptParams(files.value);
+};
+
+const patchReduce = () => {
+    files.value = selects.value;
+    reduceRef.value.acceptParams(files.value);
 };
 
 const rdFile = async (row: any) => {

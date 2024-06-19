@@ -1171,6 +1171,8 @@ const message = {
         recycleBin: 'Recycle bin',
         sourcePath: 'Original path',
         deleteTime: 'Delete time',
+        confirmReduce: 'Are you sure you want to restore the following files?',
+        reduceSuccess: 'Restore successful',
         reduce: 'Reduction',
         reduceHelper:
             'If a file or directory with the same name exists in the original path, it will be overwritten. Do you want to continue?',
