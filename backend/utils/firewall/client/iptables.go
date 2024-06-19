@@ -5,12 +5,13 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
-	"github.com/pkg/errors"
 	"regexp"
 	"strings"
 )
 
-var NatListRegex = regexp.MustCompile(`^(\d+)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?) .+?:(\d{1,5}(?::\d+)?).+?[ :](.+-.+|(?:.+:)?\d{1,5}(?:-\d{1,5})?)$`)
+const NatChain = "1PANEL"
+
+var NatListRegex = regexp.MustCompile(`^(\d+)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)\s+(.+?)(?:\s+(.+?) .+?:(\d{1,5}(?::\d+)?).+?[ :](.+-.+|(?:.+:)?\d{1,5}(?:-\d{1,5})?))?$`)
 
 type Iptables struct {
 	CmdStr string
@@ -25,10 +26,22 @@ func NewIptables() (*Iptables, error) {
 	return iptables, nil
 }
 
+func (iptables *Iptables) runf(rule string, a ...any) error {
+	stdout, err := cmd.Execf("%s iptables -t nat %s", iptables.CmdStr, fmt.Sprintf(rule, a...))
+	if err != nil {
+		return fmt.Errorf("%s, %s", err, stdout)
+	}
+	if stdout != "" {
+		return fmt.Errorf("iptables error: %s", stdout)
+	}
+
+	return nil
+}
+
 func (iptables *Iptables) Check() error {
 	stdout, err := cmd.Exec("cat /proc/sys/net/ipv4/ip_forward")
 	if err != nil {
-		return err
+		return fmt.Errorf("%s, %s", err, stdout)
 	}
 	if stdout == "0" {
 		return fmt.Errorf("disable")
@@ -37,8 +50,20 @@ func (iptables *Iptables) Check() error {
 	return nil
 }
 
-func (iptables *Iptables) NatList() ([]IptablesNatInfo, error) {
-	stdout, err := cmd.Execf("%s iptables -t nat -nL PREROUTING --line", iptables.CmdStr)
+func (iptables *Iptables) NatNewChain() error {
+	return iptables.runf("-N %s", NatChain)
+}
+
+func (iptables *Iptables) NatAppendChain() error {
+	return iptables.runf("-A PREROUTING -j %s", NatChain)
+}
+
+func (iptables *Iptables) NatList(chain ...string) ([]IptablesNatInfo, error) {
+	rule := fmt.Sprintf("%s iptables -t nat -nL %s --line", iptables.CmdStr, NatChain)
+	if len(chain) == 1 {
+		rule = fmt.Sprintf("%s iptables -t nat -nL %s --line", iptables.CmdStr, chain[0])
+	}
+	stdout, err := cmd.Exec(rule)
 	if err != nil {
 		return nil, err
 	}
@@ -70,16 +95,12 @@ func (iptables *Iptables) NatList() ([]IptablesNatInfo, error) {
 }
 
 func (iptables *Iptables) NatAdd(protocol, src, destIp, destPort string, save bool) error {
-	rule := fmt.Sprintf("%s iptables -t nat -A PREROUTING -p %s --dport %s -j REDIRECT --to-port %s", iptables.CmdStr, protocol, src, destPort)
+	rule := fmt.Sprintf("-A %s -p %s --dport %s -j REDIRECT --to-port %s", NatChain, protocol, src, destPort)
 	if destIp != "" && destIp != "127.0.0.1" && destIp != "localhost" {
-		rule = fmt.Sprintf("%s iptables -t nat -A PREROUTING -p %s --dport %s -j DNAT --to-destination %s:%s", iptables.CmdStr, protocol, src, destIp, destPort)
+		rule = fmt.Sprintf("-A %s -p %s --dport %s -j DNAT --to-destination %s:%s", NatChain, protocol, src, destIp, destPort)
 	}
-	stdout, err := cmd.Exec(rule)
-	if err != nil {
+	if err := iptables.runf(rule); err != nil {
 		return err
-	}
-	if stdout != "" {
-		return errors.New(stdout)
 	}
 
 	if save {
@@ -94,12 +115,8 @@ func (iptables *Iptables) NatAdd(protocol, src, destIp, destPort string, save bo
 }
 
 func (iptables *Iptables) NatRemove(num string, protocol, src, destIp, destPort string) error {
-	stdout, err := cmd.Execf("%s iptables -t nat -D PREROUTING %s", iptables.CmdStr, num)
-	if err != nil {
+	if err := iptables.runf("-D %s %s", NatChain, num); err != nil {
 		return err
-	}
-	if stdout != "" {
-		return fmt.Errorf(stdout)
 	}
 
 	global.DB.Where(
@@ -113,12 +130,8 @@ func (iptables *Iptables) NatRemove(num string, protocol, src, destIp, destPort 
 }
 
 func (iptables *Iptables) Reload() error {
-	stdout, err := cmd.Execf("%s iptables -t nat -F && %s iptables -t nat -X", iptables.CmdStr, iptables.CmdStr)
-	if err != nil {
+	if err := iptables.runf("-F %s", NatChain); err != nil {
 		return err
-	}
-	if stdout != "" {
-		return fmt.Errorf(stdout)
 	}
 
 	var rules []model.Forward

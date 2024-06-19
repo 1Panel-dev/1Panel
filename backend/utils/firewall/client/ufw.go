@@ -289,6 +289,21 @@ func (f *Ufw) EnableForward() error {
 	if err != nil {
 		return err
 	}
+	_ = iptables.NatNewChain()
 
+	rules, err := iptables.NatList("PREROUTING")
+	if err != nil {
+		return err
+	}
+	for _, rule := range rules {
+		if rule.Target == NatChain {
+			goto reload
+		}
+	}
+
+	if err = iptables.NatAppendChain(); err != nil {
+		return err
+	}
+reload:
 	return iptables.Reload()
 }
