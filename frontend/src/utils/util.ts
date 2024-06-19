@@ -505,13 +505,6 @@ export async function copyText(content: string) {
     }
 }
 
-export function getRuleType(ruleType: string) {
-    if (ruleType == '') {
-        return '';
-    }
-    return i18n.global.t(`xpack.waf.${ruleType}`);
-}
-
 export function getAction(action: string) {
     if (action == '') {
         return '';

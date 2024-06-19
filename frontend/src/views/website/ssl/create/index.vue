@@ -39,16 +39,8 @@
                                 :label="acme.email + ' [' + getAccountName(acme.type) + '] '"
                                 :value="acme.id"
                             >
-                                <el-row>
-                                    <el-col :span="11">
-                                        <span>{{ acme.email }}</span>
-                                    </el-col>
-                                    <el-col :span="11">
-                                        <span>
-                                            <el-tag type="success">{{ getAccountName(acme.type) }}</el-tag>
-                                        </span>
-                                    </el-col>
-                                </el-row>
+                                <span>{{ acme.email }}</span>
+                                <el-tag type="success" class="ml-2">{{ getAccountName(acme.type) }}</el-tag>
                             </el-option>
                         </el-select>
                     </el-form-item>
