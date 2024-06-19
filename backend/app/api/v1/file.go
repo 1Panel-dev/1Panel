@@ -593,6 +593,10 @@ func (b *BaseApi) Size(c *gin.Context) {
 }
 
 func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int, overwrite bool) error {
+	defer func() {
+		_ = os.RemoveAll(fileDir)
+	}()
+
 	op := files.NewFileOp()
 	dstDir = strings.TrimSpace(dstDir)
 	mode, _ := files.GetParentMode(dstDir)
@@ -629,9 +633,10 @@ func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int,
 		if err != nil {
 			return err
 		}
+		_ = os.Remove(chunkPath)
 	}
 
-	return files.NewFileOp().DeleteDir(fileDir)
+	return nil
 }
 
 // @Tags File
