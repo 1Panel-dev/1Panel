@@ -240,7 +240,7 @@ const buttons = [
             onEdit(row);
         },
         show: function (row: Website.SSLDTO) {
-            return row.provider != 'manual' && row.provider != 'selfSigned';
+            return row.provider != 'manual';
         },
     },
     {

@@ -192,6 +192,8 @@ export namespace Website {
         nameserver2: string;
         disableCNAME: boolean;
         skipDNS: boolean;
+        execShell: boolean;
+        shell: string;
     }
 
     export interface SSLDTO extends SSL {

@@ -2009,6 +2009,10 @@ const message = {
         nameserver: 'DNS 伺服器',
         nameserverHelper: '使用自訂的 DNS 伺服器來校驗網域名稱',
         edit: '編輯證書',
+        execShell: '申請憑證之後執行腳本',
+        shell: '腳本內容',
+        shellHelper:
+            '腳本預設執行目錄為 1Panel 安裝目錄，如果有推送證書，那麼執行目錄為證書推送目錄。預設超時時間 30 分鐘',
     },
     firewall: {
         create: '創建規則',

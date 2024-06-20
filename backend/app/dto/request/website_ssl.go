@@ -24,6 +24,8 @@ type WebsiteSSLCreate struct {
 	SkipDNS       bool   `json:"skipDNS"`
 	Nameserver1   string `json:"nameserver1"`
 	Nameserver2   string `json:"nameserver2"`
+	ExecShell     bool   `json:"execShell"`
+	Shell         string `json:"shell"`
 }
 
 type WebsiteDNSReq struct {
@@ -87,6 +89,8 @@ type WebsiteSSLUpdate struct {
 	SkipDNS       bool   `json:"skipDNS"`
 	Nameserver1   string `json:"nameserver1"`
 	Nameserver2   string `json:"nameserver2"`
+	ExecShell     bool   `json:"execShell"`
+	Shell         string `json:"shell"`
 }
 
 type WebsiteSSLUpload struct {
@@ -126,6 +130,8 @@ type WebsiteCAObtain struct {
 	Renew       bool   `json:"renew"`
 	SSLID       uint   `json:"sslID"`
 	Description string `json:"description"`
+	ExecShell   bool   `json:"execShell"`
+	Shell       string `json:"shell"`
 }
 
 type WebsiteCARenew struct {

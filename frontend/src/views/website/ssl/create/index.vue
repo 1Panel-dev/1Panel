@@ -31,7 +31,11 @@
                     <el-form-item :label="$t('website.remark')" prop="description">
                         <el-input v-model="ssl.description"></el-input>
                     </el-form-item>
-                    <el-form-item :label="$t('website.acmeAccount')" prop="acmeAccountId">
+                    <el-form-item
+                        :label="$t('website.acmeAccount')"
+                        prop="acmeAccountId"
+                        v-if="ssl.provider != 'selfSigned'"
+                    >
                         <el-select v-model="ssl.acmeAccountId">
                             <el-option
                                 v-for="(acme, index) in acmeAccounts"
@@ -54,7 +58,7 @@
                             ></el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item :label="$t('website.provider')" prop="provider">
+                    <el-form-item :label="$t('website.provider')" prop="provider" v-if="ssl.provider != 'selfSigned'">
                         <el-radio-group v-model="ssl.provider" @change="changeProvider()">
                             <el-radio value="dnsAccount">{{ $t('website.dnsAccount') }}</el-radio>
                             <el-radio value="dnsManual">{{ $t('website.dnsManual') }}</el-radio>
@@ -111,30 +115,41 @@
                             {{ $t('ssl.pushDirHelper') }}
                         </span>
                     </el-form-item>
-                    <el-form-item :label="''" prop="disableCNAME">
-                        <el-checkbox v-model="ssl.disableCNAME" :label="$t('ssl.disableCNAME')" />
+                    <el-form-item :label="''" prop="execShell">
+                        <el-checkbox v-model="ssl.execShell" :label="$t('ssl.execShell')" />
+                    </el-form-item>
+                    <el-form-item :label="$t('ssl.shell')" prop="shell" v-if="ssl.execShell">
+                        <el-input type="textarea" :rows="4" v-model="ssl.shell" />
                         <span class="input-help">
-                            {{ $t('ssl.disableCNAMEHelper') }}
+                            {{ $t('ssl.shellHelper') }}
                         </span>
                     </el-form-item>
-                    <el-form-item :label="''" prop="skipDNS">
-                        <el-checkbox v-model="ssl.skipDNS" :label="$t('ssl.skipDNSCheck')" />
-                        <span class="input-help">
-                            {{ $t('ssl.skipDNSCheckHelper') }}
-                        </span>
-                    </el-form-item>
-                    <el-form-item :label="$t('ssl.nameserver') + '1'" prop="nameserver1">
-                        <el-input v-model.trim="ssl.nameserver1"></el-input>
-                        <span class="input-help">
-                            {{ $t('ssl.nameserverHelper') }}
-                        </span>
-                    </el-form-item>
-                    <el-form-item :label="$t('ssl.nameserver') + '2'" prop="nameserver1">
-                        <el-input v-model.trim="ssl.nameserver2"></el-input>
-                        <span class="input-help">
-                            {{ $t('ssl.nameserverHelper') }}
-                        </span>
-                    </el-form-item>
+                    <div v-if="ssl.provider != 'selfSigned'">
+                        <el-form-item :label="''" prop="disableCNAME">
+                            <el-checkbox v-model="ssl.disableCNAME" :label="$t('ssl.disableCNAME')" />
+                            <span class="input-help">
+                                {{ $t('ssl.disableCNAMEHelper') }}
+                            </span>
+                        </el-form-item>
+                        <el-form-item :label="''" prop="skipDNS">
+                            <el-checkbox v-model="ssl.skipDNS" :label="$t('ssl.skipDNSCheck')" />
+                            <span class="input-help">
+                                {{ $t('ssl.skipDNSCheckHelper') }}
+                            </span>
+                        </el-form-item>
+                        <el-form-item :label="$t('ssl.nameserver') + '1'" prop="nameserver1">
+                            <el-input v-model.trim="ssl.nameserver1"></el-input>
+                            <span class="input-help">
+                                {{ $t('ssl.nameserverHelper') }}
+                            </span>
+                        </el-form-item>
+                        <el-form-item :label="$t('ssl.nameserver') + '2'" prop="nameserver1">
+                            <el-input v-model.trim="ssl.nameserver2"></el-input>
+                            <span class="input-help">
+                                {{ $t('ssl.nameserverHelper') }}
+                            </span>
+                        </el-form-item>
+                    </div>
                 </el-form>
             </el-col>
         </el-row>
@@ -196,6 +211,7 @@ const rules = ref({
     dir: [Rules.requiredInput],
     nameserver1: [Rules.ipv4],
     nameserver2: [Rules.ipv4],
+    shell: [Rules.requiredInput],
 });
 const websiteID = ref();
 
@@ -216,6 +232,8 @@ const initData = () => ({
     skipDNS: false,
     nameserver1: '',
     nameserver2: '',
+    execShell: false,
+    shell: '',
 });
 
 const ssl = ref(initData());
@@ -257,6 +275,8 @@ const acceptParams = (op: string, websiteSSL: Website.SSLDTO) => {
         ssl.value.nameserver1 = websiteSSL.nameserver1;
         ssl.value.nameserver2 = websiteSSL.nameserver2;
         ssl.value.keyType = websiteSSL.keyType;
+        ssl.value.execShell = websiteSSL.execShell;
+        ssl.value.shell = websiteSSL.shell;
     }
     ssl.value.websiteId = Number(id.value);
     getAcmeAccounts();
@@ -348,6 +368,8 @@ const submit = async (formEl: FormInstance | undefined) => {
                 skipDNS: ssl.value.skipDNS,
                 nameserver1: ssl.value.nameserver1,
                 nameserver2: ssl.value.nameserver2,
+                execShell: ssl.value.execShell,
+                shell: ssl.value.shell,
             };
             UpdateSSL(sslUpdate)
                 .then(() => {
