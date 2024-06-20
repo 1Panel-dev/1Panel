@@ -16,6 +16,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/i18n"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/1Panel-dev/1Panel/backend/utils/ssl"
@@ -200,6 +201,10 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 			CaID:        ca.ID,
 			AutoRenew:   req.AutoRenew,
 			Description: req.Description,
+			ExecShell:   req.ExecShell,
+		}
+		if req.ExecShell {
+			websiteSSL.Shell = req.Shell
 		}
 		if req.PushDir {
 			if !files.NewFileOp().Stat(req.Dir) {
@@ -363,6 +368,18 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 	logger := log.New(logFile, "", log.LstdFlags)
 	logger.Println(i18n.GetMsgWithMap("ApplySSLSuccess", map[string]interface{}{"domain": strings.Join(domains, ",")}))
 	saveCertificateFile(websiteSSL, logger)
+	if websiteSSL.ExecShell {
+		workDir := constant.DataDir
+		if websiteSSL.PushDir {
+			workDir = websiteSSL.Dir
+		}
+		logger.Println(i18n.GetMsgByKey("ExecShellStart"))
+		if err = cmd.ExecShellWithTimeOut(websiteSSL.Shell, workDir, logger, 30*time.Minute); err != nil {
+			logger.Println(i18n.GetMsgWithMap("ErrExecShell", map[string]interface{}{"err": err.Error()}))
+		} else {
+			logger.Println(i18n.GetMsgByKey("ExecShellSuccess"))
+		}
+	}
 	return websiteSSL, nil
 }
 

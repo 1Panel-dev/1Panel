@@ -246,7 +246,7 @@ const initCodemirror = () => {
                 }
             });
             let hljsDom = scrollerElement.value.querySelector('.hljs') as HTMLElement;
-            hljsDom.style['min-height'] = '300px';
+            hljsDom.style['min-height'] = '500px';
         }
     });
 };
@@ -266,7 +266,7 @@ defineExpose({ changeTail, onDownload, clearLog });
 .editor-main {
     height: calc(100vh - 480px);
     width: 100%;
-    min-height: 400px;
+    min-height: 600px;
     overflow: auto;
 }
 </style>

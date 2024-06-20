@@ -90,6 +90,7 @@ func Init() {
 		migrations.AddProxy,
 		migrations.AddCronJobColumn,
 		migrations.AddForward,
+		migrations.AddShellColumn,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

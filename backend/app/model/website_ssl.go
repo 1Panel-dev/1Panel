@@ -33,6 +33,8 @@ type WebsiteSSL struct {
 	Nameserver1   string    `json:"nameserver1"`
 	Nameserver2   string    `json:"nameserver2"`
 	DisableCNAME  bool      `json:"disableCNAME"`
+	ExecShell     bool      `json:"execShell"`
+	Shell         string    `json:"shell"`
 
 	AcmeAccount WebsiteAcmeAccount `json:"acmeAccount" gorm:"-:migration"`
 	DnsAccount  WebsiteDnsAccount  `json:"dnsAccount" gorm:"-:migration"`

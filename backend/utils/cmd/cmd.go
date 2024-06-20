@@ -2,7 +2,10 @@ package cmd
 
 import (
 	"bytes"
+	"context"
+	"errors"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -202,4 +205,22 @@ func SudoHandleCmd() string {
 func Which(name string) bool {
 	_, err := exec.LookPath(name)
 	return err == nil
+}
+
+func ExecShellWithTimeOut(cmdStr, workdir string, logger *log.Logger, timeout time.Duration) error {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, "bash", "-c", cmdStr)
+	cmd.Dir = workdir
+	cmd.Stdout = logger.Writer()
+	cmd.Stderr = logger.Writer()
+	if err := cmd.Start(); err != nil {
+		return err
+	}
+	err := cmd.Wait()
+	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+		return buserr.New(constant.ErrCmdTimeout)
+	}
+	return err
 }

@@ -56,6 +56,15 @@
                             {{ $t('ssl.pushDirHelper') }}
                         </span>
                     </el-form-item>
+                    <el-form-item :label="''" prop="execShell">
+                        <el-checkbox v-model="obtain.execShell" :label="$t('ssl.execShell')" />
+                    </el-form-item>
+                    <el-form-item :label="$t('ssl.shell')" prop="shell" v-if="obtain.execShell">
+                        <el-input type="textarea" :rows="4" v-model="obtain.shell" />
+                        <span class="input-help">
+                            {{ $t('ssl.shellHelper') }}
+                        </span>
+                    </el-form-item>
                 </el-form>
             </el-col>
         </el-row>
@@ -89,6 +98,7 @@ const rules = ref({
     domains: [Rules.requiredInput],
     dir: [Rules.requiredInput],
     time: [Rules.integerNumber, checkNumberRange(1, 10000)],
+    shell: [Rules.requiredInput],
 });
 
 const initData = () => ({
@@ -101,6 +111,8 @@ const initData = () => ({
     dir: '',
     autoRenew: true,
     description: '',
+    execShell: false,
+    shell: '',
 });
 const obtain = ref(initData());
 

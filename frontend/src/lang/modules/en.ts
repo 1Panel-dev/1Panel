@@ -2156,6 +2156,10 @@ const message = {
         nameserver: 'DNS server',
         nameserverHelper: 'Use a custom DNS server to verify domain names',
         edit: 'Edit certificate',
+        execShell: 'Execute the script after applying for the certificate',
+        shell: 'Script content',
+        shellHelper:
+            'The default execution directory of the script is the 1Panel installation directory. If a certificate is pushed, the execution directory is the certificate push directory. The default timeout is 30 minutes',
     },
     firewall: {
         create: 'Create rule',

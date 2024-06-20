@@ -2011,6 +2011,10 @@ const message = {
         nameserver: 'DNS 服务器',
         nameserverHelper: '使用自定义的 DNS 服务器来校验域名',
         edit: '编辑证书',
+        execShell: '申请证书之后执行脚本',
+        shell: '脚本内容',
+        shellHelper:
+            '脚本默认执行目录为 1Panel 安装目录，如果有推送证书，那么执行目录为证书推送目录。默认超时时间 30 分钟',
     },
     firewall: {
         create: '创建规则',
