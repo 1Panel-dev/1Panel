@@ -14,6 +14,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/docker/docker/api/types"
 
@@ -610,17 +611,13 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 				upErr = err
 				return
 			}
-			dockerCli, err := composeV2.NewClient()
-			if err != nil {
-				upErr = err
-				return
-			}
-			defer dockerCli.Close()
 			for _, image := range images {
 				global.LOG.Infof(i18n.GetMsgWithName("PullImageStart", image, nil))
-				if err = dockerCli.PullImage(image, true); err != nil {
+				if out, err := cmd.ExecWithTimeOut("docker pull "+image, 20*time.Minute); err != nil {
+					if out != "" {
+						err = errors.New(out)
+					}
 					upErr = buserr.WithNameAndErr("ErrDockerPullImage", "", err)
-					return
 				} else {
 					global.LOG.Infof(i18n.GetMsgByKey("PullImageSuccess"))
 				}
