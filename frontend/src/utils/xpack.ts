@@ -1,8 +1,10 @@
 import { getLicenseStatus, getSettingInfo } from '@/api/modules/setting';
 import { useTheme } from '@/hooks/use-theme';
 import { GlobalStore } from '@/store';
+import { computed } from 'vue';
 const globalStore = GlobalStore();
 const { switchTheme } = useTheme();
+const themeConfig = computed(() => globalStore.themeConfig);
 
 export function resetXSetting() {
     globalStore.themeConfig.title = '';
@@ -43,14 +45,6 @@ export async function getXpackSetting() {
     }
 }
 
-const loadDataFromDB = async () => {
-    const res = await getSettingInfo();
-    document.title = res.data.panelName;
-    globalStore.entrance = res.data.securityEntrance;
-    globalStore.setDefaultNetwork(res.data.defaultNetwork);
-    globalStore.setOpenMenuTabs(res.data.menuTabs === 'enable');
-};
-
 export async function loadProductProFromDB() {
     const res = await getLicenseStatus();
     if (!res.data) {
@@ -64,9 +58,16 @@ export async function loadProductProFromDB() {
             globalStore.productProExpires = Number(res.data.productPro);
         }
     }
+
+    const res2 = await getSettingInfo();
+    document.title = res2.data.panelName;
+    globalStore.entrance = res2.data.securityEntrance;
+    globalStore.setDefaultNetwork(res2.data.defaultNetwork);
+    globalStore.setOpenMenuTabs(res2.data.menuTabs === 'enable');
+    globalStore.updateLanguage(res2.data.language);
+    globalStore.setThemeConfig({ ...themeConfig.value, theme: res2.data.theme, panelName: res2.data.panelName });
     switchTheme();
     initFavicon();
-    loadDataFromDB();
 }
 
 export async function getXpackSettingForTheme() {
