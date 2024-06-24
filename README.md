@@ -5,14 +5,15 @@
   <a href="https://www.gnu.org/licenses/gpl-3.0.html"><img src="https://shields.io/github/license/1Panel-dev/1Panel?color=%231890FF" alt="License: GPL v3"></a>
   <a href="https://app.codacy.com/gh/1Panel-dev/1Panel?utm_source=github.com&utm_medium=referral&utm_content=1Panel-dev/1Panel&utm_campaign=Badge_Grade_Dashboard"><img src="https://app.codacy.com/project/badge/Grade/da67574fd82b473992781d1386b937ef" alt="Codacy"></a>
   <a href="https://github.com/1Panel-dev/1Panel/releases"><img src="https://img.shields.io/github/v/release/1Panel-dev/1Panel" alt="GitHub release"></a>
-  <a href="https://github.com/1Panel-dev/1Panel"><img src="https://img.shields.io/github/stars/1Panel-dev/1Panel?color=%231890FF&style=flat-square" alt="Stars"></a>
-  <a href="https://app.fossa.com/projects/git%2Bgithub.com%2F1Panel-dev%2F1Panel?ref=badge_shield"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2F1Panel-dev%2F1Panel.svg?type=shield" alt="FOSSA Status"></a><br>
+  <a href="https://github.com/1Panel-dev/1Panel"><img src="https://img.shields.io/github/stars/1Panel-dev/1Panel?color=%231890FF&style=flat-square" alt="GitHub Stars"></a>
+   <a href="https://gitee.com/fit2cloud-feizhiyun/1Panel"><img src="https://gitee.com/fit2cloud-feizhiyun/1Panel/badge/star.svg?theme=gvp" alt="Gitee Stars"></a><br>
   [<a href="docs/README_TW.md">中文(繁體)</a>] | [<a href="docs/README_EN.md">English</a>] | [<a href="docs/README_JP.md">日本語</a>]
 </p>
 
 [![Watch the video](https://resource.fit2cloud.com/1panel/img/overview_video.png)](https://www.bilibili.com/video/BV1Mt421n7LZ/)
 
 ------------------------------
+## 什么是 1Panel？
 
 1Panel 是新一代的 Linux 服务器运维管理面板。
 
@@ -40,7 +41,7 @@ curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_
 - [社区论坛](https://bbs.fit2cloud.com/c/1p/7)
 - [如何加入微信交流群?](https://bbs.fit2cloud.com/t/topic/2147)
 
-## 我们的其他明星项目
+## 飞致云的其他明星项目
 
 - [MaxKB](https://github.com/1Panel-dev/MaxKB/) - 基于 LLM 大语言模型的开源知识库问答系统
 - [JumpServer](https://github.com/jumpserver/jumpserver/) - 广受欢迎的开源堡垒机
