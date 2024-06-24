@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"path"
 	"strings"
 	"time"
 
@@ -92,6 +91,7 @@ func (u *ImageRepoService) Create(req dto.ImageRepoCreate) error {
 			return errors.New(string(stdout))
 		}
 		ticker := time.NewTicker(3 * time.Second)
+		defer ticker.Stop()
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
 		if err := func() error {
 			for range ticker.C {
@@ -195,13 +195,10 @@ func (u *ImageRepoService) CheckConn(host, user, password string) error {
 }
 
 func (u *ImageRepoService) handleRegistries(newHost, delHost, handle string) error {
-	if _, err := os.Stat(constant.DaemonJsonPath); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(path.Dir(constant.DaemonJsonPath), os.ModePerm); err != nil {
-			return err
-		}
-		_, _ = os.Create(constant.DaemonJsonPath)
+	err := createIfNotExistDaemonJsonFile()
+	if err != nil {
+		return err
 	}
-
 	daemonMap := make(map[string]interface{})
 	file, err := os.ReadFile(constant.DaemonJsonPath)
 	if err != nil {

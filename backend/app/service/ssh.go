@@ -218,7 +218,7 @@ func (u *SSHService) GenerateSSH(req dto.GenerateSSH) error {
 	}
 	secretFile := fmt.Sprintf("%s/.ssh/id_item_%s", currentUser.HomeDir, req.EncryptionMode)
 	secretPubFile := fmt.Sprintf("%s/.ssh/id_item_%s.pub", currentUser.HomeDir, req.EncryptionMode)
-	authFile := currentUser.HomeDir + "/.ssh/authorized_keys"
+	authFilePath := currentUser.HomeDir + "/.ssh/authorized_keys"
 
 	command := fmt.Sprintf("ssh-keygen -t %s -f %s/.ssh/id_item_%s | echo y", req.EncryptionMode, currentUser.HomeDir, req.EncryptionMode)
 	if len(req.Password) != 0 {
@@ -235,8 +235,12 @@ func (u *SSHService) GenerateSSH(req dto.GenerateSSH) error {
 		_ = os.Remove(secretPubFile)
 	}()
 
-	if _, err := os.Stat(authFile); err != nil {
-		_, _ = os.Create(authFile)
+	if _, err := os.Stat(authFilePath); err != nil && errors.Is(err, os.ErrNotExist) {
+		authFile, err := os.Create(authFilePath)
+		if err != nil {
+			return err
+		}
+		defer authFile.Close()
 	}
 	stdout1, err := cmd.Execf("cat %s >> %s/.ssh/authorized_keys", secretPubFile, currentUser.HomeDir)
 	if err != nil {
