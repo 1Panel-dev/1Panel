@@ -17,13 +17,14 @@
                         <el-input :placeholder="$t('container.imageNameHelper')" v-model.trim="form.name" clearable />
                     </el-form-item>
                     <el-form-item label="Dockerfile" prop="from">
-                        <el-radio-group v-model="form.from">
+                        <el-radio-group @change="onEdit()" v-model="form.from">
                             <el-radio value="edit">{{ $t('commons.button.edit') }}</el-radio>
                             <el-radio value="path">{{ $t('container.pathSelect') }}</el-radio>
                         </el-radio-group>
                     </el-form-item>
                     <el-form-item v-if="form.from === 'edit'" :rules="Rules.requiredInput">
                         <codemirror
+                            @change="onEdit()"
                             :autofocus="true"
                             placeholder="#Define or paste the content of your Dockerfile here"
                             :indent-with-tab="true"
@@ -39,7 +40,7 @@
                         />
                     </el-form-item>
                     <el-form-item v-else :rules="Rules.requiredSelect" prop="dockerfile">
-                        <el-input clearable v-model="form.dockerfile">
+                        <el-input @change="onEdit()" clearable v-model="form.dockerfile">
                             <template #prepend>
                                 <FileList @choose="loadBuildDir"></FileList>
                             </template>
@@ -47,6 +48,7 @@
                     </el-form-item>
                     <el-form-item :label="$t('container.tag')">
                         <el-input
+                            @change="onEdit()"
                             :placeholder="$t('container.tagHelper')"
                             type="textarea"
                             :rows="3"
@@ -59,6 +61,7 @@
                     ref="logRef"
                     :config="logConfig"
                     :default-button="false"
+                    v-model:is-reading="isReading"
                     v-if="logVisible"
                     :style="'height: calc(100vh - 370px);min-height: 200px'"
                 />
@@ -68,7 +71,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button :disabled="buttonDisabled" type="primary" @click="onSubmit(formRef)">
+                <el-button :disabled="isStartReading || isReading" type="primary" @click="onSubmit(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -90,9 +93,10 @@ import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const logVisible = ref<boolean>(false);
 const extensions = [javascript(), oneDark];
-const buttonDisabled = ref(false);
 const drawerVisible = ref(false);
 const logRef = ref();
+const isStartReading = ref(false);
+const isReading = ref(false);
 
 const logConfig = reactive({
     type: 'image-build',
@@ -118,7 +122,7 @@ const acceptParams = async () => {
     form.dockerfile = '';
     form.tagStr = '';
     form.name = '';
-    buttonDisabled.value = false;
+    isStartReading.value = false;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -130,6 +134,11 @@ const handleClose = () => {
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 
+const onEdit = () => {
+    if (!isReading.value && isStartReading.value) {
+        isStartReading.value = false;
+    }
+};
 const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
@@ -138,7 +147,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             form.tags = form.tagStr.split('\n');
         }
         const res = await imageBuild(form);
-        buttonDisabled.value = true;
+        isStartReading.value = true;
         logConfig.name = res.data;
         loadLogs();
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
