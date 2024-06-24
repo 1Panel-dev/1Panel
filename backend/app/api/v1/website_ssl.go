@@ -236,6 +236,7 @@ func (b *BaseApi) DownloadWebsiteSSL(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
+	defer file.Close()
 	info, err := file.Stat()
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)

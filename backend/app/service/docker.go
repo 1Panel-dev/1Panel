@@ -129,13 +129,10 @@ func (u *DockerService) LoadDockerConf() *dto.DaemonJsonConf {
 }
 
 func (u *DockerService) UpdateConf(req dto.SettingUpdate) error {
-	if _, err := os.Stat(constant.DaemonJsonPath); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(path.Dir(constant.DaemonJsonPath), os.ModePerm); err != nil {
-			return err
-		}
-		_, _ = os.Create(constant.DaemonJsonPath)
+	err := createIfNotExistDaemonJsonFile()
+	if err != nil {
+		return err
 	}
-
 	file, err := os.ReadFile(constant.DaemonJsonPath)
 	if err != nil {
 		return err
@@ -217,15 +214,26 @@ func (u *DockerService) UpdateConf(req dto.SettingUpdate) error {
 	}
 	return nil
 }
-
-func (u *DockerService) UpdateLogOption(req dto.LogOption) error {
+func createIfNotExistDaemonJsonFile() error {
 	if _, err := os.Stat(constant.DaemonJsonPath); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(path.Dir(constant.DaemonJsonPath), os.ModePerm); err != nil {
 			return err
 		}
-		_, _ = os.Create(constant.DaemonJsonPath)
+		var daemonFile *os.File
+		daemonFile, err = os.Create(constant.DaemonJsonPath)
+		if err != nil {
+			return err
+		}
+		defer daemonFile.Close()
 	}
+	return nil
+}
 
+func (u *DockerService) UpdateLogOption(req dto.LogOption) error {
+	err := createIfNotExistDaemonJsonFile()
+	if err != nil {
+		return err
+	}
 	file, err := os.ReadFile(constant.DaemonJsonPath)
 	if err != nil {
 		return err
@@ -254,11 +262,9 @@ func (u *DockerService) UpdateLogOption(req dto.LogOption) error {
 }
 
 func (u *DockerService) UpdateIpv6Option(req dto.Ipv6Option) error {
-	if _, err := os.Stat(constant.DaemonJsonPath); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(path.Dir(constant.DaemonJsonPath), os.ModePerm); err != nil {
-			return err
-		}
-		_, _ = os.Create(constant.DaemonJsonPath)
+	err := createIfNotExistDaemonJsonFile()
+	if err != nil {
+		return err
 	}
 
 	file, err := os.ReadFile(constant.DaemonJsonPath)
@@ -300,11 +306,9 @@ func (u *DockerService) UpdateConfByFile(req dto.DaemonJsonUpdateByFile) error {
 		_ = os.Remove(constant.DaemonJsonPath)
 		return nil
 	}
-	if _, err := os.Stat(constant.DaemonJsonPath); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(path.Dir(constant.DaemonJsonPath), os.ModePerm); err != nil {
-			return err
-		}
-		_, _ = os.Create(constant.DaemonJsonPath)
+	err := createIfNotExistDaemonJsonFile()
+	if err != nil {
+		return err
 	}
 	file, err := os.OpenFile(constant.DaemonJsonPath, os.O_WRONLY|os.O_TRUNC, 0640)
 	if err != nil {

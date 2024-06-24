@@ -21,9 +21,11 @@ func Init() {
 	}
 	fullPath := global.CONF.System.DbPath + "/" + global.CONF.System.DbFile
 	if _, err := os.Stat(fullPath); err != nil {
-		if _, err := os.Create(fullPath); err != nil {
+		f, err := os.Create(fullPath)
+		if err != nil {
 			panic(fmt.Errorf("init db file failed, err: %v", err))
 		}
+		_ = f.Close()
 	}
 
 	newLogger := logger.New(
@@ -65,9 +67,11 @@ func initMonitorDB(newLogger logger.Interface) {
 	}
 	fullPath := path.Join(global.CONF.System.DbPath, "monitor.db")
 	if _, err := os.Stat(fullPath); err != nil {
-		if _, err := os.Create(fullPath); err != nil {
+		f, err := os.Create(fullPath)
+		if err != nil {
 			panic(fmt.Errorf("init db file failed, err: %v", err))
 		}
+		_ = f.Close()
 	}
 
 	db, err := gorm.Open(sqlite.Open(fullPath), &gorm.Config{

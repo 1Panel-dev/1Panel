@@ -27,6 +27,7 @@ func NewParser(filePath string) (*Parser, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer f.Close()
 	l := newLexer(bufio.NewReader(f))
 	l.file = filePath
 	p := NewParserFromLexer(l)

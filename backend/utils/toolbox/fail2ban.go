@@ -131,9 +131,11 @@ func (f *Fail2ban) ListIgnore() ([]string, error) {
 }
 
 func initLocalFile() error {
-	if _, err := os.Create(defaultPath); err != nil {
+	f, err := os.Create(defaultPath)
+	if err != nil {
 		return err
 	}
+	defer f.Close()
 	initFile := `#DEFAULT-START
 [DEFAULT]
 bantime = 600
