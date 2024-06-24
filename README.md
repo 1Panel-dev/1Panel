@@ -1,5 +1,6 @@
 <p align="center"><a href="https://1panel.cn"><img src="http://1panel.oss-cn-hangzhou.aliyuncs.com/img/1panel-logo.png" alt="1Panel" width="300" /></a></p>
 <p align="center"><b>现代化、开源的 Linux 服务器运维管理面板</b></p>
+<p align="center"><a href="https://hellogithub.com/repository/71791baf930149ac9b84e1acf186573f" target="_blank"><img src="https://api.hellogithub.com/v1/widgets/recommend.svg?rid=71791baf930149ac9b84e1acf186573f&claim_uid=p8vB3kP5CMrthiL&theme=dark&theme=neutral" alt="Featured｜HelloGitHub" style="width: 250px; height: 54px;" width="250" height="54" /></a></p>
 <p align="center">
   <a href="https://www.gnu.org/licenses/gpl-3.0.html"><img src="https://shields.io/github/license/1Panel-dev/1Panel?color=%231890FF" alt="License: GPL v3"></a>
   <a href="https://app.codacy.com/gh/1Panel-dev/1Panel?utm_source=github.com&utm_medium=referral&utm_content=1Panel-dev/1Panel&utm_campaign=Badge_Grade_Dashboard"><img src="https://app.codacy.com/project/badge/Grade/da67574fd82b473992781d1386b937ef" alt="Codacy"></a>
@@ -38,10 +39,6 @@ curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_
 - [在线文档](https://1panel.cn/docs/)
 - [社区论坛](https://bbs.fit2cloud.com/c/1p/7)
 - [如何加入微信交流群?](https://bbs.fit2cloud.com/t/topic/2147)
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=1Panel-dev/1Panel&type=Date)](https://star-history.com/#1Panel-dev/1Panel&Date)
 
 ## 我们的其他明星项目
 
