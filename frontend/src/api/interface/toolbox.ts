@@ -118,7 +118,7 @@ export namespace Toolbox {
     }
 
     export interface ClamBaseInfo {
-        version:  string;
+        version: string;
         isActive: boolean;
         isExist: boolean;
     }
