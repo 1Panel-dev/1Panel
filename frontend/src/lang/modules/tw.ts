@@ -224,6 +224,7 @@ const message = {
         status: {
             running: '已啟動',
             done: '已完成',
+            scanFailed: '未完成',
             success: '成功',
             waiting: '執行中',
             waiting1: '等待中',
@@ -999,6 +1000,19 @@ const message = {
             enableHelper: '啟用選取的 FTP 帳號後，該 FTP 帳號將恢復訪問權限，是否繼續操作？',
             disableHelper: '停用選取的 FTP 帳號後，該 FTP 帳號將失去訪問權限，是否繼續操作？',
             syncHelper: '同步伺服器與資料庫中的 FTP 帳戶資料，是否繼續操作？',
+        },
+        clam: {
+            clam: '病毒掃描',
+            clamCreate: '創建掃描規則',
+            scanDate: '掃描時間',
+            scanTime: '耗時',
+            scannedFiles: '掃描文件數',
+            infectedFiles: '危險文件數',
+            log: '詳情',
+            clamConf: '掃描配置',
+            clamLog: '掃描日誌',
+            freshClam: '病毒庫刷新配置',
+            freshClamLog: '病毒庫刷新日誌',
         },
     },
     logs: {

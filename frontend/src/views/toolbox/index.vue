@@ -62,6 +62,10 @@ const buttons = [
         path: '/toolbox/supervisor',
     },
     {
+        label: i18n.global.t('toolbox.clam.clam'),
+        path: '/toolbox/clam',
+    },
+    {
         label: 'FTP',
         path: '/toolbox/ftp',
     },

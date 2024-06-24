@@ -19,7 +19,6 @@ const props = defineProps({
     code: String,
 });
 const loadErrInfo = () => {
-    console.log(props.code);
     switch (props.code) {
         case '400':
             return '400 Bad Request';

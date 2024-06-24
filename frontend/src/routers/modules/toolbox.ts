@@ -38,6 +38,26 @@ const toolboxRouter = {
                     },
                 },
                 {
+                    path: 'clam',
+                    name: 'Clam',
+                    component: () => import('@/views/toolbox/clam/index.vue'),
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/toolbox',
+                        requiresAuth: false,
+                    },
+                },
+                {
+                    path: 'clam/setting',
+                    name: 'Clam-Setting',
+                    component: () => import('@/views/toolbox/clam/setting/index.vue'),
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/toolbox',
+                        requiresAuth: false,
+                    },
+                },
+                {
                     path: 'ftp',
                     name: 'FTP',
                     component: () => import('@/views/toolbox/ftp/index.vue'),

@@ -91,6 +91,7 @@ func Init() {
 		migrations.AddCronJobColumn,
 		migrations.AddForward,
 		migrations.AddShellColumn,
+		migrations.AddClam,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

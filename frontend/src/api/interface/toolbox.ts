@@ -116,4 +116,42 @@ export namespace Toolbox {
         status: string;
         size: string;
     }
+
+    export interface ClamBaseInfo {
+        version:  string;
+        isActive: boolean;
+        isExist: boolean;
+    }
+    export interface ClamInfo {
+        id: number;
+        name: string;
+        path: string;
+        lastHandleDate: string;
+        description: string;
+    }
+    export interface ClamCreate {
+        name: string;
+        path: string;
+        description: string;
+    }
+    export interface ClamUpdate {
+        id: number;
+        name: string;
+        path: string;
+        description: string;
+    }
+    export interface ClamSearchLog extends ReqPage {
+        clamID: number;
+        startTime: Date;
+        endTime: Date;
+    }
+    export interface ClamLog {
+        name: string;
+        scanDate: string;
+        scanTime: string;
+        scannedFiles: string;
+        infectedFiles: string;
+        log: string;
+        status: string;
+    }
 }
