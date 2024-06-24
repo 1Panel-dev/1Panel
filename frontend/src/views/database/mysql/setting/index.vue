@@ -236,7 +236,6 @@ const onSavePort = async (formEl: FormInstance | undefined) => {
         submitInputInfo: i18n.global.t('database.restartNow'),
     };
     confirmPortRef.value!.acceptParams(params);
-    return;
 };
 function callback(error: any) {
     if (error) {

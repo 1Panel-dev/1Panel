@@ -216,6 +216,51 @@ definitions:
     required:
     - database
     type: object
+  dto.ClamBaseInfo:
+    properties:
+      isActive:
+        type: boolean
+      isExist:
+        type: boolean
+      version:
+        type: string
+    type: object
+  dto.ClamCreate:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      path:
+        type: string
+    type: object
+  dto.ClamLogSearch:
+    properties:
+      clamID:
+        type: integer
+      endTime:
+        type: string
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      startTime:
+        type: string
+    required:
+    - page
+    - pageSize
+    type: object
+  dto.ClamUpdate:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      path:
+        type: string
+    type: object
   dto.Clean:
     properties:
       name:
@@ -3720,6 +3765,8 @@ definitions:
     properties:
       ID:
         type: integer
+      latest:
+        type: boolean
       name:
         type: string
       page:
@@ -4564,6 +4611,16 @@ definitions:
         type: integer
     required:
     - websiteId
+    type: object
+  request.WebsiteHtmlUpdate:
+    properties:
+      content:
+        type: string
+      type:
+        type: string
+    required:
+    - content
+    - type
     type: object
   request.WebsiteInstallCheckReq:
     properties:
@@ -12360,6 +12417,285 @@ paths:
         formatEN: upgrade system => [version]
         formatZH: 更新系统 => [version]
         paramKeys: []
+  /toolbox/clam:
+    post:
+      consumes:
+      - application/json
+      description: 创建扫描规则
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ClamCreate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Create clam
+      tags:
+      - Clam
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - name
+        - path
+        formatEN: create clam [name][path]
+        formatZH: 创建扫描规则 [name][path]
+        paramKeys: []
+  /toolbox/clam/base:
+    get:
+      consumes:
+      - application/json
+      description: 获取 Clam 基础信息
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ClamBaseInfo'
+      security:
+      - ApiKeyAuth: []
+      summary: Load clam base info
+      tags:
+      - Clam
+  /toolbox/clam/del:
+    post:
+      consumes:
+      - application/json
+      description: 删除扫描规则
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BatchDeleteReq'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Delete clam
+      tags:
+      - Clam
+      x-panel-log:
+        BeforeFunctions:
+        - db: clams
+          input_column: id
+          input_value: ids
+          isList: true
+          output_column: name
+          output_value: names
+        bodyKeys:
+        - ids
+        formatEN: delete clam [names]
+        formatZH: 删除扫描规则 [names]
+        paramKeys: []
+  /toolbox/clam/file/search:
+    post:
+      consumes:
+      - application/json
+      description: 获取扫描文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OperationWithName'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Load clam file
+      tags:
+      - Clam
+  /toolbox/clam/file/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新病毒扫描配置文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateByNameAndFile'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update clam file
+      tags:
+      - Clam
+  /toolbox/clam/handle:
+    post:
+      consumes:
+      - application/json
+      description: 执行病毒扫描
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OperateByID'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Handle clam scan
+      tags:
+      - Clam
+      x-panel-log:
+        BeforeFunctions:
+        - db: clams
+          input_column: id
+          input_value: id
+          isList: true
+          output_column: name
+          output_value: name
+        bodyKeys:
+        - id
+        formatEN: handle clam scan [name]
+        formatZH: 执行病毒扫描 [name]
+        paramKeys: []
+  /toolbox/clam/operate:
+    post:
+      consumes:
+      - application/json
+      description: 修改 Clam 状态
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Operate'
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Operate Clam
+      tags:
+      - Clam
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - operation
+        formatEN: '[operation] FTP'
+        formatZH: '[operation] Clam'
+        paramKeys: []
+  /toolbox/clam/record/clean:
+    post:
+      consumes:
+      - application/json
+      description: 清空扫描报告
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OperateByID'
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Clean clam record
+      tags:
+      - Clam
+      x-panel-log:
+        BeforeFunctions:
+        - db: clams
+          input_column: id
+          input_value: id
+          isList: true
+          output_column: name
+          output_value: name
+        bodyKeys:
+        - id
+        formatEN: clean clam record [name]
+        formatZH: 清空扫描报告 [name]
+        paramKeys: []
+  /toolbox/clam/record/search:
+    post:
+      consumes:
+      - application/json
+      description: 获取扫描结果列表分页
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ClamLogSearch'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Page clam record
+      tags:
+      - Clam
+  /toolbox/clam/search:
+    post:
+      consumes:
+      - application/json
+      description: 获取扫描规则列表分页
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SearchWithPage'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Page clam
+      tags:
+      - Clam
+  /toolbox/clam/update:
+    post:
+      consumes:
+      - application/json
+      description: 修改扫描规则
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ClamUpdate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update clam
+      tags:
+      - Clam
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - name
+        - path
+        formatEN: update clam [name][path]
+        formatZH: 修改扫描规则 [name][path]
+        paramKeys: []
   /toolbox/clean:
     post:
       consumes:
@@ -13421,6 +13757,48 @@ paths:
         - websiteId
         formatEN: Nginx conf update [domain]
         formatZH: nginx 配置修改 [domain]
+        paramKeys: []
+  /websites/default/html/:type:
+    get:
+      consumes:
+      - application/json
+      description: 获取默认 html
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.FileInfo'
+      security:
+      - ApiKeyAuth: []
+      summary: Get default html
+      tags:
+      - Website
+  /websites/default/html/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新默认 html
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteHtmlUpdate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update default html
+      tags:
+      - Website
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - type
+        formatEN: Update default html
+        formatZH: 更新默认 html
         paramKeys: []
   /websites/default/server:
     post:

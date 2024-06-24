@@ -11065,6 +11065,445 @@ const docTemplate = `{
                 }
             }
         },
+        "/toolbox/clam": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "创建扫描规则",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Clam"
+                ],
+                "summary": "Create clam",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ClamCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "name",
+                        "path"
+                    ],
+                    "formatEN": "create clam [name][path]",
+                    "formatZH": "创建扫描规则 [name][path]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/toolbox/clam/base": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取 Clam 基础信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Clam"
+                ],
+                "summary": "Load clam base info",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ClamBaseInfo"
+                        }
+                    }
+                }
+            }
+        },
+        "/toolbox/clam/del": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "删除扫描规则",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Clam"
+                ],
+                "summary": "Delete clam",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.BatchDeleteReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [
+                        {
+                            "db": "clams",
+                            "input_column": "id",
+                            "input_value": "ids",
+                            "isList": true,
+                            "output_column": "name",
+                            "output_value": "names"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "ids"
+                    ],
+                    "formatEN": "delete clam [names]",
+                    "formatZH": "删除扫描规则 [names]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/toolbox/clam/file/search": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取扫描文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Clam"
+                ],
+                "summary": "Load clam file",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperationWithName"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.PageResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/toolbox/clam/file/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新病毒扫描配置文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Clam"
+                ],
+                "summary": "Update clam file",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateByNameAndFile"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/toolbox/clam/handle": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "执行病毒扫描",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Clam"
+                ],
+                "summary": "Handle clam scan",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperateByID"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [
+                        {
+                            "db": "clams",
+                            "input_column": "id",
+                            "input_value": "id",
+                            "isList": true,
+                            "output_column": "name",
+                            "output_value": "name"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "id"
+                    ],
+                    "formatEN": "handle clam scan [name]",
+                    "formatZH": "执行病毒扫描 [name]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/toolbox/clam/operate": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "修改 Clam 状态",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Clam"
+                ],
+                "summary": "Operate Clam",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.Operate"
+                        }
+                    }
+                ],
+                "responses": {},
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "operation"
+                    ],
+                    "formatEN": "[operation] FTP",
+                    "formatZH": "[operation] Clam",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/toolbox/clam/record/clean": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "清空扫描报告",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Clam"
+                ],
+                "summary": "Clean clam record",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperateByID"
+                        }
+                    }
+                ],
+                "responses": {},
+                "x-panel-log": {
+                    "BeforeFunctions": [
+                        {
+                            "db": "clams",
+                            "input_column": "id",
+                            "input_value": "id",
+                            "isList": true,
+                            "output_column": "name",
+                            "output_value": "name"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "id"
+                    ],
+                    "formatEN": "clean clam record [name]",
+                    "formatZH": "清空扫描报告 [name]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/toolbox/clam/record/search": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取扫描结果列表分页",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Clam"
+                ],
+                "summary": "Page clam record",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ClamLogSearch"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.PageResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/toolbox/clam/search": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取扫描规则列表分页",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Clam"
+                ],
+                "summary": "Page clam",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SearchWithPage"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.PageResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/toolbox/clam/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "修改扫描规则",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Clam"
+                ],
+                "summary": "Update clam",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ClamUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "name",
+                        "path"
+                    ],
+                    "formatEN": "update clam [name][path]",
+                    "formatZH": "修改扫描规则 [name][path]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/toolbox/clean": {
             "post": {
                 "security": [
@@ -12744,6 +13183,73 @@ const docTemplate = `{
                     ],
                     "formatEN": "Nginx conf update [domain]",
                     "formatZH": "nginx 配置修改 [domain]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/websites/default/html/:type": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取默认 html",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Website"
+                ],
+                "summary": "Get default html",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.FileInfo"
+                        }
+                    }
+                }
+            }
+        },
+        "/websites/default/html/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新默认 html",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Website"
+                ],
+                "summary": "Update default html",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.WebsiteHtmlUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "type"
+                    ],
+                    "formatEN": "Update default html",
+                    "formatZH": "更新默认 html",
                     "paramKeys": []
                 }
             }
@@ -14930,6 +15436,75 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ClamBaseInfo": {
+            "type": "object",
+            "properties": {
+                "isActive": {
+                    "type": "boolean"
+                },
+                "isExist": {
+                    "type": "boolean"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ClamCreate": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ClamLogSearch": {
+            "type": "object",
+            "required": [
+                "page",
+                "pageSize"
+            ],
+            "properties": {
+                "clamID": {
+                    "type": "integer"
+                },
+                "endTime": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "startTime": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ClamUpdate": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "path": {
                     "type": "string"
                 }
             }
@@ -20144,6 +20719,9 @@ const docTemplate = `{
                 "ID": {
                     "type": "integer"
                 },
+                "latest": {
+                    "type": "boolean"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -21385,6 +21963,21 @@ const docTemplate = `{
                 },
                 "websiteSSLId": {
                     "type": "integer"
+                }
+            }
+        },
+        "request.WebsiteHtmlUpdate": {
+            "type": "object",
+            "required": [
+                "content",
+                "type"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
                 }
             }
         },

@@ -268,3 +268,13 @@ var AddShellColumn = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddClam = &gormigrate.Migration{
+	ID: "20240624-add-clam",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Clam{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}

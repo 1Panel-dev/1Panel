@@ -229,6 +229,7 @@ const message = {
         status: {
             running: 'Running',
             done: 'Done',
+            scanFailed: 'Incomplete',
             success: 'Success',
             waiting: 'Waiting',
             waiting1: 'Waiting',
@@ -1057,6 +1058,19 @@ const message = {
             disableHelper:
                 'Disabling the selected FTP account will revoke its access permissions. Do you want to continue?',
             syncHelper: 'Sync FTP account data between server and database. Do you want to continue?',
+        },
+        clam: {
+            clam: 'Virus Scan',
+            clamCreate: 'Create Scan Rule',
+            scanDate: 'Scan Date',
+            scanTime: 'Elapsed Time',
+            scannedFiles: 'Number of Scanned Files',
+            infectedFiles: 'Number of Infected Files',
+            log: 'Details',
+            clamConf: 'Scan Configuration',
+            clamLog: 'Scan Log',
+            freshClam: 'Virus Database Refresh Configuration',
+            freshClamLog: 'Virus Database Refresh Log',
         },
     },
     logs: {

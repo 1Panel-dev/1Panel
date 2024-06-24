@@ -45,5 +45,17 @@ func (s *ToolboxRouter) InitRouter(Router *gin.RouterGroup) {
 		toolboxRouter.POST("/ftp/update", baseApi.UpdateFtp)
 		toolboxRouter.POST("/ftp/del", baseApi.DeleteFtp)
 		toolboxRouter.POST("/ftp/sync", baseApi.SyncFtp)
+
+		toolboxRouter.POST("/clam/search", baseApi.SearchClam)
+		toolboxRouter.POST("/clam/record/search", baseApi.SearchClamRecord)
+		toolboxRouter.POST("/clam/record/clean", baseApi.CleanClamRecord)
+		toolboxRouter.POST("/clam/file/search", baseApi.SearchClamFile)
+		toolboxRouter.POST("/clam/file/update", baseApi.UpdateFile)
+		toolboxRouter.POST("/clam", baseApi.CreateClam)
+		toolboxRouter.POST("/clam/base", baseApi.LoadClamBaseInfo)
+		toolboxRouter.POST("/clam/operate", baseApi.OperateClam)
+		toolboxRouter.POST("/clam/update", baseApi.UpdateClam)
+		toolboxRouter.POST("/clam/del", baseApi.DeleteClam)
+		toolboxRouter.POST("/clam/handle", baseApi.HandleClamScan)
 	}
 }
