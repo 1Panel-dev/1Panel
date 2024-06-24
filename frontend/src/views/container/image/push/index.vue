@@ -14,12 +14,12 @@
             <el-col :span="22">
                 <el-form ref="formRef" label-position="top" :model="form" label-width="80px">
                     <el-form-item :label="$t('container.tag')" :rules="Rules.requiredSelect" prop="tagName">
-                        <el-select filterable v-model="form.tagName" @change="form.name = form.tagName">
+                        <el-select @change="onEdit(true)" filterable v-model="form.tagName">
                             <el-option v-for="item in form.tags" :key="item" :value="item" :label="item" />
                         </el-select>
                     </el-form-item>
                     <el-form-item :label="$t('container.repoName')" :rules="Rules.requiredSelect" prop="repoID">
-                        <el-select clearable style="width: 100%" filterable v-model="form.repoID">
+                        <el-select @change="onEdit()" clearable style="width: 100%" filterable v-model="form.repoID">
                             <el-option
                                 v-for="item in dialogData.repos"
                                 :key="item.id"
@@ -29,7 +29,7 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item :label="$t('container.image')" :rules="Rules.imageName" prop="name">
-                        <el-input v-model.trim="form.name">
+                        <el-input @change="onEdit()" v-model.trim="form.name">
                             <template #prepend>{{ loadDetailInfo(form.repoID) }}/</template>
                         </el-input>
                     </el-form-item>
@@ -39,6 +39,7 @@
                     ref="logRef"
                     :config="logConfig"
                     :default-button="false"
+                    v-model:is-reading="isReading"
                     v-if="logVisible"
                     :style="'height: calc(100vh - 370px);min-height: 200px'"
                     v-model:loading="loading"
@@ -51,7 +52,7 @@
                 <el-button @click="drawerVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
+                <el-button :disabled="isStartReading || isReading" type="primary" @click="onSubmit(formRef)">
                     {{ $t('container.push') }}
                 </el-button>
             </span>
@@ -79,6 +80,8 @@ const form = reactive({
 
 const logVisible = ref(false);
 const loading = ref(false);
+const isStartReading = ref(false);
+const isReading = ref(false);
 
 const logRef = ref();
 const logConfig = reactive({
@@ -104,18 +107,28 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     form.tagName = form.tags.length !== 0 ? form.tags[0] : '';
     form.name = form.tags.length !== 0 ? form.tags[0] : '';
     dialogData.value.repos = params.repos;
+    isStartReading.value = false;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 
+const onEdit = (isName?: boolean) => {
+    if (!isReading.value && isStartReading.value) {
+        isStartReading.value = false;
+    }
+    if (isName) {
+        form.name = form.tagName;
+    }
+};
 const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
         const res = await imagePush(form);
         logVisible.value = true;
+        isStartReading.value = true;
         logConfig.name = res.data;
         loadLogs();
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

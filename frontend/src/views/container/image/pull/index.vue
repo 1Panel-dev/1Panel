@@ -14,7 +14,9 @@
             <el-col :span="22">
                 <el-form ref="formRef" label-position="top" :model="form">
                     <el-form-item :label="$t('container.from')">
-                        <el-checkbox v-model="form.fromRepo">{{ $t('container.imageRepo') }}</el-checkbox>
+                        <el-checkbox @change="onEdit()" v-model="form.fromRepo">
+                            {{ $t('container.imageRepo') }}
+                        </el-checkbox>
                     </el-form-item>
                     <el-form-item
                         v-if="form.fromRepo"
@@ -22,12 +24,12 @@
                         :rules="Rules.requiredSelect"
                         prop="repoID"
                     >
-                        <el-select clearable style="width: 100%" filterable v-model="form.repoID">
+                        <el-select @change="onEdit()" clearable style="width: 100%" filterable v-model="form.repoID">
                             <el-option v-for="item in repos" :key="item.id" :value="item.id" :label="item.name" />
                         </el-select>
                     </el-form-item>
                     <el-form-item :label="$t('container.imageName')" :rules="Rules.imageName" prop="imageName">
-                        <el-input v-model.trim="form.imageName">
+                        <el-input @change="onEdit()" v-model.trim="form.imageName">
                             <template v-if="form.fromRepo" #prepend>{{ loadDetailInfo(form.repoID) }}/</template>
                         </el-input>
                     </el-form-item>
@@ -36,6 +38,7 @@
                     ref="logRef"
                     :config="logConfig"
                     :default-button="false"
+                    v-model:is-reading="isReading"
                     v-if="showLog"
                     :style="'height: calc(100vh - 397px);min-height: 200px'"
                 />
@@ -46,7 +49,7 @@
                 <el-button @click="drawerVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button :disabled="buttonDisabled" type="primary" @click="onSubmit(formRef)">
+                <el-button :disabled="isStartReading || isReading" type="primary" @click="onSubmit(formRef)">
                     {{ $t('container.pull') }}
                 </el-button>
             </span>
@@ -63,7 +66,6 @@ import { imagePull } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
-import LogFile from '@/components/log-file/index.vue';
 
 const drawerVisible = ref(false);
 const form = reactive({
@@ -77,9 +79,10 @@ const logConfig = reactive({
 });
 const showLog = ref(false);
 const logRef = ref();
-const buttonDisabled = ref(false);
 const logVisible = ref(false);
 const logInfo = ref();
+const isStartReading = ref(false);
+const isReading = ref(false);
 
 interface DialogProps {
     repos: Array<Container.RepoOptions>;
@@ -99,7 +102,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
             break;
         }
     }
-    buttonDisabled.value = false;
+    isStartReading.value = false;
     logInfo.value = '';
     showLog.value = false;
 };
@@ -108,6 +111,11 @@ const emit = defineEmits<{ (e: 'search'): void }>();
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 
+const onEdit = () => {
+    if (!isReading.value && isStartReading.value) {
+        isStartReading.value = false;
+    }
+};
 const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
@@ -117,7 +125,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         }
         const res = await imagePull(form);
         logVisible.value = true;
-        buttonDisabled.value = true;
+        isStartReading.value = true;
         logConfig.name = res.data;
         search();
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

@@ -15,7 +15,7 @@
                 <el-col :span="22">
                     <el-form ref="formRef" @submit.prevent label-position="top" :model="form" :rules="rules">
                         <el-form-item :label="$t('container.from')">
-                            <el-radio-group v-model="form.from" @change="changeFrom">
+                            <el-radio-group v-model="form.from" @change="onEdit('form')">
                                 <el-radio value="edit">{{ $t('commons.button.edit') }}</el-radio>
                                 <el-radio value="path">{{ $t('container.pathSelect') }}</el-radio>
                                 <el-radio value="template">{{ $t('container.composeTemplate') }}</el-radio>
@@ -23,6 +23,7 @@
                         </el-form-item>
                         <el-form-item v-if="form.from === 'path'" prop="path">
                             <el-input
+                                @change="onEdit('')"
                                 :placeholder="$t('commons.example') + '/tmp/docker-compose.yml'"
                                 v-model="form.path"
                             >
@@ -32,7 +33,7 @@
                             </el-input>
                         </el-form-item>
                         <el-form-item v-if="form.from === 'template'" prop="template">
-                            <el-select v-model="form.template" @change="changeTemplate">
+                            <el-select v-model="form.template" @change="onEdit('template')">
                                 <template #prefix>{{ $t('container.template') }}</template>
                                 <el-option
                                     v-for="item in templateOptions"
@@ -43,7 +44,7 @@
                             </el-select>
                         </el-form-item>
                         <el-form-item v-if="form.from === 'edit' || form.from === 'template'" prop="name">
-                            <el-input @input="changePath" v-model.trim="form.name">
+                            <el-input @input="changePath" @change="onEdit('')" v-model.trim="form.name">
                                 <template #prefix>
                                     <span style="margin-right: 8px">{{ $t('file.dir') }}</span>
                                 </template>
@@ -59,6 +60,7 @@
                                     <el-radio-button label="log">{{ $t('commons.button.log') }}</el-radio-button>
                                 </el-radio-group>
                                 <codemirror
+                                    @change="onEdit('')"
                                     v-if="mode === 'edit'"
                                     :autofocus="true"
                                     placeholder="#Define or paste the content of your docker-compose file here"
@@ -93,7 +95,7 @@
                 <el-button @click="drawerVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button type="primary" :disabled="isReading" @click="onSubmit(formRef)">
+                <el-button type="primary" :disabled="isStartReading || isReading" @click="onSubmit(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -127,6 +129,7 @@ const baseDir = ref();
 const composeFile = ref();
 let timer: NodeJS.Timer | null = null;
 const logRef = ref();
+const isStartReading = ref(false);
 const isReading = ref();
 
 const logConfig = reactive({
@@ -162,6 +165,7 @@ const acceptParams = (): void => {
     form.template = null;
     loadTemplates();
     loadPath();
+    isStartReading.value = false;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -219,6 +223,17 @@ const changePath = async () => {
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 
+const onEdit = (item: string) => {
+    if (item === 'template') {
+        changeTemplate();
+    }
+    if (item === 'form') {
+        changeFrom();
+    }
+    if (!isReading.value && isStartReading.value) {
+        isStartReading.value = false;
+    }
+};
 const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
@@ -237,6 +252,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                         .then((res) => {
                             logConfig.name = res.data;
                             loadLogs();
+                            isStartReading.value = true;
                         })
                         .catch(() => {
                             loading.value = false;
