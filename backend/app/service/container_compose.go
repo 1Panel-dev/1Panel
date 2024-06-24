@@ -232,12 +232,6 @@ func (u *ContainerService) ComposeUpdate(req dto.ComposeUpdate) error {
 	write.Flush()
 
 	global.LOG.Infof("docker-compose.yml %s has been replaced, now start to docker-compose restart", req.Path)
-	if stdout, err := compose.Down(req.Path); err != nil {
-		if err := recreateCompose(string(oldFile), req.Path); err != nil {
-			return fmt.Errorf("update failed when handle compose down, err: %s, recreate failed: %v", string(stdout), err)
-		}
-		return fmt.Errorf("update failed when handle compose down, err: %s", string(stdout))
-	}
 	if stdout, err := compose.Up(req.Path); err != nil {
 		if err := recreateCompose(string(oldFile), req.Path); err != nil {
 			return fmt.Errorf("update failed when handle compose up, err: %s, recreate failed: %v", string(stdout), err)
