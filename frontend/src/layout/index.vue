@@ -23,6 +23,8 @@ import { DeviceType } from '@/enums/app';
 import { getSystemAvailable } from '@/api/modules/setting';
 import { useRoute, useRouter } from 'vue-router';
 import { loadProductProFromDB } from '@/utils/xpack';
+import { useTheme } from '@/hooks/use-theme';
+const { switchTheme } = useTheme();
 useResize();
 
 const router = useRouter();
@@ -98,6 +100,17 @@ onMounted(() => {
 
     loadStatus();
     loadProductProFromDB();
+
+    const mqList = window.matchMedia('(prefers-color-scheme: dark)');
+    if (mqList.addEventListener) {
+        mqList.addEventListener('change', () => {
+            switchTheme();
+        });
+    } else if (mqList.addListener) {
+        mqList.addListener(() => {
+            switchTheme();
+        });
+    }
 });
 </script>
 
