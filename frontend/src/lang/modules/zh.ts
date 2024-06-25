@@ -1644,7 +1644,7 @@ const message = {
         ignoreList: '忽略列表',
         appHelper: '部分应用的安装使用说明请在应用详情页查看',
         backupApp: '升级前备份应用',
-        backupAppHelper: '升级失败可以使用应用备份回滚',
+        backupAppHelper: '升级失败会使用备份自动回滚,请在日志审计-系统日志中查看失败原因',
         delete: '删除',
         openrestyDeleteHelper: '强制删除 OpenResty 会删除所有的网站，请确认风险之后操作',
         downloadLogHelper1: '即将下载 {0} 应用所有日志，是否继续？',

@@ -1766,7 +1766,8 @@ const message = {
         ignoreList: 'ignore list',
         appHelper: 'Please view the installation instructions of some applications on the application details page',
         backupApp: 'Backup application before upgrade',
-        backupAppHelper: 'If the upgrade fails, you can use the application backup to roll back',
+        backupAppHelper:
+            'If the upgrade fails, the backup will be automatically rolled back. Please check the failure reason in the log audit-system log',
         delete: 'Delete',
         openrestyDeleteHelper:
             'Forcibly deleting OpenResty will delete all websites, please confirm the risk before operation',
