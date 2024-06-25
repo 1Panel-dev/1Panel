@@ -108,8 +108,7 @@ func (f *Firewall) ListPort() ([]FireInfo, error) {
 				continue
 			}
 			itemRule := f.loadInfo(rule)
-			if len(itemRule.Port) != 0 && itemRule.Family == "ipv4" {
-				itemRule.Family = ""
+			if (len(itemRule.Port) != 0 && itemRule.Family == "ipv4") || (itemRule.Family == "ipv6" && len(itemRule.Address) != 0) {
 				datas = append(datas, itemRule)
 			}
 		}
@@ -177,6 +176,9 @@ func (f *Firewall) RichRules(rule FireInfo, operation string) error {
 		return buserr.New(constant.ErrCmdIllegal)
 	}
 	ruleStr := "rule family=ipv4 "
+	if strings.Contains(rule.Address, ":") {
+		ruleStr = "rule family=ipv6 "
+	}
 	if len(rule.Address) != 0 {
 		ruleStr += fmt.Sprintf("source address=%s ", rule.Address)
 	}

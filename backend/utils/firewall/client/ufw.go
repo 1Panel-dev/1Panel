@@ -255,7 +255,7 @@ func (f *Ufw) loadInfo(line string, fireType string) FireInfo {
 	if len(fields) < 4 {
 		return itemInfo
 	}
-	if fields[1] == "(v6)" {
+	if fields[1] == "(v6)" && fireType == "port" {
 		return itemInfo
 	}
 	if fields[0] == "Anywhere" && fireType != "port" {
@@ -263,7 +263,11 @@ func (f *Ufw) loadInfo(line string, fireType string) FireInfo {
 		if fields[1] == "ALLOW" {
 			itemInfo.Strategy = "accept"
 		}
-		itemInfo.Address = fields[3]
+		if fields[1] == "(v6)" {
+			itemInfo.Address = fields[4]
+		} else {
+			itemInfo.Address = fields[3]
+		}
 		return itemInfo
 	}
 	if strings.Contains(fields[0], "/") {
