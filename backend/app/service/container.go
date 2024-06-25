@@ -68,7 +68,7 @@ type IContainerService interface {
 	ContainerLogClean(req dto.OperationWithName) error
 	ContainerOperation(req dto.ContainerOperation) error
 	ContainerLogs(wsConn *websocket.Conn, containerType, container, since, tail string, follow bool) error
-	DownloadContainerLogs(containerType, container, since, tail string, follow bool, c *gin.Context) error
+	DownloadContainerLogs(containerType, container, since, tail string, c *gin.Context) error
 	ContainerStats(id string) (*dto.ContainerStats, error)
 	Inspect(req dto.InspectReq) (string, error)
 	DeleteNetwork(req dto.BatchDelete) error
@@ -774,7 +774,7 @@ func (u *ContainerService) ContainerLogs(wsConn *websocket.Conn, containerType, 
 	return nil
 }
 
-func (u *ContainerService) DownloadContainerLogs(containerType, container, since, tail string, follow bool, c *gin.Context) error {
+func (u *ContainerService) DownloadContainerLogs(containerType, container, since, tail string, c *gin.Context) error {
 	if cmd.CheckIllegal(container, since, tail) {
 		return buserr.New(constant.ErrCmdIllegal)
 	}
@@ -791,9 +791,6 @@ func (u *ContainerService) DownloadContainerLogs(containerType, container, since
 	if since != "all" {
 		commandArg = append(commandArg, "--since")
 		commandArg = append(commandArg, since)
-	}
-	if follow {
-		commandArg = append(commandArg, "-f")
 	}
 
 	cmd := exec.Command(commandName, commandArg...)

@@ -321,6 +321,6 @@ export namespace Container {
         container: string;
         since: string;
         tail: number;
-        follow: boolean;
+        containerType: string;
     }
 }

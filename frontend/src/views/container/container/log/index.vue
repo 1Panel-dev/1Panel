@@ -172,12 +172,12 @@ const onDownload = async () => {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
-    }).then(() => {
+    }).then(async () => {
         let params = {
             container: logSearch.containerID,
             since: logSearch.mode,
             tail: logSearch.tail,
-            follow: logSearch.isWatch,
+            containerType: 'container',
         };
         let addItem = {};
         addItem['name'] = logSearch.container + '-' + dateFormatForName(new Date()) + '.log';
@@ -190,7 +190,6 @@ const onDownload = async () => {
             const event = new MouseEvent('click');
             a.dispatchEvent(event);
         });
-        // downloadWithContent(logInfo.value, logSearch.container + '-' + dateFormatForName(new Date()) + '.log');
     });
 };
 

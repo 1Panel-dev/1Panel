@@ -468,9 +468,9 @@ func (b *BaseApi) DownloadContainerLogs(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	err := containerService.DownloadContainerLogs("container", req.Container, req.Since, strconv.Itoa(int(req.Tail)), req.Follow, c)
+	err := containerService.DownloadContainerLogs(req.ContainerType, req.Container, req.Since, strconv.Itoa(int(req.Tail)), c)
 	if err != nil {
-		return
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 	}
 }
 

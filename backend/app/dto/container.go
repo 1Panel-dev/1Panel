@@ -227,8 +227,8 @@ type ComposeUpdate struct {
 }
 
 type ContainerLog struct {
-	Container string `json:"container" validate:"required"`
-	Since     string `json:"since"`
-	Tail      uint   `json:"tail"`
-	Follow    bool   `json:"follow"`
+	Container     string `json:"container" validate:"required"`
+	Since         string `json:"since"`
+	Tail          uint   `json:"tail"`
+	ContainerType string `json:"containerType"`
 }
