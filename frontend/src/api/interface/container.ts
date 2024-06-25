@@ -316,4 +316,11 @@ export namespace Container {
         logMaxSize: string;
         logMaxFile: string;
     }
+
+    export interface ContainerLogInfo {
+        container: string;
+        since: string;
+        tail: number;
+        containerType: string;
+    }
 }

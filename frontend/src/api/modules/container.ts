@@ -52,6 +52,13 @@ export const inspect = (params: Container.ContainerInspect) => {
     return http.post<string>(`/containers/inspect`, params);
 };
 
+export const DownloadFile = (params: Container.ContainerLogInfo) => {
+    return http.download<BlobPart>('/containers/download/log', params, {
+        responseType: 'blob',
+        timeout: TimeoutEnum.T_40S,
+    });
+};
+
 // image
 export const searchImage = (params: SearchWithPage) => {
     return http.post<ResPage<Container.ImageInfo>>(`/containers/image/search`, params);

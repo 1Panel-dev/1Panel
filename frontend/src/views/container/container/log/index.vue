@@ -68,9 +68,9 @@
 </template>
 
 <script lang="ts" setup>
-import { cleanContainerLog } from '@/api/modules/container';
+import { cleanContainerLog, DownloadFile } from '@/api/modules/container';
 import i18n from '@/lang';
-import { dateFormatForName, downloadWithContent } from '@/utils/util';
+import { dateFormatForName } from '@/utils/util';
 import { computed, onBeforeUnmount, reactive, ref, shallowRef, watch } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
@@ -173,7 +173,23 @@ const onDownload = async () => {
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
     }).then(async () => {
-        downloadWithContent(logInfo.value, logSearch.container + '-' + dateFormatForName(new Date()) + '.log');
+        let params = {
+            container: logSearch.containerID,
+            since: logSearch.mode,
+            tail: logSearch.tail,
+            containerType: 'container',
+        };
+        let addItem = {};
+        addItem['name'] = logSearch.container + '-' + dateFormatForName(new Date()) + '.log';
+        DownloadFile(params).then((res) => {
+            const downloadUrl = window.URL.createObjectURL(new Blob([res]));
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = downloadUrl;
+            a.download = addItem['name'];
+            const event = new MouseEvent('click');
+            a.dispatchEvent(event);
+        });
     });
 };
 

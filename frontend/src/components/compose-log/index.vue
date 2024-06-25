@@ -58,7 +58,7 @@
 
 <script lang="ts" setup>
 import i18n from '@/lang';
-import { dateFormatForName, downloadWithContent } from '@/utils/util';
+import { dateFormatForName } from '@/utils/util';
 import { computed, onBeforeUnmount, reactive, ref, shallowRef, watch } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
@@ -66,6 +66,7 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import { MsgError } from '@/utils/message';
 import { GlobalStore } from '@/store';
 import screenfull from 'screenfull';
+import { DownloadFile } from '@/api/modules/container';
 
 const extensions = [javascript(), oneDark];
 
@@ -163,7 +164,23 @@ const onDownload = async () => {
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
     }).then(async () => {
-        downloadWithContent(logInfo.value, resource.value + '-' + dateFormatForName(new Date()) + '.log');
+        let params = {
+            container: logSearch.compose,
+            since: logSearch.mode,
+            tail: logSearch.tail,
+            containerType: 'compose',
+        };
+        let addItem = {};
+        addItem['name'] = logSearch.compose + '-' + dateFormatForName(new Date()) + '.log';
+        DownloadFile(params).then((res) => {
+            const downloadUrl = window.URL.createObjectURL(new Blob([res]));
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = downloadUrl;
+            a.download = addItem['name'];
+            const event = new MouseEvent('click');
+            a.dispatchEvent(event);
+        });
     });
 };
 

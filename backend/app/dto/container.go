@@ -225,3 +225,10 @@ type ComposeUpdate struct {
 	Path    string `json:"path" validate:"required"`
 	Content string `json:"content" validate:"required"`
 }
+
+type ContainerLog struct {
+	Container     string `json:"container" validate:"required"`
+	Since         string `json:"since"`
+	Tail          uint   `json:"tail"`
+	ContainerType string `json:"containerType"`
+}

@@ -7,6 +7,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
+	"strconv"
 )
 
 // @Tags Container
@@ -457,6 +458,19 @@ func (b *BaseApi) ContainerLogs(c *gin.Context) {
 	if err := containerService.ContainerLogs(wsConn, "container", container, since, tail, follow); err != nil {
 		_ = wsConn.WriteMessage(1, []byte(err.Error()))
 		return
+	}
+}
+
+// @Description 下载容器日志
+// @Router /containers/download/log [post]
+func (b *BaseApi) DownloadContainerLogs(c *gin.Context) {
+	var req dto.ContainerLog
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	err := containerService.DownloadContainerLogs(req.ContainerType, req.Container, req.Since, strconv.Itoa(int(req.Tail)), c)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 	}
 }
 

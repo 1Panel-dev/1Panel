@@ -1,11 +1,15 @@
 package service
 
 import (
+	"bufio"
 	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"io"
+	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -64,6 +68,7 @@ type IContainerService interface {
 	ContainerLogClean(req dto.OperationWithName) error
 	ContainerOperation(req dto.ContainerOperation) error
 	ContainerLogs(wsConn *websocket.Conn, containerType, container, since, tail string, follow bool) error
+	DownloadContainerLogs(containerType, container, since, tail string, c *gin.Context) error
 	ContainerStats(id string) (*dto.ContainerStats, error)
 	Inspect(req dto.InspectReq) (string, error)
 	DeleteNetwork(req dto.BatchDelete) error
@@ -766,6 +771,79 @@ func (u *ContainerService) ContainerLogs(wsConn *websocket.Conn, containerType, 
 		}
 	}()
 	_ = cmd.Wait()
+	return nil
+}
+
+func (u *ContainerService) DownloadContainerLogs(containerType, container, since, tail string, c *gin.Context) error {
+	if cmd.CheckIllegal(container, since, tail) {
+		return buserr.New(constant.ErrCmdIllegal)
+	}
+	commandName := "docker"
+	commandArg := []string{"logs", container}
+	if containerType == "compose" {
+		commandName = "docker-compose"
+		commandArg = []string{"-f", container, "logs"}
+	}
+	if tail != "0" {
+		commandArg = append(commandArg, "--tail")
+		commandArg = append(commandArg, tail)
+	}
+	if since != "all" {
+		commandArg = append(commandArg, "--since")
+		commandArg = append(commandArg, since)
+	}
+
+	cmd := exec.Command(commandName, commandArg...)
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		_ = cmd.Process.Signal(syscall.SIGTERM)
+		return err
+	}
+	cmd.Stderr = cmd.Stdout
+	if err := cmd.Start(); err != nil {
+		_ = cmd.Process.Signal(syscall.SIGTERM)
+		return err
+	}
+
+	tempFile, err := os.CreateTemp("", "cmd_output_*.txt")
+	if err != nil {
+		return err
+	}
+	defer tempFile.Close()
+	defer func() {
+		if err := os.Remove(tempFile.Name()); err != nil {
+			global.LOG.Errorf("os.Remove() failed: %v", err)
+		}
+	}()
+	errCh := make(chan error)
+	go func() {
+		scanner := bufio.NewScanner(stdout)
+		for scanner.Scan() {
+			line := scanner.Text()
+			if _, err := tempFile.WriteString(line + "\n"); err != nil {
+				errCh <- err
+				return
+			}
+		}
+		if err := scanner.Err(); err != nil {
+			errCh <- err
+			return
+		}
+		errCh <- nil
+	}()
+	select {
+	case err := <-errCh:
+		if err != nil {
+			global.LOG.Errorf("Error: %v", err)
+		}
+	case <-time.After(3 * time.Second):
+		global.LOG.Errorf("Timeout reached")
+	}
+	info, _ := tempFile.Stat()
+
+	c.Header("Content-Length", strconv.FormatInt(info.Size(), 10))
+	c.Header("Content-Disposition", "attachment; filename*=utf-8''"+url.PathEscape(info.Name()))
+	http.ServeContent(c.Writer, c.Request, info.Name(), info.ModTime(), tempFile)
 	return nil
 }
 
