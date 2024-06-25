@@ -512,6 +512,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		var (
 			upErr      error
 			backupFile string
+			preErr     error
 		)
 		global.LOG.Infof(i18n.GetMsgWithName("UpgradeAppStart", install.Name, nil))
 		if req.Backup {
@@ -544,18 +545,27 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 					_ = appInstallRepo.Save(context.Background(), &existInstall)
 				}
 			}
+			if preErr != nil {
+				global.LOG.Infof(i18n.GetMsgWithName("ErrAppUpgrade", install.Name, preErr))
+				existInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(req.InstallID))
+				if existInstall.ID > 0 {
+					existInstall.Status = constant.UpgradeErr
+					existInstall.Message = preErr.Error()
+					_ = appInstallRepo.Save(context.Background(), &existInstall)
+				}
+			}
 		}()
 
 		fileOp := files.NewFileOp()
 		detailDir := path.Join(constant.ResourceDir, "apps", install.App.Resource, install.App.Key, detail.Version)
 		if install.App.Resource == constant.AppResourceRemote {
-			if upErr = downloadApp(install.App, detail, &install); upErr != nil {
+			if preErr = downloadApp(install.App, detail, &install); preErr != nil {
 				return
 			}
 			if detail.DockerCompose == "" {
 				composeDetail, err := fileOp.GetContent(path.Join(detailDir, "docker-compose.yml"))
 				if err != nil {
-					upErr = err
+					preErr = err
 					return
 				}
 				detail.DockerCompose = string(composeDetail)
@@ -568,6 +578,32 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 
 		if install.App.Resource == constant.AppResourceLocal {
 			detailDir = path.Join(constant.ResourceDir, "apps", "local", strings.TrimPrefix(install.App.Key, "local"), detail.Version)
+		}
+
+		content, err := fileOp.GetContent(install.GetEnvPath())
+		if err != nil {
+			preErr = err
+			return
+		}
+		if req.PullImage {
+			projectName := strings.ToLower(install.Name)
+			images, err := composeV2.GetDockerComposeImages(projectName, content, []byte(detail.DockerCompose))
+			if err != nil {
+				preErr = err
+				return
+			}
+			for _, image := range images {
+				global.LOG.Infof(i18n.GetMsgWithName("PullImageStart", image, nil))
+				if out, err := cmd.ExecWithTimeOut("docker pull "+image, 20*time.Minute); err != nil {
+					if out != "" {
+						err = errors.New(out)
+					}
+					preErr = buserr.WithNameAndErr("ErrDockerPullImage", "", err)
+					return
+				} else {
+					global.LOG.Infof(i18n.GetMsgByKey("PullImageSuccess"))
+				}
+			}
 		}
 
 		command := exec.Command("/bin/bash", "-c", fmt.Sprintf("cp -rn %s/* %s || true", detailDir, install.GetPath()))
@@ -597,32 +633,6 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		install.DockerCompose = newCompose
 		install.Version = detail.Version
 		install.AppDetailId = req.DetailID
-
-		content, err := fileOp.GetContent(install.GetEnvPath())
-		if err != nil {
-			upErr = err
-			return
-		}
-
-		if req.PullImage {
-			projectName := strings.ToLower(install.Name)
-			images, err := composeV2.GetDockerComposeImages(projectName, content, []byte(detail.DockerCompose))
-			if err != nil {
-				upErr = err
-				return
-			}
-			for _, image := range images {
-				global.LOG.Infof(i18n.GetMsgWithName("PullImageStart", image, nil))
-				if out, err := cmd.ExecWithTimeOut("docker pull "+image, 20*time.Minute); err != nil {
-					if out != "" {
-						err = errors.New(out)
-					}
-					upErr = buserr.WithNameAndErr("ErrDockerPullImage", "", err)
-				} else {
-					global.LOG.Infof(i18n.GetMsgByKey("PullImageSuccess"))
-				}
-			}
-		}
 
 		if out, err := compose.Down(install.GetComposePath()); err != nil {
 			if out != "" {

@@ -1643,7 +1643,7 @@ const message = {
         ignoreList: '忽略列表',
         appHelper: '部分應用的安裝使用說明請在應用詳情頁查看',
         backupApp: '升級前備份應用',
-        backupAppHelper: '升級失敗可以使用應用備份回滾',
+        backupAppHelper: '升級失敗會使用備份自動回滾,請在日誌審計-系統日誌中查看失敗原因',
         delete: '刪除',
         openrestyDeleteHelper: '強制刪除 OpenResty 會刪除所有的網站，請確認風險後操作',
         downloadLogHelper1: '即將下載 {0} 套用所有日誌，是否繼續？ ',
