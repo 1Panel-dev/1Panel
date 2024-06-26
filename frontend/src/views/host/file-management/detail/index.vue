@@ -10,7 +10,15 @@
                     <el-descriptions-item :label="$t('commons.table.type')">{{ data.type }}</el-descriptions-item>
                     <el-descriptions-item :label="$t('file.path')">{{ data.path }}</el-descriptions-item>
                     <el-descriptions-item :label="$t('file.size')">
-                        {{ computeSize(data.size) }}
+                        <span v-if="data.isDir">
+                            <el-button type="primary" link small @click="getDirSize(data)">
+                                <span v-if="data.dirSize == undefined">
+                                    {{ $t('file.calculate') }}
+                                </span>
+                                <span v-else>{{ computeSize(data.dirSize) }}</span>
+                            </el-button>
+                        </span>
+                        <span v-else>{{ computeSize(data.size) }}</span>
                     </el-descriptions-item>
                     <el-descriptions-item :label="$t('file.role')">{{ data.mode }}</el-descriptions-item>
                     <el-descriptions-item :label="$t('commons.table.user')">{{ data.user }}</el-descriptions-item>
@@ -25,7 +33,7 @@
 </template>
 
 <script lang="ts" setup>
-import { GetFileContent } from '@/api/modules/files';
+import { ComputeDirSize, GetFileContent } from '@/api/modules/files';
 import { computeSize } from '@/utils/util';
 import { ref } from 'vue';
 import { dateFormatSimple } from '@/utils/util';
@@ -40,6 +48,7 @@ const props = ref<InfoProps>({
 
 let open = ref(false);
 let data = ref();
+let loading = ref(false);
 
 const handleClose = () => {
     open.value = false;
@@ -51,6 +60,20 @@ const acceptParams = async (params: InfoProps): Promise<void> => {
         data.value = res.data;
         open.value = true;
     });
+};
+
+const getDirSize = async (row: any) => {
+    const req = {
+        path: row.path,
+    };
+    loading.value = true;
+    await ComputeDirSize(req)
+        .then(async (res) => {
+            data.value.dirSize = res.data.size;
+        })
+        .finally(() => {
+            loading.value = false;
+        });
 };
 
 defineExpose({
