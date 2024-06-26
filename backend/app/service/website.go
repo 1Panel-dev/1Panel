@@ -336,7 +336,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 				}
 				website.Proxy = proxy
 			}
-		case constant.RuntimeNode:
+		case constant.RuntimeNode, constant.RuntimeJava:
 			website.Proxy = fmt.Sprintf("127.0.0.1:%d", runtime.Port)
 		}
 	}
@@ -540,9 +540,7 @@ func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) 
 				}
 				for _, domain := range domainModels {
 					wafSite.Domains = append(wafSite.Domains, domain.Domain)
-					if domain.Port != 80 && domain.Port != 443 {
-						wafSite.Host = append(wafSite.Host, domain.Domain+":"+string(rune(domain.Port)))
-					}
+					wafSite.Host = append(wafSite.Host, domain.Domain+":"+strconv.Itoa(domain.Port))
 				}
 				if len(wafSite.Host) == 0 {
 					wafSite.Host = []string{}
@@ -634,7 +632,7 @@ func (w WebsiteService) DeleteWebsiteDomain(domainId uint) error {
 				oldHostArray := wafSite.Host
 				var newHostArray []string
 				for _, host := range oldHostArray {
-					if host == webSiteDomain.Domain+":"+string(rune(webSiteDomain.Port)) {
+					if host == webSiteDomain.Domain+":"+strconv.Itoa(webSiteDomain.Port) {
 						continue
 					}
 					newHostArray = append(newHostArray, host)

@@ -14,6 +14,10 @@ const buttons = [
         path: '/websites/runtimes/php',
     },
     {
+        label: 'Java',
+        path: '/websites/runtimes/java',
+    },
+    {
         label: 'Node.js',
         path: '/websites/runtimes/node',
     },
