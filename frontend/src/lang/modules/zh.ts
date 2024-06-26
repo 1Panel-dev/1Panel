@@ -2141,6 +2141,7 @@ const message = {
         customScriptHelper: '请填写完整的启动命令，例如：npm run start',
         portError: '不能填写相同端口',
         systemRestartHelper: '状态说明：中断-系统重启导致状态获取失败',
+        javaScriptHelper: '请填写完整启动命令，例如：java -jar halo.jar',
     },
     process: {
         pid: '进程ID',

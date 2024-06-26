@@ -2302,6 +2302,7 @@ const message = {
         customScriptHelper: 'Please fill in the complete startup command, for example: npm run start',
         portError: 'Cannot fill in the same port',
         systemRestartHelper: 'Status description: Interruption - status acquisition failed due to system restart',
+        javaScriptHelper: 'Please fill in the complete startup command, for example: java -jar halo.jar',
     },
     process: {
         pid: 'Process ID',

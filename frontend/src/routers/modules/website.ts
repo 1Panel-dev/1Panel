@@ -58,6 +58,16 @@ const webSiteRouter = {
                 requiresAuth: false,
             },
         },
+        {
+            path: '/websites/runtimes/java',
+            name: 'java',
+            hidden: true,
+            component: () => import('@/views/website/runtime/java/index.vue'),
+            meta: {
+                activeMenu: '/websites/runtimes/java',
+                requiresAuth: false,
+            },
+        },
     ],
 };
 

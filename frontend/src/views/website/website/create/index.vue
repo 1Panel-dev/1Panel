@@ -163,6 +163,7 @@
                                     <el-select v-model="website.runtimeType" @change="changeRuntimeType()">
                                         <el-option label="PHP" value="php"></el-option>
                                         <el-option label="Node.js" value="node"></el-option>
+                                        <el-option label="Java" value="java"></el-option>
                                     </el-select>
                                 </el-form-item>
                             </el-col>
@@ -640,7 +641,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         if (!flag) {
             MsgError(i18n.global.t('website.containWarn'));
             loading.value = false;
-            return false;
+            return;
         }
         PreCheck({})
             .then((res) => {

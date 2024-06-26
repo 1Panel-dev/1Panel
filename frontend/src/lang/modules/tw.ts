@@ -2138,6 +2138,7 @@ const message = {
         customScriptHelper: '請填寫完整的啟動指令，例如：npm run start',
         portError: '不能填寫相同連接埠',
         systemRestartHelper: '狀態說明：中斷-系統重新啟動導致狀態取得失敗',
+        javaScriptHelper: '請填寫完整啟動指令，例如：java -jar halo.jar',
     },
     process: {
         pid: '進程ID',
