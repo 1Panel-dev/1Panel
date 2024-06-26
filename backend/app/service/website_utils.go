@@ -316,7 +316,7 @@ func createWafConfig(website *model.Website, domains []model.WebsiteDomain) erro
 
 	for _, domain := range domains {
 		wafWebsite.Domains = append(wafWebsite.Domains, domain.Domain)
-		wafWebsite.Host = append(wafWebsite.Host, domain.Domain+":"+string(rune(domain.Port)))
+		wafWebsite.Host = append(wafWebsite.Host, domain.Domain+":"+strconv.Itoa(domain.Port))
 	}
 	websitesArray = append(websitesArray, wafWebsite)
 	websitesContent, err := json.Marshal(websitesArray)
