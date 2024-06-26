@@ -20,7 +20,7 @@ func (t TarGzArchiver) Extract(filePath, dstDir string, secret string) error {
 	var err error
 	commands := ""
 	if len(secret) != 0 {
-		extraCmd := "openssl enc -d -aes-256-cbc -k " + secret + " -in " + filePath + " | "
+		extraCmd := "openssl enc -d -aes-256-cbc -k '" + secret + "' -in " + filePath + " | "
 		commands = fmt.Sprintf("%s tar -zxvf - -C %s", extraCmd, dstDir+" > /dev/null 2>&1")
 		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
 	} else {
@@ -47,7 +47,7 @@ func (t TarGzArchiver) Compress(sourcePaths []string, dstFile string, secret str
 	path += fmt.Sprintf("- -C %s %s", aheadDir, itemDir)
 	commands := ""
 	if len(secret) != 0 {
-		extraCmd := "| openssl enc -aes-256-cbc -salt -k " + secret + " -out"
+		extraCmd := "| openssl enc -aes-256-cbc -salt -k '" + secret + "' -out"
 		commands = fmt.Sprintf("tar -zcf %s %s %s", path, extraCmd, dstFile)
 		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
 	} else {

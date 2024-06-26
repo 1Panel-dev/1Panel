@@ -256,7 +256,7 @@ func handleSnapTar(sourceDir, targetDir, name, exclusionRules string, secret str
 	}
 	commands := ""
 	if len(secret) != 0 {
-		extraCmd := "| openssl enc -aes-256-cbc -salt -k " + secret + " -out"
+		extraCmd := "| openssl enc -aes-256-cbc -salt -k '" + secret + "' -out"
 		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read -zcf %s %s %s %s", " -"+exStr, path, extraCmd, targetDir+"/"+name)
 		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
 	} else {
