@@ -13,7 +13,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/global"
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/image"
 	"github.com/pkg/errors"
 
@@ -300,7 +299,7 @@ func loadImageTag() (string, error) {
 	itemTag = "postgres:16.1-alpine"
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 	defer cancel()
-	if _, err := client.ImagePull(ctx, itemTag, types.ImagePullOptions{}); err != nil {
+	if _, err := client.ImagePull(ctx, itemTag, image.PullOptions{}); err != nil {
 		if ctx.Err() == context.DeadlineExceeded {
 			return itemTag, buserr.New(constant.ErrPgImagePull)
 		}

@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
 	"net/url"
@@ -20,6 +19,8 @@ import (
 	"syscall"
 	"time"
 	"unicode/utf8"
+
+	"github.com/gin-gonic/gin"
 
 	"github.com/pkg/errors"
 
@@ -988,12 +989,12 @@ func checkImageExist(client *client.Client, imageItem string) bool {
 	return false
 }
 
-func pullImages(ctx context.Context, client *client.Client, image string) error {
-	options := types.ImagePullOptions{}
+func pullImages(ctx context.Context, client *client.Client, imageName string) error {
+	options := image.PullOptions{}
 	repos, _ := imageRepoRepo.List()
 	if len(repos) != 0 {
 		for _, repo := range repos {
-			if strings.HasPrefix(image, repo.DownloadUrl) && repo.Auth {
+			if strings.HasPrefix(imageName, repo.DownloadUrl) && repo.Auth {
 				authConfig := registry.AuthConfig{
 					Username: repo.Username,
 					Password: repo.Password,
@@ -1006,8 +1007,13 @@ func pullImages(ctx context.Context, client *client.Client, image string) error 
 				options.RegistryAuth = authStr
 			}
 		}
+	} else {
+		hasAuth, authStr := loadAuthInfo(imageName)
+		if hasAuth {
+			options.RegistryAuth = authStr
+		}
 	}
-	out, err := client.ImagePull(ctx, image, options)
+	out, err := client.ImagePull(ctx, imageName, options)
 	if err != nil {
 		return err
 	}

@@ -24,6 +24,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/registry"
 	"github.com/docker/docker/pkg/archive"
+	"github.com/docker/docker/pkg/homedir"
 )
 
 type ImageService struct{}
@@ -253,10 +254,15 @@ func (u *ImageService) ImagePull(req dto.ImagePull) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	options := image.PullOptions{}
 	if req.RepoID == 0 {
+		hasAuth, authStr := loadAuthInfo(req.ImageName)
+		if hasAuth {
+			options.RegistryAuth = authStr
+		}
 		go func() {
 			defer file.Close()
-			out, err := client.ImagePull(context.TODO(), req.ImageName, types.ImagePullOptions{})
+			out, err := client.ImagePull(context.TODO(), req.ImageName, options)
 			if err != nil {
 				global.LOG.Errorf("image %s pull failed, err: %v", req.ImageName, err)
 				return
@@ -271,7 +277,6 @@ func (u *ImageService) ImagePull(req dto.ImagePull) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	options := image.PullOptions{}
 	if repo.Auth {
 		authConfig := registry.AuthConfig{
 			Username: repo.Username,
@@ -463,4 +468,50 @@ func checkUsed(imageID string, containers []types.Container) bool {
 		}
 	}
 	return false
+}
+
+func loadAuthInfo(image string) (bool, string) {
+	if !strings.Contains(image, "/") {
+		return false, ""
+	}
+	homeDir := homedir.Get()
+	confPath := path.Join(homeDir, ".docker/config.json")
+	configFileBytes, err := os.ReadFile(confPath)
+	if err != nil {
+		return false, ""
+	}
+	var config dockerConfig
+	if err = json.Unmarshal(configFileBytes, &config); err != nil {
+		return false, ""
+	}
+	var (
+		user   string
+		passwd string
+	)
+	imagePrefix := strings.Split(image, "/")[0]
+	if val, ok := config.Auths[imagePrefix]; ok {
+		itemByte, _ := base64.StdEncoding.DecodeString(val.Auth)
+		itemStr := string(itemByte)
+		if strings.Contains(itemStr, ":") {
+			user = strings.Split(itemStr, ":")[0]
+			passwd = strings.Split(itemStr, ":")[1]
+		}
+	}
+	authConfig := registry.AuthConfig{
+		Username: user,
+		Password: passwd,
+	}
+	encodedJSON, err := json.Marshal(authConfig)
+	if err != nil {
+		return false, ""
+	}
+	authStr := base64.URLEncoding.EncodeToString(encodedJSON)
+	return true, authStr
+}
+
+type dockerConfig struct {
+	Auths map[string]authConfig `json:"auths"`
+}
+type authConfig struct {
+	Auth string `json:"auth"`
 }
