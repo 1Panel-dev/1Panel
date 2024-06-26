@@ -9,13 +9,17 @@
                     v-model:mask-show="maskShow"
                 />
             </template>
-            <template #toolbar>
+            <template #toolbar v-if="clamStatus.isExist">
                 <el-row>
                     <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
-                        <el-button type="primary" :disabled="!form.isActive" @click="onOpenDialog('add')">
+                        <el-button type="primary" :disabled="!clamStatus.isRunning" @click="onOpenDialog('add')">
                             {{ $t('toolbox.clam.clamCreate') }}
                         </el-button>
-                        <el-button plain :disabled="selects.length === 0 || !form.isActive" @click="onDelete(null)">
+                        <el-button
+                            plain
+                            :disabled="selects.length === 0 || !clamStatus.isRunning"
+                            @click="onDelete(null)"
+                        >
                             {{ $t('commons.button.delete') }}
                         </el-button>
                     </el-col>
@@ -24,8 +28,12 @@
                     </el-col>
                 </el-row>
             </template>
-            <template #main>
+            <el-card v-if="!clamStatus.isRunning && maskShow" class="mask-prompt">
+                <span>{{ $t('toolbox.clam.notStart') }}</span>
+            </el-card>
+            <template #main v-if="clamStatus.isExist">
                 <ComplexTable
+                    :class="{ mask: !clamStatus.isRunning }"
                     v-if="!isSettingShow"
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
@@ -100,11 +108,6 @@ const paginationConfig = reactive({
 });
 const searchName = ref();
 
-const form = reactive({
-    isActive: true,
-    isExist: true,
-});
-
 const opRef = ref();
 const dialogRef = ref();
 const operateIDs = ref();
@@ -115,8 +118,7 @@ const isSettingShow = ref();
 const maskShow = ref(true);
 const clamStatus = ref({
     isExist: false,
-    version: false,
-    isActive: true,
+    isRunning: true,
 });
 
 const search = async () => {
@@ -142,6 +144,7 @@ const setting = () => {
 };
 const getStatus = (status: any) => {
     clamStatus.value = status;
+    console.log(clamStatus.value);
     search();
 };
 

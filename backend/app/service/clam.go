@@ -60,11 +60,11 @@ func (f *ClamService) LoadBaseInfo() (dto.ClamBaseInfo, error) {
 		baseInfo.IsExist = true
 		baseInfo.IsActive, _ = systemctl.IsActive(clamServiceNameCentOs)
 	}
-	exist2, _ := systemctl.IsExist(clamServiceNameCentOs)
+	exist2, _ := systemctl.IsExist(clamServiceNameUbuntu)
 	if exist2 {
-		f.serviceName = clamServiceNameCentOs
+		f.serviceName = clamServiceNameUbuntu
 		baseInfo.IsExist = true
-		baseInfo.IsActive, _ = systemctl.IsActive(clamServiceNameCentOs)
+		baseInfo.IsActive, _ = systemctl.IsActive(clamServiceNameUbuntu)
 	}
 
 	if baseInfo.IsActive {
@@ -246,25 +246,25 @@ func (u *ClamService) LoadFile(req dto.OperationWithName) (string, error) {
 	filePath := ""
 	switch req.Name {
 	case "clamd":
-		if u.serviceName == clamServiceNameCentOs {
+		if u.serviceName == clamServiceNameUbuntu {
 			filePath = "/etc/clamav/clamd.conf"
 		} else {
 			filePath = "/etc/clamd.d/scan.conf"
 		}
 	case "clamd-log":
-		if u.serviceName == clamServiceNameCentOs {
+		if u.serviceName == clamServiceNameUbuntu {
 			filePath = "/var/log/clamav/clamav.log"
 		} else {
 			filePath = "/var/log/clamd.scan"
 		}
 	case "freshclam":
-		if u.serviceName == clamServiceNameCentOs {
+		if u.serviceName == clamServiceNameUbuntu {
 			filePath = "/etc/clamav/freshclam.conf"
 		} else {
 			filePath = "/etc/freshclam.conf"
 		}
 	case "freshclam-log":
-		if u.serviceName == clamServiceNameCentOs {
+		if u.serviceName == clamServiceNameUbuntu {
 			filePath = "/var/log/clamav/freshclam.log"
 		} else {
 			filePath = "/var/log/clamav/freshclam.log"
@@ -287,15 +287,15 @@ func (u *ClamService) UpdateFile(req dto.UpdateByNameAndFile) error {
 	service := ""
 	switch req.Name {
 	case "clamd":
-		if u.serviceName == clamServiceNameCentOs {
-			service = clamServiceNameCentOs
+		if u.serviceName == clamServiceNameUbuntu {
+			service = clamServiceNameUbuntu
 			filePath = "/etc/clamav/clamd.conf"
 		} else {
 			service = clamServiceNameCentOs
 			filePath = "/etc/clamd.d/scan.conf"
 		}
 	case "freshclam":
-		if u.serviceName == clamServiceNameCentOs {
+		if u.serviceName == clamServiceNameUbuntu {
 			filePath = "/etc/clamav/freshclam.conf"
 		} else {
 			filePath = "/etc/freshclam.conf"

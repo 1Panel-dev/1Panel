@@ -30,11 +30,11 @@
                 </div>
             </el-card>
         </div>
-        <LayoutContent :title="$t('tool.supervisor.list')" :divider="true" v-if="!data.isExist" v-loading="loading">
+        <LayoutContent :title="$t('toolbox.clam.clam')" :divider="true" v-if="!data.isExist" v-loading="loading">
             <template #main>
                 <div class="app-warn">
                     <div>
-                        <span v-if="!data.isExist">{{ $t('tool.supervisor.notSupport') }}</span>
+                        <span v-if="!data.isExist">{{ $t('toolbox.clam.noClam') }}</span>
                         <span @click="toDoc()" v-if="!data.isExist">
                             <el-icon class="ml-2"><Position /></el-icon>
                             {{ $t('firewall.quickJump') }}
@@ -69,7 +69,7 @@ const setting = () => {
 };
 
 const toDoc = async () => {
-    window.open('https://1panel.cn/docs/user_manual/toolbox/supervisor/', '_blank', 'noopener,noreferrer');
+    window.open('https://1panel.cn/docs/user_manual/toolbox/clam/', '_blank', 'noopener,noreferrer');
 };
 
 const onOperate = async (operation: string) => {

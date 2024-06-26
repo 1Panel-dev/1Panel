@@ -1005,6 +1005,8 @@ const message = {
         },
         clam: {
             clam: '病毒扫描',
+            noClam: '未检测到 ClamAV 服务，请参考官方文档进行安装！',
+            notStart: '当前未 ClamAV 服务，请先开启！',
             clamCreate: '创建扫描规则',
             scanDate: '扫描时间',
             scanTime: '耗时',
