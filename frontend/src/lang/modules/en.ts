@@ -1061,6 +1061,8 @@ const message = {
         },
         clam: {
             clam: 'Virus Scan',
+            noClam: 'ClamAV service not detected, please refer to the official documentation for installation!',
+            notStart: 'ClamAV service is currently not running, please start it first!',
             clamCreate: 'Create Scan Rule',
             scanDate: 'Scan Date',
             scanTime: 'Elapsed Time',
