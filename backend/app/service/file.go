@@ -224,6 +224,9 @@ func (f *FileService) Compress(c request.FileCompress) error {
 
 func (f *FileService) DeCompress(c request.FileDeCompress) error {
 	fo := files.NewFileOp()
+	if c.Type == "tar" && len(c.Secret) != 0 {
+		c.Type = "tar.gz"
+	}
 	return fo.Decompress(c.Path, c.Dst, files.CompressType(c.Type), c.Secret)
 }
 
