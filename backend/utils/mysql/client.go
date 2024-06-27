@@ -3,6 +3,7 @@ package mysql
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -54,7 +55,7 @@ func NewMysqlClient(conn client.DBInfo) (MysqlClient, error) {
 		global.LOG.Errorf("test mysql conn failed, err: %v", err)
 		return nil, err
 	}
-	if ctx.Err() == context.DeadlineExceeded {
+	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 		return nil, buserr.New(constant.ErrExecTimeOut)
 	}
 

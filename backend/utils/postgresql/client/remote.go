@@ -223,7 +223,7 @@ func (r *Remote) SyncDB() ([]SyncDBInfo, error) {
 		}
 		datas = append(datas, SyncDBInfo{Name: dbName, From: r.From, PostgresqlName: r.Database})
 	}
-	if ctx.Err() == context.DeadlineExceeded {
+	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 		return nil, buserr.New(constant.ErrExecTimeOut)
 	}
 	return datas, nil
@@ -240,7 +240,7 @@ func (r *Remote) ExecSQL(command string, timeout uint) error {
 	if _, err := r.Client.ExecContext(ctx, command); err != nil {
 		return err
 	}
-	if ctx.Err() == context.DeadlineExceeded {
+	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 		return buserr.New(constant.ErrExecTimeOut)
 	}
 
@@ -300,7 +300,7 @@ func loadImageTag() (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 	defer cancel()
 	if _, err := client.ImagePull(ctx, itemTag, image.PullOptions{}); err != nil {
-		if ctx.Err() == context.DeadlineExceeded {
+		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 			return itemTag, buserr.New(constant.ErrPgImagePull)
 		}
 		global.LOG.Errorf("image %s pull failed, err: %v", itemTag, err)

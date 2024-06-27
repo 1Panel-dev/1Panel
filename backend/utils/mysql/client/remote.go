@@ -387,7 +387,7 @@ func (r *Remote) ExecSQL(command string, timeout uint) error {
 	if _, err := r.Client.ExecContext(ctx, command); err != nil {
 		return err
 	}
-	if ctx.Err() == context.DeadlineExceeded {
+	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 		return buserr.New(constant.ErrExecTimeOut)
 	}
 
@@ -402,7 +402,7 @@ func (r *Remote) ExecSQLForHosts(timeout uint) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	if ctx.Err() == context.DeadlineExceeded {
+	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 		return nil, buserr.New(constant.ErrExecTimeOut)
 	}
 	var rows []string

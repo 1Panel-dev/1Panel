@@ -350,7 +350,7 @@ func (r *Local) ExecSQL(command string, timeout uint) error {
 	defer cancel()
 	cmd := exec.CommandContext(ctx, "docker", itemCommand...)
 	stdout, err := cmd.CombinedOutput()
-	if ctx.Err() == context.DeadlineExceeded {
+	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 		return buserr.New(constant.ErrExecTimeOut)
 	}
 	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
@@ -367,7 +367,7 @@ func (r *Local) ExecSQLForRows(command string, timeout uint) ([]string, error) {
 	defer cancel()
 	cmd := exec.CommandContext(ctx, "docker", itemCommand...)
 	stdout, err := cmd.CombinedOutput()
-	if ctx.Err() == context.DeadlineExceeded {
+	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 		return nil, buserr.New(constant.ErrExecTimeOut)
 	}
 	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
