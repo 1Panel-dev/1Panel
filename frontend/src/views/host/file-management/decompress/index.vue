@@ -71,7 +71,7 @@ const rules = reactive<FormRules>({
 
 const fileForm = ref<FormInstance>();
 let loading = ref(false);
-let form = ref<File.FileDeCompress>({ type: 'zip', dst: '', path: '' });
+let form = ref<File.FileDeCompress>({ type: 'zip', dst: '', path: '', secret: '' });
 let open = ref(false);
 let name = ref('');
 
