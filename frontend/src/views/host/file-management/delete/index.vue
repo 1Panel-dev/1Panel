@@ -89,7 +89,7 @@ const onConfirm = () => {
     const pros = [];
     for (const s of files.value) {
         if (s['path'].indexOf('.1panel_clash') > -1) {
-            MsgWarning(i18n.global.t('file.clashDleteAlert'));
+            MsgWarning(i18n.global.t('file.clashDeleteAlert'));
             return;
         }
         pros.push(DeleteFile({ path: s['path'], isDir: s['isDir'], forceDelete: forceDelete.value }));

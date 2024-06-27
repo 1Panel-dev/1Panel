@@ -386,7 +386,7 @@ let pointer = -1;
 const fileCreate = reactive({ path: '/', isDir: false, mode: 0o755 });
 const fileCompress = reactive({ files: [''], name: '', dst: '', operate: 'compress' });
 const fileDeCompress = reactive({ path: '', name: '', dst: '', mimeType: '' });
-const fileEdit = reactive({ content: '', path: '', name: '', language: 'plaintext' });
+const fileEdit = reactive({ content: '', path: '', name: '', language: 'plaintext', extension: '' });
 const codeReq = reactive({ path: '', expand: false, page: 1, pageSize: 100 });
 const fileUpload = reactive({ path: '' });
 const fileRename = reactive({ path: '', oldName: '' });
@@ -698,6 +698,7 @@ const openCodeEditor = (path: string, extension: string) => {
             fileEdit.content = res.data.content;
             fileEdit.path = res.data.path;
             fileEdit.name = res.data.name;
+            fileEdit.extension = res.data.extension;
 
             codeEditorRef.value.acceptParams(fileEdit);
         })
@@ -895,6 +896,10 @@ const buttons = [
         click: copyDir,
     },
     {
+        label: i18n.global.t('file.openWithVscode'),
+        click: openWithVSCode,
+    },
+    {
         label: i18n.global.t('commons.button.delete'),
         disabled: (row: File.File) => {
             return row.name == '.1panel_clash';
@@ -904,10 +909,6 @@ const buttons = [
     {
         label: i18n.global.t('file.info'),
         click: openDetail,
-    },
-    {
-        label: i18n.global.t('file.openWithVscode'),
-        click: openWithVSCode,
     },
 ];
 
