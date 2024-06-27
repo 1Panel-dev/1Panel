@@ -64,20 +64,6 @@ type FileSearchInfo struct {
 	fs.FileInfo
 }
 
-func getDirSize(fs afero.Fs, path string) (int64, error) {
-	var size int64
-	err := afero.Walk(fs, path, func(p string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() {
-			size += info.Size()
-		}
-		return nil
-	})
-	return size, err
-}
-
 func NewFileInfo(op FileOption) (*FileInfo, error) {
 	var appFs = afero.NewOsFs()
 
@@ -115,11 +101,6 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 	}
 	if op.Expand {
 		if file.IsDir {
-			size, err := getDirSize(appFs, op.Path)
-			if err != nil {
-				return nil, err
-			}
-			file.Size = size
 			if err := file.listChildren(op); err != nil {
 				return nil, err
 			}
