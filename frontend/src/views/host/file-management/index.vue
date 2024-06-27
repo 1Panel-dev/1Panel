@@ -306,6 +306,7 @@
             <RecycleBin ref="recycleBinRef" @close="search" />
             <Favorite ref="favoriteRef" @close="search" />
             <BatchRole ref="batchRoleRef" @close="search" />
+            <VscodeOpenDialog ref="dialogVscodeOpenRef" />
         </LayoutContent>
     </div>
 </template>
@@ -349,6 +350,7 @@ import Detail from './detail/index.vue';
 import RecycleBin from './recycle-bin/index.vue';
 import Favorite from './favorite/index.vue';
 import BatchRole from './batch-role/index.vue';
+import VscodeOpenDialog from '@/components/vscode-open/index.vue';
 
 const globalStore = GlobalStore();
 
@@ -413,6 +415,7 @@ const favoriteRef = ref();
 const hoveredRowIndex = ref(-1);
 const favorites = ref([]);
 const batchRoleRef = ref();
+const dialogVscodeOpenRef = ref();
 
 // editablePath
 const { searchableStatus, searchablePath, searchableInputRef, searchableInputBlur } = useSearchable(paths);
@@ -846,6 +849,10 @@ const toTerminal = () => {
     router.push({ path: '/hosts/terminal', query: { path: req.path } });
 };
 
+const openWithVSCode = (row: File.File) => {
+    dialogVscodeOpenRef.value.acceptParams({ path: row.path + (row.isDir ? '' : ':1:1') });
+};
+
 const buttons = [
     {
         label: i18n.global.t('file.open'),
@@ -897,6 +904,10 @@ const buttons = [
     {
         label: i18n.global.t('file.info'),
         click: openDetail,
+    },
+    {
+        label: i18n.global.t('file.openWithVscode'),
+        click: openWithVSCode,
     },
 ];
 

@@ -1155,6 +1155,8 @@ const message = {
         back: '後退',
         top: '返回上一層',
         refresh: '重新整理',
+        openWithVscode: 'VS Code 打開',
+        vscodeHelper: '請確保本地已安裝 VS Code 並配置了 SSH Remote 插件',
     },
     ssh: {
         autoStart: '開機自啟',

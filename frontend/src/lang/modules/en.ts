@@ -1217,6 +1217,8 @@ const message = {
         back: 'Back',
         top: 'Go Back',
         refresh: 'Refresh',
+        openWithVscode: 'Open with VS Code',
+        vscodeHelper: 'Please make sure that VS Code is installed locally and the SSH Remote plugin is configured',
     },
     ssh: {
         autoStart: 'Auto Start',
