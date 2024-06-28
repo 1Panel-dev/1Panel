@@ -196,6 +196,9 @@ func (u *MysqlService) LoadFromRemote(req dto.MysqlLoadDB) error {
 		for i := 0; i < len(databases); i++ {
 			if strings.EqualFold(databases[i].Name, data.Name) && strings.EqualFold(databases[i].MysqlName, data.MysqlName) {
 				hasOld = true
+				if databases[i].IsDelete {
+					_ = mysqlRepo.Update(databases[i].ID, map[string]interface{}{"is_delete": false})
+				}
 				deleteList = append(deleteList[:i], deleteList[i+1:]...)
 				break
 			}

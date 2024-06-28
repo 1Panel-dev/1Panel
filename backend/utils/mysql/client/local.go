@@ -300,7 +300,10 @@ func (r *Local) SyncDB(version string) ([]SyncDBInfo, error) {
 		}
 		userLines, err := r.ExecSQLForRows(fmt.Sprintf("select user,host from mysql.db where db = '%s'", parts[0]), 300)
 		if err != nil {
-			return datas, err
+			global.LOG.Debugf("sync user of db %s failed, err: %v", parts[0], err)
+			dataItem.Permission = "%"
+			datas = append(datas, dataItem)
+			continue
 		}
 
 		var permissionItem []string
