@@ -53,7 +53,7 @@
                                     </div>
                                 </el-col>
                                 <el-col :span="6">
-                                    <span>{{ $t('menu.database') }}</span>
+                                    <span>{{ $t('menu.database') }} - {{ $t('database.all') }}</span>
                                     <div class="count">
                                         <span @click="goRouter('/databases')">{{ baseInfo?.databaseNumber }}</span>
                                     </div>

@@ -377,6 +377,7 @@ const message = {
         logout: 'Logout',
     },
     database: {
+        all: 'All',
         manage: 'Management',
         database: 'database',
         deleteBackupHelper: 'Delete database backups simultaneously',
