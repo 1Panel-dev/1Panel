@@ -99,11 +99,15 @@ func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto
 		return nil, err
 	}
 	baseInfo.AppInstalledNumber = len(appInstall)
-	dbs, err := mysqlRepo.List()
+	postgresqlDbs, err := postgresqlRepo.List()
 	if err != nil {
 		return nil, err
 	}
-	baseInfo.DatabaseNumber = len(dbs)
+	mysqlDbs, err := mysqlRepo.List()
+	if err != nil {
+		return nil, err
+	}
+	baseInfo.DatabaseNumber = len(mysqlDbs) + len(postgresqlDbs)
 	website, err := websiteRepo.GetBy()
 	if err != nil {
 		return nil, err

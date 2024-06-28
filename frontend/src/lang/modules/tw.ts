@@ -370,6 +370,7 @@ const message = {
         logout: '退出登錄',
     },
     database: {
+        all: '全部',
         manage: '管理',
         database: '數據庫',
         deleteBackupHelper: '同時刪除數據庫備份',
