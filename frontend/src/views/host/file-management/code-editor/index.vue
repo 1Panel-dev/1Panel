@@ -1,7 +1,7 @@
 <template>
     <el-dialog
         v-model="open"
-        :title="$t('commons.button.edit') + ' - ' + fileName"
+        :show-close="false"
         :before-close="handleClose"
         destroy-on-close
         width="70%"
@@ -9,10 +9,18 @@
         :top="'5vh'"
         :fullscreen="isFullscreen"
     >
+        <template #header>
+            <div class="flex items-center justify-between">
+                <span>{{ $t('commons.button.edit') + ' - ' + form.path }}</span>
+                <el-space alignment="center" :size="10" class="dialog-header-icon">
+                    <el-tooltip :content="loadTooltip()" placement="top">
+                        <el-icon @click="toggleFullscreen"><FullScreen /></el-icon>
+                    </el-tooltip>
+                    <el-icon @click="handleClose" size="20"><Close /></el-icon>
+                </el-space>
+            </div>
+        </template>
         <el-form :inline="true" :model="config" class="mt-1.5">
-            <el-tooltip :content="loadTooltip()" placement="top">
-                <el-button @click="toggleFullscreen" class="fullScreen" icon="FullScreen" plain></el-button>
-            </el-tooltip>
             <el-form-item :label="$t('file.theme')">
                 <el-select v-model="config.theme" @change="changeTheme()" class="p-w-200">
                     <el-option v-for="item in themes" :key="item.label" :value="item.value" :label="item.label" />
@@ -36,7 +44,90 @@
             </el-form-item>
         </el-form>
         <div v-loading="loading">
-            <div id="codeBox" style="height: 55vh"></div>
+            <div class="flex">
+                <div class="sm:w-48 w-1/3 monaco-editor-background tree-container" v-if="isShow">
+                    <div class="flex items-center justify-between pl-1 sm:pr-4 pr-1 pt-1">
+                        <el-tooltip :content="$t('file.top')" placement="top">
+                            <el-text size="small" @click="getUpData()" class="cursor-pointer">
+                                <el-icon>
+                                    <Top />
+                                </el-icon>
+                                <span class="sm:inline hidden pl-1">{{ $t('file.up') }}</span>
+                            </el-text>
+                        </el-tooltip>
+
+                        <el-tooltip :content="$t('file.refresh')" placement="top">
+                            <el-text size="small" @click="getRefresh(directoryPath)" class="cursor-pointer">
+                                <el-icon>
+                                    <Refresh />
+                                </el-icon>
+                                <span class="sm:inline hidden pl-1">{{ $t('file.refresh') }}</span>
+                            </el-text>
+                        </el-tooltip>
+                    </div>
+                    <el-divider class="!my-1" />
+                    <el-tree-v2
+                        ref="treeRef"
+                        :data="treeData"
+                        :props="treeProps"
+                        @node-expand="handleNodeExpand"
+                        class="monaco-editor-tree monaco-editor-background"
+                        :height="treeHeight"
+                        :indent="6"
+                        :item-size="24"
+                        highlight-current
+                    >
+                        <template #default="{ node, data }">
+                            <!-- 目录 -->
+                            <span v-if="data.isDir" style="display: inline-flex; align-items: center">
+                                <svg-icon className="table-icon" iconName="p-file-folder"></svg-icon>
+                                <small :title="node.label">{{ node.label }}</small>
+                            </span>
+
+                            <!-- 文档 -->
+                            <span
+                                v-else
+                                style="display: inline-flex; align-items: center"
+                                @click="getContent(data.path, data.extension)"
+                            >
+                                <svg-icon className="table-icon" :iconName="getIconName(data.extension)"></svg-icon>
+                                <small :title="node.label" class="min-w-32">{{ node.label }}</small>
+                            </span>
+                        </template>
+                    </el-tree-v2>
+                </div>
+                <div class="relative">
+                    <el-divider
+                        v-if="isShow"
+                        direction="vertical"
+                        :style="{ height: codeHeight }"
+                        class="!m-0 p-0"
+                        :class="isShow ? 'opacity-100' : 'opacity-0'"
+                    ></el-divider>
+                    <el-icon
+                        v-if="isShow"
+                        class="cursor-pointer absolute bg-gray-100 py-2 rounded-l-sm block top-1/3 -left-[9px]"
+                        size="9"
+                        @click="toggleShow"
+                    >
+                        <DArrowLeft />
+                    </el-icon>
+                    <el-icon
+                        v-else
+                        class="cursor-pointer absolute bg-gray-100 py-2 rounded-r-sm block top-1/3 right-[7px]"
+                        size="9"
+                        @click="toggleShow"
+                    >
+                        <DArrowRight />
+                    </el-icon>
+                </div>
+                <div
+                    ref="codeBox"
+                    id="codeBox"
+                    :style="{ height: codeHeight }"
+                    class="flex-1 sm:w-4/5 w-2/3 relative"
+                ></div>
+            </div>
         </div>
         <template #footer>
             <span class="dialog-footer">
@@ -48,17 +139,25 @@
 </template>
 
 <script lang="ts" setup>
-import { SaveFileContent } from '@/api/modules/files';
+import { GetFileContent, GetFilesTree, SaveFileContent } from '@/api/modules/files';
 import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgInfo, MsgSuccess } from '@/utils/message';
 import * as monaco from 'monaco-editor';
-import { nextTick, onBeforeUnmount, reactive, ref } from 'vue';
+import { nextTick, onBeforeUnmount, reactive, ref, onMounted } from 'vue';
 import { Languages } from '@/global/mimetype';
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
 import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
+
+import { ElTreeV2 } from 'element-plus';
+import { ResultData } from '@/api/interface';
+import { File } from '@/api/interface/file';
+import { getIcon } from '@/utils/util';
+import { TreeKey, TreeNodeData } from 'element-plus/es/components/tree-v2/src/types';
+import { Top, Refresh, DArrowLeft, DArrowRight, FullScreen, Close } from '@element-plus/icons-vue';
+import { loadBaseDir } from '@/api/modules/setting';
 
 let editor: monaco.editor.IStandaloneCodeEditor | undefined;
 
@@ -85,6 +184,7 @@ interface EditProps {
     content: string;
     path: string;
     name: string;
+    extension: string;
 }
 
 interface EditorConfig {
@@ -94,11 +194,37 @@ interface EditorConfig {
     wordWrap: WordWrapOptions;
 }
 
+interface TreeNode {
+    key: TreeKey;
+    level: number;
+    parent?: TreeNode;
+    children?: File.FileTree[];
+    data: TreeNodeData;
+    disabled?: boolean;
+    name?: string;
+    isLeaf?: boolean;
+}
+
 const open = ref(false);
 const loading = ref(false);
 const fileName = ref('');
 const codeThemeKey = 'code-theme';
 const warpKey = 'code-warp';
+const directoryPath = ref('');
+const fileExtension = ref('');
+const baseDir = ref();
+const treeData = ref([]);
+const codeBox = ref();
+const defaultHeight = ref(55);
+const fullScreenHeight = ref(80);
+const treeHeight = ref(0);
+const codeHeight = ref('55vh');
+const codeReq = reactive({ path: '', expand: false, page: 1, pageSize: 100 });
+const isShow = ref(true);
+
+const toggleShow = () => {
+    isShow.value = !isShow.value;
+};
 
 type WordWrapOptions = 'off' | 'on' | 'wordWrapColumn' | 'bounded';
 
@@ -155,9 +281,29 @@ const handleClose = () => {
 const loadTooltip = () => {
     return i18n.global.t('commons.button.' + (isFullscreen.value ? 'quitFullscreen' : 'fullscreen'));
 };
-function toggleFullscreen() {
+
+onMounted(() => {
+    loadPath();
+    updateHeights();
+    window.addEventListener('resize', updateHeights);
+});
+
+const updateHeights = () => {
+    const vh = window.innerHeight / 100;
+    if (isFullscreen.value) {
+        treeHeight.value = fullScreenHeight.value * vh - 31;
+        codeHeight.value = `${fullScreenHeight.value}vh`;
+    } else {
+        treeHeight.value = defaultHeight.value * vh - 31;
+        codeHeight.value = `${defaultHeight.value}vh`;
+    }
+};
+
+const toggleFullscreen = () => {
     isFullscreen.value = !isFullscreen.value;
-}
+    updateHeights();
+};
+
 const changeLanguage = () => {
     monaco.editor.setModelLanguage(editor.getModel(), config.language);
 };
@@ -183,8 +329,7 @@ const initEditor = () => {
         editor.dispose();
     }
     nextTick(() => {
-        const codeBox = document.getElementById('codeBox');
-        editor = monaco.editor.create(codeBox as HTMLElement, {
+        editor = monaco.editor.create(codeBox.value as HTMLElement, {
             theme: config.theme,
             value: form.value.content,
             readOnly: false,
@@ -195,6 +340,10 @@ const initEditor = () => {
             overviewRulerBorder: false,
             wordWrap: config.wordWrap,
         });
+        if (editor.getModel().getValue() === '') {
+            let defaultContent = '\n\n\n\n';
+            editor.getModel().setValue(defaultContent);
+        }
         editor.onDidChangeModelContent(() => {
             if (editor) {
                 form.value.content = editor.getValue();
@@ -231,38 +380,212 @@ const saveContent = (closePage: boolean) => {
 const acceptParams = (props: EditProps) => {
     form.value.content = props.content;
     form.value.path = props.path;
-    config.language = props.language;
+    directoryPath.value = getDirectoryPath(props.path);
+    fileExtension.value = props.extension;
     fileName.value = props.name;
+    config.language = props.language;
     config.eol = monaco.editor.EndOfLineSequence.LF;
-
     config.theme = localStorage.getItem(codeThemeKey) || 'vs-dark';
     config.wordWrap = (localStorage.getItem(warpKey) as WordWrapOptions) || 'on';
     open.value = true;
 };
 
+const getIconName = (extension: string) => getIcon(extension);
+
+const loadPath = async () => {
+    const pathRes = await loadBaseDir();
+    baseDir.value = pathRes.data;
+};
+
+const getDirectoryPath = (filePath: string) => {
+    if (!filePath) {
+        return baseDir.value;
+    }
+
+    const lastSlashIndex = filePath.lastIndexOf('/');
+
+    if (lastSlashIndex === -1) {
+        return baseDir.value;
+    }
+
+    const directoryPath = filePath.substring(0, lastSlashIndex);
+    if (directoryPath === '' || directoryPath === '.' || directoryPath === '/') {
+        return baseDir.value;
+    }
+    return directoryPath;
+};
+
 const onOpen = () => {
     initEditor();
+    search(directoryPath.value).then((res) => {
+        handleSearchResult(res);
+    });
+};
+
+const handleSearchResult = (res: ResultData<File.FileTree[]>) => {
+    if (res.data.length > 0 && res.data[0].children) {
+        treeData.value = res.data[0].children.map((item) => ({
+            ...item,
+            children: item.isDir ? item.children || [] : undefined,
+        }));
+    } else {
+        treeData.value = [];
+    }
+};
+
+const getRefresh = (path: string) => {
+    loading.value = true;
+    try {
+        search(path).then((res) => {
+            treeData.value = res.data[0].children;
+            loadedNodes.value = new Set();
+        });
+    } finally {
+        loading.value = false;
+        MsgSuccess(i18n.global.t('commons.msg.refreshSuccess'));
+    }
+};
+
+const getContent = (path: string, extension: string) => {
+    if (form.value.path !== path) {
+        codeReq.path = path;
+        codeReq.expand = true;
+
+        if (extension != '') {
+            Languages.forEach((language) => {
+                const ext = extension.substring(1);
+                if (language.value.indexOf(ext) > -1) {
+                    config.language = language.label;
+                }
+            });
+        }
+
+        GetFileContent(codeReq)
+            .then((res) => {
+                form.value.content = res.data.content;
+                form.value.path = res.data.path;
+                fileExtension.value = res.data.extension;
+                fileName.value = res.data.name;
+                initEditor();
+            })
+            .catch(() => {});
+    }
+};
+
+const initTreeData = () => ({
+    path: '/',
+    expand: true,
+    showHidden: true,
+    page: 1,
+    pageSize: 1000,
+    search: '',
+    containSub: true,
+    dir: false,
+    sortBy: 'name',
+    sortOrder: 'ascending',
+});
+
+let req = reactive(initTreeData());
+
+const loadedNodes = ref(new Set());
+
+const search = async (path: string) => {
+    req.path = path;
+    if (req.search != '') {
+        req.sortBy = 'name';
+        req.sortOrder = 'ascending';
+    }
+    return await GetFilesTree(req);
+};
+
+const getUpData = async () => {
+    if ('/' === directoryPath.value) {
+        MsgInfo(i18n.global.t('commons.msg.rootInfoErr'));
+        return;
+    }
+    let pathParts = directoryPath.value.split('/');
+    pathParts.pop();
+    let newPath = pathParts.join('/') || '/';
+
+    try {
+        const response = await search(newPath);
+        treeData.value = response.data[0]?.children || [];
+        loadedNodes.value = new Set();
+    } catch (error) {
+        MsgError(i18n.global.t('commons.msg.notRecords'));
+    } finally {
+        directoryPath.value = newPath;
+    }
+};
+
+const treeRef = ref<InstanceType<typeof ElTreeV2>>();
+
+const treeProps = {
+    value: 'id',
+    label: 'name',
+    children: 'children',
+};
+
+const handleNodeExpand = async (node: any, data: TreeNode) => {
+    if (!data.data.isDir || loadedNodes.value.has(data.data.path)) {
+        return;
+    }
+    try {
+        const response = await search(node.path);
+        const newTreeData = JSON.parse(JSON.stringify(treeData.value));
+        if (response.data.length > 0 && response.data[0].children) {
+            data.children = response.data[0].children;
+            loadedNodes.value.add(data.data.path);
+            updateNodeChildren(newTreeData, data.data.path, response.data[0].children);
+        } else {
+            data.children = [];
+        }
+        treeData.value = newTreeData;
+    } catch (error) {
+        MsgError(i18n.global.t('commons.msg.notRecords'));
+    }
+};
+
+// 更新指定节点的 children 数据
+const updateNodeChildren = (nodes: any[], path: any, newChildren: File.FileTree[]) => {
+    const updateNode = (nodes: string | any[]) => {
+        for (const element of nodes) {
+            if (element.path === path) {
+                element.children = newChildren;
+                break;
+            }
+            if (element.children && element.children.length) {
+                updateNode(element.children);
+            }
+        }
+    };
+    updateNode(nodes);
 };
 
 onBeforeUnmount(() => {
     if (editor) {
         editor.dispose();
     }
+    window.removeEventListener('resize', updateHeights);
 });
 
 defineExpose({ acceptParams });
 </script>
 
-<style>
+<style scoped lang="scss">
 .dialog-top {
     top: 0;
 }
-.fullScreen {
-    background-color: transparent;
-    border: none;
-    position: absolute;
-    right: 50px;
-    font-weight: 600;
-    font-size: 14px;
+
+.dialog-header-icon {
+    color: var(--el-color-info);
+}
+
+.monaco-editor-tree {
+    color: var(--el-color-primary) !important;
+}
+
+.tree-widget {
+    background-color: var(--el-button--primary);
 }
 </style>

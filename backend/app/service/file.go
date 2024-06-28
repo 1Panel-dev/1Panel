@@ -17,6 +17,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"golang.org/x/net/html/charset"
+	"golang.org/x/sys/unix"
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/transform"
 
@@ -49,6 +50,10 @@ type IFileService interface {
 	ChangeMode(op request.FileCreate) error
 	BatchChangeModeAndOwner(op request.FileRoleReq) error
 	ReadLogByLine(req request.FileReadByLineReq) (*response.FileLineContent, error)
+}
+
+var filteredPaths = []string{
+	"/.1panel_clash",
 }
 
 func NewIFileService() IFileService {
@@ -100,25 +105,76 @@ func (f *FileService) SearchUploadWithPage(req request.SearchUploadWithPage) (in
 
 func (f *FileService) GetFileTree(op request.FileOption) ([]response.FileTree, error) {
 	var treeArray []response.FileTree
+	if _, err := os.Stat(op.Path); err != nil && os.IsNotExist(err) {
+		return treeArray, nil
+	}
 	info, err := files.NewFileInfo(op.FileOption)
 	if err != nil {
 		return nil, err
 	}
 	node := response.FileTree{
-		ID:   common.GetUuid(),
-		Name: info.Name,
-		Path: info.Path,
+		ID:        common.GetUuid(),
+		Name:      info.Name,
+		Path:      info.Path,
+		IsDir:     info.IsDir,
+		Extension: info.Extension,
 	}
-	for _, v := range info.Items {
-		if v.IsDir {
-			node.Children = append(node.Children, response.FileTree{
-				ID:   common.GetUuid(),
-				Name: v.Name,
-				Path: v.Path,
-			})
-		}
+	err = f.buildFileTree(&node, info.Items, op, 2)
+	if err != nil {
+		return nil, err
 	}
 	return append(treeArray, node), nil
+}
+
+func shouldFilterPath(path string) bool {
+	cleanedPath := filepath.Clean(path)
+	for _, filteredPath := range filteredPaths {
+		cleanedFilteredPath := filepath.Clean(filteredPath)
+		if cleanedFilteredPath == cleanedPath || strings.HasPrefix(cleanedPath, cleanedFilteredPath+"/") {
+			return true
+		}
+	}
+	return false
+}
+
+// 递归构建文件树(只取当前目录以及当前目录下的第一层子节点)
+func (f *FileService) buildFileTree(node *response.FileTree, items []*files.FileInfo, op request.FileOption, level int) error {
+	for _, v := range items {
+		if shouldFilterPath(v.Path) {
+			global.LOG.Info("File Tree: Skipping %s due to filter\n", v.Path)
+			continue
+		}
+		childNode := response.FileTree{
+			ID:        common.GetUuid(),
+			Name:      v.Name,
+			Path:      v.Path,
+			IsDir:     v.IsDir,
+			Extension: v.Extension,
+		}
+		if level > 1 && v.IsDir {
+			if err := f.buildChildNode(&childNode, v, op, level); err != nil {
+				return err
+			}
+		}
+
+		node.Children = append(node.Children, childNode)
+	}
+	return nil
+}
+
+func (f *FileService) buildChildNode(childNode *response.FileTree, fileInfo *files.FileInfo, op request.FileOption, level int) error {
+	op.Path = fileInfo.Path
+	subInfo, err := files.NewFileInfo(op.FileOption)
+	if err != nil {
+		if os.IsPermission(err) || errors.Is(err, unix.EACCES) {
+			global.LOG.Info("File Tree: Skipping %s due to permission denied\n", fileInfo.Path)
+			return nil
+		}
+		global.LOG.Errorf("File Tree: Skipping %s due to error: %s\n", fileInfo.Path, err.Error())
+		return nil
+	}
+
+	return f.buildFileTree(childNode, subInfo.Items, op, level-1)
 }
 
 func (f *FileService) Create(op request.FileCreate) error {

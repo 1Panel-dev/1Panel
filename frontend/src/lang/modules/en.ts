@@ -93,6 +93,7 @@ const message = {
             user: 'User',
             title: 'Title',
             port: 'Port',
+            forward: 'Forward',
             protocol: 'Protocol',
             tableSetting: 'Table setting',
             refreshRate: 'Rate',
@@ -139,6 +140,8 @@ const message = {
             remove: 'Remove',
             backupHelper: 'The current operation will back up {0}. Do you want to proceed?',
             recoverHelper: 'Restoring from {0} file. This operation is irreversible. Do you want to continue?',
+            refreshSuccess: 'Refresh successful',
+            rootInfoErr: "It's already the root directory",
         },
         login: {
             username: 'UserName',
@@ -1220,6 +1223,7 @@ const message = {
         refresh: 'Refresh',
         openWithVscode: 'Open with VS Code',
         vscodeHelper: 'Please make sure that VS Code is installed locally and the SSH Remote plugin is configured',
+        up: 'Go back',
     },
     ssh: {
         autoStart: 'Auto Start',
