@@ -124,7 +124,7 @@ func (u *CronjobService) handleNtpSync() error {
 	if err != nil {
 		return err
 	}
-	if err := ntp.UpdateSystemTime(ntime.Format("2006-01-02 15:04:05")); err != nil {
+	if err := ntp.UpdateSystemTime(ntime.Format(constant.DateTimeLayout)); err != nil {
 		return err
 	}
 	return nil
@@ -224,7 +224,7 @@ func (u *CronjobService) handleCutWebsiteLog(cronjob *model.Cronjob, startTime t
 			_ = os.MkdirAll(dstLogDir, 0755)
 		}
 
-		dstName := fmt.Sprintf("%s_log_%s.gz", website.PrimaryDomain, startTime.Format("20060102150405"))
+		dstName := fmt.Sprintf("%s_log_%s.gz", website.PrimaryDomain, startTime.Format(constant.DateTimeSlimLayout))
 		dstFilePath := path.Join(dstLogDir, dstName)
 		filePaths = append(filePaths, dstFilePath)
 
@@ -384,7 +384,7 @@ func (u *CronjobService) generateLogsPath(cronjob model.Cronjob, startTime time.
 		_ = os.MkdirAll(dir, os.ModePerm)
 	}
 
-	path := fmt.Sprintf("%s/%s.log", dir, startTime.Format("20060102150405"))
+	path := fmt.Sprintf("%s/%s.log", dir, startTime.Format(constant.DateTimeSlimLayout))
 	return path
 }
 

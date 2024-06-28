@@ -46,10 +46,10 @@ func WithWriter(writer io.Writer) DumpOption {
 
 func Dump(dns string, opts ...DumpOption) error {
 	start := time.Now()
-	global.LOG.Infof("dump start at %s\n", start.Format("2006-01-02 15:04:05"))
+	global.LOG.Infof("dump start at %s\n", start.Format(constant.DateTimeLayout))
 	defer func() {
 		end := time.Now()
-		global.LOG.Infof("dump end at %s, cost %s\n", end.Format("2006-01-02 15:04:05"), end.Sub(start))
+		global.LOG.Infof("dump end at %s, cost %s\n", end.Format(constant.DateTimeLayout), end.Sub(start))
 	}()
 
 	var err error
@@ -75,7 +75,7 @@ func Dump(dns string, opts ...DumpOption) error {
 
 	itemFile += "-- ----------------------------\n"
 	itemFile += "-- MySQL Database Dump\n"
-	itemFile += "-- Start Time: " + start.Format("2006-01-02 15:04:05") + "\n"
+	itemFile += "-- Start Time: " + start.Format(constant.DateTimeLayout) + "\n"
 	itemFile += "-- ----------------------------\n\n\n"
 
 	db, err := sql.Open("mysql", dns)
@@ -252,14 +252,14 @@ func loadDataSql(row []interface{}, columnTypes []*sql.ColumnType, table string)
 					global.LOG.Errorf("the DATETIME type conversion failed, err value: %v", col)
 					return ""
 				}
-				ssql += fmt.Sprintf("'%s'", t.Format("2006-01-02 15:04:05"))
+				ssql += fmt.Sprintf("'%s'", t.Format(constant.DateTimeLayout))
 			case "TIMESTAMP":
 				t, ok := col.(time.Time)
 				if !ok {
 					global.LOG.Errorf("the TIMESTAMP type conversion failed, err value: %v", col)
 					return ""
 				}
-				ssql += fmt.Sprintf("'%s'", t.Format("2006-01-02 15:04:05"))
+				ssql += fmt.Sprintf("'%s'", t.Format(constant.DateTimeLayout))
 			case "TIME":
 				t, ok := col.([]byte)
 				if !ok {

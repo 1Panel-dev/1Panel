@@ -35,7 +35,7 @@ func (u *BackupService) RedisBackup(db dto.CommonBackup) error {
 	}
 	global.LOG.Infof("appendonly in redis conf is %s", appendonly)
 
-	timeNow := time.Now().Format("20060102150405") + common.RandStrAndNum(5)
+	timeNow := time.Now().Format(constant.DateTimeSlimLayout) + common.RandStrAndNum(5)
 	fileName := fmt.Sprintf("%s.rdb", timeNow)
 	if appendonly == "yes" {
 		if strings.HasPrefix(redisInfo.Version, "6.") {
@@ -146,7 +146,7 @@ func handleRedisRecover(redisInfo *repo.RootInfo, recoverFile string, isRollback
 				suffix = "tar.gz"
 			}
 		}
-		rollbackFile := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("database/redis/%s_%s.%s", redisInfo.Name, time.Now().Format("20060102150405"), suffix))
+		rollbackFile := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("database/redis/%s_%s.%s", redisInfo.Name, time.Now().Format(constant.DateTimeSlimLayout), suffix))
 		if err := handleRedisBackup(redisInfo, path.Dir(rollbackFile), path.Base(rollbackFile), secret); err != nil {
 			return fmt.Errorf("backup database %s for rollback before recover failed, err: %v", redisInfo.Name, err)
 		}

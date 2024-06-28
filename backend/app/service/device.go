@@ -158,7 +158,7 @@ func (u *DeviceService) Update(key, value string) error {
 		if err != nil {
 			return err
 		}
-		ts := ntime.Format("2006-01-02 15:04:05")
+		ts := ntime.Format(constant.DateTimeLayout)
 		if err := ntp.UpdateSystemTime(ts); err != nil {
 			return err
 		}

@@ -119,7 +119,7 @@ type SnapshotJson struct {
 }
 
 func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
-	if _, err := u.HandleSnapshot(false, "", req, time.Now().Format("20060102150405"), req.Secret); err != nil {
+	if _, err := u.HandleSnapshot(false, "", req, time.Now().Format(constant.DateTimeSlimLayout), req.Secret); err != nil {
 		return err
 	}
 	return nil
@@ -132,7 +132,7 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 		return err
 	}
 	if hasOs(snap.Name) && !strings.Contains(snap.Name, loadOs()) {
-		return fmt.Errorf("Restoring snapshots(%s) between different server architectures(%s) is not supported.", snap.Name, loadOs())
+		return fmt.Errorf("restoring snapshots(%s) between different server architectures(%s) is not supported", snap.Name, loadOs())
 	}
 	if !req.IsNew && len(snap.InterruptStep) != 0 && len(snap.RollbackStatus) != 0 {
 		return fmt.Errorf("the snapshot has been rolled back and cannot be restored again")
@@ -350,7 +350,7 @@ func updateRecoverStatus(id uint, isRecover bool, interruptStep, status, message
 			"interrupt_step":    interruptStep,
 			"recover_status":    status,
 			"recover_message":   message,
-			"last_recovered_at": time.Now().Format("2006-01-02 15:04:05"),
+			"last_recovered_at": time.Now().Format(constant.DateTimeLayout),
 		}); err != nil {
 			global.LOG.Errorf("update snap recover status failed, err: %v", err)
 		}
@@ -365,7 +365,7 @@ func updateRecoverStatus(id uint, isRecover bool, interruptStep, status, message
 			"interrupt_step":     "",
 			"rollback_status":    "",
 			"rollback_message":   "",
-			"last_rollbacked_at": time.Now().Format("2006-01-02 15:04:05"),
+			"last_rollbacked_at": time.Now().Format(constant.DateTimeLayout),
 		}); err != nil {
 			global.LOG.Errorf("update snap recover status failed, err: %v", err)
 		}
@@ -375,7 +375,7 @@ func updateRecoverStatus(id uint, isRecover bool, interruptStep, status, message
 	if err := snapshotRepo.Update(id, map[string]interface{}{
 		"rollback_status":    status,
 		"rollback_message":   message,
-		"last_rollbacked_at": time.Now().Format("2006-01-02 15:04:05"),
+		"last_rollbacked_at": time.Now().Format(constant.DateTimeLayout),
 	}); err != nil {
 		global.LOG.Errorf("update snap recover status failed, err: %v", err)
 	}

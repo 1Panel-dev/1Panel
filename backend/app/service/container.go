@@ -190,7 +190,7 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 		ports := loadContainerPort(item.Ports)
 		info := dto.ContainerInfo{
 			ContainerID:   item.ID,
-			CreateTime:    time.Unix(item.Created, 0).Format("2006-01-02 15:04:05"),
+			CreateTime:    time.Unix(item.Created, 0).Format(constant.DateTimeLayout),
 			Name:          item.Names[0][1:],
 			ImageId:       strings.Split(item.ImageID, ":")[1],
 			ImageName:     item.Image,
@@ -1147,7 +1147,7 @@ func loadConfigInfo(isCreate bool, req dto.ContainerOperate, oldContainer *types
 		}
 	} else {
 		if req.Ipv4 != "" || req.Ipv6 != "" {
-			return nil, nil, nil, fmt.Errorf("Please set up the network")
+			return nil, nil, nil, fmt.Errorf("please set up the network")
 		}
 		networkConf = network.NetworkingConfig{}
 	}

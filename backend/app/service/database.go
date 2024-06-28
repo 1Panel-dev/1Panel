@@ -7,8 +7,8 @@ import (
 	"path"
 
 	"github.com/1Panel-dev/1Panel/backend/utils/postgresql"
-	pg_client "github.com/1Panel-dev/1Panel/backend/utils/postgresql/client"
-	redis_client "github.com/1Panel-dev/1Panel/backend/utils/redis"
+	pgclient "github.com/1Panel-dev/1Panel/backend/utils/postgresql/client"
+	redisclient "github.com/1Panel-dev/1Panel/backend/utils/redis"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
@@ -118,7 +118,7 @@ func (u *DatabaseService) LoadItems(dbType string) ([]dto.DatabaseItem, error) {
 func (u *DatabaseService) CheckDatabase(req dto.DatabaseCreate) bool {
 	switch req.Type {
 	case constant.AppPostgresql:
-		_, err := postgresql.NewPostgresqlClient(pg_client.DBInfo{
+		_, err := postgresql.NewPostgresqlClient(pgclient.DBInfo{
 			From:     "remote",
 			Address:  req.Address,
 			Port:     req.Port,
@@ -128,7 +128,7 @@ func (u *DatabaseService) CheckDatabase(req dto.DatabaseCreate) bool {
 		})
 		return err == nil
 	case constant.AppRedis:
-		_, err := redis_client.NewRedisClient(redis_client.DBInfo{
+		_, err := redisclient.NewRedisClient(redisclient.DBInfo{
 			Address:  req.Address,
 			Port:     req.Port,
 			Password: req.Password,
@@ -165,7 +165,7 @@ func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
 	}
 	switch req.Type {
 	case constant.AppPostgresql:
-		if _, err := postgresql.NewPostgresqlClient(pg_client.DBInfo{
+		if _, err := postgresql.NewPostgresqlClient(pgclient.DBInfo{
 			From:     "remote",
 			Address:  req.Address,
 			Port:     req.Port,
@@ -176,7 +176,7 @@ func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
 			return err
 		}
 	case constant.AppRedis:
-		if _, err := redis_client.NewRedisClient(redis_client.DBInfo{
+		if _, err := redisclient.NewRedisClient(redisclient.DBInfo{
 			Address:  req.Address,
 			Port:     req.Port,
 			Password: req.Password,
@@ -269,7 +269,7 @@ func (u *DatabaseService) Delete(req dto.DatabaseDelete) error {
 func (u *DatabaseService) Update(req dto.DatabaseUpdate) error {
 	switch req.Type {
 	case constant.AppPostgresql:
-		if _, err := postgresql.NewPostgresqlClient(pg_client.DBInfo{
+		if _, err := postgresql.NewPostgresqlClient(pgclient.DBInfo{
 			From:     "remote",
 			Address:  req.Address,
 			Port:     req.Port,
@@ -280,7 +280,7 @@ func (u *DatabaseService) Update(req dto.DatabaseUpdate) error {
 			return err
 		}
 	case constant.AppRedis:
-		if _, err := redis_client.NewRedisClient(redis_client.DBInfo{
+		if _, err := redisclient.NewRedisClient(redisclient.DBInfo{
 			Address:  req.Address,
 			Port:     req.Port,
 			Password: req.Password,

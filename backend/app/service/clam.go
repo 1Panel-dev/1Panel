@@ -115,11 +115,11 @@ func (f *ClamService) SearchWithPage(req dto.SearchWithPage) (int64, interface{}
 			return logPaths[i] > logPaths[j]
 		})
 		if len(logPaths) != 0 {
-			t1, err := time.ParseInLocation("20060102150405", logPaths[0], nyc)
+			t1, err := time.ParseInLocation(constant.DateTimeSlimLayout, logPaths[0], nyc)
 			if err != nil {
 				continue
 			}
-			datas[i].LastHandleDate = t1.Format("2006-01-02 15:04:05")
+			datas[i].LastHandleDate = t1.Format(constant.DateTimeLayout)
 		}
 	}
 	return total, datas, err
@@ -173,7 +173,7 @@ func (u *ClamService) HandleOnce(req dto.OperateByID) error {
 	if cmd.CheckIllegal(clam.Path) {
 		return buserr.New(constant.ErrCmdIllegal)
 	}
-	logFile := path.Join(global.CONF.System.DataDir, scanDir, clam.Name, time.Now().Format("20060102150405"))
+	logFile := path.Join(global.CONF.System.DataDir, scanDir, clam.Name, time.Now().Format(constant.DateTimeSlimLayout))
 	if _, err := os.Stat(path.Dir(logFile)); err != nil {
 		_ = os.MkdirAll(path.Dir(logFile), os.ModePerm)
 	}
@@ -197,7 +197,7 @@ func (u *ClamService) LoadRecords(req dto.ClamLogSearch) (int64, interface{}, er
 	var filterFiles []string
 	nyc, _ := time.LoadLocation(common.LoadTimeZone())
 	for _, item := range logPaths {
-		t1, err := time.ParseInLocation("20060102150405", item, nyc)
+		t1, err := time.ParseInLocation(constant.DateTimeSlimLayout, item, nyc)
 		if err != nil {
 			continue
 		}

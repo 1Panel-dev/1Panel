@@ -83,7 +83,7 @@ func (u *UpgradeService) LoadNotes(req dto.Upgrade) (string, error) {
 func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 	global.LOG.Info("start to upgrade now...")
 	fileOp := files.NewFileOp()
-	timeStr := time.Now().Format("20060102150405")
+	timeStr := time.Now().Format(constant.DateTimeSlimLayout)
 	rootDir := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("upgrade/upgrade_%s/downloads", timeStr))
 	originalDir := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("upgrade/upgrade_%s/original", timeStr))
 	if err := os.MkdirAll(rootDir, os.ModePerm); err != nil {

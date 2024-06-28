@@ -62,7 +62,9 @@ func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 		active, err := systemctl.IsActive(serviceName)
 		if !active {
 			data.Status = constant.StatusDisable
-			data.Message = err.Error()
+			if err != nil {
+				data.Message = err.Error()
+			}
 		} else {
 			data.Status = constant.StatusEnable
 		}
@@ -549,14 +551,14 @@ func loadDate(currentYear int, DateStr string, nyc *time.Location) time.Time {
 }
 
 func analyzeDateStr(parts []string) (int, string) {
-	t, err := time.Parse("2006-01-02T15:04:05.999999-07:00", parts[0])
+	t, err := time.Parse(time.RFC3339Nano, parts[0])
 	if err == nil {
 		if len(parts) < 12 {
 			return 0, ""
 		}
 		return 0, t.Format("2006 Jan 2 15:04:05")
 	}
-	t, err = time.Parse("2006-01-02 15:04:05", fmt.Sprintf("%s %s", parts[0], parts[1]))
+	t, err = time.Parse(constant.DateTimeLayout, fmt.Sprintf("%s %s", parts[0], parts[1]))
 	if err == nil {
 		if len(parts) < 14 {
 			return 0, ""
