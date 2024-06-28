@@ -28,6 +28,10 @@ export const Languages = [
         value: ['json'],
     },
     {
+        label: 'typescript',
+        value: ['ts'],
+    },
+    {
         label: 'lua',
         value: ['lua'],
     },
