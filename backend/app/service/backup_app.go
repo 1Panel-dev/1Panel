@@ -35,7 +35,7 @@ func (u *BackupService) AppBackup(req dto.CommonBackup) (*model.BackupRecord, er
 	if err != nil {
 		return nil, err
 	}
-	timeNow := time.Now().Format("20060102150405")
+	timeNow := time.Now().Format(constant.DateTimeSlimLayout)
 	itemDir := fmt.Sprintf("app/%s/%s", req.Name, req.DetailName)
 	backupDir := path.Join(localDir, itemDir)
 
@@ -163,7 +163,7 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 	}
 
 	if !isRollback {
-		rollbackFile := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("app/%s_%s.tar.gz", install.Name, time.Now().Format("20060102150405")))
+		rollbackFile := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("app/%s_%s.tar.gz", install.Name, time.Now().Format(constant.DateTimeSlimLayout)))
 		if err := handleAppBackup(install, path.Dir(rollbackFile), path.Base(rollbackFile), "", ""); err != nil {
 			return fmt.Errorf("backup app %s for rollback before recover failed, err: %v", install.Name, err)
 		}

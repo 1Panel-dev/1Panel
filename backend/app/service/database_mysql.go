@@ -518,11 +518,11 @@ func (u *MysqlService) LoadStatus(req dto.OperationWithNameAndType) (*dto.MysqlS
 
 	if value, ok := statusMap["Run"]; ok {
 		uptime, _ := strconv.Atoi(value)
-		info.Run = time.Unix(time.Now().Unix()-int64(uptime), 0).Format("2006-01-02 15:04:05")
+		info.Run = time.Unix(time.Now().Unix()-int64(uptime), 0).Format(constant.DateTimeLayout)
 	} else {
 		if value, ok := statusMap["Uptime"]; ok {
 			uptime, _ := strconv.Atoi(value)
-			info.Run = time.Unix(time.Now().Unix()-int64(uptime), 0).Format("2006-01-02 15:04:05")
+			info.Run = time.Unix(time.Now().Unix()-int64(uptime), 0).Format(constant.DateTimeLayout)
 		}
 	}
 

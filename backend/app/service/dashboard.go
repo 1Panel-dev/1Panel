@@ -135,7 +135,7 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 	var currentInfo dto.DashboardCurrent
 	hostInfo, _ := host.Info()
 	currentInfo.Uptime = hostInfo.Uptime
-	currentInfo.TimeSinceUptime = time.Now().Add(-time.Duration(hostInfo.Uptime) * time.Second).Format("2006-01-02 15:04:05")
+	currentInfo.TimeSinceUptime = time.Now().Add(-time.Duration(hostInfo.Uptime) * time.Second).Format(constant.DateTimeLayout)
 	currentInfo.Procs = hostInfo.Procs
 
 	currentInfo.CPUTotal, _ = cpu.Counts(true)

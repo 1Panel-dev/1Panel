@@ -364,7 +364,7 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 					dirStr = dirStr[:strings.LastIndex(dirStr, "/")]
 				}
 				if err := copyDir(oldDir, dirStr); err != nil {
-					_ = backupRepo.Update(req.ID, (map[string]interface{}{"vars": oldVars}))
+					_ = backupRepo.Update(req.ID, map[string]interface{}{"vars": oldVars})
 					return err
 				}
 				global.CONF.System.Backup = dirStr
@@ -460,7 +460,7 @@ func (u *BackupService) loadAccessToken(backup *model.BackupAccount) error {
 	delete(varMap, "code")
 	backup.Credential = token
 	varMap["refresh_status"] = constant.StatusSuccess
-	varMap["refresh_time"] = time.Now().Format("2006-01-02 15:04:05")
+	varMap["refresh_time"] = time.Now().Format(constant.DateTimeLayout)
 	varMap["refresh_token"] = refreshToken
 	itemVars, err := json.Marshal(varMap)
 	if err != nil {
@@ -587,10 +587,10 @@ func (u *BackupService) checkBackupConn(backup *model.BackupAccount) (bool, erro
 	}
 	defer file.Close()
 	write := bufio.NewWriter(file)
-	_, _ = write.WriteString(string("1Panel 备份账号测试文件。\n"))
-	_, _ = write.WriteString(string("1Panel 備份賬號測試文件。\n"))
-	_, _ = write.WriteString(string("1Panel Backs up account test files.\n"))
-	_, _ = write.WriteString(string("1Panelアカウントのテストファイルをバックアップします。\n"))
+	_, _ = write.WriteString("1Panel 备份账号测试文件。\n")
+	_, _ = write.WriteString("1Panel 備份賬號測試文件。\n")
+	_, _ = write.WriteString("1Panel Backs up account test files.\n")
+	_, _ = write.WriteString("1Panelアカウントのテストファイルをバックアップします。\n")
 	write.Flush()
 
 	targetPath := strings.TrimPrefix(path.Join(backup.BackupPath, "test/1panel"), "/")
@@ -625,7 +625,7 @@ func (u *BackupService) Run() {
 	}
 	token, refreshToken, err := client.RefreshToken("refresh_token", varMap)
 	varMap["refresh_status"] = constant.StatusSuccess
-	varMap["refresh_time"] = time.Now().Format("2006-01-02 15:04:05")
+	varMap["refresh_time"] = time.Now().Format(constant.DateTimeLayout)
 	if err != nil {
 		varMap["refresh_status"] = constant.StatusFailed
 		varMap["refresh_msg"] = err.Error()

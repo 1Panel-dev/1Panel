@@ -118,7 +118,7 @@ func (u *SettingService) Update(key, value string) error {
 		if err != nil {
 			return err
 		}
-		if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format("2006-01-02 15:04:05")); err != nil {
+		if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format(constant.DateTimeLayout)); err != nil {
 			return err
 		}
 	case "BindDomain":
@@ -382,7 +382,7 @@ func (u *SettingService) LoadFromCert() (*dto.SSLInfo, error) {
 		}
 		data.Domain = ssl.Domains
 		data.SSLID = uint(id)
-		data.Timeout = ssl.ExpireDate.Format("2006-01-02 15:04:05")
+		data.Timeout = ssl.ExpireDate.Format(constant.DateTimeLayout)
 	}
 	return &data, nil
 }
@@ -410,7 +410,7 @@ func (u *SettingService) HandlePasswordExpired(c *gin.Context, old, new string) 
 			return err
 		}
 		timeout, _ := strconv.Atoi(expiredSetting.Value)
-		if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format("2006-01-02 15:04:05")); err != nil {
+		if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format(constant.DateTimeLayout)); err != nil {
 			return err
 		}
 		return nil
@@ -455,7 +455,7 @@ func loadInfoFromCert() (dto.SSLInfo, error) {
 	}
 	return dto.SSLInfo{
 		Domain:   strings.Join(domains, ","),
-		Timeout:  certObj.NotAfter.Format("2006-01-02 15:04:05"),
+		Timeout:  certObj.NotAfter.Format(constant.DateTimeLayout),
 		RootPath: path.Join(global.CONF.System.BaseDir, "1panel/secret/server.crt"),
 	}, nil
 }

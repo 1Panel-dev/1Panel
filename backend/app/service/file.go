@@ -79,7 +79,7 @@ func (f *FileService) SearchUploadWithPage(req request.SearchUploadWithPage) (in
 		}
 		if !info.IsDir() {
 			files = append(files, response.UploadInfo{
-				CreatedAt: info.ModTime().Format("2006-01-02 15:04:05"),
+				CreatedAt: info.ModTime().Format(constant.DateTimeLayout),
 				Size:      int(info.Size()),
 				Name:      info.Name(),
 			})

@@ -782,7 +782,7 @@ func updateInstallInfoInDB(appKey, appName, param string, value interface{}) err
 		}
 	case "port":
 		envKey = "PANEL_APP_PORT_HTTP="
-	case "user-password":
+	default:
 		envKey = "PANEL_DB_USER_PASSWORD="
 	}
 	files := strings.Split(string(lineBytes), "\n")

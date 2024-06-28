@@ -139,7 +139,7 @@ type MysqlVariables struct {
 	MaxConnections       string `json:"max_connections"`
 	MaxHeapTableSize     string `json:"max_heap_table_size"`
 	QueryCacheSize       string `json:"query_cache_size"`
-	QueryCache_type      string `json:"query_cache_type"`
+	QueryCacheType       string `json:"query_cache_type"`
 	ReadBufferSize       string `json:"read_buffer_size"`
 	ReadRndBufferSize    string `json:"read_rnd_buffer_size"`
 	SortBufferSize       string `json:"sort_buffer_size"`
@@ -207,8 +207,8 @@ type RedisStatus struct {
 	UptimeInDays             string `json:"uptime_in_days"`
 	ConnectedClients         string `json:"connected_clients"`
 	UsedMemory               string `json:"used_memory"`
-	UsedMemory_rss           string `json:"used_memory_rss"`
-	UsedMemory_peak          string `json:"used_memory_peak"`
+	UsedMemoryRss            string `json:"used_memory_rss"`
+	UsedMemoryPeak           string `json:"used_memory_peak"`
 	MemFragmentationRatio    string `json:"mem_fragmentation_ratio"`
 	TotalConnectionsReceived string `json:"total_connections_received"`
 	TotalCommandsProcessed   string `json:"total_commands_processed"`

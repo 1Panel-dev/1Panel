@@ -246,7 +246,7 @@ func loadLogsByFiles(fileList []string, user, operation string) []FtpLog {
 			timeStr = strings.ReplaceAll(timeStr, "]", "")
 			timeItem, err := time.Parse(layout, timeStr)
 			if err == nil {
-				timeStr = timeItem.Format("2006-01-02 15:04:05")
+				timeStr = timeItem.Format(constant.DateTimeLayout)
 			}
 			operateStr := parts[5] + parts[6]
 			logs = append(logs, FtpLog{

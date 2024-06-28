@@ -114,7 +114,7 @@ func (o oneDriveClient) Upload(src, target string) (bool, error) {
 		return false, err
 	}
 	if fileInfo.IsDir() {
-		return false, errors.New("Only file is allowed to be uploaded here.")
+		return false, errors.New("only file is allowed to be uploaded here")
 	}
 	var isOk bool
 	if fileInfo.Size() < 4*1024*1024 {

@@ -72,7 +72,7 @@ func handleRuntimeRecover(runtime *model.Runtime, recoverFile string, isRollback
 	}
 
 	if !isRollback {
-		rollbackFile := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("runtime/%s_%s.tar.gz", runtime.Name, time.Now().Format("20060102150405")))
+		rollbackFile := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("runtime/%s_%s.tar.gz", runtime.Name, time.Now().Format(constant.DateTimeSlimLayout)))
 		if err := handleRuntimeBackup(runtime, path.Dir(rollbackFile), path.Base(rollbackFile), "", secret); err != nil {
 			return fmt.Errorf("backup runtime %s for rollback before recover failed, err: %v", runtime.Name, err)
 		}

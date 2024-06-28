@@ -31,7 +31,7 @@ func PasswordExpired() gin.HandlerFunc {
 			return
 		}
 		loc, _ := time.LoadLocation(common.LoadTimeZone())
-		expiredTime, err := time.ParseInLocation("2006-01-02 15:04:05", extime.Value, loc)
+		expiredTime, err := time.ParseInLocation(constant.DateTimeLayout, extime.Value, loc)
 		if err != nil {
 			helper.ErrorWithDetail(c, constant.CodePasswordExpired, constant.ErrTypePasswordExpired, err)
 			return
