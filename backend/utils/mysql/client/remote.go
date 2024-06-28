@@ -332,7 +332,10 @@ func (r *Remote) SyncDB(version string) ([]SyncDBInfo, error) {
 		}
 		userRows, err := r.Client.Query("select user,host from mysql.db where db = ?", dbName)
 		if err != nil {
-			return datas, err
+			global.LOG.Debugf("sync user of db %s failed, err: %v", dbName, err)
+			dataItem.Permission = "%"
+			datas = append(datas, dataItem)
+			continue
 		}
 
 		var permissionItem []string
