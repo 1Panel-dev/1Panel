@@ -196,7 +196,10 @@ let icons = new Map([
     ['.tar.bz2', 'p-file-zip'],
     ['.tar', 'p-file-zip'],
     ['.tar.gz', 'p-file-zip'],
-    ['.tar.xz', 'p-file-zip'],
+    ['.war', 'p-file-zip'],
+    ['.tgz', 'p-file-zip'],
+    ['.7z', 'p-file-zip'],
+    ['.rar', 'p-file-zip'],
     ['.mp3', 'p-file-mp3'],
     ['.svg', 'p-file-svg'],
     ['.txt', 'p-file-txt'],
@@ -204,9 +207,32 @@ let icons = new Map([
     ['.word', 'p-file-word'],
     ['.ppt', 'p-file-ppt'],
     ['.jpg', 'p-file-jpg'],
+    ['.jpeg', 'p-file-jpg'],
+    ['.png', 'p-file-png'],
     ['.xlsx', 'p-file-excel'],
     ['.doc', 'p-file-word'],
+    ['.xls', 'p-file-excel'],
+    ['.docx', 'p-file-word'],
     ['.pdf', 'p-file-pdf'],
+    ['.bmp', 'p-file-png'],
+    ['.gif', 'p-file-png'],
+    ['.tiff', 'p-file-png'],
+    ['.ico', 'p-file-png'],
+    ['.webp', 'p-file-png'],
+    ['.mp4', 'p-file-video'],
+    ['.webm', 'p-file-video'],
+    ['.mov', 'p-file-video'],
+    ['.wmv', 'p-file-video'],
+    ['.mkv', 'p-file-video'],
+    ['.avi', 'p-file-video'],
+    ['.wma', 'p-file-video'],
+    ['.flv', 'p-file-video'],
+    ['.wav', 'p-file-mp3'],
+    ['.wma', 'p-file-mp3'],
+    ['.ape', 'p-file-mp3'],
+    ['.acc', 'p-file-mp3'],
+    ['.ogg', 'p-file-mp3'],
+    ['.flac', 'p-file-mp3'],
 ]);
 
 export function getIcon(extension: string): string {
@@ -526,3 +552,25 @@ export function emptyLineFilter(str: string, spilt: string) {
     }
     return results.join(spilt);
 }
+
+// 文件类型映射
+let fileTypes = {
+    image: ['.jpg', '.jpeg', '.png', '.bmp', '.gif', '.tiff', '.ico', '.svg', '.webp'],
+    compress: ['.zip', '.rar', '.gz', '.war', '.tgz', '.7z', '.tar.gz', '.tar'],
+    video: ['.mp4', '.webm', '.mov', '.wmv', '.mkv', '.avi', '.wma', '.flv'],
+    audio: ['.mp3', '.wav', '.wma', '.ape', '.acc', '.ogg', '.flac'],
+    pdf: ['.pdf'],
+    word: ['.doc', '.docx'],
+    excel: ['.xls', '.xlsx'],
+    text: ['.iso', '.tiff', '.exe', '.so', '.bz', '.dmg', '.apk', '.pptx', '.ppt', '.xlsb'],
+};
+
+export const getFileType = (extension: string) => {
+    let type = 'text';
+    Object.entries(fileTypes).forEach(([key, extensions]) => {
+        if (extensions.includes(extension.toLowerCase())) {
+            type = key;
+        }
+    });
+    return type;
+};

@@ -63,6 +63,7 @@ const message = {
             hideSome: 'Hide Some',
             agree: 'Agree',
             notAgree: 'Not Agree',
+            preview: 'Preview',
         },
         search: {
             timeStart: 'Time start',
