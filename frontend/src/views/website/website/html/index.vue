@@ -1,7 +1,7 @@
 <template>
     <el-drawer :close-on-click-modal="false" :close-on-press-escape="false" v-model="open" size="40%">
         <template #header>
-            <DrawerHeader :header="$t('website.defaultServer')" :back="handleClose"></DrawerHeader>
+            <DrawerHeader :header="$t('website.defaultHtml')" :back="handleClose"></DrawerHeader>
         </template>
         <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
