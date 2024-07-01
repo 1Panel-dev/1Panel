@@ -154,7 +154,7 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 		if err != nil {
 			return err
 		}
-		if runtime.Type == constant.RuntimeNode || runtime.Type == constant.RuntimeJava {
+		if runtime.Type == constant.RuntimeNode || runtime.Type == constant.RuntimeJava || runtime.Type == constant.RuntimeGo {
 			if err := handleRuntimeRecover(runtime, fmt.Sprintf("%s/%s.runtime.tar.gz", tmpPath, website.Alias), true, ""); err != nil {
 				return err
 			}
@@ -225,7 +225,7 @@ func handleWebsiteBackup(website *model.Website, backupDir, fileName string, exc
 		if err != nil {
 			return err
 		}
-		if runtime.Type == constant.RuntimeNode || runtime.Type == constant.RuntimeJava {
+		if runtime.Type == constant.RuntimeNode || runtime.Type == constant.RuntimeJava || runtime.Type == constant.RuntimeGo {
 			if err := handleRuntimeBackup(runtime, tmpDir, fmt.Sprintf("%s.runtime.tar.gz", website.Alias), excludes, ""); err != nil {
 				return err
 			}

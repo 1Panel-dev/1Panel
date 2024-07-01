@@ -68,6 +68,16 @@ const webSiteRouter = {
                 requiresAuth: false,
             },
         },
+        {
+            path: '/websites/runtimes/go',
+            name: 'go',
+            hidden: true,
+            component: () => import('@/views/website/runtime/go/index.vue'),
+            meta: {
+                activeMenu: '/websites/runtimes/go',
+                requiresAuth: false,
+            },
+        },
     ],
 };
 

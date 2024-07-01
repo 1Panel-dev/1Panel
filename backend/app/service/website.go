@@ -336,7 +336,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 				}
 				website.Proxy = proxy
 			}
-		case constant.RuntimeNode, constant.RuntimeJava:
+		case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo:
 			website.Proxy = fmt.Sprintf("127.0.0.1:%d", runtime.Port)
 		}
 	}
