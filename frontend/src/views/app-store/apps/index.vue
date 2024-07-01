@@ -342,6 +342,7 @@ onMounted(() => {
         .app-header {
             height: 20%;
             .app-title {
+                line-height: 1.5;
                 font-weight: 500;
                 font-size: 16px;
                 color: var(--el-text-color-regular);
