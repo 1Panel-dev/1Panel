@@ -62,6 +62,7 @@ const message = {
             hideSome: '隐藏部分',
             agree: '同意',
             notAgree: '不同意',
+            preview: '预览',
         },
         search: {
             timeStart: '开始时间',

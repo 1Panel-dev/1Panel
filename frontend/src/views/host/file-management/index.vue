@@ -307,6 +307,7 @@
             <Favorite ref="favoriteRef" @close="search" />
             <BatchRole ref="batchRoleRef" @close="search" />
             <VscodeOpenDialog ref="dialogVscodeOpenRef" />
+            <Preview ref="previewRef" />
         </LayoutContent>
     </div>
 </template>
@@ -321,8 +322,8 @@ import {
     RemoveFavorite,
     SearchFavorite,
 } from '@/api/modules/files';
-import { computeSize, copyText, dateFormat, downloadFile, getIcon, getRandomStr } from '@/utils/util';
-import { StarFilled, Star, Top, Right } from '@element-plus/icons-vue';
+import { computeSize, copyText, dateFormat, downloadFile, getFileType, getIcon, getRandomStr } from '@/utils/util';
+import { StarFilled, Star, Top, Right, Close } from '@element-plus/icons-vue';
 import { File } from '@/api/interface/file';
 import { Mimetypes, Languages } from '@/global/mimetype';
 import { useRouter } from 'vue-router';
@@ -350,6 +351,7 @@ import Detail from './detail/index.vue';
 import RecycleBin from './recycle-bin/index.vue';
 import Favorite from './favorite/index.vue';
 import BatchRole from './batch-role/index.vue';
+import Preview from './preview/index.vue';
 import VscodeOpenDialog from '@/components/vscode-open/index.vue';
 
 const globalStore = GlobalStore();
@@ -387,6 +389,7 @@ const fileCreate = reactive({ path: '/', isDir: false, mode: 0o755 });
 const fileCompress = reactive({ files: [''], name: '', dst: '', operate: 'compress' });
 const fileDeCompress = reactive({ path: '', name: '', dst: '', mimeType: '' });
 const fileEdit = reactive({ content: '', path: '', name: '', language: 'plaintext', extension: '' });
+const filePreview = reactive({ path: '', name: '', extension: '', fileType: '' });
 const codeReq = reactive({ path: '', expand: false, page: 1, pageSize: 100 });
 const fileUpload = reactive({ path: '' });
 const fileRename = reactive({ path: '', oldName: '' });
@@ -416,6 +419,7 @@ const hoveredRowIndex = ref(-1);
 const favorites = ref([]);
 const batchRoleRef = ref();
 const dialogVscodeOpenRef = ref();
+const previewRef = ref();
 
 // editablePath
 const { searchableStatus, searchablePath, searchableInputRef, searchableInputBlur } = useSearchable(paths);
@@ -484,7 +488,7 @@ const open = async (row: File.File) => {
         });
         jump(req.path);
     } else {
-        openCodeEditor(row.path, row.extension);
+        openView(row);
     }
 };
 
@@ -680,6 +684,31 @@ const openDeCompress = (item: File.File) => {
     deCompressRef.value.acceptParams(fileDeCompress);
 };
 
+const openView = (item: File.File) => {
+    const fileType = getFileType(item.extension);
+
+    const previewTypes = ['image', 'video', 'audio', 'pdf', 'word', 'excel'];
+    if (previewTypes.includes(fileType)) {
+        return openPreview(item, fileType);
+    }
+
+    const actionMap = {
+        compress: openDeCompress,
+        text: () => openCodeEditor(item.path, item.extension),
+    };
+
+    return actionMap[fileType] ? actionMap[fileType](item) : openCodeEditor(item.path, item.extension);
+};
+
+const openPreview = (item: File.File, fileType: string) => {
+    filePreview.path = item.path;
+    filePreview.name = item.name;
+    filePreview.extension = item.extension;
+    filePreview.fileType = fileType;
+
+    previewRef.value.acceptParams(filePreview);
+};
+
 const openCodeEditor = (path: string, extension: string) => {
     codeReq.path = path;
     codeReq.expand = true;
@@ -839,10 +868,11 @@ const getFavoriates = async () => {
 const toFavorite = (row: File.Favorite) => {
     if (row.isDir) {
         jump(row.path);
-    } else if (row.isTxt) {
-        openCodeEditor(row.path, '.' + row.name.split('.').pop());
     } else {
-        jump(row.path.substring(0, row.path.lastIndexOf('/')));
+        let file = {} as File.File;
+        file.path = row.path;
+        file.extension = '.' + row.name.split('.').pop();
+        openView(file);
     }
 };
 
