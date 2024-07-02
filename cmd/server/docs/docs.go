@@ -1585,6 +1585,12 @@ const docTemplate = `{
                 }
             }
         },
+        "/containers/download/log": {
+            "post": {
+                "description": "下载容器日志",
+                "responses": {}
+            }
+        },
         "/containers/image": {
             "get": {
                 "security": [
@@ -11155,7 +11161,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.BatchDeleteReq"
+                            "$ref": "#/definitions/dto.ClamDelete"
                         }
                     }
                 ],
@@ -15460,11 +15466,37 @@ const docTemplate = `{
                 "description": {
                     "type": "string"
                 },
+                "infectedDir": {
+                    "type": "string"
+                },
+                "infectedStrategy": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
                 "path": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.ClamDelete": {
+            "type": "object",
+            "required": [
+                "ids"
+            ],
+            "properties": {
+                "ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "removeInfected": {
+                    "type": "boolean"
+                },
+                "removeResult": {
+                    "type": "boolean"
                 }
             }
         },
@@ -15500,6 +15532,12 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "infectedDir": {
+                    "type": "string"
+                },
+                "infectedStrategy": {
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"
@@ -20116,6 +20154,9 @@ const docTemplate = `{
                 "domains": {
                     "type": "string"
                 },
+                "execShell": {
+                    "type": "boolean"
+                },
                 "expireDate": {
                     "type": "string"
                 },
@@ -20151,6 +20192,9 @@ const docTemplate = `{
                 },
                 "pushDir": {
                     "type": "boolean"
+                },
+                "shell": {
+                    "type": "string"
                 },
                 "skipDNS": {
                     "type": "boolean"
@@ -21663,6 +21707,9 @@ const docTemplate = `{
                 "domains": {
                     "type": "string"
                 },
+                "execShell": {
+                    "type": "boolean"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -21682,6 +21729,9 @@ const docTemplate = `{
                 },
                 "renew": {
                     "type": "boolean"
+                },
+                "shell": {
+                    "type": "string"
                 },
                 "sslID": {
                     "type": "integer"
@@ -22242,6 +22292,9 @@ const docTemplate = `{
                 "dnsAccountId": {
                     "type": "integer"
                 },
+                "execShell": {
+                    "type": "boolean"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -22265,6 +22318,9 @@ const docTemplate = `{
                 },
                 "pushDir": {
                     "type": "boolean"
+                },
+                "shell": {
+                    "type": "string"
                 },
                 "skipDNS": {
                     "type": "boolean"
@@ -22318,6 +22374,9 @@ const docTemplate = `{
                 "dnsAccountId": {
                     "type": "integer"
                 },
+                "execShell": {
+                    "type": "boolean"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -22341,6 +22400,9 @@ const docTemplate = `{
                 },
                 "pushDir": {
                     "type": "boolean"
+                },
+                "shell": {
+                    "type": "string"
                 },
                 "skipDNS": {
                     "type": "boolean"
@@ -22786,8 +22848,14 @@ const docTemplate = `{
                         "$ref": "#/definitions/response.FileTree"
                     }
                 },
+                "extension": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
+                },
+                "isDir": {
+                    "type": "boolean"
                 },
                 "name": {
                     "type": "string"

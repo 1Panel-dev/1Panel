@@ -118,7 +118,7 @@ export namespace Toolbox {
     }
 
     export interface ClamBaseInfo {
-        version:  string;
+        version: string;
         isActive: boolean;
         isExist: boolean;
     }
@@ -126,18 +126,24 @@ export namespace Toolbox {
         id: number;
         name: string;
         path: string;
+        infectedStrategy: string;
+        infectedDir: string;
         lastHandleDate: string;
         description: string;
     }
     export interface ClamCreate {
         name: string;
         path: string;
+        infectedStrategy: string;
+        infectedDir: string;
         description: string;
     }
     export interface ClamUpdate {
         id: number;
         name: string;
         path: string;
+        infectedStrategy: string;
+        infectedDir: string;
         description: string;
     }
     export interface ClamSearchLog extends ReqPage {

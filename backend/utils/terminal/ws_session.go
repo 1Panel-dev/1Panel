@@ -118,7 +118,7 @@ func (sws *LogicSshWsSession) Start(quitChan chan bool) {
 func (sws *LogicSshWsSession) receiveWsMsg(exitCh chan bool) {
 	defer func() {
 		if r := recover(); r != nil {
-			global.LOG.Errorf("[xpack] A panic occurred during receive ws message, error message: %v", r)
+			global.LOG.Errorf("[A panic occurred during receive ws message, error message: %v", r)
 		}
 	}()
 	wsConn := sws.wsConn

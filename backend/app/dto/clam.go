@@ -14,10 +14,12 @@ type ClamInfo struct {
 	ID        uint      `json:"id"`
 	CreatedAt time.Time `json:"createdAt"`
 
-	Name           string `json:"name"`
-	Path           string `json:"path"`
-	LastHandleDate string `json:"lastHandleDate"`
-	Description    string `json:"description"`
+	Name             string `json:"name"`
+	Path             string `json:"path"`
+	InfectedStrategy string `json:"infectedStrategy"`
+	InfectedDir      string `json:"infectedDir"`
+	LastHandleDate   string `json:"lastHandleDate"`
+	Description      string `json:"description"`
 }
 
 type ClamLogSearch struct {
@@ -38,15 +40,25 @@ type ClamLog struct {
 }
 
 type ClamCreate struct {
-	Name        string `json:"name"`
-	Path        string `json:"path"`
-	Description string `json:"description"`
+	Name             string `json:"name"`
+	Path             string `json:"path"`
+	InfectedStrategy string `json:"infectedStrategy"`
+	InfectedDir      string `json:"infectedDir"`
+	Description      string `json:"description"`
 }
 
 type ClamUpdate struct {
 	ID uint `json:"id"`
 
-	Name        string `json:"name"`
-	Path        string `json:"path"`
-	Description string `json:"description"`
+	Name             string `json:"name"`
+	Path             string `json:"path"`
+	InfectedStrategy string `json:"infectedStrategy"`
+	InfectedDir      string `json:"infectedDir"`
+	Description      string `json:"description"`
+}
+
+type ClamDelete struct {
+	RemoveResult   bool   `json:"removeResult"`
+	RemoveInfected bool   `json:"removeInfected"`
+	Ids            []uint `json:"ids" validate:"required"`
 }

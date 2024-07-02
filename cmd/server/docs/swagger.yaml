@@ -229,10 +229,27 @@ definitions:
     properties:
       description:
         type: string
+      infectedDir:
+        type: string
+      infectedStrategy:
+        type: string
       name:
         type: string
       path:
         type: string
+    type: object
+  dto.ClamDelete:
+    properties:
+      ids:
+        items:
+          type: integer
+        type: array
+      removeInfected:
+        type: boolean
+      removeResult:
+        type: boolean
+    required:
+    - ids
     type: object
   dto.ClamLogSearch:
     properties:
@@ -256,6 +273,10 @@ definitions:
         type: string
       id:
         type: integer
+      infectedDir:
+        type: string
+      infectedStrategy:
+        type: string
       name:
         type: string
       path:
@@ -3368,6 +3389,8 @@ definitions:
         type: integer
       domains:
         type: string
+      execShell:
+        type: boolean
       expireDate:
         type: string
       id:
@@ -3392,6 +3415,8 @@ definitions:
         type: string
       pushDir:
         type: boolean
+      shell:
+        type: string
       skipDNS:
         type: boolean
       startDate:
@@ -4401,6 +4426,8 @@ definitions:
         type: string
       domains:
         type: string
+      execShell:
+        type: boolean
       id:
         type: integer
       keyType:
@@ -4416,6 +4443,8 @@ definitions:
         type: boolean
       renew:
         type: boolean
+      shell:
+        type: string
       sslID:
         type: integer
       time:
@@ -4793,6 +4822,8 @@ definitions:
         type: boolean
       dnsAccountId:
         type: integer
+      execShell:
+        type: boolean
       id:
         type: integer
       keyType:
@@ -4809,6 +4840,8 @@ definitions:
         type: string
       pushDir:
         type: boolean
+      shell:
+        type: string
       skipDNS:
         type: boolean
     required:
@@ -4844,6 +4877,8 @@ definitions:
         type: boolean
       dnsAccountId:
         type: integer
+      execShell:
+        type: boolean
       id:
         type: integer
       keyType:
@@ -4860,6 +4895,8 @@ definitions:
         type: string
       pushDir:
         type: boolean
+      shell:
+        type: string
       skipDNS:
         type: boolean
     required:
@@ -5162,8 +5199,12 @@ definitions:
         items:
           $ref: '#/definitions/response.FileTree'
         type: array
+      extension:
+        type: string
       id:
         type: string
+      isDir:
+        type: boolean
       name:
         type: string
       path:
@@ -6414,6 +6455,10 @@ paths:
       summary: Load docker status
       tags:
       - Container Docker
+  /containers/download/log:
+    post:
+      description: 下载容器日志
+      responses: {}
   /containers/image:
     get:
       description: 获取镜像名称列表
@@ -12471,7 +12516,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.BatchDeleteReq'
+          $ref: '#/definitions/dto.ClamDelete'
       responses:
         "200":
           description: OK

@@ -270,7 +270,7 @@ var AddShellColumn = &gormigrate.Migration{
 }
 
 var AddClam = &gormigrate.Migration{
-	ID: "20240624-add-clam",
+	ID: "20240701-add-clam",
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.AutoMigrate(&model.Clam{}); err != nil {
 			return err

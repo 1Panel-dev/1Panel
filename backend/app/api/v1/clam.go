@@ -210,18 +210,18 @@ func (b *BaseApi) UpdateFile(c *gin.Context) {
 // @Summary Delete clam
 // @Description 删除扫描规则
 // @Accept json
-// @Param request body dto.BatchDeleteReq true "request"
+// @Param request body dto.ClamDelete true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /toolbox/clam/del [post]
 // @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"ids","isList":true,"db":"clams","output_column":"name","output_value":"names"}],"formatZH":"删除扫描规则 [names]","formatEN":"delete clam [names]"}
 func (b *BaseApi) DeleteClam(c *gin.Context) {
-	var req dto.BatchDeleteReq
+	var req dto.ClamDelete
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 
-	if err := clamService.Delete(req.Ids); err != nil {
+	if err := clamService.Delete(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
