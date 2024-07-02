@@ -9,7 +9,7 @@ import { reactive, computed, ref, nextTick, provide } from 'vue';
 import { GlobalStore } from '@/store';
 import zhCn from 'element-plus/es/locale/lang/zh-cn';
 import en from 'element-plus/es/locale/lang/en';
-import { useTheme } from '@/hooks/use-theme';
+import { useTheme } from '@/global/use-theme';
 useTheme();
 
 const globalStore = GlobalStore();
