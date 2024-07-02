@@ -63,6 +63,8 @@ const message = {
             agree: '同意',
             notAgree: '不同意',
             preview: '预览',
+            open: '打开',
+            notSave: '不保存',
         },
         search: {
             timeStart: '开始时间',
@@ -143,6 +145,7 @@ const message = {
             recoverHelper: '将从 {0} 文件进行恢复，该操作不可回滚，是否继续？',
             refreshSuccess: '刷新成功',
             rootInfoErr: '已经是根目录了',
+            resetSuccess: '重置成功',
         },
         login: {
             username: '用户名',
@@ -1181,6 +1184,9 @@ const message = {
         up: '上一级',
         openWithVscode: 'VS Code 打开',
         vscodeHelper: '请确保本地已安装 VS Code 并配置了 SSH Remote 插件',
+        saveContentAndClose: '文件已被修改，是否保存并关闭？',
+        saveAndOpenNewFile: '文件已被修改，是否保存并打开新文件？',
+        noEdit: '文件未修改,无需此操作！',
     },
     ssh: {
         autoStart: '开机自启',

@@ -64,6 +64,8 @@ const message = {
             agree: 'Agree',
             notAgree: 'Not Agree',
             preview: 'Preview',
+            open: 'Open',
+            notSave: 'Not Save',
         },
         search: {
             timeStart: 'Time start',
@@ -143,6 +145,7 @@ const message = {
             recoverHelper: 'Restoring from {0} file. This operation is irreversible. Do you want to continue?',
             refreshSuccess: 'Refresh successful',
             rootInfoErr: "It's already the root directory",
+            resetSuccess: 'Reset successful',
         },
         login: {
             username: 'UserName',
@@ -1240,9 +1243,12 @@ const message = {
         back: 'Back',
         top: 'Go Back',
         refresh: 'Refresh',
+        up: 'Go back',
         openWithVscode: 'Open with VS Code',
         vscodeHelper: 'Please make sure that VS Code is installed locally and the SSH Remote plugin is configured',
-        up: 'Go back',
+        saveContentAndClose: 'The file has been modified, do you want to save and close it?',
+        saveAndOpenNewFile: 'The file has been modified, do you want to save and open the new file?',
+        noEdit: 'The file has not been modified, no need to do this!',
     },
     ssh: {
         autoStart: 'Auto Start',

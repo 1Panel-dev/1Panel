@@ -131,8 +131,8 @@
         </div>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="saveContent(true)">{{ $t('commons.button.confirm') }}</el-button>
+                <el-button @click="handleReset">{{ $t('commons.button.reset') }}</el-button>
+                <el-button type="primary" @click="saveContent()">{{ $t('commons.button.confirm') }}</el-button>
             </span>
         </template>
     </el-dialog>
@@ -151,7 +151,7 @@ import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 
-import { ElTreeV2 } from 'element-plus';
+import { ElMessageBox, ElTreeV2 } from 'element-plus';
 import { ResultData } from '@/api/interface';
 import { File } from '@/api/interface/file';
 import { getIcon } from '@/utils/util';
@@ -221,6 +221,8 @@ const treeHeight = ref(0);
 const codeHeight = ref('55vh');
 const codeReq = reactive({ path: '', expand: false, page: 1, pageSize: 100 });
 const isShow = ref(true);
+const isEdit = ref(false);
+const oldFileContent = ref('');
 
 const toggleShow = () => {
     isShow.value = !isShow.value;
@@ -271,11 +273,43 @@ let form = ref({
 const em = defineEmits(['close']);
 
 const handleClose = () => {
-    open.value = false;
-    if (editor) {
-        editor.dispose();
+    const closeEditor = () => {
+        open.value = false;
+        if (editor) {
+            editor.dispose();
+        }
+        em('close', open.value);
+    };
+
+    if (isEdit.value) {
+        ElMessageBox.confirm(i18n.global.t('file.saveContentAndClose'), {
+            confirmButtonText: i18n.global.t('commons.button.save'),
+            cancelButtonText: i18n.global.t('commons.button.notSave'),
+            type: 'info',
+            distinguishCancelAndClose: true,
+        })
+            .then(() => {
+                saveContent();
+            })
+            .finally(() => {
+                closeEditor();
+            });
+    } else {
+        closeEditor();
     }
-    em('close', open.value);
+};
+
+const handleReset = () => {
+    if (isEdit.value) {
+        loading.value = true;
+        form.value.content = oldFileContent.value;
+        editor.setValue(oldFileContent.value);
+        isEdit.value = false;
+        MsgSuccess(i18n.global.t('commons.msg.resetSuccess'));
+        loading.value = false;
+    } else {
+        MsgInfo(i18n.global.t('file.noEdit'));
+    }
 };
 
 const loadTooltip = () => {
@@ -347,6 +381,7 @@ const initEditor = () => {
         editor.onDidChangeModelContent(() => {
             if (editor) {
                 form.value.content = editor.getValue();
+                isEdit.value = true;
             }
         });
 
@@ -358,27 +393,30 @@ const initEditor = () => {
 };
 
 const quickSave = () => {
-    saveContent(false);
+    saveContent();
 };
 
-const saveContent = (closePage: boolean) => {
-    loading.value = true;
-    SaveFileContent(form.value)
-        .then(() => {
-            loading.value = false;
-            open.value = !closePage;
-            MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
-            if (closePage) {
-                handleClose();
-            }
-        })
-        .catch(() => {
-            loading.value = false;
-        });
+const saveContent = () => {
+    if (isEdit.value) {
+        loading.value = true;
+        SaveFileContent(form.value)
+            .then(() => {
+                loading.value = false;
+                isEdit.value = false;
+                oldFileContent.value = form.value.content;
+                MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    } else {
+        MsgInfo(i18n.global.t('file.noEdit'));
+    }
 };
 
 const acceptParams = (props: EditProps) => {
     form.value.content = props.content;
+    oldFileContent.value = props.content;
     form.value.path = props.path;
     directoryPath.value = getDirectoryPath(props.path);
     fileExtension.value = props.extension;
@@ -447,11 +485,15 @@ const getRefresh = (path: string) => {
 };
 
 const getContent = (path: string, extension: string) => {
-    if (form.value.path !== path) {
+    if (form.value.path === path) {
+        return;
+    }
+
+    const fetchFileContent = () => {
         codeReq.path = path;
         codeReq.expand = true;
 
-        if (extension != '') {
+        if (extension !== '') {
             Languages.forEach((language) => {
                 const ext = extension.substring(1);
                 if (language.value.indexOf(ext) > -1) {
@@ -463,12 +505,28 @@ const getContent = (path: string, extension: string) => {
         GetFileContent(codeReq)
             .then((res) => {
                 form.value.content = res.data.content;
+                oldFileContent.value = res.data.content;
                 form.value.path = res.data.path;
                 fileExtension.value = res.data.extension;
                 fileName.value = res.data.name;
                 initEditor();
             })
             .catch(() => {});
+    };
+
+    if (isEdit.value) {
+        ElMessageBox.confirm(i18n.global.t('file.saveAndOpenNewFile'), {
+            confirmButtonText: i18n.global.t('commons.button.open'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            type: 'info',
+        })
+            .then(() => {
+                saveContent();
+                fetchFileContent();
+            })
+            .finally(() => {});
+    } else {
+        fetchFileContent();
     }
 };
 
