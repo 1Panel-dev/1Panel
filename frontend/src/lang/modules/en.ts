@@ -146,6 +146,7 @@ const message = {
             refreshSuccess: 'Refresh successful',
             rootInfoErr: "It's already the root directory",
             resetSuccess: 'Reset successful',
+            creatingInfo: 'Creating, no need for this operation',
         },
         login: {
             username: 'UserName',
@@ -1249,6 +1250,7 @@ const message = {
         saveContentAndClose: 'The file has been modified, do you want to save and close it?',
         saveAndOpenNewFile: 'The file has been modified, do you want to save and open the new file?',
         noEdit: 'The file has not been modified, no need to do this!',
+        noNameFolder: 'Untitled Folder',
     },
     ssh: {
         autoStart: 'Auto Start',

@@ -67,7 +67,19 @@
                     <template #default="{ row }">
                         <svg-icon v-if="row.isDir" className="table-icon" iconName="p-file-folder"></svg-icon>
                         <svg-icon v-else className="table-icon" iconName="p-file-normal"></svg-icon>
-                        <el-link :underline="false" @click="open(row)">{{ row.name }}</el-link>
+                        <el-link v-if="!row.isCreate" :underline="false" @click="open(row)">{{ row.name }}</el-link>
+                        <el-input
+                            v-else
+                            ref="rowRefs"
+                            v-model="newFlower"
+                            style="width: 240px"
+                            placeholder="new flower"
+                            @input="handleChange(newFlower, row)"
+                        >
+                            <template #append>
+                                <el-button :icon="Check" @click="createFlower(row)" />
+                            </template>
+                        </el-input>
                     </template>
                 </el-table-column>
             </el-table>
@@ -83,9 +95,16 @@
                     </el-tag>
                 </el-tooltip>
             </div>
-            <div class="button">
-                <el-button @click="closePage">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="selectFile">{{ $t('commons.button.confirm') }}</el-button>
+            <div class="flex items-center justify-between">
+                <el-button link @click="onAddRow" type="primary">
+                    {{ $t('commons.button.create') }}
+                </el-button>
+                <div class="button">
+                    <el-button @click="closePage">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button type="primary" @click="selectFile" :disabled="disBtn">
+                        {{ $t('commons.button.confirm') }}
+                    </el-button>
+                </div>
             </div>
         </div>
     </el-popover>
@@ -93,19 +112,24 @@
 
 <script lang="ts" setup>
 import { File } from '@/api/interface/file';
-import { GetFilesList } from '@/api/modules/files';
-import { Folder } from '@element-plus/icons-vue';
+import { CreateFile, GetFilesList } from '@/api/modules/files';
+import { Folder, Check, HomeFilled, Close } from '@element-plus/icons-vue';
 import BreadCrumbs from '@/components/bread-crumbs/index.vue';
 import BreadCrumbItem from '@/components/bread-crumbs/bread-crumbs-item.vue';
-import { onMounted, onUpdated, reactive, ref } from 'vue';
+import { onMounted, onUpdated, reactive, ref, nextTick } from 'vue';
+import i18n from '@/lang';
+import { MsgSuccess, MsgWarning } from '@/utils/message';
 
 const rowName = ref('');
-const data = ref();
+const data = ref([]);
 const loading = ref(false);
 const paths = ref<string[]>([]);
 const req = reactive({ path: '/', expand: true, page: 1, pageSize: 300, showHidden: true });
 const selectRow = ref();
+const rowRefs = ref();
 const popoverVisible = ref(false);
+const newFlower = ref();
+const disBtn = ref(false);
 
 const props = defineProps({
     path: {
@@ -129,6 +153,7 @@ const props = defineProps({
 const em = defineEmits(['choose']);
 
 const checkFile = (row: any) => {
+    disBtn.value = row.isCreate;
     selectRow.value = row;
     rowName.value = selectRow.value.name;
 };
@@ -170,21 +195,25 @@ const open = async (row: File.File) => {
         } else {
             req.path = req.path + '/' + name;
         }
-        search(req);
+        await search(req);
     }
+    selectRow.value = {};
     rowName.value = '';
 };
 
 const jump = async (index: number) => {
-    let path = '/';
+    let path = '';
     if (index != -1) {
-        const jPaths = paths.value.slice(0, index + 1);
-        for (let i in jPaths) {
-            path = path + '/' + jPaths[i];
+        if (index !== -1) {
+            const jPaths = paths.value.slice(0, index + 1);
+            path = '/' + jPaths.join('/');
         }
     }
+    path = path || '/';
     req.path = path;
-    search(req);
+    selectRow.value = {};
+    rowName.value = '';
+    await search(req);
     popoverVisible.value = true;
 };
 
@@ -193,7 +222,7 @@ const search = async (req: File.ReqFile) => {
     loading.value = true;
     await GetFilesList(req)
         .then((res) => {
-            data.value = res.data.items;
+            data.value = res.data.items || [];
             req.path = res.data.path;
             const pathArray = req.path.split('/');
             paths.value = [];
@@ -202,6 +231,62 @@ const search = async (req: File.ReqFile) => {
                     paths.value.push(p);
                 }
             }
+        })
+        .finally(() => {
+            loading.value = false;
+        });
+};
+
+let addForm = reactive({ path: '', name: '', isDir: true, mode: 0o755, isLink: false, isSymlink: true, linkPath: '' });
+
+const onAddRow = async () => {
+    const createRow = data.value?.find((row: { isCreate: any }) => row.isCreate);
+    if (createRow) {
+        MsgWarning(i18n.global.t('commons.msg.creatingInfo'));
+        return;
+    }
+    newFlower.value = i18n.global.t('file.noNameFolder');
+    rowName.value = newFlower.value;
+    selectRow.value.name = newFlower.value;
+    const basePath = req.path === '/' ? req.path : `${req.path}/`;
+    selectRow.value.path = `${basePath}${newFlower.value}`;
+    data.value?.unshift({
+        path: selectRow.value.path,
+        isCreate: true,
+        isDir: true,
+        name: newFlower.value,
+    });
+    disBtn.value = true;
+    await nextTick();
+    rowRefs.value.focus();
+};
+
+const handleChange = (value: string, row: any) => {
+    if (rowName.value === row.name) {
+        selectRow.value.name = value;
+        rowName.value = value;
+        row.name = value;
+        const basePath = req.path === '/' ? req.path : `${req.path}/`;
+        selectRow.value.path = `${basePath}${value}`;
+    }
+};
+
+const createFlower = async (row: any) => {
+    const basePath = req.path === '/' ? req.path : `${req.path}/`;
+    addForm.path = `${basePath}${newFlower.value}`;
+    if (addForm.path.indexOf('.1panel_clash') > -1) {
+        MsgWarning(i18n.global.t('file.clashDitNotSupport'));
+        return;
+    }
+    addForm.name = newFlower.value;
+    let addItem = {};
+    Object.assign(addItem, addForm);
+    loading.value = true;
+    CreateFile(addItem as File.FileCreate)
+        .then(() => {
+            row.isCreate = false;
+            disBtn.value = false;
+            MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
         })
         .finally(() => {
             loading.value = false;
