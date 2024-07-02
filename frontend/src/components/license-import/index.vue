@@ -47,7 +47,7 @@ import { MsgSuccess } from '@/utils/message';
 import { UploadFileData } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile, genFileId } from 'element-plus';
-import { useTheme } from '@/hooks/use-theme';
+import { useTheme } from '@/global/use-theme';
 import { getXpackSetting } from '@/utils/xpack';
 const globalStore = GlobalStore();
 
