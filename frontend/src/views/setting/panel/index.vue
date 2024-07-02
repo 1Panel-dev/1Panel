@@ -173,7 +173,7 @@ import { ElForm } from 'element-plus';
 import { getSettingInfo, updateSetting, getSystemAvailable } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { useI18n } from 'vue-i18n';
-import { useTheme } from '@/hooks/use-theme';
+import { useTheme } from '@/global/use-theme';
 import { MsgSuccess } from '@/utils/message';
 import Password from '@/views/setting/panel/password/index.vue';
 import UserName from '@/views/setting/panel/username/index.vue';
