@@ -146,6 +146,7 @@ const message = {
             refreshSuccess: '重繪成功',
             rootInfoErr: '已經是根目錄了',
             resetSuccess: '重置成功',
+            creatingInfo: '正在創建，無需此操作',
         },
         login: {
             username: '用戶名',
@@ -1186,6 +1187,7 @@ const message = {
         saveContentAndClose: '檔案已被修改，是否保存並關閉？',
         saveAndOpenNewFile: '檔案已被修改，是否保存並打開新檔案？',
         noEdit: '檔案未修改，無需此操作！',
+        noNameFolder: '未命名資料夾',
     },
     ssh: {
         autoStart: '開機自啟',

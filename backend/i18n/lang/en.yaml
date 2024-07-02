@@ -74,7 +74,7 @@ ErrFileToLarge: "file is too large"
 ErrPathNotFound: "Path is not found"
 ErrMovePathFailed: "The target path cannot contain the original path!"
 ErrLinkPathNotFound: "Target path does not exist!"
-ErrFileIsExit: "File already exists!"
+ErrFileIsExit: "File or directory already exists!"
 ErrFileUpload: "Failed to upload file {{.name}}  {{.detail}}"
 ErrFileDownloadDir: "Download folder not supported"
 ErrCmdNotFound: "{{ .name}} command does not exist, please install this command on the host first"
@@ -131,7 +131,7 @@ ErrLocalExist: "The local database already exists with that name, please modify 
 #redis
 ErrTypeOfRedis: "The recovery file type does not match the current persistence mode. Modify the file type and try again"
 
-#container 
+#container
 ErrInUsed: "{{ .detail }} is in use and cannot be deleted"
 ErrObjectInUsed: "This object is in use and cannot be deleted"
 ErrPortRules: "The number of ports does not match, please re-enter!"
