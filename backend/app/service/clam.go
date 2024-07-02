@@ -26,7 +26,7 @@ import (
 const (
 	clamServiceNameCentOs = "clamd@scan.service"
 	clamServiceNameUbuntu = "clamav-daemon.service"
-	scanDir               = "scan-result"
+	resultDir             = "clamav"
 )
 
 type ClamService struct {
@@ -39,7 +39,7 @@ type IClamService interface {
 	SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error)
 	Create(req dto.ClamCreate) error
 	Update(req dto.ClamUpdate) error
-	Delete(ids []uint) error
+	Delete(req dto.ClamDelete) error
 	HandleOnce(req dto.OperateByID) error
 	LoadFile(req dto.OperationWithName) (string, error)
 	UpdateFile(req dto.UpdateByNameAndFile) error
@@ -154,15 +154,21 @@ func (f *ClamService) Update(req dto.ClamUpdate) error {
 	return nil
 }
 
-func (u *ClamService) Delete(ids []uint) error {
-	if len(ids) == 1 {
-		clam, _ := clamRepo.Get(commonRepo.WithByID(ids[0]))
+func (u *ClamService) Delete(req dto.ClamDelete) error {
+	for _, id := range req.Ids {
+		clam, _ := clamRepo.Get(commonRepo.WithByID(id))
 		if clam.ID == 0 {
-			return constant.ErrRecordNotFound
+			continue
 		}
-		return clamRepo.Delete(commonRepo.WithByID(ids[0]))
+		if req.RemoveResult {
+			_ = os.RemoveAll(path.Join(global.CONF.System.DataDir, resultDir, clam.Name))
+		}
+		if req.RemoveInfected {
+			_ = os.RemoveAll(path.Join(clam.InfectedDir, "1panel-infected", clam.Name))
+		}
+		return clamRepo.Delete(commonRepo.WithByID(id))
 	}
-	return clamRepo.Delete(commonRepo.WithIdsIn(ids))
+	return nil
 }
 
 func (u *ClamService) HandleOnce(req dto.OperateByID) error {
@@ -173,12 +179,30 @@ func (u *ClamService) HandleOnce(req dto.OperateByID) error {
 	if cmd.CheckIllegal(clam.Path) {
 		return buserr.New(constant.ErrCmdIllegal)
 	}
-	logFile := path.Join(global.CONF.System.DataDir, scanDir, clam.Name, time.Now().Format(constant.DateTimeSlimLayout))
+	timeNow := time.Now().Format(constant.DateTimeSlimLayout)
+	logFile := path.Join(global.CONF.System.DataDir, resultDir, clam.Name, timeNow)
 	if _, err := os.Stat(path.Dir(logFile)); err != nil {
 		_ = os.MkdirAll(path.Dir(logFile), os.ModePerm)
 	}
 	go func() {
-		cmd := exec.Command("clamdscan", "--fdpass", clam.Path, "-l", logFile)
+		strategy := ""
+		switch clam.InfectedStrategy {
+		case "remove":
+			strategy = "--remove"
+		case "move":
+			dir := path.Join(clam.InfectedDir, "1panel-infected", clam.Name, timeNow)
+			strategy = "--move=" + dir
+			if _, err := os.Stat(dir); err != nil {
+				_ = os.MkdirAll(dir, os.ModePerm)
+			}
+		case "copy":
+			dir := path.Join(clam.InfectedDir, "1panel-infected", clam.Name, timeNow)
+			strategy = "--copy=" + dir
+			if _, err := os.Stat(dir); err != nil {
+				_ = os.MkdirAll(dir, os.ModePerm)
+			}
+		}
+		cmd := exec.Command("clamdscan", "--fdpass", strategy, clam.Path, "-l", logFile)
 		_, _ = cmd.CombinedOutput()
 	}()
 	return nil
@@ -226,7 +250,7 @@ func (u *ClamService) LoadRecords(req dto.ClamLogSearch) (int64, interface{}, er
 
 	var datas []dto.ClamLog
 	for i := 0; i < len(records); i++ {
-		item := loadResultFromLog(path.Join(global.CONF.System.DataDir, scanDir, clam.Name, records[i]))
+		item := loadResultFromLog(path.Join(global.CONF.System.DataDir, resultDir, clam.Name, records[i]))
 		datas = append(datas, item)
 	}
 	return int64(total), datas, nil
@@ -237,7 +261,7 @@ func (u *ClamService) CleanRecord(req dto.OperateByID) error {
 	if clam.ID == 0 {
 		return constant.ErrRecordNotFound
 	}
-	pathItem := path.Join(global.CONF.System.DataDir, scanDir, clam.Name)
+	pathItem := path.Join(global.CONF.System.DataDir, resultDir, clam.Name)
 	_ = os.RemoveAll(pathItem)
 	return nil
 }
@@ -319,7 +343,7 @@ func (u *ClamService) UpdateFile(req dto.UpdateByNameAndFile) error {
 
 func loadFileByName(name string) []string {
 	var logPaths []string
-	pathItem := path.Join(global.CONF.System.DataDir, scanDir, name)
+	pathItem := path.Join(global.CONF.System.DataDir, resultDir, name)
 	_ = filepath.Walk(pathItem, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return nil

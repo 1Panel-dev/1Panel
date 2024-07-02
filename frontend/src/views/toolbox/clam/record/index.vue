@@ -4,7 +4,7 @@
             <el-card>
                 <div>
                     <el-tag class="float-left" effect="dark" type="success">
-                        {{ dialogData.rowData.name }}
+                        {{ $t('commons.table.name') }}: {{ dialogData.rowData.name }}
                     </el-tag>
                     <el-popover
                         v-if="dialogData.rowData.path.length >= 35"
@@ -15,7 +15,7 @@
                     >
                         <template #reference>
                             <el-tag style="float: left" effect="dark" type="success">
-                                {{ dialogData.rowData.path.substring(0, 20) }}...
+                                {{ $t('file.path') }}: {{ dialogData.rowData.path.substring(0, 20) }}...
                             </el-tag>
                         </template>
                     </el-popover>
@@ -25,7 +25,7 @@
                         effect="dark"
                         type="success"
                     >
-                        {{ dialogData.rowData.path }}
+                        {{ $t('file.path') }}: {{ dialogData.rowData.path }}
                     </el-tag>
 
                     <span class="buttons">
@@ -115,9 +115,14 @@
                                         <template #label>
                                             <span class="status-label">{{ $t('toolbox.clam.infectedFiles') }}</span>
                                         </template>
-                                        <span class="status-count">
+                                        <span class="status-count" v-if="!hasInfectedDir()">
                                             {{ currentRecord?.infectedFiles }}
                                         </span>
+                                        <div class="count" v-else>
+                                            <span @click="toFolder(currentRecord?.name)">
+                                                {{ currentRecord?.infectedFiles }}
+                                            </span>
+                                        </div>
                                     </el-form-item>
                                 </el-row>
                                 <el-row v-if="currentRecord?.log">
@@ -167,6 +172,8 @@ import { MsgSuccess } from '@/utils/message';
 import { shortcuts } from '@/utils/shortcuts';
 import { Toolbox } from '@/api/interface/toolbox';
 import { cleanClamRecord, handleClamScan, searchClamRecord } from '@/api/modules/toolbox';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 const loading = ref();
 const refresh = ref(false);
@@ -212,6 +219,11 @@ const handleCurrentChange = (val: number) => {
     searchInfo.page = val;
     search();
 };
+const hasInfectedDir = () => {
+    return (
+        dialogData.value.rowData!.infectedStrategy === 'move' || dialogData.value.rowData!.infectedStrategy === 'copy'
+    );
+};
 
 const timeRangeLoad = ref<[Date, Date]>([
     new Date(new Date(new Date().getTime() - 3600 * 1000 * 24 * 7).setHours(0, 0, 0, 0)),
@@ -238,6 +250,10 @@ const onHandle = async (row: Toolbox.ClamInfo) => {
         .catch(() => {
             loading.value = false;
         });
+};
+const toFolder = async (path: string) => {
+    let folder = dialogData.value.rowData!.infectedDir + '/1panel-infected/' + path;
+    router.push({ path: '/hosts/files', query: { path: folder } });
 };
 
 const search = async () => {
@@ -278,7 +294,6 @@ const onClean = async () => {
         type: 'warning',
     }).then(async () => {
         loading.value = true;
-        console.log(dialogData.value.id);
         cleanClamRecord(dialogData.value.rowData.id)
             .then(() => {
                 loading.value = false;
@@ -332,6 +347,16 @@ defineExpose({
     margin-top: 10px;
     font-size: 12px;
     float: right;
+}
+
+.count {
+    span {
+        font-size: 25px;
+        color: $primary-color;
+        font-weight: 500;
+        line-height: 32px;
+        cursor: pointer;
+    }
 }
 
 @media only screen and (max-width: 1400px) {

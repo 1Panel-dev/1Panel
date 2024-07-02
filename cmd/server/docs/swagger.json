@@ -1578,6 +1578,12 @@
                 }
             }
         },
+        "/containers/download/log": {
+            "post": {
+                "description": "下载容器日志",
+                "responses": {}
+            }
+        },
         "/containers/image": {
             "get": {
                 "security": [
@@ -11148,7 +11154,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.BatchDeleteReq"
+                            "$ref": "#/definitions/dto.ClamDelete"
                         }
                     }
                 ],
@@ -15453,11 +15459,37 @@
                 "description": {
                     "type": "string"
                 },
+                "infectedDir": {
+                    "type": "string"
+                },
+                "infectedStrategy": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
                 "path": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.ClamDelete": {
+            "type": "object",
+            "required": [
+                "ids"
+            ],
+            "properties": {
+                "ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "removeInfected": {
+                    "type": "boolean"
+                },
+                "removeResult": {
+                    "type": "boolean"
                 }
             }
         },
@@ -15493,6 +15525,12 @@
                 },
                 "id": {
                     "type": "integer"
+                },
+                "infectedDir": {
+                    "type": "string"
+                },
+                "infectedStrategy": {
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"
@@ -20109,6 +20147,9 @@
                 "domains": {
                     "type": "string"
                 },
+                "execShell": {
+                    "type": "boolean"
+                },
                 "expireDate": {
                     "type": "string"
                 },
@@ -20144,6 +20185,9 @@
                 },
                 "pushDir": {
                     "type": "boolean"
+                },
+                "shell": {
+                    "type": "string"
                 },
                 "skipDNS": {
                     "type": "boolean"
@@ -21656,6 +21700,9 @@
                 "domains": {
                     "type": "string"
                 },
+                "execShell": {
+                    "type": "boolean"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -21675,6 +21722,9 @@
                 },
                 "renew": {
                     "type": "boolean"
+                },
+                "shell": {
+                    "type": "string"
                 },
                 "sslID": {
                     "type": "integer"
@@ -22235,6 +22285,9 @@
                 "dnsAccountId": {
                     "type": "integer"
                 },
+                "execShell": {
+                    "type": "boolean"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -22258,6 +22311,9 @@
                 },
                 "pushDir": {
                     "type": "boolean"
+                },
+                "shell": {
+                    "type": "string"
                 },
                 "skipDNS": {
                     "type": "boolean"
@@ -22311,6 +22367,9 @@
                 "dnsAccountId": {
                     "type": "integer"
                 },
+                "execShell": {
+                    "type": "boolean"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -22334,6 +22393,9 @@
                 },
                 "pushDir": {
                     "type": "boolean"
+                },
+                "shell": {
+                    "type": "string"
                 },
                 "skipDNS": {
                     "type": "boolean"
@@ -22779,8 +22841,14 @@
                         "$ref": "#/definitions/response.FileTree"
                     }
                 },
+                "extension": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
+                },
+                "isDir": {
+                    "type": "boolean"
                 },
                 "name": {
                     "type": "string"

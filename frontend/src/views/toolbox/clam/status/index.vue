@@ -3,7 +3,7 @@
         <div class="app-status tool-status" v-if="data.isExist">
             <el-card>
                 <div>
-                    <el-tag effect="dark" type="success">Clamav</el-tag>
+                    <el-tag effect="dark" type="success">ClamAV</el-tag>
                     <el-tag round class="status-content" v-if="data.isActive" type="success">
                         {{ $t('commons.status.running') }}
                     </el-tag>
@@ -75,7 +75,7 @@ const toDoc = async () => {
 const onOperate = async (operation: string) => {
     em('update:maskShow', false);
     ElMessageBox.confirm(
-        i18n.global.t('commons.msg.operatorHelper', [' Clamav ', i18n.global.t('app.' + operation)]),
+        i18n.global.t('commons.msg.operatorHelper', [' ClamAV ', i18n.global.t('app.' + operation)]),
         i18n.global.t('app.' + operation),
         {
             confirmButtonText: i18n.global.t('commons.button.confirm'),

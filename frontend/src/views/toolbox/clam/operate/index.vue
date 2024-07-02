@@ -24,10 +24,29 @@
                             v-model.trim="dialogData.rowData!.name"
                         />
                     </el-form-item>
-                    <el-form-item :label="$t('file.root')" prop="path">
+                    <el-form-item :label="$t('toolbox.clam.scanDir')" prop="path">
                         <el-input v-model="dialogData.rowData!.path">
                             <template #prepend>
                                 <FileList @choose="loadDir" :dir="true"></FileList>
+                            </template>
+                        </el-input>
+                    </el-form-item>
+
+                    <el-form-item :label="$t('toolbox.clam.infectedStrategy')" prop="infectedStrategy">
+                        <el-radio-group v-model="dialogData.rowData!.infectedStrategy">
+                            <el-radio value="none">{{ $t('toolbox.clam.none') }}</el-radio>
+                            <el-radio value="remove">{{ $t('toolbox.clam.remove') }}</el-radio>
+                            <el-radio value="move">{{ $t('toolbox.clam.move') }}</el-radio>
+                            <el-radio value="copy">{{ $t('toolbox.clam.copy') }}</el-radio>
+                        </el-radio-group>
+                        <span class="input-help">
+                            {{ $t('toolbox.clam.' + dialogData.rowData!.infectedStrategy + 'Helper') }}
+                        </span>
+                    </el-form-item>
+                    <el-form-item v-if="hasInfectedDir()" :label="$t('toolbox.clam.infectedDir')" prop="infectedDir">
+                        <el-input v-model="dialogData.rowData!.infectedDir">
+                            <template #prepend>
+                                <FileList @choose="loadInfectedDir" :dir="true"></FileList>
                             </template>
                         </el-input>
                     </el-form-item>
@@ -90,8 +109,16 @@ const rules = reactive({
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 
+const hasInfectedDir = () => {
+    return (
+        dialogData.value.rowData!.infectedStrategy === 'move' || dialogData.value.rowData!.infectedStrategy === 'copy'
+    );
+};
 const loadDir = async (path: string) => {
     dialogData.value.rowData!.path = path;
+};
+const loadInfectedDir = async (path: string) => {
+    dialogData.value.rowData!.infectedDir = path;
 };
 
 const onSubmit = async (formEl: FormInstance | undefined) => {
