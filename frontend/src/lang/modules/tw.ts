@@ -694,6 +694,7 @@ const message = {
         imageNameHelper: '鏡像名稱及 Tag，例：nginx:latest',
         cleanBuildCache: '清理建置快取',
         delBuildCacheHelper: '清理建置快取將刪除所有建置所產生的快取，此操作無法回復。是否繼續？',
+        urlWarning: '路徑前綴不需要添加 http:// 或 https://，請修改',
 
         network: '網絡',
         createNetwork: '創建網絡',
