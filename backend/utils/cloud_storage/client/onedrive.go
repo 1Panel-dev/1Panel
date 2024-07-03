@@ -27,7 +27,10 @@ type oneDriveClient struct {
 }
 
 func NewOneDriveClient(vars map[string]interface{}) (*oneDriveClient, error) {
-	token := loadParamFromVars("accessToken", vars)
+	token, err := RefreshToken("refresh_token", "accessToken", vars)
+	if err != nil {
+		return nil, err
+	}
 	isCN := loadParamFromVars("isCN", vars)
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
@@ -196,7 +199,7 @@ func (o *oneDriveClient) loadIDByPath(path string) (string, error) {
 	return driveItem.Id, nil
 }
 
-func RefreshToken(grantType string, varMap map[string]interface{}) (string, string, error) {
+func RefreshToken(grantType string, tokenType string, varMap map[string]interface{}) (string, error) {
 	data := url.Values{}
 	isCN := loadParamFromVars("isCN", varMap)
 	data.Set("client_id", loadParamFromVars("client_id", varMap))
@@ -216,32 +219,37 @@ func RefreshToken(grantType string, varMap map[string]interface{}) (string, stri
 	}
 	req, err := http.NewRequest("POST", url, strings.NewReader(data.Encode()))
 	if err != nil {
-		return "", "", fmt.Errorf("new http post client for access token failed, err: %v", err)
+		return "", fmt.Errorf("new http post client for access token failed, err: %v", err)
 	}
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", "", fmt.Errorf("request for access token failed, err: %v", err)
+		return "", fmt.Errorf("request for access token failed, err: %v", err)
 	}
 	defer resp.Body.Close()
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", "", fmt.Errorf("read data from response body failed, err: %v", err)
+		return "", fmt.Errorf("read data from response body failed, err: %v", err)
 	}
 
 	tokenMap := map[string]interface{}{}
 	if err := json.Unmarshal(respBody, &tokenMap); err != nil {
-		return "", "", fmt.Errorf("unmarshal data from response body failed, err: %v", err)
+		return "", fmt.Errorf("unmarshal data from response body failed, err: %v", err)
 	}
-	accessToken, ok := tokenMap["access_token"].(string)
-	if !ok {
-		return "", "", errors.New("no such access token in response")
+	if tokenType == "accessToken" {
+		accessToken, ok := tokenMap["access_token"].(string)
+		if !ok {
+			return "", errors.New("no such access token in response")
+		}
+		tokenMap = nil
+		return accessToken, nil
 	}
 	refreshToken, ok := tokenMap["refresh_token"].(string)
 	if !ok {
-		return "", "", errors.New("no such access token in response")
+		return "", errors.New("no such access token in response")
 	}
-	return accessToken, refreshToken, nil
+	tokenMap = nil
+	return refreshToken, nil
 }
 
 func (o *oneDriveClient) createFolder(parent string) error {
@@ -356,8 +364,8 @@ func (o *oneDriveClient) upBig(ctx context.Context, srcPath, folderID string, fi
 
 	fileSessionUploadUrl := sessionCreationResp.UploadURL
 
-	sizePerSplit := int64(3200 * 1024)
-	buffer := make([]byte, 3200*1024)
+	sizePerSplit := int64(5 * 1024 * 1024)
+	buffer := make([]byte, 5*1024*1024)
 	splitCount := fileSize / sizePerSplit
 	if fileSize%sizePerSplit != 0 {
 		splitCount += 1

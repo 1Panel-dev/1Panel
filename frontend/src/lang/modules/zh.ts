@@ -1016,7 +1016,7 @@ const message = {
             clamHelper:
                 'ClamAV 的最低建议配置为：3 GiB 以上的 RAM，2.0 GHz 以上的单核 CPU，以及至少 5 GiB 的可用硬盘空间。',
             noClam: '未检测到 ClamAV 服务，请参考官方文档进行安装！',
-            notStart: '当前未 ClamAV 服务，请先开启！',
+            notStart: '当前未开启 ClamAV 服务，请先开启！',
             removeResult: '删除报告文件',
             removeResultHelper: '删除任务执行过程中生成的报告文件，以清理存储空间。',
             removeInfected: '删除病毒文件',

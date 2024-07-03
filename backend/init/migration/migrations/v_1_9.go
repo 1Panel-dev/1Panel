@@ -249,7 +249,7 @@ var UpdateOneDriveToken = &gormigrate.Migration{
 		varMap["client_secret"] = global.CONF.System.OneDriveSc
 		varMap["redirect_uri"] = constant.OneDriveRedirectURI
 		varMap["refresh_token"] = backup.Credential
-		token, refreshToken, err := client.RefreshToken("refresh_token", varMap)
+		refreshToken, err := client.RefreshToken("refresh_token", "refreshToken", varMap)
 		varMap["refresh_status"] = constant.StatusSuccess
 		varMap["refresh_time"] = time.Now().Format(constant.DateTimeLayout)
 		if err != nil {
@@ -261,8 +261,7 @@ var UpdateOneDriveToken = &gormigrate.Migration{
 		if err := tx.Model(&model.BackupAccount{}).
 			Where("id = ?", backup.ID).
 			Updates(map[string]interface{}{
-				"credential": token,
-				"vars":       string(itemVars),
+				"vars": string(itemVars),
 			}).Error; err != nil {
 			return err
 		}
