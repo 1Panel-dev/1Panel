@@ -44,13 +44,7 @@
                         show-overflow-tooltip
                         prop="domains"
                     ></el-table-column>
-                    <el-table-column
-                        :label="$t('ssl.applyType')"
-                        fix
-                        show-overflow-tooltip
-                        prop="provider"
-                        width="100px"
-                    >
+                    <el-table-column :label="$t('ssl.applyType')" fix show-overflow-tooltip prop="provider">
                         <template #default="{ row }">{{ getProvider(row.provider) }}</template>
                     </el-table-column>
                     <el-table-column
@@ -114,7 +108,7 @@
                             </fu-read-write-switch>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('ssl.autoRenew')" fix width="100px">
+                    <el-table-column :label="$t('ssl.autoRenew')" fix>
                         <template #default="{ row }">
                             <el-switch
                                 :disabled="row.provider === 'dnsManual' || row.provider === 'manual'"
@@ -128,12 +122,14 @@
                         :label="$t('website.expireDate')"
                         :formatter="dateFormat"
                         show-overflow-tooltip
+                        width="200px"
                     />
                     <fu-table-operations
                         :ellipsis="3"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         :fixed="mobile ? false : 'right'"
+                        width="300px"
                         fix
                     />
                 </ComplexTable>

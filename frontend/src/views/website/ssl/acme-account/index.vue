@@ -8,7 +8,7 @@
         </div>
         <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()" v-loading="loading">
             <template #toolbar>
-                <el-button type="primary" @click="openCreate">{{ $t('website.addAccount') }}</el-button>
+                <el-button type="primary" @click="openCreate">{{ $t('commons.button.create') }}</el-button>
             </template>
             <el-table-column
                 :label="$t('website.email')"

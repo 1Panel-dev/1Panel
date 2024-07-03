@@ -60,7 +60,7 @@
                     >
                         <template #default="{ row }">
                             <el-tag
-                                style="margin-left: 5px"
+                                class="ml-2.5"
                                 v-for="(item, index) of row.tags"
                                 :key="index"
                                 :title="item"
@@ -78,7 +78,7 @@
                         :formatter="dateFormat"
                     />
                     <fu-table-operations
-                        width="200px"
+                        width="250px"
                         :ellipsis="10"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"

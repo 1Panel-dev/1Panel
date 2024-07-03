@@ -5,7 +5,7 @@
     <ComplexTable :data="data" @search="search" v-loading="loading">
         <template #toolbar>
             <el-button type="primary" plain @click="openCreate">
-                {{ $t('commons.button.create') + $t('website.basicAuth') }}
+                {{ $t('commons.button.create') }}
             </el-button>
         </template>
         <el-table-column :label="$t('commons.login.username')" prop="username"></el-table-column>

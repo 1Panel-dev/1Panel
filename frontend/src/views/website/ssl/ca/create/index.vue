@@ -1,7 +1,7 @@
 <template>
     <el-dialog
         v-model="open"
-        :title="$t('ssl.createCA')"
+        :title="$t('commons.button.create')"
         :close-on-click-modal="false"
         width="40%"
         :before-close="handleClose"

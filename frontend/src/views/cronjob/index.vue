@@ -13,7 +13,7 @@
                 <el-row>
                     <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
                         <el-button type="primary" @click="onOpenDialog('create')">
-                            {{ $t('commons.button.create') }}{{ $t('cronjob.cronTask') }}
+                            {{ $t('commons.button.create') }} {{ $t('cronjob.cronTask') }}
                         </el-button>
                         <el-button-group class="ml-4">
                             <el-button plain :disabled="selects.length === 0" @click="onBatchChangeStatus('enable')">

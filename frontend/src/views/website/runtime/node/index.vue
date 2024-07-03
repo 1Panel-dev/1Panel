@@ -82,7 +82,7 @@
                     />
                     <fu-table-operations
                         :ellipsis="10"
-                        width="300px"
+                        width="350px"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         fixed="right"
