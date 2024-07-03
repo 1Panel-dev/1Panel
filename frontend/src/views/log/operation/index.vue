@@ -1,27 +1,24 @@
 <template>
     <div>
         <LayoutContent v-loading="loading" :title="$t('logs.operation')">
-            <template #toolbar>
-                <el-row>
-                    <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
-                        <el-button type="primary" class="tag-button" @click="onChangeRoute('OperationLog')">
-                            {{ $t('logs.operation') }}
-                        </el-button>
-                        <el-button class="tag-button no-active" @click="onChangeRoute('LoginLog')">
-                            {{ $t('logs.login') }}
-                        </el-button>
-                        <el-button class="tag-button no-active" @click="onChangeRoute('SystemLog')">
-                            {{ $t('logs.system') }}
-                        </el-button>
-                    </el-col>
-                    <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
-                        <TableSetting @search="search()" />
-                        <TableSearch @search="search()" v-model:searchName="searchName" />
-                    </el-col>
-                </el-row>
-            </template>
             <template #search>
-                <el-select v-model="searchGroup" @change="search()" clearable class="p-w-200">
+                <el-button type="primary" class="tag-button" @click="onChangeRoute('OperationLog')">
+                    {{ $t('logs.operation') }}
+                </el-button>
+                <el-button class="tag-button no-active" @click="onChangeRoute('LoginLog')">
+                    {{ $t('logs.login') }}
+                </el-button>
+                <el-button class="tag-button no-active" @click="onChangeRoute('SystemLog')">
+                    {{ $t('logs.system') }}
+                </el-button>
+            </template>
+            <template #leftToolBar>
+                <el-button type="primary" plain @click="onClean()">
+                    {{ $t('logs.deleteLogs') }}
+                </el-button>
+            </template>
+            <template #rightToolBar>
+                <el-select v-model="searchGroup" @change="search()" clearable class="p-w-200 mr-2.5">
                     <template #prefix>{{ $t('logs.resource') }}</template>
                     <el-option :label="$t('commons.table.all')" value=""></el-option>
                     <el-option :label="$t('logs.detail.apps')" value="apps"></el-option>
@@ -36,24 +33,17 @@
                     <el-option :label="$t('logs.detail.logs')" value="logs"></el-option>
                     <el-option :label="$t('logs.detail.settings')" value="settings"></el-option>
                 </el-select>
-                <el-select
-                    v-model="searchStatus"
-                    @change="search()"
-                    clearable
-                    style="margin-left: 10px"
-                    class="p-w-200"
-                >
+                <el-select v-model="searchStatus" @change="search()" clearable class="p-w-200 mr-2.5">
                     <template #prefix>{{ $t('commons.table.status') }}</template>
                     <el-option :label="$t('commons.table.all')" value=""></el-option>
                     <el-option :label="$t('commons.status.success')" value="Success"></el-option>
                     <el-option :label="$t('commons.status.failed')" value="Failed"></el-option>
                 </el-select>
-                <el-button type="primary" style="margin-left: 10px" plain @click="onClean()">
-                    {{ $t('logs.deleteLogs') }}
-                </el-button>
+                <TableSearch @search="search()" v-model:searchName="searchName" class="mr-2.5" />
+                <TableSetting @search="search()" />
             </template>
             <template #main>
-                <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
+                <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" :heightDiff="370">
                     <el-table-column :label="$t('logs.resource')" prop="group" fix>
                         <template #default="{ row }">
                             <span v-if="row.source">

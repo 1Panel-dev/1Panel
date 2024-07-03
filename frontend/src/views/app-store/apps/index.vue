@@ -1,6 +1,6 @@
 <template>
     <LayoutContent v-loading="loading" v-if="!showDetail" :title="$t('app.app')">
-        <template #toolbar>
+        <template #search>
             <el-row :gutter="5">
                 <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
                     <el-button
@@ -49,115 +49,128 @@
                         </el-dropdown>
                     </div>
                 </el-col>
-                <el-col :xs="24" :sm="4" :md="4" :lg="4" :xl="4">
-                    <TableSearch @search="searchByName()" v-model:searchName="req.name" />
-                </el-col>
+                <el-col :xs="24" :sm="4" :md="4" :lg="4" :xl="4"></el-col>
             </el-row>
         </template>
-        <template #rightButton>
-            <div class="flex justify-end">
-                <div class="mr-10">
-                    <el-checkbox v-model="req.resource" true-value="all" false-value="remote" @change="search(req)">
-                        {{ $t('app.showLocal') }}
-                    </el-checkbox>
-                </div>
-                <fu-table-pagination
-                    v-model:current-page="paginationConfig.currentPage"
-                    v-model:page-size="paginationConfig.pageSize"
-                    v-bind="paginationConfig"
-                    @change="search(req)"
-                    :layout="mobile ? ' prev, pager, next' : ' prev, pager, next'"
-                />
-                <el-badge is-dot :hidden="!canUpdate" class="ml-5">
-                    <el-button @click="sync" type="primary" plain :disabled="syncing">
-                        {{ $t('app.syncAppList') }}
-                    </el-button>
-                </el-badge>
-            </div>
+        <template #leftToolBar>
+            <el-badge is-dot :hidden="!canUpdate">
+                <el-button @click="sync" type="primary" plain :disabled="syncing">
+                    {{ $t('app.syncAppList') }}
+                </el-button>
+            </el-badge>
+        </template>
+        <template #rightToolBar>
+            <!-- <fu-table-pagination
+                v-model:current-page="paginationConfig.currentPage"
+                v-model:page-size="paginationConfig.pageSize"
+                v-bind="paginationConfig"
+                @change="search(req)"
+                :layout="mobile ? ' prev, pager, next' : ' prev, pager, next'"
+                class="mr-2.5"
+            /> -->
+            <el-checkbox
+                class="!mr-2.5"
+                v-model="req.resource"
+                true-value="all"
+                false-value="remote"
+                @change="search(req)"
+            >
+                {{ $t('app.showLocal') }}
+            </el-checkbox>
+            <TableSearch @search="searchByName()" v-model:searchName="req.name" />
         </template>
         <template #main>
-            <el-alert type="info" :title="$t('app.appHelper')" :closable="false" />
-            <el-row :gutter="5">
-                <el-col
-                    class="app-col-12"
-                    v-for="(app, index) in apps"
-                    :key="index"
-                    :xs="24"
-                    :sm="12"
-                    :md="8"
-                    :lg="8"
-                    :xl="8"
-                >
-                    <div class="app-card">
-                        <el-card class="e-card" @click.stop="openDetail(app.key)">
-                            <el-row :gutter="20">
-                                <el-col :xs="8" :sm="6" :md="6" :lg="6" :xl="5">
-                                    <div class="app-icon-container">
-                                        <div class="app-icon">
-                                            <el-avatar
-                                                shape="square"
-                                                :size="60"
-                                                :src="'data:image/png;base64,' + app.icon"
-                                            />
-                                        </div>
-                                    </div>
-                                </el-col>
-                                <el-col :xs="16" :sm="18" :md="18" :lg="18" :xl="19">
-                                    <div class="app-content">
-                                        <div class="app-header">
-                                            <span class="app-title">{{ app.name }}</span>
-                                            <el-text type="success" class="!ml-2" v-if="app.installed">
-                                                {{ $t('app.allReadyInstalled') }}
-                                            </el-text>
-                                            <el-button
-                                                class="app-button"
-                                                type="primary"
-                                                plain
-                                                round
-                                                size="small"
-                                                :disabled="
-                                                    (app.installed && app.limit == 1) || app.status === 'TakeDown'
-                                                "
-                                                @click.stop="openInstall(app)"
-                                            >
-                                                {{ $t('app.install') }}
-                                            </el-button>
-                                        </div>
-                                        <div class="app-desc">
-                                            <span class="desc">
-                                                {{
-                                                    language == 'zh' || language == 'tw'
-                                                        ? app.shortDescZh
-                                                        : app.shortDescEn
-                                                }}
-                                            </span>
-                                        </div>
-                                        <div class="app-tag">
-                                            <el-tag v-for="(tag, ind) in app.tags" :key="ind" class="p-mr-5">
-                                                <span>
-                                                    {{ language == 'zh' || language == 'tw' ? tag.name : tag.key }}
-                                                </span>
-                                            </el-tag>
-                                            <el-tag v-if="app.status === 'TakeDown'" class="p-mr-5">
-                                                <span style="color: red">{{ $t('app.takeDown') }}</span>
-                                            </el-tag>
-                                        </div>
-                                    </div>
-                                </el-col>
-                            </el-row>
-                        </el-card>
-                    </div>
-                </el-col>
-            </el-row>
-            <div class="page-button">
-                <fu-table-pagination
-                    v-model:current-page="paginationConfig.currentPage"
-                    v-model:page-size="paginationConfig.pageSize"
-                    v-bind="paginationConfig"
-                    @change="search(req)"
-                    :page-sizes="[30, 60, 90]"
-                    :layout="mobile ? 'total, prev, pager, next' : 'total, sizes, prev, pager, next, jumper'"
-                />
+            <div>
+                <MainDiv :heightDiff="350">
+                    <el-alert type="info" :title="$t('app.appHelper')" :closable="false" />
+                    <el-row :gutter="5">
+                        <el-col
+                            class="app-col-12"
+                            v-for="(app, index) in apps"
+                            :key="index"
+                            :xs="24"
+                            :sm="12"
+                            :md="8"
+                            :lg="8"
+                            :xl="8"
+                        >
+                            <div class="app-card">
+                                <el-card class="e-card" @click.stop="openDetail(app.key)">
+                                    <el-row :gutter="20">
+                                        <el-col :xs="8" :sm="6" :md="6" :lg="6" :xl="5">
+                                            <div class="app-icon-container">
+                                                <div class="app-icon">
+                                                    <el-avatar
+                                                        shape="square"
+                                                        :size="60"
+                                                        :src="'data:image/png;base64,' + app.icon"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </el-col>
+                                        <el-col :xs="16" :sm="18" :md="18" :lg="18" :xl="19">
+                                            <div class="app-content">
+                                                <div class="app-header">
+                                                    <span class="app-title">{{ app.name }}</span>
+                                                    <el-text type="success" class="!ml-2" v-if="app.installed">
+                                                        {{ $t('app.allReadyInstalled') }}
+                                                    </el-text>
+                                                    <el-button
+                                                        class="app-button"
+                                                        type="primary"
+                                                        plain
+                                                        round
+                                                        size="small"
+                                                        :disabled="
+                                                            (app.installed && app.limit == 1) ||
+                                                            app.status === 'TakeDown'
+                                                        "
+                                                        @click.stop="openInstall(app)"
+                                                    >
+                                                        {{ $t('app.install') }}
+                                                    </el-button>
+                                                </div>
+                                                <div class="app-desc">
+                                                    <span class="desc">
+                                                        {{
+                                                            language == 'zh' || language == 'tw'
+                                                                ? app.shortDescZh
+                                                                : app.shortDescEn
+                                                        }}
+                                                    </span>
+                                                </div>
+                                                <div class="app-tag">
+                                                    <el-tag v-for="(tag, ind) in app.tags" :key="ind" class="p-mr-5">
+                                                        <span>
+                                                            {{
+                                                                language == 'zh' || language == 'tw'
+                                                                    ? tag.name
+                                                                    : tag.key
+                                                            }}
+                                                        </span>
+                                                    </el-tag>
+                                                    <el-tag v-if="app.status === 'TakeDown'" class="p-mr-5">
+                                                        <span style="color: red">{{ $t('app.takeDown') }}</span>
+                                                    </el-tag>
+                                                </div>
+                                            </div>
+                                        </el-col>
+                                    </el-row>
+                                </el-card>
+                            </div>
+                        </el-col>
+                    </el-row>
+                </MainDiv>
+                <div class="page-button">
+                    <fu-table-pagination
+                        v-model:current-page="paginationConfig.currentPage"
+                        v-model:page-size="paginationConfig.pageSize"
+                        v-bind="paginationConfig"
+                        @change="search(req)"
+                        :page-sizes="[30, 60, 90]"
+                        :layout="mobile ? 'total, prev, pager, next' : 'total, sizes, prev, pager, next, jumper'"
+                    />
+                </div>
             </div>
         </template>
     </LayoutContent>
@@ -211,6 +224,7 @@ const detailRef = ref();
 const installRef = ref();
 const installKey = ref('');
 const moreTag = ref('');
+const mainHeight = ref(0);
 
 const search = async (req: App.AppReq) => {
     loading.value = true;
@@ -310,6 +324,12 @@ onMounted(() => {
         installRef.value.acceptParams(params);
     }
     search(req);
+    mainHeight.value = window.innerHeight - 380;
+    window.onresize = () => {
+        return (() => {
+            mainHeight.value = window.innerHeight - 380;
+        })();
+    };
 });
 </script>
 

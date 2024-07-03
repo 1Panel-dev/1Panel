@@ -2,7 +2,7 @@
     <el-form-item prop="enable" :label="$t('website.enableOrNot')">
         <el-switch v-model="enable" @change="changeEnable" :disabled="data.length === 0"></el-switch>
     </el-form-item>
-    <ComplexTable :data="data" @search="search" v-loading="loading">
+    <ComplexTable :data="data" @search="search" v-loading="loading" :heightDiff="420">
         <template #toolbar>
             <el-button type="primary" plain @click="openCreate">
                 {{ $t('commons.button.create') }}

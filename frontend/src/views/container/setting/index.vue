@@ -1,9 +1,9 @@
 <template>
     <div v-loading="loading">
-        <div class="app-status" style="margin-top: 20px">
+        <div class="app-status p-mt-20">
             <el-card>
                 <div>
-                    <el-tag style="float: left" effect="dark" type="success">Docker</el-tag>
+                    <el-tag class="float-left" effect="dark" type="success">Docker</el-tag>
                     <el-tag round class="status-content" v-if="form.status === 'Running'" type="success">
                         {{ $t('commons.status.running') }}
                     </el-tag>
@@ -35,18 +35,18 @@
             </el-card>
         </div>
 
-        <LayoutContent style="margin-top: 20px" :title="$t('container.setting')" :divider="true">
+        <LayoutContent class="p-mt-20" :title="$t('container.setting')">
             <template #main>
                 <el-radio-group v-model="confShowType" @change="changeMode">
                     <el-radio-button value="base">{{ $t('database.baseConf') }}</el-radio-button>
                     <el-radio-button value="all">{{ $t('database.allConf') }}</el-radio-button>
                 </el-radio-group>
-                <el-row style="margin-top: 20px" v-if="confShowType === 'base'">
+                <el-row class="p-mt-20" v-if="confShowType === 'base'">
                     <el-col :span="1"><br /></el-col>
                     <el-col :xs="24" :sm="24" :md="15" :lg="12" :xl="10">
                         <el-form :model="form" label-position="left" :rules="rules" ref="formRef" label-width="120px">
                             <el-form-item :label="$t('container.mirrors')" prop="mirrors">
-                                <div style="width: 100%" v-if="form.mirrors">
+                                <div class="w-full" v-if="form.mirrors">
                                     <el-input
                                         type="textarea"
                                         :rows="5"
@@ -66,20 +66,15 @@
                                     </template>
                                 </el-input>
                                 <span class="input-help">{{ $t('container.mirrorsHelper') }}</span>
-                                <span class="input-help flx-align-center" style="display: flex">
+                                <span class="input-help flex flx-align-center">
                                     {{ $t('container.mirrorsHelper2') }}
-                                    <el-link
-                                        style="font-size: 12px; margin-left: 5px"
-                                        icon="Position"
-                                        @click="toDoc()"
-                                        type="primary"
-                                    >
+                                    <el-link class="p-ml-5 text-xs" icon="Position" @click="toDoc()" type="primary">
                                         {{ $t('firewall.quickJump') }}
                                     </el-link>
                                 </span>
                             </el-form-item>
                             <el-form-item :label="$t('container.registries')" prop="registries">
-                                <div style="width: 100%" v-if="form.registries">
+                                <div class="w-full" v-if="form.registries">
                                     <el-input
                                         type="textarea"
                                         :rows="5"
@@ -118,9 +113,7 @@
                                 <span class="input-help"></span>
                                 <div v-if="logOptionShow">
                                     <el-tag>{{ $t('container.maxSize') }}: {{ form.logMaxSize }}</el-tag>
-                                    <el-tag style="margin-left: 5px">
-                                        {{ $t('container.maxFile') }}: {{ form.logMaxFile }}
-                                    </el-tag>
+                                    <el-tag class="p-ml-5">{{ $t('container.maxFile') }}: {{ form.logMaxFile }}</el-tag>
                                     <div>
                                         <el-button @click="handleLogOption" type="primary" link>
                                             {{ $t('commons.button.view') }}
@@ -178,7 +171,7 @@
                         :extensions="extensions"
                         v-model="dockerConf"
                     />
-                    <el-button :disabled="loading" type="primary" @click="onSaveFile" style="margin-top: 5px">
+                    <el-button :disabled="loading" type="primary" @click="onSaveFile" class="p-ml-5">
                         {{ $t('commons.button.save') }}
                     </el-button>
                 </div>
@@ -194,16 +187,16 @@
             :close-on-press-escape="false"
             :show-close="false"
         >
-            <div style="margin-top: 10px">
-                <span style="color: red">{{ $t('container.iptablesHelper2') }}</span>
-                <div style="margin-top: 10px">
-                    <span style="font-size: 12px">{{ $t('database.restartNowHelper') }}</span>
+            <div class="mt-2.5">
+                <span class="text-rose-500">{{ $t('container.iptablesHelper2') }}</span>
+                <div class="mt-2.5">
+                    <span class="text-xs">{{ $t('database.restartNowHelper') }}</span>
                 </div>
-                <div style="margin-top: 10px">
-                    <span style="font-size: 12px">{{ $t('commons.msg.operateConfirm') }}</span>
-                    <span style="font-size: 12px; color: red; font-weight: 500">'{{ $t('database.restartNow') }}'</span>
+                <div class="mt-2.5">
+                    <span class="text-xs">{{ $t('commons.msg.operateConfirm') }}</span>
+                    <span class="text-xs text-rose-500 font-medium">'{{ $t('database.restartNow') }}'</span>
                 </div>
-                <el-input style="margin-top: 10px" v-model="submitInput"></el-input>
+                <el-input class="mt-2.5" v-model="submitInput"></el-input>
             </div>
             <template #footer>
                 <span class="dialog-footer">

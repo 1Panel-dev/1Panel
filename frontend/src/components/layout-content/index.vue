@@ -3,9 +3,7 @@
         <div class="content-container__app" v-if="slots.app">
             <slot name="app"></slot>
         </div>
-        <div class="content-container__toolbar" v-if="slots.toolbar">
-            <slot name="toolbar"></slot>
-        </div>
+
         <div class="content-container__search" v-if="slots.search">
             <el-card>
                 <slot name="search"></slot>
@@ -31,21 +29,30 @@
                             :reload="reload"
                             v-if="showBack"
                         >
-                            <template v-if="slots.buttons" #buttons>
+                            <template v-if="slots.leftToolBar" #buttons>
+                                <slot name="leftToolBar"></slot>
+                            </template>
+                            <template v-else-if="slots.buttons" #buttons>
                                 <slot name="buttons"></slot>
                             </template>
                         </back-button>
+                        <div class="flex justify-between" v-else>
+                            <div>
+                                {{ title }}
+                                <el-divider direction="vertical" v-if="slots.leftToolBar || slots.buttons" />
+                                <slot name="leftToolBar" v-if="slots.leftToolBar"></slot>
+                                <slot name="buttons" v-if="slots.buttons"></slot>
+                            </div>
+                            <div class="flex justify-end" v-if="slots.rightToolBar || slots.rightButton">
+                                <slot name="rightToolBar"></slot>
+                                <slot name="rightButton"></slot>
+                            </div>
+                        </div>
 
-                        <span v-else>
-                            {{ title }}
-                            <span v-if="slots.buttons">
-                                <el-divider direction="vertical" />
-                                <slot name="buttons"></slot>
-                            </span>
-                            <span class="float-right">
-                                <slot v-if="slots.rightButton" name="rightButton"></slot>
-                            </span>
+                        <span v-if="slots.toolbar">
+                            <slot name="toolbar"></slot>
                         </span>
+
                         <div v-if="prop.divider">
                             <div class="divider"></div>
                         </div>
@@ -103,10 +110,6 @@ const showBack = computed(() => {
     font-size: 18px;
 }
 
-.content-container__toolbar {
-    margin-top: 20px;
-}
-
 .content-container_form {
     text-align: -webkit-center;
     width: 60%;
@@ -134,6 +137,6 @@ const showBack = computed(() => {
     position: relative;
 }
 .main-content {
-    margin-top: 20px;
+    margin-top: 15px;
 }
 </style>
