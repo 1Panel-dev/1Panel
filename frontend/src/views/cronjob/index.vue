@@ -9,29 +9,25 @@
             ]"
         />
         <LayoutContent v-loading="loading" v-if="!isRecordShow" :title="$t('cronjob.cronTask')">
-            <template #toolbar>
-                <el-row>
-                    <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
-                        <el-button type="primary" @click="onOpenDialog('create')">
-                            {{ $t('commons.button.create') }}{{ $t('cronjob.cronTask') }}
-                        </el-button>
-                        <el-button-group class="ml-4">
-                            <el-button plain :disabled="selects.length === 0" @click="onBatchChangeStatus('enable')">
-                                {{ $t('commons.button.enable') }}
-                            </el-button>
-                            <el-button plain :disabled="selects.length === 0" @click="onBatchChangeStatus('disable')">
-                                {{ $t('commons.button.disable') }}
-                            </el-button>
-                            <el-button plain :disabled="selects.length === 0" @click="onDelete(null)">
-                                {{ $t('commons.button.delete') }}
-                            </el-button>
-                        </el-button-group>
-                    </el-col>
-                    <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
-                        <TableSetting @search="search()" />
-                        <TableSearch @search="search()" v-model:searchName="searchName" />
-                    </el-col>
-                </el-row>
+            <template #leftToolBar>
+                <el-button type="primary" @click="onOpenDialog('create')">
+                    {{ $t('commons.button.create') }}{{ $t('cronjob.cronTask') }}
+                </el-button>
+                <el-button-group class="ml-4">
+                    <el-button plain :disabled="selects.length === 0" @click="onBatchChangeStatus('enable')">
+                        {{ $t('commons.button.enable') }}
+                    </el-button>
+                    <el-button plain :disabled="selects.length === 0" @click="onBatchChangeStatus('disable')">
+                        {{ $t('commons.button.disable') }}
+                    </el-button>
+                    <el-button plain :disabled="selects.length === 0" @click="onDelete(null)">
+                        {{ $t('commons.button.delete') }}
+                    </el-button>
+                </el-button-group>
+            </template>
+            <template #rightToolBar>
+                <TableSearch @search="search()" v-model:searchName="searchName" class="mr-2.5" />
+                <TableSetting @search="search()" />
             </template>
             <template #main>
                 <ComplexTable

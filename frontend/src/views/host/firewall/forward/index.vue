@@ -18,21 +18,17 @@
                 </el-card>
 
                 <LayoutContent :title="$t('firewall.forwardRule')" :class="{ mask: fireStatus != 'running' }">
-                    <template #toolbar>
-                        <el-row>
-                            <el-col :span="16">
-                                <el-button type="primary" @click="onOpenDialog('create')">
-                                    {{ $t('commons.button.create') }}{{ $t('firewall.forwardRule') }}
-                                </el-button>
-                                <el-button @click="onDelete(null)" plain :disabled="selects.length === 0">
-                                    {{ $t('commons.button.delete') }}
-                                </el-button>
-                            </el-col>
-                            <el-col :span="8">
-                                <TableSetting @search="search()" />
-                                <TableSearch @search="search()" v-model:searchName="searchName" />
-                            </el-col>
-                        </el-row>
+                    <template #leftToolBar>
+                        <el-button type="primary" @click="onOpenDialog('create')">
+                            {{ $t('commons.button.create') }}{{ $t('firewall.forwardRule') }}
+                        </el-button>
+                        <el-button @click="onDelete(null)" plain :disabled="selects.length === 0">
+                            {{ $t('commons.button.delete') }}
+                        </el-button>
+                    </template>
+                    <template #rightToolBar>
+                        <TableSearch @search="search()" v-model:searchName="searchName" class="mr-2.5" />
+                        <TableSetting @search="search()" />
                     </template>
                     <template #main>
                         <ComplexTable
@@ -40,6 +36,7 @@
                             v-model:selects="selects"
                             @search="search"
                             :data="data"
+                            :heightDiff="370"
                         >
                             <el-table-column type="selection" fix />
                             <el-table-column :label="$t('commons.table.protocol')" :min-width="70" prop="protocol" />

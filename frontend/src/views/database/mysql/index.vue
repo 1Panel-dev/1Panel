@@ -1,9 +1,9 @@
 <template>
     <div v-loading="loading">
-        <div class="app-status" style="margin-top: 20px" v-if="currentDB?.from === 'remote'">
+        <div class="app-status mt-5" v-if="currentDB?.from === 'remote'">
             <el-card>
                 <div>
-                    <el-tag style="float: left" effect="dark" type="success">
+                    <el-tag class="float-left" effect="dark" type="success">
                         {{ currentDB?.type === 'mysql' ? 'Mysql' : 'MariaDB' }}
                     </el-tag>
                     <el-tag class="status-content">{{ $t('app.version') }}: {{ currentDB?.version }}</el-tag>
@@ -21,9 +21,47 @@
                     @is-exist="checkExist"
                 ></AppStatus>
             </template>
-
-            <template #search v-if="currentDB">
-                <el-select v-model="currentDBName" @change="changeDatabase()" class="p-w-200">
+            <template #leftToolBar>
+                <el-button
+                    v-if="currentDB && (currentDB.from !== 'local' || mysqlStatus === 'Running')"
+                    type="primary"
+                    @click="onOpenDialog()"
+                >
+                    {{ $t('database.create') }}
+                </el-button>
+                <el-button v-if="currentDB" @click="onChangeConn" type="primary" plain>
+                    {{ $t('database.databaseConnInfo') }}
+                </el-button>
+                <el-button
+                    v-if="currentDB && (currentDB.from !== 'local' || mysqlStatus === 'Running')"
+                    @click="loadDB"
+                    type="primary"
+                    plain
+                >
+                    {{ $t('database.loadFromRemote') }}
+                </el-button>
+                <el-button @click="goRemoteDB" type="primary" plain>
+                    {{ $t('database.remoteDB') }}
+                </el-button>
+                <el-dropdown class="ml-3">
+                    <el-button type="primary" plain>
+                        {{ $t('database.manage') }}
+                        <el-icon class="el-icon--right"><arrow-down /></el-icon>
+                    </el-button>
+                    <template #dropdown>
+                        <el-dropdown-menu>
+                            <el-dropdown-item icon="Position" @click="goDashboard('phpMyAdmin')">
+                                phpMyAdmin
+                            </el-dropdown-item>
+                            <el-dropdown-item icon="Position" @click="goDashboard('Adminer')" divided>
+                                Adminer
+                            </el-dropdown-item>
+                        </el-dropdown-menu>
+                    </template>
+                </el-dropdown>
+            </template>
+            <template #rightToolBar>
+                <el-select v-model="currentDBName" @change="changeDatabase()" class="p-w-200 mr-2.5" v-if="currentDB">
                     <template #prefix>{{ $t('commons.table.type') }}</template>
                     <el-option-group :label="$t('database.local')">
                         <div v-for="(item, index) in dbOptionsLocal" :key="index">
@@ -58,53 +96,7 @@
                         </el-button>
                     </el-option-group>
                 </el-select>
-            </template>
-
-            <template #toolbar>
-                <el-row>
-                    <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
-                        <el-button
-                            v-if="currentDB && (currentDB.from !== 'local' || mysqlStatus === 'Running')"
-                            type="primary"
-                            @click="onOpenDialog()"
-                        >
-                            {{ $t('database.create') }}
-                        </el-button>
-                        <el-button v-if="currentDB" @click="onChangeConn" type="primary" plain>
-                            {{ $t('database.databaseConnInfo') }}
-                        </el-button>
-                        <el-button
-                            v-if="currentDB && (currentDB.from !== 'local' || mysqlStatus === 'Running')"
-                            @click="loadDB"
-                            type="primary"
-                            plain
-                        >
-                            {{ $t('database.loadFromRemote') }}
-                        </el-button>
-                        <el-button @click="goRemoteDB" type="primary" plain>
-                            {{ $t('database.remoteDB') }}
-                        </el-button>
-                        <el-dropdown class="ml-3">
-                            <el-button type="primary" plain>
-                                {{ $t('database.manage') }}
-                                <el-icon class="el-icon--right"><arrow-down /></el-icon>
-                            </el-button>
-                            <template #dropdown>
-                                <el-dropdown-menu>
-                                    <el-dropdown-item icon="Position" @click="goDashboard('phpMyAdmin')">
-                                        phpMyAdmin
-                                    </el-dropdown-item>
-                                    <el-dropdown-item icon="Position" @click="goDashboard('Adminer')" divided>
-                                        Adminer
-                                    </el-dropdown-item>
-                                </el-dropdown-menu>
-                            </template>
-                        </el-dropdown>
-                    </el-col>
-                    <el-col :xs="24" :sm="4" :md="4" :lg="4" :xl="4">
-                        <TableSearch @search="search()" v-model:searchName="searchName" />
-                    </el-col>
-                </el-row>
+                <TableSearch @search="search()" v-model:searchName="searchName" />
             </template>
             <template #main v-if="currentDB">
                 <ComplexTable
@@ -113,6 +105,7 @@
                     @sort-change="search"
                     @search="search"
                     :data="data"
+                    :heightDiff="370"
                 >
                     <el-table-column :label="$t('commons.table.name')" prop="name" sortable min-width="90">
                         <template #default="{ row }">

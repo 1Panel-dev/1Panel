@@ -1,62 +1,57 @@
 <template>
     <div>
         <LayoutContent v-loading="loading" :title="$t('logs.websiteLog')">
-            <template #toolbar>
-                <el-row>
-                    <el-col :span="16">
-                        <el-button
-                            class="tag-button"
-                            :class="logConfig.name === 'access.log' ? '' : 'no-active'"
-                            :type="logConfig.name === 'access.log' ? 'primary' : ''"
-                            @click="changeType('access.log')"
-                        >
-                            {{ $t('logs.runLog') }}
-                        </el-button>
-                        <el-button
-                            class="tag-button"
-                            :class="logConfig.name === 'error.log' ? '' : 'no-active'"
-                            :type="logConfig.name === 'error.log' ? 'primary' : ''"
-                            @click="changeType('error.log')"
-                        >
-                            {{ $t('logs.errLog') }}
-                        </el-button>
-                    </el-col>
-                </el-row>
-            </template>
             <template #search>
-                <div>
-                    <el-select v-model="logConfig.id" @change="changeWebsite()" class="p-w-200">
-                        <template #prefix>{{ $t('website.website') }}</template>
-                        <el-option
-                            v-for="(website, index) in websites"
-                            :key="index"
-                            :label="website.primaryDomain"
-                            :value="website.id"
-                        ></el-option>
-                    </el-select>
-                    <el-button class="left-button">
-                        <el-checkbox v-model="tailLog" @change="changeTail" :disabled="logConfig.id == undefined">
-                            {{ $t('commons.button.watch') }}
-                        </el-checkbox>
-                    </el-button>
-                    <el-button class="left-button" @click="onDownload" icon="Download" :disabled="!hasContent">
-                        {{ $t('file.download') }}
-                    </el-button>
-                    <el-button type="primary" plain @click="onClean()" class="left-button" :disabled="!hasContent">
-                        {{ $t('logs.deleteLogs') }}
-                    </el-button>
-                </div>
+                <el-button
+                    class="tag-button"
+                    :class="logConfig.name === 'access.log' ? '' : 'no-active'"
+                    :type="logConfig.name === 'access.log' ? 'primary' : ''"
+                    @click="changeType('access.log')"
+                >
+                    {{ $t('logs.runLog') }}
+                </el-button>
+                <el-button
+                    class="tag-button"
+                    :class="logConfig.name === 'error.log' ? '' : 'no-active'"
+                    :type="logConfig.name === 'error.log' ? 'primary' : ''"
+                    @click="changeType('error.log')"
+                >
+                    {{ $t('logs.errLog') }}
+                </el-button>
+            </template>
+            <template #leftToolBar>
+                <el-select v-model="logConfig.id" @change="changeWebsite()" class="p-w-200 mr-2.5">
+                    <template #prefix>{{ $t('website.website') }}</template>
+                    <el-option
+                        v-for="(website, index) in websites"
+                        :key="index"
+                        :label="website.primaryDomain"
+                        :value="website.id"
+                    ></el-option>
+                </el-select>
+                <el-button>
+                    <el-checkbox v-model="tailLog" @change="changeTail" :disabled="logConfig.id == undefined">
+                        {{ $t('commons.button.watch') }}
+                    </el-checkbox>
+                </el-button>
+                <el-button @click="onDownload" icon="Download" :disabled="!hasContent">
+                    {{ $t('file.download') }}
+                </el-button>
+                <el-button type="primary" plain @click="onClean()" :disabled="!hasContent">
+                    {{ $t('logs.deleteLogs') }}
+                </el-button>
             </template>
             <template #main>
-                <LogFile
-                    ref="logRef"
-                    :config="logConfig"
-                    :default-button="false"
-                    v-if="showLog"
-                    v-model:loading="loading"
-                    v-model:hasContent="hasContent"
-                    :style="'height: calc(100vh - 370px)'"
-                />
+                <MainDiv :heightDiff="370">
+                    <LogFile
+                        ref="logRef"
+                        :config="logConfig"
+                        :default-button="false"
+                        v-if="showLog"
+                        v-model:loading="loading"
+                        v-model:hasContent="hasContent"
+                    />
+                </MainDiv>
             </template>
         </LayoutContent>
         <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmitClean"></ConfirmDialog>

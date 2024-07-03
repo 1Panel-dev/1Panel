@@ -2,7 +2,7 @@
     <div>
         <RouterButton :buttons="routerButton" />
         <LayoutContent :title="$t('website.ssl')">
-            <template #toolbar>
+            <template #leftToolBar>
                 <el-button type="primary" @click="openSSL()">
                     {{ $t('ssl.create') }}
                 </el-button>
