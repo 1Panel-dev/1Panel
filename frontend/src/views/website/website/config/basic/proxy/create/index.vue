@@ -7,7 +7,7 @@
         :before-close="handleClose"
     >
         <template #header>
-            <DrawerHeader :header="$t('website.' + proxy.operate + 'Proxy')" :back="handleClose" />
+            <DrawerHeader :header="$t('commons.button.' + proxy.operate)" :back="handleClose" />
         </template>
         <el-row v-loading="loading">
             <el-col :span="22" :offset="1">

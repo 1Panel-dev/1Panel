@@ -284,6 +284,7 @@
                         :label="$t('commons.table.operate')"
                         :min-width="mobile ? 'auto' : 200"
                         :fixed="mobile ? false : 'right'"
+                        width="300"
                         fix
                     />
                 </ComplexTable>

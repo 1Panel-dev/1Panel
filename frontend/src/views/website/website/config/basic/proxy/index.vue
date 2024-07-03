@@ -1,7 +1,7 @@
 <template>
     <ComplexTable :data="data" @search="search" v-loading="loading">
         <template #toolbar>
-            <el-button type="primary" plain @click="openCreate">{{ $t('website.createProxy') }}</el-button>
+            <el-button type="primary" plain @click="openCreate">{{ $t('commons.button.create') }}</el-button>
         </template>
         <el-table-column :label="$t('commons.table.name')" prop="name"></el-table-column>
         <el-table-column :label="$t('website.proxyPath')" prop="match"></el-table-column>

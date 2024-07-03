@@ -1,7 +1,7 @@
 <template>
     <el-dialog
         v-model="open"
-        :title="$t('website.addAccount')"
+        :title="$t('commons.button.create')"
         :close-on-click-modal="false"
         width="30%"
         :before-close="handleClose"

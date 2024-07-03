@@ -2,7 +2,7 @@
     <ComplexTable :data="data" @search="search" v-loading="loading">
         <template #toolbar>
             <el-button type="primary" plain @click="openCreate">
-                {{ $t('commons.button.create') + $t('website.redirect') }}
+                {{ $t('commons.button.create') }}
             </el-button>
         </template>
         <el-table-column :label="$t('commons.table.name')" prop="name" min-width="60px" show-overflow-tooltip />
