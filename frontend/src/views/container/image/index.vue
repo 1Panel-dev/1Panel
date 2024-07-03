@@ -7,33 +7,29 @@
         </el-card>
 
         <LayoutContent :title="$t('container.image')" :class="{ mask: dockerStatus != 'Running' }">
-            <template #toolbar>
-                <el-row>
-                    <el-col :span="16">
-                        <el-button type="primary" plain @click="onOpenPull">
-                            {{ $t('container.imagePull') }}
-                        </el-button>
-                        <el-button type="primary" plain @click="onOpenload">
-                            {{ $t('container.importImage') }}
-                        </el-button>
-                        <el-button type="primary" plain @click="onOpenBuild">
-                            {{ $t('container.imageBuild') }}
-                        </el-button>
-                        <el-button type="primary" plain @click="onOpenBuildCache()">
-                            {{ $t('container.cleanBuildCache') }}
-                        </el-button>
-                        <el-button type="primary" plain @click="onOpenPrune()">
-                            {{ $t('container.imagePrune') }}
-                        </el-button>
-                    </el-col>
-                    <el-col :span="8">
-                        <TableSetting @search="search()" />
-                        <TableSearch @search="search()" v-model:searchName="searchName" />
-                    </el-col>
-                </el-row>
+            <template #leftToolBar>
+                <el-button type="primary" plain @click="onOpenPull">
+                    {{ $t('container.imagePull') }}
+                </el-button>
+                <el-button type="primary" plain @click="onOpenload">
+                    {{ $t('container.importImage') }}
+                </el-button>
+                <el-button type="primary" plain @click="onOpenBuild">
+                    {{ $t('container.imageBuild') }}
+                </el-button>
+                <el-button type="primary" plain @click="onOpenBuildCache()">
+                    {{ $t('container.cleanBuildCache') }}
+                </el-button>
+                <el-button type="primary" plain @click="onOpenPrune()">
+                    {{ $t('container.imagePrune') }}
+                </el-button>
+            </template>
+            <template #rightToolBar>
+                <TableSearch @search="search()" v-model:searchName="searchName" class="mr-" />
+                <TableSetting @search="search()" />
             </template>
             <template #main>
-                <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
+                <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" :heightDiff="300">
                     <el-table-column label="ID" prop="id" width="140" show-overflow-tooltip>
                         <template #default="{ row }">
                             <el-text type="primary" class="cursor-pointer" @click="onInspect(row.id)">

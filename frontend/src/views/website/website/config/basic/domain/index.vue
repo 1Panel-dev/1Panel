@@ -1,5 +1,5 @@
 <template>
-    <ComplexTable :data="data" @search="search" v-loading="loading">
+    <ComplexTable :data="data" @search="search" v-loading="loading" :heightDiff="400">
         <template #toolbar>
             <el-button type="primary" plain @click="openCreate">{{ $t('website.addDomain') }}</el-button>
         </template>

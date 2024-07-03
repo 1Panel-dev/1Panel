@@ -7,24 +7,20 @@
         </el-card>
 
         <LayoutContent :title="$t('container.network')" :class="{ mask: dockerStatus != 'Running' }">
-            <template #toolbar>
-                <el-row>
-                    <el-col :span="16">
-                        <el-button type="primary" @click="onCreate()">
-                            {{ $t('container.createNetwork') }}
-                        </el-button>
-                        <el-button type="primary" plain @click="onClean()">
-                            {{ $t('container.networkPrune') }}
-                        </el-button>
-                        <el-button :disabled="selects.length === 0" @click="batchDelete(null)">
-                            {{ $t('commons.button.delete') }}
-                        </el-button>
-                    </el-col>
-                    <el-col :span="8">
-                        <TableSetting @search="search()" />
-                        <TableSearch @search="search()" v-model:searchName="searchName" />
-                    </el-col>
-                </el-row>
+            <template #leftToolBar>
+                <el-button type="primary" @click="onCreate()">
+                    {{ $t('container.createNetwork') }}
+                </el-button>
+                <el-button type="primary" plain @click="onClean()">
+                    {{ $t('container.networkPrune') }}
+                </el-button>
+                <el-button :disabled="selects.length === 0" @click="batchDelete(null)">
+                    {{ $t('commons.button.delete') }}
+                </el-button>
+            </template>
+            <template #rightToolBar>
+                <TableSearch @search="search()" v-model:searchName="searchName" class="mr-2.5" />
+                <TableSetting @search="search()" />
             </template>
             <template #main>
                 <ComplexTable
@@ -32,6 +28,7 @@
                     v-model:selects="selects"
                     :data="data"
                     @search="search"
+                    :heightDiff="300"
                 >
                     <el-table-column type="selection" :selectable="selectable" fix />
                     <el-table-column

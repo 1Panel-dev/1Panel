@@ -1,14 +1,19 @@
 <template>
     <div class="complex-table">
-        <div class="complex-table__header" v-if="$slots.header || header">
+        <div class="complex-table__header" v-if="slots.header || header">
             <slot name="header">{{ header }}</slot>
         </div>
-        <div v-if="$slots.toolbar" style="margin-bottom: 10px">
+        <div v-if="slots.toolbar" class="bt-5">
             <slot name="toolbar"></slot>
         </div>
 
         <div class="complex-table__body">
-            <fu-table v-bind="$attrs" ref="tableRef" @selection-change="handleSelectionChange">
+            <fu-table
+                v-bind="$attrs"
+                ref="tableRef"
+                @selection-change="handleSelectionChange"
+                :max-height="tableHeight"
+            >
                 <slot></slot>
                 <template #empty>
                     <slot name="empty"></slot>
@@ -35,6 +40,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { GlobalStore } from '@/store';
+const slots = useSlots();
 
 defineOptions({ name: 'ComplexTable' });
 const props = defineProps({
@@ -44,16 +50,18 @@ const props = defineProps({
         required: false,
         default: () => {},
     },
+    heightDiff: {
+        type: Number,
+        default: 0,
+    },
 });
 const emit = defineEmits(['search', 'update:selects', 'update:paginationConfig']);
-
 const globalStore = GlobalStore();
-
 const mobile = computed(() => {
     return globalStore.isMobile();
 });
-
 const tableRef = ref();
+const tableHeight = ref(0);
 
 function currentChange() {
     emit('search');
@@ -94,6 +102,17 @@ onMounted(() => {
             props.paginationConfig.pageSize = itemSize;
         }
     }
+    let heightDiff = 320;
+    if (props.heightDiff) {
+        heightDiff = props.heightDiff;
+    }
+
+    tableHeight.value = window.innerHeight - heightDiff;
+    window.onresize = () => {
+        return (() => {
+            tableHeight.value = window.innerHeight - heightDiff;
+        })();
+    };
 });
 </script>
 

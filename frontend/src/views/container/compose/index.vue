@@ -24,18 +24,14 @@
                     </template>
                 </el-alert>
             </template>
-            <template #toolbar>
-                <el-row>
-                    <el-col :span="16">
-                        <el-button type="primary" @click="onOpenDialog()">
-                            {{ $t('container.createCompose') }}
-                        </el-button>
-                    </el-col>
-                    <el-col :span="8">
-                        <TableSetting @search="search()" />
-                        <TableSearch @search="search()" v-model:searchName="searchName" />
-                    </el-col>
-                </el-row>
+            <template #leftToolBar>
+                <el-button type="primary" @click="onOpenDialog()">
+                    {{ $t('container.createCompose') }}
+                </el-button>
+            </template>
+            <template #rightToolBar>
+                <TableSearch @search="search()" v-model:searchName="searchName" class="mr-2.5" />
+                <TableSetting @search="search()" />
             </template>
             <template #main>
                 <ComplexTable
@@ -43,6 +39,7 @@
                     v-model:selects="selects"
                     :data="data"
                     @search="search"
+                    :heightDiff="350"
                 >
                     <el-table-column
                         :label="$t('commons.table.name')"

@@ -19,31 +19,23 @@
                 </el-card>
 
                 <LayoutContent :title="$t('firewall.ipRule')" :class="{ mask: fireStatus != 'running' }">
-                    <template #toolbar>
-                        <el-row>
-                            <el-col :span="16">
-                                <el-button type="primary" @click="onOpenDialog('create')">
-                                    {{ $t('commons.button.create') }} {{ $t('firewall.ipRule') }}
-                                </el-button>
-                                <el-button @click="onDelete(null)" plain :disabled="selects.length === 0">
-                                    {{ $t('commons.button.delete') }}
-                                </el-button>
-                            </el-col>
-                            <el-col :span="8">
-                                <TableSetting @search="search()" />
-                                <TableSearch @search="search()" v-model:searchName="searchName" />
-                            </el-col>
-                        </el-row>
+                    <template #leftToolBar>
+                        <el-button type="primary" @click="onOpenDialog('create')">
+                            {{ $t('commons.button.create') }} {{ $t('firewall.ipRule') }}
+                        </el-button>
+                        <el-button @click="onDelete(null)" plain :disabled="selects.length === 0">
+                            {{ $t('commons.button.delete') }}
+                        </el-button>
                     </template>
-                    <template #search>
-                        <div class="flx-align-center">
-                            <el-select v-model="searchStrategy" @change="search()" clearable class="p-w-200">
-                                <template #prefix>{{ $t('firewall.strategy') }}</template>
-                                <el-option :label="$t('commons.table.all')" value=""></el-option>
-                                <el-option :label="$t('firewall.allow')" value="accept"></el-option>
-                                <el-option :label="$t('firewall.deny')" value="drop"></el-option>
-                            </el-select>
-                        </div>
+                    <template #rightToolBar>
+                        <el-select v-model="searchStrategy" @change="search()" clearable class="p-w-200 mr-2.5">
+                            <template #prefix>{{ $t('firewall.strategy') }}</template>
+                            <el-option :label="$t('commons.table.all')" value=""></el-option>
+                            <el-option :label="$t('firewall.allow')" value="accept"></el-option>
+                            <el-option :label="$t('firewall.deny')" value="drop"></el-option>
+                        </el-select>
+                        <TableSearch @search="search()" v-model:searchName="searchName" class="mr-2.5" />
+                        <TableSetting @search="search()" />
                     </template>
                     <template #main>
                         <ComplexTable
@@ -51,6 +43,7 @@
                             v-model:selects="selects"
                             @search="search"
                             :data="data"
+                            :heightDiff="370"
                         >
                             <el-table-column type="selection" fix />
                             <el-table-column :min-width="80" :label="$t('firewall.address')" prop="address">

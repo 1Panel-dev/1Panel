@@ -1,44 +1,34 @@
 <template>
     <div>
         <LayoutContent v-loading="loading" :title="$t('logs.login')">
-            <template #toolbar>
-                <el-row>
-                    <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
-                        <el-button class="tag-button no-active" @click="onChangeRoute('OperationLog')">
-                            {{ $t('logs.operation') }}
-                        </el-button>
-                        <el-button class="tag-button" type="primary" @click="onChangeRoute('LoginLog')">
-                            {{ $t('logs.login') }}
-                        </el-button>
-                        <el-button class="tag-button no-active" @click="onChangeRoute('SystemLog')">
-                            {{ $t('logs.system') }}
-                        </el-button>
-                    </el-col>
-                    <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
-                        <div class="flex justify-end">
-                            <TableSetting @search="search()" />
-                            <TableSearch @search="search()" v-model:searchName="searchIP" />
-                        </div>
-                    </el-col>
-                </el-row>
-            </template>
-
             <template #search>
-                <div class="flx-align-center">
-                    <el-select v-model="searchStatus" @change="search()" clearable class="p-w-200">
-                        <template #prefix>{{ $t('commons.table.status') }}</template>
-                        <el-option :label="$t('commons.table.all')" value=""></el-option>
-                        <el-option :label="$t('commons.status.success')" value="Success"></el-option>
-                        <el-option :label="$t('commons.status.failed')" value="Failed"></el-option>
-                    </el-select>
-
-                    <el-button type="primary" plain @click="onClean()" class="ml-2.5">
-                        {{ $t('logs.deleteLogs') }}
-                    </el-button>
-                </div>
+                <el-button class="tag-button no-active" @click="onChangeRoute('OperationLog')">
+                    {{ $t('logs.operation') }}
+                </el-button>
+                <el-button class="tag-button" type="primary" @click="onChangeRoute('LoginLog')">
+                    {{ $t('logs.login') }}
+                </el-button>
+                <el-button class="tag-button no-active" @click="onChangeRoute('SystemLog')">
+                    {{ $t('logs.system') }}
+                </el-button>
+            </template>
+            <template #leftToolBar>
+                <el-button type="primary" plain @click="onClean()">
+                    {{ $t('logs.deleteLogs') }}
+                </el-button>
+            </template>
+            <template #rightToolBar>
+                <el-select v-model="searchStatus" @change="search()" clearable class="p-w-200 mr-2.5">
+                    <template #prefix>{{ $t('commons.table.status') }}</template>
+                    <el-option :label="$t('commons.table.all')" value=""></el-option>
+                    <el-option :label="$t('commons.status.success')" value="Success"></el-option>
+                    <el-option :label="$t('commons.status.failed')" value="Failed"></el-option>
+                </el-select>
+                <TableSearch @search="search()" v-model:searchName="searchIP" class="mr-2.5" />
+                <TableSetting @search="search()" />
             </template>
             <template #main>
-                <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
+                <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" :heightDiff="370">
                     <el-table-column :label="$t('logs.loginIP')" prop="ip" />
                     <el-table-column :label="$t('logs.loginAddress')" prop="address" />
                     <el-table-column :label="$t('logs.loginAgent')" show-overflow-tooltip prop="agent" />
