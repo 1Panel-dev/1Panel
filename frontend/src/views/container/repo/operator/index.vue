@@ -117,7 +117,7 @@ const handleClose = () => {
 };
 const rules = reactive({
     name: [Rules.requiredInput, Rules.name],
-    downloadUrl: [Rules.illegal],
+    downloadUrl: [{ validator: validateDownloadUrl, trigger: 'blur' }, Rules.illegal],
     protocol: [Rules.requiredSelect],
     username: [Rules.illegal],
     password: [Rules.illegal],
@@ -126,6 +126,17 @@ const rules = reactive({
 
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
+
+function validateDownloadUrl(rule: any, value: any, callback: any) {
+    if (value === '') {
+        callback();
+    }
+    const pattern = /^https?/i;
+    if (pattern.test(value)) {
+        return callback(new Error(i18n.global.t('container.urlWarning')));
+    }
+    callback();
+}
 
 const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;

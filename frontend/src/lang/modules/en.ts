@@ -717,6 +717,7 @@ const message = {
         cleanBuildCache: 'Clean Build Cache',
         delBuildCacheHelper:
             'Cleaning the build cache will delete all cached artifacts generated during builds. This action cannot be undone. Continue?',
+        urlWarning: 'The URL prefix does not need to include http:// or https://. Please modify.',
 
         network: 'Network',
         createNetwork: 'Create',
