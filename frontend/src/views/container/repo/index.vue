@@ -7,18 +7,14 @@
         </el-card>
 
         <LayoutContent :title="$t('container.repo')" :class="{ mask: dockerStatus != 'Running' }">
-            <template #toolbar>
-                <el-row>
-                    <el-col :span="16">
-                        <el-button type="primary" @click="onOpenDialog('add')">
-                            {{ $t('container.createRepo') }}
-                        </el-button>
-                    </el-col>
-                    <el-col :span="8">
-                        <TableSetting @search="search()" />
-                        <TableSearch @search="search()" v-model:searchName="searchName" />
-                    </el-col>
-                </el-row>
+            <template #leftToolBar>
+                <el-button type="primary" @click="onOpenDialog('add')">
+                    {{ $t('container.createRepo') }}
+                </el-button>
+            </template>
+            <template #rightToolBar>
+                <TableSearch @search="search()" v-model:searchName="searchName" class="mr-2.5" />
+                <TableSetting @search="search()" />
             </template>
             <template #main>
                 <ComplexTable
@@ -26,6 +22,7 @@
                     v-model:selects="selects"
                     :data="data"
                     @search="search"
+                    :heightDiff="300"
                 >
                     <el-table-column :label="$t('commons.table.name')" prop="name" min-width="60" />
                     <el-table-column

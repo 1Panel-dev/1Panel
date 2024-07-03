@@ -5,26 +5,19 @@
                 <el-alert type="info" :title="$t('ssh.sshAlert2')" :closable="false" />
                 <div class="mt-2"><el-alert type="info" :title="$t('ssh.sshAlert')" :closable="false" /></div>
             </template>
-            <template #search>
-                <el-select v-model="searchStatus" @change="search()" class="p-w-200">
+            <template #rightToolBar>
+                <el-select v-model="searchStatus" @change="search()" class="p-w-200 mr-2.5">
                     <template #prefix>{{ $t('commons.table.status') }}</template>
                     <el-option :label="$t('commons.table.all')" value="All"></el-option>
                     <el-option :label="$t('commons.status.success')" value="Success"></el-option>
                     <el-option :label="$t('commons.status.failed')" value="Failed"></el-option>
                 </el-select>
-            </template>
-            <template #toolbar>
-                <el-row>
-                    <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16"></el-col>
-                    <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
-                        <TableSetting @search="search()" />
-                        <TableSearch @search="search()" v-model:searchName="searchInfo" />
-                    </el-col>
-                </el-row>
+                <TableSetting @search="search()" class="mr-2.5" />
+                <TableSearch @search="search()" v-model:searchName="searchInfo" />
             </template>
 
             <template #main>
-                <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
+                <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" :heightDiff="400">
                     <el-table-column min-width="80" :label="$t('logs.loginIP')" prop="address" />
                     <el-table-column min-width="60" :label="$t('ssh.belong')" prop="area" />
                     <el-table-column min-width="60" :label="$t('commons.table.port')" prop="port" />

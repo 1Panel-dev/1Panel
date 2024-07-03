@@ -1,63 +1,55 @@
 <template>
     <LayoutContent v-loading="loading || syncLoading" :title="activeName">
-        <template #toolbar>
-            <el-row :gutter="5">
-                <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
-                    <div>
+        <template #search>
+            <div>
+                <el-button
+                    class="tag-button"
+                    :class="activeTag === 'all' ? '' : 'no-active'"
+                    @click="changeTag('all')"
+                    :type="activeTag === 'all' ? 'primary' : ''"
+                    :plain="activeTag !== 'all'"
+                >
+                    {{ $t('app.all') }}
+                </el-button>
+                <div v-for="item in tags.slice(0, 7)" :key="item.key" class="inline">
+                    <el-button
+                        class="tag-button"
+                        :class="activeTag === item.key ? '' : 'no-active'"
+                        @click="changeTag(item.key)"
+                        :type="activeTag === item.key ? 'primary' : ''"
+                        :plain="activeTag !== item.key"
+                    >
+                        {{ language == 'zh' || language == 'tw' ? item.name : item.key }}
+                    </el-button>
+                </div>
+                <div class="inline">
+                    <el-dropdown>
                         <el-button
                             class="tag-button"
-                            :class="activeTag === 'all' ? '' : 'no-active'"
-                            @click="changeTag('all')"
-                            :type="activeTag === 'all' ? 'primary' : ''"
-                            :plain="activeTag !== 'all'"
+                            :type="moreTag !== '' ? 'primary' : ''"
+                            :class="moreTag !== '' ? '' : 'no-active'"
                         >
-                            {{ $t('app.all') }}
+                            {{ moreTag == '' ? $t('tabs.more') : getTagValue(moreTag) }}
+                            <el-icon class="el-icon--right">
+                                <arrow-down />
+                            </el-icon>
                         </el-button>
-                        <div v-for="item in tags.slice(0, 7)" :key="item.key" class="inline">
-                            <el-button
-                                class="tag-button"
-                                :class="activeTag === item.key ? '' : 'no-active'"
-                                @click="changeTag(item.key)"
-                                :type="activeTag === item.key ? 'primary' : ''"
-                                :plain="activeTag !== item.key"
-                            >
-                                {{ language == 'zh' || language == 'tw' ? item.name : item.key }}
-                            </el-button>
-                        </div>
-                        <div class="inline">
-                            <el-dropdown>
-                                <el-button
-                                    class="tag-button"
-                                    :type="moreTag !== '' ? 'primary' : ''"
-                                    :class="moreTag !== '' ? '' : 'no-active'"
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item
+                                    v-for="item in tags.slice(7)"
+                                    @click="changeTag(item.key)"
+                                    :key="item.key"
                                 >
-                                    {{ moreTag == '' ? $t('tabs.more') : getTagValue(moreTag) }}
-                                    <el-icon class="el-icon--right">
-                                        <arrow-down />
-                                    </el-icon>
-                                </el-button>
-                                <template #dropdown>
-                                    <el-dropdown-menu>
-                                        <el-dropdown-item
-                                            v-for="item in tags.slice(7)"
-                                            @click="changeTag(item.key)"
-                                            :key="item.key"
-                                        >
-                                            {{ language == 'zh' || language == 'tw' ? item.name : item.key }}
-                                        </el-dropdown-item>
-                                    </el-dropdown-menu>
-                                </template>
-                            </el-dropdown>
-                        </div>
-                    </div>
-                </el-col>
-
-                <el-col :xs="24" :sm="4" :md="4" :lg="4" :xl="4">
-                    <TableSearch @search="search()" v-model:searchName="searchReq.name" />
-                </el-col>
-            </el-row>
+                                    {{ language == 'zh' || language == 'tw' ? item.name : item.key }}
+                                </el-dropdown-item>
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
+                </div>
+            </div>
         </template>
-        <template #rightButton>
+        <template #leftToolBar>
             <el-button @click="sync" type="primary" plain v-if="mode === 'installed' && data != null">
                 {{ $t('app.sync') }}
             </el-button>
@@ -65,103 +57,124 @@
                 {{ $t('app.showIgnore') }}
             </el-button>
         </template>
-
+        <template #rightToolBar>
+            <TableSearch @search="search()" v-model:searchName="searchReq.name" />
+        </template>
         <template #main>
-            <el-alert type="info" :closable="false" v-if="mode === 'installed'">
-                <template #title>
-                    <span class="flx-align-center">
-                        {{ $t('app.installHelper') }}
-                        <el-link class="ml-5" icon="Position" @click="quickJump()" type="primary">
-                            {{ $t('firewall.quickJump') }}
-                        </el-link>
-                        　
-                    </span>
-                </template>
-            </el-alert>
-            <el-alert type="info" :title="$t('app.upgradeHelper')" :closable="false" v-if="mode === 'upgrade'" />
-            <div class="update-prompt" v-if="data == null">
-                <span>{{ mode === 'upgrade' ? $t('app.updatePrompt') : $t('app.installPrompt') }}</span>
-                <div>
-                    <img src="@/assets/images/no_update_app.svg" />
-                </div>
-            </div>
-            <el-row :gutter="5">
-                <el-col
-                    v-for="(installed, index) in data"
-                    :key="index"
-                    :xs="24"
-                    :sm="24"
-                    :md="24"
-                    :lg="12"
-                    :xl="12"
-                    class="install-card-col-12"
-                >
-                    <div class="install-card">
-                        <el-card class="e-card">
-                            <el-row :gutter="20">
-                                <el-col :xs="3" :sm="3" :md="3" :lg="4" :xl="4">
-                                    <div class="icon" @click.stop="openDetail(installed.appKey)">
-                                        <el-avatar
-                                            shape="square"
-                                            :size="66"
-                                            :src="'data:image/png;base64,' + installed.icon"
-                                        />
-                                    </div>
-                                </el-col>
-                                <el-col :xs="24" :sm="21" :md="21" :lg="20" :xl="20">
-                                    <div class="a-detail">
-                                        <div class="d-name">
-                                            <el-button link type="info">
-                                                <span class="name">{{ installed.name }}</span>
-                                            </el-button>
+            <div>
+                <MainDiv :heightDiff="mode === 'upgrade' ? 280 : 380">
+                    <el-alert
+                        type="info"
+                        :title="$t('app.upgradeHelper')"
+                        :closable="false"
+                        v-if="mode === 'upgrade'"
+                    />
 
-                                            <span class="status">
-                                                <Status :key="installed.status" :status="installed.status"></Status>
-                                            </span>
-                                            <span class="msg">
-                                                <el-popover
-                                                    v-if="isAppErr(installed)"
-                                                    placement="bottom"
-                                                    :width="400"
-                                                    trigger="hover"
-                                                    :content="installed.message"
-                                                    :popper-options="options"
-                                                >
-                                                    <template #reference>
-                                                        <el-button link type="danger">
-                                                            <el-icon><Warning /></el-icon>
-                                                        </el-button>
-                                                    </template>
-                                                    <div class="app-error">
-                                                        {{ installed.message }}
-                                                    </div>
-                                                </el-popover>
-                                            </span>
-                                            <span class="ml-1">
-                                                <el-tooltip effect="dark" :content="$t('app.toFolder')" placement="top">
-                                                    <el-button type="primary" link @click="toFolder(installed.path)">
-                                                        <el-icon>
-                                                            <FolderOpened />
-                                                        </el-icon>
+                    <el-alert type="info" :closable="false" v-if="mode === 'installed'">
+                        <template #title>
+                            <span class="flx-align-center">
+                                {{ $t('app.installHelper') }}
+                                <el-link class="ml-5" icon="Position" @click="quickJump()" type="primary">
+                                    {{ $t('firewall.quickJump') }}
+                                </el-link>
+                                　
+                            </span>
+                        </template>
+                    </el-alert>
+                    <div class="update-prompt" v-if="data == null">
+                        <span>{{ mode === 'upgrade' ? $t('app.updatePrompt') : $t('app.installPrompt') }}</span>
+                        <div>
+                            <img src="@/assets/images/no_update_app.svg" />
+                        </div>
+                    </div>
+                    <el-row :gutter="5">
+                        <el-col
+                            v-for="(installed, index) in data"
+                            :key="index"
+                            :xs="24"
+                            :sm="24"
+                            :md="24"
+                            :lg="12"
+                            :xl="12"
+                            class="install-card-col-12"
+                        >
+                            <div class="install-card">
+                                <el-card class="e-card">
+                                    <el-row :gutter="20">
+                                        <el-col :xs="3" :sm="3" :md="3" :lg="4" :xl="4">
+                                            <div class="icon" @click.stop="openDetail(installed.appKey)">
+                                                <el-avatar
+                                                    shape="square"
+                                                    :size="66"
+                                                    :src="'data:image/png;base64,' + installed.icon"
+                                                />
+                                            </div>
+                                        </el-col>
+                                        <el-col :xs="24" :sm="21" :md="21" :lg="20" :xl="20">
+                                            <div class="a-detail">
+                                                <div class="d-name">
+                                                    <el-button link type="info">
+                                                        <span class="name">{{ installed.name }}</span>
                                                     </el-button>
-                                                </el-tooltip>
-                                            </span>
-                                            <span class="ml-1">
-                                                <el-tooltip
-                                                    effect="dark"
-                                                    :content="$t('commons.button.log')"
-                                                    placement="top"
-                                                >
-                                                    <el-button
-                                                        type="primary"
-                                                        link
-                                                        @click="openLog(installed)"
-                                                        :disabled="installed.status === 'DownloadErr'"
-                                                    >
-                                                        <el-icon><Tickets /></el-icon>
-                                                    </el-button>
-                                                </el-tooltip>
-                                            </span>
+
+                                                    <span class="status">
+                                                        <Status
+                                                            :key="installed.status"
+                                                            :status="installed.status"
+                                                        ></Status>
+                                                    </span>
+                                                    <span class="msg">
+                                                        <el-popover
+                                                            v-if="isAppErr(installed)"
+                                                            placement="bottom"
+                                                            :width="400"
+                                                            trigger="hover"
+                                                            :content="installed.message"
+                                                            :popper-options="options"
+                                                        >
+                                                            <template #reference>
+                                                                <el-button link type="danger">
+                                                                    <el-icon><Warning /></el-icon>
+                                                                </el-button>
+                                                            </template>
+                                                            <div class="app-error">
+                                                                {{ installed.message }}
+                                                            </div>
+                                                        </el-popover>
+                                                    </span>
+                                                    <span class="ml-1">
+                                                        <el-tooltip
+                                                            effect="dark"
+                                                            :content="$t('app.toFolder')"
+                                                            placement="top"
+                                                        >
+                                                            <el-button
+                                                                type="primary"
+                                                                link
+                                                                @click="toFolder(installed.path)"
+                                                            >
+                                                                <el-icon>
+                                                                    <FolderOpened />
+                                                                </el-icon>
+                                                            </el-button>
+                                                        </el-tooltip>
+                                                    </span>
+                                                    <span class="ml-1">
+                                                        <el-tooltip
+                                                            effect="dark"
+                                                            :content="$t('commons.button.log')"
+                                                            placement="top"
+                                                        >
+                                                            <el-button
+                                                                type="primary"
+                                                                link
+                                                                @click="openLog(installed)"
+                                                                :disabled="installed.status === 'DownloadErr'"
+                                                            >
+                                                                <el-icon><Tickets /></el-icon>
+                                                            </el-button>
+                                                        </el-tooltip>
+                                                    </span>
 
                                             <el-button
                                                 class="h-button"
@@ -215,60 +228,65 @@
                                                 {{ $t('app.version') }}：{{ installed.version }}
                                             </el-button>
 
-                                            <el-button
-                                                v-if="installed.httpPort > 0"
-                                                @click="goDashboard(installed.httpPort, 'http')"
-                                                class="tagMargin"
-                                                icon="Position"
-                                                plain
-                                                size="small"
-                                            >
-                                                {{ $t('app.busPort') }}：{{ installed.httpPort }}
-                                            </el-button>
+                                                    <el-button
+                                                        v-if="installed.httpPort > 0"
+                                                        @click="goDashboard(installed.httpPort, 'http')"
+                                                        class="tagMargin"
+                                                        icon="Position"
+                                                        plain
+                                                        size="small"
+                                                    >
+                                                        {{ $t('app.busPort') }}：{{ installed.httpPort }}
+                                                    </el-button>
 
-                                            <el-button
-                                                v-if="installed.httpsPort > 0"
-                                                @click="goDashboard(installed.httpsPort, 'https')"
-                                                class="tagMargin"
-                                                icon="Position"
-                                                plain
-                                                size="small"
-                                            >
-                                                {{ $t('app.busPort') }}：{{ installed.httpsPort }}
-                                            </el-button>
+                                                    <el-button
+                                                        v-if="installed.httpsPort > 0"
+                                                        @click="goDashboard(installed.httpsPort, 'https')"
+                                                        class="tagMargin"
+                                                        icon="Position"
+                                                        plain
+                                                        size="small"
+                                                    >
+                                                        {{ $t('app.busPort') }}：{{ installed.httpsPort }}
+                                                    </el-button>
 
-                                            <div class="description">
-                                                <span>
-                                                    {{ $t('app.alreadyRun') }}： {{ getAge(installed.createdAt) }}
-                                                </span>
+                                                    <div class="description">
+                                                        <span>
+                                                            {{ $t('app.alreadyRun') }}：
+                                                            {{ getAge(installed.createdAt) }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="app-divider" />
+                                                <div
+                                                    class="d-button"
+                                                    v-if="mode === 'installed' && installed.status != 'Installing'"
+                                                >
+                                                    <el-button
+                                                        class="app-button"
+                                                        v-for="(button, key) in buttons"
+                                                        :key="key"
+                                                        :type="
+                                                            button.disabled && button.disabled(installed) ? 'info' : ''
+                                                        "
+                                                        plain
+                                                        round
+                                                        size="small"
+                                                        @click="button.click(installed)"
+                                                        :disabled="button.disabled && button.disabled(installed)"
+                                                    >
+                                                        {{ button.label }}
+                                                    </el-button>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="app-divider" />
-                                        <div
-                                            class="d-button"
-                                            v-if="mode === 'installed' && installed.status != 'Installing'"
-                                        >
-                                            <el-button
-                                                class="app-button"
-                                                v-for="(button, key) in buttons"
-                                                :key="key"
-                                                :type="button.disabled && button.disabled(installed) ? 'info' : ''"
-                                                plain
-                                                round
-                                                size="small"
-                                                @click="button.click(installed)"
-                                                :disabled="button.disabled && button.disabled(installed)"
-                                            >
-                                                {{ button.label }}
-                                            </el-button>
-                                        </div>
-                                    </div>
-                                </el-col>
-                            </el-row>
-                        </el-card>
-                    </div>
-                </el-col>
-            </el-row>
+                                        </el-col>
+                                    </el-row>
+                                </el-card>
+                            </div>
+                        </el-col>
+                    </el-row>
+                </MainDiv>
+            </div>
             <div class="page-button" v-if="mode === 'installed'">
                 <fu-table-pagination
                     v-model:current-page="paginationConfig.currentPage"

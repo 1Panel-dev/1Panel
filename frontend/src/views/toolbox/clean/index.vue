@@ -1,18 +1,13 @@
 <template>
     <div v-loading="loading">
         <LayoutContent :title="$t('setting.diskClean')" :divider="true">
-            <template #toolbar>
-                <el-row>
-                    <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
-                        <el-button type="primary" @click="scanData">
-                            {{ $t('clean.scan') }}
-                        </el-button>
-                    </el-col>
-                </el-row>
+            <template #leftToolBar>
+                <el-button type="primary" @click="scanData">
+                    {{ $t('clean.scan') }}
+                </el-button>
             </template>
             <template #main>
                 <el-row class="mt-5 mb-5">
-                    <el-col :span="1"><br /></el-col>
                     <el-col :xs="24" :sm="20" :md="20" :lg="10" :xl="10">
                         <div v-if="scanStatus !== 'scanned'">
                             <div v-if="scanStatus === 'beforeScan'">

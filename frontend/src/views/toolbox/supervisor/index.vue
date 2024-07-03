@@ -12,8 +12,8 @@
                     v-model:mask-show="maskShow"
                 />
             </template>
-            <template v-if="showTable" #toolbar>
-                <el-button type="primary" @click="openCreate">
+            <template v-if="showTable" #leftToolBar>
+                <el-button type="primary" @click="openCreate" :disabled="showStopped">
                     {{ $t('commons.button.create') + $t('tool.supervisor.list') }}
                 </el-button>
             </template>

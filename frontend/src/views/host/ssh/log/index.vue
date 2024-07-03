@@ -1,7 +1,6 @@
 <template>
     <div>
         <FireRouter />
-
         <Log />
     </div>
 </template>

@@ -9,7 +9,7 @@
                     </template>
                 </el-alert>
             </template>
-            <template #toolbar>
+            <template #leftToolBar>
                 <el-button type="primary" @click="openCreate">
                     {{ $t('runtime.create') }}
                 </el-button>
@@ -19,7 +19,7 @@
                 </el-button>
             </template>
             <template #main>
-                <ComplexTable :pagination-config="paginationConfig" :data="items" @search="search()">
+                <ComplexTable :pagination-config="paginationConfig" :data="items" @search="search()" :heightDiff="350">
                     <el-table-column
                         :label="$t('commons.table.name')"
                         fix

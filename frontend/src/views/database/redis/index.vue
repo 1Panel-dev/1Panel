@@ -1,9 +1,9 @@
 <template>
     <div v-loading="loading">
-        <div class="app-status" style="margin-top: 20px" v-if="currentDB && currentDB.from === 'remote'">
+        <div class="app-status mt-5" v-if="currentDB && currentDB.from === 'remote'">
             <el-card>
                 <div>
-                    <el-tag style="float: left" effect="dark" type="success">Redis</el-tag>
+                    <el-tag class="float-left" effect="dark" type="success">Redis</el-tag>
                     <el-tag class="status-content">{{ $t('app.version') }}: {{ currentDB?.version }}</el-tag>
                 </div>
             </el-card>
@@ -19,44 +19,46 @@
                     @setting="onSetting"
                 ></AppStatus>
             </template>
-            <template #search v-if="!isOnSetting && currentDB">
-                <el-select v-model="currentDBName" @change="changeDatabase()" class="p-w-200">
-                    <template #prefix>{{ $t('commons.table.type') }}</template>
-                    <el-option-group :label="$t('database.local')">
-                        <div v-for="(item, index) in dbOptionsLocal" :key="index">
-                            <el-option v-if="item.from === 'local'" :value="item.database" class="optionClass">
-                                <span v-if="item.database.length < 25">{{ item.database }}</span>
-                                <el-tooltip v-else :content="item.database" placement="top">
-                                    <span>{{ item.database.substring(0, 25) }}...</span>
-                                </el-tooltip>
-                            </el-option>
-                        </div>
-                        <el-button link type="primary" class="jumpAdd" @click="goRouter('app')" icon="Position">
-                            {{ $t('database.goInstall') }}
+            <template #search v-if="!isOnSetting">
+                <div class="flex">
+                    <div>
+                        <el-button v-if="currentDB" type="primary" plain @click="onLoadConn">
+                            {{ $t('database.databaseConnInfo') }}
                         </el-button>
-                    </el-option-group>
-                    <el-option-group :label="$t('database.remote')">
-                        <div v-for="(item, index) in dbOptionsRemote" :key="index">
-                            <el-option v-if="item.from === 'remote'" :value="item.database" class="optionClass">
-                                <span v-if="item.database.length < 25">{{ item.database }}</span>
-                                <el-tooltip v-else :content="item.database" placement="top">
-                                    <span>{{ item.database.substring(0, 25) }}...</span>
-                                </el-tooltip>
-                            </el-option>
-                        </div>
-                        <el-button link type="primary" class="jumpAdd" @click="goRouter('remote')" icon="Position">
-                            {{ $t('database.createRemoteDB') }}
+                        <el-button @click="goRemoteDB" type="primary" plain>
+                            {{ $t('database.remoteDB') }}
                         </el-button>
-                    </el-option-group>
-                </el-select>
-            </template>
-            <template #toolbar v-if="!isOnSetting">
-                <el-button v-if="currentDB" type="primary" plain @click="onLoadConn">
-                    {{ $t('database.databaseConnInfo') }}
-                </el-button>
-                <el-button @click="goRemoteDB" type="primary" plain>
-                    {{ $t('database.remoteDB') }}
-                </el-button>
+                    </div>
+                    <el-select v-model="currentDBName" @change="changeDatabase()" class="p-w-200 ml-5" v-if="currentDB">
+                        <template #prefix>{{ $t('commons.table.type') }}</template>
+                        <el-option-group :label="$t('database.local')">
+                            <div v-for="(item, index) in dbOptionsLocal" :key="index">
+                                <el-option v-if="item.from === 'local'" :value="item.database" class="optionClass">
+                                    <span v-if="item.database.length < 25">{{ item.database }}</span>
+                                    <el-tooltip v-else :content="item.database" placement="top">
+                                        <span>{{ item.database.substring(0, 25) }}...</span>
+                                    </el-tooltip>
+                                </el-option>
+                            </div>
+                            <el-button link type="primary" class="jumpAdd" @click="goRouter('app')" icon="Position">
+                                {{ $t('database.goInstall') }}
+                            </el-button>
+                        </el-option-group>
+                        <el-option-group :label="$t('database.remote')">
+                            <div v-for="(item, index) in dbOptionsRemote" :key="index">
+                                <el-option v-if="item.from === 'remote'" :value="item.database" class="optionClass">
+                                    <span v-if="item.database.length < 25">{{ item.database }}</span>
+                                    <el-tooltip v-else :content="item.database" placement="top">
+                                        <span>{{ item.database.substring(0, 25) }}...</span>
+                                    </el-tooltip>
+                                </el-option>
+                            </div>
+                            <el-button link type="primary" class="jumpAdd" @click="goRouter('remote')" icon="Position">
+                                {{ $t('database.createRemoteDB') }}
+                            </el-button>
+                        </el-option-group>
+                    </el-select>
+                </div>
             </template>
         </LayoutContent>
 

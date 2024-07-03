@@ -18,40 +18,32 @@
                     @is-exist="checkExist"
                 ></AppStatus>
             </template>
-            <template v-if="nginxIsExist && !openNginxConfig" #toolbar>
-                <el-row :class="{ mask: nginxStatus != 'Running' }">
-                    <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
-                        <el-button type="primary" @click="openCreate">
-                            {{ $t('website.create') }}
-                        </el-button>
-                        <el-button type="primary" plain @click="openGroup">
-                            {{ $t('website.group') }}
-                        </el-button>
-                        <el-button type="primary" plain @click="openDefault">
-                            {{ $t('website.defaultServer') }}
-                        </el-button>
-                        <el-button type="primary" plain @click="openDefaultHtml">
-                            {{ $t('website.defaultHtml') }}
-                        </el-button>
-                    </el-col>
-                    <el-col :xs="24" :sm="4" :md="4" :lg="4" :xl="4">
-                        <TableSearch @search="search()" v-model:searchName="req.name" />
-                    </el-col>
-                </el-row>
+            <template v-if="nginxIsExist && !openNginxConfig" #leftToolBar>
+                <el-button type="primary" @click="openCreate">
+                    {{ $t('website.create') }}
+                </el-button>
+                <el-button type="primary" plain @click="openGroup">
+                    {{ $t('website.group') }}
+                </el-button>
+                <el-button type="primary" plain @click="openDefault">
+                    {{ $t('website.defaultServer') }}
+                </el-button>
+                <el-button type="primary" plain @click="openDefaultHtml">
+                    {{ $t('website.defaultHtml') }}
+                </el-button>
             </template>
-            <template v-if="nginxIsExist && !openNginxConfig" #search>
-                <div :class="{ mask: nginxStatus != 'Running' }">
-                    <el-select v-model="req.websiteGroupId" @change="search()" class="p-w-200">
-                        <template #prefix>{{ $t('website.group') }}</template>
-                        <el-option :label="$t('commons.table.all')" :value="0"></el-option>
-                        <el-option
-                            v-for="(group, index) in groups"
-                            :key="index"
-                            :label="group.name"
-                            :value="group.id"
-                        ></el-option>
-                    </el-select>
-                </div>
+            <template v-if="nginxIsExist && !openNginxConfig" #rightToolBar>
+                <el-select v-model="req.websiteGroupId" @change="search()" class="p-w-200 mr-2.5">
+                    <template #prefix>{{ $t('website.group') }}</template>
+                    <el-option :label="$t('commons.table.all')" :value="0"></el-option>
+                    <el-option
+                        v-for="(group, index) in groups"
+                        :key="index"
+                        :label="group.name"
+                        :value="group.id"
+                    ></el-option>
+                </el-select>
+                <TableSearch @search="search()" v-model:searchName="req.name" />
             </template>
             <template v-if="nginxIsExist && !openNginxConfig" #main>
                 <ComplexTable
@@ -60,6 +52,7 @@
                     @sort-change="changeSort"
                     @search="search()"
                     :class="{ mask: nginxStatus != 'Running' }"
+                    :heightDiff="370"
                 >
                     <el-table-column
                         :label="$t('commons.table.name')"

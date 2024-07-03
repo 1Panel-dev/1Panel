@@ -1,34 +1,30 @@
 <template>
     <div>
         <LayoutContent v-loading="loading" v-if="!isRecordShow" :title="$t('setting.snapshot')">
-            <template #toolbar>
-                <el-row>
-                    <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
-                        <el-button type="primary" @click="onCreate()">
-                            {{ $t('setting.createSnapshot') }}
-                        </el-button>
-                        <el-button type="primary" plain @click="onImport()">
-                            {{ $t('setting.importSnapshot') }}
-                        </el-button>
-                        <el-button type="primary" plain @click="onIgnore()">
-                            {{ $t('setting.ignoreRule') }}
-                        </el-button>
-                        <el-button type="primary" plain :disabled="selects.length === 0" @click="batchDelete(null)">
-                            {{ $t('commons.button.delete') }}
-                        </el-button>
-                    </el-col>
-                    <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
-                        <TableSetting ref="timerRef" @search="search()" />
-                        <TableSearch @search="search()" v-model:searchName="searchName" />
-                    </el-col>
-                </el-row>
+            <template #leftToolBar>
+                <el-button type="primary" @click="onCreate()">
+                    {{ $t('setting.createSnapshot') }}
+                </el-button>
+                <el-button type="primary" plain @click="onImport()">
+                    {{ $t('setting.importSnapshot') }}
+                </el-button>
+                <el-button type="primary" plain @click="onIgnore()">
+                    {{ $t('setting.ignoreRule') }}
+                </el-button>
+                <el-button type="primary" plain :disabled="selects.length === 0" @click="batchDelete(null)">
+                    {{ $t('commons.button.delete') }}
+                </el-button>
+            </template>
+            <template #rightToolBar>
+                <TableSearch @search="search()" v-model:searchName="searchName" class="mr-2.5" />
+                <TableSetting ref="timerRef" @search="search()" />
             </template>
             <template #main>
                 <ComplexTable
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
                     :data="data"
-                    style="margin-top: 20px"
+                    class="mt-5"
                     @search="search"
                 >
                     <el-table-column type="selection" fix />
