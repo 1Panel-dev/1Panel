@@ -28,6 +28,10 @@ export const Languages = [
         value: ['json'],
     },
     {
+        label: 'vue',
+        value: ['vue'],
+    },
+    {
         label: 'typescript',
         value: ['ts'],
     },
