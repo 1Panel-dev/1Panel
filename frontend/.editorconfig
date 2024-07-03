@@ -6,9 +6,9 @@ root = true
 charset = utf-8 # 设置文件字符集为 utf-8
 end_of_line = lf # 控制换行类型(lf | cr | crlf)
 insert_final_newline = true # 始终在文件末尾插入一个新行
-indent_style = tab # 缩进风格（tab | space）
-indent_size = 2 # 缩进大小
-max_line_length = 130 # 最大行长度
+indent_style = space # 缩进风格（tab | space）
+indent_size = 4 # 缩进大小
+max_line_length = 120 # 最大行长度
 
 [*.md] # 表示仅 md 文件适用以下规则
 max_line_length = off # 关闭最大行长度限制
