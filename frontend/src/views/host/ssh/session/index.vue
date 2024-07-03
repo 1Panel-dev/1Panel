@@ -2,19 +2,11 @@
     <div>
         <FireRouter />
         <LayoutContent :title="$t('ssh.session')">
-            <template #toolbar>
-                <div style="width: 100%">
-                    <el-row :gutter="20">
-                        <el-col :span="8"></el-col>
-                        <el-col :span="8"></el-col>
-                        <el-col :span="8">
-                            <TableSearch @search="search()" v-model:searchName="sshSearch.loginUser" />
-                        </el-col>
-                    </el-row>
-                </div>
+            <template #rightToolBar>
+                <TableSearch @search="search()" v-model:searchName="sshSearch.loginUser" />
             </template>
             <template #main>
-                <ComplexTable :data="data" ref="tableRef" v-loading="loading">
+                <ComplexTable :data="data" ref="tableRef" v-loading="loading" :heightDiff="260">
                     <el-table-column :label="$t('commons.table.user')" fix prop="username"></el-table-column>
                     <el-table-column :label="'TTY'" fix prop="terminal"></el-table-column>
                     <el-table-column :label="$t('ssh.loginIP')" fix prop="host"></el-table-column>

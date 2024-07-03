@@ -1,32 +1,26 @@
 <template>
     <div>
         <LayoutContent v-loading="loading" :title="$t('terminal.host')">
-            <template #toolbar>
-                <el-row>
-                    <el-col :span="20">
-                        <el-button type="primary" @click="onOpenDialog('create')">
-                            {{ $t('terminal.addHost') }}
-                        </el-button>
-                        <el-button type="primary" plain @click="onOpenGroupDialog()">
-                            {{ $t('terminal.group') }}
-                        </el-button>
-                        <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
-                            {{ $t('commons.button.delete') }}
-                        </el-button>
-                    </el-col>
-                    <el-col :span="4">
-                        <TableSearch @search="search()" v-model:searchName="info" />
-                    </el-col>
-                </el-row>
+            <template #leftToolBar>
+                <el-button type="primary" @click="onOpenDialog('create')">
+                    {{ $t('terminal.addHost') }}
+                </el-button>
+                <el-button type="primary" plain @click="onOpenGroupDialog()">
+                    {{ $t('terminal.group') }}
+                </el-button>
+                <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
+                    {{ $t('commons.button.delete') }}
+                </el-button>
             </template>
-            <template #search>
-                <el-select v-model="group" @change="search()" clearable class="p-w-200">
+            <template #rightToolBar>
+                <el-select v-model="group" @change="search()" clearable class="p-w-200 mr-5">
                     <template #prefix>{{ $t('terminal.group') }}</template>
                     <el-option :label="$t('commons.table.all')" value=""></el-option>
                     <div v-for="item in groupList" :key="item.name">
                         <el-option :value="item.id" :label="item.name" />
                     </div>
                 </el-select>
+                <TableSearch @search="search()" v-model:searchName="info" />
             </template>
             <template #main>
                 <ComplexTable

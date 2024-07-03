@@ -6,62 +6,42 @@
             <span>{{ $t('container.startIn') }}</span>
         </el-card>
         <LayoutContent :title="$t('container.container')" :class="{ mask: dockerStatus != 'Running' }">
-            <template #rightButton>
-                <div class="flex justify-end">
-                    <div class="mr-10">
-                        <el-checkbox v-model="includeAppStore" @change="search()">
-                            {{ $t('container.includeAppstore') }}
-                        </el-checkbox>
-                    </div>
-                    <fu-table-column-select
-                        :columns="columns"
-                        trigger="hover"
-                        :title="$t('commons.table.selectColumn')"
-                        popper-class="popper-class"
-                    />
-                </div>
+            <template #leftToolBar>
+                <el-button type="primary" @click="onOpenDialog('create')">
+                    {{ $t('container.create') }}
+                </el-button>
+                <el-button type="primary" plain @click="onClean()">
+                    {{ $t('container.containerPrune') }}
+                </el-button>
+                <el-button-group class="ml-4">
+                    <el-button :disabled="checkStatus('start', null)" @click="onOperate('start', null)">
+                        {{ $t('container.start') }}
+                    </el-button>
+                    <el-button :disabled="checkStatus('stop', null)" @click="onOperate('stop', null)">
+                        {{ $t('container.stop') }}
+                    </el-button>
+                    <el-button :disabled="checkStatus('restart', null)" @click="onOperate('restart', null)">
+                        {{ $t('container.restart') }}
+                    </el-button>
+                    <el-button :disabled="checkStatus('kill', null)" @click="onOperate('kill', null)">
+                        {{ $t('container.kill') }}
+                    </el-button>
+                    <el-button :disabled="checkStatus('pause', null)" @click="onOperate('pause', null)">
+                        {{ $t('container.pause') }}
+                    </el-button>
+                    <el-button :disabled="checkStatus('unpause', null)" @click="onOperate('unpause', null)">
+                        {{ $t('container.unpause') }}
+                    </el-button>
+                    <el-button :disabled="checkStatus('remove', null)" @click="onOperate('remove', null)">
+                        {{ $t('container.remove') }}
+                    </el-button>
+                </el-button-group>
             </template>
-            <template #toolbar>
-                <el-row>
-                    <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
-                        <el-button type="primary" @click="onOpenDialog('create')">
-                            {{ $t('container.create') }}
-                        </el-button>
-                        <el-button type="primary" plain @click="onClean()">
-                            {{ $t('container.containerPrune') }}
-                        </el-button>
-                        <el-button-group class="ml-4">
-                            <el-button :disabled="checkStatus('start', null)" @click="onOperate('start', null)">
-                                {{ $t('container.start') }}
-                            </el-button>
-                            <el-button :disabled="checkStatus('stop', null)" @click="onOperate('stop', null)">
-                                {{ $t('container.stop') }}
-                            </el-button>
-                            <el-button :disabled="checkStatus('restart', null)" @click="onOperate('restart', null)">
-                                {{ $t('container.restart') }}
-                            </el-button>
-                            <el-button :disabled="checkStatus('kill', null)" @click="onOperate('kill', null)">
-                                {{ $t('container.kill') }}
-                            </el-button>
-                            <el-button :disabled="checkStatus('pause', null)" @click="onOperate('pause', null)">
-                                {{ $t('container.pause') }}
-                            </el-button>
-                            <el-button :disabled="checkStatus('unpause', null)" @click="onOperate('unpause', null)">
-                                {{ $t('container.unpause') }}
-                            </el-button>
-                            <el-button :disabled="checkStatus('remove', null)" @click="onOperate('remove', null)">
-                                {{ $t('container.remove') }}
-                            </el-button>
-                        </el-button-group>
-                    </el-col>
-                    <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
-                        <TableSetting title="container-refresh" @search="refresh()" />
-                        <TableSearch @search="search()" v-model:searchName="searchName" />
-                    </el-col>
-                </el-row>
-            </template>
-            <template #search>
-                <el-select v-model="searchState" @change="search()" clearable class="p-w-200">
+            <template #rightToolBar>
+                <el-checkbox v-model="includeAppStore" @change="search()" class="!mr-2.5">
+                    {{ $t('container.includeAppstore') }}
+                </el-checkbox>
+                <el-select v-model="searchState" @change="search()" clearable class="p-w-200 mr-2.5">
                     <template #prefix>{{ $t('commons.table.status') }}</template>
                     <el-option :label="$t('commons.table.all')" value="all"></el-option>
                     <el-option :label="$t('commons.status.created')" value="created"></el-option>
@@ -72,6 +52,14 @@
                     <el-option :label="$t('commons.status.exited')" value="exited"></el-option>
                     <el-option :label="$t('commons.status.dead')" value="dead"></el-option>
                 </el-select>
+                <TableSearch @search="search()" v-model:searchName="searchName" class="mr-2.5" />
+                <TableSetting title="container-refresh" @search="refresh()" class="mr-2.5" />
+                <fu-table-column-select
+                    :columns="columns"
+                    trigger="hover"
+                    :title="$t('commons.table.selectColumn')"
+                    popper-class="popper-class"
+                />
             </template>
             <template #main>
                 <ComplexTable
@@ -84,6 +72,7 @@
                     style="width: 100%"
                     :columns="columns"
                     localKey="containerColumn"
+                    :heightDiff="300"
                 >
                     <el-table-column type="selection" />
                     <el-table-column

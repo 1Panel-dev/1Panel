@@ -1,31 +1,27 @@
 <template>
     <div>
         <LayoutContent v-loading="loading" :title="$t('logs.system')">
-            <template #toolbar>
-                <el-row>
-                    <el-col :span="16">
-                        <el-button class="tag-button no-active" @click="onChangeRoute('OperationLog')">
-                            {{ $t('logs.operation') }}
-                        </el-button>
-                        <el-button class="tag-button no-active" @click="onChangeRoute('LoginLog')">
-                            {{ $t('logs.login') }}
-                        </el-button>
-                        <el-button class="tag-button" type="primary" @click="onChangeRoute('SystemLog')">
-                            {{ $t('logs.system') }}
-                        </el-button>
-                    </el-col>
-                </el-row>
-            </template>
             <template #search>
-                <el-select class="float-left p-w-200" v-model="logConfig.name" @change="search()">
-                    <template #prefix>{{ $t('commons.button.log') }}</template>
+                <el-button class="tag-button no-active" @click="onChangeRoute('OperationLog')">
+                    {{ $t('logs.operation') }}
+                </el-button>
+                <el-button class="tag-button no-active" @click="onChangeRoute('LoginLog')">
+                    {{ $t('logs.login') }}
+                </el-button>
+                <el-button class="tag-button" type="primary" @click="onChangeRoute('SystemLog')">
+                    {{ $t('logs.system') }}
+                </el-button>
+            </template>
+            <template #leftToolBar>
+                <el-select class="p-w-200 mr-2.5" v-model="logConfig.name" @change="search()">
+                    <template #prefix>{{ $t('commons.table.date') }}</template>
                     <el-option v-for="(item, index) in fileList" :key="index" :label="item" :value="item" />
                 </el-select>
-                <div class="watchCheckbox">
-                    <el-checkbox border @change="changeTail" v-model="isWatch">
+                <el-button>
+                    <el-checkbox @change="changeTail" v-model="isWatch">
                         {{ $t('commons.button.watch') }}
                     </el-checkbox>
-                </div>
+                </el-button>
             </template>
             <template #main>
                 <LogFile
@@ -89,12 +85,3 @@ onMounted(() => {
     loadFiles();
 });
 </script>
-
-<style scoped lang="scss">
-.watchCheckbox {
-    margin-top: 2px;
-    margin-bottom: 10px;
-    float: left;
-    margin-left: 20px;
-}
-</style>

@@ -4,7 +4,7 @@
             <template #prompt>
                 <el-alert type="info" :title="$t('terminal.quickCommandHelper')" :closable="false" />
             </template>
-            <template #toolbar>
+            <template #leftToolBar>
                 <el-button type="primary" @click="onCreate()">
                     {{ $t('commons.button.create') }} {{ $t('terminal.quickCommand') }}
                 </el-button>
@@ -15,21 +15,15 @@
                     {{ $t('commons.button.delete') }}
                 </el-button>
             </template>
-            <template #search>
-                <el-row :gutter="5">
-                    <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
-                        <el-select v-model="group" @change="search()" clearable class="p-w-200">
-                            <template #prefix>{{ $t('terminal.group') }}</template>
-                            <el-option :label="$t('commons.table.all')" value=""></el-option>
-                            <div v-for="item in groupList" :key="item.name">
-                                <el-option :value="item.id" :label="item.name" />
-                            </div>
-                        </el-select>
-                    </el-col>
-                    <el-col :xs="24" :sm="4" :md="4" :lg="4" :xl="4">
-                        <TableSearch @search="search()" v-model:searchName="commandReq.name" />
-                    </el-col>
-                </el-row>
+            <template #rightToolBar>
+                <el-select v-model="group" @change="search()" clearable class="p-w-200 mr-2.5">
+                    <template #prefix>{{ $t('terminal.group') }}</template>
+                    <el-option :label="$t('commons.table.all')" value=""></el-option>
+                    <div v-for="item in groupList" :key="item.name">
+                        <el-option :value="item.id" :label="item.name" />
+                    </div>
+                </el-select>
+                <TableSearch @search="search()" v-model:searchName="commandReq.name" />
             </template>
             <template #main>
                 <ComplexTable
@@ -38,6 +32,7 @@
                     :data="data"
                     @sort-change="search"
                     @search="search"
+                    :heightDiff="350"
                 >
                     <el-table-column type="selection" fix />
                     <el-table-column

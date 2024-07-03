@@ -2,41 +2,43 @@
     <div>
         <FireRouter />
         <LayoutContent :title="$t('menu.network')" v-loading="loading">
-            <template #toolbar>
-                <el-row>
-                    <el-col :span="24">
-                        <div style="width: 100%">
-                            <el-form-item style="float: right">
-                                <el-row :gutter="20">
-                                    <el-col :span="8">
-                                        <TableSearch
-                                            @search="search()"
-                                            :placeholder="$t('process.pid')"
-                                            v-model:searchName="netSearch.processID"
-                                        />
-                                    </el-col>
-                                    <el-col :span="8">
-                                        <TableSearch
-                                            @search="search()"
-                                            :placeholder="$t('process.processName')"
-                                            v-model:searchName="netSearch.processName"
-                                        />
-                                    </el-col>
-                                    <el-col :span="8">
-                                        <TableSearch
-                                            @search="search()"
-                                            :placeholder="$t('commons.table.port')"
-                                            v-model:searchName="netSearch.port"
-                                        />
-                                    </el-col>
-                                </el-row>
-                            </el-form-item>
-                        </div>
-                    </el-col>
-                </el-row>
+            <template #rightToolBar>
+                <div class="w-full">
+                    <el-form-item class="float-right">
+                        <el-row :gutter="20">
+                            <el-col :span="8">
+                                <TableSearch
+                                    @search="search()"
+                                    :placeholder="$t('process.pid')"
+                                    v-model:searchName="netSearch.processID"
+                                />
+                            </el-col>
+                            <el-col :span="8">
+                                <TableSearch
+                                    @search="search()"
+                                    :placeholder="$t('process.processName')"
+                                    v-model:searchName="netSearch.processName"
+                                />
+                            </el-col>
+                            <el-col :span="8">
+                                <TableSearch
+                                    @search="search()"
+                                    :placeholder="$t('commons.table.port')"
+                                    v-model:searchName="netSearch.port"
+                                />
+                            </el-col>
+                        </el-row>
+                    </el-form-item>
+                </div>
             </template>
             <template #main>
-                <ComplexTable :data="data" @sort-change="changeSort" @filter-change="changeFilter" ref="tableRef">
+                <ComplexTable
+                    :data="data"
+                    @sort-change="changeSort"
+                    @filter-change="changeFilter"
+                    ref="tableRef"
+                    :heightDiff="300"
+                >
                     <el-table-column :label="$t('commons.table.type')" fix prop="type"></el-table-column>
                     <el-table-column :label="'PID'" fix prop="PID" max-width="60px" sortable></el-table-column>
                     <el-table-column

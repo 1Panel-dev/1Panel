@@ -17,7 +17,7 @@
                     :expire-date="website.expireDate"
                 />
             </template>
-            <template #buttons>
+            <template #leftToolBar>
                 <el-button type="primary" :plain="index !== 'basic'" @click="changeTab('basic')">
                     {{ $t('website.basic') }}
                 </el-button>
@@ -32,10 +32,12 @@
                 </el-button>
             </template>
             <template #main>
-                <Basic :id="id" v-if="index === 'basic'"></Basic>
-                <Log :id="id" v-if="index === 'log'"></Log>
-                <Resource :id="id" v-if="index === 'resource'"></Resource>
-                <PHP :id="id" v-if="index === 'php'"></PHP>
+                <MainDiv :heightDiff="320">
+                    <Basic :id="id" v-if="index === 'basic'"></Basic>
+                    <Log :id="id" v-if="index === 'log'"></Log>
+                    <Resource :id="id" v-if="index === 'resource'"></Resource>
+                    <PHP :id="id" v-if="index === 'php'"></PHP>
+                </MainDiv>
             </template>
         </LayoutContent>
     </div>
