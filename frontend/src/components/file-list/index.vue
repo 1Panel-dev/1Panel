@@ -51,6 +51,14 @@
                 </template>
             </BreadCrumbs>
         </div>
+        <div class="mt-4">
+            <el-button link @click="onAddItem(true)" type="primary" size="small">
+                {{ $t('commons.button.createNewFolder') }}
+            </el-button>
+            <el-button link @click="onAddItem(false)" type="primary" size="small">
+                {{ $t('commons.button.createNewFile') }}
+            </el-button>
+        </div>
         <div>
             <el-table :data="data" highlight-current-row height="40vh">
                 <el-table-column width="40" fix>
@@ -65,21 +73,34 @@
                 </el-table-column>
                 <el-table-column show-overflow-tooltip fix>
                     <template #default="{ row }">
-                        <svg-icon v-if="row.isDir" className="table-icon" iconName="p-file-folder"></svg-icon>
-                        <svg-icon v-else className="table-icon" iconName="p-file-normal"></svg-icon>
-                        <el-link v-if="!row.isCreate" :underline="false" @click="open(row)">{{ row.name }}</el-link>
-                        <el-input
-                            v-else
-                            ref="rowRefs"
-                            v-model="newFlower"
-                            style="width: 240px"
-                            placeholder="new flower"
-                            @input="handleChange(newFlower, row)"
-                        >
-                            <template #append>
-                                <el-button :icon="Check" @click="createFlower(row)" />
+                        <div>
+                            <svg-icon
+                                :class="'table-icon'"
+                                :iconName="row.isDir ? 'p-file-folder' : 'p-file-normal'"
+                            ></svg-icon>
+
+                            <template v-if="!row.isCreate">
+                                <el-link :underline="false" @click="open(row)">
+                                    {{ row.name }}
+                                </el-link>
                             </template>
-                        </el-input>
+
+                            <template v-else>
+                                <el-input
+                                    ref="rowRefs"
+                                    v-model="newFolder"
+                                    style="width: 200px"
+                                    placeholder="new folder"
+                                    @input="handleChange(newFolder, row)"
+                                ></el-input>
+                                <el-button link @click="createFolder(row)" type="primary" size="small" class="ml-2">
+                                    {{ $t('commons.button.save') }}
+                                </el-button>
+                                <el-button link @click="cancelFolder(row)" type="primary" size="small" class="!ml-2">
+                                    {{ $t('commons.button.cancel') }}
+                                </el-button>
+                            </template>
+                        </div>
                     </template>
                 </el-table-column>
             </el-table>
@@ -95,16 +116,11 @@
                     </el-tag>
                 </el-tooltip>
             </div>
-            <div class="flex items-center justify-between">
-                <el-button link @click="onAddRow" type="primary">
-                    {{ $t('commons.button.create') }}
+            <div class="button">
+                <el-button @click="closePage">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button type="primary" @click="selectFile" :disabled="disBtn">
+                    {{ $t('commons.button.confirm') }}
                 </el-button>
-                <div class="button">
-                    <el-button @click="closePage">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button type="primary" @click="selectFile" :disabled="disBtn">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </div>
             </div>
         </div>
     </el-popover>
@@ -113,7 +129,7 @@
 <script lang="ts" setup>
 import { File } from '@/api/interface/file';
 import { CreateFile, GetFilesList } from '@/api/modules/files';
-import { Folder, Check, HomeFilled, Close } from '@element-plus/icons-vue';
+import { Folder, HomeFilled, Close } from '@element-plus/icons-vue';
 import BreadCrumbs from '@/components/bread-crumbs/index.vue';
 import BreadCrumbItem from '@/components/bread-crumbs/bread-crumbs-item.vue';
 import { onMounted, onUpdated, reactive, ref, nextTick } from 'vue';
@@ -128,7 +144,7 @@ const req = reactive({ path: '/', expand: true, page: 1, pageSize: 300, showHidd
 const selectRow = ref();
 const rowRefs = ref();
 const popoverVisible = ref(false);
-const newFlower = ref();
+const newFolder = ref();
 const disBtn = ref(false);
 
 const props = defineProps({
@@ -179,6 +195,9 @@ const openPage = () => {
 const disabledDir = (row: File.File) => {
     if (props.isAll) {
         return false;
+    }
+    if (props.dir !== row.isDir) {
+        return true;
     }
     if (!props.dir) {
         return row.isDir;
@@ -239,26 +258,37 @@ const search = async (req: File.ReqFile) => {
 
 let addForm = reactive({ path: '', name: '', isDir: true, mode: 0o755, isLink: false, isSymlink: true, linkPath: '' });
 
-const onAddRow = async () => {
+const onAddItem = async (isDir: boolean) => {
     const createRow = data.value?.find((row: { isCreate: any }) => row.isCreate);
     if (createRow) {
         MsgWarning(i18n.global.t('commons.msg.creatingInfo'));
         return;
     }
-    newFlower.value = i18n.global.t('file.noNameFolder');
-    rowName.value = newFlower.value;
-    selectRow.value.name = newFlower.value;
-    const basePath = req.path === '/' ? req.path : `${req.path}/`;
-    selectRow.value.path = `${basePath}${newFlower.value}`;
+    newFolder.value = isDir ? i18n.global.t('file.noNameFolder') : i18n.global.t('file.noNameFile');
+    if (props.dir === isDir) {
+        rowName.value = newFolder.value;
+        selectRow.value.name = newFolder.value;
+        const basePath = req.path === '/' ? req.path : `${req.path}/`;
+        selectRow.value.path = `${basePath}${newFolder.value}`;
+    }
     data.value?.unshift({
         path: selectRow.value.path,
         isCreate: true,
-        isDir: true,
-        name: newFlower.value,
+        isDir: isDir,
+        name: newFolder.value,
     });
     disBtn.value = true;
     await nextTick();
     rowRefs.value.focus();
+};
+
+const cancelFolder = (row: any) => {
+    data.value.shift();
+    row.isCreate = false;
+    disBtn.value = false;
+    selectRow.value = {};
+    rowName.value = '';
+    newFolder.value = '';
 };
 
 const handleChange = (value: string, row: any) => {
@@ -271,14 +301,15 @@ const handleChange = (value: string, row: any) => {
     }
 };
 
-const createFlower = async (row: any) => {
+const createFolder = async (row: any) => {
     const basePath = req.path === '/' ? req.path : `${req.path}/`;
-    addForm.path = `${basePath}${newFlower.value}`;
+    addForm.path = `${basePath}${newFolder.value}`;
     if (addForm.path.indexOf('.1panel_clash') > -1) {
         MsgWarning(i18n.global.t('file.clashDitNotSupport'));
         return;
     }
-    addForm.name = newFlower.value;
+    addForm.isDir = row.isDir;
+    addForm.name = newFolder.value;
     let addItem = {};
     Object.assign(addItem, addForm);
     loading.value = true;

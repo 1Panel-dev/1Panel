@@ -65,6 +65,8 @@ const message = {
             preview: '預覽',
             open: '打開',
             notSave: '不保存',
+            createNewFolder: '新建資料夾',
+            createNewFile: '新建檔案',
         },
         search: {
             timeStart: '開始時間',
@@ -1189,6 +1191,7 @@ const message = {
         saveAndOpenNewFile: '檔案已被修改，是否保存並打開新檔案？',
         noEdit: '檔案未修改，無需此操作！',
         noNameFolder: '未命名資料夾',
+        noNameFile: '未命名檔案',
     },
     ssh: {
         autoStart: '開機自啟',
