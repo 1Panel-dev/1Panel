@@ -129,6 +129,12 @@ func (f *Firewall) ListForward() ([]FireInfo, error) {
 		})
 		if ForwardListRegex.MatchString(line) {
 			match := ForwardListRegex.FindStringSubmatch(line)
+			if len(match) < 4 {
+				continue
+			}
+			if len(match[4]) == 0 {
+				match[4] = "127.0.0.1"
+			}
 			datas = append(datas, FireInfo{
 				Port:       match[1],
 				Protocol:   match[2],
