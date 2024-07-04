@@ -1949,6 +1949,8 @@ const message = {
         indexPHP: 'PHP 网站默认页',
         sslExpireDate: '证书过期时间',
         website404Helper: '网站 404 错误页仅支持 PHP 运行环境网站和静态网站',
+        sni: '回源 SNI',
+        sniHelper: '反代后端为 https 的时候可能需要设置回源 SNI，具体需要看 CDN 服务商文档',
     },
     php: {
         short_open_tag: '短标签支持',
@@ -2172,7 +2174,10 @@ const message = {
         customScriptHelper: '请填写完整的启动命令，例如：npm run start',
         portError: '不能填写相同端口',
         systemRestartHelper: '状态说明：中断-系统重启导致状态获取失败',
-        javaScriptHelper: '请填写完整启动命令，例如：java -jar halo.jar',
+        javaScriptHelper: '请填写完整启动命令，例如：java -jar halo.jar -Xmx1024M -Xms256M',
+        javaDirHelper: '目录中要包含 jar 包，子目录中包含也可',
+        goHelper: '请填写完整启动命令，例如：go run main.go 或 ./main',
+        goDirHelper: '目录中要包含 go 文件或者二进制文件，子目录中包含也可',
     },
     process: {
         pid: '进程ID',
