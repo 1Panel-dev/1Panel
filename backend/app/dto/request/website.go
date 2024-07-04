@@ -189,6 +189,7 @@ type WebsiteProxyConfig struct {
 	Content   string            `json:"content"`
 	FilePath  string            `json:"filePath"`
 	Replaces  map[string]string `json:"replaces"`
+	SNI       bool              `json:"sni"`
 }
 
 type WebsiteProxyReq struct {

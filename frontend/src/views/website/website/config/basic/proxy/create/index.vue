@@ -27,6 +27,10 @@
                     <el-form-item :label="$t('website.enableCache')" prop="cache">
                         <el-switch v-model="proxy.cache" @change="changeCache(proxy.cache)"></el-switch>
                     </el-form-item>
+                    <el-form-item :label="$t('website.sni')" prop="sni">
+                        <el-switch v-model="proxy.sni"></el-switch>
+                        <span class="input-help">{{ $t('website.sniHelper') }}</span>
+                    </el-form-item>
                     <el-form-item :label="$t('website.cacheTime')" prop="cacheTime" v-if="proxy.cache">
                         <el-input v-model.number="proxy.cacheTime" maxlength="15">
                             <template #append>

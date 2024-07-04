@@ -1948,6 +1948,8 @@ const message = {
         indexPHP: 'PHP 網站預設頁',
         sslExpireDate: '憑證過期時間',
         website404Helper: '網站 404 錯誤頁僅支援 PHP 運行環境網站和靜態網站',
+        sni: '回源 SNI',
+        sniHelper: '反代後端為 https 的時候可能需要設置回源 SNI，具體需要看 CDN 服務商文檔',
     },
     php: {
         short_open_tag: '短標簽支持',
@@ -2170,7 +2172,10 @@ const message = {
         customScriptHelper: '請填寫完整的啟動指令，例如：npm run start',
         portError: '不能填寫相同連接埠',
         systemRestartHelper: '狀態說明：中斷-系統重新啟動導致狀態取得失敗',
-        javaScriptHelper: '請填寫完整啟動指令，例如：java -jar halo.jar',
+        javaScriptHelper: '請填寫完整啟動指令，例如：java -jar halo.jar -Xmx1024M -Xms256M',
+        javaDirHelper: '目錄中要包含 jar 包，子目錄中包含也可',
+        goHelper: '請填寫完整啟動命令，例如：go run main.go 或 ./main',
+        goDirHelper: '目錄中要包含 go 文件或者二進制文件，子目錄中包含也可',
     },
     process: {
         pid: '進程ID',

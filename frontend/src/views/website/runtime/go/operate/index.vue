@@ -55,7 +55,7 @@
                             </el-col>
                         </el-row>
                     </el-form-item>
-                    <el-form-item :label="$t('runtime.codeDir')" prop="codeDir">
+                    <el-form-item :label="$t('tool.supervisor.dir')" prop="codeDir">
                         <el-input v-model.trim="runtime.codeDir" :disabled="mode === 'edit'">
                             <template #prepend>
                                 <FileList
@@ -66,13 +66,16 @@
                                 ></FileList>
                             </template>
                         </el-input>
+                        <span class="input-help">
+                            {{ $t('runtime.goDirHelper') }}
+                        </span>
                     </el-form-item>
                     <el-row :gutter="20">
                         <el-col :span="18">
                             <el-form-item :label="$t('runtime.runScript')" prop="params.EXEC_SCRIPT">
                                 <el-input v-model="runtime.params['EXEC_SCRIPT']"></el-input>
                                 <span class="input-help">
-                                    {{ $t('runtime.customScriptHelper') }}
+                                    {{ $t('runtime.goHelper') }}
                                 </span>
                             </el-form-item>
                         </el-col>
