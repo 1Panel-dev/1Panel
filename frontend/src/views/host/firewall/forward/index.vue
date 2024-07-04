@@ -44,12 +44,7 @@
                             <el-table-column type="selection" fix />
                             <el-table-column :label="$t('commons.table.protocol')" :min-width="70" prop="protocol" />
                             <el-table-column :label="$t('firewall.sourcePort')" :min-width="70" prop="port" />
-                            <el-table-column :min-width="80" :label="$t('firewall.targetIP')" prop="targetIP">
-                                <template #default="{ row }">
-                                    <span v-if="row.targetIP">{{ row.targetIP }}</span>
-                                    <span v-else>127.0.0.1</span>
-                                </template>
-                            </el-table-column>
+                            <el-table-column :min-width="80" :label="$t('firewall.targetIP')" prop="targetIP" />
                             <el-table-column :label="$t('firewall.targetPort')" :min-width="70" prop="targetPort" />
                             <fu-table-operations
                                 width="200px"

@@ -115,7 +115,13 @@ func (f *Ufw) ListForward() ([]FireInfo, error) {
 
 	var list []FireInfo
 	for _, rule := range rules {
-		dest := strings.SplitN(rule.DestPort, ":", 2)
+		dest := strings.Split(rule.DestPort, ":")
+		if len(dest) < 2 {
+			continue
+		}
+		if len(dest[0]) == 0 {
+			dest[0] = "127.0.0.1"
+		}
 		list = append(list, FireInfo{
 			Num:        rule.Num,
 			Protocol:   rule.Protocol,

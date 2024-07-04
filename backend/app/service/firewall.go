@@ -96,7 +96,10 @@ func (u *FirewallService) SearchWithPage(req dto.RuleSearch) (int64, interface{}
 
 	if len(req.Info) != 0 {
 		for _, addr := range rules {
-			if strings.Contains(addr.Address, req.Info) {
+			if strings.Contains(addr.Address, req.Info) ||
+				strings.Contains(addr.Port, req.Info) ||
+				strings.Contains(addr.TargetPort, req.Info) ||
+				strings.Contains(addr.TargetIP, req.Info) {
 				datas = append(datas, addr)
 			}
 		}
