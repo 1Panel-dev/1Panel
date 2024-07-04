@@ -253,7 +253,7 @@ func loadDiskInfo() []dto.DiskInfo {
 		if isExclude {
 			continue
 		}
-		mounts = append(mounts, diskInfo{Type: fields[1], Device: fields[0], Mount: fields[6]})
+		mounts = append(mounts, diskInfo{Type: fields[1], Device: fields[0], Mount: strings.Join(fields[6:], " ")})
 	}
 
 	var (
