@@ -12,7 +12,7 @@ const message = {
         false: 'false',
         example: 'e.g.:',
         button: {
-            create: 'Create',
+            create: 'Create ',
             add: 'Add ',
             save: 'Save ',
             set: 'Setting',

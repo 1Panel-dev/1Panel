@@ -55,7 +55,7 @@
                         <el-row>
                             <el-col :span="16">
                                 <el-button type="primary" @click="onOpenDialog('create')">
-                                    {{ $t('commons.button.create') }} {{ $t('firewall.portRule') }}
+                                    {{ $t('commons.button.create') }}{{ $t('firewall.portRule') }}
                                 </el-button>
                                 <el-button @click="onDelete(null)" plain :disabled="selects.length === 0">
                                     {{ $t('commons.button.delete') }}
