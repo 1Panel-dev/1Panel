@@ -62,7 +62,13 @@
                         :min-width="60"
                         prop="name"
                         show-overflow-tooltip
-                    />
+                    >
+                        <template #default="{ row }">
+                            <el-text type="primary" class="cursor-pointer" @click="onOpenRecord(row)">
+                                {{ row.name }}
+                            </el-text>
+                        </template>
+                    </el-table-column>
                     <el-table-column
                         :label="$t('toolbox.clam.scanDir')"
                         :min-width="120"
@@ -115,7 +121,7 @@
             <template #content>
                 <el-form class="mt-4 mb-1" ref="deleteForm" label-position="left">
                     <el-form-item>
-                        <el-checkbox v-model="removeResult" :label="$t('toolbox.clam.removeResult')" />
+                        <el-checkbox v-model="removeRecord" :label="$t('toolbox.clam.removeRecord')" />
                         <span class="input-help">{{ $t('toolbox.clam.removeResultHelper') }}</span>
                     </el-form-item>
                     <el-form-item>
@@ -163,7 +169,7 @@ const operateIDs = ref();
 const dialogLogRef = ref();
 const isRecordShow = ref();
 
-const removeResult = ref();
+const removeRecord = ref();
 const removeInfected = ref();
 
 const isSettingShow = ref();
@@ -223,6 +229,13 @@ const onOpenDialog = async (
     };
     dialogRef.value!.acceptParams(params);
 };
+const onOpenRecord = (row: Toolbox.ClamInfo) => {
+    isRecordShow.value = true;
+    let params = {
+        rowData: { ...row },
+    };
+    dialogLogRef.value!.acceptParams(params);
+};
 
 const onDelete = async (row: Toolbox.ClamInfo | null) => {
     let names = [];
@@ -251,7 +264,7 @@ const onDelete = async (row: Toolbox.ClamInfo | null) => {
 
 const onSubmitDelete = async () => {
     loading.value = true;
-    await deleteClam({ ids: operateIDs.value, removeResult: removeResult.value, removeInfected: removeInfected.value })
+    await deleteClam({ ids: operateIDs.value, removeRecord: removeRecord.value, removeInfected: removeInfected.value })
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
@@ -287,11 +300,7 @@ const buttons = [
     {
         label: i18n.global.t('cronjob.record'),
         click: (row: Toolbox.ClamInfo) => {
-            isRecordShow.value = true;
-            let params = {
-                rowData: { ...row },
-            };
-            dialogLogRef.value!.acceptParams(params);
+            onOpenRecord(row);
         },
     },
     {

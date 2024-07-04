@@ -1081,7 +1081,7 @@ const message = {
             removeInfectedHelper:
                 'Delete virus files detected during the task to ensure server security and normal operation.',
             clamCreate: 'Create Scan Rules',
-            infectedStrategy: 'Virus Strategy',
+            infectedStrategy: 'Infected Strategy',
             remove: 'Delete',
             removeHelper: 'Delete virus files, choose carefully!',
             move: 'Move',
@@ -1093,8 +1093,8 @@ const message = {
             scanDir: 'Scan Directory',
             infectedDir: 'Infected Directory',
             scanDate: 'Scan Date',
+            scanResult: 'Scan log tail',
             scanTime: 'Time Taken',
-            scannedFiles: 'Scanned Files',
             infectedFiles: 'Infected Files',
             log: 'Details',
             clamConf: 'Scan Configuration',

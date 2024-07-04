@@ -236,7 +236,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
+import { nextTick, onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
 import { Cronjob } from '@/api/interface/cronjob';
 import { searchRecords, handleOnce, updateStatus, cleanRecords, getRecordLog } from '@/api/modules/cronjob';
 import { dateFormat } from '@/utils/util';
@@ -415,10 +415,12 @@ const loadRecord = async (row: Cronjob.Record) => {
             return;
         }
         currentRecordDetail.value = log;
-        const state = view.value.state;
-        view.value.dispatch({
-            selection: { anchor: state.doc.length, head: state.doc.length },
-            scrollIntoView: true,
+        nextTick(() => {
+            const state = view.value.state;
+            view.value.dispatch({
+                selection: { anchor: state.doc.length, head: state.doc.length },
+                scrollIntoView: true,
+            });
         });
     }
 };

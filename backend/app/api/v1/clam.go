@@ -164,6 +164,29 @@ func (b *BaseApi) SearchClamRecord(c *gin.Context) {
 }
 
 // @Tags Clam
+// @Summary Load clam record detail
+// @Description 获取扫描结果详情
+// @Accept json
+// @Param request body dto.ClamLogReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /toolbox/clam/record/log [post]
+func (b *BaseApi) LoadClamRecordLog(c *gin.Context) {
+	var req dto.ClamLogReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	content, err := clamService.LoadRecordLog(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, content)
+}
+
+// @Tags Clam
 // @Summary Load clam file
 // @Description 获取扫描文件
 // @Accept json

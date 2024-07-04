@@ -11388,6 +11388,39 @@
                 }
             }
         },
+        "/toolbox/clam/record/log": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取扫描结果详情",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Clam"
+                ],
+                "summary": "Load clam record detail",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ClamLogReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/toolbox/clam/record/search": {
             "post": {
                 "security": [
@@ -15488,8 +15521,22 @@
                 "removeInfected": {
                     "type": "boolean"
                 },
-                "removeResult": {
+                "removeRecord": {
                     "type": "boolean"
+                }
+            }
+        },
+        "dto.ClamLogReq": {
+            "type": "object",
+            "properties": {
+                "clamName": {
+                    "type": "string"
+                },
+                "recordName": {
+                    "type": "string"
+                },
+                "tail": {
+                    "type": "string"
                 }
             }
         },
