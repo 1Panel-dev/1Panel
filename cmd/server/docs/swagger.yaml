@@ -246,10 +246,19 @@ definitions:
         type: array
       removeInfected:
         type: boolean
-      removeResult:
+      removeRecord:
         type: boolean
     required:
     - ids
+    type: object
+  dto.ClamLogReq:
+    properties:
+      clamName:
+        type: string
+      recordName:
+        type: string
+      tail:
+        type: string
     type: object
   dto.ClamLogSearch:
     properties:
@@ -12669,6 +12678,26 @@ paths:
         formatEN: clean clam record [name]
         formatZH: 清空扫描报告 [name]
         paramKeys: []
+  /toolbox/clam/record/log:
+    post:
+      consumes:
+      - application/json
+      description: 获取扫描结果详情
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ClamLogReq'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Load clam record detail
+      tags:
+      - Clam
   /toolbox/clam/record/search:
     post:
       consumes:

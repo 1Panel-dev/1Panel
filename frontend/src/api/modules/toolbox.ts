@@ -114,6 +114,9 @@ export const cleanClamRecord = (id: number) => {
 export const searchClamRecord = (param: Toolbox.ClamSearchLog) => {
     return http.post<ResPage<Toolbox.ClamLog>>(`/toolbox/clam/record/search`, param);
 };
+export const getClamRecordLog = (param: Toolbox.ClamRecordReq) => {
+    return http.post<string>(`/toolbox/clam/record/log`, param);
+};
 export const searchClamFile = (name: string) => {
     return http.post<string>(`/toolbox/clam/file/search`, { name: name });
 };
@@ -135,7 +138,7 @@ export const createClam = (params: Toolbox.ClamCreate) => {
 export const updateClam = (params: Toolbox.ClamUpdate) => {
     return http.post(`/toolbox/clam/update`, params);
 };
-export const deleteClam = (params: { ids: number[]; removeResult: boolean; removeInfected: boolean }) => {
+export const deleteClam = (params: { ids: number[]; removeRecord: boolean; removeInfected: boolean }) => {
     return http.post(`/toolbox/clam/del`, params);
 };
 export const handleClamScan = (id: number) => {

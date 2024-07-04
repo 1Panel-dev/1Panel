@@ -25,7 +25,7 @@
                         effect="dark"
                         type="success"
                     >
-                        {{ $t('file.path') }}: {{ dialogData.rowData.path }}
+                        {{ $t('toolbox.clam.scanDir') }}: {{ dialogData.rowData.path }}
                     </el-tag>
 
                     <span class="buttons">
@@ -125,22 +125,34 @@
                                         </div>
                                     </el-form-item>
                                 </el-row>
-                                <el-row v-if="currentRecord?.log">
-                                    <span>{{ $t('commons.table.records') }}</span>
+                                <el-row>
+                                    <el-select
+                                        class="descriptionWide"
+                                        @change="search"
+                                        v-model.number="searchInfo.tail"
+                                    >
+                                        <template #prefix>{{ $t('toolbox.clam.scanResult') }}</template>
+                                        <el-option :value="0" :label="$t('commons.table.all')" />
+                                        <el-option :value="10" :label="10" />
+                                        <el-option :value="100" :label="100" />
+                                        <el-option :value="200" :label="200" />
+                                        <el-option :value="500" :label="500" />
+                                        <el-option :value="1000" :label="1000" />
+                                    </el-select>
                                     <codemirror
                                         ref="mymirror"
                                         :autofocus="true"
                                         :placeholder="$t('cronjob.noLogs')"
                                         :indent-with-tab="true"
                                         :tabSize="4"
-                                        style="height: calc(100vh - 488px); width: 100%; margin-top: 5px"
+                                        style="height: calc(100vh - 498px); width: 100%; margin-top: 5px"
                                         :lineWrapping="true"
                                         :matchBrackets="true"
                                         theme="cobalt"
                                         :styleActiveLine="true"
                                         :extensions="extensions"
                                         @ready="handleReady"
-                                        v-model="currentRecord.log"
+                                        v-model="logContent"
                                         :disabled="true"
                                     />
                                 </el-row>
@@ -162,7 +174,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
+import { nextTick, onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
 import { Codemirror } from 'vue-codemirror';
@@ -171,7 +183,7 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import { MsgSuccess } from '@/utils/message';
 import { shortcuts } from '@/utils/shortcuts';
 import { Toolbox } from '@/api/interface/toolbox';
-import { cleanClamRecord, handleClamScan, searchClamRecord } from '@/api/modules/toolbox';
+import { cleanClamRecord, getClamRecordLog, handleClamScan, searchClamRecord } from '@/api/modules/toolbox';
 import { useRouter } from 'vue-router';
 const router = useRouter();
 
@@ -195,6 +207,7 @@ interface DialogProps {
 const dialogData = ref();
 const records = ref<Array<Toolbox.ClamLog>>([]);
 const currentRecord = ref<Toolbox.ClamLog>();
+const logContent = ref();
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
     let itemSize = Number(localStorage.getItem(searchInfo.cacheSizeKey));
@@ -233,8 +246,8 @@ const searchInfo = reactive({
     cacheSizeKey: 'clam-record-page-size',
     page: 1,
     pageSize: 8,
+    tail: '100',
     recordTotal: 0,
-    cronjobID: 0,
     startTime: new Date(),
     endTime: new Date(),
 });
@@ -268,6 +281,7 @@ const search = async () => {
         page: searchInfo.page,
         pageSize: searchInfo.pageSize,
         clamID: dialogData.value.rowData!.id,
+        tail: searchInfo.tail,
         startTime: searchInfo.startTime,
         endTime: searchInfo.endTime,
     };
@@ -281,10 +295,32 @@ const search = async () => {
     if (!currentRecord.value) {
         currentRecord.value = records.value[0];
     }
+    loadRecordLog();
 };
 
 const clickRow = async (row: Toolbox.ClamLog) => {
     currentRecord.value = row;
+    loadRecordLog();
+};
+
+const loadRecordLog = async () => {
+    let param = {
+        tail: searchInfo.tail + '',
+        clamName: dialogData.value.rowData?.name,
+        recordName: currentRecord.value.name,
+    };
+    const res = await getClamRecordLog(param);
+    if (logContent.value === res.data) {
+        return;
+    }
+    logContent.value = res.data;
+    nextTick(() => {
+        const state = view.value.state;
+        view.value.dispatch({
+            selection: { anchor: state.doc.length, head: state.doc.length },
+            scrollIntoView: true,
+        });
+    });
 };
 
 const onClean = async () => {

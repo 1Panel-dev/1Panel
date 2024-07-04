@@ -151,13 +151,17 @@ export namespace Toolbox {
         startTime: Date;
         endTime: Date;
     }
+    export interface ClamRecordReq {
+        tail: string;
+        clamName: string;
+        recordName: string;
+    }
     export interface ClamLog {
         name: string;
         scanDate: string;
         scanTime: string;
-        scannedFiles: string;
+        totalError: string;
         infectedFiles: string;
-        log: string;
         status: string;
     }
 }

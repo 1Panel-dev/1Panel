@@ -45,6 +45,8 @@ type IClamService interface {
 	UpdateFile(req dto.UpdateByNameAndFile) error
 	LoadRecords(req dto.ClamLogSearch) (int64, interface{}, error)
 	CleanRecord(req dto.OperateByID) error
+
+	LoadRecordLog(req dto.ClamLogReq) (string, error)
 }
 
 func NewIClamService() IClamService {
@@ -160,7 +162,7 @@ func (u *ClamService) Delete(req dto.ClamDelete) error {
 		if clam.ID == 0 {
 			continue
 		}
-		if req.RemoveResult {
+		if req.RemoveRecord {
 			_ = os.RemoveAll(path.Join(global.CONF.System.DataDir, resultDir, clam.Name))
 		}
 		if req.RemoveInfected {
@@ -254,6 +256,21 @@ func (u *ClamService) LoadRecords(req dto.ClamLogSearch) (int64, interface{}, er
 		datas = append(datas, item)
 	}
 	return int64(total), datas, nil
+}
+func (u *ClamService) LoadRecordLog(req dto.ClamLogReq) (string, error) {
+	logPath := path.Join(global.CONF.System.DataDir, resultDir, req.ClamName, req.RecordName)
+	var tail string
+	if req.Tail != "0" {
+		tail = req.Tail
+	} else {
+		tail = "+1"
+	}
+	cmd := exec.Command("tail", "-n", tail, logPath)
+	stdout, err := cmd.CombinedOutput()
+	if err != nil {
+		return "", fmt.Errorf("tail -n %v failed, err: %v", req.Tail, err)
+	}
+	return string(stdout), nil
 }
 
 func (u *ClamService) CleanRecord(req dto.OperateByID) error {
@@ -364,7 +381,6 @@ func loadResultFromLog(pathItem string) dto.ClamLog {
 	if err != nil {
 		return data
 	}
-	data.Log = string(file)
 	lines := strings.Split(string(file), "\n")
 	for _, line := range lines {
 		if strings.Contains(line, "- SCAN SUMMARY -") {
@@ -376,6 +392,8 @@ func loadResultFromLog(pathItem string) dto.ClamLog {
 		switch {
 		case strings.HasPrefix(line, "Infected files:"):
 			data.InfectedFiles = strings.TrimPrefix(line, "Infected files:")
+		case strings.HasPrefix(line, "Total errors:"):
+			data.TotalError = strings.TrimPrefix(line, "Total errors:")
 		case strings.HasPrefix(line, "Time:"):
 			if strings.Contains(line, "(") {
 				data.ScanTime = strings.ReplaceAll(strings.Split(line, "(")[1], ")", "")

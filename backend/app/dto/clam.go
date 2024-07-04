@@ -30,12 +30,18 @@ type ClamLogSearch struct {
 	EndTime   time.Time `json:"endTime"`
 }
 
+type ClamLogReq struct {
+	Tail       string `json:"tail"`
+	ClamName   string `json:"clamName"`
+	RecordName string `json:"recordName"`
+}
+
 type ClamLog struct {
 	Name          string `json:"name"`
 	ScanDate      string `json:"scanDate"`
 	ScanTime      string `json:"scanTime"`
 	InfectedFiles string `json:"infectedFiles"`
-	Log           string `json:"log"`
+	TotalError    string `json:"totalError"`
 	Status        string `json:"status"`
 }
 
@@ -58,7 +64,7 @@ type ClamUpdate struct {
 }
 
 type ClamDelete struct {
-	RemoveResult   bool   `json:"removeResult"`
+	RemoveRecord   bool   `json:"removeRecord"`
 	RemoveInfected bool   `json:"removeInfected"`
 	Ids            []uint `json:"ids" validate:"required"`
 }
