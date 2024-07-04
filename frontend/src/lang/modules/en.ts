@@ -66,6 +66,8 @@ const message = {
             preview: 'Preview',
             open: 'Open',
             notSave: 'Not Save',
+            createNewFolder: 'Create new folder',
+            createNewFile: 'Create new file',
         },
         search: {
             timeStart: 'Time start',
@@ -1252,6 +1254,7 @@ const message = {
         saveAndOpenNewFile: 'The file has been modified, do you want to save and open the new file?',
         noEdit: 'The file has not been modified, no need to do this!',
         noNameFolder: 'Untitled Folder',
+        noNameFile: 'Untitled File',
     },
     ssh: {
         autoStart: 'Auto Start',
