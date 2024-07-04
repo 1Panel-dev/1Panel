@@ -276,3 +276,10 @@ export const GetDefaultHtml = (type: string) => {
 export const UpdateDefaultHtml = (req: Website.WebsiteHtmlUpdate) => {
     return http.post(`/websites/default/html/update`, req);
 };
+
+export const DownloadCAFile = (params: Website.SSLDownload) => {
+    return http.download<BlobPart>(`/websites/ca/download`, params, {
+        responseType: 'blob',
+        timeout: TimeoutEnum.T_40S,
+    });
+};

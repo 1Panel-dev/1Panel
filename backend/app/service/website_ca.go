@@ -15,6 +15,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
@@ -39,6 +40,7 @@ type IWebsiteCAService interface {
 	GetCA(id uint) (*response.WebsiteCADTO, error)
 	Delete(id uint) error
 	ObtainSSL(req request.WebsiteCAObtain) (*model.WebsiteSSL, error)
+	DownloadFile(id uint) (*os.File, error)
 }
 
 func NewIWebsiteCAService() IWebsiteCAService {
@@ -413,4 +415,32 @@ func createPrivateKey(keyType string) (privateKey any, publicKey any, privateKey
 	}
 	privateKeyBytes = caPrivateKeyPEM.Bytes()
 	return
+}
+
+func (w WebsiteCAService) DownloadFile(id uint) (*os.File, error) {
+	ca, err := websiteCARepo.GetFirst(commonRepo.WithByID(id))
+	if err != nil {
+		return nil, err
+	}
+	fileOp := files.NewFileOp()
+	dir := path.Join(global.CONF.System.BaseDir, "1panel/tmp/ssl", ca.Name)
+	if fileOp.Stat(dir) {
+		if err = fileOp.DeleteDir(dir); err != nil {
+			return nil, err
+		}
+	}
+	if err = fileOp.CreateDir(dir, 0666); err != nil {
+		return nil, err
+	}
+	if err = fileOp.WriteFile(path.Join(dir, "ca.csr"), strings.NewReader(ca.CSR), 0644); err != nil {
+		return nil, err
+	}
+	if err = fileOp.WriteFile(path.Join(dir, "private.key"), strings.NewReader(ca.PrivateKey), 0644); err != nil {
+		return nil, err
+	}
+	fileName := ca.Name + ".zip"
+	if err = fileOp.Compress([]string{path.Join(dir, "ca.csr"), path.Join(dir, "private.key")}, dir, fileName, files.SdkZip, ""); err != nil {
+		return nil, err
+	}
+	return os.Open(path.Join(dir, fileName))
 }

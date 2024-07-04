@@ -43,7 +43,7 @@
 <script lang="ts" setup>
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { Website } from '@/api/interface/website';
-import { DeleteCA, SearchCAs } from '@/api/modules/website';
+import { DeleteCA, SearchCAs, DownloadCAFile } from '@/api/modules/website';
 import i18n from '@/lang';
 import { reactive, ref } from 'vue';
 import Create from './create/index.vue';
@@ -77,6 +77,12 @@ const buttons = [
         label: i18n.global.t('ssl.detail'),
         click: function (row: Website.CA) {
             detailRef.value.acceptParams(row.id);
+        },
+    },
+    {
+        label: i18n.global.t('commons.button.download'),
+        click: function (row: Website.CA) {
+            onDownload(row);
         },
     },
     {
@@ -127,6 +133,23 @@ const deleteCA = async (row: any) => {
         api: DeleteCA,
         params: { id: row.id },
     });
+};
+
+const onDownload = (row: Website.CA) => {
+    loading.value = true;
+    DownloadCAFile({ id: row.id })
+        .then((res) => {
+            const downloadUrl = window.URL.createObjectURL(new Blob([res]));
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = downloadUrl;
+            a.download = row.name + '.zip';
+            const event = new MouseEvent('click');
+            a.dispatchEvent(event);
+        })
+        .finally(() => {
+            loading.value = false;
+        });
 };
 
 defineExpose({

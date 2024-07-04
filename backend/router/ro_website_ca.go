@@ -21,5 +21,6 @@ func (a *WebsiteCARouter) InitRouter(Router *gin.RouterGroup) {
 		groupRouter.POST("/obtain", baseApi.ObtainWebsiteCA)
 		groupRouter.POST("/renew", baseApi.RenewWebsiteCA)
 		groupRouter.GET("/:id", baseApi.GetWebsiteCA)
+		groupRouter.POST("/download", baseApi.DownloadCAFile)
 	}
 }

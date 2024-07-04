@@ -6,6 +6,9 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/gin-gonic/gin"
+	"net/http"
+	"net/url"
+	"strconv"
 )
 
 // @Tags Website CA
@@ -141,4 +144,34 @@ func (b *BaseApi) RenewWebsiteCA(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithOutData(c)
+}
+
+// @Tags Website CA
+// @Summary Download CA file
+// @Description 下载 CA 证书文件
+// @Accept json
+// @Param request body request.WebsiteResourceReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router  /websites/ca/download [post]
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"website_cas","output_column":"name","output_value":"name"}],"formatZH":"下载 CA 证书文件 [name]","formatEN":"download ca file [name]"}
+func (b *BaseApi) DownloadCAFile(c *gin.Context) {
+	var req request.WebsiteResourceReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	file, err := websiteCAService.DownloadFile(req.ID)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	defer file.Close()
+	info, err := file.Stat()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	c.Header("Content-Length", strconv.FormatInt(info.Size(), 10))
+	c.Header("Content-Disposition", "attachment; filename*=utf-8''"+url.PathEscape(info.Name()))
+	http.ServeContent(c.Writer, c.Request, info.Name(), info.ModTime(), file)
 }
