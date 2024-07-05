@@ -1,48 +1,34 @@
 <template>
-    <el-drawer
-        v-model="open"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        :before-close="handleClose"
-        size="40%"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('file.deCompress')" :resource="name" :back="handleClose" />
-        </template>
-        <el-row>
-            <el-col :span="22" :offset="1">
-                <el-form
-                    ref="fileForm"
-                    label-position="top"
-                    :model="form"
-                    label-width="100px"
-                    :rules="rules"
-                    v-loading="loading"
-                >
-                    <el-form-item :label="$t('commons.table.name')">
-                        <el-input v-model="name" disabled></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('file.deCompressDst')" prop="dst">
-                        <el-input v-model="form.dst">
-                            <template #prepend>
-                                <FileList :path="form.dst" @choose="getLinkPath" :dir="true"></FileList>
-                            </template>
-                        </el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('setting.compressPassword')" prop="secret" v-if="name.includes('tar.gz')">
-                        <el-input v-model="form.secret"></el-input>
-                    </el-form-item>
-                </el-form>
-            </el-col>
-        </el-row>
+    <DrawerPro v-model="open" :header="$t('file.deCompress')" :resource="name" :back="handleClose" size="normal">
+        <el-form
+            ref="fileForm"
+            label-position="top"
+            :model="form"
+            label-width="100px"
+            :rules="rules"
+            v-loading="loading"
+        >
+            <el-form-item :label="$t('commons.table.name')">
+                <el-input v-model="name" disabled></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('file.deCompressDst')" prop="dst">
+                <el-input v-model="form.dst">
+                    <template #prepend>
+                        <FileList :path="form.dst" @choose="getLinkPath" :dir="true"></FileList>
+                    </template>
+                </el-input>
+            </el-form-item>
+            <el-form-item :label="$t('setting.compressPassword')" prop="secret" v-if="name.includes('tar.gz')">
+                <el-input v-model="form.secret"></el-input>
+            </el-form-item>
+        </el-form>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
                 <el-button type="primary" @click="submit(fileForm)">{{ $t('commons.button.confirm') }}</el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script setup lang="ts">
@@ -54,7 +40,6 @@ import { Rules } from '@/global/form-rules';
 import { DeCompressFile } from '@/api/modules/files';
 import { Mimetypes } from '@/global/mimetype';
 import FileList from '@/components/file-list/index.vue';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
 
 interface CompressProps {

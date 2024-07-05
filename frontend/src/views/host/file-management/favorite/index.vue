@@ -1,19 +1,12 @@
 <template>
-    <el-drawer
-        v-model="open"
-        :before-close="handleClose"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="50%"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('file.favorite')" :back="handleClose" />
+    <DrawerPro v-model="open" :header="$t('file.favorite')" :back="handleClose" size="large">
+        <template #content>
+            <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
+                <el-table-column :label="$t('file.path')" show-overflow-tooltip prop="path"></el-table-column>
+                <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fix />
+            </ComplexTable>
         </template>
-        <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
-            <el-table-column :label="$t('file.path')" show-overflow-tooltip prop="path"></el-table-column>
-            <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fix />
-        </ComplexTable>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script setup lang="ts">

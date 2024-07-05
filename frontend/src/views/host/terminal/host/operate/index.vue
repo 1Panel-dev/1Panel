@@ -1,109 +1,80 @@
 <template>
-    <div v-loading="loading">
-        <el-drawer
-            v-model="drawerVisible"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            size="50%"
-        >
-            <template #header>
-                <DrawerHeader :header="$t('terminal.host')" :back="handleClose" />
-            </template>
-            <el-row type="flex" justify="center">
-                <el-col :span="22">
-                    <el-form ref="hostInfoRef" label-position="top" :model="dialogData.rowData" :rules="rules">
-                        <el-form-item :label="$t('terminal.ip')" prop="addr">
-                            <el-tag v-if="dialogData.rowData!.addr === '127.0.0.1' && dialogData.title === 'edit'">
-                                {{ dialogData.rowData!.addr }}
-                            </el-tag>
-                            <el-input @change="isOK = false" v-else clearable v-model.trim="dialogData.rowData!.addr" />
-                        </el-form-item>
-                        <el-form-item :label="$t('commons.login.username')" prop="user">
-                            <el-input @change="isOK = false" clearable v-model="dialogData.rowData!.user" />
-                        </el-form-item>
-                        <el-form-item :label="$t('terminal.authMode')" prop="authMode">
-                            <el-radio-group @change="isOK = false" v-model="dialogData.rowData!.authMode">
-                                <el-radio value="password">{{ $t('terminal.passwordMode') }}</el-radio>
-                                <el-radio value="key">{{ $t('terminal.keyMode') }}</el-radio>
-                            </el-radio-group>
-                        </el-form-item>
-                        <el-form-item
-                            :label="$t('commons.login.password')"
-                            v-if="dialogData.rowData!.authMode === 'password'"
-                            prop="password"
-                        >
-                            <el-input
-                                @change="isOK = false"
-                                clearable
-                                show-password
-                                type="password"
-                                v-model="dialogData.rowData!.password"
-                            />
-                        </el-form-item>
-                        <el-form-item
-                            :label="$t('terminal.key')"
-                            v-if="dialogData.rowData!.authMode === 'key'"
-                            prop="privateKey"
-                        >
-                            <el-input
-                                @change="isOK = false"
-                                clearable
-                                type="textarea"
-                                v-model="dialogData.rowData!.privateKey"
-                            />
-                        </el-form-item>
-                        <el-form-item
-                            :label="$t('terminal.keyPassword')"
-                            v-if="dialogData.rowData!.authMode === 'key'"
-                            prop="passPhrase"
-                        >
-                            <el-input
-                                @change="isOK = false"
-                                type="password"
-                                show-password
-                                clearable
-                                v-model="dialogData.rowData!.passPhrase"
-                            />
-                        </el-form-item>
-                        <el-checkbox clearable v-model.number="dialogData.rowData!.rememberPassword">
-                            {{ $t('terminal.rememberPassword') }}
-                        </el-checkbox>
-                        <el-form-item style="margin-top: 10px" :label="$t('commons.table.port')" prop="port">
-                            <el-input @change="isOK = false" clearable v-model.number="dialogData.rowData!.port" />
-                        </el-form-item>
-                        <el-form-item :label="$t('commons.table.group')" prop="groupID">
-                            <el-select filterable v-model="dialogData.rowData!.groupID" clearable style="width: 100%">
-                                <el-option
-                                    v-for="item in groupList"
-                                    :key="item.id"
-                                    :label="item.name"
-                                    :value="item.id"
-                                />
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item :label="$t('commons.table.title')" prop="name">
-                            <el-input clearable v-model="dialogData.rowData!.name" />
-                        </el-form-item>
-                        <el-form-item :label="$t('commons.table.description')" prop="description">
-                            <el-input clearable type="textarea" v-model="dialogData.rowData!.description" />
-                        </el-form-item>
-                    </el-form>
-                </el-col>
-            </el-row>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button @click="submitAddHost(hostInfoRef, 'testconn')">
-                        {{ $t('terminal.testConn') }}
-                    </el-button>
-                    <el-button type="primary" :disabled="!isOK" @click="submitAddHost(hostInfoRef, dialogData.title)">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </span>
-            </template>
-        </el-drawer>
-    </div>
+    <DrawerPro v-model="drawerVisible" :header="$t('terminal.host')" :back="handleClose" size="large">
+        <el-form ref="hostInfoRef" label-position="top" :model="dialogData.rowData" :rules="rules" v-loading="loading">
+            <el-form-item :label="$t('terminal.ip')" prop="addr">
+                <el-tag v-if="dialogData.rowData!.addr === '127.0.0.1' && dialogData.title === 'edit'">
+                    {{ dialogData.rowData!.addr }}
+                </el-tag>
+                <el-input @change="isOK = false" v-else clearable v-model.trim="dialogData.rowData!.addr" />
+            </el-form-item>
+            <el-form-item :label="$t('commons.login.username')" prop="user">
+                <el-input @change="isOK = false" clearable v-model="dialogData.rowData!.user" />
+            </el-form-item>
+            <el-form-item :label="$t('terminal.authMode')" prop="authMode">
+                <el-radio-group @change="isOK = false" v-model="dialogData.rowData!.authMode">
+                    <el-radio value="password">{{ $t('terminal.passwordMode') }}</el-radio>
+                    <el-radio value="key">{{ $t('terminal.keyMode') }}</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item
+                :label="$t('commons.login.password')"
+                v-if="dialogData.rowData!.authMode === 'password'"
+                prop="password"
+            >
+                <el-input
+                    @change="isOK = false"
+                    clearable
+                    show-password
+                    type="password"
+                    v-model="dialogData.rowData!.password"
+                />
+            </el-form-item>
+            <el-form-item :label="$t('terminal.key')" v-if="dialogData.rowData!.authMode === 'key'" prop="privateKey">
+                <el-input @change="isOK = false" clearable type="textarea" v-model="dialogData.rowData!.privateKey" />
+            </el-form-item>
+            <el-form-item
+                :label="$t('terminal.keyPassword')"
+                v-if="dialogData.rowData!.authMode === 'key'"
+                prop="passPhrase"
+            >
+                <el-input
+                    @change="isOK = false"
+                    type="password"
+                    show-password
+                    clearable
+                    v-model="dialogData.rowData!.passPhrase"
+                />
+            </el-form-item>
+            <el-checkbox clearable v-model.number="dialogData.rowData!.rememberPassword">
+                {{ $t('terminal.rememberPassword') }}
+            </el-checkbox>
+            <el-form-item style="margin-top: 10px" :label="$t('commons.table.port')" prop="port">
+                <el-input @change="isOK = false" clearable v-model.number="dialogData.rowData!.port" />
+            </el-form-item>
+            <el-form-item :label="$t('commons.table.group')" prop="groupID">
+                <el-select filterable v-model="dialogData.rowData!.groupID" clearable style="width: 100%">
+                    <el-option v-for="item in groupList" :key="item.id" :label="item.name" :value="item.id" />
+                </el-select>
+            </el-form-item>
+            <el-form-item :label="$t('commons.table.title')" prop="name">
+                <el-input clearable v-model="dialogData.rowData!.name" />
+            </el-form-item>
+            <el-form-item :label="$t('commons.table.description')" prop="description">
+                <el-input clearable type="textarea" v-model="dialogData.rowData!.description" />
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button @click="submitAddHost(hostInfoRef, 'testconn')">
+                    {{ $t('terminal.testConn') }}
+                </el-button>
+                <el-button type="primary" :disabled="!isOK" @click="submitAddHost(hostInfoRef, dialogData.title)">
+                    {{ $t('commons.button.confirm') }}
+                </el-button>
+            </span>
+        </template>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -111,7 +82,6 @@ import { ref, reactive } from 'vue';
 import type { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { addHost, editHost, testByInfo } from '@/api/modules/host';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { GetGroupList } from '@/api/modules/group';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';

@@ -59,6 +59,7 @@
                     trigger="hover"
                     :title="$t('commons.table.selectColumn')"
                     popper-class="popper-class"
+                    :only-icon="true"
                 />
             </template>
             <template #main>

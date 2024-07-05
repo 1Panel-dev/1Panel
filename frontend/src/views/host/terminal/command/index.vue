@@ -61,45 +61,34 @@
                 </ComplexTable>
             </template>
         </LayoutContent>
-        <el-drawer
+        <DrawerPro
             v-model="cmdVisible"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            size="30%"
+            :header="$t('commons.button.' + operate) + $t('terminal.quickCommand')"
+            :back="handleClose"
+            size="small"
         >
-            <template #header>
-                <DrawerHeader
-                    :header="$t('commons.button.' + operate) + $t('terminal.quickCommand')"
-                    :back="handleClose"
-                />
-            </template>
-            <el-row type="flex" justify="center">
-                <el-col :span="22">
-                    <el-form
-                        @submit.prevent
-                        ref="commandInfoRef"
-                        label-width="100px"
-                        label-position="top"
-                        :model="commandInfo"
-                        :rules="rules"
-                    >
-                        <el-form-item :label="$t('commons.table.name')" prop="name">
-                            <el-input clearable v-model="commandInfo.name" />
-                        </el-form-item>
-                        <el-form-item :label="$t('commons.table.group')" prop="name">
-                            <el-select filterable v-model="commandInfo.groupID" clearable style="width: 100%">
-                                <div v-for="item in groupList" :key="item.id">
-                                    <el-option :label="item.name" :value="item.id" />
-                                </div>
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item :label="$t('terminal.command')" prop="command">
-                            <el-input type="textarea" clearable v-model="commandInfo.command" />
-                        </el-form-item>
-                    </el-form>
-                </el-col>
-            </el-row>
+            <el-form
+                @submit.prevent
+                ref="commandInfoRef"
+                label-width="100px"
+                label-position="top"
+                :model="commandInfo"
+                :rules="rules"
+            >
+                <el-form-item :label="$t('commons.table.name')" prop="name">
+                    <el-input clearable v-model="commandInfo.name" />
+                </el-form-item>
+                <el-form-item :label="$t('commons.table.group')" prop="name">
+                    <el-select filterable v-model="commandInfo.groupID" clearable style="width: 100%">
+                        <div v-for="item in groupList" :key="item.id">
+                            <el-option :label="item.name" :value="item.id" />
+                        </div>
+                    </el-select>
+                </el-form-item>
+                <el-form-item :label="$t('terminal.command')" prop="command">
+                    <el-input type="textarea" clearable v-model="commandInfo.command" />
+                </el-form-item>
+            </el-form>
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="cmdVisible = false">{{ $t('commons.button.cancel') }}</el-button>
@@ -108,7 +97,7 @@
                     </el-button>
                 </span>
             </template>
-        </el-drawer>
+        </DrawerPro>
 
         <OpDialog ref="opRef" @search="search" />
         <GroupDialog @search="loadGroups" ref="dialogGroupRef" />
@@ -125,7 +114,6 @@ import { reactive, ref } from 'vue';
 import type { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { GetGroupList } from '@/api/modules/group';
 

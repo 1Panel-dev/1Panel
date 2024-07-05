@@ -1,42 +1,25 @@
 <template>
-    <div>
-        <el-drawer
-            v-model="drawerVisible"
-            :destroy-on-close="true"
-            @close="handleClose"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            size="30%"
-        >
-            <template #header>
-                <DrawerHeader :header="$t('commons.table.port')" :back="handleClose" />
-            </template>
-            <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
-                <el-row type="flex" justify="center">
-                    <el-col :span="22">
-                        <el-form-item :label="$t('commons.table.port')" prop="port" :rules="Rules.port">
-                            <el-input clearable v-model.number="form.port" />
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </span>
-            </template>
-        </el-drawer>
-    </div>
+    <DrawerPro v-model="drawerVisible" :header="$t('commons.table.port')" :back="handleClose" size="small">
+        <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
+            <el-form-item :label="$t('commons.table.port')" prop="port" :rules="Rules.port">
+                <el-input clearable v-model.number="form.port" />
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
+                    {{ $t('commons.button.confirm') }}
+                </el-button>
+            </span>
+        </template>
+    </DrawerPro>
 </template>
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox, FormInstance } from 'element-plus';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { Rules } from '@/global/form-rules';
 import { updateSSH } from '@/api/modules/host';
 

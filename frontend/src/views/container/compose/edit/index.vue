@@ -1,14 +1,11 @@
 <template>
-    <el-drawer
+    <DrawerPro
         v-model="composeVisible"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="50%"
+        :header="$t('commons.button.edit')"
+        :back="handleClose"
+        :resource="name"
+        size="large"
     >
-        <template #header>
-            <DrawerHeader :header="$t('commons.button.edit')" :resource="name" :back="handleClose" />
-        </template>
         <div v-loading="loading">
             <codemirror
                 :autofocus="true"
@@ -34,7 +31,7 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 <script lang="ts" setup>
 import { Codemirror } from 'vue-codemirror';
@@ -44,7 +41,6 @@ import { ref } from 'vue';
 import { composeUpdate } from '@/api/modules/container';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const loading = ref(false);
 const composeVisible = ref(false);

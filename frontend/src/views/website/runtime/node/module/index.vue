@@ -1,46 +1,49 @@
 <template>
-    <el-drawer :close-on-click-modal="false" :close-on-press-escape="false" v-model="open" size="50%">
-        <template #header>
-            <DrawerHeader :header="$t('runtime.moduleManager')" :back="handleClose" />
+    <DrawerPro v-model="open" :header="$t('runtime.moduleManager')" size="large" :back="handleClose">
+        <template #content>
+            <el-row :gutter="20" v-loading="loading">
+                <el-col :span="10">
+                    <el-input v-model="module">
+                        <template #prepend>{{ packageManager }}</template>
+                    </el-input>
+                </el-col>
+                <el-col :span="14">
+                    <el-button @click="operateModule('install', module)" type="primary" :disabled="module === ''">
+                        {{ $t('commons.operate.install') }}
+                    </el-button>
+                </el-col>
+                <el-col>
+                    <ComplexTable :data="data" @search="search()" class="mt-5" :height="800">
+                        <el-table-column
+                            :label="$t('commons.table.name')"
+                            prop="name"
+                            min-width="100px"
+                        ></el-table-column>
+                        <el-table-column :label="$t('container.version')" prop="version" width="80px"></el-table-column>
+                        <el-table-column
+                            :label="$t('commons.table.protocol')"
+                            prop="license"
+                            width="120px"
+                        ></el-table-column>
+                        <el-table-column
+                            :label="$t('container.description')"
+                            fix
+                            min-width="120px"
+                            prop="description"
+                        ></el-table-column>
+                        <fu-table-operations
+                            :ellipsis="10"
+                            width="150px"
+                            :buttons="buttons"
+                            :label="$t('commons.table.operate')"
+                            fixed="right"
+                            fix
+                        />
+                    </ComplexTable>
+                </el-col>
+            </el-row>
         </template>
-        <el-row :gutter="20" v-loading="loading">
-            <el-col :span="10">
-                <el-input v-model="module">
-                    <template #prepend>{{ packageManager }}</template>
-                </el-input>
-            </el-col>
-            <el-col :span="14">
-                <el-button @click="operateModule('install', module)" type="primary" :disabled="module === ''">
-                    {{ $t('commons.operate.install') }}
-                </el-button>
-            </el-col>
-            <el-col>
-                <ComplexTable :data="data" @search="search()" class="mt-5" :height="800">
-                    <el-table-column :label="$t('commons.table.name')" prop="name" min-width="100px"></el-table-column>
-                    <el-table-column :label="$t('container.version')" prop="version" width="80px"></el-table-column>
-                    <el-table-column
-                        :label="$t('commons.table.protocol')"
-                        prop="license"
-                        width="120px"
-                    ></el-table-column>
-                    <el-table-column
-                        :label="$t('container.description')"
-                        fix
-                        min-width="120px"
-                        prop="description"
-                    ></el-table-column>
-                    <fu-table-operations
-                        :ellipsis="10"
-                        width="150px"
-                        :buttons="buttons"
-                        :label="$t('commons.table.operate')"
-                        fixed="right"
-                        fix
-                    />
-                </ComplexTable>
-            </el-col>
-        </el-row>
-    </el-drawer>
+    </DrawerPro>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';

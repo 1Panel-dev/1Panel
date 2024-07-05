@@ -1,79 +1,72 @@
 <template>
-    <el-drawer
-        v-model="open"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="50%"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('app.detail')" :back="handleClose" />
-        </template>
-        <div class="brief" v-loading="loadingApp">
-            <div class="detail flex">
-                <div class="w-12 h-12 rounded p-1 shadow-md icon">
-                    <img :src="app.icon" alt="App Icon" class="w-full h-full rounded" style="object-fit: contain" />
+    <DrawerPro v-model="open" :header="$t('app.detail')" :back="handleClose" size="large">
+        <template #content>
+            <div class="brief" v-loading="loadingApp">
+                <div class="detail flex">
+                    <div class="w-12 h-12 rounded p-1 shadow-md icon">
+                        <img :src="app.icon" alt="App Icon" class="w-full h-full rounded" style="object-fit: contain" />
+                    </div>
+                    <div class="ml-4">
+                        <div class="name mb-2">
+                            <span>{{ app.name }}</span>
+                        </div>
+                        <div class="description mb-4">
+                            <span>
+                                {{ language == 'zh' || language == 'tw' ? app.shortDescZh : app.shortDescEn }}
+                            </span>
+                        </div>
+                        <br />
+                        <div v-if="!loadingDetail" class="mb-2">
+                            <el-alert
+                                v-if="!appDetail.enable"
+                                :title="$t('app.limitHelper')"
+                                type="warning"
+                                show-icon
+                                :closable="false"
+                            />
+                        </div>
+                        <el-button
+                            round
+                            v-if="appDetail.enable && operate === 'install'"
+                            @click="openInstall"
+                            type="primary"
+                            class="brief-button"
+                        >
+                            {{ $t('app.install') }}
+                        </el-button>
+                    </div>
                 </div>
-                <div class="ml-4">
-                    <div class="name mb-2">
-                        <span>{{ app.name }}</span>
-                    </div>
-                    <div class="description mb-4">
-                        <span>
-                            {{ language == 'zh' || language == 'tw' ? app.shortDescZh : app.shortDescEn }}
-                        </span>
-                    </div>
-                    <br />
-                    <div v-if="!loadingDetail" class="mb-2">
-                        <el-alert
-                            v-if="!appDetail.enable"
-                            :title="$t('app.limitHelper')"
-                            type="warning"
-                            show-icon
-                            :closable="false"
-                        />
-                    </div>
-                    <el-button
-                        round
-                        v-if="appDetail.enable && operate === 'install'"
-                        @click="openInstall"
-                        type="primary"
-                        class="brief-button"
-                    >
-                        {{ $t('app.install') }}
-                    </el-button>
-                </div>
-            </div>
-            <div class="divider"></div>
-            <div class="descriptions">
-                <div>
-                    <el-descriptions direction="vertical">
-                        <el-descriptions-item>
-                            <div class="icons">
-                                <el-link @click="toLink(app.website)">
-                                    <el-icon><OfficeBuilding /></el-icon>
-                                    <span>{{ $t('app.appOfficeWebsite') }}</span>
+                <div class="divider"></div>
+                <div class="descriptions">
+                    <div>
+                        <el-descriptions direction="vertical">
+                            <el-descriptions-item>
+                                <div class="icons">
+                                    <el-link @click="toLink(app.website)">
+                                        <el-icon><OfficeBuilding /></el-icon>
+                                        <span>{{ $t('app.appOfficeWebsite') }}</span>
+                                    </el-link>
+                                </div>
+                            </el-descriptions-item>
+                            <el-descriptions-item>
+                                <el-link @click="toLink(app.document)">
+                                    <el-icon><Document /></el-icon>
+                                    <span>{{ $t('app.document') }}</span>
                                 </el-link>
-                            </div>
-                        </el-descriptions-item>
-                        <el-descriptions-item>
-                            <el-link @click="toLink(app.document)">
-                                <el-icon><Document /></el-icon>
-                                <span>{{ $t('app.document') }}</span>
-                            </el-link>
-                        </el-descriptions-item>
-                        <el-descriptions-item>
-                            <el-link @click="toLink(app.github)">
-                                <el-icon><Link /></el-icon>
-                                <span>{{ $t('app.github') }}</span>
-                            </el-link>
-                        </el-descriptions-item>
-                    </el-descriptions>
+                            </el-descriptions-item>
+                            <el-descriptions-item>
+                                <el-link @click="toLink(app.github)">
+                                    <el-icon><Link /></el-icon>
+                                    <span>{{ $t('app.github') }}</span>
+                                </el-link>
+                            </el-descriptions-item>
+                        </el-descriptions>
+                    </div>
                 </div>
             </div>
-        </div>
-        <MdEditor previewOnly v-model="app.readMe" :theme="isDarkTheme ? 'dark' : 'light'" />
-    </el-drawer>
+            <MdEditor previewOnly v-model="app.readMe" :theme="isDarkTheme ? 'dark' : 'light'" />
+        </template>
+    </DrawerPro>
     <Install ref="installRef"></Install>
 </template>
 

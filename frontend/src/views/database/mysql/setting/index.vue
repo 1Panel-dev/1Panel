@@ -1,49 +1,45 @@
 <template>
     <div v-loading="loading">
-        <LayoutContent>
-            <template #title>
-                <back-button name="MySQL" :header="props.database + ' ' + $t('commons.button.set')">
-                    <template #buttons>
-                        <el-button type="primary" :plain="activeName !== 'conf'" @click="jumpToConf">
-                            {{ $t('database.confChange') }}
-                        </el-button>
-                        <el-button
-                            type="primary"
-                            :disabled="mysqlStatus !== 'Running'"
-                            :plain="activeName !== 'status'"
-                            @click="activeName = 'status'"
-                        >
-                            {{ $t('database.currentStatus') }}
-                        </el-button>
-                        <el-button
-                            type="primary"
-                            :disabled="mysqlStatus !== 'Running'"
-                            :plain="activeName !== 'tuning'"
-                            @click="activeName = 'tuning'"
-                        >
-                            {{ $t('database.performanceTuning') }}
-                        </el-button>
-                        <el-button type="primary" :plain="activeName !== 'port'" @click="activeName = 'port'">
-                            {{ $t('commons.table.port') }}
-                        </el-button>
-                        <el-button
-                            type="primary"
-                            :disabled="mysqlStatus !== 'Running'"
-                            :plain="activeName !== 'log'"
-                            @click="activeName = 'log'"
-                        >
-                            {{ $t('database.log') }}
-                        </el-button>
-                        <el-button
-                            type="primary"
-                            :disabled="mysqlStatus !== 'Running'"
-                            @click="jumpToSlowlog"
-                            :plain="activeName !== 'slowLog'"
-                        >
-                            {{ $t('database.slowLog') }}
-                        </el-button>
-                    </template>
-                </back-button>
+        <LayoutContent backName="MySQL" :title="props.database + ' ' + $t('commons.button.set')">
+            <template #leftToolBar>
+                <el-button type="primary" :plain="activeName !== 'conf'" @click="jumpToConf">
+                    {{ $t('database.confChange') }}
+                </el-button>
+                <el-button
+                    type="primary"
+                    :disabled="mysqlStatus !== 'Running'"
+                    :plain="activeName !== 'status'"
+                    @click="activeName = 'status'"
+                >
+                    {{ $t('database.currentStatus') }}
+                </el-button>
+                <el-button
+                    type="primary"
+                    :disabled="mysqlStatus !== 'Running'"
+                    :plain="activeName !== 'tuning'"
+                    @click="activeName = 'tuning'"
+                >
+                    {{ $t('database.performanceTuning') }}
+                </el-button>
+                <el-button type="primary" :plain="activeName !== 'port'" @click="activeName = 'port'">
+                    {{ $t('commons.table.port') }}
+                </el-button>
+                <el-button
+                    type="primary"
+                    :disabled="mysqlStatus !== 'Running'"
+                    :plain="activeName !== 'log'"
+                    @click="activeName = 'log'"
+                >
+                    {{ $t('database.log') }}
+                </el-button>
+                <el-button
+                    type="primary"
+                    :disabled="mysqlStatus !== 'Running'"
+                    @click="jumpToSlowlog"
+                    :plain="activeName !== 'slowLog'"
+                >
+                    {{ $t('database.slowLog') }}
+                </el-button>
             </template>
 
             <template #app>
@@ -65,17 +61,17 @@
                         :extensions="extensions"
                         v-model="mysqlConf"
                     />
-                    <el-button style="margin-top: 10px" @click="getDefaultConfig()">
+                    <el-button class="mt-2.5" @click="getDefaultConfig()">
                         {{ $t('app.defaultConfig') }}
                     </el-button>
-                    <el-button type="primary" style="margin-top: 10px" @click="onSaveConf">
+                    <el-button type="primary" class="mt-2.5" @click="onSaveConf">
                         {{ $t('commons.button.save') }}
                     </el-button>
                     <el-row>
                         <el-col :span="8">
                             <el-alert
                                 v-if="useOld"
-                                style="margin-top: 10px"
+                                class="mt-2.5"
                                 :title="$t('app.defaultConfigHelper')"
                                 type="info"
                                 :closable="false"

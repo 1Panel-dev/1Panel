@@ -1,109 +1,74 @@
 <template>
-    <div>
-        <el-drawer
-            v-model="drawerVisible"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            size="50%"
-        >
-            <template #header>
-                <DrawerHeader :header="title + $t('setting.backupAccount')" :back="handleClose" />
-            </template>
-            <el-form @submit.prevent ref="formRef" v-loading="loading" label-position="top" :model="cosData.rowData">
-                <el-row type="flex" justify="center">
-                    <el-col :span="22">
-                        <el-form-item :label="$t('commons.table.type')" prop="type" :rules="Rules.requiredSelect">
-                            <el-tag>{{ $t('setting.' + cosData.rowData!.type) }}</el-tag>
-                        </el-form-item>
-                        <el-form-item label="Access Key ID" prop="accessKey" :rules="Rules.requiredInput">
-                            <el-input v-model.trim="cosData.rowData!.accessKey" />
-                        </el-form-item>
-                        <el-form-item label="Secret Key" prop="credential" :rules="Rules.requiredInput">
-                            <el-input show-password clearable v-model.trim="cosData.rowData!.credential" />
-                        </el-form-item>
-                        <el-form-item label="Region" prop="varsJson.region" :rules="Rules.requiredInput">
-                            <el-checkbox v-model="regionInput" :label="$t('container.input')" />
-                            <el-select
-                                v-if="!regionInput"
-                                v-model="cosData.rowData!.varsJson['region']"
-                                filterable
-                                clearable
-                            >
-                                <el-option
-                                    v-for="item in cities"
-                                    :key="item.value"
-                                    :label="item.label"
-                                    :value="item.value"
-                                >
-                                    <span style="float: left">{{ item.label }}</span>
-                                    <span class="option-help">
-                                        {{ item.value }}
-                                    </span>
-                                </el-option>
-                            </el-select>
-                            <el-input v-else v-model.trim="cosData.rowData!.varsJson['region']" />
-                        </el-form-item>
-                        <el-form-item label="Endpoint" prop="varsJson.endpointItem" :rules="Rules.requiredInput">
-                            <el-input v-model.trim="cosData.rowData!.varsJson['endpointItem']">
-                                <template #prepend>
-                                    <el-select v-model.trim="endpointProto" style="width: 100px">
-                                        <el-option label="http" value="http" />
-                                        <el-option label="https" value="https" />
-                                    </el-select>
-                                </template>
-                            </el-input>
-                        </el-form-item>
-                        <el-form-item label="Bucket" prop="bucket">
-                            <el-select
-                                @change="errBuckets = false"
-                                style="width: 80%"
-                                v-model="cosData.rowData!.bucket"
-                            >
-                                <el-option v-for="item in buckets" :key="item" :value="item" />
-                            </el-select>
-                            <el-button style="width: 20%" plain @click="getBuckets(formRef)">
-                                {{ $t('setting.loadBucket') }}
-                            </el-button>
-                            <span v-if="errBuckets" class="input-error">{{ $t('commons.rule.requiredSelect') }}</span>
-                        </el-form-item>
-                        <el-form-item
-                            :label="$t('setting.scType')"
-                            prop="varsJson.scType"
-                            :rules="[Rules.requiredSelect]"
-                        >
-                            <el-select v-model="cosData.rowData!.varsJson['scType']">
-                                <el-option value="Standard" :label="$t('setting.scStandard')" />
-                                <el-option value="Standard_IA" :label="$t('setting.scStandard_IA')" />
-                                <el-option value="Archive" :label="$t('setting.scArchive')" />
-                                <el-option value="Deep_Archive" :label="$t('setting.scDeep_Archive')" />
-                            </el-select>
-                            <el-alert
-                                v-if="cosData.rowData!.varsJson['scType'] === 'Archive' || cosData.rowData!.varsJson['scType'] === 'Deep_Archive'"
-                                style="margin-top: 10px"
-                                :closable="false"
-                                type="warning"
-                                :title="$t('setting.archiveHelper')"
-                            />
-                        </el-form-item>
-                        <el-form-item :label="$t('setting.backupDir')" prop="backupPath">
-                            <el-input clearable v-model.trim="cosData.rowData!.backupPath" placeholder="/1panel" />
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button :disabled="loading" @click="handleClose">
-                        {{ $t('commons.button.cancel') }}
-                    </el-button>
-                    <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </span>
-            </template>
-        </el-drawer>
-    </div>
+    <DrawerPro v-model="drawerVisible" :header="title + $t('setting.backupAccount')" :back="handleClose" size="large">
+        <el-form @submit.prevent ref="formRef" v-loading="loading" label-position="top" :model="cosData.rowData">
+            <el-form-item :label="$t('commons.table.type')" prop="type" :rules="Rules.requiredSelect">
+                <el-tag>{{ $t('setting.' + cosData.rowData!.type) }}</el-tag>
+            </el-form-item>
+            <el-form-item label="Access Key ID" prop="accessKey" :rules="Rules.requiredInput">
+                <el-input v-model.trim="cosData.rowData!.accessKey" />
+            </el-form-item>
+            <el-form-item label="Secret Key" prop="credential" :rules="Rules.requiredInput">
+                <el-input show-password clearable v-model.trim="cosData.rowData!.credential" />
+            </el-form-item>
+            <el-form-item label="Region" prop="varsJson.region" :rules="Rules.requiredInput">
+                <el-checkbox v-model="regionInput" :label="$t('container.input')" />
+                <el-select v-if="!regionInput" v-model="cosData.rowData!.varsJson['region']" filterable clearable>
+                    <el-option v-for="item in cities" :key="item.value" :label="item.label" :value="item.value">
+                        <span class="float-left">{{ item.label }}</span>
+                        <span class="option-help">
+                            {{ item.value }}
+                        </span>
+                    </el-option>
+                </el-select>
+                <el-input v-else v-model.trim="cosData.rowData!.varsJson['region']" />
+            </el-form-item>
+            <el-form-item label="Endpoint" prop="varsJson.endpointItem" :rules="Rules.requiredInput">
+                <el-input v-model.trim="cosData.rowData!.varsJson['endpointItem']">
+                    <template #prepend>
+                        <el-select v-model.trim="endpointProto" class="p-w-100">
+                            <el-option label="http" value="http" />
+                            <el-option label="https" value="https" />
+                        </el-select>
+                    </template>
+                </el-input>
+            </el-form-item>
+            <el-form-item label="Bucket" prop="bucket">
+                <el-select @change="errBuckets = false" class="!w-4/5" v-model="cosData.rowData!.bucket">
+                    <el-option v-for="item in buckets" :key="item" :value="item" />
+                </el-select>
+                <el-button class="!w-1/5" plain @click="getBuckets(formRef)">
+                    {{ $t('setting.loadBucket') }}
+                </el-button>
+                <span v-if="errBuckets" class="input-error">{{ $t('commons.rule.requiredSelect') }}</span>
+            </el-form-item>
+            <el-form-item :label="$t('setting.scType')" prop="varsJson.scType" :rules="[Rules.requiredSelect]">
+                <el-select v-model="cosData.rowData!.varsJson['scType']">
+                    <el-option value="Standard" :label="$t('setting.scStandard')" />
+                    <el-option value="Standard_IA" :label="$t('setting.scStandard_IA')" />
+                    <el-option value="Archive" :label="$t('setting.scArchive')" />
+                    <el-option value="Deep_Archive" :label="$t('setting.scDeep_Archive')" />
+                </el-select>
+                <el-alert
+                    v-if="cosData.rowData!.varsJson['scType'] === 'Archive' || cosData.rowData!.varsJson['scType'] === 'Deep_Archive'"
+                    class="mt-2.5"
+                    :closable="false"
+                    type="warning"
+                    :title="$t('setting.archiveHelper')"
+                />
+            </el-form-item>
+            <el-form-item :label="$t('setting.backupDir')" prop="backupPath">
+                <el-input clearable v-model.trim="cosData.rowData!.backupPath" placeholder="/1panel" />
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <el-button :disabled="loading" @click="handleClose">
+                {{ $t('commons.button.cancel') }}
+            </el-button>
+            <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
+                {{ $t('commons.button.confirm') }}
+            </el-button>
+        </template>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -112,7 +77,6 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { Backup } from '@/api/interface/backup';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { addBackup, editBackup, listBucket } from '@/api/modules/setting';
 import { deepCopy, spliceHttp, splitHttp } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';

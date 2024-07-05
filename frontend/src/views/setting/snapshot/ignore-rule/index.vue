@@ -1,67 +1,48 @@
 <template>
-    <div>
-        <el-drawer
-            v-model="drawerVisible"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            size="30%"
-        >
-            <template #header>
-                <DrawerHeader :header="$t('setting.ignoreRule')" :back="handleClose" />
-            </template>
+    <DrawerPro v-model="drawerVisible" :header="$t('setting.ignoreRule')" :back="handleClose" size="small">
+        <el-alert :closable="false" type="warning">{{ $t('setting.ignoreHelper') }}</el-alert>
+        <el-form ref="formRef" :model="form" :rules="rules" v-loading="loading" class="mt-2">
+            <el-form-item prop="tmpRule">
+                <div class="w-full">
+                    <el-input
+                        v-model="form.tmpRule"
+                        :rows="5"
+                        style="width: calc(100% - 50px)"
+                        type="textarea"
+                        :placeholder="$t('setting.ignoreHelper1')"
+                    />
+                    <FileList @choose="loadDir" :path="baseDir" :isAll="true"></FileList>
+                </div>
+            </el-form-item>
+        </el-form>
 
-            <el-alert :closable="false" type="warning">{{ $t('setting.ignoreHelper') }}</el-alert>
-            <el-row type="flex" justify="center" v-loading="loading" class="mt-2">
-                <el-col :span="22">
-                    <el-form ref="formRef" :model="form" :rules="rules">
-                        <el-form-item prop="tmpRule">
-                            <div class="w-full">
-                                <el-input
-                                    v-model="form.tmpRule"
-                                    :rows="5"
-                                    style="width: calc(100% - 50px)"
-                                    type="textarea"
-                                    :placeholder="$t('setting.ignoreHelper1')"
-                                />
-                                <FileList @choose="loadDir" :path="baseDir" :isAll="true"></FileList>
-                            </div>
-                        </el-form-item>
-                    </el-form>
+        <el-button :disabled="form.tmpRule === ''" @click="handleAdd(formRef)">
+            {{ $t('xpack.tamper.addRule') }}
+        </el-button>
 
-                    <el-button :disabled="form.tmpRule === ''" @click="handleAdd(formRef)">
-                        {{ $t('xpack.tamper.addRule') }}
+        <el-table :data="tableList">
+            <el-table-column prop="value" />
+            <el-table-column min-width="18">
+                <template #default="scope">
+                    <el-button link type="primary" @click="handleDelete(scope.$index)">
+                        {{ $t('commons.button.delete') }}
                     </el-button>
-
-                    <el-table :data="tableList">
-                        <el-table-column prop="value" />
-                        <el-table-column min-width="18">
-                            <template #default="scope">
-                                <el-button link type="primary" @click="handleDelete(scope.$index)">
-                                    {{ $t('commons.button.delete') }}
-                                </el-button>
-                            </template>
-                        </el-table-column>
-                    </el-table>
-                </el-col>
-            </el-row>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button :disabled="loading" type="primary" @click="onSave()">
-                        {{ $t('commons.button.save') }}
-                    </el-button>
-                </span>
-            </template>
-        </el-drawer>
-    </div>
+                </template>
+            </el-table-column>
+        </el-table>
+        <template #footer>
+            <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+            <el-button :disabled="loading" type="primary" @click="onSave()">
+                {{ $t('commons.button.save') }}
+            </el-button>
+        </template>
+    </DrawerPro>
 </template>
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import FileList from '@/components/file-list/index.vue';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { FormInstance } from 'element-plus';
 import { getSettingInfo, loadBaseDir, updateSetting } from '@/api/modules/setting';
 

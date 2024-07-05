@@ -1,47 +1,39 @@
 <template>
-    <el-drawer
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        v-model="open"
-        size="50%"
-        @close="handleClose"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('ssl.ca')" :back="handleClose" />
-        </template>
-        <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()" v-loading="loading">
-            <template #toolbar>
-                <el-button type="primary" @click="openCreate">{{ $t('commons.button.create') }}</el-button>
-            </template>
-            <el-table-column :label="$t('commons.table.name')" show-overflow-tooltip prop="name"></el-table-column>
-            <el-table-column :label="$t('website.keyType')" show-overflow-tooltip prop="keyType">
-                <template #default="{ row }">
-                    {{ getKeyName(row.keyType) }}
+    <DrawerPro v-model="open" :header="$t('ssl.ca')" size="large" :back="handleClose">
+        <template #content>
+            <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()" v-loading="loading">
+                <template #toolbar>
+                    <el-button type="primary" @click="openCreate">{{ $t('commons.button.create') }}</el-button>
                 </template>
-            </el-table-column>
-            <el-table-column
-                prop="createdAt"
-                :label="$t('commons.table.date')"
-                :formatter="dateFormat"
-                show-overflow-tooltip
-            />
-            <fu-table-operations
-                :ellipsis="3"
-                :buttons="buttons"
-                :label="$t('commons.table.operate')"
-                fix
-                width="250px"
-            />
-        </ComplexTable>
-        <Create ref="createRef" @close="search()" />
-        <Obtain ref="obtainRef" @close="search()" />
-        <Detail ref="detailRef" />
-    </el-drawer>
+                <el-table-column :label="$t('commons.table.name')" show-overflow-tooltip prop="name"></el-table-column>
+                <el-table-column :label="$t('website.keyType')" show-overflow-tooltip prop="keyType">
+                    <template #default="{ row }">
+                        {{ getKeyName(row.keyType) }}
+                    </template>
+                </el-table-column>
+                <el-table-column
+                    prop="createdAt"
+                    :label="$t('commons.table.date')"
+                    :formatter="dateFormat"
+                    show-overflow-tooltip
+                />
+                <fu-table-operations
+                    :ellipsis="3"
+                    :buttons="buttons"
+                    :label="$t('commons.table.operate')"
+                    fix
+                    width="250px"
+                />
+            </ComplexTable>
+            <Create ref="createRef" @close="search()" />
+            <Obtain ref="obtainRef" @close="search()" />
+            <Detail ref="detailRef" />
+        </template>
+    </DrawerPro>
     <OpDialog ref="opRef" @search="search" />
 </template>
 
 <script lang="ts" setup>
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { Website } from '@/api/interface/website';
 import { DeleteCA, SearchCAs, DownloadCAFile } from '@/api/modules/website';
 import i18n from '@/lang';

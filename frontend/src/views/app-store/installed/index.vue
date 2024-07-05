@@ -176,57 +176,63 @@
                                                         </el-tooltip>
                                                     </span>
 
-                                            <el-button
-                                                class="h-button"
-                                                plain
-                                                round
-                                                size="small"
-                                                @click="openUploads(installed.appKey, installed.name)"
-                                                v-if="mode === 'installed'"
-                                            >
-                                                {{ $t('database.loadBackup') }}
-                                            </el-button>
-                                            <el-button
-                                                class="h-button"
-                                                plain
-                                                round
-                                                size="small"
-                                                @click="openBackups(installed.appKey, installed.name, installed.status)"
-                                                v-if="mode === 'installed'"
-                                            >
-                                                {{ $t('commons.button.backup') }}
-                                            </el-button>
-                                            <el-button
-                                                class="h-button"
-                                                plain
-                                                round
-                                                size="small"
-                                                :disabled="installed.appStatus === 'Upgrading'"
-                                                @click="openOperate(installed, 'ignore')"
-                                                v-if="mode === 'upgrade'"
-                                            >
-                                                {{ $t('commons.button.ignore') }}
-                                            </el-button>
-                                            <el-button
-                                                class="h-button"
-                                                plain
-                                                round
-                                                size="small"
-                                                :disabled="
-                                                    (installed.status !== 'Running' &&
-                                                        installed.status !== 'UpgradeErr') ||
-                                                    installed.appStatus === 'TakeDown'
-                                                "
-                                                @click="openOperate(installed, 'upgrade')"
-                                                v-if="mode === 'upgrade'"
-                                            >
-                                                {{ $t('commons.button.upgrade') }}
-                                            </el-button>
-                                        </div>
-                                        <div class="d-description">
-                                            <el-button class="tagMargin" plain size="small">
-                                                {{ $t('app.version') }}：{{ installed.version }}
-                                            </el-button>
+                                                    <el-button
+                                                        class="h-button"
+                                                        plain
+                                                        round
+                                                        size="small"
+                                                        @click="openUploads(installed.appKey, installed.name)"
+                                                        v-if="mode === 'installed'"
+                                                    >
+                                                        {{ $t('database.loadBackup') }}
+                                                    </el-button>
+                                                    <el-button
+                                                        class="h-button"
+                                                        plain
+                                                        round
+                                                        size="small"
+                                                        @click="
+                                                            openBackups(
+                                                                installed.appKey,
+                                                                installed.name,
+                                                                installed.status,
+                                                            )
+                                                        "
+                                                        v-if="mode === 'installed'"
+                                                    >
+                                                        {{ $t('commons.button.backup') }}
+                                                    </el-button>
+                                                    <el-button
+                                                        class="h-button"
+                                                        plain
+                                                        round
+                                                        size="small"
+                                                        :disabled="installed.appStatus === 'Upgrading'"
+                                                        @click="openOperate(installed, 'ignore')"
+                                                        v-if="mode === 'upgrade'"
+                                                    >
+                                                        {{ $t('commons.button.ignore') }}
+                                                    </el-button>
+                                                    <el-button
+                                                        class="h-button"
+                                                        plain
+                                                        round
+                                                        size="small"
+                                                        :disabled="
+                                                            (installed.status !== 'Running' &&
+                                                                installed.status !== 'UpgradeErr') ||
+                                                            installed.appStatus === 'TakeDown'
+                                                        "
+                                                        @click="openOperate(installed, 'upgrade')"
+                                                        v-if="mode === 'upgrade'"
+                                                    >
+                                                        {{ $t('commons.button.upgrade') }}
+                                                    </el-button>
+                                                </div>
+                                                <div class="d-description">
+                                                    <el-button class="tagMargin" plain size="small">
+                                                        {{ $t('app.version') }}：{{ installed.version }}
+                                                    </el-button>
 
                                                     <el-button
                                                         v-if="installed.httpPort > 0"

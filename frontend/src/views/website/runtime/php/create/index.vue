@@ -1,153 +1,153 @@
 <template>
-    <el-drawer :close-on-click-modal="false" :close-on-press-escape="false" v-model="open" size="50%">
-        <template #header>
-            <DrawerHeader :header="$t('runtime.' + mode)" :resource="runtime.name" :back="handleClose" />
-        </template>
-        <el-row v-loading="loading">
-            <el-col :span="22" :offset="1">
-                <el-form
-                    ref="runtimeForm"
-                    label-position="top"
-                    :model="runtime"
-                    label-width="125px"
-                    :rules="rules"
-                    :validate-on-rule-change="false"
+    <DrawerPro
+        v-model="open"
+        :header="$t('runtime.' + mode)"
+        size="large"
+        :resource="mode === 'edit' ? runtime.name : ''"
+        :back="handleClose"
+    >
+        <el-form
+            ref="runtimeForm"
+            label-position="top"
+            :model="runtime"
+            label-width="125px"
+            :rules="rules"
+            :validate-on-rule-change="false"
+            v-loading="loading"
+        >
+            <el-form-item :label="$t('commons.table.name')" prop="name">
+                <el-input :disabled="mode === 'edit'" v-model="runtime.name"></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('runtime.resource')" prop="resource">
+                <el-radio-group
+                    :disabled="mode === 'edit'"
+                    v-model="runtime.resource"
+                    @change="changeResource(runtime.resource)"
                 >
-                    <el-form-item :label="$t('commons.table.name')" prop="name">
-                        <el-input :disabled="mode === 'edit'" v-model="runtime.name"></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('runtime.resource')" prop="resource">
-                        <el-radio-group
-                            :disabled="mode === 'edit'"
-                            v-model="runtime.resource"
-                            @change="changeResource(runtime.resource)"
-                        >
-                            <el-radio :value="'appstore'">
-                                {{ $t('runtime.appstore') }}
-                            </el-radio>
-                            <el-radio :value="'local'">
-                                {{ $t('runtime.local') }}
-                            </el-radio>
-                        </el-radio-group>
-                    </el-form-item>
-                    <div v-if="runtime.resource === 'appstore'">
-                        <el-form-item :label="$t('runtime.app')" prop="appID">
-                            <el-row :gutter="20">
-                                <el-col :span="12">
-                                    <el-select
-                                        v-model="runtime.appID"
-                                        :disabled="mode === 'edit'"
-                                        @change="changeApp(runtime.appID)"
-                                        class="p-w-200"
-                                    >
-                                        <el-option
-                                            v-for="(app, index) in apps"
-                                            :key="index"
-                                            :label="app.name"
-                                            :value="app.id"
-                                        ></el-option>
-                                    </el-select>
-                                </el-col>
-                                <el-col :span="12">
-                                    <el-select
-                                        v-model="runtime.version"
-                                        :disabled="mode === 'edit'"
-                                        @change="changeVersion()"
-                                        class="p-w-200"
-                                    >
-                                        <el-option
-                                            v-for="(version, index) in appVersions"
-                                            :key="index"
-                                            :label="version"
-                                            :value="version"
-                                        ></el-option>
-                                    </el-select>
-                                </el-col>
-                            </el-row>
+                    <el-radio :value="'appstore'">
+                        {{ $t('runtime.appstore') }}
+                    </el-radio>
+                    <el-radio :value="'local'">
+                        {{ $t('runtime.local') }}
+                    </el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <div v-if="runtime.resource === 'appstore'">
+                <el-form-item :label="$t('runtime.app')" prop="appID">
+                    <el-row :gutter="20">
+                        <el-col :span="12">
+                            <el-select
+                                v-model="runtime.appID"
+                                :disabled="mode === 'edit'"
+                                @change="changeApp(runtime.appID)"
+                                class="p-w-200"
+                            >
+                                <el-option
+                                    v-for="(app, index) in apps"
+                                    :key="index"
+                                    :label="app.name"
+                                    :value="app.id"
+                                ></el-option>
+                            </el-select>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-select
+                                v-model="runtime.version"
+                                :disabled="mode === 'edit'"
+                                @change="changeVersion()"
+                                class="p-w-200"
+                            >
+                                <el-option
+                                    v-for="(version, index) in appVersions"
+                                    :key="index"
+                                    :label="version"
+                                    :value="version"
+                                ></el-option>
+                            </el-select>
+                        </el-col>
+                    </el-row>
+                </el-form-item>
+                <div v-if="initParam">
+                    <div v-if="runtime.type === 'php'">
+                        <el-form-item :label="$t('runtime.image')" prop="image">
+                            <el-input v-model="runtime.image"></el-input>
                         </el-form-item>
-                        <div v-if="initParam">
-                            <div v-if="runtime.type === 'php'">
-                                <el-form-item :label="$t('runtime.image')" prop="image">
-                                    <el-input v-model="runtime.image"></el-input>
-                                </el-form-item>
-                                <el-form-item :label="$t('runtime.source')" prop="source">
-                                    <el-select v-model="runtime.source" filterable allow-create default-first-option>
-                                        <el-option
-                                            v-for="(source, index) in phpSources"
-                                            :key="index"
-                                            :label="source.label + ' [' + source.value + ']'"
-                                            :value="source.value"
-                                        ></el-option>
-                                    </el-select>
-                                    <span class="input-help">
-                                        {{ $t('runtime.phpsourceHelper') }}
-                                    </span>
-                                </el-form-item>
-                                <el-form-item :label="$t('php.extensions')">
-                                    <el-select v-model="extensions" @change="changePHPExtension()" clearable>
-                                        <el-option
-                                            v-for="(extension, index) in phpExtensions"
-                                            :key="index"
-                                            :label="extension.name"
-                                            :value="extension.extensions"
-                                        ></el-option>
-                                    </el-select>
-                                </el-form-item>
-                                <Params
-                                    v-if="mode === 'create'"
-                                    v-model:form="runtime.params"
-                                    v-model:params="appParams"
-                                    v-model:rules="rules"
-                                ></Params>
-                                <EditParams
-                                    v-if="mode === 'edit'"
-                                    v-model:form="runtime.params"
-                                    v-model:params="editParams"
-                                    v-model:rules="rules"
-                                ></EditParams>
-                                <el-form-item>
-                                    <el-alert :title="$t('runtime.buildHelper')" type="warning" :closable="false" />
-                                </el-form-item>
-                                <el-form-item>
-                                    <el-alert type="info" :closable="false">
-                                        <span>{{ $t('runtime.extendHelper') }}</span>
-                                        <el-link
-                                            target="_blank"
-                                            type="primary"
-                                            href="https://1panel.cn/docs/user_manual/websites/php/#php_1"
-                                        >
-                                            {{ $t('php.toExtensionsList') }}
-                                        </el-link>
-                                        <br />
-                                    </el-alert>
-                                </el-form-item>
-                                <div v-if="mode == 'edit'">
-                                    <el-form-item>
-                                        <el-checkbox v-model="runtime.rebuild">
-                                            {{ $t('runtime.rebuild') }}
-                                        </el-checkbox>
-                                    </el-form-item>
-                                    <el-form-item>
-                                        <el-alert type="info" :closable="false">
-                                            <span>{{ $t('runtime.rebuildHelper') }}</span>
-                                            <br />
-                                        </el-alert>
-                                    </el-form-item>
-                                </div>
-                            </div>
+                        <el-form-item :label="$t('runtime.source')" prop="source">
+                            <el-select v-model="runtime.source" filterable allow-create default-first-option>
+                                <el-option
+                                    v-for="(source, index) in phpSources"
+                                    :key="index"
+                                    :label="source.label + ' [' + source.value + ']'"
+                                    :value="source.value"
+                                ></el-option>
+                            </el-select>
+                            <span class="input-help">
+                                {{ $t('runtime.phpsourceHelper') }}
+                            </span>
+                        </el-form-item>
+                        <el-form-item :label="$t('php.extensions')">
+                            <el-select v-model="extensions" @change="changePHPExtension()" clearable>
+                                <el-option
+                                    v-for="(extension, index) in phpExtensions"
+                                    :key="index"
+                                    :label="extension.name"
+                                    :value="extension.extensions"
+                                ></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <Params
+                            v-if="mode === 'create'"
+                            v-model:form="runtime.params"
+                            v-model:params="appParams"
+                            v-model:rules="rules"
+                        ></Params>
+                        <EditParams
+                            v-if="mode === 'edit'"
+                            v-model:form="runtime.params"
+                            v-model:params="editParams"
+                            v-model:rules="rules"
+                        ></EditParams>
+                        <el-form-item>
+                            <el-alert :title="$t('runtime.buildHelper')" type="warning" :closable="false" />
+                        </el-form-item>
+                        <el-form-item>
+                            <el-alert type="info" :closable="false">
+                                <span>{{ $t('runtime.extendHelper') }}</span>
+                                <el-link
+                                    target="_blank"
+                                    type="primary"
+                                    href="https://1panel.cn/docs/user_manual/websites/php/#php_1"
+                                >
+                                    {{ $t('php.toExtensionsList') }}
+                                </el-link>
+                                <br />
+                            </el-alert>
+                        </el-form-item>
+                        <div v-if="mode == 'edit'">
+                            <el-form-item>
+                                <el-checkbox v-model="runtime.rebuild">
+                                    {{ $t('runtime.rebuild') }}
+                                </el-checkbox>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-alert type="info" :closable="false">
+                                    <span>{{ $t('runtime.rebuildHelper') }}</span>
+                                    <br />
+                                </el-alert>
+                            </el-form-item>
                         </div>
                     </div>
-                    <div v-else>
-                        <el-form-item>
-                            <el-alert :title="$t('runtime.localHelper')" type="info" :closable="false" />
-                        </el-form-item>
-                        <el-form-item :label="$t('runtime.version')" prop="version">
-                            <el-input v-model="runtime.version" :placeholder="$t('runtime.versionHelper')"></el-input>
-                        </el-form-item>
-                    </div>
-                </el-form>
-            </el-col>
-        </el-row>
+                </div>
+            </div>
+            <div v-else>
+                <el-form-item>
+                    <el-alert :title="$t('runtime.localHelper')" type="info" :closable="false" />
+                </el-form-item>
+                <el-form-item :label="$t('runtime.version')" prop="version">
+                    <el-input v-model="runtime.version" :placeholder="$t('runtime.versionHelper')"></el-input>
+                </el-form-item>
+            </div>
+        </el-form>
         <template #footer>
             <span>
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
@@ -156,7 +156,7 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -171,7 +171,6 @@ import { FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
 import Params from '../param/index.vue';
 import EditParams from '../edit/index.vue';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 
 interface OperateRrops {
     id?: number;

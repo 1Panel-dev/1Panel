@@ -1,34 +1,27 @@
 <template>
-    <el-drawer v-model="open" size="40%" :close-on-click-modal="false" :close-on-press-escape="false">
-        <template #header>
-            <DrawerHeader :header="$t('file.rename')" :resource="oldName" :back="handleClose" />
-        </template>
-        <el-row>
-            <el-col :span="22" :offset="1">
-                <el-form
-                    ref="fileForm"
-                    label-position="top"
-                    :model="addForm"
-                    label-width="100px"
-                    :rules="rules"
-                    v-loading="loading"
-                >
-                    <el-form-item :label="$t('file.path')" prop="path">
-                        <el-input v-model="addForm.path" disabled />
-                    </el-form-item>
-                    <el-form-item :label="$t('commons.table.name')" prop="newName">
-                        <el-input v-model.trim="addForm.newName" />
-                    </el-form-item>
-                </el-form>
-            </el-col>
-        </el-row>
+    <DrawerPro v-model="open" :header="$t('file.rename')" :resource="oldName" :back="handleClose" size="normal">
+        <el-form
+            ref="fileForm"
+            label-position="top"
+            :model="addForm"
+            label-width="100px"
+            :rules="rules"
+            v-loading="loading"
+        >
+            <el-form-item :label="$t('file.path')" prop="path">
+                <el-input v-model="addForm.path" disabled />
+            </el-form-item>
+            <el-form-item :label="$t('commons.table.name')" prop="newName">
+                <el-input v-model.trim="addForm.newName" />
+            </el-form-item>
+        </el-form>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
                 <el-button type="primary" @click="submit(fileForm)">{{ $t('commons.button.confirm') }}</el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -39,7 +32,6 @@ import { reactive, ref } from 'vue';
 import { File } from '@/api/interface/file';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 
 interface RenameProps {
     path: string;

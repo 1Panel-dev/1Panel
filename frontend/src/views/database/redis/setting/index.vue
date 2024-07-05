@@ -1,7 +1,7 @@
 <template>
     <div v-show="settingShow" v-loading="loading">
         <LayoutContent :title="database + ' ' + $t('commons.button.set')" :reload="true">
-            <template #buttons>
+            <template #leftToolBar>
                 <el-button type="primary" :plain="activeName !== 'conf'" @click="changeTab('conf')">
                     {{ $t('database.confChange') }}
                 </el-button>

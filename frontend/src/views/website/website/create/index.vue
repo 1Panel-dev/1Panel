@@ -1,355 +1,337 @@
 <template>
-    <el-drawer :close-on-click-modal="false" :close-on-press-escape="false" v-model="open" size="50%">
-        <template #header>
-            <DrawerHeader :header="$t('website.create')" :back="handleClose">
-                <template #buttons>
-                    <span class="drawer-header-button">
-                        <template
-                            v-for="item in [
-                                {
-                                    label: i18n.global.t('website.deployment'),
-                                    value: 'deployment',
-                                },
-                                {
-                                    label: i18n.global.t('runtime.runtime'),
-                                    value: 'runtime',
-                                },
+    <DrawerPro v-model="open" :header="$t('website.create')" size="large" :back="handleClose">
+        <template #buttons>
+            <span class="drawer-header-button">
+                <template
+                    v-for="item in [
+                        {
+                            label: i18n.global.t('website.deployment'),
+                            value: 'deployment',
+                        },
+                        {
+                            label: i18n.global.t('runtime.runtime'),
+                            value: 'runtime',
+                        },
 
-                                {
-                                    label: i18n.global.t('website.proxy'),
-                                    value: 'proxy',
-                                },
-                                {
-                                    label: i18n.global.t('website.static'),
-                                    value: 'static',
-                                },
-                            ]"
-                            :key="item.value"
-                        >
-                            <el-button
-                                :class="website.type === item.value ? 'active-button' : ''"
-                                @click="changeType(item.value)"
-                                :type="website.type === item.value ? '' : 'info'"
-                                :plain="website.type === item.value"
-                                :text="website.type !== item.value"
-                                :bg="website.type !== item.value"
-                            >
-                                {{ item.label }}
-                            </el-button>
-                        </template>
-                    </span>
-                </template>
-            </DrawerHeader>
-        </template>
-        <el-row v-loading="loading" :class="{ mask: !versionExist }">
-            <el-col :span="22" :offset="1">
-                <el-alert
-                    v-if="website.type == 'deployment'"
-                    :title="$t('website.websiteDeploymentHelper')"
-                    type="info"
-                    :closable="false"
-                />
-                <el-alert
-                    v-if="website.type == 'static'"
-                    :title="$t('website.websiteStatictHelper')"
-                    type="info"
-                    :closable="false"
-                />
-                <el-alert
-                    v-if="website.type == 'proxy'"
-                    :title="$t('website.websiteProxyHelper')"
-                    type="info"
-                    :closable="false"
-                />
-                <el-alert
-                    v-if="website.type == 'runtime'"
-                    :title="$t('website.runtimeProxyHelper')"
-                    type="info"
-                    :closable="false"
-                />
-                <br />
-                <el-form
-                    ref="websiteForm"
-                    label-position="top"
-                    :model="website"
-                    label-width="125px"
-                    :rules="rules"
-                    :validate-on-rule-change="false"
+                        {
+                            label: i18n.global.t('website.proxy'),
+                            value: 'proxy',
+                        },
+                        {
+                            label: i18n.global.t('website.static'),
+                            value: 'static',
+                        },
+                    ]"
+                    :key="item.value"
                 >
-                    <el-form-item :label="$t('website.group')" prop="webSiteGroupId">
-                        <el-select v-model="website.webSiteGroupId">
+                    <el-button
+                        :class="website.type === item.value ? 'active-button' : ''"
+                        @click="changeType(item.value)"
+                        :type="website.type === item.value ? '' : 'info'"
+                        :plain="website.type === item.value"
+                        :text="website.type !== item.value"
+                        :bg="website.type !== item.value"
+                    >
+                        {{ item.label }}
+                    </el-button>
+                </template>
+            </span>
+        </template>
+        <div v-loading="loading" :class="{ mask: !versionExist }">
+            <el-alert
+                v-if="website.type == 'deployment'"
+                :title="$t('website.websiteDeploymentHelper')"
+                type="info"
+                :closable="false"
+            />
+            <el-alert
+                v-if="website.type == 'static'"
+                :title="$t('website.websiteStatictHelper')"
+                type="info"
+                :closable="false"
+            />
+            <el-alert
+                v-if="website.type == 'proxy'"
+                :title="$t('website.websiteProxyHelper')"
+                type="info"
+                :closable="false"
+            />
+            <el-alert
+                v-if="website.type == 'runtime'"
+                :title="$t('website.runtimeProxyHelper')"
+                type="info"
+                :closable="false"
+            />
+            <br />
+            <el-form
+                ref="websiteForm"
+                label-position="top"
+                :model="website"
+                label-width="125px"
+                :rules="rules"
+                :validate-on-rule-change="false"
+            >
+                <el-form-item :label="$t('website.group')" prop="webSiteGroupId">
+                    <el-select v-model="website.webSiteGroupId">
+                        <el-option
+                            v-for="(group, index) in groups"
+                            :key="index"
+                            :label="group.name"
+                            :value="group.id"
+                        ></el-option>
+                    </el-select>
+                </el-form-item>
+                <div v-if="website.type === 'deployment'">
+                    <el-form-item prop="appType">
+                        <el-radio-group v-model="website.appType" @change="changeAppType(website.appType)">
+                            <el-radio :label="'installed'" :value="'installed'">
+                                {{ $t('website.appInstalled') }}
+                            </el-radio>
+                            <el-radio :label="'new'" :value="'new'">
+                                {{ $t('website.appNew') }}
+                            </el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+                    <el-form-item
+                        v-if="website.appType == 'installed'"
+                        :label="$t('website.appInstalled')"
+                        prop="appInstallId"
+                    >
+                        <el-select v-model="website.appInstallId" class="p-w-200">
                             <el-option
-                                v-for="(group, index) in groups"
+                                v-for="(appInstall, index) in appInstalls"
                                 :key="index"
-                                :label="group.name"
-                                :value="group.id"
+                                :label="appInstall.name"
+                                :value="appInstall.id"
                             ></el-option>
                         </el-select>
                     </el-form-item>
-                    <div v-if="website.type === 'deployment'">
-                        <el-form-item prop="appType">
-                            <el-radio-group v-model="website.appType" @change="changeAppType(website.appType)">
-                                <el-radio :label="'installed'" :value="'installed'">
-                                    {{ $t('website.appInstalled') }}
-                                </el-radio>
-                                <el-radio :label="'new'" :value="'new'">
-                                    {{ $t('website.appNew') }}
-                                </el-radio>
-                            </el-radio-group>
-                        </el-form-item>
-                        <el-form-item
-                            v-if="website.appType == 'installed'"
-                            :label="$t('website.appInstalled')"
-                            prop="appInstallId"
-                        >
-                            <el-select v-model="website.appInstallId" class="p-w-200">
-                                <el-option
-                                    v-for="(appInstall, index) in appInstalls"
-                                    :key="index"
-                                    :label="appInstall.name"
-                                    :value="appInstall.id"
-                                ></el-option>
-                            </el-select>
-                        </el-form-item>
-                        <div v-if="website.appType == 'new'">
-                            <el-form-item :label="$t('app.app')" prop="appinstall.appId">
-                                <el-row :gutter="20">
-                                    <el-col :span="12">
-                                        <el-select
-                                            v-model="website.appinstall.appId"
-                                            @change="changeApp()"
-                                            class="p-w-200"
-                                        >
-                                            <el-option
-                                                v-for="(app, index) in apps"
-                                                :key="index"
-                                                :label="app.name"
-                                                :value="app.id"
-                                            ></el-option>
-                                        </el-select>
-                                    </el-col>
-                                    <el-col :span="12">
-                                        <el-select
-                                            v-model="website.appinstall.version"
-                                            @change="getAppDetail(website.appinstall.version)"
-                                            class="p-w-200"
-                                        >
-                                            <el-option
-                                                v-for="(version, index) in appVersions"
-                                                :key="index"
-                                                :label="version"
-                                                :value="version"
-                                            ></el-option>
-                                        </el-select>
-                                    </el-col>
-                                </el-row>
-                            </el-form-item>
-                            <el-form-item :label="$t('commons.table.name')" prop="appinstall.name">
-                                <el-input v-model.trim="website.appinstall.name"></el-input>
-                            </el-form-item>
-                            <Params
-                                :key="paramKey"
-                                v-model:form="website.appinstall.params"
-                                v-model:rules="rules.appinstall.params"
-                                :params="appParams"
-                                :propStart="'appinstall.params.'"
-                            ></Params>
-                        </div>
-                    </div>
-                    <div v-if="website.type === 'runtime'">
-                        <el-row :gutter="20">
-                            <el-col :span="8">
-                                <el-form-item :label="$t('commons.table.type')" prop="runtimeType">
-                                    <el-select v-model="website.runtimeType" @change="changeRuntimeType()">
-                                        <el-option label="PHP" value="php"></el-option>
-                                        <el-option label="Node.js" value="node"></el-option>
-                                        <el-option label="Java" value="java"></el-option>
-                                        <el-option label="Go" value="go"></el-option>
+                    <div v-if="website.appType == 'new'">
+                        <el-form-item :label="$t('app.app')" prop="appinstall.appId">
+                            <el-row :gutter="20">
+                                <el-col :span="12">
+                                    <el-select v-model="website.appinstall.appId" @change="changeApp()" class="p-w-200">
+                                        <el-option
+                                            v-for="(app, index) in apps"
+                                            :key="index"
+                                            :label="app.name"
+                                            :value="app.id"
+                                        ></el-option>
                                     </el-select>
-                                </el-form-item>
-                            </el-col>
-                            <el-col :span="16">
-                                <el-form-item :label="$t('runtime.runtime')" prop="runtimeID">
+                                </el-col>
+                                <el-col :span="12">
                                     <el-select
-                                        v-model="website.runtimeID"
-                                        @change="changeRuntime(website.runtimeID)"
-                                        filterable
+                                        v-model="website.appinstall.version"
+                                        @change="getAppDetail(website.appinstall.version)"
+                                        class="p-w-200"
                                     >
                                         <el-option
-                                            v-for="run in runtimes"
-                                            :key="run.name"
-                                            :label="run.name + ' [' + $t('runtime.' + run.resource) + ']'"
-                                            :value="run.id"
-                                        >
-                                            <el-row>
-                                                <el-col :span="14">
-                                                    <span class="runtimeName">
-                                                        {{ run.name }}
-                                                    </span>
-                                                </el-col>
-                                                <el-col :span="10">
-                                                    {{ ' [' + $t('runtime.' + run.resource) + ']' }}
-                                                </el-col>
-                                            </el-row>
-                                        </el-option>
+                                            v-for="(version, index) in appVersions"
+                                            :key="index"
+                                            :label="version"
+                                            :value="version"
+                                        ></el-option>
                                     </el-select>
-                                </el-form-item>
-                            </el-col>
-                        </el-row>
-                        <div v-if="website.runtimeType === 'php'">
-                            <Params
-                                v-if="runtimeResource === 'appstore'"
-                                :key="paramKey"
-                                v-model:form="website.appinstall.params"
-                                v-model:rules="rules.appinstall.params"
-                                :params="appParams"
-                                :propStart="'appinstall.params.'"
-                            ></Params>
-                            <div v-else>
-                                <el-form-item :label="$t('website.proxyType')" prop="proxyType">
-                                    <el-select v-model="website.proxyType">
-                                        <el-option :label="$t('website.tcp')" :value="'tcp'"></el-option>
-                                        <el-option :label="$t('website.unix')" :value="'unix'"></el-option>
-                                    </el-select>
-                                </el-form-item>
-                                <el-form-item
-                                    v-if="website.proxyType === 'tcp'"
-                                    :label="$t('commons.table.port')"
-                                    prop="port"
-                                >
-                                    <el-input v-model.number="website.port"></el-input>
-                                </el-form-item>
-                            </div>
-                        </div>
+                                </el-col>
+                            </el-row>
+                        </el-form-item>
+                        <el-form-item :label="$t('commons.table.name')" prop="appinstall.name">
+                            <el-input v-model.trim="website.appinstall.name"></el-input>
+                        </el-form-item>
+                        <Params
+                            :key="paramKey"
+                            v-model:form="website.appinstall.params"
+                            v-model:rules="rules.appinstall.params"
+                            :params="appParams"
+                            :propStart="'appinstall.params.'"
+                        ></Params>
                     </div>
-                    <el-form-item
-                        prop="advanced"
-                        v-if="
-                            (website.type === 'runtime' && website.runtimeType === 'php') ||
-                            (website.type === 'deployment' && website.appType === 'new')
-                        "
-                    >
-                        <el-checkbox v-model="website.appinstall.advanced" :label="$t('app.advanced')" size="large" />
-                    </el-form-item>
-
-                    <div v-if="website.appinstall.advanced">
-                        <el-form-item :label="$t('app.containerName')" prop="containerName">
-                            <el-input
-                                v-model.trim="website.appinstall.containerName"
-                                :placeholder="$t('app.containerNameHelper')"
-                            ></el-input>
-                        </el-form-item>
-                        <el-form-item :label="$t('container.cpuQuota')" prop="appinstall.cpuQuota">
-                            <el-input
-                                type="number"
-                                style="width: 40%"
-                                v-model.number="website.appinstall.cpuQuota"
-                                maxlength="5"
-                            >
-                                <template #append>{{ $t('app.cpuCore') }}</template>
-                            </el-input>
-                            <span class="input-help">{{ $t('container.limitHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item :label="$t('container.memoryLimit')" prop="appinstall.memoryLimit">
-                            <el-input style="width: 40%" v-model.number="website.appinstall.memoryLimit" maxlength="10">
-                                <template #append>
-                                    <el-select
-                                        v-model="website.appinstall.memoryUnit"
-                                        placeholder="Select"
-                                        class="pre-select"
-                                    >
-                                        <el-option label="KB" value="K" />
-                                        <el-option label="MB" value="M" />
-                                        <el-option label="GB" value="G" />
-                                    </el-select>
-                                </template>
-                            </el-input>
-                            <span class="input-help">{{ $t('container.limitHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item prop="allowPort" v-if="website.type === 'deployment'">
-                            <el-checkbox
-                                v-model="website.appinstall.allowPort"
-                                :label="$t('app.allowPort')"
-                                size="large"
-                            />
-                            <span class="input-help">{{ $t('app.allowPortHelper') }}</span>
-                        </el-form-item>
-                    </div>
-                    <el-form-item :label="$t('website.primaryDomain')" prop="primaryDomain">
-                        <el-input
-                            v-model.trim="website.primaryDomain"
-                            @input="changeAlias(website.primaryDomain)"
-                            :placeholder="$t('website.primaryDomainHelper')"
-                        ></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('website.otherDomains')" prop="otherDomains">
-                        <el-input
-                            type="textarea"
-                            :rows="3"
-                            v-model="website.otherDomains"
-                            :placeholder="$t('website.domainHelper')"
-                        ></el-input>
-                    </el-form-item>
-                    <el-form-item prop="IPV6">
-                        <el-checkbox v-model="website.IPV6" :label="$t('website.ipv6')" size="large" />
-                    </el-form-item>
-                    <el-form-item :label="$t('website.alias')" prop="alias">
-                        <el-input v-model.trim="website.alias" :placeholder="$t('website.aliasHelper')"></el-input>
-                        <div>
-                            <span class="input-help">
-                                <span>{{ $t('website.staticPath') + staticPath + website.alias }}</span>
-                                <span v-if="website.type === 'static' && website.alias != ''">{{ '/index' }}</span>
-                            </span>
-                        </div>
-                    </el-form-item>
-
-                    <el-form-item prop="enableFtp" v-if="website.type === 'static' || website.type === 'runtime'">
-                        <el-checkbox
-                            @change="random"
-                            v-model="website.enableFtp"
-                            :label="$t('website.enableFtp')"
-                            size="large"
-                        />
-                        <span class="input-help">{{ $t('website.ftpHelper') }}</span>
-                    </el-form-item>
-                    <el-row :gutter="20" v-if="website.enableFtp">
-                        <el-col :span="12">
-                            <el-form-item prop="ftpUser" :label="$t('website.ftpUser')">
-                                <el-input v-model="website.ftpUser" />
+                </div>
+                <div v-if="website.type === 'runtime'">
+                    <el-row :gutter="20">
+                        <el-col :span="8">
+                            <el-form-item :label="$t('commons.table.type')" prop="runtimeType">
+                                <el-select v-model="website.runtimeType" @change="changeRuntimeType()">
+                                    <el-option label="PHP" value="php"></el-option>
+                                    <el-option label="Node.js" value="node"></el-option>
+                                    <el-option label="Java" value="java"></el-option>
+                                    <el-option label="Go" value="go"></el-option>
+                                </el-select>
                             </el-form-item>
                         </el-col>
-                        <el-col :span="12">
-                            <el-form-item prop="ftpPassword" :label="$t('website.ftpPassword')">
-                                <el-input type="password" clearable v-model="website.ftpPassword" show-password>
-                                    <template #append>
-                                        <el-button @click="random">{{ $t('commons.button.random') }}</el-button>
-                                    </template>
-                                </el-input>
+                        <el-col :span="16">
+                            <el-form-item :label="$t('runtime.runtime')" prop="runtimeID">
+                                <el-select
+                                    v-model="website.runtimeID"
+                                    @change="changeRuntime(website.runtimeID)"
+                                    filterable
+                                >
+                                    <el-option
+                                        v-for="run in runtimes"
+                                        :key="run.name"
+                                        :label="run.name + ' [' + $t('runtime.' + run.resource) + ']'"
+                                        :value="run.id"
+                                    >
+                                        <el-row>
+                                            <el-col :span="14">
+                                                <span class="runtimeName">
+                                                    {{ run.name }}
+                                                </span>
+                                            </el-col>
+                                            <el-col :span="10">
+                                                {{ ' [' + $t('runtime.' + run.resource) + ']' }}
+                                            </el-col>
+                                        </el-row>
+                                    </el-option>
+                                </el-select>
                             </el-form-item>
                         </el-col>
                     </el-row>
+                    <div v-if="website.runtimeType === 'php'">
+                        <Params
+                            v-if="runtimeResource === 'appstore'"
+                            :key="paramKey"
+                            v-model:form="website.appinstall.params"
+                            v-model:rules="rules.appinstall.params"
+                            :params="appParams"
+                            :propStart="'appinstall.params.'"
+                        ></Params>
+                        <div v-else>
+                            <el-form-item :label="$t('website.proxyType')" prop="proxyType">
+                                <el-select v-model="website.proxyType">
+                                    <el-option :label="$t('website.tcp')" :value="'tcp'"></el-option>
+                                    <el-option :label="$t('website.unix')" :value="'unix'"></el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item
+                                v-if="website.proxyType === 'tcp'"
+                                :label="$t('commons.table.port')"
+                                prop="port"
+                            >
+                                <el-input v-model.number="website.port"></el-input>
+                            </el-form-item>
+                        </div>
+                    </div>
+                </div>
+                <el-form-item
+                    prop="advanced"
+                    v-if="
+                        (website.type === 'runtime' && website.runtimeType === 'php') ||
+                        (website.type === 'deployment' && website.appType === 'new')
+                    "
+                >
+                    <el-checkbox v-model="website.appinstall.advanced" :label="$t('app.advanced')" size="large" />
+                </el-form-item>
 
-                    <el-form-item
-                        v-if="website.type === 'proxy'"
-                        :label="$t('website.proxyAddress')"
-                        prop="proxyAddress"
-                    >
-                        <el-input v-model="website.proxyAddress" :placeholder="$t('website.proxyHelper')">
-                            <template #prepend>
-                                <el-select v-model="website.proxyProtocol" class="pre-select">
-                                    <el-option label="http" value="http://" />
-                                    <el-option label="https" value="https://" />
-                                    <el-option :label="$t('website.other')" value="" />
+                <div v-if="website.appinstall.advanced">
+                    <el-form-item :label="$t('app.containerName')" prop="containerName">
+                        <el-input
+                            v-model.trim="website.appinstall.containerName"
+                            :placeholder="$t('app.containerNameHelper')"
+                        ></el-input>
+                    </el-form-item>
+                    <el-form-item :label="$t('container.cpuQuota')" prop="appinstall.cpuQuota">
+                        <el-input
+                            type="number"
+                            style="width: 40%"
+                            v-model.number="website.appinstall.cpuQuota"
+                            maxlength="5"
+                        >
+                            <template #append>{{ $t('app.cpuCore') }}</template>
+                        </el-input>
+                        <span class="input-help">{{ $t('container.limitHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item :label="$t('container.memoryLimit')" prop="appinstall.memoryLimit">
+                        <el-input style="width: 40%" v-model.number="website.appinstall.memoryLimit" maxlength="10">
+                            <template #append>
+                                <el-select
+                                    v-model="website.appinstall.memoryUnit"
+                                    placeholder="Select"
+                                    class="pre-select"
+                                >
+                                    <el-option label="KB" value="K" />
+                                    <el-option label="MB" value="M" />
+                                    <el-option label="GB" value="G" />
                                 </el-select>
                             </template>
                         </el-input>
+                        <span class="input-help">{{ $t('container.limitHelper') }}</span>
                     </el-form-item>
-                    <el-form-item :label="$t('website.remark')" prop="remark">
-                        <el-input type="textarea" :rows="3" clearable v-model="website.remark" />
+                    <el-form-item prop="allowPort" v-if="website.type === 'deployment'">
+                        <el-checkbox v-model="website.appinstall.allowPort" :label="$t('app.allowPort')" size="large" />
+                        <span class="input-help">{{ $t('app.allowPortHelper') }}</span>
                     </el-form-item>
-                </el-form>
-            </el-col>
-        </el-row>
+                </div>
+                <el-form-item :label="$t('website.primaryDomain')" prop="primaryDomain">
+                    <el-input
+                        v-model.trim="website.primaryDomain"
+                        @input="changeAlias(website.primaryDomain)"
+                        :placeholder="$t('website.primaryDomainHelper')"
+                    ></el-input>
+                </el-form-item>
+                <el-form-item :label="$t('website.otherDomains')" prop="otherDomains">
+                    <el-input
+                        type="textarea"
+                        :rows="3"
+                        v-model="website.otherDomains"
+                        :placeholder="$t('website.domainHelper')"
+                    ></el-input>
+                </el-form-item>
+                <el-form-item prop="IPV6">
+                    <el-checkbox v-model="website.IPV6" :label="$t('website.ipv6')" size="large" />
+                </el-form-item>
+                <el-form-item :label="$t('website.alias')" prop="alias">
+                    <el-input v-model.trim="website.alias" :placeholder="$t('website.aliasHelper')"></el-input>
+                    <div>
+                        <span class="input-help">
+                            <span>{{ $t('website.staticPath') + staticPath + website.alias }}</span>
+                            <span v-if="website.type === 'static' && website.alias != ''">{{ '/index' }}</span>
+                        </span>
+                    </div>
+                </el-form-item>
+
+                <el-form-item prop="enableFtp" v-if="website.type === 'static' || website.type === 'runtime'">
+                    <el-checkbox
+                        @change="random"
+                        v-model="website.enableFtp"
+                        :label="$t('website.enableFtp')"
+                        size="large"
+                    />
+                    <span class="input-help">{{ $t('website.ftpHelper') }}</span>
+                </el-form-item>
+                <el-row :gutter="20" v-if="website.enableFtp">
+                    <el-col :span="12">
+                        <el-form-item prop="ftpUser" :label="$t('website.ftpUser')">
+                            <el-input v-model="website.ftpUser" />
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item prop="ftpPassword" :label="$t('website.ftpPassword')">
+                            <el-input type="password" clearable v-model="website.ftpPassword" show-password>
+                                <template #append>
+                                    <el-button @click="random">{{ $t('commons.button.random') }}</el-button>
+                                </template>
+                            </el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+
+                <el-form-item v-if="website.type === 'proxy'" :label="$t('website.proxyAddress')" prop="proxyAddress">
+                    <el-input v-model="website.proxyAddress" :placeholder="$t('website.proxyHelper')">
+                        <template #prepend>
+                            <el-select v-model="website.proxyProtocol" class="pre-select">
+                                <el-option label="http" value="http://" />
+                                <el-option label="https" value="https://" />
+                                <el-option :label="$t('website.other')" value="" />
+                            </el-select>
+                        </template>
+                    </el-input>
+                </el-form-item>
+                <el-form-item :label="$t('website.remark')" prop="remark">
+                    <el-input type="textarea" :rows="3" clearable v-model="website.remark" />
+                </el-form-item>
+            </el-form>
+        </div>
         <template #footer>
             <span>
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
@@ -364,11 +346,10 @@
                 {{ $t('runtime.openrestyWarn') }}
             </span>
         </el-card>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup name="CreateWebSite">
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { App } from '@/api/interface/app';
 import { GetApp, GetAppDetail, SearchApp, GetAppInstalled, GetAppDetailByID } from '@/api/modules/app';
 import { CreateWebsite, PreCheck } from '@/api/modules/website';

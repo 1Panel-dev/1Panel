@@ -1,25 +1,18 @@
 <template>
-    <el-drawer :close-on-click-modal="false" :close-on-press-escape="false" v-model="open" size="40%">
-        <template #header>
-            <DrawerHeader :header="$t('website.defaultHtml')" :back="handleClose"></DrawerHeader>
-        </template>
-        <el-row v-loading="loading">
-            <el-col :span="22" :offset="1">
-                <el-select v-model="type" class="w-full" @change="get()">
-                    <el-option :value="'404'" :label="$t('website.website404')"></el-option>
-                    <el-option :value="'domain404'" :label="$t('website.domain404')"></el-option>
-                    <el-option :value="'index'" :label="$t('website.indexHtml')"></el-option>
-                    <el-option :value="'php'" :label="$t('website.indexPHP')"></el-option>
-                    <el-option :value="'stop'" :label="$t('website.stopHtml')"></el-option>
-                </el-select>
-                <div class="mt-1.5">
-                    <el-text v-if="type == '404'" type="info">
-                        {{ $t('website.website404Helper') }}
-                    </el-text>
-                </div>
-                <div ref="htmlRef" class="default-html"></div>
-            </el-col>
-        </el-row>
+    <DrawerPro v-model="open" :header="$t('website.defaultHtml')" :back="handleClose" size="normal">
+        <el-select v-model="type" class="w-full" @change="get()" v-loading="loading">
+            <el-option :value="'404'" :label="$t('website.website404')"></el-option>
+            <el-option :value="'domain404'" :label="$t('website.domain404')"></el-option>
+            <el-option :value="'index'" :label="$t('website.indexHtml')"></el-option>
+            <el-option :value="'php'" :label="$t('website.indexPHP')"></el-option>
+            <el-option :value="'stop'" :label="$t('website.stopHtml')"></el-option>
+        </el-select>
+        <div class="mt-1.5">
+            <el-text v-if="type == '404'" type="info">
+                {{ $t('website.website404Helper') }}
+            </el-text>
+        </div>
+        <div ref="htmlRef" class="default-html"></div>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
@@ -28,10 +21,9 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 <script lang="ts" setup>
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { UpdateDefaultHtml, GetDefaultHtml } from '@/api/modules/website';
 import i18n from '@/lang';
 import { ref } from 'vue';

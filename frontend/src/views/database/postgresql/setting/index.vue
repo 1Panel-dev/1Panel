@@ -1,25 +1,21 @@
 <template>
     <div v-loading="loading">
-        <LayoutContent>
-            <template #title>
-                <back-button name="PostgreSQL" :header="props.database + ' ' + $t('commons.button.set')">
-                    <template #buttons>
-                        <el-button type="primary" :plain="activeName !== 'conf'" @click="jumpToConf">
-                            {{ $t('database.confChange') }}
-                        </el-button>
-                        <el-button type="primary" :plain="activeName !== 'port'" @click="activeName = 'port'">
-                            {{ $t('commons.table.port') }}
-                        </el-button>
-                        <el-button
-                            type="primary"
-                            :disabled="postgresqlStatus !== 'Running'"
-                            :plain="activeName !== 'log'"
-                            @click="activeName = 'log'"
-                        >
-                            {{ $t('database.log') }}
-                        </el-button>
-                    </template>
-                </back-button>
+        <LayoutContent :title="props.database + ' ' + $t('commons.button.set')" backName="PostgreSQL">
+            <template #leftToolBar>
+                <el-button type="primary" :plain="activeName !== 'conf'" @click="jumpToConf">
+                    {{ $t('database.confChange') }}
+                </el-button>
+                <el-button type="primary" :plain="activeName !== 'port'" @click="activeName = 'port'">
+                    {{ $t('commons.table.port') }}
+                </el-button>
+                <el-button
+                    type="primary"
+                    :disabled="postgresqlStatus !== 'Running'"
+                    :plain="activeName !== 'log'"
+                    @click="activeName = 'log'"
+                >
+                    {{ $t('database.log') }}
+                </el-button>
             </template>
 
             <template #app>
