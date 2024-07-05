@@ -344,6 +344,21 @@ const changeLanguage = () => {
 
 const changeTheme = () => {
     monaco.editor.setTheme(config.theme);
+    const themes = {
+        vs: 'monaco-editor-tree-light',
+        'vs-dark': 'monaco-editor-tree-dark',
+        'hc-black': 'monaco-editor-tree-dark',
+    };
+
+    if (treeRef.value) {
+        Object.values(themes).forEach((themeClass) => {
+            treeRef.value.$el.classList.remove(themeClass);
+        });
+        if (themes[config.theme]) {
+            treeRef.value.$el.classList.add(themes[config.theme]);
+        }
+    }
+
     localStorage.setItem(codeThemeKey, config.theme);
 };
 
@@ -455,6 +470,7 @@ const getDirectoryPath = (filePath: string) => {
 
 const onOpen = () => {
     initEditor();
+    changeTheme();
     search(directoryPath.value).then((res) => {
         handleSearchResult(res);
     });
