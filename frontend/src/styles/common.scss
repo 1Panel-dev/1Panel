@@ -442,3 +442,15 @@ html {
 .el-tag {
     cursor: pointer;
 }
+
+.monaco-editor-tree-light .el-tree-node__content:hover {
+    background-color: #e5eefd;
+}
+
+.monaco-editor-tree-dark .el-tree-node__content:hover {
+    background-color: #111417;
+}
+
+.monaco-editor-tree-dark .el-tree-node.is-current > .el-tree-node__content {
+    background-color: #111417;
+}
