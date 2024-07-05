@@ -56,7 +56,6 @@ export async function loadProductProFromDB() {
     if (!res.data) {
         resetXSetting();
         globalStore.isProductPro = false;
-        return;
     } else {
         globalStore.isProductPro =
             res.data.status === 'Enable' || res.data.status === 'Lost01' || res.data.status === 'Lost02';
