@@ -68,6 +68,7 @@ const message = {
             notSave: 'Not Save',
             createNewFolder: 'Create new folder',
             createNewFile: 'Create new file',
+            helpDoc: 'Help Document',
         },
         search: {
             timeStart: 'Time start',
@@ -1077,7 +1078,7 @@ const message = {
                 'The minimum recommended configuration for ClamAV is: 3 GiB of RAM or more, single-core CPU with 2.0 GHz or higher, and at least 5 GiB of available hard disk space.',
             noClam: 'ClamAV service not detected, please refer to the official documentation for installation!',
             notStart: 'ClamAV service is currently not running, please start it first!',
-            removeResult: 'Delete Report Files',
+            removeRecord: 'Delete Report Files',
             removeResultHelper: 'Delete report files generated during task execution to free up storage space.',
             removeInfected: 'Delete Virus Files',
             removeInfectedHelper:

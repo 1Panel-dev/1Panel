@@ -102,13 +102,13 @@
                         </el-col>
                         <el-col :span="17">
                             <el-form label-position="top" :v-key="refresh">
-                                <el-row v-if="currentRecord?.status === 'Done'">
+                                <el-row>
                                     <el-form-item class="descriptionWide">
                                         <template #label>
                                             <span class="status-label">{{ $t('toolbox.clam.scanTime') }}</span>
                                         </template>
                                         <span class="status-count">
-                                            {{ currentRecord?.scanTime }}
+                                            {{ currentRecord?.status === 'Done' ? currentRecord?.scanTime : '-' }}
                                         </span>
                                     </el-form-item>
                                     <el-form-item class="descriptionWide">
@@ -116,11 +116,15 @@
                                             <span class="status-label">{{ $t('toolbox.clam.infectedFiles') }}</span>
                                         </template>
                                         <span class="status-count" v-if="!hasInfectedDir()">
-                                            {{ currentRecord?.infectedFiles }}
+                                            {{ currentRecord?.status === 'Done' ? currentRecord?.infectedFiles : '-' }}
                                         </span>
                                         <div class="count" v-else>
                                             <span @click="toFolder(currentRecord?.name)">
-                                                {{ currentRecord?.infectedFiles }}
+                                                {{
+                                                    currentRecord?.status === 'Done'
+                                                        ? currentRecord?.infectedFiles
+                                                        : '-'
+                                                }}
                                             </span>
                                         </div>
                                     </el-form-item>

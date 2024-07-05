@@ -168,7 +168,9 @@ func (u *ClamService) Delete(req dto.ClamDelete) error {
 		if req.RemoveInfected {
 			_ = os.RemoveAll(path.Join(clam.InfectedDir, "1panel-infected", clam.Name))
 		}
-		return clamRepo.Delete(commonRepo.WithByID(id))
+		if err := clamRepo.Delete(commonRepo.WithByID(id)); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -204,8 +206,11 @@ func (u *ClamService) HandleOnce(req dto.OperateByID) error {
 				_ = os.MkdirAll(dir, os.ModePerm)
 			}
 		}
-		cmd := exec.Command("clamdscan", "--fdpass", strategy, clam.Path, "-l", logFile)
-		_, _ = cmd.CombinedOutput()
+		global.LOG.Debugf("clamdscan --fdpass %s %s -l %s", strategy, clam.Path, logFile)
+		stdout, err := cmd.Execf("clamdscan --fdpass %s %s -l %s", strategy, clam.Path, logFile)
+		if err != nil {
+			global.LOG.Errorf("clamdscan failed, stdout: %v, err: %v", string(stdout), err)
+		}
 	}()
 	return nil
 }
@@ -308,7 +313,7 @@ func (u *ClamService) LoadFile(req dto.OperationWithName) (string, error) {
 		if u.serviceName == clamServiceNameUbuntu {
 			filePath = "/var/log/clamav/freshclam.log"
 		} else {
-			filePath = "/var/log/clamav/freshclam.log"
+			filePath = "/var/log/freshclam.log"
 		}
 	default:
 		return "", fmt.Errorf("not support such type")

@@ -67,6 +67,7 @@ const message = {
             notSave: '不保存',
             createNewFolder: '新建資料夾',
             createNewFile: '新建檔案',
+            helpDoc: '幫助文档',
         },
         search: {
             timeStart: '開始時間',
@@ -1019,7 +1020,7 @@ const message = {
                 'ClamAV 的最低建議配置為：3 GiB 以上的 RAM，2.0 GHz 以上的單核 CPU，以及至少 5 GiB 的可用硬盤空間。',
             noClam: '未檢測到 ClamAV 服務，請參考官方文檔進行安裝！',
             notStart: '當前未 ClamAV 服務，請先開啟！',
-            removeResult: '刪除報告文件',
+            removeRecord: '刪除報告文件',
             removeResultHelper: '刪除任務執行過程中生成的報告文件，以清理存儲空間。',
             removeInfected: '刪除病毒文件',
             removeInfectedHelper: '刪除任務檢測到的病毒文件，以確保伺服器的安全和正常運行。',
