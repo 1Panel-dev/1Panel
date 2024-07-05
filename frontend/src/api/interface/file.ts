@@ -33,6 +33,7 @@ export namespace File {
         containSub?: boolean;
         sortBy?: string;
         sortOrder?: string;
+        isDetail?: boolean;
     }
 
     export interface SearchUploadInfo extends ReqPage {

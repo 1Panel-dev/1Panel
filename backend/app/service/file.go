@@ -288,8 +288,9 @@ func (f *FileService) DeCompress(c request.FileDeCompress) error {
 
 func (f *FileService) GetContent(op request.FileContentReq) (response.FileInfo, error) {
 	info, err := files.NewFileInfo(files.FileOption{
-		Path:   op.Path,
-		Expand: true,
+		Path:     op.Path,
+		Expand:   true,
+		IsDetail: op.IsDetail,
 	})
 	if err != nil {
 		return response.FileInfo{}, err
