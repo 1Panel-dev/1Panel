@@ -1,58 +1,46 @@
 <template>
-    <div>
-        <el-drawer v-model="drawerVisible" size="30%" :close-on-click-modal="false" :close-on-press-escape="false">
-            <template #header>
-                <DrawerHeader :header="$t('setting.importSnapshot')" :back="handleClose" />
-            </template>
-            <el-form ref="formRef" label-position="top" :model="form" :rules="rules" v-loading="loading">
-                <el-row type="flex" justify="center">
-                    <el-col :span="22">
-                        <el-form-item :label="$t('setting.backupAccount')" prop="from">
-                            <el-select style="width: 100%" v-model="form.from" @change="loadFiles" clearable>
-                                <el-option
-                                    v-for="item in backupOptions"
-                                    :key="item.label"
-                                    :value="item.value"
-                                    :label="item.label"
-                                />
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item :label="$t('commons.table.name')" prop="names">
-                            <el-select style="width: 100%" v-model="form.names" multiple clearable>
-                                <el-option
-                                    :disabled="checkDisable(item)"
-                                    v-for="item in fileNames"
-                                    :key="item"
-                                    :value="item"
-                                    :label="item"
-                                />
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item :label="$t('commons.table.description')" prop="description">
-                            <el-input type="textarea" clearable v-model="form.description" />
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button :disabled="loading" @click="drawerVisible = false">
-                        {{ $t('commons.button.cancel') }}
-                    </el-button>
-                    <el-button :disabled="loading" type="primary" @click="submitImport(formRef)">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </span>
-            </template>
-        </el-drawer>
-    </div>
+    <DrawerPro v-model="drawerVisible" :header="$t('setting.importSnapshot')" :back="handleClose" size="small">
+        <el-form ref="formRef" label-position="top" :model="form" :rules="rules" v-loading="loading">
+            <el-form-item :label="$t('setting.backupAccount')" prop="from">
+                <el-select v-model="form.from" @change="loadFiles" clearable>
+                    <el-option
+                        v-for="item in backupOptions"
+                        :key="item.label"
+                        :value="item.value"
+                        :label="item.label"
+                    />
+                </el-select>
+            </el-form-item>
+            <el-form-item :label="$t('commons.table.name')" prop="names">
+                <el-select v-model="form.names" multiple clearable>
+                    <el-option
+                        :disabled="checkDisable(item)"
+                        v-for="item in fileNames"
+                        :key="item"
+                        :value="item"
+                        :label="item"
+                    />
+                </el-select>
+            </el-form-item>
+            <el-form-item :label="$t('commons.table.description')" prop="description">
+                <el-input type="textarea" clearable v-model="form.description" />
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <el-button :disabled="loading" @click="drawerVisible = false">
+                {{ $t('commons.button.cancel') }}
+            </el-button>
+            <el-button :disabled="loading" type="primary" @click="submitImport(formRef)">
+                {{ $t('commons.button.confirm') }}
+            </el-button>
+        </template>
+    </DrawerPro>
 </template>
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
 import { FormInstance } from 'element-plus';
 import i18n from '@/lang';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { snapshotImport } from '@/api/modules/setting';
 import { getBackupList, getFilesFromBackup } from '@/api/modules/setting';
 import { Rules } from '@/global/form-rules';

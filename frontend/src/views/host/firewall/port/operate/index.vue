@@ -1,66 +1,47 @@
 <template>
-    <el-drawer
-        v-model="drawerVisible"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="50%"
-    >
-        <template #header>
-            <DrawerHeader :header="title" :back="handleClose" />
-        </template>
-        <div v-loading="loading">
-            <el-form ref="formRef" label-position="top" :model="dialogData.rowData" :rules="rules">
-                <el-row type="flex" justify="center">
-                    <el-col :span="22">
-                        <el-form-item :label="$t('commons.table.protocol')" prop="protocol">
-                            <el-select style="width: 100%" v-model="dialogData.rowData!.protocol">
-                                <el-option value="tcp" label="tcp" />
-                                <el-option value="udp" label="udp" />
-                                <el-option value="tcp/udp" label="tcp/udp" />
-                            </el-select>
-                        </el-form-item>
+    <DrawerPro v-model="drawerVisible" :header="title" :back="handleClose" size="large">
+        <el-form ref="formRef" label-position="top" :model="dialogData.rowData" :rules="rules" v-loading="loading">
+            <el-form-item :label="$t('commons.table.protocol')" prop="protocol">
+                <el-select class="w-full" v-model="dialogData.rowData!.protocol">
+                    <el-option value="tcp" label="tcp" />
+                    <el-option value="udp" label="udp" />
+                    <el-option value="tcp/udp" label="tcp/udp" />
+                </el-select>
+            </el-form-item>
 
-                        <el-form-item :label="$t('commons.table.port')" prop="port">
-                            <el-input
-                                :disabled="dialogData.title === 'edit'"
-                                clearable
-                                v-model.trim="dialogData.rowData!.port"
-                            />
-                            <span class="input-help">{{ $t('firewall.portHelper1') }}</span>
-                            <span class="input-help">{{ $t('firewall.portHelper2') }}</span>
-                        </el-form-item>
+            <el-form-item :label="$t('commons.table.port')" prop="port">
+                <el-input :disabled="dialogData.title === 'edit'" clearable v-model.trim="dialogData.rowData!.port" />
+                <span class="input-help">{{ $t('firewall.portHelper1') }}</span>
+                <span class="input-help">{{ $t('firewall.portHelper2') }}</span>
+            </el-form-item>
 
-                        <el-form-item :label="$t('firewall.source')" prop="source">
-                            <el-radio-group v-model="dialogData.rowData!.source">
-                                <el-radio value="anyWhere">{{ $t('firewall.anyWhere') }}</el-radio>
-                                <el-radio value="address">{{ $t('firewall.address') }}</el-radio>
-                            </el-radio-group>
-                        </el-form-item>
+            <el-form-item :label="$t('firewall.source')" prop="source">
+                <el-radio-group v-model="dialogData.rowData!.source">
+                    <el-radio value="anyWhere">{{ $t('firewall.anyWhere') }}</el-radio>
+                    <el-radio value="address">{{ $t('firewall.address') }}</el-radio>
+                </el-radio-group>
+            </el-form-item>
 
-                        <el-form-item
-                            :label="$t('firewall.address')"
-                            v-if="dialogData.rowData!.source === 'address'"
-                            prop="address"
-                        >
-                            <el-input v-model.trim="dialogData.rowData!.address" />
-                            <span class="input-help">{{ $t('firewall.addressHelper1') }}</span>
-                            <span class="input-help">{{ $t('firewall.addressHelper2') }}</span>
-                        </el-form-item>
+            <el-form-item
+                :label="$t('firewall.address')"
+                v-if="dialogData.rowData!.source === 'address'"
+                prop="address"
+            >
+                <el-input v-model.trim="dialogData.rowData!.address" />
+                <span class="input-help">{{ $t('firewall.addressHelper1') }}</span>
+                <span class="input-help">{{ $t('firewall.addressHelper2') }}</span>
+            </el-form-item>
 
-                        <el-form-item :label="$t('firewall.strategy')" prop="strategy">
-                            <el-radio-group v-model="dialogData.rowData!.strategy">
-                                <el-radio value="accept">{{ $t('firewall.accept') }}</el-radio>
-                                <el-radio value="drop">{{ $t('firewall.drop') }}</el-radio>
-                            </el-radio-group>
-                        </el-form-item>
-                        <el-form-item :label="$t('commons.table.description')" prop="description">
-                            <el-input clearable v-model.trim="dialogData.rowData!.description" />
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-            </el-form>
-        </div>
+            <el-form-item :label="$t('firewall.strategy')" prop="strategy">
+                <el-radio-group v-model="dialogData.rowData!.strategy">
+                    <el-radio value="accept">{{ $t('firewall.accept') }}</el-radio>
+                    <el-radio value="drop">{{ $t('firewall.drop') }}</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item :label="$t('commons.table.description')" prop="description">
+                <el-input clearable v-model.trim="dialogData.rowData!.description" />
+            </el-form-item>
+        </el-form>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
@@ -69,7 +50,7 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -77,7 +58,6 @@ import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { Host } from '@/api/interface/host';
 import { operatePortRule, updatePortRule } from '@/api/modules/host';

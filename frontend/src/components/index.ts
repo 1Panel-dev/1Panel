@@ -10,6 +10,7 @@ import Tooltip from '@/components/tooltip/index.vue';
 import CopyButton from '@/components/copy-button/index.vue';
 import MsgInfo from '@/components/msg-info/index.vue';
 import MainDiv from '@/components/main-div/index.vue';
+import DrawerPro from '@/components/drawer-pro/index.vue';
 export default {
     install(app: App) {
         app.component(LayoutContent.name, LayoutContent);
@@ -23,5 +24,6 @@ export default {
         app.component(TableSetting.name, TableSetting);
         app.component(MsgInfo.name, MsgInfo);
         app.component(MainDiv.name, MainDiv);
+        app.component(DrawerPro.name, DrawerPro);
     },
 };

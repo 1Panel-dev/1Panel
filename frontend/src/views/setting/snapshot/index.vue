@@ -116,10 +116,7 @@
         </LayoutContent>
         <RecoverStatus ref="recoverStatusRef" @search="search()"></RecoverStatus>
         <SnapshotImport ref="importRef" @search="search()" />
-        <el-drawer v-model="drawerVisible" size="50%" :close-on-click-modal="false" :close-on-press-escape="false">
-            <template #header>
-                <DrawerHeader :header="$t('setting.createSnapshot')" :back="handleClose" />
-            </template>
+        <DrawerPro v-model="drawerVisible" :header="$t('setting.createSnapshot')" :back="handleClose" size="large">
             <el-form
                 v-loading="loading"
                 label-position="top"
@@ -128,48 +125,42 @@
                 :model="snapInfo"
                 :rules="rules"
             >
-                <el-row type="flex" justify="center">
-                    <el-col :span="22">
-                        <el-form-item :label="$t('setting.backupAccount')" prop="fromAccounts">
-                            <el-select multiple @change="changeAccount" v-model="snapInfo.fromAccounts" clearable>
-                                <el-option
-                                    v-for="item in backupOptions"
-                                    :key="item.label"
-                                    :value="item.value"
-                                    :label="item.label"
-                                />
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item :label="$t('cronjob.default_download_path')" prop="defaultDownload">
-                            <el-select v-model="snapInfo.defaultDownload" clearable>
-                                <el-option
-                                    v-for="item in accountOptions"
-                                    :key="item.label"
-                                    :value="item.value"
-                                    :label="item.label"
-                                />
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item :label="$t('setting.compressPassword')" prop="secret">
-                            <el-input v-model="snapInfo.secret"></el-input>
-                        </el-form-item>
-                        <el-form-item :label="$t('commons.table.description')" prop="description">
-                            <el-input type="textarea" clearable v-model="snapInfo.description" />
-                        </el-form-item>
-                    </el-col>
-                </el-row>
+                <el-form-item :label="$t('setting.backupAccount')" prop="fromAccounts">
+                    <el-select multiple @change="changeAccount" v-model="snapInfo.fromAccounts" clearable>
+                        <el-option
+                            v-for="item in backupOptions"
+                            :key="item.label"
+                            :value="item.value"
+                            :label="item.label"
+                        />
+                    </el-select>
+                </el-form-item>
+                <el-form-item :label="$t('cronjob.default_download_path')" prop="defaultDownload">
+                    <el-select v-model="snapInfo.defaultDownload" clearable>
+                        <el-option
+                            v-for="item in accountOptions"
+                            :key="item.label"
+                            :value="item.value"
+                            :label="item.label"
+                        />
+                    </el-select>
+                </el-form-item>
+                <el-form-item :label="$t('setting.compressPassword')" prop="secret">
+                    <el-input v-model="snapInfo.secret"></el-input>
+                </el-form-item>
+                <el-form-item :label="$t('commons.table.description')" prop="description">
+                    <el-input type="textarea" clearable v-model="snapInfo.description" />
+                </el-form-item>
             </el-form>
             <template #footer>
-                <span class="dialog-footer">
-                    <el-button :disabled="loading" @click="drawerVisible = false">
-                        {{ $t('commons.button.cancel') }}
-                    </el-button>
-                    <el-button :disabled="loading" type="primary" @click="submitAddSnapshot(snapRef)">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </span>
+                <el-button :disabled="loading" @click="drawerVisible = false">
+                    {{ $t('commons.button.cancel') }}
+                </el-button>
+                <el-button :disabled="loading" type="primary" @click="submitAddSnapshot(snapRef)">
+                    {{ $t('commons.button.confirm') }}
+                </el-button>
             </template>
-        </el-drawer>
+        </DrawerPro>
 
         <OpDialog ref="opRef" @search="search" @submit="onSubmitDelete()">
             <template #content>
@@ -189,7 +180,6 @@
 </template>
 
 <script setup lang="ts">
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { snapshotCreate, searchSnapshotPage, snapshotDelete, updateSnapshotDescription } from '@/api/modules/setting';
 import { onMounted, reactive, ref } from 'vue';
 import { computeSize, dateFormat } from '@/utils/util';

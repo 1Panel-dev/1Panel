@@ -1,21 +1,12 @@
 <template>
-    <div>
-        <el-drawer
-            v-model="backupVisible"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            size="50%"
-        >
-            <template #header>
-                <DrawerHeader
-                    v-if="cronjob"
-                    :header="$t('commons.button.backup')"
-                    :resource="cronjob"
-                    :back="handleClose"
-                />
-                <DrawerHeader v-else :header="$t('commons.button.backup')" :resource="cronjob" :back="handleClose" />
-            </template>
+    <DrawerPro
+        v-model="backupVisible"
+        :header="$t('commons.button.backup')"
+        :resource="cronjob"
+        :back="handleClose"
+        size="large"
+    >
+        <template #content>
             <ComplexTable
                 v-loading="loading"
                 :pagination-config="paginationConfig"
@@ -48,15 +39,14 @@
 
                 <fu-table-operations width="130px" :buttons="buttons" :label="$t('commons.table.operate')" fix />
             </ComplexTable>
-        </el-drawer>
-    </div>
+        </template>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import { computeSize, dateFormat, downloadFile } from '@/utils/util';
 import i18n from '@/lang';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { downloadBackupRecord, searchBackupRecordsByCronjob } from '@/api/modules/setting';
 import { Backup } from '@/api/interface/backup';
 

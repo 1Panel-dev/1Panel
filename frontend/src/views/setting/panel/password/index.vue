@@ -1,58 +1,36 @@
 <template>
-    <div v-loading="loading">
-        <el-drawer
-            v-model="passwordVisible"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            size="30%"
-        >
-            <template #header>
-                <DrawerHeader :header="$t('setting.changePassword')" :back="handleClose" />
-            </template>
-            <el-form ref="passFormRef" label-position="top" :model="passForm" :rules="passRules">
-                <el-row type="flex" justify="center">
-                    <el-col :span="22">
-                        <el-form-item :label="$t('setting.oldPassword')" prop="oldPassword">
-                            <el-input type="password" show-password clearable v-model.trim="passForm.oldPassword" />
-                        </el-form-item>
-                        <el-form-item
-                            v-if="complexityVerification === 'disable'"
-                            :label="$t('setting.newPassword')"
-                            prop="newPassword"
-                        >
-                            <el-input type="password" show-password clearable v-model.trim="passForm.newPassword" />
-                        </el-form-item>
-                        <el-form-item
-                            v-if="complexityVerification === 'enable'"
-                            :label="$t('setting.newPassword')"
-                            prop="newPasswordComplexity"
-                        >
-                            <el-input
-                                type="password"
-                                show-password
-                                clearable
-                                v-model.trim="passForm.newPasswordComplexity"
-                            />
-                        </el-form-item>
-                        <el-form-item :label="$t('setting.retryPassword')" prop="retryPassword">
-                            <el-input type="password" show-password clearable v-model.trim="passForm.retryPassword" />
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button :disabled="loading" @click="passwordVisible = false">
-                        {{ $t('commons.button.cancel') }}
-                    </el-button>
-                    <el-button :disabled="loading" type="primary" @click="submitChangePassword(passFormRef)">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </span>
-            </template>
-        </el-drawer>
-    </div>
+    <DrawerPro v-model="passwordVisible" :header="$t('setting.changePassword')" :back="handleClose" size="small">
+        <el-form ref="passFormRef" label-position="top" :model="passForm" :rules="passRules" v-loading="loading">
+            <el-form-item :label="$t('setting.oldPassword')" prop="oldPassword">
+                <el-input type="password" show-password clearable v-model.trim="passForm.oldPassword" />
+            </el-form-item>
+            <el-form-item
+                v-if="complexityVerification === 'disable'"
+                :label="$t('setting.newPassword')"
+                prop="newPassword"
+            >
+                <el-input type="password" show-password clearable v-model.trim="passForm.newPassword" />
+            </el-form-item>
+            <el-form-item
+                v-if="complexityVerification === 'enable'"
+                :label="$t('setting.newPassword')"
+                prop="newPasswordComplexity"
+            >
+                <el-input type="password" show-password clearable v-model.trim="passForm.newPasswordComplexity" />
+            </el-form-item>
+            <el-form-item :label="$t('setting.retryPassword')" prop="retryPassword">
+                <el-input type="password" show-password clearable v-model.trim="passForm.retryPassword" />
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <el-button :disabled="loading" @click="passwordVisible = false">
+                {{ $t('commons.button.cancel') }}
+            </el-button>
+            <el-button :disabled="loading" type="primary" @click="submitChangePassword(passFormRef)">
+                {{ $t('commons.button.confirm') }}
+            </el-button>
+        </template>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -64,7 +42,6 @@ import { FormInstance } from 'element-plus';
 import { GlobalStore } from '@/store';
 import { reactive, ref } from 'vue';
 import { updatePassword } from '@/api/modules/setting';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { logOutApi } from '@/api/modules/auth';
 
 const globalStore = GlobalStore();

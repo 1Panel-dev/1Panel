@@ -1,33 +1,28 @@
 <template>
-    <el-drawer :close-on-click-modal="false" :close-on-press-escape="false" v-model="open" size="30%">
-        <template #header>
-            <DrawerHeader :header="$t('commons.button.init')" :back="handleClose" />
-        </template>
-        <el-row v-loading="loading">
-            <el-col :span="22" :offset="1">
-                <el-form ref="initForm" label-position="top" :model="initModel" label-width="100px" :rules="rules">
-                    <el-form-item :label="$t('tool.supervisor.primaryConfig')" prop="primaryConfig">
-                        <el-input v-model.trim="initModel.primaryConfig"></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('tool.supervisor.serviceName')" prop="serviceName">
-                        <el-input v-model.trim="initModel.serviceName"></el-input>
-                        <span class="input-help">{{ $t('tool.supervisor.serviceNameHelper') }}</span>
-                    </el-form-item>
-                    <el-alert
-                        :title="$t('tool.supervisor.initWarn')"
-                        class="common-prompt"
-                        :closable="false"
-                        type="error"
-                    />
-                    <el-alert
-                        :title="$t('tool.supervisor.restartHelper')"
-                        class="common-prompt"
-                        :closable="false"
-                        type="error"
-                    />
-                </el-form>
-            </el-col>
-        </el-row>
+    <DrawerPro v-model="open" :header="$t('commons.button.init')" :back="handleClose" size="small">
+        <el-form
+            ref="initForm"
+            label-position="top"
+            :model="initModel"
+            label-width="100px"
+            :rules="rules"
+            v-loading="loading"
+        >
+            <el-form-item :label="$t('tool.supervisor.primaryConfig')" prop="primaryConfig">
+                <el-input v-model.trim="initModel.primaryConfig"></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('tool.supervisor.serviceName')" prop="serviceName">
+                <el-input v-model.trim="initModel.serviceName"></el-input>
+                <span class="input-help">{{ $t('tool.supervisor.serviceNameHelper') }}</span>
+            </el-form-item>
+            <el-alert :title="$t('tool.supervisor.initWarn')" class="common-prompt" :closable="false" type="error" />
+            <el-alert
+                :title="$t('tool.supervisor.restartHelper')"
+                class="common-prompt"
+                :closable="false"
+                type="error"
+            />
+        </el-form>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose()" :disabled="loading">
@@ -39,7 +34,7 @@
             </span>
         </template>
         <ConfirmDialog ref="confirmDialogRef" @confirm="submit(initForm)"></ConfirmDialog>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>

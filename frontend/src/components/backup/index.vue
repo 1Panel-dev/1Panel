@@ -1,22 +1,12 @@
 <template>
-    <div>
-        <el-drawer
-            v-model="backupVisible"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            size="50%"
-        >
-            <template #header>
-                <DrawerHeader
-                    v-if="detailName"
-                    :header="$t('commons.button.backup')"
-                    :resource="name + '(' + detailName + ')'"
-                    :back="handleClose"
-                />
-                <DrawerHeader v-else :header="$t('commons.button.backup')" :resource="name" :back="handleClose" />
-            </template>
-
+    <DrawerPro
+        v-model="backupVisible"
+        :header="$t('commons.button.backup')"
+        :resource="detailName ? name + ' [' + detailName + ']' : name"
+        :back="handleClose"
+        size="large"
+    >
+        <template #content>
             <div class="mb-5" v-if="type === 'app'">
                 <el-alert :closable="false" type="warning">
                     <div class="mt-2 text-xs">
@@ -70,11 +60,9 @@
 
                 <fu-table-operations width="230px" :buttons="buttons" :label="$t('commons.table.operate')" fix />
             </ComplexTable>
-        </el-drawer>
-
-        <OpDialog ref="opRef" @search="search" />
-    </div>
-
+        </template>
+    </DrawerPro>
+    <OpDialog ref="opRef" @search="search" />
     <AppBackUp ref="backupRef" @close="search" />
     <AppRecover ref="recoverRef" />
 </template>
@@ -84,7 +72,6 @@ import { reactive, ref } from 'vue';
 import { computeSize, dateFormat, downloadFile } from '@/utils/util';
 import { getBackupList } from '@/api/modules/setting';
 import i18n from '@/lang';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { deleteBackupRecord, downloadBackupRecord, searchBackupRecords } from '@/api/modules/setting';
 import { Backup } from '@/api/interface/backup';
 import router from '@/routers';

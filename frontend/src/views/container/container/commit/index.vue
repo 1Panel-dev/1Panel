@@ -1,43 +1,36 @@
 <template>
-    <el-drawer
+    <DrawerPro
         v-model="drawerVisible"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="50%"
+        :header="$t('container.makeImage')"
+        :back="handleClose"
+        :resource="form.containerName"
+        size="large"
     >
-        <template #header>
-            <DrawerHeader :header="$t('container.makeImage')" :resource="form.containerName" :back="handleClose" />
-        </template>
-        <el-row v-loading="loading">
-            <el-col :span="22" :offset="1">
-                <el-form @submit.prevent ref="formRef" :model="form" label-position="top">
-                    <el-form-item prop="newImageName" :rules="Rules.imageName">
-                        <template #label>
-                            {{ $t('container.newImageName') }}
-                        </template>
-                        <el-input v-model="form.newImageName" />
-                    </el-form-item>
-                    <el-form-item prop="comment">
-                        <template #label>
-                            {{ $t('container.commitMessage') }}
-                        </template>
-                        <el-input v-model="form.comment" />
-                    </el-form-item>
-                    <el-form-item prop="author">
-                        <template #label>
-                            {{ $t('container.author') }}
-                        </template>
-                        <el-input v-model="form.author" />
-                    </el-form-item>
-                    <el-form-item prop="pause">
-                        <el-checkbox v-model="form.pause">
-                            {{ $t('container.ifPause') }}
-                        </el-checkbox>
-                    </el-form-item>
-                </el-form>
-            </el-col>
-        </el-row>
+        <el-form @submit.prevent ref="formRef" :model="form" label-position="top" v-loading="loading">
+            <el-form-item prop="newImageName" :rules="Rules.imageName">
+                <template #label>
+                    {{ $t('container.newImageName') }}
+                </template>
+                <el-input v-model="form.newImageName" />
+            </el-form-item>
+            <el-form-item prop="comment">
+                <template #label>
+                    {{ $t('container.commitMessage') }}
+                </template>
+                <el-input v-model="form.comment" />
+            </el-form-item>
+            <el-form-item prop="author">
+                <template #label>
+                    {{ $t('container.author') }}
+                </template>
+                <el-input v-model="form.author" />
+            </el-form-item>
+            <el-form-item prop="pause">
+                <el-checkbox v-model="form.pause">
+                    {{ $t('container.ifPause') }}
+                </el-checkbox>
+            </el-form-item>
+        </el-form>
         <template #footer>
             <span class="dialog-footer">
                 <el-button :disabled="loading" @click="drawerVisible = false">
@@ -48,12 +41,11 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';

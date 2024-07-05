@@ -1,120 +1,95 @@
 <template>
-    <el-drawer
+    <DrawerPro
         v-model="drawerVisible"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="50%"
+        :header="title"
+        :back="handleClose"
+        :resource="dialogData.title === 'create' ? '' : dialogData.rowData?.name"
+        size="large"
     >
-        <template #header>
-            <DrawerHeader
-                :hideResource="dialogData.title === 'create'"
-                :header="title"
-                :resource="dialogData.rowData?.name"
-                :back="handleClose"
-            />
-        </template>
         <el-form ref="formRef" v-loading="loading" label-position="top" :model="dialogData.rowData" :rules="rules">
-            <el-row type="flex" justify="center">
-                <el-col :span="22">
-                    <el-form-item :label="$t('commons.table.name')" prop="name">
-                        <el-input
-                            v-if="dialogData.title === 'create'"
-                            clearable
-                            v-model.trim="dialogData.rowData!.name"
-                        />
-                        <el-tag v-else>{{ dialogData.rowData!.name }}</el-tag>
-                    </el-form-item>
-                    <el-form-item :label="$t('commons.table.type')" prop="type">
-                        <el-radio-group v-model="dialogData.rowData!.type" @change="changeType">
-                            <el-radio-button value="mysql">MySQL</el-radio-button>
-                            <el-radio-button value="mariadb">MariaDB</el-radio-button>
-                        </el-radio-group>
-                    </el-form-item>
-                    <el-form-item :label="$t('database.version')" prop="version">
-                        <el-radio-group v-model="dialogData.rowData!.version" @change="isOK = false">
-                            <div v-if="dialogData.rowData!.type === 'mysql'">
-                                <el-radio label="8.x" value="8.x" />
-                                <el-radio label="5.7" value="5.7" />
-                                <el-radio label="5.6" value="5.6" />
-                            </div>
-                            <div v-else>
-                                <el-radio label="10.x" value="10.x" />
-                                <el-radio label="11.x" value="11.x" />
-                            </div>
-                        </el-radio-group>
-                    </el-form-item>
-                    <el-form-item :label="$t('database.address')" prop="address">
-                        <el-input @change="isOK = false" clearable v-model.trim="dialogData.rowData!.address" />
-                    </el-form-item>
-                    <el-form-item :label="$t('commons.table.port')" prop="port">
-                        <el-input @change="isOK = false" clearable v-model.number="dialogData.rowData!.port" />
-                    </el-form-item>
-                    <el-form-item :label="$t('commons.login.username')" prop="username">
-                        <el-input @change="isOK = false" clearable v-model.trim="dialogData.rowData!.username" />
-                        <span class="input-help">{{ $t('database.userHelper') }}</span>
-                    </el-form-item>
-                    <el-form-item :label="$t('commons.login.password')" prop="password">
-                        <el-input
-                            @change="isOK = false"
-                            type="password"
-                            clearable
-                            show-password
-                            v-model.trim="dialogData.rowData!.password"
-                        />
-                    </el-form-item>
-                    <el-form-item>
-                        <el-checkbox
-                            @change="isOK = false"
-                            v-model="dialogData.rowData!.ssl"
-                            :label="$t('database.ssl')"
-                        />
-                    </el-form-item>
-                    <div v-if="dialogData.rowData!.ssl">
-                        <el-form-item>
-                            <el-checkbox
-                                @change="isOK = false"
-                                v-model="dialogData.rowData!.hasCA"
-                                :label="$t('database.hasCA')"
-                            />
-                        </el-form-item>
-                        <el-form-item>
-                            <el-checkbox
-                                @change="isOK = false"
-                                v-model="dialogData.rowData!.skipVerify"
-                                :label="$t('database.skipVerify')"
-                            />
-                        </el-form-item>
-                        <el-form-item :label="$t('database.clientKey')" prop="clientKey">
-                            <el-input
-                                type="textarea"
-                                @change="isOK = false"
-                                clearable
-                                v-model="dialogData.rowData!.clientKey"
-                            />
-                        </el-form-item>
-                        <el-form-item :label="$t('database.clientCert')" prop="clientCert">
-                            <el-input
-                                type="textarea"
-                                @change="isOK = false"
-                                clearable
-                                v-model="dialogData.rowData!.clientCert"
-                            />
-                        </el-form-item>
-                        <el-form-item v-if="dialogData.rowData!.hasCA" :label="$t('database.caCert')" prop="rootCert">
-                            <el-input
-                                type="textarea"
-                                @change="isOK = false"
-                                clearable
-                                v-model="dialogData.rowData!.rootCert"
-                            />
-                        </el-form-item>
+            <el-form-item :label="$t('commons.table.name')" prop="name">
+                <el-input v-if="dialogData.title === 'create'" clearable v-model.trim="dialogData.rowData!.name" />
+                <el-tag v-else>{{ dialogData.rowData!.name }}</el-tag>
+            </el-form-item>
+            <el-form-item :label="$t('commons.table.type')" prop="type">
+                <el-radio-group v-model="dialogData.rowData!.type" @change="changeType">
+                    <el-radio-button value="mysql">MySQL</el-radio-button>
+                    <el-radio-button value="mariadb">MariaDB</el-radio-button>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item :label="$t('database.version')" prop="version">
+                <el-radio-group v-model="dialogData.rowData!.version" @change="isOK = false">
+                    <div v-if="dialogData.rowData!.type === 'mysql'">
+                        <el-radio label="8.x" value="8.x" />
+                        <el-radio label="5.7" value="5.7" />
+                        <el-radio label="5.6" value="5.6" />
                     </div>
-                    <el-form-item :label="$t('commons.table.description')" prop="description">
-                        <el-input clearable v-model.trim="dialogData.rowData!.description" />
-                    </el-form-item>
-                </el-col>
-            </el-row>
+                    <div v-else>
+                        <el-radio label="10.x" value="10.x" />
+                        <el-radio label="11.x" value="11.x" />
+                    </div>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item :label="$t('database.address')" prop="address">
+                <el-input @change="isOK = false" clearable v-model.trim="dialogData.rowData!.address" />
+            </el-form-item>
+            <el-form-item :label="$t('commons.table.port')" prop="port">
+                <el-input @change="isOK = false" clearable v-model.number="dialogData.rowData!.port" />
+            </el-form-item>
+            <el-form-item :label="$t('commons.login.username')" prop="username">
+                <el-input @change="isOK = false" clearable v-model.trim="dialogData.rowData!.username" />
+                <span class="input-help">{{ $t('database.userHelper') }}</span>
+            </el-form-item>
+            <el-form-item :label="$t('commons.login.password')" prop="password">
+                <el-input
+                    @change="isOK = false"
+                    type="password"
+                    clearable
+                    show-password
+                    v-model.trim="dialogData.rowData!.password"
+                />
+            </el-form-item>
+            <el-form-item>
+                <el-checkbox @change="isOK = false" v-model="dialogData.rowData!.ssl" :label="$t('database.ssl')" />
+            </el-form-item>
+            <div v-if="dialogData.rowData!.ssl">
+                <el-form-item>
+                    <el-checkbox
+                        @change="isOK = false"
+                        v-model="dialogData.rowData!.hasCA"
+                        :label="$t('database.hasCA')"
+                    />
+                </el-form-item>
+                <el-form-item>
+                    <el-checkbox
+                        @change="isOK = false"
+                        v-model="dialogData.rowData!.skipVerify"
+                        :label="$t('database.skipVerify')"
+                    />
+                </el-form-item>
+                <el-form-item :label="$t('database.clientKey')" prop="clientKey">
+                    <el-input
+                        type="textarea"
+                        @change="isOK = false"
+                        clearable
+                        v-model="dialogData.rowData!.clientKey"
+                    />
+                </el-form-item>
+                <el-form-item :label="$t('database.clientCert')" prop="clientCert">
+                    <el-input
+                        type="textarea"
+                        @change="isOK = false"
+                        clearable
+                        v-model="dialogData.rowData!.clientCert"
+                    />
+                </el-form-item>
+                <el-form-item v-if="dialogData.rowData!.hasCA" :label="$t('database.caCert')" prop="rootCert">
+                    <el-input type="textarea" @change="isOK = false" clearable v-model="dialogData.rowData!.rootCert" />
+                </el-form-item>
+            </div>
+            <el-form-item :label="$t('commons.table.description')" prop="description">
+                <el-input clearable v-model.trim="dialogData.rowData!.description" />
+            </el-form-item>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -127,7 +102,7 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -135,7 +110,6 @@ import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { Database } from '@/api/interface/database';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
 import { addDatabase, checkDatabase, editDatabase } from '@/api/modules/database';

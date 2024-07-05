@@ -1,63 +1,60 @@
 <template>
-    <el-drawer
-        v-model="open"
-        :before-close="handleClose"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="50%"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('file.recycleBin')" :back="handleClose" />
-        </template>
-        <div class="flex space-x-4">
-            <el-button @click="clear" type="primary" :disabled="data == null || data.length == 0">
-                {{ $t('file.clearRecycleBin') }}
-            </el-button>
-            <el-button @click="patchDelete" :disabled="data == null || selects.length == 0">
-                {{ $t('commons.button.delete') }}
-            </el-button>
-            <el-button @click="patchReduce" :disabled="data == null || selects.length == 0">
-                {{ $t('file.reduce') }}
-            </el-button>
-            <el-form-item :label="$t('file.fileRecycleBin')">
-                <el-switch v-model="status" active-value="enable" inactive-value="disable" @change="changeStatus" />
-            </el-form-item>
-        </div>
-        <ComplexTable
-            :pagination-config="paginationConfig"
-            v-model:selects="selects"
-            :data="data"
-            @search="search"
-            class="mt-5"
-        >
-            <el-table-column type="selection" fix />
-            <el-table-column prop="name" :label="$t('commons.table.name')" show-overflow-tooltip>
-                <template #default="{ row }">
-                    <span class="text-ellipsis" type="primary">
-                        <svg-icon v-if="row.isDir" className="table-icon" iconName="p-file-folder"></svg-icon>
-                        <svg-icon v-else className="table-icon" iconName="p-file-normal"></svg-icon>
-                        {{ row.name }}
-                    </span>
-                </template>
-            </el-table-column>
+    <DrawerPro v-model="open" :header="$t('file.recycleBin')" :back="handleClose" size="large">
+        <template #content>
+            <div class="flex space-x-4">
+                <el-button @click="clear" type="primary" :disabled="data == null || data.length == 0">
+                    {{ $t('file.clearRecycleBin') }}
+                </el-button>
+                <el-button @click="patchDelete" :disabled="data == null || selects.length == 0">
+                    {{ $t('commons.button.delete') }}
+                </el-button>
+                <el-button @click="patchReduce" :disabled="data == null || selects.length == 0">
+                    {{ $t('file.reduce') }}
+                </el-button>
+                <el-form-item :label="$t('file.fileRecycleBin')">
+                    <el-switch v-model="status" active-value="enable" inactive-value="disable" @change="changeStatus" />
+                </el-form-item>
+            </div>
+            <ComplexTable
+                :pagination-config="paginationConfig"
+                v-model:selects="selects"
+                :data="data"
+                @search="search"
+                class="mt-5"
+            >
+                <el-table-column type="selection" fix />
+                <el-table-column prop="name" :label="$t('commons.table.name')" show-overflow-tooltip>
+                    <template #default="{ row }">
+                        <span class="text-ellipsis" type="primary">
+                            <svg-icon v-if="row.isDir" className="table-icon" iconName="p-file-folder"></svg-icon>
+                            <svg-icon v-else className="table-icon" iconName="p-file-normal"></svg-icon>
+                            {{ row.name }}
+                        </span>
+                    </template>
+                </el-table-column>
 
-            <el-table-column :label="$t('file.sourcePath')" show-overflow-tooltip prop="sourcePath"></el-table-column>
-            <el-table-column :label="$t('file.size')" prop="size" max-width="50">
-                <template #default="{ row }">
-                    {{ getFileSize(row.size) }}
-                </template>
-            </el-table-column>
-            <el-table-column
-                :label="$t('file.deleteTime')"
-                prop="deleteTime"
-                :formatter="dateFormat"
-                show-overflow-tooltip
-            ></el-table-column>
-            <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fix />
-        </ComplexTable>
-        <Delete ref="deleteRef" @close="search" />
-        <Reduce ref="reduceRef" @close="search" />
-    </el-drawer>
+                <el-table-column
+                    :label="$t('file.sourcePath')"
+                    show-overflow-tooltip
+                    prop="sourcePath"
+                ></el-table-column>
+                <el-table-column :label="$t('file.size')" prop="size" max-width="50">
+                    <template #default="{ row }">
+                        {{ getFileSize(row.size) }}
+                    </template>
+                </el-table-column>
+                <el-table-column
+                    :label="$t('file.deleteTime')"
+                    prop="deleteTime"
+                    :formatter="dateFormat"
+                    show-overflow-tooltip
+                ></el-table-column>
+                <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fix />
+            </ComplexTable>
+            <Delete ref="deleteRef" @close="search" />
+            <Reduce ref="reduceRef" @close="search" />
+        </template>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>

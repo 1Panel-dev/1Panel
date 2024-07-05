@@ -1,135 +1,117 @@
 <template>
-    <div>
-        <el-drawer
-            v-model="drawerVisible"
-            :destroy-on-close="true"
-            @close="handleClose"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            size="50%"
-        >
-            <template #header>
-                <DrawerHeader :header="$t('setting.panelSSL')" :back="handleClose" />
-            </template>
-            <el-alert class="common-prompt" :closable="false" type="error">
-                <template #default>
-                    <span>
-                        <span>{{ $t('setting.panelSSLHelper') }}</span>
-                    </span>
-                </template>
-            </el-alert>
-            <el-form ref="formRef" label-position="top" :model="form" :rules="rules" v-loading="loading">
-                <el-row type="flex" justify="center">
-                    <el-col :span="22">
-                        <el-form-item :label="$t('setting.certType')">
-                            <el-radio-group v-model="form.sslType">
-                                <el-radio value="self">{{ $t('setting.selfSigned') }}</el-radio>
-                                <el-radio value="select">{{ $t('setting.select') }}</el-radio>
-                                <el-radio value="import">{{ $t('commons.button.import') }}</el-radio>
-                            </el-radio-group>
-                            <span class="input-help" v-if="form.sslType === 'self'">
-                                {{ $t('setting.selfSignedHelper') }}
-                            </span>
-                        </el-form-item>
-                        <el-form-item v-if="form.sslType === 'import'" :label="$t('commons.button.import')" prop="type">
-                            <el-select v-model="form.itemSSLType">
-                                <el-option :label="$t('website.pasteSSL')" value="paste"></el-option>
-                                <el-option :label="$t('website.localSSL')" value="local"></el-option>
-                            </el-select>
-                        </el-form-item>
-
-                        <el-form-item v-if="form.timeout">
-                            <el-tag>{{ $t('setting.domainOrIP') }} {{ form.domain }}</el-tag>
-                            <el-tag style="margin-left: 5px">{{ $t('setting.timeOut') }} {{ form.timeout }}</el-tag>
-                            <el-button
-                                @click="onDownload"
-                                style="margin-left: 5px"
-                                v-if="form.sslType === 'self'"
-                                type="primary"
-                                link
-                                icon="Download"
-                            >
-                                {{ $t('setting.rootCrtDownload') }}
-                            </el-button>
-                        </el-form-item>
-
-                        <div v-if="form.sslType === 'import' && form.itemSSLType === 'paste'">
-                            <el-form-item :label="$t('website.privateKey')" prop="key">
-                                <el-input v-model="form.key" :rows="5" type="textarea" />
-                            </el-form-item>
-                            <el-form-item class="marginTop" :label="$t('website.certificate')" prop="cert">
-                                <el-input v-model="form.cert" :rows="5" type="textarea" />
-                            </el-form-item>
-                        </div>
-
-                        <div v-if="form.sslType === 'import' && form.itemSSLType === 'local'">
-                            <el-form-item :label="$t('website.privateKey')" prop="key">
-                                <el-input v-model="form.key">
-                                    <template #prepend>
-                                        <FileList @choose="getKeyPath" :dir="false"></FileList>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-                            <el-form-item class="marginTop" :label="$t('website.certificate')" prop="cert">
-                                <el-input v-model="form.cert">
-                                    <template #prepend>
-                                        <FileList @choose="getCertPath" :dir="false"></FileList>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-                        </div>
-
-                        <div v-if="form.sslType === 'select'">
-                            <el-form-item :label="$t('setting.certificate')" prop="sslID">
-                                <el-select v-model="form.sslID" @change="changeSSl(form.sslID)">
-                                    <el-option
-                                        v-for="(item, index) in sslList"
-                                        :key="index"
-                                        :label="item.primaryDomain"
-                                        :value="item.id"
-                                    ></el-option>
-                                </el-select>
-                            </el-form-item>
-                            <el-descriptions
-                                class="marginTop"
-                                :column="5"
-                                border
-                                direction="vertical"
-                                v-if="form.sslID > 0 && itemSSL"
-                            >
-                                <el-descriptions-item :label="$t('website.primaryDomain')">
-                                    {{ itemSSL.primaryDomain }}
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('website.otherDomains')">
-                                    {{ itemSSL.domains }}
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('ssl.provider')">
-                                    {{ getProvider(itemSSL.provider) }}
-                                </el-descriptions-item>
-                                <el-descriptions-item
-                                    :label="$t('ssl.acmeAccount')"
-                                    v-if="itemSSL.acmeAccount?.email && itemSSL.provider !== 'manual'"
-                                >
-                                    {{ itemSSL.acmeAccount.email }}
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('website.expireDate')">
-                                    {{ dateFormatSimple(itemSSL.expireDate) }}
-                                </el-descriptions-item>
-                            </el-descriptions>
-                        </div>
-                    </el-col>
-                </el-row>
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button :disabled="loading" type="primary" @click="onSaveSSL(formRef)">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
+    <DrawerPro v-model="drawerVisible" :header="$t('setting.panelSSL')" :back="handleClose" size="large">
+        <el-alert class="common-prompt" :closable="false" type="error">
+            <template #default>
+                <span>
+                    <span>{{ $t('setting.panelSSLHelper') }}</span>
                 </span>
             </template>
-        </el-drawer>
-    </div>
+        </el-alert>
+        <el-form ref="formRef" label-position="top" :model="form" :rules="rules" v-loading="loading">
+            <el-form-item :label="$t('setting.certType')">
+                <el-radio-group v-model="form.sslType">
+                    <el-radio value="self">{{ $t('setting.selfSigned') }}</el-radio>
+                    <el-radio value="select">{{ $t('setting.select') }}</el-radio>
+                    <el-radio value="import">{{ $t('commons.button.import') }}</el-radio>
+                </el-radio-group>
+                <span class="input-help" v-if="form.sslType === 'self'">
+                    {{ $t('setting.selfSignedHelper') }}
+                </span>
+            </el-form-item>
+            <el-form-item v-if="form.sslType === 'import'" :label="$t('commons.button.import')" prop="type">
+                <el-select v-model="form.itemSSLType">
+                    <el-option :label="$t('website.pasteSSL')" value="paste"></el-option>
+                    <el-option :label="$t('website.localSSL')" value="local"></el-option>
+                </el-select>
+            </el-form-item>
+
+            <el-form-item v-if="form.timeout">
+                <el-tag>{{ $t('setting.domainOrIP') }} {{ form.domain }}</el-tag>
+                <el-tag style="margin-left: 5px">{{ $t('setting.timeOut') }} {{ form.timeout }}</el-tag>
+                <el-button
+                    @click="onDownload"
+                    style="margin-left: 5px"
+                    v-if="form.sslType === 'self'"
+                    type="primary"
+                    link
+                    icon="Download"
+                >
+                    {{ $t('setting.rootCrtDownload') }}
+                </el-button>
+            </el-form-item>
+
+            <div v-if="form.sslType === 'import' && form.itemSSLType === 'paste'">
+                <el-form-item :label="$t('website.privateKey')" prop="key">
+                    <el-input v-model="form.key" :rows="5" type="textarea" />
+                </el-form-item>
+                <el-form-item class="marginTop" :label="$t('website.certificate')" prop="cert">
+                    <el-input v-model="form.cert" :rows="5" type="textarea" />
+                </el-form-item>
+            </div>
+
+            <div v-if="form.sslType === 'import' && form.itemSSLType === 'local'">
+                <el-form-item :label="$t('website.privateKey')" prop="key">
+                    <el-input v-model="form.key">
+                        <template #prepend>
+                            <FileList @choose="getKeyPath" :dir="false"></FileList>
+                        </template>
+                    </el-input>
+                </el-form-item>
+                <el-form-item class="marginTop" :label="$t('website.certificate')" prop="cert">
+                    <el-input v-model="form.cert">
+                        <template #prepend>
+                            <FileList @choose="getCertPath" :dir="false"></FileList>
+                        </template>
+                    </el-input>
+                </el-form-item>
+            </div>
+
+            <div v-if="form.sslType === 'select'">
+                <el-form-item :label="$t('setting.certificate')" prop="sslID">
+                    <el-select v-model="form.sslID" @change="changeSSl(form.sslID)">
+                        <el-option
+                            v-for="(item, index) in sslList"
+                            :key="index"
+                            :label="item.primaryDomain"
+                            :value="item.id"
+                        ></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-descriptions
+                    class="marginTop"
+                    :column="5"
+                    border
+                    direction="vertical"
+                    v-if="form.sslID > 0 && itemSSL"
+                >
+                    <el-descriptions-item :label="$t('website.primaryDomain')">
+                        {{ itemSSL.primaryDomain }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('website.otherDomains')">
+                        {{ itemSSL.domains }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('ssl.provider')">
+                        {{ getProvider(itemSSL.provider) }}
+                    </el-descriptions-item>
+                    <el-descriptions-item
+                        :label="$t('ssl.acmeAccount')"
+                        v-if="itemSSL.acmeAccount?.email && itemSSL.provider !== 'manual'"
+                    >
+                        {{ itemSSL.acmeAccount.email }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('website.expireDate')">
+                        {{ dateFormatSimple(itemSSL.expireDate) }}
+                    </el-descriptions-item>
+                </el-descriptions>
+            </div>
+        </el-form>
+        <template #footer>
+            <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+            <el-button :disabled="loading" type="primary" @click="onSaveSSL(formRef)">
+                {{ $t('commons.button.confirm') }}
+            </el-button>
+        </template>
+    </DrawerPro>
 </template>
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
@@ -142,7 +124,6 @@ import { downloadSSL, updateSSL } from '@/api/modules/setting';
 import { Rules } from '@/global/form-rules';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { Setting } from '@/api/interface/setting';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 

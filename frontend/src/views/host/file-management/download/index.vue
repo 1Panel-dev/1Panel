@@ -1,31 +1,16 @@
 <template>
-    <el-drawer
-        v-model="open"
-        :title="$t('file.download')"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        :before-close="handleClose"
-        size="40%"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('file.download')" :back="handleClose" />
-        </template>
+    <DrawerPro v-model="open" :header="$t('file.download')" :back="handleClose" size="normal">
         <el-form ref="fileForm" label-position="top" :model="addForm" :rules="rules" v-loading="loading">
-            <el-row type="flex" justify="center">
-                <el-col :span="22">
-                    <el-form-item :label="$t('file.compressType')" prop="type">
-                        <el-select v-model="addForm.type">
-                            <el-option v-for="item in options" :key="item" :label="item" :value="item" />
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item :label="$t('commons.table.name')" prop="name">
-                        <el-input v-model="addForm.name">
-                            <template #append>{{ extension }}</template>
-                        </el-input>
-                    </el-form-item>
-                </el-col>
-            </el-row>
+            <el-form-item :label="$t('file.compressType')" prop="type">
+                <el-select v-model="addForm.type">
+                    <el-option v-for="item in options" :key="item" :label="item" :value="item" />
+                </el-select>
+            </el-form-item>
+            <el-form-item :label="$t('commons.table.name')" prop="name">
+                <el-input v-model="addForm.name">
+                    <template #append>{{ extension }}</template>
+                </el-input>
+            </el-form-item>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -33,7 +18,7 @@
                 <el-button type="primary" @click="submit(fileForm)">{{ $t('commons.button.confirm') }}</el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script setup lang="ts">
@@ -43,7 +28,6 @@ import { computed, reactive, ref } from 'vue';
 import { DownloadFile } from '@/api/modules/files';
 import { File } from '@/api/interface/file';
 import { Rules } from '@/global/form-rules';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 
 interface DownloadProps {
     paths: Array<string>;

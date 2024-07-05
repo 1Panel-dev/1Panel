@@ -1,51 +1,32 @@
 <template>
-    <el-drawer
-        v-model="drawerVisible"
-        :destroy-on-close="true"
-        @close="onCloseLog"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="50%"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('container.imagePush')" :back="onCloseLog" />
-        </template>
-        <el-row type="flex" justify="center">
-            <el-col :span="22">
-                <el-form ref="formRef" label-position="top" :model="form" label-width="80px">
-                    <el-form-item :label="$t('container.tag')" :rules="Rules.requiredSelect" prop="tagName">
-                        <el-select @change="onEdit(true)" filterable v-model="form.tagName">
-                            <el-option v-for="item in form.tags" :key="item" :value="item" :label="item" />
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item :label="$t('container.repoName')" :rules="Rules.requiredSelect" prop="repoID">
-                        <el-select @change="onEdit()" clearable style="width: 100%" filterable v-model="form.repoID">
-                            <el-option
-                                v-for="item in dialogData.repos"
-                                :key="item.id"
-                                :value="item.id"
-                                :label="item.name"
-                            />
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item :label="$t('container.image')" :rules="Rules.imageName" prop="name">
-                        <el-input @change="onEdit()" v-model.trim="form.name">
-                            <template #prepend>{{ loadDetailInfo(form.repoID) }}/</template>
-                        </el-input>
-                    </el-form-item>
-                </el-form>
+    <DrawerPro v-model="drawerVisible" :header="$t('container.imagePush')" :back="onCloseLog" size="large">
+        <el-form ref="formRef" label-position="top" :model="form" label-width="80px">
+            <el-form-item :label="$t('container.tag')" :rules="Rules.requiredSelect" prop="tagName">
+                <el-select @change="onEdit(true)" filterable v-model="form.tagName">
+                    <el-option v-for="item in form.tags" :key="item" :value="item" :label="item" />
+                </el-select>
+            </el-form-item>
+            <el-form-item :label="$t('container.repoName')" :rules="Rules.requiredSelect" prop="repoID">
+                <el-select @change="onEdit()" clearable style="width: 100%" filterable v-model="form.repoID">
+                    <el-option v-for="item in dialogData.repos" :key="item.id" :value="item.id" :label="item.name" />
+                </el-select>
+            </el-form-item>
+            <el-form-item :label="$t('container.image')" :rules="Rules.imageName" prop="name">
+                <el-input @change="onEdit()" v-model.trim="form.name">
+                    <template #prepend>{{ loadDetailInfo(form.repoID) }}/</template>
+                </el-input>
+            </el-form-item>
+        </el-form>
 
-                <LogFile
-                    ref="logRef"
-                    :config="logConfig"
-                    :default-button="false"
-                    v-model:is-reading="isReading"
-                    v-if="logVisible"
-                    :style="'height: calc(100vh - 370px);min-height: 200px'"
-                    v-model:loading="loading"
-                />
-            </el-col>
-        </el-row>
+        <LogFile
+            ref="logRef"
+            :config="logConfig"
+            :default-button="false"
+            v-model:is-reading="isReading"
+            v-if="logVisible"
+            :style="'height: calc(100vh - 370px);min-height: 200px'"
+            v-model:loading="loading"
+        />
 
         <template #footer>
             <span class="dialog-footer">
@@ -57,7 +38,7 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -67,7 +48,6 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { imagePush } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
 
 const drawerVisible = ref(false);

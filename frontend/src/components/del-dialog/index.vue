@@ -37,7 +37,7 @@
 <script setup lang="ts">
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { onMounted, reactive, ref } from 'vue';
+import { reactive, ref } from 'vue';
 
 defineOptions({ name: 'OpDialog' });
 
@@ -102,8 +102,6 @@ const handleClose = () => {
     emit('cancel');
     open.value = false;
 };
-
-onMounted(() => {});
 
 defineExpose({
     acceptParams,

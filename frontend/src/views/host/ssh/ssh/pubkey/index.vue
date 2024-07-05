@@ -1,65 +1,49 @@
 <template>
-    <div>
-        <el-drawer
-            v-model="drawerVisible"
-            :destroy-on-close="true"
-            @close="handleClose"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            size="30%"
-        >
-            <template #header>
-                <DrawerHeader :header="$t('ssh.pubkey')" :back="handleClose" />
-            </template>
-            <el-form ref="formRef" label-position="top" :rules="rules" :model="form" v-loading="loading">
-                <el-row type="flex" justify="center">
-                    <el-col :span="22">
-                        <el-form-item :label="$t('ssh.encryptionMode')" prop="encryptionMode">
-                            <el-select v-model="form.encryptionMode" @change="onLoadSecret">
-                                <el-option label="ED25519" value="ed25519" />
-                                <el-option label="ECDSA" value="ecdsa" />
-                                <el-option label="RSA" value="rsa" />
-                                <el-option label="DSA" value="dsa" />
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item :label="$t('commons.login.password')" prop="password">
-                            <el-input v-model="form.password" type="password" show-password>
-                                <template #append>
-                                    <el-button @click="onCopy(form.password)">
-                                        {{ $t('commons.button.copy') }}
-                                    </el-button>
-                                    <el-divider direction="vertical" />
-                                    <el-button @click="random">
-                                        {{ $t('commons.button.random') }}
-                                    </el-button>
-                                </template>
-                            </el-input>
-                        </el-form-item>
+    <DrawerPro v-model="drawerVisible" :header="$t('ssh.pubkey')" :back="handleClose" size="small">
+        <el-form ref="formRef" label-position="top" :rules="rules" :model="form" v-loading="loading">
+            <el-form-item :label="$t('ssh.encryptionMode')" prop="encryptionMode">
+                <el-select v-model="form.encryptionMode" @change="onLoadSecret">
+                    <el-option label="ED25519" value="ed25519" />
+                    <el-option label="ECDSA" value="ecdsa" />
+                    <el-option label="RSA" value="rsa" />
+                    <el-option label="DSA" value="dsa" />
+                </el-select>
+            </el-form-item>
+            <el-form-item :label="$t('commons.login.password')" prop="password">
+                <el-input v-model="form.password" type="password" show-password>
+                    <template #append>
+                        <el-button @click="onCopy(form.password)">
+                            {{ $t('commons.button.copy') }}
+                        </el-button>
+                        <el-divider direction="vertical" />
+                        <el-button @click="random">
+                            {{ $t('commons.button.random') }}
+                        </el-button>
+                    </template>
+                </el-input>
+            </el-form-item>
 
-                        <el-form-item :label="$t('ssh.key')" prop="primaryKey" v-if="form.encryptionMode">
-                            <el-input v-model="form.primaryKey" :rows="5" type="textarea" />
-                            <div v-if="form.primaryKey">
-                                <el-button icon="CopyDocument" class="marginTop" @click="onCopy(form.primaryKey)">
-                                    {{ $t('file.copy') }}
-                                </el-button>
-                                <el-button icon="Download" class="marginTop" @click="onDownload">
-                                    {{ $t('commons.button.download') }}
-                                </el-button>
-                            </div>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button @click="onGenerate(formRef)" type="primary">
-                        {{ $t('ssh.generate') }}
+            <el-form-item :label="$t('ssh.key')" prop="primaryKey" v-if="form.encryptionMode">
+                <el-input v-model="form.primaryKey" :rows="5" type="textarea" />
+                <div v-if="form.primaryKey">
+                    <el-button icon="CopyDocument" class="marginTop" @click="onCopy(form.primaryKey)">
+                        {{ $t('file.copy') }}
                     </el-button>
-                </span>
-            </template>
-        </el-drawer>
-    </div>
+                    <el-button icon="Download" class="marginTop" @click="onDownload">
+                        {{ $t('commons.button.download') }}
+                    </el-button>
+                </div>
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button @click="onGenerate(formRef)" type="primary">
+                    {{ $t('ssh.generate') }}
+                </el-button>
+            </span>
+        </template>
+    </DrawerPro>
 </template>
 <script lang="ts" setup>
 import { generateSecret, loadSecret } from '@/api/modules/host';
@@ -68,7 +52,6 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { copyText, dateFormatForName, getRandomStr } from '@/utils/util';
 import { FormInstance } from 'element-plus';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { reactive, ref } from 'vue';
 
 const loading = ref();

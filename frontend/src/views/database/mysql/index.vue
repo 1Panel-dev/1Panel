@@ -257,10 +257,8 @@
         <UploadDialog ref="uploadRef" />
         <OperateDialog @search="search" ref="dialogRef" />
         <Backups ref="dialogBackupRef" />
-
         <AppResources ref="checkRef"></AppResources>
         <DeleteDialog ref="deleteRef" @search="search" />
-
         <PortJumpDialog ref="dialogPortJumpRef" />
     </div>
 </template>

@@ -1,15 +1,11 @@
 <template>
-    <el-drawer
+    <DrawerPro
         v-model="monitorVisible"
-        :destroy-on-close="true"
-        @close="handleClose"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="50%"
+        :header="$t('container.monitor')"
+        :back="handleClose"
+        :resource="title"
+        size="large"
     >
-        <template #header>
-            <DrawerHeader :header="$t('container.monitor')" :resource="title" :back="handleClose" />
-        </template>
         <el-form label-position="top" @submit.prevent>
             <el-form-item :label="$t('container.refreshTime')">
                 <el-select v-model="timeInterval" @change="changeTimer">
@@ -30,7 +26,7 @@
                 v-if="chartsOption['cpuChart']"
             />
         </el-card>
-        <el-card style="margin-top: 10px">
+        <el-card class="mt-2.5">
             <v-charts
                 height="200px"
                 id="memoryChart"
@@ -39,7 +35,7 @@
                 v-if="chartsOption['memoryChart']"
             />
         </el-card>
-        <el-card style="margin-top: 10px">
+        <el-card class="mt-2.5">
             <v-charts
                 height="200px"
                 id="ioChart"
@@ -48,7 +44,7 @@
                 v-if="chartsOption['ioChart']"
             />
         </el-card>
-        <el-card style="margin-top: 10px">
+        <el-card class="mt-2.5">
             <v-charts
                 height="200px"
                 id="networkChart"
@@ -57,7 +53,7 @@
                 v-if="chartsOption['networkChart']"
             />
         </el-card>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -66,7 +62,6 @@ import { containerStats } from '@/api/modules/container';
 import { dateFormatForSecond } from '@/utils/util';
 import VCharts from '@/components/v-charts/index.vue';
 import i18n from '@/lang';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const title = ref();
 const monitorVisible = ref(false);

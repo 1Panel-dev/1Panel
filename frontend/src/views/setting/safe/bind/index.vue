@@ -1,62 +1,47 @@
 <template>
-    <div>
-        <el-drawer
-            v-model="drawerVisible"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            size="30%"
-        >
-            <template #header>
-                <DrawerHeader :header="$t('setting.bindInfo')" :back="handleClose" />
-            </template>
-            <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
-                <el-row type="flex" justify="center">
-                    <el-col :span="22">
-                        <el-form-item :label="$t('setting.ipv6')" prop="ipv6" :rules="Rules.requiredSelect">
-                            <el-radio-group style="width: 100%" v-model="form.ipv6" @change="onChangeMode()">
-                                <el-radio value="enable">{{ $t('commons.button.enable') }}</el-radio>
-                                <el-radio value="disable">{{ $t('commons.button.disable') }}</el-radio>
-                            </el-radio-group>
-                        </el-form-item>
-                        <el-form-item
-                            v-if="form.ipv6 === 'disable'"
-                            :label="$t('setting.bindAddress')"
-                            prop="bindAddress"
-                            :rules="Rules.ip"
-                        >
-                            <el-checkbox v-model="form.input" :label="$t('container.input')" />
-                            <el-select v-if="!form.input" clearable v-model="form.bindAddress">
-                                <el-option value="0.0.0.0" label="0.0.0.0"></el-option>
-                                <div v-for="item in interfaceOptions" :key="item">
-                                    <el-option v-if="item.indexOf(':') === -1" :value="item" :label="item" />
-                                </div>
-                            </el-select>
-                            <el-input v-else clearable v-model="form.bindAddress"></el-input>
-                        </el-form-item>
-                        <el-form-item v-else :label="$t('setting.bindAddress')" prop="bindAddress" :rules="Rules.ipV6">
-                            <el-checkbox v-model="form.input" :label="$t('container.input')" />
-                            <el-select v-if="!form.input" clearable v-model="form.bindAddress">
-                                <el-option value="::" label="::"></el-option>
-                                <div v-for="item in interfaceOptions" :key="item">
-                                    <el-option v-if="item.indexOf(':') !== -1" :value="item" :label="item" />
-                                </div>
-                            </el-select>
-                            <el-input v-else clearable v-model="form.bindAddress"></el-input>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button :disabled="loading" type="primary" @click="onSavePort(formRef)">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </span>
-            </template>
-        </el-drawer>
-    </div>
+    <DrawerPro v-model="drawerVisible" :header="$t('setting.bindInfo')" :back="handleClose" size="small">
+        <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
+            <el-form-item :label="$t('setting.ipv6')" prop="ipv6" :rules="Rules.requiredSelect">
+                <el-radio-group style="width: 100%" v-model="form.ipv6" @change="onChangeMode()">
+                    <el-radio value="enable">{{ $t('commons.button.enable') }}</el-radio>
+                    <el-radio value="disable">{{ $t('commons.button.disable') }}</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item
+                v-if="form.ipv6 === 'disable'"
+                :label="$t('setting.bindAddress')"
+                prop="bindAddress"
+                :rules="Rules.ip"
+            >
+                <el-checkbox v-model="form.input" :label="$t('container.input')" />
+                <el-select v-if="!form.input" clearable v-model="form.bindAddress">
+                    <el-option value="0.0.0.0" label="0.0.0.0"></el-option>
+                    <div v-for="item in interfaceOptions" :key="item">
+                        <el-option v-if="item.indexOf(':') === -1" :value="item" :label="item" />
+                    </div>
+                </el-select>
+                <el-input v-else clearable v-model="form.bindAddress"></el-input>
+            </el-form-item>
+            <el-form-item v-else :label="$t('setting.bindAddress')" prop="bindAddress" :rules="Rules.ipV6">
+                <el-checkbox v-model="form.input" :label="$t('container.input')" />
+                <el-select v-if="!form.input" clearable v-model="form.bindAddress">
+                    <el-option value="::" label="::"></el-option>
+                    <div v-for="item in interfaceOptions" :key="item">
+                        <el-option v-if="item.indexOf(':') !== -1" :value="item" :label="item" />
+                    </div>
+                </el-select>
+                <el-input v-else clearable v-model="form.bindAddress"></el-input>
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button :disabled="loading" type="primary" @click="onSavePort(formRef)">
+                    {{ $t('commons.button.confirm') }}
+                </el-button>
+            </span>
+        </template>
+    </DrawerPro>
 </template>
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
@@ -66,7 +51,6 @@ import { updateBindInfo, loadInterfaceAddr } from '@/api/modules/setting';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { GlobalStore } from '@/store';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 const globalStore = GlobalStore();
 
 interface DialogProps {

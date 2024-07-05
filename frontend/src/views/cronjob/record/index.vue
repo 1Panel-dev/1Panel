@@ -58,30 +58,24 @@
         </div>
 
         <LayoutContent :title="$t('cronjob.record')" :reload="true">
-            <template #search>
-                <el-row :gutter="20">
-                    <el-col :span="8">
-                        <el-date-picker
-                            style="width: calc(100% - 20px)"
-                            @change="search()"
-                            v-model="timeRangeLoad"
-                            type="datetimerange"
-                            :range-separator="$t('commons.search.timeRange')"
-                            :start-placeholder="$t('commons.search.timeStart')"
-                            :end-placeholder="$t('commons.search.timeEnd')"
-                            :shortcuts="shortcuts"
-                        ></el-date-picker>
-                    </el-col>
-                    <el-col :span="16">
-                        <el-select @change="search()" v-model="searchInfo.status" class="p-w-200">
-                            <template #prefix>{{ $t('commons.table.status') }}</template>
-                            <el-option :label="$t('commons.table.all')" value="" />
-                            <el-option :label="$t('commons.status.success')" value="Success" />
-                            <el-option :label="$t('commons.status.waiting')" value="Waiting" />
-                            <el-option :label="$t('commons.status.failed')" value="Failed" />
-                        </el-select>
-                    </el-col>
-                </el-row>
+            <template #rightToolBar>
+                <el-date-picker
+                    class="mr-2.5"
+                    @change="search()"
+                    v-model="timeRangeLoad"
+                    type="datetimerange"
+                    :range-separator="$t('commons.search.timeRange')"
+                    :start-placeholder="$t('commons.search.timeStart')"
+                    :end-placeholder="$t('commons.search.timeEnd')"
+                    :shortcuts="shortcuts"
+                ></el-date-picker>
+                <el-select @change="search()" v-model="searchInfo.status" class="p-w-200">
+                    <template #prefix>{{ $t('commons.table.status') }}</template>
+                    <el-option :label="$t('commons.table.all')" value="" />
+                    <el-option :label="$t('commons.status.success')" value="Success" />
+                    <el-option :label="$t('commons.status.waiting')" value="Waiting" />
+                    <el-option :label="$t('commons.status.failed')" value="Failed" />
+                </el-select>
             </template>
             <template #main>
                 <div class="mainClass">

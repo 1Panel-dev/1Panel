@@ -1,16 +1,5 @@
 <template>
-    <el-drawer
-        v-model="detailVisible"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="50%"
-    >
-        <template #header>
-            <div class="card-header">
-                <span>{{ $t('commons.button.view') }}</span>
-            </div>
-        </template>
+    <DrawerPro v-model="detailVisible" :header="$t('commons.button.view')" size="large">
         <codemirror
             :autofocus="true"
             :placeholder="$t('commons.msg.noneData')"
@@ -30,7 +19,7 @@
                 <el-button @click="detailVisible = false">{{ $t('commons.button.cancel') }}</el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>

@@ -1,65 +1,48 @@
 <template>
-    <el-drawer
-        v-model="open"
-        :before-close="handleClose"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="40%"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('commons.button.create')" :back="handleClose" />
-        </template>
-
-        <el-row>
-            <el-col :span="22" :offset="1">
-                <el-form
-                    ref="fileForm"
-                    label-position="top"
-                    :model="addForm"
-                    label-width="100px"
-                    :rules="rules"
-                    v-loading="loading"
-                    @submit.enter.prevent
-                >
-                    <el-form-item :label="$t('commons.table.name')" prop="name">
-                        <el-input v-model.trim="addForm.name" />
-                    </el-form-item>
-                    <el-form-item v-if="!addForm.isDir">
-                        <el-checkbox v-model="addForm.isLink" :label="$t('file.link')"></el-checkbox>
-                    </el-form-item>
-                    <el-form-item :label="$t('file.linkType')" v-if="addForm.isLink" prop="linkType">
-                        <el-radio-group v-model="addForm.isSymlink">
-                            <el-radio :value="true">{{ $t('file.softLink') }}</el-radio>
-                            <el-radio :value="false">{{ $t('file.hardLink') }}</el-radio>
-                        </el-radio-group>
-                    </el-form-item>
-                    <el-form-item v-if="addForm.isLink" :label="$t('file.linkPath')" prop="linkPath">
-                        <el-input v-model="addForm.linkPath">
-                            <template #prepend>
-                                <FileList @choose="getLinkPath"></FileList>
-                            </template>
-                        </el-input>
-                    </el-form-item>
-                    <el-form-item>
-                        <el-checkbox v-if="addForm.isDir" v-model="setRole" :label="$t('file.setRole')"></el-checkbox>
-                    </el-form-item>
-                </el-form>
-                <FileRole v-if="setRole" :mode="'0755'" @get-mode="getMode" :key="open.toString()"></FileRole>
-            </el-col>
-        </el-row>
-
+    <DrawerPro v-model="open" :header="$t('commons.button.create')" :back="handleClose" size="normal">
+        <el-form
+            ref="fileForm"
+            label-position="top"
+            :model="addForm"
+            label-width="100px"
+            :rules="rules"
+            v-loading="loading"
+            @submit.enter.prevent
+        >
+            <el-form-item :label="$t('commons.table.name')" prop="name">
+                <el-input v-model.trim="addForm.name" />
+            </el-form-item>
+            <el-form-item v-if="!addForm.isDir">
+                <el-checkbox v-model="addForm.isLink" :label="$t('file.link')"></el-checkbox>
+            </el-form-item>
+            <el-form-item :label="$t('file.linkType')" v-if="addForm.isLink" prop="linkType">
+                <el-radio-group v-model="addForm.isSymlink">
+                    <el-radio :value="true">{{ $t('file.softLink') }}</el-radio>
+                    <el-radio :value="false">{{ $t('file.hardLink') }}</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item v-if="addForm.isLink" :label="$t('file.linkPath')" prop="linkPath">
+                <el-input v-model="addForm.linkPath">
+                    <template #prepend>
+                        <FileList @choose="getLinkPath"></FileList>
+                    </template>
+                </el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-checkbox v-if="addForm.isDir" v-model="setRole" :label="$t('file.setRole')"></el-checkbox>
+            </el-form-item>
+        </el-form>
+        <FileRole v-if="setRole" :mode="'0755'" @get-mode="getMode" :key="open.toString()"></FileRole>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
                 <el-button type="primary" @click="submit(fileForm)">{{ $t('commons.button.confirm') }}</el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script setup lang="ts">
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { ref, reactive, computed } from 'vue';
 import { File } from '@/api/interface/file';
 import { FormInstance, FormRules } from 'element-plus';

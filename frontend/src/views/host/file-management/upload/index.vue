@@ -1,82 +1,87 @@
 <template>
-    <el-drawer
-        v-model="open"
-        :before-close="handleClose"
-        size="40%"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('file.upload')" :back="handleClose" />
-        </template>
-        <div class="button-container">
-            <div>
-                <el-button type="primary" @click="upload('file')">
-                    {{ $t('file.upload') }}{{ $t('file.file') }}
-                </el-button>
-                <el-button type="primary" @click="upload('dir')">{{ $t('file.upload') }}{{ $t('file.dir') }}</el-button>
+    <DrawerPro v-model="open" :header="$t('file.upload')" :back="handleClose" size="normal">
+        <template #content>
+            <div class="button-container">
+                <div>
+                    <el-button type="primary" @click="upload('file')">
+                        {{ $t('file.upload') }}{{ $t('file.file') }}
+                    </el-button>
+                    <el-button type="primary" @click="upload('dir')">
+                        {{ $t('file.upload') }}{{ $t('file.dir') }}
+                    </el-button>
+                </div>
+                <el-button @click="clearFiles">{{ $t('file.clearList') }}</el-button>
             </div>
-            <el-button @click="clearFiles">{{ $t('file.clearList') }}</el-button>
-        </div>
 
-        <div>
-            <div class="el-upload-dragger" @dragover="handleDragover" @drop="handleDrop" @dragleave="handleDragleave">
-                <div class="flex items-center justify-center h-52">
-                    <div>
-                        <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-                        <div class="el-upload__text">
-                            {{ $t('file.dropHelper') }}
+            <div>
+                <div
+                    class="el-upload-dragger"
+                    @dragover="handleDragover"
+                    @drop="handleDrop"
+                    @dragleave="handleDragleave"
+                >
+                    <div class="flex items-center justify-center h-52">
+                        <div>
+                            <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+                            <div class="el-upload__text">
+                                {{ $t('file.dropHelper') }}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <el-upload
-            action="#"
-            :auto-upload="false"
-            ref="uploadRef"
-            :on-change="fileOnChange"
-            :on-exceed="handleExceed"
-            :on-success="handleSuccess"
-            :show-file-list="false"
-            multiple
-            v-model:file-list="uploaderFiles"
-            :limit="1000"
-        >
-            <template #tip>
-                <el-text>{{ uploadHelper }}</el-text>
-                <el-progress v-if="loading" text-inside :stroke-width="20" :percentage="uploadPercent"></el-progress>
-            </template>
-        </el-upload>
-
-        <div>
-            <p
-                v-for="(item, index) in uploaderFiles"
-                :key="index"
-                class="file-item"
-                @mouseover="hoverIndex = index"
-                @mouseout="hoverIndex = null"
+            <el-upload
+                action="#"
+                :auto-upload="false"
+                ref="uploadRef"
+                :on-change="fileOnChange"
+                :on-exceed="handleExceed"
+                :on-success="handleSuccess"
+                :show-file-list="false"
+                multiple
+                v-model:file-list="uploaderFiles"
+                :limit="1000"
             >
-                <el-icon class="file-icon"><Document /></el-icon>
-                <span v-if="item.raw.webkitRelativePath != ''">{{ item.raw.webkitRelativePath }}</span>
-                <span v-else>{{ item.name }}</span>
-                <span v-if="item.status === 'success'" class="success-icon">
-                    <el-icon><Select /></el-icon>
-                </span>
-                <span v-else>
-                    <el-button
-                        class="delete-button"
-                        type="primary"
-                        link
-                        @click="removeFile(index)"
-                        :disabled="loading"
-                        :icon="Close"
-                    ></el-button>
-                </span>
-            </p>
-        </div>
+                <template #tip>
+                    <el-text>{{ uploadHelper }}</el-text>
+                    <el-progress
+                        v-if="loading"
+                        text-inside
+                        :stroke-width="20"
+                        :percentage="uploadPercent"
+                    ></el-progress>
+                </template>
+            </el-upload>
+
+            <div>
+                <p
+                    v-for="(item, index) in uploaderFiles"
+                    :key="index"
+                    class="file-item"
+                    @mouseover="hoverIndex = index"
+                    @mouseout="hoverIndex = null"
+                >
+                    <el-icon class="file-icon"><Document /></el-icon>
+                    <span v-if="item.raw.webkitRelativePath != ''">{{ item.raw.webkitRelativePath }}</span>
+                    <span v-else>{{ item.name }}</span>
+                    <span v-if="item.status === 'success'" class="success-icon">
+                        <el-icon><Select /></el-icon>
+                    </span>
+                    <span v-else>
+                        <el-button
+                            class="delete-button"
+                            type="primary"
+                            link
+                            @click="removeFile(index)"
+                            :disabled="loading"
+                            :icon="Close"
+                        ></el-button>
+                    </span>
+                </p>
+            </div>
+        </template>
+
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
@@ -85,7 +90,7 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script setup lang="ts">
@@ -93,7 +98,6 @@ import { nextTick, reactive, ref } from 'vue';
 import { UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile } from 'element-plus';
 import { ChunkUploadFileData, UploadFileData } from '@/api/modules/files';
 import i18n from '@/lang';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message';
 import { Close, Document, UploadFilled } from '@element-plus/icons-vue';
 import { TimeoutEnum } from '@/enums/http-enum';

@@ -1,69 +1,46 @@
 <template>
-    <el-drawer
-        v-model="createVisible"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="30%"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('database.create')" :back="handleClose" />
-        </template>
-        <div v-loading="loading">
-            <el-form ref="formRef" label-position="top" :model="form" :rules="rules">
-                <el-row type="flex" justify="center">
-                    <el-col :span="22">
-                        <el-form-item :label="$t('commons.table.name')" prop="name">
-                            <el-input clearable v-model.trim="form.name" @input="form.username = form.name">
-                                <template #append>
-                                    <el-select v-model="form.format" style="width: 120px">
-                                        <el-option label="utf8mb4" value="utf8mb4" />
-                                        <el-option label="utf-8" value="utf8" />
-                                        <el-option label="gbk" value="gbk" />
-                                        <el-option label="big5" value="big5" />
-                                    </el-select>
-                                </template>
-                            </el-input>
-                        </el-form-item>
-                        <el-form-item :label="$t('commons.login.username')" prop="username">
-                            <el-input clearable v-model.trim="form.username" />
-                        </el-form-item>
-                        <el-form-item :label="$t('commons.login.password')" prop="password">
-                            <el-input type="password" clearable show-password v-model.trim="form.password">
-                                <template #append>
-                                    <el-button @click="random">{{ $t('commons.button.random') }}</el-button>
-                                </template>
-                            </el-input>
-                        </el-form-item>
-
-                        <el-form-item :label="$t('database.permission')" prop="permission">
-                            <el-select v-model="form.permission">
-                                <el-option value="%" :label="$t('database.permissionAll')" />
-                                <el-option
-                                    v-if="form.from !== 'local'"
-                                    value="localhost"
-                                    :label="$t('terminal.localhost')"
-                                />
-                                <el-option value="ip" :label="$t('database.permissionForIP')" />
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item v-if="form.permission === 'ip'" prop="permissionIPs">
-                            <el-input clearable :rows="3" type="textarea" v-model="form.permissionIPs" />
-                            <span class="input-help">{{ $t('database.remoteHelper') }}</span>
-                        </el-form-item>
-
-                        <el-form-item :label="$t('commons.table.type')" prop="database">
-                            <el-tag>{{ form.database + ' [' + form.type + ']' }}</el-tag>
-                        </el-form-item>
-
-                        <el-form-item :label="$t('commons.table.description')" prop="description">
-                            <el-input type="textarea" clearable v-model="form.description" />
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-            </el-form>
-        </div>
-
+    <DrawerPro v-model="createVisible" :header="$t('database.create')" :back="handleClose" size="normal">
+        <el-form ref="formRef" label-position="top" :model="form" :rules="rules" v-loading="loading">
+            <el-form-item :label="$t('commons.table.name')" prop="name">
+                <el-input clearable v-model.trim="form.name" @input="form.username = form.name">
+                    <template #append>
+                        <el-select v-model="form.format" class="p-w-100">
+                            <el-option label="utf8mb4" value="utf8mb4" />
+                            <el-option label="utf-8" value="utf8" />
+                            <el-option label="gbk" value="gbk" />
+                            <el-option label="big5" value="big5" />
+                        </el-select>
+                    </template>
+                </el-input>
+            </el-form-item>
+            <el-form-item :label="$t('commons.login.username')" prop="username">
+                <el-input clearable v-model.trim="form.username" />
+            </el-form-item>
+            <el-form-item :label="$t('commons.login.password')" prop="password">
+                <el-input type="password" clearable show-password v-model.trim="form.password">
+                    <template #append>
+                        <el-button @click="random">{{ $t('commons.button.random') }}</el-button>
+                    </template>
+                </el-input>
+            </el-form-item>
+            <el-form-item :label="$t('database.permission')" prop="permission">
+                <el-select v-model="form.permission">
+                    <el-option value="%" :label="$t('database.permissionAll')" />
+                    <el-option v-if="form.from !== 'local'" value="localhost" :label="$t('terminal.localhost')" />
+                    <el-option value="ip" :label="$t('database.permissionForIP')" />
+                </el-select>
+            </el-form-item>
+            <el-form-item v-if="form.permission === 'ip'" prop="permissionIPs">
+                <el-input clearable :rows="3" type="textarea" v-model="form.permissionIPs" />
+                <span class="input-help">{{ $t('database.remoteHelper') }}</span>
+            </el-form-item>
+            <el-form-item :label="$t('commons.table.type')" prop="database">
+                <el-tag>{{ form.database + ' [' + form.type + ']' }}</el-tag>
+            </el-form-item>
+            <el-form-item :label="$t('commons.table.description')" prop="description">
+                <el-input type="textarea" clearable v-model="form.description" />
+            </el-form-item>
+        </el-form>
         <template #footer>
             <span class="dialog-footer">
                 <el-button :disabled="loading" @click="createVisible = false">
@@ -74,7 +51,7 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -83,7 +60,6 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { addMysqlDB } from '@/api/modules/database';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { checkIp, getRandomStr } from '@/utils/util';
 
