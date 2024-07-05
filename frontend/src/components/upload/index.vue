@@ -1,97 +1,100 @@
 <template>
     <div>
-        <el-drawer
+        <DrawerPro
             v-model="upVisible"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            size="50%"
+            :header="$t('commons.button.import')"
+            :resource="title"
+            :back="handleClose"
+            size="large"
         >
-            <template #header>
-                <DrawerHeader :header="$t('commons.button.import')" :resource="title" :back="handleClose" />
-            </template>
-            <div v-loading="loading">
-                <div class="mb-4" v-if="type === 'mysql' || type === 'mariadb'">
-                    <el-alert type="error" :title="$t('database.formatHelper', [remark])" />
-                </div>
-                <div class="mb-4" v-if="type === 'website'">
-                    <el-alert :closable="false" type="warning" :title="$t('website.websiteBackupWarn')"></el-alert>
-                </div>
-                <el-upload ref="uploadRef" drag :on-change="fileOnChange" class="upload-demo" :auto-upload="false">
-                    <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-                    <div class="el-upload__text">
-                        {{ $t('database.dropHelper') }}
-                        <em>{{ $t('database.clickHelper') }}</em>
+            <template #content>
+                <div v-loading="loading">
+                    <div class="mb-4" v-if="type === 'mysql' || type === 'mariadb'">
+                        <el-alert type="error" :title="$t('database.formatHelper', [remark])" />
                     </div>
-                    <template #tip>
-                        <el-progress
-                            v-if="isUpload"
-                            text-inside
-                            :stroke-width="12"
-                            :percentage="uploadPercent"
-                        ></el-progress>
-                        <div
-                            v-if="type === 'mysql' || type === 'mariadb' || type === 'postgresql'"
-                            style="width: 80%"
-                            class="el-upload__tip"
-                        >
-                            <span class="input-help">{{ $t('database.supportUpType') }}</span>
-                            <span class="input-help">
-                                {{ $t('database.zipFormat') }}
-                            </span>
+                    <div class="mb-4" v-if="type === 'website'">
+                        <el-alert :closable="false" type="warning" :title="$t('website.websiteBackupWarn')"></el-alert>
+                    </div>
+                    <el-upload ref="uploadRef" drag :on-change="fileOnChange" class="upload-demo" :auto-upload="false">
+                        <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+                        <div class="el-upload__text">
+                            {{ $t('database.dropHelper') }}
+                            <em>{{ $t('database.clickHelper') }}</em>
                         </div>
-                        <div v-else style="width: 80%" class="el-upload__tip">
-                            <span class="input-help">{{ $t('website.supportUpType') }}</span>
-                            <span class="input-help">
-                                {{ $t('website.zipFormat', [type + '.json']) }}
-                            </span>
-                        </div>
-                    </template>
-                </el-upload>
-                <el-button :disabled="isUpload" v-if="uploaderFiles.length === 1" icon="Upload" @click="onSubmit">
-                    {{ $t('commons.button.upload') }}
-                </el-button>
+                        <template #tip>
+                            <el-progress
+                                v-if="isUpload"
+                                text-inside
+                                :stroke-width="12"
+                                :percentage="uploadPercent"
+                            ></el-progress>
+                            <div
+                                v-if="type === 'mysql' || type === 'mariadb' || type === 'postgresql'"
+                                style="width: 80%"
+                                class="el-upload__tip"
+                            >
+                                <span class="input-help">{{ $t('database.supportUpType') }}</span>
+                                <span class="input-help">
+                                    {{ $t('database.zipFormat') }}
+                                </span>
+                            </div>
+                            <div v-else style="width: 80%" class="el-upload__tip">
+                                <span class="input-help">{{ $t('website.supportUpType') }}</span>
+                                <span class="input-help">
+                                    {{ $t('website.zipFormat', [type + '.json']) }}
+                                </span>
+                            </div>
+                        </template>
+                    </el-upload>
+                    <el-button :disabled="isUpload" v-if="uploaderFiles.length === 1" icon="Upload" @click="onSubmit">
+                        {{ $t('commons.button.upload') }}
+                    </el-button>
 
-                <el-divider />
-                <ComplexTable
-                    :pagination-config="paginationConfig"
-                    @search="search"
-                    v-model:selects="selects"
-                    :data="data"
-                >
-                    <template #toolbar>
-                        <el-button
-                            style="margin-left: 10px"
-                            plain
-                            :disabled="selects.length === 0"
-                            @click="onBatchDelete(null)"
+                    <el-divider />
+                    <ComplexTable
+                        :pagination-config="paginationConfig"
+                        @search="search"
+                        v-model:selects="selects"
+                        :data="data"
+                    >
+                        <template #toolbar>
+                            <el-button
+                                class="ml-2.5"
+                                plain
+                                :disabled="selects.length === 0"
+                                @click="onBatchDelete(null)"
+                            >
+                                {{ $t('commons.button.delete') }}
+                            </el-button>
+                        </template>
+                        <el-table-column type="selection" fix />
+                        <el-table-column :label="$t('commons.table.name')" show-overflow-tooltip prop="name" />
+                        <el-table-column :label="$t('file.size')" prop="size">
+                            <template #default="{ row }">
+                                {{ computeSize(row.size) }}
+                            </template>
+                        </el-table-column>
+                        <el-table-column
+                            show-overflow-tooltip
+                            :label="$t('commons.table.createdAt')"
+                            min-width="90"
+                            fix
                         >
-                            {{ $t('commons.button.delete') }}
-                        </el-button>
-                    </template>
-                    <el-table-column type="selection" fix />
-                    <el-table-column :label="$t('commons.table.name')" show-overflow-tooltip prop="name" />
-                    <el-table-column :label="$t('file.size')" prop="size">
-                        <template #default="{ row }">
-                            {{ computeSize(row.size) }}
-                        </template>
-                    </el-table-column>
-                    <el-table-column show-overflow-tooltip :label="$t('commons.table.createdAt')" min-width="90" fix>
-                        <template #default="{ row }">
-                            {{ row.createdAt }}
-                        </template>
-                    </el-table-column>
-                    <fu-table-operations
-                        width="150px"
-                        :buttons="buttons"
-                        :ellipsis="10"
-                        :label="$t('commons.table.operate')"
-                        fix
-                    />
-                </ComplexTable>
-            </div>
-        </el-drawer>
-
+                            <template #default="{ row }">
+                                {{ row.createdAt }}
+                            </template>
+                        </el-table-column>
+                        <fu-table-operations
+                            width="150px"
+                            :buttons="buttons"
+                            :ellipsis="10"
+                            :label="$t('commons.table.operate')"
+                            fix
+                        />
+                    </ComplexTable>
+                </div>
+            </template>
+        </DrawerPro>
         <OpDialog ref="opRef" @search="search" />
     </div>
     <AppRecover ref="recoverRef" />
@@ -103,7 +106,6 @@ import { computeSize } from '@/utils/util';
 import i18n from '@/lang';
 import { UploadFile, UploadFiles, UploadInstance } from 'element-plus';
 import { File } from '@/api/interface/file';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { BatchDeleteFile, CheckFile, ChunkUploadFileData, GetUploadList } from '@/api/modules/files';
 import { loadBaseDir } from '@/api/modules/setting';
 import { MsgError, MsgSuccess } from '@/utils/message';

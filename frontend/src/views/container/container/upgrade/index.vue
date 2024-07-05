@@ -1,54 +1,42 @@
 <template>
-    <el-drawer
+    <DrawerPro
         v-model="drawerVisible"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="50%"
+        :header="$t('commons.button.upgrade')"
+        :back="handleClose"
+        :resource="form.containerName"
+        size="large"
     >
-        <template #header>
-            <DrawerHeader :header="$t('commons.button.upgrade')" :resource="form.containerName" :back="handleClose" />
-        </template>
-
-        <el-row v-loading="loading">
-            <el-col :span="22" :offset="1">
-                <el-alert
-                    :title="$t('container.appHelper')"
-                    v-if="form.fromApp"
-                    class="common-prompt"
-                    :closable="false"
-                    type="error"
-                />
-                <el-form @submit.prevent ref="formRef" :model="form" label-position="top">
-                    <el-form-item :label="$t('container.oldImage')" prop="oldImage">
-                        <el-tooltip
-                            placement="top-start"
-                            :content="form.oldImageName"
-                            v-if="form.oldImageName.length > 50"
-                        >
-                            <el-tag>{{ form.oldImageName.substring(0, 50) }}...</el-tag>
-                        </el-tooltip>
-                        <el-tag v-else>{{ form.oldImageName }}</el-tag>
-                    </el-form-item>
-                    <el-form-item prop="newImageName" :rules="Rules.imageName">
-                        <template #label>
-                            {{ $t('container.targetImage') }}
-                            <span v-if="!form.hasName">
-                                {{ ' (' + $t('container.imageLoadErr') + ')' }}
-                            </span>
-                        </template>
-                        <el-input v-model="form.newImageName" />
-                        <span class="input-help">{{ $t('container.upgradeHelper') }}</span>
-                    </el-form-item>
-                    <el-form-item prop="forcePull">
-                        <el-checkbox v-model="form.forcePull">
-                            {{ $t('container.forcePull') }}
-                        </el-checkbox>
-                        <span class="input-help">{{ $t('container.forcePullHelper') }}</span>
-                    </el-form-item>
-                </el-form>
-            </el-col>
-        </el-row>
+        <el-alert
+            :title="$t('container.appHelper')"
+            v-if="form.fromApp"
+            class="common-prompt"
+            :closable="false"
+            type="error"
+        />
+        <el-form @submit.prevent ref="formRef" :model="form" label-position="top">
+            <el-form-item :label="$t('container.oldImage')" prop="oldImage">
+                <el-tooltip placement="top-start" :content="form.oldImageName" v-if="form.oldImageName.length > 50">
+                    <el-tag>{{ form.oldImageName.substring(0, 50) }}...</el-tag>
+                </el-tooltip>
+                <el-tag v-else>{{ form.oldImageName }}</el-tag>
+            </el-form-item>
+            <el-form-item prop="newImageName" :rules="Rules.imageName">
+                <template #label>
+                    {{ $t('container.targetImage') }}
+                    <span v-if="!form.hasName">
+                        {{ ' (' + $t('container.imageLoadErr') + ')' }}
+                    </span>
+                </template>
+                <el-input v-model="form.newImageName" />
+                <span class="input-help">{{ $t('container.upgradeHelper') }}</span>
+            </el-form-item>
+            <el-form-item prop="forcePull">
+                <el-checkbox v-model="form.forcePull">
+                    {{ $t('container.forcePull') }}
+                </el-checkbox>
+                <span class="input-help">{{ $t('container.forcePullHelper') }}</span>
+            </el-form-item>
+        </el-form>
         <template #footer>
             <span class="dialog-footer">
                 <el-button :disabled="loading" @click="drawerVisible = false">
@@ -59,7 +47,7 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -69,7 +57,6 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElForm } from 'element-plus';
 import { reactive, ref } from 'vue';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const loading = ref(false);
 

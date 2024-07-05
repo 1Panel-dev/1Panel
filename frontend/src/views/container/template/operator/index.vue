@@ -1,19 +1,11 @@
 <template>
-    <el-drawer
+    <DrawerPro
         v-model="drawerVisible"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="50%"
+        :header="$t('container.composeTemplate')"
+        :resource="dialogData.title === 'create' ? '' : dialogData.rowData?.name"
+        :back="handleClose"
+        size="large"
     >
-        <template #header>
-            <DrawerHeader
-                :header="title + $t('container.composeTemplate')"
-                :hideResource="dialogData.title === 'create'"
-                :resource="dialogData.rowData?.name"
-                :back="handleClose"
-            />
-        </template>
         <el-form
             v-loading="loading"
             label-position="top"
@@ -22,34 +14,27 @@
             :rules="rules"
             label-width="80px"
         >
-            <el-row type="flex" justify="center">
-                <el-col :span="22">
-                    <el-form-item :label="$t('commons.table.name')" prop="name">
-                        <el-input
-                            :disabled="dialogData.title === 'edit'"
-                            v-model.trim="dialogData.rowData!.name"
-                        ></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('container.description')">
-                        <el-input v-model="dialogData.rowData!.description"></el-input>
-                    </el-form-item>
-                    <el-form-item>
-                        <codemirror
-                            :autofocus="true"
-                            placeholder="#Define or paste the content of your docker-compose file here"
-                            :indent-with-tab="true"
-                            :tabSize="4"
-                            style="width: 100%; height: calc(100vh - 351px)"
-                            :lineWrapping="true"
-                            :matchBrackets="true"
-                            theme="cobalt"
-                            :styleActiveLine="true"
-                            :extensions="extensions"
-                            v-model="dialogData.rowData!.content"
-                        />
-                    </el-form-item>
-                </el-col>
-            </el-row>
+            <el-form-item :label="$t('commons.table.name')" prop="name">
+                <el-input :disabled="dialogData.title === 'edit'" v-model.trim="dialogData.rowData!.name"></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('container.description')">
+                <el-input v-model="dialogData.rowData!.description"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <codemirror
+                    :autofocus="true"
+                    placeholder="#Define or paste the content of your docker-compose file here"
+                    :indent-with-tab="true"
+                    :tabSize="4"
+                    style="width: 100%; height: calc(100vh - 351px)"
+                    :lineWrapping="true"
+                    :matchBrackets="true"
+                    theme="cobalt"
+                    :styleActiveLine="true"
+                    :extensions="extensions"
+                    v-model="dialogData.rowData!.content"
+                />
+            </el-form-item>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -61,7 +46,7 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -73,7 +58,6 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { Container } from '@/api/interface/container';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { createComposeTemplate, updateComposeTemplate } from '@/api/modules/container';
 import { MsgSuccess } from '@/utils/message';
 

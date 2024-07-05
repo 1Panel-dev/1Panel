@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-popover placement="bottom-start" :width="200" trigger="click">
+        <el-popover placement="bottom-start" :width="200" trigger="hover">
             <template #reference>
                 <el-button class="timer-button" :icon="Refresh"></el-button>
             </template>

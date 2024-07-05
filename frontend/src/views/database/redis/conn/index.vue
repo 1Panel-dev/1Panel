@@ -1,90 +1,77 @@
 <template>
-    <el-drawer
-        v-model="dialogVisible"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="30%"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('database.databaseConnInfo')" :back="handleClose" />
-        </template>
+    <DrawerPro v-model="dialogVisible" :header="$t('database.databaseConnInfo')" :back="handleClose" size="small">
         <el-form @submit.prevent v-loading="loading" ref="formRef" :model="form" label-position="top" :rules="rules">
-            <el-row type="flex" justify="center">
-                <el-col :span="22">
-                    <el-form-item :label="$t('database.containerConn')" v-if="form.from === 'local'">
-                        <el-card class="mini-border-card">
-                            <el-descriptions :column="1">
-                                <el-descriptions-item :label="$t('database.connAddress')">
-                                    <el-tooltip
-                                        v-if="loadRedisInfo(true).length > 48"
-                                        :content="loadRedisInfo(true)"
-                                        placement="top"
-                                    >
-                                        {{ loadRedisInfo(true).substring(0, 48) }}...
-                                    </el-tooltip>
-                                    <span else>
-                                        {{ loadRedisInfo(true) }}
-                                    </span>
-                                    <CopyButton :content="loadRedisInfo(true)" type="icon" />
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('database.connPort')">
-                                    6379
-                                    <CopyButton content="6379" type="icon" />
-                                </el-descriptions-item>
-                            </el-descriptions>
-                        </el-card>
-                        <span class="input-help">
-                            {{ $t('database.containerConnHelper') }}
-                        </span>
-                    </el-form-item>
-                    <el-form-item :label="$t('database.remoteConn')">
-                        <el-card class="mini-border-card">
-                            <el-descriptions :column="1">
-                                <el-descriptions-item :label="$t('database.connAddress')">
-                                    <el-tooltip
-                                        v-if="loadRedisInfo(false).length > 48"
-                                        :content="loadRedisInfo(false)"
-                                        placement="top"
-                                    >
-                                        {{ loadRedisInfo(false).substring(0, 48) }}...
-                                    </el-tooltip>
-                                    <span else>
-                                        {{ loadRedisInfo(false) }}
-                                    </span>
-                                    <CopyButton :content="loadRedisInfo(false)" type="icon" />
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('database.connPort')">
-                                    {{ form.port }}
-                                    <CopyButton :content="form.port + ''" type="icon" />
-                                </el-descriptions-item>
-                            </el-descriptions>
-                        </el-card>
-                        <span class="input-help">
-                            {{ $t('database.remoteConnHelper2') }}
-                        </span>
-                    </el-form-item>
+            <el-form-item :label="$t('database.containerConn')" v-if="form.from === 'local'">
+                <el-card class="mini-border-card">
+                    <el-descriptions :column="1">
+                        <el-descriptions-item :label="$t('database.connAddress')">
+                            <el-tooltip
+                                v-if="loadRedisInfo(true).length > 48"
+                                :content="loadRedisInfo(true)"
+                                placement="top"
+                            >
+                                {{ loadRedisInfo(true).substring(0, 48) }}...
+                            </el-tooltip>
+                            <span else>
+                                {{ loadRedisInfo(true) }}
+                            </span>
+                            <CopyButton :content="loadRedisInfo(true)" type="icon" />
+                        </el-descriptions-item>
+                        <el-descriptions-item :label="$t('database.connPort')">
+                            6379
+                            <CopyButton content="6379" type="icon" />
+                        </el-descriptions-item>
+                    </el-descriptions>
+                </el-card>
+                <span class="input-help">
+                    {{ $t('database.containerConnHelper') }}
+                </span>
+            </el-form-item>
+            <el-form-item :label="$t('database.remoteConn')">
+                <el-card class="mini-border-card">
+                    <el-descriptions :column="1">
+                        <el-descriptions-item :label="$t('database.connAddress')">
+                            <el-tooltip
+                                v-if="loadRedisInfo(false).length > 48"
+                                :content="loadRedisInfo(false)"
+                                placement="top"
+                            >
+                                {{ loadRedisInfo(false).substring(0, 48) }}...
+                            </el-tooltip>
+                            <span else>
+                                {{ loadRedisInfo(false) }}
+                            </span>
+                            <CopyButton :content="loadRedisInfo(false)" type="icon" />
+                        </el-descriptions-item>
+                        <el-descriptions-item :label="$t('database.connPort')">
+                            {{ form.port }}
+                            <CopyButton :content="form.port + ''" type="icon" />
+                        </el-descriptions-item>
+                    </el-descriptions>
+                </el-card>
+                <span class="input-help">
+                    {{ $t('database.remoteConnHelper2') }}
+                </span>
+            </el-form-item>
 
-                    <el-divider border-style="dashed" />
-                    <el-form-item :label="$t('commons.login.password')" v-if="form.from === 'local'" prop="password">
-                        <el-input type="password" show-password clearable v-model="form.password">
-                            <template #append>
-                                <CopyButton :content="form.password" />
-                                <el-button @click="random" class="p-ml-5">
-                                    {{ $t('commons.button.random') }}
-                                </el-button>
-                            </template>
-                        </el-input>
-                    </el-form-item>
+            <el-divider border-style="dashed" />
+            <el-form-item :label="$t('commons.login.password')" v-if="form.from === 'local'" prop="password">
+                <el-input type="password" show-password clearable v-model="form.password">
+                    <template #append>
+                        <CopyButton :content="form.password" />
+                        <el-button @click="random" class="p-ml-5">
+                            {{ $t('commons.button.random') }}
+                        </el-button>
+                    </template>
+                </el-input>
+            </el-form-item>
 
-                    <div v-if="form.from !== 'local'">
-                        <el-form-item :label="$t('commons.login.password')">
-                            <el-tag>{{ form.password }}</el-tag>
-                            <CopyButton :content="form.password" type="icon" />
-                        </el-form-item>
-                    </div>
-                </el-col>
-            </el-row>
+            <div v-if="form.from !== 'local'">
+                <el-form-item :label="$t('commons.login.password')">
+                    <el-tag>{{ form.password }}</el-tag>
+                    <CopyButton :content="form.password" type="icon" />
+                </el-form-item>
+            </div>
         </el-form>
 
         <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmit"></ConfirmDialog>
@@ -99,7 +86,7 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -110,7 +97,6 @@ import { changeRedisPassword, getDatabase } from '@/api/modules/database';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { GetAppConnInfo } from '@/api/modules/app';
 import { MsgSuccess } from '@/utils/message';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { getRandomStr } from '@/utils/util';
 import { getSettingInfo } from '@/api/modules/setting';
 

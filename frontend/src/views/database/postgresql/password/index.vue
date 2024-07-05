@@ -1,33 +1,21 @@
 <template>
     <div>
-        <el-drawer
+        <DrawerPro
             v-model="changeVisible"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            width="30%"
+            :header="title"
+            :resource="changeForm.postgresqlName"
+            :back="handleClose"
+            size="small"
         >
-            <template #header>
-                <DrawerHeader :header="title" :resource="changeForm.postgresqlName" :back="handleClose" />
-            </template>
             <el-form v-loading="loading" ref="changeFormRef" :rules="rules" :model="changeForm" label-position="top">
-                <el-row type="flex" justify="center">
-                    <el-col :span="22">
-                        <div v-if="changeForm.operation === 'password'">
-                            <el-form-item :label="$t('commons.login.username')" prop="username">
-                                <el-input disabled v-model="changeForm.username"></el-input>
-                            </el-form-item>
-                            <el-form-item :label="$t('commons.login.password')" prop="password">
-                                <el-input
-                                    type="password"
-                                    clearable
-                                    show-password
-                                    v-model="changeForm.password"
-                                ></el-input>
-                            </el-form-item>
-                        </div>
-                    </el-col>
-                </el-row>
+                <div v-if="changeForm.operation === 'password'">
+                    <el-form-item :label="$t('commons.login.username')" prop="username">
+                        <el-input disabled v-model="changeForm.username"></el-input>
+                    </el-form-item>
+                    <el-form-item :label="$t('commons.login.password')" prop="password">
+                        <el-input type="password" clearable show-password v-model="changeForm.password"></el-input>
+                    </el-form-item>
+                </div>
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
@@ -39,7 +27,7 @@
                     </el-button>
                 </span>
             </template>
-        </el-drawer>
+        </DrawerPro>
 
         <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmit"></ConfirmDialog>
     </div>
@@ -49,7 +37,6 @@ import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { deleteCheckPostgresqlDB, updatePostgresqlPassword } from '@/api/modules/database';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
 

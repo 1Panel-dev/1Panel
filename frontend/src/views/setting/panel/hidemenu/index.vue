@@ -1,20 +1,10 @@
 <template>
-    <div>
-        <el-drawer
-            v-model="drawerVisible"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            size="30%"
-        >
-            <template #header>
-                <DrawerHeader :header="$t('setting.advancedMenuHide')" :back="handleClose" />
-            </template>
-
+    <DrawerPro v-model="drawerVisible" :header="$t('setting.advancedMenuHide')" :back="handleClose" size="small">
+        <template #content>
             <ComplexTable
+                class="mb-5 w-full"
                 :data="treeData.hideMenu"
                 :show-header="false"
-                style="width: 100%; margin-bottom: 20px"
                 row-key="id"
                 default-expand-all
             >
@@ -29,22 +19,20 @@
                     </template>
                 </el-table-column>
             </ComplexTable>
-
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button :disabled="loading" type="primary" @click="saveHideMenus">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </span>
-            </template>
-        </el-drawer>
-    </div>
+        </template>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button :disabled="loading" type="primary" @click="saveHideMenus">
+                    {{ $t('commons.button.confirm') }}
+                </el-button>
+            </span>
+        </template>
+    </DrawerPro>
 </template>
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import { updateMenu } from '@/api/modules/setting';

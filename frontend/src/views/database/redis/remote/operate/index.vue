@@ -1,56 +1,40 @@
 <template>
-    <el-drawer
+    <DrawerPro
         v-model="drawerVisible"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="50%"
+        :header="title"
+        :back="handleClose"
+        :resource="dialogData.title === 'create' ? '' : dialogData.rowData?.name"
+        size="large"
     >
-        <template #header>
-            <DrawerHeader
-                :hideResource="dialogData.title === 'create'"
-                :header="title"
-                :resource="dialogData.rowData?.name"
-                :back="handleClose"
-            />
-        </template>
         <el-form ref="formRef" v-loading="loading" label-position="top" :model="dialogData.rowData" :rules="rules">
-            <el-row type="flex" justify="center">
-                <el-col :span="22">
-                    <el-form-item :label="$t('commons.table.name')" prop="name">
-                        <el-input
-                            v-if="dialogData.title === 'create'"
-                            clearable
-                            v-model.trim="dialogData.rowData!.name"
-                        />
-                        <el-tag v-else>{{ dialogData.rowData!.name }}</el-tag>
-                    </el-form-item>
-                    <el-form-item :label="$t('database.version')" prop="version">
-                        <el-radio-group v-model="dialogData.rowData!.version" @change="isOK = false">
-                            <el-radio label="6.x" value="6.x" />
-                            <el-radio label="7.x" value="7.x" />
-                        </el-radio-group>
-                    </el-form-item>
-                    <el-form-item :label="$t('database.address')" prop="address">
-                        <el-input @change="isOK = false" clearable v-model.trim="dialogData.rowData!.address" />
-                    </el-form-item>
-                    <el-form-item :label="$t('commons.table.port')" prop="port">
-                        <el-input @change="isOK = false" clearable v-model.number="dialogData.rowData!.port" />
-                    </el-form-item>
-                    <el-form-item :label="$t('commons.login.password')" prop="password">
-                        <el-input
-                            @change="isOK = false"
-                            type="password"
-                            clearable
-                            show-password
-                            v-model.trim="dialogData.rowData!.password"
-                        />
-                    </el-form-item>
-                    <el-form-item :label="$t('commons.table.description')" prop="description">
-                        <el-input clearable v-model.trim="dialogData.rowData!.description" />
-                    </el-form-item>
-                </el-col>
-            </el-row>
+            <el-form-item :label="$t('commons.table.name')" prop="name">
+                <el-input v-if="dialogData.title === 'create'" clearable v-model.trim="dialogData.rowData!.name" />
+                <el-tag v-else>{{ dialogData.rowData!.name }}</el-tag>
+            </el-form-item>
+            <el-form-item :label="$t('database.version')" prop="version">
+                <el-radio-group v-model="dialogData.rowData!.version" @change="isOK = false">
+                    <el-radio label="6.x" value="6.x" />
+                    <el-radio label="7.x" value="7.x" />
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item :label="$t('database.address')" prop="address">
+                <el-input @change="isOK = false" clearable v-model.trim="dialogData.rowData!.address" />
+            </el-form-item>
+            <el-form-item :label="$t('commons.table.port')" prop="port">
+                <el-input @change="isOK = false" clearable v-model.number="dialogData.rowData!.port" />
+            </el-form-item>
+            <el-form-item :label="$t('commons.login.password')" prop="password">
+                <el-input
+                    @change="isOK = false"
+                    type="password"
+                    clearable
+                    show-password
+                    v-model.trim="dialogData.rowData!.password"
+                />
+            </el-form-item>
+            <el-form-item :label="$t('commons.table.description')" prop="description">
+                <el-input clearable v-model.trim="dialogData.rowData!.description" />
+            </el-form-item>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -63,7 +47,7 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -71,7 +55,6 @@ import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { Database } from '@/api/interface/database';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
 import { addDatabase, checkDatabase, editDatabase } from '@/api/modules/database';

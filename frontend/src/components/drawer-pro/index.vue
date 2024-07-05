@@ -1,0 +1,122 @@
+<template>
+    <el-drawer
+        v-model="localOpenPage"
+        :destroy-on-close="true"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        :size="size"
+    >
+        <template #header>
+            <el-page-header @back="handleBack">
+                <template #content>
+                    <span>{{ header }}</span>
+                    <span v-if="resource != ''">
+                        -
+                        <el-tooltip v-if="resource.length > 25" :content="resource" placement="bottom">
+                            <el-text type="primary">{{ resource.substring(0, 23) + '...' }}</el-text>
+                        </el-tooltip>
+                        <el-text type="primary" v-else>{{ resource }}</el-text>
+                    </span>
+                    <el-divider v-if="slots.buttons" direction="vertical" />
+                    <slot v-if="slots.buttons" name="buttons"></slot>
+                </template>
+                <template #extra>
+                    <el-tooltip :content="loadTooltip()" placement="top" v-if="fullScreen">
+                        <el-button @click="toggleFullscreen" link icon="FullScreen" plain class="mr-5"></el-button>
+                    </el-tooltip>
+                    <slot v-if="slots.extra" name="extra"></slot>
+                </template>
+            </el-page-header>
+        </template>
+
+        <div v-if="slots.content">
+            <slot name="content"></slot>
+        </div>
+        <el-row v-else>
+            <el-col :span="22" :offset="1">
+                <slot></slot>
+            </el-col>
+        </el-row>
+
+        <template #footer v-if="slots.footer">
+            <slot name="footer"></slot>
+        </template>
+    </el-drawer>
+</template>
+
+<script lang="ts" setup>
+import { computed, useSlots } from 'vue';
+defineOptions({ name: 'DrawerPro' });
+import screenfull from 'screenfull';
+import i18n from '@/lang';
+
+const props = defineProps({
+    header: String,
+    back: Function,
+    resource: {
+        type: String,
+        default: '',
+    },
+    size: {
+        type: String,
+        default: 'normal',
+    },
+    modelValue: {
+        type: Boolean,
+        default: false,
+    },
+    fullScreen: {
+        type: Boolean,
+        default: false,
+    },
+});
+
+const slots = useSlots();
+
+const emit = defineEmits(['update:modelValue']);
+
+const size = computed(() => {
+    switch (props.size) {
+        case 'small':
+            return '30%';
+        case 'normal':
+            return '40%';
+        case 'large':
+            return '50%';
+        case 'full':
+            return '100%';
+        default:
+            return '50%';
+    }
+});
+
+const localOpenPage = computed({
+    get() {
+        return props.modelValue;
+    },
+    set(value: boolean) {
+        emit('update:modelValue', value);
+    },
+});
+
+const handleBack = () => {
+    if (props.back) {
+        props.back();
+    } else {
+        closePage();
+    }
+};
+
+const closePage = () => {
+    localOpenPage.value = false;
+};
+
+function toggleFullscreen() {
+    if (screenfull.isEnabled) {
+        screenfull.toggle();
+    }
+}
+const loadTooltip = () => {
+    return i18n.global.t('commons.button.' + (screenfull.isFullscreen ? 'quitFullscreen' : 'fullscreen'));
+};
+</script>

@@ -1,34 +1,19 @@
 <template>
-    <el-drawer
-        v-model="open"
-        :before-close="handleClose"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="50%"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('file.setRole')" :resource="name" :back="handleClose" />
-        </template>
-
-        <el-row>
-            <el-col :span="22" :offset="1">
-                <FileRole v-loading="loading" :mode="mode" @get-mode="getMode" :key="open.toString()"></FileRole>
-                <el-form-item v-if="form.isDir">
-                    <el-checkbox v-model="form.sub">{{ $t('file.containSub') }}</el-checkbox>
-                </el-form-item>
-            </el-col>
-        </el-row>
+    <DrawerPro v-model="open" :header="$t('file.setRole')" :back="handleClose" :resource="name" size="large">
+        <FileRole v-loading="loading" :mode="mode" @get-mode="getMode" :key="open.toString()"></FileRole>
+        <el-form-item v-if="form.isDir">
+            <el-checkbox v-model="form.sub">{{ $t('file.containSub') }}</el-checkbox>
+        </el-form-item>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
                 <el-button type="primary" @click="submit()">{{ $t('commons.button.confirm') }}</el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script setup lang="ts">
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { ref } from 'vue';
 import { File } from '@/api/interface/file';
 import { ChangeFileMode } from '@/api/modules/files';

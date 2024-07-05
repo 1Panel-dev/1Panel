@@ -1,69 +1,71 @@
 <template>
     <div>
-        <el-drawer
+        <DrawerPro
             v-model="logVisible"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            :before-close="handleClose"
-            :size="globalStore.isFullScreen ? '100%' : '50%'"
+            :header="$t('commons.button.log')"
+            :back="handleClose"
+            :resource="logSearch.container"
+            :size="globalStore.isFullScreen ? 'full' : 'large'"
         >
-            <template #header>
-                <DrawerHeader :header="$t('commons.button.log')" :resource="logSearch.container" :back="handleClose">
-                    <template #extra v-if="!mobile">
-                        <el-tooltip :content="loadTooltip()" placement="top">
-                            <el-button @click="toggleFullscreen" class="fullScreen" icon="FullScreen" plain></el-button>
-                        </el-tooltip>
-                    </template>
-                </DrawerHeader>
+            <template #extra v-if="!mobile">
+                <el-tooltip :content="loadTooltip()" placement="top">
+                    <el-button @click="toggleFullscreen" class="fullScreen" icon="FullScreen" plain></el-button>
+                </el-tooltip>
             </template>
-            <div>
-                <el-select @change="searchLogs" class="fetchClass" v-model="logSearch.mode">
-                    <template #prefix>{{ $t('container.fetch') }}</template>
-                    <el-option v-for="item in timeOptions" :key="item.label" :value="item.value" :label="item.label" />
-                </el-select>
-                <el-select @change="searchLogs" class="tailClass" v-model.number="logSearch.tail">
-                    <template #prefix>{{ $t('container.lines') }}</template>
-                    <el-option :value="0" :label="$t('commons.table.all')" />
-                    <el-option :value="100" :label="100" />
-                    <el-option :value="200" :label="200" />
-                    <el-option :value="500" :label="500" />
-                    <el-option :value="1000" :label="1000" />
-                </el-select>
-                <div class="margin-button" style="float: left">
-                    <el-checkbox border @change="searchLogs" v-model="logSearch.isWatch">
-                        {{ $t('commons.button.watch') }}
-                    </el-checkbox>
+            <template #content>
+                <div>
+                    <el-select @change="searchLogs" class="fetchClass" v-model="logSearch.mode">
+                        <template #prefix>{{ $t('container.fetch') }}</template>
+                        <el-option
+                            v-for="item in timeOptions"
+                            :key="item.label"
+                            :value="item.value"
+                            :label="item.label"
+                        />
+                    </el-select>
+                    <el-select @change="searchLogs" class="tailClass" v-model.number="logSearch.tail">
+                        <template #prefix>{{ $t('container.lines') }}</template>
+                        <el-option :value="0" :label="$t('commons.table.all')" />
+                        <el-option :value="100" :label="100" />
+                        <el-option :value="200" :label="200" />
+                        <el-option :value="500" :label="500" />
+                        <el-option :value="1000" :label="1000" />
+                    </el-select>
+                    <div class="margin-button" style="float: left">
+                        <el-checkbox border @change="searchLogs" v-model="logSearch.isWatch">
+                            {{ $t('commons.button.watch') }}
+                        </el-checkbox>
+                    </div>
+                    <el-button class="margin-button" @click="onDownload" icon="Download">
+                        {{ $t('file.download') }}
+                    </el-button>
+                    <el-button class="margin-button" @click="onClean" icon="Delete">
+                        {{ $t('commons.button.clean') }}
+                    </el-button>
                 </div>
-                <el-button class="margin-button" @click="onDownload" icon="Download">
-                    {{ $t('file.download') }}
-                </el-button>
-                <el-button class="margin-button" @click="onClean" icon="Delete">
-                    {{ $t('commons.button.clean') }}
-                </el-button>
-            </div>
 
-            <codemirror
-                :autofocus="true"
-                :placeholder="$t('commons.msg.noneData')"
-                :indent-with-tab="true"
-                :tabSize="4"
-                style="margin-top: 20px; height: calc(100vh - 230px)"
-                :lineWrapping="true"
-                :matchBrackets="true"
-                theme="cobalt"
-                :styleActiveLine="true"
-                :extensions="extensions"
-                v-model="logInfo"
-                @ready="handleReady"
-                :disabled="true"
-            />
+                <codemirror
+                    :autofocus="true"
+                    :placeholder="$t('commons.msg.noneData')"
+                    :indent-with-tab="true"
+                    :tabSize="4"
+                    style="margin-top: 20px; height: calc(100vh - 230px)"
+                    :lineWrapping="true"
+                    :matchBrackets="true"
+                    theme="cobalt"
+                    :styleActiveLine="true"
+                    :extensions="extensions"
+                    v-model="logInfo"
+                    @ready="handleReady"
+                    :disabled="true"
+                />
+            </template>
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
                 </span>
             </template>
-        </el-drawer>
+        </DrawerPro>
     </div>
 </template>
 
@@ -75,7 +77,6 @@ import { computed, onBeforeUnmount, reactive, ref, shallowRef, watch } from 'vue
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { ElMessageBox } from 'element-plus';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import screenfull from 'screenfull';

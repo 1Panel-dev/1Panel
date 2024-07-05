@@ -1,38 +1,30 @@
 <template>
-    <div v-loading="loading">
-        <el-drawer
-            v-model="drawerVisible"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            size="30%"
+    <DrawerPro v-model="drawerVisible" :header="$t('terminal.groupChange')" :back="handleClose" size="small">
+        <el-form
+            @submit.prevent
+            ref="hostInfoRef"
+            label-position="top"
+            :model="dialogData"
+            :rules="rules"
+            v-loading="loading"
         >
-            <template #header>
-                <DrawerHeader :header="$t('terminal.groupChange')" :back="handleClose" />
-            </template>
-            <el-row type="flex" justify="center">
-                <el-col :span="22">
-                    <el-form @submit.prevent ref="hostInfoRef" label-position="top" :model="dialogData" :rules="rules">
-                        <el-form-item :label="$t('commons.table.group')" prop="group">
-                            <el-select filterable v-model="dialogData.groupID" clearable style="width: 100%">
-                                <div v-for="item in groupList" :key="item.id">
-                                    <el-option :label="item.name" :value="item.id" />
-                                </div>
-                            </el-select>
-                        </el-form-item>
-                    </el-form>
-                </el-col>
-            </el-row>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button type="primary" @click="onSubmit(hostInfoRef)">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </span>
-            </template>
-        </el-drawer>
-    </div>
+            <el-form-item :label="$t('commons.table.group')" prop="group">
+                <el-select filterable v-model="dialogData.groupID" clearable class="w-full">
+                    <div v-for="item in groupList" :key="item.id">
+                        <el-option :label="item.name" :value="item.id" />
+                    </div>
+                </el-select>
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button type="primary" @click="onSubmit(hostInfoRef)">
+                    {{ $t('commons.button.confirm') }}
+                </el-button>
+            </span>
+        </template>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -41,7 +33,6 @@ import type { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { editHostGroup } from '@/api/modules/host';
 import { GetGroupList } from '@/api/modules/group';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 

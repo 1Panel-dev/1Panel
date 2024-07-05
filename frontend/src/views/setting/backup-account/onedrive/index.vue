@@ -1,108 +1,77 @@
 <template>
-    <div>
-        <el-drawer
-            v-model="drawerVisible"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            size="50%"
-        >
-            <template #header>
-                <DrawerHeader :header="title + $t('setting.backupAccount')" :back="handleClose" />
-            </template>
-            <el-form
-                @submit.prevent
-                ref="formRef"
-                v-loading="loading"
-                label-position="top"
-                :model="oneDriveData.rowData"
-            >
-                <el-row type="flex" justify="center">
-                    <el-col :span="22">
-                        <el-form-item :label="$t('commons.table.type')" prop="type">
-                            <el-tag>{{ $t('setting.' + oneDriveData.rowData!.type) }}</el-tag>
-                        </el-form-item>
-                        <el-form-item>
-                            <el-radio-group v-model="oneDriveData.rowData!.varsJson['isCN']" @change="changeFrom">
-                                <el-radio-button :value="false">{{ $t('setting.isNotCN') }}</el-radio-button>
-                                <el-radio-button :value="true">{{ $t('setting.isCN') }}</el-radio-button>
-                            </el-radio-group>
-                            <span class="input-help">
-                                {{ $t('setting.onedrive_helper') }}
-                                <el-link
-                                    style="font-size: 12px; margin-left: 5px"
-                                    icon="Position"
-                                    @click="toDoc(true)"
-                                    type="primary"
-                                >
-                                    {{ $t('firewall.quickJump') }}
-                                </el-link>
-                            </span>
-                        </el-form-item>
-                        <el-form-item
-                            :label="$t('setting.client_id')"
-                            prop="varsJson.client_id"
-                            :rules="Rules.requiredInput"
-                        >
-                            <el-input v-model.trim="oneDriveData.rowData!.varsJson['client_id']" />
-                        </el-form-item>
-                        <el-form-item
-                            :label="$t('setting.client_secret')"
-                            prop="varsJson.client_secret"
-                            :rules="Rules.requiredInput"
-                        >
-                            <el-input v-model.trim="oneDriveData.rowData!.varsJson['client_secret']" />
-                        </el-form-item>
-                        <el-form-item
-                            :label="$t('setting.redirect_uri')"
-                            prop="varsJson.redirect_uri"
-                            :rules="Rules.requiredInput"
-                        >
-                            <el-input v-model.trim="oneDriveData.rowData!.varsJson['redirect_uri']" />
-                        </el-form-item>
-                        <el-form-item :label="$t('setting.code')" prop="varsJson.code" :rules="rules.driveCode">
-                            <div style="width: 100%">
-                                <el-input
-                                    style="width: calc(100% - 80px)"
-                                    :rows="3"
-                                    type="textarea"
-                                    clearable
-                                    v-model.trim="oneDriveData.rowData!.varsJson['code']"
-                                />
-                                <el-button class="append-button" @click="jumpAzure(formRef)">
-                                    {{ $t('setting.loadCode') }}
-                                </el-button>
-                            </div>
-                            <span class="input-help">
-                                {{ $t('setting.codeHelper') }}
-                                <el-link
-                                    style="font-size: 12px; margin-left: 5px"
-                                    icon="Position"
-                                    @click="toDoc(false)"
-                                    type="primary"
-                                >
-                                    {{ $t('firewall.quickJump') }}
-                                </el-link>
-                            </span>
-                        </el-form-item>
-                        <el-form-item :label="$t('setting.backupDir')" prop="backupPath">
-                            <el-input clearable v-model.trim="oneDriveData.rowData!.backupPath" placeholder="/1panel" />
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button :disabled="loading" @click="handleClose">
-                        {{ $t('commons.button.cancel') }}
-                    </el-button>
-                    <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
+    <DrawerPro v-model="drawerVisible" :header="title + $t('setting.backupAccount')" :back="handleClose" size="large">
+        <el-form @submit.prevent ref="formRef" v-loading="loading" label-position="top" :model="oneDriveData.rowData">
+            <el-form-item :label="$t('commons.table.type')" prop="type">
+                <el-tag>{{ $t('setting.' + oneDriveData.rowData!.type) }}</el-tag>
+            </el-form-item>
+            <el-form-item>
+                <el-radio-group v-model="oneDriveData.rowData!.varsJson['isCN']" @change="changeFrom">
+                    <el-radio-button :value="false">{{ $t('setting.isNotCN') }}</el-radio-button>
+                    <el-radio-button :value="true">{{ $t('setting.isCN') }}</el-radio-button>
+                </el-radio-group>
+                <span class="input-help">
+                    {{ $t('setting.onedrive_helper') }}
+                    <el-link
+                        style="font-size: 12px; margin-left: 5px"
+                        icon="Position"
+                        @click="toDoc(true)"
+                        type="primary"
+                    >
+                        {{ $t('firewall.quickJump') }}
+                    </el-link>
                 </span>
-            </template>
-        </el-drawer>
-    </div>
+            </el-form-item>
+            <el-form-item :label="$t('setting.client_id')" prop="varsJson.client_id" :rules="Rules.requiredInput">
+                <el-input v-model.trim="oneDriveData.rowData!.varsJson['client_id']" />
+            </el-form-item>
+            <el-form-item
+                :label="$t('setting.client_secret')"
+                prop="varsJson.client_secret"
+                :rules="Rules.requiredInput"
+            >
+                <el-input v-model.trim="oneDriveData.rowData!.varsJson['client_secret']" />
+            </el-form-item>
+            <el-form-item :label="$t('setting.redirect_uri')" prop="varsJson.redirect_uri" :rules="Rules.requiredInput">
+                <el-input v-model.trim="oneDriveData.rowData!.varsJson['redirect_uri']" />
+            </el-form-item>
+            <el-form-item :label="$t('setting.code')" prop="varsJson.code" :rules="rules.driveCode">
+                <div class="!w-full">
+                    <el-input
+                        style="width: calc(100% - 80px)"
+                        :rows="3"
+                        type="textarea"
+                        clearable
+                        v-model.trim="oneDriveData.rowData!.varsJson['code']"
+                    />
+                    <el-button class="append-button" @click="jumpAzure(formRef)">
+                        {{ $t('setting.loadCode') }}
+                    </el-button>
+                </div>
+                <span class="input-help">
+                    {{ $t('setting.codeHelper') }}
+                    <el-link
+                        style="font-size: 12px; margin-left: 5px"
+                        icon="Position"
+                        @click="toDoc(false)"
+                        type="primary"
+                    >
+                        {{ $t('firewall.quickJump') }}
+                    </el-link>
+                </span>
+            </el-form-item>
+            <el-form-item :label="$t('setting.backupDir')" prop="backupPath">
+                <el-input clearable v-model.trim="oneDriveData.rowData!.backupPath" placeholder="/1panel" />
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <el-button :disabled="loading" @click="handleClose">
+                {{ $t('commons.button.cancel') }}
+            </el-button>
+            <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
+                {{ $t('commons.button.confirm') }}
+            </el-button>
+        </template>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -111,7 +80,6 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { Backup } from '@/api/interface/backup';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { addBackup, editBackup, getOneDriveInfo } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
 

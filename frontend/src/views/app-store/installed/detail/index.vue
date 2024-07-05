@@ -1,112 +1,98 @@
 <template>
-    <el-drawer :close-on-click-modal="false" :close-on-press-escape="false" v-model="open" size="40%">
-        <template #header>
-            <Header :header="$t('app.param')" :back="handleClose">
-                <template #buttons>
-                    <el-button type="primary" plain @click="editParam" :disabled="loading">
-                        {{ edit ? $t('app.detail') : $t('commons.button.edit') }}
-                    </el-button>
-                </template>
-            </Header>
+    <DrawerPro v-model="open" :header="$t('app.param')" :back="handleClose" size="normal">
+        <template #buttons>
+            <el-button type="primary" plain @click="editParam" :disabled="loading">
+                {{ edit ? $t('app.detail') : $t('commons.button.edit') }}
+            </el-button>
         </template>
-        <el-row v-if="!edit">
-            <el-col :span="22" :offset="1">
-                <el-descriptions border :column="1">
-                    <el-descriptions-item v-for="(param, key) in params" :label="getLabel(param)" :key="key">
-                        <span>{{ param.showValue && param.showValue != '' ? param.showValue : param.value }}</span>
-                    </el-descriptions-item>
-                </el-descriptions>
-            </el-col>
-        </el-row>
-        <el-row v-else v-loading="loading">
-            <el-col :span="22" :offset="1">
-                <el-alert :title="$t('app.updateHelper')" type="warning" :closable="false" class="common-prompt" />
-                <el-form @submit.prevent ref="paramForm" :model="paramModel" label-position="top" :rules="rules">
-                    <div v-for="(p, index) in params" :key="index">
-                        <el-form-item :prop="p.key" :label="getLabel(p)">
-                            <el-input
-                                v-if="p.type == 'number'"
-                                type="number"
-                                v-model.number="paramModel.params[p.key]"
-                                :disabled="!p.edit"
-                            ></el-input>
-                            <el-select
-                                v-model="paramModel.params[p.key]"
-                                v-else-if="p.type == 'select'"
-                                :multiple="p.multiple"
-                            >
-                                <el-option
-                                    v-for="value in p.values"
-                                    :key="value.label"
-                                    :value="value.value"
-                                    :label="value.label"
-                                    :disabled="!p.edit"
-                                ></el-option>
-                            </el-select>
-                            <el-input v-else v-model.trim="paramModel.params[p.key]" :disabled="!p.edit"></el-input>
-                        </el-form-item>
-                    </div>
-                    <el-form-item prop="advanced">
-                        <el-checkbox v-model="paramModel.advanced" :label="$t('app.advanced')" size="large" />
-                    </el-form-item>
-                    <div v-if="paramModel.advanced">
-                        <el-form-item :label="$t('app.containerName')" prop="containerName">
-                            <el-input
-                                v-model.trim="paramModel.containerName"
-                                :placeholder="$t('app.containerNameHelper')"
-                            ></el-input>
-                        </el-form-item>
-                        <el-form-item prop="allowPort" v-if="!paramModel.isHostMode">
-                            <el-checkbox v-model="paramModel.allowPort" :label="$t('app.allowPort')" size="large" />
-                            <span class="input-help">{{ $t('app.allowPortHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item :label="$t('container.cpuQuota')" prop="cpuQuota">
-                            <el-input
-                                type="number"
-                                style="width: 40%"
-                                v-model.number="paramModel.cpuQuota"
-                                maxlength="5"
-                            >
-                                <template #append>{{ $t('app.cpuCore') }}</template>
-                            </el-input>
-                            <span class="input-help">{{ $t('container.limitHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item :label="$t('container.memoryLimit')" prop="memoryLimit">
-                            <el-input style="width: 40%" v-model.number="paramModel.memoryLimit" maxlength="10">
-                                <template #append>
-                                    <el-select v-model="paramModel.memoryUnit" placeholder="Select" style="width: 85px">
-                                        <el-option label="KB" value="K" />
-                                        <el-option label="MB" value="M" />
-                                        <el-option label="GB" value="G" />
-                                    </el-select>
-                                </template>
-                            </el-input>
-                            <span class="input-help">{{ $t('container.limitHelper') }}</span>
-                        </el-form-item>
+        <el-descriptions border :column="1" v-if="!edit">
+            <el-descriptions-item v-for="(param, key) in params" :label="getLabel(param)" :key="key">
+                <span>{{ param.showValue && param.showValue != '' ? param.showValue : param.value }}</span>
+            </el-descriptions-item>
+        </el-descriptions>
 
-                        <el-form-item prop="editCompose">
-                            <el-checkbox v-model="paramModel.editCompose" :label="$t('app.editCompose')" size="large" />
-                            <span class="input-help">{{ $t('app.editComposeHelper') }}</span>
-                        </el-form-item>
-                        <div v-if="paramModel.editCompose">
-                            <codemirror
-                                :autofocus="true"
-                                placeholder=""
-                                :indent-with-tab="true"
-                                :tabSize="4"
-                                style="height: 400px"
-                                :lineWrapping="true"
-                                :matchBrackets="true"
-                                theme="cobalt"
-                                :styleActiveLine="true"
-                                :extensions="extensions"
-                                v-model="paramModel.dockerCompose"
-                            />
-                        </div>
+        <div v-else v-loading="loading">
+            <el-alert :title="$t('app.updateHelper')" type="warning" :closable="false" class="common-prompt" />
+            <el-form @submit.prevent ref="paramForm" :model="paramModel" label-position="top" :rules="rules">
+                <div v-for="(p, index) in params" :key="index">
+                    <el-form-item :prop="p.key" :label="getLabel(p)">
+                        <el-input
+                            v-if="p.type == 'number'"
+                            type="number"
+                            v-model.number="paramModel.params[p.key]"
+                            :disabled="!p.edit"
+                        ></el-input>
+                        <el-select
+                            v-model="paramModel.params[p.key]"
+                            v-else-if="p.type == 'select'"
+                            :multiple="p.multiple"
+                        >
+                            <el-option
+                                v-for="value in p.values"
+                                :key="value.label"
+                                :value="value.value"
+                                :label="value.label"
+                                :disabled="!p.edit"
+                            ></el-option>
+                        </el-select>
+                        <el-input v-else v-model.trim="paramModel.params[p.key]" :disabled="!p.edit"></el-input>
+                    </el-form-item>
+                </div>
+                <el-form-item prop="advanced">
+                    <el-checkbox v-model="paramModel.advanced" :label="$t('app.advanced')" size="large" />
+                </el-form-item>
+                <div v-if="paramModel.advanced">
+                    <el-form-item :label="$t('app.containerName')" prop="containerName">
+                        <el-input
+                            v-model.trim="paramModel.containerName"
+                            :placeholder="$t('app.containerNameHelper')"
+                        ></el-input>
+                    </el-form-item>
+                    <el-form-item prop="allowPort" v-if="!paramModel.isHostMode">
+                        <el-checkbox v-model="paramModel.allowPort" :label="$t('app.allowPort')" size="large" />
+                        <span class="input-help">{{ $t('app.allowPortHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item :label="$t('container.cpuQuota')" prop="cpuQuota">
+                        <el-input type="number" class="!w-2/5" v-model.number="paramModel.cpuQuota" maxlength="5">
+                            <template #append>{{ $t('app.cpuCore') }}</template>
+                        </el-input>
+                        <span class="input-help">{{ $t('container.limitHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item :label="$t('container.memoryLimit')" prop="memoryLimit">
+                        <el-input class="!w-2/5" v-model.number="paramModel.memoryLimit" maxlength="10">
+                            <template #append>
+                                <el-select v-model="paramModel.memoryUnit" placeholder="Select" style="width: 85px">
+                                    <el-option label="KB" value="K" />
+                                    <el-option label="MB" value="M" />
+                                    <el-option label="GB" value="G" />
+                                </el-select>
+                            </template>
+                        </el-input>
+                        <span class="input-help">{{ $t('container.limitHelper') }}</span>
+                    </el-form-item>
+
+                    <el-form-item prop="editCompose">
+                        <el-checkbox v-model="paramModel.editCompose" :label="$t('app.editCompose')" size="large" />
+                        <span class="input-help">{{ $t('app.editComposeHelper') }}</span>
+                    </el-form-item>
+                    <div v-if="paramModel.editCompose">
+                        <codemirror
+                            :autofocus="true"
+                            placeholder=""
+                            :indent-with-tab="true"
+                            :tabSize="4"
+                            style="height: 400px"
+                            :lineWrapping="true"
+                            :matchBrackets="true"
+                            theme="cobalt"
+                            :styleActiveLine="true"
+                            :extensions="extensions"
+                            v-model="paramModel.dockerCompose"
+                        />
                     </div>
-                </el-form>
-            </el-col>
-        </el-row>
+                </div>
+            </el-form>
+        </div>
         <template #footer v-if="edit">
             <span>
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
@@ -115,13 +101,12 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
 import { GetAppInstallParams, UpdateAppInstallParams } from '@/api/modules/app';
 import { reactive, ref } from 'vue';
-import Header from '@/components/drawer-header/index.vue';
 import { FormInstance } from 'element-plus';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';

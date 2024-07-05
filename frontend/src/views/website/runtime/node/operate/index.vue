@@ -1,198 +1,185 @@
 <template>
-    <el-drawer
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
+    <DrawerPro
         v-model="open"
-        size="50%"
+        :header="$t('runtime.' + mode)"
+        :resource="mode === 'edit' ? runtime.name : ''"
+        size="large"
+        :back="handleClose"
     >
-        <template #header>
-            <DrawerHeader
-                :header="$t('runtime.' + mode)"
-                :hideResource="mode == 'create'"
-                :resource="runtime.name"
-                :back="handleClose"
-            />
-        </template>
-        <el-row v-loading="loading">
-            <el-col :span="22" :offset="1">
-                <el-form
-                    ref="runtimeForm"
-                    label-position="top"
-                    :model="runtime"
-                    label-width="125px"
-                    :rules="rules"
-                    :validate-on-rule-change="false"
-                >
-                    <el-form-item :label="$t('commons.table.name')" prop="name">
-                        <el-input :disabled="mode === 'edit'" v-model="runtime.name"></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('runtime.app')" prop="appID">
-                        <el-row :gutter="20">
-                            <el-col :span="12">
-                                <el-select
-                                    v-model="runtime.appID"
-                                    :disabled="mode === 'edit'"
-                                    @change="changeApp(runtime.appID)"
-                                    class="p-w-200"
-                                >
-                                    <el-option
-                                        v-for="(app, index) in apps"
-                                        :key="index"
-                                        :label="app.name"
-                                        :value="app.id"
-                                    ></el-option>
-                                </el-select>
-                            </el-col>
-                            <el-col :span="12">
-                                <el-select
-                                    v-model="runtime.version"
-                                    :disabled="mode === 'edit'"
-                                    @change="changeVersion()"
-                                    class="p-w-200"
-                                >
-                                    <el-option
-                                        v-for="(version, index) in appVersions"
-                                        :key="index"
-                                        :label="version"
-                                        :value="version"
-                                    ></el-option>
-                                </el-select>
-                            </el-col>
-                        </el-row>
-                    </el-form-item>
-                    <el-form-item :label="$t('runtime.codeDir')" prop="codeDir">
-                        <el-input v-model.trim="runtime.codeDir" :disabled="mode === 'edit'">
-                            <template #prepend>
-                                <FileList
-                                    :disabled="mode === 'edit'"
-                                    :path="runtime.codeDir"
-                                    @choose="getPath"
-                                    :dir="true"
-                                ></FileList>
-                            </template>
-                        </el-input>
-                    </el-form-item>
-                    <el-row :gutter="20">
-                        <el-col :span="18">
-                            <el-form-item :label="$t('runtime.runScript')" prop="params.EXEC_SCRIPT">
-                                <el-select
-                                    v-model="runtime.params['EXEC_SCRIPT']"
-                                    v-if="runtime.params['CUSTOM_SCRIPT'] == '0'"
-                                >
-                                    <el-option
-                                        v-for="(script, index) in scripts"
-                                        :key="index"
-                                        :label="script.name + ' 【 ' + script.script + ' 】'"
-                                        :value="script.name"
-                                    >
-                                        <el-row :gutter="10">
-                                            <el-col :span="4">{{ script.name }}</el-col>
-                                            <el-col :span="10">{{ ' 【 ' + script.script + ' 】' }}</el-col>
-                                        </el-row>
-                                    </el-option>
-                                </el-select>
-                                <el-input v-else v-model="runtime.params['EXEC_SCRIPT']"></el-input>
-                                <span class="input-help" v-if="runtime.params['CUSTOM_SCRIPT'] == '0'">
-                                    {{ $t('runtime.runScriptHelper') }}
-                                </span>
-                                <span class="input-help" v-else>
-                                    {{ $t('runtime.customScriptHelper') }}
-                                </span>
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="6">
-                            <el-form-item :label="$t('runtime.customScript')" prop="params.CUSTOM_SCRIPT">
-                                <el-switch
-                                    v-model="runtime.params['CUSTOM_SCRIPT']"
-                                    :active-value="'1'"
-                                    :inactive-value="'0'"
-                                    @change="changeScriptType"
-                                />
-                            </el-form-item>
-                        </el-col>
-                    </el-row>
-                    <el-row :gutter="20">
-                        <el-col :span="7">
-                            <el-form-item :label="$t('runtime.appPort')" prop="params.NODE_APP_PORT">
-                                <el-input v-model.number="runtime.params['NODE_APP_PORT']" />
-                                <span class="input-help">{{ $t('runtime.appPortHelper') }}</span>
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="7">
-                            <el-form-item :label="$t('runtime.externalPort')" prop="port">
-                                <el-input v-model.number="runtime.port" />
-                                <span class="input-help">{{ $t('runtime.externalPortHelper') }}</span>
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="4">
-                            <el-form-item :label="$t('commons.button.add') + $t('commons.table.port')">
-                                <el-button @click="addPort">
-                                    <el-icon><Plus /></el-icon>
-                                </el-button>
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="6">
-                            <el-form-item :label="$t('app.allowPort')" prop="params.HOST_IP">
-                                <el-switch
-                                    v-model="runtime.params['HOST_IP']"
-                                    :active-value="'0.0.0.0'"
-                                    :inactive-value="'127.0.0.1'"
-                                />
-                            </el-form-item>
-                        </el-col>
-                    </el-row>
-                    <el-row :gutter="20" v-for="(port, index) of runtime.exposedPorts" :key="index">
-                        <el-col :span="7">
-                            <el-form-item
-                                :prop="'exposedPorts.' + index + '.containerPort'"
-                                :rules="rules.params.NODE_APP_PORT"
-                            >
-                                <el-input v-model.number="port.containerPort" :placeholder="$t('runtime.appPort')" />
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="7">
-                            <el-form-item
-                                :prop="'exposedPorts.' + index + '.hostPort'"
-                                :rules="rules.params.NODE_APP_PORT"
-                            >
-                                <el-input v-model.number="port.hostPort" :placeholder="$t('runtime.externalPort')" />
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="4">
-                            <el-form-item>
-                                <el-button type="primary" @click="removePort(index)" link>
-                                    {{ $t('commons.button.delete') }}
-                                </el-button>
-                            </el-form-item>
-                        </el-col>
-                    </el-row>
-                    <el-form-item :label="$t('runtime.packageManager')" prop="params.PACKAGE_MANAGER">
-                        <el-select v-model="runtime.params['PACKAGE_MANAGER']">
-                            <el-option label="npm" value="npm"></el-option>
-                            <el-option label="yarn" value="yarn"></el-option>
-                            <el-option v-if="hasPnpm" label="pnpm" value="pnpm"></el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item :label="$t('runtime.imageSource')" prop="source">
-                        <el-select v-model="runtime.source" filterable allow-create default-first-option>
+        <el-form
+            v-loading="loading"
+            ref="runtimeForm"
+            label-position="top"
+            :model="runtime"
+            label-width="125px"
+            :rules="rules"
+            :validate-on-rule-change="false"
+        >
+            <el-form-item :label="$t('commons.table.name')" prop="name">
+                <el-input :disabled="mode === 'edit'" v-model="runtime.name"></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('runtime.app')" prop="appID">
+                <el-row :gutter="20">
+                    <el-col :span="12">
+                        <el-select
+                            v-model="runtime.appID"
+                            :disabled="mode === 'edit'"
+                            @change="changeApp(runtime.appID)"
+                            class="p-w-200"
+                        >
                             <el-option
-                                v-for="(source, index) in imageSources"
+                                v-for="(app, index) in apps"
                                 :key="index"
-                                :label="source.label + ' [' + source.value + ']'"
-                                :value="source.value"
+                                :label="app.name"
+                                :value="app.id"
                             ></el-option>
                         </el-select>
-                        <span class="input-help">
-                            {{ $t('runtime.phpsourceHelper') }}
+                    </el-col>
+                    <el-col :span="12">
+                        <el-select
+                            v-model="runtime.version"
+                            :disabled="mode === 'edit'"
+                            @change="changeVersion()"
+                            class="p-w-200"
+                        >
+                            <el-option
+                                v-for="(version, index) in appVersions"
+                                :key="index"
+                                :label="version"
+                                :value="version"
+                            ></el-option>
+                        </el-select>
+                    </el-col>
+                </el-row>
+            </el-form-item>
+            <el-form-item :label="$t('runtime.codeDir')" prop="codeDir">
+                <el-input v-model.trim="runtime.codeDir" :disabled="mode === 'edit'">
+                    <template #prepend>
+                        <FileList
+                            :disabled="mode === 'edit'"
+                            :path="runtime.codeDir"
+                            @choose="getPath"
+                            :dir="true"
+                        ></FileList>
+                    </template>
+                </el-input>
+            </el-form-item>
+            <el-row :gutter="20">
+                <el-col :span="18">
+                    <el-form-item :label="$t('runtime.runScript')" prop="params.EXEC_SCRIPT">
+                        <el-select
+                            v-model="runtime.params['EXEC_SCRIPT']"
+                            v-if="runtime.params['CUSTOM_SCRIPT'] == '0'"
+                        >
+                            <el-option
+                                v-for="(script, index) in scripts"
+                                :key="index"
+                                :label="script.name + ' 【 ' + script.script + ' 】'"
+                                :value="script.name"
+                            >
+                                <el-row :gutter="10">
+                                    <el-col :span="4">{{ script.name }}</el-col>
+                                    <el-col :span="10">{{ ' 【 ' + script.script + ' 】' }}</el-col>
+                                </el-row>
+                            </el-option>
+                        </el-select>
+                        <el-input v-else v-model="runtime.params['EXEC_SCRIPT']"></el-input>
+                        <span class="input-help" v-if="runtime.params['CUSTOM_SCRIPT'] == '0'">
+                            {{ $t('runtime.runScriptHelper') }}
+                        </span>
+                        <span class="input-help" v-else>
+                            {{ $t('runtime.customScriptHelper') }}
                         </span>
                     </el-form-item>
-                    <el-form-item :label="$t('app.containerName')" prop="params.CONTAINER_NAME">
-                        <el-input v-model.trim="runtime.params['CONTAINER_NAME']"></el-input>
+                </el-col>
+                <el-col :span="6">
+                    <el-form-item :label="$t('runtime.customScript')" prop="params.CUSTOM_SCRIPT">
+                        <el-switch
+                            v-model="runtime.params['CUSTOM_SCRIPT']"
+                            :active-value="'1'"
+                            :inactive-value="'0'"
+                            @change="changeScriptType"
+                        />
                     </el-form-item>
-                </el-form>
-            </el-col>
-        </el-row>
+                </el-col>
+            </el-row>
+            <el-row :gutter="20">
+                <el-col :span="7">
+                    <el-form-item :label="$t('runtime.appPort')" prop="params.NODE_APP_PORT">
+                        <el-input v-model.number="runtime.params['NODE_APP_PORT']" />
+                        <span class="input-help">{{ $t('runtime.appPortHelper') }}</span>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="7">
+                    <el-form-item :label="$t('runtime.externalPort')" prop="port">
+                        <el-input v-model.number="runtime.port" />
+                        <span class="input-help">{{ $t('runtime.externalPortHelper') }}</span>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="4">
+                    <el-form-item :label="$t('commons.button.add') + $t('commons.table.port')">
+                        <el-button @click="addPort">
+                            <el-icon><Plus /></el-icon>
+                        </el-button>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="6">
+                    <el-form-item :label="$t('app.allowPort')" prop="params.HOST_IP">
+                        <el-switch
+                            v-model="runtime.params['HOST_IP']"
+                            :active-value="'0.0.0.0'"
+                            :inactive-value="'127.0.0.1'"
+                        />
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row :gutter="20" v-for="(port, index) of runtime.exposedPorts" :key="index">
+                <el-col :span="7">
+                    <el-form-item
+                        :prop="'exposedPorts.' + index + '.containerPort'"
+                        :rules="rules.params.NODE_APP_PORT"
+                    >
+                        <el-input v-model.number="port.containerPort" :placeholder="$t('runtime.appPort')" />
+                    </el-form-item>
+                </el-col>
+                <el-col :span="7">
+                    <el-form-item :prop="'exposedPorts.' + index + '.hostPort'" :rules="rules.params.NODE_APP_PORT">
+                        <el-input v-model.number="port.hostPort" :placeholder="$t('runtime.externalPort')" />
+                    </el-form-item>
+                </el-col>
+                <el-col :span="4">
+                    <el-form-item>
+                        <el-button type="primary" @click="removePort(index)" link>
+                            {{ $t('commons.button.delete') }}
+                        </el-button>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-form-item :label="$t('runtime.packageManager')" prop="params.PACKAGE_MANAGER">
+                <el-select v-model="runtime.params['PACKAGE_MANAGER']">
+                    <el-option label="npm" value="npm"></el-option>
+                    <el-option label="yarn" value="yarn"></el-option>
+                    <el-option v-if="hasPnpm" label="pnpm" value="pnpm"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item :label="$t('runtime.imageSource')" prop="source">
+                <el-select v-model="runtime.source" filterable allow-create default-first-option>
+                    <el-option
+                        v-for="(source, index) in imageSources"
+                        :key="index"
+                        :label="source.label + ' [' + source.value + ']'"
+                        :value="source.value"
+                    ></el-option>
+                </el-select>
+                <span class="input-help">
+                    {{ $t('runtime.phpsourceHelper') }}
+                </span>
+            </el-form-item>
+            <el-form-item :label="$t('app.containerName')" prop="params.CONTAINER_NAME">
+                <el-input v-model.trim="runtime.params['CONTAINER_NAME']"></el-input>
+            </el-form-item>
+        </el-form>
+
         <template #footer>
             <span>
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
@@ -201,7 +188,7 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -214,7 +201,6 @@ import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { computed, reactive, ref, watch } from 'vue';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 
 interface OperateRrops {
     id?: number;

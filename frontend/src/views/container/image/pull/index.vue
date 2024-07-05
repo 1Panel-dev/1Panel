@@ -1,49 +1,35 @@
 <template>
-    <el-drawer
-        v-model="drawerVisible"
-        @close="onCloseLog"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="50%"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('container.imagePull')" :back="onCloseLog" />
-        </template>
-        <el-row type="flex" justify="center">
-            <el-col :span="22">
-                <el-form ref="formRef" label-position="top" :model="form">
-                    <el-form-item :label="$t('container.from')">
-                        <el-checkbox @change="onEdit()" v-model="form.fromRepo">
-                            {{ $t('container.imageRepo') }}
-                        </el-checkbox>
-                    </el-form-item>
-                    <el-form-item
-                        v-if="form.fromRepo"
-                        :label="$t('container.repoName')"
-                        :rules="Rules.requiredSelect"
-                        prop="repoID"
-                    >
-                        <el-select @change="onEdit()" clearable style="width: 100%" filterable v-model="form.repoID">
-                            <el-option v-for="item in repos" :key="item.id" :value="item.id" :label="item.name" />
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item :label="$t('container.imageName')" :rules="Rules.imageName" prop="imageName">
-                        <el-input @change="onEdit()" v-model.trim="form.imageName">
-                            <template v-if="form.fromRepo" #prepend>{{ loadDetailInfo(form.repoID) }}/</template>
-                        </el-input>
-                    </el-form-item>
-                </el-form>
-                <LogFile
-                    ref="logRef"
-                    :config="logConfig"
-                    :default-button="false"
-                    v-model:is-reading="isReading"
-                    v-if="showLog"
-                    :style="'height: calc(100vh - 397px);min-height: 200px'"
-                />
-            </el-col>
-        </el-row>
+    <DrawerPro v-model="drawerVisible" :header="$t('container.imagePull')" :back="onCloseLog" size="large">
+        <el-form ref="formRef" label-position="top" :model="form">
+            <el-form-item :label="$t('container.from')">
+                <el-checkbox @change="onEdit()" v-model="form.fromRepo">
+                    {{ $t('container.imageRepo') }}
+                </el-checkbox>
+            </el-form-item>
+            <el-form-item
+                v-if="form.fromRepo"
+                :label="$t('container.repoName')"
+                :rules="Rules.requiredSelect"
+                prop="repoID"
+            >
+                <el-select @change="onEdit()" clearable style="width: 100%" filterable v-model="form.repoID">
+                    <el-option v-for="item in repos" :key="item.id" :value="item.id" :label="item.name" />
+                </el-select>
+            </el-form-item>
+            <el-form-item :label="$t('container.imageName')" :rules="Rules.imageName" prop="imageName">
+                <el-input @change="onEdit()" v-model.trim="form.imageName">
+                    <template v-if="form.fromRepo" #prepend>{{ loadDetailInfo(form.repoID) }}/</template>
+                </el-input>
+            </el-form-item>
+        </el-form>
+        <LogFile
+            ref="logRef"
+            :config="logConfig"
+            :default-button="false"
+            v-model:is-reading="isReading"
+            v-if="showLog"
+            :style="'height: calc(100vh - 397px);min-height: 200px'"
+        />
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisible = false">
@@ -54,7 +40,7 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -64,7 +50,6 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { imagePull } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
 
 const drawerVisible = ref(false);

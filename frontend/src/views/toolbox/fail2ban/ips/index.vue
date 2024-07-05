@@ -1,23 +1,14 @@
 <template>
-    <el-drawer
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        :destroy-on-close="true"
+    <DrawerPro
         v-model="drawerVisible"
-        size="30%"
+        :header="$t('toolbox.fail2ban.' + form.operate + 'IP')"
+        :back="handleClose"
+        size="small"
     >
-        <template #header>
-            <Header :header="$t('toolbox.fail2ban.' + form.operate + 'IP')" :back="handleClose"></Header>
-        </template>
-
         <el-form ref="formRef" label-position="top" :model="form" @submit.prevent :rules="rules" v-loading="loading">
-            <el-row type="flex" justify="center">
-                <el-col :span="22">
-                    <el-form-item :label="$t('toolbox.fail2ban.' + form.operate + 'IP')" prop="ips">
-                        <el-input :rows="25" type="textarea" clearable v-model="form.ips" />
-                    </el-form-item>
-                </el-col>
-            </el-row>
+            <el-form-item :label="$t('toolbox.fail2ban.' + form.operate + 'IP')" prop="ips">
+                <el-input :rows="25" type="textarea" clearable v-model="form.ips" />
+            </el-form-item>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -27,12 +18,11 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import { operatorFail2banSSHD, searchFail2ban } from '@/api/modules/toolbox';
-import Header from '@/components/drawer-header/index.vue';
 import { FormInstance } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';

@@ -1,53 +1,40 @@
 <template>
-    <el-drawer
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        v-model="open"
-        size="50%"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('ssl.upload')" :back="handleClose" />
-        </template>
-        <el-row v-loading="loading">
-            <el-col :span="22" :offset="1">
-                <el-form ref="sslForm" label-position="top" :model="ssl" label-width="100px" :rules="rules">
-                    <el-form-item :label="$t('website.importType')" prop="type">
-                        <el-select v-model="ssl.type">
-                            <el-option :label="$t('website.pasteSSL')" :value="'paste'"></el-option>
-                            <el-option :label="$t('website.localSSL')" :value="'local'"></el-option>
-                        </el-select>
-                    </el-form-item>
-                    <div v-if="ssl.type === 'paste'">
-                        <el-form-item :label="$t('website.privateKey')" prop="privateKey">
-                            <el-input v-model="ssl.privateKey" :rows="6" type="textarea" />
-                        </el-form-item>
-                        <el-form-item :label="$t('website.certificate')" prop="certificate">
-                            <el-input v-model="ssl.certificate" :rows="6" type="textarea" />
-                        </el-form-item>
-                    </div>
-                    <div v-if="ssl.type === 'local'">
-                        <el-form-item :label="$t('website.privateKeyPath')" prop="privateKeyPath">
-                            <el-input v-model="ssl.privateKeyPath">
-                                <template #prepend>
-                                    <FileList @choose="getPrivateKeyPath" :dir="false"></FileList>
-                                </template>
-                            </el-input>
-                        </el-form-item>
-                        <el-form-item :label="$t('website.certificatePath')" prop="certificatePath">
-                            <el-input v-model="ssl.certificatePath">
-                                <template #prepend>
-                                    <FileList @choose="getCertificatePath" :dir="false"></FileList>
-                                </template>
-                            </el-input>
-                        </el-form-item>
-                    </div>
-                    <el-form-item :label="$t('website.remark')" prop="description">
-                        <el-input v-model="ssl.description"></el-input>
-                    </el-form-item>
-                </el-form>
-            </el-col>
-        </el-row>
+    <DrawerPro v-model="open" :header="$t('ssl.upload')" size="large" :back="handleClose">
+        <el-form ref="sslForm" label-position="top" :model="ssl" label-width="100px" :rules="rules" v-loading="loading">
+            <el-form-item :label="$t('website.importType')" prop="type">
+                <el-select v-model="ssl.type">
+                    <el-option :label="$t('website.pasteSSL')" :value="'paste'"></el-option>
+                    <el-option :label="$t('website.localSSL')" :value="'local'"></el-option>
+                </el-select>
+            </el-form-item>
+            <div v-if="ssl.type === 'paste'">
+                <el-form-item :label="$t('website.privateKey')" prop="privateKey">
+                    <el-input v-model="ssl.privateKey" :rows="6" type="textarea" />
+                </el-form-item>
+                <el-form-item :label="$t('website.certificate')" prop="certificate">
+                    <el-input v-model="ssl.certificate" :rows="6" type="textarea" />
+                </el-form-item>
+            </div>
+            <div v-if="ssl.type === 'local'">
+                <el-form-item :label="$t('website.privateKeyPath')" prop="privateKeyPath">
+                    <el-input v-model="ssl.privateKeyPath">
+                        <template #prepend>
+                            <FileList @choose="getPrivateKeyPath" :dir="false"></FileList>
+                        </template>
+                    </el-input>
+                </el-form-item>
+                <el-form-item :label="$t('website.certificatePath')" prop="certificatePath">
+                    <el-input v-model="ssl.certificatePath">
+                        <template #prepend>
+                            <FileList @choose="getCertificatePath" :dir="false"></FileList>
+                        </template>
+                    </el-input>
+                </el-form-item>
+            </div>
+            <el-form-item :label="$t('website.remark')" prop="description">
+                <el-input v-model="ssl.description"></el-input>
+            </el-form-item>
+        </el-form>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
@@ -56,11 +43,10 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { UploadSSL } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';

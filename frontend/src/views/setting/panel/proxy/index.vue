@@ -1,80 +1,60 @@
 <template>
-    <div>
-        <el-drawer
-            v-model="passwordVisible"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            size="50%"
-        >
-            <template #header>
-                <DrawerHeader :header="$t('setting.proxy')" :back="handleClose" />
-            </template>
-            <el-form ref="formRef" label-position="top" :model="form" :rules="rules" v-loading="loading">
-                <el-row type="flex" justify="center">
-                    <el-col :span="22">
-                        <el-alert class="common-prompt" :closable="false" type="warning">
-                            <template #default>
-                                {{ $t('setting.proxyHelper') }}
-                                <ul style="margin-left: -20px">
-                                    <li v-if="isProductPro">{{ $t('setting.proxyHelper1') }}</li>
-                                    <li v-if="isProductPro">{{ $t('setting.proxyHelper2') }}</li>
-                                    <li>{{ $t('setting.proxyHelper3') }}</li>
-                                </ul>
-                            </template>
-                        </el-alert>
-                        <el-form-item :label="$t('setting.proxyType')" prop="proxyType">
-                            <el-select v-model="form.proxyType" clearable>
-                                <el-option value="close" :label="$t('commons.button.close')" />
-                                <el-option value="socks5" label="SOCKS5" />
-                                <el-option value="http" label="HTTP" />
-                                <el-option value="https" label="HTTPS" />
-                            </el-select>
-                        </el-form-item>
-                        <div v-if="form.proxyType !== 'close'">
-                            <el-form-item :label="$t('setting.proxyUrl')" prop="proxyUrl">
-                                <el-input
-                                    clearable
-                                    v-model.trim="form.proxyUrl"
-                                    v-if="form.proxyType == 'http' || form.proxyType === 'https'"
-                                >
-                                    <template #prepend>
-                                        <span>{{ form.proxyType }}</span>
-                                    </template>
-                                </el-input>
-                                <el-input clearable v-model.trim="form.proxyUrl" v-else />
-                            </el-form-item>
-                            <el-form-item :label="$t('setting.proxyPort')" prop="proxyPortItem">
-                                <el-input clearable type="number" v-model.number="form.proxyPortItem" />
-                            </el-form-item>
-                            <el-form-item :label="$t('commons.login.username')" prop="proxyUser">
-                                <el-input clearable v-model.trim="form.proxyUser" />
-                            </el-form-item>
-                            <el-form-item :label="$t('commons.login.password')" prop="proxyPasswd">
-                                <el-input type="password" show-password clearable v-model.trim="form.proxyPasswd" />
-                            </el-form-item>
-                            <el-form-item>
-                                <el-checkbox
-                                    v-model="form.proxyPasswdKeepItem"
-                                    :label="$t('setting.proxyPasswdKeep')"
-                                />
-                            </el-form-item>
-                        </div>
-                    </el-col>
-                </el-row>
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button :disabled="loading" @click="passwordVisible = false">
-                        {{ $t('commons.button.cancel') }}
-                    </el-button>
-                    <el-button :disabled="loading" type="primary" @click="submitChangePassword(formRef)">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </span>
-            </template>
-        </el-drawer>
-    </div>
+    <DrawerPro v-model="passwordVisible" :header="$t('setting.proxy')" :back="handleClose" size="large">
+        <el-form ref="formRef" label-position="top" :model="form" :rules="rules" v-loading="loading">
+            <el-alert class="common-prompt" :closable="false" type="warning">
+                <template #default>
+                    {{ $t('setting.proxyHelper') }}
+                    <ul class="-ml-5">
+                        <li v-if="isProductPro">{{ $t('setting.proxyHelper1') }}</li>
+                        <li v-if="isProductPro">{{ $t('setting.proxyHelper2') }}</li>
+                        <li>{{ $t('setting.proxyHelper3') }}</li>
+                    </ul>
+                </template>
+            </el-alert>
+            <el-form-item :label="$t('setting.proxyType')" prop="proxyType">
+                <el-select v-model="form.proxyType" clearable>
+                    <el-option value="close" :label="$t('commons.button.close')" />
+                    <el-option value="socks5" label="SOCKS5" />
+                    <el-option value="http" label="HTTP" />
+                    <el-option value="https" label="HTTPS" />
+                </el-select>
+            </el-form-item>
+            <div v-if="form.proxyType !== 'close'">
+                <el-form-item :label="$t('setting.proxyUrl')" prop="proxyUrl">
+                    <el-input
+                        clearable
+                        v-model.trim="form.proxyUrl"
+                        v-if="form.proxyType == 'http' || form.proxyType === 'https'"
+                    >
+                        <template #prepend>
+                            <span>{{ form.proxyType }}</span>
+                        </template>
+                    </el-input>
+                    <el-input clearable v-model.trim="form.proxyUrl" v-else />
+                </el-form-item>
+                <el-form-item :label="$t('setting.proxyPort')" prop="proxyPortItem">
+                    <el-input clearable type="number" v-model.number="form.proxyPortItem" />
+                </el-form-item>
+                <el-form-item :label="$t('commons.login.username')" prop="proxyUser">
+                    <el-input clearable v-model.trim="form.proxyUser" />
+                </el-form-item>
+                <el-form-item :label="$t('commons.login.password')" prop="proxyPasswd">
+                    <el-input type="password" show-password clearable v-model.trim="form.proxyPasswd" />
+                </el-form-item>
+                <el-form-item>
+                    <el-checkbox v-model="form.proxyPasswdKeepItem" :label="$t('setting.proxyPasswdKeep')" />
+                </el-form-item>
+            </div>
+        </el-form>
+        <template #footer>
+            <el-button :disabled="loading" @click="passwordVisible = false">
+                {{ $t('commons.button.cancel') }}
+            </el-button>
+            <el-button :disabled="loading" type="primary" @click="submitChangePassword(formRef)">
+                {{ $t('commons.button.confirm') }}
+            </el-button>
+        </template>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -83,7 +63,6 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { updateProxy } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';

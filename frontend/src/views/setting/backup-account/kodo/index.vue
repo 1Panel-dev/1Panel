@@ -1,83 +1,56 @@
 <template>
-    <div>
-        <el-drawer
-            v-model="drawerVisible"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            size="50%"
-        >
-            <template #header>
-                <DrawerHeader :header="title + $t('setting.backupAccount')" :back="handleClose" />
-            </template>
-            <el-form @submit.prevent ref="formRef" v-loading="loading" label-position="top" :model="kodoData.rowData">
-                <el-row type="flex" justify="center">
-                    <el-col :span="22">
-                        <el-form-item :label="$t('commons.table.type')" prop="type" :rules="Rules.requiredSelect">
-                            <el-tag>{{ $t('setting.' + kodoData.rowData!.type) }}</el-tag>
-                        </el-form-item>
-                        <el-form-item label="Access Key ID" prop="accessKey" :rules="Rules.requiredInput">
-                            <el-input v-model.trim="kodoData.rowData!.accessKey" />
-                        </el-form-item>
-                        <el-form-item label="Secret Key" prop="credential" :rules="Rules.requiredInput">
-                            <el-input show-password clearable v-model.trim="kodoData.rowData!.credential" />
-                        </el-form-item>
-                        <el-form-item
-                            :label="$t('setting.domain')"
-                            prop="varsJson.domainItem"
-                            :rules="Rules.requiredInput"
-                        >
-                            <el-input v-model="kodoData.rowData!.varsJson['domainItem']">
-                                <template #prepend>
-                                    <el-select v-model.trim="domainProto" style="width: 100px">
-                                        <el-option label="http" value="http" />
-                                        <el-option label="https" value="https" />
-                                    </el-select>
-                                </template>
-                            </el-input>
-                        </el-form-item>
-                        <el-form-item label="Bucket" prop="bucket">
-                            <el-select
-                                @change="errBuckets = false"
-                                style="width: 80%"
-                                v-model="kodoData.rowData!.bucket"
-                            >
-                                <el-option v-for="item in buckets" :key="item" :value="item" />
-                            </el-select>
-                            <el-button style="width: 20%" plain @click="getBuckets(formRef)">
-                                {{ $t('setting.loadBucket') }}
-                            </el-button>
-                            <span v-if="errBuckets" class="input-error">{{ $t('commons.rule.requiredSelect') }}</span>
-                        </el-form-item>
-
-                        <el-form-item :label="$t('cronjob.requestExpirationTime')" prop="varsJson.timeout">
-                            <el-input-number
-                                style="width: 200px"
-                                :min="1"
-                                step-strictly
-                                :step="1"
-                                v-model.number="kodoData.rowData!.varsJson['timeout']"
-                            ></el-input-number>
-                        </el-form-item>
-
-                        <el-form-item :label="$t('setting.backupDir')" prop="backupPath">
-                            <el-input clearable v-model.trim="kodoData.rowData!.backupPath" placeholder="/1panel" />
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button :disabled="loading" @click="handleClose">
-                        {{ $t('commons.button.cancel') }}
-                    </el-button>
-                    <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </span>
-            </template>
-        </el-drawer>
-    </div>
+    <DrawerPro v-model="drawerVisible" :header="title + $t('setting.backupAccount')" :back="handleClose" size="large">
+        <el-form @submit.prevent ref="formRef" v-loading="loading" label-position="top" :model="kodoData.rowData">
+            <el-form-item :label="$t('commons.table.type')" prop="type" :rules="Rules.requiredSelect">
+                <el-tag>{{ $t('setting.' + kodoData.rowData!.type) }}</el-tag>
+            </el-form-item>
+            <el-form-item label="Access Key ID" prop="accessKey" :rules="Rules.requiredInput">
+                <el-input v-model.trim="kodoData.rowData!.accessKey" />
+            </el-form-item>
+            <el-form-item label="Secret Key" prop="credential" :rules="Rules.requiredInput">
+                <el-input show-password clearable v-model.trim="kodoData.rowData!.credential" />
+            </el-form-item>
+            <el-form-item :label="$t('setting.domain')" prop="varsJson.domainItem" :rules="Rules.requiredInput">
+                <el-input v-model="kodoData.rowData!.varsJson['domainItem']">
+                    <template #prepend>
+                        <el-select v-model.trim="domainProto" class="p-w-100">
+                            <el-option label="http" value="http" />
+                            <el-option label="https" value="https" />
+                        </el-select>
+                    </template>
+                </el-input>
+            </el-form-item>
+            <el-form-item label="Bucket" prop="bucket">
+                <el-select @change="errBuckets = false" class="!w-4/5" v-model="kodoData.rowData!.bucket">
+                    <el-option v-for="item in buckets" :key="item" :value="item" />
+                </el-select>
+                <el-button class="!w-1/5" plain @click="getBuckets(formRef)">
+                    {{ $t('setting.loadBucket') }}
+                </el-button>
+                <span v-if="errBuckets" class="input-error">{{ $t('commons.rule.requiredSelect') }}</span>
+            </el-form-item>
+           <el-form-item :label="$t('cronjob.requestExpirationTime')" prop="varsJson.timeout">
+                <el-input-number
+                    style="width: 200px"
+                    :min="1"
+                    step-strictly
+                    :step="1"
+                    v-model.number="kodoData.rowData!.varsJson['timeout']"
+                ></el-input-number>
+            </el-form-item>
+            <el-form-item :label="$t('setting.backupDir')" prop="backupPath">
+                <el-input clearable v-model.trim="kodoData.rowData!.backupPath" placeholder="/1panel" />
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <el-button :disabled="loading" @click="handleClose">
+                {{ $t('commons.button.cancel') }}
+            </el-button>
+            <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
+                {{ $t('commons.button.confirm') }}
+            </el-button>
+        </template>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -86,7 +59,6 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { Backup } from '@/api/interface/backup';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { addBackup, editBackup, listBucket } from '@/api/modules/setting';
 import { deepCopy, spliceHttp, splitHttp } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';

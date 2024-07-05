@@ -1,137 +1,114 @@
 <template>
-    <el-drawer
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        v-model="open"
-        :title="$t('app.install')"
-        size="50%"
-        :before-close="handleClose"
-    >
-        <template #header>
-            <Header :header="$t('app.install')" :back="handleClose"></Header>
-        </template>
-        <el-row v-loading="loading">
-            <el-col :span="22" :offset="1">
-                <el-alert
-                    :title="$t('app.appInstallWarn')"
-                    class="common-prompt"
-                    :closable="false"
-                    type="error"
-                    v-if="!isHostMode"
-                />
-                <el-alert
-                    :title="$t('app.hostModeHelper')"
-                    class="common-prompt"
-                    :closable="false"
-                    type="warning"
-                    v-else
-                />
-                <el-form
-                    @submit.prevent
-                    ref="paramForm"
-                    label-position="top"
-                    :model="req"
-                    label-width="150px"
-                    :rules="rules"
-                    :validate-on-rule-change="false"
+    <DrawerPro v-model="open" :header="$t('app.install')" :back="handleClose" size="large">
+        <el-alert
+            :title="$t('app.appInstallWarn')"
+            class="common-prompt"
+            :closable="false"
+            type="error"
+            v-if="!isHostMode"
+        />
+        <el-alert :title="$t('app.hostModeHelper')" class="common-prompt" :closable="false" type="warning" v-else />
+        <el-form
+            v-loading="loading"
+            @submit.prevent
+            ref="paramForm"
+            label-position="top"
+            :model="req"
+            label-width="150px"
+            :rules="rules"
+            :validate-on-rule-change="false"
+        >
+            <el-form-item :label="$t('commons.table.name')" prop="name">
+                <el-input v-model.trim="req.name"></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('app.version')" prop="version">
+                <el-select v-model="req.version" @change="getAppDetail(req.version)">
+                    <el-option
+                        v-for="(version, index) in appVersions"
+                        :key="index"
+                        :label="version"
+                        :value="version"
+                    ></el-option>
+                </el-select>
+            </el-form-item>
+            <Params
+                :key="paramKey"
+                v-if="open"
+                v-model:form="req.params"
+                v-model:params="installData.params"
+                v-model:rules="rules.params"
+                :propStart="'params.'"
+            ></Params>
+            <el-form-item prop="advanced">
+                <el-checkbox v-model="req.advanced" :label="$t('app.advanced')" size="large" />
+            </el-form-item>
+            <div v-if="req.advanced">
+                <el-form-item :label="$t('app.containerName')" prop="containerName">
+                    <el-input v-model.trim="req.containerName" :placeholder="$t('app.containerNameHelper')"></el-input>
+                </el-form-item>
+                <el-form-item prop="allowPort" v-if="!isHostMode">
+                    <el-checkbox v-model="req.allowPort" :label="$t('app.allowPort')" size="large" />
+                    <span class="input-help">{{ $t('app.allowPortHelper') }}</span>
+                </el-form-item>
+                <el-form-item
+                    :label="$t('container.cpuQuota')"
+                    prop="cpuQuota"
+                    :rules="checkNumberRange(0, limits.cpu)"
                 >
-                    <el-form-item :label="$t('commons.table.name')" prop="name">
-                        <el-input v-model.trim="req.name"></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('app.version')" prop="version">
-                        <el-select v-model="req.version" @change="getAppDetail(req.version)">
-                            <el-option
-                                v-for="(version, index) in appVersions"
-                                :key="index"
-                                :label="version"
-                                :value="version"
-                            ></el-option>
-                        </el-select>
-                    </el-form-item>
-                    <Params
-                        :key="paramKey"
-                        v-if="open"
-                        v-model:form="req.params"
-                        v-model:params="installData.params"
-                        v-model:rules="rules.params"
-                        :propStart="'params.'"
-                    ></Params>
-                    <el-form-item prop="advanced">
-                        <el-checkbox v-model="req.advanced" :label="$t('app.advanced')" size="large" />
-                    </el-form-item>
-                    <div v-if="req.advanced">
-                        <el-form-item :label="$t('app.containerName')" prop="containerName">
-                            <el-input
-                                v-model.trim="req.containerName"
-                                :placeholder="$t('app.containerNameHelper')"
-                            ></el-input>
-                        </el-form-item>
-                        <el-form-item prop="allowPort" v-if="!isHostMode">
-                            <el-checkbox v-model="req.allowPort" :label="$t('app.allowPort')" size="large" />
-                            <span class="input-help">{{ $t('app.allowPortHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item
-                            :label="$t('container.cpuQuota')"
-                            prop="cpuQuota"
-                            :rules="checkNumberRange(0, limits.cpu)"
-                        >
-                            <el-input type="number" style="width: 40%" v-model.number="req.cpuQuota" maxlength="5">
-                                <template #append>{{ $t('app.cpuCore') }}</template>
-                            </el-input>
-                            <span class="input-help">
-                                {{ $t('container.limitHelper', [limits.cpu]) }}{{ $t('commons.units.core') }}
-                            </span>
-                        </el-form-item>
-                        <el-form-item
-                            :label="$t('container.memoryLimit')"
-                            prop="memoryLimit"
-                            :rules="checkNumberRange(0, limits.memory)"
-                        >
-                            <el-input style="width: 40%" v-model.number="req.memoryLimit" maxlength="10">
-                                <template #append>
-                                    <el-select
-                                        v-model="req.memoryUnit"
-                                        placeholder="Select"
-                                        style="width: 85px"
-                                        @change="changeUnit"
-                                    >
-                                        <el-option label="MB" value="M" />
-                                        <el-option label="GB" value="G" />
-                                    </el-select>
-                                </template>
-                            </el-input>
-                            <span class="input-help">
-                                {{ $t('container.limitHelper', [limits.memory]) }}{{ req.memoryUnit }}B
-                            </span>
-                        </el-form-item>
-                        <el-form-item prop="editCompose">
-                            <el-checkbox v-model="req.editCompose" :label="$t('app.editCompose')" size="large" />
-                            <span class="input-help">{{ $t('app.editComposeHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item pro="pullImage">
-                            <el-checkbox v-model="req.pullImage" :label="$t('container.forcePull')" size="large" />
-                            <span class="input-help">{{ $t('container.forcePullHelper') }}</span>
-                        </el-form-item>
-                        <div v-if="req.editCompose">
-                            <codemirror
-                                :autofocus="true"
-                                placeholder=""
-                                :indent-with-tab="true"
-                                :tabSize="4"
-                                style="height: 400px"
-                                :lineWrapping="true"
-                                :matchBrackets="true"
-                                theme="cobalt"
-                                :styleActiveLine="true"
-                                :extensions="extensions"
-                                v-model="req.dockerCompose"
-                            />
-                        </div>
-                    </div>
-                </el-form>
-            </el-col>
-        </el-row>
-
+                    <el-input type="number" style="width: 40%" v-model.number="req.cpuQuota" maxlength="5">
+                        <template #append>{{ $t('app.cpuCore') }}</template>
+                    </el-input>
+                    <span class="input-help">
+                        {{ $t('container.limitHelper', [limits.cpu]) }}{{ $t('commons.units.core') }}
+                    </span>
+                </el-form-item>
+                <el-form-item
+                    :label="$t('container.memoryLimit')"
+                    prop="memoryLimit"
+                    :rules="checkNumberRange(0, limits.memory)"
+                >
+                    <el-input style="width: 40%" v-model.number="req.memoryLimit" maxlength="10">
+                        <template #append>
+                            <el-select
+                                v-model="req.memoryUnit"
+                                placeholder="Select"
+                                style="width: 85px"
+                                @change="changeUnit"
+                            >
+                                <el-option label="MB" value="M" />
+                                <el-option label="GB" value="G" />
+                            </el-select>
+                        </template>
+                    </el-input>
+                    <span class="input-help">
+                        {{ $t('container.limitHelper', [limits.memory]) }}{{ req.memoryUnit }}B
+                    </span>
+                </el-form-item>
+                <el-form-item prop="editCompose">
+                    <el-checkbox v-model="req.editCompose" :label="$t('app.editCompose')" size="large" />
+                    <span class="input-help">{{ $t('app.editComposeHelper') }}</span>
+                </el-form-item>
+                <el-form-item pro="pullImage">
+                    <el-checkbox v-model="req.pullImage" :label="$t('container.forcePull')" size="large" />
+                    <span class="input-help">{{ $t('container.forcePullHelper') }}</span>
+                </el-form-item>
+                <div v-if="req.editCompose">
+                    <codemirror
+                        :autofocus="true"
+                        placeholder=""
+                        :indent-with-tab="true"
+                        :tabSize="4"
+                        style="height: 400px"
+                        :lineWrapping="true"
+                        :matchBrackets="true"
+                        theme="cobalt"
+                        :styleActiveLine="true"
+                        :extensions="extensions"
+                        v-model="req.dockerCompose"
+                    />
+                </div>
+            </div>
+        </el-form>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
@@ -140,7 +117,7 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup name="appInstall">
@@ -151,7 +128,6 @@ import { FormInstance, FormRules } from 'element-plus';
 import { onMounted, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import Params from '../params/index.vue';
-import Header from '@/components/drawer-header/index.vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';

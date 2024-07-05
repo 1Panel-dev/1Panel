@@ -1,45 +1,31 @@
 <template>
-    <el-drawer
-        v-model="open"
-        :destroy-on-close="true"
-        :before-close="handleClose"
-        size="50%"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('file.download')" :back="handleClose" />
-        </template>
-        <el-row>
-            <el-col :span="22" :offset="1">
-                <el-form
-                    ref="fileForm"
-                    label-position="top"
-                    :model="addForm"
-                    label-width="100px"
-                    :rules="rules"
-                    v-loading="loading"
-                >
-                    <el-form-item :label="$t('file.downloadUrl')" prop="url">
-                        <el-input v-model="addForm.url" @input="getFileName" />
-                    </el-form-item>
-                    <el-form-item :label="$t('file.path')" prop="path">
-                        <el-input v-model="addForm.path">
-                            <template #prepend><FileList :path="addForm.path" @choose="getPath"></FileList></template>
-                        </el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('commons.table.name')" prop="name">
-                        <el-input v-model="addForm.name"></el-input>
-                    </el-form-item>
-                    <el-form-item>
-                        <el-checkbox v-model="addForm.ignoreCertificate">
-                            {{ $t('file.ignoreCertificate') }}
-                        </el-checkbox>
-                        <span class="input-help">{{ $t('file.ignoreCertificateHelper') }}</span>
-                    </el-form-item>
-                </el-form>
-            </el-col>
-        </el-row>
+    <DrawerPro v-model="open" :header="$t('file.download')" :back="handleClose" size="large">
+        <el-form
+            ref="fileForm"
+            label-position="top"
+            :model="addForm"
+            label-width="100px"
+            :rules="rules"
+            v-loading="loading"
+        >
+            <el-form-item :label="$t('file.downloadUrl')" prop="url">
+                <el-input v-model="addForm.url" @input="getFileName" />
+            </el-form-item>
+            <el-form-item :label="$t('file.path')" prop="path">
+                <el-input v-model="addForm.path">
+                    <template #prepend><FileList :path="addForm.path" @choose="getPath"></FileList></template>
+                </el-input>
+            </el-form-item>
+            <el-form-item :label="$t('commons.table.name')" prop="name">
+                <el-input v-model="addForm.name"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-checkbox v-model="addForm.ignoreCertificate">
+                    {{ $t('file.ignoreCertificate') }}
+                </el-checkbox>
+                <span class="input-help">{{ $t('file.ignoreCertificateHelper') }}</span>
+            </el-form-item>
+        </el-form>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose()" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
@@ -48,7 +34,7 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -58,7 +44,6 @@ import i18n from '@/lang';
 import { FormInstance, FormRules } from 'element-plus';
 import { reactive, ref } from 'vue';
 import FileList from '@/components/file-list/index.vue';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
 
 interface WgetProps {

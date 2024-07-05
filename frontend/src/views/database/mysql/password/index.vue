@@ -1,50 +1,38 @@
 <template>
     <div>
-        <el-drawer
+        <DrawerPro
             v-model="changeVisible"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            width="30%"
+            :header="title"
+            :resource="changeForm.mysqlName"
+            :back="handleClose"
+            size="small"
         >
-            <template #header>
-                <DrawerHeader :header="title" :resource="changeForm.mysqlName" :back="handleClose" />
-            </template>
             <el-form v-loading="loading" ref="changeFormRef" :model="changeForm" :rules="rules" label-position="top">
-                <el-row type="flex" justify="center">
-                    <el-col :span="22">
-                        <div v-if="changeForm.operation === 'password'">
-                            <el-form-item :label="$t('commons.login.username')" prop="userName">
-                                <el-input disabled v-model="changeForm.userName"></el-input>
-                            </el-form-item>
-                            <el-form-item :label="$t('commons.login.password')" prop="password">
-                                <el-input
-                                    type="password"
-                                    clearable
-                                    show-password
-                                    v-model="changeForm.password"
-                                ></el-input>
-                            </el-form-item>
-                        </div>
-                        <div v-if="changeForm.operation === 'privilege'">
-                            <el-form-item :label="$t('database.permission')" prop="privilege">
-                                <el-select style="width: 100%" v-model="changeForm.privilege">
-                                    <el-option value="%" :label="$t('database.permissionAll')" />
-                                    <el-option
-                                        v-if="changeForm.from !== 'local'"
-                                        value="localhost"
-                                        :label="$t('terminal.localhost')"
-                                    />
-                                    <el-option value="ip" :label="$t('database.permissionForIP')" />
-                                </el-select>
-                            </el-form-item>
-                            <el-form-item v-if="changeForm.privilege === 'ip'" prop="privilegeIPs">
-                                <el-input clearable :rows="3" type="textarea" v-model="changeForm.privilegeIPs" />
-                                <span class="input-help">{{ $t('database.remoteHelper') }}</span>
-                            </el-form-item>
-                        </div>
-                    </el-col>
-                </el-row>
+                <div v-if="changeForm.operation === 'password'">
+                    <el-form-item :label="$t('commons.login.username')" prop="userName">
+                        <el-input disabled v-model="changeForm.userName"></el-input>
+                    </el-form-item>
+                    <el-form-item :label="$t('commons.login.password')" prop="password">
+                        <el-input type="password" clearable show-password v-model="changeForm.password"></el-input>
+                    </el-form-item>
+                </div>
+                <div v-if="changeForm.operation === 'privilege'">
+                    <el-form-item :label="$t('database.permission')" prop="privilege">
+                        <el-select style="width: 100%" v-model="changeForm.privilege">
+                            <el-option value="%" :label="$t('database.permissionAll')" />
+                            <el-option
+                                v-if="changeForm.from !== 'local'"
+                                value="localhost"
+                                :label="$t('terminal.localhost')"
+                            />
+                            <el-option value="ip" :label="$t('database.permissionForIP')" />
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item v-if="changeForm.privilege === 'ip'" prop="privilegeIPs">
+                        <el-input clearable :rows="3" type="textarea" v-model="changeForm.privilegeIPs" />
+                        <span class="input-help">{{ $t('database.remoteHelper') }}</span>
+                    </el-form-item>
+                </div>
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
@@ -56,7 +44,7 @@
                     </el-button>
                 </span>
             </template>
-        </el-drawer>
+        </DrawerPro>
 
         <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmit"></ConfirmDialog>
     </div>
@@ -66,7 +54,6 @@ import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { deleteCheckMysqlDB, updateMysqlAccess, updateMysqlPassword } from '@/api/modules/database';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { Rules } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';
 import { checkIp } from '@/utils/util';

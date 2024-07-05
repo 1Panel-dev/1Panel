@@ -1,40 +1,36 @@
 <template>
-    <el-drawer
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
+    <DrawerPro
         v-model="open"
-        size="30%"
+        :header="process.operate == 'create' ? $t('commons.button.create') : $t('commons.button.edit')"
+        :back="handleClose"
+        size="small"
     >
-        <template #header>
-            <DrawerHeader
-                :header="process.operate == 'create' ? $t('commons.button.create') : $t('commons.button.edit')"
-                :back="handleClose"
-            />
-        </template>
-        <el-row v-loading="loading">
-            <el-col :span="22" :offset="1">
-                <el-form ref="processForm" label-position="top" :model="process" label-width="100px" :rules="rules">
-                    <el-form-item :label="$t('commons.table.name')" prop="name">
-                        <el-input v-model.trim="process.name" :disabled="process.operate == 'update'"></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('tool.supervisor.user')" prop="user">
-                        <el-input v-model.trim="process.user"></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('tool.supervisor.dir')" prop="dir">
-                        <el-input v-model.trim="process.dir">
-                            <template #prepend><FileList @choose="getPath" :dir="true"></FileList></template>
-                        </el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('tool.supervisor.command')" prop="command">
-                        <el-input v-model="process.command"></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('tool.supervisor.numprocs')" prop="numprocsNum">
-                        <el-input type="number" v-model.number="process.numprocsNum"></el-input>
-                    </el-form-item>
-                </el-form>
-            </el-col>
-        </el-row>
+        <el-form
+            ref="processForm"
+            label-position="top"
+            :model="process"
+            label-width="100px"
+            :rules="rules"
+            v-loading="loading"
+        >
+            <el-form-item :label="$t('commons.table.name')" prop="name">
+                <el-input v-model.trim="process.name" :disabled="process.operate == 'update'"></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('tool.supervisor.user')" prop="user">
+                <el-input v-model.trim="process.user"></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('tool.supervisor.dir')" prop="dir">
+                <el-input v-model.trim="process.dir">
+                    <template #prepend><FileList @choose="getPath" :dir="true"></FileList></template>
+                </el-input>
+            </el-form-item>
+            <el-form-item :label="$t('tool.supervisor.command')" prop="command">
+                <el-input v-model="process.command"></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('tool.supervisor.numprocs')" prop="numprocsNum">
+                <el-input type="number" v-model.number="process.numprocsNum"></el-input>
+            </el-form-item>
+        </el-form>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
@@ -43,7 +39,7 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>

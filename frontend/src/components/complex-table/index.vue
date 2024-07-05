@@ -3,7 +3,7 @@
         <div class="complex-table__header" v-if="slots.header || header">
             <slot name="header">{{ header }}</slot>
         </div>
-        <div v-if="slots.toolbar" class="bt-5">
+        <div v-if="slots.toolbar">
             <slot name="toolbar"></slot>
         </div>
 
@@ -48,7 +48,6 @@ const props = defineProps({
     paginationConfig: {
         type: Object,
         required: false,
-        default: () => {},
     },
     heightDiff: {
         type: Number,
@@ -124,6 +123,10 @@ onMounted(() => {
         @include flex-row(flex-start, center);
         line-height: 60px;
         font-size: 18px;
+    }
+
+    .complex-table__body {
+        margin-top: 10px;
     }
 
     .complex-table__toolbar {

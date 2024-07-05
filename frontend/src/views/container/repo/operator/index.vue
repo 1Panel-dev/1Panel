@@ -1,18 +1,11 @@
 <template>
-    <el-drawer
+    <DrawerPro
         v-model="drawerVisible"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="30%"
+        :header="title + $t('container.repo')"
+        :resource="dialogData.rowData?.name"
+        :back="handleClose"
+        size="small"
     >
-        <template #header>
-            <DrawerHeader
-                :header="title + $t('container.repo')"
-                :resource="dialogData.rowData?.name"
-                :back="handleClose"
-            />
-        </template>
         <el-form
             ref="formRef"
             label-position="top"
@@ -21,53 +14,49 @@
             :rules="rules"
             label-width="120px"
         >
-            <el-row type="flex" justify="center">
-                <el-col :span="22">
-                    <el-form-item :label="$t('commons.table.name')" prop="name">
-                        <el-input
-                            clearable
-                            :disabled="dialogData.title === 'edit'"
-                            v-model.trim="dialogData.rowData!.name"
-                        ></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('container.auth')" prop="auth">
-                        <el-radio-group v-model="dialogData.rowData!.auth">
-                            <el-radio :value="true">{{ $t('commons.true') }}</el-radio>
-                            <el-radio :value="false">{{ $t('commons.false') }}</el-radio>
-                        </el-radio-group>
-                    </el-form-item>
-                    <el-form-item v-if="dialogData.rowData!.auth" :label="$t('commons.login.username')" prop="username">
-                        <el-input clearable v-model.trim="dialogData.rowData!.username"></el-input>
-                    </el-form-item>
-                    <el-form-item v-if="dialogData.rowData!.auth" :label="$t('commons.login.password')" prop="password">
-                        <el-input
-                            clearable
-                            type="password"
-                            show-password
-                            v-model.trim="dialogData.rowData!.password"
-                        ></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('container.downloadUrl')" prop="downloadUrl">
-                        <el-input
-                            clearable
-                            v-model.trim="dialogData.rowData!.downloadUrl"
-                            :placeholder="'172.16.10.10:8081'"
-                        ></el-input>
-                        <span v-if="dialogData.rowData!.downloadUrl" class="input-help">
-                            docker pull {{ dialogData.rowData!.downloadUrl }}/nginx
-                        </span>
-                    </el-form-item>
-                    <el-form-item :label="$t('commons.table.protocol')" prop="protocol">
-                        <el-radio-group v-model="dialogData.rowData!.protocol">
-                            <el-radio label="http">http</el-radio>
-                            <el-radio label="https">https</el-radio>
-                        </el-radio-group>
-                        <span v-if="dialogData.rowData!.protocol === 'http'" class="input-help">
-                            {{ $t('container.httpRepo') }}
-                        </span>
-                    </el-form-item>
-                </el-col>
-            </el-row>
+            <el-form-item :label="$t('commons.table.name')" prop="name">
+                <el-input
+                    clearable
+                    :disabled="dialogData.title === 'edit'"
+                    v-model.trim="dialogData.rowData!.name"
+                ></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('container.auth')" prop="auth">
+                <el-radio-group v-model="dialogData.rowData!.auth">
+                    <el-radio :value="true">{{ $t('commons.true') }}</el-radio>
+                    <el-radio :value="false">{{ $t('commons.false') }}</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item v-if="dialogData.rowData!.auth" :label="$t('commons.login.username')" prop="username">
+                <el-input clearable v-model.trim="dialogData.rowData!.username"></el-input>
+            </el-form-item>
+            <el-form-item v-if="dialogData.rowData!.auth" :label="$t('commons.login.password')" prop="password">
+                <el-input
+                    clearable
+                    type="password"
+                    show-password
+                    v-model.trim="dialogData.rowData!.password"
+                ></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('container.downloadUrl')" prop="downloadUrl">
+                <el-input
+                    clearable
+                    v-model.trim="dialogData.rowData!.downloadUrl"
+                    :placeholder="'172.16.10.10:8081'"
+                ></el-input>
+                <span v-if="dialogData.rowData!.downloadUrl" class="input-help">
+                    docker pull {{ dialogData.rowData!.downloadUrl }}/nginx
+                </span>
+            </el-form-item>
+            <el-form-item :label="$t('commons.table.protocol')" prop="protocol">
+                <el-radio-group v-model="dialogData.rowData!.protocol">
+                    <el-radio label="http">http</el-radio>
+                    <el-radio label="https">https</el-radio>
+                </el-radio-group>
+                <span v-if="dialogData.rowData!.protocol === 'http'" class="input-help">
+                    {{ $t('container.httpRepo') }}
+                </span>
+            </el-form-item>
         </el-form>
 
         <template #footer>
@@ -80,7 +69,7 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -89,7 +78,6 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { Container } from '@/api/interface/container';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { createImageRepo, updateImageRepo } from '@/api/modules/container';
 import { MsgSuccess } from '@/utils/message';
 

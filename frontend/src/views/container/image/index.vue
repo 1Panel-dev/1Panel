@@ -25,7 +25,7 @@
                 </el-button>
             </template>
             <template #rightToolBar>
-                <TableSearch @search="search()" v-model:searchName="searchName" class="mr-" />
+                <TableSearch @search="search()" v-model:searchName="searchName" class="mr-2.5" />
                 <TableSetting @search="search()" />
             </template>
             <template #main>

@@ -1,44 +1,29 @@
 <template>
-    <el-drawer
-        v-model="drawerVisible"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="50%"
-    >
-        <template #header>
-            <DrawerHeader :header="title" :back="handleClose" />
-        </template>
-        <div v-loading="loading">
-            <el-form ref="formRef" label-position="top" :model="dialogData.rowData" :rules="rules">
-                <el-row type="flex" justify="center">
-                    <el-col :span="22">
-                        <el-form-item :label="$t('commons.table.protocol')" prop="protocol">
-                            <el-select style="width: 100%" v-model="dialogData.rowData!.protocol">
-                                <el-option value="tcp" label="tcp" />
-                                <el-option value="udp" label="udp" />
-                                <el-option value="tcp/udp" label="tcp/udp" />
-                            </el-select>
-                        </el-form-item>
+    <DrawerPro v-model="drawerVisible" :header="title" :back="handleClose" size="large">
+        <el-form ref="formRef" label-position="top" :model="dialogData.rowData" :rules="rules" v-loading="loading">
+            <el-form-item :label="$t('commons.table.protocol')" prop="protocol">
+                <el-select class="w-full" v-model="dialogData.rowData!.protocol">
+                    <el-option value="tcp" label="tcp" />
+                    <el-option value="udp" label="udp" />
+                    <el-option value="tcp/udp" label="tcp/udp" />
+                </el-select>
+            </el-form-item>
 
-                        <el-form-item :label="$t('firewall.sourcePort')" prop="port">
-                            <el-input clearable v-model.trim="dialogData.rowData!.port" />
-                        </el-form-item>
+            <el-form-item :label="$t('firewall.sourcePort')" prop="port">
+                <el-input clearable v-model.trim="dialogData.rowData!.port" />
+            </el-form-item>
 
-                        <el-form-item :label="$t('firewall.targetIP')" prop="targetIP">
-                            <el-input v-model.trim="dialogData.rowData!.targetIP" />
-                            <span class="input-help">{{ $t('firewall.forwardHelper1') }}</span>
-                            <span class="input-help">{{ $t('firewall.forwardHelper2') }}</span>
-                            <span class="input-help">{{ $t('firewall.forwardHelper3') }}</span>
-                        </el-form-item>
+            <el-form-item :label="$t('firewall.targetIP')" prop="targetIP">
+                <el-input v-model.trim="dialogData.rowData!.targetIP" />
+                <span class="input-help">{{ $t('firewall.forwardHelper1') }}</span>
+                <span class="input-help">{{ $t('firewall.forwardHelper2') }}</span>
+                <span class="input-help">{{ $t('firewall.forwardHelper3') }}</span>
+            </el-form-item>
 
-                        <el-form-item :label="$t('firewall.targetPort')" prop="targetPort">
-                            <el-input clearable v-model.trim="dialogData.rowData!.targetPort" />
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-            </el-form>
-        </div>
+            <el-form-item :label="$t('firewall.targetPort')" prop="targetPort">
+                <el-input clearable v-model.trim="dialogData.rowData!.targetPort" />
+            </el-form-item>
+        </el-form>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
@@ -47,7 +32,7 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
