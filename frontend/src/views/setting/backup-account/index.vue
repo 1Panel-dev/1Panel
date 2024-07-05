@@ -38,12 +38,12 @@
                         <span>
                             {{ $t('setting.backupAlert') }}
                             <el-link
-                                class="ml-1.5"
+                                class="ml-1 text-xs"
                                 type="primary"
                                 target="_blank"
                                 href="https://1panel.cn/docs/user_manual/settings/#3"
                             >
-                                {{ $t('setting.doc') }}
+                                {{ $t('commons.button.helpDoc') }}
                             </el-link>
                         </span>
                     </template>

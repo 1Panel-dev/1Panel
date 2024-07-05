@@ -5,13 +5,8 @@
                 <el-alert type="info" :closable="false">
                     <template #title>
                         {{ $t('toolbox.clam.clamHelper') }}
-                        <el-link
-                            style="font-size: 12px; margin-left: 5px"
-                            icon="Position"
-                            @click="toDoc()"
-                            type="primary"
-                        >
-                            {{ $t('firewall.quickJump') }}
+                        <el-link class="ml-1 text-xs" @click="toDoc()" type="primary">
+                            {{ $t('commons.button.helpDoc') }}
                         </el-link>
                     </template>
                 </el-alert>
