@@ -1,20 +1,13 @@
 <template>
     <div v-loading="loading">
-        <LayoutContent>
-            <template #title>
-                <back-button name="Redis" :header="$t('database.remoteDB')" />
+        <LayoutContent :title="$t('database.remoteDB')" backName="Redis">
+            <template #leftToolBar>
+                <el-button type="primary" @click="onOpenDialog('create')">
+                    {{ $t('database.createRemoteDB') }}
+                </el-button>
             </template>
-            <template #toolbar>
-                <el-row>
-                    <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
-                        <el-button type="primary" @click="onOpenDialog('create')">
-                            {{ $t('database.createRemoteDB') }}
-                        </el-button>
-                    </el-col>
-                    <el-col :xs="24" :sm="4" :md="4" :lg="4" :xl="4">
-                        <TableSearch @search="search()" v-model:searchName="searchName" />
-                    </el-col>
-                </el-row>
+            <template #rightToolBar>
+                <TableSearch @search="search()" v-model:searchName="searchName" />
             </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" @sort-change="search" @search="search" :data="data">

@@ -138,7 +138,7 @@
                         </el-table>
                     </div>
                 </el-popover>
-                <el-button class="btn mr-5" @click="openRecycleBin">
+                <el-button class="btn mr-2.5" @click="openRecycleBin">
                     {{ $t('file.recycleBin') }}
                 </el-button>
                 <div class="w-96">

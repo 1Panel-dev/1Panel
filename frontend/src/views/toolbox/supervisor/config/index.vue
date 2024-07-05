@@ -1,6 +1,6 @@
 <template>
     <LayoutContent :title="$t('tool.supervisor.config')" :reload="true">
-        <template #buttons>
+        <template #leftToolBar>
             <el-button type="primary" :plain="activeName !== '1'" @click="changeTab('1')">
                 {{ $t('nginx.configResource') }}
             </el-button>

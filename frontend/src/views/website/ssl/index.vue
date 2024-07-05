@@ -23,7 +23,6 @@
                 </el-button>
             </template>
             <template #main>
-                <br />
                 <ComplexTable
                     :data="data"
                     :pagination-config="paginationConfig"

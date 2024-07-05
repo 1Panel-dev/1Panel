@@ -1,42 +1,29 @@
 <template>
-    <el-drawer
-        v-model="open"
-        :before-close="handleClose"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="50%"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('file.setRole')" :back="handleClose" />
-        </template>
-
-        <el-row>
-            <el-col :span="22" :offset="1" v-loading="loading">
-                <FileRole :mode="mode" @get-mode="getMode" :key="open.toString()"></FileRole>
-                <el-form ref="fileForm" label-position="left" :model="addForm" label-width="100px" :rules="rules">
-                    <el-form-item :label="$t('commons.table.user')" prop="user">
-                        <el-input v-model.trim="addForm.user" />
-                    </el-form-item>
-                    <el-form-item :label="$t('file.group')" prop="group">
-                        <el-input v-model.trim="addForm.group" />
-                    </el-form-item>
-                    <el-form-item>
-                        <el-checkbox v-model="addForm.sub">{{ $t('file.containSub') }}</el-checkbox>
-                    </el-form-item>
-                </el-form>
-            </el-col>
-        </el-row>
+    <DrawerPro v-model="open" :header="$t('file.setRole')" :back="handleClose" size="large">
+        <div v-loading="loading">
+            <FileRole :mode="mode" @get-mode="getMode" :key="open.toString()"></FileRole>
+            <el-form ref="fileForm" label-position="left" :model="addForm" label-width="100px" :rules="rules">
+                <el-form-item :label="$t('commons.table.user')" prop="user">
+                    <el-input v-model.trim="addForm.user" />
+                </el-form-item>
+                <el-form-item :label="$t('file.group')" prop="group">
+                    <el-input v-model.trim="addForm.group" />
+                </el-form-item>
+                <el-form-item>
+                    <el-checkbox v-model="addForm.sub">{{ $t('file.containSub') }}</el-checkbox>
+                </el-form-item>
+            </el-form>
+        </div>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
                 <el-button type="primary" @click="submit()">{{ $t('commons.button.confirm') }}</el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script setup lang="ts">
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { reactive, ref } from 'vue';
 import { File } from '@/api/interface/file';
 import { BatchChangeRole } from '@/api/modules/files';

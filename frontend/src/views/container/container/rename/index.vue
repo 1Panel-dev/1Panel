@@ -1,26 +1,19 @@
 <template>
-    <el-drawer
+    <DrawerPro
         v-model="newNameVisible"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="30%"
+        :header="$t('container.rename')"
+        :back="handleClose"
+        :resource="renameForm.name"
+        size="small"
     >
-        <template #header>
-            <DrawerHeader :header="$t('container.rename')" :resource="renameForm.name" :back="handleClose" />
-        </template>
         <el-form @submit.prevent ref="newNameRef" v-loading="loading" :model="renameForm" label-position="top">
-            <el-row type="flex" justify="center">
-                <el-col :span="22">
-                    <el-form-item
-                        :label="$t('container.newName')"
-                        :rules="[Rules.containerName, Rules.requiredInput]"
-                        prop="newName"
-                    >
-                        <el-input v-model="renameForm.newName"></el-input>
-                    </el-form-item>
-                </el-col>
-            </el-row>
+            <el-form-item
+                :label="$t('container.newName')"
+                :rules="[Rules.containerName, Rules.requiredInput]"
+                prop="newName"
+            >
+                <el-input v-model="renameForm.newName"></el-input>
+            </el-form-item>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -32,7 +25,7 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -42,7 +35,6 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElForm } from 'element-plus';
 import { reactive, ref } from 'vue';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const loading = ref(false);
 

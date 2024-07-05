@@ -19,23 +19,29 @@
         </div>
         <div class="content-container__main" v-if="slots.main">
             <el-card>
-                <div class="content-container__title" v-if="slots.title || title">
+                <div class="content-container__title" v-if="title">
                     <slot name="title">
-                        <back-button
-                            :path="backPath"
-                            :name="backName"
-                            :to="backTo"
-                            :header="title"
-                            :reload="reload"
-                            v-if="showBack"
-                        >
-                            <template v-if="slots.leftToolBar" #buttons>
-                                <slot name="leftToolBar"></slot>
-                            </template>
-                            <template v-else-if="slots.buttons" #buttons>
-                                <slot name="buttons"></slot>
-                            </template>
-                        </back-button>
+                        <div v-if="showBack">
+                            <div class="flex justify-between">
+                                <back-button
+                                    :path="backPath"
+                                    :name="backName"
+                                    :to="backTo"
+                                    :header="title"
+                                    :reload="reload"
+                                >
+                                    <template v-if="slots.leftToolBar" #buttons>
+                                        <slot name="leftToolBar" v-if="slots.leftToolBar"></slot>
+                                    </template>
+                                    <!-- <template v-else-if="slots.buttons" #buttons>
+                                        <slot name="buttons"></slot>
+                                    </template> -->
+                                </back-button>
+                                <div>
+                                    <slot name="rightToolBar" v-if="slots.rightToolBar"></slot>
+                                </div>
+                            </div>
+                        </div>
                         <div class="flex justify-between" v-else>
                             <div>
                                 {{ title }}
@@ -106,7 +112,7 @@ const showBack = computed(() => {
 }
 
 .content-container__title {
-    font-weight: 700;
+    font-weight: 400;
     font-size: 18px;
 }
 

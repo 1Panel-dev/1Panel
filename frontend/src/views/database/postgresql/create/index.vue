@@ -1,47 +1,33 @@
 <template>
-    <el-drawer
-        v-model="createVisible"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="30%"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('database.create')" :back="handleClose" />
-        </template>
+    <DrawerPro v-model="createVisible" :header="$t('database.create')" :back="handleClose" size="small">
         <div v-loading="loading">
             <el-form ref="formRef" label-position="top" :model="form" :rules="rules">
-                <el-row type="flex" justify="center">
-                    <el-col :span="22">
-                        <el-form-item :label="$t('commons.table.name')" prop="name">
-                            <el-input clearable v-model.trim="form.name" @input="form.username = form.name"></el-input>
-                        </el-form-item>
-                        <el-form-item :label="$t('commons.login.username')" prop="username">
-                            <el-input clearable v-model.trim="form.username" />
-                        </el-form-item>
-                        <el-form-item :label="$t('commons.login.password')" prop="password">
-                            <el-input type="password" clearable show-password v-model.trim="form.password">
-                                <template #append>
-                                    <el-button @click="random">{{ $t('commons.button.random') }}</el-button>
-                                </template>
-                            </el-input>
-                        </el-form-item>
-                        <el-form-item :label="$t('database.permission')" prop="superUser">
-                            <el-checkbox v-model="form.superUser">{{ $t('database.pgSuperUser') }}</el-checkbox>
-                        </el-form-item>
+                <el-form-item :label="$t('commons.table.name')" prop="name">
+                    <el-input clearable v-model.trim="form.name" @input="form.username = form.name"></el-input>
+                </el-form-item>
+                <el-form-item :label="$t('commons.login.username')" prop="username">
+                    <el-input clearable v-model.trim="form.username" />
+                </el-form-item>
+                <el-form-item :label="$t('commons.login.password')" prop="password">
+                    <el-input type="password" clearable show-password v-model.trim="form.password">
+                        <template #append>
+                            <el-button @click="random">{{ $t('commons.button.random') }}</el-button>
+                        </template>
+                    </el-input>
+                </el-form-item>
+                <el-form-item :label="$t('database.permission')" prop="superUser">
+                    <el-checkbox v-model="form.superUser">{{ $t('database.pgSuperUser') }}</el-checkbox>
+                </el-form-item>
 
-                        <el-form-item :label="$t('commons.table.type')" prop="database">
-                            <el-tag>{{ form.database + ' [' + form.type + ']' }}</el-tag>
-                        </el-form-item>
+                <el-form-item :label="$t('commons.table.type')" prop="database">
+                    <el-tag>{{ form.database + ' [' + form.type + ']' }}</el-tag>
+                </el-form-item>
 
-                        <el-form-item :label="$t('commons.table.description')" prop="description">
-                            <el-input type="textarea" clearable v-model="form.description" />
-                        </el-form-item>
-                    </el-col>
-                </el-row>
+                <el-form-item :label="$t('commons.table.description')" prop="description">
+                    <el-input type="textarea" clearable v-model="form.description" />
+                </el-form-item>
             </el-form>
         </div>
-
         <template #footer>
             <span class="dialog-footer">
                 <el-button :disabled="loading" @click="createVisible = false">
@@ -52,7 +38,7 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -61,7 +47,6 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { addPostgresqlDB } from '@/api/modules/database';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { getRandomStr } from '@/utils/util';
 

@@ -1,47 +1,26 @@
 <template>
-    <div v-loading="loading">
-        <el-drawer
-            v-model="drawerVisible"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            size="50%"
-        >
-            <template #header>
-                <DrawerHeader :header="title + $t('setting.backupAccount')" :back="handleClose" />
-            </template>
-            <el-form @submit.prevent ref="formRef" v-loading="loading" label-position="top" :model="dialogData.rowData">
-                <el-row type="flex" justify="center">
-                    <el-col :span="22">
-                        <el-form-item :label="$t('commons.table.type')" prop="type" :rules="Rules.requiredSelect">
-                            <el-tag>{{ $t('setting.' + dialogData.rowData!.type) }}</el-tag>
-                        </el-form-item>
-                        <el-form-item
-                            :label="$t('setting.backupDir')"
-                            prop="varsJson['dir']"
-                            :rules="Rules.requiredInput"
-                        >
-                            <el-input v-model="dialogData.rowData!.varsJson['dir']">
-                                <template #prepend>
-                                    <FileList @choose="loadDir" :dir="true"></FileList>
-                                </template>
-                            </el-input>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button :disabled="loading" @click="handleClose">
-                        {{ $t('commons.button.cancel') }}
-                    </el-button>
-                    <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </span>
-            </template>
-        </el-drawer>
-    </div>
+    <DrawerPro v-model="drawerVisible" :header="title + $t('setting.backupAccount')" :back="handleClose" size="large">
+        <el-form @submit.prevent ref="formRef" v-loading="loading" label-position="top" :model="dialogData.rowData">
+            <el-form-item :label="$t('commons.table.type')" prop="type" :rules="Rules.requiredSelect">
+                <el-tag>{{ $t('setting.' + dialogData.rowData!.type) }}</el-tag>
+            </el-form-item>
+            <el-form-item :label="$t('setting.backupDir')" prop="varsJson['dir']" :rules="Rules.requiredInput">
+                <el-input v-model="dialogData.rowData!.varsJson['dir']">
+                    <template #prepend>
+                        <FileList @choose="loadDir" :dir="true"></FileList>
+                    </template>
+                </el-input>
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <el-button :disabled="loading" @click="handleClose">
+                {{ $t('commons.button.cancel') }}
+            </el-button>
+            <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
+                {{ $t('commons.button.confirm') }}
+            </el-button>
+        </template>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -51,7 +30,6 @@ import FileList from '@/components/file-list/index.vue';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { Backup } from '@/api/interface/backup';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { addBackup, editBackup } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
 

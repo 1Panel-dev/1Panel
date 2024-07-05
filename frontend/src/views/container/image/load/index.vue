@@ -1,26 +1,13 @@
 <template>
-    <el-drawer
-        v-model="loadVisible"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="30%"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('container.importImage')" :back="handleClose" />
-        </template>
+    <DrawerPro v-model="loadVisible" :header="$t('container.importImage')" :back="handleClose" size="small">
         <el-form @submit.prevent v-loading="loading" ref="formRef" :model="form" label-position="top">
-            <el-row type="flex" justify="center">
-                <el-col :span="22">
-                    <el-form-item :label="$t('container.path')" :rules="Rules.requiredInput" prop="path">
-                        <el-input v-model="form.path">
-                            <template #prepend>
-                                <FileList @choose="loadLoadDir" :dir="false"></FileList>
-                            </template>
-                        </el-input>
-                    </el-form-item>
-                </el-col>
-            </el-row>
+            <el-form-item :label="$t('container.path')" :rules="Rules.requiredInput" prop="path">
+                <el-input v-model="form.path">
+                    <template #prepend>
+                        <FileList @choose="loadLoadDir" :dir="false"></FileList>
+                    </template>
+                </el-input>
+            </el-form-item>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -32,7 +19,7 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -43,7 +30,6 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { imageLoad } from '@/api/modules/container';
 import { MsgSuccess } from '@/utils/message';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const loading = ref(false);
 

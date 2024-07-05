@@ -1,35 +1,28 @@
 <template>
-    <el-drawer v-model="open" width="30%" :close-on-click-modal="false" :close-on-press-escape="false">
-        <template #header>
-            <DrawerHeader :header="$t('file.info')" :back="handleClose" />
-        </template>
-        <el-row>
-            <el-col>
-                <el-descriptions :column="1" border>
-                    <el-descriptions-item :label="$t('file.fileName')">{{ data.name }}</el-descriptions-item>
-                    <el-descriptions-item :label="$t('commons.table.type')">{{ data.type }}</el-descriptions-item>
-                    <el-descriptions-item :label="$t('file.path')">{{ data.path }}</el-descriptions-item>
-                    <el-descriptions-item :label="$t('file.size')">
-                        <span v-if="data.isDir">
-                            <el-button type="primary" link small @click="getDirSize(data)">
-                                <span v-if="data.dirSize == undefined">
-                                    {{ $t('file.calculate') }}
-                                </span>
-                                <span v-else>{{ computeSize(data.dirSize) }}</span>
-                            </el-button>
+    <DrawerPro v-model="open" :header="$t('file.info')" :back="handleClose" size="large">
+        <el-descriptions :column="1" border>
+            <el-descriptions-item :label="$t('file.fileName')">{{ data.name }}</el-descriptions-item>
+            <el-descriptions-item :label="$t('commons.table.type')">{{ data.type }}</el-descriptions-item>
+            <el-descriptions-item :label="$t('file.path')">{{ data.path }}</el-descriptions-item>
+            <el-descriptions-item :label="$t('file.size')">
+                <span v-if="data.isDir">
+                    <el-button type="primary" link small @click="getDirSize(data)">
+                        <span v-if="data.dirSize == undefined">
+                            {{ $t('file.calculate') }}
                         </span>
-                        <span v-else>{{ computeSize(data.size) }}</span>
-                    </el-descriptions-item>
-                    <el-descriptions-item :label="$t('file.role')">{{ data.mode }}</el-descriptions-item>
-                    <el-descriptions-item :label="$t('commons.table.user')">{{ data.user }}</el-descriptions-item>
-                    <el-descriptions-item :label="$t('file.group')">{{ data.group }}</el-descriptions-item>
-                    <el-descriptions-item :label="$t('commons.table.updatedAt')">
-                        {{ dateFormatSimple(data.modTime) }}
-                    </el-descriptions-item>
-                </el-descriptions>
-            </el-col>
-        </el-row>
-    </el-drawer>
+                        <span v-else>{{ computeSize(data.dirSize) }}</span>
+                    </el-button>
+                </span>
+                <span v-else>{{ computeSize(data.size) }}</span>
+            </el-descriptions-item>
+            <el-descriptions-item :label="$t('file.role')">{{ data.mode }}</el-descriptions-item>
+            <el-descriptions-item :label="$t('commons.table.user')">{{ data.user }}</el-descriptions-item>
+            <el-descriptions-item :label="$t('file.group')">{{ data.group }}</el-descriptions-item>
+            <el-descriptions-item :label="$t('commons.table.updatedAt')">
+                {{ dateFormatSimple(data.modTime) }}
+            </el-descriptions-item>
+        </el-descriptions>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -37,7 +30,6 @@ import { ComputeDirSize, GetFileContent } from '@/api/modules/files';
 import { computeSize } from '@/utils/util';
 import { ref } from 'vue';
 import { dateFormatSimple } from '@/utils/util';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 
 interface InfoProps {
     path: string;

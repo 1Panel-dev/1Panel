@@ -8,7 +8,7 @@
                 </div>
             </el-card>
         </div>
-        <LayoutContent>
+        <LayoutContent title="Redis">
             <template #app v-if="currentDB?.from === 'local'">
                 <AppStatus
                     :app-key="'redis'"
@@ -19,95 +19,99 @@
                     @setting="onSetting"
                 ></AppStatus>
             </template>
-            <template #search v-if="!isOnSetting">
-                <div class="flex">
-                    <div>
-                        <el-button v-if="currentDB" type="primary" plain @click="onLoadConn">
-                            {{ $t('database.databaseConnInfo') }}
+            <template #leftToolBar v-if="!isOnSetting">
+                <el-button v-if="currentDB" type="primary" plain @click="onLoadConn">
+                    {{ $t('database.databaseConnInfo') }}
+                </el-button>
+                <el-button @click="goRemoteDB" type="primary" plain>
+                    {{ $t('database.remoteDB') }}
+                </el-button>
+            </template>
+            <template #rightToolBar v-if="!isOnSetting">
+                <el-select v-model="currentDBName" @change="changeDatabase()" class="p-w-200 ml-5" v-if="currentDB">
+                    <template #prefix>{{ $t('commons.table.type') }}</template>
+                    <el-option-group :label="$t('database.local')">
+                        <div v-for="(item, index) in dbOptionsLocal" :key="index">
+                            <el-option v-if="item.from === 'local'" :value="item.database" class="optionClass">
+                                <span v-if="item.database.length < 25">{{ item.database }}</span>
+                                <el-tooltip v-else :content="item.database" placement="top">
+                                    <span>{{ item.database.substring(0, 25) }}...</span>
+                                </el-tooltip>
+                            </el-option>
+                        </div>
+                        <el-button link type="primary" class="jumpAdd" @click="goRouter('app')" icon="Position">
+                            {{ $t('database.goInstall') }}
                         </el-button>
-                        <el-button @click="goRemoteDB" type="primary" plain>
-                            {{ $t('database.remoteDB') }}
+                    </el-option-group>
+                    <el-option-group :label="$t('database.remote')">
+                        <div v-for="(item, index) in dbOptionsRemote" :key="index">
+                            <el-option v-if="item.from === 'remote'" :value="item.database" class="optionClass">
+                                <span v-if="item.database.length < 25">{{ item.database }}</span>
+                                <el-tooltip v-else :content="item.database" placement="top">
+                                    <span>{{ item.database.substring(0, 25) }}...</span>
+                                </el-tooltip>
+                            </el-option>
+                        </div>
+                        <el-button link type="primary" class="jumpAdd" @click="goRouter('remote')" icon="Position">
+                            {{ $t('database.createRemoteDB') }}
+                        </el-button>
+                    </el-option-group>
+                </el-select>
+            </template>
+            <template #main v-if="!isOnSetting">
+                <div v-if="currentDB && !isOnSetting" class="mt-5">
+                    <Terminal
+                        :style="{ height: `calc(100vh - ${loadHeight()})` }"
+                        :key="isRefresh"
+                        ref="terminalRef"
+                        v-show="redisStatus === 'Running' && terminalShow"
+                    />
+                    <el-empty
+                        v-if="redisStatus !== 'Running' || (currentDB.from === 'remote' && !redisCliExist)"
+                        :image-size="80"
+                        :style="{ height: `calc(100vh - ${loadHeight()})`, 'background-color': '#000' }"
+                        :description="loadErrMsg()"
+                    >
+                        <el-button v-if="currentDB.from === 'remote'" type="primary" @click="installCli">
+                            {{ $t('commons.button.enable') }}
+                        </el-button>
+                    </el-empty>
+                    <div>
+                        <el-select v-model="quickCmd" clearable filterable @change="quickInput" style="width: 90%">
+                            <template #prefix>{{ $t('terminal.quickCommand') }}</template>
+                            <el-option
+                                v-for="cmd in quickCmdList"
+                                :key="cmd.id"
+                                :label="cmd.name"
+                                :value="cmd.command"
+                            />
+                        </el-select>
+                        <el-button @click="onSetQuickCmd" icon="Setting" style="width: 10%">
+                            {{ $t('commons.button.set') }}
                         </el-button>
                     </div>
-                    <el-select v-model="currentDBName" @change="changeDatabase()" class="p-w-200 ml-5" v-if="currentDB">
-                        <template #prefix>{{ $t('commons.table.type') }}</template>
-                        <el-option-group :label="$t('database.local')">
-                            <div v-for="(item, index) in dbOptionsLocal" :key="index">
-                                <el-option v-if="item.from === 'local'" :value="item.database" class="optionClass">
-                                    <span v-if="item.database.length < 25">{{ item.database }}</span>
-                                    <el-tooltip v-else :content="item.database" placement="top">
-                                        <span>{{ item.database.substring(0, 25) }}...</span>
-                                    </el-tooltip>
-                                </el-option>
+                </div>
+
+                <div v-if="dbOptionsLocal.length === 0 && dbOptionsRemote.length === 0">
+                    <LayoutContent :title="'Redis ' + $t('menu.database')" :divider="true">
+                        <template #main>
+                            <div class="app-warn">
+                                <div>
+                                    <span>{{ $t('app.checkInstalledWarn', ['Redis']) }}</span>
+                                    <span @click="goRouter('app')">
+                                        <el-icon class="ml-2"><Position /></el-icon>
+                                        {{ $t('database.goInstall') }}
+                                    </span>
+                                    <div>
+                                        <img src="@/assets/images/no_app.svg" />
+                                    </div>
+                                </div>
                             </div>
-                            <el-button link type="primary" class="jumpAdd" @click="goRouter('app')" icon="Position">
-                                {{ $t('database.goInstall') }}
-                            </el-button>
-                        </el-option-group>
-                        <el-option-group :label="$t('database.remote')">
-                            <div v-for="(item, index) in dbOptionsRemote" :key="index">
-                                <el-option v-if="item.from === 'remote'" :value="item.database" class="optionClass">
-                                    <span v-if="item.database.length < 25">{{ item.database }}</span>
-                                    <el-tooltip v-else :content="item.database" placement="top">
-                                        <span>{{ item.database.substring(0, 25) }}...</span>
-                                    </el-tooltip>
-                                </el-option>
-                            </div>
-                            <el-button link type="primary" class="jumpAdd" @click="goRouter('remote')" icon="Position">
-                                {{ $t('database.createRemoteDB') }}
-                            </el-button>
-                        </el-option-group>
-                    </el-select>
+                        </template>
+                    </LayoutContent>
                 </div>
             </template>
         </LayoutContent>
-
-        <div v-if="currentDB && !isOnSetting" class="mt-5">
-            <Terminal
-                :style="{ height: `calc(100vh - ${loadHeight()})` }"
-                :key="isRefresh"
-                ref="terminalRef"
-                v-show="redisStatus === 'Running' && terminalShow"
-            />
-            <el-empty
-                v-if="redisStatus !== 'Running' || (currentDB.from === 'remote' && !redisCliExist)"
-                :image-size="80"
-                :style="{ height: `calc(100vh - ${loadHeight()})`, 'background-color': '#000' }"
-                :description="loadErrMsg()"
-            >
-                <el-button v-if="currentDB.from === 'remote'" type="primary" @click="installCli">
-                    {{ $t('commons.button.enable') }}
-                </el-button>
-            </el-empty>
-            <div>
-                <el-select v-model="quickCmd" clearable filterable @change="quickInput" style="width: 90%">
-                    <template #prefix>{{ $t('terminal.quickCommand') }}</template>
-                    <el-option v-for="cmd in quickCmdList" :key="cmd.id" :label="cmd.name" :value="cmd.command" />
-                </el-select>
-                <el-button @click="onSetQuickCmd" icon="Setting" style="width: 10%">
-                    {{ $t('commons.button.set') }}
-                </el-button>
-            </div>
-        </div>
-
-        <div v-if="dbOptionsLocal.length === 0 && dbOptionsRemote.length === 0">
-            <LayoutContent :title="'Redis ' + $t('menu.database')" :divider="true">
-                <template #main>
-                    <div class="app-warn">
-                        <div>
-                            <span>{{ $t('app.checkInstalledWarn', ['Redis']) }}</span>
-                            <span @click="goRouter('app')">
-                                <el-icon class="ml-2"><Position /></el-icon>
-                                {{ $t('database.goInstall') }}
-                            </span>
-                            <div>
-                                <img src="@/assets/images/no_app.svg" />
-                            </div>
-                        </div>
-                    </div>
-                </template>
-            </LayoutContent>
-        </div>
 
         <Setting ref="settingRef" style="margin-top: 30px" />
         <Conn ref="connRef" @check-exist="reOpenTerminal" @close-terminal="closeTerminal(true)" />

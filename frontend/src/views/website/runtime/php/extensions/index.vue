@@ -1,32 +1,25 @@
 <template>
-    <el-drawer
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        v-model="open"
-        size="50%"
-        :before-close="handleClose"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('php.extensions')" :back="handleClose" />
+    <DrawerPro v-model="open" :header="$t('php.extensions')" size="large" :back="handleClose">
+        <template #content>
+            <ComplexTable :data="data" @search="search()" :pagination-config="paginationConfig">
+                <template #toolbar>
+                    <el-button type="primary" @click="openCreate">{{ $t('commons.button.create') }}</el-button>
+                </template>
+                <el-table-column :label="$t('commons.table.name')" width="150px" prop="name"></el-table-column>
+                <el-table-column :label="$t('php.extension')" fix prop="extensions"></el-table-column>
+                <fu-table-operations
+                    :ellipsis="10"
+                    width="120px"
+                    :buttons="buttons"
+                    :label="$t('commons.table.operate')"
+                    fixed="right"
+                    fix
+                />
+            </ComplexTable>
+            <Create ref="createRef" @close="search()" />
+            <OpDialog ref="opRef" @search="search" />
         </template>
-        <ComplexTable :data="data" @search="search()" :pagination-config="paginationConfig">
-            <template #toolbar>
-                <el-button type="primary" @click="openCreate">{{ $t('commons.button.create') }}</el-button>
-            </template>
-            <el-table-column :label="$t('commons.table.name')" width="150px" prop="name"></el-table-column>
-            <el-table-column :label="$t('php.extension')" fix prop="extensions"></el-table-column>
-            <fu-table-operations
-                :ellipsis="10"
-                width="120px"
-                :buttons="buttons"
-                :label="$t('commons.table.operate')"
-                fixed="right"
-                fix
-            />
-        </ComplexTable>
-        <Create ref="createRef" @close="search()" />
-        <OpDialog ref="opRef" @search="search" />
-    </el-drawer>
+    </DrawerPro>
 </template>
 <script lang="ts" setup>
 import { DeletePHPExtensions, SearchPHPExtensions } from '@/api/modules/runtime';

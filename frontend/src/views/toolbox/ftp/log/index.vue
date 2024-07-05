@@ -1,20 +1,10 @@
 <template>
-    <el-drawer
-        v-model="drawerVisible"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="50%"
-    >
-        <template #header>
-            <DrawerHeader header="FTP" :resource="paginationConfig.user" :back="handleClose" />
-        </template>
+    <DrawerPro v-model="drawerVisible" header="FTP" :resource="paginationConfig.user" :back="handleClose" size="large">
         <el-select @change="search" class="p-w-200" clearable v-model="paginationConfig.operation">
             <template #prefix>{{ $t('commons.table.operate') }}</template>
             <el-option value="PUT" :label="$t('file.upload')" />
             <el-option value="GET" :label="$t('file.download')" />
         </el-select>
-
         <ComplexTable class="mt-2" :pagination-config="paginationConfig" :data="data" @search="search">
             <el-table-column label="ip" prop="ip" show-overflow-tooltip />
             <el-table-column :label="$t('commons.table.status')" min-width="50" show-overflow-tooltip prop="status">
@@ -45,12 +35,11 @@
                 <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { searchFtpLog } from '@/api/modules/toolbox';
 import { computeSizeFromByte } from '@/utils/util';
 import i18n from '@/lang';

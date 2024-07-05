@@ -1,51 +1,27 @@
 <template>
-    <div>
-        <el-drawer
-            v-model="drawerVisible"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            size="30%"
-        >
-            <template #header>
-                <DrawerHeader :header="$t('setting.entrance')" :back="handleClose" />
-            </template>
-            <el-form
-                ref="formRef"
-                label-position="top"
-                :model="form"
-                @submit.prevent
-                v-loading="loading"
-                :rules="rules"
-            >
-                <el-row type="flex" justify="center">
-                    <el-col :span="22">
-                        <el-form-item :label="$t('setting.entrance')" prop="securityEntrance">
-                            <el-input clearable v-model="form.securityEntrance">
-                                <template #append>
-                                    <el-button @click="random">{{ $t('setting.randomGenerate') }}</el-button>
-                                </template>
-                            </el-input>
-                            <span class="input-help">
-                                {{ $t('setting.entranceInputHelper') }}
-                            </span>
-                        </el-form-item>
-                        <el-form-item>
-                            <el-checkbox v-model="show" :label="$t('setting.showEntrance')" />
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button :disabled="loading" type="primary" @click="submitEntrance(formRef)">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
+    <DrawerPro v-model="drawerVisible" :header="$t('setting.entrance')" :back="handleClose" size="small">
+        <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading" :rules="rules">
+            <el-form-item :label="$t('setting.entrance')" prop="securityEntrance">
+                <el-input clearable v-model="form.securityEntrance">
+                    <template #append>
+                        <el-button @click="random">{{ $t('setting.randomGenerate') }}</el-button>
+                    </template>
+                </el-input>
+                <span class="input-help">
+                    {{ $t('setting.entranceInputHelper') }}
                 </span>
-            </template>
-        </el-drawer>
-    </div>
+            </el-form-item>
+            <el-form-item>
+                <el-checkbox v-model="show" :label="$t('setting.showEntrance')" />
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+            <el-button :disabled="loading" type="primary" @click="submitEntrance(formRef)">
+                {{ $t('commons.button.confirm') }}
+            </el-button>
+        </template>
+    </DrawerPro>
 </template>
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
@@ -55,7 +31,6 @@ import { updateSetting } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { getRandomStr } from '@/utils/util';
 import { FormInstance } from 'element-plus';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 const globalStore = GlobalStore();
 
 const emit = defineEmits<{ (e: 'search'): void }>();

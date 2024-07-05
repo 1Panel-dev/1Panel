@@ -1,50 +1,34 @@
 <template>
-    <div>
-        <el-drawer
-            v-model="passwordVisible"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            size="30%"
-        >
-            <template #header>
-                <DrawerHeader :header="$t('setting.changePassword')" :back="handleClose" />
-            </template>
-
-            <el-row type="flex" justify="center" v-loading="loading">
-                <el-col :span="22">
-                    <el-form ref="formRef" label-position="top" :model="form" :rules="passRules">
-                        <el-alert
-                            :title="$t('toolbox.device.passwordHelper')"
-                            class="common-prompt"
-                            :closable="false"
-                            type="warning"
-                        />
-                        <el-form-item :label="$t('setting.user')" prop="user">
-                            <el-input clearable v-model.trim="form.user" />
-                            <span class="input-help">{{ $t('toolbox.device.userHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item :label="$t('setting.newPassword')" prop="newPassword">
-                            <el-input type="password" show-password clearable v-model.trim="form.newPassword" />
-                        </el-form-item>
-                        <el-form-item :label="$t('setting.retryPassword')" prop="retryPassword">
-                            <el-input type="password" show-password clearable v-model.trim="form.retryPassword" />
-                        </el-form-item>
-                    </el-form>
-                </el-col>
-            </el-row>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button :disabled="loading" @click="passwordVisible = false">
-                        {{ $t('commons.button.cancel') }}
-                    </el-button>
-                    <el-button :disabled="loading" type="primary" @click="submitChangePassword(formRef)">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </span>
-            </template>
-        </el-drawer>
-    </div>
+    <DrawerPro v-model="passwordVisible" :header="$t('setting.changePassword')" :back="handleClose" size="small">
+        <el-form ref="formRef" label-position="top" :model="form" :rules="passRules" v-loading="loading">
+            <el-alert
+                :title="$t('toolbox.device.passwordHelper')"
+                class="common-prompt"
+                :closable="false"
+                type="warning"
+            />
+            <el-form-item :label="$t('setting.user')" prop="user">
+                <el-input clearable v-model.trim="form.user" />
+                <span class="input-help">{{ $t('toolbox.device.userHelper') }}</span>
+            </el-form-item>
+            <el-form-item :label="$t('setting.newPassword')" prop="newPassword">
+                <el-input type="password" show-password clearable v-model.trim="form.newPassword" />
+            </el-form-item>
+            <el-form-item :label="$t('setting.retryPassword')" prop="retryPassword">
+                <el-input type="password" show-password clearable v-model.trim="form.retryPassword" />
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button :disabled="loading" @click="passwordVisible = false">
+                    {{ $t('commons.button.cancel') }}
+                </el-button>
+                <el-button :disabled="loading" type="primary" @click="submitChangePassword(formRef)">
+                    {{ $t('commons.button.confirm') }}
+                </el-button>
+            </span>
+        </template>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -53,7 +37,6 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { updateDevicePasswd } from '@/api/modules/toolbox';
 
 const formRef = ref<FormInstance>();

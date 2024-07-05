@@ -1,95 +1,74 @@
 <template>
-    <el-drawer
-        v-model="drawerVisible"
-        @close="handleClose"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="50%"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('container.compose')" :back="handleClose" />
-        </template>
-        <div v-loading="loading">
-            <el-row type="flex" justify="center">
-                <el-col :span="22">
-                    <el-form ref="formRef" @submit.prevent label-position="top" :model="form" :rules="rules">
-                        <el-form-item :label="$t('container.from')">
-                            <el-radio-group v-model="form.from" @change="onEdit('form')">
-                                <el-radio value="edit">{{ $t('commons.button.edit') }}</el-radio>
-                                <el-radio value="path">{{ $t('container.pathSelect') }}</el-radio>
-                                <el-radio value="template">{{ $t('container.composeTemplate') }}</el-radio>
-                            </el-radio-group>
-                        </el-form-item>
-                        <el-form-item v-if="form.from === 'path'" prop="path">
-                            <el-input
-                                @change="onEdit('')"
-                                :placeholder="$t('commons.example') + '/tmp/docker-compose.yml'"
-                                v-model="form.path"
-                            >
-                                <template #prepend>
-                                    <FileList @choose="loadDir" :dir="false"></FileList>
-                                </template>
-                            </el-input>
-                        </el-form-item>
-                        <el-form-item v-if="form.from === 'template'" prop="template">
-                            <el-select v-model="form.template" @change="onEdit('template')">
-                                <template #prefix>{{ $t('container.template') }}</template>
-                                <el-option
-                                    v-for="item in templateOptions"
-                                    :key="item.id"
-                                    :value="item.id"
-                                    :label="item.name"
-                                />
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item v-if="form.from === 'edit' || form.from === 'template'" prop="name">
-                            <el-input @input="changePath" @change="onEdit('')" v-model.trim="form.name">
-                                <template #prefix>
-                                    <span style="margin-right: 8px">{{ $t('file.dir') }}</span>
-                                </template>
-                            </el-input>
-                            <span class="input-help">
-                                {{ $t('container.composePathHelper', [composeFile]) }}
-                            </span>
-                        </el-form-item>
-                        <el-form-item>
-                            <div v-if="form.from === 'edit' || form.from === 'template'" style="width: 100%">
-                                <el-radio-group v-model="mode" size="small">
-                                    <el-radio-button label="edit">{{ $t('commons.button.edit') }}</el-radio-button>
-                                    <el-radio-button label="log">{{ $t('commons.button.log') }}</el-radio-button>
-                                </el-radio-group>
-                                <codemirror
-                                    @change="onEdit('')"
-                                    v-if="mode === 'edit'"
-                                    :autofocus="true"
-                                    placeholder="#Define or paste the content of your docker-compose file here"
-                                    :indent-with-tab="true"
-                                    :tabSize="4"
-                                    style="width: 100%; height: calc(100vh - 376px)"
-                                    :lineWrapping="true"
-                                    :matchBrackets="true"
-                                    theme="cobalt"
-                                    :styleActiveLine="true"
-                                    :extensions="extensions"
-                                    v-model="form.file"
-                                />
-                            </div>
-                            <div style="width: 100%">
-                                <LogFile
-                                    ref="logRef"
-                                    v-model:is-reading="isReading"
-                                    :config="logConfig"
-                                    :default-button="false"
-                                    v-if="mode === 'log' && showLog"
-                                    :style="'height: calc(100vh - 370px);min-height: 200px'"
-                                />
-                            </div>
-                        </el-form-item>
-                    </el-form>
-                </el-col>
-            </el-row>
-        </div>
+    <DrawerPro v-model="drawerVisible" :header="$t('container.compose')" :back="handleClose" size="large">
+        <el-form ref="formRef" @submit.prevent label-position="top" :model="form" :rules="rules" v-loading="loading">
+            <el-form-item :label="$t('container.from')">
+                <el-radio-group v-model="form.from" @change="onEdit('form')">
+                    <el-radio value="edit">{{ $t('commons.button.edit') }}</el-radio>
+                    <el-radio value="path">{{ $t('container.pathSelect') }}</el-radio>
+                    <el-radio value="template">{{ $t('container.composeTemplate') }}</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item v-if="form.from === 'path'" prop="path">
+                <el-input
+                    @change="onEdit('')"
+                    :placeholder="$t('commons.example') + '/tmp/docker-compose.yml'"
+                    v-model="form.path"
+                >
+                    <template #prepend>
+                        <FileList @choose="loadDir" :dir="false"></FileList>
+                    </template>
+                </el-input>
+            </el-form-item>
+            <el-form-item v-if="form.from === 'template'" prop="template">
+                <el-select v-model="form.template" @change="onEdit('template')">
+                    <template #prefix>{{ $t('container.template') }}</template>
+                    <el-option v-for="item in templateOptions" :key="item.id" :value="item.id" :label="item.name" />
+                </el-select>
+            </el-form-item>
+            <el-form-item v-if="form.from === 'edit' || form.from === 'template'" prop="name">
+                <el-input @input="changePath" @change="onEdit('')" v-model.trim="form.name">
+                    <template #prefix>
+                        <span style="margin-right: 8px">{{ $t('file.dir') }}</span>
+                    </template>
+                </el-input>
+                <span class="input-help">
+                    {{ $t('container.composePathHelper', [composeFile]) }}
+                </span>
+            </el-form-item>
+            <el-form-item>
+                <div v-if="form.from === 'edit' || form.from === 'template'" style="width: 100%">
+                    <el-radio-group v-model="mode" size="small">
+                        <el-radio-button label="edit">{{ $t('commons.button.edit') }}</el-radio-button>
+                        <el-radio-button label="log">{{ $t('commons.button.log') }}</el-radio-button>
+                    </el-radio-group>
+                    <codemirror
+                        @change="onEdit('')"
+                        v-if="mode === 'edit'"
+                        :autofocus="true"
+                        placeholder="#Define or paste the content of your docker-compose file here"
+                        :indent-with-tab="true"
+                        :tabSize="4"
+                        style="width: 100%; height: calc(100vh - 376px)"
+                        :lineWrapping="true"
+                        :matchBrackets="true"
+                        theme="cobalt"
+                        :styleActiveLine="true"
+                        :extensions="extensions"
+                        v-model="form.file"
+                    />
+                </div>
+                <div style="width: 100%">
+                    <LogFile
+                        ref="logRef"
+                        v-model:is-reading="isReading"
+                        :config="logConfig"
+                        :default-button="false"
+                        v-if="mode === 'log' && showLog"
+                        :style="'height: calc(100vh - 370px);min-height: 200px'"
+                    />
+                </div>
+            </el-form-item>
+        </el-form>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisible = false">
@@ -100,7 +79,7 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -110,8 +89,6 @@ import { Codemirror } from 'vue-codemirror';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, ElMessageBox } from 'element-plus';
-import DrawerHeader from '@/components/drawer-header/index.vue';
-import { listComposeTemplate, testCompose, upCompose } from '@/api/modules/container';
 import { loadBaseDir } from '@/api/modules/setting';
 import { MsgError } from '@/utils/message';
 import { javascript } from '@codemirror/lang-javascript';

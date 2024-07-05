@@ -1,94 +1,84 @@
 <template>
-    <el-drawer :close-on-click-modal="false" :close-on-press-escape="false" v-model="open" size="50%">
-        <template #header>
-            <Header
-                :header="$t('commons.button.' + operateReq.operate)"
-                :resource="resourceName"
-                :back="handleClose"
-            ></Header>
-        </template>
-        <el-row :gutter="10">
-            <el-col :span="22" :offset="1">
-                <div>
-                    <el-descriptions direction="vertical">
-                        <el-descriptions-item>
-                            <el-link @click="toLink(app.website)">
-                                <el-icon><OfficeBuilding /></el-icon>
-                                <span>{{ $t('app.appOfficeWebsite') }}</span>
-                            </el-link>
-                        </el-descriptions-item>
-                        <el-descriptions-item>
-                            <el-link @click="toLink(app.document)">
-                                <el-icon><Document /></el-icon>
-                                <span>{{ $t('app.document') }}</span>
-                            </el-link>
-                        </el-descriptions-item>
-                        <el-descriptions-item>
-                            <el-link @click="toLink(app.github)">
-                                <el-icon><Link /></el-icon>
-                                <span>{{ $t('app.github') }}</span>
-                            </el-link>
-                        </el-descriptions-item>
-                    </el-descriptions>
-                </div>
-            </el-col>
-            <el-col :span="22" :offset="1">
-                <el-form
-                    @submit.prevent
-                    ref="updateRef"
-                    :rules="rules"
-                    label-position="top"
-                    :model="operateReq"
-                    v-loading="loading"
-                >
-                    <el-form-item :label="$t('app.versionSelect')" prop="detailId">
-                        <el-select v-model="operateReq.version" @change="getVersions(operateReq.version)">
-                            <el-option
-                                v-for="(version, index) in versions"
-                                :key="index"
-                                :value="version.version"
-                                :label="version.version"
-                            ></el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item prop="backup" v-if="operateReq.operate === 'upgrade'">
-                        <el-checkbox v-model="operateReq.backup" :label="$t('app.backupApp')" />
-                        <span class="input-help">
-                            <el-text type="warning">{{ $t('app.backupAppHelper') }}</el-text>
-                        </span>
-                    </el-form-item>
-                    <el-form-item pro="pullImage" v-if="operateReq.operate === 'upgrade'">
-                        <el-checkbox v-model="operateReq.pullImage" :label="$t('container.forcePull')" size="large" />
-                        <span class="input-help">{{ $t('container.forcePullHelper') }}</span>
-                    </el-form-item>
-                </el-form>
-            </el-col>
+    <DrawerPro
+        v-model="open"
+        :header="$t('commons.button.' + operateReq.operate)"
+        :resource="resourceName"
+        :back="handleClose"
+    >
+        <el-descriptions direction="vertical">
+            <el-descriptions-item>
+                <el-link @click="toLink(app.website)">
+                    <el-icon><OfficeBuilding /></el-icon>
+                    <span>{{ $t('app.appOfficeWebsite') }}</span>
+                </el-link>
+            </el-descriptions-item>
+            <el-descriptions-item>
+                <el-link @click="toLink(app.document)">
+                    <el-icon><Document /></el-icon>
+                    <span>{{ $t('app.document') }}</span>
+                </el-link>
+            </el-descriptions-item>
+            <el-descriptions-item>
+                <el-link @click="toLink(app.github)">
+                    <el-icon><Link /></el-icon>
+                    <span>{{ $t('app.github') }}</span>
+                </el-link>
+            </el-descriptions-item>
+        </el-descriptions>
+        <el-form
+            @submit.prevent
+            ref="updateRef"
+            :rules="rules"
+            label-position="top"
+            :model="operateReq"
+            v-loading="loading"
+        >
+            <el-form-item :label="$t('app.versionSelect')" prop="detailId">
+                <el-select v-model="operateReq.version" @change="getVersions(operateReq.version)">
+                    <el-option
+                        v-for="(version, index) in versions"
+                        :key="index"
+                        :value="version.version"
+                        :label="version.version"
+                    ></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item prop="backup" v-if="operateReq.operate === 'upgrade'">
+                <el-checkbox v-model="operateReq.backup" :label="$t('app.backupApp')" />
+                <span class="input-help">
+                    <el-text type="warning">{{ $t('app.backupAppHelper') }}</el-text>
+                </span>
+            </el-form-item>
+            <el-form-item pro="pullImage" v-if="operateReq.operate === 'upgrade'">
+                <el-checkbox v-model="operateReq.pullImage" :label="$t('container.forcePull')" size="large" />
+                <span class="input-help">{{ $t('container.forcePullHelper') }}</span>
+            </el-form-item>
+        </el-form>
 
-            <el-col :span="22" :offset="1" v-if="operateReq.operate === 'upgrade'">
-                <el-text type="warning">{{ $t('app.upgradeWarn') }}</el-text>
-                <el-button class="ml-1.5" type="text" @click="openDiff()">{{ $t('app.showDiff') }}</el-button>
-                <div>
-                    <el-checkbox v-model="useNewCompose" :label="$t('app.useCustom')" size="large" />
-                </div>
-                <div v-if="useNewCompose">
-                    <el-text type="danger">{{ $t('app.useCustomHelper') }}</el-text>
-                </div>
-                <codemirror
-                    v-if="useNewCompose"
-                    :autofocus="true"
-                    placeholder=""
-                    :indent-with-tab="true"
-                    :tabSize="4"
-                    style="width: 100%; height: calc(100vh - 500px); margin-top: 10px"
-                    :lineWrapping="true"
-                    :matchBrackets="true"
-                    theme="cobalt"
-                    :styleActiveLine="true"
-                    :extensions="extensions"
-                    v-model="newCompose"
-                />
-            </el-col>
-        </el-row>
+        <div v-if="operateReq.operate === 'upgrade'">
+            <el-text type="warning">{{ $t('app.upgradeWarn') }}</el-text>
+            <el-button class="ml-1.5" type="text" @click="openDiff()">{{ $t('app.showDiff') }}</el-button>
+            <div>
+                <el-checkbox v-model="useNewCompose" :label="$t('app.useCustom')" size="large" />
+            </div>
+            <div v-if="useNewCompose">
+                <el-text type="danger">{{ $t('app.useCustomHelper') }}</el-text>
+            </div>
+            <codemirror
+                v-if="useNewCompose"
+                :autofocus="true"
+                placeholder=""
+                :indent-with-tab="true"
+                :tabSize="4"
+                style="width: 100%; height: calc(100vh - 500px); margin-top: 10px"
+                :lineWrapping="true"
+                :matchBrackets="true"
+                theme="cobalt"
+                :styleActiveLine="true"
+                :extensions="extensions"
+                v-model="newCompose"
+            />
+        </div>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
@@ -98,7 +88,7 @@
             </span>
         </template>
         <Diff ref="composeDiffRef" @confirm="getNewCompose" />
-    </el-drawer>
+    </DrawerPro>
 </template>
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
@@ -106,7 +96,6 @@ import { GetAppUpdateVersions, IgnoreUpgrade, InstalledOp } from '@/api/modules/
 import i18n from '@/lang';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { reactive, ref, onBeforeUnmount } from 'vue';
-import Header from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
 import Diff from './diff/index.vue';

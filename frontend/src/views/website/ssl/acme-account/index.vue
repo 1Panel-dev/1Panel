@@ -1,48 +1,46 @@
 <template>
-    <el-drawer :close-on-click-modal="false" :close-on-press-escape="false" v-model="open" size="60%">
-        <template #header>
-            <DrawerHeader :header="$t('website.acmeAccountManage')" :back="handleClose" />
+    <DrawerPro v-model="open" :header="$t('website.acmeAccountManage')" size="large" :back="handleClose">
+        <template #content>
+            <div class="mb-1.5">
+                <el-alert :title="$t('ssl.acmeHelper')" type="info" :closable="false" />
+            </div>
+            <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()" v-loading="loading">
+                <template #toolbar>
+                    <el-button type="primary" @click="openCreate">{{ $t('commons.button.create') }}</el-button>
+                </template>
+                <el-table-column
+                    :label="$t('website.email')"
+                    fix
+                    show-overflow-tooltip
+                    prop="email"
+                    min-width="100px"
+                ></el-table-column>
+                <el-table-column :label="$t('website.acmeAccountType')" fix show-overflow-tooltip prop="type">
+                    <template #default="{ row }">
+                        {{ getAccountName(row.type) }}
+                    </template>
+                </el-table-column>
+                <el-table-column :label="$t('website.keyType')" fix show-overflow-tooltip prop="keyType">
+                    <template #default="{ row }">
+                        {{ getKeyName(row.keyType) }}
+                    </template>
+                </el-table-column>
+                <el-table-column label="URL" show-overflow-tooltip prop="url" min-width="300px"></el-table-column>
+                <fu-table-operations
+                    :ellipsis="1"
+                    :buttons="buttons"
+                    :label="$t('commons.table.operate')"
+                    fixed="right"
+                    fix
+                />
+            </ComplexTable>
+            <Create ref="createRef" @close="search()"></Create>
         </template>
-        <div class="mb-1.5">
-            <el-alert :title="$t('ssl.acmeHelper')" type="info" :closable="false" />
-        </div>
-        <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()" v-loading="loading">
-            <template #toolbar>
-                <el-button type="primary" @click="openCreate">{{ $t('commons.button.create') }}</el-button>
-            </template>
-            <el-table-column
-                :label="$t('website.email')"
-                fix
-                show-overflow-tooltip
-                prop="email"
-                min-width="100px"
-            ></el-table-column>
-            <el-table-column :label="$t('website.acmeAccountType')" fix show-overflow-tooltip prop="type">
-                <template #default="{ row }">
-                    {{ getAccountName(row.type) }}
-                </template>
-            </el-table-column>
-            <el-table-column :label="$t('website.keyType')" fix show-overflow-tooltip prop="keyType">
-                <template #default="{ row }">
-                    {{ getKeyName(row.keyType) }}
-                </template>
-            </el-table-column>
-            <el-table-column label="URL" show-overflow-tooltip prop="url" min-width="300px"></el-table-column>
-            <fu-table-operations
-                :ellipsis="1"
-                :buttons="buttons"
-                :label="$t('commons.table.operate')"
-                fixed="right"
-                fix
-            />
-        </ComplexTable>
-        <Create ref="createRef" @close="search()"></Create>
-    </el-drawer>
+    </DrawerPro>
     <OpDialog ref="opRef" @search="search" />
 </template>
 
 <script lang="ts" setup>
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { Website } from '@/api/interface/website';
 import { DeleteAcmeAccount, SearchAcmeAccount } from '@/api/modules/website';
 import i18n from '@/lang';

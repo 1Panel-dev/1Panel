@@ -1,78 +1,51 @@
 <template>
-    <el-drawer
-        v-model="drawerVisible"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="30%"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('container.createVolume')" :back="handleClose" />
-        </template>
-        <el-row type="flex" justify="center">
-            <el-col :span="22">
-                <el-form
-                    ref="formRef"
-                    v-loading="loading"
-                    label-position="top"
-                    :model="form"
-                    :rules="rules"
-                    label-width="80px"
-                    @submit.prevent
-                >
-                    <el-form-item :label="$t('commons.table.name')" prop="name">
-                        <el-input clearable v-model.trim="form.name" />
-                    </el-form-item>
-                    <el-form-item :label="$t('container.driver')" prop="driver">
-                        <el-tag type="success">local</el-tag>
-                    </el-form-item>
-                    <el-form-item :label="$t('container.nfsEnable')" prop="nfsStatus">
-                        <el-switch v-model="form.nfsStatus" active-value="enable" inactive-value="disable" />
-                    </el-form-item>
-                    <div v-if="form.nfsStatus === 'enable'">
-                        <el-form-item :label="$t('container.nfsAddress')" prop="nfsAddress">
-                            <el-input
-                                clearable
-                                v-model.trim="form.nfsAddress"
-                                :placeholder="$t('commons.rule.hostHelper')"
-                            />
-                        </el-form-item>
-                        <el-form-item :label="$t('container.version')" prop="nfsVersion">
-                            <el-radio-group v-model="form.nfsVersion">
-                                <el-radio value="v3">NFS</el-radio>
-                                <el-radio value="v4">NFS4</el-radio>
-                            </el-radio-group>
-                        </el-form-item>
-                        <el-form-item :label="$t('container.mountpoint')" prop="nfsMount">
-                            <el-input
-                                clearable
-                                v-model.trim="form.nfsMount"
-                                :placeholder="$t('container.mountpointNFSHelper')"
-                            />
-                        </el-form-item>
-                        <el-form-item :label="$t('container.options')" prop="nfsOption">
-                            <el-input clearable v-model.trim="form.nfsOption" />
-                        </el-form-item>
-                    </div>
-                    <el-form-item :label="$t('container.option')" prop="optionStr">
-                        <el-input
-                            type="textarea"
-                            :placeholder="$t('container.tagHelper')"
-                            :rows="3"
-                            v-model="form.optionStr"
-                        />
-                    </el-form-item>
-                    <el-form-item :label="$t('container.tag')" prop="labelStr">
-                        <el-input
-                            type="textarea"
-                            :placeholder="$t('container.tagHelper')"
-                            :rows="3"
-                            v-model="form.labelStr"
-                        />
-                    </el-form-item>
-                </el-form>
-            </el-col>
-        </el-row>
+    <DrawerPro v-model="drawerVisible" :header="$t('container.createVolume')" :back="handleClose" size="small">
+        <el-form
+            ref="formRef"
+            v-loading="loading"
+            label-position="top"
+            :model="form"
+            :rules="rules"
+            label-width="80px"
+            @submit.prevent
+        >
+            <el-form-item :label="$t('commons.table.name')" prop="name">
+                <el-input clearable v-model.trim="form.name" />
+            </el-form-item>
+            <el-form-item :label="$t('container.driver')" prop="driver">
+                <el-tag type="success">local</el-tag>
+            </el-form-item>
+            <el-form-item :label="$t('container.nfsEnable')" prop="nfsStatus">
+                <el-switch v-model="form.nfsStatus" active-value="enable" inactive-value="disable" />
+            </el-form-item>
+            <div v-if="form.nfsStatus === 'enable'">
+                <el-form-item :label="$t('container.nfsAddress')" prop="nfsAddress">
+                    <el-input clearable v-model.trim="form.nfsAddress" :placeholder="$t('commons.rule.hostHelper')" />
+                </el-form-item>
+                <el-form-item :label="$t('container.version')" prop="nfsVersion">
+                    <el-radio-group v-model="form.nfsVersion">
+                        <el-radio value="v3">NFS</el-radio>
+                        <el-radio value="v4">NFS4</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item :label="$t('container.mountpoint')" prop="nfsMount">
+                    <el-input
+                        clearable
+                        v-model.trim="form.nfsMount"
+                        :placeholder="$t('container.mountpointNFSHelper')"
+                    />
+                </el-form-item>
+                <el-form-item :label="$t('container.options')" prop="nfsOption">
+                    <el-input clearable v-model.trim="form.nfsOption" />
+                </el-form-item>
+            </div>
+            <el-form-item :label="$t('container.option')" prop="optionStr">
+                <el-input type="textarea" :placeholder="$t('container.tagHelper')" :rows="3" v-model="form.optionStr" />
+            </el-form-item>
+            <el-form-item :label="$t('container.tag')" prop="labelStr">
+                <el-input type="textarea" :placeholder="$t('container.tagHelper')" :rows="3" v-model="form.labelStr" />
+            </el-form-item>
+        </el-form>
         <template #footer>
             <span class="dialog-footer">
                 <el-button :disabled="loading" @click="drawerVisible = false">
@@ -83,7 +56,7 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -92,7 +65,6 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { createVolume } from '@/api/modules/container';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);

@@ -1,16 +1,6 @@
 <template>
-    <div>
-        <el-drawer
-            v-model="drawerVisible"
-            :destroy-on-close="true"
-            @close="handleClose"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            size="50%"
-        >
-            <template #header>
-                <DrawerHeader :header="$t('database.redisQuickCmd')" :back="handleClose" />
-            </template>
+    <DrawerPro v-model="drawerVisible" :header="$t('database.redisQuickCmd')" :back="handleClose" size="large">
+        <template #content>
             <el-button type="primary" @click="handleCmdAdd()">
                 {{ $t('commons.button.add') }}
             </el-button>
@@ -66,15 +56,14 @@
                     </template>
                 </el-table-column>
             </el-table>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
-                </span>
-            </template>
-        </el-drawer>
-
-        <OpDialog ref="opRef" @search="search" />
-    </div>
+        </template>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
+            </span>
+        </template>
+    </DrawerPro>
+    <OpDialog ref="opRef" @search="search" />
 </template>
 
 <script setup lang="ts">
@@ -82,7 +71,6 @@ import { Command } from '@/api/interface/command';
 import { saveRedisCommand, deleteRedisCommand, getRedisCommandPage } from '@/api/modules/host';
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 
 const drawerVisible = ref();
