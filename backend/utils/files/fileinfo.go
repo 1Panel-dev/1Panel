@@ -44,6 +44,7 @@ type FileInfo struct {
 	Items      []*FileInfo `json:"items"`
 	ItemTotal  int         `json:"itemTotal"`
 	FavoriteID uint        `json:"favoriteID"`
+	IsDetail   bool        `json:"isDetail"`
 }
 
 type FileOption struct {
@@ -57,6 +58,7 @@ type FileOption struct {
 	PageSize   int    `json:"pageSize"`
 	SortBy     string `json:"sortBy"`
 	SortOrder  string `json:"sortOrder"`
+	IsDetail   bool   `json:"isDetail"`
 }
 
 type FileSearchInfo struct {
@@ -89,6 +91,7 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 		Gid:       strconv.FormatUint(uint64(info.Sys().(*syscall.Stat_t).Gid), 10),
 		Group:     GetGroup(info.Sys().(*syscall.Stat_t).Gid),
 		MimeType:  GetMimeType(op.Path),
+		IsDetail:  op.IsDetail,
 	}
 	favoriteRepo := repo.NewIFavoriteRepo()
 	favorite, _ := favoriteRepo.GetFirst(favoriteRepo.WithByPath(op.Path))
@@ -322,8 +325,10 @@ func (f *FileInfo) getContent() error {
 	if err != nil {
 		return nil
 	}
-	if len(cByte) > 0 && DetectBinary(cByte) {
-		return buserr.New(constant.ErrFileCanNotRead)
+	if !f.IsDetail {
+		if len(cByte) > 0 && DetectBinary(cByte) {
+			return buserr.New(constant.ErrFileCanNotRead)
+		}
 	}
 	f.Content = string(cByte)
 	return nil

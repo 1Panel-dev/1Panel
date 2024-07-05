@@ -56,7 +56,7 @@ const handleClose = () => {
 
 const acceptParams = async (params: InfoProps): Promise<void> => {
     props.value = params;
-    GetFileContent({ path: params.path, expand: false, page: 1, pageSize: 1 }).then((res) => {
+    GetFileContent({ path: params.path, expand: false, page: 1, pageSize: 1, isDetail: true }).then((res) => {
         data.value = res.data;
         open.value = true;
     });
