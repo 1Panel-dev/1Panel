@@ -1074,6 +1074,8 @@ const message = {
         },
         clam: {
             clam: 'Virus Scan',
+            showFresh: 'Show Virus Database Service',
+            hideFresh: 'Hide Virus Database Service',
             clamHelper:
                 'The minimum recommended configuration for ClamAV is: 3 GiB of RAM or more, single-core CPU with 2.0 GHz or higher, and at least 5 GiB of available hard disk space.',
             noClam: 'ClamAV service not detected, please refer to the official documentation for installation!',

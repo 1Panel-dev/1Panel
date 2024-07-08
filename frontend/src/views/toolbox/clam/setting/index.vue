@@ -29,6 +29,15 @@
 
             <template #main>
                 <div>
+                    <el-select style="width: 20%" @change="search" v-model.number="tail">
+                        <template #prefix>{{ $t('toolbox.clam.scanResult') }}</template>
+                        <el-option :value="0" :label="$t('commons.table.all')" />
+                        <el-option :value="10" :label="10" />
+                        <el-option :value="100" :label="100" />
+                        <el-option :value="200" :label="200" />
+                        <el-option :value="500" :label="500" />
+                        <el-option :value="1000" :label="1000" />
+                    </el-select>
                     <codemirror
                         :autofocus="true"
                         :placeholder="$t('commons.msg.noneData')"
@@ -75,13 +84,14 @@ const handleReady = (payload) => {
 };
 
 const activeName = ref('clamd');
+const tail = ref(0);
 const content = ref();
 const confirmRef = ref();
 
 const loadHeight = () => {
-    let height = globalStore.openMenuTabs ? '405px' : '375px';
+    let height = globalStore.openMenuTabs ? '425px' : '395px';
     if (canUpdate()) {
-        height = globalStore.openMenuTabs ? '363px' : '333px';
+        height = globalStore.openMenuTabs ? '383px' : '353px';
     }
     return height;
 };
@@ -93,7 +103,7 @@ const canUpdate = () => {
 const search = async (itemName: string) => {
     loading.value = true;
     activeName.value = itemName;
-    await searchClamFile(activeName.value)
+    await searchClamFile(activeName.value, tail.value + '')
         .then((res) => {
             loading.value = false;
             content.value = res.data;

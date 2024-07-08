@@ -190,12 +190,12 @@ func (b *BaseApi) LoadClamRecordLog(c *gin.Context) {
 // @Summary Load clam file
 // @Description 获取扫描文件
 // @Accept json
-// @Param request body dto.OperationWithName true "request"
+// @Param request body dto.ClamFileReq true "request"
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Router /toolbox/clam/file/search [post]
 func (b *BaseApi) SearchClamFile(c *gin.Context) {
-	var req dto.OperationWithName
+	var req dto.ClamFileReq
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}

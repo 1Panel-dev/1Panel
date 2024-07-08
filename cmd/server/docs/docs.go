@@ -11212,7 +11212,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.OperationWithName"
+                            "$ref": "#/definitions/dto.ClamFileReq"
                         }
                     }
                 ],
@@ -12924,6 +12924,57 @@ const docTemplate = `{
                     ],
                     "formatEN": "Delete website ca [name]",
                     "formatZH": "删除网站 ca [name]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/websites/ca/download": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "下载 CA 证书文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Website CA"
+                ],
+                "summary": "Download CA file",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.WebsiteResourceReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [
+                        {
+                            "db": "website_cas",
+                            "input_column": "id",
+                            "input_value": "id",
+                            "isList": false,
+                            "output_column": "name",
+                            "output_value": "name"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "id"
+                    ],
+                    "formatEN": "download ca file [name]",
+                    "formatZH": "下载 CA 证书文件 [name]",
                     "paramKeys": []
                 }
             }
@@ -15482,6 +15533,15 @@ const docTemplate = `{
         "dto.ClamBaseInfo": {
             "type": "object",
             "properties": {
+                "freshIsActive": {
+                    "type": "boolean"
+                },
+                "freshIsExist": {
+                    "type": "boolean"
+                },
+                "freshVersion": {
+                    "type": "string"
+                },
                 "isActive": {
                     "type": "boolean"
                 },
@@ -15530,6 +15590,20 @@ const docTemplate = `{
                 },
                 "removeRecord": {
                     "type": "boolean"
+                }
+            }
+        },
+        "dto.ClamFileReq": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "tail": {
+                    "type": "string"
                 }
             }
         },
@@ -19778,6 +19852,9 @@ const docTemplate = `{
                 "group": {
                     "type": "string"
                 },
+                "isDetail": {
+                    "type": "boolean"
+                },
                 "isDir": {
                     "type": "boolean"
                 },
@@ -20610,6 +20687,9 @@ const docTemplate = `{
                 "path"
             ],
             "properties": {
+                "isDetail": {
+                    "type": "boolean"
+                },
                 "path": {
                     "type": "string"
                 }
@@ -20763,6 +20843,9 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "expand": {
+                    "type": "boolean"
+                },
+                "isDetail": {
                     "type": "boolean"
                 },
                 "page": {
@@ -22265,6 +22348,9 @@ const docTemplate = `{
                     "additionalProperties": {
                         "type": "string"
                     }
+                },
+                "sni": {
+                    "type": "boolean"
                 }
             }
         },
@@ -22832,6 +22918,9 @@ const docTemplate = `{
                 },
                 "group": {
                     "type": "string"
+                },
+                "isDetail": {
+                    "type": "boolean"
                 },
                 "isDir": {
                     "type": "boolean"

@@ -218,6 +218,12 @@ definitions:
     type: object
   dto.ClamBaseInfo:
     properties:
+      freshIsActive:
+        type: boolean
+      freshIsExist:
+        type: boolean
+      freshVersion:
+        type: string
       isActive:
         type: boolean
       isExist:
@@ -250,6 +256,15 @@ definitions:
         type: boolean
     required:
     - ids
+    type: object
+  dto.ClamFileReq:
+    properties:
+      name:
+        type: string
+      tail:
+        type: string
+    required:
+    - name
     type: object
   dto.ClamLogReq:
     properties:
@@ -3119,6 +3134,8 @@ definitions:
         type: string
       group:
         type: string
+      isDetail:
+        type: boolean
       isDir:
         type: boolean
       isHidden:
@@ -3668,6 +3685,8 @@ definitions:
     type: object
   request.FileContentReq:
     properties:
+      isDetail:
+        type: boolean
       path:
         type: string
     required:
@@ -3772,6 +3791,8 @@ definitions:
       dir:
         type: boolean
       expand:
+        type: boolean
+      isDetail:
         type: boolean
       page:
         type: integer
@@ -4780,6 +4801,8 @@ definitions:
         additionalProperties:
           type: string
         type: object
+      sni:
+        type: boolean
     required:
     - id
     - match
@@ -5167,6 +5190,8 @@ definitions:
         type: string
       group:
         type: string
+      isDetail:
+        type: boolean
       isDir:
         type: boolean
       isHidden:
@@ -12558,7 +12583,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.OperationWithName'
+          $ref: '#/definitions/dto.ClamFileReq'
       responses:
         "200":
           description: OK
@@ -13664,6 +13689,39 @@ paths:
         - id
         formatEN: Delete website ca [name]
         formatZH: 删除网站 ca [name]
+        paramKeys: []
+  /websites/ca/download:
+    post:
+      consumes:
+      - application/json
+      description: 下载 CA 证书文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteResourceReq'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Download CA file
+      tags:
+      - Website CA
+      x-panel-log:
+        BeforeFunctions:
+        - db: website_cas
+          input_column: id
+          input_value: id
+          isList: false
+          output_column: name
+          output_value: name
+        bodyKeys:
+        - id
+        formatEN: download ca file [name]
+        formatZH: 下载 CA 证书文件 [name]
         paramKeys: []
   /websites/ca/obtain:
     post:

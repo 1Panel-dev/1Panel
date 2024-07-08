@@ -3,14 +3,14 @@
         <div class="app-status tool-status" v-if="data.isExist">
             <el-card>
                 <div>
-                    <el-tag effect="dark" type="success">ClamAV</el-tag>
+                    <el-tag class="w-17" effect="dark" type="success">ClamAV</el-tag>
                     <el-tag round class="status-content" v-if="data.isActive" type="success">
                         {{ $t('commons.status.running') }}
                     </el-tag>
                     <el-tag round class="status-content" v-if="!data.isActive" type="info">
                         {{ $t('commons.status.stopped') }}
                     </el-tag>
-                    <el-tag class="status-content">{{ $t('app.version') }}:{{ data.version }}</el-tag>
+                    <el-tag class="status-content w-24">{{ $t('app.version') }}:{{ data.version }}</el-tag>
                     <span class="buttons">
                         <el-button type="primary" v-if="!data.isActive" link @click="onOperate('start')">
                             {{ $t('app.start') }}
@@ -25,6 +25,35 @@
                         <el-divider direction="vertical" />
                         <el-button type="primary" link @click="setting">
                             {{ $t('commons.button.set') }}
+                        </el-button>
+                        <el-divider direction="vertical" />
+                        <el-button type="primary" v-if="showFresh" link @click="changeShow(false)">
+                            {{ $t('toolbox.clam.hideFresh') }}
+                        </el-button>
+                        <el-button type="primary" v-if="!showFresh" link @click="changeShow(true)">
+                            {{ $t('toolbox.clam.showFresh') }}
+                        </el-button>
+                    </span>
+                </div>
+                <div class="mt-4" v-if="showFresh">
+                    <el-tag class="w-16" effect="dark" type="success">FreshClam</el-tag>
+                    <el-tag round class="status-content" v-if="data.freshIsActive" type="success">
+                        {{ $t('commons.status.running') }}
+                    </el-tag>
+                    <el-tag round class="status-content" v-if="!data.freshIsActive" type="info">
+                        {{ $t('commons.status.stopped') }}
+                    </el-tag>
+                    <el-tag class="status-content w-24">{{ $t('app.version') }}:{{ data.freshVersion }}</el-tag>
+                    <span class="buttons">
+                        <el-button type="primary" v-if="!data.freshIsActive" link @click="onOperate('fresh-start')">
+                            {{ $t('app.start') }}
+                        </el-button>
+                        <el-button type="primary" v-if="data.freshIsActive" link @click="onOperate('fresh-stop')">
+                            {{ $t('app.stop') }}
+                        </el-button>
+                        <el-divider direction="vertical" />
+                        <el-button type="primary" link @click="onOperate('fresh-restart')">
+                            {{ $t('app.restart') }}
                         </el-button>
                     </span>
                 </div>
@@ -59,8 +88,13 @@ const data = ref({
     isExist: false,
     isActive: false,
     version: '',
+
+    freshIsExist: false,
+    freshIsActive: false,
+    freshVersion: '',
 });
 const loading = ref(false);
+const showFresh = ref(localStorage.getItem('clam-fresh-show') !== 'hide');
 
 const em = defineEmits(['setting', 'getStatus', 'update:loading', 'update:maskShow']);
 
@@ -70,6 +104,11 @@ const setting = () => {
 
 const toDoc = async () => {
     window.open('https://1panel.cn/docs/user_manual/toolbox/clam/', '_blank', 'noopener,noreferrer');
+};
+
+const changeShow = (val: boolean) => {
+    showFresh.value = val;
+    localStorage.setItem('clam-fresh-show', showFresh.value ? 'show' : 'hide');
 };
 
 const onOperate = async (operation: string) => {

@@ -8,6 +8,10 @@ type ClamBaseInfo struct {
 	Version  string `json:"version"`
 	IsActive bool   `json:"isActive"`
 	IsExist  bool   `json:"isExist"`
+
+	FreshVersion  string `json:"freshVersion"`
+	FreshIsActive bool   `json:"freshIsActive"`
+	FreshIsExist  bool   `json:"freshIsExist"`
 }
 
 type ClamInfo struct {
@@ -34,6 +38,11 @@ type ClamLogReq struct {
 	Tail       string `json:"tail"`
 	ClamName   string `json:"clamName"`
 	RecordName string `json:"recordName"`
+}
+
+type ClamFileReq struct {
+	Tail string `json:"tail"`
+	Name string `json:"name" validate:"required"`
 }
 
 type ClamLog struct {

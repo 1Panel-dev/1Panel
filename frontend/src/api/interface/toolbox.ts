@@ -121,6 +121,10 @@ export namespace Toolbox {
         version: string;
         isActive: boolean;
         isExist: boolean;
+
+        freshVersion: string;
+        freshIsExist: boolean;
+        freshIsActive: boolean;
     }
     export interface ClamInfo {
         id: number;
