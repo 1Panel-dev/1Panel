@@ -38,48 +38,37 @@
             </el-button>
         </div>
 
-        <codemirror
-            :autofocus="true"
-            :placeholder="$t('commons.msg.noneData')"
-            :indent-with-tab="true"
-            :tabSize="4"
-            style="margin-top: 10px; height: calc(100vh - 200px)"
-            :lineWrapping="true"
-            :matchBrackets="true"
-            theme="cobalt"
-            :styleActiveLine="true"
-            :extensions="extensions"
-            @ready="handleReady"
-            v-model="logInfo"
-            :disabled="true"
-        />
+        <div class="mt-2.5">
+            <highlightjs
+                v-if="showLog"
+                ref="editorRef"
+                class="editor-main"
+                language="JavaScript"
+                :autodetect="false"
+                :code="logInfo"
+            ></highlightjs>
+        </div>
     </el-drawer>
 </template>
 
 <script lang="ts" setup>
 import i18n from '@/lang';
 import { dateFormatForName } from '@/utils/util';
-import { computed, onBeforeUnmount, reactive, ref, shallowRef, watch } from 'vue';
-import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
+import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import { MsgError } from '@/utils/message';
 import { GlobalStore } from '@/store';
 import screenfull from 'screenfull';
 import { DownloadFile } from '@/api/modules/container';
 
-const extensions = [javascript(), oneDark];
-
 const logInfo = ref();
-const view = shallowRef();
-const handleReady = (payload) => {
-    view.value = payload.view;
-};
 const terminalSocket = ref<WebSocket>();
 const open = ref(false);
 const resource = ref('');
 const globalStore = GlobalStore();
 const logVisible = ref(false);
+const showLog = ref(false);
+const editorRef = ref();
+const scrollerElement = ref<HTMLElement | null>(null);
 
 const mobile = computed(() => {
     return globalStore.isMobile();
@@ -146,10 +135,8 @@ const searchLogs = async () => {
     );
     terminalSocket.value.onmessage = (event) => {
         logInfo.value += event.data;
-        const state = view.value.state;
-        view.value.dispatch({
-            selection: { anchor: state.doc.length, head: state.doc.length },
-            scrollIntoView: true,
+        nextTick(() => {
+            scrollerElement.value.scrollTop = scrollerElement.value.scrollHeight;
         });
     };
 };
@@ -208,6 +195,17 @@ onBeforeUnmount(() => {
     handleClose();
 });
 
+onMounted(async () => {
+    await nextTick(() => {
+        showLog.value = true;
+    });
+    if (editorRef.value) {
+        scrollerElement.value = editorRef.value.$el as HTMLElement;
+        let hljsDom = scrollerElement.value.querySelector('.hljs') as HTMLElement;
+        hljsDom.style['min-height'] = '500px';
+    }
+});
+
 defineExpose({
     acceptParams,
 });
@@ -216,5 +214,12 @@ defineExpose({
 <style scoped lang="scss">
 .selectWidth {
     width: 200px;
+}
+
+.editor-main {
+    height: calc(100vh - 100px);
+    width: 100%;
+    min-height: 600px;
+    overflow: auto;
 }
 </style>

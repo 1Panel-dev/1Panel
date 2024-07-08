@@ -51,19 +51,12 @@
                     </el-table>
                 </el-tab-pane>
                 <el-tab-pane :label="$t('process.env')" name="env">
-                    <codemirror
-                        :autofocus="true"
-                        :indent-with-tab="true"
-                        :tabSize="4"
-                        style="height: calc(100vh - 200px)"
-                        :lineWrapping="true"
-                        :matchBrackets="true"
-                        theme="cobalt"
-                        :styleActiveLine="true"
-                        :extensions="extensions"
+                    <CodemirrorPro
+                        :placeholder="$t('commons.msg.noneData')"
                         v-model="envStr"
+                        :heightDiff="300"
                         :disabled="true"
-                    />
+                    ></CodemirrorPro>
                 </el-tab-pane>
                 <el-tab-pane :label="$t('process.net')" name="net">
                     <el-table :data="data.connects" border style="width: 100%">
@@ -89,9 +82,6 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
 
 interface InfoProps {
     info: object;
@@ -102,8 +92,6 @@ let data = ref();
 const resourceName = ref('');
 const activeName = ref('basic');
 const envStr = ref('');
-
-const extensions = [javascript(), oneDark];
 
 const handleClose = () => {
     open.value = false;

@@ -35,31 +35,18 @@
             </template>
             <template #main>
                 <div v-if="activeName === 'conf'">
-                    <codemirror
-                        :autofocus="true"
-                        :placeholder="$t('commons.msg.noneData')"
-                        :indent-with-tab="true"
-                        :tabSize="4"
-                        :style="{ height: `calc(100vh - ${loadHeight()})`, 'margin-top': '10px' }"
-                        :lineWrapping="true"
-                        :matchBrackets="true"
-                        theme="cobalt"
-                        :styleActiveLine="true"
-                        :extensions="extensions"
-                        @ready="handleReady"
-                        v-model="redisConf"
-                    />
-                    <el-button style="margin-top: 10px" @click="getDefaultConfig()">
+                    <CodemirrorPro v-model="redisConf" :placeholder="$t('commons.msg.noneData')"></CodemirrorPro>
+                    <el-button class="mt-5" @click="getDefaultConfig()">
                         {{ $t('app.defaultConfig') }}
                     </el-button>
-                    <el-button type="primary" @click="onSaveFile" style="margin-top: 10px">
+                    <el-button type="primary" @click="onSaveFile" class="mt-5">
                         {{ $t('commons.button.save') }}
                     </el-button>
                     <el-row>
                         <el-col :span="8">
                             <el-alert
                                 v-if="useOld"
-                                style="margin-top: 10px"
+                                class="mt-5"
                                 :title="$t('app.defaultConfigHelper')"
                                 type="info"
                                 :closable="false"
@@ -70,7 +57,7 @@
                 <Status v-show="activeName === 'status'" ref="statusRef" />
                 <div v-if="activeName === 'tuning'">
                     <el-form :model="form" ref="formRef" :rules="rules" label-position="top">
-                        <el-row style="margin-top: 20px">
+                        <el-row class="mt-10">
                             <el-col :span="1"><br /></el-col>
                             <el-col :span="10">
                                 <el-form-item :label="$t('database.timeout')" prop="timeout">
@@ -128,10 +115,7 @@
 
 <script lang="ts" setup>
 import { FormInstance } from 'element-plus';
-import { nextTick, reactive, ref, shallowRef } from 'vue';
-import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
+import { reactive, ref } from 'vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import Status from '@/views/database/redis/setting/status/index.vue';
 import Persistence from '@/views/database/redis/setting/persistence/index.vue';
@@ -140,21 +124,8 @@ import i18n from '@/lang';
 import { checkNumberRange, Rules } from '@/global/form-rules';
 import { ChangePort, GetAppDefaultConfig } from '@/api/modules/app';
 import { MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
-
-const extensions = [javascript(), oneDark];
 
 const loading = ref(false);
-
-const view = shallowRef();
-const handleReady = (payload) => {
-    view.value = payload.view;
-};
-
-const loadHeight = () => {
-    return globalStore.openMenuTabs ? '410px' : '380px';
-};
 
 const form = reactive({
     name: '',
@@ -352,13 +323,6 @@ const loadConfFile = async () => {
         .then((res) => {
             loading.value = false;
             redisConf.value = res.data;
-            nextTick(() => {
-                const state = view.value.state;
-                view.value.dispatch({
-                    selection: { anchor: state.doc.length, head: state.doc.length },
-                    scrollIntoView: true,
-                });
-            });
         })
         .catch(() => {
             loading.value = false;

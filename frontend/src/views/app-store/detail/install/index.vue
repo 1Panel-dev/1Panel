@@ -84,28 +84,16 @@
                         {{ $t('container.limitHelper', [limits.memory]) }}{{ req.memoryUnit }}B
                     </span>
                 </el-form-item>
-                <el-form-item prop="editCompose">
-                    <el-checkbox v-model="req.editCompose" :label="$t('app.editCompose')" size="large" />
-                    <span class="input-help">{{ $t('app.editComposeHelper') }}</span>
-                </el-form-item>
                 <el-form-item pro="pullImage">
                     <el-checkbox v-model="req.pullImage" :label="$t('container.forcePull')" size="large" />
                     <span class="input-help">{{ $t('container.forcePullHelper') }}</span>
                 </el-form-item>
+                <el-form-item prop="editCompose">
+                    <el-checkbox v-model="req.editCompose" :label="$t('app.editCompose')" size="large" />
+                    <span class="input-help">{{ $t('app.editComposeHelper') }}</span>
+                </el-form-item>
                 <div v-if="req.editCompose">
-                    <codemirror
-                        :autofocus="true"
-                        placeholder=""
-                        :indent-with-tab="true"
-                        :tabSize="4"
-                        style="height: 400px"
-                        :lineWrapping="true"
-                        :matchBrackets="true"
-                        theme="cobalt"
-                        :styleActiveLine="true"
-                        :extensions="extensions"
-                        v-model="req.dockerCompose"
-                    />
+                    <CodemirrorPro v-model="req.dockerCompose" mode="yaml"></CodemirrorPro>
                 </div>
             </div>
         </el-form>
@@ -128,15 +116,12 @@ import { FormInstance, FormRules } from 'element-plus';
 import { onMounted, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import Params from '../params/index.vue';
-import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
 import i18n from '@/lang';
 import { MsgError } from '@/utils/message';
 import { Container } from '@/api/interface/container';
 import { loadResourceLimit } from '@/api/modules/container';
+import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 
-const extensions = [javascript(), oneDark];
 const router = useRouter();
 
 interface InstallRrops {

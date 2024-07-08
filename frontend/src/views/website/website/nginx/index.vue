@@ -1,6 +1,6 @@
 <template>
     <LayoutContent :title="$t('nginx.nginxConfig')" :reload="true">
-        <template #buttons>
+        <template #leftToolBar>
             <el-button type="primary" :plain="activeName !== '1'" @click="changeTab('1')">
                 {{ $t('nginx.status') }}
             </el-button>

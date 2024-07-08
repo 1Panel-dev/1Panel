@@ -44,21 +44,13 @@
                     </el-button>
                 </div>
 
-                <codemirror
-                    :autofocus="true"
-                    :placeholder="$t('commons.msg.noneData')"
-                    :indent-with-tab="true"
-                    :tabSize="4"
-                    style="margin-top: 20px; height: calc(100vh - 230px)"
-                    :lineWrapping="true"
-                    :matchBrackets="true"
-                    theme="cobalt"
-                    :styleActiveLine="true"
-                    :extensions="extensions"
-                    v-model="logInfo"
-                    @ready="handleReady"
-                    :disabled="true"
-                />
+                <highlightjs
+                    class="mt-10 editor-main"
+                    ref="editorRef"
+                    language="JavaScript"
+                    :autodetect="false"
+                    :code="logInfo"
+                ></highlightjs>
             </template>
             <template #footer>
                 <span class="dialog-footer">
@@ -73,28 +65,22 @@
 import { cleanContainerLog, DownloadFile } from '@/api/modules/container';
 import i18n from '@/lang';
 import { dateFormatForName } from '@/utils/util';
-import { computed, onBeforeUnmount, reactive, ref, shallowRef, watch } from 'vue';
-import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
+import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import screenfull from 'screenfull';
 import { GlobalStore } from '@/store';
 
-const extensions = [javascript(), oneDark];
 const logVisible = ref(false);
 const mobile = computed(() => {
     return globalStore.isMobile();
 });
 
 const logInfo = ref<string>('');
-const view = shallowRef();
-const handleReady = (payload) => {
-    view.value = payload.view;
-};
 const globalStore = GlobalStore();
 const terminalSocket = ref<WebSocket>();
+const editorRef = ref();
+const scrollerElement = ref<HTMLElement | null>(null);
 
 const logSearch = reactive({
     isWatch: true,
@@ -156,10 +142,9 @@ const searchLogs = async () => {
     );
     terminalSocket.value.onmessage = (event) => {
         logInfo.value += event.data.replace(/\x1B\[[0-?]*[ -/]*[@-~]/g, '');
-        const state = view.value.state;
-        view.value.dispatch({
-            selection: { anchor: state.doc.length, head: state.doc.length },
-            scrollIntoView: true,
+        nextTick(() => {
+            initLog();
+            scrollerElement.value.scrollTop = scrollerElement.value.scrollHeight;
         });
     };
 };
@@ -230,6 +215,13 @@ const acceptParams = (props: DialogProps): void => {
 onBeforeUnmount(() => {
     handleClose();
 });
+const initLog = () => {
+    if (editorRef.value && scrollerElement.value == undefined) {
+        scrollerElement.value = editorRef.value.$el as HTMLElement;
+        let hljsDom = scrollerElement.value.querySelector('.hljs') as HTMLElement;
+        hljsDom.style['min-height'] = '500px';
+    }
+};
 
 defineExpose({
     acceptParams,
@@ -251,5 +243,12 @@ defineExpose({
 .fetchClass {
     width: 30%;
     float: left;
+}
+
+.editor-main {
+    height: calc(100vh - 250px);
+    width: 100%;
+    min-height: 600px;
+    overflow: auto;
 }
 </style>

@@ -21,19 +21,12 @@
                 <el-input v-model="dialogData.rowData!.description"></el-input>
             </el-form-item>
             <el-form-item>
-                <codemirror
-                    :autofocus="true"
+                <CodemirrorPro
                     placeholder="#Define or paste the content of your docker-compose file here"
-                    :indent-with-tab="true"
-                    :tabSize="4"
-                    style="width: 100%; height: calc(100vh - 351px)"
-                    :lineWrapping="true"
-                    :matchBrackets="true"
-                    theme="cobalt"
-                    :styleActiveLine="true"
-                    :extensions="extensions"
                     v-model="dialogData.rowData!.content"
-                />
+                    mode="yaml"
+                    :heightDiff="400"
+                ></CodemirrorPro>
             </el-form-item>
         </el-form>
         <template #footer>
@@ -51,15 +44,13 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { Container } from '@/api/interface/container';
 import { createComposeTemplate, updateComposeTemplate } from '@/api/modules/container';
 import { MsgSuccess } from '@/utils/message';
+import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 
 const loading = ref(false);
 
@@ -68,7 +59,6 @@ interface DialogProps {
     rowData?: Container.TemplateInfo;
     getTableList?: () => Promise<any>;
 }
-const extensions = [javascript(), oneDark];
 const title = ref<string>('');
 const drawerVisible = ref(false);
 const dialogData = ref<DialogProps>({
