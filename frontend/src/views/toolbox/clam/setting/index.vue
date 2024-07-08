@@ -29,8 +29,13 @@
 
             <template #main>
                 <div>
-                    <el-select style="width: 20%" @change="search" v-model.number="tail">
-                        <template #prefix>{{ $t('toolbox.clam.scanResult') }}</template>
+                    <el-select
+                        v-if="!canUpdate()"
+                        style="width: 20%"
+                        @change="search(activeName)"
+                        v-model.number="tail"
+                    >
+                        <template #prefix>{{ $t('toolbox.clam.tail') }}</template>
                         <el-option :value="0" :label="$t('commons.table.all')" />
                         <el-option :value="10" :label="10" />
                         <el-option :value="100" :label="100" />
@@ -51,9 +56,9 @@
                         @ready="handleReady"
                         :extensions="extensions"
                         v-model="content"
-                        :disabled="canUpdate()"
+                        :disabled="!canUpdate()"
                     />
-                    <el-button type="primary" style="margin-top: 10px" v-if="!canUpdate()" @click="onSave">
+                    <el-button type="primary" style="margin-top: 10px" v-if="canUpdate()" @click="onSave">
                         {{ $t('commons.button.save') }}
                     </el-button>
                 </div>
@@ -89,15 +94,15 @@ const content = ref();
 const confirmRef = ref();
 
 const loadHeight = () => {
-    let height = globalStore.openMenuTabs ? '425px' : '395px';
-    if (canUpdate()) {
+    let height = globalStore.openMenuTabs ? '405px' : '375px';
+    if (!canUpdate()) {
         height = globalStore.openMenuTabs ? '383px' : '353px';
     }
     return height;
 };
 
 const canUpdate = () => {
-    return activeName.value.indexOf('-log') !== -1;
+    return activeName.value.indexOf('-log') === -1;
 };
 
 const search = async (itemName: string) => {

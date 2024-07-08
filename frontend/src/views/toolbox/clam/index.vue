@@ -82,12 +82,14 @@
                     >
                         <template #default="{ row }">
                             <el-button
+                                v-if="row.infectedStrategy === 'copy' || row.infectedStrategy === 'move'"
                                 link
                                 type="primary"
                                 @click="toFolder(row.infectedDir + '/1panel-infected/' + row.name)"
                             >
                                 {{ row.infectedDir + '/1panel-infected/' + row.name }}
                             </el-button>
+                            <span v-else>-</span>
                         </template>
                     </el-table-column>
                     <el-table-column

@@ -1040,6 +1040,7 @@ const message = {
             infectedDir: '隔離目錄',
             scanDate: '掃描時間',
             scanResult: '掃描報告條數',
+            tail: '日誌顯示行數',
             scanTime: '耗時',
             infectedFiles: '感染文件數',
             log: '詳情',

@@ -121,7 +121,7 @@ export const searchClamFile = (name: string, tail: string) => {
     return http.post<string>(`/toolbox/clam/file/search`, { name: name, tail: tail });
 };
 export const updateClamFile = (name: string, file: string) => {
-    return http.post(`/toolbox/clam/file/update`, { name: name, file: file });
+    return http.post(`/toolbox/clam/file/update`, { name: name, file: file }, TimeoutEnum.T_60S);
 };
 export const searchClamBaseInfo = () => {
     return http.post<Toolbox.ClamBaseInfo>(`/toolbox/clam/base`);
