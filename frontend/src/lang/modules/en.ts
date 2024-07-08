@@ -1099,6 +1099,7 @@ const message = {
             infectedDir: 'Infected Directory',
             scanDate: 'Scan Date',
             scanResult: 'Scan log tail',
+            tail: 'Lines',
             scanTime: 'Time Taken',
             infectedFiles: 'Infected Files',
             log: 'Details',

@@ -1042,6 +1042,7 @@ const message = {
             infectedDir: '隔离目录',
             scanDate: '扫描时间',
             scanResult: '扫描报告条数',
+            tail: '日志显示行数',
             scanTime: '耗时',
             infectedFiles: '感染文件数',
             log: '详情',
