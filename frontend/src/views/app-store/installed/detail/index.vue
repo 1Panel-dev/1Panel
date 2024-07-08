@@ -76,19 +76,7 @@
                         <span class="input-help">{{ $t('app.editComposeHelper') }}</span>
                     </el-form-item>
                     <div v-if="paramModel.editCompose">
-                        <codemirror
-                            :autofocus="true"
-                            placeholder=""
-                            :indent-with-tab="true"
-                            :tabSize="4"
-                            style="height: 400px"
-                            :lineWrapping="true"
-                            :matchBrackets="true"
-                            theme="cobalt"
-                            :styleActiveLine="true"
-                            :extensions="extensions"
-                            v-model="paramModel.dockerCompose"
-                        />
+                        <CodemirrorPro v-model="paramModel.dockerCompose" mode="yaml"></CodemirrorPro>
                     </div>
                 </div>
             </el-form>
@@ -111,12 +99,7 @@ import { FormInstance } from 'element-plus';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
-import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
 import { getLanguage } from '@/utils/util';
-
-const extensions = [javascript(), oneDark];
 
 interface ParamProps {
     id: Number;

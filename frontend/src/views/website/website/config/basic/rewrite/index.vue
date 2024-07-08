@@ -12,21 +12,7 @@
             </el-select>
         </el-form-item>
         <el-text type="warning">{{ $t('website.rewriteHelper2') }}</el-text>
-        <Codemirror
-            ref="codeRef"
-            v-loading="loading"
-            :autofocus="true"
-            placeholder=""
-            :indent-with-tab="true"
-            :tabSize="4"
-            style="margin-top: 10px; height: 300px"
-            :lineWrapping="true"
-            :matchBrackets="true"
-            theme="cobalt"
-            :styleActiveLine="true"
-            :extensions="extensions"
-            v-model="content"
-        />
+        <CodemirrorPro v-model="content" mode="nginx"></CodemirrorPro>
         <div class="mt-2">
             <el-form-item>
                 <el-alert :title="$t('website.rewriteHelper')" type="info" :closable="false" />
@@ -40,18 +26,14 @@
 
 <script lang="ts" setup>
 import { computed, nextTick, onMounted, reactive, ref } from 'vue';
-import { Codemirror } from 'vue-codemirror';
-import { oneDark } from '@codemirror/theme-one-dark';
-import { StreamLanguage } from '@codemirror/language';
-import { nginx } from '@codemirror/legacy-modes/mode/nginx';
 import { GetWebsite, GetRewriteConfig, UpdateRewriteConfig } from '@/api/modules/website';
 import { Rewrites } from '@/global/mimetype';
 import { MsgSuccess } from '@/utils/message';
+import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import i18n from '@/lang';
 
 const loading = ref(false);
 const content = ref(' ');
-const extensions = [StreamLanguage.define(nginx), oneDark];
 const codeRef = ref();
 
 const props = defineProps({

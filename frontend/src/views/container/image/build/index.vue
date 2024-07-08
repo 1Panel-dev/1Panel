@@ -11,7 +11,12 @@
                 </el-radio-group>
             </el-form-item>
             <el-form-item v-if="form.from === 'edit'" :rules="Rules.requiredInput">
-                <codemirror
+                <CodemirrorPro
+                    v-model="form.dockerfile"
+                    mode="dockerfile"
+                    placeholder="#Define or paste the content of your Dockerfile here"
+                ></CodemirrorPro>
+                <!-- <codemirror
                     @change="onEdit()"
                     :autofocus="true"
                     placeholder="#Define or paste the content of your Dockerfile here"
@@ -25,7 +30,7 @@
                     :extensions="extensions"
                     v-model="form.dockerfile"
                     :readOnly="true"
-                />
+                /> -->
             </el-form-item>
             <el-form-item v-else :rules="Rules.requiredSelect" prop="dockerfile">
                 <el-input @change="onEdit()" clearable v-model="form.dockerfile">
@@ -67,9 +72,6 @@
 
 <script lang="ts" setup>
 import FileList from '@/components/file-list/index.vue';
-import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
 import { nextTick, reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
@@ -77,7 +79,6 @@ import { ElForm, ElMessage } from 'element-plus';
 import { imageBuild } from '@/api/modules/container';
 
 const logVisible = ref<boolean>(false);
-const extensions = [javascript(), oneDark];
 const drawerVisible = ref(false);
 const logRef = ref();
 const isStartReading = ref(false);

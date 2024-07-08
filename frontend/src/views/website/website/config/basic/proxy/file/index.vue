@@ -1,31 +1,6 @@
 <template>
-    <el-drawer
-        v-model="open"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        :size="size"
-        :before-close="handleClose"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('website.proxyFile')" :back="handleClose" />
-        </template>
-        <el-row v-loading="loading">
-            <el-col :span="22" :offset="1">
-                <codemirror
-                    :autofocus="true"
-                    placeholder=""
-                    :indent-with-tab="true"
-                    :tabSize="4"
-                    style="margin-top: 10px; height: 600px; width: 100%"
-                    :lineWrapping="true"
-                    :matchBrackets="true"
-                    theme="cobalt"
-                    :styleActiveLine="true"
-                    :extensions="extensions"
-                    v-model="req.content"
-                />
-            </el-col>
-        </el-row>
+    <DrawerPro v-model="open" :header="$t('website.proxyFile')" :back="handleClose" :size="mobile ? 'full' : 'normal'">
+        <CodemirrorPro v-model="req.content" mode="nginx"></CodemirrorPro>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
@@ -34,28 +9,23 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
 import { computed, reactive, ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
-import { Codemirror } from 'vue-codemirror';
 import { UpdateProxyConfigFile } from '@/api/modules/website';
-import { StreamLanguage } from '@codemirror/language';
-import { nginx } from '@codemirror/legacy-modes/mode/nginx';
-import { oneDark } from '@codemirror/theme-one-dark';
 import { GlobalStore } from '@/store';
+import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 const globalStore = GlobalStore();
 
 const mobile = computed(() => {
     return globalStore.isMobile();
 });
 
-const extensions = [StreamLanguage.define(nginx), oneDark];
 const proxyForm = ref<FormInstance>();
 const open = ref(false);
 const loading = ref(false);

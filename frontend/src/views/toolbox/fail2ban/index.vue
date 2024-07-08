@@ -123,20 +123,13 @@
                     </el-row>
 
                     <div v-if="confShowType === 'all'">
-                        <codemirror
-                            :autofocus="true"
+                        <CodemirrorPro
+                            class="mt-5"
                             placeholder="# The Fail2ban configuration file does not exist or is empty (/etc/ssh/sshd_config)"
-                            :indent-with-tab="true"
-                            :tabSize="4"
-                            style="margin-top: 10px; height: calc(100vh - 460px)"
-                            :lineWrapping="true"
-                            :matchBrackets="true"
-                            theme="cobalt"
-                            :styleActiveLine="true"
-                            :extensions="extensions"
                             v-model="fail2banConf"
-                        />
-                        <el-button :disabled="loading" type="primary" @click="onSaveFile" style="margin-top: 5px">
+                            :heightDiff="460"
+                        ></CodemirrorPro>
+                        <el-button :disabled="loading" type="primary" @click="onSaveFile" class="mt-2.5">
                             {{ $t('commons.button.save') }}
                         </el-button>
                     </div>
@@ -175,9 +168,6 @@
 
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue';
-import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
 import MaxRetry from '@/views/toolbox/fail2ban/max-retry/index.vue';
 import BanTime from '@/views/toolbox/fail2ban/ban-time/index.vue';
 import FindTime from '@/views/toolbox/fail2ban/find-time/index.vue';
@@ -193,7 +183,6 @@ import { transTimeUnit } from '@/utils/util';
 
 const loading = ref(false);
 const formRef = ref();
-const extensions = [javascript(), oneDark];
 const confShowType = ref('base');
 
 const portRef = ref();

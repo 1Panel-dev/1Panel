@@ -19,19 +19,11 @@
             </el-form-item>
         </el-form>
         <div v-else>
-            <codemirror
-                :autofocus="true"
+            <CodemirrorPro
                 placeholder="# The DNS configuration file does not exist or is empty (/etc/resolv.conf)"
-                :indent-with-tab="true"
-                :tabSize="4"
-                style="margin-top: 10px; height: calc(100vh - 260px)"
-                :lineWrapping="true"
-                :matchBrackets="true"
-                theme="cobalt"
-                :styleActiveLine="true"
-                :extensions="extensions"
                 v-model="dnsConf"
-            />
+                :heightDiff="260"
+            ></CodemirrorPro>
         </div>
         <template #footer>
             <span class="dialog-footer">
@@ -51,13 +43,9 @@ import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { loadDeviceConf, checkDNS, updateDevice, updateDeviceByConf } from '@/api/modules/toolbox';
-import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
-const extensions = [javascript(), oneDark];
 const confShowType = ref('form');
 const dnsConf = ref();
 

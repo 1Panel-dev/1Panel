@@ -15,20 +15,7 @@
             </div>
             <br />
             <div v-loading="loading">
-                <codemirror
-                    style="height: calc(100vh - 430px); min-height: 300px"
-                    :autofocus="true"
-                    :placeholder="$t('website.noLog')"
-                    :indent-with-tab="true"
-                    :tabSize="4"
-                    :lineWrapping="true"
-                    :matchBrackets="true"
-                    theme="cobalt"
-                    :styleActiveLine="true"
-                    :extensions="extensions"
-                    v-model="content"
-                    @ready="handleReady"
-                />
+                <CodemirrorPro class="mt-5" v-model="content" :heightDiff="400"></CodemirrorPro>
             </div>
         </template>
 
@@ -44,16 +31,12 @@
     <OpDialog ref="opRef" @search="getContent" />
 </template>
 <script lang="ts" setup>
-import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
-import { onUnmounted, reactive, ref, shallowRef } from 'vue';
+import { onUnmounted, reactive, ref } from 'vue';
 import { OperateSupervisorProcessFile } from '@/api/modules/host-tool';
 import i18n from '@/lang';
 import { TabsPaneContext } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 
-const extensions = [javascript(), oneDark];
 const loading = ref(false);
 const content = ref('');
 const tailLog = ref(false);
@@ -67,10 +50,6 @@ const req = reactive({
 const title = ref('');
 const opRef = ref();
 
-const view = shallowRef();
-const handleReady = (payload) => {
-    view.value = payload.view;
-};
 let timer: NodeJS.Timer | null = null;
 
 const em = defineEmits(['search']);

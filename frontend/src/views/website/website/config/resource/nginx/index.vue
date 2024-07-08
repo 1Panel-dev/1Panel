@@ -1,34 +1,18 @@
 <template>
     <div v-loading="loading">
-        <codemirror
-            :autofocus="true"
-            :placeholder="$t('commons.msg.noneData')"
-            :indent-with-tab="true"
-            :tabSize="4"
-            :lineWrapping="true"
-            :matchBrackets="true"
-            theme="cobalt"
-            :styleActiveLine="true"
-            :extensions="extensions"
-            v-model="content"
-        />
+        <CodemirrorPro v-model="content" mode="nginx" />
         <el-button type="primary" @click="submit()" class="mt-2.5">
             {{ $t('nginx.saveAndReload') }}
         </el-button>
     </div>
 </template>
 <script lang="ts" setup>
-import { Codemirror } from 'vue-codemirror';
-import { oneDark } from '@codemirror/theme-one-dark';
 import { GetWebsiteConfig, UpdateNginxFile } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
 import { File } from '@/api/interface/file';
 import i18n from '@/lang';
-import { StreamLanguage } from '@codemirror/language';
-import { nginx } from '@codemirror/legacy-modes/mode/nginx';
 import { MsgSuccess } from '@/utils/message';
-
-const extensions = [StreamLanguage.define(nginx), oneDark];
+import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 
 const props = defineProps({
     id: {

@@ -64,20 +64,7 @@
             <div v-if="useNewCompose">
                 <el-text type="danger">{{ $t('app.useCustomHelper') }}</el-text>
             </div>
-            <codemirror
-                v-if="useNewCompose"
-                :autofocus="true"
-                placeholder=""
-                :indent-with-tab="true"
-                :tabSize="4"
-                style="width: 100%; height: calc(100vh - 500px); margin-top: 10px"
-                :lineWrapping="true"
-                :matchBrackets="true"
-                theme="cobalt"
-                :styleActiveLine="true"
-                :extensions="extensions"
-                v-model="newCompose"
-            />
+            <CodemirrorPro v-if="useNewCompose" v-model="newCompose" mode="yaml"></CodemirrorPro>
         </div>
         <template #footer>
             <span class="dialog-footer">
@@ -100,10 +87,7 @@ import { MsgSuccess } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
 import Diff from './diff/index.vue';
 import bus from '../../bus';
-import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
-const extensions = [javascript(), oneDark];
+import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 
 const composeDiffRef = ref();
 const updateRef = ref<FormInstance>();
