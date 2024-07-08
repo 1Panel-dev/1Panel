@@ -306,6 +306,21 @@ func (u *FirewallService) OperateForwardRule(req dto.ForwardRuleOperate) error {
 		return err
 	}
 
+	rules, _ := client.ListForward()
+	for _, rule := range rules {
+		for _, reqRule := range req.Rules {
+			if reqRule.Operation == "remove" {
+				continue
+			}
+			if reqRule.TargetIP == "" {
+				reqRule.TargetIP = "127.0.0.1"
+			}
+			if reqRule.Port == rule.Port && reqRule.TargetPort == rule.TargetPort && reqRule.TargetIP == rule.TargetIP {
+				return constant.ErrRecordExist
+			}
+		}
+	}
+
 	sort.SliceStable(req.Rules, func(i, j int) bool {
 		n1, _ := strconv.Atoi(req.Rules[i].Num)
 		n2, _ := strconv.Atoi(req.Rules[j].Num)
