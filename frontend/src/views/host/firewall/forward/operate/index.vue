@@ -29,6 +29,7 @@
                             <el-input v-model.trim="dialogData.rowData!.targetIP" />
                             <span class="input-help">{{ $t('firewall.forwardHelper1') }}</span>
                             <span class="input-help">{{ $t('firewall.forwardHelper2') }}</span>
+                            <span class="input-help">{{ $t('firewall.forwardHelper3') }}</span>
                         </el-form-item>
 
                         <el-form-item :label="$t('firewall.targetPort')" prop="targetPort">

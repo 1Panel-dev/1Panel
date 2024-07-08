@@ -2289,6 +2289,7 @@ const message = {
         targetPort: 'Destination Port',
         forwardHelper1: 'In the case of local port forwarding, the destination IP is: 127.0.0.1',
         forwardHelper2: 'If the destination IP is not filled in, it will be forwarded to the local port by default',
+        forwardHelper3: 'Currently only supports port forwarding for IPv4',
     },
     runtime: {
         runtime: 'Runtime',

@@ -2127,6 +2127,7 @@ const message = {
         targetPort: '目標端口',
         forwardHelper1: '如果是本機端口轉發，目標 IP 為：127.0.0.1',
         forwardHelper2: '如果目標 IP 不填寫，默認為本機端口轉發',
+        forwardHelper3: '當前僅支持 IPv4 的端口轉發',
     },
     runtime: {
         runtime: '運行環境',
