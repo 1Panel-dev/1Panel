@@ -53,12 +53,12 @@
 import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { ElForm, FormItemRule } from 'element-plus';
+import { ElForm } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { Host } from '@/api/interface/host';
 import { operateForwardRule } from '@/api/modules/host';
-import { checkCidr, checkIpV4V6, deepCopy } from '@/utils/util';
+import { checkCidr, checkIpV4V6, checkPort, deepCopy } from '@/utils/util';
 
 const loading = ref();
 const oldRule = ref<Host.RuleForward>();
@@ -87,23 +87,22 @@ const handleClose = () => {
     drawerVisible.value = false;
 };
 
-const strPortValidator: FormItemRule = {
-    required: true,
-    trigger: 'blur',
-    validator: (_, value: string) => {
-        const port = parseInt(value);
-        return port >= 1 && port <= 65535;
-    },
-    message: i18n.global.t('commons.rule.port'),
-};
-
 const rules = reactive({
     protocol: [Rules.requiredSelect],
-    port: [Rules.requiredInput, strPortValidator],
-    targetPort: [Rules.requiredInput, strPortValidator],
+    port: [{ validator: checkPortRule, trigger: 'blur' }],
+    targetPort: [{ validator: checkPortRule, trigger: 'blur' }],
     targetIP: [{ validator: checkAddress, trigger: 'blur' }],
 });
 
+function checkPortRule(rule: any, value: string, callback: any) {
+    if (!value) {
+        return callback();
+    }
+    if (checkPort(value)) {
+        return callback(new Error(i18n.global.t('firewall.portFormatError')));
+    }
+    callback();
+}
 function checkAddress(rule: any, value: string, callback: any) {
     if (!value) {
         return callback();

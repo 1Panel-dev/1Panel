@@ -127,7 +127,7 @@ export const searchClamBaseInfo = () => {
     return http.post<Toolbox.ClamBaseInfo>(`/toolbox/clam/base`);
 };
 export const updateClamBaseInfo = (operate: string) => {
-    return http.post(`/toolbox/clam/operate`, { Operation: operate });
+    return http.post(`/toolbox/clam/operate`, { Operation: operate }, TimeoutEnum.T_60S);
 };
 export const searchClam = (param: ReqPage) => {
     return http.post<ResPage<Toolbox.ClamInfo>>(`/toolbox/clam/search`, param);

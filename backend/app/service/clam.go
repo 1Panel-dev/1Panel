@@ -135,6 +135,9 @@ func (f *ClamService) Create(req dto.ClamCreate) error {
 	if err := copier.Copy(&clam, &req); err != nil {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
+	if clam.InfectedStrategy == "none" || clam.InfectedStrategy == "remove" {
+		clam.InfectedDir = ""
+	}
 	if err := clamRepo.Create(&clam); err != nil {
 		return err
 	}
@@ -146,9 +149,14 @@ func (f *ClamService) Update(req dto.ClamUpdate) error {
 	if clam.ID == 0 {
 		return constant.ErrRecordNotFound
 	}
+	if req.InfectedStrategy == "none" || req.InfectedStrategy == "remove" {
+		req.InfectedDir = ""
+	}
 	upMap := map[string]interface{}{}
 	upMap["name"] = req.Name
 	upMap["path"] = req.Path
+	upMap["infected_dir"] = req.InfectedDir
+	upMap["infected_strategy"] = req.InfectedStrategy
 	upMap["description"] = req.Description
 	if err := clamRepo.Update(req.ID, upMap); err != nil {
 		return err
