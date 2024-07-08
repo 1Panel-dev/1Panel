@@ -1016,6 +1016,8 @@ const message = {
         },
         clam: {
             clam: '病毒掃描',
+            showFresh: '顯示病毒庫服務',
+            hideFresh: '隱藏病毒庫服務',
             clamHelper:
                 'ClamAV 的最低建議配置為：3 GiB 以上的 RAM，2.0 GHz 以上的單核 CPU，以及至少 5 GiB 的可用硬盤空間。',
             noClam: '未檢測到 ClamAV 服務，請參考官方文檔進行安裝！',
