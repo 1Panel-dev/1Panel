@@ -36,28 +36,20 @@
                 </span>
             </el-form-item>
             <el-form-item>
-                <div v-if="form.from === 'edit' || form.from === 'template'" style="width: 100%">
+                <div v-if="form.from === 'edit' || form.from === 'template'" class="w-full">
                     <el-radio-group v-model="mode" size="small">
                         <el-radio-button label="edit">{{ $t('commons.button.edit') }}</el-radio-button>
                         <el-radio-button label="log">{{ $t('commons.button.log') }}</el-radio-button>
                     </el-radio-group>
-                    <codemirror
-                        @change="onEdit('')"
+                    <CodemirrorPro
                         v-if="mode === 'edit'"
-                        :autofocus="true"
-                        placeholder="#Define or paste the content of your docker-compose file here"
-                        :indent-with-tab="true"
-                        :tabSize="4"
-                        style="width: 100%; height: calc(100vh - 376px)"
-                        :lineWrapping="true"
-                        :matchBrackets="true"
-                        theme="cobalt"
-                        :styleActiveLine="true"
-                        :extensions="extensions"
                         v-model="form.file"
-                    />
+                        placeholder="#Define or paste the content of your docker-compose file here"
+                        mode="yaml"
+                        :heightDiff="400"
+                    ></CodemirrorPro>
                 </div>
-                <div style="width: 100%">
+                <div class="w-full">
                     <LogFile
                         ref="logRef"
                         v-model:is-reading="isReading"
@@ -85,16 +77,13 @@
 <script lang="ts" setup>
 import { nextTick, onBeforeUnmount, reactive, ref } from 'vue';
 import FileList from '@/components/file-list/index.vue';
-import { Codemirror } from 'vue-codemirror';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, ElMessageBox } from 'element-plus';
 import { loadBaseDir } from '@/api/modules/setting';
 import { MsgError } from '@/utils/message';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
-
-const extensions = [javascript(), oneDark];
+import CodemirrorPro from '@/components/codemirror-pro/index.vue';
+import { listComposeTemplate, testCompose, upCompose } from '@/api/modules/container';
 
 const showLog = ref(false);
 const loading = ref();

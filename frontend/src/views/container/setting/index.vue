@@ -158,20 +158,14 @@
                 </el-row>
 
                 <div v-if="confShowType === 'all'">
-                    <codemirror
-                        :autofocus="true"
-                        placeholder="# The Docker configuration file does not exist or is empty (/etc/docker/daemon.json)"
-                        :indent-with-tab="true"
-                        :tabSize="4"
-                        :style="{ height: `calc(100vh - ${loadHeight()})`, 'margin-top': '10px' }"
-                        :lineWrapping="true"
-                        :matchBrackets="true"
-                        theme="cobalt"
-                        :styleActiveLine="true"
-                        :extensions="extensions"
+                    <CodemirrorPro
+                        class="mt-5"
+                        :heightDiff="loadHeight()"
                         v-model="dockerConf"
-                    />
-                    <el-button :disabled="loading" type="primary" @click="onSaveFile" class="p-ml-5">
+                        mode="json"
+                        placeholder="# The Docker configuration file does not exist or is empty (/etc/docker/daemon.json)"
+                    ></CodemirrorPro>
+                    <el-button :disabled="loading" type="primary" @click="onSaveFile" class="mt-2.5">
                         {{ $t('commons.button.save') }}
                     </el-button>
                 </div>
@@ -237,9 +231,7 @@
 <script lang="ts" setup>
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { onMounted, reactive, ref } from 'vue';
-import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
+import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import Mirror from '@/views/container/setting/mirror/index.vue';
 import Registry from '@/views/container/setting/registry/index.vue';
 import LogOption from '@/views/container/setting/log/index.vue';
@@ -265,7 +257,6 @@ const submitInput = ref();
 
 const loading = ref(false);
 const showDaemonJsonAlert = ref(false);
-const extensions = [javascript(), oneDark];
 const confShowType = ref('base');
 
 const logOptionRef = ref();
@@ -322,7 +313,7 @@ const onSaveFile = async () => {
 };
 
 const loadHeight = () => {
-    return globalStore.openMenuTabs ? '450px' : '430px';
+    return globalStore.openMenuTabs ? 450 : 430;
 };
 
 const onChangeMirrors = () => {

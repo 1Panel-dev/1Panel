@@ -169,22 +169,14 @@
                                 </el-row>
                                 <el-row v-if="currentRecord?.records">
                                     <span>{{ $t('commons.table.records') }}</span>
-                                    <codemirror
-                                        ref="mymirror"
-                                        :autofocus="true"
-                                        :placeholder="$t('cronjob.noLogs')"
-                                        :indent-with-tab="true"
-                                        :tabSize="4"
-                                        style="height: calc(100vh - 488px); width: 100%; margin-top: 5px"
-                                        :lineWrapping="true"
-                                        :matchBrackets="true"
-                                        theme="cobalt"
-                                        :styleActiveLine="true"
-                                        :extensions="extensions"
-                                        @ready="handleReady"
-                                        v-model="currentRecordDetail"
-                                        :disabled="true"
-                                    />
+                                    <div class="editor-main">
+                                        <highlightjs
+                                            ref="mymirror"
+                                            language="JavaScript"
+                                            :autodetect="false"
+                                            :code="currentRecordDetail"
+                                        ></highlightjs>
+                                    </div>
                                 </el-row>
                             </el-form>
                         </el-col>
@@ -230,15 +222,12 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
+import { nextTick, onBeforeUnmount, reactive, ref } from 'vue';
 import { Cronjob } from '@/api/interface/cronjob';
 import { searchRecords, handleOnce, updateStatus, cleanRecords, getRecordLog } from '@/api/modules/cronjob';
 import { dateFormat } from '@/utils/util';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
-import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
 import { MsgSuccess } from '@/utils/message';
 import { listDbItems } from '@/api/modules/database';
 import { ListAppInstalled } from '@/api/modules/app';
@@ -251,11 +240,7 @@ const hasRecords = ref();
 let timer: NodeJS.Timer | null = null;
 
 const mymirror = ref();
-const extensions = [javascript(), oneDark];
-const view = shallowRef();
-const handleReady = (payload) => {
-    view.value = payload.view;
-};
+const scrollerElement = ref<HTMLElement | null>(null);
 
 interface DialogProps {
     rowData: Cronjob.CronjobInfo;
@@ -410,11 +395,8 @@ const loadRecord = async (row: Cronjob.Record) => {
         }
         currentRecordDetail.value = log;
         nextTick(() => {
-            const state = view.value.state;
-            view.value.dispatch({
-                selection: { anchor: state.doc.length, head: state.doc.length },
-                scrollIntoView: true,
-            });
+            initLog();
+            scrollerElement.value.scrollTop = scrollerElement.value.scrollHeight;
         });
     }
 };
@@ -449,6 +431,14 @@ const cleanRecord = async () => {
         .catch(() => {
             delLoading.value = false;
         });
+};
+
+const initLog = () => {
+    if (mymirror.value && scrollerElement.value == undefined) {
+        scrollerElement.value = mymirror.value.$el as HTMLElement;
+        let hljsDom = scrollerElement.value.querySelector('.hljs') as HTMLElement;
+        hljsDom.style['min-height'] = '500px';
+    }
 };
 
 onBeforeUnmount(() => {
@@ -501,5 +491,11 @@ defineExpose({
     .mainRowClass {
         min-width: 1200px;
     }
+}
+.editor-main {
+    height: calc(100vh - 488px);
+    width: 100%;
+    margin-top: 5px;
+    overflow-x: auto;
 }
 </style>

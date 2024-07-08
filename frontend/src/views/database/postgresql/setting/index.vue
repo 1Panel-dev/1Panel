@@ -24,20 +24,8 @@
 
             <template #main>
                 <div v-if="activeName === 'conf'">
-                    <codemirror
-                        :autofocus="true"
-                        :placeholder="$t('commons.msg.noneData')"
-                        :indent-with-tab="true"
-                        :tabSize="8"
-                        :style="{ height: `calc(100vh - ${loadHeight()})`, 'margin-top': '10px' }"
-                        :lineWrapping="true"
-                        :matchBrackets="true"
-                        theme="cobalt"
-                        :styleActiveLine="true"
-                        :extensions="extensions"
-                        v-model="postgresqlConf"
-                    />
-                    <el-button type="primary" style="margin-top: 10px" @click="onSaveConf">
+                    <CodemirrorPro v-model="postgresqlConf"></CodemirrorPro>
+                    <el-button type="primary" class="mt-5" @click="onSaveConf">
                         {{ $t('commons.button.save') }}
                     </el-button>
                 </div>
@@ -91,21 +79,16 @@ import { FormInstance } from 'element-plus';
 import ContainerLog from '@/components/container-log/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { onMounted, reactive, ref } from 'vue';
-import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
 import { loadDBFile, loadDBBaseInfo, updateDBFile } from '@/api/modules/database';
 import { ChangePort, CheckAppInstalled } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import router from '@/routers';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 
 const loading = ref(false);
 
-const extensions = [javascript(), oneDark];
 const activeName = ref('conf');
 
 const baseInfo = reactive({
@@ -131,10 +114,6 @@ const props = withDefaults(defineProps<DBProps>(), {
     type: '',
     database: '',
 });
-
-const loadHeight = () => {
-    return globalStore.openMenuTabs ? '405px' : '375px';
-};
 
 const dialogContainerLogRef = ref();
 const jumpToConf = async () => {
