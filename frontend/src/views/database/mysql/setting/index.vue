@@ -9,7 +9,7 @@
                     type="primary"
                     :disabled="mysqlStatus !== 'Running'"
                     :plain="activeName !== 'status'"
-                    @click="activeName = 'status'"
+                    @click="changeTab('status')"
                 >
                     {{ $t('database.currentStatus') }}
                 </el-button>
@@ -17,7 +17,7 @@
                     type="primary"
                     :disabled="mysqlStatus !== 'Running'"
                     :plain="activeName !== 'tuning'"
-                    @click="activeName = 'tuning'"
+                    @click="changeTab('tuning')"
                 >
                     {{ $t('database.performanceTuning') }}
                 </el-button>
@@ -28,14 +28,14 @@
                     type="primary"
                     :disabled="mysqlStatus !== 'Running'"
                     :plain="activeName !== 'log'"
-                    @click="activeName = 'log'"
+                    @click="changeTab('log')"
                 >
                     {{ $t('database.log') }}
                 </el-button>
                 <el-button
                     type="primary"
                     :disabled="mysqlStatus !== 'Running'"
-                    @click="jumpToSlowlog"
+                    @click="changeTab('slowLog')"
                     :plain="activeName !== 'slowLog'"
                 >
                     {{ $t('database.slowLog') }}
@@ -48,19 +48,7 @@
 
             <template #main>
                 <div v-if="activeName === 'conf'">
-                    <codemirror
-                        :autofocus="true"
-                        :placeholder="$t('commons.msg.noneData')"
-                        :indent-with-tab="true"
-                        :tabSize="4"
-                        :style="{ height: `calc(100vh - ${loadHeight()})`, 'margin-top': '10px' }"
-                        :lineWrapping="true"
-                        :matchBrackets="true"
-                        theme="cobalt"
-                        :styleActiveLine="true"
-                        :extensions="extensions"
-                        v-model="mysqlConf"
-                    />
+                    <CodemirrorPro v-model="mysqlConf" :heightDiff="400"></CodemirrorPro>
                     <el-button class="mt-2.5" @click="getDefaultConfig()">
                         {{ $t('app.defaultConfig') }}
                     </el-button>
@@ -79,9 +67,9 @@
                         </el-col>
                     </el-row>
                 </div>
-                <Status v-show="activeName === 'status'" ref="statusRef" />
-                <Variables @loading="changeLoading" v-show="activeName === 'tuning'" ref="variablesRef" />
-                <div v-show="activeName === 'port'">
+                <Status v-if="activeName === 'status'" ref="statusRef" />
+                <Variables @loading="changeLoading" v-if="activeName === 'tuning'" ref="variablesRef" />
+                <div v-if="activeName === 'port'">
                     <el-form :model="baseInfo" ref="panelFormRef" label-position="top">
                         <el-row>
                             <el-col :span="1"><br /></el-col>
@@ -98,11 +86,11 @@
                         </el-row>
                     </el-form>
                 </div>
-                <ContainerLog v-show="activeName === 'log'" ref="dialogContainerLogRef" />
+                <ContainerLog v-if="activeName === 'log'" ref="dialogContainerLogRef" />
                 <SlowLog
                     @loading="changeLoading"
                     @refresh="loadBaseInfo"
-                    v-show="activeName === 'slowLog'"
+                    v-if="activeName === 'slowLog'"
                     ref="slowLogRef"
                 />
             </template>
@@ -140,21 +128,16 @@ import Variables from '@/views/database/mysql/setting/variables/index.vue';
 import SlowLog from '@/views/database/mysql/setting/slow-log/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { onMounted, reactive, ref } from 'vue';
-import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
 import { loadDBFile, loadDBBaseInfo, loadMysqlVariables, updateDBFile } from '@/api/modules/database';
 import { ChangePort, CheckAppInstalled, GetAppDefaultConfig } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import router from '@/routers';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 
 const loading = ref(false);
 
-const extensions = [javascript(), oneDark];
 const activeName = ref('conf');
 
 const baseInfo = reactive({
@@ -194,13 +177,29 @@ const jumpToConf = async () => {
     loadMysqlConf();
 };
 
-const loadHeight = () => {
-    return globalStore.openMenuTabs ? '405px' : '375px';
-};
+const changeTab = (tab: string) => {
+    activeName.value = tab;
 
-const jumpToSlowlog = async () => {
-    activeName.value = 'slowLog';
-    loadSlowLogs();
+    switch (tab) {
+        case 'log':
+            nextTick(() => {
+                loadContainerLog(baseInfo.containerID);
+            });
+            break;
+        case 'slowLog':
+            nextTick(() => {
+                loadSlowLogs();
+            });
+            break;
+        case 'status':
+            nextTick(() => {
+                statusRef.value!.acceptParams({ type: props.type, database: props.database });
+            });
+            break;
+        case 'tuning':
+            loadVariables();
+            break;
+    }
 };
 
 const onSubmitChangePort = async () => {
@@ -292,7 +291,6 @@ const loadBaseInfo = async () => {
     baseInfo.port = res.data?.port;
     baseInfo.containerID = res.data?.containerName;
     loadMysqlConf();
-    loadContainerLog(baseInfo.containerID);
 };
 
 const changeLoading = (status: boolean) => {
@@ -345,11 +343,6 @@ const onLoadInfo = async () => {
         mysqlStatus.value = res.data.status;
         mysqlVersion.value = res.data.version;
         loadBaseInfo();
-        if (mysqlStatus.value === 'Running') {
-            loadVariables();
-            loadSlowLogs();
-            statusRef.value!.acceptParams({ type: props.type, database: props.database });
-        }
     });
 };
 

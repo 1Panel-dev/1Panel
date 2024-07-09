@@ -52,7 +52,7 @@
 
         <LayoutContent>
             <template #main>
-                <MainDiv :heightDiff="300">
+                <MainDiv :heightDiff="3200">
                     <el-radio-group v-model="confShowType" @change="changeMode">
                         <el-radio-button value="base">{{ $t('database.baseConf') }}</el-radio-button>
                         <el-radio-button value="all">{{ $t('database.allConf') }}</el-radio-button>
@@ -125,19 +125,12 @@
                     </el-row>
 
                     <div v-if="confShowType === 'all'">
-                        <codemirror
-                            :autofocus="true"
-                            placeholder="# The SSH configuration file does not exist or is empty (/etc/ssh/sshd_config)"
-                            :indent-with-tab="true"
-                            :tabSize="4"
-                            style="margin-top: 10px; height: calc(100vh - 405px)"
-                            :lineWrapping="true"
-                            :matchBrackets="true"
-                            theme="cobalt"
-                            :styleActiveLine="true"
-                            :extensions="extensions"
+                        <CodemirrorPro
+                            :heightDiff="400"
+                            class="mt-5"
                             v-model="sshConf"
-                        />
+                            placeholder="# The SSH configuration file does not exist or is empty (/etc/ssh/sshd_config)"
+                        ></CodemirrorPro>
                         <el-button :disabled="loading" type="primary" @click="onSaveFile" style="margin-top: 5px">
                             {{ $t('commons.button.save') }}
                         </el-button>
@@ -155,10 +148,7 @@
 
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue';
-import { Codemirror } from 'vue-codemirror';
 import FireRouter from '@/views/host/ssh/index.vue';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
 import PubKey from '@/views/host/ssh/ssh/pubkey/index.vue';
 import Root from '@/views/host/ssh/ssh/root/index.vue';
 import Port from '@/views/host/ssh/ssh/port/index.vue';
@@ -168,10 +158,10 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { getSSHConf, getSSHInfo, operateSSH, updateSSH, updateSSHByfile } from '@/api/modules/host';
 import { ElMessageBox, FormInstance } from 'element-plus';
+import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 
 const loading = ref(false);
 const formRef = ref();
-const extensions = [javascript(), oneDark];
 const confShowType = ref('base');
 const pubKeyRef = ref();
 const portRef = ref();

@@ -38,22 +38,14 @@
                         <el-option :value="500" :label="500" />
                         <el-option :value="1000" :label="1000" />
                     </el-select>
-                    <codemirror
-                        :autofocus="true"
-                        :placeholder="$t('commons.msg.noneData')"
-                        :indent-with-tab="true"
-                        :tabSize="4"
-                        :style="{ height: `calc(100vh - ${loadHeight()})`, 'margin-top': '10px' }"
-                        :lineWrapping="true"
-                        :matchBrackets="true"
-                        theme="cobalt"
-                        :styleActiveLine="true"
-                        @ready="handleReady"
-                        :extensions="extensions"
+                    <CodemirrorPro
+                        :heightDiff="400"
+                        class="mt-5"
                         v-model="content"
                         :disabled="!canUpdate()"
-                    />
-                    <el-button type="primary" style="margin-top: 10px" v-if="canUpdate()" @click="onSave">
+                        :placeholder="$t('commons.msg.noneData')"
+                    ></CodemirrorPro>
+                    <el-button type="primary" class="mt-5" v-if="canUpdate()" @click="onSave">
                         {{ $t('commons.button.save') }}
                     </el-button>
                 </div>
@@ -66,35 +58,18 @@
 
 <script lang="ts" setup>
 import { nextTick, onMounted, ref, shallowRef } from 'vue';
-import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
 import ClamStatus from '@/views/toolbox/clam/status/index.vue';
 import { searchClamFile, updateClamFile } from '@/api/modules/toolbox';
-import { oneDark } from '@codemirror/theme-one-dark';
-import { GlobalStore } from '@/store';
+import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-const globalStore = GlobalStore();
 
 const loading = ref(false);
-const extensions = [javascript(), oneDark];
-const view = shallowRef();
-const handleReady = (payload) => {
-    view.value = payload.view;
-};
 
 const activeName = ref('clamd');
 const tail = ref(200);
 const content = ref();
 const confirmRef = ref();
-
-const loadHeight = () => {
-    let height = globalStore.openMenuTabs ? '405px' : '375px';
-    if (!canUpdate()) {
-        height = globalStore.openMenuTabs ? '383px' : '353px';
-    }
-    return height;
-};
 
 const canUpdate = () => {
     return activeName.value.indexOf('-log') === -1;
@@ -110,13 +85,6 @@ const search = async (itemName?: string) => {
         .then((res) => {
             loading.value = false;
             content.value = res.data;
-            nextTick(() => {
-                const state = view.value.state;
-                view.value.dispatch({
-                    selection: { anchor: state.doc.length, head: state.doc.length },
-                    scrollIntoView: true,
-                });
-            });
         })
         .catch(() => {
             loading.value = false;

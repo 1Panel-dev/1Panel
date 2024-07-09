@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div style="display: flex; flex-wrap: wrap">
+        <div class="flex flex-wrap">
             <el-select @change="searchLogs" v-model="logSearch.mode" class="selectWidth">
                 <template #prefix>{{ $t('container.fetch') }}</template>
                 <el-option v-for="item in timeOptions" :key="item.label" :value="item.value" :label="item.label" />
@@ -25,17 +25,7 @@
                 {{ $t('commons.button.clean') }}
             </el-button>
         </div>
-
-        <div :style="{ height: `calc(100vh - ${loadHeight()})`, 'margin-top': '10px', 'min-height': '400px' }">
-            <highlightjs
-                v-if="showLog"
-                ref="editorRef"
-                class="editor-main"
-                language="JavaScript"
-                :autodetect="false"
-                :code="logInfo"
-            ></highlightjs>
-        </div>
+        <LogPro v-model="logInfo" :heightDiff="400"></LogPro>
     </div>
 </template>
 
@@ -45,18 +35,10 @@ import i18n from '@/lang';
 import { dateFormatForName, downloadWithContent } from '@/utils/util';
 import { onBeforeUnmount, reactive, ref } from 'vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import LogPro from '@/components/log-pro/index.vue';
 
 const logInfo = ref();
 const terminalSocket = ref<WebSocket>();
-const editorRef = ref();
-const scrollerElement = ref<HTMLElement | null>(null);
-const showLog = ref(false);
-
-const loadHeight = () => {
-    return globalStore.openMenuTabs ? '405px' : '375px';
-};
 
 const logSearch = reactive({
     isWatch: false,
@@ -102,9 +84,6 @@ const searchLogs = async () => {
     );
     terminalSocket.value.onmessage = (event) => {
         logInfo.value += event.data;
-        nextTick(() => {
-            scrollerElement.value.scrollTop = scrollerElement.value.scrollHeight;
-        });
     };
 };
 
@@ -150,17 +129,6 @@ const onClean = async () => {
 
 onBeforeUnmount(() => {
     terminalSocket.value?.send('close conn');
-});
-
-onMounted(async () => {
-    await nextTick(() => {
-        showLog.value = true;
-    });
-    if (editorRef.value) {
-        scrollerElement.value = editorRef.value.$el as HTMLElement;
-        let hljsDom = scrollerElement.value.querySelector('.hljs') as HTMLElement;
-        hljsDom.style['min-height'] = '500px';
-    }
 });
 
 defineExpose({
