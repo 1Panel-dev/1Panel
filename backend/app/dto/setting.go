@@ -117,6 +117,7 @@ type SnapshotCreate struct {
 	DefaultDownload string `json:"defaultDownload" validate:"required"`
 	Description     string `json:"description" validate:"max=256"`
 	Secret          string `json:"secret"`
+	Timeout         int64  `json:"timeout"`
 }
 type SnapshotRecover struct {
 	IsNew      bool   `json:"isNew"`

@@ -24,9 +24,9 @@ type ICronjobService interface {
 	SearchWithPage(search dto.PageCronjob) (int64, interface{}, error)
 	SearchRecords(search dto.SearchRecord) (int64, interface{}, error)
 	Create(cronjobDto dto.CronjobCreate) error
-	HandleOnce(id uint) error
+	HandleOnce(id uint, timeout int64) error
 	Update(id uint, req dto.CronjobUpdate) error
-	UpdateStatus(id uint, status string) error
+	UpdateStatus(id uint, status string, timeout int64) error
 	Delete(req dto.CronjobBatchDelete) error
 	Download(down dto.CronjobDownload) (string, error)
 	StartJob(cronjob *model.Cronjob, isUpdate bool) (string, error)
@@ -159,11 +159,12 @@ func (u *CronjobService) Download(down dto.CronjobDownload) (string, error) {
 	return tempPath, nil
 }
 
-func (u *CronjobService) HandleOnce(id uint) error {
+func (u *CronjobService) HandleOnce(id uint, timeout int64) error {
 	cronjob, _ := cronjobRepo.Get(commonRepo.WithByID(id))
 	if cronjob.ID == 0 {
 		return constant.ErrRecordNotFound
 	}
+	cronjob.Timeout = timeout
 	u.HandleJob(&cronjob)
 	return nil
 }
@@ -174,6 +175,7 @@ func (u *CronjobService) Create(cronjobDto dto.CronjobCreate) error {
 		return constant.ErrRecordExist
 	}
 	cronjob.Secret = cronjobDto.Secret
+	cronjob.Timeout = cronjobDto.Timeout
 	if err := copier.Copy(&cronjob, &cronjobDto); err != nil {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
@@ -281,11 +283,13 @@ func (u *CronjobService) Update(id uint, req dto.CronjobUpdate) error {
 	upMap["default_download"] = req.DefaultDownload
 	upMap["retain_copies"] = req.RetainCopies
 	upMap["secret"] = req.Secret
+	upMap["timeout"] = req.Timeout
 	return cronjobRepo.Update(id, upMap)
 }
 
-func (u *CronjobService) UpdateStatus(id uint, status string) error {
+func (u *CronjobService) UpdateStatus(id uint, status string, timeout int64) error {
 	cronjob, _ := cronjobRepo.Get(commonRepo.WithByID(id))
+	cronjob.Timeout = timeout
 	if cronjob.ID == 0 {
 		return errors.WithMessage(constant.ErrRecordNotFound, "record not found")
 	}

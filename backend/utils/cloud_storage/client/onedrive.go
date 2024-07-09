@@ -96,7 +96,7 @@ func (o oneDriveClient) Delete(path string) (bool, error) {
 	return true, nil
 }
 
-func (o oneDriveClient) Upload(src, target string) (bool, error) {
+func (o oneDriveClient) Upload(src, target string, timeout int64) (bool, error) {
 	target = "/" + strings.TrimPrefix(target, "/")
 	if _, err := o.loadIDByPath(path.Dir(target)); err != nil {
 		if !strings.Contains(err.Error(), "itemNotFound") {

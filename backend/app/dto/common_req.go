@@ -20,7 +20,8 @@ type OperationWithName struct {
 }
 
 type OperateByID struct {
-	ID uint `json:"id" validate:"required"`
+	ID      uint  `json:"id" validate:"required"`
+	Timeout int64 `json:"timeout"`
 }
 
 type Operate struct {

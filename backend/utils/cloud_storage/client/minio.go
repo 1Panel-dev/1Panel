@@ -97,7 +97,7 @@ func (m minIoClient) Delete(path string) (bool, error) {
 	return true, nil
 }
 
-func (m minIoClient) Upload(src, target string) (bool, error) {
+func (m minIoClient) Upload(src, target string, timeout int64) (bool, error) {
 	file, err := os.Open(src)
 	if err != nil {
 		return false, err

@@ -10,7 +10,7 @@ type CloudStorageClient interface {
 	ListObjects(prefix string) ([]string, error)
 	Exist(path string) (bool, error)
 	Delete(path string) (bool, error)
-	Upload(src, target string) (bool, error)
+	Upload(src, target string, timeout int64) (bool, error)
 	Download(src, target string) (bool, error)
 
 	Size(path string) (int64, error)

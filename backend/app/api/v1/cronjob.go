@@ -187,7 +187,7 @@ func (b *BaseApi) UpdateCronjobStatus(c *gin.Context) {
 		return
 	}
 
-	if err := cronjobService.UpdateStatus(req.ID, req.Status); err != nil {
+	if err := cronjobService.UpdateStatus(req.ID, req.Status, req.Timeout); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
@@ -233,7 +233,7 @@ func (b *BaseApi) HandleOnce(c *gin.Context) {
 		return
 	}
 
-	if err := cronjobService.HandleOnce(req.ID); err != nil {
+	if err := cronjobService.HandleOnce(req.ID, req.Timeout); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

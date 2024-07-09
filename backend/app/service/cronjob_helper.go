@@ -307,7 +307,7 @@ type cronjobUploadHelper struct {
 	client     cloud_storage.CloudStorageClient
 }
 
-func (u *CronjobService) uploadCronjobBackFile(cronjob model.Cronjob, accountMap map[string]cronjobUploadHelper, file string) (string, error) {
+func (u *CronjobService) uploadCronjobBackFile(cronjob model.Cronjob, accountMap map[string]cronjobUploadHelper, file string, timeout int64) (string, error) {
 	defer func() {
 		_ = os.Remove(file)
 	}()
@@ -316,7 +316,7 @@ func (u *CronjobService) uploadCronjobBackFile(cronjob model.Cronjob, accountMap
 	for _, account := range accounts {
 		if len(account) != 0 {
 			global.LOG.Debugf("start upload file to %s, dir: %s", account, path.Join(accountMap[account].backupPath, cloudSrc))
-			if _, err := accountMap[account].client.Upload(file, path.Join(accountMap[account].backupPath, cloudSrc)); err != nil {
+			if _, err := accountMap[account].client.Upload(file, path.Join(accountMap[account].backupPath, cloudSrc), timeout); err != nil {
 				return "", err
 			}
 			global.LOG.Debugf("upload successful!")

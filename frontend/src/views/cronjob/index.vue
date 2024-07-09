@@ -259,6 +259,7 @@ const onOpenDialog = async (
         ],
         type: 'shell',
         retainCopies: 7,
+        timeout: 1,
     },
 ) => {
     let params = {

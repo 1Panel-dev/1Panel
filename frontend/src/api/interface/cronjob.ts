@@ -27,6 +27,7 @@ export namespace Cronjob {
         retainCopies: number;
         status: string;
         secret: string;
+        timeout: number;
     }
     export interface CronjobCreate {
         name: string;
@@ -46,6 +47,7 @@ export namespace Cronjob {
         defaultDownload: string;
         retainCopies: number;
         secret: string;
+        timeout: number;
     }
     export interface SpecObj {
         specType: string;
@@ -71,6 +73,7 @@ export namespace Cronjob {
         defaultDownload: string;
         retainCopies: number;
         secret: string;
+        timeout: number;
     }
     export interface CronjobDelete {
         ids: Array<number>;

@@ -96,7 +96,7 @@ func (s s3Client) Delete(path string) (bool, error) {
 	return true, nil
 }
 
-func (s s3Client) Upload(src, target string) (bool, error) {
+func (s s3Client) Upload(src, target string, timeout int64) (bool, error) {
 	fileInfo, err := os.Stat(src)
 	if err != nil {
 		return false, err

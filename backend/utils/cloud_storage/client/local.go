@@ -42,7 +42,7 @@ func (c localClient) Delete(file string) (bool, error) {
 	return true, nil
 }
 
-func (c localClient) Upload(src, target string) (bool, error) {
+func (c localClient) Upload(src, target string, timeout int64) (bool, error) {
 	targetFilePath := path.Join(c.dir, target)
 	if _, err := os.Stat(path.Dir(targetFilePath)); err != nil {
 		if os.IsNotExist(err) {

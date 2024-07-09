@@ -250,9 +250,12 @@ var AddForward = &gormigrate.Migration{
 }
 
 var AddCronJobColumn = &gormigrate.Migration{
-	ID: "20240524-add-cronjob-command",
+	ID: "20240708-add-cronjob-command",
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.AutoMigrate(&model.Cronjob{}); err != nil {
+			return err
+		}
+		if err := tx.Model(&model.Cronjob{}).Where("1 = 1").Update("timeout", 1).Error; err != nil {
 			return err
 		}
 		return nil

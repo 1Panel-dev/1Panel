@@ -194,7 +194,7 @@ func snapCompress(snap snapHelper, rootDir string, secret string) {
 	_ = os.RemoveAll(rootDir)
 }
 
-func snapUpload(snap snapHelper, accounts string, file string) {
+func snapUpload(snap snapHelper, accounts string, file string, timeout int64) {
 	source := path.Join(global.CONF.System.TmpDir, "system", path.Base(file))
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"upload": constant.StatusUploading})
 	accountMap, err := loadClientMap(accounts)
@@ -206,7 +206,7 @@ func snapUpload(snap snapHelper, accounts string, file string) {
 	targetAccounts := strings.Split(accounts, ",")
 	for _, item := range targetAccounts {
 		global.LOG.Debugf("start upload snapshot to %s, path: %s", item, path.Join(accountMap[item].backupPath, "system_snapshot", path.Base(file)))
-		if _, err := accountMap[item].client.Upload(source, path.Join(accountMap[item].backupPath, "system_snapshot", path.Base(file))); err != nil {
+		if _, err := accountMap[item].client.Upload(source, path.Join(accountMap[item].backupPath, "system_snapshot", path.Base(file)), timeout); err != nil {
 			global.LOG.Debugf("upload to %s failed, err: %v", item, err)
 			snap.Status.Upload = err.Error()
 			_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"upload": err.Error()})

@@ -34,6 +34,7 @@ type Cronjob struct {
 	EntryIDs string       `gorm:"type:varchar(64)" json:"entryIDs"`
 	Records  []JobRecords `json:"records"`
 	Secret   string       `gorm:"type:varchar(64)" json:"secret"`
+	Timeout  int64        `json:"timeout"`
 }
 
 type JobRecords struct {

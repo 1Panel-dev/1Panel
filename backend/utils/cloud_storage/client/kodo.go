@@ -2,11 +2,12 @@ package client
 
 import (
 	"context"
-	"time"
-
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/qiniu/go-sdk/v7/auth"
+	"github.com/qiniu/go-sdk/v7/client"
 	"github.com/qiniu/go-sdk/v7/storage"
+	"net/http"
+	"time"
 )
 
 type kodoClient struct {
@@ -65,13 +66,24 @@ func (k kodoClient) Delete(path string) (bool, error) {
 	return true, nil
 }
 
-func (k kodoClient) Upload(src, target string) (bool, error) {
+func (k kodoClient) Upload(src, target string, timeout int64) (bool, error) {
 	putPolicy := storage.PutPolicy{
 		Scope: k.bucket,
 	}
 	upToken := putPolicy.UploadToken(k.auth)
+
+	timeoutValue := time.Duration(timeout) * time.Hour
+	httpClient := &http.Client{
+		Timeout: timeoutValue,
+	}
+	qiniuClient := &client.Client{
+		Client: httpClient,
+	}
+
 	cfg := storage.Config{UseHTTPS: true, UseCdnDomains: false}
 	resumeUploader := storage.NewResumeUploaderV2(&cfg)
+	resumeUploader.Client = qiniuClient
+
 	ret := storage.PutRet{}
 	putExtra := storage.RputV2Extra{}
 	if err := resumeUploader.PutFile(context.Background(), &ret, upToken, target, src, &putExtra); err != nil {

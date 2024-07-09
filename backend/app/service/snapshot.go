@@ -277,7 +277,7 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto
 				return
 			}
 			if snapStatus.Upload != constant.StatusDone {
-				snapUpload(itemHelper, req.From, fmt.Sprintf("%s.tar.gz", rootDir))
+				snapUpload(itemHelper, req.From, fmt.Sprintf("%s.tar.gz", rootDir), req.Timeout)
 			}
 			if snapStatus.Upload != constant.StatusDone {
 				_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
@@ -308,7 +308,7 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto
 		return snap.Name, fmt.Errorf("snapshot %s compress failed", snap.Name)
 	}
 	loadLogByStatus(snapStatus, logPath)
-	snapUpload(itemHelper, req.From, fmt.Sprintf("%s.tar.gz", rootDir))
+	snapUpload(itemHelper, req.From, fmt.Sprintf("%s.tar.gz", rootDir), req.Timeout)
 	if snapStatus.Upload != constant.StatusDone {
 		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
 		loadLogByStatus(snapStatus, logPath)

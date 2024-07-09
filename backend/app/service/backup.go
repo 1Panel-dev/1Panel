@@ -591,7 +591,7 @@ func (u *BackupService) checkBackupConn(backup *model.BackupAccount) (bool, erro
 	write.Flush()
 
 	targetPath := strings.TrimPrefix(path.Join(backup.BackupPath, "test/1panel"), "/")
-	return client.Upload(fileItem, targetPath)
+	return client.Upload(fileItem, targetPath, 1)
 }
 
 func StartRefreshOneDriveToken() {

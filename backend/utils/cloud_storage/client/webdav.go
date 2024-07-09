@@ -43,7 +43,7 @@ func NewWebDAVClient(vars map[string]interface{}) (*webDAVClient, error) {
 	return &webDAVClient{Bucket: bucket, client: client}, nil
 }
 
-func (s webDAVClient) Upload(src, target string) (bool, error) {
+func (s webDAVClient) Upload(src, target string, timeout int64) (bool, error) {
 	targetFilePath := path.Join(s.Bucket, target)
 	srcFile, err := os.Open(src)
 	if err != nil {

@@ -75,7 +75,7 @@ func (o ossClient) Delete(path string) (bool, error) {
 	return true, nil
 }
 
-func (o ossClient) Upload(src, target string) (bool, error) {
+func (o ossClient) Upload(src, target string, timeout int64) (bool, error) {
 	bucket, err := o.client.Bucket(o.bucketStr)
 	if err != nil {
 		return false, err

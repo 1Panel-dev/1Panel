@@ -88,7 +88,7 @@ func (c cosClient) Delete(path string) (bool, error) {
 	return true, nil
 }
 
-func (c cosClient) Upload(src, target string) (bool, error) {
+func (c cosClient) Upload(src, target string, timeout int64) (bool, error) {
 	fileInfo, err := os.Stat(src)
 	if err != nil {
 		return false, err

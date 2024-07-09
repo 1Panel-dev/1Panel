@@ -328,6 +328,17 @@
                         <span v-else class="input-help">{{ $t('cronjob.retainCopiesHelper') }}</span>
                     </el-form-item>
 
+                    <el-form-item :label="$t('cronjob.requestExpirationTime')" prop="timeout" v-if="isBackup()">
+                        <el-input-number
+                            style="width: 200px"
+                            :min="1"
+                            step-strictly
+                            :step="1"
+                            v-model.number="dialogData.rowData!.timeout"
+                        ></el-input-number>
+                        <span class="input-help">{{ $t('cronjob.unitHours') }}</span>
+                    </el-form-item>
+
                     <el-form-item v-if="dialogData.rowData!.type === 'curl'" :label="$t('cronjob.url')" prop="url">
                         <el-input clearable v-model.trim="dialogData.rowData!.url" />
                     </el-form-item>
@@ -378,6 +389,7 @@ import { listContainer } from '@/api/modules/container';
 import { Database } from '@/api/interface/database';
 import { ListAppInstalled } from '@/api/modules/app';
 import { loadDefaultSpec, specOptions, transObjToSpec, transSpecToObj, weekOptions } from './../helper';
+
 const router = useRouter();
 
 interface DialogProps {
@@ -385,6 +397,7 @@ interface DialogProps {
     rowData?: Cronjob.CronjobInfo;
     getTableList?: () => Promise<any>;
 }
+
 const title = ref<string>('');
 const drawerVisible = ref(false);
 const dialogData = ref<DialogProps>({
@@ -561,6 +574,7 @@ const rules = reactive({
     backupAccounts: [Rules.requiredSelect],
     defaultDownload: [Rules.requiredSelect],
     retainCopies: [Rules.number],
+    timeout: [Rules.number],
 });
 
 type FormInstance = InstanceType<typeof ElForm>;
@@ -750,40 +764,49 @@ defineExpose({
 .specClass {
     width: 20% !important;
     margin-left: 20px;
+
     .append {
         width: 20px;
     }
 }
+
 @media only screen and (max-width: 1000px) {
     .specClass {
         width: 100% !important;
         margin-top: 20px;
         margin-left: 0;
+
         .append {
             width: 43px;
         }
     }
 }
+
 .specTypeClass {
     width: 22% !important;
 }
+
 @media only screen and (max-width: 1000px) {
     .specTypeClass {
         width: 100% !important;
     }
 }
+
 .selectClass {
     width: 100%;
 }
+
 .tagClass {
     float: right;
     margin-right: 10px;
     font-size: 12px;
     margin-top: 5px;
 }
+
 .logText {
     line-height: 22px;
     font-size: 12px;
+
     .link {
         font-size: 12px;
         margin-top: -3px;
