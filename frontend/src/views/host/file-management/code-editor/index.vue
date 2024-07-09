@@ -393,17 +393,17 @@ const initEditor = () => {
             let defaultContent = '\n\n\n\n';
             editor.getModel().setValue(defaultContent);
         }
+
+        editor.getModel().pushEOL(config.eol);
+
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, quickSave);
+
         editor.onDidChangeModelContent(() => {
             if (editor) {
                 form.value.content = editor.getValue();
                 isEdit.value = true;
             }
         });
-
-        // After onDidChangeModelContent
-        editor.getModel().pushEOL(config.eol);
-
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, quickSave);
     });
 };
 
