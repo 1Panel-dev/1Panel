@@ -308,7 +308,7 @@ func (r *RuntimeService) Get(id uint) (*response.RuntimeDTO, error) {
 		}
 		for k, v := range envs {
 			switch k {
-			case "NODE_APP_PORT", "PANEL_APP_PORT_HTTP", "JAVA_APP_PORT":
+			case "NODE_APP_PORT", "PANEL_APP_PORT_HTTP", "JAVA_APP_PORT", "GO_APP_PORT":
 				port, err := strconv.Atoi(v)
 				if err != nil {
 					return nil, err
