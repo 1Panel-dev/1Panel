@@ -210,7 +210,7 @@ const openDetail = (row: Runtime.Runtime) => {
     operateRef.value.acceptParams({ type: row.type, mode: 'edit', id: row.id });
 };
 
-const openDelete = async (row: Runtime.Runtime) => {
+const openDelete = (row: Runtime.Runtime) => {
     RuntimeDeleteCheck(row.id).then(async (res) => {
         const items = res.data;
         if (res.data && res.data.length > 0) {
