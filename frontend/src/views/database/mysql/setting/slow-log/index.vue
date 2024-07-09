@@ -10,61 +10,37 @@
                 />
             </el-form-item>
             <el-form-item :label="$t('database.longQueryTime')" v-if="detailShow">
-                <div style="float: left">
+                <div class="float-left">
                     <el-input type="number" v-model.number="variables.long_query_time" />
                 </div>
-                <el-button style="float: left; margin-left: 10px" @click="changeSlowLogs">
+                <el-button class="float-left ml-5" @click="changeSlowLogs">
                     {{ $t('commons.button.save') }}
                 </el-button>
-                <div style="float: left; margin-left: 20px">
-                    <el-checkbox style="margin-top: 2px" :disabled="!currentStatus" border v-model="isWatch">
+                <div class="float-left ml-10">
+                    <el-checkbox :disabled="!currentStatus" border v-model="isWatch">
                         {{ $t('commons.button.watch') }}
                     </el-checkbox>
                 </div>
-                <el-button :disabled="!currentStatus" style="margin-left: 20px" @click="onDownload" icon="Download">
+                <el-button :disabled="!currentStatus" class="ml-20" @click="onDownload" icon="Download">
                     {{ $t('file.download') }}
                 </el-button>
             </el-form-item>
         </el-form>
-        <codemirror
-            :autofocus="true"
-            :placeholder="$t('database.noData')"
-            :indent-with-tab="true"
-            :tabSize="4"
-            :style="{ height: getDynamicHeight(), width: '100%' }"
-            :lineWrapping="true"
-            :matchBrackets="true"
-            theme="cobalt"
-            :styleActiveLine="true"
-            :extensions="extensions"
-            @ready="handleReady"
-            v-model="slowLogs"
-            :disabled="true"
-        />
-
+        <LogPro v-model="slowLogs"></LogPro>
         <ConfirmDialog @cancel="onCancel" ref="confirmDialogRef" @confirm="onSave"></ConfirmDialog>
     </div>
 </template>
 <script lang="ts" setup>
-import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
-import { nextTick, onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
+import { onBeforeUnmount, reactive, ref } from 'vue';
 import { Database } from '@/api/interface/database';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { loadDBFile, updateMysqlVariables } from '@/api/modules/database';
 import { dateFormatForName, downloadWithContent } from '@/utils/util';
 import i18n from '@/lang';
 import { MsgError, MsgInfo, MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import LogPro from '@/components/log-pro/index.vue';
 
-const extensions = [javascript(), oneDark];
 const slowLogs = ref();
-const view = shallowRef();
-const handleReady = (payload) => {
-    view.value = payload.view;
-};
 const detailShow = ref();
 const currentStatus = ref();
 
@@ -121,20 +97,20 @@ const handleSlowLogs = async () => {
     confirmDialogRef.value!.acceptParams(params);
 };
 
-const getDynamicHeight = () => {
-    if (variables.slow_query_log === 'ON') {
-        if (globalStore.openMenuTabs) {
-            return `calc(100vh - 467px)`;
-        } else {
-            return `calc(100vh - 437px)`;
-        }
-    }
-    if (globalStore.openMenuTabs) {
-        return `calc(100vh - 413px)`;
-    } else {
-        return `calc(100vh - 383px)`;
-    }
-};
+// const getDynamicHeight = () => {
+//     if (variables.slow_query_log === 'ON') {
+//         if (globalStore.openMenuTabs) {
+//             return `calc(100vh - 467px)`;
+//         } else {
+//             return `calc(100vh - 437px)`;
+//         }
+//     }
+//     if (globalStore.openMenuTabs) {
+//         return `calc(100vh - 413px)`;
+//     } else {
+//         return `calc(100vh - 383px)`;
+//     }
+// };
 
 const changeSlowLogs = () => {
     if (!(variables.long_query_time > 0 && variables.long_query_time <= 600)) {
@@ -190,13 +166,13 @@ const onDownload = async () => {
 const loadMysqlSlowlogs = async () => {
     const res = await loadDBFile(currentDB.type + '-slow-logs', currentDB.database);
     slowLogs.value = res.data || '';
-    nextTick(() => {
-        const state = view.value.state;
-        view.value.dispatch({
-            selection: { anchor: state.doc.length, head: state.doc.length },
-            scrollIntoView: true,
-        });
-    });
+    // nextTick(() => {
+    //     const state = view.value.state;
+    //     view.value.dispatch({
+    //         selection: { anchor: state.doc.length, head: state.doc.length },
+    //         scrollIntoView: true,
+    //     });
+    // });
 };
 
 onBeforeUnmount(() => {

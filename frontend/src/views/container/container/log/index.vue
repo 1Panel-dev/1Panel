@@ -31,7 +31,7 @@
                         <el-option :value="500" :label="500" />
                         <el-option :value="1000" :label="1000" />
                     </el-select>
-                    <div class="margin-button" style="float: left">
+                    <div class="margin-button float-left">
                         <el-checkbox border @change="searchLogs" v-model="logSearch.isWatch">
                             {{ $t('commons.button.watch') }}
                         </el-checkbox>
@@ -43,14 +43,7 @@
                         {{ $t('commons.button.clean') }}
                     </el-button>
                 </div>
-
-                <highlightjs
-                    class="mt-10 editor-main"
-                    ref="editorRef"
-                    language="JavaScript"
-                    :autodetect="false"
-                    :code="logInfo"
-                ></highlightjs>
+                <LogPro v-model="logInfo"></LogPro>
             </template>
             <template #footer>
                 <span class="dialog-footer">
@@ -70,6 +63,7 @@ import { ElMessageBox } from 'element-plus';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import screenfull from 'screenfull';
 import { GlobalStore } from '@/store';
+import LogPro from '@/components/log-pro/index.vue';
 
 const logVisible = ref(false);
 const mobile = computed(() => {
@@ -79,8 +73,6 @@ const mobile = computed(() => {
 const logInfo = ref<string>('');
 const globalStore = GlobalStore();
 const terminalSocket = ref<WebSocket>();
-const editorRef = ref();
-const scrollerElement = ref<HTMLElement | null>(null);
 
 const logSearch = reactive({
     isWatch: true,
@@ -142,10 +134,6 @@ const searchLogs = async () => {
     );
     terminalSocket.value.onmessage = (event) => {
         logInfo.value += event.data.replace(/\x1B\[[0-?]*[ -/]*[@-~]/g, '');
-        nextTick(() => {
-            initLog();
-            scrollerElement.value.scrollTop = scrollerElement.value.scrollHeight;
-        });
     };
 };
 
@@ -215,13 +203,6 @@ const acceptParams = (props: DialogProps): void => {
 onBeforeUnmount(() => {
     handleClose();
 });
-const initLog = () => {
-    if (editorRef.value && scrollerElement.value == undefined) {
-        scrollerElement.value = editorRef.value.$el as HTMLElement;
-        let hljsDom = scrollerElement.value.querySelector('.hljs') as HTMLElement;
-        hljsDom.style['min-height'] = '500px';
-    }
-};
 
 defineExpose({
     acceptParams,

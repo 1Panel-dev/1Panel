@@ -143,22 +143,7 @@
                                         <el-option :value="500" :label="500" />
                                         <el-option :value="1000" :label="1000" />
                                     </el-select>
-                                    <codemirror
-                                        ref="mymirror"
-                                        :autofocus="true"
-                                        :placeholder="$t('cronjob.noLogs')"
-                                        :indent-with-tab="true"
-                                        :tabSize="4"
-                                        style="height: calc(100vh - 498px); width: 100%; margin-top: 5px"
-                                        :lineWrapping="true"
-                                        :matchBrackets="true"
-                                        theme="cobalt"
-                                        :styleActiveLine="true"
-                                        :extensions="extensions"
-                                        @ready="handleReady"
-                                        v-model="logContent"
-                                        :disabled="true"
-                                    />
+                                    <LogPro v-model="logContent"></LogPro>
                                 </el-row>
                             </el-form>
                         </el-col>
@@ -181,9 +166,6 @@
 import { nextTick, onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
-import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
 import { MsgSuccess } from '@/utils/message';
 import { shortcuts } from '@/utils/shortcuts';
 import { Toolbox } from '@/api/interface/toolbox';
@@ -196,13 +178,6 @@ const refresh = ref(false);
 const hasRecords = ref();
 
 let timer: NodeJS.Timer | null = null;
-
-const mymirror = ref();
-const extensions = [javascript(), oneDark];
-const view = shallowRef();
-const handleReady = (payload) => {
-    view.value = payload.view;
-};
 
 const recordShow = ref(false);
 interface DialogProps {
@@ -318,13 +293,6 @@ const loadRecordLog = async () => {
         return;
     }
     logContent.value = res.data;
-    nextTick(() => {
-        const state = view.value.state;
-        view.value.dispatch({
-            selection: { anchor: state.doc.length, head: state.doc.length },
-            scrollIntoView: true,
-        });
-    });
 };
 
 const onClean = async () => {
