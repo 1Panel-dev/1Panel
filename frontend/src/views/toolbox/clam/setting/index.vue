@@ -29,12 +29,7 @@
 
             <template #main>
                 <div>
-                    <el-select
-                        v-if="!canUpdate()"
-                        style="width: 20%"
-                        @change="search(activeName)"
-                        v-model.number="tail"
-                    >
+                    <el-select v-if="!canUpdate()" style="width: 20%" @change="search()" v-model.number="tail">
                         <template #prefix>{{ $t('toolbox.clam.tail') }}</template>
                         <el-option :value="0" :label="$t('commons.table.all')" />
                         <el-option :value="10" :label="10" />
@@ -89,7 +84,7 @@ const handleReady = (payload) => {
 };
 
 const activeName = ref('clamd');
-const tail = ref(0);
+const tail = ref(200);
 const content = ref();
 const confirmRef = ref();
 
@@ -105,9 +100,12 @@ const canUpdate = () => {
     return activeName.value.indexOf('-log') === -1;
 };
 
-const search = async (itemName: string) => {
+const search = async (itemName?: string) => {
+    if (itemName) {
+        tail.value = itemName.indexOf('-log') === -1 ? 0 : 200;
+        activeName.value = itemName;
+    }
     loading.value = true;
-    activeName.value = itemName;
     await searchClamFile(activeName.value, tail.value + '')
         .then((res) => {
             loading.value = false;
@@ -140,7 +138,7 @@ const onSubmit = async () => {
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            search(activeName.value);
+            search();
         })
         .catch(() => {
             loading.value = false;

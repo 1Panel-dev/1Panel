@@ -223,7 +223,7 @@ func (f *Ufw) RichRules(rule FireInfo, operation string) error {
 
 	stdout, err := cmd.Exec(ruleStr)
 	if err != nil {
-		if strings.Contains(stdout, "ERROR: Invalid position") {
+		if strings.Contains(stdout, "ERROR: Invalid position") || strings.Contains(stdout, "ERROR: 无效位置") {
 			stdout, err := cmd.Exec(strings.ReplaceAll(ruleStr, "insert 1 ", ""))
 			if err != nil {
 				return fmt.Errorf("%s rich rules (%s), failed, err: %s", operation, ruleStr, stdout)
@@ -270,6 +270,9 @@ func (f *Ufw) loadInfo(line string, fireType string) FireInfo {
 			itemInfo.Strategy = "accept"
 		}
 		if fields[1] == "(v6)" {
+			if fields[2] == "ALLOW" {
+				itemInfo.Strategy = "accept"
+			}
 			itemInfo.Address = fields[4]
 		} else {
 			itemInfo.Address = fields[3]
