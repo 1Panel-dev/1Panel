@@ -108,6 +108,9 @@
                             <el-descriptions-item :label="$t('website.otherDomains')">
                                 {{ websiteSSL.domains }}
                             </el-descriptions-item>
+                            <el-descriptions-item :label="$t('website.brand')">
+                                {{ websiteSSL.organization }}
+                            </el-descriptions-item>
                             <el-descriptions-item :label="$t('ssl.provider')">
                                 {{ getProvider(websiteSSL.provider) }}
                             </el-descriptions-item>
