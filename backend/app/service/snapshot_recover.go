@@ -74,7 +74,7 @@ func (u *SnapshotService) HandleSnapshotRecover(snap model.Snapshot, isRecover b
 		req.IsNew = true
 	}
 	if isRecover && (req.IsNew || snap.InterruptStep == "AppData") {
-		if err := recoverAppData(snapFileDir); err == nil {
+		if err := recoverAppData(snapFileDir); err != nil {
 			updateRecoverStatus(snap.ID, isRecover, "DockerDir", constant.StatusFailed, fmt.Sprintf("handle recover app data failed, err: %v", err))
 			return
 		}
