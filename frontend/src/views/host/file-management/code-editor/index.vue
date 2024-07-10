@@ -12,11 +12,20 @@
         <template #header>
             <div class="flex items-center justify-between">
                 <span>{{ $t('commons.button.edit') + ' - ' + form.path }}</span>
-                <el-space alignment="center" :size="10" class="dialog-header-icon">
+                <el-space alignment="center" :size="1" class="dialog-header-icon">
                     <el-tooltip :content="loadTooltip()" placement="top">
-                        <el-icon @click="toggleFullscreen"><FullScreen /></el-icon>
+                        <el-button
+                            @click="toggleFullscreen"
+                            v-if="!mobile"
+                            class="!border-none !bg-transparent !text-base !font-semibold !py-2 !px-1"
+                            icon="FullScreen"
+                        ></el-button>
                     </el-tooltip>
-                    <el-icon @click="handleClose" size="20"><Close /></el-icon>
+                    <el-button
+                        @click="handleClose"
+                        class="!border-none !bg-transparent !text-xl !py-2 !px-1"
+                        icon="Close"
+                    ></el-button>
                 </el-space>
             </div>
         </template>
@@ -143,7 +152,7 @@ import { GetFileContent, GetFilesTree, SaveFileContent } from '@/api/modules/fil
 import i18n from '@/lang';
 import { MsgError, MsgInfo, MsgSuccess } from '@/utils/message';
 import * as monaco from 'monaco-editor';
-import { nextTick, onBeforeUnmount, reactive, ref, onMounted } from 'vue';
+import { nextTick, onBeforeUnmount, reactive, ref, onMounted, computed } from 'vue';
 import { Languages } from '@/global/mimetype';
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
@@ -156,8 +165,9 @@ import { ResultData } from '@/api/interface';
 import { File } from '@/api/interface/file';
 import { getIcon } from '@/utils/util';
 import { TreeKey, TreeNodeData } from 'element-plus/es/components/tree-v2/src/types';
-import { Top, Refresh, DArrowLeft, DArrowRight, FullScreen, Close } from '@element-plus/icons-vue';
+import { Top, Refresh, DArrowLeft, DArrowRight } from '@element-plus/icons-vue';
 import { loadBaseDir } from '@/api/modules/setting';
+import { GlobalStore } from '@/store';
 
 let editor: monaco.editor.IStandaloneCodeEditor | undefined;
 
@@ -227,6 +237,11 @@ const oldFileContent = ref('');
 const toggleShow = () => {
     isShow.value = !isShow.value;
 };
+
+const globalStore = GlobalStore();
+const mobile = computed(() => {
+    return globalStore.isMobile();
+});
 
 type WordWrapOptions = 'off' | 'on' | 'wordWrapColumn' | 'bounded';
 
