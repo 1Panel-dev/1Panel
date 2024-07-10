@@ -72,25 +72,26 @@ const submit = async (formEl: FormInstance | undefined) => {
         if (!valid) {
             return;
         }
-        localStorage.setItem('VscodeConnctInfo', JSON.stringify(addForm));
+        localStorage.setItem('VscodeConnectInfo', JSON.stringify(addForm));
         dialogVisible.value = false;
-        window.open(
-            `vscode://vscode-remote/ssh-remote+${addForm.username}@${addForm.host}${addForm.path}?windowId=_blank`,
-        );
+        const vscodeUrl = `vscode://vscode-remote/ssh-remote+${addForm.username}@${addForm.host}${addForm.path}?windowId=_blank`;
+        window.open(vscodeUrl);
     });
 };
 const acceptParams = async (params: DialogProps): Promise<void> => {
-    if (localStorage.getItem('VscodeConnctInfo')) {
-        addForm.host = JSON.parse(localStorage.getItem('VscodeConnctInfo')).host;
-        addForm.port = JSON.parse(localStorage.getItem('VscodeConnctInfo')).port;
-        addForm.username = JSON.parse(localStorage.getItem('VscodeConnctInfo')).username;
-        window.open(
-            `vscode://vscode-remote/ssh-remote+${addForm.username}@${addForm.host}${params.path}?windowId=_blank`,
-        );
-    } else {
-        addForm.path = params.path;
-        dialogVisible.value = true;
+    const vscodeConnectInfo = localStorage.getItem('VscodeConnectInfo');
+
+    if (vscodeConnectInfo) {
+        try {
+            const storedInfo = JSON.parse(vscodeConnectInfo);
+            addForm.host = storedInfo.host;
+            addForm.port = storedInfo.port;
+            addForm.username = storedInfo.username;
+        } catch (error) {}
     }
+
+    addForm.path = params.path;
+    dialogVisible.value = true;
 };
 
 defineExpose({ acceptParams });
