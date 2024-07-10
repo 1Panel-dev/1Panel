@@ -8,7 +8,7 @@ type PageContainer struct {
 	PageInfo
 	Name            string `json:"name"`
 	State           string `json:"state" validate:"required,oneof=all created running paused restarting removing exited dead"`
-	OrderBy         string `json:"orderBy" validate:"required,oneof=name status created_at"`
+	OrderBy         string `json:"orderBy" validate:"required,oneof=name state created_at"`
 	Order           string `json:"order" validate:"required,oneof=null ascending descending"`
 	Filters         string `json:"filters"`
 	ExcludeAppStore bool   `json:"excludeAppStore"`
