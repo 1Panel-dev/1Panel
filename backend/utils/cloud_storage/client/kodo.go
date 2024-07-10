@@ -24,7 +24,9 @@ func NewKodoClient(vars map[string]interface{}) (*kodoClient, error) {
 	bucket := loadParamFromVars("bucket", vars)
 	domain := loadParamFromVars("domain", vars)
 	timeout := loadParamFromVars("timeout", vars)
-
+	if timeout == "" {
+		timeout = "1"
+	}
 	conn := auth.New(accessKey, secretKey)
 	cfg := storage.Config{
 		UseHTTPS: false,

@@ -119,7 +119,7 @@ const acceptParams = (params: DialogProps): void => {
         domainProto.value = httpItem.proto;
     }
     title.value = i18n.global.t('commons.button.' + kodoData.value.title);
-    if (kodoData.value.rowData!.varsJson['timeout'] == undefined) {
+    if (kodoData.value.rowData!.varsJson['timeout'] === undefined) {
         kodoData.value.rowData!.varsJson['timeout'] = 1;
     }
     drawerVisible.value = true;
