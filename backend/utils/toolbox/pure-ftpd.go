@@ -60,7 +60,7 @@ func NewFtpClient() (*Ftp, error) {
 	if err != nil {
 		return nil, errors.New(string(stdout))
 	}
-	stdout2, err := cmd.Execf("useradd -u 1000 -g 1panel %s", userItem.Username)
+	stdout2, err := cmd.Exec("useradd -u 1000 -g 1panel 1panel")
 	if err != nil {
 		return nil, errors.New(stdout2)
 	}
