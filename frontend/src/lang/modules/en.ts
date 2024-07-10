@@ -917,6 +917,9 @@ const message = {
         errPath: 'Backup path [{0}] error, cannot download!',
         cutWebsiteLog: 'Cut Website Log',
         cutWebsiteLogHelper: 'The cut log files will be backed up to the backup directory of 1Panel',
+
+        requestExpirationTime: 'Upload Request Expiration Time',
+        unitHours: 'Unit: Hours',
     },
     monitor: {
         monitor: 'Monitor',

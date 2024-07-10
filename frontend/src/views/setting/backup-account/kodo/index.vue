@@ -49,6 +49,18 @@
                             </el-button>
                             <span v-if="errBuckets" class="input-error">{{ $t('commons.rule.requiredSelect') }}</span>
                         </el-form-item>
+
+                        <el-form-item :label="$t('cronjob.requestExpirationTime')" prop="varsJson.timeout">
+                            <el-input-number
+                                style="width: 200px"
+                                :min="1"
+                                step-strictly
+                                :step="1"
+                                v-model.number="kodoData.rowData!.varsJson['timeout']"
+                            ></el-input-number>
+                            <span class="input-help">{{ $t('cronjob.unitHours') }}</span>
+                        </el-form-item>
+
                         <el-form-item :label="$t('setting.backupDir')" prop="backupPath">
                             <el-input clearable v-model.trim="kodoData.rowData!.backupPath" placeholder="/1panel" />
                         </el-form-item>
@@ -107,6 +119,9 @@ const acceptParams = (params: DialogProps): void => {
         domainProto.value = httpItem.proto;
     }
     title.value = i18n.global.t('commons.button.' + kodoData.value.title);
+    if (kodoData.value.rowData!.varsJson['timeout'] === undefined) {
+        kodoData.value.rowData!.varsJson['timeout'] = 1;
+    }
     drawerVisible.value = true;
 };
 

@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"strconv"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
@@ -10,10 +11,11 @@ import (
 )
 
 type kodoClient struct {
-	bucket string
-	domain string
-	auth   *auth.Credentials
-	client *storage.BucketManager
+	bucket  string
+	domain  string
+	timeout string
+	auth    *auth.Credentials
+	client  *storage.BucketManager
 }
 
 func NewKodoClient(vars map[string]interface{}) (*kodoClient, error) {
@@ -21,14 +23,17 @@ func NewKodoClient(vars map[string]interface{}) (*kodoClient, error) {
 	secretKey := loadParamFromVars("secretKey", vars)
 	bucket := loadParamFromVars("bucket", vars)
 	domain := loadParamFromVars("domain", vars)
-
+	timeout := loadParamFromVars("timeout", vars)
+	if timeout == "" {
+		timeout = "1"
+	}
 	conn := auth.New(accessKey, secretKey)
 	cfg := storage.Config{
 		UseHTTPS: false,
 	}
 	bucketManager := storage.NewBucketManager(conn, &cfg)
 
-	return &kodoClient{client: bucketManager, auth: conn, bucket: bucket, domain: domain}, nil
+	return &kodoClient{client: bucketManager, auth: conn, bucket: bucket, domain: domain, timeout: timeout}, nil
 }
 
 func (k kodoClient) ListBuckets() ([]interface{}, error) {
@@ -66,8 +71,13 @@ func (k kodoClient) Delete(path string) (bool, error) {
 }
 
 func (k kodoClient) Upload(src, target string) (bool, error) {
+
+	int64Value, _ := strconv.ParseInt(k.timeout, 10, 64)
+	unixTimestamp := int64Value * 3600
+
 	putPolicy := storage.PutPolicy{
-		Scope: k.bucket,
+		Scope:   k.bucket,
+		Expires: uint64(unixTimestamp),
 	}
 	upToken := putPolicy.UploadToken(k.auth)
 	cfg := storage.Config{UseHTTPS: true, UseCdnDomains: false}
