@@ -1,5 +1,11 @@
 <template>
-    <el-drawer :close-on-click-modal="false" :close-on-press-escape="false" v-model="open" size="30%">
+    <el-drawer
+        :destroy-on-close="true"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        v-model="open"
+        size="30%"
+    >
         <template #header>
             <DrawerHeader
                 :header="process.operate == 'create' ? $t('commons.button.create') : $t('commons.button.edit')"
