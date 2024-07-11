@@ -10,7 +10,7 @@
         :fullscreen="isFullscreen"
     >
         <template #header>
-            <div class="flex items-center justify-between">
+            <div ref="dialogHeader" class="flex items-center justify-between">
                 <span>{{ $t('commons.button.edit') + ' - ' + form.path }}</span>
                 <el-space alignment="center" :size="1" class="dialog-header-icon">
                     <el-tooltip :content="loadTooltip()" placement="top">
@@ -29,29 +29,36 @@
                 </el-space>
             </div>
         </template>
-        <el-form :inline="true" :model="config" class="mt-1.5">
-            <el-form-item :label="$t('file.theme')">
-                <el-select v-model="config.theme" @change="changeTheme()" class="p-w-200">
-                    <el-option v-for="item in themes" :key="item.label" :value="item.value" :label="item.label" />
-                </el-select>
-            </el-form-item>
-            <el-form-item :label="$t('file.language')">
-                <el-select v-model="config.language" @change="changeLanguage()" class="!w-32">
-                    <el-option v-for="lang in Languages" :key="lang.label" :value="lang.label" :label="lang.label" />
-                </el-select>
-            </el-form-item>
-            <el-form-item :label="$t('file.eol')">
-                <el-select v-model="config.eol" @change="changeEOL()" class="p-w-150">
-                    <el-option v-for="eol in eols" :key="eol.label" :value="eol.value" :label="eol.label" />
-                </el-select>
-            </el-form-item>
-            <el-form-item :label="$t('file.wordWrap')">
-                <el-select v-model="config.wordWrap" @change="changeWarp()" class="p-w-100">
-                    <el-option :label="$t('commons.button.enable')" value="on"></el-option>
-                    <el-option :label="$t('commons.button.disable')" value="off"></el-option>
-                </el-select>
-            </el-form-item>
-        </el-form>
+        <div ref="dialogForm">
+            <el-form :inline="true" :model="config" class="mt-1.5">
+                <el-form-item :label="$t('file.theme')">
+                    <el-select v-model="config.theme" @change="changeTheme()" class="p-w-200">
+                        <el-option v-for="item in themes" :key="item.label" :value="item.value" :label="item.label" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item :label="$t('file.language')">
+                    <el-select v-model="config.language" @change="changeLanguage()" class="!w-32">
+                        <el-option
+                            v-for="lang in Languages"
+                            :key="lang.label"
+                            :value="lang.label"
+                            :label="lang.label"
+                        />
+                    </el-select>
+                </el-form-item>
+                <el-form-item :label="$t('file.eol')">
+                    <el-select v-model="config.eol" @change="changeEOL()" class="p-w-150">
+                        <el-option v-for="eol in eols" :key="eol.label" :value="eol.value" :label="eol.label" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item :label="$t('file.wordWrap')">
+                    <el-select v-model="config.wordWrap" @change="changeWarp()" class="p-w-100">
+                        <el-option :label="$t('commons.button.enable')" value="on"></el-option>
+                        <el-option :label="$t('commons.button.disable')" value="off"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+        </div>
         <div v-loading="loading">
             <div class="flex">
                 <div class="sm:w-48 w-1/3 monaco-editor-background tree-container" v-if="isShow">
@@ -139,10 +146,10 @@
             </div>
         </div>
         <template #footer>
-            <span class="dialog-footer">
+            <div class="dialog-footer" ref="dialogFooter">
                 <el-button @click="handleReset">{{ $t('commons.button.reset') }}</el-button>
                 <el-button type="primary" @click="saveContent()">{{ $t('commons.button.confirm') }}</el-button>
-            </span>
+            </div>
         </template>
     </el-dialog>
 </template>
@@ -226,13 +233,15 @@ const baseDir = ref();
 const treeData = ref([]);
 const codeBox = ref();
 const defaultHeight = ref(55);
-const fullScreenHeight = ref(80);
 const treeHeight = ref(0);
 const codeHeight = ref('55vh');
 const codeReq = reactive({ path: '', expand: false, page: 1, pageSize: 100 });
 const isShow = ref(true);
 const isEdit = ref(false);
 const oldFileContent = ref('');
+const dialogHeader = ref(null);
+const dialogForm = ref(null);
+const dialogFooter = ref(null);
 
 const toggleShow = () => {
     isShow.value = !isShow.value;
@@ -340,8 +349,14 @@ onMounted(() => {
 const updateHeights = () => {
     const vh = window.innerHeight / 100;
     if (isFullscreen.value) {
-        treeHeight.value = fullScreenHeight.value * vh - 31;
-        codeHeight.value = `${fullScreenHeight.value}vh`;
+        let paddingHeight = 75;
+        const headerHeight = dialogHeader.value.offsetHeight;
+        const formHeight = dialogForm.value.offsetHeight;
+        const footerHeight = dialogFooter.value.offsetHeight;
+        treeHeight.value = window.innerHeight - headerHeight - formHeight - footerHeight - paddingHeight - 31;
+        codeHeight.value = `${
+            ((window.innerHeight - headerHeight - formHeight - footerHeight - paddingHeight) / window.innerHeight) * 100
+        }vh`;
     } else {
         treeHeight.value = defaultHeight.value * vh - 31;
         codeHeight.value = `${defaultHeight.value}vh`;
