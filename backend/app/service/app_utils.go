@@ -943,6 +943,13 @@ func upApp(appInstall *model.AppInstall, pullImages bool) {
 	}
 	exist, _ := appInstallRepo.GetFirst(commonRepo.WithByID(appInstall.ID))
 	if exist.ID > 0 {
+		containerNames, err := getContainerNames(*appInstall)
+		if err != nil {
+			return
+		}
+		if len(containerNames) > 0 {
+			appInstall.ContainerName = strings.Join(containerNames, ",")
+		}
 		_ = appInstallRepo.Save(context.Background(), appInstall)
 	}
 }

@@ -445,13 +445,6 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 	}
 	appInstall.Env = string(paramByte)
 
-	containerNames, err := getContainerNames(*appInstall)
-	if err != nil {
-		return
-	}
-	if len(containerNames) > 0 {
-		appInstall.ContainerName = strings.Join(containerNames, ",")
-	}
 	if err = appInstallRepo.Create(ctx, appInstall); err != nil {
 		return
 	}
