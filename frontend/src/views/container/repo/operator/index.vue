@@ -131,7 +131,7 @@ function validateDownloadUrl(rule: any, value: any, callback: any) {
     if (value === '') {
         callback();
     }
-    const pattern = /^https?/i;
+    const pattern = /^(http:\/\/|https:\/\/)/i;
     if (pattern.test(value)) {
         return callback(new Error(i18n.global.t('container.urlWarning')));
     }

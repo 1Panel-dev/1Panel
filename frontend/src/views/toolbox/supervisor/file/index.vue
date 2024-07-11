@@ -195,3 +195,9 @@ defineExpose({
     acceptParams,
 });
 </script>
+
+<style scoped lang="scss">
+.fullScreen {
+    border: none;
+}
+</style>

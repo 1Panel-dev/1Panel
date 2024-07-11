@@ -188,7 +188,7 @@
                                                 plain
                                                 round
                                                 size="small"
-                                                :disabled="installed.appStatus === 'Upgrading'"
+                                                :disabled="installed.status === 'Upgrading'"
                                                 @click="openOperate(installed, 'ignore')"
                                                 v-if="mode === 'upgrade'"
                                             >
