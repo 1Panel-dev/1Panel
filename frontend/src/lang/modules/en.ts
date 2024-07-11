@@ -918,7 +918,7 @@ const message = {
         cutWebsiteLog: 'Cut Website Log',
         cutWebsiteLogHelper: 'The cut log files will be backed up to the backup directory of 1Panel',
 
-        requestExpirationTime: 'Upload Request Expiration Time',
+        requestExpirationTime: 'Upload Request Expiration Time（Hours）',
         unitHours: 'Unit: Hours',
     },
     monitor: {
