@@ -58,7 +58,6 @@
                                 :step="1"
                                 v-model.number="kodoData.rowData!.varsJson['timeout']"
                             ></el-input-number>
-                            <span class="input-help">{{ $t('cronjob.unitHours') }}</span>
                         </el-form-item>
 
                         <el-form-item :label="$t('setting.backupDir')" prop="backupPath">
