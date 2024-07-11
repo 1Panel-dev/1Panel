@@ -163,7 +163,7 @@ const initData = () => {
 
 function filterDirectories(directories: any[]) {
     return directories.filter((dir) => {
-        return !dir.startsWith('/node_modules') && !dir.startsWith('/vendor');
+        return dir !== '/node_modules' && dir !== '/vendor';
     });
 }
 
