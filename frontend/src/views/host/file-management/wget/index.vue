@@ -1,6 +1,7 @@
 <template>
     <el-drawer
         v-model="open"
+        :destroy-on-close="true"
         :before-close="handleClose"
         size="50%"
         :close-on-click-modal="false"

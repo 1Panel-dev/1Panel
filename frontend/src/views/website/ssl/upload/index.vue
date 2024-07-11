@@ -1,5 +1,11 @@
 <template>
-    <el-drawer :close-on-click-modal="false" :close-on-press-escape="false" v-model="open" size="50%">
+    <el-drawer
+        :destroy-on-close="true"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        v-model="open"
+        size="50%"
+    >
         <template #header>
             <DrawerHeader :header="$t('ssl.upload')" :back="handleClose" />
         </template>

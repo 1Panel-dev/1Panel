@@ -5,6 +5,7 @@
         :close-on-click-modal="false"
         width="40%"
         :before-close="handleClose"
+        :destroy-on-close="true"
     >
         <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
