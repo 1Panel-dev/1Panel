@@ -74,7 +74,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         }
         localStorage.setItem('VscodeConnectInfo', JSON.stringify(addForm));
         dialogVisible.value = false;
-        const vscodeUrl = `vscode://vscode-remote/ssh-remote+${addForm.username}@${addForm.host}${addForm.path}?windowId=_blank`;
+        const vscodeUrl = `vscode://vscode-remote/ssh-remote+${addForm.username}@${addForm.host}:${addForm.port}${addForm.path}?windowId=_blank`;
         window.open(vscodeUrl);
     });
 };
