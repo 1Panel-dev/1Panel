@@ -21,7 +21,8 @@ func Init() {
 	constant.LocalAppInstallDir = path.Join(constant.AppInstallDir, "local")
 	constant.RemoteAppResourceDir = path.Join(constant.AppResourceDir, "remote")
 
-	constant.SSLLogDir = path.Join(global.CONF.System.DataDir, "log", "ssl")
+	constant.LogDir = path.Join(global.CONF.System.DataDir, "log")
+	constant.SSLLogDir = path.Join(constant.LogDir, "ssl")
 
 	dirs := []string{constant.DataDir, constant.ResourceDir, constant.AppResourceDir, constant.AppInstallDir,
 		global.CONF.System.Backup, constant.RuntimeDir, constant.LocalAppResourceDir, constant.RemoteAppResourceDir, constant.SSLLogDir}

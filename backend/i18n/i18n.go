@@ -74,6 +74,39 @@ func GetMsgByKey(key string) string {
 	return content
 }
 
+func GetWithName(key string, name string) string {
+	var (
+		dataMap = make(map[string]interface{})
+	)
+	dataMap["name"] = name
+	content, _ := global.I18n.Localize(&i18n.LocalizeConfig{
+		MessageID:    key,
+		TemplateData: dataMap,
+	})
+	return content
+}
+
+func GetWithMap(key string, dataMap map[string]string) string {
+	content, _ := global.I18n.Localize(&i18n.LocalizeConfig{
+		MessageID:    key,
+		TemplateData: dataMap,
+	})
+	return content
+}
+
+func GetWithNameAndErr(key string, name string, err error) string {
+	var (
+		dataMap = make(map[string]interface{})
+	)
+	dataMap["name"] = name
+	dataMap["err"] = err.Error()
+	content, _ := global.I18n.Localize(&i18n.LocalizeConfig{
+		MessageID:    key,
+		TemplateData: dataMap,
+	})
+	return content
+}
+
 //go:embed lang/*
 var fs embed.FS
 var bundle *i18n.Bundle
