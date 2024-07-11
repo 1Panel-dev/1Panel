@@ -9,6 +9,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/app/task"
 	"os"
 	"path"
 	"reflect"
@@ -206,12 +207,33 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 	if exist, _ := websiteRepo.GetBy(websiteRepo.WithAlias(alias)); len(exist) > 0 {
 		return buserr.New(constant.ErrAliasIsExist)
 	}
-
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return err
 	}
 	defaultHttpPort := nginxInstall.HttpPort
+
+	var (
+		existInstall model.AppInstall
+		runtime      *model.Runtime
+		appInstall   *model.AppInstall
+		proxy        string
+	)
+
+	switch create.Type {
+	case constant.Deployment:
+		if create.AppType != constant.NewApp {
+			existInstall, err = appInstallRepo.GetFirst(commonRepo.WithByID(create.AppInstallID))
+			if err != nil {
+				return err
+			}
+		}
+	case constant.Runtime:
+		runtime, err = runtimeRepo.GetFirst(commonRepo.WithByID(create.RuntimeID))
+		if err != nil {
+			return err
+		}
+	}
 
 	var (
 		otherDomains []model.WebsiteDomain
@@ -244,78 +266,35 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		IPV6:           create.IPV6,
 	}
 
-	var (
-		appInstall *model.AppInstall
-		runtime    *model.Runtime
-	)
-
-	defer func() {
-		if err != nil {
-			if website.AppInstallID > 0 {
-				req := request.AppInstalledOperate{
-					InstallId:   website.AppInstallID,
-					Operate:     constant.Delete,
-					ForceDelete: true,
-				}
-				if err := NewIAppInstalledService().Operate(req); err != nil {
-					global.LOG.Errorf(err.Error())
-				}
-			}
-		}
-	}()
-	var proxy string
+	websiteTask, err := task.NewTask("创建网站", "website")
+	if err != nil {
+		return err
+	}
 
 	switch create.Type {
 	case constant.Deployment:
 		if create.AppType == constant.NewApp {
-			var (
-				req     request.AppInstallCreate
-				install *model.AppInstall
-			)
-			req.Name = create.AppInstall.Name
-			req.AppDetailId = create.AppInstall.AppDetailId
-			req.Params = create.AppInstall.Params
-			req.AppContainerConfig = create.AppInstall.AppContainerConfig
-			tx, installCtx := getTxAndContext()
-			install, err = NewIAppService().Install(installCtx, req)
-			if err != nil {
-				tx.Rollback()
-				return err
+			deleteApp := func() {
+				if website.AppInstallID > 0 {
+					req := request.AppInstalledOperate{
+						InstallId:   website.AppInstallID,
+						Operate:     constant.Delete,
+						ForceDelete: true,
+					}
+					if err := NewIAppInstalledService().Operate(req); err != nil {
+						global.LOG.Errorf(err.Error())
+					}
+				}
 			}
-			tx.Commit()
-			appInstall = install
-			website.AppInstallID = install.ID
-			website.Proxy = fmt.Sprintf("127.0.0.1:%d", appInstall.HttpPort)
-		} else {
-			var install model.AppInstall
-			install, err = appInstallRepo.GetFirst(commonRepo.WithByID(create.AppInstallID))
-			if err != nil {
-				return err
-			}
-			appInstall = &install
-			website.AppInstallID = appInstall.ID
-			website.Proxy = fmt.Sprintf("127.0.0.1:%d", appInstall.HttpPort)
-		}
-	case constant.Runtime:
-		runtime, err = runtimeRepo.GetFirst(commonRepo.WithByID(create.RuntimeID))
-		if err != nil {
-			return err
-		}
-		website.RuntimeID = runtime.ID
-		switch runtime.Type {
-		case constant.RuntimePHP:
-			if runtime.Resource == constant.ResourceAppstore {
+			installApp := func() error {
 				var (
 					req     request.AppInstallCreate
 					install *model.AppInstall
 				)
-				reg, _ := regexp.Compile(`[^a-z0-9_-]+`)
-				req.Name = reg.ReplaceAllString(strings.ToLower(alias), "")
+				req.Name = create.AppInstall.Name
 				req.AppDetailId = create.AppInstall.AppDetailId
 				req.Params = create.AppInstall.Params
-				req.Params["IMAGE_NAME"] = runtime.Image
 				req.AppContainerConfig = create.AppInstall.AppContainerConfig
-				req.Params["PANEL_WEBSITE_DIR"] = path.Join(nginxInstall.GetPath(), "/www")
 				tx, installCtx := getTxAndContext()
 				install, err = NewIAppService().Install(installCtx, req)
 				if err != nil {
@@ -323,9 +302,47 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 					return err
 				}
 				tx.Commit()
-				website.AppInstallID = install.ID
 				appInstall = install
+				website.AppInstallID = install.ID
 				website.Proxy = fmt.Sprintf("127.0.0.1:%d", appInstall.HttpPort)
+				return nil
+			}
+			websiteTask.AddSubTask("安装应用", installApp, deleteApp)
+		} else {
+			appInstall = &existInstall
+			website.AppInstallID = appInstall.ID
+			website.Proxy = fmt.Sprintf("127.0.0.1:%d", appInstall.HttpPort)
+		}
+	case constant.Runtime:
+		website.RuntimeID = runtime.ID
+		switch runtime.Type {
+		case constant.RuntimePHP:
+			if runtime.Resource == constant.ResourceAppstore {
+				installApp := func() error {
+					var (
+						req     request.AppInstallCreate
+						install *model.AppInstall
+					)
+					reg, _ := regexp.Compile(`[^a-z0-9_-]+`)
+					req.Name = reg.ReplaceAllString(strings.ToLower(alias), "")
+					req.AppDetailId = create.AppInstall.AppDetailId
+					req.Params = create.AppInstall.Params
+					req.Params["IMAGE_NAME"] = runtime.Image
+					req.AppContainerConfig = create.AppInstall.AppContainerConfig
+					req.Params["PANEL_WEBSITE_DIR"] = path.Join(nginxInstall.GetPath(), "/www")
+					tx, installCtx := getTxAndContext()
+					install, err = NewIAppService().Install(installCtx, req)
+					if err != nil {
+						tx.Rollback()
+						return err
+					}
+					tx.Commit()
+					website.AppInstallID = install.ID
+					appInstall = install
+					website.Proxy = fmt.Sprintf("127.0.0.1:%d", appInstall.HttpPort)
+					return nil
+				}
+				websiteTask.AddSubTask("创建运行环境", installApp, nil)
 			} else {
 				website.ProxyType = create.ProxyType
 				if website.ProxyType == constant.RuntimeProxyUnix {
@@ -341,36 +358,43 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		}
 	}
 
-	if err = configDefaultNginx(website, domains, appInstall, runtime); err != nil {
-		return err
+	configNginx := func() error {
+		if err = configDefaultNginx(website, domains, appInstall, runtime); err != nil {
+			return err
+		}
+		if err = createWafConfig(website, domains); err != nil {
+			return err
+		}
+		tx, ctx := helper.GetTxAndContext()
+		defer tx.Rollback()
+		if err = websiteRepo.Create(ctx, website); err != nil {
+			return err
+		}
+		for i := range domains {
+			domains[i].WebsiteID = website.ID
+		}
+		if err = websiteDomainRepo.BatchCreate(ctx, domains); err != nil {
+			return err
+		}
+		tx.Commit()
+		return nil
 	}
+	websiteTask.AddSubTask("配置 OpenResty", configNginx, nil)
 
 	if len(create.FtpUser) != 0 && len(create.FtpPassword) != 0 {
-		indexDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "index")
-		itemID, err := NewIFtpService().Create(dto.FtpCreate{User: create.FtpUser, Password: create.FtpPassword, Path: indexDir})
-		if err != nil {
-			global.LOG.Errorf("create ftp for website failed, err: %v", err)
+		createFtp := func() error {
+			indexDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "index")
+			itemID, err := NewIFtpService().Create(dto.FtpCreate{User: create.FtpUser, Password: create.FtpPassword, Path: indexDir})
+			if err != nil {
+				websiteTask.Logger.Printf("create ftp for website failed, err: %v", err)
+			}
+			website.FtpID = itemID
+			return nil
 		}
-		website.FtpID = itemID
+		websiteTask.AddSubTask("创建 FTP", createFtp, nil)
 	}
 
-	if err = createWafConfig(website, domains); err != nil {
-		return err
-	}
-
-	tx, ctx := helper.GetTxAndContext()
-	defer tx.Rollback()
-	if err = websiteRepo.Create(ctx, website); err != nil {
-		return err
-	}
-	for i := range domains {
-		domains[i].WebsiteID = website.ID
-	}
-	if err = websiteDomainRepo.BatchCreate(ctx, domains); err != nil {
-		return err
-	}
-	tx.Commit()
-	return nil
+	return websiteTask.Execute()
 }
 
 func (w WebsiteService) OpWebsite(req request.WebsiteOp) error {
@@ -442,6 +466,7 @@ func (w WebsiteService) GetWebsite(id uint) (response.WebsiteDTO, error) {
 	res.ErrorLogPath = path.Join(sitePath, "log", "error.log")
 	res.AccessLogPath = path.Join(sitePath, "log", "access.log")
 	res.SitePath = sitePath
+	res.SiteDir = website.SiteDir
 	return res, nil
 }
 
