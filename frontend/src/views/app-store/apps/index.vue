@@ -241,6 +241,9 @@ const openInstall = (app: App.App) => {
         case 'java':
             router.push({ path: '/websites/runtimes/java' });
             break;
+        case 'go':
+            router.push({ path: '/websites/runtimes/go' });
+            break;
         default:
             const params = {
                 app: app,
