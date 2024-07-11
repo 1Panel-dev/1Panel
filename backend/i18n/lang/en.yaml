@@ -196,3 +196,12 @@ ErrLicenseSync: "Failed to sync license information, no license information dete
 ErrXpackNotFound: "This section is a professional edition feature, please import the license first in Panel Settings-License interface"
 ErrXpackNotActive: "This section is a professional edition feature, please synchronize the license status first in Panel Settings-License interface"
 ErrXpackOutOfDate: "The current license has expired, please re-import the license in Panel Settings-License interface"
+
+#task
+TaskStart: "{{.name}} started [START]"
+TaskEnd: "{{.name}} ended [COMPLETED]"
+TaskFailed: "{{.name}} failed: {{.err}}"
+TaskTimeout: "{{.name}} timed out"
+TaskSuccess: "{{.name}} succeeded"
+TaskRetry: "Start {{.name}} retry"
+SubTaskStart: "Start {{.name}}"

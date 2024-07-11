@@ -17,4 +17,5 @@ var (
 	RuntimeDir           = path.Join(DataDir, "runtime")
 	RecycleBinDir        = "/.1panel_clash"
 	SSLLogDir            = path.Join(global.CONF.System.DataDir, "log", "ssl")
+	LogDir               = path.Join(global.CONF.System.DataDir, "log")
 )

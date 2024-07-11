@@ -198,3 +198,12 @@ ErrLicenseSync: "許可證信息同步失敗，資料庫中未檢測到許可證
 ErrXpackNotFound: "該部分為專業版功能，請先在 面板設置-許可證 界面導入許可證"
 ErrXpackNotActive: "該部分為專業版功能，請先在 面板設置-許可證 界面同步許可證狀態"
 ErrXpackOutOfDate: "當前許可證已過期，請重新在 面板設置-許可證 界面導入許可證"
+
+#task
+TaskStart: "{{.name}} 開始 [START]"
+TaskEnd: "{{.name}} 結束 [COMPLETED]"
+TaskFailed: "{{.name}} 失敗: {{.err}}"
+TaskTimeout: "{{.name}} 逾時"
+TaskSuccess: "{{.name}} 成功"
+TaskRetry: "開始第 {{.name}} 次重試"
+SubTaskStart: "開始 {{.name}}"

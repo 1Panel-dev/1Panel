@@ -200,3 +200,11 @@ ErrXpackNotFound: "该部分为专业版功能，请先在 面板设置-许可�
 ErrXpackNotActive: "该部分为专业版功能，请先在 面板设置-许可证 界面同步许可证状态"
 ErrXpackOutOfDate: "当前许可证已过期，请重新在 面板设置-许可证 界面导入许可证"
 
+#task
+TaskStart: "{{.name}} 开始 [START]"
+TaskEnd: "{{.name}} 结束 [COMPLETED]"
+TaskFailed: "{{.name}} 失败: {{.err}}"
+TaskTimeout: "{{.name}} 超时"
+TaskSuccess: "{{.name}} 成功"
+TaskRetry: "开始第 {{.name}} 次重试"
+SubTaskStart: "开始 {{.name}}"
