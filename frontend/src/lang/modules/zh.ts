@@ -1201,6 +1201,7 @@ const message = {
         noEdit: '文件未修改,无需此操作！',
         noNameFolder: '未命名文件夹',
         noNameFile: '未命名文件',
+        minimap: '缩略图',
     },
     ssh: {
         autoStart: '开机自启',

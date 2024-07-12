@@ -1262,6 +1262,7 @@ const message = {
         noEdit: 'The file has not been modified, no need to do this!',
         noNameFolder: 'Untitled Folder',
         noNameFile: 'Untitled File',
+        minimap: 'Code Mini Map',
     },
     ssh: {
         autoStart: 'Auto Start',
