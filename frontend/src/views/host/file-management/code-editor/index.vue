@@ -57,6 +57,12 @@
                         <el-option :label="$t('commons.button.disable')" value="off"></el-option>
                     </el-select>
                 </el-form-item>
+                <el-form-item :label="$t('file.minimap')">
+                    <el-select v-model="config.minimap" @change="changeMinimap()" class="p-w-100">
+                        <el-option :label="$t('commons.button.enable')" :value="true"></el-option>
+                        <el-option :label="$t('commons.button.disable')" :value="false"></el-option>
+                    </el-select>
+                </el-form-item>
             </el-form>
         </div>
         <div v-loading="loading">
@@ -209,6 +215,7 @@ interface EditorConfig {
     language: string;
     eol: number;
     wordWrap: WordWrapOptions;
+    minimap: boolean;
 }
 
 interface TreeNode {
@@ -227,6 +234,7 @@ const loading = ref(false);
 const fileName = ref('');
 const codeThemeKey = 'code-theme';
 const warpKey = 'code-warp';
+const minimapKey = 'code-minimap';
 const directoryPath = ref('');
 const fileExtension = ref('');
 const baseDir = ref();
@@ -261,6 +269,7 @@ const config = reactive<EditorConfig>({
     language: 'plaintext',
     eol: monaco.editor.EndOfLineSequence.LF,
     wordWrap: 'on',
+    minimap: false,
 });
 
 const eols = [
@@ -403,6 +412,15 @@ const changeWarp = () => {
     });
 };
 
+const changeMinimap = () => {
+    localStorage.setItem(minimapKey, JSON.stringify(config.minimap));
+    editor.updateOptions({
+        minimap: {
+            enabled: config.minimap,
+        },
+    });
+};
+
 const initEditor = () => {
     if (editor) {
         editor.dispose();
@@ -418,6 +436,9 @@ const initEditor = () => {
             roundedSelection: false,
             overviewRulerBorder: false,
             wordWrap: config.wordWrap,
+            minimap: {
+                enabled: config.minimap,
+            },
         });
         if (editor.getModel().getValue() === '') {
             let defaultContent = '\n\n\n\n';
@@ -470,6 +491,7 @@ const acceptParams = (props: EditProps) => {
     config.eol = monaco.editor.EndOfLineSequence.LF;
     config.theme = localStorage.getItem(codeThemeKey) || 'vs-dark';
     config.wordWrap = (localStorage.getItem(warpKey) as WordWrapOptions) || 'on';
+    config.minimap = localStorage.getItem(minimapKey) !== null ? localStorage.getItem(minimapKey) === 'true' : true;
     open.value = true;
 };
 
