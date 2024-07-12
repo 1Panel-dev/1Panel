@@ -177,6 +177,7 @@ CutWebsiteLogSuccess: "{{ .name }} 网站日志切割成功，备份路径 {{ .p
 #toolbox
 ErrNotExistUser: "当前用户不存在，请修改后重试！"
 ErrBanAction: "设置失败，当前 {{ .name }} 服务不可用，请检查后重试！"
+ErrClamdscanNotFound: "未检测到 clamdscan 命令，请参考文档安装！"
 
 #waf
 ErrScope: "不支持修改此配置"

@@ -54,19 +54,19 @@ func NewIClamService() IClamService {
 	return &ClamService{}
 }
 
-func (f *ClamService) LoadBaseInfo() (dto.ClamBaseInfo, error) {
+func (c *ClamService) LoadBaseInfo() (dto.ClamBaseInfo, error) {
 	var baseInfo dto.ClamBaseInfo
 	baseInfo.Version = "-"
 	baseInfo.FreshVersion = "-"
 	exist1, _ := systemctl.IsExist(clamServiceNameCentOs)
 	if exist1 {
-		f.serviceName = clamServiceNameCentOs
+		c.serviceName = clamServiceNameCentOs
 		baseInfo.IsExist = true
 		baseInfo.IsActive, _ = systemctl.IsActive(clamServiceNameCentOs)
 	}
 	exist2, _ := systemctl.IsExist(clamServiceNameUbuntu)
 	if exist2 {
-		f.serviceName = clamServiceNameUbuntu
+		c.serviceName = clamServiceNameUbuntu
 		baseInfo.IsExist = true
 		baseInfo.IsActive, _ = systemctl.IsActive(clamServiceNameUbuntu)
 	}
@@ -78,41 +78,39 @@ func (f *ClamService) LoadBaseInfo() (dto.ClamBaseInfo, error) {
 
 	if baseInfo.IsActive {
 		version, err := cmd.Exec("clamdscan --version")
-		if err != nil {
-			return baseInfo, nil
-		}
-		if strings.Contains(version, "/") {
-			baseInfo.Version = strings.TrimPrefix(strings.Split(version, "/")[0], "ClamAV ")
-		} else {
-			baseInfo.Version = strings.TrimPrefix(version, "ClamAV ")
+		if err == nil {
+			if strings.Contains(version, "/") {
+				baseInfo.Version = strings.TrimPrefix(strings.Split(version, "/")[0], "ClamAV ")
+			} else {
+				baseInfo.Version = strings.TrimPrefix(version, "ClamAV ")
+			}
 		}
 	}
 	if baseInfo.FreshIsActive {
 		version, err := cmd.Exec("freshclam --version")
-		if err != nil {
-			return baseInfo, nil
-		}
-		if strings.Contains(version, "/") {
-			baseInfo.FreshVersion = strings.TrimPrefix(strings.Split(version, "/")[0], "ClamAV ")
-		} else {
-			baseInfo.FreshVersion = strings.TrimPrefix(version, "ClamAV ")
+		if err == nil {
+			if strings.Contains(version, "/") {
+				baseInfo.FreshVersion = strings.TrimPrefix(strings.Split(version, "/")[0], "ClamAV ")
+			} else {
+				baseInfo.FreshVersion = strings.TrimPrefix(version, "ClamAV ")
+			}
 		}
 	}
 	return baseInfo, nil
 }
 
-func (f *ClamService) Operate(operate string) error {
+func (c *ClamService) Operate(operate string) error {
 	switch operate {
 	case "start", "restart", "stop":
-		stdout, err := cmd.Execf("systemctl %s %s", operate, f.serviceName)
+		stdout, err := cmd.Execf("systemctl %s %s", operate, c.serviceName)
 		if err != nil {
-			return fmt.Errorf("%s the %s failed, err: %s", operate, f.serviceName, stdout)
+			return fmt.Errorf("%s the %s failed, err: %s", operate, c.serviceName, stdout)
 		}
 		return nil
 	case "fresh-start", "fresh-restart", "fresh-stop":
 		stdout, err := cmd.Execf("systemctl %s %s", strings.TrimPrefix(operate, "fresh-"), freshClamService)
 		if err != nil {
-			return fmt.Errorf("%s the %s failed, err: %s", operate, f.serviceName, stdout)
+			return fmt.Errorf("%s the %s failed, err: %s", operate, c.serviceName, stdout)
 		}
 		return nil
 	default:
@@ -120,7 +118,7 @@ func (f *ClamService) Operate(operate string) error {
 	}
 }
 
-func (f *ClamService) SearchWithPage(req dto.SearchWithPage) (int64, interface{}, error) {
+func (c *ClamService) SearchWithPage(req dto.SearchWithPage) (int64, interface{}, error) {
 	total, commands, err := clamRepo.Page(req.Page, req.PageSize, commonRepo.WithLikeName(req.Info))
 	if err != nil {
 		return 0, nil, err
@@ -151,7 +149,7 @@ func (f *ClamService) SearchWithPage(req dto.SearchWithPage) (int64, interface{}
 	return total, datas, err
 }
 
-func (f *ClamService) Create(req dto.ClamCreate) error {
+func (c *ClamService) Create(req dto.ClamCreate) error {
 	clam, _ := clamRepo.Get(commonRepo.WithByName(req.Name))
 	if clam.ID != 0 {
 		return constant.ErrRecordExist
@@ -168,7 +166,7 @@ func (f *ClamService) Create(req dto.ClamCreate) error {
 	return nil
 }
 
-func (f *ClamService) Update(req dto.ClamUpdate) error {
+func (c *ClamService) Update(req dto.ClamUpdate) error {
 	clam, _ := clamRepo.Get(commonRepo.WithByName(req.Name))
 	if clam.ID == 0 {
 		return constant.ErrRecordNotFound
@@ -188,7 +186,7 @@ func (f *ClamService) Update(req dto.ClamUpdate) error {
 	return nil
 }
 
-func (u *ClamService) Delete(req dto.ClamDelete) error {
+func (c *ClamService) Delete(req dto.ClamDelete) error {
 	for _, id := range req.Ids {
 		clam, _ := clamRepo.Get(commonRepo.WithByID(id))
 		if clam.ID == 0 {
@@ -207,7 +205,10 @@ func (u *ClamService) Delete(req dto.ClamDelete) error {
 	return nil
 }
 
-func (u *ClamService) HandleOnce(req dto.OperateByID) error {
+func (c *ClamService) HandleOnce(req dto.OperateByID) error {
+	if cmd.Which("clamdscan") == false {
+		return buserr.New("ErrClamdscanNotFound")
+	}
 	clam, _ := clamRepo.Get(commonRepo.WithByID(req.ID))
 	if clam.ID == 0 {
 		return constant.ErrRecordNotFound
@@ -241,13 +242,13 @@ func (u *ClamService) HandleOnce(req dto.OperateByID) error {
 		global.LOG.Debugf("clamdscan --fdpass %s %s -l %s", strategy, clam.Path, logFile)
 		stdout, err := cmd.Execf("clamdscan --fdpass %s %s -l %s", strategy, clam.Path, logFile)
 		if err != nil {
-			global.LOG.Errorf("clamdscan failed, stdout: %v, err: %v", string(stdout), err)
+			global.LOG.Errorf("clamdscan failed, stdout: %v, err: %v", stdout, err)
 		}
 	}()
 	return nil
 }
 
-func (u *ClamService) LoadRecords(req dto.ClamLogSearch) (int64, interface{}, error) {
+func (c *ClamService) LoadRecords(req dto.ClamLogSearch) (int64, interface{}, error) {
 	clam, _ := clamRepo.Get(commonRepo.WithByID(req.ClamID))
 	if clam.ID == 0 {
 		return 0, nil, constant.ErrRecordNotFound
@@ -294,7 +295,7 @@ func (u *ClamService) LoadRecords(req dto.ClamLogSearch) (int64, interface{}, er
 	}
 	return int64(total), datas, nil
 }
-func (u *ClamService) LoadRecordLog(req dto.ClamLogReq) (string, error) {
+func (c *ClamService) LoadRecordLog(req dto.ClamLogReq) (string, error) {
 	logPath := path.Join(global.CONF.System.DataDir, resultDir, req.ClamName, req.RecordName)
 	var tail string
 	if req.Tail != "0" {
@@ -310,7 +311,7 @@ func (u *ClamService) LoadRecordLog(req dto.ClamLogReq) (string, error) {
 	return string(stdout), nil
 }
 
-func (u *ClamService) CleanRecord(req dto.OperateByID) error {
+func (c *ClamService) CleanRecord(req dto.OperateByID) error {
 	clam, _ := clamRepo.Get(commonRepo.WithByID(req.ID))
 	if clam.ID == 0 {
 		return constant.ErrRecordNotFound
@@ -320,37 +321,37 @@ func (u *ClamService) CleanRecord(req dto.OperateByID) error {
 	return nil
 }
 
-func (u *ClamService) LoadFile(req dto.ClamFileReq) (string, error) {
+func (c *ClamService) LoadFile(req dto.ClamFileReq) (string, error) {
 	filePath := ""
 	switch req.Name {
 	case "clamd":
-		if u.serviceName == clamServiceNameUbuntu {
+		if c.serviceName == clamServiceNameUbuntu {
 			filePath = "/etc/clamav/clamd.conf"
 		} else {
 			filePath = "/etc/clamd.d/scan.conf"
 		}
 	case "clamd-log":
-		filePath = u.loadLogPath("clamd-log")
+		filePath = c.loadLogPath("clamd-log")
 		if len(filePath) != 0 {
 			break
 		}
-		if u.serviceName == clamServiceNameUbuntu {
+		if c.serviceName == clamServiceNameUbuntu {
 			filePath = "/var/log/clamav/clamav.log"
 		} else {
 			filePath = "/var/log/clamd.scan"
 		}
 	case "freshclam":
-		if u.serviceName == clamServiceNameUbuntu {
+		if c.serviceName == clamServiceNameUbuntu {
 			filePath = "/etc/clamav/freshclam.conf"
 		} else {
 			filePath = "/etc/freshclam.conf"
 		}
 	case "freshclam-log":
-		filePath = u.loadLogPath("freshclam-log")
+		filePath = c.loadLogPath("freshclam-log")
 		if len(filePath) != 0 {
 			break
 		}
-		if u.serviceName == clamServiceNameUbuntu {
+		if c.serviceName == clamServiceNameUbuntu {
 			filePath = "/var/log/clamav/freshclam.log"
 		} else {
 			filePath = "/var/log/freshclam.log"
@@ -375,12 +376,12 @@ func (u *ClamService) LoadFile(req dto.ClamFileReq) (string, error) {
 	return string(stdout), nil
 }
 
-func (u *ClamService) UpdateFile(req dto.UpdateByNameAndFile) error {
+func (c *ClamService) UpdateFile(req dto.UpdateByNameAndFile) error {
 	filePath := ""
 	service := ""
 	switch req.Name {
 	case "clamd":
-		if u.serviceName == clamServiceNameUbuntu {
+		if c.serviceName == clamServiceNameUbuntu {
 			service = clamServiceNameUbuntu
 			filePath = "/etc/clamav/clamd.conf"
 		} else {
@@ -388,7 +389,7 @@ func (u *ClamService) UpdateFile(req dto.UpdateByNameAndFile) error {
 			filePath = "/etc/clamd.d/scan.conf"
 		}
 	case "freshclam":
-		if u.serviceName == clamServiceNameUbuntu {
+		if c.serviceName == clamServiceNameUbuntu {
 			filePath = "/etc/clamav/freshclam.conf"
 		} else {
 			filePath = "/etc/freshclam.conf"
@@ -458,16 +459,16 @@ func loadResultFromLog(pathItem string) dto.ClamLog {
 	}
 	return data
 }
-func (u *ClamService) loadLogPath(name string) string {
+func (c *ClamService) loadLogPath(name string) string {
 	confPath := ""
 	if name == "clamd-log" {
-		if u.serviceName == clamServiceNameUbuntu {
+		if c.serviceName == clamServiceNameUbuntu {
 			confPath = "/etc/clamav/clamd.conf"
 		} else {
 			confPath = "/etc/clamd.d/scan.conf"
 		}
 	} else {
-		if u.serviceName == clamServiceNameUbuntu {
+		if c.serviceName == clamServiceNameUbuntu {
 			confPath = "/etc/clamav/freshclam.conf"
 		} else {
 			confPath = "/etc/freshclam.conf"
