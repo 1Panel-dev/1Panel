@@ -183,7 +183,7 @@ func (f *FileService) Create(op request.FileCreate) error {
 	}
 	fo := files.NewFileOp()
 	if fo.Stat(op.Path) {
-		return buserr.New(constant.ErrFileIsExit)
+		return buserr.New(constant.ErrFileIsExist)
 	}
 	mode := op.Mode
 	if mode == 0 {
@@ -273,7 +273,7 @@ func (f *FileService) ChangeOwner(req request.FileRoleUpdate) error {
 func (f *FileService) Compress(c request.FileCompress) error {
 	fo := files.NewFileOp()
 	if !c.Replace && fo.Stat(filepath.Join(c.Dst, c.Name)) {
-		return buserr.New(constant.ErrFileIsExit)
+		return buserr.New(constant.ErrFileIsExist)
 	}
 	return fo.Compress(c.Files, c.Dst, c.Name, files.CompressType(c.Type), c.Secret)
 }
