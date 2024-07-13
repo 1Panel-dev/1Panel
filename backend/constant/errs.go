@@ -95,7 +95,7 @@ var (
 	ErrPathNotFound     = "ErrPathNotFound"
 	ErrMovePathFailed   = "ErrMovePathFailed"
 	ErrLinkPathNotFound = "ErrLinkPathNotFound"
-	ErrFileIsExit       = "ErrFileIsExit"
+	ErrFileIsExist       = "ErrFileIsExist"
 	ErrFileUpload       = "ErrFileUpload"
 	ErrFileDownloadDir  = "ErrFileDownloadDir"
 	ErrCmdNotFound      = "ErrCmdNotFound"
