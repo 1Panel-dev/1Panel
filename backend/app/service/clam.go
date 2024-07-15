@@ -75,6 +75,10 @@ func (c *ClamService) LoadBaseInfo() (dto.ClamBaseInfo, error) {
 		baseInfo.FreshIsExist = true
 		baseInfo.FreshIsActive, _ = systemctl.IsActive(freshClamService)
 	}
+	stdout, err := cmd.Exec("which clamdscan")
+	if err != nil || (len(strings.ReplaceAll(stdout, "\n", "")) == 0 && strings.HasPrefix(stdout, "/")) {
+		baseInfo.IsActive = false
+	}
 
 	if baseInfo.IsActive {
 		version, err := cmd.Exec("clamdscan --version")
