@@ -437,6 +437,11 @@ const message = {
         remote: 'Remote',
         remoteDB: 'Remote DB',
         createRemoteDB: 'Create Remote Server',
+        unBindRemoteDB: 'Unbind remote server',
+        unBindForce: 'Force unbind',
+        unBindForceHelper: 'Ignore all errors during the unbinding process to ensure the final operation is successful',
+        unBindRemoteHelper:
+            'Unbinding the remote database will only remove the binding relationship and will not directly delete the remote database',
         editRemoteDB: 'Edit Remote Server',
         localDB: 'Local DB',
         address: 'DB address',
