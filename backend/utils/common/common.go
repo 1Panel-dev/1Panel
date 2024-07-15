@@ -230,13 +230,17 @@ func RemoveRepeatElement(a interface{}) (ret []interface{}) {
 }
 
 func LoadSizeUnit(value float64) string {
-	if value > 1048576 {
-		return fmt.Sprintf("%vM", value/1048576)
+	val := int64(value)
+	if val%1024 != 0 {
+		return fmt.Sprintf("%v", val)
 	}
-	if value > 1024 {
-		return fmt.Sprintf("%vK", value/1024)
+	if val > 1048576 {
+		return fmt.Sprintf("%vM", val/1048576)
 	}
-	return fmt.Sprintf("%v", value)
+	if val > 1024 {
+		return fmt.Sprintf("%vK", val/1024)
+	}
+	return fmt.Sprintf("%v", val)
 }
 
 func LoadSizeUnit2F(value float64) string {
