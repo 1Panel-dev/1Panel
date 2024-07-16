@@ -96,7 +96,7 @@ func (w *WebsiteRepo) Page(page, size int, opts ...DBOption) (int64, []model.Web
 	db := getDb(opts...).Model(&model.Website{})
 	count := int64(0)
 	db = db.Count(&count)
-	err := db.Limit(size).Offset(size * (page - 1)).Preload("WebsiteSSL").Find(&websites).Error
+	err := db.Debug().Limit(size).Offset(size * (page - 1)).Preload("WebsiteSSL").Find(&websites).Error
 	return count, websites, err
 }
 
