@@ -695,7 +695,7 @@ const openDeCompress = (item: File.File) => {
 const openView = (item: File.File) => {
     const fileType = getFileType(item.extension);
 
-    const previewTypes = ['image', 'video', 'audio', 'pdf', 'word', 'excel'];
+    const previewTypes = ['image', 'video', 'audio', 'word', 'excel'];
     if (previewTypes.includes(fileType)) {
         return openPreview(item, fileType);
     }
