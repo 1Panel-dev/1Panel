@@ -82,7 +82,7 @@ export const DownloadFile = (params: File.FileDownload) => {
 };
 
 export const ComputeDirSize = (params: File.DirSizeReq) => {
-    return http.post<File.DirSizeRes>('files/size', params);
+    return http.post<File.DirSizeRes>('files/size', params, TimeoutEnum.T_5M);
 };
 
 export const FileKeys = () => {
