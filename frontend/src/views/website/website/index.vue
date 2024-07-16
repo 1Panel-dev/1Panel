@@ -128,7 +128,7 @@
                         prop="protocol"
                         width="90px"
                     ></el-table-column>
-                    <el-table-column :label="$t('website.expireDate')">
+                    <el-table-column :label="$t('website.expireDate')" prop="expireDate" sortable>
                         <template #default="{ row, $index }">
                             <div v-show="row.showdate">
                                 <el-date-picker
@@ -271,6 +271,7 @@ const mobile = computed(() => {
 const changeSort = ({ prop, order }) => {
     if (order) {
         req.orderBy = prop == 'primaryDomain' ? 'primary_domain' : prop;
+        req.orderBy = prop == 'expireDate' ? 'expire_date' : prop;
         req.order = order;
     } else {
         req.orderBy = 'created_at';
