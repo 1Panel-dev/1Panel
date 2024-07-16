@@ -30,7 +30,6 @@
         "@highlightjs/vue-plugin": "^2.1.0",
         "@vue-office/docx": "^1.6.2",
         "@vue-office/excel": "^1.7.8",
-        "@vue-office/pdf": "^2.0.2",
         "@vueuse/core": "^8.9.4",
         "@xterm/addon-fit": "^0.10.0",
         "@xterm/xterm": "^5.5.0",

@@ -35,15 +35,6 @@
 
                 <audio v-else-if="fileType === 'audio'" :src="fileUrl" controls></audio>
 
-                <vue-office-pdf
-                    v-else-if="fileType === 'pdf'"
-                    :src="fileUrl"
-                    :style="isFullscreen ? 'height: 90vh' : 'height: 80vh'"
-                    class="w-full"
-                    @rendered="renderedHandler"
-                    @error="errorHandler"
-                />
-
                 <vue-office-docx
                     v-else-if="fileType === 'word'"
                     :src="fileUrl"
@@ -73,7 +64,6 @@ import { ref } from 'vue';
 import { Close, FullScreen } from '@element-plus/icons-vue';
 import VueOfficeDocx from '@vue-office/docx';
 import VueOfficeExcel from '@vue-office/excel';
-import VueOfficePdf from '@vue-office/pdf';
 import '@vue-office/docx/lib/index.css';
 import '@vue-office/excel/lib/index.css';
 import { MsgError } from '@/utils/message';
