@@ -110,8 +110,10 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 			}
 			return file, nil
 		} else {
-			if err := file.getContent(); err != nil {
-				return nil, err
+			if !file.IsDetail {
+				if err := file.getContent(); err != nil {
+					return nil, err
+				}
 			}
 		}
 	}
@@ -326,10 +328,8 @@ func (f *FileInfo) getContent() error {
 	if err != nil {
 		return nil
 	}
-	if !f.IsDetail {
-		if len(cByte) > 0 && DetectBinary(cByte) {
-			return buserr.New(constant.ErrFileCanNotRead)
-		}
+	if len(cByte) > 0 && DetectBinary(cByte) {
+		return buserr.New(constant.ErrFileCanNotRead)
 	}
 	f.Content = string(cByte)
 	return nil
