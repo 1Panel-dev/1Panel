@@ -68,6 +68,7 @@ const message = {
             createNewFolder: '新建文件夹',
             createNewFile: '新建文件',
             helpDoc: '帮助文档',
+            unbind: '解绑',
         },
         search: {
             timeStart: '开始时间',

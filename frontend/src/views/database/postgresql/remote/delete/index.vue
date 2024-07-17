@@ -74,7 +74,7 @@ const submit = async () => {
         .then(() => {
             loading.value = false;
             emit('search');
-            MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             dialogVisible.value = false;
         })
         .catch(() => {

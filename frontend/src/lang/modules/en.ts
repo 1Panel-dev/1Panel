@@ -69,6 +69,7 @@ const message = {
             createNewFolder: 'Create new folder',
             createNewFile: 'Create new file',
             helpDoc: 'Help Document',
+            unbind: 'UnBind',
         },
         search: {
             timeStart: 'Time start',

@@ -68,6 +68,7 @@ const message = {
             createNewFolder: '新建資料夾',
             createNewFile: '新建檔案',
             helpDoc: '幫助文档',
+            unbind: '解綁',
         },
         search: {
             timeStart: '開始時間',
