@@ -405,10 +405,17 @@ const search = async () => {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
     };
-    const res = await searchSnapshotPage(params);
-    cleanData.value = false;
-    data.value = res.data.items || [];
-    paginationConfig.total = res.data.total;
+    loading.value = true;
+    await searchSnapshotPage(params)
+        .then((res) => {
+            loading.value = false;
+            cleanData.value = false;
+            data.value = res.data.items || [];
+            paginationConfig.total = res.data.total;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 onMounted(() => {

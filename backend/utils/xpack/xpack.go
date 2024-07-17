@@ -7,6 +7,10 @@ import (
 	"net"
 	"net/http"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 )
 
 func RemoveTamper(website string) {}
@@ -26,4 +30,8 @@ func LoadRequestTransport() *http.Transport {
 
 func LoadGpuInfo() []interface{} {
 	return nil
+}
+
+func StartClam(startClam model.Clam, isUpdate bool) (int, error) {
+	return 0, buserr.New(constant.ErrXpackNotFound)
 }

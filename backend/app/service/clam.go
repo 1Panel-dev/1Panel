@@ -12,13 +12,16 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/systemctl"
+	"github.com/1Panel-dev/1Panel/backend/utils/xpack"
 	"github.com/jinzhu/copier"
+	"github.com/robfig/cron/v3"
 
 	"github.com/pkg/errors"
 )
@@ -37,9 +40,10 @@ type ClamService struct {
 type IClamService interface {
 	LoadBaseInfo() (dto.ClamBaseInfo, error)
 	Operate(operate string) error
-	SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error)
+	SearchWithPage(search dto.SearchClamWithPage) (int64, interface{}, error)
 	Create(req dto.ClamCreate) error
 	Update(req dto.ClamUpdate) error
+	UpdateStatus(id uint, status string) error
 	Delete(req dto.ClamDelete) error
 	HandleOnce(req dto.OperateByID) error
 	LoadFile(req dto.ClamFileReq) (string, error)
@@ -75,8 +79,7 @@ func (c *ClamService) LoadBaseInfo() (dto.ClamBaseInfo, error) {
 		baseInfo.FreshIsExist = true
 		baseInfo.FreshIsActive, _ = systemctl.IsActive(freshClamService)
 	}
-	stdout, err := cmd.Exec("which clamdscan")
-	if err != nil || (len(strings.ReplaceAll(stdout, "\n", "")) == 0 && strings.HasPrefix(stdout, "/")) {
+	if !cmd.Which("clamdscan") {
 		baseInfo.IsActive = false
 	}
 
@@ -122,8 +125,8 @@ func (c *ClamService) Operate(operate string) error {
 	}
 }
 
-func (c *ClamService) SearchWithPage(req dto.SearchWithPage) (int64, interface{}, error) {
-	total, commands, err := clamRepo.Page(req.Page, req.PageSize, commonRepo.WithLikeName(req.Info))
+func (c *ClamService) SearchWithPage(req dto.SearchClamWithPage) (int64, interface{}, error) {
+	total, commands, err := clamRepo.Page(req.Page, req.PageSize, commonRepo.WithLikeName(req.Info), commonRepo.WithOrderRuleBy(req.OrderBy, req.Order))
 	if err != nil {
 		return 0, nil, err
 	}
@@ -164,6 +167,14 @@ func (c *ClamService) Create(req dto.ClamCreate) error {
 	if clam.InfectedStrategy == "none" || clam.InfectedStrategy == "remove" {
 		clam.InfectedDir = ""
 	}
+	if len(req.Spec) != 0 {
+		entryID, err := xpack.StartClam(clam, false)
+		if err != nil {
+			return err
+		}
+		clam.EntryID = entryID
+		clam.Status = constant.StatusEnable
+	}
 	if err := clamRepo.Create(&clam); err != nil {
 		return err
 	}
@@ -178,16 +189,63 @@ func (c *ClamService) Update(req dto.ClamUpdate) error {
 	if req.InfectedStrategy == "none" || req.InfectedStrategy == "remove" {
 		req.InfectedDir = ""
 	}
+	var clamItem model.Clam
+	if err := copier.Copy(&clamItem, &req); err != nil {
+		return errors.WithMessage(constant.ErrStructTransform, err.Error())
+	}
+	clamItem.EntryID = clam.EntryID
 	upMap := map[string]interface{}{}
+	if len(clam.Spec) != 0 && clam.EntryID != 0 {
+		global.Cron.Remove(cron.EntryID(clamItem.EntryID))
+		upMap["entry_id"] = 0
+	}
+	if len(req.Spec) == 0 {
+		upMap["status"] = ""
+		upMap["entry_id"] = 0
+	}
+	if len(req.Spec) != 0 && clam.Status != constant.StatusDisable {
+		newEntryID, err := xpack.StartClam(clamItem, true)
+		if err != nil {
+			return err
+		}
+		upMap["entry_id"] = newEntryID
+	}
+	if len(clam.Spec) == 0 && len(req.Spec) != 0 {
+		upMap["status"] = constant.StatusEnable
+	}
+
 	upMap["name"] = req.Name
 	upMap["path"] = req.Path
 	upMap["infected_dir"] = req.InfectedDir
 	upMap["infected_strategy"] = req.InfectedStrategy
+	upMap["spec"] = req.Spec
 	upMap["description"] = req.Description
 	if err := clamRepo.Update(req.ID, upMap); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (c *ClamService) UpdateStatus(id uint, status string) error {
+	clam, _ := clamRepo.Get(commonRepo.WithByID(id))
+	if clam.ID == 0 {
+		return constant.ErrRecordNotFound
+	}
+	var (
+		entryID int
+		err     error
+	)
+	if status == constant.StatusEnable {
+		entryID, err = xpack.StartClam(clam, true)
+		if err != nil {
+			return err
+		}
+	} else {
+		global.Cron.Remove(cron.EntryID(clam.EntryID))
+		global.LOG.Infof("stop cronjob entryID: %v", clam.EntryID)
+	}
+
+	return clamRepo.Update(clam.ID, map[string]interface{}{"status": status, "entry_id": entryID})
 }
 
 func (c *ClamService) Delete(req dto.ClamDelete) error {

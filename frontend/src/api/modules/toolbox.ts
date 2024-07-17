@@ -138,6 +138,9 @@ export const createClam = (params: Toolbox.ClamCreate) => {
 export const updateClam = (params: Toolbox.ClamUpdate) => {
     return http.post(`/toolbox/clam/update`, params);
 };
+export const updateClamStatus = (id: number, status: string) => {
+    return http.post(`/toolbox/clam/status/update`, { id: id, status: status });
+};
 export const deleteClam = (params: { ids: number[]; removeRecord: boolean; removeInfected: boolean }) => {
     return http.post(`/toolbox/clam/del`, params);
 };

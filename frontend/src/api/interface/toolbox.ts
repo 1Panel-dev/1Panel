@@ -1,4 +1,5 @@
 import { ReqPage } from '.';
+import { Cronjob } from './cronjob';
 
 export namespace Toolbox {
     export interface DeviceBaseInfo {
@@ -129,10 +130,14 @@ export namespace Toolbox {
     export interface ClamInfo {
         id: number;
         name: string;
+        status: string;
         path: string;
         infectedStrategy: string;
         infectedDir: string;
         lastHandleDate: string;
+        hasSpec: boolean;
+        spec: string;
+        specObj: Cronjob.SpecObj;
         description: string;
     }
     export interface ClamCreate {
@@ -140,6 +145,8 @@ export namespace Toolbox {
         path: string;
         infectedStrategy: string;
         infectedDir: string;
+        spec: string;
+        specObj: Cronjob.SpecObj;
         description: string;
     }
     export interface ClamUpdate {
@@ -148,6 +155,8 @@ export namespace Toolbox {
         path: string;
         infectedStrategy: string;
         infectedDir: string;
+        spec: string;
+        specObj: Cronjob.SpecObj;
         description: string;
     }
     export interface ClamSearchLog extends ReqPage {

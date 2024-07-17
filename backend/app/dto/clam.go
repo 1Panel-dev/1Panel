@@ -4,6 +4,13 @@ import (
 	"time"
 )
 
+type SearchClamWithPage struct {
+	PageInfo
+	Info    string `json:"info"`
+	OrderBy string `json:"orderBy" validate:"required,oneof=name status created_at"`
+	Order   string `json:"order" validate:"required,oneof=null ascending descending"`
+}
+
 type ClamBaseInfo struct {
 	Version  string `json:"version"`
 	IsActive bool   `json:"isActive"`
@@ -19,10 +26,12 @@ type ClamInfo struct {
 	CreatedAt time.Time `json:"createdAt"`
 
 	Name             string `json:"name"`
+	Status           string `json:"status"`
 	Path             string `json:"path"`
 	InfectedStrategy string `json:"infectedStrategy"`
 	InfectedDir      string `json:"infectedDir"`
 	LastHandleDate   string `json:"lastHandleDate"`
+	Spec             string `json:"spec"`
 	Description      string `json:"description"`
 }
 
@@ -56,9 +65,11 @@ type ClamLog struct {
 
 type ClamCreate struct {
 	Name             string `json:"name"`
+	Status           string `json:"status"`
 	Path             string `json:"path"`
 	InfectedStrategy string `json:"infectedStrategy"`
 	InfectedDir      string `json:"infectedDir"`
+	Spec             string `json:"spec"`
 	Description      string `json:"description"`
 }
 
@@ -69,7 +80,13 @@ type ClamUpdate struct {
 	Path             string `json:"path"`
 	InfectedStrategy string `json:"infectedStrategy"`
 	InfectedDir      string `json:"infectedDir"`
+	Spec             string `json:"spec"`
 	Description      string `json:"description"`
+}
+
+type ClamUpdateStatus struct {
+	ID     uint   `json:"id"`
+	Status string `json:"status"`
 }
 
 type ClamDelete struct {

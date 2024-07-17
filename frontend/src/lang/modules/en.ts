@@ -1082,6 +1082,13 @@ const message = {
         },
         clam: {
             clam: 'Virus Scan',
+            cron: 'Scheduled scan',
+            cronHelper: 'Professional version supports scheduled scan feature',
+            specErr: 'Execution schedule format error, please check and retry!',
+            disableMsg:
+                'Stopping scheduled execution will prevent this scan task from running automatically. Do you want to continue?',
+            enableMsg:
+                'Enabling scheduled execution will allow this scan task to run automatically at regular intervals. Do you want to continue?',
             showFresh: 'Show Virus Database Service',
             hideFresh: 'Hide Virus Database Service',
             clamHelper:
@@ -1577,6 +1584,7 @@ const message = {
         recoverDetail: 'Recover detail',
         createSnapshot: 'Create Snapshot',
         importSnapshot: 'Sync Snapshot',
+        importHelper: 'Snapshot directory:',
         recover: 'Recover',
         lastRecoverAt: 'Last recovery time',
         lastRollbackAt: 'Last rollback time',

@@ -203,8 +203,11 @@ func SudoHandleCmd() string {
 }
 
 func Which(name string) bool {
-	_, err := exec.LookPath(name)
-	return err == nil
+	stdout, err := Execf("which %s", name)
+	if err != nil || (len(strings.ReplaceAll(stdout, "\n", "")) == 0 && strings.HasPrefix(stdout, "/")) {
+		return false
+	}
+	return true
 }
 
 func ExecShellWithTimeOut(cmdStr, workdir string, logger *log.Logger, timeout time.Duration) error {

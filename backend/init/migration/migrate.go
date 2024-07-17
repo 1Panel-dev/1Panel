@@ -92,6 +92,7 @@ func Init() {
 		migrations.AddForward,
 		migrations.AddShellColumn,
 		migrations.AddClam,
+		migrations.AddClamStatus,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

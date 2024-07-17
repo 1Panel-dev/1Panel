@@ -278,3 +278,13 @@ var AddClam = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddClamStatus = &gormigrate.Migration{
+	ID: "20240716-add-clam-status",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Clam{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}
