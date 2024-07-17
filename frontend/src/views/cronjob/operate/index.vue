@@ -186,9 +186,9 @@
                     <el-form-item
                         v-if="dialogData.rowData!.type === 'website' || dialogData.rowData!.type === 'cutWebsiteLog'"
                         :label="dialogData.rowData!.type === 'website' ? $t('cronjob.website'):$t('website.website')"
-                        prop="website"
+                        prop="websiteList"
                     >
-                        <el-select class="selectClass" v-model="dialogData.rowData!.website">
+                        <el-select class="selectClass" multiple v-model="dialogData.rowData!.websiteList">
                             <el-option
                                 :disabled="websiteOptions.length === 0"
                                 :label="$t('commons.table.all')"
@@ -212,8 +212,8 @@
                     </el-form-item>
 
                     <div v-if="dialogData.rowData!.type === 'app'">
-                        <el-form-item :label="$t('cronjob.app')" prop="appID">
-                            <el-select class="selectClass" clearable v-model="dialogData.rowData!.appID">
+                        <el-form-item :label="$t('cronjob.app')" prop="appIdList">
+                            <el-select class="selectClass" multiple clearable v-model="dialogData.rowData!.appIdList">
                                 <el-option
                                     :disabled="appOptions.length === 0"
                                     :label="$t('commons.table.all')"
@@ -239,8 +239,8 @@
                                 <el-radio value="postgresql">PostgreSQL</el-radio>
                             </el-radio-group>
                         </el-form-item>
-                        <el-form-item :label="$t('cronjob.database')" prop="dbName">
-                            <el-select class="selectClass" clearable v-model="dialogData.rowData!.dbName">
+                        <el-form-item :label="$t('cronjob.database')" prop="dbNameList">
+                            <el-select class="selectClass" multiple clearable v-model="dialogData.rowData!.dbNameList">
                                 <el-option
                                     :disabled="dbInfo.dbs.length === 0"
                                     :label="$t('commons.table.all')"
@@ -378,6 +378,7 @@ import { listContainer } from '@/api/modules/container';
 import { Database } from '@/api/interface/database';
 import { ListAppInstalled } from '@/api/modules/app';
 import { loadDefaultSpec, specOptions, transObjToSpec, transSpecToObj, weekOptions } from './../helper';
+
 const router = useRouter();
 
 interface DialogProps {
@@ -385,6 +386,7 @@ interface DialogProps {
     rowData?: Cronjob.CronjobInfo;
     getTableList?: () => Promise<any>;
 }
+
 const title = ref<string>('');
 const drawerVisible = ref(false);
 const dialogData = ref<DialogProps>({
@@ -407,6 +409,15 @@ const acceptParams = (params: DialogProps): void => {
     }
     if (dialogData.value.rowData.backupAccounts) {
         dialogData.value.rowData.backupAccountList = dialogData.value.rowData.backupAccounts.split(',');
+    }
+    if (dialogData.value.rowData.appID) {
+        dialogData.value.rowData.appIdList = dialogData.value.rowData.appID.split(',');
+    }
+    if (dialogData.value.rowData.website) {
+        dialogData.value.rowData.websiteList = dialogData.value.rowData.website.split(',');
+    }
+    if (dialogData.value.rowData.dbName) {
+        dialogData.value.rowData.dbNameList = dialogData.value.rowData.dbName.split(',');
     }
     dialogData.value.rowData!.command = dialogData.value.rowData!.command || 'sh';
     dialogData.value.rowData!.isCustom =
@@ -718,6 +729,17 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         specs.push(itemSpec);
     }
     dialogData.value.rowData.backupAccounts = dialogData.value.rowData.backupAccountList.join(',');
+
+    if (dialogData.value.rowData.appIdList) {
+        dialogData.value.rowData.appID = dialogData.value.rowData.appIdList.join(',');
+    }
+    if (dialogData.value.rowData.websiteList) {
+        dialogData.value.rowData.website = dialogData.value.rowData.websiteList.join(',');
+    }
+    if (dialogData.value.rowData.dbNameList) {
+        dialogData.value.rowData.dbName = dialogData.value.rowData.dbNameList.join(',');
+    }
+
     dialogData.value.rowData.spec = specs.join(',');
     if (!formEl) return;
     formEl.validate(async (valid) => {
@@ -750,40 +772,49 @@ defineExpose({
 .specClass {
     width: 20% !important;
     margin-left: 20px;
+
     .append {
         width: 20px;
     }
 }
+
 @media only screen and (max-width: 1000px) {
     .specClass {
         width: 100% !important;
         margin-top: 20px;
         margin-left: 0;
+
         .append {
             width: 43px;
         }
     }
 }
+
 .specTypeClass {
     width: 22% !important;
 }
+
 @media only screen and (max-width: 1000px) {
     .specTypeClass {
         width: 100% !important;
     }
 }
+
 .selectClass {
     width: 100%;
 }
+
 .tagClass {
     float: right;
     margin-right: 10px;
     font-size: 12px;
     margin-top: 5px;
 }
+
 .logText {
     line-height: 22px;
     font-size: 12px;
+
     .link {
         font-size: 12px;
         margin-top: -3px;

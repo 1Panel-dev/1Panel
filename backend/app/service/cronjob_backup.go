@@ -17,15 +17,20 @@ import (
 
 func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time) error {
 	var apps []model.AppInstall
-	if cronjob.AppID == "all" {
+	if strings.Contains(cronjob.AppID, "all") {
 		apps, _ = appInstallRepo.ListBy()
 	} else {
-		itemID, _ := strconv.Atoi(cronjob.AppID)
-		app, err := appInstallRepo.GetFirst(commonRepo.WithByID(uint(itemID)))
+		appIds := strings.Split(cronjob.AppID, ",")
+		var idItems []uint
+		for i := 0; i < len(appIds); i++ {
+			itemID, _ := strconv.Atoi(appIds[i])
+			idItems = append(idItems, uint(itemID))
+		}
+		appItems, err := appInstallRepo.ListBy(commonRepo.WithIdsIn(idItems))
 		if err != nil {
 			return err
 		}
-		apps = append(apps, app)
+		apps = appItems
 	}
 	accountMap, err := loadClientMap(cronjob.BackupAccounts)
 	if err != nil {
@@ -232,7 +237,7 @@ type databaseHelper struct {
 
 func loadDbsForJob(cronjob model.Cronjob) []databaseHelper {
 	var dbs []databaseHelper
-	if cronjob.DBName == "all" {
+	if strings.Contains(cronjob.DBName, "all") {
 		if cronjob.DBType == "mysql" || cronjob.DBType == "mariadb" {
 			mysqlItems, _ := mysqlRepo.List()
 			for _, mysql := range mysqlItems {
@@ -254,36 +259,42 @@ func loadDbsForJob(cronjob model.Cronjob) []databaseHelper {
 		}
 		return dbs
 	}
-	itemID, _ := strconv.Atoi(cronjob.DBName)
-	if cronjob.DBType == "mysql" || cronjob.DBType == "mariadb" {
-		mysqlItem, _ := mysqlRepo.Get(commonRepo.WithByID(uint(itemID)))
-		dbs = append(dbs, databaseHelper{
-			DBType:   cronjob.DBType,
-			Database: mysqlItem.MysqlName,
-			Name:     mysqlItem.Name,
-		})
-	} else {
-		pgItem, _ := postgresqlRepo.Get(commonRepo.WithByID(uint(itemID)))
-		dbs = append(dbs, databaseHelper{
-			DBType:   cronjob.DBType,
-			Database: pgItem.PostgresqlName,
-			Name:     pgItem.Name,
-		})
+
+	dbNames := strings.Split(cronjob.DBName, ",")
+	for _, name := range dbNames {
+		itemID, _ := strconv.Atoi(name)
+		if cronjob.DBType == "mysql" || cronjob.DBType == "mariadb" {
+			mysqlItem, _ := mysqlRepo.Get(commonRepo.WithByID(uint(itemID)))
+			dbs = append(dbs, databaseHelper{
+				DBType:   cronjob.DBType,
+				Database: mysqlItem.MysqlName,
+				Name:     mysqlItem.Name,
+			})
+		} else {
+			pgItem, _ := postgresqlRepo.Get(commonRepo.WithByID(uint(itemID)))
+			dbs = append(dbs, databaseHelper{
+				DBType:   cronjob.DBType,
+				Database: pgItem.PostgresqlName,
+				Name:     pgItem.Name,
+			})
+		}
 	}
 	return dbs
 }
 
 func loadWebsForJob(cronjob model.Cronjob) []model.Website {
 	var weblist []model.Website
-	if cronjob.Website == "all" {
+	if strings.Contains(cronjob.Website, "all") {
 		weblist, _ = websiteRepo.List()
 		return weblist
 	}
-	itemID, _ := strconv.Atoi(cronjob.Website)
-	webItem, _ := websiteRepo.GetFirst(commonRepo.WithByID(uint(itemID)))
-	if webItem.ID != 0 {
-		weblist = append(weblist, webItem)
+	websites := strings.Split(cronjob.Website, ",")
+	var idItems []uint
+	for i := 0; i < len(websites); i++ {
+		itemID, _ := strconv.Atoi(websites[i])
+		idItems = append(idItems, uint(itemID))
 	}
+	weblist, _ = websiteRepo.List(commonRepo.WithIdsIn(idItems))
 	return weblist
 }
 
