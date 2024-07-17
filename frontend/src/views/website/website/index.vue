@@ -128,25 +128,31 @@
                         prop="protocol"
                         width="90px"
                     ></el-table-column>
-                    <el-table-column :label="$t('website.expireDate')" prop="expireDate" sortable>
-                        <template #default="{ row, $index }">
-                            <div v-show="row.showdate">
+                    <el-table-column
+                        :label="$t('website.expireDate')"
+                        prop="expireDate"
+                        :sortable="'custom'"
+                        min-width="120px"
+                    >
+                        <template #default="{ row }">
+                            <div v-if="row.showdate">
                                 <el-date-picker
-                                    style="width: 120px"
+                                    :key="row.id"
+                                    class="p-w-100"
                                     v-model="row.expireDate"
                                     type="date"
                                     :disabled-date="checkDate"
                                     :shortcuts="shortcuts"
                                     :clearable="false"
-                                    :default-value="setDate(row.expireDate)"
-                                    :ref="(el) => setdateRefs(el, $index)"
                                     @change="submitDate(row)"
+                                    :ref="(el) => setdateRefs(el)"
                                     @visible-change="(visibility:boolean) => pickerVisibility(visibility, row)"
                                     size="small"
+                                    :mounted="initDatePicker(row)"
                                 ></el-date-picker>
                             </div>
-                            <div v-show="!row.showdate">
-                                <el-link type="primary" :underline="false" @click="openDatePicker(row, $index)">
+                            <div v-else>
+                                <el-link type="primary" :underline="false" @click.stop="openDatePicker(row)">
                                     <span v-if="isEver(row.expireDate)">
                                         {{ $t('website.neverExpire') }}
                                     </span>
@@ -166,7 +172,7 @@
                     </el-table-column>
                     <fu-table-operations
                         :ellipsis="10"
-                        width="400px"
+                        width="300px"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         :fixed="mobile ? false : 'right'"
@@ -201,7 +207,7 @@ import GroupDialog from '@/components/group/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
 import i18n from '@/lang';
 import router from '@/routers';
-import { onMounted, reactive, ref, computed } from '@vue/runtime-core';
+import { onMounted, reactive, ref, computed } from 'vue';
 import { OpWebsite, SearchWebsites, UpdateWebsite } from '@/api/modules/website';
 import { Website } from '@/api/interface/website';
 import { App } from '@/api/interface/app';
@@ -247,8 +253,8 @@ const uploadRef = ref();
 const dialogBackupRef = ref();
 const defaultRef = ref();
 const data = ref();
-let dateRefs: Map<number, any> = new Map();
 let groups = ref<Group.GroupInfo[]>([]);
+const dataRef = ref();
 
 const paginationConfig = reactive({
     cacheSizeKey: 'website-page-size',
@@ -270,8 +276,17 @@ const mobile = computed(() => {
 
 const changeSort = ({ prop, order }) => {
     if (order) {
-        req.orderBy = prop == 'primaryDomain' ? 'primary_domain' : prop;
-        req.orderBy = prop == 'expireDate' ? 'expire_date' : prop;
+        switch (prop) {
+            case 'primaryDomain':
+                prop = 'primary_domain';
+                break;
+            case 'expireDate':
+                prop = 'expire_date';
+                break;
+            default:
+                break;
+        }
+        req.orderBy = prop;
         req.order = order;
     } else {
         req.orderBy = 'created_at';
@@ -285,6 +300,7 @@ const search = async () => {
     req.pageSize = paginationConfig.pageSize;
 
     loading.value = true;
+    data.value = [];
     await SearchWebsites(req)
         .then((res) => {
             data.value = res.data.items;
@@ -317,40 +333,50 @@ const isBeforeNow = (time: string) => {
     return new Date() > new Date(time);
 };
 
-const setDate = (time: string) => {
-    if (isEver(time)) {
-        return new Date();
-    } else {
-        return new Date(time);
-    }
-};
-
-const openDatePicker = (row: any, index: number) => {
-    row.showdate = true;
-    const ref = dateRefs.get(index);
-    if (ref != undefined) {
-        if (isBeforeNow(row.expireDate)) {
-            row.oldExpireDate = row.expireDate;
-            const date = new Date().toLocaleDateString();
-            row.expireDate = date;
+const refreshData = () => {
+    for (let i = 0; i < data.value.length; i++) {
+        if (data.value[i].showdate) {
+            data.value[i].showdate = false;
+            if (data.value[i].oldExpireDate) {
+                data.value[i].expireDate = data.value[i].oldExpireDate;
+                data.value[i].oldExpireDate = undefined;
+            }
         }
-        ref.handleOpen();
+    }
+    if (dataRef.value) {
+        dataRef.value.handleClose();
+        dataRef.value = undefined;
     }
 };
 
-const setdateRefs = (ref: any, index: number) => {
-    dateRefs.set(index, ref);
+const openDatePicker = (row: any) => {
+    refreshData();
+    row.showdate = true;
+};
+
+const setdateRefs = (ref: any) => {
+    dataRef.value = ref;
+    if (dataRef.value != undefined) {
+        dataRef.value.handleOpen();
+    }
+};
+
+const initDatePicker = (row: any) => {
+    if (dataRef.value == undefined && row.oldExpireDate == undefined && isBeforeNow(row.expireDate)) {
+        row.oldExpireDate = row.expireDate;
+        const date = new Date().toLocaleDateString();
+        row.expireDate = date;
+    }
 };
 
 const pickerVisibility = (visibility: boolean, row: any) => {
     if (!visibility) {
-        row.showdate = false;
-        if (!row.change) {
-            if (row.oldExpireDate) {
-                row.expireDate = row.oldExpireDate;
-            }
-            row.change = false;
+        dataRef.value = undefined;
+        if (row.oldExpireDate) {
+            row.expireDate = row.oldExpireDate;
+            row.oldExpireDate = undefined;
         }
+        row.showdate = false;
     }
 };
 
@@ -366,7 +392,6 @@ const submitDate = (row: any) => {
     };
 
     UpdateWebsite(req).then(() => {
-        row.change = true;
         MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
         search();
     });
