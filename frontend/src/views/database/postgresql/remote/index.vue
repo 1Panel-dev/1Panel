@@ -163,7 +163,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('commons.button.delete'),
+        label: i18n.global.t('commons.button.unbind'),
         click: (row: Database.DatabaseInfo) => {
             onDelete(row);
         },
