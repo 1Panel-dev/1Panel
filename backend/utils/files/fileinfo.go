@@ -104,18 +104,23 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 		file.LinkPath = GetSymlink(op.Path)
 	}
 	if op.Expand {
-		if file.IsDir {
-			if err := file.listChildren(op); err != nil {
-				return nil, err
-			}
-			return file, nil
-		} else {
-			if err := file.getContent(); err != nil {
-				return nil, err
-			}
+		if err := handleExpansion(file, op); err != nil {
+			return nil, err
 		}
 	}
 	return file, nil
+}
+
+func handleExpansion(file *FileInfo, op FileOption) error {
+	if file.IsDir {
+		return file.listChildren(op)
+	}
+
+	if !file.IsDetail {
+		return file.getContent()
+	}
+
+	return nil
 }
 
 func (f *FileInfo) search(search string, count int) (files []FileSearchInfo, total int, err error) {
@@ -203,63 +208,82 @@ func (f *FileInfo) listChildren(option FileOption) error {
 			return err
 		}
 	} else {
-		dirFiles, err := afs.ReadDir(f.Path)
+		files, err = f.getFiles(afs, option)
 		if err != nil {
 			return err
 		}
-		var (
-			dirs     []FileSearchInfo
-			fileList []FileSearchInfo
-		)
-		for _, file := range dirFiles {
-			info := FileSearchInfo{
-				Path:     f.Path,
-				FileInfo: file,
-			}
-			if file.IsDir() {
-				dirs = append(dirs, info)
-			} else {
-				fileList = append(fileList, info)
-			}
-		}
-		sortFileList(dirs, option.SortBy, option.SortOrder)
-		sortFileList(fileList, option.SortBy, option.SortOrder)
-		files = append(dirs, fileList...)
 	}
 
+	items, err := f.processFiles(files, option)
+	if err != nil {
+		return err
+	}
+
+	if option.ContainSub {
+		f.ItemTotal = total
+	}
+	start := (option.Page - 1) * option.PageSize
+	end := option.PageSize + start
+	var result []*FileInfo
+	if start < 0 || start > f.ItemTotal || end < 0 || start > end {
+		result = items
+	} else {
+		if end > f.ItemTotal {
+			result = items[start:]
+		} else {
+			result = items[start:end]
+		}
+	}
+
+	f.Items = result
+	return nil
+}
+
+func (f *FileInfo) getFiles(afs *afero.Afero, option FileOption) ([]FileSearchInfo, error) {
+	dirFiles, err := afs.ReadDir(f.Path)
+	if err != nil {
+		return nil, err
+	}
+
+	var (
+		dirs     []FileSearchInfo
+		fileList []FileSearchInfo
+	)
+
+	for _, file := range dirFiles {
+		info := FileSearchInfo{
+			Path:     f.Path,
+			FileInfo: file,
+		}
+		if file.IsDir() {
+			dirs = append(dirs, info)
+		} else {
+			fileList = append(fileList, info)
+		}
+	}
+
+	sortFileList(dirs, option.SortBy, option.SortOrder)
+	sortFileList(fileList, option.SortBy, option.SortOrder)
+
+	return append(dirs, fileList...), nil
+}
+
+func (f *FileInfo) processFiles(files []FileSearchInfo, option FileOption) ([]*FileInfo, error) {
 	var items []*FileInfo
+
 	for _, df := range files {
-		if option.Dir && !df.IsDir() {
+		if shouldSkipFile(df, option) {
 			continue
 		}
-		name := df.Name()
-		fPath := path.Join(df.Path, df.Name())
-		if option.Search != "" {
-			if option.ContainSub {
-				fPath = df.Path
-				name = strings.TrimPrefix(strings.TrimPrefix(fPath, f.Path), "/")
-			} else {
-				lowerName := strings.ToLower(name)
-				lowerSearch := strings.ToLower(option.Search)
-				if !strings.Contains(lowerName, lowerSearch) {
-					continue
-				}
-			}
-		}
+
+		name, fPath := f.getFilePathAndName(option, df)
+
 		if !option.ShowHidden && IsHidden(name) {
 			continue
 		}
 		f.ItemTotal++
-		isSymlink, isInvalidLink := false, false
-		if IsSymlink(df.Mode()) {
-			isSymlink = true
-			info, err := f.Fs.Stat(fPath)
-			if err == nil {
-				df.FileInfo = info
-			} else {
-				isInvalidLink = true
-			}
-		}
+
+		isSymlink, isInvalidLink := f.checkSymlink(df)
 
 		file := &FileInfo{
 			Fs:        f.Fs,
@@ -294,24 +318,53 @@ func (f *FileInfo) listChildren(option FileOption) error {
 		}
 		items = append(items, file)
 	}
-	if option.ContainSub {
-		f.ItemTotal = total
+
+	return items, nil
+}
+
+func shouldSkipFile(df FileSearchInfo, option FileOption) bool {
+	if option.Dir && !df.IsDir() {
+		return true
 	}
-	start := (option.Page - 1) * option.PageSize
-	end := option.PageSize + start
-	var result []*FileInfo
-	if start < 0 || start > f.ItemTotal || end < 0 || start > end {
-		result = items
-	} else {
-		if end > f.ItemTotal {
-			result = items[start:]
-		} else {
-			result = items[start:end]
+
+	if option.Search != "" && !option.ContainSub {
+		lowerName := strings.ToLower(df.Name())
+		lowerSearch := strings.ToLower(option.Search)
+		if !strings.Contains(lowerName, lowerSearch) {
+			return true
 		}
 	}
 
-	f.Items = result
-	return nil
+	return false
+}
+
+func (f *FileInfo) getFilePathAndName(option FileOption, df FileSearchInfo) (string, string) {
+	name := df.Name()
+	fPath := path.Join(df.Path, df.Name())
+
+	if option.Search != "" && option.ContainSub {
+		fPath = df.Path
+		name = strings.TrimPrefix(strings.TrimPrefix(fPath, f.Path), "/")
+	}
+
+	return name, fPath
+}
+
+func (f *FileInfo) checkSymlink(df FileSearchInfo) (bool, bool) {
+	isSymlink := false
+	isInvalidLink := false
+
+	if IsSymlink(df.Mode()) {
+		isSymlink = true
+		info, err := f.Fs.Stat(path.Join(df.Path, df.Name()))
+		if err == nil {
+			df.FileInfo = info
+		} else {
+			isInvalidLink = true
+		}
+	}
+
+	return isSymlink, isInvalidLink
 }
 
 func (f *FileInfo) getContent() error {
@@ -326,10 +379,8 @@ func (f *FileInfo) getContent() error {
 	if err != nil {
 		return nil
 	}
-	if !f.IsDetail {
-		if len(cByte) > 0 && DetectBinary(cByte) {
-			return buserr.New(constant.ErrFileCanNotRead)
-		}
+	if len(cByte) > 0 && DetectBinary(cByte) {
+		return buserr.New(constant.ErrFileCanNotRead)
 	}
 	f.Content = string(cByte)
 	return nil

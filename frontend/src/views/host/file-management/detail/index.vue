@@ -11,7 +11,7 @@
                     <el-descriptions-item :label="$t('file.path')">{{ data.path }}</el-descriptions-item>
                     <el-descriptions-item :label="$t('file.size')">
                         <span v-if="data.isDir">
-                            <el-button type="primary" link small @click="getDirSize(data)">
+                            <el-button type="primary" link small @click="getDirSize(data)" :loading="loading">
                                 <span v-if="data.dirSize == undefined">
                                     {{ $t('file.calculate') }}
                                 </span>
