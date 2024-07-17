@@ -24,6 +24,9 @@ export namespace Cronjob {
         backupAccounts: string;
         defaultDownload: string;
         backupAccountList: Array<string>;
+        appIdList: Array<string>;
+        websiteList: Array<string>;
+        dbNameList: Array<string>;
         retainCopies: number;
         status: string;
         secret: string;
