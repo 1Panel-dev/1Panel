@@ -265,7 +265,7 @@
                                     link
                                     small
                                     @click="getDirSize(row, $index)"
-                                    :loading="btnLoading == $index"
+                                    :loading="btnLoading.includes($index)"
                                 >
                                     <span v-if="row.dirSize == undefined">
                                         {{ $t('file.calculate') }}
@@ -387,7 +387,7 @@ const initData = () => ({
 });
 let req = reactive(initData());
 let loading = ref(false);
-let btnLoading = ref(-1);
+let btnLoading = ref([]);
 const paths = ref<FilePaths[]>([]);
 let pathWidth = ref(0);
 const history: string[] = [];
@@ -638,7 +638,7 @@ const getDirSize = async (row: any, index: number) => {
     const req = {
         path: row.path,
     };
-    btnLoading.value = index;
+    btnLoading.value.push(index);
     await ComputeDirSize(req)
         .then(async (res) => {
             let newData = [...data.value];
@@ -646,7 +646,7 @@ const getDirSize = async (row: any, index: number) => {
             data.value = newData;
         })
         .finally(() => {
-            btnLoading.value = -1;
+            btnLoading.value = btnLoading.value.filter((item) => item !== index);
         });
 };
 
