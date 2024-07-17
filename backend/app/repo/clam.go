@@ -13,6 +13,7 @@ type IClamRepo interface {
 	Update(id uint, vars map[string]interface{}) error
 	Delete(opts ...DBOption) error
 	Get(opts ...DBOption) (model.Clam, error)
+	List(opts ...DBOption) ([]model.Clam, error)
 }
 
 func NewIClamRepo() IClamRepo {
@@ -26,6 +27,16 @@ func (u *ClamRepo) Get(opts ...DBOption) (model.Clam, error) {
 		db = opt(db)
 	}
 	err := db.First(&clam).Error
+	return clam, err
+}
+
+func (u *ClamRepo) List(opts ...DBOption) ([]model.Clam, error) {
+	var clam []model.Clam
+	db := global.DB
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	err := db.Find(&clam).Error
 	return clam, err
 }
 

@@ -11500,6 +11500,58 @@ const docTemplate = `{
                 }
             }
         },
+        "/toolbox/clam/status/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "修改扫描规则状态",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Clam"
+                ],
+                "summary": "Update clam status",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ClamUpdateStatus"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [
+                        {
+                            "db": "clams",
+                            "input_column": "id",
+                            "input_value": "id",
+                            "isList": false,
+                            "output_column": "name",
+                            "output_value": "name"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "id",
+                        "status"
+                    ],
+                    "formatEN": "change the status of clam [name] to [status].",
+                    "formatZH": "修改扫描规则 [name] 状态为 [status]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/toolbox/clam/update": {
             "post": {
                 "security": [
@@ -15570,6 +15622,12 @@ const docTemplate = `{
                 },
                 "path": {
                     "type": "string"
+                },
+                "spec": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         },
@@ -15664,6 +15722,20 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "path": {
+                    "type": "string"
+                },
+                "spec": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ClamUpdateStatus": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "status": {
                     "type": "string"
                 }
             }
@@ -18468,7 +18540,7 @@ const docTemplate = `{
                     "type": "string",
                     "enum": [
                         "name",
-                        "status",
+                        "state",
                         "created_at"
                     ]
                 },
@@ -22601,7 +22673,8 @@ const docTemplate = `{
                         "primary_domain",
                         "type",
                         "status",
-                        "created_at"
+                        "created_at",
+                        "expire_date"
                     ]
                 },
                 "page": {
@@ -22619,8 +22692,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "id",
-                "primaryDomain",
-                "webSiteGroupID"
+                "primaryDomain"
             ],
             "properties": {
                 "IPV6": {

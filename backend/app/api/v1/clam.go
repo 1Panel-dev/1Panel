@@ -52,15 +52,37 @@ func (b *BaseApi) UpdateClam(c *gin.Context) {
 }
 
 // @Tags Clam
+// @Summary Update clam status
+// @Description 修改扫描规则状态
+// @Accept json
+// @Param request body dto.ClamUpdateStatus true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /toolbox/clam/status/update [post]
+// @x-panel-log {"bodyKeys":["id","status"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"clams","output_column":"name","output_value":"name"}],"formatZH":"修改扫描规则 [name] 状态为 [status]","formatEN":"change the status of clam [name] to [status]."}
+func (b *BaseApi) UpdateClamStatus(c *gin.Context) {
+	var req dto.ClamUpdateStatus
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := clamService.UpdateStatus(req.ID, req.Status); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Clam
 // @Summary Page clam
 // @Description 获取扫描规则列表分页
 // @Accept json
-// @Param request body dto.SearchWithPage true "request"
+// @Param request body dto.SearchClamWithPage true "request"
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Router /toolbox/clam/search [post]
 func (b *BaseApi) SearchClam(c *gin.Context) {
-	var req dto.SearchWithPage
+	var req dto.SearchClamWithPage
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}

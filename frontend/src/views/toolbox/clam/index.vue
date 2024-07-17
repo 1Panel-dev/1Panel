@@ -56,6 +56,7 @@
                         :label="$t('commons.table.name')"
                         :min-width="60"
                         prop="name"
+                        sortable
                         show-overflow-tooltip
                     >
                         <template #default="{ row }">
@@ -72,6 +73,47 @@
                     >
                         <template #default="{ row }">
                             <el-button link type="primary" @click="toFolder(row.path)">{{ row.path }}</el-button>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        v-if="isProductPro"
+                        :label="$t('commons.table.status')"
+                        :min-width="70"
+                        prop="status"
+                        sortable
+                    >
+                        <template #default="{ row }">
+                            <el-button
+                                v-if="row.status === 'Enable'"
+                                @click="onChangeStatus(row.id, 'disable')"
+                                link
+                                icon="VideoPlay"
+                                type="success"
+                            >
+                                {{ $t('commons.status.enabled') }}
+                            </el-button>
+                            <el-button
+                                v-if="row.status === 'Disable'"
+                                icon="VideoPause"
+                                link
+                                type="danger"
+                                @click="onChangeStatus(row.id, 'enable')"
+                            >
+                                {{ $t('commons.status.disabled') }}
+                            </el-button>
+                            <span v-if="row.status === ''">-</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        v-if="isProductPro"
+                        :label="$t('cronjob.cronSpec')"
+                        show-overflow-tooltip
+                        :min-width="120"
+                    >
+                        <template #default="{ row }">
+                            <span>
+                                {{ row.spec !== '' ? transSpecToStr(row.spec) : '-' }}
+                            </span>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -138,17 +180,22 @@
 import { onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { deleteClam, handleClamScan, searchClam, updateClam } from '@/api/modules/toolbox';
+import { deleteClam, handleClamScan, searchClam, updateClam, updateClamStatus } from '@/api/modules/toolbox';
 import OperateDialog from '@/views/toolbox/clam/operate/index.vue';
 import LogDialog from '@/views/toolbox/clam/record/index.vue';
 import ClamStatus from '@/views/toolbox/clam/status/index.vue';
 import SettingDialog from '@/views/toolbox/clam/setting/index.vue';
 import { Toolbox } from '@/api/interface/toolbox';
 import router from '@/routers';
+import { transSpecToStr } from '../../cronjob/helper';
+import { GlobalStore } from '@/store';
+import { storeToRefs } from 'pinia';
 
 const loading = ref();
 const selects = ref<any>([]);
 
+const globalStore = GlobalStore();
+const { isProductPro } = storeToRefs(globalStore);
 const data = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'clam-page-size',
@@ -176,12 +223,16 @@ const clamStatus = ref({
     isRunning: true,
 });
 
-const search = async () => {
+const search = async (column?: any) => {
+    paginationConfig.orderBy = column?.order ? column.prop : paginationConfig.orderBy;
+    paginationConfig.order = column?.order ? column.order : paginationConfig.order;
     loading.value = true;
     let params = {
         info: searchName.value,
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
+        orderBy: paginationConfig.orderBy,
+        order: paginationConfig.order,
     };
     await searchClam(params)
         .then((res) => {
@@ -218,6 +269,14 @@ const onOpenDialog = async (
     title: string,
     rowData: Partial<Toolbox.ClamInfo> = {
         infectedStrategy: 'none',
+        specObj: {
+            specType: 'perDay',
+            week: 1,
+            day: 3,
+            hour: 1,
+            minute: 30,
+            second: 30,
+        },
     },
 ) => {
     let params = {
@@ -270,6 +329,18 @@ const onSubmitDelete = async () => {
         .catch(() => {
             loading.value = false;
         });
+};
+
+const onChangeStatus = async (id: number, status: string) => {
+    ElMessageBox.confirm(i18n.global.t('toolbox.clam.' + status + 'Msg'), i18n.global.t('cronjob.changeStatus'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+    }).then(async () => {
+        let itemStatus = status === 'enable' ? 'Enable' : 'Disable';
+        await updateClamStatus(id, itemStatus);
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        search();
+    });
 };
 
 const buttons = [

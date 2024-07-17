@@ -243,6 +243,10 @@ definitions:
         type: string
       path:
         type: string
+      spec:
+        type: string
+      status:
+        type: string
     type: object
   dto.ClamDelete:
     properties:
@@ -304,6 +308,15 @@ definitions:
       name:
         type: string
       path:
+        type: string
+      spec:
+        type: string
+    type: object
+  dto.ClamUpdateStatus:
+    properties:
+      id:
+        type: integer
+      status:
         type: string
     type: object
   dto.Clean:
@@ -2198,7 +2211,7 @@ definitions:
       orderBy:
         enum:
         - name
-        - status
+        - state
         - created_at
         type: string
       page:
@@ -4974,6 +4987,7 @@ definitions:
         - type
         - status
         - created_at
+        - expire_date
         type: string
       page:
         type: integer
@@ -5004,7 +5018,6 @@ definitions:
     required:
     - id
     - primaryDomain
-    - webSiteGroupID
     type: object
   request.WebsiteUpdateDir:
     properties:
@@ -12767,6 +12780,40 @@ paths:
       summary: Page clam
       tags:
       - Clam
+  /toolbox/clam/status/update:
+    post:
+      consumes:
+      - application/json
+      description: 修改扫描规则状态
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ClamUpdateStatus'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update clam status
+      tags:
+      - Clam
+      x-panel-log:
+        BeforeFunctions:
+        - db: clams
+          input_column: id
+          input_value: id
+          isList: false
+          output_column: name
+          output_value: name
+        bodyKeys:
+        - id
+        - status
+        formatEN: change the status of clam [name] to [status].
+        formatZH: 修改扫描规则 [name] 状态为 [status]
+        paramKeys: []
   /toolbox/clam/update:
     post:
       consumes:
