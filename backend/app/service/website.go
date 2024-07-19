@@ -910,6 +910,7 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 		websiteSSL.Provider = constant.Manual
 		websiteSSL.PrivateKey = privateKey
 		websiteSSL.Pem = certificate
+		websiteSSL.Status = constant.SSLReady
 
 		res.SSL = websiteSSL
 	}
