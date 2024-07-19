@@ -1,0 +1,200 @@
+ErrInvalidParams: "請求參數錯誤: {{ .detail }}"
+ErrTokenParse: "Token 產生錯誤: {{ .detail }}"
+ErrInitialPassword: "原密碼錯誤"
+ErrInternalServer: "伺服器內部錯誤: {{ .detail }}"
+ErrRecordExist: "記錄已存在"
+ErrRecordNotFound: "記錄未找到"
+ErrStructTransform: "類型轉換失敗: {{ .detail }}"
+ErrNotLogin: "用戶未登入: {{ .detail }}"
+ErrPasswordExpired: "當前密碼已過期: {{ .detail }}"
+ErrNotSupportType: "系統暫不支持當前類型: {{ .detail }}"
+
+#common
+ErrNameIsExist: "名稱已存在"
+ErrDemoEnvironment: "演示伺服器，禁止此操作!"
+ErrCmdTimeout: "指令執行超時！"
+ErrCmdIllegal: "執行命令中存在不合法字符，請修改後重試！"
+ErrPortExist: '{{ .port }} 埠已被 {{ .type }} [{{ .name }}] 佔用'
+TYPE_APP: "應用"
+TYPE_RUNTIME: "運作環境"
+TYPE_DOMAIN: "網域名稱"
+ErrTypePort: '埠 {{ .name }} 格式錯誤'
+ErrTypePortRange: '連接埠範圍需要在 1-65535 之間'
+Success: "成功"
+Failed: "失敗"
+SystemRestart: "系統重啟導致任務中斷"
+ErrInvalidChar: "禁止使用非法字元"
+
+#app
+ErrPortInUsed: "{{ .detail }} 端口已被佔用！"
+ErrAppLimit: "應用超出安裝數量限制"
+ErrAppRequired: "請先安裝 {{ .detail }} 應用"
+ErrNotInstall: "應用未安裝"
+ErrPortInOtherApp: "{{ .port }} 端口已被應用 {{ .apps }} 佔用！"
+ErrDbUserNotValid: "儲存資料庫，用戶名密碼不匹配！"
+ErrDockerComposeNotValid: "docker-compose 文件格式錯誤"
+ErrUpdateBuWebsite: '應用更新成功，但是網站配置文件修改失敗，請檢查配置！'
+Err1PanelNetworkFailed: '默認容器網絡創建失敗！{{ .detail }}'
+ErrFileParse: '應用 docker-compose 文件解析失敗!'
+ErrInstallDirNotFound: '安裝目錄不存在'
+AppStoreIsUpToDate: '應用商店已經是最新版本'
+LocalAppVersionNull: '{{.name}} 應用未同步到版本！無法添加到應用列表'
+LocalAppVersionErr: '{{.name}} 同步版本 {{.version}} 失敗！{{.err}}'
+ErrFileNotFound: '{{.name}} 文件不存在'
+ErrFileParseApp: '{{.name}} 文件解析失敗 {{.err}}'
+ErrAppDirNull: '版本資料夾不存在'
+LocalAppErr: "應用 {{.name}} 同步失敗！{{.err}}"
+ErrContainerName: "容器名稱已存在"
+ErrAppSystemRestart: "1Panel 重啟導致任務中斷"
+ErrCreateHttpClient: "創建HTTP請求失敗 {{.err}}"
+ErrHttpReqTimeOut: "請求超時 {{.err}}"
+ErrHttpReqFailed: "請求失敗 {{.err}}"
+ErrHttpReqNotFound: "文件不存在"
+ErrNoSuchHost: "網路連接失敗"
+ErrImagePullTimeOut: "鏡像拉取超時"
+ErrContainerNotFound: '{{ .name }} 容器不存在'
+ErrContainerMsg: '{{ .name }} 容器異常，具體請在容器頁面查看日誌'
+ErrAppBackup: '{{ .name }} 應用備份失敗 err {{.err}}'
+ErrImagePull: '{{ .name }} 鏡像拉取失敗 err {{.err}}'
+ErrVersionTooLow: '當前 1Panel 版本過低，無法更新應用商店，請升級版本之後操作'
+ErrAppNameExist: '應用名稱已存在'
+AppStoreIsSyncing: '應用程式商店正在同步中，請稍後再試'
+ErrGetCompose: "docker-compose.yml 檔案取得失敗！{{ .detail }}"
+ErrAppWarn: "狀態異常，請查看日誌"
+ErrAppParamKey: "參數 {{ .name }} 欄位異常"
+ErrAppUpgrade: "應用程式 {{ .name }} 升級失敗 {{ .err }}"
+AppRecover: "應用程式 {{ .name }} 回滾 "
+PullImageStart: "開始拉取鏡像 {{ .name }}"
+PullImageSuccess: "鏡像拉取成功"
+UpgradeAppStart: "開始升級應用程式 {{ .name }}"
+UpgradeAppSuccess: "應用程式 {{ .name }} 升級成功"
+
+#file
+ErrFileCanNotRead: "此文件不支持預覽"
+ErrFileToLarge: "文件超過10M,無法打開"
+ErrPathNotFound: "目錄不存在"
+ErrMovePathFailed: "目標路徑不能包含原路徑！"
+ErrLinkPathNotFound: "目標路徑不存在!"
+ErrFileIsExist: "文件或文件夾已存在！"
+ErrFileUpload: "{{ .name }} 上傳文件失敗 {{ .detail}}"
+ErrFileDownloadDir: "不支持下載文件夾"
+ErrCmdNotFound: "{{ .name}} 命令不存在，請先在宿主機安裝此命令"
+ErrSourcePathNotFound:  "源目錄不存在"
+ErrFavoriteExist: "已收藏此路徑"
+
+#website
+ErrDomainIsExist: "域名已存在"
+ErrAliasIsExist: "代號已存在"
+ErrAppDelete: '其他網站使用此應用,無法刪除'
+ErrGroupIsUsed: '分組正在使用中，無法刪除'
+ErrBackupMatch: '該備份文件與當前網站部分數據不匹配: {{ .detail}}'
+ErrBackupExist: '該備份文件對應部分原數據不存在: {{ .detail}}'
+ErrPHPResource: '本地運行環境不支持切換！'
+ErrPathPermission: 'index 目錄下偵測到非 1000:1000 權限資料夾，可能導致網站存取 Access denied 錯誤，請點擊上方儲存按鈕'
+ErrDomainIsUsed: "域名已被網站【{{ .name }}】使用"
+ErrDomainFormat: "{{ .name }} 域名格式不正確"
+ErrDefaultAlias: "default 為保留代號，請使用其他代號"
+
+#ssl
+ErrSSLCannotDelete: "{{ .name }} 證書正在被網站使用，無法刪除"
+ErrAccountCannotDelete: "帳號關聯證書，無法刪除"
+ErrSSLApply: "證書續簽成功，openresty reload失敗，請檢查配置！"
+ErrEmailIsExist: '郵箱已存在'
+ErrSSLKeyNotFound: '私鑰文件不存在'
+ErrSSLCertificateNotFound: '證書文件不存在'
+ErrSSLKeyFormat: '私鑰文件校驗錯誤'
+ErrSSLCertificateFormat: '證書文件格式錯誤，請使用 pem 格式'
+ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid 或 EabHmacKey 不能為空'
+ErrOpenrestyNotFound: 'Http 模式需要先安裝 Openresty'
+ApplySSLStart: '開始申請憑證,網域 [{{ .domain }}] 申請方式 [{{ .type }}] '
+dnsAccount: "DNS 自動"
+dnsManual: "DNS 手排"
+http: "HTTP"
+ApplySSLFailed: '申請 [{{ .domain }}] 憑證失敗, {{.detail}} '
+ApplySSLSuccess: '申請 [{{ .domain }}] 憑證成功！ ！ '
+DNSAccountName: 'DNS 帳號 [{{ .name }}] 廠商 [{{.type}}]'
+PushDirLog: '憑證推送到目錄 [{{ .path }}] {{ .status }}'
+ErrDeleteCAWithSSL: "目前機構下存在已簽發證書，無法刪除"
+ErrDeleteWithPanelSSL: "面板 SSL 配置使用此證書，無法刪除"
+ErrDefaultCA: "默認機構不能刪除"
+ApplyWebSiteSSLLog: "開始更新 {{ .name }} 網站憑證"
+ErrUpdateWebsiteSSL: "{{ .name }} 網站更新憑證失敗: {{ .err }}"
+ApplyWebSiteSSLSuccess: "更新網站憑證成功"
+
+
+#mysql
+ErrUserIsExist: "當前用戶已存在，請重新輸入"
+ErrDatabaseIsExist: "當前資料庫已存在，請重新輸入"
+ErrExecTimeOut: "SQL 執行超時，請檢查數據庫"
+ErrRemoteExist: "遠程數據庫已存在該名稱，請修改後重試"
+ErrLocalExist: "本地數據庫已存在該名稱，請修改後重試"
+
+#redis
+ErrTypeOfRedis: "恢復文件類型與當前持久化方式不符，請修改後重試"
+
+#container
+ErrInUsed: "{{ .detail }} 正被使用，無法刪除"
+ErrObjectInUsed: "該對象正被使用，無法刪除"
+ErrPortRules: "端口數目不匹配，請重新輸入！"
+ErrPgImagePull: "鏡像拉取超時，請配置鏡像加速或手動拉取 postgres:16.0-alpine 鏡像後重試"
+
+#runtime
+ErrDirNotFound: "build 文件夾不存在！請檢查文件完整性！"
+ErrFileNotExist: "{{ .detail }} 文件不存在！請檢查源文件完整性！"
+ErrImageBuildErr: "鏡像 build 失敗"
+ErrImageExist: "鏡像已存在！"
+ErrDelWithWebsite: "運行環境已經關聯網站，無法刪除"
+ErrRuntimeStart: "啟動失敗"
+ErrPackageJsonNotFound: "package.json 文件不存在"
+ErrScriptsNotFound: "沒有在 package.json 中找到 scripts 配置項"
+ErrContainerNameNotFound: "無法取得容器名稱，請檢查 .env 文件"
+ErrNodeModulesNotFound: "node_modules 文件夾不存在！請編輯運行環境或者等待運行環境啟動成功"
+
+#setting
+ErrBackupInUsed: "該備份帳號已在計劃任務中使用，無法刪除"
+ErrBackupCheck: "備份帳號測試連接失敗 {{ .err}}"
+ErrOSSConn: "無法獲取最新版本，請確認伺服器是否能夠連接外部網路。"
+ErrEntrance: "安全入口信息錯誤，請檢查後重試！"
+
+#tool
+ErrConfigNotFound: "配置文件不存在"
+ErrConfigParse: "配置文件格式有誤"
+ErrConfigIsNull: "配置文件不允許為空"
+ErrConfigDirNotFound: "運行目錄不存在"
+ErrConfigAlreadyExist: "已存在同名配置文件"
+ErrUserFindErr: "用戶 {{ .name }} 查找失敗 {{ .err }}"
+
+#ssh
+ErrFirewall: "當前未檢測到系統 firewalld 或 ufw 服務，請檢查後重試！"
+
+#cronjob
+ErrBashExecute: "腳本執行錯誤，請在任務輸出文本域中查看具體信息。"
+ErrCutWebsiteLog: "{{ .name }} 網站日誌切割失敗，錯誤 {{ .err }}"
+CutWebsiteLogSuccess: "{{ .name }} 網站日誌切割成功，備份路徑 {{ .path }}"
+
+#toolbox
+ErrNotExistUser: "當前使用者不存在，請修改後重試！"
+ErrBanAction: "設置失敗，當前 {{ .name }} 服務不可用，請檢查後重試！"
+ErrClamdscanNotFound: "未偵測到 clamdscan 指令，請參考文件安裝！"
+
+#waf
+ErrScope: "不支援修改此配置"
+ErrStateChange: "狀態修改失敗"
+ErrRuleExist: "規則已存在"
+ErrRuleNotExist: "規則不存在"
+ErrParseIP: "IP 格式錯誤"
+ErrDefaultIP: "default 為保留名稱，請更換其他名稱"
+ErrGroupInUse: "IP 群組被黑/白名單使用，無法刪除"
+ErrGroupExist: "IP 群組名稱已存在"
+ErrIPRange: "IP 範圍錯誤"
+ErrIPExist: "IP 已存在"
+
+
+#license
+ErrLicense: "許可證格式錯誤，請檢查後重試！"
+ErrLicenseCheck: "許可證校驗失敗，請檢查後重試！"
+ErrLicenseSave: "許可證信息保存失敗，錯誤 {{ .err }}, 請重試！"
+ErrLicenseSync: "許可證信息同步失敗，資料庫中未檢測到許可證信息！"
+ErrXpackNotFound: "該部分為專業版功能，請先在 面板設置-許可證 界面導入許可證"
+ErrXpackNotActive: "該部分為專業版功能，請先在 面板設置-許可證 界面同步許可證狀態"
+ErrXpackOutOfDate: "當前許可證已過期，請重新在 面板設置-許可證 界面導入許可證"
