@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"syscall"
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -336,8 +337,12 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
 		return
 	}
 	mode := info.Mode()
-
 	fileOp := files.NewFileOp()
+	stat, ok := info.Sys().(*syscall.Stat_t)
+	uid, gid := -1, -1
+	if ok {
+		uid, gid = int(stat.Uid), int(stat.Gid)
+	}
 
 	success := 0
 	failures := make(buserr.MultiErr)
@@ -377,6 +382,9 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
 			_ = os.Chmod(dstFilename, dstInfo.Mode())
 		} else {
 			_ = os.Chmod(dstFilename, mode)
+		}
+		if uid != -1 && gid != -1 {
+			_ = os.Chown(dstFilename, uid, gid)
 		}
 		success++
 	}
@@ -603,9 +611,17 @@ func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int,
 	if mode == 0 {
 		mode = 0755
 	}
-	if _, err := os.Stat(dstDir); err != nil && os.IsNotExist(err) {
-		if err = op.CreateDir(dstDir, mode); err != nil {
-			return err
+	uid, gid := -1, -1
+	if info, err := os.Stat(dstDir); err != nil {
+		if os.IsNotExist(err) {
+			if err = op.CreateDir(dstDir, mode); err != nil {
+				return err
+			}
+		}
+	} else {
+		stat, ok := info.Sys().(*syscall.Stat_t)
+		if ok {
+			uid, gid = int(stat.Uid), int(stat.Gid)
 		}
 	}
 	dstFileName := filepath.Join(dstDir, fileName)
@@ -615,6 +631,7 @@ func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int,
 	} else {
 		mode = 0644
 	}
+
 	if overwrite {
 		_ = os.Remove(dstFileName)
 	}
@@ -634,6 +651,9 @@ func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int,
 			return err
 		}
 		_ = os.Remove(chunkPath)
+	}
+	if uid != -1 && gid != -1 {
+		_ = os.Chown(dstFileName, uid, gid)
 	}
 
 	return nil
