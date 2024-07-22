@@ -2,17 +2,13 @@ package router
 
 import (
 	v1 "github.com/1Panel-dev/1Panel/backend/app/api/v1"
-	"github.com/1Panel-dev/1Panel/backend/middleware"
 	"github.com/gin-gonic/gin"
 )
 
 type ContainerRouter struct{}
 
 func (s *ContainerRouter) InitRouter(Router *gin.RouterGroup) {
-	baRouter := Router.Group("containers").
-		Use(middleware.JwtAuth()).
-		Use(middleware.SessionAuth()).
-		Use(middleware.PasswordExpired())
+	baRouter := Router.Group("containers")
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		baRouter.GET("/exec", baseApi.ContainerWsSsh)

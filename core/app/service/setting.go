@@ -65,7 +65,6 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 		info.ProxyPasswd, _ = encrypt.StringDecrypt(info.ProxyPasswd)
 	}
 
-	info.LocalTime = time.Now().Format("2006-01-02 15:04:05 MST -0700")
 	return &info, err
 }
 

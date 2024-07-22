@@ -37,7 +37,6 @@ var (
 	websiteAcmeRepo   = repo.NewIAcmeAccountRepo()
 	websiteCARepo     = repo.NewIWebsiteCARepo()
 
-	logRepo      = repo.NewILogRepo()
 	snapshotRepo = repo.NewISnapshotRepo()
 
 	runtimeRepo       = repo.NewIRunTimeRepo()

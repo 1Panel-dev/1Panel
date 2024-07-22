@@ -2,7 +2,6 @@ package router
 
 func commonGroups() []CommonRouter {
 	return []CommonRouter{
-		&BaseRouter{},
 		&DashboardRouter{},
 		&HostRouter{},
 		&ContainerRouter{},

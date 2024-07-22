@@ -3,18 +3,11 @@ package dto
 import "time"
 
 type SettingInfo struct {
-	UserName       string `json:"userName"`
-	Email          string `json:"email"`
-	SystemIP       string `json:"systemIP"`
-	SystemVersion  string `json:"systemVersion"`
-	DockerSockPath string `json:"dockerSockPath"`
-	DeveloperMode  string `json:"developerMode"`
+	UserName      string `json:"userName"`
+	SystemVersion string `json:"systemVersion"`
+	DeveloperMode string `json:"developerMode"`
 
 	SessionTimeout string `json:"sessionTimeout"`
-	LocalTime      string `json:"localTime"`
-	TimeZone       string `json:"timeZone"`
-	NtpSite        string `json:"ntpSite"`
-
 	Port           string `json:"port"`
 	Ipv6           string `json:"ipv6"`
 	BindAddress    string `json:"bindAddress"`
@@ -22,10 +15,6 @@ type SettingInfo struct {
 	Theme          string `json:"theme"`
 	MenuTabs       string `json:"menuTabs"`
 	Language       string `json:"language"`
-	DefaultNetwork string `json:"defaultNetwork"`
-	LastCleanTime  string `json:"lastCleanTime"`
-	LastCleanSize  string `json:"lastCleanSize"`
-	LastCleanData  string `json:"lastCleanData"`
 
 	ServerPort             string `json:"serverPort"`
 	SSL                    string `json:"ssl"`
@@ -40,24 +29,12 @@ type SettingInfo struct {
 	MFASecret              string `json:"mfaSecret"`
 	MFAInterval            string `json:"mfaInterval"`
 
-	MonitorStatus    string `json:"monitorStatus"`
-	MonitorInterval  string `json:"monitorInterval"`
-	MonitorStoreDays string `json:"monitorStoreDays"`
-
-	MessageType string `json:"messageType"`
-	EmailVars   string `json:"emailVars"`
-	WeChatVars  string `json:"weChatVars"`
-	DingVars    string `json:"dingVars"`
-
 	AppStoreVersion      string `json:"appStoreVersion"`
 	AppStoreLastModified string `json:"appStoreLastModified"`
 	AppStoreSyncStatus   string `json:"appStoreSyncStatus"`
 
-	FileRecycleBin string `json:"fileRecycleBin"`
-
-	SnapshotIgnore string `json:"snapshotIgnore"`
-	XpackHideMenu  string `json:"xpackHideMenu"`
-	NoAuthSetting  string `json:"noAuthSetting"`
+	XpackHideMenu string `json:"xpackHideMenu"`
+	NoAuthSetting string `json:"noAuthSetting"`
 
 	ProxyUrl        string `json:"proxyUrl"`
 	ProxyType       string `json:"proxyType"`

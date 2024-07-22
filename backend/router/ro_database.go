@@ -2,7 +2,6 @@ package router
 
 import (
 	v1 "github.com/1Panel-dev/1Panel/backend/app/api/v1"
-	"github.com/1Panel-dev/1Panel/backend/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -10,10 +9,7 @@ import (
 type DatabaseRouter struct{}
 
 func (s *DatabaseRouter) InitRouter(Router *gin.RouterGroup) {
-	cmdRouter := Router.Group("databases").
-		Use(middleware.JwtAuth()).
-		Use(middleware.SessionAuth()).
-		Use(middleware.PasswordExpired())
+	cmdRouter := Router.Group("databases")
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		cmdRouter.POST("/common/info", baseApi.LoadDBBaseInfo)

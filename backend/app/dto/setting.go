@@ -3,51 +3,22 @@ package dto
 import "time"
 
 type SettingInfo struct {
-	UserName       string `json:"userName"`
-	Email          string `json:"email"`
 	SystemIP       string `json:"systemIP"`
-	SystemVersion  string `json:"systemVersion"`
 	DockerSockPath string `json:"dockerSockPath"`
-	DeveloperMode  string `json:"developerMode"`
+	SystemVersion  string `json:"systemVersion"`
 
-	SessionTimeout string `json:"sessionTimeout"`
-	LocalTime      string `json:"localTime"`
-	TimeZone       string `json:"timeZone"`
-	NtpSite        string `json:"ntpSite"`
+	LocalTime string `json:"localTime"`
+	TimeZone  string `json:"timeZone"`
+	NtpSite   string `json:"ntpSite"`
 
-	Port           string `json:"port"`
-	Ipv6           string `json:"ipv6"`
-	BindAddress    string `json:"bindAddress"`
-	PanelName      string `json:"panelName"`
-	Theme          string `json:"theme"`
-	MenuTabs       string `json:"menuTabs"`
-	Language       string `json:"language"`
 	DefaultNetwork string `json:"defaultNetwork"`
 	LastCleanTime  string `json:"lastCleanTime"`
 	LastCleanSize  string `json:"lastCleanSize"`
 	LastCleanData  string `json:"lastCleanData"`
 
-	ServerPort             string `json:"serverPort"`
-	SSL                    string `json:"ssl"`
-	SSLType                string `json:"sslType"`
-	BindDomain             string `json:"bindDomain"`
-	AllowIPs               string `json:"allowIPs"`
-	SecurityEntrance       string `json:"securityEntrance"`
-	ExpirationDays         string `json:"expirationDays"`
-	ExpirationTime         string `json:"expirationTime"`
-	ComplexityVerification string `json:"complexityVerification"`
-	MFAStatus              string `json:"mfaStatus"`
-	MFASecret              string `json:"mfaSecret"`
-	MFAInterval            string `json:"mfaInterval"`
-
 	MonitorStatus    string `json:"monitorStatus"`
 	MonitorInterval  string `json:"monitorInterval"`
 	MonitorStoreDays string `json:"monitorStoreDays"`
-
-	MessageType string `json:"messageType"`
-	EmailVars   string `json:"emailVars"`
-	WeChatVars  string `json:"weChatVars"`
-	DingVars    string `json:"dingVars"`
 
 	AppStoreVersion      string `json:"appStoreVersion"`
 	AppStoreLastModified string `json:"appStoreLastModified"`
@@ -56,46 +27,11 @@ type SettingInfo struct {
 	FileRecycleBin string `json:"fileRecycleBin"`
 
 	SnapshotIgnore string `json:"snapshotIgnore"`
-	XpackHideMenu  string `json:"xpackHideMenu"`
-	NoAuthSetting  string `json:"noAuthSetting"`
-
-	ProxyUrl        string `json:"proxyUrl"`
-	ProxyType       string `json:"proxyType"`
-	ProxyPort       string `json:"proxyPort"`
-	ProxyUser       string `json:"proxyUser"`
-	ProxyPasswd     string `json:"proxyPasswd"`
-	ProxyPasswdKeep string `json:"proxyPasswdKeep"`
 }
 
 type SettingUpdate struct {
 	Key   string `json:"key" validate:"required"`
 	Value string `json:"value"`
-}
-
-type SSLUpdate struct {
-	SSLType string `json:"sslType" validate:"required,oneof=self select import import-paste import-local"`
-	Domain  string `json:"domain"`
-	SSL     string `json:"ssl" validate:"required,oneof=enable disable"`
-	Cert    string `json:"cert"`
-	Key     string `json:"key"`
-	SSLID   uint   `json:"sslID"`
-}
-type SSLInfo struct {
-	Domain   string `json:"domain"`
-	Timeout  string `json:"timeout"`
-	RootPath string `json:"rootPath"`
-	Cert     string `json:"cert"`
-	Key      string `json:"key"`
-	SSLID    uint   `json:"sslID"`
-}
-
-type PasswordUpdate struct {
-	OldPassword string `json:"oldPassword" validate:"required"`
-	NewPassword string `json:"newPassword" validate:"required"`
-}
-
-type PortUpdate struct {
-	ServerPort uint `json:"serverPort" validate:"required,number,max=65535,min=1"`
 }
 
 type SnapshotStatus struct {
@@ -128,11 +64,13 @@ type SnapshotBatchDelete struct {
 	DeleteWithFile bool   `json:"deleteWithFile"`
 	Ids            []uint `json:"ids" validate:"required"`
 }
+
 type SnapshotImport struct {
 	From        string   `json:"from"`
 	Names       []string `json:"names"`
 	Description string   `json:"description" validate:"max=256"`
 }
+
 type SnapshotInfo struct {
 	ID              uint      `json:"id"`
 	Name            string    `json:"name"`
@@ -154,33 +92,8 @@ type SnapshotInfo struct {
 	LastRollbackedAt string `json:"lastRollbackedAt"`
 }
 
-type UpgradeInfo struct {
-	TestVersion   string `json:"testVersion"`
-	NewVersion    string `json:"newVersion"`
-	LatestVersion string `json:"latestVersion"`
-	ReleaseNote   string `json:"releaseNote"`
-}
-
 type SyncTime struct {
 	NtpSite string `json:"ntpSite" validate:"required"`
-}
-
-type BindInfo struct {
-	Ipv6        string `json:"ipv6" validate:"required,oneof=enable disable"`
-	BindAddress string `json:"bindAddress" validate:"required"`
-}
-
-type Upgrade struct {
-	Version string `json:"version" validate:"required"`
-}
-
-type ProxyUpdate struct {
-	ProxyUrl        string `json:"proxyUrl"`
-	ProxyType       string `json:"proxyType"`
-	ProxyPort       string `json:"proxyPort"`
-	ProxyUser       string `json:"proxyUser"`
-	ProxyPasswd     string `json:"proxyPasswd"`
-	ProxyPasswdKeep string `json:"proxyPasswdKeep"`
 }
 
 type CleanData struct {
@@ -208,13 +121,4 @@ type Clean struct {
 	TreeType string `json:"treeType"`
 	Name     string `json:"name"`
 	Size     uint64 `json:"size"`
-}
-
-type XpackHideMenu struct {
-	ID       string          `json:"id"`
-	Label    string          `json:"label"`
-	IsCheck  bool            `json:"isCheck"`
-	Title    string          `json:"title"`
-	Path     string          `json:"path,omitempty"`
-	Children []XpackHideMenu `json:"children,omitempty"`
 }

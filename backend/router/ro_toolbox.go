@@ -2,7 +2,6 @@ package router
 
 import (
 	v1 "github.com/1Panel-dev/1Panel/backend/app/api/v1"
-	"github.com/1Panel-dev/1Panel/backend/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -10,10 +9,7 @@ import (
 type ToolboxRouter struct{}
 
 func (s *ToolboxRouter) InitRouter(Router *gin.RouterGroup) {
-	toolboxRouter := Router.Group("toolbox").
-		Use(middleware.JwtAuth()).
-		Use(middleware.SessionAuth()).
-		Use(middleware.PasswordExpired())
+	toolboxRouter := Router.Group("toolbox")
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		toolboxRouter.POST("/device/base", baseApi.LoadDeviceBaseInfo)

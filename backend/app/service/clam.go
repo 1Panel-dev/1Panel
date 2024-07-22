@@ -268,7 +268,7 @@ func (c *ClamService) Delete(req dto.ClamDelete) error {
 }
 
 func (c *ClamService) HandleOnce(req dto.OperateByID) error {
-	if cmd.Which("clamdscan") == false {
+	if !cmd.Which("clamdscan") {
 		return buserr.New("ErrClamdscanNotFound")
 	}
 	clam, _ := clamRepo.Get(commonRepo.WithByID(req.ID))

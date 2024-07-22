@@ -18,10 +18,8 @@ import (
 
 func Init() {
 	baseDir := "/opt"
-	port := "9999"
 	mode := ""
 	version := "v1.0.0"
-	username, password, entrance := "", "", ""
 	fileOp := files.NewFileOp()
 	v := viper.NewWithOptions()
 	v.SetConfigType("yaml")
@@ -41,11 +39,7 @@ func Init() {
 		}
 	} else {
 		baseDir = loadParams("BASE_DIR")
-		port = loadParams("ORIGINAL_PORT")
 		version = loadParams("ORIGINAL_VERSION")
-		username = loadParams("ORIGINAL_USERNAME")
-		password = loadParams("ORIGINAL_PASSWORD")
-		entrance = loadParams("ORIGINAL_ENTRANCE")
 
 		reader := bytes.NewReader(conf.AppYaml)
 		if err := v.ReadConfig(reader); err != nil {
@@ -65,20 +59,8 @@ func Init() {
 		if serverConfig.System.BaseDir != "" {
 			baseDir = serverConfig.System.BaseDir
 		}
-		if serverConfig.System.Port != "" {
-			port = serverConfig.System.Port
-		}
 		if serverConfig.System.Version != "" {
 			version = serverConfig.System.Version
-		}
-		if serverConfig.System.Username != "" {
-			username = serverConfig.System.Username
-		}
-		if serverConfig.System.Password != "" {
-			password = serverConfig.System.Password
-		}
-		if serverConfig.System.Entrance != "" {
-			entrance = serverConfig.System.Entrance
 		}
 	}
 
@@ -91,12 +73,7 @@ func Init() {
 	global.CONF.System.DbPath = path.Join(global.CONF.System.DataDir, "db")
 	global.CONF.System.LogPath = path.Join(global.CONF.System.DataDir, "log")
 	global.CONF.System.TmpDir = path.Join(global.CONF.System.DataDir, "tmp")
-	global.CONF.System.Port = port
 	global.CONF.System.Version = version
-	global.CONF.System.Username = username
-	global.CONF.System.Password = password
-	global.CONF.System.Entrance = entrance
-	global.CONF.System.ChangeUserInfo = loadChangeInfo()
 	global.Viper = v
 }
 
@@ -110,12 +87,4 @@ func loadParams(param string) string {
 		panic(fmt.Sprintf("error `%s` find in /usr/local/bin/1pctl", param))
 	}
 	return info
-}
-
-func loadChangeInfo() string {
-	stdout, err := cmd.Exec("grep '^CHANGE_USER_INFO=' /usr/local/bin/1pctl | cut -d'=' -f2")
-	if err != nil {
-		return ""
-	}
-	return strings.ReplaceAll(stdout, "\n", "")
 }

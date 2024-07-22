@@ -9,7 +9,7 @@ import (
 
 func Init() {
 	m := gormigrate.New(global.DB, gormigrate.DefaultOptions, []*gormigrate.Migration{
-		migrations.Init,
+		migrations.AddTable,
 		migrations.InitSetting,
 	})
 	if err := m.Migrate(); err != nil {

@@ -8,8 +8,9 @@ type ApiGroup struct {
 
 var ApiGroupApp = new(ApiGroup)
 
+type BaseApi struct{}
+
 var (
-	authService      = service.NewIAuthService()
 	dashboardService = service.NewIDashboardService()
 
 	appService        = service.NewIAppService()
@@ -54,7 +55,6 @@ var (
 
 	logService      = service.NewILogService()
 	snapshotService = service.NewISnapshotService()
-	upgradeService  = service.NewIUpgradeService()
 
 	runtimeService       = service.NewRuntimeService()
 	processService       = service.NewIProcessService()

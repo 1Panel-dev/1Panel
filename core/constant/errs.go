@@ -27,12 +27,13 @@ var (
 	ErrAuth            = errors.New("ErrAuth")
 	ErrRecordExist     = errors.New("ErrRecordExist")
 	ErrRecordNotFound  = errors.New("ErrRecordNotFound")
-	ErrStructTransform = errors.New("ErrStructTransform")
+	ErrTransform       = errors.New("ErrTransform")
 	ErrInitialPassword = errors.New("ErrInitialPassword")
-	ErrNotSupportType  = errors.New("ErrNotSupportType")
 	ErrInvalidParams   = errors.New("ErrInvalidParams")
 
 	ErrTokenParse = errors.New("ErrTokenParse")
+	ErrPortInUsed = "ErrPortInUsed"
+	ErrCmdTimeout = "ErrCmdTimeout"
 )
 
 // api
@@ -41,124 +42,6 @@ var (
 	ErrTypeInvalidParams   = "ErrInvalidParams"
 	ErrTypeNotLogin        = "ErrNotLogin"
 	ErrTypePasswordExpired = "ErrPasswordExpired"
-	ErrNameIsExist         = "ErrNameIsExist"
 	ErrDemoEnvironment     = "ErrDemoEnvironment"
-	ErrCmdIllegal          = "ErrCmdIllegal"
-	ErrXpackNotFound       = "ErrXpackNotFound"
-	ErrXpackNotActive      = "ErrXpackNotActive"
-	ErrXpackOutOfDate      = "ErrXpackOutOfDate"
-)
-
-// app
-var (
-	ErrPortInUsed          = "ErrPortInUsed"
-	ErrAppLimit            = "ErrAppLimit"
-	ErrFileCanNotRead      = "ErrFileCanNotRead"
-	ErrNotInstall          = "ErrNotInstall"
-	ErrPortInOtherApp      = "ErrPortInOtherApp"
-	ErrDbUserNotValid      = "ErrDbUserNotValid"
-	ErrUpdateBuWebsite     = "ErrUpdateBuWebsite"
-	Err1PanelNetworkFailed = "Err1PanelNetworkFailed"
-	ErrCmdTimeout          = "ErrCmdTimeout"
-	ErrFileParse           = "ErrFileParse"
-	ErrInstallDirNotFound  = "ErrInstallDirNotFound"
-	ErrContainerName       = "ErrContainerName"
-	ErrAppNameExist        = "ErrAppNameExist"
-	ErrFileNotFound        = "ErrFileNotFound"
-	ErrFileParseApp        = "ErrFileParseApp"
-	ErrAppParamKey         = "ErrAppParamKey"
-)
-
-// website
-var (
-	ErrDomainIsExist      = "ErrDomainIsExist"
-	ErrAliasIsExist       = "ErrAliasIsExist"
-	ErrGroupIsUsed        = "ErrGroupIsUsed"
-	ErrUsernameIsExist    = "ErrUsernameIsExist"
-	ErrUsernameIsNotExist = "ErrUsernameIsNotExist"
-	ErrBackupMatch        = "ErrBackupMatch"
-	ErrBackupExist        = "ErrBackupExist"
-	ErrDomainIsUsed       = "ErrDomainIsUsed"
-)
-
-// ssl
-var (
-	ErrSSLCannotDelete               = "ErrSSLCannotDelete"
-	ErrAccountCannotDelete           = "ErrAccountCannotDelete"
-	ErrSSLApply                      = "ErrSSLApply"
-	ErrEmailIsExist                  = "ErrEmailIsExist"
-	ErrEabKidOrEabHmacKeyCannotBlank = "ErrEabKidOrEabHmacKeyCannotBlank"
-)
-
-// file
-var (
-	ErrPathNotFound     = "ErrPathNotFound"
-	ErrMovePathFailed   = "ErrMovePathFailed"
-	ErrLinkPathNotFound = "ErrLinkPathNotFound"
-	ErrFileIsExist       = "ErrFileIsExist"
-	ErrFileUpload       = "ErrFileUpload"
-	ErrFileDownloadDir  = "ErrFileDownloadDir"
-	ErrCmdNotFound      = "ErrCmdNotFound"
-	ErrFavoriteExist    = "ErrFavoriteExist"
-)
-
-// mysql
-var (
-	ErrUserIsExist     = "ErrUserIsExist"
-	ErrDatabaseIsExist = "ErrDatabaseIsExist"
-	ErrExecTimeOut     = "ErrExecTimeOut"
-	ErrRemoteExist     = "ErrRemoteExist"
-	ErrLocalExist      = "ErrLocalExist"
-)
-
-// redis
-var (
-	ErrTypeOfRedis = "ErrTypeOfRedis"
-)
-
-// container
-var (
-	ErrInUsed       = "ErrInUsed"
-	ErrObjectInUsed = "ErrObjectInUsed"
-	ErrPortRules    = "ErrPortRules"
-	ErrPgImagePull  = "ErrPgImagePull"
-)
-
-// runtime
-var (
-	ErrDirNotFound         = "ErrDirNotFound"
-	ErrFileNotExist        = "ErrFileNotExist"
-	ErrImageBuildErr       = "ErrImageBuildErr"
-	ErrImageExist          = "ErrImageExist"
-	ErrDelWithWebsite      = "ErrDelWithWebsite"
-	ErrRuntimeStart        = "ErrRuntimeStart"
-	ErrPackageJsonNotFound = "ErrPackageJsonNotFound"
-	ErrScriptsNotFound     = "ErrScriptsNotFound"
-)
-
-var (
-	ErrBackupInUsed = "ErrBackupInUsed"
-	ErrOSSConn      = "ErrOSSConn"
-	ErrEntrance     = "ErrEntrance"
-)
-
-var (
-	ErrFirewall = "ErrFirewall"
-)
-
-// cronjob
-var (
-	ErrBashExecute = "ErrBashExecute"
-)
-
-var (
-	ErrNotExistUser = "ErrNotExistUser"
-)
-
-// license
-var (
-	ErrLicense      = "ErrLicense"
-	ErrLicenseCheck = "ErrLicenseCheck"
-	ErrLicenseSave  = "ErrLicenseSave"
-	ErrLicenseSync  = "ErrLicenseSync"
+	ErrEntrance            = "ErrEntrance"
 )

@@ -2,7 +2,6 @@ package router
 
 import (
 	v1 "github.com/1Panel-dev/1Panel/backend/app/api/v1"
-	"github.com/1Panel-dev/1Panel/backend/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -10,10 +9,7 @@ import (
 type CronjobRouter struct{}
 
 func (s *CronjobRouter) InitRouter(Router *gin.RouterGroup) {
-	cmdRouter := Router.Group("cronjobs").
-		Use(middleware.JwtAuth()).
-		Use(middleware.SessionAuth()).
-		Use(middleware.PasswordExpired())
+	cmdRouter := Router.Group("cronjobs")
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		cmdRouter.POST("", baseApi.CreateCronjob)

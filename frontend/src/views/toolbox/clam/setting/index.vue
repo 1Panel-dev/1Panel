@@ -57,7 +57,7 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, onMounted, ref, shallowRef } from 'vue';
+import { onMounted, ref } from 'vue';
 import ClamStatus from '@/views/toolbox/clam/status/index.vue';
 import { searchClamFile, updateClamFile } from '@/api/modules/toolbox';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';

@@ -85,7 +85,7 @@ func (u *LogService) PageLoginLog(req dto.SearchLgLogWithPage) (int64, interface
 	for _, op := range ops {
 		var item dto.LoginLog
 		if err := copier.Copy(&item, &op); err != nil {
-			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+			return 0, nil, errors.WithMessage(constant.ErrTransform, err.Error())
 		}
 		dtoOps = append(dtoOps, item)
 	}
@@ -109,7 +109,7 @@ func (u *LogService) PageOperationLog(req dto.SearchOpLogWithPage) (int64, inter
 	for _, op := range ops {
 		var item dto.OperationLog
 		if err := copier.Copy(&item, &op); err != nil {
-			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+			return 0, nil, errors.WithMessage(constant.ErrTransform, err.Error())
 		}
 		dtoOps = append(dtoOps, item)
 	}
