@@ -288,3 +288,29 @@ var AddClamStatus = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddHOSTMenu = &gormigrate.Migration{
+	ID: "20240722-add-xpack-host-menu",
+	Migrate: func(tx *gorm.DB) error {
+		var (
+			setting model.Setting
+			menu    dto.XpackHideMenu
+		)
+		tx.Model(&model.Setting{}).Where("key", "XpackHideMenu").First(&setting)
+		if err := json.Unmarshal([]byte(setting.Value), &menu); err != nil {
+			return err
+		}
+		menu.Children = append(menu.Children, dto.XpackHideMenu{
+			ID:      "7",
+			Title:   "多主机",
+			Path:    "/xpack/multihost/manage",
+			Label:   "Multihost",
+			IsCheck: true,
+		})
+		data, err := json.Marshal(menu)
+		if err != nil {
+			return err
+		}
+		return tx.Model(&model.Setting{}).Where("key", "XpackHideMenu").Updates(map[string]interface{}{"value": string(data)}).Error
+	},
+}

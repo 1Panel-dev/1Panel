@@ -93,6 +93,8 @@ func Init() {
 		migrations.AddShellColumn,
 		migrations.AddClam,
 		migrations.AddClamStatus,
+
+		migrations.AddHOSTMenu,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)
