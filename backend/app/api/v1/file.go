@@ -356,6 +356,7 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
 				global.LOG.Error(e)
 				continue
 			}
+			_ = os.Chown(dstDir, uid, gid)
 		}
 		tmpFilename := dstFilename + ".tmp"
 		if err := c.SaveUploadedFile(file, tmpFilename); err != nil {
