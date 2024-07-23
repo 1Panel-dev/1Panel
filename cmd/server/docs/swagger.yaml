@@ -2748,6 +2748,32 @@ definitions:
     - ssl
     - sslType
     type: object
+  dto.SearchClamWithPage:
+    properties:
+      info:
+        type: string
+      order:
+        enum:
+        - "null"
+        - ascending
+        - descending
+        type: string
+      orderBy:
+        enum:
+        - name
+        - status
+        - created_at
+        type: string
+      page:
+        type: integer
+      pageSize:
+        type: integer
+    required:
+    - order
+    - orderBy
+    - page
+    - pageSize
+    type: object
   dto.SearchForTree:
     properties:
       info:
@@ -5633,22 +5659,11 @@ paths:
       tags:
       - App
       x-panel-log:
-        BeforeFunctions:
-        - db: app_installs
-          input_column: name
-          input_value: name
-          isList: false
-          output_column: app_id
-          output_value: appId
-        - db: apps
-          info: appId
-          isList: false
-          output_column: key
-          output_value: appKey
+        BeforeFunctions: []
         bodyKeys:
         - name
-        formatEN: Install app [appKey]-[name]
-        formatZH: 安装应用 [appKey]-[name]
+        formatEN: Install app [name]
+        formatZH: 安装应用 [name]
         paramKeys: []
   /apps/installed/check:
     post:
@@ -12769,7 +12784,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.SearchWithPage'
+          $ref: '#/definitions/dto.SearchClamWithPage'
       responses:
         "200":
           description: OK

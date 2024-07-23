@@ -209,28 +209,12 @@
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFunctions": [
-                        {
-                            "db": "app_installs",
-                            "input_column": "name",
-                            "input_value": "name",
-                            "isList": false,
-                            "output_column": "app_id",
-                            "output_value": "appId"
-                        },
-                        {
-                            "db": "apps",
-                            "info": "appId",
-                            "isList": false,
-                            "output_column": "key",
-                            "output_value": "appKey"
-                        }
-                    ],
+                    "BeforeFunctions": [],
                     "bodyKeys": [
                         "name"
                     ],
-                    "formatEN": "Install app [appKey]-[name]",
-                    "formatZH": "安装应用 [appKey]-[name]",
+                    "formatEN": "Install app [name]",
+                    "formatZH": "安装应用 [name]",
                     "paramKeys": []
                 }
             }
@@ -11479,7 +11463,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.SearchWithPage"
+                            "$ref": "#/definitions/dto.SearchClamWithPage"
                         }
                     }
                 ],
@@ -19311,6 +19295,42 @@
                         "import-paste",
                         "import-local"
                     ]
+                }
+            }
+        },
+        "dto.SearchClamWithPage": {
+            "type": "object",
+            "required": [
+                "order",
+                "orderBy",
+                "page",
+                "pageSize"
+            ],
+            "properties": {
+                "info": {
+                    "type": "string"
+                },
+                "order": {
+                    "type": "string",
+                    "enum": [
+                        "null",
+                        "ascending",
+                        "descending"
+                    ]
+                },
+                "orderBy": {
+                    "type": "string",
+                    "enum": [
+                        "name",
+                        "status",
+                        "created_at"
+                    ]
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
                 }
             }
         },

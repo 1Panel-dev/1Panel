@@ -155,7 +155,7 @@ func (b *BaseApi) GetIgnoredApp(c *gin.Context) {
 // @Success 200 {object} model.AppInstall
 // @Security ApiKeyAuth
 // @Router /apps/install [post]
-// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[{"input_column":"name","input_value":"name","isList":false,"db":"app_installs","output_column":"app_id","output_value":"appId"},{"info":"appId","isList":false,"db":"apps","output_column":"key","output_value":"appKey"}],"formatZH":"安装应用 [appKey]-[name]","formatEN":"Install app [appKey]-[name]"}
+// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"安装应用 [name]","formatEN":"Install app [name]"}
 func (b *BaseApi) InstallApp(c *gin.Context) {
 	var req request.AppInstallCreate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
