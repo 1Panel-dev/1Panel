@@ -96,9 +96,11 @@ func OperationLog() gin.HandlerFunc {
 					if funcs.InputValue == key {
 						var names []string
 						if funcs.IsList {
-							_ = global.DB.Raw("select ? from ? where ? in (?);", funcs.OutputColumn, funcs.DB, funcs.InputColumn, value).Scan(&names)
+							query := fmt.Sprintf("SELECT %s FROM %s WHERE %s in (?)", funcs.OutputColumn, funcs.DB, funcs.InputColumn)
+							_ = global.DB.Raw(query, value).Scan(&names)
 						} else {
-							_ = global.DB.Raw("select ? from ? where ? = ?;", funcs.OutputColumn, funcs.DB, funcs.InputColumn, value).Scan(&names)
+							query := fmt.Sprintf("SELECT %s FROM %s WHERE %s = ?", funcs.OutputColumn, funcs.DB, funcs.InputColumn)
+							_ = global.DB.Raw(query, value).Scan(&names)
 						}
 						formatMap[funcs.OutputValue] = strings.Join(names, ",")
 						break
