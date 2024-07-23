@@ -145,6 +145,9 @@ func (a AppService) GetAppTags() ([]response.TagDTO, error) {
 
 func (a AppService) GetApp(key string) (*response.AppDTO, error) {
 	var appDTO response.AppDTO
+	if key == "postgres" {
+		key = "postgresql"
+	}
 	app, err := appRepo.GetFirst(appRepo.WithKey(key))
 	if err != nil {
 		return nil, err
