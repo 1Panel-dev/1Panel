@@ -18,7 +18,7 @@ func Init() {
 			panic(fmt.Errorf("init db dir failed, err: %v", err))
 		}
 	}
-	fullPath := global.CONF.System.DbPath + "/" + global.CONF.System.DbFile
+	fullPath := global.CONF.System.DbPath + "/" + global.CONF.System.DbCoreFile
 	if _, err := os.Stat(fullPath); err != nil {
 		f, err := os.Create(fullPath)
 		if err != nil {
@@ -44,7 +44,6 @@ func Init() {
 	if err != nil {
 		panic(err)
 	}
-	_ = db.Exec("PRAGMA journal_mode = WAL;")
 	sqlDB, dbError := db.DB()
 	if dbError != nil {
 		panic(dbError)

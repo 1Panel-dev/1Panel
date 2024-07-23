@@ -52,6 +52,7 @@ func Routers() *gin.Engine {
 	})
 
 	Router.Use(i18n.UseI18n())
+	Router.Use(middleware.Proxy())
 
 	swaggerRouter := Router.Group("1panel")
 	docs.SwaggerInfo.BasePath = "/api/v1"

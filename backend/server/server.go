@@ -4,14 +4,11 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/1Panel-dev/1Panel/backend/cron"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/i18n"
-
 	"github.com/1Panel-dev/1Panel/backend/init/app"
 	"github.com/1Panel-dev/1Panel/backend/init/business"
-
-	"github.com/1Panel-dev/1Panel/backend/cron"
-
-	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/init/db"
 	"github.com/1Panel-dev/1Panel/backend/init/hook"
 	"github.com/1Panel-dev/1Panel/backend/init/log"
@@ -40,10 +37,10 @@ func Start() {
 	rootRouter := router.Routers()
 
 	server := &http.Server{
-		Addr:    ":9999",
+		Addr:    "0.0.0.0:9998",
 		Handler: rootRouter,
 	}
-	ln, err := net.Listen("tcp4", ":9999")
+	ln, err := net.Listen("tcp4", "0.0.0.0:9998")
 	if err != nil {
 		panic(err)
 	}
@@ -51,7 +48,7 @@ func Start() {
 		*net.TCPListener
 	}
 
-	global.LOG.Info("listen at http://0.0.0.0:9999")
+	global.LOG.Info("listen at http://0.0.0.0:9998")
 	if err := server.Serve(tcpKeepAliveListener{ln.(*net.TCPListener)}); err != nil {
 		panic(err)
 	}

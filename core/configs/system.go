@@ -5,7 +5,7 @@ type System struct {
 	Ipv6           string `mapstructure:"ipv6"`
 	BindAddress    string `mapstructure:"bindAddress"`
 	SSL            string `mapstructure:"ssl"`
-	DbFile         string `mapstructure:"db_file"`
+	DbCoreFile     string `mapstructure:"db_core_file"`
 	DbPath         string `mapstructure:"db_path"`
 	LogPath        string `mapstructure:"log_path"`
 	DataDir        string `mapstructure:"data_dir"`

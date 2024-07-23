@@ -3,8 +3,8 @@ package main
 import (
 	_ "net/http/pprof"
 
+	"github.com/1Panel-dev/1Panel/backend/server"
 	_ "github.com/1Panel-dev/1Panel/cmd/server/docs"
-	"github.com/1Panel-dev/1Panel/server"
 )
 
 // @title 1Panel

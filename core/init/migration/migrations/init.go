@@ -50,7 +50,14 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "SessionTimeout", Value: "86400"}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "LocalTime", Value: ""}).Error; err != nil {
+
+		if err := tx.Create(&model.Setting{Key: "SSLType", Value: "self"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "SSLID", Value: "0"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "SSL", Value: "disable"}).Error; err != nil {
 			return err
 		}
 
@@ -75,7 +82,7 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "PrsoxyPasswdKeep", Value: ""}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "XpackHideMenu", Value: "{\"id\":\"1\",\"label\":\"/xpack\",\"isCheck\":true,\"title\":\"xpack.menu\",\"children\":[{\"id\":\"2\",\"title\":\"xpack.waf.name\",\"path\":\"/xpack/waf/dashboard\",\"label\":\"Dashboard\",\"isCheck\":true},{\"id\":\"3\",\"title\":\"xpack.tamper.tamper\",\"path\":\"/xpack/tamper\",\"label\":\"Tamper\",\"isCheck\":true},{\"id\":\"4\",\"title\":\"xpack.gpu.gpu\",\"path\":\"/xpack/gpu\",\"label\":\"GPU\",\"isCheck\":true},{\"id\":\"5\",\"title\":\"xpack.setting.setting\",\"path\":\"/xpack/setting\",\"label\":\"XSetting\",\"isCheck\":true},{\"id\":\"6\",\"title\":\"xpack.monitor.name\",\"path\":\"/xpack/monitor/dashboard\",\"label\":\"MonitorDashboard\",\"isCheck\":true},{\"id\":\"7\",\"title\":\"xpack.multihost\",\"path\":\"/xpack/multihost/manage\",\"label\":\"Multihost\",\"isCheck\":true}]}"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "XpackHideMenu", Value: "{\"id\":\"1\",\"label\":\"/xpack\",\"isCheck\":true,\"title\":\"xpack.menu\",\"children\":[{\"id\":\"2\",\"title\":\"xpack.waf.name\",\"path\":\"/xpack/waf/dashboard\",\"label\":\"Dashboard\",\"isCheck\":true},{\"id\":\"3\",\"title\":\"xpack.tamper.tamper\",\"path\":\"/xpack/tamper\",\"label\":\"Tamper\",\"isCheck\":true},{\"id\":\"4\",\"title\":\"xpack.gpu.gpu\",\"path\":\"/xpack/gpu\",\"label\":\"GPU\",\"isCheck\":true},{\"id\":\"5\",\"title\":\"xpack.setting.setting\",\"path\":\"/xpack/setting\",\"label\":\"XSetting\",\"isCheck\":true},{\"id\":\"6\",\"title\":\"xpack.monitor.name\",\"path\":\"/xpack/monitor/dashboard\",\"label\":\"MonitorDashboard\",\"isCheck\":true},{\"id\":\"7\",\"title\":\"xpack.multihost.agentManagement\",\"path\":\"/xpack/multihost/manage\",\"label\":\"Multihost\",\"isCheck\":true}]}"}).Error; err != nil {
 			return err
 		}
 
@@ -109,10 +116,19 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "SystemVersion", Value: global.CONF.System.Version}).Error; err != nil {
 			return err
 		}
+		if err := tx.Create(&model.Setting{Key: "SystemStatus", Value: "Free"}).Error; err != nil {
+			return err
+		}
 		if err := tx.Create(&model.Setting{Key: "BindAddress", Value: "0.0.0.0"}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "Ipv6", Value: "disable"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "BindDomain", Value: ""}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "AllowIPs", Value: ""}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "NoAuthSetting", Value: "200"}).Error; err != nil {
