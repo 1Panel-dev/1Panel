@@ -1,9 +1,12 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
 	_ "net/http/pprof"
 
-	"github.com/1Panel-dev/1Panel/backend/server"
+	"github.com/1Panel-dev/1Panel/cmd/server/cmd"
 	_ "github.com/1Panel-dev/1Panel/cmd/server/docs"
 )
 
@@ -18,5 +21,8 @@ import (
 
 //go:generate swag init -o ./docs -g main.go -d ../../backend -g ../cmd/server/main.go
 func main() {
-	server.Start()
+	if err := cmd.RootCmd.Execute(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 }
