@@ -1,9 +1,8 @@
 package router
 
 import (
+	"context"
 	"fmt"
-	"net/http"
-
 	"github.com/1Panel-dev/1Panel/cmd/server/docs"
 	"github.com/1Panel-dev/1Panel/cmd/server/web"
 	"github.com/1Panel-dev/1Panel/core/global"
@@ -14,6 +13,11 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"net"
+	"net/http"
+	"net/http/httputil"
+	"os"
+	"strings"
 )
 
 var (
@@ -44,13 +48,6 @@ func Routers() *gin.Engine {
 		Router.Use(middleware.DemoHandle())
 	}
 
-	Router.NoRoute(func(c *gin.Context) {
-		c.Writer.WriteHeader(http.StatusOK)
-		_, _ = c.Writer.Write(web.IndexByte)
-		c.Writer.Header().Add("Accept", "text/html")
-		c.Writer.Flush()
-	})
-
 	Router.Use(i18n.UseI18n())
 	Router.Use(middleware.Proxy())
 
@@ -72,6 +69,42 @@ func Routers() *gin.Engine {
 	for _, router := range rou.RouterGroupApp {
 		router.InitRouter(PrivateGroup)
 	}
+
+	// 使用 unix 代理
+	sockPath := "/tmp/agent.sock"
+	if _, err := os.Stat(sockPath); err != nil {
+		panic(err)
+	}
+	dialUnix := func(proto, addr string) (conn net.Conn, err error) {
+		return net.Dial("unix", sockPath)
+	}
+	transport := &http.Transport{
+		DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+			return dialUnix(network, addr)
+		},
+	}
+	proxy := &httputil.ReverseProxy{
+		Director: func(req *http.Request) {
+			req.URL.Scheme = "http"
+			req.URL.Host = "unix"
+		},
+		Transport: transport,
+	}
+	Router.Use(func(c *gin.Context) {
+		if strings.HasPrefix(c.Request.URL.Path, "/api") {
+			proxy.ServeHTTP(c.Writer, c.Request)
+			c.Abort()
+			return
+		}
+		c.Next()
+	})
+
+	Router.NoRoute(func(c *gin.Context) {
+		c.Writer.WriteHeader(http.StatusOK)
+		_, _ = c.Writer.Write(web.IndexByte)
+		c.Writer.Header().Add("Accept", "text/html")
+		c.Writer.Flush()
+	})
 
 	return Router
 }

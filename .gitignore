@@ -39,10 +39,10 @@ cmd/server/web/index.html
 frontend/auto-imports.d.ts
 frontend/components.d.ts
 frontend/src/xpack
-backend/xpack
-backend/router/entry_xpack.go
-backend/server/init_xpack.go
-backend/utils/xpack/xpack_xpack.go
+agent/xpack
+agent/router/entry_xpack.go
+agent/server/init_xpack.go
+agent/utils/xpack/xpack_xpack.go
 
 .history/
 dist/
