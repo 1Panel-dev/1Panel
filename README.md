@@ -53,7 +53,7 @@ curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_
 - [DataEase](https://github.com/dataease/dataease/) - 人人可用的开源数据可视化分析工具
 - [MeterSphere](https://github.com/metersphere/metersphere/) - 开源持续测试工具
 - [KubePi](https://github.com/1Panel-dev/KubePi/) - 现代化、开源的 K8s 面板
-- 
+
 ## License
 
 Copyright (c) 2014-2024 [FIT2CLOUD 飞致云](https://fit2cloud.com/), All rights reserved.
