@@ -26,7 +26,7 @@ export const unbindLicense = () => {
 };
 
 export const getSettingInfo = () => {
-    return http.post<Setting.SettingInfo>(`/settings/search`);
+    return http.post<Setting.SettingInfo>(`/core/settings/search`);
 };
 export const getSystemAvailable = () => {
     return http.get(`/settings/search/available`);

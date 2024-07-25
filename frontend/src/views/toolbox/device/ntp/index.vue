@@ -4,7 +4,7 @@
             <el-form-item :label="$t('toolbox.device.syncSite')" prop="ntpSite" :rules="Rules.domain">
                 <el-input v-model="form.ntpSite" />
                 <el-button type="primary" link class="tagClass" @click="form.ntpSite = 'pool.ntp.org'">
-                    {{ $t('website.default') }}
+                    {{ $t('commons.table.default') }}
                 </el-button>
                 <el-button type="primary" link class="tagClass" @click="form.ntpSite = 'ntp.aliyun.com'">
                     {{ $t('toolbox.device.ntpALi') }}

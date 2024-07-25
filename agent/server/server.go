@@ -3,6 +3,7 @@ package server
 import (
 	"net"
 	"net/http"
+	"os"
 
 	"github.com/1Panel-dev/1Panel/agent/cron"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
@@ -38,22 +39,11 @@ func Start() {
 	server := &http.Server{
 		Handler: rootRouter,
 	}
-	//ln, err := net.Listen("tcp4", "0.0.0.0:9998")
-	//if err != nil {
-	//	panic(err)
-	//}
-	//type tcpKeepAliveListener struct {
-	//	*net.TCPListener
-	//}
-	//
-	//global.LOG.Info("listen at http://0.0.0.0:9998")
-	//if err := server.Serve(tcpKeepAliveListener{ln.(*net.TCPListener)}); err != nil {
-	//	panic(err)
-	//}
 
+	_ = os.Remove("/tmp/agent.sock")
 	listener, err := net.Listen("unix", "/tmp/agent.sock")
 	if err != nil {
 		panic(err)
 	}
-	server.Serve(listener)
+	_ = server.Serve(listener)
 }

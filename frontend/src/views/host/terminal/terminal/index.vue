@@ -100,7 +100,7 @@
                         >
                             <template #default="{ node, data }">
                                 <span class="custom-tree-node">
-                                    <span v-if="node.label === 'default'">{{ $t('website.default') }}</span>
+                                    <span v-if="node.label === 'default'">{{ $t('commons.table.default') }}</span>
                                     <div v-else>
                                         <span v-if="node.label.length <= 25">
                                             <a @click="onClickConn(node, data)">{{ node.label }}</a>

@@ -1,3 +1,5 @@
+//go:build !xpack
+
 package router
 
 func RouterGroups() []CommonRouter {

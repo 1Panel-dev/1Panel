@@ -8,9 +8,9 @@ import (
 	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
-
-	// "github.com/1Panel-dev/1Panel/core/middleware"
+	"github.com/1Panel-dev/1Panel/core/middleware"
 	"github.com/1Panel-dev/1Panel/core/utils/captcha"
+	"github.com/1Panel-dev/1Panel/core/utils/qqwry"
 	"github.com/gin-gonic/gin"
 )
 
@@ -124,10 +124,10 @@ func (b *BaseApi) CheckIsSafety(c *gin.Context) {
 		return
 	}
 	if status == "unpass" {
-		// if middleware.Get.LoadErrCode("err-entrance") != 200 {
-		// 	helper.ErrResponse(c, middleware.LoadErrCode("err-entrance"))
-		// 	return
-		// }
+		if middleware.LoadErrCode("err-entrance") != 200 {
+			helper.ErrResponse(c, middleware.LoadErrCode("err-entrance"))
+			return
+		}
 		helper.ErrorWithDetail(c, constant.CodeErrEntrance, constant.ErrTypeInternalServer, nil)
 		return
 	}
@@ -175,12 +175,12 @@ func saveLoginLogs(c *gin.Context, err error) {
 		logs.Status = constant.StatusSuccess
 	}
 	logs.IP = c.ClientIP()
-	// qqWry, err := qqwry.NewQQwry()
-	// if err != nil {
-	// 	global.LOG.Errorf("load qqwry datas failed: %s", err)
-	// }
-	// res := qqWry.Find(logs.IP)
+	qqWry, err := qqwry.NewQQwry()
+	if err != nil {
+		global.LOG.Errorf("load qqwry datas failed: %s", err)
+	}
+	res := qqWry.Find(logs.IP)
 	logs.Agent = c.GetHeader("User-Agent")
-	// logs.Address = res.Area
+	logs.Address = res.Area
 	_ = logService.CreateLoginLog(logs)
 }

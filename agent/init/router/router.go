@@ -31,7 +31,7 @@ func Routers() *gin.Engine {
 		PublicGroup.Use(gzip.Gzip(gzip.DefaultCompression))
 		setWebStatic(PublicGroup)
 	}
-	PrivateGroup := Router.Group("/api/v1")
+	PrivateGroup := Router.Group("/api/v2")
 	PrivateGroup.Use(middleware.GlobalLoading())
 	for _, router := range rou.RouterGroupApp {
 		router.InitRouter(PrivateGroup)

@@ -13,6 +13,7 @@ ErrNotSupportType: "系統暫不支持當前類型: {{ .detail }}"
 ErrNameIsExist: "名稱已存在"
 ErrDemoEnvironment: "演示伺服器，禁止此操作!"
 ErrEntrance: "安全入口信息錯誤，請檢查後重試！"
+ErrGroupIsUsed: "分組正在使用中，無法刪除"
 
 #app
 ErrPortInUsed: "{{ .detail }} 端口已被佔用！"

@@ -31,9 +31,11 @@ var (
 	ErrInitialPassword = errors.New("ErrInitialPassword")
 	ErrInvalidParams   = errors.New("ErrInvalidParams")
 
-	ErrTokenParse = errors.New("ErrTokenParse")
-	ErrPortInUsed = "ErrPortInUsed"
-	ErrCmdTimeout = "ErrCmdTimeout"
+	ErrTokenParse      = errors.New("ErrTokenParse")
+	ErrStructTransform = errors.New("ErrStructTransform")
+	ErrPortInUsed      = "ErrPortInUsed"
+	ErrCmdTimeout      = "ErrCmdTimeout"
+	ErrGroupIsUsed     = "ErrGroupIsUsed"
 )
 
 // api

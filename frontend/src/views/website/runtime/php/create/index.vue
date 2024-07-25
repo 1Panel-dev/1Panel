@@ -243,7 +243,7 @@ const phpSources = [
         value: 'mirrors.xtom.com',
     },
     {
-        label: i18n.global.t('runtime.default'),
+        label: i18n.global.t('commons.table.default'),
         value: 'dl-cdn.alpinelinux.org',
     },
 ];

@@ -18,10 +18,10 @@
                 <template #default="{ row }">
                     <div v-if="!row.edit">
                         <span v-if="row.name === 'default'">
-                            {{ $t('website.default') }}
+                            {{ $t('commons.table.default') }}
                         </span>
                         <span v-if="row.name !== 'default'">{{ row.name }}</span>
-                        <span v-if="row.isDefault">({{ $t('website.default') }})</span>
+                        <span v-if="row.isDefault">({{ $t('commons.table.default') }})</span>
                     </div>
 
                     <el-form @submit.prevent ref="groupForm" v-if="row.edit" :model="row">

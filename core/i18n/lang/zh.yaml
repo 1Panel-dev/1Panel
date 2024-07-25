@@ -13,6 +13,7 @@ ErrNotSupportType: "系统暂不支持当前类型: {{ .detail }}"
 ErrDemoEnvironment: "演示服务器，禁止此操作!"
 ErrCmdTimeout: "命令执行超时！"
 ErrEntrance: "安全入口信息错误，请检查后重试！"
+ErrGroupIsUsed: "分组正在使用中，无法删除"
 
 #app
 ErrPortInUsed: "{{ .detail }} 端口已被占用！"

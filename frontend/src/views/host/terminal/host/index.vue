@@ -35,7 +35,7 @@
                     <el-table-column :label="$t('commons.table.port')" prop="port" />
                     <el-table-column :label="$t('commons.table.group')" show-overflow-tooltip prop="groupBelong">
                         <template #default="{ row }">
-                            <span v-if="row.groupBelong === 'default'">{{ $t('website.default') }}</span>
+                            <span v-if="row.groupBelong === 'default'">{{ $t('commons.table.default') }}</span>
                             <span v-else>{{ row.groupBelong }}</span>
                         </template>
                     </el-table-column>

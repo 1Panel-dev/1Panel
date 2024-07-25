@@ -14,6 +14,7 @@ build/1panel
 .vscode
 *.project
 *.factorypath
+__debug*
 
 # IntelliJ IDEA
 .idea/*
@@ -43,6 +44,9 @@ agent/xpack
 agent/router/entry_xpack.go
 agent/server/init_xpack.go
 agent/utils/xpack/xpack_xpack.go
+core/xpack
+core/router/entry_xpack.go
+core/server/init_xpack.go
 
 .history/
 dist/

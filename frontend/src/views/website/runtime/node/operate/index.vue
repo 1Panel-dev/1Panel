@@ -265,7 +265,7 @@ const hasPnpm = computed(() => {
 
 const imageSources = [
     {
-        label: i18n.global.t('runtime.default'),
+        label: i18n.global.t('commons.table.default'),
         value: 'https://registry.npmjs.org/',
     },
     {

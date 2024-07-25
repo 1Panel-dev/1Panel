@@ -36,6 +36,7 @@ func Start() {
 	cache.Init()
 	session.Init()
 	gin.SetMode("debug")
+	InitOthers()
 	hook.Init()
 
 	rootRouter := router.Routers()

@@ -13,6 +13,7 @@ ErrNotSupportType: "The system does not support the current type: {{ .detail }}"
 ErrNameIsExist: "Name is already exist"
 ErrDemoEnvironment: "Demo server, prohibit this operation!"
 ErrEntrance: "Security entrance information error. Please check and try again!"
+ErrGroupIsUsed: "The group is in use and cannot be deleted"
 
 #app
 ErrPortInUsed: "{{ .detail }} port already in use"
