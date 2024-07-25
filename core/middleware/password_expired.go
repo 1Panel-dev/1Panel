@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v1/helper"
@@ -13,6 +14,12 @@ import (
 
 func PasswordExpired() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if strings.HasPrefix(c.Request.URL.Path, "/api/v2/core/auth") ||
+			c.Request.URL.Path == "/api/v2/core/settings/expired/handle" ||
+			c.Request.URL.Path == "/api/v2/core/settings/search" {
+			c.Next()
+			return
+		}
 		settingRepo := repo.NewISettingRepo()
 		setting, err := settingRepo.Get(settingRepo.WithByKey("ExpirationDays"))
 		if err != nil {

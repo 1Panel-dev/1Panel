@@ -84,6 +84,12 @@ var InitHost = &gormigrate.Migration{
 var InitSetting = &gormigrate.Migration{
 	ID: "20240722-init-setting",
 	Migrate: func(tx *gorm.DB) error {
+		encryptKey := common.RandStr(16)
+		global.CONF.System.EncryptKey = encryptKey
+		if err := tx.Create(&model.Setting{Key: "EncryptKey", Value: encryptKey}).Error; err != nil {
+			return err
+		}
+
 		if err := tx.Create(&model.Setting{Key: "SystemIP", Value: ""}).Error; err != nil {
 			return err
 		}

@@ -46,4 +46,5 @@ var (
 	ErrTypePasswordExpired = "ErrPasswordExpired"
 	ErrDemoEnvironment     = "ErrDemoEnvironment"
 	ErrEntrance            = "ErrEntrance"
+	ErrProxy               = "ErrProxy"
 )

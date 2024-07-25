@@ -3,11 +3,11 @@ import { ResPage } from '../interface';
 import { Log } from '../interface/log';
 
 export const getOperationLogs = (info: Log.SearchOpLog) => {
-    return http.post<ResPage<Log.OperationLog>>(`/logs/operation`, info);
+    return http.post<ResPage<Log.OperationLog>>(`/core/logs/operation`, info);
 };
 
 export const getLoginLogs = (info: Log.SearchLgLog) => {
-    return http.post<ResPage<Log.OperationLog>>(`/logs/login`, info);
+    return http.post<ResPage<Log.OperationLog>>(`/core/logs/login`, info);
 };
 
 export const getSystemFiles = () => {

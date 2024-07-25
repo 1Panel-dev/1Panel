@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
@@ -12,6 +13,10 @@ import (
 
 func SessionAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if strings.HasPrefix(c.Request.URL.Path, "/api/v2/core/auth") {
+			c.Next()
+			return
+		}
 		if method, exist := c.Get("authMethod"); exist && method == constant.AuthMethodJWT {
 			c.Next()
 			return

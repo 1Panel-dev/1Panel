@@ -8,6 +8,7 @@ ErrTransform: "類型轉換失敗: {{ .detail }}"
 ErrNotLogin: "用戶未登入: {{ .detail }}"
 ErrPasswordExpired: "當前密碼已過期: {{ .detail }}"
 ErrNotSupportType: "系統暫不支持當前類型: {{ .detail }}"
+ErrProxy: "請求錯誤，請檢查該節點狀態"
 
 #common
 ErrNameIsExist: "名稱已存在"
