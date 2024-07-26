@@ -4,6 +4,7 @@ import (
 	"crypto"
 	"encoding/json"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -292,8 +293,12 @@ func (c *AcmeClient) GetDNSResolve(domains []string) (map[string]Resolve, error)
 			continue
 		}
 		challengeInfo := dns01.GetChallengeInfo(domain, keyAuth)
+		fqdn := challengeInfo.FQDN
+		if strings.HasPrefix(domain, "*.") && strings.Contains(fqdn, "*.") {
+			fqdn = strings.Replace(fqdn, "*.", "", 1)
+		}
 		resolves[domain] = Resolve{
-			Key:   challengeInfo.FQDN,
+			Key:   fqdn,
 			Value: challengeInfo.Value,
 		}
 	}
