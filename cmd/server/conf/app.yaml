@@ -1,6 +1,5 @@
 system:
-  db_core_file: 1Panel_Core.db
-  db_file: 1Panel.db
+  db_core_file: core.db
   base_dir: /opt
   mode: dev
   repo_url: https://resource.fit2cloud.com/1panel/package

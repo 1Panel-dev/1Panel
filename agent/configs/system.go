@@ -1,7 +1,7 @@
 package configs
 
 type System struct {
-	DbFile     string `mapstructure:"db_file"`
+	DbFile     string `mapstructure:"db_agent_file"`
 	DbPath     string `mapstructure:"db_path"`
 	LogPath    string `mapstructure:"log_path"`
 	DataDir    string `mapstructure:"data_dir"`
