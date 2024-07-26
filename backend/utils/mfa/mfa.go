@@ -40,7 +40,6 @@ func ValidCode(code, intervalStr, secret string) bool {
 	}
 	totp := gotp.NewTOTP(secret, 6, interval, nil)
 	now := time.Now().Unix()
-	strInt64 := strconv.FormatInt(now, 10)
-	id16, _ := strconv.Atoi(strInt64)
-	return totp.Verify(code, int64(id16))
+	prevTime := now - int64(interval)
+	return totp.Verify(code, now) || totp.Verify(code, prevTime)
 }
