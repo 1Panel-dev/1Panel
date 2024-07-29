@@ -253,3 +253,11 @@ var InitPHPExtensions = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddTask = &gormigrate.Migration{
+	ID: "20240724-add-task",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(
+			&model.Task{})
+	},
+}

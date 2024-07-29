@@ -1,8 +1,6 @@
 package v1
 
 import (
-	"encoding/base64"
-
 	"github.com/1Panel-dev/1Panel/agent/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
@@ -77,14 +75,6 @@ func (b *BaseApi) CreateWebsite(c *gin.Context) {
 	var req request.WebsiteCreate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
-	}
-	if len(req.FtpPassword) != 0 {
-		pass, err := base64.StdEncoding.DecodeString(req.FtpPassword)
-		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-			return
-		}
-		req.FtpPassword = string(pass)
 	}
 	err := websiteService.CreateWebsite(req)
 	if err != nil {

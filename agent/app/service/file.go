@@ -466,7 +466,13 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 				return nil, fmt.Errorf("handle ungzip file %s failed, err: %v", fileGzPath, err)
 			}
 		}
-	case "image-pull", "image-push", "image-build", "compose-create":
+	case constant.TypeTask:
+		task, err := taskRepo.GetFirst(taskRepo.WithByID(req.TaskID))
+		if err != nil {
+			return nil, err
+		}
+		logFilePath = task.LogFile
+	case constant.TypeImagePull, constant.TypeImagePush, constant.TypeImageBuild, constant.TypeComposeCreate:
 		logFilePath = path.Join(global.CONF.System.TmpDir, fmt.Sprintf("docker_logs/%s", req.Name))
 	}
 

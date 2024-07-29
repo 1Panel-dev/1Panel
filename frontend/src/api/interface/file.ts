@@ -174,6 +174,7 @@ export namespace File {
         name?: string;
         page: number;
         pageSize: number;
+        taskID?: string;
     }
 
     export interface Favorite extends CommonModel {

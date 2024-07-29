@@ -22,7 +22,7 @@ func Proxy() gin.HandlerFunc {
 			return
 		}
 		currentNode := c.Request.Header.Get("CurrentNode")
-		if currentNode == "127.0.0.1" {
+		if len(currentNode) == 0 || currentNode == "127.0.0.1" {
 			sockPath := "/tmp/agent.sock"
 			if _, err := os.Stat(sockPath); err != nil {
 				helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrProxy, err)

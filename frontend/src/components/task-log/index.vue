@@ -1,69 +1,24 @@
 <template>
-    <div>
-        <div v-if="defaultButton">
-            <el-checkbox border v-model="tailLog" class="float-left" @change="changeTail(false)">
-                {{ $t('commons.button.watch') }}
-            </el-checkbox>
-            <el-button class="ml-2.5" @click="onDownload" icon="Download" :disabled="data.content === ''">
-                {{ $t('file.download') }}
-            </el-button>
-            <span v-if="$slots.button" class="ml-2.5">
-                <slot name="button"></slot>
-            </span>
+    <el-dialog
+        v-model="open"
+        :destroy-on-close="true"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        :show-close="showClose"
+        :before-close="handleClose"
+        class="task-log-dialog"
+    >
+        <div>
+            <highlightjs ref="editorRef" language="JavaScript" :autodetect="false" :code="content"></highlightjs>
         </div>
-        <div class="mt-2.5">
-            <highlightjs
-                ref="editorRef"
-                class="editor-main"
-                language="JavaScript"
-                :autodetect="false"
-                :code="content"
-            ></highlightjs>
-        </div>
-    </div>
+    </el-dialog>
 </template>
 <script lang="ts" setup>
-import { nextTick, onMounted, onUnmounted, reactive, ref } from 'vue';
-import { downloadFile } from '@/utils/util';
+import { nextTick, onUnmounted, reactive, ref } from 'vue';
 import { ReadByLine } from '@/api/modules/files';
-import { watch } from 'vue';
 
 const editorRef = ref();
 
-interface LogProps {
-    id?: number;
-    type: string;
-    name?: string;
-    tail?: boolean;
-}
-
-const props = defineProps({
-    config: {
-        type: Object as () => LogProps | null,
-        default: () => ({
-            id: 0,
-            type: '',
-            name: '',
-            tail: false,
-        }),
-    },
-    style: {
-        type: String,
-        default: 'height: calc(100vh - 200px); width: 100%; min-height: 400px; overflow: auto;',
-    },
-    defaultButton: {
-        type: Boolean,
-        default: true,
-    },
-    loading: {
-        type: Boolean,
-        default: true,
-    },
-    hasContent: {
-        type: Boolean,
-        default: false,
-    },
-});
 const data = ref({
     enable: false,
     content: '',
@@ -78,47 +33,32 @@ const lastContent = ref('');
 const scrollerElement = ref<HTMLElement | null>(null);
 const minPage = ref(1);
 const maxPage = ref(1);
+const open = ref(false);
+const taskID = ref('');
+const showClose = ref(false);
 
 const readReq = reactive({
-    id: 0,
-    type: '',
-    name: '',
+    taskID: '',
+    type: 'task',
     page: 1,
     pageSize: 500,
     latest: false,
 });
-const emit = defineEmits(['update:loading', 'update:hasContent', 'update:isReading']);
 
-const loading = ref(props.loading);
+const stopSignals = ['[TASK-END]'];
 
-watch(
-    () => props.loading,
-    (newLoading) => {
-        loading.value = newLoading;
-    },
-);
-
-const changeLoading = () => {
-    loading.value = !loading.value;
-    emit('update:loading', loading.value);
+const acceptParams = (id: string, closeShow: boolean) => {
+    if (closeShow) {
+        showClose.value = closeShow;
+    }
+    taskID.value = id;
+    open.value = true;
+    initCodemirror();
+    init();
 };
 
-const stopSignals = [
-    'docker-compose up failed!',
-    'docker-compose up successful!',
-    'image build failed!',
-    'image build successful!',
-    'image pull failed!',
-    'image pull successful!',
-    'image push failed!',
-    'image push successful!',
-];
-
 const getContent = (pre: boolean) => {
-    emit('update:isReading', true);
-    readReq.id = props.config.id;
-    readReq.type = props.config.type;
-    readReq.name = props.config.name;
+    readReq.taskID = taskID.value;
     if (readReq.page < 1) {
         readReq.page = 1;
     }
@@ -154,7 +94,6 @@ const getContent = (pre: boolean) => {
             }
         }
         end.value = res.data.end;
-        emit('update:hasContent', content.value !== '');
         nextTick(() => {
             if (pre) {
                 if (scrollerElement.value.scrollHeight > 2000) {
@@ -187,14 +126,12 @@ const changeTail = (fromOutSide: boolean) => {
     }
 };
 
-const onDownload = async () => {
-    changeLoading();
-    downloadFile(data.value.path);
-    changeLoading();
+const handleClose = () => {
+    onCloseLog();
+    open.value = false;
 };
 
 const onCloseLog = async () => {
-    emit('update:isReading', false);
     tailLog.value = false;
     clearInterval(Number(timer));
     timer = null;
@@ -209,22 +146,12 @@ function isScrolledToTop(element: HTMLElement): boolean {
 }
 
 const init = () => {
-    if (props.config.tail) {
-        tailLog.value = props.config.tail;
-    } else {
-        tailLog.value = false;
-    }
+    tailLog.value = true;
     if (tailLog.value) {
         changeTail(false);
     }
     readReq.latest = true;
     getContent(false);
-
-    nextTick(() => {});
-};
-
-const clearLog = (): void => {
-    content.value = '';
 };
 
 const initCodemirror = () => {
@@ -255,18 +182,31 @@ onUnmounted(() => {
     onCloseLog();
 });
 
-onMounted(() => {
-    initCodemirror();
-    init();
-});
-
-defineExpose({ changeTail, onDownload, clearLog });
+defineExpose({ acceptParams, handleClose });
 </script>
 <style lang="scss" scoped>
-.editor-main {
-    height: calc(100vh - 480px);
-    width: 100%;
-    min-height: 600px;
-    overflow: auto;
+.task-log-dialog {
+    --dialog-max-height: 80vh;
+    --dialog-header-height: 50px;
+    --dialog-padding: 20px;
+    .el-dialog {
+        max-width: 60%;
+        max-height: var(--dialog-max-height);
+        margin-top: 5vh !important;
+        display: flex;
+        flex-direction: column;
+    }
+    .el-dialog__body {
+        flex: 1;
+        overflow: hidden;
+        padding: var(--dialog-padding);
+    }
+    .log-container {
+        height: calc(var(--dialog-max-height) - var(--dialog-header-height) - var(--dialog-padding) * 2);
+        overflow: hidden;
+    }
+    .log-file {
+        height: 100%;
+    }
 }
 </style>

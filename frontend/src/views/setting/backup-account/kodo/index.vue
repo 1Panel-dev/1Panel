@@ -29,7 +29,7 @@
                 </el-button>
                 <span v-if="errBuckets" class="input-error">{{ $t('commons.rule.requiredSelect') }}</span>
             </el-form-item>
-           <el-form-item :label="$t('cronjob.requestExpirationTime')" prop="varsJson.timeout">
+            <el-form-item :label="$t('cronjob.requestExpirationTime')" prop="varsJson.timeout">
                 <el-input-number
                     style="width: 200px"
                     :min="1"
