@@ -41,6 +41,8 @@ const GlobalStore = defineStore({
         productProExpires: 0,
 
         errStatus: '',
+
+        currentNode: '',
     }),
     getters: {
         isDarkTheme: (state) =>

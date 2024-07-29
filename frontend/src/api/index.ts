@@ -26,6 +26,7 @@ class RequestHttp {
                     'Accept-Language': language,
                     ...config.headers,
                 };
+                config.headers.CurrentNode = globalStore.currentNode;
                 if (config.url === '/auth/login' || config.url === '/auth/mfalogin') {
                     let entrance = Base64.encode(globalStore.entrance);
                     config.headers.EntranceCode = entrance;

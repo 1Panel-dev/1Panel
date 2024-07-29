@@ -37,6 +37,8 @@ export interface GlobalState {
     productProExpires: number;
 
     errStatus: string;
+
+    currentNode: string;
 }
 
 export interface MenuState {

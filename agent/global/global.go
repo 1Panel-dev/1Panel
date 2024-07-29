@@ -26,5 +26,7 @@ var (
 	MonitorCronID  cron.EntryID
 	OneDriveCronID cron.EntryID
 
+	CurrentNode string
+
 	I18n *i18n.Localizer
 )

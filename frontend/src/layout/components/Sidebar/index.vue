@@ -7,6 +7,21 @@
         element-loading-background="rgba(122, 122, 122, 0.01)"
     >
         <Logo :isCollapse="isCollapse" />
+
+        <span v-if="nodes.length !== 1" class="el-dropdown-link">
+            {{ globalStore.currentNode || '127.0.0.1' }}
+        </span>
+        <el-dropdown v-if="nodes.length !== 1" placement="right-start" @command="changeNode">
+            <el-icon class="ico"><Switch /></el-icon>
+            <template #dropdown>
+                <el-dropdown-menu>
+                    <el-dropdown-item v-for="item in nodes" :key="item.name" :command="item.name">
+                        {{ item.name }}
+                    </el-dropdown-item>
+                </el-dropdown-menu>
+            </template>
+        </el-dropdown>
+
         <el-scrollbar>
             <el-menu
                 :default-active="activeMenu"
@@ -50,6 +65,7 @@ import { getSettingInfo } from '@/api/modules/setting';
 const route = useRoute();
 const menuStore = MenuStore();
 const globalStore = GlobalStore();
+const nodes = ref([]);
 defineProps({
     menuRouter: {
         type: Boolean,
@@ -108,6 +124,30 @@ const logout = () => {
 
 const systemLogOut = async () => {
     await logOutApi();
+};
+
+const loadNodes = async () => {
+    if (globalStore.isProductPro) {
+        let listXNodes;
+        const xpackModules = import.meta.glob('../../../xpack/api/modules/node.ts', { eager: true });
+        if (xpackModules['../../../xpack/api/modules/node.ts']) {
+            console.log('dqwdqwd');
+            listXNodes = xpackModules['../../../xpack/api/modules/node.ts']['listNodes'] || {};
+            const res = await listXNodes();
+            if (!res) {
+                nodes.value = [];
+                return;
+            }
+            console.log('dqwdqwd');
+            nodes.value = res.data;
+            return;
+        }
+        nodes.value = [];
+    }
+};
+const changeNode = (command: string) => {
+    globalStore.currentNode = command || '127.0.0.1';
+    location.reload();
 };
 
 function extractLabels(node: Node, result: string[]): void {
@@ -172,6 +212,7 @@ const search = async () => {
 onMounted(() => {
     menuStore.setMenuList(menuList);
     search();
+    loadNodes();
 });
 </script>
 
@@ -193,5 +234,24 @@ onMounted(() => {
             border-right: none;
         }
     }
+}
+
+.el-dropdown-link {
+    margin-top: -5px;
+    margin-left: 30px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--el-color-primary);
+    display: flex;
+    align-items: center;
+    height: 28px;
+}
+.ico {
+    margin-top: -20px;
+    display: flex;
+    float: left;
+    position: absolute;
+    right: 25px;
 }
 </style>

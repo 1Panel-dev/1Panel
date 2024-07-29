@@ -1,5 +1,5 @@
 system:
-  db_file: agent.db
+  db_agent_file: agent.db
   base_dir: /opt
   mode: dev
   repo_url: https://resource.fit2cloud.com/1panel/package
