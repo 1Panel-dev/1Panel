@@ -30,7 +30,8 @@ type WebsiteCreate struct {
 	FtpUser     string `json:"ftpUser"`
 	FtpPassword string `json:"ftpPassword"`
 
-	RuntimeID uint `json:"runtimeID"`
+	RuntimeID uint   `json:"runtimeID"`
+	TaskID    string `json:"taskID"`
 	RuntimeConfig
 }
 

@@ -346,6 +346,7 @@
                 {{ $t('runtime.openrestyWarn') }}
             </span>
         </el-card>
+        <TaskLog ref="taskLog" />
     </DrawerPro>
 </template>
 
@@ -365,6 +366,8 @@ import { Group } from '@/api/interface/group';
 import { SearchRuntimes } from '@/api/modules/runtime';
 import { Runtime } from '@/api/interface/runtime';
 import { getRandomStr } from '@/utils/util';
+import TaskLog from '@/components/task-log/index.vue';
+import { v4 as uuidv4 } from 'uuid';
 
 const websiteForm = ref<FormInstance>();
 const website = ref({
@@ -402,6 +405,7 @@ const website = ref({
     proxyProtocol: 'http://',
     proxyAddress: '',
     runtimeType: 'php',
+    taskID: '',
 });
 const rules = ref<any>({
     primaryDomain: [Rules.domainWithPort],
@@ -453,6 +457,7 @@ const runtimeReq = ref<Runtime.RuntimeReq>({
 const runtimes = ref<Runtime.RuntimeDTO[]>([]);
 const versionExist = ref(true);
 const em = defineEmits(['close']);
+const taskLog = ref();
 
 const handleClose = () => {
     open.value = false;
@@ -612,6 +617,10 @@ function isSubsetOfStrArray(primaryDomain: string, otherDomains: string): boolea
     return true;
 }
 
+const openTaskLog = (taskID: string) => {
+    taskLog.value.acceptParams(taskID);
+};
+
 const submit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     await formEl.validate((valid) => {
@@ -638,6 +647,8 @@ const submit = async (formEl: FormInstance | undefined) => {
                         website.value.ftpUser = '';
                         website.value.ftpPassword = '';
                     }
+                    const taskID = uuidv4();
+                    website.value.taskID = taskID;
                     CreateWebsite(website.value)
                         .then(() => {
                             MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
@@ -646,6 +657,7 @@ const submit = async (formEl: FormInstance | undefined) => {
                         .finally(() => {
                             loading.value = false;
                         });
+                    openTaskLog(taskID);
                 }
             })
             .catch(() => {

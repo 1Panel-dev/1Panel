@@ -43,4 +43,6 @@ var (
 	phpExtensionsRepo = repo.NewIPHPExtensionsRepo()
 
 	favoriteRepo = repo.NewIFavoriteRepo()
+
+	taskRepo = repo.NewITaskRepo()
 )

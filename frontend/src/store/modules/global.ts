@@ -42,7 +42,7 @@ const GlobalStore = defineStore({
 
         errStatus: '',
 
-        currentNode: '',
+        currentNode: '127.0.0.1',
     }),
     getters: {
         isDarkTheme: (state) =>

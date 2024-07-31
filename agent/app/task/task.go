@@ -3,28 +3,35 @@ package task
 import (
 	"context"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
+	"github.com/google/uuid"
 	"log"
 	"os"
 	"path"
 	"strconv"
 	"time"
-
-	"github.com/1Panel-dev/1Panel/agent/constant"
-	"github.com/1Panel-dev/1Panel/agent/i18n"
 )
 
-type ActionFunc func() error
+type ActionFunc func(*Task) error
 type RollbackFunc func()
 
 type Task struct {
 	Name      string
+	TaskID    string
 	Logger    *log.Logger
 	SubTasks  []*SubTask
 	Rollbacks []RollbackFunc
 	logFile   *os.File
+	taskRepo  repo.ITaskRepo
+	Task      *model.Task
+	ParentID  string
 }
 
 type SubTask struct {
+	RootTask *Task
 	Name     string
 	Retry    int
 	Timeout  time.Duration
@@ -33,51 +40,107 @@ type SubTask struct {
 	Error    error
 }
 
-func NewTask(name string, taskType string) (*Task, error) {
-	logPath := path.Join(constant.LogDir, taskType)
-	//TODO 增加插入到日志表的逻辑
+const (
+	TaskInstall   = "TaskInstall"
+	TaskUninstall = "TaskUninstall"
+	TaskCreate    = "TaskCreate"
+	TaskDelete    = "TaskDelete"
+	TaskUpgrade   = "TaskUpgrade"
+	TaskUpdate    = "TaskUpdate"
+	TaskRestart   = "TaskRestart"
+)
+
+const (
+	TaskScopeWebsite  = "Website"
+	TaskScopeApp      = "App"
+	TaskScopeRuntime  = "Runtime"
+	TaskScopeDatabase = "Database"
+)
+
+const (
+	TaskSuccess = "Success"
+	TaskFailed  = "Failed"
+)
+
+func GetTaskName(resourceName, operate, scope string) string {
+	return fmt.Sprintf("%s%s [%s]", i18n.GetMsgByKey(operate), i18n.GetMsgByKey(scope), resourceName)
+}
+
+func NewTaskWithOps(resourceName, operate, scope, taskID string) (*Task, error) {
+	return NewTask(GetTaskName(resourceName, operate, scope), scope, taskID)
+}
+
+func NewChildTask(name, taskType, parentTaskID string) (*Task, error) {
+	task, err := NewTask(name, taskType, "")
+	if err != nil {
+		return nil, err
+	}
+	task.ParentID = parentTaskID
+	return task, nil
+}
+
+func NewTask(name, taskType, taskID string) (*Task, error) {
+	if taskID == "" {
+		taskID = uuid.New().String()
+	}
+	logDir := path.Join(constant.LogDir, taskType)
+	if _, err := os.Stat(logDir); os.IsNotExist(err) {
+		if err = os.MkdirAll(logDir, 0755); err != nil {
+			return nil, fmt.Errorf("failed to create log directory: %w", err)
+		}
+	}
+	logPath := path.Join(constant.LogDir, taskType, taskID+".log")
 	file, err := os.OpenFile(logPath, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open log file: %w", err)
 	}
 	logger := log.New(file, "", log.LstdFlags)
-	return &Task{Name: name, logFile: file, Logger: logger}, nil
+	taskModel := &model.Task{
+		ID:      taskID,
+		Name:    name,
+		Type:    taskType,
+		LogFile: logPath,
+		Status:  constant.StatusRunning,
+	}
+	taskRepo := repo.NewITaskRepo()
+	task := &Task{Name: name, logFile: file, Logger: logger, taskRepo: taskRepo, Task: taskModel}
+	return task, nil
 }
 
 func (t *Task) AddSubTask(name string, action ActionFunc, rollback RollbackFunc) {
-	subTask := &SubTask{Name: name, Retry: 0, Timeout: 10 * time.Minute, Action: action, Rollback: rollback}
+	subTask := &SubTask{RootTask: t, Name: name, Retry: 0, Timeout: 10 * time.Minute, Action: action, Rollback: rollback}
 	t.SubTasks = append(t.SubTasks, subTask)
 }
 
 func (t *Task) AddSubTaskWithOps(name string, action ActionFunc, rollback RollbackFunc, retry int, timeout time.Duration) {
-	subTask := &SubTask{Name: name, Retry: retry, Timeout: timeout, Action: action, Rollback: rollback}
+	subTask := &SubTask{RootTask: t, Name: name, Retry: retry, Timeout: timeout, Action: action, Rollback: rollback}
 	t.SubTasks = append(t.SubTasks, subTask)
 }
 
-func (s *SubTask) Execute(logger *log.Logger) bool {
-	logger.Printf(i18n.GetWithName("SubTaskStart", s.Name))
+func (s *SubTask) Execute() error {
+	s.RootTask.Log(s.Name)
+	var err error
 	for i := 0; i < s.Retry+1; i++ {
 		if i > 0 {
-			logger.Printf(i18n.GetWithName("TaskRetry", strconv.Itoa(i)))
+			s.RootTask.Log(i18n.GetWithName("TaskRetry", strconv.Itoa(i)))
 		}
 		ctx, cancel := context.WithTimeout(context.Background(), s.Timeout)
 		defer cancel()
 
 		done := make(chan error)
 		go func() {
-			done <- s.Action()
+			done <- s.Action(s.RootTask)
 		}()
 
 		select {
 		case <-ctx.Done():
-			logger.Printf(i18n.GetWithName("TaskTimeout", s.Name))
-		case err := <-done:
+			s.RootTask.Log(i18n.GetWithName("TaskTimeout", s.Name))
+		case err = <-done:
 			if err != nil {
-				s.Error = err
-				logger.Printf(i18n.GetWithNameAndErr("TaskFailed", s.Name, err))
+				s.RootTask.Log(i18n.GetWithNameAndErr("SubTaskFailed", s.Name, err))
 			} else {
-				logger.Printf(i18n.GetWithName("TaskSuccess", s.Name))
-				return true
+				s.RootTask.Log(i18n.GetWithName("SubTaskSuccess", s.Name))
+				return nil
 			}
 		}
 
@@ -88,29 +151,77 @@ func (s *SubTask) Execute(logger *log.Logger) bool {
 		}
 		time.Sleep(1 * time.Second)
 	}
-	if s.Error != nil {
-		s.Error = fmt.Errorf(i18n.GetWithName("TaskFailed", s.Name))
-	}
-	return false
+	return err
+}
+
+func (t *Task) updateTask(task *model.Task) {
+	_ = t.taskRepo.Update(context.Background(), task)
 }
 
 func (t *Task) Execute() error {
-	t.Logger.Printf(i18n.GetWithName("TaskStart", t.Name))
+	if err := t.taskRepo.Create(context.Background(), t.Task); err != nil {
+		return err
+	}
 	var err error
+	t.Log(i18n.GetWithName("TaskStart", t.Name))
 	for _, subTask := range t.SubTasks {
-		if subTask.Execute(t.Logger) {
+		t.Task.CurrentStep = subTask.Name
+		t.updateTask(t.Task)
+		if err = subTask.Execute(); err == nil {
 			if subTask.Rollback != nil {
 				t.Rollbacks = append(t.Rollbacks, subTask.Rollback)
 			}
 		} else {
-			err = subTask.Error
+			t.Task.ErrorMsg = err.Error()
+			t.Task.Status = constant.StatusFailed
 			for _, rollback := range t.Rollbacks {
 				rollback()
 			}
+			t.updateTask(t.Task)
 			break
 		}
 	}
-	t.Logger.Printf(i18n.GetWithName("TaskEnd", t.Name))
+	if t.Task.Status == constant.Running {
+		t.Task.Status = constant.StatusSuccess
+		t.Log(i18n.GetWithName("TaskSuccess", t.Name))
+	} else {
+		t.Log(i18n.GetWithName("TaskFailed", t.Name))
+	}
+	t.Log("[TASK-END]")
+	t.Task.EndAt = time.Now()
+	t.updateTask(t.Task)
 	_ = t.logFile.Close()
 	return err
+}
+
+func (t *Task) DeleteLogFile() {
+	_ = os.Remove(t.Task.LogFile)
+}
+
+func (t *Task) LogWithStatus(msg string, err error) {
+	if err != nil {
+		t.Logger.Printf(i18n.GetWithNameAndErr("FailedStatus", msg, err))
+	} else {
+		t.Logger.Printf(i18n.GetWithName("SuccessStatus", msg))
+	}
+}
+
+func (t *Task) Log(msg string) {
+	t.Logger.Printf(msg)
+}
+
+func (t *Task) LogFailed(msg string) {
+	t.Logger.Printf(msg + i18n.GetMsgByKey("Failed"))
+}
+
+func (t *Task) LogFailedWithErr(msg string, err error) {
+	t.Logger.Printf(fmt.Sprintf("%s %s : %s", msg, i18n.GetMsgByKey("Failed"), err.Error()))
+}
+
+func (t *Task) LogSuccess(msg string) {
+	t.Logger.Printf(msg + i18n.GetMsgByKey("Success"))
+}
+
+func (t *Task) LogStart(msg string) {
+	t.Logger.Printf(fmt.Sprintf("%s%s", i18n.GetMsgByKey("Start"), msg))
 }

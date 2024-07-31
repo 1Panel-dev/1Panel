@@ -51,6 +51,7 @@ func Start() {
 			panic(err)
 		}
 		_ = server.Serve(listener)
+		return
 	} else {
 		server.Addr = "0.0.0.0:9999"
 		settingRepo := repo.NewISettingRepo()

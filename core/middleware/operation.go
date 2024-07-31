@@ -27,7 +27,7 @@ func OperationLog() gin.HandlerFunc {
 		}
 
 		source := loadLogInfo(c.Request.URL.Path)
-		record := model.OperationLog{
+		record := &model.OperationLog{
 			Source:    source,
 			IP:        c.ClientIP(),
 			Method:    strings.ToLower(c.Request.Method),

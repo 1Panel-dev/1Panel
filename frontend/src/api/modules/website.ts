@@ -19,7 +19,7 @@ export const CreateWebsite = (req: Website.WebSiteCreateReq) => {
     if (request.ftpPassword) {
         request.ftpPassword = Base64.encode(request.ftpPassword);
     }
-    return http.post<any>(`/websites`, request);
+    return http.post<any>(`/websites`, request, TimeoutEnum.T_10M);
 };
 
 export const OpWebsite = (req: Website.WebSiteOp) => {

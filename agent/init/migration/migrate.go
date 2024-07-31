@@ -17,6 +17,7 @@ func Init() {
 		migrations.InitDefaultGroup,
 		migrations.InitDefaultCA,
 		migrations.InitPHPExtensions,
+		migrations.AddTask,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

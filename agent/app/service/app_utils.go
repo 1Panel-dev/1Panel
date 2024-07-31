@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"math"
 	"net/http"
 	"os"
@@ -130,78 +131,82 @@ var ToolKeys = map[string]uint{
 	"minio": 9001,
 }
 
-func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall, params map[string]interface{}) error {
+func createLink(ctx context.Context, installTask *task.Task, app model.App, appInstall *model.AppInstall, params map[string]interface{}) error {
+	deleteAppLink := func() {
+		_ = deleteLink(ctx, appInstall, true, true, true)
+	}
 	var dbConfig dto.AppDatabase
 	if DatabaseKeys[app.Key] > 0 {
-		database := &model.Database{
-			AppInstallID: appInstall.ID,
-			Name:         appInstall.Name,
-			Type:         app.Key,
-			Version:      appInstall.Version,
-			From:         "local",
-			Address:      appInstall.ServiceName,
-			Port:         DatabaseKeys[app.Key],
-		}
-		detail, err := appDetailRepo.GetFirst(commonRepo.WithByID(appInstall.AppDetailId))
-		if err != nil {
-			return err
-		}
-
-		formFields := &dto.AppForm{}
-		if err := json.Unmarshal([]byte(detail.Params), formFields); err != nil {
-			return err
-		}
-		for _, form := range formFields.FormFields {
-			if form.EnvKey == "PANEL_APP_PORT_HTTP" {
-				portFloat, ok := form.Default.(float64)
-				if ok {
-					database.Port = uint(int(portFloat))
-				}
-				break
+		handleDataBaseApp := func(task *task.Task) error {
+			database := &model.Database{
+				AppInstallID: appInstall.ID,
+				Name:         appInstall.Name,
+				Type:         app.Key,
+				Version:      appInstall.Version,
+				From:         "local",
+				Address:      appInstall.ServiceName,
+				Port:         DatabaseKeys[app.Key],
 			}
-		}
+			detail, err := appDetailRepo.GetFirst(commonRepo.WithByID(appInstall.AppDetailId))
+			if err != nil {
+				return err
+			}
 
-		switch app.Key {
-		case constant.AppMysql, constant.AppMariaDB, constant.AppPostgresql, constant.AppMongodb:
-			if password, ok := params["PANEL_DB_ROOT_PASSWORD"]; ok {
-				if password != "" {
+			formFields := &dto.AppForm{}
+			if err := json.Unmarshal([]byte(detail.Params), formFields); err != nil {
+				return err
+			}
+			for _, form := range formFields.FormFields {
+				if form.EnvKey == "PANEL_APP_PORT_HTTP" {
+					portFloat, ok := form.Default.(float64)
+					if ok {
+						database.Port = uint(int(portFloat))
+					}
+					break
+				}
+			}
+
+			switch app.Key {
+			case constant.AppMysql, constant.AppMariaDB, constant.AppPostgresql, constant.AppMongodb:
+				if password, ok := params["PANEL_DB_ROOT_PASSWORD"]; ok {
+					if password != "" {
+						database.Password = password.(string)
+						if app.Key == "mysql" || app.Key == "mariadb" {
+							database.Username = "root"
+						}
+						if rootUser, ok := params["PANEL_DB_ROOT_USER"]; ok {
+							database.Username = rootUser.(string)
+						}
+						authParam := dto.AuthParam{
+							RootPassword: password.(string),
+							RootUser:     database.Username,
+						}
+						authByte, err := json.Marshal(authParam)
+						if err != nil {
+							return err
+						}
+						appInstall.Param = string(authByte)
+
+					}
+				}
+			case constant.AppRedis:
+				if password, ok := params["PANEL_REDIS_ROOT_PASSWORD"]; ok {
+					if password != "" {
+						authParam := dto.RedisAuthParam{
+							RootPassword: password.(string),
+						}
+						authByte, err := json.Marshal(authParam)
+						if err != nil {
+							return err
+						}
+						appInstall.Param = string(authByte)
+					}
 					database.Password = password.(string)
-					if app.Key == "mysql" || app.Key == "mariadb" {
-						database.Username = "root"
-					}
-					if rootUser, ok := params["PANEL_DB_ROOT_USER"]; ok {
-						database.Username = rootUser.(string)
-					}
-					authParam := dto.AuthParam{
-						RootPassword: password.(string),
-						RootUser:     database.Username,
-					}
-					authByte, err := json.Marshal(authParam)
-					if err != nil {
-						return err
-					}
-					appInstall.Param = string(authByte)
-
 				}
 			}
-		case constant.AppRedis:
-			if password, ok := params["PANEL_REDIS_ROOT_PASSWORD"]; ok {
-				if password != "" {
-					authParam := dto.RedisAuthParam{
-						RootPassword: password.(string),
-					}
-					authByte, err := json.Marshal(authParam)
-					if err != nil {
-						return err
-					}
-					appInstall.Param = string(authByte)
-				}
-				database.Password = password.(string)
-			}
+			return databaseRepo.Create(ctx, database)
 		}
-		if err := databaseRepo.Create(ctx, database); err != nil {
-			return err
-		}
+		installTask.AddSubTask(i18n.GetMsgByKey("HandleDatabaseApp"), handleDataBaseApp, deleteAppLink)
 	}
 	if ToolKeys[app.Key] > 0 {
 		if app.Key == "minio" {
@@ -231,95 +236,79 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 	}
 
 	if !reflect.DeepEqual(dbConfig, dto.AppDatabase{}) && dbConfig.ServiceName != "" {
-		hostName := params["PANEL_DB_HOST_NAME"]
-		if hostName == nil || hostName.(string) == "" {
-			return nil
-		}
-		database, _ := databaseRepo.Get(commonRepo.WithByName(hostName.(string)))
-		if database.ID == 0 {
-			return nil
-		}
-		var resourceId uint
-		if dbConfig.DbName != "" && dbConfig.DbUser != "" && dbConfig.Password != "" {
-			switch database.Type {
-			case constant.AppPostgresql, constant.AppPostgres:
-				iPostgresqlRepo := repo.NewIPostgresqlRepo()
-				oldPostgresqlDb, _ := iPostgresqlRepo.Get(commonRepo.WithByName(dbConfig.DbName), iPostgresqlRepo.WithByFrom(constant.ResourceLocal))
-				resourceId = oldPostgresqlDb.ID
-				if oldPostgresqlDb.ID > 0 {
-					if oldPostgresqlDb.Username != dbConfig.DbUser || oldPostgresqlDb.Password != dbConfig.Password {
-						return buserr.New(constant.ErrDbUserNotValid)
+		createAppDataBase := func(rootTask *task.Task) error {
+			hostName := params["PANEL_DB_HOST_NAME"]
+			if hostName == nil || hostName.(string) == "" {
+				return nil
+			}
+			database, _ := databaseRepo.Get(commonRepo.WithByName(hostName.(string)))
+			if database.ID == 0 {
+				return nil
+			}
+			var resourceId uint
+			if dbConfig.DbName != "" && dbConfig.DbUser != "" && dbConfig.Password != "" {
+				switch database.Type {
+				case constant.AppPostgresql, constant.AppPostgres:
+					iPostgresqlRepo := repo.NewIPostgresqlRepo()
+					oldPostgresqlDb, _ := iPostgresqlRepo.Get(commonRepo.WithByName(dbConfig.DbName), iPostgresqlRepo.WithByFrom(constant.ResourceLocal))
+					resourceId = oldPostgresqlDb.ID
+					if oldPostgresqlDb.ID > 0 {
+						if oldPostgresqlDb.Username != dbConfig.DbUser || oldPostgresqlDb.Password != dbConfig.Password {
+							return buserr.New(constant.ErrDbUserNotValid)
+						}
+					} else {
+						var createPostgresql dto.PostgresqlDBCreate
+						createPostgresql.Name = dbConfig.DbName
+						createPostgresql.Username = dbConfig.DbUser
+						createPostgresql.Database = database.Name
+						createPostgresql.Format = "UTF8"
+						createPostgresql.Password = dbConfig.Password
+						createPostgresql.From = database.From
+						createPostgresql.SuperUser = true
+						pgdb, err := NewIPostgresqlService().Create(ctx, createPostgresql)
+						if err != nil {
+							return err
+						}
+						resourceId = pgdb.ID
 					}
-				} else {
-					var createPostgresql dto.PostgresqlDBCreate
-					createPostgresql.Name = dbConfig.DbName
-					createPostgresql.Username = dbConfig.DbUser
-					createPostgresql.Database = database.Name
-					createPostgresql.Format = "UTF8"
-					createPostgresql.Password = dbConfig.Password
-					createPostgresql.From = database.From
-					createPostgresql.SuperUser = true
-					pgdb, err := NewIPostgresqlService().Create(ctx, createPostgresql)
-					if err != nil {
-						return err
+				case constant.AppMysql, constant.AppMariaDB:
+					iMysqlRepo := repo.NewIMysqlRepo()
+					oldMysqlDb, _ := iMysqlRepo.Get(commonRepo.WithByName(dbConfig.DbName), iMysqlRepo.WithByFrom(constant.ResourceLocal))
+					resourceId = oldMysqlDb.ID
+					if oldMysqlDb.ID > 0 {
+						if oldMysqlDb.Username != dbConfig.DbUser || oldMysqlDb.Password != dbConfig.Password {
+							return buserr.New(constant.ErrDbUserNotValid)
+						}
+					} else {
+						var createMysql dto.MysqlDBCreate
+						createMysql.Name = dbConfig.DbName
+						createMysql.Username = dbConfig.DbUser
+						createMysql.Database = database.Name
+						createMysql.Format = "utf8mb4"
+						createMysql.Permission = "%"
+						createMysql.Password = dbConfig.Password
+						createMysql.From = database.From
+						mysqldb, err := NewIMysqlService().Create(ctx, createMysql)
+						if err != nil {
+							return err
+						}
+						resourceId = mysqldb.ID
 					}
-					resourceId = pgdb.ID
-				}
-			case constant.AppMysql, constant.AppMariaDB:
-				iMysqlRepo := repo.NewIMysqlRepo()
-				oldMysqlDb, _ := iMysqlRepo.Get(commonRepo.WithByName(dbConfig.DbName), iMysqlRepo.WithByFrom(constant.ResourceLocal))
-				resourceId = oldMysqlDb.ID
-				if oldMysqlDb.ID > 0 {
-					if oldMysqlDb.Username != dbConfig.DbUser || oldMysqlDb.Password != dbConfig.Password {
-						return buserr.New(constant.ErrDbUserNotValid)
-					}
-				} else {
-					var createMysql dto.MysqlDBCreate
-					createMysql.Name = dbConfig.DbName
-					createMysql.Username = dbConfig.DbUser
-					createMysql.Database = database.Name
-					createMysql.Format = "utf8mb4"
-					createMysql.Permission = "%"
-					createMysql.Password = dbConfig.Password
-					createMysql.From = database.From
-					mysqldb, err := NewIMysqlService().Create(ctx, createMysql)
-					if err != nil {
-						return err
-					}
-					resourceId = mysqldb.ID
 				}
 			}
-
+			var installResource model.AppInstallResource
+			installResource.ResourceId = resourceId
+			installResource.AppInstallId = appInstall.ID
+			if database.AppInstallID > 0 {
+				installResource.LinkId = database.AppInstallID
+			} else {
+				installResource.LinkId = database.ID
+			}
+			installResource.Key = database.Type
+			installResource.From = database.From
+			return appInstallResourceRepo.Create(ctx, &installResource)
 		}
-		var installResource model.AppInstallResource
-		installResource.ResourceId = resourceId
-		installResource.AppInstallId = appInstall.ID
-		if database.AppInstallID > 0 {
-			installResource.LinkId = database.AppInstallID
-		} else {
-			installResource.LinkId = database.ID
-		}
-		installResource.Key = database.Type
-		installResource.From = database.From
-		if err := appInstallResourceRepo.Create(ctx, &installResource); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func handleAppInstallErr(ctx context.Context, install *model.AppInstall) error {
-	op := files.NewFileOp()
-	appDir := install.GetPath()
-	dir, _ := os.Stat(appDir)
-	if dir != nil {
-		_, _ = compose.Down(install.GetComposePath())
-		if err := op.DeleteDir(appDir); err != nil {
-			return err
-		}
-	}
-	if err := deleteLink(ctx, install, true, true, true); err != nil {
-		return err
+		installTask.AddSubTask(task.GetTaskName(dbConfig.DbName, task.TaskCreate, task.TaskScopeDatabase), createAppDataBase, deleteAppLink)
 	}
 	return nil
 }
@@ -333,7 +322,8 @@ func deleteAppInstall(install model.AppInstall, deleteBackup bool, forceDelete b
 		if err != nil && !forceDelete {
 			return handleErr(install, err, out)
 		}
-		if err = runScript(&install, "uninstall"); err != nil {
+		//TODO use task
+		if err = runScript(nil, &install, "uninstall"); err != nil {
 			_, _ = compose.Up(install.GetComposePath())
 			return err
 		}
@@ -652,7 +642,8 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			return
 		}
 
-		if upErr = runScript(&install, "upgrade"); upErr != nil {
+		//TODO use task
+		if upErr = runScript(nil, &install, "upgrade"); upErr != nil {
 			return
 		}
 
@@ -800,7 +791,7 @@ func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.App
 	return
 }
 
-func copyData(app model.App, appDetail model.AppDetail, appInstall *model.AppInstall, req request.AppInstallCreate) (err error) {
+func copyData(task *task.Task, app model.App, appDetail model.AppDetail, appInstall *model.AppInstall, req request.AppInstallCreate) (err error) {
 	fileOp := files.NewFileOp()
 	appResourceDir := path.Join(constant.AppResourceDir, app.Resource)
 
@@ -853,7 +844,7 @@ func copyData(app model.App, appDetail model.AppDetail, appInstall *model.AppIns
 	return
 }
 
-func runScript(appInstall *model.AppInstall, operate string) error {
+func runScript(task *task.Task, appInstall *model.AppInstall, operate string) error {
 	workDir := appInstall.GetPath()
 	scriptPath := ""
 	switch operate {
@@ -867,15 +858,17 @@ func runScript(appInstall *model.AppInstall, operate string) error {
 	if !files.NewFileOp().Stat(scriptPath) {
 		return nil
 	}
+	logStr := i18n.GetWithName("ExecShell", operate)
+	task.LogStart(logStr)
 	out, err := cmd.ExecScript(scriptPath, workDir)
 	if err != nil {
 		if out != "" {
-			errMsg := fmt.Sprintf("run script %s error %s", scriptPath, out)
-			global.LOG.Error(errMsg)
-			return errors.New(errMsg)
+			err = errors.New(out)
 		}
+		task.LogFailedWithErr(logStr, err)
 		return err
 	}
+	task.LogSuccess(logStr)
 	return nil
 }
 
@@ -905,38 +898,59 @@ func checkContainerNameIsExist(containerName, appDir string) (bool, error) {
 	return false, nil
 }
 
-func upApp(appInstall *model.AppInstall, pullImages bool) {
+func upApp(task *task.Task, appInstall *model.AppInstall, pullImages bool) {
 	upProject := func(appInstall *model.AppInstall) (err error) {
 		var (
 			out    string
 			errMsg string
 		)
 		if pullImages && appInstall.App.Type != "php" {
-			out, err = compose.Pull(appInstall.GetComposePath())
+			projectName := strings.ToLower(appInstall.Name)
+			envByte, err := files.NewFileOp().GetContent(appInstall.GetEnvPath())
 			if err != nil {
-				if out != "" {
-					if strings.Contains(out, "no such host") {
-						errMsg = i18n.GetMsgByKey("ErrNoSuchHost") + ":"
-					}
-					if strings.Contains(out, "timeout") {
-						errMsg = i18n.GetMsgByKey("ErrImagePullTimeOut") + ":"
-					}
-					appInstall.Message = errMsg + out
-				}
 				return err
 			}
+			images, err := composeV2.GetDockerComposeImages(projectName, envByte, []byte(appInstall.DockerCompose))
+			if err != nil {
+				return err
+			}
+			for _, image := range images {
+				task.Log(i18n.GetWithName("PullImageStart", image))
+				if out, err = cmd.ExecWithTimeOut("docker pull "+image, 20*time.Minute); err != nil {
+					if out != "" {
+						if strings.Contains(out, "no such host") {
+							errMsg = i18n.GetMsgByKey("ErrNoSuchHost") + ":"
+						}
+						if strings.Contains(out, "timeout") {
+							errMsg = i18n.GetMsgByKey("ErrImagePullTimeOut") + ":"
+						}
+					}
+					appInstall.Message = errMsg + out
+					task.LogFailedWithErr(i18n.GetMsgByKey("PullImage"), err)
+					return err
+				} else {
+					task.Log(i18n.GetMsgByKey("PullImageSuccess"))
+				}
+			}
 		}
-
+		logStr := fmt.Sprintf("%s %s", i18n.GetMsgByKey("Run"), i18n.GetMsgByKey("App"))
+		task.Log(logStr)
 		out, err = compose.Up(appInstall.GetComposePath())
 		if err != nil {
 			if out != "" {
 				appInstall.Message = errMsg + out
+				err = errors.New(out)
 			}
+			task.LogFailedWithErr(logStr, err)
 			return err
 		}
+		task.LogSuccess(logStr)
 		return
 	}
 	if err := upProject(appInstall); err != nil {
+		if appInstall.Message == "" {
+			appInstall.Message = err.Error()
+		}
 		appInstall.Status = constant.UpErr
 	} else {
 		appInstall.Status = constant.Running
@@ -944,13 +958,12 @@ func upApp(appInstall *model.AppInstall, pullImages bool) {
 	exist, _ := appInstallRepo.GetFirst(commonRepo.WithByID(appInstall.ID))
 	if exist.ID > 0 {
 		containerNames, err := getContainerNames(*appInstall)
-		if err != nil {
-			return
+		if err == nil {
+			if len(containerNames) > 0 {
+				appInstall.ContainerName = strings.Join(containerNames, ",")
+			}
+			_ = appInstallRepo.Save(context.Background(), appInstall)
 		}
-		if len(containerNames) > 0 {
-			appInstall.ContainerName = strings.Join(containerNames, ",")
-		}
-		_ = appInstallRepo.Save(context.Background(), appInstall)
 	}
 }
 

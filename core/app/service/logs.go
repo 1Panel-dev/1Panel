@@ -26,7 +26,7 @@ type ILogService interface {
 	CreateLoginLog(operation model.LoginLog) error
 	PageLoginLog(search dto.SearchLgLogWithPage) (int64, interface{}, error)
 
-	CreateOperationLog(operation model.OperationLog) error
+	CreateOperationLog(operation *model.OperationLog) error
 	PageOperationLog(search dto.SearchOpLogWithPage) (int64, interface{}, error)
 
 	CleanLogs(logtype string) error
@@ -92,8 +92,8 @@ func (u *LogService) PageLoginLog(req dto.SearchLgLogWithPage) (int64, interface
 	return total, dtoOps, err
 }
 
-func (u *LogService) CreateOperationLog(operation model.OperationLog) error {
-	return logRepo.CreateOperationLog(&operation)
+func (u *LogService) CreateOperationLog(operation *model.OperationLog) error {
+	return logRepo.CreateOperationLog(operation)
 }
 
 func (u *LogService) PageOperationLog(req dto.SearchOpLogWithPage) (int64, interface{}, error) {

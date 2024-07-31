@@ -79,6 +79,7 @@ export namespace Website {
         proxyType: string;
         ftpUser: string;
         ftpPassword: string;
+        taskID: string;
     }
 
     export interface WebSiteUpdateReq {

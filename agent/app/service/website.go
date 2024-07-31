@@ -5,10 +5,12 @@ import (
 	"bytes"
 	"context"
 	"crypto/x509"
+	"encoding/base64"
 	"encoding/json"
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"os"
 	"path"
 	"reflect"
@@ -206,6 +208,13 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 	if exist, _ := websiteRepo.GetBy(websiteRepo.WithAlias(alias)); len(exist) > 0 {
 		return buserr.New(constant.ErrAliasIsExist)
 	}
+	if len(create.FtpPassword) != 0 {
+		pass, err := base64.StdEncoding.DecodeString(create.FtpPassword)
+		if err != nil {
+			return err
+		}
+		create.FtpPassword = string(pass)
+	}
 
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
@@ -249,23 +258,15 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		runtime    *model.Runtime
 	)
 
-	defer func() {
-		if err != nil {
-			if website.AppInstallID > 0 {
-				req := request.AppInstalledOperate{
-					InstallId:   website.AppInstallID,
-					Operate:     constant.Delete,
-					ForceDelete: true,
-				}
-				if err := NewIAppInstalledService().Operate(req); err != nil {
-					global.LOG.Errorf(err.Error())
-				}
-			}
-		}
-	}()
+	createTask, err := task.NewTaskWithOps(create.PrimaryDomain, task.TaskCreate, task.TaskScopeWebsite, create.TaskID)
+	if err != nil {
+		return err
+	}
+
 	var proxy string
 
 	switch create.Type {
+
 	case constant.Deployment:
 		if create.AppType == constant.NewApp {
 			var (
@@ -276,13 +277,10 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			req.AppDetailId = create.AppInstall.AppDetailId
 			req.Params = create.AppInstall.Params
 			req.AppContainerConfig = create.AppInstall.AppContainerConfig
-			tx, installCtx := getTxAndContext()
-			install, err = NewIAppService().Install(installCtx, req)
+			install, err = NewIAppService().Install(req)
 			if err != nil {
-				tx.Rollback()
 				return err
 			}
-			tx.Commit()
 			appInstall = install
 			website.AppInstallID = install.ID
 			website.Proxy = fmt.Sprintf("127.0.0.1:%d", appInstall.HttpPort)
@@ -292,9 +290,13 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			if err != nil {
 				return err
 			}
-			appInstall = &install
-			website.AppInstallID = appInstall.ID
-			website.Proxy = fmt.Sprintf("127.0.0.1:%d", appInstall.HttpPort)
+			configApp := func(t *task.Task) error {
+				appInstall = &install
+				website.AppInstallID = appInstall.ID
+				website.Proxy = fmt.Sprintf("127.0.0.1:%d", appInstall.HttpPort)
+				return nil
+			}
+			createTask.AddSubTask(i18n.GetMsgByKey("ConfigApp"), configApp, nil)
 		}
 	case constant.Runtime:
 		runtime, err = runtimeRepo.GetFirst(commonRepo.WithByID(create.RuntimeID))
@@ -302,75 +304,89 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			return err
 		}
 		website.RuntimeID = runtime.ID
-		switch runtime.Type {
-		case constant.RuntimePHP:
-			if runtime.Resource == constant.ResourceAppstore {
-				var (
-					req     request.AppInstallCreate
-					install *model.AppInstall
-				)
-				reg, _ := regexp.Compile(`[^a-z0-9_-]+`)
-				req.Name = reg.ReplaceAllString(strings.ToLower(alias), "")
-				req.AppDetailId = create.AppInstall.AppDetailId
-				req.Params = create.AppInstall.Params
-				req.Params["IMAGE_NAME"] = runtime.Image
-				req.AppContainerConfig = create.AppInstall.AppContainerConfig
-				req.Params["PANEL_WEBSITE_DIR"] = path.Join(nginxInstall.GetPath(), "/www")
-				tx, installCtx := getTxAndContext()
-				install, err = NewIAppService().Install(installCtx, req)
-				if err != nil {
-					tx.Rollback()
-					return err
-				}
-				tx.Commit()
-				website.AppInstallID = install.ID
-				appInstall = install
-				website.Proxy = fmt.Sprintf("127.0.0.1:%d", appInstall.HttpPort)
-			} else {
-				website.ProxyType = create.ProxyType
-				if website.ProxyType == constant.RuntimeProxyUnix {
-					proxy = fmt.Sprintf("unix:%s", path.Join("/www/sites", website.Alias, "php-pool", "php-fpm.sock"))
-				}
-				if website.ProxyType == constant.RuntimeProxyTcp {
-					proxy = fmt.Sprintf("127.0.0.1:%d", create.Port)
-				}
-				website.Proxy = proxy
+		if runtime.Type == constant.RuntimePHP {
+			var (
+				req     request.AppInstallCreate
+				install *model.AppInstall
+			)
+			reg, _ := regexp.Compile(`[^a-z0-9_-]+`)
+			req.Name = reg.ReplaceAllString(strings.ToLower(alias), "")
+			req.AppDetailId = create.AppInstall.AppDetailId
+			req.Params = create.AppInstall.Params
+			req.Params["IMAGE_NAME"] = runtime.Image
+			req.AppContainerConfig = create.AppInstall.AppContainerConfig
+			req.Params["PANEL_WEBSITE_DIR"] = path.Join(nginxInstall.GetPath(), "/www")
+			install, err = NewIAppService().Install(req)
+			if err != nil {
+				return err
 			}
-		case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo:
-			website.Proxy = fmt.Sprintf("127.0.0.1:%d", runtime.Port)
+			website.AppInstallID = install.ID
+			appInstall = install
+			website.Proxy = fmt.Sprintf("127.0.0.1:%d", appInstall.HttpPort)
+		} else {
+			website.ProxyType = create.ProxyType
+			if website.ProxyType == constant.RuntimeProxyUnix {
+				proxy = fmt.Sprintf("unix:%s", path.Join("/www/sites", website.Alias, "php-pool", "php-fpm.sock"))
+			}
+			if website.ProxyType == constant.RuntimeProxyTcp {
+				proxy = fmt.Sprintf("127.0.0.1:%d", create.Port)
+			}
+			website.Proxy = proxy
 		}
-	}
-
-	if err = configDefaultNginx(website, domains, appInstall, runtime); err != nil {
-		return err
+	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo:
+		website.Proxy = fmt.Sprintf("127.0.0.1:%d", runtime.Port)
 	}
 
 	if len(create.FtpUser) != 0 && len(create.FtpPassword) != 0 {
-		indexDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "index")
-		itemID, err := NewIFtpService().Create(dto.FtpCreate{User: create.FtpUser, Password: create.FtpPassword, Path: indexDir})
-		if err != nil {
-			global.LOG.Errorf("create ftp for website failed, err: %v", err)
+		createFtpUser := func(t *task.Task) error {
+			indexDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "index")
+			itemID, err := NewIFtpService().Create(dto.FtpCreate{User: create.FtpUser, Password: create.FtpPassword, Path: indexDir})
+			if err != nil {
+				createTask.Log(fmt.Sprintf("create ftp for website failed, err: %v", err))
+			}
+			website.FtpID = itemID
+			return nil
 		}
-		website.FtpID = itemID
+		deleteFtpUser := func() {
+			if website.FtpID > 0 {
+				req := dto.BatchDeleteReq{Ids: []uint{website.FtpID}}
+				if err = NewIFtpService().Delete(req); err != nil {
+					createTask.Log(err.Error())
+				}
+			}
+		}
+		createTask.AddSubTask(i18n.GetWithName("ConfigFTP", create.FtpUser), createFtpUser, deleteFtpUser)
 	}
 
-	if err = createWafConfig(website, domains); err != nil {
-		return err
+	configNginx := func(t *task.Task) error {
+		if err = configDefaultNginx(website, domains, appInstall, runtime); err != nil {
+			return err
+		}
+		if err = createWafConfig(website, domains); err != nil {
+			return err
+		}
+		tx, ctx := helper.GetTxAndContext()
+		defer tx.Rollback()
+		if err = websiteRepo.Create(ctx, website); err != nil {
+			return err
+		}
+		for i := range domains {
+			domains[i].WebsiteID = website.ID
+		}
+		if err = websiteDomainRepo.BatchCreate(ctx, domains); err != nil {
+			return err
+		}
+		tx.Commit()
+		return nil
 	}
 
-	tx, ctx := helper.GetTxAndContext()
-	defer tx.Rollback()
-	if err = websiteRepo.Create(ctx, website); err != nil {
-		return err
+	deleteWebsite := func() {
+		_ = deleteWebsiteFolder(nginxInstall, website)
 	}
-	for i := range domains {
-		domains[i].WebsiteID = website.ID
-	}
-	if err = websiteDomainRepo.BatchCreate(ctx, domains); err != nil {
-		return err
-	}
-	tx.Commit()
-	return nil
+
+	createTask.AddSubTask(i18n.GetMsgByKey("ConfigOpenresty"), configNginx, deleteWebsite)
+
+	return createTask.Execute()
 }
 
 func (w WebsiteService) OpWebsite(req request.WebsiteOp) error {

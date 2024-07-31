@@ -5,18 +5,12 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"net/http"
-	"os"
-	"path/filepath"
-	"reflect"
-	"strconv"
-	"strings"
-
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -27,7 +21,14 @@ import (
 	http2 "github.com/1Panel-dev/1Panel/agent/utils/http"
 	httpUtil "github.com/1Panel-dev/1Panel/agent/utils/http"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
+	"github.com/google/uuid"
 	"gopkg.in/yaml.v3"
+	"net/http"
+	"os"
+	"path/filepath"
+	"reflect"
+	"strconv"
+	"strings"
 )
 
 type AppService struct {
@@ -38,7 +39,7 @@ type IAppService interface {
 	GetAppTags() ([]response.TagDTO, error)
 	GetApp(key string) (*response.AppDTO, error)
 	GetAppDetail(appId uint, version, appType string) (response.AppDetailDTO, error)
-	Install(ctx context.Context, req request.AppInstallCreate) (*model.AppInstall, error)
+	Install(req request.AppInstallCreate) (*model.AppInstall, error)
 	SyncAppListFromRemote() error
 	GetAppUpdate() (*response.AppUpdateRes, error)
 	GetAppDetailByID(id uint) (*response.AppDetailDTO, error)
@@ -295,7 +296,7 @@ func (a AppService) GetIgnoredApp() ([]response.IgnoredApp, error) {
 	return res, nil
 }
 
-func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (appInstall *model.AppInstall, err error) {
+func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.AppInstall, err error) {
 	if err = docker.CreateDefaultDockerNetwork(); err != nil {
 		err = buserr.WithDetail(constant.Err1PanelNetworkFailed, err.Error(), nil)
 		return
@@ -423,14 +424,6 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 	}
 	appInstall.DockerCompose = string(composeByte)
 
-	defer func() {
-		if err != nil {
-			hErr := handleAppInstallErr(ctx, appInstall)
-			if hErr != nil {
-				global.LOG.Errorf("delete app dir error %s", hErr.Error())
-			}
-		}
-	}()
 	if hostName, ok := req.Params["PANEL_DB_HOST"]; ok {
 		database, _ := databaseRepo.Get(commonRepo.WithByName(hostName.(string)))
 		if !reflect.DeepEqual(database, model.Database{}) {
@@ -445,29 +438,48 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 	}
 	appInstall.Env = string(paramByte)
 
-	if err = appInstallRepo.Create(ctx, appInstall); err != nil {
+	if err = appInstallRepo.Create(context.Background(), appInstall); err != nil {
 		return
 	}
-	if err = createLink(ctx, app, appInstall, req.Params); err != nil {
+
+	taskID := uuid.New().String()
+	installTask, err := task.NewTaskWithOps(appInstall.Name, task.TaskCreate, task.TaskScopeApp, taskID)
+	if err != nil {
 		return
 	}
+
+	if err = createLink(context.Background(), installTask, app, appInstall, req.Params); err != nil {
+		return
+	}
+
+	installApp := func(t *task.Task) error {
+		if err = copyData(t, app, appDetail, appInstall, req); err != nil {
+			return err
+		}
+		if err = runScript(t, appInstall, "init"); err != nil {
+			return err
+		}
+		upApp(t, appInstall, req.PullImage)
+		updateToolApp(appInstall)
+		return nil
+	}
+
+	handleAppStatus := func() {
+		appInstall.Status = constant.UpErr
+		appInstall.Message = installTask.Task.ErrorMsg
+		_ = appInstallRepo.Save(context.Background(), appInstall)
+	}
+
+	installTask.AddSubTask(task.GetTaskName(appInstall.Name, task.TaskInstall, task.TaskScopeApp), installApp, handleAppStatus)
+
 	go func() {
-		defer func() {
-			if err != nil {
-				appInstall.Status = constant.UpErr
-				appInstall.Message = err.Error()
-				_ = appInstallRepo.Save(context.Background(), appInstall)
-			}
-		}()
-		if err = copyData(app, appDetail, appInstall, req); err != nil {
-			return
+		if taskErr := installTask.Execute(); taskErr != nil {
+			appInstall.Status = constant.InstallErr
+			appInstall.Message = taskErr.Error()
+			_ = appInstallRepo.Save(context.Background(), appInstall)
 		}
-		if err = runScript(appInstall, "init"); err != nil {
-			return
-		}
-		upApp(appInstall, req.PullImage)
 	}()
-	go updateToolApp(appInstall)
+
 	return
 }
 

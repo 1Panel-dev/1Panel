@@ -49,6 +49,7 @@
         "qs": "^6.12.1",
         "screenfull": "^6.0.2",
         "unplugin-vue-define-options": "^0.7.3",
+        "uuid": "^10.0.0",
         "vue": "^3.4.27",
         "vue-clipboard3": "^2.0.0",
         "vue-codemirror": "^6.1.1",

@@ -163,7 +163,7 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
+import { onBeforeUnmount, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';

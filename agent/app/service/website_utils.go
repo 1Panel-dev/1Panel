@@ -220,10 +220,9 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 	if err != nil {
 		return err
 	}
-	if err := createWebsiteFolder(nginxInstall, website, runtime); err != nil {
+	if err = createWebsiteFolder(nginxInstall, website, runtime); err != nil {
 		return err
 	}
-
 	nginxFileName := website.Alias + ".conf"
 	configPath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "conf", "conf.d", nginxFileName)
 	nginxContent := string(nginx_conf.WebsiteDefault)
@@ -284,15 +283,13 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 	}
 
 	config.FilePath = configPath
-	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return err
 	}
-	if err := opNginx(nginxInstall.ContainerName, constant.NginxCheck); err != nil {
-		_ = deleteWebsiteFolder(nginxInstall, website)
+	if err = opNginx(nginxInstall.ContainerName, constant.NginxCheck); err != nil {
 		return err
 	}
-	if err := opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
-		_ = deleteWebsiteFolder(nginxInstall, website)
+	if err = opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
 		return err
 	}
 	return nil

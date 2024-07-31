@@ -14,6 +14,7 @@ const (
 	SyncSuccess = "SyncSuccess"
 	Paused      = "Paused"
 	UpErr       = "UpErr"
+	InstallErr  = "InstallErr"
 
 	ContainerPrefix = "1Panel-"
 

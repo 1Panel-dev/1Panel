@@ -161,14 +161,11 @@ func (b *BaseApi) InstallApp(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	tx, ctx := helper.GetTxAndContext()
-	install, err := appService.Install(ctx, req)
+	install, err := appService.Install(req)
 	if err != nil {
-		tx.Rollback()
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	tx.Commit()
 	helper.SuccessWithData(c, install)
 }
 

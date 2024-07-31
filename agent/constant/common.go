@@ -7,10 +7,15 @@ const (
 
 	SystemRestart = "systemRestart"
 
-	TypeWebsite = "website"
-	TypePhp     = "php"
-	TypeSSL     = "ssl"
-	TypeSystem  = "system"
+	TypeWebsite       = "website"
+	TypePhp           = "php"
+	TypeSSL           = "ssl"
+	TypeSystem        = "system"
+	TypeTask          = "task"
+	TypeImagePull     = "image-pull"
+	TypeImagePush     = "image-push"
+	TypeImageBuild    = "image-build"
+	TypeComposeCreate = "compose-create"
 )
 
 const (
