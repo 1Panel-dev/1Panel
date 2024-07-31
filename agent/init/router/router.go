@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/1Panel-dev/1Panel/agent/i18n"
+	"github.com/1Panel-dev/1Panel/agent/middleware"
 	rou "github.com/1Panel-dev/1Panel/agent/router"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
@@ -24,6 +25,7 @@ func Routers() *gin.Engine {
 		PublicGroup.Static("/api/v1/images", "./uploads")
 	}
 	PrivateGroup := Router.Group("/api/v2")
+	PrivateGroup.Use(middleware.Certificate())
 	for _, router := range rou.RouterGroupApp {
 		router.InitRouter(PrivateGroup)
 	}

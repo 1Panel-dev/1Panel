@@ -1,10 +1,13 @@
 package server
 
 import (
+	"crypto/tls"
+	"fmt"
 	"net"
 	"net/http"
 	"os"
 
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/cron"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
@@ -17,6 +20,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/init/router"
 	"github.com/1Panel-dev/1Panel/agent/init/validator"
 	"github.com/1Panel-dev/1Panel/agent/init/viper"
+	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 
 	"github.com/gin-gonic/gin"
 )
@@ -40,7 +44,7 @@ func Start() {
 	server := &http.Server{
 		Handler: rootRouter,
 	}
-	if len(global.CurrentNode) == 0 || global.CurrentNode == "127.0.0.1" {
+	if global.CurrentNode == "127.0.0.1" {
 		_ = os.Remove("/tmp/agent.sock")
 		listener, err := net.Listen("unix", "/tmp/agent.sock")
 		if err != nil {
@@ -49,15 +53,28 @@ func Start() {
 		_ = server.Serve(listener)
 	} else {
 		server.Addr = "0.0.0.0:9999"
-		type tcpKeepAliveListener struct {
-			*net.TCPListener
-		}
-		ln, err := net.Listen("tcp4", "0.0.0.0:9999")
+		settingRepo := repo.NewISettingRepo()
+		certItem, err := settingRepo.Get(settingRepo.WithByKey("ServerCert"))
 		if err != nil {
 			panic(err)
 		}
-		global.LOG.Info("listen at http://0.0.0.0:9999")
-		if err := server.Serve(tcpKeepAliveListener{ln.(*net.TCPListener)}); err != nil {
+		cert, _ := encrypt.StringDecrypt(certItem.Value)
+		keyItem, err := settingRepo.Get(settingRepo.WithByKey("ServerKey"))
+		if err != nil {
+			panic(err)
+		}
+		key, _ := encrypt.StringDecrypt(keyItem.Value)
+		tlsCert, err := tls.X509KeyPair([]byte(cert), []byte(key))
+		if err != nil {
+			fmt.Printf("failed to load X.509 key pair: %s\n", err)
+			return
+		}
+		server.TLSConfig = &tls.Config{
+			Certificates: []tls.Certificate{tlsCert},
+			ClientAuth:   tls.RequireAnyClientCert,
+		}
+		global.LOG.Info("listen at https://0.0.0.0:9999")
+		if err := server.ListenAndServeTLS("", ""); err != nil {
 			panic(err)
 		}
 	}

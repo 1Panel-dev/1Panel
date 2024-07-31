@@ -2,6 +2,8 @@ package migrations
 
 import (
 	"fmt"
+	"os"
+	"path"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -9,6 +11,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
+	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 
 	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/gorm"
@@ -159,6 +162,24 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "SnapshotIgnore", Value: "*.sock"}).Error; err != nil {
 			return err
 		}
+
+		if _, err := os.Stat(path.Join(global.CONF.System.DataDir, "ssl", "server.key")); err != nil {
+			return err
+		}
+		serverKey, _ := os.ReadFile(path.Join(global.CONF.System.DataDir, "ssl", "server.key"))
+		itemKey, _ := encrypt.StringEncrypt(string(serverKey))
+		if err := tx.Create(&model.Setting{Key: "ServerKey", Value: itemKey}).Error; err != nil {
+			return err
+		}
+		if _, err := os.Stat(path.Join(global.CONF.System.DataDir, "ssl", "server.crt")); err != nil {
+			return err
+		}
+		serverCrt, _ := os.ReadFile(path.Join(global.CONF.System.DataDir, "ssl", "server.crt"))
+		itemCrt, _ := encrypt.StringEncrypt(string(serverCrt))
+		if err := tx.Create(&model.Setting{Key: "ServerCert", Value: string(itemCrt)}).Error; err != nil {
+			return err
+		}
+
 		return nil
 	},
 }
