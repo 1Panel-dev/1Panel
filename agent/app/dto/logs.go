@@ -1,6 +1,7 @@
 package dto
 
 import (
+	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"time"
 )
 
@@ -47,4 +48,14 @@ type LoginLog struct {
 
 type CleanLog struct {
 	LogType string `json:"logType" validate:"required,oneof=login operation"`
+}
+
+type SearchTaskLogReq struct {
+	Status string `json:"status"`
+	Type   string `json:"type"`
+	PageInfo
+}
+
+type TaskDTO struct {
+	model.Task
 }

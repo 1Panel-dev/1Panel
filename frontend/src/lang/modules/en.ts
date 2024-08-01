@@ -1155,6 +1155,9 @@ const message = {
         websiteLog: 'Website Logs',
         runLog: 'Run Log',
         errLog: 'Err Log',
+        task: 'Task Log',
+        taskName: 'Task Name',
+        taskRunning: 'Running',
     },
     file: {
         dir: 'Folder',

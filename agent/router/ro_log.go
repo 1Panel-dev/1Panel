@@ -14,5 +14,6 @@ func (s *LogRouter) InitRouter(Router *gin.RouterGroup) {
 	{
 		operationRouter.GET("/system/files", baseApi.GetSystemFiles)
 		operationRouter.POST("/system", baseApi.GetSystemLogs)
+		operationRouter.POST("/tasks/search", baseApi.PageTasks)
 	}
 }

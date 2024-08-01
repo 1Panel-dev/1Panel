@@ -67,6 +67,16 @@ const logsRouter = {
                         requiresAuth: false,
                     },
                 },
+                {
+                    path: 'task',
+                    name: 'Task',
+                    component: () => import('@/views/log/task/index.vue'),
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/logs',
+                        requiresAuth: false,
+                    },
+                },
             ],
         },
     ],

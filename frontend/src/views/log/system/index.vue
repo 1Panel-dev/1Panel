@@ -2,15 +2,7 @@
     <div>
         <LayoutContent v-loading="loading" :title="$t('logs.system')">
             <template #search>
-                <el-button class="tag-button no-active" @click="onChangeRoute('OperationLog')">
-                    {{ $t('logs.operation') }}
-                </el-button>
-                <el-button class="tag-button no-active" @click="onChangeRoute('LoginLog')">
-                    {{ $t('logs.login') }}
-                </el-button>
-                <el-button class="tag-button" type="primary" @click="onChangeRoute('SystemLog')">
-                    {{ $t('logs.system') }}
-                </el-button>
+                <LogRouter current="SystemLog" />
             </template>
             <template #leftToolBar>
                 <el-select class="p-w-200 mr-2.5" v-model="logConfig.name" @change="search()">
@@ -39,12 +31,11 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted, reactive, ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { getSystemFiles } from '@/api/modules/log';
 import LogFile from '@/components/log-file/index.vue';
+import LogRouter from '@/views/log/router/index.vue';
+import { nextTick, onMounted, reactive, ref } from 'vue';
+import { getSystemFiles } from '@/api/modules/log';
 
-const router = useRouter();
 const loading = ref();
 const isWatch = ref();
 const fileList = ref();
@@ -75,10 +66,6 @@ const search = () => {
     nextTick(() => {
         showLog.value = true;
     });
-};
-
-const onChangeRoute = async (addr: string) => {
-    router.push({ name: addr });
 };
 
 onMounted(() => {

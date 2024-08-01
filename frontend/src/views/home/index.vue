@@ -546,7 +546,7 @@ const hideEntrance = () => {
 
 const loadUpgradeStatus = async () => {
     const res = await loadUpgradeInfo();
-    if (res.data.testVersion || res.data.newVersion || res.data.latestVersion) {
+    if (res && (res.data.testVersion || res.data.newVersion || res.data.latestVersion)) {
         globalStore.hasNewVersion = true;
     } else {
         globalStore.hasNewVersion = false;

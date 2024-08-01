@@ -53,7 +53,7 @@ const loadDataFromDB = async () => {
 
 export async function loadProductProFromDB() {
     const res = await getLicenseStatus();
-    if (!res.data) {
+    if (!res || !res.data) {
         resetXSetting();
         globalStore.isProductPro = false;
     } else {
