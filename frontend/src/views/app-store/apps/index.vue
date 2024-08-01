@@ -60,14 +60,6 @@
             </el-badge>
         </template>
         <template #rightToolBar>
-            <!-- <fu-table-pagination
-                v-model:current-page="paginationConfig.currentPage"
-                v-model:page-size="paginationConfig.pageSize"
-                v-bind="paginationConfig"
-                @change="search(req)"
-                :layout="mobile ? ' prev, pager, next' : ' prev, pager, next'"
-                class="mr-2.5"
-            /> -->
             <el-checkbox
                 class="!mr-2.5"
                 v-model="req.resource"
@@ -92,55 +84,56 @@
                             :sm="12"
                             :md="8"
                             :lg="8"
-                            :xl="8"
+                            :xl="6"
                         >
-                            <div class="app-card">
-                                <el-card class="e-card" @click.stop="openDetail(app.key)">
-                                    <el-row :gutter="20">
-                                        <el-col :xs="8" :sm="6" :md="6" :lg="6" :xl="5">
-                                            <div class="app-icon-container">
-                                                <div class="app-icon">
+                            <div class="app">
+                                <el-card>
+                                    <div class="app-wrapper">
+                                        <div class="app-image">
+                                            <el-popover placement="top-start" :width="200" trigger="hover">
+                                                <template #reference>
                                                     <el-avatar
                                                         shape="square"
                                                         :size="60"
                                                         :src="'data:image/png;base64,' + app.icon"
                                                     />
+                                                </template>
+                                                <div>
+                                                    <el-link @click="toLink(app.website)">
+                                                        <el-icon><OfficeBuilding /></el-icon>
+                                                        <span>{{ $t('app.appOfficeWebsite') }}</span>
+                                                    </el-link>
+                                                    <el-link class="ml-5" @click="toLink(app.github)">
+                                                        <el-icon><Link /></el-icon>
+                                                        <span>{{ $t('app.github') }}</span>
+                                                    </el-link>
+                                                    <div class="mt-5">
+                                                        <el-text>推荐配置: 1c 1g</el-text>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </el-col>
-                                        <el-col :xs="16" :sm="18" :md="18" :lg="18" :xl="19">
-                                            <div class="app-content">
-                                                <div class="app-header">
-                                                    <span class="app-title">{{ app.name }}</span>
+                                            </el-popover>
+                                        </div>
+                                        <div class="app-content">
+                                            <div class="content-top">
+                                                <div>
+                                                    <span class="app-name">{{ app.name }}</span>
                                                     <el-text type="success" class="!ml-2" v-if="app.installed">
                                                         {{ $t('app.allReadyInstalled') }}
                                                     </el-text>
-                                                    <el-button
-                                                        class="app-button"
-                                                        type="primary"
-                                                        plain
-                                                        round
-                                                        size="small"
-                                                        :disabled="
-                                                            (app.installed && app.limit == 1) ||
-                                                            app.status === 'TakeDown'
-                                                        "
-                                                        @click.stop="openInstall(app)"
-                                                    >
-                                                        {{ $t('app.install') }}
-                                                    </el-button>
                                                 </div>
-                                                <div class="app-desc">
-                                                    <span class="desc">
-                                                        {{
-                                                            language == 'zh' || language == 'tw'
-                                                                ? app.shortDescZh
-                                                                : app.shortDescEn
-                                                        }}
-                                                    </span>
-                                                </div>
-                                                <div class="app-tag">
-                                                    <el-tag v-for="(tag, ind) in app.tags" :key="ind" class="p-mr-5">
+                                            </div>
+                                            <div class="content-middle">
+                                                <span class="app-description">
+                                                    {{
+                                                        language == 'zh' || language == 'tw'
+                                                            ? app.shortDescZh
+                                                            : app.shortDescEn
+                                                    }}
+                                                </span>
+                                            </div>
+                                            <div class="content-bottom">
+                                                <div class="app-tags">
+                                                    <el-tag v-for="(tag, ind) in app.tags" :key="ind" type="info">
                                                         <span>
                                                             {{
                                                                 language == 'zh' || language == 'tw'
@@ -153,9 +146,21 @@
                                                         <span style="color: red">{{ $t('app.takeDown') }}</span>
                                                     </el-tag>
                                                 </div>
+                                                <el-button
+                                                    type="primary"
+                                                    size="small"
+                                                    plain
+                                                    round
+                                                    :disabled="
+                                                        (app.installed && app.limit == 1) || app.status === 'TakeDown'
+                                                    "
+                                                    @click.stop="openInstall(app)"
+                                                >
+                                                    {{ $t('app.install') }}
+                                                </el-button>
                                             </div>
-                                        </el-col>
-                                    </el-row>
+                                        </div>
+                                    </div>
                                 </el-card>
                             </div>
                         </el-col>
@@ -174,7 +179,6 @@
             </div>
         </template>
     </LayoutContent>
-    <Detail ref="detailRef"></Detail>
     <Install ref="installRef" />
 </template>
 
@@ -183,7 +187,6 @@ import { App } from '@/api/interface/app';
 import { onMounted, reactive, ref, computed } from 'vue';
 import { GetAppTags, SearchApp, SyncApp } from '@/api/modules/app';
 import i18n from '@/lang';
-import Detail from '../detail/index.vue';
 import Install from '../detail/install/index.vue';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
@@ -220,7 +223,6 @@ const activeTag = ref('all');
 const showDetail = ref(false);
 const canUpdate = ref(false);
 const syncing = ref(false);
-const detailRef = ref();
 const installRef = ref();
 const installKey = ref('');
 const moreTag = ref('');
@@ -266,10 +268,6 @@ const openInstall = (app: App.App) => {
     }
 };
 
-const openDetail = (key: string) => {
-    detailRef.value.acceptParams(key, 'install');
-};
-
 const sync = () => {
     syncing.value = true;
     SyncApp()
@@ -313,6 +311,10 @@ const searchByName = () => {
     search(req);
 };
 
+const toLink = (link: string) => {
+    window.open(link, '_blank');
+};
+
 onMounted(() => {
     if (router.currentRoute.value.query.install) {
         installKey.value = String(router.currentRoute.value.query.install);
@@ -338,69 +340,83 @@ onMounted(() => {
     padding-bottom: 10px;
 }
 
-.app-card {
-    margin-top: 10px;
-    cursor: pointer;
-    padding: 5px;
-
-    .app-icon-container {
-        margin-top: 10px;
-        margin-left: 15px;
+.app {
+    margin: 10px;
+    .el-card {
+        padding: 0 !important;
+        border: var(--panel-border) !important;
+        &:hover {
+            border: 1px solid var(--el-color-primary) !important;
+        }
+    }
+    .el-card__body {
+        padding: 8px 8px 2px 8px !important;
+    }
+    .app-wrapper {
+        display: flex;
+        height: 100%;
+    }
+    .app-image {
+        cursor: pointer;
+        flex: 0 0 100px;
+        display: flex;
+        justify-content: center;
+        margin-top: 14px;
+        transition: transform 0.1s;
     }
 
-    &:hover .app-icon {
+    &:hover .app-image {
         transform: scale(1.2);
     }
 
-    .app-icon {
-        transition: transform 0.1s;
-        transform-origin: center center;
+    .el-avatar {
+        width: 65px !important;
+        height: 65px !important;
+        max-width: 65px;
+        max-height: 65px;
+        object-fit: cover;
     }
-
     .app-content {
-        margin-top: 10px;
-        height: 100%;
-        width: 100%;
-
-        .app-header {
-            height: 20%;
-            .app-title {
-                line-height: 1.5;
-                font-weight: 500;
-                font-size: 16px;
-                color: var(--el-text-color-regular);
-            }
-            .app-button {
-                float: right;
-                margin-right: 20px;
-            }
-        }
-
-        .app-desc {
-            margin-top: 8px;
-            height: 43px;
-            .desc {
-                overflow: hidden;
-                display: -webkit-box;
-                -webkit-line-clamp: 2;
-                -webkit-box-orient: vertical;
-                text-overflow: ellipsis;
-                font-size: 14px;
-                color: var(--el-text-color-regular);
-            }
-        }
-
-        .app-tag {
-            margin-top: 5px;
-        }
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
     }
+    .content-top,
+    .content-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .content-middle {
+        flex: 1;
+        margin: 10px 0;
+        overflow: hidden; /* 防止内容溢出 */
+    }
+    .app-name {
+        margin: 0;
+        line-height: 1.5;
+        font-weight: 500;
+        font-size: 16px;
+        color: var(--el-text-color-regular);
+    }
+    .app-description {
+        margin: 0;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        text-overflow: ellipsis;
+        font-size: 14px;
+        color: var(--el-text-color-regular);
 
-    .e-card {
-        border: var(--panel-border) !important;
-        &:hover {
-            cursor: pointer;
-            border: 1px solid var(--el-color-primary) !important;
-        }
+        line-height: 1.2;
+        height: calc(1.2em * 2);
+        min-height: calc(1.2em * 2);
+    }
+    .app-tags {
+        display: flex;
+        gap: 5px;
     }
 }
 
