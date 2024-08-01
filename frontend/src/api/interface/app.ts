@@ -13,6 +13,8 @@ export namespace App {
         type: string;
         status: string;
         limit: number;
+        website: string;
+        github: string;
     }
 
     export interface AppDTO extends App {
