@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"io"
 	"io/fs"
 	"os"
@@ -467,11 +468,17 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 			}
 		}
 	case constant.TypeTask:
-		task, err := taskRepo.GetFirst(taskRepo.WithByID(req.TaskID))
+		var opts []repo.DBOption
+		if req.TaskID != "" {
+			opts = append(opts, taskRepo.WithByID(req.TaskID))
+		} else {
+			opts = append(opts, taskRepo.WithType(req.TaskType), taskRepo.WithResourceID(req.ID))
+		}
+		taskModel, err := taskRepo.GetFirst(opts...)
 		if err != nil {
 			return nil, err
 		}
-		logFilePath = task.LogFile
+		logFilePath = taskModel.LogFile
 	case constant.TypeImagePull, constant.TypeImagePush, constant.TypeImageBuild, constant.TypeComposeCreate:
 		logFilePath = path.Join(global.CONF.System.TmpDir, fmt.Sprintf("docker_logs/%s", req.Name))
 	}

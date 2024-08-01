@@ -6,7 +6,7 @@
         :close-on-press-escape="false"
         :show-close="showClose"
         :before-close="handleClose"
-        class="task-log-dialog"
+        :width="width"
     >
         <div>
             <highlightjs ref="editorRef" language="JavaScript" :autodetect="false" :code="content"></highlightjs>
@@ -18,6 +18,17 @@ import { nextTick, onUnmounted, reactive, ref } from 'vue';
 import { ReadByLine } from '@/api/modules/files';
 
 const editorRef = ref();
+
+defineProps({
+    showClose: {
+        type: Boolean,
+        default: true,
+    },
+    width: {
+        type: String,
+        default: '30%',
+    },
+});
 
 const data = ref({
     enable: false,
@@ -34,8 +45,6 @@ const scrollerElement = ref<HTMLElement | null>(null);
 const minPage = ref(1);
 const maxPage = ref(1);
 const open = ref(false);
-const taskID = ref('');
-const showClose = ref(false);
 
 const readReq = reactive({
     taskID: '',
@@ -43,22 +52,30 @@ const readReq = reactive({
     page: 1,
     pageSize: 500,
     latest: false,
+    taskType: '',
+    id: 0,
 });
 
 const stopSignals = ['[TASK-END]'];
 
-const acceptParams = (id: string, closeShow: boolean) => {
-    if (closeShow) {
-        showClose.value = closeShow;
-    }
-    taskID.value = id;
+const initData = () => {
     open.value = true;
     initCodemirror();
     init();
 };
 
+const openWithTaskID = (id: string) => {
+    readReq.taskID = id;
+    initData();
+};
+
+const openWithResourceID = (taskType: string, resourceID: number) => {
+    readReq.taskType = taskType;
+    readReq.id = resourceID;
+    initData();
+};
+
 const getContent = (pre: boolean) => {
-    readReq.taskID = taskID.value;
     if (readReq.page < 1) {
         readReq.page = 1;
     }
@@ -182,7 +199,7 @@ onUnmounted(() => {
     onCloseLog();
 });
 
-defineExpose({ acceptParams, handleClose });
+defineExpose({ openWithResourceID, openWithTaskID });
 </script>
 <style lang="scss" scoped>
 .task-log-dialog {

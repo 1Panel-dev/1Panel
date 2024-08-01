@@ -258,7 +258,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		runtime    *model.Runtime
 	)
 
-	createTask, err := task.NewTaskWithOps(create.PrimaryDomain, task.TaskCreate, task.TaskScopeWebsite, create.TaskID)
+	createTask, err := task.NewTaskWithOps(create.PrimaryDomain, task.TaskCreate, task.TaskScopeWebsite, create.TaskID, 0)
 	if err != nil {
 		return err
 	}
@@ -370,6 +370,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		if err = websiteRepo.Create(ctx, website); err != nil {
 			return err
 		}
+		t.Task.ResourceID = website.ID
 		for i := range domains {
 			domains[i].WebsiteID = website.ID
 		}

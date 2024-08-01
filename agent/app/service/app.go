@@ -21,7 +21,6 @@ import (
 	http2 "github.com/1Panel-dev/1Panel/agent/utils/http"
 	httpUtil "github.com/1Panel-dev/1Panel/agent/utils/http"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
-	"github.com/google/uuid"
 	"gopkg.in/yaml.v3"
 	"net/http"
 	"os"
@@ -442,8 +441,7 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 		return
 	}
 
-	taskID := uuid.New().String()
-	installTask, err := task.NewTaskWithOps(appInstall.Name, task.TaskCreate, task.TaskScopeApp, taskID)
+	installTask, err := task.NewTaskWithOps(appInstall.Name, task.TaskCreate, task.TaskScopeApp, req.TaskID, appInstall.ID)
 	if err != nil {
 		return
 	}

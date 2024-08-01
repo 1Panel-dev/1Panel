@@ -16,6 +16,8 @@ type ITaskRepo interface {
 	Update(ctx context.Context, task *model.Task) error
 
 	WithByID(id string) DBOption
+	WithType(taskType string) DBOption
+	WithResourceID(id uint) DBOption
 }
 
 func NewITaskRepo() ITaskRepo {
@@ -25,6 +27,18 @@ func NewITaskRepo() ITaskRepo {
 func (t TaskRepo) WithByID(id string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("id = ?", id)
+	}
+}
+
+func (t TaskRepo) WithType(taskType string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("type = ?", taskType)
+	}
+}
+
+func (t TaskRepo) WithResourceID(id uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("resource_id = ?", id)
 	}
 }
 

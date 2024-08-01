@@ -102,7 +102,7 @@
                                 <el-card class="e-card">
                                     <el-row :gutter="20">
                                         <el-col :xs="3" :sm="3" :md="3" :lg="4" :xl="4">
-                                            <div class="icon" @click.stop="openDetail(installed.appKey)">
+                                            <div class="icon">
                                                 <el-avatar
                                                     shape="square"
                                                     :size="66"
@@ -313,7 +313,7 @@
     <PortJumpDialog ref="dialogPortJumpRef" />
     <AppIgnore ref="ignoreRef" @close="search" />
     <ComposeLogs ref="composeLogRef" />
-    <AppDetail ref="appDetail" />
+    <TaskLog ref="taskLogRef" />
 </template>
 
 <script lang="ts" setup>
@@ -335,7 +335,6 @@ import AppDelete from './delete/index.vue';
 import AppParams from './detail/index.vue';
 import AppUpgrade from './upgrade/index.vue';
 import AppIgnore from './ignore/index.vue';
-import AppDetail from '../detail/index.vue';
 import ComposeLogs from '@/components/compose-log/index.vue';
 import { App } from '@/api/interface/app';
 import Status from '@/components/status/index.vue';
@@ -343,6 +342,7 @@ import { getAge, getLanguage } from '@/utils/util';
 import { useRouter } from 'vue-router';
 import { MsgSuccess } from '@/utils/message';
 import { toFolder } from '@/global/business';
+import TaskLog from '@/components/task-log/index.vue';
 
 const data = ref<any>();
 const loading = ref(false);
@@ -369,6 +369,7 @@ const upgradeRef = ref();
 const ignoreRef = ref();
 const dialogPortJumpRef = ref();
 const composeLogRef = ref();
+const taskLogRef = ref();
 const tags = ref<App.Tag[]>([]);
 const activeTag = ref('all');
 const searchReq = reactive({
@@ -384,7 +385,6 @@ const activeName = ref(i18n.global.t('app.installed'));
 const mode = ref('installed');
 const moreTag = ref('');
 const language = getLanguage();
-const appDetail = ref();
 const options = {
     modifiers: [
         {
@@ -451,10 +451,6 @@ const search = async () => {
 
 const goDashboard = async (port: any, protocol: string) => {
     dialogPortJumpRef.value.acceptParams({ port: port, protocol: protocol });
-};
-
-const openDetail = (appKey: string) => {
-    appDetail.value.acceptParams(appKey, 'detail');
 };
 
 const openOperate = (row: any, op: string) => {
@@ -623,7 +619,13 @@ const quickJump = () => {
 };
 
 const openLog = (row: any) => {
-    composeLogRef.value.acceptParams({ compose: row.path + '/docker-compose.yml', resource: row.name });
+    switch (row.status) {
+        case 'Installing':
+            taskLogRef.value.openWithResourceID('App', row.id);
+            break;
+        default:
+            composeLogRef.value.acceptParams({ compose: row.path + '/docker-compose.yml', resource: row.name });
+    }
 };
 
 onMounted(() => {

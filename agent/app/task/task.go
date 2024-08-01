@@ -66,20 +66,20 @@ func GetTaskName(resourceName, operate, scope string) string {
 	return fmt.Sprintf("%s%s [%s]", i18n.GetMsgByKey(operate), i18n.GetMsgByKey(scope), resourceName)
 }
 
-func NewTaskWithOps(resourceName, operate, scope, taskID string) (*Task, error) {
-	return NewTask(GetTaskName(resourceName, operate, scope), scope, taskID)
+func NewTaskWithOps(resourceName, operate, scope, taskID string, resourceID uint) (*Task, error) {
+	return NewTask(GetTaskName(resourceName, operate, scope), scope, taskID, resourceID)
 }
 
-func NewChildTask(name, taskType, parentTaskID string) (*Task, error) {
-	task, err := NewTask(name, taskType, "")
-	if err != nil {
-		return nil, err
-	}
-	task.ParentID = parentTaskID
-	return task, nil
-}
+//func NewChildTask(name, taskType, parentTaskID string) (*Task, error) {
+//	task, err := NewTask(name, taskType, "")
+//	if err != nil {
+//		return nil, err
+//	}
+//	task.ParentID = parentTaskID
+//	return task, nil
+//}
 
-func NewTask(name, taskType, taskID string) (*Task, error) {
+func NewTask(name, taskType, taskID string, resourceID uint) (*Task, error) {
 	if taskID == "" {
 		taskID = uuid.New().String()
 	}
@@ -96,11 +96,12 @@ func NewTask(name, taskType, taskID string) (*Task, error) {
 	}
 	logger := log.New(file, "", log.LstdFlags)
 	taskModel := &model.Task{
-		ID:      taskID,
-		Name:    name,
-		Type:    taskType,
-		LogFile: logPath,
-		Status:  constant.StatusRunning,
+		ID:         taskID,
+		Name:       name,
+		Type:       taskType,
+		LogFile:    logPath,
+		Status:     constant.StatusRunning,
+		ResourceID: resourceID,
 	}
 	taskRepo := repo.NewITaskRepo()
 	task := &Task{Name: name, logFile: file, Logger: logger, taskRepo: taskRepo, Task: taskModel}
