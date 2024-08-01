@@ -19,6 +19,7 @@ type AppInstallCreate struct {
 	Params      map[string]interface{} `json:"params"`
 	Name        string                 `json:"name" validate:"required"`
 	Services    map[string]string      `json:"services"`
+	TaskID      string                 `json:"taskID"`
 	AppContainerConfig
 }
 

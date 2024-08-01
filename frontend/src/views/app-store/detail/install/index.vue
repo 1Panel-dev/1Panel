@@ -106,6 +106,7 @@
             </span>
         </template>
     </DrawerPro>
+    <TaskLog ref="taskLogRef" />
 </template>
 
 <script lang="ts" setup name="appInstall">
@@ -121,6 +122,8 @@ import { MsgError } from '@/utils/message';
 import { Container } from '@/api/interface/container';
 import { loadResourceLimit } from '@/api/modules/container';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
+import TaskLog from '@/components/task-log/index.vue';
+import { v4 as uuidv4 } from 'uuid';
 
 const router = useRouter();
 
@@ -159,6 +162,7 @@ const initData = () => ({
     version: '',
     appID: '',
     pullImage: true,
+    taskID: '',
 });
 const req = reactive(initData());
 const limits = ref<Container.ResourceLimit>({
@@ -176,6 +180,7 @@ const handleClose = () => {
 };
 const paramKey = ref(1);
 const isHostMode = ref(false);
+const taskLogRef = ref();
 
 const changeUnit = () => {
     if (req.memoryUnit == 'M') {
@@ -258,12 +263,20 @@ const submit = async (formEl: FormInstance | undefined) => {
     });
 };
 
+const openTaskLog = (taskID: string) => {
+    taskLogRef.value.openWithTaskID(taskID);
+};
+
 const install = () => {
     loading.value = true;
+    const taskID = uuidv4();
+    console.log(taskID);
+    req.taskID = taskID;
+    console.log(req);
     InstallApp(req)
         .then(() => {
             handleClose();
-            router.push({ path: '/apps/installed' });
+            openTaskLog(taskID);
         })
         .finally(() => {
             loading.value = false;

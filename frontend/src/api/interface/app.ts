@@ -94,6 +94,7 @@ export namespace App {
     export interface AppInstall {
         appDetailId: number;
         params: any;
+        taskID: string;
     }
 
     export interface AppInstallSearch extends ReqPage {
