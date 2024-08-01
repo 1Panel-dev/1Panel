@@ -2,15 +2,7 @@
     <div>
         <LayoutContent v-loading="loading" :title="$t('logs.operation')">
             <template #search>
-                <el-button type="primary" class="tag-button" @click="onChangeRoute('OperationLog')">
-                    {{ $t('logs.operation') }}
-                </el-button>
-                <el-button class="tag-button no-active" @click="onChangeRoute('LoginLog')">
-                    {{ $t('logs.login') }}
-                </el-button>
-                <el-button class="tag-button no-active" @click="onChangeRoute('SystemLog')">
-                    {{ $t('logs.system') }}
-                </el-button>
+                <LogRouter current="OperationLog" />
             </template>
             <template #leftToolBar>
                 <el-button type="primary" plain @click="onClean()">
@@ -96,14 +88,13 @@
 
 <script setup lang="ts">
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
+import LogRouter from '@/views/log/router/index.vue';
 import { dateFormat } from '@/utils/util';
 import { cleanLogs, getOperationLogs } from '@/api/modules/log';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
-import { useRouter } from 'vue-router';
-const router = useRouter();
 
 const loading = ref();
 const data = ref();
@@ -152,10 +143,6 @@ const onClean = async () => {
         submitInputInfo: i18n.global.t('logs.deleteLogs'),
     };
     confirmDialogRef.value!.acceptParams(params);
-};
-
-const onChangeRoute = async (addr: string) => {
-    router.push({ name: addr });
 };
 
 const loadDetail = (log: string) => {

@@ -66,4 +66,5 @@ var (
 	favoriteService   = service.NewIFavoriteService()
 
 	websiteCAService = service.NewIWebsiteCAService()
+	taskService      = service.NewITaskService()
 )

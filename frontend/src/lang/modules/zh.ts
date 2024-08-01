@@ -1095,6 +1095,9 @@ const message = {
         websiteLog: '网站日志',
         runLog: '运行日志',
         errLog: '错误日志',
+        task: '任务日志',
+        taskName: '任务名称',
+        taskRunning: '运行中',
     },
     file: {
         dir: '文件夹',

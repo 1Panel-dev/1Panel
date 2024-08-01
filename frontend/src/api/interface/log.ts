@@ -40,4 +40,23 @@ export namespace Log {
     export interface CleanLog {
         logType: string;
     }
+
+    export interface SearchTaskReq extends ReqPage {
+        type: string;
+        status: string;
+    }
+
+    export interface Task {
+        id: string;
+        name: string;
+        type: string;
+        logFile: string;
+        status: string;
+        errorMsg: string;
+        operationLogID: number;
+        resourceID: number;
+        currentStep: string;
+        endAt: Date;
+        createdAt: Date;
+    }
 }

@@ -1093,6 +1093,9 @@ const message = {
         websiteLog: '網站日誌',
         runLog: '運行日誌',
         errLog: '錯誤日誌',
+        task: '任務日誌',
+        taskName: '任務名稱',
+        taskRunning: '運行中',
     },
     file: {
         dir: '文件夾',
