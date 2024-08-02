@@ -92,34 +92,35 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "EncryptKey", Value: encryptKey}).Error; err != nil {
 			return err
 		}
-		if _, err := os.Stat("/opt/1panel/nodeJson"); err != nil {
+		if _, err := os.Stat("/opt/1panel/nodeJson"); err == nil {
+			type nodeInfo struct {
+				ServerCrt   string `json:"serverCrt"`
+				ServerKey   string `json:"serverKey"`
+				CurrentNode string `json:"currentNode"`
+			}
+			nodeJson, err := os.ReadFile("/opt/1panel/nodeJson")
+			if err != nil {
+				return err
+			}
+			var node nodeInfo
+			if err := json.Unmarshal(nodeJson, &node); err != nil {
+				return err
+			}
+			itemKey, _ := encrypt.StringEncrypt(node.ServerKey)
+			if err := tx.Create(&model.Setting{Key: "ServerKey", Value: itemKey}).Error; err != nil {
+				return err
+			}
+			itemCrt, _ := encrypt.StringEncrypt(node.ServerCrt)
+			if err := tx.Create(&model.Setting{Key: "ServerCrt", Value: itemCrt}).Error; err != nil {
+				return err
+			}
+			global.CurrentNode = node.CurrentNode
+		} else {
+			global.CurrentNode = "127.0.0.1"
+		}
+		if err := tx.Create(&model.Setting{Key: "CurrentNode", Value: global.CurrentNode}).Error; err != nil {
 			return err
 		}
-		type nodeInfo struct {
-			ServerCrt   string `json:"serverCrt"`
-			ServerKey   string `json:"serverKey"`
-			CurrentNode string `json:"currentNode"`
-		}
-		nodeJson, err := os.ReadFile("/opt/1panel/nodeJson")
-		if err != nil {
-			return err
-		}
-		var node nodeInfo
-		if err := json.Unmarshal(nodeJson, &node); err != nil {
-			return err
-		}
-		itemKey, _ := encrypt.StringEncrypt(node.ServerKey)
-		if err := tx.Create(&model.Setting{Key: "ServerKey", Value: itemKey}).Error; err != nil {
-			return err
-		}
-		itemCrt, _ := encrypt.StringEncrypt(node.ServerCrt)
-		if err := tx.Create(&model.Setting{Key: "ServerCrt", Value: itemCrt}).Error; err != nil {
-			return err
-		}
-		if err := tx.Create(&model.Setting{Key: "CurrentNode", Value: node.CurrentNode}).Error; err != nil {
-			return err
-		}
-		global.CurrentNode = node.CurrentNode
 
 		if err := tx.Create(&model.Setting{Key: "SystemIP", Value: ""}).Error; err != nil {
 			return err
