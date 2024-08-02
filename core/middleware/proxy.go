@@ -10,7 +10,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/core/constant"
-	"github.com/1Panel-dev/1Panel/core/xpack/utlis/proxy"
+	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,7 +22,7 @@ func Proxy() gin.HandlerFunc {
 		}
 		currentNode := c.Request.Header.Get("CurrentNode")
 		if len(currentNode) != 0 && currentNode != "127.0.0.1" {
-			if err := proxy.Proxy(c, currentNode); err != nil {
+			if err := xpack.Proxy(c, currentNode); err != nil {
 				helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrProxy, err)
 				return
 			}
