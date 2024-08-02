@@ -55,7 +55,7 @@ func Start() {
 	} else {
 		server.Addr = "0.0.0.0:9999"
 		settingRepo := repo.NewISettingRepo()
-		certItem, err := settingRepo.Get(settingRepo.WithByKey("ServerCert"))
+		certItem, err := settingRepo.Get(settingRepo.WithByKey("ServerCrt"))
 		if err != nil {
 			panic(err)
 		}

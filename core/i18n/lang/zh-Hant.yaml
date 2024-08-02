@@ -15,6 +15,7 @@ ErrNameIsExist: "名稱已存在"
 ErrDemoEnvironment: "演示伺服器，禁止此操作!"
 ErrEntrance: "安全入口信息錯誤，請檢查後重試！"
 ErrGroupIsUsed: "分組正在使用中，無法刪除"
+ErrLocalDelete: "無法刪除本地節點！"
 
 #app
 ErrPortInUsed: "{{ .detail }} 端口已被佔用！"

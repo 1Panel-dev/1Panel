@@ -15,6 +15,7 @@ ErrDemoEnvironment: "演示服务器，禁止此操作!"
 ErrCmdTimeout: "命令执行超时！"
 ErrEntrance: "安全入口信息错误，请检查后重试！"
 ErrGroupIsUsed: "分组正在使用中，无法删除"
+ErrLocalDelete: "无法删除本地节点！"
 
 #app
 ErrPortInUsed: "{{ .detail }} 端口已被占用！"

@@ -47,4 +47,5 @@ var (
 	ErrDemoEnvironment     = "ErrDemoEnvironment"
 	ErrEntrance            = "ErrEntrance"
 	ErrProxy               = "ErrProxy"
+	ErrLocalDelete         = "ErrLocalDelete"
 )
