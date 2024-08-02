@@ -114,7 +114,7 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 
 	appVersionDir := filepath.Join(app.GetAppResourcePath(), appDetail.Version)
 	if !fileOp.Stat(appVersionDir) || appDetail.Update {
-		if err = downloadApp(app, appDetail, nil); err != nil {
+		if err = downloadApp(app, appDetail, nil, nil); err != nil {
 			return nil, err
 		}
 	}
@@ -397,7 +397,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 		fileOp := files.NewFileOp()
 		appVersionDir := path.Join(constant.AppResourceDir, app.Resource, app.Key, appDetail.Version)
 		if !fileOp.Stat(appVersionDir) || appDetail.Update {
-			if err := downloadApp(app, appDetail, nil); err != nil {
+			if err := downloadApp(app, appDetail, nil, nil); err != nil {
 				return err
 			}
 			_ = fileOp.Rename(path.Join(runtime.GetPath(), "run.sh"), path.Join(runtime.GetPath(), "run.sh.bak"))

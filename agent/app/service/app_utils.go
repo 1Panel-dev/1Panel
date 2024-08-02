@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
+	"log"
 	"math"
 	"net/http"
 	"os"
@@ -132,7 +133,7 @@ var ToolKeys = map[string]uint{
 }
 
 func createLink(ctx context.Context, installTask *task.Task, app model.App, appInstall *model.AppInstall, params map[string]interface{}) error {
-	deleteAppLink := func() {
+	deleteAppLink := func(t *task.Task) {
 		_ = deleteLink(ctx, appInstall, true, true, true)
 	}
 	var dbConfig dto.AppDatabase
@@ -496,67 +497,44 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 	if install.Version == detail.Version {
 		return errors.New("two version is same")
 	}
+
+	upgradeTask, err := task.NewTaskWithOps(install.Name, task.TaskUpgrade, task.TaskScopeApp, req.TaskID, install.ID)
+	if err != nil {
+		return err
+	}
 	install.Status = constant.Upgrading
 
-	go func() {
-		var (
-			upErr      error
-			backupFile string
-			preErr     error
-		)
-		global.LOG.Infof(i18n.GetMsgWithName("UpgradeAppStart", install.Name, nil))
+	var (
+		upErr      error
+		backupFile string
+	)
+	backUpApp := func(t *task.Task) error {
 		if req.Backup {
 			backupRecord, err := NewIBackupService().AppBackup(dto.CommonBackup{Name: install.App.Key, DetailName: install.Name})
-			if err == nil {
-				localDir, err := loadLocalDir()
-				if err == nil {
-					backupFile = path.Join(localDir, backupRecord.FileDir, backupRecord.FileName)
-				} else {
-					global.LOG.Errorf(i18n.GetMsgWithName("ErrAppBackup", install.Name, err))
-				}
-			} else {
-				global.LOG.Errorf(i18n.GetMsgWithName("ErrAppBackup", install.Name, err))
+			if err != nil {
+				return buserr.WithNameAndErr("ErrAppBackup", install.Name, err)
 			}
+			localDir, err := loadLocalDir()
+			if err != nil {
+				return buserr.WithNameAndErr("ErrAppBackup", install.Name, err)
+			}
+			backupFile = path.Join(localDir, backupRecord.FileDir, backupRecord.FileName)
 		}
+		return nil
+	}
+	upgradeTask.AddSubTask(task.GetTaskName(install.Name, task.TaskBackup, task.TaskScopeApp), backUpApp, nil)
 
-		defer func() {
-			if upErr != nil {
-				global.LOG.Infof(i18n.GetMsgWithName("ErrAppUpgrade", install.Name, upErr))
-				if req.Backup {
-					global.LOG.Infof(i18n.GetMsgWithName("AppRecover", install.Name, nil))
-					if err := NewIBackupService().AppRecover(dto.CommonRecover{Name: install.App.Key, DetailName: install.Name, Type: "app", Source: constant.ResourceLocal, File: backupFile}); err != nil {
-						global.LOG.Errorf("recover app [%s] [%s] failed %v", install.App.Key, install.Name, err)
-					}
-				}
-				existInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(req.InstallID))
-				if existInstall.ID > 0 {
-					existInstall.Status = constant.UpgradeErr
-					existInstall.Message = upErr.Error()
-					_ = appInstallRepo.Save(context.Background(), &existInstall)
-				}
-			}
-			if preErr != nil {
-				global.LOG.Infof(i18n.GetMsgWithName("ErrAppUpgrade", install.Name, preErr))
-				existInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(req.InstallID))
-				if existInstall.ID > 0 {
-					existInstall.Status = constant.UpgradeErr
-					existInstall.Message = preErr.Error()
-					_ = appInstallRepo.Save(context.Background(), &existInstall)
-				}
-			}
-		}()
-
+	upgradeApp := func(t *task.Task) error {
 		fileOp := files.NewFileOp()
 		detailDir := path.Join(constant.ResourceDir, "apps", install.App.Resource, install.App.Key, detail.Version)
 		if install.App.Resource == constant.AppResourceRemote {
-			if preErr = downloadApp(install.App, detail, &install); preErr != nil {
-				return
+			if err = downloadApp(install.App, detail, &install, t.Logger); err != nil {
+				return err
 			}
 			if detail.DockerCompose == "" {
 				composeDetail, err := fileOp.GetContent(path.Join(detailDir, "docker-compose.yml"))
 				if err != nil {
-					preErr = err
-					return
+					return err
 				}
 				detail.DockerCompose = string(composeDetail)
 				_ = appDetailRepo.Update(context.Background(), detail)
@@ -565,41 +543,37 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 				_, _, _ = httpUtil.HandleGet(detail.DownloadCallBackUrl, http.MethodGet, constant.TimeOut5s)
 			}()
 		}
-
 		if install.App.Resource == constant.AppResourceLocal {
 			detailDir = path.Join(constant.ResourceDir, "apps", "local", strings.TrimPrefix(install.App.Key, "local"), detail.Version)
 		}
 
 		content, err := fileOp.GetContent(install.GetEnvPath())
 		if err != nil {
-			preErr = err
-			return
+			return err
 		}
 		if req.PullImage {
 			projectName := strings.ToLower(install.Name)
 			images, err := composeV2.GetDockerComposeImages(projectName, content, []byte(detail.DockerCompose))
 			if err != nil {
-				preErr = err
-				return
+				return err
 			}
 			for _, image := range images {
-				global.LOG.Infof(i18n.GetMsgWithName("PullImageStart", image, nil))
+				t.Log(i18n.GetWithName("PullImageStart", image))
 				if out, err := cmd.ExecWithTimeOut("docker pull "+image, 20*time.Minute); err != nil {
 					if out != "" {
 						err = errors.New(out)
 					}
-					preErr = buserr.WithNameAndErr("ErrDockerPullImage", "", err)
-					return
-				} else {
-					global.LOG.Infof(i18n.GetMsgByKey("PullImageSuccess"))
+					err = buserr.WithNameAndErr("ErrDockerPullImage", "", err)
+					return err
 				}
+				t.LogSuccess(i18n.GetMsgByKey("PullImage"))
 			}
 		}
 
 		command := exec.Command("/bin/bash", "-c", fmt.Sprintf("cp -rn %s/* %s || true", detailDir, install.GetPath()))
 		stdout, _ := command.CombinedOutput()
 		if stdout != nil {
-			global.LOG.Infof("upgrade app [%s] [%s] cp file log : %s ", install.App.Key, install.Name, string(stdout))
+			t.Logger.Printf("upgrade app [%s] [%s] cp file log : %s ", install.App.Key, install.Name, string(stdout))
 		}
 		sourceScripts := path.Join(detailDir, "scripts")
 		if fileOp.Stat(sourceScripts) {
@@ -612,9 +586,9 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 
 		var newCompose string
 		if req.DockerCompose == "" {
-			newCompose, upErr = getUpgradeCompose(install, detail)
-			if upErr != nil {
-				return
+			newCompose, err = getUpgradeCompose(install, detail)
+			if err != nil {
+				return err
 			}
 		} else {
 			newCompose = req.DockerCompose
@@ -627,40 +601,65 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		if out, err := compose.Down(install.GetComposePath()); err != nil {
 			if out != "" {
 				upErr = errors.New(out)
-				return
+				return upErr
 			}
-			upErr = err
-			return
+			return err
 		}
 		envs := make(map[string]interface{})
-		if upErr = json.Unmarshal([]byte(install.Env), &envs); upErr != nil {
-			return
+		if err = json.Unmarshal([]byte(install.Env), &envs); err != nil {
+			return err
 		}
 		envParams := make(map[string]string, len(envs))
 		handleMap(envs, envParams)
-		if upErr = env.Write(envParams, install.GetEnvPath()); upErr != nil {
-			return
+		if err = env.Write(envParams, install.GetEnvPath()); err != nil {
+			return err
 		}
 
-		//TODO use task
-		if upErr = runScript(nil, &install, "upgrade"); upErr != nil {
-			return
+		if err = runScript(t, &install, "upgrade"); err != nil {
+			return err
 		}
 
-		if upErr = fileOp.WriteFile(install.GetComposePath(), strings.NewReader(install.DockerCompose), 0775); upErr != nil {
-			return
+		if err = fileOp.WriteFile(install.GetComposePath(), strings.NewReader(install.DockerCompose), 0775); err != nil {
+			return err
 		}
+
+		logStr := fmt.Sprintf("%s %s", i18n.GetMsgByKey("Run"), i18n.GetMsgByKey("App"))
+		t.Log(logStr)
 		if out, err := compose.Up(install.GetComposePath()); err != nil {
 			if out != "" {
-				upErr = errors.New(out)
+				return errors.New(out)
+			}
+			return err
+		}
+		t.LogSuccess(logStr)
+		install.Status = constant.Running
+		return appInstallRepo.Save(context.Background(), &install)
+	}
+
+	rollBackApp := func(t *task.Task) {
+		if req.Backup {
+			t.Log(i18n.GetWithName("AppRecover", install.Name))
+			if err := NewIBackupService().AppRecover(dto.CommonRecover{Name: install.App.Key, DetailName: install.Name, Type: "app", Source: constant.ResourceLocal, File: backupFile}); err != nil {
+				t.LogFailedWithErr(i18n.GetWithName("AppRecover", install.Name), err)
 				return
 			}
-			upErr = err
+			t.LogSuccess(i18n.GetWithName("AppRecover", install.Name))
 			return
 		}
-		install.Status = constant.Running
-		_ = appInstallRepo.Save(context.Background(), &install)
-		global.LOG.Infof(i18n.GetMsgWithName("UpgradeAppSuccess", install.Name, nil))
+	}
+
+	upgradeTask.AddSubTask(task.GetTaskName(install.Name, task.TaskScopeApp, task.TaskUpgrade), upgradeApp, rollBackApp)
+
+	go func() {
+		err = upgradeTask.Execute()
+		if err != nil {
+			existInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(req.InstallID))
+			if existInstall.ID > 0 && existInstall.Status != constant.Running {
+				existInstall.Status = constant.UpgradeErr
+				existInstall.Message = upErr.Error()
+				_ = appInstallRepo.Save(context.Background(), &existInstall)
+			}
+		}
 	}()
 
 	return appInstallRepo.Save(context.Background(), &install)
@@ -747,9 +746,8 @@ func handleMap(params map[string]interface{}, envParams map[string]string) {
 	}
 }
 
-func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.AppInstall) (err error) {
+func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.AppInstall, logger *log.Logger) (err error) {
 	if app.IsLocalApp() {
-		//本地应用,不去官网下载
 		return nil
 	}
 	appResourceDir := path.Join(constant.AppResourceDir, app.Resource)
@@ -765,7 +763,12 @@ func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.App
 	if !fileOp.Stat(appVersionDir) {
 		_ = fileOp.CreateDir(appVersionDir, 0755)
 	}
-	global.LOG.Infof("download app[%s] from %s", app.Name, appDetail.DownloadUrl)
+	if logger == nil {
+		global.LOG.Infof("download app[%s] from %s", app.Name, appDetail.DownloadUrl)
+	} else {
+		logger.Printf("download app[%s] from %s", app.Name, appDetail.DownloadUrl)
+	}
+
 	filePath := path.Join(appVersionDir, app.Key+"-"+appDetail.Version+".tar.gz")
 
 	defer func() {
@@ -778,11 +781,19 @@ func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.App
 	}()
 
 	if err = fileOp.DownloadFileWithProxy(appDetail.DownloadUrl, filePath); err != nil {
-		global.LOG.Errorf("download app[%s] error %v", app.Name, err)
+		if logger == nil {
+			global.LOG.Errorf("download app[%s] error %v", app.Name, err)
+		} else {
+			logger.Printf("download app[%s] error %v", app.Name, err)
+		}
 		return
 	}
 	if err = fileOp.Decompress(filePath, appResourceDir, files.SdkTarGz, ""); err != nil {
-		global.LOG.Errorf("decompress app[%s] error %v", app.Name, err)
+		if logger == nil {
+			global.LOG.Errorf("decompress app[%s] error %v", app.Name, err)
+		} else {
+			logger.Printf("decompress app[%s] error %v", app.Name, err)
+		}
 		return
 	}
 	_ = fileOp.DeleteFile(filePath)
@@ -796,7 +807,7 @@ func copyData(task *task.Task, app model.App, appDetail model.AppDetail, appInst
 	appResourceDir := path.Join(constant.AppResourceDir, app.Resource)
 
 	if app.Resource == constant.AppResourceRemote {
-		err = downloadApp(app, appDetail, appInstall)
+		err = downloadApp(app, appDetail, appInstall, task.Logger)
 		if err != nil {
 			return
 		}

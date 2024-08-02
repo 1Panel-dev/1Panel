@@ -16,7 +16,7 @@ import (
 )
 
 type ActionFunc func(*Task) error
-type RollbackFunc func()
+type RollbackFunc func(*Task)
 
 type Task struct {
 	Name      string
@@ -48,6 +48,7 @@ const (
 	TaskUpgrade   = "TaskUpgrade"
 	TaskUpdate    = "TaskUpdate"
 	TaskRestart   = "TaskRestart"
+	TaskBackup    = "TaskBackup"
 )
 
 const (
@@ -67,29 +68,20 @@ func GetTaskName(resourceName, operate, scope string) string {
 }
 
 func NewTaskWithOps(resourceName, operate, scope, taskID string, resourceID uint) (*Task, error) {
-	return NewTask(GetTaskName(resourceName, operate, scope), scope, taskID, resourceID)
+	return NewTask(GetTaskName(resourceName, operate, scope), operate, scope, taskID, resourceID)
 }
 
-//func NewChildTask(name, taskType, parentTaskID string) (*Task, error) {
-//	task, err := NewTask(name, taskType, "")
-//	if err != nil {
-//		return nil, err
-//	}
-//	task.ParentID = parentTaskID
-//	return task, nil
-//}
-
-func NewTask(name, taskType, taskID string, resourceID uint) (*Task, error) {
+func NewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, error) {
 	if taskID == "" {
 		taskID = uuid.New().String()
 	}
-	logDir := path.Join(constant.LogDir, taskType)
+	logDir := path.Join(constant.LogDir, taskScope)
 	if _, err := os.Stat(logDir); os.IsNotExist(err) {
 		if err = os.MkdirAll(logDir, 0755); err != nil {
 			return nil, fmt.Errorf("failed to create log directory: %w", err)
 		}
 	}
-	logPath := path.Join(constant.LogDir, taskType, taskID+".log")
+	logPath := path.Join(constant.LogDir, taskScope, taskID+".log")
 	file, err := os.OpenFile(logPath, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open log file: %w", err)
@@ -98,10 +90,11 @@ func NewTask(name, taskType, taskID string, resourceID uint) (*Task, error) {
 	taskModel := &model.Task{
 		ID:         taskID,
 		Name:       name,
-		Type:       taskType,
+		Type:       taskScope,
 		LogFile:    logPath,
 		Status:     constant.StatusRunning,
 		ResourceID: resourceID,
+		Operate:    operate,
 	}
 	taskRepo := repo.NewITaskRepo()
 	task := &Task{Name: name, logFile: file, Logger: logger, taskRepo: taskRepo, Task: taskModel}
@@ -147,7 +140,7 @@ func (s *SubTask) Execute() error {
 
 		if i == s.Retry {
 			if s.Rollback != nil {
-				s.Rollback()
+				s.Rollback(s.RootTask)
 			}
 		}
 		time.Sleep(1 * time.Second)
@@ -176,7 +169,7 @@ func (t *Task) Execute() error {
 			t.Task.ErrorMsg = err.Error()
 			t.Task.Status = constant.StatusFailed
 			for _, rollback := range t.Rollbacks {
-				rollback()
+				rollback(t)
 			}
 			t.updateTask(t.Task)
 			break

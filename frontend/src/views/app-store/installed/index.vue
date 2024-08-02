@@ -116,7 +116,6 @@
                                                     <el-button link type="info">
                                                         <span class="name">{{ installed.name }}</span>
                                                     </el-button>
-
                                                     <span class="status">
                                                         <Status
                                                             :key="installed.status"
@@ -161,6 +160,7 @@
                                                     </span>
                                                     <span class="ml-1">
                                                         <el-tooltip
+                                                            v-if="mode !== 'upgrade'"
                                                             effect="dark"
                                                             :content="$t('commons.button.log')"
                                                             placement="top"
@@ -621,7 +621,7 @@ const quickJump = () => {
 const openLog = (row: any) => {
     switch (row.status) {
         case 'Installing':
-            taskLogRef.value.openWithResourceID('App', row.id);
+            taskLogRef.value.openWithResourceID('App', 'TaskInstall', row.id);
             break;
         default:
             composeLogRef.value.acceptParams({ compose: row.path + '/docker-compose.yml', resource: row.name });

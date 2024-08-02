@@ -76,6 +76,7 @@
         </template>
         <Diff ref="composeDiffRef" @confirm="getNewCompose" />
     </DrawerPro>
+    <TaskLog ref="taskLogRef" />
 </template>
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
@@ -88,6 +89,8 @@ import { Rules } from '@/global/form-rules';
 import Diff from './diff/index.vue';
 import bus from '../../bus';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
+import TaskLog from '@/components/task-log/index.vue';
+import { v4 as uuidv4 } from 'uuid';
 
 const composeDiffRef = ref();
 const updateRef = ref<FormInstance>();
@@ -102,6 +105,7 @@ const operateReq = reactive({
     pullImage: true,
     version: '',
     dockerCompose: '',
+    taskID: '',
 });
 const resourceName = ref('');
 const rules = ref<any>({
@@ -119,6 +123,7 @@ const handleClose = () => {
 const newCompose = ref('');
 const useNewCompose = ref(false);
 const appInstallID = ref(0);
+const taskLogRef = ref();
 
 const toLink = (link: string) => {
     window.open(link, '_blank');
@@ -185,17 +190,24 @@ const getVersions = async (version: string) => {
     } catch (error) {}
 };
 
+const openTaskLog = (taskID: string) => {
+    taskLogRef.value.openWithTaskID(taskID);
+};
+
 const operate = async () => {
     loading.value = true;
     if (operateReq.operate === 'upgrade') {
         if (useNewCompose.value) {
             operateReq.dockerCompose = newCompose.value;
         }
+        const taskID = uuidv4();
+        operateReq.taskID = taskID;
         await InstalledOp(operateReq)
             .then(() => {
                 MsgSuccess(i18n.global.t('app.upgradeStart'));
                 bus.emit('upgrade', true);
                 handleClose();
+                openTaskLog(taskID);
             })
             .finally(() => {
                 loading.value = false;

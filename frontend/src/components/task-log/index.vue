@@ -53,6 +53,7 @@ const readReq = reactive({
     pageSize: 500,
     latest: false,
     taskType: '',
+    taskOperate: '',
     id: 0,
 });
 
@@ -69,9 +70,10 @@ const openWithTaskID = (id: string) => {
     initData();
 };
 
-const openWithResourceID = (taskType: string, resourceID: number) => {
+const openWithResourceID = (taskType: string, taskOperate: string, resourceID: number) => {
     readReq.taskType = taskType;
     readReq.id = resourceID;
+    readReq.taskOperate = taskOperate;
     initData();
 };
 

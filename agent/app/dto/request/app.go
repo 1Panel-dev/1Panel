@@ -72,6 +72,7 @@ type AppInstalledOperate struct {
 	Backup        bool                `json:"backup"`
 	PullImage     bool                `json:"pullImage"`
 	DockerCompose string              `json:"dockerCompose"`
+	TaskID        string              `json:"taskID"`
 }
 
 type AppInstallUpgrade struct {
@@ -80,6 +81,7 @@ type AppInstallUpgrade struct {
 	Backup        bool   `json:"backup"`
 	PullImage     bool   `json:"pullImage"`
 	DockerCompose string `json:"dockerCompose"`
+	TaskID        string `json:"taskID"`
 }
 
 type AppInstalledUpdate struct {

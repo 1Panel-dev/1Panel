@@ -270,9 +270,7 @@ const openTaskLog = (taskID: string) => {
 const install = () => {
     loading.value = true;
     const taskID = uuidv4();
-    console.log(taskID);
     req.taskID = taskID;
-    console.log(req);
     InstallApp(req)
         .then(() => {
             handleClose();

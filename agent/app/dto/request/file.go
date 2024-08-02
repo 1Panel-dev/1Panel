@@ -128,8 +128,13 @@ type FileReadByLineReq struct {
 	ID       uint   `json:"ID"`
 	Name     string `json:"name"`
 	Latest   bool   `json:"latest"`
-	TaskID   string `json:"taskID"`
-	TaskType string `json:"taskType"`
+	TaskReq
+}
+
+type TaskReq struct {
+	TaskID      string `json:"taskID"`
+	TaskType    string `json:"taskType"`
+	TaskOperate string `json:"taskOperate"`
 }
 
 type FileExistReq struct {

@@ -347,7 +347,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			website.FtpID = itemID
 			return nil
 		}
-		deleteFtpUser := func() {
+		deleteFtpUser := func(t *task.Task) {
 			if website.FtpID > 0 {
 				req := dto.BatchDeleteReq{Ids: []uint{website.FtpID}}
 				if err = NewIFtpService().Delete(req); err != nil {
@@ -381,7 +381,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		return nil
 	}
 
-	deleteWebsite := func() {
+	deleteWebsite := func(t *task.Task) {
 		_ = deleteWebsiteFolder(nginxInstall, website)
 	}
 

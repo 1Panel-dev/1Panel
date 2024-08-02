@@ -19,6 +19,7 @@ type ITaskRepo interface {
 	WithType(taskType string) DBOption
 	WithResourceID(id uint) DBOption
 	WithStatus(status string) DBOption
+	WithOperate(taskOperate string) DBOption
 }
 
 func NewITaskRepo() ITaskRepo {
@@ -34,6 +35,12 @@ func (t TaskRepo) WithByID(id string) DBOption {
 func (t TaskRepo) WithType(taskType string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("type = ?", taskType)
+	}
+}
+
+func (t TaskRepo) WithOperate(taskOperate string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("operate = ?", taskOperate)
 	}
 }
 

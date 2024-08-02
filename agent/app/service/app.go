@@ -185,7 +185,7 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 
 		versionPath := filepath.Join(app.GetAppResourcePath(), detail.Version)
 		if !fileOp.Stat(versionPath) || detail.Update {
-			if err = downloadApp(app, detail, nil); err != nil {
+			if err = downloadApp(app, detail, nil, nil); err != nil {
 				return appDetailDTO, err
 			}
 		}
@@ -441,7 +441,7 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 		return
 	}
 
-	installTask, err := task.NewTaskWithOps(appInstall.Name, task.TaskCreate, task.TaskScopeApp, req.TaskID, appInstall.ID)
+	installTask, err := task.NewTaskWithOps(appInstall.Name, task.TaskInstall, task.TaskScopeApp, req.TaskID, appInstall.ID)
 	if err != nil {
 		return
 	}
@@ -462,7 +462,7 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 		return nil
 	}
 
-	handleAppStatus := func() {
+	handleAppStatus := func(t *task.Task) {
 		appInstall.Status = constant.UpErr
 		appInstall.Message = installTask.Task.ErrorMsg
 		_ = appInstallRepo.Save(context.Background(), appInstall)
