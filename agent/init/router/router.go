@@ -1,6 +1,7 @@
 package router
 
 import (
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/middleware"
 	rou "github.com/1Panel-dev/1Panel/agent/router"
@@ -25,7 +26,9 @@ func Routers() *gin.Engine {
 		PublicGroup.Static("/api/v1/images", "./uploads")
 	}
 	PrivateGroup := Router.Group("/api/v2")
-	PrivateGroup.Use(middleware.Certificate())
+	if global.CurrentNode != "127.0.0.1" {
+		PrivateGroup.Use(middleware.Certificate())
+	}
 	for _, router := range rou.RouterGroupApp {
 		router.InitRouter(PrivateGroup)
 	}

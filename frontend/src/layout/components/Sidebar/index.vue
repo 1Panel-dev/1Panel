@@ -127,23 +127,20 @@ const systemLogOut = async () => {
 };
 
 const loadNodes = async () => {
-    if (globalStore.isProductPro) {
-        let listXNodes;
-        const xpackModules = import.meta.glob('../../../xpack/api/modules/node.ts', { eager: true });
-        if (xpackModules['../../../xpack/api/modules/node.ts']) {
-            console.log('dqwdqwd');
-            listXNodes = xpackModules['../../../xpack/api/modules/node.ts']['listNodes'] || {};
-            const res = await listXNodes();
-            if (!res) {
-                nodes.value = [];
-                return;
-            }
-            console.log('dqwdqwd');
-            nodes.value = res.data;
+    let listXNodes;
+    const xpackModules = import.meta.glob('../../../xpack/api/modules/node.ts', { eager: true });
+    if (xpackModules['../../../xpack/api/modules/node.ts']) {
+        listXNodes = xpackModules['../../../xpack/api/modules/node.ts']['listNodes'] || {};
+        const res = await listXNodes();
+        if (!res) {
+            nodes.value = [];
             return;
         }
-        nodes.value = [];
+        console.log('dqwdqwd');
+        nodes.value = res.data;
+        return;
     }
+    nodes.value = [];
 };
 const changeNode = (command: string) => {
     globalStore.currentNode = command || '127.0.0.1';

@@ -4,6 +4,12 @@ const (
 	StatusSuccess = "Success"
 	StatusFailed  = "Failed"
 
-	StatusHealthy   = "Healthy"
-	StatusUnhealthy = "Unhealthy"
+	// node
+	StatusWaiting     = "waiting"
+	StatusDownloading = "downloading"
+	StatusPacking     = "packing"
+	StatusSending     = "sending"
+	StatusStarting    = "starting"
+	StatusHealthy     = "healthy"
+	StatusUnhealthy   = "unhealthy"
 )

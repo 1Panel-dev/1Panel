@@ -15,6 +15,7 @@ ErrNameIsExist: "Name is already exist"
 ErrDemoEnvironment: "Demo server, prohibit this operation!"
 ErrEntrance: "Security entrance information error. Please check and try again!"
 ErrGroupIsUsed: "The group is in use and cannot be deleted"
+ErrLocalDelete: "Unable to delete local node!"
 
 #app
 ErrPortInUsed: "{{ .detail }} port already in use"

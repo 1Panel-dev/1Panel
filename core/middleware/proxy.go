@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"fmt"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -24,7 +23,6 @@ func Proxy() gin.HandlerFunc {
 		currentNode := c.Request.Header.Get("CurrentNode")
 		if len(currentNode) != 0 && currentNode != "127.0.0.1" {
 			if err := proxy.Proxy(c, currentNode); err != nil {
-				fmt.Println(err)
 				helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrProxy, err)
 				return
 			}

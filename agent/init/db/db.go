@@ -46,7 +46,6 @@ func Init() {
 	if err != nil {
 		panic(err)
 	}
-	_ = db.Exec("PRAGMA journal_mode = WAL;")
 	sqlDB, dbError := db.DB()
 	if dbError != nil {
 		panic(dbError)

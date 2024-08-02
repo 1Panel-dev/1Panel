@@ -1,11 +1,14 @@
 package common
 
 import (
+	"fmt"
 	mathRand "math/rand"
 	"net"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/core/utils/cmd"
 )
 
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
@@ -93,4 +96,27 @@ func SplitStr(str string, spi ...string) []string {
 		lists = results
 	}
 	return results
+}
+
+func LoadArch() (string, error) {
+	std, err := cmd.Exec("uname -a")
+	if err != nil {
+		return "", fmt.Errorf("std: %s, err: %s", std, err.Error())
+	}
+	if strings.Contains(std, "x86_64") {
+		return "amd64", nil
+	}
+	if strings.Contains(std, "arm64") || strings.Contains(std, "aarch64") {
+		return "arm64", nil
+	}
+	if strings.Contains(std, "armv7l") {
+		return "armv7", nil
+	}
+	if strings.Contains(std, "ppc64le") {
+		return "ppc64le", nil
+	}
+	if strings.Contains(std, "s390x") {
+		return "s390x", nil
+	}
+	return "", fmt.Errorf("unsupported such arch: %s", std)
 }

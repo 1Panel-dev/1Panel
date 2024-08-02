@@ -1,9 +1,9 @@
 package migrations
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
-	"path"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -92,6 +92,34 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "EncryptKey", Value: encryptKey}).Error; err != nil {
 			return err
 		}
+		if _, err := os.Stat("/opt/1panel/nodeJson"); err != nil {
+			return err
+		}
+		type nodeInfo struct {
+			ServerCrt   string `json:"serverCrt"`
+			ServerKey   string `json:"serverKey"`
+			CurrentNode string `json:"currentNode"`
+		}
+		nodeJson, err := os.ReadFile("/opt/1panel/nodeJson")
+		if err != nil {
+			return err
+		}
+		var node nodeInfo
+		if err := json.Unmarshal(nodeJson, &node); err != nil {
+			return err
+		}
+		itemKey, _ := encrypt.StringEncrypt(node.ServerKey)
+		if err := tx.Create(&model.Setting{Key: "ServerKey", Value: itemKey}).Error; err != nil {
+			return err
+		}
+		itemCrt, _ := encrypt.StringEncrypt(node.ServerCrt)
+		if err := tx.Create(&model.Setting{Key: "ServerCrt", Value: itemCrt}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "CurrentNode", Value: node.CurrentNode}).Error; err != nil {
+			return err
+		}
+		global.CurrentNode = node.CurrentNode
 
 		if err := tx.Create(&model.Setting{Key: "SystemIP", Value: ""}).Error; err != nil {
 			return err
@@ -163,23 +191,7 @@ var InitSetting = &gormigrate.Migration{
 			return err
 		}
 
-		if _, err := os.Stat(path.Join(global.CONF.System.DataDir, "ssl", "server.key")); err != nil {
-			return err
-		}
-		serverKey, _ := os.ReadFile(path.Join(global.CONF.System.DataDir, "ssl", "server.key"))
-		itemKey, _ := encrypt.StringEncrypt(string(serverKey))
-		if err := tx.Create(&model.Setting{Key: "ServerKey", Value: itemKey}).Error; err != nil {
-			return err
-		}
-		if _, err := os.Stat(path.Join(global.CONF.System.DataDir, "ssl", "server.crt")); err != nil {
-			return err
-		}
-		serverCrt, _ := os.ReadFile(path.Join(global.CONF.System.DataDir, "ssl", "server.crt"))
-		itemCrt, _ := encrypt.StringEncrypt(string(serverCrt))
-		if err := tx.Create(&model.Setting{Key: "ServerCert", Value: string(itemCrt)}).Error; err != nil {
-			return err
-		}
-
+		_ = os.Remove(("/opt/1panel/nodeJson"))
 		return nil
 	},
 }

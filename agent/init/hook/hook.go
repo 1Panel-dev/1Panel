@@ -10,6 +10,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 )
 
 func Init() {
@@ -38,6 +39,7 @@ func Init() {
 	handleSnapStatus()
 	loadLocalDir()
 	initDir()
+	_ = initSSL()
 }
 
 func handleSnapStatus() {
@@ -144,4 +146,38 @@ func initDir() {
 			return
 		}
 	}
+}
+
+func initSSL() error {
+	settingRepo := repo.NewISettingRepo()
+	if _, err := os.Stat("/opt/1panel/nodeJson"); err != nil {
+		return nil
+	}
+	type nodeInfo struct {
+		ServerCrt   string `json:"serverCrt"`
+		ServerKey   string `json:"serverKey"`
+		CurrentNode string `json:"currentNode"`
+	}
+	nodeJson, err := os.ReadFile("/opt/1panel/nodeJson")
+	if err != nil {
+		return err
+	}
+	var node nodeInfo
+	if err := json.Unmarshal(nodeJson, &node); err != nil {
+		return err
+	}
+	itemKey, _ := encrypt.StringEncrypt(node.ServerKey)
+	if err := settingRepo.Update("ServerKey", itemKey); err != nil {
+		return err
+	}
+	itemCrt, _ := encrypt.StringEncrypt(node.ServerCrt)
+	if err := settingRepo.Update("ServerCrt", itemCrt); err != nil {
+		return err
+	}
+	if err := settingRepo.Update("CurrentNode", node.CurrentNode); err != nil {
+		return err
+	}
+	global.CurrentNode = node.CurrentNode
+	_ = os.Remove(("/opt/1panel/nodeJson"))
+	return nil
 }
