@@ -272,6 +272,7 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 			Backup:        req.Backup,
 			PullImage:     req.PullImage,
 			DockerCompose: req.DockerCompose,
+			TaskID:        req.TaskID,
 		}
 		return upgradeInstall(upgradeReq)
 	case constant.Reload:
