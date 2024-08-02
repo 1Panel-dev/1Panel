@@ -48,7 +48,7 @@ agent/utils/xpack/xpack_xpack.go
 core/xpack
 core/router/entry_xpack.go
 core/server/init_xpack.go
-xpack
+core/utils/xpack/xpack_xpack.go
 
 .history/
 dist/
