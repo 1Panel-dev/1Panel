@@ -932,6 +932,8 @@ const message = {
         globalFilter: 'Global Filter',
         enableMonitor: 'Enable',
         storeDays: 'Expiration days',
+        defaultNetwork: 'Default Network Adapter',
+        defaultNetworkHelper: 'Network adapter option displayed in the default monitoring and overview interface',
         cleanMonitor: 'Clearing monitoring records',
 
         avgLoad: 'Average load',
@@ -1381,7 +1383,6 @@ const message = {
         proxyPasswdKeep: 'Remember Password',
         systemIPWarning: 'The server address is not currently set. Please set it in the control panel first!',
         systemIPWarning1: 'The current server address is set to {0}, and quick redirection is not possible!',
-        defaultNetwork: 'Network Card',
         syncTime: 'Server Time',
         timeZone: 'Time Zone',
         timeZoneChangeHelper: 'Changing the time zone requires restarting the service. Do you want to continue?',

@@ -145,9 +145,6 @@ var InitSetting = &gormigrate.Migration{
 			return err
 		}
 
-		if err := tx.Create(&model.Setting{Key: "DefaultNetwork", Value: "all"}).Error; err != nil {
-			return err
-		}
 		if err := tx.Create(&model.Setting{Key: "LastCleanTime", Value: ""}).Error; err != nil {
 			return err
 		}
@@ -158,6 +155,9 @@ var InitSetting = &gormigrate.Migration{
 			return err
 		}
 
+		if err := tx.Create(&model.Setting{Key: "DefaultNetwork", Value: "all"}).Error; err != nil {
+			return err
+		}
 		if err := tx.Create(&model.Setting{Key: "MonitorStatus", Value: "enable"}).Error; err != nil {
 			return err
 		}

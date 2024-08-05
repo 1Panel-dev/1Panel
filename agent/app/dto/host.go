@@ -73,3 +73,15 @@ type TreeChild struct {
 	ID    uint   `json:"id"`
 	Label string `json:"label"`
 }
+
+type MonitorSetting struct {
+	MonitorStatus    string `json:"monitorStatus"`
+	MonitorStoreDays string `json:"monitorStoreDays"`
+	MonitorInterval  string `json:"monitorInterval"`
+	DefaultNetwork   string `json:"defaultNetwork"`
+}
+
+type MonitorSettingUpdate struct {
+	Key   string `json:"key" validate:"required,oneof=MonitorStatus MonitorStoreDays MonitorInterval DefaultNetwork"`
+	Value string `json:"value"`
+}

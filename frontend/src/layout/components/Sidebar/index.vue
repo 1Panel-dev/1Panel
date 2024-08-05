@@ -136,7 +136,6 @@ const loadNodes = async () => {
             nodes.value = [];
             return;
         }
-        console.log('dqwdqwd');
         nodes.value = res.data;
         return;
     }

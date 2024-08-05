@@ -130,6 +130,12 @@ export const getIOOptions = () => {
 export const cleanMonitors = () => {
     return http.post(`/hosts/monitor/clean`, {});
 };
+export const loadMonitorSetting = () => {
+    return http.get<Host.MonitorSetting>(`/hosts/monitor/setting`, {});
+};
+export const updateMonitorSetting = (key: string, value: string) => {
+    return http.post(`/hosts/monitor/setting/update`, { key: key, value: value });
+};
 
 // ssh
 export const getSSHInfo = () => {

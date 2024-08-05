@@ -272,16 +272,6 @@ func (b *BaseApi) HandlePasswordExpired(c *gin.Context) {
 }
 
 // @Tags System Setting
-// @Summary Load local backup dir
-// @Description 获取安装根目录
-// @Success 200 {string} path
-// @Security ApiKeyAuth
-// @Router /settings/basedir [get]
-func (b *BaseApi) LoadBaseDir(c *gin.Context) {
-	helper.SuccessWithData(c, global.CONF.System.DataDir)
-}
-
-// @Tags System Setting
 // @Summary Load mfa info
 // @Description 获取 mfa 信息
 // @Accept json

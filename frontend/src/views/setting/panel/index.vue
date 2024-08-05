@@ -89,33 +89,6 @@
                                 </span>
                             </el-form-item>
 
-                            <el-form-item :label="$t('setting.defaultNetwork')">
-                                <el-input disabled v-model="form.defaultNetworkVal">
-                                    <template #append>
-                                        <el-button v-show="!show" @click="onChangeNetwork" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-
-                            <el-form-item :label="$t('setting.systemIP')" prop="systemIP">
-                                <el-input disabled v-if="form.systemIP" v-model="form.systemIP">
-                                    <template #append>
-                                        <el-button @click="onChangeSystemIP" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                                <el-input disabled v-if="!form.systemIP" v-model="unset">
-                                    <template #append>
-                                        <el-button @click="onChangeSystemIP" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-
                             <el-form-item :label="$t('setting.proxy')" prop="proxyShow">
                                 <el-input disabled v-model="form.proxyShow">
                                     <template #append>
@@ -159,10 +132,8 @@
         <Password ref="passwordRef" />
         <UserName ref="userNameRef" />
         <PanelName ref="panelNameRef" @search="search()" />
-        <SystemIP ref="systemIPRef" @search="search()" />
         <Proxy ref="proxyRef" @search="search()" />
         <Timeout ref="timeoutRef" @search="search()" />
-        <Network ref="networkRef" @search="search()" />
         <HideMenu ref="hideMenuRef" @search="search()" />
     </div>
 </template>
@@ -179,9 +150,7 @@ import Password from '@/views/setting/panel/password/index.vue';
 import UserName from '@/views/setting/panel/username/index.vue';
 import Timeout from '@/views/setting/panel/timeout/index.vue';
 import PanelName from '@/views/setting/panel/name/index.vue';
-import SystemIP from '@/views/setting/panel/systemip/index.vue';
 import Proxy from '@/views/setting/panel/proxy/index.vue';
-import Network from '@/views/setting/panel/default-network/index.vue';
 import HideMenu from '@/views/setting/panel/hidemenu/index.vue';
 import { storeToRefs } from 'pinia';
 import { getXpackSetting, updateXpackSettingByKey } from '@/utils/xpack';
@@ -197,19 +166,12 @@ const { switchTheme } = useTheme();
 const form = reactive({
     userName: '',
     password: '',
-    email: '',
     sessionTimeout: 0,
-    localTime: '',
-    timeZone: '',
-    ntpSite: '',
     panelName: '',
-    systemIP: '',
     theme: '',
     menuTabs: '',
     language: '',
     complexityVerification: '',
-    defaultNetwork: '',
-    defaultNetworkVal: '',
     developerMode: '',
 
     proxyShow: '',
@@ -229,10 +191,8 @@ const show = ref();
 const userNameRef = ref();
 const passwordRef = ref();
 const panelNameRef = ref();
-const systemIPRef = ref();
 const proxyRef = ref();
 const timeoutRef = ref();
-const networkRef = ref();
 const hideMenuRef = ref();
 const unset = ref(i18n.t('setting.unSetting'));
 
@@ -250,16 +210,10 @@ const search = async () => {
     form.userName = res.data.userName;
     form.password = '******';
     form.sessionTimeout = Number(res.data.sessionTimeout);
-    form.localTime = res.data.localTime;
-    form.timeZone = res.data.timeZone;
-    form.ntpSite = res.data.ntpSite;
     form.panelName = res.data.panelName;
-    form.systemIP = res.data.systemIP;
     form.menuTabs = res.data.menuTabs;
     form.language = res.data.language;
     form.complexityVerification = res.data.complexityVerification;
-    form.defaultNetwork = res.data.defaultNetwork;
-    form.defaultNetworkVal = res.data.defaultNetwork === 'all' ? i18n.t('commons.table.all') : res.data.defaultNetwork;
     form.proHideMenus = res.data.xpackHideMenu;
     form.hideMenuList = res.data.xpackHideMenu;
     form.developerMode = res.data.developerMode;
@@ -322,9 +276,6 @@ const onChangeTitle = () => {
 const onChangeTimeout = () => {
     timeoutRef.value.acceptParams({ sessionTimeout: form.sessionTimeout });
 };
-const onChangeSystemIP = () => {
-    systemIPRef.value.acceptParams({ systemIP: form.systemIP });
-};
 const onChangeProxy = () => {
     proxyRef.value.acceptParams({
         url: form.proxyUrl,
@@ -334,9 +285,6 @@ const onChangeProxy = () => {
         passwd: form.proxyPasswd,
         passwdKeep: form.proxyPasswdKeep,
     });
-};
-const onChangeNetwork = () => {
-    networkRef.value.acceptParams({ defaultNetwork: form.defaultNetwork });
 };
 
 const onChangeHideMenus = () => {

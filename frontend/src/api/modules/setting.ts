@@ -6,25 +6,29 @@ import { Backup } from '../interface/backup';
 import { Setting } from '../interface/setting';
 import { TimeoutEnum } from '@/enums/http-enum';
 
+// license
 export const UploadFileData = (params: FormData) => {
     return http.upload('/licenses/upload', params);
 };
-
 export const getLicense = () => {
     return http.get<Setting.License>(`/licenses/get`);
 };
 export const getLicenseStatus = () => {
     return http.get<Setting.LicenseStatus>(`/licenses/get/status`);
 };
-
 export const syncLicense = () => {
     return http.post(`/licenses/sync`);
 };
-
 export const unbindLicense = () => {
     return http.post(`/licenses/unbind`);
 };
 
+// agent
+export const loadBaseDir = () => {
+    return http.get<string>(`/settings/basedir`);
+};
+
+// core
 export const getSettingInfo = () => {
     return http.post<Setting.SettingInfo>(`/core/settings/search`);
 };
@@ -33,11 +37,11 @@ export const getSystemAvailable = () => {
 };
 
 export const updateSetting = (param: Setting.SettingUpdate) => {
-    return http.post(`/settings/update`, param);
+    return http.post(`/core/settings/update`, param);
 };
 
 export const updateMenu = (param: Setting.SettingUpdate) => {
-    return http.post(`/settings/menu/update`, param);
+    return http.post(`/core/settings/menu/update`, param);
 };
 
 export const updateProxy = (params: Setting.ProxyUpdate) => {
@@ -46,60 +50,49 @@ export const updateProxy = (params: Setting.ProxyUpdate) => {
         request.proxyPasswd = Base64.encode(request.proxyPasswd);
     }
     request.proxyType = request.proxyType === 'close' ? '' : request.proxyType;
-    return http.post(`/settings/proxy/update`, request);
+    return http.post(`/core/settings/proxy/update`, request);
 };
 
 export const updatePassword = (param: Setting.PasswordUpdate) => {
-    return http.post(`/settings/password/update`, param);
+    return http.post(`/core/settings/password/update`, param);
 };
 
 export const loadInterfaceAddr = () => {
-    return http.get(`/settings/interface`);
+    return http.get(`/core/settings/interface`);
 };
 
 export const updateBindInfo = (ipv6: string, bindAddress: string) => {
-    return http.post(`/settings/bind/update`, { ipv6: ipv6, bindAddress: bindAddress });
+    return http.post(`/core/settings/bind/update`, { ipv6: ipv6, bindAddress: bindAddress });
 };
 
 export const updatePort = (param: Setting.PortUpdate) => {
-    return http.post(`/settings/port/update`, param);
+    return http.post(`/core/settings/port/update`, param);
 };
 
 export const updateSSL = (param: Setting.SSLUpdate) => {
-    return http.post(`/settings/ssl/update`, param);
+    return http.post(`/core/settings/ssl/update`, param);
 };
 export const loadSSLInfo = () => {
-    return http.get<Setting.SSLInfo>(`/settings/ssl/info`);
+    return http.get<Setting.SSLInfo>(`/core/settings/ssl/info`);
 };
 export const downloadSSL = () => {
-    return http.download<any>(`settings/ssl/download`);
+    return http.download<any>(`/core/settings/ssl/download`);
 };
 
 export const handleExpired = (param: Setting.PasswordUpdate) => {
-    return http.post(`/settings/expired/handle`, param);
-};
-
-export const loadTimeZone = () => {
-    return http.get<Array<string>>(`/settings/time/option`);
-};
-export const syncTime = (ntpSite: string) => {
-    return http.post<string>(`/settings/time/sync`, { ntpSite: ntpSite });
+    return http.post(`/core/settings/expired/handle`, param);
 };
 
 export const loadMFA = (param: Setting.MFARequest) => {
-    return http.post<Setting.MFAInfo>(`/settings/mfa`, param);
+    return http.post<Setting.MFAInfo>(`/core/settings/mfa`, param);
 };
 
 export const loadDaemonJsonPath = () => {
-    return http.get<string>(`/settings/daemonjson`, {});
+    return http.get<string>(`/core/settings/daemonjson`, {});
 };
 
 export const bindMFA = (param: Setting.MFABind) => {
-    return http.post(`/settings/mfa/bind`, param);
-};
-
-export const loadBaseDir = () => {
-    return http.get<string>(`/settings/basedir`);
+    return http.post(`/core/settings/mfa/bind`, param);
 };
 
 // backup

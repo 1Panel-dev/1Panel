@@ -128,6 +128,12 @@ export namespace Host {
         rules: Array<RulePort>;
     }
 
+    export interface MonitorSetting {
+        defaultNetwork: string;
+        monitorStatus: string;
+        monitorStoreDays: string;
+        monitorInterval: string;
+    }
     export interface MonitorData {
         param: string;
         date: Array<Date>;

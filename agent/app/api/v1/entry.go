@@ -35,6 +35,7 @@ var (
 	fileService     = service.NewIFileService()
 	sshService      = service.NewISSHService()
 	firewallService = service.NewIFirewallService()
+	monitorService  = service.NewIMonitorService()
 
 	deviceService   = service.NewIDeviceService()
 	fail2banService = service.NewIFail2BanService()

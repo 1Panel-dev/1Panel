@@ -22,6 +22,7 @@ type ICommonRepo interface {
 	WithLikeName(name string) DBOption
 	WithIdsIn(ids []uint) DBOption
 	WithByDate(startTime, endTime time.Time) DBOption
+	WithByCreatedAt(startTime, endTime time.Time) DBOption
 	WithByStartDate(startTime time.Time) DBOption
 	WithByStatus(status string) DBOption
 	WithByFrom(from string) DBOption
@@ -48,6 +49,12 @@ func (c *CommonRepo) WithByName(name string) DBOption {
 func (c *CommonRepo) WithByDate(startTime, endTime time.Time) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("start_time > ? AND start_time < ?", startTime, endTime)
+	}
+}
+
+func (c *CommonRepo) WithByCreatedAt(startTime, endTime time.Time) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("created_at > ? AND created_at < ?", startTime, endTime)
 	}
 }
 
