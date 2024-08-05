@@ -47,7 +47,6 @@ const loadDataFromDB = async () => {
     const res = await getSettingInfo();
     document.title = res.data.panelName;
     globalStore.entrance = res.data.securityEntrance;
-    globalStore.setDefaultNetwork(res.data.defaultNetwork);
     globalStore.setOpenMenuTabs(res.data.menuTabs === 'enable');
 };
 

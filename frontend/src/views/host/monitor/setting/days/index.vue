@@ -21,7 +21,7 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
-import { updateSetting } from '@/api/modules/setting';
+import { updateMonitorSetting } from '@/api/modules/host';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -47,7 +47,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         loading.value = true;
-        await updateSetting({ key: 'MonitorStoreDays', value: form.monitorStoreDays + '' })
+        await updateMonitorSetting('MonitorStoreDays', form.monitorStoreDays + '')
             .then(() => {
                 loading.value = false;
                 handleClose();

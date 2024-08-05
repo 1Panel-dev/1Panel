@@ -887,6 +887,8 @@ const message = {
         globalFilter: '全局過濾',
         enableMonitor: '監控狀態',
         storeDays: '保存天數',
+        defaultNetwork: '預設網卡',
+        defaultNetworkHelper: '預設監控和概覽介面顯示的網卡選項',
         cleanMonitor: '清空監控記錄',
 
         avgLoad: '平均負載',
@@ -1307,7 +1309,6 @@ const message = {
         proxyPasswdKeep: '記住密碼',
         systemIPWarning: '當前未設置服務器地址，請先在面板設置中設置！',
         systemIPWarning1: '當前服務器地址設置為 {0}，無法快速跳轉！',
-        defaultNetwork: '默認網卡',
         changePassword: '密碼修改',
         oldPassword: '原密碼',
         newPassword: '新密碼',

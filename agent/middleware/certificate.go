@@ -6,11 +6,16 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/gin-gonic/gin"
 )
 
 func Certificate() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if global.CurrentNode == "127.0.0.1" || len(global.CurrentNode) == 0 {
+			c.Next()
+			return
+		}
 		if !c.Request.TLS.HandshakeComplete || len(c.Request.TLS.PeerCertificates) == 0 {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, errors.New("no such tls peer certificates"))
 			return

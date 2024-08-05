@@ -1,7 +1,7 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('setting.defaultNetwork')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('monitor.defaultNetwork')" :back="handleClose" size="small">
         <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
-            <el-form-item :label="$t('setting.defaultNetwork')" prop="defaultNetwork" :rules="Rules.requiredSelect">
+            <el-form-item :label="$t('monitor.defaultNetwork')" prop="defaultNetwork" :rules="Rules.requiredSelect">
                 <el-select v-model="form.defaultNetwork" filterable>
                     <el-option
                         v-for="item in netOptions"
@@ -26,10 +26,9 @@
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { updateSetting } from '@/api/modules/setting';
 import { FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
-import { getNetworkOptions } from '@/api/modules/host';
+import { getNetworkOptions, updateMonitorSetting } from '@/api/modules/host';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 
@@ -63,7 +62,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        await updateSetting({ key: 'DefaultNetwork', value: form.defaultNetwork })
+        await updateMonitorSetting('DefaultNetwork', form.defaultNetwork)
             .then(async () => {
                 globalStore.setDefaultNetwork(form.defaultNetwork);
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

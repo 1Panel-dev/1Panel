@@ -149,27 +149,24 @@
                         <div :class="mobile ? 'flx-wrap' : 'flx-justify-between'">
                             <div>
                                 <span class="title">{{ $t('monitor.network') }} IO:</span>
-                                <el-popover placement="bottom" :width="200" trigger="click">
-                                    <el-select @change="search('network')" v-model="networkChoose">
-                                        <template #prefix>{{ $t('monitor.networkCard') }}</template>
-                                        <div v-for="item in netOptions" :key="item">
-                                            <el-option
-                                                v-if="item === 'all'"
-                                                :label="$t('commons.table.all')"
-                                                :value="item"
-                                            />
-                                            <el-option v-else :label="item" :value="item" />
-                                        </div>
-                                    </el-select>
-                                    <template #reference>
-                                        <span class="networkOption" v-if="networkChoose === 'all'">
-                                            {{ $t('commons.table.all') }}
-                                        </span>
-                                        <span v-else class="networkOption">
-                                            {{ networkChoose }}
-                                        </span>
+                                <el-dropdown max-height="300px" @command="onChangeNetwork">
+                                    <span class="networkOption">
+                                        {{ networkChoose === 'all' ? $t('commons.table.all') : networkChoose }}
+                                        <el-icon>
+                                            <arrow-down />
+                                        </el-icon>
+                                    </span>
+                                    <template #dropdown>
+                                        <el-dropdown-menu>
+                                            <div v-for="item in netOptions" :key="item">
+                                                <el-dropdown-item v-if="item === 'all'" command="all">
+                                                    {{ $t('commons.table.all') }}
+                                                </el-dropdown-item>
+                                                <el-dropdown-item v-else :command="item">{{ item }}</el-dropdown-item>
+                                            </div>
+                                        </el-dropdown-menu>
                                     </template>
-                                </el-popover>
+                                </el-dropdown>
                             </div>
                             <el-date-picker
                                 @change="search('network')"
@@ -246,6 +243,11 @@ const searchGlobal = () => {
     search('cpu');
     search('memory');
     search('io');
+    search('network');
+};
+
+const onChangeNetwork = (command: string) => {
+    networkChoose.value = command;
     search('network');
 };
 

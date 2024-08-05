@@ -25,7 +25,7 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { Rules, checkNumberRange } from '@/global/form-rules';
-import { updateSetting } from '@/api/modules/setting';
+import { updateMonitorSetting } from '@/api/modules/host';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -51,7 +51,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         loading.value = true;
-        await updateSetting({ key: 'MonitorInterval', value: form.monitorInterval + '' })
+        await updateMonitorSetting('MonitorInterval', form.monitorInterval + '')
             .then(() => {
                 loading.value = false;
                 handleClose();

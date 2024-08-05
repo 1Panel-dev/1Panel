@@ -888,6 +888,8 @@ const message = {
         globalFilter: '全局过滤',
         enableMonitor: '监控状态',
         storeDays: '保存天数',
+        defaultNetwork: '默认网卡',
+        defaultNetworkHelper: '默认监控和概览界面显示的网卡选项',
         cleanMonitor: '清空监控记录',
 
         avgLoad: '平均负载',
@@ -1309,7 +1311,6 @@ const message = {
         proxyPasswdKeep: '记住密码',
         systemIPWarning: '当前未设置服务器地址，请先在面板设置中设置！',
         systemIPWarning1: '当前服务器地址设置为 {0}，无法快速跳转！',
-        defaultNetwork: '默认网卡',
         changePassword: '密码修改',
         oldPassword: '原密码',
         newPassword: '新密码',

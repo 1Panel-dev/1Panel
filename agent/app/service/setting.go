@@ -6,8 +6,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/constant"
-	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/robfig/cron/v3"
 )
 
 type SettingService struct{}
@@ -45,31 +43,6 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 
 func (u *SettingService) Update(key, value string) error {
 	switch key {
-	case "MonitorStatus":
-		if value == "enable" && global.MonitorCronID == 0 {
-			interval, err := settingRepo.Get(settingRepo.WithByKey("MonitorInterval"))
-			if err != nil {
-				return err
-			}
-			if err := StartMonitor(false, interval.Value); err != nil {
-				return err
-			}
-		}
-		if value == "disable" && global.MonitorCronID != 0 {
-			monitorCancel()
-			global.Cron.Remove(cron.EntryID(global.MonitorCronID))
-			global.MonitorCronID = 0
-		}
-	case "MonitorInterval":
-		status, err := settingRepo.Get(settingRepo.WithByKey("MonitorStatus"))
-		if err != nil {
-			return err
-		}
-		if status.Value == "enable" && global.MonitorCronID != 0 {
-			if err := StartMonitor(true, value); err != nil {
-				return err
-			}
-		}
 	case "AppStoreLastModified":
 		exist, _ := settingRepo.Get(settingRepo.WithByKey("AppStoreLastModified"))
 		if exist.ID == 0 {

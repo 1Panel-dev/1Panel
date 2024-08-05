@@ -2,21 +2,17 @@ package v1
 
 import (
 	"sort"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/constant"
-	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/gin-gonic/gin"
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/net"
 )
 
 // @Tags Monitor
-// @Summary Load monitor datas
+// @Summary Load monitor data
 // @Description 获取监控数据
 // @Param request body dto.MonitorSearch true "request"
 // @Success 200
@@ -28,82 +24,60 @@ func (b *BaseApi) LoadMonitor(c *gin.Context) {
 		return
 	}
 
-	loc, _ := time.LoadLocation(common.LoadTimeZone())
-	req.StartTime = req.StartTime.In(loc)
-	req.EndTime = req.EndTime.In(loc)
-
-	var backdatas []dto.MonitorData
-	if req.Param == "all" || req.Param == "cpu" || req.Param == "memory" || req.Param == "load" {
-		var bases []model.MonitorBase
-		if err := global.MonitorDB.
-			Where("created_at > ? AND created_at < ?", req.StartTime, req.EndTime).
-			Find(&bases).Error; err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-			return
-		}
-
-		var itemData dto.MonitorData
-		itemData.Param = "base"
-		for _, base := range bases {
-			itemData.Date = append(itemData.Date, base.CreatedAt)
-			itemData.Value = append(itemData.Value, base)
-		}
-		backdatas = append(backdatas, itemData)
+	data, err := monitorService.LoadMonitorData(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
 	}
-	if req.Param == "all" || req.Param == "io" {
-		var bases []model.MonitorIO
-		if err := global.MonitorDB.
-			Where("created_at > ? AND created_at < ?", req.StartTime, req.EndTime).
-			Find(&bases).Error; err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-			return
-		}
-
-		var itemData dto.MonitorData
-		itemData.Param = "io"
-		for _, base := range bases {
-			itemData.Date = append(itemData.Date, base.CreatedAt)
-			itemData.Value = append(itemData.Value, base)
-		}
-		backdatas = append(backdatas, itemData)
-	}
-	if req.Param == "all" || req.Param == "network" {
-		var bases []model.MonitorNetwork
-		if err := global.MonitorDB.
-			Where("name = ? AND created_at > ? AND created_at < ?", req.Info, req.StartTime, req.EndTime).
-			Find(&bases).Error; err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-			return
-		}
-
-		var itemData dto.MonitorData
-		itemData.Param = "network"
-		for _, base := range bases {
-			itemData.Date = append(itemData.Date, base.CreatedAt)
-			itemData.Value = append(itemData.Value, base)
-		}
-		backdatas = append(backdatas, itemData)
-	}
-	helper.SuccessWithData(c, backdatas)
+	helper.SuccessWithData(c, data)
 }
 
 // @Tags Monitor
-// @Summary Clean monitor datas
+// @Summary Clean monitor data
 // @Description 清空监控数据
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /hosts/monitor/clean [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"清空监控数据","formatEN":"clean monitor datas"}
 func (b *BaseApi) CleanMonitor(c *gin.Context) {
-	if err := global.MonitorDB.Exec("DELETE FROM monitor_bases").Error; err != nil {
+	if err := monitorService.CleanData(); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	if err := global.MonitorDB.Exec("DELETE FROM monitor_ios").Error; err != nil {
+
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Monitor
+// @Summary Load monitor setting
+// @Description 获取默认监控设置
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /hosts/monitor/setting [get]
+func (b *BaseApi) LoadMonitorSetting(c *gin.Context) {
+	setting, err := monitorService.LoadSetting()
+	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	if err := global.MonitorDB.Exec("DELETE FROM monitor_networks").Error; err != nil {
+
+	helper.SuccessWithData(c, setting)
+}
+
+// @Tags Monitor
+// @Summary Update monitor setting
+// @Description 更新默认监控设置
+// @Param request body dto.MonitorSettingUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /hosts/monitor/setting/update [post]
+// @x-panel-log {"bodyKeys":["key", "value"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改默认监控网卡 [name]-[value]","formatEN":"update default monitor [name]-[value]"}
+func (b *BaseApi) UpdateMonitorSetting(c *gin.Context) {
+	var req dto.MonitorSettingUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := monitorService.UpdateSetting(req.Key, req.Value); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

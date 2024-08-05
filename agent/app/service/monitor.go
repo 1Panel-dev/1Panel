@@ -2,12 +2,16 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/robfig/cron/v3"
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/disk"
@@ -25,6 +29,10 @@ var monitorCancel context.CancelFunc
 
 type IMonitorService interface {
 	Run()
+	LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorData, error)
+	LoadSetting() (*dto.MonitorSetting, error)
+	UpdateSetting(key, value string) error
+	CleanData() error
 
 	saveIODataToDB(ctx context.Context, interval float64)
 	saveNetDataToDB(ctx context.Context, interval float64)
@@ -35,6 +43,94 @@ func NewIMonitorService() IMonitorService {
 		DiskIO: make(chan []disk.IOCountersStat, 2),
 		NetIO:  make(chan []net.IOCountersStat, 2),
 	}
+}
+
+func (m *MonitorService) LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorData, error) {
+	loc, _ := time.LoadLocation(common.LoadTimeZone())
+	req.StartTime = req.StartTime.In(loc)
+	req.EndTime = req.EndTime.In(loc)
+
+	var data []dto.MonitorData
+	if req.Param == "all" || req.Param == "cpu" || req.Param == "memory" || req.Param == "load" {
+		bases, err := monitorRepo.GetBase(commonRepo.WithByCreatedAt(req.StartTime, req.EndTime))
+		if err != nil {
+			return nil, err
+		}
+
+		var itemData dto.MonitorData
+		itemData.Param = "base"
+		for _, base := range bases {
+			itemData.Date = append(itemData.Date, base.CreatedAt)
+			itemData.Value = append(itemData.Value, base)
+		}
+		data = append(data, itemData)
+	}
+	if req.Param == "all" || req.Param == "io" {
+		bases, err := monitorRepo.GetIO(commonRepo.WithByCreatedAt(req.StartTime, req.EndTime))
+		if err != nil {
+			return nil, err
+		}
+
+		var itemData dto.MonitorData
+		itemData.Param = "io"
+		for _, base := range bases {
+			itemData.Date = append(itemData.Date, base.CreatedAt)
+			itemData.Value = append(itemData.Value, base)
+		}
+		data = append(data, itemData)
+	}
+	if req.Param == "all" || req.Param == "network" {
+		bases, err := monitorRepo.GetIO(commonRepo.WithByName(req.Info), commonRepo.WithByCreatedAt(req.StartTime, req.EndTime))
+		if err != nil {
+			return nil, err
+		}
+
+		var itemData dto.MonitorData
+		itemData.Param = "network"
+		for _, base := range bases {
+			itemData.Date = append(itemData.Date, base.CreatedAt)
+			itemData.Value = append(itemData.Value, base)
+		}
+		data = append(data, itemData)
+	}
+	return data, nil
+}
+
+func (m *MonitorService) LoadSetting() (*dto.MonitorSetting, error) {
+	setting, err := settingRepo.GetList()
+	if err != nil {
+		return nil, constant.ErrRecordNotFound
+	}
+	settingMap := make(map[string]string)
+	for _, set := range setting {
+		settingMap[set.Key] = set.Value
+	}
+	var info dto.MonitorSetting
+	arr, err := json.Marshal(settingMap)
+	if err != nil {
+		return nil, err
+	}
+	if err := json.Unmarshal(arr, &info); err != nil {
+		return nil, err
+	}
+	return &info, err
+}
+
+func (m *MonitorService) UpdateSetting(key, value string) error {
+	return settingRepo.Update(key, value)
+}
+
+func (m *MonitorService) CleanData() error {
+	if err := global.MonitorDB.Exec("DELETE FROM monitor_bases").Error; err != nil {
+		return err
+	}
+	if err := global.MonitorDB.Exec("DELETE FROM monitor_ios").Error; err != nil {
+		return err
+	}
+	if err := global.MonitorDB.Exec("DELETE FROM monitor_networks").Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 func (m *MonitorService) Run() {

@@ -36,6 +36,8 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 		hostRouter.POST("/monitor/clean", baseApi.CleanMonitor)
 		hostRouter.GET("/monitor/netoptions", baseApi.GetNetworkOptions)
 		hostRouter.GET("/monitor/iooptions", baseApi.GetIOOptions)
+		hostRouter.GET("/monitor/setting", baseApi.LoadMonitorSetting)
+		hostRouter.POST("/monitor/setting/update", baseApi.UpdateMonitorSetting)
 
 		hostRouter.GET("/ssh/conf", baseApi.LoadSSHConf)
 		hostRouter.POST("/ssh/search", baseApi.GetSSHInfo)

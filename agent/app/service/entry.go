@@ -26,6 +26,7 @@ var (
 	commandRepo = repo.NewICommandRepo()
 	ftpRepo     = repo.NewIFtpRepo()
 	clamRepo    = repo.NewIClamRepo()
+	monitorRepo = repo.NewIMonitorRepo()
 
 	settingRepo = repo.NewISettingRepo()
 	backupRepo  = repo.NewIBackupRepo()
