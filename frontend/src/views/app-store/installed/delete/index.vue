@@ -19,6 +19,12 @@
                     {{ $t('app.deleteBackupHelper') }}
                 </span>
             </el-form-item>
+            <el-form-item>
+                <el-checkbox v-model="deleteReq.deleteImage" :label="$t('app.deleteImage')" />
+                <span class="input-help">
+                    {{ $t('app.deleteImageHelper') }}
+                </span>
+            </el-form-item>
             <el-form-item v-if="appType === 'website'">
                 <el-checkbox v-model="deleteReq.deleteDB" :label="$t('app.deleteDB')" />
                 <span class="input-help">
@@ -57,6 +63,7 @@ let deleteReq = ref({
     deleteBackup: false,
     forceDelete: false,
     deleteDB: true,
+    deleteImage: true,
 });
 let open = ref(false);
 let loading = ref(false);
@@ -80,6 +87,7 @@ const acceptParams = async (app: App.AppInstallDto) => {
         deleteBackup: false,
         forceDelete: false,
         deleteDB: true,
+        deleteImage: true,
     };
     deleteInfo.value = '';
     deleteReq.value.installId = app.id;
