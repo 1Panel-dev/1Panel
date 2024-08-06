@@ -1,0 +1,2530 @@
+{
+	"/apps/install": {
+		"BeforeFunctions": [
+			{
+				"db": "app_installs",
+				"input_column": "name",
+				"input_value": "name",
+				"isList": false,
+				"output_column": "app_id",
+				"output_value": "appId"
+			},
+			{
+				"db": "apps",
+				"info": "appId",
+				"isList": false,
+				"output_column": "key",
+				"output_value": "appKey"
+			}
+		],
+		"bodyKeys": [
+			"name"
+		],
+		"formatEN": "Install app [appKey]-[name]",
+		"formatZH": "安装应用 [appKey]-[name]",
+		"paramKeys": []
+	},
+	"/apps/installed/ignore": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"installId"
+		],
+		"formatEN": "Application param update [installId]",
+		"formatZH": "忽略应用 [installId] 版本升级",
+		"paramKeys": []
+	},
+	"/apps/installed/op": {
+		"BeforeFunctions": [
+			{
+				"db": "app_installs",
+				"input_column": "id",
+				"input_value": "installId",
+				"isList": false,
+				"output_column": "app_id",
+				"output_value": "appId"
+			},
+			{
+				"db": "app_installs",
+				"input_column": "id",
+				"input_value": "installId",
+				"isList": false,
+				"output_column": "name",
+				"output_value": "appName"
+			},
+			{
+				"db": "apps",
+				"input_column": "id",
+				"input_value": "appId",
+				"isList": false,
+				"output_column": "key",
+				"output_value": "appKey"
+			}
+		],
+		"bodyKeys": [
+			"installId",
+			"operate"
+		],
+		"formatEN": "[operate] App [appKey][appName]",
+		"formatZH": "[operate] 应用 [appKey][appName]",
+		"paramKeys": []
+	},
+	"/apps/installed/params/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"installId"
+		],
+		"formatEN": "Application param update [installId]",
+		"formatZH": "应用参数修改 [installId]",
+		"paramKeys": []
+	},
+	"/apps/installed/port/change": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"key",
+			"name",
+			"port"
+		],
+		"formatEN": "Application port update [key]-[name] =\u003e [port]",
+		"formatZH": "应用端口修改 [key]-[name] =\u003e [port]",
+		"paramKeys": []
+	},
+	"/apps/installed/sync": {
+		"BeforeFunctions": [],
+		"bodyKeys": [],
+		"formatEN": "Sync the list of installed apps",
+		"formatZH": "同步已安装应用列表",
+		"paramKeys": []
+	},
+	"/apps/sync": {
+		"BeforeFunctions": [],
+		"bodyKeys": [],
+		"formatEN": "App store synchronization",
+		"formatZH": "应用商店同步",
+		"paramKeys": []
+	},
+	"/containers": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name",
+			"image"
+		],
+		"formatEN": "create container [name][image]",
+		"formatZH": "创建容器 [name][image]",
+		"paramKeys": []
+	},
+	"/containers/clean/log": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name"
+		],
+		"formatEN": "clean container [name] logs",
+		"formatZH": "清理容器 [name] 日志",
+		"paramKeys": []
+	},
+	"/containers/compose": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name"
+		],
+		"formatEN": "create compose [name]",
+		"formatZH": "创建 compose [name]",
+		"paramKeys": []
+	},
+	"/containers/compose/operate": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name",
+			"operation"
+		],
+		"formatEN": "compose [operation] [name]",
+		"formatZH": "compose [operation] [name]",
+		"paramKeys": []
+	},
+	"/containers/compose/test": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name"
+		],
+		"formatEN": "check compose [name]",
+		"formatZH": "检测 compose [name] 格式",
+		"paramKeys": []
+	},
+	"/containers/compose/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name"
+		],
+		"formatEN": "update compose information [name]",
+		"formatZH": "更新 compose [name]",
+		"paramKeys": []
+	},
+	"/containers/daemonjson/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"key",
+			"value"
+		],
+		"formatEN": "Updated configuration [key]",
+		"formatZH": "更新配置 [key]",
+		"paramKeys": []
+	},
+	"/containers/daemonjson/update/byfile": {
+		"BeforeFunctions": [],
+		"bodyKeys": [],
+		"formatEN": "Updated configuration file",
+		"formatZH": "更新配置文件",
+		"paramKeys": []
+	},
+	"/containers/docker/operate": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"operation"
+		],
+		"formatEN": "[operation] docker service",
+		"formatZH": "docker 服务 [operation]",
+		"paramKeys": []
+	},
+	"/containers/image/build": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name"
+		],
+		"formatEN": "build image [name]",
+		"formatZH": "构建镜像 [name]",
+		"paramKeys": []
+	},
+	"/containers/image/load": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"path"
+		],
+		"formatEN": "load image from [path]",
+		"formatZH": "从 [path] 加载镜像",
+		"paramKeys": []
+	},
+	"/containers/image/pull": {
+		"BeforeFunctions": [
+			{
+				"db": "image_repos",
+				"input_column": "id",
+				"input_value": "repoID",
+				"isList": false,
+				"output_column": "name",
+				"output_value": "reponame"
+			}
+		],
+		"bodyKeys": [
+			"repoID",
+			"imageName"
+		],
+		"formatEN": "image pull [reponame][imageName]",
+		"formatZH": "镜像拉取 [reponame][imageName]",
+		"paramKeys": []
+	},
+	"/containers/image/push": {
+		"BeforeFunctions": [
+			{
+				"db": "image_repos",
+				"input_column": "id",
+				"input_value": "repoID",
+				"isList": false,
+				"output_column": "name",
+				"output_value": "reponame"
+			}
+		],
+		"bodyKeys": [
+			"repoID",
+			"tagName",
+			"name"
+		],
+		"formatEN": "push [tagName] to [reponame][name]",
+		"formatZH": "[tagName] 推送到 [reponame][name]",
+		"paramKeys": []
+	},
+	"/containers/image/remove": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"names"
+		],
+		"formatEN": "remove image [names]",
+		"formatZH": "移除镜像 [names]",
+		"paramKeys": []
+	},
+	"/containers/image/save": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"tagName",
+			"path",
+			"name"
+		],
+		"formatEN": "save [tagName] as [path]/[name]",
+		"formatZH": "保留 [tagName] 为 [path]/[name]",
+		"paramKeys": []
+	},
+	"/containers/image/tag": {
+		"BeforeFunctions": [
+			{
+				"db": "image_repos",
+				"input_column": "id",
+				"input_value": "repoID",
+				"isList": false,
+				"output_column": "name",
+				"output_value": "reponame"
+			}
+		],
+		"bodyKeys": [
+			"repoID",
+			"targetName"
+		],
+		"formatEN": "tag image [reponame][targetName]",
+		"formatZH": "tag 镜像 [reponame][targetName]",
+		"paramKeys": []
+	},
+	"/containers/ipv6option/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [],
+		"formatEN": "Updated the ipv6 option",
+		"formatZH": "更新 ipv6 配置",
+		"paramKeys": []
+	},
+	"/containers/logoption/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [],
+		"formatEN": "Updated the log option",
+		"formatZH": "更新日志配置",
+		"paramKeys": []
+	},
+	"/containers/network": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name"
+		],
+		"formatEN": "create container network [name]",
+		"formatZH": "创建容器网络 name",
+		"paramKeys": []
+	},
+	"/containers/network/del": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"names"
+		],
+		"formatEN": "delete container network [names]",
+		"formatZH": "删除容器网络 [names]",
+		"paramKeys": []
+	},
+	"/containers/operate": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"names",
+			"operation"
+		],
+		"formatEN": "container [operation] [names]",
+		"formatZH": "容器 [names] 执行 [operation]",
+		"paramKeys": []
+	},
+	"/containers/prune": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"pruneType"
+		],
+		"formatEN": "clean container [pruneType]",
+		"formatZH": "清理容器 [pruneType]",
+		"paramKeys": []
+	},
+	"/containers/rename": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name",
+			"newName"
+		],
+		"formatEN": "rename container [name] =\u003e [newName]",
+		"formatZH": "容器重命名 [name] =\u003e [newName]",
+		"paramKeys": []
+	},
+	"/containers/repo": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name"
+		],
+		"formatEN": "create image repo [name]",
+		"formatZH": "创建镜像仓库 [name]",
+		"paramKeys": []
+	},
+	"/containers/repo/del": {
+		"BeforeFunctions": [
+			{
+				"db": "image_repos",
+				"input_column": "id",
+				"input_value": "ids",
+				"isList": true,
+				"output_column": "name",
+				"output_value": "names"
+			}
+		],
+		"bodyKeys": [
+			"ids"
+		],
+		"formatEN": "delete image repo [names]",
+		"formatZH": "删除镜像仓库 [names]",
+		"paramKeys": []
+	},
+	"/containers/repo/update": {
+		"BeforeFunctions": [
+			{
+				"db": "image_repos",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "update image repo information [name]",
+		"formatZH": "更新镜像仓库 [name]",
+		"paramKeys": []
+	},
+	"/containers/template": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name"
+		],
+		"formatEN": "create compose template [name]",
+		"formatZH": "创建 compose 模版 [name]",
+		"paramKeys": []
+	},
+	"/containers/template/del": {
+		"BeforeFunctions": [
+			{
+				"db": "compose_templates",
+				"input_column": "id",
+				"input_value": "ids",
+				"isList": true,
+				"output_column": "name",
+				"output_value": "names"
+			}
+		],
+		"bodyKeys": [
+			"ids"
+		],
+		"formatEN": "delete compose template [names]",
+		"formatZH": "删除 compose 模版 [names]",
+		"paramKeys": []
+	},
+	"/containers/template/update": {
+		"BeforeFunctions": [
+			{
+				"db": "compose_templates",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "update compose template information [name]",
+		"formatZH": "更新 compose 模版 [name]",
+		"paramKeys": []
+	},
+	"/containers/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name",
+			"image"
+		],
+		"formatEN": "update container [name][image]",
+		"formatZH": "更新容器 [name][image]",
+		"paramKeys": []
+	},
+	"/containers/upgrade": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name",
+			"image"
+		],
+		"formatEN": "upgrade container image [name][image]",
+		"formatZH": "更新容器镜像 [name][image]",
+		"paramKeys": []
+	},
+	"/containers/volume": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name"
+		],
+		"formatEN": "create container volume [name]",
+		"formatZH": "创建容器存储卷 [name]",
+		"paramKeys": []
+	},
+	"/containers/volume/del": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"names"
+		],
+		"formatEN": "delete container volume [names]",
+		"formatZH": "删除容器存储卷 [names]",
+		"paramKeys": []
+	},
+	"/core/logs/clean": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"logType"
+		],
+		"formatEN": "Clean the [logType] log information",
+		"formatZH": "清空 [logType] 日志信息",
+		"paramKeys": []
+	},
+	"/core/settings/bind/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"ipv6",
+			"bindAddress"
+		],
+		"formatEN": "update system bind info =\u003e ipv6: [ipv6], 监听 IP: [bindAddress]",
+		"formatZH": "修改系统监听信息 =\u003e ipv6: [ipv6], 监听 IP: [bindAddress]",
+		"paramKeys": []
+	},
+	"/core/settings/expired/handle": {
+		"BeforeFunctions": [],
+		"bodyKeys": [],
+		"formatEN": "reset an expired Password",
+		"formatZH": "重置过期密码",
+		"paramKeys": []
+	},
+	"/core/settings/menu/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [],
+		"formatEN": "Hide advanced feature menu.",
+		"formatZH": "隐藏高级功能菜单",
+		"paramKeys": []
+	},
+	"/core/settings/mfa/bind": {
+		"BeforeFunctions": [],
+		"bodyKeys": [],
+		"formatEN": "bind mfa",
+		"formatZH": "mfa 绑定",
+		"paramKeys": []
+	},
+	"/core/settings/password/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [],
+		"formatEN": "update system password",
+		"formatZH": "修改系统密码",
+		"paramKeys": []
+	},
+	"/core/settings/port/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"serverPort"
+		],
+		"formatEN": "update system port =\u003e [serverPort]",
+		"formatZH": "修改系统端口 =\u003e [serverPort]",
+		"paramKeys": []
+	},
+	"/core/settings/proxy/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"proxyUrl",
+			"proxyPort"
+		],
+		"formatEN": "set proxy [proxyPort]:[proxyPort].",
+		"formatZH": "服务器代理配置 [proxyPort]:[proxyPort]",
+		"paramKeys": []
+	},
+	"/core/settings/ssl/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"ssl"
+		],
+		"formatEN": "update system ssl =\u003e [ssl]",
+		"formatZH": "修改系统 ssl =\u003e [ssl]",
+		"paramKeys": []
+	},
+	"/core/settings/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"key",
+			"value"
+		],
+		"formatEN": "update system setting [key] =\u003e [value]",
+		"formatZH": "修改系统配置 [key] =\u003e [value]",
+		"paramKeys": []
+	},
+	"/core/settings/upgrade": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"version"
+		],
+		"formatEN": "upgrade system =\u003e [version]",
+		"formatZH": "更新系统 =\u003e [version]",
+		"paramKeys": []
+	},
+	"/cronjobs": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"type",
+			"name"
+		],
+		"formatEN": "create cronjob [type][name]",
+		"formatZH": "创建计划任务 [type][name]",
+		"paramKeys": []
+	},
+	"/cronjobs/del": {
+		"BeforeFunctions": [
+			{
+				"db": "cronjobs",
+				"input_column": "id",
+				"input_value": "ids",
+				"isList": true,
+				"output_column": "name",
+				"output_value": "names"
+			}
+		],
+		"bodyKeys": [
+			"ids"
+		],
+		"formatEN": "delete cronjob [names]",
+		"formatZH": "删除计划任务 [names]",
+		"paramKeys": []
+	},
+	"/cronjobs/download": {
+		"BeforeFunctions": [
+			{
+				"db": "job_records",
+				"input_column": "id",
+				"input_value": "recordID",
+				"isList": false,
+				"output_column": "file",
+				"output_value": "file"
+			}
+		],
+		"bodyKeys": [
+			"recordID"
+		],
+		"formatEN": "download the cronjob record [file]",
+		"formatZH": "下载计划任务记录 [file]",
+		"paramKeys": []
+	},
+	"/cronjobs/handle": {
+		"BeforeFunctions": [
+			{
+				"db": "cronjobs",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "manually execute the cronjob [name]",
+		"formatZH": "手动执行计划任务 [name]",
+		"paramKeys": []
+	},
+	"/cronjobs/records/clean": {
+		"BeforeFunctions": [
+			{
+				"db": "cronjobs",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "clean cronjob [name] records",
+		"formatZH": "清空计划任务记录 [name]",
+		"paramKeys": []
+	},
+	"/cronjobs/status": {
+		"BeforeFunctions": [
+			{
+				"db": "cronjobs",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"bodyKeys": [
+			"id",
+			"status"
+		],
+		"formatEN": "change the status of cronjob [name] to [status].",
+		"formatZH": "修改计划任务 [name] 状态为 [status]",
+		"paramKeys": []
+	},
+	"/cronjobs/update": {
+		"BeforeFunctions": [
+			{
+				"db": "cronjobs",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "update cronjob [name]",
+		"formatZH": "更新计划任务 [name]",
+		"paramKeys": []
+	},
+	"/databases": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name"
+		],
+		"formatEN": "create mysql database [name]",
+		"formatZH": "创建 mysql 数据库 [name]",
+		"paramKeys": []
+	},
+	"/databases/bind": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"database",
+			"username"
+		],
+		"formatEN": "bind mysql database [database] [username]",
+		"formatZH": "绑定 mysql 数据库名 [database] [username]",
+		"paramKeys": []
+	},
+	"/databases/change/access": {
+		"BeforeFunctions": [
+			{
+				"db": "database_mysqls",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "Update database [name] access",
+		"formatZH": "更新数据库 [name] 访问权限",
+		"paramKeys": []
+	},
+	"/databases/change/password": {
+		"BeforeFunctions": [
+			{
+				"db": "database_mysqls",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "Update database [name] password",
+		"formatZH": "更新数据库 [name] 密码",
+		"paramKeys": []
+	},
+	"/databases/common/update/conf": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"type",
+			"database"
+		],
+		"formatEN": "update the [type] [database] database configuration information",
+		"formatZH": "更新 [type] 数据库 [database] 配置信息",
+		"paramKeys": []
+	},
+	"/databases/db": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name",
+			"type"
+		],
+		"formatEN": "create database [name][type]",
+		"formatZH": "创建远程数据库 [name][type]",
+		"paramKeys": []
+	},
+	"/databases/db/check": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name",
+			"type"
+		],
+		"formatEN": "check if database [name][type] is connectable",
+		"formatZH": "检测远程数据库 [name][type] 连接性",
+		"paramKeys": []
+	},
+	"/databases/db/del": {
+		"BeforeFunctions": [
+			{
+				"db": "databases",
+				"input_column": "id",
+				"input_value": "ids",
+				"isList": true,
+				"output_column": "name",
+				"output_value": "names"
+			}
+		],
+		"bodyKeys": [
+			"ids"
+		],
+		"formatEN": "delete database [names]",
+		"formatZH": "删除远程数据库 [names]",
+		"paramKeys": []
+	},
+	"/databases/db/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name"
+		],
+		"formatEN": "update database [name]",
+		"formatZH": "更新远程数据库 [name]",
+		"paramKeys": []
+	},
+	"/databases/del": {
+		"BeforeFunctions": [
+			{
+				"db": "database_mysqls",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "delete mysql database [name]",
+		"formatZH": "删除 mysql 数据库 [name]",
+		"paramKeys": []
+	},
+	"/databases/description/update": {
+		"BeforeFunctions": [
+			{
+				"db": "database_mysqls",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"bodyKeys": [
+			"id",
+			"description"
+		],
+		"formatEN": "The description of the mysql database [name] is modified =\u003e [description]",
+		"formatZH": "mysql 数据库 [name] 描述信息修改 [description]",
+		"paramKeys": []
+	},
+	"/databases/pg": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name"
+		],
+		"formatEN": "create postgresql database [name]",
+		"formatZH": "创建 postgresql 数据库 [name]",
+		"paramKeys": []
+	},
+	"/databases/pg/bind": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name",
+			"username"
+		],
+		"formatEN": "bind postgresql database [name] user [username]",
+		"formatZH": "绑定 postgresql 数据库 [name] 用户 [username]",
+		"paramKeys": []
+	},
+	"/databases/pg/del": {
+		"BeforeFunctions": [
+			{
+				"db": "database_postgresqls",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "delete postgresql database [name]",
+		"formatZH": "删除 postgresql 数据库 [name]",
+		"paramKeys": []
+	},
+	"/databases/pg/description": {
+		"BeforeFunctions": [
+			{
+				"db": "database_postgresqls",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"bodyKeys": [
+			"id",
+			"description"
+		],
+		"formatEN": "The description of the postgresql database [name] is modified =\u003e [description]",
+		"formatZH": "postgresql 数据库 [name] 描述信息修改 [description]",
+		"paramKeys": []
+	},
+	"/databases/pg/password": {
+		"BeforeFunctions": [
+			{
+				"db": "database_postgresqls",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "Update database [name] password",
+		"formatZH": "更新数据库 [name] 密码",
+		"paramKeys": []
+	},
+	"/databases/pg/privileges": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"database",
+			"username"
+		],
+		"formatEN": "Update [user] privileges of database [database]",
+		"formatZH": "更新数据库 [database] 用户 [username] 权限",
+		"paramKeys": []
+	},
+	"/databases/redis/conf/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [],
+		"formatEN": "update the redis database configuration information",
+		"formatZH": "更新 redis 数据库配置信息",
+		"paramKeys": []
+	},
+	"/databases/redis/password": {
+		"BeforeFunctions": [],
+		"bodyKeys": [],
+		"formatEN": "change the password of the redis database",
+		"formatZH": "修改 redis 数据库密码",
+		"paramKeys": []
+	},
+	"/databases/redis/persistence/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [],
+		"formatEN": "redis database persistence configuration update",
+		"formatZH": "redis 数据库持久化配置更新",
+		"paramKeys": []
+	},
+	"/databases/variables/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [],
+		"formatEN": "adjust mysql database performance parameters",
+		"formatZH": "调整 mysql 数据库性能参数",
+		"paramKeys": []
+	},
+	"/files": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"path"
+		],
+		"formatEN": "Create dir or file [path]",
+		"formatZH": "创建文件/文件夹 [path]",
+		"paramKeys": []
+	},
+	"/files/batch/del": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"paths"
+		],
+		"formatEN": "Batch delete dir or file [paths]",
+		"formatZH": "批量删除文件/文件夹 [paths]",
+		"paramKeys": []
+	},
+	"/files/batch/role": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"paths",
+			"mode",
+			"user",
+			"group"
+		],
+		"formatEN": "Batch change file mode and owner [paths] =\u003e [mode]/[user]/[group]",
+		"formatZH": "批量修改文件权限和用户/组 [paths] =\u003e [mode]/[user]/[group]",
+		"paramKeys": []
+	},
+	"/files/chunkdownload": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name"
+		],
+		"formatEN": "Download file [name]",
+		"formatZH": "下载文件 [name]",
+		"paramKeys": []
+	},
+	"/files/compress": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name"
+		],
+		"formatEN": "Compress file [name]",
+		"formatZH": "压缩文件 [name]",
+		"paramKeys": []
+	},
+	"/files/content": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"path"
+		],
+		"formatEN": "Load file content [path]",
+		"formatZH": "获取文件内容 [path]",
+		"paramKeys": []
+	},
+	"/files/decompress": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"path"
+		],
+		"formatEN": "Decompress file [path]",
+		"formatZH": "解压 [path]",
+		"paramKeys": []
+	},
+	"/files/del": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"path"
+		],
+		"formatEN": "Delete dir or file [path]",
+		"formatZH": "删除文件/文件夹 [path]",
+		"paramKeys": []
+	},
+	"/files/favorite": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"path"
+		],
+		"formatEN": "收藏文件/文件夹 [path]",
+		"formatZH": "收藏文件/文件夹 [path]",
+		"paramKeys": []
+	},
+	"/files/favorite/del": {
+		"BeforeFunctions": [
+			{
+				"db": "favorites",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "path",
+				"output_value": "path"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "delete avorite [path]",
+		"formatZH": "删除收藏 [path]",
+		"paramKeys": []
+	},
+	"/files/mode": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"path",
+			"mode"
+		],
+		"formatEN": "Change mode [paths] =\u003e [mode]",
+		"formatZH": "修改权限 [paths] =\u003e [mode]",
+		"paramKeys": []
+	},
+	"/files/move": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"oldPaths",
+			"newPath"
+		],
+		"formatEN": "Move [oldPaths] =\u003e [newPath]",
+		"formatZH": "移动文件 [oldPaths] =\u003e [newPath]",
+		"paramKeys": []
+	},
+	"/files/owner": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"path",
+			"user",
+			"group"
+		],
+		"formatEN": "Change owner [paths] =\u003e [user]/[group]",
+		"formatZH": "修改用户/组 [paths] =\u003e [user]/[group]",
+		"paramKeys": []
+	},
+	"/files/recycle/clear": {
+		"BeforeFunctions": [],
+		"bodyKeys": [],
+		"formatEN": "清空回收站",
+		"formatZH": "清空回收站",
+		"paramKeys": []
+	},
+	"/files/recycle/reduce": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name"
+		],
+		"formatEN": "Reduce RecycleBin file [name]",
+		"formatZH": "还原回收站文件 [name]",
+		"paramKeys": []
+	},
+	"/files/rename": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"oldName",
+			"newName"
+		],
+		"formatEN": "Rename [oldName] =\u003e [newName]",
+		"formatZH": "重命名 [oldName] =\u003e [newName]",
+		"paramKeys": []
+	},
+	"/files/save": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"path"
+		],
+		"formatEN": "Update file content [path]",
+		"formatZH": "更新文件内容 [path]",
+		"paramKeys": []
+	},
+	"/files/size": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"path"
+		],
+		"formatEN": "Load file size [path]",
+		"formatZH": "获取文件夹大小 [path]",
+		"paramKeys": []
+	},
+	"/files/upload": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"path"
+		],
+		"formatEN": "Upload file [path]",
+		"formatZH": "上传文件 [path]",
+		"paramKeys": []
+	},
+	"/files/wget": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"url",
+			"path",
+			"name"
+		],
+		"formatEN": "Download url =\u003e [path]/[name]",
+		"formatZH": "下载 url =\u003e [path]/[name]",
+		"paramKeys": []
+	},
+	"/groups": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name",
+			"type"
+		],
+		"formatEN": "create group [name][type]",
+		"formatZH": "创建组 [name][type]",
+		"paramKeys": []
+	},
+	"/groups/del": {
+		"BeforeFunctions": [
+			{
+				"db": "groups",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "name",
+				"output_value": "name"
+			},
+			{
+				"db": "groups",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "type",
+				"output_value": "type"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "delete group [type][name]",
+		"formatZH": "删除组 [type][name]",
+		"paramKeys": []
+	},
+	"/groups/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name",
+			"type"
+		],
+		"formatEN": "update group [name][type]",
+		"formatZH": "更新组 [name][type]",
+		"paramKeys": []
+	},
+	"/host/conffile/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [],
+		"formatEN": "update SSH conf",
+		"formatZH": "修改 SSH 配置文件",
+		"paramKeys": []
+	},
+	"/host/ssh/generate": {
+		"BeforeFunctions": [],
+		"bodyKeys": [],
+		"formatEN": "generate SSH secret",
+		"formatZH": "生成 SSH 密钥 ",
+		"paramKeys": []
+	},
+	"/host/ssh/operate": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"operation"
+		],
+		"formatEN": "[operation] SSH",
+		"formatZH": "[operation] SSH ",
+		"paramKeys": []
+	},
+	"/host/ssh/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"key",
+			"value"
+		],
+		"formatEN": "update SSH setting [key] =\u003e [value]",
+		"formatZH": "修改 SSH 配置 [key] =\u003e [value]",
+		"paramKeys": []
+	},
+	"/host/tool/config": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"operate"
+		],
+		"formatEN": "[operate] tool config",
+		"formatZH": "[operate] 主机工具配置文件 ",
+		"paramKeys": []
+	},
+	"/host/tool/create": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"type"
+		],
+		"formatEN": "create [type] config",
+		"formatZH": "创建 [type] 配置",
+		"paramKeys": []
+	},
+	"/host/tool/operate": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"operate",
+			"type"
+		],
+		"formatEN": "[operate] [type]",
+		"formatZH": "[operate] [type] ",
+		"paramKeys": []
+	},
+	"/host/tool/supervisor/process": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"operate"
+		],
+		"formatEN": "[operate] process",
+		"formatZH": "[operate] 守护进程 ",
+		"paramKeys": []
+	},
+	"/host/tool/supervisor/process/file": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"operate"
+		],
+		"formatEN": "[operate] Supervisor Process Config file",
+		"formatZH": "[operate] Supervisor 进程文件 ",
+		"paramKeys": []
+	},
+	"/hosts": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name",
+			"addr"
+		],
+		"formatEN": "create host [name][addr]",
+		"formatZH": "创建主机 [name][addr]",
+		"paramKeys": []
+	},
+	"/hosts/command": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name",
+			"command"
+		],
+		"formatEN": "create quick command [name][command]",
+		"formatZH": "创建快捷命令 [name][command]",
+		"paramKeys": []
+	},
+	"/hosts/command/del": {
+		"BeforeFunctions": [
+			{
+				"db": "commands",
+				"input_column": "id",
+				"input_value": "ids",
+				"isList": true,
+				"output_column": "name",
+				"output_value": "names"
+			}
+		],
+		"bodyKeys": [
+			"ids"
+		],
+		"formatEN": "delete quick command [names]",
+		"formatZH": "删除快捷命令 [names]",
+		"paramKeys": []
+	},
+	"/hosts/command/redis": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name",
+			"command"
+		],
+		"formatEN": "save quick command for redis [name][command]",
+		"formatZH": "保存 redis 快捷命令 [name][command]",
+		"paramKeys": []
+	},
+	"/hosts/command/redis/del": {
+		"BeforeFunctions": [
+			{
+				"db": "redis_commands",
+				"input_column": "id",
+				"input_value": "ids",
+				"isList": true,
+				"output_column": "name",
+				"output_value": "names"
+			}
+		],
+		"bodyKeys": [
+			"ids"
+		],
+		"formatEN": "delete quick command of redis [names]",
+		"formatZH": "删除 redis 快捷命令 [names]",
+		"paramKeys": []
+	},
+	"/hosts/command/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name"
+		],
+		"formatEN": "update quick command [name]",
+		"formatZH": "更新快捷命令 [name]",
+		"paramKeys": []
+	},
+	"/hosts/del": {
+		"BeforeFunctions": [
+			{
+				"db": "hosts",
+				"input_column": "id",
+				"input_value": "ids",
+				"isList": true,
+				"output_column": "addr",
+				"output_value": "addrs"
+			}
+		],
+		"bodyKeys": [
+			"ids"
+		],
+		"formatEN": "delete host [addrs]",
+		"formatZH": "删除主机 [addrs]",
+		"paramKeys": []
+	},
+	"/hosts/firewall/forward": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"source_port"
+		],
+		"formatEN": "update port forward rules [source_port]",
+		"formatZH": "更新端口转发规则 [source_port]",
+		"paramKeys": []
+	},
+	"/hosts/firewall/ip": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"strategy",
+			"address"
+		],
+		"formatEN": "create address rules [strategy][address]",
+		"formatZH": "添加 ip 规则 [strategy] [address]",
+		"paramKeys": []
+	},
+	"/hosts/firewall/operate": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"operation"
+		],
+		"formatEN": "[operation] firewall",
+		"formatZH": "[operation] 防火墙",
+		"paramKeys": []
+	},
+	"/hosts/firewall/port": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"port",
+			"strategy"
+		],
+		"formatEN": "create port rules [strategy][port]",
+		"formatZH": "添加端口规则 [strategy] [port]",
+		"paramKeys": []
+	},
+	"/hosts/monitor/clean": {
+		"BeforeFunctions": [],
+		"bodyKeys": [],
+		"formatEN": "clean monitor datas",
+		"formatZH": "清空监控数据",
+		"paramKeys": []
+	},
+	"/hosts/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name",
+			"addr"
+		],
+		"formatEN": "update host [name][addr]",
+		"formatZH": "更新主机信息 [name][addr]",
+		"paramKeys": []
+	},
+	"/hosts/update/group": {
+		"BeforeFunctions": [
+			{
+				"db": "hosts",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "addr",
+				"output_value": "addr"
+			}
+		],
+		"bodyKeys": [
+			"id",
+			"group"
+		],
+		"formatEN": "change host [addr] group =\u003e [group]",
+		"formatZH": "切换主机[addr]分组 =\u003e [group]",
+		"paramKeys": []
+	},
+	"/openresty/clear": {
+		"BeforeFunctions": [],
+		"bodyKeys": [],
+		"formatEN": "Clear nginx proxy cache",
+		"formatZH": "清理 Openresty 代理缓存",
+		"paramKeys": []
+	},
+	"/openresty/file": {
+		"BeforeFunctions": [],
+		"bodyKeys": [],
+		"formatEN": "Update nginx conf",
+		"formatZH": "更新 nginx 配置",
+		"paramKeys": []
+	},
+	"/openresty/update": {
+		"BeforeFunctions": [
+			{
+				"db": "websites",
+				"input_column": "id",
+				"input_value": "websiteId",
+				"isList": false,
+				"output_column": "primary_domain",
+				"output_value": "domain"
+			}
+		],
+		"bodyKeys": [
+			"websiteId"
+		],
+		"formatEN": "Update nginx conf [domain]",
+		"formatZH": "更新 nginx 配置 [domain]",
+		"paramKeys": []
+	},
+	"/process/stop": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"PID"
+		],
+		"formatEN": "结束进程 [PID]",
+		"formatZH": "结束进程 [PID]",
+		"paramKeys": []
+	},
+	"/runtimes": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name"
+		],
+		"formatEN": "Create runtime [name]",
+		"formatZH": "创建运行环境 [name]",
+		"paramKeys": []
+	},
+	"/runtimes/del": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "Delete website [name]",
+		"formatZH": "删除网站 [name]",
+		"paramKeys": []
+	},
+	"/runtimes/operate": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "Operate runtime [name]",
+		"formatZH": "操作运行环境 [name]",
+		"paramKeys": []
+	},
+	"/runtimes/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name"
+		],
+		"formatEN": "Update runtime [name]",
+		"formatZH": "更新运行环境 [name]",
+		"paramKeys": []
+	},
+	"/settings/backup": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"type"
+		],
+		"formatEN": "create backup account [type]",
+		"formatZH": "创建备份账号 [type]",
+		"paramKeys": []
+	},
+	"/settings/backup/backup": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"type",
+			"name",
+			"detailName"
+		],
+		"formatEN": "backup [type] data [name][detailName]",
+		"formatZH": "备份 [type] 数据 [name][detailName]",
+		"paramKeys": []
+	},
+	"/settings/backup/del": {
+		"BeforeFunctions": [
+			{
+				"db": "backup_accounts",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "type",
+				"output_value": "types"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "delete backup account [types]",
+		"formatZH": "删除备份账号 [types]",
+		"paramKeys": []
+	},
+	"/settings/backup/record/del": {
+		"BeforeFunctions": [
+			{
+				"db": "backup_records",
+				"input_column": "id",
+				"input_value": "ids",
+				"isList": true,
+				"output_column": "file_name",
+				"output_value": "files"
+			}
+		],
+		"bodyKeys": [
+			"ids"
+		],
+		"formatEN": "delete backup records [files]",
+		"formatZH": "删除备份记录 [files]",
+		"paramKeys": []
+	},
+	"/settings/backup/record/download": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"source",
+			"fileName"
+		],
+		"formatEN": "download backup records [source][fileName]",
+		"formatZH": "下载备份记录 [source][fileName]",
+		"paramKeys": []
+	},
+	"/settings/backup/recover": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"type",
+			"name",
+			"detailName",
+			"file"
+		],
+		"formatEN": "recover [type] data [name][detailName] from [file]",
+		"formatZH": "从 [file] 恢复 [type] 数据 [name][detailName]",
+		"paramKeys": []
+	},
+	"/settings/backup/recover/byupload": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"type",
+			"name",
+			"detailName",
+			"file"
+		],
+		"formatEN": "recover [type] data [name][detailName] from [file]",
+		"formatZH": "从 [file] 恢复 [type] 数据 [name][detailName]",
+		"paramKeys": []
+	},
+	"/settings/backup/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"type"
+		],
+		"formatEN": "update backup account [types]",
+		"formatZH": "更新备份账号 [types]",
+		"paramKeys": []
+	},
+	"/settings/snapshot": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"from",
+			"description"
+		],
+		"formatEN": "Create system backup [description] to [from]",
+		"formatZH": "创建系统快照 [description] 到 [from]",
+		"paramKeys": []
+	},
+	"/settings/snapshot/del": {
+		"BeforeFunctions": [
+			{
+				"db": "snapshots",
+				"input_column": "id",
+				"input_value": "ids",
+				"isList": true,
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"bodyKeys": [
+			"ids"
+		],
+		"formatEN": "Delete system backup [name]",
+		"formatZH": "删除系统快照 [name]",
+		"paramKeys": []
+	},
+	"/settings/snapshot/description/update": {
+		"BeforeFunctions": [
+			{
+				"db": "snapshots",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"bodyKeys": [
+			"id",
+			"description"
+		],
+		"formatEN": "The description of the snapshot [name] is modified =\u003e [description]",
+		"formatZH": "快照 [name] 描述信息修改 [description]",
+		"paramKeys": []
+	},
+	"/settings/snapshot/import": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"from",
+			"names"
+		],
+		"formatEN": "Sync system snapshots [names] from [from]",
+		"formatZH": "从 [from] 同步系统快照 [names]",
+		"paramKeys": []
+	},
+	"/settings/snapshot/recover": {
+		"BeforeFunctions": [
+			{
+				"db": "snapshots",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "Recover from system backup [name]",
+		"formatZH": "从系统快照 [name] 恢复",
+		"paramKeys": []
+	},
+	"/settings/snapshot/rollback": {
+		"BeforeFunctions": [
+			{
+				"db": "snapshots",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "Rollback from system backup [name]",
+		"formatZH": "从系统快照 [name] 回滚",
+		"paramKeys": []
+	},
+	"/settings/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"key",
+			"value"
+		],
+		"formatEN": "update system setting [key] =\u003e [value]",
+		"formatZH": "修改系统配置 [key] =\u003e [value]",
+		"paramKeys": []
+	},
+	"/toolbox/clam": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name",
+			"path"
+		],
+		"formatEN": "create clam [name][path]",
+		"formatZH": "创建扫描规则 [name][path]",
+		"paramKeys": []
+	},
+	"/toolbox/clam/del": {
+		"BeforeFunctions": [
+			{
+				"db": "clams",
+				"input_column": "id",
+				"input_value": "ids",
+				"isList": true,
+				"output_column": "name",
+				"output_value": "names"
+			}
+		],
+		"bodyKeys": [
+			"ids"
+		],
+		"formatEN": "delete clam [names]",
+		"formatZH": "删除扫描规则 [names]",
+		"paramKeys": []
+	},
+	"/toolbox/clam/handle": {
+		"BeforeFunctions": [
+			{
+				"db": "clams",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": true,
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "handle clam scan [name]",
+		"formatZH": "执行病毒扫描 [name]",
+		"paramKeys": []
+	},
+	"/toolbox/clam/operate": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"operation"
+		],
+		"formatEN": "[operation] FTP",
+		"formatZH": "[operation] Clam",
+		"paramKeys": []
+	},
+	"/toolbox/clam/record/clean": {
+		"BeforeFunctions": [
+			{
+				"db": "clams",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": true,
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "clean clam record [name]",
+		"formatZH": "清空扫描报告 [name]",
+		"paramKeys": []
+	},
+	"/toolbox/clam/status/update": {
+		"BeforeFunctions": [
+			{
+				"db": "clams",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"bodyKeys": [
+			"id",
+			"status"
+		],
+		"formatEN": "change the status of clam [name] to [status].",
+		"formatZH": "修改扫描规则 [name] 状态为 [status]",
+		"paramKeys": []
+	},
+	"/toolbox/clam/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name",
+			"path"
+		],
+		"formatEN": "update clam [name][path]",
+		"formatZH": "修改扫描规则 [name][path]",
+		"paramKeys": []
+	},
+	"/toolbox/clean": {
+		"BeforeFunctions": [],
+		"bodyKeys": [],
+		"formatEN": "Clean system junk files",
+		"formatZH": "清理系统垃圾文件",
+		"paramKeys": []
+	},
+	"/toolbox/device/update/conf": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"key",
+			"value"
+		],
+		"formatEN": "update device conf [key] =\u003e [value]",
+		"formatZH": "修改主机参数 [key] =\u003e [value]",
+		"paramKeys": []
+	},
+	"/toolbox/device/update/host": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"key",
+			"value"
+		],
+		"formatEN": "update device host [key] =\u003e [value]",
+		"formatZH": "修改主机 Host [key] =\u003e [value]",
+		"paramKeys": []
+	},
+	"/toolbox/device/update/swap": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"operate",
+			"path"
+		],
+		"formatEN": "[operate] device swap [path]",
+		"formatZH": "[operate] 主机 swap [path]",
+		"paramKeys": []
+	},
+	"/toolbox/fail2ban/operate": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"operation"
+		],
+		"formatEN": "[operation] Fail2ban",
+		"formatZH": "[operation] Fail2ban",
+		"paramKeys": []
+	},
+	"/toolbox/fail2ban/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"key",
+			"value"
+		],
+		"formatEN": "update fail2ban conf [key] =\u003e [value]",
+		"formatZH": "修改 Fail2ban 配置 [key] =\u003e [value]",
+		"paramKeys": []
+	},
+	"/toolbox/ftp": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"user",
+			"path"
+		],
+		"formatEN": "create FTP [user][path]",
+		"formatZH": "创建 FTP 账户 [user][path]",
+		"paramKeys": []
+	},
+	"/toolbox/ftp/del": {
+		"BeforeFunctions": [
+			{
+				"db": "ftps",
+				"input_column": "id",
+				"input_value": "ids",
+				"isList": true,
+				"output_column": "user",
+				"output_value": "users"
+			}
+		],
+		"bodyKeys": [
+			"ids"
+		],
+		"formatEN": "delete FTP users [users]",
+		"formatZH": "删除 FTP 账户 [users]",
+		"paramKeys": []
+	},
+	"/toolbox/ftp/operate": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"operation"
+		],
+		"formatEN": "[operation] FTP",
+		"formatZH": "[operation] FTP",
+		"paramKeys": []
+	},
+	"/toolbox/ftp/sync": {
+		"BeforeFunctions": [],
+		"bodyKeys": [],
+		"formatEN": "sync FTP users",
+		"formatZH": "同步 FTP 账户",
+		"paramKeys": []
+	},
+	"/toolbox/ftp/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"user",
+			"path"
+		],
+		"formatEN": "update FTP [user][path]",
+		"formatZH": "修改 FTP 账户 [user][path]",
+		"paramKeys": []
+	},
+	"/toolbox/scan": {
+		"BeforeFunctions": [],
+		"bodyKeys": [],
+		"formatEN": "scan System Junk Files",
+		"formatZH": "扫描系统垃圾文件",
+		"paramKeys": []
+	},
+	"/websites": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"primaryDomain"
+		],
+		"formatEN": "Create website [primaryDomain]",
+		"formatZH": "创建网站 [primaryDomain]",
+		"paramKeys": []
+	},
+	"/websites/:id/https": {
+		"BeforeFunctions": [
+			{
+				"db": "websites",
+				"input_column": "id",
+				"input_value": "websiteId",
+				"isList": false,
+				"output_column": "primary_domain",
+				"output_value": "domain"
+			}
+		],
+		"bodyKeys": [
+			"websiteId"
+		],
+		"formatEN": "Update website https [domain] conf",
+		"formatZH": "更新网站 [domain] https 配置",
+		"paramKeys": []
+	},
+	"/websites/acme": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"email"
+		],
+		"formatEN": "Create website acme [email]",
+		"formatZH": "创建网站 acme [email]",
+		"paramKeys": []
+	},
+	"/websites/acme/del": {
+		"BeforeFunctions": [
+			{
+				"db": "website_acme_accounts",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "email",
+				"output_value": "email"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "Delete website acme [email]",
+		"formatZH": "删除网站 acme [email]",
+		"paramKeys": []
+	},
+	"/websites/ca": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name"
+		],
+		"formatEN": "Create website ca [name]",
+		"formatZH": "创建网站 ca [name]",
+		"paramKeys": []
+	},
+	"/websites/ca/del": {
+		"BeforeFunctions": [
+			{
+				"db": "website_cas",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "Delete website ca [name]",
+		"formatZH": "删除网站 ca [name]",
+		"paramKeys": []
+	},
+	"/websites/ca/download": {
+		"BeforeFunctions": [
+			{
+				"db": "website_cas",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "download ca file [name]",
+		"formatZH": "下载 CA 证书文件 [name]",
+		"paramKeys": []
+	},
+	"/websites/ca/obtain": {
+		"BeforeFunctions": [
+			{
+				"db": "website_cas",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "Obtain SSL [name]",
+		"formatZH": "自签 SSL 证书 [name]",
+		"paramKeys": []
+	},
+	"/websites/ca/renew": {
+		"BeforeFunctions": [
+			{
+				"db": "website_cas",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "Obtain SSL [name]",
+		"formatZH": "自签 SSL 证书 [name]",
+		"paramKeys": []
+	},
+	"/websites/config/update": {
+		"BeforeFunctions": [
+			{
+				"db": "websites",
+				"input_column": "id",
+				"input_value": "websiteId",
+				"isList": false,
+				"output_column": "primary_domain",
+				"output_value": "domain"
+			}
+		],
+		"bodyKeys": [
+			"websiteId"
+		],
+		"formatEN": "Nginx conf update [domain]",
+		"formatZH": "nginx 配置修改 [domain]",
+		"paramKeys": []
+	},
+	"/websites/default/html/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"type"
+		],
+		"formatEN": "Update default html",
+		"formatZH": "更新默认 html",
+		"paramKeys": []
+	},
+	"/websites/default/server": {
+		"BeforeFunctions": [
+			{
+				"db": "websites",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "primary_domain",
+				"output_value": "domain"
+			}
+		],
+		"bodyKeys": [
+			"id",
+			"operate"
+		],
+		"formatEN": "Change default server =\u003e [domain]",
+		"formatZH": "修改默认 server =\u003e [domain]",
+		"paramKeys": []
+	},
+	"/websites/del": {
+		"BeforeFunctions": [
+			{
+				"db": "websites",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "primary_domain",
+				"output_value": "domain"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "Delete website [domain]",
+		"formatZH": "删除网站 [domain]",
+		"paramKeys": []
+	},
+	"/websites/dir/permission": {
+		"BeforeFunctions": [
+			{
+				"db": "websites",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "primary_domain",
+				"output_value": "domain"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "Update  domain [domain] dir permission",
+		"formatZH": "更新网站 [domain] 目录权限",
+		"paramKeys": []
+	},
+	"/websites/dir/update": {
+		"BeforeFunctions": [
+			{
+				"db": "websites",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "primary_domain",
+				"output_value": "domain"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "Update  domain [domain] dir",
+		"formatZH": "更新网站 [domain] 目录",
+		"paramKeys": []
+	},
+	"/websites/dns": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name"
+		],
+		"formatEN": "Create website dns [name]",
+		"formatZH": "创建网站 dns [name]",
+		"paramKeys": []
+	},
+	"/websites/dns/del": {
+		"BeforeFunctions": [
+			{
+				"db": "website_dns_accounts",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "Delete website dns [name]",
+		"formatZH": "删除网站 dns [name]",
+		"paramKeys": []
+	},
+	"/websites/dns/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"name"
+		],
+		"formatEN": "Update website dns [name]",
+		"formatZH": "更新网站 dns [name]",
+		"paramKeys": []
+	},
+	"/websites/domains": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"domain"
+		],
+		"formatEN": "Create domain [domain]",
+		"formatZH": "创建域名 [domain]",
+		"paramKeys": []
+	},
+	"/websites/domains/del": {
+		"BeforeFunctions": [
+			{
+				"db": "website_domains",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "domain",
+				"output_value": "domain"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "Delete domain [domain]",
+		"formatZH": "删除域名 [domain]",
+		"paramKeys": []
+	},
+	"/websites/log": {
+		"BeforeFunctions": [
+			{
+				"db": "websites",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "primary_domain",
+				"output_value": "domain"
+			}
+		],
+		"bodyKeys": [
+			"id",
+			"operate"
+		],
+		"formatEN": "[domain][operate] logs",
+		"formatZH": "[domain][operate] 日志",
+		"paramKeys": []
+	},
+	"/websites/nginx/update": {
+		"BeforeFunctions": [
+			{
+				"db": "websites",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "primary_domain",
+				"output_value": "domain"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "[domain] Nginx conf update",
+		"formatZH": "[domain] Nginx 配置修改",
+		"paramKeys": []
+	},
+	"/websites/operate": {
+		"BeforeFunctions": [
+			{
+				"db": "websites",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "primary_domain",
+				"output_value": "domain"
+			}
+		],
+		"bodyKeys": [
+			"id",
+			"operate"
+		],
+		"formatEN": "[operate] website [domain]",
+		"formatZH": "[operate] 网站 [domain]",
+		"paramKeys": []
+	},
+	"/websites/php/config": {
+		"BeforeFunctions": [
+			{
+				"db": "websites",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "primary_domain",
+				"output_value": "domain"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "[domain] PHP conf update",
+		"formatZH": "[domain] PHP 配置修改",
+		"paramKeys": []
+	},
+	"/websites/php/update": {
+		"BeforeFunctions": [
+			{
+				"db": "websites",
+				"input_column": "id",
+				"input_value": "websiteId",
+				"isList": false,
+				"output_column": "primary_domain",
+				"output_value": "domain"
+			}
+		],
+		"bodyKeys": [
+			"websiteId"
+		],
+		"formatEN": "Nginx conf update [domain]",
+		"formatZH": "php 配置修改 [domain]",
+		"paramKeys": []
+	},
+	"/websites/php/version": {
+		"BeforeFunctions": [
+			{
+				"db": "websites",
+				"input_column": "id",
+				"input_value": "websiteId",
+				"isList": false,
+				"output_column": "primary_domain",
+				"output_value": "domain"
+			}
+		],
+		"bodyKeys": [
+			"websiteId"
+		],
+		"formatEN": "php version update [domain]",
+		"formatZH": "php 版本变更 [domain]",
+		"paramKeys": []
+	},
+	"/websites/proxies/update": {
+		"BeforeFunctions": [
+			{
+				"db": "websites",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "primary_domain",
+				"output_value": "domain"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "Update domain [domain] proxy config",
+		"formatZH": "修改网站 [domain] 反向代理配置 ",
+		"paramKeys": []
+	},
+	"/websites/proxy/file": {
+		"BeforeFunctions": [
+			{
+				"db": "websites",
+				"input_column": "id",
+				"input_value": "websiteID",
+				"isList": false,
+				"output_column": "primary_domain",
+				"output_value": "domain"
+			}
+		],
+		"bodyKeys": [
+			"websiteID"
+		],
+		"formatEN": "Nginx conf proxy file update [domain]",
+		"formatZH": "更新反向代理文件 [domain]",
+		"paramKeys": []
+	},
+	"/websites/redirect/file": {
+		"BeforeFunctions": [
+			{
+				"db": "websites",
+				"input_column": "id",
+				"input_value": "websiteID",
+				"isList": false,
+				"output_column": "primary_domain",
+				"output_value": "domain"
+			}
+		],
+		"bodyKeys": [
+			"websiteID"
+		],
+		"formatEN": "Nginx conf redirect file update [domain]",
+		"formatZH": "更新重定向文件 [domain]",
+		"paramKeys": []
+	},
+	"/websites/redirect/update": {
+		"BeforeFunctions": [
+			{
+				"db": "websites",
+				"input_column": "id",
+				"input_value": "websiteID",
+				"isList": false,
+				"output_column": "primary_domain",
+				"output_value": "domain"
+			}
+		],
+		"bodyKeys": [
+			"websiteID"
+		],
+		"formatEN": "Update domain [domain] redirect config",
+		"formatZH": "修改网站 [domain] 重定向理配置 ",
+		"paramKeys": []
+	},
+	"/websites/rewrite/update": {
+		"BeforeFunctions": [
+			{
+				"db": "websites",
+				"input_column": "id",
+				"input_value": "websiteID",
+				"isList": false,
+				"output_column": "primary_domain",
+				"output_value": "domain"
+			}
+		],
+		"bodyKeys": [
+			"websiteID"
+		],
+		"formatEN": "Nginx conf rewrite update [domain]",
+		"formatZH": "伪静态配置修改 [domain]",
+		"paramKeys": []
+	},
+	"/websites/ssl": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"primaryDomain"
+		],
+		"formatEN": "Create website ssl [primaryDomain]",
+		"formatZH": "创建网站 ssl [primaryDomain]",
+		"paramKeys": []
+	},
+	"/websites/ssl/del": {
+		"BeforeFunctions": [
+			{
+				"db": "website_ssls",
+				"input_column": "id",
+				"input_value": "ids",
+				"isList": true,
+				"output_column": "primary_domain",
+				"output_value": "domain"
+			}
+		],
+		"bodyKeys": [
+			"ids"
+		],
+		"formatEN": "Delete ssl [domain]",
+		"formatZH": "删除 ssl [domain]",
+		"paramKeys": []
+	},
+	"/websites/ssl/download": {
+		"BeforeFunctions": [
+			{
+				"db": "website_ssls",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "primary_domain",
+				"output_value": "domain"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "download ssl file [domain]",
+		"formatZH": "下载证书文件 [domain]",
+		"paramKeys": []
+	},
+	"/websites/ssl/obtain": {
+		"BeforeFunctions": [
+			{
+				"db": "website_ssls",
+				"input_column": "id",
+				"input_value": "ID",
+				"isList": false,
+				"output_column": "primary_domain",
+				"output_value": "domain"
+			}
+		],
+		"bodyKeys": [
+			"ID"
+		],
+		"formatEN": "apply ssl [domain]",
+		"formatZH": "申请证书  [domain]",
+		"paramKeys": []
+	},
+	"/websites/ssl/update": {
+		"BeforeFunctions": [
+			{
+				"db": "website_ssls",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "primary_domain",
+				"output_value": "domain"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "Update ssl config [domain]",
+		"formatZH": "更新证书设置 [domain]",
+		"paramKeys": []
+	},
+	"/websites/ssl/upload": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"type"
+		],
+		"formatEN": "Upload ssl [type]",
+		"formatZH": "上传 ssl [type]",
+		"paramKeys": []
+	},
+	"/websites/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"primaryDomain"
+		],
+		"formatEN": "Update website [primaryDomain]",
+		"formatZH": "更新网站 [primaryDomain]",
+		"paramKeys": []
+	}
+}

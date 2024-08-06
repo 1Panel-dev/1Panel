@@ -42,8 +42,8 @@ func Routers() *gin.Engine {
 	Router.Use(i18n.UseI18n())
 
 	swaggerRouter := Router.Group("1panel")
-	docs.SwaggerInfo.BasePath = "/api/v1"
-	swaggerRouter.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	docs.SwaggerInfo.BasePath = "/api/v2"
+	swaggerRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	PublicGroup := Router.Group("")
 	{
 		PublicGroup.GET("/health", func(c *gin.Context) {

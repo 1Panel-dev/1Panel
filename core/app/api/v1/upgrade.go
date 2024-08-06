@@ -12,7 +12,7 @@ import (
 // @Description 系统更新信息
 // @Success 200 {object} dto.UpgradeInfo
 // @Security ApiKeyAuth
-// @Router /settings/upgrade [get]
+// @Router /core/settings/upgrade [get]
 func (b *BaseApi) GetUpgradeInfo(c *gin.Context) {
 	info, err := upgradeService.SearchUpgrade()
 	if err != nil {
@@ -29,7 +29,7 @@ func (b *BaseApi) GetUpgradeInfo(c *gin.Context) {
 // @Param request body dto.Upgrade true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /settings/upgrade [get]
+// @Router /core/settings/upgrade [get]
 func (b *BaseApi) GetNotesByVersion(c *gin.Context) {
 	var req dto.Upgrade
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -51,7 +51,7 @@ func (b *BaseApi) GetNotesByVersion(c *gin.Context) {
 // @Param request body dto.Upgrade true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /settings/upgrade [post]
+// @Router /core/settings/upgrade [post]
 // @x-panel-log {"bodyKeys":["version"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新系统 => [version]","formatEN":"upgrade system => [version]"}
 func (b *BaseApi) Upgrade(c *gin.Context) {
 	var req dto.Upgrade

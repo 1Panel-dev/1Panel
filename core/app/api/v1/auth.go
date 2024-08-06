@@ -23,7 +23,7 @@ type BaseApi struct{}
 // @Param EntranceCode header string true "安全入口 base64 加密串"
 // @Param request body dto.Login true "request"
 // @Success 200 {object} dto.UserLoginInfo
-// @Router /auth/login [post]
+// @Router /core/auth/login [post]
 func (b *BaseApi) Login(c *gin.Context) {
 	var req dto.Login
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -57,7 +57,7 @@ func (b *BaseApi) Login(c *gin.Context) {
 // @Accept json
 // @Param request body dto.MFALogin true "request"
 // @Success 200 {object} dto.UserLoginInfo
-// @Router /auth/mfalogin [post]
+// @Router /core/auth/mfalogin [post]
 // @Header 200 {string} EntranceCode "安全入口"
 func (b *BaseApi) MFALogin(c *gin.Context) {
 	var req dto.MFALogin
@@ -84,7 +84,7 @@ func (b *BaseApi) MFALogin(c *gin.Context) {
 // @Description 用户登出
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /auth/logout [post]
+// @Router /core/auth/logout [post]
 func (b *BaseApi) LogOut(c *gin.Context) {
 	if err := authService.LogOut(c); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
@@ -97,7 +97,7 @@ func (b *BaseApi) LogOut(c *gin.Context) {
 // @Summary Load captcha
 // @Description 加载验证码
 // @Success 200 {object} dto.CaptchaResponse
-// @Router /auth/captcha [get]
+// @Router /core/auth/captcha [get]
 func (b *BaseApi) Captcha(c *gin.Context) {
 	captcha, err := captcha.CreateCaptcha()
 	if err != nil {
@@ -111,7 +111,7 @@ func (b *BaseApi) Captcha(c *gin.Context) {
 // @Summary Load safety status
 // @Description 获取系统安全登录状态
 // @Success 200
-// @Router /auth/issafety [get]
+// @Router /core/auth/issafety [get]
 func (b *BaseApi) CheckIsSafety(c *gin.Context) {
 	code := c.DefaultQuery("code", "")
 	status, err := authService.CheckIsSafety(code)
@@ -147,7 +147,7 @@ func (b *BaseApi) GetResponsePage(c *gin.Context) {
 // @Summary Check System isDemo
 // @Description 判断是否为demo环境
 // @Success 200
-// @Router /auth/demo [get]
+// @Router /core/auth/demo [get]
 func (b *BaseApi) CheckIsDemo(c *gin.Context) {
 	helper.SuccessWithData(c, global.CONF.System.IsDemo)
 }
@@ -156,7 +156,7 @@ func (b *BaseApi) CheckIsDemo(c *gin.Context) {
 // @Summary Load System Language
 // @Description 获取系统语言设置
 // @Success 200
-// @Router /auth/language [get]
+// @Router /core/auth/language [get]
 func (b *BaseApi) GetLanguage(c *gin.Context) {
 	settingInfo, err := settingService.GetSettingInfo()
 	if err != nil {
