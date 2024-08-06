@@ -89,6 +89,7 @@ func (a *AppInstallService) Page(req request.AppInstalledSearch) (int64, []respo
 	if req.Name != "" {
 		opts = append(opts, commonRepo.WithLikeName(req.Name))
 	}
+
 	if len(req.Tags) != 0 {
 		tags, err := tagRepo.GetByKeys(req.Tags)
 		if err != nil {
@@ -202,18 +203,31 @@ func (a *AppInstallService) SearchForWebsite(req request.AppInstalledSearch) ([]
 		opts     []repo.DBOption
 	)
 	if req.Type != "" {
-		apps, err := appRepo.GetBy(appRepo.WithType(req.Type))
-		if err != nil {
-			return nil, err
+		if req.Type == "proxy" {
+			phpApps, _ := appRepo.GetBy(appRepo.WithType("php"))
+			var ids []uint
+			for _, app := range phpApps {
+				ids = append(ids, app.ID)
+			}
+			runtimeApps, _ := appRepo.GetBy(appRepo.WithType("runtime"))
+			for _, app := range runtimeApps {
+				ids = append(ids, app.ID)
+			}
+			opts = append(opts, appInstallRepo.WithAppIdsNotIn(ids))
+		} else {
+			apps, err := appRepo.GetBy(appRepo.WithType(req.Type))
+			if err != nil {
+				return nil, err
+			}
+			var ids []uint
+			for _, app := range apps {
+				ids = append(ids, app.ID)
+			}
+			if req.Unused {
+				opts = append(opts, appInstallRepo.WithIdNotInWebsite())
+			}
+			opts = append(opts, appInstallRepo.WithAppIdsIn(ids))
 		}
-		var ids []uint
-		for _, app := range apps {
-			ids = append(ids, app.ID)
-		}
-		if req.Unused {
-			opts = append(opts, appInstallRepo.WithIdNotInWebsite())
-		}
-		opts = append(opts, appInstallRepo.WithAppIdsIn(ids))
 		installs, err = appInstallRepo.ListBy(opts...)
 		if err != nil {
 			return nil, err

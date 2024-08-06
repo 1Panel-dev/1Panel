@@ -121,6 +121,7 @@ export namespace App {
         icon: string;
         canUpdate: boolean;
         path: string;
+        httpPort?: number;
         app: App;
     }
 

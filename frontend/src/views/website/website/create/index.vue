@@ -316,17 +316,39 @@
                     </el-col>
                 </el-row>
 
-                <el-form-item v-if="website.type === 'proxy'" :label="$t('website.proxyAddress')" prop="proxyAddress">
-                    <el-input v-model="website.proxyAddress" :placeholder="$t('website.proxyHelper')">
-                        <template #prepend>
-                            <el-select v-model="website.proxyProtocol" class="pre-select">
-                                <el-option label="http" value="http://" />
-                                <el-option label="https" value="https://" />
-                                <el-option :label="$t('website.other')" value="" />
+                <el-row :gutter="20" v-if="website.type === 'proxy'">
+                    <el-col :span="12">
+                        <el-form-item :label="$t('website.proxyAddress')" prop="proxyAddress">
+                            <el-input v-model="website.proxyAddress" :placeholder="$t('website.proxyHelper')">
+                                <template #prepend>
+                                    <el-select v-model="website.proxyProtocol" class="pre-select">
+                                        <el-option label="http" value="http://" />
+                                        <el-option label="https" value="https://" />
+                                        <el-option :label="$t('website.other')" value="" />
+                                    </el-select>
+                                </template>
+                            </el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item :label="$t('app.app')">
+                            <el-select
+                                v-model="website.appInstallId"
+                                class="p-w-200"
+                                filterable
+                                @change="changeInstall"
+                            >
+                                <el-option
+                                    v-for="(appInstall, index) in appInstalls"
+                                    :key="index"
+                                    :label="appInstall.name"
+                                    :value="appInstall.id"
+                                ></el-option>
                             </el-select>
-                        </template>
-                    </el-input>
-                </el-form-item>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+
                 <el-form-item :label="$t('website.remark')" prop="remark">
                     <el-input type="textarea" :rows="3" clearable v-model="website.remark" />
                 </el-form-item>
@@ -479,6 +501,10 @@ const changeType = (type: string) => {
         case 'runtime':
             getRuntimes();
             break;
+        case 'proxy':
+            website.value.proxyAddress = '';
+            searchAppInstalled('proxy');
+            break;
         default:
             website.value.appInstallId = undefined;
             break;
@@ -487,11 +513,21 @@ const changeType = (type: string) => {
     versionExist.value = true;
 };
 
-const searchAppInstalled = () => {
-    GetAppInstalled({ type: 'website', unused: true, all: true, page: 1, pageSize: 100 }).then((res) => {
+const searchAppInstalled = (appType: string) => {
+    GetAppInstalled({ type: appType, unused: true, all: true, page: 1, pageSize: 100 }).then((res) => {
         appInstalls.value = res.data;
-        if (res.data && res.data.length > 0) {
+        website.value.appInstallId = undefined;
+        if (appType == 'website' && res.data && res.data.length > 0) {
             website.value.appInstallId = res.data[0].id;
+        }
+    });
+};
+
+const changeInstall = () => {
+    appInstalls.value.forEach((app) => {
+        if (app.id === website.value.appInstallId) {
+            website.value.proxyProtocol = 'http://';
+            website.value.proxyAddress = '127.0.0.1:' + app.httpPort;
         }
     });
 };
@@ -594,14 +630,14 @@ const acceptParams = async (installPath: string) => {
     website.value.type = 'deployment';
     runtimeResource.value = 'appstore';
 
-    searchAppInstalled();
+    searchAppInstalled('website');
 
     open.value = true;
 };
 
 const changeAppType = (type: string) => {
     if (type === 'installed') {
-        searchAppInstalled();
+        searchAppInstalled('website');
     } else {
         searchApp();
     }
