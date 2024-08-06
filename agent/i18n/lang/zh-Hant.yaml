@@ -232,3 +232,7 @@ ExecShell: "執行 {{ .name }} 腳本"
 PullImage: "拉取鏡像"
 Start: "開始"
 Run: "啟動"
+Stop: '停止',
+Image: '鏡像',
+AppLink: '關聯應用'
+

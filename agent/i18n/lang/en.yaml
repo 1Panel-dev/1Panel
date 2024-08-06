@@ -230,4 +230,7 @@ ExecShell: "Execute {{ .name }} Script"
 PullImage: "Pull Image"
 Start: "Start"
 Run: "Run"
+Stop: 'Stop',
+Image: 'Image',
+AppLink: 'Associated Application'
 

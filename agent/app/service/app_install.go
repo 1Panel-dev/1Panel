@@ -265,6 +265,7 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 			ForceDelete:  req.ForceDelete,
 			DeleteDB:     req.DeleteDB,
 			DeleteImage:  req.DeleteImage,
+			TaskID:       req.TaskID,
 		}
 		if err = deleteAppInstall(deleteReq); err != nil && !req.ForceDelete {
 			return err

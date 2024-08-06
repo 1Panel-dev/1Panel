@@ -88,10 +88,11 @@ type AppInstallUpgrade struct {
 
 type AppInstallDelete struct {
 	Install      model.AppInstall
-	DeleteBackup bool `json:"deleteBackup"`
-	ForceDelete  bool `json:"forceDelete"`
-	DeleteDB     bool `json:"deleteDB"`
-	DeleteImage  bool `json:"deleteImage"`
+	DeleteBackup bool   `json:"deleteBackup"`
+	ForceDelete  bool   `json:"forceDelete"`
+	DeleteDB     bool   `json:"deleteDB"`
+	DeleteImage  bool   `json:"deleteImage"`
+	TaskID       string `json:"taskID"`
 }
 
 type AppInstalledUpdate struct {

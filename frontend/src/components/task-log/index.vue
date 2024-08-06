@@ -45,6 +45,7 @@ const scrollerElement = ref<HTMLElement | null>(null);
 const minPage = ref(1);
 const maxPage = ref(1);
 const open = ref(false);
+const em = defineEmits(['close']);
 
 const readReq = reactive({
     taskID: '',
@@ -148,6 +149,7 @@ const changeTail = (fromOutSide: boolean) => {
 const handleClose = () => {
     onCloseLog();
     open.value = false;
+    em('close', open.value);
 };
 
 const onCloseLog = async () => {
