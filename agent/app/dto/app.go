@@ -1,7 +1,9 @@
 package dto
 
 import (
+	"context"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 )
 
 type AppDatabase struct {
@@ -146,4 +148,11 @@ type AppInstallInfo struct {
 	ID   uint   `json:"id"`
 	Key  string `json:"key"`
 	Name string `json:"name"`
+}
+
+type DelAppLink struct {
+	Ctx         context.Context
+	Task        *task.Task
+	Install     *model.AppInstall
+	ForceDelete bool
 }

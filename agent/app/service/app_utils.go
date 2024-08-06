@@ -134,7 +134,12 @@ var ToolKeys = map[string]uint{
 
 func createLink(ctx context.Context, installTask *task.Task, app model.App, appInstall *model.AppInstall, params map[string]interface{}) error {
 	deleteAppLink := func(t *task.Task) {
-		_ = deleteLink(ctx, appInstall, true, true, true)
+		del := dto.DelAppLink{
+			Ctx:         ctx,
+			Install:     appInstall,
+			ForceDelete: true,
+		}
+		_ = deleteLink(del)
 	}
 	var dbConfig dto.AppDatabase
 	if DatabaseKeys[app.Key] > 0 {
@@ -315,138 +320,171 @@ func createLink(ctx context.Context, installTask *task.Task, app model.App, appI
 }
 
 func deleteAppInstall(deleteReq request.AppInstallDelete) error {
-	op := files.NewFileOp()
 	install := deleteReq.Install
+	op := files.NewFileOp()
 	appDir := install.GetPath()
-	dir, _ := os.Stat(appDir)
-	if dir != nil {
-		out, err := compose.Down(install.GetComposePath())
-		if err != nil && !deleteReq.ForceDelete {
-			return handleErr(install, err, out)
-		}
-		//TODO use task
-		if err = runScript(nil, &install, "uninstall"); err != nil {
-			_, _ = compose.Up(install.GetComposePath())
-			return err
-		}
-		if deleteReq.DeleteImage {
-			images, _ := getImages(install)
-			client, err := docker.NewClient()
-			if err != nil {
+
+	uninstallTask, err := task.NewTaskWithOps(install.Name, task.TaskUninstall, task.TaskScopeApp, deleteReq.TaskID, install.ID)
+	if err != nil {
+		return err
+	}
+
+	uninstall := func(t *task.Task) error {
+		dir, _ := os.Stat(appDir)
+		if dir != nil {
+			logStr := i18n.GetMsgByKey("Stop") + i18n.GetMsgByKey("App")
+			t.Log(logStr)
+
+			out, err := compose.Down(install.GetComposePath())
+			if err != nil && !deleteReq.ForceDelete {
+				return handleErr(install, err, out)
+			}
+			t.LogSuccess(logStr)
+			if err = runScript(t, &install, "uninstall"); err != nil {
+				_, _ = compose.Up(install.GetComposePath())
 				return err
 			}
-			defer client.Close()
-			for _, image := range images {
-				imageID, err := client.GetImageIDByName(image)
-				if err == nil {
-					if err = client.DeleteImage(imageID); err != nil {
-						global.LOG.Errorf("delete image %s error %s", image, err.Error())
+			if deleteReq.DeleteImage {
+				delImageStr := i18n.GetMsgByKey("TaskDelete") + i18n.GetMsgByKey("Image")
+				images, _ := getImages(install)
+				client, err := docker.NewClient()
+				if err != nil {
+					return err
+				}
+				defer client.Close()
+				for _, image := range images {
+					imageID, err := client.GetImageIDByName(image)
+					if err == nil {
+						imgStr := delImageStr + image
+						t.Log(imgStr)
+
+						if err = client.DeleteImage(imageID); err != nil {
+							t.LogFailedWithErr(imgStr, err)
+							continue
+						}
+						t.LogSuccess(delImageStr + image)
 					}
 				}
 			}
 		}
-	}
-	tx, ctx := helper.GetTxAndContext()
-	defer tx.Rollback()
-	if err := appInstallRepo.Delete(ctx, install); err != nil {
-		return err
-	}
-	if err := deleteLink(ctx, &install, deleteReq.DeleteDB, deleteReq.ForceDelete, deleteReq.DeleteBackup); err != nil && !deleteReq.ForceDelete {
-		return err
-	}
+		tx, ctx := helper.GetTxAndContext()
+		defer tx.Rollback()
+		if err = appInstallRepo.Delete(ctx, install); err != nil {
+			return err
+		}
 
-	if DatabaseKeys[install.App.Key] > 0 {
-		_ = databaseRepo.Delete(ctx, databaseRepo.WithAppInstallID(install.ID))
-	}
+		if deleteReq.DeleteDB {
+			del := dto.DelAppLink{
+				Ctx:         ctx,
+				Install:     &install,
+				ForceDelete: deleteReq.ForceDelete,
+				Task:        uninstallTask,
+			}
+			t.LogWithOps(task.TaskDelete, i18n.GetMsgByKey("Database"))
+			if err = deleteLink(del); err != nil {
+				t.LogFailedWithOps(task.TaskDelete, i18n.GetMsgByKey("Database"), err)
+				if !deleteReq.ForceDelete {
+					return err
+				}
+			}
+			t.LogSuccessWithOps(task.TaskDelete, i18n.GetMsgByKey("Database"))
+		}
 
-	switch install.App.Key {
-	case constant.AppOpenresty:
-		websites, _ := websiteRepo.List()
-		for _, website := range websites {
-			if website.AppInstallID > 0 {
-				websiteAppInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
-				if websiteAppInstall.AppId > 0 {
-					websiteApp, _ := appRepo.GetFirst(commonRepo.WithByID(websiteAppInstall.AppId))
-					if websiteApp.Type == constant.RuntimePHP {
-						go func() {
-							_, _ = compose.Down(websiteAppInstall.GetComposePath())
-							_ = op.DeleteDir(websiteAppInstall.GetPath())
-						}()
-						_ = appInstallRepo.Delete(ctx, websiteAppInstall)
+		if DatabaseKeys[install.App.Key] > 0 {
+			_ = databaseRepo.Delete(ctx, databaseRepo.WithAppInstallID(install.ID))
+		}
+
+		switch install.App.Key {
+		case constant.AppOpenresty:
+			websites, _ := websiteRepo.List()
+			for _, website := range websites {
+				if website.AppInstallID > 0 {
+					websiteAppInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
+					if websiteAppInstall.AppId > 0 {
+						websiteApp, _ := appRepo.GetFirst(commonRepo.WithByID(websiteAppInstall.AppId))
+						if websiteApp.Type == constant.RuntimePHP {
+							go func() {
+								_, _ = compose.Down(websiteAppInstall.GetComposePath())
+								_ = op.DeleteDir(websiteAppInstall.GetPath())
+							}()
+							_ = appInstallRepo.Delete(ctx, websiteAppInstall)
+						}
 					}
 				}
 			}
+			_ = websiteRepo.DeleteAll(ctx)
+			_ = websiteDomainRepo.DeleteAll(ctx)
+			xpack.RemoveTamper("")
+		case constant.AppMysql, constant.AppMariaDB:
+			_ = mysqlRepo.Delete(ctx, mysqlRepo.WithByMysqlName(install.Name))
+		case constant.AppPostgresql:
+			_ = postgresqlRepo.Delete(ctx, postgresqlRepo.WithByPostgresqlName(install.Name))
 		}
-		_ = websiteRepo.DeleteAll(ctx)
-		_ = websiteDomainRepo.DeleteAll(ctx)
-		xpack.RemoveTamper("")
-	case constant.AppMysql, constant.AppMariaDB:
-		_ = mysqlRepo.Delete(ctx, mysqlRepo.WithByMysqlName(install.Name))
-	case constant.AppPostgresql:
-		_ = postgresqlRepo.Delete(ctx, postgresqlRepo.WithByPostgresqlName(install.Name))
-	}
 
-	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("app"), commonRepo.WithByName(install.App.Key), backupRepo.WithByDetailName(install.Name))
-	uploadDir := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/uploads/app/%s/%s", install.App.Key, install.Name))
-	if _, err := os.Stat(uploadDir); err == nil {
-		_ = os.RemoveAll(uploadDir)
-	}
-	if deleteReq.DeleteBackup {
-		localDir, _ := loadLocalDir()
-		backupDir := path.Join(localDir, fmt.Sprintf("app/%s/%s", install.App.Key, install.Name))
-		if _, err := os.Stat(backupDir); err == nil {
-			_ = os.RemoveAll(backupDir)
+		_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("app"), commonRepo.WithByName(install.App.Key), backupRepo.WithByDetailName(install.Name))
+		uploadDir := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/uploads/app/%s/%s", install.App.Key, install.Name))
+		if _, err := os.Stat(uploadDir); err == nil {
+			_ = os.RemoveAll(uploadDir)
 		}
-		global.LOG.Infof("delete app %s-%s backups successful", install.App.Key, install.Name)
+		if deleteReq.DeleteBackup {
+			localDir, _ := loadLocalDir()
+			backupDir := path.Join(localDir, fmt.Sprintf("app/%s/%s", install.App.Key, install.Name))
+			if _, err = os.Stat(backupDir); err == nil {
+				t.LogWithOps(task.TaskDelete, i18n.GetMsgByKey("TaskBackup"))
+				_ = os.RemoveAll(backupDir)
+				t.LogSuccessWithOps(task.TaskDelete, i18n.GetMsgByKey("TaskBackup"))
+			}
+		}
+		_ = op.DeleteDir(appDir)
+		tx.Commit()
+		return nil
 	}
-	_ = op.DeleteDir(appDir)
-	tx.Commit()
+	uninstallTask.AddSubTask(task.GetTaskName(install.Name, task.TaskUninstall, task.TaskScopeApp), uninstall, nil)
+	go uninstallTask.Execute()
 	return nil
 }
 
-func deleteLink(ctx context.Context, install *model.AppInstall, deleteDB bool, forceDelete bool, deleteBackup bool) error {
+func deleteLink(del dto.DelAppLink) error {
+	install := del.Install
 	resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(install.ID))
 	if len(resources) == 0 {
 		return nil
 	}
 	for _, re := range resources {
-		if deleteDB {
-			switch re.Key {
-			case constant.AppMysql, constant.AppMariaDB:
-				mysqlService := NewIMysqlService()
-				database, _ := mysqlRepo.Get(commonRepo.WithByID(re.ResourceId))
-				if reflect.DeepEqual(database, model.DatabaseMysql{}) {
-					continue
-				}
-				if err := mysqlService.Delete(ctx, dto.MysqlDBDelete{
-					ID:           database.ID,
-					ForceDelete:  forceDelete,
-					DeleteBackup: deleteBackup,
-					Type:         re.Key,
-					Database:     database.MysqlName,
-				}); err != nil && !forceDelete {
-					return err
-				}
-			case constant.AppPostgresql:
-				pgsqlService := NewIPostgresqlService()
-				database, _ := postgresqlRepo.Get(commonRepo.WithByID(re.ResourceId))
-				if reflect.DeepEqual(database, model.DatabasePostgresql{}) {
-					continue
-				}
-				if err := pgsqlService.Delete(ctx, dto.PostgresqlDBDelete{
-					ID:           database.ID,
-					ForceDelete:  forceDelete,
-					DeleteBackup: deleteBackup,
-					Type:         re.Key,
-					Database:     database.PostgresqlName,
-				}); err != nil {
-					return err
-				}
+		switch re.Key {
+		case constant.AppMysql, constant.AppMariaDB:
+			mysqlService := NewIMysqlService()
+			database, _ := mysqlRepo.Get(commonRepo.WithByID(re.ResourceId))
+			if reflect.DeepEqual(database, model.DatabaseMysql{}) {
+				continue
+			}
+			if err := mysqlService.Delete(del.Ctx, dto.MysqlDBDelete{
+				ID:           database.ID,
+				ForceDelete:  del.ForceDelete,
+				DeleteBackup: true,
+				Type:         re.Key,
+				Database:     database.MysqlName,
+			}); err != nil && !del.ForceDelete {
+				return err
+			}
+		case constant.AppPostgresql:
+			pgsqlService := NewIPostgresqlService()
+			database, _ := postgresqlRepo.Get(commonRepo.WithByID(re.ResourceId))
+			if reflect.DeepEqual(database, model.DatabasePostgresql{}) {
+				continue
+			}
+			if err := pgsqlService.Delete(del.Ctx, dto.PostgresqlDBDelete{
+				ID:           database.ID,
+				ForceDelete:  del.ForceDelete,
+				DeleteBackup: true,
+				Type:         re.Key,
+				Database:     database.PostgresqlName,
+			}); err != nil {
+				return err
 			}
 		}
-
 	}
-	return appInstallResourceRepo.DeleteBy(ctx, appInstallResourceRepo.WithAppInstallId(install.ID))
+	return appInstallResourceRepo.DeleteBy(del.Ctx, appInstallResourceRepo.WithAppInstallId(install.ID))
 }
 
 func getUpgradeCompose(install model.AppInstall, detail model.AppDetail) (string, error) {

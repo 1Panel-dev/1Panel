@@ -219,3 +219,15 @@ func (t *Task) LogSuccess(msg string) {
 func (t *Task) LogStart(msg string) {
 	t.Logger.Printf(fmt.Sprintf("%s%s", i18n.GetMsgByKey("Start"), msg))
 }
+
+func (t *Task) LogWithOps(operate, msg string) {
+	t.Logger.Printf("%s%s", i18n.GetMsgByKey(operate), msg)
+}
+
+func (t *Task) LogSuccessWithOps(operate, msg string) {
+	t.Logger.Printf("%s%s%s", i18n.GetMsgByKey(operate), msg, i18n.GetMsgByKey("Success"))
+}
+
+func (t *Task) LogFailedWithOps(operate, msg string, err error) {
+	t.Logger.Printf("%s%s%s : %s ", i18n.GetMsgByKey(operate), msg, i18n.GetMsgByKey("Failed"), err.Error())
+}

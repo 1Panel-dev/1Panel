@@ -189,6 +189,7 @@ export namespace App {
         forceDelete?: boolean;
         deleteBackup?: boolean;
         deleteImage?: boolean;
+        taskID?: string;
     }
 
     export interface AppInstalledSearch extends ReqPage {
