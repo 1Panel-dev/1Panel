@@ -1720,6 +1720,8 @@ const message = {
         useCustom: '自訂 docker-compose.yml',
         useCustomHelper: '使用自訂 docker-compose.yml 文件，可能會導致應用程式升級失敗，如無必要，請勿勾選',
         diffHelper: '左側為舊版本，右側為新版，編輯之後點選使用自訂版本儲存',
+        pullImage: '拉取鏡像',
+        pullImageHelper: '在應用啟動之前執行 docker pull 來拉取鏡像',
     },
     website: {
         website: '網站',

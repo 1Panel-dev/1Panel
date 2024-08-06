@@ -139,8 +139,9 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 	}
 	for _, web := range websites {
 		var (
-			appName     string
-			runtimeName string
+			appName      string
+			runtimeName  string
+			appInstallID uint
 		)
 		switch web.Type {
 		case constant.Deployment:
@@ -149,12 +150,14 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 				return 0, nil, err
 			}
 			appName = appInstall.Name
+			appInstallID = appInstall.ID
 		case constant.Runtime:
 			runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(web.RuntimeID))
 			if err != nil {
 				return 0, nil, err
 			}
 			runtimeName = runtime.Name
+			appInstallID = runtime.ID
 		}
 		sitePath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "www", "sites", web.Alias)
 
@@ -173,6 +176,7 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 			SSLStatus:     checkSSLStatus(web.WebsiteSSL.ExpireDate),
 			RuntimeName:   runtimeName,
 			SitePath:      sitePath,
+			AppInstallID:  appInstallID,
 		})
 	}
 	return total, websiteDTOs, nil
