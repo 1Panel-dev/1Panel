@@ -2,5 +2,5 @@ package docs
 
 import _ "embed"
 
-//go:embed swagger.json
-var SwaggerJson []byte
+//go:embed x-log.json
+var XLogJson []byte

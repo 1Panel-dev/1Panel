@@ -27,18 +27,20 @@ func OperationLog() gin.HandlerFunc {
 		}
 
 		source := loadLogInfo(c.Request.URL.Path)
+		pathItem := strings.TrimPrefix(c.Request.URL.Path, "/api/v2")
+		pathItem = strings.TrimPrefix(pathItem, "/api/v2/core")
 		record := &model.OperationLog{
 			Source:    source,
 			IP:        c.ClientIP(),
 			Method:    strings.ToLower(c.Request.Method),
-			Path:      strings.ReplaceAll(c.Request.URL.Path, "/api/v1", ""),
+			Path:      pathItem,
 			UserAgent: c.Request.UserAgent(),
 		}
 		var (
 			swagger      swaggerJson
 			operationDic operationJson
 		)
-		if err := json.Unmarshal(docs.SwaggerJson, &swagger); err != nil {
+		if err := json.Unmarshal(docs.XLogJson, &swagger); err != nil {
 			c.Next()
 			return
 		}
@@ -204,7 +206,7 @@ func (r responseBodyWriter) Write(b []byte) (int, error) {
 }
 
 func loadLogInfo(path string) string {
-	path = strings.ReplaceAll(path, "/api/v1", "")
+	path = strings.ReplaceAll(path, "/api/v2", "")
 	if !strings.Contains(path, "/") {
 		return ""
 	}

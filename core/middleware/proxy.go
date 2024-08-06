@@ -16,7 +16,7 @@ import (
 
 func Proxy() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if strings.HasPrefix(c.Request.URL.Path, "/api/v2/core") {
+		if strings.HasPrefix(c.Request.URL.Path, "/api/v2/core") || strings.HasPrefix(c.Request.URL.Path, "/1panel/swagger") {
 			c.Next()
 			return
 		}
