@@ -1723,7 +1723,9 @@ const message = {
         useDefault: '使用預設版本',
         useCustom: '自訂 docker-compose.yml',
         useCustomHelper: '使用自訂 docker-compose.yml 文件，可能會導致應用程式升級失敗，如無必要，請勿勾選',
-        diffHelper: '左側為舊版本，右側為新版，編輯之後點選使用自訂版本儲存',
+        diffHelper: '左側為舊版本，右側為新版，編輯之後點擊使用自訂版本保存',
+        deleteImage: '刪除鏡像',
+        deleteImageHelper: '刪除應用相關鏡像，刪除失敗任務不會終止',
     },
     website: {
         website: '網站',

@@ -2,6 +2,7 @@ package request
 
 import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 )
 
@@ -73,6 +74,7 @@ type AppInstalledOperate struct {
 	PullImage     bool                `json:"pullImage"`
 	DockerCompose string              `json:"dockerCompose"`
 	TaskID        string              `json:"taskID"`
+	DeleteImage   bool                `json:"deleteImage"`
 }
 
 type AppInstallUpgrade struct {
@@ -82,6 +84,14 @@ type AppInstallUpgrade struct {
 	PullImage     bool   `json:"pullImage"`
 	DockerCompose string `json:"dockerCompose"`
 	TaskID        string `json:"taskID"`
+}
+
+type AppInstallDelete struct {
+	Install      model.AppInstall
+	DeleteBackup bool `json:"deleteBackup"`
+	ForceDelete  bool `json:"forceDelete"`
+	DeleteDB     bool `json:"deleteDB"`
+	DeleteImage  bool `json:"deleteImage"`
 }
 
 type AppInstalledUpdate struct {

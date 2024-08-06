@@ -479,7 +479,13 @@ func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 	if checkIsLinkApp(website) && req.DeleteApp {
 		appInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
 		if appInstall.ID > 0 {
-			if err = deleteAppInstall(appInstall, true, req.ForceDelete, true); err != nil && !req.ForceDelete {
+			deleteReq := request.AppInstallDelete{
+				Install:      appInstall,
+				ForceDelete:  req.ForceDelete,
+				DeleteBackup: true,
+				DeleteDB:     true,
+			}
+			if err = deleteAppInstall(deleteReq); err != nil && !req.ForceDelete {
 				return err
 			}
 		}

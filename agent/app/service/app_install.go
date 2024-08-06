@@ -259,7 +259,14 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 		}
 		return syncAppInstallStatus(&install, false)
 	case constant.Delete:
-		if err := deleteAppInstall(install, req.DeleteBackup, req.ForceDelete, req.DeleteDB); err != nil && !req.ForceDelete {
+		deleteReq := request.AppInstallDelete{
+			Install:      install,
+			DeleteBackup: req.DeleteBackup,
+			ForceDelete:  req.ForceDelete,
+			DeleteDB:     req.DeleteDB,
+			DeleteImage:  req.DeleteImage,
+		}
+		if err = deleteAppInstall(deleteReq); err != nil && !req.ForceDelete {
 			return err
 		}
 		return nil

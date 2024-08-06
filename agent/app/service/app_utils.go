@@ -314,13 +314,14 @@ func createLink(ctx context.Context, installTask *task.Task, app model.App, appI
 	return nil
 }
 
-func deleteAppInstall(install model.AppInstall, deleteBackup bool, forceDelete bool, deleteDB bool) error {
+func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 	op := files.NewFileOp()
+	install := deleteReq.Install
 	appDir := install.GetPath()
 	dir, _ := os.Stat(appDir)
 	if dir != nil {
 		out, err := compose.Down(install.GetComposePath())
-		if err != nil && !forceDelete {
+		if err != nil && !deleteReq.ForceDelete {
 			return handleErr(install, err, out)
 		}
 		//TODO use task
@@ -328,13 +329,29 @@ func deleteAppInstall(install model.AppInstall, deleteBackup bool, forceDelete b
 			_, _ = compose.Up(install.GetComposePath())
 			return err
 		}
+		if deleteReq.DeleteImage {
+			images, _ := getImages(install)
+			client, err := docker.NewClient()
+			if err != nil {
+				return err
+			}
+			defer client.Close()
+			for _, image := range images {
+				imageID, err := client.GetImageIDByName(image)
+				if err == nil {
+					if err = client.DeleteImage(imageID); err != nil {
+						global.LOG.Errorf("delete image %s error %s", image, err.Error())
+					}
+				}
+			}
+		}
 	}
 	tx, ctx := helper.GetTxAndContext()
 	defer tx.Rollback()
 	if err := appInstallRepo.Delete(ctx, install); err != nil {
 		return err
 	}
-	if err := deleteLink(ctx, &install, deleteDB, forceDelete, deleteBackup); err != nil && !forceDelete {
+	if err := deleteLink(ctx, &install, deleteReq.DeleteDB, deleteReq.ForceDelete, deleteReq.DeleteBackup); err != nil && !deleteReq.ForceDelete {
 		return err
 	}
 
@@ -374,7 +391,7 @@ func deleteAppInstall(install model.AppInstall, deleteBackup bool, forceDelete b
 	if _, err := os.Stat(uploadDir); err == nil {
 		_ = os.RemoveAll(uploadDir)
 	}
-	if deleteBackup {
+	if deleteReq.DeleteBackup {
 		localDir, _ := loadLocalDir()
 		backupDir := path.Join(localDir, fmt.Sprintf("app/%s/%s", install.App.Key, install.Name))
 		if _, err := os.Stat(backupDir); err == nil {
@@ -689,6 +706,22 @@ func getContainerNames(install model.AppInstall) ([]string, error) {
 		containerNames = append(containerNames, install.ContainerName)
 	}
 	return containerNames, nil
+}
+
+func getImages(install model.AppInstall) ([]string, error) {
+	envStr, err := coverEnvJsonToStr(install.Env)
+	if err != nil {
+		return nil, err
+	}
+	project, err := composeV2.GetComposeProject(install.Name, install.GetPath(), []byte(install.DockerCompose), []byte(envStr), true)
+	if err != nil {
+		return nil, err
+	}
+	var images []string
+	for _, service := range project.AllServices() {
+		images = append(images, service.Image)
+	}
+	return images, nil
 }
 
 func coverEnvJsonToStr(envJson string) (string, error) {
