@@ -58,8 +58,8 @@
                         </span>
                     </el-form-item>
                     <el-form-item pro="pullImage" v-if="operateReq.operate === 'upgrade'">
-                        <el-checkbox v-model="operateReq.pullImage" :label="$t('container.forcePull')" size="large" />
-                        <span class="input-help">{{ $t('container.forcePullHelper') }}</span>
+                        <el-checkbox v-model="operateReq.pullImage" :label="$t('app.pullImage')" size="large" />
+                        <span class="input-help">{{ $t('app.pullImageHelper') }}</span>
                     </el-form-item>
                 </el-form>
             </el-col>
