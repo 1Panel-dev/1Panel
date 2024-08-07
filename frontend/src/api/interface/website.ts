@@ -288,6 +288,7 @@ export namespace Website {
         SSLProtocol: string[];
         algorithm: string;
         hsts: boolean;
+        httpsPort: number;
     }
 
     export interface CheckReq {

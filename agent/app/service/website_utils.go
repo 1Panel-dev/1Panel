@@ -568,8 +568,8 @@ func createPemFile(website model.Website, websiteSSL model.WebsiteSSL) error {
 	return nil
 }
 
-func applySSL(website model.Website, websiteSSL model.WebsiteSSL, req request.WebsiteHTTPSOp) error {
-	nginxFull, err := getNginxFull(&website)
+func applySSL(website *model.Website, websiteSSL model.WebsiteSSL, req request.WebsiteHTTPSOp) error {
+	nginxFull, err := getNginxFull(website)
 	if err != nil {
 		return nil
 	}
@@ -587,11 +587,15 @@ func applySSL(website model.Website, websiteSSL model.WebsiteSSL, req request.We
 	server := config.FindServers()[0]
 
 	httpPort := strconv.Itoa(nginxFull.Install.HttpPort)
-	httpsPort := strconv.Itoa(nginxFull.Install.HttpsPort)
+	httpsPort := nginxFull.Install.HttpsPort
+	if req.HttpsPort > 0 {
+		httpsPort = req.HttpsPort
+	}
+	website.HttpsPort = httpsPort
 	httpPortIPV6 := "[::]:" + httpPort
-	httpsPortIPV6 := "[::]:" + httpsPort
+	httpsPortIPV6 := "[::]:" + strconv.Itoa(httpsPort)
 
-	server.UpdateListen(httpsPort, website.DefaultServer, "ssl", "http2")
+	server.UpdateListen(strconv.Itoa(httpsPort), website.DefaultServer, "ssl", "http2")
 	if website.IPV6 {
 		server.UpdateListen(httpsPortIPV6, website.DefaultServer, "ssl", "http2")
 	}
@@ -626,7 +630,7 @@ func applySSL(website model.Website, websiteSSL model.WebsiteSSL, req request.We
 	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return err
 	}
-	if err := createPemFile(website, websiteSSL); err != nil {
+	if err := createPemFile(*website, websiteSSL); err != nil {
 		return err
 	}
 	nginxParams := getNginxParamsFromStaticFile(dto.SSL, []dto.NginxParam{})
@@ -651,7 +655,7 @@ func applySSL(website model.Website, websiteSSL model.WebsiteSSL, req request.We
 		})
 	}
 
-	if err := updateNginxConfig(constant.NginxScopeServer, nginxParams, &website); err != nil {
+	if err := updateNginxConfig(constant.NginxScopeServer, nginxParams, website); err != nil {
 		return err
 	}
 	return nil

@@ -297,7 +297,7 @@ var AddTask = &gormigrate.Migration{
 }
 
 var UpdateWebsite = &gormigrate.Migration{
-	ID: "20240803-update-website",
+	ID: "20240807-update-website",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(
 			&model.Website{})

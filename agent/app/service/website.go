@@ -225,6 +225,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		return err
 	}
 	defaultHttpPort := nginxInstall.HttpPort
+	defaultHttpsPort := nginxInstall.HttpsPort
 
 	var (
 		otherDomains []model.WebsiteDomain
@@ -239,6 +240,9 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		return err
 	}
 	domains = append(domains, otherDomains...)
+	if len(domains) == 1 && domains[0].Port != defaultHttpPort {
+		defaultHttpsPort = domains[0].Port
+	}
 
 	defaultDate, _ := time.Parse(constant.DateLayout, constant.DefaultDate)
 	website := &model.Website{
@@ -255,6 +259,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		AccessLog:      true,
 		ErrorLog:       true,
 		IPV6:           create.IPV6,
+		HttpsPort:      defaultHttpsPort,
 	}
 
 	var (
@@ -459,8 +464,9 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 				SSLProtocol:  []string{"TLSv1.3", "TLSv1.2", "TLSv1.1", "TLSv1"},
 				Algorithm:    "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:!aNULL:!eNULL:!EXPORT:!DSS:!DES:!RC4:!3DES:!MD5:!PSK:!KRB5:!SRP:!CAMELLIA:!SEED",
 				Hsts:         true,
+				HttpsPort:    website.HttpsPort,
 			}
-			if err = applySSL(*website, *websiteModel, appSSLReq); err != nil {
+			if err = applySSL(website, *websiteModel, appSSLReq); err != nil {
 				return err
 			}
 			if err = websiteRepo.Save(context.Background(), website); err != nil {
@@ -863,6 +869,7 @@ func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, 
 		return response.WebsiteHTTPS{}, err
 	}
 	var res response.WebsiteHTTPS
+	res.HttpsPort = website.HttpsPort
 	if website.WebsiteSSLID == 0 {
 		res.Enable = false
 		return res, nil
@@ -918,9 +925,12 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 	if !req.Enable {
 		website.Protocol = constant.ProtocolHTTP
 		website.WebsiteSSLID = 0
-		_, httpsPort, err := getAppInstallPort(constant.AppOpenresty)
-		if err != nil {
-			return nil, err
+		httpsPort := website.HttpsPort
+		if httpsPort == 0 {
+			_, httpsPort, err = getAppInstallPort(constant.AppOpenresty)
+			if err != nil {
+				return nil, err
+			}
 		}
 		httpsPortStr := strconv.Itoa(httpsPort)
 		if err := deleteListenAndServerName(website, []string{httpsPortStr, "[::]:" + httpsPortStr}, []string{}); err != nil {
@@ -1025,7 +1035,7 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 	}
 
 	website.Protocol = constant.ProtocolHTTPS
-	if err := applySSL(website, websiteSSL, req); err != nil {
+	if err := applySSL(&website, websiteSSL, req); err != nil {
 		return nil, err
 	}
 	website.HttpConfig = req.HttpConfig
