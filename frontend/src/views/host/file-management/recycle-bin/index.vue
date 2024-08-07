@@ -52,6 +52,7 @@
                 prop="deleteTime"
                 :formatter="dateFormat"
                 show-overflow-tooltip
+                sortable
             ></el-table-column>
             <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fix />
         </ComplexTable>
