@@ -235,4 +235,5 @@ Run: "啟動"
 Stop: '停止',
 Image: '鏡像',
 AppLink: '關聯應用'
+EnableSSL: "開啟 HTTPS"
 

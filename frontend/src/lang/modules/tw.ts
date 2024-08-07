@@ -1978,6 +1978,7 @@ const message = {
         sni: '回源 SNI',
         sniHelper: '反代後端為 https 的時候可能需要設置回源 SNI，具體需要看 CDN 服務商文檔',
         createDb: '建立資料庫',
+        enableSSLHelper: '開啟失敗不會影響網站創建',
     },
     php: {
         short_open_tag: '短標簽支持',

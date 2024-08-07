@@ -16,7 +16,7 @@
                     <el-text type="warning" class="!ml-2">{{ $t('website.ipWebsiteWarn') }}</el-text>
                     <el-divider content-position="left">{{ $t('website.SSLConfig') }}</el-divider>
                     <el-form-item :label="$t('website.HTTPConfig')" prop="httpConfig">
-                        <el-select v-model="form.httpConfig" style="width: 240px">
+                        <el-select v-model="form.httpConfig" class="p-w-200">
                             <el-option :label="$t('website.HTTPToHTTPS')" :value="'HTTPToHTTPS'"></el-option>
                             <el-option :label="$t('website.HTTPAlso')" :value="'HTTPAlso'"></el-option>
                             <el-option :label="$t('website.HTTPSOnly')" :value="'HTTPSOnly'"></el-option>

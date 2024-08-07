@@ -233,4 +233,5 @@ Run: "Run"
 Stop: 'Stop',
 Image: 'Image',
 AppLink: 'Associated Application'
+EnableSSL: "Enable HTTPS"
 

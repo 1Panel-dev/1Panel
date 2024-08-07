@@ -80,6 +80,14 @@ export namespace Website {
         ftpUser: string;
         ftpPassword: string;
         taskID: string;
+        SSLID?: number;
+        enableSSL: boolean;
+        createDB?: boolean;
+        dbName?: string;
+        dbPassword?: string;
+        dbFormat?: string;
+        dbUser?: string;
+        dbHost?: string;
     }
 
     export interface WebSiteUpdateReq {

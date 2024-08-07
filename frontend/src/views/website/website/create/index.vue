@@ -351,7 +351,7 @@
 
                 <el-form-item prop="createDb" v-if="website.type === 'runtime'">
                     <el-checkbox
-                        @change="random"
+                        @change="randomDbPassword"
                         v-model="website.createDb"
                         :label="$t('website.createDb')"
                         size="large"
@@ -415,6 +415,75 @@
                     </el-col>
                 </el-row>
 
+                <el-form-item prop="enableSSL">
+                    <el-checkbox v-model="website.enableSSL" :label="$t('website.enableHTTPS')" size="large" />
+                    <span class="input-help">{{ $t('website.enableSSLHelper') }}</span>
+                </el-form-item>
+
+                <div v-if="website.enableSSL">
+                    <el-form-item :label="$t('website.acmeAccountManage')" prop="acmeAccountID">
+                        <el-select
+                            v-model="website.acmeAccountID"
+                            :placeholder="$t('website.selectAcme')"
+                            @change="listSSL"
+                        >
+                            <el-option :key="0" :label="$t('website.imported')" :value="0"></el-option>
+                            <el-option
+                                v-for="(acme, index) in acmeAccounts"
+                                :key="index"
+                                :label="acme.email"
+                                :value="acme.id"
+                            >
+                                <span>
+                                    {{ acme.email }}
+                                    <el-tag class="ml-5">{{ getAccountName(acme.type) }}</el-tag>
+                                </span>
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item :label="$t('website.ssl')" prop="websiteSSLID" :hide-required-asterisk="true">
+                        <el-select
+                            v-model="website.websiteSSLID"
+                            :placeholder="$t('website.selectSSL')"
+                            @change="changeSSl(website.websiteSSLID)"
+                        >
+                            <el-option
+                                v-for="(ssl, index) in ssls"
+                                :key="index"
+                                :label="ssl.primaryDomain"
+                                :value="ssl.id"
+                            ></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item :label="' '" v-if="websiteSSL && websiteSSL.id > 0">
+                        <el-descriptions :column="7" border direction="vertical">
+                            <el-descriptions-item :label="$t('website.primaryDomain')">
+                                {{ websiteSSL.primaryDomain }}
+                            </el-descriptions-item>
+                            <el-descriptions-item :label="$t('website.otherDomains')">
+                                {{ websiteSSL.domains }}
+                            </el-descriptions-item>
+                            <el-descriptions-item :label="$t('website.brand')">
+                                {{ websiteSSL.organization }}
+                            </el-descriptions-item>
+                            <el-descriptions-item :label="$t('ssl.provider')">
+                                {{ getProvider(websiteSSL.provider) }}
+                            </el-descriptions-item>
+                            <el-descriptions-item
+                                :label="$t('ssl.acmeAccount')"
+                                v-if="websiteSSL.acmeAccount && websiteSSL.provider !== 'manual'"
+                            >
+                                {{ websiteSSL.acmeAccount.email }}
+                            </el-descriptions-item>
+                            <el-descriptions-item :label="$t('website.expireDate')">
+                                {{ dateFormatSimple(websiteSSL.expireDate) }}
+                            </el-descriptions-item>
+                            <el-descriptions-item :label="$t('website.remark')">
+                                {{ websiteSSL.description }}
+                            </el-descriptions-item>
+                        </el-descriptions>
+                    </el-form-item>
+                </div>
                 <el-form-item :label="$t('website.remark')" prop="remark">
                     <el-input type="textarea" :rows="3" clearable v-model="website.remark" />
                 </el-form-item>
@@ -441,7 +510,7 @@
 <script lang="ts" setup name="CreateWebSite">
 import { App } from '@/api/interface/app';
 import { GetApp, GetAppDetail, SearchApp, GetAppInstalled, GetAppDetailByID } from '@/api/modules/app';
-import { CreateWebsite, PreCheck } from '@/api/modules/website';
+import { CreateWebsite, ListSSL, PreCheck, SearchAcmeAccount } from '@/api/modules/website';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, FormInstance } from 'element-plus';
@@ -457,9 +526,12 @@ import { getRandomStr } from '@/utils/util';
 import TaskLog from '@/components/task-log/index.vue';
 import { GetAppService } from '@/api/modules/app';
 import { v4 as uuidv4 } from 'uuid';
+import { dateFormatSimple, getProvider, getAccountName } from '@/utils/util';
+import { Website } from '@/api/interface/website';
 
 const websiteForm = ref<FormInstance>();
-const website = ref({
+
+const initData = () => ({
     primaryDomain: '',
     type: 'deployment',
     alias: '',
@@ -502,7 +574,11 @@ const website = ref({
     dbUser: '',
     dbType: 'mysql',
     dbHost: '',
+    enableSSL: false,
+    websiteSSLID: undefined,
+    acmeAccountID: undefined,
 });
+const website = ref(initData());
 const rules = ref<any>({
     primaryDomain: [Rules.domainWithPort],
     alias: [Rules.linuxName],
@@ -529,12 +605,13 @@ const rules = ref<any>({
     dbUser: [Rules.requiredInput, Rules.name],
     dbPassword: [Rules.requiredInput, Rules.paramComplexity],
     dbHost: [Rules.requiredSelect],
+    websiteSSLID: [Rules.requiredSelect],
 });
 
 const open = ref(false);
 const loading = ref(false);
 const groups = ref<Group.GroupInfo[]>([]);
-
+const acmeAccounts = ref();
 const appInstalls = ref<App.AppInstalled[]>([]);
 const appReq = reactive({
     type: 'website',
@@ -559,6 +636,8 @@ const versionExist = ref(true);
 const em = defineEmits(['close']);
 const taskLog = ref();
 const dbServices = ref();
+const ssls = ref();
+const websiteSSL = ref();
 
 const handleClose = () => {
     open.value = false;
@@ -708,6 +787,7 @@ const getRuntimes = async () => {
 };
 
 const acceptParams = async (installPath: string) => {
+    website.value = initData();
     if (websiteForm.value) {
         websiteForm.value.resetFields();
     }
@@ -720,6 +800,7 @@ const acceptParams = async (installPath: string) => {
     runtimeResource.value = 'appstore';
 
     searchAppInstalled('website');
+    listAcmeAccount();
 
     open.value = true;
 };
@@ -744,6 +825,31 @@ function isSubsetOfStrArray(primaryDomain: string, otherDomains: string): boolea
 
 const openTaskLog = (taskID: string) => {
     taskLog.value.acceptParams(taskID);
+};
+
+const listAcmeAccount = () => {
+    SearchAcmeAccount({ page: 1, pageSize: 100 }).then((res) => {
+        acmeAccounts.value = res.data.items || [];
+    });
+};
+
+const listSSL = () => {
+    ListSSL({
+        acmeAccountID: String(website.value.acmeAccountID),
+    }).then((res) => {
+        ssls.value = res.data || [];
+        if (ssls.value.length > 0) {
+            website.value.websiteSSLID = ssls.value[0].id;
+            changeSSl(website.value.websiteSSLID);
+        }
+    });
+};
+
+const changeSSl = (sslid: number) => {
+    const res = ssls.value.filter((element: Website.SSL) => {
+        return element.id == sslid;
+    });
+    websiteSSL.value = res[0];
 };
 
 const submit = async (formEl: FormInstance | undefined) => {
