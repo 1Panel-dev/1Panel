@@ -3,7 +3,7 @@ package middleware
 import (
 	"strings"
 
-	"github.com/1Panel-dev/1Panel/core/app/api/v1/helper"
+	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	jwtUtils "github.com/1Panel-dev/1Panel/core/utils/jwt"
 

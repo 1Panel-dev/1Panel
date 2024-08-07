@@ -27,17 +27,31 @@ type WebsiteCreate struct {
 	AppID        uint          `json:"appID"`
 	AppInstallID uint          `json:"appInstallID"`
 
-	FtpUser     string `json:"ftpUser"`
-	FtpPassword string `json:"ftpPassword"`
-
 	RuntimeID uint   `json:"runtimeID"`
 	TaskID    string `json:"taskID"`
+
 	RuntimeConfig
+	FtpConfig
+	DataBaseConfig
 }
 
 type RuntimeConfig struct {
 	ProxyType string `json:"proxyType"`
 	Port      int    `json:"port"`
+}
+
+type FtpConfig struct {
+	FtpUser     string `json:"ftpUser"`
+	FtpPassword string `json:"ftpPassword"`
+}
+
+type DataBaseConfig struct {
+	CreateDb   bool   `json:"createDb"`
+	DbName     string `json:"dbName"`
+	DbUser     string `json:"dbUser"`
+	DbPassword string `json:"dbPassword"`
+	DbHost     string `json:"dbHost"`
+	DBFormat   string `json:"dbFormat"`
 }
 
 type NewAppInstall struct {

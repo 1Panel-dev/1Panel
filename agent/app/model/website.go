@@ -31,6 +31,9 @@ type Website struct {
 	User  string `gorm:"type:varchar;" json:"user"`
 	Group string `gorm:"type:varchar;" json:"group"`
 
+	DbType string `json:"dbType"`
+	DbID   uint   `json:"dbID"`
+
 	Domains    []WebsiteDomain `json:"domains" gorm:"-:migration"`
 	WebsiteSSL WebsiteSSL      `json:"webSiteSSL" gorm:"-:migration"`
 }

@@ -349,6 +349,72 @@
                     </el-col>
                 </el-row>
 
+                <el-form-item prop="createDb" v-if="website.type === 'runtime'">
+                    <el-checkbox
+                        @change="random"
+                        v-model="website.createDb"
+                        :label="$t('website.createDb')"
+                        size="large"
+                    />
+                </el-form-item>
+                <el-row :gutter="20" v-if="website.type === 'runtime' && website.createDb">
+                    <el-col :span="24">
+                        <el-form-item :label="$t('database.database')" prop="dbHost">
+                            <el-row :gutter="20">
+                                <el-col :span="12">
+                                    <el-select
+                                        v-model="website.dbType"
+                                        class="p-w-200"
+                                        @change="getAppByService(website.dbType)"
+                                    >
+                                        <el-option label="MySQL" value="mysql" />
+                                        <el-option label="MariaDB" value="mariadb" />
+                                        <el-option label="PostgreSQL" value="postgresql" />
+                                    </el-select>
+                                </el-col>
+                                <el-col :span="12">
+                                    <el-select v-model="website.dbHost" class="p-w-200">
+                                        <el-option
+                                            v-for="(service, index) in dbServices"
+                                            :key="index"
+                                            :label="service.label"
+                                            :value="service.value"
+                                        ></el-option>
+                                    </el-select>
+                                </el-col>
+                            </el-row>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="24">
+                        <el-form-item :label="$t('commons.table.name')" prop="dbName">
+                            <el-input clearable v-model.trim="website.dbName" @input="website.dbUser = website.dbName">
+                                <template #append>
+                                    <el-select v-model="website.dbFormat" class="p-w-100">
+                                        <el-option label="utf8mb4" value="utf8mb4" />
+                                        <el-option label="utf-8" value="utf8" />
+                                        <el-option label="gbk" value="gbk" />
+                                        <el-option label="big5" value="big5" />
+                                    </el-select>
+                                </template>
+                            </el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item :label="$t('commons.login.username')" prop="dbUser">
+                            <el-input clearable v-model.trim="website.dbUser" />
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item :label="$t('commons.login.password')" prop="dbPassword">
+                            <el-input type="dbPassword" clearable show-password v-model.trim="website.dbPassword">
+                                <template #append>
+                                    <el-button @click="randomDbPassword">{{ $t('commons.button.random') }}</el-button>
+                                </template>
+                            </el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+
                 <el-form-item :label="$t('website.remark')" prop="remark">
                     <el-input type="textarea" :rows="3" clearable v-model="website.remark" />
                 </el-form-item>
@@ -389,6 +455,7 @@ import { SearchRuntimes } from '@/api/modules/runtime';
 import { Runtime } from '@/api/interface/runtime';
 import { getRandomStr } from '@/utils/util';
 import TaskLog from '@/components/task-log/index.vue';
+import { GetAppService } from '@/api/modules/app';
 import { v4 as uuidv4 } from 'uuid';
 
 const websiteForm = ref<FormInstance>();
@@ -428,6 +495,13 @@ const website = ref({
     proxyAddress: '',
     runtimeType: 'php',
     taskID: '',
+    createDb: false,
+    dbName: '',
+    dbPassword: '',
+    dbFormat: 'utf8mb4',
+    dbUser: '',
+    dbType: 'mysql',
+    dbHost: '',
 });
 const rules = ref<any>({
     primaryDomain: [Rules.domainWithPort],
@@ -451,6 +525,10 @@ const rules = ref<any>({
     proxyType: [Rules.requiredSelect],
     port: [Rules.port],
     runtimeType: [Rules.requiredInput],
+    dbName: [Rules.requiredInput, Rules.dbName],
+    dbUser: [Rules.requiredInput, Rules.name],
+    dbPassword: [Rules.requiredInput, Rules.paramComplexity],
+    dbHost: [Rules.requiredSelect],
 });
 
 const open = ref(false);
@@ -480,6 +558,7 @@ const runtimes = ref<Runtime.RuntimeDTO[]>([]);
 const versionExist = ref(true);
 const em = defineEmits(['close']);
 const taskLog = ref();
+const dbServices = ref();
 
 const handleClose = () => {
     open.value = false;
@@ -488,6 +567,10 @@ const handleClose = () => {
 
 const random = async () => {
     website.value.ftpPassword = getRandomStr(16);
+};
+
+const randomDbPassword = async () => {
+    website.value.dbPassword = getRandomStr(16);
 };
 
 const changeType = (type: string) => {
@@ -500,6 +583,7 @@ const changeType = (type: string) => {
             break;
         case 'runtime':
             getRuntimes();
+            getAppByService(website.value.dbType);
             break;
         case 'proxy':
             website.value.proxyAddress = '';
@@ -521,6 +605,11 @@ const searchAppInstalled = (appType: string) => {
             website.value.appInstallId = res.data[0].id;
         }
     });
+};
+
+const getAppByService = async (key: string) => {
+    const res = await GetAppService(key);
+    dbServices.value = res.data;
 };
 
 const changeInstall = () => {

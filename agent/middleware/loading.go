@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/1Panel-dev/1Panel/agent/app/api/v1/helper"
+	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"

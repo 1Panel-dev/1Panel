@@ -26,7 +26,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 
-	"github.com/1Panel-dev/1Panel/agent/app/api/v1/helper"
+	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/subosito/gotenv"

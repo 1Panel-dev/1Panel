@@ -1403,6 +1403,16 @@
 		"formatZH": "清空监控数据",
 		"paramKeys": []
 	},
+	"/hosts/monitor/setting/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"key",
+			"value"
+		],
+		"formatEN": "update default monitor [name]-[value]",
+		"formatZH": "修改默认监控网卡 [name]-[value]",
+		"paramKeys": []
+	},
 	"/hosts/update": {
 		"BeforeFunctions": [],
 		"bodyKeys": [
