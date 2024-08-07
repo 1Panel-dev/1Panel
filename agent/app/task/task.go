@@ -31,13 +31,14 @@ type Task struct {
 }
 
 type SubTask struct {
-	RootTask *Task
-	Name     string
-	Retry    int
-	Timeout  time.Duration
-	Action   ActionFunc
-	Rollback RollbackFunc
-	Error    error
+	RootTask  *Task
+	Name      string
+	Retry     int
+	Timeout   time.Duration
+	Action    ActionFunc
+	Rollback  RollbackFunc
+	Error     error
+	IgnoreErr bool
 }
 
 const (
@@ -111,6 +112,11 @@ func (t *Task) AddSubTaskWithOps(name string, action ActionFunc, rollback Rollba
 	t.SubTasks = append(t.SubTasks, subTask)
 }
 
+func (t *Task) AddSubTaskWithIgnoreErr(name string, action ActionFunc) {
+	subTask := &SubTask{RootTask: t, Name: name, Retry: 0, Timeout: 10 * time.Minute, Action: action, Rollback: nil, IgnoreErr: true}
+	t.SubTasks = append(t.SubTasks, subTask)
+}
+
 func (s *SubTask) Execute() error {
 	s.RootTask.Log(s.Name)
 	var err error
@@ -166,6 +172,10 @@ func (t *Task) Execute() error {
 				t.Rollbacks = append(t.Rollbacks, subTask.Rollback)
 			}
 		} else {
+			if subTask.IgnoreErr {
+				err = nil
+				continue
+			}
 			t.Task.ErrorMsg = err.Error()
 			t.Task.Status = constant.StatusFailed
 			for _, rollback := range t.Rollbacks {

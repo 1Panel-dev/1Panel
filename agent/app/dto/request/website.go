@@ -33,6 +33,7 @@ type WebsiteCreate struct {
 	RuntimeConfig
 	FtpConfig
 	DataBaseConfig
+	SSLConfig
 }
 
 type RuntimeConfig struct {
@@ -52,6 +53,11 @@ type DataBaseConfig struct {
 	DbPassword string `json:"dbPassword"`
 	DbHost     string `json:"dbHost"`
 	DBFormat   string `json:"dbFormat"`
+}
+
+type SSLConfig struct {
+	EnableSSL    bool `json:"enableSSL"`
+	WebsiteSSLID uint `json:"websiteSSLID"`
 }
 
 type NewAppInstall struct {

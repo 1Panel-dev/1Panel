@@ -442,6 +442,35 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 
 	createTask.AddSubTask(i18n.GetMsgByKey("ConfigOpenresty"), configNginx, deleteWebsite)
 
+	if create.EnableSSL {
+		enableSSL := func(t *task.Task) error {
+			websiteModel, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(create.WebsiteSSLID))
+			if err != nil {
+				return err
+			}
+			website.Protocol = constant.ProtocolHTTPS
+			website.WebsiteSSLID = create.WebsiteSSLID
+			appSSLReq := request.WebsiteHTTPSOp{
+				WebsiteID:    website.ID,
+				Enable:       true,
+				WebsiteSSLID: websiteModel.ID,
+				Type:         "existed",
+				HttpConfig:   "HTTPToHTTPS",
+				SSLProtocol:  []string{"TLSv1.3", "TLSv1.2", "TLSv1.1", "TLSv1"},
+				Algorithm:    "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:!aNULL:!eNULL:!EXPORT:!DSS:!DES:!RC4:!3DES:!MD5:!PSK:!KRB5:!SRP:!CAMELLIA:!SEED",
+				Hsts:         true,
+			}
+			if err = applySSL(*website, *websiteModel, appSSLReq); err != nil {
+				return err
+			}
+			if err = websiteRepo.Save(context.Background(), website); err != nil {
+				return err
+			}
+			return nil
+		}
+		createTask.AddSubTaskWithIgnoreErr(i18n.GetMsgByKey("EnableSSL"), enableSSL)
+	}
+
 	return createTask.Execute()
 }
 
