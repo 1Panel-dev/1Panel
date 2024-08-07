@@ -146,7 +146,6 @@ const handleDrop = async (event: DragEvent) => {
     initTempFiles();
     event.preventDefault();
     const items = event.dataTransfer?.items;
-
     if (items) {
         const entries = Array.from(items).map((item) => item.webkitGetAsEntry());
         await Promise.all(entries.map((entry) => traverseFileTree(entry)));
@@ -183,7 +182,9 @@ const convertFileToUploadFile = (file: File, path: string): UploadFile => {
 
 const traverseFileTree = async (item: any, path = '') => {
     path = path || '';
-
+    if (!item) {
+        return;
+    }
     if (item.isFile) {
         if (tmpFiles.value.length > 1000) {
             breakFlag.value = true;
