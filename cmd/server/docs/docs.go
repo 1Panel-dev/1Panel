@@ -3482,28 +3482,6 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/core/settings/basedir": {
-			"get": {
-				"description": "获取安装根目录",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"type": "string"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					}
-				],
-				"summary": "Load local backup dir",
-				"tags": [
-					"System Setting"
-				]
-			}
-		},
 		"/core/settings/bind/update": {
 			"post": {
 				"consumes": [
@@ -9083,7 +9061,7 @@ const docTemplate = `{
 						"ApiKeyAuth": []
 					}
 				],
-				"summary": "Clean monitor datas",
+				"summary": "Clean monitor data",
 				"tags": [
 					"Monitor"
 				],
@@ -9120,10 +9098,69 @@ const docTemplate = `{
 						"ApiKeyAuth": []
 					}
 				],
-				"summary": "Load monitor datas",
+				"summary": "Load monitor data",
 				"tags": [
 					"Monitor"
 				]
+			}
+		},
+		"/hosts/monitor/setting": {
+			"get": {
+				"description": "获取默认监控设置",
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					}
+				],
+				"summary": "Load monitor setting",
+				"tags": [
+					"Monitor"
+				]
+			}
+		},
+		"/hosts/monitor/setting/update": {
+			"post": {
+				"description": "更新默认监控设置",
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.MonitorSettingUpdate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					}
+				],
+				"summary": "Update monitor setting",
+				"tags": [
+					"Monitor"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"key",
+						"value"
+					],
+					"formatEN": "update default monitor [name]-[value]",
+					"formatZH": "修改默认监控网卡 [name]-[value]",
+					"paramKeys": []
+				}
 			}
 		},
 		"/hosts/search": {
@@ -17958,6 +17995,26 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.MonitorSettingUpdate": {
+			"properties": {
+				"key": {
+					"enum": [
+						"MonitorStatus",
+						"MonitorStoreDays",
+						"MonitorInterval",
+						"DefaultNetwork"
+					],
+					"type": "string"
+				},
+				"value": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"key"
+			],
+			"type": "object"
+		},
 		"dto.MysqlDBCreate": {
 			"properties": {
 				"database": {
@@ -19938,6 +19995,12 @@ const docTemplate = `{
 				"createdAt": {
 					"type": "string"
 				},
+				"dbID": {
+					"type": "integer"
+				},
+				"dbType": {
+					"type": "string"
+				},
 				"defaultServer": {
 					"type": "boolean"
 				},
@@ -20295,6 +20358,9 @@ const docTemplate = `{
 					"type": "boolean"
 				},
 				"deleteDB": {
+					"type": "boolean"
+				},
+				"deleteImage": {
 					"type": "boolean"
 				},
 				"detailId": {
@@ -21788,6 +21854,24 @@ const docTemplate = `{
 					],
 					"type": "string"
 				},
+				"createDb": {
+					"type": "boolean"
+				},
+				"dbFormat": {
+					"type": "string"
+				},
+				"dbHost": {
+					"type": "string"
+				},
+				"dbName": {
+					"type": "string"
+				},
+				"dbPassword": {
+					"type": "string"
+				},
+				"dbUser": {
+					"type": "string"
+				},
 				"ftpPassword": {
 					"type": "string"
 				},
@@ -23079,6 +23163,12 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"createdAt": {
+					"type": "string"
+				},
+				"dbID": {
+					"type": "integer"
+				},
+				"dbType": {
 					"type": "string"
 				},
 				"defaultServer": {

@@ -1,7 +1,7 @@
 package router
 
 import (
-	v1 "github.com/1Panel-dev/1Panel/agent/app/api/v1"
+	v2 "github.com/1Panel-dev/1Panel/agent/app/api/v2"
 	"github.com/gin-gonic/gin"
 )
 
@@ -11,7 +11,7 @@ type NginxRouter struct {
 func (a *NginxRouter) InitRouter(Router *gin.RouterGroup) {
 	groupRouter := Router.Group("openresty")
 
-	baseApi := v1.ApiGroupApp.BaseApi
+	baseApi := v2.ApiGroupApp.BaseApi
 	{
 		groupRouter.GET("", baseApi.GetNginx)
 		groupRouter.POST("/scope", baseApi.GetNginxConfigByScope)

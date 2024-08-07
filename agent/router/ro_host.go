@@ -1,8 +1,7 @@
 package router
 
 import (
-	v1 "github.com/1Panel-dev/1Panel/agent/app/api/v1"
-
+	v2 "github.com/1Panel-dev/1Panel/agent/app/api/v2"
 	"github.com/gin-gonic/gin"
 )
 
@@ -10,7 +9,7 @@ type HostRouter struct{}
 
 func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 	hostRouter := Router.Group("hosts")
-	baseApi := v1.ApiGroupApp.BaseApi
+	baseApi := v2.ApiGroupApp.BaseApi
 	{
 		hostRouter.POST("", baseApi.CreateHost)
 		hostRouter.POST("/del", baseApi.DeleteHost)

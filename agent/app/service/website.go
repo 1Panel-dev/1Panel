@@ -29,7 +29,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 	"github.com/1Panel-dev/1Panel/agent/utils/env"
 
-	"github.com/1Panel-dev/1Panel/agent/app/api/v1/helper"
+	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/cmd/server/nginx_conf"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
@@ -141,8 +141,9 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 	}
 	for _, web := range websites {
 		var (
-			appName     string
-			runtimeName string
+			appName      string
+			runtimeName  string
+			appInstallID uint
 		)
 		switch web.Type {
 		case constant.Deployment:
@@ -151,12 +152,14 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 				return 0, nil, err
 			}
 			appName = appInstall.Name
+			appInstallID = appInstall.ID
 		case constant.Runtime:
 			runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(web.RuntimeID))
 			if err != nil {
 				return 0, nil, err
 			}
 			runtimeName = runtime.Name
+			appInstallID = runtime.ID
 		}
 		sitePath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "www", "sites", web.Alias)
 
@@ -175,6 +178,7 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 			SSLStatus:     checkSSLStatus(web.WebsiteSSL.ExpireDate),
 			RuntimeName:   runtimeName,
 			SitePath:      sitePath,
+			AppInstallID:  appInstallID,
 		})
 	}
 	return total, websiteDTOs, nil
@@ -263,10 +267,62 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		return err
 	}
 
+	if create.CreateDb {
+		createDataBase := func(t *task.Task) error {
+			database, _ := databaseRepo.Get(commonRepo.WithByName(create.DbHost))
+			if database.ID == 0 {
+				return nil
+			}
+			dbConfig := create.DataBaseConfig
+			switch database.Type {
+			case constant.AppPostgresql, constant.AppPostgres:
+				iPostgresqlRepo := repo.NewIPostgresqlRepo()
+				oldPostgresqlDb, _ := iPostgresqlRepo.Get(commonRepo.WithByName(create.DbName), iPostgresqlRepo.WithByFrom(constant.ResourceLocal))
+				if oldPostgresqlDb.ID > 0 {
+					return buserr.New(constant.ErrDbUserNotValid)
+				}
+				var createPostgresql dto.PostgresqlDBCreate
+				createPostgresql.Name = dbConfig.DbName
+				createPostgresql.Username = dbConfig.DbUser
+				createPostgresql.Database = database.Name
+				createPostgresql.Format = dbConfig.DBFormat
+				createPostgresql.Password = dbConfig.DbPassword
+				createPostgresql.From = database.From
+				createPostgresql.SuperUser = true
+				pgDB, err := NewIPostgresqlService().Create(context.Background(), createPostgresql)
+				if err != nil {
+					return err
+				}
+				website.DbID = pgDB.ID
+				website.DbType = database.Type
+			case constant.AppMysql, constant.AppMariaDB:
+				iMysqlRepo := repo.NewIMysqlRepo()
+				oldMysqlDb, _ := iMysqlRepo.Get(commonRepo.WithByName(dbConfig.DbName), iMysqlRepo.WithByFrom(constant.ResourceLocal))
+				if oldMysqlDb.ID > 0 {
+					return buserr.New(constant.ErrDbUserNotValid)
+				}
+				var createMysql dto.MysqlDBCreate
+				createMysql.Name = dbConfig.DbName
+				createMysql.Username = dbConfig.DbUser
+				createMysql.Database = database.Name
+				createMysql.Format = dbConfig.DBFormat
+				createMysql.Permission = "%"
+				createMysql.Password = dbConfig.DbPassword
+				createMysql.From = database.From
+				mysqlDB, err := NewIMysqlService().Create(context.Background(), createMysql)
+				if err != nil {
+					return err
+				}
+				website.DbID = mysqlDB.ID
+				website.DbType = database.Type
+			}
+			return nil
+		}
+		createTask.AddSubTask(task.GetTaskName(create.DbName, task.TaskCreate, task.TaskScopeDatabase), createDataBase, nil)
+	}
+
 	var proxy string
-
 	switch create.Type {
-
 	case constant.Deployment:
 		if create.AppType == constant.NewApp {
 			var (
@@ -349,8 +405,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		}
 		deleteFtpUser := func(t *task.Task) {
 			if website.FtpID > 0 {
-				req := dto.BatchDeleteReq{Ids: []uint{website.FtpID}}
-				if err = NewIFtpService().Delete(req); err != nil {
+				if err = NewIFtpService().Delete(dto.BatchDeleteReq{Ids: []uint{website.FtpID}}); err != nil {
 					createTask.Log(err.Error())
 				}
 			}

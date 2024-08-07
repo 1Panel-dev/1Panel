@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/1Panel-dev/1Panel/agent/app/api/v1/helper"
+	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/gin-gonic/gin"

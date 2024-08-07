@@ -1977,6 +1977,7 @@ const message = {
         website404Helper: '網站 404 錯誤頁僅支援 PHP 運行環境網站和靜態網站',
         sni: '回源 SNI',
         sniHelper: '反代後端為 https 的時候可能需要設置回源 SNI，具體需要看 CDN 服務商文檔',
+        createDb: '建立資料庫',
     },
     php: {
         short_open_tag: '短標簽支持',

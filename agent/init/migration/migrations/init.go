@@ -295,3 +295,11 @@ var AddTask = &gormigrate.Migration{
 			&model.Task{})
 	},
 }
+
+var UpdateWebsite = &gormigrate.Migration{
+	ID: "20240803-update-website",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(
+			&model.Website{})
+	},
+}
