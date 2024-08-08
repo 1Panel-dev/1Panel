@@ -13,8 +13,8 @@
                     <el-switch v-model="form.enable" @change="changeEnable"></el-switch>
                 </el-form-item>
                 <div v-if="form.enable">
-                    <el-form-item :label="'HTTPS ' + $t('commons.table.port')" prop="httpsPort">
-                        <el-input v-model.number="form.httpsPort" />
+                    <el-form-item :label="'HTTPS ' + $t('commons.table.port')" prop="HttpsPort">
+                        <el-text>{{ form.httpsPort }}</el-text>
                     </el-form-item>
                     <el-text type="warning" class="!ml-2">{{ $t('website.ipWebsiteWarn') }}</el-text>
                     <el-divider content-position="left">{{ $t('website.SSLConfig') }}</el-divider>
@@ -173,7 +173,7 @@ import { GetHTTPSConfig, ListSSL, SearchAcmeAccount, UpdateHTTPSConfig } from '@
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { computed, onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
-import { Rules, checkNumberRange } from '@/global/form-rules';
+import { Rules } from '@/global/form-rules';
 import { dateFormatSimple, getProvider, getAccountName } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';
 import FileList from '@/components/file-list/index.vue';
@@ -204,7 +204,7 @@ const form = reactive({
     algorithm:
         'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:!aNULL:!eNULL:!EXPORT:!DSS:!DES:!RC4:!3DES:!MD5:!PSK:!KRB5:!SRP:!CAMELLIA:!SEED',
     SSLProtocol: ['TLSv1.3', 'TLSv1.2', 'TLSv1.1', 'TLSv1'],
-    httpsPort: 443,
+    httpsPort: '443',
 });
 const loading = ref(false);
 const ssls = ref();
@@ -222,7 +222,6 @@ const rules = ref({
     SSLProtocol: [Rules.requiredSelect],
     algorithm: [Rules.requiredInput],
     acmeAccountID: [Rules.requiredInput],
-    httpsPort: [Rules.requiredInput, checkNumberRange(1, 65535)],
 });
 const resData = ref();
 const sslReq = reactive({
@@ -301,9 +300,7 @@ const get = () => {
                 form.acmeAccountID = data.SSL.acmeAccountId;
             }
             form.hsts = data.hsts;
-            if (data.httpsPort > 0) {
-                form.httpsPort = data.httpsPort;
-            }
+            form.httpsPort = data.httpsPort;
         }
         listSSL();
         listAcmeAccount();

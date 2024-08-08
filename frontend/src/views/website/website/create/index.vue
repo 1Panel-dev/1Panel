@@ -262,21 +262,7 @@
                         <span class="input-help">{{ $t('app.allowPortHelper') }}</span>
                     </el-form-item>
                 </div>
-                <el-form-item :label="$t('website.primaryDomain')" prop="primaryDomain">
-                    <el-input
-                        v-model.trim="website.primaryDomain"
-                        @input="changeAlias(website.primaryDomain)"
-                        :placeholder="$t('website.primaryDomainHelper')"
-                    ></el-input>
-                </el-form-item>
-                <el-form-item :label="$t('website.otherDomains')" prop="otherDomains">
-                    <el-input
-                        type="textarea"
-                        :rows="3"
-                        v-model="website.otherDomains"
-                        :placeholder="$t('website.domainHelper')"
-                    ></el-input>
-                </el-form-item>
+                <DomainCreate v-model:form="website"></DomainCreate>
                 <el-form-item prop="IPV6">
                     <el-checkbox v-model="website.IPV6" :label="$t('website.ipv6')" size="large" />
                 </el-form-item>
@@ -517,7 +503,7 @@ import { ElForm, FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
 import Params from '@/views/app-store/detail/params/index.vue';
 import Check from '../check/index.vue';
-import { MsgError, MsgSuccess } from '@/utils/message';
+import { MsgSuccess } from '@/utils/message';
 import { GetGroupList } from '@/api/modules/group';
 import { Group } from '@/api/interface/group';
 import { SearchRuntimes } from '@/api/modules/runtime';
@@ -528,6 +514,7 @@ import { GetAppService } from '@/api/modules/app';
 import { v4 as uuidv4 } from 'uuid';
 import { dateFormatSimple, getProvider, getAccountName } from '@/utils/util';
 import { Website } from '@/api/interface/website';
+import DomainCreate from '@/views/website/website/domain-create/index.vue';
 
 const websiteForm = ref<FormInstance>();
 
@@ -577,6 +564,7 @@ const initData = () => ({
     enableSSL: false,
     websiteSSLID: undefined,
     acmeAccountID: undefined,
+    domains: [],
 });
 const website = ref(initData());
 const rules = ref<any>({
@@ -813,16 +801,6 @@ const changeAppType = (type: string) => {
     }
 };
 
-function isSubsetOfStrArray(primaryDomain: string, otherDomains: string): boolean {
-    const arr: string[] = otherDomains.split('\n');
-    for (const item of arr) {
-        if (primaryDomain === item) {
-            return false;
-        }
-    }
-    return true;
-}
-
 const openTaskLog = (taskID: string) => {
     taskLog.value.acceptParams(taskID);
 };
@@ -859,12 +837,6 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         loading.value = true;
-        const flag = isSubsetOfStrArray(website.value.primaryDomain, website.value.otherDomains);
-        if (!flag) {
-            MsgError(i18n.global.t('website.containWarn'));
-            loading.value = false;
-            return;
-        }
         PreCheck({})
             .then((res) => {
                 if (res.data) {
@@ -896,6 +868,17 @@ const submit = async (formEl: FormInstance | undefined) => {
             });
     });
 };
+
+watch(
+    () => website.value.domains,
+    (value) => {
+        if (value.length > 0) {
+            const firstDomain = value[0].domain;
+            changeAlias(firstDomain);
+        }
+    },
+    { deep: true },
+);
 
 const changeAlias = (value: string) => {
     const domain = value.split(':')[0];

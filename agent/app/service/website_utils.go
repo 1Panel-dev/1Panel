@@ -7,7 +7,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -34,40 +33,6 @@ import (
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 )
-
-func getDomain(domainStr string, defaultPort int) (model.WebsiteDomain, error) {
-	var (
-		err    error
-		domain = model.WebsiteDomain{}
-		portN  int
-	)
-	domainArray := strings.Split(domainStr, ":")
-	if len(domainArray) == 1 {
-		domain.Domain, err = handleChineseDomain(domainArray[0])
-		if err != nil {
-			return domain, err
-		}
-		domain.Port = defaultPort
-		return domain, nil
-	}
-	if len(domainArray) > 1 {
-		domain.Domain, err = handleChineseDomain(domainArray[0])
-		if err != nil {
-			return domain, err
-		}
-		portStr := domainArray[1]
-		portN, err = strconv.Atoi(portStr)
-		if err != nil {
-			return domain, buserr.WithName("ErrTypePort", portStr)
-		}
-		if portN <= 0 || portN > 65535 {
-			return domain, buserr.New("ErrTypePortRange")
-		}
-		domain.Port = portN
-		return domain, nil
-	}
-	return domain, nil
-}
 
 func handleChineseDomain(domain string) (string, error) {
 	if common.ContainsChinese(domain) {
@@ -481,7 +446,7 @@ func delWafConfig(website model.Website, force bool) error {
 	return nil
 }
 
-func addListenAndServerName(website model.Website, ports []int, domains []string) error {
+func addListenAndServerName(website model.Website, domains []model.WebsiteDomain) error {
 	nginxFull, err := getNginxFull(&website)
 	if err != nil {
 		return nil
@@ -489,16 +454,20 @@ func addListenAndServerName(website model.Website, ports []int, domains []string
 	nginxConfig := nginxFull.SiteConfig
 	config := nginxFull.SiteConfig.Config
 	server := config.FindServers()[0]
-	for _, port := range ports {
-		server.AddListen(strconv.Itoa(port), false)
-		if website.IPV6 {
-			server.UpdateListen("[::]:"+strconv.Itoa(port), false)
-		}
-	}
+
 	for _, domain := range domains {
-		server.AddServerName(domain)
+		var params []string
+		if website.Protocol == constant.ProtocolHTTPS && domain.SSL {
+			params = append(params, "ssl", "http2")
+		}
+		server.AddListen(strconv.Itoa(domain.Port), false, params...)
+		if website.IPV6 {
+			server.UpdateListen("[::]:"+strconv.Itoa(domain.Port), false, params...)
+		}
+		server.UpdateServerName([]string{domain.Domain})
 	}
-	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+
+	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return err
 	}
 	return nginxCheckAndReload(nginxConfig.OldContent, nginxConfig.FilePath, nginxFull.Install.ContainerName)
@@ -568,6 +537,24 @@ func createPemFile(website model.Website, websiteSSL model.WebsiteSSL) error {
 	return nil
 }
 
+func getHttpsPort(website *model.Website) ([]int, error) {
+	websiteDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(website.ID))
+	var httpsPorts []int
+	for _, domain := range websiteDomains {
+		if domain.SSL {
+			httpsPorts = append(httpsPorts, domain.Port)
+		}
+	}
+	if len(httpsPorts) == 0 {
+		nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+		if err != nil {
+			return nil, err
+		}
+		httpsPorts = append(httpsPorts, nginxInstall.HttpsPort)
+	}
+	return httpsPorts, nil
+}
+
 func applySSL(website *model.Website, websiteSSL model.WebsiteSSL, req request.WebsiteHTTPSOp) error {
 	nginxFull, err := getNginxFull(website)
 	if err != nil {
@@ -587,17 +574,18 @@ func applySSL(website *model.Website, websiteSSL model.WebsiteSSL, req request.W
 	server := config.FindServers()[0]
 
 	httpPort := strconv.Itoa(nginxFull.Install.HttpPort)
-	httpsPort := nginxFull.Install.HttpsPort
-	if req.HttpsPort > 0 {
-		httpsPort = req.HttpsPort
+	httpsPort, err := getHttpsPort(website)
+	if err != nil {
+		return err
 	}
-	website.HttpsPort = httpsPort
 	httpPortIPV6 := "[::]:" + httpPort
-	httpsPortIPV6 := "[::]:" + strconv.Itoa(httpsPort)
 
-	server.UpdateListen(strconv.Itoa(httpsPort), website.DefaultServer, "ssl", "http2")
-	if website.IPV6 {
-		server.UpdateListen(httpsPortIPV6, website.DefaultServer, "ssl", "http2")
+	for _, port := range httpsPort {
+		httpsPortIPV6 := "[::]:" + strconv.Itoa(port)
+		server.UpdateListen(strconv.Itoa(port), website.DefaultServer, "ssl", "http2")
+		if website.IPV6 {
+			server.UpdateListen(httpsPortIPV6, website.DefaultServer, "ssl", "http2")
+		}
 	}
 
 	switch req.HttpConfig {
@@ -911,30 +899,36 @@ func changeServiceName(newComposeContent, newServiceName string) (composeByte []
 	return yaml.Marshal(composeMap)
 }
 
-func getWebsiteDomains(domains string, defaultPort int, websiteID uint) (domainModels []model.WebsiteDomain, addPorts []int, addDomains []string, err error) {
+func getWebsiteDomains(domains []request.WebsiteDomain, defaultPort int, websiteID uint) (domainModels []model.WebsiteDomain, addPorts []int, addDomains []string, err error) {
 	var (
-		ports = make(map[int]struct{})
+		ports     = make(map[int]struct{})
+		existPort = make(map[int]struct{})
 	)
-	domainArray := strings.Split(domains, "\n")
-	for _, domain := range domainArray {
-		if domain == "" {
+	existDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(websiteID))
+	for _, domain := range existDomains {
+		existPort[domain.Port] = struct{}{}
+	}
+	for _, domain := range domains {
+		if domain.Domain == "" {
 			continue
 		}
-		if !common.IsValidDomain(domain) {
-			err = buserr.WithName("ErrDomainFormat", domain)
+		if !common.IsValidDomain(domain.Domain) {
+			err = buserr.WithName("ErrDomainFormat", domain.Domain)
 			return
 		}
 		var domainModel model.WebsiteDomain
-		domainModel, err = getDomain(domain, defaultPort)
+		domainModel.Domain, err = handleChineseDomain(domain.Domain)
 		if err != nil {
 			return
 		}
-		if reflect.DeepEqual(domainModel, model.WebsiteDomain{}) {
-			continue
+		domainModel.Port = domain.Port
+		if domain.Port == 0 {
+			domain.Port = defaultPort
 		}
+		domainModel.SSL = domain.SSL
 		domainModel.WebsiteID = websiteID
 		domainModels = append(domainModels, domainModel)
-		if domainModel.Port != defaultPort {
+		if _, ok := existPort[domainModel.Port]; !ok {
 			ports[domainModel.Port] = struct{}{}
 		}
 		if exist, _ := websiteDomainRepo.GetFirst(websiteDomainRepo.WithDomain(domainModel.Domain), websiteDomainRepo.WithWebsiteId(websiteID)); exist.ID == 0 {
@@ -950,6 +944,10 @@ func getWebsiteDomains(domains string, defaultPort int, websiteID uint) (domainM
 	}
 
 	for port := range ports {
+		if port == defaultPort {
+			addPorts = append(addPorts, port)
+			continue
+		}
 		if existPorts, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithPort(port)); len(existPorts) == 0 {
 			errMap := make(map[string]interface{})
 			errMap["port"] = port

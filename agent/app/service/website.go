@@ -225,28 +225,21 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		return err
 	}
 	defaultHttpPort := nginxInstall.HttpPort
-	defaultHttpsPort := nginxInstall.HttpsPort
-
 	var (
-		otherDomains []model.WebsiteDomain
-		domains      []model.WebsiteDomain
+		domains []model.WebsiteDomain
 	)
-	domains, _, _, err = getWebsiteDomains(create.PrimaryDomain, defaultHttpPort, 0)
+	domains, _, _, err = getWebsiteDomains(create.Domains, defaultHttpPort, 0)
 	if err != nil {
 		return err
 	}
-	otherDomains, _, _, err = getWebsiteDomains(create.OtherDomains, defaultHttpPort, 0)
-	if err != nil {
-		return err
-	}
-	domains = append(domains, otherDomains...)
-	if len(domains) == 1 && domains[0].Port != defaultHttpPort {
-		defaultHttpsPort = domains[0].Port
+	primaryDomain := domains[0].Domain
+	if domains[0].Port != defaultHttpPort {
+		primaryDomain = fmt.Sprintf("%s:%v", domains[0].Domain, domains[0].Port)
 	}
 
 	defaultDate, _ := time.Parse(constant.DateLayout, constant.DefaultDate)
 	website := &model.Website{
-		PrimaryDomain:  create.PrimaryDomain,
+		PrimaryDomain:  primaryDomain,
 		Type:           create.Type,
 		Alias:          alias,
 		Remark:         create.Remark,
@@ -259,7 +252,6 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		AccessLog:      true,
 		ErrorLog:       true,
 		IPV6:           create.IPV6,
-		HttpsPort:      defaultHttpsPort,
 	}
 
 	var (
@@ -267,7 +259,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		runtime    *model.Runtime
 	)
 
-	createTask, err := task.NewTaskWithOps(create.PrimaryDomain, task.TaskCreate, task.TaskScopeWebsite, create.TaskID, 0)
+	createTask, err := task.NewTaskWithOps(primaryDomain, task.TaskCreate, task.TaskScopeWebsite, create.TaskID, 0)
 	if err != nil {
 		return err
 	}
@@ -464,7 +456,6 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 				SSLProtocol:  []string{"TLSv1.3", "TLSv1.2", "TLSv1.1", "TLSv1"},
 				Algorithm:    "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:!aNULL:!eNULL:!EXPORT:!DSS:!DES:!RC4:!3DES:!MD5:!PSK:!KRB5:!SRP:!CAMELLIA:!SEED",
 				Hsts:         true,
-				HttpsPort:    website.HttpsPort,
 			}
 			if err = applySSL(website, *websiteModel, appSSLReq); err != nil {
 				return err
@@ -607,7 +598,6 @@ func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) 
 	var (
 		domainModels []model.WebsiteDomain
 		addPorts     []int
-		addDomains   []string
 	)
 	httpPort, _, err := getAppInstallPort(constant.AppOpenresty)
 	if err != nil {
@@ -618,7 +608,7 @@ func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) 
 		return nil, err
 	}
 
-	domainModels, addPorts, addDomains, err = getWebsiteDomains(create.Domains, httpPort, create.WebsiteID)
+	domainModels, addPorts, _, err = getWebsiteDomains(create.Domains, httpPort, create.WebsiteID)
 	if err != nil {
 		return nil, err
 	}
@@ -626,7 +616,7 @@ func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) 
 		_ = OperateFirewallPort(nil, addPorts)
 	}()
 
-	if err := addListenAndServerName(website, addPorts, addDomains); err != nil {
+	if err = addListenAndServerName(website, domainModels); err != nil {
 		return nil, err
 	}
 
@@ -868,8 +858,22 @@ func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, 
 	if err != nil {
 		return response.WebsiteHTTPS{}, err
 	}
-	var res response.WebsiteHTTPS
-	res.HttpsPort = website.HttpsPort
+	var (
+		res        response.WebsiteHTTPS
+		httpsPorts []string
+	)
+	websiteDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(websiteId))
+	for _, domain := range websiteDomains {
+		if domain.SSL {
+			httpsPorts = append(httpsPorts, strconv.Itoa(domain.Port))
+		}
+	}
+	if len(httpsPorts) == 0 {
+		nginxInstall, _ := getAppInstallByKey(constant.AppOpenresty)
+		res.HttpsPort = strconv.Itoa(nginxInstall.HttpsPort)
+	} else {
+		res.HttpsPort = strings.Join(httpsPorts, ",")
+	}
 	if website.WebsiteSSLID == 0 {
 		res.Enable = false
 		return res, nil
@@ -925,17 +929,17 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 	if !req.Enable {
 		website.Protocol = constant.ProtocolHTTP
 		website.WebsiteSSLID = 0
-		httpsPort := website.HttpsPort
-		if httpsPort == 0 {
-			_, httpsPort, err = getAppInstallPort(constant.AppOpenresty)
-			if err != nil {
-				return nil, err
-			}
-		}
-		httpsPortStr := strconv.Itoa(httpsPort)
-		if err := deleteListenAndServerName(website, []string{httpsPortStr, "[::]:" + httpsPortStr}, []string{}); err != nil {
-			return nil, err
-		}
+		//httpsPort := req.HttpsPort
+		//if len(httpsPort) == 0 {
+		//	_, httpsPort, err = getAppInstallPort(constant.AppOpenresty)
+		//	if err != nil {
+		//		return nil, err
+		//	}
+		//}
+		//httpsPortStr := strconv.Itoa(httpsPort)
+		//if err = deleteListenAndServerName(website, []string{httpsPortStr, "[::]:" + httpsPortStr}, []string{}); err != nil {
+		//	return nil, err
+		//}
 		nginxParams := getNginxParamsFromStaticFile(dto.SSL, nil)
 		nginxParams = append(nginxParams,
 			dto.NginxParam{
@@ -1035,18 +1039,18 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 	}
 
 	website.Protocol = constant.ProtocolHTTPS
-	if err := applySSL(&website, websiteSSL, req); err != nil {
+	if err = applySSL(&website, websiteSSL, req); err != nil {
 		return nil, err
 	}
 	website.HttpConfig = req.HttpConfig
 
 	if websiteSSL.ID == 0 {
-		if err := websiteSSLRepo.Create(ctx, &websiteSSL); err != nil {
+		if err = websiteSSLRepo.Create(ctx, &websiteSSL); err != nil {
 			return nil, err
 		}
 		website.WebsiteSSLID = websiteSSL.ID
 	}
-	if err := websiteRepo.Save(ctx, &website); err != nil {
+	if err = websiteRepo.Save(ctx, &website); err != nil {
 		return nil, err
 	}
 	return &res, nil

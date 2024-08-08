@@ -4,6 +4,7 @@ type WebsiteDomain struct {
 	BaseModel
 	WebsiteID uint   `gorm:"column:website_id;type:varchar(64);not null;" json:"websiteId"`
 	Domain    string `gorm:"type:varchar(256);not null" json:"domain"`
+	SSL       bool   `json:"SSL"`
 	Port      int    `gorm:"type:integer" json:"port"`
 }
 

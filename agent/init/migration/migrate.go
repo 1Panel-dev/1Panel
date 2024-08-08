@@ -19,6 +19,7 @@ func Init() {
 		migrations.InitPHPExtensions,
 		migrations.AddTask,
 		migrations.UpdateWebsite,
+		migrations.UpdateWebsiteDomain,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)
