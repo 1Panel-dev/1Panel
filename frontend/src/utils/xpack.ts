@@ -20,9 +20,9 @@ export function initFavicon() {
     link.rel = 'shortcut icon';
     if (globalStore.isDarkGoldTheme) {
         let goldLink = new URL(`../assets/images/favicon-gold.png`, import.meta.url).href;
-        link.href = favicon ? '/api/v1/images/favicon' : goldLink;
+        link.href = favicon ? '/api/v2/images/favicon' : goldLink;
     } else {
-        link.href = favicon ? '/api/v1/images/favicon' : '/public/favicon.png';
+        link.href = favicon ? '/api/v2/images/favicon' : '/public/favicon.png';
     }
     document.getElementsByTagName('head')[0].appendChild(link);
 }

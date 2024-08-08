@@ -1,6 +1,8 @@
 package migrations
 
 import (
+	"fmt"
+	"path"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/core/app/model"
@@ -13,12 +15,13 @@ import (
 )
 
 var AddTable = &gormigrate.Migration{
-	ID: "20240722-add-table",
+	ID: "20240808-add-table",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(
 			&model.OperationLog{},
 			&model.LoginLog{},
 			&model.Setting{},
+			&model.BackupAccount{},
 		)
 	},
 }
@@ -132,6 +135,26 @@ var InitSetting = &gormigrate.Migration{
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "NoAuthSetting", Value: "200"}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var InitOneDrive = &gormigrate.Migration{
+	ID: "20240808-init-one-drive",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "OneDriveID", Value: "MDEwOTM1YTktMWFhOS00ODU0LWExZGMtNmU0NWZlNjI4YzZi"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "OneDriveSc", Value: "akpuOFF+YkNXOU1OLWRzS1ZSRDdOcG1LT2ZRM0RLNmdvS1RkVWNGRA=="}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.BackupAccount{
+			Name: "localhost",
+			Type: "LOCAL",
+			Vars: fmt.Sprintf("{\"dir\":\"%s\"}", path.Join(global.CONF.System.BaseDir, "1panel/backup")),
+		}).Error; err != nil {
 			return err
 		}
 		return nil

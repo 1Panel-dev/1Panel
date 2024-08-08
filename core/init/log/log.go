@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 	"strings"
 	"time"
 
@@ -29,7 +30,7 @@ func Init() {
 
 func setOutput(logger *logrus.Logger, config configs.LogConfig) {
 	writer, err := log.NewWriterFromConfig(&log.Config{
-		LogPath:            global.CONF.System.LogPath,
+		LogPath:            path.Join(global.CONF.System.BaseDir, "1panel/log"),
 		FileName:           config.LogName,
 		TimeTagFormat:      FileTImeFormat,
 		MaxRemain:          config.MaxBackup,

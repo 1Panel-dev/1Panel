@@ -83,8 +83,8 @@ func (u *UpgradeService) LoadNotes(req dto.Upgrade) (string, error) {
 func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 	global.LOG.Info("start to upgrade now...")
 	timeStr := time.Now().Format(constant.DateTimeSlimLayout)
-	rootDir := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("upgrade/upgrade_%s/downloads", timeStr))
-	originalDir := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("upgrade/upgrade_%s/original", timeStr))
+	rootDir := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/tmp/upgrade/upgrade_%s/downloads", timeStr))
+	originalDir := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/tmp/upgrade/upgrade_%s/original", timeStr))
 	if err := os.MkdirAll(rootDir, os.ModePerm); err != nil {
 		return err
 	}
@@ -181,13 +181,14 @@ func (u *UpgradeService) handleRollback(originalDir string, errStep int) {
 	_ = settingRepo.Update("SystemStatus", "Free")
 
 	checkPointOfWal()
+	dbPath := path.Join(global.CONF.System.BaseDir, "1panel/db")
 	if _, err := os.Stat(path.Join(originalDir, "1Panel.db")); err == nil {
-		if err := files.CopyFile(path.Join(originalDir, "1Panel.db"), global.CONF.System.DbPath); err != nil {
+		if err := files.CopyFile(path.Join(originalDir, "1Panel.db"), dbPath); err != nil {
 			global.LOG.Errorf("rollback 1panel db failed, err: %v", err)
 		}
 	}
 	if _, err := os.Stat(path.Join(originalDir, "db.tar.gz")); err == nil {
-		if err := files.HandleUnTar(path.Join(originalDir, "db.tar.gz"), global.CONF.System.DbPath, ""); err != nil {
+		if err := files.HandleUnTar(path.Join(originalDir, "db.tar.gz"), dbPath, ""); err != nil {
 			global.LOG.Errorf("rollback 1panel db failed, err: %v", err)
 		}
 	}

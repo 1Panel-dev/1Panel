@@ -1336,6 +1336,7 @@ const message = {
         client_secret: '客戶端密鑰',
         redirect_uri: '重定向 URL',
         onedrive_helper: '自訂配置可參考官方文件',
+        clickToRefresh: '單擊可手動刷新',
         refreshTime: '令牌刷新時間',
         refreshStatus: '令牌刷新狀態',
         codeWarning: '當前授權碼格式錯誤，請重新確認！',

@@ -1338,6 +1338,7 @@ const message = {
         client_secret: '客户端密钥',
         redirect_uri: '重定向 Url',
         onedrive_helper: '自定义配置可参考官方文档',
+        clickToRefresh: '单击可手动刷新',
         refreshTime: '令牌刷新时间',
         refreshStatus: '令牌刷新状态',
         codeWarning: '当前授权码格式错误，请重新确认！',

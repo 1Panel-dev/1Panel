@@ -24,3 +24,8 @@ ErrHttpReqTimeOut: "請求超時 {{.err}}"
 ErrHttpReqFailed: "請求失敗 {{.err}}"
 ErrHttpReqNotFound: "文件不存在"
 ErrNoSuchHost: "網路連接失敗"
+
+#backup
+ErrBackupInUsed: "該備份帳號已在計劃任務中使用，無法刪除"
+ErrBackupCheck: "備份帳號測試連接失敗 {{.err}}"
+ErrBackupLocalDelete: "暫不支持刪除本地伺服器備份帳號"

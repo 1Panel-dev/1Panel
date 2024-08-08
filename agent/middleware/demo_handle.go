@@ -11,30 +11,30 @@ import (
 )
 
 var whiteUrlList = map[string]struct{}{
-	"/api/v1/auth/login":          {},
-	"/api/v1/websites/config":     {},
-	"/api/v1/websites/waf/config": {},
-	"/api/v1/files/loadfile":      {},
-	"/api/v1/files/size":          {},
-	"/api/v1/logs/operation":      {},
-	"/api/v1/logs/login":          {},
-	"/api/v1/auth/logout":         {},
+	"/api/v2/auth/login":          {},
+	"/api/v2/websites/config":     {},
+	"/api/v2/websites/waf/config": {},
+	"/api/v2/files/loadfile":      {},
+	"/api/v2/files/size":          {},
+	"/api/v2/logs/operation":      {},
+	"/api/v2/logs/login":          {},
+	"/api/v2/auth/logout":         {},
 
-	"/api/v1/apps/installed/loadport": {},
-	"/api/v1/apps/installed/check":    {},
-	"/api/v1/apps/installed/conninfo": {},
-	"/api/v1/databases/load/file":     {},
-	"/api/v1/databases/variables":     {},
-	"/api/v1/databases/status":        {},
-	"/api/v1/databases/baseinfo":      {},
+	"/api/v2/apps/installed/loadport": {},
+	"/api/v2/apps/installed/check":    {},
+	"/api/v2/apps/installed/conninfo": {},
+	"/api/v2/databases/load/file":     {},
+	"/api/v2/databases/variables":     {},
+	"/api/v2/databases/status":        {},
+	"/api/v2/databases/baseinfo":      {},
 
-	"/api/v1/waf/attack/stat":    {},
-	"/api/v1/waf/config/website": {},
+	"/api/v2/waf/attack/stat":    {},
+	"/api/v2/waf/config/website": {},
 
-	"/api/v1/monitor/stat":         {},
-	"/api/v1/monitor/visitors":     {},
-	"/api/v1/monitor/visitors/loc": {},
-	"/api/v1/monitor/qps":          {},
+	"/api/v2/monitor/stat":         {},
+	"/api/v2/monitor/visitors":     {},
+	"/api/v2/monitor/visitors/loc": {},
+	"/api/v2/monitor/qps":          {},
 }
 
 func DemoHandle() gin.HandlerFunc {

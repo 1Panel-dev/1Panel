@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"path"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/core/global"
@@ -9,7 +10,7 @@ import (
 )
 
 func Init() {
-	c := global.CONF.System.Cache
+	c := path.Join(global.CONF.System.BaseDir, "1panel/cache")
 
 	options := badger.Options{
 		Dir:                c,

@@ -23,7 +23,7 @@ func Routers() *gin.Engine {
 			c.JSON(200, "ok")
 		})
 		PublicGroup.Use(gzip.Gzip(gzip.DefaultCompression))
-		PublicGroup.Static("/api/v1/images", "./uploads")
+		PublicGroup.Static("/api/v2/images", "./uploads")
 	}
 	PrivateGroup := Router.Group("/api/v2")
 	if global.CurrentNode != "127.0.0.1" {

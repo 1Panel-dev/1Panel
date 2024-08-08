@@ -130,7 +130,7 @@ const searchLogs = async () => {
     const protocol = href.split('//')[0] === 'http:' ? 'ws' : 'wss';
     const host = href.split('//')[1].split('/')[0];
     terminalSocket.value = new WebSocket(
-        `${protocol}://${host}/api/v1/containers/search/log?container=${logSearch.containerID}&since=${logSearch.mode}&tail=${logSearch.tail}&follow=${logSearch.isWatch}`,
+        `${protocol}://${host}/api/v2/containers/search/log?container=${logSearch.containerID}&since=${logSearch.mode}&tail=${logSearch.tail}&follow=${logSearch.isWatch}`,
     );
     terminalSocket.value.onmessage = (event) => {
         logInfo.value += event.data.replace(/\x1B\[[0-?]*[ -/]*[@-~]/g, '');

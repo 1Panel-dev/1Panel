@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/core/global"
@@ -13,12 +14,13 @@ import (
 )
 
 func Init() {
-	if _, err := os.Stat(global.CONF.System.DbPath); err != nil {
-		if err := os.MkdirAll(global.CONF.System.DbPath, os.ModePerm); err != nil {
+	dbPath := path.Join(global.CONF.System.BaseDir, "1panel/db")
+	if _, err := os.Stat(dbPath); err != nil {
+		if err := os.MkdirAll(dbPath, os.ModePerm); err != nil {
 			panic(fmt.Errorf("init db dir failed, err: %v", err))
 		}
 	}
-	fullPath := global.CONF.System.DbPath + "/" + global.CONF.System.DbCoreFile
+	fullPath := path.Join(dbPath, global.CONF.System.DbCoreFile)
 	if _, err := os.Stat(fullPath); err != nil {
 		f, err := os.Create(fullPath)
 		if err != nil {

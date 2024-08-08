@@ -1,0 +1,26 @@
+import i18n from '@/lang';
+
+export const cities = [
+    { value: 'ap-beijing-1', label: i18n.global.t('setting.ap_beijing_1') },
+    { value: 'ap-beijing', label: i18n.global.t('setting.ap_beijing') },
+    { value: 'ap-nanjing', label: i18n.global.t('setting.ap_nanjing') },
+    { value: 'ap-shanghai', label: i18n.global.t('setting.ap_shanghai') },
+    { value: 'ap-guangzhou', label: i18n.global.t('setting.ap_guangzhou') },
+    { value: 'ap-chengdu', label: i18n.global.t('setting.ap_chengdu') },
+    { value: 'ap-chongqing', label: i18n.global.t('setting.ap_chongqing') },
+    { value: 'ap-shenzhen_fsi', label: i18n.global.t('setting.ap_shenzhen_fsi') },
+    { value: 'ap-shanghai_fsi', label: i18n.global.t('setting.ap_shanghai_fsi') },
+    { value: 'ap-beijing_fsi', label: i18n.global.t('setting.ap_beijing_fsi') },
+    { value: 'ap-hongkong', label: i18n.global.t('setting.ap_hongkong') },
+    { value: 'ap-singapore', label: i18n.global.t('setting.ap_singapore') },
+    { value: 'ap-mumbai', label: i18n.global.t('setting.ap_mumbai') },
+    { value: 'ap-jakarta', label: i18n.global.t('setting.ap_jakarta') },
+    { value: 'ap-seoul', label: i18n.global.t('setting.ap_seoul') },
+    { value: 'ap-bangkok', label: i18n.global.t('setting.ap_bangkok') },
+    { value: 'ap-tokyo', label: i18n.global.t('setting.ap_tokyo') },
+    { value: 'na-siliconvalley', label: i18n.global.t('setting.na_siliconvalley') },
+    { value: 'na-ashburn', label: i18n.global.t('setting.na_ashburn') },
+    { value: 'na-toronto', label: i18n.global.t('setting.na_toronto') },
+    { value: 'sa-saopaulo', label: i18n.global.t('setting.sa_saopaulo') },
+    { value: 'eu-frankfurt', label: i18n.global.t('setting.eu_frankfurt') },
+];
