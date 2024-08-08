@@ -59,6 +59,7 @@ type WebsiteHTTPS struct {
 	SSLProtocol []string         `json:"SSLProtocol"`
 	Algorithm   string           `json:"algorithm"`
 	Hsts        bool             `json:"hsts"`
+	HttpsPort   int              `json:"httpsPort"`
 }
 
 type WebsiteLog struct {

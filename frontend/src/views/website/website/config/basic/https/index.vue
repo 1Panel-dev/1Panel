@@ -13,10 +13,13 @@
                     <el-switch v-model="form.enable" @change="changeEnable"></el-switch>
                 </el-form-item>
                 <div v-if="form.enable">
+                    <el-form-item :label="'HTTPS ' + $t('commons.table.port')" prop="httpsPort">
+                        <el-input v-model.number="form.httpsPort" />
+                    </el-form-item>
                     <el-text type="warning" class="!ml-2">{{ $t('website.ipWebsiteWarn') }}</el-text>
                     <el-divider content-position="left">{{ $t('website.SSLConfig') }}</el-divider>
                     <el-form-item :label="$t('website.HTTPConfig')" prop="httpConfig">
-                        <el-select v-model="form.httpConfig" class="p-w-200">
+                        <el-select v-model="form.httpConfig" class="p-w-400">
                             <el-option :label="$t('website.HTTPToHTTPS')" :value="'HTTPToHTTPS'"></el-option>
                             <el-option :label="$t('website.HTTPAlso')" :value="'HTTPAlso'"></el-option>
                             <el-option :label="$t('website.HTTPSOnly')" :value="'HTTPSOnly'"></el-option>
@@ -101,7 +104,7 @@
                         </div>
                     </div>
                     <el-form-item :label="' '" v-if="websiteSSL && websiteSSL.id > 0">
-                        <el-descriptions :column="6" border direction="vertical">
+                        <el-descriptions :column="7" border direction="vertical">
                             <el-descriptions-item :label="$t('website.primaryDomain')">
                                 {{ websiteSSL.primaryDomain }}
                             </el-descriptions-item>
@@ -170,7 +173,7 @@ import { GetHTTPSConfig, ListSSL, SearchAcmeAccount, UpdateHTTPSConfig } from '@
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { computed, onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
-import { Rules } from '@/global/form-rules';
+import { Rules, checkNumberRange } from '@/global/form-rules';
 import { dateFormatSimple, getProvider, getAccountName } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';
 import FileList from '@/components/file-list/index.vue';
@@ -201,6 +204,7 @@ const form = reactive({
     algorithm:
         'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:!aNULL:!eNULL:!EXPORT:!DSS:!DES:!RC4:!3DES:!MD5:!PSK:!KRB5:!SRP:!CAMELLIA:!SEED',
     SSLProtocol: ['TLSv1.3', 'TLSv1.2', 'TLSv1.1', 'TLSv1'],
+    httpsPort: 443,
 });
 const loading = ref(false);
 const ssls = ref();
@@ -218,6 +222,7 @@ const rules = ref({
     SSLProtocol: [Rules.requiredSelect],
     algorithm: [Rules.requiredInput],
     acmeAccountID: [Rules.requiredInput],
+    httpsPort: [Rules.requiredInput, checkNumberRange(1, 65535)],
 });
 const resData = ref();
 const sslReq = reactive({
@@ -278,23 +283,27 @@ const get = () => {
     GetHTTPSConfig(id.value).then((res) => {
         if (res.data) {
             form.type = 'existed';
-            resData.value = res.data;
-            form.enable = res.data.enable;
-            if (res.data.httpConfig != '') {
-                form.httpConfig = res.data.httpConfig;
+            const data = res.data;
+            resData.value = data;
+            form.enable = data.enable;
+            if (data.httpConfig != '') {
+                form.httpConfig = data.httpConfig;
             }
-            if (res.data.SSLProtocol && res.data.SSLProtocol.length > 0) {
-                form.SSLProtocol = res.data.SSLProtocol;
+            if (data.SSLProtocol && data.SSLProtocol.length > 0) {
+                form.SSLProtocol = data.SSLProtocol;
             }
-            if (res.data.algorithm != '') {
-                form.algorithm = res.data.algorithm;
+            if (data.algorithm != '') {
+                form.algorithm = data.algorithm;
             }
-            if (res.data.SSL && res.data.SSL.id > 0) {
-                form.websiteSSLId = res.data.SSL.id;
-                websiteSSL.value = res.data.SSL;
-                form.acmeAccountID = res.data.SSL.acmeAccountId;
+            if (data.SSL && data.SSL.id > 0) {
+                form.websiteSSLId = data.SSL.id;
+                websiteSSL.value = data.SSL;
+                form.acmeAccountID = data.SSL.acmeAccountId;
             }
-            form.hsts = res.data.hsts;
+            form.hsts = data.hsts;
+            if (data.httpsPort > 0) {
+                form.httpsPort = data.httpsPort;
+            }
         }
         listSSL();
         listAcmeAccount();
