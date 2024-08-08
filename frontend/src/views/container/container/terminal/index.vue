@@ -95,7 +95,7 @@ const initTerm = (formEl: FormInstance | undefined) => {
         terminalOpen.value = true;
         await nextTick();
         terminalRef.value!.acceptParams({
-            endpoint: '/api/v1/containers/exec',
+            endpoint: '/api/v2/containers/exec',
             args: `containerid=${form.containerID}&user=${form.user}&command=${form.command}`,
             error: '',
             initCmd: '',

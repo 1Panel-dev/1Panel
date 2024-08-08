@@ -27,6 +27,9 @@ export const unbindLicense = () => {
 export const loadBaseDir = () => {
     return http.get<string>(`/settings/basedir`);
 };
+export const loadDaemonJsonPath = () => {
+    return http.get<string>(`/settings/daemonjson`, {});
+};
 
 // core
 export const getSettingInfo = () => {
@@ -35,15 +38,12 @@ export const getSettingInfo = () => {
 export const getSystemAvailable = () => {
     return http.get(`/settings/search/available`);
 };
-
 export const updateSetting = (param: Setting.SettingUpdate) => {
     return http.post(`/core/settings/update`, param);
 };
-
 export const updateMenu = (param: Setting.SettingUpdate) => {
     return http.post(`/core/settings/menu/update`, param);
 };
-
 export const updateProxy = (params: Setting.ProxyUpdate) => {
     let request = deepCopy(params) as Setting.ProxyUpdate;
     if (request.proxyPasswd) {
@@ -52,23 +52,18 @@ export const updateProxy = (params: Setting.ProxyUpdate) => {
     request.proxyType = request.proxyType === 'close' ? '' : request.proxyType;
     return http.post(`/core/settings/proxy/update`, request);
 };
-
 export const updatePassword = (param: Setting.PasswordUpdate) => {
     return http.post(`/core/settings/password/update`, param);
 };
-
 export const loadInterfaceAddr = () => {
     return http.get(`/core/settings/interface`);
 };
-
 export const updateBindInfo = (ipv6: string, bindAddress: string) => {
     return http.post(`/core/settings/bind/update`, { ipv6: ipv6, bindAddress: bindAddress });
 };
-
 export const updatePort = (param: Setting.PortUpdate) => {
     return http.post(`/core/settings/port/update`, param);
 };
-
 export const updateSSL = (param: Setting.SSLUpdate) => {
     return http.post(`/core/settings/ssl/update`, param);
 };
@@ -78,24 +73,17 @@ export const loadSSLInfo = () => {
 export const downloadSSL = () => {
     return http.download<any>(`/core/settings/ssl/download`);
 };
-
 export const handleExpired = (param: Setting.PasswordUpdate) => {
     return http.post(`/core/settings/expired/handle`, param);
 };
-
 export const loadMFA = (param: Setting.MFARequest) => {
     return http.post<Setting.MFAInfo>(`/core/settings/mfa`, param);
 };
-
-export const loadDaemonJsonPath = () => {
-    return http.get<string>(`/core/settings/daemonjson`, {});
-};
-
 export const bindMFA = (param: Setting.MFABind) => {
     return http.post(`/core/settings/mfa/bind`, param);
 };
 
-// backup
+// backup-agent
 export const handleBackup = (params: Backup.Backup) => {
     return http.post(`/settings/backup/backup`, params, TimeoutEnum.T_1H);
 };
@@ -104,9 +92,6 @@ export const handleRecover = (params: Backup.Recover) => {
 };
 export const handleRecoverByUpload = (params: Backup.Recover) => {
     return http.post(`/settings/backup/recover/byupload`, params, TimeoutEnum.T_1D);
-};
-export const refreshOneDrive = () => {
-    return http.post(`/settings/backup/refresh/onedrive`, {});
 };
 export const downloadBackupRecord = (params: Backup.RecordDownload) => {
     return http.post<string>(`/settings/backup/record/download`, params, TimeoutEnum.T_10M);
@@ -120,15 +105,22 @@ export const searchBackupRecords = (params: Backup.SearchBackupRecord) => {
 export const searchBackupRecordsByCronjob = (params: Backup.SearchBackupRecordByCronjob) => {
     return http.post<ResPage<Backup.RecordInfo>>(`/settings/backup/record/search/bycronjob`, params, TimeoutEnum.T_5M);
 };
-
-export const getBackupList = () => {
-    return http.get<Array<Backup.BackupInfo>>(`/settings/backup/search`);
-};
-export const getOneDriveInfo = () => {
-    return http.get<Backup.OneDriveInfo>(`/settings/backup/onedrive`);
-};
 export const getFilesFromBackup = (type: string) => {
     return http.post<Array<any>>(`/settings/backup/search/files`, { type: type });
+};
+
+// backup-core
+export const refreshOneDrive = () => {
+    return http.post(`/core/backup/refresh/onedrive`, {});
+};
+export const getBackupList = () => {
+    return http.post<Array<Backup.BackupInfo>>(`/core/backup/list`);
+};
+export const searchBackup = (params: Backup.SearchWithType) => {
+    return http.post<ResPage<Backup.BackupInfo>>(`/core/backup/search`, params);
+};
+export const getOneDriveInfo = () => {
+    return http.get<Backup.OneDriveInfo>(`/core/backup/onedrive`);
 };
 export const addBackup = (params: Backup.BackupOperate) => {
     let request = deepCopy(params) as Backup.BackupOperate;
@@ -138,7 +130,7 @@ export const addBackup = (params: Backup.BackupOperate) => {
     if (request.credential) {
         request.credential = Base64.encode(request.credential);
     }
-    return http.post<Backup.BackupOperate>(`/settings/backup`, request);
+    return http.post<Backup.BackupOperate>(`/core/backup`, request, TimeoutEnum.T_60S);
 };
 export const editBackup = (params: Backup.BackupOperate) => {
     let request = deepCopy(params) as Backup.BackupOperate;
@@ -148,10 +140,10 @@ export const editBackup = (params: Backup.BackupOperate) => {
     if (request.credential) {
         request.credential = Base64.encode(request.credential);
     }
-    return http.post(`/settings/backup/update`, request);
+    return http.post(`/core/backup/update`, request);
 };
 export const deleteBackup = (params: { id: number }) => {
-    return http.post(`/settings/backup/del`, params);
+    return http.post(`/core/backup/del`, params);
 };
 export const listBucket = (params: Backup.ForBucket) => {
     let request = deepCopy(params) as Backup.BackupOperate;
@@ -161,7 +153,7 @@ export const listBucket = (params: Backup.ForBucket) => {
     if (request.credential) {
         request.credential = Base64.encode(request.credential);
     }
-    return http.post(`/settings/backup/buckets`, request);
+    return http.post(`/core/backup/buckets`, request);
 };
 
 // snapshot

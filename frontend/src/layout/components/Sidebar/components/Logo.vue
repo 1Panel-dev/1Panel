@@ -1,13 +1,13 @@
 <template>
     <div class="logo" style="cursor: pointer" @click="goHome">
         <template v-if="isCollapse">
-            <img v-if="globalStore.themeConfig.logo" :src="'/api/v1/images/logo'" style="cursor: pointer" alt="logo" />
+            <img v-if="globalStore.themeConfig.logo" :src="'/api/v2/images/logo'" style="cursor: pointer" alt="logo" />
             <MenuLogo v-else />
         </template>
         <template v-else>
             <img
                 v-if="globalStore.themeConfig.logoWithText"
-                :src="'/api/v1/images/logoWithText'"
+                :src="'/api/v2/images/logoWithText'"
                 style="cursor: pointer"
                 alt="logo"
             />

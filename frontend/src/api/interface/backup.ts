@@ -1,12 +1,18 @@
 import { ReqPage } from '.';
 
 export namespace Backup {
+    export interface SearchWithType extends ReqPage {
+        type: string;
+        name: string;
+    }
     export interface BackupInfo {
         id: number;
+        name: string;
         type: string;
         accessKey: string;
         bucket: string;
         credential: string;
+        rememberAuth: boolean;
         backupPath: string;
         vars: string;
         varsJson: object;

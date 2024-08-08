@@ -1423,6 +1423,7 @@ const message = {
         client_secret: 'Client Secret',
         redirect_uri: 'Redirect URL',
         onedrive_helper: 'Custom configuration can be referred to in the official documentation',
+        clickToRefresh: 'Click to refresh',
         refreshTime: 'Token Refresh Time',
         refreshStatus: 'Token Refresh Status',
         backupDir: 'Backup Dir',

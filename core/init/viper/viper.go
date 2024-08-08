@@ -86,12 +86,6 @@ func Init() {
 	global.CONF = serverConfig
 	global.CONF.System.BaseDir = baseDir
 	global.CONF.System.IsDemo = v.GetBool("system.is_demo")
-	global.CONF.System.DataDir = path.Join(global.CONF.System.BaseDir, "1panel")
-	global.CONF.System.Cache = path.Join(global.CONF.System.DataDir, "cache")
-	global.CONF.System.Backup = path.Join(global.CONF.System.DataDir, "backup")
-	global.CONF.System.DbPath = path.Join(global.CONF.System.DataDir, "db")
-	global.CONF.System.LogPath = path.Join(global.CONF.System.DataDir, "log")
-	global.CONF.System.TmpDir = path.Join(global.CONF.System.DataDir, "tmp")
 	global.CONF.System.Port = port
 	global.CONF.System.Version = version
 	global.CONF.System.Username = username

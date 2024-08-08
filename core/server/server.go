@@ -12,6 +12,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/i18n"
 	"github.com/1Panel-dev/1Panel/core/init/cache"
+	"github.com/1Panel-dev/1Panel/core/init/cron"
 	"github.com/1Panel-dev/1Panel/core/init/db"
 	"github.com/1Panel-dev/1Panel/core/init/hook"
 	"github.com/1Panel-dev/1Panel/core/init/log"
@@ -34,6 +35,7 @@ func Start() {
 	validator.Init()
 	gob.Register(psession.SessionUser{})
 	cache.Init()
+	cron.Init()
 	session.Init()
 	gin.SetMode("debug")
 	InitOthers()

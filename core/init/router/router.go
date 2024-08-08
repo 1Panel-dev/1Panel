@@ -22,7 +22,7 @@ var (
 
 func setWebStatic(rootRouter *gin.RouterGroup) {
 	rootRouter.StaticFS("/public", http.FS(web.Favicon))
-	rootRouter.Static("/api/v1/images", "./uploads")
+	rootRouter.Static("/api/v2/images", "./uploads")
 	rootRouter.Use(func(c *gin.Context) {
 		c.Next()
 	})

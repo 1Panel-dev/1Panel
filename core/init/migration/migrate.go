@@ -11,6 +11,7 @@ func Init() {
 	m := gormigrate.New(global.DB, gormigrate.DefaultOptions, []*gormigrate.Migration{
 		migrations.AddTable,
 		migrations.InitSetting,
+		migrations.InitOneDrive,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

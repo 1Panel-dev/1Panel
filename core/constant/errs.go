@@ -30,6 +30,7 @@ var (
 	ErrTransform       = errors.New("ErrTransform")
 	ErrInitialPassword = errors.New("ErrInitialPassword")
 	ErrInvalidParams   = errors.New("ErrInvalidParams")
+	ErrNotSupportType  = errors.New("ErrNotSupportType")
 
 	ErrTokenParse      = errors.New("ErrTokenParse")
 	ErrStructTransform = errors.New("ErrStructTransform")
@@ -48,4 +49,10 @@ var (
 	ErrEntrance            = "ErrEntrance"
 	ErrProxy               = "ErrProxy"
 	ErrLocalDelete         = "ErrLocalDelete"
+)
+
+// backup
+var (
+	ErrBackupInUsed      = "ErrBackupInUsed"
+	ErrBackupLocalDelete = "ErrBackupLocalDelete"
 )
