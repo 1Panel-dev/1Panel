@@ -1054,4 +1054,7 @@ onMounted(() => {
         color: #726e6e;
     }
 }
+.search-button {
+    width: 20vw;
+}
 </style>

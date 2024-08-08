@@ -57,6 +57,7 @@
                                 :width="400"
                                 trigger="hover"
                                 :content="row.message"
+                                popper-class="max-h-[300px] overflow-auto"
                             >
                                 <template #reference>
                                     <Status :key="row.status" :status="row.status"></Status>
