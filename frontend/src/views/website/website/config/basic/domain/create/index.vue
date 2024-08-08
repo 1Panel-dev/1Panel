@@ -1,30 +1,8 @@
 <template>
-    <el-drawer
-        v-model="open"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        :title="$t('website.addDomain')"
-        size="40%"
-        :before-close="handleClose"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('website.addDomain')" :back="handleClose" />
-        </template>
-
-        <el-row v-loading="loading">
-            <el-col :span="22" :offset="1">
-                <el-form ref="domainForm" label-position="top" :model="domain" :rules="rules">
-                    <el-form-item :label="$t('website.domain')" prop="domains">
-                        <el-input
-                            type="textarea"
-                            :rows="3"
-                            v-model="domain.domains"
-                            :placeholder="$t('website.domainHelper')"
-                        ></el-input>
-                    </el-form-item>
-                </el-form>
-            </el-col>
-        </el-row>
+    <DrawerPro v-model="open" :header="$t('website.addDomain')" :back="handleClose">
+        <el-form ref="domainForm" label-position="top" :model="create">
+            <DomainCreate v-model:form="create"></DomainCreate>
+        </el-form>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
@@ -33,29 +11,31 @@
                 </el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { CreateDomain } from '@/api/modules/website';
-import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
+import DomainCreate from '@/views/website/website/domain-create/index.vue';
 
 const domainForm = ref<FormInstance>();
 
-const rules = ref({
-    domains: [Rules.requiredInput],
+const initDomain = () => ({
+    domain: '',
+    port: 80,
+    ssl: false,
 });
 
 const open = ref(false);
 const loading = ref(false);
-const domain = ref({
+const create = ref({
     websiteID: 0,
-    domains: '',
+    domains: [initDomain()],
+    domainStr: '',
 });
 
 const em = defineEmits(['close']);
@@ -66,7 +46,9 @@ const handleClose = () => {
 };
 
 const acceptParams = async (websiteId: number) => {
-    domain.value.websiteID = Number(websiteId);
+    create.value.websiteID = Number(websiteId);
+    create.value.domains = [initDomain()];
+    create.value.domainStr = '';
     open.value = true;
 };
 
@@ -77,7 +59,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         loading.value = true;
-        CreateDomain(domain.value)
+        CreateDomain(create.value)
             .then(() => {
                 MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
                 handleClose();

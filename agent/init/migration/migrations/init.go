@@ -296,3 +296,11 @@ var UpdateWebsite = &gormigrate.Migration{
 			&model.Website{})
 	},
 }
+
+var UpdateWebsiteDomain = &gormigrate.Migration{
+	ID: "20240808-update-website-domain",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(
+			&model.WebsiteDomain{})
+	},
+}

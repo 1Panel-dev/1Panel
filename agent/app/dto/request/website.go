@@ -13,14 +13,14 @@ type WebsiteSearch struct {
 }
 
 type WebsiteCreate struct {
-	PrimaryDomain  string `json:"primaryDomain" validate:"required"`
 	Type           string `json:"type" validate:"required"`
 	Alias          string `json:"alias" validate:"required"`
 	Remark         string `json:"remark"`
-	OtherDomains   string `json:"otherDomains"`
 	Proxy          string `json:"proxy"`
 	WebsiteGroupID uint   `json:"webSiteGroupID" validate:"required"`
 	IPV6           bool   `json:"IPV6"`
+
+	Domains []WebsiteDomain `json:"domains"`
 
 	AppType      string        `json:"appType" validate:"oneof=new installed"`
 	AppInstall   NewAppInstall `json:"appInstall"`
@@ -123,8 +123,14 @@ type WebsiteGroupUpdate struct {
 }
 
 type WebsiteDomainCreate struct {
-	WebsiteID uint   `json:"websiteID" validate:"required"`
-	Domains   string `json:"domains" validate:"required"`
+	WebsiteID uint            `json:"websiteID" validate:"required"`
+	Domains   []WebsiteDomain `json:"domains" validate:"required"`
+}
+
+type WebsiteDomain struct {
+	Domain string `json:"domain" validate:"required"`
+	Port   int    `json:"port"`
+	SSL    bool   `json:"SSL"`
 }
 
 type WebsiteDomainDelete struct {
@@ -145,7 +151,7 @@ type WebsiteHTTPSOp struct {
 	SSLProtocol     []string `json:"SSLProtocol"`
 	Algorithm       string   `json:"algorithm"`
 	Hsts            bool     `json:"hsts"`
-	HttpsPort       int      `json:"httpsPort"`
+	HttpsPorts      []int    `json:"httpsPorts"`
 }
 
 type WebsiteNginxUpdate struct {

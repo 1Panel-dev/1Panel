@@ -67,14 +67,12 @@ export namespace Website {
     }
 
     export interface WebSiteCreateReq {
-        primaryDomain: string;
         type: string;
         alias: string;
         remark: string;
         appType: string;
         appInstallId: number;
         webSiteGroupId: number;
-        otherDomains: string;
         proxy: string;
         proxyType: string;
         ftpUser: string;
@@ -88,6 +86,7 @@ export namespace Website {
         dbFormat?: string;
         dbUser?: string;
         dbHost?: string;
+        domains: SubDomain[];
     }
 
     export interface WebSiteUpdateReq {
@@ -128,7 +127,13 @@ export namespace Website {
 
     export interface DomainCreate {
         websiteID: number;
-        domains: string;
+        domains: SubDomain[];
+    }
+
+    interface SubDomain {
+        domain: string;
+        port: number;
+        ssl: boolean;
     }
 
     export interface DomainDelete {
@@ -288,7 +293,7 @@ export namespace Website {
         SSLProtocol: string[];
         algorithm: string;
         hsts: boolean;
-        httpsPort: number;
+        httpsPort?: string;
     }
 
     export interface CheckReq {

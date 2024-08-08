@@ -28,8 +28,6 @@ type Website struct {
 	AppInstallID   uint `gorm:"type:integer" json:"appInstallId"`
 	FtpID          uint `gorm:"type:integer" json:"ftpId"`
 
-	HttpsPort int `json:"httpsPort"`
-
 	User  string `gorm:"type:varchar;" json:"user"`
 	Group string `gorm:"type:varchar;" json:"group"`
 

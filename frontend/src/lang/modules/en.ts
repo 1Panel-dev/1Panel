@@ -2130,6 +2130,8 @@ const message = {
             "When the reverse proxy backend is HTTPS, you might need to set the origin SNI. Please refer to the CDN service provider's documentation for details.",
         createDb: 'Create Database',
         enableSSLHelper: 'Failure to enable will not affect the creation of the website',
+        batchAdd: 'Batch Add Domains',
+        generateDomain: 'Generate',
     },
     php: {
         short_open_tag: 'Short tag support',
