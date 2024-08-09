@@ -18,7 +18,7 @@
             <span class="font-normal">{{ isProductPro ? $t('license.pro') : $t('license.community') }}</span>
         </el-button>
         <span v-if="isSupported" class="version" @click="copy(version)">
-            {{ copied ? '复制成功' : version }}
+            {{ copied ? $t('commons.msg.copySuccess') : version }}
         </span>
         <span class="version" v-else>{{ version }}</span>
         <el-badge is-dot style="margin-top: -3px" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
