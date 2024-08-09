@@ -2132,6 +2132,8 @@ const message = {
         enableSSLHelper: 'Failure to enable will not affect the creation of the website',
         batchAdd: 'Batch Add Domains',
         generateDomain: 'Generate',
+        domainSSLHelper:
+            'Enabling SSL on a non-443 port will cause the 443 port to stop listening. If you need the 443 port to continue listening, please add the domain:443',
     },
     php: {
         short_open_tag: 'Short tag support',

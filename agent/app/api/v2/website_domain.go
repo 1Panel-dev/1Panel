@@ -71,3 +71,25 @@ func (b *BaseApi) GetWebDomains(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, list)
 }
+
+// 写一个 update website domain 的接口
+// @Tags Website Domain
+// @Summary Update website domain
+// @Description 更新网站域名
+// @Accept json
+// @Param request body request.WebsiteDomainUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/domains/update [post]
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"website_domains","output_column":"domain","output_value":"domain"}],"formatZH":"更新域名 [domain]","formatEN":"Update domain [domain]"}
+func (b *BaseApi) UpdateWebDomain(c *gin.Context) {
+	var req request.WebsiteDomainUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteService.UpdateWebsiteDomain(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}

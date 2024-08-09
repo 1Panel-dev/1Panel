@@ -123,11 +123,17 @@ export namespace Website {
         port: number;
         id: number;
         domain: string;
+        ssl: boolean;
     }
 
     export interface DomainCreate {
         websiteID: number;
         domains: SubDomain[];
+    }
+
+    export interface DomainUpdate {
+        id: number;
+        ssl: boolean;
     }
 
     interface SubDomain {

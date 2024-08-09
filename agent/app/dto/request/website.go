@@ -127,10 +127,15 @@ type WebsiteDomainCreate struct {
 	Domains   []WebsiteDomain `json:"domains" validate:"required"`
 }
 
+type WebsiteDomainUpdate struct {
+	ID  uint `json:"id" validate:"required"`
+	SSL bool `json:"ssl"`
+}
+
 type WebsiteDomain struct {
 	Domain string `json:"domain" validate:"required"`
 	Port   int    `json:"port"`
-	SSL    bool   `json:"SSL"`
+	SSL    bool   `json:"ssl"`
 }
 
 type WebsiteDomainDelete struct {

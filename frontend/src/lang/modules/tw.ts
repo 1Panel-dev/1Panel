@@ -1982,6 +1982,7 @@ const message = {
         enableSSLHelper: '開啟失敗不會影響網站創建',
         batchAdd: '批量添加域名',
         generateDomain: '生成',
+        domainSSLHelper: '非 443 端口開啟 SSL 會導致 443 端口移除監聽，如需 443 端口繼續監聽，請添加域名:443',
     },
     php: {
         short_open_tag: '短標簽支持',
