@@ -67,6 +67,7 @@ type IWebsiteService interface {
 	CreateWebsiteDomain(create request.WebsiteDomainCreate) ([]model.WebsiteDomain, error)
 	GetWebsiteDomain(websiteId uint) ([]model.WebsiteDomain, error)
 	DeleteWebsiteDomain(domainId uint) error
+	UpdateWebsiteDomain(req request.WebsiteDomainUpdate) error
 
 	GetNginxConfigByScope(req request.NginxScopeReq) (*response.WebsiteNginxConfig, error)
 	UpdateNginxConfigByScope(req request.NginxConfigUpdate) error
@@ -594,6 +595,42 @@ func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 	return nil
 }
 
+func (w WebsiteService) UpdateWebsiteDomain(req request.WebsiteDomainUpdate) error {
+	domain, err := websiteDomainRepo.GetFirst(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	domain.SSL = req.SSL
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(domain.WebsiteID))
+	if err != nil {
+		return err
+	}
+	if website.Protocol == constant.ProtocolHTTPS {
+		nginxFull, err := getNginxFull(&website)
+		if err != nil {
+			return nil
+		}
+		nginxConfig := nginxFull.SiteConfig
+		config := nginxFull.SiteConfig.Config
+		server := config.FindServers()[0]
+		var params []string
+		if domain.SSL {
+			params = append(params, "ssl", "http2")
+		}
+		server.UpdateListen(strconv.Itoa(domain.Port), false, params...)
+		if website.IPV6 {
+			server.UpdateListen("[::]:"+strconv.Itoa(domain.Port), false, params...)
+		}
+		if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+			return err
+		}
+		if err = nginxCheckAndReload(nginxConfig.OldContent, nginxConfig.FilePath, nginxFull.Install.ContainerName); err != nil {
+			return err
+		}
+	}
+	return websiteDomainRepo.Save(context.TODO(), &domain)
+}
+
 func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) ([]model.WebsiteDomain, error) {
 	var (
 		domainModels []model.WebsiteDomain
@@ -929,17 +966,25 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 	if !req.Enable {
 		website.Protocol = constant.ProtocolHTTP
 		website.WebsiteSSLID = 0
-		//httpsPort := req.HttpsPort
-		//if len(httpsPort) == 0 {
-		//	_, httpsPort, err = getAppInstallPort(constant.AppOpenresty)
-		//	if err != nil {
-		//		return nil, err
-		//	}
-		//}
-		//httpsPortStr := strconv.Itoa(httpsPort)
-		//if err = deleteListenAndServerName(website, []string{httpsPortStr, "[::]:" + httpsPortStr}, []string{}); err != nil {
-		//	return nil, err
-		//}
+
+		httpsPorts, err := getHttpsPort(&website)
+		if err != nil {
+			return nil, err
+		}
+		if len(httpsPorts) == 1 && httpsPorts[0] == nginxInstall.HttpsPort {
+			httpsPortStr := strconv.Itoa(httpsPorts[0])
+			if err = deleteListenAndServerName(website, []string{httpsPortStr, "[::]:" + httpsPortStr}, []string{}); err != nil {
+				return nil, err
+			}
+		} else {
+			for _, port := range httpsPorts {
+				httpsPortStr := strconv.Itoa(port)
+				if err = removeSSLListen(website, []string{httpsPortStr}); err != nil {
+					return nil, err
+				}
+			}
+		}
+
 		nginxParams := getNginxParamsFromStaticFile(dto.SSL, nil)
 		nginxParams = append(nginxParams,
 			dto.NginxParam{

@@ -2,6 +2,7 @@
     <ComplexTable :data="data" @search="search" v-loading="loading" :heightDiff="400">
         <template #toolbar>
             <el-button type="primary" plain @click="openCreate">{{ $t('website.addDomain') }}</el-button>
+            <el-text type="info" class="!ml-2">{{ $t('website.domainSSLHelper') }}</el-text>
         </template>
         <el-table-column width="30px">
             <template #default="{ row }">
@@ -10,6 +11,11 @@
         </el-table-column>
         <el-table-column :label="$t('website.domain')" prop="domain"></el-table-column>
         <el-table-column :label="$t('commons.table.port')" prop="port"></el-table-column>
+        <el-table-column :label="'SSL'" prop="ssl">
+            <template #default="{ row }">
+                <el-switch v-model="row.ssl" @change="update(row)" :disabled="row.port == 80" />
+            </template>
+        </el-table-column>
         <fu-table-operations
             :ellipsis="1"
             :buttons="buttons"
@@ -25,12 +31,13 @@
 <script lang="ts" setup>
 import Domain from './create/index.vue';
 import { Website } from '@/api/interface/website';
-import { DeleteDomain, GetWebsite, ListDomains } from '@/api/modules/website';
+import { DeleteDomain, GetWebsite, ListDomains, UpdateDomain } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
 import i18n from '@/lang';
 import { Promotion } from '@element-plus/icons-vue';
 import { GlobalStore } from '@/store';
 import { CheckAppInstalled } from '@/api/modules/app';
+import { MsgSuccess } from '@/utils/message';
 const globalStore = GlobalStore();
 
 const props = defineProps({
@@ -124,6 +131,16 @@ const onCheck = async () => {
             httpsPort.value = res.data.httpsPort;
         })
         .catch(() => {});
+};
+
+const update = async (row: Website.Domain) => {
+    try {
+        await UpdateDomain({
+            id: row.id,
+            ssl: row.ssl,
+        });
+        MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+    } catch {}
 };
 
 onMounted(() => {

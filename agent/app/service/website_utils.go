@@ -460,7 +460,7 @@ func addListenAndServerName(website model.Website, domains []model.WebsiteDomain
 		if website.Protocol == constant.ProtocolHTTPS && domain.SSL {
 			params = append(params, "ssl", "http2")
 		}
-		server.AddListen(strconv.Itoa(domain.Port), false, params...)
+		server.UpdateListen(strconv.Itoa(domain.Port), false, params...)
 		if website.IPV6 {
 			server.UpdateListen("[::]:"+strconv.Itoa(domain.Port), false, params...)
 		}
@@ -489,6 +489,26 @@ func deleteListenAndServerName(website model.Website, binds []string, domains []
 		server.DeleteServerName(domain)
 	}
 
+	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+		return err
+	}
+	return nginxCheckAndReload(nginxConfig.OldContent, nginxConfig.FilePath, nginxFull.Install.ContainerName)
+}
+
+func removeSSLListen(website model.Website, binds []string) error {
+	nginxFull, err := getNginxFull(&website)
+	if err != nil {
+		return nil
+	}
+	nginxConfig := nginxFull.SiteConfig
+	config := nginxFull.SiteConfig.Config
+	server := config.FindServers()[0]
+	for _, bind := range binds {
+		server.UpdateListen(bind, false)
+		if website.IPV6 {
+			server.UpdateListen("[::]:"+bind, false)
+		}
+	}
 	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return err
 	}
