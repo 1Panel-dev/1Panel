@@ -393,6 +393,7 @@ export namespace Website {
         content?: string;
         proxyAddress?: string;
         proxyProtocol?: string;
+        sni?: boolean;
     }
 
     export interface ProxReplace {
@@ -425,6 +426,18 @@ export namespace Website {
         username: string;
         password: string;
         remark: string;
+        scope: string;
+        path?: '';
+        name?: '';
+    }
+
+    export interface NginxPathAuthConfig {
+        websiteID: number;
+        operate: string;
+        path: string;
+        username: string;
+        password: string;
+        name: string;
     }
 
     export interface LeechConfig {

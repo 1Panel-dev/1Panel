@@ -1912,7 +1912,6 @@ const message = {
         proxyHelper1: '訪問這個目錄時將會把目標URL的內容返回並顯示',
         proxyPassHelper: '代理的站點，必須為可正常訪問的URL',
         proxyHostHelper: '將域名添加到請求頭傳遞到代理服務器',
-        replacementHelper: '最多可以添加5條替換內容,如果不需要替換請留空',
         modifier: '匹配規則',
         modifierHelper: '例：= 精確匹配，~ 正則匹配，^~ 匹配路徑開頭 等',
         replace: '文本替換',
@@ -1983,6 +1982,7 @@ const message = {
         batchAdd: '批量添加域名',
         generateDomain: '生成',
         domainSSLHelper: '非 443 端口開啟 SSL 會導致 443 端口移除監聽，如需 443 端口繼續監聽，請添加域名:443',
+        global: '全局',
     },
     php: {
         short_open_tag: '短標簽支持',

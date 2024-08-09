@@ -89,16 +89,22 @@ type IWebsiteService interface {
 	LoadWebsiteDirConfig(req request.WebsiteCommonReq) (*response.WebsiteDirConfig, error)
 	UpdateSiteDir(req request.WebsiteUpdateDir) error
 	UpdateSitePermission(req request.WebsiteUpdateDirPermission) error
+
 	OperateProxy(req request.WebsiteProxyConfig) (err error)
 	GetProxies(id uint) (res []request.WebsiteProxyConfig, err error)
 	UpdateProxyFile(req request.NginxProxyUpdate) (err error)
-	GetAuthBasics(req request.NginxAuthReq) (res response.NginxAuthRes, err error)
-	UpdateAuthBasic(req request.NginxAuthUpdate) (err error)
+
 	GetAntiLeech(id uint) (*response.NginxAntiLeechRes, error)
 	UpdateAntiLeech(req request.NginxAntiLeechUpdate) (err error)
+
 	OperateRedirect(req request.NginxRedirectReq) (err error)
 	GetRedirect(id uint) (res []response.NginxRedirectConfig, err error)
 	UpdateRedirectFile(req request.NginxRedirectUpdate) (err error)
+
+	GetAuthBasics(req request.NginxAuthReq) (res response.NginxAuthRes, err error)
+	UpdateAuthBasic(req request.NginxAuthUpdate) (err error)
+	GetPathAuthBasics(req request.NginxAuthReq) (res []response.NginxPathAuthRes, err error)
+	UpdatePathAuthBasic(req request.NginxPathAuthUpdate) error
 
 	UpdateDefaultHtml(req request.WebsiteHtmlUpdate) error
 	GetDefaultHtml(resourceType string) (*response.WebsiteHtmlRes, error)
@@ -1935,6 +1941,50 @@ func (w WebsiteService) UpdateProxyFile(req request.NginxProxyUpdate) (err error
 	return updateNginxConfig(constant.NginxScopeServer, nil, &website)
 }
 
+func (w WebsiteService) GetAuthBasics(req request.NginxAuthReq) (res response.NginxAuthRes, err error) {
+	var (
+		website      model.Website
+		nginxInstall model.AppInstall
+		authContent  []byte
+		nginxParams  []response.NginxParam
+	)
+	website, err = websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	if err != nil {
+		return
+	}
+	nginxInstall, err = getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return
+	}
+	authPath := fmt.Sprintf("/www/sites/%s/auth_basic/auth.pass", website.Alias)
+	absoluteAuthPath := path.Join(nginxInstall.GetPath(), authPath)
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(absoluteAuthPath) {
+		return
+	}
+	nginxParams, err = getNginxParamsByKeys(constant.NginxScopeServer, []string{"auth_basic"}, &website)
+	if err != nil {
+		return
+	}
+	res.Enable = len(nginxParams[0].Params) > 0
+	authContent, err = fileOp.GetContent(absoluteAuthPath)
+	authArray := strings.Split(string(authContent), "\n")
+	for _, line := range authArray {
+		if line == "" {
+			continue
+		}
+		params := strings.Split(line, ":")
+		auth := dto.NginxAuth{
+			Username: params[0],
+		}
+		if len(params) == 3 {
+			auth.Remark = params[2]
+		}
+		res.Items = append(res.Items, auth)
+	}
+	return
+}
+
 func (w WebsiteService) UpdateAuthBasic(req request.NginxAuthUpdate) (err error) {
 	var (
 		website      model.Website
@@ -2064,12 +2114,11 @@ func (w WebsiteService) UpdateAuthBasic(req request.NginxAuthUpdate) (err error)
 	return
 }
 
-func (w WebsiteService) GetAuthBasics(req request.NginxAuthReq) (res response.NginxAuthRes, err error) {
+func (w WebsiteService) GetPathAuthBasics(req request.NginxAuthReq) (res []response.NginxPathAuthRes, err error) {
 	var (
 		website      model.Website
 		nginxInstall model.AppInstall
 		authContent  []byte
-		nginxParams  []response.NginxParam
 	)
 	website, err = websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
 	if err != nil {
@@ -2079,33 +2128,125 @@ func (w WebsiteService) GetAuthBasics(req request.NginxAuthReq) (res response.Ng
 	if err != nil {
 		return
 	}
-	authPath := fmt.Sprintf("/www/sites/%s/auth_basic/auth.pass", website.Alias)
-	absoluteAuthPath := path.Join(nginxInstall.GetPath(), authPath)
 	fileOp := files.NewFileOp()
-	if !fileOp.Stat(absoluteAuthPath) {
+	authDir := fmt.Sprintf("/www/sites/%s/path_auth", website.Alias)
+	absoluteAuthDir := path.Join(nginxInstall.GetPath(), authDir)
+	passDir := path.Join(absoluteAuthDir, "pass")
+	if !fileOp.Stat(absoluteAuthDir) || !fileOp.Stat(passDir) {
 		return
 	}
-	nginxParams, err = getNginxParamsByKeys(constant.NginxScopeServer, []string{"auth_basic"}, &website)
+
+	entries, err := os.ReadDir(absoluteAuthDir)
 	if err != nil {
-		return
+		return nil, err
 	}
-	res.Enable = len(nginxParams[0].Params) > 0
-	authContent, err = fileOp.GetContent(absoluteAuthPath)
-	authArray := strings.Split(string(authContent), "\n")
-	for _, line := range authArray {
-		if line == "" {
-			continue
+
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			name := strings.TrimSuffix(entry.Name(), ".conf")
+			pathAuth := dto.NginxPathAuth{
+				Name: name,
+			}
+			configPath := path.Join(absoluteAuthDir, entry.Name())
+			content, err := fileOp.GetContent(configPath)
+			if err != nil {
+				return nil, err
+			}
+			config, err := parser.NewStringParser(string(content)).Parse()
+			if err != nil {
+				return nil, err
+			}
+			directives := config.Directives
+			location, _ := directives[0].(*components.Location)
+			pathAuth.Path = location.Match
+			passPath := path.Join(passDir, fmt.Sprintf("%s.pass", name))
+			authContent, err = fileOp.GetContent(passPath)
+			authArray := strings.Split(string(authContent), "\n")
+			for _, line := range authArray {
+				if line == "" {
+					continue
+				}
+				params := strings.Split(line, ":")
+				pathAuth.Username = params[0]
+				if len(params) == 3 {
+					pathAuth.Remark = params[2]
+				}
+			}
+			res = append(res, response.NginxPathAuthRes{
+				NginxPathAuth: pathAuth,
+			})
 		}
-		params := strings.Split(line, ":")
-		auth := dto.NginxAuth{
-			Username: params[0],
-		}
-		if len(params) == 3 {
-			auth.Remark = params[2]
-		}
-		res.Items = append(res.Items, auth)
 	}
 	return
+}
+
+func (w WebsiteService) UpdatePathAuthBasic(req request.NginxPathAuthUpdate) error {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	if err != nil {
+		return err
+	}
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return err
+	}
+	fileOp := files.NewFileOp()
+	authDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "path_auth")
+	if !fileOp.Stat(authDir) {
+		_ = fileOp.CreateDir(authDir, 0755)
+	}
+	passDir := path.Join(authDir, "pass")
+	if !fileOp.Stat(passDir) {
+		_ = fileOp.CreateDir(passDir, 0755)
+	}
+	confPath := path.Join(authDir, fmt.Sprintf("%s.conf", req.Name))
+	passPath := path.Join(passDir, fmt.Sprintf("%s.pass", req.Name))
+	var config *components.Config
+	switch req.Operate {
+	case "delete":
+		_ = fileOp.DeleteFile(confPath)
+		_ = fileOp.DeleteFile(passPath)
+		return updateNginxConfig(constant.NginxScopeServer, nil, &website)
+	case "create":
+		config, err = parser.NewStringParser(string(nginx_conf.PathAuth)).Parse()
+		if err != nil {
+			return err
+		}
+		if fileOp.Stat(confPath) || fileOp.Stat(passPath) {
+			return buserr.New(constant.ErrNameIsExist)
+		}
+	case "edit":
+		par, err := parser.NewParser(confPath)
+		if err != nil {
+			return err
+		}
+		config, err = par.Parse()
+		if err != nil {
+			return err
+		}
+	}
+	config.FilePath = confPath
+	directives := config.Directives
+	location, _ := directives[0].(*components.Location)
+	location.UpdateDirective("auth_basic_user_file", []string{fmt.Sprintf("/www/sites/%s/path_auth/pass/%s", website.Alias, fmt.Sprintf("%s.pass", req.Name))})
+	location.ChangePath("~*", req.Path)
+	var passwdHash []byte
+	passwdHash, err = bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	line := fmt.Sprintf("%s:%s\n", req.Username, passwdHash)
+	if req.Remark != "" {
+		line = fmt.Sprintf("%s:%s:%s\n", req.Username, passwdHash, req.Remark)
+	}
+	_ = fileOp.SaveFile(passPath, line, 0644)
+	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+		return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
+	}
+	nginxInclude := fmt.Sprintf("/www/sites/%s/path_auth/*.conf", website.Alias)
+	if err = updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: "include", Params: []string{nginxInclude}}}, &website); err != nil {
+		return nil
+	}
+	return nil
 }
 
 func (w WebsiteService) UpdateAntiLeech(req request.NginxAntiLeechUpdate) (err error) {

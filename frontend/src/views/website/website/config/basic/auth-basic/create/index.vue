@@ -20,8 +20,17 @@
                     />
                 </el-form-item>
                 <el-form ref="proxyForm" label-position="top" :model="authBasic" :rules="rules">
+                    <el-form-item :label="$t('commons.table.name')" prop="name" v-if="authBasic.scope != 'root'">
+                        <el-input v-model.trim="authBasic.name" :disabled="authBasic.operate === 'edit'"></el-input>
+                    </el-form-item>
+                    <el-form-item :label="$t('website.path')" prop="path" v-if="authBasic.scope != 'root'">
+                        <el-input v-model.trim="authBasic.path" :disabled="authBasic.operate === 'edit'"></el-input>
+                    </el-form-item>
                     <el-form-item :label="$t('commons.login.username')" prop="username">
-                        <el-input v-model.trim="authBasic.username" :disabled="authBasic.operate === 'edit'"></el-input>
+                        <el-input
+                            v-model.trim="authBasic.username"
+                            :disabled="authBasic.scope == 'root' && authBasic.operate === 'edit'"
+                        ></el-input>
                     </el-form-item>
                     <el-form-item :label="$t('commons.login.password')" prop="password">
                         <el-input type="password" clearable show-password v-model.trim="authBasic.password">
@@ -51,7 +60,7 @@
 
 <script lang="ts" setup>
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { OperateAuthConfig } from '@/api/modules/website';
+import { OperateAuthConfig, OperatePathAuthConfig } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
@@ -64,6 +73,8 @@ const proxyForm = ref<FormInstance>();
 const rules = ref({
     username: [Rules.requiredInput, Rules.name],
     password: [Rules.requiredInput],
+    name: [Rules.requiredInput],
+    path: [Rules.requiredInput],
 });
 const open = ref(false);
 const loading = ref(false);
@@ -74,6 +85,8 @@ const initData = (): Website.NginxAuthConfig => ({
     username: '',
     password: '',
     remark: '',
+    scope: 'root',
+    path: '',
 });
 
 let authBasic = ref(initData());
@@ -95,23 +108,36 @@ const acceptParams = (proxyParam: Website.NginxAuthConfig) => {
 
 const submit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
-    await formEl.validate((valid) => {
+    await formEl.validate(async (valid) => {
         if (!valid) {
             return;
         }
         loading.value = true;
-        OperateAuthConfig(authBasic.value)
-            .then(() => {
-                if (authBasic.value.operate == 'create') {
-                    MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
-                } else {
-                    MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
-                }
-                handleClose();
-            })
-            .finally(() => {
-                loading.value = false;
-            });
+        try {
+            if (authBasic.value.scope == 'root') {
+                await OperateAuthConfig(authBasic.value);
+            } else {
+                const req = {
+                    websiteID: authBasic.value.websiteID,
+                    path: authBasic.value.path,
+                    name: authBasic.value.name,
+                    username: authBasic.value.username,
+                    password: authBasic.value.password,
+                    operate: authBasic.value.operate,
+                    remark: authBasic.value.remark,
+                };
+                await OperatePathAuthConfig(req);
+            }
+            if (authBasic.value.operate == 'create') {
+                MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
+            } else {
+                MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+            }
+            handleClose();
+        } catch (error) {
+        } finally {
+            loading.value = false;
+        }
     });
 };
 

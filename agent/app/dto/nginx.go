@@ -33,6 +33,13 @@ type NginxAuth struct {
 	Remark   string `json:"remark"`
 }
 
+type NginxPathAuth struct {
+	Username string `json:"username"`
+	Remark   string `json:"remark"`
+	Path     string `json:"path"`
+	Name     string `json:"name"`
+}
+
 type NginxKey string
 
 const (

@@ -2056,7 +2056,6 @@ const message = {
         proxyHelper1: 'When accessing this directory, the content of the target URL will be returned and displayed',
         proxyPassHelper: 'The proxied site must be a valid and accessible URL',
         proxyHostHelper: 'Pass the domain name in the request header to the proxy server',
-        replacementHelper: 'Up to 5 replacements can be added, please leave blank if no replacement is required',
         modifier: 'Matching Rules',
         modifierHelper: 'Example: = exact match, ~ regular match, ^~ match the beginning of the path, etc',
         replace: 'Text Replacement',
@@ -2134,6 +2133,7 @@ const message = {
         generateDomain: 'Generate',
         domainSSLHelper:
             'Enabling SSL on a non-443 port will cause the 443 port to stop listening. If you need the 443 port to continue listening, please add the domain:443',
+        global: 'Global',
     },
     php: {
         short_open_tag: 'Short tag support',
