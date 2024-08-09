@@ -15,6 +15,4 @@ type System struct {
 	Version    string `mapstructure:"version"`
 	IsDemo     bool   `mapstructure:"is_demo"`
 	AppRepo    string `mapstructure:"app_repo"`
-	OneDriveID string `mapstructure:"one_drive_id"`
-	OneDriveSc string `mapstructure:"one_drive_sc"`
 }

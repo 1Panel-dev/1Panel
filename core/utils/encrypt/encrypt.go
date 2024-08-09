@@ -5,6 +5,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"encoding/base32"
 	"encoding/base64"
 	"fmt"
 	"io"
@@ -12,6 +13,26 @@ import (
 	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/global"
 )
+
+func StringEncryptWithBase64(text string) (string, error) {
+	base64Item, err := base64.StdEncoding.DecodeString(text)
+	if err != nil {
+		return "", err
+	}
+	encryptItem, err := StringEncrypt(string(base64Item))
+	if err != nil {
+		return "", err
+	}
+	return encryptItem, nil
+}
+
+func StringDecryptWithBase64(text string) (string, error) {
+	decryptItem, err := StringDecrypt(text)
+	if err != nil {
+		return "", err
+	}
+	return base32.StdEncoding.EncodeToString([]byte(decryptItem)), nil
+}
 
 func StringEncrypt(text string) (string, error) {
 	if len(text) == 0 {

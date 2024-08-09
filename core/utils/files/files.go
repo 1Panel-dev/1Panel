@@ -17,14 +17,14 @@ import (
 	httpUtil "github.com/1Panel-dev/1Panel/core/utils/http"
 )
 
-func CopyFile(src, dst string) error {
+func CopyFile(src, dst string, withName bool) error {
 	source, err := os.Open(src)
 	if err != nil {
 		return err
 	}
 	defer source.Close()
 
-	if path.Base(src) != path.Base(dst) {
+	if path.Base(src) != path.Base(dst) && !withName {
 		dst = path.Join(dst, path.Base(src))
 	}
 	if _, err := os.Stat(path.Dir(dst)); err != nil {

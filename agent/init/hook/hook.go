@@ -1,7 +1,6 @@
 package hook
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"os"
 	"path"
@@ -15,25 +14,17 @@ import (
 
 func Init() {
 	settingRepo := repo.NewISettingRepo()
-	OneDriveID, err := settingRepo.Get(settingRepo.WithByKey("OneDriveID"))
-	if err != nil {
-		global.LOG.Errorf("load onedrive info from setting failed, err: %v", err)
-	}
-	idItem, _ := base64.StdEncoding.DecodeString(OneDriveID.Value)
-	global.CONF.System.OneDriveID = string(idItem)
-	OneDriveSc, err := settingRepo.Get(settingRepo.WithByKey("OneDriveSc"))
-	if err != nil {
-		global.LOG.Errorf("load onedrive info from setting failed, err: %v", err)
-	}
-	scItem, _ := base64.StdEncoding.DecodeString(OneDriveSc.Value)
-	global.CONF.System.OneDriveSc = string(scItem)
-
 	if _, err := settingRepo.Get(settingRepo.WithByKey("SystemStatus")); err != nil {
 		_ = settingRepo.Create("SystemStatus", "Free")
 	}
 	if err := settingRepo.Update("SystemStatus", "Free"); err != nil {
 		global.LOG.Fatalf("init service before start failed, err: %v", err)
 	}
+	node, err := settingRepo.Get(settingRepo.WithByKey("CurrentNode"))
+	if err != nil {
+		global.LOG.Fatalf("load current node before start failed, err: %v", err)
+	}
+	global.CurrentNode = node.Value
 
 	handleCronjobStatus()
 	handleSnapStatus()

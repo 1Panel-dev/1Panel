@@ -45,21 +45,26 @@ var restoreCmd = &cobra.Command{
 		tmpPath = path.Join(upgradeDir, tmpPath, "original")
 		fmt.Printf("(0/4) 开始从 %s 目录回滚 1Panel 服务及数据... \n", tmpPath)
 
-		if err := files.CopyFile(path.Join(tmpPath, "1panel"), "/usr/local/bin"); err != nil {
+		if err := files.CopyFile(path.Join(tmpPath, "1panel"), "/usr/local/bin", false); err != nil {
 			return err
 		}
 		fmt.Println("(1/4) 1panel 二进制回滚成功")
-		if err := files.CopyFile(path.Join(tmpPath, "1pctl"), "/usr/local/bin"); err != nil {
+		if err := files.CopyFile(path.Join(tmpPath, "1pctl"), "/usr/local/bin", false); err != nil {
 			return err
 		}
 		fmt.Println("(2/4) 1panel 脚本回滚成功")
-		if err := files.CopyFile(path.Join(tmpPath, "1panel.service"), "/etc/systemd/system"); err != nil {
+		if err := files.CopyFile(path.Join(tmpPath, "1panel.service"), "/etc/systemd/system", false); err != nil {
 			return err
 		}
 		fmt.Println("(3/4) 1panel 服务回滚成功")
 		checkPointOfWal()
-		if _, err := os.Stat(path.Join(tmpPath, "1Panel.db")); err == nil {
-			if err := files.CopyFile(path.Join(tmpPath, "1Panel.db"), path.Join(baseDir, "1panel/db")); err != nil {
+		if _, err := os.Stat(path.Join(tmpPath, "core.db")); err == nil {
+			if err := files.CopyFile(path.Join(tmpPath, "core.db"), path.Join(baseDir, "core/db"), false); err != nil {
+				return err
+			}
+		}
+		if _, err := os.Stat(path.Join(tmpPath, "agent.db")); err == nil {
+			if err := files.CopyFile(path.Join(tmpPath, "agent.db"), path.Join(baseDir, "1panel/db"), false); err != nil {
 				return err
 			}
 		}

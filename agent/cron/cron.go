@@ -50,13 +50,6 @@ func Run() {
 		global.LOG.Errorf("can not add  cache corn job: %s", err.Error())
 	}
 
-	var backup model.BackupAccount
-	_ = global.DB.Where("type = ?", "OneDrive").Find(&backup).Error
-	if backup.ID != 0 {
-		service.StartRefreshOneDriveToken()
-	}
-	global.Cron.Start()
-
 	var cronJobs []model.Cronjob
 	if err := global.DB.Where("status = ?", constant.StatusEnable).Find(&cronJobs).Error; err != nil {
 		global.LOG.Errorf("start my cronjob failed, err: %v", err)

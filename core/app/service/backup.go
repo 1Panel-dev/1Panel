@@ -17,7 +17,9 @@ import (
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/cloud_storage"
 	"github.com/1Panel-dev/1Panel/core/utils/cloud_storage/client"
+	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
 	fileUtils "github.com/1Panel-dev/1Panel/core/utils/files"
+	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 	"github.com/robfig/cron/v3"
@@ -113,6 +115,16 @@ func (u *BackupService) Create(req dto.BackupOperate) error {
 	if err := copier.Copy(&backup, &req); err != nil {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
+	itemAccessKey, err := base64.StdEncoding.DecodeString(backup.AccessKey)
+	if err != nil {
+		return err
+	}
+	backup.AccessKey = string(itemAccessKey)
+	itemCredential, err := base64.StdEncoding.DecodeString(backup.Credential)
+	if err != nil {
+		return err
+	}
+	backup.Credential = string(itemCredential)
 
 	if req.Type == constant.OneDrive {
 		if err := u.loadAccessToken(&backup); err != nil {
@@ -129,26 +141,49 @@ func (u *BackupService) Create(req dto.BackupOperate) error {
 			return err
 		}
 	}
+	if err := xpack.SyncBackupOperation("add", []model.BackupAccount{backup}); err != nil {
+		return err
+	}
+
+	backup.AccessKey, err = encrypt.StringEncrypt(backup.AccessKey)
+	if err != nil {
+		return err
+	}
+	backup.Credential, err = encrypt.StringEncrypt(backup.Credential)
+	if err != nil {
+		return err
+	}
 	if err := backupRepo.Create(&backup); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (u *BackupService) GetBuckets(backupDto dto.ForBuckets) ([]interface{}, error) {
-	varMap := make(map[string]interface{})
-	if err := json.Unmarshal([]byte(backupDto.Vars), &varMap); err != nil {
+func (u *BackupService) GetBuckets(req dto.ForBuckets) ([]interface{}, error) {
+	itemAccessKey, err := base64.StdEncoding.DecodeString(req.AccessKey)
+	if err != nil {
 		return nil, err
 	}
-	switch backupDto.Type {
-	case constant.Sftp, constant.WebDAV:
-		varMap["username"] = backupDto.AccessKey
-		varMap["password"] = backupDto.Credential
-	case constant.OSS, constant.S3, constant.MinIo, constant.Cos, constant.Kodo:
-		varMap["accessKey"] = backupDto.AccessKey
-		varMap["secretKey"] = backupDto.Credential
+	req.AccessKey = string(itemAccessKey)
+	itemCredential, err := base64.StdEncoding.DecodeString(req.Credential)
+	if err != nil {
+		return nil, err
 	}
-	client, err := cloud_storage.NewCloudStorageClient(backupDto.Type, varMap)
+	req.Credential = string(itemCredential)
+
+	varMap := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(req.Vars), &varMap); err != nil {
+		return nil, err
+	}
+	switch req.Type {
+	case constant.Sftp, constant.WebDAV:
+		varMap["username"] = req.AccessKey
+		varMap["password"] = req.Credential
+	case constant.OSS, constant.S3, constant.MinIo, constant.Cos, constant.Kodo:
+		varMap["accessKey"] = req.AccessKey
+		varMap["secretKey"] = req.Credential
+	}
+	client, err := cloud_storage.NewCloudStorageClient(req.Type, varMap)
 	if err != nil {
 		return nil, err
 	}
@@ -169,70 +204,80 @@ func (u *BackupService) Delete(id uint) error {
 	if backup.Type == constant.OneDrive {
 		global.Cron.Remove(cron.EntryID(backup.EntryID))
 	}
+
+	if err := xpack.SyncBackupOperation("remove", []model.BackupAccount{backup}); err != nil {
+		return err
+	}
 	return backupRepo.Delete(commonRepo.WithByID(id))
 }
 
 func (u *BackupService) Update(req dto.BackupOperate) error {
-	backup, err := backupRepo.Get(commonRepo.WithByID(req.ID))
-	if err != nil {
+	backup, _ := backupRepo.Get(commonRepo.WithByID(req.ID))
+	if backup.ID == 0 {
 		return constant.ErrRecordNotFound
 	}
-	varMap := make(map[string]interface{})
-	if err := json.Unmarshal([]byte(req.Vars), &varMap); err != nil {
-		return err
+	var newBackup model.BackupAccount
+	if err := copier.Copy(&newBackup, &req); err != nil {
+		return errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
-
-	oldVars := backup.Vars
-	oldDir, err := loadLocalDir()
+	itemAccessKey, err := base64.StdEncoding.DecodeString(newBackup.AccessKey)
 	if err != nil {
 		return err
 	}
-	upMap := make(map[string]interface{})
-	upMap["bucket"] = req.Bucket
-	upMap["access_key"] = req.AccessKey
-	upMap["credential"] = req.Credential
-	upMap["backup_path"] = req.BackupPath
-	upMap["vars"] = req.Vars
-	backup.Bucket = req.Bucket
-	backup.Vars = req.Vars
-	backup.Credential = req.Credential
-	backup.AccessKey = req.AccessKey
-	backup.BackupPath = req.BackupPath
+	newBackup.AccessKey = string(itemAccessKey)
+	itemCredential, err := base64.StdEncoding.DecodeString(newBackup.Credential)
+	if err != nil {
+		return err
+	}
+	newBackup.Credential = string(itemCredential)
+	if backup.Type == constant.Local {
+		if newBackup.Vars != backup.Vars {
+			oldPath, err := loadLocalDirByStr(backup.Vars)
+			if err != nil {
+				return err
+			}
+			newPath, err := loadLocalDirByStr(newBackup.Vars)
+			if err != nil {
+				return err
+			}
+			if strings.HasSuffix(newPath, "/") && newPath != "/" {
+				newPath = newPath[:strings.LastIndex(newPath, "/")]
+			}
+			if err := copyDir(oldPath, newPath); err != nil {
+				return err
+			}
+			global.CONF.System.BackupDir = newPath
+		}
+	}
 
-	if req.Type == constant.OneDrive {
+	if newBackup.Type == constant.OneDrive {
 		global.Cron.Remove(cron.EntryID(backup.EntryID))
 		if err := u.loadAccessToken(&backup); err != nil {
 			return err
 		}
-		upMap["credential"] = backup.Credential
-		upMap["vars"] = backup.Vars
-		if err := StartRefreshOneDriveToken(&backup); err != nil {
-			return err
-		}
-		upMap["entry_id"] = backup.EntryID
 	}
 	if backup.Type != "LOCAL" {
-		isOk, err := u.checkBackupConn(&backup)
+		isOk, err := u.checkBackupConn(&newBackup)
 		if err != nil || !isOk {
 			return buserr.WithMap("ErrBackupCheck", map[string]interface{}{"err": err.Error()}, err)
 		}
 	}
 
-	if err := backupRepo.Update(req.ID, upMap); err != nil {
+	if err := xpack.SyncBackupOperation("update", []model.BackupAccount{newBackup}); err != nil {
 		return err
 	}
-	if backup.Type == "LOCAL" {
-		if dir, ok := varMap["dir"]; ok {
-			if dirStr, isStr := dir.(string); isStr {
-				if strings.HasSuffix(dirStr, "/") && dirStr != "/" {
-					dirStr = dirStr[:strings.LastIndex(dirStr, "/")]
-				}
-				if err := copyDir(oldDir, dirStr); err != nil {
-					_ = backupRepo.Update(req.ID, map[string]interface{}{"vars": oldVars})
-					return err
-				}
-			}
-		}
+
+	newBackup.AccessKey, err = encrypt.StringEncrypt(newBackup.AccessKey)
+	if err != nil {
+		return err
+	}
+	newBackup.Credential, err = encrypt.StringEncrypt(newBackup.Credential)
+	if err != nil {
+		return err
+	}
+	newBackup.ID = backup.ID
+	if err := backupRepo.Save(&newBackup); err != nil {
+		return err
 	}
 	return nil
 }
@@ -281,13 +326,9 @@ func (u *BackupService) loadAccessToken(backup *model.BackupAccount) error {
 	return nil
 }
 
-func loadLocalDir() (string, error) {
-	backup, err := backupRepo.Get(commonRepo.WithByType("LOCAL"))
-	if err != nil {
-		return "", err
-	}
+func loadLocalDirByStr(vars string) (string, error) {
 	varMap := make(map[string]interface{})
-	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
+	if err := json.Unmarshal([]byte(vars), &varMap); err != nil {
 		return "", err
 	}
 	if _, ok := varMap["dir"]; !ok {
@@ -300,7 +341,6 @@ func loadLocalDir() (string, error) {
 				return "", fmt.Errorf("mkdir %s failed, err: %v", baseDir, err)
 			}
 		}
-		return baseDir, nil
 	}
 	return "", fmt.Errorf("error type dir: %T", varMap["dir"])
 }
@@ -325,7 +365,7 @@ func copyDir(src, dst string) error {
 				global.LOG.Errorf("copy dir %s to %s failed, err: %v", srcPath, dstPath, err)
 			}
 		} else {
-			if err := fileUtils.CopyFile(srcPath, dst); err != nil {
+			if err := fileUtils.CopyFile(srcPath, dst, false); err != nil {
 				global.LOG.Errorf("copy file %s to %s failed, err: %v", srcPath, dstPath, err)
 			}
 		}

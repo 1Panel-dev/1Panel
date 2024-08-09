@@ -12,13 +12,14 @@ type BackupRepo struct{}
 
 type IBackupRepo interface {
 	Get(opts ...DBOption) (model.BackupAccount, error)
+	List(opts ...DBOption) ([]model.BackupAccount, error)
+	Create(backup []model.BackupAccount) error
+	Save(backup *model.BackupAccount) error
+	Delete(opts ...DBOption) error
+
 	ListRecord(opts ...DBOption) ([]model.BackupRecord, error)
 	PageRecord(page, size int, opts ...DBOption) (int64, []model.BackupRecord, error)
-	List(opts ...DBOption) ([]model.BackupAccount, error)
-	Create(backup *model.BackupAccount) error
 	CreateRecord(record *model.BackupRecord) error
-	Update(id uint, vars map[string]interface{}) error
-	Delete(opts ...DBOption) error
 	DeleteRecord(ctx context.Context, opts ...DBOption) error
 	UpdateRecord(record *model.BackupRecord) error
 	WithByDetailName(detailName string) DBOption
@@ -39,6 +40,10 @@ func (u *BackupRepo) Get(opts ...DBOption) (model.BackupAccount, error) {
 	}
 	err := db.First(&backup).Error
 	return backup, err
+}
+
+func (u *BackupRepo) Save(backup *model.BackupAccount) error {
+	return global.DB.Save(backup).Error
 }
 
 func (u *BackupRepo) ListRecord(opts ...DBOption) ([]model.BackupRecord, error) {
@@ -100,7 +105,7 @@ func (u *BackupRepo) List(opts ...DBOption) ([]model.BackupAccount, error) {
 	return ops, err
 }
 
-func (u *BackupRepo) Create(backup *model.BackupAccount) error {
+func (u *BackupRepo) Create(backup []model.BackupAccount) error {
 	return global.DB.Create(backup).Error
 }
 
@@ -110,10 +115,6 @@ func (u *BackupRepo) CreateRecord(record *model.BackupRecord) error {
 
 func (u *BackupRepo) UpdateRecord(record *model.BackupRecord) error {
 	return global.DB.Save(record).Error
-}
-
-func (u *BackupRepo) Update(id uint, vars map[string]interface{}) error {
-	return global.DB.Model(&model.BackupAccount{}).Where("id = ?", id).Updates(vars).Error
 }
 
 func (u *BackupRepo) Delete(opts ...DBOption) error {

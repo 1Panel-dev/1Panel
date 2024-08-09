@@ -8,6 +8,7 @@ type System struct {
 	DbCoreFile     string `mapstructure:"db_core_file"`
 	EncryptKey     string `mapstructure:"encrypt_key"`
 	BaseDir        string `mapstructure:"base_dir"`
+	BackupDir      string `mapstructure:"backup_dir"`
 	Mode           string `mapstructure:"mode"`
 	RepoUrl        string `mapstructure:"repo_url"`
 	Version        string `mapstructure:"version"`

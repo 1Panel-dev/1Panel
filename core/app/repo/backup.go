@@ -12,7 +12,7 @@ type IBackupRepo interface {
 	List(opts ...DBOption) ([]model.BackupAccount, error)
 	Page(limit, offset int, opts ...DBOption) (int64, []model.BackupAccount, error)
 	Create(backup *model.BackupAccount) error
-	Update(id uint, vars map[string]interface{}) error
+	Save(backup *model.BackupAccount) error
 	Delete(opts ...DBOption) error
 }
 
@@ -56,8 +56,8 @@ func (u *BackupRepo) Create(backup *model.BackupAccount) error {
 	return global.DB.Create(backup).Error
 }
 
-func (u *BackupRepo) Update(id uint, vars map[string]interface{}) error {
-	return global.DB.Model(&model.BackupAccount{}).Where("id = ?", id).Updates(vars).Error
+func (u *BackupRepo) Save(backup *model.BackupAccount) error {
+	return global.DB.Save(backup).Error
 }
 
 func (u *BackupRepo) Delete(opts ...DBOption) error {

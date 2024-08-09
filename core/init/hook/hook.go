@@ -1,8 +1,11 @@
 package hook
 
 import (
+	"encoding/json"
+	"os"
 	"strings"
 
+	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/cmd"
@@ -41,6 +44,7 @@ func Init() {
 	}
 
 	handleUserInfo(global.CONF.System.ChangeUserInfo, settingRepo)
+	loadLocalDir()
 }
 
 func handleUserInfo(tags string, settingRepo repo.ISettingRepo) {
@@ -79,4 +83,33 @@ func handleUserInfo(tags string, settingRepo repo.ISettingRepo) {
 
 	sudo := cmd.SudoHandleCmd()
 	_, _ = cmd.Execf("%s sed -i '/CHANGE_USER_INFO=%v/d' /usr/local/bin/1pctl", sudo, global.CONF.System.ChangeUserInfo)
+}
+
+func loadLocalDir() {
+	var backup model.BackupAccount
+	_ = global.DB.Where("type = ?", "LOCAL").First(&backup).Error
+	if backup.ID == 0 {
+		global.LOG.Errorf("no such backup account `%s` in db", "LOCAL")
+		return
+	}
+	varMap := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
+		global.LOG.Errorf("json unmarshal backup.Vars: %v failed, err: %v", backup.Vars, err)
+		return
+	}
+	if _, ok := varMap["dir"]; !ok {
+		global.LOG.Error("load local backup dir failed")
+		return
+	}
+	baseDir, ok := varMap["dir"].(string)
+	if ok {
+		if _, err := os.Stat(baseDir); err != nil && os.IsNotExist(err) {
+			if err = os.MkdirAll(baseDir, os.ModePerm); err != nil {
+				global.LOG.Errorf("mkdir %s failed, err: %v", baseDir, err)
+				return
+			}
+		}
+	}
+	global.CONF.System.BackupDir = baseDir
+	global.LOG.Errorf("error type dir: %T", varMap["dir"])
 }
