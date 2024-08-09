@@ -13,6 +13,18 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 )
 
+func StringEncryptWithBase64(text string) (string, error) {
+	accessKeyItem, err := base64.StdEncoding.DecodeString(text)
+	if err != nil {
+		return "", err
+	}
+	encryptKeyItem, err := StringEncrypt(string(accessKeyItem))
+	if err != nil {
+		return "", err
+	}
+	return encryptKeyItem, nil
+}
+
 func StringEncrypt(text string) (string, error) {
 	if len(text) == 0 {
 		return "", nil

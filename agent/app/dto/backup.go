@@ -1,15 +1,14 @@
 package dto
 
-import "time"
+import (
+	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/model"
+)
 
 type BackupOperate struct {
-	ID         uint   `json:"id"`
-	Type       string `json:"type" validate:"required"`
-	Bucket     string `json:"bucket"`
-	AccessKey  string `json:"accessKey"`
-	Credential string `json:"credential"`
-	BackupPath string `json:"backupPath"`
-	Vars       string `json:"vars" validate:"required"`
+	Operate string                `json:"operate" validate:"required,oneof=add remove update"`
+	Data    []model.BackupAccount `json:"data" validate:"required"`
 }
 
 type BackupInfo struct {
@@ -19,12 +18,6 @@ type BackupInfo struct {
 	Bucket     string    `json:"bucket"`
 	BackupPath string    `json:"backupPath"`
 	Vars       string    `json:"vars"`
-}
-
-type OneDriveInfo struct {
-	ClientID     string `json:"client_id"`
-	ClientSecret string `json:"client_secret"`
-	RedirectUri  string `json:"redirect_uri"`
 }
 
 type BackupSearchFile struct {
@@ -72,11 +65,4 @@ type DownloadRecord struct {
 	Source   string `json:"source" validate:"required,oneof=OSS S3 SFTP MINIO LOCAL COS KODO OneDrive WebDAV"`
 	FileDir  string `json:"fileDir" validate:"required"`
 	FileName string `json:"fileName" validate:"required"`
-}
-
-type ForBuckets struct {
-	Type       string `json:"type" validate:"required"`
-	AccessKey  string `json:"accessKey"`
-	Credential string `json:"credential" validate:"required"`
-	Vars       string `json:"vars" validate:"required"`
 }

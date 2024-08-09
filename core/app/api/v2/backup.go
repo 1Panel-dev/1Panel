@@ -1,8 +1,6 @@
 package v2
 
 import (
-	"encoding/base64"
-
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/constant"
@@ -22,22 +20,6 @@ func (b *BaseApi) CreateBackup(c *gin.Context) {
 	var req dto.BackupOperate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
-	}
-	if len(req.Credential) != 0 {
-		credential, err := base64.StdEncoding.DecodeString(req.Credential)
-		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-			return
-		}
-		req.Credential = string(credential)
-	}
-	if len(req.AccessKey) != 0 {
-		accessKey, err := base64.StdEncoding.DecodeString(req.AccessKey)
-		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-			return
-		}
-		req.AccessKey = string(accessKey)
 	}
 
 	if err := backupService.Create(req); err != nil {
@@ -70,22 +52,6 @@ func (b *BaseApi) ListBuckets(c *gin.Context) {
 	var req dto.ForBuckets
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
-	}
-	if len(req.Credential) != 0 {
-		credential, err := base64.StdEncoding.DecodeString(req.Credential)
-		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-			return
-		}
-		req.Credential = string(credential)
-	}
-	if len(req.AccessKey) != 0 {
-		accessKey, err := base64.StdEncoding.DecodeString(req.AccessKey)
-		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-			return
-		}
-		req.AccessKey = string(accessKey)
 	}
 
 	buckets, err := backupService.GetBuckets(req)
@@ -149,23 +115,6 @@ func (b *BaseApi) UpdateBackup(c *gin.Context) {
 		return
 	}
 
-	if len(req.Credential) != 0 {
-		credential, err := base64.StdEncoding.DecodeString(req.Credential)
-		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-			return
-		}
-		req.Credential = string(credential)
-	}
-	if len(req.AccessKey) != 0 {
-		accessKey, err := base64.StdEncoding.DecodeString(req.AccessKey)
-		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-			return
-		}
-		req.AccessKey = string(accessKey)
-	}
-
 	if err := backupService.Update(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -178,7 +127,7 @@ func (b *BaseApi) UpdateBackup(c *gin.Context) {
 // @Description 获取备份账号列表
 // @Accept json
 // @Param request body dto.SearchPageWithType true "request"
-// @Success 200 {array} dto.BackupList
+// @Success 200
 // @Security ApiKeyAuth
 // @Router /core/backup/search [get]
 func (b *BaseApi) SearchBackup(c *gin.Context) {

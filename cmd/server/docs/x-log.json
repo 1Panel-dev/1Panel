@@ -469,6 +469,42 @@
 		"formatZH": "删除容器存储卷 [names]",
 		"paramKeys": []
 	},
+	"/core/backup": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"type"
+		],
+		"formatEN": "create backup account [type]",
+		"formatZH": "创建备份账号 [type]",
+		"paramKeys": []
+	},
+	"/core/backup/del": {
+		"BeforeFunctions": [
+			{
+				"db": "backup_accounts",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "type",
+				"output_value": "types"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "delete backup account [types]",
+		"formatZH": "删除备份账号 [types]",
+		"paramKeys": []
+	},
+	"/core/backup/update": {
+		"BeforeFunctions": [],
+		"bodyKeys": [
+			"type"
+		],
+		"formatEN": "update backup account [types]",
+		"formatZH": "更新备份账号 [types]",
+		"paramKeys": []
+	},
 	"/core/logs/clean": {
 		"BeforeFunctions": [],
 		"bodyKeys": [
@@ -1519,15 +1555,6 @@
 		"formatZH": "更新运行环境 [name]",
 		"paramKeys": []
 	},
-	"/settings/backup": {
-		"BeforeFunctions": [],
-		"bodyKeys": [
-			"type"
-		],
-		"formatEN": "create backup account [type]",
-		"formatZH": "创建备份账号 [type]",
-		"paramKeys": []
-	},
 	"/settings/backup/backup": {
 		"BeforeFunctions": [],
 		"bodyKeys": [
@@ -1537,24 +1564,6 @@
 		],
 		"formatEN": "backup [type] data [name][detailName]",
 		"formatZH": "备份 [type] 数据 [name][detailName]",
-		"paramKeys": []
-	},
-	"/settings/backup/del": {
-		"BeforeFunctions": [
-			{
-				"db": "backup_accounts",
-				"input_column": "id",
-				"input_value": "id",
-				"isList": false,
-				"output_column": "type",
-				"output_value": "types"
-			}
-		],
-		"bodyKeys": [
-			"id"
-		],
-		"formatEN": "delete backup account [types]",
-		"formatZH": "删除备份账号 [types]",
 		"paramKeys": []
 	},
 	"/settings/backup/record/del": {
@@ -1607,15 +1616,6 @@
 		],
 		"formatEN": "recover [type] data [name][detailName] from [file]",
 		"formatZH": "从 [file] 恢复 [type] 数据 [name][detailName]",
-		"paramKeys": []
-	},
-	"/settings/backup/update": {
-		"BeforeFunctions": [],
-		"bodyKeys": [
-			"type"
-		],
-		"formatEN": "update backup account [types]",
-		"formatZH": "更新备份账号 [types]",
 		"paramKeys": []
 	},
 	"/settings/snapshot": {
@@ -2236,6 +2236,24 @@
 		],
 		"formatEN": "Delete domain [domain]",
 		"formatZH": "删除域名 [domain]",
+		"paramKeys": []
+	},
+	"/websites/domains/update": {
+		"BeforeFunctions": [
+			{
+				"db": "website_domains",
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"output_column": "domain",
+				"output_value": "domain"
+			}
+		],
+		"bodyKeys": [
+			"id"
+		],
+		"formatEN": "Update domain [domain]",
+		"formatZH": "更新域名 [domain]",
 		"paramKeys": []
 	},
 	"/websites/log": {

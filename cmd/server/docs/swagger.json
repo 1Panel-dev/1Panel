@@ -1,8 +1,4 @@
-package docs
-
-import "github.com/swaggo/swag"
-
-const docTemplate = `{
+{
 	"swagger": "2.0",
 	"info": {
 		"contact": {},
@@ -23453,21 +23449,4 @@ const docTemplate = `{
 			"type": "object"
 		}
 	}
-}`
-
-var SwaggerInfo = &swag.Spec{
-	Version:          "2.0",
-	Host:             "localhost",
-	BasePath:         "/api/v2",
-	Schemes:          []string{},
-	Title:            "1Panel",
-	Description:      "开源Linux面板",
-	InfoInstanceName: "swagger",
-	SwaggerTemplate:  docTemplate,
-	LeftDelim:        "{{",
-	RightDelim:       "}}",
-}
-
-func init() {
-	swag.Register(SwaggerInfo.InstanceName(), SwaggerInfo)
 }

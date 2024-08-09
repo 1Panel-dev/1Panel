@@ -33,7 +33,7 @@ func (c localClient) Upload(src, target string) (bool, error) {
 		}
 	}
 
-	if err := files.CopyFile(src, targetFilePath); err != nil {
+	if err := files.CopyFile(src, targetFilePath, false); err != nil {
 		return false, fmt.Errorf("cp file failed, err: %v", err)
 	}
 	return true, nil

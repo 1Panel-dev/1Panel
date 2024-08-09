@@ -127,13 +127,13 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 		}
 		global.LOG.Info("backup original data successful, now start to upgrade!")
 
-		if err := files.CopyFile(path.Join(tmpDir, "1panel"), "/usr/local/bin"); err != nil {
+		if err := files.CopyFile(path.Join(tmpDir, "1panel"), "/usr/local/bin", false); err != nil {
 			global.LOG.Errorf("upgrade 1panel failed, err: %v", err)
 			u.handleRollback(originalDir, 1)
 			return
 		}
 
-		if err := files.CopyFile(path.Join(tmpDir, "1pctl"), "/usr/local/bin"); err != nil {
+		if err := files.CopyFile(path.Join(tmpDir, "1pctl"), "/usr/local/bin", false); err != nil {
 			global.LOG.Errorf("upgrade 1pctl failed, err: %v", err)
 			u.handleRollback(originalDir, 2)
 			return
@@ -144,7 +144,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 			return
 		}
 
-		if err := files.CopyFile(path.Join(tmpDir, "1panel.service"), "/etc/systemd/system"); err != nil {
+		if err := files.CopyFile(path.Join(tmpDir, "1panel.service"), "/etc/systemd/system", false); err != nil {
 			global.LOG.Errorf("upgrade 1panel.service failed, err: %v", err)
 			u.handleRollback(originalDir, 3)
 			return
@@ -161,13 +161,13 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 }
 
 func (u *UpgradeService) handleBackup(originalDir string) error {
-	if err := files.CopyFile("/usr/local/bin/1panel", originalDir); err != nil {
+	if err := files.CopyFile("/usr/local/bin/1panel", originalDir, false); err != nil {
 		return err
 	}
-	if err := files.CopyFile("/usr/local/bin/1pctl", originalDir); err != nil {
+	if err := files.CopyFile("/usr/local/bin/1pctl", originalDir, false); err != nil {
 		return err
 	}
-	if err := files.CopyFile("/etc/systemd/system/1panel.service", originalDir); err != nil {
+	if err := files.CopyFile("/etc/systemd/system/1panel.service", originalDir, false); err != nil {
 		return err
 	}
 	checkPointOfWal()
@@ -183,7 +183,7 @@ func (u *UpgradeService) handleRollback(originalDir string, errStep int) {
 	checkPointOfWal()
 	dbPath := path.Join(global.CONF.System.BaseDir, "1panel/db")
 	if _, err := os.Stat(path.Join(originalDir, "1Panel.db")); err == nil {
-		if err := files.CopyFile(path.Join(originalDir, "1Panel.db"), dbPath); err != nil {
+		if err := files.CopyFile(path.Join(originalDir, "1Panel.db"), dbPath, false); err != nil {
 			global.LOG.Errorf("rollback 1panel db failed, err: %v", err)
 		}
 	}
@@ -192,19 +192,19 @@ func (u *UpgradeService) handleRollback(originalDir string, errStep int) {
 			global.LOG.Errorf("rollback 1panel db failed, err: %v", err)
 		}
 	}
-	if err := files.CopyFile(path.Join(originalDir, "1panel"), "/usr/local/bin"); err != nil {
+	if err := files.CopyFile(path.Join(originalDir, "1panel"), "/usr/local/bin", false); err != nil {
 		global.LOG.Errorf("rollback 1pctl failed, err: %v", err)
 	}
 	if errStep == 1 {
 		return
 	}
-	if err := files.CopyFile(path.Join(originalDir, "1pctl"), "/usr/local/bin"); err != nil {
+	if err := files.CopyFile(path.Join(originalDir, "1pctl"), "/usr/local/bin", false); err != nil {
 		global.LOG.Errorf("rollback 1panel failed, err: %v", err)
 	}
 	if errStep == 2 {
 		return
 	}
-	if err := files.CopyFile(path.Join(originalDir, "1panel.service"), "/etc/systemd/system"); err != nil {
+	if err := files.CopyFile(path.Join(originalDir, "1panel.service"), "/etc/systemd/system", false); err != nil {
 		global.LOG.Errorf("rollback 1panel failed, err: %v", err)
 	}
 }

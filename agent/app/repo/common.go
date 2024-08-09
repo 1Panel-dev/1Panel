@@ -21,6 +21,7 @@ type ICommonRepo interface {
 	WithByGroupID(groupID uint) DBOption
 	WithLikeName(name string) DBOption
 	WithIdsIn(ids []uint) DBOption
+	WithNamesIn(names []string) DBOption
 	WithByDate(startTime, endTime time.Time) DBOption
 	WithByCreatedAt(startTime, endTime time.Time) DBOption
 	WithByStartDate(startTime time.Time) DBOption
@@ -121,6 +122,12 @@ func (c *CommonRepo) WithOrderRuleBy(orderBy, order string) DBOption {
 	}
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Order(fmt.Sprintf("%s %s", orderBy, order))
+	}
+}
+
+func (c *CommonRepo) WithNamesIn(names []string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("name in (?)", names)
 	}
 }
 
