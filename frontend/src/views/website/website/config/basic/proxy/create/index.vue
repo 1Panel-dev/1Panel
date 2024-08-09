@@ -99,7 +99,7 @@
                         </div>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="addReplaces" :disabled="replaces.length >= 5">
+                        <el-button type="primary" @click="addReplaces">
                             {{ $t('website.addReplace') }}
                         </el-button>
                         <div>
@@ -159,6 +159,7 @@ const initData = (): Website.ProxyConfig => ({
     replaces: {},
     proxyAddress: '',
     proxyProtocol: 'http://',
+    sni: false,
 });
 let proxy = ref(initData());
 const replaces = ref<any>([]);

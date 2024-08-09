@@ -44,6 +44,16 @@ type NginxAuthUpdate struct {
 	Remark    string `json:"remark"`
 }
 
+type NginxPathAuthUpdate struct {
+	WebsiteID uint   `json:"websiteID" validate:"required"`
+	Operate   string `json:"operate" validate:"required"`
+	Name      string `json:"name"`
+	Username  string `json:"username"`
+	Password  string `json:"password"`
+	Path      string `json:"path"`
+	Remark    string `json:"remark"`
+}
+
 type NginxAuthReq struct {
 	WebsiteID uint `json:"websiteID" validate:"required"`
 }

@@ -644,6 +644,47 @@ func (b *BaseApi) UpdateAuthConfig(c *gin.Context) {
 }
 
 // @Tags Website
+// @Summary Get AuthBasic conf
+// @Description 获取路由密码访问配置
+// @Accept json
+// @Param request body request.NginxAuthReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/auths/path [post]
+func (b *BaseApi) GetPathAuthConfig(c *gin.Context) {
+	var req request.NginxAuthReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	res, err := websiteService.GetPathAuthBasics(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags Website
+// @Summary Get AuthBasic conf
+// @Description 更新路由密码访问配置
+// @Accept json
+// @Param request body request.NginxPathAuthUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/auths/path/update [post]
+func (b *BaseApi) UpdatePathAuthConfig(c *gin.Context) {
+	var req request.NginxPathAuthUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteService.UpdatePathAuthBasic(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}
+
+// @Tags Website
 // @Summary Get AntiLeech conf
 // @Description 获取防盗链配置
 // @Accept json

@@ -37,3 +37,6 @@ var DomainNotFoundHTML []byte
 
 //go:embed stop.html
 var StopHTML []byte
+
+//go:embed path_auth.conf
+var PathAuth []byte

@@ -210,6 +210,14 @@ export const OperateAuthConfig = (req: Website.NginxAuthConfig) => {
     return http.post<any>(`/websites/auths/update`, req);
 };
 
+export const GetPathAuthConfig = (req: Website.AuthReq) => {
+    return http.post<Website.NginxPathAuthConfig[]>(`/websites/auths/path`, req);
+};
+
+export const OperatePathAuthConfig = (req: Website.NginxPathAuthConfig) => {
+    return http.post(`/websites/auths/path/update`, req);
+};
+
 export const GetAntiLeech = (req: Website.LeechReq) => {
     return http.post<Website.LeechConfig>(`/websites/leech`, req);
 };

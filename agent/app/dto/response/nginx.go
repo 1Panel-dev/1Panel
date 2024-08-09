@@ -22,6 +22,10 @@ type NginxAuthRes struct {
 	Items  []dto.NginxAuth `json:"items"`
 }
 
+type NginxPathAuthRes struct {
+	dto.NginxPathAuth
+}
+
 type NginxAntiLeechRes struct {
 	Enable      bool     `json:"enable"`
 	Extends     string   `json:"extends"`

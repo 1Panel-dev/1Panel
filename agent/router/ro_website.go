@@ -56,6 +56,8 @@ func (a *WebsiteRouter) InitRouter(Router *gin.RouterGroup) {
 
 		websiteRouter.POST("/auths", baseApi.GetAuthConfig)
 		websiteRouter.POST("/auths/update", baseApi.UpdateAuthConfig)
+		websiteRouter.POST("/auths/path", baseApi.GetPathAuthConfig)
+		websiteRouter.POST("/auths/path/update", baseApi.UpdatePathAuthConfig)
 
 		websiteRouter.POST("/leech", baseApi.GetAntiLeech)
 		websiteRouter.POST("/leech/update", baseApi.UpdateAntiLeech)
