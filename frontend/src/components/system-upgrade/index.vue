@@ -17,7 +17,10 @@
         <el-button type="primary" link @click="toHalo">
             <span class="font-normal">{{ isProductPro ? $t('license.pro') : $t('license.community') }}</span>
         </el-button>
-        <span class="version">{{ version }}</span>
+        <span v-if="isSupported" class="version" @click="copy(version)">
+            {{ copied ? $t('commons.msg.copySuccess') : version }}
+        </span>
+        <span class="version" v-else>{{ version }}</span>
         <el-badge is-dot style="margin-top: -3px" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
             <el-button type="primary" link @click="onLoadUpgradeInfo">
                 <span class="font-normal">({{ $t('setting.hasNewVersion') }})</span>
@@ -85,9 +88,11 @@ import { onMounted, ref } from 'vue';
 import { GlobalStore } from '@/store';
 import { ElMessageBox } from 'element-plus';
 import { storeToRefs } from 'pinia';
+import { useClipboard } from '@vueuse/core';
 
 const globalStore = GlobalStore();
 const { isDarkTheme } = storeToRefs(globalStore);
+const { copied, copy, isSupported } = useClipboard();
 
 const version = ref<string>('');
 const isProductPro = ref();
@@ -190,6 +195,7 @@ onMounted(() => {
     color: var(--dark-gold-base-color);
     text-decoration: none;
     letter-spacing: 0.5px;
+    cursor: pointer;
 }
 .line-height {
     line-height: 25px;
