@@ -67,6 +67,22 @@
                             <el-text type="primary" class="cursor-pointer" @click="openConfig(row.id)">
                                 {{ row.primaryDomain }}
                             </el-text>
+                            <el-popover placement="top-start" trigger="hover" @before-enter="searchDomains(row.id)">
+                                <template #reference>
+                                    <el-button link icon="Promotion" class="ml-2.5"></el-button>
+                                </template>
+                                <table>
+                                    <tbody>
+                                        <tr v-for="(domain, index) in domains" :key="index">
+                                            <td>
+                                                <el-button type="primary" link @click="openUrl(getUrl(domain, row))">
+                                                    {{ getUrl(domain, row) }}
+                                                </el-button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </el-popover>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -201,7 +217,7 @@ import AppStatus from '@/components/app-status/index.vue';
 import i18n from '@/lang';
 import router from '@/routers';
 import { onMounted, reactive, ref, computed } from 'vue';
-import { OpWebsite, SearchWebsites, UpdateWebsite } from '@/api/modules/website';
+import { ListDomains, OpWebsite, SearchWebsites, UpdateWebsite } from '@/api/modules/website';
 import { Website } from '@/api/interface/website';
 import { App } from '@/api/interface/app';
 import { ElMessageBox } from 'element-plus';
@@ -248,6 +264,7 @@ const defaultRef = ref();
 const data = ref();
 let groups = ref<Group.GroupInfo[]>([]);
 const dataRef = ref();
+const domains = ref<Website.Domain[]>([]);
 
 const paginationConfig = reactive({
     cacheSizeKey: 'website-page-size',
@@ -472,6 +489,28 @@ const opWebsite = (op: string, id: number) => {
 
 const toFolder = (folder: string) => {
     router.push({ path: '/hosts/files', query: { path: folder } });
+};
+
+const searchDomains = (id: number) => {
+    ListDomains(id).then((res) => {
+        domains.value = res.data;
+    });
+};
+
+const openUrl = (url: string) => {
+    window.open(url);
+};
+
+const getUrl = (domain: Website.Domain, website: Website.Website): string => {
+    const protocol = website.protocol.toLowerCase();
+    let url = protocol + '://' + domain.domain;
+    if (protocol == 'http' && domain.port != 80) {
+        url = url + ':' + domain.port;
+    }
+    if (protocol == 'https' && domain.ssl) {
+        url = url + ':' + domain.port;
+    }
+    return url;
 };
 
 onMounted(() => {
