@@ -44,6 +44,15 @@
                     ></el-option>
                 </el-select>
                 <TableSearch @search="search()" v-model:searchName="req.name" />
+                <div class="!ml-2.5">
+                    <fu-table-column-select
+                        :columns="columns"
+                        trigger="hover"
+                        :title="$t('commons.table.selectColumn')"
+                        popper-class="popper-class"
+                        :only-icon="true"
+                    />
+                </div>
             </template>
             <template v-if="nginxIsExist && !openNginxConfig" #main>
                 <ComplexTable
@@ -53,6 +62,8 @@
                     @search="search()"
                     :class="{ mask: nginxStatus != 'Running' }"
                     :heightDiff="370"
+                    :columns="columns"
+                    localKey="websiteColumn"
                 >
                     <el-table-column
                         :label="$t('commons.table.name')"
@@ -172,7 +183,7 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('website.sslExpireDate')" width="150px">
+                    <el-table-column :label="$t('website.sslExpireDate')" prop="sslExpireDate" width="150px">
                         <template #default="{ row }">
                             <el-tag v-if="row.protocol == 'HTTPS'" :type="row.sslStatus">
                                 {{ dateFormatSimple(row.sslExpireDate) }}
@@ -265,6 +276,7 @@ const data = ref();
 let groups = ref<Group.GroupInfo[]>([]);
 const dataRef = ref();
 const domains = ref<Website.Domain[]>([]);
+const columns = ref([]);
 
 const paginationConfig = reactive({
     cacheSizeKey: 'website-page-size',
