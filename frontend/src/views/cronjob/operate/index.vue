@@ -632,7 +632,7 @@ const loadAppInstalls = async () => {
 };
 
 const loadWebsites = async () => {
-    const res = await GetWebsiteOptions();
+    const res = await GetWebsiteOptions({});
     websiteOptions.value = res.data || [];
 };
 

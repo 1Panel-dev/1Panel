@@ -27,13 +27,18 @@ type WebsiteCreate struct {
 	AppID        uint          `json:"appID"`
 	AppInstallID uint          `json:"appInstallID"`
 
-	RuntimeID uint   `json:"runtimeID"`
-	TaskID    string `json:"taskID"`
+	RuntimeID       uint   `json:"runtimeID"`
+	TaskID          string `json:"taskID"`
+	ParentWebsiteID uint   `json:"parentWebsiteID"`
 
 	RuntimeConfig
 	FtpConfig
 	DataBaseConfig
 	SSLConfig
+}
+
+type WebsiteOptionReq struct {
+	Types []string `json:"types"`
 }
 
 type RuntimeConfig struct {

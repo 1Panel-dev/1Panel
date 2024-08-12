@@ -52,9 +52,13 @@ func (b *BaseApi) GetWebsites(c *gin.Context) {
 // @Description 获取网站列表
 // @Success 200 {array} string
 // @Security ApiKeyAuth
-// @Router /websites/options [get]
+// @Router /websites/options [post]
 func (b *BaseApi) GetWebsiteOptions(c *gin.Context) {
-	websites, err := websiteService.GetWebsiteOptions()
+	var req request.WebsiteOptionReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	websites, err := websiteService.GetWebsiteOptions(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

@@ -1985,6 +1985,10 @@ const message = {
         generateDomain: '生成',
         domainSSLHelper: '非 443 端口开启 SSL 会导致 443 端口去掉监听，如需 443 端口继续监听，请添加域名:443',
         global: '全局',
+        subsite: '子网站',
+        subsiteHelper: '子网站可以选择已存在的 PHP 和静态网站的目录作为主目录',
+        parentWbeiste: '父级网站',
+        deleteSubsite: '删除当前网站需要先删除子网站 {0}',
     },
     php: {
         short_open_tag: '短标签支持',

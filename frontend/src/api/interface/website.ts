@@ -23,6 +23,7 @@ export namespace Website {
         IPV6: boolean;
         accessLog?: boolean;
         errorLog?: boolean;
+        childSites?: string[];
     }
 
     export interface WebsiteDTO extends Website {
@@ -109,6 +110,10 @@ export namespace Website {
         logType: string;
         page?: number;
         pageSize?: number;
+    }
+
+    export interface OptionReq {
+        types?: string[];
     }
 
     export interface WebSiteLog {
