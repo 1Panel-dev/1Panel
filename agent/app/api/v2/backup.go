@@ -10,20 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (b *BaseApi) OperateBackup(c *gin.Context) {
-	var req dto.BackupOperate
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInvalidParams, err)
-		return
-	}
-
-	if err := backupService.Operate(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	helper.SuccessWithData(c, nil)
-}
-
 // @Tags Backup Account
 // @Summary Page backup records
 // @Description 获取备份记录列表分页
@@ -125,12 +111,12 @@ func (b *BaseApi) DeleteBackupRecord(c *gin.Context) {
 // @Summary List files from backup accounts
 // @Description 获取备份账号内文件列表
 // @Accept json
-// @Param request body dto.BackupSearchFile true "request"
+// @Param request body dto.OperateByID true "request"
 // @Success 200 {array} string
 // @Security ApiKeyAuth
 // @Router /settings/backup/search/files [post]
 func (b *BaseApi) LoadFilesFromBackup(c *gin.Context) {
-	var req dto.BackupSearchFile
+	var req dto.OperateByID
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
@@ -199,7 +185,11 @@ func (b *BaseApi) Recover(c *gin.Context) {
 		return
 	}
 
-	downloadPath, err := backupService.DownloadRecord(dto.DownloadRecord{Source: req.Source, FileDir: path.Dir(req.File), FileName: path.Base(req.File)})
+	downloadPath, err := backupService.DownloadRecord(dto.DownloadRecord{
+		DownloadAccountID: req.BackupAccountID,
+		FileDir:           path.Dir(req.File),
+		FileName:          path.Base(req.File),
+	})
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, fmt.Errorf("download file failed, err: %v", err))
 		return

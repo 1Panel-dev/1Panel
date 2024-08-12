@@ -5,6 +5,13 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"os"
+	"path/filepath"
+	"reflect"
+	"strconv"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
@@ -22,12 +29,6 @@ import (
 	httpUtil "github.com/1Panel-dev/1Panel/agent/utils/http"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"gopkg.in/yaml.v3"
-	"net/http"
-	"os"
-	"path/filepath"
-	"reflect"
-	"strconv"
-	"strings"
 )
 
 type AppService struct {
@@ -91,10 +92,6 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 	}
 	var appDTOs []*response.AppDto
 	for _, ap := range apps {
-		ap.ReadMe = ""
-		ap.Website = ""
-		ap.Document = ""
-		ap.Github = ""
 		appDTO := &response.AppDto{
 			ID:          ap.ID,
 			Name:        ap.Name,

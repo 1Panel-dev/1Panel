@@ -22,14 +22,9 @@ import (
 )
 
 func (u *BackupService) PostgresqlBackup(req dto.CommonBackup) error {
-	localDir, err := loadLocalDir()
-	if err != nil {
-		return err
-	}
-
 	timeNow := time.Now().Format(constant.DateTimeSlimLayout)
 	itemDir := fmt.Sprintf("database/%s/%s/%s", req.Type, req.Name, req.DetailName)
-	targetDir := path.Join(localDir, itemDir)
+	targetDir := path.Join(global.CONF.System.Backup, itemDir)
 	fileName := fmt.Sprintf("%s_%s.sql.gz", req.DetailName, timeNow+common.RandStrAndNum(5))
 
 	if err := handlePostgresqlBackup(req.Name, req.DetailName, targetDir, fileName); err != nil {
@@ -37,13 +32,13 @@ func (u *BackupService) PostgresqlBackup(req dto.CommonBackup) error {
 	}
 
 	record := &model.BackupRecord{
-		Type:       req.Type,
-		Name:       req.Name,
-		DetailName: req.DetailName,
-		Source:     "LOCAL",
-		BackupType: "LOCAL",
-		FileDir:    itemDir,
-		FileName:   fileName,
+		Type:              req.Type,
+		Name:              req.Name,
+		DetailName:        req.DetailName,
+		SourceAccountIDs:  "1",
+		DownloadAccountID: 1,
+		FileDir:           itemDir,
+		FileName:          fileName,
 	}
 	if err := backupRepo.CreateRecord(record); err != nil {
 		global.LOG.Errorf("save backup record failed, err: %v", err)

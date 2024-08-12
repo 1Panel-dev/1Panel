@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"log"
 	"math"
 	"net/http"
@@ -17,6 +16,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 
 	"github.com/docker/docker/api/types"
 
@@ -427,8 +428,7 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 			_ = os.RemoveAll(uploadDir)
 		}
 		if deleteReq.DeleteBackup {
-			localDir, _ := loadLocalDir()
-			backupDir := path.Join(localDir, fmt.Sprintf("app/%s/%s", install.App.Key, install.Name))
+			backupDir := path.Join(global.CONF.System.Backup, fmt.Sprintf("app/%s/%s", install.App.Key, install.Name))
 			if _, err = os.Stat(backupDir); err == nil {
 				t.LogWithOps(task.TaskDelete, i18n.GetMsgByKey("TaskBackup"))
 				_ = os.RemoveAll(backupDir)
@@ -569,11 +569,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			if err != nil {
 				return buserr.WithNameAndErr("ErrAppBackup", install.Name, err)
 			}
-			localDir, err := loadLocalDir()
-			if err != nil {
-				return buserr.WithNameAndErr("ErrAppBackup", install.Name, err)
-			}
-			backupFile = path.Join(localDir, backupRecord.FileDir, backupRecord.FileName)
+			backupFile = path.Join(global.CONF.System.Backup, backupRecord.FileDir, backupRecord.FileName)
 		}
 		return nil
 	}
@@ -694,7 +690,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 	rollBackApp := func(t *task.Task) {
 		if req.Backup {
 			t.Log(i18n.GetWithName("AppRecover", install.Name))
-			if err := NewIBackupService().AppRecover(dto.CommonRecover{Name: install.App.Key, DetailName: install.Name, Type: "app", Source: constant.ResourceLocal, File: backupFile}); err != nil {
+			if err := NewIBackupService().AppRecover(dto.CommonRecover{Name: install.App.Key, DetailName: install.Name, Type: "app", BackupAccountID: 1, File: backupFile}); err != nil {
 				t.LogFailedWithErr(i18n.GetWithName("AppRecover", install.Name), err)
 				return
 			}

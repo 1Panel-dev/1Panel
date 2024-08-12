@@ -27,7 +27,7 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time) e
 		}
 		apps = append(apps, app)
 	}
-	accountMap, err := loadClientMap(cronjob.BackupAccounts)
+	accountMap, err := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
 	if err != nil {
 		return err
 	}
@@ -38,7 +38,7 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time) e
 		record.CronjobID = cronjob.ID
 		record.Name = app.App.Key
 		record.DetailName = app.Name
-		record.Source, record.BackupType = loadRecordPath(cronjob, accountMap)
+		record.DownloadAccountID, record.SourceAccountIDs = loadRecordPath(cronjob, accountMap)
 		backupDir := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("app/%s/%s", app.App.Key, app.Name))
 		record.FileName = fmt.Sprintf("app_%s_%s.tar.gz", app.Name, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
 		if err := handleAppBackup(&app, backupDir, record.FileName, cronjob.ExclusionRules, cronjob.Secret); err != nil {
@@ -60,7 +60,7 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time) e
 
 func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Time) error {
 	webs := loadWebsForJob(cronjob)
-	accountMap, err := loadClientMap(cronjob.BackupAccounts)
+	accountMap, err := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
 	if err != nil {
 		return err
 	}
@@ -71,7 +71,7 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Tim
 		record.CronjobID = cronjob.ID
 		record.Name = web.PrimaryDomain
 		record.DetailName = web.Alias
-		record.Source, record.BackupType = loadRecordPath(cronjob, accountMap)
+		record.DownloadAccountID, record.SourceAccountIDs = loadRecordPath(cronjob, accountMap)
 		backupDir := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("website/%s", web.PrimaryDomain))
 		record.FileName = fmt.Sprintf("website_%s_%s.tar.gz", web.PrimaryDomain, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
 		if err := handleWebsiteBackup(&web, backupDir, record.FileName, cronjob.ExclusionRules, cronjob.Secret); err != nil {
@@ -93,7 +93,7 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Tim
 
 func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Time) error {
 	dbs := loadDbsForJob(cronjob)
-	accountMap, err := loadClientMap(cronjob.BackupAccounts)
+	accountMap, err := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
 	if err != nil {
 		return err
 	}
@@ -104,7 +104,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 		record.CronjobID = cronjob.ID
 		record.Name = dbInfo.Database
 		record.DetailName = dbInfo.Name
-		record.Source, record.BackupType = loadRecordPath(cronjob, accountMap)
+		record.DownloadAccountID, record.SourceAccountIDs = loadRecordPath(cronjob, accountMap)
 
 		backupDir := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("database/%s/%s/%s", dbInfo.DBType, record.Name, dbInfo.Name))
 		record.FileName = fmt.Sprintf("db_%s_%s.sql.gz", dbInfo.Name, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
@@ -132,7 +132,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 }
 
 func (u *CronjobService) handleDirectory(cronjob model.Cronjob, startTime time.Time) error {
-	accountMap, err := loadClientMap(cronjob.BackupAccounts)
+	accountMap, err := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
 	if err != nil {
 		return err
 	}
@@ -146,7 +146,7 @@ func (u *CronjobService) handleDirectory(cronjob model.Cronjob, startTime time.T
 	record.Type = "directory"
 	record.CronjobID = cronjob.ID
 	record.Name = cronjob.Name
-	record.Source, record.BackupType = loadRecordPath(cronjob, accountMap)
+	record.DownloadAccountID, record.SourceAccountIDs = loadRecordPath(cronjob, accountMap)
 	downloadPath, err := u.uploadCronjobBackFile(cronjob, accountMap, path.Join(backupDir, fileName))
 	if err != nil {
 		return err
@@ -162,7 +162,7 @@ func (u *CronjobService) handleDirectory(cronjob model.Cronjob, startTime time.T
 }
 
 func (u *CronjobService) handleSystemLog(cronjob model.Cronjob, startTime time.Time) error {
-	accountMap, err := loadClientMap(cronjob.BackupAccounts)
+	accountMap, err := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
 	if err != nil {
 		return err
 	}
@@ -177,7 +177,7 @@ func (u *CronjobService) handleSystemLog(cronjob model.Cronjob, startTime time.T
 	record.Type = "log"
 	record.CronjobID = cronjob.ID
 	record.Name = cronjob.Name
-	record.Source, record.BackupType = loadRecordPath(cronjob, accountMap)
+	record.DownloadAccountID, record.SourceAccountIDs = loadRecordPath(cronjob, accountMap)
 	downloadPath, err := u.uploadCronjobBackFile(cronjob, accountMap, path.Join(path.Dir(backupDir), fileName))
 	if err != nil {
 		return err
@@ -193,7 +193,7 @@ func (u *CronjobService) handleSystemLog(cronjob model.Cronjob, startTime time.T
 }
 
 func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, startTime time.Time, logPath string) error {
-	accountMap, err := loadClientMap(cronjob.BackupAccounts)
+	accountMap, err := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
 	if err != nil {
 		return err
 	}
@@ -203,12 +203,12 @@ func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, startTime time.Ti
 	record.Type = "directory"
 	record.CronjobID = cronjob.ID
 	record.Name = cronjob.Name
-	record.Source, record.BackupType = loadRecordPath(cronjob, accountMap)
+	record.DownloadAccountID, record.SourceAccountIDs = loadRecordPath(cronjob, accountMap)
 	record.FileDir = "system_snapshot"
 
 	req := dto.SnapshotCreate{
-		From:            record.BackupType,
-		DefaultDownload: cronjob.DefaultDownload,
+		SourceAccountIDs: record.SourceAccountIDs,
+		DownloadAccountID: cronjob.DownloadAccountID,
 	}
 	name, err := NewISnapshotService().HandleSnapshot(true, logPath, req, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5), cronjob.Secret)
 	if err != nil {
@@ -287,20 +287,20 @@ func loadWebsForJob(cronjob model.Cronjob) []model.Website {
 	return weblist
 }
 
-func loadRecordPath(cronjob model.Cronjob, accountMap map[string]cronjobUploadHelper) (string, string) {
-	source := accountMap[fmt.Sprintf("%v", cronjob.DefaultDownload)].backType
-	targets := strings.Split(cronjob.BackupAccounts, ",")
+func loadRecordPath(cronjob model.Cronjob, accountMap map[string]backupClientHelper) (uint, string) {
+	download := accountMap[fmt.Sprintf("%v", cronjob.DownloadAccountID)].id
+	sources := strings.Split(cronjob.SourceAccountIDs, ",")
 	var itemAccounts []string
-	for _, target := range targets {
+	for _, target := range sources {
 		if len(target) == 0 {
 			continue
 		}
-		if len(accountMap[target].backType) != 0 {
-			itemAccounts = append(itemAccounts, accountMap[target].backType)
+		if accountMap[target].id != 0 {
+			itemAccounts = append(itemAccounts, fmt.Sprintf("%v", accountMap[target].id))
 		}
 	}
 	backupType := strings.Join(itemAccounts, ",")
-	return source, backupType
+	return download, backupType
 }
 
 func handleBackupLogs(targetDir, fileName string, secret string) error {

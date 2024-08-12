@@ -13,12 +13,6 @@ type JWT struct {
 	SigningKey []byte
 }
 
-type JwtRequest struct {
-	BaseClaims
-	BufferTime int64
-	jwt.RegisteredClaims
-}
-
 type CustomClaims struct {
 	BaseClaims
 	BufferTime int64
@@ -26,8 +20,9 @@ type CustomClaims struct {
 }
 
 type BaseClaims struct {
-	ID   uint
-	Name string
+	ID      uint
+	Name    string
+	IsAgent bool
 }
 
 func NewJWT() *JWT {
@@ -55,14 +50,14 @@ func (j *JWT) CreateToken(request CustomClaims) (string, error) {
 	return token.SignedString(j.SigningKey)
 }
 
-func (j *JWT) ParseToken(tokenStr string) (*JwtRequest, error) {
-	token, err := jwt.ParseWithClaims(tokenStr, &JwtRequest{}, func(token *jwt.Token) (interface{}, error) {
+func (j *JWT) ParseToken(tokenStr string) (*CustomClaims, error) {
+	token, err := jwt.ParseWithClaims(tokenStr, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return j.SigningKey, nil
 	})
 	if err != nil || token == nil {
 		return nil, constant.ErrTokenParse
 	}
-	if claims, ok := token.Claims.(*JwtRequest); ok && token.Valid {
+	if claims, ok := token.Claims.(*CustomClaims); ok && token.Valid {
 		return claims, nil
 	}
 	return nil, constant.ErrTokenParse

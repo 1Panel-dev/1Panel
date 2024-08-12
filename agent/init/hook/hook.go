@@ -7,6 +7,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/app/service"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
@@ -100,33 +101,14 @@ func handleCronjobStatus() {
 }
 
 func loadLocalDir() {
-	var backup model.BackupAccount
-	_ = global.DB.Where("type = ?", "LOCAL").First(&backup).Error
-	if backup.ID == 0 {
-		global.LOG.Errorf("no such backup account `%s` in db", "LOCAL")
-		return
+	account, _, err := service.NewBackupClientWithID(1)
+	if err != nil {
+		global.LOG.Errorf("load local backup account info failed, err: %v", err)
 	}
-	varMap := make(map[string]interface{})
-	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
-		global.LOG.Errorf("json unmarshal backup.Vars: %v failed, err: %v", backup.Vars, err)
-		return
+	global.CONF.System.Backup, err = service.LoadLocalDirByStr(account.Vars)
+	if err != nil {
+		global.LOG.Errorf("load local backup dir failed, err: %v", err)
 	}
-	if _, ok := varMap["dir"]; !ok {
-		global.LOG.Error("load local backup dir failed")
-		return
-	}
-	baseDir, ok := varMap["dir"].(string)
-	if ok {
-		if _, err := os.Stat(baseDir); err != nil && os.IsNotExist(err) {
-			if err = os.MkdirAll(baseDir, os.ModePerm); err != nil {
-				global.LOG.Errorf("mkdir %s failed, err: %v", baseDir, err)
-				return
-			}
-		}
-		global.CONF.System.Backup = baseDir
-		return
-	}
-	global.LOG.Errorf("error type dir: %T", varMap["dir"])
 }
 
 func initDir() {

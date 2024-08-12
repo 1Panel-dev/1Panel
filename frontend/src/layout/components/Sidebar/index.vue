@@ -137,6 +137,9 @@ const loadNodes = async () => {
             return;
         }
         nodes.value = res.data;
+        if (nodes.value.length === 1) {
+            globalStore.currentNode = nodes.value[0].name;
+        }
         return;
     }
     nodes.value = [];

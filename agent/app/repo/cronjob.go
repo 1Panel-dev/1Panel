@@ -28,7 +28,7 @@ type ICronjobRepo interface {
 	Update(id uint, vars map[string]interface{}) error
 	Delete(opts ...DBOption) error
 	DeleteRecord(opts ...DBOption) error
-	StartRecords(cronjobID uint, fromLocal bool, targetPath string) model.JobRecords
+	StartRecords(cronjobID uint, targetPath string) model.JobRecords
 	UpdateRecords(id uint, vars map[string]interface{}) error
 	EndRecords(record model.JobRecords, status, message, records string)
 	PageRecords(page, size int, opts ...DBOption) (int64, []model.JobRecords, error)
@@ -142,11 +142,10 @@ func (c *CronjobRepo) WithByRecordDropID(id int) DBOption {
 	}
 }
 
-func (u *CronjobRepo) StartRecords(cronjobID uint, fromLocal bool, targetPath string) model.JobRecords {
+func (u *CronjobRepo) StartRecords(cronjobID uint, targetPath string) model.JobRecords {
 	var record model.JobRecords
 	record.StartTime = time.Now()
 	record.CronjobID = cronjobID
-	record.FromLocal = fromLocal
 	record.Status = constant.StatusWaiting
 	if err := global.DB.Create(&record).Error; err != nil {
 		global.LOG.Errorf("create record status failed, err: %v", err)

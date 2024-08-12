@@ -34,3 +34,6 @@ type Options struct {
 type OperateByID struct {
 	ID uint `json:"id"`
 }
+type OperateByIDs struct {
+	IDs []uint `json:"ids"`
+}

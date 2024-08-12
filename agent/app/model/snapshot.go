@@ -2,34 +2,34 @@ package model
 
 type Snapshot struct {
 	BaseModel
-	Name            string `json:"name" gorm:"type:varchar(64);not null;unique"`
-	Description     string `json:"description" gorm:"type:varchar(256)"`
-	From            string `json:"from"`
-	DefaultDownload string `json:"defaultDownload" gorm:"type:varchar(64)"`
-	Status          string `json:"status" gorm:"type:varchar(64)"`
-	Message         string `json:"message" gorm:"type:varchar(256)"`
-	Version         string `json:"version" gorm:"type:varchar(256)"`
+	Name              string `json:"name" gorm:"not null;unique"`
+	Description       string `json:"description"`
+	SourceAccountIDs  string `json:"sourceAccountsIDs"`
+	DownloadAccountID uint   `json:"downloadAccountID"`
+	Status            string `json:"status"`
+	Message           string `json:"message"`
+	Version           string `json:"version"`
 
-	InterruptStep    string `json:"interruptStep" gorm:"type:varchar(64)"`
-	RecoverStatus    string `json:"recoverStatus" gorm:"type:varchar(64)"`
-	RecoverMessage   string `json:"recoverMessage" gorm:"type:varchar(256)"`
-	LastRecoveredAt  string `json:"lastRecoveredAt" gorm:"type:varchar(64)"`
-	RollbackStatus   string `json:"rollbackStatus" gorm:"type:varchar(64)"`
-	RollbackMessage  string `json:"rollbackMessage" gorm:"type:varchar(256)"`
-	LastRollbackedAt string `json:"lastRollbackedAt" gorm:"type:varchar(64)"`
+	InterruptStep   string `json:"interruptStep"`
+	RecoverStatus   string `json:"recoverStatus"`
+	RecoverMessage  string `json:"recoverMessage"`
+	LastRecoveredAt string `json:"lastRecoveredAt"`
+	RollbackStatus  string `json:"rollbackStatus"`
+	RollbackMessage string `json:"rollbackMessage"`
+	LastRollbackAt  string `json:"lastRollbackAt"`
 }
 
 type SnapshotStatus struct {
 	BaseModel
-	SnapID     uint   `gorm:"type:decimal" json:"snapID"`
-	Panel      string `json:"panel" gorm:"type:varchar(64);default:Running"`
-	PanelInfo  string `json:"panelInfo" gorm:"type:varchar(64);default:Running"`
-	DaemonJson string `json:"daemonJson" gorm:"type:varchar(64);default:Running"`
-	AppData    string `json:"appData" gorm:"type:varchar(64);default:Running"`
-	PanelData  string `json:"panelData" gorm:"type:varchar(64);default:Running"`
-	BackupData string `json:"backupData" gorm:"type:varchar(64);default:Running"`
+	SnapID     uint   `json:"snapID"`
+	Panel      string `json:"panel" gorm:"default:Running"`
+	PanelInfo  string `json:"panelInfo" gorm:"default:Running"`
+	DaemonJson string `json:"daemonJson" gorm:"default:Running"`
+	AppData    string `json:"appData" gorm:"default:Running"`
+	PanelData  string `json:"panelData" gorm:"default:Running"`
+	BackupData string `json:"backupData" gorm:"default:Running"`
 
-	Compress string `json:"compress" gorm:"type:varchar(64);default:Waiting"`
-	Size     string `json:"size" gorm:"type:varchar(64)"`
-	Upload   string `json:"upload" gorm:"type:varchar(64);default:Waiting"`
+	Compress string `json:"compress" gorm:"default:Waiting"`
+	Size     string `json:"size" `
+	Upload   string `json:"upload" gorm:"default:Waiting"`
 }

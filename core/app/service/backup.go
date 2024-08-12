@@ -19,7 +19,6 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/cloud_storage/client"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
 	fileUtils "github.com/1Panel-dev/1Panel/core/utils/files"
-	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 	"github.com/robfig/cron/v3"
@@ -28,6 +27,9 @@ import (
 type BackupService struct{}
 
 type IBackupService interface {
+	Get(req dto.OperateByID) (dto.BackupInfo, error)
+	List(req dto.OperateByIDs) ([]dto.BackupInfo, error)
+
 	SearchWithPage(search dto.SearchPageWithType) (int64, interface{}, error)
 	LoadOneDriveInfo() (dto.OneDriveInfo, error)
 	Create(backupDto dto.BackupOperate) error
@@ -41,6 +43,50 @@ type IBackupService interface {
 
 func NewIBackupService() IBackupService {
 	return &BackupService{}
+}
+
+func (u *BackupService) Get(req dto.OperateByID) (dto.BackupInfo, error) {
+	var data dto.BackupInfo
+	account, err := backupRepo.List(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return data, err
+	}
+	if err := copier.Copy(&data, &account); err != nil {
+		global.LOG.Errorf("copy backup account to dto backup info failed, err: %v", err)
+	}
+	data.AccessKey, err = encrypt.StringDecryptWithBase64(data.AccessKey)
+	if err != nil {
+		return data, err
+	}
+	data.Credential, err = encrypt.StringDecryptWithBase64(data.Credential)
+	if err != nil {
+		return data, err
+	}
+	return data, nil
+}
+
+func (u *BackupService) List(req dto.OperateByIDs) ([]dto.BackupInfo, error) {
+	accounts, err := backupRepo.List(commonRepo.WithByIDs(req.IDs), commonRepo.WithOrderBy("created_at desc"))
+	if err != nil {
+		return nil, err
+	}
+	var data []dto.BackupInfo
+	for _, account := range accounts {
+		var item dto.BackupInfo
+		if err := copier.Copy(&item, &account); err != nil {
+			global.LOG.Errorf("copy backup account to dto backup info failed, err: %v", err)
+		}
+		item.AccessKey, err = encrypt.StringDecryptWithBase64(item.AccessKey)
+		if err != nil {
+			return nil, err
+		}
+		item.Credential, err = encrypt.StringDecryptWithBase64(item.Credential)
+		if err != nil {
+			return nil, err
+		}
+		data = append(data, item)
+	}
+	return data, nil
 }
 
 func (u *BackupService) SearchWithPage(req dto.SearchPageWithType) (int64, interface{}, error) {
@@ -141,9 +187,6 @@ func (u *BackupService) Create(req dto.BackupOperate) error {
 			return err
 		}
 	}
-	if err := xpack.SyncBackupOperation("add", []model.BackupAccount{backup}); err != nil {
-		return err
-	}
 
 	backup.AccessKey, err = encrypt.StringEncrypt(backup.AccessKey)
 	if err != nil {
@@ -205,9 +248,6 @@ func (u *BackupService) Delete(id uint) error {
 		global.Cron.Remove(cron.EntryID(backup.EntryID))
 	}
 
-	if err := xpack.SyncBackupOperation("remove", []model.BackupAccount{backup}); err != nil {
-		return err
-	}
 	return backupRepo.Delete(commonRepo.WithByID(id))
 }
 
@@ -261,10 +301,6 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 		if err != nil || !isOk {
 			return buserr.WithMap("ErrBackupCheck", map[string]interface{}{"err": err.Error()}, err)
 		}
-	}
-
-	if err := xpack.SyncBackupOperation("update", []model.BackupAccount{newBackup}); err != nil {
-		return err
 	}
 
 	newBackup.AccessKey, err = encrypt.StringEncrypt(newBackup.AccessKey)

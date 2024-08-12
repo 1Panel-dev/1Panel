@@ -9,6 +9,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/i18n"
 	"github.com/1Panel-dev/1Panel/core/middleware"
+	"github.com/1Panel-dev/1Panel/core/router"
 	rou "github.com/1Panel-dev/1Panel/core/router"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
@@ -52,6 +53,11 @@ func Routers() *gin.Engine {
 		PublicGroup.Use(gzip.Gzip(gzip.DefaultCompression))
 		setWebStatic(PublicGroup)
 	}
+
+	agentRouter := Router.Group("agent")
+	agentRouter.Use(middleware.JwtAuth())
+	var agent router.AgentRouter
+	agent.InitRouter(agentRouter)
 
 	Router.Use(middleware.OperationLog())
 	if global.CONF.System.IsDemo {

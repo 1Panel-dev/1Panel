@@ -24,7 +24,6 @@ func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 		settingRouter.POST("/snapshot/rollback", baseApi.RollbackSnapshot)
 		settingRouter.POST("/snapshot/description/update", baseApi.UpdateSnapDescription)
 
-		settingRouter.POST("/backup/operate", baseApi.OperateBackup)
 		settingRouter.POST("/backup/backup", baseApi.Backup)
 		settingRouter.POST("/backup/recover", baseApi.Recover)
 		settingRouter.POST("/backup/recover/byupload", baseApi.RecoverByUpload)

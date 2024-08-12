@@ -127,24 +127,24 @@ func snapAppData(snap snapHelper, targetDir string) {
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"app_data": constant.StatusDone})
 }
 
-func snapBackup(snap snapHelper, localDir, targetDir string) {
+func snapBackup(snap snapHelper, targetDir string) {
 	defer snap.Wg.Done()
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"backup_data": constant.Running})
 	status := constant.StatusDone
-	if err := handleSnapTar(localDir, targetDir, "1panel_backup.tar.gz", "./system;./system_snapshot;", ""); err != nil {
+	if err := handleSnapTar(global.CONF.System.Backup, targetDir, "1panel_backup.tar.gz", "./system;./system_snapshot;", ""); err != nil {
 		status = err.Error()
 	}
 	snap.Status.BackupData = status
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"backup_data": status})
 }
 
-func snapPanelData(snap snapHelper, localDir, targetDir string) {
+func snapPanelData(snap snapHelper, targetDir string) {
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"panel_data": constant.Running})
 	status := constant.StatusDone
 	dataDir := path.Join(global.CONF.System.BaseDir, "1panel")
 	exclusionRules := "./tmp;./log;./cache;./db/1Panel.db-*;"
-	if strings.Contains(localDir, dataDir) {
-		exclusionRules += ("." + strings.ReplaceAll(localDir, dataDir, "") + ";")
+	if strings.Contains(global.CONF.System.Backup, dataDir) {
+		exclusionRules += ("." + strings.ReplaceAll(global.CONF.System.Backup, dataDir, "") + ";")
 	}
 	ignoreVal, _ := settingRepo.Get(settingRepo.WithByKey("SnapshotIgnore"))
 	rules := strings.Split(ignoreVal.Value, ",")
@@ -197,7 +197,7 @@ func snapCompress(snap snapHelper, rootDir string, secret string) {
 func snapUpload(snap snapHelper, accounts string, file string) {
 	source := path.Join(global.CONF.System.TmpDir, "system", path.Base(file))
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"upload": constant.StatusUploading})
-	accountMap, err := loadClientMap(accounts)
+	accountMap, err := NewBackupClientMap(strings.Split(accounts, ","))
 	if err != nil {
 		snap.Status.Upload = err.Error()
 		_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"upload": err.Error()})

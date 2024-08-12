@@ -21,10 +21,6 @@ import (
 )
 
 func (u *BackupService) RedisBackup(db dto.CommonBackup) error {
-	localDir, err := loadLocalDir()
-	if err != nil {
-		return err
-	}
 	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", db.Name)
 	if err != nil {
 		return err
@@ -45,17 +41,17 @@ func (u *BackupService) RedisBackup(db dto.CommonBackup) error {
 		}
 	}
 	itemDir := fmt.Sprintf("database/redis/%s", redisInfo.Name)
-	backupDir := path.Join(localDir, itemDir)
+	backupDir := path.Join(global.CONF.System.Backup, itemDir)
 	if err := handleRedisBackup(redisInfo, backupDir, fileName, db.Secret); err != nil {
 		return err
 	}
 	record := &model.BackupRecord{
-		Type:       "redis",
-		Name:       db.Name,
-		Source:     "LOCAL",
-		BackupType: "LOCAL",
-		FileDir:    itemDir,
-		FileName:   fileName,
+		Type:              "redis",
+		Name:              db.Name,
+		SourceAccountIDs:  "1",
+		DownloadAccountID: 1,
+		FileDir:           itemDir,
+		FileName:          fileName,
 	}
 	if err := backupRepo.CreateRecord(record); err != nil {
 		global.LOG.Errorf("save backup record failed, err: %v", err)

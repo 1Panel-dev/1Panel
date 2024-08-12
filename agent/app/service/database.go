@@ -237,11 +237,7 @@ func (u *DatabaseService) Delete(req dto.DatabaseDelete) error {
 		if _, err := os.Stat(uploadDir); err == nil {
 			_ = os.RemoveAll(uploadDir)
 		}
-		localDir, err := loadLocalDir()
-		if err != nil && !req.ForceDelete {
-			return err
-		}
-		backupDir := path.Join(localDir, fmt.Sprintf("database/%s/%s", db.Type, db.Name))
+		backupDir := path.Join(global.CONF.System.Backup, fmt.Sprintf("database/%s/%s", db.Type, db.Name))
 		if _, err := os.Stat(backupDir); err == nil {
 			_ = os.RemoveAll(backupDir)
 		}

@@ -78,12 +78,12 @@ func (u *SnapshotService) SnapshotImport(req dto.SnapshotImport) error {
 			snap = strings.ReplaceAll(snap, ".tar.gz", "")
 		}
 		itemSnap := model.Snapshot{
-			Name:            snap,
-			From:            req.From,
-			DefaultDownload: req.From,
-			Version:         nameItems[1],
-			Description:     req.Description,
-			Status:          constant.StatusSuccess,
+			Name:              snap,
+			SourceAccountIDs:  fmt.Sprintf("%v", req.BackupAccountID),
+			DownloadAccountID: req.BackupAccountID,
+			Version:           nameItems[1],
+			Description:       req.Description,
+			Status:            constant.StatusSuccess,
 		}
 		if err := snapshotRepo.Create(&itemSnap); err != nil {
 			return err
@@ -180,14 +180,11 @@ func (u *SnapshotService) readFromJson(path string) (SnapshotJson, error) {
 }
 
 func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto.SnapshotCreate, timeNow string, secret string) (string, error) {
-	localDir, err := loadLocalDir()
-	if err != nil {
-		return "", err
-	}
 	var (
 		rootDir    string
 		snap       model.Snapshot
 		snapStatus model.SnapshotStatus
+		err        error
 	)
 
 	if req.ID == 0 {
@@ -197,15 +194,15 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto
 		if isCronjob {
 			name = fmt.Sprintf("snapshot_1panel_%s_%s_%s", versionItem.Value, loadOs(), timeNow)
 		}
-		rootDir = path.Join(localDir, "system", name)
+		rootDir = path.Join(global.CONF.System.Backup, "system", name)
 
 		snap = model.Snapshot{
-			Name:            name,
-			Description:     req.Description,
-			From:            req.From,
-			DefaultDownload: req.DefaultDownload,
-			Version:         versionItem.Value,
-			Status:          constant.StatusWaiting,
+			Name:              name,
+			Description:       req.Description,
+			SourceAccountIDs:  req.SourceAccountIDs,
+			DownloadAccountID: req.DownloadAccountID,
+			Version:           versionItem.Value,
+			Status:            constant.StatusWaiting,
 		}
 		_ = snapshotRepo.Create(&snap)
 		snapStatus.SnapID = snap.ID
@@ -221,7 +218,7 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto
 			snapStatus.SnapID = snap.ID
 			_ = snapshotRepo.CreateStatus(&snapStatus)
 		}
-		rootDir = path.Join(localDir, fmt.Sprintf("system/%s", snap.Name))
+		rootDir = path.Join(global.CONF.System.Backup, fmt.Sprintf("system/%s", snap.Name))
 	}
 
 	var wg sync.WaitGroup
@@ -233,7 +230,7 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto
 
 	jsonItem := SnapshotJson{
 		BaseDir:       global.CONF.System.BaseDir,
-		BackupDataDir: localDir,
+		BackupDataDir: global.CONF.System.Backup,
 		PanelDataDir:  path.Join(global.CONF.System.BaseDir, "1panel"),
 	}
 	loadLogByStatus(snapStatus, logPath)
@@ -255,7 +252,7 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto
 	}
 	if snapStatus.BackupData != constant.StatusDone {
 		wg.Add(1)
-		go snapBackup(itemHelper, localDir, backupPanelDir)
+		go snapBackup(itemHelper, backupPanelDir)
 	}
 
 	if !isCronjob {
@@ -266,7 +263,7 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto
 				return
 			}
 			if snapStatus.PanelData != constant.StatusDone {
-				snapPanelData(itemHelper, localDir, backupPanelDir)
+				snapPanelData(itemHelper, backupPanelDir)
 			}
 			if snapStatus.PanelData != constant.StatusDone {
 				_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
@@ -280,7 +277,7 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto
 				return
 			}
 			if snapStatus.Upload != constant.StatusDone {
-				snapUpload(itemHelper, req.From, fmt.Sprintf("%s.tar.gz", rootDir))
+				snapUpload(itemHelper, req.SourceAccountIDs, fmt.Sprintf("%s.tar.gz", rootDir))
 			}
 			if snapStatus.Upload != constant.StatusDone {
 				_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
@@ -297,7 +294,7 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto
 		return snap.Name, fmt.Errorf("snapshot %s backup failed", snap.Name)
 	}
 	loadLogByStatus(snapStatus, logPath)
-	snapPanelData(itemHelper, localDir, backupPanelDir)
+	snapPanelData(itemHelper, backupPanelDir)
 	if snapStatus.PanelData != constant.StatusDone {
 		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
 		loadLogByStatus(snapStatus, logPath)
@@ -311,7 +308,7 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto
 		return snap.Name, fmt.Errorf("snapshot %s compress failed", snap.Name)
 	}
 	loadLogByStatus(snapStatus, logPath)
-	snapUpload(itemHelper, req.From, fmt.Sprintf("%s.tar.gz", rootDir))
+	snapUpload(itemHelper, req.SourceAccountIDs, fmt.Sprintf("%s.tar.gz", rootDir))
 	if snapStatus.Upload != constant.StatusDone {
 		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed})
 		loadLogByStatus(snapStatus, logPath)
@@ -326,12 +323,12 @@ func (u *SnapshotService) Delete(req dto.SnapshotBatchDelete) error {
 	snaps, _ := snapshotRepo.GetList(commonRepo.WithIdsIn(req.Ids))
 	for _, snap := range snaps {
 		if req.DeleteWithFile {
-			targetAccounts, err := loadClientMap(snap.From)
+			accounts, err := NewBackupClientMap(strings.Split(snap.SourceAccountIDs, ","))
 			if err != nil {
 				return err
 			}
-			for _, item := range targetAccounts {
-				global.LOG.Debugf("remove snapshot file %s.tar.gz from %s", snap.Name, item.backType)
+			for _, item := range accounts {
+				global.LOG.Debugf("remove snapshot file %s.tar.gz from %s", snap.Name, item.name)
 				_, _ = item.client.Delete(path.Join(item.backupPath, "system_snapshot", snap.Name+".tar.gz"))
 			}
 		}
@@ -512,7 +509,7 @@ func loadOs() string {
 
 func loadSnapSize(records []model.Snapshot) ([]dto.SnapshotInfo, error) {
 	var datas []dto.SnapshotInfo
-	clientMap := make(map[string]loadSizeHelper)
+	clientMap := make(map[uint]loadSizeHelper)
 	var wg sync.WaitGroup
 	for i := 0; i < len(records); i++ {
 		var item dto.SnapshotInfo
@@ -520,30 +517,23 @@ func loadSnapSize(records []model.Snapshot) ([]dto.SnapshotInfo, error) {
 			return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 		}
 		itemPath := fmt.Sprintf("system_snapshot/%s.tar.gz", item.Name)
-		if _, ok := clientMap[records[i].DefaultDownload]; !ok {
-			backup, err := backupRepo.Get(commonRepo.WithByType(records[i].DefaultDownload))
+		if _, ok := clientMap[records[i].DownloadAccountID]; !ok {
+			backup, client, err := NewBackupClientWithID(records[i].DownloadAccountID)
 			if err != nil {
-				global.LOG.Errorf("load backup model %s from db failed, err: %v", records[i].DefaultDownload, err)
-				clientMap[records[i].DefaultDownload] = loadSizeHelper{}
-				datas = append(datas, item)
-				continue
-			}
-			client, err := NewIBackupService().NewClient(&backup)
-			if err != nil {
-				global.LOG.Errorf("load backup client %s from db failed, err: %v", records[i].DefaultDownload, err)
-				clientMap[records[i].DefaultDownload] = loadSizeHelper{}
+				global.LOG.Errorf("load backup client from db failed, err: %v", err)
+				clientMap[records[i].DownloadAccountID] = loadSizeHelper{}
 				datas = append(datas, item)
 				continue
 			}
 			item.Size, _ = client.Size(path.Join(strings.TrimLeft(backup.BackupPath, "/"), itemPath))
 			datas = append(datas, item)
-			clientMap[records[i].DefaultDownload] = loadSizeHelper{backupPath: strings.TrimLeft(backup.BackupPath, "/"), client: client, isOk: true}
+			clientMap[records[i].DownloadAccountID] = loadSizeHelper{backupPath: strings.TrimLeft(backup.BackupPath, "/"), client: client, isOk: true}
 			continue
 		}
-		if clientMap[records[i].DefaultDownload].isOk {
+		if clientMap[records[i].DownloadAccountID].isOk {
 			wg.Add(1)
 			go func(index int) {
-				item.Size, _ = clientMap[records[index].DefaultDownload].client.Size(path.Join(clientMap[records[index].DefaultDownload].backupPath, itemPath))
+				item.Size, _ = clientMap[records[index].DownloadAccountID].client.Size(path.Join(clientMap[records[index].DownloadAccountID].backupPath, itemPath))
 				datas = append(datas, item)
 				wg.Done()
 			}(i)

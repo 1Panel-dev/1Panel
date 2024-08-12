@@ -23,10 +23,6 @@ import (
 )
 
 func (u *BackupService) AppBackup(req dto.CommonBackup) (*model.BackupRecord, error) {
-	localDir, err := loadLocalDir()
-	if err != nil {
-		return nil, err
-	}
 	app, err := appRepo.GetFirst(appRepo.WithKey(req.Name))
 	if err != nil {
 		return nil, err
@@ -37,7 +33,7 @@ func (u *BackupService) AppBackup(req dto.CommonBackup) (*model.BackupRecord, er
 	}
 	timeNow := time.Now().Format(constant.DateTimeSlimLayout)
 	itemDir := fmt.Sprintf("app/%s/%s", req.Name, req.DetailName)
-	backupDir := path.Join(localDir, itemDir)
+	backupDir := path.Join(global.CONF.System.Backup, itemDir)
 
 	fileName := fmt.Sprintf("%s_%s.tar.gz", req.DetailName, timeNow+common.RandStrAndNum(5))
 	if err := handleAppBackup(&install, backupDir, fileName, "", req.Secret); err != nil {
@@ -45,13 +41,13 @@ func (u *BackupService) AppBackup(req dto.CommonBackup) (*model.BackupRecord, er
 	}
 
 	record := &model.BackupRecord{
-		Type:       "app",
-		Name:       req.Name,
-		DetailName: req.DetailName,
-		Source:     "LOCAL",
-		BackupType: "LOCAL",
-		FileDir:    itemDir,
-		FileName:   fileName,
+		Type:              "app",
+		Name:              req.Name,
+		DetailName:        req.DetailName,
+		SourceAccountIDs:  "1",
+		DownloadAccountID: 1,
+		FileDir:           itemDir,
+		FileName:          fileName,
 	}
 
 	if err := backupRepo.CreateRecord(record); err != nil {
