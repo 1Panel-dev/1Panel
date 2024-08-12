@@ -23,14 +23,20 @@
                     <span class="input-help">
                         {{ $t('website.deleteAppHelper') }}
                     </span>
-                    <span class="input-help" style="color: red" v-if="runtimeApp">
+                    <span class="input-help text-red-500" v-if="runtimeApp">
                         {{ $t('website.deleteRuntimeHelper') }}
                     </span>
                 </el-form-item>
+
                 <el-form-item>
                     <el-checkbox v-model="deleteReq.deleteBackup" :label="$t('website.deleteBackup')" />
                     <span class="input-help">
                         {{ $t('website.deleteBackupHelper') }}
+                    </span>
+                </el-form-item>
+                <el-form-item v-if="subSites != ''">
+                    <span class="input-help text-red-500">
+                        {{ $t('website.deleteSubsite', [subSites]) }}
                     </span>
                 </el-form-item>
                 <el-form-item>
@@ -74,6 +80,7 @@ const deleteInfo = ref('');
 const websiteName = ref('');
 const deleteHelper = ref('');
 const runtimeApp = ref(false);
+const subSites = ref('');
 
 const handleClose = () => {
     open.value = false;
@@ -87,9 +94,13 @@ const acceptParams = async (website: Website.Website) => {
         deleteBackup: false,
         forceDelete: false,
     };
+    subSites.value = '';
     if (website.type === 'runtime' && website.appInstallId > 0) {
         runtimeApp.value = true;
         deleteReq.value.deleteApp = true;
+    }
+    if (website.childSites && website.childSites.length > 0) {
+        subSites.value = website.childSites.join(',');
     }
     deleteInfo.value = '';
     deleteReq.value.id = website.id;

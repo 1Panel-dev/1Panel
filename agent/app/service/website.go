@@ -59,7 +59,7 @@ type IWebsiteService interface {
 	GetWebsites() ([]response.WebsiteDTO, error)
 	CreateWebsite(create request.WebsiteCreate) error
 	OpWebsite(req request.WebsiteOp) error
-	GetWebsiteOptions() ([]response.WebsiteOption, error)
+	GetWebsiteOptions(req request.WebsiteOptionReq) ([]response.WebsiteOption, error)
 	UpdateWebsite(req request.WebsiteUpdate) error
 	DeleteWebsite(req request.WebsiteDelete) error
 	GetWebsite(id uint) (response.WebsiteDTO, error)
@@ -170,7 +170,7 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 		}
 		sitePath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "www", "sites", web.Alias)
 
-		websiteDTOs = append(websiteDTOs, response.WebsiteRes{
+		siteDTO := response.WebsiteRes{
 			ID:            web.ID,
 			CreatedAt:     web.CreatedAt,
 			Protocol:      web.Protocol,
@@ -186,7 +186,15 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 			RuntimeName:   runtimeName,
 			SitePath:      sitePath,
 			AppInstallID:  appInstallID,
-		})
+		}
+
+		sites, _ := websiteRepo.List(websiteRepo.WithParentID(web.ID))
+		if len(sites) > 0 {
+			for _, site := range sites {
+				siteDTO.ChildSites = append(siteDTO.ChildSites, site.PrimaryDomain)
+			}
+		}
+		websiteDTOs = append(websiteDTOs, siteDTO)
 	}
 	return total, websiteDTOs, nil
 }
@@ -198,9 +206,10 @@ func (w WebsiteService) GetWebsites() ([]response.WebsiteDTO, error) {
 		return nil, err
 	}
 	for _, web := range websites {
-		websiteDTOs = append(websiteDTOs, response.WebsiteDTO{
+		res := response.WebsiteDTO{
 			Website: web,
-		})
+		}
+		websiteDTOs = append(websiteDTOs, res)
 	}
 	return websiteDTOs, nil
 }
@@ -364,37 +373,47 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			return err
 		}
 		website.RuntimeID = runtime.ID
-		if runtime.Type == constant.RuntimePHP {
-			var (
-				req     request.AppInstallCreate
-				install *model.AppInstall
-			)
-			reg, _ := regexp.Compile(`[^a-z0-9_-]+`)
-			req.Name = reg.ReplaceAllString(strings.ToLower(alias), "")
-			req.AppDetailId = create.AppInstall.AppDetailId
-			req.Params = create.AppInstall.Params
-			req.Params["IMAGE_NAME"] = runtime.Image
-			req.AppContainerConfig = create.AppInstall.AppContainerConfig
-			req.Params["PANEL_WEBSITE_DIR"] = path.Join(nginxInstall.GetPath(), "/www")
-			install, err = NewIAppService().Install(req)
-			if err != nil {
-				return err
+
+		switch runtime.Type {
+		case constant.RuntimePHP:
+			if runtime.Resource == constant.ResourceAppstore {
+				var (
+					req     request.AppInstallCreate
+					install *model.AppInstall
+				)
+				reg, _ := regexp.Compile(`[^a-z0-9_-]+`)
+				req.Name = reg.ReplaceAllString(strings.ToLower(alias), "")
+				req.AppDetailId = create.AppInstall.AppDetailId
+				req.Params = create.AppInstall.Params
+				req.Params["IMAGE_NAME"] = runtime.Image
+				req.AppContainerConfig = create.AppInstall.AppContainerConfig
+				req.Params["PANEL_WEBSITE_DIR"] = path.Join(nginxInstall.GetPath(), "/www")
+				install, err = NewIAppService().Install(req)
+				if err != nil {
+					return err
+				}
+				website.AppInstallID = install.ID
+				appInstall = install
+				website.Proxy = fmt.Sprintf("127.0.0.1:%d", appInstall.HttpPort)
+			} else {
+				website.ProxyType = create.ProxyType
+				if website.ProxyType == constant.RuntimeProxyUnix {
+					proxy = fmt.Sprintf("unix:%s", path.Join("/www/sites", website.Alias, "php-pool", "php-fpm.sock"))
+				}
+				if website.ProxyType == constant.RuntimeProxyTcp {
+					proxy = fmt.Sprintf("127.0.0.1:%d", create.Port)
+				}
+				website.Proxy = proxy
 			}
-			website.AppInstallID = install.ID
-			appInstall = install
-			website.Proxy = fmt.Sprintf("127.0.0.1:%d", appInstall.HttpPort)
-		} else {
-			website.ProxyType = create.ProxyType
-			if website.ProxyType == constant.RuntimeProxyUnix {
-				proxy = fmt.Sprintf("unix:%s", path.Join("/www/sites", website.Alias, "php-pool", "php-fpm.sock"))
-			}
-			if website.ProxyType == constant.RuntimeProxyTcp {
-				proxy = fmt.Sprintf("127.0.0.1:%d", create.Port)
-			}
-			website.Proxy = proxy
+		case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo:
+			website.Proxy = fmt.Sprintf("127.0.0.1:%d", runtime.Port)
 		}
-	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo:
-		website.Proxy = fmt.Sprintf("127.0.0.1:%d", runtime.Port)
+	case constant.Subsite:
+		parentWebsite, err := websiteRepo.GetFirst(commonRepo.WithByID(create.ParentWebsiteID))
+		if err != nil {
+			return err
+		}
+		website.ParentWebsiteID = parentWebsite.ID
 	}
 
 	if len(create.FtpUser) != 0 && len(create.FtpPassword) != 0 {
@@ -489,8 +508,12 @@ func (w WebsiteService) OpWebsite(req request.WebsiteOp) error {
 	return websiteRepo.Save(context.Background(), &website)
 }
 
-func (w WebsiteService) GetWebsiteOptions() ([]response.WebsiteOption, error) {
-	webs, err := websiteRepo.List()
+func (w WebsiteService) GetWebsiteOptions(req request.WebsiteOptionReq) ([]response.WebsiteOption, error) {
+	var options []repo.DBOption
+	if len(req.Types) > 0 {
+		options = append(options, websiteRepo.WithTypes(req.Types))
+	}
+	webs, err := websiteRepo.List(options...)
 	if err != nil {
 		return nil, err
 	}
@@ -555,6 +578,16 @@ func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
 	if err != nil {
 		return err
+	}
+	if website.Type != constant.Subsite {
+		parentWebsites, _ := websiteRepo.List(websiteRepo.WithParentID(website.ID))
+		if len(parentWebsites) > 0 {
+			var names []string
+			for _, site := range parentWebsites {
+				names = append(names, site.PrimaryDomain)
+			}
+			return buserr.WithName("ErrParentWebsite", strings.Join(names, ","))
+		}
 	}
 	if err = delNginxConfig(website, req.ForceDelete); err != nil {
 		return err
@@ -2759,7 +2792,7 @@ func (w WebsiteService) LoadWebsiteDirConfig(req request.WebsiteCommonReq) (*res
 	}
 	res.Dirs = []string{"/"}
 	for _, file := range indexFiles {
-		if !file.IsDir() {
+		if !file.IsDir() || file.Name() == "node_modules" || file.Name() == "vendor" {
 			continue
 		}
 		res.Dirs = append(res.Dirs, fmt.Sprintf("/%s", file.Name()))

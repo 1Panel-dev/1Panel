@@ -21,6 +21,10 @@
                             label: i18n.global.t('website.static'),
                             value: 'static',
                         },
+                        {
+                            label: i18n.global.t('website.subsite'),
+                            value: 'subsite',
+                        },
                     ]"
                     :key="item.value"
                 >
@@ -59,6 +63,12 @@
             <el-alert
                 v-if="website.type == 'runtime'"
                 :title="$t('website.runtimeProxyHelper')"
+                type="info"
+                :closable="false"
+            />
+            <el-alert
+                v-if="website.type == 'subsite'"
+                :title="$t('website.subsiteHelper')"
                 type="info"
                 :closable="false"
             />
@@ -146,6 +156,28 @@
                             :propStart="'appinstall.params.'"
                         ></Params>
                     </div>
+                </div>
+                <div v-if="website.type === 'subsite'">
+                    <el-form-item :label="$t('website.parentWbeiste')" prop="parentWebsiteID">
+                        <el-select v-model="website.parentWebsiteID" @change="getDirConfig(website.parentWebsiteID)">
+                            <el-option
+                                v-for="(site, index) in parentWebsites"
+                                :key="index"
+                                :label="site.primaryDomain"
+                                :value="site.id"
+                            ></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item :label="$t('website.runDir')" prop="siteDir">
+                        <el-select v-model="website.siteDir" filterable class="p-w-200">
+                            <el-option
+                                v-for="(item, index) in dirs"
+                                :label="item"
+                                :value="item"
+                                :key="index"
+                            ></el-option>
+                        </el-select>
+                    </el-form-item>
                 </div>
                 <div v-if="website.type === 'runtime'">
                     <el-row :gutter="20">
@@ -496,7 +528,14 @@
 <script lang="ts" setup name="CreateWebSite">
 import { App } from '@/api/interface/app';
 import { GetApp, GetAppDetail, SearchApp, GetAppInstalled, GetAppDetailByID } from '@/api/modules/app';
-import { CreateWebsite, ListSSL, PreCheck, SearchAcmeAccount } from '@/api/modules/website';
+import {
+    CreateWebsite,
+    GetWebsiteOptions,
+    ListSSL,
+    PreCheck,
+    SearchAcmeAccount,
+    GetDirConfig,
+} from '@/api/modules/website';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, FormInstance } from 'element-plus';
@@ -565,6 +604,8 @@ const initData = () => ({
     websiteSSLID: undefined,
     acmeAccountID: undefined,
     domains: [],
+    parentWebsiteID: undefined,
+    siteDir: '',
 });
 const website = ref(initData());
 const rules = ref<any>({
@@ -594,6 +635,8 @@ const rules = ref<any>({
     dbPassword: [Rules.requiredInput, Rules.paramComplexity],
     dbHost: [Rules.requiredSelect],
     websiteSSLID: [Rules.requiredSelect],
+    parentWebsiteID: [Rules.requiredSelect],
+    siteDir: [Rules.requiredSelect],
 });
 
 const open = ref(false);
@@ -626,6 +669,8 @@ const taskLog = ref();
 const dbServices = ref();
 const ssls = ref();
 const websiteSSL = ref();
+const parentWebsites = ref();
+const dirs = ref([]);
 
 const handleClose = () => {
     open.value = false;
@@ -655,6 +700,9 @@ const changeType = (type: string) => {
         case 'proxy':
             website.value.proxyAddress = '';
             searchAppInstalled('proxy');
+            break;
+        case 'subsite':
+            listWebsites();
             break;
         default:
             website.value.appInstallId = undefined;
@@ -883,6 +931,27 @@ watch(
 const changeAlias = (value: string) => {
     const domain = value.split(':')[0];
     website.value.alias = domain;
+};
+
+const listWebsites = async () => {
+    try {
+        const res = await GetWebsiteOptions({ types: ['static', 'runtime'] });
+        parentWebsites.value = res.data;
+        if (res.data.length > 0) {
+            website.value.parentWebsiteID = res.data[0].id;
+            getDirConfig(res.data[0].id);
+        }
+    } catch (error) {}
+};
+
+const getDirConfig = async (websiteID: number) => {
+    try {
+        const res = await GetDirConfig({ id: websiteID });
+        dirs.value = res.data.dirs;
+        if (res.data.dirs.length > 0) {
+            website.value.siteDir = res.data.dirs[0];
+        }
+    } catch (error) {}
 };
 
 defineExpose({

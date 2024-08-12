@@ -161,17 +161,10 @@ const initData = () => {
     dirs.value = [];
 };
 
-function filterDirectories(directories: any[]) {
-    return directories.filter((dir) => {
-        return dir !== '/node_modules' && dir !== '/vendor';
-    });
-}
-
 const getDirConfig = async () => {
     try {
         const res = await GetDirConfig({ id: props.id });
         dirs.value = res.data.dirs;
-        dirs.value = filterDirectories(dirs.value);
         dirConfig.value = res.data;
     } catch (error) {}
 };

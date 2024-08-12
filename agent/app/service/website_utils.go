@@ -231,12 +231,9 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 		case constant.RuntimePHP:
 			server.UpdateDirective("error_page", []string{"404", "/404.html"})
 			if runtime.Resource == constant.ResourceLocal {
-				switch runtime.Type {
-				case constant.RuntimePHP:
-					server.UpdateRoot(rootIndex)
-					localPath := path.Join(nginxInstall.GetPath(), rootIndex, "index.php")
-					server.UpdatePHPProxy([]string{website.Proxy}, localPath)
-				}
+				server.UpdateRoot(rootIndex)
+				localPath := path.Join(nginxInstall.GetPath(), rootIndex, "index.php")
+				server.UpdatePHPProxy([]string{website.Proxy}, localPath)
 			} else {
 				server.UpdateRoot(rootIndex)
 				server.UpdatePHPProxy([]string{website.Proxy}, "")
@@ -244,6 +241,34 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 		case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo:
 			proxy := fmt.Sprintf("http://127.0.0.1:%d", runtime.Port)
 			server.UpdateRootProxy([]string{proxy})
+		}
+	case constant.Subsite:
+		parentWebsite, err := websiteRepo.GetFirst(commonRepo.WithByID(website.ParentWebsiteID))
+		if err != nil {
+			return err
+		}
+		website.Proxy = parentWebsite.Proxy
+		rootIndex = path.Join("/www/sites", parentWebsite.Alias, "index", website.SiteDir)
+		server.UpdateDirective("error_page", []string{"404", "/404.html"})
+		if parentWebsite.Type == constant.Runtime {
+			parentRuntime, err := runtimeRepo.GetFirst(commonRepo.WithByID(parentWebsite.RuntimeID))
+			if err != nil {
+				return err
+			}
+			website.RuntimeID = parentRuntime.ID
+			if parentRuntime.Type == constant.RuntimePHP {
+				if parentRuntime.Resource == constant.ResourceLocal {
+					server.UpdateRoot(rootIndex)
+					localPath := path.Join(nginxInstall.GetPath(), rootIndex, "index.php")
+					server.UpdatePHPProxy([]string{website.Proxy}, localPath)
+				} else {
+					server.UpdateRoot(rootIndex)
+					server.UpdatePHPProxy([]string{website.Proxy}, "")
+				}
+			}
+		}
+		if parentWebsite.Type == constant.Static {
+			server.UpdateRoot(rootIndex)
 		}
 	}
 

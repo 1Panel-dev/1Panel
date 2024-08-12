@@ -19,6 +19,9 @@ type IWebsiteRepo interface {
 	WithDomainLike(domain string) DBOption
 	WithRuntimeID(runtimeID uint) DBOption
 	WithIDs(ids []uint) DBOption
+	WithTypes(types []string) DBOption
+	WithParentID(websiteID uint) DBOption
+
 	Page(page, size int, opts ...DBOption) (int64, []model.Website, error)
 	List(opts ...DBOption) ([]model.Website, error)
 	GetFirst(opts ...DBOption) (model.Website, error)
@@ -49,6 +52,12 @@ func (w *WebsiteRepo) WithIDs(ids []uint) DBOption {
 	}
 }
 
+func (w *WebsiteRepo) WithTypes(types []string) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("type in (?)", types)
+	}
+}
+
 func (w *WebsiteRepo) WithRuntimeID(runtimeID uint) DBOption {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("runtime_id = ?", runtimeID)
@@ -76,6 +85,12 @@ func (w *WebsiteRepo) WithAlias(alias string) DBOption {
 func (w *WebsiteRepo) WithWebsiteSSLID(sslId uint) DBOption {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("website_ssl_id = ?", sslId)
+	}
+}
+
+func (w *WebsiteRepo) WithParentID(websiteID uint) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("parent_website_id = ?", websiteID)
 	}
 }
 

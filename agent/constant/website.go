@@ -14,6 +14,7 @@ const (
 	Static     = "static"
 	Proxy      = "proxy"
 	Runtime    = "runtime"
+	Subsite    = "subsite"
 
 	SSLExisted = "existed"
 	SSLAuto    = "auto"

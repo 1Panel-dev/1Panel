@@ -2134,6 +2134,10 @@ const message = {
         domainSSLHelper:
             'Enabling SSL on a non-443 port will cause the 443 port to stop listening. If you need the 443 port to continue listening, please add the domain:443',
         global: 'Global',
+        subsite: 'Subsite',
+        subsiteHelper: 'A subsite can select an existing PHP or static website directory as the main directory.',
+        parentWbeiste: 'Parent Website',
+        deleteSubsite: 'To delete the current website, you must first delete the subsite(s) {0}',
     },
     php: {
         short_open_tag: 'Short tag support',

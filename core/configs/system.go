@@ -17,4 +17,5 @@ type System struct {
 	Entrance       string `mapstructure:"entrance"`
 	IsDemo         bool   `mapstructure:"is_demo"`
 	ChangeUserInfo string `mapstructure:"change_user_info"`
+	DbPath         string `mapstructure:"db_path"`
 }
