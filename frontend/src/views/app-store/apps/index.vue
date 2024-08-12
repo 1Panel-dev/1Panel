@@ -56,11 +56,6 @@
         </template>
         <template #rightButton>
             <div class="flex justify-end">
-                <div class="mr-10">
-                    <el-checkbox v-model="req.resource" true-value="all" false-value="remote" @change="search(req)">
-                        {{ $t('app.showLocal') }}
-                    </el-checkbox>
-                </div>
                 <fu-table-pagination
                     v-model:current-page="paginationConfig.currentPage"
                     v-model:page-size="paginationConfig.pageSize"
@@ -68,11 +63,11 @@
                     @change="search(req)"
                     :layout="mobile ? ' prev, pager, next' : ' prev, pager, next'"
                 />
-                <el-badge is-dot :hidden="!canUpdate" class="ml-5">
-                    <el-button @click="sync" type="primary" plain :disabled="syncing">
-                        {{ $t('app.syncAppList') }}
-                    </el-button>
-                </el-badge>
+                <div>
+                    <el-checkbox v-model="req.resource" true-value="all" false-value="remote" @change="search(req)">
+                        {{ $t('app.showLocal') }}
+                    </el-checkbox>
+                </div>
             </div>
         </template>
         <template #main>
@@ -168,12 +163,10 @@
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
 import { onMounted, reactive, ref, computed } from 'vue';
-import { GetAppTags, SearchApp, SyncApp } from '@/api/modules/app';
-import i18n from '@/lang';
+import { GetAppTags, SearchApp } from '@/api/modules/app';
 import Detail from '../detail/index.vue';
 import Install from '../detail/install/index.vue';
 import router from '@/routers';
-import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
 import { getLanguage } from '@/utils/util';
 
@@ -205,8 +198,6 @@ const tags = ref<App.Tag[]>([]);
 const loading = ref(false);
 const activeTag = ref('all');
 const showDetail = ref(false);
-const canUpdate = ref(false);
-const syncing = ref(false);
 const detailRef = ref();
 const installRef = ref();
 const installKey = ref('');
@@ -254,23 +245,6 @@ const openInstall = (app: App.App) => {
 
 const openDetail = (key: string) => {
     detailRef.value.acceptParams(key, 'install');
-};
-
-const sync = () => {
-    syncing.value = true;
-    SyncApp()
-        .then((res) => {
-            if (res.message != '') {
-                MsgSuccess(res.message);
-            } else {
-                MsgSuccess(i18n.global.t('app.syncStart'));
-            }
-            canUpdate.value = false;
-            search(req);
-        })
-        .finally(() => {
-            syncing.value = false;
-        });
 };
 
 const changeTag = (key: string) => {
