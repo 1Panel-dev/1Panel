@@ -3,32 +3,44 @@
         <template #header>
             <DrawerHeader :header="$t('file.info')" :back="handleClose" />
         </template>
-        <el-row>
-            <el-col>
-                <el-descriptions :column="1" border>
-                    <el-descriptions-item :label="$t('file.fileName')">{{ data.name }}</el-descriptions-item>
-                    <el-descriptions-item :label="$t('commons.table.type')">{{ data.type }}</el-descriptions-item>
-                    <el-descriptions-item :label="$t('file.path')">{{ data.path }}</el-descriptions-item>
-                    <el-descriptions-item :label="$t('file.size')">
-                        <span v-if="data.isDir">
-                            <el-button type="primary" link small @click="getDirSize(data)" :loading="loading">
-                                <span v-if="data.dirSize == undefined">
-                                    {{ $t('file.calculate') }}
-                                </span>
-                                <span v-else>{{ computeSize(data.dirSize) }}</span>
-                            </el-button>
+        <el-descriptions :column="1" border>
+            <el-descriptions-item label-class-name="detail-label" :label="$t('file.fileName')">
+                {{ data.name }}
+            </el-descriptions-item>
+            <el-descriptions-item
+                label-class-name="detail-label"
+                :label="$t('commons.table.type')"
+                v-if="data.type != ''"
+            >
+                {{ data.type }}
+            </el-descriptions-item>
+            <el-descriptions-item class-name="detail-content" label-class-name="detail-label" :label="$t('file.path')">
+                {{ data.path }}
+            </el-descriptions-item>
+            <el-descriptions-item label-class-name="detail-label" :label="$t('file.size')">
+                <span v-if="data.isDir">
+                    <el-button type="primary" link small @click="getDirSize(data)" :loading="loading">
+                        <span v-if="data.dirSize == undefined">
+                            {{ $t('file.calculate') }}
                         </span>
-                        <span v-else>{{ computeSize(data.size) }}</span>
-                    </el-descriptions-item>
-                    <el-descriptions-item :label="$t('file.role')">{{ data.mode }}</el-descriptions-item>
-                    <el-descriptions-item :label="$t('commons.table.user')">{{ data.user }}</el-descriptions-item>
-                    <el-descriptions-item :label="$t('file.group')">{{ data.group }}</el-descriptions-item>
-                    <el-descriptions-item :label="$t('commons.table.updatedAt')">
-                        {{ dateFormatSimple(data.modTime) }}
-                    </el-descriptions-item>
-                </el-descriptions>
-            </el-col>
-        </el-row>
+                        <span v-else>{{ computeSize(data.dirSize) }}</span>
+                    </el-button>
+                </span>
+                <span v-else>{{ computeSize(data.size) }}</span>
+            </el-descriptions-item>
+            <el-descriptions-item label-class-name="detail-label" :label="$t('file.role')">
+                {{ data.mode }}
+            </el-descriptions-item>
+            <el-descriptions-item label-class-name="detail-label" :label="$t('commons.table.user')">
+                {{ data.user }}
+            </el-descriptions-item>
+            <el-descriptions-item label-class-name="detail-label" :label="$t('file.group')">
+                {{ data.group }}
+            </el-descriptions-item>
+            <el-descriptions-item label-class-name="detail-label" :label="$t('commons.table.updatedAt')">
+                {{ dateFormatSimple(data.modTime) }}
+            </el-descriptions-item>
+        </el-descriptions>
     </el-drawer>
 </template>
 
@@ -80,3 +92,14 @@ defineExpose({
     acceptParams,
 });
 </script>
+<style scoped>
+:deep(.detail-label) {
+    min-width: 100px !important;
+}
+
+:deep(.detail-content) {
+    max-width: 295px;
+    word-break: break-all;
+    word-wrap: break-word;
+}
+</style>
