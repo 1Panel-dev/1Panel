@@ -446,7 +446,7 @@ func (a *AppInstallService) SyncAll(systemInit bool) error {
 		return err
 	}
 	for _, i := range allList {
-		if i.Status == constant.Installing || i.Status == constant.Upgrading || i.Status == constant.Rebuilding {
+		if i.Status == constant.Installing || i.Status == constant.Upgrading || i.Status == constant.Rebuilding || i.Status == constant.Uninstalling {
 			if systemInit {
 				i.Status = constant.Error
 				i.Message = "1Panel restart causes the task to terminate"
@@ -755,7 +755,7 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 }
 
 func syncAppInstallStatus(appInstall *model.AppInstall, force bool) error {
-	if appInstall.Status == constant.Installing || appInstall.Status == constant.Rebuilding || appInstall.Status == constant.Upgrading {
+	if appInstall.Status == constant.Installing || appInstall.Status == constant.Rebuilding || appInstall.Status == constant.Upgrading || appInstall.Status == constant.Uninstalling {
 		return nil
 	}
 	cli, err := docker.NewClient()

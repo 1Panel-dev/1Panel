@@ -275,6 +275,7 @@ const message = {
             applyerror: '失敗',
             syncerr: '失敗',
             uperr: '失败',
+            uninstalling: '卸載中',
         },
         units: {
             second: '秒',

@@ -51,6 +51,7 @@ const loadingStatus = [
     'starting',
     'removing',
     'applying',
+    'uninstalling',
 ];
 
 const loadingIcon = (status: string): boolean => {

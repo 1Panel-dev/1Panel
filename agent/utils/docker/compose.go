@@ -59,6 +59,7 @@ func GetDockerComposeImages(projectName string, env, yml []byte) ([]string, erro
 	var (
 		configFiles []types.ConfigFile
 		images      []string
+		imagesMap   = make(map[string]struct{})
 	)
 	configFiles = append(configFiles, types.ConfigFile{
 		Filename: "docker-compose.yml",
@@ -81,7 +82,10 @@ func GetDockerComposeImages(projectName string, env, yml []byte) ([]string, erro
 		return nil, err
 	}
 	for _, service := range project.AllServices() {
-		images = append(images, service.Image)
+		imagesMap[service.Image] = struct{}{}
+	}
+	for image := range imagesMap {
+		images = append(images, image)
 	}
 	return images, nil
 }

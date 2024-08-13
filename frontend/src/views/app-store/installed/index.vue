@@ -520,7 +520,12 @@ const buttons = [
             openOperate(row, 'sync');
         },
         disabled: (row: any) => {
-            return row.status === 'DownloadErr' || row.status === 'Upgrading' || row.status === 'Rebuilding';
+            return (
+                row.status === 'DownloadErr' ||
+                row.status === 'Upgrading' ||
+                row.status === 'Rebuilding' ||
+                row.status === 'Uninstalling'
+            );
         },
     },
     {
@@ -529,7 +534,12 @@ const buttons = [
             openOperate(row, 'rebuild');
         },
         disabled: (row: any) => {
-            return row.status === 'DownloadErr' || row.status === 'Upgrading' || row.status === 'Rebuilding';
+            return (
+                row.status === 'DownloadErr' ||
+                row.status === 'Upgrading' ||
+                row.status === 'Rebuilding' ||
+                row.status === 'Uninstalling'
+            );
         },
     },
     {
@@ -538,7 +548,12 @@ const buttons = [
             openOperate(row, 'restart');
         },
         disabled: (row: any) => {
-            return row.status === 'DownloadErr' || row.status === 'Upgrading' || row.status === 'Rebuilding';
+            return (
+                row.status === 'DownloadErr' ||
+                row.status === 'Upgrading' ||
+                row.status === 'Rebuilding' ||
+                row.status === 'Uninstalling'
+            );
         },
     },
     {
@@ -552,7 +567,8 @@ const buttons = [
                 row.status === 'Error' ||
                 row.status === 'DownloadErr' ||
                 row.status === 'Upgrading' ||
-                row.status === 'Rebuilding'
+                row.status === 'Rebuilding' ||
+                row.status === 'Uninstalling'
             );
         },
     },
@@ -566,7 +582,8 @@ const buttons = [
                 row.status !== 'Running' ||
                 row.status === 'DownloadErr' ||
                 row.status === 'Upgrading' ||
-                row.status === 'Rebuilding'
+                row.status === 'Rebuilding' ||
+                row.status === 'Uninstalling'
             );
         },
     },
@@ -582,7 +599,12 @@ const buttons = [
             openParam(row);
         },
         disabled: (row: any) => {
-            return row.status === 'DownloadErr' || row.status === 'Upgrading' || row.status === 'Rebuilding';
+            return (
+                row.status === 'DownloadErr' ||
+                row.status === 'Upgrading' ||
+                row.status === 'Rebuilding' ||
+                row.status === 'Uninstalling'
+            );
         },
     },
 ];
