@@ -330,6 +330,8 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 	}
 
 	uninstall := func(t *task.Task) error {
+		install.Status = constant.Uninstalling
+		_ = appInstallRepo.Save(context.Background(), &install)
 		dir, _ := os.Stat(appDir)
 		if dir != nil {
 			logStr := i18n.GetMsgByKey("Stop") + i18n.GetMsgByKey("App")
@@ -346,7 +348,15 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 			}
 			if deleteReq.DeleteImage {
 				delImageStr := i18n.GetMsgByKey("TaskDelete") + i18n.GetMsgByKey("Image")
-				images, _ := getImages(install)
+				projectName := strings.ToLower(install.Name)
+				content, err := op.GetContent(install.GetEnvPath())
+				if err != nil {
+					return err
+				}
+				images, err := composeV2.GetDockerComposeImages(projectName, content, []byte(install.DockerCompose))
+				if err != nil {
+					return err
+				}
 				client, err := docker.NewClient()
 				if err != nil {
 					return err
@@ -440,7 +450,12 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 		return nil
 	}
 	uninstallTask.AddSubTask(task.GetTaskName(install.Name, task.TaskUninstall, task.TaskScopeApp), uninstall, nil)
-	go uninstallTask.Execute()
+	go func() {
+		if err := uninstallTask.Execute(); err != nil {
+			install.Status = constant.Error
+			_ = appInstallRepo.Save(context.Background(), &install)
+		}
+	}()
 	return nil
 }
 
@@ -744,22 +759,6 @@ func getContainerNames(install model.AppInstall) ([]string, error) {
 		containerNames = append(containerNames, install.ContainerName)
 	}
 	return containerNames, nil
-}
-
-func getImages(install model.AppInstall) ([]string, error) {
-	envStr, err := coverEnvJsonToStr(install.Env)
-	if err != nil {
-		return nil, err
-	}
-	project, err := composeV2.GetComposeProject(install.Name, install.GetPath(), []byte(install.DockerCompose), []byte(envStr), true)
-	if err != nil {
-		return nil, err
-	}
-	var images []string
-	for _, service := range project.AllServices() {
-		images = append(images, service.Image)
-	}
-	return images, nil
 }
 
 func coverEnvJsonToStr(envJson string) (string, error) {
@@ -1254,10 +1253,11 @@ func handleErr(install model.AppInstall, err error, out string) error {
 
 func doNotNeedSync(installed model.AppInstall) bool {
 	return installed.Status == constant.Installing || installed.Status == constant.Rebuilding || installed.Status == constant.Upgrading ||
-		installed.Status == constant.Syncing
+		installed.Status == constant.Syncing || installed.Status == constant.Uninstalling
 }
 
 func synAppInstall(containers map[string]types.Container, appInstall *model.AppInstall, force bool) {
+	oldStatus := appInstall.Status
 	containerNames := strings.Split(appInstall.ContainerName, ",")
 	if len(containers) == 0 {
 		if appInstall.Status == constant.UpErr && !force {
@@ -1294,6 +1294,9 @@ func synAppInstall(containers map[string]types.Container, appInstall *model.AppI
 		appInstall.Status = constant.Stopped
 	case runningCount == total:
 		appInstall.Status = constant.Running
+		if oldStatus == constant.Running {
+			return
+		}
 	case pausedCount == total:
 		appInstall.Status = constant.Paused
 	case len(notFoundNames) == total:

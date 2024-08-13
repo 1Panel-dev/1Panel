@@ -280,6 +280,7 @@ const message = {
             applyerror: 'Failure',
             syncerr: 'Error',
             uperr: 'Error',
+            uninstalling: 'Uninstalling',
         },
         units: {
             second: 'Second',

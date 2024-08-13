@@ -72,16 +72,21 @@ func countLines(path string) (int, error) {
 		return 0, err
 	}
 	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	lineCount := 0
-	for scanner.Scan() {
-		lineCount++
+	reader := bufio.NewReader(file)
+	count := 0
+	for {
+		_, err := reader.ReadString('\n')
+		if err != nil {
+			if err == io.EOF {
+				if count > 0 {
+					count++
+				}
+				return count, nil
+			}
+			return count, err
+		}
+		count++
 	}
-	if err := scanner.Err(); err != nil {
-		return 0, err
-	}
-	return lineCount, nil
 }
 
 func ReadFileByLine(filename string, page, pageSize int, latest bool) (lines []string, isEndOfFile bool, total int, err error) {
