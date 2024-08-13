@@ -25,6 +25,7 @@ type IBackupRepo interface {
 	WithByFileName(fileName string) DBOption
 	WithByType(backupType string) DBOption
 	WithByCronID(cronjobID uint) DBOption
+	WithFileNameStartWith(filePrefix string) DBOption
 }
 
 func NewIBackupRepo() IBackupRepo {
@@ -47,7 +48,7 @@ func (u *BackupRepo) ListRecord(opts ...DBOption) ([]model.BackupRecord, error) 
 	for _, opt := range opts {
 		db = opt(db)
 	}
-	err := db.Find(&users).Error
+	err := db.Debug().Find(&users).Error
 	return users, err
 }
 
@@ -78,6 +79,12 @@ func (u *BackupRepo) WithByFileName(fileName string) DBOption {
 			return g
 		}
 		return g.Where("file_name = ?", fileName)
+	}
+}
+
+func (u *BackupRepo) WithFileNameStartWith(filePrefix string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("file_name LIKE ?", filePrefix+"%")
 	}
 }
 

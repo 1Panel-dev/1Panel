@@ -516,8 +516,19 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		)
 		global.LOG.Infof(i18n.GetMsgWithName("UpgradeAppStart", install.Name, nil))
 		if req.Backup {
-			backupRecord, err := NewIBackupService().AppBackup(dto.CommonBackup{Name: install.App.Key, DetailName: install.Name})
+			iBackUpService := NewIBackupService()
+			fileName := fmt.Sprintf("upgrade_backup_%s_%s.tar.gz", install.Name, time.Now().Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
+			backupRecord, err := iBackUpService.AppBackup(dto.CommonBackup{Name: install.App.Key, DetailName: install.Name, FileName: fileName})
 			if err == nil {
+				backups, _ := iBackUpService.ListAppRecords(install.App.Key, install.Name, "upgrade_backup")
+				if len(backups) > 3 {
+					backupsToDelete := backups[:len(backups)-3]
+					var deleteIDs []uint
+					for _, backup := range backupsToDelete {
+						deleteIDs = append(deleteIDs, backup.ID)
+					}
+					_ = iBackUpService.BatchDeleteRecord(deleteIDs)
+				}
 				localDir, err := loadLocalDir()
 				if err == nil {
 					backupFile = path.Join(localDir, backupRecord.FileDir, backupRecord.FileName)
