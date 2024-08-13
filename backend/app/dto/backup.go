@@ -36,6 +36,7 @@ type CommonBackup struct {
 	Name       string `json:"name"`
 	DetailName string `json:"detailName"`
 	Secret     string `json:"secret"`
+	FileName   string `json:"fileName"`
 }
 type CommonRecover struct {
 	Source     string `json:"source" validate:"required,oneof=OSS S3 SFTP MINIO LOCAL COS KODO OneDrive WebDAV"`

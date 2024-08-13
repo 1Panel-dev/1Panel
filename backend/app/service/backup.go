@@ -40,6 +40,7 @@ type IBackupService interface {
 	DeleteRecordByName(backupType, name, detailName string, withDeleteFile bool) error
 	BatchDeleteRecord(ids []uint) error
 	NewClient(backup *model.BackupAccount) (cloud_storage.CloudStorageClient, error)
+	ListAppRecords(name, detailName, fileName string) ([]model.BackupRecord, error)
 
 	ListFiles(req dto.BackupSearchFile) []string
 
@@ -98,6 +99,20 @@ func (u *BackupService) SearchRecordsWithPage(search dto.RecordSearch) (int64, [
 		return datas[i].CreatedAt.After(datas[j].CreatedAt)
 	})
 	return total, datas, err
+}
+
+func (u *BackupService) ListAppRecords(name, detailName, fileName string) ([]model.BackupRecord, error) {
+	records, err := backupRepo.ListRecord(
+		commonRepo.WithOrderBy("created_at asc"),
+		commonRepo.WithByName(name),
+		commonRepo.WithByType("app"),
+		backupRepo.WithFileNameStartWith(fileName),
+		backupRepo.WithByDetailName(detailName),
+	)
+	if err != nil {
+		return nil, err
+	}
+	return records, err
 }
 
 func (u *BackupService) SearchRecordsByCronjobWithPage(search dto.RecordSearchByCronjob) (int64, []dto.BackupRecords, error) {

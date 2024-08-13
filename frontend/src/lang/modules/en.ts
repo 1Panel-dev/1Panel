@@ -1829,7 +1829,7 @@ const message = {
         appHelper: 'Please view the installation instructions of some applications on the application details page',
         backupApp: 'Backup application before upgrade',
         backupAppHelper:
-            'If the upgrade fails, the backup will be automatically rolled back. Please check the failure reason in the log audit-system log',
+            'If the upgrade fails, the backup will be automatically rolled back. Please check the failure reason in the log audit-system log. The backup will retain the latest 3 copies by default',
         delete: 'Delete',
         openrestyDeleteHelper:
             'Forcibly deleting OpenResty will delete all websites, please confirm the risk before operation',

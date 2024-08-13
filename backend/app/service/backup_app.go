@@ -39,7 +39,10 @@ func (u *BackupService) AppBackup(req dto.CommonBackup) (*model.BackupRecord, er
 	itemDir := fmt.Sprintf("app/%s/%s", req.Name, req.DetailName)
 	backupDir := path.Join(localDir, itemDir)
 
-	fileName := fmt.Sprintf("%s_%s.tar.gz", req.DetailName, timeNow+common.RandStrAndNum(5))
+	fileName := req.FileName
+	if req.FileName == "" {
+		fileName = fmt.Sprintf("%s_%s.tar.gz", req.DetailName, timeNow+common.RandStrAndNum(5))
+	}
 	if err := handleAppBackup(&install, backupDir, fileName, "", req.Secret); err != nil {
 		return nil, err
 	}
