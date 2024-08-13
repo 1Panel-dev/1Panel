@@ -1235,6 +1235,31 @@ func synAppInstall(containers map[string]types.Container, appInstall *model.AppI
 	_ = appInstallRepo.Save(context.Background(), appInstall)
 }
 
+func getMajorVersion(version string) string {
+	parts := strings.Split(version, ".")
+	if len(parts) >= 2 {
+		return parts[0] + "." + parts[1]
+	}
+	return version
+}
+
+func ignoreUpdate(installed model.AppInstall) bool {
+	if installed.App.Type == "php" || installed.Status == constant.Installing {
+		return true
+	}
+	if installed.App.Key == constant.AppMysql {
+		majorVersion := getMajorVersion(installed.Version)
+		appDetails, _ := appDetailRepo.GetBy(appDetailRepo.WithAppId(installed.App.ID))
+		for _, appDetail := range appDetails {
+			if strings.HasPrefix(appDetail.Version, majorVersion) && common.CompareVersion(appDetail.Version, installed.Version) {
+				return false
+			}
+		}
+		return true
+	}
+	return false
+}
+
 func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool) ([]response.AppInstallDTO, error) {
 	var (
 		res           []response.AppInstallDTO
@@ -1257,7 +1282,7 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 	}
 
 	for _, installed := range appInstallList {
-		if updated && (installed.App.Type == "php" || installed.Status == constant.Installing || (installed.App.Key == constant.AppMysql && installed.Version == "5.6.51")) {
+		if updated && ignoreUpdate(installed) {
 			continue
 		}
 		if sync && !doNotNeedSync(installed) {

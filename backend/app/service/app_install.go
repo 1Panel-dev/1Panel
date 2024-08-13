@@ -535,6 +535,12 @@ func (a *AppInstallService) GetUpdateVersions(req request.AppUpdateVersion) ([]d
 			if err != nil {
 				return versions, err
 			}
+			if app.Key == constant.AppMysql {
+				majorVersion := getMajorVersion(install.Version)
+				if !strings.HasPrefix(detail.Version, majorVersion) {
+					continue
+				}
+			}
 			versions = append(versions, dto.AppVersion{
 				Version:       detail.Version,
 				DetailId:      detail.ID,
