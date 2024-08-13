@@ -2,26 +2,17 @@ package dto
 
 import (
 	"time"
-
-	"github.com/1Panel-dev/1Panel/agent/app/model"
 )
 
-type BackupOperate struct {
-	Operate string                `json:"operate" validate:"required,oneof=add remove update"`
-	Data    []model.BackupAccount `json:"data" validate:"required"`
-}
-
 type BackupInfo struct {
-	ID         uint      `json:"id"`
-	CreatedAt  time.Time `json:"createdAt"`
-	Type       string    `json:"type"`
-	Bucket     string    `json:"bucket"`
-	BackupPath string    `json:"backupPath"`
-	Vars       string    `json:"vars"`
-}
-
-type BackupSearchFile struct {
-	Type string `json:"type" validate:"required"`
+	ID         uint   `json:"id"`
+	Name       string `json:"name"`
+	Type       string `json:"type" validate:"required"`
+	Bucket     string `json:"bucket"`
+	AccessKey  string `json:"accessKey"`
+	Credential string `json:"credential"`
+	BackupPath string `json:"backupPath"`
+	Vars       string `json:"vars" validate:"required"`
 }
 
 type CommonBackup struct {
@@ -31,12 +22,12 @@ type CommonBackup struct {
 	Secret     string `json:"secret"`
 }
 type CommonRecover struct {
-	Source     string `json:"source" validate:"required,oneof=OSS S3 SFTP MINIO LOCAL COS KODO OneDrive WebDAV"`
-	Type       string `json:"type" validate:"required,oneof=app mysql mariadb redis website postgresql"`
-	Name       string `json:"name"`
-	DetailName string `json:"detailName"`
-	File       string `json:"file"`
-	Secret     string `json:"secret"`
+	BackupAccountID uint   `json:"backupAccountID" validate:"required"`
+	Type            string `json:"type" validate:"required,oneof=app mysql mariadb redis website postgresql"`
+	Name            string `json:"name"`
+	DetailName      string `json:"detailName"`
+	File            string `json:"file"`
+	Secret          string `json:"secret"`
 }
 
 type RecordSearch struct {
@@ -62,7 +53,7 @@ type BackupRecords struct {
 }
 
 type DownloadRecord struct {
-	Source   string `json:"source" validate:"required,oneof=OSS S3 SFTP MINIO LOCAL COS KODO OneDrive WebDAV"`
-	FileDir  string `json:"fileDir" validate:"required"`
-	FileName string `json:"fileName" validate:"required"`
+	DownloadAccountID uint   `json:"downloadAccountID" validate:"required"`
+	FileDir           string `json:"fileDir" validate:"required"`
+	FileName          string `json:"fileName" validate:"required"`
 }

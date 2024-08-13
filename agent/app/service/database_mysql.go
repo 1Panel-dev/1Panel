@@ -280,11 +280,7 @@ func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error 
 		if _, err := os.Stat(uploadDir); err == nil {
 			_ = os.RemoveAll(uploadDir)
 		}
-		localDir, err := loadLocalDir()
-		if err != nil && !req.ForceDelete {
-			return err
-		}
-		backupDir := path.Join(localDir, fmt.Sprintf("database/%s/%s/%s", req.Type, db.MysqlName, db.Name))
+		backupDir := path.Join(global.CONF.System.Backup, fmt.Sprintf("database/%s/%s/%s", req.Type, db.MysqlName, db.Name))
 		if _, err := os.Stat(backupDir); err == nil {
 			_ = os.RemoveAll(backupDir)
 		}

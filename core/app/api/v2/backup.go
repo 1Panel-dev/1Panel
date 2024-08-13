@@ -129,7 +129,7 @@ func (b *BaseApi) UpdateBackup(c *gin.Context) {
 // @Param request body dto.SearchPageWithType true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /core/backup/search [get]
+// @Router /core/backup/search [post]
 func (b *BaseApi) SearchBackup(c *gin.Context) {
 	var req dto.SearchPageWithType
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -146,4 +146,33 @@ func (b *BaseApi) SearchBackup(c *gin.Context) {
 		Items: list,
 		Total: total,
 	})
+}
+
+func (b *BaseApi) GetBackup(c *gin.Context) {
+	var req dto.OperateByID
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	data, err := backupService.Get(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, data)
+}
+func (b *BaseApi) ListBackup(c *gin.Context) {
+	var req dto.OperateByIDs
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	list, err := backupService.List(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, list)
 }

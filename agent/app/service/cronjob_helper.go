@@ -15,7 +15,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/cloud_storage"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/ntp"
@@ -27,7 +26,7 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 		message []byte
 		err     error
 	)
-	record := cronjobRepo.StartRecords(cronjob.ID, cronjob.KeepLocal, "")
+	record := cronjobRepo.StartRecords(cronjob.ID, "")
 	go func() {
 		switch cronjob.Type {
 		case "shell":
@@ -269,49 +268,11 @@ func (u *CronjobService) handleSystemClean() (string, error) {
 	return NewIDeviceService().CleanForCronjob()
 }
 
-func loadClientMap(backupAccounts string) (map[string]cronjobUploadHelper, error) {
-	clients := make(map[string]cronjobUploadHelper)
-	accounts, err := backupRepo.List()
-	if err != nil {
-		return nil, err
-	}
-	targets := strings.Split(backupAccounts, ",")
-	for _, target := range targets {
-		if len(target) == 0 {
-			continue
-		}
-		for _, account := range accounts {
-			if target == account.Type {
-				client, err := NewIBackupService().NewClient(&account)
-				if err != nil {
-					return nil, err
-				}
-				pathItem := account.BackupPath
-				if account.BackupPath != "/" {
-					pathItem = strings.TrimPrefix(account.BackupPath, "/")
-				}
-				clients[target] = cronjobUploadHelper{
-					client:     client,
-					backupPath: pathItem,
-					backType:   account.Type,
-				}
-			}
-		}
-	}
-	return clients, nil
-}
-
-type cronjobUploadHelper struct {
-	backupPath string
-	backType   string
-	client     cloud_storage.CloudStorageClient
-}
-
-func (u *CronjobService) uploadCronjobBackFile(cronjob model.Cronjob, accountMap map[string]cronjobUploadHelper, file string) (string, error) {
+func (u *CronjobService) uploadCronjobBackFile(cronjob model.Cronjob, accountMap map[string]backupClientHelper, file string) (string, error) {
 	defer func() {
 		_ = os.Remove(file)
 	}()
-	accounts := strings.Split(cronjob.BackupAccounts, ",")
+	accounts := strings.Split(cronjob.SourceAccountIDs, ",")
 	cloudSrc := strings.TrimPrefix(file, global.CONF.System.TmpDir+"/")
 	for _, account := range accounts {
 		if len(account) != 0 {
@@ -325,14 +286,14 @@ func (u *CronjobService) uploadCronjobBackFile(cronjob model.Cronjob, accountMap
 	return cloudSrc, nil
 }
 
-func (u *CronjobService) removeExpiredBackup(cronjob model.Cronjob, accountMap map[string]cronjobUploadHelper, record model.BackupRecord) {
+func (u *CronjobService) removeExpiredBackup(cronjob model.Cronjob, accountMap map[string]backupClientHelper, record model.BackupRecord) {
 	global.LOG.Infof("start to handle remove expired, retain copies: %d", cronjob.RetainCopies)
 	var opts []repo.DBOption
 	opts = append(opts, commonRepo.WithByFrom("cronjob"))
 	opts = append(opts, backupRepo.WithByCronID(cronjob.ID))
 	opts = append(opts, commonRepo.WithOrderBy("created_at desc"))
 	if record.ID != 0 {
-		opts = append(opts, backupRepo.WithByType(record.Type))
+		opts = append(opts, commonRepo.WithByType(record.Type))
 		opts = append(opts, commonRepo.WithByName(record.Name))
 		opts = append(opts, backupRepo.WithByDetailName(record.DetailName))
 	}
@@ -341,7 +302,7 @@ func (u *CronjobService) removeExpiredBackup(cronjob model.Cronjob, accountMap m
 		return
 	}
 	for i := int(cronjob.RetainCopies); i < len(records); i++ {
-		accounts := strings.Split(cronjob.BackupAccounts, ",")
+		accounts := strings.Split(cronjob.SourceAccountIDs, ",")
 		if cronjob.Type == "snapshot" {
 			for _, account := range accounts {
 				if len(account) != 0 {

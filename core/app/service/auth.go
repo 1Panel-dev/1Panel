@@ -123,7 +123,8 @@ func (u *AuthService) generateSession(c *gin.Context, name, authMethod string) (
 	if authMethod == constant.AuthMethodJWT {
 		j := jwt.NewJWT()
 		claims := j.CreateClaims(jwt.BaseClaims{
-			Name: name,
+			Name:    name,
+			IsAgent: false,
 		})
 		token, err := j.CreateToken(claims)
 		if err != nil {

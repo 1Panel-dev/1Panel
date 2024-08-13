@@ -22,10 +22,6 @@ import (
 )
 
 func (u *BackupService) WebsiteBackup(req dto.CommonBackup) error {
-	localDir, err := loadLocalDir()
-	if err != nil {
-		return err
-	}
 	website, err := websiteRepo.GetFirst(websiteRepo.WithAlias(req.DetailName))
 	if err != nil {
 		return err
@@ -33,20 +29,20 @@ func (u *BackupService) WebsiteBackup(req dto.CommonBackup) error {
 
 	timeNow := time.Now().Format(constant.DateTimeSlimLayout)
 	itemDir := fmt.Sprintf("website/%s", req.Name)
-	backupDir := path.Join(localDir, itemDir)
+	backupDir := path.Join(global.CONF.System.Backup, itemDir)
 	fileName := fmt.Sprintf("%s_%s.tar.gz", website.PrimaryDomain, timeNow+common.RandStrAndNum(5))
 	if err := handleWebsiteBackup(&website, backupDir, fileName, "", req.Secret); err != nil {
 		return err
 	}
 
 	record := &model.BackupRecord{
-		Type:       "website",
-		Name:       website.PrimaryDomain,
-		DetailName: req.DetailName,
-		Source:     "LOCAL",
-		BackupType: "LOCAL",
-		FileDir:    itemDir,
-		FileName:   fileName,
+		Type:              "website",
+		Name:              website.PrimaryDomain,
+		DetailName:        req.DetailName,
+		SourceAccountIDs:  "1",
+		DownloadAccountID: 1,
+		FileDir:           itemDir,
+		FileName:          fileName,
 	}
 	if err := backupRepo.CreateRecord(record); err != nil {
 		global.LOG.Errorf("save backup record failed, err: %v", err)

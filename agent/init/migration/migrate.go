@@ -12,7 +12,6 @@ func Init() {
 		migrations.AddTable,
 		migrations.InitHost,
 		migrations.InitSetting,
-		migrations.InitBackupAccount,
 		migrations.InitImageRepo,
 		migrations.InitDefaultGroup,
 		migrations.InitDefaultCA,

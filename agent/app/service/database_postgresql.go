@@ -305,11 +305,7 @@ func (u *PostgresqlService) Delete(ctx context.Context, req dto.PostgresqlDBDele
 		if _, err := os.Stat(uploadDir); err == nil {
 			_ = os.RemoveAll(uploadDir)
 		}
-		localDir, err := loadLocalDir()
-		if err != nil && !req.ForceDelete {
-			return err
-		}
-		backupDir := path.Join(localDir, fmt.Sprintf("database/%s/%s/%s", req.Type, db.PostgresqlName, db.Name))
+		backupDir := path.Join(global.CONF.System.Backup, fmt.Sprintf("database/%s/%s/%s", req.Type, db.PostgresqlName, db.Name))
 		if _, err := os.Stat(backupDir); err == nil {
 			_ = os.RemoveAll(backupDir)
 		}

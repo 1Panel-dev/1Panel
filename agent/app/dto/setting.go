@@ -48,11 +48,11 @@ type SnapshotStatus struct {
 }
 
 type SnapshotCreate struct {
-	ID              uint   `json:"id"`
-	From            string `json:"from" validate:"required"`
-	DefaultDownload string `json:"defaultDownload" validate:"required"`
-	Description     string `json:"description" validate:"max=256"`
-	Secret          string `json:"secret"`
+	ID                uint   `json:"id"`
+	SourceAccountIDs  string `json:"sourceAccountsIDs" validate:"required"`
+	DownloadAccountID uint   `json:"downloadAccountID" validate:"required"`
+	Description       string `json:"description" validate:"max=256"`
+	Secret            string `json:"secret"`
 }
 type SnapshotRecover struct {
 	IsNew      bool   `json:"isNew"`
@@ -66,9 +66,9 @@ type SnapshotBatchDelete struct {
 }
 
 type SnapshotImport struct {
-	From        string   `json:"from"`
-	Names       []string `json:"names"`
-	Description string   `json:"description" validate:"max=256"`
+	BackupAccountID uint     `json:"backupAccountID"`
+	Names           []string `json:"names"`
+	Description     string   `json:"description" validate:"max=256"`
 }
 
 type SnapshotInfo struct {

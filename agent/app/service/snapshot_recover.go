@@ -168,7 +168,7 @@ func backupBeforeRecover(snap model.Snapshot) error {
 	go snapJson(itemHelper, jsonItem, baseDir)
 	go snapPanel(itemHelper, path.Join(baseDir, "1panel"))
 	go snapDaemonJson(itemHelper, path.Join(baseDir, "docker"))
-	go snapBackup(itemHelper, global.CONF.System.Backup, path.Join(baseDir, "1panel"))
+	go snapBackup(itemHelper, path.Join(baseDir, "1panel"))
 	wg.Wait()
 	itemHelper.Status.AppData = constant.StatusDone
 
@@ -176,7 +176,7 @@ func backupBeforeRecover(snap model.Snapshot) error {
 	if !allDone {
 		return errors.New(msg)
 	}
-	snapPanelData(itemHelper, global.CONF.System.BaseDir, path.Join(baseDir, "1panel"))
+	snapPanelData(itemHelper, path.Join(baseDir, "1panel"))
 	if status.PanelData != constant.StatusDone {
 		return errors.New(status.PanelData)
 	}
@@ -184,23 +184,19 @@ func backupBeforeRecover(snap model.Snapshot) error {
 }
 
 func handleDownloadSnapshot(snap model.Snapshot, targetDir string) error {
-	backup, err := backupRepo.Get(commonRepo.WithByType(snap.DefaultDownload))
+	account, client, err := NewBackupClientWithID(snap.DownloadAccountID)
 	if err != nil {
 		return err
 	}
-	client, err := NewIBackupService().NewClient(&backup)
-	if err != nil {
-		return err
-	}
-	pathItem := backup.BackupPath
-	if backup.BackupPath != "/" {
-		pathItem = strings.TrimPrefix(backup.BackupPath, "/")
+	pathItem := account.BackupPath
+	if account.BackupPath != "/" {
+		pathItem = strings.TrimPrefix(account.BackupPath, "/")
 	}
 	filePath := fmt.Sprintf("%s/%s.tar.gz", targetDir, snap.Name)
 	_ = os.RemoveAll(filePath)
 	ok, err := client.Download(path.Join(pathItem, fmt.Sprintf("system_snapshot/%s.tar.gz", snap.Name)), filePath)
 	if err != nil || !ok {
-		return fmt.Errorf("download file %s from %s failed, err: %v", snap.Name, backup.Type, err)
+		return fmt.Errorf("download file %s from %s failed, err: %v", snap.Name, account.Name, err)
 	}
 	return nil
 }

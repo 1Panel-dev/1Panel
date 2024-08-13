@@ -99,7 +99,7 @@ func (u *CronjobService) CleanRecord(req dto.CronjobClean) error {
 	}
 	if req.CleanData {
 		if hasBackup(cronjob.Type) {
-			accountMap, err := loadClientMap(cronjob.BackupAccounts)
+			accountMap, err := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
 			if err != nil {
 				return err
 			}
@@ -129,16 +129,16 @@ func (u *CronjobService) CleanRecord(req dto.CronjobClean) error {
 	return nil
 }
 
-func (u *CronjobService) Download(down dto.CronjobDownload) (string, error) {
-	record, _ := cronjobRepo.GetRecord(commonRepo.WithByID(down.RecordID))
+func (u *CronjobService) Download(req dto.CronjobDownload) (string, error) {
+	record, _ := cronjobRepo.GetRecord(commonRepo.WithByID(req.RecordID))
 	if record.ID == 0 {
 		return "", constant.ErrRecordNotFound
 	}
-	backup, _ := backupRepo.Get(commonRepo.WithByID(down.BackupAccountID))
-	if backup.ID == 0 {
-		return "", constant.ErrRecordNotFound
+	account, client, err := NewBackupClientWithID(req.BackupAccountID)
+	if err != nil {
+		return "", err
 	}
-	if backup.Type == "LOCAL" || record.FromLocal {
+	if account.Type == "LOCAL" || record.FromLocal {
 		if _, err := os.Stat(record.File); err != nil && os.IsNotExist(err) {
 			return "", err
 		}
@@ -146,10 +146,6 @@ func (u *CronjobService) Download(down dto.CronjobDownload) (string, error) {
 	}
 	tempPath := fmt.Sprintf("%s/download/%s", constant.DataDir, record.File)
 	if _, err := os.Stat(tempPath); err != nil && os.IsNotExist(err) {
-		client, err := NewIBackupService().NewClient(&backup)
-		if err != nil {
-			return "", err
-		}
 		_ = os.MkdirAll(path.Dir(tempPath), os.ModePerm)
 		isOK, err := client.Download(record.File, tempPath)
 		if !isOK || err != nil {

@@ -2,7 +2,6 @@ package migrations
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
@@ -27,7 +26,6 @@ var AddTable = &gormigrate.Migration{
 			&model.AppTag{},
 			&model.Tag{},
 			&model.App{},
-			&model.BackupAccount{},
 			&model.BackupRecord{},
 			&model.Clam{},
 			&model.Command{},
@@ -94,9 +92,11 @@ var InitSetting = &gormigrate.Migration{
 		}
 		if _, err := os.Stat("/opt/1panel/nodeJson"); err == nil {
 			type nodeInfo struct {
-				ServerCrt   string `json:"serverCrt"`
-				ServerKey   string `json:"serverKey"`
-				CurrentNode string `json:"currentNode"`
+				MasterRequestAddr string `json:"masterRequestAddr"`
+				Token             string `json:"token"`
+				ServerCrt         string `json:"serverCrt"`
+				ServerKey         string `json:"serverKey"`
+				CurrentNode       string `json:"currentNode"`
 			}
 			nodeJson, err := os.ReadFile("/opt/1panel/nodeJson")
 			if err != nil {
@@ -106,14 +106,20 @@ var InitSetting = &gormigrate.Migration{
 			if err := json.Unmarshal(nodeJson, &node); err != nil {
 				return err
 			}
-			itemKey, _ := encrypt.StringEncrypt(node.ServerKey)
+			itemKey, _ := encrypt.StringEncryptWithBase64(node.ServerKey)
 			if err := tx.Create(&model.Setting{Key: "ServerKey", Value: itemKey}).Error; err != nil {
 				return err
 			}
-			itemCrt, _ := encrypt.StringEncrypt(node.ServerCrt)
+			itemCrt, _ := encrypt.StringEncryptWithBase64(node.ServerCrt)
 			if err := tx.Create(&model.Setting{Key: "ServerCrt", Value: itemCrt}).Error; err != nil {
 				return err
 			}
+			itemToken, _ := encrypt.StringEncryptWithBase64(node.Token)
+			if err := tx.Create(&model.Setting{Key: "Token", Value: itemToken}).Error; err != nil {
+				return err
+			}
+			global.CONF.System.MasterRequestAddr = node.MasterRequestAddr
+			global.CONF.System.MasterRequestToken = itemToken
 			global.CurrentNode = node.CurrentNode
 		} else {
 			global.CurrentNode = "127.0.0.1"
@@ -186,20 +192,6 @@ var InitSetting = &gormigrate.Migration{
 		}
 
 		_ = os.Remove(("/opt/1panel/nodeJson"))
-		return nil
-	},
-}
-
-var InitBackupAccount = &gormigrate.Migration{
-	ID: "20240722-init-backup",
-	Migrate: func(tx *gorm.DB) error {
-		item := &model.BackupAccount{
-			Type: "LOCAL",
-			Vars: fmt.Sprintf("{\"dir\":\"%s\"}", global.CONF.System.Backup),
-		}
-		if err := tx.Create(item).Error; err != nil {
-			return err
-		}
 		return nil
 	},
 }
