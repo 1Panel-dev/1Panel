@@ -23,7 +23,7 @@
                     v-if="showLog"
                     v-model:loading="loading"
                     v-model:hasContent="hasContent"
-                    :style="'height: calc(100vh - 370px);min-height: 200px'"
+                    :height-diff="330"
                 />
             </template>
         </LayoutContent>

@@ -136,7 +136,7 @@ func (a *AppInstallRepo) Create(ctx context.Context, install *model.AppInstall) 
 }
 
 func (a *AppInstallRepo) Save(ctx context.Context, install *model.AppInstall) error {
-	return getTx(ctx).Debug().Omit("App").Save(&install).Error
+	return getTx(ctx).Omit("App").Save(&install).Error
 }
 
 func (a *AppInstallRepo) DeleteBy(opts ...DBOption) error {
