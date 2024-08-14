@@ -2,9 +2,9 @@ package model
 
 type WebsiteDnsAccount struct {
 	BaseModel
-	Name          string `gorm:"type:varchar(64);not null" json:"name"`
-	Type          string `gorm:"type:varchar(64);not null" json:"type"`
-	Authorization string `gorm:"type:varchar(256);not null" json:"-"`
+	Name          string `gorm:"not null" json:"name"`
+	Type          string `gorm:"not null" json:"type"`
+	Authorization string `gorm:"not null" json:"-"`
 }
 
 func (w WebsiteDnsAccount) TableName() string {
