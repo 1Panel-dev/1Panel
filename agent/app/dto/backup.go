@@ -4,17 +4,6 @@ import (
 	"time"
 )
 
-type BackupInfo struct {
-	ID         uint   `json:"id"`
-	Name       string `json:"name"`
-	Type       string `json:"type" validate:"required"`
-	Bucket     string `json:"bucket"`
-	AccessKey  string `json:"accessKey"`
-	Credential string `json:"credential"`
-	BackupPath string `json:"backupPath"`
-	Vars       string `json:"vars" validate:"required"`
-}
-
 type CommonBackup struct {
 	Type       string `json:"type" validate:"required,oneof=app mysql mariadb redis website postgresql"`
 	Name       string `json:"name"`
@@ -22,12 +11,12 @@ type CommonBackup struct {
 	Secret     string `json:"secret"`
 }
 type CommonRecover struct {
-	BackupAccountID uint   `json:"backupAccountID" validate:"required"`
-	Type            string `json:"type" validate:"required,oneof=app mysql mariadb redis website postgresql"`
-	Name            string `json:"name"`
-	DetailName      string `json:"detailName"`
-	File            string `json:"file"`
-	Secret          string `json:"secret"`
+	DownloadAccountID uint   `json:"downloadAccountID" validate:"required"`
+	Type              string `json:"type" validate:"required,oneof=app mysql mariadb redis website postgresql"`
+	Name              string `json:"name"`
+	DetailName        string `json:"detailName"`
+	File              string `json:"file"`
+	Secret            string `json:"secret"`
 }
 
 type RecordSearch struct {
@@ -43,13 +32,14 @@ type RecordSearchByCronjob struct {
 }
 
 type BackupRecords struct {
-	ID         uint      `json:"id"`
-	CreatedAt  time.Time `json:"createdAt"`
-	Source     string    `json:"source"`
-	BackupType string    `json:"backupType"`
-	FileDir    string    `json:"fileDir"`
-	FileName   string    `json:"fileName"`
-	Size       int64     `json:"size"`
+	ID                uint      `json:"id"`
+	CreatedAt         time.Time `json:"createdAt"`
+	AccountType       string    `json:"accountType"`
+	AccountName       string    `json:"accountName"`
+	DownloadAccountID uint      `json:"downloadAccountID"`
+	FileDir           string    `json:"fileDir"`
+	FileName          string    `json:"fileName"`
+	Size              int64     `json:"size"`
 }
 
 type DownloadRecord struct {

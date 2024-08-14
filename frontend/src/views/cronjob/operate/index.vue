@@ -245,11 +245,16 @@
                     <el-select
                         multiple
                         class="selectClass"
-                        v-model="dialogData.rowData!.backupAccountList"
+                        v-model="dialogData.rowData!.sourceAccounts"
                         @change="changeAccount"
                     >
-                        <div v-for="item in backupOptions" :key="item.label">
-                            <el-option :value="item.value" :label="item.label" />
+                        <div v-for="item in backupOptions" :key="item.id">
+                            <el-option
+                                v-if="item.type !== $t('setting.LOCAL')"
+                                :value="item.id"
+                                :label="item.type + ' - ' + item.name"
+                            />
+                            <el-option v-else :value="item.id" :label="item.type" />
                         </div>
                     </el-select>
                     <span class="input-help">
@@ -271,10 +276,15 @@
                 >
                     <el-input v-model="dialogData.rowData!.secret" />
                 </el-form-item>
-                <el-form-item :label="$t('cronjob.default_download_path')" prop="defaultDownload">
-                    <el-select class="selectClass" v-model="dialogData.rowData!.defaultDownload">
-                        <div v-for="item in accountOptions" :key="item.label">
-                            <el-option :value="item.value" :label="item.label" />
+                <el-form-item :label="$t('cronjob.default_download_path')" prop="downloadAccountID">
+                    <el-select class="selectClass" v-model="dialogData.rowData!.downloadAccountID">
+                        <div v-for="item in accountOptions" :key="item.id">
+                            <el-option
+                                v-if="item.type !== $t('setting.LOCAL')"
+                                :value="item.id"
+                                :label="item.type + ' - ' + item.name"
+                            />
+                            <el-option v-else :value="item.id" :label="item.type" />
                         </div>
                     </el-select>
                 </el-form-item>
@@ -360,10 +370,13 @@ const acceptParams = (params: DialogProps): void => {
     if (dialogData.value.title === 'create') {
         changeType();
         dialogData.value.rowData.dbType = 'mysql';
-        dialogData.value.rowData.defaultDownload = 'LOCAL';
+        dialogData.value.rowData.downloadAccountID = 1;
     }
-    if (dialogData.value.rowData.backupAccounts) {
-        dialogData.value.rowData.backupAccountList = dialogData.value.rowData.backupAccounts.split(',');
+    if (dialogData.value.rowData.sourceAccountIDs) {
+        let itemIDs = dialogData.value.rowData.sourceAccountIDs.split(',');
+        for (const item of itemIDs) {
+            dialogData.value.rowData.sourceAccounts.push(Number(item));
+        }
     }
     dialogData.value.rowData!.command = dialogData.value.rowData!.command || 'sh';
     dialogData.value.rowData!.isCustom =
@@ -591,14 +604,14 @@ const handleSpecDelete = (index: number) => {
 const loadBackups = async () => {
     const res = await getBackupList();
     backupOptions.value = [];
-    if (!dialogData.value.rowData!.backupAccountList) {
-        dialogData.value.rowData!.backupAccountList = ['LOCAL'];
+    if (!dialogData.value.rowData!.sourceAccounts) {
+        dialogData.value.rowData!.sourceAccounts = [1];
     }
     for (const item of res.data) {
         if (item.id === 0) {
             continue;
         }
-        backupOptions.value.push({ label: i18n.global.t('setting.' + item.type), value: item.type });
+        backupOptions.value.push({ id: item.id, type: i18n.global.t('setting.' + item.type), name: item.name });
     }
     changeAccount();
 };
@@ -608,21 +621,21 @@ const changeAccount = async () => {
     let isInAccounts = false;
     for (const item of backupOptions.value) {
         let exist = false;
-        for (const ac of dialogData.value.rowData.backupAccountList) {
-            if (item.value == ac) {
+        for (const ac of dialogData.value.rowData.sourceAccounts) {
+            if (item.id == ac) {
                 exist = true;
                 break;
             }
         }
         if (exist) {
-            if (item.value === dialogData.value.rowData.defaultDownload) {
+            if (item.value === dialogData.value.rowData.downloadAccountID) {
                 isInAccounts = true;
             }
             accountOptions.value.push(item);
         }
     }
     if (!isInAccounts) {
-        dialogData.value.rowData.defaultDownload = '';
+        dialogData.value.rowData.downloadAccountID = undefined;
     }
 };
 
@@ -632,7 +645,7 @@ const loadAppInstalls = async () => {
 };
 
 const loadWebsites = async () => {
-    const res = await GetWebsiteOptions({});
+    const res = await GetWebsiteOptions();
     websiteOptions.value = res.data || [];
 };
 
@@ -674,7 +687,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         }
         specs.push(itemSpec);
     }
-    dialogData.value.rowData.backupAccounts = dialogData.value.rowData.backupAccountList.join(',');
+    dialogData.value.rowData.sourceAccountIDs = dialogData.value.rowData.sourceAccounts.join(',');
     dialogData.value.rowData.spec = specs.join(',');
     if (!formEl) return;
     formEl.validate(async (valid) => {

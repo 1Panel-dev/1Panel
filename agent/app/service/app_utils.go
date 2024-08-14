@@ -705,7 +705,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 	rollBackApp := func(t *task.Task) {
 		if req.Backup {
 			t.Log(i18n.GetWithName("AppRecover", install.Name))
-			if err := NewIBackupService().AppRecover(dto.CommonRecover{Name: install.App.Key, DetailName: install.Name, Type: "app", BackupAccountID: 1, File: backupFile}); err != nil {
+			if err := NewIBackupService().AppRecover(dto.CommonRecover{Name: install.App.Key, DetailName: install.Name, Type: "app", DownloadAccountID: 1, File: backupFile}); err != nil {
 				t.LogFailedWithErr(i18n.GetWithName("AppRecover", install.Name), err)
 				return
 			}

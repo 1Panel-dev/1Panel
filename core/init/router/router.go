@@ -6,6 +6,8 @@ import (
 
 	"github.com/1Panel-dev/1Panel/cmd/server/docs"
 	"github.com/1Panel-dev/1Panel/cmd/server/web"
+	"github.com/1Panel-dev/1Panel/core/app/dto"
+	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/i18n"
 	"github.com/1Panel-dev/1Panel/core/middleware"
@@ -47,17 +49,17 @@ func Routers() *gin.Engine {
 	swaggerRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	PublicGroup := Router.Group("")
 	{
-		PublicGroup.GET("/health", func(c *gin.Context) {
-			c.JSON(200, "ok")
-		})
 		PublicGroup.Use(gzip.Gzip(gzip.DefaultCompression))
 		setWebStatic(PublicGroup)
 	}
 
-	agentRouter := Router.Group("agent")
+	agentRouter := Router.Group("/api/v2/agent")
 	agentRouter.Use(middleware.JwtAuth())
 	var agent router.AgentRouter
 	agent.InitRouter(agentRouter)
+	agentRouter.GET("/health", func(c *gin.Context) {
+		c.JSON(200, dto.Response{Code: constant.CodeSuccess, Data: "ok"})
+	})
 
 	Router.Use(middleware.OperationLog())
 	if global.CONF.System.IsDemo {

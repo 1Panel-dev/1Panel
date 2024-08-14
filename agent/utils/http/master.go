@@ -17,20 +17,21 @@ func RequestToMaster(reqUrl, reqMethod string, reqBody io.Reader) (interface{}, 
 	client := &http.Client{
 		Timeout: time.Second * 5,
 	}
-	parsedURL, err := url.Parse(global.CONF.System.MasterRequestAddr)
+	parsedURL, err := url.Parse(global.CONF.System.MasterAddr)
 	if err != nil {
 		return nil, fmt.Errorf("handle url Parse failed, err: %v \n", err)
 	}
 	rURL := &url.URL{
-		Path: reqUrl,
-		Host: parsedURL.Host,
+		Scheme: "http",
+		Path:   reqUrl,
+		Host:   parsedURL.Host,
 	}
 	req, err := http.NewRequest(reqMethod, rURL.String(), reqBody)
 	if err != nil {
 		return nil, fmt.Errorf("handle request failed, err: %v \n", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set(constant.JWTHeaderName, global.CONF.System.MasterRequestToken)
+	req.Header.Set(constant.JWTHeaderName, global.CONF.System.MasterToken)
 
 	resp, err := client.Do(req)
 	if err != nil {

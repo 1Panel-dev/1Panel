@@ -186,7 +186,7 @@ func (b *BaseApi) Recover(c *gin.Context) {
 	}
 
 	downloadPath, err := backupService.DownloadRecord(dto.DownloadRecord{
-		DownloadAccountID: req.BackupAccountID,
+		DownloadAccountID: req.DownloadAccountID,
 		FileDir:           path.Dir(req.File),
 		FileName:          path.Base(req.File),
 	})

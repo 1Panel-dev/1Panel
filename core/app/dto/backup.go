@@ -15,6 +15,12 @@ type BackupOperate struct {
 	RememberAuth bool `json:"rememberAuth"`
 }
 
+type BackupOption struct {
+	ID   uint   `json:"id"`
+	Name string `json:"name"`
+	Type string `json:"type"`
+}
+
 type BackupInfo struct {
 	ID         uint      `json:"id"`
 	Name       string    `json:"name"`

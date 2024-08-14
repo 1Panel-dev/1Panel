@@ -5,6 +5,11 @@ export namespace Backup {
         type: string;
         name: string;
     }
+    export interface BackupOption {
+        id: number;
+        name: string;
+        type: string;
+    }
     export interface BackupInfo {
         id: number;
         name: string;
@@ -33,15 +38,16 @@ export namespace Backup {
         vars: string;
     }
     export interface RecordDownload {
-        source: string;
+        downloadAccountID: number;
         fileDir: string;
         fileName: string;
     }
     export interface RecordInfo {
         id: number;
         createdAt: Date;
-        source: string;
-        backupType: string;
+        accountType: string;
+        accountName: string;
+        downloadAccountID: number;
         fileDir: string;
         fileName: string;
     }
@@ -66,7 +72,7 @@ export namespace Backup {
         secret: string;
     }
     export interface Recover {
-        source: string;
+        downloadAccountID: number;
         type: string;
         name: string;
         detailName: string;

@@ -1,12 +1,11 @@
 package hook
 
 import (
-	"encoding/json"
-	"os"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
+	"github.com/1Panel-dev/1Panel/core/app/service"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/cmd"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
@@ -15,11 +14,11 @@ import (
 
 func Init() {
 	settingRepo := repo.NewISettingRepo()
-	masterSetting, err := settingRepo.Get(settingRepo.WithByKey("MasterRequestAddr"))
+	masterSetting, err := settingRepo.Get(settingRepo.WithByKey("MasterAddr"))
 	if err != nil {
-		global.LOG.Errorf("load master request addr from setting failed, err: %v", err)
+		global.LOG.Errorf("load master addr from setting failed, err: %v", err)
 	}
-	global.CONF.System.MasterRequestAddr = masterSetting.Value
+	global.CONF.System.MasterAddr = masterSetting.Value
 	portSetting, err := settingRepo.Get(settingRepo.WithByKey("ServerPort"))
 	if err != nil {
 		global.LOG.Errorf("load service port from setting failed, err: %v", err)
@@ -97,24 +96,10 @@ func loadLocalDir() {
 		global.LOG.Errorf("no such backup account `%s` in db", "LOCAL")
 		return
 	}
-	varMap := make(map[string]interface{})
-	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
-		global.LOG.Errorf("json unmarshal backup.Vars: %v failed, err: %v", backup.Vars, err)
+	dir, err := service.LoadLocalDirByStr(backup.Vars)
+	if err != nil {
+		global.LOG.Errorf("load local backup dir failed,err: %v", err)
 		return
 	}
-	if _, ok := varMap["dir"]; !ok {
-		global.LOG.Error("load local backup dir failed")
-		return
-	}
-	baseDir, ok := varMap["dir"].(string)
-	if ok {
-		if _, err := os.Stat(baseDir); err != nil && os.IsNotExist(err) {
-			if err = os.MkdirAll(baseDir, os.ModePerm); err != nil {
-				global.LOG.Errorf("mkdir %s failed, err: %v", baseDir, err)
-				return
-			}
-		}
-	}
-	global.CONF.System.BackupDir = baseDir
-	global.LOG.Errorf("error type dir: %T", varMap["dir"])
+	global.CONF.System.BackupDir = dir
 }

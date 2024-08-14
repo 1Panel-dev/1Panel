@@ -273,8 +273,8 @@ func (u *CronjobService) Update(id uint, req dto.CronjobUpdate) error {
 	upMap["url"] = req.URL
 	upMap["source_dir"] = req.SourceDir
 
-	upMap["backup_accounts"] = req.BackupAccounts
-	upMap["default_download"] = req.DefaultDownload
+	upMap["source_account_ids"] = req.SourceAccountIDs
+	upMap["download_account_id"] = req.DownloadAccountID
 	upMap["retain_copies"] = req.RetainCopies
 	upMap["secret"] = req.Secret
 	return cronjobRepo.Update(id, upMap)

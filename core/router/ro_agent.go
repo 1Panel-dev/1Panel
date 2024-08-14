@@ -10,7 +10,7 @@ type AgentRouter struct{}
 func (s *AgentRouter) InitRouter(Router *gin.RouterGroup) {
 	baseApi := v2.ApiGroupApp.BaseApi
 	{
-		Router.GET("/backup/:id", baseApi.GetBackup)
+		Router.POST("/backup", baseApi.GetBackup)
 		Router.POST("/backup/list", baseApi.ListBackup)
 	}
 }

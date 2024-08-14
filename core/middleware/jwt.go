@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
@@ -25,6 +26,21 @@ func JwtAuth() gin.HandlerFunc {
 		claims, err := j.ParseToken(token)
 		if err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrTypeInternalServer, err)
+			return
+		}
+		if claims.BaseClaims.IsAgent {
+			if strings.HasPrefix(c.Request.URL.Path, "/api/v2/agent/") {
+				c.Set("claims", claims)
+				c.Set("authMethod", constant.AuthMethodJWT)
+				c.Next()
+				return
+			} else {
+				helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrTypeInternalServer, fmt.Errorf("err token from request"))
+				return
+			}
+		}
+		if strings.HasPrefix(c.Request.URL.Path, "/api/v2/agent/") {
+			helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrTypeInternalServer, fmt.Errorf("err token from request"))
 			return
 		}
 		c.Set("claims", claims)

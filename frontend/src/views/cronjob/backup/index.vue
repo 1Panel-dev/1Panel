@@ -23,11 +23,15 @@
                         <span v-else>-</span>
                     </template>
                 </el-table-column>
-                <el-table-column :label="$t('database.source')" prop="backupType">
+                <el-table-column :label="$t('database.source')" prop="accountType" show-overflow-tooltip>
                     <template #default="{ row }">
-                        <span v-if="row.source">
-                            {{ $t('setting.' + row.source) }}
+                        <span v-if="row.accountType === 'LOCAL'">
+                            {{ $t('setting.LOCAL') }}
                         </span>
+                        <span v-if="row.accountType && row.accountType !== 'LOCAL'">
+                            {{ $t('setting.' + row.accountType) + ' - ' + row.accountName }}
+                        </span>
+                        <span v-if="!row.accountType">-</span>
                     </template>
                 </el-table-column>
                 <el-table-column
@@ -99,7 +103,7 @@ const search = async () => {
 
 const onDownload = async (row: Backup.RecordInfo) => {
     let params = {
-        source: row.source,
+        downloadAccountID: row.downloadAccountID,
         fileDir: row.fileDir,
         fileName: row.fileName,
     };

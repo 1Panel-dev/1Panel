@@ -30,6 +30,8 @@ type IBackupService interface {
 	Get(req dto.OperateByID) (dto.BackupInfo, error)
 	List(req dto.OperateByIDs) ([]dto.BackupInfo, error)
 
+	GetLocalDir() (string, error)
+	LoadBackupOptions() ([]dto.BackupOption, error)
 	SearchWithPage(search dto.SearchPageWithType) (int64, interface{}, error)
 	LoadOneDriveInfo() (dto.OneDriveInfo, error)
 	Create(backupDto dto.BackupOperate) error
@@ -47,7 +49,7 @@ func NewIBackupService() IBackupService {
 
 func (u *BackupService) Get(req dto.OperateByID) (dto.BackupInfo, error) {
 	var data dto.BackupInfo
-	account, err := backupRepo.List(commonRepo.WithByID(req.ID))
+	account, err := backupRepo.Get(commonRepo.WithByID(req.ID))
 	if err != nil {
 		return data, err
 	}
@@ -83,6 +85,34 @@ func (u *BackupService) List(req dto.OperateByIDs) ([]dto.BackupInfo, error) {
 		item.Credential, err = encrypt.StringDecryptWithBase64(item.Credential)
 		if err != nil {
 			return nil, err
+		}
+		data = append(data, item)
+	}
+	return data, nil
+}
+
+func (u *BackupService) GetLocalDir() (string, error) {
+	account, err := backupRepo.Get(commonRepo.WithByType(constant.Local))
+	if err != nil {
+		return "", err
+	}
+	dir, err := LoadLocalDirByStr(account.Vars)
+	if err != nil {
+		return "", err
+	}
+	return dir, nil
+}
+
+func (u *BackupService) LoadBackupOptions() ([]dto.BackupOption, error) {
+	accounts, err := backupRepo.List(commonRepo.WithOrderBy("created_at desc"))
+	if err != nil {
+		return nil, err
+	}
+	var data []dto.BackupOption
+	for _, account := range accounts {
+		var item dto.BackupOption
+		if err := copier.Copy(&item, &account); err != nil {
+			global.LOG.Errorf("copy backup account to dto backup info failed, err: %v", err)
 		}
 		data = append(data, item)
 	}
@@ -272,11 +302,11 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 	newBackup.Credential = string(itemCredential)
 	if backup.Type == constant.Local {
 		if newBackup.Vars != backup.Vars {
-			oldPath, err := loadLocalDirByStr(backup.Vars)
+			oldPath, err := LoadLocalDirByStr(backup.Vars)
 			if err != nil {
 				return err
 			}
-			newPath, err := loadLocalDirByStr(newBackup.Vars)
+			newPath, err := LoadLocalDirByStr(newBackup.Vars)
 			if err != nil {
 				return err
 			}
@@ -362,7 +392,7 @@ func (u *BackupService) loadAccessToken(backup *model.BackupAccount) error {
 	return nil
 }
 
-func loadLocalDirByStr(vars string) (string, error) {
+func LoadLocalDirByStr(vars string) (string, error) {
 	varMap := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(vars), &varMap); err != nil {
 		return "", err

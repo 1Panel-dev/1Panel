@@ -28,20 +28,11 @@ func Init() {
 		_ = f.Close()
 	}
 
-	newLogger := logger.New(
-		log.New(os.Stdout, "\r\n", log.LstdFlags),
-		logger.Config{
-			SlowThreshold:             time.Second,
-			LogLevel:                  logger.Silent,
-			IgnoreRecordNotFoundError: true,
-			Colorful:                  false,
-		},
-	)
-	initMonitorDB(newLogger)
+	initMonitorDB()
 
 	db, err := gorm.Open(sqlite.Open(fullPath), &gorm.Config{
 		DisableForeignKeyConstraintWhenMigrating: true,
-		Logger:                                   newLogger,
+		Logger:                                   newLogger(),
 	})
 	if err != nil {
 		panic(err)
@@ -56,14 +47,10 @@ func Init() {
 
 	global.DB = db
 	global.LOG.Info("init db successfully")
+
 }
 
-func initMonitorDB(newLogger logger.Interface) {
-	if _, err := os.Stat(global.CONF.System.DbPath); err != nil {
-		if err := os.MkdirAll(global.CONF.System.DbPath, os.ModePerm); err != nil {
-			panic(fmt.Errorf("init db dir failed, err: %v", err))
-		}
-	}
+func initMonitorDB() {
 	fullPath := path.Join(global.CONF.System.DbPath, "monitor.db")
 	if _, err := os.Stat(fullPath); err != nil {
 		f, err := os.Create(fullPath)
@@ -75,7 +62,7 @@ func initMonitorDB(newLogger logger.Interface) {
 
 	db, err := gorm.Open(sqlite.Open(fullPath), &gorm.Config{
 		DisableForeignKeyConstraintWhenMigrating: true,
-		Logger:                                   newLogger,
+		Logger:                                   newLogger(),
 	})
 	if err != nil {
 		panic(err)
@@ -90,4 +77,45 @@ func initMonitorDB(newLogger logger.Interface) {
 
 	global.MonitorDB = db
 	global.LOG.Info("init monitor db successfully")
+}
+
+func InitCoreDB() {
+	fullPath := path.Join(global.CONF.System.DbPath, "core.db")
+	if _, err := os.Stat(fullPath); err != nil {
+		f, err := os.Create(fullPath)
+		if err != nil {
+			panic(fmt.Errorf("init db file failed, err: %v", err))
+		}
+		_ = f.Close()
+	}
+
+	db, err := gorm.Open(sqlite.Open(fullPath), &gorm.Config{
+		DisableForeignKeyConstraintWhenMigrating: true,
+		Logger:                                   newLogger(),
+	})
+	if err != nil {
+		panic(err)
+	}
+	sqlDB, dbError := db.DB()
+	if dbError != nil {
+		panic(dbError)
+	}
+	sqlDB.SetConnMaxIdleTime(10)
+	sqlDB.SetMaxOpenConns(100)
+	sqlDB.SetConnMaxLifetime(time.Hour)
+
+	global.CoreDB = db
+	global.LOG.Info("init local core db successfully")
+}
+
+func newLogger() logger.Interface {
+	return logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
+		logger.Config{
+			SlowThreshold:             time.Second,
+			LogLevel:                  logger.Silent,
+			IgnoreRecordNotFoundError: true,
+			Colorful:                  false,
+		},
+	)
 }

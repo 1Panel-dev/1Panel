@@ -76,6 +76,8 @@ func (u *SettingService) Update(key, value string) error {
 			_ = settingRepo.Create("AppStoreLastModified", value)
 			return nil
 		}
+	case "MasterAddr":
+		global.CONF.System.MasterAddr = value
 	}
 
 	if err := settingRepo.Update(key, value); err != nil {

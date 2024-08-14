@@ -79,6 +79,22 @@ func (b *BaseApi) LoadOneDriveInfo(c *gin.Context) {
 }
 
 // @Tags Backup Account
+// @Summary Load backup account options
+// @Description 获取备份账号选项
+// @Accept json
+// @Success 200 {array} dto.BackupOption
+// @Security ApiKeyAuth
+// @Router /core/backup/options [get]
+func (b *BaseApi) LoadBackupOptions(c *gin.Context) {
+	list, err := backupService.LoadBackupOptions()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, list)
+}
+
+// @Tags Backup Account
 // @Summary Delete backup account
 // @Description 删除备份账号
 // @Accept json
@@ -146,6 +162,22 @@ func (b *BaseApi) SearchBackup(c *gin.Context) {
 		Items: list,
 		Total: total,
 	})
+}
+
+// @Tags Backup Account
+// @Summary get local backup dir
+// @Description 获取本地备份目录
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /core/backup/local [get]
+func (b *BaseApi) GetLocalDir(c *gin.Context) {
+	dir, err := backupService.GetLocalDir()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, dir)
 }
 
 func (b *BaseApi) GetBackup(c *gin.Context) {

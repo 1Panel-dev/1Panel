@@ -63,6 +63,17 @@ var AddTable = &gormigrate.Migration{
 	},
 }
 
+var AddMonitorTable = &gormigrate.Migration{
+	ID: "20240813-add-monitor-table",
+	Migrate: func(tx *gorm.DB) error {
+		return global.MonitorDB.AutoMigrate(
+			&model.MonitorBase{},
+			&model.MonitorIO{},
+			&model.MonitorNetwork{},
+		)
+	},
+}
+
 var InitHost = &gormigrate.Migration{
 	ID: "20240722-init-host",
 	Migrate: func(tx *gorm.DB) error {
@@ -90,13 +101,14 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "EncryptKey", Value: encryptKey}).Error; err != nil {
 			return err
 		}
+		currentNode := ""
 		if _, err := os.Stat("/opt/1panel/nodeJson"); err == nil {
 			type nodeInfo struct {
-				MasterRequestAddr string `json:"masterRequestAddr"`
-				Token             string `json:"token"`
-				ServerCrt         string `json:"serverCrt"`
-				ServerKey         string `json:"serverKey"`
-				CurrentNode       string `json:"currentNode"`
+				MasterAddr  string `json:"masterAddr"`
+				Token       string `json:"token"`
+				ServerCrt   string `json:"serverCrt"`
+				ServerKey   string `json:"serverKey"`
+				CurrentNode string `json:"currentNode"`
 			}
 			nodeJson, err := os.ReadFile("/opt/1panel/nodeJson")
 			if err != nil {
@@ -118,13 +130,17 @@ var InitSetting = &gormigrate.Migration{
 			if err := tx.Create(&model.Setting{Key: "Token", Value: itemToken}).Error; err != nil {
 				return err
 			}
-			global.CONF.System.MasterRequestAddr = node.MasterRequestAddr
-			global.CONF.System.MasterRequestToken = itemToken
-			global.CurrentNode = node.CurrentNode
+			if err := tx.Create(&model.Setting{Key: "MasterAddr", Value: node.MasterAddr}).Error; err != nil {
+				return err
+			}
+			global.CONF.System.MasterAddr = node.MasterAddr
+			global.CONF.System.MasterToken = itemToken
+			global.IsMaster = false
+			currentNode = node.CurrentNode
 		} else {
-			global.CurrentNode = "127.0.0.1"
+			global.IsMaster = true
 		}
-		if err := tx.Create(&model.Setting{Key: "CurrentNode", Value: global.CurrentNode}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "CurrentNode", Value: currentNode}).Error; err != nil {
 			return err
 		}
 

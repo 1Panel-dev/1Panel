@@ -17,6 +17,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cloud_storage"
+	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 	httpUtils "github.com/1Panel-dev/1Panel/agent/utils/http"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
@@ -66,6 +67,9 @@ func (u *BackupService) SearchRecordsWithPage(search dto.RecordSearch) (int64, [
 		return 0, nil, err
 	}
 
+	if total == 0 {
+		return 0, nil, nil
+	}
 	datas, err := u.loadRecordSize(records)
 	sort.Slice(datas, func(i, j int) bool {
 		return datas[i].CreatedAt.After(datas[j].CreatedAt)
@@ -83,6 +87,9 @@ func (u *BackupService) SearchRecordsByCronjobWithPage(search dto.RecordSearchBy
 		return 0, nil, err
 	}
 
+	if total == 0 {
+		return 0, nil, nil
+	}
 	datas, err := u.loadRecordSize(records)
 	sort.Slice(datas, func(i, j int) bool {
 		return datas[i].CreatedAt.After(datas[j].CreatedAt)
@@ -189,32 +196,35 @@ func (u *BackupService) ListFiles(req dto.OperateByID) []string {
 }
 
 func (u *BackupService) loadRecordSize(records []model.BackupRecord) ([]dto.BackupRecords, error) {
+	recordMap := make(map[uint]struct{})
+	var recordIds []string
+	for _, record := range records {
+		if _, ok := recordMap[record.DownloadAccountID]; !ok {
+			recordMap[record.DownloadAccountID] = struct{}{}
+			recordIds = append(recordIds, fmt.Sprintf("%v", record.DownloadAccountID))
+		}
+	}
+	clientMap, err := NewBackupClientMap(recordIds)
+	if err != nil {
+		return nil, err
+	}
+
 	var datas []dto.BackupRecords
-	clientMap := make(map[uint]loadSizeHelper)
 	var wg sync.WaitGroup
 	for i := 0; i < len(records); i++ {
 		var item dto.BackupRecords
 		if err := copier.Copy(&item, &records[i]); err != nil {
 			return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 		}
+
 		itemPath := path.Join(records[i].FileDir, records[i].FileName)
-		if _, ok := clientMap[records[i].DownloadAccountID]; !ok {
-			account, client, err := NewBackupClientWithID(records[i].DownloadAccountID)
-			if err != nil {
-				global.LOG.Errorf("load backup client from db failed, err: %v", err)
-				clientMap[records[i].DownloadAccountID] = loadSizeHelper{}
-				datas = append(datas, item)
-				continue
-			}
-			item.Size, _ = client.Size(path.Join(strings.TrimLeft(account.BackupPath, "/"), itemPath))
-			datas = append(datas, item)
-			clientMap[records[i].DownloadAccountID] = loadSizeHelper{backupPath: strings.TrimLeft(account.BackupPath, "/"), client: client, isOk: true}
-			continue
-		}
-		if clientMap[records[i].DownloadAccountID].isOk {
+		if val, ok := clientMap[fmt.Sprintf("%v", records[i].DownloadAccountID)]; ok {
+			item.AccountName = val.name
+			item.AccountType = val.accountType
+			item.DownloadAccountID = val.id
 			wg.Add(1)
 			go func(index int) {
-				item.Size, _ = clientMap[records[index].DownloadAccountID].client.Size(path.Join(clientMap[records[index].DownloadAccountID].backupPath, itemPath))
+				item.Size, _ = val.client.Size(path.Join(strings.TrimLeft(val.backupPath, "/"), itemPath))
 				datas = append(datas, item)
 				wg.Done()
 			}(i)
@@ -226,25 +236,46 @@ func (u *BackupService) loadRecordSize(records []model.BackupRecord) ([]dto.Back
 	return datas, nil
 }
 
-func NewBackupClientWithID(id uint) (*dto.BackupInfo, cloud_storage.CloudStorageClient, error) {
-	data, err := httpUtils.RequestToMaster(fmt.Sprintf("/api/v2/backup/%v", id), http.MethodGet, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-	global.LOG.Debug("我走到了这里11")
-	account, ok := data.(dto.BackupInfo)
-	if !ok {
-		return nil, nil, fmt.Errorf("err response from master: %v", data)
-	}
-	global.LOG.Debug("我走到了这里22")
-	if account.Type == constant.Local {
-		localDir, err := LoadLocalDirByStr(account.Vars)
+func NewBackupClientWithID(id uint) (*model.BackupAccount, cloud_storage.CloudStorageClient, error) {
+	var account model.BackupAccount
+	if global.IsMaster {
+		var setting model.Setting
+		if err := global.CoreDB.Where("key = ?", "EncryptKey").First(&setting).Error; err != nil {
+			return nil, nil, err
+		}
+		if err := global.CoreDB.Where("id = ?", id).First(&account).Error; err != nil {
+			return nil, nil, err
+		}
+		if account.ID == 0 {
+			return nil, nil, constant.ErrRecordNotFound
+		}
+		account.AccessKey, _ = encrypt.StringDecryptWithKey(account.AccessKey, setting.Value)
+		account.Credential, _ = encrypt.StringDecryptWithKey(account.Credential, setting.Value)
+	} else {
+		bodyItem, err := json.Marshal(dto.OperateByID{ID: id})
 		if err != nil {
 			return nil, nil, err
 		}
-		global.CONF.System.Backup = localDir
+		data, err := httpUtils.RequestToMaster("/api/v2/agent/backup", http.MethodPost, bytes.NewReader(bodyItem))
+		if err != nil {
+			return nil, nil, err
+		}
+		item, err := json.Marshal(data)
+		if err != nil {
+			return nil, nil, err
+		}
+		if err := json.Unmarshal(item, &account); err != nil {
+			return nil, nil, fmt.Errorf("err response from master: %v", data)
+		}
+
+		if account.Type == constant.Local {
+			localDir, err := LoadLocalDirByStr(account.Vars)
+			if err != nil {
+				return nil, nil, err
+			}
+			global.CONF.System.Backup = localDir
+		}
 	}
-	global.LOG.Debug("我走到了这里33")
 	backClient, err := newClient(&account)
 	if err != nil {
 		return nil, nil, err
@@ -253,24 +284,46 @@ func NewBackupClientWithID(id uint) (*dto.BackupInfo, cloud_storage.CloudStorage
 }
 
 type backupClientHelper struct {
-	id         uint
-	name       string
-	backupPath string
-	client     cloud_storage.CloudStorageClient
+	id          uint
+	accountType string
+	name        string
+	backupPath  string
+	client      cloud_storage.CloudStorageClient
 }
 
 func NewBackupClientMap(ids []string) (map[string]backupClientHelper, error) {
-	bodyItem, err := json.Marshal(ids)
-	if err != nil {
-		return nil, err
-	}
-	data, err := httpUtils.RequestToMaster("/api/v2/backup/list", http.MethodPost, bytes.NewReader(bodyItem))
-	if err != nil {
-		return nil, err
-	}
-	accounts, ok := data.([]dto.BackupInfo)
-	if !ok {
-		return nil, fmt.Errorf("err response from master: %v", data)
+	var accounts []model.BackupAccount
+	if global.IsMaster {
+		var setting model.Setting
+		if err := global.CoreDB.Where("key = ?", "EncryptKey").First(&setting).Error; err != nil {
+			return nil, err
+		}
+		if err := global.CoreDB.Where("id in (?)", ids).Find(&accounts).Error; err != nil {
+			return nil, err
+		}
+		if len(accounts) == 0 {
+			return nil, constant.ErrRecordNotFound
+		}
+		for i := 0; i < len(accounts); i++ {
+			accounts[i].AccessKey, _ = encrypt.StringDecryptWithKey(accounts[i].AccessKey, setting.Value)
+			accounts[i].Credential, _ = encrypt.StringDecryptWithKey(accounts[i].Credential, setting.Value)
+		}
+	} else {
+		bodyItem, err := json.Marshal(ids)
+		if err != nil {
+			return nil, err
+		}
+		data, err := httpUtils.RequestToMaster("/api/v2/agent/backup/list", http.MethodPost, bytes.NewReader(bodyItem))
+		if err != nil {
+			return nil, err
+		}
+		item, err := json.Marshal(data)
+		if err != nil {
+			return nil, err
+		}
+		if err := json.Unmarshal(item, &accounts); err != nil {
+			return nil, fmt.Errorf("err response from master: %v", data)
+		}
 	}
 	clientMap := make(map[string]backupClientHelper)
 	for _, item := range accounts {
@@ -282,12 +335,18 @@ func NewBackupClientMap(ids []string) (map[string]backupClientHelper, error) {
 		if item.BackupPath != "/" {
 			pathItem = strings.TrimPrefix(item.BackupPath, "/")
 		}
-		clientMap[item.Name] = backupClientHelper{client: backClient, backupPath: pathItem, name: item.Name}
+		clientMap[fmt.Sprintf("%v", item.ID)] = backupClientHelper{
+			client:      backClient,
+			backupPath:  pathItem,
+			name:        item.Name,
+			accountType: item.Type,
+			id:          item.ID,
+		}
 	}
 	return clientMap, nil
 }
 
-func newClient(account *dto.BackupInfo) (cloud_storage.CloudStorageClient, error) {
+func newClient(account *model.BackupAccount) (cloud_storage.CloudStorageClient, error) {
 	varMap := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(account.Vars), &varMap); err != nil {
 		return nil, err
@@ -323,6 +382,7 @@ func LoadLocalDirByStr(vars string) (string, error) {
 			if err = os.MkdirAll(baseDir, os.ModePerm); err != nil {
 				return "", fmt.Errorf("mkdir %s failed, err: %v", baseDir, err)
 			}
+			return baseDir, nil
 		}
 	}
 	return "", fmt.Errorf("error type dir: %T", varMap["dir"])

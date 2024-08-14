@@ -114,7 +114,10 @@ export const refreshOneDrive = () => {
     return http.post(`/core/backup/refresh/onedrive`, {});
 };
 export const getBackupList = () => {
-    return http.post<Array<Backup.BackupInfo>>(`/core/backup/list`);
+    return http.get<Array<Backup.BackupOption>>(`/core/backup/options`);
+};
+export const getLocalBackupDir = () => {
+    return http.get<string>(`/core/backup/local`);
 };
 export const searchBackup = (params: Backup.SearchWithType) => {
     return http.post<ResPage<Backup.BackupInfo>>(`/core/backup/search`, params);

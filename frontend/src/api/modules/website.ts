@@ -38,8 +38,8 @@ export const GetWebsite = (id: number) => {
     return http.get<Website.WebsiteDTO>(`/websites/${id}`);
 };
 
-export const GetWebsiteOptions = (req: Website.OptionReq) => {
-    return http.post<any>(`/websites/options`, req);
+export const GetWebsiteOptions = () => {
+    return http.get<any>(`/websites/options`);
 };
 
 export const GetWebsiteConfig = (id: number, type: string) => {

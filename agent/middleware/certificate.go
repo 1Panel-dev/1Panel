@@ -12,7 +12,7 @@ import (
 
 func Certificate() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if global.CurrentNode == "127.0.0.1" || len(global.CurrentNode) == 0 {
+		if global.IsMaster {
 			c.Next()
 			return
 		}

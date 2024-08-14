@@ -46,6 +46,23 @@ func StringEncrypt(text string) (string, error) {
 	return "", err
 }
 
+func StringDecryptWithKey(text, key string) (string, error) {
+	if len(text) == 0 {
+		return "", nil
+	}
+	bytesPass, err := base64.StdEncoding.DecodeString(text)
+	if err != nil {
+		return "", err
+	}
+	var tpass []byte
+	tpass, err = aesDecryptWithSalt([]byte(key), bytesPass)
+	if err == nil {
+		result := string(tpass[:])
+		return result, err
+	}
+	return "", err
+}
+
 func StringDecrypt(text string) (string, error) {
 	if len(text) == 0 {
 		return "", nil
@@ -58,17 +75,7 @@ func StringDecrypt(text string) (string, error) {
 		global.CONF.System.EncryptKey = encryptSetting.Value
 	}
 	key := global.CONF.System.EncryptKey
-	bytesPass, err := base64.StdEncoding.DecodeString(text)
-	if err != nil {
-		return "", err
-	}
-	var tpass []byte
-	tpass, err = aesDecryptWithSalt([]byte(key), bytesPass)
-	if err == nil {
-		result := string(tpass[:])
-		return result, err
-	}
-	return "", err
+	return StringDecryptWithKey(text, key)
 }
 
 func padding(plaintext []byte, blockSize int) []byte {
