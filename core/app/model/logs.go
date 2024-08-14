@@ -6,26 +6,25 @@ import (
 
 type OperationLog struct {
 	BaseModel
-	Source string `gorm:"type:varchar(64)" json:"source"`
+	Source    string `json:"source"`
+	IP        string `json:"ip"`
+	Path      string `json:"path"`
+	Method    string `json:"method"`
+	UserAgent string `json:"userAgent"`
 
-	IP        string `gorm:"type:varchar(64)" json:"ip"`
-	Path      string `gorm:"type:varchar(64)" json:"path"`
-	Method    string `gorm:"type:varchar(64)" json:"method"`
-	UserAgent string `gorm:"type:varchar(256)" json:"userAgent"`
+	Latency time.Duration `json:"latency"`
+	Status  string        `json:"status"`
+	Message string        `json:"message"`
 
-	Latency time.Duration `gorm:"type:varchar(64)" json:"latency"`
-	Status  string        `gorm:"type:varchar(64)" json:"status"`
-	Message string        `gorm:"type:varchar(256)" json:"message"`
-
-	DetailZH string `gorm:"type:varchar(256)" json:"detailZH"`
-	DetailEN string `gorm:"type:varchar(256)" json:"detailEN"`
+	DetailZH string `json:"detailZH"`
+	DetailEN string `json:"detailEN"`
 }
 
 type LoginLog struct {
 	BaseModel
-	IP      string `gorm:"type:varchar(64)" json:"ip"`
-	Address string `gorm:"type:varchar(64)" json:"address"`
-	Agent   string `gorm:"type:varchar(256)" json:"agent"`
-	Status  string `gorm:"type:varchar(64)" json:"status"`
-	Message string `gorm:"type:longText" json:"message"`
+	IP      string `json:"ip"`
+	Address string `json:"address"`
+	Agent   string `json:"agent"`
+	Status  string `json:"status"`
+	Message string `json:"message"`
 }

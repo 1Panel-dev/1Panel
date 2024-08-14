@@ -13,7 +13,7 @@ type WebsiteDTO struct {
 	SitePath      string `json:"sitePath"`
 	AppName       string `json:"appName"`
 	RuntimeName   string `json:"runtimeName"`
-	SiteDir       string `gorm:"type:varchar;" json:"siteDir"`
+	SiteDir       string `json:"siteDir"`
 }
 
 type WebsiteRes struct {
