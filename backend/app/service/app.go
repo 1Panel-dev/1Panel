@@ -188,7 +188,7 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 
 		versionPath := filepath.Join(app.GetAppResourcePath(), detail.Version)
 		if !fileOp.Stat(versionPath) || detail.Update {
-			if err = downloadApp(app, detail, nil); err != nil {
+			if err = downloadApp(app, detail, nil); err != nil && !fileOp.Stat(versionPath) {
 				return appDetailDTO, err
 			}
 		}

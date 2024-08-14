@@ -2,6 +2,7 @@ package http
 
 import (
 	"context"
+	"errors"
 	"io"
 	"net/http"
 	"time"
@@ -34,6 +35,9 @@ func HandleGetWithTransport(url, method string, transport *http.Transport, timeo
 	resp, err := client.Do(request)
 	if err != nil {
 		return 0, nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return 0, nil, errors.New(resp.Status)
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
