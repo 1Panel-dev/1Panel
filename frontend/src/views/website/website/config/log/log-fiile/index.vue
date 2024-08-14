@@ -5,7 +5,7 @@
                 <el-switch v-model="data.enable" @change="updateEnable"></el-switch>
             </el-form-item>
         </div>
-        <LogFile :config="{ id: id, type: 'website', name: logType }" :style="style" ref="logRef">
+        <LogFile :config="{ id: id, type: 'website', name: logType }" ref="logRef">
             <template #button>
                 <el-button @click="cleanLog" icon="Delete">
                     {{ $t('commons.button.clean') }}
@@ -38,7 +38,6 @@ const logType = computed(() => {
 const id = computed(() => {
     return props.id;
 });
-const style = ref('height: calc(100vh - 402px); width: 100%; min-height: 300px');
 const loading = ref(false);
 const data = ref({
     enable: false,

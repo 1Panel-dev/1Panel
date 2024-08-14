@@ -18,6 +18,7 @@
                 language="JavaScript"
                 :autodetect="false"
                 :code="content"
+                :style="editorStyle"
             ></highlightjs>
         </div>
     </div>
@@ -37,6 +38,15 @@ interface LogProps {
     tail?: boolean;
 }
 
+const editorStyle = computed(() => {
+    const height = 'calc(100vh - ' + props.heightDiff + 'px)';
+    return {
+        height,
+        width: '100%',
+        overflow: 'auto',
+    };
+});
+
 const props = defineProps({
     config: {
         type: Object as () => LogProps | null,
@@ -46,10 +56,6 @@ const props = defineProps({
             name: '',
             tail: false,
         }),
-    },
-    style: {
-        type: String,
-        default: 'height: calc(100vh - 200px); width: 100%; min-height: 400px; overflow: auto;',
     },
     defaultButton: {
         type: Boolean,
@@ -62,6 +68,10 @@ const props = defineProps({
     hasContent: {
         type: Boolean,
         default: false,
+    },
+    heightDiff: {
+        type: Number,
+        default: 500,
     },
 });
 const data = ref({
@@ -246,7 +256,7 @@ const initCodemirror = () => {
                 }
             });
             let hljsDom = scrollerElement.value.querySelector('.hljs') as HTMLElement;
-            hljsDom.style['min-height'] = '100px';
+            hljsDom.style.minHeight = '95%';
         }
     });
 };
@@ -264,9 +274,7 @@ defineExpose({ changeTail, onDownload, clearLog });
 </script>
 <style lang="scss" scoped>
 .editor-main {
-    height: calc(100vh - 480px);
     width: 100%;
-    min-height: 600px;
     overflow: auto;
 }
 </style>

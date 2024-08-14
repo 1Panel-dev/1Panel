@@ -201,10 +201,7 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 
 func (w WebsiteService) GetWebsites() ([]response.WebsiteDTO, error) {
 	var websiteDTOs []response.WebsiteDTO
-	websites, err := websiteRepo.List(commonRepo.WithOrderRuleBy("primary_domain", "ascending"))
-	if err != nil {
-		return nil, err
-	}
+	websites, _ := websiteRepo.List(commonRepo.WithOrderRuleBy("primary_domain", "ascending"))
 	for _, web := range websites {
 		res := response.WebsiteDTO{
 			Website: web,
@@ -513,10 +510,7 @@ func (w WebsiteService) GetWebsiteOptions(req request.WebsiteOptionReq) ([]respo
 	if len(req.Types) > 0 {
 		options = append(options, websiteRepo.WithTypes(req.Types))
 	}
-	webs, err := websiteRepo.List(options...)
-	if err != nil {
-		return nil, err
-	}
+	webs, _ := websiteRepo.List(options...)
 	var datas []response.WebsiteOption
 	for _, web := range webs {
 		var item response.WebsiteOption
@@ -2902,4 +2896,8 @@ func (w WebsiteService) UpdateDefaultHtml(req request.WebsiteHtmlUpdate) error {
 		return nil
 	}
 	return fileOp.SaveFile(resourcePath, req.Content, 0644)
+}
+
+func (w WebsiteService) GetUpStreams() ([]dto.NginxUpstream, error) {
+	return nil, nil
 }

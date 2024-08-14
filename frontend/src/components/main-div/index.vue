@@ -1,32 +1,36 @@
 <template>
-    <div class="overflow-y-auto overflow-x-hidden" :style="'height: ' + mainHeight + 'px'">
+    <div class="main-div" :style="{ '--main-height': mainHeight + 'px' }">
         <slot></slot>
     </div>
 </template>
-
 <script lang="ts" setup>
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 const props = defineProps({
     heightDiff: {
         type: Number,
         default: 0,
     },
 });
+const windowHeight = ref(window.innerHeight);
+const mainHeight = computed(() => windowHeight.value - props.heightDiff);
 
-let mainHeight = ref(0);
+const updateHeight = () => {
+    windowHeight.value = window.innerHeight;
+};
 
 onMounted(() => {
-    let heightDiff = 300;
-    if (props.heightDiff) {
-        heightDiff = props.heightDiff;
-    }
-
-    mainHeight.value = window.innerHeight - heightDiff;
-    window.onresize = () => {
-        return (() => {
-            mainHeight.value = window.innerHeight - heightDiff;
-        })();
-    };
+    window.addEventListener('resize', updateHeight);
 });
 
+onUnmounted(() => {
+    window.removeEventListener('resize', updateHeight);
+});
 defineOptions({ name: 'MainDiv' });
 </script>
+<style scoped>
+.main-div {
+    height: var(--main-height);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+</style>

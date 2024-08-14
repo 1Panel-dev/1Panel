@@ -16,21 +16,6 @@
                     mode="dockerfile"
                     placeholder="#Define or paste the content of your Dockerfile here"
                 ></CodemirrorPro>
-                <!-- <codemirror
-                    @change="onEdit()"
-                    :autofocus="true"
-                    placeholder="#Define or paste the content of your Dockerfile here"
-                    :indent-with-tab="true"
-                    :tabSize="4"
-                    style="width: 100%; height: calc(100vh - 520px)"
-                    :lineWrapping="true"
-                    :matchBrackets="true"
-                    theme="cobalt"
-                    :styleActiveLine="true"
-                    :extensions="extensions"
-                    v-model="form.dockerfile"
-                    :readOnly="true"
-                /> -->
             </el-form-item>
             <el-form-item v-else :rules="Rules.requiredSelect" prop="dockerfile">
                 <el-input @change="onEdit()" clearable v-model="form.dockerfile">
@@ -56,7 +41,7 @@
             :default-button="false"
             v-model:is-reading="isReading"
             v-if="logVisible"
-            :style="'height: calc(100vh - 370px);min-height: 200px'"
+            :height-diff="370"
         />
 
         <template #footer>

@@ -28,7 +28,7 @@
             :default-button="false"
             v-model:is-reading="isReading"
             v-if="showLog"
-            :style="'height: calc(100vh - 397px);min-height: 200px'"
+            :height-diff="420"
         />
         <template #footer>
             <span class="dialog-footer">

@@ -49,17 +49,17 @@
                         :heightDiff="400"
                     ></CodemirrorPro>
                 </div>
-                <div class="w-full">
-                    <LogFile
-                        ref="logRef"
-                        v-model:is-reading="isReading"
-                        :config="logConfig"
-                        :default-button="false"
-                        v-if="mode === 'log' && showLog"
-                        :style="'height: calc(100vh - 370px);min-height: 200px'"
-                    />
-                </div>
             </el-form-item>
+            <div class="w-full h-32">
+                <LogFile
+                    ref="logRef"
+                    v-model:is-reading="isReading"
+                    :config="logConfig"
+                    :default-button="false"
+                    v-if="mode === 'log' && showLog"
+                    :height-diff="370"
+                />
+            </div>
         </el-form>
         <template #footer>
             <span class="dialog-footer">

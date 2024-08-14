@@ -24,7 +24,7 @@
             :default-button="false"
             v-model:is-reading="isReading"
             v-if="logVisible"
-            :style="'height: calc(100vh - 370px);min-height: 200px'"
+            :height-diff="420"
             v-model:loading="loading"
         />
 

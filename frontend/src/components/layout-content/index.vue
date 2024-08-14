@@ -33,9 +33,6 @@
                                     <template v-if="slots.leftToolBar" #buttons>
                                         <slot name="leftToolBar" v-if="slots.leftToolBar"></slot>
                                     </template>
-                                    <!-- <template v-else-if="slots.buttons" #buttons>
-                                        <slot name="buttons"></slot>
-                                    </template> -->
                                 </back-button>
                                 <div>
                                     <slot name="rightToolBar" v-if="slots.rightToolBar"></slot>
