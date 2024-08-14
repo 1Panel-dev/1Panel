@@ -10,6 +10,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/service"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/init/db"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 )
 
@@ -25,7 +26,21 @@ func Init() {
 	if err != nil {
 		global.LOG.Fatalf("load current node before start failed, err: %v", err)
 	}
-	global.CurrentNode = node.Value
+	global.IsMaster = node.Value == "127.0.0.1" || len(node.Value) == 0
+	if global.IsMaster {
+		db.InitCoreDB()
+	} else {
+		masterAddr, err := settingRepo.Get(settingRepo.WithByKey("MasterAddr"))
+		if err != nil {
+			global.LOG.Fatalf("load master addr before start failed, err: %v", err)
+		}
+		global.CONF.System.MasterAddr = masterAddr.Value
+		token, err := settingRepo.Get(settingRepo.WithByKey("Token"))
+		if err != nil {
+			global.LOG.Fatalf("load token before start failed, err: %v", err)
+		}
+		global.CONF.System.MasterToken, _ = encrypt.StringDecrypt(token.Value)
+	}
 
 	handleCronjobStatus()
 	handleSnapStatus()
@@ -101,14 +116,28 @@ func handleCronjobStatus() {
 }
 
 func loadLocalDir() {
-	account, _, err := service.NewBackupClientWithID(1)
-	if err != nil {
-		global.LOG.Errorf("load local backup account info failed, err: %v", err)
+	var vars string
+	if global.IsMaster {
+		var account model.BackupAccount
+		if err := global.CoreDB.Where("id = 1").First(&account).Error; err != nil {
+			global.LOG.Errorf("load local backup account info failed, err: %v", err)
+			return
+		}
+		vars = account.Vars
+	} else {
+		account, _, err := service.NewBackupClientWithID(1)
+		if err != nil {
+			global.LOG.Errorf("load local backup account info failed, err: %v", err)
+			return
+		}
+		vars = account.Vars
 	}
-	global.CONF.System.Backup, err = service.LoadLocalDirByStr(account.Vars)
+	localDir, err := service.LoadLocalDirByStr(vars)
 	if err != nil {
 		global.LOG.Errorf("load local backup dir failed, err: %v", err)
+		return
 	}
+	global.CONF.System.Backup = localDir
 }
 
 func initDir() {
@@ -150,7 +179,7 @@ func initSSL() error {
 	if err := settingRepo.Update("CurrentNode", node.CurrentNode); err != nil {
 		return err
 	}
-	global.CurrentNode = node.CurrentNode
+	global.IsMaster = node.CurrentNode == "127.0.0.1" || len(node.CurrentNode) == 0
 	_ = os.Remove(("/opt/1panel/nodeJson"))
 	return nil
 }

@@ -4,6 +4,8 @@ import (
 	"time"
 )
 
+// BackupAccounts ---> SourceAccountIDs
+// BackupAccounts ---> DownloadAccountID
 type Cronjob struct {
 	BaseModel
 
@@ -22,7 +24,7 @@ type Cronjob struct {
 	SourceDir      string `json:"sourceDir"`
 	ExclusionRules string `json:"exclusionRules"`
 
-	SourceAccountIDs  string `json:"sourceAccountsIDs"`
+	SourceAccountIDs  string `json:"sourceAccountIDs"`
 	DownloadAccountID uint   `json:"downloadAccountID"`
 	RetainCopies      uint64 `json:"retainCopies"`
 

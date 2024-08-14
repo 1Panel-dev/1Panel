@@ -49,7 +49,7 @@ type SnapshotStatus struct {
 
 type SnapshotCreate struct {
 	ID                uint   `json:"id"`
-	SourceAccountIDs  string `json:"sourceAccountsIDs" validate:"required"`
+	SourceAccountIDs  string `json:"sourceAccountIDs" validate:"required"`
 	DownloadAccountID uint   `json:"downloadAccountID" validate:"required"`
 	Description       string `json:"description" validate:"max=256"`
 	Secret            string `json:"secret"`

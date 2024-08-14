@@ -1,6 +1,7 @@
 package router
 
 import (
+	v2 "github.com/1Panel-dev/1Panel/agent/app/api/v2"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/middleware"
@@ -19,19 +20,17 @@ func Routers() *gin.Engine {
 
 	PublicGroup := Router.Group("")
 	{
-		PublicGroup.GET("/health", func(c *gin.Context) {
-			c.JSON(200, "ok")
-		})
 		PublicGroup.Use(gzip.Gzip(gzip.DefaultCompression))
 		PublicGroup.Static("/api/v2/images", "./uploads")
 	}
 	PrivateGroup := Router.Group("/api/v2")
-	if global.CurrentNode != "127.0.0.1" {
+	if !global.IsMaster {
 		PrivateGroup.Use(middleware.Certificate())
 	}
 	for _, router := range rou.RouterGroupApp {
 		router.InitRouter(PrivateGroup)
 	}
+	PrivateGroup.GET("/health/check", v2.ApiGroupApp.BaseApi.CheckHealth)
 
 	return Router
 }

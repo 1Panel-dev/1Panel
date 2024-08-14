@@ -21,9 +21,9 @@ export namespace Cronjob {
         url: string;
         sourceDir: string;
 
-        backupAccounts: string;
-        defaultDownload: string;
-        backupAccountList: Array<string>;
+        sourceAccountIDs: string;
+        downloadAccountID: number;
+        sourceAccounts: Array<number>;
         retainCopies: number;
         status: string;
         secret: string;
@@ -42,8 +42,8 @@ export namespace Cronjob {
         url: string;
         sourceDir: string;
 
-        backupAccounts: string;
-        defaultDownload: string;
+        sourceAccountIDs: string;
+        downloadAccountID: number;
         retainCopies: number;
         secret: string;
     }
@@ -67,8 +67,8 @@ export namespace Cronjob {
         url: string;
         sourceDir: string;
 
-        backupAccounts: string;
-        defaultDownload: string;
+        sourceAccountIDs: string;
+        downloadAccountID: number;
         retainCopies: number;
         secret: string;
     }

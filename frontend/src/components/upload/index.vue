@@ -95,9 +95,37 @@
                 </div>
             </template>
         </DrawerPro>
+
+        <el-dialog
+            v-model="open"
+            :title="$t('commons.button.recover') + ' - ' + name"
+            width="40%"
+            :close-on-click-modal="false"
+            :before-close="handleBackupClose"
+        >
+            <el-form ref="backupForm" label-position="left" v-loading="loading">
+                <el-form-item
+                    :label="$t('setting.compressPassword')"
+                    style="margin-top: 10px"
+                    v-if="type === 'app' || type === 'website'"
+                >
+                    <el-input v-model="secret" :placeholder="$t('setting.backupRecoverMessage')" />
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="handleClose" :disabled="loading">
+                        {{ $t('commons.button.cancel') }}
+                    </el-button>
+                    <el-button type="primary" @click="onHandleRecover" :disabled="loading">
+                        {{ $t('commons.button.confirm') }}
+                    </el-button>
+                </span>
+            </template>
+        </el-dialog>
+
         <OpDialog ref="opRef" @search="search" />
     </div>
-    <AppRecover ref="recoverRef" />
 </template>
 
 <script lang="ts" setup>
@@ -107,9 +135,8 @@ import i18n from '@/lang';
 import { UploadFile, UploadFiles, UploadInstance } from 'element-plus';
 import { File } from '@/api/interface/file';
 import { BatchDeleteFile, CheckFile, ChunkUploadFileData, GetUploadList } from '@/api/modules/files';
-import { loadBaseDir } from '@/api/modules/setting';
+import { handleRecoverByUpload, loadBaseDir } from '@/api/modules/setting';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import AppRecover from '@/views/app-store/installed/recover/index.vue';
 
 const loading = ref();
 const isUpload = ref();
@@ -117,7 +144,8 @@ const uploadPercent = ref<number>(0);
 const selects = ref<any>([]);
 const baseDir = ref();
 const opRef = ref();
-const recoverRef = ref();
+
+const open = ref();
 
 const data = ref();
 const title = ref();
@@ -181,17 +209,44 @@ const search = async () => {
     paginationConfig.total = res.data.total;
 };
 
-const onRecover = async (row: File.File) => {
+const onHandleRecover = async (row?: any) => {
     let params = {
-        source: 'LOCAL',
+        downloadAccountID: 1,
         type: type.value,
         name: name.value,
         detailName: detailName.value,
         file: baseDir.value + row.name,
         secret: secret.value,
-        recoverType: 'upload',
     };
-    recoverRef.value.acceptParams(params);
+    loading.value = true;
+    await handleRecoverByUpload(params)
+        .then(() => {
+            loading.value = false;
+            handleClose();
+            handleBackupClose();
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            search();
+        })
+        .catch(() => {
+            loading.value = false;
+        });
+};
+
+const onRecover = async (row: File.File) => {
+    if (type.value !== 'app' && type.value !== 'website') {
+        ElMessageBox.confirm(
+            i18n.global.t('commons.msg.backupHelper', [name.value + '( ' + detailName.value + ' )']),
+            i18n.global.t('commons.button.backup'),
+            {
+                confirmButtonText: i18n.global.t('commons.button.confirm'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+            },
+        ).then(async () => {
+            onHandleRecover(row);
+        });
+        return;
+    }
+    open.value = true;
 };
 
 const uploaderFiles = ref<UploadFiles>([]);
@@ -220,6 +275,9 @@ const handleClose = () => {
     uploaderFiles.value = [];
     uploadRef.value!.clearFiles();
     upVisible.value = false;
+};
+const handleBackupClose = () => {
+    open.value = false;
 };
 
 const onSubmit = async () => {

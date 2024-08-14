@@ -16,6 +16,7 @@ ErrCmdTimeout: "命令执行超时！"
 ErrEntrance: "安全入口信息错误，请检查后重试！"
 ErrGroupIsUsed: "分组正在使用中，无法删除"
 ErrLocalDelete: "无法删除本地节点！"
+ErrMasterAddr: "当前未设置主节点地址，无法添加节点！"
 
 #app
 ErrPortInUsed: "{{ .detail }} 端口已被占用！"

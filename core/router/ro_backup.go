@@ -11,7 +11,9 @@ func (s *BackupRouter) InitRouter(Router *gin.RouterGroup) {
 	backupRouter := Router.Group("backup")
 	baseApi := v2.ApiGroupApp.BaseApi
 	{
+		backupRouter.GET("/local", baseApi.GetLocalDir)
 		backupRouter.GET("/onedrive", baseApi.LoadOneDriveInfo)
+		backupRouter.GET("/options", baseApi.LoadBackupOptions)
 		backupRouter.POST("/search", baseApi.SearchBackup)
 		backupRouter.POST("/refresh/onedrive", baseApi.RefreshOneDriveToken)
 		backupRouter.POST("/buckets", baseApi.ListBuckets)

@@ -4,7 +4,7 @@ type Snapshot struct {
 	BaseModel
 	Name              string `json:"name" gorm:"not null;unique"`
 	Description       string `json:"description"`
-	SourceAccountIDs  string `json:"sourceAccountsIDs"`
+	SourceAccountIDs  string `json:"sourceAccountIDs"`
 	DownloadAccountID uint   `json:"downloadAccountID"`
 	Status            string `json:"status"`
 	Message           string `json:"message"`

@@ -15,6 +15,7 @@ import (
 var (
 	DB        *gorm.DB
 	MonitorDB *gorm.DB
+	CoreDB    *gorm.DB
 	LOG       *logrus.Logger
 	CONF      configs.ServerConfig
 	VALID     *validator.Validate
@@ -26,7 +27,7 @@ var (
 	MonitorCronID  cron.EntryID
 	OneDriveCronID cron.EntryID
 
-	CurrentNode string
+	IsMaster bool
 
 	I18n *i18n.Localizer
 )

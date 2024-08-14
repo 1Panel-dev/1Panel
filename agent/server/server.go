@@ -44,7 +44,7 @@ func Start() {
 	server := &http.Server{
 		Handler: rootRouter,
 	}
-	if len(global.CurrentNode) == 0 || global.CurrentNode == "127.0.0.1" {
+	if global.IsMaster {
 		_ = os.Remove("/tmp/agent.sock")
 		listener, err := net.Listen("unix", "/tmp/agent.sock")
 		if err != nil {
