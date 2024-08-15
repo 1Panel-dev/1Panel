@@ -565,8 +565,10 @@ const rules = reactive({
     ],
 
     script: [Rules.requiredInput],
-    website: [Rules.requiredSelect],
-    dbName: [Rules.requiredSelect],
+    websiteList: [Rules.requiredSelect],
+    appIdList: [Rules.requiredSelect],
+    dbNameList: [Rules.requiredSelect],
+    backupAccountList: [Rules.requiredSelect],
     url: [Rules.requiredInput],
     sourceDir: [Rules.requiredInput],
     backupAccounts: [Rules.requiredSelect],
