@@ -265,3 +265,37 @@ export const Actions = [
         value: 'five_seconds',
     },
 ];
+
+export const Algorithms = [
+    {
+        label: i18n.global.t('commons.table.default'),
+        value: 'default',
+        placeHolder: i18n.global.t('website.defaultHelper'),
+    },
+    {
+        label: i18n.global.t('website.ipHash'),
+        value: 'ip_hash',
+        placeHolder: i18n.global.t('website.ipHashHelper'),
+    },
+    {
+        label: i18n.global.t('website.leastConn'),
+        value: 'least_conn',
+        placeHolder: i18n.global.t('website.leastConnHelper'),
+    },
+    {
+        label: i18n.global.t('website.leastTime'),
+        value: 'least_time',
+        placeHolder: i18n.global.t('website.leastTimeHelper'),
+    },
+];
+
+export const StatusStrategy = [
+    {
+        label: i18n.global.t('website.strategyDown'),
+        value: 'down',
+    },
+    {
+        label: i18n.global.t('website.strategyBackup'),
+        value: 'backup',
+    },
+];

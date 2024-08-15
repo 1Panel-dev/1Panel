@@ -203,7 +203,6 @@ const searchPath = async () => {
 const searchAll = () => {
     search();
     searchPath();
-    console.log(11111);
 };
 
 onMounted(() => {

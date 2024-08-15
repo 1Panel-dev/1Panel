@@ -50,7 +50,7 @@
                 </el-form-item>
             </el-col>
             <el-col :span="4" v-if="index == 0">
-                <el-form-item :label="$t('commons.button.add') + $t('commons.table.port')">
+                <el-form-item :label="$t('commons.button.add') + $t('website.domain')">
                     <el-button @click="addDomain">
                         <el-icon><Plus /></el-icon>
                     </el-button>
