@@ -81,6 +81,7 @@ func (c *ClamService) LoadBaseInfo() (dto.ClamBaseInfo, error) {
 	}
 	if !cmd.Which("clamdscan") {
 		baseInfo.IsActive = false
+		stopAllCronJob()
 	}
 
 	if baseInfo.IsActive {
@@ -268,7 +269,8 @@ func (c *ClamService) Delete(req dto.ClamDelete) error {
 }
 
 func (c *ClamService) HandleOnce(req dto.OperateByID) error {
-	if cmd.Which("clamdscan") == false {
+	if !cmd.Which("clamdscan") {
+		stopAllCronJob()
 		return buserr.New("ErrClamdscanNotFound")
 	}
 	clam, _ := clamRepo.Get(commonRepo.WithByID(req.ID))
@@ -471,6 +473,14 @@ func (c *ClamService) UpdateFile(req dto.UpdateByNameAndFile) error {
 
 	_ = systemctl.Restart(service)
 	return nil
+}
+
+func stopAllCronJob() {
+	clams, _ := clamRepo.List(commonRepo.WithByStatus(constant.StatusEnable))
+	for i := 0; i < len(clams); i++ {
+		global.Cron.Remove(cron.EntryID(clams[i].EntryID))
+		_ = clamRepo.Update(clams[i].ID, map[string]interface{}{"status": constant.StatusDisable, "entry_id": 0})
+	}
 }
 
 func loadFileByName(name string) []string {
