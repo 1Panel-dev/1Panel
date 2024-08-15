@@ -191,7 +191,7 @@ const message = {
             simpleName: 'Supports non-underscore starting, English, numbers, _, length 3-30',
             simplePassword: 'Supports non-underscore starting, English, numbers, _, length 1-30',
             dbName: 'Supports non-special character starting, including English, Chinese, numbers, .-_, with a length of 1-64',
-            imageName: 'Support English, numbers, :/.-_, length 1-150',
+            imageName: 'Support English, numbers, :@/.-_, length 1-256',
             volumeName: 'Support English, numbers, .-_, length 2-30',
             supervisorName: 'Supports non-special characters starting with English, numbers, - and _, length 1-128',
             complexityPassword:
