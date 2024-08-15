@@ -1,8 +1,8 @@
 <template>
     <div>
-        <el-popover placement="bottom-start" :width="200" trigger="hover">
+        <el-popover placement="bottom-start" :width="200" trigger="click">
             <template #reference>
-                <el-button class="timer-button" :icon="Refresh"></el-button>
+                <el-button class="timer-button" icon="Refresh"></el-button>
             </template>
             <el-select v-model="refreshRate" @change="changeRefresh">
                 <template #prefix>{{ $t('commons.table.refreshRate') }}</template>
@@ -20,7 +20,6 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue';
-import { Refresh } from '@element-plus/icons-vue';
 defineOptions({ name: 'TableSetting' });
 
 const refreshRate = ref<number>(0);

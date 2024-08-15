@@ -32,12 +32,6 @@ func ErrorWithDetail(ctx *gin.Context, code int, msgKey string, err error) {
 			res.Message = i18n.GetMsgWithMap("ErrInvalidParams", nil)
 		case errors.Is(constant.ErrStructTransform, err):
 			res.Message = i18n.GetMsgWithMap("ErrStructTransform", map[string]interface{}{"detail": err})
-		case errors.Is(constant.ErrCaptchaCode, err):
-			res.Code = constant.CodeAuth
-			res.Message = "ErrCaptchaCode"
-		case errors.Is(constant.ErrAuth, err):
-			res.Code = constant.CodeAuth
-			res.Message = "ErrAuth"
 		case errors.Is(constant.ErrInitialPassword, err):
 			res.Message = i18n.GetMsgWithMap("ErrInitialPassword", map[string]interface{}{"detail": err})
 		case errors.As(err, &buserr.BusinessError{}):
