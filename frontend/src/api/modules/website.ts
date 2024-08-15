@@ -295,3 +295,15 @@ export const DownloadCAFile = (params: Website.SSLDownload) => {
         timeout: TimeoutEnum.T_40S,
     });
 };
+
+export const GetLoadBalances = (id: number) => {
+    return http.get<Website.NginxUpstream[]>(`/websites/${id}/lbs`);
+};
+
+export const CreateLoadBalance = (req: Website.LoadBalanceReq) => {
+    return http.post(`/websites/lbs/create`, req);
+};
+
+export const DeleteLoadBalance = (req: Website.LoadBalanceDel) => {
+    return http.post(`/websites/lbs/del`, req);
+};

@@ -855,3 +855,65 @@ func (b *BaseApi) UpdateDefaultHtml(c *gin.Context) {
 	}
 	helper.SuccessWithOutData(c)
 }
+
+// @Tags Website
+// @Summary Get website upstreams
+// @Description 获取网站 upstreams
+// @Accept json
+// @Param request body request.WebsiteCommonReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/lbs [get]
+func (b *BaseApi) GetLoadBalances(c *gin.Context) {
+	id, err := helper.GetParamID(c)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		return
+	}
+	res, err := websiteService.GetLoadBalances(id)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags Website
+// @Summary Create website upstream
+// @Description 创建网站 upstream
+// @Accept json
+// @Param request body request.WebsiteLBCreate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/lbs/create [post]
+func (b *BaseApi) CreateLoadBalance(c *gin.Context) {
+	var req request.WebsiteLBCreate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteService.CreateLoadBalance(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}
+
+// @Tags Website
+// @Summary Delete website upstream
+// @Description 删除网站 upstream
+// @Accept json
+// @Param request body request.WebsiteLBDelete true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/lbs/delete [post]
+func (b *BaseApi) DeleteLoadBalance(c *gin.Context) {
+	var req request.WebsiteLBDelete
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteService.DeleteLoadBalance(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}

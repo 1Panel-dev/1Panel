@@ -40,3 +40,6 @@ var StopHTML []byte
 
 //go:embed path_auth.conf
 var PathAuth []byte
+
+//go:embed upstream.conf
+var Upstream []byte

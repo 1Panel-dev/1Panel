@@ -15,23 +15,26 @@
         <el-tab-pane :label="$t('website.proxy')">
             <Proxy :id="id" v-if="tabIndex == '4'"></Proxy>
         </el-tab-pane>
+        <el-tab-pane :label="$t('website.loadBalance')">
+            <LoadBalance :id="id" v-if="tabIndex == '5'"></LoadBalance>
+        </el-tab-pane>
         <el-tab-pane :label="$t('website.basicAuth')">
-            <AuthBasic :id="id" v-if="tabIndex == '5'"></AuthBasic>
+            <AuthBasic :id="id" v-if="tabIndex == '6'"></AuthBasic>
         </el-tab-pane>
         <el-tab-pane :label="'HTTPS'">
-            <HTTPS :id="id" v-if="tabIndex == '6'"></HTTPS>
+            <HTTPS :id="id" v-if="tabIndex == '7'"></HTTPS>
         </el-tab-pane>
         <el-tab-pane :label="$t('website.rewrite')">
-            <Rewrite :id="id" v-if="tabIndex == '7'"></Rewrite>
+            <Rewrite :id="id" v-if="tabIndex == '8'"></Rewrite>
         </el-tab-pane>
         <el-tab-pane :label="$t('website.antiLeech')">
-            <AntiLeech :id="id" v-if="tabIndex == '8'"></AntiLeech>
+            <AntiLeech :id="id" v-if="tabIndex == '9'"></AntiLeech>
         </el-tab-pane>
         <el-tab-pane :label="$t('website.redirect')">
-            <Redirect :id="id" v-if="tabIndex == '9'"></Redirect>
+            <Redirect :id="id" v-if="tabIndex == '10'"></Redirect>
         </el-tab-pane>
         <el-tab-pane :label="$t('website.other')">
-            <Other :id="id" v-if="tabIndex == '10'"></Other>
+            <Other :id="id" v-if="tabIndex == '11'"></Other>
         </el-tab-pane>
     </el-tabs>
 </template>
@@ -50,6 +53,7 @@ import Proxy from './proxy/index.vue';
 import AuthBasic from './auth-basic/index.vue';
 import AntiLeech from './anti-Leech/index.vue';
 import Redirect from './redirect/index.vue';
+import LoadBalance from './load-balance/index.vue';
 
 const props = defineProps({
     id: {

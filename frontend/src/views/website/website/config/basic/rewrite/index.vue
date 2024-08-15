@@ -12,7 +12,7 @@
             </el-select>
         </el-form-item>
         <el-text type="warning">{{ $t('website.rewriteHelper2') }}</el-text>
-        <CodemirrorPro v-model="content" mode="nginx"></CodemirrorPro>
+        <CodemirrorPro v-model="content" mode="nginx" :heightDiff="500"></CodemirrorPro>
         <div class="mt-2">
             <el-form-item>
                 <el-alert :title="$t('website.rewriteHelper')" type="info" :closable="false" />

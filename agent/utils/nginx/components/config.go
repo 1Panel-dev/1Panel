@@ -24,6 +24,15 @@ func (c *Config) FindHttp() *Http {
 	return http
 }
 
+func (c *Config) FindUpstreams() []*Upstream {
+	var upstreams []*Upstream
+	directives := c.Block.FindDirectives("upstream")
+	for _, directive := range directives {
+		upstreams = append(upstreams, directive.(*Upstream))
+	}
+	return upstreams
+}
+
 var repeatKeys = map[string]struct {
 }{
 	"limit_conn":       {},

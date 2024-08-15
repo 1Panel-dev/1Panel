@@ -568,4 +568,31 @@ export namespace Website {
         type: string;
         content: string;
     }
+
+    export interface NginxUpstream {
+        name: string;
+        algorithm: string;
+        servers: NginxUpstreamServer[];
+    }
+
+    export interface LoadBalanceReq {
+        websiteID: number;
+        name: string;
+        algorithm: string;
+        servers: NginxUpstreamServer[];
+    }
+
+    interface NginxUpstreamServer {
+        server: string;
+        weight: number;
+        failTimeout: string;
+        maxFails: number;
+        maxConns: number;
+        flag: string;
+    }
+
+    export interface LoadBalanceDel {
+        websiteID: number;
+        name: string;
+    }
 }

@@ -64,3 +64,20 @@ var StaticFileKeyMap = map[NginxKey]struct {
 	CACHE:      {},
 	ProxyCache: {},
 }
+
+type NginxUpstream struct {
+	Name      string                `json:"name"`
+	Algorithm string                `json:"algorithm"`
+	Servers   []NginxUpstreamServer `json:"servers"`
+}
+
+type NginxUpstreamServer struct {
+	Server      string `json:"server"`
+	Weight      int    `json:"weight"`
+	FailTimeout string `json:"failTimeout"`
+	MaxFails    int    `json:"maxFails"`
+	MaxConns    int    `json:"maxConns"`
+	Flag        string `json:"flag"`
+}
+
+var LBAlgorithms = map[string]struct{}{"ip_hash": {}, "least_conn": {}}
