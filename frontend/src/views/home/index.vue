@@ -251,7 +251,7 @@ import LicenseImport from '@/components/license-import/index.vue';
 import CardWithHeader from '@/components/card-with-header/index.vue';
 import i18n from '@/lang';
 import { Dashboard } from '@/api/interface/dashboard';
-import { dateFormatForSecond, computeSize, computeSizeFromKBs } from '@/utils/util';
+import { dateFormatForSecond, computeSize, computeSizeFromKBs, loadUpTime } from '@/utils/util';
 import { useRouter } from 'vue-router';
 import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
 import { getIOOptions, getNetworkOptions } from '@/api/modules/host';
@@ -464,47 +464,6 @@ const onLoadCurrentInfo = async () => {
     currentInfo.value = res.data;
     statusRef.value.acceptParams(currentInfo.value, baseInfo.value, isStatusInit.value);
 };
-
-function loadUpTime(uptime: number) {
-    if (uptime <= 0) {
-        return '-';
-    }
-    let days = Math.floor(uptime / 86400);
-    let hours = Math.floor((uptime % 86400) / 3600);
-    let minutes = Math.floor((uptime % 3600) / 60);
-    let seconds = uptime % 60;
-    if (days !== 0) {
-        return (
-            days +
-            i18n.global.t('commons.units.day') +
-            ' ' +
-            hours +
-            i18n.global.t('commons.units.hour') +
-            ' ' +
-            minutes +
-            i18n.global.t('commons.units.minute') +
-            ' ' +
-            seconds +
-            i18n.global.t('commons.units.second')
-        );
-    }
-    if (hours !== 0) {
-        return (
-            hours +
-            i18n.global.t('commons.units.hour') +
-            ' ' +
-            minutes +
-            i18n.global.t('commons.units.minute') +
-            ' ' +
-            seconds +
-            i18n.global.t('commons.units.second')
-        );
-    }
-    if (minutes !== 0) {
-        return minutes + i18n.global.t('commons.units.minute') + ' ' + seconds + i18n.global.t('commons.units.second');
-    }
-    return seconds + i18n.global.t('commons.units.second');
-}
 
 const loadData = async () => {
     if (chartOption.value === 'io') {

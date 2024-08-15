@@ -1,5 +1,4 @@
 ErrInvalidParams: "請求參數錯誤: {{ .detail }}"
-ErrTokenParse: "Token 產生錯誤: {{ .detail }}"
 ErrInitialPassword: "原密碼錯誤"
 ErrInternalServer: "伺服器內部錯誤: {{ .detail }}"
 ErrRecordExist: "記錄已存在"

@@ -34,6 +34,27 @@ type OsInfo struct {
 	DiskSize int64 `json:"diskSize"`
 }
 
+type NodeCurrent struct {
+	Load1            float64 `json:"load1"`
+	Load5            float64 `json:"load5"`
+	Load15           float64 `json:"load15"`
+	LoadUsagePercent float64 `json:"loadUsagePercent"`
+
+	CPUUsedPercent float64 `json:"cpuUsedPercent"`
+	CPUUsed        float64 `json:"cpuUsed"`
+	CPUTotal       int     `json:"cpuTotal"`
+
+	MemoryTotal       uint64  `json:"memoryTotal"`
+	MemoryAvailable   uint64  `json:"memoryAvailable"`
+	MemoryUsed        uint64  `json:"memoryUsed"`
+	MemoryUsedPercent float64 `json:"memoryUsedPercent"`
+
+	SwapMemoryTotal       uint64  `json:"swapMemoryTotal"`
+	SwapMemoryAvailable   uint64  `json:"swapMemoryAvailable"`
+	SwapMemoryUsed        uint64  `json:"swapMemoryUsed"`
+	SwapMemoryUsedPercent float64 `json:"swapMemoryUsedPercent"`
+}
+
 type DashboardCurrent struct {
 	Uptime          uint64 `json:"uptime"`
 	TimeSinceUptime string `json:"timeSinceUptime"`

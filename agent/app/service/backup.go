@@ -384,6 +384,7 @@ func LoadLocalDirByStr(vars string) (string, error) {
 			}
 			return baseDir, nil
 		}
+		return baseDir, nil
 	}
 	return "", fmt.Errorf("error type dir: %T", varMap["dir"])
 }
