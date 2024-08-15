@@ -27,6 +27,7 @@ type DashboardService struct{}
 type IDashboardService interface {
 	LoadOsInfo() (*dto.OsInfo, error)
 	LoadBaseInfo(ioOption string, netOption string) (*dto.DashboardBase, error)
+	LoadCurrentInfoForNode() *dto.NodeCurrent
 	LoadCurrentInfo(ioOption string, netOption string) *dto.DashboardCurrent
 
 	Restart(operation string) error
@@ -40,7 +41,7 @@ func (u *DashboardService) Restart(operation string) error {
 	if operation != "1panel" && operation != "system" {
 		return fmt.Errorf("handle restart operation %s failed, err: nonsupport such operation", operation)
 	}
-	itemCmd := fmt.Sprintf("%s 1pctl restart", cmd.SudoHandleCmd())
+	itemCmd := fmt.Sprintf("%s systemctl restart 1panel.service", cmd.SudoHandleCmd())
 	if operation == "system" {
 		itemCmd = fmt.Sprintf("%s reboot", cmd.SudoHandleCmd())
 	}
@@ -77,6 +78,37 @@ func (u *DashboardService) LoadOsInfo() (*dto.OsInfo, error) {
 		baseInfo.KernelArch = "amd64"
 	}
 	return &baseInfo, nil
+}
+
+func (u *DashboardService) LoadCurrentInfoForNode() *dto.NodeCurrent {
+	var currentInfo dto.NodeCurrent
+
+	currentInfo.CPUTotal, _ = cpu.Counts(true)
+	totalPercent, _ := cpu.Percent(0, false)
+	if len(totalPercent) == 1 {
+		currentInfo.CPUUsedPercent = totalPercent[0]
+		currentInfo.CPUUsed = currentInfo.CPUUsedPercent * 0.01 * float64(currentInfo.CPUTotal)
+	}
+
+	loadInfo, _ := load.Avg()
+	currentInfo.Load1 = loadInfo.Load1
+	currentInfo.Load5 = loadInfo.Load5
+	currentInfo.Load15 = loadInfo.Load15
+	currentInfo.LoadUsagePercent = loadInfo.Load1 / (float64(currentInfo.CPUTotal*2) * 0.75) * 100
+
+	memoryInfo, _ := mem.VirtualMemory()
+	currentInfo.MemoryTotal = memoryInfo.Total
+	currentInfo.MemoryAvailable = memoryInfo.Available
+	currentInfo.MemoryUsed = memoryInfo.Used
+	currentInfo.MemoryUsedPercent = memoryInfo.UsedPercent
+
+	swapInfo, _ := mem.SwapMemory()
+	currentInfo.SwapMemoryTotal = swapInfo.Total
+	currentInfo.SwapMemoryAvailable = swapInfo.Free
+	currentInfo.SwapMemoryUsed = swapInfo.Used
+	currentInfo.SwapMemoryUsedPercent = swapInfo.UsedPercent
+
+	return &currentInfo
 }
 
 func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto.DashboardBase, error) {

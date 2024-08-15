@@ -53,6 +53,17 @@ func (b *BaseApi) LoadDashboardBaseInfo(c *gin.Context) {
 }
 
 // @Tags Dashboard
+// @Summary Load dashboard current info for node
+// @Description 获取节点实时数据
+// @Success 200 {object} dto.NodeCurrent
+// @Security ApiKeyAuth
+// @Router /dashboard/current/node [get]
+func (b *BaseApi) LoadCurrentInfoForNode(c *gin.Context) {
+	data := dashboardService.LoadCurrentInfoForNode()
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags Dashboard
 // @Summary Load dashboard current info
 // @Description 获取首页实时数据
 // @Accept json
