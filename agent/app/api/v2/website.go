@@ -917,3 +917,43 @@ func (b *BaseApi) DeleteLoadBalance(c *gin.Context) {
 	}
 	helper.SuccessWithOutData(c)
 }
+
+// @Tags Website
+// @Summary Update website upstream
+// @Description 更新网站 upstream
+// @Accept json
+// @Param request body request.WebsiteLBUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/lbs/update [post]
+func (b *BaseApi) UpdateLoadBalance(c *gin.Context) {
+	var req request.WebsiteLBUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteService.UpdateLoadBalance(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}
+
+// @Tags Website
+// @Summary Update website upstream file
+// @Description 更新网站 upstream 文件
+// @Accept json
+// @Param request body request.WebsiteLBUpdateFile true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/lbs/file [post]
+func (b *BaseApi) UpdateLoadBalanceFile(c *gin.Context) {
+	var req request.WebsiteLBUpdateFile
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteService.UpdateLoadBalanceFile(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}

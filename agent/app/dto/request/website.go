@@ -264,7 +264,20 @@ type WebsiteLBCreate struct {
 	Servers   []dto.NginxUpstreamServer `json:"servers"`
 }
 
+type WebsiteLBUpdate struct {
+	WebsiteID uint                      `json:"websiteID" validate:"required"`
+	Name      string                    `json:"name" validate:"required"`
+	Algorithm string                    `json:"algorithm"`
+	Servers   []dto.NginxUpstreamServer `json:"servers"`
+}
+
 type WebsiteLBDelete struct {
 	WebsiteID uint   `json:"websiteID" validate:"required"`
 	Name      string `json:"name" validate:"required"`
+}
+
+type WebsiteLBUpdateFile struct {
+	WebsiteID uint   `json:"websiteID" validate:"required"`
+	Name      string `json:"name" validate:"required"`
+	Content   string `json:"content" validate:"required"`
 }

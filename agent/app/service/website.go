@@ -112,6 +112,8 @@ type IWebsiteService interface {
 	GetLoadBalances(id uint) ([]dto.NginxUpstream, error)
 	CreateLoadBalance(req request.WebsiteLBCreate) error
 	DeleteLoadBalance(req request.WebsiteLBDelete) error
+	UpdateLoadBalance(req request.WebsiteLBUpdate) error
+	UpdateLoadBalanceFile(req request.WebsiteLBUpdateFile) error
 }
 
 func NewIWebsiteService() IWebsiteService {
@@ -2934,6 +2936,11 @@ func (w WebsiteService) GetLoadBalances(id uint) ([]dto.NginxUpstream, error) {
 			Name: upstreamName,
 		}
 		upstreamPath := path.Join(includeDir, name)
+		content, err := fileOp.GetContent(upstreamPath)
+		if err != nil {
+			return nil, err
+		}
+		upstream.Content = string(content)
 		nginxParser, err := parser.NewParser(upstreamPath)
 		if err != nil {
 			return nil, err
@@ -3019,6 +3026,9 @@ func (w WebsiteService) CreateLoadBalance(req request.WebsiteLBCreate) error {
 	upstream := components.Upstream{
 		UpstreamName: req.Name,
 	}
+	if req.Algorithm != "default" {
+		upstream.UpdateDirective(req.Algorithm, []string{})
+	}
 
 	servers := make([]*components.UpstreamServer, 0)
 
@@ -3064,6 +3074,78 @@ func (w WebsiteService) CreateLoadBalance(req request.WebsiteLBCreate) error {
 	return nil
 }
 
+func (w WebsiteService) UpdateLoadBalance(req request.WebsiteLBUpdate) error {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	if err != nil {
+		return err
+	}
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return err
+	}
+	includeDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "upstream")
+	fileOp := files.NewFileOp()
+	filePath := path.Join(includeDir, fmt.Sprintf("%s.conf", req.Name))
+	if !fileOp.Stat(filePath) {
+		return nil
+	}
+	parser, err := parser.NewParser(filePath)
+	if err != nil {
+		return err
+	}
+	config, err := parser.Parse()
+	if err != nil {
+		return err
+	}
+	upstreams := config.FindUpstreams()
+	for _, up := range upstreams {
+		if up.UpstreamName == req.Name {
+			directives := up.GetDirectives()
+			for _, d := range directives {
+				dName := d.GetName()
+				if _, ok := dto.LBAlgorithms[dName]; ok {
+					up.RemoveDirective(dName, nil)
+				}
+			}
+			if req.Algorithm != "default" {
+				up.UpdateDirective(req.Algorithm, []string{})
+			}
+			var servers []*components.UpstreamServer
+			for _, server := range req.Servers {
+				upstreamServer := &components.UpstreamServer{
+					Address: server.Server,
+				}
+				parameters := make(map[string]string)
+				if server.Weight > 0 {
+					parameters["weight"] = strconv.Itoa(server.Weight)
+				}
+				if server.MaxFails > 0 {
+					parameters["max_fails"] = strconv.Itoa(server.MaxFails)
+				}
+				if server.FailTimeout != "" {
+					parameters["fail_timeout"] = server.FailTimeout
+				}
+				if server.MaxConns > 0 {
+					parameters["max_conns"] = strconv.Itoa(server.MaxConns)
+				}
+				if server.Flag != "" {
+					upstreamServer.Flags = []string{server.Flag}
+				}
+				upstreamServer.Parameters = parameters
+				servers = append(servers, upstreamServer)
+			}
+			up.UpstreamServers = servers
+		}
+	}
+	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+		return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
+	}
+	if err = opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (w WebsiteService) DeleteLoadBalance(req request.WebsiteLBDelete) error {
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
 	if err != nil {
@@ -3082,8 +3164,32 @@ func (w WebsiteService) DeleteLoadBalance(req request.WebsiteLBDelete) error {
 	if err = fileOp.DeleteFile(filePath); err != nil {
 		return err
 	}
-	if err = opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
+	return opNginx(nginxInstall.ContainerName, constant.NginxReload)
+}
+
+func (w WebsiteService) UpdateLoadBalanceFile(req request.WebsiteLBUpdateFile) error {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	if err != nil {
 		return err
 	}
-	return nil
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return err
+	}
+	includeDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "upstream")
+	filePath := path.Join(includeDir, fmt.Sprintf("%s.conf", req.Name))
+	fileOp := files.NewFileOp()
+	oldContent, err := fileOp.GetContent(filePath)
+	if err != nil {
+		return err
+	}
+	if err = fileOp.WriteFile(filePath, strings.NewReader(req.Content), 0755); err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			_ = fileOp.WriteFile(filePath, bytes.NewReader(oldContent), 0755)
+		}
+	}()
+	return opNginx(nginxInstall.ContainerName, constant.NginxReload)
 }

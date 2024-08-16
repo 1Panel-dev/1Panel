@@ -573,6 +573,14 @@ export namespace Website {
         name: string;
         algorithm: string;
         servers: NginxUpstreamServer[];
+        content?: string;
+        websiteID?: number;
+    }
+
+    export interface NginxUpstreamFile {
+        name: string;
+        content: string;
+        websiteID: number;
     }
 
     export interface LoadBalanceReq {
@@ -594,5 +602,11 @@ export namespace Website {
     export interface LoadBalanceDel {
         websiteID: number;
         name: string;
+    }
+
+    export interface WebsiteLBUpdateFile {
+        websiteID: number;
+        name: string;
+        content: string;
     }
 }
