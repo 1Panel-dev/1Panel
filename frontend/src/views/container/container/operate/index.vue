@@ -201,7 +201,11 @@
                         </el-button>
                     </el-form-item>
                     <el-form-item label="Command" prop="cmdStr">
-                        <el-input v-model="dialogData.rowData!.cmdStr" :placeholder="$t('container.cmdHelper')" />
+                        <el-input
+                            type="textarea"
+                            v-model="dialogData.rowData!.cmdStr"
+                            :placeholder="$t('container.cmdHelper')"
+                        />
                     </el-form-item>
                     <el-form-item label="Entrypoint" prop="entrypointStr">
                         <el-input
