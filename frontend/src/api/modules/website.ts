@@ -307,3 +307,11 @@ export const CreateLoadBalance = (req: Website.LoadBalanceReq) => {
 export const DeleteLoadBalance = (req: Website.LoadBalanceDel) => {
     return http.post(`/websites/lbs/del`, req);
 };
+
+export const UpdateLoadBalance = (req: Website.LoadBalanceReq) => {
+    return http.post(`/websites/lbs/update`, req);
+};
+
+export const UpdateLoadBalanceFile = (req: Website.WebsiteLBUpdateFile) => {
+    return http.post(`/websites/lbs/file`, req);
+};

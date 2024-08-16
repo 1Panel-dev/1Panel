@@ -69,6 +69,7 @@ type NginxUpstream struct {
 	Name      string                `json:"name"`
 	Algorithm string                `json:"algorithm"`
 	Servers   []NginxUpstreamServer `json:"servers"`
+	Content   string                `json:"content"`
 }
 
 type NginxUpstreamServer struct {

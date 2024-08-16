@@ -82,10 +82,10 @@ func (us *Upstream) FindDirectives(directiveName string) []IDirective {
 }
 
 func (us *Upstream) UpdateDirective(key string, params []string) {
-	if key == "" || len(params) == 0 {
+	if key == "" {
 		return
 	}
-	directives := us.GetDirectives()
+	directives := us.Directives
 	index := -1
 	for i, dir := range directives {
 		if dir.GetName() == key {
@@ -112,7 +112,7 @@ func (us *Upstream) UpdateDirective(key string, params []string) {
 }
 
 func (us *Upstream) RemoveDirective(key string, params []string) {
-	directives := us.GetDirectives()
+	directives := us.Directives
 	var newDirectives []IDirective
 	for _, dir := range directives {
 		if dir.GetName() == key {

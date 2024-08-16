@@ -1,5 +1,11 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('website.addDomain')" :back="handleClose" size="large">
+    <DrawerPro
+        v-model="open"
+        :back="handleClose"
+        size="large"
+        :header="$t('commons.button.' + item.operate) + $t('website.loadBalance')"
+        :resource="item.operate == 'create' ? '' : item.name"
+    >
         <el-form ref="lbForm" label-position="top" :model="item" :rules="rules">
             <el-form-item :label="$t('commons.table.name')" prop="name">
                 <el-input v-model.trim="item.name" :disabled="item.operate === 'edit'"></el-input>
@@ -100,13 +106,14 @@
 </template>
 
 <script lang="ts" setup>
-import { CreateLoadBalance } from '@/api/modules/website';
+import { CreateLoadBalance, UpdateLoadBalance } from '@/api/modules/website';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { Algorithms, StatusStrategy } from '@/global/mimetype';
+import { Website } from '@/api/interface/website';
 
 const rules = ref<any>({
     name: [Rules.linuxName],
@@ -119,6 +126,12 @@ const rules = ref<any>({
     maxFails: [checkNumberRange(1, 1000)],
     maxConns: [checkNumberRange(1, 1000)],
 });
+
+interface LoadBalanceOperate {
+    websiteID: number;
+    operate: string;
+    upstream?: Website.NginxUpstream;
+}
 
 const lbForm = ref<FormInstance>();
 
@@ -163,27 +176,51 @@ const removeServer = (index: number) => {
     item.value.servers.splice(index, 1);
 };
 
-const acceptParams = async (websiteId: number) => {
-    item.value.websiteID = Number(websiteId);
-    item.value.servers = [initServer()];
+const acceptParams = async (req: LoadBalanceOperate) => {
+    item.value.websiteID = req.websiteID;
+    if (req.operate == 'edit') {
+        item.value.operate = 'edit';
+        item.value.name = req.upstream?.name || '';
+        item.value.algorithm = req.upstream?.algorithm || 'default';
+        let servers = [];
+        req.upstream?.servers?.forEach((server) => {
+            const weight = server.weight == 0 ? undefined : server.weight;
+            const maxFails = server.maxFails == 0 ? undefined : server.maxFails;
+            const maxConns = server.maxConns == 0 ? undefined : server.maxConns;
+            servers.push({
+                server: server.server,
+                weight: weight,
+                maxFails: maxFails,
+                maxConns: maxConns,
+                flag: server.flag,
+            });
+        });
+        item.value.servers = servers;
+    } else {
+        item.value.servers = [initServer()];
+    }
     open.value = true;
 };
 
 const submit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
-    await formEl.validate((valid) => {
+    await formEl.validate(async (valid) => {
         if (!valid) {
             return;
         }
         loading.value = true;
-        CreateLoadBalance(item.value)
-            .then(() => {
+        try {
+            if (item.value.operate === 'edit') {
+                await UpdateLoadBalance(item.value);
+                MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+            } else {
+                await CreateLoadBalance(item.value);
                 MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
-                handleClose();
-            })
-            .finally(() => {
-                loading.value = false;
-            });
+            }
+            handleClose();
+        } finally {
+            loading.value = false;
+        }
     });
 };
 
