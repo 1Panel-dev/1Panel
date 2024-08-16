@@ -533,7 +533,18 @@ func (u *MysqlService) LoadStatus(req dto.OperationWithNameAndType) (*dto.MysqlS
 	info.Position = "OFF"
 	rows, err := executeSqlForRows(app.ContainerName, app.Key, app.Password, "show master status;")
 	if err != nil {
-		return nil, err
+		rows, err := executeSqlForRows(app.ContainerName, app.Key, app.Password, "SHOW BINARY LOG STATUS;")
+		if err != nil{
+			return nil, err
+		}
+		if len(rows) > 2 {
+			itemValue := strings.Split(rows[1], "\t")
+			if len(itemValue) > 2 {
+				info.File = itemValue[0]
+				info.Position = itemValue[1]
+			}
+		}
+		return &info, nil
 	}
 	if len(rows) > 2 {
 		itemValue := strings.Split(rows[1], "\t")
