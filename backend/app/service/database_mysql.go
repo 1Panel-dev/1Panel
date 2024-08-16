@@ -141,6 +141,10 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 }
 
 func (u *MysqlService) BindUser(req dto.BindUser) error {
+	if cmd.CheckIllegal(req.Username, req.Password, req.Permission) {
+		return buserr.New(constant.ErrCmdIllegal)
+	}
+
 	dbItem, err := mysqlRepo.Get(mysqlRepo.WithByMysqlName(req.Database), commonRepo.WithByName(req.DB))
 	if err != nil {
 		return err
