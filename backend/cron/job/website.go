@@ -1,6 +1,9 @@
 package job
 
 import (
+	"sync"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
@@ -8,8 +11,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
-	"sync"
-	"time"
 )
 
 type website struct{}
@@ -19,7 +20,7 @@ func NewWebsiteJob() *website {
 }
 
 func (w *website) Run() {
-	nyc, _ := time.LoadLocation(common.LoadTimeZone())
+	nyc, _ := time.LoadLocation(common.LoadTimeZoneByCmd())
 	websites, _ := repo.NewIWebsiteRepo().List()
 	global.LOG.Info("Website scheduled task in progress ...")
 	now := time.Now().Add(10 * time.Minute)

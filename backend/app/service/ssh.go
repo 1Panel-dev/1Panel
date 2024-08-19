@@ -312,7 +312,7 @@ func (u *SSHService) LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error) {
 
 	showCountFrom := (req.Page - 1) * req.PageSize
 	showCountTo := req.Page * req.PageSize
-	nyc, _ := time.LoadLocation(common.LoadTimeZone())
+	nyc, _ := time.LoadLocation(common.LoadTimeZoneByCmd())
 	qqWry, err := qqwry.NewQQwry()
 	if err != nil {
 		global.LOG.Errorf("load qqwry datas failed: %s", err)

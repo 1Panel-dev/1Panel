@@ -131,6 +131,8 @@ const onSave = async (formEl: FormInstance | undefined) => {
                 })
                 .catch(() => {
                     loading.value = false;
+                    let href = window.location.href;
+                    window.open(href, '_self');
                 });
         });
     });

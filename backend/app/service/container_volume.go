@@ -52,7 +52,7 @@ func (u *ContainerService) PageVolume(req dto.SearchWithPage) (int64, interface{
 		records = list.Volumes[start:end]
 	}
 
-	nyc, _ := time.LoadLocation(common.LoadTimeZone())
+	nyc, _ := time.LoadLocation(common.LoadTimeZoneByCmd())
 	for _, item := range records {
 		tag := make([]string, 0)
 		for _, val := range item.Labels {

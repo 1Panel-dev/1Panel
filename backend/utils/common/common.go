@@ -256,13 +256,6 @@ func LoadSizeUnit2F(value float64) string {
 	return fmt.Sprintf("%.2f", value)
 }
 
-func LoadTimeZone() string {
-	loc := time.Now().Location()
-	if _, err := time.LoadLocation(loc.String()); err != nil {
-		return "Asia/Shanghai"
-	}
-	return loc.String()
-}
 func LoadTimeZoneByCmd() string {
 	loc := time.Now().Location().String()
 	if _, err := time.LoadLocation(loc); err != nil {

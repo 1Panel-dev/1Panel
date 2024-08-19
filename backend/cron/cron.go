@@ -17,14 +17,14 @@ import (
 )
 
 func Run() {
-	nyc, _ := time.LoadLocation(common.LoadTimeZone())
+	nyc, _ := time.LoadLocation(common.LoadTimeZoneByCmd())
 	global.Cron = cron.New(cron.WithLocation(nyc), cron.WithChain(cron.Recover(cron.DefaultLogger)), cron.WithChain(cron.DelayIfStillRunning(cron.DefaultLogger)))
 
 	var (
 		interval model.Setting
 		status   model.Setting
 	)
-	syncBeforeStart()
+	go syncBeforeStart()
 	if err := global.DB.Where("key = ?", "MonitorStatus").Find(&status).Error; err != nil {
 		global.LOG.Errorf("load monitor status from db failed, err: %v", err)
 	}

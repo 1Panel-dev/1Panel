@@ -140,7 +140,7 @@ func (c *ClamService) SearchWithPage(req dto.SearchClamWithPage) (int64, interfa
 		item.LastHandleDate = "-"
 		datas = append(datas, item)
 	}
-	nyc, _ := time.LoadLocation(common.LoadTimeZone())
+	nyc, _ := time.LoadLocation(common.LoadTimeZoneByCmd())
 	for i := 0; i < len(datas); i++ {
 		logPaths := loadFileByName(datas[i].Name)
 		sort.Slice(logPaths, func(i, j int) bool {
@@ -323,7 +323,7 @@ func (c *ClamService) LoadRecords(req dto.ClamLogSearch) (int64, interface{}, er
 	}
 
 	var filterFiles []string
-	nyc, _ := time.LoadLocation(common.LoadTimeZone())
+	nyc, _ := time.LoadLocation(common.LoadTimeZoneByCmd())
 	for _, item := range logPaths {
 		t1, err := time.ParseInLocation(constant.DateTimeSlimLayout, item, nyc)
 		if err != nil {
