@@ -31,6 +31,10 @@ type Options struct {
 	Option string `json:"option"`
 }
 
+type OperateByType struct {
+	Type string `json:"type"`
+}
+
 type OperateByID struct {
 	ID uint `json:"id"`
 }

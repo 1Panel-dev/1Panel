@@ -41,17 +41,6 @@ const hostRouter = {
             },
         },
         {
-            path: '/hosts/terminal',
-            name: 'Terminal',
-            props: true,
-            component: () => import('@/views/host/terminal/index.vue'),
-            meta: {
-                title: 'menu.terminal',
-                keepAlive: true,
-                requiresAuth: false,
-            },
-        },
-        {
             path: '/hosts/firewall/port',
             name: 'FirewallPort',
             component: () => import('@/views/host/firewall/port/index.vue'),

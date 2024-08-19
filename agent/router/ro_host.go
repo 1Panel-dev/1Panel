@@ -11,15 +11,6 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 	hostRouter := Router.Group("hosts")
 	baseApi := v2.ApiGroupApp.BaseApi
 	{
-		hostRouter.POST("", baseApi.CreateHost)
-		hostRouter.POST("/del", baseApi.DeleteHost)
-		hostRouter.POST("/update", baseApi.UpdateHost)
-		hostRouter.POST("/update/group", baseApi.UpdateHostGroup)
-		hostRouter.POST("/search", baseApi.SearchHost)
-		hostRouter.POST("/tree", baseApi.HostTree)
-		hostRouter.POST("/test/byinfo", baseApi.TestByInfo)
-		hostRouter.POST("/test/byid/:id", baseApi.TestByID)
-
 		hostRouter.GET("/firewall/base", baseApi.LoadFirewallBaseInfo)
 		hostRouter.POST("/firewall/search", baseApi.SearchFirewallRule)
 		hostRouter.POST("/firewall/operate", baseApi.OperateFirewall)
@@ -46,18 +37,6 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 		hostRouter.POST("/ssh/log", baseApi.LoadSSHLogs)
 		hostRouter.POST("/ssh/conffile/update", baseApi.UpdateSSHByfile)
 		hostRouter.POST("/ssh/operate", baseApi.OperateSSH)
-
-		hostRouter.GET("/command", baseApi.ListCommand)
-		hostRouter.POST("/command", baseApi.CreateCommand)
-		hostRouter.POST("/command/del", baseApi.DeleteCommand)
-		hostRouter.POST("/command/search", baseApi.SearchCommand)
-		hostRouter.GET("/command/tree", baseApi.SearchCommandTree)
-		hostRouter.POST("/command/update", baseApi.UpdateCommand)
-
-		hostRouter.GET("/command/redis", baseApi.ListRedisCommand)
-		hostRouter.POST("/command/redis", baseApi.SaveRedisCommand)
-		hostRouter.POST("/command/redis/search", baseApi.SearchRedisCommand)
-		hostRouter.POST("/command/redis/del", baseApi.DeleteRedisCommand)
 
 		hostRouter.POST("/tool", baseApi.GetToolStatus)
 		hostRouter.POST("/tool/init", baseApi.InitToolConfig)

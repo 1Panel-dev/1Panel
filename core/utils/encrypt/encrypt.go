@@ -5,7 +5,6 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
-	"encoding/base32"
 	"encoding/base64"
 	"fmt"
 	"io"
@@ -31,7 +30,7 @@ func StringDecryptWithBase64(text string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return base32.StdEncoding.EncodeToString([]byte(decryptItem)), nil
+	return base64.StdEncoding.EncodeToString([]byte(decryptItem)), nil
 }
 
 func StringEncrypt(text string) (string, error) {

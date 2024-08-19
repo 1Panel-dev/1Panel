@@ -6,5 +6,8 @@ func commonGroups() []CommonRouter {
 		&BackupRouter{},
 		&LogRouter{},
 		&SettingRouter{},
+		&CommandRouter{},
+		&HostRouter{},
+		&GroupRouter{},
 	}
 }

@@ -28,7 +28,6 @@ var AddTable = &gormigrate.Migration{
 			&model.App{},
 			&model.BackupRecord{},
 			&model.Clam{},
-			&model.Command{},
 			&model.ComposeTemplate{},
 			&model.Compose{},
 			&model.Cronjob{},
@@ -39,15 +38,12 @@ var AddTable = &gormigrate.Migration{
 			&model.Forward{},
 			&model.Firewall{},
 			&model.Ftp{},
-			&model.Group{},
-			&model.Host{},
 			&model.ImageRepo{},
 			&model.JobRecords{},
 			&model.MonitorBase{},
 			&model.MonitorIO{},
 			&model.MonitorNetwork{},
 			&model.PHPExtensions{},
-			&model.RedisCommand{},
 			&model.Runtime{},
 			&model.Setting{},
 			&model.Snapshot{},
@@ -71,25 +67,6 @@ var AddMonitorTable = &gormigrate.Migration{
 			&model.MonitorIO{},
 			&model.MonitorNetwork{},
 		)
-	},
-}
-
-var InitHost = &gormigrate.Migration{
-	ID: "20240722-init-host",
-	Migrate: func(tx *gorm.DB) error {
-		group := model.Group{
-			Name: "default", Type: "host", IsDefault: true,
-		}
-		if err := tx.Create(&group).Error; err != nil {
-			return err
-		}
-		host := model.Host{
-			Name: "localhost", Addr: "127.0.0.1", User: "root", Port: 22, AuthMode: "password", GroupID: group.ID,
-		}
-		if err := tx.Create(&host).Error; err != nil {
-			return err
-		}
-		return nil
 	},
 }
 
@@ -222,25 +199,6 @@ var InitImageRepo = &gormigrate.Migration{
 			Status:      constant.StatusSuccess,
 		}
 		if err := tx.Create(item).Error; err != nil {
-			return err
-		}
-		return nil
-	},
-}
-
-var InitDefaultGroup = &gormigrate.Migration{
-	ID: "20240722-init-default-group",
-	Migrate: func(tx *gorm.DB) error {
-		websiteGroup := &model.Group{
-			Name:      "默认",
-			IsDefault: true,
-			Type:      "website",
-		}
-		if err := tx.Create(websiteGroup).Error; err != nil {
-			return err
-		}
-		commandGroup := &model.Group{IsDefault: true, Name: "默认", Type: "command"}
-		if err := tx.Create(commandGroup).Error; err != nil {
 			return err
 		}
 		return nil

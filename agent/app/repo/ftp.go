@@ -15,6 +15,7 @@ type IFtpRepo interface {
 	Create(ftp *model.Ftp) error
 	Update(id uint, vars map[string]interface{}) error
 	Delete(opts ...DBOption) error
+	WithLikeUser(user string) DBOption
 	WithByUser(user string) DBOption
 }
 
@@ -33,6 +34,12 @@ func (u *FtpRepo) Get(opts ...DBOption) (model.Ftp, error) {
 }
 
 func (h *FtpRepo) WithByUser(user string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("user = ?", user)
+	}
+}
+
+func (h *FtpRepo) WithLikeUser(user string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		if len(user) == 0 {
 			return g

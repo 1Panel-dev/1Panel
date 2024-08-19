@@ -27,7 +27,7 @@
                 <el-table-column min-width="40">
                     <template #default="scope">
                         <el-button
-                            v-if="scope.row.lineStatus === 'create'"
+                            v-if="scope.row.lineStatus === 'create' || scope.row.lineStatus === 'edit'"
                             link
                             type="primary"
                             @click="handleCmdSave(scope.row)"
@@ -38,15 +38,20 @@
                             v-if="!scope.row.lineStatus || scope.row.lineStatus === 'saved'"
                             link
                             type="primary"
-                            @click="scope.row.lineStatus = 'create'"
+                            @click="scope.row.lineStatus = 'edit'"
                         >
                             {{ $t('commons.button.edit') }}
                         </el-button>
-                        <el-button v-if="scope.row.lineStatus === 'create'" link type="primary" @click="search()">
+                        <el-button
+                            v-if="scope.row.lineStatus === 'create' || scope.row.lineStatus === 'edit'"
+                            link
+                            type="primary"
+                            @click="search()"
+                        >
                             {{ $t('commons.button.cancel') }}
                         </el-button>
                         <el-button
-                            v-if="scope.row.lineStatus !== 'create'"
+                            v-if="scope.row.lineStatus !== 'create' && scope.row.lineStatus !== 'edit'"
                             link
                             type="primary"
                             @click="handleCmdDelete(scope.$index)"
@@ -68,7 +73,7 @@
 
 <script setup lang="ts">
 import { Command } from '@/api/interface/command';
-import { saveRedisCommand, deleteRedisCommand, getRedisCommandPage } from '@/api/modules/host';
+import { deleteCommand, getCommandPage, addCommand, editCommand } from '@/api/modules/command';
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
@@ -81,6 +86,8 @@ const paginationConfig = reactive({
     currentPage: 1,
     pageSize: 10,
     total: 0,
+    orderBy: 'name',
+    order: 'ascending',
 });
 const opRef = ref();
 
@@ -99,6 +106,7 @@ const handleCmdAdd = () => {
     let item = {
         name: '',
         command: '',
+        type: 'redis',
         lineStatus: 'create',
     };
     data.value.push(item);
@@ -113,7 +121,20 @@ const handleCmdSave = async (row: any) => {
         return;
     }
     loading.value = true;
-    await saveRedisCommand(row)
+    if (row.lineStatus === 'create') {
+        await addCommand(row)
+            .then(() => {
+                loading.value = false;
+                row.lineStatus = 'saved';
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                search();
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+        return;
+    }
+    await editCommand(row)
         .then(() => {
             loading.value = false;
             row.lineStatus = 'saved';
@@ -123,10 +144,9 @@ const handleCmdSave = async (row: any) => {
         .catch(() => {
             loading.value = false;
         });
-    return;
 };
 
-const batchDelete = async (row: Command.RedisCommand | null) => {
+const batchDelete = async (row: Command.CommandInfo | null) => {
     let names = [];
     let ids = [];
     if (row) {
@@ -145,19 +165,24 @@ const batchDelete = async (row: Command.RedisCommand | null) => {
             i18n.global.t('terminal.quickCommand'),
             i18n.global.t('commons.button.delete'),
         ]),
-        api: deleteRedisCommand,
+        api: deleteCommand,
         params: { ids: ids },
     });
 };
 
-const search = async () => {
+const search = async (column?: any) => {
+    paginationConfig.orderBy = column?.order ? column.prop : paginationConfig.orderBy;
+    paginationConfig.order = column?.order ? column.order : paginationConfig.order;
     let params = {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
+        orderBy: paginationConfig.orderBy,
+        order: paginationConfig.order,
         info: '',
+        type: 'redis',
     };
     loading.value = true;
-    await getRedisCommandPage(params)
+    await getCommandPage(params)
         .then((res) => {
             loading.value = false;
             data.value = res.data.items || [];

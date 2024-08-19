@@ -10,6 +10,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func (b *BaseApi) CheckBackupUsed(c *gin.Context) {
+	id, err := helper.GetIntParamByKey(c, "id")
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		return
+	}
+
+	if err := backupService.CheckUsed(id); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		return
+	}
+
+	helper.SuccessWithOutData(c)
+}
+
 // @Tags Backup Account
 // @Summary Page backup records
 // @Description 获取备份记录列表分页

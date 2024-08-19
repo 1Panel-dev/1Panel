@@ -74,7 +74,7 @@ func (u *FtpService) Operate(operation string) error {
 }
 
 func (f *FtpService) SearchWithPage(req dto.SearchWithPage) (int64, interface{}, error) {
-	total, lists, err := ftpRepo.Page(req.Page, req.PageSize, ftpRepo.WithByUser(req.Info), commonRepo.WithOrderBy("created_at desc"))
+	total, lists, err := ftpRepo.Page(req.Page, req.PageSize, ftpRepo.WithLikeUser(req.Info), commonRepo.WithOrderBy("created_at desc"))
 	if err != nil {
 		return 0, nil, err
 	}
@@ -142,7 +142,7 @@ func (f *FtpService) Create(req dto.FtpCreate) (uint, error) {
 	if err != nil {
 		return 0, err
 	}
-	userInDB, _ := ftpRepo.Get(hostRepo.WithByUser(req.User))
+	userInDB, _ := ftpRepo.Get(ftpRepo.WithByUser(req.User))
 	if userInDB.ID != 0 {
 		return 0, constant.ErrRecordExist
 	}

@@ -1,7 +1,7 @@
 import { Layout } from '@/routers/constant';
 
 const settingRouter = {
-    sort: 10,
+    sort: 12,
     path: '/settings',
     component: Layout,
     redirect: '/settings/panel',

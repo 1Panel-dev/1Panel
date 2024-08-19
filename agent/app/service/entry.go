@@ -22,8 +22,6 @@ var (
 	cronjobRepo = repo.NewICronjobRepo()
 
 	hostRepo    = repo.NewIHostRepo()
-	groupRepo   = repo.NewIGroupRepo()
-	commandRepo = repo.NewICommandRepo()
 	ftpRepo     = repo.NewIFtpRepo()
 	clamRepo    = repo.NewIClamRepo()
 	monitorRepo = repo.NewIMonitorRepo()

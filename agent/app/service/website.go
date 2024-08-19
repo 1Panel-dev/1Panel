@@ -10,7 +10,6 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"os"
 	"path"
 	"reflect"
@@ -19,6 +18,8 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/jinzhu/copier"
@@ -114,6 +115,8 @@ type IWebsiteService interface {
 	DeleteLoadBalance(req request.WebsiteLBDelete) error
 	UpdateLoadBalance(req request.WebsiteLBUpdate) error
 	UpdateLoadBalanceFile(req request.WebsiteLBUpdateFile) error
+
+	ChangeGroup(group, newGroup uint) error
 }
 
 func NewIWebsiteService() IWebsiteService {
@@ -3192,4 +3195,8 @@ func (w WebsiteService) UpdateLoadBalanceFile(req request.WebsiteLBUpdateFile) e
 		}
 	}()
 	return opNginx(nginxInstall.ContainerName, constant.NginxReload)
+}
+
+func (w WebsiteService) ChangeGroup(group, newGroup uint) error {
+	return websiteRepo.UpdateGroup(group, newGroup)
 }

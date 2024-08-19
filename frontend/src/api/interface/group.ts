@@ -4,6 +4,7 @@ export namespace Group {
         name: string;
         type: string;
         isDefault: boolean;
+        isDelete: boolean;
     }
     export interface GroupCreate {
         id: number;
@@ -14,8 +15,5 @@ export namespace Group {
         id: number;
         name: string;
         isDefault: boolean;
-    }
-    export interface GroupSearch {
-        type: string;
     }
 }

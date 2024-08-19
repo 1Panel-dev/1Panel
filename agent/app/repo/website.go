@@ -31,6 +31,8 @@ type IWebsiteRepo interface {
 	DeleteBy(ctx context.Context, opts ...DBOption) error
 	Create(ctx context.Context, app *model.Website) error
 	DeleteAll(ctx context.Context) error
+
+	UpdateGroup(group, newGroup uint) error
 }
 
 func NewIWebsiteRepo() IWebsiteRepo {
@@ -157,4 +159,8 @@ func (w *WebsiteRepo) DeleteBy(ctx context.Context, opts ...DBOption) error {
 
 func (w *WebsiteRepo) DeleteAll(ctx context.Context) error {
 	return getTx(ctx).Where("1 = 1 ").Delete(&model.Website{}).Error
+}
+
+func (w *WebsiteRepo) UpdateGroup(group, newGroup uint) error {
+	return global.DB.Model(&model.Website{}).Where("website_group_id = ?", group).Updates(map[string]interface{}{"website_group_id": newGroup}).Error
 }

@@ -3,17 +3,20 @@ package service
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
 	"path"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cloud_storage"
@@ -26,6 +29,8 @@ import (
 type BackupService struct{}
 
 type IBackupService interface {
+	CheckUsed(id uint) error
+
 	SearchRecordsWithPage(search dto.RecordSearch) (int64, []dto.BackupRecords, error)
 	SearchRecordsByCronjobWithPage(search dto.RecordSearchByCronjob) (int64, []dto.BackupRecords, error)
 	DownloadRecord(info dto.DownloadRecord) (string, error)
@@ -95,6 +100,22 @@ func (u *BackupService) SearchRecordsByCronjobWithPage(search dto.RecordSearchBy
 		return datas[i].CreatedAt.After(datas[j].CreatedAt)
 	})
 	return total, datas, err
+}
+
+func (u *BackupService) CheckUsed(id uint) error {
+	cronjobs, _ := cronjobRepo.List()
+	for _, job := range cronjobs {
+		if job.DownloadAccountID == id {
+			return buserr.New(constant.ErrBackupInUsed)
+		}
+		ids := strings.Split(job.SourceAccountIDs, ",")
+		for _, idItem := range ids {
+			if idItem == fmt.Sprintf("%v", id) {
+				return buserr.New(constant.ErrBackupInUsed)
+			}
+		}
+	}
+	return nil
 }
 
 type loadSizeHelper struct {
@@ -309,7 +330,15 @@ func NewBackupClientMap(ids []string) (map[string]backupClientHelper, error) {
 			accounts[i].Credential, _ = encrypt.StringDecryptWithKey(accounts[i].Credential, setting.Value)
 		}
 	} else {
-		bodyItem, err := json.Marshal(ids)
+		var idItems []uint
+		for i := 0; i < len(ids); i++ {
+			item, _ := strconv.Atoi(ids[i])
+			idItems = append(idItems, uint(item))
+		}
+		operateByIDs := struct {
+			IDs []uint `json:"ids"`
+		}{IDs: idItems}
+		bodyItem, err := json.Marshal(operateByIDs)
 		if err != nil {
 			return nil, err
 		}
@@ -327,6 +356,18 @@ func NewBackupClientMap(ids []string) (map[string]backupClientHelper, error) {
 	}
 	clientMap := make(map[string]backupClientHelper)
 	for _, item := range accounts {
+		if !global.IsMaster {
+			accessItem, err := base64.StdEncoding.DecodeString(item.AccessKey)
+			if err != nil {
+				return nil, err
+			}
+			item.AccessKey = string(accessItem)
+			secretItem, err := base64.StdEncoding.DecodeString(item.Credential)
+			if err != nil {
+				return nil, err
+			}
+			item.Credential = string(secretItem)
+		}
 		backClient, err := newClient(&item)
 		if err != nil {
 			return nil, err

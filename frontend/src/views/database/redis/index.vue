@@ -152,7 +152,7 @@ import { listDatabases, checkRedisCli, installRedisCli } from '@/api/modules/dat
 import { Database } from '@/api/interface/database';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
-import { getRedisCommandList } from '@/api/modules/host';
+import { getCommandList } from '@/api/modules/command';
 const globalStore = GlobalStore();
 
 const loading = ref(false);
@@ -364,7 +364,7 @@ const installCli = async () => {
 };
 
 const loadQuickCmd = async () => {
-    const res = await getRedisCommandList();
+    const res = await getCommandList('redis');
     quickCmdList.value = res.data || [];
 };
 

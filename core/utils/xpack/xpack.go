@@ -9,3 +9,11 @@ import (
 func Proxy(c *gin.Context, currentNode string) error {
 	return nil
 }
+
+func UpdateGroup(name string, group, newGroup uint) error {
+	return nil
+}
+
+func CheckBackupUsed(id uint) error {
+	return nil
+}

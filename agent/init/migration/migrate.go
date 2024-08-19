@@ -11,10 +11,8 @@ func Init() {
 	m := gormigrate.New(global.DB, gormigrate.DefaultOptions, []*gormigrate.Migration{
 		migrations.AddTable,
 		migrations.AddMonitorTable,
-		migrations.InitHost,
 		migrations.InitSetting,
 		migrations.InitImageRepo,
-		migrations.InitDefaultGroup,
 		migrations.InitDefaultCA,
 		migrations.InitPHPExtensions,
 		migrations.AddTask,
