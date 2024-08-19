@@ -28,7 +28,7 @@ func (b *BaseApi) LoadMonitor(c *gin.Context) {
 		return
 	}
 
-	loc, _ := time.LoadLocation(common.LoadTimeZone())
+	loc, _ := time.LoadLocation(common.LoadTimeZoneByCmd())
 	req.StartTime = req.StartTime.In(loc)
 	req.EndTime = req.EndTime.In(loc)
 

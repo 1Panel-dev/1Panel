@@ -1,6 +1,10 @@
 package job
 
 import (
+	"path"
+	"strings"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/app/service"
@@ -8,9 +12,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
-	"path"
-	"strings"
-	"time"
 )
 
 type ssl struct {
@@ -25,7 +26,7 @@ func (ssl *ssl) Run() {
 	sslRepo := repo.NewISSLRepo()
 	sslService := service.NewIWebsiteSSLService()
 	sslList, _ := sslRepo.List()
-	nyc, _ := time.LoadLocation(common.LoadTimeZone())
+	nyc, _ := time.LoadLocation(common.LoadTimeZoneByCmd())
 	global.LOG.Info("The scheduled certificate update task is currently in progress ...")
 	now := time.Now().Add(10 * time.Second)
 	for _, s := range sslList {
