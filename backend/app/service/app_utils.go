@@ -186,17 +186,18 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 			}
 		case constant.AppRedis:
 			if password, ok := params["PANEL_REDIS_ROOT_PASSWORD"]; ok {
-				if password != "" {
-					authParam := dto.RedisAuthParam{
-						RootPassword: password.(string),
-					}
-					authByte, err := json.Marshal(authParam)
-					if err != nil {
-						return err
-					}
-					appInstall.Param = string(authByte)
+				authParam := dto.RedisAuthParam{
+					RootPassword: "",
 				}
-				database.Password = password.(string)
+				if password != "" {
+					authParam.RootPassword = password.(string)
+					database.Password = password.(string)
+				}
+				authByte, err := json.Marshal(authParam)
+				if err != nil {
+					return err
+				}
+				appInstall.Param = string(authByte)
 			}
 		}
 		if err := databaseRepo.Create(ctx, database); err != nil {
