@@ -30,8 +30,6 @@ var (
 
 	cronjobService = service.NewICronjobService()
 
-	hostService     = service.NewIHostService()
-	groupService    = service.NewIGroupService()
 	fileService     = service.NewIFileService()
 	sshService      = service.NewISSHService()
 	firewallService = service.NewIFirewallService()
@@ -44,8 +42,6 @@ var (
 
 	settingService = service.NewISettingService()
 	backupService  = service.NewIBackupService()
-
-	commandService = service.NewICommandService()
 
 	websiteService            = service.NewIWebsiteService()
 	websiteDnsAccountService  = service.NewIWebsiteDnsAccountService()

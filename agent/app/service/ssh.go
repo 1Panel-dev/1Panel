@@ -181,10 +181,6 @@ func (u *SSHService) Update(req dto.SSHUpdate) error {
 		if err := NewIFirewallService().UpdatePortRule(ruleItem); err != nil {
 			global.LOG.Errorf("reset firewall rules %s -> %s failed, err: %v", req.OldValue, req.NewValue, err)
 		}
-
-		if err = NewIHostService().Update(1, map[string]interface{}{"port": req.NewValue}); err != nil {
-			global.LOG.Errorf("reset host port %s -> %s failed, err: %v", req.OldValue, req.NewValue, err)
-		}
 	}
 
 	_, _ = cmd.Execf("%s systemctl restart %s", sudo, serviceName)

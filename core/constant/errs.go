@@ -37,6 +37,7 @@ var (
 	ErrPortInUsed      = "ErrPortInUsed"
 	ErrCmdTimeout      = "ErrCmdTimeout"
 	ErrGroupIsUsed     = "ErrGroupIsUsed"
+	ErrGroupIsDefault  = "ErrGroupIsDefault"
 )
 
 // api

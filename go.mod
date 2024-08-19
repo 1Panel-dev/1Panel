@@ -5,6 +5,7 @@ go 1.22.4
 require (
 	github.com/aliyun/aliyun-oss-go-sdk v3.0.2+incompatible
 	github.com/aws/aws-sdk-go v1.55.5
+	github.com/creack/pty v1.1.9
 	github.com/dgraph-io/badger/v4 v4.2.0
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/gin-contrib/gzip v1.0.1
@@ -15,6 +16,7 @@ require (
 	github.com/goh-chunlin/go-onedrive v1.1.1
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/google/uuid v1.6.0
+	github.com/gorilla/websocket v1.5.3
 	github.com/jinzhu/copier v0.4.0
 	github.com/minio/minio-go/v7 v7.0.74
 	github.com/mojocn/base64Captcha v1.3.6

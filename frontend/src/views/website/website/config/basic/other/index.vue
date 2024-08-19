@@ -88,7 +88,7 @@ const submit = async (formEl: FormInstance | undefined) => {
     });
 };
 const search = async () => {
-    const res = await GetGroupList({ type: 'website' });
+    const res = await GetGroupList('website');
     groups.value = res.data;
 
     GetWebsite(websiteId.value).then((res) => {

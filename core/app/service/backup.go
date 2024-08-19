@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"path"
 	"strings"
@@ -19,6 +20,8 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/cloud_storage/client"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
 	fileUtils "github.com/1Panel-dev/1Panel/core/utils/files"
+	httpUtils "github.com/1Panel-dev/1Panel/core/utils/http"
+	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 	"github.com/robfig/cron/v3"
@@ -271,11 +274,16 @@ func (u *BackupService) Delete(id uint) error {
 	if backup.Type == constant.Local {
 		return buserr.New(constant.ErrBackupLocalDelete)
 	}
-	if backup.InUsed {
-		return buserr.New(constant.ErrBackupInUsed)
-	}
 	if backup.Type == constant.OneDrive {
 		global.Cron.Remove(cron.EntryID(backup.EntryID))
+	}
+	if _, err := httpUtils.NewLocalClient(fmt.Sprintf("/api/v2/backups/check/%v", id), http.MethodGet, nil); err != nil {
+		global.LOG.Errorf("check used of local cronjob failed, err: %v", err)
+		return buserr.New(constant.ErrBackupInUsed)
+	}
+	if err := xpack.CheckBackupUsed(id); err != nil {
+		global.LOG.Errorf("check used of node cronjob failed, err: %v", err)
+		return buserr.New(constant.ErrBackupInUsed)
 	}
 
 	return backupRepo.Delete(commonRepo.WithByID(id))

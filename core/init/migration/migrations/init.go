@@ -15,13 +15,16 @@ import (
 )
 
 var AddTable = &gormigrate.Migration{
-	ID: "20240808-add-table",
+	ID: "20240819-add-table",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(
 			&model.OperationLog{},
 			&model.LoginLog{},
 			&model.Setting{},
 			&model.BackupAccount{},
+			&model.Group{},
+			&model.Host{},
+			&model.Command{},
 		)
 	},
 }
@@ -138,6 +141,35 @@ var InitSetting = &gormigrate.Migration{
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "NoAuthSetting", Value: "200"}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var InitHost = &gormigrate.Migration{
+	ID: "20240816-init-host",
+	Migrate: func(tx *gorm.DB) error {
+		hostGroup := &model.Group{Name: "default", Type: "host", IsDefault: true}
+		if err := tx.Create(hostGroup).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Group{Name: "default", Type: "node", IsDefault: true}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Group{Name: "default", Type: "command", IsDefault: true}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Group{Name: "default", Type: "website", IsDefault: true}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Group{Name: "default", Type: "redis", IsDefault: true}).Error; err != nil {
+			return err
+		}
+		host := model.Host{
+			Name: "localhost", Addr: "127.0.0.1", User: "root", Port: 22, AuthMode: "password", GroupID: hostGroup.ID,
+		}
+		if err := tx.Create(&host).Error; err != nil {
 			return err
 		}
 		return nil

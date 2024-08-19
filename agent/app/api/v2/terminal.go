@@ -12,66 +12,11 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
-	"github.com/1Panel-dev/1Panel/agent/utils/copier"
-	"github.com/1Panel-dev/1Panel/agent/utils/ssh"
 	"github.com/1Panel-dev/1Panel/agent/utils/terminal"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
 )
-
-func (b *BaseApi) WsSsh(c *gin.Context) {
-	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
-	if err != nil {
-		global.LOG.Errorf("gin context http handler failed, err: %v", err)
-		return
-	}
-	defer wsConn.Close()
-
-	id, err := strconv.Atoi(c.Query("id"))
-	if wshandleError(wsConn, errors.WithMessage(err, "invalid param id in request")) {
-		return
-	}
-	cols, err := strconv.Atoi(c.DefaultQuery("cols", "80"))
-	if wshandleError(wsConn, errors.WithMessage(err, "invalid param cols in request")) {
-		return
-	}
-	rows, err := strconv.Atoi(c.DefaultQuery("rows", "40"))
-	if wshandleError(wsConn, errors.WithMessage(err, "invalid param rows in request")) {
-		return
-	}
-	host, err := hostService.GetHostInfo(uint(id))
-	if wshandleError(wsConn, errors.WithMessage(err, "load host info by id failed")) {
-		return
-	}
-	var connInfo ssh.ConnInfo
-	_ = copier.Copy(&connInfo, &host)
-	connInfo.PrivateKey = []byte(host.PrivateKey)
-	if len(host.PassPhrase) != 0 {
-		connInfo.PassPhrase = []byte(host.PassPhrase)
-	}
-
-	client, err := connInfo.NewClient()
-	if wshandleError(wsConn, errors.WithMessage(err, "failed to set up the connection. Please check the host information")) {
-		return
-	}
-	defer client.Close()
-	sws, err := terminal.NewLogicSshWsSession(cols, rows, true, connInfo.Client, wsConn)
-	if wshandleError(wsConn, err) {
-		return
-	}
-	defer sws.Close()
-
-	quitChan := make(chan bool, 3)
-	sws.Start(quitChan)
-	go sws.Wait(quitChan)
-
-	<-quitChan
-
-	if wshandleError(wsConn, err) {
-		return
-	}
-}
 
 func (b *BaseApi) RedisWsSsh(c *gin.Context) {
 	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)

@@ -52,3 +52,8 @@ type OperationWithNameAndType struct {
 	Name string `json:"name"`
 	Type string `json:"type" validate:"required"`
 }
+
+type UpdateGroup struct {
+	Group    uint `json:"group"`
+	NewGroup uint `json:"newGroup"`
+}

@@ -829,7 +829,7 @@ const acceptParams = async (installPath: string) => {
     }
     staticPath.value = installPath + '/www/sites/';
 
-    const res = await GetGroupList({ type: 'website' });
+    const res = await GetGroupList('website');
     groups.value = res.data;
     website.value.webSiteGroupId = res.data[0].id;
     website.value.type = 'deployment';

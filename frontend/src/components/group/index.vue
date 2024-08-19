@@ -21,7 +21,13 @@
                             {{ $t('commons.table.default') }}
                         </span>
                         <span v-if="row.name !== 'default'">{{ row.name }}</span>
-                        <span v-if="row.isDefault">({{ $t('commons.table.default') }})</span>
+                        <el-tag v-if="row.isDefault" type="success" class="ml-2" size="small">
+                            ({{ $t('commons.table.default') }})
+                        </el-tag>
+
+                        <el-tag type="warning" size="small" class="ml-4" v-if="row.isDelete">
+                            {{ $t('app.takeDown') }}
+                        </el-tag>
                     </div>
 
                     <el-form @submit.prevent ref="groupForm" v-if="row.edit" :model="row">
@@ -31,6 +37,24 @@
                     </el-form>
                 </template>
             </el-table-column>
+
+            <el-table-column :label="$t('commons.table.status')" prop="status" :min-width="60">
+                <template #default="{ row }">
+                    <el-button
+                        v-if="row.status === 'Enable'"
+                        @click="onChangeStatus(row.id, 'disable')"
+                        link
+                        icon="VideoPlay"
+                        type="success"
+                    >
+                        {{ $t('commons.status.enabled') }}
+                    </el-button>
+                    <el-button v-else icon="VideoPause" link type="danger" @click="onChangeStatus(row.id, 'enable')">
+                        {{ $t('commons.status.disabled') }}
+                    </el-button>
+                </template>
+            </el-table-column>
+
             <el-table-column :label="$t('commons.table.operate')">
                 <template #default="{ row, $index }">
                     <div>
@@ -52,7 +76,12 @@
                         <el-button link v-if="row.edit" type="primary" @click="search()">
                             {{ $t('commons.button.cancel') }}
                         </el-button>
-                        <el-button link v-if="!row.edit && !row.isDefault" type="primary" @click="setDefault(row)">
+                        <el-button
+                            link
+                            v-if="!row.edit && !row.isDefault && !row.isDelete"
+                            type="primary"
+                            @click="setDefault(row)"
+                        >
                             {{ $t('website.setDefault') }}
                         </el-button>
                     </div>
@@ -92,17 +121,8 @@ const acceptParams = (params: DialogProps): void => {
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const search = () => {
-    data.value = [];
-    GetGroupList({ type: type.value }).then((res) => {
-        for (const d of res.data) {
-            const g = {
-                id: d.id,
-                name: d.name,
-                isDefault: d.isDefault,
-                edit: false,
-            };
-            data.value.push(g);
-        }
+    GetGroupList(type.value).then((res) => {
+        data.value = res.data || [];
     });
 };
 
@@ -136,6 +156,18 @@ const setDefault = (group: Group.GroupInfo) => {
     });
 };
 
+const onChangeStatus = async (row: any, status: string) => {
+    ElMessageBox.confirm(i18n.global.t('cronjob.' + status + 'Msg'), i18n.global.t('cronjob.changeStatus'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+    }).then(async () => {
+        row.status = status === 'enable' ? 'Enable' : 'Disable';
+        await UpdateGroup(row);
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        search();
+    });
+};
+
 const openCreate = () => {
     for (const d of data.value) {
         if (d.name == '') {
@@ -150,6 +182,7 @@ const openCreate = () => {
         name: '',
         isDefault: false,
         edit: true,
+        status: 'Enable',
     };
     data.value.unshift(g);
 };

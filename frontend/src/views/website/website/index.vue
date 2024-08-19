@@ -334,7 +334,7 @@ const search = async () => {
 };
 
 const listGroup = async () => {
-    const res = await GetGroupList({ type: 'website' });
+    const res = await GetGroupList('website');
     groups.value = res.data;
 };
 

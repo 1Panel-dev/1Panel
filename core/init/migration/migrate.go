@@ -13,6 +13,7 @@ func Init() {
 		migrations.InitSetting,
 		migrations.InitOneDrive,
 		migrations.InitMasterAddr,
+		migrations.InitHost,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

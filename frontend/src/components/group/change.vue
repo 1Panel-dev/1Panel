@@ -72,7 +72,7 @@ const rules = reactive({
 });
 
 const loadGroups = async (groupName: string) => {
-    const res = await GetGroupList({ type: dialogData.value.groupType });
+    const res = await GetGroupList(dialogData.value.groupType);
     groupList.value = res.data;
     for (const group of groupList.value) {
         if (group.name === groupName) {

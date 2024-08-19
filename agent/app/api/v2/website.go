@@ -957,3 +957,15 @@ func (b *BaseApi) UpdateLoadBalanceFile(c *gin.Context) {
 	}
 	helper.SuccessWithOutData(c)
 }
+
+func (b *BaseApi) ChangeWebsiteGroup(c *gin.Context) {
+	var req dto.UpdateGroup
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteService.ChangeGroup(req.Group, req.NewGroup); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}
