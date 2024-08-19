@@ -36,10 +36,11 @@ type FileWgetRes struct {
 }
 
 type FileLineContent struct {
-	Content string `json:"content"`
-	End     bool   `json:"end"`
-	Path    string `json:"path"`
-	Total   int    `json:"total"`
+	Content string   `json:"content"`
+	End     bool     `json:"end"`
+	Path    string   `json:"path"`
+	Total   int      `json:"total"`
+	Lines   []string `json:"lines"`
 }
 
 type FileExist struct {
