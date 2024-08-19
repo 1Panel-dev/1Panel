@@ -29,7 +29,6 @@ import { ReadByLine } from '@/api/modules/files';
 import { watch } from 'vue';
 
 const editorRef = ref();
-
 interface LogProps {
     id?: number;
     type: string;
@@ -74,10 +73,11 @@ let timer: NodeJS.Timer | null = null;
 const tailLog = ref(false);
 const content = ref('');
 const end = ref(false);
-const lastContent = ref('');
 const scrollerElement = ref<HTMLElement | null>(null);
 const minPage = ref(1);
 const maxPage = ref(1);
+const logs = ref([]);
+const isLoading = ref(false);
 
 const readReq = reactive({
     id: 0,
@@ -114,7 +114,12 @@ const stopSignals = [
     'image push successful!',
 ];
 
+const lastLogs = ref([]);
+
 const getContent = (pre: boolean) => {
+    if (isLoading.value) {
+        return;
+    }
     emit('update:isReading', true);
     readReq.id = props.config.id;
     readReq.type = props.config.type;
@@ -122,37 +127,52 @@ const getContent = (pre: boolean) => {
     if (readReq.page < 1) {
         readReq.page = 1;
     }
+    isLoading.value = true;
     ReadByLine(readReq).then((res) => {
         if (!end.value && res.data.end) {
-            lastContent.value = content.value;
+            lastLogs.value = [...logs.value];
         }
 
-        res.data.content = res.data.content.replace(/\\u(\w{4})/g, function (match, grp) {
-            return String.fromCharCode(parseInt(grp, 16));
-        });
         data.value = res.data;
-        if (res.data.content != '') {
-            if (stopSignals.some((signal) => res.data.content.endsWith(signal))) {
+        if (res.data.lines && res.data.lines.length > 0) {
+            res.data.lines = res.data.lines.map((line) =>
+                line.replace(/\\u(\w{4})/g, function (match, grp) {
+                    return String.fromCharCode(parseInt(grp, 16));
+                }),
+            );
+            const newLogs = res.data.lines;
+            if (newLogs.length === readReq.pageSize && readReq.page < res.data.total) {
+                readReq.page++;
+            }
+
+            if (
+                readReq.type == 'php' &&
+                logs.value.length > 0 &&
+                newLogs.length > 0 &&
+                newLogs[newLogs.length - 1] === logs.value[logs.value.length - 1]
+            ) {
+                isLoading.value = false;
+                return;
+            }
+
+            if (stopSignals.some((signal) => newLogs[newLogs.length - 1].endsWith(signal))) {
                 onCloseLog();
             }
             if (end.value) {
-                if (lastContent.value == '') {
-                    content.value = res.data.content;
+                if ((logs.value.length = 0)) {
+                    logs.value = newLogs;
                 } else {
-                    content.value = pre
-                        ? res.data.content + '\n' + lastContent.value
-                        : lastContent.value + '\n' + res.data.content;
+                    logs.value = pre ? [...newLogs, ...lastLogs.value] : [...lastLogs.value, ...newLogs];
                 }
             } else {
-                if (content.value == '') {
-                    content.value = res.data.content;
+                if ((logs.value.length = 0)) {
+                    logs.value = newLogs;
                 } else {
-                    content.value = pre
-                        ? res.data.content + '\n' + content.value
-                        : content.value + '\n' + res.data.content;
+                    logs.value = pre ? [...newLogs, ...logs.value] : [...logs.value, ...newLogs];
                 }
             }
         }
+
         end.value = res.data.end;
         emit('update:hasContent', content.value !== '');
         nextTick(() => {
@@ -171,7 +191,44 @@ const getContent = (pre: boolean) => {
             maxPage.value = res.data.total;
             minPage.value = res.data.total;
         }
+        if (logs.value && logs.value.length > 3000) {
+            logs.value.splice(0, readReq.pageSize);
+            if (minPage.value > 1) {
+                minPage.value--;
+            }
+        }
+
+        isLoading.value = false;
+        content.value = logs.value.join('\n');
     });
+};
+
+function throttle<T extends (...args: any[]) => any>(func: T, limit: number): (...args: Parameters<T>) => void {
+    let inThrottle: boolean;
+    let lastFunc: ReturnType<typeof setTimeout>;
+    let lastRan: number;
+    return function (this: any, ...args: Parameters<T>) {
+        if (!inThrottle) {
+            func.apply(this, args);
+            lastRan = Date.now();
+            inThrottle = true;
+            setTimeout(() => (inThrottle = false), limit);
+        } else {
+            clearTimeout(lastFunc);
+            lastFunc = setTimeout(() => {
+                if (Date.now() - lastRan >= limit) {
+                    func.apply(this, args);
+                    lastRan = Date.now();
+                }
+            }, limit - (Date.now() - lastRan));
+        }
+    };
+}
+
+const throttledGetContent = throttle(getContent, 3000);
+
+const search = () => {
+    throttledGetContent(false);
 };
 
 const changeTail = (fromOutSide: boolean) => {
@@ -180,7 +237,7 @@ const changeTail = (fromOutSide: boolean) => {
     }
     if (tailLog.value) {
         timer = setInterval(() => {
-            getContent(false);
+            search();
         }, 1000 * 3);
     } else {
         onCloseLog();
@@ -198,6 +255,7 @@ const onCloseLog = async () => {
     tailLog.value = false;
     clearInterval(Number(timer));
     timer = null;
+    isLoading.value = false;
 };
 
 function isScrolledToBottom(element: HTMLElement): boolean {
@@ -218,7 +276,7 @@ const init = () => {
         changeTail(false);
     }
     readReq.latest = true;
-    getContent(false);
+    search();
 
     nextTick(() => {});
 };
@@ -232,9 +290,14 @@ const initCodemirror = () => {
         if (editorRef.value) {
             scrollerElement.value = editorRef.value.$el as HTMLElement;
             scrollerElement.value.addEventListener('scroll', function () {
+                if (tailLog.value) {
+                    return;
+                }
                 if (isScrolledToBottom(scrollerElement.value)) {
-                    readReq.page = maxPage.value;
-                    getContent(false);
+                    if (maxPage.value > 1) {
+                        readReq.page = maxPage.value;
+                    }
+                    search();
                 }
                 if (isScrolledToTop(scrollerElement.value)) {
                     readReq.page = minPage.value - 1;
@@ -242,7 +305,7 @@ const initCodemirror = () => {
                         return;
                     }
                     minPage.value = readReq.page;
-                    getContent(true);
+                    throttledGetContent(true);
                 }
             });
             let hljsDom = scrollerElement.value.querySelector('.hljs') as HTMLElement;

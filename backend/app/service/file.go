@@ -474,11 +474,20 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 	if err != nil {
 		return nil, err
 	}
+	if req.Latest && req.Page == 1 && len(lines) < 1000 && total > 1 {
+		preLines, _, _, err := files.ReadFileByLine(logFilePath, total-1, req.PageSize, false)
+		if err != nil {
+			return nil, err
+		}
+		lines = append(preLines, lines...)
+	}
+
 	res := &response.FileLineContent{
 		Content: strings.Join(lines, "\n"),
 		End:     isEndOfFile,
 		Path:    logFilePath,
 		Total:   total,
+		Lines:   lines,
 	}
 	return res, nil
 }
