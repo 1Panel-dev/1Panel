@@ -361,15 +361,16 @@ html {
 
 .el-input-group__append {
     border-left: 0;
-    &:hover {
-        color: var(--el-color-primary);
-        background-color: var(--el-color-primary-light-9) !important;
-    }
     background-color: #ffffff !important;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
     box-shadow: 0 1px 0 0 var(--el-input-border-color) inset, 0 -1px 0 0 var(--el-input-border-color) inset,
         -1px 0 0 0 var(--el-input-border-color) inset;
+
+    &:hover {
+        color: var(--el-color-primary);
+        background-color: var(--el-color-primary-light-9) !important;
+    }
 }
 
 .tag-button {

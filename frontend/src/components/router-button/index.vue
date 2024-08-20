@@ -86,6 +86,7 @@ onMounted(() => {
         background-color: var(--panel-button-active) !important;
         box-shadow: none !important;
         border: 2px solid transparent !important;
+        color: var(--el-text-color-regular) !important;
     }
 
     .el-radio-button__original-radio:checked + .el-radio-button__inner {

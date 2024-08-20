@@ -173,12 +173,13 @@ html {
 }
 
 .el-dialog {
+    border-radius: 5px;
+
     .el-dialog__header {
         .el-dialog__title {
             font-size: 17px;
         }
     }
-    border-radius: 5px;
 }
 
 .row-box {

@@ -80,10 +80,6 @@ html.dark {
         border: 1px solid var(--panel-border-color);
     }
 
-    // * wangEditor
-    --w-e-textarea-bg-color: #1b1b1b;
-    --w-e-textarea-color: #eeeeee;
-
     .md-editor-dark {
         --md-bk-color: #111417;
     }
@@ -251,14 +247,16 @@ html.dark {
         color: rgb(174, 166, 153);
     }
     .el-dialog {
+        border: 1px solid var(--panel-border-color);
+
         .el-dialog__header {
             border-bottom: var(--panel-border);
             color: #999999;
+
             .el-dialog__title {
                 color: var(--el-menu-text-color);
             }
         }
-        border: 1px solid var(--panel-border-color);
     }
     .el-tabs__item {
         color: #999999;
@@ -330,15 +328,16 @@ html.dark {
 
     .el-input-group__append {
         border-left: 0;
-        &:hover {
-            color: var(--el-color-primary);
-            background-color: var(--el-color-primary-light-9) !important;
-        }
         background-color: #212426 !important;
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
         box-shadow: 0 1px 0 0 var(--el-input-border-color) inset, 0 -1px 0 0 var(--el-input-border-color) inset,
             -1px 0 0 0 var(--el-input-border-color) inset;
+
+        &:hover {
+            color: var(--el-color-primary);
+            background-color: var(--el-color-primary-light-9) !important;
+        }
     }
 
     .el-collapse-item__header {
