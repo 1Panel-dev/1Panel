@@ -12,14 +12,14 @@
                     </el-tag>
                     <el-tag class="status-content w-24">{{ $t('app.version') }}:{{ data.version }}</el-tag>
                     <span class="buttons">
-                        <el-button type="primary" v-if="!data.isActive" link @click="onOperate('start')">
+                        <el-button type="primary" v-if="!data.isActive" link @click="onOperate('ClamAV', 'start')">
                             {{ $t('app.start') }}
                         </el-button>
-                        <el-button type="primary" v-if="data.isActive" link @click="onOperate('stop')">
+                        <el-button type="primary" v-if="data.isActive" link @click="onOperate('ClamAV', 'stop')">
                             {{ $t('app.stop') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button type="primary" link @click="onOperate('restart')">
+                        <el-button type="primary" link @click="onOperate('ClamAV', 'restart')">
                             {{ $t('app.restart') }}
                         </el-button>
                         <el-divider direction="vertical" />
@@ -45,14 +45,24 @@
                     </el-tag>
                     <el-tag class="status-content w-24">{{ $t('app.version') }}:{{ data.freshVersion }}</el-tag>
                     <span class="buttons">
-                        <el-button type="primary" v-if="!data.freshIsActive" link @click="onOperate('fresh-start')">
+                        <el-button
+                            type="primary"
+                            v-if="!data.freshIsActive"
+                            link
+                            @click="onOperate('FreshClam', 'start')"
+                        >
                             {{ $t('app.start') }}
                         </el-button>
-                        <el-button type="primary" v-if="data.freshIsActive" link @click="onOperate('fresh-stop')">
+                        <el-button
+                            type="primary"
+                            v-if="data.freshIsActive"
+                            link
+                            @click="onOperate('FreshClam', 'stop')"
+                        >
                             {{ $t('app.stop') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button type="primary" link @click="onOperate('fresh-restart')">
+                        <el-button type="primary" link @click="onOperate('FreshClam', 'restart')">
                             {{ $t('app.restart') }}
                         </el-button>
                     </span>
@@ -111,10 +121,10 @@ const changeShow = (val: boolean) => {
     localStorage.setItem('clam-fresh-show', showFresh.value ? 'show' : 'hide');
 };
 
-const onOperate = async (operation: string) => {
+const onOperate = async (service: string, operation: string) => {
     em('update:maskShow', false);
     ElMessageBox.confirm(
-        i18n.global.t('commons.msg.operatorHelper', [' ClamAV ', i18n.global.t('app.' + operation)]),
+        i18n.global.t('commons.msg.operatorHelper', [' ' + service + ' ', i18n.global.t('app.' + operation)]),
         i18n.global.t('app.' + operation),
         {
             confirmButtonText: i18n.global.t('commons.button.confirm'),

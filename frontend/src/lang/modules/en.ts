@@ -1524,6 +1524,7 @@ const message = {
         allowIPEgs:
             'If multiple ip authorizations exist, newlines need to be displayed. For example, \n172.16.10.111 \n172.16.10.0/24',
         mfa: 'MFA',
+        mfaClose: 'Disabling MFA will reduce the security of the service. Do you want to continue?',
         secret: 'Secret',
         mfaInterval: 'Refresh interval (s)',
         mfaTitleHelper:
