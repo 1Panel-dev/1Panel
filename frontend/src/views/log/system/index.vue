@@ -32,7 +32,6 @@
                     ref="logRef"
                     :config="logConfig"
                     :default-button="false"
-                    v-if="showLog"
                     v-model:loading="loading"
                     v-model:hasContent="hasContent"
                     :style="'height: calc(100vh - 370px);min-height: 200px'"

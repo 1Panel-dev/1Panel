@@ -80,14 +80,14 @@ const handleClose = () => {
     em('close', false);
 };
 
-const acceptParams = async (website: Website.Website) => {
+const acceptParams = async (website: Website.WebsiteDTO) => {
     deleteReq.value = {
         id: 0,
         deleteApp: false,
         deleteBackup: false,
         forceDelete: false,
     };
-    if (website.type === 'runtime' && website.appInstallId > 0) {
+    if (website.type === 'runtime' && website.appInstallId > 0 && website.runtimeType == 'php') {
         runtimeApp.value = true;
         deleteReq.value.deleteApp = true;
     }
