@@ -47,7 +47,7 @@ func (u *SnapshotService) HandleSnapshotRecover(snap model.Snapshot, isRecover b
 			req.IsNew = true
 		}
 		if req.IsNew || snap.InterruptStep == "Backup" {
-			if err := backupBeforeRecover(snap, ""); err != nil {
+			if err := backupBeforeRecover(snap); err != nil {
 				updateRecoverStatus(snap.ID, isRecover, "Backup", constant.StatusFailed, fmt.Sprintf("handle backup before recover failed, err: %v", err))
 				return
 			}
@@ -149,7 +149,7 @@ func (u *SnapshotService) HandleSnapshotRecover(snap model.Snapshot, isRecover b
 	_, _ = cmd.Exec("systemctl daemon-reload && systemctl restart 1panel.service")
 }
 
-func backupBeforeRecover(snap model.Snapshot, secret string) error {
+func backupBeforeRecover(snap model.Snapshot) error {
 	baseDir := fmt.Sprintf("%s/1panel_original/original_%s", global.CONF.System.BaseDir, snap.Name)
 	var wg sync.WaitGroup
 	var status model.SnapshotStatus

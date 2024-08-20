@@ -475,7 +475,9 @@ func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 	tx, ctx := helper.GetTxAndContext()
 	defer tx.Rollback()
 
-	go NewIBackupService().DeleteRecordByName("website", website.PrimaryDomain, website.Alias, req.DeleteBackup)
+	go func() {
+		_ = NewIBackupService().DeleteRecordByName("website", website.PrimaryDomain, website.Alias, req.DeleteBackup)
+	}()
 	if err := websiteRepo.DeleteBy(ctx, commonRepo.WithByID(req.ID)); err != nil {
 		return err
 	}

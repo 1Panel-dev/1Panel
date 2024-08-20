@@ -286,7 +286,7 @@ func (u *ImageService) ImagePull(req dto.ImagePull) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		authStr := base64.URLEncoding.EncodeToString(encodedJSON)
+		authStr := base64.StdEncoding.EncodeToString(encodedJSON)
 		options.RegistryAuth = authStr
 	}
 	image := repo.DownloadUrl + "/" + req.ImageName
@@ -295,7 +295,7 @@ func (u *ImageService) ImagePull(req dto.ImagePull) (string, error) {
 		out, err := client.ImagePull(context.TODO(), image, options)
 		if err != nil {
 			_, _ = file.WriteString("image pull failed!")
-			global.LOG.Errorf("image %s pull failed, err: %v", image, err)
+			_, _ = file.WriteString(fmt.Sprintf("image %s pull failed, err: %v", image, err))
 			return
 		}
 		defer out.Close()
