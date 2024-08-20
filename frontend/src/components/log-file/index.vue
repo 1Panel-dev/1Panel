@@ -174,6 +174,8 @@ const getContent = (pre: boolean) => {
         }
 
         end.value = res.data.end;
+        content.value = logs.value.join('\n');
+
         emit('update:hasContent', content.value !== '');
         nextTick(() => {
             if (pre) {
@@ -199,7 +201,6 @@ const getContent = (pre: boolean) => {
         }
 
         isLoading.value = false;
-        content.value = logs.value.join('\n');
     });
 };
 
