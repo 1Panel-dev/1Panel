@@ -48,6 +48,9 @@ func NewISnapshotService() ISnapshotService {
 
 func (u *SnapshotService) SearchWithPage(req dto.SearchWithPage) (int64, interface{}, error) {
 	total, systemBackups, err := snapshotRepo.Page(req.Page, req.PageSize, commonRepo.WithLikeName(req.Info))
+	if err != nil {
+		return 0, nil, err
+	}
 	dtoSnap, err := loadSnapSize(systemBackups)
 	if err != nil {
 		return 0, nil, err
