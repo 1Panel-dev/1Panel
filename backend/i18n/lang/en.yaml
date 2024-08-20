@@ -196,3 +196,11 @@ ErrLicenseSync: "Failed to sync license information, no license information dete
 ErrXpackNotFound: "This section is a professional edition feature, please import the license first in Panel Settings-License interface"
 ErrXpackNotActive: "This section is a professional edition feature, please synchronize the license status first in Panel Settings-License interface"
 ErrXpackOutOfDate: "The current license has expired, please re-import the license in Panel Settings-License interface"
+
+
+#license
+ErrAlert: "Alert information format error, please check and try again!"
+ErrAlertPush: "Alert push error, please check and try again!"
+ErrAlertSave: "Alert save error, please check and try again!"
+ErrAlertSync: "Alert sync error, please check and try again!"
+ErrAlertRemote: "Remote alert error, please check and try again!"

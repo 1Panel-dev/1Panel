@@ -200,3 +200,10 @@ ErrXpackNotFound: "该部分为专业版功能，请先在 面板设置-许可�
 ErrXpackNotActive: "该部分为专业版功能，请先在 面板设置-许可证 界面同步许可证状态"
 ErrXpackOutOfDate: "当前许可证已过期，请重新在 面板设置-许可证 界面导入许可证"
 
+#license
+ErrAlert: "告警信息格式错误，请检查后重试！"
+ErrAlertPush: "告警信息推送错误，请检查后重试！"
+ErrAlertSave: "告警信息保存错误，请检查后重试！"
+ErrAlertSync: "告警信息同步错误，请检查后重试！"
+ErrAlertRemote: "告警信息远端错误，请检查后重试！"
+

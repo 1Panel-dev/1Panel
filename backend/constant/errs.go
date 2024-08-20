@@ -95,7 +95,7 @@ var (
 	ErrPathNotFound     = "ErrPathNotFound"
 	ErrMovePathFailed   = "ErrMovePathFailed"
 	ErrLinkPathNotFound = "ErrLinkPathNotFound"
-	ErrFileIsExist       = "ErrFileIsExist"
+	ErrFileIsExist      = "ErrFileIsExist"
 	ErrFileUpload       = "ErrFileUpload"
 	ErrFileDownloadDir  = "ErrFileDownloadDir"
 	ErrCmdNotFound      = "ErrCmdNotFound"
@@ -161,4 +161,13 @@ var (
 	ErrLicenseCheck = "ErrLicenseCheck"
 	ErrLicenseSave  = "ErrLicenseSave"
 	ErrLicenseSync  = "ErrLicenseSync"
+)
+
+// alert
+var (
+	ErrAlert       = "ErrAlert"
+	ErrAlertPush   = "ErrAlertPush"
+	ErrAlertSave   = "ErrAlertSave"
+	ErrAlertSync   = "ErrAlertSync"
+	ErrAlertRemote = "ErrAlertRemote"
 )
