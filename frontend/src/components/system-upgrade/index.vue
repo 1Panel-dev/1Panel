@@ -17,10 +17,7 @@
         <el-button type="primary" link @click="toHalo">
             <span class="font-normal">{{ isProductPro ? $t('license.pro') : $t('license.community') }}</span>
         </el-button>
-        <span v-if="isSupported" class="version" @click="copy(version)">
-            {{ copied ? $t('commons.msg.copySuccess') : version }}
-        </span>
-        <span class="version" v-else>{{ version }}</span>
+        <span class="version" @click="copyText(version)">{{ version }}</span>
         <el-badge is-dot style="margin-top: -3px" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
             <el-button type="primary" link @click="onLoadUpgradeInfo">
                 <span class="font-normal">({{ $t('setting.hasNewVersion') }})</span>
@@ -84,15 +81,14 @@ import MdEditor from 'md-editor-v3';
 import i18n from '@/lang';
 import 'md-editor-v3/lib/style.css';
 import { MsgSuccess } from '@/utils/message';
+import { copyText } from '@/utils/util';
 import { onMounted, ref } from 'vue';
 import { GlobalStore } from '@/store';
 import { ElMessageBox } from 'element-plus';
 import { storeToRefs } from 'pinia';
-import { useClipboard } from '@vueuse/core';
 
 const globalStore = GlobalStore();
 const { isDarkTheme } = storeToRefs(globalStore);
-const { copied, copy, isSupported } = useClipboard();
 
 const version = ref<string>('');
 const isProductPro = ref();

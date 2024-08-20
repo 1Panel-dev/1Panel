@@ -277,16 +277,21 @@ const handleMFA = async () => {
         mfaRef.value.acceptParams({ interval: form.mfaInterval });
         return;
     }
-    loading.value = true;
-    await updateSetting({ key: 'MFAStatus', value: 'disable' })
-        .then(() => {
-            loading.value = false;
-            search();
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-        })
-        .catch(() => {
-            loading.value = false;
-        });
+    ElMessageBox.confirm(i18n.global.t('setting.mfaClose'), i18n.global.t('setting.mfa'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+    }).then(async () => {
+        loading.value = true;
+        await updateSetting({ key: 'MFAStatus', value: 'disable' })
+            .then(() => {
+                loading.value = false;
+                search();
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
 };
 
 const onChangeEntrance = () => {
