@@ -421,13 +421,14 @@ onMounted(() => {
     }
 
     .login-captcha {
+        margin-top: 10px;
+
         :deep(.el-input__wrapper) {
             background: none !important;
             box-shadow: none !important;
             border-radius: 0 !important;
             border-bottom: 1px solid #dcdfe6;
         }
-        margin-top: 10px;
         .el-input {
             width: 50%;
             height: 44px;
