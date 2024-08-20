@@ -288,3 +288,29 @@ var AddClamStatus = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddAlertMenu = &gormigrate.Migration{
+	ID: "20240706-update-xpack-hide-menu",
+	Migrate: func(tx *gorm.DB) error {
+		var (
+			setting model.Setting
+			menu    dto.XpackHideMenu
+		)
+		tx.Model(&model.Setting{}).Where("key", "XpackHideMenu").First(&setting)
+		if err := json.Unmarshal([]byte(setting.Value), &menu); err != nil {
+			return err
+		}
+		menu.Children = append(menu.Children, dto.XpackHideMenu{
+			ID:      "7",
+			Title:   "xpack.alert.alert",
+			Path:    "/xpack/alert/dashboard",
+			Label:   "XAlertDashboard",
+			IsCheck: true,
+		})
+		data, err := json.Marshal(menu)
+		if err != nil {
+			return err
+		}
+		return tx.Model(&model.Setting{}).Where("key", "XpackHideMenu").Updates(map[string]interface{}{"value": string(data)}).Error
+	},
+}

@@ -50,7 +50,6 @@ func (w WebsiteSSLRepo) WithByCAID(caID uint) DBOption {
 		return db.Where("ca_id = ?", caID)
 	}
 }
-
 func (w WebsiteSSLRepo) Page(page, size int, opts ...DBOption) (int64, []model.WebsiteSSL, error) {
 	var sslList []model.WebsiteSSL
 	db := getDb(opts...).Model(&model.WebsiteSSL{})

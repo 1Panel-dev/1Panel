@@ -198,3 +198,10 @@ ErrLicenseSync: "許可證信息同步失敗，資料庫中未檢測到許可證
 ErrXpackNotFound: "該部分為專業版功能，請先在 面板設置-許可證 界面導入許可證"
 ErrXpackNotActive: "該部分為專業版功能，請先在 面板設置-許可證 界面同步許可證狀態"
 ErrXpackOutOfDate: "當前許可證已過期，請重新在 面板設置-許可證 界面導入許可證"
+
+#license
+ErrAlert: "告警資訊格式錯誤，請檢查後重試！"
+ErrAlertPush: "告警資訊推送錯誤，請檢查後重試！"
+ErrAlertSave: "告警資訊保存錯誤，請檢查後重試！"
+ErrAlertSync: "告警資訊同步錯誤，請檢查後重試！"
+ErrAlertRemote: "告警資訊遠端錯誤，請檢查後重試！"
