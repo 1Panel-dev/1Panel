@@ -140,6 +140,7 @@ func handleTar(sourceDir, targetDir, name, exclusionRules string, secret string)
 	excludes := strings.Split(exclusionRules, ",")
 	excludeRules := ""
 	excludes = append(excludes, "*.sock")
+	excludes = append(excludes, "*.socket")
 	for _, exclude := range excludes {
 		if len(exclude) == 0 {
 			continue
