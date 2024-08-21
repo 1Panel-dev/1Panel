@@ -135,8 +135,9 @@ import i18n from '@/lang';
 import { UploadFile, UploadFiles, UploadInstance } from 'element-plus';
 import { File } from '@/api/interface/file';
 import { BatchDeleteFile, CheckFile, ChunkUploadFileData, GetUploadList } from '@/api/modules/files';
-import { handleRecoverByUpload, loadBaseDir } from '@/api/modules/setting';
+import { loadBaseDir } from '@/api/modules/setting';
 import { MsgError, MsgSuccess } from '@/utils/message';
+import { handleRecoverByUpload } from '@/api/modules/backup';
 
 const loading = ref();
 const isUpload = ref();

@@ -51,7 +51,7 @@
 import { reactive, ref } from 'vue';
 import { computeSize, dateFormat, downloadFile } from '@/utils/util';
 import i18n from '@/lang';
-import { downloadBackupRecord, searchBackupRecordsByCronjob } from '@/api/modules/setting';
+import { downloadBackupRecord, searchBackupRecordsByCronjob } from '@/api/modules/backup';
 import { Backup } from '@/api/interface/backup';
 
 const selects = ref<any>([]);

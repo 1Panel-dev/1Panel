@@ -2,9 +2,7 @@ import http from '@/api';
 import { deepCopy } from '@/utils/util';
 import { Base64 } from 'js-base64';
 import { ResPage, SearchWithPage, DescriptionUpdate } from '../interface';
-import { Backup } from '../interface/backup';
 import { Setting } from '../interface/setting';
-import { TimeoutEnum } from '@/enums/http-enum';
 
 // license
 export const UploadFileData = (params: FormData) => {
@@ -81,82 +79,6 @@ export const loadMFA = (param: Setting.MFARequest) => {
 };
 export const bindMFA = (param: Setting.MFABind) => {
     return http.post(`/core/settings/mfa/bind`, param);
-};
-
-// backup-agent
-export const handleBackup = (params: Backup.Backup) => {
-    return http.post(`/settings/backup/backup`, params, TimeoutEnum.T_1H);
-};
-export const handleRecover = (params: Backup.Recover) => {
-    return http.post(`/settings/backup/recover`, params, TimeoutEnum.T_1D);
-};
-export const handleRecoverByUpload = (params: Backup.Recover) => {
-    return http.post(`/settings/backup/recover/byupload`, params, TimeoutEnum.T_1D);
-};
-export const downloadBackupRecord = (params: Backup.RecordDownload) => {
-    return http.post<string>(`/settings/backup/record/download`, params, TimeoutEnum.T_10M);
-};
-export const deleteBackupRecord = (params: { ids: number[] }) => {
-    return http.post(`/settings/backup/record/del`, params);
-};
-export const searchBackupRecords = (params: Backup.SearchBackupRecord) => {
-    return http.post<ResPage<Backup.RecordInfo>>(`/settings/backup/record/search`, params, TimeoutEnum.T_5M);
-};
-export const searchBackupRecordsByCronjob = (params: Backup.SearchBackupRecordByCronjob) => {
-    return http.post<ResPage<Backup.RecordInfo>>(`/settings/backup/record/search/bycronjob`, params, TimeoutEnum.T_5M);
-};
-export const getFilesFromBackup = (type: string) => {
-    return http.post<Array<any>>(`/settings/backup/search/files`, { type: type });
-};
-
-// backup-core
-export const refreshOneDrive = () => {
-    return http.post(`/core/backup/refresh/onedrive`, {});
-};
-export const getBackupList = () => {
-    return http.get<Array<Backup.BackupOption>>(`/core/backup/options`);
-};
-export const getLocalBackupDir = () => {
-    return http.get<string>(`/core/backup/local`);
-};
-export const searchBackup = (params: Backup.SearchWithType) => {
-    return http.post<ResPage<Backup.BackupInfo>>(`/core/backup/search`, params);
-};
-export const getOneDriveInfo = () => {
-    return http.get<Backup.OneDriveInfo>(`/core/backup/onedrive`);
-};
-export const addBackup = (params: Backup.BackupOperate) => {
-    let request = deepCopy(params) as Backup.BackupOperate;
-    if (request.accessKey) {
-        request.accessKey = Base64.encode(request.accessKey);
-    }
-    if (request.credential) {
-        request.credential = Base64.encode(request.credential);
-    }
-    return http.post<Backup.BackupOperate>(`/core/backup`, request, TimeoutEnum.T_60S);
-};
-export const editBackup = (params: Backup.BackupOperate) => {
-    let request = deepCopy(params) as Backup.BackupOperate;
-    if (request.accessKey) {
-        request.accessKey = Base64.encode(request.accessKey);
-    }
-    if (request.credential) {
-        request.credential = Base64.encode(request.credential);
-    }
-    return http.post(`/core/backup/update`, request);
-};
-export const deleteBackup = (params: { id: number }) => {
-    return http.post(`/core/backup/del`, params);
-};
-export const listBucket = (params: Backup.ForBucket) => {
-    let request = deepCopy(params) as Backup.BackupOperate;
-    if (request.accessKey) {
-        request.accessKey = Base64.encode(request.accessKey);
-    }
-    if (request.credential) {
-        request.credential = Base64.encode(request.credential);
-    }
-    return http.post(`/core/backup/buckets`, request);
 };
 
 // snapshot

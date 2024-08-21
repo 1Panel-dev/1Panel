@@ -17,3 +17,5 @@ func UpdateGroup(name string, group, newGroup uint) error {
 func CheckBackupUsed(id uint) error {
 	return nil
 }
+
+func InitAgentRouter(Router *gin.RouterGroup) {}

@@ -24,15 +24,6 @@ func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 		settingRouter.POST("/snapshot/rollback", baseApi.RollbackSnapshot)
 		settingRouter.POST("/snapshot/description/update", baseApi.UpdateSnapDescription)
 
-		settingRouter.POST("/backup/backup", baseApi.Backup)
-		settingRouter.POST("/backup/recover", baseApi.Recover)
-		settingRouter.POST("/backup/recover/byupload", baseApi.RecoverByUpload)
-		settingRouter.POST("/backup/search/files", baseApi.LoadFilesFromBackup)
-		settingRouter.POST("/backup/record/search", baseApi.SearchBackupRecords)
-		settingRouter.POST("/backup/record/search/bycronjob", baseApi.SearchBackupRecordsByCronjob)
-		settingRouter.POST("/backup/record/download", baseApi.DownloadRecord)
-		settingRouter.POST("/backup/record/del", baseApi.DeleteBackupRecord)
-
 		settingRouter.GET("/basedir", baseApi.LoadBaseDir)
 	}
 }

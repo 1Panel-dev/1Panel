@@ -332,7 +332,7 @@
 import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import FileList from '@/components/file-list/index.vue';
-import { getBackupList } from '@/api/modules/setting';
+import { getBackupList } from '@/api/modules/backup';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { Cronjob } from '@/api/interface/cronjob';

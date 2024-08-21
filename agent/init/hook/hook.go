@@ -35,11 +35,6 @@ func Init() {
 			global.LOG.Fatalf("load master addr before start failed, err: %v", err)
 		}
 		global.CONF.System.MasterAddr = masterAddr.Value
-		token, err := settingRepo.Get(settingRepo.WithByKey("Token"))
-		if err != nil {
-			global.LOG.Fatalf("load token before start failed, err: %v", err)
-		}
-		global.CONF.System.MasterToken, _ = encrypt.StringDecrypt(token.Value)
 	}
 
 	handleCronjobStatus()

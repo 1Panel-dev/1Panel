@@ -32,7 +32,7 @@ func (b *BaseApi) CheckBackupUsed(c *gin.Context) {
 // @Param request body dto.RecordSearch true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /settings/backup/record/search [post]
+// @Router /backup/record/search [post]
 func (b *BaseApi) SearchBackupRecords(c *gin.Context) {
 	var req dto.RecordSearch
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -58,7 +58,7 @@ func (b *BaseApi) SearchBackupRecords(c *gin.Context) {
 // @Param request body dto.RecordSearchByCronjob true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /settings/backup/record/search/bycronjob [post]
+// @Router /backup/record/search/bycronjob [post]
 func (b *BaseApi) SearchBackupRecordsByCronjob(c *gin.Context) {
 	var req dto.RecordSearchByCronjob
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -84,7 +84,7 @@ func (b *BaseApi) SearchBackupRecordsByCronjob(c *gin.Context) {
 // @Param request body dto.DownloadRecord true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /settings/backup/record/download [post]
+// @Router /backup/record/download [post]
 // @x-panel-log {"bodyKeys":["source","fileName"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"下载备份记录 [source][fileName]","formatEN":"download backup records [source][fileName]"}
 func (b *BaseApi) DownloadRecord(c *gin.Context) {
 	var req dto.DownloadRecord
@@ -107,7 +107,7 @@ func (b *BaseApi) DownloadRecord(c *gin.Context) {
 // @Param request body dto.BatchDeleteReq true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /settings/backup/record/del [post]
+// @Router /record/del [post]
 // @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"ids","isList":true,"db":"backup_records","output_column":"file_name","output_value":"files"}],"formatZH":"删除备份记录 [files]","formatEN":"delete backup records [files]"}
 func (b *BaseApi) DeleteBackupRecord(c *gin.Context) {
 	var req dto.BatchDeleteReq
@@ -129,7 +129,7 @@ func (b *BaseApi) DeleteBackupRecord(c *gin.Context) {
 // @Param request body dto.OperateByID true "request"
 // @Success 200 {array} string
 // @Security ApiKeyAuth
-// @Router /settings/backup/search/files [post]
+// @Router /backup/search/files [post]
 func (b *BaseApi) LoadFilesFromBackup(c *gin.Context) {
 	var req dto.OperateByID
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -147,7 +147,7 @@ func (b *BaseApi) LoadFilesFromBackup(c *gin.Context) {
 // @Param request body dto.CommonBackup true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /settings/backup/backup [post]
+// @Router /backup/backup [post]
 // @x-panel-log {"bodyKeys":["type","name","detailName"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"备份 [type] 数据 [name][detailName]","formatEN":"backup [type] data [name][detailName]"}
 func (b *BaseApi) Backup(c *gin.Context) {
 	var req dto.CommonBackup
@@ -192,7 +192,7 @@ func (b *BaseApi) Backup(c *gin.Context) {
 // @Param request body dto.CommonRecover true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /settings/backup/recover [post]
+// @Router /backup/recover [post]
 // @x-panel-log {"bodyKeys":["type","name","detailName","file"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"从 [file] 恢复 [type] 数据 [name][detailName]","formatEN":"recover [type] data [name][detailName] from [file]"}
 func (b *BaseApi) Recover(c *gin.Context) {
 	var req dto.CommonRecover
@@ -247,7 +247,7 @@ func (b *BaseApi) Recover(c *gin.Context) {
 // @Param request body dto.CommonRecover true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /settings/backup/recover/byupload [post]
+// @Router /backup/recover/byupload [post]
 // @x-panel-log {"bodyKeys":["type","name","detailName","file"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"从 [file] 恢复 [type] 数据 [name][detailName]","formatEN":"recover [type] data [name][detailName] from [file]"}
 func (b *BaseApi) RecoverByUpload(c *gin.Context) {
 	var req dto.CommonRecover
