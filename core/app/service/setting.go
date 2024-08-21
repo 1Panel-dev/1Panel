@@ -43,7 +43,7 @@ func NewISettingService() ISettingService {
 }
 
 func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
-	setting, err := settingRepo.GetList()
+	setting, err := settingRepo.List()
 	if err != nil {
 		return nil, constant.ErrRecordNotFound
 	}

@@ -20,7 +20,6 @@ type IDatabaseRepo interface {
 	Update(id uint, vars map[string]interface{}) error
 	Delete(ctx context.Context, opts ...DBOption) error
 	Get(opts ...DBOption) (model.Database, error)
-	WithByFrom(from string) DBOption
 	WithoutByFrom(from string) DBOption
 	WithAppInstallID(appInstallID uint) DBOption
 	WithTypeList(dbType string) DBOption
@@ -85,12 +84,6 @@ func (d *DatabaseRepo) GetList(opts ...DBOption) ([]model.Database, error) {
 		databases[i].Password = pass
 	}
 	return databases, nil
-}
-
-func (d *DatabaseRepo) WithByFrom(from string) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("`from` = ?", from)
-	}
 }
 
 func (d *DatabaseRepo) WithoutByFrom(from string) DBOption {

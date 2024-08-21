@@ -193,7 +193,7 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 			if err != nil {
 				return err
 			}
-			database, err = databaseRepo.Get(databaseRepo.WithAppInstallID(resourceApp.ID), commonRepo.WithByType(resource.Key), databaseRepo.WithByFrom(constant.AppResourceLocal), commonRepo.WithByName(resourceApp.Name))
+			database, err = databaseRepo.Get(databaseRepo.WithAppInstallID(resourceApp.ID), commonRepo.WithByType(resource.Key), commonRepo.WithByFrom(constant.AppResourceLocal), commonRepo.WithByName(resourceApp.Name))
 			if err != nil {
 				return err
 			}

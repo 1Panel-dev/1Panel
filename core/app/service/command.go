@@ -24,7 +24,7 @@ func NewICommandService() ICommandService {
 }
 
 func (u *CommandService) List(req dto.OperateByType) ([]dto.CommandInfo, error) {
-	commands, err := commandRepo.GetList(commonRepo.WithOrderBy("name"), commonRepo.WithByType(req.Type))
+	commands, err := commandRepo.List(commonRepo.WithOrderBy("name"), commonRepo.WithByType(req.Type))
 	if err != nil {
 		return nil, constant.ErrRecordNotFound
 	}
@@ -40,7 +40,7 @@ func (u *CommandService) List(req dto.OperateByType) ([]dto.CommandInfo, error) 
 }
 
 func (u *CommandService) SearchForTree(req dto.OperateByType) ([]dto.CommandTree, error) {
-	cmdList, err := commandRepo.GetList(commonRepo.WithOrderBy("name"), commonRepo.WithByType(req.Type))
+	cmdList, err := commandRepo.List(commonRepo.WithOrderBy("name"), commonRepo.WithByType(req.Type))
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +71,7 @@ func (u *CommandService) SearchWithPage(req dto.SearchCommandWithPage) (int64, i
 		commonRepo.WithByType(req.Type),
 	}
 	if len(req.Info) != 0 {
-		options = append(options, commandRepo.WithLikeName(req.Info))
+		options = append(options, commonRepo.WithLikeName(req.Info))
 	}
 	if req.GroupID != 0 {
 		options = append(options, groupRepo.WithByGroupID(req.GroupID))

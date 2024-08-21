@@ -1,11 +1,8 @@
 ErrInvalidParams: "Request parameter error: {{ .detail }}"
-ErrInitialPassword: "Initial password error"
 ErrInternalServer: "Service internal error: {{ .detail }}"
 ErrRecordExist: "Record already exists"
 ErrRecordNotFound: "Records not found"
 ErrStructTransform: "Type conversion failure: {{ .detail }}"
-ErrNotLogin: "User is not Login: {{ .detail }}"
-ErrPasswordExpired: "The current password has expired: {{ .detail }}"
 ErrNotSupportType: "The system does not support the current type: {{ .detail }}"
 
 #common
@@ -18,7 +15,6 @@ TYPE_APP: "Application"
 TYPE_RUNTIME: "Runtime environment"
 TYPE_DOMAIN: "Domain name"
 ErrTypePort: 'Port {{ .name }} format error'
-ErrTypePortRange: 'Port range needs to be between 1-65535'
 Success: "Success"
 Failed: "Failed"
 SystemRestart: "System restart causes task interruption"
@@ -167,7 +163,6 @@ ErrUserFindErr: "Failed to find user {{ .name }} {{ .err }}"
 ErrFirewall: "No firewalld or ufw service is detected. Please check and try again!"
 
 #cronjob
-ErrBashExecute: "Script execution error, please check the specific information in the task output text area."
 ErrCutWebsiteLog: "{{ .name }} website log cutting failed, error {{ .err }}"
 CutWebsiteLogSuccess: "{{ .name }} website log cut successfully, backup path {{ .path }}"
 

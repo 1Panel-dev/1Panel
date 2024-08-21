@@ -38,23 +38,6 @@
                 </template>
             </el-table-column>
 
-            <el-table-column :label="$t('commons.table.status')" prop="status" :min-width="60">
-                <template #default="{ row }">
-                    <el-button
-                        v-if="row.status === 'Enable'"
-                        @click="onChangeStatus(row.id, 'disable')"
-                        link
-                        icon="VideoPlay"
-                        type="success"
-                    >
-                        {{ $t('commons.status.enabled') }}
-                    </el-button>
-                    <el-button v-else icon="VideoPause" link type="danger" @click="onChangeStatus(row.id, 'enable')">
-                        {{ $t('commons.status.disabled') }}
-                    </el-button>
-                </template>
-            </el-table-column>
-
             <el-table-column :label="$t('commons.table.operate')">
                 <template #default="{ row, $index }">
                     <div>
@@ -152,18 +135,6 @@ const setDefault = (group: Group.GroupInfo) => {
     group.type = type.value;
     UpdateGroup(group).then(() => {
         MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
-        search();
-    });
-};
-
-const onChangeStatus = async (row: any, status: string) => {
-    ElMessageBox.confirm(i18n.global.t('cronjob.' + status + 'Msg'), i18n.global.t('cronjob.changeStatus'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-    }).then(async () => {
-        row.status = status === 'enable' ? 'Enable' : 'Disable';
-        await UpdateGroup(row);
-        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         search();
     });
 };

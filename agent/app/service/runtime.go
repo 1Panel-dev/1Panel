@@ -56,7 +56,7 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 		opts []repo.DBOption
 	)
 	if create.Name != "" {
-		opts = append(opts, commonRepo.WithLikeName(create.Name))
+		opts = append(opts, commonRepo.WithByLikeName(create.Name))
 	}
 	if create.Type != "" {
 		opts = append(opts, commonRepo.WithByType(create.Type))
@@ -151,7 +151,7 @@ func (r *RuntimeService) Page(req request.RuntimeSearch) (int64, []response.Runt
 		res  []response.RuntimeDTO
 	)
 	if req.Name != "" {
-		opts = append(opts, commonRepo.WithLikeName(req.Name))
+		opts = append(opts, commonRepo.WithByLikeName(req.Name))
 	}
 	if req.Status != "" {
 		opts = append(opts, runtimeRepo.WithStatus(req.Status))

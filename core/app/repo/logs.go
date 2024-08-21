@@ -13,13 +13,14 @@ type ILogRepo interface {
 	CreateLoginLog(user *model.LoginLog) error
 	PageLoginLog(limit, offset int, opts ...DBOption) (int64, []model.LoginLog, error)
 
+	CleanOperation() error
+	CreateOperationLog(user *model.OperationLog) error
+	PageOperationLog(limit, offset int, opts ...DBOption) (int64, []model.OperationLog, error)
+
 	WithByIP(ip string) DBOption
 	WithByStatus(status string) DBOption
 	WithByGroup(group string) DBOption
 	WithByLikeOperation(operation string) DBOption
-	CleanOperation() error
-	CreateOperationLog(user *model.OperationLog) error
-	PageOperationLog(limit, offset int, opts ...DBOption) (int64, []model.OperationLog, error)
 }
 
 func NewILogRepo() ILogRepo {

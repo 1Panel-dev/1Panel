@@ -143,7 +143,7 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 			for _, domain := range domains {
 				websiteIds = append(websiteIds, domain.WebsiteID)
 			}
-			opts = append(opts, websiteRepo.WithIDs(websiteIds))
+			opts = append(opts, commonRepo.WithByIDs(websiteIds))
 		} else {
 			opts = append(opts, websiteRepo.WithDomainLike(req.Name))
 		}
@@ -298,8 +298,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			dbConfig := create.DataBaseConfig
 			switch database.Type {
 			case constant.AppPostgresql, constant.AppPostgres:
-				iPostgresqlRepo := repo.NewIPostgresqlRepo()
-				oldPostgresqlDb, _ := iPostgresqlRepo.Get(commonRepo.WithByName(create.DbName), iPostgresqlRepo.WithByFrom(constant.ResourceLocal))
+				oldPostgresqlDb, _ := postgresqlRepo.Get(commonRepo.WithByName(create.DbName), commonRepo.WithByFrom(constant.ResourceLocal))
 				if oldPostgresqlDb.ID > 0 {
 					return buserr.New(constant.ErrDbUserNotValid)
 				}
@@ -318,8 +317,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 				website.DbID = pgDB.ID
 				website.DbType = database.Type
 			case constant.AppMysql, constant.AppMariaDB:
-				iMysqlRepo := repo.NewIMysqlRepo()
-				oldMysqlDb, _ := iMysqlRepo.Get(commonRepo.WithByName(dbConfig.DbName), iMysqlRepo.WithByFrom(constant.ResourceLocal))
+				oldMysqlDb, _ := mysqlRepo.Get(commonRepo.WithByName(dbConfig.DbName), commonRepo.WithByFrom(constant.ResourceLocal))
 				if oldMysqlDb.ID > 0 {
 					return buserr.New(constant.ErrDbUserNotValid)
 				}
@@ -520,7 +518,7 @@ func (w WebsiteService) OpWebsite(req request.WebsiteOp) error {
 func (w WebsiteService) GetWebsiteOptions(req request.WebsiteOptionReq) ([]response.WebsiteOption, error) {
 	var options []repo.DBOption
 	if len(req.Types) > 0 {
-		options = append(options, websiteRepo.WithTypes(req.Types))
+		options = append(options, commonRepo.WithTypes(req.Types))
 	}
 	webs, _ := websiteRepo.List(options...)
 	var datas []response.WebsiteOption
@@ -1170,7 +1168,7 @@ func (w WebsiteService) PreInstallCheck(req request.WebsiteInstallCheckReq) ([]r
 		checkIds = append(req.InstallIds, appInstall.ID)
 	}
 	if len(checkIds) > 0 {
-		installList, _ := appInstallRepo.ListBy(commonRepo.WithIdsIn(checkIds))
+		installList, _ := appInstallRepo.ListBy(commonRepo.WithByIDs(checkIds))
 		for _, install := range installList {
 			if err = syncAppInstallStatus(&install, false); err != nil {
 				return nil, err
@@ -2200,6 +2198,9 @@ func (w WebsiteService) GetPathAuthBasics(req request.NginxAuthReq) (res []respo
 			pathAuth.Path = location.Match
 			passPath := path.Join(passDir, fmt.Sprintf("%s.pass", name))
 			authContent, err = fileOp.GetContent(passPath)
+			if err != nil {
+				return nil, err
+			}
 			authArray := strings.Split(string(authContent), "\n")
 			for _, line := range authArray {
 				if line == "" {

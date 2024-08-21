@@ -33,7 +33,6 @@ import (
 	"github.com/subosito/gotenv"
 	"gopkg.in/yaml.v3"
 
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/utils/env"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
@@ -256,8 +255,7 @@ func createLink(ctx context.Context, installTask *task.Task, app model.App, appI
 			if dbConfig.DbName != "" && dbConfig.DbUser != "" && dbConfig.Password != "" {
 				switch database.Type {
 				case constant.AppPostgresql, constant.AppPostgres:
-					iPostgresqlRepo := repo.NewIPostgresqlRepo()
-					oldPostgresqlDb, _ := iPostgresqlRepo.Get(commonRepo.WithByName(dbConfig.DbName), iPostgresqlRepo.WithByFrom(constant.ResourceLocal))
+					oldPostgresqlDb, _ := postgresqlRepo.Get(commonRepo.WithByName(dbConfig.DbName), commonRepo.WithByFrom(constant.ResourceLocal))
 					resourceId = oldPostgresqlDb.ID
 					if oldPostgresqlDb.ID > 0 {
 						if oldPostgresqlDb.Username != dbConfig.DbUser || oldPostgresqlDb.Password != dbConfig.Password {
@@ -279,8 +277,7 @@ func createLink(ctx context.Context, installTask *task.Task, app model.App, appI
 						resourceId = pgdb.ID
 					}
 				case constant.AppMysql, constant.AppMariaDB:
-					iMysqlRepo := repo.NewIMysqlRepo()
-					oldMysqlDb, _ := iMysqlRepo.Get(commonRepo.WithByName(dbConfig.DbName), iMysqlRepo.WithByFrom(constant.ResourceLocal))
+					oldMysqlDb, _ := mysqlRepo.Get(commonRepo.WithByName(dbConfig.DbName), commonRepo.WithByFrom(constant.ResourceLocal))
 					resourceId = oldMysqlDb.ID
 					if oldMysqlDb.ID > 0 {
 						if oldMysqlDb.Username != dbConfig.DbUser || oldMysqlDb.Password != dbConfig.Password {
@@ -432,7 +429,7 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 			_ = postgresqlRepo.Delete(ctx, postgresqlRepo.WithByPostgresqlName(install.Name))
 		}
 
-		_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("app"), commonRepo.WithByName(install.App.Key), backupRepo.WithByDetailName(install.Name))
+		_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("app"), commonRepo.WithByName(install.App.Key), commonRepo.WithByDetailName(install.Name))
 		uploadDir := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/uploads/app/%s/%s", install.App.Key, install.Name))
 		if _, err := os.Stat(uploadDir); err == nil {
 			_ = os.RemoveAll(uploadDir)

@@ -55,7 +55,7 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 	var opts []repo.DBOption
 	opts = append(opts, appRepo.OrderByRecommend())
 	if req.Name != "" {
-		opts = append(opts, appRepo.WithLikeName(req.Name))
+		opts = append(opts, appRepo.WithByLikeName(req.Name))
 	}
 	if req.Type != "" {
 		opts = append(opts, appRepo.WithType(req.Type))
@@ -83,7 +83,7 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 		for _, t := range appTags {
 			appIds = append(appIds, t.AppId)
 		}
-		opts = append(opts, commonRepo.WithIdsIn(appIds))
+		opts = append(opts, commonRepo.WithByIDs(appIds))
 	}
 	var res response.AppRes
 	total, apps, err := appRepo.Page(req.Page, req.PageSize, opts...)

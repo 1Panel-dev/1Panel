@@ -295,7 +295,7 @@ func (u *CronjobService) removeExpiredBackup(cronjob model.Cronjob, accountMap m
 	if record.ID != 0 {
 		opts = append(opts, commonRepo.WithByType(record.Type))
 		opts = append(opts, commonRepo.WithByName(record.Name))
-		opts = append(opts, backupRepo.WithByDetailName(record.DetailName))
+		opts = append(opts, commonRepo.WithByDetailName(record.DetailName))
 	}
 	records, _ := backupRepo.ListRecord(opts...)
 	if len(records) <= int(cronjob.RetainCopies) {

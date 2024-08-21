@@ -18,7 +18,6 @@ var (
 	ErrRecordExist     = errors.New("ErrRecordExist")
 	ErrRecordNotFound  = errors.New("ErrRecordNotFound")
 	ErrStructTransform = errors.New("ErrStructTransform")
-	ErrInitialPassword = errors.New("ErrInitialPassword")
 	ErrNotSupportType  = errors.New("ErrNotSupportType")
 	ErrInvalidParams   = errors.New("ErrInvalidParams")
 )
@@ -130,11 +129,6 @@ var (
 
 var (
 	ErrFirewall = "ErrFirewall"
-)
-
-// cronjob
-var (
-	ErrBashExecute = "ErrBashExecute"
 )
 
 var (

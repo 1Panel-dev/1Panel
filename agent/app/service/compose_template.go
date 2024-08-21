@@ -38,7 +38,7 @@ func (u *ComposeTemplateService) List() ([]dto.ComposeTemplateInfo, error) {
 }
 
 func (u *ComposeTemplateService) SearchWithPage(req dto.SearchWithPage) (int64, interface{}, error) {
-	total, composes, err := composeRepo.Page(req.Page, req.PageSize, commonRepo.WithLikeName(req.Info))
+	total, composes, err := composeRepo.Page(req.Page, req.PageSize, commonRepo.WithByLikeName(req.Info))
 	var dtoComposeTemplates []dto.ComposeTemplateInfo
 	for _, compose := range composes {
 		var item dto.ComposeTemplateInfo
@@ -72,7 +72,7 @@ func (u *ComposeTemplateService) Delete(ids []uint) error {
 		}
 		return composeRepo.Delete(commonRepo.WithByID(ids[0]))
 	}
-	return composeRepo.Delete(commonRepo.WithIdsIn(ids))
+	return composeRepo.Delete(commonRepo.WithByIDs(ids))
 }
 
 func (u *ComposeTemplateService) Update(id uint, upMap map[string]interface{}) error {

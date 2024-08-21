@@ -153,7 +153,7 @@ func (u *HostService) GetHostInfo(id uint) (*model.Host, error) {
 func (u *HostService) SearchWithPage(req dto.SearchHostWithPage) (int64, interface{}, error) {
 	var options []repo.DBOption
 	if len(req.Info) != 0 {
-		options = append(options, commandRepo.WithLikeName(req.Info))
+		options = append(options, commonRepo.WithLikeName(req.Info))
 	}
 	if req.GroupID != 0 {
 		options = append(options, groupRepo.WithByGroupID(req.GroupID))
