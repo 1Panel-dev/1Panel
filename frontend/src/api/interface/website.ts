@@ -32,6 +32,7 @@ export namespace Website {
         sitePath: string;
         appName: string;
         runtimeName: string;
+        runtimeType: string;
     }
     export interface WebsiteRes extends CommonModel {
         protocol: string;
