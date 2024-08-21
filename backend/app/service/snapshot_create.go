@@ -232,6 +232,7 @@ func handleSnapTar(sourceDir, targetDir, name, exclusionRules string, secret str
 	exStr := ""
 	excludes := strings.Split(exclusionRules, ";")
 	excludes = append(excludes, "*.sock")
+	excludes = append(excludes, "*.socket")
 	for _, exclude := range excludes {
 		if len(exclude) == 0 {
 			continue
