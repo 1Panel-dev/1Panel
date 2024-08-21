@@ -87,6 +87,7 @@ const acceptParams = async (website: Website.WebsiteDTO) => {
         deleteBackup: false,
         forceDelete: false,
     };
+    runtimeApp.value = false;
     if (website.type === 'runtime' && website.appInstallId > 0 && website.runtimeType == 'php') {
         runtimeApp.value = true;
         deleteReq.value.deleteApp = true;
