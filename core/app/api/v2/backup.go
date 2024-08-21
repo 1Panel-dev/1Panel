@@ -179,32 +179,3 @@ func (b *BaseApi) GetLocalDir(c *gin.Context) {
 
 	helper.SuccessWithData(c, dir)
 }
-
-func (b *BaseApi) GetBackup(c *gin.Context) {
-	var req dto.OperateByID
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	data, err := backupService.Get(req)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-
-	helper.SuccessWithData(c, data)
-}
-func (b *BaseApi) ListBackup(c *gin.Context) {
-	var req dto.OperateByIDs
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	list, err := backupService.List(req)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-
-	helper.SuccessWithData(c, list)
-}

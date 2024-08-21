@@ -1,7 +1,6 @@
 package migrations
 
 import (
-	"encoding/json"
 	"os"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
@@ -10,7 +9,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
-	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
+	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 
 	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/gorm"
@@ -73,51 +72,16 @@ var AddMonitorTable = &gormigrate.Migration{
 var InitSetting = &gormigrate.Migration{
 	ID: "20240722-init-setting",
 	Migrate: func(tx *gorm.DB) error {
-		encryptKey := common.RandStr(16)
-		global.CONF.System.EncryptKey = encryptKey
-		if err := tx.Create(&model.Setting{Key: "EncryptKey", Value: encryptKey}).Error; err != nil {
+		global.CONF.System.EncryptKey = common.RandStr(16)
+		isMaster, currentNode, err := xpack.InitNodeData(tx)
+		if err != nil {
 			return err
 		}
-		currentNode := ""
-		if _, err := os.Stat("/opt/1panel/nodeJson"); err == nil {
-			type nodeInfo struct {
-				MasterAddr  string `json:"masterAddr"`
-				Token       string `json:"token"`
-				ServerCrt   string `json:"serverCrt"`
-				ServerKey   string `json:"serverKey"`
-				CurrentNode string `json:"currentNode"`
-			}
-			nodeJson, err := os.ReadFile("/opt/1panel/nodeJson")
-			if err != nil {
-				return err
-			}
-			var node nodeInfo
-			if err := json.Unmarshal(nodeJson, &node); err != nil {
-				return err
-			}
-			itemKey, _ := encrypt.StringEncryptWithBase64(node.ServerKey)
-			if err := tx.Create(&model.Setting{Key: "ServerKey", Value: itemKey}).Error; err != nil {
-				return err
-			}
-			itemCrt, _ := encrypt.StringEncryptWithBase64(node.ServerCrt)
-			if err := tx.Create(&model.Setting{Key: "ServerCrt", Value: itemCrt}).Error; err != nil {
-				return err
-			}
-			itemToken, _ := encrypt.StringEncryptWithBase64(node.Token)
-			if err := tx.Create(&model.Setting{Key: "Token", Value: itemToken}).Error; err != nil {
-				return err
-			}
-			if err := tx.Create(&model.Setting{Key: "MasterAddr", Value: node.MasterAddr}).Error; err != nil {
-				return err
-			}
-			global.CONF.System.MasterAddr = node.MasterAddr
-			global.CONF.System.MasterToken = itemToken
-			global.IsMaster = false
-			currentNode = node.CurrentNode
-		} else {
-			global.IsMaster = true
-		}
+		global.IsMaster = isMaster
 		if err := tx.Create(&model.Setting{Key: "CurrentNode", Value: currentNode}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "EncryptKey", Value: global.CONF.System.EncryptKey}).Error; err != nil {
 			return err
 		}
 

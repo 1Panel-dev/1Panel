@@ -6,13 +6,11 @@ import (
 
 	"github.com/1Panel-dev/1Panel/cmd/server/docs"
 	"github.com/1Panel-dev/1Panel/cmd/server/web"
-	"github.com/1Panel-dev/1Panel/core/app/dto"
-	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/i18n"
 	"github.com/1Panel-dev/1Panel/core/middleware"
-	"github.com/1Panel-dev/1Panel/core/router"
 	rou "github.com/1Panel-dev/1Panel/core/router"
+	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
@@ -54,12 +52,7 @@ func Routers() *gin.Engine {
 	}
 
 	agentRouter := Router.Group("/api/v2/agent")
-	agentRouter.Use(middleware.JwtAuth())
-	var agent router.AgentRouter
-	agent.InitRouter(agentRouter)
-	agentRouter.GET("/health", func(c *gin.Context) {
-		c.JSON(200, dto.Response{Code: constant.CodeSuccess, Data: "ok"})
-	})
+	xpack.InitAgentRouter(agentRouter)
 
 	Router.Use(middleware.OperationLog())
 	if global.CONF.System.IsDemo {

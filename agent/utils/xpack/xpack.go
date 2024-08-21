@@ -4,6 +4,7 @@ package xpack
 
 import (
 	"crypto/tls"
+	"io"
 	"net"
 	"net/http"
 	"time"
@@ -11,6 +12,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
+	"gorm.io/gorm"
 )
 
 func RemoveTamper(website string) {}
@@ -34,4 +36,10 @@ func LoadGpuInfo() []interface{} {
 
 func StartClam(startClam model.Clam, isUpdate bool) (int, error) {
 	return 0, buserr.New(constant.ErrXpackNotFound)
+}
+
+func InitNodeData(tx *gorm.DB) (bool, string, error) { return true, "127.0.0.1", nil }
+
+func RequestToMaster(reqUrl, reqMethod string, reqBody io.Reader) (interface{}, error) {
+	return nil, nil
 }

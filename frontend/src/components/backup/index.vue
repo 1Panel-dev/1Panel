@@ -101,9 +101,15 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import { computeSize, dateFormat, downloadFile } from '@/utils/util';
-import { getLocalBackupDir, handleBackup, handleRecover } from '@/api/modules/setting';
+import {
+    getLocalBackupDir,
+    handleBackup,
+    handleRecover,
+    deleteBackupRecord,
+    downloadBackupRecord,
+    searchBackupRecords,
+} from '@/api/modules/backup';
 import i18n from '@/lang';
-import { deleteBackupRecord, downloadBackupRecord, searchBackupRecords } from '@/api/modules/setting';
 import { Backup } from '@/api/interface/backup';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';

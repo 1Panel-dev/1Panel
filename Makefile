@@ -44,6 +44,10 @@ build_agent_xpack_on_darwin:
 	cd $(AGENT_PATH) \
     && GOOS=linux GOARCH=amd64 $(GOBUILD) -tags=xpack -trimpath -ldflags '-s -w'  -o $(BUILD_PATH)/$(AGENT_NAME) $(AGENT_MAIN)
 
+build_agent_xpack_on_linux:
+	cd $(AGENT_PATH) \
+    && GOOS=$(GOOS) GOARCH=$(GOARCH) $(GOBUILD) -tags=xpack -trimpath -ldflags '-s -w' -o $(BUILD_PATH)/$(AGENT_NAME) $(AGENT_MAIN)
+
 build_all: build_frontend build_core_on_linux build_agent_on_linux
 
 build_on_local: clean_assets build_frontend build_core_on_darwin build_agent_on_darwin upx_bin

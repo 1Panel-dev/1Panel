@@ -45,6 +45,13 @@ func StringEncrypt(text string) (string, error) {
 		global.CONF.System.EncryptKey = encryptSetting.Value
 	}
 	key := global.CONF.System.EncryptKey
+	return StringEncryptWithKey(text, key)
+}
+
+func StringEncryptWithKey(text, key string) (string, error) {
+	if len(text) == 0 || len(key) == 0 {
+		return "", nil
+	}
 	pass := []byte(text)
 	xpass, err := aesEncryptWithSalt([]byte(key), pass)
 	if err == nil {
@@ -66,6 +73,13 @@ func StringDecrypt(text string) (string, error) {
 		global.CONF.System.EncryptKey = encryptSetting.Value
 	}
 	key := global.CONF.System.EncryptKey
+	return StringDecryptWithKey(text, key)
+}
+
+func StringDecryptWithKey(text, key string) (string, error) {
+	if len(text) == 0 {
+		return "", nil
+	}
 	bytesPass, err := base64.StdEncoding.DecodeString(text)
 	if err != nil {
 		return "", err

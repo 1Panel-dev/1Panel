@@ -116,7 +116,7 @@
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { Database } from '@/api/interface/database';
 import { redisPersistenceConf, updateRedisPersistenceConf } from '@/api/modules/database';
-import { deleteBackupRecord, handleBackup, handleRecover, searchBackupRecords } from '@/api/modules/setting';
+import { deleteBackupRecord, handleBackup, handleRecover, searchBackupRecords } from '@/api/modules/backup';
 import { Rules } from '@/global/form-rules';
 import { dateFormat } from '@/utils/util';
 import i18n from '@/lang';
@@ -205,7 +205,7 @@ const onBackup = async () => {
 };
 const onRecover = async () => {
     let param = {
-        source: currentRow.value.source,
+        downloadAccountID: currentRow.value.source,
         type: 'redis',
         name: database.value,
         detailName: '',

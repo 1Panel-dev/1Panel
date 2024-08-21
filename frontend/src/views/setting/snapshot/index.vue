@@ -191,7 +191,7 @@ import IgnoreRule from '@/views/setting/snapshot/ignore-rule/index.vue';
 import SnapStatus from '@/views/setting/snapshot/snap_status/index.vue';
 import RecoverStatus from '@/views/setting/snapshot/status/index.vue';
 import SnapshotImport from '@/views/setting/snapshot/import/index.vue';
-import { getBackupList } from '@/api/modules/setting';
+import { getBackupList } from '@/api/modules/backup';
 import { MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);

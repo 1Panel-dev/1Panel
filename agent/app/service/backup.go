@@ -21,7 +21,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cloud_storage"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
-	httpUtils "github.com/1Panel-dev/1Panel/agent/utils/http"
+	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 )
@@ -277,7 +277,7 @@ func NewBackupClientWithID(id uint) (*model.BackupAccount, cloud_storage.CloudSt
 		if err != nil {
 			return nil, nil, err
 		}
-		data, err := httpUtils.RequestToMaster("/api/v2/agent/backup", http.MethodPost, bytes.NewReader(bodyItem))
+		data, err := xpack.RequestToMaster("/api/v2/agent/backup", http.MethodPost, bytes.NewReader(bodyItem))
 		if err != nil {
 			return nil, nil, err
 		}
@@ -342,7 +342,7 @@ func NewBackupClientMap(ids []string) (map[string]backupClientHelper, error) {
 		if err != nil {
 			return nil, err
 		}
-		data, err := httpUtils.RequestToMaster("/api/v2/agent/backup/list", http.MethodPost, bytes.NewReader(bodyItem))
+		data, err := xpack.RequestToMaster("/api/v2/agent/backup/list", http.MethodPost, bytes.NewReader(bodyItem))
 		if err != nil {
 			return nil, err
 		}

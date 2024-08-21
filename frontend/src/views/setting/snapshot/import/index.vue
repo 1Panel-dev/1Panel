@@ -46,7 +46,7 @@ import { reactive, ref } from 'vue';
 import { FormInstance } from 'element-plus';
 import i18n from '@/lang';
 import { snapshotImport } from '@/api/modules/setting';
-import { getBackupList, getFilesFromBackup } from '@/api/modules/setting';
+import { getBackupList, getFilesFromBackup } from '@/api/modules/backup';
 import { Rules } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';
 import router from '@/routers';
@@ -125,13 +125,7 @@ const loadBackups = async () => {
             loading.value = false;
             backupOptions.value = [];
             for (const item of res.data) {
-                if (item.id !== 0) {
-                    backupOptions.value.push({ label: i18n.global.t('setting.' + item.type), value: item.type });
-                }
-                if (item.type === 'LOCAL') {
-                    item.varsJson = JSON.parse(item.vars);
-                    backupPath.value = item.varsJson['dir'] + '/system_snapshot';
-                }
+                backupOptions.value.push({ label: i18n.global.t('setting.' + item.type), value: item.type });
             }
         })
         .catch(() => {
