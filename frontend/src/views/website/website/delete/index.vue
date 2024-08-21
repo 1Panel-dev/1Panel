@@ -87,7 +87,7 @@ const handleClose = () => {
     em('close', false);
 };
 
-const acceptParams = async (website: Website.Website) => {
+const acceptParams = async (website: Website.WebsiteDTO) => {
     deleteReq.value = {
         id: 0,
         deleteApp: false,

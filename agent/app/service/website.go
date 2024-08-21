@@ -159,6 +159,7 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 		var (
 			appName      string
 			runtimeName  string
+			runtimeType  string
 			appInstallID uint
 		)
 		switch web.Type {
@@ -175,6 +176,7 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 				return 0, nil, err
 			}
 			runtimeName = runtime.Name
+			runtimeType = runtime.Type
 			appInstallID = runtime.ID
 		}
 		sitePath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "www", "sites", web.Alias)
@@ -195,6 +197,7 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 			RuntimeName:   runtimeName,
 			SitePath:      sitePath,
 			AppInstallID:  appInstallID,
+			RuntimeType:   runtimeType,
 		}
 
 		sites, _ := websiteRepo.List(websiteRepo.WithParentID(web.ID))

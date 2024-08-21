@@ -255,7 +255,7 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 	case constant.Rebuild:
 		return rebuildApp(install)
 	case constant.Start:
-		out, err := compose.Start(dockerComposePath)
+		out, err := compose.Up(dockerComposePath)
 		if err != nil {
 			return handleErr(install, err, out)
 		}

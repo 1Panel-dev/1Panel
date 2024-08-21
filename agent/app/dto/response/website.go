@@ -33,6 +33,7 @@ type WebsiteRes struct {
 	SSLStatus     string    `json:"sslStatus"`
 	AppInstallID  uint      `json:"appInstallId"`
 	ChildSites    []string  `json:"childSites"`
+	RuntimeType   string    `json:"runtimeType"`
 }
 
 type WebsiteOption struct {

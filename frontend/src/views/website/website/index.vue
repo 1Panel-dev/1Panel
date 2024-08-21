@@ -188,6 +188,7 @@
                             <el-tag v-if="row.protocol == 'HTTPS'" :type="row.sslStatus">
                                 {{ dateFormatSimple(row.sslExpireDate) }}
                             </el-tag>
+                            <span v-else></span>
                         </template>
                     </el-table-column>
                     <fu-table-operations
