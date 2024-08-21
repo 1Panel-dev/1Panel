@@ -20,10 +20,10 @@ func (u *TaskLogService) Page(req dto.SearchTaskLogReq) (int64, []dto.TaskDTO, e
 		commonRepo.WithOrderBy("created_at desc"),
 	}
 	if req.Status != "" {
-		opts = append(opts, taskRepo.WithStatus(req.Status))
+		opts = append(opts, commonRepo.WithByStatus(req.Status))
 	}
 	if req.Type != "" {
-		opts = append(opts, taskRepo.WithType(req.Type))
+		opts = append(opts, commonRepo.WithByType(req.Type))
 	}
 
 	total, tasks, err := taskRepo.Page(

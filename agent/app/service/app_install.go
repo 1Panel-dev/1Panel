@@ -87,7 +87,7 @@ func (a *AppInstallService) Page(req request.AppInstalledSearch) (int64, []respo
 	)
 
 	if req.Name != "" {
-		opts = append(opts, commonRepo.WithLikeName(req.Name))
+		opts = append(opts, commonRepo.WithByLikeName(req.Name))
 	}
 
 	if len(req.Tags) != 0 {

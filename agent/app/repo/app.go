@@ -17,7 +17,7 @@ type IAppRepo interface {
 	OrderByRecommend() DBOption
 	GetRecommend() DBOption
 	WithResource(resource string) DBOption
-	WithLikeName(name string) DBOption
+	WithByLikeName(name string) DBOption
 	Page(page, size int, opts ...DBOption) (int64, []model.App, error)
 	GetFirst(opts ...DBOption) (model.App, error)
 	GetBy(opts ...DBOption) ([]model.App, error)
@@ -32,7 +32,7 @@ func NewIAppRepo() IAppRepo {
 	return &AppRepo{}
 }
 
-func (a AppRepo) WithLikeName(name string) DBOption {
+func (a AppRepo) WithByLikeName(name string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		if len(name) == 0 {
 			return g

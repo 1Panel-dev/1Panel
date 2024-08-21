@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"io"
 	"io/fs"
 	"os"
@@ -12,6 +11,8 @@ import (
 	"strings"
 	"time"
 	"unicode/utf8"
+
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
@@ -472,7 +473,7 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 		if req.TaskID != "" {
 			opts = append(opts, taskRepo.WithByID(req.TaskID))
 		} else {
-			opts = append(opts, taskRepo.WithType(req.TaskType), taskRepo.WithOperate(req.TaskOperate), taskRepo.WithResourceID(req.ID))
+			opts = append(opts, commonRepo.WithByType(req.TaskType), taskRepo.WithOperate(req.TaskOperate), taskRepo.WithResourceID(req.ID))
 		}
 		taskModel, err := taskRepo.GetFirst(opts...)
 		if err != nil {

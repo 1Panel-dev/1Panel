@@ -373,6 +373,7 @@ const acceptParams = (params: DialogProps): void => {
         dialogData.value.rowData.downloadAccountID = 1;
     }
     if (dialogData.value.rowData.sourceAccountIDs) {
+        dialogData.value.rowData.sourceAccounts = [];
         let itemIDs = dialogData.value.rowData.sourceAccountIDs.split(',');
         for (const item of itemIDs) {
             dialogData.value.rowData.sourceAccounts.push(Number(item));
@@ -628,7 +629,7 @@ const changeAccount = async () => {
             }
         }
         if (exist) {
-            if (item.value === dialogData.value.rowData.downloadAccountID) {
+            if (item.id === dialogData.value.rowData.downloadAccountID) {
                 isInAccounts = true;
             }
             accountOptions.value.push(item);

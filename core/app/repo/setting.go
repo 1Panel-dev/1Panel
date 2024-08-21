@@ -9,7 +9,7 @@ import (
 type SettingRepo struct{}
 
 type ISettingRepo interface {
-	GetList(opts ...DBOption) ([]model.Setting, error)
+	List(opts ...DBOption) ([]model.Setting, error)
 	Get(opts ...DBOption) (model.Setting, error)
 	Create(key, value string) error
 	Update(key, value string) error
@@ -20,7 +20,7 @@ func NewISettingRepo() ISettingRepo {
 	return &SettingRepo{}
 }
 
-func (u *SettingRepo) GetList(opts ...DBOption) ([]model.Setting, error) {
+func (u *SettingRepo) List(opts ...DBOption) ([]model.Setting, error) {
 	var settings []model.Setting
 	db := global.DB.Model(&model.Setting{})
 	for _, opt := range opts {

@@ -14,19 +14,22 @@ type DBOption func(*gorm.DB) *gorm.DB
 
 type ICommonRepo interface {
 	WithByID(id uint) DBOption
+	WithByIDs(ids []uint) DBOption
 	WithByName(name string) DBOption
+	WithByNames(names []string) DBOption
+	WithByLikeName(name string) DBOption
+	WithByDetailName(detailName string) DBOption
+
+	WithByFrom(from string) DBOption
 	WithByType(tp string) DBOption
+	WithTypes(types []string) DBOption
+	WithByStatus(status string) DBOption
+
 	WithOrderBy(orderStr string) DBOption
 	WithOrderRuleBy(orderBy, order string) DBOption
-	WithByGroupID(groupID uint) DBOption
-	WithLikeName(name string) DBOption
-	WithIdsIn(ids []uint) DBOption
-	WithNamesIn(names []string) DBOption
+
 	WithByDate(startTime, endTime time.Time) DBOption
 	WithByCreatedAt(startTime, endTime time.Time) DBOption
-	WithByStartDate(startTime time.Time) DBOption
-	WithByStatus(status string) DBOption
-	WithByFrom(from string) DBOption
 }
 
 type CommonRepo struct{}
@@ -40,10 +43,60 @@ func (c *CommonRepo) WithByID(id uint) DBOption {
 		return g.Where("id = ?", id)
 	}
 }
+func (c *CommonRepo) WithByIDs(ids []uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("id in (?)", ids)
+	}
+}
 
 func (c *CommonRepo) WithByName(name string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("name = ?", name)
+	}
+}
+func (c *CommonRepo) WithByNames(names []string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("name in (?)", names)
+	}
+}
+func (c *CommonRepo) WithByLikeName(name string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		if len(name) == 0 {
+			return g
+		}
+		return g.Where("name like ?", "%"+name+"%")
+	}
+}
+func (c *CommonRepo) WithByDetailName(detailName string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		if len(detailName) == 0 {
+			return g
+		}
+		return g.Where("detail_name = ?", detailName)
+	}
+}
+
+func (c *CommonRepo) WithByType(tp string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("type = ?", tp)
+	}
+}
+func (c *CommonRepo) WithTypes(types []string) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("type in (?)", types)
+	}
+}
+func (c *CommonRepo) WithByStatus(status string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		if len(status) == 0 {
+			return g
+		}
+		return g.Where("status = ?", status)
+	}
+}
+func (c *CommonRepo) WithByFrom(from string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("`from` = ?", from)
 	}
 }
 
@@ -59,57 +112,11 @@ func (c *CommonRepo) WithByCreatedAt(startTime, endTime time.Time) DBOption {
 	}
 }
 
-func (c *CommonRepo) WithByStartDate(startTime time.Time) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("start_time < ?", startTime)
-	}
-}
-
-func (c *CommonRepo) WithByType(tp string) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("type = ?", tp)
-	}
-}
-
-func (c *CommonRepo) WithByGroupID(groupID uint) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		if groupID == 0 {
-			return g
-		}
-		return g.Where("group_id = ?", groupID)
-	}
-}
-
-func (c *CommonRepo) WithByStatus(status string) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		if len(status) == 0 {
-			return g
-		}
-		return g.Where("status = ?", status)
-	}
-}
-
-func (c *CommonRepo) WithByFrom(from string) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("`from` = ?", from)
-	}
-}
-
-func (c *CommonRepo) WithLikeName(name string) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		if len(name) == 0 {
-			return g
-		}
-		return g.Where("name like ?", "%"+name+"%")
-	}
-}
-
 func (c *CommonRepo) WithOrderBy(orderStr string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Order(orderStr)
 	}
 }
-
 func (c *CommonRepo) WithOrderRuleBy(orderBy, order string) DBOption {
 	switch order {
 	case constant.OrderDesc:
@@ -122,24 +129,6 @@ func (c *CommonRepo) WithOrderRuleBy(orderBy, order string) DBOption {
 	}
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Order(fmt.Sprintf("%s %s", orderBy, order))
-	}
-}
-
-func (c *CommonRepo) WithNamesIn(names []string) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("name in (?)", names)
-	}
-}
-
-func (c *CommonRepo) WithIdsIn(ids []uint) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("id in (?)", ids)
-	}
-}
-
-func (c *CommonRepo) WithIdsNotIn(ids []uint) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("id not in (?)", ids)
 	}
 }
 

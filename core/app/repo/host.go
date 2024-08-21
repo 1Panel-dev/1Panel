@@ -12,14 +12,15 @@ type IHostRepo interface {
 	Get(opts ...DBOption) (model.Host, error)
 	GetList(opts ...DBOption) ([]model.Host, error)
 	Page(limit, offset int, opts ...DBOption) (int64, []model.Host, error)
-	WithByInfo(info string) DBOption
-	WithByPort(port uint) DBOption
-	WithByUser(user string) DBOption
-	WithByAddr(addr string) DBOption
 	Create(host *model.Host) error
 	Update(id uint, vars map[string]interface{}) error
 	UpdateGroup(group, newGroup uint) error
 	Delete(opts ...DBOption) error
+
+	WithByInfo(info string) DBOption
+	WithByPort(port uint) DBOption
+	WithByUser(user string) DBOption
+	WithByAddr(addr string) DBOption
 }
 
 func NewIHostRepo() IHostRepo {

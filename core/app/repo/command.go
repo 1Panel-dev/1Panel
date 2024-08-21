@@ -3,21 +3,18 @@ package repo
 import (
 	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/global"
-	"gorm.io/gorm"
 )
 
 type CommandRepo struct{}
 
 type ICommandRepo interface {
-	GetList(opts ...DBOption) ([]model.Command, error)
+	List(opts ...DBOption) ([]model.Command, error)
 	Page(limit, offset int, opts ...DBOption) (int64, []model.Command, error)
-	WithByInfo(info string) DBOption
 	Create(command *model.Command) error
 	Update(id uint, vars map[string]interface{}) error
 	UpdateGroup(group, newGroup uint) error
 	Delete(opts ...DBOption) error
 	Get(opts ...DBOption) (model.Command, error)
-	WithLikeName(name string) DBOption
 }
 
 func NewICommandRepo() ICommandRepo {
@@ -46,7 +43,7 @@ func (u *CommandRepo) Page(page, size int, opts ...DBOption) (int64, []model.Com
 	return count, users, err
 }
 
-func (u *CommandRepo) GetList(opts ...DBOption) ([]model.Command, error) {
+func (u *CommandRepo) List(opts ...DBOption) ([]model.Command, error) {
 	var commands []model.Command
 	db := global.DB.Model(&model.Command{})
 	for _, opt := range opts {
@@ -54,16 +51,6 @@ func (u *CommandRepo) GetList(opts ...DBOption) ([]model.Command, error) {
 	}
 	err := db.Find(&commands).Error
 	return commands, err
-}
-
-func (c *CommandRepo) WithByInfo(info string) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		if len(info) == 0 {
-			return g
-		}
-		infoStr := "%" + info + "%"
-		return g.Where("name LIKE ? OR addr LIKE ?", infoStr, infoStr)
-	}
 }
 
 func (u *CommandRepo) Create(command *model.Command) error {
@@ -83,13 +70,4 @@ func (u *CommandRepo) Delete(opts ...DBOption) error {
 		db = opt(db)
 	}
 	return db.Delete(&model.Command{}).Error
-}
-
-func (a CommandRepo) WithLikeName(name string) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		if len(name) == 0 {
-			return g
-		}
-		return g.Where("name like ? or command like ?", "%"+name+"%", "%"+name+"%")
-	}
 }

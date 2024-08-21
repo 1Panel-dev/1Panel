@@ -42,7 +42,7 @@ func NewIDatabaseService() IDatabaseService {
 func (u *DatabaseService) SearchWithPage(search dto.DatabaseSearch) (int64, interface{}, error) {
 	total, dbs, err := databaseRepo.Page(search.Page, search.PageSize,
 		databaseRepo.WithTypeList(search.Type),
-		commonRepo.WithLikeName(search.Info),
+		commonRepo.WithByLikeName(search.Info),
 		commonRepo.WithOrderRuleBy(search.OrderBy, search.Order),
 		databaseRepo.WithoutByFrom("local"),
 	)
@@ -215,7 +215,7 @@ func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
 
 func (u *DatabaseService) DeleteCheck(id uint) ([]string, error) {
 	var appInUsed []string
-	apps, _ := appInstallResourceRepo.GetBy(databaseRepo.WithByFrom("remote"), appInstallResourceRepo.WithLinkId(id))
+	apps, _ := appInstallResourceRepo.GetBy(commonRepo.WithByFrom("remote"), appInstallResourceRepo.WithLinkId(id))
 	for _, app := range apps {
 		appInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(app.AppInstallId))
 		if appInstall.ID != 0 {

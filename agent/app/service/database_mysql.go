@@ -55,7 +55,7 @@ func NewIMysqlService() IMysqlService {
 func (u *MysqlService) SearchWithPage(search dto.MysqlDBSearch) (int64, interface{}, error) {
 	total, mysqls, err := mysqlRepo.Page(search.Page, search.PageSize,
 		mysqlRepo.WithByMysqlName(search.Database),
-		commonRepo.WithLikeName(search.Info),
+		commonRepo.WithByLikeName(search.Info),
 		commonRepo.WithOrderRuleBy(search.OrderBy, search.Order),
 	)
 	var dtoMysqls []dto.MysqlDBInfo
@@ -101,7 +101,7 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 		return nil, buserr.New(constant.ErrCmdIllegal)
 	}
 
-	mysql, _ := mysqlRepo.Get(commonRepo.WithByName(req.Name), mysqlRepo.WithByMysqlName(req.Database), databaseRepo.WithByFrom(req.From))
+	mysql, _ := mysqlRepo.Get(commonRepo.WithByName(req.Name), mysqlRepo.WithByMysqlName(req.Database), commonRepo.WithByFrom(req.From))
 	if mysql.ID != 0 {
 		return nil, constant.ErrRecordExist
 	}
@@ -284,7 +284,7 @@ func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error 
 		if _, err := os.Stat(backupDir); err == nil {
 			_ = os.RemoveAll(backupDir)
 		}
-		_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType(req.Type), commonRepo.WithByName(req.Database), backupRepo.WithByDetailName(db.Name))
+		_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType(req.Type), commonRepo.WithByName(req.Database), commonRepo.WithByDetailName(db.Name))
 		global.LOG.Infof("delete database %s-%s backups successful", req.Database, db.Name)
 	}
 

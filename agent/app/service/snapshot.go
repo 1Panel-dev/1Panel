@@ -47,7 +47,7 @@ func NewISnapshotService() ISnapshotService {
 }
 
 func (u *SnapshotService) SearchWithPage(req dto.SearchWithPage) (int64, interface{}, error) {
-	total, systemBackups, err := snapshotRepo.Page(req.Page, req.PageSize, commonRepo.WithLikeName(req.Info))
+	total, systemBackups, err := snapshotRepo.Page(req.Page, req.PageSize, commonRepo.WithByLikeName(req.Info))
 	if err != nil {
 		return 0, nil, err
 	}
@@ -320,7 +320,7 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto
 }
 
 func (u *SnapshotService) Delete(req dto.SnapshotBatchDelete) error {
-	snaps, _ := snapshotRepo.GetList(commonRepo.WithIdsIn(req.Ids))
+	snaps, _ := snapshotRepo.GetList(commonRepo.WithByIDs(req.Ids))
 	for _, snap := range snaps {
 		if req.DeleteWithFile {
 			accounts, err := NewBackupClientMap(strings.Split(snap.SourceAccountIDs, ","))

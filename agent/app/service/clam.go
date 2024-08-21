@@ -126,7 +126,7 @@ func (c *ClamService) Operate(operate string) error {
 }
 
 func (c *ClamService) SearchWithPage(req dto.SearchClamWithPage) (int64, interface{}, error) {
-	total, commands, err := clamRepo.Page(req.Page, req.PageSize, commonRepo.WithLikeName(req.Info), commonRepo.WithOrderRuleBy(req.OrderBy, req.Order))
+	total, commands, err := clamRepo.Page(req.Page, req.PageSize, commonRepo.WithByLikeName(req.Info), commonRepo.WithOrderRuleBy(req.OrderBy, req.Order))
 	if err != nil {
 		return 0, nil, err
 	}

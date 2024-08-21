@@ -66,7 +66,7 @@ func (u *BackupService) SearchRecordsWithPage(search dto.RecordSearch) (int64, [
 		commonRepo.WithOrderBy("created_at desc"),
 		commonRepo.WithByName(search.Name),
 		commonRepo.WithByType(search.Type),
-		backupRepo.WithByDetailName(search.DetailName),
+		commonRepo.WithByDetailName(search.DetailName),
 	)
 	if err != nil {
 		return 0, nil, err
@@ -153,10 +153,10 @@ func (u *BackupService) DownloadRecord(info dto.DownloadRecord) (string, error) 
 
 func (u *BackupService) DeleteRecordByName(backupType, name, detailName string, withDeleteFile bool) error {
 	if !withDeleteFile {
-		return backupRepo.DeleteRecord(context.Background(), commonRepo.WithByType(backupType), commonRepo.WithByName(name), backupRepo.WithByDetailName(detailName))
+		return backupRepo.DeleteRecord(context.Background(), commonRepo.WithByType(backupType), commonRepo.WithByName(name), commonRepo.WithByDetailName(detailName))
 	}
 
-	records, err := backupRepo.ListRecord(commonRepo.WithByType(backupType), commonRepo.WithByName(name), backupRepo.WithByDetailName(detailName))
+	records, err := backupRepo.ListRecord(commonRepo.WithByType(backupType), commonRepo.WithByName(name), commonRepo.WithByDetailName(detailName))
 	if err != nil {
 		return err
 	}
@@ -176,7 +176,7 @@ func (u *BackupService) DeleteRecordByName(backupType, name, detailName string, 
 }
 
 func (u *BackupService) BatchDeleteRecord(ids []uint) error {
-	records, err := backupRepo.ListRecord(commonRepo.WithIdsIn(ids))
+	records, err := backupRepo.ListRecord(commonRepo.WithByIDs(ids))
 	if err != nil {
 		return err
 	}
@@ -190,7 +190,7 @@ func (u *BackupService) BatchDeleteRecord(ids []uint) error {
 			global.LOG.Errorf("remove file %s failed, err: %v", path.Join(record.FileDir, record.FileName), err)
 		}
 	}
-	return backupRepo.DeleteRecord(context.Background(), commonRepo.WithIdsIn(ids))
+	return backupRepo.DeleteRecord(context.Background(), commonRepo.WithByIDs(ids))
 }
 
 func (u *BackupService) ListFiles(req dto.OperateByID) []string {

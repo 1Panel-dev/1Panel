@@ -15,7 +15,6 @@ type MysqlRepo struct{}
 type IMysqlRepo interface {
 	Get(opts ...DBOption) (model.DatabaseMysql, error)
 	WithByMysqlName(mysqlName string) DBOption
-	WithByFrom(from string) DBOption
 	List(opts ...DBOption) ([]model.DatabaseMysql, error)
 	Page(limit, offset int, opts ...DBOption) (int64, []model.DatabaseMysql, error)
 	Create(ctx context.Context, mysql *model.DatabaseMysql) error
@@ -110,14 +109,5 @@ func (u *MysqlRepo) Update(id uint, vars map[string]interface{}) error {
 func (u *MysqlRepo) WithByMysqlName(mysqlName string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("mysql_name = ?", mysqlName)
-	}
-}
-
-func (u *MysqlRepo) WithByFrom(from string) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		if len(from) != 0 {
-			return g.Where("`from` = ?", from)
-		}
-		return g
 	}
 }

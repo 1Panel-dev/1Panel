@@ -43,7 +43,7 @@ func NewIPostgresqlService() IPostgresqlService {
 func (u *PostgresqlService) SearchWithPage(search dto.PostgresqlDBSearch) (int64, interface{}, error) {
 	total, postgresqls, err := postgresqlRepo.Page(search.Page, search.PageSize,
 		postgresqlRepo.WithByPostgresqlName(search.Database),
-		commonRepo.WithLikeName(search.Info),
+		commonRepo.WithByLikeName(search.Info),
 		commonRepo.WithOrderRuleBy(search.OrderBy, search.Order),
 	)
 	var dtoPostgresqls []dto.PostgresqlDBInfo
@@ -125,7 +125,7 @@ func (u *PostgresqlService) Create(ctx context.Context, req dto.PostgresqlDBCrea
 		return nil, buserr.New(constant.ErrCmdIllegal)
 	}
 
-	pgsql, _ := postgresqlRepo.Get(commonRepo.WithByName(req.Name), postgresqlRepo.WithByPostgresqlName(req.Database), databaseRepo.WithByFrom(req.From))
+	pgsql, _ := postgresqlRepo.Get(commonRepo.WithByName(req.Name), postgresqlRepo.WithByPostgresqlName(req.Database), commonRepo.WithByFrom(req.From))
 	if pgsql.ID != 0 {
 		return nil, constant.ErrRecordExist
 	}
@@ -309,7 +309,7 @@ func (u *PostgresqlService) Delete(ctx context.Context, req dto.PostgresqlDBDele
 		if _, err := os.Stat(backupDir); err == nil {
 			_ = os.RemoveAll(backupDir)
 		}
-		_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType(req.Type), commonRepo.WithByName(req.Database), backupRepo.WithByDetailName(db.Name))
+		_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType(req.Type), commonRepo.WithByName(req.Database), commonRepo.WithByDetailName(db.Name))
 		global.LOG.Infof("delete database %s-%s backups successful", req.Database, db.Name)
 	}
 

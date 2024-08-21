@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"gorm.io/gorm"
 )
@@ -16,9 +17,7 @@ type ITaskRepo interface {
 	Update(ctx context.Context, task *model.Task) error
 
 	WithByID(id string) DBOption
-	WithType(taskType string) DBOption
 	WithResourceID(id uint) DBOption
-	WithStatus(status string) DBOption
 	WithOperate(taskOperate string) DBOption
 }
 
@@ -32,21 +31,9 @@ func (t TaskRepo) WithByID(id string) DBOption {
 	}
 }
 
-func (t TaskRepo) WithType(taskType string) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("type = ?", taskType)
-	}
-}
-
 func (t TaskRepo) WithOperate(taskOperate string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("operate = ?", taskOperate)
-	}
-}
-
-func (t TaskRepo) WithStatus(status string) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("status = ?", status)
 	}
 }
 

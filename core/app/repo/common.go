@@ -11,8 +11,9 @@ type DBOption func(*gorm.DB) *gorm.DB
 
 type ICommonRepo interface {
 	WithByID(id uint) DBOption
-	WithByName(name string) DBOption
 	WithByIDs(ids []uint) DBOption
+	WithByName(name string) DBOption
+	WithLikeName(name string) DBOption
 	WithByType(ty string) DBOption
 	WithOrderBy(orderStr string) DBOption
 
@@ -30,6 +31,11 @@ func (c *CommonRepo) WithByID(id uint) DBOption {
 		return g.Where("id = ?", id)
 	}
 }
+func (c *CommonRepo) WithByIDs(ids []uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("id in (?)", ids)
+	}
+}
 func (c *CommonRepo) WithByName(name string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		if len(name) == 0 {
@@ -38,9 +44,12 @@ func (c *CommonRepo) WithByName(name string) DBOption {
 		return g.Where("`name` = ?", name)
 	}
 }
-func (c *CommonRepo) WithByIDs(ids []uint) DBOption {
+func (c *CommonRepo) WithLikeName(name string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("id in (?)", ids)
+		if len(name) == 0 {
+			return g
+		}
+		return g.Where("name like ? or command like ?", "%"+name+"%", "%"+name+"%")
 	}
 }
 func (c *CommonRepo) WithByType(ty string) DBOption {

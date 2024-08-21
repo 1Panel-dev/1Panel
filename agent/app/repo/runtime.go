@@ -12,7 +12,6 @@ type RuntimeRepo struct {
 }
 
 type IRuntimeRepo interface {
-	WithName(name string) DBOption
 	WithImage(image string) DBOption
 	WithNotId(id uint) DBOption
 	WithStatus(status string) DBOption
@@ -28,12 +27,6 @@ type IRuntimeRepo interface {
 
 func NewIRunTimeRepo() IRuntimeRepo {
 	return &RuntimeRepo{}
-}
-
-func (r *RuntimeRepo) WithName(name string) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("name = ?", name)
-	}
 }
 
 func (r *RuntimeRepo) WithStatus(status string) DBOption {

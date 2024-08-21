@@ -15,7 +15,6 @@ type PostgresqlRepo struct{}
 type IPostgresqlRepo interface {
 	Get(opts ...DBOption) (model.DatabasePostgresql, error)
 	WithByPostgresqlName(postgresqlName string) DBOption
-	WithByFrom(from string) DBOption
 	List(opts ...DBOption) ([]model.DatabasePostgresql, error)
 	Page(limit, offset int, opts ...DBOption) (int64, []model.DatabasePostgresql, error)
 	Create(ctx context.Context, postgresql *model.DatabasePostgresql) error
@@ -110,14 +109,5 @@ func (u *PostgresqlRepo) Update(id uint, vars map[string]interface{}) error {
 func (u *PostgresqlRepo) WithByPostgresqlName(postgresqlName string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("postgresql_name = ?", postgresqlName)
-	}
-}
-
-func (u *PostgresqlRepo) WithByFrom(from string) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		if len(from) != 0 {
-			return g.Where("`from` = ?", from)
-		}
-		return g
 	}
 }

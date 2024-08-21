@@ -34,7 +34,7 @@ func NewIImageRepoService() IImageRepoService {
 }
 
 func (u *ImageRepoService) Page(req dto.SearchWithPage) (int64, interface{}, error) {
-	total, ops, err := imageRepoRepo.Page(req.Page, req.PageSize, commonRepo.WithLikeName(req.Info), commonRepo.WithOrderBy("created_at desc"))
+	total, ops, err := imageRepoRepo.Page(req.Page, req.PageSize, commonRepo.WithByLikeName(req.Info), commonRepo.WithOrderBy("created_at desc"))
 	var dtoOps []dto.ImageRepoInfo
 	for _, op := range ops {
 		var item dto.ImageRepoInfo
@@ -137,7 +137,7 @@ func (u *ImageRepoService) BatchDelete(req dto.ImageRepoDelete) error {
 			return errors.New("The default value cannot be edit !")
 		}
 	}
-	if err := imageRepoRepo.Delete(commonRepo.WithIdsIn(req.Ids)); err != nil {
+	if err := imageRepoRepo.Delete(commonRepo.WithByIDs(req.Ids)); err != nil {
 		return err
 	}
 	return nil
