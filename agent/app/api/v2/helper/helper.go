@@ -35,10 +35,10 @@ func ErrorWithDetail(ctx *gin.Context, code int, msgKey string, err error) {
 		case errors.As(err, &buserr.BusinessError{}):
 			res.Message = err.Error()
 		default:
-			res.Message = i18n.GetMsgWithMap(msgKey, map[string]interface{}{"detail": err})
+			res.Message = i18n.GetMsgWithDetail(msgKey, err.Error())
 		}
 	} else {
-		res.Message = i18n.GetMsgWithMap(msgKey, map[string]interface{}{"detail": err})
+		res.Message = i18n.GetMsgWithDetail(msgKey, err.Error())
 	}
 	ctx.JSON(http.StatusOK, res)
 	ctx.Abort()

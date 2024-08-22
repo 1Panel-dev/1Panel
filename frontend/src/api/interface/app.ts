@@ -251,4 +251,8 @@ export namespace App {
         appInstallID: number;
         updateVersion?: string;
     }
+
+    export interface AppStoreSync {
+        taskID: string;
+    }
 }

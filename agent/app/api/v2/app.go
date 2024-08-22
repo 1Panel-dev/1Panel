@@ -2,6 +2,7 @@ package v2
 
 import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -31,20 +32,22 @@ func (b *BaseApi) SearchApp(c *gin.Context) {
 }
 
 // @Tags App
-// @Summary Sync app list
-// @Description 同步应用列表
+// @Summary Sync remote app list
+// @Description 同步远程应用列表
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /apps/sync [post]
+// @Router /apps/sync/remote [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"应用商店同步","formatEN":"App store synchronization"}
 func (b *BaseApi) SyncApp(c *gin.Context) {
-	go appService.SyncAppListFromLocal()
+	var req dto.OperateWithTask
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
 	res, err := appService.GetAppUpdate()
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-
 	if !res.CanUpdate {
 		if res.IsSyncing {
 			helper.SuccessWithMsg(c, i18n.GetMsgByKey("AppStoreIsSyncing"))
@@ -54,11 +57,23 @@ func (b *BaseApi) SyncApp(c *gin.Context) {
 		return
 	}
 	go func() {
-		if err := appService.SyncAppListFromRemote(); err != nil {
+		if err = appService.SyncAppListFromRemote(req.TaskID); err != nil {
 			global.LOG.Errorf("Synchronization with the App Store failed [%s]", err.Error())
 		}
 	}()
-	helper.SuccessWithData(c, "")
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags App
+// @Summary Sync local  app list
+// @Description 同步本地应用列表
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /apps/sync/local [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"应用商店同步","formatEN":"App store synchronization"}
+func (b *BaseApi) SyncLocalApp(c *gin.Context) {
+	go appService.SyncAppListFromLocal()
+	helper.SuccessWithOutData(c)
 }
 
 // @Tags App

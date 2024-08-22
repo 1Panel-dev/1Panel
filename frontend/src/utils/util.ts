@@ -3,6 +3,7 @@ import i18n from '@/lang';
 import useClipboard from 'vue-clipboard3';
 const { toClipboard } = useClipboard();
 import { MsgError, MsgSuccess } from '@/utils/message';
+import { v4 as uuidv4 } from 'uuid';
 
 export function deepCopy<T>(obj: any): T {
     let newObj: any;
@@ -615,4 +616,8 @@ export const getFileType = (extension: string) => {
         }
     });
     return type;
+};
+
+export const newUUID = () => {
+    return uuidv4();
 };

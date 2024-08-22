@@ -3,6 +3,7 @@ package server
 import (
 	"crypto/tls"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/init/business"
 	"net"
 	"net/http"
 	"os"
@@ -12,7 +13,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/init/app"
-	"github.com/1Panel-dev/1Panel/agent/init/business"
 	"github.com/1Panel-dev/1Panel/agent/init/db"
 	"github.com/1Panel-dev/1Panel/agent/init/hook"
 	"github.com/1Panel-dev/1Panel/agent/init/log"
@@ -36,7 +36,6 @@ func Start() {
 	gin.SetMode("debug")
 	cron.Run()
 	InitOthers()
-	business.Init()
 	hook.Init()
 
 	rootRouter := router.Routers()
@@ -75,6 +74,7 @@ func Start() {
 			ClientAuth:   tls.RequireAnyClientCert,
 		}
 		global.LOG.Info("listen at https://0.0.0.0:9999")
+		business.Init()
 		if err := server.ListenAndServeTLS("", ""); err != nil {
 			panic(err)
 		}

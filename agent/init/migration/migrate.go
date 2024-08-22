@@ -19,6 +19,7 @@ func Init() {
 		migrations.UpdateWebsite,
 		migrations.UpdateWebsiteDomain,
 		migrations.UpdateApp,
+		migrations.AddTaskDB,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

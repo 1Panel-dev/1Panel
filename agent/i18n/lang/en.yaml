@@ -62,6 +62,10 @@ PullImageStart: "Start pulling image {{ .name }}"
 PullImageSuccess: "Image pulled successfully"
 UpgradeAppStart: "Start upgrading application {{ .name }}"
 UpgradeAppSuccess: "App {{ .name }} upgraded successfully"
+AppStoreIsLastVersion: "The app store is up to date"
+AppStoreSyncSuccess: "App store synchronized successfully"
+SyncAppDetail: "Synchronize app configuration"
+
 
 #file
 ErrFileCanNotRead: "File can not read"
@@ -229,4 +233,6 @@ Stop: 'Stop',
 Image: 'Image',
 AppLink: 'Associated Application'
 EnableSSL: "Enable HTTPS"
+AppStore: "App Store"
+TaskSync: "Sync"
 

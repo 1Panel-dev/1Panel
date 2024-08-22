@@ -123,7 +123,7 @@ import { Container } from '@/api/interface/container';
 import { loadResourceLimit } from '@/api/modules/container';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import TaskLog from '@/components/task-log/index.vue';
-import { v4 as uuidv4 } from 'uuid';
+import { newUUID } from '@/utils/util';
 
 const router = useRouter();
 
@@ -269,7 +269,7 @@ const openTaskLog = (taskID: string) => {
 
 const install = () => {
     loading.value = true;
-    const taskID = uuidv4();
+    const taskID = newUUID();
     req.taskID = taskID;
     InstallApp(req)
         .then(() => {

@@ -242,3 +242,12 @@ var UpdateApp = &gormigrate.Migration{
 			&model.App{})
 	},
 }
+
+var AddTaskDB = &gormigrate.Migration{
+	ID: "20240822-add-task-table",
+	Migrate: func(tx *gorm.DB) error {
+		return global.TaskDB.AutoMigrate(
+			&model.Task{},
+		)
+	},
+}
