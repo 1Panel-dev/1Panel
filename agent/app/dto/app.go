@@ -94,6 +94,8 @@ type AppProperty struct {
 	Website            string   `json:"website"`
 	Github             string   `json:"github"`
 	Document           string   `json:"document"`
+	Architectures      []string `json:"architectures"`
+	MemoryLimit        int      `json:"memoryLimit"`
 }
 
 type AppConfigVersion struct {

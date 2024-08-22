@@ -1729,6 +1729,10 @@ const message = {
         diffHelper: '左侧为旧版本，右侧为新版，编辑之后点击使用自定义版本保存',
         deleteImage: '删除镜像',
         deleteImageHelper: '删除应用相关镜像，删除失败任务不会终止',
+        requireMemory: '内存需求',
+        supportedArchitectures: '支持架构',
+        link: '链接',
+        showCurrentArch: '仅显示当前服务器架构应用',
     },
     website: {
         website: '网站',

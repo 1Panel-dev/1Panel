@@ -60,6 +60,9 @@
             </el-badge>
         </template>
         <template #rightToolBar>
+            <el-checkbox class="!mr-2.5" v-model="req.showCurrentArch" @change="search(req)">
+                {{ $t('app.showCurrentArch') }}
+            </el-checkbox>
             <el-checkbox
                 class="!mr-2.5"
                 v-model="req.resource"
@@ -90,28 +93,12 @@
                                 <el-card>
                                     <div class="app-wrapper">
                                         <div class="app-image">
-                                            <el-popover placement="top-start" :width="200" trigger="hover">
-                                                <template #reference>
-                                                    <el-avatar
-                                                        shape="square"
-                                                        :size="60"
-                                                        :src="'data:image/png;base64,' + app.icon"
-                                                    />
-                                                </template>
-                                                <div>
-                                                    <el-link @click="toLink(app.website)">
-                                                        <el-icon><OfficeBuilding /></el-icon>
-                                                        <span>{{ $t('app.appOfficeWebsite') }}</span>
-                                                    </el-link>
-                                                    <el-link class="ml-5" @click="toLink(app.github)">
-                                                        <el-icon><Link /></el-icon>
-                                                        <span>{{ $t('app.github') }}</span>
-                                                    </el-link>
-                                                    <div class="mt-5">
-                                                        <el-text>推荐配置: 1c 1g</el-text>
-                                                    </div>
-                                                </div>
-                                            </el-popover>
+                                            <el-avatar
+                                                @click="openDetail(app.key)"
+                                                shape="square"
+                                                :size="60"
+                                                :src="'data:image/png;base64,' + app.icon"
+                                            />
                                         </div>
                                         <div class="app-content">
                                             <div class="content-top">
@@ -180,6 +167,7 @@
         </template>
     </LayoutContent>
     <Install ref="installRef" />
+    <Detail ref="detailRef" />
 </template>
 
 <script lang="ts" setup>
@@ -192,6 +180,7 @@ import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
 import { getLanguage } from '@/utils/util';
+import Detail from '../detail/index.vue';
 
 const globalStore = GlobalStore();
 
@@ -214,6 +203,7 @@ const req = reactive({
     page: 1,
     pageSize: 60,
     resource: 'all',
+    showCurrentArch: false,
 });
 
 const apps = ref<App.AppDTO[]>([]);
@@ -227,6 +217,7 @@ const installRef = ref();
 const installKey = ref('');
 const moreTag = ref('');
 const mainHeight = ref(0);
+const detailRef = ref();
 
 const search = async (req: App.AppReq) => {
     loading.value = true;
@@ -266,6 +257,10 @@ const openInstall = (app: App.App) => {
             };
             installRef.value.acceptParams(params);
     }
+};
+
+const openDetail = (key: string) => {
+    detailRef.value.acceptParams(key, 'install');
 };
 
 const sync = () => {
@@ -309,10 +304,6 @@ const getTagValue = (key: string) => {
 
 const searchByName = () => {
     search(req);
-};
-
-const toLink = (link: string) => {
-    window.open(link, '_blank');
 };
 
 onMounted(() => {

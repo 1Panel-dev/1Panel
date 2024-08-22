@@ -8,11 +8,12 @@ import (
 
 type AppSearch struct {
 	dto.PageInfo
-	Name      string   `json:"name"`
-	Tags      []string `json:"tags"`
-	Type      string   `json:"type"`
-	Recommend bool     `json:"recommend"`
-	Resource  string   `json:"resource"`
+	Name            string   `json:"name"`
+	Tags            []string `json:"tags"`
+	Type            string   `json:"type"`
+	Recommend       bool     `json:"recommend"`
+	Resource        string   `json:"resource"`
+	ShowCurrentArch bool     `json:"showCurrentArch"`
 }
 
 type AppInstallCreate struct {

@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"gorm.io/gorm"
@@ -26,6 +27,7 @@ type IAppRepo interface {
 	Create(ctx context.Context, app *model.App) error
 	Save(ctx context.Context, app *model.App) error
 	BatchDelete(ctx context.Context, apps []model.App) error
+	WithArch(arch string) DBOption
 }
 
 func NewIAppRepo() IAppRepo {
@@ -68,6 +70,12 @@ func (a AppRepo) GetRecommend() DBOption {
 func (a AppRepo) WithResource(resource string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("resource = ?", resource)
+	}
+}
+
+func (a AppRepo) WithArch(arch string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("architectures like ?", fmt.Sprintf("%%%s%%", arch))
 	}
 }
 

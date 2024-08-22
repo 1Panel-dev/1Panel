@@ -1728,6 +1728,10 @@ const message = {
         diffHelper: '左側為舊版本，右側為新版，編輯之後點擊使用自訂版本保存',
         deleteImage: '刪除鏡像',
         deleteImageHelper: '刪除應用相關鏡像，刪除失敗任務不會終止',
+        requireMemory: '最低內存',
+        supportedArchitectures: '支持架構',
+        link: '鏈接',
+        showCurrentArch: '僅顯示當前架構',
     },
     website: {
         website: '網站',
