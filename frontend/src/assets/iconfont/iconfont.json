@@ -6,6 +6,83 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "29851742",
+      "name": "短信告警",
+      "font_class": "alert-1",
+      "unicode": "e611",
+      "unicode_decimal": 58897
+    },
+    {
+      "icon_id": "33427786",
+      "name": "告警日志",
+      "font_class": "alert-2",
+      "unicode": "e701",
+      "unicode_decimal": 59137
+    },
+    {
+      "icon_id": "32101973",
+      "name": "Amazon_Web_Services_Logo",
+      "font_class": "aws",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
+      "icon_id": "12959160",
+      "name": "腾讯云",
+      "font_class": "tengxunyun1",
+      "unicode": "e651",
+      "unicode_decimal": 58961
+    },
+    {
+      "icon_id": "24877229",
+      "name": "七牛云",
+      "font_class": "qiniuyun",
+      "unicode": "e62c",
+      "unicode_decimal": 58924
+    },
+    {
+      "icon_id": "20290513",
+      "name": "minio",
+      "font_class": "minio",
+      "unicode": "e63c",
+      "unicode_decimal": 58940
+    },
+    {
+      "icon_id": "13015332",
+      "name": "onedrive",
+      "font_class": "onedrive",
+      "unicode": "e601",
+      "unicode_decimal": 58881
+    },
+    {
+      "icon_id": "16268521",
+      "name": "oss",
+      "font_class": "oss",
+      "unicode": "e607",
+      "unicode_decimal": 58887
+    },
+    {
+      "icon_id": "13532955",
+      "name": "SFTP",
+      "font_class": "SFTP",
+      "unicode": "e647",
+      "unicode_decimal": 58951
+    },
+    {
+      "icon_id": "23044673",
+      "name": "webdav",
+      "font_class": "webdav",
+      "unicode": "e622",
+      "unicode_decimal": 58914
+    },
+    {
+      "icon_id": "30053592",
+      "name": "终端",
+      "font_class": "zhongduan",
+      "unicode": "e731",
+      "unicode_decimal": 59185
+    },
+    {
       "icon_id": "1064806",
       "name": "docker",
       "font_class": "docker1",
@@ -293,25 +370,11 @@
       "unicode_decimal": 59478
     },
     {
-      "icon_id": "23044673",
-      "name": "webdav",
-      "font_class": "webdav",
-      "unicode": "e622",
-      "unicode_decimal": 58914
-    },
-    {
       "icon_id": "10293150",
       "name": "详情",
       "font_class": "xiangqing",
       "unicode": "e677",
       "unicode_decimal": 58999
-    },
-    {
-      "icon_id": "13015332",
-      "name": "onedrive",
-      "font_class": "onedrive",
-      "unicode": "e601",
-      "unicode_decimal": 58881
     },
     {
       "icon_id": "7708032",
@@ -326,20 +389,6 @@
       "font_class": "yanzhengma1",
       "unicode": "e744",
       "unicode_decimal": 59204
-    },
-    {
-      "icon_id": "12959160",
-      "name": "腾讯云",
-      "font_class": "tengxunyun1",
-      "unicode": "e651",
-      "unicode_decimal": 58961
-    },
-    {
-      "icon_id": "24877229",
-      "name": "七牛云",
-      "font_class": "qiniuyun",
-      "unicode": "e62c",
-      "unicode_decimal": 58924
     },
     {
       "icon_id": "19671162",
@@ -419,13 +468,6 @@
       "unicode_decimal": 58895
     },
     {
-      "icon_id": "32101973",
-      "name": "Amazon_Web_Services_Logo",
-      "font_class": "aws",
-      "unicode": "e600",
-      "unicode_decimal": 58880
-    },
-    {
       "icon_id": "1760690",
       "name": "讨论",
       "font_class": "taolun",
@@ -440,32 +482,11 @@
       "unicode_decimal": 58902
     },
     {
-      "icon_id": "13532955",
-      "name": "SFTP",
-      "font_class": "SFTP",
-      "unicode": "e647",
-      "unicode_decimal": 58951
-    },
-    {
       "icon_id": "15337722",
       "name": "Logo GitHub",
       "font_class": "huaban88",
       "unicode": "e67c",
       "unicode_decimal": 59004
-    },
-    {
-      "icon_id": "16268521",
-      "name": "oss",
-      "font_class": "oss",
-      "unicode": "e607",
-      "unicode_decimal": 58887
-    },
-    {
-      "icon_id": "20290513",
-      "name": "minio",
-      "font_class": "minio",
-      "unicode": "e63c",
-      "unicode_decimal": 58940
     },
     {
       "icon_id": "924436",
