@@ -1,9 +1,9 @@
 @font-face {
   font-family: "panel"; /* Project id 3575356 */
-  src: url('iconfont.woff2?t=1717570629440') format('woff2'),
-       url('iconfont.woff?t=1717570629440') format('woff'),
-       url('iconfont.ttf?t=1717570629440') format('truetype'),
-       url('iconfont.svg?t=1717570629440#panel') format('svg');
+  src: url('iconfont.woff2?t=1724290117056') format('woff2'),
+       url('iconfont.woff?t=1724290117056') format('woff'),
+       url('iconfont.ttf?t=1724290117056') format('truetype'),
+       url('iconfont.svg?t=1724290117056#panel') format('svg');
 }
 
 .panel {
@@ -12,6 +12,50 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.p-alert-1:before {
+  content: "\e611";
+}
+
+.p-alert-2:before {
+  content: "\e701";
+}
+
+.p-aws:before {
+  content: "\e600";
+}
+
+.p-tengxunyun1:before {
+  content: "\e651";
+}
+
+.p-qiniuyun:before {
+  content: "\e62c";
+}
+
+.p-minio:before {
+  content: "\e63c";
+}
+
+.p-onedrive:before {
+  content: "\e601";
+}
+
+.p-oss:before {
+  content: "\e607";
+}
+
+.p-SFTP:before {
+  content: "\e647";
+}
+
+.p-webdav:before {
+  content: "\e622";
+}
+
+.p-zhongduan:before {
+  content: "\e731";
 }
 
 .p-docker1:before {
@@ -178,16 +222,8 @@
   content: "\e856";
 }
 
-.p-webdav:before {
-  content: "\e622";
-}
-
 .p-xiangqing:before {
   content: "\e677";
-}
-
-.p-onedrive:before {
-  content: "\e601";
 }
 
 .p-caidan:before {
@@ -196,14 +232,6 @@
 
 .p-yanzhengma1:before {
   content: "\e744";
-}
-
-.p-tengxunyun1:before {
-  content: "\e651";
-}
-
-.p-qiniuyun:before {
-  content: "\e62c";
 }
 
 .p-file-png:before {
@@ -250,10 +278,6 @@
   content: "\e60f";
 }
 
-.p-aws:before {
-  content: "\e600";
-}
-
 .p-taolun:before {
   content: "\e602";
 }
@@ -262,20 +286,8 @@
   content: "\e616";
 }
 
-.p-SFTP:before {
-  content: "\e647";
-}
-
 .p-huaban88:before {
   content: "\e67c";
-}
-
-.p-oss:before {
-  content: "\e607";
-}
-
-.p-minio:before {
-  content: "\e63c";
 }
 
 .p-logout:before {

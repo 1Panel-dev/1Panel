@@ -1681,7 +1681,7 @@ const message = {
             'Upgrading to the professional version allows customization of panel logo, welcome message, and other information.',
         monitor:
             'Upgrade to the professional version to view the real-time status of the website, visitor trends, visitor sources, request logs and other information. ',
-        alert: 'Upgrading to the professional version allows you to receive alarm information via SMS.',
+        alert: 'Upgrade to the professional version to receive alarm information via SMS and view alarm logs, fully control various key events, and ensure worry-free system operation',
     },
     clean: {
         scan: 'Start Scanning',
