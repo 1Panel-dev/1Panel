@@ -205,3 +205,31 @@ var InitMasterAddr = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var InitTerminalSetting = &gormigrate.Migration{
+	ID: "20240814-init-terminal-setting",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "LineHeight", Value: "1.2"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "LetterSpacing", Value: "0"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "FontSize", Value: "12"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "CursorBlink", Value: "enable"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "CursorStyle", Value: "block"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "Scrollback", Value: "1000"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "ScrollSensitivity", Value: "6"}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

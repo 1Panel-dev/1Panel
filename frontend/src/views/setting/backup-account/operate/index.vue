@@ -291,7 +291,7 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { Backup } from '@/api/interface/backup';
-import { addBackup, editBackup, getOneDriveInfo, listBucket } from '@/api/modules/setting';
+import { addBackup, editBackup, getOneDriveInfo, listBucket } from '@/api/modules/backup';
 import { cities } from './../helper';
 import { deepCopy, spliceHttp, splitHttp } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';

@@ -12,9 +12,11 @@ func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 	baseApi := v2.ApiGroupApp.BaseApi
 	{
 		settingRouter.POST("/search", baseApi.GetSettingInfo)
+		settingRouter.POST("/terminal/search", baseApi.GetTerminalSettingInfo)
 		settingRouter.POST("/expired/handle", baseApi.HandlePasswordExpired)
 		settingRouter.GET("/search/available", baseApi.GetSystemAvailable)
 		settingRouter.POST("/update", baseApi.UpdateSetting)
+		settingRouter.POST("/terminal/update", baseApi.UpdateTerminalSetting)
 		settingRouter.GET("/interface", baseApi.LoadInterfaceAddr)
 		settingRouter.POST("/menu/update", baseApi.UpdateMenu)
 		settingRouter.POST("/proxy/update", baseApi.UpdateProxy)

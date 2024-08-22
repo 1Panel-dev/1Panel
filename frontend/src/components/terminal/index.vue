@@ -1,5 +1,5 @@
 <template>
-    <div ref="terminalElement" @wheel="onTermWheel"></div>
+    <div ref="terminalElement"></div>
 </template>
 
 <script lang="ts" setup>
@@ -8,6 +8,7 @@ import { Terminal } from '@xterm/xterm';
 import '@xterm/xterm/css/xterm.css';
 import { FitAddon } from '@xterm/addon-fit';
 import { Base64 } from 'js-base64';
+import { TerminalStore } from '@/store';
 
 const terminalElement = ref<HTMLDivElement | null>(null);
 const fitAddon = new FitAddon();
@@ -28,6 +29,33 @@ const readyWatcher = watch(
         }
     },
 );
+
+const terminalStore = TerminalStore();
+const lineHeight = computed(() => terminalStore.lineHeight);
+const fontSize = computed(() => terminalStore.fontSize);
+const letterSpacing = computed(() => terminalStore.letterSpacing);
+watch([lineHeight, fontSize, letterSpacing], ([newLineHeight, newFontSize, newLetterSpacing]) => {
+    term.value.options.lineHeight = newLineHeight;
+    term.value.options.letterSpacing = newLetterSpacing;
+    term.value.options.fontSize = newFontSize;
+    changeTerminalSize();
+});
+const cursorStyle = computed(() => terminalStore.cursorStyle);
+watch(cursorStyle, (newCursorStyle) => {
+    term.value.options.cursorStyle = newCursorStyle;
+});
+const cursorBlink = computed(() => terminalStore.cursorBlink);
+watch(cursorBlink, (newCursorBlink) => {
+    term.value.options.cursorBlink = newCursorBlink === 'enable';
+});
+const scrollback = computed(() => terminalStore.scrollback);
+watch(scrollback, (newScrollback) => {
+    term.value.options.scrollback = newScrollback;
+});
+const scrollSensitivity = computed(() => terminalStore.scrollSensitivity);
+watch(scrollSensitivity, (newScrollSensitivity) => {
+    term.value.options.scrollSensitivity = newScrollSensitivity;
+});
 
 interface WsProps {
     endpoint: string;
@@ -58,7 +86,6 @@ const newTerm = () => {
         cursorStyle: 'underline',
         scrollback: 1000,
         scrollSensitivity: 15,
-        tabStopWidth: 4,
     });
 };
 
@@ -116,25 +143,6 @@ function changeTerminalSize() {
         );
     }
 }
-
-/**
- * Support for Ctrl+MouseWheel to scaling fonts
- * @param event WheelEvent
- */
-const onTermWheel = (event: WheelEvent) => {
-    if (event.ctrlKey) {
-        event.preventDefault();
-        if (event.deltaY > 0) {
-            // web font-size mini 12px
-            if (term.value.options.fontSize > 12) {
-                term.value.options.fontSize = term.value.options.fontSize - 1;
-            }
-        } else {
-            term.value.options.fontSize = term.value.options.fontSize + 1;
-        }
-        changeTerminalSize();
-    }
-};
 
 // terminal 相关代码 end
 
@@ -201,7 +209,7 @@ const errorRealTerminal = (ex: any) => {
 
 const closeRealTerminal = (ev: CloseEvent) => {
     if (heartbeatTimer.value) {
-        clearInterval(heartbeatTimer.value);
+        clearInterval(Number(heartbeatTimer.value));
     }
     term.value.write('The connection has been disconnected.');
     term.value.write(ev.reason);

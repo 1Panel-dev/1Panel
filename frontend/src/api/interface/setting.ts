@@ -59,6 +59,15 @@ export namespace Setting {
         proxyPasswd: string;
         proxyPasswdKeep: string;
     }
+    export interface TerminalInfo {
+        lineHeight: string;
+        letterSpacing: string;
+        fontSize: string;
+        cursorBlink: string;
+        cursorStyle: string;
+        scrollback: string;
+        scrollSensitivity: string;
+    }
     export interface SettingUpdate {
         key: string;
         value: string;
