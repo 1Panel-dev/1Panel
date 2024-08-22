@@ -36,6 +36,9 @@ type ISettingService interface {
 	UpdateSSL(c *gin.Context, req dto.SSLUpdate) error
 	LoadFromCert() (*dto.SSLInfo, error)
 	HandlePasswordExpired(c *gin.Context, old, new string) error
+
+	GetTerminalInfo() (*dto.TerminalInfo, error)
+	UpdateTerminal(req dto.TerminalInfo) error
 }
 
 func NewISettingService() ISettingService {
@@ -336,6 +339,50 @@ func (u *SettingService) HandlePasswordExpired(c *gin.Context, old, new string) 
 		return nil
 	}
 	return constant.ErrInitialPassword
+}
+
+func (u *SettingService) GetTerminalInfo() (*dto.TerminalInfo, error) {
+	setting, err := settingRepo.List()
+	if err != nil {
+		return nil, constant.ErrRecordNotFound
+	}
+	settingMap := make(map[string]string)
+	for _, set := range setting {
+		settingMap[set.Key] = set.Value
+	}
+	var info dto.TerminalInfo
+	arr, err := json.Marshal(settingMap)
+	if err != nil {
+		return nil, err
+	}
+	if err := json.Unmarshal(arr, &info); err != nil {
+		return nil, err
+	}
+	return &info, err
+}
+func (u *SettingService) UpdateTerminal(req dto.TerminalInfo) error {
+	if err := settingRepo.Update("LineHeight", req.LineHeight); err != nil {
+		return err
+	}
+	if err := settingRepo.Update("LetterSpacing", req.LetterSpacing); err != nil {
+		return err
+	}
+	if err := settingRepo.Update("FontSize", req.FontSize); err != nil {
+		return err
+	}
+	if err := settingRepo.Update("CursorBlink", req.CursorBlink); err != nil {
+		return err
+	}
+	if err := settingRepo.Update("CursorStyle", req.CursorStyle); err != nil {
+		return err
+	}
+	if err := settingRepo.Update("Scrollback", req.Scrollback); err != nil {
+		return err
+	}
+	if err := settingRepo.Update("ScrollSensitivity", req.ScrollSensitivity); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *SettingService) UpdatePassword(c *gin.Context, old, new string) error {

@@ -96,7 +96,7 @@
 <script setup lang="ts">
 import { dateFormat } from '@/utils/util';
 import { onMounted, ref } from 'vue';
-import { searchBackup, deleteBackup, refreshOneDrive } from '@/api/modules/setting';
+import { searchBackup, deleteBackup, refreshOneDrive } from '@/api/modules/backup';
 import Operate from '@/views/setting/backup-account/operate/index.vue';
 import { Backup } from '@/api/interface/backup';
 import i18n from '@/lang';

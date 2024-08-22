@@ -46,3 +46,13 @@ export interface MenuState {
     menuList: RouteRecordRaw[];
     withoutAnimation: boolean;
 }
+
+export interface TerminalState {
+    lineHeight: number;
+    letterSpacing: number;
+    fontSize: number;
+    cursorBlink: string;
+    cursorStyle: string;
+    scrollback: number;
+    scrollSensitivity: number;
+}

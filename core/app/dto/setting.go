@@ -196,3 +196,13 @@ type XpackHideMenu struct {
 	Path     string          `json:"path,omitempty"`
 	Children []XpackHideMenu `json:"children,omitempty"`
 }
+
+type TerminalInfo struct {
+	LineHeight        string `json:"lineHeight"`
+	LetterSpacing     string `json:"letterSpacing"`
+	FontSize          string `json:"fontSize"`
+	CursorBlink       string `json:"cursorBlink"`
+	CursorStyle       string `json:"cursorStyle"`
+	Scrollback        string `json:"scrollback"`
+	ScrollSensitivity string `json:"scrollSensitivity"`
+}

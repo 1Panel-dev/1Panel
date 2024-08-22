@@ -30,6 +30,21 @@ func (b *BaseApi) GetSettingInfo(c *gin.Context) {
 }
 
 // @Tags System Setting
+// @Summary Load system terminal setting info
+// @Description 加载系统终端配置信息
+// @Success 200 {object} dto.TerminalInfo
+// @Security ApiKeyAuth
+// @Router /core/settings/terminal/search [post]
+func (b *BaseApi) GetTerminalSettingInfo(c *gin.Context) {
+	setting, err := settingService.GetTerminalInfo()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, setting)
+}
+
+// @Tags System Setting
 // @Summary Load system available status
 // @Description 获取系统可用状态
 // @Success 200
@@ -55,6 +70,28 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 	}
 
 	if err := settingService.Update(req.Key, req.Value); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags System Setting
+// @Summary Update system terminal setting
+// @Description 更新系统终端配置
+// @Accept json
+// @Param request body dto.TerminalInfo true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /core/settings/terminal/update [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改系统终端配置","formatEN":"update system terminal setting"}
+func (b *BaseApi) UpdateTerminalSetting(c *gin.Context) {
+	var req dto.TerminalInfo
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := settingService.UpdateTerminal(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

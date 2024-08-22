@@ -33,6 +33,12 @@ export const loadDaemonJsonPath = () => {
 export const getSettingInfo = () => {
     return http.post<Setting.SettingInfo>(`/core/settings/search`);
 };
+export const getTerminalInfo = () => {
+    return http.post<Setting.TerminalInfo>(`/core/settings/terminal/search`);
+};
+export const UpdateTerminalInfo = (param: Setting.TerminalInfo) => {
+    return http.post(`/core/settings/terminal/update`, param);
+};
 export const getSystemAvailable = () => {
     return http.get(`/settings/search/available`);
 };
