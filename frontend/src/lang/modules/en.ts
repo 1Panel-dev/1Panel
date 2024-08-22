@@ -1857,7 +1857,7 @@ const message = {
         syncAllAppHelper: 'All applications are about to be synchronized. Do you want to continue? ',
         hostModeHelper:
             'The current application network mode is host mode. If you need to open the port, please open it manually on the firewall page.',
-        showLocal: 'Show Local App',
+        showLocal: 'Local',
         reload: 'Reload',
         upgradeWarn:
             'Upgrading the application will replace the docker-compose.yml file. If there are any changes, you can click to view the file comparison',
@@ -1877,7 +1877,7 @@ const message = {
         requireMemory: 'Memory',
         supportedArchitectures: 'Architectures',
         link: 'Link',
-        showCurrentArch: 'Show current architecture App',
+        showCurrentArch: 'Architecture',
     },
     website: {
         website: 'Website',

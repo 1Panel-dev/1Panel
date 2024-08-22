@@ -50,6 +50,7 @@ const (
 	TaskUpdate    = "TaskUpdate"
 	TaskRestart   = "TaskRestart"
 	TaskBackup    = "TaskBackup"
+	TaskSync      = "TaskSync"
 )
 
 const (
@@ -57,6 +58,7 @@ const (
 	TaskScopeApp      = "App"
 	TaskScopeRuntime  = "Runtime"
 	TaskScopeDatabase = "Database"
+	TaskScopeAppStore = "AppStore"
 )
 
 const (

@@ -15,6 +15,7 @@ import (
 var (
 	DB        *gorm.DB
 	MonitorDB *gorm.DB
+	TaskDB    *gorm.DB
 	CoreDB    *gorm.DB
 	LOG       *logrus.Logger
 	CONF      configs.ServerConfig

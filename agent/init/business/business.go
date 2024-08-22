@@ -15,7 +15,7 @@ func Init() {
 
 func syncApp() {
 	_ = service.NewISettingService().Update("AppStoreSyncStatus", constant.SyncSuccess)
-	if err := service.NewIAppService().SyncAppListFromRemote(); err != nil {
+	if err := service.NewIAppService().SyncAppListFromRemote(""); err != nil {
 		global.LOG.Errorf("App Store synchronization failed")
 		return
 	}

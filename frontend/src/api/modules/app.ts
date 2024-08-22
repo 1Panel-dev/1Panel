@@ -3,8 +3,8 @@ import { ResPage } from '../interface';
 import { App } from '../interface/app';
 import { TimeoutEnum } from '@/enums/http-enum';
 
-export const SyncApp = () => {
-    return http.post<any>('apps/sync', {});
+export const SyncApp = (req: App.AppStoreSync) => {
+    return http.post('apps/sync', req);
 };
 
 export const GetAppListUpdate = () => {

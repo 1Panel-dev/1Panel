@@ -63,6 +63,10 @@ PullImageStart: "開始拉取鏡像 {{ .name }}"
 PullImageSuccess: "鏡像拉取成功"
 UpgradeAppStart: "開始升級應用程式 {{ .name }}"
 UpgradeAppSuccess: "應用程式 {{ .name }} 升級成功"
+AppStoreIsLastVersion: "應用商店已經是最新版本"
+AppStoreSyncSuccess: "應用商店同步成功"
+SyncAppDetail: "同步應用配置"
+
 
 #file
 ErrFileCanNotRead: "此文件不支持預覽"
@@ -231,4 +235,6 @@ Stop: '停止',
 Image: '鏡像',
 AppLink: '關聯應用'
 EnableSSL: "開啟 HTTPS"
+AppStore: "應用商店"
+TaskSync: "同步"
 

@@ -2,6 +2,8 @@ package repo
 
 import (
 	"context"
+	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"gorm.io/gorm"
@@ -25,6 +27,25 @@ func NewITaskRepo() ITaskRepo {
 	return &TaskRepo{}
 }
 
+func getTaskDb(opts ...DBOption) *gorm.DB {
+	db := global.TaskDB
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	return db
+}
+
+func getTaskTx(ctx context.Context, opts ...DBOption) *gorm.DB {
+	tx, ok := ctx.Value(constant.DB).(*gorm.DB)
+	if ok {
+		for _, opt := range opts {
+			tx = opt(tx)
+		}
+		return tx
+	}
+	return getTaskDb(opts...)
+}
+
 func (t TaskRepo) WithByID(id string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("id = ?", id)
@@ -44,12 +65,12 @@ func (t TaskRepo) WithResourceID(id uint) DBOption {
 }
 
 func (t TaskRepo) Create(ctx context.Context, task *model.Task) error {
-	return getTx(ctx).Create(&task).Error
+	return getTaskTx(ctx).Create(&task).Error
 }
 
 func (t TaskRepo) GetFirst(opts ...DBOption) (model.Task, error) {
 	var task model.Task
-	db := getDb(opts...).Model(&model.Task{})
+	db := getTaskDb(opts...).Model(&model.Task{})
 	if err := db.First(&task).Error; err != nil {
 		return task, err
 	}
@@ -58,7 +79,7 @@ func (t TaskRepo) GetFirst(opts ...DBOption) (model.Task, error) {
 
 func (t TaskRepo) Page(page, size int, opts ...DBOption) (int64, []model.Task, error) {
 	var tasks []model.Task
-	db := getDb(opts...).Model(&model.Task{})
+	db := getTaskDb(opts...).Model(&model.Task{})
 	count := int64(0)
 	db = db.Count(&count)
 	err := db.Limit(size).Offset(size * (page - 1)).Find(&tasks).Error
@@ -66,5 +87,5 @@ func (t TaskRepo) Page(page, size int, opts ...DBOption) (int64, []model.Task, e
 }
 
 func (t TaskRepo) Update(ctx context.Context, task *model.Task) error {
-	return getTx(ctx).Save(&task).Error
+	return getTaskTx(ctx).Save(&task).Error
 }

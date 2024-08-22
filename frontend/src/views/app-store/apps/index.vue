@@ -168,6 +168,7 @@
     </LayoutContent>
     <Install ref="installRef" />
     <Detail ref="detailRef" />
+    <TaskLog ref="taskLogRef" />
 </template>
 
 <script lang="ts" setup>
@@ -179,8 +180,9 @@ import Install from '../detail/install/index.vue';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
-import { getLanguage } from '@/utils/util';
+import { getLanguage, newUUID } from '@/utils/util';
 import Detail from '../detail/index.vue';
+import TaskLog from '@/components/task-log/index.vue';
 
 const globalStore = GlobalStore();
 
@@ -218,6 +220,7 @@ const installKey = ref('');
 const moreTag = ref('');
 const mainHeight = ref(0);
 const detailRef = ref();
+const taskLogRef = ref();
 
 const search = async (req: App.AppReq) => {
     loading.value = true;
@@ -263,14 +266,23 @@ const openDetail = (key: string) => {
     detailRef.value.acceptParams(key, 'install');
 };
 
+const openTaskLog = (taskID: string) => {
+    taskLogRef.value.openWithTaskID(taskID);
+};
+
 const sync = () => {
     syncing.value = true;
-    SyncApp()
+    const taskID = newUUID();
+    const syncReq = {
+        taskID: taskID,
+    };
+    SyncApp(syncReq)
         .then((res) => {
             if (res.message != '') {
                 MsgSuccess(res.message);
             } else {
                 MsgSuccess(i18n.global.t('app.syncStart'));
+                openTaskLog(taskID);
             }
             canUpdate.value = false;
             search(req);

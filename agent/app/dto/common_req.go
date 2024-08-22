@@ -57,3 +57,7 @@ type UpdateGroup struct {
 	Group    uint `json:"group"`
 	NewGroup uint `json:"newGroup"`
 }
+
+type OperateWithTask struct {
+	TaskID string `json:"taskID"`
+}

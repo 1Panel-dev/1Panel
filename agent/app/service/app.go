@@ -40,7 +40,7 @@ type IAppService interface {
 	GetApp(key string) (*response.AppDTO, error)
 	GetAppDetail(appId uint, version, appType string) (response.AppDetailDTO, error)
 	Install(req request.AppInstallCreate) (*model.AppInstall, error)
-	SyncAppListFromRemote() error
+	SyncAppListFromRemote(taskID string) error
 	GetAppUpdate() (*response.AppUpdateRes, error)
 	GetAppDetailByID(id uint) (*response.AppDetailDTO, error)
 	SyncAppListFromLocal()
@@ -805,242 +805,244 @@ var InitTypes = map[string]struct{}{
 	"node":    {},
 }
 
-func (a AppService) SyncAppListFromRemote() (err error) {
-	global.LOG.Infof("Starting synchronization with App Store...")
-	updateRes, err := a.GetAppUpdate()
+func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
+	syncTask, err := task.NewTaskWithOps(i18n.GetMsgByKey("App"), task.TaskSync, task.TaskScopeAppStore, taskID, 0)
 	if err != nil {
 		return err
 	}
-	if !updateRes.CanUpdate {
-		if updateRes.IsSyncing {
-			global.LOG.Infof("AppStore is Syncing!")
-			return
-		}
-		global.LOG.Infof("The App Store is at the latest version")
-		return
-	}
-
-	list := &dto.AppList{}
-	if updateRes.AppList == nil {
-		list, err = getAppList()
-		if err != nil {
-			return
-		}
-	} else {
-		list = updateRes.AppList
-	}
-	settingService := NewISettingService()
-	_ = settingService.Update("AppStoreSyncStatus", constant.Syncing)
-
-	var (
-		tags      []*model.Tag
-		appTags   []*model.AppTag
-		oldAppIds []uint
-	)
-	for _, t := range list.Extra.Tags {
-		tags = append(tags, &model.Tag{
-			Key:  t.Key,
-			Name: t.Name,
-			Sort: t.Sort,
-		})
-	}
-	oldApps, err := appRepo.GetBy(appRepo.WithResource(constant.AppResourceRemote))
-	if err != nil {
-		return
-	}
-	for _, old := range oldApps {
-		oldAppIds = append(oldAppIds, old.ID)
-	}
-
-	transport := xpack.LoadRequestTransport()
-	baseRemoteUrl := fmt.Sprintf("%s/%s/1panel", global.CONF.System.AppRepo, global.CONF.System.Mode)
-	appsMap := getApps(oldApps, list.Apps)
-
-	global.LOG.Infof("Starting synchronization of application details...")
-	for _, l := range list.Apps {
-		app := appsMap[l.AppProperty.Key]
-		_, iconRes, err := httpUtil.HandleGetWithTransport(l.Icon, http.MethodGet, transport, constant.TimeOut20s)
+	syncTask.AddSubTask(task.GetTaskName(i18n.GetMsgByKey("App"), task.TaskSync, task.TaskScopeAppStore), func(t *task.Task) (err error) {
+		updateRes, err := a.GetAppUpdate()
 		if err != nil {
 			return err
 		}
-		iconStr := ""
-		if !strings.Contains(string(iconRes), "<xml>") {
-			iconStr = base64.StdEncoding.EncodeToString(iconRes)
+		if !updateRes.CanUpdate {
+			if updateRes.IsSyncing {
+				t.Log(i18n.GetMsgByKey("AppStoreIsSyncing"))
+				return nil
+			}
+			t.Log(i18n.GetMsgByKey("AppStoreIsLastVersion"))
+			return nil
 		}
-
-		app.Icon = iconStr
-		app.TagsKey = l.AppProperty.Tags
-		if l.AppProperty.Recommend > 0 {
-			app.Recommend = l.AppProperty.Recommend
+		list := &dto.AppList{}
+		if updateRes.AppList == nil {
+			list, err = getAppList()
+			if err != nil {
+				return err
+			}
 		} else {
-			app.Recommend = 9999
+			list = updateRes.AppList
 		}
-		app.ReadMe = l.ReadMe
-		app.LastModified = l.LastModified
-		versions := l.Versions
-		detailsMap := getAppDetails(app.Details, versions)
-		for _, v := range versions {
-			version := v.Name
-			detail := detailsMap[version]
-			versionUrl := fmt.Sprintf("%s/%s/%s", baseRemoteUrl, app.Key, version)
+		settingService := NewISettingService()
+		_ = settingService.Update("AppStoreSyncStatus", constant.Syncing)
 
-			if _, ok := InitTypes[app.Type]; ok {
-				dockerComposeUrl := fmt.Sprintf("%s/%s", versionUrl, "docker-compose.yml")
-				_, composeRes, err := httpUtil.HandleGetWithTransport(dockerComposeUrl, http.MethodGet, transport, constant.TimeOut20s)
-				if err != nil {
-					return err
-				}
-				detail.DockerCompose = string(composeRes)
-			} else {
-				detail.DockerCompose = ""
+		var (
+			tags      []*model.Tag
+			appTags   []*model.AppTag
+			oldAppIds []uint
+		)
+		for _, t := range list.Extra.Tags {
+			tags = append(tags, &model.Tag{
+				Key:  t.Key,
+				Name: t.Name,
+				Sort: t.Sort,
+			})
+		}
+		oldApps, err := appRepo.GetBy(appRepo.WithResource(constant.AppResourceRemote))
+		if err != nil {
+			return err
+		}
+		for _, old := range oldApps {
+			oldAppIds = append(oldAppIds, old.ID)
+		}
+
+		transport := xpack.LoadRequestTransport()
+		baseRemoteUrl := fmt.Sprintf("%s/%s/1panel", global.CONF.System.AppRepo, global.CONF.System.Mode)
+		appsMap := getApps(oldApps, list.Apps)
+
+		t.LogStart(i18n.GetMsgByKey("SyncAppDetail"))
+		for _, l := range list.Apps {
+			app := appsMap[l.AppProperty.Key]
+			_, iconRes, err := httpUtil.HandleGetWithTransport(l.Icon, http.MethodGet, transport, constant.TimeOut20s)
+			if err != nil {
+				return err
+			}
+			iconStr := ""
+			if !strings.Contains(string(iconRes), "<xml>") {
+				iconStr = base64.StdEncoding.EncodeToString(iconRes)
 			}
 
-			paramByte, _ := json.Marshal(v.AppForm)
-			detail.Params = string(paramByte)
-			detail.DownloadUrl = fmt.Sprintf("%s/%s", versionUrl, app.Key+"-"+version+".tar.gz")
-			detail.DownloadCallBackUrl = v.DownloadCallBackUrl
-			detail.Update = true
-			detail.LastModified = v.LastModified
-			detailsMap[version] = detail
-		}
-		var newDetails []model.AppDetail
-		for _, detail := range detailsMap {
-			newDetails = append(newDetails, detail)
-		}
-		app.Details = newDetails
-		appsMap[l.AppProperty.Key] = app
-	}
-
-	global.LOG.Infof("Synchronization of application details Success")
-
-	var (
-		addAppArray    []model.App
-		updateAppArray []model.App
-		deleteAppArray []model.App
-		deleteIds      []uint
-		tagMap         = make(map[string]uint, len(tags))
-	)
-
-	for _, v := range appsMap {
-		if v.ID == 0 {
-			addAppArray = append(addAppArray, v)
-		} else {
-			if v.Status == constant.AppTakeDown {
-				installs, _ := appInstallRepo.ListBy(appInstallRepo.WithAppId(v.ID))
-				if len(installs) > 0 {
-					updateAppArray = append(updateAppArray, v)
-					continue
-				}
-				deleteAppArray = append(deleteAppArray, v)
-				deleteIds = append(deleteIds, v.ID)
+			app.Icon = iconStr
+			app.TagsKey = l.AppProperty.Tags
+			if l.AppProperty.Recommend > 0 {
+				app.Recommend = l.AppProperty.Recommend
 			} else {
-				updateAppArray = append(updateAppArray, v)
+				app.Recommend = 9999
 			}
-		}
-	}
-	tx, ctx := getTxAndContext()
-	defer tx.Rollback()
-	if len(addAppArray) > 0 {
-		if err = appRepo.BatchCreate(ctx, addAppArray); err != nil {
-			return
-		}
-	}
-	if len(deleteAppArray) > 0 {
-		if err = appRepo.BatchDelete(ctx, deleteAppArray); err != nil {
-			return
-		}
-		if err = appDetailRepo.DeleteByAppIds(ctx, deleteIds); err != nil {
-			return
-		}
-	}
-	if err = tagRepo.DeleteAll(ctx); err != nil {
-		return
-	}
-	if len(tags) > 0 {
-		if err = tagRepo.BatchCreate(ctx, tags); err != nil {
-			return
-		}
-		for _, t := range tags {
-			tagMap[t.Key] = t.ID
-		}
-	}
-	for _, update := range updateAppArray {
-		if err = appRepo.Save(ctx, &update); err != nil {
-			return
-		}
-	}
-	apps := append(addAppArray, updateAppArray...)
+			app.ReadMe = l.ReadMe
+			app.LastModified = l.LastModified
+			versions := l.Versions
+			detailsMap := getAppDetails(app.Details, versions)
+			for _, v := range versions {
+				version := v.Name
+				detail := detailsMap[version]
+				versionUrl := fmt.Sprintf("%s/%s/%s", baseRemoteUrl, app.Key, version)
 
-	var (
-		addDetails    []model.AppDetail
-		updateDetails []model.AppDetail
-		deleteDetails []model.AppDetail
-	)
-	for _, app := range apps {
-		for _, t := range app.TagsKey {
-			tagId, ok := tagMap[t]
-			if ok {
-				appTags = append(appTags, &model.AppTag{
-					AppId: app.ID,
-					TagId: tagId,
-				})
-			}
-		}
-		for _, d := range app.Details {
-			d.AppId = app.ID
-			if d.ID == 0 {
-				addDetails = append(addDetails, d)
-			} else {
-				if d.Status == constant.AppTakeDown {
-					runtime, _ := runtimeRepo.GetFirst(runtimeRepo.WithDetailId(d.ID))
-					if runtime != nil {
-						updateDetails = append(updateDetails, d)
-						continue
+				if _, ok := InitTypes[app.Type]; ok {
+					dockerComposeUrl := fmt.Sprintf("%s/%s", versionUrl, "docker-compose.yml")
+					_, composeRes, err := httpUtil.HandleGetWithTransport(dockerComposeUrl, http.MethodGet, transport, constant.TimeOut20s)
+					if err != nil {
+						return err
 					}
-					installs, _ := appInstallRepo.ListBy(appInstallRepo.WithDetailIdsIn([]uint{d.ID}))
-					if len(installs) > 0 {
-						updateDetails = append(updateDetails, d)
-						continue
-					}
-					deleteDetails = append(deleteDetails, d)
+					detail.DockerCompose = string(composeRes)
 				} else {
-					updateDetails = append(updateDetails, d)
+					detail.DockerCompose = ""
+				}
+
+				paramByte, _ := json.Marshal(v.AppForm)
+				detail.Params = string(paramByte)
+				detail.DownloadUrl = fmt.Sprintf("%s/%s", versionUrl, app.Key+"-"+version+".tar.gz")
+				detail.DownloadCallBackUrl = v.DownloadCallBackUrl
+				detail.Update = true
+				detail.LastModified = v.LastModified
+				detailsMap[version] = detail
+			}
+			var newDetails []model.AppDetail
+			for _, detail := range detailsMap {
+				newDetails = append(newDetails, detail)
+			}
+			app.Details = newDetails
+			appsMap[l.AppProperty.Key] = app
+		}
+		t.LogSuccess(i18n.GetMsgByKey("SyncAppDetail"))
+
+		var (
+			addAppArray    []model.App
+			updateAppArray []model.App
+			deleteAppArray []model.App
+			deleteIds      []uint
+			tagMap         = make(map[string]uint, len(tags))
+		)
+
+		for _, v := range appsMap {
+			if v.ID == 0 {
+				addAppArray = append(addAppArray, v)
+			} else {
+				if v.Status == constant.AppTakeDown {
+					installs, _ := appInstallRepo.ListBy(appInstallRepo.WithAppId(v.ID))
+					if len(installs) > 0 {
+						updateAppArray = append(updateAppArray, v)
+						continue
+					}
+					deleteAppArray = append(deleteAppArray, v)
+					deleteIds = append(deleteIds, v.ID)
+				} else {
+					updateAppArray = append(updateAppArray, v)
 				}
 			}
 		}
-	}
-	if len(addDetails) > 0 {
-		if err = appDetailRepo.BatchCreate(ctx, addDetails); err != nil {
-			return
-		}
-	}
-	if len(deleteDetails) > 0 {
-		if err = appDetailRepo.BatchDelete(ctx, deleteDetails); err != nil {
-			return
-		}
-	}
-	for _, u := range updateDetails {
-		if err = appDetailRepo.Update(ctx, u); err != nil {
-			return
-		}
-	}
 
-	if len(oldAppIds) > 0 {
-		if err = appTagRepo.DeleteByAppIds(ctx, oldAppIds); err != nil {
+		if len(addAppArray) > 0 {
+			if err = appRepo.BatchCreate(context.Background(), addAppArray); err != nil {
+				return
+			}
+		}
+		if len(deleteAppArray) > 0 {
+			if err = appRepo.BatchDelete(context.Background(), deleteAppArray); err != nil {
+				return
+			}
+			if err = appDetailRepo.DeleteByAppIds(context.Background(), deleteIds); err != nil {
+				return
+			}
+		}
+		if err = tagRepo.DeleteAll(context.Background()); err != nil {
 			return
 		}
-	}
-
-	if len(appTags) > 0 {
-		if err = appTagRepo.BatchCreate(ctx, appTags); err != nil {
-			return
+		if len(tags) > 0 {
+			if err = tagRepo.BatchCreate(context.Background(), tags); err != nil {
+				return
+			}
+			for _, tag := range tags {
+				tagMap[tag.Key] = tag.ID
+			}
 		}
-	}
-	tx.Commit()
+		for _, update := range updateAppArray {
+			if err = appRepo.Save(context.Background(), &update); err != nil {
+				return
+			}
+		}
+		apps := append(addAppArray, updateAppArray...)
 
-	_ = settingService.Update("AppStoreSyncStatus", constant.SyncSuccess)
-	_ = settingService.Update("AppStoreLastModified", strconv.Itoa(list.LastModified))
+		var (
+			addDetails    []model.AppDetail
+			updateDetails []model.AppDetail
+			deleteDetails []model.AppDetail
+		)
+		for _, app := range apps {
+			for _, tag := range app.TagsKey {
+				tagId, ok := tagMap[tag]
+				if ok {
+					appTags = append(appTags, &model.AppTag{
+						AppId: app.ID,
+						TagId: tagId,
+					})
+				}
+			}
+			for _, d := range app.Details {
+				d.AppId = app.ID
+				if d.ID == 0 {
+					addDetails = append(addDetails, d)
+				} else {
+					if d.Status == constant.AppTakeDown {
+						runtime, _ := runtimeRepo.GetFirst(runtimeRepo.WithDetailId(d.ID))
+						if runtime != nil {
+							updateDetails = append(updateDetails, d)
+							continue
+						}
+						installs, _ := appInstallRepo.ListBy(appInstallRepo.WithDetailIdsIn([]uint{d.ID}))
+						if len(installs) > 0 {
+							updateDetails = append(updateDetails, d)
+							continue
+						}
+						deleteDetails = append(deleteDetails, d)
+					} else {
+						updateDetails = append(updateDetails, d)
+					}
+				}
+			}
+		}
+		if len(addDetails) > 0 {
+			if err = appDetailRepo.BatchCreate(context.Background(), addDetails); err != nil {
+				return
+			}
+		}
+		if len(deleteDetails) > 0 {
+			if err = appDetailRepo.BatchDelete(context.Background(), deleteDetails); err != nil {
+				return
+			}
+		}
+		for _, u := range updateDetails {
+			if err = appDetailRepo.Update(context.Background(), u); err != nil {
+				return
+			}
+		}
 
-	global.LOG.Infof("Synchronization with the App Store was successful!")
-	return
+		if len(oldAppIds) > 0 {
+			if err = appTagRepo.DeleteByAppIds(context.Background(), oldAppIds); err != nil {
+				return
+			}
+		}
+
+		if len(appTags) > 0 {
+			if err = appTagRepo.BatchCreate(context.Background(), appTags); err != nil {
+				return
+			}
+		}
+
+		_ = settingService.Update("AppStoreSyncStatus", constant.SyncSuccess)
+		_ = settingService.Update("AppStoreLastModified", strconv.Itoa(list.LastModified))
+		t.Log(i18n.GetMsgByKey("AppStoreSyncSuccess"))
+		return nil
+	}, nil)
+
+	return syncTask.Execute()
 }

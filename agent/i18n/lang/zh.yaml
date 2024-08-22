@@ -62,6 +62,9 @@ PullImageStart: "开始拉取镜像 {{ .name }}"
 PullImageSuccess: "镜像拉取成功"
 UpgradeAppStart: "开始升级应用 {{ .name }}"
 UpgradeAppSuccess: "应用  {{ .name }} 升级成功"
+AppStoreIsLastVersion: "应用商店已经是最新版本"
+AppStoreSyncSuccess: "应用商店同步成功"
+SyncAppDetail: "同步应用配置"
 
 #file
 ErrFileCanNotRead: "此文件不支持预览"
@@ -124,7 +127,7 @@ ExecShellSuccess: "脚本执行成功"
 ErrUserIsExist: "当前用户已存在，请重新输入"
 ErrDatabaseIsExist: "当前数据库已存在，请重新输入"
 ErrExecTimeOut: "SQL 执行超时，请检查数据库"
-ErrRemoteExist: "远程数据库已存在该名称，请修改后重试"vv
+ErrRemoteExist: "远程数据库已存在该名称，请修改后重试"
 ErrLocalExist: "本地数据库已存在该名称，请修改后重试"
 
 #redis
@@ -233,3 +236,5 @@ Stop: "停止"
 Image: "镜像"
 AppLink: "关联应用"
 EnableSSL: "开启 HTTPS"
+AppStore: "应用商店"
+TaskSync: "同步"

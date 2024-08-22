@@ -13,6 +13,21 @@ import (
 	"gorm.io/gorm/logger"
 )
 
+func GetDBWithPath(dbPath string) (*gorm.DB, error) {
+	db, _ := gorm.Open(sqlite.Open(dbPath), &gorm.Config{
+		DisableForeignKeyConstraintWhenMigrating: true,
+		Logger:                                   newLogger(),
+	})
+	sqlDB, dbError := db.DB()
+	if dbError != nil {
+		return nil, dbError
+	}
+	sqlDB.SetConnMaxIdleTime(10)
+	sqlDB.SetMaxOpenConns(100)
+	sqlDB.SetConnMaxLifetime(time.Hour)
+	return db, nil
+}
+
 func Init() {
 	if _, err := os.Stat(global.CONF.System.DbPath); err != nil {
 		if err := os.MkdirAll(global.CONF.System.DbPath, os.ModePerm); err != nil {
@@ -29,25 +44,35 @@ func Init() {
 	}
 
 	initMonitorDB()
+	initTaskDB()
 
-	db, err := gorm.Open(sqlite.Open(fullPath), &gorm.Config{
-		DisableForeignKeyConstraintWhenMigrating: true,
-		Logger:                                   newLogger(),
-	})
+	db, err := GetDBWithPath(fullPath)
 	if err != nil {
 		panic(err)
 	}
-	sqlDB, dbError := db.DB()
-	if dbError != nil {
-		panic(dbError)
-	}
-	sqlDB.SetConnMaxIdleTime(10)
-	sqlDB.SetMaxOpenConns(100)
-	sqlDB.SetConnMaxLifetime(time.Hour)
 
 	global.DB = db
 	global.LOG.Info("init db successfully")
 
+}
+
+func initTaskDB() {
+	fullPath := path.Join(global.CONF.System.DbPath, "task.db")
+	if _, err := os.Stat(fullPath); err != nil {
+		f, err := os.Create(fullPath)
+		if err != nil {
+			panic(fmt.Errorf("init task db file failed, err: %v", err))
+		}
+		_ = f.Close()
+	}
+
+	db, err := GetDBWithPath(fullPath)
+	if err != nil {
+		panic(err)
+	}
+
+	global.TaskDB = db
+	global.LOG.Info("init task db successfully")
 }
 
 func initMonitorDB() {
