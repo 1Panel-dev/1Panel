@@ -15,11 +15,13 @@ export namespace App {
         limit: number;
         website: string;
         github: string;
+        readme: string;
     }
 
     export interface AppDTO extends App {
         versions: string[];
         installed: boolean;
+        architectures: string;
     }
 
     export interface Tag {
@@ -47,6 +49,8 @@ export namespace App {
         dockerCompose: string;
         image: string;
         hostMode?: boolean;
+        memoryLimit: number;
+        architectures: string;
     }
 
     export interface AppReq extends ReqPage {

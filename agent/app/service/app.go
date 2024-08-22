@@ -66,6 +66,13 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 	if req.Resource != "" && req.Resource != "all" {
 		opts = append(opts, appRepo.WithResource(req.Resource))
 	}
+	if req.ShowCurrentArch {
+		info, err := NewIDashboardService().LoadOsInfo()
+		if err != nil {
+			return nil, err
+		}
+		opts = append(opts, appRepo.WithArch(info.KernelArch))
+	}
 	if len(req.Tags) != 0 {
 		tags, err := tagRepo.GetByKeys(req.Tags)
 		if err != nil {
@@ -102,6 +109,8 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 			ShortDescEn: ap.ShortDescEn,
 			Resource:    ap.Resource,
 			Limit:       ap.Limit,
+			Website:     ap.Website,
+			Github:      ap.Github,
 		}
 		appDTOs = append(appDTOs, appDTO)
 		appTags, err := appTagRepo.GetByAppId(ap.ID)
@@ -253,6 +262,8 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 	if err := checkLimit(app); err != nil {
 		appDetailDTO.Enable = false
 	}
+	appDetailDTO.Architectures = app.Architectures
+	appDetailDTO.MemoryLimit = app.MemoryLimit
 	return appDetailDTO, nil
 }
 func (a AppService) GetAppDetailByID(id uint) (*response.AppDetailDTO, error) {

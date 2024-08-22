@@ -42,6 +42,8 @@ type AppDto struct {
 	Versions    []string    `json:"versions"`
 	Limit       int         `json:"limit"`
 	Tags        []model.Tag `json:"tags"`
+	Github      string      `json:"github"`
+	Website     string      `json:"website"`
 }
 
 type TagDTO struct {
@@ -65,10 +67,12 @@ type AppInstalledCheck struct {
 
 type AppDetailDTO struct {
 	model.AppDetail
-	Enable   bool        `json:"enable"`
-	Params   interface{} `json:"params"`
-	Image    string      `json:"image"`
-	HostMode bool        `json:"hostMode"`
+	Enable        bool        `json:"enable"`
+	Params        interface{} `json:"params"`
+	Image         string      `json:"image"`
+	HostMode      bool        `json:"hostMode"`
+	Architectures string      `json:"architectures"`
+	MemoryLimit   int         `json:"memoryLimit"`
 }
 
 type IgnoredApp struct {

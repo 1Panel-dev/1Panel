@@ -1118,6 +1118,8 @@ func getApps(oldApps []model.App, items []dto.AppDefine) map[string]model.App {
 		app.Status = constant.AppNormal
 		app.LastModified = item.LastModified
 		app.ReadMe = item.ReadMe
+		app.MemoryLimit = config.MemoryLimit
+		app.Architectures = strings.Join(config.Architectures, ",")
 		apps[key] = app
 	}
 	return apps

@@ -26,6 +26,8 @@ type App struct {
 	Resource           string `json:"resource" gorm:"not null;default:remote"`
 	ReadMe             string `json:"readMe"`
 	LastModified       int    `json:"lastModified"`
+	Architectures      string `json:"architectures"`
+	MemoryLimit        int    `json:"memoryLimit"`
 
 	Details []AppDetail `json:"-" gorm:"-:migration"`
 	TagsKey []string    `json:"tags" yaml:"tags" gorm:"-"`
