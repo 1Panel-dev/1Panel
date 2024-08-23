@@ -43,7 +43,7 @@ type IAppService interface {
 	SyncAppListFromRemote(taskID string) error
 	GetAppUpdate() (*response.AppUpdateRes, error)
 	GetAppDetailByID(id uint) (*response.AppDetailDTO, error)
-	SyncAppListFromLocal()
+	SyncAppListFromLocal(taskID string)
 	GetIgnoredApp() ([]response.IgnoredApp, error)
 }
 
@@ -489,231 +489,236 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 	return
 }
 
-func (a AppService) SyncAppListFromLocal() {
-	fileOp := files.NewFileOp()
-	localAppDir := constant.LocalAppResourceDir
-	if !fileOp.Stat(localAppDir) {
-		return
-	}
+func (a AppService) SyncAppListFromLocal(TaskID string) {
 	var (
 		err        error
 		dirEntries []os.DirEntry
 		localApps  []model.App
 	)
 
-	defer func() {
-		if err != nil {
-			global.LOG.Errorf("Sync local app failed %v", err)
-		}
-	}()
-
-	global.LOG.Infof("Starting local application synchronization ...")
-	dirEntries, err = os.ReadDir(localAppDir)
+	syncTask, err := task.NewTaskWithOps(i18n.GetMsgByKey("LocalApp"), task.TaskSync, task.TaskScopeAppStore, TaskID, 0)
 	if err != nil {
+		global.LOG.Errorf("Create sync task failed %v", err)
 		return
 	}
-	for _, dirEntry := range dirEntries {
-		if dirEntry.IsDir() {
-			appDir := filepath.Join(localAppDir, dirEntry.Name())
-			appDirEntries, err := os.ReadDir(appDir)
-			if err != nil {
-				global.LOG.Errorf(i18n.GetMsgWithMap("ErrAppDirNull", map[string]interface{}{"name": dirEntry.Name(), "err": err.Error()}))
-				continue
-			}
-			app, err := handleLocalApp(appDir)
-			if err != nil {
-				global.LOG.Errorf(i18n.GetMsgWithMap("LocalAppErr", map[string]interface{}{"name": dirEntry.Name(), "err": err.Error()}))
-				continue
-			}
-			var appDetails []model.AppDetail
-			for _, appDirEntry := range appDirEntries {
-				if appDirEntry.IsDir() {
-					appDetail := model.AppDetail{
-						Version: appDirEntry.Name(),
-						Status:  constant.AppNormal,
-					}
-					versionDir := filepath.Join(appDir, appDirEntry.Name())
-					if err = handleLocalAppDetail(versionDir, &appDetail); err != nil {
-						global.LOG.Errorf(i18n.GetMsgWithMap("LocalAppVersionErr", map[string]interface{}{"name": app.Name, "version": appDetail.Version, "err": err.Error()}))
-						continue
-					}
-					appDetails = append(appDetails, appDetail)
-				}
-			}
-			if len(appDetails) > 0 {
-				app.Details = appDetails
-				localApps = append(localApps, *app)
-			} else {
-				global.LOG.Errorf(i18n.GetMsgWithMap("LocalAppVersionNull", map[string]interface{}{"name": app.Name}))
-			}
+
+	syncTask.AddSubTask(task.GetTaskName(i18n.GetMsgByKey("LocalApp"), task.TaskSync, task.TaskScopeAppStore), func(t *task.Task) (err error) {
+		fileOp := files.NewFileOp()
+		localAppDir := constant.LocalAppResourceDir
+		if !fileOp.Stat(localAppDir) {
+			return nil
 		}
-	}
-
-	var (
-		newApps    []model.App
-		deleteApps []model.App
-		updateApps []model.App
-		oldAppIds  []uint
-
-		deleteAppIds     []uint
-		deleteAppDetails []model.AppDetail
-		newAppDetails    []model.AppDetail
-		updateDetails    []model.AppDetail
-
-		appTags []*model.AppTag
-	)
-
-	oldApps, _ := appRepo.GetBy(appRepo.WithResource(constant.AppResourceLocal))
-	apps := make(map[string]model.App, len(oldApps))
-	for _, old := range oldApps {
-		old.Status = constant.AppTakeDown
-		apps[old.Key] = old
-	}
-	for _, app := range localApps {
-		if oldApp, ok := apps[app.Key]; ok {
-			app.ID = oldApp.ID
-			appDetails := make(map[string]model.AppDetail, len(oldApp.Details))
-			for _, old := range oldApp.Details {
-				old.Status = constant.AppTakeDown
-				appDetails[old.Version] = old
-			}
-			for i, newDetail := range app.Details {
-				version := newDetail.Version
-				newDetail.Status = constant.AppNormal
-				newDetail.AppId = app.ID
-				oldDetail, exist := appDetails[version]
-				if exist {
-					newDetail.ID = oldDetail.ID
-					delete(appDetails, version)
-				}
-				app.Details[i] = newDetail
-			}
-			for _, v := range appDetails {
-				app.Details = append(app.Details, v)
-			}
+		dirEntries, err = os.ReadDir(localAppDir)
+		if err != nil {
+			return
 		}
-		app.TagsKey = append(app.TagsKey, constant.AppResourceLocal)
-		apps[app.Key] = app
-	}
-
-	for _, app := range apps {
-		if app.ID == 0 {
-			newApps = append(newApps, app)
-		} else {
-			oldAppIds = append(oldAppIds, app.ID)
-			if app.Status == constant.AppTakeDown {
-				installs, _ := appInstallRepo.ListBy(appInstallRepo.WithAppId(app.ID))
-				if len(installs) > 0 {
-					updateApps = append(updateApps, app)
+		for _, dirEntry := range dirEntries {
+			if dirEntry.IsDir() {
+				appDir := filepath.Join(localAppDir, dirEntry.Name())
+				appDirEntries, err := os.ReadDir(appDir)
+				if err != nil {
+					t.Log(i18n.GetWithNameAndErr("ErrAppDirNull", dirEntry.Name(), err))
 					continue
 				}
-				deleteAppIds = append(deleteAppIds, app.ID)
-				deleteApps = append(deleteApps, app)
-				deleteAppDetails = append(deleteAppDetails, app.Details...)
-			} else {
-				updateApps = append(updateApps, app)
-			}
-		}
-
-	}
-
-	tags, _ := tagRepo.All()
-	tagMap := make(map[string]uint, len(tags))
-	for _, tag := range tags {
-		tagMap[tag.Key] = tag.ID
-	}
-
-	tx, ctx := getTxAndContext()
-	defer tx.Rollback()
-	if len(newApps) > 0 {
-		if err = appRepo.BatchCreate(ctx, newApps); err != nil {
-			return
-		}
-	}
-	for _, update := range updateApps {
-		if err = appRepo.Save(ctx, &update); err != nil {
-			return
-		}
-	}
-	if len(deleteApps) > 0 {
-		if err = appRepo.BatchDelete(ctx, deleteApps); err != nil {
-			return
-		}
-		if err = appDetailRepo.DeleteByAppIds(ctx, deleteAppIds); err != nil {
-			return
-		}
-	}
-
-	if err = appTagRepo.DeleteByAppIds(ctx, oldAppIds); err != nil {
-		return
-	}
-	for _, newApp := range newApps {
-		if newApp.ID > 0 {
-			for _, detail := range newApp.Details {
-				detail.AppId = newApp.ID
-				newAppDetails = append(newAppDetails, detail)
-			}
-		}
-	}
-	for _, update := range updateApps {
-		for _, detail := range update.Details {
-			if detail.ID == 0 {
-				detail.AppId = update.ID
-				newAppDetails = append(newAppDetails, detail)
-			} else {
-				if detail.Status == constant.AppNormal {
-					updateDetails = append(updateDetails, detail)
+				app, err := handleLocalApp(appDir)
+				if err != nil {
+					t.Log(i18n.GetWithNameAndErr("LocalAppErr", dirEntry.Name(), err))
+					continue
+				}
+				var appDetails []model.AppDetail
+				for _, appDirEntry := range appDirEntries {
+					if appDirEntry.IsDir() {
+						appDetail := model.AppDetail{
+							Version: appDirEntry.Name(),
+							Status:  constant.AppNormal,
+						}
+						versionDir := filepath.Join(appDir, appDirEntry.Name())
+						if err = handleLocalAppDetail(versionDir, &appDetail); err != nil {
+							t.Log(i18n.GetMsgWithMap("LocalAppVersionErr", map[string]interface{}{"name": app.Name, "version": appDetail.Version, "err": err.Error()}))
+							continue
+						}
+						appDetails = append(appDetails, appDetail)
+					}
+				}
+				if len(appDetails) > 0 {
+					app.Details = appDetails
+					localApps = append(localApps, *app)
 				} else {
-					deleteAppDetails = append(deleteAppDetails, detail)
+					t.Log(i18n.GetWithName("LocalAppVersionNull", app.Name))
 				}
 			}
 		}
-	}
 
-	allApps := append(newApps, updateApps...)
-	for _, app := range allApps {
-		for _, t := range app.TagsKey {
-			tagId, ok := tagMap[t]
-			if ok {
-				appTags = append(appTags, &model.AppTag{
-					AppId: app.ID,
-					TagId: tagId,
-				})
+		var (
+			newApps    []model.App
+			deleteApps []model.App
+			updateApps []model.App
+			oldAppIds  []uint
+
+			deleteAppIds     []uint
+			deleteAppDetails []model.AppDetail
+			newAppDetails    []model.AppDetail
+			updateDetails    []model.AppDetail
+
+			appTags []*model.AppTag
+		)
+
+		oldApps, _ := appRepo.GetBy(appRepo.WithResource(constant.AppResourceLocal))
+		apps := make(map[string]model.App, len(oldApps))
+		for _, old := range oldApps {
+			old.Status = constant.AppTakeDown
+			apps[old.Key] = old
+		}
+		for _, app := range localApps {
+			if oldApp, ok := apps[app.Key]; ok {
+				app.ID = oldApp.ID
+				appDetails := make(map[string]model.AppDetail, len(oldApp.Details))
+				for _, old := range oldApp.Details {
+					old.Status = constant.AppTakeDown
+					appDetails[old.Version] = old
+				}
+				for i, newDetail := range app.Details {
+					version := newDetail.Version
+					newDetail.Status = constant.AppNormal
+					newDetail.AppId = app.ID
+					oldDetail, exist := appDetails[version]
+					if exist {
+						newDetail.ID = oldDetail.ID
+						delete(appDetails, version)
+					}
+					app.Details[i] = newDetail
+				}
+				for _, v := range appDetails {
+					app.Details = append(app.Details, v)
+				}
+			}
+			app.TagsKey = append(app.TagsKey, constant.AppResourceLocal)
+			apps[app.Key] = app
+		}
+
+		for _, app := range apps {
+			if app.ID == 0 {
+				newApps = append(newApps, app)
+			} else {
+				oldAppIds = append(oldAppIds, app.ID)
+				if app.Status == constant.AppTakeDown {
+					installs, _ := appInstallRepo.ListBy(appInstallRepo.WithAppId(app.ID))
+					if len(installs) > 0 {
+						updateApps = append(updateApps, app)
+						continue
+					}
+					deleteAppIds = append(deleteAppIds, app.ID)
+					deleteApps = append(deleteApps, app)
+					deleteAppDetails = append(deleteAppDetails, app.Details...)
+				} else {
+					updateApps = append(updateApps, app)
+				}
+			}
+
+		}
+
+		tags, _ := tagRepo.All()
+		tagMap := make(map[string]uint, len(tags))
+		for _, tag := range tags {
+			tagMap[tag.Key] = tag.ID
+		}
+
+		tx, ctx := getTxAndContext()
+		defer tx.Rollback()
+		if len(newApps) > 0 {
+			if err = appRepo.BatchCreate(ctx, newApps); err != nil {
+				return
 			}
 		}
-	}
-
-	if len(newAppDetails) > 0 {
-		if err = appDetailRepo.BatchCreate(ctx, newAppDetails); err != nil {
-			return
+		for _, update := range updateApps {
+			if err = appRepo.Save(ctx, &update); err != nil {
+				return
+			}
 		}
-	}
-
-	for _, updateAppDetail := range updateDetails {
-		if err = appDetailRepo.Update(ctx, updateAppDetail); err != nil {
-			return
+		if len(deleteApps) > 0 {
+			if err = appRepo.BatchDelete(ctx, deleteApps); err != nil {
+				return
+			}
+			if err = appDetailRepo.DeleteByAppIds(ctx, deleteAppIds); err != nil {
+				return
+			}
 		}
-	}
 
-	if len(deleteAppDetails) > 0 {
-		if err = appDetailRepo.BatchDelete(ctx, deleteAppDetails); err != nil {
-			return
-		}
-	}
-
-	if len(oldAppIds) > 0 {
 		if err = appTagRepo.DeleteByAppIds(ctx, oldAppIds); err != nil {
 			return
 		}
-	}
-
-	if len(appTags) > 0 {
-		if err = appTagRepo.BatchCreate(ctx, appTags); err != nil {
-			return
+		for _, newApp := range newApps {
+			if newApp.ID > 0 {
+				for _, detail := range newApp.Details {
+					detail.AppId = newApp.ID
+					newAppDetails = append(newAppDetails, detail)
+				}
+			}
 		}
-	}
-	tx.Commit()
-	global.LOG.Infof("Synchronization of local applications completed")
+		for _, update := range updateApps {
+			for _, detail := range update.Details {
+				if detail.ID == 0 {
+					detail.AppId = update.ID
+					newAppDetails = append(newAppDetails, detail)
+				} else {
+					if detail.Status == constant.AppNormal {
+						updateDetails = append(updateDetails, detail)
+					} else {
+						deleteAppDetails = append(deleteAppDetails, detail)
+					}
+				}
+			}
+		}
+
+		allApps := append(newApps, updateApps...)
+		for _, app := range allApps {
+			for _, t := range app.TagsKey {
+				tagId, ok := tagMap[t]
+				if ok {
+					appTags = append(appTags, &model.AppTag{
+						AppId: app.ID,
+						TagId: tagId,
+					})
+				}
+			}
+		}
+
+		if len(newAppDetails) > 0 {
+			if err = appDetailRepo.BatchCreate(ctx, newAppDetails); err != nil {
+				return
+			}
+		}
+
+		for _, updateAppDetail := range updateDetails {
+			if err = appDetailRepo.Update(ctx, updateAppDetail); err != nil {
+				return
+			}
+		}
+
+		if len(deleteAppDetails) > 0 {
+			if err = appDetailRepo.BatchDelete(ctx, deleteAppDetails); err != nil {
+				return
+			}
+		}
+
+		if len(oldAppIds) > 0 {
+			if err = appTagRepo.DeleteByAppIds(ctx, oldAppIds); err != nil {
+				return
+			}
+		}
+
+		if len(appTags) > 0 {
+			if err = appTagRepo.BatchCreate(ctx, appTags); err != nil {
+				return
+			}
+		}
+		tx.Commit()
+		global.LOG.Infof("Synchronization of local applications completed")
+		return nil
+	}, nil)
+	go func() {
+		_ = syncTask.Execute()
+	}()
 }
 
 func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
@@ -941,24 +946,31 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 			}
 		}
 
+		tx, ctx := getTxAndContext()
+		defer func() {
+			if err != nil {
+				tx.Rollback()
+				return
+			}
+		}()
 		if len(addAppArray) > 0 {
-			if err = appRepo.BatchCreate(context.Background(), addAppArray); err != nil {
+			if err = appRepo.BatchCreate(ctx, addAppArray); err != nil {
 				return
 			}
 		}
 		if len(deleteAppArray) > 0 {
-			if err = appRepo.BatchDelete(context.Background(), deleteAppArray); err != nil {
+			if err = appRepo.BatchDelete(ctx, deleteAppArray); err != nil {
 				return
 			}
-			if err = appDetailRepo.DeleteByAppIds(context.Background(), deleteIds); err != nil {
+			if err = appDetailRepo.DeleteByAppIds(ctx, deleteIds); err != nil {
 				return
 			}
 		}
-		if err = tagRepo.DeleteAll(context.Background()); err != nil {
+		if err = tagRepo.DeleteAll(ctx); err != nil {
 			return
 		}
 		if len(tags) > 0 {
-			if err = tagRepo.BatchCreate(context.Background(), tags); err != nil {
+			if err = tagRepo.BatchCreate(ctx, tags); err != nil {
 				return
 			}
 			for _, tag := range tags {
@@ -966,7 +978,7 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 			}
 		}
 		for _, update := range updateAppArray {
-			if err = appRepo.Save(context.Background(), &update); err != nil {
+			if err = appRepo.Save(ctx, &update); err != nil {
 				return
 			}
 		}
@@ -1011,32 +1023,33 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 			}
 		}
 		if len(addDetails) > 0 {
-			if err = appDetailRepo.BatchCreate(context.Background(), addDetails); err != nil {
+			if err = appDetailRepo.BatchCreate(ctx, addDetails); err != nil {
 				return
 			}
 		}
 		if len(deleteDetails) > 0 {
-			if err = appDetailRepo.BatchDelete(context.Background(), deleteDetails); err != nil {
+			if err = appDetailRepo.BatchDelete(ctx, deleteDetails); err != nil {
 				return
 			}
 		}
 		for _, u := range updateDetails {
-			if err = appDetailRepo.Update(context.Background(), u); err != nil {
+			if err = appDetailRepo.Update(ctx, u); err != nil {
 				return
 			}
 		}
 
 		if len(oldAppIds) > 0 {
-			if err = appTagRepo.DeleteByAppIds(context.Background(), oldAppIds); err != nil {
+			if err = appTagRepo.DeleteByAppIds(ctx, oldAppIds); err != nil {
 				return
 			}
 		}
 
 		if len(appTags) > 0 {
-			if err = appTagRepo.BatchCreate(context.Background(), appTags); err != nil {
+			if err = appTagRepo.BatchCreate(ctx, appTags); err != nil {
 				return
 			}
 		}
+		tx.Commit()
 
 		_ = settingService.Update("AppStoreSyncStatus", constant.SyncSuccess)
 		_ = settingService.Update("AppStoreLastModified", strconv.Itoa(list.LastModified))

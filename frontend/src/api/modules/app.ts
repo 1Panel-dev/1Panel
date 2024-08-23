@@ -4,7 +4,11 @@ import { App } from '../interface/app';
 import { TimeoutEnum } from '@/enums/http-enum';
 
 export const SyncApp = (req: App.AppStoreSync) => {
-    return http.post('apps/sync', req);
+    return http.post('apps/sync/remote', req);
+};
+
+export const SyncLocalApp = (req: App.AppStoreSync) => {
+    return http.post('apps/sync/local', req);
 };
 
 export const GetAppListUpdate = () => {

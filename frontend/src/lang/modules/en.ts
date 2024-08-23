@@ -1878,6 +1878,7 @@ const message = {
         supportedArchitectures: 'Architectures',
         link: 'Link',
         showCurrentArch: 'Architecture',
+        syncLocalApp: 'Sync Local App',
     },
     website: {
         website: 'Website',

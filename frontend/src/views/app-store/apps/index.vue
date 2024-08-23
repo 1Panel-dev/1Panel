@@ -53,11 +53,12 @@
             </el-row>
         </template>
         <template #leftToolBar>
-            <el-badge is-dot :hidden="!canUpdate">
-                <el-button @click="sync" type="primary" plain :disabled="syncing">
-                    {{ $t('app.syncAppList') }}
-                </el-button>
-            </el-badge>
+            <el-button @click="sync" type="primary" plain :disabled="syncing">
+                {{ $t('app.syncAppList') }}
+            </el-button>
+            <el-button @click="syncLocal" type="primary" plain :disabled="syncing" class="ml-2">
+                {{ $t('app.syncLocalApp') }}
+            </el-button>
         </template>
         <template #rightToolBar>
             <el-checkbox class="!mr-2.5" v-model="req.showCurrentArch" @change="search(req)">
@@ -174,8 +175,7 @@
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
 import { onMounted, reactive, ref, computed } from 'vue';
-import { GetAppTags, SearchApp, SyncApp } from '@/api/modules/app';
-import i18n from '@/lang';
+import { GetAppTags, SearchApp, SyncApp, SyncLocalApp } from '@/api/modules/app';
 import Install from '../detail/install/index.vue';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
@@ -281,9 +281,25 @@ const sync = () => {
             if (res.message != '') {
                 MsgSuccess(res.message);
             } else {
-                MsgSuccess(i18n.global.t('app.syncStart'));
                 openTaskLog(taskID);
             }
+            canUpdate.value = false;
+            search(req);
+        })
+        .finally(() => {
+            syncing.value = false;
+        });
+};
+
+const syncLocal = () => {
+    const taskID = newUUID();
+    const syncReq = {
+        taskID: taskID,
+    };
+    syncing.value = true;
+    SyncLocalApp(syncReq)
+        .then(() => {
+            openTaskLog(taskID);
             canUpdate.value = false;
             search(req);
         })

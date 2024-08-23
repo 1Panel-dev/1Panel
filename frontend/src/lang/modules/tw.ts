@@ -1744,6 +1744,7 @@ const message = {
         supportedArchitectures: '支持架構',
         link: '鏈接',
         showCurrentArch: '僅顯示當前架構',
+        syncLocalApp: '同步本地應用',
     },
     website: {
         website: '網站',
