@@ -67,12 +67,12 @@ type AppInstalledCheck struct {
 
 type AppDetailDTO struct {
 	model.AppDetail
-	Enable        bool        `json:"enable"`
-	Params        interface{} `json:"params"`
-	Image         string      `json:"image"`
-	HostMode      bool        `json:"hostMode"`
-	Architectures string      `json:"architectures"`
-	MemoryLimit   int         `json:"memoryLimit"`
+	Enable         bool        `json:"enable"`
+	Params         interface{} `json:"params"`
+	Image          string      `json:"image"`
+	HostMode       bool        `json:"hostMode"`
+	Architectures  string      `json:"architectures"`
+	MemoryRequired int         `json:"memoryRequired"`
 }
 
 type IgnoredApp struct {

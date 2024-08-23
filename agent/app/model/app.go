@@ -27,7 +27,7 @@ type App struct {
 	ReadMe             string `json:"readMe"`
 	LastModified       int    `json:"lastModified"`
 	Architectures      string `json:"architectures"`
-	MemoryLimit        int    `json:"memoryLimit"`
+	MemoryRequired     int    `json:"memoryRequired"`
 
 	Details []AppDetail `json:"-" gorm:"-:migration"`
 	TagsKey []string    `json:"tags" yaml:"tags" gorm:"-"`

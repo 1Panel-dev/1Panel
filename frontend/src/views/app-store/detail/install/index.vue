@@ -1,13 +1,19 @@
 <template>
     <DrawerPro v-model="open" :header="$t('app.install')" :back="handleClose" size="large">
         <el-alert
-            :title="$t('app.appInstallWarn')"
+            :title="$t('app.hostModeHelper')"
             class="common-prompt"
             :closable="false"
-            type="error"
-            v-if="!isHostMode"
+            type="warning"
+            v-if="isHostMode"
         />
-        <el-alert :title="$t('app.hostModeHelper')" class="common-prompt" :closable="false" type="warning" v-else />
+        <el-alert
+            :title="$t('app.memoryRequiredHelper', [computeSizeFromMB(memoryRequired)])"
+            class="common-prompt"
+            :closable="false"
+            type="warning"
+            v-if="memoryRequired > 0"
+        />
         <el-form
             v-loading="loading"
             @submit.prevent
@@ -124,6 +130,7 @@ import { loadResourceLimit } from '@/api/modules/container';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import TaskLog from '@/components/task-log/index.vue';
 import { newUUID } from '@/utils/util';
+import { computeSizeFromMB } from '@/utils/util';
 
 const router = useRouter();
 
@@ -181,6 +188,7 @@ const handleClose = () => {
 const paramKey = ref(1);
 const isHostMode = ref(false);
 const taskLogRef = ref();
+const memoryRequired = ref(0);
 
 const changeUnit = () => {
     if (req.memoryUnit == 'M') {
@@ -228,6 +236,7 @@ const getAppDetail = async (version: string) => {
         isHostMode.value = res.data.hostMode;
         installData.value.params = res.data.params;
         paramKey.value++;
+        memoryRequired.value = res.data.memoryRequired;
     } catch (error) {
     } finally {
         loading.value = false;

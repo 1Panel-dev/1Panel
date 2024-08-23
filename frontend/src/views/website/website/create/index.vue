@@ -120,7 +120,12 @@
                         <el-form-item :label="$t('app.app')" prop="appinstall.appId">
                             <el-row :gutter="20">
                                 <el-col :span="12">
-                                    <el-select v-model="website.appinstall.appId" @change="changeApp()" class="p-w-200">
+                                    <el-select
+                                        v-model="website.appinstall.appId"
+                                        @change="changeApp()"
+                                        class="p-w-200"
+                                        filterable
+                                    >
                                         <el-option
                                             v-for="(app, index) in apps"
                                             :key="index"

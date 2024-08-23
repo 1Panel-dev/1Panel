@@ -1879,6 +1879,7 @@ const message = {
         link: 'Link',
         showCurrentArch: 'Architecture',
         syncLocalApp: 'Sync Local App',
+        memoryRequiredHelper: 'Current application memory requirement {0}',
     },
     website: {
         website: 'Website',

@@ -1745,6 +1745,7 @@ const message = {
         link: '鏈接',
         showCurrentArch: '僅顯示當前架構',
         syncLocalApp: '同步本地應用',
+        memoryRequiredHelper: '目前應用記憶體需求 {0}',
     },
     website: {
         website: '網站',
