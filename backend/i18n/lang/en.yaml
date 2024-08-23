@@ -94,6 +94,7 @@ ErrPathPermission: 'A folder with non-1000:1000 permissions was detected in the 
 ErrDomainIsUsed: "Domain is already used by website {{ .name }}"
 ErrDomainFormat: "{{ .name }} domain format error"
 ErrDefaultAlias: "default is a reserved code name, please use another code name"
+ErrImageNotExist: "Running environment {{.name}} image does not exist, please re-edit the running environment"
 
 #ssl
 ErrSSLCannotDelete: "The certificate {{ .name }} is being used by the website and cannot be removed"
