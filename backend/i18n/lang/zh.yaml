@@ -94,6 +94,7 @@ ErrPathPermission: 'index 目录下检测到非 1000:1000 权限文件夹，可�
 ErrDomainIsUsed: "域名已被网站【{{ .name }}】使用"
 ErrDomainFormat: "{{ .name }} 域名格式不正确"
 ErrDefaultAlias: "default 为保留代号，请使用其他代号"
+ErrImageNotExist: "运行环境 {{.name}} 镜像不存在，请重新编辑运行环境"
 
 #ssl
 ErrSSLCannotDelete: "{{ .name }} 证书正在被网站使用，无法删除"

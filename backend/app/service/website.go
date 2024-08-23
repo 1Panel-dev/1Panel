@@ -9,6 +9,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"os"
 	"path"
 	"reflect"
@@ -312,6 +313,14 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		switch runtime.Type {
 		case constant.RuntimePHP:
 			if runtime.Resource == constant.ResourceAppstore {
+				client, err := docker.NewDockerClient()
+				if err != nil {
+					return err
+				}
+				defer client.Close()
+				if !checkImageExist(client, runtime.Image) {
+					return buserr.WithName("ErrImageNotExist", runtime.Name)
+				}
 				var (
 					req     request.AppInstallCreate
 					install *model.AppInstall
