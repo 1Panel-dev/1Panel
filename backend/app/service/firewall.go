@@ -588,14 +588,6 @@ func (u *FirewallService) addPortsBeforeStart(client firewall.FirewallClient) er
 	if err := client.Port(fireClient.FireInfo{Port: "443", Protocol: "tcp", Strategy: "accept"}, "add"); err != nil {
 		return err
 	}
-	apps := u.loadPortByApp()
-	for _, app := range apps {
-		if len(app.HttpPort) != 0 && app.HttpPort != "0" {
-			if err := client.Port(fireClient.FireInfo{Port: app.HttpPort, Protocol: "tcp", Strategy: "accept"}, "add"); err != nil {
-				return err
-			}
-		}
-	}
 
 	return client.Reload()
 }
