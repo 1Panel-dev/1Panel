@@ -240,7 +240,6 @@ func (u *CronjobService) handleCutWebsiteLog(cronjob *model.Cronjob, startTime t
 			_ = fileOp.WriteFile(srcErrorLogPath, strings.NewReader(""), 0755)
 		}
 		msg := i18n.GetMsgWithMap("CutWebsiteLogSuccess", map[string]interface{}{"name": website.PrimaryDomain, "path": dstFilePath})
-		global.LOG.Infof(msg)
 		msgs = append(msgs, msg)
 	}
 	u.removeExpiredLog(*cronjob)
@@ -327,7 +326,6 @@ func (u *CronjobService) uploadCronjobBackFile(cronjob model.Cronjob, accountMap
 }
 
 func (u *CronjobService) removeExpiredBackup(cronjob model.Cronjob, accountMap map[string]cronjobUploadHelper, record model.BackupRecord) {
-	global.LOG.Infof("start to handle remove expired, retain copies: %d", cronjob.RetainCopies)
 	var opts []repo.DBOption
 	opts = append(opts, commonRepo.WithByFrom("cronjob"))
 	opts = append(opts, backupRepo.WithByCronID(cronjob.ID))
@@ -362,7 +360,6 @@ func (u *CronjobService) removeExpiredBackup(cronjob model.Cronjob, accountMap m
 }
 
 func (u *CronjobService) removeExpiredLog(cronjob model.Cronjob) {
-	global.LOG.Infof("start to handle remove expired, retain copies: %d", cronjob.RetainCopies)
 	records, _ := cronjobRepo.ListRecord(cronjobRepo.WithByJobID(int(cronjob.ID)), commonRepo.WithOrderBy("created_at desc"))
 	if len(records) <= int(cronjob.RetainCopies) {
 		return
